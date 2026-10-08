@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -588,7 +587,7 @@ export default function VisualizadorDesarrolloFarmacoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-desarrollo-farmaco')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-desarrollo-farmaco" />
         <Footer appName="visualizador-desarrollo-farmaco" />
     </div>

@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -677,7 +676,7 @@ export default function VisualizadorMecanicaCuantica() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-mecanica-cuantica')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-mecanica-cuantica" />
       <Footer appName="visualizador-mecanica-cuantica" />
     </div>

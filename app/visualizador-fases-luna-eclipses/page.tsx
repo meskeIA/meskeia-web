@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import styles from './FasesLuna.module.css';
 import {
   MeskeiaLogo,
@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -411,7 +410,6 @@ export default function VisualizadorFasesLunaEclipsesPage() {
 
   const faseActual = FASES[faseIndex];
 
-  const relatedApps = useMemo(() => getRelatedApps('visualizador-fases-luna-eclipses'), []);
 
   return (
     <div className={styles.container}>
@@ -727,7 +725,7 @@ export default function VisualizadorFasesLunaEclipsesPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={relatedApps} />
+        <RelatedApps />
         <ShareCard appName="visualizador-fases-luna-eclipses" />
         <Footer appName="visualizador-fases-luna-eclipses" />
     </div>

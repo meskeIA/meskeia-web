@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -434,7 +433,7 @@ export default function TestMadurezDigitalPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('test-madurez-digital')} />
+      <RelatedApps />
       <ShareCard appName="test-madurez-digital" />
       <Footer appName="test-madurez-digital" />
     </div>

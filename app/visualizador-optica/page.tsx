@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -770,7 +769,7 @@ export default function VisualizadorOpticaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-optica')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-optica" />
         <Footer appName="visualizador-optica" />
     </div>

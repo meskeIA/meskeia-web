@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaAhorrarDinero.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para ahorrar dinero
 const tools = [
@@ -311,7 +310,7 @@ export default function GuiaAhorrarDineroPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('guia-ahorrar-dinero')} />
+      <RelatedApps />
       <ShareCard appName="guia-ahorrar-dinero" />
       <Footer appName="guia-ahorrar-dinero" />
     </div>

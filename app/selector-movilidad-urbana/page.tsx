@@ -12,7 +12,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularResultado,
   TRANSPORTES,
@@ -449,7 +448,7 @@ export default function SelectorMovilidadUrbana() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-movilidad-urbana')} />
+      <RelatedApps />
 
       <ShareCard appName="selector-movilidad-urbana" />
 

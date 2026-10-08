@@ -6,7 +6,6 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, Rela
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   PENSION_VIUDEDAD_2026, RECLAMACION_PREVIA_SS, MINIMOS_VIUDEDAD_2026,
   COMPLEMENTO_MINIMOS_LIMITES_2026, TOPE_COMPLEMENTO_MINIMOS_2026,
@@ -674,7 +673,7 @@ export default function EstimadorPensionViudedad() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-pension-viudedad')} />
+      <RelatedApps />
       <ShareCard appName="estimador-pension-viudedad" />
       <Footer appName="estimador-pension-viudedad" />
     </div>

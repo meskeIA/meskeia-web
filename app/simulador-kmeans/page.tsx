@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorKmeans.module.css';
 import {
@@ -1864,7 +1863,7 @@ export default function SimuladorKmeans() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-kmeans')} />
+      <RelatedApps />
       <ShareCard appName="simulador-kmeans" />
       <Footer appName="simulador-kmeans" />
     </div>

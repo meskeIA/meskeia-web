@@ -5,7 +5,6 @@ import styles from './ChecklistDeclaracionRenta.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatDate } from '@/lib';
 
 // ──────────────────────────────────────────
@@ -736,7 +735,7 @@ export default function ChecklistDeclaracionRentaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('checklist-declaracion-renta')} />
+      <RelatedApps />
       <ShareCard appName="checklist-declaracion-renta" />
       <Footer appName="checklist-declaracion-renta" />
     </div>

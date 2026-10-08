@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorMercadosFinancieros.module.css';
 
 // --- Tipos ---
@@ -799,7 +798,7 @@ export default function VisualizadorMercadosFinancieros() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-mercados-financieros')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-mercados-financieros" />
       <Footer appName="visualizador-mercados-financieros" />
     </div>

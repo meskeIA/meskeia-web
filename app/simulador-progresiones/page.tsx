@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   CASOS,
   TERMINOS_VISIBLES,
@@ -1605,7 +1604,7 @@ export default function SimuladorProgresionesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-progresiones')} />
+      <RelatedApps />
 
       <ShareCard appName="simulador-progresiones" />
 

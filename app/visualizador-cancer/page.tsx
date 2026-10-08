@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes de navegación
@@ -891,7 +890,7 @@ export default function VisualizadorCancerPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-cancer')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-cancer" />
         <Footer appName="visualizador-cancer" />
     </div>

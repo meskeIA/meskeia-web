@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -501,7 +500,7 @@ export default function ChecklistPreMortemPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('checklist-pre-mortem')} />
+        <RelatedApps />
         <ShareCard appName="checklist-pre-mortem" />
         <Footer appName="checklist-pre-mortem" />
     </div>

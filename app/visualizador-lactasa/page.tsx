@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -118,7 +117,6 @@ function getColorBarra(porcentaje: number): string {
 
 export default function VisualizadorLactasa() {
   const [paso, setPaso] = useState(0);
-  const relatedApps = getRelatedApps('visualizador-lactasa');
 
   const coloresBarra = regionesLactosa.map((r) => getColorBarra(r.porcentaje));
 
@@ -405,7 +403,7 @@ export default function VisualizadorLactasa() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-lactasa" />
       <Footer appName="visualizador-lactasa" />
     </div>

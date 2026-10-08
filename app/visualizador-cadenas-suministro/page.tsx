@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './CadenasSuministro.module.css';
 
@@ -911,7 +910,7 @@ export default function VisualizadorCadenasSuministro() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-cadenas-suministro')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-cadenas-suministro" />
       <Footer appName="visualizador-cadenas-suministro" />
     </div>

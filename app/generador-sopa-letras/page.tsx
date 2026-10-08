@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
@@ -721,7 +720,7 @@ export default function GeneradorSopaLetrasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('generador-sopa-letras')} />
+        <RelatedApps />
 
         <ShareCard appName="generador-sopa-letras" />
 

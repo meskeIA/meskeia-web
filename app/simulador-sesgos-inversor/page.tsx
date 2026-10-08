@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorSesgosInversor.module.css';
 
 type Fase = 'inicio' | 'test' | 'resultado';
@@ -733,7 +732,7 @@ export default function SimuladorSesgosInversorPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-sesgos-inversor')} />
+      <RelatedApps />
       <ShareCard appName="simulador-sesgos-inversor" />
       <Footer appName="simulador-sesgos-inversor" />
     </div>

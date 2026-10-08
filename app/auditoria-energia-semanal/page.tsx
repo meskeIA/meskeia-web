@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -475,7 +474,7 @@ export default function AuditoriaEnergiaSemanalPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('auditoria-energia-semanal')} />
+        <RelatedApps />
         <ShareCard appName="auditoria-energia-semanal" />
         <Footer appName="auditoria-energia-semanal" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -520,7 +519,7 @@ export default function TestDelegacionEfectivaPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-delegacion-efectiva')} />
+        <RelatedApps />
         <ShareCard appName="test-delegacion-efectiva" />
         <Footer appName="test-delegacion-efectiva" />
     </div>

@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   calcularRecetaPan,
@@ -817,7 +816,7 @@ export default function CalculadoraRecetaPanPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-receta-pan')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-receta-pan" />
       <Footer appName="calculadora-receta-pan" />
     </div>

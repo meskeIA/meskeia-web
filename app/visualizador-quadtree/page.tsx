@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './VisualizadorQuadtree.module.css';
 
@@ -865,7 +864,7 @@ export default function VisualizadorQuadtreePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-quadtree')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-quadtree" />
       <Footer appName="visualizador-quadtree" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularPuntosAzucar,
   FASES_AZUCAR,
@@ -374,7 +373,7 @@ export default function CalculadoraPuntosAzucarPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-puntos-azucar')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-puntos-azucar" />
       <Footer appName="calculadora-puntos-azucar" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   analizarFormula,
   nombreAFormula,
@@ -764,7 +763,7 @@ export default function FormuladorCompuestosInorganicos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('formulador-compuestos-inorganicos')} />
+      <RelatedApps />
 
       <ShareCard appName="formulador-compuestos-inorganicos" />
 

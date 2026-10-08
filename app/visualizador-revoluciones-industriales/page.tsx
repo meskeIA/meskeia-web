@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -742,7 +741,7 @@ export default function RevolucionesIndustriales() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-revoluciones-industriales')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-revoluciones-industriales" />
       <Footer appName="visualizador-revoluciones-industriales" />
     </div>

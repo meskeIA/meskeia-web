@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -259,7 +258,6 @@ export default function VisualizadorIbuprofeno() {
   const chartRef = useRef<HTMLCanvasElement>(null);
   const chartInstanceRef = useRef<unknown>(null);
 
-  const relatedApps = getRelatedApps('visualizador-ibuprofeno');
 
   // Chart.js: Gráfico de barras horizontales COX-1 vs COX-2
   useEffect(() => {
@@ -637,7 +635,7 @@ export default function VisualizadorIbuprofeno() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-ibuprofeno" />
       <Footer appName="visualizador-ibuprofeno" />
     </div>

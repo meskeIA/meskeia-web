@@ -13,7 +13,6 @@ import {
   NumberInput,
   ShareCard, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 
 // ──────────────────────────────────────────
@@ -384,7 +383,7 @@ export default function OrientadorDeduccionObrasEnergeticasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('orientador-deduccion-obras-energeticas')} />
+        <RelatedApps />
         <ShareCard appName="orientador-deduccion-obras-energeticas" />
         <Footer appName="orientador-deduccion-obras-energeticas" />
     </div>

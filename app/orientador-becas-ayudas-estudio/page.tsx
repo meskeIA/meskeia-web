@@ -14,7 +14,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   CATEGORIAS_BECAS_ESTUDIO,
   FISCAL_BECAS_ESTUDIO_META,
@@ -434,7 +433,7 @@ export default function OrientadorBecasAyudasEstudioPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-becas-ayudas-estudio')} />
+      <RelatedApps />
       <ShareCard appName="orientador-becas-ayudas-estudio" />
       <Footer appName="orientador-becas-ayudas-estudio" />
     </div>

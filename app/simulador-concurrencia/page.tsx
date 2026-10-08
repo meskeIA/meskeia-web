@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorConcurrencia.module.css';
 
 // ============================================================
@@ -935,7 +934,7 @@ export default function SimuladorConcurrencia() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-concurrencia')} />
+      <RelatedApps />
       <ShareCard appName="simulador-concurrencia" />
       <Footer appName="simulador-concurrencia" />
     </div>

@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import styles from './DescongelacionSegura.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import { METODOS_DESCONGELACION, calcularDescongelacion } from '@/lib/calculadoras/descongelacionSegura';
 
 export default function DescongelacionSeguraPage() {
@@ -95,7 +94,7 @@ export default function DescongelacionSeguraPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('descongelacion-segura')} />
+      <RelatedApps />
       <ShareCard appName="descongelacion-segura" />
       <Footer appName="descongelacion-segura" />
     </div>

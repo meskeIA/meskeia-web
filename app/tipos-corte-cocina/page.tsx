@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './TiposCorte.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { CORTES, ETIQUETA_FORMA, type FormaCorte } from '@/lib/guias/cortes-cocina';
 
 const FORMAS: FormaCorte[] = ['dados', 'tiras', 'laminas', 'otros'];
@@ -128,7 +127,7 @@ export default function TiposCorteCocinaPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('tipos-corte-cocina')} />
+      <RelatedApps />
       <ShareCard appName="tipos-corte-cocina" />
       <Footer appName="tipos-corte-cocina" />
     </div>

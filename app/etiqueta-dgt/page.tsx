@@ -12,7 +12,6 @@ import {
   DataReference,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { AYUDA_AUTO_PLUS_2026, FISCAL_AYUDAS_VEHICULO_META } from '@/data/fiscal';
 import { formatDate, parseISODateLocal } from '@/lib';
 import {
@@ -641,7 +640,7 @@ export default function EtiquetaDgtPage() {
         </div>
       </main>
 
-      <RelatedApps apps={getRelatedApps('etiqueta-dgt')} />
+      <RelatedApps />
       <ShareCard appName="etiqueta-dgt" />
       <Footer appName="etiqueta-dgt" />
     </div>

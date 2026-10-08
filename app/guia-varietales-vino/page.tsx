@@ -10,7 +10,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaVarietalesVino.module.css';
 
 // ── Tipos ───────────────────────────────────────────────────────────────────
@@ -1126,7 +1125,7 @@ export default function GuiaVarietalesVinoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-varietales-vino')} />
+        <RelatedApps />
 
         <ShareCard appName="guia-varietales-vino" />
 

@@ -12,7 +12,6 @@ import {
   EducationalSection,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────────────────
 // DATOS: catálogo de formatos de papel (medidas en milímetros)
@@ -1468,7 +1467,7 @@ export default function ComparadorTamanosPapelPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('comparador-tamanos-papel')} />
+      <RelatedApps />
 
       <ShareCard appName="comparador-tamanos-papel" />
 

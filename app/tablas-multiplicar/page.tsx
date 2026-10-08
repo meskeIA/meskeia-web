@@ -4,7 +4,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './TablasMultiplicar.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Dificultad = 'facil' | 'medio' | 'dificil';
 type EstadoJuego = 'menu' | 'jugando' | 'resultado';
@@ -527,7 +526,7 @@ export default function TablasMultiplicarPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tablas-multiplicar')} />
+      <RelatedApps />
       <ShareCard appName="tablas-multiplicar" />
       <Footer appName="tablas-multiplicar" />
     </div>

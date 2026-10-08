@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de contrato mercantil
 interface TipoContrato {
@@ -675,7 +674,7 @@ export default function OrientadorContratoMercantilPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('orientador-contrato-mercantil')} />
+        <RelatedApps />
 
         <ShareCard appName="orientador-contrato-mercantil" />
 

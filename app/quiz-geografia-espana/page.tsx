@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   PREGUNTAS_GEO_FACIL,
   PREGUNTAS_GEO_MEDIO,
@@ -522,7 +521,7 @@ export default function QuizGeografiaEspanaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-geografia-espana')} />
+      <RelatedApps />
       <ShareCard appName="quiz-geografia-espana" />
       <Footer appName="quiz-geografia-espana" />
     </div>

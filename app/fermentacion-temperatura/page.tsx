@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   ajustarFermentacion,
   dentroDelModelo,
@@ -215,7 +214,7 @@ export default function FermentacionTemperaturaPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('fermentacion-temperatura')} />
+      <RelatedApps />
       <ShareCard appName="fermentacion-temperatura" />
       <Footer appName="fermentacion-temperatura" />
     </div>

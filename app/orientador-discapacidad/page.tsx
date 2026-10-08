@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ===================================================
 // PREGUNTAS FUNCIONALES
@@ -722,7 +721,7 @@ export default function OrientadorDiscapacidadPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-discapacidad')} />
+      <RelatedApps />
       <ShareCard appName="orientador-discapacidad" />
       <Footer appName="orientador-discapacidad" />
     </div>

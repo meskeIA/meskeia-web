@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   calcularSustitucionMasaMadre,
@@ -448,7 +447,7 @@ export default function CalculadoraMasaMadrePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-masa-madre')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-masa-madre" />
       <Footer appName="calculadora-masa-madre" />
     </div>

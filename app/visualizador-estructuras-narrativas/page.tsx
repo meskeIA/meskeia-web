@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorEstructurasNarrativas.module.css';
 
 type EstructuraId = 'freytag' | 'tres-actos' | 'viaje-heroe' | 'kishotenketsu' | 'save-the-cat' | 'cinco-actos';
@@ -419,7 +418,7 @@ export default function VisualizadorEstructurasNarrativasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-estructuras-narrativas')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-estructuras-narrativas" />
       <Footer appName="visualizador-estructuras-narrativas" />
     </div>

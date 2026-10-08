@@ -6,7 +6,6 @@ import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
 import styles from './CalculadoraPropinas.module.css';
-import { getRelatedApps } from '@/data/app-relations';
 import { SMI_2026, FISCAL_SMI_META } from '@/data/fiscal';
 
 // Porcentaje de propina habitual por país/contexto
@@ -774,7 +773,7 @@ export default function CalculadoraPropinas() {
       </main>
 
       {/* Footer meskeIA */}
-      <RelatedApps apps={getRelatedApps('calculadora-propinas')} />
+      <RelatedApps />
       <ShareCard appName="Calculadora de Propinas" />
       <Footer appName="Calculadora de Propinas" />
     </>

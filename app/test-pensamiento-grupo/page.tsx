@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -473,7 +472,7 @@ export default function TestPensamientoGrupoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-pensamiento-grupo')} />
+        <RelatedApps />
         <ShareCard appName="test-pensamiento-grupo" />
         <Footer appName="test-pensamiento-grupo" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────
 type TabId = 'ruta' | 'organos' | 'aldh2' | 'cerebro';
@@ -518,7 +517,7 @@ export default function MetabolismoAlcoholPage() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-metabolismo-alcohol')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-metabolismo-alcohol" />
       <Footer appName="visualizador-metabolismo-alcohol" />
     </div>

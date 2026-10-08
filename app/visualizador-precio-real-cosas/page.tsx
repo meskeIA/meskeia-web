@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos: objetos y servicios cotidianos
@@ -248,7 +247,7 @@ export default function VisualizadorPrecioRealCosasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-precio-real-cosas')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-precio-real-cosas" />
         <Footer appName="visualizador-precio-real-cosas" />
     </div>

@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import styles from './EscaladoCocteles.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import { COCTELES, COCTEL_POR_ID, escalarCoctel } from '@/lib/calculadoras/escaladoCocteles';
 import { formatNumber } from '@/lib/formatters';
 
@@ -95,7 +94,7 @@ export default function EscaladoCoctelesPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('escalado-cocteles')} />
+      <RelatedApps />
       <ShareCard appName="escalado-cocteles" />
       <Footer appName="escalado-cocteles" />
     </div>

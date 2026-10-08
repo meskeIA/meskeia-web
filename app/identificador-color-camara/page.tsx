@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { type RGB, hexARgb, rgbAHex, nombreDeColor } from '@/data/colores-nombrados';
 
 function rgbAHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
@@ -696,7 +695,7 @@ export default function IdentificadorColorPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('identificador-color-camara')} />
+      <RelatedApps />
       <ShareCard appName="identificador-color-camara" />
       <Footer appName="identificador-color-camara" />
     </div>

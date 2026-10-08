@@ -7,7 +7,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 type FiltroBusco = 'todos' | 'suspense' | 'mundos' | 'personajes' | 'ideas' | 'emocion' | 'historia';
 
@@ -789,7 +788,7 @@ export default function VisualizadorGenerosNovelaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-generos-novela')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-generos-novela" />
       </main>
 

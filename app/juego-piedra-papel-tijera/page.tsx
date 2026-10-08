@@ -6,7 +6,6 @@ import styles from './JuegoPiedraPapelTijera.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Opcion = 'piedra' | 'papel' | 'tijera';
 type Resultado = 'ganaste' | 'perdiste' | 'empate' | null;
@@ -647,7 +646,7 @@ export default function JuegoPiedraPapelTijeraPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-piedra-papel-tijera')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-piedra-papel-tijera" />
       <Footer appName="juego-piedra-papel-tijera" />

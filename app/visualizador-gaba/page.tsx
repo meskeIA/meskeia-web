@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -312,7 +311,6 @@ function ModuladoresSection() {
 // ─────────────────────────────────────────────
 
 export default function VisualizadorGaba() {
-  const relacionadas = getRelatedApps('visualizador-gaba');
 
   return (
     <div className={styles.container}>
@@ -445,7 +443,7 @@ export default function VisualizadorGaba() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relacionadas} />
+      <RelatedApps />
       <ShareCard appName="visualizador-gaba" />
       <Footer appName="visualizador-gaba" />
     </div>

@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './Superconductividad.module.css';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
@@ -440,7 +439,7 @@ export default function SuperconductividadPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-superconductividad')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-superconductividad" />
       <Footer appName="visualizador-superconductividad" />
     </div>

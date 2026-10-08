@@ -12,7 +12,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency } from '@/lib';
 import {
   BONIFICACIONES_CCAA_PATRIMONIO,
@@ -872,7 +871,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-limite-conjunto-patrimonio')} />
+      <RelatedApps />
       <ShareCard appName="orientador-limite-conjunto-patrimonio" />
       <Footer appName="orientador-limite-conjunto-patrimonio" />
     </div>

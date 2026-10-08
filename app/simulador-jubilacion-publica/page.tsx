@@ -15,7 +15,6 @@ import {
 } from '@/components';
 import { formatCurrency, formatDate, formatNumber, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import { calcularPorcentajePension, mesesQueFaltanParaCien } from '@/lib/calculadoras/pensionPublica';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_PENSIONES_META,
   ESCALA_PORCENTAJE_PENSION_META,
@@ -1177,7 +1176,7 @@ export default function SimuladorJubilacionPublicaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-jubilacion-publica')} />
+        <RelatedApps />
         <ShareCard appName="simulador-jubilacion-publica" />
         <Footer appName="simulador-jubilacion-publica" />
     </div>

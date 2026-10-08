@@ -4,7 +4,6 @@
 import { useEffect, useState } from 'react';
 import styles from './CalendarioTemporada.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { MESES_TEMPORADA, MES_TEMPORADA_POR_ID } from '@/lib/calculadoras/calendarioTemporada';
 
 export default function CalendarioTemporadaPage() {
@@ -90,7 +89,7 @@ export default function CalendarioTemporadaPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calendario-temporada')} />
+      <RelatedApps />
       <ShareCard appName="calendario-temporada" />
       <Footer appName="calendario-temporada" />
     </div>

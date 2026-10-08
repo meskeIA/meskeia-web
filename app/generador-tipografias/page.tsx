@@ -6,7 +6,6 @@ import styles from './GeneradorTipografias.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface FontInfo {
   name: string;
@@ -638,7 +637,7 @@ text-align: ${textAlign};`;
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-tipografias')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-tipografias" />
       <Footer appName="generador-tipografias" />

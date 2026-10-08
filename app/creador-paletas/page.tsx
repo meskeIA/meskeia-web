@@ -6,7 +6,6 @@ import styles from './CreadorPaletas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type HarmonyType = 'complementary' | 'analogous' | 'triadic' | 'tetradic' | 'split-complementary' | 'monochromatic';
 
@@ -753,7 +752,7 @@ export default function CreadorPaletasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('creador-paletas')} />
+      <RelatedApps />
 
       <ShareCard appName="creador-paletas" />
       <Footer appName="creador-paletas" />

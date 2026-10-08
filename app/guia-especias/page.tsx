@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================================
 // TIPOS Y DATOS
@@ -1232,7 +1231,7 @@ export default function GuiaEspeciasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-especias')} />
+        <RelatedApps />
         <ShareCard appName="guia-especias" />
         <Footer appName="guia-especias" />
     </div>

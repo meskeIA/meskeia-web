@@ -3,7 +3,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './ErroresEscrituraCreativa.module.css';
 
 type Categoria = 'voz' | 'dialogos' | 'descripcion' | 'estructura' | 'personajes' | 'estilo';
@@ -563,7 +562,7 @@ export default function ErroresEscrituraCreativaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('errores-escritura-creativa')} />
+      <RelatedApps />
       <ShareCard appName="errores-escritura-creativa" />
       <Footer appName="errores-escritura-creativa" />
     </div>

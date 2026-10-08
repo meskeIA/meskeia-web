@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularSustitucionGelatina,
   type TipoGelatina,
@@ -355,7 +354,7 @@ export default function CalculadoraGelatinaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-gelatina')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-gelatina" />
       <Footer appName="calculadora-gelatina" />
     </div>

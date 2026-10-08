@@ -6,7 +6,6 @@ import styles from './JuegoSudoku.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Dificultad = 'facil' | 'medio' | 'dificil';
 type Tablero = (number | null)[][];
@@ -858,7 +857,7 @@ export default function JuegoSudokuPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-sudoku')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-sudoku" />
       <Footer appName="juego-sudoku" />

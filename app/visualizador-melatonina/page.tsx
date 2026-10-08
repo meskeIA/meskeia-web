@@ -10,7 +10,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -578,7 +577,7 @@ export default function VisualizadorMelatoninaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-melatonina')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-melatonina" />
       <Footer appName="visualizador-melatonina" />
     </div>

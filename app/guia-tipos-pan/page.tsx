@@ -3,7 +3,6 @@
 
 import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaTiposPan.module.css';
 
 type RegionPan = 'Europa' | 'América' | 'Asia' | 'Oriente Medio' | 'África';
@@ -786,7 +785,7 @@ export default function GuiaTiposPan() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-tipos-pan')} />
+      <RelatedApps />
       <ShareCard appName="guia-tipos-pan" />
       <Footer appName="guia-tipos-pan" />
     </div>

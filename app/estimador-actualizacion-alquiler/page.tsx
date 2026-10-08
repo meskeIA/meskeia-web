@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, NumberInput, ResultCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   IRAV_POR_TRIMESTRE,
@@ -623,7 +622,7 @@ export default function EstimadorActualizacionAlquilerPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-actualizacion-alquiler')} />
+      <RelatedApps />
       <ShareCard appName="estimador-actualizacion-alquiler" />
       <Footer appName="estimador-actualizacion-alquiler" />
     </div>

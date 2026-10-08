@@ -12,7 +12,6 @@ import {
   DisclaimerCard, RegionBadge
 } from '@/components';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -592,7 +591,7 @@ export default function DeclaracionRentaFallecidosPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('declaracion-renta-fallecidos')} />
+        <RelatedApps />
         <ShareCard appName="declaracion-renta-fallecidos" />
         <Footer appName="declaracion-renta-fallecidos" />
     </div>

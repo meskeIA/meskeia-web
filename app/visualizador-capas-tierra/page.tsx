@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -705,7 +704,7 @@ export default function VisualizadorCapasTierraPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-capas-tierra')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-capas-tierra" />
         <Footer appName="visualizador-capas-tierra" />
     </div>

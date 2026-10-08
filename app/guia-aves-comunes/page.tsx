@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaAvesComunes.module.css';
 
 type OrdenAve =
@@ -1329,7 +1328,7 @@ export default function GuiaAvesComunesPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-aves-comunes')} />
+        <RelatedApps />
         <ShareCard appName="guia-aves-comunes" />
         <Footer appName="guia-aves-comunes" />
     </div>

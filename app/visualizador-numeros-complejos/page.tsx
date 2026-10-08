@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './NumerosComplejos.module.css';
 
 // ─────────────────────────────────────────────
@@ -655,7 +654,7 @@ export default function NumerosComplejosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-numeros-complejos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-numeros-complejos" />
       <Footer appName="visualizador-numeros-complejos" />
     </div>

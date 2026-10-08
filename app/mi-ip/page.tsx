@@ -4,7 +4,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import styles from './MiIp.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface IpInfo {
   ip: string;
@@ -683,7 +682,7 @@ export default function MiIpPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('mi-ip')} />
+      <RelatedApps />
 
       <ShareCard appName="mi-ip" />
       <Footer appName="mi-ip" />

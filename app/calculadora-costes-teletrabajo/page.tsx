@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Días laborables por mes (aprox.)
 const DIAS_MES = 21.7;
@@ -510,7 +509,7 @@ export default function CalculadoraCostesTeletrabajoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-costes-teletrabajo')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-costes-teletrabajo" />
       <Footer appName="calculadora-costes-teletrabajo" />
     </div>

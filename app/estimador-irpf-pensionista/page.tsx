@@ -6,7 +6,6 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, Rela
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
   cuotaEscalaGeneral,
@@ -996,7 +995,7 @@ export default function EstimadorIrpfPensionista() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-irpf-pensionista')} />
+      <RelatedApps />
       <ShareCard appName="estimador-irpf-pensionista" />
       <Footer appName="estimador-irpf-pensionista" />
     </div>

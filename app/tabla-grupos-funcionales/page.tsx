@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades
@@ -2295,7 +2294,7 @@ export default function TablaGruposFuncionalesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-grupos-funcionales')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-grupos-funcionales" />
 

@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import styles from './CursoInversion.module.css';
 import { MeskeiaLogo, Footer, DisclaimerCard, LegalNotice, RelatedApps, ShareCard, RegionBadge } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { CHAPTERS, TOOLS, RESOURCES, useCourse } from './CourseContext';
 
 export default function CursoDecisionesInversionPage() {
@@ -242,7 +241,7 @@ export default function CursoDecisionesInversionPage() {
         </Link>
       </section>
 
-      <RelatedApps apps={getRelatedApps('curso-decisiones-inversion')} />
+      <RelatedApps />
       <ShareCard appName="curso-decisiones-inversion" />
       <Footer appName="curso-decisiones-inversion" />
     </div>

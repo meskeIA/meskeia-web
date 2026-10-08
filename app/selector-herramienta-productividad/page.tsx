@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorHerramientaProductividad.module.css';
 
 // ============================================================
@@ -549,7 +548,7 @@ export default function SelectorHerramientaProductividad() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-herramienta-productividad')} />
+      <RelatedApps />
       <ShareCard appName="selector-herramienta-productividad" />
       <Footer appName="selector-herramienta-productividad" />
     </div>

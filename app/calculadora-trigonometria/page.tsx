@@ -5,7 +5,6 @@ import { useState, useMemo, useId } from 'react';
 import styles from './CalculadoraTrigonometria.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 // La aritmética de los casos vive en casos.ts; la de las cuatro calculadoras de arriba, en
 // motor.ts. Las dos fuera de la vista, porque el build compila esta página sin comprobar si
 // la trigonometría está bien: los dos módulos se prueban con casos resueltos a mano.
@@ -1426,7 +1425,7 @@ export default function CalculadoraTrigonometriaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-trigonometria')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-trigonometria" />
       <Footer appName="calculadora-trigonometria" />

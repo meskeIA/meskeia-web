@@ -5,7 +5,6 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Disc
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatNumber } from '@/lib/formatters';
 import styles from './ComparadorCosteVida.module.css';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface DatosCosteVida {
   ciudad: string;
@@ -635,7 +634,7 @@ export default function ComparadorCosteVida() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('comparador-coste-vida')} />
+        <RelatedApps />
         <ShareCard appName="comparador-coste-vida" />
       <Footer appName="comparador-coste-vida" />
       </main>

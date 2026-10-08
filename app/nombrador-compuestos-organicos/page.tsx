@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ═══════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -1618,7 +1617,7 @@ export default function NombradorCompuestosOrganicosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('nombrador-compuestos-organicos')} />
+      <RelatedApps />
 
       <ShareCard appName="nombrador-compuestos-organicos" />
 

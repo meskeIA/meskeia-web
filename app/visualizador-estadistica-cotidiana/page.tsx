@@ -22,7 +22,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -659,7 +658,7 @@ export default function VisualizadorEstadisticaCotidiana() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-estadistica-cotidiana')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-estadistica-cotidiana" />
       <Footer appName="visualizador-estadistica-cotidiana" />
     </div>

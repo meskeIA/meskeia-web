@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './LimpiadorTexto.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
 
@@ -472,7 +471,7 @@ export default function LimpiadorTextoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('limpiador-texto')} />
+      <RelatedApps />
 
       <ShareCard appName="limpiador-texto" />
       <Footer appName="limpiador-texto" />

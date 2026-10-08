@@ -20,7 +20,6 @@ import {
   formatPercentage,
   parseISODateLocal,
 } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_CNAE_IAE_META,
   SECCIONES_IAE,
@@ -961,7 +960,6 @@ export default function ConversorCnaeIaePage() {
 
   // ─── Render ────────────────────────────────────────────────────────────────
 
-  const relacionadas = getRelatedApps('conversor-cnae-iae');
   const meta = catalogo?.meta;
 
   return (
@@ -1860,7 +1858,7 @@ export default function ConversorCnaeIaePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relacionadas} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-cnae-iae" />
 

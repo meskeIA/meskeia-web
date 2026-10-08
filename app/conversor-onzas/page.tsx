@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   PESO_UNIDADES,
   volUnidades,
@@ -361,7 +360,7 @@ export default function ConversorOnzasPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('conversor-onzas')} />
+      <RelatedApps />
       <ShareCard appName="conversor-onzas" />
       <Footer appName="conversor-onzas" />
     </div>

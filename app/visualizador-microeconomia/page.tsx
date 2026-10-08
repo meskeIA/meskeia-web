@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y datos de los 6 conceptos
@@ -622,7 +621,7 @@ export default function VisualizadorMicroeconomiaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-microeconomia')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-microeconomia" />
       <Footer appName="visualizador-microeconomia" />
     </div>

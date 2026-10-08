@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos de población
@@ -195,7 +194,7 @@ export default function PiramidePoblacionPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-piramide-poblacion')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-piramide-poblacion" />
       <Footer appName="visualizador-piramide-poblacion" />
     </div>

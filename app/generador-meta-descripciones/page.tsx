@@ -8,7 +8,6 @@ import { RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 const PLANTILLAS = {
   producto: {
@@ -832,7 +831,7 @@ export default function GeneradorMetaDescripcionesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-meta-descripciones')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-meta-descripciones" />
       <Footer appName="generador-meta-descripciones" />

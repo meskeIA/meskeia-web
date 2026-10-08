@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 type SeccionId = 'bonos' | 'tenedores' | 'prima' | 'sostenibilidad';
 
@@ -124,7 +123,6 @@ export default function VisualizadorDeudaPublica() {
   const [precioSlider, setPrecioSlider] = useState<number>(100);
   const [escenarioSeleccionado, setEscenarioSeleccionado] = useState<string>('estable');
 
-  const relatedApps = getRelatedApps('visualizador-deuda-publica');
 
   // Cálculo yield a partir del precio (bono 10 años, cupón 3%)
   const cupon = 3;
@@ -735,7 +733,7 @@ export default function VisualizadorDeudaPublica() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-deuda-publica" />
       <Footer appName="visualizador-deuda-publica" />
     </div>

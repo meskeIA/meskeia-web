@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Template = 'minimal' | 'corporate' | 'creative' | 'social';
 
@@ -596,7 +595,7 @@ export default function GeneradorFirmaEmailPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-firma-email')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-firma-email" />
       <Footer appName="generador-firma-email" />

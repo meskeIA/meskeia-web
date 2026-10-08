@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── DATOS TÉCNICOS ─── */
 
@@ -600,7 +599,7 @@ export default function SimuladorPlacasSolaresPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-placas-solares')} />
+        <RelatedApps />
         <ShareCard appName="simulador-placas-solares" />
         <Footer appName="simulador-placas-solares" />
     </div>

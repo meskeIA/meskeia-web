@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -699,7 +698,7 @@ export default function CosmologiaPage() {
         </ul>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-cosmologia')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-cosmologia" />
       <Footer appName="visualizador-cosmologia" />
     </div>

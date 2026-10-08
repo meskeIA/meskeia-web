@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   determinizar,
   minimizar,
@@ -2022,7 +2021,7 @@ export default function SimuladorAutomatasFinitos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-automatas-finitos')} />
+      <RelatedApps />
       <ShareCard appName="simulador-automatas-finitos" />
       <Footer appName="simulador-automatas-finitos" />
     </div>

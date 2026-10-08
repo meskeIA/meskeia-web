@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades de render de fórmulas (sin librerías externas: la CSP
@@ -1725,7 +1724,7 @@ export default function TablaIntegralesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-integrales')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-integrales" />
 

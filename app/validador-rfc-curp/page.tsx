@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────
 // Catálogos y tablas oficiales
@@ -1436,7 +1435,7 @@ export default function ValidadorRfcCurpPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('validador-rfc-curp')} />
+      <RelatedApps />
 
       <ShareCard appName="validador-rfc-curp" />
 

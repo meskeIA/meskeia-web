@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorOndasInterferencia.module.css';
 
@@ -1474,7 +1473,7 @@ export default function Page() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-ondas-interferencia')} />
+        <RelatedApps />
         <ShareCard appName="simulador-ondas-interferencia" />
       </main>
 

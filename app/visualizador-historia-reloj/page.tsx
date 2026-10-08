@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos e interfaces
@@ -610,7 +609,7 @@ export default function VisualizadorHistoriaRelojPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-historia-reloj')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-historia-reloj" />
         <Footer appName="visualizador-historia-reloj" />
     </div>

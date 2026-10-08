@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorGrafos.module.css';
 
@@ -2286,7 +2285,7 @@ export default function SimuladorGrafosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-grafos')} />
+      <RelatedApps />
       <ShareCard appName="simulador-grafos" />
       <Footer appName="simulador-grafos" />
     </div>

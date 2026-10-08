@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   CIUDADES,
   puntoEbullicion,
@@ -293,7 +292,7 @@ export default function AjusteRecetasAltitudPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('ajuste-recetas-altitud')} />
+      <RelatedApps />
       <ShareCard appName="ajuste-recetas-altitud" />
       <Footer appName="ajuste-recetas-altitud" />
     </div>

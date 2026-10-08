@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularGanache,
   type TipoChocolate,
@@ -607,7 +606,7 @@ export default function CalculadoraGanachePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-ganache')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-ganache" />
       <Footer appName="calculadora-ganache" />
     </div>

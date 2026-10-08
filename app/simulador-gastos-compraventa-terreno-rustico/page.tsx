@@ -17,7 +17,6 @@ import {
   RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import {
   ITP_CCAA,
@@ -1041,7 +1040,7 @@ export default function SimuladorTerrenoRusticoPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-gastos-compraventa-terreno-rustico')} />
+      <RelatedApps />
       <ShareCard appName="simulador-gastos-compraventa-terreno-rustico" />
       <Footer appName="simulador-gastos-compraventa-terreno-rustico" />
     </div>

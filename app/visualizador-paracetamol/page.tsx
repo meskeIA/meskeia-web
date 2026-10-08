@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -238,7 +237,6 @@ function SliderPeso() {
 // ─────────────────────────────────────────────
 
 export default function VisualizadorParacetamol() {
-  const relacionadas = getRelatedApps('visualizador-paracetamol');
 
   return (
     <div className={styles.container}>
@@ -471,7 +469,7 @@ export default function VisualizadorParacetamol() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relacionadas} />
+      <RelatedApps />
       <ShareCard appName="visualizador-paracetamol" />
       <Footer appName="visualizador-paracetamol" />
     </div>

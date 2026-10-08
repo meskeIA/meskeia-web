@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ============================================================
    Tipos
@@ -534,7 +533,7 @@ export default function SelectorCuentaBancariaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-cuenta-bancaria')} />
+      <RelatedApps />
       <ShareCard appName="selector-cuenta-bancaria" />
       <Footer appName="selector-cuenta-bancaria" />
     </div>

@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './AguasFrescas.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { AGUAS_FRESCAS, AGUA_FRESCA_POR_ID, calcularAguaFresca } from '@/lib/calculadoras/aguasFrescas';
 
 export default function AguasFrescasPage() {
@@ -93,7 +92,7 @@ export default function AguasFrescasPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('aguas-frescas')} />
+      <RelatedApps />
       <ShareCard appName="aguas-frescas" />
       <Footer appName="aguas-frescas" />
     </div>

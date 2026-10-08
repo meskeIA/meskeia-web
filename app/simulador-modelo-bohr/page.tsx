@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorModeloBohr.module.css';
 import {
@@ -787,7 +786,7 @@ export default function SimuladorModeloBohrPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-modelo-bohr')} />
+        <RelatedApps />
         <ShareCard appName="simulador-modelo-bohr" />
       </main>
 

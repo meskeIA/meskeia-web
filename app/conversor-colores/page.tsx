@@ -7,7 +7,6 @@ import CampoCanal from './CampoCanal';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   buscarColores,
   colorPorHex,
@@ -1331,7 +1330,7 @@ export default function ConvertidorColoresPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-colores')} />
+      <RelatedApps />
       <ShareCard appName="conversor-colores" />
       <Footer appName="conversor-colores" />
     </div>

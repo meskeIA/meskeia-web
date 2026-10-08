@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorModeloOsi.module.css';
 
 // ============================================================
@@ -703,7 +702,7 @@ export default function SimuladorModeloOsi() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-modelo-osi')} />
+      <RelatedApps />
       <ShareCard appName="simulador-modelo-osi" />
       <Footer appName="simulador-modelo-osi" />
     </div>

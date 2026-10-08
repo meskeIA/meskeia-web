@@ -12,7 +12,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, formatPercentage } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   ANIO_NOMINA,
   DEVENGOS_IMPORTES,
@@ -419,7 +418,7 @@ export default function VisualizadorAnatomiaNominaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-anatomia-nomina')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-anatomia-nomina" />
         <Footer appName="visualizador-anatomia-nomina" />
     </div>

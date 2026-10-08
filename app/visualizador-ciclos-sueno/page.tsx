@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -732,7 +731,7 @@ export default function VisualizadorCiclosSuenoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-ciclos-sueno')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-ciclos-sueno" />
         <Footer appName="visualizador-ciclos-sueno" />
     </div>

@@ -11,7 +11,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -828,7 +827,7 @@ export default function VisualizadorCicloCarbonoCompleto() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-ciclo-carbono-completo')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-ciclo-carbono-completo" />
       <Footer appName="visualizador-ciclo-carbono-completo" />
     </div>

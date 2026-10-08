@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './QuizLiteraturaUniversal.module.css';
 import { POOL, preguntasDeNivel, type Nivel, type Categoria, type Pregunta } from './preguntas';
 
@@ -579,7 +578,7 @@ export default function QuizLiteraturaUniversal() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('quiz-literatura-universal')} />
+      <RelatedApps />
       <ShareCard appName="quiz-literatura-universal" />
       <Footer appName="quiz-literatura-universal" />
     </div>

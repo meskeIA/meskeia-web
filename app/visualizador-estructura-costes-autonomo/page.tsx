@@ -12,7 +12,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos de ejemplo simplificados (NO son cálculos fiscales exactos)
@@ -612,7 +611,7 @@ export default function VisualizadorEstructuraCostesAutonomo() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-estructura-costes-autonomo')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-estructura-costes-autonomo" />
       <Footer appName="visualizador-estructura-costes-autonomo" />
     </div>

@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './EstadisticaAvanzada.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, LecturaSerie } from '@/components';
 import { formatNumber, formatPercentage, parseSpanishNumber, parsearSerieNumerica, type ModoLectura } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   alfaTexto,
   chiBondadAjuste,
@@ -1297,7 +1296,7 @@ export default function EstadisticaAvanzadaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estadistica-avanzada')} />
+      <RelatedApps />
       <ShareCard appName="estadistica-avanzada" />
       <Footer appName="estadistica-avanzada" />
     </div>

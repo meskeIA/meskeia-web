@@ -4,7 +4,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import styles from './SimuladorLogicaSecuencial.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -1151,7 +1150,7 @@ export default function SimuladorLogicaSecuencial() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-logica-secuencial')} />
+      <RelatedApps />
       <ShareCard appName="simulador-logica-secuencial" />
       <Footer appName="simulador-logica-secuencial" />
     </div>

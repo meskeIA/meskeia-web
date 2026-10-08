@@ -5,7 +5,6 @@ import styles from './PlanificadorTurnos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============ TIPOS ============
 
@@ -1512,7 +1511,7 @@ export default function PlanificadorTurnosPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('planificador-turnos')} />
+      <RelatedApps />
       <ShareCard appName="planificador-turnos" />
       <Footer appName="planificador-turnos" />
     </div>

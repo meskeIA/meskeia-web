@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -323,7 +322,6 @@ export default function VisualizadorDopamina() {
   const [pasoActual, setPasoActual] = useState(0);
 
   const paso = PASOS_CIRCUITO[pasoActual];
-  const relacionadas = getRelatedApps('visualizador-dopamina');
 
   function irAnterior() {
     setPasoActual((prev) => Math.max(0, prev - 1));
@@ -624,7 +622,7 @@ export default function VisualizadorDopamina() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relacionadas} />
+      <RelatedApps />
       <ShareCard appName="visualizador-dopamina" />
       <Footer appName="visualizador-dopamina" />
     </div>

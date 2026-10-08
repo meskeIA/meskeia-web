@@ -12,7 +12,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import { TRAMOS_IRPF_2025, FISCAL_IRPF_META } from '@/data/fiscal';
 import styles from './SimuladorMitoTramoSuperior.module.css';
@@ -952,7 +951,7 @@ export default function SimuladorMitoTramoSuperiorPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-mito-tramo-superior')} />
+      <RelatedApps />
       <ShareCard appName="simulador-mito-tramo-superior" />
       <Footer appName="simulador-mito-tramo-superior" />
     </div>

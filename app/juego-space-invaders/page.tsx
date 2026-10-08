@@ -5,7 +5,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoSpaceInvaders.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Player {
@@ -1064,7 +1063,7 @@ export default function JuegoSpaceInvadersPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-space-invaders')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-space-invaders" />
       <Footer appName="juego-space-invaders" />

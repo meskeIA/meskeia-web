@@ -9,7 +9,6 @@ import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import { PREGUNTAS, calcularResultado, type TipoVivienda } from './motor';
 import {
   IVA_OBRA_NUEVA,
@@ -504,7 +503,7 @@ export default function SelectorTipoVivienda() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-tipo-vivienda')} />
+      <RelatedApps />
       <ShareCard appName="selector-tipo-vivienda" />
       <Footer appName="selector-tipo-vivienda" />
     </div>

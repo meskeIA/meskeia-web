@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -469,7 +468,7 @@ export default function DetectorSesgosCognitivosPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('detector-sesgos-cognitivos')} />
+        <RelatedApps />
         <ShareCard appName="detector-sesgos-cognitivos" />
         <Footer appName="detector-sesgos-cognitivos" />
     </div>

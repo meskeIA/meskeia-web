@@ -6,7 +6,6 @@ import styles from './QuizReinosNaturaleza.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { organismosNaturaleza, OrganismoNaturaleza } from '@/data/organismos-naturaleza';
 
 type Nivel = 'basico' | 'intermedio' | 'avanzado' | 'todos';
@@ -586,7 +585,7 @@ export default function QuizReinosNaturalezaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-reinos-naturaleza')} />
+      <RelatedApps />
       <ShareCard appName="quiz-reinos-naturaleza" />
       <Footer appName="quiz-reinos-naturaleza" />
     </div>

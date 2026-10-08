@@ -4,7 +4,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './GeneradorHorarios.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============ TIPOS ============
 
@@ -1478,7 +1477,6 @@ export default function GeneradorHorariosPage() {
       </EducationalSection>
 
       <RelatedApps
-        apps={getRelatedApps('generador-horarios-estudio')}
         title="Mejora tu rendimiento académico"
         icon="📚"
       />

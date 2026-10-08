@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -722,7 +721,7 @@ export default function VisualizadorTermodinamicaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-termodinamica')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-termodinamica" />
         <Footer appName="visualizador-termodinamica" />
     </div>

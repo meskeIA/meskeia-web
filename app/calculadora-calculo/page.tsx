@@ -5,7 +5,6 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraCalculo.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'derivadas' | 'integrales' | 'limites' | 'series';
 
@@ -845,7 +844,7 @@ export default function CalculadoraCalculoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-calculo')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-calculo" />
       <Footer appName="calculadora-calculo" />

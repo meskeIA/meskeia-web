@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -247,7 +246,7 @@ export default function VisualizadorMapaTiempoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-mapa-tiempo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-mapa-tiempo" />
         <Footer appName="visualizador-mapa-tiempo" />
     </div>

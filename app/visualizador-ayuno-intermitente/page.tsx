@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────
 type TabId = 'fases' | 'autofagia' | 'tipos' | 'contraindicaciones';
@@ -476,7 +475,7 @@ export default function AyunoIntermitentePage() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-ayuno-intermitente')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-ayuno-intermitente" />
       <Footer appName="visualizador-ayuno-intermitente" />
     </div>

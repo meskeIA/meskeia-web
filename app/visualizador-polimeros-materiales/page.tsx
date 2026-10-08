@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { generateJsonLd } from './metadata';
 
 type Tab = 'polimerizacion' | 'propiedades' | 'clasificacion' | 'sostenibilidad';
@@ -921,7 +920,7 @@ export default function VisualizadorPolimerosMateriales() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-polimeros-materiales')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-polimeros-materiales" />
         <Footer appName="visualizador-polimeros-materiales" />
       </div>

@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -682,7 +681,7 @@ export default function VisualizadorMagnesio() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-magnesio')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-magnesio" />
       <Footer appName="visualizador-magnesio" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Pregunta { id: number; texto: string; dimension: 'asuncion' | 'validacion'; }
 interface Perfil { nombre: string; emoji: string; descripcion: string; fortalezas: string[]; riesgos: string[]; acciones: string[]; }
@@ -225,7 +224,7 @@ export default function TestValidacionIdeaPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-validacion-idea')} />
+        <RelatedApps />
         <ShareCard appName="test-validacion-idea" />
         <Footer appName="test-validacion-idea" />
     </div>

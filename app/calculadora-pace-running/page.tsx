@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularPaceRunning, ResultadoPaceRunning } from '@/lib/calculadoras/deporte';
 
 export default function CalculadoraPaceRunningPage() {
@@ -346,7 +345,7 @@ export default function CalculadoraPaceRunningPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-pace-running')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-pace-running" />
 

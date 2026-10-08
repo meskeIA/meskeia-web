@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './TeoriaJuegos.module.css';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
@@ -594,7 +593,7 @@ export default function TeoriaJuegosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-teoria-juegos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-teoria-juegos" />
       <Footer appName="visualizador-teoria-juegos" />
     </div>

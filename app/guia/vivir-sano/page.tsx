@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaVivirSano.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para vivir más sano
 const tools = [
@@ -320,7 +319,7 @@ export default function GuiaVivirSanoPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('guia-vivir-sano')} />
+      <RelatedApps />
       <ShareCard appName="guia-vivir-sano" />
       <Footer appName="guia-vivir-sano" />
     </div>

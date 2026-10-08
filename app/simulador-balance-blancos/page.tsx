@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorBalanceBlancos.module.css';
 
@@ -637,7 +636,7 @@ export default function SimuladorBalanceBlancosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-balance-blancos')} />
+        <RelatedApps />
         <ShareCard appName="simulador-balance-blancos" />
       </main>
 

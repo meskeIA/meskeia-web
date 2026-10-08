@@ -10,7 +10,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorCanalVenta.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -609,7 +608,7 @@ export default function SelectorCanalVenta() {
             </div>
           </EducationalSection>
 
-          <RelatedApps apps={getRelatedApps('selector-canal-venta')} />
+          <RelatedApps />
           <ShareCard appName="selector-canal-venta" />
           <Footer appName="selector-canal-venta" />
         </div>

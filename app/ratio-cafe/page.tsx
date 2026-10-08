@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   METODOS_CAFE,
   METODO_CAFE_POR_ID,
@@ -149,7 +148,7 @@ export default function RatioCafePage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('ratio-cafe')} />
+      <RelatedApps />
       <ShareCard appName="ratio-cafe" />
       <Footer appName="ratio-cafe" />
     </div>

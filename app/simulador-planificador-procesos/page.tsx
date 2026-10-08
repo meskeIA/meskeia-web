@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorPlanificadorProcesos.module.css';
 
@@ -1655,7 +1654,7 @@ export default function SimuladorPlanificadorProcesos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-planificador-procesos')} />
+      <RelatedApps />
       <ShareCard appName="simulador-planificador-procesos" />
       <Footer appName="simulador-planificador-procesos" />
     </div>

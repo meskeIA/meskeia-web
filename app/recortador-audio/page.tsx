@@ -6,7 +6,6 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type OutputFormat = 'mp3' | 'wav' | 'ogg';
@@ -1060,7 +1059,7 @@ export default function RecortadorAudioPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('recortador-audio')} />
+      <RelatedApps />
 
       <ShareCard appName="recortador-audio" />
       <Footer appName="recortador-audio" />

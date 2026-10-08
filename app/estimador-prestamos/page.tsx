@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import styles from './EstimadorPrestamos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 type Sistema = 'frances' | 'aleman' | 'americano';
@@ -1800,7 +1799,7 @@ export default function SimuladorPrestamosPage() {
       </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-prestamos')} />
+      <RelatedApps />
 
       <ShareCard appName="estimador-prestamos" />
       <Footer appName="estimador-prestamos" />

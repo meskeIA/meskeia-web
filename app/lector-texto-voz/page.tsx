@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type EstadoLector = 'parado' | 'reproduciendo' | 'pausado';
 
@@ -665,7 +664,7 @@ export default function LectorTextoVozPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('lector-texto-voz')} />
+      <RelatedApps />
       <ShareCard appName="lector-texto-voz" />
       <Footer appName="lector-texto-voz" />
     </div>

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -747,7 +746,7 @@ export default function SimuladorCicloExplotacionPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-ciclo-explotacion')} />
+      <RelatedApps />
 
       <ShareCard appName="simulador-ciclo-explotacion" />
 

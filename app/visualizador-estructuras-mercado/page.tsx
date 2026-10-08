@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ==========================================
 // TIPOS
@@ -649,7 +648,7 @@ export default function VisualizadorEstructurasMercadoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-estructuras-mercado')} />
+        <RelatedApps />
 
         <ShareCard appName="visualizador-estructuras-mercado" />
 

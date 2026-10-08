@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type SchemaType = 'article' | 'product' | 'faq' | 'localbusiness' | 'recipe';
 
@@ -1309,7 +1308,7 @@ export default function GeneradorSchemaMarkupPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-schema-markup')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-schema-markup" />
       <Footer appName="generador-schema-markup" />

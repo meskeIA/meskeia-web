@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ═══════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -1369,7 +1368,7 @@ export default function RevisorLecturaFacilPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('revisor-lectura-facil')} />
+      <RelatedApps />
 
       <ShareCard appName="revisor-lectura-facil" />
 

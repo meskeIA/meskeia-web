@@ -6,7 +6,6 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, Rela
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   TRAMOS_IRPF_2025,
   MINIMOS_IRPF_2025,
@@ -724,7 +723,7 @@ export default function OptimizadorRentas60() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('optimizador-rentas-60')} />
+      <RelatedApps />
       <ShareCard appName="optimizador-rentas-60" />
       <Footer appName="optimizador-rentas-60" />
     </div>

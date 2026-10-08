@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import styles from './MotorCombustion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TabId = 'ciclo' | 'eficiencia' | 'perdidas' | 'comparativa';
 
@@ -450,7 +449,7 @@ export default function MotorCombustionPage() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-motor-combustion')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-motor-combustion" />
       <Footer appName="visualizador-motor-combustion" />
     </div>

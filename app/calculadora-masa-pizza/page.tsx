@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   ESTILOS_PIZZA,
   ESTILO_POR_ID,
@@ -241,7 +240,7 @@ export default function CalculadoraMasaPizzaPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-masa-pizza')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-masa-pizza" />
       <Footer appName="calculadora-masa-pizza" />
     </div>

@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Presets de tiempo en minutos
 const PRESETS = [1, 2, 5, 10, 15, 20, 30];
@@ -473,7 +472,7 @@ export default function TemporizadorVisualPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('temporizador-visual')} />
+      <RelatedApps />
       <ShareCard appName="temporizador-visual" />
       <Footer appName="temporizador-visual" />
     </div>

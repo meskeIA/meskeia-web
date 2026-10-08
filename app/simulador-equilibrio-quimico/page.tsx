@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorEquilibrioQuimico.module.css';
 
@@ -1139,7 +1138,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-equilibrio-quimico')} />
+        <RelatedApps />
         <ShareCard appName="simulador-equilibrio-quimico" />
       </main>
 

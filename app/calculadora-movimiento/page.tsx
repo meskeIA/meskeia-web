@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { G, resolverRectilineo, resolverParabolico, type ResultadoRectilineo, type ResultadoParabolico } from './motor';
 import SimuladorCinematica from './SimuladorCinematica';
 
@@ -754,7 +753,7 @@ export default function CalculadoraMovimientoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-movimiento')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-movimiento" />
       <Footer appName="calculadora-movimiento" />

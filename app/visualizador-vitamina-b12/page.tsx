@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -556,7 +555,7 @@ export default function VisualizadorVitaminaB12Page() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-vitamina-b12')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-vitamina-b12" />
       <Footer appName="visualizador-vitamina-b12" />
     </div>

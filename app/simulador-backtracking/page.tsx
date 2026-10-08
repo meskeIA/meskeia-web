@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorBacktracking.module.css';
 
@@ -535,7 +534,7 @@ export default function SimuladorBacktracking() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-backtracking')} />
+      <RelatedApps />
       <ShareCard appName="simulador-backtracking" />
       <Footer appName="simulador-backtracking" />
     </div>

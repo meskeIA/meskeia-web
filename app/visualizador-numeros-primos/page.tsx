@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Seccion = 'criba' | 'patrones' | 'criptografia' | 'datos';
 
@@ -756,7 +755,7 @@ export default function VisualizadorNumerosPrimosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-numeros-primos')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-numeros-primos" />
         <Footer appName="visualizador-numeros-primos" />
     </div>

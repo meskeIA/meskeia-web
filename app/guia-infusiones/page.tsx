@@ -10,7 +10,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaInfusiones.module.css';
 
 type Familia =
@@ -1189,7 +1188,7 @@ export default function GuiaInfusiones() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-infusiones')} />
+      <RelatedApps />
       <ShareCard appName="guia-infusiones" />
       <Footer appName="guia-infusiones" />
     </div>

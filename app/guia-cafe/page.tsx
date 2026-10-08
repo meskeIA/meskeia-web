@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaCafe.module.css';
 
 type Continente = 'América' | 'África' | 'Asia / Oceanía';
@@ -1119,7 +1118,7 @@ export default function GuiaCafe() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-cafe')} />
+      <RelatedApps />
       <ShareCard appName="guia-cafe" />
       <Footer appName="guia-cafe" />
     </div>

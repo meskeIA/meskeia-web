@@ -11,7 +11,6 @@ import {
   ShareCard,
   NumberInput,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorPrincipioPascal.module.css';
 import {
@@ -1049,7 +1048,7 @@ export default function SimuladorPrincipioPascalPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-principio-pascal')} />
+        <RelatedApps />
         <ShareCard appName="simulador-principio-pascal" />
       </main>
 

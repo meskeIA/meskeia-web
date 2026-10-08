@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Constantes del canvas
 const CANVAS_WIDTH = 1280;
@@ -1672,7 +1671,7 @@ export default function CreadorThumbnailsPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('creador-thumbnails')} />
+      <RelatedApps />
 
       <ShareCard appName="creador-thumbnails" />
       <Footer appName="creador-thumbnails" />

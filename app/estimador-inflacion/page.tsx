@@ -9,7 +9,6 @@ import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/component
 import DataReference from '@/components/DataReference';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { IPC_DATA, IPC_META, IPC_YEARS as YEARS } from '@/data/ipc-ine';
 
 type ModoApp = 'calculadora' | 'comparador';
@@ -1019,7 +1018,7 @@ export default function CalculadoraInflacionPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-inflacion')} />
+      <RelatedApps />
 
       <ShareCard appName="estimador-inflacion" />
       <Footer appName="estimador-inflacion" />

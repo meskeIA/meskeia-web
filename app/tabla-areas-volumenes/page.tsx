@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades de render (sin librerías externas: la CSP del sitio
@@ -3178,7 +3177,7 @@ export default function TablaAreasVolumenesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-areas-volumenes')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-areas-volumenes" />
 

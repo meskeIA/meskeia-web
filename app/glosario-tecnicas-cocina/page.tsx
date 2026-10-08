@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './GlosarioTecnicas.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { TECNICAS, ETIQUETA_GRUPO, type Grupo } from '@/lib/guias/tecnicas-cocina';
 
 const GRUPOS: Grupo[] = ['liquido', 'grasa', 'previa', 'acabado'];
@@ -131,7 +130,7 @@ export default function GlosarioTecnicasCocinaPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('glosario-tecnicas-cocina')} />
+      <RelatedApps />
       <ShareCard appName="glosario-tecnicas-cocina" />
       <Footer appName="glosario-tecnicas-cocina" />
     </div>

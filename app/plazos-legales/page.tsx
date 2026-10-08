@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import styles from './PlazosLegales.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   PLAZOS_LEGALES,
   CATEGORIES,
@@ -668,7 +667,7 @@ export default function PlazosLegalesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('plazos-legales')} />
+      <RelatedApps />
       <ShareCard appName="plazos-legales" />
       <Footer appName="plazos-legales" />
     </div>

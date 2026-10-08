@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -705,7 +704,7 @@ export default function VisualizadorTiposRocasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-tipos-rocas')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-tipos-rocas" />
         <Footer appName="visualizador-tipos-rocas" />
     </div>

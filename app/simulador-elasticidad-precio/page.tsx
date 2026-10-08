@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ---------------------------------------------------------------------------
 // Tipos
@@ -891,7 +890,7 @@ export default function SimuladorElasticidadPrecio() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-elasticidad-precio')} />
+        <RelatedApps />
         <ShareCard appName="simulador-elasticidad-precio" />
         <Footer appName="simulador-elasticidad-precio" />
     </div>

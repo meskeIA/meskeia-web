@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './CalendarioFiscal.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type TipoContribuyente = 'autonomo' | 'sociedad' | 'ambos';
@@ -1495,7 +1494,7 @@ export default function CalendarioFiscalPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calendario-fiscal-emprendedor')} />
+      <RelatedApps />
       <ShareCard appName="calendario-fiscal-emprendedor" />
       <Footer appName="calendario-fiscal-emprendedor" />
     </div>

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularHidratacionPan,
   type ModoHidratacion,
@@ -431,7 +430,7 @@ export default function CalculadoraHidratacionPanPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-hidratacion-pan')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-hidratacion-pan" />
       <Footer appName="calculadora-hidratacion-pan" />
     </div>

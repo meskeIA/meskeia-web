@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 /**
  * Un <rect>/<circle> con role="button" se enfoca con Tab, pero Enter y Espacio no hacen nada
@@ -914,7 +913,7 @@ export default function SangreComponentesPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sangre-componentes')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sangre-componentes" />
         <Footer appName="visualizador-sangre-componentes" />
     </div>

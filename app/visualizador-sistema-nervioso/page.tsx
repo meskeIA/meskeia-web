@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -1139,7 +1138,7 @@ export default function VisualizadorSistemaNerviosoPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-sistema-nervioso')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-sistema-nervioso" />
       <Footer appName="visualizador-sistema-nervioso" />
     </div>

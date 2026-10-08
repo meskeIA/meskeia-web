@@ -3,7 +3,6 @@
 
 import styles from './MedidasAOjo.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { MEDIDAS_OJO } from '@/lib/calculadoras/medidasAOjo';
 
 export default function MedidasAOjoPage() {
@@ -69,7 +68,7 @@ export default function MedidasAOjoPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('medidas-a-ojo')} />
+      <RelatedApps />
       <ShareCard appName="medidas-a-ojo" />
       <Footer appName="medidas-a-ojo" />
     </div>

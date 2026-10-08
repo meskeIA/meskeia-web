@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './QuizTiposPlantas.module.css';
 
 // ============================================================================
@@ -524,7 +523,7 @@ export default function QuizTiposPlantas() {
             </div>
           </EducationalSection>
 
-          <RelatedApps apps={getRelatedApps('quiz-tipos-plantas')} />
+          <RelatedApps />
           <ShareCard appName="quiz-tipos-plantas" />
         </main>
         <Footer appName="quiz-tipos-plantas" />
@@ -727,7 +726,7 @@ export default function QuizTiposPlantas() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('quiz-tipos-plantas')} />
+        <RelatedApps />
         <ShareCard appName="quiz-tipos-plantas" />
       </main>
       <Footer appName="quiz-tipos-plantas" />

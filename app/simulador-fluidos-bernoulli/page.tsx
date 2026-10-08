@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorFluidosBernoulli.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 // La física (fluidos, secciones, continuidad y Bernoulli) vive en ./motor.ts desde el
 // 23/09/2026: la usan esta página y la sección «Casos para clase», con una sola implementación.
@@ -1019,7 +1018,7 @@ export default function SimuladorFluidosBernoulliPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-fluidos-bernoulli')} />
+      <RelatedApps />
       <ShareCard appName="simulador-fluidos-bernoulli" />
       <Footer appName="simulador-fluidos-bernoulli" />
     </div>

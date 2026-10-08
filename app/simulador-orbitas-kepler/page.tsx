@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorOrbitasKepler.module.css';
 // La física (constantes, cuerpos, órbitas reales, Kepler y el cálculo de la órbita) vive en
@@ -954,7 +953,7 @@ export default function SimuladorOrbitasKepler() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-orbitas-kepler')} />
+        <RelatedApps />
         <ShareCard appName="simulador-orbitas-kepler" />
       </main>
 

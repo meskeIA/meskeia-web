@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import styles from './VitaminasMinerales.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   NUTRIENTS,
   TIPOS,
@@ -621,7 +620,7 @@ export default function VitaminasMineralesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('vitaminas-minerales')} />
+      <RelatedApps />
       <ShareCard appName="vitaminas-minerales" />
       <Footer appName="vitaminas-minerales" />
     </div>

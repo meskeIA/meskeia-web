@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTestHipotesis.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -889,7 +888,7 @@ export default function SimuladorTestHipotesisPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-test-hipotesis')} />
+      <RelatedApps />
       <ShareCard appName="simulador-test-hipotesis" />
       <Footer appName="simulador-test-hipotesis" />
     </div>

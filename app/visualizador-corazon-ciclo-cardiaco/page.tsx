@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -636,7 +635,7 @@ export default function VisualizadorCorazonCicloCardiaco() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-corazon-ciclo-cardiaco')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-corazon-ciclo-cardiaco" />
       <Footer appName="visualizador-corazon-ciclo-cardiaco" />
     </div>

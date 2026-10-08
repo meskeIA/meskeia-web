@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -638,7 +637,7 @@ export default function VisualizadorAnatomiaVueloPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-anatomia-vuelo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-anatomia-vuelo" />
         <Footer appName="visualizador-anatomia-vuelo" />
     </div>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './EstimadorLegitimas.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularLegitimas,
   REGIMENES_INFO,
@@ -586,7 +585,7 @@ export default function EstimadorLegitimas() {
       </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-legitimas')} />
+      <RelatedApps />
       <ShareCard appName="estimador-legitimas" />
       <Footer appName="estimador-legitimas" />
     </div>

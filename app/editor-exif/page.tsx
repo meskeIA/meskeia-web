@@ -6,7 +6,6 @@ import styles from './EditorExif.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Categorías de metadatos con explicaciones educativas
 interface MetadataCategory {
@@ -1025,7 +1024,7 @@ export default function EditorExifPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('editor-exif')} />
+      <RelatedApps />
 
       <ShareCard appName="editor-exif" />
       <Footer appName="editor-exif" />

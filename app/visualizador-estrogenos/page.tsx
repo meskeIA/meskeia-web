@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import styles from './VisualizadorEstrogenos.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -283,7 +282,6 @@ export default function VisualizadorEstrogenos() {
     },
   };
 
-  const relatedApps = getRelatedApps('visualizador-estrogenos');
 
   return (
     <div className={styles.container}>
@@ -527,7 +525,7 @@ export default function VisualizadorEstrogenos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-estrogenos" />
       <Footer appName="visualizador-estrogenos" />
     </div>

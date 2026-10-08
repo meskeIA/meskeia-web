@@ -5,7 +5,6 @@ import styles from './PlanificadorMenu.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type DayOfWeek = 'lunes' | 'martes' | 'miercoles' | 'jueves' | 'viernes' | 'sabado' | 'domingo';
 type MealType = 'desayuno' | 'almuerzo' | 'cena';
@@ -672,7 +671,7 @@ export default function PlanificadorMenuPage() {
 
       
 
-      <RelatedApps apps={getRelatedApps('planificador-menu')} />
+      <RelatedApps />
       <ShareCard appName="planificador-menu" />
       <Footer appName="planificador-menu" />
     </div>

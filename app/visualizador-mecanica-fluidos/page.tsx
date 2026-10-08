@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1052,7 +1051,7 @@ export default function VisualizadorMecanikaFluidos() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-mecanica-fluidos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-mecanica-fluidos" />
       <Footer appName="visualizador-mecanica-fluidos" />
     </div>

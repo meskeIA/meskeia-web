@@ -8,7 +8,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Datos del juego ──────────────────────────────────────────────────────────
 
@@ -315,7 +314,7 @@ export default function JuegoPresupuestoMensualPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('juego-presupuesto-mensual')} />
+        <RelatedApps />
         <ShareCard appName="juego-presupuesto-mensual" />
         <Footer appName="juego-presupuesto-mensual" />
     </div>

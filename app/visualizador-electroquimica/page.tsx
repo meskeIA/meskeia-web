@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -819,7 +818,7 @@ export default function VisualizadorElectroquimicaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-electroquimica')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-electroquimica" />
         <Footer appName="visualizador-electroquimica" />
   </div>

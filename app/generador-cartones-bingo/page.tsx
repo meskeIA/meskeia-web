@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
@@ -637,7 +636,7 @@ export default function GeneradorCartonesBingoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('generador-cartones-bingo')} />
+        <RelatedApps />
 
         <ShareCard appName="generador-cartones-bingo" />
 

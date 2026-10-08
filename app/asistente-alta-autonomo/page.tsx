@@ -6,7 +6,6 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, RelatedApps, Educational
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   TIPO_COTIZACION_RETA, TARIFA_PLANA_2025, BASES_RETA_2025, TRAMOS_RETA_2025, tramoRETA, FISCAL_AUTONOMOS_META,
   TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026, AUTONOMO_SOCIETARIO_2025, SMI_2026, TRAMOS_IRPF_2025,
@@ -1793,7 +1792,7 @@ export default function AsistenteAltaAutonomoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('asistente-alta-autonomo')} />
+      <RelatedApps />
       <ShareCard appName="asistente-alta-autonomo" />
       <Footer appName="asistente-alta-autonomo" />
     </div>

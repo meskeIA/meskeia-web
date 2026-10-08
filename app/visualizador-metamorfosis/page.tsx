@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -711,7 +710,7 @@ export default function MetamorfosisPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-metamorfosis')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-metamorfosis" />
         <Footer appName="visualizador-metamorfosis" />
     </div>

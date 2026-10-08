@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Constantes físicas y cálculos relativistas
@@ -685,7 +684,7 @@ export default function VisualizadorRelatividadEspecial() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-relatividad-especial')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-relatividad-especial" />
       <Footer appName="visualizador-relatividad-especial" />
     </div>

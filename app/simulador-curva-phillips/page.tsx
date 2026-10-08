@@ -4,7 +4,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorCurvaPhillips.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // CONSTANTES
@@ -757,7 +756,7 @@ export default function SimuladorCurvaPhillipsPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-curva-phillips')} />
+      <RelatedApps />
       <ShareCard appName="simulador-curva-phillips" />
       <Footer appName="simulador-curva-phillips" />
     </div>

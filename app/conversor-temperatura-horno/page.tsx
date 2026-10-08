@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   MARCAS_GAS,
   convertirTemperatura,
@@ -305,7 +304,7 @@ export default function ConversorTemperaturaHornoPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('conversor-temperatura-horno')} />
+      <RelatedApps />
       <ShareCard appName="conversor-temperatura-horno" />
       <Footer appName="conversor-temperatura-horno" />
     </div>

@@ -11,7 +11,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -500,7 +499,7 @@ export default function RecordatorioMedicacionPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('recordatorio-medicacion')} />
+        <RelatedApps />
         <ShareCard appName="recordatorio-medicacion" />
         <Footer appName="recordatorio-medicacion" />
       </div>

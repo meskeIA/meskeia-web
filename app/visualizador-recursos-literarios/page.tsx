@@ -7,7 +7,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import { figurasRetorica, FiguraRetorica, GrupoFigura, NivelFigura } from '@/data/figuras-retoricas';
 
 type FiltroNivel = NivelFigura | 'todos';
@@ -579,7 +578,7 @@ export default function VisualizadorRecursosLiterariosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-recursos-literarios')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-recursos-literarios" />
       </main>
 

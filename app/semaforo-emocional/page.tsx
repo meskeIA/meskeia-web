@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // Tipos y constantes
@@ -474,7 +473,7 @@ export default function SemaforoEmocionalPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('semaforo-emocional')} />
+      <RelatedApps />
       <ShareCard appName="semaforo-emocional" />
       <Footer appName="semaforo-emocional" />
     </div>

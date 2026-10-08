@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TabType = 'azulejos' | 'pintura' | 'tarima' | 'mortero';
 
@@ -662,7 +661,7 @@ export default function CalculadoraMaterialesPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-materiales-construccion')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-materiales-construccion" />
         <Footer appName="calculadora-materiales-construccion" />
     </div>

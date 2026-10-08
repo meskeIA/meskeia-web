@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -792,7 +791,7 @@ export default function VisualizadorCortisolPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-cortisol')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-cortisol" />
         <Footer appName="visualizador-cortisol" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -747,7 +746,7 @@ export default function VisualizadorSistemaLinfaticoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sistema-linfatico')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sistema-linfatico" />
         <Footer appName="visualizador-sistema-linfatico" />
     </div>

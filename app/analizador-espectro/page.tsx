@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AnalizadorEspectro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import { picoDominante } from '@/lib/calculadoras/frecuenciaDominante';
 
@@ -1071,7 +1070,7 @@ export default function AnalizadorEspectroPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('analizador-espectro')} />
+      <RelatedApps />
 
       <ShareCard appName="analizador-espectro" />
       <Footer appName="analizador-espectro" />

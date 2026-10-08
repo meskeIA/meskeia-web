@@ -10,7 +10,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import { DataReference } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───
 
@@ -775,7 +774,7 @@ export default function ComparadorAsistentesCodigo() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('comparador-asistentes-codigo')} />
+      <RelatedApps />
       <ShareCard appName="comparador-asistentes-codigo" />
       <Footer appName="comparador-asistentes-codigo" />
     </div>

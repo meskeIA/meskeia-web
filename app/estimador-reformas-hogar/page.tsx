@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency } from '@/lib';
 
 type CalidadReforma = 'basica' | 'estandar' | 'premium';
@@ -771,7 +770,7 @@ export default function CalculadoraReformasHogar() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('estimador-reformas-hogar')} />
+        <RelatedApps />
         <ShareCard appName="estimador-reformas-hogar" />
       <Footer appName="estimador-reformas-hogar" />
       </div>

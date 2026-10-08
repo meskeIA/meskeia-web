@@ -8,7 +8,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Objetivos predefinidos ───────────────────────────────────────────────────
 
@@ -234,7 +233,7 @@ export default function EstimadorTiempoAhorroPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('estimador-tiempo-ahorro')} />
+        <RelatedApps />
         <ShareCard appName="estimador-tiempo-ahorro" />
         <Footer appName="estimador-tiempo-ahorro" />
     </div>

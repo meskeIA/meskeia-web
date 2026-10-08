@@ -10,7 +10,6 @@ import {
   ESCALA_RECARGO_EXTEMPORANEO,
   porcentajeRecargoExtemporaneo,
 } from '@/lib/calculadoras/recargoPresentacionTardia';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_SUCESIONES_META,
   FISCAL_SUCESIONES_CATALUNA_META,
@@ -2124,7 +2123,7 @@ export default function EstimadorImpuestoSucesionesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-impuesto-sucesiones')} />
+      <RelatedApps />
       <ShareCard appName="estimador-impuesto-sucesiones" />
       <Footer appName="estimador-impuesto-sucesiones" />
     </div>

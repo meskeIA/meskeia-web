@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────
 type TabId = 'conceptos' | 'alimentos' | 'fibra' | 'curva';
@@ -608,7 +607,7 @@ export default function IndiceGlucemicoPage() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-indice-glucemico')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-indice-glucemico" />
       <Footer appName="visualizador-indice-glucemico" />
     </div>

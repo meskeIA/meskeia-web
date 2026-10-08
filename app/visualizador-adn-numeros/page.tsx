@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -359,7 +358,7 @@ export default function VisualizadorAdnNumerosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-adn-numeros')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-adn-numeros" />
         <Footer appName="visualizador-adn-numeros" />
     </div>

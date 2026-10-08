@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import styles from './CalculadoraCalorias.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 interface Actividad {
@@ -602,7 +601,7 @@ export default function CalculadoraCaloriasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-calorias-ejercicio')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-calorias-ejercicio" />
       <Footer appName="calculadora-calorias-ejercicio" />
     </div>

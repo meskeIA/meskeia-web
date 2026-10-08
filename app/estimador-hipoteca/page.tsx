@@ -5,7 +5,6 @@ import styles from './EstimadorHipoteca.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
 type TipoInteres = 'fijo' | 'variable' | 'mixta';
@@ -1359,7 +1358,7 @@ export default function SimuladorHipotecaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-hipoteca')} />
+      <RelatedApps />
       <ShareCard appName="estimador-hipoteca" />
       <Footer appName="estimador-hipoteca" />
     </div>

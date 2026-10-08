@@ -12,7 +12,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   TIEMPOS_COCCION,
   CATEGORIAS_COCCION,
@@ -180,7 +179,7 @@ export default function TiemposCoccionPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('tiempos-coccion')} />
+      <RelatedApps />
       <ShareCard appName="tiempos-coccion" />
       <Footer appName="tiempos-coccion" />
     </div>

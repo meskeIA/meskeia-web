@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraGastoEnergetico.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Electrodomestico {
   id: string;
@@ -1075,7 +1074,7 @@ export default function CalculadoraGastoEnergeticoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-gasto-energetico')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-gasto-energetico" />
       <Footer appName="calculadora-gasto-energetico" />

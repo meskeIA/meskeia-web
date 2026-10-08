@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1330,7 +1329,7 @@ export default function VisualizadorSistemasOperativos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-sistemas-operativos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-sistemas-operativos" />
       <Footer appName="visualizador-sistemas-operativos" />
     </div>

@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   INGREDIENTES,
   CATEGORIAS_INGREDIENTE,
@@ -434,7 +433,7 @@ export default function ConversorTazasGramosPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('conversor-tazas-gramos')} />
+      <RelatedApps />
       <ShareCard appName="conversor-tazas-gramos" />
       <Footer appName="conversor-tazas-gramos" />
     </div>

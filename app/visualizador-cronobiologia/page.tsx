@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { generateJsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -1076,7 +1075,7 @@ export default function VisualizadorCronobiologiaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-cronobiologia')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-cronobiologia" />
         <Footer appName="visualizador-cronobiologia" />
       </div>

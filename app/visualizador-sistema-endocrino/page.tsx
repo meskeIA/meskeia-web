@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -751,7 +750,7 @@ export default function VisualizadorSistemaEndocrinoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sistema-endocrino')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sistema-endocrino" />
         <Footer appName="visualizador-sistema-endocrino" />
     </div>

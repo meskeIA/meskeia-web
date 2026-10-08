@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { generateJsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -1469,7 +1468,7 @@ export default function VisualizadorBiomasTerrestres() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-biomas-terrestres')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-biomas-terrestres" />
       <Footer appName="visualizador-biomas-terrestres" />
     </div>

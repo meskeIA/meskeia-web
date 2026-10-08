@@ -7,7 +7,6 @@ import {
   ShareCard, DisclaimerCard, DataReference,
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   ARANCEL_PROCURA, COSTAS_JUDICIALES_META, COSTAS_LJCA, COSTAS_LRJS, PORCENTAJES_IVA,
   TASAS_JUDICIALES_CUOTA_FIJA, UMBRALES_LEC,
@@ -340,7 +339,7 @@ export default function EstimadorCostasJudicialesPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('estimador-costas-judiciales')} />
+        <RelatedApps />
         <ShareCard appName="estimador-costas-judiciales" />
         <Footer appName="estimador-costas-judiciales" />
     </div>

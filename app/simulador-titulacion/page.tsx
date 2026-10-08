@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorTitulacion.module.css';
 // El pH y el volumen de equivalencia viven en `./motor.ts`, que comparten el simulador y la
@@ -953,7 +952,7 @@ export default function SimuladorTitulacion() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-titulacion')} />
+        <RelatedApps />
         <ShareCard appName="simulador-titulacion" />
       </main>
 

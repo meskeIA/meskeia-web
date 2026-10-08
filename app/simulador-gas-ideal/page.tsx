@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatPercentage } from '@/lib';
 import styles from './SimuladorGasIdeal.module.css';
 // Toda la física vive en ./motor.ts (28/09/2026): la ecuación de estado, los procesos y los
@@ -1435,7 +1434,7 @@ export default function Page(): React.ReactElement {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-gas-ideal')} />
+        <RelatedApps />
       </main>
 
       <ShareCard appName="simulador-gas-ideal" />

@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -496,7 +495,7 @@ export default function VisualizadorAdrenalina() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-adrenalina')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-adrenalina" />
       <Footer appName="visualizador-adrenalina" />
     </div>

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -689,7 +688,7 @@ export default function VisualizadorProduccionEnergiaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-produccion-energia')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-produccion-energia" />
         <Footer appName="visualizador-produccion-energia" />
     </div>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './Maridaje.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import { MARIDAJES, MARIDAJE_POR_ID } from '@/lib/calculadoras/maridaje';
 
 export default function MaridajePage() {
@@ -87,7 +86,7 @@ export default function MaridajePage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('maridaje')} />
+      <RelatedApps />
       <ShareCard appName="maridaje" />
       <Footer appName="maridaje" />
     </div>

@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './GuiaCard.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { AZUCARES, ETIQUETA_TIPO_AZUCAR, type TipoAzucar } from '@/lib/guias/azucares';
 
 const TIPOS: TipoAzucar[] = ['azucar', 'natural', 'edulcorante'];
@@ -92,7 +91,7 @@ export default function GuiaAzucaresPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('guia-azucares')} />
+      <RelatedApps />
       <ShareCard appName="guia-azucares" />
       <Footer appName="guia-azucares" />
     </div>

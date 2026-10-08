@@ -8,7 +8,6 @@ import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de categorías
 type Categoria = 'longitud' | 'masa' | 'temperatura' | 'area' | 'volumen' | 'tiempo' | 'velocidad' | 'datos' | 'quimica' | 'presion' | 'energia' | 'fuerza' | 'potencia';
@@ -1190,7 +1189,7 @@ Cinta USA marca millas
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-unidades')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-unidades" />
       <Footer appName="conversor-unidades" />

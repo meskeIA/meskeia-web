@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -553,7 +552,7 @@ export default function VisualizadorElNino() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('visualizador-el-nino')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-el-nino" />
       <Footer appName="visualizador-el-nino" />
     </div>

@@ -4,7 +4,6 @@ import { useState, useCallback } from 'react';
 import styles from './OrientadorColesterol.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface CholesterolResults {
@@ -737,7 +736,7 @@ export default function CalculadoraColesterolPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-colesterol')} />
+      <RelatedApps />
       <ShareCard appName="orientador-colesterol" />
       <Footer appName="orientador-colesterol" />
     </div>

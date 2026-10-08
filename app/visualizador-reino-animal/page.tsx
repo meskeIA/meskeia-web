@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './ReinoAnimal.module.css';
 
 // ─────────────────────────────────────────────
@@ -1000,7 +999,7 @@ export default function VisualizadorReinoAnimalPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-reino-animal')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-reino-animal" />
       </main>
 

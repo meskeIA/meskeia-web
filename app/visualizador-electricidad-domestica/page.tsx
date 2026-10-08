@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -769,7 +768,7 @@ export default function VisualizadorElectricidadDomestica() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-electricidad-domestica')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-electricidad-domestica" />
         <Footer appName="visualizador-electricidad-domestica" />
     </div>

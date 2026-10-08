@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import styles from './SeguimientoHabitos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Habito {
@@ -1170,7 +1169,7 @@ export default function SeguimientoHabitosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('seguimiento-habitos')} />
+      <RelatedApps />
 
       <ShareCard appName="seguimiento-habitos" />
       <Footer appName="seguimiento-habitos" />

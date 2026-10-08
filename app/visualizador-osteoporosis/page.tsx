@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -899,7 +898,7 @@ export default function VisualizadorOsteoporosisPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-osteoporosis')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-osteoporosis" />
         <Footer appName="visualizador-osteoporosis" />
     </div>

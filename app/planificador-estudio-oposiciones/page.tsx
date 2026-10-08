@@ -6,7 +6,6 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -303,7 +302,7 @@ export default function PlanificadorEstudioOposicionesPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('planificador-estudio-oposiciones')} />
+        <RelatedApps />
         <ShareCard appName="planificador-estudio-oposiciones" />
         <Footer appName="planificador-estudio-oposiciones" />
     </div>

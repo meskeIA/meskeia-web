@@ -6,7 +6,6 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -354,7 +353,7 @@ export default function DiarioEmocionalPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('diario-emocional')} />
+        <RelatedApps />
         <ShareCard appName="diario-emocional" />
         <Footer appName="diario-emocional" />
     </div>

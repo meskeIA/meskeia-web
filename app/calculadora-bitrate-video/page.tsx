@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularBitrateVideo,
   type TipoResolucionVideo,
@@ -492,7 +491,7 @@ export default function CalculadoraBitrateVideoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-bitrate-video')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-bitrate-video" />
       </main>
 

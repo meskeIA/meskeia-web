@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -1120,7 +1119,7 @@ export default function VisualizadorComercioInternacional() {
         </EducationalSection>
       </section>
 
-      <RelatedApps apps={getRelatedApps('visualizador-comercio-internacional')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-comercio-internacional" />
       <Footer appName="visualizador-comercio-internacional" />
     </div>

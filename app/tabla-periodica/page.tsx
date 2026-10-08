@@ -7,7 +7,6 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
 import { formatNumber } from '@/lib';
 import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './elementos-data';
 import { parsearFormulaQuimica } from '@/lib/formula-quimica';
-import { getRelatedApps } from '@/data/app-relations';
 import { RADIOS_ATOMICOS_META, RADIO_SOLO_TEORICO_DESDE_Z } from '@/data/radios-atomicos';
 import {
   CASOS,
@@ -1253,7 +1252,7 @@ export default function TablaPerodicaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-periodica')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-periodica" />
       <Footer appName="tabla-periodica" />

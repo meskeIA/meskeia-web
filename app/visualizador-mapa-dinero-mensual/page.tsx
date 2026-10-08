@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -235,7 +234,7 @@ export default function VisualizadorMapaDineroMensualPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-mapa-dinero-mensual')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-mapa-dinero-mensual" />
         <Footer appName="visualizador-mapa-dinero-mensual" />
     </div>

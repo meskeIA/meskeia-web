@@ -10,8 +10,8 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
+  type RelatedApp,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────
 // Helpers
@@ -107,8 +107,12 @@ export default function HistoriaInteractivo({
   data,
   marca = 'meskeia',
   topSlot,
+  relacionadas = [],
 }: {
   data: HistoriaData;
+  /** Tarjetas de relacionadas, resueltas en el servidor por page.tsx: este fichero es
+   *  'use client' y no puede importar `data/app-relations` (check:catalogo-cliente). */
+  relacionadas?: RelatedApp[];
   /** 'meskeia' (por defecto) renderiza el chrome de meskeIA; 'cronicum' lo omite
    *  (la cabecera/footer las pone el layout de Cronicum) y usa `topSlot` arriba. */
   marca?: 'meskeia' | 'cronicum';
@@ -703,7 +707,7 @@ export default function HistoriaInteractivo({
 
         {marca === 'meskeia' && (
           <>
-            <RelatedApps apps={getRelatedApps(appKey)} />
+            <RelatedApps apps={relacionadas} />
             <ShareCard appName={appKey} />
             <Footer appName={appKey} />
           </>

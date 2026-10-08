@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './VisualizadorFuncionesEasing.module.css';
 
@@ -829,7 +828,7 @@ export default function VisualizadorFuncionesEasingPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-funciones-easing')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-funciones-easing" />
       <Footer appName="visualizador-funciones-easing" />
     </div>

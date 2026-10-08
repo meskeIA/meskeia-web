@@ -5,7 +5,6 @@ import styles from './PlanificadorChequeosMedicos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, DisclaimerCard, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { parseSpanishNumber } from '@/lib';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -758,7 +757,7 @@ export default function PlanificadorChequeosMedicos() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('planificador-chequeos-medicos')} />
+      <RelatedApps />
       <ShareCard appName="planificador-chequeos-medicos" />
       <Footer appName="planificador-chequeos-medicos" />
     </div>

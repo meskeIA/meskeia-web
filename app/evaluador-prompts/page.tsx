@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -492,7 +491,7 @@ export default function EvaluadorPromptsPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('evaluador-prompts')} />
+        <RelatedApps />
         <ShareCard appName="evaluador-prompts" />
         <Footer appName="evaluador-prompts" />
     </div>

@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ────────────────────────────────────────────────────────────────
    Normaliza texto para buscar sin acentos ni mayúsculas.
@@ -1055,7 +1054,7 @@ export default function TablaUnidadesSiPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-unidades-si')} />
+      <RelatedApps />
       <ShareCard appName="tabla-unidades-si" />
       <Footer appName="tabla-unidades-si" />
     </div>

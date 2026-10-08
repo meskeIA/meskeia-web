@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 type SeccionAdme = 'A' | 'D' | 'M' | 'E';
@@ -903,7 +902,7 @@ export default function VisualizadorFarmacocinetica() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-farmacocinetica')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-farmacocinetica" />
       </main>
 

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './SousVide.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import { ALIMENTOS_SOUSVIDE, ALIMENTO_SOUSVIDE_POR_ID } from '@/lib/calculadoras/sousVide';
 
 export default function SousVidePage() {
@@ -98,7 +97,7 @@ export default function SousVidePage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('sous-vide')} />
+      <RelatedApps />
       <ShareCard appName="sous-vide" />
       <Footer appName="sous-vide" />
     </div>

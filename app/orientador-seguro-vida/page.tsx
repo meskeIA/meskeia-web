@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './OrientadorSeguroVida.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface ResultadoCalculo {
   capitalMinimo: number;
@@ -642,7 +641,7 @@ export default function CalculadoraSeguroVidaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-seguro-vida')} />
+      <RelatedApps />
       <ShareCard appName="orientador-seguro-vida" />
       <Footer appName="orientador-seguro-vida" />
     </div>

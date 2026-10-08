@@ -7,7 +7,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import { figurasRetorica, FiguraRetorica } from '@/data/figuras-retoricas';
 
 type Nivel = 'basico' | 'intermedio' | 'avanzado' | 'todos';
@@ -809,7 +808,7 @@ export default function QuizFigurasRetoricaPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-figuras-retoricas')} />
+      <RelatedApps />
       <ShareCard appName="quiz-figuras-retoricas" />
       <Footer appName="quiz-figuras-retoricas" />
     </div>

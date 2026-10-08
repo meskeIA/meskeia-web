@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
   RegionBadge,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularResultado, FORMACIONES, LABELS, CON_ARTICULO, PREGUNTAS, RESTRICCION_CORTA } from './motor';
 
 // Las preguntas con sus pesos, las fichas de cada vía y la lógica viven en ./motor.ts.
@@ -493,7 +492,7 @@ export default function SelectorFormacionPostgradoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-formacion-postgrado')} />
+      <RelatedApps />
       <ShareCard appName="selector-formacion-postgrado" />
       <Footer appName="selector-formacion-postgrado" />
     </div>

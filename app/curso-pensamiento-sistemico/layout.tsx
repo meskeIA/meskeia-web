@@ -1,5 +1,6 @@
 import { CourseProvider } from './CourseContext';
 import { jsonLd, faqJsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 export { metadata } from './metadata';
 
 export default function CursoLayout({
@@ -11,7 +12,7 @@ export default function CursoLayout({
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <CourseProvider>{children}</CourseProvider>
+      <CourseProvider><ConRelacionadas slug="curso-pensamiento-sistemico">{children}</ConRelacionadas></CourseProvider>
     </>
   );
 }

@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import styles from './CursoOptimizacionIA.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { useCourse, COURSE_MODULES } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -335,7 +334,7 @@ export default function CursoOptimizacionIAPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('curso-optimizacion-ia')} />
+      <RelatedApps />
       <ShareCard appName="curso-optimizacion-ia" />
       <Footer appName="curso-optimizacion-ia" />
     </div>

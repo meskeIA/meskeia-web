@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // =========================================================
 // TIPOS Y DATOS
@@ -711,7 +710,7 @@ export default function ComparadorVelocidadAlmacenamientoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('comparador-velocidad-almacenamiento')} />
+      <RelatedApps />
       <ShareCard appName="comparador-velocidad-almacenamiento" />
       <Footer appName="comparador-velocidad-almacenamiento" />
     </div>

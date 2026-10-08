@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -498,7 +497,7 @@ export default function VisualizadorAguaVirtualPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-agua-virtual')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-agua-virtual" />
         <Footer appName="visualizador-agua-virtual" />
     </div>

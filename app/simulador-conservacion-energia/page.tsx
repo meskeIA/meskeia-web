@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorConservacionEnergia.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import CasosAula from './CasosAula';
 import {
   TRACKS,
@@ -793,7 +792,7 @@ export default function SimuladorConservacionEnergiaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-conservacion-energia')} />
+      <RelatedApps />
       <ShareCard appName="simulador-conservacion-energia" />
       <Footer appName="simulador-conservacion-energia" />
     </div>

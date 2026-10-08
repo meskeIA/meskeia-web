@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorFormaJuridica.module.css';
 
 // ─────────────────────────────────────────────
@@ -478,7 +477,7 @@ export default function SelectorFormaJuridica() {
       </EducationalSection>
 
       {/* ── APPS RELACIONADAS ── */}
-      <RelatedApps apps={getRelatedApps('selector-forma-juridica')} />
+      <RelatedApps />
 
       {/* ── SHARE CARD ── */}
       <ShareCard appName="selector-forma-juridica" />

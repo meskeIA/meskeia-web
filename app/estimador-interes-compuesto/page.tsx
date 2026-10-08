@@ -5,7 +5,6 @@ import styles from './EstimadorInteresCompuesto.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
 type FrecuenciaCapitalizacion = 'anual' | 'semestral' | 'trimestral' | 'mensual';
@@ -589,7 +588,7 @@ export default function InteresCompuestoPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-interes-compuesto')} />
+      <RelatedApps />
       <ShareCard appName="estimador-interes-compuesto" />
       <Footer appName="estimador-interes-compuesto" />
     </div>

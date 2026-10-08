@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 type PerfilInversor = 'conservador' | 'moderado' | 'equilibrado' | 'dinamico' | 'agresivo';
@@ -1216,7 +1215,7 @@ export default function CalculadoraInversionesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-inversiones')} />
+      <RelatedApps />
 
       <ShareCard appName="estimador-inversiones" />
       <Footer appName="estimador-inversiones" />

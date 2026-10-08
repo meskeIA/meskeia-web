@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularPotenciaCiclismo,
   calcularVatiosPorFuerzas,
@@ -791,7 +790,7 @@ export default function CalculadoraPotenciaCiclismoPage() {
 
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-potencia-ciclismo')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-potencia-ciclismo" />
       <Footer appName="calculadora-potencia-ciclismo" />
     </div>

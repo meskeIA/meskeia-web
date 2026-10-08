@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorEnergiaHogar.module.css';
 
 // ─────────────────────────────────────────────
@@ -736,7 +735,7 @@ export default function SelectorEnergiaHogarPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-energia-hogar')} />
+      <RelatedApps />
       <ShareCard appName="selector-energia-hogar" />
       <Footer appName="selector-energia-hogar" />
     </div>

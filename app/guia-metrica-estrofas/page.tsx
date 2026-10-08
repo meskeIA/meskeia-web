@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaMetricaEstrofas.module.css';
 
 type TabId = 'reglas' | 'versos' | 'rima' | 'estrofas' | 'formas';
@@ -665,7 +664,7 @@ export default function GuiaMetricaEstrofasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-metrica-estrofas')} />
+      <RelatedApps />
       <ShareCard appName="guia-metrica-estrofas" />
       <Footer appName="guia-metrica-estrofas" />
     </div>

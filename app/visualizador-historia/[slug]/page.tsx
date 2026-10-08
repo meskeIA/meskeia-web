@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getHistoria, getAllHistoriaSlugs } from '@/data/historias/index';
+import { getRelatedApps } from '@/data/app-relations';
 import HistoriaInteractivo from './HistoriaInteractivo';
 
 interface Props {
@@ -60,5 +61,10 @@ export default async function Page({ params }: Props) {
   const { slug } = await params;
   const data = getHistoria(slug);
   if (!data) notFound();
-  return <HistoriaInteractivo data={data} />;
+  return (
+    <HistoriaInteractivo
+      data={data}
+      relacionadas={getRelatedApps(`visualizador-historia-${data.slug}`)}
+    />
+  );
 }

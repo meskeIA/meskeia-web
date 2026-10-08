@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // --- Tipos ---
 
@@ -404,7 +403,7 @@ export default function VisualizadorMicrobiomaPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-microbioma')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-microbioma" />
         <Footer appName="visualizador-microbioma" />
     </div>

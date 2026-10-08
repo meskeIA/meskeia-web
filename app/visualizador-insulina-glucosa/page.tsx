@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -208,7 +207,6 @@ export default function VisualizadorInsulinaGlucosa() {
     setMontado(true);
   }, []);
 
-  const relatedApps = getRelatedApps('visualizador-insulina-glucosa');
 
   // Datos del gráfico
   const datosGrafico = {
@@ -538,7 +536,7 @@ export default function VisualizadorInsulinaGlucosa() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-insulina-glucosa" />
       <Footer appName="visualizador-insulina-glucosa" />
     </div>

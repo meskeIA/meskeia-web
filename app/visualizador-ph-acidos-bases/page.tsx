@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -730,7 +729,7 @@ export default function VisualizadorPhAcidosBases() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-ph-acidos-bases')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-ph-acidos-bases" />
         <Footer appName="visualizador-ph-acidos-bases" />
     </div>

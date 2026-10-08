@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './VisualizadorIluminacionPhong.module.css';
 
@@ -775,7 +774,7 @@ export default function VisualizadorIluminacionPhongPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-iluminacion-phong')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-iluminacion-phong" />
       <Footer appName="visualizador-iluminacion-phong" />
     </div>

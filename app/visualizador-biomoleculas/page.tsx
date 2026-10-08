@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -682,7 +681,7 @@ export default function VisualizadorBiomoleculasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-biomoleculas')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-biomoleculas" />
         <Footer appName="visualizador-biomoleculas" />
     </div>

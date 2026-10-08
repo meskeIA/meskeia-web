@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './CalculadoraRegla500NPFAstrofoto.module.css';
 
@@ -674,7 +673,7 @@ export default function CalculadoraRegla500NPFAstrofotoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-regla-500-npf-astrofoto')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-regla-500-npf-astrofoto" />
       </main>
 

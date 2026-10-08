@@ -13,7 +13,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   CATEGORIAS_AYUDAS,
   FISCAL_AYUDAS_PUBLICAS_META,
@@ -422,7 +421,7 @@ export default function OrientadorAyudasAutonomosPymesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-ayudas-autonomos-pymes')} />
+      <RelatedApps />
       <ShareCard appName="orientador-ayudas-autonomos-pymes" />
       <Footer appName="orientador-ayudas-autonomos-pymes" />
     </div>

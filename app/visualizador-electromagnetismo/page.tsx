@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -869,7 +868,7 @@ export default function VisualizadorElectromagnetismo(): React.ReactNode {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-electromagnetismo')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-electromagnetismo" />
       <Footer appName="visualizador-electromagnetismo" />
     </div>

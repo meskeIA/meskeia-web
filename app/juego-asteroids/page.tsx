@@ -5,7 +5,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoAsteroids.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Vector {
@@ -1261,7 +1260,7 @@ export default function JuegoAsteroidsPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-asteroids')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-asteroids" />
       <Footer appName="juego-asteroids" />

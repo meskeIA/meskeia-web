@@ -8,7 +8,6 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './CicloViral.module.css';
 
 // ─────────────────────────────────────────────
@@ -772,7 +771,7 @@ export default function VisualizadorCicloViral() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-ciclo-viral')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-ciclo-viral" />
       <Footer appName="visualizador-ciclo-viral" />
     </div>

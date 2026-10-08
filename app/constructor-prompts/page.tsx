@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -815,7 +814,7 @@ export default function ConstructorPrompts() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('constructor-prompts')} />
+      <RelatedApps />
       <ShareCard appName="constructor-prompts" />
       <Footer appName="constructor-prompts" />
     </div>

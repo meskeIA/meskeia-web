@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
@@ -1091,7 +1090,7 @@ export default function CalculadoraHorasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-horas')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-horas" />
 

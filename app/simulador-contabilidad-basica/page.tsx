@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -739,7 +738,7 @@ export default function SimuladorContabilidadBasicaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-contabilidad-basica')} />
+      <RelatedApps />
       <ShareCard appName="simulador-contabilidad-basica" />
       <Footer appName="simulador-contabilidad-basica" />
     </div>

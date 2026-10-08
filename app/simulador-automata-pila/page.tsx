@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   simular,
   revisarAutomata,
@@ -1365,7 +1364,7 @@ export default function SimuladorAutomataPila() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-automata-pila')} />
+      <RelatedApps />
       <ShareCard appName="simulador-automata-pila" />
       <Footer appName="simulador-automata-pila" />
     </div>

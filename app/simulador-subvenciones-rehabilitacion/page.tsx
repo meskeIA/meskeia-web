@@ -13,7 +13,6 @@ import {
   NumberInput, RegionBadge
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───
 
@@ -699,7 +698,7 @@ export default function SimuladorSubvencionesRehabilitacionPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-subvenciones-rehabilitacion')} />
+        <RelatedApps />
         <ShareCard appName="simulador-subvenciones-rehabilitacion" />
         <Footer appName="simulador-subvenciones-rehabilitacion" />
     </div>

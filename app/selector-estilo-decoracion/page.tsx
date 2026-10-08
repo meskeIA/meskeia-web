@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -568,7 +567,7 @@ export default function SelectorEstiloDecoracion() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-estilo-decoracion')} />
+      <RelatedApps />
       <ShareCard appName="selector-estilo-decoracion" />
       <Footer appName="selector-estilo-decoracion" />
     </div>

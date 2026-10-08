@@ -12,7 +12,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib/formatters';
 import {
   anguloEntre,
@@ -309,7 +308,6 @@ export default function TransportadorAngulosPage() {
     return () => window.removeEventListener('paste', alPegar);
   }, []);
 
-  const relatedApps = getRelatedApps('transportador-angulos');
 
   /** El texto de la medida, ya formateado, o el aviso de que no hay ángulo. */
   const medidaTexto = grados === null ? null : formatNumber(grados, 1);
@@ -948,7 +946,7 @@ export default function TransportadorAngulosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={relatedApps} />
+        <RelatedApps />
         <ShareCard appName="transportador-angulos" />
         <Footer appName="transportador-angulos" />
       </div>

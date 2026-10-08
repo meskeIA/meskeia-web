@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber, parsearSerieNumerica, formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'ohm' | 'potencia' | 'circuito' | 'consumo' | 'divisor' | 'mixto' | 'rcrl';
 type VariableOhm = 'V' | 'I' | 'R';
@@ -1523,7 +1522,7 @@ export default function CalculadoraElectricidadPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-electricidad')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-electricidad" />
       <Footer appName="calculadora-electricidad" />

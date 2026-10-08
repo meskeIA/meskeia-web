@@ -6,7 +6,6 @@ import styles from './ContadorSilabas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // La escansión (silabeo, sinalefas, acentuación) vive en metrica.ts y el análisis
@@ -879,7 +878,7 @@ sabañón garrafal, morado y frito.`,
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('contador-silabas')} />
+      <RelatedApps />
 
       <ShareCard appName="contador-silabas" />
       <Footer appName="contador-silabas" />

@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import {
   SUSTANCIAS,
@@ -1036,7 +1035,7 @@ export default function SimuladorCalorimetria() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-calorimetria')} />
+        <RelatedApps />
         <ShareCard appName="simulador-calorimetria" />
       </main>
 

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -786,7 +785,7 @@ export default function VisualizadorHipertensionPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-hipertension')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-hipertension" />
         <Footer appName="visualizador-hipertension" />
     </div>

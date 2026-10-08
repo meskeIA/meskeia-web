@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './TestTipoLector.module.css';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
@@ -718,7 +717,7 @@ export default function TestTipoLector() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('test-tipo-lector')} />
+      <RelatedApps />
       <ShareCard appName="test-tipo-lector" />
       <Footer appName="test-tipo-lector" />
     </div>

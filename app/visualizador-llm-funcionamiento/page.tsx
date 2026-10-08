@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -975,7 +974,7 @@ export default function VisualizadorLlmFuncionamiento() {
           </p>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-llm-funcionamiento')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-llm-funcionamiento" />
       </main>
 

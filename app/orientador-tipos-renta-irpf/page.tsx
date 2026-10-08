@@ -15,7 +15,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   TRAMOS_IRPF_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
@@ -677,7 +676,7 @@ export default function OrientadorTiposRentaIrpfPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-tipos-renta-irpf')} />
+      <RelatedApps />
       <ShareCard appName="orientador-tipos-renta-irpf" />
       <Footer appName="orientador-tipos-renta-irpf" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -494,7 +493,7 @@ export default function MapaAutomatizacionPersonalPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('mapa-automatizacion-personal')} />
+        <RelatedApps />
         <ShareCard appName="mapa-automatizacion-personal" />
         <Footer appName="mapa-automatizacion-personal" />
     </div>

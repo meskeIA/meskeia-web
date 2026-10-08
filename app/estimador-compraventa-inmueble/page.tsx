@@ -5,7 +5,6 @@ import styles from './EstimadorCompraventa.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, DataReference, ShareCard, RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA } from '@/data/fiscal';
@@ -3185,7 +3184,7 @@ export default function SimuladorCompraventaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-compraventa-inmueble')} />
+      <RelatedApps />
       <ShareCard appName="estimador-compraventa-inmueble" />
       <Footer appName="estimador-compraventa-inmueble" />
     </div>

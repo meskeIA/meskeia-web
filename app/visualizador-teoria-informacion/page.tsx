@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1252,7 +1251,7 @@ export default function TeoriaInformacionPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-teoria-informacion')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-teoria-informacion" />
       <Footer appName="visualizador-teoria-informacion" />
     </div>

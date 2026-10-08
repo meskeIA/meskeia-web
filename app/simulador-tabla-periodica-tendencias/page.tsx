@@ -4,7 +4,6 @@
 import { useState, useCallback, useRef } from 'react';
 import styles from './SimuladorTablaPeriodica.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   ELEMENTOS,
   ANION_NO_ESTABLE,
@@ -742,7 +741,7 @@ export default function SimuladorTablaPeriodica() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-tabla-periodica-tendencias')} />
+      <RelatedApps />
       <ShareCard appName="simulador-tabla-periodica-tendencias" />
       <Footer appName="simulador-tabla-periodica-tendencias" />
     </div>

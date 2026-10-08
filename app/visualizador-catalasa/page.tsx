@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -496,7 +495,7 @@ export default function VisualizadorCatalasa() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-catalasa')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-catalasa" />
       <Footer appName="visualizador-catalasa" />
     </div>

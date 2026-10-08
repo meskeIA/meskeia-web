@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorGitRamas.module.css';
 
 // ============================================================
@@ -580,7 +579,7 @@ export default function SimuladorGitRamas() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-git-ramas')} />
+      <RelatedApps />
       <ShareCard appName="simulador-git-ramas" />
       <Footer appName="simulador-git-ramas" />
     </div>

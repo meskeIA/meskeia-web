@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Fases de Minsky
 interface FaseMinsky {
@@ -290,7 +289,6 @@ export default function VisualizadorBurbujaEspeculativa() {
   const [casoSeleccionado, setCasoSeleccionado] = useState<number | null>(null);
   const [checkItems, setCheckItems] = useState<boolean[]>(Array(CHECKLIST_ITEMS.length).fill(false));
 
-  const relatedApps = getRelatedApps('visualizador-burbuja-especulativa');
 
   const puntuacionChecklist = checkItems.reduce(
     (acc, checked, i) => acc + (checked ? CHECKLIST_ITEMS[i].peso : 0),
@@ -775,7 +773,7 @@ export default function VisualizadorBurbujaEspeculativa() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-burbuja-especulativa" />
       <Footer appName="visualizador-burbuja-especulativa" />
     </div>

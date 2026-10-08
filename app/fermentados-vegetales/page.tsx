@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './FermentadosVegetales.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { METODOS_FERMENTO, METODO_FERMENTO_POR_ID, calcularFermento } from '@/lib/calculadoras/fermentadosVegetales';
 import { formatNumber } from '@/lib/formatters';
 
@@ -93,7 +92,7 @@ export default function FermentadosVegetalesPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('fermentados-vegetales')} />
+      <RelatedApps />
       <ShareCard appName="fermentados-vegetales" />
       <Footer appName="fermentados-vegetales" />
     </div>

@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './EstimadorBreakEven.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 export default function CalculadoraBreakEvenPage() {
   // Inputs principales
@@ -860,7 +859,7 @@ export default function CalculadoraBreakEvenPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-break-even')} />
+      <RelatedApps />
 
       <ShareCard appName="estimador-break-even" />
       <Footer appName="estimador-break-even" />

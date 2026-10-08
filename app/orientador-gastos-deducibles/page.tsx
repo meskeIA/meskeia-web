@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './OrientadorGastosDeducibles.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Base de datos de gastos deducibles
 const gastosDB = {
@@ -936,7 +935,7 @@ export default function OrientadorGastosDeduciblesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-gastos-deducibles')} />
+      <RelatedApps />
       <ShareCard appName="orientador-gastos-deducibles" />
       <Footer appName="orientador-gastos-deducibles" />
     </div>

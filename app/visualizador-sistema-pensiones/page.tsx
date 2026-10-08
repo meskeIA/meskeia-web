@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos del ratio trabajadores / pensionistas
@@ -647,7 +646,7 @@ export default function VisualizadorSistemaPensiones() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-sistema-pensiones')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-sistema-pensiones" />
       <Footer appName="visualizador-sistema-pensiones" />
     </div>

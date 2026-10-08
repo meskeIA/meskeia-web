@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorBoids.module.css';
 
 // ============== TIPOS Y CONSTANTES ==============
@@ -753,7 +752,7 @@ export default function SimuladorBoidsPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-boids')} />
+      <RelatedApps />
       <ShareCard appName="simulador-boids" />
       <Footer appName="simulador-boids" />
     </div>

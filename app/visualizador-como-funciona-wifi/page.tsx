@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -575,7 +574,7 @@ export default function VisualizadorComoFuncionaWifiPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-como-funciona-wifi')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-como-funciona-wifi" />
         <Footer appName="visualizador-como-funciona-wifi" />
       </div>

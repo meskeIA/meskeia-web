@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -821,7 +820,7 @@ export default function VisualizadorEpigenetica() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-epigenetica')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-epigenetica" />
       <Footer appName="visualizador-epigenetica" />
     </div>

@@ -3,7 +3,6 @@
 import { useState, useCallback } from 'react';
 import styles from './GeneradorNombresEmpresa.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Diccionarios por sector
 const diccionarios = {
@@ -671,7 +670,7 @@ export default function GeneradorNombresEmpresaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-nombres-empresa')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-nombres-empresa" />
       <Footer appName="generador-nombres-empresa" />

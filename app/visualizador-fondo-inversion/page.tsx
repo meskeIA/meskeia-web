@@ -9,7 +9,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './FondoInversion.module.css';
 
 type TabId = 'anatomia' | 'activos-vs-indice' | 'comisiones' | 'diversificacion';
@@ -715,7 +714,7 @@ export default function VisualizadorFondoInversion() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-fondo-inversion')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-fondo-inversion" />
       <Footer appName="visualizador-fondo-inversion" />
     </div>

@@ -13,7 +13,6 @@ import {
   RegionBadge,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   AYUDA_AUTO_PLUS_2026,
   FISCAL_AYUDAS_VEHICULO_META,
@@ -537,7 +536,7 @@ export default function SelectorVehiculoElectrico() {
         </main>
       ) : null}
 
-      <RelatedApps apps={getRelatedApps('selector-vehiculo-electrico')} />
+      <RelatedApps />
       <ShareCard appName="selector-vehiculo-electrico" />
       <Footer appName="selector-vehiculo-electrico" />
     </div>

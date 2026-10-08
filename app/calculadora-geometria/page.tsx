@@ -5,7 +5,6 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraGeometria.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Figura2D = 'cuadrado' | 'rectangulo' | 'triangulo' | 'circulo' | 'trapecio' | 'rombo' | 'pentagono' | 'hexagono';
 type Figura3D = 'cubo' | 'prisma' | 'cilindro' | 'esfera' | 'cono' | 'piramide';
@@ -1161,7 +1160,7 @@ export default function CalculadoraGeometriaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-geometria')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-geometria" />
       <Footer appName="calculadora-geometria" />

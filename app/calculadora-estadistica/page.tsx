@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraEstadistica.module.css';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, LecturaSerie } from '@/components';
 import { formatNumber, parseSpanishNumber, parsearSerieNumerica, type ModoLectura } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -1203,7 +1202,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-estadistica')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-estadistica" />
       <Footer appName="calculadora-estadistica" />

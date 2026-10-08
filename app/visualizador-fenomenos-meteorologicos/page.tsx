@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y datos
@@ -689,7 +688,7 @@ export default function VisualizadorFenomenosMeteorologicosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-fenomenos-meteorologicos')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-fenomenos-meteorologicos" />
         <Footer appName="visualizador-fenomenos-meteorologicos" />
     </div>

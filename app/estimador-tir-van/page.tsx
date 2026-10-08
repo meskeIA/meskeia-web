@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface FlujosCaja {
   ano: number;
@@ -744,7 +743,7 @@ export default function CalculadoraTIRVANPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-tir-van')} />
+      <RelatedApps />
 
       <ShareCard appName="estimador-tir-van" />
       <Footer appName="estimador-tir-van" />

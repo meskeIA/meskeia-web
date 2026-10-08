@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import styles from './OrientadorGradoDependencia.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, DataReference, RegionBadge } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
 import {
   BVD_ACTIVIDADES_18_MAS,
@@ -629,7 +628,7 @@ export default function OrientadorGradoDependencia() {
       </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-grado-dependencia')} />
+      <RelatedApps />
       <ShareCard appName="orientador-grado-dependencia" />
       <Footer appName="orientador-grado-dependencia" />
     </div>

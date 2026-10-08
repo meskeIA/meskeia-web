@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -863,7 +862,7 @@ export default function VisualizadorEvolucionMolecular() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-evolucion-molecular')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-evolucion-molecular" />
       <Footer appName="visualizador-evolucion-molecular" />
     </div>

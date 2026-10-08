@@ -14,7 +14,6 @@ import {
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   MINIMO_INGRESOS_TITULAR_NOMADA,
   MINIMO_INGRESOS_DEPENDIENTE_NOMADA,
@@ -786,7 +785,7 @@ export default function RequisitosNomadaDigitalPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('requisitos-nomada-digital')} />
+      <RelatedApps />
       <ShareCard appName="requisitos-nomada-digital" />
       <Footer appName="requisitos-nomada-digital" />
     </div>

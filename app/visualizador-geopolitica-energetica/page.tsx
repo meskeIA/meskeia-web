@@ -9,7 +9,6 @@ import {
   EducationalSection,
 } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GeopoliticaEnergetica.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -606,7 +605,7 @@ export default function VisualizadorGeopoliticaEnergetica() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-geopolitica-energetica')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-geopolitica-energetica" />
       <Footer appName="visualizador-geopolitica-energetica" />
     </div>

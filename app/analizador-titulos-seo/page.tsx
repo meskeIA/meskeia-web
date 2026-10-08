@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Palabras de poder que aumentan CTR
 const PALABRAS_PODER = {
@@ -722,7 +721,7 @@ export default function AnalizadorTitulosSeoPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('analizador-titulos-seo')} />
+      <RelatedApps />
 
       <ShareCard appName="analizador-titulos-seo" />
       <Footer appName="analizador-titulos-seo" />

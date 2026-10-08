@@ -6,7 +6,6 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
   DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
   TRAMOS_IRPF_2025,
@@ -1072,7 +1071,7 @@ export default function EstimadorIRPFPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-irpf')} />
+      <RelatedApps />
       <ShareCard appName="estimador-irpf" />
       <Footer appName="estimador-irpf" />
     </div>

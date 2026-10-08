@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorCircuitosElectricos.module.css';
 // La aritmética de las cuatro pestañas vive en ./motor.ts (28/09/2026), la misma con la que
@@ -893,7 +892,7 @@ function motivoTension(texto: string): string | null {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-circuitos-electricos')} />
+        <RelatedApps />
         <ShareCard appName="simulador-circuitos-electricos" />
       </main>
 

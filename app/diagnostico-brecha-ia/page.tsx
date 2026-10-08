@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -493,7 +492,7 @@ export default function DiagnosticoBrechaIAPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('diagnostico-brecha-ia')} />
+        <RelatedApps />
         <ShareCard appName="diagnostico-brecha-ia" />
         <Footer appName="diagnostico-brecha-ia" />
     </div>

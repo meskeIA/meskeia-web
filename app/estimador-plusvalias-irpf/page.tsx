@@ -7,7 +7,6 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
   DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_INMUEBLES_META,
   GANANCIAS_PATRIMONIALES_META,
@@ -910,7 +909,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-plusvalias-irpf')} />
+      <RelatedApps />
       <ShareCard appName="estimador-plusvalias-irpf" />
       <Footer appName="estimador-plusvalias-irpf" />
     </div>

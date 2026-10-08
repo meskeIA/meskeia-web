@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -719,7 +718,7 @@ export default function VisualizadorOjoHumanoVisionPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-ojo-humano-vision')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-ojo-humano-vision" />
         <Footer appName="visualizador-ojo-humano-vision" />
     </div>

@@ -15,7 +15,6 @@ import { Line } from 'react-chartjs-2';
 import styles from './VisualizadorTestosterona.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -468,7 +467,7 @@ export default function VisualizadorTestosterona() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-testosterona')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-testosterona" />
       </main>
 

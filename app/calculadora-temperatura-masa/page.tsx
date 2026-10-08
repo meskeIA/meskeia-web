@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularDDT,
   type TipoAmasadora,
@@ -427,7 +426,7 @@ export default function CalculadoraTemperaturaMasaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-temperatura-masa')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-temperatura-masa" />
       <Footer appName="calculadora-temperatura-masa" />
     </div>

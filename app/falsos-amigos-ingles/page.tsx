@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Categoria = 'cotidiano' | 'emociones' | 'profesional' | 'acciones' | 'identicos';
 type Nivel = 'basico' | 'medio' | 'avanzado';
@@ -599,7 +598,7 @@ export default function FalsosAmigosIngles() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('falsos-amigos-ingles')} />
+      <RelatedApps />
       <ShareCard appName="falsos-amigos-ingles" />
       <Footer appName="falsos-amigos-ingles" />
     </div>

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -643,7 +642,7 @@ export default function VisualizadorMatricesPage() {
           <div className={styles.warningBox}><strong>Nota:</strong> las transformaciones de esta herramienta son 2D con matrices 2×2. En la práctica, las transformaciones 3D usan matrices 4×4 (coordenadas homogéneas) y las de IA pueden tener millones de filas y columnas.</div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-matrices')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-matrices" />
         <Footer appName="visualizador-matrices" />
     </div>

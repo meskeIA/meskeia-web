@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   MAX_ELEMENTOS,
@@ -1256,7 +1255,7 @@ Arreglo:  [ 50, 30, 40, 10, 20, 35 ]
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-monticulo-binario')} />
+      <RelatedApps />
       <ShareCard appName="simulador-monticulo-binario" />
       <Footer appName="simulador-monticulo-binario" />
     </div>

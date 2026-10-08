@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Los pasos del viaje de una petición web
@@ -366,7 +365,7 @@ export default function VisualizadorInternet60SegundosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-internet-60-segundos')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-internet-60-segundos" />
         <Footer appName="visualizador-internet-60-segundos" />
     </div>

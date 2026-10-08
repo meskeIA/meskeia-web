@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -502,7 +501,7 @@ export default function VisualizadorComoFuncionaBancoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-como-funciona-banco')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-como-funciona-banco" />
         <Footer appName="visualizador-como-funciona-banco" />
     </div>

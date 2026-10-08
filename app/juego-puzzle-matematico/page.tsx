@@ -6,7 +6,6 @@ import styles from './JuegoPuzzleMatematico.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Modo = 'suma' | 'resta' | 'multiplicacion' | 'division' | 'mixto';
 type Pantalla = 'inicio' | 'juego' | 'resultado';
@@ -710,7 +709,7 @@ export default function JuegoPuzzleMatematicoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-puzzle-matematico')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-puzzle-matematico" />
       <Footer appName="juego-puzzle-matematico" />

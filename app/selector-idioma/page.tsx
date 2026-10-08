@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorIdioma.module.css';
 
 // ============================================================
@@ -877,7 +876,7 @@ export default function SelectorIdioma() {
         </ul>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-idioma')} />
+      <RelatedApps />
       <ShareCard appName="selector-idioma" />
       <Footer appName="selector-idioma" />
     </div>

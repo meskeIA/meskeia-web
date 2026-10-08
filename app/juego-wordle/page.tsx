@@ -6,7 +6,6 @@ import styles from './JuegoWordle.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /**
  * Pool de palabras del día (~530 palabras curadas) y diccionario completo de
@@ -689,7 +688,7 @@ export default function JuegoWordlePage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-wordle')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-wordle" />
       <Footer appName="juego-wordle" />

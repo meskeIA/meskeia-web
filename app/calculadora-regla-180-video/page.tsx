@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularRegla180, type ResultadoRegla180 } from '@/lib/calculadoras/videografia';
 
 const FPS_COMUNES = [24, 25, 30, 48, 50, 60, 90, 120, 180, 240] as const;
@@ -249,7 +248,7 @@ export default function CalculadoraRegla180VideoPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-regla-180-video')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-regla-180-video" />
       <Footer appName="calculadora-regla-180-video" />
     </div>

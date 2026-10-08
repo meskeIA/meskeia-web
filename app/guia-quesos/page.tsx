@@ -3,7 +3,6 @@
 
 import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaQuesos.module.css';
 
 type TipoLeche = 'Vaca' | 'Oveja' | 'Cabra' | 'Mezcla' | 'Búfala';
@@ -833,7 +832,7 @@ export default function GuiaQuesos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-quesos')} />
+      <RelatedApps />
       <ShareCard appName="guia-quesos" />
       <Footer appName="guia-quesos" />
     </div>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaProgramarConIa.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import RelatedApps from '@/components/RelatedApps';
 
 // ─── Herramientas del journey ───
@@ -308,7 +307,7 @@ export default function GuiaProgramarConIaPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('guia-programar-con-ia')} />
+      <RelatedApps />
       <ShareCard appName="guia-programar-con-ia" />
       <Footer appName="guia-programar-con-ia" />
     </div>

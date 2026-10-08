@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraProbabilidad.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'simple' | 'combinaciones' | 'permutaciones' | 'binomial' | 'condicional';
 
@@ -1214,7 +1213,7 @@ export default function CalculadoraProbabilidadPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-probabilidad')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-probabilidad" />
       <Footer appName="calculadora-probabilidad" />

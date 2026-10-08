@@ -5,7 +5,6 @@ import styles from './Cronometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
 
@@ -718,7 +717,7 @@ export default function CronometroPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('cronometro')} />
+      <RelatedApps />
 
       <ShareCard appName="cronometro" />
       <Footer appName="cronometro" />

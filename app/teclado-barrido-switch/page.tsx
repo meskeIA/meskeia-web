@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import {
   construirFilas,
@@ -481,7 +480,7 @@ export default function TecladoBarridoSwitchPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('teclado-barrido-switch')} />
+      <RelatedApps />
 
       <ShareCard appName="teclado-barrido-switch" />
       <Footer appName="teclado-barrido-switch" />

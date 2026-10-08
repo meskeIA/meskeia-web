@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -860,7 +859,7 @@ export default function VisualizadorRinonFiltracion() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-rinon-filtracion')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-rinon-filtracion" />
       <Footer appName="visualizador-rinon-filtracion" />
     </div>

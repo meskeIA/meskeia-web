@@ -13,7 +13,6 @@ import {
   NumberInput,
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 
 // Consumo medio en España: 133 L/persona/día (INE 2023)
@@ -679,7 +678,7 @@ export default function EstimacionAhorroHidricoPage() {
         </EducationalSection>
 
         {/* Apps relacionadas */}
-        <RelatedApps apps={getRelatedApps('estimacion-ahorro-hidrico')} />
+        <RelatedApps />
 
         {/* Tarjeta de compartir */}
         <ShareCard appName="estimacion-ahorro-hidrico" />

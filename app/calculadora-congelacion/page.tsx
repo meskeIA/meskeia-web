@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import styles from './CalculadoraCongelacion.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   ALIMENTOS_CONGELACION, CATEGORIAS_CONGELACION, ETIQUETA_APTO,
   type CategoriaCongelacion, type AptoCongelar,
@@ -110,7 +109,7 @@ export default function CalculadoraCongelacionPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-congelacion')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-congelacion" />
       <Footer appName="calculadora-congelacion" />
     </div>

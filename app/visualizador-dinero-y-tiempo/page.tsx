@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -850,7 +849,7 @@ export default function VisualizadorDineroYTiempoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-dinero-y-tiempo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-dinero-y-tiempo" />
         <Footer appName="visualizador-dinero-y-tiempo" />
     </div>

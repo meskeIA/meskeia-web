@@ -4,7 +4,6 @@
 import { useState, useMemo, useEffect, useRef, Fragment, type FormEvent } from 'react';
 import styles from './GeneradorAnagramas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   puntuarPalabra,
   letrasSinFicha,
@@ -1766,7 +1765,7 @@ export default function GeneradorAnagramasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-anagramas')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-anagramas" />
       <Footer appName="generador-anagramas" />

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -482,7 +481,7 @@ export default function TestSindromeImpostorPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-sindrome-impostor')} />
+        <RelatedApps />
         <ShareCard appName="test-sindrome-impostor" />
         <Footer appName="test-sindrome-impostor" />
     </div>

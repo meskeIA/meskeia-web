@@ -4,7 +4,6 @@
 import { useState, useMemo, useEffect, useRef, type FormEvent } from 'react';
 import styles from './BuscadorPalabrasPatron.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 /**
@@ -716,7 +715,7 @@ export default function BuscadorPalabrasPatronPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('buscador-palabras-patron')} />
+      <RelatedApps />
 
       <ShareCard appName="buscador-palabras-patron" />
       <Footer appName="buscador-palabras-patron" />

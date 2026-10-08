@@ -8,7 +8,6 @@ import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Función para contar sílabas en español
 function contarSilabas(palabra: string): number {
@@ -812,7 +811,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-legibilidad')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-legibilidad" />
       <Footer appName="calculadora-legibilidad" />

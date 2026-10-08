@@ -9,7 +9,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -563,7 +562,7 @@ export default function VisualizadorSilicio() {
         <p>La industria de semiconductores supera los <strong>600.000 millones de dólares anuales</strong> (2024). La dependencia de pocas fábricas (TSMC en Taiwán, Samsung en Corea del Sur) crea tensiones geopolíticas: la Unión Europea con la <em>Chips Act</em> y Estados Unidos con la <em>CHIPS and Science Act</em> destinan cientos de miles de millones para crear capacidad propia de fabricación.</p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-silicio')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-silicio" />
       <Footer appName="visualizador-silicio" />
     </div>

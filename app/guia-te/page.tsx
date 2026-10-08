@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaTe.module.css';
 
 type FamiliaTe = 'Verde' | 'Negro' | 'Oolong' | 'Blanco' | 'Pu-erh' | 'Amarillo' | 'Rooibos';
@@ -1059,7 +1058,7 @@ export default function GuiaTe() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-te')} />
+      <RelatedApps />
       <ShareCard appName="guia-te" />
       <Footer appName="guia-te" />
     </div>

@@ -9,7 +9,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './CicloNitrogeno.module.css';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
@@ -963,7 +962,7 @@ export default function VisualizadorCicloNitrogenoPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('visualizador-ciclo-nitrogeno')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-ciclo-nitrogeno" />
       <Footer appName="visualizador-ciclo-nitrogeno" />
     </div>

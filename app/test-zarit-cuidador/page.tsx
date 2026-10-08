@@ -12,7 +12,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import DataReference from '@/components/DataReference';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   PREGUNTAS_ZARIT,
   ESCALA_ZARIT_NIVELES,
@@ -675,7 +674,7 @@ export default function TestZaritCuidadorPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-zarit-cuidador')} />
+        <RelatedApps />
         <ShareCard appName="test-zarit-cuidador" />
         <Footer appName="test-zarit-cuidador" />
     </div>

@@ -5,7 +5,6 @@ import styles from './GeneradorLoremIpsum.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Párrafos de Lorem Ipsum clásicos
 const loremIpsumParrafos = [
@@ -389,7 +388,7 @@ export default function GeneradorLoremIpsumPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-lorem-ipsum')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-lorem-ipsum" />
       <Footer appName="generador-lorem-ipsum" />

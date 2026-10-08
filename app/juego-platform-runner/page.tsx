@@ -5,7 +5,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './JuegoPlatformRunner.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Player {
@@ -1176,7 +1175,7 @@ export default function JuegoPlatformRunnerPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-platform-runner')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-platform-runner" />
       <Footer appName="juego-platform-runner" />

@@ -4,7 +4,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import styles from './QuizSimbolosQuimicos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, ShareCard, LegalNotice, RelatedApps } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatPercentage } from '@/lib';
 import { ELEMENTOS, TOTAL_ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
 
@@ -675,7 +674,7 @@ export default function QuizSimbolosQuimicosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-simbolos-quimicos')} />
+      <RelatedApps />
       <ShareCard appName="quiz-simbolos-quimicos" />
       <Footer appName="quiz-simbolos-quimicos" />
     </div>

@@ -4,6 +4,7 @@ import styles from './RelatedApps.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { withFrom } from '@/lib/trackingFrom';
+import { useRelacionadas } from './RelacionadasContexto';
 
 /**
  * Interfaz para una app relacionada
@@ -21,8 +22,8 @@ export interface RelatedApp {
 interface RelatedAppsProps {
   /** Título de la sección (ej: "Más herramientas para estudiantes") */
   title?: string;
-  /** Lista de apps relacionadas (máximo 4 recomendado) */
-  apps: RelatedApp[];
+  /** Lista de apps relacionadas (máximo 4). Sin ella, las que pasa `ConRelacionadas` desde el layout */
+  apps?: RelatedApp[];
   /** Icono del título (opcional) */
   icon?: string;
 }
@@ -35,11 +36,11 @@ interface RelatedAppsProps {
  *
  * @example
  * ```tsx
- * import { RelatedApps, getRelatedApps } from '@/components';
- *
- * // Opción 1: Usar helper automático
- * const apps = getRelatedApps('calculadora-notas');
- * {apps.length > 0 && <RelatedApps apps={apps} title="Herramientas para estudiantes" />}
+ * // Opción 1 (la de todas las apps): el layout.tsx envuelve {children} en
+ * // <ConRelacionadas slug="calculadora-notas"> y la página pinta, sin prop:
+ * <RelatedApps />
+ * // ⚠️ Nunca getRelatedApps() en una página 'use client': manda al navegador el mapa
+ * // de relacionadas de todo el catálogo (733 KB). Lo impide check:catalogo-cliente.
  *
  * // Opción 2: Definir manualmente
  * <RelatedApps
@@ -51,8 +52,11 @@ interface RelatedAppsProps {
  * />
  * ```
  */
-export default function RelatedApps({ title = 'Apps relacionadas', apps, icon = '🔗' }: RelatedAppsProps) {
+export default function RelatedApps({ title = 'Apps relacionadas', apps: appsProp, icon = '🔗' }: RelatedAppsProps) {
   const pathname = usePathname();
+  // Sin prop, las del contexto que rellena `ConRelacionadas` en el layout de la app
+  const appsContexto = useRelacionadas();
+  const apps = appsProp ?? appsContexto;
 
   // No renderizar si no hay apps o hay más de 4 (limitar a 4 máximo)
   if (!apps || apps.length === 0) return null;

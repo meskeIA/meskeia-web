@@ -5,7 +5,6 @@ import styles from './GeneradorCarruseles.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Slide {
@@ -885,7 +884,7 @@ export default function GeneradorCarruselesPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-carruseles')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-carruseles" />
       <Footer appName="generador-carruseles" />

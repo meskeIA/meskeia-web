@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -769,7 +768,7 @@ export default function VisualizadorCerebroPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-cerebro')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-cerebro" />
         <Footer appName="visualizador-cerebro" />
     </div>

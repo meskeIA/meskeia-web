@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -654,7 +653,7 @@ export default function VisualizadorMapaEspeciasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-mapa-especias')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-mapa-especias" />
         <Footer appName="visualizador-mapa-especias" />
     </div>

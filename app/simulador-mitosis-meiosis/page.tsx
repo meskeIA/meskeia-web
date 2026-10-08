@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { parseSpanishNumber } from '@/lib';
 import {
   cromatidasPorCromosoma,
@@ -982,7 +981,7 @@ export default function SimuladorMitosisMeiosis() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-mitosis-meiosis')} />
+      <RelatedApps />
       <ShareCard appName="simulador-mitosis-meiosis" />
       <Footer appName="simulador-mitosis-meiosis" />
     </div>

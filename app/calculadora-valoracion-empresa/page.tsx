@@ -13,7 +13,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -230,7 +229,6 @@ export default function CalculadoraValoracionEmpresa() {
     setRawValues({});
   };
 
-  const relatedApps = getRelatedApps('calculadora-valoracion-empresa');
 
   return (
     <div className={styles.container}>
@@ -622,7 +620,7 @@ export default function CalculadoraValoracionEmpresa() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="calculadora-valoracion-empresa" />
       <Footer appName="calculadora-valoracion-empresa" />
     </div>

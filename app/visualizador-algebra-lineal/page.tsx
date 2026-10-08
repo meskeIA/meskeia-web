@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -1014,7 +1013,7 @@ export default function VisualizadorAlgebraLineal() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-algebra-lineal')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-algebra-lineal" />
       <Footer appName="visualizador-algebra-lineal" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos de los 12 niveles de escala
@@ -449,7 +448,7 @@ export default function VisualizadorEscalaUniversoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-escala-universo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-escala-universo" />
         <Footer appName="visualizador-escala-universo" />
     </div>

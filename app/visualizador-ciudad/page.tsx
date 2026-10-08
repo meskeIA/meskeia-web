@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -484,7 +483,7 @@ export default function VisualizadorCiudadPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-ciudad')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-ciudad" />
         <Footer appName="visualizador-ciudad" />
       </div>

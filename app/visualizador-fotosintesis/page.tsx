@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -745,7 +744,7 @@ export default function VisualizadorFotosintesisPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-fotosintesis')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-fotosintesis" />
         <Footer appName="visualizador-fotosintesis" />
     </div>

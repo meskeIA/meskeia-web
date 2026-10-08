@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos: el mundo en 100 personas
@@ -263,7 +262,7 @@ export default function VisualizadorMundo100PersonasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-mundo-100-personas')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-mundo-100-personas" />
         <Footer appName="visualizador-mundo-100-personas" />
     </div>

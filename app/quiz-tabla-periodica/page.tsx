@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './QuizTablaPeriodica.module.css';
 
 
@@ -409,7 +408,7 @@ export default function QuizTablaPeriodicaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-tabla-periodica')} />
+      <RelatedApps />
       <ShareCard appName="quiz-tabla-periodica" />
       <Footer appName="quiz-tabla-periodica" />
     </div>

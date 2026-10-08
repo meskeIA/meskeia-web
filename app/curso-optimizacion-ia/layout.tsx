@@ -1,5 +1,6 @@
 import { CourseProvider } from './CourseContext';
 import { jsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 
 export { metadata } from './metadata';
 
@@ -14,7 +15,7 @@ export default function CursoLayout({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <CourseProvider>{children}</CourseProvider>
+      <CourseProvider><ConRelacionadas slug="curso-optimizacion-ia">{children}</ConRelacionadas></CourseProvider>
     </>
   );
 }

@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorEspaciosColor.module.css';
 
 // ============== TIPOS ==============
@@ -864,7 +863,7 @@ export default function VisualizadorEspaciosColorPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-espacios-color')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-espacios-color" />
       <Footer appName="visualizador-espacios-color" />
     </div>

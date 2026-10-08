@@ -14,7 +14,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   TIPOS_IS_2025,
   TRAMOS_IS_MICROPYMES_2026,
@@ -268,7 +267,6 @@ export default function SimuladorFinanciacionEmpresarial() {
     setRawValues({});
   };
 
-  const relatedApps = getRelatedApps('simulador-financiacion-empresarial');
 
   // Campos agrupados por vía para el render
   const camposComunes: { campo: keyof InputData; label: string; sufijo: string; placeholder: string }[] = [
@@ -677,7 +675,7 @@ export default function SimuladorFinanciacionEmpresarial() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="simulador-financiacion-empresarial" />
       <Footer appName="simulador-financiacion-empresarial" />
     </div>

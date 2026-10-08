@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorProyectiles.module.css';
 
@@ -976,7 +975,7 @@ export default function SimuladorProyectiles() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-proyectiles')} />
+        <RelatedApps />
         <ShareCard appName="simulador-proyectiles" />
       </main>
 

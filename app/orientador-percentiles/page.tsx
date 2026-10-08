@@ -5,7 +5,6 @@ import styles from './OrientadorPercentiles.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Sexo = 'nino' | 'nina';
 
@@ -731,7 +730,7 @@ export default function CalculadoraPercentilesPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-percentiles')} />
+      <RelatedApps />
 
       <ShareCard appName="orientador-percentiles" />
       <Footer appName="orientador-percentiles" />

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, RegionBadge } from '@/components';
 import { formatNumber, formatPercentage } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Definición de preguntas con puntuaciones
 interface Option {
@@ -982,7 +981,7 @@ export default function TestPerfilInversorPage() {
         <GuiaPerfilInversor />
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('test-perfil-inversor')} />
+      <RelatedApps />
 
       <ShareCard appName="test-perfil-inversor" />
 

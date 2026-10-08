@@ -18,7 +18,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -655,7 +654,7 @@ export default function SelectorSmartphone() {
         </EducationalSection>
       </div>
 
-      <RelatedApps apps={getRelatedApps('selector-smartphone')} />
+      <RelatedApps />
       <ShareCard appName="selector-smartphone" />
       <Footer appName="selector-smartphone" />
     </div>

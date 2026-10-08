@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import styles from './PlanificadorMascota.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type TabType = 'perfil' | 'checklist' | 'compras' | 'vacunas';
@@ -1225,7 +1224,6 @@ export default function PlanificadorMascotaPage() {
       </EducationalSection>
 
       <RelatedApps
-        apps={getRelatedApps('planificador-mascota')}
         title="Más herramientas para tu mascota"
         icon="🐾"
       />

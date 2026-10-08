@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './CalculadoraPorcentajes.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type CalculationType = 'percentOf' | 'whatPercent' | 'increase' | 'decrease' | 'variation';
 
@@ -440,7 +439,7 @@ export default function CalculadoraPorcentajesPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-porcentajes')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-porcentajes" />
       <Footer appName="calculadora-porcentajes" />

@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   ALIMENTOS_COCCION,
   ALIMENTO_COCCION_POR_ID,
@@ -206,7 +205,7 @@ export default function TemperaturaCoccionCarnePage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('temperatura-coccion-carne')} />
+      <RelatedApps />
       <ShareCard appName="temperatura-coccion-carne" />
       <Footer appName="temperatura-coccion-carne" />
     </div>

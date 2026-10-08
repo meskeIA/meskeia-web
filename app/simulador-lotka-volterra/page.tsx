@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorLotkaVolterra.module.css';
 
@@ -960,7 +959,7 @@ export default function Page() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('simulador-lotka-volterra')} />
+      <RelatedApps />
       <ShareCard appName="simulador-lotka-volterra" />
       <Footer appName="simulador-lotka-volterra" />
     </div>

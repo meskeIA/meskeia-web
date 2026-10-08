@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCodigoBarras = 'EAN13' | 'EAN8' | 'UPCA' | 'CODE128' | 'CODE39' | 'ITF14';
 
@@ -1016,7 +1015,7 @@ export default function GeneradorCodigosBarrasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-codigos-barras')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-codigos-barras" />
       <Footer appName="generador-codigos-barras" />

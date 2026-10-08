@@ -10,7 +10,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaCocteles.module.css';
 
 type FamiliaCoctel = 'Sour' | 'Highball' | 'Martini' | 'Tropical' | 'Spritz / Aperitivo' | 'Cremoso / Caliente' | 'Sin alcohol';
@@ -1212,7 +1211,7 @@ export default function GuiaCocteles() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-cocteles')} />
+      <RelatedApps />
       <ShareCard appName="guia-cocteles" />
       <Footer appName="guia-cocteles" />
     </div>

@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './QuizBiologiaMolecular.module.css';
 import {
@@ -986,7 +985,7 @@ export default function QuizBiologiaMolecularPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-biologia-molecular')} />
+      <RelatedApps />
       <ShareCard appName="quiz-biologia-molecular" />
       <Footer appName="quiz-biologia-molecular" />
     </div>

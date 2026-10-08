@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tipos
@@ -971,7 +970,7 @@ export default function VisualizadorEmbriogenesis() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-embriogenesis')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-embriogenesis" />
       <Footer appName="visualizador-embriogenesis" />
     </div>

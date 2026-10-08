@@ -16,7 +16,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   BONIFICACIONES_CCAA_PATRIMONIO,
   EXENCION_VIVIENDA_HABITUAL,
@@ -641,7 +640,7 @@ export default function OrientadorImpuestoPatrimonioPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-impuesto-patrimonio')} />
+      <RelatedApps />
       <ShareCard appName="orientador-impuesto-patrimonio" />
       <Footer appName="orientador-impuesto-patrimonio" />
     </div>

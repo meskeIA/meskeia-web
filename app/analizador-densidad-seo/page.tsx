@@ -8,7 +8,6 @@ import EducationalSection from '@/components/EducationalSection';
 import { RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // Stop words en español (palabras a ignorar)
@@ -470,7 +469,7 @@ export default function AnalizadorDensidadSeoPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('analizador-densidad-seo')} />
+      <RelatedApps />
       <ShareCard appName="analizador-densidad-seo" />
       <Footer appName="analizador-densidad-seo" />
     </div>

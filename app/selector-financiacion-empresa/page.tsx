@@ -10,7 +10,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorFinanciacionEmpresa.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -606,7 +605,7 @@ export default function SelectorFinanciacionEmpresa() {
             </div>
           </EducationalSection>
 
-          <RelatedApps apps={getRelatedApps('selector-financiacion-empresa')} />
+          <RelatedApps />
           <ShareCard appName="selector-financiacion-empresa" />
           <Footer appName="selector-financiacion-empresa" />
         </div>

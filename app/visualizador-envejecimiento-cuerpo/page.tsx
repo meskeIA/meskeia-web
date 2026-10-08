@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -294,7 +293,7 @@ export default function VisualizadorEnvejecimientoCuerpoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-envejecimiento-cuerpo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-envejecimiento-cuerpo" />
         <Footer appName="visualizador-envejecimiento-cuerpo" />
     </div>

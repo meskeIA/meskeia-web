@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularPrediccionRunning, type ResultadoPrediccionRunning } from '@/lib/calculadoras/deporte';
 import { formatNumber } from '@/lib';
 
@@ -345,7 +344,7 @@ export default function CalculadoraTiemposRunningPage() {
         </ul>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-tiempos-running')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-tiempos-running" />
       <Footer appName="calculadora-tiempos-running" />
     </div>

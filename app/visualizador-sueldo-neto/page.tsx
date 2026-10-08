@@ -13,7 +13,6 @@ import {
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, formatPercentage } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
   FISCAL_SS_CUENTA_AJENA_META,
@@ -551,7 +550,7 @@ export default function VisualizadorSueldoNetoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sueldo-neto')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sueldo-neto" />
         <Footer appName="visualizador-sueldo-neto" />
     </div>

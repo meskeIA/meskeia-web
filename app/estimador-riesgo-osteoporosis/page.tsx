@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import styles from './EstimadorRiesgoOsteoporosis.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
 
@@ -502,7 +501,7 @@ export default function EstimadorRiesgoOsteoporosis() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-riesgo-osteoporosis')} />
+      <RelatedApps />
       <ShareCard appName="estimador-riesgo-osteoporosis" />
       <Footer appName="estimador-riesgo-osteoporosis" />
     </div>

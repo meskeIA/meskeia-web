@@ -5,7 +5,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './LupaDigital.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type FiltroTipo = 'ninguno' | 'alto-contraste' | 'invertir' | 'escala-grises' | 'sepia';
 
@@ -904,7 +903,7 @@ export default function LupaDigitalPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('lupa-digital')} />
+      <RelatedApps />
       <ShareCard appName="lupa-digital" />
       <Footer appName="lupa-digital" />
     </div>

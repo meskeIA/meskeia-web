@@ -14,7 +14,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   CATEGORIAS_JUBILACION_TRAMITES,
   FISCAL_JUBILACION_TRAMITES_META,
@@ -432,7 +431,7 @@ export default function OrientadorTramitesJubilacionPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-tramites-jubilacion')} />
+      <RelatedApps />
       <ShareCard appName="orientador-tramites-jubilacion" />
       <Footer appName="orientador-tramites-jubilacion" />
     </div>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './EstimadorCostePlazos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Resultado {
   precioContado: number;
@@ -520,7 +519,7 @@ export default function CalculadoraCostePlazosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-coste-plazos')} />
+      <RelatedApps />
       <ShareCard appName="estimador-coste-plazos" />
       <Footer appName="estimador-coste-plazos" />
     </div>

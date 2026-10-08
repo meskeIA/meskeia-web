@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularFOVVideo } from '@/lib/calculadoras/videografia';
 import type { TipoSensor } from '@/lib/calculadoras/fotografia';
 
@@ -301,7 +300,7 @@ export default function CalculadoraFovVideoPage() {
       </EducationalSection>
 
       {/* Apps relacionadas */}
-      <RelatedApps apps={getRelatedApps('calculadora-fov-video')} />
+      <RelatedApps />
 
       {/* Tarjeta de compartir */}
       <ShareCard appName="calculadora-fov-video" />

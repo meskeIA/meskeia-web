@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
@@ -803,7 +802,7 @@ export default function GeneradorCrucigramasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('generador-crucigramas')} />
+        <RelatedApps />
 
         <ShareCard appName="generador-crucigramas" />
 

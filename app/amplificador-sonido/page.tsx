@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AmplificadorSonido.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // Parámetros del amplificador
@@ -639,7 +638,7 @@ export default function AmplificadorSonidoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('amplificador-sonido')} />
+      <RelatedApps />
 
       <ShareCard appName="amplificador-sonido" />
       <Footer appName="amplificador-sonido" />

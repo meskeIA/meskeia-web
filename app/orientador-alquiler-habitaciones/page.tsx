@@ -12,7 +12,6 @@ import {
   ShareCard,
   NumberInput,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 
 // ──────────────────────────────────────────
@@ -366,7 +365,7 @@ export default function OrientadorAlquilerHabitacionesPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('orientador-alquiler-habitaciones')} />
+        <RelatedApps />
         <ShareCard appName="orientador-alquiler-habitaciones" />
         <Footer appName="orientador-alquiler-habitaciones" />
     </div>

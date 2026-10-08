@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 /* ────────────────────────────────────────────────────────────────
@@ -2261,7 +2260,7 @@ export default function TablaKaKbPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-ka-kb')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-ka-kb" />
 

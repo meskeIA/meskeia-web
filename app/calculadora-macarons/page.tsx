@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraMacarons.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularMacarons, almendraDesdeClaras } from '@/lib/calculadoras/macarons';
 import { formatNumber } from '@/lib/formatters';
 
@@ -85,7 +84,7 @@ export default function CalculadoraMacaronsPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-macarons')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-macarons" />
       <Footer appName="calculadora-macarons" />
     </div>

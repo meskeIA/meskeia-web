@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaRazasPerros.module.css';
 
 type GrupoFCI =
@@ -1514,7 +1513,7 @@ export default function GuiaRazasPerrosPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-razas-perros')} />
+        <RelatedApps />
         <ShareCard appName="guia-razas-perros" />
         <Footer appName="guia-razas-perros" />
     </div>

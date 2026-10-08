@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraRoyalIcing.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { CONSISTENCIAS_ICING, CONSISTENCIA_ICING_POR_ID, calcularIcing } from '@/lib/calculadoras/royalIcing';
 import { formatNumber } from '@/lib/formatters';
 
@@ -94,7 +93,7 @@ export default function CalculadoraRoyalIcingPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-royal-icing')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-royal-icing" />
       <Footer appName="calculadora-royal-icing" />
     </div>

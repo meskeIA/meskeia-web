@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState, type MouseEvent } from 'react';
 import styles from './SelectorEjercicio.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularResultado, PREGUNTAS, EJERCICIOS, CON_ARTICULO, type Resultado } from './motor';
 
 // Las preguntas con sus pesos, las fichas de cada actividad y la lógica viven en ./motor.ts.
@@ -495,7 +494,7 @@ export default function SelectorEjercicio() {
       </div>
 
       <ShareCard appName="selector-ejercicio" />
-      <RelatedApps apps={getRelatedApps('selector-ejercicio')} />
+      <RelatedApps />
       <Footer appName="selector-ejercicio" />
     </div>
   );

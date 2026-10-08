@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import styles from './MatrizEisenhower.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type Quadrant = 'hacer' | 'planificar' | 'delegar' | 'eliminar';
@@ -611,7 +610,7 @@ export default function MatrizEisenhowerPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('matriz-eisenhower')} />
+      <RelatedApps />
       <ShareCard appName="matriz-eisenhower" />
       <Footer appName="matriz-eisenhower" />
     </div>

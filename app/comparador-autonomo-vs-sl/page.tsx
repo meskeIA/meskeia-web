@@ -6,7 +6,6 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, Rela
   DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_IRPF_META,
   FISCAL_AUTONOMOS_META,
@@ -871,7 +870,7 @@ export default function ComparadorAutonomoVsSLPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('comparador-autonomo-vs-sl')} />
+      <RelatedApps />
       <ShareCard appName="comparador-autonomo-vs-sl" />
       <Footer appName="comparador-autonomo-vs-sl" />
     </div>

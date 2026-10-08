@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaPrimerEmpleo.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import RelatedApps from '@/components/RelatedApps';
 
 // ─── Herramientas del journey ───
@@ -357,7 +356,7 @@ export default function GuiaPrimerEmpleoPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('guia-primer-empleo')} />
+      <RelatedApps />
       <ShareCard appName="guia-primer-empleo" />
       <Footer appName="guia-primer-empleo" />
     </div>

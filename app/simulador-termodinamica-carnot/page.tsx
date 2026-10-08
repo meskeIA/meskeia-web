@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTermodinamicaCarnot.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatPercentage } from '@/lib';
 
 // ============================================
@@ -878,7 +877,7 @@ export default function SimuladorTermodinamicaCarnotPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-termodinamica-carnot')} />
+      <RelatedApps />
       <ShareCard appName="simulador-termodinamica-carnot" />
       <Footer appName="simulador-termodinamica-carnot" />
     </div>

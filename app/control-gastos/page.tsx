@@ -5,7 +5,6 @@ import styles from './ControlGastos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 
 // Categorías de gastos
@@ -944,7 +943,7 @@ export default function ControlGastosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('control-gastos')} />
+      <RelatedApps />
       <ShareCard appName="control-gastos" />
       <Footer appName="control-gastos" />
     </div>

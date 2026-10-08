@@ -13,7 +13,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   BONO_ALQUILER_JOVEN_2026,
   UMBRAL_IPREM_VIVIENDA_JOVEN,
@@ -948,7 +947,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-bono-joven-alquiler')} />
+      <RelatedApps />
       <ShareCard appName="simulador-bono-joven-alquiler" />
       <Footer appName="simulador-bono-joven-alquiler" />
     </div>

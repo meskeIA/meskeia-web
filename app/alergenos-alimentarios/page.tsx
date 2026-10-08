@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import styles from './Alergenos.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import { ALERGENOS, ETIQUETA_GRUPO, type GrupoAlergeno } from '@/lib/guias/alergenos';
 
 const GRUPOS: GrupoAlergeno[] = ['animal', 'vegetal', 'aditivo'];
@@ -156,7 +155,7 @@ export default function AlergenosAlimentariosPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('alergenos-alimentarios')} />
+      <RelatedApps />
       <ShareCard appName="alergenos-alimentarios" />
       <Footer appName="alergenos-alimentarios" />
     </div>

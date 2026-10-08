@@ -8,7 +8,6 @@ import { RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface HashtagCategoria {
   nombre: string;
@@ -421,7 +420,7 @@ export default function GeneradorHashtagsPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-hashtags')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-hashtags" />
       <Footer appName="generador-hashtags" />

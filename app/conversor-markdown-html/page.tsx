@@ -6,7 +6,6 @@ import styles from './ConversorMarkdown.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Ejemplos predefinidos
 const EJEMPLOS = {
@@ -120,7 +119,6 @@ npm install @meskeia/markdown-converter
 
 \`\`\`javascript
 import { convert } from '@meskeia/markdown-converter';
-import { getRelatedApps } from '@/data/app-relations';
 
 const html = convert('# Hola Mundo');
 console.log(html); // <h1>Hola Mundo</h1>
@@ -757,7 +755,7 @@ console.log('Hola mundo');
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-markdown-html')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-markdown-html" />
       <Footer appName="conversor-markdown-html" />

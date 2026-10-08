@@ -4,7 +4,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './RecortadorVideo.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   cargarVideo,
   recortar,
@@ -562,7 +561,7 @@ export default function RecortadorVideoPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('recortador-video')} />
+      <RelatedApps />
       <ShareCard appName="recortador-video" />
       <Footer appName="recortador-video" />
     </div>

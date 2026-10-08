@@ -24,7 +24,6 @@ import {
   RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
 
@@ -2132,7 +2131,7 @@ export default function SimuladorTrasteroCompraventaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-gastos-compraventa-trastero')} />
+      <RelatedApps />
       <ShareCard appName="simulador-gastos-compraventa-trastero" />
       <Footer appName="simulador-gastos-compraventa-trastero" />
     </div>

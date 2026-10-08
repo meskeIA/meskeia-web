@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import styles from './ConversorTallas.module.css';
 import { Footer, ResultCard, MeskeiaLogo, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type TabType = 'hombre' | 'mujer' | 'calzado' | 'complementos';
@@ -1151,7 +1150,7 @@ export default function ConversorTallasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-tallas')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-tallas" />
       <Footer appName="conversor-tallas" />

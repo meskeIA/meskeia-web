@@ -12,7 +12,6 @@ import {
   ShareCard,
   DataReference, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_MATERNIDAD_META,
   PERMISO_NACIMIENTO,
@@ -834,7 +833,7 @@ export default function EstimacionBajaMaternalPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimacion-baja-maternal')} />
+      <RelatedApps />
       <ShareCard appName="estimacion-baja-maternal" />
       <Footer appName="estimacion-baja-maternal" />
     </div>

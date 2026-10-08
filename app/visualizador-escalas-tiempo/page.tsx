@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos
@@ -234,7 +233,7 @@ export default function VisualizadorEscalasTiempoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-escalas-tiempo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-escalas-tiempo" />
         <Footer appName="visualizador-escalas-tiempo" />
     </div>

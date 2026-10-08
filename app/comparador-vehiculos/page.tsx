@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import styles from './ComparadorVehiculos.module.css';
 import { MeskeiaLogo, Footer, NumberInput, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
 type PerfilUsuario = 'particular' | 'autonomo' | 'empresa';
@@ -1041,7 +1040,7 @@ Total real con opción compra: ~26.200 € (vs 35.000 contado)</code>
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('comparador-vehiculos')} />
+      <RelatedApps />
       <ShareCard appName="comparador-vehiculos" />
       <Footer appName="comparador-vehiculos" />
     </div>

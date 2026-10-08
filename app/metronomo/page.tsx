@@ -4,7 +4,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Metronomo.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tempos preestablecidos con nombres musicales
 const TEMPO_PRESETS = [
@@ -507,7 +506,7 @@ export default function MetronomoPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('metronomo')} />
+      <RelatedApps />
       <ShareCard appName="metronomo" />
       <Footer appName="metronomo" />
     </div>

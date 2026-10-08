@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './Luxometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import DataReference from '@/components/DataReference';
 import {
@@ -1031,7 +1030,7 @@ export default function LuxometroPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('luxometro')} />
+      <RelatedApps />
 
       <ShareCard appName="luxometro" />
       <Footer appName="luxometro" />

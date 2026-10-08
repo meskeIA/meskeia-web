@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -366,7 +365,6 @@ function GraficaAlzheimer() {
 export default function VisualizadorAcetilcolina() {
   const [sistemaActivo, setSistemaActivo] = useState<SistemaId>('neuromuscular');
   const [cicloAnimando, setCicloAnimando] = useState(false);
-  const relacionadas = getRelatedApps('visualizador-acetilcolina');
 
   const sistema = SISTEMAS.find((s) => s.id === sistemaActivo)!;
 
@@ -642,7 +640,7 @@ export default function VisualizadorAcetilcolina() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relacionadas} />
+      <RelatedApps />
       <ShareCard appName="visualizador-acetilcolina" />
       <Footer appName="visualizador-acetilcolina" />
     </div>

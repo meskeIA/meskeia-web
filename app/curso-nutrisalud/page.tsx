@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './CursoNutrisalud.module.css';
 import { MeskeiaLogo, Footer, DisclaimerCard, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   MODULES,
   CHAPTERS,
@@ -345,7 +344,7 @@ export default function CursoNutrisaludPage() {
         </Link>
       </section>
 
-      <RelatedApps apps={getRelatedApps('curso-nutrisalud')} />
+      <RelatedApps />
 
       <ShareCard appName="curso-nutrisalud" />
       <Footer appName="curso-nutrisalud" />

@@ -12,7 +12,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, formatPercentage } from '@/lib';
 import {
   desglosarEscalaGeneral,
@@ -1099,7 +1098,7 @@ export default function SimuladorDesgloseNominaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-desglose-nomina')} />
+      <RelatedApps />
       <ShareCard appName="simulador-desglose-nomina" />
       <Footer appName="simulador-desglose-nomina" />
     </div>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './CalculadoraDescuentos.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface DiscountResult {
   precioOriginal: number;
@@ -397,7 +396,7 @@ export default function CalculadoraDescuentosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-descuentos')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-descuentos" />
       <Footer appName="calculadora-descuentos" />

@@ -10,7 +10,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorMovimientoCircular.module.css';
 import CasosAula from './CasosAula';
@@ -811,7 +810,7 @@ export default function SimuladorMovimientoCircularPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-movimiento-circular')} />
+      <RelatedApps />
       <ShareCard appName="simulador-movimiento-circular" />
       <Footer appName="simulador-movimiento-circular" />
     </div>

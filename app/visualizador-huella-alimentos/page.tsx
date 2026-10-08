@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos: impacto ambiental por kg de alimento
@@ -208,7 +207,7 @@ export default function VisualizadorHuellaAlimentosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-huella-alimentos')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-huella-alimentos" />
         <Footer appName="visualizador-huella-alimentos" />
     </div>

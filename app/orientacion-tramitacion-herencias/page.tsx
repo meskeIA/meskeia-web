@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './OrientacionHerencias.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, DataReference, ShareCard } from '@/components';
 import Link from 'next/link';
-import { getRelatedApps } from '@/data/app-relations';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import { PLAZO_ISD, PLAZO_IIVTNU } from '@/data/fiscal';
 
@@ -1055,7 +1054,7 @@ export default function OrientacionTramitacionHerenciasPage() {
       </EducationalSection>
 
       <ShareCard appName="orientacion-tramitacion-herencias" />
-      <RelatedApps apps={getRelatedApps('orientacion-tramitacion-herencias')} />
+      <RelatedApps />
       <Footer appName="orientacion-tramitacion-herencias" />
     </div>
   );

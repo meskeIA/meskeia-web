@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, formatPercentage } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import CasosAula from './CasosAula';
 // La longitud de onda y el periodo NO se calculan aquí: vienen del mismo módulo con el que se
 // corrigen los casos para clase, para que la app no pueda suspender una respuesta que ella
@@ -1015,7 +1014,7 @@ export default function SonidoOndasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sonido-ondas')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sonido-ondas" />
         <Footer appName="visualizador-sonido-ondas" />
     </div>

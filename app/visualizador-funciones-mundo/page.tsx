@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 import {
   CASOS,
@@ -602,7 +601,7 @@ export default function VisualizadorFuncionesMundoPage() {
           <div className={styles.warningBox}><strong>Nota:</strong> las funciones aquí presentadas están simplificadas con fines educativos. En la realidad, los fenómenos suelen seguir combinaciones de funciones o tener condiciones de contorno que modifican su comportamiento.</div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-funciones-mundo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-funciones-mundo" />
         <Footer appName="visualizador-funciones-mundo" />
     </div>

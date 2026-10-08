@@ -17,7 +17,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { PREGUNTAS_FRECUENTES } from './metadata';
 
 export default function [NombreApp]Page() {
@@ -113,7 +112,8 @@ export default function [NombreApp]Page() {
         </EducationalSection>
 
         {/* Apps relacionadas */}
-        <RelatedApps apps={getRelatedApps('[nombre-app]')} />
+        {/* Sin prop: las tarjetas las resuelve ConRelacionadas en layout.tsx */}
+        <RelatedApps />
 
         {/* Tarjeta de compartir */}
         <ShareCard appName="[nombre-app]" />

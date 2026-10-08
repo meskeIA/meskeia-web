@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatDate } from '@/lib';
 
 // Tipos
@@ -1147,7 +1146,7 @@ export default function CalculadoraFechaPartoPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('planificador-embarazo')} />
+      <RelatedApps />
 
       <ShareCard appName="planificador-embarazo" />
       <Footer appName="planificador-embarazo" />

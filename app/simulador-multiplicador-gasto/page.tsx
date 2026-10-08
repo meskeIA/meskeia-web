@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import { jsonLd } from './metadata';
 
@@ -764,7 +763,7 @@ export default function SimuladorMultiplicadorGastoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-multiplicador-gasto')} />
+        <RelatedApps />
         <ShareCard appName="simulador-multiplicador-gasto" />
         <Footer appName="simulador-multiplicador-gasto" />
       </div>

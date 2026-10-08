@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones
@@ -376,7 +375,7 @@ export default function VisualizadorProbabilidadPage() {
           <div className={styles.warningBox}><strong>Nota:</strong> las simulaciones usan Math.random() del navegador, que es pseudoaleatorio pero suficiente para fines educativos. Las probabilidades teóricas asumen eventos ideales.</div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-probabilidad')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-probabilidad" />
         <Footer appName="visualizador-probabilidad" />
     </div>

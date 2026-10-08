@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ── Tipos del motor de decisión ──────────────────────────────────────────
 type Elemento = 'interior' | 'exterior' | 'suelo' | 'contacto-alimentos' | 'melamina';
@@ -573,7 +572,7 @@ export default function ElegirBarnizMaderaPage() {
       </EducationalSection>
 
       {/* Apps relacionadas */}
-      <RelatedApps apps={getRelatedApps('elegir-barniz-madera')} />
+      <RelatedApps />
 
       {/* Tarjeta de compartir */}
       <ShareCard appName="elegir-barniz-madera" />

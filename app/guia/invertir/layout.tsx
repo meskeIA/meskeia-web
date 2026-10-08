@@ -1,4 +1,5 @@
 import { jsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 
 export { metadata } from './metadata';
 
@@ -9,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {children}
+      <ConRelacionadas slug="guia-invertir">{children}</ConRelacionadas>
     </>
   );
 }

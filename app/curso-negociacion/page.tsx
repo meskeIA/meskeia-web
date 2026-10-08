@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import styles from './CursoNegociacion.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { useCourse, COURSE_MODULES } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -230,7 +229,7 @@ export default function CursoNegociacionPage() {
         )}
       </section>
 
-      <RelatedApps apps={getRelatedApps('curso-negociacion')} />
+      <RelatedApps />
       <ShareCard appName="curso-negociacion" />
       <Footer appName="curso-negociacion" />
     </div>

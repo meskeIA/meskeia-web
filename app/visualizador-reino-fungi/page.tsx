@@ -9,7 +9,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorReinoFungi.module.css';
 
 // ============================================================================
@@ -695,7 +694,7 @@ export default function VisualizadorReinoFungi() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-reino-fungi')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-reino-fungi" />
       </main>
 

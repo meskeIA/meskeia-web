@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 
 // ─────────────────────────────────────────────
@@ -614,7 +613,7 @@ export default function VisualizadorConstruccionEdificioPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-construccion-edificio')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-construccion-edificio" />
         <Footer appName="visualizador-construccion-edificio" />
       </div>

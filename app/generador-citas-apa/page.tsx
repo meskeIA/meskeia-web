@@ -4,7 +4,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import styles from './GeneradorCitasApa.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ══════════════════════════════════════════════════════════════════════
    TIPOS Y CONSTANTES
@@ -2442,7 +2441,7 @@ export default function GeneradorCitasApaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-citas-apa')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-citas-apa" />
       <Footer appName="generador-citas-apa" />

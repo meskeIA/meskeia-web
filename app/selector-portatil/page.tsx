@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
   RegionBadge,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularResultado,
   infoFormato,
@@ -473,7 +472,7 @@ export default function SelectorPortatil() {
         </EducationalSection>
       </div>
 
-      <RelatedApps apps={getRelatedApps('selector-portatil')} />
+      <RelatedApps />
       <ShareCard appName="selector-portatil" />
       <Footer appName="selector-portatil" />
     </div>

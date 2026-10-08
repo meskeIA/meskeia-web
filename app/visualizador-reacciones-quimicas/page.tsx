@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -725,7 +724,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-reacciones-quimicas')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-reacciones-quimicas" />
         <Footer appName="visualizador-reacciones-quimicas" />
     </div>

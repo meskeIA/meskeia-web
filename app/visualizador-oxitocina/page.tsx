@@ -11,7 +11,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ========================
 // TIPOS
@@ -519,7 +518,7 @@ export default function VisualizadorOxitocinaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-oxitocina')} />
+      <RelatedApps />
 
       <ShareCard appName="visualizador-oxitocina" />
 

@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 type SeccionId = 'neurona' | 'red' | 'entrenamiento' | 'tipos';
 type FuncionActivacion = 'sigmoid' | 'relu' | 'tanh' | 'softmax';
@@ -905,7 +904,7 @@ export default function VisualizadorIaRedesNeuronales() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-ia-redes-neuronales')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-ia-redes-neuronales" />
       <Footer appName="visualizador-ia-redes-neuronales" />
     </div>

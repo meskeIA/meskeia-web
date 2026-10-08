@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularBakersPercentage,
   calcularBakersPercentageDesdePeso,
@@ -1460,7 +1459,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-porcentaje-panadero')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-porcentaje-panadero" />
       <Footer appName="calculadora-porcentaje-panadero" />
     </div>

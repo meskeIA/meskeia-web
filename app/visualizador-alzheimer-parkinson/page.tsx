@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -801,7 +800,7 @@ export default function VisualizadorAlzheimerParkinsonPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-alzheimer-parkinson')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-alzheimer-parkinson" />
         <Footer appName="visualizador-alzheimer-parkinson" />
     </div>

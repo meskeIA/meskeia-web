@@ -4,7 +4,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './PlaygroundSQL.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { DATASETS, getDatasetById, EXERCISES } from './components';
 import type { Dataset, QueryResult, Exercise, ExerciseProgress } from './components/types';
 import { corregir, importaElOrden, type Veredicto } from './components/correccion';
@@ -1051,7 +1050,7 @@ WHERE precio > (
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('playground-sql')} />
+      <RelatedApps />
       <ShareCard appName="playground-sql" />
       <Footer appName="playground-sql" />
     </div>

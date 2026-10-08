@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades de render de fórmulas (sin librerías externas: la CSP
@@ -2090,7 +2089,7 @@ export default function TablaLimitesNotablesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-limites-notables')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-limites-notables" />
 

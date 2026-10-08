@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from './EstimadorCartera.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import {
   Chart as ChartJS,
@@ -1686,7 +1685,7 @@ export default function SimuladorCarteraPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-cartera-inversion')} />
+      <RelatedApps />
 
       <ShareCard appName="estimador-cartera-inversion" />
       <Footer appName="estimador-cartera-inversion" />

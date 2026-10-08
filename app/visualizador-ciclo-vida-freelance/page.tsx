@@ -12,7 +12,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y datos
@@ -505,7 +504,7 @@ export default function VisualizadorCicloVidaFreelancePage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-ciclo-vida-freelance')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-ciclo-vida-freelance" />
         <Footer appName="visualizador-ciclo-vida-freelance" />
     </div>

@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorPotencialAccion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 import {
   simular,
@@ -697,7 +696,7 @@ export default function SimuladorPotencialAccionPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-potencial-accion')} />
+      <RelatedApps />
       <ShareCard appName="simulador-potencial-accion" />
       <Footer appName="simulador-potencial-accion" />
     </div>

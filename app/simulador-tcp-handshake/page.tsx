@@ -3,7 +3,6 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorTcpHandshake.module.css';
 
 // ============================================
@@ -956,7 +955,7 @@ export default function SimuladorTcpHandshakePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-tcp-handshake')} />
+      <RelatedApps />
       <ShareCard appName="simulador-tcp-handshake" />
       <Footer appName="simulador-tcp-handshake" />
     </div>

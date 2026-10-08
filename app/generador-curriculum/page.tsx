@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   CV_VACIO,
   habilidadesLista,
@@ -989,7 +988,7 @@ export default function GeneradorCurriculumPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-curriculum')} />
+      <RelatedApps />
       <ShareCard appName="generador-curriculum" />
       <Footer appName="generador-curriculum" />
     </div>

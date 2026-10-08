@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
@@ -386,7 +385,7 @@ export default function VisualizadorTiroides() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-tiroides')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-tiroides" />
       </main>
 

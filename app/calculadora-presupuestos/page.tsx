@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, EducationalSection, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber, formatDate } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface DatosFreelance {
@@ -1049,7 +1048,7 @@ export default function CalculadoraPresupuestosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-presupuestos')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-presupuestos" />
       <Footer appName="calculadora-presupuestos" />
     </div>

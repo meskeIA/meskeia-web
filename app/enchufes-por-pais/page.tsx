@@ -6,7 +6,6 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
 } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from './EnchufesPais.module.css';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface DatosPais {
   pais: string;
@@ -557,7 +556,7 @@ export default function EnchufesPais() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('enchufes-por-pais')} />
+        <RelatedApps />
         <ShareCard appName="enchufes-por-pais" />
       <Footer appName="enchufes-por-pais" />
       </main>

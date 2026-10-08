@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos: cadena de producción de una camiseta de 15€
@@ -335,7 +334,7 @@ export default function VisualizadorOrigenCamisetaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-origen-camiseta')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-origen-camiseta" />
         <Footer appName="visualizador-origen-camiseta" />
     </div>

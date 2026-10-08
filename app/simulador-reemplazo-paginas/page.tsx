@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorReemplazoPaginas.module.css';
 
@@ -387,7 +386,6 @@ export default function SimuladorReemplazoPaginas() {
     ? ['fifo', 'lru', 'optimal', 'clock', 'lfu']
     : [algoritmoActivo];
 
-  const relatedApps = getRelatedApps('simulador-reemplazo-paginas');
 
   // Calcular eficiencia relativa al óptimo
   const calcularEficiencia = (faults: number, faultsOptimal: number): number => {
@@ -949,7 +947,7 @@ export default function SimuladorReemplazoPaginas() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="simulador-reemplazo-paginas" />
       <Footer appName="simulador-reemplazo-paginas" />
     </div>

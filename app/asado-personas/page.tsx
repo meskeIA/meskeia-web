@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './AsadoPersonas.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { NIVELES_APETITO, calcularAsado } from '@/lib/calculadoras/asadoPersonas';
 import { formatNumber } from '@/lib/formatters';
 
@@ -104,7 +103,7 @@ export default function AsadoPersonasPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('asado-personas')} />
+      <RelatedApps />
       <ShareCard appName="asado-personas" />
       <Footer appName="asado-personas" />
     </div>

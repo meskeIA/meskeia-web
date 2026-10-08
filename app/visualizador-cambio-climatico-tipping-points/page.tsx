@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -803,7 +802,7 @@ export default function VisualizadorCambioClimatico() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-cambio-climatico-tipping-points')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-cambio-climatico-tipping-points" />
       <Footer appName="visualizador-cambio-climatico-tipping-points" />
     </div>

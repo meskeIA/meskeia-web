@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import styles from './SelectorDieta.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -561,7 +560,7 @@ export default function SelectorDieta() {
       )}
 
       <ShareCard appName="selector-dieta" />
-      <RelatedApps apps={getRelatedApps('selector-dieta')} />
+      <RelatedApps />
       <Footer appName="selector-dieta" />
     </div>
   );

@@ -4,7 +4,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Espejo.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 export default function EspejoPage() {
   const [activo, setActivo] = useState(false);
@@ -546,7 +545,7 @@ export default function EspejoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('espejo')} />
+      <RelatedApps />
       <ShareCard appName="espejo" />
       <Footer appName="espejo" />
     </div>

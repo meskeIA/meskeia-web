@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorArbolesBstAvl.module.css';
 import CasosAula from './CasosAula';
@@ -1200,7 +1199,7 @@ export default function SimuladorArbolesBstAvl() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-arboles-bst-avl')} />
+      <RelatedApps />
       <ShareCard appName="simulador-arboles-bst-avl" />
       <Footer appName="simulador-arboles-bst-avl" />
     </div>

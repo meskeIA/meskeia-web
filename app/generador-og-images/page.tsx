@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Constantes del canvas OG estándar
 const CANVAS_WIDTH = 1200;
@@ -1563,7 +1562,7 @@ export default function GeneradorOGImagesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-og-images')} />
+      <RelatedApps />
       <ShareCard appName="generador-og-images" />
       <Footer appName="generador-og-images" />
     </div>

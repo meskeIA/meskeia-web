@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
@@ -819,7 +818,7 @@ export default function GeneradorNonogramasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('generador-nonogramas')} />
+        <RelatedApps />
 
         <ShareCard appName="generador-nonogramas" />
 

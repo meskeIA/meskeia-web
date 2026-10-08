@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './DesempleoTipos.module.css';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
@@ -880,7 +879,7 @@ export default function DesempleoTiposPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-desempleo-tipos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-desempleo-tipos" />
       <Footer appName="visualizador-desempleo-tipos" />
     </div>

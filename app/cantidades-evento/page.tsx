@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import styles from './CantidadesEvento.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import { TIPOS_EVENTO, calcularEvento } from '@/lib/calculadoras/cantidadesEvento';
 
 export default function CantidadesEventoPage() {
@@ -92,7 +91,7 @@ export default function CantidadesEventoPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('cantidades-evento')} />
+      <RelatedApps />
       <ShareCard appName="cantidades-evento" />
       <Footer appName="cantidades-evento" />
     </div>

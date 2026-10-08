@@ -11,7 +11,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 type TipoRuido = 'blanco' | 'rosa' | 'marron' | 'azul' | 'violeta';
@@ -1017,7 +1016,7 @@ export default function GeneradorRuidoBlancoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-ruido-blanco')} />
+      <RelatedApps />
       <ShareCard appName="generador-ruido-blanco" />
       <Footer appName="generador-ruido-blanco" />
     </div>

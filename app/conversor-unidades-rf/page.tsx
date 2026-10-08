@@ -5,7 +5,6 @@ import { useState, useMemo } from 'react';
 import styles from './ConversorUnidadesRF.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de conversión RF
 type CategoriaRF = 'potencia' | 'voltaje' | 'vswr' | 'frecuencia' | 'atenuacion';
@@ -1081,7 +1080,7 @@ export default function ConversorUnidadesRFPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-unidades-rf')} />
+      <RelatedApps />
       <ShareCard appName="conversor-unidades-rf" />
       <Footer appName="conversor-unidades-rf" />
     </div>

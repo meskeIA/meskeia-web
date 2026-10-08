@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatDate } from '@/lib';
 
 interface UTMParams {
@@ -977,7 +976,7 @@ export default function GeneradorUTMPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-utm')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-utm" />
       <Footer appName="generador-utm" />

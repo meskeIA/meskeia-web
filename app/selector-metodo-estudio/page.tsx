@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorMetodoEstudio.module.css';
 
 // ============================================================
@@ -750,7 +749,7 @@ export default function SelectorMetodoEstudioPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-metodo-estudio')} />
+      <RelatedApps />
       <ShareCard appName="selector-metodo-estudio" />
       <Footer appName="selector-metodo-estudio" />
     </div>

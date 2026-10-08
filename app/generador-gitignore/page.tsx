@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Templates de .gitignore para cada tecnología
 const TEMPLATES: Record<string, string[]> = {
@@ -1056,7 +1055,7 @@ export default function GeneradorGitignorePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-gitignore')} />
+      <RelatedApps />
       <ShareCard appName="generador-gitignore" />
       <Footer appName="generador-gitignore" />
     </div>

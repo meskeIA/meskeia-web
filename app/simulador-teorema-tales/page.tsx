@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -1804,7 +1803,7 @@ export default function SimuladorTeoremaTalesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-teorema-tales')} />
+      <RelatedApps />
 
       <ShareCard appName="simulador-teorema-tales" />
 

@@ -6,7 +6,6 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalN
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatDate, formatNumber, formatPercentage, parseISODateLocal, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_DONACIONES_META,
   BONIFICACIONES_CCAA_ID,
@@ -1145,7 +1144,7 @@ export default function EstimadorImpuestoDonacionesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-impuesto-donaciones')} />
+      <RelatedApps />
       <ShareCard appName="estimador-impuesto-donaciones" />
       <Footer appName="estimador-impuesto-donaciones" />
     </div>

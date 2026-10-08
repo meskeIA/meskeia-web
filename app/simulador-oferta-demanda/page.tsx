@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularCurvas,
   calcularEquilibrio,
@@ -1249,7 +1248,7 @@ export default function SimuladorOfertaDemandaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-oferta-demanda')} />
+      <RelatedApps />
       <ShareCard appName="simulador-oferta-demanda" />
       <Footer appName="simulador-oferta-demanda" />
     </div>

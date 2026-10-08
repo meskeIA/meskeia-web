@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y datos
@@ -491,7 +490,7 @@ export default function VisualizadorCicloAguaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-ciclo-agua')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-ciclo-agua" />
         <Footer appName="visualizador-ciclo-agua" />
     </div>

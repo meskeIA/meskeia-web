@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // --- Tipos ---
 
@@ -1211,7 +1210,7 @@ export default function GuiaMaderasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-maderas')} />
+        <RelatedApps />
         <ShareCard appName="guia-maderas" />
         <Footer appName="guia-maderas" />
     </div>

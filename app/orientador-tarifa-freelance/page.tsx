@@ -6,7 +6,6 @@ import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, Relat
 import DataReference from '@/components/DataReference';
 import { FISCAL_AUTONOMOS_META } from '@/data/fiscal';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface GastoItem {
   id: string;
@@ -775,7 +774,7 @@ export default function OrientadorTarifaFreelancePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-tarifa-freelance')} />
+      <RelatedApps />
 
       <ShareCard appName="orientador-tarifa-freelance" />
       <Footer appName="orientador-tarifa-freelance" />

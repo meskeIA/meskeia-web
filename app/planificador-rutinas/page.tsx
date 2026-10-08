@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // Tipos
@@ -842,7 +841,7 @@ export default function PlanificadorRutinasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('planificador-rutinas')} />
+      <RelatedApps />
       <ShareCard appName="planificador-rutinas" />
       <Footer appName="planificador-rutinas" />
     </div>

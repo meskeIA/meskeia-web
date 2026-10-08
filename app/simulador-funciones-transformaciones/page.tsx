@@ -4,7 +4,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import styles from './SimuladorFuncionesTransformaciones.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 import { FUNCIONES_BASE, evaluarBase, evaluarTransformada, fmtParam, construirEcuacion, ajustarB, type FuncionBase } from './motor';
 import { cifra } from './casos';
@@ -839,7 +838,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-funciones-transformaciones')} />
+      <RelatedApps />
       <ShareCard appName="simulador-funciones-transformaciones" />
       <Footer appName="simulador-funciones-transformaciones" />
     </div>

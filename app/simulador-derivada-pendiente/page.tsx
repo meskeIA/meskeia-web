@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorDerivadaPendiente.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -818,7 +817,7 @@ export default function SimuladorDerivadaPendientePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-derivada-pendiente')} />
+      <RelatedApps />
       <ShareCard appName="simulador-derivada-pendiente" />
       <Footer appName="simulador-derivada-pendiente" />
     </div>

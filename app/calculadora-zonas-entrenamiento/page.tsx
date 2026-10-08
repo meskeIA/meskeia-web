@@ -10,7 +10,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './CalculadoraZonasEntrenamiento.module.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -483,7 +482,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
 
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-zonas-entrenamiento')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-zonas-entrenamiento" />
       <Footer appName="calculadora-zonas-entrenamiento" />
     </div>

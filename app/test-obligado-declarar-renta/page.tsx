@@ -12,7 +12,6 @@ import {
   DataReference,
   ShareCard, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { OBLIGACION_DECLARAR_2025, FISCAL_IRPF_META } from '@/data/fiscal';
 import { formatCurrency } from '@/lib';
 
@@ -614,7 +613,7 @@ export default function TestObligadoDeclararRentaPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-obligado-declarar-renta')} />
+        <RelatedApps />
         <ShareCard appName="test-obligado-declarar-renta" />
         <Footer appName="test-obligado-declarar-renta" />
     </div>

@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaTiposPasta.module.css';
 
 type FormaPasta = 'Larga' | 'Corta' | 'Rellena' | 'Lámina' | 'Sopa' | 'Especial';
@@ -1235,7 +1234,7 @@ export default function GuiaTiposPastaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-tipos-pasta')} />
+      <RelatedApps />
 
       <ShareCard appName="guia-tipos-pasta" />
 

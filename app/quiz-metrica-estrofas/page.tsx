@@ -4,7 +4,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import styles from './QuizMetricaEstrofas.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Nivel = 'basico' | 'intermedio' | 'avanzado';
 type Pantalla = 'config' | 'quiz' | 'resultado';
@@ -687,7 +686,7 @@ export default function QuizMetricaEstrofasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-metrica-estrofas')} />
+      <RelatedApps />
       <ShareCard appName="quiz-metrica-estrofas" />
       <Footer appName="quiz-metrica-estrofas" />
     </div>

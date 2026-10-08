@@ -11,7 +11,6 @@ import {
   EducationalSection,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorColisiones.module.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -648,7 +647,7 @@ export default function SimuladorColisionesPage() {
 
       </main>
 
-      <RelatedApps apps={getRelatedApps('simulador-colisiones')} />
+      <RelatedApps />
       <ShareCard appName="simulador-colisiones" />
       <Footer appName="simulador-colisiones" />
     </div>

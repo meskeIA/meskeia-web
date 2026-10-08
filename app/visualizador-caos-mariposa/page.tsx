@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './CaosMariposa.module.css';
 
 // ─────────────────────────────────────────────
@@ -394,7 +393,7 @@ export default function CaosMariposaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-caos-mariposa')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-caos-mariposa" />
       <Footer appName="visualizador-caos-mariposa" />
     </div>

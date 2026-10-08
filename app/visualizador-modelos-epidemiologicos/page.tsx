@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -991,7 +990,7 @@ export default function VisualizadorModelosEpidemiologicos() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-modelos-epidemiologicos')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-modelos-epidemiologicos" />
         <Footer appName="visualizador-modelos-epidemiologicos" />
       </div>

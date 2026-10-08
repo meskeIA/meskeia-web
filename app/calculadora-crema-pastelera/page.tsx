@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraCremaPastelera.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { TIPOS_CREMA, TIPO_CREMA_POR_ID, calcularCrema } from '@/lib/calculadoras/cremaPastelera';
 
 export default function CalculadoraCremaPasteleraPage() {
@@ -95,7 +94,7 @@ export default function CalculadoraCremaPasteleraPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-crema-pastelera')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-crema-pastelera" />
       <Footer appName="calculadora-crema-pastelera" />
     </div>

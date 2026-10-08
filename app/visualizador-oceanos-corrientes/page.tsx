@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -1081,7 +1080,7 @@ export default function VisualizadorOceanosCorreintes() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-oceanos-corrientes')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-oceanos-corrientes" />
       <Footer appName="visualizador-oceanos-corrientes" />
     </div>

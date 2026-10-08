@@ -57,7 +57,7 @@ Ya implementada en `app/globals.css` — **no duplicar la definición**, solo us
 5. Resultados
 6. <DisclaimerCard /> O `// @disclaimer: exempt` en la línea 2
 7. <EducationalSection>                  ← contenido colapsable
-8. <RelatedApps apps={getRelatedApps('slug')} />
+8. <RelatedApps />                       ← sin prop: layout.tsx monta <ConRelacionadas slug="slug">
 9. <ShareCard appName="slug" />
 10. <Footer appName="slug" />
 ```
@@ -461,6 +461,18 @@ obligatoria: la marca a secas también rompe.
 > las 21 apps `app/test-*` sin aviso legal. Crónica y barrido: cabecera de
 > `scripts/check-legal-notice.mjs` · pruebas: `npm run legal:probar-candado`.
 
+### Candado del catálogo en el cliente
+
+`npm run check:catalogo-cliente` — en el build, y **rompe el build** si un fichero `'use client'`
+alcanza `data/app-relations.ts` o si el barrel `@/components` alcanza `data/applications.ts`,
+siguiendo los imports en cadena. Turbopack funde el barrel en un módulo: lo que alcanza uno de sus
+componentes lo descargan todas las apps. Las relacionadas se resuelven en el layout
+(`<ConRelacionadas slug>`) y la página pinta `<RelatedApps />` sin prop.
+**Sin pasivo** · Escape: `catalogo-ok: <razón>` en la línea del import, razón obligatoria.
+> Salió de la P1 del digest del 08/10/2026: el catálogo (692 KB) en 925 páginas y las
+> relacionadas (733 KB) en 1.005, el 52 % del JS de una app. Crónica: cabecera de
+> `scripts/check-catalogo-cliente.mjs` · pruebas: `npm run catalogo:probar-candado`.
+
 ### Candado de las celdas braille
 
 `npm run check:braille` — en el build, y **rompe el build** si una celda que `conversor-braille`
@@ -651,7 +663,7 @@ están en el **CLAUDE.md global §7** y aplican aquí tal cual. Lo propio de mes
 
 ⚠️ Un servidor Node huérfano lanzado de forma interactiva bajo la cuenta del usuario puede bloquear la descarga limpia de su registro de perfil (`NTUSER.DAT`) al apagar Windows — Visor de sucesos, `Microsoft-Windows-User Profiles Service`, eventos 1512/1517, "acceso denegado: la causa suelen ser servicios ejecutándose como cuentas de usuario". Consecuencia observada: la configuración de esa sesión (incluido el color de fondo de escritorio) no se persiste, y el siguiente arranque puede mostrar pantalla en negro. Diagnosticado el 31/08/2026: un `next start -p 3050` llevaba viva desde una sesión de pruebas anterior sin cerrar, coincidiendo con los eventos del Visor de sucesos.
 
-`npm run dev` ya se protegía solo (`predev: npx kill-port 3050`, mata cualquier proceso previo antes de arrancar); `npm run start` tenía el mismo hueco — no llevaba `prestart` — y es el comando usado para verificar rutas de API tras un build. Ya tiene el mismo guardián.
+`npm run dev` y `npm run start` matan antes lo que ocupe el puerto (`predev: npx kill-port 3050` y su `prestart` gemelo).
 
 ---
 

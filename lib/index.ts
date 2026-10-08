@@ -32,11 +32,8 @@ export {
   type RecentApp,
 } from './recentApps';
 
-export {
-  getDailyApps,
-  getDailyAppsForDate,
-  getRotationCycleDays,
-} from './dailyApps';
+// `./dailyApps` NO se reexporta aquí: importa el catálogo entero (`data/applications.ts`) y
+// este barrel lo usan casi todas las apps. Se importa por su ruta (check:catalogo-cliente).
 
 export {
   parsearSerieNumerica,

@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   flujoEnergia,
   formatEntero,
@@ -851,7 +850,7 @@ export default function VisualizadorEcosistemaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-ecosistema')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-ecosistema" />
         <Footer appName="visualizador-ecosistema" />
     </div>

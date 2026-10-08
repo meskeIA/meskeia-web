@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -717,7 +716,7 @@ export default function VisualizadorEstadosMateria() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-estados-materia')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-estados-materia" />
         <Footer appName="visualizador-estados-materia" />
     </div>

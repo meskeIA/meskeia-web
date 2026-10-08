@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TipoViaje = 'playa' | 'montana' | 'ciudad' | 'negocios' | 'aventura';
 type Clima = 'calido' | 'templado' | 'frio';
@@ -743,7 +742,7 @@ export default function ListaEquipajePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('lista-equipaje')} />
+      <RelatedApps />
       <ShareCard appName="lista-equipaje" />
       <Footer appName="lista-equipaje" />
     </div>

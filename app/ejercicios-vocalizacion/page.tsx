@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // Tipos y constantes
@@ -907,7 +906,7 @@ export default function EjerciciosVocalizacionPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('ejercicios-vocalizacion')} />
+      <RelatedApps />
       <ShareCard appName="ejercicios-vocalizacion" />
       <Footer appName="ejercicios-vocalizacion" />
     </div>

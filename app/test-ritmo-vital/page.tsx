@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -465,7 +464,7 @@ export default function TestRitmoVitalPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-ritmo-vital')} />
+        <RelatedApps />
         <ShareCard appName="test-ritmo-vital" />
         <Footer appName="test-ritmo-vital" />
     </div>

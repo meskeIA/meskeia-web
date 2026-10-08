@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import styles from './ConversorBinario.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'texto-binario' | 'binario-texto';
 
@@ -460,7 +459,7 @@ export default function ConversorBinarioPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-binario')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-binario" />
       <Footer appName="conversor-binario" />

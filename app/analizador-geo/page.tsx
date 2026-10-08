@@ -5,7 +5,6 @@ import styles from './AnalizadorGeo.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface AnalysisResult {
@@ -1285,7 +1284,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('analizador-geo')} />
+      <RelatedApps />
       <ShareCard appName="analizador-geo" />
       <Footer appName="analizador-geo" />
     </div>

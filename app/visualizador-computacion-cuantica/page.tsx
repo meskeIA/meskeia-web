@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatPercentage } from '@/lib';
 import {
   probabilidades,
@@ -690,7 +689,7 @@ export default function VisualizadorComputacionCuantica() {
           </p>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-computacion-cuantica')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-computacion-cuantica" />
       </main>
 

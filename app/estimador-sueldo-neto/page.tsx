@@ -6,7 +6,6 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
   DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, formatPercentage, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026, LIMITES_PLAN_PENSIONES_2025, DEDUCCION_MATERNIDAD_IRPF, REDUCCION_TRIBUTACION_CONJUNTA_2025 } from '@/data/fiscal';
 import { calcularBrutoANeto, calcularNetoABruto, tipoMarginal, TIPO_SS_TRABAJADOR, COTIZACION_EMPRESA_2026, TIPO_SS_EMPRESA, type SituacionFamiliar } from './motor';
 
@@ -1117,7 +1116,7 @@ export default function EstimadorSueldoNetoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-sueldo-neto')} />
+      <RelatedApps />
       <ShareCard appName="estimador-sueldo-neto" />
       <Footer appName="estimador-sueldo-neto" />
     </div>

@@ -5,7 +5,6 @@ import styles from './ContadorManual.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Contador {
   id: number;
@@ -455,7 +454,7 @@ export default function ContadorManualPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('contador-manual')} />
+      <RelatedApps />
       <ShareCard appName="contador-manual" />
       <Footer appName="contador-manual" />
     </div>

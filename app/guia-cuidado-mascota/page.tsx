@@ -4,7 +4,6 @@ import Link from 'next/link';
 import styles from './GuiaCuidadoMascota.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { CourseProvider, useCourse, COURSE_MODULES } from './CourseContext';
-import { getRelatedApps } from '@/data/app-relations';
 
 function GuideContent() {
   const { isCompleted, getProgressPercentage, getCompletedCount, getTotalChapters, getTotalDuration } = useCourse();
@@ -142,7 +141,7 @@ function GuideContent() {
         <p className={styles.highlight}><strong><span aria-hidden="true">🐾</span> Ante cualquier emergencia médica de tu mascota, acude inmediatamente a tu veterinario o clínica de urgencias.</strong></p>
       </DisclaimerCard>
 
-      <RelatedApps apps={getRelatedApps('guia-cuidado-mascota')} />
+      <RelatedApps />
 
       <ShareCard appName="guia-cuidado-mascota" />
       <Footer appName="guia-cuidado-mascota" />

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './EstimadorFondoEmergencia.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type SituacionLaboral = 'estable' | 'moderada' | 'inestable' | 'autonomo';
 type CargasFamiliares = 'sin_cargas' | 'pareja' | 'hijos' | 'dependientes';
@@ -535,7 +534,7 @@ export default function CalculadoraFondoEmergenciaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-fondo-emergencia')} />
+      <RelatedApps />
       <ShareCard appName="estimador-fondo-emergencia" />
       <Footer appName="estimador-fondo-emergencia" />
     </div>

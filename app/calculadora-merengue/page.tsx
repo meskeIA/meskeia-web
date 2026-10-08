@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraMerengue.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { TIPOS_MERENGUE, calcularMerengue } from '@/lib/calculadoras/merengue';
 import { formatNumber } from '@/lib/formatters';
 
@@ -108,7 +107,7 @@ export default function CalculadoraMerenguePage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-merengue')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-merengue" />
       <Footer appName="calculadora-merengue" />
     </div>

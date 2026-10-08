@@ -5,7 +5,6 @@ import styles from './OrientadorJetLag.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Ciudad {
   nombre: string;
@@ -778,7 +777,7 @@ export default function SimuladorJetLagPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-jet-lag')} />
+      <RelatedApps />
 
       <ShareCard appName="orientador-jet-lag" />
       <Footer appName="orientador-jet-lag" />

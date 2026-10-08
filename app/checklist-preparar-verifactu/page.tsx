@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -424,7 +423,7 @@ export default function ChecklistPrepararVerifactuPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('checklist-preparar-verifactu')} />
+        <RelatedApps />
         <ShareCard appName="checklist-preparar-verifactu" />
         <Footer appName="checklist-preparar-verifactu" />
     </div>

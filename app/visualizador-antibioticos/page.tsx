@@ -10,7 +10,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -190,7 +189,6 @@ export default function VisualizadorAntibioticos() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chartInstance = useRef<any>(null);
 
-  const relatedApps = getRelatedApps('visualizador-antibioticos');
 
   // Gráfico bacteriostático vs bactericida
   useEffect(() => {
@@ -600,7 +598,7 @@ export default function VisualizadorAntibioticos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-antibioticos" />
       <Footer appName="visualizador-antibioticos" />
     </div>

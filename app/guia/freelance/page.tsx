@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaFreelance.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para freelances
 const tools = [
@@ -363,7 +362,7 @@ export default function GuiaFreelancePage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('guia-freelance')} />
+      <RelatedApps />
       <ShareCard appName="guia-freelance" />
       <Footer appName="guia-freelance" />
     </div>

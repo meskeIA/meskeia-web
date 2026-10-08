@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -524,7 +523,7 @@ export default function VisualizadorProteinasPlegamiento() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-proteinas-plegamiento')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-proteinas-plegamiento" />
         <Footer appName="visualizador-proteinas-plegamiento" />
       </div>

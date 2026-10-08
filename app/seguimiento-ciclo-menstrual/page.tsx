@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ===== TIPOS =====
 interface CicloPrediccion {
@@ -541,7 +540,7 @@ export default function SeguimientoCicloMenstrualPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('seguimiento-ciclo-menstrual')} />
+      <RelatedApps />
 
       <ShareCard appName="seguimiento-ciclo-menstrual" />
       <Footer appName="seguimiento-ciclo-menstrual" />

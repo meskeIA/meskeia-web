@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './CalculadoraHuellaCarbono.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -1468,7 +1467,7 @@ export default function CalculadoraHuellaCarbono() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-huella-carbono')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-huella-carbono" />
       <Footer appName="calculadora-huella-carbono" />
     </div>

@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import styles from './CursoMarketingDigital.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { useCourse, COURSE_MODULES } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -210,7 +209,7 @@ export default function CursoMarketingDigitalPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('curso-marketing-digital')} />
+      <RelatedApps />
       <ShareCard appName="curso-marketing-digital" />
       <Footer appName="curso-marketing-digital" />
     </div>

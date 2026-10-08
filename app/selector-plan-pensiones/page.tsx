@@ -10,7 +10,6 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import EducationalSection from '@/components/EducationalSection';
 import RegionBadge from '@/components/RegionBadge';
-import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_PLAN_PENSIONES_META } from '@/data/fiscal';
 import styles from './SelectorPlanPensiones.module.css';
 
@@ -728,7 +727,7 @@ export default function SelectorPlanPensiones() {
 
       {/* ---- APPS RELACIONADAS ---- */}
       <div className={styles.relatedWrapper}>
-        <RelatedApps apps={getRelatedApps('selector-plan-pensiones')} />
+        <RelatedApps />
       </div>
 
       <ShareCard appName="selector-plan-pensiones" />

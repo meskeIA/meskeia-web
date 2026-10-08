@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1018,7 +1017,7 @@ export default function SeriesConvergenciaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-series-convergencia')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-series-convergencia" />
       <Footer appName="visualizador-series-convergencia" />
     </div>

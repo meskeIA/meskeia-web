@@ -9,7 +9,6 @@ import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './ComparadorTransporte.module.css';
 
 // ─────────────────────────────────────────────
@@ -591,7 +590,7 @@ export default function ComparadorTransporteViaje() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('comparador-transporte-viaje')} />
+      <RelatedApps />
       <ShareCard appName="comparador-transporte-viaje" />
       <Footer appName="comparador-transporte-viaje" />
     </div>

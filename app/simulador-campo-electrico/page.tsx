@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorCampoElectrico.module.css';
 import { CARACTERES_COORDENADA, alCentimetro, leerCoordenada, textoCoordenada } from './coordenada';
@@ -1476,7 +1475,7 @@ export default function SimuladorCampoElectrico() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-campo-electrico')} />
+        <RelatedApps />
         <ShareCard appName="simulador-campo-electrico" />
       </main>
 

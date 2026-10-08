@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorColoresCielo.module.css';
 
 interface PaletaColor {
@@ -270,7 +269,6 @@ export default function VisualizadorColoresCielo() {
   const sunX = 50;
   const sunVisible = elevNorm > -5;
 
-  const relatedApps = getRelatedApps('visualizador-colores-cielo');
 
   return (
     <div className={styles.container}>
@@ -602,7 +600,7 @@ export default function VisualizadorColoresCielo() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-colores-cielo" />
       <Footer appName="visualizador-colores-cielo" />
     </div>

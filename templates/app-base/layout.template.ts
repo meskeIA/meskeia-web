@@ -1,4 +1,5 @@
 import { jsonLd, faqJsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 
 export { metadata } from './metadata';
 
@@ -11,7 +12,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: webAppScript }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqScript }} />
-      {children}
+      {/* Relacionadas resueltas aquí, en el servidor: al cliente llegan solo sus 4 tarjetas */}
+      <ConRelacionadas slug="[nombre-app]">{children}</ConRelacionadas>
     </>
   );
 }

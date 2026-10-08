@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import styles from './CursoPensamientoCientifico.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { useCourse, COURSE_MODULES } from './CourseContext';
 
 const MODULE_ICONS: Record<string, string> = {
@@ -234,7 +233,7 @@ export default function CursoPensamientoCientificoPage() {
         )}
       </section>
 
-      <RelatedApps apps={getRelatedApps('curso-pensamiento-cientifico')} />
+      <RelatedApps />
       <ShareCard appName="curso-pensamiento-cientifico" />
       <Footer appName="curso-pensamiento-cientifico" />
     </div>

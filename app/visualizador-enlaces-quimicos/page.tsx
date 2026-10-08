@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -565,7 +564,7 @@ export default function VisualizadorEnlacesQuimicosPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-enlaces-quimicos')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-enlaces-quimicos" />
         <Footer appName="visualizador-enlaces-quimicos" />
     </div>

@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './EstimadorDeuda.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Deuda {
   id: string;
@@ -759,7 +758,7 @@ export default function CalculadoraDeudaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-deuda')} />
+      <RelatedApps />
       <ShareCard appName="estimador-deuda" />
       <Footer appName="estimador-deuda" />
     </div>

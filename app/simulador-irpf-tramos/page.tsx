@@ -12,7 +12,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import { TRAMOS_IRPF_2025, FISCAL_IRPF_META } from '@/data/fiscal';
 import styles from './SimuladorIrpfTramos.module.css';
@@ -805,7 +804,7 @@ export default function SimuladorIrpfTramosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-irpf-tramos')} />
+      <RelatedApps />
       <ShareCard appName="simulador-irpf-tramos" />
       <Footer appName="simulador-irpf-tramos" />
     </div>

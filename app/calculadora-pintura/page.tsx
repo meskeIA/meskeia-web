@@ -7,7 +7,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DataReference } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TipoSuperficie = 'lisa' | 'gotele' | 'rugosa' | 'porosa';
 
@@ -791,7 +790,7 @@ export default function CalculadoraPinturaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-pintura')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-pintura" />
       <Footer appName="calculadora-pintura" />

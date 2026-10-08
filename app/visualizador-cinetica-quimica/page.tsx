@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './CineticaQuimica.module.css';
 
 // ─────────────────────────────────────────────
@@ -897,7 +896,7 @@ export default function VisualizadorCineticaQuimica() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-cinetica-quimica')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-cinetica-quimica" />
       <Footer appName="visualizador-cinetica-quimica" />
     </div>

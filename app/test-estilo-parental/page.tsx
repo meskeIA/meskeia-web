@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { ESTILOS_PARENTALES } from '@/data/fiscal';
 
 // ─── Tipos ─────────────────────────────────────────────────────────────────────
@@ -599,7 +598,7 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-estilo-parental')} />
+        <RelatedApps />
         <ShareCard appName="test-estilo-parental" />
         <Footer appName="test-estilo-parental" />
     </div>

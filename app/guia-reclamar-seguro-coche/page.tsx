@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import styles from './GuiaReclamarSeguroCoche.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de situaciones
 type SituacionId = 'siniestro-menor' | 'averia-carretera' | 'bateria-garaje' | 'atropello-animal' | 'rotura-luna' | 'robo-vandalismo' | 'meteorologia';
@@ -733,7 +732,7 @@ export default function GuiaReclamarSeguroCochePage() {
       </EducationalSection>
 
       {/* Apps relacionadas */}
-      <RelatedApps apps={getRelatedApps('guia-reclamar-seguro-coche')} />
+      <RelatedApps />
       <ShareCard appName="guia-reclamar-seguro-coche" />
       <Footer appName="guia-reclamar-seguro-coche" />
     </div>

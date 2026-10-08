@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   arroces,
   normalizarTexto,
@@ -579,7 +578,7 @@ export default function GuiaTiposArrozPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-tipos-arroz')} />
+      <RelatedApps />
 
       <ShareCard appName="guia-tipos-arroz" />
 

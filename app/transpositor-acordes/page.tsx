@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Escala cromática: 12 notas
 const ESCALA_CROMATICA = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
@@ -451,7 +450,7 @@ export default function TranspositorAcordesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('transpositor-acordes')} />
+      <RelatedApps />
       <ShareCard appName="transpositor-acordes" />
       <Footer appName="transpositor-acordes" />
     </div>

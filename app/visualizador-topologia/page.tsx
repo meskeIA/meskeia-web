@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -613,7 +612,7 @@ export default function VisualizadorTopologiaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-topologia')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-topologia" />
       <Footer appName="visualizador-topologia" />
     </div>

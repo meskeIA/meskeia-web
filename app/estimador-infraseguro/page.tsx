@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './EstimadorInfraseguro.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface ResultadoCalculo {
   porcentajeCobertura: number;
@@ -573,7 +572,7 @@ export default function CalculadoraInfraseguroPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-infraseguro')} />
+      <RelatedApps />
       <ShareCard appName="estimador-infraseguro" />
       <Footer appName="estimador-infraseguro" />
     </div>

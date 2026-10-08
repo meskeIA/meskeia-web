@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -836,7 +835,7 @@ export default function VisualizadorSegurosRiesgo(): React.ReactNode {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('visualizador-seguros-riesgo')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-seguros-riesgo" />
       <Footer appName="visualizador-seguros-riesgo" />
     </div>

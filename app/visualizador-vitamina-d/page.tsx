@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -532,7 +531,7 @@ export default function VisualizadorVitaminaDPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-vitamina-d')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-vitamina-d" />
       <Footer appName="visualizador-vitamina-d" />
     </div>

@@ -4,7 +4,6 @@
 import { useState, useCallback, useRef } from 'react';
 import styles from './TeoriaGrafos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ======== TIPOS ========
 interface GraphNode {
@@ -1019,7 +1018,7 @@ export default function VisualizadorTeoriaGrafosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-teoria-grafos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-teoria-grafos" />
       <Footer appName="visualizador-teoria-grafos" />
     </div>

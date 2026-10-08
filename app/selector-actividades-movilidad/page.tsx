@@ -6,7 +6,6 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -409,7 +408,7 @@ export default function SelectorActividadesMovilidadPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('selector-actividades-movilidad')} />
+        <RelatedApps />
         <ShareCard appName="selector-actividades-movilidad" />
         <Footer appName="selector-actividades-movilidad" />
     </div>

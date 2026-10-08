@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import styles from './VueloAvion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TabId = 'mito' | 'realidad' | 'fuerzas' | 'casos';
 
@@ -458,7 +457,7 @@ export default function VueloAvionPage() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-vuelo-avion')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-vuelo-avion" />
       <Footer appName="visualizador-vuelo-avion" />
     </div>

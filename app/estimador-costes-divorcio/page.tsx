@@ -7,7 +7,6 @@ import {
   ShareCard, DisclaimerCard, RegionBadge, DataReference, NumberInput,
 } from '@/components';
 import { formatCurrency, formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { COSTAS_JUDICIALES_META, ARANCEL_PROCURA_FAMILIA, PORCENTAJES_IVA } from '@/data/fiscal';
 import {
   calcular, tipoPosible,
@@ -416,7 +415,7 @@ export default function EstimadorCostesDivorcioPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('estimador-costes-divorcio')} />
+        <RelatedApps />
         <ShareCard appName="estimador-costes-divorcio" />
         <Footer appName="estimador-costes-divorcio" />
     </div>

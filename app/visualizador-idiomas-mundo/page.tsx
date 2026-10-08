@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -468,7 +467,7 @@ export default function VisualizadorIdiomasMundoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-idiomas-mundo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-idiomas-mundo" />
         <Footer appName="visualizador-idiomas-mundo" />
     </div>

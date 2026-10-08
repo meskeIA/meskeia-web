@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -699,7 +698,7 @@ export default function VisualizadorFalaciasLogicasPage() {
         </ul>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-falacias-logicas')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-falacias-logicas" />
       <Footer appName="visualizador-falacias-logicas" />
     </div>

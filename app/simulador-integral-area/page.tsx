@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorIntegralArea.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -860,7 +859,7 @@ export default function SimuladorIntegralAreaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-integral-area')} />
+      <RelatedApps />
       <ShareCard appName="simulador-integral-area" />
       <Footer appName="simulador-integral-area" />
     </div>

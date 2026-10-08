@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect } from 'react';
 import styles from './CalculadoraIVA.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type OperationType = 'add' | 'remove';
 
@@ -542,7 +541,7 @@ export default function CalculadoraIvaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-iva')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-iva" />
       <Footer appName="calculadora-iva" />

@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorZonaResidencia.module.css';
 
 // ============================================
@@ -660,7 +659,7 @@ export default function SelectorZonaResidencia() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-zona-residencia')} />
+      <RelatedApps />
       <ShareCard appName="selector-zona-residencia" />
       <Footer appName="selector-zona-residencia" />
     </div>

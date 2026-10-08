@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
 
 // ===== TIPOS =====
@@ -699,7 +698,7 @@ export default function CalculadoraGastosComunidadPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-gastos-comunidad')} />
+      <RelatedApps />
 
       <ShareCard appName="estimador-gastos-comunidad" />
       <Footer appName="estimador-gastos-comunidad" />

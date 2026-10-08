@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularFiltroNDVideo } from '@/lib/calculadoras/videografia';
 
 // Velocidades de obturación comunes en fracción de segundo
@@ -333,7 +332,7 @@ export default function CalculadoraFiltroNdVideoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-filtro-nd-video')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-filtro-nd-video" />
 

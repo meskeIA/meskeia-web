@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './OrientadorRegla503020.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, parseSpanishNumber, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Distribucion {
   necesidades: number;
@@ -563,7 +562,7 @@ export default function CalculadoraRegla503020Page() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-regla-50-30-20')} />
+      <RelatedApps />
       <ShareCard appName="orientador-regla-50-30-20" />
       <Footer appName="orientador-regla-50-30-20" />
     </div>

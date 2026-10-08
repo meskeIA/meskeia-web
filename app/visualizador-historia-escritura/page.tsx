@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -640,7 +639,7 @@ export default function VisualizadorHistoriaEscrituraPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-historia-escritura')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-historia-escritura" />
         <Footer appName="visualizador-historia-escritura" />
     </div>

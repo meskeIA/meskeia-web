@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos de las fuerzas físicas cotidianas
@@ -345,7 +344,7 @@ export default function VisualizadorFuerzasInvisiblesPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-fuerzas-invisibles')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-fuerzas-invisibles" />
         <Footer appName="visualizador-fuerzas-invisibles" />
     </div>

@@ -7,7 +7,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface AspectPreset {
   name: string;
@@ -614,7 +613,7 @@ export default function CalculadoraAspectosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-aspectos')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-aspectos" />
       <Footer appName="calculadora-aspectos" />

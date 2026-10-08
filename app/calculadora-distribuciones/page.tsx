@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraDistribuciones.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import jStat from 'jstat';
 
 type DistributionType = 'normal' | 'poisson' | 'exponential' | 'uniform' | 'gamma' | 'beta' | 'binomial' | 'student';
@@ -1116,7 +1115,7 @@ export default function CalculadoraDistribucionesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-distribuciones')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-distribuciones" />
       <Footer appName="calculadora-distribuciones" />
     </div>

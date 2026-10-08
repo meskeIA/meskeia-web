@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
 import { formatCurrency, formatDate } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface DatosEmisor {
@@ -1469,7 +1468,7 @@ export default function GeneradorFacturasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-facturas')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-facturas" />
       <Footer appName="generador-facturas" />

@@ -7,7 +7,6 @@ import styles from './QuizPaisesCapitales.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { countries, Country } from '@/data/countries';
 import EducationalSection from '@/components/EducationalSection';
 import { formatPercentage } from '@/lib';
@@ -819,7 +818,7 @@ export default function QuizPaisesCapitalesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-paises-capitales')} />
+      <RelatedApps />
 
       <ShareCard appName="quiz-paises-capitales" />
       <Footer appName="quiz-paises-capitales" />

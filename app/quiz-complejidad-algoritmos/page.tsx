@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './QuizComplejidadAlgoritmos.module.css';
 
 type CategoriaAlgo = 'notacion' | 'busqueda-ordenacion' | 'estructuras-datos' | 'analisis-codigo' | 'comparativa';
@@ -686,7 +685,7 @@ export default function QuizComplejidadAlgoritmosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-complejidad-algoritmos')} />
+      <RelatedApps />
       <ShareCard appName="quiz-complejidad-algoritmos" />
       <Footer appName="quiz-complejidad-algoritmos" />
     </div>

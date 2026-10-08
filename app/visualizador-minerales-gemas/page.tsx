@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -643,7 +642,7 @@ export default function VisualizadorMineralesGemas() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-minerales-gemas')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-minerales-gemas" />
       <Footer appName="visualizador-minerales-gemas" />
     </div>

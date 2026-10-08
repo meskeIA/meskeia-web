@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -672,7 +671,7 @@ export default function VisualizadorOceanoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-oceano')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-oceano" />
         <Footer appName="visualizador-oceano" />
     </div>

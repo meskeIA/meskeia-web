@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1109,7 +1108,7 @@ export default function VisualizadorCircuitosElectronicos() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-circuitos-electronicos')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-circuitos-electronicos" />
         <Footer appName="visualizador-circuitos-electronicos" />
     </div>

@@ -7,7 +7,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorEnergiaNuclear.module.css';
 
 type Seccion = 'fision' | 'fusion' | 'reactores' | 'comparativa';
@@ -779,7 +778,7 @@ export default function VisualizadorEnergiaNuclear() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-energia-nuclear')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-energia-nuclear" />
       <Footer appName="visualizador-energia-nuclear" />
     </div>

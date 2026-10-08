@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './EstimadorFire.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TipoFIRE = 'lean' | 'normal' | 'fat';
 
@@ -631,7 +630,7 @@ export default function CalculadoraFIREPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-fire')} />
+      <RelatedApps />
       <ShareCard appName="estimador-fire" />
       <Footer appName="estimador-fire" />
     </div>

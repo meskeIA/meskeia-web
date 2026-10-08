@@ -12,7 +12,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================================================
 // DATOS ESTÁTICOS — Trimestres fiscales del autónomo español
@@ -663,7 +662,7 @@ export default function PlanificadorTrimestresFreelancePage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('planificador-trimestres-freelance')} />
+        <RelatedApps />
 
         <ShareCard appName="planificador-trimestres-freelance" />
 

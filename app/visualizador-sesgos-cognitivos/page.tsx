@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos de sesgos
@@ -301,7 +300,7 @@ export default function VisualizadorSesgosCognitivosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sesgos-cognitivos')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sesgos-cognitivos" />
         <Footer appName="visualizador-sesgos-cognitivos" />
     </div>

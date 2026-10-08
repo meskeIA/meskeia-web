@@ -1,4 +1,5 @@
 import { metadata as appMetadata, jsonLd, faqJsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 
 export const metadata = appMetadata;
 
@@ -13,7 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      {children}
+      <ConRelacionadas slug="visualizador-reino-fungi">{children}</ConRelacionadas>
     </>
   );
 }

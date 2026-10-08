@@ -8,7 +8,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -335,7 +334,7 @@ export default function SimuladorPagaAhorroPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-paga-ahorro')} />
+        <RelatedApps />
         <ShareCard appName="simulador-paga-ahorro" />
         <Footer appName="simulador-paga-ahorro" />
     </div>

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // =========================================================
 // TIPOS
@@ -1053,7 +1052,7 @@ export default function VisualizadorVolumenesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-volumenes')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-volumenes" />
       <Footer appName="visualizador-volumenes" />
     </div>

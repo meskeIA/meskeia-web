@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './VisualizadorCurvasBezier.module.css';
 
@@ -778,7 +777,7 @@ export default function VisualizadorCurvasBezierPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-curvas-bezier')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-curvas-bezier" />
       <Footer appName="visualizador-curvas-bezier" />
     </div>

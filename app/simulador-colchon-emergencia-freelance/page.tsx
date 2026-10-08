@@ -7,7 +7,6 @@ import {
   ShareCard, DisclaimerCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // --- Tipos ---
 
@@ -569,7 +568,7 @@ export default function SimuladorColchonEmergenciaFreelancePage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-colchon-emergencia-freelance')} />
+        <RelatedApps />
         <ShareCard appName="simulador-colchon-emergencia-freelance" />
         <Footer appName="simulador-colchon-emergencia-freelance" />
     </div>

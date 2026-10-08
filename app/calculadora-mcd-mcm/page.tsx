@@ -5,7 +5,6 @@ import { useState } from 'react';
 import styles from './CalculadoraMcdMcm.module.css';
 import { MeskeiaLogo, Footer, ResultCard, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 const CERO = BigInt(0);
 const MAXIMO_SEGURO = BigInt(Number.MAX_SAFE_INTEGER);
@@ -719,7 +718,7 @@ export default function CalculadoraMcdMcmPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-mcd-mcm')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-mcd-mcm" />
       <Footer appName="calculadora-mcd-mcm" />

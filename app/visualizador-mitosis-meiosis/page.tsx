@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -827,7 +826,7 @@ export default function VisualizadorMitosisMeiosisPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-mitosis-meiosis')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-mitosis-meiosis" />
         <Footer appName="visualizador-mitosis-meiosis" />
     </div>

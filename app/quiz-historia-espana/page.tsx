@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatPercentage } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   PREGUNTAS_HISTORIA,
   PREGUNTAS_FACIL,
@@ -592,7 +591,7 @@ export default function QuizHistoriaEspanaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-historia-espana')} />
+      <RelatedApps />
       <ShareCard appName="quiz-historia-espana" />
       <Footer appName="quiz-historia-espana" />
     </div>

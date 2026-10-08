@@ -5,7 +5,6 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import styles from './PresupuestoViaje.module.css';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface GastoItem {
   id: string;
@@ -835,7 +834,7 @@ export default function PresupuestoViaje() {
 
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('presupuesto-viaje')} />
+        <RelatedApps />
         <ShareCard appName="presupuesto-viaje" />
       <Footer appName="presupuesto-viaje" />
       </main>

@@ -6,7 +6,6 @@ import styles from './JuegoAhorcado.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Categoria = 'animales' | 'paises' | 'profesiones' | 'vocabulario';
 
@@ -700,7 +699,7 @@ export default function JuegoAhorcadoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-ahorcado')} />
+      <RelatedApps />
       <ShareCard appName="juego-ahorcado" />
       <Footer appName="juego-ahorcado" />
     </div>

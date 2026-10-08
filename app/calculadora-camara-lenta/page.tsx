@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularCamaraLenta } from '@/lib/calculadoras/videografia';
 import styles from './CalculadoraCamaraLenta.module.css';
 
@@ -562,7 +561,7 @@ export default function CalculadoraCamaraLentaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-camara-lenta')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-camara-lenta" />
       </main>
 

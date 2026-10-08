@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -719,7 +718,7 @@ export default function VisualizadorGeometriaFractalesPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-geometria-fractales')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-geometria-fractales" />
         <Footer appName="visualizador-geometria-fractales" />
     </div>

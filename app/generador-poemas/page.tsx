@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import EducationalSection from '@/components/EducationalSection';
 import ShareCard from '@/components/ShareCard';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GeneradorPoemas.module.css';
 
 // ─── TIPOS ───────────────────────────────────────────────────────────────────
@@ -380,7 +379,6 @@ export default function GeneradorPoemas() {
     }
   }
 
-  const relatedApps = getRelatedApps('generador-poemas');
 
   return (
     <div className={styles.container}>
@@ -766,7 +764,7 @@ export default function GeneradorPoemas() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="generador-poemas" />
       <Footer appName="generador-poemas" />
     </div>

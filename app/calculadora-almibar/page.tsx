@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraAlmibar.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { USOS_ALMIBAR, USO_ALMIBAR_POR_ID, calcularAlmibar } from '@/lib/calculadoras/almibar';
 import { formatNumber } from '@/lib/formatters';
 
@@ -104,7 +103,7 @@ export default function CalculadoraAlmibarPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-almibar')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-almibar" />
       <Footer appName="calculadora-almibar" />
     </div>

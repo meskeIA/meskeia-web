@@ -11,7 +11,6 @@ import {
   ShareCard,
   NumberInput,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorFlotabilidad.module.css';
 import {
@@ -870,7 +869,7 @@ export default function SimuladorFlotabilidadPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-flotabilidad')} />
+        <RelatedApps />
         <ShareCard appName="simulador-flotabilidad" />
       </main>
 

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1224,7 +1223,7 @@ export default function VisualizadorRedesComputadoras() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-redes-computadoras')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-redes-computadoras" />
       <Footer appName="visualizador-redes-computadoras" />
     </div>

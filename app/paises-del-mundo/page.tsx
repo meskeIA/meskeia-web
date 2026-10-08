@@ -5,7 +5,6 @@ import styles from './PaisesDelMundo.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   countries,
   Country,
@@ -887,7 +886,7 @@ export default function PaisesDelMundoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('paises-del-mundo')} />
+      <RelatedApps />
       <ShareCard appName="paises-del-mundo" />
       <Footer appName="paises-del-mundo" />
     </div>

@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorDerivaGenetica.module.css';
 
@@ -1099,7 +1098,7 @@ export default function SimuladorDerivaGenetica() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-deriva-genetica')} />
+        <RelatedApps />
         <ShareCard appName="simulador-deriva-genetica" />
       </main>
 

@@ -8,7 +8,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Alfabeto Braille español (Unicode)
 const textToBraille: { [key: string]: string } = {
@@ -1358,7 +1357,7 @@ export default function ConversorBraillePage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-braille')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-braille" />
       <Footer appName="conversor-braille" />

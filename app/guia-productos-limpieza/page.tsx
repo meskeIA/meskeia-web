@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // =========================================================
 // TIPOS
@@ -967,7 +966,7 @@ export default function GuiaProductosLimpiezaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-productos-limpieza')} />
+      <RelatedApps />
       <ShareCard appName="guia-productos-limpieza" />
       <Footer appName="guia-productos-limpieza" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -721,7 +720,7 @@ export default function VisualizadorCirculoQuintasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-circulo-quintas')} />
+      <RelatedApps />
 
       <ShareCard appName="visualizador-circulo-quintas" />
 

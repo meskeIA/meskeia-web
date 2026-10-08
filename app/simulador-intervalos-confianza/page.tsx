@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorIntervalosConfianza.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -961,7 +960,7 @@ export default function SimuladorIntervalosConfianzaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-intervalos-confianza')} />
+      <RelatedApps />
       <ShareCard appName="simulador-intervalos-confianza" />
       <Footer appName="simulador-intervalos-confianza" />
     </div>

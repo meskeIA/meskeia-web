@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type FormaType = 'rectangular' | 'circular' | 'ovalada';
 
@@ -691,7 +690,7 @@ export default function CalculadoraPiscinasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-piscinas')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-piscinas" />
         <Footer appName="calculadora-piscinas" />
     </div>

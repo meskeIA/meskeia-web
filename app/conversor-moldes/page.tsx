@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FORMAS_MOLDE,
   PRESETS_MOLDE,
@@ -189,7 +188,7 @@ export default function ConversorMoldesPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('conversor-moldes')} />
+      <RelatedApps />
       <ShareCard appName="conversor-moldes" />
       <Footer appName="conversor-moldes" />
     </div>

@@ -19,7 +19,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -534,7 +533,6 @@ function EspetroCli() {
 
 export default function VisualizadorHierro() {
   const [vitaminaCmg, setVitaminaCmg] = useState<number>(0);
-  const relacionadas = getRelatedApps('visualizador-hierro');
 
   return (
     <div className={styles.container}>
@@ -699,7 +697,7 @@ export default function VisualizadorHierro() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relacionadas} />
+      <RelatedApps />
       <ShareCard appName="visualizador-hierro" />
       <Footer appName="visualizador-hierro" />
     </div>

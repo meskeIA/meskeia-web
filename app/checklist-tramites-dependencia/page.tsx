@@ -11,7 +11,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -710,7 +709,7 @@ export default function ChecklistTramitesDependenciaPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('checklist-tramites-dependencia')} />
+        <RelatedApps />
         <ShareCard appName="checklist-tramites-dependencia" />
         <Footer appName="checklist-tramites-dependencia" />
     </div>

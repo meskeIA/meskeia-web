@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -764,7 +763,7 @@ export default function MusculosMovimientoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-musculos-movimiento')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-musculos-movimiento" />
         <Footer appName="visualizador-musculos-movimiento" />
     </div>

@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorTipoTelevision.module.css';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
@@ -633,7 +632,7 @@ export default function SelectorTipoTelevision() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-tipo-television')} />
+      <RelatedApps />
       <ShareCard appName="selector-tipo-television" />
       <Footer appName="selector-tipo-television" />
     </div>

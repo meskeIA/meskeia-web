@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos: ejemplos de inercia
@@ -644,7 +643,7 @@ export default function VisualizadorLeyesNewtonPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-leyes-newton')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-leyes-newton" />
         <Footer appName="visualizador-leyes-newton" />
     </div>

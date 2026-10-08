@@ -11,7 +11,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -758,7 +757,7 @@ export default function HistoriasSocialesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('historias-sociales')} />
+      <RelatedApps />
       <ShareCard appName="historias-sociales" />
       <Footer appName="historias-sociales" />
     </div>

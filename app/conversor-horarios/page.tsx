@@ -4,7 +4,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import styles from './ConversorHorarios.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Importar estilos de flag-icons
 import 'flag-icons/css/flag-icons.min.css';
@@ -747,7 +746,7 @@ export default function ConversorHorariosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-horarios')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-horarios" />
       <Footer appName="conversor-horarios" />

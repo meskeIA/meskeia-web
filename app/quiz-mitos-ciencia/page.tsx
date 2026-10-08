@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Categoria = 'cuerpo' | 'animales' | 'fisica' | 'historia' | 'biologia';
 type Fase = 'inicio' | 'jugando' | 'revelado' | 'fin';
@@ -644,7 +643,7 @@ export default function QuizMitosCiencia() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-mitos-ciencia')} />
+      <RelatedApps />
       <ShareCard appName="quiz-mitos-ciencia" />
       <Footer appName="quiz-mitos-ciencia" />
     </div>

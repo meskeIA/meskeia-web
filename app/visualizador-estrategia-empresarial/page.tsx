@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y datos de los 6 módulos
@@ -716,7 +715,7 @@ export default function VisualizadorEstrategiaEmpresarialPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-estrategia-empresarial')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-estrategia-empresarial" />
       <Footer appName="visualizador-estrategia-empresarial" />
     </div>

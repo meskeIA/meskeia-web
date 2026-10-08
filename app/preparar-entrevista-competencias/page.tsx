@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatDate } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────────────────
 // Catálogo de competencias conductuales frecuentes en entrevistas de trabajo.
@@ -1052,7 +1051,7 @@ export default function PrepararEntrevistaCompetenciasPage() {
       </EducationalSection>
 
       {/* Apps relacionadas */}
-      <RelatedApps apps={getRelatedApps('preparar-entrevista-competencias')} />
+      <RelatedApps />
 
       {/* Tarjeta de compartir */}
       <ShareCard appName="preparar-entrevista-competencias" />

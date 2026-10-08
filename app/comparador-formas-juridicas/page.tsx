@@ -5,7 +5,6 @@ import styles from './ComparadorFormasJuridicas.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import DataReference from '@/components/DataReference';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_SOCIEDADES_META } from '@/data/fiscal';
 import { PREGUNTAS_FRECUENTES } from './metadata';
 import {
@@ -1314,7 +1313,7 @@ export default function ComparadorFormasJuridicasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('comparador-formas-juridicas')} />
+      <RelatedApps />
       <ShareCard appName="comparador-formas-juridicas" />
       <Footer appName="comparador-formas-juridicas" />
     </div>

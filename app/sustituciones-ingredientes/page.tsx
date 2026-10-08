@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   INGREDIENTES_SUSTITUIBLES,
   INGREDIENTE_SUSTITUIBLE_POR_ID,
@@ -245,7 +244,7 @@ export default function SustitucionesIngredientesPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('sustituciones-ingredientes')} />
+      <RelatedApps />
       <ShareCard appName="sustituciones-ingredientes" />
       <Footer appName="sustituciones-ingredientes" />
     </div>

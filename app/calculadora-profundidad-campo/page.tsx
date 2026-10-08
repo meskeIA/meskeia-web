@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './CalculadoraProfundidadCampo.module.css';
 
@@ -659,7 +658,7 @@ export default function CalculadoraProfundidadCampoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-profundidad-campo')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-profundidad-campo" />
       </main>
 

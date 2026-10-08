@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────────────────
 // Banco de casos. Nombres de entidades genéricos (no imitan marcas reales).
@@ -562,7 +561,7 @@ export default function TestPhishingPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('test-phishing')} />
+      <RelatedApps />
       <ShareCard appName="test-phishing" />
       <Footer appName="test-phishing" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -561,7 +560,7 @@ export default function SeleccionNaturalPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-seleccion-natural')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-seleccion-natural" />
         <Footer appName="visualizador-seleccion-natural" />
     </div>

@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorAdnPolimerasa.module.css';
 
 const PASOS_HORQUILLA = [
@@ -503,7 +502,7 @@ export default function VisualizadorAdnPolimerasa() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-adn-polimerasa')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-adn-polimerasa" />
       <Footer appName="visualizador-adn-polimerasa" />
     </div>

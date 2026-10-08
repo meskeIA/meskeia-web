@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ==========================================
 // TIPOS
@@ -632,7 +631,7 @@ export default function SelectorRegimenFiscalAutonomo() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-regimen-fiscal-autonomo')} />
+      <RelatedApps />
       <ShareCard appName="selector-regimen-fiscal-autonomo" />
       <Footer appName="selector-regimen-fiscal-autonomo" />
     </div>

@@ -1,5 +1,6 @@
 import { CourseProvider } from './CourseContext';
 import { jsonLd, faqJsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 export { metadata } from './metadata';
 
 export default function CursoNutrisaludLayout({
@@ -17,7 +18,7 @@ export default function CursoNutrisaludLayout({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <CourseProvider>{children}</CourseProvider>
+      <CourseProvider><ConRelacionadas slug="curso-nutrisalud">{children}</ConRelacionadas></CourseProvider>
     </>
   );
 }

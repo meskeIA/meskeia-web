@@ -6,7 +6,6 @@ import styles from './DiccionarioRimas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // El motor de rima (núcleo tónico, fonemas, asonancia) vive en rimas.ts: es
@@ -247,7 +246,6 @@ export default function DiccionarioRimasPage() {
     }
   }
 
-  const relatedApps = getRelatedApps('diccionario-rimas');
   const truncado = resultado ? resultado.palabras.length > LIMITE_VISIBLE && !verTodas : false;
 
   return (
@@ -816,7 +814,7 @@ export default function DiccionarioRimasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="diccionario-rimas" />
       <Footer appName="diccionario-rimas" />
     </div>

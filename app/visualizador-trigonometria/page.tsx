@@ -4,7 +4,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './Trigonometria.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { razones, formatear, anguloDoble, sumaResta, fraccionEjeX, ANGULO_B } from './motor';
 
 // ======== TIPOS ========
@@ -1052,7 +1051,7 @@ export default function VisualizadorTrigonometria() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-trigonometria')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-trigonometria" />
       <Footer appName="visualizador-trigonometria" />
     </div>

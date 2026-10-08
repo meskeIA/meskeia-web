@@ -12,7 +12,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, formatDate, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_SUCESIONES_META,
@@ -2122,7 +2121,7 @@ export default function SimuladorHeredarViviendaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-heredar-vivienda')} />
+      <RelatedApps />
       <ShareCard appName="simulador-heredar-vivienda" />
       <Footer appName="simulador-heredar-vivienda" />
     </div>

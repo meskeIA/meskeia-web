@@ -20,7 +20,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -540,7 +539,7 @@ export default function SelectorMascota() {
         </div>
       )}
 
-      <RelatedApps apps={getRelatedApps('selector-mascota')} />
+      <RelatedApps />
       <ShareCard appName="selector-mascota" />
       <Footer appName="selector-mascota" />
     </div>

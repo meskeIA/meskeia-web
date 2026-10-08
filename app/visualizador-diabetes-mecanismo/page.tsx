@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -726,7 +725,7 @@ export default function VisualizadorDiabetesMecanismo() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-diabetes-mecanismo')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-diabetes-mecanismo" />
       <Footer appName="visualizador-diabetes-mecanismo" />
     </div>

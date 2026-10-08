@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -739,7 +738,7 @@ export default function VisualizadorMaquinasSimples() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-maquinas-simples')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-maquinas-simples" />
         <Footer appName="visualizador-maquinas-simples" />
     </div>

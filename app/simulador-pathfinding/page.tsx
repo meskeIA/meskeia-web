@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorPathfinding.module.css';
 
@@ -1196,7 +1195,7 @@ export default function SimuladorPathfindingPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-pathfinding')} />
+      <RelatedApps />
       <ShareCard appName="simulador-pathfinding" />
       <Footer appName="simulador-pathfinding" />
     </div>

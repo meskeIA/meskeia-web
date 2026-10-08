@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, formatDate } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface TimeEntry {
   id: string;
@@ -946,7 +945,7 @@ export default function TimeTrackerPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('time-tracker')} />
+      <RelatedApps />
 
       <ShareCard appName="time-tracker" />
       <Footer appName="time-tracker" />

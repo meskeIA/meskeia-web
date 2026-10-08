@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib/formatters';
 
 /* ────────────────────────────────────────────────────────────────
@@ -2072,7 +2071,7 @@ export default function TablaPotencialesRedoxPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-potenciales-redox')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-potenciales-redox" />
 

@@ -4,7 +4,6 @@
 import { useState, useEffect } from 'react';
 import styles from './CalculadoraSistemasNumericos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 import {
   ANCHOS,
@@ -720,7 +719,7 @@ export default function CalculadoraSistemasNumericosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-sistemas-numericos')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-sistemas-numericos" />
       <Footer appName="calculadora-sistemas-numericos" />
     </div>

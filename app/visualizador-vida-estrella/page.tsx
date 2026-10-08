@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -578,7 +577,7 @@ export default function VisualizadorVidaEstrellaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-vida-estrella')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-vida-estrella" />
         <Footer appName="visualizador-vida-estrella" />
     </div>

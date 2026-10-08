@@ -12,7 +12,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_IRPF_META,
@@ -923,7 +922,7 @@ export default function SimuladorModulosVsDirectaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-modulos-vs-directa')} />
+      <RelatedApps />
       <ShareCard appName="simulador-modulos-vs-directa" />
       <Footer appName="simulador-modulos-vs-directa" />
     </div>

@@ -10,7 +10,6 @@ import {
   EducationalSection,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -637,7 +636,7 @@ export default function VisualizadorGeopoliticaRecursos() {
         </EducationalSection>
       </section>
 
-      <RelatedApps apps={getRelatedApps('visualizador-geopolitica-recursos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-geopolitica-recursos" />
       <Footer appName="visualizador-geopolitica-recursos" />
     </div>

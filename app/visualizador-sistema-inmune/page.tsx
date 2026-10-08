@@ -11,7 +11,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorSistemaInmune.module.css';
 
 // Suprimir advertencia de metadata no usada en client component
@@ -1088,7 +1087,7 @@ export default function VisualizadorSistemaInmune() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sistema-inmune')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sistema-inmune" />
       </main>
 

@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorPunnett.module.css';
 
 import {
@@ -804,7 +803,7 @@ export default function SimuladorPunnettPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-punnett')} />
+      <RelatedApps />
       <ShareCard appName="simulador-punnett" />
       <Footer appName="simulador-punnett" />
     </div>

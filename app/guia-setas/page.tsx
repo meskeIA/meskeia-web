@@ -11,7 +11,6 @@ import {
 } from '@/components';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================================
 // TIPOS
@@ -1098,7 +1097,7 @@ export default function GuiaSetasPage() {
 
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-setas')} />
+        <RelatedApps />
         <ShareCard appName="guia-setas" />
         <Footer appName="guia-setas" />
     </div>

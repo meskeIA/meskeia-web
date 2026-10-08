@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -524,7 +523,7 @@ export default function VisualizadorCuerpoNumerosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-cuerpo-numeros')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-cuerpo-numeros" />
         <Footer appName="visualizador-cuerpo-numeros" />
     </div>

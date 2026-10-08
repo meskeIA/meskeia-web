@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
   RegionBadge,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularResultado,
   PREGUNTAS,
@@ -440,7 +439,7 @@ export default function SelectorSeguroCochePage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-seguro-coche')} />
+      <RelatedApps />
       <ShareCard appName="selector-seguro-coche" />
       <Footer appName="selector-seguro-coche" />
     </div>

@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './ContadorPalabras.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
 
@@ -551,7 +550,7 @@ export default function ContadorPalabrasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('contador-palabras')} />
+      <RelatedApps />
 
       <ShareCard appName="contador-palabras" />
       <Footer appName="contador-palabras" />

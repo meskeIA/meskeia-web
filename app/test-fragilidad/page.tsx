@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './TestFragilidad.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import DataReference from '@/components/DataReference';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
 
@@ -593,7 +592,7 @@ export default function TestFragilidad() {
       </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('test-fragilidad')} />
+      <RelatedApps />
       <ShareCard appName="test-fragilidad" />
       <Footer appName="test-fragilidad" />
     </div>

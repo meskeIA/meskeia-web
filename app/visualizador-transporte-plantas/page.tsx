@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -718,7 +717,7 @@ export default function VisualizadorTransportePlantasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-transporte-plantas')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-transporte-plantas" />
         <Footer appName="visualizador-transporte-plantas" />
     </div>

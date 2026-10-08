@@ -10,7 +10,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './QueVinoElegir.module.css';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────
@@ -595,7 +594,7 @@ export default function QueVinoElegir() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('que-vino-elegir')} />
+      <RelatedApps />
       <ShareCard appName="que-vino-elegir" />
       <Footer appName="que-vino-elegir" />
     </div>

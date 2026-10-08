@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -668,7 +667,7 @@ export default function VisualizadorSistemaElectoralPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sistema-electoral')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sistema-electoral" />
         <Footer appName="visualizador-sistema-electoral" />
     </div>

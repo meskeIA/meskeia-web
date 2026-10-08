@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './AgujerosNegros.module.css';
 
 // ─────────────────────────────────────────────
@@ -815,7 +814,7 @@ export default function AgujerosNegrosPage(): React.ReactNode {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-agujeros-negros')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-agujeros-negros" />
       <Footer appName="visualizador-agujeros-negros" />
     </div>

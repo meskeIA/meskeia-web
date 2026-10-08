@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaSeguridadInternet.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import RelatedApps from '@/components/RelatedApps';
 
 // ─── Herramientas del journey ───
@@ -400,7 +399,7 @@ export default function GuiaSeguridadInternetPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('guia-seguridad-internet')} />
+      <RelatedApps />
       <ShareCard appName="guia-seguridad-internet" />
       <Footer appName="guia-seguridad-internet" />
     </div>

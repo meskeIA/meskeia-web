@@ -8,7 +8,6 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './RegimenesPoliticos.module.css';
 
 // ─────────────────────────────────────────────
@@ -760,7 +759,7 @@ export default function VisualizadorRegimenesPoliticos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-regimenes-politicos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-regimenes-politicos" />
       <Footer appName="visualizador-regimenes-politicos" />
     </div>

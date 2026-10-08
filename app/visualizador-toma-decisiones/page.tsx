@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -730,7 +729,7 @@ export default function TomaDecisionesPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-toma-decisiones')} />
+        <RelatedApps />
 
         <ShareCard appName="visualizador-toma-decisiones" />
 

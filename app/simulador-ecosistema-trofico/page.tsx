@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import styles from './SimuladorEcosistemaTrofico.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 // El modelo de la cascada (tipos, ecosistemas, eventos, ATENUACION y aplicarEvento) vive en
 // `motor.ts` desde el 23/09/2026: lo comparten el simulador y los casos para clase, y una
@@ -785,7 +784,7 @@ export default function SimuladorEcosistemaTroficoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-ecosistema-trofico')} />
+        <RelatedApps />
         <ShareCard appName="simulador-ecosistema-trofico" />
         <Footer appName="simulador-ecosistema-trofico" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -864,7 +863,7 @@ export default function VisualizadorFosilesGeologicoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-fosiles-tiempo-geologico')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-fosiles-tiempo-geologico" />
         <Footer appName="visualizador-fosiles-tiempo-geologico" />
     </div>

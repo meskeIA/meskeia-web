@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import DataReference from '@/components/DataReference';
-import { getRelatedApps } from '@/data/app-relations';
 import { ELEMENTOS, IONES, type CategoriaId, type Elemento } from './datos';
 import {
   CASOS,
@@ -1624,7 +1623,7 @@ export default function TablaValenciasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-valencias')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-valencias" />
 

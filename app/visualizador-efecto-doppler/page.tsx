@@ -2,7 +2,6 @@
 // @disclaimer: exempt
 import { useState, useEffect, useRef } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './EfectoDoppler.module.css';
 
 type Tab = 'efecto' | 'slider' | 'aplicaciones' | 'cosmos';
@@ -174,7 +173,6 @@ export default function VisualizadorEfectoDoppler(): React.ReactNode {
   const vRecesion = velocidadRecesion(redshift);
   const dist = distanciaAnosLuz(redshift);
 
-  const relacionadas = getRelatedApps('visualizador-efecto-doppler');
 
   return (
     <div className={styles.container}>
@@ -554,7 +552,7 @@ export default function VisualizadorEfectoDoppler(): React.ReactNode {
         </div>
       </details>
 
-      <RelatedApps apps={relacionadas} />
+      <RelatedApps />
       <ShareCard appName="visualizador-efecto-doppler" />
       <Footer appName="visualizador-efecto-doppler" />
     </div>

@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorMaquinaTuring.module.css';
 
@@ -1361,7 +1360,7 @@ export default function SimuladorMaquinaTuring() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-maquina-turing')} />
+      <RelatedApps />
       <ShareCard appName="simulador-maquina-turing" />
       <Footer appName="simulador-maquina-turing" />
     </div>

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatDate } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   AREAS,
   COMPETENCIAS,
@@ -901,7 +900,7 @@ export default function TestCompetenciasDigitalesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('test-competencias-digitales')} />
+      <RelatedApps />
       <ShareCard appName="test-competencias-digitales" />
       <Footer appName="test-competencias-digitales" />
     </div>

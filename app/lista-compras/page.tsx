@@ -4,7 +4,6 @@
 import { useState, useEffect } from 'react';
 import styles from './ListaCompras.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatDate } from '@/lib';
 
 // ==================== TIPOS ====================
@@ -740,7 +739,7 @@ export default function ListaComprasPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('lista-compras')} />
+      <RelatedApps />
 
       <ShareCard appName="lista-compras" />
       <Footer appName="lista-compras" />

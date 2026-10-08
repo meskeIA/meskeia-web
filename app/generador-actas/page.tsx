@@ -5,7 +5,6 @@ import styles from './GeneradorActas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatDate as formatDateCorto } from '@/lib';
 
 // Tipos
@@ -1541,7 +1540,7 @@ export default function GeneradorActasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-actas')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-actas" />
       <Footer appName="generador-actas" />

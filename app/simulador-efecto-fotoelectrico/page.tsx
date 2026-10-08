@@ -11,7 +11,6 @@ import {
   ShareCard,
   NumberInput,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorEfectoFotoelectrico.module.css';
 import {
@@ -931,7 +930,7 @@ export default function SimuladorEfectoFotoelectricoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-efecto-fotoelectrico')} />
+        <RelatedApps />
         <ShareCard appName="simulador-efecto-fotoelectrico" />
       </main>
 

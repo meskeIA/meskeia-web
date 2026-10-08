@@ -14,7 +14,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcular1RM, Resultado1RM } from '@/lib/calculadoras/deporte';
 
 export default function Calculadora1RMGimnasioPage() {
@@ -274,7 +273,7 @@ export default function Calculadora1RMGimnasioPage() {
       </EducationalSection>
 
       {/* Apps relacionadas */}
-      <RelatedApps apps={getRelatedApps('calculadora-1rm-gimnasio')} />
+      <RelatedApps />
 
       {/* Tarjeta de compartir */}
       <ShareCard appName="calculadora-1rm-gimnasio" />

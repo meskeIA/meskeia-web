@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaEstilosCerveza.module.css';
 
 type TipoCerveza = 'Ale' | 'Lager' | 'Híbrida' | 'Silvestre';
@@ -1255,7 +1254,7 @@ export default function GuiaEstilosCerveza() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('guia-estilos-cerveza')} />
+      <RelatedApps />
       <ShareCard appName="guia-estilos-cerveza" />
       <Footer appName="guia-estilos-cerveza" />
     </div>

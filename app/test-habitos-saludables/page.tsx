@@ -5,7 +5,6 @@ import styles from './TestHabitos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Question {
   id: string;
@@ -799,7 +798,7 @@ export default function TestHabitosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('test-habitos-saludables')} />
+      <RelatedApps />
 
       <ShareCard appName="test-habitos-saludables" />
       <Footer appName="test-habitos-saludables" />

@@ -4,7 +4,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AfinadorInstrumentos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import {
   AFINACIONES,
@@ -736,7 +735,7 @@ export default function AfinadorInstrumentosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('afinador-instrumentos')} />
+      <RelatedApps />
       <ShareCard appName="afinador-instrumentos" />
       <Footer appName="afinador-instrumentos" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { generateJsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -922,7 +921,7 @@ export default function VisualizadorMicrobiologia() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-microbiologia')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-microbiologia" />
       <Footer appName="visualizador-microbiologia" />
     </div>

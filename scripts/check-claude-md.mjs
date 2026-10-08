@@ -101,7 +101,7 @@ const OBLIGACIONES = [
   ['Estructura estándar de una app', [
     '<MeskeiaLogo />', '<LegalNotice /> ← RGPD',
     '<DisclaimerCard /> O // @disclaimer: exempt en la línea 2', '<EducationalSection>',
-    "<RelatedApps apps={getRelatedApps('slug')} />", '<ShareCard appName="slug" />',
+    '<RelatedApps /> ← sin prop: layout.tsx monta <ConRelacionadas slug="slug">', '<ShareCard appName="slug" />',
     '<Footer appName="slug" />', 'Los cinco obligatorios en TODAS las apps',
     'MeskeiaLogo, LegalNotice, RelatedApps, ShareCard, Footer', 'Se importan de @/components',
     'los formateadores, de @/lib',
@@ -239,6 +239,11 @@ const OBLIGACIONES = [
     'npm run check:legal', 'rompe el build', 'no monta <LegalNotice />',
     'se monte y no solo se importe', 'no viva dentro de <EducationalSection>', 'Sin pasivo',
     'legal-ok: <razón>', 'razón es obligatoria', 'npm run legal:probar-candado',
+  ]],
+  ['Candado del catálogo en el cliente', [
+    'npm run check:catalogo-cliente', 'rompe el build', "un fichero 'use client' alcanza data/app-relations.ts",
+    'el barrel @/components alcanza data/applications.ts', 'Sin pasivo',
+    'catalogo-ok: <razón>', 'razón obligatoria', 'npm run catalogo:probar-candado',
   ]],
   ['Candado de las celdas braille', [
     'npm run check:braille', 'rompe el build',

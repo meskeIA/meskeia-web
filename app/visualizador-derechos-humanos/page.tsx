@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -676,7 +675,7 @@ export default function DerechosHumanos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-derechos-humanos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-derechos-humanos" />
       <Footer appName="visualizador-derechos-humanos" />
     </div>

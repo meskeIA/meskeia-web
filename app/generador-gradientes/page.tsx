@@ -6,7 +6,6 @@ import styles from './GeneradorGradientes.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type GradientType = 'linear' | 'radial' | 'conic';
 
@@ -574,7 +573,7 @@ export default function GeneradorGradientesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-gradientes')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-gradientes" />
       <Footer appName="generador-gradientes" />

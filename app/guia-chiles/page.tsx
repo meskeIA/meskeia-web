@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './GuiaCard.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { CHILES, ETIQUETA_NIVEL, type NivelPicante } from '@/lib/guias/chiles';
 import { formatNumber } from '@/lib/formatters';
 
@@ -105,7 +104,7 @@ export default function GuiaChilesPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('guia-chiles')} />
+      <RelatedApps />
       <ShareCard appName="guia-chiles" />
       <Footer appName="guia-chiles" />
     </div>

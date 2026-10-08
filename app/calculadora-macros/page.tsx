@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 import styles from './CalculadoraMacros.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 type Objetivo = 'volumen' | 'definicion' | 'mantenimiento';
@@ -782,7 +781,7 @@ export default function CalculadoraMacrosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-macros')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-macros" />
       <Footer appName="calculadora-macros" />
     </div>

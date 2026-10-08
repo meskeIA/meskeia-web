@@ -4,7 +4,6 @@
 import { useState, useCallback } from 'react';
 import styles from './TiradorDados.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de dados disponibles
 interface DiceType {
@@ -787,7 +786,7 @@ export default function TiradorDadosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tirador-dados')} />
+      <RelatedApps />
       <ShareCard appName="tirador-dados" />
       <Footer appName="tirador-dados" />
     </div>

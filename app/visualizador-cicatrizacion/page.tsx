@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -869,7 +868,7 @@ export default function VisualizadorCicatrizacion() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-cicatrizacion')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-cicatrizacion" />
       <Footer appName="visualizador-cicatrizacion" />
     </div>

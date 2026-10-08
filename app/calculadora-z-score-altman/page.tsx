@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -212,7 +211,6 @@ export default function CalculadoraZScoreAltman() {
     setRawValues({});
   };
 
-  const relatedApps = getRelatedApps('calculadora-z-score-altman');
 
   // Campos visibles según modelo
   const campos: { campo: keyof InputData; label: string; placeholder: string; oculto?: boolean }[] = [
@@ -530,7 +528,7 @@ export default function CalculadoraZScoreAltman() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="calculadora-z-score-altman" />
       <Footer appName="calculadora-z-score-altman" />
     </div>

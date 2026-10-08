@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -637,7 +636,7 @@ export default function VisualizadorCadenaAlimentariaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-cadena-alimentaria')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-cadena-alimentaria" />
         <Footer appName="visualizador-cadena-alimentaria" />
     </div>

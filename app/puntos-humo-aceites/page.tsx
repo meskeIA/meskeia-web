@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './PuntosHumo.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { ACEITES, ETIQUETA_BANDA, type Banda } from '@/lib/guias/puntos-humo';
 
 const BANDAS: Banda[] = ['crudo', 'media', 'alta'];
@@ -135,7 +134,7 @@ export default function PuntosHumoAceitesPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('puntos-humo-aceites')} />
+      <RelatedApps />
       <ShareCard appName="puntos-humo-aceites" />
       <Footer appName="puntos-humo-aceites" />
     </div>

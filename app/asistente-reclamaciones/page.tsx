@@ -5,7 +5,6 @@ import styles from './AsistenteReclamaciones.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   PROBLEM_OPTIONS,
   CHANNEL_OPTIONS,
@@ -683,7 +682,7 @@ export default function AsistenteReclamacionesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('asistente-reclamaciones')} />
+      <RelatedApps />
       <ShareCard appName="asistente-reclamaciones" />
       <Footer appName="asistente-reclamaciones" />
     </div>

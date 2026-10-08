@@ -5,7 +5,6 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import styles from './GoldenHour.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   eventosDelDia,
   posicionSol,
@@ -1082,7 +1081,7 @@ export default function GoldenHourPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('golden-hour')} />
+      <RelatedApps />
 
       <ShareCard appName="golden-hour" />
       <Footer appName="golden-hour" />

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type SeccionActiva = 'telomeros' | 'hallmarks' | 'senescencia' | 'relojes';
 
@@ -960,7 +959,7 @@ export default function VisualizadorEnvejecimientoCelularPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-envejecimiento-celular')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-envejecimiento-celular" />
       <Footer appName="visualizador-envejecimiento-celular" />
     </div>

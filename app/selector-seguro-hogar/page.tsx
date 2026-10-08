@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorSeguroHogar.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularResultado, PREGUNTAS, VEREDICTOS, UMBRAL_BASICA, UMBRAL_ESTANDAR, type Resultado } from './motor';
 
 // Las preguntas con sus puntos, los veredictos y la lógica viven en ./motor.ts.
@@ -360,7 +359,7 @@ export default function SelectorSeguroHogar() {
       )}
 
       <ShareCard appName="selector-seguro-hogar" />
-      <RelatedApps apps={getRelatedApps('selector-seguro-hogar')} />
+      <RelatedApps />
       <Footer appName="selector-seguro-hogar" />
     </div>
   );

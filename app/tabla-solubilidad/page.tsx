@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades
@@ -2584,7 +2583,7 @@ export default function TablaSolubilidadPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-solubilidad')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-solubilidad" />
 

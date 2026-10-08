@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1020,7 +1019,7 @@ export default function VisualizadorQuimicaOrganica() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-quimica-organica')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-quimica-organica" />
       <Footer appName="visualizador-quimica-organica" />
     </div>

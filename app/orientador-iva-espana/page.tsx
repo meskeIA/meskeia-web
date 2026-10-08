@@ -14,7 +14,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   TIPOS_IVA,
   PORCENTAJES_IVA,
@@ -1075,7 +1074,7 @@ export default function OrientadorIvaEspanaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-iva-espana')} />
+      <RelatedApps />
       <ShareCard appName="orientador-iva-espana" />
       <Footer appName="orientador-iva-espana" />
     </div>

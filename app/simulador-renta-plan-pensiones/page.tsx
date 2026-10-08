@@ -12,7 +12,6 @@ import {
   RegionBadge,
   DataReference,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib';
 import {
   TRAMOS_IRPF_2025,
@@ -905,7 +904,7 @@ export default function SimuladorRentaPlanPensionesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-renta-plan-pensiones')} />
+      <RelatedApps />
       <ShareCard appName="simulador-renta-plan-pensiones" />
       <Footer appName="simulador-renta-plan-pensiones" />
     </div>

@@ -6,7 +6,6 @@ import styles from './JuegoMemoria.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Dificultad = 'facil' | 'medio' | 'dificil';
 
@@ -637,7 +636,7 @@ export default function JuegoMemoriaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-memoria')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-memoria" />
       <Footer appName="juego-memoria" />

@@ -3,7 +3,6 @@
 
 import styles from './GuiaCard.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { SALES } from '@/lib/guias/sales';
 
 export default function GuiaTiposSalPage() {
@@ -72,7 +71,7 @@ export default function GuiaTiposSalPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('guia-tipos-sal')} />
+      <RelatedApps />
       <ShareCard appName="guia-tipos-sal" />
       <Footer appName="guia-tipos-sal" />
     </div>

@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorTipoPrestamo.module.css';
 
 // ==========================================
@@ -617,7 +616,7 @@ export default function SelectorTipoPrestamoPage() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-tipo-prestamo')} />
+      <RelatedApps />
       <ShareCard appName="selector-tipo-prestamo" />
       <Footer appName="selector-tipo-prestamo" />
     </div>

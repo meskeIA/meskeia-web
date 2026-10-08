@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import styles from './GeneradorTonos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import {
   frecuenciasDeMedida,
@@ -1956,7 +1955,7 @@ export default function GeneradorTonosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-tonos')} />
+      <RelatedApps />
       <ShareCard appName="generador-tonos" />
       <Footer appName="generador-tonos" />
     </div>

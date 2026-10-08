@@ -13,7 +13,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
@@ -719,7 +718,7 @@ export default function GeneradorFichasCalculoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('generador-fichas-calculo')} />
+        <RelatedApps />
 
         <ShareCard appName="generador-fichas-calculo" />
 

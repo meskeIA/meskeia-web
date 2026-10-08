@@ -5,7 +5,6 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './GeneradorOndas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { envolventePorColumna, formatearTamano } from './motor';
 
 // Tipos
@@ -1144,7 +1143,7 @@ export default function GeneradorOndasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-ondas')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-ondas" />
       <Footer appName="generador-ondas" />

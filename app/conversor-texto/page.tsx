@@ -5,7 +5,6 @@ import styles from './ConversorTexto.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 export default function ConversorTextoPage() {
   const [textoEntrada, setTextoEntrada] = useState('');
@@ -414,7 +413,7 @@ export default function ConversorTextoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-texto')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-texto" />
       <Footer appName="conversor-texto" />

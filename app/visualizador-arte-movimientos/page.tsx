@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -811,7 +810,7 @@ export default function VisualizadorArteMovimientos() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-arte-movimientos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-arte-movimientos" />
       <Footer appName="visualizador-arte-movimientos" />
     </div>

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos: decisiones y su impacto acumulado
@@ -321,7 +320,7 @@ export default function VisualizadorPesoDecisionesPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-peso-decisiones')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-peso-decisiones" />
         <Footer appName="visualizador-peso-decisiones" />
     </div>

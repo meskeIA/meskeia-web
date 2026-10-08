@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorCampoMagnetico.module.css';
 
@@ -1754,7 +1753,7 @@ export default function SimuladorCampoMagnetico() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-campo-magnetico')} />
+        <RelatedApps />
         <ShareCard appName="simulador-campo-magnetico" />
       </main>
 

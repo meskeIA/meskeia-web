@@ -1,4 +1,5 @@
 import { jsonLd, faqJsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 export { metadata } from './metadata';
 
 // Inyección de JSON-LD a partir de contenido estático del proyecto (sin input de
@@ -8,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      {children}
+      <ConRelacionadas slug="simulador-modelo-osi">{children}</ConRelacionadas>
     </>
   );
 }

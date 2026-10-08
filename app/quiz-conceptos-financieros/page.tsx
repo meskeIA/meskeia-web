@@ -7,7 +7,6 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Preguntas ────────────────────────────────────────────────────────────────
 
@@ -219,7 +218,7 @@ export default function QuizConceptosFinancierosPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('quiz-conceptos-financieros')} />
+        <RelatedApps />
         <ShareCard appName="quiz-conceptos-financieros" />
         <Footer appName="quiz-conceptos-financieros" />
     </div>

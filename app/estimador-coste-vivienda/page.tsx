@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './EstimadorCosteVivienda.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 export default function CalculadoraCosteViviendaPage() {
   // Estado para todos los campos (vacío = no introducido)
@@ -819,7 +818,7 @@ export default function CalculadoraCosteViviendaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-coste-vivienda')} />
+      <RelatedApps />
       <ShareCard appName="estimador-coste-vivienda" />
       <Footer appName="estimador-coste-vivienda" />
     </div>

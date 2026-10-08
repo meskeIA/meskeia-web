@@ -1,3 +1,5 @@
+import ConRelacionadas from '@/components/ConRelacionadas';
+
 ﻿import { jsonLd, faqJsonLd } from './metadata';
 export { metadata } from './metadata';
 
@@ -6,7 +8,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      {children}
+      <ConRelacionadas slug="visualizador-toma-decisiones">{children}</ConRelacionadas>
     </>
   );
 }

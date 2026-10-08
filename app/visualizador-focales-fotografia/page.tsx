@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './VisualizadorFocalesFotografia.module.css';
 
@@ -561,7 +560,7 @@ export default function VisualizadorFocalesFotografiaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-focales-fotografia')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-focales-fotografia" />
       </main>
 

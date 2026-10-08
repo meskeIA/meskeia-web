@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type ModoCalculo = 'consumo' | 'viaje';
 
@@ -586,7 +585,7 @@ export default function CalculadoraCombustiblePage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-combustible')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-combustible" />
       <Footer appName="calculadora-combustible" />

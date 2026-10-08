@@ -10,7 +10,6 @@ import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
 import DataReference from '@/components/DataReference';
 import RegionBadge from '@/components/RegionBadge';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './OrientadorFacturacionRetencion.module.css';
 import { metadata, jsonLd } from './metadata';
 
@@ -532,7 +531,7 @@ export default function OrientadorFacturacionRetencionPage() {
             </div>
           </EducationalSection>
 
-          <RelatedApps apps={getRelatedApps('orientador-facturacion-retencion')} />
+          <RelatedApps />
           <ShareCard appName="orientador-facturacion-retencion" />
         </main>
 

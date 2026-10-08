@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 type SistemaId = 'vestibular' | 'visual' | 'propioceptivo';
 
@@ -393,7 +392,7 @@ export default function VisualizadorSistemasEquilibrio() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sistemas-equilibrio')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sistemas-equilibrio" />
       </main>
 

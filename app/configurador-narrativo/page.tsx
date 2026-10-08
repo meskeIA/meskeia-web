@@ -7,7 +7,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Persona = '1a' | '3a' | '2a';
 type TipoNarrador = 'protagonista' | 'testigo' | 'no-fiable' | 'omnisciente' | 'limitado' | 'objetivo' | 'participante';
@@ -890,7 +889,7 @@ export default function ConfiguradorNarrativoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('configurador-narrativo')} />
+        <RelatedApps />
         <ShareCard appName="configurador-narrativo" />
       </main>
 

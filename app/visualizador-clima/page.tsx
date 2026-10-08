@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -628,7 +627,7 @@ export default function VisualizadorClimaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-clima')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-clima" />
         <Footer appName="visualizador-clima" />
       </div>

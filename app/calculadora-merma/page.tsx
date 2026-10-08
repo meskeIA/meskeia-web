@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularMerma, REFERENCIAS_MERMA } from '@/lib/calculadoras/merma';
 import { formatNumber, formatCurrency } from '@/lib/formatters';
 
@@ -196,7 +195,7 @@ export default function CalculadoraMermaPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-merma')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-merma" />
       <Footer appName="calculadora-merma" />
     </div>

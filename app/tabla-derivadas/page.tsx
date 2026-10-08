@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades de render de fórmulas (sin librerías externas: la CSP
@@ -1551,7 +1550,7 @@ export default function TablaDerivadasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-derivadas')} />
+      <RelatedApps />
 
       <ShareCard appName="tabla-derivadas" />
 

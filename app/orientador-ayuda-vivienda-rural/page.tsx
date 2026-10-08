@@ -14,7 +14,6 @@ import {
   RegionBadge,
 } from '@/components';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { AYUDA_COMPRA_JOVEN_RURAL_2026, FISCAL_VIVIENDA_JOVEN_META } from '@/data/fiscal';
 
 type SiNo = 'si' | 'no' | 'pendiente';
@@ -500,7 +499,7 @@ export default function OrientadorAyudaViviendaRural() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-ayuda-vivienda-rural')} />
+      <RelatedApps />
       <ShareCard appName="orientador-ayuda-vivienda-rural" />
       <Footer appName="orientador-ayuda-vivienda-rural" />
     </div>

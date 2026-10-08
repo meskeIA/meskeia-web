@@ -6,7 +6,6 @@ import styles from './GeneradorIconos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface GeneratedIcon {
   size: number;
@@ -1303,7 +1302,7 @@ export default function GeneradorIconosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-iconos')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-iconos" />
       <Footer appName="generador-iconos" />

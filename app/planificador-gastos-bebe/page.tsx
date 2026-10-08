@@ -13,7 +13,6 @@ import {
 } from '@/components';
 import { GASTOS_PRIMER_ANO_BEBE } from '@/data/fiscal';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type NivelGasto = 'min' | 'med' | 'alto';
 
@@ -421,7 +420,7 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('planificador-gastos-bebe')} />
+        <RelatedApps />
         <ShareCard appName="planificador-gastos-bebe" />
         <Footer appName="planificador-gastos-bebe" />
     </div>

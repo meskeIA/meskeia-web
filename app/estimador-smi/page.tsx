@@ -13,7 +13,6 @@ import {
   ResultCard,
   ShareCard, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
 import {
   FISCAL_SMI_META,
@@ -592,7 +591,7 @@ export default function EstimadorSMIPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('estimador-smi')} />
+        <RelatedApps />
         <ShareCard appName="estimador-smi" />
         <Footer appName="estimador-smi" />
     </div>

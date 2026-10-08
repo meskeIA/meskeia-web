@@ -11,7 +11,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -919,7 +918,7 @@ export default function VisualizadorEstadisticaInferencial() {
 
       </main>
 
-      <RelatedApps apps={getRelatedApps('visualizador-estadistica-inferencial')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-estadistica-inferencial" />
       <Footer appName="visualizador-estadistica-inferencial" />
     </div>

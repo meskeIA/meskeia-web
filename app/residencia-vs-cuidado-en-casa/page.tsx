@@ -4,7 +4,6 @@ import { useState } from 'react';
 import styles from './ResidenciaVsCuidadoCasa.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, DataReference, RegionBadge } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   SMI_2026,
   FISCAL_SMI_META,
@@ -601,7 +600,7 @@ export default function ResidenciaVsCuidadoCasa() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('residencia-vs-cuidado-en-casa')} />
+      <RelatedApps />
       <ShareCard appName="residencia-vs-cuidado-en-casa" />
       <Footer appName="residencia-vs-cuidado-en-casa" />
     </div>

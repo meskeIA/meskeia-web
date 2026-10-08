@@ -8,7 +8,6 @@ import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Velocidades de lectura por defecto
 const VELOCIDADES = {
@@ -715,7 +714,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-tiempo-lectura')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-tiempo-lectura" />
       <Footer appName="calculadora-tiempo-lectura" />

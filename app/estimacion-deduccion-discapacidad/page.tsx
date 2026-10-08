@@ -13,7 +13,6 @@ import {
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
   FISCAL_DEPENDENCIA_META,
@@ -572,7 +571,7 @@ export default function EstimacionDeduccionDiscapacidadPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimacion-deduccion-discapacidad')} />
+      <RelatedApps />
       <ShareCard appName="estimacion-deduccion-discapacidad" />
       <Footer appName="estimacion-deduccion-discapacidad" />
     </div>

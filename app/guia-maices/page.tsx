@@ -3,7 +3,6 @@
 
 import styles from './GuiaCard.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { MAICES } from '@/lib/guias/maices';
 
 export default function GuiaMaicesPage() {
@@ -70,7 +69,7 @@ export default function GuiaMaicesPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('guia-maices')} />
+      <RelatedApps />
       <ShareCard appName="guia-maices" />
       <Footer appName="guia-maices" />
     </div>

@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './MercadoInmobiliario.module.css';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
@@ -555,7 +554,7 @@ export default function VisualizadorMercadoInmobiliario() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-mercado-inmobiliario')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-mercado-inmobiliario" />
         <Footer appName="visualizador-mercado-inmobiliario" />
       </div>

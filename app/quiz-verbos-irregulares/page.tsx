@@ -6,7 +6,6 @@ import styles from './QuizVerbosIrregulares.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import EducationalSection from '@/components/EducationalSection';
 import { formatPercentage } from '@/lib';
 import { verbosIrregulares, VerboIrregular } from '@/data/verbos-irregulares';
@@ -1122,7 +1121,7 @@ export default function QuizVerbosIrregularesPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-verbos-irregulares')} />
+      <RelatedApps />
       <ShareCard appName="quiz-verbos-irregulares" />
       <Footer appName="quiz-verbos-irregulares" />
     </div>

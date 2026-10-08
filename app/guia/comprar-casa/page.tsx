@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaComprarCasa.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, RegionBadge, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas disponibles para compra de vivienda
 const tools = [
@@ -298,7 +297,7 @@ export default function GuiaComprarCasaPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('guia-comprar-casa')} />
+      <RelatedApps />
       <ShareCard appName="guia-comprar-casa" />
       <Footer appName="guia-comprar-casa" />
     </div>

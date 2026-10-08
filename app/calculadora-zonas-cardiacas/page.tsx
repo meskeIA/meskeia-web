@@ -10,7 +10,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularZonasCardiacas, type ZonaCardiaca } from '@/lib/calculadoras/deporte';
 import styles from './CalculadoraZonasCardiacas.module.css';
 
@@ -525,7 +524,7 @@ export default function CalculadoraZonasCardiacasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-zonas-cardiacas')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-zonas-cardiacas" />
       </main>
 

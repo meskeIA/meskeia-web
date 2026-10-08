@@ -9,7 +9,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorCriptografia.module.css';
 
 type SeccionActiva = 'simetrico' | 'hash' | 'firma' | 'tls';
@@ -924,7 +923,7 @@ export default function VisualizadorCriptografia() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-criptografia')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-criptografia" />
       <Footer appName="visualizador-criptografia" />
     </div>

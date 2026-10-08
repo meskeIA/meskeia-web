@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -776,7 +775,7 @@ export default function EspectroElectromagneticoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-espectro-electromagnetico')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-espectro-electromagnetico" />
         <Footer appName="visualizador-espectro-electromagnetico" />
     </div>

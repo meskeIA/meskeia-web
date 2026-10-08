@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -832,7 +831,7 @@ export default function VisualizadorTectonicaPlacasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-tectonica-placas')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-tectonica-placas" />
         <Footer appName="visualizador-tectonica-placas" />
     </div>

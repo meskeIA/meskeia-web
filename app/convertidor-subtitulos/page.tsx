@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useCallback, DragEvent, ChangeEvent } from 'react';
 import styles from './ConvertidorSubtitulos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Formato = 'srt' | 'vtt' | 'sub' | 'ssa';
 
@@ -820,7 +819,7 @@ export default function ConvertidorSubtitulosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('convertidor-subtitulos')} />
+      <RelatedApps />
 
       <ShareCard appName="convertidor-subtitulos" />
 

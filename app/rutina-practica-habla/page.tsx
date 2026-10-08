@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   AREAS,
   DURACIONES,
@@ -627,7 +626,7 @@ export default function RutinaPracticaHablaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('rutina-practica-habla')} />
+      <RelatedApps />
 
       <ShareCard appName="rutina-practica-habla" />
 

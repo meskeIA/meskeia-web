@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -631,7 +630,7 @@ export default function VisualizadorTablaPeriodica() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-tabla-periodica')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-tabla-periodica" />
         <Footer appName="visualizador-tabla-periodica" />
     </div>

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaJubilacion.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas del journey de jubilación
 const tools = [
@@ -325,7 +324,7 @@ export default function GuiaJubilacionPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('guia-jubilacion')} />
+      <RelatedApps />
       <ShareCard appName="guia-jubilacion" />
       <Footer appName="guia-jubilacion" />
     </div>

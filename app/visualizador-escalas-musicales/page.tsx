@@ -13,7 +13,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -832,7 +831,7 @@ export default function VisualizadorEscalasMusicales() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('visualizador-escalas-musicales')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-escalas-musicales" />
       <Footer appName="visualizador-escalas-musicales" />
     </div>

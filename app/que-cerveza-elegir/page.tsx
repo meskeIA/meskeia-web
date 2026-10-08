@@ -10,7 +10,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './QueCervezaElegir.module.css';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────
@@ -589,7 +588,7 @@ export default function QueCervezaElegir() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('que-cerveza-elegir')} />
+      <RelatedApps />
       <ShareCard appName="que-cerveza-elegir" />
       <Footer appName="que-cerveza-elegir" />
     </div>

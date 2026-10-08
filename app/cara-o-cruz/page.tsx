@@ -5,7 +5,6 @@ import { useState, useCallback } from 'react';
 import styles from './CaraOCruz.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Resultado = 'cara' | 'cruz';
 
@@ -560,7 +559,7 @@ export default function CaraOCruzPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('cara-o-cruz')} />
+      <RelatedApps />
       <ShareCard appName="cara-o-cruz" />
       <Footer appName="cara-o-cruz" />
     </div>

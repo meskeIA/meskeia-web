@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './QuizConceptosInversion.module.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -682,7 +681,7 @@ export default function QuizConceptosInversionPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('quiz-conceptos-inversion')} />
+      <RelatedApps />
       <ShareCard appName="quiz-conceptos-inversion" />
       <Footer appName="quiz-conceptos-inversion" />
     </div>

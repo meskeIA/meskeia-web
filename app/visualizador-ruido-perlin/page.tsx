@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './VisualizadorRuidoPerlin.module.css';
 
@@ -663,7 +662,7 @@ export default function VisualizadorRuidoPerlinPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-ruido-perlin')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-ruido-perlin" />
       <Footer appName="visualizador-ruido-perlin" />
     </div>

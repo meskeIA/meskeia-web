@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -516,7 +515,7 @@ export default function ComoFuncionaElDolorPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-como-funciona-el-dolor')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-como-funciona-el-dolor" />
         <Footer appName="visualizador-como-funciona-el-dolor" />
     </div>

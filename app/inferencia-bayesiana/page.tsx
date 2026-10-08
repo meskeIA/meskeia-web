@@ -5,7 +5,6 @@ import { useState, useMemo } from 'react';
 import styles from './InferenciaBayesiana.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TabType = 'simple' | 'multiple' | 'sequential' | 'diagnostic';
 
@@ -1217,7 +1216,7 @@ export default function InferenciaBayesianaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('inferencia-bayesiana')} />
+      <RelatedApps />
       <ShareCard appName="inferencia-bayesiana" />
       <Footer appName="inferencia-bayesiana" />
     </div>

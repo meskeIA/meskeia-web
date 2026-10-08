@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================================
 // TIPOS Y DATOS
@@ -1077,7 +1076,7 @@ export default function GuiaTejidosFibrasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-tejidos-fibras')} />
+        <RelatedApps />
         <ShareCard appName="guia-tejidos-fibras" />
         <Footer appName="guia-tejidos-fibras" />
     </div>

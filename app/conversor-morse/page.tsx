@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import styles from './ConversorMorse.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   MARCA_DESCONOCIDO,
   MORSE_EXTENSIONES,
@@ -626,7 +625,7 @@ export default function ConversorMorsePage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-morse')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-morse" />
       <Footer appName="conversor-morse" />

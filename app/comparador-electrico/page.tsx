@@ -14,7 +14,6 @@ import {
   RegionBadge,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   AYUDA_AUTO_PLUS_2026,
   FISCAL_AYUDAS_VEHICULO_META,
@@ -639,7 +638,7 @@ export default function ComparadorElectrico() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('comparador-electrico')} />
+      <RelatedApps />
       <ShareCard appName="comparador-electrico" />
       <Footer appName="comparador-electrico" />
     </div>

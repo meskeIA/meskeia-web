@@ -7,7 +7,6 @@ import {
   ShareCard, DisclaimerCard,
 } from '@/components';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Datos IPREM 2026 ────────────────────────────────────────────────────────
 
@@ -372,7 +371,7 @@ export default function OrientadorJusticiaGratuitaPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('orientador-justicia-gratuita')} />
+        <RelatedApps />
         <ShareCard appName="orientador-justicia-gratuita" />
         <Footer appName="orientador-justicia-gratuita" />
     </div>

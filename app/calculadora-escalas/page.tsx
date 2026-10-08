@@ -10,7 +10,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './CalculadoraEscalas.module.css';
 import {
   ESCALAS_CONOCIDAS,
@@ -1436,7 +1435,7 @@ export default function CalculadoraEscalasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-escalas')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-escalas" />
       </main>
 

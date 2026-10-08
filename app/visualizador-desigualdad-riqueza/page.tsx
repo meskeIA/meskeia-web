@@ -23,7 +23,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency } from '@/lib/formatters';
 import styles from './VisualizadorDesigualdadRiqueza.module.css';
 
@@ -486,7 +485,7 @@ export default function VisualizadorDesigualdadRiqueza() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-desigualdad-riqueza')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-desigualdad-riqueza" />
       <Footer appName="visualizador-desigualdad-riqueza" />
     </div>

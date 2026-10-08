@@ -3,7 +3,6 @@
 
 import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaCortesCarne.module.css';
 
 // ─────────────────────────────────────────────
@@ -748,7 +747,7 @@ export default function GuiaCortesCarne() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-cortes-carne')} />
+        <RelatedApps />
         <ShareCard appName="guia-cortes-carne" />
       </main>
 

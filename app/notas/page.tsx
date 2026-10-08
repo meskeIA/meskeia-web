@@ -5,7 +5,6 @@ import styles from './Notas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Categorías disponibles
 const CATEGORIAS = [
@@ -665,7 +664,7 @@ export default function NotasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('notas')} />
+      <RelatedApps />
 
       <ShareCard appName="notas" />
       <Footer appName="notas" />

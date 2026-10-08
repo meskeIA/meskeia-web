@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorLentesOpticas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import { calcularImagen, potenciaDioptrias, redondearCifra } from './motor';
 import CasosAula from './CasosAula';
@@ -846,7 +845,7 @@ export default function SimuladorLentesOpticasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-lentes-opticas')} />
+      <RelatedApps />
       <ShareCard appName="simulador-lentes-opticas" />
       <Footer appName="simulador-lentes-opticas" />
     </div>

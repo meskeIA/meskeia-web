@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorInversiones.module.css';
 
 // ── Tipos ────────────────────────────────────────────────────
@@ -586,7 +585,7 @@ export default function SelectorInversionesPage() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-inversiones')} />
+      <RelatedApps />
       <ShareCard appName="selector-inversiones" />
       <Footer appName="selector-inversiones" />
     </div>

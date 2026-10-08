@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Seccion = 'macronutrientes' | 'digestion' | 'micronutrientes' | 'datos';
 
@@ -617,7 +616,7 @@ export default function VisualizadorDigestionNutrientesPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-digestion-nutrientes')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-digestion-nutrientes" />
         <Footer appName="visualizador-digestion-nutrientes" />
     </div>

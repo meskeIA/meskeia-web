@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y datos
@@ -463,7 +462,7 @@ export default function CalculoVisualPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-calculo-visual')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-calculo-visual" />
       <Footer appName="visualizador-calculo-visual" />
     </div>

@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 type MetodoEstres =
@@ -661,7 +660,7 @@ export default function SelectorGestionEstresPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-gestion-estres')} />
+      <RelatedApps />
       <ShareCard appName="selector-gestion-estres" />
       <Footer appName="selector-gestion-estres" />
     </div>

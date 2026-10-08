@@ -10,7 +10,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -597,7 +596,7 @@ export default function VisualizadorCarbono(): React.ReactNode {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-carbono')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-carbono" />
       <Footer appName="visualizador-carbono" />
     </div>

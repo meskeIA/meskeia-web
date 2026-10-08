@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ── Tipos del motor de decisión ──────────────────────────────────────────
 type Superficie = 'interior-seco' | 'humedo' | 'techo' | 'fachada';
@@ -582,7 +581,7 @@ export default function ElegirPinturaParedesPage() {
       </EducationalSection>
 
       {/* Apps relacionadas */}
-      <RelatedApps apps={getRelatedApps('elegir-pintura-paredes')} />
+      <RelatedApps />
 
       {/* Tarjeta de compartir */}
       <ShareCard appName="elegir-pintura-paredes" />

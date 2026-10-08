@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -756,7 +755,6 @@ export default function VisualizadorGeometriaAnalitica() {
     setTabActivo(tab);
   }, []);
 
-  const relatedApps = getRelatedApps('visualizador-geometria-analitica');
 
   return (
     <div className={styles.container}>
@@ -1072,7 +1070,7 @@ export default function VisualizadorGeometriaAnalitica() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-geometria-analitica" />
       <Footer appName="visualizador-geometria-analitica" />
     </div>

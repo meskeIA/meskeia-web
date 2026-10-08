@@ -3,7 +3,6 @@
 
 import { useState, useCallback } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './ConstructorPersonaje.module.css';
 
 type TabId = 'superficie' | 'psicologia' | 'voz' | 'herida' | 'arco' | 'ficha';
@@ -666,7 +665,7 @@ export default function ConstructorPersonajePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('constructor-personaje')} />
+      <RelatedApps />
       <ShareCard appName="constructor-personaje" />
       <Footer appName="constructor-personaje" />
     </div>

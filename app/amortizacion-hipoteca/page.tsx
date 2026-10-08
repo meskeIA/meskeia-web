@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import styles from './AmortizacionHipoteca.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 
 type ModoCalculo = 'simple' | 'escenarios' | 'periodica';
@@ -1145,7 +1144,7 @@ export default function AmortizacionHipotecaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('amortizacion-hipoteca')} />
+      <RelatedApps />
       <ShareCard appName="amortizacion-hipoteca" />
       <Footer appName="amortizacion-hipoteca" />
     </div>

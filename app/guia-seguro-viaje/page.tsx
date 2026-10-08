@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type ZonaDestino = 'europa' | 'mundo' | 'riesgo';
 type TipoViaje = 'turismo' | 'aventura' | 'negocio' | 'larga';
@@ -836,7 +835,7 @@ export default function GuiaSeguroViaje() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-seguro-viaje')} />
+        <RelatedApps />
         <ShareCard appName="guia-seguro-viaje" />
       <Footer appName="guia-seguro-viaje" />
       </div>

@@ -17,7 +17,6 @@ import {
   RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { RESPUESTA_IMPUESTO_COMPRA } from './metadata';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
@@ -2312,7 +2311,7 @@ export default function SimuladorLocalComercialPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-gastos-compraventa-local-comercial')} />
+      <RelatedApps />
       <ShareCard appName="simulador-gastos-compraventa-local-comercial" />
       <Footer appName="simulador-gastos-compraventa-local-comercial" />
     </div>

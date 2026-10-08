@@ -14,7 +14,6 @@ import {
   ShareCard,
   DataReference, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   TIPOS_DEMORA_COMERCIAL,
@@ -844,7 +843,7 @@ export default function OrientadorInteresesDemoraPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-intereses-demora')} />
+      <RelatedApps />
       <ShareCard appName="orientador-intereses-demora" />
       <Footer appName="orientador-intereses-demora" />
     </div>

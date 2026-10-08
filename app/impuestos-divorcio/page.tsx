@@ -15,7 +15,6 @@ import {
   RegionBadge,
 } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_IRPF_META } from '@/data/fiscal';
 import {
   calcularImpuestosDivorcio,
@@ -917,7 +916,7 @@ export default function ImpuestosDivorcioPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('impuestos-divorcio')} />
+      <RelatedApps />
       <ShareCard appName="impuestos-divorcio" />
       <Footer appName="impuestos-divorcio" />
     </div>

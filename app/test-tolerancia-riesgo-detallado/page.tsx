@@ -10,7 +10,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './TestToleranciaRiesgo.module.css';
 
 type Fase = 'inicio' | 'test' | 'resultado';
@@ -761,7 +760,7 @@ export default function TestToleranciaRiesgoDetallado() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-tolerancia-riesgo-detallado')} />
+        <RelatedApps />
         <ShareCard appName="test-tolerancia-riesgo-detallado" />
       </main>
 

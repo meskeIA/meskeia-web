@@ -10,7 +10,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorTipoGimnasio.module.css';
 
 // ─────────────────────────────────────────────────────────────
@@ -400,7 +399,7 @@ export default function SelectorTipoGimnasio() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('selector-tipo-gimnasio')} />
+        <RelatedApps />
         <ShareCard appName="selector-tipo-gimnasio" />
         <Footer appName="selector-tipo-gimnasio" />
       </div>
@@ -475,7 +474,7 @@ export default function SelectorTipoGimnasio() {
         </div>
       </div>
 
-      <RelatedApps apps={getRelatedApps('selector-tipo-gimnasio')} />
+      <RelatedApps />
       <ShareCard appName="selector-tipo-gimnasio" />
       <Footer appName="selector-tipo-gimnasio" />
     </div>

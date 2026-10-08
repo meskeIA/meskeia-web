@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // --- Datos estáticos ---
 
@@ -180,7 +179,6 @@ export default function VisualizadorTerremotosTsunamis() {
   const [tabActiva, setTabActiva] = useState<Tab>('Fallas y terremotos');
   const [fallaSeleccionada, setFallaSeleccionada] = useState(0);
   const [magnitudSlider, setMagnitudSlider] = useState(6);
-  const relatedApps = getRelatedApps('visualizador-terremotos-tsunamis');
 
   const energiaActual = energiaEnJulios(magnitudSlider);
   const bombas = energiaActual / HIRSOHIMA_J;
@@ -835,7 +833,7 @@ export default function VisualizadorTerremotosTsunamis() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-terremotos-tsunamis" />
       <Footer appName="visualizador-terremotos-tsunamis" />
     </div>

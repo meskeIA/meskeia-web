@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -504,7 +503,7 @@ export default function VisualizadorSerotoninaPagina() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-serotonina')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-serotonina" />
       <Footer appName="visualizador-serotonina" />
     </div>

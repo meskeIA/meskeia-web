@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -862,7 +861,7 @@ export default function VisualizadorLogicaProposicional() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('visualizador-logica-proposicional')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-logica-proposicional" />
       <Footer appName="visualizador-logica-proposicional" />
     </div>

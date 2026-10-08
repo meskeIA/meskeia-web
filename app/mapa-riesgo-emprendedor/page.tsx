@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Pregunta { id: number; texto: string; dimension: 'exposicion' | 'preparacion'; }
 interface Perfil { nombre: string; emoji: string; descripcion: string; fortalezas: string[]; riesgos: string[]; acciones: string[]; }
@@ -219,7 +218,7 @@ export default function MapaRiesgoEmprendedorPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('mapa-riesgo-emprendedor')} />
+        <RelatedApps />
         <ShareCard appName="mapa-riesgo-emprendedor" />
         <Footer appName="mapa-riesgo-emprendedor" />
     </div>

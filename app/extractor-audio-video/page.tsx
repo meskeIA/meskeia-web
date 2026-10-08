@@ -6,7 +6,6 @@ import styles from './ExtractorAudioVideo.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type FormatoSalida = 'mp3' | 'wav';
 type CalidadMp3 = '128k' | '192k' | '320k';
@@ -776,7 +775,7 @@ export default function ExtractorAudioVideoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('extractor-audio-video')} />
+      <RelatedApps />
       <ShareCard appName="extractor-audio-video" />
       <Footer appName="extractor-audio-video" />
     </div>

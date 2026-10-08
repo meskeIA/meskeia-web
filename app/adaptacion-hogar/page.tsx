@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import styles from './AdaptacionHogar.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
 
@@ -487,7 +486,7 @@ export default function AdaptacionHogar() {
       </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('adaptacion-hogar')} />
+      <RelatedApps />
       <ShareCard appName="adaptacion-hogar" />
       <Footer appName="adaptacion-hogar" />
     </div>

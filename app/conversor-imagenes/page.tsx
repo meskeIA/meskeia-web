@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type OutputFormat = 'jpeg' | 'png' | 'webp';
 
@@ -561,7 +560,7 @@ export default function ConversorImagenesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-imagenes')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-imagenes" />
       <Footer appName="conversor-imagenes" />

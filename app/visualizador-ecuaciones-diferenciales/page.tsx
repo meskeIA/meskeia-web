@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1043,7 +1042,7 @@ export default function VisualizadorEcuacionesDiferenciales() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-ecuaciones-diferenciales')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-ecuaciones-diferenciales" />
       <Footer appName="visualizador-ecuaciones-diferenciales" />
     </div>

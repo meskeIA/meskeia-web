@@ -1,4 +1,5 @@
 import { jsonLd, faqJsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 
 export { metadata } from './metadata';
 
@@ -19,7 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         // biome-ignore lint/security/noDangerouslySetInnerHtml: contenido JSON-LD generado internamente, sin input de usuario
         dangerouslySetInnerHTML={{ __html: faqScript }}
       />
-      {children}
+      <ConRelacionadas slug="visualizador-volumenes">{children}</ConRelacionadas>
     </>
   );
 }

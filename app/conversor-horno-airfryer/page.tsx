@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { convertirAAirfryer, REFERENCIAS_AIRFRYER } from '@/lib/calculadoras/hornoAirfryer';
 import { formatNumber } from '@/lib/formatters';
 
@@ -156,7 +155,7 @@ export default function ConversorHornoAirfryerPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('conversor-horno-airfryer')} />
+      <RelatedApps />
       <ShareCard appName="conversor-horno-airfryer" />
       <Footer appName="conversor-horno-airfryer" />
     </div>

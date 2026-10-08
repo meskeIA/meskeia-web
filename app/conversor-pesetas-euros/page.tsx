@@ -9,7 +9,6 @@ import RegionBadge from '@/components/RegionBadge';
 import DataReference from '@/components/DataReference';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { IPC_DATA, IPC_MAX_YEAR, IPC_META, TASA_FIJA_PESETA_EURO } from '@/data/ipc-ine';
 
 // La peseta circuló hasta el 28/02/2002; los años seleccionables para "valor real
@@ -618,7 +617,7 @@ export default function ConversorPesetasEurosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-pesetas-euros')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-pesetas-euros" />
       <Footer appName="conversor-pesetas-euros" />

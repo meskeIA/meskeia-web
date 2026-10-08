@@ -4,7 +4,6 @@
 import { useState, useCallback } from 'react';
 import styles from './VisualizadorEstructurasDatos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type StructureType = 'array' | 'stack' | 'queue' | 'linkedList' | 'bst';
@@ -1068,7 +1067,7 @@ export default function VisualizadorEstructurasDatosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-estructuras-datos')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-estructuras-datos" />
       <Footer appName="visualizador-estructuras-datos" />
     </div>

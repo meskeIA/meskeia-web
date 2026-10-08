@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -808,7 +807,7 @@ export default function TransformadaFourierPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-transformada-fourier')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-transformada-fourier" />
       <Footer appName="visualizador-transformada-fourier" />
     </div>

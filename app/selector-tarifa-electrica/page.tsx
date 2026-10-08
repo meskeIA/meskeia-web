@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -887,7 +886,7 @@ export default function SelectorTarifaElectricaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('selector-tarifa-electrica')} />
+        <RelatedApps />
         <ShareCard appName="selector-tarifa-electrica" />
         <Footer appName="selector-tarifa-electrica" />
     </div>

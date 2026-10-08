@@ -6,7 +6,6 @@ import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSe
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 const TEXTOS_ESPANOL = [
   'El sol brillaba sobre las montañas mientras el viento suave acariciaba las hojas de los árboles. Era un día perfecto para caminar por el bosque y disfrutar de la naturaleza.',
@@ -545,7 +544,7 @@ export default function TestVelocidadEscrituraPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('test-velocidad-escritura')} />
+      <RelatedApps />
 
       <ShareCard appName="test-velocidad-escritura" />
       <Footer appName="test-velocidad-escritura" />

@@ -3,7 +3,6 @@
 
 import styles from './GuiaCard.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { CHOCOLATES } from '@/lib/guias/chocolate';
 
 export default function GuiaChocolatePage() {
@@ -73,7 +72,7 @@ export default function GuiaChocolatePage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('guia-chocolate')} />
+      <RelatedApps />
       <ShareCard appName="guia-chocolate" />
       <Footer appName="guia-chocolate" />
     </div>

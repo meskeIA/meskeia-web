@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -844,7 +843,7 @@ export default function AnalizadorRatiosFinancierosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('analizador-ratios-financieros')} />
+      <RelatedApps />
       <ShareCard appName="analizador-ratios-financieros" />
       <Footer appName="analizador-ratios-financieros" />
     </div>

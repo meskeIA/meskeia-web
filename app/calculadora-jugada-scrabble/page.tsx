@@ -4,7 +4,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import styles from './CalculadoraJugadaScrabble.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { parseSpanishNumber } from '@/lib';
 import {
   BONUS_ATRIL_COMPLETO,
@@ -1269,7 +1268,7 @@ export default function CalculadoraJugadaScrabblePage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-jugada-scrabble')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-jugada-scrabble" />
 

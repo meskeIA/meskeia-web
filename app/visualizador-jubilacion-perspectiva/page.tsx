@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_PENSIONES_META } from '@/data/fiscal';
 import Chart from 'chart.js/auto';
 import {
@@ -378,7 +377,7 @@ export default function VisualizadorJubilacionPerspectivaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-jubilacion-perspectiva')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-jubilacion-perspectiva" />
         <Footer appName="visualizador-jubilacion-perspectiva" />
     </div>

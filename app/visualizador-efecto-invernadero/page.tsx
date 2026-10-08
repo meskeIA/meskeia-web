@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -828,7 +827,7 @@ export default function VisualizadorEfectoInvernaderoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-efecto-invernadero')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-efecto-invernadero" />
         <Footer appName="visualizador-efecto-invernadero" />
     </div>

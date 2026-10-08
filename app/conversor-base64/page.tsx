@@ -4,7 +4,6 @@
 import { useState, useCallback, useRef } from 'react';
 import styles from './ConversorBase64.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TabType = 'texto' | 'imagen' | 'archivo';
 
@@ -650,7 +649,7 @@ export default function ConversorBase64Page() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-base64')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-base64" />
       <Footer appName="conversor-base64" />

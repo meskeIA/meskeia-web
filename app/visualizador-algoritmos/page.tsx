@@ -4,7 +4,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import styles from './VisualizadorAlgoritmos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   SortingCanvas,
   AlgorithmCode,
@@ -1229,7 +1228,7 @@ export default function VisualizadorAlgoritmosPage() {
       </EducationalSection>
 
       {/* Apps Relacionadas */}
-      <RelatedApps apps={getRelatedApps('visualizador-algoritmos')} />
+      <RelatedApps />
 
       <ShareCard appName="visualizador-algoritmos" />
       <Footer appName="visualizador-algoritmos" />

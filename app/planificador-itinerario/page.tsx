@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -828,7 +827,7 @@ export default function PlanificadorItinerario() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('planificador-itinerario')} />
+      <RelatedApps />
       <ShareCard appName="planificador-itinerario" />
       <Footer appName="planificador-itinerario" />
     </div>

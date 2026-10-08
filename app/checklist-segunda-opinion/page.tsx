@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -467,7 +466,7 @@ export default function ChecklistSegundaOpinionPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('checklist-segunda-opinion')} />
+        <RelatedApps />
         <ShareCard appName="checklist-segunda-opinion" />
         <Footer appName="checklist-segunda-opinion" />
       </div>

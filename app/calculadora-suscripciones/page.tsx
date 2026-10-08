@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import styles from './CalculadoraSuscripciones.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Suscripcion {
@@ -834,7 +833,7 @@ export default function CalculadoraSuscripcionesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-suscripciones')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-suscripciones" />
       <Footer appName="calculadora-suscripciones" />

@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './AsistenteConstitucionSociedad.module.css';
 import { MeskeiaLogo, Footer, NumberInput, RelatedApps, EducationalSection, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ===== TIPOS =====
 type TipoSociedad = 'SL' | 'SLU' | 'SA';
@@ -989,7 +988,7 @@ export default function AsistenteConstitucionSociedadPage() {
       </EducationalSection>
 
       <ShareCard appName="asistente-constitucion-sociedad" />
-      <RelatedApps apps={getRelatedApps('asistente-constitucion-sociedad')} />
+      <RelatedApps />
       <Footer appName="asistente-constitucion-sociedad" />
     </div>
   );

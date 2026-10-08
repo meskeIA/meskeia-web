@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -728,7 +727,7 @@ export default function AdnCodigoGeneticoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-adn-codigo-genetico')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-adn-codigo-genetico" />
         <Footer appName="visualizador-adn-codigo-genetico" />
     </div>

@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -579,7 +578,7 @@ export default function OrientadorDiversificacionClientesPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('orientador-diversificacion-clientes')} />
+        <RelatedApps />
         <ShareCard appName="orientador-diversificacion-clientes" />
         <Footer appName="orientador-diversificacion-clientes" />
     </div>

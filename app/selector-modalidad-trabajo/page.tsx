@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================================
 // TIPOS
@@ -728,7 +727,7 @@ export default function SelectorModalidadTrabajoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-modalidad-trabajo')} />
+      <RelatedApps />
       <ShareCard appName="selector-modalidad-trabajo" />
       <Footer appName="selector-modalidad-trabajo" />
     </div>

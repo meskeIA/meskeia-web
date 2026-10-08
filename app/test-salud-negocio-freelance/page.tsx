@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 // ============================================================================
@@ -639,7 +638,7 @@ export default function TestSaludNegocioFreelance() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-salud-negocio-freelance')} />
+        <RelatedApps />
         <ShareCard appName="test-salud-negocio-freelance" />
         <Footer appName="test-salud-negocio-freelance" />
     </div>

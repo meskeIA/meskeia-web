@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
@@ -922,7 +921,7 @@ export default function OrientadorEscrituraCreativaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-escritura-creativa')} />
+      <RelatedApps />
       <ShareCard appName="orientador-escritura-creativa" />
       <Footer appName="orientador-escritura-creativa" />
     </div>

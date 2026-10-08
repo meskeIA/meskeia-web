@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // Constantes
@@ -557,7 +556,7 @@ export default function DafRetroalimentacionPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('daf-retroalimentacion-auditiva')} />
+      <RelatedApps />
       <ShareCard appName="daf-retroalimentacion-auditiva" />
       <Footer appName="daf-retroalimentacion-auditiva" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -512,7 +511,7 @@ export default function VisualizadorTiposClienteFreelance() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-tipos-cliente-freelance')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-tipos-cliente-freelance" />
       <Footer appName="visualizador-tipos-cliente-freelance" />
     </div>

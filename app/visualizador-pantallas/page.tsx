@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -642,7 +641,7 @@ export default function VisualizadorPantallasPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-pantallas')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-pantallas" />
         <Footer appName="visualizador-pantallas" />
     </div>

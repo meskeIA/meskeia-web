@@ -6,7 +6,6 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── WHO-5 Well-Being Index ───────────────────────────────────────────────────
 // Fuente: Psychiatric Research Unit, WHO Collaborating Centre, Hillerød (Dinamarca)
@@ -309,7 +308,7 @@ export default function TestBienestarWho5Page() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('test-bienestar-who5')} />
+        <RelatedApps />
         <ShareCard appName="test-bienestar-who5" />
         <Footer appName="test-bienestar-who5" />
     </div>

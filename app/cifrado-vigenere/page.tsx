@@ -4,7 +4,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import styles from './CifradoVigenere.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type ModoType = 'cifrar' | 'descifrar';
 
@@ -653,7 +652,7 @@ export default function CifradoVigenerePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('cifrado-vigenere')} />
+      <RelatedApps />
       <ShareCard appName="cifrado-vigenere" />
       <Footer appName="cifrado-vigenere" />
     </div>

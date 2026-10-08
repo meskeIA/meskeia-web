@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================================
 // TIPOS
@@ -1366,7 +1365,7 @@ export default function GuiaHierbasAromaticasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-hierbas-aromaticas')} />
+        <RelatedApps />
         <ShareCard appName="guia-hierbas-aromaticas" />
         <Footer appName="guia-hierbas-aromaticas" />
     </div>

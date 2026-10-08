@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaRazasGatos.module.css';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
@@ -1416,7 +1415,7 @@ export default function GuiaRazasGatosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-razas-gatos')} />
+      <RelatedApps />
       <ShareCard appName="guia-razas-gatos" />
       <Footer appName="guia-razas-gatos" />
     </div>

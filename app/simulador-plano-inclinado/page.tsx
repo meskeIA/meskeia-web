@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorPlanoInclinado.module.css';
 import { analizarPlano, redondearCifra } from './motor';
@@ -1263,7 +1262,7 @@ export default function SimuladorPlanoInclinado() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-plano-inclinado')} />
+        <RelatedApps />
         <ShareCard appName="simulador-plano-inclinado" />
       </main>
 

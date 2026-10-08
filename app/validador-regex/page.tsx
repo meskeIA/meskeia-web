@@ -6,7 +6,6 @@ import styles from './ValidadorRegex.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Match {
   text: string;
@@ -733,7 +732,7 @@ export default function ValidadorRegexPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('validador-regex')} />
+      <RelatedApps />
 
       <ShareCard appName="validador-regex" />
       <Footer appName="validador-regex" />

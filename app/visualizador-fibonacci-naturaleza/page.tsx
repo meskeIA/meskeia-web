@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -522,7 +521,7 @@ export default function VisualizadorFibonacciNaturalezaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-fibonacci-naturaleza')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-fibonacci-naturaleza" />
         <Footer appName="visualizador-fibonacci-naturaleza" />
     </div>

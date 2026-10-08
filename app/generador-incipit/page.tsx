@@ -3,7 +3,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GeneradorIncipit.module.css';
 
 type Genero = 'literaria' | 'negra' | 'terror' | 'romantica' | 'aventura' | 'ciencia-ficcion' | 'historica' | 'infantil-juvenil';
@@ -503,7 +502,7 @@ export default function GeneradorIncipitPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-incipit')} />
+      <RelatedApps />
       <ShareCard appName="generador-incipit" />
       <Footer appName="generador-incipit" />
     </div>

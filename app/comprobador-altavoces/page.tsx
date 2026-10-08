@@ -11,7 +11,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -424,7 +423,6 @@ export default function ComprobadorAltavocesPage() {
     };
   })();
 
-  const relatedApps = getRelatedApps('comprobador-altavoces');
 
   return (
     <div className={styles.container}>
@@ -1283,7 +1281,7 @@ export default function ComprobadorAltavocesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
 
       <ShareCard appName="comprobador-altavoces" />
       <Footer appName="comprobador-altavoces" />

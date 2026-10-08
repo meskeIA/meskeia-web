@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection } from '@/components';
 import ShareCard from '@/components/ShareCard';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaPlantasInterior.module.css';
 
 // ==============================
@@ -510,7 +509,7 @@ export default function GuiaPlantas() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-plantas-interior')} />
+        <RelatedApps />
         <ShareCard appName="guia-plantas-interior" />
       </main>
 

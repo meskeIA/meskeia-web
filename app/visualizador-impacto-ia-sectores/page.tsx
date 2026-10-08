@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -502,7 +501,7 @@ export default function VisualizadorImpactoIASectores() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-impacto-ia-sectores')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-impacto-ia-sectores" />
       <Footer appName="visualizador-impacto-ia-sectores" />
     </div>

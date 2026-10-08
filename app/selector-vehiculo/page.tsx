@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency } from '@/lib';
 
 // ─────────────────────────────────────────────
@@ -747,7 +746,7 @@ export default function SelectorVehiculo() {
           </div>
         </main>
 
-        <RelatedApps apps={getRelatedApps('selector-vehiculo')} />
+        <RelatedApps />
         <ShareCard appName="selector-vehiculo" />
         <Footer appName="selector-vehiculo" />
       </div>
@@ -1092,7 +1091,7 @@ export default function SelectorVehiculo() {
             </div>
           </EducationalSection>
 
-          <RelatedApps apps={getRelatedApps('selector-vehiculo')} />
+          <RelatedApps />
           <ShareCard appName="selector-vehiculo" />
         </main>
 

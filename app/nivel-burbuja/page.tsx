@@ -4,7 +4,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './NivelBurbuja.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // Tipo para orientación del dispositivo
@@ -760,7 +759,7 @@ export default function NivelBurbujaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('nivel-burbuja')} />
+      <RelatedApps />
 
       <ShareCard appName="nivel-burbuja" />
       <Footer appName="nivel-burbuja" />

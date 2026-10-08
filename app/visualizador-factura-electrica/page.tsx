@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -314,7 +313,7 @@ export default function VisualizadorFacturaElectricaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-factura-electrica')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-factura-electrica" />
         <Footer appName="visualizador-factura-electrica" />
     </div>

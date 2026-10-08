@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import styles from './OrientadorMedicamentosMascotas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 type TabType = 'antiparasitarios' | 'frecuencia' | 'sintomas';
@@ -515,7 +514,6 @@ export default function CalculadoraMedicamentosMascotasPage() {
       </DisclaimerCard>
 
       <RelatedApps
-        apps={getRelatedApps('orientador-medicamentos-mascotas')}
         title="Más herramientas para tu mascota"
         icon="🐾"
       />

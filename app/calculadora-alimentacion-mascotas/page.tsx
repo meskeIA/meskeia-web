@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import styles from './CalculadoraAlimentacionMascotas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 type TabType = 'calculadora' | 'toxicos' | 'transicion';
@@ -618,7 +617,6 @@ export default function CalculadoraAlimentacionMascotasPage() {
 
 
       <RelatedApps
-        apps={getRelatedApps('calculadora-alimentacion-mascotas')}
         title="Más herramientas para tu mascota"
         icon="🐾"
       />

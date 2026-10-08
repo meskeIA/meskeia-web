@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -464,7 +463,7 @@ export default function VisualizadorHistoriaDineroPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-historia-dinero')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-historia-dinero" />
         <Footer appName="visualizador-historia-dinero" />
     </div>

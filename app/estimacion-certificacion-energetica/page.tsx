@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   LegalNotice,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // ===== CONSTANTES =====
@@ -735,7 +734,7 @@ export default function EstimacionCertificacionEnergeticaPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('estimacion-certificacion-energetica')} />
+        <RelatedApps />
         <ShareCard appName="estimacion-certificacion-energetica" />
         <Footer appName="estimacion-certificacion-energetica" />
     </div>

@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface Persona {
@@ -1019,7 +1018,7 @@ export default function CalculadoraGastosCompartidosPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-gastos-compartidos')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-gastos-compartidos" />
       <Footer appName="calculadora-gastos-compartidos" />

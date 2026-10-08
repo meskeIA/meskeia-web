@@ -6,7 +6,6 @@ import styles from './JuegoTresEnRaya.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Casilla = 'X' | 'O' | null;
 type Tablero = Casilla[];
@@ -666,7 +665,7 @@ export default function JuegoTresEnRayaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-tres-en-raya')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-tres-en-raya" />
       <Footer appName="juego-tres-en-raya" />

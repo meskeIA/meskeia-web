@@ -12,7 +12,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 // ─────────────────────────────────────────────
@@ -346,7 +345,7 @@ export default function VisualizadorViajeImpuestosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-viaje-impuestos')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-viaje-impuestos" />
         <Footer appName="visualizador-viaje-impuestos" />
     </div>

@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // Tipos de fuente disponibles
@@ -988,7 +987,7 @@ export default function AdaptadorDislexiaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('adaptador-dislexia')} />
+      <RelatedApps />
       <ShareCard appName="adaptador-dislexia" />
       <Footer appName="adaptador-dislexia" />
     </div>

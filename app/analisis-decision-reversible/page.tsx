@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 
@@ -476,7 +475,7 @@ export default function AnalisisDecisionReversiblePage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('analisis-decision-reversible')} />
+        <RelatedApps />
         <ShareCard appName="analisis-decision-reversible" />
         <Footer appName="analisis-decision-reversible" />
       </div>

@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './MigracionGlobal.module.css';
 
 // --- Tipos ---
@@ -597,7 +596,7 @@ export default function MigracionGlobalPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-migracion-global')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-migracion-global" />
       <Footer appName="visualizador-migracion-global" />
     </div>

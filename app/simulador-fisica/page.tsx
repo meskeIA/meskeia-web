@@ -5,7 +5,6 @@ import styles from './SimuladorFisica.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 import { CaidaLibre, PenduloSimple, Proyectil, Ondas, Resorte } from './components';
 
@@ -466,7 +465,7 @@ export default function SimuladorFisicaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-fisica')} />
+      <RelatedApps />
       <ShareCard appName="simulador-fisica" />
       <Footer appName="simulador-fisica" />
     </div>

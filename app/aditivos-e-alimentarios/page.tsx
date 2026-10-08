@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================================
 // DATOS
@@ -563,7 +562,7 @@ export default function AdditivosEAlimentariosPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('aditivos-e-alimentarios')} />
+        <RelatedApps />
         <ShareCard appName="aditivos-e-alimentarios" />
         <Footer appName="aditivos-e-alimentarios" />
     </div>

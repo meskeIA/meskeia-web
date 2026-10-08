@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorVsepr.module.css';
 // La química (tabla VSEPR, átomos, moléculas famosas y el tope X + E ≤ 6) vive en motor.ts,
 // para que los casos para clase corrijan con las mismas reglas que pinta el simulador.
@@ -211,7 +210,6 @@ export default function SimuladorVseprPage() {
         libres === 0 ? 'ningún par libre' : contarPares(libres, 'par libre', 'pares libres')
       }, repartidos ${DISPOSICION_POR_TOTAL[totalPares] ?? 'sin disposición definida'}: combinación poco común, fuera de la tabla VSEPR`;
 
-  const relatedApps = getRelatedApps('simulador-vsepr');
 
   return (
     <div className={styles.container}>
@@ -844,7 +842,7 @@ export default function SimuladorVseprPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={relatedApps} />
+        <RelatedApps />
         <ShareCard appName="simulador-vsepr" />
       </main>
 

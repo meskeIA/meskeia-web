@@ -8,7 +8,6 @@ import {
   ShareCard, DisclaimerCard, DataReference, RegionBadge,
 } from '@/components';
 import { formatCurrency, formatFechaLarga, formatPercentage, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   COMPLEMENTO_BRECHA_GENERO_2026,
   COMPLEMENTO_BRECHA_GENERO_META,
@@ -616,7 +615,6 @@ export default function VerificadorComplementoBrechaGeneroPage() {
     setEvaluado(false);
   };
 
-  const relatedApps = getRelatedApps('verificador-complemento-brecha-genero');
 
   return (
     <div className={styles.container}>
@@ -1480,7 +1478,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
 
       <ShareCard appName="verificador-complemento-brecha-genero" />
 

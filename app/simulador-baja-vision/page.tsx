@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import { matrizParaFeColorMatrix } from '@/lib/calculadoras/daltonismo';
 
 type CondicionId =
@@ -560,7 +559,7 @@ export default function SimuladorBajaVision() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-baja-vision')} />
+        <RelatedApps />
         <ShareCard appName="simulador-baja-vision" />
       </main>
 

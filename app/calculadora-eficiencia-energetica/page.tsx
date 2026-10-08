@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TabType = 'aislamiento' | 'ventanas' | 'calefaccion';
 
@@ -617,7 +616,7 @@ export default function EficienciaEnergeticaPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-eficiencia-energetica')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-eficiencia-energetica" />
         <Footer appName="calculadora-eficiencia-energetica" />
     </div>

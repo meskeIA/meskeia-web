@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   ALIMENTOS_CADUCIDAD,
   CATEGORIAS_CADUCIDAD,
@@ -164,7 +163,7 @@ export default function CalculadoraCaducidadPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-caducidad')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-caducidad" />
       <Footer appName="calculadora-caducidad" />
     </div>

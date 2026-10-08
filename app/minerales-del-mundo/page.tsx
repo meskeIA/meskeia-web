@@ -4,7 +4,6 @@
 import { useState, useMemo } from 'react';
 import styles from './MineralesDelMundo.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   MINERALS,
   CATEGORIAS,
@@ -714,7 +713,7 @@ export default function MineralesDelMundoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('minerales-del-mundo')} />
+      <RelatedApps />
       <ShareCard appName="minerales-del-mundo" />
       <Footer appName="minerales-del-mundo" />
     </div>

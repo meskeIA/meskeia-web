@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -735,7 +734,7 @@ export default function EstructuraAtomoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-estructura-atomo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-estructura-atomo" />
         <Footer appName="visualizador-estructura-atomo" />
     </div>

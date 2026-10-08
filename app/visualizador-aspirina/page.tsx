@@ -9,7 +9,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -483,7 +482,7 @@ export default function VisualizadorAspirina() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-aspirina')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-aspirina" />
       <Footer appName="visualizador-aspirina" />
     </div>

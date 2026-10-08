@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './AsistenteConstitucionAsociacion.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatDate } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS E INTERFACES
@@ -2015,7 +2014,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('asistente-constitucion-asociacion')} />
+      <RelatedApps />
       <ShareCard appName="asistente-constitucion-asociacion" />
       <Footer appName="asistente-constitucion-asociacion" />
     </div>

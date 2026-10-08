@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './Desinformacion.module.css';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
@@ -437,7 +436,7 @@ export default function DesinformacionPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-desinformacion')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-desinformacion" />
       <Footer appName="visualizador-desinformacion" />
     </div>

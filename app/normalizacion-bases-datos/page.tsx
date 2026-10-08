@@ -4,7 +4,6 @@
 import { useCallback, useRef, useState } from 'react';
 import styles from './NormalizacionBasesDatos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   analizar,
   cierreExplicado,
@@ -820,7 +819,7 @@ export default function NormalizacionBasesDatosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('normalizacion-bases-datos')} />
+      <RelatedApps />
       <ShareCard appName="normalizacion-bases-datos" />
       <Footer appName="normalizacion-bases-datos" />
     </div>

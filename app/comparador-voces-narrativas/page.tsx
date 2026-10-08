@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './ComparadorVocesNarrativas.module.css';
 
 interface Dimensiones {
@@ -824,7 +823,7 @@ export default function ComparadorVocesNarrativas() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('comparador-voces-narrativas')} />
+      <RelatedApps />
       <ShareCard appName="comparador-voces-narrativas" />
       <Footer appName="comparador-voces-narrativas" />
     </div>

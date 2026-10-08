@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ===================================================
 // PREGUNTAS DEL TEST
@@ -789,7 +788,7 @@ export default function TestBurnoutLaboralPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('test-burnout-laboral')} />
+      <RelatedApps />
       <ShareCard appName="test-burnout-laboral" />
       <Footer appName="test-burnout-laboral" />
     </div>

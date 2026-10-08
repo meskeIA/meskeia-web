@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 // Equivalencias exactas entre las tres unidades con las que se vende la misma potencia
@@ -539,7 +538,7 @@ export default function CalculadoraFrigoriasBtuPage() {
           </p>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-frigorias-btu')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-frigorias-btu" />
       </main>
 

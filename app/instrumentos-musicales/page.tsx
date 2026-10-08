@@ -4,7 +4,6 @@
 import { useState, useMemo } from 'react';
 import styles from './InstrumentosMusicales.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   INSTRUMENTS,
   FAMILIAS,
@@ -655,7 +654,7 @@ export default function InstrumentosMusicalesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('instrumentos-musicales')} />
+      <RelatedApps />
       <ShareCard appName="instrumentos-musicales" />
       <Footer appName="instrumentos-musicales" />
     </div>

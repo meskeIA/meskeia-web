@@ -4,7 +4,6 @@
 import { useState, useCallback } from 'react';
 import styles from './ConjugadorVerbos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   conjugarVerbo,
   esVerboValido,
@@ -670,7 +669,7 @@ export default function ConjugadorVerbosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conjugador-verbos')} />
+      <RelatedApps />
       <ShareCard appName="conjugador-verbos" />
       <Footer appName="conjugador-verbos" />
     </div>

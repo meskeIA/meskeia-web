@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ─── Tipos ─── */
 interface Cuidador {
@@ -578,7 +577,7 @@ export default function PlanificadorTurnosCuidadoresPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('planificador-turnos-cuidadores')} />
+        <RelatedApps />
         <ShareCard appName="planificador-turnos-cuidadores" />
         <Footer appName="planificador-turnos-cuidadores" />
     </div>

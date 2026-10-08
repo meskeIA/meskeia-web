@@ -18,7 +18,6 @@ import {
   lecturaAmbiguaAlternativa,
   type PartesNumericas,
 } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   MONEDAS,
   cantidadALetras,
@@ -852,7 +851,7 @@ export default function ConversorNumerosLetrasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-numeros-letras')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-numeros-letras" />
 

@@ -4,7 +4,6 @@
 import { useState, useCallback } from 'react';
 import styles from './SimuladorMontyHall.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -730,7 +729,7 @@ export default function SimuladorMontyHallPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-monty-hall')} />
+      <RelatedApps />
       <ShareCard appName="simulador-monty-hall" />
       <Footer appName="simulador-monty-hall" />
     </div>

@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import RegionBadge from '@/components/RegionBadge';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ───────────────────────────────────────────────────────────────
 // Constantes del algoritmo oficial
@@ -1213,7 +1212,7 @@ NIE:      X1234567 → 01234567 % 23 = 19 → "L" → X1234567L`}
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('validador-dni-nif-cif')} />
+      <RelatedApps />
 
       <ShareCard appName="validador-dni-nif-cif" />
       <Footer appName="validador-dni-nif-cif" />

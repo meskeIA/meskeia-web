@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTeoremaBayes.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -788,7 +787,7 @@ export default function SimuladorTeoremaBayesPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-teorema-bayes')} />
+      <RelatedApps />
       <ShareCard appName="simulador-teorema-bayes" />
       <Footer appName="simulador-teorema-bayes" />
     </div>

@@ -13,7 +13,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type NivelComplejidad = 'basico' | 'medio' | 'alto' | 'especialista';
 type NivelUrgencia = 'no' | 'algo' | 'muy';
@@ -574,7 +573,7 @@ export default function CalculadoraPrecioPorProyectoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-precio-por-proyecto')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-precio-por-proyecto" />
         <Footer appName="calculadora-precio-por-proyecto" />
     </div>

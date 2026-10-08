@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 export default function CalculadoraAlquilerVsCompraPage() {
   // Datos de la vivienda
@@ -823,7 +822,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-alquiler-vs-compra')} />
+      <RelatedApps />
 
       <ShareCard appName="orientador-alquiler-vs-compra" />
       <Footer appName="orientador-alquiler-vs-compra" />

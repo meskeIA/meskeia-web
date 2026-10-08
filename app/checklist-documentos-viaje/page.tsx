@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatDate } from '@/lib';
 
 type TipoViaje = 'espana' | 'europa' | 'internacional';
@@ -635,7 +634,7 @@ export default function ChecklistDocumentosViajePage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('checklist-documentos-viaje')} />
+      <RelatedApps />
       <ShareCard appName="checklist-documentos-viaje" />
       <Footer appName="checklist-documentos-viaje" />
     </div>

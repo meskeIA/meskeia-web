@@ -6,7 +6,6 @@ import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSe
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ==================== TIPOS ====================
 
@@ -593,7 +592,7 @@ Nueva línea agregada
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('comparador-textos')} />
+      <RelatedApps />
 
       <ShareCard appName="comparador-textos" />
       <Footer appName="comparador-textos" />

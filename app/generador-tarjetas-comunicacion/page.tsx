@@ -11,7 +11,6 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // Tipos
@@ -740,7 +739,7 @@ export default function GeneradorTarjetasPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('generador-tarjetas-comunicacion')} />
+        <RelatedApps />
         <ShareCard appName="generador-tarjetas-comunicacion" />
         <Footer appName="generador-tarjetas-comunicacion" />
       </div>

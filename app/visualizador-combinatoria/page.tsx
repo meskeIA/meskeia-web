@@ -4,7 +4,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import styles from './Combinatoria.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ======== TIPOS ========
 type TabId = 'permcomb' | 'pascal' | 'principio';
@@ -922,7 +921,7 @@ export default function VisualizadorCombinatoriaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-combinatoria')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-combinatoria" />
       <Footer appName="visualizador-combinatoria" />
     </div>

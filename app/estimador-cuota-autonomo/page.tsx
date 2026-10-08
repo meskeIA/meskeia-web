@@ -6,7 +6,6 @@ import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, Shar
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA, tramoRETA } from '@/data/fiscal';
 
 // Datos fiscales centralizados en data/fiscal/autonomos.ts
@@ -978,7 +977,7 @@ export default function EstimadorCuotaAutonomoPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-cuota-autonomo')} />
+      <RelatedApps />
       <ShareCard appName="estimador-cuota-autonomo" />
       <Footer appName="estimador-cuota-autonomo" />
     </div>

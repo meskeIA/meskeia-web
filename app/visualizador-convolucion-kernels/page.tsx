@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorConvolucionKernels.module.css';
 
 // ============== TIPOS Y CONSTANTES ==============
@@ -889,7 +888,7 @@ export default function VisualizadorConvolucionKernelsPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-convolucion-kernels')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-convolucion-kernels" />
       <Footer appName="visualizador-convolucion-kernels" />
     </div>

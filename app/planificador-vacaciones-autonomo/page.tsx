@@ -12,7 +12,6 @@ import {
   DisclaimerCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -613,7 +612,7 @@ export default function PlanificadorVacacionesAutonomoPage() {
         </EducationalSection>
 
         {/* Apps relacionadas */}
-        <RelatedApps apps={getRelatedApps('planificador-vacaciones-autonomo')} />
+        <RelatedApps />
 
         {/* Tarjeta de compartir */}
         <ShareCard appName="planificador-vacaciones-autonomo" />

@@ -6,7 +6,6 @@ import styles from './GeneradorSombras.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type ShadowType = 'box' | 'text';
 
@@ -645,7 +644,7 @@ export default function GeneradorSombrasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-sombras')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-sombras" />
       <Footer appName="generador-sombras" />

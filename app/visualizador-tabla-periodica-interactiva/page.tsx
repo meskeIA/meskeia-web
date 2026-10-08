@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -651,7 +650,7 @@ export default function VisualizadorTablaPeriodInteractiva() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-tabla-periodica-interactiva')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-tabla-periodica-interactiva" />
         <Footer appName="visualizador-tabla-periodica-interactiva" />
       </div>

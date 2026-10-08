@@ -1,4 +1,5 @@
 import { jsonLd, faqJsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 export { metadata } from './metadata';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -6,7 +7,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      {children}
+      <ConRelacionadas slug="visualizador-electroquimica">{children}</ConRelacionadas>
     </>
   );
 }

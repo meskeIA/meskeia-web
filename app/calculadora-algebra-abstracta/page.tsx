@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraAlgebraAbstracta.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TipoCalculo = 'grupos' | 'anillos' | 'cayley' | 'propiedades';
 
@@ -988,7 +987,7 @@ export default function CalculadoraAlgebraAbstractaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-algebra-abstracta')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-algebra-abstracta" />
       <Footer appName="calculadora-algebra-abstracta" />

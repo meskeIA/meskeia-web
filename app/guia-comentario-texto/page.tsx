@@ -3,7 +3,6 @@
 
 import { useState, type KeyboardEvent } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaComentarioTexto.module.css';
 
 type TabId = 'metodologia' | 'poesia' | 'prosa' | 'vocabulario' | 'plantillas';
@@ -779,7 +778,7 @@ export default function GuiaComentarioTextoPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-comentario-texto')} />
+      <RelatedApps />
       <ShareCard appName="guia-comentario-texto" />
       <Footer appName="guia-comentario-texto" />
     </div>

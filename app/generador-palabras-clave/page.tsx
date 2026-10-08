@@ -8,7 +8,6 @@ import { RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Modificadores para generar variaciones
 const MODIFICADORES = {
@@ -852,7 +851,7 @@ export default function GeneradorPalabrasClavePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-palabras-clave')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-palabras-clave" />
       <Footer appName="generador-palabras-clave" />

@@ -8,7 +8,6 @@ import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/compo
 import ResultCard from '@/components/ResultCard';
 import { jsonLd } from './metadata';
 import styles from './GeneradorContrasenas.module.css';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de caracteres para generar contraseñas
 const CHAR_SETS = {
@@ -788,7 +787,7 @@ export default function GeneradorContrasenas() {
       </main>
 
       {/* Footer meskeIA */}
-      <RelatedApps apps={getRelatedApps('generador-contrasenas')} />
+      <RelatedApps />
       <ShareCard appName="generador-contrasenas" />
       <Footer appName="generador-contrasenas" />
     </>

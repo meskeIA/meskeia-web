@@ -3,7 +3,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorSeguroSalud.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { calcularResultado, PREGUNTAS, VEREDICTOS, TEXTO_CARENCIAS, TEXTO_COPAGO, TEXTO_ESPERA_SNS, type Resultado } from './motor';
 
 // Las preguntas, los puntos, los veredictos y la lógica viven en ./motor.ts.
@@ -227,7 +226,7 @@ export default function SelectorSeguroSalud() {
         </div>
       )}
 
-      <RelatedApps apps={getRelatedApps('selector-seguro-salud')} />
+      <RelatedApps />
       <ShareCard appName="selector-seguro-salud" />
       <Footer appName="selector-seguro-salud" />
     </div>

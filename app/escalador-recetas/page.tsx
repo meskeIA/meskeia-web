@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   escalarReceta,
   type CategoriaIngrediente,
@@ -671,7 +670,7 @@ export default function EscaladorRecetasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('escalador-recetas')} />
+      <RelatedApps />
       <ShareCard appName="escalador-recetas" />
       <Footer appName="escalador-recetas" />
     </div>

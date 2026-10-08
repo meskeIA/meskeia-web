@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorAtpSintasa.module.css';
 
 // Tipos para los estados de síntesis de las subunidades beta
@@ -133,7 +132,6 @@ export default function VisualizadorAtpSintasa() {
   const atpDiario = Math.round(peso * 0.6);
   const recargas = 500;
 
-  const relatedApps = getRelatedApps('visualizador-atp-sintasa');
 
   return (
     <div className={styles.container}>
@@ -492,7 +490,7 @@ export default function VisualizadorAtpSintasa() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-atp-sintasa" />
       <Footer appName="visualizador-atp-sintasa" />
     </div>

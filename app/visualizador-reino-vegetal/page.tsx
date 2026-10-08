@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorReinoVegetal.module.css';
 
 // Suprimir advertencia de metadata no usada en client component
@@ -1113,7 +1112,7 @@ export default function VisualizadorReinoVegetal() {
           </ul>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-reino-vegetal')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-reino-vegetal" />
       </main>
 

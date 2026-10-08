@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import {
   razasReferencia,
@@ -613,7 +612,6 @@ export default function CalculadoraTamanoAdultoPerroPage() {
       />
 
       <RelatedApps
-        apps={getRelatedApps('calculadora-tamano-adulto-perro')}
         title="Más herramientas para tu mascota"
         icon="🐾"
       />

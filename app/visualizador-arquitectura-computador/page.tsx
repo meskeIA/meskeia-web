@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorArquitecturaComputador.module.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -940,7 +939,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-arquitectura-computador')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-arquitectura-computador" />
       <Footer appName="visualizador-arquitectura-computador" />
     </div>

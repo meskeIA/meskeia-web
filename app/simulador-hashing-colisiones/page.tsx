@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorHashingColisiones.module.css';
 
 // ============================================================
@@ -922,7 +921,7 @@ export default function SimuladorHashingColisiones() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-hashing-colisiones')} />
+      <RelatedApps />
 
       <ShareCard appName="simulador-hashing-colisiones" />
 

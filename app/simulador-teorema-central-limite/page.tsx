@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTeoremaCentralLimite.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import CasosAula from './CasosAula';
 import { construirHistograma, type Reticula } from './histograma';
 // μ y σ de cada población NO se escriben aquí: vienen de `./casos.ts`, que es también donde se
@@ -1054,7 +1053,7 @@ export default function SimuladorTeoremaCentralLimitePage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-teorema-central-limite')} />
+      <RelatedApps />
       <ShareCard appName="simulador-teorema-central-limite" />
       <Footer appName="simulador-teorema-central-limite" />
     </div>

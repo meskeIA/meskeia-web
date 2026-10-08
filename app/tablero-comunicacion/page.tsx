@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type CategoriaId = 'favoritos' | 'necesidades' | 'emociones' | 'comida' | 'acciones' | 'personas' | 'lugares';
@@ -629,7 +628,7 @@ export default function TableroComunicacionPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tablero-comunicacion')} />
+      <RelatedApps />
       <ShareCard appName="tablero-comunicacion" />
       <Footer appName="tablero-comunicacion" />
     </div>

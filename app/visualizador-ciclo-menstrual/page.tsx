@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import styles from './CicloMenstrual.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
@@ -449,7 +448,7 @@ export default function VisualizadorCicloMenstrual() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-ciclo-menstrual')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-ciclo-menstrual" />
       <Footer appName="visualizador-ciclo-menstrual" />
     </div>

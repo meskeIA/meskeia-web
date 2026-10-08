@@ -7,7 +7,6 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface ContrastResult {
   ratio: number;
@@ -1033,7 +1032,7 @@ export default function ContrasteColoresPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('contraste-colores')} />
+      <RelatedApps />
 
       <ShareCard appName="contraste-colores" />
       <Footer appName="contraste-colores" />

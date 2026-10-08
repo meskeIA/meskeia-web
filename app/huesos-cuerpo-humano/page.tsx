@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import styles from './HuesosCuerpoHumano.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   BONES,
   REGIONES,
@@ -755,7 +754,7 @@ export default function HuesosCuerpoHumanoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('huesos-cuerpo-humano')} />
+      <RelatedApps />
       <ShareCard appName="huesos-cuerpo-humano" />
       <Footer appName="huesos-cuerpo-humano" />
     </div>

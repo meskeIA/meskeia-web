@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularEscandallo,
   costeIngrediente,
@@ -271,7 +270,7 @@ export default function EscandalloFoodCostPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('escandallo-food-cost')} />
+      <RelatedApps />
       <ShareCard appName="escandallo-food-cost" />
       <Footer appName="escandallo-food-cost" />
     </div>

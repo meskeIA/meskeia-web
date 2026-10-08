@@ -5,7 +5,6 @@ import { useState, useMemo } from 'react';
 import styles from './SimuladorEstequiometria.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -954,7 +953,7 @@ export default function SimuladorEstequiometriaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-estequiometria')} />
+        <RelatedApps />
         <ShareCard appName="simulador-estequiometria" />
         <Footer appName="simulador-estequiometria" />
     </div>

@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Perfil = 'jovenes' | 'familias';
 
@@ -489,7 +488,7 @@ export default function OrientadorAvalIcoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-aval-ico')} />
+      <RelatedApps />
       <ShareCard appName="orientador-aval-ico" />
       <Footer appName="orientador-aval-ico" />
     </div>

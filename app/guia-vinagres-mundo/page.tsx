@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaVinagresMundo.module.css';
 
 type OrigenVinagre =
@@ -1479,7 +1478,7 @@ export default function GuiaVinagresMundo() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-vinagres-mundo')} />
+      <RelatedApps />
       <ShareCard appName="guia-vinagres-mundo" />
       <Footer appName="guia-vinagres-mundo" />
     </div>

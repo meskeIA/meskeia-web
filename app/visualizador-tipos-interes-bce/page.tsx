@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
 } from '@/components';
 import ShareCard from '@/components/ShareCard';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorTiposInteresBce.module.css';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -683,7 +682,7 @@ export default function VisualizadorTiposInteresBce() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-tipos-interes-bce')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-tipos-interes-bce" />
       <Footer appName="visualizador-tipos-interes-bce" />
     </div>

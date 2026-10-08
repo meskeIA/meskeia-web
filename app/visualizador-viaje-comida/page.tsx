@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Etapas del sistema digestivo
@@ -367,7 +366,7 @@ export default function VisualizadorViajeComidaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-viaje-comida')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-viaje-comida" />
         <Footer appName="visualizador-viaje-comida" />
     </div>

@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Fases del ciclo de respiración
 type Fase = 'parado' | 'inhala' | 'reten1' | 'exhala' | 'reten2';
@@ -627,7 +626,7 @@ export default function GuiaRespiracionPage() {
         </ul>
       </div>
 
-      <RelatedApps apps={getRelatedApps('guia-respiracion')} />
+      <RelatedApps />
       <ShareCard appName="guia-respiracion" />
       <Footer appName="guia-respiracion" />
     </div>

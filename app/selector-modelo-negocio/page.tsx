@@ -7,7 +7,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorModeloNegocio.module.css';
 
 // =====================================================
@@ -619,7 +618,7 @@ export default function SelectorModeloNegocioPage() {
         </ol>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('selector-modelo-negocio')} />
+      <RelatedApps />
       <ShareCard appName="selector-modelo-negocio" />
       <Footer appName="selector-modelo-negocio" />
     </div>

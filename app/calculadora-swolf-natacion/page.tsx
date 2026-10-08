@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularSWOLF,
   CORTES_SWOLF_25,
@@ -604,7 +603,7 @@ export default function CalculadoraSwolfNatacionPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-swolf-natacion')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-swolf-natacion" />
       </main>
 

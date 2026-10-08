@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorDistribucionNormal.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatPercentage } from '@/lib';
 import { pdf, probabilidadNormal } from './casos';
 import CasosAula from './CasosAula';
@@ -968,7 +967,7 @@ export default function SimuladorDistribucionNormalPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-distribucion-normal')} />
+      <RelatedApps />
       <ShareCard appName="simulador-distribucion-normal" />
       <Footer appName="simulador-distribucion-normal" />
     </div>

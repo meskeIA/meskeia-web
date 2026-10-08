@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatPercentage } from '@/lib';
 import styles from './SimuladorPendulo.module.css';
 import {
@@ -1006,7 +1005,7 @@ export default function SimuladorPenduloPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-pendulo')} />
+        <RelatedApps />
         <ShareCard appName="simulador-pendulo" />
       </main>
 

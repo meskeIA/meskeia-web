@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorFotosintesisFactores.module.css';
 
@@ -629,7 +628,7 @@ export default function SimuladorFotosintesisFactoresPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-fotosintesis-factores')} />
+        <RelatedApps />
         <ShareCard appName="simulador-fotosintesis-factores" />
         <Footer appName="simulador-fotosintesis-factores" />
     </div>

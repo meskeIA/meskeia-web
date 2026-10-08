@@ -12,7 +12,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
@@ -902,7 +901,7 @@ export default function GeneradorSudokusPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('generador-sudokus')} />
+        <RelatedApps />
 
         <ShareCard appName="generador-sudokus" />
 

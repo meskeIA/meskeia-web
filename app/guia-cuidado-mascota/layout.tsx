@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { CourseProvider } from './CourseContext';
+import ConRelacionadas from '@/components/ConRelacionadas';
 
 export const metadata: Metadata = {
   title: 'Guía para el Cuidado de tu Mascota | meskeIA',
@@ -79,7 +80,7 @@ export default function GuiaCuidadoMascotaLayout({
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <CourseProvider>{children}</CourseProvider>
+      <CourseProvider><ConRelacionadas slug="guia-cuidado-mascota">{children}</ConRelacionadas></CourseProvider>
     </>
   );
 }

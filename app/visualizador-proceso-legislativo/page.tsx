@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -507,7 +506,7 @@ export default function VisualizadorProcesoLegislativoPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-proceso-legislativo')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-proceso-legislativo" />
         <Footer appName="visualizador-proceso-legislativo" />
   </div>

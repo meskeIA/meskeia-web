@@ -5,7 +5,6 @@ import styles from './ConversorFormatos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos de formato soportados
 type FileFormat = 'json' | 'csv' | 'xlsx' | 'xml' | 'yaml' | 'tsv';
@@ -1299,7 +1298,7 @@ export default function ConversorFormatosPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-formatos')} />
+      <RelatedApps />
 
       <ShareCard appName="conversor-formatos" />
       <Footer appName="conversor-formatos" />

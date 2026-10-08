@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './EstimadorROIMarketing.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber, formatPercentage } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import Chart from 'chart.js/auto';
 
 interface CanalMarketing {
@@ -791,7 +790,7 @@ export default function CalculadoraROIMarketingPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-roi-marketing')} />
+      <RelatedApps />
 
       <ShareCard appName="estimador-roi-marketing" />
       <Footer appName="estimador-roi-marketing" />

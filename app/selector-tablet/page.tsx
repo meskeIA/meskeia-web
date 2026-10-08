@@ -11,7 +11,6 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -397,7 +396,7 @@ export default function SelectorTabletPage() {
         </main>
       )}
 
-      <RelatedApps apps={getRelatedApps('selector-tablet')} />
+      <RelatedApps />
       <ShareCard appName="selector-tablet" />
       <Footer appName="selector-tablet" />
     </div>

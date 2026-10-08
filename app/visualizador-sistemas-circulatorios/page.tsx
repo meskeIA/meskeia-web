@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -843,7 +842,7 @@ export default function VisualizadorSistemasCirculatoriosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-sistemas-circulatorios')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-sistemas-circulatorios" />
         <Footer appName="visualizador-sistemas-circulatorios" />
     </div>

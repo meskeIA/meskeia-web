@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -563,7 +562,7 @@ export default function AnatomiaFlorPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-anatomia-flor')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-anatomia-flor" />
         <Footer appName="visualizador-anatomia-flor" />
     </div>

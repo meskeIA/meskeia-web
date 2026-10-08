@@ -6,7 +6,6 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -335,7 +334,7 @@ export default function OrientadorTipoOposicionPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('orientador-tipo-oposicion')} />
+        <RelatedApps />
         <ShareCard appName="orientador-tipo-oposicion" />
         <Footer appName="orientador-tipo-oposicion" />
     </div>

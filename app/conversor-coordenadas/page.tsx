@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import {
   aUTM,
@@ -677,7 +676,7 @@ export default function ConversorCoordenadasPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('conversor-coordenadas')} />
+      <RelatedApps />
       <ShareCard appName="conversor-coordenadas" />
       <Footer appName="conversor-coordenadas" />
     </div>

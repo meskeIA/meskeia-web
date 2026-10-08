@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './EstrategicacionSocial.module.css';
 
 // ─────────────────────────────────────────────
@@ -978,7 +977,7 @@ export default function VisualizadorEstrategicacionSocial() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-estratificacion-social')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-estratificacion-social" />
       <Footer appName="visualizador-estratificacion-social" />
     </div>

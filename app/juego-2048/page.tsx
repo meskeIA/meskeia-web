@@ -6,7 +6,6 @@ import styles from './Juego2048.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type Tablero = number[][];
 type Direccion = 'up' | 'down' | 'left' | 'right';
@@ -688,7 +687,7 @@ export default function Juego2048Page() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('juego-2048')} />
+      <RelatedApps />
 
       <ShareCard appName="juego-2048" />
       <Footer appName="juego-2048" />

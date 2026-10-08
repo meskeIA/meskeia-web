@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorCineticaArrhenius.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // CONSTANTES
@@ -912,7 +911,7 @@ export default function SimuladorCineticaArrheniusPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-cinetica-arrhenius')} />
+      <RelatedApps />
       <ShareCard appName="simulador-cinetica-arrhenius" />
       <Footer appName="simulador-cinetica-arrhenius" />
     </div>

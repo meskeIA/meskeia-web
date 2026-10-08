@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────────────────
 // Datos y lógica (100% en el navegador — nada se envía a ningún servidor)
@@ -540,7 +539,7 @@ export default function EvaluadorFortalezaContrasenaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('evaluador-fortaleza-contrasena')} />
+      <RelatedApps />
       <ShareCard appName="evaluador-fortaleza-contrasena" />
       <Footer appName="evaluador-fortaleza-contrasena" />
     </div>

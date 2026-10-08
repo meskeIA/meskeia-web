@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1010,7 +1009,7 @@ export default function VisualizadorBlockchainPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-blockchain')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-blockchain" />
       <Footer appName="visualizador-blockchain" />
     </div>

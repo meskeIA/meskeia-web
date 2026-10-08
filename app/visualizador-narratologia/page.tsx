@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorNarratologia.module.css';
 
 type TabId = 'historia-relato' | 'tiempo' | 'voz-focalizacion' | 'actancial';
@@ -514,7 +513,7 @@ export default function VisualizadorNarratologiaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-narratologia')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-narratologia" />
       <Footer appName="visualizador-narratologia" />
     </div>

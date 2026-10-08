@@ -14,7 +14,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   TABLA_AMORTIZACION_2026,
   MULTIPLICADORES_DEGRESIVO_2026,
@@ -292,7 +291,6 @@ export default function CalculadoraAmortizacionInmovilizado() {
     setRawValues({});
   };
 
-  const relatedApps = getRelatedApps('calculadora-amortizacion-inmovilizado');
 
   const campos: { campo: keyof InputData; label: string; sufijo: string; placeholder: string }[] = [
     { campo: 'valorAdquisicion', label: 'Valor de adquisición', sufijo: '€', placeholder: '50.000' },
@@ -660,7 +658,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="calculadora-amortizacion-inmovilizado" />
       <Footer appName="calculadora-amortizacion-inmovilizado" />
     </div>

@@ -8,7 +8,6 @@ import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type TipoQR = 'texto' | 'url' | 'wifi' | 'contacto' | 'email' | 'telefono';
@@ -1413,7 +1412,7 @@ export default function GeneradorQRPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-qr')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-qr" />
       <Footer appName="generador-qr" />

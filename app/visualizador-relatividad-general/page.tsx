@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './RelatividadGeneral.module.css';
 
 // ─────────────────────────────────────────────
@@ -436,7 +435,7 @@ export default function RelatividadGeneralPage(): React.ReactNode {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-relatividad-general')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-relatividad-general" />
       <Footer appName="visualizador-relatividad-general" />
     </div>

@@ -12,7 +12,6 @@ import {
   ShareCard,
   RegionBadge,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────────────────────────────────
 // TIPOS
@@ -583,7 +582,6 @@ export default function CalculadoraIbanPage() {
     };
   }, [bicInput]);
 
-  const relacionadas = getRelatedApps('calculadora-iban');
 
   return (
     <div className={styles.container}>
@@ -1638,7 +1636,7 @@ export default function CalculadoraIbanPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={relacionadas} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-iban" />
 

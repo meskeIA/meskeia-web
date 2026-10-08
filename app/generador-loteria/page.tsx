@@ -3,7 +3,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from './GeneradorLoteria.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatDate, formatNumber, formatPercentage } from '@/lib';
 import ComprobadorSorteo from './ComprobadorSorteo';
 import RepartoPena from './RepartoPena';
@@ -1122,7 +1121,7 @@ export default function GeneradorLoteriaPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('generador-loteria')} />
+      <RelatedApps />
 
       <ShareCard appName="generador-loteria" />
       <Footer appName="generador-loteria" />

@@ -4,7 +4,6 @@
 import { useState, useEffect, useRef, useCallback, DragEvent, ChangeEvent } from 'react';
 import styles from './SimuladorDaltonismo.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   MATRICES_CVD,
   CVD_META,
@@ -590,7 +589,7 @@ export default function SimuladorDaltonismoPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-daltonismo')} />
+      <RelatedApps />
 
       <ShareCard appName="simulador-daltonismo" />
 

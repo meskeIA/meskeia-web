@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorCifradoCesar.module.css';
 
 // ============================================================
@@ -871,7 +870,7 @@ export default function SimuladorCifradoCesar() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-cifrado-cesar')} />
+        <RelatedApps />
         <ShareCard appName="simulador-cifrado-cesar" />
       </main>
 

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades
@@ -1759,7 +1758,7 @@ export default function TablaConstantesFisicasPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tabla-constantes-fisicas')} />
+      <RelatedApps />
       <ShareCard appName="tabla-constantes-fisicas" />
       <Footer appName="tabla-constantes-fisicas" />
     </div>

@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorSqlJoin.module.css';
 
@@ -1136,7 +1135,7 @@ export default function Page() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-sql-join')} />
+      <RelatedApps />
       <ShareCard appName="simulador-sql-join" />
       <Footer appName="simulador-sql-join" />
     </div>

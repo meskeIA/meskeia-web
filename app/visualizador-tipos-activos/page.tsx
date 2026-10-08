@@ -10,7 +10,6 @@ import {
   ShareCard,
 } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 import styles from './VisualizadorTiposActivos.module.css';
 
@@ -1050,7 +1049,7 @@ export default function VisualizadorTiposActivosPage() {
             </div>
           </EducationalSection>
 
-          <RelatedApps apps={getRelatedApps('visualizador-tipos-activos')} />
+          <RelatedApps />
           <ShareCard appName="visualizador-tipos-activos" />
         </main>
 

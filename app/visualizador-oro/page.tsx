@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './VisualizadorOro.module.css';
 
 /* ─── Datos ─────────────────────────────────────────── */
@@ -471,7 +470,7 @@ export default function VisualizadorOro() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-oro')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-oro" />
       <Footer appName="visualizador-oro" />
     </div>

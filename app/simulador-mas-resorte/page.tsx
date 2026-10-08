@@ -11,7 +11,6 @@ import {
   ShareCard,
   NumberInput,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorMasResorte.module.css';
 import {
@@ -1088,7 +1087,7 @@ export default function SimuladorMasResortePage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('simulador-mas-resorte')} />
+        <RelatedApps />
         <ShareCard appName="simulador-mas-resorte" />
       </main>
 

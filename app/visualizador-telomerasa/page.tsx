@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -556,7 +555,7 @@ export default function VisualizadorTelomerasa() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-telomerasa')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-telomerasa" />
       <Footer appName="visualizador-telomerasa" />
     </div>

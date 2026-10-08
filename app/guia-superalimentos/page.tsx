@@ -11,7 +11,6 @@ import {
   LegalNotice,
 } from '@/components';
 import ShareCard from '@/components/ShareCard';
-import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 
 // ============================================================
@@ -998,7 +997,7 @@ export default function GuiaSuperalimentosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('guia-superalimentos')} />
+        <RelatedApps />
         <ShareCard appName="guia-superalimentos" />
       </main>
 

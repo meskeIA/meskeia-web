@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -622,7 +621,7 @@ export default function VisualizadorHidrogeno() {
         </ul>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-hidrogeno')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-hidrogeno" />
       <Footer appName="visualizador-hidrogeno" />
     </div>

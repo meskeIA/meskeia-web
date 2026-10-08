@@ -4,7 +4,6 @@
 import { useState } from 'react';
 import styles from './VisualizadorEndorfinas.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -155,7 +154,6 @@ const TABLA_COMPARATIVA: FilaComparativa[] = [
 export default function VisualizadorEndorfinas() {
   const [activadorSeleccionado, setActivadorSeleccionado] = useState<number | null>(null);
 
-  const relatedApps = getRelatedApps('visualizador-endorfinas');
 
   return (
     <div className={styles.container}>
@@ -423,7 +421,7 @@ export default function VisualizadorEndorfinas() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={relatedApps} />
+      <RelatedApps />
       <ShareCard appName="visualizador-endorfinas" />
       <Footer appName="visualizador-endorfinas" />
     </div>

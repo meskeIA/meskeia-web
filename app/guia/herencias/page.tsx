@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import styles from './GuiaHerencias.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Herramientas del journey
 const tools = [
@@ -298,7 +297,7 @@ export default function GuiaHerenciasPage() {
         </div>
       </section>
 
-      <RelatedApps apps={getRelatedApps('guia-herencias')} />
+      <RelatedApps />
       <ShareCard appName="guia-herencias" />
       <Footer appName="guia-herencias" />
     </div>

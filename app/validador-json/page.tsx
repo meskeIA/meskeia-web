@@ -6,7 +6,6 @@ import styles from './ValidadorJSON.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 type TabType = 'json' | 'xml';
 
@@ -891,7 +890,7 @@ export default function ValidadorJSONPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('validador-json')} />
+      <RelatedApps />
 
       <ShareCard appName="validador-json" />
       <Footer appName="validador-json" />

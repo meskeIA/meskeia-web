@@ -4,7 +4,6 @@
 import { useState, useMemo } from 'react';
 import styles from './CalculadoraSubredes.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 interface SubnetInfo {
@@ -654,7 +653,7 @@ export default function CalculadoraSubredesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-subredes')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-subredes" />
       <Footer appName="calculadora-subredes" />
     </div>

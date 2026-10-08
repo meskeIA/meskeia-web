@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Sonometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber, formatDate } from '@/lib';
 
 // Niveles de referencia en dB
@@ -1746,7 +1745,7 @@ export default function SonometroPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('sonometro')} />
+      <RelatedApps />
 
       <ShareCard appName="sonometro" />
       <Footer appName="sonometro" />

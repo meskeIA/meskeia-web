@@ -14,7 +14,6 @@ import {
 } from '@/components';
 import NumberInput from '@/components/NumberInput';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_MATERNIDAD_META,
   DEDUCCION_MATERNIDAD_IRPF,
@@ -844,7 +843,7 @@ export default function EstimacionDeduccionMaternidadPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimacion-deduccion-maternidad')} />
+      <RelatedApps />
       <ShareCard appName="estimacion-deduccion-maternidad" />
       <Footer appName="estimacion-deduccion-maternidad" />
     </div>

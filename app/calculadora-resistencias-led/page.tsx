@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface ColorBanda {
   nombre: string;
@@ -512,7 +511,7 @@ export default function CalculadoraResistenciasLedPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-resistencias-led')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-resistencias-led" />
       <Footer appName="calculadora-resistencias-led" />
     </div>

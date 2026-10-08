@@ -13,7 +13,6 @@ import {
   NumberInput, RegionBadge
 } from '@/components';
 import DataReference from '@/components/DataReference';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency } from '@/lib';
 import {
   FISCAL_MATERNIDAD_META,
@@ -951,7 +950,7 @@ export default function EstimacionPrestacionNacimiento() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimacion-prestacion-nacimiento')} />
+      <RelatedApps />
       <ShareCard appName="estimacion-prestacion-nacimiento" />
       <Footer appName="estimacion-prestacion-nacimiento" />
     </div>

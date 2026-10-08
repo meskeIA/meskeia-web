@@ -5,7 +5,6 @@ import styles from './OrientadorTensionArterial.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, DisclaimerCard, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatDate, formatNumber } from '@/lib';
 import {
   CLASIFICACIONES,
@@ -899,7 +898,7 @@ export default function CalculadoraTensionArterial() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('orientador-tension-arterial')} />
+      <RelatedApps />
       <ShareCard appName="orientador-tension-arterial" />
       <Footer appName="orientador-tension-arterial" />
     </div>

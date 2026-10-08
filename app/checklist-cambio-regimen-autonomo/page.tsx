@@ -10,7 +10,6 @@ import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
 import RegionBadge from '@/components/RegionBadge';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -650,7 +649,7 @@ export default function ChecklistCambioRegimenPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('checklist-cambio-regimen-autonomo')} />
+        <RelatedApps />
         <ShareCard appName="checklist-cambio-regimen-autonomo" />
         <Footer appName="checklist-cambio-regimen-autonomo" />
     </div>

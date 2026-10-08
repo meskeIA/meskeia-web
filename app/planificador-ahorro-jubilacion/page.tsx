@@ -14,7 +14,6 @@ import {
   ShareCard, RegionBadge
 } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   FISCAL_ESPERANZA_VIDA_META,
   FISCAL_PENSIONES_META,
@@ -709,7 +708,7 @@ export default function PlanificadorAhorroJubilacionPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('planificador-ahorro-jubilacion')} />
+        <RelatedApps />
         <ShareCard appName="planificador-ahorro-jubilacion" />
         <Footer appName="planificador-ahorro-jubilacion" />
     </div>

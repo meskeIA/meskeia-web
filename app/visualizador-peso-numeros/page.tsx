@@ -13,7 +13,6 @@ import {
   RegionBadge,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Datos: escalas numéricas
@@ -283,7 +282,7 @@ export default function VisualizadorPesoNumerosPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-peso-numeros')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-peso-numeros" />
         <Footer appName="visualizador-peso-numeros" />
     </div>

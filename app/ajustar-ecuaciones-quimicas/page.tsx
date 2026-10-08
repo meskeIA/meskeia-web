@@ -5,7 +5,6 @@ import { useState } from 'react';
 import styles from './AjustarEcuacionesQuimicas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ============================================
 // TIPOS
@@ -1734,7 +1733,7 @@ export default function AjustarEcuacionesQuimicas() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('ajustar-ecuaciones-quimicas')} />
+      <RelatedApps />
       <ShareCard appName="ajustar-ecuaciones-quimicas" />
       <Footer appName="ajustar-ecuaciones-quimicas" />
     </div>

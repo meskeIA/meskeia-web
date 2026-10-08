@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber } from '@/lib';
 
 // ===== TIPOS =====
@@ -673,7 +672,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-rentabilidad-alquiler')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-rentabilidad-alquiler" />
       <Footer appName="calculadora-rentabilidad-alquiler" />

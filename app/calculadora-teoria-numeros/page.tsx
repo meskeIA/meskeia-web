@@ -5,7 +5,6 @@ import { useState, useMemo } from 'react';
 import styles from './CalculadoraTeoriaNumeros.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   antiprimosHasta,
   analizarAntiprimo,
@@ -1428,7 +1427,7 @@ export default function CalculadoraTeoriaNumerosPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('calculadora-teoria-numeros')} />
+      <RelatedApps />
 
       <ShareCard appName="calculadora-teoria-numeros" />
       <Footer appName="calculadora-teoria-numeros" />

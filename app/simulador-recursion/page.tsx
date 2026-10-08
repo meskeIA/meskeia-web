@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorRecursion.module.css';
 
@@ -1663,7 +1662,7 @@ export default function Page() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-recursion')} />
+      <RelatedApps />
       <ShareCard appName="simulador-recursion" />
       <Footer appName="simulador-recursion" />
     </div>

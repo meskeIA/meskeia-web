@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 import styles from './OrientadorIMC.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps, getRelatedAppsTitle } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import {
   evaluarEntrada,
@@ -973,11 +972,7 @@ export default function CalculadoraIMCPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps
-        apps={getRelatedApps('orientador-imc')}
-        title={getRelatedAppsTitle('orientador-imc').title}
-        icon={getRelatedAppsTitle('orientador-imc').icon}
-      />
+      <RelatedApps />
 
       <ShareCard appName="orientador-imc" />
       <Footer appName="orientador-imc" />

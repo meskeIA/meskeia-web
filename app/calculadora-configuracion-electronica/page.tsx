@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   ELEMENTOS,
   ORDEN_LLENADO,
@@ -892,7 +891,7 @@ export default function CalculadoraConfiguracionElectronica() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-configuracion-electronica')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-configuracion-electronica" />
       </main>
 

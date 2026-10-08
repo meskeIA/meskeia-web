@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SimuladorProgramacionDinamica.module.css';
 
 // ============================================================
@@ -812,7 +811,7 @@ export default function SimuladorProgramacionDinamica() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-programacion-dinamica')} />
+      <RelatedApps />
       <ShareCard appName="simulador-programacion-dinamica" />
       <Footer appName="simulador-programacion-dinamica" />
     </div>

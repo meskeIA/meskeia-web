@@ -12,7 +12,6 @@ import {
   DisclaimerCard,
   RegionBadge,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularResultado,
   SISTEMAS,
@@ -496,7 +495,7 @@ export default function SelectorCalefaccion() {
         </div>
       )}
 
-      <RelatedApps apps={getRelatedApps('selector-calefaccion')} />
+      <RelatedApps />
       <ShareCard appName="selector-calefaccion" />
       <Footer appName="selector-calefaccion" />
     </div>

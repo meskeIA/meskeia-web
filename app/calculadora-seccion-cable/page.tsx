@@ -10,7 +10,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 import styles from './CalculadoraSeccionCable.module.css';
 
@@ -913,7 +912,7 @@ export default function CalculadoraSeccionCable() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('calculadora-seccion-cable')} />
+        <RelatedApps />
         <ShareCard appName="calculadora-seccion-cable" />
       </main>
 

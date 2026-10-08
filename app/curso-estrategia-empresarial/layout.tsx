@@ -1,5 +1,6 @@
 import { CourseProvider } from './CourseContext';
 import { jsonLd } from './metadata';
+import ConRelacionadas from '@/components/ConRelacionadas';
 
 export { metadata } from './metadata';
 
@@ -14,7 +15,7 @@ export default function CursoLayout({
   return (
     <CourseProvider>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: webAppScript }} />
-      {children}
+      <ConRelacionadas slug="curso-estrategia-empresarial">{children}</ConRelacionadas>
     </CourseProvider>
   );
 }

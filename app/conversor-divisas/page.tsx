@@ -5,7 +5,6 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatNumber } from '@/lib/formatters';
 import styles from './ConversionDivisas.module.css';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Divisa {
   codigo: string;
@@ -349,7 +348,7 @@ export default function ConversionDivisas() {
 
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('conversor-divisas')} />
+        <RelatedApps />
         <ShareCard appName="conversor-divisas" />
       <Footer appName="conversor-divisas" />
       </main>

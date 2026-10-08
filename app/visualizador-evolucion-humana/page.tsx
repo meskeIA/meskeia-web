@@ -9,7 +9,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -270,7 +269,6 @@ export default function VisualizadorEvolucionHumana() {
   const caracteristicaActual = CARACTERISTICAS_ANATOMICAS.find(c => c.id === caracteristicaActiva) ?? CARACTERISTICAS_ANATOMICAS[0];
   const destinoActual = DESTINOS_MIGRACION.find(d => d.id === destinoSeleccionado);
 
-  const appsRelacionadas = getRelatedApps('visualizador-evolucion-humana');
 
   return (
     <div className={styles.container}>
@@ -682,7 +680,7 @@ export default function VisualizadorEvolucionHumana() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={appsRelacionadas} />
+      <RelatedApps />
       <ShareCard appName="visualizador-evolucion-humana" />
       <Footer appName="visualizador-evolucion-humana" />
     </div>

@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -490,7 +489,7 @@ export default function VisualizadorMotorElectrico(): React.ReactNode {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-motor-electrico')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-motor-electrico" />
       <Footer appName="visualizador-motor-electrico" />
     </div>

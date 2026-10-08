@@ -8,7 +8,6 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './Exoplanetas.module.css';
 
 // ─────────────────────────────────────────────
@@ -965,7 +964,7 @@ export default function VisualizadorExoplanetas() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-exoplanetas')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-exoplanetas" />
       <Footer appName="visualizador-exoplanetas" />
     </div>

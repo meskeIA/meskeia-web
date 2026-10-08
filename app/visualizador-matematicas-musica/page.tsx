@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   VENTANA_ONDAS_S,
   ciclosEnVentana,
@@ -947,7 +946,7 @@ export default function VisualizadorMatematicasMusicaPage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-matematicas-musica')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-matematicas-musica" />
         <Footer appName="visualizador-matematicas-musica" />
     </div>

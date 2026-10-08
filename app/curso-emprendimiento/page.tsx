@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import styles from './CursoEmprendimiento.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { CHAPTERS, TOOLS, useCourse } from './CourseContext';
 
 export default function CursoEmprendimientoPage() {
@@ -184,7 +183,7 @@ export default function CursoEmprendimientoPage() {
         </Link>
       </section>
 
-      <RelatedApps apps={getRelatedApps('curso-emprendimiento')} />
+      <RelatedApps />
       <ShareCard appName="curso-emprendimiento" />
       <Footer appName="curso-emprendimiento" />
     </div>

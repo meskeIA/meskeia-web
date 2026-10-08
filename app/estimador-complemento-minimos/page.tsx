@@ -7,7 +7,6 @@ import {
   ShareCard, DisclaimerCard, DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   PENSIONES_MINIMAS_2026, COMPLEMENTO_MINIMOS_LIMITES_2026, TOPE_COMPLEMENTO_MINIMOS_2026,
   FISCAL_PENSIONES_META,
@@ -732,7 +731,7 @@ export default function EstimadorComplementoMinimosPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('estimador-complemento-minimos')} />
+        <RelatedApps />
         <ShareCard appName="estimador-complemento-minimos" />
         <Footer appName="estimador-complemento-minimos" />
     </div>

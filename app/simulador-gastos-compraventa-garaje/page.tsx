@@ -17,7 +17,6 @@ import {
   RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr, registrarEventoInteraccion } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
 
@@ -2089,7 +2088,7 @@ export default function SimuladorGarajeCompraventaPage() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-gastos-compraventa-garaje')} />
+      <RelatedApps />
       <ShareCard appName="simulador-gastos-compraventa-garaje" />
       <Footer appName="simulador-gastos-compraventa-garaje" />
     </div>

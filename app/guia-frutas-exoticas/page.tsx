@@ -10,7 +10,6 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaFrutasExoticas.module.css';
 
 type RegionFruta =
@@ -1218,7 +1217,7 @@ export default function GuiaFrutasExoticasPage() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-frutas-exoticas')} />
+      <RelatedApps />
 
       <ShareCard appName="guia-frutas-exoticas" />
 

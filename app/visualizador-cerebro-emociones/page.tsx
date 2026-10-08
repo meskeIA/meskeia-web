@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -841,7 +840,7 @@ export default function VisualizadorCerebroEmociones() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-cerebro-emociones')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-cerebro-emociones" />
         <Footer appName="visualizador-cerebro-emociones" />
       </div>

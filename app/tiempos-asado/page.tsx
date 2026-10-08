@@ -5,7 +5,6 @@ import Link from 'next/link';
 import styles from './TiemposAsado.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { getRelatedApps } from '@/data/app-relations';
 import { TIPOS_ASADO, calcularAsado, formatearMin } from '@/lib/calculadoras/tiemposAsado';
 
 export default function TiemposAsadoPage() {
@@ -101,7 +100,7 @@ export default function TiemposAsadoPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('tiempos-asado')} />
+      <RelatedApps />
       <ShareCard appName="tiempos-asado" />
       <Footer appName="tiempos-asado" />
     </div>

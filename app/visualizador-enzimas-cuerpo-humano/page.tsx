@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -695,7 +694,7 @@ export default function EnzimasCuerpoHumanoPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-enzimas-cuerpo-humano')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-enzimas-cuerpo-humano" />
         <Footer appName="visualizador-enzimas-cuerpo-humano" />
     </div>

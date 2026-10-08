@@ -4,7 +4,6 @@
 import { useState, useMemo } from 'react';
 import styles from './GlosarioProgramacion.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   TERMINOS,
   CATEGORIAS,
@@ -643,7 +642,7 @@ export default function GlosarioProgramacionPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('glosario-programacion')} />
+      <RelatedApps />
       <ShareCard appName="glosario-programacion" />
       <Footer appName="glosario-programacion" />
     </div>

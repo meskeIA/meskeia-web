@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -730,7 +729,7 @@ export default function GerminacionPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-germinacion')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-germinacion" />
         <Footer appName="visualizador-germinacion" />
     </div>

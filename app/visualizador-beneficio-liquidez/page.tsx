@@ -14,7 +14,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -697,7 +696,7 @@ export default function VisualizadorBeneficioLiquidezPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-beneficio-liquidez')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-beneficio-liquidez" />
       <Footer appName="visualizador-beneficio-liquidez" />
     </div>

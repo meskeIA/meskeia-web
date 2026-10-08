@@ -8,7 +8,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './SelectorTipoAhorro.module.css';
 
 // ============================================================
@@ -531,7 +530,7 @@ export default function SelectorTipoAhorro() {
 
       {/* ---- Apps relacionadas ---- */}
       <div className={styles.relatedWrapper}>
-        <RelatedApps apps={getRelatedApps('selector-tipo-ahorro')} />
+        <RelatedApps />
       </div>
 
       <ShareCard appName="selector-tipo-ahorro" />

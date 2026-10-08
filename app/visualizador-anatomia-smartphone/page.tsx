@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Secciones del explicador
@@ -526,7 +525,7 @@ export default function VisualizadorAnatomiaSmartphonePage() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-anatomia-smartphone')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-anatomia-smartphone" />
         <Footer appName="visualizador-anatomia-smartphone" />
     </div>

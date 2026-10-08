@@ -13,7 +13,6 @@ import {
   DataReference,
   RegionBadge,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import {
   calcularResultado,
   PREGUNTAS,
@@ -446,7 +445,7 @@ export default function SelectorAlquilerVsCompra() {
         </div>
       )}
 
-      <RelatedApps apps={getRelatedApps('selector-alquiler-vs-compra')} />
+      <RelatedApps />
       <ShareCard appName="selector-alquiler-vs-compra" />
       <Footer appName="selector-alquiler-vs-compra" />
     </div>

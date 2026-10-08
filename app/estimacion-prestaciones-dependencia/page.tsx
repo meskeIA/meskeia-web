@@ -12,7 +12,6 @@ import {
   LegalNotice, RegionBadge
 } from '@/components';
 import DataReference from '@/components/DataReference';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency } from '@/lib';
 import {
   FISCAL_DEPENDENCIA_META,
@@ -585,7 +584,7 @@ export default function EstimacionPrestacionesDependencia() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimacion-prestaciones-dependencia')} />
+      <RelatedApps />
       <ShareCard appName="estimacion-prestaciones-dependencia" />
       <Footer appName="estimacion-prestaciones-dependencia" />
     </div>

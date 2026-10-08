@@ -4,7 +4,6 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import styles from './SimuladorTrigonometriaCirculoUnitario.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { parseSpanishNumber } from '@/lib';
 // La aritmética de esta página vive en `casos.ts`, fuera de la vista: el build compila el
 // JSX sin comprobar si la trigonometría está bien. Las siete funciones de conversión,
@@ -1357,7 +1356,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('simulador-trigonometria-circulo-unitario')} />
+      <RelatedApps />
       <ShareCard appName="simulador-trigonometria-circulo-unitario" />
       <Footer appName="simulador-trigonometria-circulo-unitario" />
     </div>

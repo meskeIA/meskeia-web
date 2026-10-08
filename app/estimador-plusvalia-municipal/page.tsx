@@ -14,7 +14,6 @@ import {
   ShareCard,
   DataReference, RegionBadge
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   COEFICIENTES_IIVTNU_2025,
@@ -1046,7 +1045,7 @@ export default function EstimadorPlusvaliaMunicipalPage() {
 
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('estimador-plusvalia-municipal')} />
+      <RelatedApps />
       <ShareCard appName="estimador-plusvalia-municipal" />
       <Footer appName="estimador-plusvalia-municipal" />
     </div>

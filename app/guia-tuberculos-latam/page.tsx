@@ -3,7 +3,6 @@
 
 import styles from './GuiaCard.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { TUBERCULOS } from '@/lib/guias/tuberculosLatam';
 
 export default function GuiaTuberculosLatamPage() {
@@ -73,7 +72,7 @@ export default function GuiaTuberculosLatamPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('guia-tuberculos-latam')} />
+      <RelatedApps />
       <ShareCard appName="guia-tuberculos-latam" />
       <Footer appName="guia-tuberculos-latam" />
     </div>

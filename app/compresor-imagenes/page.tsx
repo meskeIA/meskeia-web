@@ -5,7 +5,6 @@ import { useState, useCallback, useRef } from 'react';
 import styles from './CompresorImagenes.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // Tipos
 type OutputFormat = 'original' | 'webp' | 'jpeg' | 'png';
@@ -1371,7 +1370,7 @@ export default function CompresorImagenesPage() {
         </section>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('compresor-imagenes')} />
+      <RelatedApps />
 
       <ShareCard appName="compresor-imagenes" />
       <Footer appName="compresor-imagenes" />

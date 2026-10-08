@@ -11,7 +11,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -1130,7 +1129,7 @@ export default function VisualizadorEstructurasCristalinas() {
         </p>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-estructuras-cristalinas')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-estructuras-cristalinas" />
       <Footer appName="visualizador-estructuras-cristalinas" />
     </div>

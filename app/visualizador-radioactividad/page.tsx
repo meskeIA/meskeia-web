@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -1079,7 +1078,7 @@ export default function VisualizadorRadioactividad() {
           </div>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('visualizador-radioactividad')} />
+        <RelatedApps />
         <ShareCard appName="visualizador-radioactividad" />
         <Footer appName="visualizador-radioactividad" />
       </div>

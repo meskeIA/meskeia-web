@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 interface Pregunta { id: number; texto: string; dimension: 'encaje' | 'comunicacion'; }
 interface Perfil { nombre: string; emoji: string; descripcion: string; fortalezas: string[]; riesgos: string[]; acciones: string[]; }
@@ -215,7 +214,7 @@ export default function AuditoriaPropuestaValorPage() {
           </section>
         </EducationalSection>
 
-        <RelatedApps apps={getRelatedApps('auditoria-propuesta-valor')} />
+        <RelatedApps />
         <ShareCard appName="auditoria-propuesta-valor" />
         <Footer appName="auditoria-propuesta-valor" />
     </div>

@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraMermelada.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { NIVELES_MERMELADA, calcularMermelada } from '@/lib/calculadoras/mermelada';
 import { formatNumber } from '@/lib/formatters';
 
@@ -96,7 +95,7 @@ export default function CalculadoraMermeladaPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-mermelada')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-mermelada" />
       <Footer appName="calculadora-mermelada" />
     </div>

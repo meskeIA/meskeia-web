@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import styles from './CalculadoraNotas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { formatNumber } from '@/lib';
 
 // Tipos
@@ -1269,7 +1268,6 @@ export default function CalculadoraNotasPage() {
       </EducationalSection>
 
       <RelatedApps
-        apps={getRelatedApps('calculadora-notas')}
         title="Más herramientas para estudiantes"
         icon="📚"
       />

@@ -10,7 +10,6 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import { DataReference } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─── Tipos ───
 
@@ -462,7 +461,7 @@ export default function TokenizadorIa() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('tokenizador-ia')} />
+      <RelatedApps />
       <ShareCard appName="tokenizador-ia" />
       <Footer appName="tokenizador-ia" />
     </div>

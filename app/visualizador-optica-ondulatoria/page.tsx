@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -945,7 +944,7 @@ export default function OpticaOndulatoria() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('visualizador-optica-ondulatoria')} />
+      <RelatedApps />
       <ShareCard appName="visualizador-optica-ondulatoria" />
       <Footer appName="visualizador-optica-ondulatoria" />
     </div>

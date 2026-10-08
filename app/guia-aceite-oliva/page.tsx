@@ -10,7 +10,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import styles from './GuiaAceiteOliva.module.css';
 
 type PaisOrigen =
@@ -1222,7 +1221,7 @@ export default function GuiaAceiteOliva() {
         </div>
       </EducationalSection>
 
-      <RelatedApps apps={getRelatedApps('guia-aceite-oliva')} />
+      <RelatedApps />
       <ShareCard appName="guia-aceite-oliva" />
       <Footer appName="guia-aceite-oliva" />
     </div>

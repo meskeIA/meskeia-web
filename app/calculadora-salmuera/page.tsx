@@ -4,7 +4,6 @@
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraSalmuera.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { getRelatedApps } from '@/data/app-relations';
 import { NIVELES_SALMUERA, NIVEL_SALMUERA_POR_ID, calcularSalmuera, TIEMPOS_SALMUERA } from '@/lib/calculadoras/salmuera';
 import { formatNumber } from '@/lib/formatters';
 
@@ -115,7 +114,7 @@ export default function CalculadoraSalmueraPage() {
         </EducationalSection>
       </main>
 
-      <RelatedApps apps={getRelatedApps('calculadora-salmuera')} />
+      <RelatedApps />
       <ShareCard appName="calculadora-salmuera" />
       <Footer appName="calculadora-salmuera" />
     </div>
