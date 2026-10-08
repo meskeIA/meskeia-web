@@ -141,9 +141,10 @@ export default function CalculadoraCombustiblePage() {
               </p>
 
               <div className={styles.inputGroup}>
-                <label>Kilómetros recorridos</label>
+                <label htmlFor="combustible-km">Kilómetros recorridos</label>
                 <div className={styles.inputConUnidad}>
                   <input
+                    id="combustible-km"
                     type="text"
                     value={kilometros}
                     onChange={(e) => setKilometros(e.target.value)}
@@ -155,9 +156,10 @@ export default function CalculadoraCombustiblePage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label>Litros repostados</label>
+                <label htmlFor="combustible-litros">Litros repostados</label>
                 <div className={styles.inputConUnidad}>
                   <input
+                    id="combustible-litros"
                     type="text"
                     value={litros}
                     onChange={(e) => setLitros(e.target.value)}
@@ -169,9 +171,10 @@ export default function CalculadoraCombustiblePage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label>Precio del combustible</label>
+                <label htmlFor="combustible-precio">Precio del combustible</label>
                 <div className={styles.inputConUnidad}>
                   <input
+                    id="combustible-precio"
                     type="text"
                     value={precioCombustible}
                     onChange={(e) => setPrecioCombustible(e.target.value)}
@@ -189,9 +192,10 @@ export default function CalculadoraCombustiblePage() {
               </p>
 
               <div className={styles.inputGroup}>
-                <label>Distancia del viaje</label>
+                <label htmlFor="viaje-distancia">Distancia del viaje</label>
                 <div className={styles.inputConUnidad}>
                   <input
+                    id="viaje-distancia"
                     type="text"
                     value={distanciaViaje}
                     onChange={(e) => setDistanciaViaje(e.target.value)}
@@ -203,9 +207,10 @@ export default function CalculadoraCombustiblePage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label>Consumo medio del vehículo</label>
+                <label htmlFor="viaje-consumo">Consumo medio del vehículo</label>
                 <div className={styles.inputConUnidad}>
                   <input
+                    id="viaje-consumo"
                     type="text"
                     value={consumoMedio}
                     onChange={(e) => setConsumoMedio(e.target.value)}
@@ -217,9 +222,10 @@ export default function CalculadoraCombustiblePage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label>Precio del combustible</label>
+                <label htmlFor="viaje-precio">Precio del combustible</label>
                 <div className={styles.inputConUnidad}>
                   <input
+                    id="viaje-precio"
                     type="text"
                     value={precioViaje}
                     onChange={(e) => setPrecioViaje(e.target.value)}
