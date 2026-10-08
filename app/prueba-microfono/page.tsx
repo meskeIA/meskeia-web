@@ -535,6 +535,7 @@ export default function PruebaMicrofonoPage() {
                           type="button"
                           onClick={() => deleteRecording(recording.id)}
                           className={styles.btnSmallDanger}
+                          aria-label={`Borrar la grabación de las ${recording.timestamp.toLocaleTimeString('es-ES')}`}
                         >
                           🗑️
                         </button>
