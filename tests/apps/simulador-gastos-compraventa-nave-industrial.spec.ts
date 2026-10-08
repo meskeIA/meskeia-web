@@ -4105,7 +4105,8 @@ test.describe('Regresión — hallazgos 1267 y 1268 del 23/09/2026', () => {
     const faq = bloques.find((b) => b.includes('"FAQPage"')) ?? '';
     expect(faq, 'hay FAQPage').not.toBe('');
     const pregunta = (JSON.parse(faq) as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] })
-      .mainEntity.find((q) => q.name === '¿Qué impuesto paga la compra de una nave industrial?');
+      // Desde el 08/10/2026 (3085) el FAQPage hace la misma pregunta que la FAQ visible.
+      .mainEntity.find((q) => q.name === '¿Se paga IVA o ITP al comprar una nave industrial?');
     const respuesta = pregunta?.acceptedAnswer.text ?? '';
     expect(respuesta, 'la respuesta existe y habla del IVA de obra nueva').toContain('se paga IVA al 21\u00A0%');
 
@@ -5210,7 +5211,8 @@ test.describe('Reparación 26/09/2026 — hallazgos 2204-2207 y la receta de la 
     const faq = JSON.parse(bloques.find((b) => b.includes('"FAQPage"')) ?? '{}') as {
       mainEntity: { name: string; acceptedAnswer: { text: string } }[];
     };
-    const respuesta = faq.mainEntity.find((q) => /Qué impuesto paga/.test(q.name))?.acceptedAnswer.text ?? '';
+    // La pregunta del FAQPage es, desde el 08/10/2026 (3085), la misma que la visible.
+    const respuesta = faq.mainEntity.find((q) => /IVA o ITP/.test(q.name))?.acceptedAnswer.text ?? '';
     const frase = respuesta.split(/(?<=\.)\s/).find((f) => /AJD/.test(f) && /va del/.test(f)) ?? '';
     expect(frase).toMatch(/Ceuta y Melilla se paga la mitad/);
 
@@ -6157,7 +6159,7 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
   });
 
   /**
-   * [08/10-b] (contenido, bajo) — forma del 2968 de local-comercial: la pregunta del impuesto de la
+   * [08/10-b] (contenido, bajo) — ✅ REPARADO el 08/10/2026 (3085): RESPUESTA_IMPUESTO_COMPRA en metadata.ts, que importan las dos bocas. Forma del 2968 de local-comercial: la pregunta del impuesto de la
    * compra tiene dos respuestas escritas aparte. Visible: «¿Se paga IVA o ITP al comprar una nave
    * industrial?» (page.tsx:1042-1062); FAQPage: «¿Qué impuesto paga la compra de una nave
    * industrial?» (metadata.ts). El FAQPage da los rangos del AJD y del ITP y la bonificación de
@@ -6166,7 +6168,6 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
    * la misma operación, salvo que se renuncie…: entonces vuelve a haber IVA… y no se paga ITP».
    */
   test('[08/10-b] la pregunta del impuesto de la compra tiene UNA respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-b] abierto: dos redacciones de la misma pregunta');
     await page.goto(RUTA);
     const tema = /IVA o ITP|Qué impuesto (se )?paga/;
     const visible = (await faqVisible(page)).find((f) => tema.test(f.q));
@@ -6178,7 +6179,7 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
   });
 
   /**
-   * [08/10-c] (contenido, medio) — la pregunta del IVA deducible tiene dos respuestas escritas
+   * [08/10-c] (contenido, medio) — ✅ REPARADO el 08/10/2026 (3086): RESPUESTA_IVA_DEDUCIBLE en metadata.ts. La pregunta del IVA deducible tiene dos respuestas escritas
    * aparte, y la del FAQPage calla el aviso de la visible. Visible: «¿Es deducible el IVA en la
    * compra de una nave industrial?» → «…actividad económica sujeta y no exenta de IVA… Si la
    * actividad está exenta de IVA (ej. médico, educación), no es deducible.» FAQPage: «¿Puede una
@@ -6186,7 +6187,6 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
    * deducirse…», sin la actividad exenta.
    */
   test('[08/10-c] la pregunta del IVA deducible tiene UNA respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-c] abierto: el FAQPage calla la actividad exenta');
     await page.goto(RUTA);
     const tema = /deduc/i;
     const visible = (await faqVisible(page)).find((f) => tema.test(f.q));

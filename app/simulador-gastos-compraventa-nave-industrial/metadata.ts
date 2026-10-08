@@ -52,6 +52,22 @@ const efectivo = (clave: ComunidadAutonoma, tipo: number) =>
  */
 const generalNave = (clave: ComunidadAutonoma) => tipoGeneralITP(clave, 'otro', 0);
 
+/** Las comunidades con tipo de AJD propio de la renuncia VERIFICADO en su norma (motor). */
+const CCAA_CON_AJD_DE_RENUNCIA = (Object.keys(ITP_CCAA) as ComunidadAutonoma[])
+  .filter((clave) => ITP_CCAA[clave].ajdRenuncia !== undefined)
+  .map(nombreEnFrase);
+
+/**
+ * Las dos preguntas que la FAQ visible y el FAQPage hacían por separado, con dos respuestas
+ * escritas aparte (hallazgos 3085 y 3086, 08/10/2026): cada boca callaba lo que daba la otra, y la
+ * del FAQPage sobre el IVA deducible omitía que una actividad exenta no deduce. UNA constante que
+ * importan las dos, como en app/simulador-gastos-compraventa-garaje.
+ */
+export const PREGUNTA_IMPUESTO_COMPRA = '¿Se paga IVA o ITP al comprar una nave industrial?';
+export const RESPUESTA_IMPUESTO_COMPRA = `Depende del tipo de transmisión, y nunca se pagan los dos a la vez. Si la nave es de nueva construcción y la vende el promotor (primera entrega), se paga IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD (Actos Jurídicos Documentados), que va del ${pct(RANGO_AJD_OTROS.min)} al ${pct(RANGO_AJD_OTROS.max)} según la comunidad autónoma; en Ceuta y Melilla se paga la mitad (bonificación del ${BONIFICACION_PCT} de la cuota, art. 57 bis.1 del TRLITPAJD). Si es de segunda mano, se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad, que va del ${pct(RANGO_ITP_OTROS.min)} al ${pct(RANGO_ITP_OTROS.max)} contando el tramo más alto de las comunidades con escala progresiva. Con una salvedad que en naves industriales es frecuente: la segunda transmisión está exenta de IVA, pero cuando comprador y vendedor son empresarios con derecho a deducción es habitual renunciar a esa exención. Entonces la operación vuelve al IVA, con inversión del sujeto pasivo (lo declara el comprador), y no se paga ITP, aunque el AJD suele ir a un tipo incrementado en muchas comunidades. El simulador lo contempla en su opción «2ª mano con renuncia al IVA» y aplica el AJD propio de la renuncia donde está verificado en su norma (${CCAA_CON_AJD_DE_RENUNCIA.join(', ')}); en las demás usa el general, así que conviene contrastarlo con tu asesor. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador no calcula ahí el impuesto de la obra nueva, ni en Canarias el de la renuncia, que allí es a la exención del IGIC (art. 50.Cinco de la Ley canaria 4/2012). En Ceuta y Melilla el IPSI no admite la renuncia (Ley 8/1991, arts. 7 y 20.3), así que la segunda mano paga siempre ITP, cuya cuota se bonifica al ${BONIFICACION_PCT} (art. 57 bis del TRLITPAJD), sea cual sea el uso del inmueble.`;
+export const PREGUNTA_IVA_DEDUCIBLE = '¿Es deducible el IVA en la compra de una nave industrial?';
+export const RESPUESTA_IVA_DEDUCIBLE = 'Sí, si el comprador es un sujeto pasivo de IVA (empresa o autónomo) y destina la nave a una actividad económica sujeta y no exenta de IVA: el IVA soportado se deduce en el modelo 303, y el porcentaje deducible depende del grado de afectación de la nave a esa actividad. Si la actividad está exenta de IVA (por ejemplo, la sanitaria o la educativa), no es deducible. Con el ITP no existe esta posibilidad: es un gasto no recuperable.';
+
 /**
  * El extremo alto de cada comunidad: su tipo general, el último tramo si tiene escala, o el
  * tipo de su umbral (Valencia: el 11 % por encima del millón, sobre TODO el valor; hallazgo
@@ -168,18 +184,18 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué impuesto paga la compra de una nave industrial?',
+      name: PREGUNTA_IMPUESTO_COMPRA,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Si la nave es de nueva construcción y la vende el promotor, se paga IVA al ${pct(IVA_INMUEBLES_2025.local)} más AJD (Actos Jurídicos Documentados), que va del ${pct(RANGO_AJD_OTROS.min)} al ${pct(RANGO_AJD_OTROS.max)} según la comunidad autónoma, y en Ceuta y Melilla se paga la mitad (bonificación del ${BONIFICACION_PCT} de la cuota, art. 57 bis.1 del TRLITPAJD). Si es una segunda transmisión (segunda mano), se paga ITP (Impuesto de Transmisiones Patrimoniales) al tipo general de la comunidad, que va del ${pct(RANGO_ITP_OTROS.min)} al ${pct(RANGO_ITP_OTROS.max)} contando el tramo más alto de las comunidades con escala progresiva. No pueden coexistir IVA e ITP en la misma operación, salvo que se renuncie a la exención de IVA en la segunda transmisión entre empresarios: entonces vuelve a haber IVA con inversión del sujeto pasivo y no se paga ITP. En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos: por eso el simulador no calcula ahí el impuesto de la obra nueva, ni en Canarias el de la renuncia, que allí es a la exención del IGIC (art. 50.Cinco de la Ley canaria 4/2012). En Ceuta y Melilla el IPSI no admite la renuncia (Ley 8/1991, arts. 7 y 20.3), así que la segunda mano paga siempre ITP, cuya cuota se bonifica al ${BONIFICACION_PCT} (art. 57 bis del TRLITPAJD), sea cual sea el uso del inmueble.`,
+        text: RESPUESTA_IMPUESTO_COMPRA,
       },
     },
     {
       '@type': 'Question',
-      name: '¿Puede una empresa deducirse el IVA de la compra de una nave industrial?',
+      name: PREGUNTA_IVA_DEDUCIBLE,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Si el comprador es una empresa o autónomo que actúa en el ejercicio de su actividad económica y está sujeto a IVA, puede deducirse el IVA soportado en la compra de la nave, siempre que la nave se destine a la actividad. El porcentaje deducible depende del porcentaje de afectación a la actividad. Esta deducibilidad no existe con el ITP, que es un gasto no recuperable.',
+        text: RESPUESTA_IVA_DEDUCIBLE,
       },
     },
     {

@@ -1344,9 +1344,10 @@ test.describe('Re-inspección 23/09/2026 — familia compraventa (grupo B)', () 
     await sembrarValor(page, SEL_PRECIO, '120000');
 
     const faq = page
-      .locator('strong', { hasText: '¿Hay plusvalía municipal en la compra de un solar?' })
+      // Una sola pregunta y una sola respuesta desde el 08/10/2026 (hallazgo 3090).
+      .locator('strong', { hasText: '¿Hay plusvalía municipal al comprar o vender un solar?' })
       .locator('xpath=following-sibling::p[1]');
-    expect(((await faq.textContent()) ?? '').replace(/\s+/g, ' ')).toContain('la transmisión NO está sujeta');
+    expect(((await faq.textContent()) ?? '').replace(/\s+/g, ' ')).toContain('la transmisión no está sujeta');
 
     const nota = (await page.locator('[role="note"]', { hasText: 'Recuerda' }).innerText()).replace(/\s+/g, ' ');
     expect(nota).toContain('plusvalía municipal');
@@ -1752,7 +1753,8 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
     await page.goto(RUTA);
     await esperarHidratacion(page, [SEL_PRECIO]);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const si = page.locator('td', { hasText: 'Sí (si actividad sujeta)' });
+    // «y no exenta» desde el 08/10/2026 (hallazgo 3089).
+    const si = page.locator('td', { hasText: 'Sí (si actividad sujeta y no exenta)' });
     const no = page.locator('td', { hasText: 'No hay IVA' });
     await expect(si).toBeVisible();
     const medirEstable = async (): Promise<{ si: number; no: number }> => {
@@ -1844,7 +1846,8 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, y lo que el te
     const faq = JSON.parse(bloques.find((b) => b.includes('FAQPage')) ?? '{}') as {
       mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
     };
-    const sexta = faq.mainEntity?.find((q) => q.name.includes('finca rústica'))?.acceptedAnswer.text ?? '';
+    // Por el principio: desde el 08/10/2026 otra pregunta (la del IVA) también nombra la finca rústica.
+    const sexta = faq.mainEntity?.find((q) => q.name.startsWith('¿Qué diferencia') && q.name.includes('finca rústica'))?.acceptedAnswer.text ?? '';
     // (La respuesta decía «genera plusvalía municipal»; reparada, dice que está sujeto a ella.)
     expect(sexta).toContain('plusvalía municipal');
 
@@ -3505,7 +3508,7 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-c] sospecha (d), la forma del 2968: la misma
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3090: una constante por pregunta en metadata.ts) — [08/10-c] sospecha (d), la forma del 2968: la misma
    * pregunta tiene dos respuestas escritas aparte, una en page.tsx (FAQ visible) y otra en
    * metadata.ts (FAQPage). Son cuatro parejas; solo «escriturar» comparte función. No se
    * contradicen en cifras, pero cada boca calla lo que da la otra: el FAQPage da el rango del AJD
@@ -3515,12 +3518,12 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
    * (como app/simulador-gastos-compraventa-garaje).
    */
   test('[08/10-c] cada pregunta de la FAQ visible que repite el FAQPage tiene la misma respuesta', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-c] abierto: cuatro preguntas con dos respuestas escritas aparte');
     const PAREJAS: Array<[string, string]> = [
       ['¿Se paga IVA o ITP al comprar un solar?', '¿Se paga IVA o ITP al comprar un solar?'],
       ['¿Por qué el solar no está exento de IVA como la finca rústica?', '¿Por qué un solar de empresario lleva IVA y no ITP?'],
       ['¿El autopromotor de su vivienda puede deducir el IVA del solar?', '¿Puedo deducir el IVA de la compra de un solar?'],
-      ['¿Hay plusvalía municipal en la compra de un solar?', '¿Hay plusvalía municipal al vender un solar?'],
+      // Tras la reparación (3090), la plusvalía quedó con una sola redacción que cubre las dos.
+      ['¿Hay plusvalía municipal al comprar o vender un solar?', '¿Hay plusvalía municipal al comprar o vender un solar?'],
     ];
     await page.goto(RUTA);
     await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
@@ -3543,7 +3546,7 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, medio) — [08/10-d] la condición para deducir el IVA del solar
+   * ✅ REPARADO 08/10/2026 (contenido, medio; hallazgo 3089) — [08/10-d] la condición para deducir el IVA del solar
    * se publica de dos maneras. «Limitaciones» y el FAQPage la dan bien, «actividad sujeta y NO
    * EXENTA» (Ley 37/1992, art. 94.Uno.1.º.a: «sujetas y no exentas»). El aviso de compra a
    * promotor («es deducible si eres empresario o autónomo y afectas el solar a una actividad
@@ -3557,7 +3560,6 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
    *   obtenido «actividad sujeta a IVA», «sujeto a IVA», «Sí (si actividad sujeta)», «sujeta a IVA».
    */
   test('[08/10-d] todas las bocas condicionan el IVA deducible a una actividad «sujeta y no exenta»', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-d] abierto: aviso, tarjeta, tabla y FAQ visible omiten «no exenta»');
     await abrir(page, 'madrid', 'promotor');
     await sembrarValor(page, SEL_PRECIO, '300000');
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -3571,7 +3573,11 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
       'aviso del promotor': n(await page.locator('[role="note"]', { hasText: 'Compra a promotor o empresa' }).innerText()),
       'tarjeta del IVA': tarjeta(await leer(page), /^IVA \(/).desc,
       tabla: n(await page.locator('tr', { hasText: '¿IVA deducible?' }).locator('td').nth(1).innerText()),
-      'FAQ visible': (await faqVisible(page)).get('¿El autopromotor de su vivienda puede deducir el IVA del solar?') ?? '',
+      // La FAQ visible quedó con la pregunta del FAQPage (hallazgo 3090).
+      'FAQ visible':
+        (await faqVisible(page)).get('¿El autopromotor de su vivienda puede deducir el IVA del solar?') ??
+        (await faqVisible(page)).get('¿Puedo deducir el IVA de la compra de un solar?') ??
+        '',
     };
     expect(Object.values(bocas).every((tx) => /IVA|sujet/.test(tx))).toBe(true);
     const sinExencion = Object.entries(bocas)

@@ -20,6 +20,21 @@ const pct = (n: number) => `${String(n).replace('.', ',')}\u00A0%`;
  */
 const IVA_SOLAR = pct(PORCENTAJES_IVA.general);
 
+/**
+ * Las cuatro preguntas que la FAQ visible y el FAQPage hacían por separado, con dos respuestas
+ * escritas aparte (hallazgo 3090, 08/10/2026): cada boca callaba lo que daba la otra, y la visible
+ * del IVA deducible omitía «no exenta» (3089). UNA constante por pregunta, que importan las dos,
+ * como en app/simulador-gastos-compraventa-garaje.
+ */
+export const PREGUNTA_IVA_O_ITP = '¿Se paga IVA o ITP al comprar un solar?';
+export const RESPUESTA_IVA_O_ITP = `Depende de quién venda. Si el vendedor es un promotor o empresario que actúa en su actividad, la entrega del solar está sujeta a IVA al ${IVA_SOLAR} más AJD, que va del ${pct(RANGO_AJD_OTROS.min)} al ${pct(RANGO_AJD_OTROS.max)} según la comunidad autónoma (en Ceuta y Melilla la cuota se bonifica al ${pct(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}, art. 57 bis.1 TRLITPAJD). Si el vendedor es un particular, la compra tributa por ITP al tipo general de la comunidad, salvo los tipos reducidos que alguna comunidad liga a la actividad económica del comprador (Aragón, por ejemplo, para un inmueble con el que se inicia una actividad). Nunca se pagan IVA e ITP a la vez. En Canarias, Ceuta y Melilla no rige el IVA: la operación tributa por IGIC o IPSI, con sus propios tipos.`;
+export const PREGUNTA_SOLAR_NO_EXENTO = '¿Por qué el solar no está exento de IVA como la finca rústica?';
+export const RESPUESTA_SOLAR_NO_EXENTO = `Porque la exención de IVA alcanza al terreno rústico y no edificable, y los solares y terrenos edificables quedan expresamente excluidos de ella. Cuando un empresario o promotor entrega un solar en el ejercicio de su actividad, la operación está sujeta y no exenta de IVA al ${IVA_SOLAR} —o de IGIC o IPSI en Canarias, Ceuta y Melilla, donde no rige el IVA—, y la escritura tributa además por Actos Jurídicos Documentados (AJD).`;
+export const PREGUNTA_IVA_DEDUCIBLE = '¿Puedo deducir el IVA de la compra de un solar?';
+export const RESPUESTA_IVA_DEDUCIBLE = 'Si eres promotor, empresario o autónomo y afectas el solar a una actividad económica sujeta y no exenta de IVA, puedes deducir el IVA soportado en el modelo 303. Si la actividad está exenta, no: es el caso de quien levanta en él viviendas para alquilarlas, porque ese arrendamiento está exento (art. 20.Uno.23.º de la Ley del IVA). Y un particular que compra un solar para autopromover su vivienda no actúa como empresario, así que tampoco lo deduce: el IVA soportado se convierte en un mayor coste de la parcela.';
+export const PREGUNTA_PLUSVALIA = '¿Hay plusvalía municipal al comprar o vender un solar?';
+export const RESPUESTA_PLUSVALIA = 'Sí, pero la paga el vendedor, no el comprador. El solar es suelo de naturaleza urbana, así que su transmisión genera plusvalía municipal (IIVTNU) sobre el incremento de valor del terreno durante el tiempo de tenencia. Si no ha habido incremento real de valor, la transmisión no está sujeta al impuesto (art. 104.5 TRLRHL, redacción del RDL 26/2021): hay que declararlo y acreditarlo con las escrituras de compra y venta.';
+
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Solar / Terreno Edificable - IVA o ITP | meskeIA',
   // La plusvalía municipal del vendedor NO se calcula: la página la da como recordatorio y lo
@@ -81,34 +96,34 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Se paga IVA o ITP al comprar un solar?',
+      name: PREGUNTA_IVA_O_ITP,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Depende de quién venda. Si el vendedor es un promotor o empresario que actúa en su actividad, la entrega del solar está sujeta a IVA al ${IVA_SOLAR} más AJD, que va del ${pct(RANGO_AJD_OTROS.min)} al ${pct(RANGO_AJD_OTROS.max)} según la comunidad autónoma (en Ceuta y Melilla la cuota se bonifica al ${pct(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}, art. 57 bis.1 TRLITPAJD). Si el vendedor es un particular, la compra tributa por ITP al tipo general de la comunidad, salvo los tipos reducidos que alguna comunidad liga a la actividad económica del comprador (Aragón, por ejemplo, para un inmueble con el que se inicia una actividad). No coinciden IVA e ITP en la misma operación. En Canarias, Ceuta y Melilla no rige el IVA: la operación tributa por IGIC o IPSI, con sus propios tipos.`,
+        text: RESPUESTA_IVA_O_ITP,
       },
     },
     {
       '@type': 'Question',
-      name: '¿Por qué un solar de empresario lleva IVA y no ITP?',
+      name: PREGUNTA_SOLAR_NO_EXENTO,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Porque los terrenos edificables (solares) están excluidos de la exención de IVA que sí se aplica al suelo rústico. Cuando un empresario o promotor entrega un solar en el ejercicio de su actividad, la operación está sujeta y no exenta de IVA al ${IVA_SOLAR} —o de IGIC o IPSI en Canarias, Ceuta y Melilla, donde no rige el IVA—, y la escritura tributa además por Actos Jurídicos Documentados (AJD).`,
+        text: RESPUESTA_SOLAR_NO_EXENTO,
       },
     },
     {
       '@type': 'Question',
-      name: '¿Hay plusvalía municipal al vender un solar?',
+      name: PREGUNTA_PLUSVALIA,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El solar es suelo de naturaleza urbana, por lo que su transmisión genera plusvalía municipal (IIVTNU) para el vendedor, calculada sobre el incremento de valor del terreno durante el tiempo de tenencia. Si no ha habido incremento real de valor, la transmisión no está sujeta al impuesto (art. 104.5 TRLRHL, redacción del RDL 26/2021): hay que declararlo y acreditarlo con las escrituras de compra y venta.',
+        text: RESPUESTA_PLUSVALIA,
       },
     },
     {
       '@type': 'Question',
-      name: '¿Puedo deducir el IVA de la compra de un solar?',
+      name: PREGUNTA_IVA_DEDUCIBLE,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Si eres promotor, empresario o autónomo y afectas el solar a una actividad económica sujeta y no exenta de IVA, puedes deducir el IVA soportado en el modelo 303. En cambio, un particular que compra un solar para autopromover su vivienda no puede deducir el IVA, que se convierte en un mayor coste de la parcela.',
+        text: RESPUESTA_IVA_DEDUCIBLE,
       },
     },
     {
