@@ -40,6 +40,12 @@ import { REFRACTARIO_ABSOLUTO } from '../../app/simulador-potencial-accion/motor
  * siguen en pie (la 980 se vigila ahora en el propio lienzo). Se añaden los casos en móvil
  * —con el DEDO, no con el setter— y la cuenta de POST de analytics por carga, que descarta
  * la firma falsa por remontaje. Los hallazgos nuevos van con `test.fail()` y su motivo.
+ *
+ * REINSPECCIÓN DEL 08/10/2026, tras la reparación del 2952 (contraste, edd92c04) y el refactor
+ * de las relacionadas (99e1ee7e). El 2952 llega a sus casos en los dos temas, pero no al modo
+ * sostenido, donde el rótulo «Estímulo» del lienzo cae sobre la última barra naranja. Casos
+ * nuevos (umbral −60, los extremos de los controles, el estímulo continuo justo en la asíntota)
+ * en el bloque «Inspector 08/10/2026», al final.
  */
 
 const INTENSIDAD = '#estimulo-intensidad';
@@ -448,6 +454,8 @@ test('hallazgo 980 (REPARADO): con umbral −45 mV el PA arranca en el umbral, s
   expect(fondo).toBeGreaterThan(-50);
 });
 
+// Hallazgo 2952, REPARADO el 07/10/2026 (edd92c04) y verificado el 08/10/2026: 4,61:1 en
+// «DISPARA» y 4,94:1 en «Sí» (claro); 5,19:1 en «SUBUMBRAL» y 7,20:1 en «No» (oscuro).
 test('contraste en tema claro: el veredicto «DISPARA» (4,5:1) y el «Sí» (3:1) se leen', async ({ page }) => {
   await sembrarValor(page, INTENSIDAD, 30);
   await expect(barraEstado(page)).toContainText('La neurona DISPARA');
@@ -682,5 +690,273 @@ test.describe('móvil 390×844, con el dedo', () => {
 
     expect(visitas).toHaveLength(1);
     expect((JSON.parse(visitas[0]) as { aplicacion: string }).aplicacion).toBe('simulador-potencial-accion');
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Inspector 08/10/2026 — umbral −60, extremos de los controles y estímulo continuo
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/** Número de una tarjeta («-56,5 mV», «2,00 ms»…), leído con el parser canónico. */
+async function cifra(page: Page, rotulo: string): Promise<number> {
+  const texto = (await tarjeta(page, rotulo).innerText()).replace(/\s*(mV|ms|Hz)\s*$/, '');
+  return parseSpanishNumber(texto);
+}
+
+/** Los «X u.a. harían falta para cruzar el umbral» del pie de la tarjeta, o null si no está. */
+async function intensidadQueHaceFalta(page: Page): Promise<number | null> {
+  const pie = await page
+    .locator('[class*="resultCard"]')
+    .filter({ hasText: 'Despolarización del pulso' })
+    .locator('[class*="resultRange"]')
+    .innerText();
+  const m = pie.match(/([\d.,]+)\s*u\.a\. harían falta/);
+  return m ? parseSpanishNumber(m[1]) : null;
+}
+
+/**
+ * Contraste de un rótulo del LIENZO medido por píxel. El lienzo es transparente: cada píxel se
+ * compone sobre el fondo del envoltorio antes de comparar. Fondo = el color compuesto más
+ * frecuente en la caja del rótulo; texto = el píxel más contrastado con él (a 2× hay trazos del
+ * glifo con cobertura total, que dan el fillStyle exacto). La caja sale de las mismas cuentas
+ * que page.tsx: márgenes 30/30/50/60, rango −100..+50 mV, «Umbral» a 11 px sobre su línea y
+ * «Estímulo» a 10 px alineado a la derecha en y = 26.
+ */
+async function contrasteRotuloLienzo(page: Page, rotulo: 'Umbral' | 'Estímulo'): Promise<number> {
+  return page.evaluate((rotulo) => {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
+    const escala = canvas.width / rect.width;
+    const ctx = canvas.getContext('2d')!;
+    const plotW = rect.width - 90;
+    const plotH = rect.height - 80;
+    const umbral = Number((document.querySelector('#estimulo-umbral') as HTMLInputElement).value);
+    const yToPx = (v: number) => 30 + plotH - ((v + 100) / 150) * plotH;
+    ctx.save();
+    let caja: { x: number; y: number; w: number; h: number };
+    if (rotulo === 'Umbral') {
+      ctx.font = '11px system-ui';
+      caja = { x: 68, y: yToPx(umbral) - 13, w: ctx.measureText(`Umbral (${umbral} mV)`).width, h: 10 };
+    } else {
+      ctx.font = '10px system-ui';
+      const w = ctx.measureText('Estímulo').width;
+      caja = { x: 60 + plotW - 4 - w, y: 17, w, h: 10 };
+    }
+    ctx.restore();
+    const leer = (c: string): number[] => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      const p = m ? m[1].split(/[\s,/]+/).filter(Boolean).map(Number) : [255, 255, 255];
+      return [p[0], p[1], p[2]];
+    };
+    const base = leer(getComputedStyle(canvas.parentElement as HTMLElement).backgroundColor);
+    const img = ctx.getImageData(
+      Math.floor(caja.x * escala),
+      Math.floor(caja.y * escala),
+      Math.ceil(caja.w * escala),
+      Math.ceil(caja.h * escala),
+    ).data;
+    const lineal = (v: number) => {
+      const s = v / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    const lum = (c: number[]) => 0.2126 * lineal(c[0]) + 0.7152 * lineal(c[1]) + 0.0722 * lineal(c[2]);
+    const razon = (a: number[], b: number[]) => {
+      const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+      return (x + 0.05) / (y + 0.05);
+    };
+    const pixeles: number[][] = [];
+    const frecuencia = new Map<string, number>();
+    for (let i = 0; i < img.length; i += 4) {
+      const a = img[i + 3] / 255;
+      const c = [0, 1, 2].map((k) => Math.round(a * img[i + k] + (1 - a) * base[k]));
+      pixeles.push(c);
+      frecuencia.set(c.join(','), (frecuencia.get(c.join(',')) ?? 0) + 1);
+    }
+    const fondo = [...frecuencia.entries()].sort((a, b) => b[1] - a[1])[0][0].split(',').map(Number);
+    return Math.max(...pixeles.map((c) => razon(c, fondo)));
+  }, rotulo);
+}
+
+test.describe('Inspector 08/10/2026 — umbral −60, extremos de los controles y estímulo continuo', () => {
+  // A 2× el texto de 10-11 px del lienzo tiene trazos con cobertura total (es una opción del
+  // contexto, no fuerza un worker nuevo).
+  test.use({ deviceScaleFactor: 2 });
+
+  test('caso normal: umbral −60 mV, pulso de 3 ms e I = 30 dispara un PA a los 2,00 ms', async ({ page }) => {
+    // Las tres siembras parten de la fábrica (umbral −55, 5 ms, 20 u.a.): las tres mueven algo.
+    await sembrarValor(page, UMBRAL, -60);
+    await sembrarValor(page, DURACION, 3);
+    await sembrarValor(page, INTENSIDAD, 30);
+    await expect(etiquetaControl(page, 'Umbral de disparo')).toContainText('-60 mV');
+
+    // A mano (τ = 5 ms, paso 0,1 ms): V = −70 + 30·(1 − 0,98^k) supera −60 en k = 21 (−59,63;
+    // con k = 20 se queda en −60,03) → t = 7,0 ms, latencia 2,00 ms. Analítica: 5·ln(30/20) =
+    // 2,03 ms, que sobre la rejilla de 0,1 ms es 2,00 también con el factor exacto e^(−0,02).
+    await expect(barraEstado(page)).toContainText('La neurona DISPARA. 1 potencial de acción registrado.');
+    await expect(tarjeta(page, '¿Disparó?')).toHaveText('Sí');
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('1');
+    await expect(tarjeta(page, 'Latencia')).toHaveText('2,00 ms');
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('35,0 mV');
+    // Un solo pulso: no hay segundo PA y la tarjeta de frecuencia no sale.
+    await expect(page.locator('[class*="resultCard"]').filter({ hasText: 'Frecuencia de disparo' })).toHaveCount(0);
+
+    // Tarjeta del pulso: −70 + 30·(1 − e^(−3/5)) = −56,46 mV y 10/0,4512 = 22,16 u.a. La fórmula
+    // discreta que propone el 2953 daría −56,36 y 22,00: ±0,5 cubre las dos y caza el defecto
+    // que vigila esta tarjeta (979: anunciar la asíntota, −40 mV, en vez de lo alcanzado).
+    expect(await cifra(page, 'Despolarización del pulso')).toBeCloseTo(-56.45, 0);
+    const falta = await intensidadQueHaceFalta(page);
+    expect(falta).not.toBeNull();
+    expect(falta!).toBeCloseTo(22.1, 0);
+    expect(falta!).toBeLessThan(30); // coherente con el disparo
+  });
+
+  test('caso límite: en las dos esquinas de los controles no hay disparo posible', async ({ page }) => {
+    // Esquina 1: pulso mínimo (0,5 ms), umbral más permisivo (−65 mV), intensidad máxima (40).
+    await sembrarValor(page, DURACION, 0.5);
+    await sembrarValor(page, UMBRAL, -65);
+    await sembrarValor(page, INTENSIDAD, 40);
+    // A mano: 5 pasos de estímulo → −70 + 40·(1 − 0,98^5) = −66,16 mV (analítica −66,19): a
+    // 1,2 mV del umbral más bajo del control. Harían falta 5/(1 − e^(−0,1)) = 52,5 u.a., más
+    // que el tope del deslizador (40): con 0,5 ms la neurona no puede disparar nunca.
+    await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('0');
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-66,2 mV');
+    expect(await cifra(page, 'Despolarización del pulso')).toBeCloseTo(-66.2, 0);
+    expect((await intensidadQueHaceFalta(page))!).toBeGreaterThan(40);
+
+    // Esquina 2: pulso máximo (5 ms) y umbral más exigente (−40 mV), con la intensidad al tope.
+    await sembrarValor(page, DURACION, 5);
+    await sembrarValor(page, UMBRAL, -40);
+    // A mano: −70 + 40·(1 − 0,98^50) = −44,57 mV (analítica −44,72): no llega a −40. Harían falta
+    // 30/(1 − e^(−1)) = 47,5 u.a.: con umbral −40 el modo único no dispara con nada.
+    await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('0');
+    expect(await cifra(page, 'V_m máximo alcanzado')).toBeCloseTo(-44.65, 0);
+    expect(await cifra(page, 'Despolarización del pulso')).toBeCloseTo(-44.65, 0);
+    expect((await intensidadQueHaceFalta(page))!).toBeGreaterThan(40);
+    const panel = await page.locator('[class*="resultsPanel"]').innerText();
+    expect(panel).not.toMatch(/NaN|Infinity|∞|undefined/);
+  });
+
+  test('caso a rechazar: estímulo continuo justo en la asíntota (I = 15) no dispara; con 16 sí', async ({ page }) => {
+    await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
+    // Pulso de 5 ms cada 5 ms = estímulo continuo desde t = 5 ms (sale de 10 ms: mueve algo).
+    await sembrarValor(page, INTERVALO, 5);
+    await expect(etiquetaControl(page, 'Umbral de disparo')).toContainText('-55 mV');
+
+    // I = 15: la membrana tiende a −70 + 15 = −55 mV, que es el umbral EXACTO, y la condición de
+    // disparo es estricta (V > umbral): se acerca sin cruzarlo. En 45 ms llega a
+    // −70 + 15·(1 − 0,98^451) = −55,002 → «-55,0 mV» y ningún PA.
+    await sembrarValor(page, INTENSIDAD, 15);
+    await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+    await expect(tarjeta(page, '¿Disparó?')).toHaveText('No');
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('0');
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-55,0 mV');
+
+    // I = 16: asíntota −54 mV, por encima. Cruza cuando 16·(1 − 0,98^k) > 15 → k = 138 →
+    // latencia 13,70 ms (analítica 5·ln 16 = 13,86; con el factor exacto, 13,80). La plantilla de
+    // 8 ms y otros 13,8 de carga ponen el 2.º PA hacia 40,5 ms y ya no cabe un 3.º: 2 PA a
+    // ~46 Hz (1000/21,8). La horquilla cubre Euler y el factor exacto.
+    await sembrarValor(page, INTENSIDAD, 16);
+    await expect(barraEstado(page)).toContainText('La neurona DISPARA');
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('2');
+    const latencia = await cifra(page, 'Latencia');
+    expect(latencia).toBeGreaterThanOrEqual(13.6);
+    expect(latencia).toBeLessThanOrEqual(13.95);
+    const hz = await cifra(page, 'Frecuencia de disparo');
+    expect(hz).toBeGreaterThanOrEqual(44);
+    expect(hz).toBeLessThanOrEqual(48);
+  });
+
+  test('en modo sostenido, la tarjeta del pulso no pide más intensidad de la que ya dispara', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO (08/10/2026): «X u.a. harían falta» es la cuenta de UN pulso aislado; en modo sostenido los pulsos se suman y la neurona dispara con 21 (intervalo 10) mientras la tarjeta dice 23,7',
+    );
+    // Sostenido de fábrica (pulso 5 ms cada 10 ms, umbral −55) e I = 21.
+    await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
+    await expect(etiquetaControl(page, 'Intervalo entre pulsos')).toContainText('10,0 ms');
+    await sembrarValor(page, INTENSIDAD, 21);
+    // A mano: 1.er pulso → −70 + 21·0,6358 = −56,65 mV; 5 ms sin estímulo → −70 + 13,35·0,3642 =
+    // −65,14; el 2.º pulso parte de ahí y cruza −55 a los 4,9 ms (t = 19,8 ms, latencia 14,80).
+    // La tarjeta: 15/(1 − e^(−1)) = 23,7 u.a. «harían falta», con 21 disparando.
+    await expect(barraEstado(page)).toContainText('La neurona DISPARA');
+    await expect(tarjeta(page, 'Latencia')).toHaveText('14,80 ms');
+    const falta = await intensidadQueHaceFalta(page);
+    // Si la reparación quita la frase en modo sostenido, no hay contradicción posible.
+    if (falta !== null) expect(21).toBeGreaterThanOrEqual(falta);
+  });
+
+  test('2952 (REPARADO): los rótulos del lienzo llegan a 4,5:1 en modo único, en los dos temas', async ({ page }) => {
+    // Claro: «Umbral» #A82E68 y «Estímulo» #A3520A sobre #FAFAFA → 6,18:1 y 5,34:1.
+    await expect.poll(() => contrasteRotuloLienzo(page, 'Umbral')).toBeGreaterThanOrEqual(4.5);
+    await expect.poll(() => contrasteRotuloLienzo(page, 'Estímulo')).toBeGreaterThanOrEqual(4.5);
+    // Oscuro: #E58BB5 y #E07A1F sobre #1A1A1A → 7,20:1 y 5,78:1 (antes 2,70:1 el «Umbral»).
+    await page.addInitScript(() => localStorage.setItem('meskeia-theme', 'dark'));
+    await page.reload();
+    await esperarHidratacion(page, [INTENSIDAD, UMBRAL, DURACION]);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect.poll(() => contrasteRotuloLienzo(page, 'Umbral')).toBeGreaterThanOrEqual(4.5);
+    await expect.poll(() => contrasteRotuloLienzo(page, 'Estímulo')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('en modo sostenido el rótulo «Estímulo» del lienzo sigue legible (4,5:1) sobre la barra naranja', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO (08/10/2026): en modo sostenido el último pulso (45-50 ms) pinta la barra naranja al 60 % justo debajo del rótulo: 2,85:1 en claro y 2,03:1 en oscuro',
+    );
+    await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
+    await expect(etiquetaControl(page, 'Intervalo entre pulsos')).toContainText('10,0 ms');
+    // A mano, claro: barra #E07A1F al 60 % sobre #FAFAFA = rgb(234,173,119); texto #A3520A →
+    // 2,86:1. Oscuro: la barra sobre #1A1A1A = rgb(145,84,29); texto #E07A1F → 2,01:1. Es texto
+    // de 10 px: exige 4,5:1. La espera deja pasar la transición de tema de globals.css.
+    await expect.poll(() => contrasteRotuloLienzo(page, 'Estímulo')).toBeGreaterThanOrEqual(4.5);
+    await page.addInitScript(() => localStorage.setItem('meskeia-theme', 'dark'));
+    await page.reload();
+    await esperarHidratacion(page, [INTENSIDAD, UMBRAL, DURACION]);
+    await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
+    await expect.poll(() => contrasteRotuloLienzo(page, 'Estímulo')).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('en tema claro, el azul de marca como texto llega a 4,5:1 (valores de los controles y títulos del bloque educativo)', async ({ page }) => {
+    test.fail(
+      true,
+      'ABIERTO (08/10/2026): var(--primary) #2E86AB como texto de 16-16,8 px: 4,10:1 sobre la tarjeta blanca (valor de cada deslizador) y 3,93:1 sobre #FAFAFA (títulos de escenarios, pasos, consejos y preguntas)',
+    );
+    // A mano: #2E86AB sobre #FFFFFF = 4,11:1 y sobre #FAFAFA = 3,94:1. A 16,8 px en negrita no
+    // es texto grande (hace falta 18,66 px en negrita): exige 4,5:1. --primary-texto (#26718F)
+    // da 5,47:1 y 5,24:1.
+    await expect
+      .poll(async () => (await contrasteDe(page, 'label[for="estimulo-intensidad"] strong')).ratio)
+      .toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const consejo = page.locator('[class*="tipCard"] strong').first();
+    await expect(consejo).toBeVisible();
+    await expect
+      .poll(async () => (await contrasteDe(page, '[class*="tipCard"] strong')).ratio)
+      .toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('«Apps relacionadas» pinta sus 4 tarjetas en el HTML servido y tras hidratar, sin error de hidratación', async ({ page, request }) => {
+    // Refactor 99e1ee7e: page.tsx pinta <RelatedApps /> sin prop y layout.tsx monta
+    // <ConRelacionadas slug>. Las 4 de data/app-relations.ts deben viajar ya en el HTML.
+    const html = await (await request.get('/simulador-potencial-accion/')).text();
+    const servidas = (html.match(/href="\/[a-z0-9-]+\/#from=related-simulador-potencial-accion"/g) ?? []).map((h) =>
+      h.slice(6, -1),
+    );
+    expect(servidas).toHaveLength(4);
+
+    const errores: string[] = [];
+    page.on('console', (m) => {
+      if (m.type() === 'error') errores.push(m.text());
+    });
+    page.on('pageerror', (e) => errores.push(e.message));
+    await page.reload();
+    await esperarHidratacion(page, [INTENSIDAD, UMBRAL, DURACION]);
+    const enlaces = page.locator('a[href*="#from=related-simulador-potencial-accion"]');
+    await expect(enlaces).toHaveCount(4);
+    const hidratadas = await enlaces.evaluateAll((anclas) => anclas.map((a) => a.getAttribute('href') ?? ''));
+    expect(hidratadas).toEqual(servidas);
+    expect(errores.filter((e) => /hydrat|did not match|server rendered/i.test(e))).toEqual([]);
   });
 });

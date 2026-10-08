@@ -824,7 +824,16 @@ test.describe('Segunda inspección (07/10/2026) · hallazgos REPARADOS el 07/10/
     expect(tipos).toEqual(expect.arrayContaining(['WebApplication', 'FAQPage']));
     expect(html).toMatch(/<h1[^>]*>[^<]*Estimador de Cartera de Inversión/);
     expect(html).toContain('id="capitalInicial"');
-    expect(html).not.toContain('BAILOUT_TO_CLIENT_SIDE_RENDERING');
+    // Bajo `next start` el <Suspense fallback={null}> de LectorPerfilURL (la reparación del 2970)
+    // deja UNA frontera vacía con el digest BAILOUT en el prerender; bajo `next dev` no deja
+    // ninguna, y por eso un «not.toContain» pasaba en dev y fallaba en producción (inspector
+    // 08/10/2026). Lo que vigila el caso es que no se caiga la página ENTERA: como mucho una
+    // frontera, y vacía (no envuelve nada que se vea).
+    const bailouts = html.match(/BAILOUT_TO_CLIENT_SIDE_RENDERING/g) ?? [];
+    expect(bailouts.length).toBeLessThanOrEqual(1);
+    if (bailouts.length === 1) {
+      expect(html).toContain('<!--$!--><template data-dgst="BAILOUT_TO_CLIENT_SIDE_RENDERING"></template><!--/$-->');
+    }
   });
 
   test('CASO 17 · formato español: «Rent: 1.5%» con punto decimal y el % pegado', async ({ page }) => {

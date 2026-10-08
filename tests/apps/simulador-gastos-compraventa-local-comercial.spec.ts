@@ -4765,9 +4765,11 @@ test.describe('RE-INSPECCIÓN 07/10/2026 — La Rioja, el euro 50.001 de la base
     expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
   });
 
-  // ─── HALLAZGOS del 07/10/2026, ABIERTOS ──────────────────────────────────────────────
-  // Con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la del defecto son
-  // cifras que la reparación no debe mover; la del defecto lee y compara, sin reintento.
+  // ─── HALLAZGOS del 07/10/2026: [07/10-a] ABIERTO; [07/10-b] y [07/10-c] REPARADOS ─────────
+  // Se escribieron con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la
+  // del defecto son cifras que la reparación no debe mover; la del defecto lee y compara, sin
+  // reintento. [07/10-b] y [07/10-c] (2967 y 2968) se repararon el 07/10 (e8c8d2ca) y la
+  // re-inspección del 08/10/2026 los verificó en navegador: ya van sin la marca.
 
   // HALLAZGO [07/10-a] (medio, cálculo) — ❌ ABIERTO. La SOSPECHA de la inversa del 1261, con caso:
   // la regla «amortizaciones mayores que todo el coste de adquisición = no puede ser» rechaza la
@@ -4798,12 +4800,15 @@ test.describe('RE-INSPECCIÓN 07/10/2026 — La Rioja, el euro 50.001 de la base
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).not.toBe('Sin calcular');
   });
 
-  // HALLAZGO [07/10-b] (medio, dato) — ✅ REPARADO el 07/10/2026 (RESPUESTA_IMPUESTO_COMPRA). Efecto familia del 714 (trastero) y el 670 (garaje):
-  // la respuesta a «qué impuesto se paga al comprar», en el FAQPage y en la FAQ visible, dice «se paga
-  // IVA al 21 % más AJD» sin excepción territorial, y el FAQPage mete a Ceuta y Melilla en esa misma
+  // HALLAZGO [07/10-b] (medio, dato) — ✅ REPARADO el 07/10/2026 (RESPUESTA_IMPUESTO_COMPRA, e8c8d2ca),
+  // verificado el 08/10/2026. Efecto familia del 714 (trastero) y el 670 (garaje). Era así: la
+  // respuesta a «qué impuesto se paga al comprar», en el FAQPage y en la FAQ visible, decía «se paga
+  // IVA al 21 % más AJD» sin excepción territorial, y el FAQPage metía a Ceuta y Melilla en esa misma
   // frase («en Ceuta y Melilla se paga la mitad»). La propia app responde allí «En Ciudad Autónoma de
-  // Ceuta no rige el IVA: la compra de obra nueva tributa por el IPSI». «IGIC» e «IPSI» no aparecen en
-  // todo metadata.ts; nave, solar, garaje, trastero y terreno sí lo dicen en su FAQPage.
+  // Ceuta no rige el IVA: la compra de obra nueva tributa por el IPSI». «IGIC» e «IPSI» no aparecían en
+  // todo metadata.ts; nave, solar, garaje, trastero y terreno sí lo decían en su FAQPage.
+  // ⚠️ El `toBe` de la tarjeta del IPSI fija el texto SIN artículo («En Ciudad Autónoma de Ceuta»),
+  // que es el hallazgo [08/10-f]: al repararlo, este literal cambia con él.
   test('[07/10-b] el FAQPage y la FAQ visible dicen que en Canarias, Ceuta y Melilla no rige el IVA', async ({ page }) => {
     await page.selectOption('#select-ccaa', 'ceuta');
     await sembrarImporte12(page, 'Precio del local comercial', '200000');
@@ -4824,11 +4829,13 @@ test.describe('RE-INSPECCIÓN 07/10/2026 — La Rioja, el euro 50.001 de la base
     });
   });
 
-  // HALLAZGO [07/10-c] (bajo, contenido) — ✅ REPARADO el 07/10/2026 (una constante, dos bocas). La misma pregunta, dos respuestas escritas
-  // aparte: «¿Se paga IVA o ITP al comprar un local comercial?» (visible) y «¿Qué impuesto se paga al
-  // comprar un local comercial?» (FAQPage). La del FAQPage da los rangos del AJD y del ITP y la
-  // bonificación de Ceuta y Melilla; la visible, la excepción de la renuncia. La reparación es UNA
-  // constante en metadata.ts que importen las dos bocas (como simulador-gastos-compraventa-garaje).
+  // HALLAZGO [07/10-c] (bajo, contenido) — ✅ REPARADO el 07/10/2026 (una constante, dos bocas),
+  // verificado el 08/10/2026. Era así: la misma pregunta tenía dos respuestas escritas aparte, «¿Se
+  // paga IVA o ITP al comprar un local comercial?» (visible) y «¿Qué impuesto se paga al comprar un
+  // local comercial?» (FAQPage). La del FAQPage daba los rangos del AJD y del ITP y la bonificación de
+  // Ceuta y Melilla; la visible, la excepción de la renuncia. La reparación fue UNA constante en
+  // metadata.ts (RESPUESTA_IMPUESTO_COMPRA) que importan las dos bocas. La pareja de la RENUNCIA sigue
+  // escrita dos veces: es el hallazgo [08/10-d].
   test('[07/10-c] la pregunta del impuesto de la compra tiene UNA respuesta en las dos bocas', async ({ page }) => {
     const faq = await faqPage0710(page);
     const jsonLd = faq.get('¿Qué impuesto se paga al comprar un local comercial?') ?? '';
@@ -4888,5 +4895,398 @@ test.describe('RE-INSPECCIÓN 07/10/2026 — 390 px', () => {
     expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES (PARCIAL)');
     expect((await valorTarjeta(page, /^NETO QUE RECIBES/)).replace('−', '-')).toBe('-40.900,00 €');
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 08/10/2026 — re-inspección tras e8c8d2ca (2967 y 2968) y 99e1ee7e (relacionadas
+// pintadas por el layout), con la familia «Compraventa inmobiliaria» entera en la misma tanda.
+//
+// Batería previa en verde; [06/10-a] (2911) y [07/10-a] (2966) siguen con `test.fail()` porque
+// siguen ABIERTOS en la base. [07/10-b] y [07/10-c] ya van sin la marca y pasan (verificado).
+//
+// De dónde sale CADA cifra de los casos nuevos (resueltos a mano ANTES de ejecutar la app):
+//   · Aragón: escala del art. 121-1 (8 % hasta 400.000 · 8,5 % hasta 450.000 · 9 % hasta 500.000 ·
+//     9,5 % hasta 750.000 · 10 % el resto), `ITP_CCAA.aragon.tramosProgresivos`; AJD 1,5 %
+//     (`ITP_CCAA.aragon.ajd`), sin tipo propio de la renuncia.
+//   · IVA del local: `IVA_INMUEBLES_2025.local` = 21.
+//   · Plusvalía: `COEFICIENTES_IIVTNU_2025` (3 años 0,14 · 10 años 0,12) × 25 % orientativo
+//     (`PLUSVALIA_MUNICIPAL_META.tipoOrientativo`); método real del art. 107.5 TRLRHL.
+//   · IRPF: `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 · 21 % hasta 50.000 · 23 % hasta
+//     200.000) sobre el art. 35 LIRPF; amortizaciones del alquiler, art. 35.2 LIRPF.
+//   · CEUTA Y MELILLA, en el BOE consolidado leído el 08/10/2026:
+//       - art. 68.4 LIRPF (BOE-A-2006-20764): «se considerarán rentas obtenidas en Ceuta o Melilla
+//         […] d) Las ganancias patrimoniales que procedan de bienes inmuebles radicados en Ceuta o
+//         Melilla», y tanto los residentes (1.º a) como los no residentes (2.º, que solo excluye las
+//         letras a, e e i) «se deducirán el 60 por ciento de la parte de la suma de las cuotas
+//         íntegras estatal y autonómica que proporcionalmente corresponda» a esas rentas.
+//       - art. 159.2 TRLRHL (BOE-A-2004-4214): «Las cuotas tributarias correspondientes a los
+//         impuestos municipales regulados en esta ley serán objeto de una bonificación del 50 por
+//         ciento.» El IIVTNU es uno de ellos (arts. 104-110).
+//   · IRPF foral: Ley 12/2002 del Concierto Económico (BOE-A-2002-9969), art. 6.Uno: «El Impuesto
+//     sobre la Renta de las Personas Físicas es un tributo concertado de normativa autónoma. Su
+//     exacción corresponderá a la Diputación Foral competente […] cuando el contribuyente tenga su
+//     residencia habitual en el País Vasco»; Ley 28/1990 del Convenio con Navarra (BOE-A-1990-31117),
+//     art. 9.1: «Corresponde a la Comunidad Foral la exacción del Impuesto sobre la Renta de las
+//     Personas Físicas de los sujetos pasivos que tengan su residencia habitual en Navarra».
+//   · Notaría y registro NO se fijan (hallazgos 2901 y 2902, abiertos en la referencia): se exige
+//     que el total cuadre con las líneas visibles (`totalCuadra0610`).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Abre la app y espera a que React escuche, recogiendo los errores de la consola. */
+async function abrir0810(page: Page): Promise<string[]> {
+  const errores: string[] = [];
+  page.on('console', (m) => {
+    if (m.type() === 'error') errores.push(m.text());
+  });
+  page.on('pageerror', (e) => errores.push(e.message));
+  await page.goto(RUTA);
+  await esperarHidratacion(page, TESTIGOS_12_09);
+  return errores;
+}
+
+/** El texto del recuadro que sustituye al desglose cuando no hay precio que calcular. */
+async function avisoSinDesglose0810(page: Page): Promise<string> {
+  const p = page.locator('div[class*="placeholder"] > p').first();
+  return ((await p.innerText()) ?? '').replace(ESPACIO_DURO, ' ').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * El vendedor de la base del testigo SIN amortizaciones, en la comunidad que se pida:
+ *   200.000 · compra 150.000 · gastos 15.000 · 10 años · suelo 40.000 · total 100.000 · comisión 3 % ·
+ *   gestoría 500 · perfil «Local no afecto».
+ *   plusvalía objetivo = 40.000 × 0,12 × 25 % = 1200,00 (real 50.000 × 0,4 × 25 % = 5.000)
+ *   transmisión 200.000 − 6.000 − 500 − 1.200 = 192.300 · adquisición 165.000 · ganancia 27.300
+ *   IRPF = 1.140 + 21.300 × 21 % = 5613,00 · neto 200.000 − 13.313 = 186.687,00
+ */
+async function vendedorSinAmortizar0810(page: Page, ccaa: string): Promise<void> {
+  await page.selectOption('#select-ccaa', ccaa);
+  await sembrarImporte12(page, 'Precio del local comercial', '200000');
+  await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+  await sembrarImporte12(page, 'Precio de compra original', '150000');
+  await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '15000');
+  await sembrarImporte12(page, 'Años de propiedad', '10');
+  await sembrarImporte12(page, 'Valor catastral del suelo (€)', '40000');
+  await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '100000');
+  await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3');
+  await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '500');
+}
+
+const PREGUNTA_RENUNCIA_FAQPAGE_0810 = '¿Qué es la renuncia a la exención de IVA en la compra de un local?';
+const PREGUNTA_RENUNCIA_VISIBLE_0810 = '¿Qué es la renuncia a la exención de IVA y a quién le interesa?';
+
+test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de Ceuta, el precio en cero y las dos bocas de la renuncia', () => {
+  // ══════════════════════════════════════════════════════════════════════════
+  // REPARADO 99e1ee7e — «Apps relacionadas» la pinta ahora el layout (<ConRelacionadas slug>) y la
+  // página monta <RelatedApps /> sin prop. Las cuatro tarjetas de data/app-relations.ts (nave,
+  // solar, rústico y la referencia) tienen que estar en el HTML SERVIDO, seguir tras hidratar y no
+  // dejar errores de hidratación en la consola.
+  // ══════════════════════════════════════════════════════════════════════════
+  test('REPARADO 99e1ee7e — las cuatro relacionadas en el HTML servido y tras hidratar, sin error de hidratación', async ({ page, request }) => {
+    const html = await (await request.get(RUTA)).text();
+    expect(html.match(/aria-label="Ir a [^"]+"/g)).toEqual([
+      'aria-label="Ir a Gastos Nave Industrial"',
+      'aria-label="Ir a Gastos Solar"',
+      'aria-label="Ir a Gastos Finca Rústica"',
+      'aria-label="Ir a Gastos Compraventa Vivienda"',
+    ]);
+    const errores = await abrir0810(page);
+    const tarjetas = page.locator('section[aria-label="Aplicaciones relacionadas"] a');
+    await expect(tarjetas).toHaveCount(4);
+    await expect(tarjetas.first()).toHaveAttribute(
+      'href',
+      '/simulador-gastos-compraventa-nave-industrial/#from=related-simulador-gastos-compraventa-local-comercial',
+    );
+    expect(errores.filter((e) => /hydrat|did not match|server rendered|Minified React error #(418|419|422|423|425)/i.test(e))).toEqual([]);
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 42 (NORMAL) — ARAGÓN, local de 620.000 €: la escala del art. 121-1 recorrida en CUATRO
+  // tramos (el CASO 17 solo pisaba el primero), y un vendedor que lo tuvo ALQUILADO tres años.
+  //   2ª mano: 400.000 × 8 % + 50.000 × 8,5 % + 50.000 × 9 % + 120.000 × 9,5 %
+  //          = 32.000 + 4.250 + 4.500 + 11.400 = 52.150,00 → «ITP (8,41 %)» (52.150 / 620.000)
+  //   Obra nueva: IVA 21 % = 130.200,00 + AJD 1,5 % = 9300,00. Renuncia: el mismo IVA y el AJD
+  //   general («AJD general de Aragón»), porque Aragón no tiene tipo propio de la renuncia.
+  //   VENDEDOR «Local no afecto»: compra 450.000 · gastos 36.000 · amortizaciones del alquiler 27.000
+  //     · 3 años · suelo 120.000 · total 400.000 · comisión 3 % · gestoría 1.000
+  //     plusvalía objetivo = 120.000 × 0,14 × 25 % = 4200,00 ; real = 170.000 × 0,3 × 25 % = 12.750
+  //     transmisión = 620.000 − 18.600 − 1.000 − 4.200 =                         596.200,00
+  //     adquisición = 450.000 + 36.000 − 27.000 =                                 459.000,00
+  //     ganancia 137.200 → IRPF = 1.140 + 9.240 + 87.200 × 23 % =                  30.436,00
+  //     total = 4.200 + 18.600 + 1.000 + 30.436 = 54.236,00 (8,75 %) · NETO       565.764,00
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 42 (normal) — Aragón 620.000 €: cuatro tramos de la escala, IVA + AJD 1,5 %, y un vendedor que lo tuvo alquilado', async ({ page }) => {
+    expect(ITP_CCAA.aragon.tramosProgresivos).toEqual([
+      { hasta: 400000, tipo: 8 },
+      { hasta: 450000, tipo: 8.5 },
+      { hasta: 500000, tipo: 9 },
+      { hasta: 750000, tipo: 9.5 },
+      { hasta: Infinity, tipo: 10 },
+    ]);
+    expect(ITP_CCAA.aragon.ajd).toBe(1.5);
+    expect(ITP_CCAA.aragon.ajdRenuncia).toBeUndefined();
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 3)?.coeficiente).toBe(0.14);
+
+    await abrir0810(page);
+    await page.selectOption('#select-ccaa', 'aragon');
+    await sembrarImporte12(page, 'Precio del local comercial', '620000');
+    await esperarTarjeta2609(page, /^ITP/, '52.150,00 €');
+    expect(await tituloTarjeta24(page, /^ITP/)).toBe('ITP (8,41 %)');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    await totalCuadra0610(page, 620000, [/^ITP/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('8,75 % sobre el precio de compra');
+
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await esperarTarjeta2609(page, /^IVA \(21/, '130.200,00 €');
+    expect(await tituloTarjeta24(page, /^AJD/)).toBe('AJD (1,50 %)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('9300,00 €');
+    await totalCuadra0610(page, 620000, [/^IVA/, /^AJD/, 'Gastos de notaría', 'Registro de la Propiedad', 'Gastos de gestoría']);
+
+    await page.getByRole('button', { name: /2ª mano con renuncia/ }).click();
+    await esperarTarjeta2609(page, /^IVA \(renuncia/, '130.200,00 €');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('9300,00 €');
+    expect(await descripcionTarjeta(page, /^AJD/)).toBe(
+      'AJD general de Aragón: algunas comunidades aplican un tipo incrementado en la renuncia',
+    );
+
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await expect(page.getByRole('button', { name: /Local no afecto/ })).toHaveAttribute('aria-pressed', 'true');
+    await sembrarImporte12(page, 'Precio de compra original', '450000');
+    await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '36000');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '27000');
+    await sembrarImporte12(page, 'Años de propiedad', '3');
+    await sembrarImporte12(page, 'Valor catastral del suelo (€)', '120000');
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '400000');
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3');
+    await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '1000');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('4200,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe(
+      'Método objetivo (más favorable), tipo municipal orientativo del 25 %',
+    );
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('459.000,00 €');
+    expect(await descripcionTarjeta(page, 'Valor de adquisición')).toBe(
+      'Precio de compra + impuestos y gastos de aquella compra − 27.000,00 € de amortizaciones deducidas',
+    );
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('596.200,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('137.200,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('30.436,00 €');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('18.600,00 €');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('54.236,00 €');
+    expect(await descripcionTarjeta(page, 'Total gastos de la venta')).toBe('8,75 % sobre el precio de venta');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('565.764,00 €');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 43 (LÍMITE territorial) — CEUTA, el vendedor. Lo que la app hace bien y no depende del
+  // territorio: el valor de adquisición, la comisión y la ganancia sobre la plusvalía que publica.
+  // Las dos rebajas de Ceuta y Melilla que NO aplica van abajo como [08/10-a] y [08/10-b].
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 43 (límite) — Ceuta, vendedor: las partidas que no dependen del territorio', async ({ page }) => {
+    await abrir0810(page);
+    await vendedorSinAmortizar0810(page, 'ceuta');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('165.000,00 €');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('6000,00 €');
+    // La ganancia es la transmisión menos la adquisición con la plusvalía que se PUBLICA.
+    const plusvalia = centimos0610(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)'));
+    expect(centimos0610(await valorTarjeta(page, 'Valor de transmisión'))).toBe(20000000 - 600000 - 50000 - plusvalia);
+    expect(centimos0610(await valorTarjeta(page, 'Ganancia patrimonial'))).toBe(20000000 - 600000 - 50000 - plusvalia - 16500000);
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 44 (RECHAZO) — un precio que no vale no publica desglose: «0», «-5000» con el foco dentro,
+  // «0,004» (se pinta 0,00 €, hallazgo 1601) e ilegible. Lo que dice el recuadro con el 0 escrito
+  // es el hallazgo [08/10-c].
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 44 (rechazo) — precio 0, negativo con el foco o 0,004: ningún desglose en los dos paneles', async ({ page }) => {
+    await abrir0810(page);
+    await sembrarImporte12(page, 'Precio del local comercial', '0');
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await expect(page.locator('h3', { hasText: /^NETO QUE RECIBES/ })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Comprador', exact: true }).click();
+
+    await sembrarImporte12(page, 'Precio del local comercial', '-5000', { blur: false });
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+    await page.locator('input[aria-label="Precio del local comercial"]').blur();
+    // El min = 0 del NumberInput lo deja en 0 al salir: sigue sin desglose.
+    await expect(page.locator('input[aria-label="Precio del local comercial"]')).toHaveValue('0');
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+
+    await sembrarImporte12(page, 'Precio del local comercial', '0,004');
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+
+    await sembrarImporte12(page, 'Precio del local comercial', ILEGIBLE_2309);
+    expect(await avisoSinDesglose0810(page)).toBe(
+      'No se ha podido leer el precio «2.000.50». Introduce el precio del local comercial con coma decimal (200.000 o 200000,50) para ver el desglose de gastos',
+    );
+  });
+
+  // REPARADO 2967 (la parte de la RENUNCIA): las dos respuestas sobre la renuncia llevan la salvedad
+  // de Ceuta y Melilla, donde la app deshabilita el botón (hallazgo 1584).
+  test('REPARADO 2967 — las dos respuestas de la renuncia dicen que no existe en Ceuta y Melilla, como el botón', async ({ page }) => {
+    await abrir0810(page);
+    const faq = await faqPage0710(page);
+    expect(faq.get(PREGUNTA_RENUNCIA_FAQPAGE_0810)).toContain('La renuncia no existe en Ceuta y Melilla');
+    expect(await faqVisible0710(page, PREGUNTA_RENUNCIA_VISIBLE_0810)).toContain('No existe en Ceuta y Melilla');
+    await page.selectOption('#select-ccaa', 'melilla');
+    await expect(page.getByRole('button', { name: /2ª mano con renuncia/ })).toBeDisabled();
+  });
+
+  // ─── HALLAZGOS del 08/10/2026, ABIERTOS ──────────────────────────────────────────────
+  // Con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la del defecto son
+  // cifras o textos que la reparación no debe mover; la del defecto lee y compara, sin reintento.
+
+  // HALLAZGO [08/10-a] (alto, cálculo) — ❌ ABIERTO. El IRPF de la ganancia de un local SITUADO en
+  // Ceuta o Melilla se liquida entero: la app no aplica la deducción del 60 % del art. 68.4 LIRPF,
+  // que alcanza a esa ganancia («d) Las ganancias patrimoniales que procedan de bienes inmuebles
+  // radicados en Ceuta o Melilla») resida donde resida el vendedor en territorio común (1.º a y 2.º,
+  // que solo excluye las letras a, e e i). La app sabe dónde está el local —es su selector— y en
+  // Ceuta publica las mismas cifras que en Madrid.
+  //   Ceuta · base sin amortizaciones → cuota íntegra 5.613 (sobre la ganancia de 27.300 que publica)
+  //   − 60 % = 2245,20 ; o 2295,60 si antes se repara [08/10-b] (plusvalía 600, ganancia 27.900,
+  //   cuota 1.140 + 21.900 × 21 % = 5.739, × 40 %). Obtenido: 5613,00 € como definitivo.
+  test('[08/10-a] Ceuta: el IRPF de la ganancia de un local situado allí lleva la deducción del 60 % (art. 68.4 LIRPF)', async ({ page }) => {
+    test.fail();
+    await abrir0810(page);
+    await vendedorSinAmortizar0810(page, 'ceuta');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('165.000,00 €');
+    // El defecto (lee y compara, sin reintento).
+    expect(['2245,20 €', '2295,60 €']).toContain(await valorTarjeta(page, 'IRPF sobre la ganancia'));
+  });
+
+  // HALLAZGO [08/10-b] (medio, cálculo) — ❌ ABIERTO. La plusvalía municipal de un local en Ceuta o
+  // Melilla se liquida sin la bonificación del 50 % del art. 159.2 TRLRHL («Las cuotas tributarias
+  // correspondientes a los impuestos municipales regulados en esta ley serán objeto de una
+  // bonificación del 50 por ciento»). `calcularPlusvaliaMunicipal` no recibe la comunidad.
+  //   Ceuta · base sin amortizaciones → objetivo 40.000 × 0,12 × 25 % = 1.200 (el real, 5.000, es
+  //   mayor) → con la bonificación 600,00 · obtenido 1200,00 €, igual que en Madrid.
+  test('[08/10-b] Ceuta: la plusvalía municipal lleva la bonificación del 50 % de la cuota (art. 159.2 TRLRHL)', async ({ page }) => {
+    test.fail();
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.12);
+    await abrir0810(page);
+    await vendedorSinAmortizar0810(page, 'ceuta');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('6000,00 €');
+    // El defecto.
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('600,00 €');
+  });
+
+  // HALLAZGO [08/10-c] (bajo, contenido) — ❌ ABIERTO. Patrón 5 en el PRECIO principal, el 2960 de
+  // la referencia: con «0» escrito (o «-5000» con el foco dentro, que el blur deja en 0) los dos
+  // paneles piden que se introduzca el precio, como si el campo estuviera vacío. Solar, nave y
+  // terreno ya lo distinguen («El precio escrito («0») tiene que ser mayor que 0: corrígelo…»).
+  //   obtenido: «Introduce el precio del local comercial para ver el desglose de gastos» (comprador) y
+  //   «Introduce el precio de venta del local para ver lo que te queda tras impuestos» (vendedor).
+  test('[08/10-c] un precio escrito como 0 se nombra como no válido, no como que falta', async ({ page }) => {
+    test.fail();
+    await abrir0810(page);
+    await sembrarImporte12(page, 'Precio del local comercial', '0');
+    await expect(page.locator('input[aria-label="Precio del local comercial"]')).toHaveValue('0');
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+    const comprador = await avisoSinDesglose0810(page);
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    const vendedor = await avisoSinDesglose0810(page);
+    // El defecto.
+    expect({ comprador: /mayor que 0/.test(comprador), vendedor: /mayor que 0/.test(vendedor) }).toEqual({
+      comprador: true,
+      vendedor: true,
+    });
+  });
+
+  // HALLAZGO [08/10-d] (bajo, contenido) — ❌ ABIERTO. La forma del 2968 en la otra pareja: «¿Qué es la
+  // renuncia a la exención de IVA y a quién le interesa?» (visible) y «¿Qué es la renuncia a la
+  // exención de IVA en la compra de un local?» (FAQPage) son la misma pregunta con dos respuestas
+  // escritas aparte; e8c8d2ca tuvo que añadir la misma salvedad de Ceuta y Melilla DOS veces. La
+  // reparación es UNA constante en metadata.ts que importen las dos bocas.
+  test('[08/10-d] la pregunta de qué es la renuncia tiene UNA respuesta en las dos bocas', async ({ page }) => {
+    test.fail();
+    await abrir0810(page);
+    const jsonLd = (await faqPage0710(page)).get(PREGUNTA_RENUNCIA_FAQPAGE_0810) ?? '';
+    const visible = await faqVisible0710(page, PREGUNTA_RENUNCIA_VISIBLE_0810);
+    expect(jsonLd.length).toBeGreaterThan(0);
+    expect(visible.length).toBeGreaterThan(0);
+    // El defecto.
+    expect(visible).toBe(jsonLd);
+  });
+
+  // HALLAZGO [08/10-e] (bajo, dato) — ❌ ABIERTO. Las dos respuestas sobre la renuncia dicen que la
+  // operación pasa a «IVA al 21 %» y solo exceptúan Ceuta y Melilla; en Canarias la renuncia existe
+  // pero es a la exención del IGIC, y la propia app lo dice en el botón («2ª mano con renuncia IGIC»),
+  // en el aviso y en la tarjeta («IGIC · No calculado»). RESPUESTA_IMPUESTO_COMPRA dice además que el
+  // simulador no calcula allí «el impuesto de la obra nueva», cuando tampoco calcula el IGIC de la
+  // renuncia. nave-industrial y terreno-rustico ya lo dicen en su FAQPage («En Canarias la renuncia
+  // existe igual, sobre la exención del IGIC»).
+  test('[08/10-e] las respuestas de la renuncia dicen que en Canarias es a la exención del IGIC', async ({ page }) => {
+    test.fail();
+    await abrir0810(page);
+    await page.selectOption('#select-ccaa', 'canarias');
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    await page.getByRole('button', { name: /2ª mano con renuncia/ }).click();
+    await esperarTarjeta2609(page, /^IGIC$/, 'No calculado');
+    expect(await descripcionTarjeta(page, /^IGIC$/)).toBe(
+      'En Canarias no rige el IVA: la renuncia a la exención tributa por el IGIC, que este simulador no calcula',
+    );
+    const jsonLd = (await faqPage0710(page)).get(PREGUNTA_RENUNCIA_FAQPAGE_0810) ?? '';
+    const visible = await faqVisible0710(page, PREGUNTA_RENUNCIA_VISIBLE_0810);
+    expect(jsonLd).toContain('IVA al 21 %');
+    // El defecto.
+    expect({ jsonLd: /Canarias[^.]*IGIC/.test(jsonLd), visible: /Canarias[^.]*IGIC/.test(visible) }).toEqual({
+      jsonLd: true,
+      visible: true,
+    });
+  });
+
+  // HALLAZGO [08/10-f] (bajo, contenido) — ❌ ABIERTO. El nombre de la comunidad de `ITP_CCAA.nombre`
+  // se interpola sin artículo: «en Ciudad Autónoma de Ceuta no rige el IVA», «En Ciudad Autónoma de
+  // Ceuta no se aplica el IVA… la administración tributaria de Ciudad Autónoma de Ceuta»
+  // (AvisoTerritorioSinIva, común), «AJD general de Comunidad de Madrid», «En Comunidad Valenciana
+  // es del 2 %», «Comunidad Foral de Navarra», «Región de Murcia». Es la sospecha del 06/10 (c),
+  // medida aquí: sale en pantalla.
+  test('[08/10-f] el nombre de la comunidad lleva su artículo en las frases que lo interpolan', async ({ page }) => {
+    test.fail();
+    const sinArticulo = /(?:^|[\s(])(?:[Ee]n|de) (?:Ciudad Autónoma|Comunidad|Región) /;
+    await abrir0810(page);
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await esperarTarjeta2609(page, /^IPSI/, 'No calculado');
+    const ipsi = await descripcionTarjeta(page, /^IPSI/);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await page.getByRole('button', { name: /2ª mano con renuncia/ }).click();
+    await esperarTarjeta2609(page, /^AJD/, '1500,00 €');
+    const ajdMadrid = await descripcionTarjeta(page, /^AJD/);
+    // El defecto.
+    expect({ ipsi: sinArticulo.test(ipsi), ajdMadrid: sinArticulo.test(ajdMadrid) }).toEqual({
+      ipsi: false,
+      ajdMadrid: false,
+    });
+  });
+
+  // HALLAZGO [08/10-g] (medio, dato) — ❌ ABIERTO. El IRPF de la ganancia se liquida con la escala del
+  // ahorro de territorio común (arts. 66 y 76 LIRPF) y la página no dice en ningún sitio que con
+  // residencia en el País Vasco o en Navarra el IRPF es foral (Concierto, art. 6.Uno; Convenio, art.
+  // 9.1). El sello del IRPF afirma lo contrario: «Toda ganancia patrimonial por transmisión tributa
+  // con esta escala». La residencia del vendedor no es la ubicación del local, así que el caso va en
+  // Madrid, donde hoy la palabra «foral» no sale en toda la página (tampoco en lo plegado).
+  test('[08/10-g] la página avisa de que con residencia en el País Vasco o Navarra el IRPF de la ganancia es foral', async ({ page }) => {
+    test.fail();
+    await abrir0810(page);
+    await vendedorSinAmortizar0810(page, 'madrid');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('5613,00 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toBe(
+      'Base del ahorro (19–30 %). Un local no tiene exención por reinversión ni por edad.',
+    );
+    // El defecto.
+    // Todo el texto de la página, también lo plegado del bloque educativo, sin los scripts (el JSON-LD).
+    const texto = await page.evaluate(() => {
+      const copia = document.body.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('script, style, noscript').forEach((n) => n.remove());
+      return copia.textContent ?? '';
+    });
+    expect(/foral/i.test(texto)).toBe(true);
   });
 });

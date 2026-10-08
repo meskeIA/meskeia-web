@@ -67,7 +67,13 @@
  *    salieron en las hermanas. Las cifras de notaría y registro NO se fijan en los casos
  *    nuevos: los hallazgos 2901 y 2902 (rebaja del 5 % de los dos aranceles, abiertos en la
  *    referencia) las cambiarán; se comprueba que el desglose CUADRA con ellas. Dos hallazgos
- *    bajos al final, con `test.fail()`.
+ *    bajos (2914 y 2915), REPARADOS ese mismo día: sus tests perdieron el `test.fail()`.
+ *  · 08/10/2026 — INSPECCIÓN como hermana de la familia (único cambio de código desde el 06/10:
+ *    99e1ee7e, las relacionadas montadas desde el layout). Casos nuevos: Asturias 420.000 € en
+ *    el segundo tramo de su escala, Melilla en obra nueva a 7.000.000 € (IPSI sin calcular, AJD
+ *    bonificado, notaría de libre acuerdo y gestoría ilegible a la vez) y la renuncia elegida en
+ *    Galicia que Melilla rechaza; las relacionadas en el HTML servido y tras hidratar, y cinco
+ *    hallazgos al final con `test.fail()` salvo con `VER_HUECOS=1`.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -102,9 +108,10 @@
  * Todos los casos están resueltos a mano ANTES de ejecutar la app; el desarrollo va comentado
  * junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS ABIERTOS a 06/10/2026: los dos de la re-inspección de ese día, al final del fichero
- * con `test.fail()`. Los anteriores se escribieron igual, afirmando lo que DEBERÍA pasar, y al
- * repararse perdieron la marca y se quedaron como regresión en los bloques que llevan su fecha.
+ * Los dos hallazgos de la re-inspección del 06/10/2026 (2914 y 2915) se repararon ese mismo día y
+ * se quedaron como regresión. HALLAZGOS ABIERTOS a 08/10/2026: los cinco de la inspección de ese
+ * día, al final del fichero con `test.fail()`. Todos se escriben igual, afirmando lo que DEBERÍA
+ * pasar, y al repararse pierden la marca y se quedan como regresión en el bloque de su fecha.
  */
 import { test, expect, Page } from '@playwright/test';
 import {
@@ -5862,5 +5869,364 @@ test.describe('Re-inspección 06/10/2026 — familia: casos nuevos, invariante y
     const recuadro = await recuadroCcaa(page);
     expect(recuadro).toContain('ITP General 6,5%');
     expect(recuadro).not.toMatch(/más bajo de España junto con País Vasco/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 08/10/2026 — hermana de la familia «Compraventa inmobiliaria» (referencia:
+// estimador-compraventa-inmueble). Único cambio de código desde el 06/10: 99e1ee7e (page.tsx pinta
+// `<RelatedApps />` sin prop y layout.tsx monta `<ConRelacionadas slug>`).
+//
+// Los tres casos se resolvieron a mano ANTES de abrir el navegador, con las tablas de
+// `data/itp-ccaa.ts` y `data/fiscal/inmuebles.ts`:
+//  - Asturias: `tramosProgresivos` 8 % hasta 300.000, 9 % hasta 500.000, 10 % el resto; `ajd: 1.2`.
+//  - Melilla: `tipoGeneral: 6`, `ajd: 0.5`, × (1 − `BONIFICACION_CUOTA_CEUTA_MELILLA`) = la mitad;
+//    IPSI sin calcular (`TERRITORIOS_SIN_IVA`) y notaría y registro sin IVA (`honorariosLlevanIVA`).
+//  - Galicia: `tipoGeneral: 8`, `ajd: 1.5`, sin `ajdRenuncia`. IVA de la nave: `IVA_INMUEBLES_2025.local = 21`.
+//  - Notaría: `ARANCELES_NOTARIO` hasta `LIMITE_ARANCEL_NOTARIAL` (6.010.121,04 €), × 1,5 / 1,75 / 2.
+//
+// ⚠️ Notaría y registro, a mano y con el motor de hoy: Asturias 420.000 € → 991,91 € (850,21–1133,61)
+// y 316,08 €; Melilla 7.000.000 € (sin IPSI) → 3817,93 € (3272,51–4363,34) y 1595,33 €; Melilla
+// 250.000 € (sin IPSI) → 671,01 € (575,15–766,87) y 210,23 €. La app da esas cifras al céntimo, y
+// las tres arrastran los hallazgos de familia 2901 y 2902 (sin la rebaja del 5 % de los aranceles:
+// con ella, Asturias 420.000 € serían 942,31 € y 300,83 €). Como el 06/10, NO se fijan: se
+// comprueba que el desglose CUADRA con ellas (`cuadraElDesglose`).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** `VER_HUECOS=1` quita la marca de los hallazgos abiertos y enseña por qué fallan. */
+const I08_VER_HUECOS = Boolean(process.env.VER_HUECOS);
+
+/** Las preguntas de la FAQ visible, leídas del DOM (la guía nace plegada, pero se renderiza). */
+async function faqVisible(page: Page): Promise<{ q: string; a: string }[]> {
+  return page.evaluate(() => {
+    const h2 = Array.from(document.querySelectorAll('h2')).find((x) =>
+      /Preguntas frecuentes — Compra de nave industrial/.test(x.textContent ?? ''),
+    );
+    const bloques = Array.from(h2?.parentElement?.querySelectorAll(':scope > div > div') ?? []);
+    return bloques.map((d) => ({
+      q: (d.querySelector('strong')?.textContent ?? '').replace(/\s+/g, ' ').trim(),
+      a: Array.from(d.querySelectorAll('p'))
+        .map((p) => (p.textContent ?? '').replace(/\s+/g, ' ').trim())
+        .join(' '),
+    }));
+  });
+}
+
+/** Las preguntas del FAQPage que la página sirve en su `<script type="application/ld+json">`. */
+async function faqPage(page: Page): Promise<{ q: string; a: string }[]> {
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faq = JSON.parse(bloques.find((b) => b.includes('"FAQPage"')) ?? '{"mainEntity":[]}') as {
+    mainEntity: { name: string; acceptedAnswer: { text: string } }[];
+  };
+  return faq.mainEntity.map((e) => ({
+    q: e.name.replace(/\s+/g, ' ').trim(),
+    a: e.acceptedAnswer.text.replace(/\s+/g, ' ').trim(),
+  }));
+}
+
+test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en obra nueva sobre el límite del arancel y la renuncia que Melilla rechaza', () => {
+  test.describe.configure({ timeout: 90_000 });
+
+  /**
+   * CASO 1 (NORMAL) — Asturias, segunda mano, 420.000 €, gestoría 700 € (Asturias solo se había
+   * probado a 750.000 €, en el tercer tramo).
+   *   ITP = 300.000 × 8 % + 120.000 × 9 % = 24.000 + 10.800 = 34.800,00 €
+   *   efectivo 34.800 / 420.000 = 8,2857 % → «ITP (8,29 %)»; recuadro: «ITP General 8 %» (primer
+   *   tramo, el nominal que rotula el motor) y «AJD 1,2 %», con la nota de la escala.
+   *   Sin AJD (segunda mano sin renuncia). Fijos: 34.800 + 700 = 35.500.
+   *   (Total a mano con el motor de hoy: 36.807,99 €, 8,76 %; coste 456.807,99 €.)
+   */
+  test('CASO 1 (normal) — Asturias 420.000 €: ITP de escala 34.800,00 € (8,29 %), sin AJD, cierre definitivo', async ({ page }) => {
+    const ast = ITP_CCAA['asturias'];
+    expect(ast.tramosProgresivos).toEqual([
+      { hasta: 300000, tipo: 8 },
+      { hasta: 500000, tipo: 9 },
+      { hasta: Infinity, tipo: 10 },
+    ]);
+    expect(ast.ajd).toBe(1.2);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'asturias');
+    await sembrar(page, PRECIO, '420000');
+    await sembrar(page, GESTORIA, '700');
+
+    await expect(page.getByRole('button', { name: /Segunda mano/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (8,29%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('34.800,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (')).toBe(
+      'Tipo general — las naves no tienen los reducidos de vivienda, pero alguna comunidad sí tiene tipos ligados a la ACTIVIDAD',
+    );
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('700,00 €');
+    expect(await rotuloTarjeta(page, /^Gastos de notaría/)).toBe('Gastos de notaría (IVA incluido)');
+    await cuadraElDesglose(page, 420000, 34800 + 700);
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos (antes de deducir IVA si aplica)');
+
+    const recuadro = await recuadroCcaa(page);
+    expect(recuadro).toContain('ITP General 8%');
+    expect(recuadro).toContain('AJD 1,2%');
+    expect(recuadro).toContain('aplica escala progresiva (8% → 9% → 10%): cada tramo del valor tributa a su tipo');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Melilla, OBRA NUEVA, 7.000.000 €: cuatro cosas que faltan a la vez.
+   *   IPSI de la operación: «No calculado» (TERRITORIOS_SIN_IVA.melilla).
+   *   AJD = 7.000.000 × 0,5 % × 0,5 = 17.500,00 € → efectivo 0,25 %.
+   *   Notaría: el arancel se corta en 6.010.121,04 € y lo que excede es de libre acuerdo.
+   *   Notaría y registro sin IPSI (honorariosLlevanIVA('melilla') = false).
+   *   Gestoría 500 → fijos 18.000 (total a mano 23.413,26 €, 0,33 %; coste 7.023.413,26 €).
+   *   Gestoría «2.000.50»: ilegible, el coste BAJA 500 € → el aviso nombra la gestoría y dice
+   *   «será mayor» (total a mano 22.913,26 €; coste 7.022.913,26 €).
+   * La coma que falta antes de «ni» en ese aviso es el hallazgo [08/10-d], aparte.
+   */
+  test('CASO 2 (límite) — Melilla, obra nueva, 7.000.000 €: AJD bonificado 17.500,00 €, notaría de libre acuerdo y gestoría ilegible con su dirección', async ({ page }) => {
+    expect(ITP_CCAA['melilla'].ajd).toBe(0.5);
+    expect(BONIFICACION_CUOTA_CEUTA_MELILLA).toBe(0.5);
+    expect(LIMITE_ARANCEL_NOTARIAL).toBe(6010121.04);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'melilla');
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await expect(page.getByRole('button', { name: /Obra nueva/ })).toHaveAttribute('aria-pressed', 'true');
+    await sembrar(page, PRECIO, '7000000');
+    await sembrar(page, GESTORIA, '500');
+
+    expect(await rotuloTarjeta(page, /^IPSI$/)).toBe('IPSI');
+    expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD/))).toBe('AJD (0,25%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('17.500,00 €');
+    expect(await descripcionTarjeta(page, 'AJD (')).toBe('Con la bonificación del 50% de Ceuta y Melilla aplicada');
+    expect(await rotuloTarjeta(page, /^Gastos de notaría/)).toBe('Gastos de notaría (sin IPSI)');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Arancel hasta 6.010.121,04 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('libre acuerdo');
+    expect(await rotuloTarjeta(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IPSI)');
+    const conDato = await cuadraElDesglose(page, 7000000, 17500 + 500);
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+      'No incluye el IPSI ni la parte de la notaría de libre acuerdo: el coste real puede ser mayor',
+    );
+    await expect(page.locator('[class*="avisoHonorarios"]')).toContainText('llevan además IPSI');
+
+    // La gestoría ilegible: se nombra, sale del total y la dirección es la medida.
+    await sembrar(page, GESTORIA, '2.000.50');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    const sinDato = await cuadraElDesglose(page, 7000000, 17500);
+    expect(conDato - sinDato).toBeCloseTo(500, 2);
+    const descTotal = sinEspacioPct(await descripcionTarjeta(page, 'Total gastos adicionales'));
+    expect(descTotal).toContain(' — SIN el IPSI, que no está incluido');
+    expect(descTotal).toContain(' — SIN la gestoría, que no se ha podido leer');
+    expect(descTotal).toContain(' — SIN la parte de la notaría de libre acuerdo (el valor que excede de 6.010.121,04 €)');
+    expect(descTotal.endsWith(sinHonorarios('IPSI'))).toBe(true);
+    const descCoste = await descripcionTarjeta(page, 'COSTE TOTAL');
+    expect(descCoste.startsWith('No incluye el IPSI ni la gestoría, que no se ha podido leer')).toBe(true);
+    expect(descCoste).toContain('la parte de la notaría de libre acuerdo');
+    expect(descCoste.endsWith(': el coste real será mayor')).toBe(true);
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — la renuncia elegida en Galicia no se cuela en Melilla, y un precio
+   * ilegible no publica ninguna cifra.
+   *   Galicia, renuncia pulsada. En Melilla el botón «renuncia al IPSI» se desactiva (el IPSI no
+   *   la admite, Ley 8/1991 arts. 7 y 20.3; hallazgo 1584) y se calcula la segunda mano.
+   *   Precio «250.000.00» → sin desglose y el marcador nombra lo escrito.
+   *   Precio 250.000 → ITP = 250.000 × 6 % × 0,5 = 7500,00 € (3,00 %), sin AJD; gestoría 500
+   *   → fijos 8000 (total a mano 8881,24 €, 3,55 %; coste 258.881,24 €), parcial solo por el IPSI
+   *   de los fedatarios.
+   *   De vuelta en Galicia, la elección reaparece: IVA 250.000 × 21 % = 52.500,00 € (ISP) y AJD
+   *   250.000 × 1,5 % = 3750,00 € (tipo general: Galicia no tiene `ajdRenuncia`) → fijos 56.750.
+   */
+  test('CASO 3 (rechazo) — Melilla rechaza la renuncia elegida en Galicia y no publica cifra con «250.000.00»; con 250.000 €, ITP 7500,00 € (3,00 %)', async ({ page }) => {
+    expect(ITP_CCAA['melilla'].tipoGeneral).toBe(6);
+    expect(ITP_CCAA['galicia'].ajd).toBe(1.5);
+    expect(ITP_CCAA['galicia'].ajdRenuncia).toBeUndefined();
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'galicia');
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    await expect(page.getByRole('button', { name: /renuncia al IVA/ })).toHaveAttribute('aria-pressed', 'true');
+
+    await page.selectOption('#select-ccaa', 'melilla');
+    const renunciaIpsi = page.getByRole('button', { name: /renuncia al IPSI/ });
+    await expect(renunciaIpsi).toBeDisabled();
+    await expect(renunciaIpsi).toHaveAttribute('aria-pressed', 'false');
+    await expect(renunciaIpsi).toContainText('No existe en el IPSI: paga ITP');
+    await expect(page.getByRole('button', { name: /Segunda mano/ })).toHaveAttribute('aria-pressed', 'true');
+
+    const marcador = page.locator('[class*="placeholder"] p');
+    await sembrar(page, PRECIO, '250.000.00');
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+    await expect(marcador).toContainText('No se ha podido leer el precio «250.000.00»');
+
+    await sembrar(page, PRECIO, '250000');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (3,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('7500,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (')).toBe(
+      'Tipo general con la bonificación del 50% de la cuota ya aplicada (art. 57 bis TRLITPAJD)',
+    );
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    await expect(page.locator('[class*="resultados"] h3', { hasText: /^(IVA|IPSI)/ })).toHaveCount(0);
+    await cuadraElDesglose(page, 250000, 7500 + 500);
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IPSI'));
+
+    // De vuelta en Galicia, la elección del usuario sigue ahí.
+    await page.selectOption('#select-ccaa', 'galicia');
+    await expect(page.getByRole('button', { name: /renuncia al IVA/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'IVA (')).toBe('52.500,00 €');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD/))).toBe('AJD (1,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('3750,00 €');
+    await cuadraElDesglose(page, 250000, 52500 + 3750 + 500);
+  });
+
+  /**
+   * 99e1ee7e: la página pinta `<RelatedApps />` sin prop y el layout monta `<ConRelacionadas
+   * slug>`. Las cuatro primeras de `data/app-relations.ts` para esta app tienen que salir en el
+   * HTML servido y seguir ahí tras hidratar, sin errores en la consola.
+   */
+  test('relacionadas (99e1ee7e) — las cuatro tarjetas en el HTML servido y tras hidratar, sin errores de hidratación', async ({ page }) => {
+    const esperadas = [
+      '/simulador-gastos-compraventa-local-comercial/',
+      '/estimador-compraventa-inmueble/',
+      '/simulador-gastos-compraventa-garaje/',
+      '/simulador-gastos-compraventa-trastero/',
+    ];
+    const marca = '#from=related-simulador-gastos-compraventa-nave-industrial';
+
+    const servido = await (await page.request.get(RUTA)).text();
+    expect(servido).toContain('Apps relacionadas');
+    const enServido = [...servido.matchAll(/href="(\/[a-z0-9-]+\/)#from=related-simulador-gastos-compraventa-nave-industrial"/g)].map((m) => m[1]);
+    expect([...new Set(enServido)]).toEqual(esperadas);
+
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error') errores.push(m.text());
+    });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    const tras = await page
+      .locator(`a[href$="${marca}"]`)
+      .evaluateAll((as) => as.map((a) => (a.getAttribute('href') ?? '').split('#')[0]));
+    expect(tras).toEqual(esperadas);
+    expect(errores).toEqual([]);
+  });
+
+  // ─── Hallazgos de la inspección del 08/10/2026, con `test.fail()` salvo con VER_HUECOS=1 ───
+
+  /**
+   * [08/10-a] (contenido, bajo) — `ITP_CCAA[x].nombre` es el nombre oficial con su sustantivo
+   * («Ciudad Autónoma de Melilla», «Comunidad Valenciana»), y esta app lo encaja en frases propias
+   * de su page.tsx y su metadata.ts sin artículo. No es el componente común AvisoTerritorioSinIva,
+   * que esta app no usa: los textos son suyos (líneas 436-441, 524, 665, 690-693, 751, 571 y 779 de
+   * page.tsx, y la 6.ª respuesta del FAQPage).
+   */
+  test('[08/10-a] los nombres oficiales llevan artículo: «en la Ciudad Autónoma de Melilla», «en la Comunidad Valenciana»', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-a] abierto: «En Ciudad Autónoma de Melilla no rige el IVA»');
+    const sinArticulo = /\b(?:[Ee]n|de) (?:Ciudad Autónoma de (?:Ceuta|Melilla)|Comunidad Valenciana)/g;
+    const textos = async () => {
+      const notas = await page.locator('[role="note"]').allInnerTexts();
+      const herramienta = await page.locator('[class*="mainContent"]').first().innerText();
+      return [...notas, herramienta].join(' ').replace(/\s+/g, ' ');
+    };
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await sembrar(page, PRECIO, '250000');
+    const vistos: string[] = [];
+    // Melilla en segunda mano (aviso de la renuncia) y en obra nueva (tarjeta del IPSI).
+    await page.selectOption('#select-ccaa', 'melilla');
+    vistos.push(...((await textos()).match(sinArticulo) ?? []));
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    vistos.push(...((await textos()).match(sinArticulo) ?? []));
+    // Valencia con renuncia: el tipo propio del AJD se atribuye a la comunidad.
+    await page.selectOption('#select-ccaa', 'valencia');
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    vistos.push(...((await textos()).match(sinArticulo) ?? []));
+    // FAQPage: «Los más bajos hoy son Ciudad Autónoma de Ceuta (…), …, Comunidad de Madrid (6 %)…»
+    const sexta = (await faqPage(page)).find((f) => /ITP más bajo/.test(f.q))?.a ?? '';
+    if (/\bson Ciudad Autónoma/.test(sexta)) vistos.push('FAQPage: «hoy son Ciudad Autónoma de Ceuta…»');
+    expect(vistos).toEqual([]);
+  });
+
+  /**
+   * [08/10-b] (contenido, bajo) — forma del 2968 de local-comercial: la pregunta del impuesto de la
+   * compra tiene dos respuestas escritas aparte. Visible: «¿Se paga IVA o ITP al comprar una nave
+   * industrial?» (page.tsx:1042-1062); FAQPage: «¿Qué impuesto paga la compra de una nave
+   * industrial?» (metadata.ts). El FAQPage da los rangos del AJD y del ITP y la bonificación de
+   * Ceuta y Melilla; la visible, que con la renuncia se paga AJD a un tipo que puede ser
+   * incrementado (Valencia). Y el FAQPage coloca mal la salvedad: «No pueden coexistir IVA e ITP en
+   * la misma operación, salvo que se renuncie…: entonces vuelve a haber IVA… y no se paga ITP».
+   */
+  test('[08/10-b] la pregunta del impuesto de la compra tiene UNA respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-b] abierto: dos redacciones de la misma pregunta');
+    await page.goto(RUTA);
+    const tema = /IVA o ITP|Qué impuesto (se )?paga/;
+    const visible = (await faqVisible(page)).find((f) => tema.test(f.q));
+    const ld = (await faqPage(page)).find((f) => tema.test(f.q));
+    expect(visible, 'la FAQ visible tiene la pregunta').toBeDefined();
+    expect(ld, 'el FAQPage tiene la pregunta').toBeDefined();
+    expect(ld!.a).not.toMatch(/No pueden coexistir IVA e ITP en la misma operación, salvo/);
+    expect(ld!.a).toBe(visible!.a);
+  });
+
+  /**
+   * [08/10-c] (contenido, medio) — la pregunta del IVA deducible tiene dos respuestas escritas
+   * aparte, y la del FAQPage calla el aviso de la visible. Visible: «¿Es deducible el IVA en la
+   * compra de una nave industrial?» → «…actividad económica sujeta y no exenta de IVA… Si la
+   * actividad está exenta de IVA (ej. médico, educación), no es deducible.» FAQPage: «¿Puede una
+   * empresa deducirse el IVA de la compra de una nave industrial?» → «Si… está sujeto a IVA, puede
+   * deducirse…», sin la actividad exenta.
+   */
+  test('[08/10-c] la pregunta del IVA deducible tiene UNA respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-c] abierto: el FAQPage calla la actividad exenta');
+    await page.goto(RUTA);
+    const tema = /deduc/i;
+    const visible = (await faqVisible(page)).find((f) => tema.test(f.q));
+    const ld = (await faqPage(page)).find((f) => tema.test(f.q));
+    expect(visible, 'la FAQ visible tiene la pregunta').toBeDefined();
+    expect(ld, 'el FAQPage tiene la pregunta').toBeDefined();
+    expect(ld!.a).toMatch(/exenta/);
+    expect(ld!.a).toBe(visible!.a);
+  });
+
+  /**
+   * [08/10-d] (contenido, bajo) — forma del 2958 de la referencia: el aviso del coste total une las
+   * ausencias con `.join(' ni ')` (page.tsx:873-879) y el inciso «que no se ha podido leer» no se
+   * cierra con coma antes del «ni» siguiente. Madrid, segunda mano, 7.000.000 €, gestoría
+   * «2.000.50»: esperado «No incluye la gestoría, que no se ha podido leer, ni la parte de la
+   * notaría de libre acuerdo: el coste real será mayor».
+   */
+  test('[08/10-d] el inciso de la gestoría ilegible se cierra con coma antes de «ni»', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-d] abierto: falta la coma antes de «ni»');
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await sembrar(page, PRECIO, '7000000');
+    await sembrar(page, GESTORIA, '2.000.50');
+    const desc = await descripcionTarjeta(page, 'COSTE TOTAL');
+    expect(desc).toContain('la gestoría, que no se ha podido leer');
+    expect(desc).toContain('la parte de la notaría de libre acuerdo');
+    expect(desc).toContain('el coste real será mayor');
+    expect(desc).not.toMatch(/que no se ha podido leer ni /);
+  });
+
+  /**
+   * [08/10-e] (dato, bajo) — dónde NO existe la renuncia a la exención es un dato normativo (Ley
+   * 8/1991 del IPSI, arts. 7 y 20.3, leída en el BOE el 24/09/2026), y vive tecleado en esta
+   * página como `TERRITORIOS_SIN_RENUNCIA = ['ceuta', 'melilla']`, igual que en local-comercial y
+   * terreno-rustico (tres copias), mientras su gemelo `TERRITORIOS_SIN_IVA` vive en
+   * `data/itp-ccaa.ts`. La regla de las apps Legal-Fiscal: nunca inline.
+   */
+  test('[08/10-e] la lista de territorios sin renuncia no se teclea en la página', async () => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-e] abierto: TERRITORIOS_SIN_RENUNCIA escrito a mano en page.tsx');
+    const fuente = await leerFuente();
+    expect(fuente).not.toMatch(/const\s+TERRITORIOS_SIN_RENUNCIA[^=]*=\s*\[/);
   });
 });

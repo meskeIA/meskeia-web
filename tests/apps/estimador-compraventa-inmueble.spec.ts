@@ -8269,3 +8269,366 @@ test.describe('Inspector 07/10/2026 — 390 px', () => {
     expect(sobra).toBeLessThanOrEqual(0);
   });
 });
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Inspector 08/10/2026 — la pestaña Vendedor no mira la comunidad
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// Re-inspección de la REFERENCIA de la familia tras 99e1ee7e (las relacionadas ya no viajan en el
+// barrel: page.tsx pinta <RelatedApps /> sin prop y layout.tsx monta <ConRelacionadas slug>). Se
+// buscó donde la familia no había mirado: lo que pasa en la pestaña Vendedor cuando el inmueble
+// está en Ceuta, Melilla, Navarra o el País Vasco. `resultadosVendedor` no depende de `ccaa` (no
+// está en sus dependencias) y `calcularPlusvaliaMunicipal` (data/itp-ccaa.ts) no la recibe: el
+// vendedor de Madrid y el de Ceuta, Melilla, Navarra o el País Vasco salen con las MISMAS cifras.
+//
+// Normas leídas en el BOE (API de legislación consolidada) en esta sesión:
+//  · TRLRHL (BOE-A-2004-4214), art. 1.2: «Esta ley se aplicará en todo el territorio nacional, sin
+//    perjuicio de los regímenes financieros forales de los Territorios Históricos del País Vasco y
+//    Navarra». Art. 159.2 (Ceuta y Melilla): «Las cuotas tributarias correspondientes a los impuestos
+//    municipales regulados en esta ley serán objeto de una bonificación del 50 por ciento».
+//  · LIRPF (BOE-A-2006-20764), art. 68.4: 1.º.a) residentes en Ceuta o Melilla y 2.º no residentes
+//    «se deducirán el 60 por ciento de la parte de la suma de las cuotas íntegras estatal y
+//    autonómica que proporcionalmente corresponda a las rentas […] obtenidas en Ceuta o Melilla»;
+//    3.º.d) son rentas obtenidas allí «Las ganancias patrimoniales que procedan de bienes inmuebles
+//    radicados en Ceuta o Melilla» (la exclusión del 2.º solo alcanza a las letras a, e e i).
+//  · Concierto Económico, Ley 12/2002 (BOE-A-2002-9969), art. 6.Uno: el IRPF «es un tributo
+//    concertado de normativa autónoma. Su exacción corresponderá a la Diputación Foral […] cuando el
+//    contribuyente tenga su residencia habitual en el País Vasco»; art. 42: los Territorios
+//    Históricos «podrán mantener, establecer y regular […] el régimen tributario de otros tributos
+//    propios de las Entidades locales».
+//  · Convenio Económico, Ley 28/1990 (BOE-A-1990-31117, redacción de la Ley 25/2003), art. 1:
+//    «Navarra tiene potestad para mantener, establecer y regular su propio régimen tributario»;
+//    art. 9.1: la exacción del IRPF de quien tenga su residencia habitual en Navarra; arts. 48-49:
+//    Haciendas Locales de Navarra.
+//  · Ley Foral 2/1995, de Haciendas Locales de Navarra (BOE-A-1995-16401), art. 175.2 en la
+//    redacción del art. 8.2 de la Ley Foral 17/2025 (BOE-A-2026-3910, vigente desde el 01/01/2026):
+//    coeficiente máximo de 10 años = 0,58 (el art. 107.4 TRLRHL da 0,12); art. 176.2: tipo máximo
+//    del 25 %, que es también el tipo orientativo de la app (PLUSVALIA_MUNICIPAL_META).
+//
+// Siguen abiertos y NO se registran de nuevo: 2901, 2902, 2904 y 2958 a 2965 (sus test.fail siguen
+// en los describes del 06/10 y del 07/10).
+test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales en la pestaña Vendedor', () => {
+  const CAMPO_PRECIO = 'input[aria-label="Precio de la vivienda"]';
+
+  /** Escribe como el usuario, comprueba que el ESTADO de React lo recogió y sale del campo. */
+  async function sembrar(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  async function abrir(page: Page, ccaa?: string): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO_PRECIO]);
+    if (ccaa) await page.locator('#ccaa-inmueble').selectOption(ccaa);
+  }
+
+  async function aVendedor(page: Page): Promise<void> {
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+  }
+
+  /** «8868,00 €» → 8868, con el parser del catálogo. */
+  const euros = (texto: string): number => parseSpanishNumber(texto.replace(/\s*€\s*$/, ''));
+  const normaliza = (s: string) => s.replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
+
+  /**
+   * VENDEDOR A: venta 200.000 · compra 150.000 · 10 años · suelo 40.000 · sin valor catastral
+   * total · comisión 3 % (de fábrica) · vivienda habitual (de fábrica), sin edad ni reinversión.
+   */
+  async function montarVendedorA(page: Page, ccaa: string): Promise<void> {
+    await abrir(page, ccaa);
+    await sembrar(page, 'Precio de la vivienda', '200000');
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '150000');
+    await sembrar(page, 'Años de propiedad', '10');
+    await sembrar(page, 'Valor catastral del suelo', '40000');
+  }
+
+  /** VENDEDOR B: venta 300.000 · compra 200.000 · 10 años · suelo 60.000, el resto de fábrica. */
+  async function montarVendedorB(page: Page, ccaa: string): Promise<void> {
+    await abrir(page, ccaa);
+    await sembrar(page, 'Precio de la vivienda', '300000');
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '200000');
+    await sembrar(page, 'Años de propiedad', '10');
+    await sembrar(page, 'Valor catastral del suelo', '60000');
+  }
+
+  /** Las respuestas de todos los FAQPage servidos (la página sirve dos: hallazgo 2963). */
+  async function respuestasFaqPage(page: Page): Promise<string[]> {
+    const crudos = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const respuestas: string[] = [];
+    for (const crudo of crudos) {
+      const datos = JSON.parse(crudo);
+      for (const nodo of datos['@graph'] ?? [datos]) {
+        if (nodo['@type'] !== 'FAQPage') continue;
+        for (const q of nodo.mainEntity ?? []) respuestas.push(normaliza(q.acceptedAnswer.text));
+      }
+    }
+    return respuestas;
+  }
+
+  /**
+   * CASO 70 (normal) — Ceuta COMPRA bien y el mismo vendedor en MADRID (régimen común) sale bien.
+   *
+   * Comprador, Ceuta · segunda mano · vivienda de 200.000 € · General · gestoría 300 (de fábrica):
+   *   ITP 6 % (ITP_CCAA.ceuta.tipoGeneral) con la bonificación del 50 % del art. 57 bis TRLITPAJD
+   *   → 3 % → 6000,00 € («ITP (3,00 %)»). Notaría y registro sin IPSI (hallazgo 2214); el total suma
+   *   lo que se ve y se rotula «(PARCIAL)» porque falta el IPSI de esas dos facturas.
+   * Vendedor A en Madrid, a mano con COEFICIENTES_IIVTNU_2025 (10 años = 0,12),
+   * PLUSVALIA_MUNICIPAL_META.tipoOrientativo (25 %) y TRAMOS_GANANCIAS_PATRIMONIALES_2025:
+   *   plusvalía 40.000 × 0,12 × 25 % = 1.200 · comisión 6.000 · transmisión 192.800
+   *   adquisición 150.000 · ganancia 42.800 · IRPF 6.000 × 19 % + 36.800 × 21 % = 1.140 + 7.728 = 8.868
+   *   total 1.200 + 6.000 + 8.868 = 16.068 · neto 183.932,00
+   */
+  test('CASO 70 (normal) — Ceuta compra al 3 % y el vendedor A en Madrid: 1200,00 · 8868,00 · 183.932,00', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    expect(ITP_CCAA['ceuta'].tipoGeneral).toBe(6);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.12);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.slice(0, 2)).toEqual([
+      { hasta: 6000, tipo: 19 },
+      { hasta: 50000, tipo: 21 },
+    ]);
+
+    await abrir(page, 'ceuta');
+    await sembrar(page, 'Precio de la vivienda', '200000');
+    await expect(page.locator('h3', { hasText: /^ITP/ }).first()).toHaveText('ITP (3,00 %)');
+    expect(await valorTarjeta(page, /^ITP/)).toBe('6000,00 €');
+    const notaria = euros(await valorTarjeta(page, /^Gastos de notaría/));
+    const registro = euros(await valorTarjeta(page, /^Registro de la Propiedad/));
+    const total = euros(await valorTarjeta(page, /^Total gastos adicionales/));
+    expect(total).toBeCloseTo(6000 + notaria + registro + 300, 2);
+    await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ }).first()).toHaveText('COSTE TOTAL (PARCIAL)');
+
+    await montarVendedorA(page, 'madrid');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('192.800,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('42.800,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8868,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('16.068,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('183.932,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+  });
+
+  /**
+   * CONTROL de montaje de los hallazgos del CASO 71 — va en VERDE, antes y después de repararlos.
+   * Exige solo lo que no depende del régimen: la comisión y el valor de adquisición de los dos
+   * vendedores, y que el comprador de Ceuta paga el ITP y el AJD a la mitad (lo que los rangos del
+   * hallazgo de abajo no contienen). Si un montaje deja de valer, cae aquí y no dentro de un fallo
+   * esperado.
+   *   A en Ceuta: comisión 200.000 × 3 % = 6000,00 · adquisición 150.000,00
+   *   B en Navarra: comisión 300.000 × 3 % = 9000,00 · adquisición 200.000,00
+   *   Ceuta · local · primera mano · 200.000: AJD 0,5 % (ITP_CCAA.ceuta.ajd) × 50 % (art. 57 bis.1
+   *   TRLITPAJD) = 0,25 % → 500,00 €
+   */
+  test('CONTROL de montaje — vendedores A (Ceuta) y B (Navarra), y el 3 % y el 0,25 % que cobra Ceuta', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await montarVendedorA(page, 'ceuta');
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('6000,00 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('150.000,00 €');
+    await expect(page.locator('h3', { hasText: 'Plusvalía municipal' })).toHaveCount(1);
+    await expect(page.locator('h3', { hasText: /^IRPF sobre ganancia/ })).toHaveCount(1);
+
+    await montarVendedorB(page, 'navarra');
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('9000,00 €');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('200.000,00 €');
+
+    expect(ITP_CCAA['ceuta'].ajd).toBe(0.5);
+    await abrir(page, 'ceuta');
+    await page.getByRole('button', { name: /Local comercial/ }).click();
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await sembrar(page, 'Precio del inmueble', '200000');
+    await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,25 %)');
+    expect(await valorTarjeta(page, /^AJD/)).toBe('500,00 €');
+  });
+
+  // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
+
+  /**
+   * HALLAZGO [alto, calculo] — ABIERTO (08/10/2026). CASO 71 (límite: régimen especial). La
+   * plusvalía municipal de un inmueble en Ceuta o Melilla no lleva la bonificación del 50 % del art.
+   * 159.2 TRLRHL. `calcularPlusvaliaMunicipal` (data/itp-ccaa.ts) no recibe la comunidad, así que
+   * alcanza a toda pestaña Vendedor de la familia; el motor sí aplica la bonificación «por el SITIO»
+   * al ITP y al AJD (`aplicarBonificacionCiudad`), y el recuadro de Ceuta dice «Bonificación
+   * automática del 50 % para inmuebles en Ceuta».
+   * Vendedor A en Ceuta → esperado 40.000 × 0,12 × 25 % × 50 % = 600,00 € · obtenido 1200,00 €. Igual
+   * en Melilla.
+   */
+  test.fail('HALLAZGO IIVTNU en Ceuta y Melilla — la cuota lleva la bonificación del 50 % (art. 159.2 TRLRHL)', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await montarVendedorA(page, 'ceuta');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('600,00 €');
+    await page.locator('#ccaa-inmueble').selectOption('melilla');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('600,00 €');
+  });
+
+  /**
+   * HALLAZGO [alto, calculo] — ABIERTO (08/10/2026). CASO 71. El IRPF de la ganancia de un inmueble
+   * radicado en Ceuta o Melilla no lleva la deducción del 60 % del art. 68.4 LIRPF, que vale para
+   * residentes (1.º.a) y no residentes (2.º) por la letra d) del 3.º: depende del SITIO, que la app
+   * ya conoce. Vendedor A en Ceuta, con la plusvalía que la app publica (1.200): ganancia 42.800 →
+   * cuota 8.868 → esperado 8.868 × 40 % = 3547,20 €; con la plusvalía bonificada del hallazgo de
+   * arriba (600): ganancia 43.400 → cuota 1.140 + 37.400 × 21 % = 8.994 → 3597,60 €. Obtenido
+   * 8868,00 € y neto 183.932,00 € «Lo que realmente recibes» (esperado, con las dos: 200.000 − 600 −
+   * 6.000 − 3.597,60 = 189.802,40 €).
+   */
+  test.fail('HALLAZGO IRPF en Ceuta y Melilla — la ganancia de un inmueble radicado allí lleva la deducción del 60 % (art. 68.4 LIRPF)', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await montarVendedorA(page, 'ceuta');
+    const irpf = euros(await valorTarjeta(page, /^IRPF sobre ganancia/));
+    expect(irpf).toBeGreaterThanOrEqual(3547.2 - 0.005);
+    expect(irpf).toBeLessThanOrEqual(3597.6 + 0.005);
+  });
+
+  /**
+   * HALLAZGO [alto, calculo] — ABIERTO (08/10/2026), sospecha (b). En Navarra y el País Vasco el
+   * IIVTNU no se rige por el TRLRHL (art. 1.2) sino por la norma foral (Convenio arts. 48-49;
+   * Concierto art. 42), y la app lo liquida con los coeficientes del art. 107.4 TRLRHL. Navarra es
+   * calculable desde el BOE: Ley Foral 2/1995, art. 175.2 (10 años = 0,58) y art. 176.2 (máx. 25 %).
+   * Vendedor B en Navarra → esperado, con el coeficiente máximo y el tipo orientativo de la app
+   * (25 %, que allí es el máximo legal), 60.000 × 0,58 × 25 % = 8700,00 € · obtenido 1800,00 €
+   * (60.000 × 0,12 × 25 %), con ganancia 89.200,00 €, IRPF 19.396,00 € y neto 269.804,00 € «Lo que
+   * realmente recibes», idénticos a Madrid. País Vasco: misma forma (Normas Forales del IIVTNU de cada
+   * territorio, sin texto consolidado en el BOE): se pide al menos que lo nombre.
+   */
+  test.fail('HALLAZGO IIVTNU foral — Navarra y el País Vasco no liquidan con los coeficientes del art. 107.4 TRLRHL', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await montarVendedorB(page, 'navarra');
+    const valorNavarra = await valorTarjeta(page, 'Plusvalía municipal');
+    const descNavarra = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(valorNavarra).not.toBe('1800,00 €');
+    expect(`${valorNavarra} ${descNavarra}`).toMatch(/8700,00 €|foral/i);
+    await page.locator('#ccaa-inmueble').selectOption('pais-vasco');
+    const valorPV = await valorTarjeta(page, 'Plusvalía municipal');
+    const descPV = await descripcionTarjeta(page, 'Plusvalía municipal');
+    expect(`${valorPV} ${descPV}`).toMatch(/foral/i);
+  });
+
+  /**
+   * HALLAZGO [medio, calculo] — ABIERTO (08/10/2026), sospecha (a). Quien vende su vivienda habitual
+   * en el País Vasco o en Navarra reside allí, y su IRPF es foral (Concierto art. 6.Uno; Convenio
+   * arts. 1 y 9.1): la app le aplica la escala estatal del ahorro sin decirlo. data/fiscal no tiene
+   * las escalas forales, así que lo esperado no es una cifra sino que la tarjeta lo nombre (como el
+   * IGIC y el IPSI, que la familia nombra y no calcula).
+   * Vendedor B en el País Vasco (o Navarra), «Es mi vivienda habitual» marcada → esperado: la tarjeta
+   * del IRPF dice que es foral y que esa cuota no es la suya · obtenido «IRPF sobre ganancia
+   * 19.396,00 € · Tributación en base del ahorro» y neto «Lo que realmente recibes».
+   */
+  test.fail('HALLAZGO IRPF foral — la vivienda habitual vendida en el País Vasco o Navarra no tributa con la escala estatal', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await montarVendedorB(page, 'pais-vasco');
+    await expect(page.getByRole('checkbox', { name: 'Es mi vivienda habitual' })).toBeChecked();
+    const irpfPV = `${await valorTarjeta(page, /^IRPF sobre ganancia/)} ${await descripcionTarjeta(page, /^IRPF sobre ganancia/)}`;
+    expect(irpfPV).toMatch(/foral/i);
+    await page.locator('#ccaa-inmueble').selectOption('navarra');
+    const irpfNA = `${await valorTarjeta(page, /^IRPF sobre ganancia/)} ${await descripcionTarjeta(page, /^IRPF sobre ganancia/)}`;
+    expect(irpfNA).toMatch(/foral/i);
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (08/10/2026), sospecha (c). Los rangos de ITP y AJD que
+   * publica la página son los NOMINALES de la tabla y no contienen lo que la app cobra en Ceuta y
+   * Melilla (3 % de ITP y 0,25 % de AJD en lo que no es vivienda), sin salvedad. Es la forma de los
+   * hallazgos 2206 y 2212 de nave y solar, que la referencia no recibió. El propio FAQPage se
+   * contradice: «Los gastos e impuestos van del 3,3 %…» (el suelo es Ceuta) y, en la misma
+   * respuesta, «ITP entre el 4 % y el 13 %».
+   * Esperado: cada texto que publica el rango nombra Ceuta y Melilla (o lo contiene) · obtenido:
+   * «…va del 4 % (País Vasco) al 13 %…», «4 % – 13 % (según CC.AA.)», «En locales, naves y suelo
+   * va del 0,5 % al 1,5 %, también en el País Vasco.» y, en los dos FAQPage, «ITP entre el 4 % y el
+   * 13 %» y «varía entre el 4 % y el 13 % de su valor», sin Ceuta ni Melilla.
+   */
+  test.fail('HALLAZGO rangos — el ITP y el AJD publicados salvan lo que la app cobra en Ceuta y Melilla', async ({
+    page,
+  }) => {
+    await abrir(page);
+    // El bloque educativo nace plegado: se lee el textContent del párrafo o la celda ENTEROS, para
+    // que una salvedad añadida en otra frase del mismo párrafo también cuente.
+    const texto = async (selector: string, contiene: string): Promise<string> =>
+      normaliza(await page.locator(selector, { hasText: contiene }).first().evaluate((e) => e.textContent ?? ''));
+    const parrafoITP = await texto('p', 'Cada comunidad autónoma fija su propio tipo');
+    const parrafoAJD = await texto('p', 'En locales, naves y suelo va del');
+    const celdaITP = await texto('td', '(según CC.AA.)');
+    // Las respuestas que dan un rango de ITP en la misma frase (hoy, «ITP entre el 4 % y el 13 %»
+    // y «(ITP) de una vivienda varía entre el 4 % y el 13 %»); [^.] corta también en «100.000».
+    const faq = (await respuestasFaqPage(page)).filter((r) =>
+      /(ITP|Transmisiones Patrimoniales)[^.]*entre el [\d,]+ % y el [\d,]+ %/.test(r),
+    );
+    for (const t of [parrafoITP, parrafoAJD, celdaITP, ...faq]) expect(t).toMatch(/Ceuta|Melilla/);
+  });
+
+  // ─── Lo que sí está bien (verde) ───────────────────────────────────────────────────────
+
+  /**
+   * CASO 72 (debe rechazarse) — Ceuta, «Estimar por mí» con aquella compra de OBRA NUEVA: allí no se
+   * pagó IVA sino IPSI (TERRITORIOS_SIN_IVA), que el catálogo no calcula, así que el botón no estima.
+   * Con SEGUNDA MANO sí estima, y a mano: ITP 150.000 × 3 % = 4.500 · notaría sin IPSI (escala del
+   * nº 2.1 de data/itp-ccaa.ts: 90,15 + 24.040,49 × 4,5 ‰ + 30.050,60 × 1,5 ‰ + 89.898,79 × 1 ‰ =
+   * 333,307 × 1,75 = 583,29) · registro sin IPSI 180,11 (el del caso del hallazgo 2214) · gestoría
+   * 300 → 5563,40 → «5563».
+   */
+  test('CASO 72 (debe rechazarse) — Ceuta: «Estimar por mí» no estima una obra nueva que pagó IPSI', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await abrir(page, 'ceuta');
+    await sembrar(page, 'Precio de la vivienda', '200000');
+    await aVendedor(page);
+    await sembrar(page, 'Precio de compra original', '150000');
+    const boton = page.getByRole('button', { name: /Estimar por mí/ });
+    const campo = page.locator('input[aria-label="Impuestos y gastos que pagaste al comprar"]');
+    await page.locator('#regimen-compra-original').selectOption('primera-mano');
+    await expect(boton).toBeDisabled();
+    await expect(page.locator('#nota-estimar-gastos')).toHaveText(
+      'En Ciudad Autónoma de Ceuta la obra nueva no paga IVA sino IPSI (Impuesto sobre la Producción, los Servicios y la Importación), que esta app no calcula: escribe lo que pagaste, que figura en tu escritura.',
+    );
+    await boton.click({ force: true });
+    await expect(campo).toHaveValue('');
+    await page.locator('#regimen-compra-original').selectOption('segunda-mano');
+    await expect(boton).toBeEnabled();
+    await boton.click();
+    await expect(campo).toHaveValue('5563');
+  });
+
+  /**
+   * 99e1ee7e (08/10) — las relacionadas se resuelven en el layout y la página pinta <RelatedApps />
+   * sin prop. Las cuatro tarjetas tienen que estar en el HTML SERVIDO (sin JS) y seguir tras hidratar,
+   * sin error de hidratación en la consola. Medido hoy: garaje, trastero, estimador-plusvalia-municipal
+   * y estimador-hipoteca.
+   */
+  test('Relacionadas — cuatro tarjetas en el HTML servido y tras hidratar, sin error de hidratación', async ({
+    page,
+  }) => {
+    const ENLACE = /href="(\/[^"]+#from=related-estimador-compraventa-inmueble)"/g;
+    const html = await (await page.request.get(RUTA)).text();
+    const servidas = Array.from(html.matchAll(ENLACE), (m) => m[1]);
+    expect(servidas).toHaveLength(4);
+
+    const errores: string[] = [];
+    page.on('console', (m) => {
+      if (m.type() === 'error') errores.push(m.text());
+    });
+    page.on('pageerror', (e) => errores.push(e.message));
+    await abrir(page);
+    await expect(page.getByRole('heading', { name: 'Apps relacionadas' })).toBeVisible();
+    const hidratadas = await page
+      .locator('a[href*="#from=related-estimador-compraventa-inmueble"]')
+      .evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+    expect(hidratadas).toEqual(servidas);
+    expect(errores.filter((e) => /hydrat|did not match|#418|#423|#425/i.test(e))).toEqual([]);
+  });
+});

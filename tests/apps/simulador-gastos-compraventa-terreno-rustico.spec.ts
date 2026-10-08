@@ -38,10 +38,12 @@
  * Los tres casos están resueltos a mano ANTES de ejecutar la app; el desarrollo va comentado
  * junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS ABIERTOS a 06/10/2026: los tres de la re-inspección de ese día, en cuatro casos con
- * `test.fail()` y «ABIERTO» en el último describe (las notas de la comunidad escritas para la
- * vivienda —tipos reducidos de vivienda habitual; Canarias y Andalucía, que contradicen la tabla—
- * y el botón «Con renuncia a la exención IVA»). Todo lo anterior está REPARADO: los de la
+ * HALLAZGOS: los tres de la re-inspección del 06/10/2026 (2920-2922: las notas de la comunidad
+ * escritas para la vivienda —Galicia y Andalucía—, Canarias y Andalucía contradiciendo la tabla, y
+ * el botón «Con renuncia a la exención IVA») se REPARARON ese mismo día y sus cuatro casos ya no
+ * llevan `test.fail()`. A 08/10/2026 la base no tenía ninguno abierto antes de la inspección de
+ * ese día, cuyos seis hallazgos van con `test.fail()` y etiqueta [08/10-a…f] en el ÚLTIMO
+ * describe del fichero. Lo anterior también está REPARADO: los de la
  * re-inspección del 26/09/2026 (2214-2220) están sin marca en su describe, con la receta de la
  * familia (base mínima del AJD, 2209; notas de la comunidad, 2208). Los casos anteriores con Canarias,
  * Ceuta y Melilla se recalcularon a mano (notaría y registro ÷ 1,21), y los lectores de tarjeta
@@ -3091,5 +3093,426 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
     await expect(boton).toHaveCount(1);
     // El defecto que fue.
     await expect(boton).toContainText(/exención (del|de) IVA/, { timeout: 2000 });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 08/10/2026 — la familia «Compraventa inmobiliaria» entera, una hermana por agente
+// (referencia: estimador-compraventa-inmueble · testigo: tests/familias/compraventa.spec.ts, 82/82
+// en verde ese día). Único cambio de código desde la re-inspección del 06/10: 99e1ee7e, las
+// relacionadas resueltas en el servidor (`<ConRelacionadas slug>` en layout.tsx).
+//
+// Cifras a mano ANTES de abrir la app, ninguna de memoria:
+//  - ITP: `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts) — Castilla-La Mancha 9, sin escala ni
+//    umbral en `ITP_CCAA`; Ceuta 6 (excepción declarada en data/itp-ccaa.ts) con la bonificación
+//    del 50 % de `aplicarBonificacionCiudad` (art. 57 bis TRLITPAJD).
+//  - AJD de la renuncia: `ITP_CCAA[x].ajd` (Castilla-La Mancha 1,5) y `ajdRenuncia` (Valencia 2;
+//    Ley 13/1997, art. 14). IVA: `PORCENTAJES_IVA.general` = 21.
+//  - Notaría y registro: calculados a mano y coincidentes (CLM 125.000 €: arancel 308,306895 ×
+//    1,21 × 1,75 = 652,84 · registro 161,363382 × 1,21 = 195,25; Valencia 7.000.000 €: 2.181,672142
+//    × 1,21 × 1,75 = 4619,69 · 1.595,3284555 × 1,21 = 1930,35; Ceuta 45.000 €, sin IVA: 220,75629
+//    × 1,75 = 386,32 · 93,81), pero NO se fijan: los hallazgos 2901 y 2902 (rebaja del 5 % de los
+//    dos aranceles, abiertos en la referencia) los moverán. Los totales se comprueban como suma de
+//    lo que se ve y restando esas dos líneas de la pantalla.
+//
+// Con `VER_HUECOS=1 npx playwright test <este fichero>` los seis hallazgos de esta sección dejan de
+// estar marcados y la salida enseña lo que la app publica frente a lo esperado.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const I08_VER_HUECOS = Boolean(process.env.VER_HUECOS);
+
+/** El texto de los avisos de la renuncia (o de su ausencia en Ceuta y Melilla). */
+async function i08AvisosRenuncia(page: Page): Promise<string[]> {
+  return (await page.locator('[class*="renunciaAviso"]').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
+}
+
+/** La ficha de la comunidad: la nota del recuadro que empieza por su nombre. */
+async function i08Ficha(page: Page, ccaa: keyof typeof ITP_CCAA) {
+  const ficha = page.locator('[class*="infoCcaaNote"]', { hasText: `${ITP_CCAA[ccaa].nombre}:` }).last();
+  await expect(ficha).toHaveCount(1);
+  return ficha;
+}
+
+test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valenciana a 7 millones, Ceuta y las notas de la comunidad', () => {
+  test.describe.configure({ timeout: 60_000 });
+
+  /**
+   * CASO 1 (NORMAL) — Castilla-La Mancha, 125.000 €, gestoría 350 €. Ninguna ronda había pisado
+   * esta comunidad.
+   *   a) Compra habitual: ITP = 125.000 × 9 % = 11.250,00 € (9,00 %). Total − notaría − registro =
+   *      11.250 + 350 = 11.600,00 · coste − total = 125.000,00. Recuadro: ITP 9 %, AJD de la
+   *      renuncia 1,5 % (el general: sin `ajdRenuncia`), IVA 21 %.
+   *   b) Renuncia: IVA 125.000 × 21 % = 26.250,00 · AJD 125.000 × 1,5 % = 1.875,00 · ningún ITP.
+   *      Total − notaría − registro = 26.250 + 1.875 + 350 = 28.475,00.
+   *   (Medido el 08/10/2026: total a) 12.448,09 y coste 137.448,09; b) 29.323,09 y 154.323,09.)
+   */
+  test('CASO 1 (normal) — Castilla-La Mancha, 125.000 €: ITP 9 % y, con renuncia, IVA 21 % + AJD 1,5 %', async ({ page }) => {
+    expect(TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === 'Castilla-La Mancha')?.tipo).toBe(9);
+    expect(ITP_CCAA['castilla-mancha'].tramosProgresivos).toBeUndefined();
+    expect(ITP_CCAA['castilla-mancha'].umbralTipoUnico).toBeUndefined();
+    expect(ITP_CCAA['castilla-mancha'].ajd).toBe(1.5);
+    expect(ITP_CCAA['castilla-mancha'].ajdRenuncia).toBeUndefined();
+    expect(PORCENTAJES_IVA.general).toBe(21);
+
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'castilla-mancha');
+    await sembrarValor(page, CAMPO_PRECIO, '125000');
+    await sembrarValor(page, CAMPO_GESTORIA, '350');
+
+    // a) Compra habitual.
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (9,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('11.250,00 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('350,00 €');
+    await expect(page.locator('h3', { hasText: /^(AJD|IVA)/ })).toHaveCount(0);
+    expect((await lineasPanelCcaa(page)).map(sinEspacioPct)).toEqual(['ITP General 9%', 'AJD (renuncia) 1,5%', 'IVA (renuncia) 21%']);
+    let lineas = [
+      await importe(page, 'ITP ('),
+      await importe(page, 'Gastos de notaría'),
+      await importe(page, 'Registro de la Propiedad'),
+      await importe(page, 'Gastos de gestoría'),
+    ];
+    let total = await importe(page, 'Total gastos adicionales');
+    expect(total).toBeCloseTo(lineas.reduce((a, b) => a + b, 0), 2);
+    expect(total - lineas[1] - lineas[2]).toBeCloseTo(11600, 2);
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos de la operación');
+    expect((await importe(page, 'COSTE TOTAL')) - total).toBeCloseTo(125000, 2);
+
+    // b) Renuncia.
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^IVA \(/))).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('26.250,00 €');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD \(/))).toBe('AJD (1,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('1875,00 €');
+    lineas = [
+      await importe(page, 'IVA ('),
+      await importe(page, 'AJD ('),
+      await importe(page, 'Gastos de notaría'),
+      await importe(page, 'Registro de la Propiedad'),
+      await importe(page, 'Gastos de gestoría'),
+    ];
+    total = await importe(page, 'Total gastos adicionales');
+    expect(total).toBeCloseTo(lineas.reduce((a, b) => a + b, 0), 2);
+    expect(total - lineas[2] - lineas[3]).toBeCloseTo(28475, 2);
+    expect((await importe(page, 'COSTE TOTAL')) - total).toBeCloseTo(125000, 2);
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos (antes de deducir el IVA si tienes derecho)');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Comunitat Valenciana con renuncia, 7.000.000 €: el AJD propio de la renuncia
+   * (2 %), la notaría por encima del límite del arancel (6.010.121,04 €) y el invariante de la
+   * familia con la gestoría.
+   *   IVA 7.000.000 × 21 % = 1.470.000,00 · AJD 7.000.000 × 2 % = 140.000,00 (2,00 %).
+   *   Gestoría 500 → total − notaría − registro = 1.610.500,00; con «2.000.50» = 1.610.000,00: la
+   *   cifra publicada BAJA 500 € y el aviso tiene que decir que el coste real será MAYOR.
+   */
+  test('CASO 2 (límite) — Valencia con renuncia, 7.000.000 €: AJD del 2 %, notaría de libre acuerdo y la gestoría ilegible con su dirección', async ({ page }) => {
+    expect(ITP_CCAA['valencia'].ajdRenuncia).toBe(2);
+
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'valencia');
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await sembrarValor(page, CAMPO_PRECIO, '7.000.000');
+    await sembrarValor(page, CAMPO_GESTORIA, '500');
+
+    expect(await valorTarjeta(page, 'IVA (')).toBe('1.470.000,00 €');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD \(/))).toBe('AJD (2,00%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('140.000,00 €');
+    const notaria = await importe(page, 'Gastos de notaría');
+    const registro = await importe(page, 'Registro de la Propiedad');
+    const conDato = await importe(page, 'COSTE TOTAL');
+    expect((await importe(page, 'Total gastos adicionales')) - notaria - registro).toBeCloseTo(1610500, 2);
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+
+    await sembrarValor(page, CAMPO_GESTORIA, '2.000.50');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect((await importe(page, 'Total gastos adicionales')) - notaria - registro).toBeCloseTo(1610000, 2);
+    // Dirección medida: sin el dato la cifra es MENOR en lo que valía la gestoría.
+    expect(conDato - (await importe(page, 'COSTE TOTAL'))).toBeCloseTo(500, 2);
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toMatch(
+      / — SIN la gestoría, que no se ha podido leer — SIN la parte de la notaría de libre acuerdo \(el valor que excede de 6\.010\.121,04 €\)$/,
+    );
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toContain(
+      'el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho)',
+    );
+  });
+
+  /**
+   * CASO 2b (LÍMITE) — Ceuta, 45.000 €, gestoría escrita a 0 (un dato, no un hueco). Sin renuncia
+   * en el IPSI: ITP = 45.000 × 6 % × 50 % = 1.350,00 € (3,00 %). Total − notaría − registro =
+   * 1.350,00 · coste − total = 45.000,00. Notaría y registro «(sin IPSI)» y cierre parcial solo por
+   * esos honorarios.
+   */
+  test('CASO 2b (límite) — Ceuta, 45.000 € y gestoría 0: ITP bonificado al 3 % y cierre parcial solo por el IPSI de los honorarios', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await sembrarValor(page, CAMPO_PRECIO, '45000');
+    await sembrarValor(page, CAMPO_GESTORIA, '0');
+
+    await expect(page.getByRole('button', { name: /renuncia a la exención/i })).toBeDisabled();
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (3,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('1350,00 €');
+    await expect(page.locator('h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Gastos de notaría (sin IPSI)' })).toHaveCount(1);
+    await expect(page.locator('h3', { hasText: 'Registro de la Propiedad (sin IPSI)' })).toHaveCount(1);
+    const total = await importe(page, 'Total gastos adicionales');
+    expect(total - (await importe(page, 'Gastos de notaría')) - (await importe(page, 'Registro de la Propiedad'))).toBeCloseTo(1350, 2);
+    expect((await importe(page, 'COSTE TOTAL')) - total).toBeCloseTo(45000, 2);
+    expect((await descripcionTarjeta(page, 'Total gastos adicionales')).endsWith(`% sobre el precio de compra${sinHonorarios('IPSI')}`)).toBe(true);
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IPSI'));
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — tres precios que no publican desglose, cada uno con su mensaje:
+   *   «,»       → ilegible: «No se ha podido leer el precio «,»…».
+   *   «0,001»   → legible pero 0,00 € al céntimo: «se queda en 0,00 € al céntimo, y tiene que ser
+   *               mayor que 0».
+   *   «-80000»  → con el foco dentro: «tiene que ser mayor que 0»; al salir, el min={0} lo deja en
+   *               «0» y el mensaje lo sigue diciendo (no «Introduce…», que es el campo vacío).
+   */
+  test('CASO 3 (rechazo) — «,», «0,001» y «-80000» (con y sin foco) no publican cifras y dicen por qué', async ({ page }) => {
+    await abrirHidratada(page);
+    const marcador = page.locator('[class*="placeholder"] p');
+    const sinTarjetas = () => expect(page.locator('[class*="resultados"] h3')).toHaveCount(0);
+
+    await sembrarValor(page, CAMPO_PRECIO, ',');
+    await sinTarjetas();
+    await expect(marcador).toHaveText(
+      'No se ha podido leer el precio «,». Introduce el precio de la finca rústica para ver el desglose de gastos, con coma decimal (80.000 o 80000,50)',
+    );
+    await sembrarValor(page, CAMPO_PRECIO, '0,001');
+    await sinTarjetas();
+    await expect(marcador).toHaveText(`El precio escrito («0,001») se queda en 0,00 € al céntimo, y ${PRECIO_NO_VALE}.`);
+    await sembrarValor(page, CAMPO_PRECIO, '-80000');
+    await sinTarjetas();
+    await expect(marcador).toHaveText(`El precio escrito («-80000») ${PRECIO_NO_VALE}.`);
+    await page.locator(CAMPO_PRECIO).focus();
+    await page.locator(CAMPO_GESTORIA).focus();
+    await esperarValorEnReact(page, CAMPO_PRECIO, '0');
+    await sinTarjetas();
+    await expect(marcador).toHaveText(`El precio escrito («0») ${PRECIO_NO_VALE}.`);
+    expect(await page.locator('body').innerText()).not.toMatch(/NaN|undefined/);
+  });
+
+  /**
+   * 99e1ee7e (08/10/2026) — las relacionadas las resuelve el SERVIDOR en el layout y la página
+   * pinta `<RelatedApps />` sin prop. Esperado: las cuatro primeras de
+   * `appRelations['simulador-gastos-compraventa-terreno-rustico']` (data/app-relations.ts; son
+   * cinco y el bloque pinta cuatro: queda fuera el simulador de hipoteca), con su `#from=related-…`,
+   * en el HTML servido y las MISMAS tras hidratar, sin error de hidratación (React de producción
+   * los da minificados: #418, #423, #425…). Medido el 08/10/2026: 4 y 4, y la consola limpia.
+   */
+  test('99e1ee7e — «Apps relacionadas» pinta sus cuatro tarjetas en el HTML servido y tras hidratar, sin error de hidratación', async ({
+    page,
+    request,
+  }) => {
+    const desde = '#from=related-simulador-gastos-compraventa-terreno-rustico';
+    const esperadas = [
+      `/simulador-gastos-compraventa-solar/${desde}`,
+      `/simulador-gastos-compraventa-local-comercial/${desde}`,
+      `/estimador-compraventa-inmueble/${desde}`,
+      `/simulador-gastos-compraventa-nave-industrial/${desde}`,
+    ];
+    const html = await (await request.get(RUTA)).text();
+    const seccion = html.match(/aria-label="Aplicaciones relacionadas"[\s\S]*?<\/section>/)?.[0] ?? '';
+    expect([...seccion.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(esperadas);
+
+    const errores: string[] = [];
+    page.on('console', (m) => {
+      if (m.type() === 'error') errores.push(m.text());
+    });
+    page.on('pageerror', (e) => errores.push(e.message));
+    await abrirHidratada(page);
+    const tarjetas = page.locator('section[aria-label="Aplicaciones relacionadas"] a');
+    await expect(tarjetas).toHaveCount(4);
+    expect(await tarjetas.evaluateAll((as) => as.map((a) => a.getAttribute('href')))).toEqual(esperadas);
+    expect(errores.filter((e) => /hydrat|#418|#419|#422|#423|#425/i.test(e))).toEqual([]);
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-a] la coma que cierra el inciso «que no se ha
+   * podido leer» antes de «ni». Es la forma del 2958 de la referencia (sospecha (a), vista aquí el
+   * 06/10 sin registrar): page.tsx une las partidas del COSTE TOTAL con `.join(' ni ')` (l. 811) y
+   * el inciso se queda abierto, así que se lee como si tampoco se hubiera podido leer la parte de
+   * la notaría.
+   *   Valencia · renuncia · 7.000.000 € · gestoría «2.000.50» → esperado «No incluye la gestoría,
+   *   que no se ha podido leer, ni la parte de la notaría de libre acuerdo: el coste real será
+   *   mayor (…)» · obtenido «…que no se ha podido leer ni la parte…».
+   */
+  test('[08/10-a] el coste total parcial cierra con coma el inciso «que no se ha podido leer» antes de «ni»', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-a] abierto: falta la coma antes de «ni»');
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'valencia');
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await sembrarValor(page, CAMPO_PRECIO, '7000000');
+    await sembrarValor(page, CAMPO_GESTORIA, '2.000.50');
+    // Preparación (pasa): las dos partidas que faltan, en la frase.
+    const desc = await descripcionTarjeta(page, 'COSTE TOTAL');
+    expect(desc).toContain('la parte de la notaría de libre acuerdo');
+    // El defecto.
+    expect(desc).toBe(
+      'No incluye la gestoría, que no se ha podido leer, ni la parte de la notaría de libre acuerdo: el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho)',
+    );
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-b] el nombre oficial de `ITP_CCAA.nombre` entra
+   * sin artículo en frases escritas en ESTE page.tsx (forma del 3065 de local-comercial, 3077 de
+   * garaje, 3081 de trastero y 3084 de nave): el aviso de Ceuta y Melilla (l. 480, `En
+   * {datosCcaaActual.nombre} no rige el IVA`) y, con renuncia en Valencia, el aviso de la renuncia
+   * (l. 522) y la descripción de la tarjeta del AJD (l. 716).
+   *   Ceuta → esperado «En la Ciudad Autónoma de Ceuta no rige el IVA…» (o «En Ceuta…») · obtenido
+   *   «En Ciudad Autónoma de Ceuta no rige el IVA, sino el IPSI…» (igual en Melilla).
+   *   Valencia · renuncia → esperado «en la Comunidad Valenciana» · obtenido «Tipo propio de la
+   *   renuncia a la exención en Comunidad Valenciana» y «al tipo propio de la renuncia en Comunidad
+   *   Valenciana (2 %)».
+   */
+  test('[08/10-b] las frases de page.tsx con el nombre de la comunidad llevan su artículo', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-b] abierto: «En Ciudad Autónoma de Ceuta», «en Comunidad Valenciana»');
+    await abrirHidratada(page);
+    await sembrarValor(page, CAMPO_PRECIO, '45000');
+    for (const [ccaa, ciudad] of [['ceuta', 'Ceuta'], ['melilla', 'Melilla']] as const) {
+      await page.selectOption('#select-ccaa', ccaa);
+      const avisos = await i08AvisosRenuncia(page);
+      expect(avisos.some((a) => a.includes('no existe la renuncia a la exención'))).toBe(true);
+      expect(avisos.join(' ')).toMatch(new RegExp(`En (la Ciudad Autónoma de ${ciudad}|${ciudad}) no rige el IVA`));
+    }
+    await page.selectOption('#select-ccaa', 'valencia');
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    expect(await descripcionTarjeta(page, 'AJD (')).toBe('Tipo propio de la renuncia a la exención en la Comunidad Valenciana');
+    expect((await i08AvisosRenuncia(page)).join(' ')).toContain('al tipo propio de la renuncia en la Comunidad Valenciana (2');
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-c] forma del 2968 (sospecha (d)): la FAQ
+   * visible (page.tsx) y el FAQPage (metadata.ts) se escriben dos veces, y cuatro preguntas del
+   * FAQPage repiten una visible con otra redacción y otra respuesta. No se contradicen, pero cada
+   * una calla lo que da la otra: «¿Se paga IVA o ITP…?» (visible: la renuncia y Canarias, Ceuta y
+   * Melilla) frente a «¿Qué impuesto se paga…?» (FAQPage: el rango del 6 % al 13 % y la
+   * bonificación de Ceuta y Melilla); la plusvalía (el FAQPage añade el IRPF del vendedor); la
+   * renuncia; y las reducciones agrarias. La reparación es UNA constante que importen las dos
+   * bocas (`PREGUNTAS_FRECUENTES`, PASO 5 de /nueva-app-meskeia; como garaje).
+   */
+  test('[08/10-c] la FAQ visible y el FAQPage dan la misma respuesta a la misma pregunta', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-c] abierto: cuatro preguntas con dos redacciones');
+    await abrirHidratada(page);
+    const { visible, ld } = await page.evaluate(() => {
+      const limpio = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').trim();
+      const h2 = [...document.querySelectorAll('h2')].find((h) => h.textContent?.includes('Preguntas frecuentes'));
+      const visible = [...(h2?.parentElement?.querySelectorAll('div > div') ?? [])].map((d) => ({
+        q: limpio(d.querySelector('strong')?.textContent),
+        a: limpio(d.querySelector('p')?.textContent),
+      }));
+      const faq = [...document.querySelectorAll('script[type="application/ld+json"]')]
+        .map((s) => JSON.parse(s.textContent ?? '{}'))
+        .find((j) => j['@type'] === 'FAQPage');
+      const ld: { q: string; a: string }[] = (faq?.mainEntity ?? []).map(
+        (q: { name: string; acceptedAnswer: { text: string } }) => ({ q: limpio(q.name), a: limpio(q.acceptedAnswer.text) }),
+      );
+      return { visible, ld };
+    });
+    // Preparación (pasa): las dos bocas existen y la de escriturar ya es una sola respuesta.
+    expect(visible.length).toBeGreaterThanOrEqual(5);
+    expect(ld.length).toBeGreaterThanOrEqual(5);
+    expect(visible[0]).toEqual(ld[0]);
+    const temas = [/impuesto se paga|IVA o ITP/i, /plusvalía municipal/i, /renuncia a la exención|Puede aplicarse IVA/i, /reducciones de ITP/i];
+    for (const tema of temas) {
+      const v = visible.find((x) => tema.test(x.q));
+      const j = ld.find((x) => tema.test(x.q));
+      expect(v, String(tema)).toBeTruthy();
+      expect(j, String(tema)).toBeTruthy();
+      // El defecto: la misma pregunta con dos respuestas escritas aparte.
+      expect(v?.a, String(tema)).toBe(j?.a);
+    }
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, medio) — [08/10-d] la reparación del 2920 (06/10) se quedó en
+   * Galicia y Andalucía. Las fichas de Asturias, Cataluña y Extremadura (data/itp-ccaa.ts) siguen
+   * anunciando en esta app de fincas tipos reducidos que, según la propia tabla del motor, son de la
+   * VIVIENDA (todos sus `tiposReducidos` llevan «Vivienda habitual» o VPO), sin decirlo, debajo de
+   * «Puede haber reducciones de ITP para … jóvenes agricultores».
+   *   Asturias · 100.000 € → ITP (8,00 %) 8000,00 € (correcto) · esperado: la ficha dice que el 4 %
+   *   es de la vivienda habitual (o no se pinta para una finca) · obtenido «Asturias: Escala
+   *   progresiva. Tipo reducido 4 % ampliado a familias monoparentales desde 2025.». Cataluña:
+   *   «Tipo reducido 5 % para colectivos específicos, con el límite de edad de los jóvenes en 35
+   *   años…» (ITP 10.000,00). Extremadura: «los tipos reducidos para jóvenes/familia numerosa varían
+   *   entre fuentes (7 %, 6,4 %… o 3 %)».
+   * Aragón tiene la misma forma en su 12,5 % del art. 121-4 (sus tres reducidos llevan «Vivienda
+   * habitual»), pero no entra en el caso: su familia numerosa rural remite a «los mismos requisitos
+   * del art. 121-5» sin la palabra, y el ancla del test es literal.
+   */
+  test('[08/10-d] las fichas de Asturias, Cataluña y Extremadura dicen que sus reducidos son de la vivienda', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-d] abierto: la reparación del 2920 no llegó a estas tres fichas');
+    const casos = [
+      ['asturias', '8000,00 €', 'Tipo reducido 4'],
+      ['cataluna', '10.000,00 €', 'Tipo reducido 5'],
+      ['extremadura', '8000,00 €', 'tipos reducidos para jóvenes'],
+    ] as const;
+    for (const [c] of casos) {
+      expect(ITP_CCAA[c].tiposReducidos.every((r) => r.condiciones.some((cond) => /vivienda|VPO/i.test(cond))), c).toBe(true);
+    }
+    await abrirHidratada(page);
+    await sembrarValor(page, CAMPO_PRECIO, '100000');
+    for (const [c, itp, anuncio] of casos) {
+      await page.selectOption('#select-ccaa', c);
+      expect(await valorTarjeta(page, 'ITP ('), c).toBe(itp);
+      const notas = await notasRecuadro(page);
+      expect(notas.some((n) => n.includes('jóvenes agricultores (Ley 19/1995)'))).toBe(true);
+      const ficha = (await (await i08Ficha(page, c)).innerText()).replace(/\s+/g, ' ');
+      expect(ficha, c).toContain(anuncio);
+      // El defecto: el reducido se anuncia sin su condición de vivienda.
+      expect(ficha, c).toMatch(/vivienda/i);
+    }
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (accesibilidad, bajo) — [08/10-e] el «⚠️» que llevan dentro las fichas de
+   * Aragón, Cataluña, Extremadura y La Rioja (texto de `ITP_CCAA[x].notas`) se pinta como texto,
+   * sin `<span aria-hidden="true">` (CLAUDE.md global §5, regla 3; forma del 3083 de trastero, que
+   * era un literal del page.tsx). El lector de pantalla lo anuncia en mitad de la nota y
+   * check:a11y-jsx no lo ve porque viaja en un string de data/.
+   *   Aragón · 100.000 € → esperado: el emoji fuera del árbol accesible · obtenido ariaSnapshot
+   *   «- text: "Aragón aplica bonificaciones … ⚠️ Esta app no calcula dos casos que sí existen…"».
+   */
+  test('[08/10-e] el «⚠️» de las fichas de la comunidad no llega al lector de pantalla', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-e] abierto: el emoji de las notas está en el árbol accesible');
+    await abrirHidratada(page);
+    for (const c of ['aragon', 'cataluna', 'extremadura', 'rioja'] as const) {
+      expect(ITP_CCAA[c].notas, c).toContain('⚠️');
+      await page.selectOption('#select-ccaa', c);
+      const ficha = await i08Ficha(page, c);
+      await expect(ficha, c).toContainText('⚠️');
+      // El defecto: el emoji forma parte del texto accesible.
+      expect(await ficha.ariaSnapshot(), c).not.toContain('⚠️');
+    }
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (dato, bajo) — [08/10-f] dónde NO existe la renuncia a la exención es un
+   * dato normativo (Ley 8/1991 del IPSI, arts. 7 y 20.3, decidido contra el BOE el 24/09/2026) y
+   * está tecleado en la página: `const TERRITORIOS_SIN_RENUNCIA = ['ceuta', 'melilla']`
+   * (page.tsx:163), mientras su gemelo `TERRITORIOS_SIN_IVA` vive en data/itp-ccaa.ts. Es la línea
+   * que ya cita el 3088 de nave («vistas por grep y sin medir»): aquí medida. Hoy la app se
+   * comporta bien (preparación); el riesgo es que las tres copias diverjan.
+   */
+  test('[08/10-f] la lista de territorios sin renuncia se importa de data/, no se teclea en page.tsx', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-f] abierto: TERRITORIOS_SIN_RENUNCIA inline en page.tsx');
+    // Preparación (pasa): el comportamiento es el correcto.
+    await abrirHidratada(page);
+    const renuncia = page.getByRole('button', { name: /renuncia a la exención/i });
+    for (const [c, desactivado] of [['ceuta', true], ['melilla', true], ['canarias', false], ['madrid', false]] as const) {
+      await page.selectOption('#select-ccaa', c);
+      if (desactivado) await expect(renuncia, c).toBeDisabled();
+      else await expect(renuncia, c).toBeEnabled();
+    }
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(join(process.cwd(), 'app', 'simulador-gastos-compraventa-terreno-rustico', 'page.tsx'), 'utf8');
+    // El defecto.
+    expect(fuente).not.toMatch(/const\s+TERRITORIOS_SIN_RENUNCIA\b[^=]*=\s*\[/);
   });
 });

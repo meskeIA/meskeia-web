@@ -45,9 +45,12 @@
  * y registral recalculados tramo a tramo por un script propio que NO llama al código de la
  * app; el desarrollo va comentado junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS ABIERTOS: cuatro desde la re-inspección del 06/10/2026, con `test.fail()` y la
- * palabra ABIERTO en el último describe del fichero (el pegado que NumberInput descarta, la
- * nota de Canarias, el FAQPage sin IGIC/IPSI y el ITP «al tipo general»). Ninguno a 26/09/2026 (tarde): los de ese día
+ * HALLAZGOS ABIERTOS: cuatro desde el Inspector del 08/10/2026 ([08/10-a] a [08/10-d]), con
+ * `test.fail()` en el último describe del fichero (la coma antes de «ni», el nombre de Ceuta y
+ * Melilla sin artículo, cuatro preguntas de la FAQ escritas dos veces y el IVA deducible sin «no
+ * exenta»). Los cuatro de la re-inspección del 06/10/2026 (2916-2919: el pegado que NumberInput
+ * descartaba, la nota de Canarias, el FAQPage sin IGIC/IPSI y el ITP «al tipo general») se
+ * repararon ese mismo día y quedaron como regresión, sin marca. Ninguno a 26/09/2026 (tarde): los de ese día
  * (2208-2213) están reparados y sin marca en el describe «Reparación 26/09/2026», con la receta de la familia
  * (notaría y registro sin IVA en Canarias, Ceuta y Melilla, 2214; foco del select, 2215). Los
  * casos anteriores con esas comunidades se recalcularon a mano (líneas ÷ 1,21), y los lectores
@@ -2953,9 +2956,9 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
   });
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // HALLAZGOS ABIERTOS del 06/10/2026. Escritos afirmando lo que DEBERÍA pasar: hoy fallan a
-  // propósito (`test.fail()`, salvo con `VER_HUECOS=1`, que enseña el fallo). Al repararlos,
-  // quitar la marca y reescribir «ABIERTO» en pasado.
+  // HALLAZGOS del 06/10/2026 (2916-2919). Se escribieron afirmando lo que DEBERÍA pasar, con
+  // `test.fail()` (salvo con `VER_HUECOS=1`). Se repararon ese mismo día: la marca se quitó y
+  // quedan aquí como regresión (a 08/10/2026 la base no tiene ninguno abierto).
   // ─────────────────────────────────────────────────────────────────────────────
 
   /**
@@ -3073,5 +3076,509 @@ test.describe('Re-inspección 06/10/2026 — casos a mano, cifras intermedias y 
     expect(frase(visible)).not.toBe('');
     expect(frase(ld)).toMatch(conSalvedad);
     expect(frase(visible)).toMatch(conSalvedad);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 08/10/2026 — la familia «Compraventa inmobiliaria» entera, una hermana por agente
+// (referencia: estimador-compraventa-inmueble; testigo tests/familias/compraventa.spec.ts, 82/82
+// en verde ese día). Tres casos resueltos a mano ANTES de abrir el navegador, el invariante de la
+// familia campo a campo (la app tiene dos NumberInput: el precio y la gestoría), el refactor
+// 99e1ee7e de las relacionadas y las cuatro sospechas del 06/10 medidas aquí:
+//   (a) la coma que cierra «que no se ha podido leer» antes de «ni» → HALLAZGO [08/10-a];
+//   (b) el patrón 5 («no falta, no vale») en un campo que no puede valer 0 → la app no tiene valor
+//       catastral, la gestoría sí puede valer 0 y el precio ya distingue «0», «0,00» y el
+//       negativo con el foco (CASO 3) → SANA;
+//   (c) los rangos de ITP y AJD frente a la bonificación de Ceuta y Melilla → SANA en las cuatro
+//       bocas que dan un rango (sello, tabla, «escriturar» y FAQPage);
+//   (d) la misma pregunta con dos redacciones → HALLAZGO [08/10-c] (cuatro parejas); una de ellas
+//       arrastra el [08/10-d], la condición del IVA deducible sin «no exenta».
+// Y el [08/10-b]: el nombre oficial de ITP_CCAA.nombre sin artículo en dos frases de page.tsx.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//   · ITP de un solar → TIPOS_ITP_CCAA_2025 (data/fiscal/inmuebles.ts): Cantabria 9 %, sin escala
+//     ni umbral en ITP_CCAA; Ceuta 6 % (excepción declarada en data/itp-ccaa.ts) por
+//     BONIFICACION_CUOTA_CEUTA_MELILLA = 0,5 (art. 57 bis TRLITPAJD) → 3 % efectivo.
+//   · AJD de un solar → ITP_CCAA[x].ajd: La Rioja 1 %, Navarra 0,5 %, Madrid 0,75 %.
+//   · IVA → PORCENTAJES_IVA.general = 21 (data/fiscal/iva.ts).
+//   · Límite del arancel notarial → LIMITE_ARANCEL_NOTARIAL = 6.010.121,04 € (RD 1426/1989, nº 2.1).
+//   · Condición del IVA deducible → Ley 37/1992 (la fuente de FISCAL_IVA_META), consolidado
+//     BOE-A-1992-28740 leído el 08/10/2026: art. 94.Uno.1.º.a) «Las entregas de bienes y
+//     prestaciones de servicios sujetas y no exentas del Impuesto sobre el Valor Añadido»;
+//     art. 20.Uno.23.º.b) exime el arrendamiento de «edificios o partes de los mismos destinados
+//     exclusivamente a viviendas».
+// Notaría y registro, sin literal: los hallazgos 2901 y 2902 (rebaja del 5 % de los dos aranceles,
+// abiertos en la referencia) los moverán. Se exige que el total cuadre con las líneas visibles.
+// Resueltos a mano con el motor de hoy, y coincidentes con la app: Cantabria 230.000 → notaría
+// 790,75 (677,78–903,71) y registro 247,11; La Rioja 82.500 → 562,85 y 156,68; Navarra 95.000 →
+// 589,31 y 168,02; Ceuta 7.000.000, sin IPSI → 3817,93 (3272,51–4363,34) y 1595,33.
+//
+// Los hallazgos van con `test.fail()` salvo con `VER_HUECOS=1`, que enseña el fallo (el mismo
+// interruptor que el testigo de la familia). Al repararlos, quitar la marca y reescribir en pasado.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const I08_VER_HUECOS = Boolean(process.env.VER_HUECOS);
+
+test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a campo y las sospechas (a)-(d)', () => {
+  test.describe.configure({ timeout: 90_000 });
+  const SEL_PRECIO = `input[aria-label="${PRECIO}"]`;
+  const SEL_GESTORIA = `input[aria-label="${GESTORIA}"]`;
+  const n = (s: string | null | undefined): string => (s ?? '').replace(/\s+/g, ' ').trim();
+  /** El marcador del panel sin cifra (y no el anunciador de rutas de Next). */
+  const marcador = (page: Page) => page.locator('[class*="placeholder"] p');
+
+  async function elegirVendedor(page: Page, vende: 'particular' | 'promotor'): Promise<void> {
+    const boton = page.getByRole('button', {
+      name: vende === 'particular' ? /Un particular/ : /Promotor \/ Empresa/,
+    });
+    await boton.click();
+    await expect(boton).toHaveAttribute('aria-pressed', 'true');
+  }
+
+  async function abrir(page: Page, ccaa: string, vende: 'particular' | 'promotor'): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
+    await page.selectOption('#select-ccaa', ccaa);
+    await expect(page.locator('#select-ccaa')).toHaveValue(ccaa);
+    await elegirVendedor(page, vende);
+  }
+
+  interface I08Tarjeta {
+    titulo: string;
+    valor: string;
+    desc: string;
+  }
+
+  /** Las tarjetas del panel, en orden, con el texto normalizado (el U+00A0 pasa a espacio). */
+  const leer = (page: Page): Promise<I08Tarjeta[]> =>
+    page.evaluate(() => {
+      const cont = document.querySelector('[class*="resultados"]');
+      const norm = (s: string | undefined) => (s ?? '').replace(/\s+/g, ' ').trim();
+      return [...(cont?.querySelectorAll('h3') ?? [])].map((h) => {
+        const card = h.parentElement!.parentElement!;
+        const valor = card.querySelector(':scope > div:nth-of-type(2) > p') as HTMLElement | null;
+        const ps = card.querySelectorAll(':scope > p');
+        return {
+          titulo: norm(h.innerText),
+          valor: norm(valor?.innerText),
+          desc: ps.length ? norm((ps[ps.length - 1] as HTMLElement).innerText) : '',
+        };
+      });
+    });
+
+  const euros = (s: string): number => parseSpanishNumber(s.replace(/\s?€$/, ''));
+  const tarjeta = (ts: I08Tarjeta[], re: RegExp): I08Tarjeta => {
+    const x = ts.find((c) => re.test(c.titulo));
+    if (!x) throw new Error(`No hay tarjeta ${re} entre: ${ts.map((c) => c.titulo).join(' | ')}`);
+    return x;
+  };
+
+  /**
+   * El total es la suma de lo que se ve encima, el coste es precio + total, y el % de la
+   * descripción del total sigue al total. Precisión 1 en el % (±0,05 puntos): vigila que el %
+   * siga al total —una gestoría ilegible de 300 € sobre 95.000 € lo mueve 0,32 puntos—, no el
+   * redondeo del segundo decimal.
+   */
+  function cuadra(ts: I08Tarjeta[], precio: number): void {
+    const lineas = ts
+      .filter((c) => !/^(Precio del solar|Total gastos|COSTE TOTAL)/.test(c.titulo) && /€$/.test(c.valor))
+      .map((c) => euros(c.valor));
+    const total = euros(tarjeta(ts, /^Total gastos/).valor);
+    expect(total).toBeCloseTo(lineas.reduce((a, b) => a + b, 0), 2);
+    expect(euros(tarjeta(ts, /^COSTE TOTAL/).valor)).toBeCloseTo(precio + total, 2);
+    const desc = tarjeta(ts, /^Total gastos/).desc;
+    const pct = desc.match(/^([\d.,]+) % sobre el precio de compra/);
+    expect(pct, `descripción del total: «${desc}»`).not.toBeNull();
+    expect(parseSpanishNumber(pct![1])).toBeCloseTo((total / precio) * 100, 1);
+  }
+
+  /** El FAQPage del JSON-LD, pregunta → respuesta normalizada. */
+  async function faqLd(page: Page): Promise<Map<string, string>> {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = JSON.parse(bloques.find((b) => b.includes('"FAQPage"')) ?? '{}') as {
+      mainEntity: Array<{ name: string; acceptedAnswer: { text: string } }>;
+    };
+    return new Map(faq.mainEntity.map((q): [string, string] => [q.name, n(q.acceptedAnswer.text)]));
+  }
+
+  /** La FAQ visible (la guía ya abierta), pregunta → respuesta normalizada. */
+  async function faqVisible(page: Page): Promise<Map<string, string>> {
+    const pares = await page.evaluate(() => {
+      const h2 = [...document.querySelectorAll('h2')].find((h) => /Preguntas frecuentes/.test(h.textContent ?? ''));
+      const cont = h2?.parentElement?.querySelector('div');
+      return [...(cont?.children ?? [])].map((d) => [
+        (d.querySelector('strong') as HTMLElement | null)?.innerText ?? '',
+        (d.querySelector('p') as HTMLElement | null)?.innerText ?? '',
+      ]);
+    });
+    return new Map(pares.map(([p, r]): [string, string] => [n(p), n(r)]));
+  }
+
+  /**
+   * CASO 1 (NORMAL) — Cantabria, vende un PARTICULAR, 230.000 €, gestoría 650 €.
+   *   ITP = 230.000 × 9 % = 20.700,00 → «ITP (9,00 %)»; sin AJD (incompatible con el ITP) ni IVA.
+   *   Cierre completo. A mano, con el motor de hoy: 20.700 + 790,75 + 247,11 + 650 = 22.387,86
+   *   (9,73 %) y coste 252.387,86; aquí se fijan el ITP, la gestoría y el cuadre (2901/2902).
+   */
+  test('CASO 1 (normal) — Cantabria, particular, 230.000 €: ITP 9 % = 20.700 € y el cierre cuadra', async ({ page }) => {
+    await abrir(page, 'cantabria', 'particular');
+    await sembrarValor(page, SEL_GESTORIA, '650');
+    await sembrarValor(page, SEL_PRECIO, '230000');
+    const ts = await leer(page);
+    expect(tarjeta(ts, /^Precio del solar/).valor).toBe('230.000,00 €');
+    expect(tarjeta(ts, /^ITP \(/).titulo).toBe('ITP (9,00 %)');
+    expect(tarjeta(ts, /^ITP \(/).valor).toBe('20.700,00 €');
+    expect(ts.some((c) => /^(AJD|IVA|IGIC|IPSI)/.test(c.titulo))).toBe(false);
+    expect(tarjeta(ts, /^Gastos de notaría/).titulo).toBe('Gastos de notaría (IVA incluido)');
+    expect(tarjeta(ts, /^Gastos de gestoría/).valor).toBe('650,00 €');
+    expect(tarjeta(ts, /^Total gastos/).titulo).toBe('Total gastos adicionales');
+    expect(tarjeta(ts, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(tarjeta(ts, /^COSTE TOTAL/).desc).toBe('Precio + todos los gastos de la operación');
+    cuadra(ts, 230000);
+    const recuadro = n(await page.locator('[class*="infoCcaa"]').first().innerText());
+    expect(recuadro).toContain('ITP General 9 %');
+    expect(recuadro).toContain('AJD 1,5 %');
+  });
+
+  /**
+   * CASO 1-bis (NORMAL) — La Rioja, vende un PROMOTOR, 82.500 € (con punto de millar), la gestoría
+   * de 500 € que trae el campo.
+   *   IVA = 82.500 × 21 % = 17.325,00 · AJD = 82.500 × 1 % = 825,00 → «AJD (1,00 %)»
+   *   A mano: 17.325 + 825 + 562,85 + 156,68 + 500 = 19.369,53 (23,48 %), coste 101.869,53.
+   */
+  test('CASO 1-bis (normal) — La Rioja, promotor, 82.500 €: IVA 17.325 € + AJD 1 % = 825 €', async ({ page }) => {
+    await abrir(page, 'rioja', 'promotor');
+    await sembrarValor(page, SEL_PRECIO, '82.500');
+    const ts = await leer(page);
+    expect(tarjeta(ts, /^Precio del solar/).valor).toBe('82.500,00 €');
+    expect(tarjeta(ts, /^IVA \(/).titulo).toBe('IVA (21,00 %)');
+    expect(tarjeta(ts, /^IVA \(/).valor).toBe('17.325,00 €');
+    expect(tarjeta(ts, /^AJD \(/).titulo).toBe('AJD (1,00 %)');
+    expect(tarjeta(ts, /^AJD \(/).valor).toBe('825,00 €');
+    expect(ts.some((c) => /^ITP/.test(c.titulo))).toBe(false);
+    expect(tarjeta(ts, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(tarjeta(ts, /^COSTE TOTAL/).desc).toBe(
+      `Precio + todos los gastos (antes de deducir el IVA si tienes derecho). ${AVISO_BASE_AJD}`,
+    );
+    cuadra(ts, 82500);
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Ceuta, vende un PARTICULAR, 7.000.000 €, gestoría 750 €: tres límites a la vez.
+   *   ITP = 7.000.000 × 6 % × (1 − 0,5) = 210.000,00 → «ITP (3,00 %)» (art. 57 bis.3.a);
+   *   el precio pasa de 6.010.121,04 € → la parte de la notaría que excede es de libre acuerdo;
+   *   Ceuta no lleva IVA en las facturas → notaría y registro «(sin IPSI)» y la nota de debajo.
+   *   Cierre «(parcial)»: el total nombra la notaría libre y el IPSI de los honorarios, y el coste
+   *   dice «puede ser mayor». A mano: 210.000 + 3817,93 + 1595,33 + 750 = 216.163,26 (3,09 %).
+   *   INVARIANTE: con la gestoría «2.000.50», total y coste BAJAN 750,00 € (la cifra queda por
+   *   debajo de la real), el total, su % y el coste lo nombran, y el coste pasa a «será mayor».
+   */
+  test('CASO 2 (límite) — Ceuta, particular, 7.000.000 €: ITP 3 %, notaría de libre acuerdo, honorarios sin IPSI y la gestoría ilegible nombrada', async ({ page }) => {
+    await abrir(page, 'ceuta', 'particular');
+    await sembrarValor(page, SEL_GESTORIA, '750');
+    await sembrarValor(page, SEL_PRECIO, '7.000.000');
+    const a = await leer(page);
+    expect(tarjeta(a, /^ITP \(/).titulo).toBe('ITP (3,00 %)');
+    expect(tarjeta(a, /^ITP \(/).valor).toBe('210.000,00 €');
+    expect(tarjeta(a, /^ITP \(/).desc).toContain('con la bonificación del 50 % de la cuota ya aplicada');
+    expect(tarjeta(a, /^Gastos de notaría/).titulo).toBe('Gastos de notaría (sin IPSI)');
+    expect(tarjeta(a, /^Gastos de notaría/).desc).toMatch(/^Arancel hasta 6\.010\.121,04 €: factura estimada entre/);
+    expect(tarjeta(a, /^Registro de la Propiedad/).titulo).toBe('Registro de la Propiedad (sin IPSI)');
+    expect(tarjeta(a, /^Gastos de gestoría/).valor).toBe('750,00 €');
+    expect(tarjeta(a, /^Total gastos/).titulo).toBe('Total gastos adicionales (parcial)');
+    expect(tarjeta(a, /^Total gastos/).desc).toContain(
+      'SIN la parte de la notaría de libre acuerdo (el valor que excede de 6.010.121,04 €)',
+    );
+    expect(tarjeta(a, /^Total gastos/).desc.endsWith(sinHonorarios('IPSI'))).toBe(true);
+    expect(tarjeta(a, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL (PARCIAL)');
+    expect(tarjeta(a, /^COSTE TOTAL/).desc).toBe('No incluye la parte de la notaría de libre acuerdo: el coste real puede ser mayor');
+    await expect(page.locator('[class*="avisoHonorarios"]')).toContainText('llevan además IPSI');
+    cuadra(a, 7000000);
+
+    await sembrarValor(page, SEL_GESTORIA, '2.000.50');
+    const b = await leer(page);
+    expect(tarjeta(b, /^Gastos de gestoría/).valor).toBe('Sin leer');
+    expect(euros(tarjeta(b, /^Total gastos/).valor) - euros(tarjeta(a, /^Total gastos/).valor)).toBeCloseTo(-750, 2);
+    expect(euros(tarjeta(b, /^COSTE TOTAL/).valor) - euros(tarjeta(a, /^COSTE TOTAL/).valor)).toBeCloseTo(-750, 2);
+    expect(tarjeta(b, /^Total gastos/).desc).toContain('SIN la gestoría, que no se ha podido leer');
+    // La coma que falta antes de «ni» es el [08/10-a]: aquí se tolera y se mide la dirección.
+    expect(tarjeta(b, /^COSTE TOTAL/).desc).toMatch(
+      /^No incluye la gestoría, que no se ha podido leer,? ni la parte de la notaría de libre acuerdo: el coste real será mayor$/,
+    );
+    cuadra(b, 7000000);
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — Navarra, vende un PROMOTOR. El precio:
+   *   «-50000» sin salir del campo → no vale (patrón 5), con lo escrito entre comillas;
+   *   al salir, el min={0} lo deja en «0» → el mismo mensaje con «0»;
+   *   «0,00» → no vale; «7.000.000,00.5» (dos separadores decimales) → no se lee, y se nombra.
+   *   Ninguno publica cifra. Con «95.000» y la gestoría 300 → IVA 19.950,00 + AJD (0,50 %) 475,00
+   *   (a mano: + 589,31 + 168,02 + 300 = 21.482,33, 22,61 %). La gestoría «1,500,5» (dos comas
+   *   que no agrupan millares) es ILEGIBLE: total y coste bajan 300,00 € (21.182,33, 22,30 %) y la
+   *   app lo nombra en el total, el % y el coste, con «será mayor» y la salvedad del IVA deducible.
+   */
+  test('CASO 3 (rechazo) — Navarra, promotor: «-50000», «0» y «0,00» no valen, «7.000.000,00.5» no se lee; la gestoría «1,500,5» se nombra', async ({ page }) => {
+    await abrir(page, 'navarra', 'promotor');
+    const cierre = page.locator('h3', { hasText: /^COSTE TOTAL/ });
+    await sembrarValor(page, SEL_PRECIO, '-50000');
+    await expect(cierre).toHaveCount(0);
+    await expect(marcador(page)).toHaveText(
+      'El precio escrito («-50000») tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del solar.',
+    );
+    await page.locator(SEL_PRECIO).focus();
+    await page.locator(SEL_PRECIO).blur();
+    await esperarValorEnReact(page, SEL_PRECIO, '0');
+    await expect(cierre).toHaveCount(0);
+    await expect(marcador(page)).toHaveText(
+      'El precio escrito («0») tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del solar.',
+    );
+    await sembrarValor(page, SEL_PRECIO, '0,00');
+    await expect(cierre).toHaveCount(0);
+    await expect(marcador(page)).toHaveText(
+      'El precio escrito («0,00») tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del solar.',
+    );
+    await sembrarValor(page, SEL_PRECIO, '7.000.000,00.5');
+    await expect(cierre).toHaveCount(0);
+    await expect(marcador(page)).toHaveText(/^No se ha podido leer el precio «7\.000\.000,00\.5»/);
+
+    await sembrarValor(page, SEL_PRECIO, '95.000');
+    await sembrarValor(page, SEL_GESTORIA, '300');
+    const a = await leer(page);
+    expect(tarjeta(a, /^IVA \(/).valor).toBe('19.950,00 €');
+    expect(tarjeta(a, /^AJD \(/).titulo).toBe('AJD (0,50 %)');
+    expect(tarjeta(a, /^AJD \(/).valor).toBe('475,00 €');
+    expect(tarjeta(a, /^Gastos de gestoría/).valor).toBe('300,00 €');
+    cuadra(a, 95000);
+
+    await sembrarValor(page, SEL_GESTORIA, '1,500,5');
+    const b = await leer(page);
+    expect(tarjeta(b, /^Gastos de gestoría/).valor).toBe('Sin leer');
+    expect(euros(tarjeta(b, /^Total gastos/).valor) - euros(tarjeta(a, /^Total gastos/).valor)).toBeCloseTo(-300, 2);
+    expect(euros(tarjeta(b, /^COSTE TOTAL/).valor) - euros(tarjeta(a, /^COSTE TOTAL/).valor)).toBeCloseTo(-300, 2);
+    expect(tarjeta(b, /^Total gastos/).titulo).toBe('Total gastos adicionales (parcial)');
+    expect(tarjeta(b, /^Total gastos/).desc).toMatch(/^[\d.,]+ % sobre el precio de compra — SIN la gestoría, que no se ha podido leer$/);
+    expect(tarjeta(b, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL (PARCIAL)');
+    expect(tarjeta(b, /^COSTE TOTAL/).desc).toBe(
+      `No incluye la gestoría, que no se ha podido leer: el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho). ${AVISO_BASE_AJD}`,
+    );
+    cuadra(b, 95000);
+  });
+
+  /**
+   * 99e1ee7e (08/10/2026) — las relacionadas las resuelve ahora el SERVIDOR en el layout
+   * (`<ConRelacionadas slug>`) y la página pinta `<RelatedApps />` sin prop. Esperado: las cuatro
+   * primeras de `appRelationsMap['simulador-gastos-compraventa-solar']` (data/app-relations.ts; el
+   * bloque pinta cuatro y la quinta, el simulador de hipoteca, no sale), con su `#from=related-…`,
+   * en el HTML servido y las MISMAS tras hidratar, sin error de hidratación en la consola (React
+   * de producción los da minificados: #418, #423, #425…). Medido el 08/10/2026: 4 y 4, consola
+   * limpia (solo dos avisos de precarga de CSS).
+   */
+  test('99e1ee7e — «Apps relacionadas» pinta sus cuatro tarjetas en el HTML servido y tras hidratar, sin error de hidratación', async ({
+    page,
+    request,
+  }) => {
+    const desde = '#from=related-simulador-gastos-compraventa-solar';
+    const esperadas = [
+      `/simulador-gastos-compraventa-terreno-rustico/${desde}`,
+      `/simulador-gastos-compraventa-local-comercial/${desde}`,
+      `/estimador-compraventa-inmueble/${desde}`,
+      `/estimador-plusvalia-municipal/${desde}`,
+    ];
+    const html = await (await request.get(RUTA)).text();
+    const seccion = html.match(/aria-label="Aplicaciones relacionadas"[\s\S]*?<\/section>/)?.[0] ?? '';
+    expect([...seccion.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(esperadas);
+
+    const errores: string[] = [];
+    page.on('console', (m) => {
+      if (m.type() === 'error') errores.push(m.text());
+    });
+    page.on('pageerror', (e) => errores.push(e.message));
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
+    const enlaces = page.locator('section[aria-label="Aplicaciones relacionadas"] a');
+    await expect(enlaces).toHaveCount(4);
+    expect(await enlaces.evaluateAll((as) => as.map((a) => a.getAttribute('href')))).toEqual(esperadas);
+    expect(errores.filter((e) => /hydrat|#418|#419|#422|#423|#425/i.test(e))).toEqual([]);
+  });
+
+  /**
+   * Sospecha (c) — los rangos de ITP y AJD que publica la página frente a lo que cobra en Ceuta y
+   * Melilla (ITP 3 % efectivo en el CASO 2; AJD 0,25 % con promotor). Se reparó aquí el 26/09
+   * (2212). Se miden las cuatro bocas que dan un rango —el sello del ITP, la fila AJD de la tabla,
+   * la respuesta de «escriturar» (visible y FAQPage, la misma función) y el FAQPage del impuesto—
+   * y que NINGUNA otra frase con un rango de porcentajes, en pantalla o en el FAQPage, calle Ceuta
+   * y Melilla. Se midió SANA el 08/10/2026.
+   *   RANGO_ITP_OTROS = { 6, 13 } (Madrid, Navarra, Ceuta y Melilla al 6 % nominal; Baleares y
+   *   Cataluña al 13 % en su último tramo) · RANGO_AJD_OTROS = { 0,5, 1,5 }.
+   */
+  test('Sospecha (c) — los rangos de ITP y AJD nombran Ceuta y Melilla en sello, tabla, «escriturar» y FAQPage', async ({ page }) => {
+    expect(RANGO_ITP_OTROS).toEqual({ min: 6, max: 13 });
+    expect(RANGO_AJD_OTROS).toEqual({ min: 0.5, max: 1.5 });
+    expect(BONIFICACION_CUOTA_CEUTA_MELILLA).toBe(0.5);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const cuerpo = n(await page.evaluate(() => document.body.innerText));
+    expect(cuerpo).toContain(
+      'El ITP de un solar va del 6 % al 13 % según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota se bonifica un 50 % (art. 57 bis TRLITPAJD)',
+    );
+    expect(cuerpo).toContain(
+      'Sí (0,5 %–1,5 %; en Ceuta y Melilla, la mitad por la bonificación del 50 %, art. 57 bis.1 TRLITPAJD)',
+    );
+    const escriturar =
+      'el ITP, del 6 % al 13 % según la comunidad autónoma (la mitad en Ceuta y Melilla, por su bonificación del 50 %, que alcanza también al AJD)';
+    expect(cuerpo).toContain(escriturar);
+    const ld = await faqLd(page);
+    expect(ld.get('¿Cuánto cuesta escriturar un solar?')).toContain(escriturar);
+    expect(ld.get('¿Se paga IVA o ITP al comprar un solar?')).toContain(
+      'AJD, que va del 0,5 % al 1,5 % según la comunidad autónoma (en Ceuta y Melilla la cuota se bonifica al 50 %, art. 57 bis.1 TRLITPAJD)',
+    );
+    const sinCiudades: string[] = [];
+    for (const texto of [cuerpo, ...ld.values()]) {
+      for (const m of texto.matchAll(/\d+(?:,\d+)? % ?(?:al |–)(?:el )?\d+(?:,\d+)? %[^.]*/g)) {
+        if (!/Ceuta y Melilla/.test(m[0])) sinCiudades.push(m[0]);
+      }
+    }
+    expect(sinCiudades).toEqual([]);
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-a] sospecha (a), la forma del 2958 de la
+   * referencia (3076, 3080 y 3087 en garaje, trastero y nave). La descripción de «COSTE TOTAL
+   * (PARCIAL)» une las ausencias con `.join(' ni ')` (page.tsx:727-733) y el inciso «que no se ha
+   * podido leer» queda sin coma de cierre: se lee como si tampoco se hubiera podido leer la parte
+   * de libre acuerdo de la notaría.
+   *   Madrid, promotor, 7.000.000 €, gestoría «2.000.50» → esperado «No incluye la gestoría, que no
+   *   se ha podido leer, ni la parte de la notaría de libre acuerdo: el coste real será mayor (…)».
+   *   Ceuta, promotor, lo mismo → «No incluye el IPSI ni la gestoría, que no se ha podido leer, ni
+   *   la parte de la notaría de libre acuerdo: el coste real será mayor.»
+   */
+  test('[08/10-a] el coste total parcial cierra con coma el inciso «que no se ha podido leer» antes de «ni»', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-a] abierto: falta la coma antes de «ni»');
+    await abrir(page, 'madrid', 'promotor');
+    await sembrarValor(page, SEL_PRECIO, '7.000.000');
+    await sembrarValor(page, SEL_GESTORIA, '2.000.50');
+    const madrid = tarjeta(await leer(page), /^COSTE TOTAL/).desc;
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await expect.poll(async () => tarjeta(await leer(page), /^IPSI/).valor).toBe('No calculado');
+    const ceuta = tarjeta(await leer(page), /^COSTE TOTAL/).desc;
+    // Lo que no depende de la coma: las ausencias están y en la dirección del ilegible.
+    expect(madrid).toMatch(/la gestoría, que no se ha podido leer,? ni la parte de la notaría de libre acuerdo: el coste real será mayor/);
+    expect(ceuta).toMatch(/^No incluye el IPSI ni la gestoría, que no se ha podido leer,? ni la parte/);
+    // Lo que falta: la coma.
+    expect(madrid).toMatch(
+      /^No incluye la gestoría, que no se ha podido leer, ni la parte de la notaría de libre acuerdo: el coste real será mayor \(precio \+ gastos antes de deducir el IVA si tienes derecho\)/,
+    );
+    expect(ceuta).toMatch(
+      /^No incluye el IPSI ni la gestoría, que no se ha podido leer, ni la parte de la notaría de libre acuerdo: el coste real será mayor\./,
+    );
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-b] el nombre oficial de `ITP_CCAA.nombre`
+   * («Ciudad Autónoma de Ceuta», «… de Melilla») entra sin artículo en dos frases escritas en ESTE
+   * page.tsx: la tarjeta del impuesto no calculado (l. 607, `En ${datosCcaaActual.nombre} no rige
+   * el IVA`) y la nota de la bonificación del recuadro (l. 528, `pero en {datosCcaaActual.nombre}
+   * se aplica además`). Es la forma del 3065 (local), 3077 (garaje), 3081 (trastero) y 3084 (nave).
+   * El aviso común AvisoTerritorioSinIva arrastra lo mismo, pero ese es de la familia (3065) y no
+   * se mide aquí. Ninguna otra frase de page.tsx mete el nombre tras «en» o «de».
+   *   Ceuta, promotor, 100.000 € → esperado «En la Ciudad Autónoma de Ceuta no rige el IVA…» (o «En
+   *   Ceuta…») y «pero en la Ciudad Autónoma de Ceuta se aplica además…» · obtenido sin «la».
+   */
+  test('[08/10-b] las frases de page.tsx con el nombre de Ceuta y Melilla llevan su artículo', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-b] abierto: «En Ciudad Autónoma de Ceuta», «pero en Ciudad Autónoma de Melilla»');
+    const sinArticulo = /[^.]*\b[Ee]n Ciudad Autónoma de (?:Ceuta|Melilla)[^.]*/;
+    const encontrados: string[] = [];
+    for (const ciudad of ['ceuta', 'melilla']) {
+      await abrir(page, ciudad, 'promotor');
+      await sembrarValor(page, SEL_PRECIO, '100000');
+      const ipsi = tarjeta(await leer(page), /^IPSI/).desc;
+      const recuadro = n(await page.locator('[class*="infoCcaa"]').first().innerText());
+      // Lo que no depende del artículo: las dos frases están.
+      expect(ipsi).toMatch(/no rige el IVA: la compra al promotor tributa por el IPSI/);
+      expect(recuadro).toMatch(/se aplica además la bonificación del 50 % de la cuota/);
+      for (const frase of [ipsi, recuadro]) {
+        const m = frase.match(sinArticulo);
+        if (m) encontrados.push(`${ciudad}: ${m[0].trim()}`);
+      }
+    }
+    expect(encontrados).toEqual([]);
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-c] sospecha (d), la forma del 2968: la misma
+   * pregunta tiene dos respuestas escritas aparte, una en page.tsx (FAQ visible) y otra en
+   * metadata.ts (FAQPage). Son cuatro parejas; solo «escriturar» comparte función. No se
+   * contradicen en cifras, pero cada boca calla lo que da la otra: el FAQPage da el rango del AJD
+   * (0,5-1,5 %) y su bonificación en Ceuta y Melilla, el AJD de la escritura, el modelo 303 y la
+   * condición «sujeta y no exenta» (ver [08/10-d]); la visible, que la plusvalía no la paga el
+   * comprador. Reparación: UNA constante por pregunta en metadata.ts que importen las dos bocas
+   * (como app/simulador-gastos-compraventa-garaje).
+   */
+  test('[08/10-c] cada pregunta de la FAQ visible que repite el FAQPage tiene la misma respuesta', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-c] abierto: cuatro preguntas con dos respuestas escritas aparte');
+    const PAREJAS: Array<[string, string]> = [
+      ['¿Se paga IVA o ITP al comprar un solar?', '¿Se paga IVA o ITP al comprar un solar?'],
+      ['¿Por qué el solar no está exento de IVA como la finca rústica?', '¿Por qué un solar de empresario lleva IVA y no ITP?'],
+      ['¿El autopromotor de su vivienda puede deducir el IVA del solar?', '¿Puedo deducir el IVA de la compra de un solar?'],
+      ['¿Hay plusvalía municipal en la compra de un solar?', '¿Hay plusvalía municipal al vender un solar?'],
+    ];
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const visible = await faqVisible(page);
+    const ld = await faqLd(page);
+    // Control del lector: la pareja que ya comparte función sale igual.
+    expect(visible.get('¿Cuánto cuesta escriturar un solar?')).toBeTruthy();
+    expect(visible.get('¿Cuánto cuesta escriturar un solar?')).toBe(ld.get('¿Cuánto cuesta escriturar un solar?'));
+    const distintas: string[] = [];
+    for (const [pv, pl] of PAREJAS) {
+      // Al repararlo, la pregunta puede quedar con una sola redacción: vale cualquiera de las dos.
+      const rv = visible.get(pv) ?? visible.get(pl);
+      const rl = ld.get(pl) ?? ld.get(pv);
+      expect(rv, `falta en la FAQ visible: ${pv}`).toBeTruthy();
+      expect(rl, `falta en el FAQPage: ${pl}`).toBeTruthy();
+      if (rv !== rl) distintas.push(pv);
+    }
+    expect(distintas).toEqual([]);
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, medio) — [08/10-d] la condición para deducir el IVA del solar
+   * se publica de dos maneras. «Limitaciones» y el FAQPage la dan bien, «actividad sujeta y NO
+   * EXENTA» (Ley 37/1992, art. 94.Uno.1.º.a: «sujetas y no exentas»). El aviso de compra a
+   * promotor («es deducible si eres empresario o autónomo y afectas el solar a una actividad
+   * sujeta a IVA»), la tarjeta del IVA («Deducible si eres empresa/autónomo sujeto a IVA»), la fila
+   * de la tabla («Sí (si actividad sujeta)») y la FAQ visible («Solo deducen el IVA quienes afectan
+   * el solar a una actividad económica sujeta a IVA») omiten la exención. Caso típico de un solar:
+   * una promotora que lo compra para construir viviendas en ALQUILER (arrendamiento exento, art.
+   * 20.Uno.23.º.b) no deduce el 21 %, y el aviso y la tarjeta le dicen que sí. Las cifras no cambian:
+   * el coste ya va «antes de deducir el IVA si tienes derecho».
+   *   Madrid, promotor, 300.000 € → esperado: las cuatro bocas condicionan a «sujeta y no exenta» ·
+   *   obtenido «actividad sujeta a IVA», «sujeto a IVA», «Sí (si actividad sujeta)», «sujeta a IVA».
+   */
+  test('[08/10-d] todas las bocas condicionan el IVA deducible a una actividad «sujeta y no exenta»', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-d] abierto: aviso, tarjeta, tabla y FAQ visible omiten «no exenta»');
+    await abrir(page, 'madrid', 'promotor');
+    await sembrarValor(page, SEL_PRECIO, '300000');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    // Las dos bocas que ya lo dicen bien: la referencia de lo esperado.
+    const ld = await faqLd(page);
+    expect(ld.get('¿Puedo deducir el IVA de la compra de un solar?')).toContain('actividad económica sujeta y no exenta de IVA');
+    expect(n(await page.locator('li', { hasText: 'El IVA solo es deducible' }).first().innerText())).toContain(
+      'actividad sujeta y no exenta',
+    );
+    const bocas: Record<string, string> = {
+      'aviso del promotor': n(await page.locator('[role="note"]', { hasText: 'Compra a promotor o empresa' }).innerText()),
+      'tarjeta del IVA': tarjeta(await leer(page), /^IVA \(/).desc,
+      tabla: n(await page.locator('tr', { hasText: '¿IVA deducible?' }).locator('td').nth(1).innerText()),
+      'FAQ visible': (await faqVisible(page)).get('¿El autopromotor de su vivienda puede deducir el IVA del solar?') ?? '',
+    };
+    expect(Object.values(bocas).every((tx) => /IVA|sujet/.test(tx))).toBe(true);
+    const sinExencion = Object.entries(bocas)
+      .filter(([, tx]) => !/no exent/.test(tx))
+      .map(([k, tx]) => `${k}: «${tx}»`);
+    expect(sinExencion).toEqual([]);
   });
 });

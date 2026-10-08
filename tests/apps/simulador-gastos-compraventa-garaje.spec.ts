@@ -44,11 +44,16 @@
  *  13-22. Las re-inspecciones del 10/09 al 26/09/2026, cada una con su cabecera abajo.
  *  23. RE-INSPECCIÓN 06/10/2026 — la hermana tras fa0772c0, 7d5c1876 y 242fffcd: el
  *      invariante de la familia campo a campo (los nueve importes), el umbral de Valencia
- *      y dos hallazgos nuevos con `test.fail()` (al final del fichero).
+ *      y dos hallazgos con `test.fail()` (2905 y 2906), REPARADOS ese mismo día: ya no
+ *      llevan la marca.
+ *  24. INSPECTOR 08/10/2026 — la familia entera, una hermana por agente: Baleares con el
+ *      perfil General, el millón EXACTO de Valencia anclado en la ley, la reventa a un mes
+ *      con la ganancia en el tramo del 30 %, la comprobación de 99e1ee7e (relacionadas) y
+ *      cuatro hallazgos con `test.fail()` (al final del fichero).
  *
  * ⚠️ 06/10/2026 — los bloques «✅ REPARADO» (antes «❌ ABIERTO») describen el defecto TAL
- * COMO SE VIO el día de su inspección, con los verbos de entonces: la base no tiene ninguno
- * abierto en esta app. Los únicos `test.fail()` vivos son los de la sección 23.
+ * COMO SE VIO el día de su inspección, con los verbos de entonces. A 08/10/2026 la base no
+ * tenía ninguno abierto en esta app: los únicos `test.fail()` vivos son los de la sección 24.
  *
  * ⚠️ Desde el 09/09/2026 las preguntas de la FAQ son `<h3>` (reparación del 626) y
  * `EducationalSection` monta su contenido SIEMPRE en el DOM, así que un
@@ -6869,8 +6874,8 @@ test.describe('Re-inspección 06/10/2026 — la hermana tras fa0772c0, 7d5c1876 
   });
 
   /**
-   * ❌ ABIERTO 06/10/2026 (accesibilidad, medio) — los subtítulos de los botones de transmisión y
-   * de tipo de garaje no llegan a 4,5:1.
+   * ✅ REPARADO el 06/10/2026 (hallazgo 2906; era accesibilidad, medio) — los subtítulos de los
+   * botones de transmisión y de tipo de garaje no llegaban a 4,5:1. Así se vio entonces:
    *
    * `.transmisionSub { font-size: 0.8rem; opacity: 0.8 }`: texto de 12,8 px con la opacidad
    * rebajada sobre el fondo del botón. Medido el 06/10/2026 (sin transiciones, en obra nueva):
@@ -6897,5 +6902,373 @@ test.describe('Re-inspección 06/10/2026 — la hermana tras fa0772c0, 7d5c1876 
       fallos.push(...(await i06SubtitulosBajos(page)).map((f) => `${tema}: ${f}`));
     }
     expect(fallos).toEqual([]);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 24. INSPECTOR 08/10/2026 — la familia «Compraventa inmobiliaria» entera, una hermana por
+//     agente (referencia: estimador-compraventa-inmueble). Único cambio de código en esta app
+//     desde el 06/10: 99e1ee7e (page.tsx pinta `<RelatedApps />` sin prop y layout.tsx monta
+//     `<ConRelacionadas slug>`). Las secciones 1-23 siguen en verde.
+//
+// Tres casos NUEVOS, resueltos a mano ANTES de ejecutar (scratch del Inspector), la comprobación
+// de 99e1ee7e y cuatro hallazgos con `test.fail()`: afirman lo que DEBERÍA pasar, así que hoy
+// fallan a propósito; al repararlos se les quita la marca. Al repararlos cambian también textos
+// que hoy fijan casos anteriores: el CASO 3 (placeholder con el precio 0), el CASO L (suelo «-5000»
+// «falta») y el CASO T («En Ciudad Autónoma de Melilla no rige el IVA…»).
+//
+// Notaría y registro siguen sin literal (cabecera de la sección 23: hallazgos 2901 y 2902,
+// abiertos en la referencia); el total se exige cuadrado con las líneas visibles.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//   · ITP → `ITP_CCAA.baleares.tramosProgresivos` (8 % hasta 400.000 €) y `ITP_CCAA.valencia`
+//     (9 % y `umbralTipoUnico` { superiorA: 1.000.000, tipo: 11 }). El millón EXACTO, que la
+//     sección 23 dejó sin probar por no tener el texto a mano, se ancla hoy en la norma: Ley
+//     13/1997, art. 13.Uno (BOE-A-1998-8202, consolidado, versión del 11/08/2026, leído el
+//     08/10/2026): «cuando el valor de los bienes inmuebles transmitidos […] sea superior a un
+//     millón de euros, el tipo aplicable será el 11 %». 1.000.000,00 € → 9 %; 1.000.000,01 € → 11 %.
+//   · Plusvalía → `COEFICIENTES_IIVTNU_2025` (9 años: 0,15; menos de 1 año: 0,15 anual,
+//     prorrateado por meses completos, art. 107.4 TRLRHL) × el 25 % de `tipoOrientativo`.
+//   · IRPF → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (art. 66 LIRPF: 19/21/23/27/30 %).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Un `test.fail()` se traga el motivo. Con `VER_HUECOS=1 npx playwright test <este fichero>` los
+ * cuatro hallazgos de esta sección dejan de estar marcados y la salida enseña lo que la app
+ * publica frente a lo esperado (el mismo interruptor que el testigo de la familia).
+ */
+const I08_VER_HUECOS = Boolean(process.env.VER_HUECOS);
+
+/** El texto del placeholder de la pestaña activa (cuando no hay desglose). */
+async function i08Placeholder(page: Page): Promise<string> {
+  return i24Normaliza(await page.locator('[role="tabpanel"] [class*="__placeholder"] p').first().innerText());
+}
+
+test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia y el patrón 5 en el precio', () => {
+  /**
+   * CASO DA (NORMAL) — ISLAS BALEARES · segunda mano · 52.000 € · perfil General · gestoría 280,
+   * y un vendedor con comisión DECIMAL (3,5 %). Ninguna sección recorría Baleares con el perfil
+   * General ni el primer tramo de su escala.
+   *
+   * Comprador: ITP 52.000 × 8 % = 4.160,00 € (primer tramo de la escala 8/9/10/12/13 %, hasta
+   *   400.000 €; sus reducidos exigen vivienda habitual o son de colectivo, así que no hay aviso
+   *   «Podrías pagar menos»). Recuadro «ITP General 8,00 %» y «AJD 1,5 %».
+   * Vendedor: venta 52.000 · compra 41.000 · gastos de aquella compra 3.300 · 9 años · suelo
+   *   8.000 · total 30.000 · comisión 3,5 % · gestoría 120.
+   *   Comisión 52.000 × 3,5 % = 1.820,00
+   *   Plusvalía objetivo 8.000 × 0,15 × 25 % = 300,00 · real 11.000 × 8.000/30.000 × 25 % =
+   *     733,33 → 300,00 (el objetivo es el más favorable)
+   *   Adquisición 41.000 + 3.300 = 44.300,00 · transmisión 52.000 − 1.820 − 120 − 300 = 49.760,00
+   *   Ganancia 5.460,00 · IRPF 5.460 × 19 % = 1.037,40 (todo en el primer tramo)
+   *   Total gastos 300 + 1.820 + 120 + 1.037,40 = 3.277,40 · neto 52.000 − 3.277,40 = 48.722,60
+   */
+  test('CASO DA (normal) — Baleares 52.000 €: el 8 % del primer tramo, y un vendedor con comisión del 3,5 %', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.baleares.tramosProgresivos?.[0]).toEqual({ hasta: 400000, tipo: 8 });
+    expect(ITP_CCAA.baleares.ajd).toBe(1.5);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 9)?.coeficiente).toBe(0.15);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0]).toEqual({ hasta: 6000, tipo: 19 });
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'baleares');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '52000');
+    await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '280');
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('8,00 %');
+    expect(await valorPanelCcaa(page, 'AJD')).toBe('1,5 %');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (8,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('4160,00 €');
+    expect(await i24Valor(page, /^Gastos de gestoría/)).toBe('280,00 €');
+    await i06CuadraComprador(page, 52000, 4160, 280);
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await i24Desc(page, /^COSTE TOTAL/)).toBe('Precio + todos los gastos');
+    await expect(page.locator('[role="note"]', { hasText: 'Podrías pagar menos' })).toHaveCount(0);
+
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    for (const [etiqueta, valor] of [
+      ['Precio de compra original del garaje', '41000'],
+      ['Impuestos y gastos que pagaste al comprarlo (€)', '3300'],
+      ['Años de propiedad', '9'],
+      ['Valor catastral del suelo (€)', '8000'],
+      ['Valor catastral total (suelo + construcción) (€)', '30000'],
+      ['Comisión inmobiliaria del vendedor (%)', '3,5'],
+      ['Gestoría y certificados del vendedor (€)', '120'],
+    ] as const) {
+      await sembrarImporte(page, etiqueta, valor);
+    }
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('300,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método objetivo (más favorable)');
+    expect(await i24Valor(page, /^Valor de adquisición/)).toBe('44.300,00 €');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('49.760,00 €');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('5460,00 €');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('1037,40 €');
+    expect(await i24Titulo(page, /^Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (3,5 %)');
+    expect(await i24Valor(page, /^Comisión inmobiliaria/)).toBe('1820,00 €');
+    expect(await i24Valor(page, /^Gestoría y certificados del vendedor/)).toBe('120,00 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('3277,40 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('48.722,60 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes tras gastos e impuestos');
+  });
+
+  /**
+   * CASO DB (LÍMITE) — COMUNIDAD VALENCIANA en el MILLÓN EXACTO y un céntimo por encima (ver la
+   * cabecera: «superior a un millón»), y un vendedor en los dos extremos de sus tablas: la
+   * reventa a UN mes completo (el prorrateo más pequeño del art. 107.4 TRLRHL) y una ganancia en
+   * el QUINTO tramo del ahorro (30 %), que ninguna sección alcanzaba.
+   *
+   * Comprador (gestoría 300, la de partida):
+   *   1.000.000,00 € → no es «superior a un millón»: 9 % = 90.000,00 € · «ITP (9,00 %)» · recuadro 9,00 %
+   *   1.000.000,01 € → 11 % sobre TODO el valor = 110.000,0011 → 110.000,00 € · «ITP (11,00 %)» ·
+   *     recuadro 11,00 %; y el coste total es el precio más el total: 1.000.000,01 + total
+   * Vendedor: venta 1.000.000 · compra 600.000 · 0 años y 1 mes completo · suelo 200.000 · total
+   *   400.000 · comisión 2 % · sin gestoría ni gastos de aquella compra.
+   *   Coeficiente 0,15 × 1/12 = 0,0125 · plusvalía objetivo 200.000 × 0,0125 × 25 % = 625,00 ·
+   *     real 400.000 × 200.000/400.000 × 25 % = 50.000,00 → 625,00 (objetivo)
+   *   Comisión 20.000,00 · transmisión 1.000.000 − 20.000 − 625 = 979.375,00 · adquisición 600.000,00
+   *   Ganancia 379.375,00 · IRPF 6.000 × 19 % + 44.000 × 21 % + 150.000 × 23 % + 100.000 × 27 % +
+   *     79.375 × 30 % = 1.140 + 9.240 + 34.500 + 27.000 + 23.812,50 = 95.692,50
+   *   Total gastos 625 + 20.000 + 95.692,50 = 116.317,50 · neto 1.000.000 − 116.317,50 = 883.682,50
+   */
+  test('CASO DB (límite) — Valencia: 1.000.000 € al 9 % y 1.000.000,01 € al 11 %; reventa a un mes con la ganancia al 30 %', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.valencia.tipoGeneral).toBe(9);
+    expect(ITP_CCAA.valencia.umbralTipoUnico).toEqual({ superiorA: 1_000_000, tipo: 11 });
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 0)?.coeficiente).toBe(0.15);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t) => t.tipo)).toEqual([19, 21, 23, 27, 30]);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t) => t.hasta)).toEqual([6000, 50000, 200000, 300000, Infinity]);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'valencia');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '1000000');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (9,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('90.000,00 €');
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('9,00 %');
+    await i06CuadraComprador(page, 1000000, 90000, 300);
+
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '1000000,01');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (11,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('110.000,00 €');
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('11,00 %');
+    await i06CuadraComprador(page, 1000000.01, 110000, 300);
+
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '1000000');
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '600000');
+    await sembrarImporte(page, 'Años de propiedad', '0');
+    await page.selectOption('#meses-completos', '1');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '200000');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '400000');
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '2');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('625,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método objetivo (más favorable)');
+    expect(await i24Valor(page, /^Valor de adquisición/)).toBe('600.000,00 €');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('979.375,00 €');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('379.375,00 €');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('95.692,50 €');
+    expect(await i24Titulo(page, /^Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (2 %)');
+    expect(await i24Valor(page, /^Comisión inmobiliaria/)).toBe('20.000,00 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('116.317,50 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('883.682,50 €');
+  });
+
+  /**
+   * CASO DC (RECHAZO) — un precio «0» escrito, o «-25000» con el foco dentro (el blur lo acota a 0
+   * por su min={0}), no puede producir ningún desglose en ninguna pestaña; y un valor catastral
+   * del suelo «0» no puede liquidar una plusvalía de 0 €: queda «Sin calcular» y el neto, parcial.
+   *
+   * Suelo «0» · Madrid · venta 30.000 · compra 20.000 · 5 años · total 10.000 · comisión 3 %:
+   *   comisión 900,00 · transmisión 30.000 − 900 = 29.100,00 (sin plusvalía) · adquisición 20.000
+   *   ganancia 9.100,00 (máximo) · IRPF 1.140 + 3.100 × 21 % = 1.791,00 (máximo)
+   *   total gastos 900 + 1.791 = 2.691,00 · neto 30.000 − 2.691 = 27.309,00 (PARCIAL, puede ser menor)
+   * Lo que el aviso DICE del 0 (que no «falta», que no vale) es el hallazgo [08/10-b], aparte.
+   */
+  test('CASO DC (rechazo) — el precio «0» o negativo no da desglose, y el suelo «0» no liquida plusvalía', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    const precio = page.locator('input[aria-label="Precio del garaje / plaza de parking"]');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '-25000', { blur: false });
+    await expect(page.locator('[role="tabpanel"] h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+    await precio.blur();
+    await expect(precio).toHaveValue('0');
+    await expect(page.locator('[role="tabpanel"] h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
+    await expect(page.locator('[role="tabpanel"] h3', { hasText: /^ITP/ })).toHaveCount(0);
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '18000');
+    await expect(page.locator('[role="tabpanel"] h3', { hasText: /^IMPORTE NETO/ })).toHaveCount(0);
+    await expect(page.getByText(/No definido|NaN/)).toHaveCount(0);
+
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await sembrarImporte(page, 'Precio de compra original del garaje', '20000');
+    await sembrarImporte(page, 'Años de propiedad', '5');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '0');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '10000');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('29.100,00 €');
+    expect(await i24Titulo(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial (máximo)');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('9100,00 €');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('1791,00 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('2691,00 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('27.309,00 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toContain('el neto real puede ser menor que este');
+  });
+
+  /**
+   * 99e1ee7e (08/10/2026) — las relacionadas las resuelve ahora el SERVIDOR en el layout
+   * (`<ConRelacionadas slug>`) y la página pinta `<RelatedApps />` sin prop. Esperado: las cuatro
+   * primeras de `appRelations['simulador-gastos-compraventa-garaje']` (data/app-relations.ts; el
+   * bloque pinta cuatro), con su `#from=related-…`, en el HTML servido y las MISMAS tras hidratar,
+   * sin ningún error de hidratación en la consola (React de producción los da minificados: #418,
+   * #423, #425…). Medido el 08/10/2026: 4 y 4, y la consola limpia.
+   */
+  test('99e1ee7e — «Apps relacionadas» pinta sus cuatro tarjetas en el HTML servido y tras hidratar, sin error de hidratación', async ({
+    page,
+    request,
+  }) => {
+    const desde = '#from=related-simulador-gastos-compraventa-garaje';
+    const esperadas = [
+      `/estimador-compraventa-inmueble/${desde}`,
+      `/simulador-gastos-compraventa-local-comercial/${desde}`,
+      `/simulador-gastos-compraventa-trastero/${desde}`,
+      `/simulador-gastos-compraventa-nave-industrial/${desde}`,
+    ];
+    const html = await (await request.get(RUTA)).text();
+    const seccion = html.match(/aria-label="Aplicaciones relacionadas"[\s\S]*?<\/section>/)?.[0] ?? '';
+    expect([...seccion.matchAll(/href="([^"]+)"/g)].map((m) => m[1])).toEqual(esperadas);
+
+    const errores: string[] = [];
+    page.on('console', (m) => {
+      if (m.type() === 'error') errores.push(m.text());
+    });
+    page.on('pageerror', (e) => errores.push(e.message));
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    const tarjetas = page.locator('section[aria-label="Aplicaciones relacionadas"] a');
+    await expect(tarjetas).toHaveCount(4);
+    expect(await tarjetas.evaluateAll((as) => as.map((a) => a.getAttribute('href')))).toEqual(esperadas);
+    expect(errores.filter((e) => /hydrat|#418|#419|#422|#423|#425/i.test(e))).toEqual([]);
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-a] patrón 5 en el PRECIO principal: es el
+   * hallazgo 2960 de la referencia y el 3062 de local-comercial, aquí en su forma literal.
+   * page.tsx distingue el precio ilegible (`escritoIlegible`) del vacío, pero no el «no vale»: con
+   * el precio escrito «0», o «-25000» con el foco dentro (el blur lo deja en 0), las dos pestañas
+   * piden que se introduzca el precio, como si el campo estuviera vacío, con el 0 a la vista. La
+   * misma app ya lo distingue en el precio de compra original desde el 2189, y solar, nave y
+   * terreno rústico en su precio («El precio escrito («0») tiene que ser mayor que 0: corrígelo…»).
+   * Caso: Madrid · precio «0» → esperado un mensaje que nombre el 0 escrito como no válido
+   *   («mayor que 0») · obtenido «Introduce el precio del garaje para ver el desglose de gastos del
+   *   comprador» y, en Vendedor, «Introduce el precio de venta y los datos adicionales para
+   *   calcular el neto del vendedor».
+   */
+  test('[08/10-a] un precio «0» escrito (o negativo con el foco) no se anuncia como que falta', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-a] abierto: el precio «0» se anuncia como si el campo estuviera vacío');
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '-25000', { blur: false });
+    expect(await i08Placeholder(page)).toMatch(/mayor que 0/);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '0');
+    expect(await i08Placeholder(page)).not.toContain('Introduce el precio del garaje para ver');
+    expect(await i08Placeholder(page)).toMatch(/mayor que 0/);
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    expect(await i08Placeholder(page)).not.toContain('Introduce el precio de venta y los datos adicionales');
+    expect(await i08Placeholder(page)).toMatch(/mayor que 0/);
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-b] patrón 5 en el VALOR CATASTRAL DEL SUELO:
+   * es el hallazgo 2959 de la referencia, aquí con la misma forma. `faltanVacios` nombra el suelo
+   * con la guarda `valorSuelo > 0`, así que un 0 escrito (o un negativo con el foco, que el blur
+   * acota a 0 por su min={0}) se anuncia como si faltara, mientras en la misma tarjeta el precio
+   * de compra 0 ya dice «tiene que ser mayor que 0» (2189) y los años negativos «no pueden ser
+   * negativos» (1552). Los importes son correctos (CASO DC).
+   * Caso: Madrid · venta 30.000 · compra 20.000 · 5 años · suelo «0» (o «-6000» con el foco) ·
+   *   total 10.000 → esperado: que diga que el valor escrito no vale y pida corregirlo · obtenido
+   *   «No calculada (falta el valor catastral del suelo)» y, en el neto, «Rellena el valor
+   *   catastral del suelo para obtenerlo», con el 0 a la vista.
+   */
+  test('[08/10-b] un valor catastral del suelo «0» escrito no se anuncia como que falta', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-b] abierto: el suelo «0» se anuncia como si faltara');
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '20000');
+    await sembrarImporte(page, 'Años de propiedad', '5');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '10000');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '0');
+    await expect(page.locator('input[aria-label="Valor catastral del suelo (€)"]')).toHaveValue('0');
+    const plusvalia = await i24Desc(page, /^Plusvalía municipal/);
+    expect(plusvalia).not.toContain('falta el valor catastral del suelo');
+    expect(plusvalia).toMatch(/valor catastral del suelo.*mayor que 0/);
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).not.toContain('Rellena el valor catastral del suelo');
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-c] la coma que cierra el inciso «que no se ha
+   * podido leer» antes de «ni»: es el hallazgo 2958 de la referencia, con la misma forma. Las
+   * partidas de `avisoCosteComprador` se unen con `.join(' ni ')` en page.tsx, y tal como queda se
+   * lee como si tampoco se hubiera podido leer la parte de libre acuerdo de la notaría.
+   * Caso: Madrid · segunda mano · precio 7.000.000 · gestoría «2.000.50» → esperado «No incluye la
+   *   gestoría, que no se ha podido leer, ni la parte de la notaría que excede de 6.010.121,04 €,
+   *   que es de libre acuerdo: el coste real será mayor» · obtenido «…que no se ha podido leer ni
+   *   la parte…». En Canarias, obra nueva: «No incluye el IGIC ni la gestoría, que no se ha podido
+   *   leer ni la parte…».
+   */
+  test('[08/10-c] el coste total parcial cierra con coma el inciso «que no se ha podido leer» antes de «ni»', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-c] abierto: falta la coma antes de «ni»');
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '7000000');
+    await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '2.000.50');
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await i24Desc(page, /^COSTE TOTAL/)).toBe(
+      'No incluye la gestoría, que no se ha podido leer, ni la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo: el coste real será mayor',
+    );
+  });
+
+  /**
+   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-d] el nombre oficial de `ITP_CCAA.nombre` se
+   * mete sin artículo en tres frases escritas en el PROPIO page.tsx (la forma del 3065 de
+   * local-comercial): la tarjeta del impuesto no calculado (`En ${nombre} no rige el IVA`), el
+   * rótulo de la lista de reducidos (`Beneficios fiscales en {nombre}`) y el aviso «Podrías pagar
+   * menos» (`En {nombre} existe:`). Sale con Ceuta y Melilla («Ciudad Autónoma de…») y con Madrid,
+   * Valencia, Murcia, Navarra y Baleares («Comunidad de Madrid», «Islas Baleares»…). El aviso
+   * común `AvisoTerritorioSinIva` arrastra lo mismo, pero es de la familia (3065) y no se mide aquí.
+   * Caso: Ceuta · obra nueva · 25.000 → esperado «En la Ciudad Autónoma de Ceuta» (o «En Ceuta») ·
+   *   obtenido «En Ciudad Autónoma de Ceuta no rige el IVA: la compra de obra nueva tributa por el
+   *   IPSI…». Madrid · segunda mano · Familia numerosa → obtenido «Beneficios fiscales en Comunidad
+   *   de Madrid (solo si se cumplen TODAS sus condiciones):» y «En Comunidad de Madrid existe:».
+   */
+  test('[08/10-d] las frases de page.tsx con el nombre de la comunidad llevan su artículo', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-d] abierto: «En Ciudad Autónoma de Ceuta», «en Comunidad de Madrid»');
+    expect(ITP_CCAA.ceuta.nombre).toBe('Ciudad Autónoma de Ceuta');
+    expect(ITP_CCAA.madrid.nombre).toBe('Comunidad de Madrid');
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '25000');
+    await page.selectOption('#select-perfil', 'familia-numerosa');
+    const rotulo = i24Normaliza(
+      await page.locator('h3', { hasText: 'Beneficios fiscales en' }).first().innerText(),
+    );
+    const aviso = i24Normaliza(
+      await page.locator('[role="note"]', { hasText: 'Podrías pagar menos' }).innerText(),
+    );
+    await page.getByRole('button', { name: /Primera mano/ }).first().click();
+    await page.selectOption('#select-ccaa', 'ceuta');
+    const tarjeta = await i24Desc(page, /^IPSI$/);
+    expect(tarjeta).not.toMatch(/\b[Ee]n Ciudad Autónoma\b/);
+    expect(rotulo).not.toMatch(/\ben Comunidad de Madrid\b/);
+    expect(aviso).not.toMatch(/\bEn Comunidad de Madrid existe\b/);
   });
 });
