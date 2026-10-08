@@ -1451,6 +1451,29 @@ export const TERRITORIOS_SIN_IVA: Partial<Record<ComunidadAutonoma, { impuesto: 
  */
 export const TERRITORIOS_SIN_RENUNCIA: readonly ComunidadAutonoma[] = ['ceuta', 'melilla'];
 
+/**
+ * Dónde el IRPF de quien reside allí no es el de la escala estatal: en el País Vasco es «un tributo
+ * concertado de normativa autónoma» que exacciona la Diputación Foral «cuando el contribuyente
+ * tenga su residencia habitual en el País Vasco» (Concierto Económico, Ley 12/2002, art. 6.Uno,
+ * leído en el BOE el 08/10/2026), y Navarra tiene su propio régimen tributario (Convenio Económico,
+ * Ley 28/1990). Depende de la RESIDENCIA del vendedor, no de dónde está el inmueble, y data/fiscal
+ * no tiene esas escalas: las apps lo NOMBRAN (hallazgos 3061 y 3072, 08/10/2026).
+ */
+export const TERRITORIOS_IRPF_FORAL: readonly ComunidadAutonoma[] = ['pais-vasco', 'navarra'];
+
+/** Para el sello del IRPF de las apps con vendedor, que no saben dónde reside. */
+export const AVISO_IRPF_FORAL =
+  'Es la escala estatal: si resides en el País Vasco o en Navarra, tu IRPF es foral y se liquida con su propia escala, que esta herramienta no aplica.';
+
+/**
+ * Para la tarjeta del IRPF cuando la app SÍ sabe que el vendedor reside allí: vende su vivienda
+ * habitual en el País Vasco o en Navarra. Fuera de ese caso, `null`.
+ */
+export function avisoIrpfForalResidente(ccaa: ComunidadAutonoma, viviendaHabitual: boolean): string | null {
+  if (!viviendaHabitual || !TERRITORIOS_IRPF_FORAL.includes(ccaa)) return null;
+  return `Vendes tu vivienda habitual en ${nombreEnFrase(ccaa)}, así que resides allí: tu IRPF es foral y se liquida con su propia escala, no con esta estatal, de modo que la cuota real será distinta`;
+}
+
 /** IVA general que se repercute en las facturas de notaría y registro (art. 90.Uno Ley 37/1992). */
 const IVA_HONORARIOS = 0.21;
 

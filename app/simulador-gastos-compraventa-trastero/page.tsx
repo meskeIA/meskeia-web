@@ -84,7 +84,7 @@ import {
   sumarLineasVisibles,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
-  respuestaEscriturar, superaElTope, nombreEnFrase, deNombreCcaa } from '@/data/itp-ccaa';
+  respuestaEscriturar, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
@@ -1081,7 +1081,7 @@ export default function SimuladorTrasteroCompraventaPage() {
         fuente={GANANCIAS_PATRIMONIALES_META.fuente}
         verificado={GANANCIAS_PATRIMONIALES_META.verificado}
         urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
-        nota={`${GANANCIAS_PATRIMONIALES_META.nota} Escala del ahorro: del ${formatNumber(TIPO_AHORRO_MIN, 0)}\u00A0% al ${formatNumber(TIPO_AHORRO_MAX, 0)}\u00A0%.`}
+        nota={`${GANANCIAS_PATRIMONIALES_META.nota} Escala del ahorro: del ${formatNumber(TIPO_AHORRO_MIN, 0)}\u00A0% al ${formatNumber(TIPO_AHORRO_MAX, 0)}\u00A0%. ${AVISO_IRPF_FORAL}`}
       />
       {/* Y los dos aranceles con los que se estiman la notaría y el registro (RD 1426/1989 y
           RD 1427/1989), que la página publica y no tenían sello. */}

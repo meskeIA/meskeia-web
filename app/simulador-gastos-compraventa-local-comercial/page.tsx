@@ -17,7 +17,7 @@ import {
   RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
-import { RESPUESTA_IMPUESTO_COMPRA } from './metadata';
+import { RESPUESTA_IMPUESTO_COMPRA, PREGUNTA_RENUNCIA, RESPUESTA_RENUNCIA } from './metadata';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
 import {
@@ -60,6 +60,7 @@ import {
   nombreEnFrase,
   deNombreCcaa,
   TERRITORIOS_SIN_RENUNCIA,
+  AVISO_IRPF_FORAL,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -1194,7 +1195,7 @@ export default function SimuladorLocalComercialPage() {
         fuente={GANANCIAS_PATRIMONIALES_META.fuente}
         verificado={GANANCIAS_PATRIMONIALES_META.verificado}
         urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
-        nota={separarPorcentajes(GANANCIAS_PATRIMONIALES_META.nota)}
+        nota={`${separarPorcentajes(GANANCIAS_PATRIMONIALES_META.nota)} ${AVISO_IRPF_FORAL}`}
       />
 
       {/* Aviso IVA deducible */}
@@ -2218,14 +2219,8 @@ export default function SimuladorLocalComercialPage() {
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
-              <strong>¿Qué es la renuncia a la exención de IVA y a quién le interesa?</strong>
-              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                La segunda transmisión de un inmueble está exenta de IVA (Art. 20.Uno.22º LIVA). Si comprador y
-                vendedor son empresarios con derecho a deducción, el vendedor puede renunciar a esa exención
-                (Art. 20.Dos): la compra tributa por IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} con inversión del sujeto pasivo en lugar de ITP.
-                Interesa al comprador que puede deducir el IVA, porque el ITP es un coste no recuperable. No
-                existe en Ceuta y Melilla, donde la ley del IPSI no la regula.
-              </p>
+              <strong>{PREGUNTA_RENUNCIA}</strong>
+              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>{RESPUESTA_RENUNCIA}</p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Qué es la inversión del sujeto pasivo en la compra de un local?</strong>

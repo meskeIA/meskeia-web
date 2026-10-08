@@ -4974,7 +4974,8 @@ async function vendedorSinAmortizar0810(page: Page, ccaa: string): Promise<void>
   await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '500');
 }
 
-const PREGUNTA_RENUNCIA_FAQPAGE_0810 = '¿Qué es la renuncia a la exención de IVA en la compra de un local?';
+// Desde el 08/10/2026 (3063) las dos bocas hacen la misma pregunta.
+const PREGUNTA_RENUNCIA_FAQPAGE_0810 = '¿Qué es la renuncia a la exención de IVA y a quién le interesa?';
 const PREGUNTA_RENUNCIA_VISIBLE_0810 = '¿Qué es la renuncia a la exención de IVA y a quién le interesa?';
 
 test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de Ceuta, el precio en cero y las dos bocas de la renuncia', () => {
@@ -5134,7 +5135,7 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
     await abrir0810(page);
     const faq = await faqPage0710(page);
     expect(faq.get(PREGUNTA_RENUNCIA_FAQPAGE_0810)).toContain('La renuncia no existe en Ceuta y Melilla');
-    expect(await faqVisible0710(page, PREGUNTA_RENUNCIA_VISIBLE_0810)).toContain('No existe en Ceuta y Melilla');
+    expect(await faqVisible0710(page, PREGUNTA_RENUNCIA_VISIBLE_0810)).toContain('La renuncia no existe en Ceuta y Melilla');
     await page.selectOption('#select-ccaa', 'melilla');
     await expect(page.getByRole('button', { name: /2ª mano con renuncia/ })).toBeDisabled();
   });
@@ -5198,13 +5199,12 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
     });
   });
 
-  // HALLAZGO [08/10-d] (bajo, contenido) — ❌ ABIERTO. La forma del 2968 en la otra pareja: «¿Qué es la
+  // HALLAZGO [08/10-d] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3063, PREGUNTA_/RESPUESTA_RENUNCIA). La forma del 2968 en la otra pareja: «¿Qué es la
   // renuncia a la exención de IVA y a quién le interesa?» (visible) y «¿Qué es la renuncia a la
   // exención de IVA en la compra de un local?» (FAQPage) son la misma pregunta con dos respuestas
   // escritas aparte; e8c8d2ca tuvo que añadir la misma salvedad de Ceuta y Melilla DOS veces. La
   // reparación es UNA constante en metadata.ts que importen las dos bocas.
   test('[08/10-d] la pregunta de qué es la renuncia tiene UNA respuesta en las dos bocas', async ({ page }) => {
-    test.fail();
     await abrir0810(page);
     const jsonLd = (await faqPage0710(page)).get(PREGUNTA_RENUNCIA_FAQPAGE_0810) ?? '';
     const visible = await faqVisible0710(page, PREGUNTA_RENUNCIA_VISIBLE_0810);
@@ -5214,7 +5214,7 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
     expect(visible).toBe(jsonLd);
   });
 
-  // HALLAZGO [08/10-e] (bajo, dato) — ❌ ABIERTO. Las dos respuestas sobre la renuncia dicen que la
+  // HALLAZGO [08/10-e] (bajo, dato) — ✅ REPARADO el 08/10/2026 (3064). Las dos respuestas sobre la renuncia dicen que la
   // operación pasa a «IVA al 21 %» y solo exceptúan Ceuta y Melilla; en Canarias la renuncia existe
   // pero es a la exención del IGIC, y la propia app lo dice en el botón («2ª mano con renuncia IGIC»),
   // en el aviso y en la tarjeta («IGIC · No calculado»). RESPUESTA_IMPUESTO_COMPRA dice además que el
@@ -5222,7 +5222,6 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
   // renuncia. nave-industrial y terreno-rustico ya lo dicen en su FAQPage («En Canarias la renuncia
   // existe igual, sobre la exención del IGIC»).
   test('[08/10-e] las respuestas de la renuncia dicen que en Canarias es a la exención del IGIC', async ({ page }) => {
-    test.fail();
     await abrir0810(page);
     await page.selectOption('#select-ccaa', 'canarias');
     await sembrarImporte12(page, 'Precio del local comercial', '200000');
@@ -5268,14 +5267,14 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
     expect(ajdMadrid).toContain('AJD general de la Comunidad de Madrid');
   });
 
-  // HALLAZGO [08/10-g] (medio, dato) — ❌ ABIERTO. El IRPF de la ganancia se liquida con la escala del
+  // HALLAZGO [08/10-g] (medio, dato) — ✅ REPARADO el 08/10/2026 (3061). El IRPF de la ganancia se liquida con la escala del
   // ahorro de territorio común (arts. 66 y 76 LIRPF) y la página no dice en ningún sitio que con
   // residencia en el País Vasco o en Navarra el IRPF es foral (Concierto, art. 6.Uno; Convenio, art.
   // 9.1). El sello del IRPF afirma lo contrario: «Toda ganancia patrimonial por transmisión tributa
   // con esta escala». La residencia del vendedor no es la ubicación del local, así que el caso va en
   // Madrid, donde hoy la palabra «foral» no sale en toda la página (tampoco en lo plegado).
+  // REPARADO el 08/10/2026 (3061): el sello del IRPF lleva AVISO_IRPF_FORAL (data/itp-ccaa.ts).
   test('[08/10-g] la página avisa de que con residencia en el País Vasco o Navarra el IRPF de la ganancia es foral', async ({ page }) => {
-    test.fail();
     await abrir0810(page);
     await vendedorSinAmortizar0810(page, 'madrid');
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('5613,00 €');

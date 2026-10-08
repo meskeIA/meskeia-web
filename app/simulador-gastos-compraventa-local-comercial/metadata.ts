@@ -99,7 +99,16 @@ export const jsonLd = generateWebAppSchema({
  * Melilla no rige el IVA sino el IGIC o el IPSI (hallazgo 2967), y que la renuncia no existe en
  * Ceuta y Melilla (la app ya la deshabilita allí: hallazgo 1584).
  */
-export const RESPUESTA_IMPUESTO_COMPRA = `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}${PCT} más AJD (del ${AJD_MIN}${PCT} al ${AJD_MAX}${PCT} según la comunidad autónoma). En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos, y por eso el simulador no calcula ahí el impuesto de la obra nueva; en Ceuta y Melilla el AJD se paga con la bonificación del ${formatNumber(BONIFICACION_CUOTA_CEUTA_MELILLA * 100, 0)}${PCT} de la cuota (art. 57 bis.1 TRLITPAJD). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${ITP_MIN}${PCT} al ${ITP_MAX}${PCT}. La excepción es la renuncia a la exención entre empresarios, que no existe en Ceuta y Melilla. No coinciden IVA e ITP en la misma operación.`;
+export const RESPUESTA_IMPUESTO_COMPRA = `Depende del tipo de transmisión. Si el local es de nueva construcción y lo vende el promotor (primera entrega), se paga IVA al ${IVA_INMUEBLES_2025.local}${PCT} más AJD (del ${AJD_MIN}${PCT} al ${AJD_MAX}${PCT} según la comunidad autónoma). En Canarias, Ceuta y Melilla no rige el IVA sino el IGIC o el IPSI, con sus propios tipos, y por eso el simulador no calcula ahí el impuesto de la obra nueva, ni en Canarias el de la renuncia, que allí es a la exención del IGIC (art. 50.Cinco de la Ley canaria 4/2012); en Ceuta y Melilla el AJD se paga con la bonificación del ${formatNumber(BONIFICACION_CUOTA_CEUTA_MELILLA * 100, 0)}${PCT} de la cuota (art. 57 bis.1 TRLITPAJD). Si es una segunda transmisión, por regla general está exenta de IVA y se paga ITP al tipo general de la comunidad, que va del ${ITP_MIN}${PCT} al ${ITP_MAX}${PCT}. La excepción es la renuncia a la exención entre empresarios, que no existe en Ceuta y Melilla. No coinciden IVA e ITP en la misma operación.`;
+
+/**
+ * Respuesta ÚNICA a «qué es la renuncia», por la misma razón que la de arriba (hallazgo 3063): eran
+ * dos textos, y la reparación del 2967 tuvo que añadir la salvedad de Ceuta y Melilla dos veces. Y
+ * dice que en Canarias la renuncia es a la exención del IGIC (hallazgo 3064), como el botón, el
+ * aviso y la tarjeta de la propia app, y como nave y terreno rústico.
+ */
+export const PREGUNTA_RENUNCIA = '¿Qué es la renuncia a la exención de IVA y a quién le interesa?';
+export const RESPUESTA_RENUNCIA = `La segunda transmisión de un inmueble está exenta de IVA (artículo 20.Uno.22.º de la Ley del IVA), por lo que tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a esa exención (artículo 20.Dos). Entonces la operación pasa a tributar por IVA al ${IVA_INMUEBLES_2025.local}${PCT} en lugar de ITP, con inversión del sujeto pasivo: es el comprador quien autoliquida y, si tiene derecho, deduce el IVA. Interesa a ese comprador, porque el ITP es un coste no recuperable. En Canarias la renuncia existe igual, pero a la exención del IGIC (art. 50.Cinco de la Ley canaria 4/2012), que el simulador no calcula. La renuncia no existe en Ceuta y Melilla, donde la ley del IPSI no la regula.`;
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -123,10 +132,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué es la renuncia a la exención de IVA en la compra de un local?',
+      name: PREGUNTA_RENUNCIA,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La segunda transmisión de un inmueble está exenta de IVA (artículo 20.Uno.22º de la Ley del IVA), por lo que tributa por ITP. Sin embargo, si comprador y vendedor son empresarios o profesionales con derecho a deducir el IVA, el vendedor puede renunciar a esa exención (artículo 20.Dos). Entonces la operación pasa a tributar por IVA al ${IVA_INMUEBLES_2025.local}${PCT} en lugar de ITP, con inversión del sujeto pasivo: es el comprador quien autoliquida y, si tiene derecho, deduce el IVA. La renuncia no existe en Ceuta y Melilla, donde la ley del IPSI no la regula.`,
+        text: RESPUESTA_RENUNCIA,
       },
     },
     {

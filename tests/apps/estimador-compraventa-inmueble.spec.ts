@@ -8190,7 +8190,8 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
    * la única de las siete preguntas compartidas que diverge; las otras seis son idénticas, y dos de
    * ellas ya salen de una constante de metadata.ts (PREGUNTA/RESPUESTA_NO_SUJECION y _QUIEN_PAGA).
    */
-  test.fail('HALLAZGO — la FAQ visible y el FAQPage responden lo mismo a «¿Qué son los tipos reducidos de ITP…?»', async ({
+  // REPARADO el 08/10/2026 (2964): PREGUNTA_/RESPUESTA_TIPOS_REDUCIDOS en metadata.ts.
+  test('HALLAZGO — la FAQ visible y el FAQPage responden lo mismo a «¿Qué son los tipos reducidos de ITP…?»', async ({
     page,
   }) => {
     const PREGUNTA = '¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?';
@@ -8534,7 +8535,8 @@ test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales
    * del IRPF dice que es foral y que esa cuota no es la suya · obtenido «IRPF sobre ganancia
    * 19.396,00 € · Tributación en base del ahorro» y neto «Lo que realmente recibes».
    */
-  test.fail('HALLAZGO IRPF foral — la vivienda habitual vendida en el País Vasco o Navarra no tributa con la escala estatal', async ({
+  // REPARADO el 08/10/2026 (3072): la tarjeta lo nombra con avisoIrpfForalResidente (data/itp-ccaa.ts).
+  test('HALLAZGO IRPF foral — la vivienda habitual vendida en el País Vasco o Navarra no tributa con la escala estatal', async ({
     page,
   }) => {
     test.setTimeout(60_000);
@@ -8559,7 +8561,8 @@ test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales
    * va del 0,5 % al 1,5 %, también en el País Vasco.» y, en los dos FAQPage, «ITP entre el 4 % y el
    * 13 %» y «varía entre el 4 % y el 13 % de su valor», sin Ceuta ni Melilla.
    */
-  test.fail('HALLAZGO rangos — el ITP y el AJD publicados salvan lo que la app cobra en Ceuta y Melilla', async ({
+  // REPARADO el 08/10/2026 (3073): cada rango publicado dice que en Ceuta y Melilla se paga la mitad.
+  test('HALLAZGO rangos — el ITP y el AJD publicados salvan lo que la app cobra en Ceuta y Melilla', async ({
     page,
   }) => {
     await abrir(page);

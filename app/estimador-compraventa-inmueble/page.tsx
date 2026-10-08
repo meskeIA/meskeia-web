@@ -40,7 +40,8 @@ import {
   honorariosLlevanIVA,
   FACTURA_NOTARIAL,
   REGISTRO_CONCEPTOS,
-  sumarLineasVisibles, superaElTope, nombreEnFrase, deNombreCcaa } from '@/data/itp-ccaa';
+  sumarLineasVisibles, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL, avisoIrpfForalResidente,
+  BONIFICACION_CUOTA_CEUTA_MELILLA } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
   HORQUILLA_GASTOS_COMPRAVENTA,
@@ -50,6 +51,8 @@ import {
   RESPUESTA_NO_SUJECION,
   PREGUNTA_QUIEN_PAGA,
   RESPUESTA_QUIEN_PAGA,
+  PREGUNTA_TIPOS_REDUCIDOS,
+  RESPUESTA_TIPOS_REDUCIDOS,
 } from './metadata';
 
 /**
@@ -1557,7 +1560,7 @@ export default function SimuladorCompraventaPage() {
         fuente={GANANCIAS_PATRIMONIALES_META.fuente}
         verificado={GANANCIAS_PATRIMONIALES_META.verificado}
         urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
-        nota={GANANCIAS_PATRIMONIALES_META.nota}
+        nota={`${GANANCIAS_PATRIMONIALES_META.nota} ${AVISO_IRPF_FORAL}`}
       />
 
       {/* Formulario principal */}
@@ -2571,6 +2574,8 @@ export default function SimuladorCompraventaPage() {
                                       : 'Tributación en base del ahorro'),
                             // El plazo del art. 41 bis.1 RIRPF, dicho junto a la cuota que lo aplica (2182).
                             resultadosVendedor.gananciaPatrimonial > 0 ? aviso41bis : null,
+                            // Vende su vivienda habitual allí, luego reside allí: su IRPF es foral (3072).
+                            resultadosVendedor.gananciaPatrimonial > 0 ? avisoIrpfForalResidente(ccaa, esViviendaHabitual) : null,
                           ]
                             .filter((x): x is string => !!x)
                             .reduce((texto, frase) => (texto ? `${texto}${texto.endsWith('.') ? '' : '.'} ${frase}` : frase), '')
@@ -2780,6 +2785,7 @@ export default function SimuladorCompraventaPage() {
               <p>
                 El <strong>Impuesto de Transmisiones Patrimoniales</strong> grava las compras de inmuebles de segunda mano.
                 Cada comunidad autónoma fija su propio tipo, que en la vivienda va del {formatNumber(RANGO_ITP_VIVIENDA.min, 0)}&nbsp;% (País Vasco) al {formatNumber(RANGO_ITP_VIVIENDA.max, 0)}&nbsp;% (el tramo más alto de las escalas progresivas de Baleares y Cataluña).
+                En Ceuta y Melilla se paga la mitad: la cuota se bonifica un {formatNumber(BONIFICACION_CUOTA_CEUTA_MELILLA * 100, 0)}&nbsp;% (art. 57 bis TRLITPAJD).
                 En el País Vasco ese {formatNumber(RANGO_ITP_VIVIENDA.min, 0)}&nbsp;% es solo de la vivienda: un local, una nave, un terreno o un garaje comprado por separado pagan el {formatNumber(ITP_PV_NO_VIVIENDA, 0)}&nbsp;%.
               </p>
               <p>
@@ -2795,7 +2801,7 @@ export default function SimuladorCompraventaPage() {
               </p>
               <p>
                 Además, se paga <strong>AJD</strong> (Actos Jurídicos Documentados), que en la vivienda va del {formatNumber(RANGO_AJD_VIVIENDA.min, 0)}&nbsp;% al {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}&nbsp;% según la comunidad: el País Vasco exime la primera transmisión de vivienda, por su régimen foral.
-                En locales, naves y suelo va del {formatNumber(RANGO_AJD_OTROS.min, 1)}&nbsp;% al {formatNumber(RANGO_AJD_OTROS.max, 1)}&nbsp;%, también en el País Vasco.
+                En locales, naves y suelo va del {formatNumber(RANGO_AJD_OTROS.min, 1)}&nbsp;% al {formatNumber(RANGO_AJD_OTROS.max, 1)}&nbsp;%, también en el País Vasco. En Ceuta y Melilla, la mitad, por la misma bonificación.
               </p>
             </div>
 
@@ -2906,7 +2912,7 @@ export default function SimuladorCompraventaPage() {
                 <tr>
                   <td>ITP</td>
                   <td>No aplica</td>
-                  <td>{formatNumber(RANGO_ITP_VIVIENDA.min, 0)}&nbsp;% – {formatNumber(RANGO_ITP_VIVIENDA.max, 0)}&nbsp;% (según CC.AA.)</td>
+                  <td>{formatNumber(RANGO_ITP_VIVIENDA.min, 0)}&nbsp;% – {formatNumber(RANGO_ITP_VIVIENDA.max, 0)}&nbsp;% (según CC.AA.), la mitad en Ceuta y Melilla</td>
                   <td>Comprador</td>
                 </tr>
                 <tr>
@@ -3048,12 +3054,8 @@ export default function SimuladorCompraventaPage() {
               incrementan el valor de adquisición, reduciendo la ganancia patrimonial futura al vender.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?</h4>
-              <p>Muchas comunidades aplican tipos reducidos para jóvenes, familias numerosas,
-              personas con discapacidad (≥33&nbsp;%), VPO o municipios en riesgo de despoblación. Los requisitos
-              (edad, ingresos, valor máximo del inmueble) varían por comunidad: la edad tope del tipo joven
-              va de los {EDAD_JOVEN.min} a los {EDAD_JOVEN.max} años según dónde compres, y el panel de beneficios fiscales de la
-              calculadora muestra la que aplica en cada caso. Consulta la normativa de tu CC.AA.</p>
+              <h4>{PREGUNTA_TIPOS_REDUCIDOS}</h4>
+              <p>{RESPUESTA_TIPOS_REDUCIDOS}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿La gestoría es obligatoria en la compraventa?</h4>
