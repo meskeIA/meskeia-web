@@ -3385,7 +3385,7 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-c] forma del 2968 (sospecha (d)): la FAQ
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3095: una constante por pregunta en metadata.ts) — [08/10-c] forma del 2968 (sospecha (d)): la FAQ
    * visible (page.tsx) y el FAQPage (metadata.ts) se escriben dos veces, y cuatro preguntas del
    * FAQPage repiten una visible con otra redacción y otra respuesta. No se contradicen, pero cada
    * una calla lo que da la otra: «¿Se paga IVA o ITP…?» (visible: la renuncia y Canarias, Ceuta y
@@ -3395,7 +3395,6 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
    * bocas (`PREGUNTAS_FRECUENTES`, PASO 5 de /nueva-app-meskeia; como garaje).
    */
   test('[08/10-c] la FAQ visible y el FAQPage dan la misma respuesta a la misma pregunta', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-c] abierto: cuatro preguntas con dos redacciones');
     await abrirHidratada(page);
     const { visible, ld } = await page.evaluate(() => {
       const limpio = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').trim();
@@ -3428,7 +3427,7 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, medio) — [08/10-d] la reparación del 2920 (06/10) se quedó en
+   * ✅ REPARADO 08/10/2026 (contenido, medio; hallazgo 3096: las seis notas dicen «en la vivienda habitual») — [08/10-d] la reparación del 2920 (06/10) se quedó en
    * Galicia y Andalucía. Las fichas de Asturias, Cataluña y Extremadura (data/itp-ccaa.ts) siguen
    * anunciando en esta app de fincas tipos reducidos que, según la propia tabla del motor, son de la
    * VIVIENDA (todos sus `tiposReducidos` llevan «Vivienda habitual» o VPO), sin decirlo, debajo de
@@ -3444,11 +3443,11 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
    * del art. 121-5» sin la palabra, y el ancla del test es literal.
    */
   test('[08/10-d] las fichas de Asturias, Cataluña y Extremadura dicen que sus reducidos son de la vivienda', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-d] abierto: la reparación del 2920 no llegó a estas tres fichas');
     const casos = [
-      ['asturias', '8000,00 €', 'Tipo reducido 4'],
-      ['cataluna', '10.000,00 €', 'Tipo reducido 5'],
-      ['extremadura', '8000,00 €', 'tipos reducidos para jóvenes'],
+      // Anclas reescritas con la reparación del 08/10/2026 (3096): las notas dicen «de la vivienda».
+      ['asturias', '8000,00 €', 'Tipo reducido del 4'],
+      ['cataluna', '10.000,00 €', 'Tipo reducido del 5'],
+      ['extremadura', '8000,00 €', 'tipos reducidos de la vivienda habitual para jóvenes'],
     ] as const;
     for (const [c] of casos) {
       expect(ITP_CCAA[c].tiposReducidos.every((r) => r.condiciones.some((cond) => /vivienda|VPO/i.test(cond))), c).toBe(true);
@@ -3468,7 +3467,7 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (accesibilidad, bajo) — [08/10-e] el «⚠️» que llevan dentro las fichas de
+   * ✅ REPARADO 08/10/2026 (accesibilidad, bajo; hallazgo 3097: el emoji sale de las notas de data/) — [08/10-e] el «⚠️» que llevan dentro las fichas de
    * Aragón, Cataluña, Extremadura y La Rioja (texto de `ITP_CCAA[x].notas`) se pinta como texto,
    * sin `<span aria-hidden="true">` (CLAUDE.md global §5, regla 3; forma del 3083 de trastero, que
    * era un literal del page.tsx). El lector de pantalla lo anuncia en mitad de la nota y
@@ -3477,20 +3476,22 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
    *   «- text: "Aragón aplica bonificaciones … ⚠️ Esta app no calcula dos casos que sí existen…"».
    */
   test('[08/10-e] el «⚠️» de las fichas de la comunidad no llega al lector de pantalla', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-e] abierto: el emoji de las notas está en el árbol accesible');
     await abrirHidratada(page);
     for (const c of ['aragon', 'cataluna', 'extremadura', 'rioja'] as const) {
-      expect(ITP_CCAA[c].notas, c).toContain('⚠️');
+      // Reparado en el origen: un string de data/ no puede ocultar el emoji al lector de pantalla.
+      expect(ITP_CCAA[c].notas, c).not.toContain('⚠️');
       await page.selectOption('#select-ccaa', c);
       const ficha = await i08Ficha(page, c);
-      await expect(ficha, c).toContainText('⚠️');
+      // La frase que llevaba el emoji sigue en la ficha, ya sin él.
+      const frase = { aragon: 'Esta app no calcula', cataluna: 'La ATC reconoce', extremadura: 'Dato orientativo', rioja: 'Dato orientativo' }[c];
+      await expect(ficha, c).toContainText(frase);
       // El defecto: el emoji forma parte del texto accesible.
       expect(await ficha.ariaSnapshot(), c).not.toContain('⚠️');
     }
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (dato, bajo) — [08/10-f] dónde NO existe la renuncia a la exención es un
+   * ✅ REPARADO 08/10/2026 (dato, bajo; hallazgo 3098: la lista vive en data/itp-ccaa.ts) — [08/10-f] dónde NO existe la renuncia a la exención es un
    * dato normativo (Ley 8/1991 del IPSI, arts. 7 y 20.3, decidido contra el BOE el 24/09/2026) y
    * está tecleado en la página: `const TERRITORIOS_SIN_RENUNCIA = ['ceuta', 'melilla']`
    * (page.tsx:163), mientras su gemelo `TERRITORIOS_SIN_IVA` vive en data/itp-ccaa.ts. Es la línea
@@ -3498,7 +3499,6 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
    * comporta bien (preparación); el riesgo es que las tres copias diverjan.
    */
   test('[08/10-f] la lista de territorios sin renuncia se importa de data/, no se teclea en page.tsx', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-f] abierto: TERRITORIOS_SIN_RENUNCIA inline en page.tsx');
     // Preparación (pasa): el comportamiento es el correcto.
     await abrirHidratada(page);
     const renuncia = page.getByRole('button', { name: /renuncia a la exención/i });

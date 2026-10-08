@@ -59,6 +59,7 @@ import {
   respuestaEscriturar,
   nombreEnFrase,
   deNombreCcaa,
+  TERRITORIOS_SIN_RENUNCIA,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -374,7 +375,7 @@ const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PAT
  * canaria 4/2012). Decisión común de la familia, verificada en el BOE por nave-industrial
  * (hallazgo 1584, 24/09/2026); aquí la app calculaba la renuncia en los tres territorios.
  */
-const TERRITORIOS_SIN_RENUNCIA: readonly ComunidadAutonoma[] = ['ceuta', 'melilla'];
+// La lista vive en data/itp-ccaa.ts, junto a TERRITORIOS_SIN_IVA (hallazgos 3088 y 3098).
 
 /** Enumera en español: «a», «a y b», «a, b y c». */
 function enumerarEnEspanol(partes: string[]): string {

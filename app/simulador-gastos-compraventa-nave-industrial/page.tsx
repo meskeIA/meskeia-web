@@ -51,6 +51,7 @@ import {
   respuestaEscriturar,
   nombreEnFrase,
   deNombreCcaa,
+  TERRITORIOS_SIN_RENUNCIA,
 } from '@/data/itp-ccaa';
 import {
   IVA_INMUEBLES_2025,
@@ -170,7 +171,7 @@ const AVISO_BASE_AJD =
  * 4/2012, sobre la exención del 50.Uno.22.º), con inversión del sujeto pasivo (art. 19.1.2.º g
  * Ley 20/1991) y sin TPO (art. 4.4 de esa misma ley).
  */
-const TERRITORIOS_SIN_RENUNCIA: readonly ComunidadAutonoma[] = ['ceuta', 'melilla'];
+// La lista vive en data/itp-ccaa.ts, junto a TERRITORIOS_SIN_IVA (hallazgos 3088 y 3098).
 
 
 /**

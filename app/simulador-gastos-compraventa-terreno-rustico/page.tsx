@@ -4,6 +4,16 @@
 import { useState, useMemo } from 'react';
 import styles from './SimuladorTerrenoRustico.module.css';
 import {
+  PREGUNTA_IVA_O_ITP,
+  RESPUESTA_IVA_O_ITP,
+  PREGUNTA_PLUSVALIA,
+  RESPUESTA_PLUSVALIA,
+  PREGUNTA_RENUNCIA,
+  RESPUESTA_RENUNCIA,
+  PREGUNTA_REDUCCIONES,
+  RESPUESTA_REDUCCIONES,
+} from './metadata';
+import {
   MeskeiaLogo,
   Footer,
   EducationalSection,
@@ -44,6 +54,7 @@ import {
   respuestaEscriturar,
   nombreEnFrase,
   deNombreCcaa,
+  TERRITORIOS_SIN_RENUNCIA,
 } from '@/data/itp-ccaa';
 import {
   FISCAL_INMUEBLES_META,
@@ -162,7 +173,7 @@ const TIPO_AHORRO_MAX = TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PAT
  *    compra de inmuebles (art. 20.3), que es lo que la renuncia del art. 20.Dos LIVA exige. La
  *    finca exenta paga TPO (art. 3.c Ley 8/1991 y art. 7.5 TRLITPAJD), con la bonificación.
  */
-const TERRITORIOS_SIN_RENUNCIA: readonly ComunidadAutonoma[] = ['ceuta', 'melilla'];
+// La lista vive en data/itp-ccaa.ts, junto a TERRITORIOS_SIN_IVA (hallazgos 3088 y 3098).
 
 /** Las comunidades con tipo de AJD propio de la renuncia VERIFICADO en su norma (motor). */
 const CCAA_CON_AJD_DE_RENUNCIA = Object.values(ITP_CCAA)
@@ -970,44 +981,20 @@ export default function SimuladorTerrenoRusticoPage() {
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
-              <strong>¿Se paga IVA o ITP al comprar una finca rústica?</strong>
-              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                Por regla general, ITP. El terreno rústico no edificable está exento de IVA (Art. 20.Uno.20º LIVA),
-                incluso cuando lo vende un empresario. Solo se paga IVA si hay renuncia a la exención entre
-                profesionales con derecho a deducción — y en Canarias, Ceuta y Melilla ni siquiera entonces:
-                allí rige el IGIC o el IPSI. En Canarias la renuncia es a la exención del IGIC (art. 50.Cinco
-                Ley canaria 4/2012), que esta calculadora no cifra; en Ceuta y Melilla el IPSI no la admite
-                (Ley 8/1991, arts. 7 y 20.3), así que allí se paga siempre ITP.
-              </p>
+              <strong>{PREGUNTA_IVA_O_ITP}</strong>
+              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>{RESPUESTA_IVA_O_ITP}</p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
-              <strong>¿Por qué no hay plusvalía municipal en una finca rústica?</strong>
-              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                Porque la plusvalía municipal (IIVTNU) solo grava el incremento de valor de los terrenos de
-                naturaleza urbana. El suelo rústico queda fuera del hecho imponible, así que su transmisión no
-                genera este impuesto para el vendedor.
-              </p>
+              <strong>{PREGUNTA_PLUSVALIA}</strong>
+              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>{RESPUESTA_PLUSVALIA}</p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
-              <strong>¿Qué es la renuncia a la exención de IVA en tierras rústicas?</strong>
-              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                Es la opción (Art. 20.Dos LIVA) por la que el vendedor renuncia a la exención y la operación pasa
-                a tributar por IVA al {formatNumber(IVA_RENUNCIA, 0)}&nbsp;% en lugar de ITP, con inversión del sujeto
-                pasivo. Solo cabe entre empresarios o profesionales con derecho a deducir el IVA; interesa cuando
-                el comprador puede deducirlo y así evita un ITP no recuperable. En Canarias, Ceuta y Melilla no
-                hay IVA al que renunciar: allí la operación va por IGIC o IPSI. El IGIC tiene su propia renuncia,
-                con las mismas condiciones (art. 50.Cinco Ley canaria 4/2012) y también con inversión del sujeto
-                pasivo; el IPSI no tiene ninguna.
-              </p>
+              <strong>{PREGUNTA_RENUNCIA}</strong>
+              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>{RESPUESTA_RENUNCIA}</p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
-              <strong>¿Qué reducciones de ITP existen para explotaciones agrarias?</strong>
-              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
-                La Ley 19/1995 prevé reducciones para la adquisición de fincas por titulares de explotaciones
-                prioritarias y por jóvenes agricultores en su primera instalación, y algunas comunidades tienen
-                tipos reducidos propios. Los porcentajes y requisitos varían, así que conviene confirmarlos con
-                la normativa de cada comunidad autónoma.
-              </p>
+              <strong>{PREGUNTA_REDUCCIONES}</strong>
+              <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>{RESPUESTA_REDUCCIONES}</p>
             </div>
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Sobre qué valor se calcula el ITP de una finca rústica?</strong>

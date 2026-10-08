@@ -153,6 +153,11 @@ export interface DatosCCAA {
   ajdViviendaHabitual?: number;
   /** AJD cuando se ha renunciado a la exención del IVA (art. 20.Dos LIVA), si hay tipo propio. */
   ajdRenuncia?: number;
+  /**
+   * Se pinta en el recuadro de las siete apps del clúster, también en solar, nave y finca
+   * rústica: un tipo reducido que solo es de la vivienda habitual tiene que decirlo (hallazgos
+   * 2920 y 3096). Sin emojis: dentro de un string no se pueden ocultar al lector de pantalla (3097).
+   */
   notas: string;
 }
 
@@ -288,7 +293,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Aragón aplica bonificaciones sobre la cuota, no tipos reducidos: el 12,5 % del art. 121-4 para menores de 35 años, discapacidad ≥65 % y víctimas de violencia de género (inmueble ≤100.000 €, compatibles entre sí), y el 50 % del art. 121-5 para familias numerosas, que sube al 60 % en medio rural. En una compra en proindiviso donde no todos los compradores cumplan los requisitos, la bonificación se aplica en proporción a la participación de quien sí los cumple (art. 121-4.4). ⚠️ Esta app no calcula dos casos que sí existen: el 1 % por adquirir un inmueble para iniciar una actividad económica (art. 121-11, 0,75 % en medio rural) y el 100 % en la cesión de derechos sobre VPO (art. 121-8).',
+    notas: 'Aragón aplica bonificaciones sobre la cuota, no tipos reducidos, y solo en la compra de la vivienda habitual: el 12,5 % del art. 121-4 para menores de 35 años, discapacidad ≥65 % y víctimas de violencia de género (inmueble ≤100.000 €, compatibles entre sí), y el 50 % del art. 121-5 para familias numerosas, que sube al 60 % en medio rural. En una compra en proindiviso donde no todos los compradores cumplan los requisitos, la bonificación se aplica en proporción a la participación de quien sí los cumple (art. 121-4.4). Esta app no calcula dos casos que sí existen: el 1 % por adquirir un inmueble para iniciar una actividad económica (art. 121-11, 0,75 % en medio rural) y el 100 % en la cesión de derechos sobre VPO (art. 121-8).',
   },
 
   'asturias': {
@@ -320,7 +325,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.2,
-    notas: 'Escala progresiva. Tipo reducido 4% ampliado a familias monoparentales desde 2025.',
+    notas: 'Escala progresiva. Tipo reducido del 4% en la vivienda habitual (valor ≤150.000 €) para jóvenes y familias numerosas, ampliado a las monoparentales desde 2025.',
   },
 
   'baleares': {
@@ -559,7 +564,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'ITP elevado (10-13% en escala progresiva desde el 27/06/2025, Decreto-ley 5/2025). Tipo reducido 5% para colectivos específicos, con el límite de edad de los jóvenes en 35 años desde esa misma fecha (antes 32). ⚠️ La ATC reconoce además un 5% para víctimas de violencia machista, un 4% en municipios rurales (3% en los de especial atención) y un 20% para grandes tenedores, que esta app no distingue.',
+    notas: 'ITP elevado (10-13% en escala progresiva desde el 27/06/2025, Decreto-ley 5/2025). Tipo reducido del 5% en la vivienda habitual para colectivos específicos, con el límite de edad de los jóvenes en 35 años desde esa misma fecha (antes 32). La ATC reconoce además un 5% para víctimas de violencia machista, un 4% en municipios rurales (3% en los de especial atención) y un 20% para grandes tenedores, que esta app no distingue.',
   },
 
   'valencia': {
@@ -613,7 +618,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     ajd: 1.4,
     ajdViviendaHabitual: 0.1,
     ajdRenuncia: 2,
-    notas: 'Tipo general 9% desde el 01/06/2026 (antes 10%); si el valor supera 1.000.000 €, el 11% sobre TODO el valor. Múltiples tipos reducidos para colectivos. AJD 1,4% (0,1% en vivienda habitual y 2% con renuncia a la exención del IVA).',
+    notas: 'Tipo general 9% desde el 01/06/2026 (antes 10%); si el valor supera 1.000.000 €, el 11% sobre TODO el valor. Tipos reducidos en la vivienda habitual para varios colectivos. AJD 1,4% (0,1% en vivienda habitual y 2% con renuncia a la exención del IVA).',
   },
 
   'extremadura': {
@@ -648,7 +653,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Escala progresiva 8/10/11%. ⚠️ Dato orientativo: los tipos reducidos para jóvenes/familia numerosa varían entre fuentes (7%, 6,4% por bonificación 20% o 3%) según valor y límites de renta — verifica la tarifa vigente en gobiernodeextremadura.es',
+    notas: 'Escala progresiva 8/10/11%. Dato orientativo: los tipos reducidos de la vivienda habitual para jóvenes/familia numerosa varían entre fuentes (7%, 6,4% por bonificación 20% o 3%) según valor y límites de renta — verifica la tarifa vigente en gobiernodeextremadura.es',
   },
 
   'galicia': {
@@ -745,7 +750,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Tipo general 7,75% desde el 25/07/2025 (Ley 3/2025, antes 8%). Límite de edad generoso para jóvenes (40 años). Fuente: ATRM (agenciatributaria.carm.es).',
+    notas: 'Tipo general 7,75% desde el 25/07/2025 (Ley 3/2025, antes 8%). Tipo reducido del 3% en la vivienda habitual para jóvenes de hasta 40 años, familias numerosas y personas con discapacidad ≥65%. Fuente: ATRM (agenciatributaria.carm.es).',
   },
 
   'navarra': {
@@ -830,7 +835,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1,
-    notas: 'ITP moderado (7%). Jóvenes menores de 40 años en primera vivienda habitual: 4% (3% en los municipios del anexo I de la Ley 10/2017), por la Ley 1/2025 de medidas urgentes para el acceso a la vivienda, con efectos desde el 03/03/2025. ⚠️ Dato orientativo: la familia numerosa baja del 5% al 3% con requisitos adicionales de renta (≤30.600 €) que esta app no pregunta — verifica la tarifa vigente en larioja.org',
+    notas: 'ITP moderado (7%). Jóvenes menores de 40 años en primera vivienda habitual: 4% (3% en los municipios del anexo I de la Ley 10/2017), por la Ley 1/2025 de medidas urgentes para el acceso a la vivienda, con efectos desde el 03/03/2025. Dato orientativo: la familia numerosa baja del 5% al 3% con requisitos adicionales de renta (≤30.600 €) que esta app no pregunta — verifica la tarifa vigente en larioja.org',
   },
 
   'ceuta': {
@@ -1432,6 +1437,19 @@ export const TERRITORIOS_SIN_IVA: Partial<Record<ComunidadAutonoma, { impuesto: 
   ceuta: { impuesto: 'IPSI', nombre: 'Impuesto sobre la Producción, los Servicios y la Importación' },
   melilla: { impuesto: 'IPSI', nombre: 'Impuesto sobre la Producción, los Servicios y la Importación' },
 };
+
+/**
+ * Territorios donde NO existe la renuncia a la exención del art. 20.Dos LIVA: Ceuta y Melilla.
+ *
+ * Allí no rige el IVA sino el IPSI (Ley 8/1991), que no regula ninguna renuncia (art. 7), prohíbe
+ * deducir el IPSI soportado en la compra de inmuebles (art. 20.3) y remite a la legislación común
+ * la incompatibilidad con las TPO: la segunda mano paga SIEMPRE ITP, bonificado (art. 57 bis.3.a
+ * TRLITPAJD). Decidido contra el BOE el 24/09/2026 (hallazgo 1584). Canarias no está: el IGIC sí
+ * tiene renuncia (art. 50.Cinco Ley canaria 4/2012).
+ *
+ * Vivía tecleada en tres page.tsx (nave, local comercial y terreno rústico; hallazgos 3088 y 3098).
+ */
+export const TERRITORIOS_SIN_RENUNCIA: readonly ComunidadAutonoma[] = ['ceuta', 'melilla'];
 
 /** IVA general que se repercute en las facturas de notaría y registro (art. 90.Uno Ley 37/1992). */
 const IVA_HONORARIOS = 0.21;

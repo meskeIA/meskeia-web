@@ -6217,14 +6217,13 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
   });
 
   /**
-   * [08/10-e] (dato, bajo) — dónde NO existe la renuncia a la exención es un dato normativo (Ley
+   * [08/10-e] (dato, bajo) — ✅ REPARADO el 08/10/2026 (3088): importada de data/itp-ccaa.ts. Dónde NO existe la renuncia a la exención es un dato normativo (Ley
    * 8/1991 del IPSI, arts. 7 y 20.3, leída en el BOE el 24/09/2026), y vive tecleado en esta
    * página como `TERRITORIOS_SIN_RENUNCIA = ['ceuta', 'melilla']`, igual que en local-comercial y
    * terreno-rustico (tres copias), mientras su gemelo `TERRITORIOS_SIN_IVA` vive en
    * `data/itp-ccaa.ts`. La regla de las apps Legal-Fiscal: nunca inline.
    */
   test('[08/10-e] la lista de territorios sin renuncia no se teclea en la página', async () => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-e] abierto: TERRITORIOS_SIN_RENUNCIA escrito a mano en page.tsx');
     const fuente = await leerFuente();
     expect(fuente).not.toMatch(/const\s+TERRITORIOS_SIN_RENUNCIA[^=]*=\s*\[/);
   });
