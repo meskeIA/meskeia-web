@@ -496,10 +496,10 @@ export default function VisualizadorEvolucionMolecular() {
             )}
 
             <div className={styles.botones}>
-              <button type="button" className={styles.btnPrimario} onClick={handleMutar} aria-label="Introducir mutación aleatoria">
+              <button type="button" className={styles.btnPrimario} onClick={handleMutar} aria-label="Mutar: introducir una mutación aleatoria">
                 <span aria-hidden="true">🔬</span> Mutar
               </button>
-              <button type="button" className={styles.btnSecundario} onClick={handleResetDna} aria-label="Resetear secuencia original">
+              <button type="button" className={styles.btnSecundario} onClick={handleResetDna} aria-label="Reiniciar la secuencia original">
                 Reiniciar
               </button>
             </div>
