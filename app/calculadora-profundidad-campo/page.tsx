@@ -788,7 +788,7 @@ function ReglaSVG({ dnM, dfM, distanciaM, hiperfocalM, dfEsInfinito }: ReglaSVGP
           fontWeight="700"
           fontFamily="system-ui, sans-serif"
         >
-          📍 sujeto
+          <tspan aria-hidden="true">📍</tspan> sujeto
         </text>
       </g>
 
