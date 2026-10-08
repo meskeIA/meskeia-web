@@ -6,7 +6,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, Resu
   AvisoTerritorioSinIva,
 } from '@/components';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
+import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -342,6 +342,8 @@ interface ResultadosVendedor {
    */
   precioCompraNoValido: boolean;
   faltaValorSuelo: boolean;
+  /** El suelo escrito como 0 o negativo: no falta, no vale (patrón 5, hallazgo 2959). */
+  sueloNoValido: boolean;
   faltaAnios: boolean;
   /**
    * Los años están escritos y se leen, pero son negativos: no «faltan», son imposibles, y el
@@ -963,7 +965,7 @@ export default function SimuladorCompraventaPage() {
             ? // «falta el valor catastral total» era falso cuando el usuario lo había escrito
               // y lo seguía viendo en el campo (hueco C1): no falta, no se ha podido leer.
               valorTotalLegible
-              ? 'Método objetivo (falta el valor catastral total para comparar)'
+              ? `Método objetivo (${escritoNoValido(valorCatastralTotal, parseSpanishNumber) ? 'el valor catastral total escrito tiene que ser mayor que 0: corrígelo para comparar con el método real' : 'falta el valor catastral total para comparar'})`
               : 'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).'
             : rp.metodoReal < rp.metodoObjetivo
               ? 'Método real (más favorable)'
@@ -1083,7 +1085,9 @@ export default function SimuladorCompraventaPage() {
       // NaN <= 0 es false — el mismo bug que el propio hallazgo 512 venía a cerrar.
       faltaPrecioCompra: !(precioC > 0) && !(Number.isFinite(precioC) && precioC <= 0),
       precioCompraNoValido: Number.isFinite(precioC) && precioC <= 0,
-      faltaValorSuelo: !plusvaliaResuelta && !(valorSuelo > 0),
+      // Un suelo escrito como 0 (o negativo con el foco) no «falta»: no vale (patrón 5, 2959).
+      faltaValorSuelo: !plusvaliaResuelta && !(valorSuelo > 0) && !escritoNoValido(valorCatastralSuelo, parseSpanishNumber),
+      sueloNoValido: !plusvaliaResuelta && escritoNoValido(valorCatastralSuelo, parseSpanishNumber),
       // Un año negativo no «falta»: está escrito y es imposible (patrón 5, hallazgo 1552).
       faltaAnios: !plusvaliaResuelta && !aniosDisponibles && !aniosNegativo,
       aniosNegativos: !plusvaliaResuelta && aniosNegativo,
@@ -2056,7 +2060,10 @@ export default function SimuladorCompraventaPage() {
                               <br />
                               Requisitos: {separarPorcentajes(condiciones.join(' · '))}
                               {topeYaDicho ? '' : ` · Valor máximo ${formatCurrency(r.valorMaximo ?? 0)}`}
-                              {superaElTope(r, resultadosComprador.precioInmueble) ? ' · ⚠️ tu precio supera ese límite: no podrías acogerte' : ''}
+                              {superaElTope(r, resultadosComprador.precioInmueble) && (
+                              // El emoji, fuera del árbol accesible (hallazgo 3083).
+                              <> · <span aria-hidden="true">⚠️</span> tu precio supera ese límite: no podrías acogerte</>
+                            )}
                             </li>
                           );
                         })}
@@ -2073,7 +2080,9 @@ export default function SimuladorCompraventaPage() {
                   <p>
                     {escritoIlegible(precioVenta, parseSpanishNumber)
                       ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio del inmueble con coma decimal (200.000 o 200000,50) para ver el desglose de gastos del comprador`
-                      : 'Introduce el precio del inmueble para ver el desglose de gastos del comprador'}
+                      : escritoNoValido(precioVenta, parseSpanishNumber)
+                        ? avisoEscritoNoValido('el precio', precioVenta, parseSpanishNumber, 'ver el desglose de gastos del comprador')
+                        : 'Introduce el precio del inmueble para ver el desglose de gastos del comprador'}
                   </p>
                 </div>
               )}
@@ -2404,6 +2413,7 @@ export default function SimuladorCompraventaPage() {
                             // Escrito, legible e imposible: ni «falta» ni «no se lee» (patrón 5).
                             resultadosVendedor.precioCompraNoValido ? AVISO_PRECIO_COMPRA_NO_VALIDO : null,
                             resultadosVendedor.aniosNegativos ? AVISO_ANIOS_NEGATIVOS : null,
+                            resultadosVendedor.sueloNoValido ? 'el valor catastral del suelo tiene que ser mayor que 0' : null,
                           ]
                             .filter((x): x is string => x !== null)
                             .join('; ')
@@ -2676,6 +2686,7 @@ export default function SimuladorCompraventaPage() {
                           resultadosVendedor.aniosNegativos ? 'corrige los años de tenencia (no pueden ser negativos)' : null,
                           // Ni un precio de compra 0: está escrito y no vale (hallazgo 1799).
                           resultadosVendedor.precioCompraNoValido ? 'corrige el precio de compra original (tiene que ser mayor que 0)' : null,
+                          resultadosVendedor.sueloNoValido ? 'corrige el valor catastral del suelo (tiene que ser mayor que 0)' : null,
                           // Ni una comisión por encima del 100 %: escrita y legible, pero imposible (2186).
                           resultadosVendedor.comisionImposible
                             ? 'corrige la comisión: no puede superar el 100\u00A0% del precio de venta'
@@ -2697,7 +2708,9 @@ export default function SimuladorCompraventaPage() {
                   <p>
                     {escritoIlegible(precioVenta, parseSpanishNumber)
                       ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio de venta con coma decimal (200.000 o 200000,50) para calcular el neto del vendedor`
-                      : 'Introduce el precio de venta y los datos adicionales para calcular el neto del vendedor'}
+                      : escritoNoValido(precioVenta, parseSpanishNumber)
+                        ? avisoEscritoNoValido('el precio de venta', precioVenta, parseSpanishNumber, 'calcular el neto del vendedor')
+                        : 'Introduce el precio de venta y los datos adicionales para calcular el neto del vendedor'}
                   </p>
                 </div>
               )}

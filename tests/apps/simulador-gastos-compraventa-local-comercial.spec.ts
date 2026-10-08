@@ -254,16 +254,17 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
 
     const campo = page.locator('input[aria-label="Precio del local comercial"]');
 
-    // Importe negativo: nada de ITP negativo ni de coste total negativo.
+    // Importe negativo: nada de ITP negativo ni de coste total negativo. Escrito y legible, se
+    // nombra como no válido en vez de pedirlo (patrón 5, hallazgo 3062, 08/10/2026).
     await campo.fill('-50000');
-    await expect(page.getByText('Introduce el precio del local comercial')).toBeVisible();
+    await expect(page.getByText('El precio escrito («-50000») tiene que ser mayor que 0').first()).toBeVisible();
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
     // Y al salir del campo, NumberInput lo lleva al mínimo declarado (min = 0).
     await campo.blur();
     await expect(campo).toHaveValue('0');
 
     // Base cero: mismo tratamiento, sin tarjetas a 0,00 €.
-    await expect(page.getByText('Introduce el precio del local comercial')).toBeVisible();
+    await expect(page.getByText('El precio escrito («0») tiene que ser mayor que 0').first()).toBeVisible();
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
 
     // Texto: el input ni siquiera admite los caracteres.
@@ -558,13 +559,14 @@ test.describe('Simulador de gastos de compraventa de local comercial', () => {
     // Negativo: mientras el campo tiene el foco tampoco puede haber resultados
     // (la guarda es `precio <= 0`, no solo el min del NumberInput).
     await campo.fill('-50000');
-    await expect(page.getByText('Introduce el precio del local comercial')).toBeVisible();
+    // Escrito y legible: se nombra como no válido (patrón 5, hallazgo 3062, 08/10/2026).
+    await expect(page.getByText('El precio escrito («-50000») tiene que ser mayor que 0').first()).toBeVisible();
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL' })).toHaveCount(0);
     await campo.blur();
     await expect(campo).toHaveValue('0');   // min = 0 del NumberInput
 
     // Cero: mismo tratamiento, sin tarjetas a 0,00 €.
-    await expect(page.getByText('Introduce el precio del local comercial')).toBeVisible();
+    await expect(page.getByText('El precio escrito («0») tiene que ser mayor que 0').first()).toBeVisible();
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL' })).toHaveCount(0);
 
     // Texto: el input no admite los caracteres (regex /^-?[\d.,]*$/ de NumberInput).
@@ -5175,14 +5177,13 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
     expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('600,00 €');
   });
 
-  // HALLAZGO [08/10-c] (bajo, contenido) — ❌ ABIERTO. Patrón 5 en el PRECIO principal, el 2960 de
+  // HALLAZGO [08/10-c] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3062). Patrón 5 en el PRECIO principal, el 2960 de
   // la referencia: con «0» escrito (o «-5000» con el foco dentro, que el blur deja en 0) los dos
   // paneles piden que se introduzca el precio, como si el campo estuviera vacío. Solar, nave y
   // terreno ya lo distinguen («El precio escrito («0») tiene que ser mayor que 0: corrígelo…»).
   //   obtenido: «Introduce el precio del local comercial para ver el desglose de gastos» (comprador) y
   //   «Introduce el precio de venta del local para ver lo que te queda tras impuestos» (vendedor).
   test('[08/10-c] un precio escrito como 0 se nombra como no válido, no como que falta', async ({ page }) => {
-    test.fail();
     await abrir0810(page);
     await sembrarImporte12(page, 'Precio del local comercial', '0');
     await expect(page.locator('input[aria-label="Precio del local comercial"]')).toHaveValue('0');

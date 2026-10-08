@@ -133,3 +133,25 @@ export function mayuscula(frase: string): string {
 export function escritoIlegible(texto: string, leer: (t: string) => number): boolean {
   return texto.trim() !== '' && !Number.isFinite(leer(texto));
 }
+
+/**
+ * Patrón 5 de la familia de compraventa, «no falta, no vale»: un importe ESCRITO, legible e
+ * imposible —un 0, un negativo mientras el campo tiene el foco, o uno que se pinta 0,00 €— no es
+ * un dato que falta, y pedir que se «introduzca» cuando el usuario lo ve escrito lo confunde
+ * (hallazgo 1799 en la referencia; 2959, 2960, 3062, 3074, 3075, 3078 y 3079 en la familia).
+ */
+export function escritoNoValido(texto: string, leer: (t: string) => number): boolean {
+  const valor = leer(texto);
+  return texto.trim() !== '' && Number.isFinite(valor) && Math.round(valor * 100) <= 0;
+}
+
+/** «El precio escrito («0») tiene que ser mayor que 0: corrígelo para ver…», para `escritoNoValido`. */
+export function avisoEscritoNoValido(
+  rotulo: string,
+  texto: string,
+  leer: (t: string) => number,
+  para: string,
+): string {
+  const alCentimo = leer(texto) > 0 ? ' se queda en 0,00 € al céntimo, y' : '';
+  return `${mayuscula(rotulo)} escrito («${texto.trim()}»)${alCentimo} tiene que ser mayor que 0: corrígelo para ${para}.`;
+}

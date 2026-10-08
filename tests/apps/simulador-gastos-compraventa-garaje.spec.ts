@@ -276,8 +276,10 @@ test.describe('Simulador de gastos de compraventa de garaje — inspección 20/0
 
     // Con un negativo y SIN salir del campo: la guarda `precio <= 0` corta el cálculo.
     await precio.fill('-3000');
+    // Escrito y legible, pero imposible: no se pide como si faltara (patrón 5, 08/10/2026).
+    const noValido = (v: string) => page.getByText(`El precio escrito («${v}») tiene que ser mayor que 0`);
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
-    await expect(aviso).toBeVisible();
+    await expect(noValido('-3000')).toBeVisible();
 
     // Al perder el foco, NumberInput normaliza al mínimo declarado (min = 0)...
     await precio.blur();
@@ -286,7 +288,7 @@ test.describe('Simulador de gastos de compraventa de garaje — inspección 20/0
     // ...y con 0 tampoco calcula: nada de ITP de 0 €, ni notaría de 190,89 €, ni «0,00 %».
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
     await expect(page.locator('h3', { hasText: 'Gastos de notaría' })).toHaveCount(0);
-    await expect(aviso).toBeVisible();
+    await expect(noValido('0')).toBeVisible();
     await expect(page.getByText('No definido')).toHaveCount(0);
   });
 });
@@ -2910,8 +2912,9 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — los tres casos, resueltos a mano an
     await suelo.fill('-5000'); // a propósito SIN blur: así lo ve quien está tecleando
 
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    // Desde el 08/10/2026 (hallazgo 3075) no «falta»: está escrito y no vale.
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
-      'No calculada (falta el valor catastral del suelo)',
+      'No calculada (el valor catastral del suelo tiene que ser mayor que 0)',
     );
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('25.000,00 €');
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('38.800,00 €');
@@ -2921,7 +2924,7 @@ test.describe('RE-INSPECCIÓN 11/09/2026 — los tres casos, resueltos a mano an
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('3978,00 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('36.022,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
-      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. Rellena el valor catastral del suelo para obtenerlo.',
+      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. Corrige el valor catastral del suelo (tiene que ser mayor que 0) para obtenerlo.',
     );
     await expect(page.getByText('No definido')).toHaveCount(0);
 
@@ -7159,7 +7162,7 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-a] patrón 5 en el PRECIO principal: es el
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3074) — [08/10-a] patrón 5 en el PRECIO principal: es el
    * hallazgo 2960 de la referencia y el 3062 de local-comercial, aquí en su forma literal.
    * page.tsx distingue el precio ilegible (`escritoIlegible`) del vacío, pero no el «no vale»: con
    * el precio escrito «0», o «-25000» con el foco dentro (el blur lo deja en 0), las dos pestañas
@@ -7172,7 +7175,6 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
    *   calcular el neto del vendedor».
    */
   test('[08/10-a] un precio «0» escrito (o negativo con el foco) no se anuncia como que falta', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-a] abierto: el precio «0» se anuncia como si el campo estuviera vacío');
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await sembrarImporte(page, 'Precio del garaje / plaza de parking', '-25000', { blur: false });
@@ -7186,7 +7188,7 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-b] patrón 5 en el VALOR CATASTRAL DEL SUELO:
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3075) — [08/10-b] patrón 5 en el VALOR CATASTRAL DEL SUELO:
    * es el hallazgo 2959 de la referencia, aquí con la misma forma. `faltanVacios` nombra el suelo
    * con la guarda `valorSuelo > 0`, así que un 0 escrito (o un negativo con el foco, que el blur
    * acota a 0 por su min={0}) se anuncia como si faltara, mientras en la misma tarjeta el precio
@@ -7198,7 +7200,6 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
    *   catastral del suelo para obtenerlo», con el 0 a la vista.
    */
   test('[08/10-b] un valor catastral del suelo «0» escrito no se anuncia como que falta', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-b] abierto: el suelo «0» se anuncia como si faltara');
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');

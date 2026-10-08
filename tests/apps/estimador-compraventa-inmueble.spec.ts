@@ -439,7 +439,7 @@ test.describe('Estimador de gastos de compraventa de vivienda', () => {
     // pintar un ITP negativo ni un «No definido».
     await expect(page.locator('input[aria-label="Precio de la vivienda"]')).toHaveValue('0');
     await expect(
-      page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador'),
+      page.getByText('El precio escrito («0») tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del comprador.'),
     ).toBeVisible();
     await expect(page.getByText('No definido')).toHaveCount(0);
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
@@ -816,11 +816,11 @@ test.describe('Inspector 20/08/2026 — factura notarial y registral', () => {
     // La guarda del useMemo es `!Number.isFinite(precio) || precio <= 0` → null, y el panel
     // pide el dato. Ni un ITP de 0 €, ni la base mínima de 90,15 € del arancel notarial
     // —que es lo que saldría de calcular sobre 0—, ni ningún «No definido».
-    // ⚠️ 07/10/2026: que el panel diga «Introduce el precio…» con el «0» escrito en el campo es
-    // un hallazgo del patrón 5 de la familia («no falta, no vale»; ver el describe del 07/10 al
-    // final). Al repararlo, la aserción del mensaje de aquí cambia; las otras cuatro, no.
+    // 08/10/2026: el panel decía «Introduce el precio…» con el «0» escrito en el campo; era
+    // el hallazgo 2960, patrón 5 de la familia («no falta, no vale»; ver el describe del 07/10 al
+    // final), REPARADO: cambió la aserción del mensaje; las otras cuatro, no.
     await expect(
-      page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador'),
+      page.getByText('El precio escrito («0») tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del comprador.'),
     ).toBeVisible();
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
     await expect(page.locator('h3', { hasText: 'Gastos de notaría' })).toHaveCount(0);
@@ -2647,21 +2647,22 @@ test.describe('Inspector 10/09/2026 — re-inspección tras el refactor de motor
     expect(await campoPrecio.inputValue()).toBe('-250000');
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
     await expect(page.locator('h3', { hasText: /COSTE TOTAL/ })).toHaveCount(0);
-    await expect(page.getByText('Introduce el precio del inmueble')).toBeVisible();
+    await expect(page.getByText('El precio escrito («-250000») tiene que ser mayor que 0')).toBeVisible();
 
     // b) La pestaña Vendedor tampoco puede inventarse un neto
     await page.getByRole('button', { name: 'Vendedor' }).click();
-    await expect(page.getByText('Introduce el precio de venta')).toBeVisible();
+    // Al pulsar la pestaña, el campo pierde el foco y el NumberInput lo acota a «0».
+    await expect(page.getByText('El precio de venta escrito («0») tiene que ser mayor que 0')).toBeVisible();
     await expect(page.locator('h3', { hasText: /IMPORTE NETO VENDEDOR/ })).toHaveCount(0);
 
     // c) Al salir del campo, el NumberInput lo acota a su `min` y sigue sin haber importes
-    // (⚠️ 07/10/2026: el «Introduce el precio…» con «-250000» o «0» a la vista es el hallazgo del
-    // patrón 5 del describe del 07/10; al repararlo cambian los textos de este caso, no los importes)
+    // (08/10/2026: el «Introduce el precio…» con «-250000» o «0» a la vista era el hallazgo 2960 del
+    // patrón 5, REPARADO: cambiaron los textos de este caso, no los importes)
     await page.getByRole('button', { name: 'Comprador' }).click();
     await campoPrecio.blur();
     expect(await campoPrecio.inputValue()).toBe('0');
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
-    await expect(page.getByText('Introduce el precio del inmueble')).toBeVisible();
+    await expect(page.getByText('El precio escrito («0») tiene que ser mayor que 0')).toBeVisible();
   });
 
   /**
@@ -8071,7 +8072,7 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026), la sospecha (c). Patrón 5 de la familia
+   * HALLAZGO [bajo, contenido] — ✅ REPARADO el 08/10/2026 (2959, `escritoNoValido`), la sospecha (c). Patrón 5 de la familia
    * («no falta, no vale»): un suelo ESCRITO, legible e imposible se anuncia como si faltara. La
    * misma tarjeta ya dice «el precio de compra original tiene que ser mayor que 0» (hallazgo
    * 1799) y «los años de tenencia no pueden ser negativos» (1552); el suelo, que es el tercer dato
@@ -8082,7 +8083,7 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
    * catastral del suelo. Este impuesto NO está incluido…» y «Rellena el valor catastral del suelo
    * para obtenerlo», con el 0 a la vista. Los importes los sujeta el CASO 69.
    */
-  test.fail('HALLAZGO patrón 5 — un valor catastral del suelo 0 o negativo no «falta»: no vale', async ({ page }) => {
+  test('HALLAZGO patrón 5 — un valor catastral del suelo 0 o negativo no «falta»: no vale', async ({ page }) => {
     test.setTimeout(60_000);
     await abrir(page, 'madrid');
     await sembrar(page, 'Precio de la vivienda', '300000');
@@ -8093,12 +8094,16 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).not.toContain('Falta el valor catastral del suelo');
     expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).not.toContain('Rellena el valor catastral del suelo');
+    // Y en positivo: lo nombra como no válido y pide corregirlo, como el precio de compra 0.
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('El valor catastral del suelo tiene que ser mayor que 0');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toContain('Corrige el valor catastral del suelo (tiene que ser mayor que 0) para obtenerlo.');
     await escribirConFoco(page, 'Valor catastral del suelo', '-60000');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).not.toContain('Falta el valor catastral del suelo');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('tiene que ser mayor que 0');
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026). El mismo patrón 5, en el PRECIO de la
+   * HALLAZGO [bajo, contenido] — ✅ REPARADO el 08/10/2026 (2960, `avisoEscritoNoValido`). El mismo patrón 5, en el PRECIO de la
    * propia referencia: con «0» escrito (o «-250000» con el foco, que el blur acota a 0) los dos
    * paneles piden «Introduce el precio…». Solar, nave y terreno rústico ya lo dicen bien —«El precio
    * escrito («0») tiene que ser mayor que 0: corrígelo…», con el comentario «hallazgo 1799 en la
@@ -8107,14 +8112,16 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
    * precio del inmueble para ver el desglose de gastos del comprador» (y en Vendedor, «Introduce el
    * precio de venta y los datos adicionales…»). Al repararlo cambian los textos de los CASOS C y 35.
    */
-  test.fail('HALLAZGO patrón 5 — un precio «0» escrito no se pide como si faltara', async ({ page }) => {
+  test('HALLAZGO patrón 5 — un precio «0» escrito no se pide como si faltara', async ({ page }) => {
     await abrir(page, 'madrid');
     await sembrar(page, 'Precio de la vivienda', '0');
     await expect(page.locator(CAMPO_PRECIO)).toHaveValue('0');
     await expect(page.locator('[class*="placeholder"] p').first()).toBeVisible();
     await expect(page.getByText('Introduce el precio del inmueble para ver el desglose de gastos del comprador')).toHaveCount(0);
+    await expect(page.getByText('El precio escrito («0») tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del comprador.')).toHaveCount(1);
     await aVendedor(page);
     await expect(page.getByText('Introduce el precio de venta y los datos adicionales')).toHaveCount(0);
+    await expect(page.getByText('El precio de venta escrito («0») tiene que ser mayor que 0: corrígelo para calcular el neto del vendedor.')).toHaveCount(1);
   });
 
   /**

@@ -25,7 +25,7 @@ import {
   AvisoTerritorioSinIva,
 } from '@/components';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
+import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
 
 /** Importe en euros SIN decimales, para los ejemplos del bloque educativo */
 const eurosEnteros = (n: number) => `${formatNumber(n, 0)} €`;
@@ -196,6 +196,8 @@ interface ResultadosVendedor {
    * referencia).
    */
   precioCompraNoValido: boolean;
+  /** El suelo escrito como 0 o negativo: no falta, no vale (patrón 5). */
+  sueloNoValido: boolean;
   /**
    * La comisión escrita supera el 100 % del precio de venta: el propio campo lo dice, y la app
    * no liquida con ella ni la ganancia ni el IRPF (patrón 5, la forma del hallazgo 2191 de la
@@ -657,11 +659,13 @@ export default function SimuladorTrasteroCompraventaPage() {
      * esos dos campos no bloquean nada: nombrarlos marcaría «(PARCIAL)» un neto definitivo.
      */
     const plusvaliaResuelta = rp !== null;
+    // Un suelo escrito como 0 (o negativo con el foco dentro) tampoco «falta»: no vale (patrón 5).
+    const sueloNoValido = !plusvaliaResuelta && escritoNoValido(valorCatastralSuelo, parseSpanishNumber);
     // Un año negativo no «falta»: está escrito, se lee y es imposible (patrón 5, hallazgo 1566).
     const aniosNegativos = !plusvaliaResuelta && aniosNegativo;
     const faltanMeses = !plusvaliaResuelta && aniosDisponibles && anios === 0 && meses === undefined;
     const faltanVacios = [
-      plusvaliaResuelta || valorSuelo > 0 || ilegibleTexto(valorCatastralSuelo) ? null : 'el valor catastral del suelo',
+      plusvaliaResuelta || valorSuelo > 0 || sueloNoValido || ilegibleTexto(valorCatastralSuelo) ? null : 'el valor catastral del suelo',
       plusvaliaResuelta || aniosDisponibles || aniosNegativo || ilegibleTexto(aniosPropiedad) ? null : 'los años de propiedad',
       faltanMeses ? 'los meses completos desde la compra' : null,
       precioC > 0 || precioCompraNoValido || ilegibleTexto(precioCompraOriginal) ? null : 'el precio de compra original',
@@ -678,6 +682,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       aniosNegativos ? 'los años de propiedad no pueden ser negativos' : null,
       // Ni un precio de compra 0: está escrito y no vale (patrón 5, hallazgo 2193).
       precioCompraNoValido ? AVISO_PRECIO_COMPRA_NO_VALIDO : null,
+      sueloNoValido ? 'el valor catastral del suelo tiene que ser mayor que 0' : null,
     ].filter((x): x is string => x !== null).join('; ');
 
     let metodoPlusvalia = `No calculada (${porQueNoSeCalcula})`;
@@ -691,7 +696,7 @@ export default function SimuladorTrasteroCompraventaPage() {
             ? // «falta el valor catastral total» era falso cuando el usuario lo había
               // escrito y lo seguía viendo en el campo (hueco C1): no falta, no se lee.
               valorTotalLegible
-              ? 'Método objetivo (falta el valor catastral total para comparar)'
+              ? `Método objetivo (${escritoNoValido(valorCatastralTotal, parseSpanishNumber) ? 'el valor catastral total escrito tiene que ser mayor que 0: corrígelo para comparar con el método real' : 'falta el valor catastral total para comparar'})`
               : 'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).'
             : rp.metodoReal < rp.metodoObjetivo
               ? 'Método real (más favorable)'
@@ -762,6 +767,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       camposIlegibles: faltanIlegibles,
       aniosNegativos,
       precioCompraNoValido,
+      sueloNoValido,
       comisionImposible,
       gananciaPosibleSinPlusvalia,
       faltanMeses,
@@ -1466,7 +1472,10 @@ export default function SimuladorTrasteroCompraventaPage() {
                                 ofrecerse como rebaja al alcance cuando el precio la descarta
                                 (hallazgo 765). Se enseña igualmente porque dice a partir de qué
                                 precio existiría, que es lo que los hallazgos 721 y 741 exigen. */}
-                            {superaElTope(r, resultadosComprador.precioInmueble) ? ' · ⚠️ tu precio supera ese límite: no podrías acogerte' : ''}
+                            {superaElTope(r, resultadosComprador.precioInmueble) && (
+                              // El emoji, fuera del árbol accesible (hallazgo 3083).
+                              <> · <span aria-hidden="true">⚠️</span> tu precio supera ese límite: no podrías acogerte</>
+                            )}
                           </li>
                         ))}
                       </ul>
@@ -1482,7 +1491,9 @@ export default function SimuladorTrasteroCompraventaPage() {
                   <p>
                     {escritoIlegible(precioVenta, parseSpanishNumber)
                       ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio del trastero con coma decimal (15.000 o 15000,50) para ver el desglose de gastos del comprador`
-                      : 'Introduce el precio del trastero para ver el desglose de gastos del comprador'}
+                      : escritoNoValido(precioVenta, parseSpanishNumber)
+                        ? avisoEscritoNoValido('el precio', precioVenta, parseSpanishNumber, 'ver el desglose de gastos del comprador')
+                        : 'Introduce el precio del trastero para ver el desglose de gastos del comprador'}
                   </p>
                 </div>
               )}
@@ -1866,6 +1877,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                           // Ni un precio de compra 0 ni una comisión de más del 100 %: están escritos
                           // y no valen (patrón 5, hallazgo 2193 y la forma del 2191 de garaje).
                           resultadosVendedor.precioCompraNoValido ? 'corrige el precio de compra original (tiene que ser mayor que 0)' : null,
+                          resultadosVendedor.sueloNoValido ? 'corrige el valor catastral del suelo (tiene que ser mayor que 0)' : null,
                           resultadosVendedor.comisionImposible ? 'corrige la comisión (no puede superar el 100\u00A0% del precio de venta)' : null,
                           hayIlegiblesQueCorregir ? 'escribe con coma decimal (1.234,56) lo que no se ha podido leer' : null,
                           resultadosVendedor.parCatastralImposible ? 'revisa los dos valores catastrales del recibo del IBI' : null,
@@ -1883,7 +1895,9 @@ export default function SimuladorTrasteroCompraventaPage() {
                   <p>
                     {escritoIlegible(precioVenta, parseSpanishNumber)
                       ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio de venta con coma decimal (15.000 o 15000,50) para calcular el neto del vendedor`
-                      : 'Introduce el precio de venta y los datos adicionales para calcular el neto del vendedor'}
+                      : escritoNoValido(precioVenta, parseSpanishNumber)
+                        ? avisoEscritoNoValido('el precio de venta', precioVenta, parseSpanishNumber, 'calcular el neto del vendedor')
+                        : 'Introduce el precio de venta y los datos adicionales para calcular el neto del vendedor'}
                   </p>
                 </div>
               )}

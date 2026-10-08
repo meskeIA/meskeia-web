@@ -19,7 +19,7 @@ import {
 } from '@/components';
 import { RESPUESTA_IMPUESTO_COMPRA } from './metadata';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
-import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, type Veredicto } from '@/lib/sondeoIlegibles';
+import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
 import {
   calcularGananciaInmueble,
   IVA_INMUEBLES_2025,
@@ -762,7 +762,7 @@ export default function SimuladorLocalComercialPage() {
           ? // «falta el valor catastral total» era falso cuando el usuario lo había
             // escrito y lo seguía viendo en el campo (hueco C1): no falta, no se lee.
             valorTotalLegible
-            ? `Método objetivo, ${tipoMunicipal} (falta el valor catastral total para comparar)`
+            ? `Método objetivo, ${tipoMunicipal} (${escritoNoValido(valorCatastralTotal, parseSpanishNumber) ? 'el valor catastral total escrito tiene que ser mayor que 0: corrígelo para comparar con el método real' : 'falta el valor catastral total para comparar'})`
             : `Método objetivo, ${tipoMunicipal}, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).`
           : rp.metodoReal < rp.metodoObjetivo
             ? `Método real (más favorable), ${tipoMunicipal}`
@@ -1636,7 +1636,9 @@ export default function SimuladorLocalComercialPage() {
               <p>
                 {escritoIlegible(precioVenta, parseSpanishNumber)
                   ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio del local comercial con coma decimal (200.000 o 200000,50) para ver el desglose de gastos`
-                  : 'Introduce el precio del local comercial para ver el desglose de gastos'}
+                  : escritoNoValido(precioVenta, parseSpanishNumber)
+                    ? avisoEscritoNoValido('el precio', precioVenta, parseSpanishNumber, 'ver el desglose de gastos')
+                    : 'Introduce el precio del local comercial para ver el desglose de gastos'}
               </p>
             </div>
           ))}
@@ -2103,7 +2105,9 @@ export default function SimuladorLocalComercialPage() {
                   <p>
                     {escritoIlegible(precioVenta, parseSpanishNumber)
                       ? `No se ha podido leer el precio «${precioVenta.trim()}». Introduce el precio de venta del local con coma decimal (200.000 o 200000,50) para ver lo que te queda tras impuestos`
-                      : 'Introduce el precio de venta del local para ver lo que te queda tras impuestos'}
+                      : escritoNoValido(precioVenta, parseSpanishNumber)
+                        ? avisoEscritoNoValido('el precio de venta', precioVenta, parseSpanishNumber, 'ver lo que te queda tras impuestos')
+                        : 'Introduce el precio de venta del local para ver lo que te queda tras impuestos'}
                   </p>
                 </div>
               )}

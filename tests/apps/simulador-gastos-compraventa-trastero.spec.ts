@@ -436,9 +436,11 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
 
     // Con un negativo y SIN salir del campo: la guarda `precio <= 0` corta el cálculo.
     await precio.fill('-3000');
+    // Escrito y legible, pero imposible: no se pide como si faltara (patrón 5, 08/10/2026).
+    const noValido = (v: string) => page.getByText(`El precio escrito («${v}») tiene que ser mayor que 0`);
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
     await expect(page.locator('h3', { hasText: 'ITP' })).toHaveCount(0);
-    await expect(aviso).toBeVisible();
+    await expect(noValido('-3000')).toBeVisible();
 
     // Al perder el foco, NumberInput normaliza al mínimo declarado (min = 0)...
     await precio.blur();
@@ -447,14 +449,12 @@ test.describe('Simulador de gastos de compraventa de trastero — inspección 20
     // ...y con 0 tampoco calcula: nada de ITP de 0 €, ni notaría de 190,89 €, ni «0,00 %».
     await expect(page.locator('h3', { hasText: 'COSTE TOTAL DE ADQUISICIÓN' })).toHaveCount(0);
     await expect(page.locator('h3', { hasText: 'Gastos de notaría' })).toHaveCount(0);
-    await expect(aviso).toBeVisible();
+    await expect(noValido('0')).toBeVisible();
     await expect(page.getByText('No definido')).toHaveCount(0);
 
     // La pestaña del vendedor tiene la misma guarda sobre el mismo precio.
     await page.getByRole('button', { name: /Vendedor/ }).click();
-    await expect(
-      page.getByText('Introduce el precio de venta y los datos adicionales'),
-    ).toBeVisible();
+    await expect(page.getByText('El precio de venta escrito («0») tiene que ser mayor que 0')).toBeVisible();
     await expect(page.locator('h3', { hasText: 'IMPORTE NETO VENDEDOR' })).toHaveCount(0);
   });
 });
@@ -4443,14 +4443,15 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el
     await sembrar(page, 'Valor catastral total (suelo + construcción)', '8000');
 
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    // Desde el 08/10/2026 (hallazgo 3079) no «falta»: está escrito y no vale.
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
-      'No calculada (falta el valor catastral del suelo)',
+      'No calculada (el valor catastral del suelo tiene que ser mayor que 0)',
     );
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1056,40 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1596,40 €');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('16.403,60 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
-      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. Rellena el valor catastral del suelo para obtenerlo.',
+      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. Corrige el valor catastral del suelo (tiene que ser mayor que 0) para obtenerlo.',
     );
     // El 0 se queda en el campo: el blur no lo reescribe (min = 0).
     await expect(page.locator('input[aria-label="Valor catastral del suelo"]')).toHaveValue('0');
@@ -5868,14 +5869,13 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Baleares, Navarra en obra nueva, la
       'No incluye el IPSI: el coste real puede ser mayor. Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
     );
 
-    // ⚠️ 08/10/2026: este literal es el hallazgo [08/10-a] (el 0 escrito se anuncia como si el
-    // precio faltara); al repararlo, el texto del «0» cambia con él.
+    // 08/10/2026: el 0 escrito se anunciaba como si el precio faltara (hallazgo [08/10-a], 3078),
+    // REPARADO: ahora se nombra como no válido, y 0,004 «se queda en 0,00 € al céntimo».
     for (const precio of ['0', '0,004']) {
       await sembrar(page, 'Precio del trastero', precio);
       await expect(page.locator('h3', { hasText: /^COSTE TOTAL/ })).toHaveCount(0);
-      await expect(
-        page.getByText('Introduce el precio del trastero para ver el desglose de gastos del comprador'),
-      ).toBeVisible();
+      await expect(page.getByText(`El precio escrito («${precio}»)`)).toBeVisible();
+      await expect(page.getByText('Introduce el precio del trastero para ver el desglose de gastos del comprador')).toHaveCount(0);
     }
   });
 
@@ -6432,7 +6432,7 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
   // con que falle cualquiera, así que la primera es la que de verdad se comprueba). El escenario
   // de los dos primeros lo sujeta en verde el CASO 54.
 
-  // HALLAZGO [08/10-a] (bajo, contenido) — ❌ ABIERTO. Patrón 5 en el PRECIO principal: es el 2960
+  // HALLAZGO [08/10-a] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3078). Patrón 5 en el PRECIO principal: es el 2960
   // de la referencia y el 3062 de local-comercial. Con el precio escrito «0», o «-5000» con el foco
   // dentro (el blur lo deja en 0), los dos paneles piden que se introduzca el precio, como si el
   // campo estuviera vacío, con el 0 a la vista. page.tsx distingue el ilegible (escritoIlegible)
@@ -6442,7 +6442,6 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
   //   obtenido: «Introduce el precio del trastero para ver el desglose de gastos del comprador» y
   //   «Introduce el precio de venta y los datos adicionales para calcular el neto del vendedor».
   test('[08/10-a] un precio escrito como 0 se nombra como no válido, no como que falta', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await sembrar(page, 'Precio del trastero', '0');
@@ -6459,7 +6458,7 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
     expect(await sinDesglose0810(page)).toMatch(/mayor que 0/);
   });
 
-  // HALLAZGO [08/10-b] (bajo, contenido) — ❌ ABIERTO. Patrón 5 en el valor catastral del SUELO: es
+  // HALLAZGO [08/10-b] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3079). Patrón 5 en el valor catastral del SUELO: es
   // el 2959 de la referencia. Un suelo escrito «0», o «-3000» con el foco dentro (el blur lo acota a
   // 0 por su min={0}), se anuncia como si faltara: `faltanVacios` lo mete por `!(valorSuelo > 0)`
   // (page.tsx ~l. 664). La misma tarjeta ya distingue el precio de compra 0 (2193) y los años
@@ -6469,7 +6468,6 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
   //   obtenido: «No calculada (falta el valor catastral del suelo)» y, en el neto, «Rellena el
   //   valor catastral del suelo para obtenerlo».
   test('[08/10-b] un valor catastral del suelo escrito como 0 se nombra como no válido, no como que falta', async ({ page }) => {
-    test.fail();
     await vendedor0810(page, { ...BASE_0810, suelo: '0' });
     const plusvalia = await descripcionTarjeta(page, 'Plusvalía municipal');
     const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
@@ -6542,7 +6540,7 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
     expect(await texto(aviso)).toContain('En Castilla-La Mancha existen:');
   });
 
-  // HALLAZGO [08/10-f] (bajo, accesibilidad) — ❌ ABIERTO. El aviso de que el precio supera el tope
+  // HALLAZGO [08/10-f] (bajo, accesibilidad) — ✅ REPARADO el 08/10/2026 (3083, también en la referencia y garaje). El aviso de que el precio supera el tope
   // de un reducido lleva el emoji dentro de una cadena (page.tsx ~l. 1469: ' · ⚠️ tu precio supera
   // ese límite: no podrías acogerte'), sin <span aria-hidden="true"> (CLAUDE.md global §5, regla
   // 3): el lector de pantalla lo anuncia en mitad de la línea. `check:a11y-jsx` no lo ve porque
@@ -6551,7 +6549,6 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
   //   Galicia · segunda mano · 160.000 € · discapacidad → ITP 8 % = 12.800,00 y el 3 % ofrecido
   //   con «· ⚠️ tu precio supera ese límite» (tope 150.000 €), con el ⚠️ fuera de aria-hidden.
   test('[08/10-f] el ⚠️ del tope de valor de un reducido va con aria-hidden', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await page.locator('#select-ccaa').selectOption('galicia');
