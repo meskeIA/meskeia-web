@@ -283,8 +283,11 @@ test('hallazgo 979: la despolarización anunciada es la que el pulso alcanza', a
   // Anunciaba «+40 mV · ≈ −30 mV (V_target)» mientras la tarjeta de al lado decía que el
   // máximo alcanzado era −56,7 mV y el veredicto «Subumbral»: tres cifras incompatibles
   // en el mismo panel. −30 mV es la asíntota tras ≥5τ = 25 ms, y el pulso dura 2.
+  // Desde el 08/10/2026 (hallazgos 2953 y 3066) la tarjeta sale del mismo integrador que la
+  // simulación: −70 + 40·(1 − 0,98^20) = −56,70, la misma cifra que el máximo alcanzado (la forma
+  // cerrada daba −56,81 → «-56,8»).
   const despolarizacion = tarjeta(page, 'Despolarización del pulso');
-  await expect(despolarizacion).toHaveText('-56,8 mV');
+  await expect(despolarizacion).toHaveText('-56,7 mV');
   await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-56,7 mV');
   await expect(page.locator('body')).not.toContainText('V_target');
 });
@@ -484,11 +487,9 @@ test('contraste en tema oscuro: el veredicto de fábrica «SUBUMBRAL» y el «No
     .toBeGreaterThanOrEqual(3);
 });
 
+// REPARADO el 08/10/2026 (hallazgo 2953, junto al 3066): la tarjeta sale de `respuestaEstimulo`,
+// que usa el mismo integrador que la simulación. Con 2,5 ms pide 15/(1 − 0,98^25) = 37,83 u.a.
 test('el veredicto y la tarjeta «Despolarización del pulso» no se contradicen (pulso 2,5 ms, I = 38, umbral −55)', async ({ page }) => {
-  test.fail(
-    true,
-    'ABIERTO (07/10/2026): la tarjeta usa la fórmula analítica y la simulación integra con Euler (paso 0,1 ms), que llega un 0,8 % más arriba: dice «38,1 u.a. harían falta» con la neurona disparando a 38',
-  );
   await sembrarValor(page, DURACION, 2.5);
   await sembrarValor(page, INTENSIDAD, 38);
   await expect(etiquetaControl(page, 'Duración del pulso')).toContainText('2,5 ms');
@@ -595,12 +596,13 @@ test.describe('móvil 390×844, con el dedo', () => {
 
   test('caso normal: de fábrica no dispara; arrastrando la intensidad con el dedo hasta el tope dispara y redibuja el lienzo', async ({ page }) => {
     // Fábrica: I = 20 u.a., pulso 5 ms, umbral −55 mV. A mano:
-    //   tarjeta (analítica)  −70 + 20·(1 − e^(−1)) = −57,4 mV · harían falta 15/0,632 = 23,7 u.a.
     //   simulación (Euler)   −70 + 20·(1 − 0,98^50) = −57,3 mV → subumbral
+    //   tarjeta, con el mismo integrador desde el 08/10/2026 (2953): −57,3 mV y harían falta
+    //   15/(1 − 0,98^50) = 23,6 u.a. (la forma cerrada, 15/0,632, daba 23,7 y −57,4)
     await expect(barraEstado(page)).toContainText('SUBUMBRAL');
     await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-57,3 mV');
-    await expect(tarjeta(page, 'Despolarización del pulso')).toHaveText('-57,4 mV');
-    await expect(page.locator('[class*="resultCard"]').filter({ hasText: 'Despolarización del pulso' })).toContainText('23,7 u.a.');
+    await expect(tarjeta(page, 'Despolarización del pulso')).toHaveText('-57,3 mV');
+    await expect(page.locator('[class*="resultCard"]').filter({ hasText: 'Despolarización del pulso' })).toContainText('23,6 u.a.');
     // Nada se sale por los lados en 390 px
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     // El lienzo de fábrica dibuja la respuesta pasiva: la cima del trazo, −57,3 mV (+ grosor)
@@ -738,9 +740,11 @@ async function contrasteRotuloLienzo(page: Page, rotulo: 'Umbral' | 'Estímulo')
       ctx.font = '11px system-ui';
       caja = { x: 68, y: yToPx(umbral) - 13, w: ctx.measureText(`Umbral (${umbral} mV)`).width, h: 10 };
     } else {
+      // Desde el 08/10/2026 (hallazgo 3067) va en el margen izquierdo, alineado a la derecha en
+      // x = 60 − 4 y con la línea base en y = 30 − 8: ahí no cae ninguna barra de estímulo.
       ctx.font = '10px system-ui';
       const w = ctx.measureText('Estímulo').width;
-      caja = { x: 60 + plotW - 4 - w, y: 17, w, h: 10 };
+      caja = { x: 60 - 4 - w, y: 13, w, h: 10 };
     }
     ctx.restore();
     const leer = (c: string): number[] => {
@@ -868,11 +872,10 @@ test.describe('Inspector 08/10/2026 — umbral −60, extremos de los controles 
     expect(hz).toBeLessThanOrEqual(48);
   });
 
+  // REPARADO el 08/10/2026 (hallazgo 3066): la intensidad necesaria se calcula con el tren de
+  // pulsos sumado. A mano, la respuesta a 1 u.a. llega como mucho a 0,7330 mV en 50 ms, así que
+  // hacen falta 15/0,7330 = 20,46 u.a. y la tarjeta dice «20,5».
   test('en modo sostenido, la tarjeta del pulso no pide más intensidad de la que ya dispara', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO (08/10/2026): «X u.a. harían falta» es la cuenta de UN pulso aislado; en modo sostenido los pulsos se suman y la neurona dispara con 21 (intervalo 10) mientras la tarjeta dice 23,7',
-    );
     // Sostenido de fábrica (pulso 5 ms cada 10 ms, umbral −55) e I = 21.
     await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
     await expect(etiquetaControl(page, 'Intervalo entre pulsos')).toContainText('10,0 ms');
@@ -883,8 +886,11 @@ test.describe('Inspector 08/10/2026 — umbral −60, extremos de los controles 
     await expect(barraEstado(page)).toContainText('La neurona DISPARA');
     await expect(tarjeta(page, 'Latencia')).toHaveText('14,80 ms');
     const falta = await intensidadQueHaceFalta(page);
-    // Si la reparación quita la frase en modo sostenido, no hay contradicción posible.
-    if (falta !== null) expect(21).toBeGreaterThanOrEqual(falta);
+    expect(falta).toBeCloseTo(20.5, 1);
+    expect(21).toBeGreaterThanOrEqual(falta!);
+    // Y por debajo de ella no dispara: con 20 u.a. el panel dice subumbral.
+    await sembrarValor(page, INTENSIDAD, 20);
+    await expect(barraEstado(page)).toContainText('SUBUMBRAL');
   });
 
   test('2952 (REPARADO): los rótulos del lienzo llegan a 4,5:1 en modo único, en los dos temas', async ({ page }) => {
@@ -900,11 +906,9 @@ test.describe('Inspector 08/10/2026 — umbral −60, extremos de los controles 
     await expect.poll(() => contrasteRotuloLienzo(page, 'Estímulo')).toBeGreaterThanOrEqual(4.5);
   });
 
+  // REPARADO el 08/10/2026 (hallazgo 3067): el rótulo pasó al margen izquierdo, donde no cae
+  // ninguna barra, y queda sobre el fondo liso contra el que se eligió su color.
   test('en modo sostenido el rótulo «Estímulo» del lienzo sigue legible (4,5:1) sobre la barra naranja', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO (08/10/2026): en modo sostenido el último pulso (45-50 ms) pinta la barra naranja al 60 % justo debajo del rótulo: 2,85:1 en claro y 2,03:1 en oscuro',
-    );
     await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
     await expect(etiquetaControl(page, 'Intervalo entre pulsos')).toContainText('10,0 ms');
     // A mano, claro: barra #E07A1F al 60 % sobre #FAFAFA = rgb(234,173,119); texto #A3520A →
@@ -918,11 +922,9 @@ test.describe('Inspector 08/10/2026 — umbral −60, extremos de los controles 
     await expect.poll(() => contrasteRotuloLienzo(page, 'Estímulo')).toBeGreaterThanOrEqual(4.5);
   });
 
+  // REPARADO el 08/10/2026 (hallazgo 3068): los seis `color: var(--primary)` del módulo pasan a
+  // `var(--primary-texto)`.
   test('en tema claro, el azul de marca como texto llega a 4,5:1 (valores de los controles y títulos del bloque educativo)', async ({ page }) => {
-    test.fail(
-      true,
-      'ABIERTO (08/10/2026): var(--primary) #2E86AB como texto de 16-16,8 px: 4,10:1 sobre la tarjeta blanca (valor de cada deslizador) y 3,93:1 sobre #FAFAFA (títulos de escenarios, pasos, consejos y preguntas)',
-    );
     // A mano: #2E86AB sobre #FFFFFF = 4,11:1 y sobre #FAFAFA = 3,94:1. A 16,8 px en negrita no
     // es texto grande (hace falta 18,66 px en negrita): exige 4,5:1. --primary-texto (#26718F)
     // da 5,47:1 y 5,24:1.

@@ -93,6 +93,39 @@ export function intensidadUmbral(umbral: number, duracion: number): number {
   return (umbral - V_REPOSO) / fraccion;
 }
 
+export interface RespuestaEstimulo {
+  /** Hasta dónde llega la membrana con el estímulo elegido si no disparase (mV). */
+  despolarizacion: number;
+  /** Intensidad a partir de la cual dispara: con MÁS que esto dispara, con esto o menos no. */
+  intensidadNecesaria: number;
+}
+
+/**
+ * Lo que anuncia la tarjeta «Despolarización del pulso», calculado con el MISMO integrador y el
+ * MISMO patrón de pulsos que `simular`, para que nunca contradiga al veredicto.
+ *
+ * Hasta el primer disparo la membrana es lineal en la intensidad: con u = V − V_reposo, cada paso
+ * hace u ← u + (I·s(t) − u)·DT/τ, así que u(t) = I · u₁(t), donde u₁ es la respuesta a 1 u.a. Por
+ * eso la neurona dispara si y solo si I · máx u₁ > umbral − V_reposo, y la intensidad necesaria
+ * es exactamente (umbral − V_reposo) / máx u₁ dentro de la ventana de `T_TOTAL` ms.
+ *
+ * Sustituye en la vista a `despolarizacionAlcanzable` e `intensidadUmbral`, que siguen aquí como
+ * la forma cerrada de UN pulso aislado en tiempo continuo, y fallaban dos veces:
+ *  - en modo sostenido no suman el tren: con pulsos de 5 ms cada 10 ms la neurona dispara con
+ *    21 u.a. y la tarjeta pedía 23,7 (hallazgo 3066; 7.874 de 277.160 combinaciones);
+ *  - en modo único, la integración por pasos de 0,1 ms llega un 0,8 % más arriba que la fórmula:
+ *    con 2,5 ms la neurona disparaba a 38 y la tarjeta pedía 38,1 (hallazgo 2953).
+ */
+export function respuestaEstimulo(p: ParametrosSimulacion): RespuestaEstimulo {
+  // Con umbral infinito la simulación no dispara nunca: es la carga pura de la membrana.
+  const unitaria = simular({ ...p, intensidad: 1, umbral: Infinity });
+  const maxU1 = Math.max(...unitaria.trayectoria.map((m) => m.v - V_REPOSO));
+  return {
+    despolarizacion: V_REPOSO + p.intensidad * maxU1,
+    intensidadNecesaria: maxU1 > 0 ? (p.umbral - V_REPOSO) / maxU1 : Infinity,
+  };
+}
+
 /**
  * Plantilla del potencial de acción, arrancando en `vInicio` — el umbral que se acaba de
  * cruzar — en vez de en un −55 mV cableado.

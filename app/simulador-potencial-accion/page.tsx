@@ -7,8 +7,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
 
 import {
   simular,
-  despolarizacionAlcanzable,
-  intensidadUmbral,
+  respuestaEstimulo,
   V_REPOSO,
   V_PICO,
   V_HIPER,
@@ -46,6 +45,21 @@ export default function SimuladorPotencialAccionPage() {
   const sim = useMemo(
     () =>
       simular({
+        intensidad,
+        duracionEstimulo: duracion,
+        inicioEstimulo,
+        umbral,
+        modo,
+        intervaloSostenido,
+      }),
+    [intensidad, duracion, umbral, modo, intervaloSostenido]
+  );
+
+  // Lo que anuncia la tarjeta «Despolarización del pulso», con el mismo integrador y el mismo
+  // tren de pulsos que la simulación (hallazgos 2953 y 3066).
+  const respuesta = useMemo(
+    () =>
+      respuestaEstimulo({
         intensidad,
         duracionEstimulo: duracion,
         inicioEstimulo,
@@ -202,10 +216,13 @@ export default function SimuladorPotencialAccionPage() {
       ctx.fillRect(xToPx(estIniciado), pad.top - estiHeight - 2, xToPx(T_TOTAL) - xToPx(estIniciado), estiHeight);
       ctx.globalAlpha = 1;
     }
+    // El rótulo va en el margen izquierdo, a la altura de la banda: ahí no cae ninguna barra. Al
+    // final del trazo, en modo sostenido, el último pulso lo tapaba al 60 % de opacidad y bajaba
+    // a 2,85:1 en claro y 2,03:1 en oscuro (hallazgo 3067); su color se eligió contra el fondo liso.
     ctx.fillStyle = textoEstimulo;
     ctx.font = '10px system-ui';
     ctx.textAlign = 'right';
-    ctx.fillText('Estímulo', pad.left + plotW - 4, pad.top - 4);
+    ctx.fillText('Estímulo', pad.left - 4, pad.top - 8);
 
     // Curva V_m(t)
     ctx.fillStyle = colorVmFill;
@@ -449,10 +466,11 @@ export default function SimuladorPotencialAccionPage() {
                 pulso más largo que admite el control dura 5 ms: anunciarla contradecía a
                 las dos tarjetas vecinas del mismo panel (hallazgo 979). */}
             <span className={styles.resultValue}>
-              {fmt(despolarizacionAlcanzable(intensidad, duracion), 1)} mV
+              {fmt(respuesta.despolarizacion, 1)} mV
             </span>
             <span className={styles.resultRange}>
-              hasta donde llega este pulso · {fmt(intensidadUmbral(umbral, duracion), 1)} u.a.
+              {modo === 'sostenido' ? 'hasta donde llega con los pulsos sumados' : 'hasta donde llega este pulso'} ·{' '}
+              {fmt(respuesta.intensidadNecesaria, 1)} u.a.
               harían falta para cruzar el umbral
             </span>
           </div>
