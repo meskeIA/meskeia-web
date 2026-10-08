@@ -84,7 +84,7 @@ import {
   sumarLineasVisibles,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
-  respuestaEscriturar, superaElTope } from '@/data/itp-ccaa';
+  respuestaEscriturar, superaElTope, nombreEnFrase, deNombreCcaa } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
@@ -1344,7 +1344,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                     icon="📋"
                     description={
                       resultadosComprador.impuestoNoCalculado
-                        ? `En ${datosCcaaActual.nombre} no rige el IVA: la obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                        ? `En ${nombreEnFrase(ccaa)} no rige el IVA: la obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                         : tipoTransmision === 'primera-mano'
                           ? (modalidadTrastero === 'vinculado'
                               ? `IVA ${formatNumber(IVA_INMUEBLES_2025.anejoVinculado, 0)}\u00A0% — anejo transmitido con la vivienda (obra nueva)`
@@ -1453,7 +1453,7 @@ export default function SimuladorTrasteroCompraventaPage() {
                       </p>
                       <p className={styles.avisoReducidosTexto}>
                         El cálculo usa el tipo general porque no podemos comprobar tu situación.
-                        En {datosCcaaActual.nombre} existe:
+                        En {nombreEnFrase(ccaa)} {resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:
                       </p>
                       <ul className={styles.avisoReducidosLista}>
                         {resultadosComprador.tipoElegido.noComprobables.map(r => (

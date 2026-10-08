@@ -864,6 +864,34 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
   },
 };
 
+/**
+ * Artículo que pide el nombre oficial dentro de una frase. `nombre` es un rótulo («Comunidad
+ * de Madrid»), y encajado tras «en» o «de» sin artículo da «En Ciudad Autónoma de Ceuta no rige
+ * el IVA» (hallazgos 3065, 3077, 3081, 3084, 3092 y 3094 del Inspector, 08/10/2026, en las siete
+ * apps del clúster). Las que no figuran aquí van sin artículo («en Galicia», «en La Rioja»).
+ */
+const ARTICULO_CCAA: Partial<Record<ComunidadAutonoma, 'el' | 'la' | 'las'>> = {
+  baleares: 'las',
+  valencia: 'la',
+  madrid: 'la',
+  murcia: 'la',
+  navarra: 'la',
+  'pais-vasco': 'el',
+  ceuta: 'la',
+  melilla: 'la',
+};
+
+/** El nombre listo para ir detrás de «en»: «la Comunidad de Madrid», «el País Vasco», «Galicia». */
+export function nombreEnFrase(ccaa: ComunidadAutonoma): string {
+  const articulo = ARTICULO_CCAA[ccaa];
+  return articulo ? `${articulo} ${ITP_CCAA[ccaa].nombre}` : ITP_CCAA[ccaa].nombre;
+}
+
+/** «de» + el nombre, con la contracción: «de la Comunidad de Madrid», «del País Vasco». */
+export function deNombreCcaa(ccaa: ComunidadAutonoma): string {
+  return `de ${nombreEnFrase(ccaa)}`.replace(/^de el /, 'del ');
+}
+
 // ===== ARANCELES NOTARIALES Y REGISTRALES =====
 // Basados en Real Decreto 1426/1989 y Real Decreto 1427/1989
 

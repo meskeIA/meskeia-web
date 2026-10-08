@@ -13,6 +13,7 @@ import {
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar,
+  nombreEnFrase,
 } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025 } from '@/data/fiscal';
 
@@ -87,8 +88,8 @@ const sueloDe = (clave: ComunidadAutonoma) => {
 const CLAVES = Object.keys(ITP_CCAA) as ComunidadAutonoma[];
 const rotulo = (clave: ComunidadAutonoma, tipo: number) =>
   CIUDADES_CON_BONIFICACION.includes(clave)
-    ? `${ITP_CCAA[clave].nombre} (${pct(tipo)} efectivo, ya bonificado)`
-    : `${ITP_CCAA[clave].nombre} (${pct(tipo)})`;
+    ? `${nombreEnFrase(clave)} (${pct(tipo)} efectivo, ya bonificado)`
+    : `${nombreEnFrase(clave)} (${pct(tipo)})`;
 
 /**
  * Las tres primeras según `valor`, y con ellas las EMPATADAS con la tercera: cortar a tres
@@ -105,7 +106,7 @@ const masBaratas = podio(sueloDe, true)
   .map((clave) => rotulo(clave, sueloDe(clave)))
   .join(', ');
 const masCaras = podio(techoDe, false)
-  .map((clave) => `${ITP_CCAA[clave].nombre} (hasta el ${pct(techoDe(clave))})`)
+  .map((clave) => `${nombreEnFrase(clave)} (hasta el ${pct(techoDe(clave))})`)
   .join(', ');
 
 export const metadata: Metadata = {

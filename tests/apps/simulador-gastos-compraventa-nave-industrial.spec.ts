@@ -4607,7 +4607,8 @@ test.describe('Hallazgos reparados — 24/09/2026 (1581-1585)', () => {
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.find((b) => b.includes('"FAQPage"')) ?? '';
     expect(faq).toContain(
-      'Los más bajos hoy son Ciudad Autónoma de Ceuta (3\u00A0% efectivo, ya bonificado), Ciudad Autónoma de Melilla (3\u00A0% efectivo, ya bonificado), Comunidad de Madrid (6\u00A0%), Comunidad Foral de Navarra (6\u00A0%)',
+      // Con artículo desde el 08/10/2026 (hallazgo 3084, nombreEnFrase).
+      'Los más bajos hoy son la Ciudad Autónoma de Ceuta (3\u00A0% efectivo, ya bonificado), la Ciudad Autónoma de Melilla (3\u00A0% efectivo, ya bonificado), la Comunidad de Madrid (6\u00A0%), la Comunidad Foral de Navarra (6\u00A0%)',
     );
     expect(faq).not.toMatch(/País Vasco \(4%\)/);
   });
@@ -6122,14 +6123,13 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
   // ─── Hallazgos de la inspección del 08/10/2026, con `test.fail()` salvo con VER_HUECOS=1 ───
 
   /**
-   * [08/10-a] (contenido, bajo) — `ITP_CCAA[x].nombre` es el nombre oficial con su sustantivo
+   * [08/10-a] (contenido, bajo) — ✅ REPARADO el 08/10/2026 (3084, `nombreEnFrase` y `deNombreCcaa`). `ITP_CCAA[x].nombre` es el nombre oficial con su sustantivo
    * («Ciudad Autónoma de Melilla», «Comunidad Valenciana»), y esta app lo encaja en frases propias
    * de su page.tsx y su metadata.ts sin artículo. No es el componente común AvisoTerritorioSinIva,
    * que esta app no usa: los textos son suyos (líneas 436-441, 524, 665, 690-693, 751, 571 y 779 de
    * page.tsx, y la 6.ª respuesta del FAQPage).
    */
   test('[08/10-a] los nombres oficiales llevan artículo: «en la Ciudad Autónoma de Melilla», «en la Comunidad Valenciana»', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-a] abierto: «En Ciudad Autónoma de Melilla no rige el IVA»');
     const sinArticulo = /\b(?:[Ee]n|de) (?:Ciudad Autónoma de (?:Ceuta|Melilla)|Comunidad Valenciana)/g;
     const textos = async () => {
       const notas = await page.locator('[role="note"]').allInnerTexts();

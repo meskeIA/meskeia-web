@@ -917,7 +917,7 @@ test.describe('Re-inspección 12/09/2026 — Murcia al 7,75 % y Melilla sin IVA'
     await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
     await expect(page.locator('h3', { hasText: /IVA \(renuncia/ })).toHaveCount(0);
     // Ni el aviso de «no se aplica el IVA», que es de una operación que aquí no se calcula.
-    await expect(page.getByText(/En Ciudad Autónoma de Melilla no se aplica el IVA/)).toHaveCount(0);
+    await expect(page.getByText(/En (?:la )?Ciudad Autónoma de Melilla no se aplica el IVA/)).toHaveCount(0);
 
     expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (3,00%)');
     expect(await valorTarjeta(page, 'ITP (')).toBe('9000,00 €');
@@ -1831,7 +1831,7 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
     expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (2,00%)');
     expect(await valorTarjeta(page, 'AJD (')).toBe('6000,00 €');
     // Y se dice: el tipo es el propio de la renuncia, no el general con un aviso genérico.
-    expect(await descripcionTarjeta(page, 'AJD (')).toBe('Tipo propio de la renuncia a la exención en Comunidad Valenciana');
+    expect(await descripcionTarjeta(page, 'AJD (')).toBe('Tipo propio de la renuncia a la exención en la Comunidad Valenciana');
     const aviso = (await page.locator('[class*="renunciaAviso"]').first().innerText()).replace(/\s+/g, ' ');
     expect(aviso).toContain('tipo propio de la renuncia');
     expect(aviso).not.toContain('este simulador usa el AJD general');
@@ -2326,7 +2326,7 @@ test.describe('Re-inspección 26/09/2026 — familia grupo B: casos nuevos y el 
     expect(await valorTarjeta(page, 'IVA (')).toBe('210.000,00 €');
     expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD \(/))).toBe('AJD (2,00%)');
     expect(await valorTarjeta(page, 'AJD (')).toBe('20.000,00 €');
-    expect(await descripcionTarjeta(page, 'AJD (')).toBe('Tipo propio de la renuncia a la exención en Comunidad Valenciana');
+    expect(await descripcionTarjeta(page, 'AJD (')).toBe('Tipo propio de la renuncia a la exención en la Comunidad Valenciana');
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('232.315,36 €');
     expect(sinEspacioPct(await descripcionTarjeta(page, 'Total gastos adicionales'))).toBe('23,23% sobre el precio de compra');
     expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('1.232.315,37 €');
@@ -3358,7 +3358,7 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-b] el nombre oficial de `ITP_CCAA.nombre` entra
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3094) — [08/10-b] el nombre oficial de `ITP_CCAA.nombre` entra
    * sin artículo en frases escritas en ESTE page.tsx (forma del 3065 de local-comercial, 3077 de
    * garaje, 3081 de trastero y 3084 de nave): el aviso de Ceuta y Melilla (l. 480, `En
    * {datosCcaaActual.nombre} no rige el IVA`) y, con renuncia en Valencia, el aviso de la renuncia
@@ -3370,7 +3370,6 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
    *   Valenciana (2 %)».
    */
   test('[08/10-b] las frases de page.tsx con el nombre de la comunidad llevan su artículo', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-b] abierto: «En Ciudad Autónoma de Ceuta», «en Comunidad Valenciana»');
     await abrirHidratada(page);
     await sembrarValor(page, CAMPO_PRECIO, '45000');
     for (const [ccaa, ciudad] of [['ceuta', 'Ceuta'], ['melilla', 'Melilla']] as const) {

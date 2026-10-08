@@ -43,6 +43,8 @@ import {
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar,
+  nombreEnFrase,
+  deNombreCcaa,
 } from '@/data/itp-ccaa';
 import { FISCAL_INMUEBLES_META, FISCAL_IVA_META, PORCENTAJES_IVA } from '@/data/fiscal';
 
@@ -525,7 +527,7 @@ export default function SimuladorSolarPage() {
             {ciudadBonificada ? (
               <p className={styles.infoCcaaNote}>
                 Los solares tributan por el <strong>tipo general</strong> de ITP cuando vende un particular,
-                pero en {datosCcaaActual.nombre} se aplica además la{' '}
+                pero en {nombreEnFrase(ccaa)} se aplica además la{' '}
                 <strong>bonificación del {BONIFICACION_CIUDADES} de la cuota</strong> del artículo 57 bis
                 del TRLITPAJD, que corresponde a los inmuebles situados en la ciudad sea cual sea su uso.
                 El simulador ya la descuenta.
@@ -604,7 +606,7 @@ export default function SimuladorSolarPage() {
                 icon="📋"
                 description={
                   resultadosComprador.impuestoNoCalculado
-                    ? `En ${datosCcaaActual.nombre} no rige el IVA: la compra al promotor tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    ? `En ${nombreEnFrase(ccaa)} no rige el IVA: la compra al promotor tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                     : esEmpresario
                       ? 'Deducible si eres empresa/autónomo sujeto a IVA; no deducible si autopromueves tu vivienda'
                       // La bonificación se NOMBRA donde se aplica: «no tienen tipos reducidos»

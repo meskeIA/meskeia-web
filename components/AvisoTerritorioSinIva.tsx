@@ -1,6 +1,6 @@
 'use client';
 
-import { TERRITORIOS_SIN_IVA, ITP_CCAA, ComunidadAutonoma } from '@/data/itp-ccaa';
+import { TERRITORIOS_SIN_IVA, ComunidadAutonoma, nombreEnFrase, deNombreCcaa } from '@/data/itp-ccaa';
 import styles from './AvisoTerritorioSinIva.module.css';
 
 interface Props {
@@ -39,10 +39,10 @@ export default function AvisoTerritorioSinIva({ ccaa, aplica = true }: Props) {
 
   return (
     <p className={styles.aviso} role="note">
-      <span aria-hidden="true">⚠️</span> En {ITP_CCAA[ccaa].nombre} <strong>no se aplica el IVA</strong>:
+      <span aria-hidden="true">⚠️</span> En {nombreEnFrase(ccaa)} <strong>no se aplica el IVA</strong>:
       esta operación tributa por el {territorio.impuesto} ({territorio.nombre}), que tiene sus propios
       tipos. Esta herramienta no lo calcula, así que el importe del impuesto indirecto no es el tuyo —
-      consúltalo en la administración tributaria de {ITP_CCAA[ccaa].nombre}.
+      consúltalo en la administración tributaria {deNombreCcaa(ccaa)}.
     </p>
   );
 }

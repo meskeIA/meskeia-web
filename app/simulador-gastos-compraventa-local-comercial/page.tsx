@@ -57,6 +57,8 @@ import {
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar,
+  nombreEnFrase,
+  deNombreCcaa,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -1204,7 +1206,7 @@ export default function SimuladorLocalComercialPage() {
         {territorioActualSinIva ? (
           <>
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
-            {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
+            {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
             ({territorioActualSinIva.nombre}), que esta calculadora no cifra. El impuesto soportado
             también puede ser <strong>deducible</strong>, pero con las reglas del{' '}
             {territorioActualSinIva.impuesto}.{' '}
@@ -1302,7 +1304,7 @@ export default function SimuladorLocalComercialPage() {
                 // del sujeto pasivo entran en juego», y en el IGIC entran las dos.
                 <>
                   <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención del {territorioActualSinIva.impuesto}:</strong> en{' '}
-                  {datosCcaaActual.nombre} no se devenga IVA, sino el <strong>{territorioActualSinIva.impuesto}</strong>, y la
+                  {nombreEnFrase(ccaa)} no se devenga IVA, sino el <strong>{territorioActualSinIva.impuesto}</strong>, y la
                   renuncia es a su exención (art. 50.Cinco Ley canaria 4/2012), entre empresarios con derecho a
                   deducción. Ese {territorioActualSinIva.impuesto} lo <strong>autoliquida el comprador</strong> por inversión
                   del sujeto pasivo, la operación deja de pagar ITP y la escritura paga AJD. Esta calculadora no
@@ -1319,8 +1321,8 @@ export default function SimuladorLocalComercialPage() {
                       solo está verificado en Valencia (Ley 13/1997, art. 14.Dos: 2 %, hallazgo 1603),
                       y ahí el simulador lo aplica; en el resto usa el general y lo dice. */}
                   {ajdRenunciaPropio
-                    ? <>En {datosCcaaActual.nombre} es del {conPct(formatTipoNominal(ajdRenuncia.tipo))}, y es el que aplica este simulador.</>
-                    : <>Este simulador usa el AJD general de {datosCcaaActual.nombre}: si tu comunidad tiene un tipo propio para la renuncia, el coste real de AJD puede ser mayor.</>}
+                    ? <>En {nombreEnFrase(ccaa)} es del {conPct(formatTipoNominal(ajdRenuncia.tipo))}, y es el que aplica este simulador.</>
+                    : <>Este simulador usa el AJD general {deNombreCcaa(ccaa)}: si tu comunidad tiene un tipo propio para la renuncia, el coste real de AJD puede ser mayor.</>}
                 </>
               )}
             </div>
@@ -1502,7 +1504,7 @@ export default function SimuladorLocalComercialPage() {
                   resultadosComprador.impuestoNoCalculado
                     // El texto nombra la operación ELEGIDA, no siempre la obra nueva: es el
                     // hallazgo 451 de la app hermana de la nave industrial.
-                    ? `En ${datosCcaaActual.nombre} no rige el IVA: ${esRenuncia ? 'la renuncia a la exención' : 'la compra de obra nueva'} tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    ? `En ${nombreEnFrase(ccaa)} no rige el IVA: ${esRenuncia ? 'la renuncia a la exención' : 'la compra de obra nueva'} tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                     : esRenuncia
                       ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
                       : resultadosComprador.ivaRecuperable
@@ -1528,8 +1530,8 @@ export default function SimuladorLocalComercialPage() {
                       ? `Con la bonificación del ${conPct(formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100))} de Ceuta y Melilla aplicada`
                       : esRenuncia
                         ? ajdRenunciaPropio
-                          ? `Tipo propio de la renuncia a la exención del IVA en ${datosCcaaActual.nombre}`
-                          : `AJD general de ${datosCcaaActual.nombre}: algunas comunidades aplican un tipo incrementado en la renuncia`
+                          ? `Tipo propio de la renuncia a la exención del IVA en ${nombreEnFrase(ccaa)}`
+                          : `AJD general ${deNombreCcaa(ccaa)}: algunas comunidades aplican un tipo incrementado en la renuncia`
                         : null,
                     // La base mínima del AJD (art. 30.1 TRLITPAJD, hallazgo 2209).
                     AVISO_BASE_AJD,

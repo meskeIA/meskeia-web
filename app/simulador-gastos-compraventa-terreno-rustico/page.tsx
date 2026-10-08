@@ -42,6 +42,8 @@ import {
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar,
+  nombreEnFrase,
+  deNombreCcaa,
 } from '@/data/itp-ccaa';
 import {
   FISCAL_INMUEBLES_META,
@@ -477,7 +479,7 @@ export default function SimuladorTerrenoRusticoPage() {
           {/* En Ceuta y Melilla la opción está desactivada, y se dice por qué con la norma. */}
           {renunciaImposible && territorioActualSinIva && (
             <p className={styles.renunciaAviso} role="note">
-              <span aria-hidden="true">ℹ️</span> En {datosCcaaActual.nombre} no rige el IVA, sino el{' '}
+              <span aria-hidden="true">ℹ️</span> En {nombreEnFrase(ccaa)} no rige el IVA, sino el{' '}
               {territorioActualSinIva.impuesto} ({territorioActualSinIva.nombre}), y en él{' '}
               <strong>no existe la renuncia a la exención</strong>: la Ley 8/1991 toma sus exenciones de la
               ley del IVA (art. 7) sin regular ninguna renuncia, y no deja deducir el{' '}
@@ -500,7 +502,7 @@ export default function SimuladorTerrenoRusticoPage() {
               {territorioActualSinIva ? (
                 <>
                   <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención del {territorioActualSinIva.impuesto} (art. 50.Cinco Ley canaria 4/2012):</strong>{' '}
-                  en {datosCcaaActual.nombre} <strong>no se devenga IVA</strong> —rige el{' '}
+                  en {nombreEnFrase(ccaa)} <strong>no se devenga IVA</strong> —rige el{' '}
                   {territorioActualSinIva.impuesto}—, pero la entrega de terrenos rústicos también está exenta
                   del {territorioActualSinIva.impuesto} (art. 50.Uno.20.º) y esa exención se puede renunciar
                   entre empresarios con derecho a deducción. El{' '}
@@ -519,7 +521,7 @@ export default function SimuladorTerrenoRusticoPage() {
                   escritura tributa por AJD
                   {ajdRenunciaRotulo.motivo === 'renuncia' ? (
                     <>
-                      , al <strong>tipo propio de la renuncia</strong> en {datosCcaaActual.nombre} (
+                      , al <strong>tipo propio de la renuncia</strong> en {nombreEnFrase(ccaa)} (
                       {formatTipoNominal(ajdRenunciaRotulo.tipo)}&nbsp;%), que es el que se aplica aquí.
                     </>
                   ) : (
@@ -684,7 +686,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 icon="📋"
                 description={
                   resultadosComprador.impuestoNoCalculado
-                    ? `En ${datosCcaaActual.nombre} no rige el IVA: la operación tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    ? `En ${nombreEnFrase(ccaa)} no rige el IVA: la operación tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                     : esRenuncia
                       ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
                       : ciudadBonificada
@@ -713,7 +715,7 @@ export default function SimuladorTerrenoRusticoPage() {
                   // genérico queda para las comunidades en las que se usa el general (1603).
                   description={`${
                     resultadosComprador.ajdTipo.motivo === 'renuncia'
-                      ? `Tipo propio de la renuncia a la exención en ${datosCcaaActual.nombre}`
+                      ? `Tipo propio de la renuncia a la exención en ${nombreEnFrase(ccaa)}`
                       : 'Tipo general de la comunidad: algunas CCAA aplican un tipo de AJD incrementado en la renuncia'
                   }. ${AVISO_BASE_AJD}`}
                 />

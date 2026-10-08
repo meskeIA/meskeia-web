@@ -6501,14 +6501,13 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
     );
   });
 
-  // HALLAZGO [08/10-d] (bajo, contenido) — ❌ ABIERTO. El nombre oficial de `ITP_CCAA.nombre` se
+  // HALLAZGO [08/10-d] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3081, `nombreEnFrase`). El nombre oficial de `ITP_CCAA.nombre` se
   // interpola sin artículo en dos frases ESCRITAS EN ESTE page.tsx (la forma del 3065 de
   // local-comercial): la tarjeta del impuesto no calculado (~l. 1347, «En Ciudad Autónoma de Ceuta
   // no rige el IVA…», y Melilla) y el aviso de reducidos (~l. 1456, «En Comunidad de Madrid
   // existe:», «En Comunidad Valenciana…», «En Región de Murcia…», «En Islas Baleares…»). El
   // aviso común AvisoTerritorioSinIva tiene la misma forma, pero es código común y va en el 3065.
   test('[08/10-d] el nombre de la comunidad lleva su artículo en las frases de esta página', async ({ page }) => {
-    test.fail();
     const sinArticulo = /(?:^|[\s(])(?:[Ee]n|de) (?:Ciudad Autónoma|Comunidad|Región|Islas) /;
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
@@ -6522,16 +6521,17 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
     const aviso = await texto(avisoReducidos0810(page));
     // El defecto.
     expect({ ipsi: sinArticulo.test(ipsi), aviso: sinArticulo.test(aviso) }).toEqual({ ipsi: false, aviso: false });
+    expect(ipsi).toContain('En la Ciudad Autónoma de Ceuta no rige el IVA');
+    expect(aviso).toMatch(/En la Comunidad de Madrid existen?:/);
   });
 
-  // HALLAZGO [08/10-e] (bajo, contenido) — ❌ ABIERTO. «En {nombre} existe:» (page.tsx ~l. 1456) va
+  // HALLAZGO [08/10-e] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3082, también en la referencia y garaje). «En {nombre} existe:» (page.tsx ~l. 1456) va
   // en singular delante de una lista de DOS o TRES tipos: Castilla-La Mancha con perfil general
   // (las tres zonas de despoblación), Cantabria con familia numerosa (3), y con 2 Aragón, Asturias,
   // Cataluña, Castilla y León, Valencia y La Rioja. La referencia y garaje tienen la misma frase.
   //   Castilla-La Mancha · segunda mano · 27.500 € · general → obtenido «En Castilla-La Mancha
   //   existe:» y debajo 5,00 %, 4,00 % y 3,00 %.
   test('[08/10-e] el aviso de reducidos concuerda en plural cuando ofrece varios tipos', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await page.locator('#select-ccaa').selectOption('castilla-mancha');

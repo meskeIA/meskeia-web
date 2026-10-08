@@ -3955,7 +3955,7 @@ test.describe('RE-INSPECCIÓN 18/09/2026 — los tres casos, resueltos a mano an
     expect(TERRITORIOS_SIN_IVA.melilla?.impuesto).toBe('IPSI');
     expect(await valorTarjeta(page, 'IPSI')).toBe('No calculado');
     expect(await descripcionTarjeta(page, 'IPSI')).toBe(
-      'En Ciudad Autónoma de Melilla no rige el IVA: la compra de obra nueva tributa por el IPSI, que este simulador no calcula',
+      'En la Ciudad Autónoma de Melilla no rige el IVA: la compra de obra nueva tributa por el IPSI, que este simulador no calcula',
     );
     // Sin IVA, el selector vinculado/independiente no decide nada y no se enseña.
     await expect(page.locator('button', { hasText: 'Vinculado a vivienda' })).toHaveCount(0);
@@ -7237,7 +7237,7 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-d] el nombre oficial de `ITP_CCAA.nombre` se
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3077, con `nombreEnFrase` de data/itp-ccaa) — [08/10-d] el nombre oficial de `ITP_CCAA.nombre` se
    * mete sin artículo en tres frases escritas en el PROPIO page.tsx (la forma del 3065 de
    * local-comercial): la tarjeta del impuesto no calculado (`En ${nombre} no rige el IVA`), el
    * rótulo de la lista de reducidos (`Beneficios fiscales en {nombre}`) y el aviso «Podrías pagar
@@ -7250,7 +7250,6 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
    *   de Madrid (solo si se cumplen TODAS sus condiciones):» y «En Comunidad de Madrid existe:».
    */
   test('[08/10-d] las frases de page.tsx con el nombre de la comunidad llevan su artículo', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-d] abierto: «En Ciudad Autónoma de Ceuta», «en Comunidad de Madrid»');
     expect(ITP_CCAA.ceuta.nombre).toBe('Ciudad Autónoma de Ceuta');
     expect(ITP_CCAA.madrid.nombre).toBe('Comunidad de Madrid');
     await page.goto(RUTA);
@@ -7269,5 +7268,9 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
     expect(tarjeta).not.toMatch(/\b[Ee]n Ciudad Autónoma\b/);
     expect(rotulo).not.toMatch(/\ben Comunidad de Madrid\b/);
     expect(aviso).not.toMatch(/\bEn Comunidad de Madrid existe\b/);
+    // Y en positivo, para que no pase en verde si la frase desaparece.
+    expect(tarjeta).toContain('En la Ciudad Autónoma de Ceuta no rige el IVA');
+    expect(rotulo).toContain('Beneficios fiscales en la Comunidad de Madrid');
+    expect(aviso).toMatch(/En la Comunidad de Madrid existen?:/);
   });
 });

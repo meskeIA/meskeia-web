@@ -3475,7 +3475,7 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
   });
 
   /**
-   * ❌ ABIERTO 08/10/2026 (contenido, bajo) — [08/10-b] el nombre oficial de `ITP_CCAA.nombre`
+   * ✅ REPARADO 08/10/2026 (contenido, bajo; hallazgo 3092) — [08/10-b] el nombre oficial de `ITP_CCAA.nombre`
    * («Ciudad Autónoma de Ceuta», «… de Melilla») entra sin artículo en dos frases escritas en ESTE
    * page.tsx: la tarjeta del impuesto no calculado (l. 607, `En ${datosCcaaActual.nombre} no rige
    * el IVA`) y la nota de la bonificación del recuadro (l. 528, `pero en {datosCcaaActual.nombre}
@@ -3486,7 +3486,6 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
    *   Ceuta…») y «pero en la Ciudad Autónoma de Ceuta se aplica además…» · obtenido sin «la».
    */
   test('[08/10-b] las frases de page.tsx con el nombre de Ceuta y Melilla llevan su artículo', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo [08/10-b] abierto: «En Ciudad Autónoma de Ceuta», «pero en Ciudad Autónoma de Melilla»');
     const sinArticulo = /[^.]*\b[Ee]n Ciudad Autónoma de (?:Ceuta|Melilla)[^.]*/;
     const encontrados: string[] = [];
     for (const ciudad of ['ceuta', 'melilla']) {

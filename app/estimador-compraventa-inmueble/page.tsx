@@ -40,7 +40,7 @@ import {
   honorariosLlevanIVA,
   FACTURA_NOTARIAL,
   REGISTRO_CONCEPTOS,
-  sumarLineasVisibles, superaElTope } from '@/data/itp-ccaa';
+  sumarLineasVisibles, superaElTope, nombreEnFrase, deNombreCcaa } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
   HORQUILLA_GASTOS_COMPRAVENTA,
@@ -1744,7 +1744,7 @@ export default function SimuladorCompraventaPage() {
                       nota —impresa unos centímetros más arriba— lo dice. Quien llamara a la
                       oficina liquidadora pedía algo que allí no existe con ese nombre
                       (hallazgo 769; ya reparado así en la hermana garaje el 11/09). */}
-                  <h4>Beneficios fiscales en {datosCcaaActual.nombre}, solo si se cumplen TODAS sus condiciones:</h4>
+                  <h4>Beneficios fiscales en {nombreEnFrase(ccaa)}, solo si se cumplen TODAS sus condiciones:</h4>
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
@@ -1829,7 +1829,7 @@ export default function SimuladorCompraventaPage() {
                     icon="📋"
                     description={
                       resultadosComprador.impuestoNoCalculado
-                        ? `En ${datosCcaaActual.nombre} no rige el IVA: la compra de obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                        ? `En ${nombreEnFrase(ccaa)} no rige el IVA: la compra de obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                         : undefined
                     }
                   />
@@ -1851,7 +1851,7 @@ export default function SimuladorCompraventaPage() {
                         if (tipoInmueble !== 'vivienda') return AVISO_BASE_AJD;
                         const habitual = tipoAJD(ccaa, { objeto: 'vivienda', viviendaHabitual: true });
                         if (habitual.motivo !== 'vivienda-habitual') return AVISO_BASE_AJD;
-                        return `Si va a ser tu vivienda habitual, en ${datosCcaaActual.nombre} el AJD baja al ${formatTipoNominal(habitual.tipo)}\u00A0%: serían ${formatCurrency(calcularAJD(resultadosComprador.precioInmueble, ccaa, { objeto: 'vivienda', viviendaHabitual: true }))}. No lo aplicamos porque no lo preguntamos. ${AVISO_BASE_AJD}`;
+                        return `Si va a ser tu vivienda habitual, en ${nombreEnFrase(ccaa)} el AJD baja al ${formatTipoNominal(habitual.tipo)}\u00A0%: serían ${formatCurrency(calcularAJD(resultadosComprador.precioInmueble, ccaa, { objeto: 'vivienda', viviendaHabitual: true }))}. No lo aplicamos porque no lo preguntamos. ${AVISO_BASE_AJD}`;
                       })()}
                     />
                   )}
@@ -2025,13 +2025,13 @@ export default function SimuladorCompraventaPage() {
                             {resultadosComprador.tipoElegido.nombre
                               ? ` (${separarPorcentajes(resultadosComprador.tipoElegido.nombre)})`
                               : ''}
-                            . En {datosCcaaActual.nombre} hay además tipos más bajos que dependen
+                            . En {nombreEnFrase(ccaa)} hay además tipos más bajos que dependen
                             de requisitos que no preguntamos:
                           </>
                         ) : (
                           <>
                             El cálculo usa el tipo general porque no podemos comprobar tu situación.
-                            En {datosCcaaActual.nombre} existe:
+                            En {nombreEnFrase(ccaa)} {resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:
                           </>
                         )}
                       </p>
@@ -2193,10 +2193,10 @@ export default function SimuladorCompraventaPage() {
                       no solo tras pulsar: es lo que hay que saber ANTES de fiarse de la cifra. */}
                   <p id="nota-estimar-gastos" className={styles.notaEstimar}>
                     {sinIvaCompraOriginal
-                      ? `En ${datosCcaaActual.nombre} la obra nueva no paga IVA sino ${sinIvaCompraOriginal.impuesto} (${sinIvaCompraOriginal.nombre}), que esta app no calcula: escribe lo que pagaste, que figura en tu escritura.`
+                      ? `En ${nombreEnFrase(ccaa)} la obra nueva no paga IVA sino ${sinIvaCompraOriginal.impuesto} (${sinIvaCompraOriginal.nombre}), que esta app no calcula: escribe lo que pagaste, que figura en tu escritura.`
                       : `La estimación aplica los tipos generales vigentes hoy en la comunidad elegida, sin tipos reducidos: si aquella compra pagó otro tipo (el que regía en su año, o uno reducido por edad, familia numerosa o vivienda protegida), escribe lo que figura en tu escritura o en la autoliquidación del impuesto.${
                           TERRITORIOS_SIN_IVA[ccaa]
-                            ? ` En ${datosCcaaActual.nombre} la notaría y el registro se estiman sin el ${TERRITORIOS_SIN_IVA[ccaa]?.impuesto} que llevaron sus facturas, que esta app no calcula: súmalo si lo tienes, porque también forma parte del valor de adquisición.`
+                            ? ` En ${nombreEnFrase(ccaa)} la notaría y el registro se estiman sin el ${TERRITORIOS_SIN_IVA[ccaa]?.impuesto} que llevaron sus facturas, que esta app no calcula: súmalo si lo tienes, porque también forma parte del valor de adquisición.`
                             : ''
                         }`}
                   </p>
@@ -2942,7 +2942,7 @@ export default function SimuladorCompraventaPage() {
                 <span className={styles.casoEmoji} aria-hidden="true">🏠</span>
                 <span className={styles.casoTag}>Comprador primera vivienda</span>
               </div>
-              <p>Marta, {EJEMPLO_MARTA_EDAD} años, compra su primera vivienda habitual de segunda mano en {ITP_CCAA[EJEMPLO_MARTA.ccaa].nombre} por
+              <p>Marta, {EJEMPLO_MARTA_EDAD} años, compra su primera vivienda habitual de segunda mano en {nombreEnFrase(EJEMPLO_MARTA.ccaa)} por
               {' '}{eurosEnteros(EJEMPLO_MARTA.precio)}. {EJEMPLO_MARTA_JOVEN_APLICA
                 ? <>Al ser menor de {EJEMPLO_MARTA_EDAD_TOPE} años{EJEMPLO_MARTA_TOPE ? <> y no superar los {eurosEnteros(EJEMPLO_MARTA_TOPE)}</> : null}, se aplica el tipo
               reducido de ITP del {formatTipoNominal(EJEMPLO_MARTA_TIPO_JOVEN)}&nbsp;% ({eurosEnteros(EJEMPLO_MARTA_ITP)}) en lugar del tipo general

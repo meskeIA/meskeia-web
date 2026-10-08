@@ -43,6 +43,8 @@ import {
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar,
+  nombreEnFrase,
+  deNombreCcaa,
 } from '@/data/itp-ccaa';
 import {
   IVA_INMUEBLES_2025,
@@ -434,11 +436,11 @@ export default function SimuladorNaveIndustrialPage() {
         {territorioActualSinIva ? (
           <>
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
-            {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
+            {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
             ({territorioActualSinIva.nombre}), que esta calculadora no cifra. El impuesto soportado
             también puede ser <strong>deducible</strong>, pero con las reglas del{' '}
-            {territorioActualSinIva.impuesto}: consúltalas en la administración tributaria de{' '}
-            {datosCcaaActual.nombre} y con tu asesor fiscal antes de tomar decisiones.
+            {territorioActualSinIva.impuesto}: consúltalas en la administración tributaria{' '}
+            {deNombreCcaa(ccaa)} y con tu asesor fiscal antes de tomar decisiones.
           </>
         ) : (
           <>
@@ -521,7 +523,7 @@ export default function SimuladorNaveIndustrialPage() {
                 <span aria-hidden="true">ℹ️</span>{' '}
                 {renunciaImposible && territorioActualSinIva ? (
                   <>
-                    En {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
+                    En {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
                     ({territorioActualSinIva.nombre}), y en él <strong>no existe la renuncia a la
                     exención</strong>: la Ley 8/1991 toma sus exenciones de la ley del IVA (art. 7) sin
                     regular ninguna renuncia, y no deja deducir el {territorioActualSinIva.impuesto}{' '}
@@ -531,7 +533,7 @@ export default function SimuladorNaveIndustrialPage() {
                   </>
                 ) : territorioActualSinIva ? (
                   <>
-                    En {datosCcaaActual.nombre} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
+                    En {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
                     ({territorioActualSinIva.nombre}). También en él la segunda entrega de una nave está
                     exenta y, entre empresarios con derecho a deducción, se puede{' '}
                     <strong>renunciar a esa exención</strong> (art. 50.Cinco Ley canaria 4/2012): la
@@ -554,7 +556,7 @@ export default function SimuladorNaveIndustrialPage() {
                 <span aria-hidden="true">ℹ️</span>{' '}
                 {territorioActualSinIva ? (
                   <>
-                    En {datosCcaaActual.nombre} <strong>no se devenga IVA</strong>: la renuncia es a la
+                    En {nombreEnFrase(ccaa)} <strong>no se devenga IVA</strong>: la renuncia es a la
                     exención del {territorioActualSinIva.impuesto} (art. 50.Cinco Ley canaria 4/2012), y
                     ese {territorioActualSinIva.impuesto} lo <strong>autoliquida el comprador</strong> por
                     inversión del sujeto pasivo (art. 19.1.2.º g Ley 20/1991). Con la renuncia la
@@ -568,7 +570,7 @@ export default function SimuladorNaveIndustrialPage() {
                     Con renuncia a la exención el IVA no se paga al vendedor: lo{' '}
                     <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
                     deducible si tu actividad está sujeta a IVA. El AJD de la escritura va al{' '}
-                    <strong>tipo propio de la renuncia</strong> en {datosCcaaActual.nombre} (
+                    <strong>tipo propio de la renuncia</strong> en {nombreEnFrase(ccaa)} (
                     {formatTipoNominal(ajdRotulo.tipo)}&nbsp;%), que es el que se aplica aquí.
                   </>
                 ) : (
@@ -662,7 +664,7 @@ export default function SimuladorNaveIndustrialPage() {
             {esCiudadBonificada ? (
               <p className={styles.infoCcaaNote}>
                 Las naves industriales tributan por el <strong>tipo general</strong> de ITP, pero en{' '}
-                {datosCcaaActual.nombre} se aplica además la{' '}
+                {nombreEnFrase(ccaa)} se aplica además la{' '}
                 <strong>bonificación del {BONIFICACION_CIUDADES} de la cuota</strong>{' '}
                 del artículo 57 bis del TRLITPAJD, que corresponde a los inmuebles situados en la ciudad
                 sea cual sea su uso. El simulador ya la descuenta.
@@ -687,10 +689,10 @@ export default function SimuladorNaveIndustrialPage() {
             )}
             {territorioActualSinIva && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> En {datosCcaaActual.nombre} <strong>no se aplica el IVA</strong>:
+                <span aria-hidden="true">⚠️</span> En {nombreEnFrase(ccaa)} <strong>no se aplica el IVA</strong>:
                 la obra nueva tributa por el {territorioActualSinIva.impuesto} ({territorioActualSinIva.nombre}),
                 con sus propios tipos. Este simulador no lo calcula — consúltalo en la administración tributaria
-                de {datosCcaaActual.nombre}.
+                {deNombreCcaa(ccaa)}.
               </p>
             )}
           </div>
@@ -748,7 +750,7 @@ export default function SimuladorNaveIndustrialPage() {
                 icon="📋"
                 description={
                   resultadosComprador.impuestoNoCalculado
-                    ? `En ${datosCcaaActual.nombre} no rige el IVA: ${transmision === 'segunda-mano-renuncia' ? `la renuncia a la exención del ${resultadosComprador.tipoImpuesto}` : 'la obra nueva'} tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                    ? `En ${nombreEnFrase(ccaa)} no rige el IVA: ${transmision === 'segunda-mano-renuncia' ? `la renuncia a la exención del ${resultadosComprador.tipoImpuesto}` : 'la obra nueva'} tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                     // startsWith y no igualdad estricta: con renuncia el rótulo es
                     // «IVA (renuncia · ISP)» y caía al ramal del ITP, así que bajo un IVA de
                     // 105.000 € se leía «naves industriales no tienen tipos reducidos», que
@@ -776,7 +778,7 @@ export default function SimuladorNaveIndustrialPage() {
                     resultadosComprador.bonificado
                       ? `Con la bonificación del ${BONIFICACION_CIUDADES} de Ceuta y Melilla aplicada`
                       : resultadosComprador.ajdTipo.motivo === 'renuncia'
-                        ? `Tipo propio de la renuncia a la exención en ${datosCcaaActual.nombre}`
+                        ? `Tipo propio de la renuncia a la exención en ${nombreEnFrase(ccaa)}`
                         : transmision === 'segunda-mano-renuncia'
                           ? 'Tipo general de la comunidad: algunas aplican uno incrementado cuando hay renuncia'
                           : null,

@@ -8594,7 +8594,7 @@ test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales
     await page.locator('#regimen-compra-original').selectOption('primera-mano');
     await expect(boton).toBeDisabled();
     await expect(page.locator('#nota-estimar-gastos')).toHaveText(
-      'En Ciudad Autónoma de Ceuta la obra nueva no paga IVA sino IPSI (Impuesto sobre la Producción, los Servicios y la Importación), que esta app no calcula: escribe lo que pagaste, que figura en tu escritura.',
+      'En la Ciudad Autónoma de Ceuta la obra nueva no paga IVA sino IPSI (Impuesto sobre la Producción, los Servicios y la Importación), que esta app no calcula: escribe lo que pagaste, que figura en tu escritura.',
     );
     await boton.click({ force: true });
     await expect(campo).toHaveValue('');

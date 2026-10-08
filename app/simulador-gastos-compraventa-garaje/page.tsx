@@ -73,7 +73,7 @@ import {
   sumarLineasVisibles,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
-  respuestaEscriturar, superaElTope } from '@/data/itp-ccaa';
+  respuestaEscriturar, superaElTope, nombreEnFrase, deNombreCcaa } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
   RESPUESTA_ITP_GARAJE_SEGUNDA_MANO,
@@ -1208,7 +1208,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     llamara a su oficina liquidadora pediría algo que no existe con ese nombre
                     (hallazgo 711). El rótulo nombra ahora lo que la lista contiene de verdad.
                   */}
-                  <h3>Beneficios fiscales en {datosCcaaActual.nombre} (solo si se cumplen TODAS sus condiciones):</h3>
+                  <h3>Beneficios fiscales en {nombreEnFrase(ccaa)} (solo si se cumplen TODAS sus condiciones):</h3>
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
@@ -1327,7 +1327,7 @@ export default function SimuladorGarajeCompraventaPage() {
                     icon="📋"
                     description={
                       resultadosComprador.impuestoNoCalculado
-                        ? `En ${datosCcaaActual.nombre} no rige el IVA: la compra de obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
+                        ? `En ${nombreEnFrase(ccaa)} no rige el IVA: la compra de obra nueva tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                         : undefined
                     }
                   />
@@ -1448,7 +1448,7 @@ export default function SimuladorGarajeCompraventaPage() {
                       <p className={styles.avisoReducidosTexto}>
                         El cálculo usa el tipo que te corresponde sin requisitos especiales
                         ({formatNumber(resultadosComprador.porcentajeImpuesto, 2)}&nbsp;% efectivo sobre el precio)
-                        porque no podemos comprobar tu situación. En {datosCcaaActual.nombre} existe:
+                        porque no podemos comprobar tu situación. En {nombreEnFrase(ccaa)} {resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:
                       </p>
                       <ul className={styles.avisoReducidosLista}>
                         {resultadosComprador.tipoElegido.noComprobables.map(r => (

@@ -1592,7 +1592,7 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — Galicia, Melilla y la comisión del
     await expect(page.locator('h3', { hasText: /^IPSI/ }).first()).toHaveText('IPSI');
     expect(await valorTarjeta(page, /^IPSI/)).toBe('No calculado');
     expect(await descripcionTarjeta(page, /^IPSI/)).toContain(
-      'En Ciudad Autónoma de Melilla no rige el IVA: la compra de obra nueva tributa por el IPSI',
+      'En la Ciudad Autónoma de Melilla no rige el IVA: la compra de obra nueva tributa por el IPSI',
     );
     await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (0,25 %)');
     expect(await valorTarjeta(page, /^AJD/)).toBe('1000,00 €');
@@ -1940,7 +1940,7 @@ test.describe('RE-INSPECCIÓN 21/09/2026 — Valencia, la ganancia en cero y el 
     await expect(page.locator('h3', { hasText: /^AJD/ }).first()).toHaveText('AJD (2,00 %)');
     expect(await valorTarjeta(page, /^AJD/)).toBe('16.000,00 €');
     expect(await descripcionTarjeta(page, /^AJD/)).toBe(
-      'Tipo propio de la renuncia a la exención del IVA en Comunidad Valenciana',
+      'Tipo propio de la renuncia a la exención del IVA en la Comunidad Valenciana',
     );
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('186.239,91 €');
     await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
@@ -4807,15 +4807,15 @@ test.describe('RE-INSPECCIÓN 07/10/2026 — La Rioja, el euro 50.001 de la base
   // frase («en Ceuta y Melilla se paga la mitad»). La propia app responde allí «En Ciudad Autónoma de
   // Ceuta no rige el IVA: la compra de obra nueva tributa por el IPSI». «IGIC» e «IPSI» no aparecían en
   // todo metadata.ts; nave, solar, garaje, trastero y terreno sí lo decían en su FAQPage.
-  // ⚠️ El `toBe` de la tarjeta del IPSI fija el texto SIN artículo («En Ciudad Autónoma de Ceuta»),
-  // que es el hallazgo [08/10-f]: al repararlo, este literal cambia con él.
+  // El `toBe` de la tarjeta del IPSI fijaba el texto SIN artículo; cambió con la reparación del
+  // hallazgo [08/10-f] (3065, 08/10/2026): «En la Ciudad Autónoma de Ceuta».
   test('[07/10-b] el FAQPage y la FAQ visible dicen que en Canarias, Ceuta y Melilla no rige el IVA', async ({ page }) => {
     await page.selectOption('#select-ccaa', 'ceuta');
     await sembrarImporte12(page, 'Precio del local comercial', '200000');
     await page.getByRole('button', { name: /Obra nueva/ }).click();
     await esperarTarjeta2609(page, /^IPSI/, 'No calculado');
     expect(await descripcionTarjeta(page, /^IPSI/)).toBe(
-      'En Ciudad Autónoma de Ceuta no rige el IVA: la compra de obra nueva tributa por el IPSI, que este simulador no calcula',
+      'En la Ciudad Autónoma de Ceuta no rige el IVA: la compra de obra nueva tributa por el IPSI, que este simulador no calcula',
     );
     const faq = await faqPage0710(page);
     const jsonLd = faq.get('¿Qué impuesto se paga al comprar un local comercial?') ?? '';
@@ -5240,14 +5240,13 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
     });
   });
 
-  // HALLAZGO [08/10-f] (bajo, contenido) — ❌ ABIERTO. El nombre de la comunidad de `ITP_CCAA.nombre`
+  // HALLAZGO [08/10-f] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3065, `nombreEnFrase` y `deNombreCcaa`). El nombre de la comunidad de `ITP_CCAA.nombre`
   // se interpola sin artículo: «en Ciudad Autónoma de Ceuta no rige el IVA», «En Ciudad Autónoma de
   // Ceuta no se aplica el IVA… la administración tributaria de Ciudad Autónoma de Ceuta»
   // (AvisoTerritorioSinIva, común), «AJD general de Comunidad de Madrid», «En Comunidad Valenciana
   // es del 2 %», «Comunidad Foral de Navarra», «Región de Murcia». Es la sospecha del 06/10 (c),
   // medida aquí: sale en pantalla.
   test('[08/10-f] el nombre de la comunidad lleva su artículo en las frases que lo interpolan', async ({ page }) => {
-    test.fail();
     const sinArticulo = /(?:^|[\s(])(?:[Ee]n|de) (?:Ciudad Autónoma|Comunidad|Región) /;
     await abrir0810(page);
     await page.selectOption('#select-ccaa', 'ceuta');
@@ -5264,6 +5263,8 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
       ipsi: false,
       ajdMadrid: false,
     });
+    expect(ipsi).toContain('En la Ciudad Autónoma de Ceuta no rige el IVA');
+    expect(ajdMadrid).toContain('AJD general de la Comunidad de Madrid');
   });
 
   // HALLAZGO [08/10-g] (medio, dato) — ❌ ABIERTO. El IRPF de la ganancia se liquida con la escala del
