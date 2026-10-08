@@ -70,6 +70,8 @@
     "inspector:probar-contador": "node scripts/inspector/probar-contador.mjs",
     "inspector:probar-familias": "node scripts/inspector/probar-familias.mjs",
     "inspector:probar-revalidar": "node scripts/inspector/probar-revalidar.mjs",
+    "cabos": "node scripts/cabos/cabos.mjs",
+    "cabos:probar": "node scripts/cabos/probar-cabos.mjs",
     "check:tipos": "node scripts/check-tipos.mjs",
     "cuadrante": "node scripts/cuadrante-catalogo.mjs",
     "analisis:geografia": "node scripts/analisis-geografia-serie.mjs",
