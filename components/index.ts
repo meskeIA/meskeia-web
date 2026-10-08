@@ -30,10 +30,11 @@ export { default as LastUpdated } from './LastUpdated';
 // Componente de aviso legal (términos, privacidad, fecha, copyright)
 export { default as LegalNotice } from './LegalNotice';
 
-// Nuevos componentes de navegación
-export { default as Sidebar } from './Sidebar';
-export { default as SidebarMobile } from './SidebarMobile';
-export { default as DailyApps } from './DailyApps';
+// ⚠️ Sidebar, SidebarMobile y DailyApps NO van en este barrel: importan el catálogo
+// entero (`data/applications.ts`), y Turbopack funde el barrel en UN módulo, así que
+// cualquier app que importara de aquí un NumberInput descargaba también el catálogo
+// (692.214 B en 925 de 1.021 páginas, 08/10/2026). Solo los usa la portada, que los
+// importa por su ruta.
 
 // Banner de transparencia (localStorage)
 export { default as TransparencyBanner } from './TransparencyBanner';

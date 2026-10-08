@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sidebar, SidebarMobile, DailyApps, MeskeiaLogo } from '@/components';
+import { MeskeiaLogo } from '@/components';
+import Sidebar from '@/components/Sidebar';
+import SidebarMobile from '@/components/SidebarMobile';
+import DailyApps from '@/components/DailyApps';
 import AsistenteChat from '@/components/AsistenteChat';
 import HomeFooter from '@/components/home/HomeFooter';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
