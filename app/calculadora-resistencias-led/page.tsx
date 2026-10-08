@@ -346,7 +346,7 @@ export default function CalculadoraResistenciasLedPage() {
               </div>
               {resultadoLed.potencia >= 0.25 && (
                 <div className={styles.alertaBox} role="alert">
-                  ⚠️ La potencia disipada ({formatNumber(resultadoLed.potencia * 1000, 0)} mW) supera los 250 mW típicos de una resistencia de ¼W. Usa una resistencia de mayor potencia.
+                  <span aria-hidden="true">⚠️</span> La potencia disipada ({formatNumber(resultadoLed.potencia * 1000, 0)} mW) supera los 250 mW típicos de una resistencia de ¼W. Usa una resistencia de mayor potencia.
                 </div>
               )}
             </div>

@@ -261,7 +261,7 @@ export default function TableroComunicacionPage() {
             aria-label="Leer frase en voz alta"
             title="Leer frase"
           >
-            🔊 Leer
+            <span aria-hidden="true">🔊</span> Leer
           </button>
           <button
             type="button"
@@ -334,7 +334,7 @@ export default function TableroComunicacionPage() {
       >
         {categoriaActiva === 'favoritos' && favoritos.length === 0 && (
           <p className={styles.favoritosVacio}>
-            ⭐ Pulsa la estrella ☆ en cualquier símbolo para añadirlo aquí
+            <span aria-hidden="true">⭐</span> Pulsa la estrella ☆ en cualquier símbolo para añadirlo aquí
           </p>
         )}
         <div className={styles.simbolosGrid}>
@@ -396,7 +396,7 @@ export default function TableroComunicacionPage() {
           <ul>
             <li>Pulsa los símbolos para ir construyendo la frase en la barra superior</li>
             <li>Cada símbolo también se lee en voz alta al pulsarlo (retroalimentación inmediata)</li>
-            <li>El botón <strong>🔊 Leer</strong> lee la frase completa</li>
+            <li>El botón <strong><span aria-hidden="true">🔊</span> Leer</strong> lee la frase completa</li>
             <li>El botón <strong>⌫</strong> borra el último símbolo</li>
             <li>El botón <strong>🗑️</strong> limpia toda la frase</li>
             <li>Las categorías con color ayudan a localizar rápidamente los símbolos</li>
@@ -428,7 +428,7 @@ export default function TableroComunicacionPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>💬 Este tablero (meskeIA)</td>
+                  <td><span aria-hidden="true">💬</span> Este tablero (meskeIA)</td>
                   <td className={styles.celdaDestacada}>Sí</td>
                   <td>Básica</td>
                   <td className={styles.celdaDestacada}>Sí (navegador)</td>

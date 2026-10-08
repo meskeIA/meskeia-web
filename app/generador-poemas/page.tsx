@@ -657,7 +657,7 @@ export default function GeneradorPoemas() {
             <div className={styles.faqItem}>
               <strong>¿Es obligatorio que las sílabas sean exactas?</strong>
               <p>En la métrica clásica se espera exactitud, pero los poetas siempre han empleado licencias. El contador muestra ±1 en amarillo como variación aceptable en muchos contextos. Lo importante es que el ritmo fluya al leer en voz alta.</p>
-              <div className={styles.faqTip}>💡 Lee siempre el verso en voz alta: el oído detecta lo que la pantalla no.</div>
+              <div className={styles.faqTip}><span aria-hidden="true">💡</span> Lee siempre el verso en voz alta: el oído detecta lo que la pantalla no.</div>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Qué significa que el verso sea agudo, llano o esdrújulo?</strong>

@@ -509,7 +509,7 @@ export default function PruebaMicrofonoPage() {
             {recordings.length > 0 && (
               <div className={styles.recordingsSection}>
                 <h2 className={styles.sectionTitle}>
-                  🎵 Grabaciones ({recordings.length})
+                  <span aria-hidden="true">🎵</span> Grabaciones ({recordings.length})
                 </h2>
                 <div className={styles.recordingsList}>
                   {recordings.map(recording => (
@@ -550,7 +550,7 @@ export default function PruebaMicrofonoPage() {
 
       {/* Info de privacidad */}
       <div className={styles.privacyInfo}>
-        <h3>🔒 Tu privacidad es importante</h3>
+        <h3><span aria-hidden="true">🔒</span> Tu privacidad es importante</h3>
         <ul>
           <li>✓ El audio NO se envía a ningún servidor</li>
           <li>✓ Las grabaciones se guardan SOLO en tu navegador</li>
@@ -561,7 +561,7 @@ export default function PruebaMicrofonoPage() {
 
       {/* Tips */}
       <div className={styles.tipsSection}>
-        <h3>💡 Consejos para un buen audio</h3>
+        <h3><span aria-hidden="true">💡</span> Consejos para un buen audio</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon}>🎯</span>
@@ -611,28 +611,28 @@ export default function PruebaMicrofonoPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>💻 Micrófono integrado portátil</td>
+                  <td><span aria-hidden="true">💻</span> Micrófono integrado portátil</td>
                   <td>Básica</td>
                   <td>Capta mucho ruido</td>
                   <td>Uso ocasional, emergencias</td>
                   <td>Incluido</td>
                 </tr>
                 <tr>
-                  <td>🎧 Auriculares con micro</td>
+                  <td><span aria-hidden="true">🎧</span> Auriculares con micro</td>
                   <td>Media-buena</td>
                   <td>Moderado (micro cerca)</td>
                   <td>Videollamadas diarias, gaming</td>
                   <td>10 – 80 €</td>
                 </tr>
                 <tr>
-                  <td>🎙️ Micro USB externo</td>
+                  <td><span aria-hidden="true">🎙️</span> Micro USB externo</td>
                   <td>Buena</td>
                   <td>Bajo (cardioide)</td>
                   <td>Podcasts, streaming, teletrabajo</td>
                   <td>40 – 150 €</td>
                 </tr>
                 <tr>
-                  <td>🏆 Micro XLR profesional</td>
+                  <td><span aria-hidden="true">🏆</span> Micro XLR profesional</td>
                   <td>Excelente</td>
                   <td>Muy bajo</td>
                   <td>Grabación profesional, radio</td>

@@ -119,16 +119,18 @@ export default function CalculadoraCombustiblePage() {
           {/* Selector de modo */}
           <div className={styles.modoSelector}>
             <button
+              type="button"
               className={`${styles.modoBtn} ${modo === 'consumo' ? styles.active : ''}`}
               onClick={() => { setModo('consumo'); setResultado(null); }}
             >
-              ⛽ Calcular Consumo
+              <span aria-hidden="true">⛽</span> Calcular Consumo
             </button>
             <button
+              type="button"
               className={`${styles.modoBtn} ${modo === 'viaje' ? styles.active : ''}`}
               onClick={() => { setModo('viaje'); setResultado(null); }}
             >
-              🚗 Planificar Viaje
+              <span aria-hidden="true">🚗</span> Planificar Viaje
             </button>
           </div>
 
@@ -231,10 +233,10 @@ export default function CalculadoraCombustiblePage() {
           )}
 
           <div className={styles.botones}>
-            <button onClick={calcular} className={styles.btnPrimary}>
+            <button type="button" onClick={calcular} className={styles.btnPrimary}>
               Calcular
             </button>
-            <button onClick={limpiar} className={styles.btnSecondary}>
+            <button type="button" onClick={limpiar} className={styles.btnSecondary}>
               Limpiar
             </button>
           </div>
@@ -353,7 +355,7 @@ export default function CalculadoraCombustiblePage() {
       <EducationalSection title="Todo sobre el consumo de combustible" subtitle="Aprende a calcular el gasto real de tu coche, carro o auto, comparar combustibles y reducir el coste por kilómetro">
 
         {/* Tabla comparativa combustibles */}
-        <h3 className={styles.eduSectionTitle}>⚖️ Gasolina vs Diésel vs GLP vs Eléctrico</h3>
+        <h3 className={styles.eduSectionTitle}><span aria-hidden="true">⚖️</span> Gasolina vs Diésel vs GLP vs Eléctrico</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -417,7 +419,7 @@ export default function CalculadoraCombustiblePage() {
         </div>
 
         {/* Casos de uso */}
-        <h3 className={styles.eduSectionTitle}>💼 Cuándo usar esta calculadora</h3>
+        <h3 className={styles.eduSectionTitle}><span aria-hidden="true">💼</span> Cuándo usar esta calculadora</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
@@ -450,7 +452,7 @@ export default function CalculadoraCombustiblePage() {
         </div>
 
         {/* FAQ */}
-        <h3 className={styles.eduSectionTitle}>❓ Preguntas frecuentes</h3>
+        <h3 className={styles.eduSectionTitle}><span aria-hidden="true">❓</span> Preguntas frecuentes</h3>
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
             <h4>¿Qué es el consumo homologado y por qué difiere del real?</h4>
@@ -479,7 +481,7 @@ export default function CalculadoraCombustiblePage() {
         </div>
 
         {/* Guía paso a paso */}
-        <h3 className={styles.eduSectionTitle}>📋 Cómo reducir tu gasto en combustible</h3>
+        <h3 className={styles.eduSectionTitle}><span aria-hidden="true">📋</span> Cómo reducir tu gasto en combustible</h3>
         <div className={styles.stepGuide}>
           <div className={styles.step}>
             <div className={styles.stepNumber}>1</div>
@@ -526,7 +528,7 @@ export default function CalculadoraCombustiblePage() {
         </div>
 
         {/* Mejores prácticas */}
-        <h3 className={styles.eduSectionTitle}>✅ 6 hábitos del conductor eficiente</h3>
+        <h3 className={styles.eduSectionTitle}><span aria-hidden="true">✅</span> 6 hábitos del conductor eficiente</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon}>⛽</span>
@@ -567,12 +569,12 @@ export default function CalculadoraCombustiblePage() {
             <h3>Errores que disparan tu gasto en combustible</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Conducir con neumáticos bajos de presión:</strong> Cada 0,5 bar menos aumenta el consumo un 3% y reduce la seguridad. Comprueba mensualmente y siempre antes de un viaje largo.</li>
-            <li><strong>❌ Acelerar hasta el máximo antes de cambiar de marcha:</strong> En gasolina, subir de marcha a 2.500 rpm en lugar de 3.500 rpm puede reducir el consumo un 10–15%. En diésel, ya a 2.000 rpm.</li>
-            <li><strong>❌ Llenar el depósito hasta arriba en verano:</strong> El calor dilata los líquidos. Las gasolineras tienen compartimentos de ventilación; al llenar a tope en verano puedes desperdiciar algunos centilitros y ensuciar el sistema de recuperación de vapores.</li>
-            <li><strong>❌ Ignorar la luz de presión de neumáticos (TPMS):</strong> Esa luz anaranjada con el neumático no es decorativa. Conduce con cuidado hasta la gasolinera más próxima e infla. Cada kilómetro con presión baja aumenta el desgaste y el consumo.</li>
-            <li><strong>❌ Cambiar a punto muerto en bajadas (coches modernos):</strong> En los coches con inyección electrónica (desde los 90), al soltar el acelerador en marcha el motor NO consume combustible (corte de inyección). En punto muerto, sí consume para mantener el ralentí. Mantén la marcha engranada en bajadas.</li>
-            <li><strong>❌ Comparar solo el precio del carburante sin calcular el coste por kilómetro:</strong> Un coche que consume 5 L/100km con gasolina a 1,60 €/L cuesta 0,08 €/km. Uno con 8 L/100km y gasolina a 1,45 €/L cuesta 0,116 €/km. El precio en el surtidor no cuenta la historia completa.</li>
+            <li><strong><span aria-hidden="true">❌</span> Conducir con neumáticos bajos de presión:</strong> Cada 0,5 bar menos aumenta el consumo un 3% y reduce la seguridad. Comprueba mensualmente y siempre antes de un viaje largo.</li>
+            <li><strong><span aria-hidden="true">❌</span> Acelerar hasta el máximo antes de cambiar de marcha:</strong> En gasolina, subir de marcha a 2.500 rpm en lugar de 3.500 rpm puede reducir el consumo un 10–15%. En diésel, ya a 2.000 rpm.</li>
+            <li><strong><span aria-hidden="true">❌</span> Llenar el depósito hasta arriba en verano:</strong> El calor dilata los líquidos. Las gasolineras tienen compartimentos de ventilación; al llenar a tope en verano puedes desperdiciar algunos centilitros y ensuciar el sistema de recuperación de vapores.</li>
+            <li><strong><span aria-hidden="true">❌</span> Ignorar la luz de presión de neumáticos (TPMS):</strong> Esa luz anaranjada con el neumático no es decorativa. Conduce con cuidado hasta la gasolinera más próxima e infla. Cada kilómetro con presión baja aumenta el desgaste y el consumo.</li>
+            <li><strong><span aria-hidden="true">❌</span> Cambiar a punto muerto en bajadas (coches modernos):</strong> En los coches con inyección electrónica (desde los 90), al soltar el acelerador en marcha el motor NO consume combustible (corte de inyección). En punto muerto, sí consume para mantener el ralentí. Mantén la marcha engranada en bajadas.</li>
+            <li><strong><span aria-hidden="true">❌</span> Comparar solo el precio del carburante sin calcular el coste por kilómetro:</strong> Un coche que consume 5 L/100km con gasolina a 1,60 €/L cuesta 0,08 €/km. Uno con 8 L/100km y gasolina a 1,45 €/L cuesta 0,116 €/km. El precio en el surtidor no cuenta la historia completa.</li>
           </ul>
         </div>
 

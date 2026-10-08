@@ -564,7 +564,7 @@ export default function GuiaCortesCarne() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🐄 Vacuno mayor</td>
+                  <td><span aria-hidden="true">🐄</span> Vacuno mayor</td>
                   <td>Intenso, umami, profundo</td>
                   <td>Variable (mucho corte a corte)</td>
                   <td>Parrilla / Estofado</td>
@@ -572,7 +572,7 @@ export default function GuiaCortesCarne() {
                   <td>Chuletón</td>
                 </tr>
                 <tr>
-                  <td>🐷 Cerdo ibérico</td>
+                  <td><span aria-hidden="true">🐷</span> Cerdo ibérico</td>
                   <td>Bellota, untuoso, jamón caliente</td>
                   <td>Tierno a medio</td>
                   <td>Plancha rápida</td>
@@ -580,7 +580,7 @@ export default function GuiaCortesCarne() {
                   <td>Secreto ibérico</td>
                 </tr>
                 <tr>
-                  <td>🐑 Cordero</td>
+                  <td><span aria-hidden="true">🐑</span> Cordero</td>
                   <td>Herbáceo, lanolina, silvestre</td>
                   <td>Tierno a medio</td>
                   <td>Horno lento / Parrilla</td>
@@ -588,7 +588,7 @@ export default function GuiaCortesCarne() {
                   <td>Chuletas</td>
                 </tr>
                 <tr>
-                  <td>🐔 Pollo</td>
+                  <td><span aria-hidden="true">🐔</span> Pollo</td>
                   <td>Neutro, versátil, absorbe marinados</td>
                   <td>Tierno (si no se reseca)</td>
                   <td>Horno / Plancha</td>
@@ -596,7 +596,7 @@ export default function GuiaCortesCarne() {
                   <td>Muslo</td>
                 </tr>
                 <tr>
-                  <td>🐮 Ternera</td>
+                  <td><span aria-hidden="true">🐮</span> Ternera</td>
                   <td>Suave, láctico, delicado</td>
                   <td>Muy tierno</td>
                   <td>Plancha / Estofado</td>
@@ -604,7 +604,7 @@ export default function GuiaCortesCarne() {
                   <td>Filete / Ossobuco</td>
                 </tr>
                 <tr>
-                  <td>🐷 Cerdo convencional</td>
+                  <td><span aria-hidden="true">🐷</span> Cerdo convencional</td>
                   <td>Suave, graso, versátil</td>
                   <td>Tierno</td>
                   <td>Horno / Estofado</td>

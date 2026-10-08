@@ -259,7 +259,7 @@ export default function ComparadorAutonomoVsSLPage() {
               </p>
             )}
             <p className={styles.ganadorNota}>
-              ⚠️ Estimación simplificada. La decisión real depende de muchos otros factores.
+              <span aria-hidden="true">⚠️</span> Estimación simplificada. La decisión real depende de muchos otros factores.
             </p>
           </div>
 
@@ -362,7 +362,7 @@ export default function ComparadorAutonomoVsSLPage() {
 
       {/* Disclaimer - SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Herramienta de Orientación — No es asesoramiento fiscal ni mercantil</h3>
+        <h3><span aria-hidden="true">⚠️</span> Herramienta de Orientación — No es asesoramiento fiscal ni mercantil</h3>
         <p>
           Esta comparativa es una <strong>estimación orientativa muy simplificada</strong> basada en{' '}
           <a href={FISCAL_IRPF_META.urlOficial} target="_blank" rel="noopener noreferrer">
@@ -404,7 +404,7 @@ export default function ComparadorAutonomoVsSLPage() {
 
           <div className={styles.guideGrid}>
             <div className={styles.guideCard}>
-              <h4>📊 Fiscalidad (cuándo suele convenir SL)</h4>
+              <h4><span aria-hidden="true">📊</span> Fiscalidad (cuándo suele convenir SL)</h4>
               <ul>
                 <li>Beneficios netos anuales superiores a <strong>40.000-60.000 €</strong> aprox.</li>
                 <li>Cuando no necesitas retirar todo el beneficio como salario</li>
@@ -413,7 +413,7 @@ export default function ComparadorAutonomoVsSLPage() {
               </ul>
             </div>
             <div className={styles.guideCard}>
-              <h4>⚠️ Costes de la SL a considerar</h4>
+              <h4><span aria-hidden="true">⚠️</span> Costes de la SL a considerar</h4>
               <ul>
                 <li>Constitución: ~1.500-3.000 € (notaría + registro)</li>
                 <li>Gestoría mensual: ~150-400 €/mes</li>
@@ -422,7 +422,7 @@ export default function ComparadorAutonomoVsSLPage() {
               </ul>
             </div>
             <div className={styles.guideCard}>
-              <h4>🛡️ Responsabilidad</h4>
+              <h4><span aria-hidden="true">🛡️</span> Responsabilidad</h4>
               <p>
                 El autónomo responde con su patrimonio personal (incluso vivienda habitual en algunos casos).
                 La SL limita la responsabilidad al capital social, aunque el administrador puede responder
@@ -430,7 +430,7 @@ export default function ComparadorAutonomoVsSLPage() {
               </p>
             </div>
             <div className={styles.guideCard}>
-              <h4>💡 Salario del administrador en SL</h4>
+              <h4><span aria-hidden="true">💡</span> Salario del administrador en SL</h4>
               <p>
                 El administrador puede cobrar un salario de la SL (si consta en estatutos), que es gasto deducible
                 para la sociedad y tributa en el IRPF del perceptor. Permite distribuir el beneficio entre IS y IRPF,
@@ -449,8 +449,8 @@ export default function ComparadorAutonomoVsSLPage() {
               <thead>
                 <tr>
                   <th>Característica</th>
-                  <th>👤 Autónomo</th>
-                  <th>🏢 Sociedad Limitada</th>
+                  <th><span aria-hidden="true">👤</span> Autónomo</th>
+                  <th><span aria-hidden="true">🏢</span> Sociedad Limitada</th>
                 </tr>
               </thead>
               <tbody>

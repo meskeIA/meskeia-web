@@ -723,13 +723,13 @@ export default function SimuladorTestHipotesisPage() {
               <tbody>
                 <tr>
                   <td><strong>H₀ es cierta</strong></td>
-                  <td>✅ Decisión correcta (1 − α)</td>
+                  <td><span aria-hidden="true">✅</span> Decisión correcta (1 − α)</td>
                   <td>❌ <strong>Error tipo I</strong> (α). Rechazar H₀ siendo cierta.</td>
                 </tr>
                 <tr>
                   <td><strong>H₀ es falsa (H₁ cierta)</strong></td>
                   <td>❌ <strong>Error tipo II</strong> (β). No rechazar H₀ siendo falsa.</td>
-                  <td>✅ Decisión correcta (1 − β = potencia)</td>
+                  <td><span aria-hidden="true">✅</span> Decisión correcta (1 − β = potencia)</td>
                 </tr>
               </tbody>
             </table>
@@ -775,31 +775,31 @@ export default function SimuladorTestHipotesisPage() {
             <div className={styles.faqItem}>
               <h4>¿El p-valor es la probabilidad de que H₀ sea cierta?</h4>
               <p><strong>NO.</strong> Es uno de los errores más extendidos, incluso entre profesionales. El p-valor es la <em>probabilidad de obtener un resultado tan o más extremo que el observado, asumiendo que H₀ es cierta</em>. NO es la probabilidad de que H₀ sea cierta dados los datos (eso sería un razonamiento bayesiano y requiere prior).</p>
-              <p className={styles.faqTip}>💡 Mejor traducción: &quot;si H₀ fuera cierta, ¿cómo de raro sería ver lo que vimos?&quot;. Si es muy raro (p pequeño), es una señal de que H₀ podría ser falsa.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Mejor traducción: &quot;si H₀ fuera cierta, ¿cómo de raro sería ver lo que vimos?&quot;. Si es muy raro (p pequeño), es una señal de que H₀ podría ser falsa.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿&quot;No rechazar H₀&quot; significa &quot;aceptar H₀&quot;?</h4>
               <p><strong>NO.</strong> No rechazar H₀ solo significa &quot;no hay suficiente evidencia para rechazarla con esta muestra&quot;. Podría ser cierta, podría ser falsa pero con un efecto pequeño (β alto = baja potencia), podría faltar n. Nunca se &quot;acepta&quot; H₀.</p>
-              <p className={styles.faqTip}>💡 La traducción correcta es: &quot;los datos no son incompatibles con H₀&quot;. No es lo mismo que confirmarla.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La traducción correcta es: &quot;los datos no son incompatibles con H₀&quot;. No es lo mismo que confirmarla.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo aumento la potencia (1 − β) de mi test?</h4>
               <p>Cuatro palancas: <strong>(1)</strong> aumentar n (la palanca más segura), <strong>(2)</strong> reducir σ (mejor diseño experimental), <strong>(3)</strong> aceptar mayor α (5 % en vez de 1 %), <strong>(4)</strong> esperar a que el efecto real sea grande (μ₁ − μ₀ alto). En el simulador, mueve μ₁ alejándolo de μ₀ y verás la potencia subir.</p>
-              <p className={styles.faqTip}>💡 Estándar de la industria: potencia ≥ 80 % antes de hacer el test. Por debajo, el test puede fracasar incluso aunque H₁ sea cierta.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Estándar de la industria: potencia ≥ 80 % antes de hacer el test. Por debajo, el test puede fracasar incluso aunque H₁ sea cierta.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cuándo uso bilateral y cuándo unilateral?</h4>
               <p><strong>Bilateral</strong> cuando solo te importa si μ es distinto de μ₀, sin saber si por encima o por debajo. <strong>Unilateral</strong> cuando tienes una hipótesis direccional clara (un fármaco solo puede mejorar, no empeorar; un proceso solo puede degradarse).</p>
-              <p className={styles.faqTip}>💡 Los unilaterales tienen mayor potencia para una desviación dada, pero NO los uses post-hoc al ver los datos: eso infla α y es mala práctica.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Los unilaterales tienen mayor potencia para una desviación dada, pero NO los uses post-hoc al ver los datos: eso infla α y es mala práctica.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué relación hay entre p-valor e intervalo de confianza?</h4>
               <p>Son <strong>dos caras de la misma moneda</strong>. Un test bilateral con α = 5 % rechaza H₀: μ = μ₀ ⟺ el IC al 95 % NO contiene μ₀. Pero el IC da más información: el rango plausible de μ, no solo si rechazas o no.</p>
-              <p className={styles.faqTip}>💡 La American Statistical Association recomienda reportar IC y tamaño de efecto, no solo p-valores.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La American Statistical Association recomienda reportar IC y tamaño de efecto, no solo p-valores.</p>
             </div>
           </div>
         </section>

@@ -455,7 +455,7 @@ function SeccionAlternativas() {
         <h3 className={styles.comparativaTitulo}>Tomate convencional vs local</h3>
         <div className={styles.comparativaGrid}>
           <div className={styles.comparativaCol}>
-            <span className={styles.comparativaColTitulo}>🏭 Convencional</span>
+            <span className={styles.comparativaColTitulo}><span aria-hidden="true">🏭</span> Convencional</span>
             <div className={styles.comparativaFila}>
               <span className={styles.comparativaLabel}>Distancia</span>
               <span className={styles.comparativaValor}>{formatNumber(3000, 0)} km</span>
@@ -474,7 +474,7 @@ function SeccionAlternativas() {
             </div>
           </div>
           <div className={`${styles.comparativaCol} ${styles.comparativaColLocal}`}>
-            <span className={styles.comparativaColTitulo}>🌱 Local / Km 0</span>
+            <span className={styles.comparativaColTitulo}><span aria-hidden="true">🌱</span> Local / Km 0</span>
             <div className={styles.comparativaFila}>
               <span className={styles.comparativaLabel}>Distancia</span>
               <span className={styles.comparativaValor}>{formatNumber(50, 0)} km</span>

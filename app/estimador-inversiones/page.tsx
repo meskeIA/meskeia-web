@@ -301,7 +301,7 @@ export default function CalculadoraInversionesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📊 Estimador de Inversiones</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📊</span> Estimador de Inversiones</h1>
         <p className={styles.subtitle}>
           Diseña tu cartera según tu perfil de riesgo
         </p>
@@ -335,7 +335,7 @@ export default function CalculadoraInversionesPage() {
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}
         <div className={styles.configPanel}>
-          <h2 className={styles.sectionTitle}>💰 Capital a Invertir</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Capital a Invertir</h2>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Importe total</label>
@@ -351,7 +351,7 @@ export default function CalculadoraInversionesPage() {
             </div>
           </div>
 
-          <h2 className={styles.sectionTitle}>👤 Tu Perfil</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">👤</span> Tu Perfil</h2>
 
           <div className={styles.sliderGroup}>
             <div className={styles.sliderHeader}>
@@ -383,7 +383,7 @@ export default function CalculadoraInversionesPage() {
             />
           </div>
 
-          <h2 className={styles.sectionTitle}>📈 Perfil de Riesgo</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📈</span> Perfil de Riesgo</h2>
 
           <div className={styles.perfilesGrid}>
             {(Object.keys(PERFILES) as PerfilInversor[]).map((key) => (
@@ -404,7 +404,7 @@ export default function CalculadoraInversionesPage() {
 
         {/* Panel de Resultados */}
         <div className={styles.resultsPanel}>
-          <h2 className={styles.sectionTitle}>📊 Tu Distribución de Activos</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Tu Distribución de Activos</h2>
 
           {/* Barra Visual */}
           <div className={styles.distribucionVisual}>
@@ -467,7 +467,7 @@ export default function CalculadoraInversionesPage() {
           <div className={styles.distribucionGrid}>
             <div className={styles.activoCard}>
               <div className={styles.activoHeader}>
-                <span className={styles.activoNombre}>📈 Renta Variable</span>
+                <span className={styles.activoNombre}><span aria-hidden="true">📈</span> Renta Variable</span>
                 <span className={styles.activoPorcentaje}>{distribucion.rentaVariable.porcentaje}%</span>
               </div>
               <div className={styles.activoImporte}>{formatCurrency(distribucion.rentaVariable.importe)}</div>
@@ -476,7 +476,7 @@ export default function CalculadoraInversionesPage() {
 
             <div className={styles.activoCard}>
               <div className={styles.activoHeader}>
-                <span className={styles.activoNombre}>📊 Renta Fija</span>
+                <span className={styles.activoNombre}><span aria-hidden="true">📊</span> Renta Fija</span>
                 <span className={styles.activoPorcentaje}>{distribucion.rentaFija.porcentaje}%</span>
               </div>
               <div className={styles.activoImporte}>{formatCurrency(distribucion.rentaFija.importe)}</div>
@@ -485,7 +485,7 @@ export default function CalculadoraInversionesPage() {
 
             <div className={styles.activoCard}>
               <div className={styles.activoHeader}>
-                <span className={styles.activoNombre}>💵 Liquidez</span>
+                <span className={styles.activoNombre}><span aria-hidden="true">💵</span> Liquidez</span>
                 <span className={styles.activoPorcentaje}>{distribucion.liquidez.porcentaje}%</span>
               </div>
               <div className={styles.activoImporte}>{formatCurrency(distribucion.liquidez.importe)}</div>
@@ -494,7 +494,7 @@ export default function CalculadoraInversionesPage() {
 
             <div className={styles.activoCard}>
               <div className={styles.activoHeader}>
-                <span className={styles.activoNombre}>🏠 Alternativos</span>
+                <span className={styles.activoNombre}><span aria-hidden="true">🏠</span> Alternativos</span>
                 <span className={styles.activoPorcentaje}>{distribucion.alternativos.porcentaje}%</span>
               </div>
               <div className={styles.activoImporte}>{formatCurrency(distribucion.alternativos.importe)}</div>
@@ -504,7 +504,7 @@ export default function CalculadoraInversionesPage() {
 
           {/* Métricas */}
           <div className={styles.metricasSection}>
-            <h3 className={styles.sectionTitle}>📈 Proyección a {horizonteTemporal} años</h3>
+            <h3 className={styles.sectionTitle}><span aria-hidden="true">📈</span> Proyección a {horizonteTemporal} años</h3>
             <div className={styles.metricasGrid}>
               <div className={`${styles.metricaCard} ${styles.positivo}`}>
                 <span className={styles.metricaLabel}>Capital proyectado</span>
@@ -535,7 +535,7 @@ export default function CalculadoraInversionesPage() {
 
           {/* Recomendaciones */}
           <div className={styles.recomendacionesSection}>
-            <h4>💡 Recomendaciones Personalizadas</h4>
+            <h4><span aria-hidden="true">💡</span> Recomendaciones Personalizadas</h4>
             {recomendaciones.map((rec, index) => (
               <div key={index} className={styles.recomendacionItem}>
                 <span className={styles.recomendacionIcon}>💡</span>
@@ -629,7 +629,7 @@ export default function CalculadoraInversionesPage() {
 
         {/* Gráfico de Evolución */}
         <div className={styles.graficoSection}>
-          <h3 className={styles.sectionTitle}>📈 Evolución del Capital a {horizonteTemporal} años</h3>
+          <h3 className={styles.sectionTitle}><span aria-hidden="true">📈</span> Evolución del Capital a {horizonteTemporal} años</h3>
           <div className={styles.chartContainer}>
             <canvas ref={chartRef}></canvas>
           </div>
@@ -663,7 +663,7 @@ export default function CalculadoraInversionesPage() {
 
         {/* Tabla Comparativa */}
         <div className={styles.comparativaEscenarios}>
-          <h3>📊 Tabla Comparativa</h3>
+          <h3><span aria-hidden="true">📊</span> Tabla Comparativa</h3>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -719,7 +719,7 @@ export default function CalculadoraInversionesPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📈 Renta Variable</h4>
+              <h4><span aria-hidden="true">📈</span> Renta Variable</h4>
               <p>
                 Acciones y fondos de renta variable. Mayor potencial pero también caídas históricas del 30-55% en crisis.
                 Rentabilidad histórica nominal: ~5-7% anual en mercados desarrollados ex-USA, ~7-10% en el S&amp;P 500 (1926-2023).
@@ -728,7 +728,7 @@ export default function CalculadoraInversionesPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📊 Renta Fija</h4>
+              <h4><span aria-hidden="true">📊</span> Renta Fija</h4>
               <p>
                 Bonos y obligaciones. Menor rentabilidad pero más estabilidad.
                 Actúa como amortiguador cuando la renta variable cae.
@@ -736,7 +736,7 @@ export default function CalculadoraInversionesPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>💵 Liquidez</h4>
+              <h4><span aria-hidden="true">💵</span> Liquidez</h4>
               <p>
                 Efectivo y equivalentes (depósitos, monetarios). Rentabilidad mínima
                 pero disponibilidad inmediata. Esencial para emergencias
@@ -744,7 +744,7 @@ export default function CalculadoraInversionesPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🏠 Alternativos</h4>
+              <h4><span aria-hidden="true">🏠</span> Alternativos</h4>
               <p>
                 Inmobiliario (REITs), materias primas, oro, cripto.
                 Descorrelación con mercados tradicionales.
@@ -758,7 +758,7 @@ export default function CalculadoraInversionesPage() {
           <h2>La Regla del 110</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📐 Fórmula Simple</h4>
+              <h4><span aria-hidden="true">📐</span> Fórmula Simple</h4>
               <p>
                 % Renta Variable = 110 - tu edad. A los 30 años: 80% RV, 20% RF.
                 A los 50 años: 60% RV, 40% RF. A los 65: 45% RV, 55% RF.
@@ -766,7 +766,7 @@ export default function CalculadoraInversionesPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🔄 Rebalanceo</h4>
+              <h4><span aria-hidden="true">🔄</span> Rebalanceo</h4>
               <p>
                 Revisa tu cartera anualmente y rebalancea si la distribución
                 se desvía más de un 5% del objetivo. Vende lo que ha subido
@@ -791,11 +791,11 @@ export default function CalculadoraInversionesPage() {
               <thead>
                 <tr>
                   <th>Criterio</th>
-                  <th>📈 Acciones RV</th>
-                  <th>📊 Bonos RF</th>
-                  <th>🏠 REITs</th>
-                  <th>🪙 Materias Primas</th>
-                  <th>💵 Liquidez</th>
+                  <th><span aria-hidden="true">📈</span> Acciones RV</th>
+                  <th><span aria-hidden="true">📊</span> Bonos RF</th>
+                  <th><span aria-hidden="true">🏠</span> REITs</th>
+                  <th><span aria-hidden="true">🪙</span> Materias Primas</th>
+                  <th><span aria-hidden="true">💵</span> Liquidez</th>
                 </tr>
               </thead>
               <tbody>
@@ -945,7 +945,7 @@ export default function CalculadoraInversionesPage() {
                 extra, obtienes 0,8% de rentabilidad adicional sobre la tasa libre de riesgo.
               </p>
               <p className={styles.eduFaqTip}>
-                💡 El perfil equilibrado suele tener el mejor Ratio Sharpe de todos, no el agresivo.
+                <span aria-hidden="true">💡</span> El perfil equilibrado suele tener el mejor Ratio Sharpe de todos, no el agresivo.
                 Más rentabilidad bruta no significa mejor rentabilidad ajustada al riesgo.
               </p>
             </div>
@@ -989,7 +989,7 @@ export default function CalculadoraInversionesPage() {
                 como cobertura contra inflación y para diversificar sin sacrificar liquidez.
               </p>
               <p className={styles.eduFaqTip}>
-                💡 Muchos ETFs globales ya incluyen REITs en su composición. Antes de añadirlos
+                <span aria-hidden="true">💡</span> Muchos ETFs globales ya incluyen REITs en su composición. Antes de añadirlos
                 por separado, comprueba si tu ETF principal ya tiene exposición inmobiliaria.
               </p>
             </div>

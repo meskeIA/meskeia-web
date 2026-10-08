@@ -279,7 +279,7 @@ export default function SimuladorHipotecaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🏠 Estimador de Hipoteca</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🏠</span> Estimador de Hipoteca</h1>
         <p className={styles.subtitle}>
           Calcula tu cuota mensual y visualiza la amortización completa
         </p>
@@ -317,7 +317,7 @@ export default function SimuladorHipotecaPage() {
       <div className={styles.mainContent}>
         {/* Panel de Configuración */}
         <div className={styles.configPanel}>
-          <h2 className={styles.sectionTitle}>🏡 Datos del Préstamo</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">🏡</span> Datos del Préstamo</h2>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Precio de la vivienda</label>
@@ -365,7 +365,7 @@ export default function SimuladorHipotecaPage() {
             />
           </div>
 
-          <h2 className={styles.sectionTitle}>📊 Tipo de Interés</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Tipo de Interés</h2>
 
           <div className={styles.tipoToggle}>
             <button
@@ -373,21 +373,21 @@ export default function SimuladorHipotecaPage() {
               className={`${styles.tipoBtn} ${tipoInteres === 'fijo' ? styles.activo : ''}`}
               onClick={() => setTipoInteres('fijo')}
             >
-              🔒 Fijo
+              <span aria-hidden="true">🔒</span> Fijo
             </button>
             <button
               type="button"
               className={`${styles.tipoBtn} ${tipoInteres === 'variable' ? styles.activo : ''}`}
               onClick={() => setTipoInteres('variable')}
             >
-              📊 Variable
+              <span aria-hidden="true">📊</span> Variable
             </button>
             <button
               type="button"
               className={`${styles.tipoBtn} ${tipoInteres === 'mixta' ? styles.activo : ''}`}
               onClick={() => setTipoInteres('mixta')}
             >
-              🔄 Mixta
+              <span aria-hidden="true">🔄</span> Mixta
             </button>
           </div>
 
@@ -509,7 +509,7 @@ export default function SimuladorHipotecaPage() {
             </>
           )}
 
-          <h2 className={styles.sectionTitle}>💰 Tus Ingresos</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Tus Ingresos</h2>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Ingresos netos mensuales</label>
@@ -529,7 +529,7 @@ export default function SimuladorHipotecaPage() {
 
         {/* Panel de Resultados */}
         <div className={styles.resultsPanel}>
-          <h2 className={styles.sectionTitle}>📊 Resultado de la Simulación</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Resultado de la Simulación</h2>
 
           {resultado ? (
             <>
@@ -607,15 +607,17 @@ export default function SimuladorHipotecaPage() {
               {/* Tabla de Amortización */}
               <div className={styles.tablaSection}>
                 <div className={styles.tablaHeader}>
-                  <h3 className={styles.sectionTitle}>📋 Tabla de Amortización</h3>
+                  <h3 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Tabla de Amortización</h3>
                   <div className={styles.tablaToggle}>
                     <button
+                      type="button"
                       className={`${styles.tablaToggleBtn} ${vistaTabla === 'anual' ? styles.activo : ''}`}
                       onClick={() => setVistaTabla('anual')}
                     >
                       Anual
                     </button>
                     <button
+                      type="button"
                       className={`${styles.tablaToggleBtn} ${vistaTabla === 'mensual' ? styles.activo : ''}`}
                       onClick={() => setVistaTabla('mensual')}
                     >
@@ -665,12 +667,13 @@ export default function SimuladorHipotecaPage() {
         <div className={styles.htmlSection}>
           <div className={styles.htmlHeader}>
             <div>
-              <h2>💻 Código de implementación</h2>
+              <h2><span aria-hidden="true">💻</span> Código de implementación</h2>
               <p className={styles.htmlSubtitle}>
                 Integra este widget en tu blog, inmobiliaria o sitio web de finanzas personales
               </p>
             </div>
             <button
+              type="button"
               onClick={() => setHtmlExpanded(!htmlExpanded)}
               className={styles.btnToggleCode}
               aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
@@ -684,7 +687,7 @@ export default function SimuladorHipotecaPage() {
               <pre className={styles.codeBlock}>
                 <code>{htmlCode}</code>
               </pre>
-              <button onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
+              <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
                 {copiado ? '✅ Copiado' : '📋 Copiar código'}
               </button>
             </div>
@@ -695,7 +698,7 @@ export default function SimuladorHipotecaPage() {
       {/* Comparador simultáneo Fija vs Variable vs Mixta */}
       {comparacion && (
         <div className={styles.comparadorSection}>
-          <h2 className={styles.comparadorTitle}>⚖️ Compara los 3 tipos en tiempo real</h2>
+          <h2 className={styles.comparadorTitle}><span aria-hidden="true">⚖️</span> Compara los 3 tipos en tiempo real</h2>
           <p className={styles.comparadorSubtitle}>
             Misma hipoteca ({formatCurrency(comparacion.fija.cuota > 0 ? (parseSpanishNumber(precioVivienda) || 0) - (parseSpanishNumber(entrada) || 0) : 0)} de capital · {plazo} años), tres escenarios distintos
           </p>
@@ -703,7 +706,7 @@ export default function SimuladorHipotecaPage() {
 
             {/* Fija */}
             <div className={`${styles.comparadorCard} ${tipoInteres === 'fijo' ? styles.comparadorActivo : ''}`}>
-              <div className={styles.comparadorCardHeader}>🔒 Hipoteca Fija</div>
+              <div className={styles.comparadorCardHeader}><span aria-hidden="true">🔒</span> Hipoteca Fija</div>
               <div className={styles.comparadorCuota}>{formatCurrency(comparacion.fija.cuota)}<span className={styles.comparadorMes}>/mes</span></div>
               <div className={styles.comparadorRows}>
                 <div className={styles.comparadorRow}>
@@ -719,12 +722,12 @@ export default function SimuladorHipotecaPage() {
                   <strong>{formatCurrency(comparacion.fija.intereses)}</strong>
                 </div>
               </div>
-              <div className={styles.comparadorTag}>✅ Máxima estabilidad</div>
+              <div className={styles.comparadorTag}><span aria-hidden="true">✅</span> Máxima estabilidad</div>
             </div>
 
             {/* Variable */}
             <div className={`${styles.comparadorCard} ${tipoInteres === 'variable' ? styles.comparadorActivo : ''}`}>
-              <div className={styles.comparadorCardHeader}>📊 Hipoteca Variable</div>
+              <div className={styles.comparadorCardHeader}><span aria-hidden="true">📊</span> Hipoteca Variable</div>
               <div className={styles.comparadorCuota}>{formatCurrency(comparacion.variable.cuota)}<span className={styles.comparadorMes}>/mes</span></div>
               <div className={styles.comparadorRows}>
                 <div className={styles.comparadorRow}>
@@ -740,12 +743,12 @@ export default function SimuladorHipotecaPage() {
                   <strong>{formatCurrency(comparacion.variable.intereses)}</strong>
                 </div>
               </div>
-              <div className={styles.comparadorTag}>⚡ Potencial de ahorro</div>
+              <div className={styles.comparadorTag}><span aria-hidden="true">⚡</span> Potencial de ahorro</div>
             </div>
 
             {/* Mixta */}
             <div className={`${styles.comparadorCard} ${tipoInteres === 'mixta' ? styles.comparadorActivo : ''}`}>
-              <div className={styles.comparadorCardHeader}>🔄 Hipoteca Mixta</div>
+              <div className={styles.comparadorCardHeader}><span aria-hidden="true">🔄</span> Hipoteca Mixta</div>
               <div className={styles.comparadorCuota}>{formatCurrency(comparacion.mixta.cuota1)}<span className={styles.comparadorMes}>/mes*</span></div>
               <div className={styles.comparadorRows}>
                 <div className={styles.comparadorRow}>
@@ -761,13 +764,13 @@ export default function SimuladorHipotecaPage() {
                   <strong>{formatCurrency(comparacion.mixta.intereses)}</strong>
                 </div>
               </div>
-              <div className={styles.comparadorTag}>🎯 Equilibrio riesgo-ahorro</div>
+              <div className={styles.comparadorTag}><span aria-hidden="true">🎯</span> Equilibrio riesgo-ahorro</div>
               <p className={styles.comparadorNota}>*Con Euríbor actual. Puede variar.</p>
             </div>
 
           </div>
           <p className={styles.comparadorAviso}>
-            💡 Usa los controles de arriba para ajustar Euríbor y diferencial y ver cómo cambia la comparativa en tiempo real.
+            <span aria-hidden="true">💡</span> Usa los controles de arriba para ajustar Euríbor y diferencial y ver cómo cambia la comparativa en tiempo real.
           </p>
         </div>
       )}
@@ -779,7 +782,7 @@ export default function SimuladorHipotecaPage() {
       >
         {/* Tabla comparativa Fija vs Variable vs Mixta */}
         <div className={styles.comparativaSection}>
-          <h2>⚖️ Hipoteca Fija vs Variable vs Mixta: ¿Cuál te conviene?</h2>
+          <h2><span aria-hidden="true">⚖️</span> Hipoteca Fija vs Variable vs Mixta: ¿Cuál te conviene?</h2>
         <p className={styles.comparativaSubtitle}>
           Entiende las diferencias clave para tomar la mejor decisión según tu perfil
         </p>
@@ -787,9 +790,9 @@ export default function SimuladorHipotecaPage() {
         <div className={styles.comparativaTable} style={{ '--cols': '4' } as React.CSSProperties}>
           <div className={styles.comparativaRow4}>
             <div className={styles.comparativaAspecto}><strong>Aspecto</strong></div>
-            <div className={styles.comparativaFija}><strong>🔒 Fija</strong></div>
-            <div className={styles.comparativaVariable}><strong>📊 Variable</strong></div>
-            <div className={styles.comparativaMixta}><strong>🔄 Mixta</strong></div>
+            <div className={styles.comparativaFija}><strong><span aria-hidden="true">🔒</span> Fija</strong></div>
+            <div className={styles.comparativaVariable}><strong><span aria-hidden="true">📊</span> Variable</strong></div>
+            <div className={styles.comparativaMixta}><strong><span aria-hidden="true">🔄</span> Mixta</strong></div>
           </div>
 
           <div className={styles.comparativaRow4}>
@@ -808,9 +811,9 @@ export default function SimuladorHipotecaPage() {
 
           <div className={styles.comparativaRow4}>
             <div className={styles.comparativaAspecto}>Riesgo</div>
-            <div className={styles.comparativaFija}>✅ Nulo</div>
-            <div className={styles.comparativaVariable}>⚠️ Alto</div>
-            <div className={styles.comparativaMixta}>🟡 Medio (solo fase variable)</div>
+            <div className={styles.comparativaFija}><span aria-hidden="true">✅</span> Nulo</div>
+            <div className={styles.comparativaVariable}><span aria-hidden="true">⚠️</span> Alto</div>
+            <div className={styles.comparativaMixta}><span aria-hidden="true">🟡</span> Medio (solo fase variable)</div>
           </div>
 
           <div className={styles.comparativaRow4}>
@@ -841,7 +844,7 @@ export default function SimuladorHipotecaPage() {
         </div>
 
           <div className={styles.comparativaConsejo}>
-            <strong>💡 Recomendación meskeIA:</strong> Si tu ratio de endeudamiento supera el 35%,
+            <strong><span aria-hidden="true">💡</span> Recomendación meskeIA:</strong> Si tu ratio de endeudamiento supera el 35%,
             prioriza la hipoteca fija para evitar sorpresas. Si está por debajo del 25% y tienes
             colchón de ahorro, la variable puede ahorrarte dinero. La mixta es óptima si planeas
             amortizar anticipadamente en los primeros años.
@@ -850,7 +853,7 @@ export default function SimuladorHipotecaPage() {
 
         {/* Escenarios típicos */}
         <div className={styles.escenariosSection}>
-        <h2>🎯 Escenarios típicos de hipoteca</h2>
+        <h2><span aria-hidden="true">🎯</span> Escenarios típicos de hipoteca</h2>
         <p className={styles.escenariosSubtitle}>
           Ejemplos reales para ayudarte a tomar decisiones informadas
         </p>
@@ -1018,7 +1021,7 @@ export default function SimuladorHipotecaPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🏦 Sistema Francés</h4>
+              <h4><span aria-hidden="true">🏦</span> Sistema Francés</h4>
               <p>
                 Es el más común en España. La cuota es constante durante toda la vida del préstamo,
                 pero al principio pagas más intereses y menos capital. Con el tiempo, esta proporción
@@ -1026,7 +1029,7 @@ export default function SimuladorHipotecaPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📊 TIN vs TAE</h4>
+              <h4><span aria-hidden="true">📊</span> TIN vs TAE</h4>
               <p>
                 El TIN (Tipo de Interés Nominal) es el porcentaje que aplica el banco. La TAE
                 (Tasa Anual Equivalente) incluye además comisiones y gastos, siendo más representativa
@@ -1034,7 +1037,7 @@ export default function SimuladorHipotecaPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🔄 Fija vs Variable</h4>
+              <h4><span aria-hidden="true">🔄</span> Fija vs Variable</h4>
               <p>
                 La hipoteca fija te da seguridad (cuota constante) pero suele ser más cara.
                 La variable (Euríbor + diferencial) puede ser más barata pero conlleva riesgo
@@ -1042,7 +1045,7 @@ export default function SimuladorHipotecaPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📉 Ratio de Endeudamiento</h4>
+              <h4><span aria-hidden="true">📉</span> Ratio de Endeudamiento</h4>
               <p>
                 Los bancos recomiendan que la cuota no supere el 30-35% de tus ingresos netos.
                 Por encima del 40%, es difícil que aprueben la hipoteca. Cuanto menor sea el ratio,
@@ -1131,7 +1134,7 @@ export default function SimuladorHipotecaPage() {
           <h2>Preguntas frecuentes</h2>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Qué es mejor: hipoteca fija o variable?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Qué es mejor: hipoteca fija o variable?</h3>
             <p>
               Depende de tu perfil de riesgo y situación financiera:
             </p>
@@ -1152,7 +1155,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Cuánto necesito exactamente de entrada y gastos?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Cuánto necesito exactamente de entrada y gastos?</h3>
             <p>
               Para comprar una vivienda de <strong>200.000 €</strong>, necesitas ahorrar:
             </p>
@@ -1172,7 +1175,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Puedo cambiar mi hipoteca de banco (subrogación)?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Puedo cambiar mi hipoteca de banco (subrogación)?</h3>
             <p>
               Sí, es posible y GRATIS desde 2019 (Ley de Crédito Inmobiliario). El proceso:
             </p>
@@ -1191,7 +1194,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Qué pasa si suben los tipos de interés en una variable?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Qué pasa si suben los tipos de interés en una variable?</h3>
             <p>
               En hipotecas variables, tu cuota se revisa cada 6 o 12 meses según el Euríbor.
               <strong>Ejemplo real:</strong>
@@ -1215,7 +1218,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Conviene hacer amortizaciones anticipadas?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Conviene hacer amortizaciones anticipadas?</h3>
             <p>
               Sí, <strong>especialmente en los primeros años</strong> de la hipoteca, cuando pagas más intereses.
             </p>
@@ -1239,7 +1242,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Qué comisiones puedo negociar o evitar?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Qué comisiones puedo negociar o evitar?</h3>
             <p>
               Hay comisiones obligatorias y otras negociables. Lista completa:
             </p>
@@ -1263,7 +1266,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Qué es la hipoteca mixta y cuándo conviene?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Qué es la hipoteca mixta y cuándo conviene?</h3>
             <p>
               La hipoteca mixta combina un período inicial a tipo fijo (normalmente 3-10 años) con el resto a tipo variable (Euríbor + diferencial). Ventajas: tipos fijos del tramo inicial suelen ser menores que una hipoteca fija pura; si amortizas anticipadamente durante el tramo fijo, reduces mucho el coste del tramo variable posterior. Inconveniente: si los tipos suben mucho justo cuando empieza el tramo variable, te quedas sin el escudo de la fija.
             </p>
@@ -1273,7 +1276,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Qué es el seguro de vida vinculado a la hipoteca y es obligatorio?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Qué es el seguro de vida vinculado a la hipoteca y es obligatorio?</h3>
             <p>
               Desde la Ley de Crédito Inmobiliario (2019), el banco no puede obligarte a contratar seguros con ellos. Pero sí pueden ofrecerte un diferencial de interés menor si los contratas (bonificación). El seguro de vida hipotecario garantiza el pago del préstamo si el titular fallece. El seguro de hogar (continente) sí es obligatorio por ley, pero puedes contratarlo con cualquier aseguradora.
             </p>
@@ -1283,7 +1286,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Cómo afecta el Euríbor a mi hipoteca variable y qué perspectivas hay?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Cómo afecta el Euríbor a mi hipoteca variable y qué perspectivas hay?</h3>
             <p>
               El Euríbor (Euro Interbank Offered Rate) es el tipo al que los bancos europeos se prestan dinero entre sí. Las hipotecas variables en España se referencian principalmente al Euríbor a 12 meses. Cuando el BCE sube los tipos de interés para combatir la inflación, el Euríbor sube; cuando los baja (entorno de recesión o baja inflación), el Euríbor baja. La revisión de tu hipoteca variable ocurre cada 6 o 12 meses según el contrato.
             </p>
@@ -1329,7 +1332,7 @@ export default function SimuladorHipotecaPage() {
 
           {/* Advertencias */}
           <div className={styles.warningBox}>
-            <h3>⚠️ Errores comunes que debes evitar</h3>
+            <h3><span aria-hidden="true">⚠️</span> Errores comunes que debes evitar</h3>
             <ul>
               <li><strong>Apurar toda tu capacidad de ahorro en la entrada:</strong> Necesitas colchón post-compra para imprevistos.</li>
               <li><strong>No leer el contrato completo antes de firmar:</strong> Las cláusulas en letra pequeña pueden costarte miles de euros.</li>

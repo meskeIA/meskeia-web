@@ -338,7 +338,7 @@ export default function VisualizadorPiel() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🧬 Visualizador de la Piel</h1>
+        <h1><span aria-hidden="true">🧬</span> Visualizador de la Piel</h1>
         <p>Explora las capas de la piel, sus funciones y mecanismos de protección</p>
       </header>
 

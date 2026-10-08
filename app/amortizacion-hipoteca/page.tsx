@@ -629,7 +629,7 @@ export default function AmortizacionHipotecaPage() {
               </div>
 
               <div className={styles.recomendacion}>
-                <h3>💡 Recomendación</h3>
+                <h3><span aria-hidden="true">💡</span> Recomendación</h3>
                 {resultado.ahorroInteresesPlazo > resultado.ahorroInteresesCuota ? (
                   <p>
                     <strong>Reducir plazo</strong> implica <strong>{formatCurrency(resultado.ahorroInteresesPlazo - resultado.ahorroInteresesCuota)}</strong> menos en intereses totales si puedes mantener la cuota actual.
@@ -683,7 +683,7 @@ export default function AmortizacionHipotecaPage() {
               </div>
 
               <div className={styles.comparativaEscenarios}>
-                <h3>📊 Tabla comparativa - Reducir Plazo (máximo ahorro)</h3>
+                <h3><span aria-hidden="true">📊</span> Tabla comparativa - Reducir Plazo (máximo ahorro)</h3>
                 <table className={styles.comparativaTable}>
                   <thead>
                     <tr>
@@ -713,7 +713,7 @@ export default function AmortizacionHipotecaPage() {
               </div>
 
               <div className={styles.recomendacion}>
-                <h3>💡 Análisis</h3>
+                <h3><span aria-hidden="true">💡</span> Análisis</h3>
                 <p>
                   El escenario con mejor ratio ahorro/inversión es <strong>{formatCurrency(
                     resultadosEscenarios.reduce((best, r) =>
@@ -757,7 +757,7 @@ export default function AmortizacionHipotecaPage() {
               </div>
 
               <div className={styles.tablaPeriodica}>
-                <h3>📅 Evolución año a año</h3>
+                <h3><span aria-hidden="true">📅</span> Evolución año a año</h3>
                 <table className={styles.comparativaTable}>
                   <thead>
                     <tr>
@@ -798,7 +798,7 @@ export default function AmortizacionHipotecaPage() {
               </div>
 
               <div className={styles.recomendacion}>
-                <h3>💡 Resumen del plan</h3>
+                <h3><span aria-hidden="true">💡</span> Resumen del plan</h3>
                 <p>
                   Con amortizaciones anuales de <strong>{formatCurrency(parseSpanishNumber(amortizacionAnual))}</strong> durante {aniosAmortizando} años,
                   habrás amortizado <strong>{formatCurrency(totalesPeriodicos.totalAmortizado)}</strong> y
@@ -829,21 +829,21 @@ export default function AmortizacionHipotecaPage() {
         <h2>¿Qué es la amortización anticipada?</h2>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <h3>📉 Reducir cuota</h3>
+            <h3><span aria-hidden="true">📉</span> Reducir cuota</h3>
             <p>
               Mantienes el mismo plazo pero pagas menos cada mes.
               Ideal si necesitas más liquidez mensual o tienes ingresos variables.
             </p>
           </div>
           <div className={styles.infoCard}>
-            <h3>⏱️ Reducir plazo</h3>
+            <h3><span aria-hidden="true">⏱️</span> Reducir plazo</h3>
             <p>
               Mantienes la misma cuota pero terminas antes.
               <strong> Genera más ahorro en intereses totales</strong> porque reduces el tiempo durante el que el dinero está prestado. A cambio, mantienes la misma cuota mensual y no recuperas margen de liquidez.
             </p>
           </div>
           <div className={styles.infoCard}>
-            <h3>💰 Comisiones</h3>
+            <h3><span aria-hidden="true">💰</span> Comisiones</h3>
             <p>
               Desde 2019, las hipotecas a tipo variable no pueden cobrar más del 0,25% (primeros 3 años) o 0,15% (resto).
               Las de tipo fijo: máximo 2% (primeros 10 años) o 1,5% (resto).
@@ -853,7 +853,7 @@ export default function AmortizacionHipotecaPage() {
       </section>
 
       <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso Importante</h3>
         <p>
           Este simulador proporciona cálculos orientativos basados en el sistema de amortización francés (cuota fija).
           Los resultados pueden variar según las condiciones específicas de tu hipoteca.
@@ -874,8 +874,8 @@ export default function AmortizacionHipotecaPage() {
               <thead>
                 <tr>
                   <th>Factor</th>
-                  <th>🔽 Reducir cuota</th>
-                  <th>⏰ Reducir plazo</th>
+                  <th><span aria-hidden="true">🔽</span> Reducir cuota</th>
+                  <th><span aria-hidden="true">⏰</span> Reducir plazo</th>
                 </tr>
               </thead>
               <tbody>

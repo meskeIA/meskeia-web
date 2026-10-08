@@ -246,7 +246,7 @@ export default function VisualizadorPhAcidosBases() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🧪 pH: Ácidos y Bases</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🧪</span> pH: Ácidos y Bases</h1>
           <p className={styles.subtitle}>La escala que mide la química de todo lo que te rodea</p>
         </header>
 

@@ -159,6 +159,7 @@ export default function GlosarioFisicaQuimicaPage() {
             <label className={styles.label}>Categoría</label>
             <div className={styles.selectorGrid}>
               <button
+                type="button"
                 className={`${styles.selectorBtn} ${categoriaFiltro === 'todos' ? styles.selectorActivo : ''}`}
                 onClick={() => setCategoriaFiltro('todos')}
                 aria-pressed={categoriaFiltro === 'todos'}
@@ -166,6 +167,7 @@ export default function GlosarioFisicaQuimicaPage() {
                 Todos
               </button>
               <button
+                type="button"
                 className={`${styles.selectorBtn} ${categoriaFiltro === 'fisica' ? styles.selectorActivo : ''}`}
                 onClick={() => setCategoriaFiltro('fisica')}
                 aria-pressed={categoriaFiltro === 'fisica'}
@@ -173,6 +175,7 @@ export default function GlosarioFisicaQuimicaPage() {
                 <span aria-hidden="true">🔬</span> Física
               </button>
               <button
+                type="button"
                 className={`${styles.selectorBtn} ${categoriaFiltro === 'quimica' ? styles.selectorActivo : ''}`}
                 onClick={() => setCategoriaFiltro('quimica')}
                 aria-pressed={categoriaFiltro === 'quimica'}
@@ -187,6 +190,7 @@ export default function GlosarioFisicaQuimicaPage() {
             <label className={styles.label}>Nivel</label>
             <div className={styles.selectorGrid}>
               <button
+                type="button"
                 className={`${styles.selectorBtn} ${nivelFiltro === 'todos' ? styles.selectorActivo : ''}`}
                 onClick={() => setNivelFiltro('todos')}
                 aria-pressed={nivelFiltro === 'todos'}
@@ -194,6 +198,7 @@ export default function GlosarioFisicaQuimicaPage() {
                 Todos
               </button>
               <button
+                type="button"
                 className={`${styles.selectorBtn} ${nivelFiltro === 'basico' ? styles.selectorActivo : ''}`}
                 onClick={() => setNivelFiltro('basico')}
                 aria-pressed={nivelFiltro === 'basico'}
@@ -201,6 +206,7 @@ export default function GlosarioFisicaQuimicaPage() {
                 Básico
               </button>
               <button
+                type="button"
                 className={`${styles.selectorBtn} ${nivelFiltro === 'intermedio' ? styles.selectorActivo : ''}`}
                 onClick={() => setNivelFiltro('intermedio')}
                 aria-pressed={nivelFiltro === 'intermedio'}
@@ -208,6 +214,7 @@ export default function GlosarioFisicaQuimicaPage() {
                 Intermedio
               </button>
               <button
+                type="button"
                 className={`${styles.selectorBtn} ${nivelFiltro === 'avanzado' ? styles.selectorActivo : ''}`}
                 onClick={() => setNivelFiltro('avanzado')}
                 aria-pressed={nivelFiltro === 'avanzado'}

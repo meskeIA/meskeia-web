@@ -265,7 +265,7 @@ export default function PlanificadorRutinasPage() {
                   className={styles.btnFinPrimario}
                   onClick={() => iniciarRutina(rutinaActiva)}
                 >
-                  🔄 Repetir rutina
+                  <span aria-hidden="true">🔄</span> Repetir rutina
                 </button>
                 <button
                   type="button"
@@ -568,7 +568,7 @@ export default function PlanificadorRutinasPage() {
                   onClick={() => iniciarRutina(rutina)}
                   aria-label={`Iniciar rutina ${rutina.nombre}`}
                 >
-                  ▶ Iniciar
+                  <span aria-hidden="true">▶</span> Iniciar
                 </button>
                 <button
                   type="button"
@@ -641,7 +641,7 @@ export default function PlanificadorRutinasPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>📱 Esta app (meskeIA)</td>
+                  <td><span aria-hidden="true">📱</span> Esta app (meskeIA)</td>
                   <td className={styles.celdaDestacada}>Sí</td>
                   <td className={styles.celdaDestacada}>Sí (audio)</td>
                   <td className={styles.celdaDestacada}>Sí</td>
@@ -775,7 +775,7 @@ export default function PlanificadorRutinasPage() {
               <span className={styles.stepNumber}>5</span>
               <div>
                 <strong>Activa el modo &quot;Seguir rutina&quot;</strong>
-                <p>Pulsa el botón ▶ junto a la rutina. Aparecerá la primera tarea en grande. Muestra la pantalla al usuario.</p>
+                <p>Pulsa el botón <span aria-hidden="true">▶</span> junto a la rutina. Aparecerá la primera tarea en grande. Muestra la pantalla al usuario.</p>
               </div>
             </li>
             <li className={styles.step}>

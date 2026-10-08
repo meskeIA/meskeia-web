@@ -801,31 +801,31 @@ export default function SimuladorCineticaArrheniusPage() {
             <div className={styles.faqItem}>
               <h4>¿Es cierto que +10 °C duplica la velocidad?</h4>
               <p>Es una <strong>regla heurística</strong>, no una ley exacta. Funciona bien para Ea ≈ 50-80 kJ/mol cerca de T ambiente. Para Ea muy bajas (≤ 20) la aceleración es menor; para Ea muy altas (≥ 200), subir 10 °C puede acelerar 5-10 veces o más.</p>
-              <p className={styles.faqTip}>💡 En el simulador, fija T₁ = 298 K y T₂ = 308 K, y prueba distintas Ea: verás qué tanto se acerca al &quot;factor 2&quot;.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, fija T₁ = 298 K y T₂ = 308 K, y prueba distintas Ea: verás qué tanto se acerca al &quot;factor 2&quot;.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué hace exactamente un catalizador?</h4>
               <p>Un <strong>catalizador baja Ea</strong> ofreciendo un mecanismo alternativo. NO cambia ΔH (la termodinámica) ni la composición de productos. Solo acelera tanto la reacción directa como la inversa por igual: el equilibrio se alcanza antes, pero es el mismo.</p>
-              <p className={styles.faqTip}>💡 En el simulador, baja Ea de 75 a 23 kJ/mol (efecto de la catalasa sobre H₂O₂) y verás que k crece millones de veces.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, baja Ea de 75 a 23 kJ/mol (efecto de la catalasa sobre H₂O₂) y verás que k crece millones de veces.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué la temperatura sube en muchas reacciones?</h4>
               <p>Si la reacción es <strong>exotérmica</strong> (ΔH &lt; 0), libera energía. Esa energía calienta el sistema, lo que aumenta T y por Arrhenius acelera aún más la reacción. Es un bucle de retroalimentación que puede acabar en explosión si no se controla.</p>
-              <p className={styles.faqTip}>💡 Por eso los reactores químicos industriales tienen sistemas de refrigeración elaborados: para mantener T constante y la reacción bajo control.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Por eso los reactores químicos industriales tienen sistemas de refrigeración elaborados: para mantener T constante y la reacción bajo control.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué es un orden de reacción y cómo afecta?</h4>
               <p>El <strong>orden</strong> es el exponente de cada concentración en la ley de velocidad: v = k·[A]ᵐ·[B]ⁿ. Arrhenius solo modela k (parte que depende de T). El orden viene del mecanismo y se determina experimentalmente. Para reacciones de 1.er orden, t½ = ln(2)/k es independiente de la concentración inicial.</p>
-              <p className={styles.faqTip}>💡 Reacciones radiactivas son SIEMPRE de 1.er orden: t½ es constante. Por eso el carbono-14 sirve para datar fósiles.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Reacciones radiactivas son SIEMPRE de 1.er orden: t½ es constante. Por eso el carbono-14 sirve para datar fósiles.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo se mide Ea experimentalmente?</h4>
               <p>Midiendo k a varias temperaturas y representando ln k frente a 1/T. Sale una <strong>recta de pendiente −Ea/R</strong>. Multiplicando la pendiente por −R obtienes Ea directamente. Es uno de los experimentos clásicos de laboratorio universitario.</p>
-              <p className={styles.faqTip}>💡 En el simulador, activa el toggle &quot;recta de Arrhenius&quot; y mueve T₁/T₂. Verás que ambos puntos siempre caen sobre la misma recta de pendiente fija.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, activa el toggle &quot;recta de Arrhenius&quot; y mueve T₁/T₂. Verás que ambos puntos siempre caen sobre la misma recta de pendiente fija.</p>
             </div>
           </div>
         </section>
