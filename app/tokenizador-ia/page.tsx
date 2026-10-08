@@ -28,7 +28,7 @@ const MODELOS_DEFAULT: ModeloIA[] = [
   { id: 'gpt4o',         nombre: 'GPT-4o',          empresa: 'OpenAI',    icono: '🤖', contexto: 128000,  precioEntrada: 2.50,  precioSalida: 10.00, urlPrecios: 'https://openai.com/pricing' },
   { id: 'gpt4o-mini',    nombre: 'GPT-4o mini',     empresa: 'OpenAI',    icono: '🤖', contexto: 128000,  precioEntrada: 0.15,  precioSalida: 0.60,  urlPrecios: 'https://openai.com/pricing' },
   { id: 'claude-sonnet', nombre: 'Claude Sonnet 4.6',empresa: 'Anthropic', icono: '🧠', contexto: 200000,  precioEntrada: 3.00,  precioSalida: 15.00, urlPrecios: 'https://www.anthropic.com/pricing' },
-  { id: 'claude-haiku',  nombre: 'Claude Haiku 4.5', empresa: 'Anthropic', icono: '🧠', contexto: 200000,  precioEntrada: 0.80,  precioSalida: 4.00,  urlPrecios: 'https://www.anthropic.com/pricing' },
+  { id: 'claude-haiku',  nombre: 'Claude Haiku 4.5', empresa: 'Anthropic', icono: '🧠', contexto: 200000,  precioEntrada: 1.00,  precioSalida: 5.00,  urlPrecios: 'https://www.anthropic.com/pricing' },
   { id: 'gemini-pro',    nombre: 'Gemini 1.5 Pro',   empresa: 'Google',    icono: '✨', contexto: 1048576, precioEntrada: 1.25,  precioSalida: 5.00,  urlPrecios: 'https://ai.google.dev/pricing' },
   { id: 'gemini-flash',  nombre: 'Gemini 1.5 Flash', empresa: 'Google',    icono: '✨', contexto: 1048576, precioEntrada: 0.075, precioSalida: 0.30,  urlPrecios: 'https://ai.google.dev/pricing' },
 ];
@@ -330,7 +330,7 @@ export default function TokenizadorIa() {
               <tr><td>GPT-4o</td><td>128.000 tokens</td><td>~350 págs.</td><td>$2,50/1M</td><td>$10,00/1M</td></tr>
               <tr><td>GPT-4o mini</td><td>128.000 tokens</td><td>~350 págs.</td><td>$0,15/1M</td><td>$0,60/1M</td></tr>
               <tr><td>Claude Sonnet 4.6</td><td>200.000 tokens</td><td>~550 págs.</td><td>$3,00/1M</td><td>$15,00/1M</td></tr>
-              <tr><td>Claude Haiku 4.5</td><td>200.000 tokens</td><td>~550 págs.</td><td>$0,80/1M</td><td>$4,00/1M</td></tr>
+              <tr><td>Claude Haiku 4.5</td><td>200.000 tokens</td><td>~550 págs.</td><td>$1,00/1M</td><td>$5,00/1M</td></tr>
               <tr><td>Gemini 1.5 Pro</td><td>1.048.576 tokens</td><td>~2.800 págs.</td><td>$1,25/1M</td><td>$5,00/1M</td></tr>
               <tr><td>Gemini 1.5 Flash</td><td>1.048.576 tokens</td><td>~2.800 págs.</td><td>$0,075/1M</td><td>$0,30/1M</td></tr>
             </tbody>
