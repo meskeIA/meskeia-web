@@ -44,7 +44,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const GENERADOS = path.join(RAIZ, '.next', 'dev', 'types');
+// Los de `next dev` y los de `next build`. Los segundos se añadieron el 08/10/2026: al
+// retirar `app/api/asistente/`, el `validator.ts` del último build seguía importando su
+// `route.js` (TS2307) y la validación se declaraba ciega, con lo que el siguiente
+// `npm run build` —que pasa por aquí ANTES de `next build`— no habría llegado a regenerarlo.
+const GENERADOS = [path.join(RAIZ, '.next', 'dev', 'types'), path.join(RAIZ, '.next', 'types')];
 const AUTOCOMPROBAR = process.argv.includes('--autocomprobar');
 
 // En Vercel no se ejecuta: ver cabecera
@@ -71,9 +75,11 @@ let limpiados = [];
 // 1. Si los ficheros generados están corruptos, se borran: son regenerables y su única
 //    función —tipar las rutas— ya no la cumplen cuando no parsean.
 if (errores.some(esGenerado)) {
-  for (const f of ['routes.d.ts', 'validator.ts', 'root-params.d.ts']) {
-    const p = path.join(GENERADOS, f);
-    if (fs.existsSync(p)) { fs.rmSync(p); limpiados.push(f); }
+  for (const dir of GENERADOS) {
+    for (const f of ['routes.d.ts', 'validator.ts', 'root-params.d.ts']) {
+      const p = path.join(dir, f);
+      if (fs.existsSync(p)) { fs.rmSync(p); limpiados.push(path.relative(RAIZ, p)); }
+    }
   }
   if (limpiados.length) {
     console.log(`  · ficheros generados corruptos, retirados: ${limpiados.join(', ')}`);
@@ -90,7 +96,7 @@ if (restanGenerados.length) {
   for (const l of restanGenerados.slice(0, 3)) console.error('    ' + l);
   console.error('\n  Mientras existan, tsc aborta el análisis del proyecto y "0 errores" NO');
   console.error('  significa que el código esté bien: significa que no se ha mirado.');
-  console.error('  Borrar .next/dev/types/ a mano y repetir.\n');
+  console.error('  Borrar .next/dev/types/ y .next/types/ a mano y repetir.\n');
   process.exit(1);
 }
 
