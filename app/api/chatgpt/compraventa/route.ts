@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         ...resultado,
-        aviso_legal: '⚠️ Resultado orientativo basado en tipos ITP/AJD 2025 por CCAA. Los gastos reales pueden variar según el notario, registro y gestoría elegidos. Consulta con un profesional inmobiliario. Fuente: meskeia.com/gastos-compraventa',
+        aviso_legal: '⚠️ Resultado orientativo con los tipos de ITP y AJD de cada comunidad (escalas, umbrales y tipos reducidos solo si el perfil cubre sus condiciones). Los gastos reales pueden variar según el notario, registro y gestoría elegidos. Consulta con un profesional inmobiliario. Fuente: meskeia.com/gastos-compraventa',
       },
       { headers: corsHeaders(origin) }
     );

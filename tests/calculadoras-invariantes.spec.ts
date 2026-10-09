@@ -414,6 +414,33 @@ test.describe('Golden — calcularImpuestoSociedades (Capa 1 · IS micropymes 20
 });
 
 // ────────────────────────────────────────────────────────────────────────────
+// GOLDEN — el ITP del MCP sale del motor de las apps (cabo C0004, 09/10/2026)
+// Antes: tipo plano de la comunidad, sin umbral, escala ni tipo de lo que no es vivienda.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — ITP del MCP con el motor de las apps (C0004)', () => {
+  test('Valencia 1.200.000 € → 11 % sobre TODO el valor: 132.000 € (Ley 13/1997, art. 13.Uno)', () => {
+    const cv = calcularCompraventa({ precioInmueble: 1200000, ccaa: 'valencia', tipoTransmision: 'segunda_mano' });
+    expect(cv.comprador.importeImpuesto).toBeCloseTo(132000, 2); // antes 108.000 (9 % plano)
+  });
+
+  test('Cataluña 1.000.000 € → escala: 600.000 × 10 % + 300.000 × 11 % + 100.000 × 12 % = 105.000 €', () => {
+    const cv = calcularCompraventa({ precioInmueble: 1000000, ccaa: 'cataluna', tipoTransmision: 'segunda_mano' });
+    expect(cv.comprador.importeImpuesto).toBeCloseTo(105000, 2); // antes 100.000 (10 % plano)
+  });
+
+  test('local de 200.000 € en el País Vasco → 7 % (no el 4 % de la vivienda): 14.000 €', () => {
+    const g = calcularGastosCompraInmueble({ precio: 200000, ccaa: 'pais-vasco', tipoInmueble: 'local_comercial' });
+    expect(g.importeImpuesto).toBeCloseTo(14000, 2);
+  });
+
+  test('Ceuta 200.000 € → la bonificación del 50 % del art. 57 bis: 6.000 €', () => {
+    const cv = calcularCompraventa({ precioInmueble: 200000, ccaa: 'ceuta', tipoTransmision: 'segunda_mano' });
+    expect(cv.comprador.importeImpuesto).toBeCloseTo(6000, 2);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
 // COMPOSICIÓN — consulta_compra_vivienda (compraventa + hipoteca)
 // ────────────────────────────────────────────────────────────────────────────
 

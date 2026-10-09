@@ -482,7 +482,7 @@ function crearServidorDelegum(): McpServer {
           `💶 Precio: **${fmt(c.precioInmueble)} €**`,
           '',
           `🧾 **Impuestos y gastos de compra**`,
-          `  • ${c.tipoImpuesto} (${c.porcentajeImpuesto}%): ${fmt(c.importeImpuesto)} €`,
+          `  • ${c.tipoImpuesto} (${pct(c.porcentajeImpuesto)}%): ${fmt(c.importeImpuesto)} €`,
           `  • AJD: ${fmt(c.ajd)} € · Notaría: ${fmt(c.notaria)} € · Registro: ${fmt(c.registro)} € · Gestoría: ${fmt(c.gestoria)} €`,
           `  • **Total gastos: ${fmt(c.totalGastos)} €** (${pct((c.totalGastos / c.precioInmueble) * 100)}% del precio)`,
           '',

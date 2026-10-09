@@ -18,17 +18,20 @@
  *    suelo urbano).
  *
  * Replica el criterio de las apps especializadas de meskeIA del clúster de gastos de
- * compraventa. Fuente de los datos: data/fiscal/inmuebles.ts
+ * compraventa. Fuente de los datos: data/fiscal/inmuebles.ts; el ITP y el AJD, del motor de
+ * esas apps (data/itp-ccaa.ts) a través de `itpSegunApps`/`ajdSegunApps` de compraventa.ts
+ * desde el 09/10/2026 (cabo C0004: el ITP era el tipo plano de la comunidad y el AJD un
+ * 1,5 % igual en todas; un local en el País Vasco salía al 4 % y no al 7 %).
  */
 
 import {
-  TIPOS_ITP_CCAA_2025,
   IVA_INMUEBLES_2025,
-  TIPOS_AJD_2025,
   COSTES_COMPRAVENTA_2025,
   FISCAL_INMUEBLES_META,
 } from '@/data/fiscal';
-import type { PerfilCompradorMCP } from './compraventa';
+import { ITP_CCAA, tipoAJD, type ObjetoTransmision } from '@/data/itp-ccaa';
+import { formatNumber } from '@/lib/formatters';
+import { claveCCAA, itpSegunApps, ajdSegunApps, type PerfilCompradorMCP } from './compraventa';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -96,52 +99,14 @@ export interface ResultadoGastosCompra {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const sinTildes = (s: string) =>
-  s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-
-function normalizarCCAA(ccaa: string): string {
-  const mapa: Record<string, string> = {
-    'madrid': 'Madrid',
-    'andalucia': 'Andalucía',
-    'cataluna': 'Cataluña',
-    'valencia': 'Valencia',
-    'galicia': 'Galicia',
-    'castilla-leon': 'Castilla y León',
-    'castilla-mancha': 'Castilla-La Mancha',
-    'aragon': 'Aragón',
-    'baleares': 'Baleares',
-    'canarias': 'Canarias',
-    'cantabria': 'Cantabria',
-    'asturias': 'Asturias',
-    'extremadura': 'Extremadura',
-    'murcia': 'Murcia',
-    'rioja': 'La Rioja',
-    'pais-vasco': 'País Vasco',
-    'navarra': 'Navarra',
-  };
-  return mapa[ccaa.toLowerCase()] ?? ccaa;
-}
-
-function getTipoITP(ccaaNombre: string, perfil: PerfilCompradorMCP): { tipo: number; nota: string } {
-  const datos = TIPOS_ITP_CCAA_2025.find(t => sinTildes(t.ccaa) === sinTildes(ccaaNombre));
-  if (!datos) return { tipo: 8, nota: 'CCAA no encontrada — usando media orientativa del 8%.' };
-
-  const usaReducido = perfil !== 'general' && datos.reducido !== undefined;
-  return {
-    tipo: usaReducido ? (datos.reducido ?? datos.tipo) : datos.tipo,
-    nota: usaReducido
-      ? `Tipo reducido ${datos.reducido}% — ${datos.notaReducido ?? 'perfil especial'}.`
-      : `Tipo general ${datos.tipo}% en ${datos.ccaa}.`,
-  };
-}
-
 // ─── Función principal ─────────────────────────────────────────────────────────
 
 export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): ResultadoGastosCompra {
   if (p.precio <= 0) throw new Error('El precio del inmueble debe ser mayor que cero.');
 
   const r = (n: number) => Math.round(n * 100) / 100;
-  const ccaaNombre = normalizarCCAA(p.ccaa);
+  const ccaa = claveCCAA(p.ccaa);
+  const ccaaNombre = ITP_CCAA[ccaa].nombre;
   const obraNueva = p.obraNueva ?? false;
   const anejo = p.anejoDeVivienda ?? true;
   const advertencias: string[] = [];
@@ -163,21 +128,25 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
     p.tipoInmueble === 'vivienda' ||
     ((p.tipoInmueble === 'garaje' || p.tipoInmueble === 'trastero') && anejo);
   const perfil: PerfilCompradorMCP = admiteTipoReducido ? (p.perfilComprador ?? 'general') : 'general';
+  // Para el motor de las apps, el anejo va con la vivienda; lo demás (suelto incluido), aparte
+  const objeto: ObjetoTransmision = admiteTipoReducido ? 'vivienda' : 'otro';
+  const pct = (t: number) => `${formatNumber(t, Number.isInteger(t) ? 0 : 2)} %`;
 
   const aplicarITP = (motivo: string) => {
-    const { tipo, nota: notaTipo } = getTipoITP(ccaaNombre, perfil);
+    const itp = itpSegunApps(p.precio, ccaa, perfil, { objeto, viviendaHabitual: objeto === 'vivienda' });
+    const notaTipo = itp.nota;
     tipoImpuesto = 'ITP (segunda mano)';
-    porcentajeImpuesto = tipo;
-    importeImpuesto = r(p.precio * tipo / 100);
+    porcentajeImpuesto = itp.tipoEfectivo;
+    importeImpuesto = itp.importe;
     ajd = 0; // ITP y AJD gradual son incompatibles sobre el mismo acto (art. 31.2 TRLITP)
     nota = `${motivo} ${notaTipo}`;
   };
 
-  const aplicarIVA = (porcentaje: number, etiqueta: string, motivo: string) => {
+  const aplicarIVA = (porcentaje: number, etiqueta: string, motivo: string, renunciaExencionIVA = false) => {
     tipoImpuesto = etiqueta;
     porcentajeImpuesto = porcentaje;
     importeImpuesto = r(p.precio * porcentaje / 100);
-    ajd = r(p.precio * TIPOS_AJD_2025.general / 100);
+    ajd = ajdSegunApps(p.precio, ccaa, { objeto, renunciaExencionIVA });
     ivaDeducible = porcentaje === IVA_INMUEBLES_2025.local;
     nota = motivo;
   };
@@ -220,9 +189,11 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
           `Primera entrega de ${bien}: IVA general del 21% más AJD.`);
       } else if (p.renunciaExencionIva) {
         aplicarIVA(IVA_INMUEBLES_2025.local, 'IVA (renuncia a la exención · inversión del sujeto pasivo)',
-          `Segunda transmisión de ${bien} con renuncia a la exención de IVA (art. 20.Dos LIVA): tributa por IVA al 21% en lugar de por ITP.`);
+          `Segunda transmisión de ${bien} con renuncia a la exención de IVA (art. 20.Dos LIVA): tributa por IVA al 21% en lugar de por ITP.`, true);
         advertencias.push('La renuncia solo cabe si comprador y vendedor son empresarios o profesionales con derecho a deducción. El IVA no se paga al vendedor: lo autoliquida el comprador por inversión del sujeto pasivo.');
-        advertencias.push(`Muchas comunidades aplican un tipo de AJD incrementado cuando hay renuncia a la exención; aquí se usa el tipo medio orientativo del ${TIPOS_AJD_2025.general}%.`);
+        advertencias.push(tipoAJD(ccaa, { objeto, renunciaExencionIVA: true }).motivo === 'renuncia'
+          ? `Con renuncia a la exención, ${ccaaNombre} aplica un AJD propio del ${pct(tipoAJD(ccaa, { objeto, renunciaExencionIVA: true }).tipo)}.`
+          : `Se aplica el AJD general de ${ccaaNombre} (${pct(tipoAJD(ccaa, { objeto }).tipo)}); algunas comunidades lo incrementan cuando hay renuncia a la exención.`);
       } else {
         aplicarITP(`Segunda transmisión de ${bien}: exenta de IVA (art. 20.Uno.22º LIVA), tributa por ITP.`);
         advertencias.push('Si comprador y vendedor son empresarios con derecho a deducción, puede convenir renunciar a la exención de IVA: el ITP es un coste no recuperable, mientras que el IVA autoliquidado se deduce.');
@@ -246,7 +217,7 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
       // La entrega de terrenos rústicos está EXENTA de IVA aunque venda un empresario.
       if (p.renunciaExencionIva) {
         aplicarIVA(IVA_INMUEBLES_2025.local, 'IVA (renuncia a la exención · inversión del sujeto pasivo)',
-          'Finca rústica con renuncia a la exención de IVA (art. 20.Dos LIVA) entre empresarios o profesionales con derecho a deducción.');
+          'Finca rústica con renuncia a la exención de IVA (art. 20.Dos LIVA) entre empresarios o profesionales con derecho a deducción.', true);
         advertencias.push('La renuncia solo cabe entre empresarios o profesionales con derecho a deducción; en una compraventa entre particulares no es posible.');
       } else {
         aplicarITP('La entrega de terrenos rústicos está exenta de IVA (art. 20.Uno.20º LIVA): tributa por ITP aunque el vendedor sea un empresario.');

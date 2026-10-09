@@ -5,19 +5,40 @@
  * Cubre los gastos del comprador (ITP/IVA, AJD, notaría, registro, gestoría)
  * y los del vendedor (plusvalía municipal IIVTNU, IRPF sobre ganancia patrimonial).
  *
- * Fuente: data/fiscal/inmuebles.ts
+ * Fuente: data/fiscal/inmuebles.ts · el ITP y el AJD, del motor de las apps (data/itp-ccaa.ts)
+ *
+ * Hasta el 09/10/2026 (cabo C0004) el ITP era el tipo PLANO de TIPOS_ITP_CCAA_2025: sin el
+ * umbral valenciano (1.200.000 € → 108.000 € en vez de 132.000 €, Ley 13/1997 art. 13.Uno),
+ * sin las escalas (Cataluña, 1.000.000 € al 10 % plano), sin el tipo vasco de lo que no es
+ * vivienda (un local al 4 % en vez del 7 %) y aplicando el reducido de un perfil sin mirar sus
+ * condiciones. El AJD era un 1,5 % igual en todas partes. Ahora los dos salen de las mismas
+ * funciones que las siete apps del clúster de compraventa (`itpSegunApps`, `ajdSegunApps`),
+ * que usa también gastosCompraInmueble.ts.
  */
 
 import {
-  TIPOS_ITP_CCAA_2025,
   IVA_INMUEBLES_2025,
-  TIPOS_AJD_2025,
   COSTES_COMPRAVENTA_2025,
   coeficienteIIVTNU,
   PLUSVALIA_MUNICIPAL_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   FISCAL_INMUEBLES_META,
 } from '@/data/fiscal';
+import {
+  ITP_CCAA,
+  elegirTipoITP,
+  importeITP,
+  calcularAJD,
+  tipoAJD,
+  describirSubidaITP,
+  CIUDADES_CON_BONIFICACION,
+  normaliza,
+  type ComunidadAutonoma,
+  type ContextoAJD,
+  type ObjetoTransmision,
+  type PerfilComprador,
+} from '@/data/itp-ccaa';
+import { formatNumber } from '@/lib/formatters';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -85,21 +106,61 @@ export interface ResultadoCompraventa {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function getTipoITP(ccaaNombre: string, perfil: PerfilCompradorMCP): { tipo: number; nota: string } {
-  const datos = TIPOS_ITP_CCAA_2025.find(
-    t => t.ccaa.toLowerCase().replace(/[íóáéú]/g, c => ({ í: 'i', ó: 'o', á: 'a', é: 'e', ú: 'u' }[c] ?? c))
-      === ccaaNombre.toLowerCase().replace(/[íóáéú]/g, c => ({ í: 'i', ó: 'o', á: 'a', é: 'e', ú: 'u' }[c] ?? c))
-  );
+const pct = (t: number) => `${formatNumber(t, Number.isInteger(t) ? 0 : 2)} %`;
 
-  if (!datos) return { tipo: 8, nota: 'CCAA no encontrada — usando media orientativa del 8%' };
+/** La clave del motor de las apps para una comunidad dada por su clave o por su nombre. */
+export function claveCCAA(ccaa: string): ComunidadAutonoma {
+  const n = normaliza(ccaa.trim());
+  const claves = Object.keys(ITP_CCAA) as ComunidadAutonoma[];
+  const clave = claves.find(c => c === n || normaliza(ITP_CCAA[c].nombre) === n);
+  if (!clave) throw new Error(`Comunidad autónoma no reconocida: «${ccaa}».`);
+  return clave;
+}
 
-  const usaReducido = perfil !== 'general' && datos.reducido !== undefined;
-  return {
-    tipo: usaReducido ? (datos.reducido ?? datos.tipo) : datos.tipo,
-    nota: usaReducido
-      ? `Tipo reducido ${datos.reducido}% — ${datos.notaReducido ?? 'perfil especial'}`
-      : `Tipo general ${datos.tipo}% en ${datos.ccaa}`,
-  };
+/**
+ * ITP de una compra de segunda mano con el motor de las apps del clúster: escalas, umbral
+ * valenciano, tipo propio de lo que no es vivienda, bonificación de Ceuta y Melilla y tipos
+ * reducidos aplicados solo cuando el perfil cubre TODAS sus condiciones. Los que exigen algo
+ * que no se pregunta (renta, municipio…) no se aplican: se nombran en la nota.
+ */
+export function itpSegunApps(
+  precio: number,
+  ccaa: ComunidadAutonoma,
+  perfil: PerfilCompradorMCP,
+  { objeto, viviendaHabitual }: { objeto: ObjetoTransmision; viviendaHabitual: boolean }
+): { importe: number; tipoEfectivo: number; nota: string } {
+  const perfilApps = perfil.replace('_', '-') as PerfilComprador;
+  const elegido = elegirTipoITP(ccaa, perfilApps, precio, { viviendaHabitual, objeto });
+  const importe = Math.round(importeITP(precio, ccaa, elegido) * 100) / 100;
+  const tipoEfectivo = Math.round((importe / precio) * 10000) / 100;
+  const nombre = ITP_CCAA[ccaa].nombre;
+  const partes: string[] = [];
+  if (elegido.esReducido) {
+    partes.push(`Tipo reducido del ${pct(elegido.tipo)} en ${nombre}: ${elegido.nombre ?? 'perfil especial'}.`);
+  } else {
+    const subida = describirSubidaITP(ccaa);
+    partes.push(subida
+      ? `En ${nombre} ${subida}.`
+      : `Tipo general del ${pct(elegido.tipo)} en ${nombre}.`);
+    if (CIUDADES_CON_BONIFICACION.includes(ccaa)) {
+      partes.push('Incluye la bonificación del 50 % de la cuota (art. 57 bis TRLITPAJD).');
+    }
+  }
+  if (elegido.noComprobables.length) {
+    partes.push(
+      'Podría pagar menos si cumple requisitos que este cálculo no pregunta: ' +
+      elegido.noComprobables
+        .map(r => `${r.nombre} (${pct(r.tipo)}${r.condiciones.length ? `; ${r.condiciones.join(', ')}` : ''})`)
+        .join(' · ') +
+      '.'
+    );
+  }
+  return { importe, tipoEfectivo, nota: partes.join(' ') };
+}
+
+/** AJD de la primera copia con el tipo de la comunidad (y la bonificación de Ceuta y Melilla). */
+export function ajdSegunApps(precio: number, ccaa: ComunidadAutonoma, contexto: ContextoAJD): number {
+  return Math.round(calcularAJD(precio, ccaa, contexto) * 100) / 100;
 }
 
 function calcularIRPFGanancia(ganancia: number): number {
@@ -118,29 +179,7 @@ function calcularIRPFGanancia(ganancia: number): number {
   return impuesto;
 }
 
-function normalizarCCAA(ccaa: string): string {
-  // Mapeo de claves internas a nombres que coincidan con TIPOS_ITP_CCAA_2025
-  const mapa: Record<string, string> = {
-    'madrid': 'Madrid',
-    'andalucia': 'Andalucía',
-    'cataluna': 'Cataluña',
-    'valencia': 'Valencia',
-    'galicia': 'Galicia',
-    'castilla-leon': 'Castilla y León',
-    'castilla-mancha': 'Castilla-La Mancha',
-    'aragon': 'Aragón',
-    'baleares': 'Baleares',
-    'canarias': 'Canarias',
-    'cantabria': 'Cantabria',
-    'asturias': 'Asturias',
-    'extremadura': 'Extremadura',
-    'murcia': 'Murcia',
-    'rioja': 'La Rioja',
-    'pais-vasco': 'País Vasco',
-    'navarra': 'Navarra',
-  };
-  return mapa[ccaa.toLowerCase()] ?? ccaa;
-}
+const esResidencialObjeto = (t: TipoInmuebleMCP): boolean => t === 'vivienda' || t === 'garaje';
 
 // ─── Función principal ─────────────────────────────────────────────────────────
 
@@ -148,8 +187,11 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
   if (p.precioInmueble <= 0) throw new Error('El precio del inmueble debe ser mayor que cero.');
 
   const r = (n: number) => Math.round(n * 100) / 100;
-  const ccaaNombre = normalizarCCAA(p.ccaa);
+  const ccaa = claveCCAA(p.ccaa);
+  const ccaaNombre = ITP_CCAA[ccaa].nombre;
   const tipoInmueble = p.tipoInmueble ?? 'vivienda';
+  // Garaje y anejos van con la vivienda (objeto «vivienda» del motor); local y terreno, aparte
+  const objeto: ObjetoTransmision = esResidencialObjeto(tipoInmueble) ? 'vivienda' : 'otro';
   const perfil = p.perfilComprador ?? 'general';
   const esResidencial = tipoInmueble === 'vivienda' || tipoInmueble === 'garaje';
 
@@ -171,18 +213,26 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
     importeImpuesto = r(p.precioInmueble * porcentajeImpuesto / 100);
     notaITP = `IVA ${porcentajeImpuesto}% (${esResidencial ? 'residencial' : 'comercial/industrial'})`;
   } else {
-    const { tipo, nota } = getTipoITP(ccaaNombre, perfil);
+    const itp = itpSegunApps(p.precioInmueble, ccaa, perfil, { objeto, viviendaHabitual: objeto === 'vivienda' });
     tipoImpuesto = 'ITP (segunda mano)';
-    porcentajeImpuesto = tipo;
-    importeImpuesto = r(p.precioInmueble * tipo / 100);
-    notaITP = nota;
+    porcentajeImpuesto = itp.tipoEfectivo;
+    importeImpuesto = itp.importe;
+    notaITP = itp.nota;
   }
 
   // AJD y ITP son incompatibles sobre el mismo acto (art. 31.2 TRLITP): en segunda mano
   // (sujeta a ITP) no se devenga AJD gradual. Solo aplica en obra nueva y VPO (sujetas a IVA).
   const ajd = p.tipoTransmision === 'segunda_mano'
     ? 0
-    : r(p.precioInmueble * TIPOS_AJD_2025.general / 100);
+    : ajdSegunApps(p.precioInmueble, ccaa, { objeto });
+  // Como las apps: el AJD de la vivienda habitual no se da por hecho, se avisa (Valencia, 0,1 %)
+  if (ajd > 0 && objeto === 'vivienda') {
+    const habitual = tipoAJD(ccaa, { objeto, viviendaHabitual: true });
+    if (habitual.motivo === 'vivienda-habitual') {
+      notaITP += ` Si va a ser la vivienda habitual, el AJD baja al ${pct(habitual.tipo)}: ` +
+        `${formatNumber(ajdSegunApps(p.precioInmueble, ccaa, { objeto, viviendaHabitual: true }), 2)} €.`;
+    }
+  }
 
   // Notaría: arancel regulado, estimación porcentual con límites
   const notariaBase = p.precioInmueble * COSTES_COMPRAVENTA_2025.notaria.estimacion / 100;
