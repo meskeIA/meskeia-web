@@ -64,7 +64,7 @@ const TECNOLOGIAS: TecnologiaDisplay[] = [
   {
     id: 'lcd',
     nombre: 'LCD',
-    anio: '1970s',
+    anio: 'Años 70',
     icono: '💡',
     color: '#3B82F6',
     principio: 'Cristales líquidos + retroiluminación',
@@ -75,7 +75,7 @@ const TECNOLOGIAS: TecnologiaDisplay[] = [
   {
     id: 'plasma',
     nombre: 'Plasma',
-    anio: '1990s',
+    anio: 'Años 90',
     icono: '✨',
     color: '#8B5CF6',
     principio: 'Gas ionizado (plasma)',

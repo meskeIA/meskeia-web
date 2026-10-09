@@ -349,7 +349,7 @@ export const historiaArquitecturaModerna: HistoriaData = {
         titulo: '¿Y si el Guggenheim Bilbao hubiera fracasado?',
         perfil: 'Contrafactual — urbanismo y cultura',
         texto:
-          'El Guggenheim de Bilbao (1997) se convirtió en el caso de estudio más influyente de la arquitectura de las últimas décadas: el "Efecto Bilbao" justificó inversiones billonarias en museos icónicos de todo el mundo. Pero si el museo hubiera fracasado económicamente —y hubo voces que predijeron ese fracaso—, la estrategia de "edificio-marca" para regenerar ciudades habría quedado desacreditada. La arquitectura espectacular como política cultural habría encontrado resistencia mucho antes. Y quizás ciudades como Abu Dhabi, Doha o Shanghái no habrían apostado por museos-icono de arquitectos occidentales.',
+          'El Guggenheim de Bilbao (1997) se convirtió en el caso de estudio más influyente de la arquitectura de las últimas décadas: el "Efecto Bilbao" justificó inversiones multimillonarias en museos icónicos de todo el mundo. Pero si el museo hubiera fracasado económicamente —y hubo voces que predijeron ese fracaso—, la estrategia de "edificio-marca" para regenerar ciudades habría quedado desacreditada. La arquitectura espectacular como política cultural habría encontrado resistencia mucho antes. Y quizás ciudades como Abu Dhabi, Doha o Shanghái no habrían apostado por museos-icono de arquitectos occidentales.',
       },
       {
         icono: '🌿',

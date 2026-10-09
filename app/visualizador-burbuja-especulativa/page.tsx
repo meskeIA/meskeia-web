@@ -37,9 +37,9 @@ const FASES_MINSKY: FaseMinsky[] = [
     ],
     ejemplos: [
       'Primera web comercial (1993)',
-      'Titulización hipotecaria (1980s)',
+      'Titulización hipotecaria (años 80)',
       'Bitcoin white paper (2008)',
-      'Primer bulbo de tulipán negro en subasta (1630s)',
+      'Primer bulbo de tulipán negro en subasta (década de 1630)',
     ],
   },
   {

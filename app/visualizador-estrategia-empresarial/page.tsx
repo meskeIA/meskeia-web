@@ -511,12 +511,12 @@ function VisualDelModulo({ id }: { id: ModuloId }) {
 // ─────────────────────────────────────────────
 
 const ERAS = [
-  { anios: '1960s', nombre: 'Planificación corporativa', desc: 'Grandes planes a varios años; la estrategia se diseña arriba y se ejecuta abajo.' },
+  { anios: 'Años 60', nombre: 'Planificación corporativa', desc: 'Grandes planes a varios años; la estrategia se diseña arriba y se ejecuta abajo.' },
   { anios: '1970-80', nombre: 'Matrices de cartera', desc: 'Auge de los conglomerados. Matrices BCG y GE/McKinsey reparten la inversión entre negocios.' },
-  { anios: '1980s', nombre: 'Posicionamiento competitivo', desc: 'Porter: 5 fuerzas y estrategias genéricas. La clave está en la estructura del sector.' },
-  { anios: '1990s', nombre: 'Recursos y capacidades', desc: 'La ventaja nace de dentro: competencias nucleares y recursos difíciles de imitar (VRIO).' },
-  { anios: '2000s', nombre: 'Disrupción e innovación', desc: 'Christensen y la disrupción; «Océano Azul» y la creación de mercados nuevos.' },
-  { anios: '2010s-hoy', nombre: 'Plataformas, datos e IA', desc: 'Efectos de red, ecosistemas y estrategia ágil y experimental ante la incertidumbre.' },
+  { anios: 'Años 80', nombre: 'Posicionamiento competitivo', desc: 'Porter: 5 fuerzas y estrategias genéricas. La clave está en la estructura del sector.' },
+  { anios: 'Años 90', nombre: 'Recursos y capacidades', desc: 'La ventaja nace de dentro: competencias nucleares y recursos difíciles de imitar (VRIO).' },
+  { anios: 'Años 2000', nombre: 'Disrupción e innovación', desc: 'Christensen y la disrupción; «Océano Azul» y la creación de mercados nuevos.' },
+  { anios: '2010-hoy', nombre: 'Plataformas, datos e IA', desc: 'Efectos de red, ecosistemas y estrategia ágil y experimental ante la incertidumbre.' },
 ];
 
 // ─────────────────────────────────────────────
