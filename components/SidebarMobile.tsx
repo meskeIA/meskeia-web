@@ -78,7 +78,7 @@ export default function SidebarMobile() {
   // Evitar hidratación incorrecta
   if (!mounted) {
     return (
-      <button className={styles.hamburgerButton} aria-label="Abrir menú">
+      <button type="button" className={styles.hamburgerButton} aria-label="Abrir menú">
         ☰
       </button>
     );
@@ -88,6 +88,7 @@ export default function SidebarMobile() {
     <>
       {/* Botón hamburguesa */}
       <button
+        type="button"
         className={styles.hamburgerButton}
         onClick={() => setIsOpen(true)}
         aria-label="Abrir menú de navegación"
@@ -115,6 +116,7 @@ export default function SidebarMobile() {
             <MeskeiaLogo inline showThemeToggle={false} disableLink />
           </Link>
           <button
+            type="button"
             className={styles.closeButton}
             onClick={() => setIsOpen(false)}
             aria-label="Cerrar menú"
@@ -141,7 +143,7 @@ export default function SidebarMobile() {
                 aria-expanded={recentAppsCollapsed ? 'false' : 'true'}
                 aria-label={recentAppsCollapsed ? 'Expandir apps visitadas' : 'Colapsar apps visitadas'}
               >
-                <span className={styles.sectionIcon}>🕐</span>
+                <span className={styles.sectionIcon} aria-hidden="true">🕐</span>
                 <span className={styles.sectionTitle}>Apps visitadas</span>
                 <span className={`${styles.sectionArrow} ${!recentAppsCollapsed ? styles.sectionArrowOpen : ''}`}>
                   ▼
@@ -184,7 +186,7 @@ export default function SidebarMobile() {
               className={`${styles.navButton} ${pathname === '/apps' ? styles.navButtonActive : ''}`}
               onClick={() => setIsOpen(false)}
             >
-              <span className={styles.navButtonIcon}>📦</span>
+              <span className={styles.navButtonIcon} aria-hidden="true">📦</span>
               <span className={styles.navButtonText}>Catálogo completo</span>
             </Link>
           </div>

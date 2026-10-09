@@ -15,7 +15,7 @@ export default function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <button className={styles.themeToggle} aria-label="Cambiar tema">
+      <button type="button" className={styles.themeToggle} aria-label="Cambiar tema">
         <span className={styles.icon}>🌙</span>
       </button>
     );
@@ -23,6 +23,7 @@ export default function ThemeToggle() {
 
   return (
     <button
+      type="button"
       className={styles.themeToggle}
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       aria-label={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}

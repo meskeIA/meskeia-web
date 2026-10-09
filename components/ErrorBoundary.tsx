@@ -52,7 +52,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             color: 'var(--text-primary, #1a1a1a)',
             marginBottom: '1rem',
           }}>
-            ⚠️ Algo salió mal
+            <span aria-hidden="true">⚠️</span> Algo salió mal
           </h2>
           <p style={{
             color: 'var(--text-secondary, #666)',
@@ -61,6 +61,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             Ha ocurrido un error inesperado. Por favor, recarga la página.
           </p>
           <button
+            type="button"
             onClick={() => window.location.reload()}
             style={{
               padding: '0.75rem 1.5rem',

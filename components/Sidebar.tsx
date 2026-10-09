@@ -103,6 +103,7 @@ export default function Sidebar() {
       {/* Toggle button en línea separada */}
       <div className={styles.toggleRow}>
         <button
+          type="button"
           className={styles.toggleButton}
           onClick={toggleCollapsed}
           aria-label={isCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}
@@ -130,7 +131,7 @@ export default function Sidebar() {
               aria-expanded={recentAppsCollapsed ? 'false' : 'true'}
               aria-label={recentAppsCollapsed ? 'Expandir apps visitadas' : 'Colapsar apps visitadas'}
             >
-              <span className={styles.sectionIcon}>🕐</span>
+              <span className={styles.sectionIcon} aria-hidden="true">🕐</span>
               <span className={styles.sectionTitle}>Apps visitadas</span>
               <span className={`${styles.sectionArrow} ${!recentAppsCollapsed ? styles.sectionArrowOpen : ''}`}>
                 ▼
@@ -169,9 +170,10 @@ export default function Sidebar() {
         <div className={styles.navButtons}>
           <Link
             href="/apps"
+            aria-label="Catálogo completo"
             className={`${styles.navButton} ${pathname === '/apps' ? styles.navButtonActive : ''}`}
           >
-            <span className={styles.navButtonIcon}>📦</span>
+            <span className={styles.navButtonIcon} aria-hidden="true">📦</span>
             <span className={styles.navButtonText}>Catálogo completo</span>
           </Link>
         </div>
