@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import styles from './CalculadoraMasaMadre.module.css';
 import {
   MeskeiaLogo,
@@ -23,6 +23,8 @@ import {
   TEMP_MODELO_MAX,
   TEMP_MODELO_MIN,
 } from '@/lib/calculadoras/fermentacionTemperatura';
+import { useRecetasGuardadas } from '@/lib/recetasGuardadas';
+import { AvisoRecetaRecuperada } from '@/components/RecetasGuardadas';
 
 const TIPOS: { id: TipoLevaduraOrigen; label: string; emoji: string; descripcion: string }[] = [
   { id: 'fresca',      label: 'Levadura fresca',      emoji: '🧊', descripcion: 'Bloques refrigerados, textura húmeda' },
@@ -47,14 +49,71 @@ const ETIQUETA_LEVADURA: Record<TipoLevaduraOrigen, string> = {
 const gramosLegibles = (g: number): string =>
   formatNumber(g, Number.isInteger(g) ? 0 : 1);
 
-export default function CalculadoraMasaMadrePage() {
-  const [tipoLevadura, setTipoLevadura] = useState<TipoLevaduraOrigen>('fresca');
-  const [levaduraG, setLevaduraG] = useState<string>('10');
-  const [hidratacion, setHidratacion] = useState<number>(100);
+/**
+ * Lo que se recuerda de una visita a la siguiente (S0190, como las otras dos calculadoras de
+ * pan). Aquí no hay recetas con nombre que guardar: es una conversión. Lo que sí es del usuario
+ * y no cambia de un día a otro es la hidratación de SU masa madre, la levadura que suele usar y
+ * la temperatura de su cocina, y eso es lo que vuelve solo.
+ */
+interface ConversionGuardada {
+  tipo: TipoLevaduraOrigen;
+  gramos: string;
+  hidratacion: number;
+  temperatura: string;
+}
+
+const CONVERSION_POR_DEFECTO: ConversionGuardada = {
+  tipo: 'fresca',
+  gramos: '10',
+  hidratacion: 100,
   // Arranca en la temperatura de referencia de la horquilla: mientras nadie diga a qué
   // temperatura tiene la cocina, el ajuste debe ser neutro y mostrar el mismo 4-6 h que
   // declara la receta, no adivinar una cocina que no sabemos cómo está.
-  const [tempMasa, setTempMasa] = useState<string>(String(FERMENTACION_MM_REF.tempRefC));
+  temperatura: String(FERMENTACION_MM_REF.tempRefC),
+};
+
+/** Lo guardado es dato de fuera: un tipo desconocido dejaría la etiqueta en `undefined`. */
+function validarConversion(crudo: unknown): ConversionGuardada | null {
+  if (!crudo || typeof crudo !== 'object') return null;
+  const r = crudo as Record<string, unknown>;
+  if (!TIPOS.some((t) => t.id === r.tipo)) return null;
+  if (typeof r.gramos !== 'string' || r.gramos.length > 12) return null;
+  if (typeof r.temperatura !== 'string' || r.temperatura.length > 8) return null;
+  if (typeof r.hidratacion !== 'number' || !Number.isFinite(r.hidratacion)) return null;
+  return {
+    tipo: r.tipo as TipoLevaduraOrigen,
+    gramos: r.gramos,
+    // El deslizador va de 50 a 150 de 5 en 5: lo que no caiga ahí se lleva al paso más cercano.
+    hidratacion: Math.min(150, Math.max(50, Math.round(r.hidratacion / 5) * 5)),
+    temperatura: r.temperatura,
+  };
+}
+
+export default function CalculadoraMasaMadrePage() {
+  const [tipoLevadura, setTipoLevadura] = useState<TipoLevaduraOrigen>(CONVERSION_POR_DEFECTO.tipo);
+  const [levaduraG, setLevaduraG] = useState<string>(CONVERSION_POR_DEFECTO.gramos);
+  const [hidratacion, setHidratacion] = useState<number>(CONVERSION_POR_DEFECTO.hidratacion);
+  const [tempMasa, setTempMasa] = useState<string>(CONVERSION_POR_DEFECTO.temperatura);
+
+  const conversionActual = useMemo<ConversionGuardada>(
+    () => ({ tipo: tipoLevadura, gramos: levaduraG, hidratacion, temperatura: tempMasa }),
+    [tipoLevadura, levaduraG, hidratacion, tempMasa],
+  );
+
+  const aplicarConversion = useCallback((c: ConversionGuardada) => {
+    setTipoLevadura(c.tipo);
+    setLevaduraG(c.gramos);
+    setHidratacion(c.hidratacion);
+    setTempMasa(c.temperatura);
+  }, []);
+
+  const recuerdo = useRecetasGuardadas<ConversionGuardada>({
+    clave: 'meskeia-masa-madre',
+    validar: validarConversion,
+    actual: conversionActual,
+    aplicar: aplicarConversion,
+    porDefecto: CONVERSION_POR_DEFECTO,
+  });
 
   const resultado = useCallback(() => {
     // `parseSpanishNumber`, el parser canónico del proyecto, no `parseFloat`: aquel colaba
@@ -115,6 +174,10 @@ export default function CalculadoraMasaMadrePage() {
       <LegalNotice />
 
       <div className={styles.card}>
+        {recuerdo.recuperada && (
+          <AvisoRecetaRecuperada queEs="conversión" onEmpezarDeCero={recuerdo.empezarDeCero} />
+        )}
+
         <div className={styles.tipoLabel}>Tipo de levadura en tu receta original</div>
         <div className={styles.tipoGroup}>
           {TIPOS.map(t => (

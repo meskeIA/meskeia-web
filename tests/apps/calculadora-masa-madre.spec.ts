@@ -603,3 +603,76 @@ test.describe('Equivalencia entre levaduras — el segundo camino de la página'
     await expect(page.getByText(/equivalen a:/)).toHaveCount(0);
   });
 });
+
+/**
+ * LA CONVERSIÓN SE RECUERDA (S0190, 09/10/2026)
+ *
+ * Como las otras dos calculadoras de pan, pero sin recetas con nombre: aquí lo que vuelve solo es
+ * lo que es del usuario y no cambia de un día a otro —la hidratación de SU masa madre, la
+ * levadura que usa y la temperatura de su cocina—. El almacén se siembra con `addInitScript`,
+ * que corre antes que la página; sembrar tras el `goto` es una carrera que la app gana.
+ */
+const CLAVE_CONVERSION = 'meskeia-masa-madre-ultima';
+
+async function sembrarConversion(page: Page, valor: string) {
+  await page.addInitScript(([k, v]) => {
+    if (window.sessionStorage.getItem('sembrado')) return; // solo la primera carga
+    window.sessionStorage.setItem('sembrado', '1');
+    window.localStorage.setItem(k, v);
+  }, [CLAVE_CONVERSION, valor] as const);
+}
+
+test.describe('La conversión se recuerda de una visita a otra', () => {
+  test('LA HIDRATACIÓN DE TU MASA MADRE vuelve sola, con aviso y salida', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [GRAMOS, HIDRATACION]);
+    await page.getByRole('button', { name: /Levadura seca/ }).click();
+    await ponerGramos(page, '7');
+    await ponerHidratacion(page, '60');
+    // 7 g de seca al 60 %: la harina prefermentada de 7 × 10 = 70 g → 70 × 1,6 = 112 g.
+    await expect.poll(() => masaMadre(page)).toBe('112 g');
+
+    await page.reload();
+    await esperarHidratacion(page, [GRAMOS, HIDRATACION]);
+
+    await expect(page.getByText(/Hemos recuperado la conversión/)).toBeVisible();
+    await expect(page.locator(HIDRATACION)).toHaveValue('60');
+    await expect(page.locator(GRAMOS)).toHaveValue('7');
+    await expect(page.getByRole('button', { name: /Levadura seca/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => masaMadre(page)).toBe('112 g');
+
+    await page.getByRole('button', { name: 'Empezar de cero' }).click();
+    await expect(page.locator(HIDRATACION)).toHaveValue('100');
+    await expect(page.locator(GRAMOS)).toHaveValue('10');
+    await expect(page.getByText(/Hemos recuperado la conversión/)).toHaveCount(0);
+  });
+
+  test('NO HAY PANEL DE RECETAS: aquí se recuerda, no se archiva', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [GRAMOS, HIDRATACION]);
+    await expect(page.locator('#nombre-receta')).toHaveCount(0);
+    await expect(page.getByText(/Hemos recuperado/)).toHaveCount(0);
+    // Pero lo de ejemplo ya queda escrito: prueba de que el guardado corre.
+    await page.waitForFunction((k) => window.localStorage.getItem(k) !== null, CLAVE_CONVERSION);
+  });
+
+  test('LO SEMBRADO se recupera: la clave es la que lee la app', async ({ page }) => {
+    await sembrarConversion(page, JSON.stringify({ tipo: 'instantanea', gramos: '5', hidratacion: 150, temperatura: '20' }));
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [GRAMOS, HIDRATACION]);
+    await expect(page.locator(HIDRATACION)).toHaveValue('150');
+    await expect(page.locator(TEMPERATURA)).toHaveValue('20');
+    await expect(page.getByRole('button', { name: /Levadura instantánea/ })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('UN ALMACÉN CORRUPTO no tumba la página: se arranca con el ejemplo', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await sembrarConversion(page, JSON.stringify({ tipo: 'liofilizada', gramos: '5', hidratacion: 150, temperatura: '20' }));
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [GRAMOS, HIDRATACION]);
+    await expect(page.locator(HIDRATACION)).toHaveValue('100');
+    await expect(page.locator(GRAMOS)).toHaveValue('10');
+    expect(errores).toEqual([]);
+  });
+});
