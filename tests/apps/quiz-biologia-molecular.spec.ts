@@ -864,7 +864,8 @@ test.describe('Hallazgos del Inspector · móvil 360 × 740', () => {
     const tocar = async (loc: Locator): Promise<void> => {
       const b = await loc.boundingBox();
       if (!b) throw new Error('sin caja');
-      await page.touchscreen.tap(b.x + Math.min(20, b.width / 2), b.y + b.height / 2);
+      // En el centro: bajo next dev el indicador «N» ocupa la esquina inferior izquierda (C0031)
+      await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
     };
     await abrir(page);
     await page.getByRole('button', { name: /Comenzar quiz/ }).scrollIntoViewIfNeeded();

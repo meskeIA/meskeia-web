@@ -1098,7 +1098,8 @@ test.describe('Re-inspección 25/09/2026 · móvil 360 × 740', () => {
     test.setTimeout(240_000);
     const tapar = async (sel: ReturnType<Page['locator']>) => {
       const b = (await sel.boundingBox())!;
-      await page.touchscreen.tap(b.x + Math.min(20, b.width / 2), b.y + b.height / 2);
+      // En el centro: bajo next dev el indicador «N» ocupa la esquina inferior izquierda (C0031)
+      await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
     };
     const ocultas: string[] = [];
     for (const nivel of [/^Avanzado/, /^Básico/]) {

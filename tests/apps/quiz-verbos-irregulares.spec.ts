@@ -1446,10 +1446,13 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
 
   test('hallazgo · tras «Siguiente pregunta» el enunciado nuevo no queda bajo la barra fija del logo', async ({ page }) => {
     // Reparado el 25/09/2026 (hallazgo 1835): traerALaVista + scroll-margin-top bajo la barra.
+    // Se toca en el CENTRO: bajo next dev, el indicador «N» de Next ocupa la esquina inferior
+    // izquierda, y un toque a 20 px del borde de un botón que queda al pie lo atrapaba él
+    // (fallaba 1 de cada 3-6; cabos C0065 y C0031).
     const tocar = async (loc: Locator): Promise<void> => {
       const b = await loc.boundingBox();
       if (!b) throw new Error('el elemento no tiene caja');
-      await page.touchscreen.tap(b.x + Math.min(20, b.width / 2), b.y + b.height / 2);
+      await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
     };
     await abrirHidratada(page);
     await arrancarPartida(page, 'A1 Básico', 10);
