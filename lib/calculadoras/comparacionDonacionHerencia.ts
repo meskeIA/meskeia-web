@@ -48,6 +48,12 @@ export interface ParametrosComparacionDonacionHerencia {
   valorAdquisicion: number;
   /** Año en que el transmitente adquirió el inmueble (p. ej. 2003) */
   anioAdquisicion: number;
+  /**
+   * Mes de la adquisición (1-12). Con él, la tenencia de la plusvalía municipal se cuenta en años
+   * y meses completos (art. 107.4 TRLRHL) y la ganancia de IRPF se fecha en ese mes. Sin él se
+   * supone el 1 de enero, y la nota lo dice (cabo C0017, la forma del hallazgo 1615).
+   */
+  mesAdquisicion?: number;
   /** Comunidad autónoma (clave de data/fiscal: 'madrid', 'cataluna'...) */
   ccaa: string;
   /** Parentesco del receptor. Por defecto 'II' (hijo/a de 21 o más años). */
@@ -129,9 +135,24 @@ export function compararDonacionHerencia(
   const grupo = p.grupo ?? 'II';
   const discapacidad = p.discapacidad ?? '0';
   const patrimonioIdx = p.patrimonioIdx ?? 1;
-  const anioActual = new Date().getFullYear();
-  const aniosTenencia = Math.max(0, anioActual - p.anioAdquisicion);
+  const hoy = new Date();
+  const mes = p.mesAdquisicion;
+  if (mes !== undefined && !(Number.isInteger(mes) && mes >= 1 && mes <= 12)) {
+    throw new Error('El mes de adquisición debe estar entre 1 y 12.');
+  }
+  // Meses completos desde el día 1 del mes de compra hasta hoy (años con decimales: el
+  // coeficiente toma los años completos y, por debajo del año, prorratea por meses)
+  const mesesTenencia = Math.max(
+    0,
+    (hoy.getFullYear() - p.anioAdquisicion) * 12 + (hoy.getMonth() + 1 - (mes ?? 1)),
+  );
+  const aniosTenencia = mesesTenencia / 12;
   const notas: string[] = [];
+  if (mes === undefined) {
+    notas.push(
+      `Sin el mes de adquisición se supone el 1 de enero de ${p.anioAdquisicion}: la tenencia puede salir hasta 11 meses más larga que la real, y con ella el coeficiente de la plusvalía municipal. Indica el mes para afinarla.`,
+    );
+  }
 
   // ── Vía DONACIÓN ────────────────────────────────────────────────────────────
   // 1) ISD del donatario (Impuesto sobre Donaciones)
@@ -157,7 +178,7 @@ export function compararDonacionHerencia(
     const irpf = calcularPlusvaliasIRPF({
       precioCompra: p.valorAdquisicion,
       precioVenta: p.valorInmueble,
-      fechaCompra: `${p.anioAdquisicion}-01-01`,
+      fechaCompra: `${p.anioAdquisicion}-${String(mes ?? 1).padStart(2, '0')}-01`,
       fechaVenta: new Date().toISOString().slice(0, 10),
       tipoActivo: 'inmueble',
     });

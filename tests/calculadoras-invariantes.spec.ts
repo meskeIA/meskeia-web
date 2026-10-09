@@ -712,6 +712,28 @@ test.describe('Invariantes de composición — comparar_donacion_vs_herencia', (
     );
   });
 
+  test('C0017: con el mes, la plusvalía municipal cuenta meses completos; sin él, se avisa de que supone enero', () => {
+    // Art. 107.4 TRLRHL: años completos y, por debajo del año, prorrateo por meses completos.
+    // Comprado hace 6 meses: la plusvalía es la del motor con 0,5 años (6/12 del coeficiente).
+    // Antes se contaba «año actual − año de compra» desde el 1 de enero, sin forma de decir el mes.
+    const hoy = new Date();
+    const hace6 = new Date(hoy.getFullYear(), hoy.getMonth() - 6, 1);
+    const base = {
+      valorInmueble: 300000, valorAdquisicion: 250000, anioAdquisicion: hace6.getFullYear(),
+      ccaa: 'madrid', grupo: 'II' as const, valorCatastralSuelo: 60000, valorCatastralTotal: 150000,
+    };
+    const conMes = compararDonacionHerencia({ ...base, mesAdquisicion: hace6.getMonth() + 1 });
+    const esperada = calcularIIVTNU({
+      valorCatastralSuelo: 60000, valorCatastralTotal: 150000,
+      precioAdquisicion: 250000, precioTransmision: 300000, aniosTenencia: 0.5,
+    }).cuotaIIVTNU;
+    expect(conMes.donacion.plusvaliaMunicipal).toBeCloseTo(esperada, 2);
+    expect(conMes.notas.join(' ')).not.toContain('Sin el mes de adquisición');
+    const sinMes = compararDonacionHerencia(base);
+    expect(sinMes.notas.join(' ')).toContain('Sin el mes de adquisición se supone el 1 de enero');
+    expect(() => compararDonacionHerencia({ ...base, mesAdquisicion: 13 })).toThrow();
+  });
+
   test('COHERENCIA: la recomendación concuerda con el total más barato', () => {
     expect(r.ahorroEstimado).toBeCloseTo(Math.abs(r.donacion.total - r.herencia.total), 2);
     if (r.opcionRecomendada === 'donacion') {
