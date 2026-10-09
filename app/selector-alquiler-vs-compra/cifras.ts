@@ -98,8 +98,8 @@ export const GASTOS_NUEVA = extremos((c) =>
       PRECIO_EJEMPLO,
 );
 
-/** «3,5 %», «12 %». */
-export const porcentaje = (fraccion: number): string => `${formatTipoNominal(aPorcentaje1(fraccion))} %`;
+/** «3,5 %», «12 %», con espacio duro: el «%» no salta solo de línea (CLAUDE.md global §2; hallazgo 3115). */
+export const porcentaje = (fraccion: number): string => `${formatTipoNominal(aPorcentaje1(fraccion))}\u00A0%`;
 
 /** «Ceuta y Melilla», «Cataluña». */
 const enumerar = (items: string[]): string =>
@@ -164,8 +164,8 @@ export const EJEMPLO_HIPOTECA = (() => {
 /** La frase del ejemplo, para la FAQ. */
 export const FRASE_INTERESES =
   `por ejemplo, con ${formatNumber(EJEMPLO_HIPOTECA.capital, 0)} € al ` +
-  `${formatTipoNominal(EJEMPLO_HIPOTECA.tipoAnual * 100)} % a ${EJEMPLO_HIPOTECA.anios} años, el ` +
-  `${formatNumber(EJEMPLO_HIPOTECA.partePrimerAnio * 100, 1)} % de lo que se paga el primer año son ` +
+  `${formatTipoNominal(EJEMPLO_HIPOTECA.tipoAnual * 100)}\u00A0% a ${EJEMPLO_HIPOTECA.anios} años, el ` +
+  `${formatNumber(EJEMPLO_HIPOTECA.partePrimerAnio * 100, 1)}\u00A0% de lo que se paga el primer año son ` +
   `intereses, y en toda la vida del préstamo suman unos ${EJEMPLO_HIPOTECA.interesesTotalesTexto}`;
 
 /**
@@ -188,7 +188,7 @@ export const REFERENCIA_NORMATIVA = {
   verificado: FISCAL_INMUEBLES_META.verificado,
   urlOficial: FISCAL_INMUEBLES_META.urlOficialITP,
   nota:
-    `Financiación habitual de hasta el ${formatTipoNominal(FINANCIACION_HABITUAL.maximo * 100)} % del valor ` +
+    `Financiación habitual de hasta el ${formatTipoNominal(FINANCIACION_HABITUAL.maximo * 100)}\u00A0% del valor ` +
     `de tasación: ${FINANCIACION_HABITUAL.fuente}. ${AVAL_ICO.nombre}: ${AVAL_ICO.organismo}, ficha ` +
     `verificada el ${formatDate(parseISODateLocal(FISCAL_AYUDAS_PERSONAS_META.verificado))}.`,
 } as const;

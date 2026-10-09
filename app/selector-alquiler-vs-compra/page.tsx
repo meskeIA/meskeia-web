@@ -88,24 +88,99 @@ export default function SelectorAlquilerVsCompra() {
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
 
-  // Al pulsar «Ver resultado» el test se desmonta con el botón que tenía el foco, que caía a
-  // <body>: se lleva al encabezado del resultado (familia de selectores, punto g).
+  // Al cambiar de pantalla o de pregunta se desmonta o se desactiva el botón que tenía el foco
+  // («Empezar», «Siguiente» sin respuesta aún, «Ver resultado»), y el foco caía a <body>: el
+  // siguiente Tab salía del cuestionario y, en móvil, la pregunta nueva quedaba bajo la barra o
+  // fuera de la vista (hallazgos 3108 y 3110; la receta de selector-smartphone, 1680 y 2657). Se
+  // lleva al enunciado de la pregunta nueva o al encabezado del resultado, que además lo desplaza a
+  // la vista con su scroll-margin-top.
   const encabezadoResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     if (pantalla === 'resultado') encabezadoResultado.current?.focus();
-  }, [pantalla]);
+    else if (pantalla === 'test') enunciado.current?.focus();
+  }, [pantalla, paso]);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
   const progreso = ((paso + 1) / totalPreguntas) * 100;
 
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 3111; receta `clicDeMas` de la familia, 2659 de
+   * selector-smartphone). El primer clic cambia la pantalla y el segundo caía sobre lo que hubiera
+   * debajo en la nueva: tras «Siguiente» de la 1, marcaba «Contrato temporal o en transición» en
+   * la 2; tras «Ver resultado», el enlace de Delegum o «Contacto» de la cabecera, y se perdían las
+   * 10 respuestas. Un clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el teclado
+   * no produce) Y el clic anterior de la app cambió de pantalla.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
+    e.detail > 1 && ultimoCambioPantallaRef.current;
+  const registrarClic = (cambiaPantalla: boolean) => {
+    ultimoCambioPantallaRef.current = cambiaPantalla;
+  };
+
+  // Lo que el segundo toque pisa tras «Ver resultado» no es de esta app: el foco sube la página al
+  // encabezado y el toque cae en la cabecera común (el enlace de Delegum de <LegalNotice />, o
+  // «Contacto»), que `clicDeMas` no alcanza. La misma regla, en fase de captura sobre window, antes
+  // de que el enlace o React lo vean. Un clic suelto (detail 1) no se toca y cierra la ráfaga: la
+  // app vuelve a marcar el cambio de pantalla, si lo hay, en su propio manejador.
+  useEffect(() => {
+    function filtrar(e: MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantallaRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantallaRef.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+
   function seleccionarOpcion(valor: string) {
+    registrarClic(false);
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
   }
 
-  function avanzar() {
+  function elegirOpcion(e: React.MouseEvent<HTMLButtonElement>, valor: string) {
+    if (clicDeMas(e)) return;
+    seleccionarOpcion(valor);
+  }
+
+  function empezar(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
+    setPantalla('test');
+  }
+
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG, hallazgo 3109; 1681 de selector-smartphone): las
+   * flechas mueven el foco a la opción vecina y la marcan, con vuelta al principio, e Inicio/Fin
+   * van a los extremos. El grupo es UNA parada de Tab (tabindex itinerante).
+   */
+  function teclaEnOpcion(e: React.KeyboardEvent<HTMLButtonElement>, indice: number) {
+    const total = preguntaActual.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(preguntaActual.opciones[destino].valor);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  }
+
+  // Avanza a la pregunta SIGUIENTE A LA PULSADA (`paso + 1` del render, no `p => p + 1`): dos
+  // clics antes de repintar no saltan una pregunta. Y solo con la pregunta respondida: el
+  // `disabled` lo pone el render, y un clic que llega antes de repintar no lo ve.
+  function avanzar(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || !respuestas[preguntaActual.id]) return;
+    registrarClic(true);
     if (paso < totalPreguntas - 1) {
-      setPaso(p => p + 1);
+      setPaso(paso + 1);
     } else {
       const res = calcularResultado(respuestas);
       setResultado(res);
@@ -113,11 +188,15 @@ export default function SelectorAlquilerVsCompra() {
     }
   }
 
-  function retroceder() {
-    if (paso > 0) setPaso(p => p - 1);
+  function retroceder(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || paso === 0) return;
+    registrarClic(true);
+    setPaso(paso - 1);
   }
 
-  function reiniciar() {
+  function reiniciar(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
     setPantalla('inicio');
     setPaso(0);
     setRespuestas({});
@@ -189,7 +268,7 @@ export default function SelectorAlquilerVsCompra() {
             <button
               type="button"
               className={styles.btnStart}
-              onClick={() => setPantalla('test')}
+              onClick={empezar}
             >
               Empezar el test →
             </button>
@@ -223,19 +302,26 @@ export default function SelectorAlquilerVsCompra() {
 
           <div className={styles.preguntaCard}>
             <span className={styles.preguntaIcon} aria-hidden="true">{preguntaActual.icono}</span>
-            <h2 className={styles.preguntaTexto}>{preguntaActual.texto}</h2>
+            <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{preguntaActual.texto}</h2>
             <div className={styles.opcionesGrid} role="radiogroup" aria-label={preguntaActual.texto}>
-              {preguntaActual.opciones.map(op => (
+              {preguntaActual.opciones.map((op, indice) => (
                 <button
                   key={op.valor}
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
-                  onClick={() => seleccionarOpcion(op.valor)}
+                  onClick={e => elegirOpcion(e, op.valor)}
                   // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                   // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                   // radio dentro (selector-smartphone, hallazgo 950).
                   role="radio"
                   aria-checked={respuestas[preguntaActual.id] === op.valor}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (3109).
+                  tabIndex={
+                    respuestas[preguntaActual.id]
+                      ? respuestas[preguntaActual.id] === op.valor ? 0 : -1
+                      : indice === 0 ? 0 : -1
+                  }
+                  onKeyDown={e => teclaEnOpcion(e, indice)}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.descripcion}</span>
@@ -343,6 +429,9 @@ export default function SelectorAlquilerVsCompra() {
             ) : (
               <p className={styles.razonItem}>Ninguna de tus respuestas suma en esta dirección.</p>
             )}
+            {/* Lo que no cabe en las tres de más peso, sumado: así lo enseñado cuadra con la
+                puntuación de arriba (hallazgo 3107). */}
+            {resultado.restoRazones && <p className={styles.razonResto}>{resultado.restoRazones}</p>}
           </div>
 
           {resultado.contrapeso.length > 0 && (
@@ -353,6 +442,7 @@ export default function SelectorAlquilerVsCompra() {
               {resultado.contrapeso.map((razon) => (
                 <p key={razon} className={`${styles.razonItem} ${styles.razonContraria}`}>{razon}</p>
               ))}
+              {resultado.restoContrapeso && <p className={styles.razonResto}>{resultado.restoContrapeso}</p>}
             </div>
           )}
 
@@ -373,69 +463,6 @@ export default function SelectorAlquilerVsCompra() {
             ← Repetir el test
           </button>
 
-          <EducationalSection
-            title="Alquilar (arrendar) vs Comprar: lo que nadie te cuenta"
-            subtitle="Más allá de los números, los factores que realmente importan al decidir entre arriendo y compra"
-            defaultOpen={false}
-          >
-            {/* Las cifras salen de ./cifras.ts y el plazo de ./motor.ts, lo mismo que lee la FAQ.
-                Decía «entre un 10% y un 15%» de gastos, escrito a mano (hallazgo 1462), y «entre 5 y
-                8 años» frente a los «7 a 12» de la FAQ (hallazgo 1463). */}
-            <h3>El punto de equilibrio: cuántos años hacen falta</h3>
-            <p>
-              Comprar tiene costes iniciales que no se recuperan al vender. La entrada sigue siendo
-              patrimonio tuyo (el banco suele financiar como máximo el {porcentaje(FINANCIACION_HABITUAL.maximo)} del
-              valor de tasación, así que el {porcentaje(ENTRADA_HABITUAL)} restante sale del ahorro), pero los gastos no:
-              en España, {FRASE_GASTOS}. Si tienes que vender antes de amortizarlos, pierdes esa parte,
-              más los gastos de la venta.
-            </p>
-            <p>
-              {FRASE_SIN_PLAZO_UNIVERSAL} {FRASE_PLAZO_DEL_TEST}
-            </p>
-
-            <h3>Costes ocultos de la compra que nadie menciona</h3>
-            <p>
-              Más allá de la hipoteca mensual, comprar tiene costes que los propietarios suelen olvidar:
-            </p>
-            <ul>
-              <li><strong>IBI:</strong> impuesto anual que varía por municipio (200-1.500 €/año en pisos).</li>
-              <li><strong>Comunidad de propietarios:</strong> cuotas mensuales, derramas y obras imprevistas.</li>
-              <li><strong>Mantenimiento:</strong> reparaciones, electrodomésticos, instalaciones. Regla práctica: 1% del valor del inmueble al año.</li>
-              <li><strong>Seguro del hogar:</strong> obligatorio con hipoteca (100-400 €/año).</li>
-              <li><strong>Gastos de venta:</strong> si vendes, pagarás agencia (3-5%), plusvalía municipal e IRPF por la ganancia.</li>
-            </ul>
-
-            <h3>Las ventajas reales del alquiler (arriendo)</h3>
-            <p>
-              El alquiler —arriendo, como se conoce en gran parte de Latinoamérica— no es tirar el dinero.
-              Te ofrece cosas que la compra no puede darte:
-            </p>
-            <ul>
-              <li><strong>Liquidez:</strong> el dinero de la entrada sigue siendo tuyo e invertible.</li>
-              <li><strong>Flexibilidad:</strong> cambiar de ciudad, de zona o de tamaño sin penalizaciones.</li>
-              <li><strong>Sin riesgo de depreciación:</strong> si el mercado cae, no te afecta como propietario.</li>
-              <li><strong>Sin imprevistos costosos:</strong> las reparaciones estructurales son responsabilidad del propietario.</li>
-            </ul>
-
-            <h3>Cuándo comprar tiene sentido de verdad</h3>
-            <p>
-              La compra tiene más sentido cuando se dan varios de estos factores a la vez:
-            </p>
-            <ul>
-              <li>Estabilidad laboral sólida (indefinido o autónomo consolidado +3 años).</li>
-              <li>Horizonte de más de 7 años en la misma zona (el tramo que este test puntúa a favor).</li>
-              <li>Ahorro para la entrada y los gastos sin agotar el colchón de emergencia, o acceso al {AVAL_ICO.nombre} si cumples sus requisitos.</li>
-              <li>Cuota hipotecaria razonable respecto a tus ingresos netos (como referencia orientativa, los bancos suelen exigir que no supere el 30-35%, pero esta cifra varía según tu perfil completo de ingresos y gastos).</li>
-              <li>Mercado donde el alquiler es proporcionalmente más caro que la hipoteca equivalente.</li>
-            </ul>
-
-            <div className={styles.warningBox}>
-              <strong>Recuerda:</strong> este test analiza factores cualitativos y vitales, no los números concretos
-              de tu caso. Para una decisión informada, combina este resultado con una calculadora de alquiler
-              vs compra que tenga en cuenta precios reales, tipos de interés actuales y tu situación fiscal específica.
-            </div>
-          </EducationalSection>
-
           <div className={styles.warningBox} role="note">
             Esta herramienta es orientativa y se basa exclusivamente en tus respuestas. No tiene en cuenta
             datos financieros concretos ni el mercado específico de tu zona. Para una decisión tan importante,
@@ -444,6 +471,81 @@ export default function SelectorAlquilerVsCompra() {
 
         </div>
       )}
+
+      {/* Guía educativa, en TODAS las pantallas (hallazgo 3112; 2663 de selector-smartphone). Vivía
+          dentro de la rama del resultado: el HTML servido no traía ni una línea de ella, aunque
+          EducationalSection monta su contenido siempre «porque Googlebot no hace clic», y quien no
+          terminaba las 10 preguntas no podía abrirla. Los avisos van arriba, fuera de ella. */}
+      <div className={styles.guiaContainer}>
+        <EducationalSection
+          title="Alquilar (arrendar) vs Comprar: lo que nadie te cuenta"
+          subtitle="Más allá de los números, los factores que realmente importan al decidir entre arriendo y compra"
+          defaultOpen={false}
+        >
+          {/* Las cifras salen de ./cifras.ts y el plazo de ./motor.ts, lo mismo que lee la FAQ.
+              Decía «entre un 10 % y un 15 %» de gastos, escrito a mano (hallazgo 1462), y «entre 5 y
+              8 años» frente a los «7 a 12» de la FAQ (hallazgo 1463). */}
+          <h3>El punto de equilibrio: cuántos años hacen falta</h3>
+          <p>
+            Comprar tiene costes iniciales que no se recuperan al vender. La entrada sigue siendo
+            patrimonio tuyo (el banco suele financiar como máximo el {porcentaje(FINANCIACION_HABITUAL.maximo)} del
+            valor de tasación, así que el {porcentaje(ENTRADA_HABITUAL)} restante sale del ahorro), pero los gastos no:
+            en España, {FRASE_GASTOS}. Si tienes que vender antes de amortizarlos, pierdes esa parte,
+            más los gastos de la venta.
+          </p>
+          <p>
+            {FRASE_SIN_PLAZO_UNIVERSAL} {FRASE_PLAZO_DEL_TEST}
+          </p>
+
+          {/* Sin cifras que no tengan fuente (hallazgo 3113): decía «200-1.500 €/año» de IBI, «1 % del
+              valor al año» de mantenimiento, «100-400 €/año» de seguro y «3-5 %» de agencia, escritos
+              a mano. El seguro exigible es el de daños del inmueble, no «el del hogar»: RD 716/2009,
+              art. 10.1, consultado en el BOE el 09/10/2026. Y la venta de la vivienda habitual tiene
+              las exenciones de data/fiscal/ganancia-inmueble.ts (hallazgo 3114): arts. 33.4.b y 38.1
+              de la Ley 35/2006, consultados en el BOE el 09/10/2026. */}
+          <h3>Costes ocultos de la compra que nadie menciona</h3>
+          <p>
+            Más allá de la hipoteca mensual, comprar tiene costes que los propietarios suelen olvidar:
+          </p>
+          <ul>
+            <li><strong>IBI:</strong> impuesto anual del ayuntamiento, que se calcula sobre el valor catastral con el tipo que fija cada municipio: la cuota cambia mucho de un sitio a otro. Pide el último recibo antes de comprar.</li>
+            <li><strong>Comunidad de propietarios:</strong> cuotas mensuales, derramas y obras imprevistas.</li>
+            <li><strong>Mantenimiento:</strong> reparaciones, electrodomésticos, instalaciones. Conviene reservar algo cada año, más cuanto más antigua sea la vivienda.</li>
+            <li><strong>Seguro de daños:</strong> con hipoteca, la vivienda tiene que estar asegurada contra daños por su valor de tasación sin contar el suelo (Real Decreto 716/2009, art. 10). Esa norma no exige las demás coberturas de un seguro de hogar, como el contenido.</li>
+            <li><strong>Gastos de venta:</strong> si vendes, la comisión de la agencia si la contratas (se pacta con ella), la plusvalía municipal y el IRPF por la ganancia. Si es tu vivienda habitual, la ganancia está exenta para los mayores de 65 años (y para las personas en situación de dependencia severa o gran dependencia), y total o parcialmente con la reinversión de lo obtenido en otra vivienda habitual (Ley del IRPF, arts. 33.4.b y 38).</li>
+          </ul>
+
+          <h3>Las ventajas reales del alquiler (arriendo)</h3>
+          <p>
+            El alquiler —arriendo, como se conoce en gran parte de Latinoamérica— no es tirar el dinero.
+            Te ofrece cosas que la compra no puede darte:
+          </p>
+          <ul>
+            <li><strong>Liquidez:</strong> el dinero de la entrada sigue siendo tuyo e invertible.</li>
+            <li><strong>Flexibilidad:</strong> cambiar de ciudad, de zona o de tamaño sin penalizaciones.</li>
+            <li><strong>Sin riesgo de depreciación:</strong> si el mercado cae, no te afecta como propietario.</li>
+            <li><strong>Sin imprevistos costosos:</strong> las reparaciones estructurales son responsabilidad del propietario.</li>
+          </ul>
+
+          <h3>Cuándo comprar tiene sentido de verdad</h3>
+          <p>
+            La compra tiene más sentido cuando se dan varios de estos factores a la vez:
+          </p>
+          <ul>
+            <li>Estabilidad laboral sólida (indefinido o autónomo consolidado +3 años).</li>
+            <li>Horizonte de más de 7 años en la misma zona (el tramo que este test puntúa a favor).</li>
+            <li>Ahorro para la entrada y los gastos sin agotar el colchón de emergencia, o acceso al {AVAL_ICO.nombre} si cumples sus requisitos.</li>
+            <li>Cuota hipotecaria razonable respecto a tus ingresos netos: cada banco fija su propio límite según tu perfil completo de ingresos y gastos.</li>
+            <li>Mercado donde el alquiler es proporcionalmente más caro que la hipoteca equivalente.</li>
+          </ul>
+
+          <div className={styles.warningBox}>
+            <strong>Recuerda:</strong> este test analiza factores cualitativos y vitales, no los números concretos
+            de tu caso. Para una decisión informada, combina este resultado con una calculadora de alquiler
+            vs compra que tenga en cuenta precios reales, tipos de interés actuales y tu situación fiscal específica.
+          </div>
+        </EducationalSection>
+      </div>
 
       <RelatedApps />
       <ShareCard appName="selector-alquiler-vs-compra" />

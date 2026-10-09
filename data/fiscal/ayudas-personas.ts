@@ -211,7 +211,7 @@ export const CATEGORIAS_AYUDAS_PERSONAS: CategoriaAyudaPersonal[] = [
     nombre: 'Aval ICO para primera vivienda',
     tipo: 'Aval público sobre la hipoteca',
     descripcion:
-      'Aval del Estado que cubre parte de la entrada de la hipoteca para facilitar el acceso a la primera vivienda a jóvenes y familias con hijos menores, sin necesidad de ahorrar el 20% inicial.',
+      'Aval del Estado que cubre parte de la entrada de la hipoteca para facilitar el acceso a la primera vivienda a jóvenes y familias con hijos menores, sin necesidad de ahorrar el 20\u00A0% inicial.',
     comoFunciona:
       'Usa nuestro orientador para comprobar si cumples los requisitos de edad, ingresos y tipo de vivienda, y entender el proceso para solicitarlo en una entidad bancaria adherida.',
     organismo: 'Instituto de Crédito Oficial (ICO)',

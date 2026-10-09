@@ -128,3 +128,22 @@
    y 31-61px bajo el logo, de 10 a 52px), y el resultado recibe el foco al llegar. Es el hueco
    que deja la plantilla para el logo fijo (templates/app-base, margin-top: 80px). */
 .hero, .heroResultados { padding-top: 80px; }
+
+/* El enunciado recibe el foco al cambiar de pregunta (hallazgo 3108): no es un control, no lleva
+   anillo con ratón; con teclado, sí. */
+.preguntaTexto:focus { outline: none; }
+.preguntaTexto:focus-visible { outline: 2px solid var(--primary-texto); outline-offset: 4px; border-radius: 4px; }
+
+/* Lo que recibe el foco al cambiar de pantalla no puede quedar bajo la barra fija del logo
+   (hallazgo 3110; 2657 de selector-smartphone): focus() desplaza lo justo para que se vea, y sin
+   margen lo dejaba en y 0, bajo la barra (hasta y 52 en móvil). 80 px, el hueco del hero. */
+.preguntaTexto,
+.heroTitleSm {
+  scroll-margin-top: 80px;
+}
+
+/* La guía vive fuera de las tres pantallas (hallazgo 3112): mismo ancho que el resultado. */
+.guiaContainer { max-width: 800px; margin: 0 auto 3rem; padding: 0 1rem; }
+
+/* Las respuestas que no caben en las tres de más peso, sumadas (hallazgo 3107). */
+.razonResto { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; margin: 0.4rem 0 0; }

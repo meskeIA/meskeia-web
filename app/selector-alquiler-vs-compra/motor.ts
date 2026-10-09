@@ -67,10 +67,10 @@ export const PREGUNTAS: Pregunta[] = [
       // entrada (20 %) y los gastos salen del ahorro. Decían «Lo mínimo, con poco margen» del 10
       // al 20 %, que no llega en ninguna comunidad, y «Entrada cómoda con algo de colchón» del 20
       // al 30 % (hallazgo 1461).
-      { valor: 'bajo', etiqueta: 'Menos del 10% del precio buscado', descripcion: 'No llega a la entrada que el banco no suele financiar', puntos: -4 },
-      { valor: 'justo', etiqueta: 'Entre el 10% y el 20%', descripcion: 'Todavía no cubre la entrada y los gastos sin aval ni ayuda', puntos: -1 },
-      { valor: 'suficiente', etiqueta: 'Entre el 20% y el 30%', descripcion: 'Cubre la entrada; los gastos, según la comunidad y la vivienda', puntos: 2 },
-      { valor: 'holgado', etiqueta: 'Más del 30%', descripcion: 'Cubre la entrada y los gastos en la mayoría de casos', puntos: 4 },
+      { valor: 'bajo', etiqueta: 'Menos del 10\u00A0% del precio buscado', descripcion: 'No llega a la entrada que el banco no suele financiar', puntos: -4 },
+      { valor: 'justo', etiqueta: 'Entre el 10\u00A0% y el 20\u00A0%', descripcion: 'Todavía no cubre la entrada y los gastos sin aval ni ayuda', puntos: -1 },
+      { valor: 'suficiente', etiqueta: 'Entre el 20\u00A0% y el 30\u00A0%', descripcion: 'Cubre la entrada; los gastos, según la comunidad y la vivienda', puntos: 2 },
+      { valor: 'holgado', etiqueta: 'Más del 30\u00A0%', descripcion: 'Cubre la entrada y los gastos en la mayoría de casos', puntos: 4 },
     ],
   },
   {
@@ -298,6 +298,10 @@ export interface Resultado {
   razones: string[];
   /** Las que empujan en sentido contrario (en «espera», hacia alquilar). */
   contrapeso: string[];
+  /** Lo que el recorte a 3 deja fuera de `razones`, sumado y nombrado; null si no queda nada. */
+  restoRazones: string | null;
+  /** Lo mismo para `contrapeso`. */
+  restoContrapeso: string | null;
 }
 
 interface Empuje {
@@ -338,27 +342,19 @@ export function calcularResultado(respuestas: Record<string, string>): Resultado
   const veredicto: VeredictoKey = limitado ? 'espera' : veredictoPorPuntos;
 
   // De más a menos peso; a igualdad, en el orden de las preguntas.
-  const hacia = (signo: 1 | -1) =>
+  const hacia = (signo: 1 | -1): Empuje[] =>
     empujes
       .map((e, i) => ({ e, i }))
       .filter(({ e }) => Math.sign(e.puntos) === signo)
       .sort((a, b) => Math.abs(b.e.puntos) - Math.abs(a.e.puntos) || a.i - b.i)
-      .map(({ e }) => frase(e));
+      .map(({ e }) => e);
   const aComprar = hacia(1);
   const aAlquilar = hacia(-1);
 
-  let razones: string[];
-  let contrapeso: string[];
-  if (veredicto === 'compra') {
-    razones = aComprar.slice(0, 3);
-    contrapeso = aAlquilar.slice(0, 3);
-  } else if (veredicto === 'alquila') {
-    razones = aAlquilar.slice(0, 3);
-    contrapeso = aComprar.slice(0, 3);
-  } else {
-    razones = aComprar.slice(0, 3);
-    contrapeso = aAlquilar.slice(0, 3);
-  }
+  // Se enseñan las 3 de más peso en cada dirección y el resto se suma en una línea que las nombra
+  // (hallazgo 3107): sin ella, lo enseñado no explicaba la puntuación de al lado. Con «+11» se veían
+  // +2, +2, +2 y −1, y faltaban cinco respuestas que sumaban +6.
+  const [aFavor, enContra] = veredicto === 'alquila' ? [aAlquilar, aComprar] : [aComprar, aAlquilar];
 
   return {
     veredicto,
@@ -368,9 +364,28 @@ export function calcularResultado(respuestas: Record<string, string>): Resultado
     proximosPasos: proximosPasos(veredicto, limitado, limites, respuestas),
     puntuacion,
     respuestasPorCategoria: respuestas,
-    razones,
-    contrapeso,
+    razones: aFavor.slice(0, MOSTRADAS).map(frase),
+    contrapeso: enContra.slice(0, MOSTRADAS).map(frase),
+    restoRazones: fraseResto(aFavor.slice(MOSTRADAS)),
+    restoContrapeso: fraseResto(enContra.slice(MOSTRADAS)),
   };
+}
+
+/** Cuántas respuestas se enseñan con su frase propia en cada dirección. */
+const MOSTRADAS = 3;
+
+/**
+ * Las respuestas que no caben en las 3 de más peso, en una línea: cuántas son, lo que suman y
+ * cuáles. «Y otras 5 respuestas suman 6 puntos más hacia la compra: «…» (+2), «…» (+1)…».
+ */
+function fraseResto(resto: Empuje[]): string | null {
+  if (resto.length === 0) return null;
+  const total = resto.reduce((s, e) => s + e.puntos, 0);
+  const una = resto.length === 1;
+  const verbo = total > 0 ? (una ? 'suma' : 'suman') : (una ? 'resta' : 'restan');
+  const sentido = total > 0 ? 'más hacia la compra' : 'más hacia seguir de alquiler';
+  const cuales = resto.map((e) => `«${e.etiqueta}» (${puntuacionConSigno(e.puntos)})`).join(', ');
+  return `Y ${una ? 'otra respuesta' : `otras ${resto.length} respuestas`} ${verbo} ${enLetra(total)} ${sentido}: ${cuales}.`;
 }
 
 /** La puntuación con su signo, en tipografía española («+12», «−3», «0»). */

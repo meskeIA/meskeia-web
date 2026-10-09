@@ -106,7 +106,7 @@ test('las razones salen de las respuestas: con contrato temporal no se alaba la 
   expect(texto).toContain('Tu puntuación total es +25: a partir de +8 la orientación es comprar, hasta −8 alquilar');
   // Lo que más empuja a comprar: los dos +4 y el primer +3, por orden de pregunta.
   expect(texto).toContain('Horizonte Temporal: «Indefinidamente» suma 4 puntos hacia la compra.');
-  expect(texto).toContain('Capacidad de Entrada: «Más del 30%» suma 4 puntos hacia la compra.');
+  expect(texto).toContain('Capacidad de Entrada: «Más del 30 %» suma 4 puntos hacia la compra.');
   expect(texto).toContain('Flexibilidad Geográfica: «Muy improbable, estoy arraigado/a» suma 3 puntos hacia la compra.');
   // Y el contrato temporal aparece donde debe: en sentido contrario.
   expect(texto).toMatch(/Lo que apunta en sentido contrario/i); // el título va en mayúsculas por CSS
@@ -187,12 +187,15 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, cifras de la
     const faq = bloques
       .map((b) => JSON.parse(b) as { '@type'?: string; mainEntity?: Pregunta[] })
       .find((j) => j['@type'] === 'FAQPage');
-    return (faq?.mainEntity ?? []).map((q) => `${q.name} ${q.acceptedAnswer.text}`).join(' ');
+    // El espacio duro del «%» se lee como espacio normal, igual que los textos de pantalla, que se
+    // comparan normalizados: el carácter en sí lo exige el test del hallazgo 3115.
+    return (faq?.mainEntity ?? []).map((q) => `${q.name} ${q.acceptedAnswer.text}`).join(' ').replace(/ /g, ' ');
   }
 
+  // La guía vive fuera del resultado desde el 09/10/2026 (hallazgo 3112): se leen los dos.
   async function guiaDesplegada(page: Page): Promise<string> {
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    return (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+    return (await page.locator('[class*="resultadosContainer"], [class*="guiaContainer"]').allInnerTexts()).join(' ').replace(/\s+/g, ' ');
   }
 
   /** Recorre las 1.048.576 combinaciones con el motor real y cuenta las que cumplen `pred`. */
@@ -300,25 +303,25 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, cifras de la
   // ─ Perfiles, con la suma hecha a mano ─
 
   // +3 +4 +2 +3 +1 0 +1 +1 0 +2 = +17 → comprar. Sin ninguna respuesta negativa: no hay contrapeso.
-  const NORMAL = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 20% y el 30%', 'Muy improbable, estoy arraigado/a', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Estabilidad y echar raíces'] as const;
+  const NORMAL = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 20 % y el 30 %', 'Muy improbable, estoy arraigado/a', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Estabilidad y echar raíces'] as const;
   // +3 +4 +2 −1 −2 0 +1 +1 0 0 = +8 → comprar (el umbral incluye el +8).
   // Reescrito el 24/09/2026: el perfil del umbral llevaba «Entre el 10% y el 20%», que desde la
   // reparación de los hallazgos 1459-1461 es un límite (no llega a la entrada) y da «esperar»;
   // ese caso vive ahora en MAS_8_SIN_ENTRADA. Este cambia el ahorro a «Entre el 20% y el 30%»
   // (+3) y la situación personal a «En transición» (−3) para seguir sumando +8.
-  const MAS_8 = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 20% y el 30%', 'No descarto que ocurra', 'En transición (separación, nido vacío...)', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
+  const MAS_8 = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 20 % y el 30 %', 'No descarto que ocurra', 'En transición (separación, nido vacío...)', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
   // +4 +2 −1 −1 +1 0 +1 +1 0 0 = +7 → esperar.
-  const MAS_7 = ['Indefinidamente', 'Autónomo consolidado (+3 años)', 'Entre el 10% y el 20%', 'No descarto que ocurra', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
+  const MAS_7 = ['Indefinidamente', 'Autónomo consolidado (+3 años)', 'Entre el 10 % y el 20 %', 'No descarto que ocurra', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
   // −4 −3 −1 −1 −1 0 +1 +1 0 0 = −8 → alquilar.
-  const MENOS_8 = ['Menos de 3 años', 'Contrato temporal o en transición', 'Entre el 10% y el 20%', 'No descarto que ocurra', 'Vivo solo/a, sin planes inmediatos', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
+  const MENOS_8 = ['Menos de 3 años', 'Contrato temporal o en transición', 'Entre el 10 % y el 20 %', 'No descarto que ocurra', 'Vivo solo/a, sin planes inmediatos', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
   // +4 +4 −4 +3 +3 +3 +1 +1 −3 +2 = +14 → la app dice comprar a quien tiene MENOS DEL 10 % ahorrado
   // («Entrada insuficiente en la mayoría de casos», según la propia opción) y para quien vender
   // en 3-4 años «Sería un problema grave».
-  const SIN_AHORRO = ['Indefinidamente', 'Contrato indefinido o funcionario', 'Menos del 10% del precio buscado', 'Muy improbable, estoy arraigado/a', 'Con hijos o planificándolos', 'Alquiler caro, compra más razonable', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Sería un problema grave', 'Estabilidad y echar raíces'] as const;
+  const SIN_AHORRO = ['Indefinidamente', 'Contrato indefinido o funcionario', 'Menos del 10 % del precio buscado', 'Muy improbable, estoy arraigado/a', 'Con hijos o planificándolos', 'Alquiler caro, compra más razonable', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Sería un problema grave', 'Estabilidad y echar raíces'] as const;
   // −4 +4 +4 +1 +3 +3 +3 +3 +2 +3 = +22 → comprar, con MENOS DE 3 AÑOS en la ciudad.
-  const HORIZONTE_CORTO = ['Menos de 3 años', 'Contrato indefinido o funcionario', 'Más del 30%', 'Trabajo en remoto, tengo libertad total', 'Con hijos o planificándolos', 'Alquiler caro, compra más razonable', 'La veo como un instrumento financiero que estoy dispuesto a usar', 'No, situación económica despejada', 'Tengo margen, no me preocupa', 'Construir patrimonio a largo plazo'] as const;
+  const HORIZONTE_CORTO = ['Menos de 3 años', 'Contrato indefinido o funcionario', 'Más del 30 %', 'Trabajo en remoto, tengo libertad total', 'Con hijos o planificándolos', 'Alquiler caro, compra más razonable', 'La veo como un instrumento financiero que estoy dispuesto a usar', 'No, situación económica despejada', 'Tengo margen, no me preocupa', 'Construir patrimonio a largo plazo'] as const;
   // −4 −3 +4 −4 −1 −3 −3 +3 −2 −3 = −16 → alquilar, con MÁS DEL 30 % ahorrado.
-  const ALQUILA_CON_AHORRO = ['Menos de 3 años', 'Contrato temporal o en transición', 'Más del 30%', 'Sí, es bastante probable', 'Vivo solo/a, sin planes inmediatos', 'Compra muy cara, alquiler razonable', 'Me incomoda asumir una deuda grande y prolongada', 'No, situación económica despejada', 'No quiero asumir ese riesgo en ningún caso', 'Flexibilidad y libertad de movimiento'] as const;
+  const ALQUILA_CON_AHORRO = ['Menos de 3 años', 'Contrato temporal o en transición', 'Más del 30 %', 'Sí, es bastante probable', 'Vivo solo/a, sin planes inmediatos', 'Compra muy cara, alquiler razonable', 'Me incomoda asumir una deuda grande y prolongada', 'No, situación económica despejada', 'No quiero asumir ese riesgo en ningún caso', 'Flexibilidad y libertad de movimiento'] as const;
 
   // ─ Lo que está bien ─
 
@@ -387,7 +390,7 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, cifras de la
 
   // +3 +4 −1 −1 +1 0 +1 +1 0 0 = +8, con «Entre el 10% y el 20%»: era el perfil del umbral +8.
   // Ahora el ahorro no llega a la entrada y «comprar» no puede salir (hallazgo 1461 + familia a).
-  const MAS_8_SIN_ENTRADA = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 10% y el 20%', 'No descarto que ocurra', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
+  const MAS_8_SIN_ENTRADA = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 10 % y el 20 %', 'No descarto que ocurra', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
 
   const aviso = (page: Page, id: string) => page.locator(`[data-limite="${id}"]`);
   /** El texto del aviso sin el icono decorativo (⚠️, aria-hidden) que lo encabeza. */
@@ -408,7 +411,7 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, cifras de la
       'Por puntuación, tus respuestas apuntarían a comprar, pero has declarado algo que ninguna otra respuesta compensa: mientras siga así, comprar no sale como recomendación. Justo debajo tienes qué es y qué puedes hacer.',
     );
     expect(await textoAviso(page, 'ahorro')).toBe(
-      `Has declarado un ahorro de «Menos del 10% del precio buscado». El banco suele financiar como máximo el 80 % del valor de tasación (según el Banco de España), así que la entrada —el 20 %— y los gastos de compra salen del ahorro. En España, ${FRASE_GASTOS_HOY}. Con menos del 20 % no se llega ni a la entrada. La vía que existe para ese hueco es el Aval ICO para primera vivienda: Aval del Estado que cubre parte de la entrada de la hipoteca para facilitar el acceso a la primera vivienda a jóvenes y familias con hijos menores, sin necesidad de ahorrar el 20% inicial. Comprueba si cumples sus requisitos.`,
+      `Has declarado un ahorro de «Menos del 10 % del precio buscado». El banco suele financiar como máximo el 80 % del valor de tasación (según el Banco de España), así que la entrada —el 20 %— y los gastos de compra salen del ahorro. En España, ${FRASE_GASTOS_HOY}. Con menos del 20 % no se llega ni a la entrada. La vía que existe para ese hueco es el Aval ICO para primera vivienda: Aval del Estado que cubre parte de la entrada de la hipoteca para facilitar el acceso a la primera vivienda a jóvenes y familias con hijos menores, sin necesidad de ahorrar el 20 % inicial. Comprueba si cumples sus requisitos.`,
     );
     await expect(aviso(page, 'ahorro').getByRole('link', { name: 'Comprueba si cumples sus requisitos' })).toHaveAttribute('href', '/orientador-aval-ico/');
     expect(texto).toContain('Tu puntuación total es +14: a partir de +8 la orientación es comprar, hasta −8 alquilar, y entre medias, esperar. Aquí pasa de ese umbral, pero lo que has declarado arriba impide recomendar la compra.');
@@ -479,7 +482,7 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, cifras de la
     const texto = await textoResultado(page);
     expect(texto).toContain('Tu puntuación total es +8:');
     await expect(page.locator('[class*="veredictoValor"]')).toHaveText('Espera antes de decidir');
-    expect(await textoAviso(page, 'ahorro')).toContain('Has declarado un ahorro de «Entre el 10% y el 20%».');
+    expect(await textoAviso(page, 'ahorro')).toContain('Has declarado un ahorro de «Entre el 10 % y el 20 %».');
   });
 
   test('1462 los gastos de compra de la guía y la FAQ salen de data/itp-ccaa, no de un «10-15 %» a mano', async ({ page }) => {
@@ -684,23 +687,23 @@ test('móvil y escritorio: el logo fijo no tapa el título, ni en la intro ni en
 //
 // Cada valor esperado se resolvió A MANO con los pesos de motor.ts (suma de las 10 respuestas
 // contra ±8, razones = las 3 de más peso hacia el veredicto, a igual peso por orden de pregunta)
-// ANTES de abrir el navegador. Los test.fail() son hallazgos ABIERTOS (pendientes de número,
-// inspector 09/10/2026): cuando se reparen, pasan a exigir la reparación.
+// ANTES de abrir el navegador. Los hallazgos (3107-3115) se repararon el mismo día: sus
+// test.fail() pasaron a exigir la reparación, con el número de cada uno.
 // ─────────────────────────────────────────────────────────────────────────────────────────
 test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, móvil, guía y cifras', () => {
   // +4 «Indefinidamente» · +2 «Autónomo consolidado» · +4 «Más del 30%» · +1 «remoto» · +3 «Con hijos»
   // · −2 «Ambos están muy caros» · +1 «La acepto» · −1 «dependientes» · 0 «asumibles» · +2 «Estabilidad»
   // = +14 ≥ +8 → comprar, sin límites (ahorro ≥ 20 %, horizonte ≥ 3 años).
-  const NORMAL_14 = ['Indefinidamente', 'Autónomo consolidado (+3 años)', 'Más del 30%', 'Trabajo en remoto, tengo libertad total', 'Con hijos o planificándolos', 'Ambos están muy caros', 'La acepto si los números tienen sentido', 'Tengo dependientes a mi cargo', 'Me generaría pérdidas asumibles', 'Estabilidad y echar raíces'] as const;
+  const NORMAL_14 = ['Indefinidamente', 'Autónomo consolidado (+3 años)', 'Más del 30 %', 'Trabajo en remoto, tengo libertad total', 'Con hijos o planificándolos', 'Ambos están muy caros', 'La acepto si los números tienen sentido', 'Tengo dependientes a mi cargo', 'Me generaría pérdidas asumibles', 'Estabilidad y echar raíces'] as const;
   // −1 «Entre 3 y 7 años» · −3 «temporal» · +2 «20-30 %» · −1 «No descarto» · −1 «solo» · −3 «Compra muy
   // cara» · +1 «La acepto» · −1 «dependientes» · 0 «asumibles» · 0 «Optimizar» = −7 → esperar (alquilar
   // empieza en −8 INCLUIDO: −7 se queda a un punto).
-  const MENOS_7 = ['Entre 3 y 7 años', 'Contrato temporal o en transición', 'Entre el 20% y el 30%', 'No descarto que ocurra', 'Vivo solo/a, sin planes inmediatos', 'Compra muy cara, alquiler razonable', 'La acepto si los números tienen sentido', 'Tengo dependientes a mi cargo', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
+  const MENOS_7 = ['Entre 3 y 7 años', 'Contrato temporal o en transición', 'Entre el 20 % y el 30 %', 'No descarto que ocurra', 'Vivo solo/a, sin planes inmediatos', 'Compra muy cara, alquiler razonable', 'La acepto si los números tienen sentido', 'Tengo dependientes a mi cargo', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
   // −1 «Entre 3 y 7 años» · +2 «Autónomo consolidado» · +2 «20-30 %» · +1 «remoto» · +1 «pareja»
   // · 0 «Equilibrado» · +1 «La acepto» · +1 «leve» · +2 «Tengo margen» · +2 «Estabilidad» = +11 → comprar.
-  const OCULTO_11 = ['Entre 3 y 7 años', 'Autónomo consolidado (+3 años)', 'Entre el 20% y el 30%', 'Trabajo en remoto, tengo libertad total', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Tengo margen, no me preocupa', 'Estabilidad y echar raíces'] as const;
+  const OCULTO_11 = ['Entre 3 y 7 años', 'Autónomo consolidado (+3 años)', 'Entre el 20 % y el 30 %', 'Trabajo en remoto, tengo libertad total', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Tengo margen, no me preocupa', 'Estabilidad y echar raíces'] as const;
   // +4 +4 −4 +3 +3 +3 +1 +1 −3 +2 = +14 con «Menos del 10%» → esperar con el aviso del ahorro (lleva «%»).
-  const SIN_AHORRO_14 = ['Indefinidamente', 'Contrato indefinido o funcionario', 'Menos del 10% del precio buscado', 'Muy improbable, estoy arraigado/a', 'Con hijos o planificándolos', 'Alquiler caro, compra más razonable', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Sería un problema grave', 'Estabilidad y echar raíces'] as const;
+  const SIN_AHORRO_14 = ['Indefinidamente', 'Contrato indefinido o funcionario', 'Menos del 10 % del precio buscado', 'Muy improbable, estoy arraigado/a', 'Con hijos o planificándolos', 'Alquiler caro, compra más razonable', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Sería un problema grave', 'Estabilidad y echar raíces'] as const;
 
   async function contestar(page: Page, etiquetas: readonly string[]): Promise<void> {
     for (let i = 0; i < etiquetas.length; i++) {
@@ -712,7 +715,7 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
   const razones = (page: Page) => page.locator('[class*="razonItem"]').allInnerTexts();
   async function guia(page: Page): Promise<string> {
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    return (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+    return (await page.locator('[class*="resultadosContainer"], [class*="guiaContainer"]').allInnerTexts()).join(' ').replace(/\s+/g, ' ');
   }
 
   test('caso normal: +14 → comprar; las tres razones de más peso y el contrapeso, en orden', async ({ page }) => {
@@ -724,7 +727,7 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     await expect(page.locator('[class*="puntuacionNota"]')).toContainText('Tu puntuación total es +14: a partir de +8 la orientación es comprar, hasta −8 alquilar, y entre medias, esperar.');
     expect(await razones(page)).toEqual([
       'Horizonte Temporal: «Indefinidamente» suma 4 puntos hacia la compra.',
-      'Capacidad de Entrada: «Más del 30%» suma 4 puntos hacia la compra.',
+      'Capacidad de Entrada: «Más del 30\u00A0%» suma 4 puntos hacia la compra.',
       'Situación Personal: «Con hijos o planificándolos» suma 3 puntos hacia la compra.',
       'Mercado Local: «Ambos están muy caros» resta 2 puntos: empuja hacia seguir de alquiler.',
       'Cargas Económicas: «Tengo dependientes a mi cargo» resta 1 punto: empuja hacia seguir de alquiler.',
@@ -748,7 +751,7 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     // textContent: el título va en mayúsculas por CSS.
     expect(await page.locator('[class*="razonesTitulo"]').allTextContents()).toEqual(['Lo que empuja hacia comprar', 'Lo que empuja hacia alquilar']);
     expect(await razones(page)).toEqual([
-      'Capacidad de Entrada: «Entre el 20% y el 30%» suma 2 puntos hacia la compra.',
+      'Capacidad de Entrada: «Entre el 20\u00A0% y el 30\u00A0%» suma 2 puntos hacia la compra.',
       'Tolerancia a la Deuda: «La acepto si los números tienen sentido» suma 1 punto hacia la compra.',
       'Estabilidad Laboral: «Contrato temporal o en transición» resta 3 puntos: empuja hacia seguir de alquiler.',
       'Mercado Local: «Compra muy cara, alquiler razonable» resta 3 puntos: empuja hacia seguir de alquiler.',
@@ -809,8 +812,9 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     expect(mal).toBe(0);
   });
 
-  test.fail('C0011 b: lo que se enseña explica la puntuación — las respuestas a la vista suman los +11', async ({ page }) => {
-    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). OCULTO_11 da +11 → comprar. La
+  test('3107 lo que se enseña explica la puntuación — las respuestas a la vista suman los +11', async ({ page }) => {
+    // REPARADO el 09/10/2026: bajo las tres de más peso, una línea suma y nombra las que no caben
+    // («Y otras 5 respuestas suman 6 puntos más hacia la compra: …»). Antes: OCULTO_11 da +11 → comprar. La
     // pantalla enseña +2 (laboral), +2 (ahorro), +2 (riesgo de venta) —los tres +2 primeros por orden
     // de pregunta— y −1 (horizonte): +5. No se ven «Estabilidad y echar raíces» (+2) ni los cuatro +1
     // (+6 en total), y las tres razones (+6) no llegan al +8 que la nota de al lado da como umbral.
@@ -819,7 +823,7 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     // Barrido del motor: en 105.636 de los 120.194 «comprar» y 180.139 de los 207.542 «alquilar» lo
     // enseñado no llega al umbral; en 840, ni las tres razones solas.
     // Esperado: +11 entre lo que se enseña (con todas las respuestas, o con un resumen del resto que
-    // diga cuánto suma). Obtenido hoy: +5.
+    // diga cuánto suma). Obtenido antes de reparar: +5.
     await abrirTest(page);
     await contestar(page, OCULTO_11);
     await expect(page.locator('[class*="puntuacionNota"]')).toContainText('Tu puntuación total es +11:');
@@ -827,10 +831,37 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     const aLaVista = [...texto.matchAll(/(suman?|restan?) (\d+) puntos?/g)]
       .reduce((s, m) => s + (m[1].startsWith('suma') ? 1 : -1) * Number(m[2]), 0);
     expect(aLaVista).toBe(11);
+    await expect(page.locator('[class*="razonResto"]')).toHaveText([
+      'Y otras 5 respuestas suman 6 puntos más hacia la compra: «Estabilidad y echar raíces» (+2), «Trabajo en remoto, tengo libertad total» (+1), «En pareja, sin hijos aún» (+1), «La acepto si los números tienen sentido» (+1), «Solo algo menor (coche, tarjeta...)» (+1).',
+    ]);
   });
 
-  test.fail('C0016 a: tras «Empezar», «Siguiente» y «Anterior» el foco va al enunciado de la pregunta nueva', async ({ page }) => {
-    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 1680 de
+  test('3107 motor: en las 1.048.576 combinaciones, lo enseñado (las 3 y el resumen) suma la puntuación', () => {
+    test.setTimeout(120_000);
+    const r: Record<string, string> = {};
+    let mal = 0;
+    const firmado = (f: string) => {
+      const m = f.match(/(suman?|restan?) (\d+) puntos?/);
+      return m ? (m[1].startsWith('suma') ? 1 : -1) * Number(m[2]) : Number.NaN;
+    };
+    const rec = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        const res = calcularResultado(r);
+        const lineas = [...res.razones, ...res.contrapeso, res.restoRazones, res.restoContrapeso].filter((x): x is string => x !== null);
+        if (lineas.reduce((s, f) => s + firmado(f), 0) !== res.puntuacion) mal++;
+        return;
+      }
+      for (const o of PREGUNTAS[i].opciones) {
+        r[PREGUNTAS[i].id] = o.valor;
+        rec(i + 1);
+      }
+    };
+    rec(0);
+    expect(mal).toBe(0);
+  });
+
+  test('3108 tras «Empezar», «Siguiente» y «Anterior» el foco va al enunciado de la pregunta nueva', async ({ page }) => {
+    // REPARADO el 09/10/2026. Antes: Forma del 1680 de
     // selector-smartphone (reparado en b0f31109 con un useEffect sobre [pantalla, paso]). Aquí solo
     // se lleva el foco al «Tu resultado». Medido el 09/10/2026:
     //   «Empezar» desaparece → foco en <body> · «Siguiente» se desactiva en la pregunta nueva (sin
@@ -867,7 +898,7 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     await page.keyboard.press('Enter');
     await page.getByText('Pregunta 2 de 10').first().waitFor();
     vistos.push(await foco());
-    // Obtenido hoy: ['body', 'body', 'a Ir a Orientador Alquiler vs Compra', 'body', 'button Pregunta anterior'].
+    // Obtenido antes de reparar: ['body', 'body', 'a Ir a Orientador Alquiler vs Compra', 'body', 'button Pregunta anterior'].
     expect(vistos).toEqual([
       'h2 ¿Cuánto tiempo prevés quedarte en esta ciudad o zona?',
       'h2 ¿Cuál es tu situación laboral actual?',
@@ -877,8 +908,8 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     ]);
   });
 
-  test.fail('C0016 b: teclado de radios (APG): las flechas mueven y marcan, y el grupo es UNA parada de Tab', async ({ page }) => {
-    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 1681 de
+  test('3109 teclado de radios (APG): las flechas mueven y marcan, y el grupo es UNA parada de Tab', async ({ page }) => {
+    // REPARADO el 09/10/2026. Antes: Forma del 1681 de
     // selector-smartphone (reparado en b0f31109: tabindex itinerante y teclaEnOpcion). Medido el
     // 09/10/2026: tabIndex [0, 0, 0, 0] (cuatro paradas de Tab), y ArrowDown sobre «Menos de 3 años»
     // no mueve el foco ni marca nada. La referencia, en el mismo navegador: [0, −1, −1, −1] y la
@@ -898,12 +929,12 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     await expect(page.getByRole('button', { name: 'Siguiente pregunta' })).toBeFocused();
   });
 
-  test.fail('C0104 (3): la guía educativa está en el HTML servido y se puede abrir antes del resultado', async ({ page }) => {
-    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 2663 de
+  test('3112 la guía educativa está en el HTML servido y se puede abrir antes del resultado', async ({ page }) => {
+    // REPARADO el 09/10/2026. Antes: Forma del 2663 de
     // selector-smartphone. EducationalSection monta siempre su contenido «porque Googlebot no hace
     // clic», pero aquí el componente entero va dentro de `pantalla === 'resultado'`: el HTML servido
     // no trae ni una línea de la guía (ni «Costes ocultos…» ni la frase de los gastos), y quien no
-    // termina las 10 preguntas no la ve. Obtenido hoy: false y 0 botones en la intro y en el test.
+    // termina las 10 preguntas no la ve. Obtenido antes de reparar: false y 0 botones en la intro y en el test.
     const html = await (await page.request.get('/selector-alquiler-vs-compra/')).text();
     expect(html).toContain('Costes ocultos de la compra que nadie menciona');
     await page.goto('/selector-alquiler-vs-compra/');
@@ -911,8 +942,8 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toHaveCount(1, { timeout: 1_000 });
   });
 
-  test.fail('C0008: las cifras de «Costes ocultos» no se publican sin fuente', async ({ page }) => {
-    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Sobrevivieron al 1463, que retiró
+  test('3113 las cifras de «Costes ocultos» no se publican sin fuente', async ({ page }) => {
+    // REPARADO el 09/10/2026. Antes: Sobrevivieron al 1463, que retiró
     // las horquillas sin fuente del plazo: page.tsx, l. 401-405, escritas a mano y sin derivar de
     // nada de data/ (data/fiscal no tiene IBI, seguro ni comisión de agencia). Si la reparación
     // conserva una cifra con su fuente, este test se reescribe con la fuente literal.
@@ -925,12 +956,17 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
       /obligatorio con hipoteca \(100-400[\s ]€\/año\)/,
       /agencia \(3-5[\s ]?%\)/,
     ].filter((re) => re.test(texto)).map(String);
-    // Obtenido hoy: las cuatro.
+    // Obtenido antes de reparar: las cuatro.
     expect(sinFuente).toEqual([]);
+    // «Seguro del hogar: obligatorio con hipoteca» era impreciso: lo exigible es el seguro contra
+    // daños del inmueble hipotecado, por su valor de tasación sin el suelo (RD 716/2009, art. 10.1,
+    // leído en el BOE el 09/10/2026). Y la guía ya no da un 30-35 % de cuota sobre ingresos sin fuente.
+    expect(texto).toContain('con hipoteca, la vivienda tiene que estar asegurada contra daños por su valor de tasación sin contar el suelo (Real Decreto 716/2009, art. 10)');
+    expect(texto).not.toMatch(/obligatorio con hipoteca|30-35/);
   });
 
-  test.fail('la guía no dice «pagarás IRPF por la ganancia» sin sus exenciones (data/fiscal/ganancia-inmueble.ts)', async ({ page }) => {
-    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). data/fiscal/ganancia-inmueble.ts
+  test('3114 la guía no dice «pagarás IRPF por la ganancia» sin sus exenciones (data/fiscal/ganancia-inmueble.ts)', async ({ page }) => {
+    // REPARADO el 09/10/2026. Antes: data/fiscal/ganancia-inmueble.ts
     // (arts. 33.4.b y 38 LIRPF): la ganancia por transmitir la vivienda habitual está exenta para los
     // mayores de 65 años, y total o parcialmente si se reinvierte en otra vivienda habitual. La guía,
     // que habla de la vivienda que el usuario compraría para vivir, dice «si vendes, pagarás agencia
@@ -940,10 +976,13 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     const texto = await guia(page);
     const hablaDelIrpf = /IRPF/.test(texto);
     expect(hablaDelIrpf ? /reinvers|mayores de 65/i.test(texto) : true).toBe(true);
+    // Las dos, con lo que dice la ley (leída en el BOE el 09/10/2026): el art. 33.4.b exime también
+    // a las personas en situación de dependencia severa o gran dependencia.
+    expect(texto).toContain('la ganancia está exenta para los mayores de 65 años (y para las personas en situación de dependencia severa o gran dependencia), y total o parcialmente con la reinversión de lo obtenido en otra vivienda habitual (Ley del IRPF, arts. 33.4.b y 38)');
   });
 
-  test.fail('los porcentajes llevan espacio duro antes del «%» (CLAUDE.md §2, desde el 25/09/2026)', async ({ page }) => {
-    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Medido el 09/10/2026 con
+  test('3115 los porcentajes llevan espacio duro antes del «%» (CLAUDE.md §2, desde el 25/09/2026)', async ({ page }) => {
+    // REPARADO el 09/10/2026. Antes: Medido el 09/10/2026 con
     // textContent (el carácter real), en las opciones y en el resultado con la guía abierta: 0 con
     // U+00A0, 9 pegados («Menos del 10% del precio buscado», «Entre el 10% y el 20%», «Más del 30%»,
     // «1% del valor», «(3-5%)», «30-35%» y «el 20% inicial» del aval, que viene de
@@ -958,7 +997,9 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
     }
     await page.getByRole('heading', { name: 'Tu resultado' }).waitFor();
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    textos.push((await page.locator('[class*="resultadosContainer"]').textContent()) ?? '');
+    // El resultado, la guía (fuera de él desde el 3112), el sello de datos y el FAQPage servido.
+    textos.push(...(await page.locator('[class*="resultadosContainer"], [class*="guiaContainer"], [aria-label="Datos de referencia normativos"]').allTextContents()));
+    textos.push(...(await page.locator('script[type="application/ld+json"]').allTextContents()).filter((b) => b.includes('FAQPage')));
     const separadores = [...textos.join(' ').matchAll(/\d([\s ]?)%/g)]
       .map((m) => (m[1] === ' ' ? 'U+00A0' : m[1] === '' ? 'pegado' : 'espacio normal'));
     expect(separadores.length).toBeGreaterThan(0);
@@ -1013,8 +1054,8 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
       hasTouch: true,
     });
 
-    test.fail('C0104 (1): tras «Empezar» y «Siguiente», el enunciado de la pregunta queda a la vista y por debajo de la barra del logo', async ({ page }) => {
-      // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 2657 de
+    test('3110 tras «Empezar» y «Siguiente», el enunciado de la pregunta queda a la vista y por debajo de la barra del logo', async ({ page }) => {
+      // REPARADO el 09/10/2026. Antes: Forma del 2657 de
       // selector-smartphone. Aquí no hay foco programático en las preguntas, así que la página no se
       // mueve: la pregunta nueva se pinta donde estaba la anterior. Medido el 09/10/2026 tocando
       // como un usuario (tap(), que desplaza lo justo): a 390 px las 10 preguntas en y 20..74 (P4 y
@@ -1030,6 +1071,10 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
         await page.waitForTimeout(150);
         const m = await bajoLaBarra(page, '[class*="preguntaTexto"]');
         if (m.tapado || m.top < m.barra) fuera.push(`P${i}: enunciado en y ${m.top}..${m.bottom}, barra hasta ${m.barra}`);
+        // Lee la pregunta antes de tocar, como en selector-smartphone (2659): a velocidad de máquina el
+        // toque llega a menos de 300 ms y 100 px del de «Siguiente», Chrome lo cuenta como el 2.º de la
+        // ráfaga, y la receta clicDeMas (hallazgo 3111) lo ignora a propósito.
+        await page.waitForTimeout(500);
         await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
         await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
       }
@@ -1042,6 +1087,10 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
       await abrirMovil(page);
       await page.getByRole('button', { name: /Empezar el test/ }).tap();
       for (let i = 0; i < 10; i++) {
+        // Lee la pregunta antes de tocar, como en selector-smartphone (2659): a velocidad de máquina el
+        // toque llega a menos de 300 ms y 100 px del de «Siguiente», Chrome lo cuenta como el 2.º de la
+        // ráfaga, y la receta clicDeMas (hallazgo 3111) lo ignora a propósito.
+        await page.waitForTimeout(500);
         await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
         await page.getByRole('button', { name: i === 9 ? 'Ver resultado' : 'Siguiente pregunta' }).tap();
       }
@@ -1064,7 +1113,27 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
 
     // +3 +4 +2 +3 +1 0 +1 +1 0 +2 = +17 → comprar (el NORMAL de la inspección del 24/09, con el que se
     // midió la pantalla del resultado).
-    const NORMAL_17 = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 20% y el 30%', 'Muy improbable, estoy arraigado/a', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Estabilidad y echar raíces'] as const;
+    const NORMAL_17 = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 20 % y el 30 %', 'Muy improbable, estoy arraigado/a', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Estabilidad y echar raíces'] as const;
+
+    test('3110 a 360 px, con «Siguiente» a media pantalla, el enunciado de las 10 preguntas queda a la vista y bajo la barra', async ({ page }) => {
+      // El caso más duro de la ficha: a 360×740 la 1 estaba en y −58..23 y de la 2 a la 10 por ENCIMA
+      // del borde; con el botón a media pantalla (y 360), de la 3 a la 10 fuera en los dos anchos.
+      await abrirMovil(page);
+      await page.getByRole('button', { name: /Empezar el test/ }).tap();
+      const fuera: string[] = [];
+      for (let i = 1; i <= 10; i++) {
+        await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();
+        await page.waitForTimeout(150);
+        const m = await bajoLaBarra(page, '[class*="preguntaTexto"]');
+        if (m.tapado || m.top < m.barra) fuera.push(`P${i}: enunciado en y ${m.top}..${m.bottom}, barra hasta ${m.barra}`);
+        await page.waitForTimeout(500);
+        await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+        if (i === 10) break;
+        const p = await colocar(page, 'Siguiente pregunta', 360);
+        await page.touchscreen.tap(p.x, p.y);
+      }
+      expect(fuera, 'enunciados bajo la barra o fuera de la vista').toEqual([]);
+    });
 
     test('C0104 (2), descartado en «Empezar»: un doble toque no contesta la pregunta 1', async ({ page }) => {
       // Medido el 09/10/2026 con el botón a 15 alturas (y 120..680, de 40 en 40): el segundo toque
@@ -1079,8 +1148,8 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
       await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0);
     });
 
-    test.fail('C0104 (2): un doble toque en «Siguiente» de la pregunta 1 no contesta la 2', async ({ page }) => {
-      // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 2659 de
+    test('3111 un doble toque en «Siguiente» de la pregunta 1 no contesta la 2', async ({ page }) => {
+      // REPARADO el 09/10/2026. Antes: Forma del 2659 de
       // selector-smartphone (receta `clicDeMas`: se ignora el clic con detail > 1 si el anterior
       // cambió de pantalla). Medido el 09/10/2026 a 360 y 390 px: con «Siguiente» entre y 150 y 350,
       // el segundo toque (detail 2) cae en «Contrato temporal o en transición» de la pregunta 2 y la
@@ -1096,12 +1165,12 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
       await page.touchscreen.tap(p.x, p.y);
       await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible();
       await page.waitForTimeout(300);
-      // Obtenido hoy: 1 («Contrato temporal o en transición»).
+      // Obtenido antes de reparar: 1 («Contrato temporal o en transición»).
       await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0, { timeout: 1_000 });
     });
 
-    test.fail('C0104 (2): un doble toque en «Ver resultado» no saca de la app', async ({ page }) => {
-      // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). El primer toque monta el
+    test('3111 un doble toque en «Ver resultado» no saca de la app', async ({ page }) => {
+      // REPARADO el 09/10/2026. Antes: El primer toque monta el
       // resultado y el foco al «Tu resultado» sube la página arriba del todo; el segundo cae en lo que
       // haya allí, que es la cabecera común: el enlace «Contacto» y la banda de Delegum que pinta
       // <LegalNotice />. Medido el 09/10/2026 a 360 y 390 px con el botón a 15 alturas (y 280..560):
@@ -1112,6 +1181,10 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
       const origen = new URL(page.url()).origin;
       await page.getByRole('button', { name: /Empezar el test/ }).tap();
       for (let i = 0; i < 10; i++) {
+        // Lee la pregunta antes de tocar, como en selector-smartphone (2659): a velocidad de máquina el
+        // toque llega a menos de 300 ms y 100 px del de «Siguiente», Chrome lo cuenta como el 2.º de la
+        // ráfaga, y la receta clicDeMas (hallazgo 3111) lo ignora a propósito.
+        await page.waitForTimeout(500);
         await page.locator('[role="radiogroup"] [role="radio"]', { has: page.getByText(NORMAL_17[i], { exact: true }) }).tap();
         if (i < 9) await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
       }
@@ -1121,7 +1194,7 @@ test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, mó
       await page.waitForTimeout(150);
       await page.touchscreen.tap(p.x, p.y);
       await page.waitForTimeout(600);
-      // Obtenido hoy: https://delegum.com/soluciones/?from=meskeia.
+      // Obtenido antes de reparar: https://delegum.com/soluciones/?from=meskeia.
       expect(page.url()).toBe(`${origen}/selector-alquiler-vs-compra/`);
       await expect(page.getByRole('heading', { name: 'Tu resultado' })).toBeVisible({ timeout: 1_000 });
     });
