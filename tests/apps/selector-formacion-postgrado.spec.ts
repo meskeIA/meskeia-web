@@ -589,3 +589,376 @@ test.describe('Reparación 24/09/2026 — restricciones declaradas, datos de la 
     expect(features.length).toBeLessThanOrEqual(8);
   });
 });
+
+/**
+ * RE-INSPECCIÓN 09/10/2026 (Inspector) — la app se invalidó por el refactor compartido de
+ * relacionadas del 08/10 (99e1ee7e). Casos resueltos a mano con los pesos de motor.ts ANTES de
+ * ejecutar la app, y las sospechas de la entrada de cabos sobre esta app:
+ *
+ *   · C0006 (desempate en superlativo encadenado, la forma del 1442 de mascota) — DESCARTADA.
+ *     Ninguna opción de la pregunta 1 ni de la 5 da el mismo peso no nulo a dos vías, así que dos
+ *     vías solo empatan en ellas a 0; quien no se separa por la motivación tiene 0 en ella igual que
+ *     la recomendada, y entonces la recomendada no puede ganar a nadie por motivación (ídem con el
+ *     objetivo). La cadena «y, a igualdad,» no se forma nunca: de 57.371 empates, 46.497 los deshace
+ *     la motivación, 8.348 el objetivo y 2.526 el coste, y 0 encadenan dos criterios. El test de
+ *     abajo lo fija: si un cambio de pesos lo hiciera posible, exige que el superlativo sea verdad
+ *     frente a TODAS las empatadas.
+ *   · C0104 (3) guía montada solo en el resultado — DESCARTADA: los 7 bloques están desde la carga.
+ *   · C0104 (1) el título del resultado no queda bajo la barra (213-407 px frente a 52/77); sí queda
+ *     fuera de la vista el enunciado de cada pregunta nueva (ver C0016 b).
+ *   · Lo demás son hallazgos nuevos: test.fail() con «ABIERTO».
+ */
+test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la familia y lo que el testigo no ve', () => {
+  const textos = async (page: Page, sel: string): Promise<string[]> =>
+    (await page.locator(sel).allInnerTexts()).map((s) => s.replace(/\s+/g, ' ').trim());
+  const sinEmoji = (s: string) => s.replace(/^\S+\s/, '');
+  const textoGuia = (page: Page) =>
+    page.locator('[class*="guideSection"]').evaluateAll((els) => els.map((e) => e.textContent ?? '').join(' ').replace(/\s+/g, ' '));
+  const titulo = (page: Page) => page.locator('[class*="resultadoTitulo"]');
+  const avisoRestricciones = (page: Page) => page.locator('[class*="avisoRestricciones"]');
+
+  // Cambiar de sector · 1-2 años compaginando · Otro sector · 2.000-6.000 € · Habilidades prácticas
+  // en mi sector · 1-3 años · PRESENCIAL · Sanidad, industria… · En 1-2 años · Titulación pública.
+  const NORMAL_FP = [2, 1, 2, 1, 3, 1, 0, 3, 1, 1] as const;
+
+  test('caso normal: FP de grado superior con 31 puntos, sin empate ni aviso', async ({ page }) => {
+    // A mano (pesos de motor.ts):
+    //   FP 3 (P2) + 2 (P3) + 3 (P4) + 4 (P5) + 2 (P6) + 3 (P7) + 5 (P8) + 4 (P9) + 5 (P10) = 31
+    //   bootcamp 4 (P1) + 4 (P3) + 3 (P4) + 3 (P6) = 14 · certificación 2 + 2 + 3 + 2 = 9
+    //   máster 3 (P2) + 3 (P7) + 3 (P9) = 9 · oposiciones 2 + 2 + 2 + 2 = 8.
+    // Ningún límite: presupuesto hasta 6.000 €, «1-2 años» (24 meses) y «En 1-2 años» no apartan
+    // nada (las oposiciones empiezan en 24) y no se pide título universitario. Máster y
+    // certificación empatan a 9 FUERA de cabeza: la motivación da 2 a la certificación y 0 al
+    // máster, así que la certificación va antes en la comparativa.
+    await abrirTest(page);
+    await responder(page, NORMAL_FP);
+    await expect(titulo(page)).toHaveText('FP de Grado Superior');
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    await expect(avisoRestricciones(page)).toHaveCount(0);
+    expect(await textos(page, '[class*="alternativaPct"]')).toEqual(['31 puntos', '14 puntos', '9 puntos', '9 puntos', '8 puntos']);
+    expect((await textos(page, '[class*="alternativaLabel"]')).map(sinEmoji)).toEqual(['FP Superior', 'Bootcamp', 'Certificación', 'Máster', 'Oposiciones']);
+    // Las tres que más suman a la FP: 5 (sector), 5 (título) y 4 (objetivo, pregunta 5, antes que
+    // la urgencia, pregunta 9, que también da 4).
+    expect(await textos(page, '[class*="razones"] li')).toEqual([
+      'Sector: has respondido «Sanidad, industria, comercio o sector técnico», que suma 5 puntos a la FP de grado superior.',
+      'Título: has respondido «Prefiero titulación pública con valor en el mercado», que suma 5 puntos a la FP de grado superior.',
+      'Objetivo profesional: has respondido «Adquirir habilidades prácticas reconocidas en mi sector», que suma 4 puntos a la FP de grado superior.',
+    ]);
+    await expect(page.locator('[class*="warningBox"]')).toContainText('Duración estimada: 1-2 años');
+    await expect(page.locator('[class*="warningBox"]')).toContainText('Coste orientativo: 0 – 2.000 € (pública/privada)');
+  });
+
+  // Estabilidad · 1-2 años · Recién graduado · 2.000-6.000 € · Tecnología o startups · Sin
+  // experiencia · Presencial · Empresa… · En 1-2 años · Habilidades más que el título.
+  const EMPATE_COSTE = [0, 1, 0, 1, 2, 0, 0, 2, 1, 2] as const;
+
+  test('límite: empate a 19 entre FP y máster que solo deshace el coste mínimo', async ({ page }) => {
+    // A mano: máster 3 + 3 + 3 + 3 + 4 + 3 = 19 (P2, P3, P6, P7, P8, P9) · FP 3 + 3 + 3 + 3 + 3 + 4
+    // = 19 (P2, P3, P4, P6, P7, P9) · certificación 1 + 2 + 3 + 3 + 4 = 13 · oposiciones
+    // 4 + 2 + 2 + 2 + 2 = 12 · bootcamp 3 + 5 + 4 = 12. La motivación («estabilidad») y el objetivo
+    // («tecnología») dan 0 a las dos empatadas: decide el coste mínimo, FP 0 € frente a máster
+    // 820,80 €. Oposiciones y bootcamp empatan a 12 y la motivación da 4 a oposiciones.
+    await abrirTest(page);
+    await responder(page, EMPATE_COSTE);
+    await expect(titulo(page)).toHaveText('FP de Grado Superior');
+    await expect(page.locator('[class*="avisoEmpate"]')).toContainText(
+      'Empate: con tus respuestas, la FP de grado superior y el máster universitario encajan exactamente igual; se muestra primero la FP de grado superior porque su coste mínimo es el más bajo.',
+    );
+    expect(await textos(page, '[class*="alternativaPct"]')).toEqual(['19 puntos', '19 puntos', '13 puntos', '12 puntos', '12 puntos']);
+    expect((await textos(page, '[class*="alternativaLabel"]')).map(sinEmoji)).toEqual(['FP Superior', 'Máster', 'Certificación', 'Oposiciones', 'Bootcamp']);
+    expect((await textos(page, '[class*="razones"] li'))[0]).toBe('Urgencia: has respondido «En 1-2 años, puedo esperar», que suma 4 puntos a la FP de grado superior.');
+  });
+
+  // Cambiar de sector · 3-6 MESES · Otro sector · MENOS DE 2.000 € · Tecnología · Sin experiencia ·
+  // Presencial · Tecnología · LO ANTES POSIBLE · NECESITO UN TÍTULO UNIVERSITARIO.
+  const LIMITE_TODO = [2, 0, 2, 0, 2, 0, 0, 0, 0, 0] as const;
+
+  test('límite: ninguna vía cumple todo y la certificación es la única que incumple uno solo', async ({ page }) => {
+    // A mano: bootcamp 4 + 4 + 4 + 5 + 5 + 4 = 26 · certificación 2 + 2 + 4 + 3 + 3 + 4 = 18 · máster
+    // 3 + 3 + 5 = 11 · FP 2 + 2 + 3 + 3 = 10 · oposiciones 3 + 2 + 2 = 7. Límites: menos de 2.000 €
+    // aparta el bootcamp (desde 2.000 €); 3-6 meses y «lo antes posible» apartan máster, FP y
+    // oposiciones (12, 12 y 24 meses); el título aparta todo menos el máster. Incumplen: máster 2,
+    // FP 3, bootcamp 2, oposiciones 3, certificación 1 → la certificación, SOLA.
+    await abrirTest(page);
+    await responder(page, LIMITE_TODO);
+    await expect(titulo(page)).toHaveText('Certificación Profesional');
+    await expect(avisoRestricciones(page)).toContainText(
+      'Ninguna vía cumple a la vez todo lo que has declarado. La certificación profesional es la que menos choca con tus límites, pero no da un título universitario oficial, y has respondido que lo necesitas.',
+    );
+    expect(await textos(page, '[class*="alternativaPct"]')).toEqual(['18 puntos', '26 puntos', '11 puntos', '10 puntos', '7 puntos']);
+    expect(await page.locator('[class*="alternativaItem"]').evaluateAll((els) => els.map((e) => (e.querySelector('[class*="alternativaIncumple"]')?.textContent ?? '').trim()))).toEqual([
+      'sin título universitario oficial',
+      'fuera de tu presupuesto · sin título universitario oficial',
+      'más larga que tu tiempo disponible · más larga que tu urgencia',
+      'más larga que tu tiempo disponible · más larga que tu urgencia · sin título universitario oficial',
+      'más larga que tu tiempo disponible · más larga que tu urgencia · sin título universitario oficial',
+    ]);
+  });
+
+  test('rechazo: sin contestar la 10, «Ver resultado» no hace nada (ni clic forzado ni Enter)', async ({ page }) => {
+    await abrirTest(page);
+    const boton = page.getByRole('button', { name: /^Siguiente|^Ver resultado/ });
+    for (let k = 0; k < 9; k++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').nth(1).click();
+      await boton.click();
+    }
+    await expect(page.locator('[class*="progresoTexto"]')).toHaveText('10 / 10');
+    await expect(boton).toHaveText(/Ver resultado/);
+    await expect(boton).toBeDisabled();
+    await boton.click({ force: true });
+    await boton.evaluate((b) => (b as HTMLButtonElement).focus());
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(300);
+    await expect(titulo(page)).toHaveCount(0);
+    await expect(page.locator('[class*="progresoTexto"]')).toHaveText('10 / 10');
+  });
+
+  test('C0006 descartada: ningún empate encadena dos criterios, y si los encadenara el superlativo sería verdad', () => {
+    test.setTimeout(180_000);
+    // La razón, comprobable sin enumerar: en las preguntas 1 y 5 ninguna opción da el MISMO peso
+    // no nulo a dos vías.
+    for (const id of [1, 5]) {
+      for (const o of PREGUNTAS[id - 1].opciones) {
+        const positivos = Object.values(o.pesos).filter((v) => (v ?? 0) > 0);
+        expect(new Set(positivos).size, `pregunta ${id}, «${o.texto}»`).toBe(positivos.length);
+      }
+    }
+    const r: Record<number, number> = {};
+    const peso = (id: number, k: TipoFormacion) => PREGUNTAS[id - 1].opciones[r[id]].pesos[k] ?? 0;
+    let empates = 0;
+    let encadenados = 0;
+    const falsos: string[] = [];
+    const recorrer = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        const res = calcularResultado(r);
+        if (res.empatadas.length === 0) return;
+        empates++;
+        const decisivo = (k: TipoFormacion) => (peso(1, res.tipo) !== peso(1, k) ? 0 : peso(5, res.tipo) !== peso(5, k) ? 1 : 2);
+        const usados = [...new Set(res.empatadas.map(decisivo))];
+        if (usados.length > 1) {
+          encadenados++;
+          // Leído contra TODAS las empatadas (hallazgo 1442 de mascota, 2678 de calefacción).
+          if (usados.includes(2) && res.empatadas.some((k) => COSTE_MINIMO[k] < COSTE_MINIMO[res.tipo]) && falsos.length < 5) falsos.push(JSON.stringify(r));
+          if (usados.includes(1) && res.empatadas.some((k) => peso(5, k) > peso(5, res.tipo)) && falsos.length < 5) falsos.push(JSON.stringify(r));
+        }
+        return;
+      }
+      for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) {
+        r[PREGUNTAS[i].id] = k;
+        recorrer(i + 1);
+      }
+    };
+    recorrer(0);
+    expect(empates).toBe(57_371);
+    expect(encadenados).toBe(0);
+    expect(falsos).toEqual([]);
+  });
+
+  test('C0104 (3) descartada: la guía está montada desde la carga, no solo en el resultado', async ({ page }) => {
+    await abrirTest(page);
+    await expect(page.locator('[role="radiogroup"]')).toHaveCount(1);
+    await expect(page.locator('[class*="guideSection"]')).toHaveCount(7);
+    // El botón que la despliega se anuncia como «Ver guía educativa» (aria-label de EducationalSection).
+    await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toHaveCount(1);
+  });
+
+  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0016 a.
+  test.fail('C0016 a: teclado de radios (APG): las flechas mueven y marcan, y el grupo es una sola parada de Tab', async ({ page }) => {
+    // La referencia de la familia (selector-smartphone, hallazgo 1681): tabindex 0 / -1 / -1 / -1 y
+    // ArrowDown lleva el foco al radio siguiente y lo marca. Aquí, medido: los cuatro radios sin
+    // tabindex (cuatro paradas de Tab) y ArrowDown deja el foco en el primero sin marcar nada.
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    await radios.first().focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused();
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).not.toBe('radio');
+  });
+
+  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0016 b.
+  test.fail('C0016 b: tras «Siguiente» el foco va al enunciado de la pregunta nueva, no a <body>', async ({ page }) => {
+    // Medido: el botón «Siguiente» se desactiva con el foco dentro (la pregunta 2 está sin
+    // contestar) y el foco cae a <body>; el siguiente Tab sale a «Ver Guía Completa», DESPUÉS del
+    // cuestionario. La referencia lo lleva al enunciado (smartphone, hallazgo 1680).
+    await abrirTest(page);
+    await page.locator('[role="radiogroup"] [role="radio"]').nth(1).click();
+    await page.getByRole('button', { name: /^Siguiente/ }).click();
+    await expect(page.locator('[class*="progresoTexto"]')).toHaveText('2 / 10');
+    await expect
+      .poll(() => page.evaluate(() => (document.activeElement === document.body ? 'BODY' : (document.activeElement?.textContent ?? '').trim())))
+      .toBe('¿Cuánto tiempo puedes dedicar a la formación?');
+  });
+
+  // Cambiar de sector · 3-6 meses · Otro sector · 6.000-15.000 € · Tecnología · 1-3 años ·
+  // PRESENCIAL · Tecnología · Lo antes posible · Habilidades más que el título.
+  const PRESENCIAL_BOOT = [2, 0, 2, 2, 2, 1, 0, 0, 0, 2] as const;
+
+  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0011 a.
+  test.fail('C0011 a: a quien prefiere formación presencial, una vía «online» no se le recomienda en silencio', async ({ page }) => {
+    // A mano: bootcamp 4 + 4 + 4 + 3 + 5 + 3 + 5 + 4 + 4 = 36 · certificación 2 + 2 + 3 + 3 + 4 + 4
+    // = 18 · FP 2 + 2 + 3 = 7 · máster 3 + 3 = 6 · oposiciones 2 + 2 = 4. Ningún límite aparta el
+    // bootcamp: gana «Bootcamp / Formación Online Intensiva» a quien ha marcado «Presencial, con
+    // contacto directo con docentes y compañeros», y nada en el resultado lo dice (la modalidad no
+    // suma al bootcamp, así que tampoco sale en las razones). Enumerado: de 262.144 perfiles con
+    // «Presencial», 40.903 reciben el bootcamp y 111.513 la certificación («Formato flexible y
+    // online» como ventaja clave). La hermana selector-mascota dice las respuestas que juegan EN
+    // CONTRA de la ganadora (`tensiones`, hallazgo 1443).
+    await abrirTest(page);
+    await responder(page, PRESENCIAL_BOOT);
+    const tarjeta = (await page.locator('section[class*="resultado"]').innerText()).replace(/\s+/g, ' ');
+    const recomiendaOnline = /online/i.test(`${await titulo(page).innerText()} ${(await textos(page, '[class*="resultadoPuntos"] [role="listitem"]')).join(' ')}`);
+    expect(recomiendaOnline && !/presencial/i.test(tarjeta), 'vía online a quien prefiere presencial, sin decirlo').toBe(false);
+  });
+
+  // Especializarme · 1-2 años · DESEMPLEADO · Más de 15.000 € o beca · Título oficial · Más de 7
+  // años · Híbrido · Empresa… · Sin urgencia · Certificado internacional.
+  const MASTER_SIN_PREGUNTAR_GRADO = [1, 1, 3, 3, 1, 3, 2, 2, 3, 3] as const;
+
+  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0011 b.
+  test.fail('C0011 b: si recomienda el máster, dice que su acceso pide un título universitario de grado', async ({ page }) => {
+    // A mano: máster 4 + 3 + 4 + 4 + 2 + 3 + 4 + 4 + 2 = 30 · FP 1 + 3 + 3 + 2 + 2 + 2 = 13 ·
+    // certificación 5 + 3 + 5 = 13 · bootcamp 3 + 2 = 5 · oposiciones 2 + 2 = 4; ningún límite.
+    // Ninguna de las 10 preguntas pregunta si se tiene un grado, y la guía se dirige también a quien
+    // solo ha «acumulado experiencia laboral»; la propia guía da el requisito por supuesto («la
+    // opción más adecuada si tienes un grado universitario»; acceso con título extranjero, RD
+    // 822/2021, art. 18.2), pero la tarjeta del resultado no lo dice. Enumerado: el máster sale en
+    // 267.630 de 1.048.576 perfiles, 58.760 de ellos con «Llevo tiempo desempleado/a».
+    await abrirTest(page);
+    await responder(page, MASTER_SIN_PREGUNTAR_GRADO);
+    await expect(titulo(page)).toHaveText('Máster Universitario');
+    const tarjeta = (await page.locator('section[class*="resultado"]').innerText()).replace(/\s+/g, ' ');
+    expect(tarjeta).toMatch(/\bgrado universitario|título (universitario )?de grado|un grado\b/i);
+  });
+
+  // Cambiar de sector · 3-6 meses · DESEMPLEADO · MENOS DE 2.000 € · Tecnología · 1-3 años · Online
+  // · Tecnología · Lo antes posible · Habilidades más que el título.
+  const DESEMPLEADO_SEPE = [2, 0, 3, 0, 2, 1, 1, 0, 0, 2] as const;
+
+  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0008.
+  test.fail('C0008: el bootcamp no se aparta por un coste mínimo de 2.000 € que la propia guía contradice', async ({ page }) => {
+    // A mano: bootcamp 4 + 4 + 3 + 5 + 3 + 3 + 5 + 4 + 4 = 35 · certificación 2 + 2 + 4 + 3 + 4 + 3 +
+    // 4 + 4 = 26 · FP 3 + 2 + 2 = 7 · oposiciones 2 + 3 + 2 = 7 · máster 0. Con menos de 2.000 € se
+    // aparta el bootcamp «porque su coste orientativo empieza en 2.000 €» (horquilla sin fuente),
+    // y gana la certificación; la guía de la misma página dice que «algunos están subvencionados por
+    // el SEPE o tienen financiación ISA». Enumerado: en 15.314 perfiles el bootcamp sería la
+    // recomendación de no ser por ese mínimo.
+    await abrirTest(page);
+    await responder(page, DESEMPLEADO_SEPE);
+    const aviso = await avisoRestricciones(page).allInnerTexts();
+    const guia = await textoGuia(page);
+    const aparta = aviso.some((a) => a.includes('coste orientativo empieza en 2.000 €'));
+    expect(aparta && /subvencionados por el SEPE/.test(guia), 'aparta por 2.000 € lo que la guía dice que puede ser subvencionado').toBe(false);
+  });
+
+  // Cambiar de sector · 3-6 meses · Otro sector · 2.000-6.000 € · Tecnología · 1-3 años · Online ·
+  // Tecnología · Lo antes posible · NECESITO UN TÍTULO UNIVERSITARIO (el perfil del test de 1447).
+  const MENOS_CHOCA = [2, 0, 2, 1, 2, 1, 1, 0, 0, 0] as const;
+
+  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026).
+  test.fail('«es la que menos choca con tus límites» no se dice de una vía si otra choca exactamente igual', async ({ page }) => {
+    // A mano: bootcamp 35 · certificación 2 + 2 + 2 + 3 + 4 + 3 + 4 = 20 · FP 2 + 3 + 2 = 7 · máster
+    // 5 · oposiciones 2. Incumplen: bootcamp 1 (título) y certificación 1 (título); máster 2,
+    // oposiciones 3, FP 3. Las dos candidatas chocan igual y la elegida lo es por afinidad, pero el
+    // aviso afirma que el bootcamp es «la que menos choca». Enumerado: de 163.840 perfiles con ese
+    // aviso, en 155.648 otra candidata incumple los mismos límites (la forma del superlativo del
+    // 1442, aquí en el aviso de restricciones).
+    await abrirTest(page);
+    await responder(page, MENOS_CHOCA);
+    await expect(titulo(page)).toHaveText('Bootcamp / Formación Online Intensiva');
+    const notas = await page.locator('[class*="alternativaItem"]').evaluateAll((els) => els.map((e) => (e.querySelector('[class*="alternativaIncumple"]')?.textContent ?? '').trim()));
+    expect(notas.slice(0, 2)).toEqual(['sin título universitario oficial', 'sin título universitario oficial']);
+    await expect(avisoRestricciones(page)).not.toContainText('El bootcamp es la que menos choca con tus límites');
+  });
+
+  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026).
+  test.fail('el «%» va separado con espacio duro (U+00A0), en la guía y en el FAQPage', async ({ page }) => {
+    // Regla del 25/09/2026 (CLAUDE.md global §2): el código nuevo la cumple y lo anterior se corrige
+    // cuando pasa el Inspector. Medido: «51,1 %», «65 %», «75 %» y «100 %» en la guía, y «86,1 %» y
+    // «87,3 %» en el FAQPage, los seis con espacio normal (U+0020), que deja saltar el «%» solo.
+    // Al repararlo, las cadenas literales de los tests 1451 y 1453 (de arriba) cambian con él.
+    await abrirTest(page);
+    const guia = await textoGuia(page);
+    const faq = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    const conEspacioNormal = [...`${guia} ${faq}`.matchAll(/\d+(,\d+)? %/g)].map((m) => m[0]);
+    expect(conEspacioNormal).toEqual([]);
+  });
+
+  test.describe('móvil 360 × 740', () => {
+    test.use({
+      viewport: { width: 360, height: 740 },
+      userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    const fondoBarra = (page: Page) =>
+      page.evaluate(() => Math.max(...[...document.querySelectorAll('[class*="headerBar"] > *')].map((e) => e.getBoundingClientRect().bottom)));
+
+    test('C0104 (1): tras «Ver resultado» el título del resultado no queda bajo la barra del logo', async ({ page }) => {
+      // Medido el 09/10: título a 213-407 px y barra hasta 52 px (77 en escritorio), con el botón
+      // tocado al pie, en el centro o arriba de la pantalla.
+      await abrirTest(page);
+      for (let k = 0; k < 10; k++) {
+        await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+        const boton = page.getByRole('button', { name: /^Siguiente|^Ver resultado/ });
+        await boton.evaluate((b) => b.scrollIntoView({ block: 'end' }));
+        await boton.tap();
+      }
+      await titulo(page).waitFor();
+      const caja = await titulo(page).boundingBox();
+      expect(caja?.y ?? -1).toBeGreaterThanOrEqual(await fondoBarra(page));
+    });
+
+    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0016 b y C0104 (1).
+    test.fail('C0016 b / C0104 (1): tras «Siguiente» el enunciado de la pregunta nueva se ve, debajo de la barra', async ({ page }) => {
+      // Medido: con «Siguiente» en el centro de la pantalla, el enunciado de la pregunta 2 queda a
+      // −197 px (fuera de la vista, por encima); nada desplaza la página ni lleva el foco a él.
+      await abrirTest(page);
+      await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+      const boton = page.getByRole('button', { name: /^Siguiente/ });
+      await boton.evaluate((b) => b.scrollIntoView({ block: 'center' }));
+      await boton.tap();
+      await expect(page.locator('[class*="progresoTexto"]')).toHaveText('2 / 10');
+      await page.waitForTimeout(300);
+      const caja = await page.locator('[class*="preguntaTexto"]').boundingBox();
+      expect(caja?.y ?? -1).toBeGreaterThanOrEqual(await fondoBarra(page));
+    });
+
+    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0104 (2).
+    test.fail('C0104 (2): un doble toque en «Siguiente» avanza UNA pregunta, sin contestar la siguiente ni volver atrás', async ({ page }) => {
+      test.setTimeout(120_000);
+      // Doble clic REAL (mouse.dblclick: detail 1 y 2 en el mismo punto) en el centro de
+      // «Siguiente», con la opción más baja marcada. Medido: en la 3 y en la 5 el segundo toque cae
+      // en «Anterior» (la botonera de la pregunta nueva queda más arriba) y deshace el avance; en la
+      // 4 marca en la 5 «Adquirir habilidades prácticas reconocidas en mi sector» (+4 FP, +3
+      // certificación) sin que nadie la elija. La referencia descarta el clic de más (smartphone,
+      // hallazgo 2659: `detail > 1` tras un cambio de pantalla).
+      const anomalias: string[] = [];
+      for (let q = 0; q < 10; q++) {
+        await abrirTest(page);
+        for (let k = 0; k < q; k++) {
+          await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+          await page.getByRole('button', { name: /^Siguiente/ }).tap();
+        }
+        await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+        const boton = page.getByRole('button', { name: /^Siguiente|^Ver resultado/ });
+        await boton.evaluate((b) => b.scrollIntoView({ block: 'center' }));
+        const caja = await boton.boundingBox();
+        if (!caja) throw new Error(`pregunta ${q + 1}: sin botón`);
+        await page.mouse.dblclick(caja.x + caja.width / 2, caja.y + caja.height / 2);
+        await page.waitForTimeout(400);
+        if (q < 9) {
+          const pregunta = await page.locator('[class*="progresoTexto"]').innerText();
+          const marcadas = await page.locator('[role="radiogroup"] [aria-checked="true"]').count();
+          if (pregunta !== `${q + 2} / 10` || marcadas !== 0) anomalias.push(`pregunta ${q + 1}: queda en ${pregunta} con ${marcadas} marcada(s)`);
+        } else if ((await titulo(page).count()) !== 1 || !page.url().endsWith('/selector-formacion-postgrado/')) {
+          anomalias.push(`pregunta 10: ${page.url()}`);
+        }
+      }
+      expect(anomalias).toEqual([]);
+    });
+  });
+});

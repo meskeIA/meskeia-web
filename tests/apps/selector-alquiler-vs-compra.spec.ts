@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
 import { calcularResultado, PREGUNTAS, UMBRAL } from '../../app/selector-alquiler-vs-compra/motor';
 import { calcularITP, calcularNotario, calcularRegistro, ITP_CCAA, type ComunidadAutonoma } from '../../data/itp-ccaa';
 
@@ -674,4 +674,456 @@ test('móvil y escritorio: el logo fijo no tapa el título, ni en la intro ni en
     solapes.push(...(await medir(`${ancho}px resultado`)));
   }
   expect(solapes).toEqual([]);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// Re-inspección 09/10/2026 (Inspector en tarea, copia aparte). Invalidada por el refactor de las
+// relacionadas del 08/10 (99e1ee7e); entra por los cabos C0008, C0011, C0016 y C0104. El testigo
+// de familia (tests/familias/selectores.spec.ts) ya mide radios y barra de la pregunta 1: esto es
+// lo que el testigo no ve. App de referencia: selector-smartphone (b0f31109 y 02/10/2026).
+//
+// Cada valor esperado se resolvió A MANO con los pesos de motor.ts (suma de las 10 respuestas
+// contra ±8, razones = las 3 de más peso hacia el veredicto, a igual peso por orden de pregunta)
+// ANTES de abrir el navegador. Los test.fail() son hallazgos ABIERTOS (pendientes de número,
+// inspector 09/10/2026): cuando se reparen, pasan a exigir la reparación.
+// ─────────────────────────────────────────────────────────────────────────────────────────
+test.describe('Re-inspección 09/10/2026 — razones ocultas, foco, teclado, móvil, guía y cifras', () => {
+  // +4 «Indefinidamente» · +2 «Autónomo consolidado» · +4 «Más del 30%» · +1 «remoto» · +3 «Con hijos»
+  // · −2 «Ambos están muy caros» · +1 «La acepto» · −1 «dependientes» · 0 «asumibles» · +2 «Estabilidad»
+  // = +14 ≥ +8 → comprar, sin límites (ahorro ≥ 20 %, horizonte ≥ 3 años).
+  const NORMAL_14 = ['Indefinidamente', 'Autónomo consolidado (+3 años)', 'Más del 30%', 'Trabajo en remoto, tengo libertad total', 'Con hijos o planificándolos', 'Ambos están muy caros', 'La acepto si los números tienen sentido', 'Tengo dependientes a mi cargo', 'Me generaría pérdidas asumibles', 'Estabilidad y echar raíces'] as const;
+  // −1 «Entre 3 y 7 años» · −3 «temporal» · +2 «20-30 %» · −1 «No descarto» · −1 «solo» · −3 «Compra muy
+  // cara» · +1 «La acepto» · −1 «dependientes» · 0 «asumibles» · 0 «Optimizar» = −7 → esperar (alquilar
+  // empieza en −8 INCLUIDO: −7 se queda a un punto).
+  const MENOS_7 = ['Entre 3 y 7 años', 'Contrato temporal o en transición', 'Entre el 20% y el 30%', 'No descarto que ocurra', 'Vivo solo/a, sin planes inmediatos', 'Compra muy cara, alquiler razonable', 'La acepto si los números tienen sentido', 'Tengo dependientes a mi cargo', 'Me generaría pérdidas asumibles', 'Optimizar el gasto mensual'] as const;
+  // −1 «Entre 3 y 7 años» · +2 «Autónomo consolidado» · +2 «20-30 %» · +1 «remoto» · +1 «pareja»
+  // · 0 «Equilibrado» · +1 «La acepto» · +1 «leve» · +2 «Tengo margen» · +2 «Estabilidad» = +11 → comprar.
+  const OCULTO_11 = ['Entre 3 y 7 años', 'Autónomo consolidado (+3 años)', 'Entre el 20% y el 30%', 'Trabajo en remoto, tengo libertad total', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Tengo margen, no me preocupa', 'Estabilidad y echar raíces'] as const;
+  // +4 +4 −4 +3 +3 +3 +1 +1 −3 +2 = +14 con «Menos del 10%» → esperar con el aviso del ahorro (lleva «%»).
+  const SIN_AHORRO_14 = ['Indefinidamente', 'Contrato indefinido o funcionario', 'Menos del 10% del precio buscado', 'Muy improbable, estoy arraigado/a', 'Con hijos o planificándolos', 'Alquiler caro, compra más razonable', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Sería un problema grave', 'Estabilidad y echar raíces'] as const;
+
+  async function contestar(page: Page, etiquetas: readonly string[]): Promise<void> {
+    for (let i = 0; i < etiquetas.length; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]', { has: page.getByText(etiquetas[i], { exact: true }) }).click();
+      await page.getByRole('button', { name: i === etiquetas.length - 1 ? 'Ver resultado' : 'Siguiente pregunta' }).click();
+    }
+    await page.getByRole('heading', { name: 'Tu resultado' }).waitFor();
+  }
+  const razones = (page: Page) => page.locator('[class*="razonItem"]').allInnerTexts();
+  async function guia(page: Page): Promise<string> {
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    return (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+  }
+
+  test('caso normal: +14 → comprar; las tres razones de más peso y el contrapeso, en orden', async ({ page }) => {
+    // Razones: los dos +4 por orden de pregunta (horizonte, ahorro) y el +3 (situación personal); los
+    // +2 (laboral, prioridad) y los +1 quedan fuera. Contrapeso: −2 (mercado) y −1 (cargas).
+    await abrirTest(page);
+    await contestar(page, NORMAL_14);
+    await expect(page.locator('[class*="veredictoValor"]')).toHaveText('Tu situación apunta a comprar');
+    await expect(page.locator('[class*="puntuacionNota"]')).toContainText('Tu puntuación total es +14: a partir de +8 la orientación es comprar, hasta −8 alquilar, y entre medias, esperar.');
+    expect(await razones(page)).toEqual([
+      'Horizonte Temporal: «Indefinidamente» suma 4 puntos hacia la compra.',
+      'Capacidad de Entrada: «Más del 30%» suma 4 puntos hacia la compra.',
+      'Situación Personal: «Con hijos o planificándolos» suma 3 puntos hacia la compra.',
+      'Mercado Local: «Ambos están muy caros» resta 2 puntos: empuja hacia seguir de alquiler.',
+      'Cargas Económicas: «Tengo dependientes a mi cargo» resta 1 punto: empuja hacia seguir de alquiler.',
+    ]);
+    await expect(page.locator('[data-limite]')).toHaveCount(0);
+    expect(await page.locator('[class*="proximoItem"]').allInnerTexts()).toEqual([
+      'Usa la calculadora de alquiler vs compra para validar los números de tu caso concreto',
+      'Consulta con una entidad financiera para conocer tu capacidad hipotecaria real',
+      'Analiza el mercado de tu zona y define tu presupuesto máximo',
+      'Plantéate contratar un seguro de hogar adecuado antes de escriturar',
+    ]);
+  });
+
+  test('caso límite: −7 es esperar, con lo que empuja a cada lado y el paso del ahorro que ya alcanza', async ({ page }) => {
+    // En «esperar», razones = hacia comprar (+2 ahorro, +1 deuda) y contrapeso = hacia alquilar, los 3
+    // de más peso: −3 laboral, −3 mercado y, de los cuatro −1, el primero por orden (horizonte).
+    await abrirTest(page);
+    await contestar(page, MENOS_7);
+    await expect(page.locator('[class*="veredictoValor"]')).toHaveText('Espera antes de decidir');
+    await expect(page.locator('[class*="puntuacionNota"]')).toContainText('Tu puntuación total es −7:');
+    // textContent: el título va en mayúsculas por CSS.
+    expect(await page.locator('[class*="razonesTitulo"]').allTextContents()).toEqual(['Lo que empuja hacia comprar', 'Lo que empuja hacia alquilar']);
+    expect(await razones(page)).toEqual([
+      'Capacidad de Entrada: «Entre el 20% y el 30%» suma 2 puntos hacia la compra.',
+      'Tolerancia a la Deuda: «La acepto si los números tienen sentido» suma 1 punto hacia la compra.',
+      'Estabilidad Laboral: «Contrato temporal o en transición» resta 3 puntos: empuja hacia seguir de alquiler.',
+      'Mercado Local: «Compra muy cara, alquiler razonable» resta 3 puntos: empuja hacia seguir de alquiler.',
+      'Horizonte Temporal: «Entre 3 y 7 años» resta 1 punto: empuja hacia seguir de alquiler.',
+    ]);
+    expect(await page.locator('[class*="proximoItem"]').allInnerTexts()).toEqual([
+      'Identifica los 1-2 factores que más te frenan y trabájalos',
+      'Pon un plazo de revisión: en 6-12 meses repite este test',
+      'Tu ahorro ya alcanza la entrada: lo que falta por aclarar son otros factores',
+      'Habla con un profesional inmobiliario o financiero sin compromiso',
+    ]);
+  });
+
+  test('rechazo: sin responder la pregunta 10, «Ver resultado» no lleva al resultado', async ({ page }) => {
+    await abrirTest(page);
+    for (let i = 0; i < 9; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    }
+    await expect(page.getByText('Pregunta 10 de 10').first()).toBeVisible();
+    const ver = page.getByRole('button', { name: 'Ver resultado' });
+    await expect(ver).toBeDisabled();
+    await ver.click({ force: true });
+    await expect(page.getByText('Pregunta 10 de 10').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Tu resultado' })).toHaveCount(0);
+  });
+
+  test('motor (C0011 b, descartado en esta forma): lo recortado a 3 nunca pesa más que lo mostrado en su dirección', () => {
+    // Barrido de las 1.048.576 combinaciones (09/10/2026). Las razones se recortan a 3 en 954.965
+    // perfiles y el contrapeso en 645.547, y TODOS esconden al menos una respuesta (7 preguntas no
+    // tienen opción de 0 puntos y se enseñan 6 como mucho). Pero el recorte es siempre por peso:
+    // 0 perfiles con una respuesta oculta más pesada que una mostrada de su misma dirección.
+    test.setTimeout(120_000);
+    const r: Record<string, string> = {};
+    let mal = 0;
+    const peso = (f: string) => Number(f.match(/(\d+) punto/)?.[1] ?? Number.NaN);
+    const rec = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        const res = calcularResultado(r);
+        const empujes = PREGUNTAS
+          .map((p) => ({ cat: p.categoria, puntos: p.opciones.find((o) => o.valor === r[p.id])?.puntos ?? 0 }))
+          .filter((e) => e.puntos !== 0);
+        const aFavor = res.veredicto === 'alquila' ? -1 : 1;
+        const tramos: [number, string[]][] = [[aFavor, res.razones], [-aFavor, res.contrapeso]];
+        for (const [signo, frases] of tramos) {
+          const mostradas = new Set(frases.map((f) => f.split(':')[0]));
+          const minimo = Math.min(...frases.map(peso));
+          if (empujes.some((e) => Math.sign(e.puntos) === signo && !mostradas.has(e.cat) && Math.abs(e.puntos) > minimo)) mal++;
+        }
+        return;
+      }
+      for (const o of PREGUNTAS[i].opciones) {
+        r[PREGUNTAS[i].id] = o.valor;
+        rec(i + 1);
+      }
+    };
+    rec(0);
+    expect(mal).toBe(0);
+  });
+
+  test.fail('C0011 b: lo que se enseña explica la puntuación — las respuestas a la vista suman los +11', async ({ page }) => {
+    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). OCULTO_11 da +11 → comprar. La
+    // pantalla enseña +2 (laboral), +2 (ahorro), +2 (riesgo de venta) —los tres +2 primeros por orden
+    // de pregunta— y −1 (horizonte): +5. No se ven «Estabilidad y echar raíces» (+2) ni los cuatro +1
+    // (+6 en total), y las tres razones (+6) no llegan al +8 que la nota de al lado da como umbral.
+    // El veredicto «comprar» dice «abajo tienes qué respuestas pesan a favor y cuáles en contra, para
+    // que compruebes que el resultado se sostiene en tu caso», y con lo enseñado no se puede.
+    // Barrido del motor: en 105.636 de los 120.194 «comprar» y 180.139 de los 207.542 «alquilar» lo
+    // enseñado no llega al umbral; en 840, ni las tres razones solas.
+    // Esperado: +11 entre lo que se enseña (con todas las respuestas, o con un resumen del resto que
+    // diga cuánto suma). Obtenido hoy: +5.
+    await abrirTest(page);
+    await contestar(page, OCULTO_11);
+    await expect(page.locator('[class*="puntuacionNota"]')).toContainText('Tu puntuación total es +11:');
+    const texto = (await page.locator('[class*="razonesSection"]').allTextContents()).join(' ');
+    const aLaVista = [...texto.matchAll(/(suman?|restan?) (\d+) puntos?/g)]
+      .reduce((s, m) => s + (m[1].startsWith('suma') ? 1 : -1) * Number(m[2]), 0);
+    expect(aLaVista).toBe(11);
+  });
+
+  test.fail('C0016 a: tras «Empezar», «Siguiente» y «Anterior» el foco va al enunciado de la pregunta nueva', async ({ page }) => {
+    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 1680 de
+    // selector-smartphone (reparado en b0f31109 con un useEffect sobre [pantalla, paso]). Aquí solo
+    // se lleva el foco al «Tu resultado». Medido el 09/10/2026:
+    //   «Empezar» desaparece → foco en <body> · «Siguiente» se desactiva en la pregunta nueva (sin
+    //   responder) → <body>, y el siguiente Tab sale DESPUÉS del cuestionario, al enlace «Ir a
+    //   Orientador Alquiler vs Compra» de las relacionadas · «Anterior» conserva el foco y la pregunta
+    //   cambia sin que nada la anuncie (y en la 1 se desactiva → <body>).
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-alquiler-vs-compra/');
+    await esperarHidratacionBotones(page);
+    const foco = () => page.evaluate(() => {
+      const a = document.activeElement as HTMLElement | null;
+      if (!a || a === document.body) return 'body';
+      if (a.getAttribute('role') === 'radio') return `radio ${a.querySelector('span')?.textContent ?? ''}`;
+      return `${a.tagName.toLowerCase()} ${a.getAttribute('aria-label') ?? a.textContent ?? ''}`.trim();
+    });
+    const vistos: string[] = [];
+    await page.getByRole('button', { name: /Empezar el test/ }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    vistos.push(await foco());
+    await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 2 de 10').first().waitFor();
+    vistos.push(await foco());
+    await page.keyboard.press('Tab');
+    vistos.push(await foco());
+    await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 3 de 10').first().waitFor();
+    vistos.push(await foco());
+    await page.getByRole('button', { name: 'Pregunta anterior' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 2 de 10').first().waitFor();
+    vistos.push(await foco());
+    // Obtenido hoy: ['body', 'body', 'a Ir a Orientador Alquiler vs Compra', 'body', 'button Pregunta anterior'].
+    expect(vistos).toEqual([
+      'h2 ¿Cuánto tiempo prevés quedarte en esta ciudad o zona?',
+      'h2 ¿Cuál es tu situación laboral actual?',
+      'radio Contrato indefinido o funcionario',
+      'h2 ¿Cuánto ahorro tienes disponible para la entrada y gastos?',
+      'h2 ¿Cuál es tu situación laboral actual?',
+    ]);
+  });
+
+  test.fail('C0016 b: teclado de radios (APG): las flechas mueven y marcan, y el grupo es UNA parada de Tab', async ({ page }) => {
+    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 1681 de
+    // selector-smartphone (reparado en b0f31109: tabindex itinerante y teclaEnOpcion). Medido el
+    // 09/10/2026: tabIndex [0, 0, 0, 0] (cuatro paradas de Tab), y ArrowDown sobre «Menos de 3 años»
+    // no mueve el foco ni marca nada. La referencia, en el mismo navegador: [0, −1, −1, −1] y la
+    // flecha pasa a la segunda opción.
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    expect(await radios.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1]);
+    await radios.nth(0).focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused({ timeout: 1_000 });
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
+    await page.keyboard.press('End');
+    await expect(radios.nth(3)).toBeFocused();
+    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(1);
+    // En la pregunta 1 «Anterior» está desactivado: tras el grupo, la siguiente parada es «Siguiente».
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Siguiente pregunta' })).toBeFocused();
+  });
+
+  test.fail('C0104 (3): la guía educativa está en el HTML servido y se puede abrir antes del resultado', async ({ page }) => {
+    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 2663 de
+    // selector-smartphone. EducationalSection monta siempre su contenido «porque Googlebot no hace
+    // clic», pero aquí el componente entero va dentro de `pantalla === 'resultado'`: el HTML servido
+    // no trae ni una línea de la guía (ni «Costes ocultos…» ni la frase de los gastos), y quien no
+    // termina las 10 preguntas no la ve. Obtenido hoy: false y 0 botones en la intro y en el test.
+    const html = await (await page.request.get('/selector-alquiler-vs-compra/')).text();
+    expect(html).toContain('Costes ocultos de la compra que nadie menciona');
+    await page.goto('/selector-alquiler-vs-compra/');
+    await esperarHidratacionBotones(page);
+    await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toHaveCount(1, { timeout: 1_000 });
+  });
+
+  test.fail('C0008: las cifras de «Costes ocultos» no se publican sin fuente', async ({ page }) => {
+    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Sobrevivieron al 1463, que retiró
+    // las horquillas sin fuente del plazo: page.tsx, l. 401-405, escritas a mano y sin derivar de
+    // nada de data/ (data/fiscal no tiene IBI, seguro ni comisión de agencia). Si la reparación
+    // conserva una cifra con su fuente, este test se reescribe con la fuente literal.
+    await abrirTest(page);
+    await contestar(page, NORMAL_14);
+    const texto = await guia(page);
+    const sinFuente = [
+      /200-1\.500[\s ]€\/año en pisos/,
+      /Regla práctica: 1[\s ]?% del valor del inmueble al año/,
+      /obligatorio con hipoteca \(100-400[\s ]€\/año\)/,
+      /agencia \(3-5[\s ]?%\)/,
+    ].filter((re) => re.test(texto)).map(String);
+    // Obtenido hoy: las cuatro.
+    expect(sinFuente).toEqual([]);
+  });
+
+  test.fail('la guía no dice «pagarás IRPF por la ganancia» sin sus exenciones (data/fiscal/ganancia-inmueble.ts)', async ({ page }) => {
+    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). data/fiscal/ganancia-inmueble.ts
+    // (arts. 33.4.b y 38 LIRPF): la ganancia por transmitir la vivienda habitual está exenta para los
+    // mayores de 65 años, y total o parcialmente si se reinvierte en otra vivienda habitual. La guía,
+    // que habla de la vivienda que el usuario compraría para vivir, dice «si vendes, pagarás agencia
+    // (3-5%), plusvalía municipal e IRPF por la ganancia», sin matiz.
+    await abrirTest(page);
+    await contestar(page, NORMAL_14);
+    const texto = await guia(page);
+    const hablaDelIrpf = /IRPF/.test(texto);
+    expect(hablaDelIrpf ? /reinvers|mayores de 65/i.test(texto) : true).toBe(true);
+  });
+
+  test.fail('los porcentajes llevan espacio duro antes del «%» (CLAUDE.md §2, desde el 25/09/2026)', async ({ page }) => {
+    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Medido el 09/10/2026 con
+    // textContent (el carácter real), en las opciones y en el resultado con la guía abierta: 0 con
+    // U+00A0, 9 pegados («Menos del 10% del precio buscado», «Entre el 10% y el 20%», «Más del 30%»,
+    // «1% del valor», «(3-5%)», «30-35%» y «el 20% inicial» del aval, que viene de
+    // data/fiscal/ayudas-personas.ts) y 21 con espacio normal (porcentaje() de cifras.ts: «80 %»,
+    // «20 %», «3,5 %»…, y FRASE_INTERESES).
+    await abrirTest(page);
+    const textos: string[] = [];
+    for (let i = 0; i < SIN_AHORRO_14.length; i++) {
+      textos.push((await page.locator('[role="radiogroup"]').textContent()) ?? '');
+      await page.locator('[role="radiogroup"] [role="radio"]', { has: page.getByText(SIN_AHORRO_14[i], { exact: true }) }).click();
+      await page.getByRole('button', { name: i === 9 ? 'Ver resultado' : 'Siguiente pregunta' }).click();
+    }
+    await page.getByRole('heading', { name: 'Tu resultado' }).waitFor();
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    textos.push((await page.locator('[class*="resultadosContainer"]').textContent()) ?? '');
+    const separadores = [...textos.join(' ').matchAll(/\d([\s ]?)%/g)]
+      .map((m) => (m[1] === ' ' ? 'U+00A0' : m[1] === '' ? 'pegado' : 'espacio normal'));
+    expect(separadores.length).toBeGreaterThan(0);
+    expect(separadores.filter((s) => s !== 'U+00A0')).toEqual([]);
+  });
+
+  // ─ Móvil ─────────────────────────────────────────────────────────────────────────────
+
+  /** ¿Pisa alguna pieza de la barra fija del logo las letras del elemento? */
+  async function bajoLaBarra(page: Page, selector: string): Promise<{ tapado: boolean; top: number; bottom: number; barra: number }> {
+    return page.evaluate((sel) => {
+      const piezas = Array.from(document.querySelectorAll('[class*="headerBar"] > *')).map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0);
+      const el = document.querySelector(sel);
+      if (!el || piezas.length === 0) throw new Error(`sin barra (${piezas.length}) o sin ${sel}`);
+      const rango = document.createRange();
+      rango.selectNodeContents(el);
+      const letras = Array.from(rango.getClientRects()).filter((c) => c.width > 0);
+      const caja = el.getBoundingClientRect();
+      return {
+        tapado: piezas.some((p) => letras.some((c) => !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom))),
+        top: Math.round(caja.top),
+        bottom: Math.round(caja.bottom),
+        barra: Math.round(Math.max(...piezas.map((p) => p.bottom))),
+      };
+    }, selector);
+  }
+
+  /** Deja el centro del botón a la altura y del viewport y devuelve ese punto. */
+  async function colocar(page: Page, nombre: string | RegExp, y: number): Promise<{ x: number; y: number }> {
+    const boton = page.getByRole('button', { name: nombre });
+    await boton.evaluate((e, yy) => {
+      const r = e.getBoundingClientRect();
+      window.scrollBy(0, r.top + r.height / 2 - yy);
+    }, y);
+    const caja = await boton.boundingBox();
+    if (!caja) throw new Error(`sin caja para ${String(nombre)}`);
+    return { x: caja.x + caja.width / 2, y: caja.y + caja.height / 2 };
+  }
+
+  async function abrirMovil(page: Page): Promise<void> {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-alquiler-vs-compra/');
+    await esperarHidratacionBotones(page);
+  }
+
+  test.describe('móvil 390 px', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent: devices['Pixel 7'].userAgent,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test.fail('C0104 (1): tras «Empezar» y «Siguiente», el enunciado de la pregunta queda a la vista y por debajo de la barra del logo', async ({ page }) => {
+      // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 2657 de
+      // selector-smartphone. Aquí no hay foco programático en las preguntas, así que la página no se
+      // mueve: la pregunta nueva se pinta donde estaba la anterior. Medido el 09/10/2026 tocando
+      // como un usuario (tap(), que desplaza lo justo): a 390 px las 10 preguntas en y 20..74 (P4 y
+      // P8, 20..101) con la barra hasta 52 → letras tapadas; a 360 px la 1 en y −58..23 y de la 2 a
+      // la 10 por ENCIMA del borde (y −58..−4 / −85..−4). Con el botón a media pantalla, de la 3 a
+      // la 10 por encima del borde en los dos anchos. Si se repara llevando el foco al enunciado
+      // (C0016 a), hace falta además el scroll-margin-top de la referencia, o reaparece el 2657.
+      await abrirMovil(page);
+      await page.getByRole('button', { name: /Empezar el test/ }).tap();
+      const fuera: string[] = [];
+      for (let i = 1; i <= 5; i++) {
+        await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();
+        await page.waitForTimeout(150);
+        const m = await bajoLaBarra(page, '[class*="preguntaTexto"]');
+        if (m.tapado || m.top < m.barra) fuera.push(`P${i}: enunciado en y ${m.top}..${m.bottom}, barra hasta ${m.barra}`);
+        await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+        await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
+      }
+      expect(fuera, 'enunciados bajo la barra o fuera de la vista').toEqual([]);
+    });
+
+    test('C0104 (1), descartado en el resultado: «Tu resultado» tiene el foco y queda por debajo de la barra', async ({ page }) => {
+      // Medido el 09/10/2026 a 360 y 390 px, con el botón donde lo deja tap(), a media pantalla y
+      // abajo del todo: el <h1> enfocado en y 80..109, scroll 0, barra hasta 52.
+      await abrirMovil(page);
+      await page.getByRole('button', { name: /Empezar el test/ }).tap();
+      for (let i = 0; i < 10; i++) {
+        await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+        await page.getByRole('button', { name: i === 9 ? 'Ver resultado' : 'Siguiente pregunta' }).tap();
+      }
+      const titulo = page.getByRole('heading', { name: 'Tu resultado' });
+      await expect(titulo).toBeFocused();
+      await page.waitForTimeout(150);
+      const m = await bajoLaBarra(page, 'h1');
+      expect({ tapado: m.tapado, debajo: m.top >= m.barra }, `h1 en y ${m.top}..${m.bottom}, barra hasta ${m.barra}`).toEqual({ tapado: false, debajo: true });
+    });
+  });
+
+  test.describe('móvil 360 px', () => {
+    test.use({
+      viewport: { width: 360, height: 740 },
+      userAgent: devices['Pixel 7'].userAgent,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    // +3 +4 +2 +3 +1 0 +1 +1 0 +2 = +17 → comprar (el NORMAL de la inspección del 24/09, con el que se
+    // midió la pantalla del resultado).
+    const NORMAL_17 = ['Más de 7 años', 'Contrato indefinido o funcionario', 'Entre el 20% y el 30%', 'Muy improbable, estoy arraigado/a', 'En pareja, sin hijos aún', 'Equilibrado, sin grandes diferencias', 'La acepto si los números tienen sentido', 'Solo algo menor (coche, tarjeta...)', 'Me generaría pérdidas asumibles', 'Estabilidad y echar raíces'] as const;
+
+    test('C0104 (2), descartado en «Empezar»: un doble toque no contesta la pregunta 1', async ({ page }) => {
+      // Medido el 09/10/2026 con el botón a 15 alturas (y 120..680, de 40 en 40): el segundo toque
+      // (detail 2) cae siempre en algo sin acción.
+      await abrirMovil(page);
+      const p = await colocar(page, /Empezar el test/, 360);
+      await page.touchscreen.tap(p.x, p.y);
+      await page.waitForTimeout(150);
+      await page.touchscreen.tap(p.x, p.y);
+      await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+      await page.waitForTimeout(300);
+      await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0);
+    });
+
+    test.fail('C0104 (2): un doble toque en «Siguiente» de la pregunta 1 no contesta la 2', async ({ page }) => {
+      // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). Forma del 2659 de
+      // selector-smartphone (receta `clicDeMas`: se ignora el clic con detail > 1 si el anterior
+      // cambió de pantalla). Medido el 09/10/2026 a 360 y 390 px: con «Siguiente» entre y 150 y 350,
+      // el segundo toque (detail 2) cae en «Contrato temporal o en transición» de la pregunta 2 y la
+      // deja marcada (−3 puntos) sin que nadie la elija. En las otras ocho transiciones no pasa.
+      await abrirMovil(page);
+      await page.getByRole('button', { name: /Empezar el test/ }).tap();
+      await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+      await page.waitForTimeout(400);
+      await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+      const p = await colocar(page, 'Siguiente pregunta', 300);
+      await page.touchscreen.tap(p.x, p.y);
+      await page.waitForTimeout(150);
+      await page.touchscreen.tap(p.x, p.y);
+      await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible();
+      await page.waitForTimeout(300);
+      // Obtenido hoy: 1 («Contrato temporal o en transición»).
+      await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0, { timeout: 1_000 });
+    });
+
+    test.fail('C0104 (2): un doble toque en «Ver resultado» no saca de la app', async ({ page }) => {
+      // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026). El primer toque monta el
+      // resultado y el foco al «Tu resultado» sube la página arriba del todo; el segundo cae en lo que
+      // haya allí, que es la cabecera común: el enlace «Contacto» y la banda de Delegum que pinta
+      // <LegalNotice />. Medido el 09/10/2026 a 360 y 390 px con el botón a 15 alturas (y 280..560):
+      // y 300-320 → /contacto/; y 360-460 → https://delegum.com/soluciones/?from=meskeia. El
+      // resultado no se guarda: se pierden las 10 respuestas. Delegum se sirve aquí sin red.
+      await page.route(/^https:\/\/(www\.)?delegum\.com\//, (ruta) => ruta.fulfill({ status: 200, contentType: 'text/html', body: '<title>delegum</title>externo' }));
+      await abrirMovil(page);
+      const origen = new URL(page.url()).origin;
+      await page.getByRole('button', { name: /Empezar el test/ }).tap();
+      for (let i = 0; i < 10; i++) {
+        await page.locator('[role="radiogroup"] [role="radio"]', { has: page.getByText(NORMAL_17[i], { exact: true }) }).tap();
+        if (i < 9) await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
+      }
+      await page.waitForTimeout(400);
+      const p = await colocar(page, 'Ver resultado', 400);
+      await page.touchscreen.tap(p.x, p.y);
+      await page.waitForTimeout(150);
+      await page.touchscreen.tap(p.x, p.y);
+      await page.waitForTimeout(600);
+      // Obtenido hoy: https://delegum.com/soluciones/?from=meskeia.
+      expect(page.url()).toBe(`${origen}/selector-alquiler-vs-compra/`);
+      await expect(page.getByRole('heading', { name: 'Tu resultado' })).toBeVisible({ timeout: 1_000 });
+    });
+  });
 });
