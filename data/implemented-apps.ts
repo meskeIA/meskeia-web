@@ -639,7 +639,7 @@ export const implementedAppsUrls = [
   "/selector-coche-nuevo-usado/",             // Test 10 preguntas: nuevo, seminuevo o segunda mano
 
   // Herramientas de decisión de vehículo (2026-03-27)
-  "/comparador-electrico/",               // Break-even eléctrico vs gasolina, MOVES III, proyección 10 años
+  "/comparador-electrico/",               // Break-even eléctrico vs gasolina, ayuda Auto+, proyección 10 años
   "/etiqueta-dgt/",                       // Etiqueta DGT (CERO/ECO/C/B) + acceso ZBE 7 ciudades
 
   // Herramientas de forma jurídica (2026-03-28)

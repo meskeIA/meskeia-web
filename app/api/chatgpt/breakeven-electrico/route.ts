@@ -3,8 +3,9 @@
  * Endpoint: POST /api/chatgpt/breakeven-electrico
  *
  * Calcula el año en que un coche eléctrico empieza a ser más barato que
- * uno de gasolina equivalente, considerando diferencia de precio, MOVES III,
- * consumos y coste de cargador doméstico.
+ * uno de gasolina equivalente, considerando diferencia de precio, ayuda a la compra
+ * (Programa Auto+ desde 2026; el MOVES III terminó en 2025), consumos y cargador doméstico.
+ * El cálculo es el del motor de la app comparador-electrico (el cargador entra entero al comprar).
  *
  * Analytics: registra cada llamada con modo='chatgpt' en Turso.
  */
@@ -12,12 +13,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
 import { datosLlamanteGpt } from '@/lib/analytics-gpt';
+import { calcularComparador } from '@/app/comparador-electrico/motor';
 
 export const runtime = 'nodejs';
 
 const AVISO_LEGAL =
-  '⚠️ Cálculo orientativo. No incluye depreciación diferencial, financiación ni carga en puntos públicos (0,45-0,65 €/kWh). ' +
-  'El subsidio MOVES III puede cambiar. ' +
+  '⚠️ Cálculo orientativo. No incluye depreciación diferencial, financiación ni la carga en puntos públicos, más cara que la doméstica. ' +
+  'La ayuda del Programa Auto+ (RD 609/2026) depende del vehículo y de la convocatoria. ' +
   'Fuente: meskeia.com/comparador-electrico';
 
 function corsHeaders() {
@@ -66,44 +68,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Costes anuales de energía
-    const costeEnergiaEV = (kmAnuales / 100) * consumoElectrico * precioLuz;
-    const costeEnergiaGas = (kmAnuales / 100) * consumoGasolina * precioGasolinaLitro;
+    // Motor de la app (hallazgos 1995 y 1998): el cargador se paga al comprar, no cargador/10
+    // al año. Mantenimiento: el diferencial de ~200 €/año de antes.
+    const r = calcularComparador({
+      precioElectrico, precioGasolina, ayuda: subsidioMoves, kmAnuales,
+      consumoElectrico, consumoGasolina, precioLuz, precioGasolinaLitro,
+      cargador: costeCargador, mantElectrico: 0, mantGasolina: 200, anios: 15,
+    });
+    const anioBreakEven = r.tipo === 'equilibrio' ? r.anioEquilibrio : null;
+    const mensajes = {
+      'equilibrio': `El eléctrico empieza a ser más barato a partir del año ${r.anioEquilibrio}.`,
+      'fuera-horizonte': `No se alcanza el punto de equilibrio en 15 años (llegaría en el año ${r.anioEquilibrio}).`,
+      'desde-compra': 'El eléctrico es más barato desde la compra y su uso no cuesta más.',
+      'ventaja-se-agota': `El eléctrico es más barato de comprar pero más caro de usar: su ventaja se agota en el año ${r.anioCruce}.`,
+      'nunca': 'No se alcanza nunca el punto de equilibrio: el eléctrico cuesta más de comprar y su uso no es más barato.',
+    };
 
-    // Ahorro de mantenimiento EV vs gasolina (~200€/año)
-    const ahorroMantAnual = 200;
-    const ahorroAnual = (costeEnergiaGas - costeEnergiaEV) + ahorroMantAnual;
-
-    // Inversión neta extra del EV
-    const inversionNetaExtra = (precioElectrico - subsidioMoves) - precioGasolina;
-
-    // Cargador amortizado en 10 años
-    const cargadorAnual = costeCargador / 10;
-
-    // Break-even: año en que el ahorro acumulado supera la inversión extra
-    let anioBreakEven: number | null = null;
-    let ahorroAcumulado = 0;
-    for (let anio = 1; anio <= 15; anio++) {
-      ahorroAcumulado += ahorroAnual - cargadorAnual;
-      if (ahorroAcumulado >= inversionNetaExtra && anioBreakEven === null) {
-        anioBreakEven = anio;
-        break;
-      }
-    }
-
-    const costePorKmEV = costeEnergiaEV / kmAnuales + 0.005; // +mant. variable
-    const costePorKmGas = costeEnergiaGas / kmAnuales + 0.008;
+    const costePorKmEV = r.energiaEV / kmAnuales + 0.005; // +mant. variable
+    const costePorKmGas = r.energiaGas / kmAnuales + 0.008;
 
     registrarLlamada(kmAnuales, precioElectrico).catch(() => {});
 
     return NextResponse.json(
       {
         anio_breakeven: anioBreakEven,
-        mensaje_breakeven: anioBreakEven
-          ? `El eléctrico empieza a ser más barato a partir del año ${anioBreakEven}.`
-          : 'No se alcanza el punto de equilibrio en 15 años con estos datos.',
-        ahorro_anual_estimado: Math.round(ahorroAnual),
-        inversion_neta_extra: Math.round(inversionNetaExtra),
+        mensaje_breakeven: mensajes[r.tipo],
+        ahorro_anual_estimado: Math.round(r.ahorroAnual),
+        inversion_neta_extra: Math.round(r.inversionInicialExtra),
         coste_km_electrico: parseFloat(costePorKmEV.toFixed(3)),
         coste_km_gasolina: parseFloat(costePorKmGas.toFixed(3)),
         aviso_legal: AVISO_LEGAL,

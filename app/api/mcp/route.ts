@@ -25,6 +25,8 @@ import {
   type OperacionFecha,
 } from '@/lib/calculadoras/fechas';
 import { calcularGastoEnergetico, type Electrodomestico } from '@/lib/calculadoras/gastoEnergetico';
+import { calcularComparador } from '@/app/comparador-electrico/motor';
+import { AYUDA_AUTO_PLUS_2026, MOVES_III_HISTORICO } from '@/data/fiscal';
 import { convertirEdadMascota, type TipoMascota, type TamanoPerro } from '@/lib/calculadoras/edadMascota';
 import { calcularReglaTres, type TipoRegla, type TipoRelacion } from '@/lib/calculadoras/reglaTres';
 import { convertirUnidades, type CategoriaUnidad } from '@/lib/calculadoras/conversorUnidades';
@@ -1176,7 +1178,7 @@ function crearServidorMCP(): McpServer {
     'calcular_breakeven_electrico',
     'Calcula el año en que un coche eléctrico empieza a ser más barato que uno de gasolina equivalente (punto de equilibrio). ' +
     'Necesita los precios de ambos coches y los km anuales. ' +
-    'Opcionales: subsidio MOVES III (0/4500/7000€), consumos, precio luz y gasolina, coste cargador. ' +
+    'Opcionales: ayuda a la compra (en España, el Programa Auto+ del RD 609/2026; el MOVES III terminó en 2025), consumos, precio luz y gasolina, coste cargador. ' +
     'Devuelve año de break-even, ahorro anual estimado, inversión neta extra y coste por km de cada opción.',
     {
       precioElectrico: z.number().positive()
@@ -1186,7 +1188,7 @@ function crearServidorMCP(): McpServer {
       kmAnuales: z.number().positive()
         .describe('Kilómetros que se conducen al año (ej: 15000)'),
       subsidioMoves: z.number().min(0).optional()
-        .describe('Subsidio MOVES III aplicable: 0 (sin subsidio), 4500 (sin achatarramiento) o 7000 (con achatarramiento). Por defecto: 0'),
+        .describe(`Ayuda a la compra que corresponda, en euros. En España rige el Programa Auto+ (RD 609/2026): hasta ${AYUDA_AUTO_PLUS_2026.maximo.turismo} € por turismo, sumando criterios, sin tramo por achatarramiento. El MOVES III terminó el ${MOVES_III_HISTORICO.finalizado.split('-').reverse().join('/')}. Por defecto: 0`),
       consumoElectrico: z.number().positive().optional()
         .describe('Consumo del eléctrico en kWh/100km. Por defecto: 16'),
       consumoGasolina: z.number().positive().optional()
@@ -1210,39 +1212,39 @@ function crearServidorMCP(): McpServer {
       const subsidio = subsidioMoves ?? 0;
       const cargador = costeCargador ?? 800;
 
-      const costeEnergiaEV = (kmAnuales / 100) * consEV * pLuz;
-      const costeEnergiaGas = (kmAnuales / 100) * consGas * pGas;
-      const ahorroAnual = (costeEnergiaGas - costeEnergiaEV) + 200; // +200€ ahorro mantenimiento EV
-      const inversionNeta = (precioElectrico - subsidio) - precioGasolina;
-      const cargadorAnual = cargador / 10;
-
-      let breakEvenAnio: number | null = null;
-      let acumulado = 0;
-      for (let a = 1; a <= 15; a++) {
-        acumulado += ahorroAnual - cargadorAnual;
-        if (acumulado >= inversionNeta && breakEvenAnio === null) { breakEvenAnio = a; break; }
-      }
-
-      const costePorKmEV = parseFloat(((consEV / 100) * pLuz).toFixed(4));
-      const costePorKmGas = parseFloat(((consGas / 100) * pGas).toFixed(4));
+      // Motor de la app comparador-electrico (hallazgos 1995 y 1998): el cargador entra ENTERO al
+      // comprar, no como cargador/10 al año. Mantenimiento: el diferencial de 200 €/año de antes.
+      const r = calcularComparador({
+        precioElectrico, precioGasolina, ayuda: subsidio, kmAnuales,
+        consumoElectrico: consEV, consumoGasolina: consGas, precioLuz: pLuz, precioGasolinaLitro: pGas,
+        cargador, mantElectrico: 0, mantGasolina: 200, anios: 15,
+      });
+      const eur = (n: number) => Math.round(n).toLocaleString('es-ES');
+      const porKm = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+      const veredicto = {
+        'equilibrio': `✅ **Punto de equilibrio: año ${r.anioEquilibrio}** — A partir de ese año el eléctrico es más barato en total.`,
+        'fuera-horizonte': `❌ **No se alcanza el punto de equilibrio en 15 años** (llegaría en el año ${r.anioEquilibrio}).`,
+        'desde-compra': '✅ **El eléctrico es más barato desde la compra** y su uso no cuesta más.',
+        'ventaja-se-agota': `⚠️ **El eléctrico es más barato de comprar, pero más caro de usar**: su ventaja se agota en el año ${r.anioCruce}.`,
+        'nunca': '❌ **No se alcanza nunca el punto de equilibrio**: el eléctrico cuesta más de comprar y su uso no es más barato.',
+      }[r.tipo];
 
       const lineas = [
         `⚡ **Break-even: Eléctrico vs Gasolina**`,
         ``,
         `💰 Diferencia de precio: ${precioElectrico.toLocaleString('es-ES')} € (EV) vs ${precioGasolina.toLocaleString('es-ES')} € (gasolina)`,
-        subsidio > 0 ? `🎁 Subsidio MOVES III: -${subsidio.toLocaleString('es-ES')} €` : '',
-        `📊 Inversión neta extra del eléctrico: **${Math.round(inversionNeta).toLocaleString('es-ES')} €**`,
+        subsidio > 0 ? `🎁 Ayuda a la compra: -${subsidio.toLocaleString('es-ES')} €` : '',
+        cargador > 0 ? `🔌 Cargador doméstico: +${cargador.toLocaleString('es-ES')} € (se paga al comprar)` : '',
+        `📊 Inversión neta extra del eléctrico: **${eur(r.inversionInicialExtra)} €**`,
         ``,
-        `⛽ Ahorro anual estimado: **${Math.round(ahorroAnual).toLocaleString('es-ES')} €/año**`,
+        `⛽ Ahorro anual estimado: **${eur(r.ahorroAnual)} €/año**`,
         `   (energía + mantenimiento diferencial)`,
         ``,
-        breakEvenAnio
-          ? `✅ **Punto de equilibrio: año ${breakEvenAnio}** — A partir de ese año el eléctrico es más barato en total.`
-          : `❌ **No se alcanza el break-even en 15 años** con estos datos. El eléctrico no compensa económicamente en este horizonte.`,
+        veredicto,
         ``,
-        `🔑 Coste por km — EV: ${costePorKmEV} €/km | Gasolina: ${costePorKmGas} €/km`,
+        `🔑 Coste de energía por km — EV: ${porKm(r.energiaEV / kmAnuales)} €/km | Gasolina: ${porKm(r.energiaGas / kmAnuales)} €/km`,
         ``,
-        `⚠️ Cálculo orientativo. No incluye depreciación diferencial ni carga en puntos públicos (0,45-0,65 €/kWh). El subsidio MOVES III tiene fondos limitados, verificar disponibilidad.`,
+        `⚠️ Cálculo orientativo. No incluye depreciación diferencial ni la carga en puntos públicos, más cara que la doméstica. La ayuda del Programa Auto+ depende del vehículo y de la convocatoria: verificar la cuantía antes de contar con ella.`,
       ].filter(l => l !== null && l !== '');
       return { content: [{ type: 'text', text: lineas.join('\n') }] };
     }

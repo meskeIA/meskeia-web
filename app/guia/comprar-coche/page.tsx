@@ -49,7 +49,7 @@ const tools = [
     icon: '⚡',
     url: '/comparador-electrico/',
     question: '¿Cuándo me compensa el eléctrico? ¿En qué año recupero la diferencia?',
-    description: 'Calcula el punto de equilibrio entre un eléctrico y un gasolina. Introduce precios, km anuales, consumos y subsidio MOVES III. Proyección de ahorro a 10 años.',
+    description: 'Calcula el punto de equilibrio entre un eléctrico y un gasolina. Introduce precios, km anuales, consumos y la ayuda a la compra. Proyección de ahorro a 10 años.',
     step: 5,
   },
   {

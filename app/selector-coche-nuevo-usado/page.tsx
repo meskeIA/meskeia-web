@@ -155,7 +155,7 @@ const VEREDICTOS: Record<VeredictoKey, Veredicto> = {
     ],
     consejos: [
       'Compara entre varios concesionarios: los descuentos sobre el precio de lista pueden llegar al 15-20%.',
-      'Consulta el Plan MOVES u otras ayudas autonómicas si consideras un vehículo electrófico o híbrido.',
+      'Consulta el Programa Auto+ (la ayuda estatal que sustituyó al MOVES III en 2026) u otras ayudas autonómicas si consideras un vehículo eléctrico o híbrido enchufable.',
       'Calcula el coste total: precio + seguro + mantenimiento + combustible a lo largo de los años que lo vas a usar.',
       'Revisa el historial de fiabilidad del modelo en foros y asociaciones de consumidores.',
     ],

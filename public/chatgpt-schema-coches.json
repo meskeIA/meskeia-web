@@ -46,7 +46,7 @@
       "post": {
         "operationId": "calcularBreakevenElectrico",
         "summary": "Calcula el año en que un coche eléctrico empieza a ser más barato que uno de gasolina.",
-        "description": "Compara el coste total acumulado de un eléctrico vs gasolina considerando diferencia de precio, subsidio MOVES III, consumos, precio de luz y gasolina, y coste de cargador doméstico. Devuelve el año de break-even y ahorro anual.",
+        "description": "Compara el coste total acumulado de un eléctrico vs gasolina considerando diferencia de precio, ayuda a la compra (Programa Auto+), consumos, precio de luz y gasolina, y coste de cargador doméstico. Devuelve el año de break-even y ahorro anual.",
         "requestBody": {
           "required": true,
           "content": {
@@ -242,7 +242,7 @@
           "precioElectrico": { "type": "number", "description": "Precio del coche eléctrico en euros.", "example": 32000 },
           "precioGasolina": { "type": "number", "description": "Precio del coche de gasolina equivalente en euros.", "example": 22000 },
           "kmAnuales": { "type": "number", "description": "Kilómetros anuales recorridos.", "example": 15000 },
-          "subsidioMoves": { "type": "number", "description": "Subsidio MOVES III: 0 (sin subsidio), 4500 (sin achatarramiento) o 7000 (con achatarramiento).", "default": 0, "enum": [0, 4500, 7000] },
+          "subsidioMoves": { "type": "number", "description": "Ayuda a la compra que corresponda, en euros. En España rige el Programa Auto+ (RD 609/2026): hasta 4.500 € por turismo, sumando criterios, sin tramo por achatarramiento. El MOVES III terminó el 31/12/2025.", "default": 0, "minimum": 0 },
           "consumoElectrico": { "type": "number", "description": "Consumo del eléctrico en kWh/100km.", "default": 16 },
           "consumoGasolina": { "type": "number", "description": "Consumo del gasolina en L/100km.", "default": 7 },
           "precioLuz": { "type": "number", "description": "Precio de la electricidad doméstica en €/kWh.", "default": 0.18 },
@@ -256,7 +256,7 @@
           "anio_breakeven": { "type": ["integer", "null"], "description": "Año en que el eléctrico empieza a ser más barato. null si no se alcanza en 15 años." },
           "mensaje_breakeven": { "type": "string", "description": "Mensaje explicativo sobre el punto de equilibrio." },
           "ahorro_anual_estimado": { "type": "number", "description": "Ahorro anual estimado del eléctrico vs gasolina en euros." },
-          "inversion_neta_extra": { "type": "number", "description": "Dinero extra que cuesta el eléctrico respecto al gasolina (tras subsidio MOVES)." },
+          "inversion_neta_extra": { "type": "number", "description": "Dinero extra que cuesta el eléctrico respecto al gasolina, con el cargador y tras la ayuda." },
           "coste_km_electrico": { "type": "number", "description": "Coste de energía por km del eléctrico en euros." },
           "coste_km_gasolina": { "type": "number", "description": "Coste de combustible por km del gasolina en euros." },
           "aviso_legal": { "type": "string" }
