@@ -11,7 +11,7 @@
       "post": {
         "operationId": "calcularSucesiones",
         "summary": "Calcular Impuesto de Sucesiones por CCAA en España (ISD 2025)",
-        "description": "Calcula el Impuesto de Sucesiones para un heredero en España según su CCAA. Aplica reducciones por parentesco, discapacidad y vivienda habitual. Incluye bonificaciones autonómicas de las 17 CCAA.",
+        "description": "Calcula el Impuesto de Sucesiones para un heredero en España según su CCAA. Aplica reducciones por parentesco, discapacidad y vivienda habitual. Incluye bonificaciones autonómicas de las 17 CCAA. NO calcula la reducción por empresa familiar (empresa individual, negocio profesional o participaciones): si hay una empresa, la cuota no es una estimación del caso y hay que consultar a un asesor fiscal.",
         "requestBody": {
           "required": true,
           "content": {
@@ -44,7 +44,7 @@
       "post": {
         "operationId": "calcularDonaciones",
         "summary": "Calcular Impuesto de Donaciones por CCAA en España (ISD 2025)",
-        "description": "Calcula el Impuesto de Donaciones para el donatario en España según su CCAA. Aplica reducciones por parentesco y discapacidad. Incluye bonificaciones autonómicas y tarifa propia de Cataluña.",
+        "description": "Calcula el Impuesto de Donaciones para el donatario en España según su CCAA. Aplica reducciones por parentesco y discapacidad. Incluye bonificaciones autonómicas y tarifa propia de Cataluña. NO calcula la reducción por empresa familiar (empresa individual, negocio profesional o participaciones): si hay una empresa, la cuota no es una estimación del caso y hay que consultar a un asesor fiscal.",
         "requestBody": {
           "required": true,
           "content": {
@@ -126,8 +126,8 @@
           },
           "grupo": {
             "type": "string",
-            "enum": ["I-conyuge", "I-descendiente", "II", "II-ascendiente", "III", "IV"],
-            "description": "Grupo de parentesco: 'I-conyuge' (cónyuge), 'I-descendiente' (hijo/nieto), 'II' (hermano/sobrino), 'II-ascendiente' (padre/madre), 'III' (tío/primo), 'IV' (extraño).",
+            "enum": ["I-conyuge", "I-descendiente", "II", "II-descendiente", "II-ascendiente", "III", "IV"],
+            "description": "Grupo de parentesco del heredero. 'I-conyuge' = cónyuge (la clave es histórica: la ley lo pone en el Grupo II). 'I-descendiente' = hijo u otro descendiente MENOR de 21 años (Grupo I). 'II' = hijo de 21 años o más (Grupo II). 'II-descendiente' = nieto u otro descendiente de 21 años o más (Grupo II; Cataluña le reduce distinto que al hijo). 'II-ascendiente' = padre, madre u otro ascendiente (Grupo II). 'III' = hermanos, tíos y sobrinos, y ascendientes o descendientes por afinidad (Grupo III). 'IV' = primos y parientes más lejanos, y extraños (Grupo IV). Art. 20.2.a Ley 29/1987.",
             "example": "I-descendiente"
           },
           "edadHeredero": {
@@ -187,7 +187,7 @@
           "grupo": {
             "type": "string",
             "enum": ["I-conyuge", "I-descendiente", "II", "II-ascendiente", "III", "IV"],
-            "description": "Grupo de parentesco: 'I-conyuge' (cónyuge), 'I-descendiente' (hijo/nieto), 'II' (hermano/sobrino), 'II-ascendiente' (padre/madre), 'III' (tío/primo), 'IV' (extraño).",
+            "description": "Grupo de parentesco del donatario. 'I-conyuge' = cónyuge (la clave es histórica: la ley lo pone en el Grupo II). 'I-descendiente' = hijo u otro descendiente MENOR de 21 años (Grupo I). 'II' = hijo de 21 años o más (Grupo II). Un nieto de 21 años o más también es 'II'. 'II-ascendiente' = padre, madre u otro ascendiente (Grupo II). 'III' = hermanos, tíos y sobrinos, y ascendientes o descendientes por afinidad (Grupo III). 'IV' = primos y parientes más lejanos, y extraños (Grupo IV). Art. 20.2.a Ley 29/1987.",
             "example": "I-descendiente"
           },
           "cargas": {
