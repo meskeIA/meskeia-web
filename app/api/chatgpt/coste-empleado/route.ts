@@ -4,7 +4,7 @@
  *
  * Calcula el coste total para el empleador: salario bruto + cuotas SS
  * a cargo de la empresa (contingencias, desempleo, FP, FOGASA, AT/EP).
- * Datos SS 2025 (Orden PJC/51/2025).
+ * Datos SS 2026 (Orden PJC/297/2026).
  *
  * Analytics: registra cada llamada con modo='chatgpt' en Turso.
  */
@@ -18,7 +18,7 @@ import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 export const runtime = 'nodejs';
 
 const AVISO_LEGAL =
-  '⚠️ Resultado orientativo basado en Orden PJC/51/2025 de cotización a la SS. ' +
+  '⚠️ Resultado orientativo basado en la Orden PJC/297/2026 de cotización a la SS. ' +
   'El tipo AT/EP real depende de la actividad CNAE concreta. ' +
   'No incluye posibles bonificaciones por contratación. ' +
   'Fuente: meskeia.com/coste-empleado';

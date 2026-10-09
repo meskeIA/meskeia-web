@@ -82,6 +82,7 @@ import { calcularCapacidadHipoteca } from '../lib/calculadoras/capacidadHipoteca
 import { calcularGananciaCriptomonedas } from '../lib/calculadoras/gananciaCriptomonedas';
 import { calcularPlanPensiones } from '../lib/calculadoras/planPensiones';
 import { calcularBajaMedica } from '../lib/calculadoras/bajaMedica';
+import { calcularCosteEmpleado } from '../lib/calculadoras/costeEmpleado';
 import { calcularJubilacionAnticipada } from '../lib/calculadoras/jubilacionAnticipada';
 import { calcularPensionIncapacidad } from '../lib/calculadoras/pensionIncapacidad';
 import { calcularPensionViudedad } from '../lib/calculadoras/pensionViudedad';
@@ -2463,6 +2464,53 @@ test.describe('Golden — calcularBajaMedica (Capa 1 · LGSS arts. 169-176)', ()
     expect(bm.totalSubsidio).toBeCloseTo(1125.00, 2);
     expect(bm.subsidioMensualEquivalente).toBeCloseTo(2250.00, 2);
     expect(bm.perdidaEstimada).toBeCloseTo(750.00, 2);
+  });
+
+  // Cabo C0001 (09/10/2026): la base se subía a la mínima de jornada COMPLETA (1.424,40 €/mes) y
+  // 800 €/mes daba 47,48 €/día de base. Por debajo de esa mínima solo cabe la jornada parcial.
+  test('GOLDEN-C0001a: 800 €/mes (jornada parcial), común, 30 días → base diaria 26,67 € y 16,00 €/día', () => {
+    // BC diaria = 800/30 = 26,67 €. Días 4-20 al 60 % = 16,00 €/día.
+    const bm = calcularBajaMedica({ salarioBrutoMensual: 800, tipoBaja: 'comun', diasBaja: 30 });
+    expect(bm.baseCotizacionDiaria).toBeCloseTo(26.67, 2);
+    expect(bm.subsidioDiarioFase1).toBeCloseTo(16.00, 2);
+  });
+
+  test('GOLDEN-C0001b: 1.800 €/mes en 14 pagas → la base lleva la prorrata de las extras (× 14/12)', () => {
+    // Base mensual = 1.800 × 14/12 = 2.100 €. BC diaria = 70,00 €. Día 21+ al 75 % = 52,50 €/día.
+    const bm = calcularBajaMedica({ salarioBrutoMensual: 1800, pagas: 14, tipoBaja: 'comun', diasBaja: 30 });
+    expect(bm.baseCotizacionDiaria).toBeCloseTo(70.00, 2);
+    expect(bm.subsidioDiarioFase2).toBeCloseTo(52.50, 2);
+  });
+
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// CAPA 1 — Golden tests: calcularCosteEmpleado
+// Cuotas de empresa 2026 (Orden PJC/297/2026), con el MEI de empresa (0,75 %).
+// Cabos C0001 y C0075 (09/10/2026): copia local de los tipos de 2025 sin MEI y base subida a
+// la mínima de jornada completa.
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — calcularCosteEmpleado (Capa 1 · Orden PJC/297/2026)', () => {
+
+  test('GOLDEN-C0001c: 14.000 €/año indefinido de oficina → base 1.166,67 €, cuotas 4.501,00 €', () => {
+    // Base = 14.000/12 = 1.166,67 € (jornada parcial: no se sube a 1.424,40).
+    // Tipo = 23,60 + 5,50 + 0,60 + 0,20 + 0,75 (MEI) + 1,50 (AT oficina) = 32,15 %.
+    // Cuotas = 14.000 × 32,15 % = 4.501,00 €.
+    const ce = calcularCosteEmpleado({ salarioBrutoAnual: 14000, tipoContrato: 'indefinido', sector: 'oficina' });
+    expect(ce.baseCotizacion).toBeCloseTo(1166.67, 2);
+    expect(ce.tipos.totalSS).toBeCloseTo(32.15, 2);
+    expect(ce.cuotas.total).toBeCloseTo(4501.00, 2);
+    expect(ce.advertencias.length).toBe(1);
+  });
+
+  test('GOLDEN-C0075: 30.000 €/año indefinido de oficina → cuotas 9.645 € con el MEI de empresa', () => {
+    // Base = 2.500 €/mes, entre la mínima y el tope. 30.000 × 32,15 % = 9.645,00 € (sin el MEI, 9.420).
+    const ce = calcularCosteEmpleado({ salarioBrutoAnual: 30000, tipoContrato: 'indefinido', sector: 'oficina' });
+    expect(ce.baseCotizacion).toBeCloseTo(2500, 2);
+    expect(ce.cuotas.mei).toBeCloseTo(225.00, 2);
+    expect(ce.cuotas.total).toBeCloseTo(9645.00, 2);
+    expect(ce.advertencias).toEqual([]);
   });
 
 });

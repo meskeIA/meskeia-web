@@ -2494,17 +2494,19 @@ function crearServidorDelegum(): McpServer {
     'común (60% de la base los días 4-20, 75% a partir del día 21) o accidente laboral (75% desde el primer día). ' +
     'Devuelve el subsidio diario, mensual y total para los días de baja, y la pérdida respecto al salario habitual.',
     {
-      salario_bruto_mensual: z.number().positive().describe('Salario bruto mensual del trabajador (€)'),
+      salario_bruto_mensual: z.number().positive().describe('Salario bruto que el trabajador cobra cada mes ordinario (€)'),
+      pagas: z.union([z.literal(12), z.literal(14)]).optional().describe('Pagas al año: 14 si cobra dos pagas extra aparte (entran en la base prorrateadas, × 14/12); 12 si las tiene prorrateadas en la nómina mensual. Por defecto 12.'),
       tipo_baja: z.enum(['comun', 'accidente_laboral']).describe('"comun" = enfermedad o accidente no laboral. "accidente_laboral" = accidente de trabajo o enfermedad profesional.'),
       dias_baja: z.number().int().min(1).max(730).optional().describe('Número de días de baja a simular. Por defecto 30.'),
       empresa_paga_dias_espera: z.boolean().optional().describe('¿La empresa cubre los 3 días de espera (según convenio)? Por defecto false.'),
     },
     { title: 'Calcula el subsidio por baja médica (incapacidad temporal)', readOnlyHint: true },
-    async ({ salario_bruto_mensual, tipo_baja, dias_baja, empresa_paga_dias_espera }, extra) => {
+    async ({ salario_bruto_mensual, pagas, tipo_baja, dias_baja, empresa_paga_dias_espera }, extra) => {
       await registrarUsoDelegum('calcular_baja_medica', getCaller(extra));
       try {
         const r = calcularBajaMedica({
           salarioBrutoMensual: salario_bruto_mensual,
+          pagas: pagas as 12 | 14 | undefined,
           tipoBaja: tipo_baja as TipoBaja,
           diasBaja: dias_baja,
           empresaPagaDiasEspera: empresa_paga_dias_espera,
@@ -2513,7 +2515,7 @@ function crearServidorDelegum(): McpServer {
         const lineas = [
           `🏥 **Baja médica — ${tipoTexto}**`,
           '',
-          `💼 Salario bruto: ${fmt(salario_bruto_mensual)} €/mes · base diaria ${fmt(r.baseCotizacionDiaria)} €`,
+          `💼 Salario bruto: ${fmt(salario_bruto_mensual)} €/mes en ${pagas ?? 12} pagas · base diaria ${fmt(r.baseCotizacionDiaria)} €`,
           `📅 Días de baja: ${r.diasBaja}`,
           '',
           `📊 **Subsidio por período**`,

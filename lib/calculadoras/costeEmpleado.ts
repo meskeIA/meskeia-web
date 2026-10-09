@@ -4,30 +4,30 @@
  *
  * Calcula el coste total para el empleador: salario bruto + cuotas
  * de Seguridad Social a cargo de la empresa (contingencias comunes,
- * desempleo, FP, FOGASA y accidentes de trabajo).
+ * desempleo, FP, FOGASA, MEI y accidentes de trabajo).
  *
- * Fuente: Orden PJC/51/2025 de cotización SS + Estatuto de los Trabajadores
+ * Fuente: Orden PJC/297/2026 de cotización SS + Estatuto de los Trabajadores
+ *
+ * Hasta el 09/10/2026 (cabos C0001 y C0075) llevaba una copia propia de los tipos de 2025 SIN
+ * el MEI de empresa (0,75 % en 2026), y subía la base a la mínima de jornada COMPLETA: con
+ * 14.000 €/año daba una base de 1.424,40 € en vez de 1.166,67 € (+971 € de cuotas). Un sueldo
+ * por debajo de esa mínima solo es legal a jornada parcial, cuya base mínima es por horas y
+ * queda por debajo: la base es el propio sueldo prorrateado.
  */
 
-import { BASES_SS_2026 } from '@/data/fiscal';
+import { BASES_SS_2026, COTIZACION_EMPRESA_2026 } from '@/data/fiscal';
 
-// ─── Constantes SS empresa 2025 ────────────────────────────────────────────────
+// ─── Tipos de accidentes de trabajo ─────────────────────────────────────────────
 
-// Tipos de cotización a cargo de la empresa (porción patronal)
-const SS_EMPRESA_2025 = {
-  contingenciasComunes:   23.60,  // %
-  desempleoIndefinido:     5.50,  // % — contratos indefinidos
-  desempleoTemporal:       6.70,  // % — contratos temporales (<6 meses: 8.30%)
-  formacionProfesional:    0.60,  // %
-  fogasa:                  0.20,  // %
-  accidentesTrabajo: {
-    oficina:               1.50,  // % — media orientativa actividades de oficina
-    comercio:              1.80,  // % — media orientativa comercio/hostelería
-    construccion:          6.70,  // % — construcción (la más alta)
-    industrial:            2.80,  // % — industria media
-  },
-  fuenteDatos: 'Orden PJC/51/2025 de cotización a la Seguridad Social. Tipos vigentes 2025.',
+// El tipo AT/EP real depende del CNAE (tarifa de primas, DA 61.ª LGSS): aquí, medias orientativas
+const TIPOS_AT_ORIENTATIVOS = {
+  oficina:               1.50,  // % — media orientativa actividades de oficina
+  comercio:              1.80,  // % — media orientativa comercio/hostelería
+  construccion:          6.70,  // % — construcción (la más alta)
+  industrial:            2.80,  // % — industria media
 };
+
+const FUENTE_DATOS = 'Orden PJC/297/2026 de cotización a la Seguridad Social. Tipos vigentes 2026.';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ export interface ResultadoCosteEmpleado {
   salarioBrutoAnual: number;
   /** Salario bruto mensual */
   salarioBrutoMensual: number;
-  /** Base de cotización mensual (clampada entre mín y máx) */
+  /** Base de cotización mensual: el sueldo prorrateado, con el tope máximo */
   baseCotizacion: number;
   /** Desglose cuotas empresa anuales */
   cuotas: {
@@ -60,6 +60,7 @@ export interface ResultadoCosteEmpleado {
     desempleo: number;
     formacionProfesional: number;
     fogasa: number;
+    mei: number;
     accidentesTrabajo: number;
     total: number;
   };
@@ -69,6 +70,7 @@ export interface ResultadoCosteEmpleado {
     desempleo: number;
     formacionProfesional: number;
     fogasa: number;
+    mei: number;
     accidentesTrabajo: number;
     totalSS: number;
   };
@@ -82,6 +84,8 @@ export interface ResultadoCosteEmpleado {
   sobrecoste: number;
   /** Fuente normativa */
   fuenteDatos: string;
+  /** Avisos sobre la base (sueldo bajo la mínima de jornada completa o sobre el tope) */
+  advertencias: string[];
 }
 
 // ─── Función principal ─────────────────────────────────────────────────────────
@@ -94,34 +98,44 @@ export function calcularCosteEmpleado(p: ParametrosCosteEmpleado): ResultadoCost
   const tipoContrato = p.tipoContrato ?? 'indefinido';
   const sector = p.sector ?? 'oficina';
   const beneficiosExtra = p.beneficiosExtra ?? 0;
-  const pagas = p.pagas ?? 14;
 
   const salarioBrutoMensual = r(p.salarioBrutoAnual / 12);
 
-  // Base de cotización (clampada)
-  const baseCotizacion = Math.min(
-    Math.max(salarioBrutoMensual, BASES_SS_2026.minima),
-    BASES_SS_2026.maxima
-  );
+  // Base de cotización: el sueldo prorrateado (incluye la parte de las pagas extra, art. 147
+  // LGSS) con el tope máximo. NO se sube a la mínima de jornada completa: por debajo de ella
+  // solo cabe la jornada parcial (cabecera)
+  const baseSinTope = p.salarioBrutoAnual / 12;
+  const baseCotizacion = Math.min(baseSinTope, BASES_SS_2026.maxima);
+  const advertencias: string[] = [];
+  if (baseSinTope < BASES_SS_2026.minima) {
+    advertencias.push(
+      `El sueldo queda por debajo de la base mínima de jornada completa (${BASES_SS_2026.minima} €/mes): ` +
+      'se calcula como jornada parcial, con el propio sueldo como base. A jornada completa no sería legal.'
+    );
+  }
+  if (baseSinTope > BASES_SS_2026.maxima) {
+    advertencias.push(`La base se limita al tope máximo de ${BASES_SS_2026.maxima} €/mes.`);
+  }
 
   // Tipos aplicados
-  const tipoDesempleo = tipoContrato === 'indefinido'
-    ? SS_EMPRESA_2025.desempleoIndefinido
-    : SS_EMPRESA_2025.desempleoTemporal;
-  const tipoAT = SS_EMPRESA_2025.accidentesTrabajo[sector];
+  const T = COTIZACION_EMPRESA_2026;
+  const tipoDesempleo = tipoContrato === 'indefinido' ? T.desempleoIndefinido : T.desempleoTemporal;
+  const tipoAT = TIPOS_AT_ORIENTATIVOS[sector];
   const tipoTotalSS = (
-    SS_EMPRESA_2025.contingenciasComunes +
+    T.contingenciasComunes +
     tipoDesempleo +
-    SS_EMPRESA_2025.formacionProfesional +
-    SS_EMPRESA_2025.fogasa +
+    T.formacionProfesional +
+    T.fogasa +
+    T.mei +
     tipoAT
   );
 
   // Cuotas mensuales → × 12 para anual
-  const ccMensual = baseCotizacion * (SS_EMPRESA_2025.contingenciasComunes / 100);
+  const ccMensual = baseCotizacion * (T.contingenciasComunes / 100);
   const desempleoMensual = baseCotizacion * (tipoDesempleo / 100);
-  const fpMensual = baseCotizacion * (SS_EMPRESA_2025.formacionProfesional / 100);
-  const fogasaMensual = baseCotizacion * (SS_EMPRESA_2025.fogasa / 100);
+  const fpMensual = baseCotizacion * (T.formacionProfesional / 100);
+  const fogasaMensual = baseCotizacion * (T.fogasa / 100);
+  const meiMensual = baseCotizacion * (T.mei / 100);
   const atMensual = baseCotizacion * (tipoAT / 100);
 
   const cuotas = {
@@ -129,8 +143,9 @@ export function calcularCosteEmpleado(p: ParametrosCosteEmpleado): ResultadoCost
     desempleo: r(desempleoMensual * 12),
     formacionProfesional: r(fpMensual * 12),
     fogasa: r(fogasaMensual * 12),
+    mei: r(meiMensual * 12),
     accidentesTrabajo: r(atMensual * 12),
-    total: r((ccMensual + desempleoMensual + fpMensual + fogasaMensual + atMensual) * 12),
+    total: r((ccMensual + desempleoMensual + fpMensual + fogasaMensual + meiMensual + atMensual) * 12),
   };
 
   const costeTotalAnual = r(p.salarioBrutoAnual + cuotas.total + beneficiosExtra);
@@ -143,10 +158,11 @@ export function calcularCosteEmpleado(p: ParametrosCosteEmpleado): ResultadoCost
     baseCotizacion: r(baseCotizacion),
     cuotas,
     tipos: {
-      contingenciasComunes: SS_EMPRESA_2025.contingenciasComunes,
+      contingenciasComunes: T.contingenciasComunes,
       desempleo: tipoDesempleo,
-      formacionProfesional: SS_EMPRESA_2025.formacionProfesional,
-      fogasa: SS_EMPRESA_2025.fogasa,
+      formacionProfesional: T.formacionProfesional,
+      fogasa: T.fogasa,
+      mei: T.mei,
       accidentesTrabajo: tipoAT,
       totalSS: r(tipoTotalSS),
     },
@@ -154,6 +170,7 @@ export function calcularCosteEmpleado(p: ParametrosCosteEmpleado): ResultadoCost
     costeTotalAnual,
     costeTotalMensual,
     sobrecoste,
-    fuenteDatos: SS_EMPRESA_2025.fuenteDatos,
+    fuenteDatos: FUENTE_DATOS,
+    advertencias,
   };
 }

@@ -10,6 +10,12 @@
  * - Accidente de trabajo / enfermedad profesional: 75% BC desde día 1
  *
  * Fuente: LGSS arts. 169-176 + Real Decreto 1430/2009 + bases de cotización 2026 (Orden PJC/297/2026)
+ *
+ * Base reguladora: la base de cotización del mes anterior, que incluye la prorrata de las pagas
+ * extraordinarias (art. 147 LGSS). Hasta el 09/10/2026 (cabo C0001) no aplicaba esa prorrata y
+ * subía la base a la mínima de jornada COMPLETA: 800 €/mes daba una base diaria de 47,48 € en
+ * vez de 26,67 € (28,49 €/día de subsidio frente a 16,00 €). Un sueldo por debajo de la mínima
+ * solo es legal a jornada parcial, cuya base mínima es por horas: la base es el propio sueldo.
  */
 
 import { BASES_SS_2026 } from '@/data/fiscal';
@@ -19,8 +25,13 @@ import { BASES_SS_2026 } from '@/data/fiscal';
 export type TipoBaja = 'comun' | 'accidente_laboral';
 
 export interface ParametrosBajaMedica {
-  /** Salario bruto mensual (€). Se usa para calcular la base de cotización diaria. */
+  /** Salario bruto que se cobra cada mes ordinario (€): con 12 pagas ya lleva las extras. */
   salarioBrutoMensual: number;
+  /**
+   * Pagas al año del salario anterior: 12 (extras prorrateadas o inexistentes) o 14 (dos
+   * extras aparte, que entran en la base como salario × 14/12). Por defecto 12.
+   */
+  pagas?: 12 | 14;
   /** Tipo de baja: "comun" (enfermedad/accidente no laboral) o "accidente_laboral" */
   tipoBaja: TipoBaja;
   /** Número de días de baja a simular. Por defecto 30. */
@@ -37,7 +48,7 @@ export interface ResultadoBajaMedica {
   tipoBaja: TipoBaja;
   /** Días de baja simulados */
   diasBaja: number;
-  /** Base de cotización diaria (salario bruto mensual / 30) (€) */
+  /** Base reguladora diaria (base mensual con la prorrata de pagas / 30, con el tope) (€) */
   baseCotizacionDiaria: number;
   /** % aplicado en el período de baja (60% o 75%) */
   porcentajeFase1: number;
@@ -69,11 +80,12 @@ export function calcularBajaMedica(p: ParametrosBajaMedica): ResultadoBajaMedica
   const r = (n: number) => Math.round(n * 100) / 100;
   const empresaPagaDiasEspera = p.empresaPagaDiasEspera ?? false;
 
-  // Base de cotización diaria: salario bruto mensual / 30
-  // Clamped entre mínimo y máximo SS
-  const salerioMensual = p.salarioBrutoMensual;
-  const baseMensualClamp = Math.min(Math.max(salerioMensual, BASES_SS_2026.minima), BASES_SS_2026.maxima);
-  const baseCotizacionDiaria = r(baseMensualClamp / 30);
+  // Base mensual con la prorrata de las extras, con el tope máximo; sin subirla a la mínima de
+  // jornada completa (cabecera). La pérdida se mide contra el salario mensual con prorrata
+  const pagas = p.pagas ?? 12;
+  const salarioMensual = p.salarioBrutoMensual * pagas / 12;
+  const baseMensual = Math.min(salarioMensual, BASES_SS_2026.maxima);
+  const baseCotizacionDiaria = r(baseMensual / 30);
 
   const desglose: { periodo: string; dias: number; pct: number; importeDiario: number; total: number }[] = [];
   let totalSubsidio = 0;
@@ -97,7 +109,7 @@ export function calcularBajaMedica(p: ParametrosBajaMedica): ResultadoBajaMedica
       diasEspera: 0,
       totalSubsidio: total,
       subsidioMensualEquivalente: r(diario * 30),
-      perdidaEstimada: r(salerioMensual - r(diario * 30)),
+      perdidaEstimada: r(salarioMensual - r(diario * 30)),
       desglose,
     };
   }
@@ -141,7 +153,7 @@ export function calcularBajaMedica(p: ParametrosBajaMedica): ResultadoBajaMedica
     diasEspera,
     totalSubsidio,
     subsidioMensualEquivalente,
-    perdidaEstimada: r(salerioMensual - subsidioMensualEquivalente),
+    perdidaEstimada: r(salarioMensual - subsidioMensualEquivalente),
     desglose,
   };
 }

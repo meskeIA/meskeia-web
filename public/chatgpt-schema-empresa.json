@@ -153,7 +153,7 @@
       "post": {
         "operationId": "calcularCosteEmpleado",
         "summary": "Calcula el coste real de contratar un empleado en España",
-        "description": "Calcula el coste total para el empleador: salario bruto + cuotas SS patronales (contingencias comunes 23,6%, desempleo, FP, FOGASA, AT/EP por sector). Datos SS 2025.",
+        "description": "Calcula el coste total para el empleador: salario bruto + cuotas SS patronales (contingencias comunes 23,6 %, desempleo, FP, FOGASA, MEI, AT/EP por sector). Datos SS 2026. Un sueldo por debajo de la base mínima de jornada completa se calcula como jornada parcial y lo avisa en advertencias.",
         "requestBody": {
           "required": true,
           "content": {
@@ -203,7 +203,8 @@
                     "costeTotalAnual": { "type": "number", "description": "Coste total anual para la empresa: salario + SS patronal + beneficios extra (€)" },
                     "costeTotalMensual": { "type": "number", "description": "Coste total mensual para la empresa (€)" },
                     "sobrecoste": { "type": "number", "description": "Porcentaje que supone la SS patronal sobre el salario bruto (%)" },
-                    "cuotas": { "type": "object", "description": "Desglose de cuotas SS patronales: contingencias, desempleo, FP, FOGASA, AT/EP (€)" },
+                    "cuotas": { "type": "object", "description": "Desglose de cuotas SS patronales: contingencias, desempleo, FP, FOGASA, MEI, AT/EP (€)" },
+                    "advertencias": { "type": "array", "items": { "type": "string" }, "description": "Avisos sobre la base de cotización (jornada parcial o tope máximo)" },
                     "aviso_legal": { "type": "string" }
                   }
                 }
