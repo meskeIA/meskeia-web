@@ -14,8 +14,13 @@ export function formatNumber(num: number, decimals: number = 2): string {
   if (isNaN(num)) return 'No definido';
   if (!isFinite(num)) return num > 0 ? '∞' : '-∞';
 
-  // Verificar si el número es muy pequeño (científico)
-  if (Math.abs(num) < 0.0001 && num !== 0) return '≈0';
+  // Un número muy pequeño que con los decimales pedidos saldría «0,00» se escribe «≈0», para
+  // no hacerlo pasar por un cero exacto. Hasta el 09/10/2026 (cabo C0021) el corte era fijo en
+  // 0,0001 aunque se pidieran más decimales: sen(0,00005 rad) con 8 decimales salía «≈0» y no
+  // «0,00005000». Ahora es el menor de 0,0001 y media unidad del último decimal pedido: con
+  // 0 a 3 decimales no cambia nada.
+  const umbralCasiCero = Math.min(0.0001, 0.5 * 10 ** -decimals);
+  if (Math.abs(num) < umbralCasiCero && num !== 0) return '≈0';
 
   // El cero negativo se imprime CON signo: `(-0).toLocaleString('es-ES')` da «-0,00», y la
   // guarda de arriba no lo atrapa porque `-0 !== 0` es false. En JavaScript el -0 aparece

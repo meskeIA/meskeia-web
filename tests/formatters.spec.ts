@@ -55,6 +55,18 @@ test.describe('formatNumber', () => {
     expect(formatNumber(0.00001, 2)).toBe('≈0');
   });
 
+  test('C0021 · con muchos decimales, un número pequeño se escribe entero y no «≈0»', () => {
+    expect(formatNumber(0.00005, 8)).toBe('0,00005000');
+    expect(formatNumber(-0.00002, 6)).toBe('-0,000020');
+    expect(formatNumber(0.00007, 4)).toBe('0,0001');
+    // Lo que con los decimales pedidos se redondearía a cero sigue diciendo «≈0»
+    expect(formatNumber(0.000000004, 8)).toBe('≈0');
+    expect(formatNumber(0.00004, 4)).toBe('≈0');
+    // Con 0 a 3 decimales el corte sigue en 0,0001, como antes
+    expect(formatNumber(0.00009, 3)).toBe('≈0');
+    expect(formatNumber(0.0002, 3)).toBe('0,000');
+  });
+
   test('maneja números negativos', () => {
     const result = formatNumber(-1234.56, 2);
     expect(result).toContain('-');
