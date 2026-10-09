@@ -699,7 +699,8 @@
 
 /* Límites declarados: la recomendada incumple alguno, o se ha apartado una vía con más afinidad
    (hallazgos 1445, 1446 y 1447). */
-.avisoRestricciones {
+.avisoRestricciones,
+.avisoModalidad {
   text-align: left;
   margin: 0 0 1.25rem;
   padding: 0.85rem 1rem;
@@ -712,8 +713,22 @@
   line-height: 1.5;
 }
 
-[data-theme='dark'] .avisoRestricciones {
+[data-theme='dark'] .avisoRestricciones,
+[data-theme='dark'] .avisoModalidad {
   border-color: #b45309;
   background: #3a2a08;
   color: #fde68a;
+}
+
+/* El enunciado recibe el foco al cambiar de pregunta (hallazgo 3100): no es un control, no lleva
+   anillo con ratón; con teclado, sí. */
+.preguntaTexto:focus { outline: none; }
+.preguntaTexto:focus-visible { outline: 2px solid var(--primary-texto); outline-offset: 4px; border-radius: 4px; }
+
+/* Lo que recibe el foco al cambiar de pantalla no puede quedar bajo la barra fija del logo
+   (hallazgo 3100; 2657 de selector-smartphone): focus() desplaza lo justo para que se vea, y sin
+   margen lo dejaba en y 0, bajo la barra (hasta y 52 en móvil, 77 desde 769 px). */
+.preguntaTexto,
+.resultadoTitulo {
+  scroll-margin-top: 80px;
 }

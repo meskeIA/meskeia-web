@@ -78,7 +78,7 @@ export const faqJsonLd = {
         // (Orden ECI/332/2008) y la especialidad es por residencia MIR (hallazgo 1449). Empleo: INE,
         // Encuesta de Inserción Laboral de Titulados Universitarios 2019, publicada el 29/10/2020, la
         // última edición en INEbase (hallazgo 1451; antes decía «un 8 % superior»).
-        text: 'Depende del objetivo. Es obligatorio para ejercer las profesiones reguladas con máster habilitante, como la abogacía y la procura, la psicología general sanitaria o el profesorado de secundaria, y es la vía general de acceso al doctorado. Medicina, en cambio, se ejerce con el grado, y sus especialidades se obtienen por residencia (MIR), no por un máster. Según la Encuesta de Inserción Laboral de Titulados Universitarios del INE (2019), la tasa de empleo en 2019 de los graduados universitarios del curso 2013-2014 era del 86,1 %, y la de los titulados de máster, del 87,3 %.',
+        text: 'Depende del objetivo. Es obligatorio para ejercer las profesiones reguladas con máster habilitante, como la abogacía y la procura, la psicología general sanitaria o el profesorado de secundaria, y es la vía general de acceso al doctorado. Medicina, en cambio, se ejerce con el grado, y sus especialidades se obtienen por residencia (MIR), no por un máster. Según la Encuesta de Inserción Laboral de Titulados Universitarios del INE (2019), la tasa de empleo en 2019 de los graduados universitarios del curso 2013-2014 era del 86,1 %, y la de los titulados de máster, del 87,3 %.',
       },
     },
     {

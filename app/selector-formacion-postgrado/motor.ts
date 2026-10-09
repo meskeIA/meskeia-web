@@ -60,6 +60,10 @@ export interface FormacionInfo {
   coste: string;
   /** Solo el máster da un título universitario oficial. */
   daTituloUniversitario: boolean;
+  /** Lo que hace falta para empezar, si el test no lo pregunta (hallazgo 3103). */
+  requisitoAcceso?: string;
+  /** La vía se presenta como formación online (hallazgo 3102). */
+  online?: boolean;
 }
 
 export const PREGUNTAS: Pregunta[] = [
@@ -191,6 +195,10 @@ export const FORMACIONES: Record<TipoFormacion, FormacionInfo> = {
     // comunidades más económicas). Antes: «3.000 – 30.000 €», sin fuente (hallazgo 1448).
     coste: '820,80 € o más (60 ECTS en universidad pública de Andalucía; el precio por crédito lo fija cada comunidad, y en la privada, cada centro)',
     daTituloUniversitario: true,
+    // RD 822/2021, art. 18.1 y 18.2, leído en el BOE el 09/10/2026. El test no pregunta si se tiene un
+    // grado, y el máster salía en 267.630 perfiles sin decirlo, 58.760 con «desempleado/a».
+    requisitoAcceso:
+      'un título universitario de grado, u otro equivalente; con uno de fuera del Espacio Europeo de Educación Superior, sin homologarlo, tras comprobar la universidad su nivel (RD 822/2021, art. 18)',
   },
   fp_superior: {
     tipo: 'fp_superior',
@@ -217,6 +225,7 @@ export const FORMACIONES: Record<TipoFormacion, FormacionInfo> = {
     duracionMinimaMeses: 3,
     coste: '2.000 – 12.000 €',
     daTituloUniversitario: false,
+    online: true,
   },
   oposiciones: {
     tipo: 'oposiciones',
@@ -241,6 +250,7 @@ export const FORMACIONES: Record<TipoFormacion, FormacionInfo> = {
     duracionMinimaMeses: 0,
     coste: '200 – 3.000 €',
     daTituloUniversitario: false,
+    online: true,
   },
 };
 
@@ -354,6 +364,18 @@ export interface Resultado {
    * todo), o una vía con más afinidad se ha apartado por un límite. Vacío si no hay nada que decir.
    */
   avisoRestricciones: string;
+  /**
+   * La modalidad declarada que la recomendada no cumple: «Presencial» con una vía que se presenta
+   * como online (hallazgo 3102). La modalidad no suma nada a esas vías, así que tampoco salía en las
+   * razones. Vacío si no hay nada que decir.
+   */
+  avisoModalidad: string;
+}
+
+/** Lista legible: «A, B y C». */
+export function enumerar(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
 }
 
 const puntosEnLetra = (n: number) => `${n} ${n === 1 ? 'punto' : 'puntos'}`;
@@ -434,7 +456,16 @@ export function calcularResultado(respuestas: Record<number, number>): Resultado
   };
   let avisoRestricciones = '';
   if (incumple[tipo].length > 0) {
-    avisoRestricciones = `Ninguna vía cumple a la vez todo lo que has declarado. ${capitalizar(CON_ARTICULO[tipo])} es la que menos choca con tus límites, pero ${motivos(tipo)}.`;
+    // El superlativo solo si es SOLA: cuando otra candidata incumple los mismos límites, se elige
+    // entre ellas por afinidad, y se dice (hallazgo 3105; la forma del 1442 de mascota). Antes: «El
+    // bootcamp es la que menos choca…» con la certificación chocando exactamente igual.
+    const igualDeLejos = candidatas.slice(1);
+    const porque = empatadas.length > 0
+      ? 'que es la que se muestra primero en el empate de arriba'
+      : 'que es la de más afinidad entre ellas';
+    avisoRestricciones = igualDeLejos.length === 0
+      ? `Ninguna vía cumple a la vez todo lo que has declarado. ${capitalizar(CON_ARTICULO[tipo])} es la que menos choca con tus límites, pero ${motivos(tipo)}.`
+      : `Ninguna vía cumple a la vez todo lo que has declarado. ${capitalizar(enumerar(candidatas.map((k) => CON_ARTICULO[k])))} son las que menos chocan con tus límites; se recomienda ${CON_ARTICULO[tipo]}, ${porque}, pero ${motivos(tipo)}.`;
   } else {
     const apartada = orden.find((k) => incumple[k].length > 0 && puntos[k] > puntos[tipo]);
     if (apartada) {
@@ -442,7 +473,11 @@ export function calcularResultado(respuestas: Record<number, number>): Resultado
     }
   }
 
-  return { tipo, puntos, orden, candidatas, incumple, empatadas, criterioDesempate, razones, avisoRestricciones };
+  const avisoModalidad = respuestas[7] === 0 && FORMACIONES[tipo].online
+    ? `Has respondido que prefieres «${PREGUNTAS[6].opciones[0].texto.toLowerCase()}», y ${CON_ARTICULO[tipo]} se presenta aquí como formación online: esa preferencia no se cumple. Si eliges esta vía, comprueba antes de matricularte si hay un formato presencial.`
+    : '';
+
+  return { tipo, puntos, orden, candidatas, incumple, empatadas, criterioDesempate, razones, avisoRestricciones, avisoModalidad };
 }
 
 const capitalizar = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

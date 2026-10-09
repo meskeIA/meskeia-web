@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorFormacionPostgrado.module.css';
 import {
   MeskeiaLogo,
@@ -12,15 +12,9 @@ import {
   DisclaimerCard,
   RegionBadge,
 } from '@/components';
-import { calcularResultado, FORMACIONES, LABELS, CON_ARTICULO, PREGUNTAS, RESTRICCION_CORTA } from './motor';
+import { calcularResultado, enumerar, FORMACIONES, LABELS, CON_ARTICULO, PREGUNTAS, RESTRICCION_CORTA } from './motor';
 
 // Las preguntas con sus pesos, las fichas de cada vía y la lógica viven en ./motor.ts.
-
-/** Lista legible: «A, B y C». */
-function enumerar(items: string[]): string {
-  if (items.length <= 1) return items.join('');
-  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
-}
 
 /* ===================================================
    Componente principal
@@ -31,36 +25,92 @@ export default function SelectorFormacionPostgradoPage() {
   const [paso, setPaso] = useState<'quiz' | 'resultado'>('quiz');
   const [preguntaActual, setPreguntaActual] = useState(0);
   const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLParagraphElement>(null);
+  // Solo se mueve el foco cuando CAMBIA la pregunta o la pantalla: al cargar, la pregunta 1 ya está a
+  // la vista (y el modo estricto de React repite el efecto del montaje sin que cambie nada).
+  const vistaAnterior = useRef(`${paso}-${preguntaActual}`);
 
-  // Al pulsar «Ver resultado» se desmonta la sección del test con el botón que tenía el foco, y el
-  // foco caía a <body> sin que nada se anunciara: se lleva al título del resultado (hallazgo 1458;
-  // familia selector-*, forma g).
+  // Al cambiar de pregunta o de pantalla se desactiva o se desmonta el botón que tenía el foco, y el
+  // foco caía a <body>: el siguiente Tab salía del cuestionario y, en móvil, el enunciado nuevo
+  // quedaba fuera de la vista (hallazgo 3100; antes 1458 para el resultado). Se lleva al enunciado
+  // de la pregunta nueva o al título del resultado, que además los desplaza a la vista con su
+  // scroll-margin-top (receta de selector-smartphone, 1680 y 2657).
   useEffect(() => {
+    const vista = `${paso}-${preguntaActual}`;
+    if (vista === vistaAnterior.current) return;
+    vistaAnterior.current = vista;
     if (paso === 'resultado') tituloResultado.current?.focus();
-  }, [paso]);
+    else enunciado.current?.focus();
+  }, [paso, preguntaActual]);
 
   const totalPreguntas = PREGUNTAS.length;
   const pregunta = PREGUNTAS[preguntaActual];
   const opcionSeleccionada = respuestas[pregunta.id] ?? -1;
 
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 3101; receta `clicDeMas` de la familia, 2659 de
+   * selector-smartphone). El primer clic cambia de pregunta y el segundo caía en lo que hubiera en
+   * ese punto en la nueva: «Anterior» (deshacía el avance) o una opción que nadie había elegido. Un
+   * clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el teclado no produce) Y el
+   * clic anterior de la app cambió de pantalla.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
+    e.detail > 1 && ultimoCambioPantallaRef.current;
+  const registrarClic = (cambiaPantalla: boolean) => {
+    ultimoCambioPantallaRef.current = cambiaPantalla;
+  };
+
   const seleccionarOpcion = (idx: number) => {
+    registrarClic(false);
     setRespuestas((prev) => ({ ...prev, [pregunta.id]: idx }));
   };
 
-  const irAnterior = () => {
-    if (preguntaActual > 0) setPreguntaActual((p) => p - 1);
+  const elegirOpcion = (e: React.MouseEvent<HTMLButtonElement>, idx: number) => {
+    if (clicDeMas(e)) return;
+    seleccionarOpcion(idx);
   };
 
-  const irSiguiente = () => {
-    if (opcionSeleccionada === -1) return;
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG, hallazgo 3099; 1681 de selector-smartphone): las
+   * flechas mueven el foco a la opción vecina y la marcan, con vuelta al principio, e Inicio/Fin van
+   * a los extremos. El grupo es UNA parada de Tab (tabindex itinerante).
+   */
+  const teclaEnOpcion = (e: React.KeyboardEvent<HTMLButtonElement>, indice: number) => {
+    const total = pregunta.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(destino);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  };
+
+  // A la pregunta SIGUIENTE A LA PULSADA (`preguntaActual ± 1` del render, no `p => p ± 1`): dos
+  // clics antes de repintar no saltan una pregunta.
+  const irAnterior = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (clicDeMas(e) || preguntaActual === 0) return;
+    registrarClic(true);
+    setPreguntaActual(preguntaActual - 1);
+  };
+
+  const irSiguiente = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (clicDeMas(e) || opcionSeleccionada === -1) return;
+    registrarClic(true);
     if (preguntaActual < totalPreguntas - 1) {
-      setPreguntaActual((p) => p + 1);
+      setPreguntaActual(preguntaActual + 1);
     } else {
       setPaso('resultado');
     }
   };
 
-  const reiniciar = () => {
+  const reiniciar = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
     setRespuestas({});
     setPaso('quiz');
     setPreguntaActual(0);
@@ -144,7 +194,7 @@ export default function SelectorFormacionPostgradoPage() {
             <div className={styles.preguntaHeader}>
               <span className={styles.preguntaNumero} aria-hidden="true">{pregunta.id}</span>
               <span className={styles.preguntaIcono} aria-hidden="true">{pregunta.icono}</span>
-              <p className={styles.preguntaTexto}>{pregunta.texto}</p>
+              <p className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{pregunta.texto}</p>
             </div>
 
             {/* Opciones */}
@@ -154,12 +204,15 @@ export default function SelectorFormacionPostgradoPage() {
                   key={idx}
                   type="button"
                   className={`${styles.opcion} ${opcionSeleccionada === idx ? styles.seleccionada : ''}`}
-                  onClick={() => seleccionarOpcion(idx)}
+                  onClick={(e) => elegirOpcion(e, idx)}
                   // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                   // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                   // radio dentro (selector-smartphone, hallazgo 950).
                   role="radio"
                   aria-checked={opcionSeleccionada === idx}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (3099).
+                  tabIndex={opcionSeleccionada === -1 ? (idx === 0 ? 0 : -1) : (opcionSeleccionada === idx ? 0 : -1)}
+                  onKeyDown={(e) => teclaEnOpcion(e, idx)}
                 >
                   <span className={styles.opcionIcono} aria-hidden="true">{opcion.icono}</span>
                   <span className={styles.opcionTexto}>{opcion.texto}</span>
@@ -225,6 +278,13 @@ export default function SelectorFormacionPostgradoPage() {
               </p>
             )}
 
+            {/* La modalidad declarada que la vía no cumple (hallazgo 3102). */}
+            {calculo.avisoModalidad && (
+              <p className={styles.avisoModalidad} role="note" data-aviso="modalidad">
+                <span aria-hidden="true">🏫</span> {calculo.avisoModalidad}
+              </p>
+            )}
+
             {/* Por qué: las respuestas que más han sumado. La descripción de cada vía afirmaba
                 cosas del usuario que no dependían de lo que había contestado («Tienes
                 experiencia laboral…» a quien había marcado «Sin experiencia»). */}
@@ -252,6 +312,10 @@ export default function SelectorFormacionPostgradoPage() {
               <span>
                 <strong>Duración estimada:</strong> {resultado.duracion} &nbsp;·&nbsp;{' '}
                 <strong>Coste orientativo:</strong> {resultado.coste}. Estas cifras son orientativas y pueden variar según institución, región y modalidad.
+                {/* El test no pregunta si se tiene un grado (hallazgo 3103). */}
+                {resultado.requisitoAcceso && (
+                  <> <strong>Requisito de acceso:</strong> {resultado.requisitoAcceso}.</>
+                )}
               </span>
             </div>
 
@@ -393,9 +457,9 @@ export default function SelectorFormacionPostgradoPage() {
             La Formación Profesional de grado superior es formación práctica orientada al empleo, con
             costes bajos y titulación pública reconocida. Según el Ministerio de Educación, Formación
             Profesional y Deportes (titulados del curso 2020-2021, nota del 26/11/2025), la tasa media de
-            afiliación de los titulados de grado superior fue del 51,1 % al año de terminar; en las tres
+            afiliación de los titulados de grado superior fue del 51,1&nbsp;% al año de terminar; en las tres
             familias con más afiliación (Informática y Comunicaciones, Fabricación Mecánica e Instalación y
-            Mantenimiento), en torno al 65 % el primer año y cerca del 75 % al tercero.
+            Mantenimiento), en torno al 65&nbsp;% el primer año y cerca del 75&nbsp;% al tercero.
           </p>
           <h3>Ventajas clave</h3>
           <ul>
@@ -412,7 +476,7 @@ export default function SelectorFormacionPostgradoPage() {
           <p>
             Los bootcamps son la opción más popular para quienes quieren entrar en tecnología o cambiar
             de sector en el menor tiempo posible. En unos meses puedes aprender programación,
-            ciberseguridad, diseño UX o análisis de datos con enfoque 100 % práctico.
+            ciberseguridad, diseño UX o análisis de datos con enfoque 100&nbsp;% práctico.
           </p>
           <h3>Lo que debes valorar</h3>
           <ul>

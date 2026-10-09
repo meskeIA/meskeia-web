@@ -389,7 +389,9 @@ test.describe('Reparación 24/09/2026 — restricciones declaradas, datos de la 
     await responder(page, [1, 0, 0, 3, 1, 0, 0, 2, 3, 0]);
     expect(await tituloResultado(page)).toBe('Máster Universitario');
     await expect(aviso(page)).toContainText(
-      'Ninguna vía cumple a la vez todo lo que has declarado. El máster universitario es la que menos choca con tus límites, pero dura 1-2 años, más de lo que puedes dedicar («3-6 meses a tiempo completo»).',
+      // Reescrito el 09/10/2026 (hallazgo 3105): certificación y bootcamp también incumplen un solo límite
+      // (el título), así que el máster no es «la que menos choca»: es la de más afinidad de las tres.
+      'Ninguna vía cumple a la vez todo lo que has declarado. El máster universitario, la certificación profesional y el bootcamp son las que menos chocan con tus límites; se recomienda el máster universitario, que es la de más afinidad entre ellas, pero dura 1-2 años, más de lo que puedes dedicar («3-6 meses a tiempo completo»).',
     );
     // Estabilidad · UNAS SEMANAS O MESES · Desempleado · <2.000 € · Administración Pública ·
     // 1-3 años · Autónomo · Administración · LO ANTES POSIBLE · Titulación pública → oposiciones 27
@@ -411,7 +413,8 @@ test.describe('Reparación 24/09/2026 — restricciones declaradas, datos de la 
     await responder(page, [2, 0, 2, 1, 2, 1, 1, 0, 0, 0]);
     expect(await tituloResultado(page)).toBe('Bootcamp / Formación Online Intensiva');
     await expect(aviso(page)).toContainText(
-      'Ninguna vía cumple a la vez todo lo que has declarado. El bootcamp es la que menos choca con tus límites, pero no da un título universitario oficial, y has respondido que lo necesitas.',
+      // Reescrito el 09/10/2026 (hallazgo 3105): la certificación incumple lo mismo que el bootcamp.
+      'Ninguna vía cumple a la vez todo lo que has declarado. El bootcamp y la certificación profesional son las que menos chocan con tus límites; se recomienda el bootcamp, que es la de más afinidad entre ellas, pero no da un título universitario oficial, y has respondido que lo necesitas.',
     );
     const b = barrer();
     expect(b.tituloSinAviso).toBe(0);
@@ -467,7 +470,7 @@ test.describe('Reparación 24/09/2026 — restricciones declaradas, datos de la 
     await abrirTest(page);
     const faqMaster = (await leerFaq(page)).find((q) => /Vale la pena hacer un máster/.test(q.p))?.r ?? '';
     expect(faqMaster).not.toMatch(/8\s?% superior/);
-    expect(faqMaster).toContain('la tasa de empleo en 2019 de los graduados universitarios del curso 2013-2014 era del 86,1 %, y la de los titulados de máster, del 87,3 %');
+    expect(faqMaster).toContain('la tasa de empleo en 2019 de los graduados universitarios del curso 2013-2014 era del 86,1\u00A0%, y la de los titulados de máster, del 87,3\u00A0%');
   });
 
   test('1452: el FAQ da las duraciones de la pantalla y las cinco vías', async ({ page }) => {
@@ -762,8 +765,8 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
     await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toHaveCount(1);
   });
 
-  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0016 a.
-  test.fail('C0016 a: teclado de radios (APG): las flechas mueven y marcan, y el grupo es una sola parada de Tab', async ({ page }) => {
+  // REPARADO el 09/10/2026 (hallazgo 3099): tabindex itinerante y teclaEnOpcion, como smartphone.
+  test('3099 teclado de radios (APG): las flechas mueven y marcan, y el grupo es una sola parada de Tab', async ({ page }) => {
     // La referencia de la familia (selector-smartphone, hallazgo 1681): tabindex 0 / -1 / -1 / -1 y
     // ArrowDown lleva el foco al radio siguiente y lo marca. Aquí, medido: los cuatro radios sin
     // tabindex (cuatro paradas de Tab) y ArrowDown deja el foco en el primero sin marcar nada.
@@ -777,8 +780,8 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
     expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).not.toBe('radio');
   });
 
-  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0016 b.
-  test.fail('C0016 b: tras «Siguiente» el foco va al enunciado de la pregunta nueva, no a <body>', async ({ page }) => {
+  // REPARADO el 09/10/2026 (hallazgo 3100): un efecto sobre [paso, preguntaActual] lleva el foco al enunciado.
+  test('3100 tras «Siguiente» el foco va al enunciado de la pregunta nueva, no a <body>', async ({ page }) => {
     // Medido: el botón «Siguiente» se desactiva con el foco dentro (la pregunta 2 está sin
     // contestar) y el foco cae a <body>; el siguiente Tab sale a «Ver Guía Completa», DESPUÉS del
     // cuestionario. La referencia lo lleva al enunciado (smartphone, hallazgo 1680).
@@ -795,8 +798,8 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
   // PRESENCIAL · Tecnología · Lo antes posible · Habilidades más que el título.
   const PRESENCIAL_BOOT = [2, 0, 2, 2, 2, 1, 0, 0, 0, 2] as const;
 
-  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0011 a.
-  test.fail('C0011 a: a quien prefiere formación presencial, una vía «online» no se le recomienda en silencio', async ({ page }) => {
+  // REPARADO el 09/10/2026 (hallazgo 3102): `avisoModalidad` dice que la preferencia presencial no se cumple.
+  test('3102 a quien prefiere formación presencial, una vía «online» no se le recomienda en silencio', async ({ page }) => {
     // A mano: bootcamp 4 + 4 + 4 + 3 + 5 + 3 + 5 + 4 + 4 = 36 · certificación 2 + 2 + 3 + 3 + 4 + 4
     // = 18 · FP 2 + 2 + 3 = 7 · máster 3 + 3 = 6 · oposiciones 2 + 2 = 4. Ningún límite aparta el
     // bootcamp: gana «Bootcamp / Formación Online Intensiva» a quien ha marcado «Presencial, con
@@ -810,14 +813,17 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
     const tarjeta = (await page.locator('section[class*="resultado"]').innerText()).replace(/\s+/g, ' ');
     const recomiendaOnline = /online/i.test(`${await titulo(page).innerText()} ${(await textos(page, '[class*="resultadoPuntos"] [role="listitem"]')).join(' ')}`);
     expect(recomiendaOnline && !/presencial/i.test(tarjeta), 'vía online a quien prefiere presencial, sin decirlo').toBe(false);
+    await expect(page.locator('[data-aviso="modalidad"]')).toHaveText(
+      '🏫 Has respondido que prefieres «presencial, con contacto directo con docentes y compañeros», y el bootcamp se presenta aquí como formación online: esa preferencia no se cumple. Si eliges esta vía, comprueba antes de matricularte si hay un formato presencial.',
+    );
   });
 
   // Especializarme · 1-2 años · DESEMPLEADO · Más de 15.000 € o beca · Título oficial · Más de 7
   // años · Híbrido · Empresa… · Sin urgencia · Certificado internacional.
   const MASTER_SIN_PREGUNTAR_GRADO = [1, 1, 3, 3, 1, 3, 2, 2, 3, 3] as const;
 
-  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0011 b.
-  test.fail('C0011 b: si recomienda el máster, dice que su acceso pide un título universitario de grado', async ({ page }) => {
+  // REPARADO el 09/10/2026 (hallazgo 3103): `requisitoAcceso` del máster, RD 822/2021, art. 18 (BOE, 09/10/2026).
+  test('3103 si recomienda el máster, dice que su acceso pide un título universitario de grado', async ({ page }) => {
     // A mano: máster 4 + 3 + 4 + 4 + 2 + 3 + 4 + 4 + 2 = 30 · FP 1 + 3 + 3 + 2 + 2 + 2 = 13 ·
     // certificación 5 + 3 + 5 = 13 · bootcamp 3 + 2 = 5 · oposiciones 2 + 2 = 4; ningún límite.
     // Ninguna de las 10 preguntas pregunta si se tiene un grado, y la guía se dirige también a quien
@@ -836,8 +842,9 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
   // · Tecnología · Lo antes posible · Habilidades más que el título.
   const DESEMPLEADO_SEPE = [2, 0, 3, 0, 2, 1, 1, 0, 0, 2] as const;
 
-  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0008.
-  test.fail('C0008: el bootcamp no se aparta por un coste mínimo de 2.000 € que la propia guía contradice', async ({ page }) => {
+  // ABIERTO (hallazgo 3104, espera decisión del usuario: quitar el filtro cambia la recomendación en
+  // 15.314 perfiles, y el mínimo de 2.000 € no tiene fuente que lo zanje).
+  test.fail('3104 el bootcamp no se aparta por un coste mínimo de 2.000 € que la propia guía contradice', async ({ page }) => {
     // A mano: bootcamp 4 + 4 + 3 + 5 + 3 + 3 + 5 + 4 + 4 = 35 · certificación 2 + 2 + 4 + 3 + 4 + 3 +
     // 4 + 4 = 26 · FP 3 + 2 + 2 = 7 · oposiciones 2 + 3 + 2 = 7 · máster 0. Con menos de 2.000 € se
     // aparta el bootcamp «porque su coste orientativo empieza en 2.000 €» (horquilla sin fuente),
@@ -856,8 +863,9 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
   // Tecnología · Lo antes posible · NECESITO UN TÍTULO UNIVERSITARIO (el perfil del test de 1447).
   const MENOS_CHOCA = [2, 0, 2, 1, 2, 1, 1, 0, 0, 0] as const;
 
-  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026).
-  test.fail('«es la que menos choca con tus límites» no se dice de una vía si otra choca exactamente igual', async ({ page }) => {
+  // REPARADO el 09/10/2026 (hallazgo 3105): con varias candidatas igual de lejos, se nombran todas y
+  // se dice que la recomendada es la de más afinidad entre ellas.
+  test('3105 «es la que menos choca con tus límites» no se dice de una vía si otra choca exactamente igual', async ({ page }) => {
     // A mano: bootcamp 35 · certificación 2 + 2 + 2 + 3 + 4 + 3 + 4 = 20 · FP 2 + 3 + 2 = 7 · máster
     // 5 · oposiciones 2. Incumplen: bootcamp 1 (título) y certificación 1 (título); máster 2,
     // oposiciones 3, FP 3. Las dos candidatas chocan igual y la elegida lo es por afinidad, pero el
@@ -870,19 +878,48 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
     const notas = await page.locator('[class*="alternativaItem"]').evaluateAll((els) => els.map((e) => (e.querySelector('[class*="alternativaIncumple"]')?.textContent ?? '').trim()));
     expect(notas.slice(0, 2)).toEqual(['sin título universitario oficial', 'sin título universitario oficial']);
     await expect(avisoRestricciones(page)).not.toContainText('El bootcamp es la que menos choca con tus límites');
+    await expect(avisoRestricciones(page)).toContainText(
+      'El bootcamp y la certificación profesional son las que menos chocan con tus límites; se recomienda el bootcamp, que es la de más afinidad entre ellas, pero no da un título universitario oficial, y has respondido que lo necesitas.',
+    );
   });
 
-  // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026).
-  test.fail('el «%» va separado con espacio duro (U+00A0), en la guía y en el FAQPage', async ({ page }) => {
+  test('3105 motor: en las 1.048.576 combinaciones, el superlativo solo se dice de una candidata SOLA', () => {
+    test.setTimeout(180_000);
+    const r: Record<number, number> = {};
+    let superlativoFalso = 0;
+    let conAviso = 0;
+    const recorrer = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        const res = calcularResultado(r);
+        if (!res.avisoRestricciones.startsWith('Ninguna vía cumple')) return;
+        conAviso++;
+        const sola = res.candidatas.length === 1;
+        if (/es la que menos choca/.test(res.avisoRestricciones) !== sola) superlativoFalso++;
+        return;
+      }
+      for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) {
+        r[PREGUNTAS[i].id] = k;
+        recorrer(i + 1);
+      }
+    };
+    recorrer(0);
+    expect(conAviso).toBe(163_840);
+    expect(superlativoFalso).toBe(0);
+  });
+
+  // REPARADO el 09/10/2026 (hallazgo 3106).
+  test('3106 el «%» va separado con espacio duro (U+00A0), en la guía y en el FAQPage', async ({ page }) => {
     // Regla del 25/09/2026 (CLAUDE.md global §2): el código nuevo la cumple y lo anterior se corrige
     // cuando pasa el Inspector. Medido: «51,1 %», «65 %», «75 %» y «100 %» en la guía, y «86,1 %» y
     // «87,3 %» en el FAQPage, los seis con espacio normal (U+0020), que deja saltar el «%» solo.
     // Al repararlo, las cadenas literales de los tests 1451 y 1453 (de arriba) cambian con él.
     await abrirTest(page);
-    const guia = await textoGuia(page);
+    // Sin `textoGuia`, que normaliza con /\s+/ y convierte el U+00A0 en espacio: así no medía nada.
+    const guia = await page.locator('[class*="guideSection"]').evaluateAll((els) => els.map((e) => e.textContent ?? '').join(' ').replace(/[ \t\r\n]+/g, ' '));
     const faq = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     const conEspacioNormal = [...`${guia} ${faq}`.matchAll(/\d+(,\d+)? %/g)].map((m) => m[0]);
     expect(conEspacioNormal).toEqual([]);
+    expect([...`${guia} ${faq}`.matchAll(/\d\u00A0%/g)].length).toBe(6);
   });
 
   test.describe('móvil 360 × 740', () => {
@@ -902,6 +939,7 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
       // tocado al pie, en el centro o arriba de la pantalla.
       await abrirTest(page);
       for (let k = 0; k < 10; k++) {
+        await page.waitForTimeout(500); // lee antes de contestar: un toque a <300 ms del de «Siguiente» es el doble toque que se ignora (3101)
         await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
         const boton = page.getByRole('button', { name: /^Siguiente|^Ver resultado/ });
         await boton.evaluate((b) => b.scrollIntoView({ block: 'end' }));
@@ -912,8 +950,8 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
       expect(caja?.y ?? -1).toBeGreaterThanOrEqual(await fondoBarra(page));
     });
 
-    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0016 b y C0104 (1).
-    test.fail('C0016 b / C0104 (1): tras «Siguiente» el enunciado de la pregunta nueva se ve, debajo de la barra', async ({ page }) => {
+    // REPARADO el 09/10/2026 (hallazgo 3100): el foco al enunciado lo trae a la vista, con scroll-margin-top de 80 px.
+    test('3100 tras «Siguiente» el enunciado de la pregunta nueva se ve, debajo de la barra', async ({ page }) => {
       // Medido: con «Siguiente» en el centro de la pantalla, el enunciado de la pregunta 2 queda a
       // −197 px (fuera de la vista, por encima); nada desplaza la página ni lleva el foco a él.
       await abrirTest(page);
@@ -927,8 +965,8 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
       expect(caja?.y ?? -1).toBeGreaterThanOrEqual(await fondoBarra(page));
     });
 
-    // ABIERTO (hallazgo pendiente de número, inspector 09/10/2026) — C0104 (2).
-    test.fail('C0104 (2): un doble toque en «Siguiente» avanza UNA pregunta, sin contestar la siguiente ni volver atrás', async ({ page }) => {
+    // REPARADO el 09/10/2026 (hallazgo 3101): receta clicDeMas de la familia.
+    test('3101 un doble toque en «Siguiente» avanza UNA pregunta, sin contestar la siguiente ni volver atrás', async ({ page }) => {
       test.setTimeout(120_000);
       // Doble clic REAL (mouse.dblclick: detail 1 y 2 en el mismo punto) en el centro de
       // «Siguiente», con la opción más baja marcada. Medido: en la 3 y en la 5 el segundo toque cae
@@ -940,9 +978,11 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
       for (let q = 0; q < 10; q++) {
         await abrirTest(page);
         for (let k = 0; k < q; k++) {
+          await page.waitForTimeout(500); // lee antes de contestar: un toque a <300 ms del de «Siguiente» es el doble toque que se ignora (3101)
           await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
           await page.getByRole('button', { name: /^Siguiente/ }).tap();
         }
+        await page.waitForTimeout(500); // lee antes de contestar: un toque a <300 ms del de «Siguiente» es el doble toque que se ignora (3101)
         await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
         const boton = page.getByRole('button', { name: /^Siguiente|^Ver resultado/ });
         await boton.evaluate((b) => b.scrollIntoView({ block: 'center' }));
