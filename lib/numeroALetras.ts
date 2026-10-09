@@ -221,6 +221,18 @@ function cuantificaConDe(numeral: string): boolean {
   return /mill(ón|ones)$/.test(numeral);
 }
 
+/**
+ * Céntimos de un importe redondeando sobre las CIFRAS escritas, no sobre el binario.
+ * `Math.round(0.145 * 100)` da 14, porque 0,145 se guarda como 0,14499999…: «catorce
+ * céntimos» por quince (hallazgo 1708, reparado en el motor de conversor-numeros-letras; aquí,
+ * cabo C0022). Desplazar la coma en la notación decimal («0.145e2» = 14,5) redondea lo que se
+ * escribió. Si el número ya viene en notación exponencial (< 1e-6), basta el producto.
+ */
+function centimosDe(importe: number): number {
+  const texto = String(importe);
+  return texto.includes('e') ? Math.round(importe * 100) : Math.round(Number(`${texto}e2`));
+}
+
 export function cantidadALetras(valor: number, opciones: OpcionesCantidad): CantidadEnLetras {
   const { moneda, estiloFraccion = 'letras', mayusculas = false } = opciones;
 
@@ -228,7 +240,7 @@ export function cantidadALetras(valor: number, opciones: OpcionesCantidad): Cant
     throw new Error('Introduce una cantidad válida.');
   }
   const negativo = valor < 0;
-  const totalCentimos = Math.round(Math.abs(valor) * 100);
+  const totalCentimos = centimosDe(Math.abs(valor));
   const entero = Math.floor(totalCentimos / 100);
   const fraccion = totalCentimos % 100;
 

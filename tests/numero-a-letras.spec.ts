@@ -99,6 +99,10 @@ test.describe('cantidadALetras — importes', () => {
   test('singular y plural de la moneda y de la fracción', () => {
     expect(cantidadALetras(1, { moneda: EUR }).texto).toBe('un euro');
     expect(cantidadALetras(1.01, { moneda: EUR }).texto).toBe('un euro con un céntimo');
+    // C0022: el redondeo es sobre lo escrito; 0,145 se guarda como 0,14499999… y salía «catorce»
+    expect(cantidadALetras(0.145, { moneda: EUR }).texto).toBe('cero euros con quince céntimos');
+    expect(cantidadALetras(1.005, { moneda: EUR }).texto).toBe('un euro con un céntimo');
+    expect(cantidadALetras(-2.675, { moneda: EUR }).texto).toContain('sesenta y ocho céntimos');
   });
 
   test('el numeral concuerda con la moneda, no con el número', () => {
