@@ -1,6 +1,16 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FISCAL_SMI_META } from '@/data/fiscal';
+import { FISCAL_SMI_META, COTIZACIONES_SS_2026, SMI_2026 } from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
+
+// Cotización del trabajador y neto del FAQ, derivados de los mismos datos que la app (cabo
+// C0015): decía «6,35 %» (sin el MEI) y «1.060-1.080 euros netos», cuando la app da 6,50 % y
+// 1.141,64 €/mes en 14 pagas (CASO de tests/apps/estimador-smi.spec.ts). Con el SMI la cuota
+// de IRPF queda en cero (lo comprueba ese mismo caso): si un SMI futuro la hiciera positiva, el
+// spec dejaría de cuadrar con esta cuenta.
+const TIPO_SS_TRABAJADOR = COTIZACIONES_SS_2026.contingenciasComunes + COTIZACIONES_SS_2026.desempleo
+  + COTIZACIONES_SS_2026.formacionProfesional + COTIZACIONES_SS_2026.mef;
+const NETO_ANUAL_SMI = SMI_2026.anual * (1 - TIPO_SS_TRABAJADOR / 100);
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
 // y no se escribe a mano (lo exige check:anio-titulo).
@@ -68,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se cobra neto con el SMI 2026?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El importe neto del SMI 2026 depende de la situación personal del trabajador (estado civil, hijos a cargo, discapacidad), pero como referencia orientativa, una persona soltera sin hijos cobraría aproximadamente 1.060-1.080 euros netos al mes. Las retenciones de IRPF son muy bajas o nulas a este nivel salarial; la mayor deducción proviene de la cotización a la Seguridad Social del trabajador (6,35 % sobre el salario bruto).',
+        text: `El importe neto del SMI 2026 depende de la situación personal del trabajador (estado civil, hijos a cargo, discapacidad), pero como referencia orientativa, una persona soltera sin hijos cobraría unos ${formatNumber(NETO_ANUAL_SMI / 14, 0)} euros netos al mes en 14 pagas (${formatNumber(NETO_ANUAL_SMI / 12, 0)} en 12). La cuota de IRPF queda en cero a este nivel salarial; lo que se descuenta es la cotización a la Seguridad Social del trabajador (${formatNumber(TIPO_SS_TRABAJADOR, 2)}\u00A0% sobre el salario bruto).`,
       },
     },
     {

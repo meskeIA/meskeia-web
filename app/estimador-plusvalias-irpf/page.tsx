@@ -6,7 +6,7 @@ import styles from './EstimadorPlusvalias.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { formatNumber, formatCurrency, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_INMUEBLES_META,
   GANANCIAS_PATRIMONIALES_META,
@@ -533,7 +533,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
           </a>.
         </p>
         <p className={styles.disclaimerFecha}>
-          Datos verificados: {GANANCIAS_PATRIMONIALES_META.verificado} | Vigencia: {GANANCIAS_PATRIMONIALES_META.vigencia}
+          Datos verificados: {formatDate(parseISODateLocal(GANANCIAS_PATRIMONIALES_META.verificado))} | Vigencia: {GANANCIAS_PATRIMONIALES_META.vigencia}
         </p>
       </div>
 

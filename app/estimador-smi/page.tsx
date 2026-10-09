@@ -323,7 +323,7 @@ export default function EstimadorSMIPage() {
               {neto.deduccionRentasBajas > 0 && (
                 <div className={styles.desgloseRow}>
                   <span>Deducción por rendimientos del trabajo (ya restada del IRPF)</span>
-                  <span className={styles.desgloseValue} style={{ color: '#27ae60' }}>
+                  <span className={`${styles.desgloseValue} ${styles.importePositivo}`}>
                     +{formatCurrency(neto.deduccionRentasBajas)}
                   </span>
                 </div>
@@ -396,7 +396,7 @@ export default function EstimadorSMIPage() {
               </div>
               <div className={styles.desgloseRow}>
                 <span>Diferencia mensual</span>
-                <span className={styles.desgloseValue} style={{ color: '#27ae60' }}>
+                <span className={`${styles.desgloseValue} ${styles.importePositivo}`}>
                   +{formatCurrency(atrasos.diferenciaMensual14)}
                 </span>
               </div>

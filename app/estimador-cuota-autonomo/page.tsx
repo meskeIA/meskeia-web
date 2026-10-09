@@ -5,7 +5,7 @@ import styles from './EstimadorCuotaAutonomo.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatDate, formatNumber, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import { FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA, tramoRETA } from '@/data/fiscal';
 
 // Datos fiscales centralizados en data/fiscal/autonomos.ts
@@ -258,7 +258,7 @@ export default function EstimadorCuotaAutonomoPage() {
         </div>
         <p>{FISCAL_AUTONOMOS_META.fuente}</p>
         <p className={styles.normativaVigencia}>
-          Vigencia: {FISCAL_AUTONOMOS_META.vigencia} | Datos verificados: {FISCAL_AUTONOMOS_META.verificado}
+          Vigencia: {FISCAL_AUTONOMOS_META.vigencia} | Datos verificados: {formatDate(parseISODateLocal(FISCAL_AUTONOMOS_META.verificado))}
         </p>
         <p className={styles.normativaNota}>{FISCAL_AUTONOMOS_META.nota}</p>
         <p className={styles.normativaNota}>
@@ -510,7 +510,7 @@ export default function EstimadorCuotaAutonomoPage() {
           </a>, tu gestoría o un asesor profesional.
         </p>
         <p className={styles.disclaimerFecha}>
-          Datos verificados: {FISCAL_AUTONOMOS_META.verificado} | Vigencia: {FISCAL_AUTONOMOS_META.vigencia}
+          Datos verificados: {formatDate(parseISODateLocal(FISCAL_AUTONOMOS_META.verificado))} | Vigencia: {FISCAL_AUTONOMOS_META.vigencia}
         </p>
       </div>
 

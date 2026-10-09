@@ -100,3 +100,10 @@ test('CASO 2 · 120.000 € de beneficio: el mínimo cae entero en el tramo del 
   expect(await fila(page, 'Total cargas (SS + IRPF)')).toBe('43.355,52 €');
   expect(await fila(page, 'Neto anual estimado')).toBe('66.644,48 €');
 });
+
+// Cabo C0015 (09/10/2026): la fecha de verificación salía en ISO («2026-06-10»).
+test('C0015 · la fecha de verificación de los datos sale en formato español', async ({ page }) => {
+  const texto = await page.locator('body').innerText();
+  expect(texto).toMatch(/Datos verificados: \d{2}\/\d{2}\/\d{4}/);
+  expect(texto).not.toMatch(/verificad[oa]s?:? (a )?\d{4}-\d{2}-\d{2}/);
+});

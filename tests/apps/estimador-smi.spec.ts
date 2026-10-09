@@ -93,3 +93,23 @@ test('en 12 pagas el neto anual no cambia, solo el reparto mensual', async ({ pa
   const neto = page.locator('css=div:has(> span > strong:text-is("Salario neto anual"))').first();
   expect(limpiar(await neto.locator('span').nth(1).innerText())).toBe('15.982,89 €');
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cabo C0015 (09/10/2026): el FAQPage decía «6,35 %» (sin el MEI) y «1.060-1.080 euros netos»,
+// y los importes a favor del desglose eran un #27ae60 en línea (2,87:1, sin variante oscura).
+test('C0015 · el FAQ da el neto y la cotización que calcula la app', async ({ page }) => {
+  const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+  // Cuatro cifras enteras no se agrupan (RAE 2010, formatNumber): «1142», no «1.142»
+  expect(ld).toContain('unos 1142 euros netos al mes en 14 pagas (1332 en 12)');
+  expect(ld).toContain('6,50\u00A0% sobre el salario bruto');
+  expect(ld).not.toContain('6,35');
+  expect(ld).not.toContain('1.060-1.080');
+});
+
+test('C0015 · los importes a favor del desglose se leen en los dos temas', async ({ page }) => {
+  const importe = page.locator('[class*="importePositivo"]').first();
+  await expect(importe).toBeVisible();
+  await expect(importe).toHaveCSS('color', 'rgb(30, 123, 69)'); // #1E7B45: 5,28:1 sobre blanco
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+  await expect(importe).toHaveCSS('color', 'rgb(102, 187, 106)'); // #66BB6A: 5,82:1 sobre #2d2d2d
+});

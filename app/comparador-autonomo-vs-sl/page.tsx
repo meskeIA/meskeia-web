@@ -5,7 +5,7 @@ import styles from './ComparadorAutonomoVsSL.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { formatNumber, formatCurrency, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_IRPF_META,
   FISCAL_AUTONOMOS_META,
@@ -382,10 +382,10 @@ export default function ComparadorAutonomoVsSLPage() {
         </ul>
         <p>
           <strong>Consulta siempre con un asesor fiscal y mercantil</strong> antes de tomar esta decisión.
-          Los datos normativos están verificados a {FISCAL_SOCIEDADES_META.verificado}.
+          Los datos normativos están verificados a {formatDate(parseISODateLocal(FISCAL_SOCIEDADES_META.verificado))}.
         </p>
         <p className={styles.disclaimerFecha}>
-          Datos verificados: {FISCAL_SOCIEDADES_META.verificado} | Vigencia: {FISCAL_SOCIEDADES_META.vigencia}
+          Datos verificados: {formatDate(parseISODateLocal(FISCAL_SOCIEDADES_META.verificado))} | Vigencia: {FISCAL_SOCIEDADES_META.vigencia}
         </p>
       </div>
 
