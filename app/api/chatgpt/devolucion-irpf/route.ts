@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const {
-      rendimientosTrabajoAnuales, retencionesTrabajoAnuales,
+      rendimientosTrabajoAnuales, retencionesTrabajoAnuales, cotizacionesSSTrabajador,
       rendimientosActividadesEconomicas, retencionesActividadesEconomicas, pagosFraccionados,
       rendimientosCapitalMobiliario, retencionesCapitalMobiliario,
       rendimientosCapitalInmobiliario, retencionesCapitalInmobiliario,
@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
     const resultado = calcularDevolucionIRPF({
       rendimientosTrabajoAnuales,
       retencionesTrabajoAnuales: typeof retencionesTrabajoAnuales === 'number' ? retencionesTrabajoAnuales : undefined,
+      cotizacionesSSTrabajador: typeof cotizacionesSSTrabajador === 'number' ? cotizacionesSSTrabajador : undefined,
       rendimientosActividadesEconomicas: typeof rendimientosActividadesEconomicas === 'number' ? rendimientosActividadesEconomicas : undefined,
       retencionesActividadesEconomicas: typeof retencionesActividadesEconomicas === 'number' ? retencionesActividadesEconomicas : undefined,
       pagosFraccionados: typeof pagosFraccionados === 'number' ? pagosFraccionados : undefined,

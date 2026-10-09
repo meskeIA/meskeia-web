@@ -54,6 +54,8 @@ import {
 } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
+const AVISO_SIN_SS = "No se ha indicado cotización a la Seguridad Social del trabajador: si alguno de los ingresos es una nómina, añádela desde el certificado de retenciones. Sin ella, los gastos deducibles y la reducción por rendimientos del trabajo salen menores y la cuota estimada, mayor (20.000 € de nómina: reducción de 0 € en vez de unos 1.194 €). En pensiones y prestaciones del SEPE es correcto dejarla en 0.";
+
 const LIMITE_SEGUNDO_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.limiteSegundoPagador;
 const LIMITE_OBLIGACION_UN_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.unPagador;
 const LIMITE_OBLIGACION_SEGUNDO_PAGADOR = OBLIGACION_DECLARAR_2025.trabajo.variosPagadores;
@@ -67,6 +69,12 @@ export interface PagadorInfo {
   importeBruto: number;
   /** Retenciones practicadas por este pagador (€) */
   retencionesPracticadas: number;
+  /**
+   * Cotizaciones a la Seguridad Social del TRABAJADOR que retuvo este pagador (€/año), las del
+   * certificado de retenciones. Son gasto deducible (art. 19.2.a LIRPF) y cuentan para la
+   * reducción del art. 20. 0 o ausente en pensiones y prestaciones. Cabo C0020 (09/10/2026).
+   */
+  cotizacionSS?: number;
 }
 
 export interface ParametrosIRPFSegundoPagador {
@@ -115,16 +123,16 @@ export interface ResultadoIRPFSegundoPagador {
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function estimarCuotaIRPF(rendimientosBrutos: number): number {
+function estimarCuotaIRPF(rendimientosBrutos: number, cotizacionesSS: number): number {
   // Arts. 19 y 20 LIRPF. ⚠️ CORREGIDO EL 25/09/2026: el comentario que había aquí afirmaba
   // que los 2.000 € de la letra f) del art. 19.2 se restan ANTES de medir la reducción del
   // art. 20, y es al revés: el art. 20 dice que, «a estos efectos», el rendimiento neto es el
   // íntegro menos los gastos de las letras a) a e) (hallazgo 1687 de estimador-sueldo-neto).
-  // Este motor no modela la cotización a la SS (la mayoría de segundos pagadores son
-  // pensiones o prestaciones), así que no resta gastos de las letras a) a e).
+  // La cotización a la SS del trabajador es el gasto de la letra a); hasta el 09/10/2026 (cabo
+  // C0020) no se pedía, y la reducción de una nómina se medía sobre el bruto.
   const rendimientoNeto = calcularRendimientoNetoTrabajo({
     integros: rendimientosBrutos,
-    gastosAaE: 0,
+    gastosAaE: cotizacionesSS,
   }).rendimientoNetoReducido;
 
   // Mínimo personal (soltero orientativo)
@@ -153,6 +161,9 @@ export function calcularIRPFSegundoPagador(p: ParametrosIRPFSegundoPagador): Res
   if (p.pagadores.some(pg => !Number.isFinite(pg.importeBruto) || !Number.isFinite(pg.retencionesPracticadas))) {
     throw new Error('Los importes y las retenciones deben ser números finitos.');
   }
+  if (p.pagadores.some(pg => pg.cotizacionSS !== undefined && (!Number.isFinite(pg.cotizacionSS) || pg.cotizacionSS < 0))) {
+    throw new Error('La cotización a la Seguridad Social debe ser un número no negativo.');
+  }
 
   const r = (n: number) => Math.round(n * 100) / 100;
 
@@ -172,7 +183,8 @@ export function calcularIRPFSegundoPagador(p: ParametrosIRPFSegundoPagador): Res
   const obligacionDeclarar = totalRendimientosBrutos > limiteObligacion;
 
   // Estimación cuota IRPF sobre el total
-  const cuotaIRPFEstimada = estimarCuotaIRPF(totalRendimientosBrutos);
+  const totalCotizacionesSS = r(pagadoresOrdenados.reduce((s, pg) => s + (pg.cotizacionSS ?? 0), 0));
+  const cuotaIRPFEstimada = estimarCuotaIRPF(totalRendimientosBrutos, totalCotizacionesSS);
   const tipoEfectivoEstimado = totalRendimientosBrutos > 0
     ? r(cuotaIRPFEstimada / totalRendimientosBrutos * 100)
     : 0;
@@ -190,6 +202,8 @@ export function calcularIRPFSegundoPagador(p: ParametrosIRPFSegundoPagador): Res
     'Para evitar la deuda, comunicar al pagador principal los ingresos del segundo pagador mediante el modelo 145 actualizado, solicitando un tipo de retención mayor.',
     'La cuota IRPF estimada es orientativa (situación: soltero sin hijos, solo rendimientos del trabajo). La cuota real depende de deducciones adicionales, rendimientos de capital y circunstancias personales completas.',
   ];
+
+  if (totalCotizacionesSS === 0) advertencias.push(AVISO_SIN_SS);
 
   if (resultadoDeclaracion === 'a_pagar') {
     advertencias.unshift(`⚠️ Resultado estimado A PAGAR: ${formatNumber(Math.abs(resultadoEstimado))} €. Las retenciones acumuladas son insuficientes. Solicita un tipo de retención mayor al pagador principal indicando los ingresos del segundo pagador en el modelo 145.`);

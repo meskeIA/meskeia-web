@@ -97,6 +97,7 @@ import { calcularIIVTNU } from '../lib/calculadoras/iivtnuPlusvaliaMunicipal';
 import { calcularImpuestoPatrimonio } from '../lib/calculadoras/impuestoPatrimonio';
 import { calcularImpuestosDivorcio } from '../lib/calculadoras/impuestosDivorcio';
 import { calcularIRPFSegundoPagador } from '../lib/calculadoras/irpfSegundoPagador';
+import { calcularDevolucionIRPF } from '../lib/calculadoras/devolucionIRPF';
 import {
   calcularLegitimas,
   REGIMENES_INFO,
@@ -4119,6 +4120,37 @@ test.describe('Motores 09/09 — segundo pagador: dos constantes copiadas y enve
     expect(res.superaUmbralSegundoPagador).toBe(true);
     expect(res.limiteObligacionDeclarar).toBe(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores);
     expect(res.obligacionDeclarar).toBe(false); // 15.501 € ≤ 15.876 €
+  });
+
+  test('C0020: la cotización a la SS de una nómina se resta y entra en la reducción del art. 20', () => {
+    // 20.000 € de nómina con 1.300 € de cotización del trabajador (6,50 %):
+    //   art. 20 sobre 20.000 − 1.300 = 18.700 → 2.364,34 − 1,14 × (18.700 − 17.673,52) = 1.194,15 €
+    //   RNR = 20.000 − 1.300 − 2.000 − 1.194,15 = 15.505,85 €
+    //   cuota = (12.450 × 19 % + 3.055,85 × 24 %) − 5.550 × 19 % = 3.098,90 − 1.054,50 = 2.044,40 €
+    // Sin la SS (lo único que el motor sabía hacer antes): RNR = 18.000 → cuota 2.643,00 €.
+    const conSS = calcularIRPFSegundoPagador({
+      pagadores: [{ descripcion: 'Empresa', importeBruto: 20000, retencionesPracticadas: 0, cotizacionSS: 1300 }],
+    });
+    expect(conSS.cuotaIRPFEstimada).toBeCloseTo(2044.40, 1);
+    expect(conSS.advertencias.join(' ')).not.toContain('No se ha indicado cotización');
+    const sinSS = calcularIRPFSegundoPagador({
+      pagadores: [{ descripcion: 'Empresa', importeBruto: 20000, retencionesPracticadas: 0 }],
+    });
+    expect(sinSS.cuotaIRPFEstimada).toBeCloseTo(2643.00, 1);
+    expect(sinSS.advertencias.join(' ')).toContain('No se ha indicado cotización a la Seguridad Social');
+    expect(() => calcularIRPFSegundoPagador({
+      pagadores: [{ descripcion: 'Empresa', importeBruto: 20000, retencionesPracticadas: 0, cotizacionSS: -1 }],
+    })).toThrow();
+  });
+
+  test('C0020: la devolución también resta la cotización a la SS del trabajador', () => {
+    // Misma cadena que el caso anterior: base imponible general 15.505,85 € con la SS; 18.000 € sin ella
+    const con = calcularDevolucionIRPF({ rendimientosTrabajoAnuales: 20000, cotizacionesSSTrabajador: 1300 });
+    expect(con.baseImponibleGeneral).toBeCloseTo(15505.85, 1);
+    expect(con.advertencia).not.toContain('No se ha indicado cotización');
+    const sin = calcularDevolucionIRPF({ rendimientosTrabajoAnuales: 20000 });
+    expect(sin.baseImponibleGeneral).toBeCloseTo(18000, 1);
+    expect(sin.advertencia).toContain('No se ha indicado cotización a la Seguridad Social');
   });
 
   test('CRÍTICO: la reducción del art. 20 se aplica sobre el RNT y con los importes vigentes', () => {

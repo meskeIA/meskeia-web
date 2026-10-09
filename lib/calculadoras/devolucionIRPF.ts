@@ -31,6 +31,12 @@ export interface ParametrosDevolucionIRPF {
   rendimientosTrabajoAnuales: number;
   /** Retenciones del trabajo practicadas por la empresa (€). Si no conoce, usar 0. */
   retencionesTrabajoAnuales?: number;
+  /**
+   * Cotizaciones a la Seguridad Social del TRABAJADOR en el año (€), las del certificado de
+   * retenciones. Gasto deducible (art. 19.2.a LIRPF) que cuenta para la reducción del art. 20.
+   * 0 o ausente en pensiones y prestaciones. Cabo C0020 (09/10/2026).
+   */
+  cotizacionesSSTrabajador?: number;
 
   // ── Rendimientos de actividades económicas (autónomos)
   /** Rendimientos netos de actividades económicas (€). Por defecto 0. */
@@ -193,11 +199,16 @@ export function calcularDevolucionIRPF(p: ParametrosDevolucionIRPF): ResultadoDe
   // sueldo alto—, aunque data/fiscal/irpf.ts lo daba por migrado desde el 09/09/2026; y no
   // restaba los 2.000 € de la letra f) del art. 19.2. Ahora lo hace la fuente única, con la
   // condición de las otras rentas del art. 20 (más de 6.500 € → sin reducción).
-  // No modela la cotización a la SS: `rendimientosTrabajoAnuales` son los brutos.
+  // La cotización a la SS del trabajador es el gasto de la letra a); hasta el 09/10/2026 (cabo
+  // C0020) no se pedía y la reducción de una nómina se medía sobre el bruto.
   const rdt = p.rendimientosTrabajoAnuales;
+  const cotizacionesSS = p.cotizacionesSSTrabajador ?? 0;
+  if (!Number.isFinite(cotizacionesSS) || cotizacionesSS < 0) {
+    throw new Error('La cotización a la Seguridad Social debe ser un número no negativo.');
+  }
   const rendimientoTrabajo = calcularRendimientoNetoTrabajo({
     integros: rdt,
-    gastosAaE: 0,
+    gastosAaE: cotizacionesSS,
     otrasRentas: Math.max(0, actEco) + Math.max(0, capInmob) + Math.max(0, capMob) + Math.max(0, ganPat),
   });
 
@@ -263,7 +274,8 @@ export function calcularDevolucionIRPF(p: ParametrosDevolucionIRPF): ResultadoDe
     importeADevolver: aDevolver ? r(Math.abs(resultadoDeclaracion)) : 0,
     importeAPagar: aPagar ? r(resultadoDeclaracion) : 0,
     tipoEfectivo,
-    advertencia: 'Simulación orientativa basada en tramos estatales + autonómicos medios. El resultado exacto depende de la CCAA de residencia, deducciones autonómicas y circunstancias personales. Usa la herramienta oficial de la AEAT (Renta WEB) para calcular tu declaración real.',
+    advertencia: 'Simulación orientativa basada en tramos estatales + autonómicos medios. El resultado exacto depende de la CCAA de residencia, deducciones autonómicas y circunstancias personales. Usa la herramienta oficial de la AEAT (Renta WEB) para calcular tu declaración real.'
+      + (rdt > 0 && cotizacionesSS === 0 ? ' ' + "No se ha indicado cotización a la Seguridad Social del trabajador: si alguno de los ingresos es una nómina, añádela desde el certificado de retenciones. Sin ella, los gastos deducibles y la reducción por rendimientos del trabajo salen menores y la cuota estimada, mayor (20.000 € de nómina: reducción de 0 € en vez de unos 1.194 €). En pensiones y prestaciones del SEPE es correcto dejarla en 0." : ''),
     fuenteDatos: `${FISCAL_IRPF_META.fuente} — verificado ${FISCAL_IRPF_META.verificado}`,
   };
 }

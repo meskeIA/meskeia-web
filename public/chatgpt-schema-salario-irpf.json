@@ -136,6 +136,11 @@
                     "type": "number",
                     "description": "Total de retenciones IRPF practicadas por la empresa durante el año en euros. Aparece en la nómina de diciembre o en el certificado de retenciones."
                   },
+                  "cotizacionesSSTrabajador": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Cotizaciones a la Seguridad Social del trabajador en el año, en euros (certificado de retenciones, «gastos deducibles»). Si es una nómina, pídela: sin ella la cuota sale mayor. 0 en pensiones y prestaciones."
+                  },
                   "rendimientosActividadesEconomicas": {
                     "type": "number",
                     "description": "Rendimientos netos de actividades económicas (autónomos) en euros. Por defecto 0."
@@ -232,6 +237,11 @@
                         "retencionesPracticadas": {
                           "type": "number",
                           "description": "Retenciones IRPF practicadas por este pagador durante el año en euros."
+                        },
+                        "cotizacionSS": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Cotizaciones a la Seguridad Social del trabajador retenidas por este pagador en el año, en euros (certificado de retenciones). Si es una nómina, pídela: sin ella la cuota sale mayor. 0 en pensiones y prestaciones del SEPE."
                         }
                       }
                     }

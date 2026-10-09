@@ -77,6 +77,12 @@ export async function POST(request: NextRequest) {
           { status: 400, headers: corsHeaders() }
         );
       }
+      if (p.cotizacionSS !== undefined && (typeof p.cotizacionSS !== 'number' || p.cotizacionSS < 0)) {
+        return NextResponse.json(
+          { error: `Pagador "${p.descripcion}": el campo "cotizacionSS" debe ser un número >= 0 en euros.` },
+          { status: 400, headers: corsHeaders() }
+        );
+      }
       if (typeof p.retencionesPracticadas !== 'number' || p.retencionesPracticadas < 0) {
         return NextResponse.json(
           { error: `Pagador "${p.descripcion}": el campo "retencionesPracticadas" debe ser un número >= 0 en euros.` },
@@ -89,6 +95,7 @@ export async function POST(request: NextRequest) {
       descripcion: String(p.descripcion).trim(),
       importeBruto: Number(p.importeBruto),
       retencionesPracticadas: Number(p.retencionesPracticadas),
+      cotizacionSS: p.cotizacionSS !== undefined ? Number(p.cotizacionSS) : undefined,
     }));
 
     const resultado = calcularIRPFSegundoPagador({ pagadores: pagadoresValidados });
