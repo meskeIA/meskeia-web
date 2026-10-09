@@ -756,7 +756,7 @@ export default function VisualizadorQuimicaOrganica() {
                 {bencenoVista === 'kekule' ? (
                   <>
                     <p><strong>Estructura de Kekulé</strong> (1865): dobles enlaces alternos entre los 6 C del anillo. Históricamente la primera propuesta de Kekulé. En realidad los electrones π están deslocalizados.</p>
-                    <p>C₆H₆ · n=1 · <strong>6 electrones π</strong> ✅ aromático</p>
+                    <p>C₆H₆ · n=1 · <strong>6 electrones π</strong> <span aria-hidden="true">✅</span> aromático</p>
                   </>
                 ) : (
                   <>

@@ -193,6 +193,7 @@ export default function EficienciaEnergeticaPage() {
             { id: 'calefaccion', label: 'Calefacción / BC', emoji: '🌡️' },
           ] as { id: TabType; label: string; emoji: string }[]).map(t => (
             <button
+              type="button"
               key={t.id}
               role="tab"
               aria-selected={tabActiva === t.id}
@@ -526,7 +527,7 @@ export default function EficienciaEnergeticaPage() {
                   Casa 160 m², Castilla, letra E, gas natural.<br/>
                   Aislamiento cubierta (90 m²): 3.200 €.<br/>
                   Ahorro estimado: ~480 €/año (30% de 1.600 €).<br/>
-                  Payback: 6,7 años. ✅ Muy rentable.
+                  Payback: 6,7 años. <span aria-hidden="true">✅</span> Muy rentable.
                 </div>
                 <p className={styles.escenarioTip}><strong>Clave:</strong> En zonas frías con mucha demanda de calefacción, el aislamiento de cubierta tiene el payback más corto (5–8 años). Es la primera mejora a realizar.</p>
               </div>
@@ -574,11 +575,11 @@ export default function EficienciaEnergeticaPage() {
                 <span>Errores que reducen el retorno de tu inversión</span>
               </div>
               <ul className={styles.warningList}>
-                <li><strong>❌ Instalar la bomba de calor sin aislar primero:</strong> Una BC eficiente en una vivienda mal aislada trabaja al límite de su capacidad en días fríos y consume más de lo esperado. El ahorro real puede ser un 40% menor que el calculado.</li>
-                <li><strong>❌ No solicitar la subvención antes de comenzar la obra:</strong> La mayoría de ayudas PREE 5000 y Next Generation requieren resolución favorable antes de iniciar los trabajos. Comenzar sin ella implica perder la subvención por completo.</li>
-                <li><strong>❌ Comparar solo el precio de la caldera, no el coste total:</strong> Una caldera de condensación puede ser 1.000 € más cara que una convencional, pero su mayor eficiencia amortiza la diferencia en 2–3 años en climas fríos.</li>
-                <li><strong>❌ Ignorar los puentes térmicos al aislar:</strong> Aislar fachada y cubierta sin corregir puentes térmicos (pilares, forjados, dinteles) puede dejar un 15–20% de las pérdidas sin resolver y generar condensaciones locales.</li>
-                <li><strong>❌ Elegir el triple acristalamiento siempre:</strong> El triple acristalamiento solo compensa en zonas muy frías (zona D–E del RITE). En clima mediterráneo, el doble Low-E ofrece un payback 2–3 veces mejor con prestaciones similares.</li>
+                <li><strong><span aria-hidden="true">❌</span> Instalar la bomba de calor sin aislar primero:</strong> Una BC eficiente en una vivienda mal aislada trabaja al límite de su capacidad en días fríos y consume más de lo esperado. El ahorro real puede ser un 40% menor que el calculado.</li>
+                <li><strong><span aria-hidden="true">❌</span> No solicitar la subvención antes de comenzar la obra:</strong> La mayoría de ayudas PREE 5000 y Next Generation requieren resolución favorable antes de iniciar los trabajos. Comenzar sin ella implica perder la subvención por completo.</li>
+                <li><strong><span aria-hidden="true">❌</span> Comparar solo el precio de la caldera, no el coste total:</strong> Una caldera de condensación puede ser 1.000 € más cara que una convencional, pero su mayor eficiencia amortiza la diferencia en 2–3 años en climas fríos.</li>
+                <li><strong><span aria-hidden="true">❌</span> Ignorar los puentes térmicos al aislar:</strong> Aislar fachada y cubierta sin corregir puentes térmicos (pilares, forjados, dinteles) puede dejar un 15–20% de las pérdidas sin resolver y generar condensaciones locales.</li>
+                <li><strong><span aria-hidden="true">❌</span> Elegir el triple acristalamiento siempre:</strong> El triple acristalamiento solo compensa en zonas muy frías (zona D–E del RITE). En clima mediterráneo, el doble Low-E ofrece un payback 2–3 veces mejor con prestaciones similares.</li>
               </ul>
             </div>
 

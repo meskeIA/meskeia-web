@@ -434,28 +434,28 @@ export default function GeneradorGitignorePage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔒 Seguridad</h4>
+              <h4><span aria-hidden="true">🔒</span> Seguridad</h4>
               <p>
                 Evita subir <strong>credenciales, API keys, tokens</strong> y archivos <code>.env</code> con información sensible. Un error puede exponer datos críticos públicamente.
               </p>
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📦 Eficiencia</h4>
+              <h4><span aria-hidden="true">📦</span> Eficiencia</h4>
               <p>
                 Excluye <strong>dependencias</strong> (<code>node_modules/</code>, <code>vendor/</code>), <strong>builds</strong> (<code>dist/</code>, <code>target/</code>) y archivos temporales. Reduce el tamaño del repo un 90%.
               </p>
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🧹 Limpieza</h4>
+              <h4><span aria-hidden="true">🧹</span> Limpieza</h4>
               <p>
                 Filtra <strong>archivos del sistema</strong> (<code>.DS_Store</code>, <code>Thumbs.db</code>), <strong>logs</strong> y <strong>cachés</strong> que no aportan valor al código fuente.
               </p>
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🤝 Colaboración</h4>
+              <h4><span aria-hidden="true">🤝</span> Colaboración</h4>
               <p>
                 Evita conflictos de merge por archivos de configuración personal de IDEs (<code>.vscode/</code>, <code>.idea/</code>). Cada desarrollador tiene su entorno sin contaminar el repo.
               </p>
@@ -485,48 +485,48 @@ export default function GeneradorGitignorePage() {
               <tbody>
                 <tr>
                   <td><strong>Manual</strong></td>
-                  <td>⏱️ Lento</td>
-                  <td>⭐⭐⭐⭐⭐ Alta</td>
-                  <td>🎯 Máxima</td>
+                  <td><span aria-hidden="true">⏱️</span> Lento</td>
+                  <td><span aria-hidden="true">⭐⭐⭐⭐⭐</span> Alta</td>
+                  <td><span aria-hidden="true">🎯</span> Máxima</td>
                   <td>Proyectos únicos, expertos Git</td>
                   <td>Propenso a olvidos, laborioso</td>
                 </tr>
                 <tr>
                   <td><strong>Templates GitHub</strong></td>
-                  <td>⚡ Rápido</td>
-                  <td>⭐⭐⭐⭐ Buena</td>
-                  <td>📝 Media</td>
+                  <td><span aria-hidden="true">⚡</span> Rápido</td>
+                  <td><span aria-hidden="true">⭐⭐⭐⭐</span> Buena</td>
+                  <td><span aria-hidden="true">📝</span> Media</td>
                   <td>Proyectos estándar mono-tecnología</td>
                   <td>Limitado a una tecnología a la vez</td>
                 </tr>
                 <tr>
                   <td><strong>gitignore.io</strong></td>
-                  <td>⚡ Rápido</td>
-                  <td>⭐⭐⭐⭐ Buena</td>
-                  <td>🔧 Media-Alta</td>
+                  <td><span aria-hidden="true">⚡</span> Rápido</td>
+                  <td><span aria-hidden="true">⭐⭐⭐⭐</span> Buena</td>
+                  <td><span aria-hidden="true">🔧</span> Media-Alta</td>
                   <td>Proyectos multi-tecnología estándar</td>
                   <td>Requiere conexión, interfaz externa</td>
                 </tr>
                 <tr>
                   <td><strong>meskeIA Generator</strong></td>
-                  <td>⚡ Rápido</td>
-                  <td>⭐⭐⭐⭐ Buena</td>
-                  <td>🎯 Alta</td>
+                  <td><span aria-hidden="true">⚡</span> Rápido</td>
+                  <td><span aria-hidden="true">⭐⭐⭐⭐</span> Buena</td>
+                  <td><span aria-hidden="true">🎯</span> Alta</td>
                   <td>Proyectos multi-stack, principiantes</td>
                   <td>Plantillas predefinidas (pero editables)</td>
                 </tr>
                 <tr>
                   <td><strong>IDE plugins</strong></td>
-                  <td>⚡⚡ Muy rápido</td>
-                  <td>⭐⭐⭐ Media</td>
-                  <td>📝 Baja</td>
+                  <td><span aria-hidden="true">⚡⚡</span> Muy rápido</td>
+                  <td><span aria-hidden="true">⭐⭐⭐</span> Media</td>
+                  <td><span aria-hidden="true">📝</span> Baja</td>
                   <td>Workflows integrados en IDE</td>
                   <td>Depende del IDE, menos control</td>
                 </tr>
                 <tr>
                   <td><strong>Sin .gitignore</strong></td>
-                  <td>⚡⚡⚡ Instantáneo</td>
-                  <td>❌ Nula</td>
+                  <td><span aria-hidden="true">⚡⚡⚡</span> Instantáneo</td>
+                  <td><span aria-hidden="true">❌</span> Nula</td>
                   <td>-</td>
                   <td>Nunca (riesgo de seguridad)</td>
                   <td>Expone secretos, repo gigante, conflictos</td>
@@ -552,9 +552,9 @@ export default function GeneradorGitignorePage() {
               <div className={styles.escenarioExample}>
                 <p>Configuración:</p>
                 <code>
-                  ✅ Node.js + React + VS Code + macOS<br />
-                  ✅ Resultado: 40+ patrones combinados<br />
-                  ⚠️ Evita: node_modules/ (300 MB), .next/ (build), .env (API keys)
+                  <span aria-hidden="true">✅</span> Node.js + React + VS Code + macOS<br />
+                  <span aria-hidden="true">✅</span> Resultado: 40+ patrones combinados<br />
+                  <span aria-hidden="true">⚠️</span> Evita: node_modules/ (300 MB), .next/ (build), .env (API keys)
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -570,9 +570,9 @@ export default function GeneradorGitignorePage() {
               <div className={styles.escenarioExample}>
                 <p>Configuración:</p>
                 <code>
-                  ✅ Python + JetBrains (PyCharm) + Windows<br />
-                  ✅ Resultado: Ignora __pycache__/, venv/, .ipynb_checkpoints/<br />
-                  ⚠️ Evita: Archivos de entorno (200 MB+), checkpoints innecesarios
+                  <span aria-hidden="true">✅</span> Python + JetBrains (PyCharm) + Windows<br />
+                  <span aria-hidden="true">✅</span> Resultado: Ignora __pycache__/, venv/, .ipynb_checkpoints/<br />
+                  <span aria-hidden="true">⚠️</span> Evita: Archivos de entorno (200 MB+), checkpoints innecesarios
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -588,9 +588,9 @@ export default function GeneradorGitignorePage() {
               <div className={styles.escenarioExample}>
                 <p>Configuración:</p>
                 <code>
-                  ✅ Java + JetBrains (IntelliJ) + macOS<br />
-                  ✅ Resultado: Excluye target/, .idea/, *.class<br />
-                  ⚠️ Evita: Archivos compilados (gigabytes), configs IDE personales
+                  <span aria-hidden="true">✅</span> Java + JetBrains (IntelliJ) + macOS<br />
+                  <span aria-hidden="true">✅</span> Resultado: Excluye target/, .idea/, *.class<br />
+                  <span aria-hidden="true">⚠️</span> Evita: Archivos compilados (gigabytes), configs IDE personales
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -606,9 +606,9 @@ export default function GeneradorGitignorePage() {
               <div className={styles.escenarioExample}>
                 <p>Configuración:</p>
                 <code>
-                  ✅ Node.js + .env (API keys, DB passwords)<br />
-                  ✅ Resultado: .env en .gitignore ANTES del primer commit<br />
-                  🚨 Crítico: Una vez en Git, eliminar .env es complejo (reescribir historial)
+                  <span aria-hidden="true">✅</span> Node.js + .env (API keys, DB passwords)<br />
+                  <span aria-hidden="true">✅</span> Resultado: .env en .gitignore ANTES del primer commit<br />
+                  <span aria-hidden="true">🚨</span> Crítico: Una vez en Git, eliminar .env es complejo (reescribir historial)
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -624,9 +624,9 @@ export default function GeneradorGitignorePage() {
               <div className={styles.escenarioExample}>
                 <p>Configuración:</p>
                 <code>
-                  ✅ React (algunos usan VS Code, otros JetBrains, otros Sublime)<br />
-                  ✅ Resultado: Ignora .vscode/, .idea/, *.sublime-*<br />
-                  ⚠️ Evita: Conflictos de merge por configuraciones personales
+                  <span aria-hidden="true">✅</span> React (algunos usan VS Code, otros JetBrains, otros Sublime)<br />
+                  <span aria-hidden="true">✅</span> Resultado: Ignora .vscode/, .idea/, *.sublime-*<br />
+                  <span aria-hidden="true">⚠️</span> Evita: Conflictos de merge por configuraciones personales
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -642,9 +642,9 @@ export default function GeneradorGitignorePage() {
               <div className={styles.escenarioExample}>
                 <p>Configuración:</p>
                 <code>
-                  ✅ Node.js + Python + Go + Rust (microservicios)<br />
-                  ✅ Resultado: .gitignore raíz combina todos los patrones<br />
-                  ⚠️ Evita: node_modules/, venv/, target/, duplicar 4× las dependencias
+                  <span aria-hidden="true">✅</span> Node.js + Python + Go + Rust (microservicios)<br />
+                  <span aria-hidden="true">✅</span> Resultado: .gitignore raíz combina todos los patrones<br />
+                  <span aria-hidden="true">⚠️</span> Evita: node_modules/, venv/, target/, duplicar 4× las dependencias
                 </code>
               </div>
               <p className={styles.escenarioTip}>
@@ -689,7 +689,7 @@ export default function GeneradorGitignorePage() {
                 <code>git commit -m "Remove sensitive files from tracking"</code>
               </p>
               <p>
-                <strong>⚠️ Importante:</strong> Si subiste secrets públicamente, rótalos inmediatamente. El historial de Git conserva los commits antiguos. Para reescribir historial: <code>git filter-branch</code> o BFG Repo-Cleaner (avanzado).
+                <strong><span aria-hidden="true">⚠️</span> Importante:</strong> Si subiste secrets públicamente, rótalos inmediatamente. El historial de Git conserva los commits antiguos. Para reescribir historial: <code>git filter-branch</code> o BFG Repo-Cleaner (avanzado).
               </p>
             </div>
 
@@ -712,13 +712,13 @@ export default function GeneradorGitignorePage() {
                 Depende del tipo de configuración:
               </p>
               <p>
-                <strong>✅ SÍ ignorar (personal):</strong><br />
+                <strong><span aria-hidden="true">✅</span> SÍ ignorar (personal):</strong><br />
                 • <code>.vscode/settings.json</code> (preferencias individuales)<br />
                 • <code>.idea/workspace.xml</code> (estado de ventanas del IDE)<br />
                 • <code>.editorconfig</code> NO (este SÍ debe compartirse)
               </p>
               <p>
-                <strong>❌ NO ignorar (equipo):</strong><br />
+                <strong><span aria-hidden="true">❌</span> NO ignorar (equipo):</strong><br />
                 • <code>.prettierrc</code> (formato de código compartido)<br />
                 • <code>eslint.config.js</code> (linting del equipo)<br />
                 • <code>.nvmrc</code> / <code>.tool-versions</code> (versiones de Node/herramientas)
@@ -748,7 +748,7 @@ export default function GeneradorGitignorePage() {
                 </code>
               </p>
               <p>
-                <strong>⚠️ Importante:</strong> La negación NO funciona si ya ignoraste el directorio padre. Ejemplo: <code>build/</code> ignora TODO dentro, <code>!build/file.txt</code> NO funcionará. Solución: <code>build/*</code> en lugar de <code>build/</code>.
+                <strong><span aria-hidden="true">⚠️</span> Importante:</strong> La negación NO funciona si ya ignoraste el directorio padre. Ejemplo: <code>build/</code> ignora TODO dentro, <code>!build/file.txt</code> NO funcionará. Solución: <code>build/*</code> en lugar de <code>build/</code>.
               </p>
             </div>
 
@@ -795,8 +795,8 @@ export default function GeneradorGitignorePage() {
               </p>
               <p>
                 <code>
-                  *.log          # ✅ Funciona en todos los sistemas<br />
-                  *.LOG          # ⚠️ Solo funciona en Linux si el archivo es .LOG
+                  *.log          # <span aria-hidden="true">✅</span> Funciona en todos los sistemas<br />
+                  *.LOG          # <span aria-hidden="true">⚠️</span> Solo funciona en Linux si el archivo es .LOG
                 </code>
               </p>
             </div>
@@ -807,14 +807,14 @@ export default function GeneradorGitignorePage() {
                 <strong>Depende del tipo de proyecto:</strong>
               </p>
               <p>
-                <strong>✅ NO IGNORAR (aplicaciones):</strong><br />
+                <strong><span aria-hidden="true">✅</span> NO IGNORAR (aplicaciones):</strong><br />
                 • <code>package-lock.json</code> / <code>yarn.lock</code> (Node.js apps)<br />
                 • <code>Cargo.lock</code> (Rust apps)<br />
                 • <code>Gemfile.lock</code> (Ruby apps)<br />
                 <strong>Razón:</strong> Garantiza que todos los desarrolladores/producción usen las mismas versiones exactas de dependencias. Evita bugs tipo "en mi máquina funciona".
               </p>
               <p>
-                <strong>❌ SÍ IGNORAR (librerías/paquetes):</strong><br />
+                <strong><span aria-hidden="true">❌</span> SÍ IGNORAR (librerías/paquetes):</strong><br />
                 • Si estás creando una librería NPM/Rust crate/Ruby gem que otros instalarán<br />
                 <strong>Razón:</strong> Los consumidores de tu librería deben resolver sus propias dependencias. Los lock files pueden causar conflictos.
               </p>
@@ -838,7 +838,7 @@ export default function GeneradorGitignorePage() {
                   Usa este generador para crear el archivo con las tecnologías de tu proyecto. Descárgalo y guárdalo como <code>.gitignore</code> (con punto al inicio) en la raíz del repositorio.
                 </p>
                 <p>
-                  <strong>⚠️ Crítico:</strong> Si ya hiciste <code>git init</code> pero AÚN NO hiciste <code>git add .</code>, estás a tiempo. Si ya hiciste commit de node_modules/ o .env, tendrás que limpiar el historial.
+                  <strong><span aria-hidden="true">⚠️</span> Crítico:</strong> Si ya hiciste <code>git init</code> pero AÚN NO hiciste <code>git add .</code>, estás a tiempo. Si ya hiciste commit de node_modules/ o .env, tendrás que limpiar el historial.
                 </p>
               </div>
             </div>

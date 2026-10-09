@@ -352,7 +352,7 @@ export default function EjerciciosVocalizacionPage() {
               onClick={activarMicrofono}
               aria-label="Activar micrófono"
             >
-              🎤 Activar micrófono
+              <span aria-hidden="true">🎤</span> Activar micrófono
             </button>
           </div>
         ) : (
@@ -390,7 +390,7 @@ export default function EjerciciosVocalizacionPage() {
               onClick={desactivarMicrofono}
               aria-label="Desactivar micrófono"
             >
-              🔇 Desactivar micrófono
+              <span aria-hidden="true">🔇</span> Desactivar micrófono
             </button>
           </div>
         )}
@@ -407,7 +407,7 @@ export default function EjerciciosVocalizacionPage() {
               role="tab"
               aria-selected={modo === 'vocal'}
             >
-              🗣️ Vocales sostenidas
+              <span aria-hidden="true">🗣️</span> Vocales sostenidas
             </button>
             <button
               type="button"
@@ -416,7 +416,7 @@ export default function EjerciciosVocalizacionPage() {
               role="tab"
               aria-selected={modo === 'frase'}
             >
-              📝 Lectura en voz alta
+              <span aria-hidden="true">📝</span> Lectura en voz alta
             </button>
           </div>
 
@@ -479,7 +479,7 @@ export default function EjerciciosVocalizacionPage() {
 
                     {ejercicioCompleto ? (
                       <div className={styles.exito} role="status">
-                        🎉 ¡Objetivo alcanzado!
+                        <span aria-hidden="true">🎉</span> ¡Objetivo alcanzado!
                       </div>
                     ) : (
                       <div className={styles.indicadorVoz} role="status" aria-live="polite">
@@ -493,7 +493,7 @@ export default function EjerciciosVocalizacionPage() {
 
                   {enEjercicio && (
                     <button type="button" className={styles.btnDetener} onClick={detenerEjercicio}>
-                      ⏹ Detener ejercicio
+                      <span aria-hidden="true">⏹</span> Detener ejercicio
                     </button>
                   )}
                   {ejercicioCompleto && (
@@ -551,7 +551,7 @@ export default function EjerciciosVocalizacionPage() {
               {/* Botón iniciar */}
               {!enEjercicio && !ejercicioCompleto && (
                 <button type="button" className={styles.btnIniciarFrase} onClick={iniciarFraseActual}>
-                  ▶ Iniciar esta frase
+                  <span aria-hidden="true">▶</span> Iniciar esta frase
                 </button>
               )}
 
@@ -574,7 +574,7 @@ export default function EjerciciosVocalizacionPage() {
                     </div>
                   </div>
                   <button type="button" className={styles.btnDetener} onClick={detenerEjercicio}>
-                    ⏹ Detener ejercicio
+                    <span aria-hidden="true">⏹</span> Detener ejercicio
                   </button>
                 </div>
               )}
@@ -588,9 +588,9 @@ export default function EjerciciosVocalizacionPage() {
                     </div>
                     <div className={styles.progresoLinealTexto}>{segundosVoz}s / {objetivoSeg}s</div>
                   </div>
-                  <div className={styles.exito} role="status">🎉 ¡Frase completada!</div>
+                  <div className={styles.exito} role="status"><span aria-hidden="true">🎉</span> ¡Frase completada!</div>
                   <button type="button" className={styles.btnNuevo} onClick={fraseSiguiente}>
-                    ▶ Siguiente frase
+                    <span aria-hidden="true">▶</span> Siguiente frase
                   </button>
                 </div>
               )}
@@ -606,7 +606,7 @@ export default function EjerciciosVocalizacionPage() {
                 onClick={() => setMostrarHistorial(p => !p)}
                 aria-expanded={mostrarHistorial}
               >
-                📋 Historial de sesiones ({historial.length})
+                <span aria-hidden="true">📋</span> Historial de sesiones ({historial.length})
                 <span className={styles.toggleFlecha} aria-hidden="true">{mostrarHistorial ? '▲' : '▼'}</span>
               </button>
 
@@ -629,7 +629,7 @@ export default function EjerciciosVocalizacionPage() {
                       try { localStorage.removeItem(HISTORIA_KEY); } catch { /* ignorar */ }
                     }}
                   >
-                    🗑️ Borrar historial
+                    <span aria-hidden="true">🗑️</span> Borrar historial
                   </button>
                 </div>
               )}
@@ -705,7 +705,7 @@ export default function EjerciciosVocalizacionPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🎙️ Esta app (meskeIA)</td>
+                  <td><span aria-hidden="true">🎙️</span> Esta app (meskeIA)</td>
                   <td className={styles.celdaDestacada}>24/7, sin cita</td>
                   <td className={styles.celdaDestacada}>Sí (volumen)</td>
                   <td>Básica</td>
@@ -893,7 +893,7 @@ export default function EjerciciosVocalizacionPage() {
         {/* WARNING BOX */}
         <section className={styles.guiaSeccion}>
           <div className={styles.warningBox}>
-            <h3>⚠️ Señales de que debes consultar al médico o logopeda</h3>
+            <h3><span aria-hidden="true">⚠️</span> Señales de que debes consultar al médico o logopeda</h3>
             <ul>
               <li><strong>Dolor al hablar o al tragar:</strong> la disfonía con dolor no debe tratarse con ejercicios sin evaluación previa. Puede indicar una lesión en las cuerdas vocales o disfagia que requiere valoración médica.</li>
               <li><strong>Cambio repentino en la voz:</strong> si la voz cambia significativamente en pocos días, consulta a tu neurólogo. Puede indicar un cambio en la progresión de la enfermedad que requiera ajuste de tratamiento.</li>

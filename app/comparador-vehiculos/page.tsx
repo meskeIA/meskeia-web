@@ -661,7 +661,7 @@ export default function ComparadorVehiculosPage() {
 
                     <div className={styles.incluyeNoIncluye}>
                       <div className={styles.incluye}>
-                        <strong>✅ Incluye:</strong>
+                        <strong><span aria-hidden="true">✅</span> Incluye:</strong>
                         <ul>
                           {resultado.incluye.map((item, idx) => (
                             <li key={idx}>{item}</li>
@@ -669,7 +669,7 @@ export default function ComparadorVehiculosPage() {
                         </ul>
                       </div>
                       <div className={styles.noIncluye}>
-                        <strong>❌ No incluye:</strong>
+                        <strong><span aria-hidden="true">❌</span> No incluye:</strong>
                         <ul>
                           {resultado.noIncluye.map((item, idx) => (
                             <li key={idx}>{item}</li>
@@ -708,7 +708,7 @@ export default function ComparadorVehiculosPage() {
       >
         {/* TABLA COMPARATIVA */}
         <section className={styles.eduComparativa}>
-          <h2>🚗 Contado vs Financiación vs Renting vs Leasing: comparativa completa</h2>
+          <h2><span aria-hidden="true">🚗</span> Contado vs Financiación vs Renting vs Leasing: comparativa completa</h2>
           <p className={styles.eduIntro}>
             Elegir mal la forma de adquirir un vehículo puede costarte entre 5.000 y 20.000 € de diferencia en el mismo coche. Esta tabla te da los criterios clave para decidir según tu perfil.
           </p>
@@ -717,19 +717,19 @@ export default function ComparadorVehiculosPage() {
               <thead>
                 <tr>
                   <th>Criterio</th>
-                  <th>💵 Contado</th>
-                  <th>🏦 Financiación</th>
-                  <th>🔄 Renting</th>
-                  <th>📑 Leasing</th>
+                  <th><span aria-hidden="true">💵</span> Contado</th>
+                  <th><span aria-hidden="true">🏦</span> Financiación</th>
+                  <th><span aria-hidden="true">🔄</span> Renting</th>
+                  <th><span aria-hidden="true">📑</span> Leasing</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td><strong>¿Eres propietario?</strong></td>
-                  <td>✅ Desde el primer día</td>
-                  <td>✅ Al acabar de pagar</td>
-                  <td>❌ Nunca</td>
-                  <td>⚠️ Solo si ejerces opción compra</td>
+                  <td><span aria-hidden="true">✅</span> Desde el primer día</td>
+                  <td><span aria-hidden="true">✅</span> Al acabar de pagar</td>
+                  <td><span aria-hidden="true">❌</span> Nunca</td>
+                  <td><span aria-hidden="true">⚠️</span> Solo si ejerces opción compra</td>
                 </tr>
                 <tr>
                   <td><strong>Desembolso inicial</strong></td>
@@ -747,31 +747,31 @@ export default function ComparadorVehiculosPage() {
                 </tr>
                 <tr>
                   <td><strong>Gastos incluidos</strong></td>
-                  <td>❌ Seguro, ITV, mantenimiento aparte</td>
-                  <td>❌ Seguro, ITV, mantenimiento aparte</td>
-                  <td>✅ Seguro, mantenimiento, impuestos, asistencia</td>
-                  <td>❌ Solo el vehículo</td>
+                  <td><span aria-hidden="true">❌</span> Seguro, ITV, mantenimiento aparte</td>
+                  <td><span aria-hidden="true">❌</span> Seguro, ITV, mantenimiento aparte</td>
+                  <td><span aria-hidden="true">✅</span> Seguro, mantenimiento, impuestos, asistencia</td>
+                  <td><span aria-hidden="true">❌</span> Solo el vehículo</td>
                 </tr>
                 <tr>
                   <td><strong>Ventaja fiscal (autónomos/empresa)</strong></td>
-                  <td>⚠️ Solo amortización</td>
-                  <td>⚠️ Solo intereses deducibles</td>
-                  <td>✅ Cuota 100% deducible (IVA + IS/IRPF)</td>
-                  <td>✅ Cuota 100% deducible + amortización acelerada</td>
+                  <td><span aria-hidden="true">⚠️</span> Solo amortización</td>
+                  <td><span aria-hidden="true">⚠️</span> Solo intereses deducibles</td>
+                  <td><span aria-hidden="true">✅</span> Cuota 100% deducible (IVA + IS/IRPF)</td>
+                  <td><span aria-hidden="true">✅</span> Cuota 100% deducible + amortización acelerada</td>
                 </tr>
                 <tr>
                   <td><strong>Flexibilidad</strong></td>
-                  <td>✅ Máxima (vendes cuando quieras)</td>
-                  <td>⚠️ Puedes vender pagando la deuda</td>
-                  <td>❌ Contrato fijo (penalización si cancelas)</td>
-                  <td>❌ Contrato fijo</td>
+                  <td><span aria-hidden="true">✅</span> Máxima (vendes cuando quieras)</td>
+                  <td><span aria-hidden="true">⚠️</span> Puedes vender pagando la deuda</td>
+                  <td><span aria-hidden="true">❌</span> Contrato fijo (penalización si cancelas)</td>
+                  <td><span aria-hidden="true">❌</span> Contrato fijo</td>
                 </tr>
                 <tr>
                   <td><strong>Riesgo de depreciación</strong></td>
-                  <td>🔴 Lo asumes tú</td>
-                  <td>🔴 Lo asumes tú</td>
-                  <td>✅ Lo asume la empresa</td>
-                  <td>⚠️ Depende del valor residual pactado</td>
+                  <td><span aria-hidden="true">🔴</span> Lo asumes tú</td>
+                  <td><span aria-hidden="true">🔴</span> Lo asumes tú</td>
+                  <td><span aria-hidden="true">✅</span> Lo asume la empresa</td>
+                  <td><span aria-hidden="true">⚠️</span> Depende del valor residual pactado</td>
                 </tr>
                 <tr>
                   <td><strong>Ideal para</strong></td>
@@ -787,7 +787,7 @@ export default function ComparadorVehiculosPage() {
 
         {/* CASOS DE USO */}
         <section className={styles.eduEscenarios}>
-          <h2>💼 Tu perfil, tu opción: casos reales de decisión</h2>
+          <h2><span aria-hidden="true">💼</span> Tu perfil, tu opción: casos reales de decisión</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -868,59 +868,59 @@ Total real con opción compra: ~26.200 € (vs 35.000 contado)</code>
 
         {/* FAQ */}
         <section className={styles.eduFaq}>
-          <h2>❓ Preguntas frecuentes sobre la compra de vehículos</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre la compra de vehículos</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el concesionario insiste tanto en que financie?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué el concesionario insiste tanto en que financie?</h4>
               <p>
                 Los concesionarios reciben <strong>comisiones de entre 2-5% del capital financiado</strong> por parte de las financieras (filiales de los propios fabricantes en la mayoría de casos). Por eso a veces ofrecen descuentos especiales si financias: el descuento lo recuperan con la comisión. Antes de aceptar financiación con &quot;descuento especial&quot;, calcula si el descuento supera los intereses totales que pagarás. Si financias 20.000 € al 8% TAE durante 5 años, pagas ~4.300 € en intereses.
               </p>
               <p className={styles.faqTip}>💡 <strong>Truco:</strong> Negocia el precio al contado primero (consigue el mejor precio posible), y luego decide si financias o no. No negocies cuota mensual: es la trampa para no ver el coste real.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo deducir el renting o el leasing como particular?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo deducir el renting o el leasing como particular?</h4>
               <p>
                 No. Las deducciones fiscales del renting y leasing son exclusivamente para <strong>autónomos y sociedades</strong> cuando el vehículo está afecto a la actividad económica. Como particular, no existe ninguna ventaja fiscal por financiar, rentar o hacer leasing de un vehículo. Lo único que puedes deducir como particular (si eres asalariado) son los gastos de vehículo si trabajas en actividades específicas con rendimientos del trabajo con gastos deducibles.
               </p>
               <p className={styles.faqTip}>💡 <strong>Excepción:</strong> Si eres autónomo persona física y el vehículo está afecto parcialmente a tu actividad, puedes deducir el porcentaje correspondiente. La afectación parcial es difícil de justificar ante Hacienda.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es la TAE y por qué es más importante que la cuota?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es la TAE y por qué es más importante que la cuota?</h4>
               <p>
                 La TAE (Tasa Anual Equivalente) incluye el tipo de interés nominal <strong>más</strong> todas las comisiones y gastos de la financiación. La cuota mensual puede parecer baja pero esconder una TAE muy elevada. Ejemplo: 200.000 € financiados al 2% TIN con comisión apertura del 2% da una TAE real del ~3,8%. La normativa europea obliga a mostrar siempre la TAE en publicidad financiera. Nunca compares ofertas de financiación solo por la cuota mensual: compara siempre la TAE.
               </p>
               <p className={styles.faqTip}>💡 <strong>Referencia 2025:</strong> TAE competitiva para coche nuevo: 4-7%. TAE de concesionario típica: 7-12%. TAE de promociones especiales: puede llegar al 0% (el coste está en el precio del coche).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué pasa si me paso de kilómetros en renting?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué pasa si me paso de kilómetros en renting?</h4>
               <p>
                 Al devolver el vehículo al final del contrato, la empresa calcula los kilómetros reales recorridos y te cobra el exceso a un precio pactado (típicamente <strong>0,05-0,15 €/km según el vehículo</strong>). Este coste puede ser sustancial: 10.000 km de exceso a 0,10 €/km = 1.000 € de sorpresa. Si al llegar a los 2 años ya ves que te vas a pasar, contacta con la empresa de renting para renegociar el contrato: suelen preferir adaptar las condiciones a cobrar el exceso al final.
               </p>
               <p className={styles.faqTip}>💡 <strong>Estrategia:</strong> Sobreestima siempre los km que vas a hacer al contratar. Es más barato pagar algo más por cuota con más km incluidos que pagar el exceso al final (que tiene precio de penalización).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo conviene el leasing sobre el renting para autónomos?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo conviene el leasing sobre el renting para autónomos?</h4>
               <p>
                 El leasing conviene sobre el renting cuando quieres <strong>acabar siendo propietario del vehículo</strong>. Con el renting nunca eres propietario. Con el leasing tienes una opción de compra al final por el valor residual pactado. El leasing también permite la <strong>amortización acelerada</strong> del vehículo (deducción más agresiva al principio), lo que puede ser ventajoso si tienes mucha base imponible que reducir. Ojo: el leasing no incluye seguro ni mantenimiento, a diferencia del renting que sí los incluye.
               </p>
               <p className={styles.faqTip}>💡 <strong>Regla práctica:</strong> ¿Quieres la comodidad de &quot;todo incluido&quot; y cambiar de coche cada 3-4 años? → Renting. ¿Quieres ventajas fiscales Y acabar siendo propietario? → Leasing.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es el valor residual y cómo afecta a mi decisión?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es el valor residual y cómo afecta a mi decisión?</h4>
               <p>
                 El valor residual es lo que vale el vehículo al final del periodo de uso. En compra/financiación, es lo que recuperas si vendes. Los coches que conservan mejor el valor (Toyota, Porsche, marcas premium alemanas) hacen que comprar al contado sea más rentable porque recuperas más. En leasing, es el precio de la opción de compra al final del contrato: si el mercado tasa el coche por encima del valor residual pactado, tienes un &quot;beneficio&quot; al ejercer la opción.
               </p>
               <p className={styles.faqTip}>💡 <strong>Dato:</strong> Un coche de 30.000 € puede valer entre 9.000 € (bajo valor residual, marca desconocida) y 18.000 € (alto valor residual, Toyota o BMW) a los 5 años. Esta diferencia de 9.000 € impacta enormemente en el coste total real del contado.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo cancelar un renting o leasing antes de tiempo?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo cancelar un renting o leasing antes de tiempo?</h4>
               <p>
                 Sí, pero tiene coste. En el renting, la penalización por cancelación anticipada suele ser <strong>el 3-5% de las cuotas pendientes</strong>, más a veces la devolución del descuento inicial. En el leasing, la cancelación anticipada puede implicar devolver todas las cuotas pendientes más el valor residual. Antes de firmar cualquier contrato de renting o leasing, revisa minuciosamente las condiciones de cancelación anticipada y asegúrate de que podrás cumplir el plazo.
               </p>
               <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si tienes dudas sobre si seguirás usando el vehículo, la financiación o el contado ofrecen más flexibilidad. Puedes vender el coche con financiación pagando la deuda pendiente, lo que es menos costoso que cancelar un renting.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo afecta el IRPF y el IVA según la opción elegida?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo afecta el IRPF y el IVA según la opción elegida?</h4>
               <p>
                 Para <strong>particulares</strong>: ninguna opción tiene ventaja fiscal especial. Para <strong>autónomos</strong>: en renting y leasing, las cuotas son gasto deducible al 100% en IRPF (si vehículo afecto 100%) + IVA deducible 100%. En financiación, solo los intereses son deducibles. En contado, solo la amortización anual (~25% del valor en 4 años). Para <strong>sociedades</strong>: similar al autónomo pero con Impuesto de Sociedades (IS) en lugar de IRPF. Los vehículos de empresa permiten deducción del IVA al 50% salvo que se pruebe uso 100% empresarial.
               </p>
@@ -931,7 +931,7 @@ Total real con opción compra: ~26.200 € (vs 35.000 contado)</code>
 
         {/* GUÍA PASO A PASO */}
         <section className={styles.eduGuia}>
-          <h2>📋 Cómo elegir la mejor opción para tu vehículo paso a paso</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo elegir la mejor opción para tu vehículo paso a paso</h2>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
@@ -987,7 +987,7 @@ Total real con opción compra: ~26.200 € (vs 35.000 contado)</code>
 
         {/* MEJORES PRÁCTICAS */}
         <section className={styles.eduTips}>
-          <h2>✅ Claves para tomar la mejor decisión de compra</h2>
+          <h2><span aria-hidden="true">✅</span> Claves para tomar la mejor decisión de compra</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>📊</span>
@@ -1029,13 +1029,13 @@ Total real con opción compra: ~26.200 € (vs 35.000 contado)</code>
             <h3>Errores frecuentes al comprar un vehículo que cuestan miles de euros</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Negociar solo la cuota mensual:</strong> La cuota baja puede esconder TAE del 12-15%. Siempre calcula el coste total (cuota × meses + entrada + comisiones). Una cuota de 250 €/mes a 72 meses = 18.000 € en total, más de lo que vale muchos coches de segunda mano.</li>
-            <li><strong>❌ No leer las condiciones del renting antes de firmar:</strong> Los contratos de renting tienen cláusulas de penalización por cancelación anticipada (3-5% cuotas pendientes), coste por km extra (0,05-0,15 €/km), y reclamaciones por estado de devolución. Una lectura superficial puede costarte 3.000-5.000 € adicionales.</li>
-            <li><strong>❌ Asumir que el renting siempre sale más barato para autónomos:</strong> Depende de tu tipo marginal de IRPF, los km que hagas, y el valor residual del vehículo. Para autónomos con IRPF bajo (15-20%) y alto kilometraje, el contado puede salir más barato incluso sin las ventajas fiscales del renting.</li>
-            <li><strong>❌ Elegir leasing sin entender la opción de compra:</strong> El leasing tiene sentido si vas a ejercer la opción de compra. Si al final decides no comprarlo, habrás pagado cuotas más altas que el renting por un coche que devuelves igualmente. Confirma desde el principio si quieres acabar siendo propietario o no.</li>
-            <li><strong>❌ Ignorar el coste total de propiedad (TCO):</strong> El precio de compra es solo una parte. Seguro (~600-1.200 €/año), mantenimiento (~400-800 €/año), ITV (~50 €/2 años), combustible, impuesto circulación. Un coche &quot;barato&quot; de 15.000 € puede costar 4.000-5.000 € al año de total de propiedad.</li>
-            <li><strong>❌ Financiar con tarjeta de crédito o crédito revolving:</strong> Las tarjetas de crédito tienen TAE del 20-30%. Usar tarjeta para comprar un coche o pagar entrada es el error más caro posible. Usa financiación de concesionario, banco o préstamo personal, siempre con TAE verificada.</li>
-            <li><strong>❌ No comparar múltiples ofertas de financiación:</strong> La financiera del fabricante no siempre es la más barata. Tu banco habitual, entidades online (ING, Bankinter) o comparadores pueden ofrecer TAE 2-4 puntos más baja, lo que supone 1.000-2.500 € de ahorro en intereses totales.</li>
+            <li><strong><span aria-hidden="true">❌</span> Negociar solo la cuota mensual:</strong> La cuota baja puede esconder TAE del 12-15%. Siempre calcula el coste total (cuota × meses + entrada + comisiones). Una cuota de 250 €/mes a 72 meses = 18.000 € en total, más de lo que vale muchos coches de segunda mano.</li>
+            <li><strong><span aria-hidden="true">❌</span> No leer las condiciones del renting antes de firmar:</strong> Los contratos de renting tienen cláusulas de penalización por cancelación anticipada (3-5% cuotas pendientes), coste por km extra (0,05-0,15 €/km), y reclamaciones por estado de devolución. Una lectura superficial puede costarte 3.000-5.000 € adicionales.</li>
+            <li><strong><span aria-hidden="true">❌</span> Asumir que el renting siempre sale más barato para autónomos:</strong> Depende de tu tipo marginal de IRPF, los km que hagas, y el valor residual del vehículo. Para autónomos con IRPF bajo (15-20%) y alto kilometraje, el contado puede salir más barato incluso sin las ventajas fiscales del renting.</li>
+            <li><strong><span aria-hidden="true">❌</span> Elegir leasing sin entender la opción de compra:</strong> El leasing tiene sentido si vas a ejercer la opción de compra. Si al final decides no comprarlo, habrás pagado cuotas más altas que el renting por un coche que devuelves igualmente. Confirma desde el principio si quieres acabar siendo propietario o no.</li>
+            <li><strong><span aria-hidden="true">❌</span> Ignorar el coste total de propiedad (TCO):</strong> El precio de compra es solo una parte. Seguro (~600-1.200 €/año), mantenimiento (~400-800 €/año), ITV (~50 €/2 años), combustible, impuesto circulación. Un coche &quot;barato&quot; de 15.000 € puede costar 4.000-5.000 € al año de total de propiedad.</li>
+            <li><strong><span aria-hidden="true">❌</span> Financiar con tarjeta de crédito o crédito revolving:</strong> Las tarjetas de crédito tienen TAE del 20-30%. Usar tarjeta para comprar un coche o pagar entrada es el error más caro posible. Usa financiación de concesionario, banco o préstamo personal, siempre con TAE verificada.</li>
+            <li><strong><span aria-hidden="true">❌</span> No comparar múltiples ofertas de financiación:</strong> La financiera del fabricante no siempre es la más barata. Tu banco habitual, entidades online (ING, Bankinter) o comparadores pueden ofrecer TAE 2-4 puntos más baja, lo que supone 1.000-2.500 € de ahorro en intereses totales.</li>
           </ul>
         </div>
       </EducationalSection>

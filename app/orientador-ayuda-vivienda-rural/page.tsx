@@ -226,7 +226,7 @@ export default function OrientadorAyudaViviendaRural() {
           </div>
           {municipio === 'despoblacion' && (
             <p className={styles.municipioAviso}>
-              ⚠️ Para municipios de 10.001-20.000 habitantes la elegibilidad depende de que tu CA lo haya incluido en la lista de municipios con pérdida de población. Verifica con tu Comunidad Autónoma.
+              <span aria-hidden="true">⚠️</span> Para municipios de 10.001-20.000 habitantes la elegibilidad depende de que tu CA lo haya incluido en la lista de municipios con pérdida de población. Verifica con tu Comunidad Autónoma.
             </p>
           )}
         </div>

@@ -562,7 +562,7 @@ export default function CalculadoraGastoEnergeticoPage() {
 
       {/* Disclaimer */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso Importante</h3>
         <p>
           Esta calculadora proporciona una <strong>estimación orientativa</strong> basada en consumos típicos
           y precios medios. Los precios de la electricidad varían diariamente (especialmente en PVPC)
@@ -687,7 +687,7 @@ export default function CalculadoraGastoEnergeticoPage() {
 
         {/* Sección 4: Tabla Comparativa de Tarifas */}
         <section className={styles.guideSection}>
-          <h2>⚖️ Comparativa de Tarifas Eléctricas</h2>
+          <h2><span aria-hidden="true">⚖️</span> Comparativa de Tarifas Eléctricas</h2>
           <p className={styles.introParagraph}>
             Elegir la tarifa correcta puede suponerte un ahorro de 100-300 € al año. Aquí tienes
             los factores clave para decidir cuál se adapta mejor a tu perfil de consumo.
@@ -746,7 +746,7 @@ export default function CalculadoraGastoEnergeticoPage() {
 
         {/* Sección 5: Casos de Uso Prácticos */}
         <section className={styles.guideSection}>
-          <h2>💼 Casos de Uso Prácticos</h2>
+          <h2><span aria-hidden="true">💼</span> Casos de Uso Prácticos</h2>
           <p className={styles.introParagraph}>
             Descubre cuánto consume y paga cada tipo de hogar en España y qué puedes hacer para
             reducir tu factura según tu situación concreta.
@@ -809,7 +809,7 @@ export default function CalculadoraGastoEnergeticoPage() {
 
         {/* Sección 6: FAQ Ampliado */}
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes sobre la Factura Eléctrica</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre la Factura Eléctrica</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>¿Qué es el PVPC y cuándo conviene?</h4>
@@ -888,7 +888,7 @@ export default function CalculadoraGastoEnergeticoPage() {
 
         {/* Sección 7: Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>📋 Guía Paso a Paso: Optimiza tu Factura de Luz</h2>
+          <h2><span aria-hidden="true">📋</span> Guía Paso a Paso: Optimiza tu Factura de Luz</h2>
           <p className={styles.introParagraph}>
             Sigue estos 7 pasos en orden para reducir tu factura de manera sistemática y
             sin inversiones innecesarias.
@@ -974,7 +974,7 @@ export default function CalculadoraGastoEnergeticoPage() {
 
         {/* Sección 8: Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>✅ Mejores Prácticas de Ahorro Energético</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas de Ahorro Energético</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">❄️</span>

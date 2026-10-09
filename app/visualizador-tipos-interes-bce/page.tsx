@@ -676,7 +676,7 @@ export default function VisualizadorTiposInteresBce() {
         </p>
 
         <div className={styles.warningBox}>
-          <strong>⚡ Dato clave:</strong> El BCE es independiente de los gobiernos nacionales. Sus decisiones
+          <strong><span aria-hidden="true">⚡</span> Dato clave:</strong> El BCE es independiente de los gobiernos nacionales. Sus decisiones
           las toma el Consejo de Gobierno (los gobernadores de los bancos centrales nacionales + el Comité
           Ejecutivo). Ningún gobierno puede ordenarle subir o bajar tipos.
         </div>

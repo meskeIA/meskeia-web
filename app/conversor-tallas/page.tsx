@@ -778,7 +778,7 @@ export default function ConversorTallasPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🌏 Otros Sistemas</h4>
+              <h4><span aria-hidden="true">🌏</span> Otros Sistemas</h4>
               <p>
                 <strong>Francia (FR):</strong> Similar al EU pero con pequeñas diferencias.{' '}
                 <strong>Italia (IT):</strong> Propio sistema numérico.{' '}

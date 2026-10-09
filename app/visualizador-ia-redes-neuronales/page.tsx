@@ -559,7 +559,7 @@ export default function VisualizadorIaRedesNeuronales() {
                     disabled={loss <= 0.01}
                     aria-label="Ejecutar una época de entrenamiento"
                   >
-                    ▶ Ejecutar época {epoch + 1}
+                    <span aria-hidden="true">▶</span> Ejecutar época {epoch + 1}
                   </button>
                   <button
                     type="button"
@@ -885,19 +885,19 @@ export default function VisualizadorIaRedesNeuronales() {
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>❌ &quot;La IA entiende lo que dice&quot;</strong> — Los LLMs predicen el siguiente token más probable; no comprenden ni tienen conciencia.
+              <strong><span aria-hidden="true">❌</span> &quot;La IA entiende lo que dice&quot;</strong> — Los LLMs predicen el siguiente token más probable; no comprenden ni tienen conciencia.
             </li>
             <li>
-              <strong>❌ &quot;Más parámetros = mejor modelo&quot;</strong> — Un modelo enorme mal entrenado o con datos malos puede superar en coste pero no en calidad a uno optimizado.
+              <strong><span aria-hidden="true">❌</span> &quot;Más parámetros = mejor modelo&quot;</strong> — Un modelo enorme mal entrenado o con datos malos puede superar en coste pero no en calidad a uno optimizado.
             </li>
             <li>
-              <strong>❌ &quot;La IA es objetiva porque es una máquina&quot;</strong> — Aprende los sesgos de sus datos; algoritmos de contratación y crédito han discriminado por raza y género.
+              <strong><span aria-hidden="true">❌</span> &quot;La IA es objetiva porque es una máquina&quot;</strong> — Aprende los sesgos de sus datos; algoritmos de contratación y crédito han discriminado por raza y género.
             </li>
             <li>
-              <strong>❌ &quot;Los modelos aprenden en tiempo real&quot;</strong> — La mayoría tienen un corte de conocimiento (knowledge cutoff); no aprenden de las conversaciones del usuario salvo fine-tuning explícito.
+              <strong><span aria-hidden="true">❌</span> &quot;Los modelos aprenden en tiempo real&quot;</strong> — La mayoría tienen un corte de conocimiento (knowledge cutoff); no aprenden de las conversaciones del usuario salvo fine-tuning explícito.
             </li>
             <li>
-              <strong>❌ &quot;El deep learning siempre supera a los métodos clásicos&quot;</strong> — En datos tabulares pequeños, gradient boosting (XGBoost) suele superar a las redes neuronales.
+              <strong><span aria-hidden="true">❌</span> &quot;El deep learning siempre supera a los métodos clásicos&quot;</strong> — En datos tabulares pequeños, gradient boosting (XGBoost) suele superar a las redes neuronales.
             </li>
           </ul>
         </div>

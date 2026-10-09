@@ -407,6 +407,7 @@ export default function CalculadoraDistribucionesPage() {
           <div className={styles.distGrid}>
             {distributions.map(dist => (
               <button
+                type="button"
                 key={dist.id}
                 onClick={() => handleDistChange(dist.id)}
                 className={`${styles.distCard} ${selectedDist === dist.id ? styles.distSelected : ''}`}
@@ -457,6 +458,7 @@ export default function CalculadoraDistribucionesPage() {
               <div className={styles.modeButtons}>
                 {calcModes.map(mode => (
                   <button
+                    type="button"
                     key={mode.id}
                     onClick={() => setCalcMode(mode.id)}
                     className={`${styles.modeBtn} ${calcMode === mode.id ? styles.modeActive : ''}`}
@@ -738,7 +740,7 @@ export default function CalculadoraDistribucionesPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📊 Normal (Gaussiana)</h4>
+              <h4><span aria-hidden="true">📊</span> Normal (Gaussiana)</h4>
               <p>
                 La distribución más importante en estadística. Describe fenómenos naturales
                 como alturas, pesos, errores de medición. El <strong>Teorema Central del Límite</strong>
@@ -748,7 +750,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🎲 Poisson</h4>
+              <h4><span aria-hidden="true">🎲</span> Poisson</h4>
               <p>
                 Modela el número de eventos en un intervalo fijo de tiempo o espacio cuando
                 los eventos ocurren independientemente. Ejemplos: llamadas por hora, defectos
@@ -758,7 +760,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>⏱️ Exponencial</h4>
+              <h4><span aria-hidden="true">⏱️</span> Exponencial</h4>
               <p>
                 Tiempo de espera entre eventos de Poisson. Tiene la propiedad de
                 <strong> &quot;sin memoria&quot;</strong>: la probabilidad de esperar más tiempo no depende
@@ -768,7 +770,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🔲 Uniforme</h4>
+              <h4><span aria-hidden="true">🔲</span> Uniforme</h4>
               <p>
                 Todos los valores en un rango tienen la misma probabilidad. Representa
                 incertidumbre total sobre dónde caerá un valor. Usada en generación
@@ -778,7 +780,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📈 Gamma</h4>
+              <h4><span aria-hidden="true">📈</span> Gamma</h4>
               <p>
                 Generaliza la exponencial. Modela el tiempo hasta que ocurran α eventos
                 de Poisson. Muy flexible: incluye exponencial (α=1) y chi-cuadrado
@@ -788,7 +790,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🔄 Beta</h4>
+              <h4><span aria-hidden="true">🔄</span> Beta</h4>
               <p>
                 Define probabilidades sobre el intervalo [0,1]. Ideal para modelar
                 proporciones, tasas de éxito, o como prior en inferencia bayesiana.
@@ -798,7 +800,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🎯 Binomial</h4>
+              <h4><span aria-hidden="true">🎯</span> Binomial</h4>
               <p>
                 Número de éxitos en n ensayos independientes con probabilidad p.
                 Ejemplos: caras en n lanzamientos, clientes que compran de n visitantes.
@@ -808,7 +810,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🎓 t de Student</h4>
+              <h4><span aria-hidden="true">🎓</span> t de Student</h4>
               <p>
                 Similar a la normal pero con colas más pesadas. Se usa cuando
                 estimamos la media poblacional con muestras pequeñas y σ desconocida.
@@ -846,7 +848,7 @@ export default function CalculadoraDistribucionesPage() {
 
           {/* 1. Tabla Comparativa v2.0 */}
           <div className={styles.tableWrapper}>
-            <h3>⚖️ Tabla Comparativa de Distribuciones de Probabilidad</h3>
+            <h3><span aria-hidden="true">⚖️</span> Tabla Comparativa de Distribuciones de Probabilidad</h3>
             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
               Las 6 distribuciones más importantes: cuándo usarlas, sus parámetros y cómo calcularlas en Python/R
             </p>
@@ -916,7 +918,7 @@ export default function CalculadoraDistribucionesPage() {
 
           {/* 2. Casos de Uso por Perfil */}
           <div className={styles.escenariosGrid}>
-            <h3 style={{ gridColumn: '1 / -1' }}>👥 Casos de Uso por Perfil Profesional</h3>
+            <h3 style={{ gridColumn: '1 / -1' }}><span aria-hidden="true">👥</span> Casos de Uso por Perfil Profesional</h3>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon}>🧑‍🎓</span>
@@ -961,7 +963,7 @@ export default function CalculadoraDistribucionesPage() {
 
           {/* 3. FAQ */}
           <div className={styles.faqList}>
-            <h3 style={{ marginBottom: '1rem' }}>❓ Preguntas Frecuentes sobre Distribuciones de Probabilidad</h3>
+            <h3 style={{ marginBottom: '1rem' }}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Distribuciones de Probabilidad</h3>
             <div className={styles.faqItem}>
               <h4>¿Cuándo usar Normal vs t-Student?</h4>
               <p>Usa Normal cuando conoces σ (desviación estándar poblacional) o tienes muestras grandes (n &gt; 30). Usa t-Student cuando σ es desconocida y la estimas con la muestra. El cuantil t(0,975; ν=10) = 2,228 vs 1,960 de la Normal: la diferencia es relevante con muestras pequeñas. Con ν &gt; 30, la t-Student converge prácticamente a la Normal estándar.</p>
@@ -1006,7 +1008,7 @@ export default function CalculadoraDistribucionesPage() {
 
           {/* 4. Guía Paso a Paso */}
           <div className={styles.stepGuide}>
-            <h3 style={{ marginBottom: '0.25rem' }}>📋 Cómo Elegir la Distribución Correcta: 7 Pasos</h3>
+            <h3 style={{ marginBottom: '0.25rem' }}><span aria-hidden="true">📋</span> Cómo Elegir la Distribución Correcta: 7 Pasos</h3>
             <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
               Proceso sistemático para seleccionar el modelo probabilístico adecuado a tus datos
             </p>
@@ -1063,7 +1065,7 @@ export default function CalculadoraDistribucionesPage() {
 
           {/* 5. Mejores Prácticas */}
           <div className={styles.tipsGrid}>
-            <h3 style={{ gridColumn: '1 / -1', marginBottom: '0.5rem' }}>✅ Mejores Prácticas al Trabajar con Distribuciones</h3>
+            <h3 style={{ gridColumn: '1 / -1', marginBottom: '0.5rem' }}><span aria-hidden="true">✅</span> Mejores Prácticas al Trabajar con Distribuciones</h3>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>📊</span>
               <h4>Visualiza antes de asumir</h4>

@@ -407,7 +407,7 @@ export default function PlanificadorMascotaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🐾 Planificador de Mascota</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🐾</span> Planificador de Mascota</h1>
         <p className={styles.subtitle}>
           Organiza la llegada de tu cachorro o gatito: checklist, compras y vacunas
         </p>
@@ -455,7 +455,7 @@ export default function PlanificadorMascotaPage() {
       {tabActiva === 'perfil' && (
         <div className={styles.mainContent}>
           <div className={styles.inputPanel}>
-            <h2 className={styles.panelTitle}>📋 Datos de tu mascota</h2>
+            <h2 className={styles.panelTitle}><span aria-hidden="true">📋</span> Datos de tu mascota</h2>
 
             {/* Selector tipo mascota */}
             <div className={styles.mascotaSelector}>
@@ -636,7 +636,7 @@ export default function PlanificadorMascotaPage() {
                 </div>
 
                 <div className={styles.resumenProgreso}>
-                  <h4>📊 Tu progreso</h4>
+                  <h4><span aria-hidden="true">📊</span> Tu progreso</h4>
                   <div className={styles.progresoItem}>
                     <span>Checklist</span>
                     <div className={styles.progresoBarMini}>
@@ -669,7 +669,7 @@ export default function PlanificadorMascotaPage() {
         <div className={styles.checklistContainer}>
           <div className={styles.checklistHeader}>
             <h2 className={styles.panelTitle}>
-              ✅ Checklist {perfil.tipo === 'gato' ? 'del Gatito' : 'del Cachorro'}
+              <span aria-hidden="true">✅</span> Checklist {perfil.tipo === 'gato' ? 'del Gatito' : 'del Cachorro'}
             </h2>
             <div className={styles.progresoCompacto}>
               <span>{getProgresoChecklist().completados} de {getProgresoChecklist().total}</span>
@@ -731,7 +731,7 @@ export default function PlanificadorMascotaPage() {
         <div className={styles.comprasContainer}>
           <div className={styles.comprasHeader}>
             <h2 className={styles.panelTitle}>
-              🛒 Lista de Compras {perfil.tipo === 'gato' ? 'para Gato' : 'para Perro'}
+              <span aria-hidden="true">🛒</span> Lista de Compras {perfil.tipo === 'gato' ? 'para Gato' : 'para Perro'}
             </h2>
             <div className={styles.progresoCompacto}>
               <span>{getProgresoCompras().comprados} de {getProgresoCompras().total}</span>
@@ -808,7 +808,7 @@ export default function PlanificadorMascotaPage() {
       {tabActiva === 'vacunas' && (
         <div className={styles.vacunasContainer}>
           <h2 className={styles.panelTitle}>
-            💉 Calendario de Vacunación {perfil.tipo === 'gato' ? 'Felina' : 'Canina'} (España)
+            <span aria-hidden="true">💉</span> Calendario de Vacunación {perfil.tipo === 'gato' ? 'Felina' : 'Canina'} (España)
           </h2>
 
           <div className={styles.vacunasInfo}>
@@ -834,7 +834,7 @@ export default function PlanificadorMascotaPage() {
           </div>
 
           <div className={styles.vacunasNota}>
-            <h4>📝 Notas importantes:</h4>
+            <h4><span aria-hidden="true">📝</span> Notas importantes:</h4>
             <ul>
               <li>La vacuna antirrábica es obligatoria para perros en la mayoría de comunidades autónomas</li>
               <li>Consulta con tu veterinario las vacunas opcionales según el estilo de vida de tu mascota</li>
@@ -870,11 +870,11 @@ export default function PlanificadorMascotaPage() {
         subtitle="Consejos, errores comunes a evitar y preguntas frecuentes"
       >
         <section className={styles.guideSection}>
-          <h2>🏠 Preparar la Llegada de tu Mascota</h2>
+          <h2><span aria-hidden="true">🏠</span> Preparar la Llegada de tu Mascota</h2>
 
           <div className={styles.consejosGrid}>
             <div className={styles.consejoCard}>
-              <h4>🐕 Si es un Cachorro</h4>
+              <h4><span aria-hidden="true">🐕</span> Si es un Cachorro</h4>
               <ul>
                 <li>Prepara una zona segura y tranquila para sus primeros días</li>
                 <li>Retira objetos pequeños que pueda tragar</li>
@@ -885,7 +885,7 @@ export default function PlanificadorMascotaPage() {
             </div>
 
             <div className={styles.consejoCard}>
-              <h4>🐱 Si es un Gatito</h4>
+              <h4><span aria-hidden="true">🐱</span> Si es un Gatito</h4>
               <ul>
                 <li>Prepara una habitación pequeña para los primeros días</li>
                 <li>Coloca el arenero lejos de la comida y agua</li>
@@ -896,7 +896,7 @@ export default function PlanificadorMascotaPage() {
             </div>
 
             <div className={styles.consejoCard}>
-              <h4>🍖 Alimentación</h4>
+              <h4><span aria-hidden="true">🍖</span> Alimentación</h4>
               <ul>
                 <li>Mantén el mismo pienso que comía antes (cambios graduales)</li>
                 <li>Cachorros: 3-4 comidas al día hasta los 4 meses</li>
@@ -909,46 +909,46 @@ export default function PlanificadorMascotaPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>❌ Errores Comunes a Evitar</h2>
+          <h2><span aria-hidden="true">❌</span> Errores Comunes a Evitar</h2>
 
           <div className={styles.erroresGrid}>
             <div className={styles.errorCard}>
-              <strong>❌ Bañarle demasiado pronto</strong>
+              <strong><span aria-hidden="true">❌</span> Bañarle demasiado pronto</strong>
               <p>Espera al menos 1-2 semanas tras la llegada y asegúrate de que tenga las vacunas al día. Los cachorros no regulan bien la temperatura.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Sacarlo a la calle sin vacunas</strong>
+              <strong><span aria-hidden="true">❌</span> Sacarlo a la calle sin vacunas</strong>
               <p>No lo expongas a otros perros ni a zonas de paseo hasta completar el calendario de vacunación inicial (16 semanas aprox.).</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Castigar los accidentes</strong>
+              <strong><span aria-hidden="true">❌</span> Castigar los accidentes</strong>
               <p>Nunca le riñas por hacer sus necesidades donde no debe. Limpia con productos enzimáticos y refuerza positivamente cuando lo haga bien.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Sobrealimentar</strong>
+              <strong><span aria-hidden="true">❌</span> Sobrealimentar</strong>
               <p>Sigue las indicaciones del pienso según peso y edad. La obesidad causa problemas graves de salud.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ No socializar a tiempo</strong>
+              <strong><span aria-hidden="true">❌</span> No socializar a tiempo</strong>
               <p>El período de socialización (3-12 semanas) es crucial. Expón gradualmente a diferentes personas, sonidos y situaciones.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Humanizar en exceso</strong>
+              <strong><span aria-hidden="true">❌</span> Humanizar en exceso</strong>
               <p>Trátalo como lo que es: un animal con necesidades específicas. Evita la ropa innecesaria y el exceso de mimos que generen dependencia.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Ignorar señales de enfermedad</strong>
+              <strong><span aria-hidden="true">❌</span> Ignorar señales de enfermedad</strong>
               <p>Vómitos repetidos, diarrea, apatía, falta de apetito... Ante la duda, consulta al veterinario. En cachorros todo es más urgente.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Usar collares extensibles al principio</strong>
+              <strong><span aria-hidden="true">❌</span> Usar collares extensibles al principio</strong>
               <p>Para enseñar a pasear, usa correa fija corta. Los extensibles no permiten control y enseñan a tirar.</p>
             </div>
           </div>
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🚫 Alimentos Tóxicos para Mascotas</h2>
+          <h2><span aria-hidden="true">🚫</span> Alimentos Tóxicos para Mascotas</h2>
 
           <div className={styles.toxicosGrid}>
             <div className={styles.toxicoCard}>
@@ -995,7 +995,7 @@ export default function PlanificadorMascotaPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes</h2>
 
           <div className={styles.faqGrid}>
             <details className={styles.faqItem}>

@@ -202,7 +202,7 @@ export default function ChecklistPrepararVerifactuPage() {
 
         {/* Hero */}
         <header className={styles.hero}>
-          <h1 className={styles.title}>📋 Checklist VeriFactu</h1>
+          <h1 className={styles.title}><span aria-hidden="true">📋</span> Checklist VeriFactu</h1>
           <p className={styles.subtitle}>
             Prepara tu negocio para la facturación electrónica obligatoria (enero 2027)
           </p>
@@ -229,7 +229,7 @@ export default function ChecklistPrepararVerifactuPage() {
           </div>
           {porcentaje === 100 && (
             <div className={styles.completadoMsg} role="alert" aria-live="polite">
-              🎉 ¡Checklist completado! Tu negocio está preparado para VeriFactu.
+              <span aria-hidden="true">🎉</span> ¡Checklist completado! Tu negocio está preparado para VeriFactu.
             </div>
           )}
         </div>

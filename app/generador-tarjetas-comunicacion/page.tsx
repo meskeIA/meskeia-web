@@ -208,7 +208,7 @@ export default function GeneradorTarjetasPage() {
           role="tab"
           aria-selected={vista === 'editor'}
         >
-          ✏️ Editor
+          <span aria-hidden="true">✏️</span> Editor
         </button>
         <button
           type="button"
@@ -217,7 +217,7 @@ export default function GeneradorTarjetasPage() {
           role="tab"
           aria-selected={vista === 'imprimir'}
         >
-          🖨️ Previsualizar e imprimir
+          <span aria-hidden="true">🖨️</span> Previsualizar e imprimir
         </button>
       </div>
 
@@ -233,6 +233,7 @@ export default function GeneradorTarjetasPage() {
             <div className={styles.mazosList}>
               {mazos.map(m => (
                 <button
+                  type="button"
                   key={m.id}
                   className={`${styles.mazoItem} ${m.id === mazoActivo ? styles.mazoItemActivo : ''}`}
                   onClick={() => setMazoActivo(m.id)}
@@ -293,6 +294,7 @@ export default function GeneradorTarjetasPage() {
                   <div className={styles.categoriaSelector}>
                     {Object.entries(COLORES_CATEGORIA).map(([key, val]) => (
                       <button
+                        type="button"
                         key={key}
                         className={`${styles.categoriaBtnColor} ${nuevaCategoria === key ? styles.categoriaActiva : ''}`}
                         style={{ backgroundColor: val.bg }}
@@ -328,6 +330,7 @@ export default function GeneradorTarjetasPage() {
                         <div className={styles.emojiDropdown} role="listbox">
                           {EMOJIS_POR_CATEGORIA[nuevaCategoria]?.map(e => (
                             <button
+                              type="button"
                               key={e}
                               className={`${styles.emojiOpt} ${e === nuevoEmoji ? styles.emojiOptActivo : ''}`}
                               onClick={() => { setNuevoEmoji(e); setMostrarEmojisPara(null); }}
@@ -339,6 +342,7 @@ export default function GeneradorTarjetasPage() {
                           {['😀','🌟','🔴','🟢','🔵','🟡','🟠','⬛','⬜','🔶','🔷','💡',
                             '🎯','🎪','🎭','🏅','🎀','🌈','🍀','🌸','🦋','🐣','🌻','🎸'].map(e => (
                             <button
+                              type="button"
                               key={e}
                               className={`${styles.emojiOpt} ${e === nuevoEmoji ? styles.emojiOptActivo : ''}`}
                               onClick={() => { setNuevoEmoji(e); setMostrarEmojisPara(null); }}
@@ -457,7 +461,7 @@ export default function GeneradorTarjetasPage() {
               onClick={imprimir}
               aria-label="Imprimir tarjetas"
             >
-              🖨️ Imprimir
+              <span aria-hidden="true">🖨️</span> Imprimir
             </button>
           </div>
 

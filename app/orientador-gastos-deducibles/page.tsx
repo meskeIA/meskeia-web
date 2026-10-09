@@ -178,7 +178,7 @@ export default function OrientadorGastosDeduciblesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💰 Orientador de Gastos Deducibles</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💰</span> Orientador de Gastos Deducibles</h1>
         <p className={styles.subtitle}>
           Descubre qué gastos puedes deducir legalmente como autónomo y calcula su impacto en IRPF e IVA. Un autónomo con 30.000€ de ingresos suele declarar entre 2.000€ y 4.000€ en gastos deducibles reales según su actividad.
         </p>
@@ -422,7 +422,7 @@ export default function OrientadorGastosDeduciblesPage() {
 
       {/* Disclaimer SIEMPRE VISIBLE */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Herramienta de Orientación — No es asesoramiento profesional</h3>
+        <h3><span aria-hidden="true">⚠️</span> Herramienta de Orientación — No es asesoramiento profesional</h3>
         <p>
           Este orientador es <strong>únicamente orientativo y educativo</strong>. Los cálculos se basan en la normativa general
           del IRPF e IVA para autónomos en régimen de estimación directa y <strong>NO sustituyen el asesoramiento profesional</strong>.
@@ -461,7 +461,7 @@ export default function OrientadorGastosDeduciblesPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📌 ¿Por qué hay diferentes porcentajes?</h4>
+              <h4><span aria-hidden="true">📌</span> ¿Por qué hay diferentes porcentajes?</h4>
               <p>
                 <strong>100%:</strong> Gastos exclusivos de tu actividad (oficina, software, asesoría).<br />
                 <strong>50%:</strong> Gastos mixtos personal/profesional (móvil, internet casa).<br />
@@ -469,21 +469,21 @@ export default function OrientadorGastosDeduciblesPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📌 ¿Cómo funciona la recuperación del IVA?</h4>
+              <h4><span aria-hidden="true">📌</span> ¿Cómo funciona la recuperación del IVA?</h4>
               <p>
                 El IVA que pagas en tus compras profesionales (IVA soportado) lo recuperas
                 restándolo del IVA que cobras a tus clientes (IVA repercutido) en la declaración trimestral.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📌 ¿Qué pasa si deduzco algo incorrecto?</h4>
+              <h4><span aria-hidden="true">📌</span> ¿Qué pasa si deduzco algo incorrecto?</h4>
               <p>
                 Hacienda puede revisar hasta 4 años atrás. Si no puedes justificar un gasto: devuelves el ahorro,
                 más intereses (4-5%), más sanción (50-150%). Mejor consultar ante la duda.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📌 ¿Puedo deducir el coche?</h4>
+              <h4><span aria-hidden="true">📌</span> ¿Puedo deducir el coche?</h4>
               <p>
                 Solo si está 100% afecto a la actividad (vehículo comercial, taxi, VTC).
                 Un turismo de uso mixto personal/profesional NO es deducible, aunque puedes deducir desplazamientos concretos.

@@ -286,7 +286,7 @@ export default function NotasPage() {
                 <span aria-hidden="true">💾</span> Exportar
               </button>
               <label className={styles.btnSmall}>
-                📂 Importar
+                <span aria-hidden="true">📂</span> Importar
                 <input
                   type="file"
                   accept=".json"
@@ -457,28 +457,28 @@ export default function NotasPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>📝 Notas libres</td>
+                  <td><span aria-hidden="true">📝</span> Notas libres</td>
                   <td>Baja</td>
                   <td>Muy alta</td>
                   <td>Difícil</td>
                   <td>Captura rápida, lluvia de ideas</td>
                 </tr>
                 <tr>
-                  <td>📋 Lista estructurada</td>
+                  <td><span aria-hidden="true">📋</span> Lista estructurada</td>
                   <td>Media</td>
                   <td>Alta</td>
                   <td>Fácil</td>
                   <td>Tareas, recordatorios, listas de compra</td>
                 </tr>
                 <tr>
-                  <td>🗒️ Método Cornell</td>
+                  <td><span aria-hidden="true">🗒️</span> Método Cornell</td>
                   <td>Alta</td>
                   <td>Media</td>
                   <td>Muy fácil</td>
                   <td>Estudio, clases, conferencias</td>
                 </tr>
                 <tr>
-                  <td>🗺️ Mapas mentales</td>
+                  <td><span aria-hidden="true">🗺️</span> Mapas mentales</td>
                   <td>Alta</td>
                   <td>Media</td>
                   <td>Visual e intuitiva</td>

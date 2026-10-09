@@ -419,7 +419,7 @@ export default function SimuladorIntervalosConfianzaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📏 Simulador de Intervalos de Confianza</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📏</span> Simulador de Intervalos de Confianza</h1>
         <p className={styles.subtitle}>
           Genera <strong>100 intervalos</strong> a partir de muestras independientes y comprueba que ~95
           contienen μ. Aprende qué significa de verdad un IC al 95 %.
@@ -431,6 +431,7 @@ export default function SimuladorIntervalosConfianzaPage() {
       {/* SELECTOR DE MODO */}
       <div className={styles.modeSelector}>
         <button
+          type="button"
           className={`${styles.modeBtn} ${modo === 'conceptual' ? styles.modeBtnActive : ''}`}
           onClick={() => setModo('conceptual')}
           aria-pressed={modo === 'conceptual'}
@@ -440,6 +441,7 @@ export default function SimuladorIntervalosConfianzaPage() {
           <span className={styles.modeDesc}>100 IC simulados — entiende qué significa &quot;95 % de confianza&quot;</span>
         </button>
         <button
+          type="button"
           className={`${styles.modeBtn} ${modo === 'calculadora' ? styles.modeBtnActive : ''}`}
           onClick={() => setModo('calculadora')}
           aria-pressed={modo === 'calculadora'}
@@ -503,6 +505,7 @@ export default function SimuladorIntervalosConfianzaPage() {
                   <div className={styles.discreteSteps} role="group" aria-label="Tamaño muestral">
                     {N_VALORES.map(v => (
                       <button
+                        type="button"
                         key={v}
                         className={`${styles.stepBtn} ${n === v ? styles.stepBtnActive : ''}`}
                         onClick={() => setN(v)}
@@ -520,6 +523,7 @@ export default function SimuladorIntervalosConfianzaPage() {
                   <div className={styles.discreteSteps} role="group" aria-label="Nivel de confianza">
                     {NIVELES.map(v => (
                       <button
+                        type="button"
                         key={v}
                         className={`${styles.stepBtn} ${nivel === v ? styles.stepBtnActive : ''}`}
                         onClick={() => setNivel(v)}
@@ -542,8 +546,8 @@ export default function SimuladorIntervalosConfianzaPage() {
               </label>
 
               <div className={styles.actions}>
-                <button className={styles.runBtn} onClick={generarIntervalos}>
-                  🔄 Generar 100 nuevos intervalos
+                <button type="button" className={styles.runBtn} onClick={generarIntervalos}>
+                  <span aria-hidden="true">🔄</span> Generar 100 nuevos intervalos
                 </button>
               </div>
             </div>
@@ -661,6 +665,7 @@ export default function SimuladorIntervalosConfianzaPage() {
                   <div className={styles.discreteSteps} role="group" aria-label="Nivel de confianza">
                     {NIVELES.map(v => (
                       <button
+                        type="button"
                         key={v}
                         className={`${styles.stepBtn} ${nivelCalc === v ? styles.stepBtnActive : ''}`}
                         onClick={() => setNivelCalc(v)}
@@ -846,31 +851,31 @@ export default function SimuladorIntervalosConfianzaPage() {
             <div className={styles.faqItem}>
               <h4>¿&quot;95 % de confianza&quot; significa que μ está dentro del IC con probabilidad 95 %?</h4>
               <p><strong>NO</strong>. Esa interpretación es incorrecta y muy común. Una vez calculado, μ está o no está en el IC: probabilidad 1 o 0. La confianza del 95 % se refiere al <em>procedimiento</em>: si repitieras el muestreo muchas veces, ~95 % de los IC contendrían μ.</p>
-              <p className={styles.faqTip}>💡 En el simulador, modo conceptual, lo ves directamente: 100 IC, ~95 contienen μ. Esa es la interpretación correcta.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, modo conceptual, lo ves directamente: 100 IC, ~95 contienen μ. Esa es la interpretación correcta.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cuándo uso z y cuándo t?</h4>
               <p>Usa <strong>z (normal)</strong> cuando σ poblacional es conocido (caso raro) o cuando n es muy grande (n ≥ 30) y σ es estimada con s. Usa <strong>t (Student)</strong> cuando σ es desconocida y n es pequeño (n &lt; 30): la t es más ancha que la z y compensa la incertidumbre extra de estimar σ.</p>
-              <p className={styles.faqTip}>💡 A partir de n ≈ 30, t y z dan resultados casi idénticos. Por defecto, en la práctica, usa siempre t cuando estimes σ con la muestra.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> A partir de n ≈ 30, t y z dan resultados casi idénticos. Por defecto, en la práctica, usa siempre t cuando estimes σ con la muestra.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cómo reduzco la anchura de mi IC?</h4>
               <p>Tres palancas: <strong>(1)</strong> aumentar n (la anchura es proporcional a 1/√n: cuadruplicar n reduce a la mitad la anchura). <strong>(2)</strong> reducir σ (si puedes controlar mejor las mediciones, mejor). <strong>(3)</strong> aceptar menor confianza (95 % → 80 % reduce la anchura, pero a cambio de más riesgo).</p>
-              <p className={styles.faqTip}>💡 La opción (1) es la más segura y honesta. Las otras pueden manipularse para hacer parecer significativo lo que no lo es.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La opción (1) es la más segura y honesta. Las otras pueden manipularse para hacer parecer significativo lo que no lo es.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué pasa si la población NO es normal?</h4>
               <p>Por el <strong>Teorema Central del Límite</strong>, la distribución de X̄ se aproxima a una normal cuando n es grande, sea cual sea la población original. Por eso los IC funcionan razonablemente bien con n ≥ 30 incluso para poblaciones asimétricas.</p>
-              <p className={styles.faqTip}>💡 Para n pequeño con población muy asimétrica, considera transformaciones (log) o métodos no paramétricos (bootstrap, percentiles).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Para n pequeño con población muy asimétrica, considera transformaciones (log) o métodos no paramétricos (bootstrap, percentiles).</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿IC y test de hipótesis están relacionados?</h4>
               <p>Sí, son <strong>dos caras de la misma moneda</strong>. Si el IC al 95 % para μ NO contiene un valor μ₀, entonces rechazas H₀: μ = μ₀ al nivel α = 5 % (test bilateral). El IC te da MÁS información: no solo si rechazas, sino el rango de valores plausibles.</p>
-              <p className={styles.faqTip}>💡 Por eso muchos estadísticos prefieren reportar IC en vez de p-valores: comunica más y se interpreta peor.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Por eso muchos estadísticos prefieren reportar IC en vez de p-valores: comunica más y se interpreta peor.</p>
             </div>
           </div>
         </section>

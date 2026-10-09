@@ -216,7 +216,7 @@ export default function ControlGastosPage() {
       <div className={styles.mainContent}>
         {/* Panel Formulario */}
         <div className={styles.formPanel}>
-          <h2 className={styles.sectionTitle}>➕ Nuevo Movimiento</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">➕</span> Nuevo Movimiento</h2>
 
           {/* Toggle Tipo */}
           <div className={styles.tipoToggle}>
@@ -300,7 +300,7 @@ export default function ControlGastosPage() {
           {/* Estadísticas por categoría */}
           {gastosPorCategoria.length > 0 && (
             <div className={styles.categoriasStats}>
-              <h3 className={styles.sectionTitle}>📊 Gastos por Categoría</h3>
+              <h3 className={styles.sectionTitle}><span aria-hidden="true">📊</span> Gastos por Categoría</h3>
               {gastosPorCategoria.map((cat) => (
                 <div key={cat.id} className={styles.categoriaStatItem}>
                   <span className={styles.categoriaStatIcon}>{cat.icon}</span>
@@ -331,7 +331,7 @@ export default function ControlGastosPage() {
 
         {/* Panel Lista */}
         <div className={styles.listaPanel}>
-          <h2 className={styles.sectionTitle}>📋 Movimientos</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Movimientos</h2>
 
           {/* Filtros */}
           <div className={styles.filtros}>
@@ -426,7 +426,7 @@ export default function ControlGastosPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📊 La Regla 50/30/20</h4>
+              <h4><span aria-hidden="true">📊</span> La Regla 50/30/20</h4>
               <p>
                 Destina el 50% de tus ingresos a necesidades (vivienda, alimentación, transporte),
                 el 30% a deseos (ocio, caprichos) y el 20% al ahorro e inversión.
@@ -434,7 +434,7 @@ export default function ControlGastosPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎯 Fondo de Emergencia</h4>
+              <h4><span aria-hidden="true">🎯</span> Fondo de Emergencia</h4>
               <p>
                 Antes de invertir, crea un colchón de 3-6 meses de gastos esenciales.
                 Este fondo te protege ante imprevistos como pérdida de empleo,
@@ -442,7 +442,7 @@ export default function ControlGastosPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>💡 Gastos Hormiga</h4>
+              <h4><span aria-hidden="true">💡</span> Gastos Hormiga</h4>
               <p>
                 Los pequeños gastos recurrentes (café, suscripciones, compras pequeñas)
                 suman cientos de euros al año aunque por sí solos parezcan invisibles.
@@ -451,7 +451,7 @@ export default function ControlGastosPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📈 Págate Primero</h4>
+              <h4><span aria-hidden="true">📈</span> Págate Primero</h4>
               <p>
                 Al recibir tu nómina, transfiere automáticamente un porcentaje
                 a tu cuenta de ahorro. Así ahorras antes de gastar,
@@ -463,7 +463,7 @@ export default function ControlGastosPage() {
 
         {/* Sección 1: Tabla Comparativa de Métodos de Presupuesto */}
         <section className={styles.guideSection}>
-          <h2>⚖️ Comparativa de Métodos de Presupuesto</h2>
+          <h2><span aria-hidden="true">⚖️</span> Comparativa de Métodos de Presupuesto</h2>
           <p className={styles.introParagraph}>
             No existe un único método válido. Elige el que mejor encaje con tu estilo de vida,
             tu disponibilidad de tiempo y tu nivel de disciplina financiera.
@@ -552,7 +552,7 @@ export default function ControlGastosPage() {
 
         {/* Sección 2: Casos de Uso Prácticos */}
         <section className={styles.guideSection}>
-          <h2>💼 Casos de Uso Prácticos</h2>
+          <h2><span aria-hidden="true">💼</span> Casos de Uso Prácticos</h2>
           <p className={styles.introParagraph}>
             Cada perfil financiero tiene sus propios retos. Encuentra el tuyo y aplica
             la estrategia más adecuada a tu situación real.
@@ -646,7 +646,7 @@ export default function ControlGastosPage() {
 
         {/* Sección 3: FAQ Ampliado */}
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes sobre Control de Gastos</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Control de Gastos</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>¿Qué porcentaje de mis ingresos debo ahorrar?</h4>
@@ -740,7 +740,7 @@ export default function ControlGastosPage() {
 
         {/* Sección 4: Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>📋 Guía Paso a Paso para Implantar el Control de Gastos</h2>
+          <h2><span aria-hidden="true">📋</span> Guía Paso a Paso para Implantar el Control de Gastos</h2>
           <p className={styles.introParagraph}>
             Siete pasos ordenados para pasar de &quot;no sé en qué se va el dinero&quot; a tener
             un presupuesto claro y funcionar en piloto automático.
@@ -833,7 +833,7 @@ export default function ControlGastosPage() {
 
         {/* Sección 5: Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>✅ Mejores Prácticas con Datos Concretos</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas con Datos Concretos</h2>
           <p className={styles.introParagraph}>
             Pequeños hábitos, aplicados de forma consistente, generan grandes resultados
             financieros a largo plazo.

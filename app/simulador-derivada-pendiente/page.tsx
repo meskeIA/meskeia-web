@@ -703,31 +703,31 @@ export default function SimuladorDerivadaPendientePage() {
             <div className={styles.faqItem}>
               <h4>¿Por qué la pendiente de la tangente y no de la curva?</h4>
               <p>Porque una curva no tiene una pendiente única: cambia en cada punto. La tangente es la mejor aproximación lineal en un punto concreto, y su pendiente captura cómo cambia la función justo ahí.</p>
-              <p className={styles.faqTip}>💡 Imagina que conduces por una carretera curva: tu velocidad lateral instantánea está dictada por la inclinación de la tangente al asfalto, no por la curvatura global.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Imagina que conduces por una carretera curva: tu velocidad lateral instantánea está dictada por la inclinación de la tangente al asfalto, no por la curvatura global.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué relación hay entre derivada y límite?</h4>
               <p>La derivada <em>es</em> un límite: el límite de la pendiente de la secante cuando los dos puntos se acercan. Sin la idea de límite, la derivada no se podría definir rigurosamente. Activa el modo secante en el simulador y reduce h para verlo.</p>
-              <p className={styles.faqTip}>💡 La pendiente secante (y −y₀)/(x−x₀) es la velocidad media. El límite cuando x→x₀ es la velocidad instantánea.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La pendiente secante (y −y₀)/(x−x₀) es la velocidad media. El límite cuando x→x₀ es la velocidad instantánea.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cuándo no existe la derivada?</h4>
               <p>Cuando la función tiene un <strong>pico angular</strong> (como |x| en x = 0), una <strong>discontinuidad</strong> (como 1/x en x = 0) o una <strong>tangente vertical</strong> (como √x en x = 0). En esos casos no se puede dibujar una única tangente.</p>
-              <p className={styles.faqTip}>💡 Una función puede ser continua pero no derivable: |x| es el ejemplo clásico. La derivabilidad es más restrictiva que la continuidad.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Una función puede ser continua pero no derivable: |x| es el ejemplo clásico. La derivabilidad es más restrictiva que la continuidad.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué dice la derivada sobre máximos y mínimos?</h4>
               <p>Si f&apos;(a) = 0 y f&apos;(x) cambia de positiva a negativa en a, hay un <strong>máximo local</strong>. Si cambia de negativa a positiva, hay un <strong>mínimo local</strong>. Si no cambia de signo, es un punto de inflexión horizontal.</p>
-              <p className={styles.faqTip}>💡 El criterio de la segunda derivada: si f&apos;(a) = 0 y f&apos;&apos;(a) &gt; 0, es mínimo. Si f&apos;&apos;(a) &lt; 0, es máximo. Si f&apos;&apos;(a) = 0, no concluye.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> El criterio de la segunda derivada: si f&apos;(a) = 0 y f&apos;&apos;(a) &gt; 0, es mínimo. Si f&apos;&apos;(a) &lt; 0, es máximo. Si f&apos;&apos;(a) = 0, no concluye.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué la derivada de eˣ es eˣ?</h4>
               <p>e (≈ 2,718) se define justamente como el número cuya función exponencial tiene pendiente 1 en x = 0. De ahí se deduce que la pendiente en cualquier x es eˣ. Es la única base con esta propiedad: por eso e es tan especial en cálculo.</p>
-              <p className={styles.faqTip}>💡 Para 2ˣ, la derivada es 2ˣ · ln(2). Solo eˣ se &quot;auto-deriva&quot; sin factor extra.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Para 2ˣ, la derivada es 2ˣ · ln(2). Solo eˣ se &quot;auto-deriva&quot; sin factor extra.</p>
             </div>
           </div>
         </section>
