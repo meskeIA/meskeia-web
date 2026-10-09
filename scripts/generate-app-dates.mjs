@@ -105,13 +105,16 @@ const anterior = existsSync(SALIDA) ? JSON.parse(readFileSync(SALIDA, 'utf8')) :
 // ~128 claves antiguas (apps renombradas y ficheros sueltos de app/) que llevan meses aquí
 // sin hacer daño, porque ninguna de esas URLs está en el sitemap. Purgarlas es una limpieza
 // aparte, con su propia comprobación: no se cuela de rondón en el arreglo de otra cosa.
+//
+// El descarte es SILENCIOSO a propósito. El historial de git no olvida la carpeta, así que
+// una app retirada se descarta en CADA ejecución, para siempre: el aviso que lo anunciaba
+// (09/10/2026) repetía «radio-meskeia» en cada /push sin pedir nada, y desde varias
+// conversaciones se leía como un pendiente. Un aviso que sale siempre no informa.
 const vivas = new Set(carpetas);
 const existeEnDisco = (clave) =>
   clave.startsWith('guia/') ? existsSync(path.join(RAIZ, 'app', clave)) : vivas.has(clave);
-const retiradas = [];
 for (const clave of Object.keys(fechas)) {
   if (existeEnDisco(clave) || clave in anterior) continue;
-  retiradas.push(clave);
   delete fechas[clave];
 }
 
@@ -123,7 +126,4 @@ const cambiadas = Object.keys(ordenado).filter((k) => anterior[k] !== ordenado[k
 console.log(`✅ data/app-dates.json: ${Object.keys(ordenado).length} carpetas (${cambiadas} con fecha nueva)`);
 if (sinFecha.length) {
   console.log(`   ℹ️  sin fecha en git (usarán la del build): ${sinFecha.slice(0, 5).join(', ')}${sinFecha.length > 5 ? '…' : ''}`);
-}
-if (retiradas.length) {
-  console.log(`   🗑️  descartadas (ya no existen en app/): ${retiradas.join(', ')}`);
 }
