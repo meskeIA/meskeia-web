@@ -472,7 +472,23 @@ export default function SelectorSeguroVidaPage() {
       )}
 
       {/* ---- DISCLAIMER ---- */}
-      <DisclaimerCard variant="financial" severity="high" />
+      <DisclaimerCard variant="financial" severity="high">
+        <p>
+          Esta herramienta tiene <strong>carácter exclusivamente orientativo</strong> y no
+          constituye asesoramiento financiero, fiscal ni jurídico. Los resultados son
+          estimaciones basadas en los datos introducidos y pueden no reflejar tu situación real.
+        </p>
+        <p>
+          <strong>Las decisiones sobre seguros de alto impacto requieren la intervención de un
+          profesional cualificado</strong>: un corredor o agente de seguros registrado, o un
+          abogado si hay un siniestro en disputa.
+        </p>
+        <p>
+          <strong>TÚ ERES RESPONSABLE</strong> de verificar esta información con un profesional
+          antes de tomar cualquier decisión. meskeIA no ejerce actividades reguladas y no se
+          responsabiliza de las consecuencias derivadas del uso de esta herramienta.
+        </p>
+      </DisclaimerCard>
 
       {/* ---- CONTENIDO EDUCATIVO ---- */}
       <EducationalSection

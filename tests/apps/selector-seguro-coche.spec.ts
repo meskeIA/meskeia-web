@@ -313,6 +313,10 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, fichas fijas
     await expect(aviso).toHaveClass(/severity-high/);
     await expect(aviso.locator('button')).toHaveCount(0);
     await expect(aviso).toContainText('no constituye asesoramiento financiero');
+    // C0010 (decidido por el usuario el 09/10/2026): en seguros el profesional regulado es un
+    // corredor o agente, no el «asesor fiscal, gestor, abogado o entidad financiera» del genérico.
+    await expect(aviso).toContainText('corredor o agente de seguros registrado');
+    await expect(aviso).not.toContainText('asesor fiscal');
   });
 
   test('tema oscuro (con el conmutador real): los textos del resultado pasan de 4,5:1', async ({ page }) => {
