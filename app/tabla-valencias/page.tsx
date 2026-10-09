@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import ZonaHerramienta from '@/components/ZonaHerramienta';
 import DataReference from '@/components/DataReference';
 import { ELEMENTOS, IONES, type CategoriaId, type Elemento } from './datos';
 import {
@@ -388,6 +389,7 @@ export default function TablaValenciasPage() {
       </header>
 
       <LegalNotice />
+      <ZonaHerramienta app="tabla-valencias">
 
       {/*
         Trazabilidad de los datos (hallazgo 931). Las 51 fichas, sus estados de oxidación, los
@@ -1174,6 +1176,8 @@ export default function TablaValenciasPage() {
           </div>
         )}
       </section>
+
+      </ZonaHerramienta>
 
       {/* ═══════════ CONTENIDO EDUCATIVO v2.0 ═══════════ */}
       <EducationalSection

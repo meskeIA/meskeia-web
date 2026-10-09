@@ -10,6 +10,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import ZonaHerramienta from '@/components/ZonaHerramienta';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorReaccionesQuimicas.module.css';
 
@@ -429,6 +430,7 @@ export default function SimuladorReaccionesQuimicas() {
       <LegalNotice />
 
       <main className={styles.main}>
+        <ZonaHerramienta app="simulador-reacciones-quimicas">
         <nav className={styles.tabBar} aria-label="Secciones del simulador" role="tablist">
           {(['catalogo', 'estequiometria', 'limitante'] as Tab[]).map(t => (
             <button
@@ -727,6 +729,8 @@ export default function SimuladorReaccionesQuimicas() {
             </div>
           </div>
         )}
+
+        </ZonaHerramienta>
 
         <EducationalSection
           title="Guía de Estequiometría y Reacciones Químicas"

@@ -4,6 +4,7 @@
 import { useState, useMemo } from 'react';
 import styles from './SimuladorPuertasLogicas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import ZonaHerramienta from '@/components/ZonaHerramienta';
 import { evaluarExpresion, extraerVariables, MAX_VARIABLES } from './motor';
 import { RETOS, corregirIntento, type Correccion } from './motor-retos';
 
@@ -291,6 +292,7 @@ export default function SimuladorPuertasLogicasPage() {
       </header>
 
       <LegalNotice />
+      <ZonaHerramienta app="simulador-puertas-logicas">
 
       {/* Mode Selector */}
       <div className={styles.modeSelector}>
@@ -926,6 +928,8 @@ export default function SimuladorPuertasLogicasPage() {
           </div>
         </div>
       )}
+
+      </ZonaHerramienta>
 
       {/* Educational Section */}
       <EducationalSection

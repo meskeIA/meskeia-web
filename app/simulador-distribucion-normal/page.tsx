@@ -4,6 +4,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorDistribucionNormal.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import ZonaHerramienta from '@/components/ZonaHerramienta';
 import { formatPercentage } from '@/lib';
 import { pdf, probabilidadNormal } from './casos';
 import CasosAula from './CasosAula';
@@ -493,6 +494,7 @@ export default function SimuladorDistribucionNormalPage() {
       </header>
 
       <LegalNotice />
+      <ZonaHerramienta app="simulador-distribucion-normal">
 
       {/* === SELECTOR DE MODO === */}
       <div className={styles.modeSelector}>
@@ -728,6 +730,8 @@ export default function SimuladorDistribucionNormalPage() {
       {/* Tarea de aula (skill /casos-aula-meskeia): fuera del panel del simulador, para que se
           vea en los tres modos y no toque su estado. */}
       <CasosAula />
+
+      </ZonaHerramienta>
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0

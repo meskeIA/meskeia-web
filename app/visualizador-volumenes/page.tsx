@@ -11,6 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import ZonaHerramienta from '@/components/ZonaHerramienta';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 
 // =========================================================
@@ -693,6 +694,7 @@ export default function VisualizadorVolumenesPage() {
       </header>
 
       <LegalNotice />
+      <ZonaHerramienta app="visualizador-volumenes">
 
       {/* Selector de figura */}
       <div className={styles.figSelector} role="group" aria-label="Seleccionar figura geométrica">
@@ -791,6 +793,8 @@ export default function VisualizadorVolumenesPage() {
           <code className={styles.formulaTexto}>{formula}</code>
         </div>
       </div>
+
+      </ZonaHerramienta>
 
       {/* ========================================================= */}
       {/* CONTENIDO EDUCATIVO v2.0 */}

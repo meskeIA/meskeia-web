@@ -690,8 +690,12 @@ test.describe('móvil 390×844, con el dedo', () => {
     await page.getByRole('button', { name: 'Ver guía educativa' }).tap();
     await page.waitForTimeout(1000);
 
-    expect(visitas).toHaveLength(1);
-    expect((JSON.parse(visitas[0]) as { aplicacion: string }).aplicacion).toBe('simulador-potencial-accion');
+    // Desde el 09/10/2026 la zona de herramienta emite también `evt:primer-uso` (piloto de
+    // rebote, components/ZonaHerramienta.tsx): va al mismo endpoint pero no es una visita
+    // (modo 'bot', prefijo `evt:`). Se separan por nombre y se exige UNO de cada.
+    const nombres = visitas.map((v) => (JSON.parse(v) as { aplicacion: string }).aplicacion);
+    expect(nombres.filter((n) => !n.startsWith('evt:'))).toEqual(['simulador-potencial-accion']);
+    expect(nombres.filter((n) => n === 'evt:primer-uso')).toHaveLength(1);
   });
 });
 

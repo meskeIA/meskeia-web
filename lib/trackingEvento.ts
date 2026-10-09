@@ -49,8 +49,14 @@ const yaEmitidos = new Set<string>();
  * @param evento  Nombre corto y estable del evento, sin el prefijo (p. ej. 'pestana-vendedor').
  * @param app     Slug de la app donde ocurre, que va en `datos_adicionales` para poder
  *                repartir el mismo evento entre varias apps hermanas.
+ * @param extra   Campos adicionales para `datos_adicionales` (p. ej. `{ t: 7 }`, segundos hasta
+ *                el primer uso en `evt:primer-uso`). Nunca datos del usuario: solo medidas.
  */
-export function registrarEventoInteraccion(evento: string, app: string): void {
+export function registrarEventoInteraccion(
+  evento: string,
+  app: string,
+  extra?: Record<string, number | string>,
+): void {
   try {
     if (typeof window === 'undefined') return;
     if (!HOSTS_PRODUCCION.has(window.location.hostname)) return;
@@ -74,7 +80,7 @@ export function registrarEventoInteraccion(evento: string, app: string): void {
         aplicacion: `evt:${evento}`,
         modo: 'bot', // ver la cabecera: NO es un bot, es la única forma de no contar como visita
         sesion_id: sesionId,
-        datos_adicionales: { app },
+        datos_adicionales: { ...extra, app },
       }),
       keepalive: true,
     }).catch(() => {});

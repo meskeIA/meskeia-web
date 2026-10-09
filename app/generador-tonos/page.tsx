@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import styles from './GeneradorTonos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
+import ZonaHerramienta from '@/components/ZonaHerramienta';
 import { formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import {
   frecuenciasDeMedida,
@@ -1123,6 +1124,7 @@ export default function GeneradorTonosPage() {
       </header>
 
       <LegalNotice />
+      <ZonaHerramienta app="generador-tonos">
 
       {/* Panel principal */}
       <div className={styles.mainPanel}>
@@ -1699,6 +1701,8 @@ export default function GeneradorTonosPage() {
           </div>
         </div>
       </div>
+
+      </ZonaHerramienta>
 
       {/*
         Nivel 2 ALTO, variante médica (hallazgo 2309, Inspector 27/09/2026): la app se anuncia para
