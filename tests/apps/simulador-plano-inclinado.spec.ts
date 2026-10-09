@@ -17,6 +17,7 @@ import {
   generarEjercicioAleatorio,
 } from '../../app/simulador-plano-inclinado/casos';
 import { G, analizarPlano } from '../../app/simulador-plano-inclinado/motor';
+import { PUERTO } from './_puerto';
 
 /**
  * Simulador de Plano Inclinado — primera inspección, 23/09/2026
@@ -98,7 +99,7 @@ import { G, analizarPlano } from '../../app/simulador-plano-inclinado/motor';
  * y la píldora «Stemum › Física» en la barra fija). Al NIVEL DEL FICHERO porque `launchOptions`
  * fuerza un worker nuevo; al resto de tests no les afecta: solo resuelve ese host.
  */
-test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
+test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0.1:${PUERTO}`] } });
 
 const RUTA = '/simulador-plano-inclinado/';
 const DESLIZADORES = ['#masa', '#angulo', '#mus', '#muk', '#fuerza', '#longitud'] as const;
@@ -1454,7 +1455,7 @@ async function puenteHmr(page: Page): Promise<void> {
   page.on('close', () => abiertos.forEach((s) => s.close()));
   await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
     const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
     arriba.binaryType = 'arraybuffer';
     abiertos.push(arriba);
     const cola: (string | Buffer)[] = [];

@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
+import { ORIGEN } from './_puerto';
 
 /**
  * Inspector — guia-comentario-texto (segmento INTERACTIVA sin número, riesgo 3)
@@ -160,7 +161,7 @@ test.describe('CASO 2 — uso normal en escritorio (1280 px)', () => {
     context,
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
-      origin: 'http://localhost:3050',
+      origin: ORIGEN,
     });
     await abrir(page, 1280, 900);
     const tabs = page.getByRole('tab');
@@ -384,7 +385,7 @@ test.describe('CASO 3 — móvil, teclado y contraste', () => {
     context,
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
-      origin: 'http://localhost:3050',
+      origin: ORIGEN,
     });
     await abrir(page, 1280, 900);
     await page.getByRole('tab', { name: 'Plantillas' }).click();

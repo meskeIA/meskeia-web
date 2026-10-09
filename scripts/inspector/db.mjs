@@ -89,6 +89,10 @@ export function abrir() {
   const ruta = process.env.INSPECTOR_DB || RUTA_BASE;
   fs.mkdirSync(path.dirname(ruta), { recursive: true });
   const db = new DatabaseSync(ruta);
+  // Esperar y no fallar si otro proceso está escribiendo: desde el 09/10/2026 el Inspector
+  // corre en una copia aparte (tarea «Inspector meskeIA») mientras el usuario trabaja en otras
+  // conversaciones, y las dos escriben en esta misma base.
+  db.prepare('PRAGMA busy_timeout = 5000').run();
   for (const t of TABLAS) db.prepare(t).run();
   migrar(db);
   return db;

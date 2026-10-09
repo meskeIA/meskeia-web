@@ -1,4 +1,5 @@
 import { test, expect, devices, Page } from '@playwright/test';
+import { PUERTO } from './_puerto';
 import {
   esperarHidratacion,
   esperarValorEnReact,
@@ -128,7 +129,7 @@ import {
  * servidor local. `launchOptions` fuerza un worker nuevo, por eso va al nivel del fichero; a las
  * visitas a localhost no les afecta.
  */
-test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
+test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0.1:${PUERTO}`] } });
 
 /** El valor de una fila de resultados, localizada por su etiqueta (las clases van con hash). */
 async function leerFila(page: Page, etiqueta: string): Promise<string> {
@@ -706,7 +707,7 @@ async function puenteHmr(page: Page): Promise<void> {
   page.on('close', () => abiertos.forEach((s) => s.close()));
   await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
     const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
     arriba.binaryType = 'arraybuffer';
     abiertos.push(arriba);
     const cola: (string | Buffer)[] = [];

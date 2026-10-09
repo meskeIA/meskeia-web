@@ -131,6 +131,9 @@ const TABLAS = [
 export function abrir(ruta = process.env.CABOS_DB || RUTA_BASE) {
   fs.mkdirSync(path.dirname(ruta), { recursive: true });
   const db = new DatabaseSync(ruta);
+  // Esperar y no fallar si otro proceso está escribiendo: el Inspector de la tarea de Windows
+  // (copia aparte, 09/10/2026) anota y cierra cabos mientras otras conversaciones también anotan.
+  db.prepare('PRAGMA busy_timeout = 5000').run();
   for (const t of TABLAS) db.prepare(t).run();
   return db;
 }

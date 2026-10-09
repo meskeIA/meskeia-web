@@ -86,7 +86,9 @@ export const UMBRALES = {
 };
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const DIR_DUMPS = path.join(RAIZ, '_backups', 'turso');
+// `TURSO_DUMPS`: la copia del Inspector (tarea de Windows) no tiene `_backups/`, que no se
+// versiona, y lee los dumps de meskeia-web.
+export const DIR_DUMPS = process.env.TURSO_DUMPS || path.join(RAIZ, '_backups', 'turso');
 
 /** El dump más reciente de `_backups/turso`, o null si no hay ninguno. */
 export function dumpMasReciente(dir = DIR_DUMPS) {

@@ -1,5 +1,6 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { PUERTO } from './_puerto';
 
 /**
  * Playground SQL — test de regresión (Inspector, 07/10/2026)
@@ -164,7 +165,7 @@ test('caso 3 · errores de SQL se muestran en el aviso y la página sigue funcio
 });
 
 test('caso 3 · funciona sin red externa (el wasm es local)', async ({ page }) => {
-  await page.route(/^(?!http:\/\/localhost:3050)/, (ruta) => ruta.abort());
+  await page.route(new RegExp(`^(?!http://localhost:${PUERTO})`), (ruta) => ruta.abort());
   await abrir(page);
   await ejecutar(page, 'SELECT COUNT(*) FROM productos;');
   await expect(filas(page).nth(0).locator('td')).toHaveText(['12']);

@@ -28,7 +28,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { execFileSync } from 'child_process';
 import { abrir, RAIZ } from './db.mjs';
-import { calcularFirma, cargarDump, dumpMasReciente } from './firma.mjs';
+import { calcularFirma, cargarDump, dumpMasReciente, DIR_DUMPS } from './firma.mjs';
 
 // ─── Riesgo por suite ─────────────────────────────────────────────────────────
 // Derivado de _private/DISCLAIMER-POLICY.md. Cuando una app pertenece a varias
@@ -124,7 +124,7 @@ function analizarApp(slug) {
 // ─── Uso real (dump de Turso) ─────────────────────────────────────────────────
 
 function leerUso() {
-  const dir = path.join(RAIZ, '_backups', 'turso');
+  const dir = DIR_DUMPS;
   if (!fs.existsSync(dir)) return { porSlug: new Map(), porNombre: new Map(), fecha: null };
   const dumps = fs.readdirSync(dir).filter(f => /^turso-dump-.*\.sql$/.test(f)).sort();
   if (!dumps.length) return { porSlug: new Map(), porNombre: new Map(), fecha: null };

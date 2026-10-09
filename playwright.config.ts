@@ -1,16 +1,18 @@
 import { defineConfig, devices } from '@playwright/test';
+import { PUERTO, ORIGEN } from './tests/apps/_puerto';
 
 /**
  * Configuración centralizada de Playwright para meskeIA
  *
- * Puerto oficial: 3050 (evita conflictos con otros proyectos en 3000)
+ * Puerto oficial: 3050 (evita conflictos con otros proyectos en 3000). `PUERTO_PRUEBAS` lo
+ * cambia: el Inspector de la tarea de Windows usa el 3052 en su copia (tests/apps/_puerto.ts).
  *
  * @see https://playwright.dev/docs/test-configuration
  */
 
 // Puerto centralizado - usar en toda la configuración
-const PORT = 3050;
-const BASE_URL = `http://localhost:${PORT}`;
+const PORT = PUERTO;
+const BASE_URL = ORIGEN;
 
 export default defineConfig({
   // Directorio de tests

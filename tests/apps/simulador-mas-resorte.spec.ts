@@ -13,13 +13,14 @@ import {
   generarEjercicioAleatorio,
 } from '../../app/simulador-mas-resorte/casos';
 import { describirOscilador } from '../../app/simulador-mas-resorte/motor';
+import { PUERTO } from './_puerto';
 
 /**
  * stemum.com → el servidor local, para ver la app como la sirve el portal (data-brand="stemum"
  * y la píldora «Stemum › Física» en la barra fija). Va al NIVEL DEL FICHERO porque
  * `launchOptions` fuerza un worker nuevo; al resto de tests no les afecta: solo resuelve ese host.
  */
-test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
+test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0.1:${PUERTO}`] } });
 
 /**
  * Simulador Masa-Resorte (MAS) — inspección del 20/09/2026
@@ -1622,7 +1623,7 @@ async function puenteHmr(page: Page): Promise<void> {
   page.on('close', () => abiertos.forEach((s) => s.close()));
   await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
     const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
     arriba.binaryType = 'arraybuffer';
     abiertos.push(arriba);
     const cola: (string | Buffer)[] = [];

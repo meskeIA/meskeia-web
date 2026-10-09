@@ -1,4 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
+import { PUERTO } from './_puerto';
 import {
   esperarHidratacion,
   esperarPaginaAsentada,
@@ -12,7 +13,7 @@ import {
  * `launchOptions` fuerza un worker nuevo; al resto de tests no les afecta: solo resuelve ese host.
  * (Re-inspección del 04/10/2026, bloque «hero» del final.)
  */
-test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
+test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0.1:${PUERTO}`] } });
 
 /**
  * Inspector — simulador-campo-magnetico (segmento CÁLCULO / física, portal Stemum)
@@ -906,7 +907,7 @@ async function puenteHmr(page: Page): Promise<void> {
   page.on('close', () => abiertos.forEach((s) => s.close()));
   await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
     const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
     arriba.binaryType = 'arraybuffer';
     abiertos.push(arriba);
     const cola: (string | Buffer)[] = [];

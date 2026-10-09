@@ -1,5 +1,6 @@
 import { test, expect, devices, type Page } from '@playwright/test';
 import { calcularResultado, CLAVES, PREGUNTAS, SISTEMAS, TECHO_PRESUPUESTO } from '../../app/selector-calefaccion/motor';
+import { PUERTO } from './_puerto';
 
 /**
  * Asesor de Calefacción (selector-calefaccion) — reparado el 24/09/2026 desde una sospecha del
@@ -1102,7 +1103,7 @@ test.describe('Re-inspección 02/10/2026 — móvil 360 px con pantalla táctil'
         await page.waitForTimeout(1_200);
       }
       const url = new URL(page.url());
-      if (url.pathname !== '/selector-calefaccion/' || url.host !== 'localhost:3050') {
+      if (url.pathname !== '/selector-calefaccion/' || url.host !== `localhost:${PUERTO}`) {
         fallos.push(`pregunta ${pregunta}: sale a ${url.host}${url.pathname}`);
         continue;
       }

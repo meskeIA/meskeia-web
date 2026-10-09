@@ -11,6 +11,7 @@ import {
   type DatosCaso,
 } from '../../app/simulador-lentes-opticas/casos';
 import { calcularImagen, potenciaDioptrias, redondearCifra } from '../../app/simulador-lentes-opticas/motor';
+import { PUERTO } from './_puerto';
 
 /**
  * stemum.com → el servidor local, para medir la app como la sirve el portal (data-brand="stemum",
@@ -18,7 +19,7 @@ import { calcularImagen, potenciaDioptrias, redondearCifra } from '../../app/sim
  * worker nuevo; al resto de tests no les afecta: solo resuelve ese host. Copiado de
  * tests/apps/simulador-mas-resorte.spec.ts.
  */
-test.use({ launchOptions: { args: ['--host-resolver-rules=MAP stemum.com 127.0.0.1:3050'] } });
+test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0.1:${PUERTO}`] } });
 
 /**
  * Simulador de Lentes Ópticas — regresión del motor de óptica geométrica.
@@ -1220,7 +1221,7 @@ async function puenteHmr(page: Page): Promise<void> {
   page.on('close', () => abiertos.forEach((s) => s.close()));
   await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
     const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:3050${u.pathname}${u.search}`);
+    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
     arriba.binaryType = 'arraybuffer';
     abiertos.push(arriba);
     const cola: (string | Buffer)[] = [];
