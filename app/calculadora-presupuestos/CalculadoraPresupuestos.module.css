@@ -503,7 +503,7 @@
 }
 
 .docTable th {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   padding: 10px;
   text-align: left;
@@ -783,7 +783,7 @@
 }
 
 [data-theme='dark'] .docTable th {
-  background: #48A9A6;
+  background: var(--secondary-boton);
 }
 
 [data-theme='dark'] .docTable td {

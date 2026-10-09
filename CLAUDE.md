@@ -502,7 +502,7 @@ y no lo dispara.
 ### Candado del contraste de las cabeceras de tabla
 
 `npm run check:contraste-cabeceras` — en el build, y **rompe el build** si un `<th>`, `<thead>`
-o `.th` pone **texto blanco sobre `var(--primary)` o `var(--secondary)`** (en CSS o en
+o `.th` pone **texto blanco sobre `var(--primary)` o `var(--secondary)`**, o su hexadecimal (en CSS o en
 `style={{…}}`): es texto pequeño, exige 4,5:1, y con blanco la marca da 4,11:1 el azul y 2,80:1
 el teal (menos en oscuro). Vigila además que **un token
 `-texto` no se use como FONDO** con blanco encima: `--primary-texto`/`--secondary-texto` son para

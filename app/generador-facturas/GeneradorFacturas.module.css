@@ -668,7 +668,7 @@
 }
 
 .previewTabla th {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   padding: 12px;
   text-align: left;
@@ -1148,7 +1148,7 @@
 }
 
 .comparativaTable thead tr {
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
 }
 

@@ -117,8 +117,16 @@ const VERBOSO = process.argv.includes('--todo');
  * Hasta el 25/09/2026 exigía el paréntesis justo detrás del nombre y esa forma pasaba
  * callada (hallazgo 1670, simulador-punnett: la tabla de recuento a 4,11:1 y 2,79:1).
  * `--primary-boton` no casa: tras el nombre solo se admite `,` o `)`.
+ *
+ * Y el hexadecimal LITERAL de la marca (desde el 09/10/2026, cabos C0014 y C0141): un `<th>`
+ * con blanco sobre `#2E86AB` escrito a mano da los mismos 4,11:1 y pasaba en verde
+ * (generador-ondas, inspector 25/09; estimador-plusvalia-municipal, hallazgo 2839). En
+ * oscuro no aclara como el token, así que tampoco llega: el sustituto es el mismo.
  */
-const RE_MARCA_FONDO = /var\(\s*--(primary|secondary)\s*(?:,[^)]*)?\)/;
+const RE_MARCA_FONDO = /var\(\s*--(primary|secondary)\s*(?:,[^)]*)?\)|(#2E86AB|#48A9A6)(?![0-9a-f])/i;
+const LITERAL_A_TOKEN = { '#2e86ab': 'primary', '#48a9a6': 'secondary' };
+/** El token del fondo, se haya escrito con `var()` o con el hexadecimal de la marca. */
+const tokenDe = (m) => m[1] ?? LITERAL_A_TOKEN[m[2].toLowerCase()];
 const RE_BLANCO = /^(#fff|#ffffff|white)$/i;
 const SUSTITUTO = { primary: '--primary-boton', secondary: '--secondary-boton' };
 /** Un token de TEXTO puesto de fondo: en oscuro se invierte y el blanco encima cae a 2,23:1. */
@@ -274,7 +282,7 @@ function fondoDe(decls) {
   for (const d of decls) {
     if (!/^background(-color|-image)?$/.test(d.prop)) continue;
     const m = d.valor.match(RE_MARCA_FONDO);
-    if (m) return { token: m[1], valor: d.valor, tenido: /color-mix/i.test(d.valor) };
+    if (m) return { token: tokenDe(m), literal: m[2] ?? null, valor: d.valor, tenido: /color-mix/i.test(d.valor) };
   }
   return null;
 }
@@ -371,7 +379,7 @@ for (const ruta of ARBOLES.flatMap((a) => recorrer(path.join(RAIZ, a), '.module.
     const de = blancoHermano ? ' (el texto blanco lo pone una regla hermana de la misma tabla)' : '';
     const tenido = fondo.tenido ? ' dentro de un `color-mix`' : '';
     errores.push(
-      `${rel}:${b.linea} — \`${b.selector}\` pone texto blanco sobre \`var(--${fondo.token})\`${tenido}${de}: ` +
+      `${rel}:${b.linea} — \`${b.selector}\` pone texto blanco sobre ${fondo.literal ? `\`${fondo.literal}\` (el --${fondo.token} de la marca escrito a mano)` : `\`var(--${fondo.token})\``}${tenido}${de}: ` +
       `4,11:1 en claro y 2,79:1 en oscuro, cuando un \`<th>\` exige 4,5:1. ` +
       `Usa \`var(${SUSTITUTO[fondo.token]})\`, que vale 5,47:1 en ambos temas.${porQue}`
     );
@@ -391,7 +399,7 @@ for (const ruta of ARBOLES.flatMap((a) => recorrer(path.join(RAIZ, a), '.tsx')))
     const linea = lineas[n];
     for (const m of linea.matchAll(/style=\{\{([^}]*)\}\}/g)) {
       const cuerpo = m[1];
-      const mf = cuerpo.match(/background(?:Color|Image)?\s*:\s*['"`][^'"`]*var\(\s*--(primary|secondary)\s*(?:,[^)]*)?\)/);
+      const mf = cuerpo.match(/background(?:Color|Image)?\s*:\s*['"`][^'"`]*(?:var\(\s*--(primary|secondary)\s*(?:,[^)]*)?\)|(#2E86AB|#48A9A6)(?![0-9a-f]))/i);
       if (!mf) continue;
       const mc = cuerpo.match(/(?:^|[,{\s])color\s*:\s*['"`]\s*(#fff|#ffffff|white)\s*['"`]/i);
       if (!mc) continue;
@@ -406,9 +414,9 @@ for (const ruta of ARBOLES.flatMap((a) => recorrer(path.join(RAIZ, a), '.tsx')))
         ? ' — lleva `contraste-ok:` SIN razón escrita, y una excepción sin motivo no se puede revisar'
         : '';
       errores.push(
-        `${rel}:${n + 1} — estilo en línea con texto blanco sobre \`var(--${mf[1]})\`: ` +
+        `${rel}:${n + 1} — estilo en línea con texto blanco sobre \`${mf[2] ? mf[2] : `var(--${tokenDe(mf)})`}\`: ` +
         `4,11:1 en claro y 2,79:1 en oscuro, cuando un \`<th>\` exige 4,5:1. ` +
-        `Usa \`var(${SUSTITUTO[mf[1]]})\`, que vale 5,47:1 en ambos temas. ` +
+        `Usa \`var(${SUSTITUTO[tokenDe(mf)]})\`, que vale 5,47:1 en ambos temas. ` +
         `Es la forma exacta del hallazgo 1175.${porQue}`
       );
     }
@@ -429,7 +437,7 @@ if (errores.length) {
 
 console.log('✅ Contraste de cabeceras correcto');
 console.log(`   · ${cssRevisados} hojas .module.css y ${tsxRevisados} .tsx de app/ y components/, sin pasivo`);
-console.log(`   · ninguna cabecera de tabla pone texto blanco sobre var(--primary)/var(--secondary)`);
+console.log(`   · ninguna cabecera de tabla pone texto blanco sobre var(--primary)/var(--secondary) ni sobre su hexadecimal`);
 if (exentas.length) {
   console.log(`   · ${exentas.length} exenta(s) con \`contraste-ok\`: ${exentas.slice(0, 5).join(', ')}`);
 }

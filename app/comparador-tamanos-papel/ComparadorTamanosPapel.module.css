@@ -327,7 +327,7 @@
 }
 
 .tabla thead th {
-  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   font-weight: 600;
   font-size: 0.82rem;

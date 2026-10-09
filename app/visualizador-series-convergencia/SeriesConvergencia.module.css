@@ -510,7 +510,7 @@
 }
 
 [data-theme='dark'] .tabla th {
-  background: #2E86AB;
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .tabla td {

@@ -618,7 +618,7 @@
 }
 
 .comparativaTable th {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   padding: 0.75rem 1rem;
   text-align: left;

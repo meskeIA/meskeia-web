@@ -647,7 +647,7 @@
 .comparativaTable th {
   padding: 14px 16px;
   text-align: left;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-weight: 600;
   white-space: nowrap;

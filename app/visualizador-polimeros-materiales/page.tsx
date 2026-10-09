@@ -301,7 +301,7 @@ export default function VisualizadorPolimerosMateriales() {
                   </div>
                   <span className={styles.masSigno}>+</span>
                   <div className={styles.grupoFuncional}>
-                    <span className={styles.grupoBadge} style={{ background: '#48A9A6', color: '#fff' }}>H₂O</span>
+                    <span className={styles.grupoBadge} style={{ background: 'var(--secondary-boton)', color: '#fff' }}>H₂O</span>
                     <span className={styles.grupoNombre}>Subproducto</span>
                   </div>
                 </div>

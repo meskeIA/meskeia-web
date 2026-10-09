@@ -364,6 +364,40 @@ const CASOS = [
       ].join('\n'),
     },
   },
+  {
+    n: 21,
+    nombre: 'CASO DE ORIGEN 4 · el hexadecimal LITERAL #2E86AB (hallazgo 2839, plusvalía; 45 en el pasivo)',
+    debeFallar: true,
+    ficheros: {
+      'app/plusvalia/Plusvalia.module.css': [
+        '.comparativaTable th {',
+        '  background: #2e86ab;',
+        '  color: white;',
+        '}',
+      ].join('\n'),
+    },
+  },
+  {
+    n: 22,
+    nombre: 'literal del teal en un estilo EN LÍNEA (visualizador-polimeros-materiales)',
+    debeFallar: true,
+    ficheros: {
+      'app/polimeros/page.tsx': "<span style={{ background: '#48A9A6', color: '#fff' }}>H₂O</span>\n",
+    },
+  },
+  {
+    n: 23,
+    nombre: 'un hexadecimal que solo EMPIEZA como el de la marca (#2E86ABCC con alfa) no es la marca opaca',
+    debeFallar: false,
+    ficheros: {
+      'app/alfa/Alfa.module.css': [
+        '.tabla th {',
+        '  background: #2E86ABCC;',
+        '  color: #1a1a1a;',
+        '}',
+      ].join('\n'),
+    },
+  },
 ];
 
 /** Ejecuta el candado sobre `dir` y dice si se encendió. */

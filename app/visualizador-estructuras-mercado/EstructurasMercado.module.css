@@ -167,7 +167,7 @@
 }
 
 .comparativaTable thead tr {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -382,7 +382,7 @@
 
 .matrizPagos th {
   padding: 0.6rem 1rem;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #ffffff;
   font-weight: 600;
   text-align: center;
