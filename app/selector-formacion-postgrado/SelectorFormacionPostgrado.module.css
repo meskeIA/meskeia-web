@@ -700,7 +700,7 @@
 /* Límites declarados: la recomendada incumple alguno, o se ha apartado una vía con más afinidad
    (hallazgos 1445, 1446 y 1447). */
 .avisoRestricciones,
-.avisoModalidad {
+.avisoTension {
   text-align: left;
   margin: 0 0 1.25rem;
   padding: 0.85rem 1rem;
@@ -714,7 +714,7 @@
 }
 
 [data-theme='dark'] .avisoRestricciones,
-[data-theme='dark'] .avisoModalidad {
+[data-theme='dark'] .avisoTension {
   border-color: #b45309;
   background: #3a2a08;
   color: #fde68a;

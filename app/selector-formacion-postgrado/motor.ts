@@ -19,7 +19,9 @@
  *
  *  3. Restricciones declaradas (hallazgos 1445, 1446 y 1447; familia selector-*, forma a). Cuatro
  *     respuestas no son preferencias sino límites que la propia ficha de cada vía permite comprobar:
- *       · presupuesto «Menos de 2.000 €» → fuera la vía cuyo coste orientativo EMPIEZA por encima;
+ *       · presupuesto «Menos de 2.000 €» → fuera la vía cuyo coste orientativo EMPIEZA por encima,
+ *         salvo la que tiene oferta subvencionada (`subvencionable`, el bootcamp): esa se avisa y no
+ *         se aparta (hallazgo 3104, 10/10/2026);
  *       · tiempo «3-6 meses a tiempo completo» o «Unas semanas o meses» → fuera las vías que duran
  *         un año o más (máster, FP de grado superior, oposiciones);
  *       · urgencia «Lo antes posible, en meses» → lo mismo;
@@ -64,6 +66,11 @@ export interface FormacionInfo {
   requisitoAcceso?: string;
   /** La vía se presenta como formación online (hallazgo 3102). */
   online?: boolean;
+  /**
+   * Hay oferta subvencionada o con financiación, así que el mínimo de la horquilla de coste no la
+   * aparta por presupuesto: se avisa en su lugar (hallazgo 3104).
+   */
+  subvencionable?: boolean;
 }
 
 export const PREGUNTAS: Pregunta[] = [
@@ -226,6 +233,11 @@ export const FORMACIONES: Record<TipoFormacion, FormacionInfo> = {
     coste: '2.000 – 12.000 €',
     daTituloUniversitario: false,
     online: true,
+    // La horquilla no tiene fuente, y la guía de la propia página dice que algunos bootcamps están
+    // subvencionados por el SEPE o tienen financiación. Con «Menos de 2.000 €» el filtro lo apartaba
+    // en 15.314 perfiles donde era la vía de más afinidad (hallazgo 3104; opción A, decidida por el
+    // usuario el 10/10/2026).
+    subvencionable: true,
   },
   oposiciones: {
     tipo: 'oposiciones',
@@ -303,12 +315,18 @@ const PRESUPUESTO_MAXIMO = [2000, 6000, 15000, Infinity];
 const MESES_TIEMPO = [6, 24, 48, 6];
 const MESES_URGENCIA = [6, 24, 60, Infinity];
 
+/** El coste orientativo de la vía empieza por encima del presupuesto declarado. */
+function fueraDePresupuesto(tipo: TipoFormacion, respuestas: Record<number, number>): boolean {
+  return COSTE_MINIMO[tipo] >= (PRESUPUESTO_MAXIMO[respuestas[4]] ?? Infinity);
+}
+
 /** Qué límites incumple cada vía con estas respuestas. */
 function incumplimientos(tipo: TipoFormacion, respuestas: Record<number, number>): Restriccion[] {
   const f = FORMACIONES[tipo];
   const lista: Restriccion[] = [];
-  // «Menos de 2.000 €»: fuera la vía cuyo coste orientativo EMPIEZA en 2.000 € o más.
-  if (COSTE_MINIMO[tipo] >= (PRESUPUESTO_MAXIMO[respuestas[4]] ?? Infinity)) lista.push('presupuesto');
+  // «Menos de 2.000 €»: fuera la vía cuyo coste orientativo EMPIEZA en 2.000 € o más, salvo que
+  // tenga oferta subvencionada (hallazgo 3104): entonces se avisa, no se aparta.
+  if (!f.subvencionable && fueraDePresupuesto(tipo, respuestas)) lista.push('presupuesto');
   // Una vía que dura como mínimo un año no cabe en «3-6 meses» ni en «unas semanas o meses»; con
   // «1-2 años» o más, las horquillas se solapan y no se descarta nada.
   if (f.duracionMinimaMeses > (MESES_TIEMPO[respuestas[2]] ?? Infinity)) lista.push('tiempo');
@@ -370,6 +388,11 @@ export interface Resultado {
    * razones. Vacío si no hay nada que decir.
    */
   avisoModalidad: string;
+  /**
+   * La recomendada tiene un coste orientativo por encima del presupuesto pero oferta subvencionada,
+   * así que no se ha apartado: qué buscar (hallazgo 3104). Vacío si no hay nada que decir.
+   */
+  avisoPresupuesto: string;
 }
 
 /** Lista legible: «A, B y C». */
@@ -382,6 +405,8 @@ const puntosEnLetra = (n: number) => `${n} ${n === 1 ? 'punto' : 'puntos'}`;
 
 /** «a» + nombre con artículo, con la contracción: «al máster», «a la FP». */
 const aNombre = (s: string) => (s.startsWith('el ') ? `al ${s.slice(3)}` : `a ${s}`);
+/** «de» + nombre con artículo: «del bootcamp», «de la FP». */
+const deNombre = (s: string) => (s.startsWith('el ') ? `del ${s.slice(3)}` : `de ${s}`);
 
 /** `respuestas` guarda, por id de pregunta, el ÍNDICE de la opción elegida. */
 export function calcularResultado(respuestas: Record<number, number>): Resultado {
@@ -477,7 +502,11 @@ export function calcularResultado(respuestas: Record<number, number>): Resultado
     ? `Has respondido que prefieres «${PREGUNTAS[6].opciones[0].texto.toLowerCase()}», y ${CON_ARTICULO[tipo]} se presenta aquí como formación online: esa preferencia no se cumple. Si eliges esta vía, comprueba antes de matricularte si hay un formato presencial.`
     : '';
 
-  return { tipo, puntos, orden, candidatas, incumple, empatadas, criterioDesempate, razones, avisoRestricciones, avisoModalidad };
+  const avisoPresupuesto = FORMACIONES[tipo].subvencionable && fueraDePresupuesto(tipo, respuestas)
+    ? `Tu presupuesto es de menos de 2.000 €, y el coste orientativo ${deNombre(CON_ARTICULO[tipo])} en esta ficha empieza en ${FORMACIONES[tipo].coste.split(' ')[0]} €. No se aparta por eso porque algunos están subvencionados (por ejemplo, por el SEPE) o tienen financiación: busca uno así antes de matricularte.`
+    : '';
+
+  return { tipo, puntos, orden, candidatas, incumple, empatadas, criterioDesempate, razones, avisoRestricciones, avisoModalidad, avisoPresupuesto };
 }
 
 const capitalizar = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

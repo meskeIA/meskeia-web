@@ -280,8 +280,16 @@ export default function SelectorFormacionPostgradoPage() {
 
             {/* La modalidad declarada que la vía no cumple (hallazgo 3102). */}
             {calculo.avisoModalidad && (
-              <p className={styles.avisoModalidad} role="note" data-aviso="modalidad">
+              <p className={styles.avisoTension} role="note" data-aviso="modalidad">
                 <span aria-hidden="true">🏫</span> {calculo.avisoModalidad}
+              </p>
+            )}
+
+            {/* Por encima del presupuesto, pero con oferta subvencionada: no se aparta, se dice qué
+                buscar (hallazgo 3104). */}
+            {calculo.avisoPresupuesto && (
+              <p className={styles.avisoTension} role="note" data-aviso="presupuesto">
+                <span aria-hidden="true">💶</span> {calculo.avisoPresupuesto}
               </p>
             )}
 

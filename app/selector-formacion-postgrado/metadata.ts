@@ -41,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Test de 10 preguntas sobre motivación, tiempo, presupuesto, experiencia y objetivos',
     'Compara cinco vías: máster universitario, FP de grado superior, bootcamp, oposiciones y certificación profesional',
-    'Respeta tus límites de presupuesto, tiempo, urgencia y título, y avisa si ninguna vía los cumple todos',
+    'Respeta tus límites de tiempo, urgencia y título, y avisa si ninguna vía los cumple todos o si la recomendada supera tu presupuesto',
     'Razones sacadas de tus respuestas y comparativa de afinidad con cada vía',
     'Duración y coste orientativos de cada vía',
     'Guía con la normativa de másteres habilitantes, acceso a cuerpos docentes y créditos ECTS',

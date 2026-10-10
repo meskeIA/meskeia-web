@@ -59,7 +59,8 @@ async function responder(page: Page, indices: readonly number[]): Promise<string
 //   P5 op 5, cert 1 · P6 máster 3, FP 3, op 2 · P7 máster 3, FP 3, op 2 · P8 máster 4, cert 3 ·
 //   P9 máster 4, FP 2 · P10 boot 4, cert 4
 //   = máster 20 · FP 16 · bootcamp 4 · oposiciones 20 · certificación 13.
-// Límites: solo el presupuesto aparta el bootcamp (desde 2.000 €). Empate a 20 entre dos vías que
+// Límites: ninguno aparta a nadie (el presupuesto apartaba el bootcamp hasta el 3104, 10/10/2026; con
+// 4 puntos no cambia nada). Empate a 20 entre dos vías que
 // lo cumplen todo; la motivación («estabilidad laboral») da 4 a oposiciones y 0 al máster.
 //
 // El perfil que usaba este test hasta la reparación de 1446/1447 ([0,0,0,0,0,0,0,2,0,0]: 3-6 meses,
@@ -190,8 +191,9 @@ test('motor: ningún empate queda en silencio, y el criterio que se anuncia es v
   expect(fallos).toEqual([]);
   expect(total).toBe(1_048_576);
   // 88.071 antes de la reparación, cuando competían siempre las cinco vías; con los límites,
-  // compiten menos y empatan menos (recuento del motor el 24/09/2026).
-  expect(empates).toBe(57_371);
+  // compiten menos y empatan menos (recuento del motor el 24/09/2026: 57.371). Desde el 3104
+  // (10/10/2026) el presupuesto ya no aparta el bootcamp, que vuelve a competir: 62.110.
+  expect(empates).toBe(62_110);
 });
 
 /**
@@ -275,7 +277,8 @@ test.describe('Reparación 24/09/2026 — restricciones declaradas, datos de la 
       if (i === PREGUNTAS.length) {
         const res = calcularResultado(r);
         const avisa = res.avisoRestricciones;
-        if (r[4] === 0 && COSTE_MINIMO[res.tipo] >= 2000 && !/presupuesto/.test(avisa)) c.presupuestoSinAviso++;
+        // Desde el 3104 el bootcamp no se aparta por presupuesto: el aviso es `avisoPresupuesto`.
+        if (r[4] === 0 && COSTE_MINIMO[res.tipo] >= 2000 && !/presupuesto/.test(`${avisa} ${res.avisoPresupuesto}`)) c.presupuestoSinAviso++;
         if ((r[2] === 0 || r[2] === 3 || r[9] === 0) && largas.includes(res.tipo) && !/dura /.test(avisa)) c.tiempoSinAviso++;
         if (r[10] === 0 && res.tipo !== 'master' && !/título universitario/.test(avisa)) c.tituloSinAviso++;
         const hayCompatible = CLAVES.some((k) => res.incumple[k].length === 0);
@@ -360,17 +363,19 @@ test.describe('Reparación 24/09/2026 — restricciones declaradas, datos de la 
     }
   });
 
-  test('1445: con «Menos de 2.000 €» el bootcamp se aparta y se dice; el máster cabe en universidad pública', async ({ page }) => {
+  test('1445: con «Menos de 2.000 €» el bootcamp se recomienda con el aviso de buscar uno subvencionado; el máster cabe en universidad pública', async ({ page }) => {
     // Cambiar de sector · 3-6 meses · Otro sector · MENOS DE 2.000 € · Tecnología · 1-3 años ·
-    // Online · Tecnología · Lo antes posible · Habilidades → bootcamp 36 (desde 2.000 €) ·
-    // certificación 26 (desde 200 €), que cumple todos los límites.
+    // Online · Tecnología · Lo antes posible · Habilidades → bootcamp 36 · certificación 26.
+    // Reescrito el 10/10/2026 (hallazgo 3104, opción A decidida por el usuario): este test exigía
+    // apartar el bootcamp por una horquilla sin fuente («desde 2.000 €») que la guía contradice
+    // («algunos están subvencionados por el SEPE»). Ahora gana el bootcamp y se dice qué buscar.
     await abrirTest(page);
     await responder(page, [2, 0, 2, 0, 2, 1, 1, 0, 0, 2]);
-    expect(await tituloResultado(page)).toBe('Certificación Profesional');
-    await expect(aviso(page)).toContainText(
-      'Por afinidad encajaría más el bootcamp (36 puntos), pero su coste orientativo empieza en 2.000 €, y tu presupuesto es de menos de 2.000 €.',
+    expect(await tituloResultado(page)).toBe('Bootcamp / Formación Online Intensiva');
+    await expect(aviso(page)).toHaveCount(0);
+    await expect(page.locator('[data-aviso="presupuesto"]')).toHaveText(
+      '💶 Tu presupuesto es de menos de 2.000 €, y el coste orientativo del bootcamp en esta ficha empieza en 2.000 €. No se aparta por eso porque algunos están subvencionados (por ejemplo, por el SEPE) o tienen financiación: busca uno así antes de matricularte.',
     );
-    expect(await minimoPublicado(page)).toBeLessThan(2000);
     // Especializarme · 1-2 años · Recién graduado · MENOS DE 2.000 € · título oficial · Sin
     // experiencia · Presencial · Empresa · Sin urgencia · Necesito título → máster 33: su mínimo es
     // ahora el precio público (820,80 €, hallazgo 1448), que cabe en el presupuesto.
@@ -676,22 +681,25 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
   // Presencial · Tecnología · LO ANTES POSIBLE · NECESITO UN TÍTULO UNIVERSITARIO.
   const LIMITE_TODO = [2, 0, 2, 0, 2, 0, 0, 0, 0, 0] as const;
 
-  test('límite: ninguna vía cumple todo y la certificación es la única que incumple uno solo', async ({ page }) => {
+  test('límite: ninguna vía cumple todo; bootcamp y certificación incumplen uno solo y gana el de más afinidad', async ({ page }) => {
     // A mano: bootcamp 4 + 4 + 4 + 5 + 5 + 4 = 26 · certificación 2 + 2 + 4 + 3 + 3 + 4 = 18 · máster
-    // 3 + 3 + 5 = 11 · FP 2 + 2 + 3 + 3 = 10 · oposiciones 3 + 2 + 2 = 7. Límites: menos de 2.000 €
-    // aparta el bootcamp (desde 2.000 €); 3-6 meses y «lo antes posible» apartan máster, FP y
-    // oposiciones (12, 12 y 24 meses); el título aparta todo menos el máster. Incumplen: máster 2,
-    // FP 3, bootcamp 2, oposiciones 3, certificación 1 → la certificación, SOLA.
+    // 3 + 3 + 5 = 11 · FP 2 + 2 + 3 + 3 = 10 · oposiciones 3 + 2 + 2 = 7. Límites: 3-6 meses y «lo
+    // antes posible» apartan máster, FP y oposiciones (12, 12 y 24 meses); el título aparta todo
+    // menos el máster. Incumplen: máster 2, FP 3, bootcamp 1, oposiciones 3, certificación 1 →
+    // bootcamp y certificación, y el bootcamp por afinidad (26 frente a 18).
+    // Reescrito el 10/10/2026 (hallazgo 3104, opción A): hasta entonces «Menos de 2.000 €» apartaba
+    // el bootcamp (2 límites) y ganaba la certificación SOLA. Ahora no se aparta: se avisa.
     await abrirTest(page);
     await responder(page, LIMITE_TODO);
-    await expect(titulo(page)).toHaveText('Certificación Profesional');
+    await expect(titulo(page)).toHaveText('Bootcamp / Formación Online Intensiva');
     await expect(avisoRestricciones(page)).toContainText(
-      'Ninguna vía cumple a la vez todo lo que has declarado. La certificación profesional es la que menos choca con tus límites, pero no da un título universitario oficial, y has respondido que lo necesitas.',
+      'Ninguna vía cumple a la vez todo lo que has declarado. El bootcamp y la certificación profesional son las que menos chocan con tus límites; se recomienda el bootcamp, que es la de más afinidad entre ellas, pero no da un título universitario oficial, y has respondido que lo necesitas.',
     );
-    expect(await textos(page, '[class*="alternativaPct"]')).toEqual(['18 puntos', '26 puntos', '11 puntos', '10 puntos', '7 puntos']);
+    await expect(page.locator('[data-aviso="presupuesto"]')).toContainText('Tu presupuesto es de menos de 2.000 €');
+    expect(await textos(page, '[class*="alternativaPct"]')).toEqual(['26 puntos', '18 puntos', '11 puntos', '10 puntos', '7 puntos']);
     expect(await page.locator('[class*="alternativaItem"]').evaluateAll((els) => els.map((e) => (e.querySelector('[class*="alternativaIncumple"]')?.textContent ?? '').trim()))).toEqual([
       'sin título universitario oficial',
-      'fuera de tu presupuesto · sin título universitario oficial',
+      'sin título universitario oficial',
       'más larga que tu tiempo disponible · más larga que tu urgencia',
       'más larga que tu tiempo disponible · más larga que tu urgencia · sin título universitario oficial',
       'más larga que tu tiempo disponible · más larga que tu urgencia · sin título universitario oficial',
@@ -752,7 +760,8 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
       }
     };
     recorrer(0);
-    expect(empates).toBe(57_371);
+    // 57.371 hasta el 3104; desde el 10/10/2026 el bootcamp vuelve a competir con «Menos de 2.000 €».
+    expect(empates).toBe(62_110);
     expect(encadenados).toBe(0);
     expect(falsos).toEqual([]);
   });
@@ -842,9 +851,10 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
   // · Tecnología · Lo antes posible · Habilidades más que el título.
   const DESEMPLEADO_SEPE = [2, 0, 3, 0, 2, 1, 1, 0, 0, 2] as const;
 
-  // ABIERTO (hallazgo 3104, espera decisión del usuario: quitar el filtro cambia la recomendación en
-  // 15.314 perfiles, y el mínimo de 2.000 € no tiene fuente que lo zanje).
-  test.fail('3104 el bootcamp no se aparta por un coste mínimo de 2.000 € que la propia guía contradice', async ({ page }) => {
+  // REPARADO el 10/10/2026 (hallazgo 3104, opción A decidida por el usuario): el bootcamp es
+  // `subvencionable` y el presupuesto no lo aparta; `avisoPresupuesto` dice que busque uno
+  // subvencionado. Con «Menos de 2.000 €» hoy sale el bootcamp en 18.211 perfiles, todos con el aviso.
+  test('3104 el bootcamp no se aparta por un coste mínimo de 2.000 € que la propia guía contradice', async ({ page }) => {
     // A mano: bootcamp 4 + 4 + 3 + 5 + 3 + 3 + 5 + 4 + 4 = 35 · certificación 2 + 2 + 4 + 3 + 4 + 3 +
     // 4 + 4 = 26 · FP 3 + 2 + 2 = 7 · oposiciones 2 + 3 + 2 = 7 · máster 0. Con menos de 2.000 € se
     // aparta el bootcamp «porque su coste orientativo empieza en 2.000 €» (horquilla sin fuente),
@@ -857,6 +867,35 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
     const guia = await textoGuia(page);
     const aparta = aviso.some((a) => a.includes('coste orientativo empieza en 2.000 €'));
     expect(aparta && /subvencionados por el SEPE/.test(guia), 'aparta por 2.000 € lo que la guía dice que puede ser subvencionado').toBe(false);
+    await expect(titulo(page)).toHaveText('Bootcamp / Formación Online Intensiva');
+    await expect(page.locator('[data-aviso="presupuesto"]')).toContainText('algunos están subvencionados (por ejemplo, por el SEPE) o tienen financiación');
+  });
+
+  test('3104 motor: con «Menos de 2.000 €», ningún bootcamp sale sin el aviso, y ninguna otra vía lo lleva', () => {
+    test.setTimeout(180_000);
+    const r: Record<number, number> = {};
+    let bootcamp = 0;
+    let sinAviso = 0;
+    let avisoAjeno = 0;
+    const recorrer = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        const res = calcularResultado(r);
+        const conPoco = r[4] === 0 && res.tipo === 'bootcamp';
+        if (conPoco) bootcamp++;
+        if (conPoco && !res.avisoPresupuesto) sinAviso++;
+        if (!conPoco && res.avisoPresupuesto) avisoAjeno++;
+        if (res.incumple.bootcamp.includes('presupuesto')) avisoAjeno++;
+        return;
+      }
+      for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) {
+        r[PREGUNTAS[i].id] = k;
+        recorrer(i + 1);
+      }
+    };
+    recorrer(0);
+    expect(bootcamp).toBe(18_211);
+    expect(sinAviso).toBe(0);
+    expect(avisoAjeno).toBe(0);
   });
 
   // Cambiar de sector · 3-6 meses · Otro sector · 2.000-6.000 € · Tecnología · 1-3 años · Online ·
