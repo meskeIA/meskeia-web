@@ -333,7 +333,7 @@ export default function CalculadoraCosteViviendaPage() {
                 {/* Gastos fijos */}
                 {totalFijos > 0 && (
                   <div className={styles.desgloseSection}>
-                    <h4>📋 Gastos fijos: {formatCurrency(totalFijos)}/mes</h4>
+                    <h4><span aria-hidden="true">📋</span> Gastos fijos: {formatCurrency(totalFijos)}/mes</h4>
                     <div className={styles.desgloseGrid}>
                       {gastosFijos.hipoteca > 0 && (
                         <div className={styles.desgloseRow}>
@@ -372,7 +372,7 @@ export default function CalculadoraCosteViviendaPage() {
                 {/* Suministros */}
                 {totalSuministros > 0 && (
                   <div className={styles.desgloseSection}>
-                    <h4>💡 Suministros: {formatCurrency(totalSuministros)}/mes</h4>
+                    <h4><span aria-hidden="true">💡</span> Suministros: {formatCurrency(totalSuministros)}/mes</h4>
                     <div className={styles.desgloseGrid}>
                       {suministros.electricidad > 0 && (
                         <div className={styles.desgloseRow}>
@@ -405,7 +405,7 @@ export default function CalculadoraCosteViviendaPage() {
                 {/* Otros gastos */}
                 {totalOtros > 0 && (
                   <div className={styles.desgloseSection}>
-                    <h4>🔧 Otros gastos: {formatCurrency(totalOtros)}/mes</h4>
+                    <h4><span aria-hidden="true">🔧</span> Otros gastos: {formatCurrency(totalOtros)}/mes</h4>
                     <div className={styles.desgloseGrid}>
                       {otrosGastos.mantenimientoMensual > 0 && (
                         <div className={styles.desgloseRow}>
@@ -469,7 +469,7 @@ export default function CalculadoraCosteViviendaPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>💰 Gastos ineludibles</h4>
+              <h4><span aria-hidden="true">💰</span> Gastos ineludibles</h4>
               <ul>
                 <li><strong>IBI:</strong> Impuesto municipal (0,4%-1,1% del valor catastral)</li>
                 <li><strong>Comunidad:</strong> Obligatorio en edificios (50-200€/mes)</li>
@@ -478,7 +478,7 @@ export default function CalculadoraCosteViviendaPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>🔧 Mantenimiento preventivo</h4>
+              <h4><span aria-hidden="true">🔧</span> Mantenimiento preventivo</h4>
               <ul>
                 <li><strong>Revisión caldera:</strong> Obligatoria cada 2 años (80-120€)</li>
                 <li><strong>Aire acondicionado:</strong> Revisión anual recomendada (60-100€)</li>
@@ -498,7 +498,7 @@ export default function CalculadoraCosteViviendaPage() {
           </p>
 
           <div className={styles.infoBox}>
-            <h4>📌 Ejemplo práctico</h4>
+            <h4><span aria-hidden="true">📌</span> Ejemplo práctico</h4>
             <p>Una segunda residencia con gastos de 400€/mes:</p>
             <ul>
               <li>Coste anual: 4.800€</li>
@@ -535,7 +535,7 @@ export default function CalculadoraCosteViviendaPage() {
 
         {/* --- SECCIÓN: Tabla Comparativa de Tipos de Vivienda --- */}
         <section className={styles.eduComparativaSection}>
-          <h3>🏠 Costes Estimados por Tipo de Vivienda en España</h3>
+          <h3><span aria-hidden="true">🏠</span> Costes Estimados por Tipo de Vivienda en España</h3>
           <p className={styles.eduComparativaSubtitle}>Rangos orientativos para 2025. Los valores varían según municipio, antigüedad, superficie y consumo personal. No incluyen hipoteca cuando el inmueble está pagado.</p>
           <div className={styles.eduTablaWrapper}>
             <table className={styles.eduTablaComparativa}>
@@ -552,7 +552,7 @@ export default function CalculadoraCosteViviendaPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🏙️ Piso centro ciudad</td>
+                  <td><span aria-hidden="true">🏙️</span> Piso centro ciudad</td>
                   <td>800–1.200 €</td>
                   <td>50–100 €</td>
                   <td>80–200 €</td>
@@ -561,7 +561,7 @@ export default function CalculadoraCosteViviendaPage() {
                   <td>1.130–1.830 €</td>
                 </tr>
                 <tr>
-                  <td>🏢 Piso periferia/barrio</td>
+                  <td><span aria-hidden="true">🏢</span> Piso periferia/barrio</td>
                   <td>500–800 €</td>
                   <td>30–60 €</td>
                   <td>50–120 €</td>
@@ -570,7 +570,7 @@ export default function CalculadoraCosteViviendaPage() {
                   <td>740–1.240 €</td>
                 </tr>
                 <tr>
-                  <td>🏡 Vivienda unifamiliar</td>
+                  <td><span aria-hidden="true">🏡</span> Vivienda unifamiliar</td>
                   <td>700–1.100 €</td>
                   <td>60–150 €</td>
                   <td>0–50 €</td>
@@ -579,7 +579,7 @@ export default function CalculadoraCosteViviendaPage() {
                   <td>1.040–1.850 €</td>
                 </tr>
                 <tr>
-                  <td>🏘️ Adosado / Pareado</td>
+                  <td><span aria-hidden="true">🏘️</span> Adosado / Pareado</td>
                   <td>650–1.000 €</td>
                   <td>50–120 €</td>
                   <td>30–80 €</td>
@@ -588,7 +588,7 @@ export default function CalculadoraCosteViviendaPage() {
                   <td>980–1.670 €</td>
                 </tr>
                 <tr>
-                  <td>🌊 Segunda residencia</td>
+                  <td><span aria-hidden="true">🌊</span> Segunda residencia</td>
                   <td>300–600 €</td>
                   <td>40–100 €</td>
                   <td>50–150 €</td>
@@ -603,7 +603,7 @@ export default function CalculadoraCosteViviendaPage() {
 
         {/* --- SECCIÓN: Casos de Uso por Perfil de Propietario --- */}
         <section className={styles.eduEscenariosSection}>
-          <h3>👤 Casos de Uso: Perfiles de Propietario</h3>
+          <h3><span aria-hidden="true">👤</span> Casos de Uso: Perfiles de Propietario</h3>
           <p className={styles.eduEscenariosSubtitle}>Ejemplos reales de lo que cuesta mantener una vivienda según tu situación personal en España.</p>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
@@ -614,7 +614,7 @@ export default function CalculadoraCosteViviendaPage() {
               <p className={styles.eduEscenarioExample}>
                 Piso de 180.000 € (hipoteca 80%, 30 años, euríbor + 0,8%). Hipoteca: 720 €/mes. IBI: 35 €. Comunidad: 80 €. Seguros: 30 €. Suministros: 150 €. Fondo mantenimiento: 50 €. Total: ~1.065 €/mes.
               </p>
-              <p className={styles.eduEscenarioTip}>💡 Necesita mínimo 3.550 € netos/mes para cumplir la regla del 30% de salario dedicado a vivienda.</p>
+              <p className={styles.eduEscenarioTip}><span aria-hidden="true">💡</span> Necesita mínimo 3.550 € netos/mes para cumplir la regla del 30% de salario dedicado a vivienda.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
@@ -624,7 +624,7 @@ export default function CalculadoraCosteViviendaPage() {
               <p className={styles.eduEscenarioExample}>
                 Unifamiliar de 300.000 € sin hipoteca (pagada o heredada). IBI: 80 €/mes. Comunidad: 0 € (sin zonas comunes). Seguros: 35 €. Suministros: 300 €. Mantenimiento: 120 €. Total: ~535 €/mes.
               </p>
-              <p className={styles.eduEscenarioTip}>💡 Sin hipoteca, la vivienda sigue costando más de 500 €/mes. El mantenimiento de una unifamiliar es sensiblemente mayor.</p>
+              <p className={styles.eduEscenarioTip}><span aria-hidden="true">💡</span> Sin hipoteca, la vivienda sigue costando más de 500 €/mes. El mantenimiento de una unifamiliar es sensiblemente mayor.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
@@ -634,7 +634,7 @@ export default function CalculadoraCosteViviendaPage() {
               <p className={styles.eduEscenarioExample}>
                 Apartamento costero de 150.000 € (hipoteca parcial 350 €/mes). IBI: 55 €. Comunidad: 90 €. Seguros: 25 €. Suministros mínimos: 60 €. Mantenimiento: 60 €. Total: ~640 €/mes.
               </p>
-              <p className={styles.eduEscenarioTip}>💡 A solo 30 días de uso al año = 256 €/día. Compara con apartamento vacacional antes de decidir si comprar.</p>
+              <p className={styles.eduEscenarioTip}><span aria-hidden="true">💡</span> A solo 30 días de uso al año = 256 €/día. Compara con apartamento vacacional antes de decidir si comprar.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
@@ -644,14 +644,14 @@ export default function CalculadoraCosteViviendaPage() {
               <p className={styles.eduEscenarioExample}>
                 Piso de 200.000 € en alquiler. Hipoteca: 550 €. Gastos fijos (IBI, comunidad, seguros): 200 €. Alquiler recibido: 950 €. Margen bruto antes de IRPF: 200 €/mes.
               </p>
-              <p className={styles.eduEscenarioTip}>💡 Incluye vacíos y derramas en tus cálculos. El 60% de reducción IRPF por alquiler habitual mejora la rentabilidad real.</p>
+              <p className={styles.eduEscenarioTip}><span aria-hidden="true">💡</span> Incluye vacíos y derramas en tus cálculos. El 60% de reducción IRPF por alquiler habitual mejora la rentabilidad real.</p>
             </div>
           </div>
         </section>
 
         {/* --- SECCIÓN: FAQ Avanzado --- */}
         <section className={styles.eduFaqSection}>
-          <h3>❓ Preguntas Frecuentes sobre Costes de Vivienda</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Costes de Vivienda</h3>
           <p className={styles.eduFaqSubtitle}>Respuestas detalladas a las dudas más habituales al planificar el presupuesto de tu hogar.</p>
           <div className={styles.eduFaqList}>
             <div className={styles.eduFaqItem}>
@@ -691,7 +691,7 @@ export default function CalculadoraCosteViviendaPage() {
 
         {/* --- SECCIÓN: Guía Paso a Paso --- */}
         <section className={styles.eduStepSection}>
-          <h3>🗺️ Guía: Cómo Auditar y Reducir el Coste de tu Vivienda</h3>
+          <h3><span aria-hidden="true">🗺️</span> Guía: Cómo Auditar y Reducir el Coste de tu Vivienda</h3>
           <p className={styles.eduStepSubtitle}>Proceso sistemático para identificar oportunidades de ahorro y optimizar el presupuesto de tu hogar.</p>
           <div className={styles.eduStepGuide}>
             <div className={styles.eduStepItem}>
@@ -748,7 +748,7 @@ export default function CalculadoraCosteViviendaPage() {
 
         {/* --- SECCIÓN: Mejores Prácticas --- */}
         <section className={styles.eduTipsSection}>
-          <h3>⚡ 6 Hábitos del Propietario Inteligente</h3>
+          <h3><span aria-hidden="true">⚡</span> 6 Hábitos del Propietario Inteligente</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon}>🔍</span>

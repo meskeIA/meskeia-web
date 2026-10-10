@@ -361,7 +361,7 @@ export default function OrientadorEscrituraCreativaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>✍️ Orientador de Escritura Creativa</h1>
+        <h1 className={styles.title}><span aria-hidden="true">✍️</span> Orientador de Escritura Creativa</h1>
         <p className={styles.subtitle}>Tu guía personalizada para empezar a escribir con confianza</p>
       </header>
 
@@ -461,7 +461,7 @@ export default function OrientadorEscrituraCreativaPage() {
                     <span key={i} className={styles.ventajaBadge}>✓ {v}</span>
                   ))}
                 </div>
-                <p className={styles.perspectivIdeal}>🎯 Ideal para: {p.ideal}</p>
+                <p className={styles.perspectivIdeal}><span aria-hidden="true">🎯</span> Ideal para: {p.ideal}</p>
                 <p className={styles.perspectivEjemplo}>📚 {p.ejemploFamoso}</p>
               </button>
             ))}
@@ -495,7 +495,7 @@ export default function OrientadorEscrituraCreativaPage() {
 
           {/* Estructura */}
           <div className={styles.guiaSection}>
-            <h3 className={styles.guiaSectionTitle}>📐 Estructura básica</h3>
+            <h3 className={styles.guiaSectionTitle}><span aria-hidden="true">📐</span> Estructura básica</h3>
             <div className={styles.estructuraList}>
               {guia.estructura.map((e, i) => (
                 <div key={i} className={styles.estructuraPaso}>
@@ -511,7 +511,7 @@ export default function OrientadorEscrituraCreativaPage() {
 
           {/* Kit de arranque */}
           <div className={styles.guiaSection}>
-            <h3 className={styles.guiaSectionTitle}>🚀 Kit de arranque</h3>
+            <h3 className={styles.guiaSectionTitle}><span aria-hidden="true">🚀</span> Kit de arranque</h3>
             <p className={styles.guiaSectionDesc}>
               Responde estas preguntas antes de escribir la primera línea. Cuanto más concretas sean tus respuestas, más fácil será empezar.
             </p>
@@ -538,13 +538,13 @@ export default function OrientadorEscrituraCreativaPage() {
               onClick={() => setMostrarHojaRuta(true)}
               type="button"
             >
-              📄 Generar mi Hoja de Ruta
+              <span aria-hidden="true">📄</span> Generar mi Hoja de Ruta
             </button>
           </div>
 
           {/* Errores frecuentes */}
           <div className={styles.guiaSection}>
-            <h3 className={styles.guiaSectionTitle}>⚠️ Errores frecuentes en {generoSeleccionado.nombre.toLowerCase()}</h3>
+            <h3 className={styles.guiaSectionTitle}><span aria-hidden="true">⚠️</span> Errores frecuentes en {generoSeleccionado.nombre.toLowerCase()}</h3>
             <ul className={styles.erroresList}>
               {guia.erroresFrecuentes.map((error, i) => (
                 <li key={i} className={styles.errorItem}>
@@ -562,7 +562,7 @@ export default function OrientadorEscrituraCreativaPage() {
           {/* Hoja de Ruta */}
           {mostrarHojaRuta && (
             <div className={styles.hojaRuta} role="region" aria-label="Hoja de ruta personalizada">
-              <h3 className={styles.hojaRutaTitle}>📄 Mi Hoja de Ruta</h3>
+              <h3 className={styles.hojaRutaTitle}><span aria-hidden="true">📄</span> Mi Hoja de Ruta</h3>
               <div className={styles.hojaRutaGrid}>
                 <div className={styles.hojaRutaItem}>
                   <span className={styles.hojaRutaLabel}>Género</span>
@@ -603,7 +603,7 @@ export default function OrientadorEscrituraCreativaPage() {
               ← Cambiar {necesitaPerspectiva ? 'perspectiva' : 'género'}
             </button>
             <button className={styles.btnSecundario} onClick={reiniciar} type="button">
-              🔄 Empezar de nuevo
+              <span aria-hidden="true">🔄</span> Empezar de nuevo
             </button>
           </div>
         </section>
@@ -631,42 +631,42 @@ export default function OrientadorEscrituraCreativaPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>📖 Novela</strong></td>
+                  <td><strong><span aria-hidden="true">📖</span> Novela</strong></td>
                   <td>50.000–120.000 palabras</td>
                   <td>1–3 años</td>
                   <td>⚡⚡⚡</td>
                   <td>Tienes una historia larga con varios personajes</td>
                 </tr>
                 <tr>
-                  <td><strong>✨ Cuento corto</strong></td>
+                  <td><strong><span aria-hidden="true">✨</span> Cuento corto</strong></td>
                   <td>500–10.000 palabras</td>
                   <td>1 día–1 mes</td>
                   <td>⚡</td>
                   <td>Quieres empezar hoy y terminar pronto</td>
                 </tr>
                 <tr>
-                  <td><strong>🏰 Novela histórica</strong></td>
+                  <td><strong><span aria-hidden="true">🏰</span> Novela histórica</strong></td>
                   <td>80.000–150.000 palabras</td>
                   <td>2–5 años</td>
                   <td>⚡⚡⚡⚡</td>
                   <td>Te apasiona un período histórico y quieres investigarlo</td>
                 </tr>
                 <tr>
-                  <td><strong>🎭 Poesía</strong></td>
+                  <td><strong><span aria-hidden="true">🎭</span> Poesía</strong></td>
                   <td>1 verso – poemario</td>
                   <td>1 hora–6 meses</td>
                   <td>⚡</td>
                   <td>Tienes una imagen o emoción que quieres fijar en palabras</td>
                 </tr>
                 <tr>
-                  <td><strong>📔 Memorias</strong></td>
+                  <td><strong><span aria-hidden="true">📔</span> Memorias</strong></td>
                   <td>40.000–100.000 palabras</td>
                   <td>6 meses–2 años</td>
                   <td>⚡⚡</td>
                   <td>Quieres narrar tu propia historia con forma literaria</td>
                 </tr>
                 <tr>
-                  <td><strong>✍️ Ensayo</strong></td>
+                  <td><strong><span aria-hidden="true">✍️</span> Ensayo</strong></td>
                   <td>1.000–30.000 palabras</td>
                   <td>1 semana–6 meses</td>
                   <td>⚡⚡</td>
@@ -741,56 +741,56 @@ export default function OrientadorEscrituraCreativaPage() {
           <h2>Preguntas frecuentes del escritor principiante</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Necesito un plan detallado antes de escribir o puedo ir improvisando?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Necesito un plan detallado antes de escribir o puedo ir improvisando?</h4>
               <p>
                 Depende de tu forma de pensar, no del género. Los escritores se dividen en <em>plotters</em> (planifican todo) y <em>pantsers</em> (escriben "a la intuición"). Ambos producen buena literatura. La recomendación para principiantes es el punto medio: responde el Kit de Arranque (protagonista, objetivo, obstáculo, clímax) pero deja que los detalles emerjan durante la escritura.
               </p>
               <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si te bloqueas improvisando, escribe una frase resumen de cada capítulo antes de escribirlo. Si te bloqueas con el plan, escribe la escena más emocionante primero, aunque no sea la primera.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuántas palabras debería escribir al día?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuántas palabras debería escribir al día?</h4>
               <p>
                 No existe una respuesta correcta. Stephen King recomienda 2.000 palabras diarias; muchos escritores profesionales producen 500. Lo que importa es la regularidad: escribir 300 palabras todos los días produce 109.500 palabras al año — suficientes para dos novelas. La constancia supera a la intensidad, especialmente cuando se empieza.
               </p>
               <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Elige un número alcanzable y cúmplelo el 90% de los días. Es mejor 200 palabras diarias reales que 2.000 teóricas que rara vez suceden.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Primera persona o tercera persona: cuál es mejor para empezar?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Primera persona o tercera persona: cuál es mejor para empezar?</h4>
               <p>
                 La primera persona es más natural al principio porque es la voz de tu vida diaria. La tercera persona limitada (la más usada en la ficción contemporánea) da más flexibilidad sin la complejidad de la omnisciente. Evita la segunda persona ("tú") hasta que tengas varios proyectos terminados — es técnicamente muy exigente.
               </p>
               <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Escribe la primera escena en primera persona y luego en tercera limitada. Léelas en voz alta y elige la que suene más natural para esa historia específica.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué hago cuando me bloqueo y no sé cómo continuar?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué hago cuando me bloqueo y no sé cómo continuar?</h4>
               <p>
                 El bloqueo del escritor rara vez es falta de inspiración: casi siempre es una señal de que algo no funciona en la historia. Pregúntate: ¿Mi personaje actuaría así realmente? ¿He resuelto el conflicto demasiado pronto? ¿Me he ido por las ramas en una subtrama? El bloqueo apunta al problema antes de que lo identifiques conscientemente.
               </p>
               <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Cuando te bloquees, escribe la escena desde el punto de vista del antagonista o de un personaje secundario. A menudo eso desbloquea el problema principal.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo sé que mi primer borrador está listo para ser revisado?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo sé que mi primer borrador está listo para ser revisado?</h4>
               <p>
                 Cuando está terminado, aunque sea imperfecto. El error más común es revisar capítulo a capítulo mientras escribes: destruye el impulso y hace que reescribas sin conocer el final. Termina el borrador completo primero, luego espera al menos dos semanas antes de revisarlo. La distancia temporal es el mejor corrector de estilo.
               </p>
               <p className={styles.faqTip}>💡 <strong>Consejo:</strong> En el primer borrador, permítete todo: escenas malas, diálogos planos, inconsistencias. Escribe "[arreglar esto]" en el manuscrito y sigue adelante. El momentum importa más que la perfección.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Necesito leer mucho para escribir bien?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Necesito leer mucho para escribir bien?</h4>
               <p>
                 Sí, sin excepciones. Stephen King lo resume mejor que nadie: "Si no tienes tiempo para leer, no tienes el tiempo (ni las herramientas) para escribir." Leer en tu género te enseña estructuras, ritmos y convenciones. Leer fuera de tu género te da perspectiva y rompe clichés. Leer ficción mala te enseña exactamente qué no hacer.
               </p>
               <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Lee activamente: subraya frases que funcionan, anota qué hace el autor en los momentos de tensión, cómo construye los diálogos, cómo termina los capítulos. Léelo como escritor, no solo como lector.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo sé si mi historia tiene potencial?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo sé si mi historia tiene potencial?</h4>
               <p>
                 Haz la prueba del "¿y qué?": después de cada frase importante de tu sinopsis, pregúntate "¿y qué?". Si la historia responde con más tensión, consecuencias o preguntas, tiene potencial. Si se detiene o la respuesta es obvia, necesita más conflicto. Una historia con potencial siempre tiene en juego algo que el protagonista no puede perder.
               </p>
               <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Cuéntale el argumento a alguien de confianza en dos minutos. Si hace preguntas al final ("¿y qué pasa después?"), la historia tiene gancho. Si asiente cortésmente y cambia de tema, revisa el conflicto central.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Debería mostrar mi texto mientras lo escribo o esperar a terminarlo?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Debería mostrar mi texto mientras lo escribo o esperar a terminarlo?</h4>
               <p>
                 No muestres el trabajo en progreso hasta tener al menos un borrador completo o una sección terminada. Las opiniones tempranas, aunque bienintencionadas, pueden desviar o bloquear el proceso. Sí puedes compartir la sinopsis o el concepto general para recibir feedback sobre la premisa antes de invertir meses en el desarrollo.
               </p>
@@ -900,22 +900,22 @@ export default function OrientadorEscrituraCreativaPage() {
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>❌ Esperar a la inspiración para escribir:</strong> La inspiración no precede a la escritura — la escritura genera la inspiración. Sentarse a escribir aunque no "tengas ganas" es la única forma de activar el estado creativo de forma consistente.
+              <strong><span aria-hidden="true">❌</span> Esperar a la inspiración para escribir:</strong> La inspiración no precede a la escritura — la escritura genera la inspiración. Sentarse a escribir aunque no "tengas ganas" es la única forma de activar el estado creativo de forma consistente.
             </li>
             <li>
-              <strong>❌ Empezar por el capítulo 1 antes de conocer el final:</strong> Sin saber adónde vas, la historia se bifurca, pierde tensión y muere en el capítulo 3. Conoce el destino (aunque cambies el camino) antes de salir.
+              <strong><span aria-hidden="true">❌</span> Empezar por el capítulo 1 antes de conocer el final:</strong> Sin saber adónde vas, la historia se bifurca, pierde tensión y muere en el capítulo 3. Conoce el destino (aunque cambies el camino) antes de salir.
             </li>
             <li>
-              <strong>❌ Revisar el capítulo 1 hasta la perfección antes de seguir:</strong> El capítulo 1 cambiará cuando escribas el capítulo 20. Revisarlo 40 veces antes de tener un borrador completo es una forma segura de no terminar nunca el libro.
+              <strong><span aria-hidden="true">❌</span> Revisar el capítulo 1 hasta la perfección antes de seguir:</strong> El capítulo 1 cambiará cuando escribas el capítulo 20. Revisarlo 40 veces antes de tener un borrador completo es una forma segura de no terminar nunca el libro.
             </li>
             <li>
-              <strong>❌ Compartir el borrador demasiado pronto:</strong> Las opiniones externas antes de que el texto esté maduro generan inseguridad y confusión. El escritor principiante necesita terminar primero; recibir feedback después.
+              <strong><span aria-hidden="true">❌</span> Compartir el borrador demasiado pronto:</strong> Las opiniones externas antes de que el texto esté maduro generan inseguridad y confusión. El escritor principiante necesita terminar primero; recibir feedback después.
             </li>
             <li>
-              <strong>❌ Compararse con escritores publicados:</strong> Compares tu primer borrador con la décima novela de un autor consolidado. Eso paraliza. Compárate solo con tu versión de hace seis meses.
+              <strong><span aria-hidden="true">❌</span> Compararse con escritores publicados:</strong> Compares tu primer borrador con la décima novela de un autor consolidado. Eso paraliza. Compárate solo con tu versión de hace seis meses.
             </li>
             <li>
-              <strong>❌ Cambiar de proyecto cada vez que la historia se complica:</strong> La "segunda novela brillante" que aparece cuando la primera se atora suele ser una fantasía. La complicación que quieres evitar es exactamente el problema que necesitas aprender a resolver.
+              <strong><span aria-hidden="true">❌</span> Cambiar de proyecto cada vez que la historia se complica:</strong> La "segunda novela brillante" que aparece cuando la primera se atora suele ser una fantasía. La complicación que quieres evitar es exactamente el problema que necesitas aprender a resolver.
             </li>
           </ul>
         </div>

@@ -381,7 +381,7 @@ export default function PruebaCamaraPage() {
             {photos.length > 0 && (
               <div className={styles.gallerySection}>
                 <h2 className={styles.sectionTitle}>
-                  📸 Fotos capturadas ({photos.length})
+                  <span aria-hidden="true">📸</span> Fotos capturadas ({photos.length})
                 </h2>
                 <div className={styles.gallery}>
                   {photos.map(photo => (
@@ -412,7 +412,7 @@ export default function PruebaCamaraPage() {
 
       {/* Info de privacidad */}
       <div className={styles.privacyInfo}>
-        <h3>🔒 Tu privacidad es importante</h3>
+        <h3><span aria-hidden="true">🔒</span> Tu privacidad es importante</h3>
         <ul>
           <li>✓ El video NO se envía a ningún servidor</li>
           <li>✓ Las fotos se guardan SOLO en tu navegador</li>
@@ -423,7 +423,7 @@ export default function PruebaCamaraPage() {
 
       {/* Tips */}
       <div className={styles.tipsSection}>
-        <h3>💡 Consejos para una buena imagen</h3>
+        <h3><span aria-hidden="true">💡</span> Consejos para una buena imagen</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon}>💡</span>

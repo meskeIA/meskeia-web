@@ -1200,7 +1200,7 @@ export default function GuiaVinagresMundo() {
         <h3>¿Para qué uso es cada vinagre?</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🥗 Vinagretas frescas para ensaladas</strong>
+            <strong><span aria-hidden="true">🥗</span> Vinagretas frescas para ensaladas</strong>
             <p>
               Para una vinagreta clásica equilibrada, usa 1 parte de vinagre
               de vino blanco o champagne por 3 partes de aceite de oliva.
@@ -1210,7 +1210,7 @@ export default function GuiaVinagresMundo() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🥩 Marinados de carnes y pescados</strong>
+            <strong><span aria-hidden="true">🥩</span> Marinados de carnes y pescados</strong>
             <p>
               El vinagre rompe las fibras del músculo y permite que las
               especias penetren. Para carnes rojas: vinagre de tinto o jerez.
@@ -1221,7 +1221,7 @@ export default function GuiaVinagresMundo() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🥒 Encurtidos caseros y conservas</strong>
+            <strong><span aria-hidden="true">🥒</span> Encurtidos caseros y conservas</strong>
             <p>
               Para encurtir, busca un vinagre con al menos 5% de acidez (la
               mayoría comerciales lo tienen). El de manzana funciona para
@@ -1232,7 +1232,7 @@ export default function GuiaVinagresMundo() {
             </p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🍨 Postres y reducciones gourmet</strong>
+            <strong><span aria-hidden="true">🍨</span> Postres y reducciones gourmet</strong>
             <p>
               El balsámico tradicional sobre fresas o helado de vainilla
               transforma un postre simple en alta cocina. Para reducir, usa

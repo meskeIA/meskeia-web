@@ -1032,11 +1032,11 @@ export default function VisualizadorEcuacionesDiferenciales() {
               <h3>Errores Comunes con Ecuaciones Diferenciales</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ Olvidar la constante de integración:</strong> La solución general de una EDO incluye una constante C. Sin la condición inicial, hay infinitas soluciones.</li>
-              <li><strong>❌ Confundir EDO con EDP:</strong> Las EDO tienen una sola variable independiente (tiempo o espacio 1D). Las EDP tienen varias (ej: temperatura en función de x, y, t).</li>
-              <li><strong>❌ Usar Euler con paso h muy grande:</strong> Si h es demasiado grande, la solución numérica diverge incluso cuando la solución real es estable.</li>
-              <li><strong>❌ Interpretar mal el diagrama de fase:</strong> Las flechas muestran la dirección del cambio, no la velocidad. La densidad de flechas no indica velocidad.</li>
-              <li><strong>❌ Ignorar los puntos de equilibrio:</strong> Antes de resolver numéricamente, identifica dónde dy/dt = 0 — esos son los puntos clave del comportamiento a largo plazo.</li>
+              <li><strong><span aria-hidden="true">❌</span> Olvidar la constante de integración:</strong> La solución general de una EDO incluye una constante C. Sin la condición inicial, hay infinitas soluciones.</li>
+              <li><strong><span aria-hidden="true">❌</span> Confundir EDO con EDP:</strong> Las EDO tienen una sola variable independiente (tiempo o espacio 1D). Las EDP tienen varias (ej: temperatura en función de x, y, t).</li>
+              <li><strong><span aria-hidden="true">❌</span> Usar Euler con paso h muy grande:</strong> Si h es demasiado grande, la solución numérica diverge incluso cuando la solución real es estable.</li>
+              <li><strong><span aria-hidden="true">❌</span> Interpretar mal el diagrama de fase:</strong> Las flechas muestran la dirección del cambio, no la velocidad. La densidad de flechas no indica velocidad.</li>
+              <li><strong><span aria-hidden="true">❌</span> Ignorar los puntos de equilibrio:</strong> Antes de resolver numéricamente, identifica dónde dy/dt = 0 — esos son los puntos clave del comportamiento a largo plazo.</li>
             </ul>
           </div>
         </div>

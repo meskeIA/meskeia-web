@@ -239,6 +239,7 @@ export default function CalculadoraMatematicaPage() {
           <div className={styles.tiposGrid} role="tablist">
             {tipos.map((tipo) => (
               <button
+                type="button"
                 key={tipo.id}
                 role="tab"
                 aria-selected={tipoOperacion === tipo.id}
@@ -257,6 +258,7 @@ export default function CalculadoraMatematicaPage() {
                 <div className={styles.operacionesMatriz}>
                   {(['suma', 'resta', 'mult', 'det', 'inv'] as const).map(op => (
                     <button
+                      type="button"
                       key={op}
                       className={`${styles.opBtn} ${operacionMatriz === op ? styles.opActivo : ''}`}
                       onClick={() => setOperacionMatriz(op)}
@@ -337,6 +339,7 @@ export default function CalculadoraMatematicaPage() {
                   <div className={styles.operacionFraccion}>
                     {(['+', '-', '*', '/'] as const).map(op => (
                       <button
+                        type="button"
                         key={op}
                         className={`${styles.opFracBtn} ${operacionFraccion === op ? styles.opActivo : ''}`}
                         onClick={() => setOperacionFraccion(op)}

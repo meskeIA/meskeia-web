@@ -892,7 +892,7 @@ export default function Page() {
               huérfanas con cliente borrado (aparecerán con cliente NULL).
             </p>
             <p className={styles.escenarioTip}>
-              💡 LEFT JOIN es ideal para detectar registros huérfanos sin perder ninguna fila.
+              <span aria-hidden="true">💡</span> LEFT JOIN es ideal para detectar registros huérfanos sin perder ninguna fila.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -905,7 +905,7 @@ export default function Page() {
               Ignora artículos descatalogados o sin alta en almacén.
             </p>
             <p className={styles.escenarioTip}>
-              💡 INNER JOIN garantiza que no aparezcan productos sin información completa.
+              <span aria-hidden="true">💡</span> INNER JOIN garantiza que no aparezcan productos sin información completa.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -918,7 +918,7 @@ export default function Page() {
               y departamentos sin empleados de un solo vistazo.
             </p>
             <p className={styles.escenarioTip}>
-              💡 FULL OUTER es la herramienta de auditoría por excelencia.
+              <span aria-hidden="true">💡</span> FULL OUTER es la herramienta de auditoría por excelencia.
             </p>
           </div>
           <div className={styles.escenarioCard}>
@@ -931,7 +931,7 @@ export default function Page() {
               las salas para crear una matriz de disponibilidad.
             </p>
             <p className={styles.escenarioTip}>
-              💡 CROSS JOIN es perfecto para crear todas las combinaciones posibles.
+              <span aria-hidden="true">💡</span> CROSS JOIN es perfecto para crear todas las combinaciones posibles.
             </p>
           </div>
         </div>
@@ -946,7 +946,7 @@ export default function Page() {
               del lado contrario.
             </p>
             <p className={styles.faqTip}>
-              💡 Regla rápida: si necesitas ver registros huérfanos, usa OUTER. Si solo te
+              <span aria-hidden="true">💡</span> Regla rápida: si necesitas ver registros huérfanos, usa OUTER. Si solo te
               interesan emparejamientos limpios, usa INNER.
             </p>
           </div>
@@ -958,7 +958,7 @@ export default function Page() {
               servidor o agotar memoria.
             </p>
             <p className={styles.faqTip}>
-              💡 Usa CROSS JOIN solo con tablas pequeñas y conscientemente, nunca por
+              <span aria-hidden="true">💡</span> Usa CROSS JOIN solo con tablas pequeñas y conscientemente, nunca por
               accidente al olvidar la cláusula ON.
             </p>
           </div>
@@ -970,7 +970,7 @@ export default function Page() {
               consistencia y leer la consulta de izquierda a derecha.
             </p>
             <p className={styles.faqTip}>
-              💡 En la práctica casi nadie usa RIGHT JOIN. Reescribe siempre con LEFT.
+              <span aria-hidden="true">💡</span> En la práctica casi nadie usa RIGHT JOIN. Reescribe siempre con LEFT.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -981,7 +981,7 @@ export default function Page() {
               <strong> 6 filas</strong> en el resultado.
             </p>
             <p className={styles.faqTip}>
-              💡 Si te aparecen muchas más filas de las esperadas, casi seguro hay duplicados
+              <span aria-hidden="true">💡</span> Si te aparecen muchas más filas de las esperadas, casi seguro hay duplicados
               en una de las tablas.
             </p>
           </div>
@@ -993,7 +993,7 @@ export default function Page() {
               JOIN y un RIGHT JOIN excluyendo la intersección.
             </p>
             <p className={styles.faqTip}>
-              💡 Antes de usar FULL OUTER, comprueba la documentación de tu motor.
+              <span aria-hidden="true">💡</span> Antes de usar FULL OUTER, comprueba la documentación de tu motor.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -1005,7 +1005,7 @@ export default function Page() {
               cambia de significado silenciosamente.
             </p>
             <p className={styles.faqTip}>
-              💡 Mejor usa siempre <code>INNER JOIN ... ON</code> explícito. Es más verboso pero
+              <span aria-hidden="true">💡</span> Mejor usa siempre <code>INNER JOIN ... ON</code> explícito. Es más verboso pero
               robusto.
             </p>
           </div>

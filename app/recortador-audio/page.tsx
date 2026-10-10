@@ -792,27 +792,27 @@ export default function RecortadorAudioPage() {
         {/* Sección 2: Casos de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>📱 Crear tono de llamada personalizado</h3>
+            <h3><span aria-hidden="true">📱</span> Crear tono de llamada personalizado</h3>
             <p>Recorta tu canción favorita a 30-40 segundos y añade un fade out al final para un tono profesional sin cortes bruscos. La mayoría de móviles aceptan WAV directamente.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎬 Sincronizar audio con vídeo</h3>
+            <h3><span aria-hidden="true">🎬</span> Sincronizar audio con vídeo</h3>
             <p>Prepara clips de audio con la duración exacta necesaria para tu proyecto de vídeo. Recorta con precisión de centésimas de segundo para sincronización perfecta.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎙️ Editar grabaciones de voz</h3>
+            <h3><span aria-hidden="true">🎙️</span> Editar grabaciones de voz</h3>
             <p>Elimina los silencios iniciales/finales de grabaciones de podcast, entrevistas o voice-overs para obtener un resultado más limpio y profesional.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🧘 Crear loop de música ambiental</h3>
+            <h3><span aria-hidden="true">🧘</span> Crear loop de música ambiental</h3>
             <p>Extrae el fragmento más repetitivo de una pieza musical y añade fade in/out en ambos extremos para crear un loop perfecto para meditación o concentración.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎵 Preparar samples para producción</h3>
+            <h3><span aria-hidden="true">🎵</span> Preparar samples para producción</h3>
             <p>Aísla el fragmento exacto que quieres samplear con precisión de centésimas de segundo. Exporta en WAV para mantener la máxima calidad al importarlo en tu DAW.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📚 Extraer fragmentos de audiolibros</h3>
+            <h3><span aria-hidden="true">📚</span> Extraer fragmentos de audiolibros</h3>
             <p>Recorta capítulos o secciones específicas de audiolibros o conferencias largas para escucharlas de forma independiente sin tener que buscar el minuto cada vez.</p>
           </div>
         </div>
@@ -909,34 +909,34 @@ export default function RecortadorAudioPage() {
         {/* Sección 5: Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>🌊 Usa la forma de onda para guiarte</h3>
+            <h3><span aria-hidden="true">🌊</span> Usa la forma de onda para guiarte</h3>
             <p>Los silencios aparecen como líneas planas en la waveform. Los picos de audio son momentos de alta intensidad. Es mucho más fácil identificar el punto exacto visualmente que a ciegas.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🌅 Fade in de 0,5s evita arranques bruscos</h3>
+            <h3><span aria-hidden="true">🌅</span> Fade in de 0,5s evita arranques bruscos</h3>
             <p>Un fade in de 0,5 a 1 segundo elimina los clics y arranques abruptos sin que el oyente lo perciba. Es especialmente útil para tonos de llamada y clips de música.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔊 Sube volumen con cuidado</h3>
+            <h3><span aria-hidden="true">🔊</span> Sube volumen con cuidado</h3>
             <p>Superar el 150% de volumen puede introducir distorsión (clipping). Si la grabación original es muy baja, súbelo gradualmente y escucha el resultado antes de descargar.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📱 Para tonos: recorta a 30-40 segundos</h3>
+            <h3><span aria-hidden="true">📱</span> Para tonos: recorta a 30-40 segundos</h3>
             <p>La mayoría de sistemas operativos limitan los tonos a 30-40 segundos. Añade un fade out en los últimos 2-3 segundos para que el tono termine de forma natural.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🎛️ WAV para seguir editando</h3>
+            <h3><span aria-hidden="true">🎛️</span> WAV para seguir editando</h3>
             <p>Si vas a importar el resultado en un editor de audio (Audacity, Logic, Premiere), usa siempre WAV. Cada conversión a formato con pérdida (MP3) degrada la calidad acumulativamente.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>⏱️ Usa los campos numéricos para precisión máxima</h3>
+            <h3><span aria-hidden="true">⏱️</span> Usa los campos numéricos para precisión máxima</h3>
             <p>Los sliders son útiles para aproximarte al fragmento, pero los campos de segundos te dan precisión de centésimas. Para cortes exactos en producción, siempre escribe el valor manualmente.</p>
           </div>
         </div>
 
         {/* Sección 6: Warning Box */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Limitaciones técnicas y legales</h3>
+          <h3><span aria-hidden="true">⚠️</span> Limitaciones técnicas y legales</h3>
           <ul className={styles.warningList}>
             <li>Los navegadores no codifican MP3/OGG de forma nativa; el archivo exportado siempre es WAV, independientemente del formato seleccionado.</li>
             <li>La calidad del resultado está limitada por la calidad del archivo original. No se puede recuperar calidad perdida en una codificación previa.</li>
@@ -954,28 +954,28 @@ export default function RecortadorAudioPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📱 Tonos de llamada</h4>
+              <h4><span aria-hidden="true">📱</span> Tonos de llamada</h4>
               <p>
                 Recorta tu canción favorita para crear un tono personalizado.
                 La mayoría de teléfonos aceptan tonos de 30-40 segundos máximo.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎙️ Podcasts y grabaciones</h4>
+              <h4><span aria-hidden="true">🎙️</span> Podcasts y grabaciones</h4>
               <p>
                 Elimina silencios, errores o partes irrelevantes de tus
                 grabaciones de voz para un resultado más profesional.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎬 Videos y presentaciones</h4>
+              <h4><span aria-hidden="true">🎬</span> Videos y presentaciones</h4>
               <p>
                 Prepara clips de audio con la duración exacta que necesitas
                 para sincronizar con tus videos o diapositivas.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎵 Samples y loops</h4>
+              <h4><span aria-hidden="true">🎵</span> Samples y loops</h4>
               <p>
                 Extrae fragmentos de canciones para usar como samples
                 en producción musical o proyectos creativos.
@@ -989,32 +989,32 @@ export default function RecortadorAudioPage() {
 
           <div className={styles.formatComparison}>
             <div className={styles.formatCard}>
-              <h4>🎵 MP3</h4>
+              <h4><span aria-hidden="true">🎵</span> MP3</h4>
               <ul>
-                <li>✅ El más compatible</li>
-                <li>✅ Archivos pequeños</li>
-                <li>❌ Compresión con pérdida</li>
-                <li>❌ No ideal para edición repetida</li>
+                <li><span aria-hidden="true">✅</span> El más compatible</li>
+                <li><span aria-hidden="true">✅</span> Archivos pequeños</li>
+                <li><span aria-hidden="true">❌</span> Compresión con pérdida</li>
+                <li><span aria-hidden="true">❌</span> No ideal para edición repetida</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: música, podcasts, compartir</p>
             </div>
             <div className={styles.formatCard}>
-              <h4>🔊 WAV</h4>
+              <h4><span aria-hidden="true">🔊</span> WAV</h4>
               <ul>
-                <li>✅ Sin pérdida de calidad</li>
-                <li>✅ Estándar profesional</li>
-                <li>❌ Archivos muy grandes</li>
-                <li>❌ No soporta metadatos</li>
+                <li><span aria-hidden="true">✅</span> Sin pérdida de calidad</li>
+                <li><span aria-hidden="true">✅</span> Estándar profesional</li>
+                <li><span aria-hidden="true">❌</span> Archivos muy grandes</li>
+                <li><span aria-hidden="true">❌</span> No soporta metadatos</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: edición, producción, archivo</p>
             </div>
             <div className={styles.formatCard}>
-              <h4>🌐 OGG</h4>
+              <h4><span aria-hidden="true">🌐</span> OGG</h4>
               <ul>
-                <li>✅ Mejor compresión que MP3</li>
-                <li>✅ Código abierto y gratuito</li>
-                <li>⚠️ Menos compatible</li>
-                <li>⚠️ No soportado por Apple</li>
+                <li><span aria-hidden="true">✅</span> Mejor compresión que MP3</li>
+                <li><span aria-hidden="true">✅</span> Código abierto y gratuito</li>
+                <li><span aria-hidden="true">⚠️</span> Menos compatible</li>
+                <li><span aria-hidden="true">⚠️</span> No soportado por Apple</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: web, juegos, streaming</p>
             </div>

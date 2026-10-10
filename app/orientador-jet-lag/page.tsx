@@ -177,7 +177,7 @@ export default function SimuladorJetLagPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Orientador de Jet Lag ✈️</h1>
+        <h1 className={styles.title}>Orientador de Jet Lag <span aria-hidden="true">✈️</span></h1>
         <p className={styles.subtitle}>
           Calcula el impacto del cambio horario y prepárate para adaptarte más rápido
         </p>
@@ -352,8 +352,8 @@ export default function SimuladorJetLagPage() {
               <thead>
                 <tr>
                   <th>Factor</th>
-                  <th>Al este ➡️</th>
-                  <th>Al oeste ⬅️</th>
+                  <th>Al este <span aria-hidden="true">➡️</span></th>
+                  <th>Al oeste <span aria-hidden="true">⬅️</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -408,8 +408,8 @@ export default function SimuladorJetLagPage() {
               <thead>
                 <tr>
                   <th>Husos cruzados</th>
-                  <th>Al este ➡️</th>
-                  <th>Al oeste ⬅️</th>
+                  <th>Al este <span aria-hidden="true">➡️</span></th>
+                  <th>Al oeste <span aria-hidden="true">⬅️</span></th>
                   <th>Días recuperación (este)</th>
                   <th>Días recuperación (oeste)</th>
                   <th>Estrategia clave</th>

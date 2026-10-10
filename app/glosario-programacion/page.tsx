@@ -275,7 +275,7 @@ export default function GlosarioProgramacionPage() {
 
       {/* Sección informativa */}
       <div className={styles.infoSection}>
-        <h2 className={styles.infoTitle}>📚 Sobre este glosario</h2>
+        <h2 className={styles.infoTitle}><span aria-hidden="true">📚</span> Sobre este glosario</h2>
         <p className={styles.infoText}>
           Este glosario está diseñado para ayudar a quienes están aprendiendo programación
           a entender los términos técnicos que se usan habitualmente en desarrollo web.
@@ -306,7 +306,7 @@ export default function GlosarioProgramacionPage() {
       >
         {/* Tabla Comparativa: Paradigmas de Programación */}
         <section className={styles.guideSection}>
-          <h2>⚖️ Comparativa de Paradigmas de Programación</h2>
+          <h2><span aria-hidden="true">⚖️</span> Comparativa de Paradigmas de Programación</h2>
           <p className={styles.introParagraph}>
             Elegir el paradigma adecuado es una de las decisiones más importantes en cualquier proyecto. Esta tabla te ayuda a entender cuándo usar cada uno.
           </p>
@@ -371,7 +371,7 @@ export default function GlosarioProgramacionPage() {
 
         {/* Casos de Uso Prácticos */}
         <section className={styles.guideSection}>
-          <h2>💼 ¿Para quién es útil este glosario?</h2>
+          <h2><span aria-hidden="true">💼</span> ¿Para quién es útil este glosario?</h2>
           <p className={styles.introParagraph}>
             Según tu nivel y objetivo, usarás el glosario de forma diferente. Aquí te explicamos cómo sacarle el máximo partido a cada perfil.
           </p>
@@ -433,10 +433,10 @@ export default function GlosarioProgramacionPage() {
 
         {/* FAQ Ampliado */}
         <section className={styles.guideSection}>
-          <h2>❓ Dudas Frecuentes sobre Programación</h2>
+          <h2><span aria-hidden="true">❓</span> Dudas Frecuentes sobre Programación</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuál es la diferencia real entre frontend y backend?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuál es la diferencia real entre frontend y backend?</h4>
               <p>
                 El frontend es todo lo que el usuario ve y con lo que interactúa directamente: HTML (estructura), CSS (estilo) y JavaScript (comportamiento) que se ejecutan en el navegador. El backend es el servidor: recibe peticiones del frontend, procesa la lógica de negocio, accede a la base de datos y devuelve respuestas. Un sistema de login: el frontend muestra el formulario, el backend verifica las credenciales contra la base de datos.
               </p>
@@ -445,7 +445,7 @@ export default function GlosarioProgramacionPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia hay entre null y undefined en JavaScript?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre null y undefined en JavaScript?</h4>
               <p>
                 <code>undefined</code> significa que una variable existe pero no se le ha asignado ningún valor. <code>null</code> es un valor intencionalmente asignado que representa "sin valor". <code>typeof null === 'object'</code> (bug histórico de JS). <code>typeof undefined === 'undefined'</code>. En comparación laxa: <code>null == undefined</code> es <code>true</code>. En estricta: <code>null === undefined</code> es <code>false</code>.
               </p>
@@ -454,7 +454,7 @@ export default function GlosarioProgramacionPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo usar var, let o const en JavaScript?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo usar var, let o const en JavaScript?</h4>
               <p>
                 <strong>var</strong>: scope de función, hoisting, evitar en código moderno. <strong>let</strong>: scope de bloque, valor puede cambiar. <strong>const</strong>: scope de bloque, referencia no puede reasignarse (pero el objeto interno sí puede mutarse). Regla de oro: usa <code>const</code> por defecto. Cambia a <code>let</code> solo si necesitas reasignar. Nunca uses <code>var</code> en código nuevo (ES6+).
               </p>
@@ -463,7 +463,7 @@ export default function GlosarioProgramacionPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es una API REST y cómo funciona?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es una API REST y cómo funciona?</h4>
               <p>
                 REST (Representational State Transfer) es un estilo arquitectónico para APIs web. Una API REST usa HTTP con los verbos GET (leer), POST (crear), PUT/PATCH (actualizar), DELETE (eliminar). Cada recurso tiene una URL única: <code>GET /usuarios/123</code> devuelve el usuario 123. Las respuestas son típicamente JSON. "Stateless" significa que cada petición es independiente: el servidor no guarda estado de sesión.
               </p>
@@ -472,7 +472,7 @@ export default function GlosarioProgramacionPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es Git y por qué es imprescindible?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es Git y por qué es imprescindible?</h4>
               <p>
                 Git es un sistema de control de versiones distribuido. Guarda instantáneas del código (commits) que permiten ver la historia completa, revertir cambios, trabajar en ramas paralelas (branches) sin interferir con el código principal y fusionar cambios (merge). GitHub/GitLab son plataformas que alojan repositorios Git en la nube y añaden colaboración, CI/CD y revisión de código. Sin Git, perder código por error o conflictos entre compañeros es inevitable.
               </p>
@@ -481,7 +481,7 @@ export default function GlosarioProgramacionPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo usar SQL (relacional) vs NoSQL?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo usar SQL (relacional) vs NoSQL?</h4>
               <p>
                 <strong>SQL</strong> (PostgreSQL, MySQL): datos estructurados con relaciones complejas, transacciones ACID, integridad de datos crítica (banking, e-commerce). <strong>NoSQL</strong> (MongoDB, Redis, Cassandra): datos semiestructurados o sin esquema fijo, escala horizontal masiva, lecturas/escrituras de alta velocidad (sesiones, caché, tiempo real). El 80% de proyectos funciona perfectamente con PostgreSQL. NoSQL no es "mejor" sino diferente: úsalo cuando tengas un problema concreto que SQL no resuelva eficientemente.
               </p>
@@ -490,7 +490,7 @@ export default function GlosarioProgramacionPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es Docker y cuándo lo necesito?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es Docker y cuándo lo necesito?</h4>
               <p>
                 Docker empaqueta una aplicación con todas sus dependencias en un contenedor: un entorno aislado y reproducible. Resuelve el clásico "en mi máquina funciona": si funciona en el contenedor, funciona en cualquier entorno (desarrollo, CI, producción). Un contenedor es más ligero que una máquina virtual porque comparte el kernel del sistema operativo. Lo necesitas cuando: diferentes devs tienen distintas versiones de Node/Python, el servidor de producción difiere del entorno local, o tienes múltiples microservicios.
               </p>
@@ -499,7 +499,7 @@ export default function GlosarioProgramacionPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia hay entre proceso síncrono y asíncrono?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre proceso síncrono y asíncrono?</h4>
               <p>
                 <strong>Síncrono</strong>: el código espera a que cada operación termine antes de continuar. Si leer un archivo tarda 2 segundos, el hilo se bloquea 2 segundos. <strong>Asíncrono</strong>: la operación lenta se inicia, el código sigue ejecutándose, y cuando termina se procesa el resultado (callback, Promise, async/await). JavaScript es single-threaded: la asincronía es fundamental para no bloquear la UI. Una petición a una API siempre debe ser asíncrona.
               </p>
@@ -512,7 +512,7 @@ export default function GlosarioProgramacionPage() {
 
         {/* Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>📋 Ruta de Aprendizaje para Desarrollador Web Junior</h2>
+          <h2><span aria-hidden="true">📋</span> Ruta de Aprendizaje para Desarrollador Web Junior</h2>
           <p className={styles.introParagraph}>
             Esta guía te muestra el orden óptimo para aprender programación web desde cero hasta conseguir tu primer empleo como desarrollador.
           </p>
@@ -576,7 +576,7 @@ export default function GlosarioProgramacionPage() {
 
         {/* Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>✅ Mejores Prácticas para Aprender Programación</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas para Aprender Programación</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🏗️</span>
@@ -620,22 +620,22 @@ export default function GlosarioProgramacionPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Confundir Java con JavaScript:</strong> Son lenguajes completamente distintos. Java es compilado, tipado estático, orientado a objetos (Android, backend empresarial). JavaScript es interpretado, dinámico, multiparadigma (web, Node.js). El nombre es coincidencia histórica de marketing. No tienen relación técnica.
+                <strong><span aria-hidden="true">❌</span> Confundir Java con JavaScript:</strong> Son lenguajes completamente distintos. Java es compilado, tipado estático, orientado a objetos (Android, backend empresarial). JavaScript es interpretado, dinámico, multiparadigma (web, Node.js). El nombre es coincidencia histórica de marketing. No tienen relación técnica.
               </li>
               <li>
-                <strong>❌ Creer que CSS es "fácil" porque no es un lenguaje de programación:</strong> CSS moderno (Grid, Custom Properties, animaciones, Container Queries) es complejo. Las cascada, especificidad y herencia generan bugs difíciles de depurar. Los devs senior dedican tiempo serio a dominar CSS. Subestimarlo retrasa el desarrollo frontend.
+                <strong><span aria-hidden="true">❌</span> Creer que CSS es "fácil" porque no es un lenguaje de programación:</strong> CSS moderno (Grid, Custom Properties, animaciones, Container Queries) es complejo. Las cascada, especificidad y herencia generan bugs difíciles de depurar. Los devs senior dedican tiempo serio a dominar CSS. Subestimarlo retrasa el desarrollo frontend.
               </li>
               <li>
-                <strong>❌ Empezar con frameworks antes de dominar JavaScript:</strong> React, Vue o Angular son abstracciones sobre JavaScript. Sin bases sólidas (async, closures, prototypes, DOM), los errores del framework son incomprensibles. Aprende JavaScript puro durante 2-3 meses antes de tocar cualquier framework.
+                <strong><span aria-hidden="true">❌</span> Empezar con frameworks antes de dominar JavaScript:</strong> React, Vue o Angular son abstracciones sobre JavaScript. Sin bases sólidas (async, closures, prototypes, DOM), los errores del framework son incomprensibles. Aprende JavaScript puro durante 2-3 meses antes de tocar cualquier framework.
               </li>
               <li>
-                <strong>❌ Confundir librería y framework:</strong> Una librería (jQuery, Lodash, Axios) es un conjunto de funciones que tú llamas cuando quieres. Un framework (Angular, Django, Spring) invierte el control: el framework llama a tu código siguiendo su estructura. React es técnicamente una librería, aunque en la práctica se usa como framework con ecosistema propio.
+                <strong><span aria-hidden="true">❌</span> Confundir librería y framework:</strong> Una librería (jQuery, Lodash, Axios) es un conjunto de funciones que tú llamas cuando quieres. Un framework (Angular, Django, Spring) invierte el control: el framework llama a tu código siguiendo su estructura. React es técnicamente una librería, aunque en la práctica se usa como framework con ecosistema propio.
               </li>
               <li>
-                <strong>❌ Pensar que más líneas de código = mejor código:</strong> Un buen programador escribe el mínimo código necesario para resolver el problema. Código largo es más difícil de leer, probar y mantener. La refactorización que reduce un componente de 200 a 50 líneas sin perder funcionalidad es una mejora, no una simplificación peligrosa.
+                <strong><span aria-hidden="true">❌</span> Pensar que más líneas de código = mejor código:</strong> Un buen programador escribe el mínimo código necesario para resolver el problema. Código largo es más difícil de leer, probar y mantener. La refactorización que reduce un componente de 200 a 50 líneas sin perder funcionalidad es una mejora, no una simplificación peligrosa.
               </li>
               <li>
-                <strong>❌ Ignorar el manejo de errores:</strong> Código sin try/catch, sin validación de inputs o sin manejo de casos extremos (null, array vacío, timeout de red) funciona en desarrollo y falla en producción. El 40% de los bugs reportados vienen de casos no contemplados. Siempre pregúntate: "¿Qué pasa si esto es null/undefined/vacío?"
+                <strong><span aria-hidden="true">❌</span> Ignorar el manejo de errores:</strong> Código sin try/catch, sin validación de inputs o sin manejo de casos extremos (null, array vacío, timeout de red) funciona en desarrollo y falla en producción. El 40% de los bugs reportados vienen de casos no contemplados. Siempre pregúntate: "¿Qué pasa si esto es null/undefined/vacío?"
               </li>
             </ul>
           </div>

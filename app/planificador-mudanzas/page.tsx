@@ -949,7 +949,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
 
         {/* TABLA COMPARATIVA */}
         <section className={styles.eduComparativa}>
-          <h2>⚖️ ¿Contratar empresa, alquilar furgoneta o mudanza propia?</h2>
+          <h2><span aria-hidden="true">⚖️</span> ¿Contratar empresa, alquilar furgoneta o mudanza propia?</h2>
           <p className={styles.eduIntro}>
             La decisión más importante de tu mudanza. Cada opción tiene ventajas según tu volumen de pertenencias, distancia y presupuesto disponible.
           </p>
@@ -958,10 +958,10 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
               <thead>
                 <tr>
                   <th>Criterio</th>
-                  <th>🏢 Empresa mudanzas</th>
-                  <th>🚐 Furgoneta alquilada</th>
-                  <th>🚗 Mudanza propia</th>
-                  <th>📦 Empresa básica (solo transporte)</th>
+                  <th><span aria-hidden="true">🏢</span> Empresa mudanzas</th>
+                  <th><span aria-hidden="true">🚐</span> Furgoneta alquilada</th>
+                  <th><span aria-hidden="true">🚗</span> Mudanza propia</th>
+                  <th><span aria-hidden="true">📦</span> Empresa básica (solo transporte)</th>
                 </tr>
               </thead>
               <tbody>
@@ -981,10 +981,10 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 </tr>
                 <tr>
                   <td><strong>Seguro de daños</strong></td>
-                  <td>✅ Incluido</td>
-                  <td>⚠️ Opcional extra</td>
-                  <td>❌ No incluido</td>
-                  <td>⚠️ Limitado</td>
+                  <td><span aria-hidden="true">✅</span> Incluido</td>
+                  <td><span aria-hidden="true">⚠️</span> Opcional extra</td>
+                  <td><span aria-hidden="true">❌</span> No incluido</td>
+                  <td><span aria-hidden="true">⚠️</span> Limitado</td>
                 </tr>
                 <tr>
                   <td><strong>Distancia óptima</strong></td>
@@ -1002,10 +1002,10 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                 </tr>
                 <tr>
                   <td><strong>Muebles grandes</strong></td>
-                  <td>✅ Desmontan/remontan</td>
-                  <td>⚠️ Tú te encargas</td>
-                  <td>❌ Complicado</td>
-                  <td>⚠️ Solo transporte</td>
+                  <td><span aria-hidden="true">✅</span> Desmontan/remontan</td>
+                  <td><span aria-hidden="true">⚠️</span> Tú te encargas</td>
+                  <td><span aria-hidden="true">❌</span> Complicado</td>
+                  <td><span aria-hidden="true">⚠️</span> Solo transporte</td>
                 </tr>
                 <tr>
                   <td><strong>Ideal para</strong></td>
@@ -1021,7 +1021,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
 
         {/* CASOS DE USO */}
         <section className={styles.eduEscenarios}>
-          <h2>💼 4 perfiles de mudanza y sus estrategias</h2>
+          <h2><span aria-hidden="true">💼</span> 4 perfiles de mudanza y sus estrategias</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -1083,10 +1083,10 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
 
         {/* FAQ */}
         <section className={styles.eduFaq}>
-          <h2>❓ Preguntas frecuentes sobre mudanzas</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre mudanzas</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuánto tiempo de antelación necesito para planificar una mudanza?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuánto tiempo de antelación necesito para planificar una mudanza?</h4>
               <p>
                 Depende del tamaño y distancia. Para mudanzas locales pequeñas (estudiante), con <strong>2-3 semanas</strong> es suficiente. Para mudanzas de piso completo, lo ideal son <strong>6-8 semanas</strong>. Para mudanzas internacionales o de empresa, se recomienda <strong>3-6 meses</strong>. En temporada alta (junio-septiembre y enero-febrero), las empresas se reservan antes; planifica con el doble de tiempo habitual.
               </p>
@@ -1096,7 +1096,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué documentos necesito cambiar al hacer una mudanza?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué documentos necesito cambiar al hacer una mudanza?</h4>
               <p>
                 Los obligatorios por ley son: <strong>empadronamiento</strong> (30 días desde el cambio, Ayuntamiento), <strong>DNI/carnet de conducir</strong> (3 meses desde el empadronamiento), <strong>Hacienda/AEAT</strong> (antes de la siguiente declaración) y <strong>Seguridad Social</strong> (30 días). Los recomendados: banco, seguro del hogar, suscripciones (Amazon, Netflix), trabajo, médico de cabecera y colegio de los hijos.
               </p>
@@ -1106,7 +1106,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo sé si una empresa de mudanzas es fiable?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo sé si una empresa de mudanzas es fiable?</h4>
               <p>
                 Verifica estos puntos antes de contratar: <strong>CIF/NIF visible</strong> en presupuesto, <strong>seguro de responsabilidad civil</strong> (mínimo 600.000 €, pídelo por escrito), <strong>reseñas verificadas</strong> en Google Maps (mínimo 20 reseñas, media &gt;4.0), <strong>presupuesto por escrito</strong> (nunca verbal), y <strong>dirección física verificable</strong> de la empresa. Desconfía de precios muy por debajo de la media: suelen añadir extras no comunicados.
               </p>
@@ -1116,7 +1116,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué debo hacer con los electrodomésticos antes de la mudanza?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué debo hacer con los electrodomésticos antes de la mudanza?</h4>
               <p>
                 <strong>Nevera/congelador:</strong> Vaciar y descongelar con 48 horas de antelación (coloca toallas para absorber el agua). <strong>Lavadora:</strong> Vaciar el tambor y poner los tornillos de transporte (si los conservas). <strong>Lavavajillas:</strong> Vaciar completamente. <strong>Horno:</strong> Limpiar bien para evitar olores. Los electrodomésticos deben transportarse en vertical (lavadora, nevera). Si la empresa de mudanzas los tumbara, pueden sufrir daños internos.
               </p>
@@ -1126,7 +1126,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo empacar correctamente para que no se rompa nada?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo empacar correctamente para que no se rompa nada?</h4>
               <p>
                 Reglas básicas: <strong>objetos pesados en cajas pequeñas</strong> (libros, vajilla); <strong>objetos frágiles con papel de burbujas</strong> (mínimo 3 capas); <strong>ropa como relleno</strong> en cajas con objetos de vidrio; <strong>cajas siempre llenas</strong> (no dejar huecos, rellenar con papel periódico para que no se muevan). Etiqueta cada caja con: habitación de destino, contenido básico y si es frágil.
               </p>
@@ -1136,7 +1136,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Es necesario hacer fotos de la vivienda antes de irse?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Es necesario hacer fotos de la vivienda antes de irse?</h4>
               <p>
                 <strong>Sí, es fundamental si tienes contrato de alquiler.</strong> Documenta con fotos y vídeo (con fecha visible) el estado de cada habitación, electrodomésticos y paredes. Envía el archivo por email al propietario el mismo día de entrega de llaves. En caso de conflicto sobre la fianza, estas pruebas son determinantes. Si eres propietario que vende, las fotos del estado original también protegen ante posibles reclamaciones del comprador.
               </p>
@@ -1146,7 +1146,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo gestiono los suministros (luz, agua, gas) en el cambio?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo gestiono los suministros (luz, agua, gas) en el cambio?</h4>
               <p>
                 Para la vivienda que abandonas: solicita la <strong>baja</strong> o cambio de titular 15-30 días antes. Para la nueva vivienda: solicita el <strong>alta</strong> o cambio de titular 15-30 días antes. El día de la mudanza, anota las lecturas de los contadores (agua, luz, gas) con foto del marcador. Esto evita disputas sobre el consumo del período de transición. Los nuevos suministros pueden tardar 7-15 días laborables en darse de alta.
               </p>
@@ -1156,7 +1156,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuánto dinero debo reservar como colchón extra para la mudanza?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuánto dinero debo reservar como colchón extra para la mudanza?</h4>
               <p>
                 Calcula el <strong>presupuesto de la empresa + 20-30% adicional</strong> para imprevistos. Los más frecuentes: piso origen con ascensor averiado (requiere más personal: +150-300 €), furgoneta adicional por volumen mayor al estimado (+200-400 €), reparaciones urgentes en vivienda nueva (cerradura, humedades, etc.), gastos de primeros días (comidas fuera, hotel si la mudanza se retrasa). Para una mudanza media de familia, reserva mínimo 500-1.000 € de colchón.
               </p>
@@ -1169,7 +1169,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
 
         {/* GUÍA PASO A PASO */}
         <section className={styles.eduGuia}>
-          <h2>📋 Plan de acción: 7 semanas para una mudanza perfecta</h2>
+          <h2><span aria-hidden="true">📋</span> Plan de acción: 7 semanas para una mudanza perfecta</h2>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
@@ -1239,7 +1239,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
 
         {/* MEJORES PRÁCTICAS */}
         <section className={styles.eduTips}>
-          <h2>✅ 6 hábitos del mudador inteligente</h2>
+          <h2><span aria-hidden="true">✅</span> 6 hábitos del mudador inteligente</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>✅</span>
@@ -1283,25 +1283,25 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Contratar sin pedir presupuesto por escrito:</strong> Un presupuesto verbal no tiene validez legal. Si la empresa añade extras no pactados el día de la mudanza, estarás en una posición muy débil para negarte. Siempre exige presupuesto detallado por email o documento firmado antes de confirmar.
+                <strong><span aria-hidden="true">❌</span> Contratar sin pedir presupuesto por escrito:</strong> Un presupuesto verbal no tiene validez legal. Si la empresa añade extras no pactados el día de la mudanza, estarás en una posición muy débil para negarte. Siempre exige presupuesto detallado por email o documento firmado antes de confirmar.
               </li>
               <li>
-                <strong>❌ No verificar el seguro de daños:</strong> Las empresas de mudanzas tienen cobertura limitada por defecto (suele ser solo 2-5 € por kilo transportado). Si tienes objetos valiosos (obras de arte, electrónica cara, instrumentos musicales), contrata cobertura adicional o un seguro específico de mudanza.
+                <strong><span aria-hidden="true">❌</span> No verificar el seguro de daños:</strong> Las empresas de mudanzas tienen cobertura limitada por defecto (suele ser solo 2-5 € por kilo transportado). Si tienes objetos valiosos (obras de arte, electrónica cara, instrumentos musicales), contrata cobertura adicional o un seguro específico de mudanza.
               </li>
               <li>
-                <strong>❌ Olvidar notificar el cambio de dirección a Hacienda:</strong> Si no actualizas la dirección fiscal, las notificaciones importantes de la AEAT irán a tu domicilio anterior. Puedes perderte requerimientos con multas por no responder. El plazo legal es antes de la siguiente declaración de la renta.
+                <strong><span aria-hidden="true">❌</span> Olvidar notificar el cambio de dirección a Hacienda:</strong> Si no actualizas la dirección fiscal, las notificaciones importantes de la AEAT irán a tu domicilio anterior. Puedes perderte requerimientos con multas por no responder. El plazo legal es antes de la siguiente declaración de la renta.
               </li>
               <li>
-                <strong>❌ Dejar los suministros sin gestionar:</strong> Si no solicitas la baja en la vivienda que abandonas, pueden seguir cargándote cuotas mínimas. Peor aún: si el nuevo inquilino/propietario no da de alta los suyos, los gastos se acumularán en tu nombre hasta que solicites la baja.
+                <strong><span aria-hidden="true">❌</span> Dejar los suministros sin gestionar:</strong> Si no solicitas la baja en la vivienda que abandonas, pueden seguir cargándote cuotas mínimas. Peor aún: si el nuevo inquilino/propietario no da de alta los suyos, los gastos se acumularán en tu nombre hasta que solicites la baja.
               </li>
               <li>
-                <strong>❌ Transportar la nevera o lavadora tumbadas sin precaución:</strong> La nevera transportada tumbada necesita estar en vertical durante 24-48 horas antes de enchufarse (el compresor necesita que el aceite vuelva a su posición). La lavadora sin tornillos de transporte puede sufrir daños en el tambor que no son visibles inmediatamente.
+                <strong><span aria-hidden="true">❌</span> Transportar la nevera o lavadora tumbadas sin precaución:</strong> La nevera transportada tumbada necesita estar en vertical durante 24-48 horas antes de enchufarse (el compresor necesita que el aceite vuelva a su posición). La lavadora sin tornillos de transporte puede sufrir daños en el tambor que no son visibles inmediatamente.
               </li>
               <li>
-                <strong>❌ No hacer inventario del nuevo piso antes de entrar:</strong> Documenta el estado de la vivienda nueva antes de llevar tus muebles. Si hay desperfectos preexistentes (manchas, grietas, electrodomésticos averiados), notifícalo al propietario ese mismo día. De lo contrario, al salir, pueden hacerte responsable de daños que ya existían.
+                <strong><span aria-hidden="true">❌</span> No hacer inventario del nuevo piso antes de entrar:</strong> Documenta el estado de la vivienda nueva antes de llevar tus muebles. Si hay desperfectos preexistentes (manchas, grietas, electrodomésticos averiados), notifícalo al propietario ese mismo día. De lo contrario, al salir, pueden hacerte responsable de daños que ya existían.
               </li>
               <li>
-                <strong>❌ Infravalorar el tiempo necesario para desembalar:</strong> El 80% de las familias subestima el tiempo de instalación. Una mudanza de piso completo requiere 1-3 semanas de trabajo parcial para quedar completamente organizada. No planifiques eventos sociales ni compromisos importantes en las dos semanas posteriores a la mudanza.
+                <strong><span aria-hidden="true">❌</span> Infravalorar el tiempo necesario para desembalar:</strong> El 80% de las familias subestima el tiempo de instalación. Una mudanza de piso completo requiere 1-3 semanas de trabajo parcial para quedar completamente organizada. No planifiques eventos sociales ni compromisos importantes en las dos semanas posteriores a la mudanza.
               </li>
             </ul>
           </div>

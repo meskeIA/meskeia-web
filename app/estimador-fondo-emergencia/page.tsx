@@ -287,42 +287,42 @@ export default function CalculadoraFondoEmergenciaPage() {
                   <td>Inmediata</td>
                   <td>0-0,1%</td>
                   <td>Máxima disponibilidad</td>
-                  <td>✅ Parcial</td>
+                  <td><span aria-hidden="true">✅</span> Parcial</td>
                 </tr>
                 <tr>
                   <td><strong>Cuenta de ahorro</strong></td>
                   <td>24-48h</td>
                   <td>0,5-3%</td>
                   <td>Rentabilidad + liquidez</td>
-                  <td>✅ Sí</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
                 </tr>
                 <tr>
                   <td><strong>Depósito a plazo</strong></td>
                   <td>Al vencimiento</td>
                   <td>2-4%</td>
                   <td>Mayor rentabilidad fija</td>
-                  <td>⚠️ Parcial</td>
+                  <td><span aria-hidden="true">⚠️</span> Parcial</td>
                 </tr>
                 <tr>
                   <td><strong>Fondo monetario</strong></td>
                   <td>1-2 días</td>
                   <td>2,5-3,5%</td>
                   <td>Diversificado y líquido</td>
-                  <td>✅ Sí</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
                 </tr>
                 <tr>
                   <td><strong>Letras del Tesoro</strong></td>
                   <td>Al vencimiento</td>
                   <td>2,5-3,5%</td>
                   <td>Sin riesgo de entidad</td>
-                  <td>⚠️ Parcial</td>
+                  <td><span aria-hidden="true">⚠️</span> Parcial</td>
                 </tr>
                 <tr>
                   <td><strong>Bolsa / fondos renta variable</strong></td>
                   <td>Variable</td>
                   <td>Variable</td>
                   <td>Alta rentabilidad potencial</td>
-                  <td>❌ No</td>
+                  <td><span aria-hidden="true">❌</span> No</td>
                 </tr>
               </tbody>
             </table>

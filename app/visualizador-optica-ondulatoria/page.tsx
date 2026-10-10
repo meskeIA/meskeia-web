@@ -838,7 +838,7 @@ export default function OpticaOndulatoria() {
           <div className={styles.faqItem}>
             <strong>¿Qué demostró Young en 1801?</strong>
             <p>Que la luz tiene naturaleza ondulatoria: al pasar por dos rendijas crea franjas de interferencia, imposibles si la luz fuera solo corpuscular. Fue el experimento que confirmó la teoría ondulatoria de Huygens-Fresnel.</p>
-            <div className={styles.faqTip}>💡 La posición de la franja brillante n es: y_n = nλD/d, donde D es la distancia a la pantalla y d la separación entre rendijas.</div>
+            <div className={styles.faqTip}><span aria-hidden="true">💡</span> La posición de la franja brillante n es: y_n = nλD/d, donde D es la distancia a la pantalla y d la separación entre rendijas.</div>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Por qué la difracción ocurre en bordes y aberturas?</strong>

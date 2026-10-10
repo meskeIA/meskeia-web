@@ -556,18 +556,20 @@ const SeccionImprinting = () => {
 
         <div className={styles.imprintingToggle}>
           <button
+            type="button"
             className={`${styles.toggleBtn} ${origen === 'paterno' ? styles.toggleBtnActive : ''}`}
             onClick={() => setOrigen('paterno')}
             aria-pressed={origen === 'paterno'}
           >
-            👨 Alelo paterno activo
+            <span aria-hidden="true">👨</span> Alelo paterno activo
           </button>
           <button
+            type="button"
             className={`${styles.toggleBtn} ${origen === 'materno' ? styles.toggleBtnActive : ''}`}
             onClick={() => setOrigen('materno')}
             aria-pressed={origen === 'materno'}
           >
-            👩 Alelo materno activo
+            <span aria-hidden="true">👩</span> Alelo materno activo
           </button>
         </div>
 

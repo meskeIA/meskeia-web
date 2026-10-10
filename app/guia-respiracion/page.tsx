@@ -330,7 +330,7 @@ export default function GuiaRespiracionPage() {
               onClick={iniciar}
               aria-label="Iniciar ejercicio de respiración"
             >
-              ▶ Iniciar
+              <span aria-hidden="true">▶</span> Iniciar
             </button>
           ) : (
             <button
@@ -339,7 +339,7 @@ export default function GuiaRespiracionPage() {
               onClick={detener}
               aria-label="Detener ejercicio de respiración"
             >
-              ⏹ Detener
+              <span aria-hidden="true">⏹</span> Detener
             </button>
           )}
 
@@ -371,22 +371,22 @@ export default function GuiaRespiracionPage() {
           <h2>Las 4 técnicas en detalle</h2>
           <ul>
             <li>
-              <strong>🌬️ Diafragmática (4-6)</strong>: La respiración natural y profunda.
+              <strong><span aria-hidden="true">🌬️</span> Diafragmática (4-6)</strong>: La respiración natural y profunda.
               Activa el diafragma en lugar del pecho. La exhalación más larga que la inhalación
               estimula el nervio vago y reduce la frecuencia cardíaca. Ideal para principiantes y EPOC.
             </li>
             <li>
-              <strong>⬜ Cuadrada (4-4-4-4)</strong>: Usada por fuerzas especiales y meditadores.
+              <strong><span aria-hidden="true">⬜</span> Cuadrada (4-4-4-4)</strong>: Usada por fuerzas especiales y meditadores.
               Las retenciones equilibran el CO₂ en sangre y mejoran la concentración.
               Excelente para prepararse antes de una situación estresante.
             </li>
             <li>
-              <strong>💤 4-7-8</strong>: Desarrollada por el Dr. Andrew Weil.
+              <strong><span aria-hidden="true">💤</span> 4-7-8</strong>: Desarrollada por el Dr. Andrew Weil.
               La retención larga (7s) actúa como sedante natural del sistema nervioso.
               Especialmente eficaz para reducir la ansiedad aguda y facilitar el sueño.
             </li>
             <li>
-              <strong>💙 Coherente (5-5)</strong>: Crea coherencia entre el ritmo cardíaco
+              <strong><span aria-hidden="true">💙</span> Coherente (5-5)</strong>: Crea coherencia entre el ritmo cardíaco
               y la respiración. Mejora el equilibrio emocional y la variabilidad de la
               frecuencia cardíaca (HRV), un indicador de salud cardiovascular.
             </li>
@@ -426,28 +426,28 @@ export default function GuiaRespiracionPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🌬️ Diafragmática</td>
+                  <td><span aria-hidden="true">🌬️</span> Diafragmática</td>
                   <td className={styles.celdaDestacada}>Principiante</td>
                   <td>10 s</td>
                   <td>Relajación general</td>
                   <td>No</td>
                 </tr>
                 <tr>
-                  <td>⬜ Cuadrada</td>
+                  <td><span aria-hidden="true">⬜</span> Cuadrada</td>
                   <td>Intermedia</td>
                   <td>16 s</td>
                   <td>Concentración</td>
                   <td>Sí</td>
                 </tr>
                 <tr>
-                  <td>💤 4-7-8</td>
+                  <td><span aria-hidden="true">💤</span> 4-7-8</td>
                   <td>Intermedia</td>
                   <td>19 s</td>
                   <td>Ansiedad / sueño</td>
                   <td>Sí (7 s)</td>
                 </tr>
                 <tr>
-                  <td>💙 Coherente</td>
+                  <td><span aria-hidden="true">💙</span> Coherente</td>
                   <td className={styles.celdaDestacada}>Fácil</td>
                   <td>10 s</td>
                   <td>Equilibrio emocional</td>

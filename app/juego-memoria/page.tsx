@@ -226,6 +226,7 @@ export default function JuegoMemoriaPage() {
           <div className={styles.dificultadSelector}>
             {(['facil', 'medio', 'dificil'] as Dificultad[]).map((d) => (
               <button
+                type="button"
                 key={d}
                 onClick={() => iniciarJuego(d)}
                 className={`${styles.dificultadBtn} ${dificultad === d ? styles.active : ''}`}
@@ -254,7 +255,7 @@ export default function JuegoMemoriaPage() {
 
           {mejoresTiempos[dificultad] !== null && (
             <div className={styles.mejorTiempo}>
-              🏆 Mejor: {formatearTiempo(mejoresTiempos[dificultad]!)}
+              <span aria-hidden="true">🏆</span> Mejor: {formatearTiempo(mejoresTiempos[dificultad]!)}
             </div>
           )}
         </div>
@@ -266,6 +267,7 @@ export default function JuegoMemoriaPage() {
         >
           {cartas.map((carta) => (
             <button
+              type="button"
               key={carta.id}
               onClick={() => clickCarta(carta.id)}
               className={`${styles.carta} ${carta.volteada || carta.encontrada ? styles.volteada : ''} ${carta.encontrada ? styles.encontrada : ''}`}
@@ -290,17 +292,17 @@ export default function JuegoMemoriaPage() {
         {juegoTerminado && (
           <div className={styles.modalOverlay} role="dialog" aria-modal="true" aria-labelledby="modalVictoriaTitulo">
             <div className={styles.modal}>
-              <h2 id="modalVictoriaTitulo">🎉 ¡Felicidades!</h2>
+              <h2 id="modalVictoriaTitulo"><span aria-hidden="true">🎉</span> ¡Felicidades!</h2>
               <p>Encontraste todas las parejas</p>
               <div className={styles.modalStats}>
-                <div>⏱️ Tiempo: <strong>{formatearTiempo(tiempo)}</strong></div>
-                <div>👆 Movimientos: <strong>{movimientos}</strong></div>
+                <div><span aria-hidden="true">⏱️</span> Tiempo: <strong>{formatearTiempo(tiempo)}</strong></div>
+                <div><span aria-hidden="true">👆</span> Movimientos: <strong>{movimientos}</strong></div>
               </div>
               {mejoresTiempos[dificultad] === tiempo && (
-                <p className={styles.nuevoRecord}>🏆 ¡Nuevo récord!</p>
+                <p className={styles.nuevoRecord}><span aria-hidden="true">🏆</span> ¡Nuevo récord!</p>
               )}
-              <button ref={playAgainRef} onClick={() => iniciarJuego(dificultad)} className={styles.playAgainBtn}>
-                🔄 Jugar de nuevo
+              <button type="button" ref={playAgainRef} onClick={() => iniciarJuego(dificultad)} className={styles.playAgainBtn}>
+                <span aria-hidden="true">🔄</span> Jugar de nuevo
               </button>
             </div>
           </div>
@@ -332,7 +334,7 @@ export default function JuegoMemoriaPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>😊 Fácil (4×3)</td>
+                  <td><span aria-hidden="true">😊</span> Fácil (4×3)</td>
                   <td>6 pares</td>
                   <td>1-2 min</td>
                   <td>Bajo</td>
@@ -340,7 +342,7 @@ export default function JuegoMemoriaPage() {
                   <td>4-7 años / mayores con deterioro leve</td>
                 </tr>
                 <tr>
-                  <td>🤔 Medio (4×4)</td>
+                  <td><span aria-hidden="true">🤔</span> Medio (4×4)</td>
                   <td>8 pares</td>
                   <td>2-4 min</td>
                   <td>Moderado</td>
@@ -348,7 +350,7 @@ export default function JuegoMemoriaPage() {
                   <td>8-12 años / adultos principiantes</td>
                 </tr>
                 <tr>
-                  <td>🧠 Difícil (6×4)</td>
+                  <td><span aria-hidden="true">🧠</span> Difícil (6×4)</td>
                   <td>12 pares</td>
                   <td>5-9 min</td>
                   <td>Alto</td>

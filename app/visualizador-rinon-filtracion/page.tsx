@@ -323,7 +323,7 @@ export default function VisualizadorRinonFiltracion() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🫘 Visualizador del Riñón y Filtración</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🫘</span> Visualizador del Riñón y Filtración</h1>
         <p className={styles.subtitle}>La nefrona y la formación de orina: filtración glomerular, reabsorción y secreción</p>
       </header>
 

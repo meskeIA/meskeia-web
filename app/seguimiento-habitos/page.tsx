@@ -489,7 +489,7 @@ export default function SeguimientoHabitosPage() {
             <span aria-hidden="true">💾</span> Exportar
           </button>
           <label className={styles.btnSecondary}>
-            📥 Importar
+            <span aria-hidden="true">📥</span> Importar
             <input type="file" accept=".json" onChange={importarDatos} style={{ display: 'none' }} />
           </label>
         </div>
@@ -607,7 +607,7 @@ export default function SeguimientoHabitosPage() {
       {vistaActiva === 'calendario' && (
         <div className={styles.calendarioSection}>
           <div className={styles.calendarioHeader}>
-            <h2 className={styles.calendarioTitulo}>📅 Calendario Mensual</h2>
+            <h2 className={styles.calendarioTitulo}><span aria-hidden="true">📅</span> Calendario Mensual</h2>
             <div className={styles.calendarioNav}>
               <button
                 type="button"
@@ -682,7 +682,7 @@ export default function SeguimientoHabitosPage() {
 
           {/* Logros */}
           <div className={styles.logrosSection}>
-            <h3 className={styles.seccionTitulo}>🏆 Mis Logros</h3>
+            <h3 className={styles.seccionTitulo}><span aria-hidden="true">🏆</span> Mis Logros</h3>
             <div className={styles.logrosGrid}>
               {LOGROS.map(logro => {
                 const desbloqueado = logrosDesbloqueados.has(logro.id);
@@ -703,7 +703,7 @@ export default function SeguimientoHabitosPage() {
           {/* Detalle por hábito */}
           {habitos.length > 0 && (
             <div className={styles.detalleHabitos}>
-              <h3 className={styles.seccionTitulo}>📋 Detalle por Hábito</h3>
+              <h3 className={styles.seccionTitulo}><span aria-hidden="true">📋</span> Detalle por Hábito</h3>
               {habitos.map(habito => {
                 const rachaActual = calcularRachaActual(habito);
                 const mejorRacha = calcularMejorRacha(habito);
@@ -922,7 +922,7 @@ export default function SeguimientoHabitosPage() {
       >
         {/* Tabla Comparativa */}
         <div className="edu-table-wrapper">
-          <h3 className="edu-section-title">📊 Cronología real de formación de un hábito</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">📊</span> Cronología real de formación de un hábito</h3>
           <div className="edu-table-scroll">
             <table className="edu-table">
               <thead>
@@ -936,42 +936,42 @@ export default function SeguimientoHabitosPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>🏅 Inicio</strong></td>
+                  <td><strong><span aria-hidden="true">🏅</span> Inicio</strong></td>
                   <td>7 días</td>
                   <td>El cerebro empieza a reconocer el patrón</td>
                   <td>Primer logro desbloqueado</td>
                   <td>Logro &quot;7 Días&quot;</td>
                 </tr>
                 <tr>
-                  <td><strong>🌟 Mito popular</strong></td>
+                  <td><strong><span aria-hidden="true">🌟</span> Mito popular</strong></td>
                   <td>21 días</td>
                   <td>Mejora visible, pero NO es automatismo</td>
                   <td>Maxwell Maltz, 1960 (cirujano plástico)</td>
                   <td>Logro &quot;21 Días&quot;</td>
                 </tr>
                 <tr>
-                  <td><strong>🔥 Un mes</strong></td>
+                  <td><strong><span aria-hidden="true">🔥</span> Un mes</strong></td>
                   <td>30 días</td>
                   <td>Rutina establecida, menor esfuerzo consciente</td>
                   <td>Hito psicológico ampliamente aceptado</td>
                   <td>Logro &quot;30 Días&quot;</td>
                 </tr>
                 <tr>
-                  <td><strong>💎 Consolidación</strong></td>
+                  <td><strong><span aria-hidden="true">💎</span> Consolidación</strong></td>
                   <td>66 días</td>
                   <td>Media real de automatismo conductual</td>
                   <td>Phillippa Lally, UCL 2010 (96 participantes)</td>
                   <td>Logro &quot;66 Días&quot; ← objetivo real</td>
                 </tr>
                 <tr>
-                  <td><strong>🎯 Centenario</strong></td>
+                  <td><strong><span aria-hidden="true">🎯</span> Centenario</strong></td>
                   <td>100 días</td>
                   <td>Hábito profundamente integrado</td>
                   <td>Rango superior del estudio UCL (18-254 días)</td>
                   <td>Logro &quot;100 Días&quot;</td>
                 </tr>
                 <tr>
-                  <td><strong>👑 Un año</strong></td>
+                  <td><strong><span aria-hidden="true">👑</span> Un año</strong></td>
                   <td>365 días</td>
                   <td>Parte de la identidad personal</td>
                   <td>James Clear: &quot;Soy alguien que...&quot;</td>
@@ -984,7 +984,7 @@ export default function SeguimientoHabitosPage() {
 
         {/* Casos de Uso */}
         <div className="edu-escenarios-section">
-          <h3 className="edu-section-title">🎯 ¿Para qué tipo de hábitos funciona mejor?</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">🎯</span> ¿Para qué tipo de hábitos funciona mejor?</h3>
           <div className="edu-escenarios-grid">
             <div className="edu-escenario-card">
               <span className="edu-escenario-icon">💪</span>
@@ -1011,7 +1011,7 @@ export default function SeguimientoHabitosPage() {
 
         {/* FAQ */}
         <div className="edu-faq-section">
-          <h3 className="edu-section-title">❓ Preguntas Frecuentes</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">❓</span> Preguntas Frecuentes</h3>
           <div className="edu-faq-list">
             <details className="edu-faq-item">
               <summary className="edu-faq-question">¿Es verdad que un hábito se forma en 21 días?</summary>
@@ -1066,7 +1066,7 @@ export default function SeguimientoHabitosPage() {
 
         {/* Guía Paso a Paso */}
         <div className="edu-guide-section">
-          <h3 className="edu-section-title">📋 Guía: Cómo crear un nuevo hábito con éxito</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">📋</span> Guía: Cómo crear un nuevo hábito con éxito</h3>
           <ol className="edu-steps-list">
             <li className="edu-step-item">
               <div className="edu-step-number">1</div>
@@ -1122,7 +1122,7 @@ export default function SeguimientoHabitosPage() {
 
         {/* Tips Grid */}
         <div className="edu-tips-section">
-          <h3 className="edu-section-title">💡 Estrategias para Mantener los Hábitos</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">💡</span> Estrategias para Mantener los Hábitos</h3>
           <div className="edu-tips-grid">
             <div className="edu-tip-card">
               <span className="edu-tip-icon">🔗</span>
@@ -1159,7 +1159,7 @@ export default function SeguimientoHabitosPage() {
 
         {/* Warning Box */}
         <div className="edu-warning-box">
-          <h4 className="edu-warning-title">⚠️ Mitos y errores comunes sobre los hábitos</h4>
+          <h4 className="edu-warning-title"><span aria-hidden="true">⚠️</span> Mitos y errores comunes sobre los hábitos</h4>
           <ul className="edu-warning-list">
             <li><strong>Los 21 días son un mito sin base científica</strong>: Ese número viene de un cirujano plástico en 1960. La media real es 66 días (rango 18-254). No te rindas al mes.</li>
             <li><strong>No empieces más de 2-3 hábitos a la vez</strong>: La fuerza de voluntad es un recurso limitado. Iniciar muchos hábitos simultáneamente garantiza que ninguno se consolide.</li>

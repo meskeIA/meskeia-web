@@ -204,8 +204,8 @@ function AnimacionConduccion() {
         ))}
       </div>
       <div className={styles.animacionLabels}>
-        <span className={styles.animLabelCaliente}>🔥 Caliente</span>
-        <span className={styles.animLabelFrio}>❄️ Frío</span>
+        <span className={styles.animLabelCaliente}><span aria-hidden="true">🔥</span> Caliente</span>
+        <span className={styles.animLabelFrio}><span aria-hidden="true">❄️</span> Frío</span>
       </div>
     </div>
   );
@@ -498,7 +498,7 @@ function SeccionConveccionNaturaleza() {
               onClick={() => setBrisaNoche(false)}
               aria-pressed={!brisaNoche}
             >
-              ☀️ Día
+              <span aria-hidden="true">☀️</span> Día
             </button>
             <button
               type="button"
@@ -506,7 +506,7 @@ function SeccionConveccionNaturaleza() {
               onClick={() => setBrisaNoche(true)}
               aria-pressed={brisaNoche}
             >
-              🌙 Noche
+              <span aria-hidden="true">🌙</span> Noche
             </button>
           </div>
         </div>
@@ -599,7 +599,7 @@ function SeccionDatos() {
 
       {/* El termo como ejemplo perfecto */}
       <div className={styles.termoContainer}>
-        <h3 className={styles.termoTitulo}>☕ El termo: combate las 3 formas</h3>
+        <h3 className={styles.termoTitulo}><span aria-hidden="true">☕</span> El termo: combate las 3 formas</h3>
         <div className={styles.termoGrid}>
           <div className={styles.termoItem}>
             <span className={styles.termoForma} style={{ color: '#EF4444' }}>Anti-conducción</span>

@@ -581,7 +581,7 @@ export default function CifradoTransposicionPage() {
       >
         {/* ========== SECCIÓN 1: TABLA COMPARATIVA ========== */}
         <section className={styles.comparativaSection}>
-          <h2>📊 Comparativa de los tres métodos de transposición</h2>
+          <h2><span aria-hidden="true">📊</span> Comparativa de los tres métodos de transposición</h2>
           <p className={styles.comparativaSubtitle}>
             Columnar, Rail Fence y Escítala frente a frente: complejidad, seguridad y uso histórico
           </p>
@@ -590,9 +590,9 @@ export default function CifradoTransposicionPage() {
               <thead>
                 <tr>
                   <th>Característica</th>
-                  <th>📊 Columnar</th>
-                  <th>🚃 Rail Fence</th>
-                  <th>📜 Escítala</th>
+                  <th><span aria-hidden="true">📊</span> Columnar</th>
+                  <th><span aria-hidden="true">🚃</span> Rail Fence</th>
+                  <th><span aria-hidden="true">📜</span> Escítala</th>
                 </tr>
               </thead>
               <tbody>
@@ -639,10 +639,10 @@ export default function CifradoTransposicionPage() {
 
         {/* ========== SECCIÓN 2: HISTORIA ========== */}
         <section className={styles.infoSection}>
-          <h2>🏛️ Historia de los cifrados de transposición</h2>
+          <h2><span aria-hidden="true">🏛️</span> Historia de los cifrados de transposición</h2>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>📜 Escítala espartana (~500 a.C.)</h3>
+              <h3><span aria-hidden="true">📜</span> Escítala espartana (~500 a.C.)</h3>
               <p>
                 Es uno de los dispositivos criptográficos más antiguos conocidos.
                 Los espartanos enrollaban una tira de cuero en un bastón (escítala)
@@ -651,7 +651,7 @@ export default function CifradoTransposicionPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>📊 Cifrado columnar (s. XIX)</h3>
+              <h3><span aria-hidden="true">📊</span> Cifrado columnar (s. XIX)</h3>
               <p>
                 Popularizado en el siglo XIX, fue extensamente usado en la
                 <strong> Primera Guerra Mundial</strong> por Alemania y Francia.
@@ -660,7 +660,7 @@ export default function CifradoTransposicionPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🚃 Rail Fence en la Guerra Civil (1861-1865)</h3>
+              <h3><span aria-hidden="true">🚃</span> Rail Fence en la Guerra Civil (1861-1865)</h3>
               <p>
                 Utilizado por las tropas de la Unión durante la Guerra Civil estadounidense
                 para transmitir mensajes por telégrafo. Era rápido de aplicar pero
@@ -669,7 +669,7 @@ export default function CifradoTransposicionPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🔐 Sustitución vs. Transposición</h3>
+              <h3><span aria-hidden="true">🔐</span> Sustitución vs. Transposición</h3>
               <p>
                 Los cifrados de sustitución (César, Vigenère) <strong>reemplazan</strong>
                 cada letra por otra. Los de transposición <strong>reordenan</strong>
@@ -682,7 +682,7 @@ export default function CifradoTransposicionPage() {
 
         {/* ========== SECCIÓN 3: FAQ ========== */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas frecuentes sobre transposición</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre transposición</h2>
           <div className={styles.faqList}>
             <details className={styles.faqItem}>
               <summary className={styles.faqQuestion}>
@@ -747,7 +747,7 @@ export default function CifradoTransposicionPage() {
 
         {/* ========== SECCIÓN 4: CÓMO FUNCIONA PASO A PASO ========== */}
         <section className={styles.pasosSection}>
-          <h2>🧮 Cifrado columnar: paso a paso</h2>
+          <h2><span aria-hidden="true">🧮</span> Cifrado columnar: paso a paso</h2>
           <div className={styles.pasosGrid}>
             <div className={styles.pasoCard}>
               <div className={styles.pasoNum}>1</div>
@@ -793,7 +793,7 @@ export default function CifradoTransposicionPage() {
 
         {/* ========== SECCIÓN 5: CONSEJOS ========== */}
         <section className={styles.tipsSection}>
-          <h2>💡 Consejos para usar transposición</h2>
+          <h2><span aria-hidden="true">💡</span> Consejos para usar transposición</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🔑</span>
@@ -828,7 +828,7 @@ export default function CifradoTransposicionPage() {
 
         {/* ========== SECCIÓN 6: WARNING BOX ========== */}
         <div className={styles.warningBox}>
-          <h2>⚠️ Errores frecuentes con cifrados de transposición</h2>
+          <h2><span aria-hidden="true">⚠️</span> Errores frecuentes con cifrados de transposición</h2>
           <ul className={styles.warningList}>
             <li className={styles.warningItem}>
               <span className={styles.warningIcon} aria-hidden="true">🚫</span>
