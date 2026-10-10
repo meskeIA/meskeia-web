@@ -351,8 +351,8 @@ Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt:
 2. Actualizar data/implemented-apps.ts (añadir URLs)
 3. Actualizar data/app-relations.ts (añadir relaciones)
 4. npm run build (una sola vez, verificar 0 errores) — genera ai-index.json automáticamente
-6. Corregir errores si los hay (CSS: no usar `*` puro, TS: no usar JSX.Element)
-7. Commit + push
+5. Corregir errores si los hay (CSS: no usar `*` puro, TS: no usar JSX.Element)
+6. Commit — el push va en el lote de `/push` («Flujo de Despliegue»)
 ```
 
 **Razón**: Los agentes que no terminan limpiamente producen procesos zombie, locks de build, reintentos en cadena y docenas de notificaciones residuales. La clave es que cada agente cree sus archivos, verifique UNA vez, y termine inmediatamente.

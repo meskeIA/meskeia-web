@@ -1,6 +1,6 @@
 ---
 name: cuadre
-description: Cuadra lo que pediste con lo que se tocó en la sesión, y calla si cuadra. Cubre UNA clase de fallo — se coló algo que nadie pidió: un test borrado, un disclaimer caído, una dependencia nueva, un candado desenganchado del build, un dominio nuevo. Cuenta y compara; NO juzga si el código es bueno, de eso responde el Inspector. Normalmente no hace falta invocarla: el pre-commit la ejecuta solo y bloquea. Se invoca para mirar cómo va la sesión, para entender un commit bloqueado o para tenderle la trampa y comprobar que sigue viva.
+description: 'Cuadra lo que pediste con lo que se tocó en la sesión, y calla si cuadra. Cubre UNA clase de fallo — se coló algo que nadie pidió: un test borrado, un disclaimer caído, una dependencia nueva, un candado desenganchado del build, un dominio nuevo. Cuenta y compara; NO juzga si el código es bueno, de eso responde el Inspector. Normalmente no hace falta invocarla: el pre-commit la ejecuta solo y bloquea. Se invoca para mirar cómo va la sesión, para entender un commit bloqueado o para tenderle la trampa y comprobar que sigue viva.'
 allowed-tools: Bash, Read, Edit, Glob, Grep
 ---
 
