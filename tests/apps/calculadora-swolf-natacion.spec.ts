@@ -1043,9 +1043,10 @@ test.describe('REPARADO — HALLAZGO I: textos del panel de resultado', () => {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════
- * ABIERTO — 04/10/2026 · HALLAZGO J (contenido/bajo): cifras sin fuente presentadas como
- * dato en la guía. La reparación del 2637 RETIRÓ el «1,5–3 %» por no tener fuente
- * (antipatrón 1 de neutralidad editorial), pero quedan otras dos con la misma forma:
+ * REPARADO — 10/10/2026 · HALLAZGO J (2861, contenido/bajo): cifras sin fuente presentadas
+ * como dato en la guía. La reparación del 2637 RETIRÓ el «1,5–3 %» por no tener fuente
+ * (antipatrón 1 de neutralidad editorial), pero quedaban otras dos con la misma forma, y se
+ * han reformulado en cualitativo (no hay una fuente oficial de ritmos de mejora del SWOLF):
  *   · FAQ «¿Cuánto tarda en mejorar el SWOLF?»: «es habitual ver mejoras de 2-4 puntos en
  *     4-8 semanas en nadadores intermedios. Los principiantes pueden mejorar 5-10 puntos en
  *     el primer mes».
@@ -1062,8 +1063,8 @@ function cifraSinFuente(texto: string, unidad: RegExp): boolean {
   return cifra && !fuente;
 }
 
-test.describe('ABIERTO — HALLAZGO J: cifras sin fuente en la guía', () => {
-  test.fail('FAQ «¿Cuánto tarda en mejorar el SWOLF?»: sin «2-4 puntos en 4-8 semanas» sin fuente', async ({
+test.describe('REPARADO — HALLAZGO J: cifras sin fuente en la guía', () => {
+  test('FAQ «¿Cuánto tarda en mejorar el SWOLF?»: sin «2-4 puntos en 4-8 semanas» sin fuente', async ({
     page,
   }) => {
     await abrirGuia(page);
@@ -1073,7 +1074,7 @@ test.describe('ABIERTO — HALLAZGO J: cifras sin fuente en la guía', () => {
     expect(cifraSinFuente(texto, /puntos/), texto).toBe(false);
   });
 
-  test.fail('tarjeta «Viraje eficiente»: sin «0,5–1 segundo por largo» sin fuente', async ({ page }) => {
+  test('tarjeta «Viraje eficiente»: sin «0,5–1 segundo por largo» sin fuente', async ({ page }) => {
     await abrirGuia(page);
     const tarjeta = page.locator('[class*="escenarioCard"]', { hasText: 'Viraje eficiente' });
     await expect(tarjeta).toHaveCount(1);

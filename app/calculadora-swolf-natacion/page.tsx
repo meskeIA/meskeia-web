@@ -438,8 +438,9 @@ export default function CalculadoraSwolfNatacionPage() {
             <div className={styles.escenarioCard}>
               <h4><span aria-hidden="true">📏</span> Viraje eficiente</h4>
               <p>
-                El viraje suma tiempo pero no brazadas. Un giro de volteo bien ejecutado
-                puede ahorrar 0,5–1 segundo por largo, lo que mejora el SWOLF directamente.
+                El viraje suma tiempo pero no brazadas. Un giro de volteo bien ejecutado, con
+                un buen impulso en la pared, acorta el tiempo del largo siguiente y mejora el
+                SWOLF directamente.
               </p>
             </div>
           </div>
@@ -520,9 +521,11 @@ export default function CalculadoraSwolfNatacionPage() {
             <div className={styles.faqItem}>
               <strong>¿Cuánto tarda en mejorar el SWOLF?</strong>
               <p>
-                Con trabajo técnico regular (2-3 sesiones semanales con drills), es habitual
-                ver mejoras de 2-4 puntos en 4-8 semanas en nadadores intermedios. Los
-                principiantes pueden mejorar 5-10 puntos en el primer mes de trabajo consciente.
+                Depende del punto de partida y de la constancia, y no hay una cifra general
+                fiable. Con trabajo técnico regular (drills varias veces por semana), los avances
+                suelen ser más rápidos al principio y más lentos cuando la técnica ya está
+                consolidada. La referencia útil es tu propia serie de mediciones, siempre en la
+                misma piscina y en condiciones parecidas.
               </p>
             </div>
           </div>
