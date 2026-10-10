@@ -1757,7 +1757,7 @@ function crearServidorMCP(): McpServer {
         `📊 **${tiempo_s_largo} s + ${brazadas_largo} brazadas = SWOLF ${r.swolf}**` +
           (metrosPiscina === 50 ? ` (equivale a ${r.swolfEquivalente25} por cada 25 m, que es lo que decide el nivel)` : ''),
         `${nivelEmoji[r.nivel]} **Nivel: ${r.eficiencia}** — ${r.descripcionNivel}`,
-        `⚡ Velocidad: ${r.velocidadMedia_min100m}`,
+        `⚡ Ritmo: ${r.velocidadMedia_min100m}`,
         ``,
         `💡 **Consejo:** ${r.consejo}`,
       ];

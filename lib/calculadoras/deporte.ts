@@ -680,12 +680,15 @@ export function calcularSWOLF(
 
   if (swolfEquivalente25 <= CORTES_SWOLF_25.elite) {
     nivel = 'elite'; eficiencia = 'Excelente';
-    descripcionNivel = 'Eficiencia de nadador avanzado o competitivo';
+    // Hasta el 10/10/2026 decía «nadador avanzado o competitivo»: nombraba el nivel inferior
+    // (hallazgo 2860). La guía describe la Élite como «Nadador de competición de alto nivel».
+    descripcionNivel = 'Eficiencia propia de nadadores de competición';
     consejo = 'Mantén la técnica y trabaja la resistencia para bajar tiempos.';
   } else if (swolfEquivalente25 <= CORTES_SWOLF_25.avanzado) {
     nivel = 'avanzado'; eficiencia = 'Buena';
     descripcionNivel = 'Técnica consolidada con margen de mejora';
-    consejo = 'Trabaja la planada y el agarre para reducir brazadas por largo.';
+    // «Planada» (una llanura, DRAE) hasta el 10/10/2026: el término de natación es el deslizamiento.
+    consejo = 'Trabaja el deslizamiento y el agarre para reducir brazadas por largo.';
   } else if (swolfEquivalente25 <= CORTES_SWOLF_25.intermedio) {
     nivel = 'intermedio'; eficiencia = 'En desarrollo';
     descripcionNivel = 'Nadador con base, técnica mejorable';

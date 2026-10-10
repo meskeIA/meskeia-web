@@ -245,7 +245,7 @@ export default function CalculadoraSwolfNatacionPage() {
                   <span className={styles.detalleValor}>{resultado.escala.eficiencia}</span>
                 </div>
                 <div className={styles.detalleItem}>
-                  <span className={styles.detalleLabel}>Velocidad media</span>
+                  <span className={styles.detalleLabel}>Ritmo medio</span>
                   <span className={styles.detalleValor}>{resultado.ritmo}</span>
                 </div>
                 <div className={styles.detalleItem}>

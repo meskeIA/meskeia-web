@@ -119,7 +119,7 @@ const RUTA = '/calculadora-swolf-natacion/';
 // que generan CSS Modules ("<hash>__swolfScore"), que "…Wrapper" no cumple.
 const swolfScore = (page: Page) => page.locator('[class$="__swolfScore"]').first();
 const nivelBadge = (page: Page) => page.locator('[class*="nivelBadge"]').first();
-/** 0 = Eficiencia · 1 = Velocidad media (min/100 m) · 2 = Descripción del nivel. */
+/** 0 = Eficiencia · 1 = Ritmo medio (min/100 m) · 2 = Descripción del nivel. */
 const detalle = (page: Page, i: number) => page.locator('[class*="detalleValor"]').nth(i);
 const consejoTexto = (page: Page) => page.locator('[class*="consejoTexto"]').first();
 const tiempoInput = (page: Page) => page.locator('#tiempo-input');
@@ -291,7 +291,7 @@ test.describe('CASO 2b (límite) — piscina de 50 m con los valores MÍNIMOS de
     await expect(detalle(page, 0)).toHaveText('Excelente');
     // 100 · 10 / 50 = 20 s por 100 m → «0:20 min/100 m»
     await expect(detalle(page, 1)).toHaveText('0:20 min/100 m');
-    await expect(detalle(page, 2)).toHaveText('Eficiencia de nadador avanzado o competitivo');
+    await expect(detalle(page, 2)).toHaveText('Eficiencia propia de nadadores de competición');
   });
 
   test('50 m · 5 s · 1 brazada (los mínimos de 25 m) ya no recibe «Élite»: aviso y sin nivel', async ({
@@ -1003,9 +1003,11 @@ test.describe('CASO 8 (móvil 360 px) — tecleo pulsación a pulsación', () =>
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════
- * ABIERTO — 04/10/2026 · HALLAZGO I (contenido/bajo): textos del panel de resultado que la
- * reparación del 02/10 no alcanzó. Dos salen del MOTOR (también los reciben la API de ChatGPT
- * y la tool del MCP) y uno de la página:
+ * REPARADO — 10/10/2026 · HALLAZGO I (2860, contenido/bajo): textos del panel de resultado que
+ * la reparación del 02/10 no alcanzó. Dos salen del MOTOR (también los reciben la API de ChatGPT
+ * y la tool del MCP) y uno de la página. Ahora: «Trabaja el deslizamiento y el agarre…»,
+ * «Eficiencia propia de nadadores de competición» y el rótulo «Ritmo medio» (también «Ritmo:»
+ * en la tool del MCP). Lo que había:
  *   · Avanzado (25 m · 20 s · 10 brazadas): consejo «Trabaja la planada y el agarre…».
  *     «Planada» es una llanura (DRAE); el término de natación es el deslizamiento, que es el
  *     que usa la guía de la propia página («Trabaja el deslizamiento y el planeado»).
@@ -1016,26 +1018,27 @@ test.describe('CASO 8 (móvil 360 px) — tecleo pulsación a pulsación', () =>
  *     app llama a esa magnitud «El ritmo (min/100 m)»: min/100 m es tiempo por distancia.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
-test.describe('ABIERTO — HALLAZGO I: textos del panel de resultado', () => {
-  test.fail('Avanzado: el consejo no habla de «la planada»', async ({ page }) => {
-    // Motivo del fail: el motor da «Trabaja la planada y el agarre para reducir brazadas por largo.»
+test.describe('REPARADO — HALLAZGO I: textos del panel de resultado', () => {
+  test('Avanzado: el consejo habla del deslizamiento, no de «la planada»', async ({ page }) => {
     await caso(page, 25, '20', '10');
     await expect(nivelBadge(page)).toContainText('Avanzado');
     await expect(consejoTexto(page)).not.toContainText('planada');
+    await expect(consejoTexto(page)).toContainText('deslizamiento');
   });
 
-  test.fail('Élite: la descripción no la llama «nadador avanzado»', async ({ page }) => {
-    // Motivo del fail: el motor da «Eficiencia de nadador avanzado o competitivo».
+  test('Élite: la descripción no la llama «nadador avanzado»', async ({ page }) => {
     await caso(page, 25, '15', '10');
     await expect(nivelBadge(page)).toContainText('Élite');
     await expect(detalle(page, 2)).not.toContainText('avanzado');
+    await expect(detalle(page, 2)).toContainText('competición');
   });
 
-  test.fail('el ritmo en min/100 m no se rotula «Velocidad media»', async ({ page }) => {
-    // Motivo del fail: la etiqueta es «Velocidad media» y el valor, un ritmo (min/100 m).
+  test('el ritmo en min/100 m no se rotula «Velocidad media»', async ({ page }) => {
     await caso(page, 25, '22', '16');
     await expect(detalle(page, 1)).toHaveText('1:28 min/100 m');
-    await expect(page.locator('[class*="detalleLabel"]').nth(1)).not.toContainText('Velocidad');
+    const rotulo = page.locator('[class*="detalleLabel"]').nth(1);
+    await expect(rotulo).not.toContainText('Velocidad');
+    await expect(rotulo).toContainText('Ritmo');
   });
 });
 

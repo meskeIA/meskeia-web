@@ -49,7 +49,7 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Índice SWOLF de eficiencia en natación',
     'Clasificación por nivel: élite, avanzado, intermedio y principiante',
-    'Velocidad media en min/100 m',
+    'Ritmo medio en min/100 m',
     'Consejos de mejora técnica personalizados según el nivel',
     'Compatible con piscinas de 25 m y 50 m, con los cortes de nivel ajustados a la longitud del largo',
   ],
