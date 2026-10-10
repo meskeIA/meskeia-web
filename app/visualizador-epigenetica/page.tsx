@@ -579,7 +579,7 @@ const SeccionImprinting = () => {
 
           {/* Alelo paterno */}
           <rect x="20" y="20" width="250" height="60" rx="10" fill={origen === 'paterno' ? 'rgba(46,134,171,0.15)' : 'rgba(200,200,200,0.15)'} stroke={origen === 'paterno' ? '#2E86AB' : '#ccc'} strokeWidth="2" />
-          <text x="145" y="38" textAnchor="middle" fontSize="11" fontWeight="700" fill={origen === 'paterno' ? '#2E86AB' : '#aaa'}>👨 Alelo paterno</text>
+          <text x="145" y="38" textAnchor="middle" fontSize="11" fontWeight="700" fill={origen === 'paterno' ? '#2E86AB' : '#aaa'}>👨 Alelo paterno</text>{/* a11y-ok: el SVG es role="img" con aria-label; su texto no llega al lector */}
 
           {/* Gen IGF2 paterno */}
           <rect x="35" y="50" width="80" height="22" rx="6" fill={origen === 'paterno' ? '#2E86AB' : '#ddd'} opacity="0.9" />
@@ -591,7 +591,7 @@ const SeccionImprinting = () => {
 
           {/* Alelo materno */}
           <rect x="310" y="20" width="250" height="60" rx="10" fill={origen === 'materno' ? 'rgba(72,169,166,0.15)' : 'rgba(200,200,200,0.15)'} stroke={origen === 'materno' ? '#48A9A6' : '#ccc'} strokeWidth="2" />
-          <text x="435" y="38" textAnchor="middle" fontSize="11" fontWeight="700" fill={origen === 'materno' ? '#48A9A6' : '#aaa'}>👩 Alelo materno</text>
+          <text x="435" y="38" textAnchor="middle" fontSize="11" fontWeight="700" fill={origen === 'materno' ? '#48A9A6' : '#aaa'}>👩 Alelo materno</text>{/* a11y-ok: el SVG es role="img" con aria-label; su texto no llega al lector */}
 
           {/* Gen IGF2 materno (silenciado) */}
           <rect x="325" y="50" width="80" height="22" rx="6" fill="#ddd" opacity="0.6" />

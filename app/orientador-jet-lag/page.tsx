@@ -374,8 +374,8 @@ export default function SimuladorJetLagPage() {
                 </tr>
                 <tr>
                   <td>Factor adaptación</td>
-                  <td>×1.15 días/h</td>
-                  <td>×0.85 días/h</td>
+                  <td>×1,15 días/h</td>
+                  <td>×0,85 días/h</td>
                 </tr>
                 <tr>
                   <td>Exposición luz</td>

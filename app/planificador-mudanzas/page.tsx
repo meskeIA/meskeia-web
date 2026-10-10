@@ -725,9 +725,9 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                   onChange={(e) => setNuevoObjeto(prev => ({ ...prev, estado: e.target.value as EstadoObjeto }))}
                   className={styles.selectEstado}
                 >
-                  <option value="bueno">✅ Bueno</option>
-                  <option value="regular">⚠️ Regular</option>
-                  <option value="malo">❌ Malo</option>
+                  <option value="bueno">✅ Bueno</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el estado */}
+                  <option value="regular">⚠️ Regular</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el estado */}
+                  <option value="malo">❌ Malo</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el estado */}
                 </select>
                 <input
                   type="number"
@@ -778,7 +778,9 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                           <div className={styles.objetoDetalles}>
                             <span>Cantidad: {objeto.cantidad}</span>
                             <span>
-                              Estado: {objeto.estado === 'bueno' ? '✅' : objeto.estado === 'regular' ? '⚠️' : '❌'}
+                              Estado:{' '}
+                              <span aria-hidden="true">{objeto.estado === 'bueno' ? '✅' : objeto.estado === 'regular' ? '⚠️' : '❌'}</span>
+                              <span className="sr-only">{objeto.estado}</span>
                             </span>
                             {objeto.valorEstimado > 0 && (
                               <span>Valor: {formatCurrency(objeto.valorEstimado * objeto.cantidad)}</span>

@@ -991,30 +991,30 @@ export default function RecortadorAudioPage() {
             <div className={styles.formatCard}>
               <h4><span aria-hidden="true">🎵</span> MP3</h4>
               <ul>
-                <li><span aria-hidden="true">✅</span> El más compatible</li>
-                <li><span aria-hidden="true">✅</span> Archivos pequeños</li>
-                <li><span aria-hidden="true">❌</span> Compresión con pérdida</li>
-                <li><span aria-hidden="true">❌</span> No ideal para edición repetida</li>
+                <li><span role="img" aria-label="Ventaja:">✅</span> El más compatible</li>
+                <li><span role="img" aria-label="Ventaja:">✅</span> Archivos pequeños</li>
+                <li><span role="img" aria-label="Inconveniente:">❌</span> Compresión con pérdida</li>
+                <li><span role="img" aria-label="Inconveniente:">❌</span> No ideal para edición repetida</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: música, podcasts, compartir</p>
             </div>
             <div className={styles.formatCard}>
               <h4><span aria-hidden="true">🔊</span> WAV</h4>
               <ul>
-                <li><span aria-hidden="true">✅</span> Sin pérdida de calidad</li>
-                <li><span aria-hidden="true">✅</span> Estándar profesional</li>
-                <li><span aria-hidden="true">❌</span> Archivos muy grandes</li>
-                <li><span aria-hidden="true">❌</span> No soporta metadatos</li>
+                <li><span role="img" aria-label="Ventaja:">✅</span> Sin pérdida de calidad</li>
+                <li><span role="img" aria-label="Ventaja:">✅</span> Estándar profesional</li>
+                <li><span role="img" aria-label="Inconveniente:">❌</span> Archivos muy grandes</li>
+                <li><span role="img" aria-label="Inconveniente:">❌</span> No soporta metadatos</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: edición, producción, archivo</p>
             </div>
             <div className={styles.formatCard}>
               <h4><span aria-hidden="true">🌐</span> OGG</h4>
               <ul>
-                <li><span aria-hidden="true">✅</span> Mejor compresión que MP3</li>
-                <li><span aria-hidden="true">✅</span> Código abierto y gratuito</li>
-                <li><span aria-hidden="true">⚠️</span> Menos compatible</li>
-                <li><span aria-hidden="true">⚠️</span> No soportado por Apple</li>
+                <li><span role="img" aria-label="Ventaja:">✅</span> Mejor compresión que MP3</li>
+                <li><span role="img" aria-label="Ventaja:">✅</span> Código abierto y gratuito</li>
+                <li><span role="img" aria-label="Con reservas:">⚠️</span> Menos compatible</li>
+                <li><span role="img" aria-label="Con reservas:">⚠️</span> No soportado por Apple</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: web, juegos, streaming</p>
             </div>

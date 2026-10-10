@@ -287,7 +287,7 @@ export default function CalculadoraFondoEmergenciaPage() {
                   <td>Inmediata</td>
                   <td>0-0,1%</td>
                   <td>Máxima disponibilidad</td>
-                  <td><span aria-hidden="true">✅</span> Parcial</td>
+                  <td><span aria-hidden="true">✅</span> Parcial<span className="sr-only">, con valoración positiva</span></td>
                 </tr>
                 <tr>
                   <td><strong>Cuenta de ahorro</strong></td>
@@ -301,7 +301,7 @@ export default function CalculadoraFondoEmergenciaPage() {
                   <td>Al vencimiento</td>
                   <td>2-4%</td>
                   <td>Mayor rentabilidad fija</td>
-                  <td><span aria-hidden="true">⚠️</span> Parcial</td>
+                  <td><span aria-hidden="true">⚠️</span> Parcial<span className="sr-only">, con reservas</span></td>
                 </tr>
                 <tr>
                   <td><strong>Fondo monetario</strong></td>
@@ -315,7 +315,7 @@ export default function CalculadoraFondoEmergenciaPage() {
                   <td>Al vencimiento</td>
                   <td>2,5-3,5%</td>
                   <td>Sin riesgo de entidad</td>
-                  <td><span aria-hidden="true">⚠️</span> Parcial</td>
+                  <td><span aria-hidden="true">⚠️</span> Parcial<span className="sr-only">, con reservas</span></td>
                 </tr>
                 <tr>
                   <td><strong>Bolsa / fondos renta variable</strong></td>

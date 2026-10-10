@@ -634,42 +634,42 @@ export default function OrientadorEscrituraCreativaPage() {
                   <td><strong><span aria-hidden="true">📖</span> Novela</strong></td>
                   <td>50.000–120.000 palabras</td>
                   <td>1–3 años</td>
-                  <td>⚡⚡⚡</td>
+                  <td><span role="img" aria-label="Dificultad 3 de 4">⚡⚡⚡</span></td>
                   <td>Tienes una historia larga con varios personajes</td>
                 </tr>
                 <tr>
                   <td><strong><span aria-hidden="true">✨</span> Cuento corto</strong></td>
                   <td>500–10.000 palabras</td>
                   <td>1 día–1 mes</td>
-                  <td>⚡</td>
+                  <td><span role="img" aria-label="Dificultad 1 de 4">⚡</span></td>
                   <td>Quieres empezar hoy y terminar pronto</td>
                 </tr>
                 <tr>
                   <td><strong><span aria-hidden="true">🏰</span> Novela histórica</strong></td>
                   <td>80.000–150.000 palabras</td>
                   <td>2–5 años</td>
-                  <td>⚡⚡⚡⚡</td>
+                  <td><span role="img" aria-label="Dificultad 4 de 4">⚡⚡⚡⚡</span></td>
                   <td>Te apasiona un período histórico y quieres investigarlo</td>
                 </tr>
                 <tr>
                   <td><strong><span aria-hidden="true">🎭</span> Poesía</strong></td>
                   <td>1 verso – poemario</td>
                   <td>1 hora–6 meses</td>
-                  <td>⚡</td>
+                  <td><span role="img" aria-label="Dificultad 1 de 4">⚡</span></td>
                   <td>Tienes una imagen o emoción que quieres fijar en palabras</td>
                 </tr>
                 <tr>
                   <td><strong><span aria-hidden="true">📔</span> Memorias</strong></td>
                   <td>40.000–100.000 palabras</td>
                   <td>6 meses–2 años</td>
-                  <td>⚡⚡</td>
+                  <td><span role="img" aria-label="Dificultad 2 de 4">⚡⚡</span></td>
                   <td>Quieres narrar tu propia historia con forma literaria</td>
                 </tr>
                 <tr>
                   <td><strong><span aria-hidden="true">✍️</span> Ensayo</strong></td>
                   <td>1.000–30.000 palabras</td>
                   <td>1 semana–6 meses</td>
-                  <td>⚡⚡</td>
+                  <td><span role="img" aria-label="Dificultad 2 de 4">⚡⚡</span></td>
                   <td>Tienes una tesis o reflexión que quieres desarrollar</td>
                 </tr>
               </tbody>

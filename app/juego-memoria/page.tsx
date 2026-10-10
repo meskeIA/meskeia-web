@@ -230,25 +230,29 @@ export default function JuegoMemoriaPage() {
                 key={d}
                 onClick={() => iniciarJuego(d)}
                 className={`${styles.dificultadBtn} ${dificultad === d ? styles.active : ''}`}
+                aria-pressed={dificultad === d}
               >
-                {d === 'facil' && '😊 Fácil (6)'}
-                {d === 'medio' && '🤔 Medio (8)'}
-                {d === 'dificil' && '🧠 Difícil (12)'}
+                {d === 'facil' && <><span aria-hidden="true">😊</span> Fácil (6)</>}
+                {d === 'medio' && <><span aria-hidden="true">🤔</span> Medio (8)</>}
+                {d === 'dificil' && <><span aria-hidden="true">🧠</span> Difícil (12)</>}
               </button>
             ))}
           </div>
 
           <div className={styles.stats}>
             <div className={styles.stat}>
-              <span className={styles.statIcon}>⏱️</span>
+              <span className={styles.statIcon} aria-hidden="true">⏱️</span>
+              <span className="sr-only">Tiempo: </span>
               <span className={styles.statValor}>{formatearTiempo(tiempo)}</span>
             </div>
             <div className={styles.stat}>
-              <span className={styles.statIcon}>👆</span>
+              <span className={styles.statIcon} aria-hidden="true">👆</span>
+              <span className="sr-only">Movimientos: </span>
               <span className={styles.statValor}>{movimientos}</span>
             </div>
             <div className={styles.stat}>
-              <span className={styles.statIcon}>✅</span>
+              <span className={styles.statIcon} aria-hidden="true">✅</span>
+              <span className="sr-only">Parejas encontradas: </span>
               <span className={styles.statValor}>{parejasEncontradas}/{totalParejas}</span>
             </div>
           </div>
@@ -513,7 +517,7 @@ export default function JuegoMemoriaPage() {
                 <strong>Memoriza la posición antes de voltear</strong>
                 <p>
                   Cuando descubres una carta, no te centres solo en el emoji: registra
-                  mentalmente su fila y columna en el tablero. Di internamente &quot;🍎 — fila 2,
+                  mentalmente su fila y columna en el tablero. Di internamente &quot;<span role="img" aria-label="manzana">🍎</span> — fila 2,
                   columna 3&quot;. Este etiquetado posicional reduce los errores drásticamente.
                 </p>
               </div>
