@@ -26,6 +26,7 @@
     "check:fiscal": "node scripts/check-fiscal-manifiesto.mjs",
     "check:itp": "node scripts/check-itp.mjs",
     "audit:fiscal-fuentes": "node scripts/audit-fiscal-fuentes.mjs",
+    "audit:series-oficiales": "node --no-warnings scripts/audit-series-oficiales.mjs",
     "audit:motores": "node scripts/audit-motores-fiscales.mjs",
     "check:memoria": "node scripts/check-memoria.mjs",
     "memoria:probar-ritmo": "node scripts/pruebas/memoria-ritmo.mjs",
