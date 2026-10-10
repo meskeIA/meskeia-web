@@ -45,7 +45,7 @@
  * Fuente: Ley 35/2006 del IRPF (arts. 33 a 40 y DT 9.ª) + RD 439/2007 (RIRPF, arts. 40 y 41)
  */
 
-import { calcularCuotaBaseAhorro } from './inmuebles';
+import { calcularCuotaBaseAhorro, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from './inmuebles';
 // El motivo de la exención se PRESENTA al usuario, así que su porcentaje lleva coma decimal:
 // toFixed() escribía «51.8 %» en una app en español (CLAUDE.md global §2, hallazgo 433).
 import { formatNumber } from '@/lib/formatters';
@@ -67,6 +67,11 @@ export interface EntradaGananciaInmueble {
   plusvaliaMunicipal?: number;
   /** Vendedor mayor de 65 años que transmite su vivienda habitual (art. 33.4.b LIRPF) */
   exentoPorEdad?: boolean;
+  /**
+   * El inmueble está en Ceuta o Melilla: la cuota lleva la deducción del 60 % del art. 68.4
+   * LIRPF (`DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA`), resida donde resida el vendedor.
+   */
+  inmuebleEnCeutaMelilla?: boolean;
   /** Reinversión en nueva vivienda habitual (art. 38 LIRPF). Omitir si no aplica */
   reinversion?: {
     /** Importe que se reinvierte o se compromete a reinvertir en 2 años (€) */
@@ -113,8 +118,10 @@ export interface ResultadoGananciaInmueble {
   importeTotalObtenido: number;
   /** Ganancia sujeta y no exenta: la que tributa */
   baseImponible: number;
-  /** Cuota del IRPF sobre la base del ahorro */
+  /** Cuota del IRPF sobre la base del ahorro, ya con la deducción de Ceuta y Melilla si aplica */
   cuotaIRPF: number;
+  /** Deducción del art. 68.4 LIRPF restada de la cuota (0 fuera de Ceuta y Melilla) */
+  deduccionCeutaMelilla: number;
   /** Tipo efectivo sobre la ganancia total (%) */
   tipoEfectivo: number;
   /** Motivo de la exención cuando la hay, para mostrarlo en la interfaz */
@@ -157,6 +164,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
       importeTotalObtenido: valorTransmision,
       baseImponible: 0,
       cuotaIRPF: 0,
+      deduccionCeutaMelilla: 0,
       tipoEfectivo: 0,
       motivoExencion: null,
     };
@@ -176,6 +184,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
       importeTotalObtenido: valorTransmision,
       baseImponible: 0,
       cuotaIRPF: 0,
+      deduccionCeutaMelilla: 0,
       tipoEfectivo: 0,
       motivoExencion: 'Mayor de 65 años que transmite su vivienda habitual (art. 33.4.b LIRPF)',
     };
@@ -206,7 +215,13 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
   }
 
   const baseImponible = Math.max(0, ganancia - exentaPorReinversion);
-  const cuotaIRPF = calcularCuotaBaseAhorro(baseImponible);
+  // Con el inmueble en Ceuta o Melilla, el 60 % de la cuota que corresponde a esta ganancia, que
+  // aquí es la cuota entera: se calcula como la única renta de la base del ahorro (art. 68.4 LIRPF).
+  const cuotaIntegra = calcularCuotaBaseAhorro(baseImponible);
+  const deduccionCeutaMelilla = e.inmuebleEnCeutaMelilla
+    ? cuotaIntegra * (DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje / 100)
+    : 0;
+  const cuotaIRPF = cuotaIntegra - deduccionCeutaMelilla;
 
   const motivoExencion = proporcionReinvertida >= 1 && cubiertoPorLaHipoteca
     ? 'Reinversión en una nueva vivienda habitual: el principal pendiente del préstamo iguala o supera el valor de transmisión, así que el importe obtenido es 0 y cualquier reinversión lo cubre (art. 38 LIRPF y art. 41.1 RIRPF)'
@@ -228,6 +243,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
     importeTotalObtenido,
     baseImponible,
     cuotaIRPF,
+    deduccionCeutaMelilla,
     tipoEfectivo: ganancia > 0 ? (cuotaIRPF / ganancia) * 100 : 0,
     motivoExencion,
   };

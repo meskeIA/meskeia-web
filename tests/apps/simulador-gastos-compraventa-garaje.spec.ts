@@ -7275,3 +7275,55 @@ test.describe('Inspector 08/10/2026 — Baleares, el millón exacto de Valencia 
     expect(aviso).toMatch(/En la Comunidad de Madrid existen?:/);
   });
 });
+
+/**
+ * REPARACIÓN DEL 10/10/2026 — Ceuta, Melilla y territorio foral en la pestaña Vendedor.
+ *
+ * Por decisión del usuario sobre los hallazgos 3059/3060 y 3069-3071 (local y la referencia), que
+ * alcanzaban a esta app por el motor común: la plusvalía de Ceuta y Melilla lleva la bonificación
+ * del 50 % de la cuota (art. 159.2 TRLRHL), el IRPF de un inmueble situado allí la deducción del
+ * 60 % (art. 68.4 LIRPF), y en el País Vasco y Navarra la plusvalía no se calcula, porque es foral.
+ * Venta 30.000 · compra 20.000 · gastos 1.000 · 5 años · suelo 6.000 · total 10.000 · comisión 3 %.
+ */
+test.describe('Reparación 10/10/2026 — Ceuta, Melilla y la plusvalía foral', () => {
+  async function vendedor1010(page: Page, ccaa: string): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', ccaa);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '20000');
+    await sembrarImporte(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '1000');
+    await sembrarImporte(page, 'Años de propiedad', '5');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '6000');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '10000');
+    await sembrarImporte(page, 'Comisión inmobiliaria del vendedor (%)', '3');
+  }
+
+  test('Ceuta: plusvalía bonificada al 50 % e IRPF con la deducción del 60 %', async ({ page }) => {
+    // A mano: objetivo 6.000 × 0,18 × 25 % = 270 → 135 (el real, 10.000 × 0,6 × 25 % = 1.500 → 750,
+    // es mayor). Transmisión 30.000 − 900 − 135 = 28.965; adquisición 21.000; ganancia 7.965;
+    // cuota 1.140 + 1.965 × 21 % = 1.552,65; × 40 % = 621,06. Neto 30.000 − 135 − 900 − 621,06.
+    await vendedor1010(page, 'ceuta');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('135,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toMatch(/bonificación del 50\s% de la cuota de Ceuta y Melilla/);
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('621,06 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(/deducción del 60\s% por rentas obtenidas en Ceuta o Melilla \(art\. 68\.4 LIRPF\): 931,59 € menos/);
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('28.343,94 €');
+    // Control: en Madrid la cuota entera.
+    await page.selectOption('#select-ccaa', 'madrid');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('270,00 €');
+  });
+
+  test('Navarra y País Vasco: la plusvalía es foral, no se calcula y el neto no pide rellenar el suelo', async ({ page }) => {
+    await vendedor1010(page, 'navarra');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Ley Foral 2/1995 de Haciendas Locales de Navarra');
+    const neto = await i24Desc(page, /^IMPORTE NETO VENDEDOR/);
+    expect(neto).toContain('No descuenta la plusvalía municipal');
+    expect(neto).not.toContain('Rellena');
+    expect(neto).not.toMatch(/\.\s*para obtenerlo/);
+    await page.selectOption('#select-ccaa', 'pais-vasco');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('norma foral de cada territorio histórico');
+  });
+});

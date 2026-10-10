@@ -843,6 +843,13 @@ test.describe('Inspección 07/09/2026 — casos nuevos', () => {
     await rellenar(page, 'Comisión de la inmobiliaria (%)', '0');
     await rellenar(page, 'Gestoría y certificados del vendedor (€)', '0');
 
+    // 10/10/2026 (hallazgo 3071, decisión del usuario): en el País Vasco la plusvalía es foral y
+    // no se calcula. El tope de 20 años y el tramo del 30 % son reglas del TRLRHL y de la LIRPF, así
+    // que el resto del caso se mide en territorio común (Madrid), con las mismas cifras.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('norma foral');
+    await page.locator('#select-ccaa').selectOption('madrid');
+
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('9375,00 €');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Método real');
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('450.000,00 €');
@@ -2648,6 +2655,9 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
   //   valor de transmisión = 180.000 − 5.400 − 1.425 =                           173.175,00
   //   control, amortizaciones 12.000 → adquisición 117.000 → ganancia 56.175
   //     IRPF = 1.140 + 9.240 + 6.175 × 23 % = 11.800,25 → neto =                161.374,75
+  //   ⚠️ 10/10/2026 (hallazgo 3071, decisión del usuario): en Navarra la plusvalía es foral y no
+  //   se calcula, así que no resta: transmisión 180.000 − 5.400 = 174.600, ganancia 57.600,
+  //   IRPF = 1.140 + 9.240 + 7.600 × 23 % = 12.128,00 (un máximo) y neto PARCIAL 162.472,00.
   //   amortizaciones 150.000 > 129.000 → la app liquidaba con adquisición 0 sin una palabra.
   // ══════════════════════════════════════════════════════════════════════════
   test('CASO 28 (rechazo) — unas amortizaciones mayores que el precio de compra y sus gastos no se liquidan en silencio', async ({ page }) => {
@@ -2669,8 +2679,8 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
     await sembrarImporte12(page, 'Valor catastral del suelo (€)', '30000');
     await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '80000');
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('117.000,00 €');
-    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('11.800,25 €');
-    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('161.374,75 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('12.128,00 €');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('162.472,00 €');
 
     // El dato imposible: el neto tiene que nombrarlo, no publicarse limpio.
     await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '150000');
@@ -5144,7 +5154,7 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
   // Con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la del defecto son
   // cifras o textos que la reparación no debe mover; la del defecto lee y compara, sin reintento.
 
-  // HALLAZGO [08/10-a] (alto, cálculo) — ❌ ABIERTO. El IRPF de la ganancia de un local SITUADO en
+  // HALLAZGO [08/10-a] (alto, cálculo) — ✅ REPARADO el 10/10/2026 (3059, decisión del usuario con la cita del art. 68.4 LIRPF). El IRPF de la ganancia de un local SITUADO en
   // Ceuta o Melilla se liquida entero: la app no aplica la deducción del 60 % del art. 68.4 LIRPF,
   // que alcanza a esa ganancia («d) Las ganancias patrimoniales que procedan de bienes inmuebles
   // radicados en Ceuta o Melilla») resida donde resida el vendedor en territorio común (1.º a y 2.º,
@@ -5154,28 +5164,30 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
   //   − 60 % = 2245,20 ; o 2295,60 si antes se repara [08/10-b] (plusvalía 600, ganancia 27.900,
   //   cuota 1.140 + 21.900 × 21 % = 5.739, × 40 %). Obtenido: 5613,00 € como definitivo.
   test('[08/10-a] Ceuta: el IRPF de la ganancia de un local situado allí lleva la deducción del 60 % (art. 68.4 LIRPF)', async ({ page }) => {
-    test.fail();
     await abrir0810(page);
     await vendedorSinAmortizar0810(page, 'ceuta');
     expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('165.000,00 €');
     // El defecto (lee y compara, sin reintento).
-    expect(['2245,20 €', '2295,60 €']).toContain(await valorTarjeta(page, 'IRPF sobre la ganancia'));
+    // Con las dos rebajas reparadas, la cifra exacta de la ficha: cuota 5.739 × 40 % y neto.
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('2295,60 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toMatch(/deducción del 60\s% por rentas obtenidas en Ceuta o Melilla \(art\. 68\.4 LIRPF\): 3443,40 € menos/);
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('190.604,40 €');
   });
 
-  // HALLAZGO [08/10-b] (medio, cálculo) — ❌ ABIERTO. La plusvalía municipal de un local en Ceuta o
+  // HALLAZGO [08/10-b] (medio, cálculo) — ✅ REPARADO el 10/10/2026 (3060, decisión del usuario con la cita del art. 159.2 TRLRHL). La plusvalía municipal de un local en Ceuta o
   // Melilla se liquida sin la bonificación del 50 % del art. 159.2 TRLRHL («Las cuotas tributarias
   // correspondientes a los impuestos municipales regulados en esta ley serán objeto de una
   // bonificación del 50 por ciento»). `calcularPlusvaliaMunicipal` no recibe la comunidad.
   //   Ceuta · base sin amortizaciones → objetivo 40.000 × 0,12 × 25 % = 1.200 (el real, 5.000, es
   //   mayor) → con la bonificación 600,00 · obtenido 1200,00 €, igual que en Madrid.
   test('[08/10-b] Ceuta: la plusvalía municipal lleva la bonificación del 50 % de la cuota (art. 159.2 TRLRHL)', async ({ page }) => {
-    test.fail();
     expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.12);
     await abrir0810(page);
     await vendedorSinAmortizar0810(page, 'ceuta');
     expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('6000,00 €');
     // El defecto.
     expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('600,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('192.900,00 €');
   });
 
   // HALLAZGO [08/10-c] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3062). Patrón 5 en el PRECIO principal, el 2960 de

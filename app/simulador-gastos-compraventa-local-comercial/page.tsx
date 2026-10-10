@@ -28,6 +28,8 @@ import {
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   COEFICIENTES_IIVTNU_2025,
   GANANCIAS_PATRIMONIALES_META,
+  BONIFICACION_IIVTNU_CEUTA_MELILLA,
+  DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA,
 } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -61,6 +63,8 @@ import {
   deNombreCcaa,
   TERRITORIOS_SIN_RENUNCIA,
   AVISO_IRPF_FORAL,
+  TERRITORIOS_IIVTNU_FORAL,
+  motivoPlusvaliaForal,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -126,6 +130,10 @@ interface ResultadosVendedor {
    * transmisión (art. 35.1 LIRPF), así que la ganancia y el IRPF son un MÁXIMO (patrón 2, 1570).
    */
   plusvaliaPendiente: boolean;
+  /** País Vasco o Navarra: la plusvalía es foral y no se calcula (3071). */
+  plusvaliaForal: boolean;
+  /** Deducción del 60 % del art. 68.4 LIRPF ya restada del IRPF (Ceuta y Melilla). */
+  deduccionCeutaMelilla: number;
   /**
    * Las amortizaciones superan el precio de compra y los gastos de aquella compra no se han
    * podido leer: la app no puede decir que sean imposibles (hallazgo 1573), pero sí cuánto
@@ -234,6 +242,9 @@ interface EntradaVendedor {
    * habría ganancia en el mejor caso del total catastral ilegible (hallazgo 2201).
    */
   plusvaliaForzada?: number;
+  /** Dónde está el local: Ceuta y Melilla bonifican la plusvalía y deducen el IRPF; en
+   *  territorio foral la plusvalía no es la del TRLRHL (hallazgos 3059, 3060 y 3071, 10/10/2026). */
+  ccaa: ComunidadAutonoma;
 }
 
 /**
@@ -253,7 +264,10 @@ function calcularVendedor(e: EntradaVendedor) {
   const sinIncremento = e.precioC > 0 && e.precioV <= e.precioC;
   /** Con años = 0 hacen falta además los meses completos, para prorratear el coeficiente (1560). */
   const periodoCompleto = Number.isFinite(e.anios) && (e.anios >= 1 || e.meses !== undefined);
-  const plusvaliaCalculable = e.precioC > 0 && (sinIncremento || (e.valorSuelo > 0 && periodoCompleto));
+  // En el País Vasco y Navarra la plusvalía es foral: no se liquida con el TRLRHL (3071).
+  const plusvaliaForal = TERRITORIOS_IIVTNU_FORAL.includes(e.ccaa);
+  const plusvaliaCalculable =
+    !plusvaliaForal && e.precioC > 0 && (sinIncremento || (e.valorSuelo > 0 && periodoCompleto));
   const resultadoPlusvalia = plusvaliaCalculable
     ? calcularPlusvaliaMunicipal({
         // Sin incremento el suelo y los años no intervienen (sale no sujeta): se pasan a 0.
@@ -263,6 +277,8 @@ function calcularVendedor(e: EntradaVendedor) {
         precioCompra: e.precioC,
         precioVenta: e.precioV,
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
+        // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL; hallazgo 3060).
+        ccaa: e.ccaa,
       })
     : null;
   const plusvalia = e.plusvaliaForzada ?? (resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0);
@@ -277,12 +293,15 @@ function calcularVendedor(e: EntradaVendedor) {
     amortizacionesDeducidas: e.amortizaciones,
     gastosTransmision: comision + e.gestoria,
     plusvaliaMunicipal: plusvalia,
+    // Ceuta y Melilla: la deducción del 60 % del art. 68.4 LIRPF (hallazgo 3059).
+    inmuebleEnCeutaMelilla: CIUDADES_CON_BONIFICACION.includes(e.ccaa),
   });
   const hayDatosGanancia = e.precioC > 0;
   const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
   const totalGastos = sumarLineasVisibles(plusvalia, comision, e.gestoria, irpf);
   return {
     comision,
+    plusvaliaForal,
     resultadoPlusvalia,
     plusvalia,
     g,
@@ -653,6 +672,7 @@ export default function SimuladorLocalComercialPage() {
       gestoria: Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta)),
       gastosAdquisicion: Math.max(0, parseSpanishNumberOr(gastosAdquisicion)),
       amortizaciones: Math.max(0, parseSpanishNumberOr(amortizacionesAcumuladas)),
+      ccaa,
     };
 
     /**
@@ -720,7 +740,8 @@ export default function SimuladorLocalComercialPage() {
      * Con la plusvalía ya resuelta (sin incremento no hace falta el suelo ni los años, patrón 4)
      * esos dos campos no bloquean nada: nombrarlos marcaría «(PARCIAL)» un neto definitivo.
      */
-    const plusvaliaResuelta = rp !== null;
+    // En territorio foral el suelo y los años no desbloquean nada: no se piden (3071).
+    const plusvaliaResuelta = rp !== null || r.plusvaliaForal;
     // Un año negativo no «falta»: está escrito, se lee y es imposible (patrón 5, hallazgo 1578).
     const aniosNegativos = !plusvaliaResuelta && aniosNegativo;
     const faltanMeses = !plusvaliaResuelta && aniosDisponibles && anios === 0 && meses === undefined;
@@ -743,7 +764,9 @@ export default function SimuladorLocalComercialPage() {
       precioCompraNoValido ? 'el precio de compra original tiene que ser mayor que 0' : null,
     ].filter((x): x is string => x !== null).join('; ');
 
-    let metodoPlusvalia = `No calculada (${porQueNoSeCalcula})`;
+    let metodoPlusvalia = r.plusvaliaForal
+      ? `No calculada: ${motivoPlusvaliaForal(ccaa)}`
+      : `No calculada (${porQueNoSeCalcula})`;
     const exentoPlusvalia = rp ? rp.exento : false;
     if (rp) {
       /**
@@ -768,6 +791,9 @@ export default function SimuladorLocalComercialPage() {
           : rp.metodoReal < rp.metodoObjetivo
             ? `Método real (más favorable), ${tipoMunicipal}`
             : `Método objetivo (más favorable), ${tipoMunicipal}`;
+      if (!rp.exento && rp.bonificadaCiudad) {
+        metodoPlusvalia += `, con la bonificación del ${conPct(formatNumber(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje, 0))} de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+      }
     }
 
     /**
@@ -850,7 +876,9 @@ export default function SimuladorLocalComercialPage() {
       aniosNegativos,
       faltanMeses,
       parCatastralImposible: rp !== null && !rp.exento && rp.parCatastralImposible,
-      plusvaliaPendiente: !plusvaliaResuelta && irpfPublicable,
+      plusvaliaPendiente: rp === null && irpfPublicable,
+      plusvaliaForal: r.plusvaliaForal,
+      deduccionCeutaMelilla: irpfPublicable ? r.g.deduccionCeutaMelilla : 0,
       excesoSobrePrecio,
       exentoPlusvalia,
       comisionInmobiliaria: r.comision,
@@ -894,6 +922,8 @@ export default function SimuladorLocalComercialPage() {
     // Sin perfilVendedor: desde el 26/09/2026 los dos perfiles restan las amortizaciones
     // (hallazgo 2199), así que el perfil ya no mueve ninguna cifra.
     comisionInmobiliaria, gastosGestoriaVenta, amortizacionesAcumuladas,
+    // La comunidad mueve la plusvalía (Ceuta, Melilla y territorio foral) y el IRPF (3059-3071).
+    ccaa,
   ]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
@@ -1084,6 +1114,8 @@ export default function SimuladorLocalComercialPage() {
    * un mínimo (patrón de familia 2, hallazgo 1570).
    */
   const plusvaliaPendiente = resultadosVendedor?.plusvaliaPendiente ?? false;
+  /** Por qué no está la plusvalía: falta un dato, o es foral y aquí no se calcula (3071). */
+  const faltaPlusvalia = resultadosVendedor?.plusvaliaForal ? 'que aquí no se calcula' : 'que falta';
 
   /**
    * Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve, o cuando falta
@@ -1092,7 +1124,7 @@ export default function SimuladorLocalComercialPage() {
    */
   const avisoTarjeta = (v: Veredicto, que: string, cuentaPlusvalia = true): string | null => {
     const pendiente = cuentaPlusvalia && plusvaliaPendiente;
-    const frasePlusvalia = `No resta la plusvalía municipal, que falta, así que ${que} real puede ser menor`;
+    const frasePlusvalia = `No resta la plusvalía municipal, ${faltaPlusvalia}, así que ${que} real puede ser menor`;
     if (v.tipo === 'ninguno') return pendiente ? `${frasePlusvalia}.` : null;
     if (v.tipo === 'mixto' || (pendiente && v.tipo === 'mayor')) {
       const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
@@ -1112,7 +1144,7 @@ export default function SimuladorLocalComercialPage() {
    * mayúscula, como los demás avisos de la redacción común (hallazgo 1577).
    */
   const avisoPerdida = (v: Veredicto): string | null => {
-    const frasePlusvalia = 'No resta la plusvalía municipal, que falta, así que la pérdida real puede ser mayor que esta';
+    const frasePlusvalia = `No resta la plusvalía municipal, ${faltaPlusvalia}, así que la pérdida real puede ser mayor que esta`;
     if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
     if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
       const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
@@ -1129,7 +1161,7 @@ export default function SimuladorLocalComercialPage() {
    * haber. Tenía texto fijo y no miraba el sondeo (patrón 6, hallazgo 1575).
    */
   const avisoCero = (v: Veredicto): string | null => {
-    const frasePlusvalia = 'No resta la plusvalía municipal, que falta: con ella puede haber una pérdida que se compensaría en la declaración';
+    const frasePlusvalia = `No resta la plusvalía municipal, ${faltaPlusvalia}: con ella puede haber una pérdida que se compensaría en la declaración`;
     if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
     if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
       const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
@@ -1884,8 +1916,8 @@ export default function SimuladorLocalComercialPage() {
                           (resultadosVendedor.comisionLegible && resultadosVendedor.gestoriaLegible
                             ? resultadosVendedor.plusvaliaCalculada
                               ? 'Precio de venta − comisión, gestoría y plusvalía municipal'
-                              : 'Precio de venta − comisión y gestoría, sin la plusvalía municipal, que falta'
-                            : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ' (sin la plusvalía municipal, que falta)'}: ${noSePudoLeer([
+                              : `Precio de venta − comisión y gestoría, sin la plusvalía municipal, ${faltaPlusvalia}`
+                            : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ` (sin la plusvalía municipal, ${faltaPlusvalia})`}: ${noSePudoLeer([
                                 ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
                                 ...(resultadosVendedor.gestoriaLegible ? [] : ['la gestoría de la venta']),
                               ])}`) +
@@ -1994,7 +2026,11 @@ export default function SimuladorLocalComercialPage() {
                               ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
                               : resultadosVendedor.gananciaPatrimonial === 0
                                 ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
-                                : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). Un local no tiene exención por reinversión ni por edad.`))
+                                : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). Un local no tiene exención por reinversión ni por edad.${
+                                  resultadosVendedor.deduccionCeutaMelilla > 0
+                                    ? ` Lleva la deducción del ${conPct(formatNumber(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje, 0))} por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos.`
+                                    : ''
+                                }`))
                     }
                   />
 
@@ -2074,6 +2110,7 @@ export default function SimuladorLocalComercialPage() {
                             'El valor catastral del suelo supera al total, y con el recibo del IBI bien leído la plusvalía puede salir más barata por el método real: el neto real puede ser MAYOR que este',
                           );
                         }
+                        if (resultadosVendedor.plusvaliaForal) avisos.push(mayuscula(motivoPlusvaliaForal(ccaa)));
                         if (avisos.length === 0) return 'Precio de venta menos impuestos, comisión y gestoría';
                         const pedir = [
                           camposPendientes.length > 0 ? `Rellena ${enumerarEnEspanol(camposPendientes)}` : null,
@@ -2088,7 +2125,10 @@ export default function SimuladorLocalComercialPage() {
                           resultadosVendedor.parCatastralImposible ? 'revisa los dos valores catastrales del recibo del IBI' : null,
                         ].filter((x): x is string => x !== null);
                         const texto = pedir.join(' y ');
-                        return `${avisos.join('. ')}. ${texto.charAt(0).toUpperCase()}${texto.slice(1)} para obtenerlo.`;
+                        // En territorio foral puede no haber nada que pedir: entonces no hay «para obtenerlo».
+                        return texto
+                          ? `${avisos.join('. ')}. ${texto.charAt(0).toUpperCase()}${texto.slice(1)} para obtenerlo.`
+                          : `${avisos.join('. ')}.`;
                       })()
                     }
                   />

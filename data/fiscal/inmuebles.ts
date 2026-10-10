@@ -239,6 +239,48 @@ export const PLUSVALIA_MUNICIPAL_META = {
 };
 
 /**
+ * Bonificación de la cuota de los impuestos municipales en Ceuta y Melilla, el IIVTNU incluido.
+ *
+ * TRLRHL, art. 159.2 (capítulo «Ceuta y Melilla», BOE-A-2004-4214, texto consolidado, leído el
+ * 08/10/2026): «Las cuotas tributarias correspondientes a los impuestos municipales regulados en
+ * esta ley serán objeto de una bonificación del 50 por ciento». Es otra norma que la bonificación
+ * del ITP y el AJD en las dos ciudades (art. 57 bis TRLITPAJD, `BONIFICACION_CUOTA_CEUTA_MELILLA`
+ * de data/itp-ccaa.ts), aunque coincida el porcentaje.
+ *
+ * Hasta el 10/10/2026 `calcularPlusvaliaMunicipal` no recibía la comunidad y las cuatro apps con
+ * vendedor cobraban la plusvalía entera en Ceuta y Melilla (hallazgos 3060 y 3069). Aplicarla lo
+ * decidió el usuario ese día, con la cita de arriba.
+ */
+export const BONIFICACION_IIVTNU_CEUTA_MELILLA = {
+  porcentaje: 50,
+  fuente: 'TRLRHL (RD Legislativo 2/2004), art. 159.2',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2004-4214#a159',
+  verificado: '2026-10-08',
+};
+
+/**
+ * Deducción del IRPF por rentas obtenidas en Ceuta o Melilla, en lo que toca a la venta de un
+ * inmueble situado allí.
+ *
+ * LIRPF, art. 68.4 (BOE-A-2006-20764, texto consolidado, leído el 08/10/2026): quien reside allí
+ * (1.º a) y quien no (2.º) «se deducirán el 60 por ciento de la parte de la suma de las cuotas
+ * íntegras estatal y autonómica que proporcionalmente corresponda a las rentas […] obtenidas en
+ * Ceuta o Melilla». Lo son, según el 3.º d), «las ganancias patrimoniales que procedan de bienes
+ * inmuebles radicados en Ceuta o Melilla», y la exclusión de los no residentes del 2.º solo
+ * alcanza a las letras a), e) e i). Depende del SITIO del inmueble, no de la residencia.
+ *
+ * Las apps calculan la cuota de la ganancia como si fuera la única renta de la base del ahorro, así
+ * que la parte proporcional es la cuota entera. Hasta el 10/10/2026 no se aplicaba (hallazgos 3059
+ * y 3070); lo decidió el usuario ese día, con la cita de arriba.
+ */
+export const DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA = {
+  porcentaje: 60,
+  fuente: 'Ley 35/2006 del IRPF, art. 68.4 (1.º a, 2.º y 3.º d)',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a68',
+  verificado: '2026-10-08',
+};
+
+/**
  * Plazo de autoliquidación del ITP y AJD.
  *
  * ── De dónde sale (11/09/2026, hallazgo 713 del Inspector) ───────────────────

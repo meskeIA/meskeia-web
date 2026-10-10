@@ -7,7 +7,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, Resu
 } from '@/components';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -41,6 +41,7 @@ import {
   FACTURA_NOTARIAL,
   REGISTRO_CONCEPTOS,
   sumarLineasVisibles, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL, avisoIrpfForalResidente,
+  TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION,
   BONIFICACION_CUOTA_CEUTA_MELILLA } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
@@ -317,6 +318,10 @@ interface ResultadosVendedor {
   irpfGanancia: number;
   /** false mientras falte el precio de compra: entonces el 0 no es una exención */
   irpfCalculado: boolean;
+  /** Vende su vivienda habitual en territorio foral: el IRPF no se calcula (3072). */
+  irpfForal: boolean;
+  /** Deducción del 60 % del art. 68.4 LIRPF ya restada del IRPF (Ceuta y Melilla). */
+  deduccionCeutaMelilla: number;
   exentoIRPF: boolean;
   /** La exención del art. 33.4.b LIRPF es por dependencia severa o gran dependencia, no por edad */
   exentoPorDependencia: boolean;
@@ -361,6 +366,8 @@ interface ResultadosVendedor {
    * MÁXIMO (patrón de familia 2).
    */
   plusvaliaPendiente: boolean;
+  /** País Vasco o Navarra: la plusvalía es foral y no se calcula (3071). */
+  plusvaliaForal: boolean;
   /**
    * Los importes cuyo TEXTO el parser no ha podido leer (hallazgo 1190, ALTO).
    *
@@ -436,6 +443,14 @@ interface EntradaVendedor {
   exentoPorEdad: boolean;
   /** undefined si no hay reinversión que aplicar (casilla sin marcar, no habitual o exento) */
   reinversion: { importeReinvertido: number; principalPendiente: number } | undefined;
+  /** Dónde está el inmueble: Ceuta y Melilla bonifican la plusvalía y deducen el IRPF; en
+   *  territorio foral la plusvalía no es la del TRLRHL (hallazgos 3069-3071, 10/10/2026). */
+  ccaa: ComunidadAutonoma;
+  /**
+   * Vende su vivienda habitual en el País Vasco o en Navarra, así que reside allí y su IRPF es
+   * foral: la cuota de la escala estatal no es la suya y no se publica (3072, 10/10/2026).
+   */
+  irpfForal: boolean;
 }
 
 /**
@@ -456,7 +471,10 @@ function calcularVendedor(e: EntradaVendedor) {
   const sinIncremento = e.precioC > 0 && e.precioV <= e.precioC;
   /** Con años = 0 hacen falta además los meses completos, para prorratear el coeficiente (1560). */
   const periodoCompleto = Number.isFinite(e.anios) && (e.anios >= 1 || e.meses !== undefined);
-  const plusvaliaCalculable = e.precioC > 0 && (sinIncremento || (e.valorSuelo > 0 && periodoCompleto));
+  // En el País Vasco y Navarra la plusvalía es foral: no se liquida con el TRLRHL (3071).
+  const plusvaliaForal = TERRITORIOS_IIVTNU_FORAL.includes(e.ccaa);
+  const plusvaliaCalculable =
+    !plusvaliaForal && e.precioC > 0 && (sinIncremento || (e.valorSuelo > 0 && periodoCompleto));
   const resultadoPlusvalia = plusvaliaCalculable
     ? calcularPlusvaliaMunicipal({
         // Sin incremento el suelo y los años no intervienen (sale no sujeta): se pasan a 0.
@@ -466,6 +484,8 @@ function calcularVendedor(e: EntradaVendedor) {
         precioCompra: e.precioC,
         precioVenta: e.precioV,
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
+        // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL; hallazgo 3069).
+        ccaa: e.ccaa,
       })
     : null;
   const plusvalia = resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0;
@@ -483,11 +503,14 @@ function calcularVendedor(e: EntradaVendedor) {
     plusvaliaMunicipal: plusvalia,
     exentoPorEdad: e.exentoPorEdad,
     reinversion: e.reinversion,
+    // Ceuta y Melilla: la deducción del 60 % del art. 68.4 LIRPF (hallazgo 3070).
+    inmuebleEnCeutaMelilla: CIUDADES_CON_BONIFICACION.includes(e.ccaa),
   });
   // Sin precio de compra no hay ganancia que calcular: el IRPF queda a 0, pero ese 0 NO es
   // una exención, es un dato que falta (hallazgo 428).
   const hayDatosGanancia = e.precioC > 0;
-  const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
+  // Con el IRPF foral no se publica la cuota de la escala estatal (3072).
+  const irpf = hayDatosGanancia && !e.irpfForal ? g.cuotaIRPF : 0;
   const totalGastos = sumarLineasVisibles(plusvalia, comision, e.otrosVenta, irpf);
   /** El valor de transmisión SIN restar la plusvalía, contra el de adquisición (receta 6). */
   const gananciaSinPlusvalia = hayDatosGanancia
@@ -495,6 +518,7 @@ function calcularVendedor(e: EntradaVendedor) {
     : 0;
   return {
     comision,
+    plusvaliaForal,
     gananciaSinPlusvalia,
     resultadoPlusvalia,
     plusvalia,
@@ -538,6 +562,9 @@ const EJEMPLO_ANA_CALCULO = calcularVendedor({
   mejoras: 0,
   exentoPorEdad: false,
   reinversion: undefined,
+  // El caso de Ana no dice dónde está la vivienda: ni Ceuta, ni Melilla, ni territorio foral.
+  ccaa: 'madrid',
+  irpfForal: false,
 });
 
 // ===== CONSTANTES =====
@@ -953,12 +980,14 @@ export default function SimuladorCompraventaPage() {
             principalPendiente: Math.max(0, parseSpanishNumberOr(hipotecaPendiente)),
           }
         : undefined,
+      ccaa,
+      irpfForal: esViviendaHabitual && TERRITORIOS_IIVTNU_FORAL.includes(ccaa),
     };
     const r = calcularVendedor(entrada);
     const rp = r.resultadoPlusvalia;
     const plusvaliaCalculada = rp !== null;
     const exentoPlusvalia = rp ? rp.exento : false;
-    let metodoPlusvalia = 'No calculada';
+    let metodoPlusvalia = r.plusvaliaForal ? `No calculada: ${motivoPlusvaliaForal(ccaa)}` : 'No calculada';
     if (rp) {
       metodoPlusvalia = rp.exento
         ? 'No sujeta (sin incremento de valor)'
@@ -973,12 +1002,16 @@ export default function SimuladorCompraventaPage() {
             : rp.metodoReal < rp.metodoObjetivo
               ? 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
+      if (!rp.exento && rp.bonificadaCiudad) {
+        metodoPlusvalia += `, con la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+      }
     }
 
     // Escrito pero ilegible no es «falta» (hallazgo 1231): se nombra aparte. Y con la plusvalía
     // ya resuelta (sin incremento no hace falta el suelo ni los años, patrón 4) esos dos campos
     // no bloquean nada: nombrarlos marcaría «(PARCIAL)» un neto que es definitivo.
-    const plusvaliaResuelta = rp !== null;
+    // En territorio foral el suelo y los años no desbloquean nada: no se piden (3071).
+    const plusvaliaResuelta = rp !== null || r.plusvaliaForal;
     const ilegibleTexto = (t: string) => escritoIlegible(t, parseSpanishNumber);
     const camposIlegibles = [
       !plusvaliaResuelta && ilegibleTexto(valorCatastralSuelo) ? 'el valor catastral del suelo' : null,
@@ -1076,7 +1109,9 @@ export default function SimuladorCompraventaPage() {
       sinGananciaNiPerdida: hayDatosGanancia && g.sinGananciaNiPerdida,
       baseImponibleIRPF: hayDatosGanancia ? g.baseImponible : 0,
       irpfGanancia: r.irpf,
-      irpfCalculado: hayDatosGanancia,
+      irpfCalculado: hayDatosGanancia && !entrada.irpfForal,
+      irpfForal: hayDatosGanancia && entrada.irpfForal,
+      deduccionCeutaMelilla: hayDatosGanancia && !entrada.irpfForal ? r.g.deduccionCeutaMelilla : 0,
       exentoIRPF,
       exentoPorDependencia: exentoIRPF && !vendedorMayor65,
       exencionBloqueada41bis: pideExencion && !plazoResidenciaCumplido,
@@ -1095,7 +1130,8 @@ export default function SimuladorCompraventaPage() {
       faltaAnios: !plusvaliaResuelta && !aniosDisponibles && !aniosNegativo,
       aniosNegativos: !plusvaliaResuelta && aniosNegativo,
       faltanMeses: !plusvaliaResuelta && aniosDisponibles && anios === 0 && meses === undefined,
-      plusvaliaPendiente: !plusvaliaResuelta && hayDatosGanancia,
+      plusvaliaPendiente: rp === null && hayDatosGanancia,
+      plusvaliaForal: r.plusvaliaForal,
       comisionLegible,
       otrosVentaLegible,
       gastosAdquisicionLegible,
@@ -1116,7 +1152,7 @@ export default function SimuladorCompraventaPage() {
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioVenta, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble]);
+  }, [precioVenta, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble]);
 
   /**
    * En Canarias, Ceuta y Melilla la obra nueva no pagó IVA sino IGIC o IPSI, que esta app no
@@ -1326,6 +1362,8 @@ export default function SimuladorCompraventaPage() {
    * un mínimo (patrón de familia 2, hallazgos 1546, 1562 y 1570).
    */
   const plusvaliaPendiente = resultadosVendedor?.plusvaliaPendiente ?? false;
+  /** Por qué no está la plusvalía: falta un dato, o es foral y aquí no se calcula (3071). */
+  const faltaPlusvalia = resultadosVendedor?.plusvaliaForal ? 'que aquí no se calcula' : 'que falta';
   /**
    * La comisión escrita por encima del 100 % tampoco resta del valor de transmisión (queda fuera
    * del cálculo, hallazgo 2186), así que la ganancia y el IRPF son un MÁXIMO por el mismo motivo
@@ -1336,7 +1374,7 @@ export default function SimuladorCompraventaPage() {
     !!resultadosVendedor && resultadosVendedor.comisionImposible && resultadosVendedor.irpfCalculado;
   const restaPendiente = plusvaliaPendiente || comisionPendiente;
   const noRestaQue = [
-    plusvaliaPendiente ? 'la plusvalía municipal, que falta' : null,
+    plusvaliaPendiente ? `la plusvalía municipal, ${faltaPlusvalia}` : null,
     comisionPendiente ? 'la comisión inmobiliaria, que no es válida' : null,
   ].filter((x): x is string => x !== null);
   /** «No resta la plusvalía municipal, que falta, ni la comisión inmobiliaria, que no es válida» */
@@ -2406,7 +2444,9 @@ export default function SimuladorCompraventaPage() {
                     }
                     icon="🏛️"
                     description={
-                      resultadosVendedor.plusvaliaCalculada
+                      resultadosVendedor.plusvaliaForal
+                        ? `${resultadosVendedor.metodoPlusvalia}. Este impuesto NO está incluido en el neto de abajo.`
+                        : resultadosVendedor.plusvaliaCalculada
                         ? resultadosVendedor.metodoPlusvalia
                         : `${[
                             camposQueFaltan.length > 0 ? faltaOFaltan(camposQueFaltan) : null,
@@ -2454,12 +2494,12 @@ export default function SimuladorCompraventaPage() {
                       description={
                         resultadosVendedor.comisionImposible
                           ? // La comisión por encima del 100 % no entra (hallazgo 2186): no se resta.
-                            `Precio de venta − otros gastos de la venta${resultadosVendedor.plusvaliaCalculada ? ' y plusvalía municipal' : ' (sin la plusvalía municipal, que falta)'}, sin la comisión, que no es válida${resultadosVendedor.otrosVentaLegible ? '' : `: ${noSePudoLeer(['los otros gastos de la venta'])}`}`
+                            `Precio de venta − otros gastos de la venta${resultadosVendedor.plusvaliaCalculada ? ' y plusvalía municipal' : ` (sin la plusvalía municipal, ${faltaPlusvalia})`}, sin la comisión, que no es válida${resultadosVendedor.otrosVentaLegible ? '' : `: ${noSePudoLeer(['los otros gastos de la venta'])}`}`
                           : resultadosVendedor.comisionLegible && resultadosVendedor.otrosVentaLegible
                           ? resultadosVendedor.plusvaliaCalculada
                             ? 'Precio de venta − comisión, otros gastos de la venta y plusvalía municipal'
-                            : 'Precio de venta − comisión y otros gastos de la venta, sin la plusvalía municipal, que falta'
-                          : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ' (sin la plusvalía municipal, que falta)'}: ${noSePudoLeer([
+                            : `Precio de venta − comisión y otros gastos de la venta, sin la plusvalía municipal, ${faltaPlusvalia}`
+                          : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ` (sin la plusvalía municipal, ${faltaPlusvalia})`}: ${noSePudoLeer([
                               ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
                               ...(resultadosVendedor.otrosVentaLegible ? [] : ['los otros gastos de la venta']),
                             ])}`
@@ -2548,7 +2588,9 @@ export default function SimuladorCompraventaPage() {
                     icon="💸"
                     description={
                       !resultadosVendedor.irpfCalculado
-                        ? resultadosVendedor.camposIlegibles.includes('el precio de compra original')
+                        ? resultadosVendedor.irpfForal
+                          ? `${avisoIrpfForalResidente(ccaa, esViviendaHabitual)}. Este impuesto NO está incluido en el neto de abajo.`
+                          : resultadosVendedor.camposIlegibles.includes('el precio de compra original')
                           ? 'El precio de compra original no se ha podido leer: escríbelo con coma decimal (1.234,56). Este impuesto NO está incluido en el neto de abajo.'
                           : resultadosVendedor.precioCompraNoValido
                             ? `${mayuscula(AVISO_PRECIO_COMPRA_NO_VALIDO)}: corrígelo. Este impuesto NO está incluido en el neto de abajo.`
@@ -2574,8 +2616,10 @@ export default function SimuladorCompraventaPage() {
                                       : 'Tributación en base del ahorro'),
                             // El plazo del art. 41 bis.1 RIRPF, dicho junto a la cuota que lo aplica (2182).
                             resultadosVendedor.gananciaPatrimonial > 0 ? aviso41bis : null,
-                            // Vende su vivienda habitual allí, luego reside allí: su IRPF es foral (3072).
-                            resultadosVendedor.gananciaPatrimonial > 0 ? avisoIrpfForalResidente(ccaa, esViviendaHabitual) : null,
+                            // Ceuta y Melilla: la deducción del art. 68.4 LIRPF, dicha junto a la cuota (3070).
+                            resultadosVendedor.deduccionCeutaMelilla > 0
+                              ? `Lleva la deducción del ${DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje}\u00A0% por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos`
+                              : null,
                           ]
                             .filter((x): x is string => !!x)
                             .reduce((texto, frase) => (texto ? `${texto}${texto.endsWith('.') ? '' : '.'} ${frase}` : frase), '')
@@ -2682,6 +2726,8 @@ export default function SimuladorCompraventaPage() {
                             'El valor catastral del suelo supera al total, y con el recibo del IBI bien leído la plusvalía puede salir más barata por el método real: el neto real puede ser MAYOR que este',
                           );
                         }
+                        if (resultadosVendedor.plusvaliaForal) avisos.push(mayuscula(motivoPlusvaliaForal(ccaa)));
+                        if (resultadosVendedor.irpfForal) avisos.push(avisoIrpfForalResidente(ccaa, esViviendaHabitual) ?? '');
                         if (avisos.length === 0) return 'Lo que realmente recibes';
                         const rellenar = camposQueFaltan.filter((c) => c !== 'los meses completos desde la compra');
                         const pedir = [
@@ -2702,7 +2748,8 @@ export default function SimuladorCompraventaPage() {
                           resultadosVendedor.parCatastralImposible ? 'revisa los dos valores catastrales del recibo del IBI' : null,
                         ].filter((x): x is string => x !== null);
                         const texto = pedir.join(' y ');
-                        return `${avisos.join('. ')}. ${mayuscula(texto)} para obtenerlo.`;
+                        // En territorio foral puede no haber nada que pedir: entonces no hay «para obtenerlo».
+                        return texto ? `${avisos.join('. ')}. ${mayuscula(texto)} para obtenerlo.` : `${avisos.join('. ')}.`;
                       })()
                     }
                   />

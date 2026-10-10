@@ -43,7 +43,7 @@
 
 // ===== TIPOS =====
 
-import { coeficienteIIVTNU, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025 } from '@/data/fiscal';
+import { coeficienteIIVTNU, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025, BONIFICACION_IIVTNU_CEUTA_MELILLA } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
 /**
@@ -1461,17 +1461,39 @@ export const TERRITORIOS_SIN_RENUNCIA: readonly ComunidadAutonoma[] = ['ceuta', 
  */
 export const TERRITORIOS_IRPF_FORAL: readonly ComunidadAutonoma[] = ['pais-vasco', 'navarra'];
 
+/**
+ * Dónde la plusvalía municipal no es la del TRLRHL: su art. 1.2 (leído en el BOE el 10/10/2026) se
+ * aplica «sin perjuicio de los regímenes financieros forales de los Territorios Históricos del País
+ * Vasco y Navarra». Allí el IIVTNU lo regulan la Ley Foral 2/1995 de Haciendas Locales de Navarra
+ * y las normas forales de cada territorio histórico, con coeficientes propios.
+ *
+ * Las apps NO la liquidan allí con los coeficientes del art. 107.4 TRLRHL, y lo dicen: en Navarra
+ * la cuota salía 4,8 veces por debajo (hallazgo 3071). Mejor sin cifra que con una que no es la
+ * del contribuyente, como el IGIC; lo decidió el usuario el 10/10/2026.
+ */
+export const TERRITORIOS_IIVTNU_FORAL: readonly ComunidadAutonoma[] = ['pais-vasco', 'navarra'];
+
+/** El porqué de una plusvalía sin calcular en territorio foral, para encajar tras «No calculada: ». */
+export function motivoPlusvaliaForal(ccaa: ComunidadAutonoma): string {
+  const norma = ccaa === 'navarra'
+    ? 'la Ley Foral 2/1995 de Haciendas Locales de Navarra'
+    : 'la norma foral de cada territorio histórico (Álava, Bizkaia o Gipuzkoa)';
+  return `en ${nombreEnFrase(ccaa)} la plusvalía municipal se rige por ${norma}, que esta herramienta no aplica`;
+}
+
 /** Para el sello del IRPF de las apps con vendedor, que no saben dónde reside. */
 export const AVISO_IRPF_FORAL =
   'Es la escala estatal: si resides en el País Vasco o en Navarra, tu IRPF es foral y se liquida con su propia escala, que esta herramienta no aplica.';
 
 /**
  * Para la tarjeta del IRPF cuando la app SÍ sabe que el vendedor reside allí: vende su vivienda
- * habitual en el País Vasco o en Navarra. Fuera de ese caso, `null`.
+ * habitual en el País Vasco o en Navarra. Va EN LUGAR de la cuota, no debajo: la de la escala
+ * estatal no es la suya, y un aviso bajo una cifra que el usuario se lleva no lo protege (3072;
+ * decisión del usuario del 10/10/2026). Fuera de ese caso, `null`.
  */
 export function avisoIrpfForalResidente(ccaa: ComunidadAutonoma, viviendaHabitual: boolean): string | null {
   if (!viviendaHabitual || !TERRITORIOS_IRPF_FORAL.includes(ccaa)) return null;
-  return `Vendes tu vivienda habitual en ${nombreEnFrase(ccaa)}, así que resides allí: tu IRPF es foral y se liquida con su propia escala, no con esta estatal, de modo que la cuota real será distinta`;
+  return `Vendes tu vivienda habitual en ${nombreEnFrase(ccaa)}, así que resides allí: tu IRPF es foral y se liquida con su propia escala, que esta herramienta no aplica`;
 }
 
 /** IVA general que se repercute en las facturas de notaría y registro (art. 90.Uno Ley 37/1992). */
@@ -1804,6 +1826,12 @@ export interface DatosPlusvalia {
    */
   mesesCompletos?: number;
   tipoMaximo?: number; // Por defecto el tipo orientativo (25%); el máximo legal es 30%
+  /**
+   * Dónde está el inmueble. En Ceuta y Melilla la cuota lleva la bonificación del 50 % del art.
+   * 159.2 TRLRHL (`BONIFICACION_IIVTNU_CEUTA_MELILLA`; hallazgos 3060 y 3069, 10/10/2026). Sin
+   * ella, la cuota sin bonificar.
+   */
+  ccaa?: ComunidadAutonoma;
 }
 
 /**
@@ -1831,6 +1859,8 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
    * un TECHO (hallazgo 1560). La app que lo publique tiene que decirlo.
    */
   cotaSuperior: boolean;
+  /** Se ha aplicado la bonificación de Ceuta y Melilla a la cuota (art. 159.2 TRLRHL). */
+  bonificadaCiudad: boolean;
 } {
   const {
     valorCatastralSuelo,
@@ -1853,8 +1883,11 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   const { coeficiente, cotaSuperior } = coeficienteIIVTNU(aniosPropiedad, mesesCompletos);
 
   // Método objetivo (art. 107.4 TRLHL)
+  // La bonificación es de la CUOTA, así que alcanza a los dos métodos por igual (art. 159.2 TRLRHL).
+  const bonificadaCiudad = datos.ccaa !== undefined && CIUDADES_CON_BONIFICACION.includes(datos.ccaa);
+  const factorCuota = bonificadaCiudad ? 1 - BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje / 100 : 1;
   const baseObjetivo = valorCatastralSuelo * coeficiente;
-  const metodoObjetivo = baseObjetivo * (tipoMaximo / 100);
+  const metodoObjetivo = baseObjetivo * (tipoMaximo / 100) * factorCuota;
 
   // No sujeción cuando no hay incremento de valor (art. 104.5 TRLHL)
   const incrementoReal = precioVenta - precioCompra;
@@ -1878,7 +1911,9 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   const proporcionSuelo = metodoRealDisponible
     ? Math.min(1, valorCatastralSuelo / (valorCatastralTotal as number))
     : 0;
-  const metodoReal = metodoRealDisponible ? Math.max(0, incrementoReal * proporcionSuelo * (tipoMaximo / 100)) : 0;
+  const metodoReal = metodoRealDisponible
+    ? Math.max(0, incrementoReal * proporcionSuelo * (tipoMaximo / 100) * factorCuota)
+    : 0;
 
   // El contribuyente puede elegir el método más favorable
   const recomendado = exento
@@ -1896,6 +1931,7 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
     exento,
     coeficiente,
     cotaSuperior,
+    bonificadaCiudad,
   };
 }
 

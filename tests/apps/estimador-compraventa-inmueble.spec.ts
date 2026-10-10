@@ -8460,7 +8460,7 @@ test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
 
   /**
-   * HALLAZGO [alto, calculo] — ABIERTO (08/10/2026). CASO 71 (límite: régimen especial). La
+   * HALLAZGO [alto, calculo] — ✅ REPARADO el 10/10/2026 (3069, decisión del usuario con la cita del art. 159.2 TRLRHL). CASO 71 (límite: régimen especial). La
    * plusvalía municipal de un inmueble en Ceuta o Melilla no lleva la bonificación del 50 % del art.
    * 159.2 TRLRHL. `calcularPlusvaliaMunicipal` (data/itp-ccaa.ts) no recibe la comunidad, así que
    * alcanza a toda pestaña Vendedor de la familia; el motor sí aplica la bonificación «por el SITIO»
@@ -8469,18 +8469,22 @@ test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales
    * Vendedor A en Ceuta → esperado 40.000 × 0,12 × 25 % × 50 % = 600,00 € · obtenido 1200,00 €. Igual
    * en Melilla.
    */
-  test.fail('HALLAZGO IIVTNU en Ceuta y Melilla — la cuota lleva la bonificación del 50 % (art. 159.2 TRLRHL)', async ({
+  test('HALLAZGO IIVTNU en Ceuta y Melilla — la cuota lleva la bonificación del 50 % (art. 159.2 TRLRHL)', async ({
     page,
   }) => {
     test.setTimeout(60_000);
     await montarVendedorA(page, 'ceuta');
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('600,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toMatch(/bonificación del 50\s% de la cuota de Ceuta y Melilla \(art\. 159\.2 TRLRHL\)/);
     await page.locator('#ccaa-inmueble').selectOption('melilla');
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('600,00 €');
+    // Control: fuera de las dos ciudades, la cuota entera.
+    await page.locator('#ccaa-inmueble').selectOption('madrid');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1200,00 €');
   });
 
   /**
-   * HALLAZGO [alto, calculo] — ABIERTO (08/10/2026). CASO 71. El IRPF de la ganancia de un inmueble
+   * HALLAZGO [alto, calculo] — ✅ REPARADO el 10/10/2026 (3070, decisión del usuario con la cita del art. 68.4 LIRPF). CASO 71. El IRPF de la ganancia de un inmueble
    * radicado en Ceuta o Melilla no lleva la deducción del 60 % del art. 68.4 LIRPF, que vale para
    * residentes (1.º.a) y no residentes (2.º) por la letra d) del 3.º: depende del SITIO, que la app
    * ya conoce. Vendedor A en Ceuta, con la plusvalía que la app publica (1.200): ganancia 42.800 →
@@ -8489,18 +8493,19 @@ test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales
    * 8868,00 € y neto 183.932,00 € «Lo que realmente recibes» (esperado, con las dos: 200.000 − 600 −
    * 6.000 − 3.597,60 = 189.802,40 €).
    */
-  test.fail('HALLAZGO IRPF en Ceuta y Melilla — la ganancia de un inmueble radicado allí lleva la deducción del 60 % (art. 68.4 LIRPF)', async ({
+  test('HALLAZGO IRPF en Ceuta y Melilla — la ganancia de un inmueble radicado allí lleva la deducción del 60 % (art. 68.4 LIRPF)', async ({
     page,
   }) => {
     test.setTimeout(60_000);
     await montarVendedorA(page, 'ceuta');
-    const irpf = euros(await valorTarjeta(page, /^IRPF sobre ganancia/));
-    expect(irpf).toBeGreaterThanOrEqual(3547.2 - 0.005);
-    expect(irpf).toBeLessThanOrEqual(3597.6 + 0.005);
+    // Reparadas las dos (plusvalía 600 y deducción del 60 %): la cifra exacta de la ficha.
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('3597,60 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toMatch(/deducción del 60\s% por rentas obtenidas en Ceuta o Melilla \(art\. 68\.4 LIRPF\): 5396,40 € menos/);
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('189.802,40 €');
   });
 
   /**
-   * HALLAZGO [alto, calculo] — ABIERTO (08/10/2026), sospecha (b). En Navarra y el País Vasco el
+   * HALLAZGO [alto, calculo] — ✅ REPARADO el 10/10/2026 (3071): por decisión del usuario, en territorio foral la plusvalía no se calcula y se dice por qué, como el IGIC. Sospecha (b). En Navarra y el País Vasco el
    * IIVTNU no se rige por el TRLRHL (art. 1.2) sino por la norma foral (Convenio arts. 48-49;
    * Concierto art. 42), y la app lo liquida con los coeficientes del art. 107.4 TRLRHL. Navarra es
    * calculable desde el BOE: Ley Foral 2/1995, art. 175.2 (10 años = 0,58) y art. 176.2 (máx. 25 %).
@@ -8510,7 +8515,7 @@ test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales
    * realmente recibes», idénticos a Madrid. País Vasco: misma forma (Normas Forales del IIVTNU de cada
    * territorio, sin texto consolidado en el BOE): se pide al menos que lo nombre.
    */
-  test.fail('HALLAZGO IIVTNU foral — Navarra y el País Vasco no liquidan con los coeficientes del art. 107.4 TRLRHL', async ({
+  test('HALLAZGO IIVTNU foral — Navarra y el País Vasco no liquidan con los coeficientes del art. 107.4 TRLRHL', async ({
     page,
   }) => {
     test.setTimeout(60_000);
@@ -8523,6 +8528,12 @@ test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales
     const valorPV = await valorTarjeta(page, 'Plusvalía municipal');
     const descPV = await descripcionTarjeta(page, 'Plusvalía municipal');
     expect(`${valorPV} ${descPV}`).toMatch(/foral/i);
+    // Sin cifra: el neto es parcial y no pide rellenar un suelo que ya está escrito.
+    expect(valorPV).toBe('Sin calcular');
+    const neto = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
+    expect(neto).toContain('No descuenta');
+    expect(neto).toContain('la plusvalía municipal se rige por la norma foral');
+    expect(neto).not.toContain('Rellena el valor catastral del suelo');
   });
 
   /**

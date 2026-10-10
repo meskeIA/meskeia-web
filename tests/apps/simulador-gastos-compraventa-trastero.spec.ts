@@ -6571,3 +6571,32 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
     expect(await valorTarjeta(page, /^ITP \(/)).toBe('12.800,00 €');
   });
 });
+
+/**
+ * REPARACIÓN DEL 10/10/2026 — Ceuta, Melilla y territorio foral en la pestaña Vendedor.
+ *
+ * Por decisión del usuario sobre los hallazgos 3059/3060 y 3069-3071 (local y la referencia), que
+ * alcanzaban a esta app por el motor común. BASE_0810 trasladada a cada comunidad.
+ */
+test.describe('Reparación 10/10/2026 — Ceuta, Melilla y la plusvalía foral', () => {
+  test('Ceuta: plusvalía bonificada al 50 % e IRPF con la deducción del 60 %', async ({ page }) => {
+    // A mano: objetivo 5.200 × 0,09 × 25 % = 117 → 58,50 (el real, 11.500 × 0,4 × 25 % = 1.150 →
+    // 575, es mayor). Transmisión 27.500 − 1.100 − 220 − 58,50 = 26.121,50; adquisición 17.400;
+    // ganancia 8.721,50; cuota 1.140 + 2.721,50 × 21 % = 1.711,515; × 40 % = 684,61.
+    await vendedor0810(page, { ...BASE_0810, ccaa: 'ceuta' });
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('58,50 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toMatch(/bonificación del 50\s% de la cuota de Ceuta y Melilla/);
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('684,61 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(/deducción del 60\s% por rentas obtenidas en Ceuta o Melilla/);
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('25.436,89 €');
+  });
+
+  test('Navarra: la plusvalía es foral, no se calcula y el neto no pide rellenar el suelo', async ({ page }) => {
+    await vendedor0810(page, { ...BASE_0810, ccaa: 'navarra' });
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('Ley Foral 2/1995 de Haciendas Locales de Navarra');
+    const neto = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
+    expect(neto).toContain('No descuenta la plusvalía municipal');
+    expect(neto).not.toMatch(/[Rr]ellena/);
+  });
+});

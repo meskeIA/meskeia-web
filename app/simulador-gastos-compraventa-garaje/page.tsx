@@ -43,7 +43,7 @@ const AVISO_BASE_AJD =
 /** La salvedad del AJD detrás de un texto, con o sin punto final, solo si hay AJD. */
 const conAvisoBaseAjd = (texto: string, ajd: number): string =>
   ajd > 0 ? `${texto}${texto.endsWith('.') ? '' : '.'} ${AVISO_BASE_AJD}` : texto;
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -73,7 +73,8 @@ import {
   sumarLineasVisibles,
   CASOS_ESCRITURAR,
   preguntaEscriturar,
-  respuestaEscriturar, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL } from '@/data/itp-ccaa';
+  respuestaEscriturar, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL,
+  TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
   RESPUESTA_ITP_GARAJE_SEGUNDA_MANO,
@@ -214,6 +215,10 @@ interface ResultadosVendedor {
    * transmisión (art. 35.1 LIRPF), así que la ganancia y el IRPF son un MÁXIMO (patrón 2, 1546).
    */
   plusvaliaPendiente: boolean;
+  /** País Vasco o Navarra: la plusvalía es foral y no se calcula (3071). */
+  plusvaliaForal: boolean;
+  /** Deducción del 60 % del art. 68.4 LIRPF ya restada del IRPF (Ceuta y Melilla). */
+  deduccionCeutaMelilla: number;
   exentoPlusvalia: boolean;
   comisionInmobiliaria: number;
   gastosGestoria: number;
@@ -331,6 +336,9 @@ interface EntradaVendedor {
    * dato imposible (patrón 5 de la familia, hallazgo 2191). Se nombran como pendientes.
    */
   sinGanancia?: boolean;
+  /** Dónde está el inmueble: Ceuta y Melilla bonifican la plusvalía y deducen el IRPF; en
+   *  territorio foral la plusvalía no es la del TRLRHL (hallazgos 3059-3071, 10/10/2026). */
+  ccaa: ComunidadAutonoma;
 }
 
 /**
@@ -349,7 +357,10 @@ function calcularVendedor(e: EntradaVendedor) {
   const sinIncremento = e.precioC > 0 && e.precioV <= e.precioC;
   /** Con años = 0 hacen falta además los meses completos, para prorratear el coeficiente (1560). */
   const periodoCompleto = Number.isFinite(e.anios) && (e.anios >= 1 || e.meses !== undefined);
-  const plusvaliaCalculable = e.precioC > 0 && (sinIncremento || (e.valorSuelo > 0 && periodoCompleto));
+  // En el País Vasco y Navarra la plusvalía es foral: no se liquida con el TRLRHL (3071).
+  const plusvaliaForal = TERRITORIOS_IIVTNU_FORAL.includes(e.ccaa);
+  const plusvaliaCalculable =
+    !plusvaliaForal && e.precioC > 0 && (sinIncremento || (e.valorSuelo > 0 && periodoCompleto));
   const resultadoPlusvalia = plusvaliaCalculable
     ? calcularPlusvaliaMunicipal({
         // Sin incremento el suelo y los años no intervienen (sale no sujeta): se pasan a 0.
@@ -359,6 +370,8 @@ function calcularVendedor(e: EntradaVendedor) {
         precioCompra: e.precioC,
         precioVenta: e.precioV,
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
+        // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL).
+        ccaa: e.ccaa,
       })
     : null;
   const plusvalia = resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0;
@@ -372,12 +385,15 @@ function calcularVendedor(e: EntradaVendedor) {
     gastosAdquisicion: e.gastosAdquisicion,
     gastosTransmision: comision + e.gestoria,
     plusvaliaMunicipal: plusvalia,
+    // Ceuta y Melilla: la deducción del 60 % del art. 68.4 LIRPF, resida donde resida el vendedor.
+    inmuebleEnCeutaMelilla: CIUDADES_CON_BONIFICACION.includes(e.ccaa),
   });
   const hayDatosGanancia = e.precioC > 0 && !e.sinGanancia;
   const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
   const totalGastos = sumarLineasVisibles(plusvalia, comision, e.gestoria, irpf);
   return {
     comision,
+    plusvaliaForal,
     resultadoPlusvalia,
     plusvalia,
     g,
@@ -604,6 +620,7 @@ export default function SimuladorGarajeCompraventaPage() {
       gestoria: Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta)),
       gastosAdquisicion: Math.max(0, parseSpanishNumberOr(gastosAdquisicion)),
       sinGanancia: comisionImposible,
+      ccaa,
     };
     const r = calcularVendedor(entrada);
     /**
@@ -631,7 +648,8 @@ export default function SimuladorGarajeCompraventaPage() {
      * Con la plusvalía ya resuelta (sin incremento no hace falta el suelo ni los años, patrón 4)
      * esos dos campos no bloquean nada: nombrarlos marcaría «(PARCIAL)» un neto definitivo.
      */
-    const plusvaliaResuelta = rp !== null;
+    // En territorio foral el suelo y los años no desbloquean nada: no se piden (3071).
+    const plusvaliaResuelta = rp !== null || r.plusvaliaForal;
     // Un suelo escrito como 0 (o negativo con el foco dentro) tampoco «falta»: no vale (patrón 5).
     const sueloNoValido = !plusvaliaResuelta && escritoNoValido(valorCatastralSuelo, parseSpanishNumber);
     // Un año negativo no «falta»: está escrito, se lee y es imposible (patrón 5, hallazgo 1552).
@@ -658,7 +676,9 @@ export default function SimuladorGarajeCompraventaPage() {
       sueloNoValido ? 'el valor catastral del suelo tiene que ser mayor que 0' : null,
     ].filter((x): x is string => x !== null).join('; ');
 
-    let metodoPlusvalia = `No calculada (${porQueNoSeCalcula})`;
+    let metodoPlusvalia = r.plusvaliaForal
+      ? `No calculada: ${motivoPlusvaliaForal(ccaa)}`
+      : `No calculada (${porQueNoSeCalcula})`;
     const exentoPlusvalia = rp ? rp.exento : false;
     if (rp) {
       metodoPlusvalia = rp.exento
@@ -674,6 +694,9 @@ export default function SimuladorGarajeCompraventaPage() {
             : rp.metodoReal < rp.metodoObjetivo
               ? 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
+    }
+    if (rp && !rp.exento && rp.bonificadaCiudad) {
+      metodoPlusvalia += `, con la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
     }
 
     /**
@@ -745,7 +768,9 @@ export default function SimuladorGarajeCompraventaPage() {
       gananciaPosibleSinPlusvalia,
       faltanMeses,
       parCatastralImposible: rp !== null && !rp.exento && rp.parCatastralImposible,
-      plusvaliaPendiente: !plusvaliaResuelta && r.hayDatosGanancia,
+      plusvaliaPendiente: rp === null && r.hayDatosGanancia,
+      plusvaliaForal: r.plusvaliaForal,
+      deduccionCeutaMelilla: r.hayDatosGanancia ? r.g.deduccionCeutaMelilla : 0,
       exentoPlusvalia,
       comisionInmobiliaria: r.comision,
       gastosGestoria: entrada.gestoria,
@@ -768,7 +793,7 @@ export default function SimuladorGarajeCompraventaPage() {
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioGaraje, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion]);
+  }, [precioGaraje, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   /** El precio escrito, para rotular el tipo que le toca (0 mientras no se lea). */
@@ -935,6 +960,8 @@ export default function SimuladorGarajeCompraventaPage() {
    * un mínimo (patrón de familia 2, hallazgos 1546 y 1562).
    */
   const plusvaliaPendiente = resultadosVendedor?.plusvaliaPendiente ?? false;
+  /** Por qué no está la plusvalía: falta un dato, o es foral y aquí no se calcula (3071). */
+  const faltaPlusvalia = resultadosVendedor?.plusvaliaForal ? 'que aquí no se calcula' : 'que falta';
 
   /**
    * Texto de una tarjeta intermedia (IRPF, ganancia) cuando un ilegible la mueve, o cuando falta
@@ -943,7 +970,7 @@ export default function SimuladorGarajeCompraventaPage() {
    */
   const avisoTarjeta = (v: Veredicto, que: string, cuentaPlusvalia = true): string | null => {
     const pendiente = cuentaPlusvalia && plusvaliaPendiente;
-    const frasePlusvalia = `No resta la plusvalía municipal, que falta, así que ${que} real puede ser menor`;
+    const frasePlusvalia = `No resta la plusvalía municipal, ${faltaPlusvalia}, así que ${que} real puede ser menor`;
     if (v.tipo === 'ninguno') return pendiente ? `${frasePlusvalia}.` : null;
     if (v.tipo === 'mixto' || (pendiente && v.tipo === 'mayor')) {
       const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
@@ -963,7 +990,7 @@ export default function SimuladorGarajeCompraventaPage() {
    * mayúscula, como los demás avisos de la redacción común (hallazgos 1551 y 1568).
    */
   const avisoPerdida = (v: Veredicto): string | null => {
-    const frasePlusvalia = 'No resta la plusvalía municipal, que falta, así que la pérdida real puede ser mayor que esta';
+    const frasePlusvalia = `No resta la plusvalía municipal, ${faltaPlusvalia}, así que la pérdida real puede ser mayor que esta`;
     if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
     if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
       const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
@@ -982,7 +1009,7 @@ export default function SimuladorGarajeCompraventaPage() {
    * haber. Tenía texto fijo y no miraba el sondeo (patrón 6, hallazgos 1549 y 1565).
    */
   const avisoCero = (v: Veredicto): string | null => {
-    const frasePlusvalia = 'No resta la plusvalía municipal, que falta: con ella puede haber una pérdida que se compensaría en la declaración';
+    const frasePlusvalia = `No resta la plusvalía municipal, ${faltaPlusvalia}: con ella puede haber una pérdida que se compensaría en la declaración`;
     if (v.tipo === 'ninguno') return plusvaliaPendiente ? `${frasePlusvalia}.` : null;
     if (v.tipo === 'mixto' || (plusvaliaPendiente && v.tipo === 'mayor')) {
       const ilegibles = v.tipo === 'mixto' ? [...v.menor, ...v.mayor] : v.campos;
@@ -1666,8 +1693,8 @@ export default function SimuladorGarajeCompraventaPage() {
                           resultadosVendedor.comisionLegible && resultadosVendedor.gestoriaLegible
                             ? resultadosVendedor.plusvaliaCalculada
                               ? 'Precio de venta − comisión, gestoría y plusvalía municipal'
-                              : 'Precio de venta − comisión y gestoría, sin la plusvalía municipal, que falta'
-                            : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ' (sin la plusvalía municipal, que falta)'}: ${noSePudoLeer([
+                              : `Precio de venta − comisión y gestoría, sin la plusvalía municipal, ${faltaPlusvalia}`
+                            : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ` (sin la plusvalía municipal, ${faltaPlusvalia})`}: ${noSePudoLeer([
                                 ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
                                 ...(resultadosVendedor.gestoriaLegible ? [] : ['la gestoría de la venta']),
                               ])}`
@@ -1763,7 +1790,11 @@ export default function SimuladorGarajeCompraventaPage() {
                             ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
                             : resultadosVendedor.gananciaPatrimonial === 0
                               ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
-                              : `Tributación en base del ahorro (del ${TIPO_AHORRO_MIN}\u00A0% al ${TIPO_AHORRO_MAX}\u00A0%)`))
+                              : `Tributación en base del ahorro (del ${TIPO_AHORRO_MIN}\u00A0% al ${TIPO_AHORRO_MAX}\u00A0%)${
+                                  resultadosVendedor.deduccionCeutaMelilla > 0
+                                    ? `, con la deducción del ${DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje}\u00A0% por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos`
+                                    : ''
+                                }`))
                     }
                   />
                   {/* Un importe ilegible no hace desaparecer su línea: se ve «Sin leer» (hallazgo
@@ -1856,6 +1887,7 @@ export default function SimuladorGarajeCompraventaPage() {
                             'El valor catastral del suelo supera al total, y con el recibo del IBI bien leído la plusvalía puede salir más barata por el método real: el neto real puede ser MAYOR que este',
                           );
                         }
+                        if (resultadosVendedor.plusvaliaForal) avisos.push(mayuscula(motivoPlusvaliaForal(ccaa)));
                         if (avisos.length === 0) return 'Lo que realmente recibes tras gastos e impuestos';
                         const pedir = [
                           camposPendientes.length > 0 ? `Rellena ${enumerar(camposPendientes)}` : null,
@@ -1872,7 +1904,8 @@ export default function SimuladorGarajeCompraventaPage() {
                         ]
                           .filter(Boolean)
                           .join(' y ');
-                        return `${avisos.join('. ')}. ${mayuscula(pedir)} para obtenerlo.`;
+                        // En territorio foral puede no haber nada que pedir: entonces no hay «para obtenerlo».
+                        return pedir ? `${avisos.join('. ')}. ${mayuscula(pedir)} para obtenerlo.` : `${avisos.join('. ')}.`;
                       })()
                     }
                   />
