@@ -1,7 +1,7 @@
 ---
 name: inspector-app
 description: Inspecciona UNA app de meskeIA para la skill /inspector — casos resueltos a mano, ejecutados con Playwright, spec de regresión y acta JSON. Solo lo lanza /inspector; no usar para reparar.
-tools: Bash, Read, Write, Edit, Glob, Grep
+tools: Bash, Read, Write, Edit, Glob, Grep, WebFetch
 model: opus
 effort: xhigh
 ---
