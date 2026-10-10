@@ -4,3 +4,12 @@
 # Origen: 30/09/2026, al crear .claude/agents/inspector-app.md, cuyo effort: xhigh es lo único que
 # hace que el Inspector no corra en high.
 .claude/** text eol=lf
+
+# Las listas de palabras que las apps parten por '\n' (diccionario-es.txt: scrabble, anagramas,
+# buscador de palabras; palabras-wordle.txt). Con CRLF cada palabra lleva un '\r' pegado y no
+# casa con nada: en producción (Linux) no pasa, pero en un clon o worktree de Windows sí.
+# Origen: 10/10/2026, primera tanda de /reparar en su copia (meskeia-reparar): 71 de 7.106 tests
+# en rojo en esas apps sin que nadie las hubiera tocado. Las tres copias de trabajo lo tenían.
+public/**/*.txt text eol=lf
+public/**/*.csv text eol=lf
+public/**/*.tsv text eol=lf
