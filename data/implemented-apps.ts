@@ -144,6 +144,7 @@ export const implementedAppsUrls = [
   "/calculadora-iva/",
   "/calculadora-descuentos/",
   "/calculadora-porcentajes/",
+  "/calculadora-tramos/",               // Escala por tramos genérica: progresivo vs al tramo alcanzado (S0193)
   "/calculadora-fechas/",
   "/calculadora-regla-de-tres/",
   "/calculadora-cocina/",
