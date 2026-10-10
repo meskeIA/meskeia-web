@@ -553,3 +553,313 @@ test.describe('Reparación 24/09/2026 — restricciones declaradas, FAQ, guía y
     await expect(page.getByRole('heading', { name: 'Tu cobertura recomendada' })).toBeFocused();
   });
 });
+
+/**
+ * RE-INSPECCIÓN DEL 10/10/2026 (Inspector, Opus 5.5 en xhigh). La app estaba INVALIDADA desde la
+ * reparación del 24/09. Familia «selectores» (referencia: selector-smartphone, b0f31109; recetas
+ * del 09/10 en selector-alquiler-vs-compra 7cc1064e y selector-formacion-postgrado 250b8baa).
+ *
+ * Cada esperado se resolvió a mano con los puntos de motor.ts ANTES de abrir el navegador. Los
+ * índices de un perfil son la posición de la opción en cada una de las 10 preguntas (0 = la
+ * primera). Número de opciones por pregunta: 4 · 4 · 4 · 4 · 4 · 5 · 3 · 5 · 3 · 3.
+ */
+test.describe('Re-inspección 10/10/2026 — umbrales, foco, teclado, doble toque, guía y cifras', () => {
+  /** Recorre el test con clics de ratón. `click()` despacha clickCount 1 (detail 1): no forma
+   *  ráfaga con el clic anterior, así que aquí no hace falta la pausa de lectura de los toques. */
+  async function resultadoDe(page: Page, indices: readonly number[]): Promise<string> {
+    await abrirTest(page);
+    for (let i = 0; i < indices.length; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').nth(indices[i]).click();
+      await page.getByRole('button', { name: i === indices.length - 1 ? 'Ver resultado' : 'Siguiente pregunta' }).click();
+    }
+    await page.getByRole('heading', { name: 'Tu cobertura recomendada' }).waitFor();
+    return (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+  }
+
+  const avisosDe = async (page: Page) => (await page.locator('p[role="note"][class*="aviso"]').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
+
+  async function faqPage(page: Page): Promise<{ mainEntity: { name: string; acceptedAnswer: { text: string } }[] }> {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map((b) => JSON.parse(b) as Record<string, unknown>).find((j) => j['@type'] === 'FAQPage');
+    if (!faq) throw new Error('sin FAQPage');
+    return faq as unknown as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] };
+  }
+
+  /** Lo que tiene el foco: «BODY» o el texto del elemento. */
+  const foco = (page: Page) =>
+    page.evaluate(() => (document.activeElement === document.body || !document.activeElement ? 'BODY' : (document.activeElement.textContent ?? '').trim()));
+
+  // ── Lo que funciona (pasa) ─────────────────────────────────────────────────
+
+  test('perfil normal: 12 puntos → multirriesgo estándar, sin avisos', async ({ page }) => {
+    // Propietario/a con hipoteca 3 · Piso 1 · 10-30 años 1 · 10.000-30.000 € 2 · Centro urbano 2 ·
+    // Dos personas 1 · Nada valioso 0 · Agua 1 · Ninguno 0 · Equilibrio 1 = 12 → estándar (11-20).
+    const texto = await resultadoDe(page, [0, 0, 1, 1, 0, 1, 0, 0, 0, 1]);
+    expect(texto).toContain('Multirriesgo Estándar');
+    expect(texto).toContain('200 – 400 €/año');
+    expect(texto).toContain('Tu puntuación es 12:');
+    // Las tres que más suman: el 3 y, empatados a 2, por orden de pregunta.
+    expect(texto).toContain('Régimen de Tenencia: «Propietario/a con hipoteca vigente» suma 3 puntos. Valor del Contenido: «Entre 10.000 y 30.000 €» suma 2 puntos. Zona Geográfica: «Centro urbano consolidado» suma 2 puntos.');
+    expect(texto).toContain('Objetos de Alto Valor: «No, nada especialmente valioso» no suma puntos. Historial de Siniestros: «No, ninguno» no suma puntos.');
+    expect(await avisosDe(page)).toEqual([]);
+  });
+
+  test('frontera alta: 20 → estándar y 21 → completa, con lo que más ha pesado', async ({ page }) => {
+    // Hipoteca 3 · Unifamiliar 3 · 30-50 años 2 · 10.000-30.000 € 2 · Centro urbano 2 · Familia 2 ·
+    // Nada valioso 0 · Robo 2 · Siniestro menor 1 · La más amplia 3 = 20 → estándar (hasta 20).
+    let texto = await resultadoDe(page, [0, 1, 2, 1, 0, 2, 0, 1, 1, 2]);
+    expect(texto).toContain('Multirriesgo Estándar');
+    expect(texto).toContain('Tu puntuación es 20:');
+    expect(texto).toContain('Régimen de Tenencia: «Propietario/a con hipoteca vigente» suma 3 puntos. Tipo de Vivienda: «Casa unifamiliar o adosado» suma 3 puntos. Prioridad al Contratar: «La cobertura más amplia posible» suma 3 puntos.');
+    // El mismo con «Más de 50 años» (3 en vez de 2) = 21 → completa.
+    texto = await resultadoDe(page, [0, 1, 3, 1, 0, 2, 0, 1, 1, 2]);
+    expect(texto).toContain('Multirriesgo Completa');
+    expect(texto).toContain('400 – 800 €/año');
+    expect(texto).toContain('Tu puntuación es 21:');
+    // Empate a 3 en cuatro respuestas: las dos primeras por orden de pregunta.
+    expect(texto).toContain('Tu perfil justifica la cobertura más amplia disponible. Lo que más ha pesado: régimen de tenencia y tipo de vivienda.');
+    expect(texto).toContain('Antigüedad del Edificio: «Más de 50 años» suma 3 puntos.');
+  });
+
+  test('el máximo: 32 puntos → completa, y sin respuestas a cero no sale «Lo que no ha sumado»', async ({ page }) => {
+    // Hipoteca 3 · Unifamiliar 3 · Más de 50 años 3 · Más de 60.000 € 4 · Zona de riesgo 4 · Familia 2 ·
+    // Bastante valor 4 · Incendio 3 · Uno o más importantes 3 · La más amplia 3 = 32 (el máximo posible).
+    const texto = await resultadoDe(page, [0, 1, 3, 3, 3, 2, 2, 2, 2, 2]);
+    expect(texto).toContain('Tu puntuación es 32:');
+    expect(texto).toContain('Lo que más ha pesado: valor del contenido y zona geográfica.');
+    expect(texto).toContain('Valor del Contenido: «Más de 60.000 €» suma 4 puntos. Zona Geográfica: «Zona con riesgo de inundación o incendio forestal» suma 4 puntos. Objetos de Alto Valor: «Sí, bastante valor acumulado (arte, instrumentos, colecciones...)» suma 4 puntos.');
+    await expect(page.locator('[class*="razonesTitulo"]', { hasText: 'Lo que no ha sumado' })).toHaveCount(0);
+  });
+
+  test('«El precio más bajo posible» con 11 puntos: estándar, y el aviso lo dice con las dos horquillas', async ({ page }) => {
+    // Hipoteca 3 · Piso 1 · 10-30 años 1 · 10.000-30.000 € 2 · Centro urbano 2 · Dos personas 1 ·
+    // Nada valioso 0 · Agua 1 · Ninguno 0 · PRECIO 0 = 11 → estándar. Lo que más ha pesado: el 3 del
+    // régimen y el primer 2 por orden de pregunta (contenido, P4, antes que zona, P5).
+    const texto = await resultadoDe(page, [0, 0, 1, 1, 0, 1, 0, 0, 0, 0]);
+    expect(texto).toContain('Multirriesgo Estándar');
+    expect(texto).toContain('Tu puntuación es 11:');
+    expect(await avisosDe(page)).toEqual([
+      '⚠️ Has dicho que priorizas el precio más bajo posible, pero por tus respuestas la orientación es la multirriesgo estándar (200 – 400 €/año, estimación de meskeIA). Si contratas solo la cobertura básica (100 – 200 €/año), revisa en «Coberturas incluidas» lo que dejarías fuera, sobre todo lo que tiene que ver con lo que más ha sumado: régimen de tenencia y valor del contenido.',
+    ]);
+  });
+
+  test('bloqueo: en la pregunta 10 sin contestar, «Ver resultado» está desactivado y no hay resultado', async ({ page }) => {
+    await abrirTest(page);
+    for (let i = 0; i < 9; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    }
+    await page.getByText('Pregunta 10 de 10').first().waitFor();
+    await expect(page.getByRole('button', { name: 'Ver resultado' })).toBeDisabled();
+    await page.getByRole('button', { name: 'Ver resultado' }).click({ force: true });
+    await expect(page.getByRole('heading', { name: 'Tu cobertura recomendada' })).toHaveCount(0);
+    await expect(page.getByText('Pregunta 10 de 10').first()).toBeVisible();
+  });
+
+  // ── Hallazgos ABIERTOS ─────────────────────────────────────────────────────
+
+  test('ABIERTO (inspector 10/10/2026): tras «Empezar», «Siguiente» y «Anterior» el foco va al enunciado, no a <body>', async ({ page }) => {
+    test.fail();
+    // Medido: tras «Empezar» (Enter) → BODY; tras «Siguiente» (Enter) → BODY, porque el botón se
+    // desactiva con el foco dentro (la pregunta nueva está sin contestar) y el Tab siguiente sale a
+    // un enlace de «Apps relacionadas», DESPUÉS del cuestionario; tras «Anterior» de P2 a P1 → BODY
+    // (el botón se desactiva) y de P3 a P2 se queda en «Anterior». La referencia lleva el foco al
+    // enunciado (selector-smartphone, hallazgo 1680, b0f31109).
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-seguro-hogar/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    await expect.poll(() => foco(page), { timeout: 2_000 }).toBe('¿Eres propietario/a o inquilino/a?');
+    await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 2 de 10').first().waitFor();
+    await expect.poll(() => foco(page), { timeout: 2_000 }).toBe('¿Qué tipo de vivienda tienes?');
+    await page.getByRole('button', { name: 'Pregunta anterior' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    await expect.poll(() => foco(page), { timeout: 2_000 }).toBe('¿Eres propietario/a o inquilino/a?');
+  });
+
+  test('ABIERTO (inspector 10/10/2026): teclado de radios (APG): las flechas mueven y marcan, y el grupo es una parada de Tab', async ({ page }) => {
+    test.fail();
+    // Referencia (selector-smartphone, hallazgo 1681): tabindex 0 / -1 / -1 / -1 y ArrowDown lleva
+    // el foco a la opción siguiente y la marca. Medido aquí: los cuatro radios sin tabindex (cuatro
+    // paradas de Tab) y ArrowDown deja el foco en el primero sin marcar nada.
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    await radios.first().focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused({ timeout: 2_000 });
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 2_000 });
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).not.toBe('radio');
+  });
+
+  test('ABIERTO (inspector 10/10/2026): la guía educativa viene en el HTML servido, no solo en el resultado', async ({ page }) => {
+    test.fail();
+    // La EducationalSection vive dentro de la rama `pantalla === 'resultado'`: el HTML servido no trae
+    // ni una línea de la guía (EducationalSection monta su contenido siempre «porque Googlebot no
+    // hace clic») y quien no termina las 10 preguntas no la ve. Referencia: selector-smartphone,
+    // hallazgo 2663 (guía fuera de las pantallas).
+    const html = await (await page.request.get('/selector-seguro-hogar/')).text();
+    expect(html).toContain('Diferencia entre seguro de continente y contenido');
+    expect(html).toContain('Qué es el infraseguro y cómo evitarlo');
+  });
+
+  test('ABIERTO (inspector 10/10/2026): el «%» va separado con espacio duro (U+00A0), en la guía y en el JSON-LD', async ({ page }) => {
+    test.fail();
+    // Regla del 25/09/2026 (CLAUDE.md global §2): lo anterior se corrige cuando pasa el Inspector.
+    // Medido: en la guía «60 %» ×4, «38,2 %», «15,2 %», «42,4 %», «10,8 %» y «9,3 %», los nueve con
+    // espacio normal (U+0020); en el JSON-LD, «100%» (featureList) y «10-20%» (FAQPage) pegados.
+    await resultadoDe(page, [0, 0, 1, 1, 0, 1, 0, 0, 0, 1]);
+    // Sin normalizar con /\s+/, que convertiría el U+00A0 en espacio y no mediría nada.
+    const guia = await page.locator('[class*="resultadosContainer"]').evaluate((el) => el.textContent ?? '');
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    const texto = `${guia} ${ld}`;
+    expect([...texto.matchAll(/\d+(,\d+)? %/g)].map((m) => m[0])).toEqual([]);
+    expect([...texto.matchAll(/[\d-]+%/g)].map((m) => m[0])).toEqual([]);
+  });
+
+  test('ABIERTO (inspector 10/10/2026): el FAQPage no da sin fuente el módulo de construcción con el que fijar el capital', async ({ page }) => {
+    test.fail();
+    // Pregunta 3 del FAQPage («¿Cómo se calcula el valor del continente…?»): «oscila entre 700 y
+    // 1.200 €/m² según la comunidad autónoma», sin fuente ni año. Es la cifra con la que el lector
+    // fijaría el capital del continente, y un capital bajo es el infraseguro que la propia guía
+    // explica (regla proporcional, art. 30 de la Ley 50/1980). Neutralidad editorial, regla 1.
+    await page.goto('/selector-seguro-hogar/');
+    const faq = await faqPage(page);
+    const respuesta = faq.mainEntity.find((q) => q.name.startsWith('¿Cómo se calcula el valor del continente'))?.acceptedAnswer.text ?? '';
+    expect(respuesta).not.toBe('');
+    const cifraSinFuente = /\d[\d.]* y \d[\d.]* €\/m²/.test(respuesta) && !/(según [A-ZÁÉÍÓÚ]|fuente|\b20\d\d\b)/.test(respuesta);
+    expect(cifraSinFuente, respuesta).toBe(false);
+  });
+
+  // ── Móvil ──────────────────────────────────────────────────────────────────
+
+  test.describe('móvil 360 × 740 (y 390 donde se dice)', () => {
+    test.use({
+      viewport: { width: 360, height: 740 },
+      userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    const fondoBarra = (page: Page) =>
+      page.evaluate(() => Math.max(...[...document.querySelectorAll('[class*="headerBar"] > *')].map((e) => e.getBoundingClientRect().bottom)));
+
+    /** Contesta con toques las preguntas 1…n con la primera opción. Lee antes de tocar: un toque a
+     *  menos de 300 ms del de «Siguiente» es el doble toque que la receta de la familia ignora. */
+    async function tocarHasta(page: Page, n: number): Promise<void> {
+      for (let k = 0; k < n; k++) {
+        await page.waitForTimeout(500);
+        await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+        await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
+      }
+      await page.waitForTimeout(500);
+    }
+
+    test('C0104 (1) descartada: tras «Ver resultado» el título del resultado no queda bajo la barra del logo', async ({ page }) => {
+      // Medido el 10/10 a 360 y 390 px, con el botón al pie, en el centro o arriba: h1 a 80-109 px y
+      // barra hasta 52 px (el foco lleva el h1 a la vista y el hero deja 80 px arriba).
+      for (const ancho of [360, 390]) {
+        await page.setViewportSize({ width: ancho, height: 740 });
+        await abrirTest(page);
+        await tocarHasta(page, 9);
+        await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+        const boton = page.getByRole('button', { name: 'Ver resultado' });
+        await boton.evaluate((b) => b.scrollIntoView({ block: 'end' }));
+        await boton.tap();
+        const titulo = page.getByRole('heading', { name: 'Tu cobertura recomendada' });
+        await titulo.waitFor();
+        await page.waitForTimeout(300);
+        const caja = await titulo.boundingBox();
+        expect(caja?.y ?? -1, `${ancho} px`).toBeGreaterThanOrEqual(await fondoBarra(page));
+      }
+    });
+
+    test('un doble toque en «Empezar» no contesta la pregunta 1', async ({ page }) => {
+      // Medido el 10/10 a 360 y 390 px: el 2.º toque cae en un DIV de la pantalla del test.
+      for (const ancho of [360, 390]) {
+        await page.setViewportSize({ width: ancho, height: 740 });
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await page.goto('/selector-seguro-hogar/');
+        await esperarHidratacionBotones(page);
+        const boton = page.getByRole('button', { name: /Empezar el test/ });
+        await boton.evaluate((b) => b.scrollIntoView({ block: 'center' }));
+        const caja = await boton.boundingBox();
+        if (!caja) throw new Error('sin botón');
+        await page.mouse.dblclick(caja.x + caja.width / 2, caja.y + caja.height / 2);
+        await page.waitForTimeout(400);
+        await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+        await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(0);
+      }
+    });
+
+    test('ABIERTO (inspector 10/10/2026): tras «Siguiente» el enunciado de la pregunta nueva se ve, debajo de la barra', async ({ page }) => {
+      test.fail();
+      // Medido: con «Siguiente» en el centro de la pantalla, el enunciado de la pregunta nueva queda
+      // por ENCIMA de la vista (de −26 a −260 px a 360 y 390 px; con el botón arriba, hasta −608):
+      // nada lleva el foco a él ni desplaza la página. La referencia enfoca el enunciado, y con
+      // scroll-margin-top de 80 px (7cc1064e, 250b8baa) para que no caiga bajo la barra de 52 px.
+      await abrirTest(page);
+      await page.waitForTimeout(500);
+      await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+      const boton = page.getByRole('button', { name: 'Siguiente pregunta' });
+      await boton.evaluate((b) => b.scrollIntoView({ block: 'center' }));
+      await boton.tap();
+      await page.getByText('Pregunta 2 de 10').first().waitFor();
+      await page.waitForTimeout(300);
+      const caja = await page.locator('[class*="preguntaTexto"]').boundingBox();
+      expect(caja?.y ?? -1).toBeGreaterThanOrEqual(await fondoBarra(page));
+      expect((caja?.y ?? 9999) + (caja?.height ?? 0)).toBeLessThanOrEqual(740);
+    });
+
+    test('ABIERTO (inspector 10/10/2026): un doble toque avanza UNA pregunta, sin contestar la siguiente ni sacar de la app', async ({ page }) => {
+      test.fail();
+      test.setTimeout(180_000);
+      // Doble toque REAL (mouse.dblclick: detail 1 y 2 en el mismo punto) en el centro del botón,
+      // con la ÚLTIMA opción marcada. Medido el 10/10 a 360 y 390 px (las preguntas tienen 4, 4, 4,
+      // 4, 4, 5, 3, 5, 3 y 3 opciones, y la botonera se mueve bajo el dedo):
+      //   · P5 → P6: marca «Nadie de forma habitual (segunda residencia o vivienda vacía)» (+2 y el
+      //     aviso del art. 10 de la Ley 50/1980) sin que nadie la elija;
+      //   · P6 → P7: abre «Selector Seguro de Salud» (Apps relacionadas) y se pierden las respuestas;
+      //   · «Ver resultado»: abre https://delegum.com/soluciones/?from=meskeia (tarjeta de Delegum
+      //     de arriba) y el resultado no llega a verse.
+      // La referencia ignora el clic de más (selector-smartphone, 2659) y alquiler-vs-compra lo filtra
+      // además en captura sobre window, porque su 2.º toque de «Ver resultado» caía en un enlace.
+      await page.route((url) => url.hostname !== 'localhost', (ruta) => ruta.abort());
+      const OPCIONES = [4, 4, 4, 4, 4, 5, 3, 5, 3, 3];
+      const anomalias: string[] = [];
+      for (const ancho of [360, 390]) {
+        await page.setViewportSize({ width: ancho, height: 740 });
+        for (const q of [4, 5, 9]) {
+          await abrirTest(page);
+          await tocarHasta(page, q);
+          await page.locator('[role="radiogroup"] [role="radio"]').nth(OPCIONES[q] - 1).tap();
+          const boton = page.getByRole('button', { name: q === 9 ? 'Ver resultado' : 'Siguiente pregunta' });
+          await boton.evaluate((b) => b.scrollIntoView({ block: 'center' }));
+          const caja = await boton.boundingBox();
+          if (!caja) throw new Error(`${ancho} px, pregunta ${q + 1}: sin botón`);
+          await page.mouse.dblclick(caja.x + caja.width / 2, caja.y + caja.height / 2);
+          await page.waitForTimeout(700);
+          if (!new URL(page.url()).pathname.endsWith('/selector-seguro-hogar/')) {
+            anomalias.push(`${ancho} px, pregunta ${q + 1}: sale a ${page.url()}`);
+            continue;
+          }
+          if (q < 9) {
+            const paso = (await page.locator('[class*="progresoPaso"]').innerText()).trim();
+            const marcadas = await page.locator('[role="radiogroup"] [aria-checked="true"]').allInnerTexts();
+            if (paso !== `Pregunta ${q + 2} de 10` || marcadas.length) anomalias.push(`${ancho} px, pregunta ${q + 1}: queda en «${paso}» con ${JSON.stringify(marcadas)}`);
+          } else if ((await page.getByRole('heading', { name: 'Tu cobertura recomendada' }).count()) !== 1) {
+            anomalias.push(`${ancho} px, «Ver resultado»: sin resultado`);
+          }
+        }
+      }
+      expect(anomalias).toEqual([]);
+    });
+  });
+});

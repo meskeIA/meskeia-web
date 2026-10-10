@@ -637,3 +637,437 @@ test.describe('Reparación 24/09/2026 — límites declarados, espera en tu zona
     await expect(page.getByRole('heading', { name: 'Tu perfil de cobertura sanitaria' })).toBeFocused();
   });
 });
+
+/**
+ * RE-INSPECCIÓN 10/10/2026 (Inspector; la app estaba INVALIDADA). Familia «selectores», referencia
+ * selector-smartphone. El testigo tests/familias/selectores.spec.ts solo mira los radios y la barra
+ * de la pregunta 1: aquí se mide lo que no ve (foco, teclado, móvil y doble toque), con los cabos
+ * C0011, C0016 y C0104.
+ *
+ * Cada valor esperado se resolvió a mano ANTES de abrir el navegador, con PESOS y umbrales de
+ * motor.ts (pública hasta 2, complementario de 3 a 7, completo desde 8) y las plantillas de
+ * calcularResultado. Los perfiles son el índice de la opción en cada pregunta (la 4 tiene cinco
+ * opciones; las demás, cuatro). Los casos con test.fail() demuestran un hallazgo ABIERTO.
+ */
+test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C0104 y lo que el testigo no ve', () => {
+  const textos = async (page: Page, sel: string): Promise<string[]> =>
+    (await page.locator(sel).allInnerTexts()).map((s) => s.replace(/\s+/g, ' ').trim());
+  const veredicto = (page: Page) => page.locator('[class*="veredictoValor"]');
+  const enfocado = (page: Page) =>
+    page.evaluate(() => (!document.activeElement || document.activeElement === document.body ? 'BODY' : (document.activeElement.textContent ?? '').replace(/\s+/g, ' ').trim()));
+  const UA_PIXEL7 = 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
+
+  /** Abre el test y contesta `n` preguntas con la primera opción, con clics de ratón (detail 1). */
+  async function hasta(page: Page, n: number): Promise<void> {
+    await abrirTest(page);
+    for (let k = 0; k < n; k++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').nth(0).click();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    }
+    await expect(page.locator('[class*="progresoPaso"]')).toHaveText(`Pregunta ${n + 1} de 10`);
+  }
+
+  /** ¿Pisa alguna pieza de la barra fija del logo las letras del elemento? */
+  async function bajoLaBarra(page: Page, selector: string): Promise<{ tapado: boolean; top: number; bottom: number; barra: number }> {
+    return page.evaluate((sel) => {
+      const piezas = Array.from(document.querySelectorAll('[class*="headerBar"] > *')).map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0);
+      const el = document.querySelector(sel);
+      if (!el || piezas.length === 0) throw new Error(`sin barra (${piezas.length}) o sin ${sel}`);
+      const rango = document.createRange();
+      rango.selectNodeContents(el);
+      const letras = Array.from(rango.getClientRects()).filter((c) => c.width > 0);
+      const caja = el.getBoundingClientRect();
+      return {
+        tapado: piezas.some((p) => letras.some((c) => !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom))),
+        top: Math.round(caja.top),
+        bottom: Math.round(caja.bottom),
+        barra: Math.round(Math.max(...piezas.map((p) => p.bottom))),
+      };
+    }, selector);
+  }
+
+  /** Deja el centro del botón a la altura y del viewport y devuelve ese punto. */
+  async function colocar(page: Page, nombre: string | RegExp, y: number): Promise<{ x: number; y: number }> {
+    const boton = page.getByRole('button', { name: nombre });
+    await boton.evaluate((e, yy) => {
+      const r = e.getBoundingClientRect();
+      window.scrollBy(0, r.top + r.height / 2 - yy);
+    }, y);
+    const caja = await boton.boundingBox();
+    if (!caja) throw new Error(`sin caja para ${String(nombre)}`);
+    return { x: caja.x + caja.width / 2, y: caja.y + caja.height / 2 };
+  }
+
+  /** Dos toques a 100 ms en el mismo punto: Chrome entrega el 2.º con detail 2 (un doble toque). */
+  async function dobleToque(page: Page, p: { x: number; y: number }): Promise<void> {
+    await page.touchscreen.tap(p.x, p.y);
+    await page.waitForTimeout(100);
+    await page.touchscreen.tap(p.x, p.y);
+  }
+
+  /** Enunciados de las preguntas 1..n tras «Empezar» y «Siguiente» tocados con tap(): los que quedan mal. */
+  async function enunciadosFuera(page: Page, n: number): Promise<string[]> {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-seguro-salud/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    const fuera: string[] = [];
+    for (let i = 1; i <= n; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();
+      await page.waitForTimeout(150);
+      const m = await bajoLaBarra(page, '[class*="preguntaTexto"]');
+      if (m.tapado || m.top < m.barra) fuera.push(`P${i}: enunciado en y ${m.top}..${m.bottom}, barra hasta ${m.barra}`);
+      if (i === n) break;
+      // Lee la pregunta antes de tocar, como en selector-smartphone (2659): un toque a menos de 300 ms
+      // del de «Siguiente» es el doble toque que la receta clicDeMas ignora a propósito.
+      await page.waitForTimeout(500);
+      await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
+    }
+    return fuera;
+  }
+
+  // Ocasional (0) · Un especialista (+2) · ZONA RURAL (+2) · Sin hijos · Cuenta ajena · «Lo acepto» ·
+  // Dental bien · «Me interesa» · 40 – 100 € (0) · Sin seguro de empresa = 4 → complementario.
+  const RURAL = [1, 1, 3, 0, 0, 1, 0, 2, 2, 2] as const;
+  // El mismo perfil con «Menos de 2 meses» (0) en la pregunta 3 = 2 → sanidad pública.
+  const RURAL_A_CORTA = [1, 1, 0, 0, 0, 1, 0, 2, 2, 2] as const;
+
+  test('caso normal: 4 puntos con zona rural → complementario; con espera corta, 2 → pública', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, RURAL);
+    await expect(veredicto(page)).toHaveText('Seguro complementario recomendado');
+    // Suman, por puntos y luego por número de pregunta: la 2 (+2) y la 3 (+2).
+    expect(await textos(page, '[class*="razonItem"]')).toEqual([
+      'Tu puntuación es 4: de 3 a 7, un seguro que complemente a la sanidad pública.',
+      'Especialistas: «Sí, un especialista» suma 2 puntos.',
+      'Espera en tu zona: «Vivo en zona rural o con poca oferta sanitaria» suma 2 puntos.',
+    ]);
+    // LO_QUE_PESA de las dos primeras que suman (motor.ts).
+    await expect(page.locator('[class*="veredictoDesc"]')).toHaveText(
+      'Tu perfil se beneficiaría de un seguro que complemente la sanidad pública. En tu caso, lo que más pesa es el seguimiento de especialistas y la lejanía de los centros de especialidades.',
+    );
+    // 12.059 M€ / 12,6 M personas / 12 = 79,76 → 80 (UNESPA 2024, REFERENCIA_PRIMA de motor.ts).
+    await expect(page.locator('[class*="precioRango"]')).toHaveText('≈ 80 €/mes de media');
+    await expect(page.locator('p[role="note"][class*="aviso"]')).toHaveCount(0);
+    await abrirTest(page);
+    await responder(page, RURAL_A_CORTA);
+    await expect(veredicto(page)).toHaveText('Sanidad pública es suficiente');
+    await expect(page.locator('[class*="precioRango"]')).toHaveText('0 €/mes');
+    expect((await textos(page, '[class*="razonItem"]'))[0]).toBe('Tu puntuación es 2: hasta 2, la sanidad pública cubre tu perfil sin necesidad de un seguro.');
+  });
+
+  // Con frecuencia (+2) · Varios especialistas (+3) · Entre 2 y 4 meses (0) · Sin hijos · Cuenta ajena
+  // · «Muy importante» (+2) · Dental bien · «No estoy seguro» · 40 – 100 € (0) · Sin seguro = 7.
+  const LIMITE_7 = [2, 2, 1, 0, 0, 2, 0, 3, 2, 2] as const;
+  // El mismo con «Más de 100 €/mes» (+1) = 8.
+  const LIMITE_8 = [2, 2, 1, 0, 0, 2, 0, 3, 3, 2] as const;
+
+  test('límite: 7 puntos es complementario y 8 ya es seguro completo (lo mueve «Más de 100 €/mes»)', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, LIMITE_7);
+    await expect(veredicto(page)).toHaveText('Seguro complementario recomendado');
+    expect(await textos(page, '[class*="razonItem"]')).toEqual([
+      'Tu puntuación es 7: de 3 a 7, un seguro que complemente a la sanidad pública.',
+      'Especialistas: «Sí, varios especialistas» suma 3 puntos.',
+      'Visitas al médico: «Con frecuencia (5-10 veces al año)» suma 2 puntos.',
+      'Acceso rápido: «Para mí es muy importante ir rápido» suma 2 puntos.',
+    ]);
+    await abrirTest(page);
+    await responder(page, LIMITE_8);
+    await expect(veredicto(page)).toHaveText('Seguro privado completo recomendado');
+    expect(await textos(page, '[class*="razonItem"]')).toEqual([
+      'Tu puntuación es 8: desde 8, un seguro privado completo.',
+      'Especialistas: «Sí, varios especialistas» suma 3 puntos.',
+      'Visitas al médico: «Con frecuencia (5-10 veces al año)» suma 2 puntos.',
+      'Acceso rápido: «Para mí es muy importante ir rápido» suma 2 puntos.',
+      'Presupuesto: «Más de 100 €/mes» suma 1 punto.',
+    ]);
+    await expect(page.locator('[class*="veredictoDesc"]')).toHaveText(
+      'La suma de tus respuestas justifica un seguro de salud privado completo, más allá de un complemento a la sanidad pública. En tu caso, lo que más pesa es el seguimiento de especialistas y la frecuencia con que vas al médico.',
+    );
+    await expect(page.locator('[class*="precioNota"]')).toContainText('Es por persona: cada familiar que añadas paga la suya.');
+  });
+
+  // Casi nunca · Solo cabecera · Menos de 2 meses · Sin hijos · Desempleo, estudiante o jubilado/a ·
+  // Puedo esperar · Dental bien · «Apenas lo usé» · HASTA 40 €/MES (−1) · Sin seguro = −1.
+  const NEGATIVO = [0, 0, 0, 0, 3, 0, 0, 1, 1, 2] as const;
+
+  test('límite inferior: −1 punto sin filtros → pública, y sin aviso de presupuesto (no hay nada que contratar)', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, NEGATIVO);
+    await expect(veredicto(page)).toHaveText('Sanidad pública es suficiente');
+    expect(await textos(page, '[class*="razonItem"]')).toEqual([
+      'Tu puntuación es -1: hasta 2, la sanidad pública cubre tu perfil sin necesidad de un seguro.',
+      'Ninguna de tus respuestas apunta a una necesidad que la sanidad pública no cubra.',
+      'Presupuesto: «Hasta 40 €/mes» resta 1 punto.',
+    ]);
+    // El aviso de «Hasta 40 €/mes» solo sale si la orientación es contratar (motor.ts, `contrataria`).
+    await expect(page.locator('p[role="note"][class*="aviso"]')).toHaveCount(0);
+  });
+
+  test('rechazo: sin contestar la 10, «Ver resultado» no hace nada (ni clic forzado ni Enter)', async ({ page }) => {
+    await abrirTest(page);
+    for (let k = 0; k < 9; k++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').nth(1).click();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    }
+    const ver = page.getByRole('button', { name: 'Ver resultado' });
+    await expect(page.locator('[class*="progresoPaso"]')).toHaveText('Pregunta 10 de 10');
+    await expect(ver).toBeDisabled();
+    await ver.click({ force: true });
+    await ver.evaluate((b) => (b as HTMLButtonElement).focus());
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(300);
+    await expect(page.getByRole('heading', { name: 'Tu perfil de cobertura sanitaria' })).toHaveCount(0);
+    await expect(page.locator('[class*="progresoPaso"]')).toHaveText('Pregunta 10 de 10');
+  });
+
+  test('C0011 (hallazgo) «zona rural» suma 2 puntos hacia el seguro y el resultado no le dice al usuario rural lo que su propia guía sabe', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). PESOS[3].rural = 2, sin fuente ni comentario en motor.ts, y la
+    // descripción lo da como lo que más pesa («la lejanía de los centros de especialidades»). Un
+    // seguro privado no acerca los centros: la guía de la misma app asocia la zona rural a los
+    // cuadros médicos limitados («Reembolso de gastos: algunos seguros con cuadro médico limitado
+    // permiten ir a cualquier médico […]. Útil en zonas rurales»), pero en el resultado el usuario
+    // rural solo lee «Revisa la red de médicos en tu ciudad». Y decide el veredicto: con «Menos de
+    // 2 meses» el mismo perfil sale pública (test «caso normal» de arriba).
+    // Obtenido: suma 2 y ningún aviso ni consejo nombra la zona rural, el reembolso ni la distancia.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, RURAL);
+    const sumaRural = (await textos(page, '[class*="razonItem"]')).some((r) => r.includes('Vivo en zona rural') && r.includes(' suma '));
+    const avisosYConsejos = [...(await textos(page, 'p[role="note"][class*="aviso"]')), ...(await textos(page, '[class*="consejoItem"]'))].join(' ');
+    expect(sumaRural && !/rural|reembolso|lejos|cerca|distancia/i.test(avisosYConsejos), 'la zona rural empuja al seguro sin decir que su cuadro médico puede no estar cerca').toBe(false);
+  });
+
+  test('C0011 (descartado en parte): no hay ranking ni nombres de aseguradoras, ni en el resultado, ni en la guía, ni en el FAQPage', async ({ page }) => {
+    // Medido el 10/10/2026: ninguna marca, ni «ICEA», ni ranking, ni cuota de mercado en la intro,
+    // el resultado con la guía abierta y el JSON-LD. Lo que queda del cabo es el peso de la zona rural.
+    await abrirTest(page);
+    await responder(page, LIMITE_8);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByText('MUFACE, ISFAS y MUGEJU: las mutualidades de funcionarios')).toBeVisible();
+    const todo = `${await page.locator('[class*="resultadosContainer"]').innerText()} ${(await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ')}`;
+    expect(todo.match(/\b(Sanitas|Adeslas|Asisa|DKV|Mapfre|AXA|Caser|Cigna|Generali|ICEA)\b|ranking|cuota de mercado/g) ?? []).toEqual([]);
+  });
+
+  test('C0016 (hallazgo) tras «Empezar», «Siguiente» y «Anterior» el foco cae a <body>, no al enunciado de la pregunta', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). Forma del 1680 de selector-smartphone: allí un efecto sobre
+    // [pantalla, paso] lleva el foco al enunciado (h2 con tabIndex −1). Aquí solo lo recibe el
+    // resultado. Medido con teclado: «Empezar» se desmonta y «Siguiente» se desactiva con el foco
+    // dentro (la pregunta nueva está sin contestar), y el foco queda en <body>; el Tab siguiente a
+    // «Siguiente» sale a la primera tarjeta de RelatedApps («Selector de Mascota»), DESPUÉS del
+    // cuestionario. «Anterior» de la 2 a la 1 también lo pierde (en la 1 se desactiva).
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-seguro-salud/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: /Empezar el test/ }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    await expect.poll(() => enfocado(page), { timeout: 2_000 }).toBe('¿Con qué frecuencia vas al médico aproximadamente?');
+    await page.locator('[role="radiogroup"] [role="radio"]').nth(2).click();
+    await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 2 de 10').first().waitFor();
+    await expect.poll(() => enfocado(page), { timeout: 2_000 }).toBe('¿Necesitas seguimiento de alguna especialidad médica de forma regular?');
+    await page.getByRole('button', { name: 'Pregunta anterior' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 1 de 10').first().waitFor();
+    await expect.poll(() => enfocado(page), { timeout: 2_000 }).toBe('¿Con qué frecuencia vas al médico aproximadamente?');
+  });
+
+  test('C0016 (hallazgo) teclado de radios (APG): las flechas no hacen nada y cada opción es una parada de Tab', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). Forma del 1681 de selector-smartphone (tabindex itinerante
+    // 0/−1/−1/−1 y teclaEnOpcion). Medido: los cuatro radios sin tabindex (cuatro paradas de Tab) y
+    // ArrowDown deja el foco en el primero sin marcar nada.
+    test.fail();
+    await abrirTest(page);
+    const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    await radios.first().focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios.nth(1)).toBeFocused({ timeout: 1_000 });
+    await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
+    // La marcada es la única parada de Tab del grupo.
+    expect(await radios.evaluateAll((els) => els.map((e) => e.getAttribute('tabindex')))).toEqual(['-1', '0', '-1', '-1']);
+  });
+
+  test('C0104 (hallazgo) la guía educativa no está en el HTML servido: solo se monta en el resultado', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). Forma del 2663 de selector-smartphone y del 3112 de alquiler:
+    // EducationalSection monta siempre su contenido «porque Googlebot no hace clic», pero aquí va
+    // dentro de `pantalla === 'resultado'`. Obtenido: el HTML servido sin «Guía completa: seguros de
+    // salud en España» y 0 botones «Ver guía educativa» en la intro.
+    test.fail();
+    const html = await (await page.request.get('/selector-seguro-salud/')).text();
+    expect(html.includes('Guía completa: seguros de salud en España'), 'la guía en el HTML servido').toBe(true);
+    await page.goto('/selector-seguro-salud/');
+    await esperarHidratacionBotones(page);
+    await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toHaveCount(1, { timeout: 1_000 });
+  });
+
+  test('el «%» del JSON-LD lleva espacio duro (CLAUDE.md §2, desde el 25/09/2026)', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). FUNCIONES de metadata.ts alimenta el featureList del JSON-LD
+    // WebApplication y la meta schema:WebApplication: «100% en el navegador, sin registro ni
+    // instalación», pegado. Es el único «%» de la app (pantalla, guía y FAQPage no tienen ninguno).
+    test.fail();
+    await page.goto('/selector-seguro-salud/');
+    const bloques = (await page.locator('script[type="application/ld+json"]').allTextContents()).filter((b) => b.includes('Selector de Seguro de Salud') || b.includes('FAQPage'));
+    const meta = (await page.locator('meta[name="schema:WebApplication"]').getAttribute('content')) ?? '';
+    const separadores = [...`${bloques.join(' ')} ${meta}`.matchAll(/\d([\s ]?)%/g)]
+      .map((m) => (m[1] === ' ' ? 'U+00A0' : m[1] === '' ? 'pegado' : 'espacio normal'));
+    expect(separadores.filter((s) => s !== 'U+00A0')).toEqual([]);
+  });
+
+  test('la descripción para redes promete «cuánto te costaría», y la app dice que no puede calcularlo', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). openGraph.description: «… qué cobertura necesitas y cuánto te
+    // costaría aproximadamente». La app da la prima media del sector y dice en la nota de precio
+    // «Esta app no pregunta tu edad, que es lo que más mueve el precio: pide presupuesto con tus
+    // datos» (NOTA_PRECIO_BASE de motor.ts). La description y la de Twitter no lo prometen.
+    test.fail();
+    await page.goto('/selector-seguro-salud/');
+    const og = (await page.locator('meta[property="og:description"]').getAttribute('content')) ?? '';
+    expect(og).not.toMatch(/cuánto te costar/);
+  });
+
+  test('neutralidad (§1.quinquies, reglas 2 y 4): las opciones de presupuesto no valoran cuánto se gasta en salud', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). Pregunta 9: «Más de 100 €/mes — La salud es mi prioridad» (que
+    // además suma 1 punto al seguro) y «40 – 100 €/mes — Inversión razonable en salud». Equipara pagar
+    // un seguro con priorizar la salud —quien se queda en la sanidad pública o no puede pagar más no
+    // la prioriza menos— y da por «razonable» un gasto que depende de la renta.
+    test.fail();
+    await hasta(page, 8);
+    const opciones = (await page.locator('[role="radiogroup"]').innerText()).replace(/\s+/g, ' ');
+    expect(opciones).toContain('Más de 100 €/mes'); // precondición: es la pregunta del presupuesto
+    expect(opciones).not.toMatch(/La salud es mi prioridad|Inversión razonable/);
+  });
+
+  test.describe('móvil 360 × 740', () => {
+    test.use({
+      viewport: { width: 360, height: 740 },
+      userAgent: UA_PIXEL7,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('C0104 (hallazgo) tras «Empezar» y «Siguiente» el enunciado de la pregunta nueva queda fuera de la vista o bajo la barra del logo', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). Forma del 2657 de selector-smartphone y del 3110 de alquiler:
+      // sin foco programático en las preguntas la página no se mueve, y la pregunta nueva se pinta
+      // donde estaba la anterior. Medido tocando como un usuario (tap(), que desplaza lo justo): a
+      // 360 px las preguntas 1-6 por ENCIMA del borde (y −152..−44) y la 7-10 bajo la barra (y
+      // 25..79, barra hasta 52); a 390 px, las diez bajo la barra (y 5..59). Con «Siguiente» a media
+      // pantalla, casi todas por encima del borde. Si se repara con el foco al enunciado (C0016),
+      // hace falta además el scroll-margin-top de 80 px de la receta, o reaparece el 2657.
+      test.fail();
+      test.setTimeout(60_000);
+      expect(await enunciadosFuera(page, 10), 'enunciados bajo la barra o fuera de la vista').toEqual([]);
+    });
+
+    test('C0104 (hallazgo) un doble toque en «Siguiente» contesta la pregunta siguiente', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). Forma del 2659 de selector-smartphone (receta clicDeMas) y del
+      // 3111 de alquiler. El primer toque avanza y el segundo (detail 2) cae en la pregunta nueva,
+      // cuya botonera está en otro sitio. Barrido con «Siguiente» a 6 alturas (y 150..650): de la 5 a
+      // la 6 (y 450-650) marca «Es crítico por mi trabajo o condición» (+3); de la 6 a la 7 (y
+      // 150-450), «Voy a clínicas privadas de precio económico»; de la 9 a la 10 (y 450-650), «Tengo
+      // mutualidad de funcionarios (MUFACE/ISFAS)», que FUERZA el veredicto «Tu mutualidad ya te da
+      // cobertura» y habilita «Ver resultado». A 390 px, de la 6 a la 7 (test de abajo).
+      test.fail();
+      test.setTimeout(60_000);
+      const anomalias: string[] = [];
+      for (const q of [5, 9]) { // pregunta en la que se pulsa «Siguiente»
+        await hasta(page, q - 1);
+        await page.locator('[role="radiogroup"] [role="radio"]').nth(0).click();
+        await page.waitForTimeout(350);
+        await dobleToque(page, await colocar(page, 'Siguiente pregunta', 550));
+        await page.waitForTimeout(350);
+        const paso = await page.locator('[class*="progresoPaso"]').innerText();
+        const marcadas = await textos(page, '[role="radiogroup"] [aria-checked="true"] [class*="opcionEtiqueta"]');
+        if (paso !== `Pregunta ${q + 1} de 10` || marcadas.length > 0) anomalias.push(`P${q} → ${paso}, marcada ${JSON.stringify(marcadas)}`);
+      }
+      expect(anomalias).toEqual([]);
+    });
+
+    test('C0104 (hallazgo) un doble toque en «Ver resultado» saca de la app y se pierden las 10 respuestas', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). Forma del 3111 de alquiler (allí, guarda en captura sobre
+      // window): el foco al <h1> del resultado sube la página arriba del todo y el segundo toque cae
+      // en la cabecera común. Medido a 360 y 390 px con «Ver resultado» a 8 alturas: en y 350 →
+      // /contacto/; en y 450 (y también 400 a 390 px) → https://delegum.com/soluciones/?from=meskeia,
+      // la banda de <LegalNotice />. Delegum se sirve aquí sin red.
+      test.fail();
+      test.setTimeout(60_000);
+      await page.route(/^https:\/\/(www\.)?delegum\.com\//, (ruta) => ruta.fulfill({ status: 200, contentType: 'text/html', body: '<title>delegum</title>externo' }));
+      const fuera: string[] = [];
+      for (const y of [350, 450]) {
+        await hasta(page, 9);
+        await page.locator('[role="radiogroup"] [role="radio"]').nth(1).click();
+        await page.waitForTimeout(350);
+        await dobleToque(page, await colocar(page, 'Ver resultado', y));
+        await page.waitForTimeout(700);
+        if (!page.url().endsWith('/selector-seguro-salud/')) fuera.push(`y ${y}: ${page.url()}`);
+      }
+      expect(fuera).toEqual([]);
+    });
+
+    test('C0104 (1) descartado en el resultado: el <h1> enfocado queda por debajo de la barra del logo', async ({ page }) => {
+      // Medido el 10/10/2026 a 360 y 390 px con «Ver resultado» donde lo deja tap(), a media pantalla
+      // y al pie: <h1> en y 80, scroll 0, barra hasta 52 (el padding-top de 80 px y el foco al título).
+      test.setTimeout(60_000);
+      for (const y of [370, 700]) {
+        await hasta(page, 9);
+        await page.locator('[role="radiogroup"] [role="radio"]').nth(0).click();
+        await page.waitForTimeout(350);
+        const p = await colocar(page, 'Ver resultado', y);
+        await page.touchscreen.tap(p.x, p.y);
+        const titulo = page.getByRole('heading', { name: 'Tu perfil de cobertura sanitaria' });
+        await expect(titulo).toBeFocused();
+        await page.waitForTimeout(150);
+        const m = await bajoLaBarra(page, 'h1');
+        expect({ tapado: m.tapado, debajo: m.top >= m.barra }, `y ${y}: h1 en ${m.top}..${m.bottom}, barra hasta ${m.barra}`).toEqual({ tapado: false, debajo: true });
+      }
+    });
+
+    test('C0104 (2) descartado en «Empezar»: un doble toque no contesta la pregunta 1', async ({ page }) => {
+      // Medido el 10/10/2026 a 360 y 390 px con el botón a 6 alturas (y 150..650): el segundo toque
+      // cae siempre en algo sin acción (el contenedor del test).
+      for (const y of [150, 350, 550]) {
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await page.goto('/selector-seguro-salud/');
+        await esperarHidratacionBotones(page);
+        await dobleToque(page, await colocar(page, /Empezar el test/, y));
+        await expect(page.getByText('Pregunta 1 de 10').first()).toBeVisible();
+        await page.waitForTimeout(300);
+        await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0);
+      }
+    });
+  });
+
+  test.describe('móvil 390 × 844', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent: UA_PIXEL7,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('C0104 (hallazgo) a 390 px el enunciado de cada pregunta nueva queda bajo la barra del logo', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). Medido: las diez en y 5..59 (o más abajo) con la barra hasta 52.
+      test.fail();
+      test.setTimeout(60_000);
+      expect(await enunciadosFuera(page, 4), 'enunciados bajo la barra o fuera de la vista').toEqual([]);
+    });
+
+    test('C0104 (hallazgo) a 390 px un doble toque en «Siguiente» de la 6 contesta la 7', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). Medido con «Siguiente» en y 150-350: marca «Voy a clínicas
+      // privadas de precio económico» en la pregunta 7 sin que nadie la elija.
+      test.fail();
+      await hasta(page, 5);
+      await page.locator('[role="radiogroup"] [role="radio"]').nth(0).click();
+      await page.waitForTimeout(350);
+      await dobleToque(page, await colocar(page, 'Siguiente pregunta', 250));
+      await page.waitForTimeout(350);
+      await expect(page.locator('[class*="progresoPaso"]')).toHaveText('Pregunta 7 de 10');
+      await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(0, { timeout: 1_000 });
+    });
+  });
+});

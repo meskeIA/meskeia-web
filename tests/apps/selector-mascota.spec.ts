@@ -1000,7 +1000,8 @@ const NORMAL_0210: Perfil = [
 // P9 Sin límite: — · P10 Más de 180 €/mes: perro-grande 2, perro-mediano 1.
 // perro-mediano 3+2+2+2+2+1 = 12 · perro-grande 3+2+3+2−2+2 = 10 · perro-pequeño 4 · gato 3 ·
 // pez 2 · roedor 1 → Perro mediano. Razones: P1 (+3), P2 (+2), P3 (+2). La restricción de la
-// comunidad solo ha restado 2 al perro grande; ningún texto la menciona.
+// comunidad solo resta 2 al perro grande; hasta la reparación del 2664 (02/10/2026) ningún texto
+// la mencionaba. REPARADO: ahora «Lo que juega en contra» pide comprobarla.
 const COMUNIDAD_PERRO: Perfil = [
   'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'No, solo adultos',
   'La comunidad restringe', 'Compañía constante', 'Varios años con posibilidad', 'Sin límite especial', 'Más de 180 €/mes',
@@ -1012,9 +1013,9 @@ const COMUNIDAD_PERRO: Perfil = [
 // perro-mediano 2, gato 1, roedor 1 · P8 Varios años: — · P9 300 – 1.000 €: — · P10 Más de
 // 180 €/mes: perro-grande 2, perro-mediano 1.
 // perro-mediano 2+2+2+2+1 = 9 · gato 3+3+1+1 = 8 · perro-grande 3+2+2 = 7 · pez 4 · roedor 2 ·
-// pájaro 2 → hoy Perro mediano, con dos avisos que lo descalifican: «necesita salir varias veces
-// al día, todos los días» y «la casa vacía 6 – 10 horas: un perro lo lleva mal». Lo correcto:
-// la mejor sin esa incompatibilidad, Gato (8).
+// pájaro 2 → hasta el 02/10/2026, Perro mediano, con dos avisos que lo descalificaban: «necesita
+// salir varias veces al día, todos los días» y «la casa vacía 6 – 10 horas: un perro lo lleva
+// mal». Lo correcto: la mejor sin esa incompatibilidad, Gato (8). REPARADO (hallazgo 2665).
 const SIN_TIEMPO_NI_CASA: Perfil = [
   'Poco — menos de 1 h', '6 – 10 horas', 'Casa con jardín', 'Muy activo', 'Sí, de 5 a 12 años',
   'Sin restricciones', 'Juego e interacción', 'Varios años con posibilidad', '300 – 1.000 €', 'Más de 180 €/mes',
@@ -1489,5 +1490,505 @@ test.describe('re-inspección 02/10/2026 · contenido y lectores de pantalla', (
     // El consejo del perro, también
     const perro = calcularResultado({ 1: 'mucho', 2: 'siempre', 3: 'jardin', 4: 'mucho', 5: 'no', 6: 'ninguna', 7: 'compania', 8: 'medio', 9: 'alto', 10: 'alto' });
     expect(perro.consejos.map((c) => c.texto).join(' ')).toContain('el 45\u00A0% de los dueños de perro');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN DEL 10/10/2026 — invalidada porque el código cambió después del 02/10
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Todo lo de arriba se ha vuelto a ejecutar tal cual, en verde (45 de 45): los hallazgos
+// 1332-1343, 1437-1444 y 2664-2673 siguen reparados. Además se ha medido en navegador, tocando, a
+// 360, 390 y 412 px, que lo reparado el 02/10 aguanta en las DIEZ transiciones (el testigo de la
+// familia solo mira la pregunta 1): foco al enunciado, enunciado entero bajo la barra del logo y
+// doble toque sin contestar la pregunta siguiente. El invariante de la familia (radios con
+// aria-checked, una sola marcada, barra que anuncia lo que pinta) se cumple en las diez preguntas.
+//
+// Los casos nuevos se resolvieron a mano con la tabla PESOS de motor.ts ANTES de abrir el
+// navegador; cada cuenta es la del flujo de su propio test.
+//
+// Hallazgos ABIERTOS que fija este bloque (inspector 10/10/2026):
+//   1. El 2.º toque de un doble toque en «Ver resultado» o en «Repetir el test» cae en un ENLACE de
+//      un componente compartido («Contacto» del aviso legal; el pie, o «Más información →» del
+//      aviso de transparencia) y saca de la app. El guard de ráfaga del 2671 solo está en los
+//      botones de la app, y un enlace no pasa por él.
+//   2. Las horquillas de coste de los perros no cuadran con la media de la OCU que la propia
+//      página cita como contraste (cabo C0011).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Como `responder`, pero en la pregunta 6 se pueden marcar varias casillas (lista de textos). */
+async function responderConCasillas(page: Page, perfil: ReadonlyArray<string | readonly string[]>): Promise<void> {
+  for (let i = 0; i < perfil.length; i++) {
+    const entrada = perfil[i];
+    const textos: readonly string[] = typeof entrada === 'string' ? [entrada] : entrada;
+    for (const texto of textos) {
+      const opcion = page.locator(OPCIONES_EN_PANTALLA, { hasText: texto });
+      await expect(opcion, `P${i + 1}: «${texto}» debe casar con UNA opción`).toHaveCount(1);
+      await opcion.click();
+    }
+    await page
+      .getByRole('button', { name: i === perfil.length - 1 ? 'Ver resultado' : 'Siguiente pregunta' })
+      .click();
+  }
+}
+
+/** Los párrafos de una sección del resultado, por su título (vacío si la sección no se pinta). */
+async function itemsDeSeccion(page: Page, titulo: string): Promise<string[]> {
+  const seccion = page.locator('[class*="consejosSection"]').filter({
+    has: page.locator('[class*="consejosTitulo"]', { hasText: titulo }),
+  });
+  if ((await seccion.count()) === 0) return [];
+  return (await seccion.locator('[class*="consejoItem"]').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
+}
+
+test.describe('Re-inspección 10/10/2026 — casos resueltos a mano', () => {
+  test('caso normal: silencio Y comunidad a la vez, adolescentes y compañía → Gato (11 frente a 7 y 7)', async ({ page }) => {
+    // P1 Bastante: gato 3, perro-pequeño 2, perro-mediano 1 · P2 Casi nunca vacía: perro-grande 2,
+    // perro-mediano 2 · P3 Piso normal: perro-pequeño 2, gato 2 · P4 Moderado: perro-mediano 1,
+    // perro-pequeño 1 · P5 Adolescentes: perro-mediano 1, gato 1 · P6 COMUNIDAD (pez 2, roedor 1,
+    // gato 1, perro-grande −2) + SILENCIO (pez 3, reptil 2, gato 1, pájaro −2, perro-pequeño −1) ·
+    // P7 Compañía: perro-pequeño 2, perro-mediano 2, gato 1 · P8 Toda la vida: gato 2,
+    // perro-pequeño 1, reptil 1 · P9 300 – 1.000 € y P10 80 – 180 €/mes: nada (techo 180: caben todos).
+    // gato 3+2+1+1+1+1+2 = 11 · perro-pequeño 2+2+1−1+2+1 = 7 · perro-mediano 1+2+1+1+2 = 7 ·
+    // pez 2+3 = 5 · reptil 3 · roedor 1 · perro-grande 0 · pájaro −2 → Gato, sin empate ni recorte.
+    // Razones: P1 (+3), P3 (+2) y P8 (+2, detrás de P3 por número). La comunidad suma al gato (+1),
+    // así que no se pide comprobarla; 120 € < 180 €: nada juega en contra.
+    const motor = calcularResultado({ 1: 'medio', 2: 'siempre', 3: 'piso_normal', 4: 'medio', 5: 'adolescentes', 6: 'comunidad,sin_ruido', 7: 'compania', 8: 'largo', 9: 'medio', 10: 'medio' });
+    expect([motor.puntos.gato, motor.puntos['perro-pequeno'], motor.puntos['perro-mediano'], motor.puntos.pez]).toEqual([11, 7, 7, 5]);
+    await abrirTest(page);
+    await responderConCasillas(page, [
+      'Bastante — 1-2 h', 'Casi nunca está vacía', 'Piso normal', 'Moderado', 'Sí, adolescentes',
+      ['La comunidad restringe', 'Necesidad de silencio'], 'Compañía constante', 'Para toda la vida', '300 – 1.000 €', '80 – 180 €/mes',
+    ]);
+    const ficha = await leerFicha(page);
+    expect([ficha.mascota, ficha.inicial, ficha.mensual, ficha.vida]).toEqual(['Gato', '100 – 1.500 €', '50 – 120 €', '12 – 20 años']);
+    expect(await itemsDeSeccion(page, 'Por qué esta recomendación')).toEqual([
+      'Con 1 – 2 horas al día cubres bien lo que necesita un gato.',
+      'Un piso de 50 – 80 m² es suficiente para un gato.',
+      'Piensas en un compromiso para toda la vida, y un gato es longevo.',
+      'Coste mensual estimado para Gato: 50 – 120 €. Esperanza de vida: 12 – 20 años.',
+    ]);
+    expect(await itemsDeSeccion(page, 'Lo que juega en contra')).toEqual([]);
+    await expect(page.locator('[class*="avisoRecorte"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    // Consejos: protectora, esterilización del gato (Ley 7/2023, art. 26.i) y plan B; ninguno de perro
+    const consejos = await itemsDeSeccion(page, 'Antes de decidirte');
+    expect(consejos).toHaveLength(3);
+    expect(consejos[1]).toContain('Ley 7/2023, art. 26.i');
+  });
+
+  test('caso límite: Perro grande con «80 – 180 €/mes» — su mínimo (150) cabe y se avisa de que la parte alta (280) no', async ({ page }) => {
+    // P1 Mucho: perro-mediano 3, perro-grande 3, perro-pequeño 2, gato 1 · P2 Casi nunca vacía:
+    // perro-grande 2, perro-mediano 2 · P3 Jardín: perro-grande 3, perro-mediano 2 · P4 Muy activo:
+    // perro-grande 2, perro-mediano 2 · P7 Presencia tranquila: pez 2, gato 2, reptil 1 · P5 Sin
+    // niños, P6 Sin restricciones, P8 Varios años, P9 Sin límite y P10 80 – 180 €/mes: nada.
+    // perro-grande 3+2+3+2 = 10 · perro-mediano 3+2+2+2 = 9 · gato 1+2 = 3 · perro-pequeño 2 ·
+    // pez 2 · reptil 1 → Perro grande. Filtro (1438): cabe si el MÍNIMO queda por debajo del techo,
+    // 150 < 180 → cabe; pero 280 > 180, y eso se avisa. Razones: P1 (+3), P3 (+3) y P2 (+2, antes
+    // que P4 por número). Sin «Lo mínimo» ni «Hasta 300 €»: el coste inicial es el de compra.
+    const motor = calcularResultado({ 1: 'mucho', 2: 'siempre', 3: 'jardin', 4: 'mucho', 5: 'no', 6: 'ninguna', 7: 'tranquilidad', 8: 'medio', 9: 'alto', 10: 'medio' });
+    expect([motor.puntos['perro-grande'], motor.puntos['perro-mediano'], motor.puntos.gato]).toEqual([10, 9, 3]);
+    await abrirTest(page);
+    await responder(page, [
+      'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'No, solo adultos',
+      'Sin restricciones', 'Presencia tranquila', 'Varios años con posibilidad', 'Sin límite especial', '80 – 180 €/mes',
+    ]);
+    const ficha = await leerFicha(page);
+    expect([ficha.mascota, ficha.inicial, ficha.mensual, ficha.vida]).toEqual(['Perro grande', '400 – 2.000 €', '150 – 280 €', '8 – 12 años']);
+    expect(await itemsDeSeccion(page, 'Por qué esta recomendación')).toEqual([
+      'Tienes más de 2 horas al día: da para los paseos, el juego y la atención que pide un perro grande.',
+      'Tienes casa con jardín o patio, el espacio que mejor aprovecha un perro grande.',
+      'Casi siempre hay alguien en casa, y un perro grande lo agradece: no pasará horas a solas.',
+      'Coste mensual estimado para Perro grande: 150 – 280 €. Esperanza de vida: 8 – 12 años.',
+    ]);
+    expect(await itemsDeSeccion(page, 'Lo que juega en contra')).toEqual([
+      'La parte alta de la horquilla de un perro grande (150 – 280 €) supera tu tramo de 80 – 180 €/mes: los meses con veterinario pueden salirse de él.',
+    ]);
+    await expect(page.locator('[class*="avisoRecorte"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    expect(await itemsDeSeccion(page, 'Antes de decidirte')).toHaveLength(4); // protectora, seguro, chip/licencia, plan B
+  });
+
+  test('caso límite: menos de 1 h al día pero la casa vacía solo 3 – 5 h → el perro NO se descarta (2665) y se dice lo que juega en contra', async ({ page }) => {
+    // P1 Poco: gato 3, pez 2, pájaro 1 · P2 3 – 5 h: perro-pequeño 1, gato 1 · P3 Jardín:
+    // perro-grande 3, perro-mediano 2 · P4 Muy activo: perro-grande 2, perro-mediano 2 · P5 Niños
+    // 5-12: perro-mediano 2, gato 1, roedor 1 · P7 Juego: perro-mediano 2, gato 1, roedor 1 · P10 Más
+    // de 180: perro-grande 2, perro-mediano 1 · P6 Sin restricciones, P8 Varios años, P9 Sin límite: nada.
+    // perro-mediano 2+2+2+2+1 = 9 · perro-grande 3+2+2 = 7 · gato 3+1+1+1 = 6 · pez 2 · roedor 2 ·
+    // pájaro 1 · perro-pequeño 1 → Perro mediano. El descarte del 2665 exige poco tiempo Y la casa
+    // vacía 6 – 10 h o varios días (motor.ts, punto 6: cada condición sola es un aviso); con 3 – 5 h
+    // no se aplica, y las dos condiciones van a «Lo que juega en contra». Razones: P3, P4 y P5
+    // (+2 cada una, por número; P7 también suma 2 y queda cuarta).
+    const motor = calcularResultado({ 1: 'poco', 2: 'pocas', 3: 'jardin', 4: 'mucho', 5: 'si_mayores', 6: 'ninguna', 7: 'juego', 8: 'medio', 9: 'alto', 10: 'alto' });
+    expect([motor.puntos['perro-mediano'], motor.puntos['perro-grande'], motor.puntos.gato]).toEqual([9, 7, 6]);
+    expect(motor.descartes['perro-mediano']).toBeUndefined();
+    await abrirTest(page);
+    await responder(page, [
+      'Poco — menos de 1 h', '3 – 5 horas', 'Casa con jardín', 'Muy activo', 'Sí, de 5 a 12 años',
+      'Sin restricciones', 'Juego e interacción', 'Varios años con posibilidad', 'Sin límite especial', 'Más de 180 €/mes',
+    ]);
+    const ficha = await leerFicha(page);
+    expect([ficha.mascota, ficha.inicial, ficha.mensual, ficha.vida]).toEqual(['Perro mediano', '300 – 1.500 €', '100 – 200 €', '10 – 14 años']);
+    expect(await itemsDeSeccion(page, 'Por qué esta recomendación')).toEqual([
+      'Tienes casa con jardín o patio, el espacio que mejor aprovecha un perro mediano.',
+      'Te declaras muy activo: puedes compartir paseos largos y salidas al campo con un perro mediano.',
+      'Con niños de 5 a 12 años, un perro mediano les deja participar en el cuidado.',
+      'Coste mensual estimado para Perro mediano: 100 – 200 €. Esperanza de vida: 10 – 14 años.',
+    ]);
+    expect(await itemsDeSeccion(page, 'Lo que juega en contra')).toEqual([
+      'Has dicho que tienes menos de una hora al día: un perro mediano necesita salir varias veces al día, todos los días.',
+      'La casa se queda vacía 3 – 5 horas: las guías de bienestar animal (RSPCA, PDSA) aconsejan no dejar a un perro solo más de cuatro horas seguidas, así que los días largos alguien tendrá que sacar a un perro mediano.',
+    ]);
+    await expect(page.locator('[class*="avisoRecorte"]')).toHaveCount(0);
+  });
+
+  test('caso que debe rechazarse: solo fines de semana y viajes de varios días con perfil perruno → fuera los perros, Peces', async ({ page }) => {
+    // P1 Mínimo: pez 3, reptil 2, roedor 1 · P2 Varios días: pez 3, reptil 2, roedor 1, gato −1 ·
+    // P3 Jardín: perro-grande 3, perro-mediano 2 · P4 Muy activo: perro-grande 2, perro-mediano 2 ·
+    // P5 Niños 5-12: perro-mediano 2, gato 1, roedor 1 · P7 Compañía: perro-pequeño 2,
+    // perro-mediano 2, gato 1 · P10 Más de 180: perro-grande 2, perro-mediano 1 · el resto, nada.
+    // perro-mediano 2+2+2+2+1 = 9 · perro-grande 3+2+2 = 7 · pez 3+3 = 6 · reptil 2+2 = 4 ·
+    // roedor 1+1+1 = 3 · perro-pequeño 2 · gato −1+1+1 = 1 → por estilo de vida, Perro mediano; con
+    // «Mínimo» Y «Varios días seguidos» caen los tres perros (motivo «atencion») → Peces (6). Como
+    // el perro mediano (9) superaba a los peces, el descarte se explica también en las razones.
+    // Los peces no se adoptan y P9 es «Sin límite»: coste inicial de compra, 50 – 500 €.
+    const motor = calcularResultado({ 1: 'minimo', 2: 'viajes', 3: 'jardin', 4: 'mucho', 5: 'si_mayores', 6: 'ninguna', 7: 'compania', 8: 'medio', 9: 'alto', 10: 'alto' });
+    expect([motor.puntos['perro-mediano'], motor.puntos.pez, motor.puntos.reptil]).toEqual([9, 6, 4]);
+    expect(motor.mascotaPorPerfil).toBe('perro-mediano');
+    await abrirTest(page);
+    await responder(page, [
+      'Mínimo — solo fines', 'Varios días seguidos', 'Casa con jardín', 'Muy activo', 'Sí, de 5 a 12 años',
+      'Sin restricciones', 'Compañía constante', 'Varios años con posibilidad', 'Sin límite especial', 'Más de 180 €/mes',
+    ]);
+    const ficha = await leerFicha(page);
+    expect([ficha.mascota, ficha.inicial, ficha.mensual, ficha.vida]).toEqual(['Peces', '50 – 500 €', '10 – 30 €', '1 – 15 años (según especie)']);
+    const aviso = (await page.locator('[class*="avisoRecorte"]').innerText()).replace(/\s+/g, ' ');
+    expect(aviso).toContain('Por estilo de vida encajaría un perro mediano, pero has dicho que tienes tiempo solo los fines de semana y que la casa se queda vacía varios días seguidos');
+    expect(await itemsDeSeccion(page, 'Por qué esta recomendación')).toEqual([
+      'Solo tienes los fines de semana: unos peces se cuidan con rutinas cortas entre semana.',
+      'Viajas varios días seguidos: unos peces lo llevan mejor que otros animales, con un cuidador puntual o un sistema automático.',
+      'Has dicho que tienes tiempo solo los fines de semana y que la casa se queda vacía varios días seguidos: se han descartado los perros, porque necesitan salir varias veces al día y las guías de bienestar animal (RSPCA, PDSA) aconsejan no dejarlos solos más de cuatro horas seguidas.',
+      'Coste mensual estimado para Peces: 10 – 30 €. Esperanza de vida: 1 – 15 años (según especie).',
+    ]);
+    expect(await itemsDeSeccion(page, 'Lo que juega en contra')).toEqual([]);
+  });
+
+  test('caso bloqueado: en la pregunta 6, desmarcar la única casilla vuelve a bloquear «Siguiente», y «Sin restricciones» excluye a las demás', async ({ page }) => {
+    // alternarCasilla (page.tsx): desmarcar la única marcada deja la respuesta vacía → «Siguiente»
+    // desactivado; «Sin restricciones» (exclusiva) desmarca a las demás, y marcar otra la desmarca.
+    // Teclado del patrón de casillas: cada una es su parada de Tab, Espacio la marca y las flechas
+    // no mueven el foco ni marcan nada (teclaEnOpcion sale en las preguntas múltiples).
+    await abrirTest(page);
+    for (const t of ['Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'No, solo adultos']) {
+      await page.locator(OPCIONES_EN_PANTALLA, { hasText: t }).click();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    }
+    await expect(page.getByText('Pregunta 6 de 10').first()).toBeVisible();
+    const siguiente = page.getByRole('button', { name: 'Siguiente pregunta' });
+    const casilla = (texto: string) => page.locator('[role="group"] [role="checkbox"]', { hasText: texto });
+    await expect(siguiente).toBeDisabled();
+    expect(await page.locator(OPCIONES_EN_PANTALLA).evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([0, 0, 0, 0]);
+    await casilla('Alergia al pelo').click();
+    await expect(siguiente).toBeEnabled();
+    await casilla('Alergia al pelo').click();
+    await expect(casilla('Alergia al pelo')).toHaveAttribute('aria-checked', 'false');
+    await expect(siguiente).toBeDisabled();
+    await casilla('La comunidad restringe').focus();
+    await page.keyboard.press('Space');
+    await expect(casilla('La comunidad restringe')).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('ArrowDown');
+    await expect(casilla('La comunidad restringe')).toBeFocused();
+    await expect(casilla('Necesidad de silencio')).toHaveAttribute('aria-checked', 'false');
+    await casilla('Sin restricciones').click();
+    await expect(page.locator(MARCADAS_EN_PANTALLA)).toHaveCount(1);
+    await expect(casilla('Sin restricciones')).toHaveAttribute('aria-checked', 'true');
+    await casilla('Alergia al pelo').click();
+    await expect(casilla('Sin restricciones')).toHaveAttribute('aria-checked', 'false');
+    await expect(page.locator(MARCADAS_EN_PANTALLA)).toHaveCount(1);
+    await expect(siguiente).toBeEnabled();
+  });
+
+  test('familia: en las diez preguntas, radios con aria-checked (casillas en la 6), una sola marcada y la barra anuncia lo que pinta', async ({ page }) => {
+    // El testigo tests/familias/selectores.spec.ts solo mira la pregunta 1. Aquí, las diez: tras
+    // dos clics seguidos en opciones distintas queda UNA marcada (dos en la 6, que es de casillas),
+    // ninguna lleva aria-pressed, y (valuenow − valuemin) / (valuemax − valuemin) es el ancho real
+    // del relleno: 0, 0,1 … 0,9. Tolerancia 0,005: el relleno es un % de la caja de contenido y la
+    // barra se mide con su borde (medido el 10/10/2026 a 1280 px: 0,8969 pintado frente a 0,9).
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await abrirTest(page);
+    for (let i = 1; i <= 10; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();
+      const m = await page.evaluate(() => {
+        const grupo = document.querySelector('[class*="opcionesGrid"]')!;
+        const barra = document.querySelector('[role="progressbar"]')!;
+        const relleno = barra.firstElementChild!;
+        const num = (a: string) => Number(barra.getAttribute(a));
+        return {
+          rol: grupo.getAttribute('role'),
+          radios: grupo.querySelectorAll('[role="radio"]').length,
+          casillas: grupo.querySelectorAll('[role="checkbox"]').length,
+          opciones: grupo.children.length,
+          pressed: grupo.querySelectorAll('[aria-pressed]').length,
+          anunciado: (num('aria-valuenow') - num('aria-valuemin')) / (num('aria-valuemax') - num('aria-valuemin')),
+          pintado: relleno.getBoundingClientRect().width / barra.getBoundingClientRect().width,
+        };
+      });
+      const multiple = i === 6;
+      expect(m.rol, `P${i}`).toBe(multiple ? 'group' : 'radiogroup');
+      expect(multiple ? m.casillas : m.radios, `P${i}`).toBe(m.opciones);
+      expect(m.pressed, `P${i}`).toBe(0);
+      expect(m.anunciado, `P${i}`).toBeCloseTo((i - 1) / 10, 6);
+      expect(Math.abs(m.anunciado - m.pintado), `P${i}: anunciado ${m.anunciado}, pintado ${m.pintado}`).toBeLessThan(0.005);
+      const ops = page.locator(OPCIONES_EN_PANTALLA);
+      await ops.nth(0).click();
+      await ops.nth(1).click();
+      await expect(page.locator(MARCADAS_EN_PANTALLA), `P${i}`).toHaveCount(multiple ? 2 : 1);
+      await page.locator('[class*="btnSiguiente"]').click();
+    }
+    await expect(page.getByRole('heading', { name: 'Tu mascota ideal' })).toBeVisible();
+  });
+});
+
+test('motor (forma del 1838): ningún texto que pinta el resultado lleva un emoji dentro de la cadena', () => {
+  // Los consejos llevaban el emoji dentro del texto y el lector lo leía (2672, reparado: ahora van
+  // en `icono`, que la vista pinta con aria-hidden). Se recorren las 589.824 combinaciones y se
+  // mira TODO lo que la vista pinta como texto: razones, «lo que juega en contra», el desempate,
+  // el texto de cada consejo, el coste inicial y su nota, y las fichas de MASCOTAS (salvo `icon`).
+  const OPCIONES: string[][] = [
+    ['mucho', 'medio', 'poco', 'minimo'], ['siempre', 'pocas', 'muchas', 'viajes'],
+    ['jardin', 'piso_grande', 'piso_normal', 'piso_pequeno'], ['mucho', 'medio', 'poco'],
+    ['si_pequenos', 'si_mayores', 'no', 'adolescentes'], ['alergia_pelo', 'comunidad', 'sin_ruido', 'ninguna'],
+    ['compania', 'juego', 'tranquilidad', 'novedad'], ['largo', 'medio', 'corto'],
+    ['minimo', 'bajo', 'medio', 'alto'], ['muy_bajo', 'bajo', 'medio', 'alto'],
+  ];
+  const textos = new Set<string>();
+  const idx = new Array(10).fill(0);
+  for (;;) {
+    const r: Record<number, string> = {};
+    OPCIONES.forEach((o, i) => { r[i + 1] = o[idx[i]]; });
+    const res = calcularResultado(r);
+    for (const t of [...res.razones, ...res.aTenerEnCuenta, res.criterioDesempate, res.costeInicial.valor, res.costeInicial.nota]) textos.add(t);
+    for (const c of res.consejos) textos.add(c.texto);
+    let i = 9;
+    while (i >= 0 && ++idx[i] === OPCIONES[i].length) { idx[i] = 0; i--; }
+    if (i < 0) break;
+  }
+  for (const f of Object.values(MASCOTAS)) {
+    for (const t of [f.nombre, f.conArticulo, f.perfil, f.descripcion, f.costeInicial, f.costeMensual, f.esperanzaVida, ...f.pros, ...f.contras]) textos.add(t);
+  }
+  const conEmoji = [...textos].filter((t) => /\p{Extended_Pictographic}/u.test(t));
+  expect(textos.size).toBeGreaterThan(100);
+  expect(conEmoji).toEqual([]);
+});
+
+/** Coloca el centro de un botón en la ordenada `y` de la pantalla y devuelve ese punto. */
+async function centrarBotonEn(page: Page, selector: string, y: number): Promise<{ x: number; y: number }> {
+  const boton = page.locator(selector);
+  await boton.evaluate((e, yy) => {
+    const r = e.getBoundingClientRect();
+    window.scrollBy(0, r.top + r.height / 2 - yy);
+  }, y);
+  const caja = (await boton.boundingBox())!;
+  return { x: caja.x + caja.width / 2, y: caja.y + caja.height / 2 };
+}
+
+/** Contesta las diez preguntas con clics sueltos (detail 1: nunca una ráfaga) y deja la 10 marcada. */
+async function contestarLasDiez(page: Page): Promise<void> {
+  for (let i = 1; i <= 10; i++) {
+    await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();
+    await page.locator(OPCIONES_EN_PANTALLA).last().click();
+    if (i < 10) await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+  }
+}
+
+// Franjas medidas el 10/10/2026 (barrido de 5 en 5 px, centro del botón): el 2.º toque de
+// «Ver resultado» cae en «Contacto» con el botón en y 300–335 a 360 px y en y 285–320 a 390 y
+// 412 px; el de «Repetir el test», con el aviso de transparencia ya cerrado, cae en el pie (que
+// lleva a «/») en y 580–680 a 360 px y en y 640–740 a 390 y 412 px. Cada test usa el centro.
+const MOVILES_1010 = [
+  { ancho: 360, alto: 780, dpr: 2, yVer: 315, yRepetir: 620 },
+  { ancho: 390, alto: 844, dpr: 3, yVer: 300, yRepetir: 690 },
+  { ancho: 412, alto: 839, dpr: 2.625, yVer: 300, yRepetir: 690 },
+];
+
+for (const movil of MOVILES_1010) {
+  test.describe(`Re-inspección 10/10/2026 — móvil ${movil.ancho} px`, () => {
+    test.use({
+      viewport: { width: movil.ancho, height: movil.alto },
+      userAgent: devices['Pixel 7'].userAgent,
+      deviceScaleFactor: movil.dpr,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('REPARADO sigue en pie (2667, 2669, 2670): tocando, el foco va al enunciado de cada pregunta, entero y bajo la barra, y al título del resultado', async ({ page }) => {
+      // Medido el 10/10/2026: en las diez transiciones el enunciado queda en y 80 (barra hasta y 52)
+      // con el foco puesto, y el título del resultado también. Toques sueltos: el 2.º de un doble
+      // toque mueve el foco a donde caiga, como cualquier toque.
+      test.setTimeout(60_000);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto('/selector-mascota/');
+      await esperarHidratacionBotones(page);
+      await page.locator('[class*="btnStart"]').tap();
+      const malas: string[] = [];
+      for (let i = 1; i <= 10; i++) {
+        await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();
+        // Medio segundo: posición asentada, y el toque de la opción queda fuera de la ráfaga (2671)
+        await page.waitForTimeout(500);
+        const m = await bajoLaBarraLogo(page, '[class*="preguntaTexto"]');
+        const enfocado = await page.locator('[class*="preguntaTexto"]').evaluate((e) => e === document.activeElement);
+        if (!enfocado || m.tapado || m.top < m.barra || m.bottom > movil.alto) {
+          malas.push(`P${i}: foco ${enfocado}, enunciado en y ${m.top}–${m.bottom}, barra hasta ${m.barra}`);
+        }
+        await page.locator('[class*="btnSiguiente"]').evaluate((e) => {
+          const r = e.getBoundingClientRect();
+          if (r.bottom > window.innerHeight) window.scrollBy(0, r.bottom - window.innerHeight + 8);
+        });
+        await page.locator(OPCIONES_EN_PANTALLA).last().tap();
+        await page.locator('[class*="btnSiguiente"]').tap();
+      }
+      await expect(page.getByRole('heading', { name: 'Tu mascota ideal' })).toBeFocused();
+      const h1 = await bajoLaBarraLogo(page, 'header h1');
+      expect(h1.tapado, `título del resultado en y ${h1.top}, barra hasta ${h1.barra}`).toBe(false);
+      expect(malas).toEqual([]);
+    });
+
+    test('REPARADO sigue en pie (2671): un doble toque en cada «Siguiente» y en «Ver resultado», donde quedan sin desplazar de más, no contesta nada ni saca de la app', async ({ page }) => {
+      // Medido el 10/10/2026 (tres vueltas por ancho): «Ver resultado» queda en y ≈ 551, fuera de la
+      // franja de «Contacto», y ninguna pregunta se contesta sola.
+      test.setTimeout(60_000);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto('/selector-mascota/');
+      await esperarHidratacionBotones(page);
+      await page.locator('[class*="btnStart"]').tap();
+      const contestadas: string[] = [];
+      for (let i = 1; i <= 10; i++) {
+        await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();
+        // Medio segundo: el toque de la opción no entra en la ráfaga del doble toque anterior
+        await page.waitForTimeout(500);
+        const boton = page.locator('[class*="btnSiguiente"]');
+        await boton.evaluate((e) => {
+          const r = e.getBoundingClientRect();
+          if (r.bottom > window.innerHeight) window.scrollBy(0, r.bottom - window.innerHeight + 8);
+        });
+        await page.locator(OPCIONES_EN_PANTALLA).first().tap();
+        await page.waitForTimeout(400);
+        const caja = (await boton.boundingBox())!;
+        const x = caja.x + caja.width / 2;
+        const y = caja.y + caja.height / 2;
+        await page.touchscreen.tap(x, y);
+        await page.waitForTimeout(150);
+        await page.touchscreen.tap(x, y);
+        await page.waitForTimeout(300);
+        if (i < 10 && (await page.locator(MARCADAS_EN_PANTALLA).count()) > 0) contestadas.push(`P${i + 1} (botón en y ${Math.round(y)})`);
+      }
+      expect(new URL(page.url()).pathname).toBe('/selector-mascota/');
+      await expect(page.locator('[class*="recomendacionValor"]')).toBeVisible();
+      expect(contestadas).toEqual([]);
+    });
+
+    test(`HALLAZGO: el 2.º toque de un doble toque en «Ver resultado» (botón en y ${movil.yVer}) no saca de la app`, async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). El primer toque pinta el resultado y lo sube a su sitio; en
+      // ese punto queda la fila del aviso legal (LegalNotice) y el 2.º toque, que el navegador
+      // ajusta al enlace más cercano, abre «Contacto» (/contacto/). Se pierden el resultado y las
+      // diez respuestas: «atrás» vuelve a la intro. El guard de ráfaga del 2671 (`clicDeMas`) solo
+      // está en los botones de la app; un enlace de un componente compartido no pasa por él.
+      // Esperado: el resultado sigue en /selector-mascota/. Obtenido hoy: /contacto/.
+      test.fail();
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await abrirTest(page);
+      await contestarLasDiez(page);
+      const p = await centrarBotonEn(page, '[class*="btnSiguiente"]', movil.yVer);
+      await page.touchscreen.tap(p.x, p.y);
+      await expect(page.getByRole('heading', { name: 'Tu mascota ideal' })).toBeVisible();
+      await page.waitForTimeout(150);
+      await page.touchscreen.tap(p.x, p.y);
+      await page.waitForTimeout(800);
+      expect(new URL(page.url()).pathname).toBe('/selector-mascota/');
+      await expect(page.locator('[class*="recomendacionValor"]')).toBeVisible();
+    });
+
+    test(`HALLAZGO: el 2.º toque de un doble toque en «Repetir el test» (botón en y ${movil.yRepetir}) no saca de la app`, async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). Mismo defecto que el anterior: al volver a la intro la página
+      // encoge y bajo el dedo queda el pie (enlace a «/»); con el aviso de transparencia sin cerrar,
+      // su «Más información →» (/privacidad/), en una franja más baja. Se cierra con su botón, como
+      // quien ya lo ha visto. Esperado: la intro del test en /selector-mascota/. Obtenido hoy: «/».
+      test.fail();
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto('/selector-mascota/');
+      await esperarHidratacionBotones(page);
+      const cerrarAviso = page.getByRole('button', { name: 'Cerrar aviso de transparencia' });
+      await cerrarAviso.click();
+      await expect(cerrarAviso).toHaveCount(0);
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.getByRole('button', { name: /Empezar el test/ }).click();
+      await contestarLasDiez(page);
+      await page.getByRole('button', { name: 'Ver resultado' }).click();
+      await page.getByRole('heading', { name: 'Tu mascota ideal' }).waitFor();
+      await page.waitForTimeout(500);
+      const p = await centrarBotonEn(page, '[class*="btnRepetir"]', movil.yRepetir);
+      await page.touchscreen.tap(p.x, p.y);
+      await expect(page.getByRole('button', { name: /Empezar el test/ })).toBeVisible();
+      await page.waitForTimeout(150);
+      await page.touchscreen.tap(p.x, p.y);
+      await page.waitForTimeout(800);
+      expect(new URL(page.url()).pathname).toBe('/selector-mascota/');
+      await expect(page.getByRole('button', { name: /Empezar el test/ })).toBeVisible();
+    });
+  });
+}
+
+test.describe('Re-inspección 10/10/2026 — contenido (cabo C0011)', () => {
+  /** La nota bajo los costes, en una línea (se pinta en todo resultado). */
+  async function notaCostes(page: Page): Promise<string> {
+    await abrirTest(page);
+    await responder(page, NORMAL);
+    await leerFicha(page);
+    return (await page.locator('[class*="notaCostes"]').innerText()).replace(/\s+/g, ' ');
+  }
+
+  test('control: la horquilla del gato contiene la media de la OCU que cita la página, casi en su centro', async ({ page }) => {
+    // Nota y FAQPage: «986 € por gato (unos 82 €)». 986 / 12 = 82,17 €/mes. Horquilla del gato
+    // (motor.ts): 50 – 120 €, centro 85 €. 50 ≤ 82,17 ≤ 120, a 2,83 € del centro: con el gato, la
+    // estimación y el contraste que la página pone al lado se sostienen el uno al otro.
+    expect(await notaCostes(page)).toContain('986 € por gato (unos 82 €)');
+    const ocuGatoMes = 986 / 12;
+    expect(ocuGatoMes).toBeCloseTo(82.17, 2);
+    expect(ocuGatoMes).toBeGreaterThanOrEqual(MASCOTAS.gato.costeMensualMin);
+    expect(ocuGatoMes).toBeLessThanOrEqual(MASCOTAS.gato.costeMensualMax);
+    expect(Math.abs(ocuGatoMes - (MASCOTAS.gato.costeMensualMin + MASCOTAS.gato.costeMensualMax) / 2)).toBeLessThan(3);
+  });
+
+  test('FAQPage y pantalla dan las mismas cifras de la OCU (no hay FAQ visible que pueda divergir)', async ({ page }) => {
+    const nota = await notaCostes(page);
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    for (const cifra of ['1.131 € al año por perro (unos 94 € al mes', '986 € por gato (unos 82 €']) {
+      expect(nota).toContain(cifra);
+      expect(ld).toContain(cifra);
+    }
+  });
+
+  test('HALLAZGO (C0011): las horquillas de los perros cuadran con la media de la OCU que la propia página cita', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). Bajo los costes de cualquier resultado: «la encuesta de la OCU
+    // de 2022 midió un gasto medio de 1.131 € al año por perro (unos 94 € al mes)»; el FAQPage da la
+    // misma cifra como «referencia» de «¿Cuánto cuesta mantener una mascota al mes?».
+    // 1.131 / 12 = 94,25 €/mes. Horquillas (motor.ts): pequeño 80 – 150, mediano 100 – 200,
+    // grande 150 – 280. Aun con CADA perro en el MÍNIMO de su horquilla y los tres tamaños por
+    // igual, la media sería (80 + 100 + 150) / 3 = 110 € > 94,25. Con mediano y grande en su mínimo,
+    // el pequeño tendría que costar 3 × 94,25 − 250 = 32,75 €/mes, menos de la mitad de su propio
+    // mínimo (80); y el centro más barato de las tres (115 €, el pequeño) ya pasa un 22 % de la media.
+    // No lo explica ni la fecha (2022 frente a 2026: haría falta un +17 % solo para llegar a la media
+    // de los mínimos) ni los conceptos (la OCU incluye veterinario; la guía de la app llama «coste
+    // mensual visible» a comida, arena y accesorios). Con el gato sí cuadra (control de arriba), y
+    // las horquillas de los perros alimentan el filtro de presupuesto.
+    // Esperado: media de los mínimos ≤ media de la OCU. Obtenido: 110 frente a 94,25.
+    test.fail();
+    expect(await notaCostes(page)).toContain('1.131 € al año por perro (unos 94 € al mes)');
+    const ocuPerroMes = 1131 / 12;
+    expect(ocuPerroMes).toBeCloseTo(94.25, 2);
+    const minimos = [MASCOTAS['perro-pequeno'], MASCOTAS['perro-mediano'], MASCOTAS['perro-grande']].map((m) => m.costeMensualMin);
+    expect(minimos).toEqual([80, 100, 150]);
+    const mediaDeMinimos = minimos.reduce((a, b) => a + b, 0) / minimos.length;
+    expect(mediaDeMinimos).toBeLessThanOrEqual(ocuPerroMes);
   });
 });

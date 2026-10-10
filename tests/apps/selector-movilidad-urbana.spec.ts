@@ -1,4 +1,4 @@
-import { test, expect, devices, type Page } from '@playwright/test';
+import { test, expect, devices, type Locator, type Page } from '@playwright/test';
 import { calcularResultado, CLAVES, COSTE_MENSUAL_MINIMO, PREGUNTAS, TRANSPORTES, rangoMensual, type TipoTransporte } from '../../app/selector-movilidad-urbana/motor';
 
 /**
@@ -1079,11 +1079,13 @@ test.describe('Re-inspección 02/10/2026 — móvil 360 px', () => {
     }
   });
 
-  // ── HALLAZGO (02/10/2026, ABIERTO): «Repetir el test» deja la pregunta 1 fuera de la pantalla ──
-  // El resultado (unos 1.300 px a 360) se sustituye por el cuestionario en su sitio sin desplazar
-  // la vista, y el botón pulsado se desmonta: foco en <body>. Medido: el enunciado de la 1 queda
-  // 694 px POR ENCIMA de la pantalla a 360 px (622 a 390, 318 en escritorio), y lo que se ve es
-  // la guía educativa y las apps relacionadas. Forma del 1679 de la referencia, en el reinicio.
+  // ── 2694 (02/10/2026, REPARADO): «Repetir el test» dejaba la pregunta 1 fuera de la pantalla ──
+  // El resultado (unos 1.300 px a 360) se sustituía por el cuestionario en su sitio sin desplazar
+  // la vista, y el botón pulsado se desmontaba: foco en <body>. Medido entonces: el enunciado de
+  // la 1 quedaba 694 px POR ENCIMA de la pantalla a 360 px (622 a 390, 318 en escritorio), y lo
+  // que se veía era la guía educativa y las apps relacionadas. Forma del 1679 de la referencia, en
+  // el reinicio. REPARADO: `reiniciar` marca `moverFoco` y el foco va al enunciado de la 1
+  // (scroll-margin-top 80 px). Re-inspección del 10/10/2026: sigue en verde.
   test('2694: tras «Repetir el test» se ve la pregunta 1 y el foco no cae a <body>', async ({ page }) => {
     await abrirTest(page);
     // Medio segundo entre un toque que cambia de pantalla y el siguiente: es lo que tarda una
@@ -1156,5 +1158,325 @@ test.describe('Re-inspección 02/10/2026 — móvil 412 px (Pixel 7)', () => {
       await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(0);
     }
     expect(caidasEnAnterior.length, 'alguna transición pone «Anterior» bajo el 2.º toque').toBeGreaterThan(0);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 10/10/2026 (la app volvió INVALIDADA: su código cambió tras la ronda 23)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Antes de añadir nada, el spec entero pasó (43/43): lo reparado el 02/10 sigue en pie. Medido
+// además con scripts en el navegador a 360 y 390 px: un toque SUELTO en «Siguiente», «Anterior»,
+// «Ver mi resultado» y «Repetir el test», con el botón al 15, 30, 50, 70 y 90 % de la altura de
+// la pantalla, deja el foco en el encabezado nuevo, visible y por debajo de la barra del logo
+// (120 medidas de 120). Ningún texto propio del cuestionario ni del resultado baja de 4,5:1
+// (3:1 el grande), ni en claro ni en oscuro. El FAQPage (cinco preguntas, ninguna en pantalla)
+// cuadra con COSTE_MENSUAL y con las fichas.
+//
+// Perfiles como índices de opción (0 = la primera), en el orden coche · transporte público (TP)
+// · moto · bici · combinación. Cada esperado se resolvió a mano ANTES de abrir la app, y los
+// recuentos salen de recorrer en Node las 104.976 combinaciones con el motor real.
+
+/** Recorre las 104.976 combinaciones y cuenta las que cumplen `cond`. */
+function contarPerfiles(cond: (r: readonly number[], res: ReturnType<typeof calcularResultado>) => boolean): number {
+  const r: number[] = [];
+  let n = 0;
+  const rec = (i: number): void => {
+    if (i === PREGUNTAS.length) {
+      if (cond(r, calcularResultado(r))) n++;
+      return;
+    }
+    for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) {
+      r[i] = k;
+      rec(i + 1);
+    }
+  };
+  rec(0);
+  return n;
+}
+
+// 5-15 km · No hay transporte público en mi zona · Casi nunca, solo lo básico · No, horario fijo ·
+// Importante, pero puedo asumir · No, es complicado o caro aparcar · Poco, me siento cómodo/a ·
+// Moderado · Me importa, pero no es el factor decisivo · Sí, tengo limitaciones importantes.
+//   coche 3 (P2) + 4 (P10) = 7 · TP 2+2+3+2+3+1+2+2 = 17 · moto 3+2+2+2+2+2+1 = 14 ·
+//   bici 2+2+2+1+2+2+1 = 12 · combinación 2+1+2+2+2+2+3+2 = 16.
+// Se descartan el TP (no hay red), la bici y la moto (limitación) y la combinación (sin TP ni
+// bici en que apoyarse): queda SOLO el coche, con 7 puntos.
+const LIMITACION_SOLO_COCHE = [1, 3, 2, 2, 1, 2, 2, 1, 1, 0] as const;
+
+test.describe('Re-inspección 10/10/2026 — casos del motor y el cabo C0011', () => {
+  // ── CASO NORMAL ──
+  // 15-40 km · Sí, muy completa y frecuente · Casi nunca · No, horario fijo · Crítica, quiero el
+  // mínimo gasto posible · No, es complicado o caro aparcar · Mucho, es una prioridad · Sí, llueve
+  // mucho… · Me importa · Leve, prefiero comodidad.
+  //   coche 2+2+3+2 = 9 · TP 3+4+2+3+4+3+3+2+2+2 = 28 · moto 2+2+2 = 6 · bici 2+2+3+2+1 = 10 ·
+  //   combinación 2+2+1+2+2+2+1 = 12. Nada se descarta y no hay empate. Razones: P2 (4) y P5 (4), y
+  //   de las de 3 puntos la de número más bajo, P1. Sin «Lo que juega en contra»: con el TP solo se
+  //   cita la red «Deficiente», y el coste «Crítica» solo va contra el coche, la moto o la combinación.
+  test('caso normal: 15-40 km con red completa y coste crítico dan el transporte público con 28 puntos', async ({ page }) => {
+    await abrirTest(page);
+    const texto = await responder(page, [2, 0, 2, 2, 0, 2, 0, 0, 1, 1]);
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Transporte Público');
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoDescarte"]')).toHaveCount(0);
+    await expect(page.locator('[class*="enContra"]')).toHaveCount(0);
+    await expect(page.locator('[class*="razones"] li')).toHaveText([
+      'Red de transporte público: has respondido «Sí, muy completa y frecuente», que suma 4 puntos al transporte público.',
+      'Coste mensual: has respondido «Crítica, quiero el mínimo gasto posible», que suma 4 puntos al transporte público.',
+      'Distancia: has respondido «Entre 15 y 40 km», que suma 3 puntos al transporte público.',
+    ]);
+    expect(texto).toContain('Coste estimado: 20–80 €/mes (abono mensual de metro, autobús o cercanías)');
+  });
+
+  // ── CASO LÍMITE: el coche como única opción admitida ──
+  // LIMITACION_SOLO_COCHE (arriba). El aviso nombra a los cuatro descartados, que superaban al
+  // coche, ordenados por puntos: TP 17 · combinación 16 · moto 14 · bici 12. Recuento del motor:
+  // «No hay transporte público» con «Sí, tengo limitaciones importantes» son 4 × 3^7 = 8.748
+  // perfiles (la distancia y las preguntas 3 a 9, libres), y en los 8.748 el coche es lo único que
+  // queda admitido: la cifra del cabo C0011.
+  test('caso límite: sin red y con limitaciones importantes solo queda el coche, y el aviso nombra los cuatro descartes', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, LIMITACION_SOLO_COCHE);
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Coche Propio');
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    await expect(page.locator('[class*="avisoDescarte"]')).toContainText(
+      'Se han descartado opciones que sumaban tantos puntos o más que el coche propio (7 puntos): el transporte público (17 puntos), porque sobre la red de transporte público has respondido «No hay transporte público en mi zona»; la combinación multimodal (16 puntos), porque se apoya en el transporte público o en la bici o el patinete, y tus respuestas descartan los dos; la moto o el escúter (14 puntos), porque has respondido «Sí, tengo limitaciones importantes» sobre tu movilidad física; la bici o el patinete eléctrico (12 puntos), porque has respondido «Sí, tengo limitaciones importantes» sobre tu movilidad física.',
+    );
+    let perfiles = 0;
+    let soloCoche = 0;
+    contarPerfiles((r, res) => {
+      if (r[1] !== 3 || r[9] !== 0) return false;
+      perfiles++;
+      if (res.tipo === 'coche_propio' && CLAVES.filter((k) => !res.descartes[k]).length === 1) soloCoche++;
+      return false;
+    });
+    expect(perfiles).toBe(8_748);
+    expect(soloCoche).toBe(8_748);
+  });
+
+  // ── CASO QUE DEBE QUEDAR BLOQUEADO ──
+  // Las nueve primeras contestadas y la 10 sin contestar: «Ver mi resultado» está desactivado, y ni
+  // un clic real ni uno sintético (dispatchEvent, que no pasa por las comprobaciones de Playwright)
+  // muestran el resultado; irSiguiente exige además la respuesta. Al contestar, sí.
+  test('caso bloqueado: sin contestar la 10 no hay resultado, ni con un clic sintético', async ({ page }) => {
+    await abrirTest(page);
+    for (let i = 0; i < 9; i++) {
+      await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+    }
+    await expect(page.getByText('10/10', { exact: true })).toBeVisible();
+    const ver = page.getByRole('button', { name: 'Ver mi resultado' });
+    await expect(ver).toBeDisabled();
+    await ver.dispatchEvent('click');
+    await ver.click({ force: true });
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveCount(0);
+    await expect(page.getByText('10/10', { exact: true })).toBeVisible();
+    await page.locator('[role="radiogroup"] [role="radio"]').nth(2).click();
+    await expect(ver).toBeEnabled();
+    await ver.click();
+    await expect(page.locator('[class*="resultadoTitulo"]')).toBeVisible();
+  });
+
+  // ── ABIERTO (inspector 10/10/2026): cabo C0011 — el coche, a quien declara una condición que
+  //    puede impedir conducir, sin aviso ni alternativa ──
+  // La pregunta 10 dice «¿Tienes alguna limitación de movilidad física o condición de salud que
+  // afecte al transporte?». «Sí, tengo limitaciones importantes» DESCARTA la moto, que también se
+  // conduce («riesgo de seguridad, no una preferencia», cabecera de motor.ts), pero suma 4 puntos
+  // al coche y es la razón que se da para recomendarlo: «Movilidad física: has respondido «Sí,
+  // tengo limitaciones importantes», que suma 4 puntos al coche propio.». La ficha promete «Total
+  // independencia de horarios y rutas» y cotiza 400–700 €/mes con amortización: comprarlo y
+  // conducirlo. Ni una palabra de que la condición declarada puede impedir conducir o pedir un
+  // vehículo adaptado, ni una alternativa (taxi adaptado, transporte a demanda, que te lleve otra
+  // persona). Recuento con el motor: el coche sale en 21.878 de los 34.992 perfiles con esa
+  // respuesta, con esa razón en los 21.878 y sin ese aviso en ninguno; en 8.748 es lo único que queda.
+  test.fail('C0011: con «limitaciones importantes», el resultado del coche avisa de que la condición puede impedir conducir y da una alternativa', async ({ page }) => {
+    await abrirTest(page);
+    const texto = await responder(page, LIMITACION_SOLO_COCHE);
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Coche Propio');
+    expect(texto).toMatch(/conduc|taxi|acompañ|adaptad|te lleve/i);
+  });
+});
+
+/**
+ * Lleva el centro de `boton` a la altura `y` de la pantalla y da un doble toque: dos toques a
+ * 150 ms en el mismo punto, que Chrome cuenta como ráfaga (el 2.º llega con detail 2, el que mira
+ * el guard `clicDeMas`). Devuelve la altura real a la que quedó el botón.
+ */
+async function dobleToqueA(page: Page, boton: Locator, y: number): Promise<number> {
+  await boton.evaluate((e, yy) => { const r = e.getBoundingClientRect(); window.scrollBy(0, r.top + r.height / 2 - yy); }, y);
+  const caja = await boton.boundingBox();
+  if (!caja) throw new Error('el botón no tiene caja');
+  const x = caja.x + caja.width / 2;
+  const yReal = caja.y + caja.height / 2;
+  await page.touchscreen.tap(x, yReal);
+  await page.waitForTimeout(150);
+  await page.touchscreen.tap(x, yReal);
+  await page.waitForTimeout(700);
+  return Math.round(yReal);
+}
+
+/**
+ * Contesta con la primera opción las nueve primeras preguntas y deja marcada también la 10, lista
+ * para «Ver mi resultado». Clics con pausa: dos acciones legítimas seguidas no son una ráfaga.
+ */
+async function hastaVerResultado(page: Page): Promise<void> {
+  for (let i = 0; i < 10; i++) {
+    await page.locator('[role="radiogroup"] [role="radio"]').first().click();
+    await page.waitForTimeout(350);
+    if (i < 9) {
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+      await page.waitForTimeout(350);
+    }
+  }
+}
+
+/** Dónde ha acabado la página: la ruta, si ha salido de la app. */
+function fueraDeLaApp(page: Page, origen: string): string | null {
+  const u = new URL(page.url());
+  return u.origin === origen && u.pathname === '/selector-movilidad-urbana/' ? null : `${u.host}${u.pathname}`;
+}
+
+/**
+ * El recorrido que el guard de 2698 SÍ cubre: doble toque con el botón a la altura `y`, en las
+ * nueve transiciones, «Anterior» (de la 4 a la 3), «Ver mi resultado» y «Repetir el test». Con
+ * todo contestado con la primera opción: coche 4+3+3+2+3+4 = 19 · TP 2+4+4+3+2+3+2 = 20 · moto 3 ·
+ * bici 10 y combinación 4 (la bici, además, descartada por la limitación) → Transporte Público.
+ */
+async function recorridoConDobleToque(page: Page, y: number): Promise<void> {
+  await abrirTest(page);
+  const origen = new URL(page.url()).origin;
+  for (let i = 0; i < 10; i++) {
+    await page.waitForTimeout(500);
+    await page.locator('[role="radiogroup"] [role="radio"]').first().tap();
+    await page.waitForTimeout(500);
+    const nombre = i === 9 ? 'Ver mi resultado' : 'Siguiente pregunta';
+    await dobleToqueA(page, page.getByRole('button', { name: nombre }), y);
+    expect(fueraDeLaApp(page, origen), `${nombre} en la ${i + 1}`).toBeNull();
+    if (i === 9) break;
+    await expect(page.getByText(`${i + 2}/10`, { exact: true }), `doble toque de la ${i + 1} a la ${i + 2}`).toBeVisible();
+    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(0);
+    if (i === 2) {
+      // En la 4, sin contestar: doble toque en «Anterior» → la 3, con su respuesta.
+      await page.waitForTimeout(500);
+      await dobleToqueA(page, page.getByRole('button', { name: 'Pregunta anterior' }), y);
+      expect(fueraDeLaApp(page, origen), 'Anterior de la 4 a la 3').toBeNull();
+      await expect(page.getByText('3/10', { exact: true })).toBeVisible();
+      await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(1);
+      await page.waitForTimeout(500);
+      await page.getByRole('button', { name: 'Siguiente pregunta' }).tap();
+      await expect(page.getByText('4/10', { exact: true })).toBeVisible();
+    }
+  }
+  await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Transporte Público');
+  await page.waitForTimeout(500);
+  await dobleToqueA(page, page.getByRole('button', { name: 'Repetir el test' }), y);
+  expect(fueraDeLaApp(page, origen), 'Repetir el test').toBeNull();
+  await expect(page.getByText('1/10', { exact: true })).toBeVisible();
+  await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(0);
+}
+
+/**
+ * Doble toque en `boton` con el botón a cada altura de `alturas`; devuelve las que sacan de la
+ * app. `preparar` deja la pantalla lista antes de cada intento. Los enlaces a meskeia.com (el
+ * aviso legal los escribe absolutos) se sirven en local: no hay red.
+ */
+async function alturasQueSacan(page: Page, alturas: number[], preparar: () => Promise<void>, boton: () => Locator): Promise<string[]> {
+  await page.route(/meskeia\.com|delegum\.com/, (r) => r.fulfill({ body: '<h1>fuera de la app</h1>', contentType: 'text/html' }));
+  const fuera: string[] = [];
+  for (const y of alturas) {
+    await abrirTest(page);
+    const origen = new URL(page.url()).origin;
+    await preparar();
+    await page.waitForTimeout(500);
+    const yReal = await dobleToqueA(page, boton(), y);
+    const destino = fueraDeLaApp(page, origen);
+    if (destino) fuera.push(`botón en y ${yReal} → ${destino}`);
+  }
+  return fuera;
+}
+
+// ── ABIERTO (inspector 10/10/2026): el 2.º toque de un doble toque cae en un ENLACE del aviso legal ──
+// El guard de 2698 (`clicDeMas`) vive en los onClick de los botones de la app: un enlace no lo
+// tiene. Tras el 1.er toque, el foco va al encabezado nuevo (la pregunta siguiente, el título del
+// resultado o la pregunta 1) y, si ese encabezado está por encima de la pantalla, Chrome lo
+// CENTRA: la vista sube unos 500 px (a 360 px, scroll de 615 a 107 tras «Siguiente») y bajo el dedo
+// queda la fila de enlaces de <LegalNotice />. El 2.º toque (detail 2) abre «Política de
+// Privacidad» (https://meskeia.com/privacidad/) a 360 px o «Contacto» (/contacto/) a 390, y se
+// pierden las respuestas. Medido con el botón a cada altura, de 10 en 10 px:
+//   · 360 px: «Siguiente» de 250 a 280 px (las 9 transiciones), «Ver mi resultado» de 209 a 240,
+//     «Repetir el test» de 270 a 300 y «Anterior» de la 10 a la 9 a 273;
+//   · 390 px: «Siguiente» de 288 a 320 px, «Ver mi resultado» de 240 a 260.
+// Con el botón a media pantalla (el recorrido de abajo) no pasa. selector-calefaccion lo resolvió
+// (2674) con el guard en captura sobre el contenedor, que también ve los enlaces.
+
+test.describe('Re-inspección 10/10/2026 — doble toque a 360 px', () => {
+  test.use({
+    viewport: { width: 360, height: 780 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('2698 sigue reparado: doble toque con el botón a media pantalla, de la 1 al resultado, «Anterior» y «Repetir»', async ({ page }) => {
+    test.setTimeout(120_000);
+    await recorridoConDobleToque(page, Math.round(780 * 0.6));
+  });
+
+  test.fail('ABIERTO: el 2.º toque de «Siguiente» no saca de la app (botón entre 250 y 280 px)', async ({ page }) => {
+    test.setTimeout(90_000);
+    const fuera = await alturasQueSacan(page, [250, 260, 270, 280],
+      async () => { await page.locator('[role="radiogroup"] [role="radio"]').first().tap(); },
+      () => page.getByRole('button', { name: 'Siguiente pregunta' }));
+    expect(fuera).toEqual([]);
+  });
+
+  test.fail('ABIERTO: el 2.º toque de «Ver mi resultado» no saca de la app (botón entre 210 y 240 px)', async ({ page }) => {
+    test.setTimeout(150_000);
+    const fuera = await alturasQueSacan(page, [210, 220, 230, 240], () => hastaVerResultado(page),
+      () => page.getByRole('button', { name: 'Ver mi resultado' }));
+    expect(fuera).toEqual([]);
+  });
+
+  test.fail('ABIERTO: el 2.º toque de «Repetir el test» no saca de la app (botón entre 270 y 290 px)', async ({ page }) => {
+    test.setTimeout(150_000);
+    const fuera = await alturasQueSacan(page, [270, 280, 290],
+      async () => {
+        await hastaVerResultado(page);
+        await page.getByRole('button', { name: 'Ver mi resultado' }).click();
+        await page.locator('[class*="resultadoTitulo"]').waitFor();
+      },
+      () => page.getByRole('button', { name: 'Repetir el test' }));
+    expect(fuera).toEqual([]);
+  });
+});
+
+test.describe('Re-inspección 10/10/2026 — doble toque a 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('2698 sigue reparado: doble toque con el botón a media pantalla, de la 1 al resultado, «Anterior» y «Repetir»', async ({ page }) => {
+    test.setTimeout(120_000);
+    await recorridoConDobleToque(page, Math.round(844 * 0.6));
+  });
+
+  test.fail('ABIERTO: el 2.º toque de «Siguiente» no saca de la app (botón entre 290 y 320 px)', async ({ page }) => {
+    test.setTimeout(90_000);
+    const fuera = await alturasQueSacan(page, [290, 300, 310, 320],
+      async () => { await page.locator('[role="radiogroup"] [role="radio"]').first().tap(); },
+      () => page.getByRole('button', { name: 'Siguiente pregunta' }));
+    expect(fuera).toEqual([]);
+  });
+
+  test.fail('ABIERTO: el 2.º toque de «Ver mi resultado» no saca de la app (botón entre 240 y 260 px)', async ({ page }) => {
+    test.setTimeout(150_000);
+    const fuera = await alturasQueSacan(page, [240, 250, 260], () => hastaVerResultado(page),
+      () => page.getByRole('button', { name: 'Ver mi resultado' }));
+    expect(fuera).toEqual([]);
   });
 });

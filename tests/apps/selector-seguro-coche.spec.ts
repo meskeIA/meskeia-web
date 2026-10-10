@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
 import { calcularResultado, CLAVES, ORDEN_PRIMA, PREGUNTAS, RESULTADOS, type Modalidad } from '../../app/selector-seguro-coche/motor';
 
 /**
@@ -616,5 +616,471 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, fichas fijas
     await abrirTest(page);
     await responder(page, NORMAL);
     await expect(titulo(page)).toBeFocused();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Re-inspección del 10/10/2026 (la anterior quedó INVALIDADA).
+//
+// Familia «selectores»: lo que la receta de selector-smartphone (b0f31109) y las reparaciones del
+// 09/10 de selector-alquiler-vs-compra (7cc1064e) y selector-formacion-postgrado (250b8baa)
+// arreglaron y aquí NO ha llegado: teclado APG de los radios, foco tras «Siguiente»/«Anterior»,
+// doble toque y enunciado/título bajo la barra fija en móvil. Y cuatro incoherencias entre lo
+// declarado, el test y sus textos (guía y FAQPage).
+//
+// Las sumas, a mano con los pesos de motor.ts, en el orden (básico, ampliado, TR con franquicia,
+// TR sin franquicia). Los recuentos de los comentarios salen de enumerar las 93.312
+// combinaciones con el motor real el 10/10/2026.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil y coherencia de textos', () => {
+  // A · normal: Entre 2 y 5 años · 10.000-25.000 € · No, de mi propiedad · Entre 2 y 5 años
+  // conduciendo · Uno leve · Uso diario · Ciudad · Siempre en la calle · Podría asumir parte ·
+  // Solo con experiencia.
+  // P1 (0,0,2,1) P2 (0,0,4,2) P3 (1,1,5,2) P4 (1,2,7,2) P5 (1,3,9,2) P6 (1,4,10,2) P7 (1,4,12,3)
+  // P8 (1,6,13,3) P9 (1,6,16,3) P10 (2,7,16,3) → TR con franquicia 16, sin empate ni notas.
+  const NORMAL_A = [1, 1, 1, 1, 1, 1, 0, 2, 1, 2] as const;
+
+  // B · límite (empate que solo deshace la prima): Más de 10 años · 10.000-25.000 € · No, de mi
+  // propiedad · Más de 5 años · Ninguno · Ocasional · Carretera o rural · Siempre en la calle ·
+  // No, sería un problema económico serio · Solo con experiencia.
+  // P1 (3,1,0,0) P2 (3,1,2,1) P3 (4,2,3,1) P4 (5,3,3,1) P5 (6,4,3,1) P6 (8,5,3,1) P7 (9,7,3,1)
+  // P8 (9,9,4,1) P9 (9,9,4,4) P10 (10,10,4,4) → básico y ampliado a 10. La pregunta 9 no los
+  // separa (0 y 0), el valor tampoco (0 y 0): gana la prima más baja, el básico.
+  const EMPATE_PRIMA = [3, 1, 1, 2, 0, 0, 2, 2, 2, 2] as const;
+
+  // C · no podría pagar una reparación y recibe terceros: Entre 2 y 5 años · 10.000-25.000 € · No,
+  // de mi propiedad · Entre 2 y 5 años conduciendo · Ninguno · Ocasional · Carretera o rural ·
+  // Garaje siempre · No, sería un problema económico serio · Solo con experiencia.
+  // P1 (0,0,2,1) P2 (0,0,4,2) P3 (1,1,5,2) P4 (1,2,7,2) P5 (2,3,7,2) P6 (4,4,7,2) P7 (5,6,7,2)
+  // P8 (6,7,7,2) P9 (6,7,7,5) P10 (7,8,7,5) → Terceros Ampliado 8; el todo riesgo mejor puntuado
+  // es el con franquicia (7, frente a 5).
+  const NO_PUEDE_PAGAR = [1, 1, 1, 1, 0, 0, 2, 0, 2, 2] as const;
+
+  // D · menos de 3.000 € y la modalidad más cara: Menos de 2 años · Menos de 3.000 € · Sí,
+  // financiado · Novel · Ninguno · Ocasional · Ciudad · Garaje siempre · Sí, sin problemas · Joven
+  // frecuente. P1 (0,0,0,3) P2 (3,0,0,3) P3 (3,0,1,6) P4 (3,0,3,8) P5 (4,1,3,8) P6 (6,2,3,8)
+  // P7 (6,2,5,9) P8 (7,3,5,9) P9 (9,4,5,9) P10 (9,4,6,11) → TR sin franquicia 11; el terceros mejor
+  // puntuado, el básico (9).
+  const BARATO_TRSF = [0, 3, 0, 0, 0, 0, 0, 0, 0, 0] as const;
+
+  // E · conductor joven con un primer coche de poco valor: Más de 10 años · Menos de 3.000 € · No,
+  // de mi propiedad · Novel · Ninguno · Uso diario · Semiurbana · A veces en la calle · Podría
+  // asumir parte · Joven frecuente.
+  // P1 (3,1,0,0) P2 (6,1,0,0) P3 (7,2,1,0) P4 (7,2,3,2) P5 (8,3,3,2) P6 (8,4,4,2) P7 (8,5,5,2)
+  // P8 (8,6,6,2) P9 (8,6,9,2) P10 (8,6,10,4) → TR con franquicia 10; el terceros mejor puntuado es
+  // el básico (8); el ampliado, 6.
+  const JOVEN_PRIMER_COCHE = [3, 3, 1, 0, 0, 1, 1, 1, 1, 0] as const;
+
+  const titulo = (page: Page) => page.locator('[class*="resultadoTitulo"]');
+  const radios = (page: Page) => page.locator('[role="radiogroup"] [role="radio"]');
+  const nota = (page: Page, tipo: string) => page.locator(`[data-nota="${tipo}"]`);
+
+  /** El elemento con el foco, en una línea: «body», «radio …», «button …», «p ¿…?». */
+  const foco = (page: Page): Promise<string> => page.evaluate(() => {
+    const a = document.activeElement;
+    if (!a || a === document.body) return 'body';
+    const rol = a.getAttribute('role') ?? a.tagName.toLowerCase();
+    return `${rol} ${(a.getAttribute('aria-label') ?? a.textContent ?? '').trim()}`;
+  });
+
+  async function abrirGuia(page: Page): Promise<string> {
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByRole('button', { name: 'Ocultar guía educativa' })).toBeVisible();
+    return page.locator('body').innerText();
+  }
+
+  async function respuestaFaq(page: Page, pregunta: string): Promise<string> {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map((b) => JSON.parse(b) as { '@type': string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] })
+      .find((j) => j['@type'] === 'FAQPage');
+    const q = faq?.mainEntity?.find((e) => e.name === pregunta);
+    if (!q) throw new Error(`el FAQPage no tiene «${pregunta}»`);
+    return q.acceptedAnswer.text;
+  }
+
+  /** Recorre las 93.312 combinaciones con el motor real. */
+  function barrer(visita: (r: readonly number[]) => void): void {
+    const r: number[] = [];
+    const rec = (i: number): void => {
+      if (i === PREGUNTAS.length) { visita(r); return; }
+      for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) { r[i] = k; rec(i + 1); }
+    };
+    rec(0);
+  }
+
+  // ── Lo que está bien ────────────────────────────────────────────────────────
+
+  test('caso normal A: 2-5 años y 10.000-25.000 € con un siniestro leve → todo riesgo con franquicia 16, sin empate ni notas', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, NORMAL_A);
+    await expect(titulo(page)).toHaveText('Todo Riesgo con Franquicia');
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
+    await expect(page.locator('[data-nota]')).toHaveCount(0);
+    expect(calcularResultado(NORMAL_A).puntos).toEqual({
+      terceros_basico: 2, terceros_ampliado: 7, todo_riesgo_franquicia: 16, todo_riesgo_sin_franquicia: 3,
+    });
+  });
+
+  test('caso límite B: básico y ampliado empatan a 10, ni la pregunta 9 ni el valor los separan, y la prima lo deshace en voz alta', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, EMPATE_PRIMA);
+    await expect(titulo(page)).toHaveText('Seguro a Terceros Básico');
+    await expect(page.locator('[class*="avisoEmpate"]')).toHaveText(
+      '⚖️ Empate: con tus respuestas, el seguro a terceros básico y el seguro a terceros ampliado encajan exactamente igual; se muestra primero el seguro a terceros básico porque es la modalidad de prima más baja.',
+    );
+  });
+
+  test('bloqueado: en la pregunta 10 sin responder, «Ver resultado» está deshabilitado y un clic forzado no da resultado', async ({ page }) => {
+    await abrirTest(page);
+    for (let i = 0; i < 9; i++) {
+      await radios(page).nth(0).click();
+      await page.getByRole('button', { name: 'Ir a la siguiente pregunta' }).click();
+    }
+    const ver = page.getByRole('button', { name: 'Ver resultado' });
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    await expect(ver).toBeDisabled();
+    await ver.click({ force: true });
+    await page.waitForTimeout(300);
+    await expect(titulo(page)).toHaveCount(0);
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+  });
+
+  test('C0011 descartado: con menos de 3.000 € y el todo riesgo sin franquicia, la nota cita el valor y nombra el básico', async ({ page }) => {
+    // La app no pregunta presupuesto ni promete renting (h1, metadata y guía). Lo que se buscó es la
+    // forma del 1678: la cobertura más cara a quien declara un coche de poco valor. Pasa en 5.181
+    // perfiles, y TODOS llevan la nota «valor-bajo» con un terceros como alternativa.
+    await abrirTest(page);
+    await responder(page, BARATO_TRSF);
+    await expect(titulo(page)).toHaveText('Todo Riesgo sin Franquicia');
+    await expect(nota(page, 'valor-bajo')).toContainText('Has dicho que el coche vale «Menos de 3.000 €»');
+    await expect(nota(page, 'valor-bajo')).toContainText('Pide también precio para el seguro a terceros básico, la modalidad a terceros que mejor encaja con tus respuestas.');
+    await expect(nota(page, 'conductor-joven')).toHaveCount(1);
+    let caros = 0;
+    let sinNota = 0;
+    barrer((r) => {
+      if (r[1] !== 3) return;
+      const res = calcularResultado(r);
+      if (res.modalidad !== 'todo_riesgo_sin_franquicia') return;
+      caros++;
+      if (!res.notas.some((n) => n.tipo === 'valor-bajo' && n.alternativa?.startsWith('terceros'))) sinNota++;
+    });
+    expect({ caros, sinNota }).toEqual({ caros: 5_181, sinNota: 0 });
+  });
+
+  test('C0104 (3) descartado: la guía educativa va en el HTML servido, fuera de la rama del resultado', async ({ page }) => {
+    const html = await (await page.request.get('/selector-seguro-coche/')).text();
+    expect(html).toContain('¿Qué es la franquicia y cómo afecta al precio?');
+    expect(html).toContain('Conductores jóvenes: ¿qué seguro conviene?');
+    await abrirTest(page);
+    await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toHaveCount(1);
+  });
+
+  // ── Hallazgos ABIERTOS (inspector 10/10/2026) ───────────────────────────────
+
+  test('teclado de radios (APG): las flechas mueven y marcan, y el grupo es UNA parada de Tab', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). C0016. Forma del 1681 de selector-smartphone (b0f31109:
+    // tabindex itinerante y teclaEnOpcion). Medido el 10/10/2026: tabIndex [0, 0, 0, 0], ArrowDown y
+    // End sobre «Menos de 2 años» no mueven el foco ni marcan nada, y Tab recorre las cuatro opciones.
+    test.fail();
+    await abrirTest(page);
+    expect(await radios(page).evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1]);
+    await radios(page).nth(0).focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(radios(page).nth(1)).toBeFocused({ timeout: 1_000 });
+    await expect(radios(page).nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
+    await page.keyboard.press('End');
+    await expect(radios(page).nth(3)).toBeFocused();
+    await expect(page.locator('[role="radiogroup"] [aria-checked="true"]')).toHaveCount(1);
+  });
+
+  test('foco: tras «Siguiente» y «Anterior» va al enunciado de la pregunta nueva, no a <body>', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). C0016. Forma del 1679/1680 de selector-smartphone. «Siguiente»
+    // sigue montado pero se DESACTIVA (la pregunta nueva no tiene respuesta) y el foco cae a <body>;
+    // el Tab siguiente sale del cuestionario a «Ver guía educativa». Igual con «Anterior» al volver a
+    // la 1. Obtenido el 10/10/2026: ['body', 'button Ver guía educativa', 'body'].
+    test.fail();
+    await abrirTest(page);
+    const vistos: string[] = [];
+    await radios(page).nth(1).click();
+    await page.getByRole('button', { name: 'Ir a la siguiente pregunta' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 2 de 10').waitFor();
+    vistos.push(await foco(page));
+    await page.keyboard.press('Tab');
+    vistos.push(await foco(page));
+    await page.getByRole('button', { name: 'Volver a la pregunta anterior' }).focus();
+    await page.keyboard.press('Enter');
+    await page.getByText('Pregunta 1 de 10').waitFor();
+    vistos.push(await foco(page));
+    expect(vistos[0], 'tras Siguiente').toContain('¿Cuál es el valor de mercado aproximado de tu coche?');
+    expect(vistos[1], 'Tab tras Siguiente').toMatch(/^radio /);
+    expect(vistos[2], 'tras Anterior').toContain('¿Cuántos años tiene tu vehículo?');
+  });
+
+  test('quien declara que no podría pagar una reparación y recibe terceros lo lee en el resultado, con el todo riesgo que mejor encaja', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). El motor llama a la pregunta 9 «el centro de la decisión entre
+    // terceros y todo riesgo», y la nota «valor-alto» ya dice «Si no podrías asumirla, compara
+    // también…». Pero quien contesta «No, sería un problema económico serio» y acaba en terceros no
+    // lee nada que lo recoja. NO_PUEDE_PAGAR: Terceros Ampliado 8, sin ninguna nota.
+    // Enumerado: de 31.104 perfiles con esa respuesta, 5.384 acaban en terceros (1.545 en el básico,
+    // 76 de ellos por el desempate de la prima, como EMPATE_PRIMA); 3.159 sin nota de financiación
+    // ni de valor alto (las dos que nombran un todo riesgo), 1.209 sin ninguna nota.
+    test.fail();
+    await abrirTest(page);
+    await responder(page, NO_PUEDE_PAGAR);
+    await expect(titulo(page)).toHaveText('Seguro a Terceros Ampliado');
+    const notas = (await page.locator('[data-nota]').allInnerTexts()).join(' ');
+    expect(notas).toContain('No, sería un problema económico serio');
+    expect(notas).toContain('el todo riesgo con franquicia');
+    let sinAviso = 0;
+    barrer((r) => {
+      if (r[8] !== 2) return;
+      const res = calcularResultado(r);
+      if (res.modalidad.startsWith('todo_riesgo')) return;
+      if (!res.notas.some((n) => n.alternativa?.startsWith('todo_riesgo'))) sinAviso++;
+    });
+    expect(sinAviso).toBe(0);
+  });
+
+  test('FAQPage y guía: el todo riesgo con franquicia no se recomienda a «conductores experimentados» mientras el test les resta peso', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). El FAQPage dice que el TR con franquicia «resulta adecuado
+    // para conductores experimentados con bajo historial de siniestros», y la guía, que con «buen
+    // historial» la franquicia es «una excelente forma de reducir el coste». El test hace lo
+    // contrario: «Más de 5 años con experiencia sólida» y «No, ninguno» dan 0 al TR con franquicia
+    // (y +1 al básico y al ampliado); «novel» y «uno leve», +2 cada una. Enumerado: el TR con
+    // franquicia gana en el 29,1 % de los experimentados sin siniestros, frente al 49,5 % de todos,
+    // el 51,9 % de los noveles y el 62,0 % de quien tuvo un siniestro leve.
+    // A mano: [1,1,1,2,0,1,1,1,1,2] → TRf 11 (4, 7, 11, 2); el mismo con «novel» y «uno leve»,
+    // [1,1,1,0,1,1,1,1,1,2] → TRf 15 (2, 6, 15, 4).
+    test.fail();
+    expect(calcularResultado([1, 1, 1, 2, 0, 1, 1, 1, 1, 2]).puntos.todo_riesgo_franquicia).toBe(11);
+    expect(calcularResultado([1, 1, 1, 0, 1, 1, 1, 1, 1, 2]).puntos.todo_riesgo_franquicia).toBe(15);
+    await abrirTest(page);
+    const faq = await respuestaFaq(page, '¿Qué es el todo riesgo con franquicia y para quién es recomendable?');
+    const guia = await abrirGuia(page);
+    const loDice = /conductores experimentados con bajo historial/.test(faq) || /conductor experimentado con buen historial/.test(guia);
+    const trf = (p: number, o: number) => PREGUNTAS[p].opciones[o].pesos.todo_riesgo_franquicia ?? 0;
+    const experimentadoLimpio = trf(3, 2) + trf(4, 0);
+    const novelConParte = trf(3, 0) + trf(4, 1);
+    expect(loDice && experimentadoLimpio < novelConParte, `texto ${loDice} · pesos TRf ${experimentadoLimpio} frente a ${novelConParte}`).toBe(false);
+  });
+
+  test('guía: «primer coche de bajo valor → terceros ampliado» no contradice lo que el test da a ese perfil', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). Forma del 1480 (la guía orientaba con otros criterios que el
+    // test). JOVEN_PRIMER_COCHE: el test da TR con franquicia (10) y su nota nombra el BÁSICO (8)
+    // como terceros; el ampliado queda con 6. La guía, en la misma página: «Para el primer coche (de
+    // bajo valor): terceros ampliado». Enumerado: con un menor de 25 y menos de 3.000 €, el ampliado
+    // sale en el 5,5 % de los 15.552 perfiles (TRf 51,0 %, TRsf 23,4 %, básico 20,1 %).
+    test.fail();
+    await abrirTest(page);
+    await responder(page, JOVEN_PRIMER_COCHE);
+    await expect(titulo(page)).toHaveText('Todo Riesgo con Franquicia');
+    const textoNota = await nota(page, 'valor-bajo').innerText();
+    expect(textoNota).toContain('Pide también precio para el seguro a terceros básico');
+    const guia = await abrirGuia(page);
+    const guiaDiceAmpliado = guia.includes('Para el primer coche (de bajo valor): terceros ampliado');
+    const testDaAmpliado = (await titulo(page).innerText()) === 'Seguro a Terceros Ampliado' || textoNota.includes('terceros ampliado');
+    expect(guiaDiceAmpliado && !testDaAmpliado, 'la guía dice ampliado y el test, otra cosa').toBe(false);
+  });
+
+  test('FAQPage: «el de terceros… no repara tu propio coche» no contradice la ficha del terceros ampliado', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). La ficha del terceros ampliado (y la 4.ª respuesta del mismo
+    // FAQPage) incluye robo, incendio y rotura de lunas del propio coche; la 1.ª respuesta dice del
+    // seguro «de terceros», sin distinguir, que «no repara tu propio coche».
+    test.fail();
+    expect(RESULTADOS.terceros_ampliado.coberturas).toContain('Rotura de lunas (parabrisas, luneta, laterales)');
+    await abrirTest(page);
+    const q1 = await respuestaFaq(page, '¿Qué diferencia hay entre seguro a terceros y todo riesgo?');
+    expect(q1).not.toMatch(/el de terceros cubre[^.]*pero no repara tu propio coche/);
+  });
+
+  test('doble clic (escritorio) en «Siguiente» de la pregunta 3 no contesta la 4', async ({ page }) => {
+    // ABIERTO (inspector 10/10/2026). C0104 (2). La 3 tiene 2 opciones y la 4, 3: la botonera baja
+    // y el segundo clic (detail 2) cae en «Más de 5 años con experiencia sólida» (+1 básico, +1
+    // ampliado). Igual de la 5 (3 opciones) a la 6 (4): «Lo comparten varias personas…».
+    test.fail();
+    await abrirTest(page);
+    for (const i of [0, 0]) {
+      await radios(page).nth(i).click();
+      await page.getByRole('button', { name: 'Ir a la siguiente pregunta' }).click();
+    }
+    await page.waitForTimeout(500);
+    await radios(page).nth(0).click();
+    await page.waitForTimeout(500);
+    await page.getByRole('button', { name: 'Ir a la siguiente pregunta' }).dblclick();
+    await expect(page.getByText('Pregunta 4 de 10')).toBeVisible();
+    await page.waitForTimeout(300);
+    // Obtenido el 10/10/2026: 1 («Más de 5 años con experiencia sólida»).
+    await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0, { timeout: 1_000 });
+  });
+
+  // ─ Móvil ─────────────────────────────────────────────────────────────────────────────
+
+  /** ¿Pisa alguna pieza de la barra fija del logo las letras del elemento? */
+  async function bajoLaBarra(page: Page, selector: string): Promise<{ tapado: boolean; top: number; bottom: number; barra: number }> {
+    return page.evaluate((sel) => {
+      const piezas = Array.from(document.querySelectorAll('[class*="headerBar"] > *')).map((c) => c.getBoundingClientRect()).filter((c) => c.width > 0);
+      const el = document.querySelector(sel);
+      if (!el || piezas.length === 0) throw new Error(`sin barra (${piezas.length}) o sin ${sel}`);
+      const rango = document.createRange();
+      rango.selectNodeContents(el);
+      const letras = Array.from(rango.getClientRects()).filter((c) => c.width > 0);
+      const caja = el.getBoundingClientRect();
+      return {
+        tapado: piezas.some((p) => letras.some((c) => !(p.right <= c.left || p.left >= c.right || p.bottom <= c.top || p.top >= c.bottom))),
+        top: Math.round(caja.top),
+        bottom: Math.round(caja.bottom),
+        barra: Math.round(Math.max(...piezas.map((p) => p.bottom))),
+      };
+    }, selector);
+  }
+
+  /** Deja el centro del botón a la altura y del viewport y devuelve ese punto. */
+  async function colocar(page: Page, nombre: string, y: number): Promise<{ x: number; y: number }> {
+    const boton = page.getByRole('button', { name: nombre, exact: true });
+    await boton.evaluate((e, yy) => {
+      const r = e.getBoundingClientRect();
+      window.scrollBy(0, r.top + r.height / 2 - yy);
+    }, y);
+    const caja = await boton.boundingBox();
+    if (!caja) throw new Error(`sin caja para ${nombre}`);
+    return { x: caja.x + caja.width / 2, y: caja.y + caja.height / 2 };
+  }
+
+  /**
+   * Contesta tocando como un usuario. Lee la pregunta antes de tocar, como en selector-smartphone
+   * (2659): a velocidad de máquina el toque llega a menos de 300 ms del de «Siguiente», Chrome lo
+   * cuenta como el 2.º de la ráfaga, y la receta clicDeMas, cuando llegue, lo ignorará a propósito.
+   */
+  async function contestarTocando(page: Page, indices: readonly number[]): Promise<void> {
+    for (const i of indices) {
+      await page.waitForTimeout(500);
+      await radios(page).nth(i).tap();
+      await page.getByRole('button', { name: 'Ir a la siguiente pregunta' }).tap();
+    }
+  }
+
+  async function dobleToque(page: Page, p: { x: number; y: number }): Promise<void> {
+    await page.touchscreen.tap(p.x, p.y);
+    await page.waitForTimeout(150);
+    await page.touchscreen.tap(p.x, p.y);
+  }
+
+  test.describe('móvil 360 px', () => {
+    test.use({
+      viewport: { width: 360, height: 740 },
+      userAgent: devices['Pixel 7'].userAgent,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('con «Siguiente» a media pantalla, el enunciado de cada pregunta nueva queda a la vista y bajo la barra', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). C0104 (1), forma del 3110 de alquiler-vs-compra y del 2657 de
+      // selector-smartphone. Sin foco programático la página no se mueve y la pregunta nueva se pinta
+      // donde estaba la anterior. Medido el 10/10/2026 a 360 y 390 px con el botón en y 360 (barra
+      // hasta 52): P2 en y −60..−9, P3 −44..7, P5 −4..47, P6 11..62, P7 −112..−61, P8 −4..47,
+      // P9 −20..57, P10 −46..31; solo la 4 (82..133) queda bien. Tocando donde lo deja tap(), bien.
+      test.fail();
+      await abrirTest(page);
+      const fuera: string[] = [];
+      for (let i = 1; i <= 10; i++) {
+        await expect(page.getByText(`Pregunta ${i} de 10`)).toBeVisible();
+        await page.waitForTimeout(150);
+        const m = await bajoLaBarra(page, '[class*="preguntaTexto"]');
+        if (i > 1 && (m.tapado || m.top < m.barra)) fuera.push(`P${i}: enunciado en y ${m.top}..${m.bottom}, barra hasta ${m.barra}`);
+        if (i === 10) break;
+        await page.waitForTimeout(500);
+        await radios(page).nth(0).tap();
+        const p = await colocar(page, 'Ir a la siguiente pregunta', 360);
+        await page.touchscreen.tap(p.x, p.y);
+      }
+      expect(fuera, 'enunciados bajo la barra o fuera de la vista').toEqual([]);
+    });
+
+    test('con «Ver resultado» a media pantalla, el título del resultado tiene el foco y queda por debajo de la barra', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). C0104 (1). El h2 ya está a la vista y el foco no desplaza:
+      // queda en y 49..111 con la barra hasta 52 (medido a 360 y 390 px). Falta el scroll-margin-top
+      // de la receta (80 px).
+      test.fail();
+      await abrirTest(page);
+      await contestarTocando(page, [0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      await page.waitForTimeout(500);
+      await radios(page).nth(0).tap();
+      const p = await colocar(page, 'Ver resultado', 360);
+      await page.touchscreen.tap(p.x, p.y);
+      await expect(titulo(page)).toBeFocused();
+      await page.waitForTimeout(150);
+      const m = await bajoLaBarra(page, '[class*="resultadoTitulo"]');
+      expect({ tapado: m.tapado, debajo: m.top >= m.barra }, `h2 en y ${m.top}..${m.bottom}, barra hasta ${m.barra}`).toEqual({ tapado: false, debajo: true });
+    });
+
+    test('un doble toque en «Siguiente» de la pregunta 3 no contesta la 4', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). C0104 (2), forma del 2659/3111. Medido el 10/10/2026 a 360 y
+      // 390 px con el botón entre y 150 y 650: el segundo toque (detail 2) marca «Más de 5 años con
+      // experiencia sólida» en la 4, y en la 6 «Lo comparten varias personas (coche de empresa o
+      // familiar)» tras el doble toque en la 5.
+      test.fail();
+      await abrirTest(page);
+      await contestarTocando(page, [0, 0]);
+      await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+      await page.waitForTimeout(500);
+      await radios(page).nth(0).tap();
+      await page.waitForTimeout(400);
+      await dobleToque(page, await colocar(page, 'Ir a la siguiente pregunta', 350));
+      await expect(page.getByText('Pregunta 4 de 10')).toBeVisible();
+      await page.waitForTimeout(300);
+      // Obtenido el 10/10/2026: 1 («Más de 5 años con experiencia sólida»).
+      await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(0, { timeout: 1_000 });
+    });
+
+    test('un doble toque en «Ver resultado» no saca de la app', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). C0104 (2), forma del 3111 de alquiler-vs-compra. Con el botón
+      // en la parte alta (y 100-150 a 360 px; 150-200 a 390), el h2 del resultado queda por encima de
+      // la vista, el foco lo centra (y 339) y el enlace de Delegum de <LegalNotice /> baja a y 66..165:
+      // el segundo toque lo abre y se pierden las 10 respuestas. Delegum se sirve aquí sin red.
+      test.fail();
+      await page.route(/^https:\/\/(www\.)?delegum\.com\//, (ruta) => ruta.fulfill({ status: 200, contentType: 'text/html', body: '<title>delegum</title>externo' }));
+      await abrirTest(page);
+      const origen = new URL(page.url()).origin;
+      await contestarTocando(page, [0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      await page.waitForTimeout(500);
+      await radios(page).nth(0).tap();
+      await page.waitForTimeout(400);
+      await dobleToque(page, await colocar(page, 'Ver resultado', 150));
+      await page.waitForTimeout(600);
+      // Obtenido el 10/10/2026: https://delegum.com/soluciones/?from=meskeia.
+      expect(page.url()).toBe(`${origen}/selector-seguro-coche/`);
+      await expect(titulo(page)).toBeVisible({ timeout: 1_000 });
+    });
+  });
+
+  test.describe('móvil 390 px', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent: devices['Pixel 7'].userAgent,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('un doble toque en «Siguiente» de la pregunta 6 no devuelve a la 6 por «Anterior»', async ({ page }) => {
+      // ABIERTO (inspector 10/10/2026). C0104 (2). Forma propia de esta hermana: en móvil la botonera
+      // va en columna inversa («Anterior» justo DEBAJO de «Siguiente»), y de la 6 (4 opciones) a la 7
+      // (3) sube: el segundo toque cae en «Volver a la pregunta anterior». Medido a 390 px con el
+      // botón entre y 150 y 650; a 360 px no pasa.
+      test.fail();
+      await abrirTest(page);
+      await contestarTocando(page, [0, 0, 0, 0, 0]);
+      await expect(page.getByText('Pregunta 6 de 10')).toBeVisible();
+      await page.waitForTimeout(500);
+      await radios(page).nth(0).tap();
+      await page.waitForTimeout(400);
+      await dobleToque(page, await colocar(page, 'Ir a la siguiente pregunta', 350));
+      await page.waitForTimeout(400);
+      // Obtenido el 10/10/2026: «Pregunta 6 de 10».
+      await expect(page.getByText('Pregunta 7 de 10')).toBeVisible({ timeout: 1_000 });
+    });
   });
 });
