@@ -1,5 +1,19 @@
 import type { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { B12_LACTOOVO } from './motor';
+
+/** Las funciones reales de la app: alimentan la meta schema:WebApplication y el JSON-LD (§1.ter;
+ *  el JSON-LD salía con "featureList": [], hallazgo 3158). */
+const FUNCIONES = [
+  'Test de 10 preguntas sobre objetivos y estilo de vida',
+  '6 patrones alimentarios analizados',
+  'Las restricciones vegana y vegetariana descartan los patrones con productos animales',
+  'Tiene en cuenta la condición de salud declarada',
+  'Avisa de los empates y de lo declarado que el patrón no recoge',
+  'Consejos prácticos de transición',
+  '100 % en el navegador, sin registro',
+  'Gratuito y sin publicidad',
+];
 
 export const metadata: Metadata = {
   title: 'Selector de Dieta — ¿Qué alimentación te conviene? | meskeIA',
@@ -42,16 +56,7 @@ export const metadata: Metadata = {
       name: 'Selector de Dieta',
       description: 'Test orientativo para descubrir qué patrón alimentario (mediterránea, vegetariana, vegana, cetogénica, DASH, ayuno intermitente) se adapta mejor al perfil, objetivos y estilo de vida del usuario.',
       url: 'https://meskeia.com/selector-dieta/',
-      features: [
-        'Test de 10 preguntas sobre objetivos y estilo de vida',
-        '6 patrones alimentarios analizados',
-        'Consideración de condiciones de salud',
-        'Análisis de restricciones alimentarias',
-        'Consejos prácticos de transición',
-        '100% en el navegador, sin registro',
-        'Gratuito y sin publicidad',
-        'En español',
-      ],
+      features: FUNCIONES,
     })),
   },
 };
@@ -61,7 +66,7 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para descubrir qué patrón alimentario se adapta mejor a tus objetivos, estilo de vida, salud y restricciones. Mediterránea, vegana, cetogénica, DASH y más.",
   url: "https://meskeia.com/selector-dieta/",
   category: 'UtilityApplication',
-  features: [],
+  features: FUNCIONES,
 });
 
 export const faqJsonLd = {
@@ -97,7 +102,8 @@ export const faqJsonLd = {
       name: '¿Puede una persona vegetariana cubrir todos sus nutrientes?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, una dieta vegetariana bien planificada puede cubrir todos los nutrientes esenciales. Es importante prestar atención a la vitamina B12 (en vegetarianos que consumen lácteos y huevos la ingesta puede ser suficiente, pero en veganos es necesario suplementar), el hierro de origen vegetal, el calcio, el zinc y los ácidos grasos omega-3. Combinar legumbres con cereales y consumir alimentos variados facilita obtener todos los aminoácidos esenciales.',
+        // La B12, con la misma formulación que la tarjeta vegetariana (hallazgo 3159).
+        text: `Sí, una dieta vegetariana bien planificada puede cubrir todos los nutrientes esenciales. Es importante prestar atención a la vitamina B12 (en vegetarianos, ${B12_LACTOOVO}; en veganos es necesario suplementar), el hierro de origen vegetal, el calcio, el zinc y los ácidos grasos omega-3. Combinar legumbres con cereales y consumir alimentos variados facilita obtener todos los aminoácidos esenciales.`,
       },
     },
     {

@@ -1,4 +1,5 @@
 import { test, expect, Page, devices } from '@playwright/test';
+import { calcularResultado, PREGUNTAS, DIETAS, ORDEN_DIETAS } from '../../app/selector-dieta/motor';
 
 /**
  * Selector de Dieta (selector-dieta) — primera inspección, 10/10/2026
@@ -41,8 +42,17 @@ import { test, expect, Page, devices } from '@playwright/test';
  *   gestionar emociones» pesa lo mismo que «Como de todo sin problema» menos 1 en las seis
  *   dietas: el resultado es idéntico en los 82.944 perfiles.
  *
- * Los casos que demuestran un hallazgo ABIERTO van con test.fail(): afirman lo CORRECTO, y el
- * día que se repare pasarán y Playwright avisará de que hay que quitar la marca.
+ * REPARACIÓN DEL 11/10/2026 (hallazgos 3140-3165): los 32 testigos que iban con test.fail()
+ * pasan a exigir lo reparado. El motor salió a app/selector-dieta/motor.ts: «Vegano/a» y
+ * «Vegetariano/a» DESCARTAN los patrones con productos animales, «Colesterol alto o
+ * hipertensión» descarta la cetogénica, el empate se dice y lo declarado que el ganador no
+ * recoge sale en una nota. Lo que cambia en los perfiles de abajo (resuelto a mano con la tabla):
+ *   · VEGANO_DIABETES: admitidas vegana 15 y ayuno 18 → Ayuno Intermitente, con dos notas
+ *     (vegano y diabetes).
+ *   · VEGANO_ENERGIA: vegana 20 y ayuno 19 → Dieta Vegana.
+ *   · CARDIO_CETO: sin la cetogénica (22), mediterránea 21 = ayuno 21 → Mediterránea, con el
+ *     empate dicho.
+ * La sección «motor» del final lo comprueba sin navegador.
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -328,13 +338,13 @@ test('rechazo: sin respuesta no se avanza; «Anterior» conserva lo contestado y
   await expect(page.getByText('Pregunta 2 de 10')).toBeVisible();
   await expect(siguiente).toBeDisabled(); // la P2 llega sin respuesta
   await page.getByRole('button', { name: /Anterior/ }).click();
-  await expect(page.locator('[class*="opcionesGrid"] [aria-pressed="true"]')).toHaveText(/Ganar músculo/);
+  await expect(page.locator('[class*="opcionesGrid"] [aria-checked="true"]')).toHaveText(/Ganar músculo/);
 
   await page.getByRole('button', { name: /Anterior/ }).click();
   await expect(page.getByRole('button', { name: 'Comenzar el test' })).toBeVisible();
   await page.getByRole('button', { name: 'Comenzar el test' }).click();
   await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
-  await expect(page.locator('[class*="opcionesGrid"] [aria-pressed="true"]')).toHaveCount(0);
+  await expect(page.locator('[class*="opcionesGrid"] [aria-checked="true"]')).toHaveCount(0);
 });
 
 test('aviso de salud: nivel 2 (high), siempre desplegado, fuera de la guía educativa y antes del test', async ({ page }) => {
@@ -354,55 +364,59 @@ test('aviso de salud: nivel 2 (high), siempre desplegado, fuera de la guía educ
 // 2. Hallazgos del motor — ABIERTOS (inspector 10/10/2026)
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('HALLAZGO: quien se declara vegano/a no recibe una dieta con carne, pescado, huevos ni queso', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). La restricción solo suma puntos («Vegano/a» da 0 a la
+test('REPARADO: quien se declara vegano/a no recibe una dieta con carne, pescado, huevos ni queso', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: La restricción solo suma puntos («Vegano/a» da 0 a la
   // cetogénica) y no descarta. Perfil resuelto a mano: 19, 16, 15, 21, 17, 18 → Cetogénica, cuyos
   // alimentos clave son «Carnes y pescados grasos», «Huevos…», «Quesos curados y mantequilla».
-  test.fail();
   await abrirTest(page);
   await responder(page, VEGANO_DIABETES);
   await leerResultado(page);
   const alimentos = await textos(page, 'alimentoItem');
   expect(alimentos.filter((a) => /carne|pescado|huevo|queso|mantequilla|lácteo/i.test(a))).toEqual([]);
+  // A mano: entre las admitidas, vegana 15 y ayuno 18 → Ayuno, con la nota de que organiza cuándo
+  // se come y no qué, y la de la diabetes.
+  expect(await leerResultado(page)).toBe('Ayuno Intermitente');
+  const texto = await textoResultado(page);
+  expect(texto).toContain('mantén tu alimentación vegana (sin productos animales)');
+  expect(texto).toContain('Has declarado diabetes o prediabetes: el ayuno intermitente puede provocar bajadas de glucosa');
 });
 
-test('HALLAZGO: a quien se declara vegano/a no se le recomienda pescado azul 2-3 veces por semana', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). 27, 20, 20, 15, 21, 19 → Dieta Mediterránea, la de 72.253 de
+test('REPARADO: a quien se declara vegano/a no se le recomienda pescado azul 2-3 veces por semana', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: 27, 20, 20, 15, 21, 19 → Dieta Mediterránea, la de 72.253 de
   // los 82.944 perfiles veganos del barrido.
-  test.fail();
   await abrirTest(page);
   await responder(page, VEGANO_ENERGIA);
   await leerResultado(page);
   expect(await textos(page, 'alimentoItem')).not.toContain('Pescado azul 2-3 veces/semana');
 });
 
-test('HALLAZGO: quien declara «Sin gluten (celiaquía…)» no recibe «Sustituye el pan blanco por integral» sin una palabra del gluten', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). 29, 20, 20, 18, 23, 19 → Mediterránea. Ningún texto de las
+test('REPARADO: quien declara «Sin gluten (celiaquía…)» no recibe «Sustituye el pan blanco por integral» sin una palabra del gluten', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: 29, 20, 20, 18, 23, 19 → Mediterránea. Ningún texto de las
   // seis dietas menciona el gluten.
-  test.fail();
   await abrirTest(page);
   await responder(page, SIN_GLUTEN);
   expect(await leerResultado(page)).toBe('Dieta Mediterránea');
   expect(await textoResultado(page)).toMatch(/gluten/i);
 });
 
-test('HALLAZGO: con colesterol alto o hipertensión la tarjeta no recomienda la cetogénica sin mencionar la condición', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). La propia app da 0 puntos a la cetogénica para esa condición,
+test('REPARADO: con colesterol alto o hipertensión la tarjeta no recomienda la cetogénica sin mencionar la condición', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: La propia app da 0 puntos a la cetogénica para esa condición,
   // y aun así gana: 21, 16, 14, 22, 18, 21. La tarjeta (70-75 % de grasas, «Quesos curados y
   // mantequilla») solo avisa de la diabetes tipo 1. 26 perfiles en el barrido.
-  test.fail();
   await abrirTest(page);
   await responder(page, CARDIO_CETO);
   const valor = await leerResultado(page);
   const texto = await textoResultado(page);
   expect(valor === 'Dieta Cetogénica' && !/colesterol|cardiovascular|hipertensi/i.test(texto)).toBe(false);
+  // A mano: sin la cetogénica (22), mediterránea 21 = ayuno 21 → Mediterránea, con el empate dicho.
+  expect(valor).toBe('Dieta Mediterránea');
+  expect(texto).toContain('Empate: con tus respuestas, «Ayuno Intermitente» tiene los mismos puntos (21) que «Dieta Mediterránea».');
 });
 
-test('HALLAZGO: «A veces uso la comida para gestionar emociones» mueve el resultado o lo matiza', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Sus pesos son los de «Como de todo sin problema» menos 1 en
+test('REPARADO: «A veces uso la comida para gestionar emociones» mueve el resultado o lo matiza', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Sus pesos son los de «Como de todo sin problema» menos 1 en
   // las seis dietas: el orden no cambia nunca. Este perfil da Ayuno Intermitente (26 frente a 21)
   // igual que con «Como de todo sin problema» (27 frente a 22), y la tarjeta no dice nada de ello.
-  test.fail();
   await abrirTest(page);
   await responder(page, AYUNO_EMOCIONES);
   const valor = await leerResultado(page);
@@ -410,20 +424,18 @@ test('HALLAZGO: «A veces uso la comida para gestionar emociones» mueve el resu
   expect(valor === 'Ayuno Intermitente' && !/emoci/i.test(texto)).toBe(false);
 });
 
-test('HALLAZGO: un empate en cabeza se dice; no lo decide en silencio el orden de declaración', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). 29 mediterránea = 29 DASH. Gana la mediterránea porque va
+test('REPARADO: un empate en cabeza se dice; no lo decide en silencio el orden de declaración', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: 29 mediterránea = 29 DASH. Gana la mediterránea porque va
   // primero en el objeto `puntos`, y la pantalla no nombra la DASH. 37.775 perfiles empatan.
-  test.fail();
   await abrirTest(page);
   await responder(page, EMPATE_MED_DASH);
   expect(await leerResultado(page)).toBe('Dieta Mediterránea');
   expect(await textoResultado(page)).toContain('DASH');
 });
 
-test('HALLAZGO: con «Muy ajustado, busco economía» no gana un patrón de coste «Moderada a alta» sin decirlo', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Forma del 1678: el presupuesto solo suma (1 punto a la
+test('REPARADO: con «Muy ajustado, busco economía» no gana un patrón de coste «Moderada a alta» sin decirlo', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Forma del 1678: el presupuesto solo suma (1 punto a la
   // cetogénica) y no descarta. 22, 17, 13, 23, 18, 21 → Cetogénica. 105 perfiles en el barrido.
-  test.fail();
   await abrirTest(page);
   await responder(page, AJUSTADO_CETO);
   await leerResultado(page);
@@ -436,10 +448,9 @@ test('HALLAZGO: con «Muy ajustado, busco economía» no gana un patrón de cost
 // 3. Invariante de la familia «selectores» y recetas de la referencia (selector-smartphone)
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('HALLAZGO: las opciones son radios de verdad (role="radio", aria-checked, sin aria-pressed)', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Hoy: role="group" con cuatro <button aria-pressed>, la forma
+test('REPARADO: las opciones son radios de verdad (role="radio", aria-checked, sin aria-pressed)', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Hoy: role="group" con cuatro <button aria-pressed>, la forma
   // de los hallazgos 950/1341 de la familia.
-  test.fail();
   await abrirTest(page);
   const grupo = page.locator('[class*="opcionesGrid"]');
   await expect(grupo).toHaveAttribute('role', 'radiogroup', { timeout: 1_000 });
@@ -447,10 +458,9 @@ test('HALLAZGO: las opciones son radios de verdad (role="radio", aria-checked, s
   await expect(grupo.locator('[aria-pressed]')).toHaveCount(0, { timeout: 1_000 });
 });
 
-test('HALLAZGO: la barra de progreso anuncia la misma fracción que pinta', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). aria-valuenow = n, aria-valuemin = 1, aria-valuemax = 10:
+test('REPARADO: la barra de progreso anuncia la misma fracción que pinta', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: aria-valuenow = n, aria-valuemin = 1, aria-valuemax = 10:
   // anuncia (n − 1) / 9 y pinta n / 10. En la P1, 0 frente a 0,1; en la P2, 0,111 frente a 0,2.
-  test.fail();
   await abrirTest(page);
   const barra = page.locator('[role="progressbar"]');
   const fracciones = async () => barra.evaluate((el) => {
@@ -468,11 +478,10 @@ test('HALLAZGO: la barra de progreso anuncia la misma fracción que pinta', asyn
   expect(p2.anunciada).toBeCloseTo(p2.pintada, 2);
 });
 
-test('HALLAZGO (C0016): tras «Comenzar» y «Siguiente» con teclado el foco sigue en el cuestionario', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). «Comenzar» desaparece y «Siguiente» se desactiva al llegar la
+test('REPARADO (C0016): tras «Comenzar» y «Siguiente» con teclado el foco sigue en el cuestionario', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: «Comenzar» desaparece y «Siguiente» se desactiva al llegar la
   // pregunta nueva sin responder: en los dos casos el foco cae a <body>, y el siguiente Tab sale
   // del cuestionario a la primera tarjeta de Apps relacionadas («Orientador IMC»).
-  test.fail();
   await cargar(page);
   await page.getByRole('button', { name: 'Comenzar el test' }).focus();
   await page.keyboard.press('Enter');
@@ -486,10 +495,9 @@ test('HALLAZGO (C0016): tras «Comenzar» y «Siguiente» con teclado el foco si
   expect(await dentro(), 'tras «Siguiente»').toBe(true);
 });
 
-test('HALLAZGO: teclado del patrón de radios (APG): la flecha mueve y marca, y el grupo es una sola parada de Tab', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Hoy ArrowDown no hace nada y las cuatro opciones tienen
+test('REPARADO: teclado del patrón de radios (APG): la flecha mueve y marca, y el grupo es una sola parada de Tab', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Hoy ArrowDown no hace nada y las cuatro opciones tienen
   // tabIndex 0 (cuatro paradas de Tab).
-  test.fail();
   await abrirTest(page);
   const opciones = page.locator('[class*="opcionesGrid"] button');
   await opciones.nth(0).focus();
@@ -499,10 +507,9 @@ test('HALLAZGO: teclado del patrón de radios (APG): la flecha mueve y marca, y 
   expect(await opciones.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([-1, 0, -1, -1]);
 });
 
-test('HALLAZGO: la pantalla de resultado tiene un <h1>', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). El hero del resultado son dos <p> («Tu patrón alimentario» y
+test('REPARADO: la pantalla de resultado tiene un <h1>', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: El hero del resultado son dos <p> («Tu patrón alimentario» y
   // el nombre de la dieta), y la tarjeta tampoco tiene encabezado: 0 <h1> en esa pantalla.
-  test.fail();
   await abrirTest(page);
   await responder(page, SALUD_GENERAL);
   await leerResultado(page);
@@ -513,11 +520,10 @@ test('HALLAZGO: la pantalla de resultado tiene un <h1>', async ({ page }) => {
 // 4. Contraste (claro y oscuro)
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('HALLAZGO: el hero del resultado (degradado --primary → --secondary) llega al contraste mínimo en los dos temas', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Forma del 1444 (selector-mascota). Medido: nombre de la dieta
+test('REPARADO: el hero del resultado (degradado --primary → --secondary) llega al contraste mínimo en los dos temas', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Forma del 1444 (selector-mascota). Medido: nombre de la dieta
   // (16 px, opacidad 0,88) 2,90:1 en claro y 2,22:1 en oscuro, exige 4,5; «Tu patrón alimentario»
   // (texto grande) 3,23:1 en claro y 2,43:1 en oscuro, exige 3.
-  test.fail();
   await abrirTest(page);
   await responder(page, SALUD_GENERAL);
   await leerResultado(page);
@@ -533,12 +539,11 @@ test('HALLAZGO: el hero del resultado (degradado --primary → --secondary) lleg
   expect(medidas).toEqual([]);
 });
 
-test('HALLAZGO: botones de marca y textos pequeños llegan a 4,5:1', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Forma del 1682 (selector-smartphone). Medido en claro:
+test('REPARADO: botones de marca y textos pequeños llegan a 4,5:1', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Forma del 1682 (selector-smartphone). Medido en claro:
   // «Comenzar el test» 3,22 · «Siguiente →» 3,26 · «Pregunta N de 10» 3,93 · perfil de la dieta
   // (--secondary) 2,80 · «Alimentos clave» 2,52 · «Reducir o evitar» 3,90 · macros/dificultad/
   // coste 4,11. En oscuro, «Comenzar» 2,43 y «Siguiente» 2,45. Ninguno es texto grande.
-  test.fail();
   await cargar(page);
   const bajos: string[] = [];
   const medir = async (nombre: string, selector: string) => {
@@ -586,29 +591,26 @@ async function jsonLd(page: Page): Promise<Record<string, unknown>[]> {
   );
 }
 
-test('HALLAZGO: la guía educativa está en el HTML servido', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Forma del 2663: <EducationalSection> va dentro de
+test('REPARADO: la guía educativa está en el HTML servido', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Forma del 2663: <EducationalSection> va dentro de
   // `pantalla === 'resultado'`, así que el HTML no lleva ni una línea de la guía.
-  test.fail();
   const html = await (await page.request.get('/selector-dieta/')).text();
   // Booleano y no toContain: si falla, no vuelca 40 KB de HTML en la salida.
   expect(html.includes('Diferencia entre dieta y patrón alimentario'), 'la guía en el HTML servido').toBe(true);
 });
 
-test('HALLAZGO: el JSON-LD WebApplication lleva entre 4 y 8 featureList (§1.ter)', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). El `jsonLd` que inyecta layout.tsx lleva `features: []`; las
+test('REPARADO: el JSON-LD WebApplication lleva entre 4 y 8 featureList (§1.ter)', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: El `jsonLd` que inyecta layout.tsx lleva `features: []`; las
   // ocho características solo están en la meta schema:WebApplication.
-  test.fail();
   const app = (await jsonLd(page)).find((b) => b['@type'] === 'WebApplication');
   expect(app, 'hay un WebApplication').toBeTruthy();
   expect(((app?.featureList ?? []) as unknown[]).length).toBeGreaterThanOrEqual(4);
 });
 
-test('HALLAZGO: el FAQPage y la tarjeta vegetariana dicen lo mismo de la vitamina B12', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). FAQPage: «en vegetarianos que consumen lácteos y huevos la
+test('REPARADO: el FAQPage y la tarjeta vegetariana dicen lo mismo de la vitamina B12', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: FAQPage: «en vegetarianos que consumen lácteos y huevos la
   // ingesta puede ser suficiente». Tarjeta vegetariana: «Vigila vitamina B12 (suplementación
   // recomendable)». Perfil: 24, 26, 20, 11, 24, 18 → Dieta Vegetariana.
-  test.fail();
   const faq = (await jsonLd(page)).find((b) => b['@type'] === 'FAQPage') as
     { mainEntity: { name: string; acceptedAnswer: { text: string } }[] } | undefined;
   const respuesta = faq?.mainEntity.find((q) => q.name.includes('vegetariana'))?.acceptedAnswer.text ?? '';
@@ -620,22 +622,20 @@ test('HALLAZGO: el FAQPage y la tarjeta vegetariana dicen lo mismo de la vitamin
   expect(consejos.includes('suplementación recomendable') && respuesta.includes('puede ser suficiente')).toBe(false);
 });
 
-test('HALLAZGO: embarazo, lactancia, menores y enfermedad renal se ven junto a un resultado de ayuno', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Esa lista solo está en «Cuándo consultar con un
+test('REPARADO: embarazo, lactancia, menores y enfermedad renal se ven junto a un resultado de ayuno', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Esa lista solo está en «Cuándo consultar con un
   // dietista-nutricionista», dentro de la guía educativa, que nace cerrada (display:none). La app
   // no pregunta por esos perfiles y recomienda ayuno o cetogénica. Diabetes: 21, 16, 13, 22, 18, 28.
-  test.fail();
   await abrirTest(page);
   await responder(page, DIABETES_AYUNO);
   expect(await leerResultado(page)).toBe('Ayuno Intermitente');
   await expect(page.getByText(/embarazada/).first()).toBeVisible({ timeout: 1_000 });
 });
 
-test('HALLAZGO: los porcentajes llevan espacio duro antes del «%» (CLAUDE.md §2)', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). «45-55% carbohidratos · 25-35% grasas saludables · 15-20%
+test('REPARADO: los porcentajes llevan espacio duro antes del «%» (CLAUDE.md §2)', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: «45-55% carbohidratos · 25-35% grasas saludables · 15-20%
   // proteínas» (macros de la mediterránea), «30%» y «80%» en la guía, «100% vegetal» (P2) y
   // «100% en el navegador» (meta). Norma del 25/09/2026: separado con U+00A0.
-  test.fail();
   await abrirTest(page);
   await responder(page, SALUD_GENERAL);
   await leerResultado(page);
@@ -643,11 +643,10 @@ test('HALLAZGO: los porcentajes llevan espacio duro antes del «%» (CLAUDE.md �
   expect(macros).toContain('45-55 %');
 });
 
-test('HALLAZGO: sin erratas en el enunciado de la P10 ni en la tarjeta vegana', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). «¿Qué describes mejor tu relación con la variedad…?» (debe ser
+test('REPARADO: sin erratas en el enunciado de la P10 ni en la tarjeta vegana', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: «¿Qué describes mejor tu relación con la variedad…?» (debe ser
   // «describe») y «Procesados veganos ultrarefinados» («ultrarrefinados»). Perfil vegano: 23, 22,
   // 24, 15, 22, 18 → Dieta Vegana.
-  test.fail();
   await abrirTest(page);
   for (let i = 0; i < 9; i++) {
     await opcion(page, VEGANA[i]).click();
@@ -663,46 +662,46 @@ test('HALLAZGO: sin erratas en el enunciado de la P10 ni en la tarjeta vegana', 
     .toEqual({ enunciado: false, ultra: false });
 });
 
-test('HALLAZGO: el ámbito España se declara con RegionBadge', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Presupuestos en €/mes por persona, «Adaptado al contexto
+test('REPARADO: el ámbito España se declara con RegionBadge', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Presupuestos en €/mes por persona, «Adaptado al contexto
   // español», «culturalmente alineada con España», el colegio profesional «de España»; sin
   // RegionBadge (forma del 949 de selector-smartphone).
-  test.fail();
   await cargar(page);
   await expect(page.getByText(/Datos de referencia: España|Solo España|Herramienta universal/).first())
     .toBeVisible({ timeout: 1_000 });
 });
 
-test('HALLAZGO: la guía no da para formar un hábito una cifra que contradice la que cita el propio catálogo', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). «El cerebro necesita entre 3 y 8 semanas para consolidar un
+test('REPARADO: la guía no da para formar un hábito una cifra que contradice la que cita el propio catálogo', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: «El cerebro necesita entre 3 y 8 semanas para consolidar un
   // nuevo hábito», sin fuente. selector-ejercicio y seguimiento-habitos citan Lally y col.
   // (European Journal of Social Psychology, 2010): mediana de 66 días, rango 18-254.
-  test.fail();
   await abrirTest(page);
   await responder(page, SALUD_GENERAL);
   await leerResultado(page);
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   await expect(page.getByRole('heading', { name: 'Cómo hacer la transición sin fracasar' })).toBeVisible();
-  expect(await textoResultado(page)).not.toContain('entre 3 y 8 semanas');
+  // La guía vive fuera del resultado desde el 3157: se lee su contenedor.
+  const guia = (await page.locator('[class*="guiaContainer"]').innerText()).replace(/\s+/g, ' ');
+  expect(guia).not.toContain('entre 3 y 8 semanas');
+  expect(guia).toContain('una mediana de 66 días');
+  expect(guia).not.toMatch(/adherencia del 80/);
 });
 
-test('HALLAZGO: el tope de sal de la DASH no confunde sal con sodio', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). «Sal añadida (< 2g/día en versión estricta)». data/nutrients.ts
+test('REPARADO: el tope de sal de la DASH no confunde sal con sodio', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: «Sal añadida (< 2g/día en versión estricta)». data/nutrients.ts
   // da para el sodio 1.500 mg/día (máx. 2.300): 1.500 mg de sodio son 3,8 g de sal
   // (NaCl/Na = 58,44/22,99 = 2,54). 2 g de sal son 0,79 g de sodio, la mitad de esa cifra.
   // Perfil: 28, 22, 20, 16, 30, 18 → Dieta DASH.
-  test.fail();
   await abrirTest(page);
   await responder(page, DASH_POR_UNO);
   expect(await leerResultado(page)).toBe('Dieta DASH');
   expect((await textos(page, 'limitarItem')).join(' ')).not.toContain('< 2g/día');
 });
 
-test('HALLAZGO: la P7 no califica de «sana y sin obsesiones» solo a quien come de todo', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Regla 1.quinquies.4 (no moralizar elecciones legítimas): la
+test('REPARADO: la P7 no califica de «sana y sin obsesiones» solo a quien come de todo', async ({ page }) => {
+  // REPARADO el 11/10/2026; antes: Regla 1.quinquies.4 (no moralizar elecciones legítimas): la
   // descripción de «Como de todo sin problema» es «Relación sana y sin obsesiones», que por
   // contraste etiqueta a quien es selectivo/a.
-  test.fail();
   await abrirTest(page);
   for (let i = 0; i < 6; i++) {
     await opcion(page, SALUD_GENERAL[i]).click();
@@ -737,11 +736,10 @@ test.describe('móvil 390 px', () => {
     }
   }
 
-  test('HALLAZGO: tras tocar «Ver resultado» la tarjeta del resultado está a la vista', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Sin foco ni desplazamiento al resultado, y con el anclaje de
+  test('REPARADO: tras tocar «Ver resultado» la tarjeta del resultado está a la vista', async ({ page }) => {
+    // REPARADO el 11/10/2026; antes: Sin foco ni desplazamiento al resultado, y con el anclaje de
     // scroll del navegador sujetando lo que había debajo: se aterriza en scrollY ≈ 3.070 con la
     // tarjeta ≈ 1.960 px por ENCIMA del borde y «Repetir el test» bajo el dedo. Foco en <body>.
-    test.fail();
     test.setTimeout(60_000);
     await abrirTest(page);
     await tocarHasta(page, 9);
@@ -753,11 +751,10 @@ test.describe('móvil 390 px', () => {
     await expect(page.locator('[class*="recomendacionCard"]')).toBeInViewport({ timeout: 2_000 });
   });
 
-  test('HALLAZGO: un doble toque en «Ver resultado» no tira el test y vuelve a la intro', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). El 1.er toque cambia a la pantalla de resultado y el anclaje
+  test('REPARADO: un doble toque en «Ver resultado» no tira el test y vuelve a la intro', async ({ page }) => {
+    // REPARADO el 11/10/2026; antes: El 1.er toque cambia a la pantalla de resultado y el anclaje
     // de scroll deja «🔄 Repetir el test» justo bajo el dedo; el 2.º lo pulsa: intro, las 10
     // respuestas perdidas. Medido a 360 y 390 px con el botón centrado y arriba.
-    test.fail();
     test.setTimeout(60_000);
     await abrirTest(page);
     await tocarHasta(page, 9);
@@ -770,22 +767,20 @@ test.describe('móvil 390 px', () => {
     await expect(page.locator('[class*="recomendacionValor"]')).toBeVisible({ timeout: 1_000 });
   });
 
-  test('HALLAZGO: un doble toque en «Comenzar el test» no contesta la pregunta 1', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Forma del 2659. Con el botón a y 600 (medido de 540 a 780) el
+  test('REPARADO: un doble toque en «Comenzar el test» no contesta la pregunta 1', async ({ page }) => {
+    // REPARADO el 11/10/2026; antes: Forma del 2659. Con el botón a y 600 (medido de 540 a 780) el
     // 2.º toque cae en «Mejorar la salud general y longevidad» (+3 a mediterránea y DASH).
-    test.fail();
     await cargar(page);
     const p = await encuadrar(page, 'Comenzar el test', 600);
     await page.mouse.dblclick(p.x, p.y);
     await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
     await page.waitForTimeout(300);
-    await expect(page.locator('[class*="opcionesGrid"] [aria-pressed="true"]')).toHaveCount(0, { timeout: 1_000 });
+    await expect(page.locator('[class*="opcionesGrid"] [aria-checked="true"]')).toHaveCount(0, { timeout: 1_000 });
   });
 
-  test('HALLAZGO: un doble toque en «Siguiente» de la P6 (3 opciones) no contesta la P7 (4 opciones)', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). La P7 tiene una opción más que la P6: su cuarta opción
+  test('REPARADO: un doble toque en «Siguiente» de la P6 (3 opciones) no contesta la P7 (4 opciones)', async ({ page }) => {
+    // REPARADO el 11/10/2026; antes: La P7 tiene una opción más que la P6: su cuarta opción
     // («Como fuera o con horarios muy irregulares», +3 al ayuno) queda donde estaba «Siguiente».
-    test.fail();
     test.setTimeout(60_000);
     await abrirTest(page);
     await tocarHasta(page, 5);
@@ -796,14 +791,13 @@ test.describe('móvil 390 px', () => {
     await page.mouse.dblclick(p.x, p.y);
     await expect(page.getByText('Pregunta 7 de 10')).toBeVisible();
     await page.waitForTimeout(300);
-    await expect(page.locator('[class*="opcionesGrid"] [aria-pressed="true"]')).toHaveCount(0, { timeout: 1_000 });
+    await expect(page.locator('[class*="opcionesGrid"] [aria-checked="true"]')).toHaveCount(0, { timeout: 1_000 });
   });
 
-  test('HALLAZGO: tras tocar «Comenzar» el enunciado de la P1 está a la vista, por debajo de la barra del logo', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Con el botón centrado, la página se queda en scrollY ≈ 1.420
+  test('REPARADO: tras tocar «Comenzar» el enunciado de la P1 está a la vista, por debajo de la barra del logo', async ({ page }) => {
+    // REPARADO el 11/10/2026; antes: Con el botón centrado, la página se queda en scrollY ≈ 1.420
     // y el enunciado en y −14…40, bajo la barra fija (que acaba en y 62). A 360 px queda entero
     // por encima del borde (y −92…−11).
-    test.fail();
     await cargar(page);
     const p = await encuadrar(page, 'Comenzar el test');
     await page.touchscreen.tap(p.x, p.y);
@@ -813,11 +807,10 @@ test.describe('móvil 390 px', () => {
     expect(m.tapado || m.top < m.barra || m.bottom > m.alto, JSON.stringify(m)).toBe(false);
   });
 
-  test('HALLAZGO: el título del resultado no queda bajo la barra del logo a 390 ni a 360 px', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). `.heroResultados` lleva 2rem arriba (el `.hero` de la intro
+  test('REPARADO: el título del resultado no queda bajo la barra del logo a 390 ni a 360 px', async ({ page }) => {
+    // REPARADO el 11/10/2026; antes: `.heroResultados` lleva 2rem arriba (el `.hero` de la intro
     // sí tiene los 80 px hasta 1.023 px): «Tu patrón alimentario» ocupa y 34-64 y la píldora del
     // logo y 10-52, en scrollY 0.
-    test.fail();
     test.setTimeout(60_000);
     await abrirTest(page);
     await responder(page, SALUD_GENERAL);
@@ -844,21 +837,19 @@ test.describe('móvil 360 px', () => {
     hasTouch: true,
   });
 
-  test('HALLAZGO: un doble toque en «Comenzar el test» (botón a y 660) no contesta la pregunta 1', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). A 360 px, con el botón a y 600-660, el 2.º toque cae en
+  test('REPARADO: un doble toque en «Comenzar el test» (botón a y 660) no contesta la pregunta 1', async ({ page }) => {
+    // REPARADO el 11/10/2026; antes: A 360 px, con el botón a y 600-660, el 2.º toque cae en
     // «Más energía y menos bajones».
-    test.fail();
     await cargar(page);
     const p = await encuadrar(page, 'Comenzar el test', 660);
     await page.mouse.dblclick(p.x, p.y);
     await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
     await page.waitForTimeout(300);
-    await expect(page.locator('[class*="opcionesGrid"] [aria-pressed="true"]')).toHaveCount(0, { timeout: 1_000 });
+    await expect(page.locator('[class*="opcionesGrid"] [aria-checked="true"]')).toHaveCount(0, { timeout: 1_000 });
   });
 
-  test('HALLAZGO: un doble toque en «Ver resultado» centrado no devuelve a la intro', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Mismo mecanismo que a 390 px.
-    test.fail();
+  test('REPARADO: un doble toque en «Ver resultado» centrado no devuelve a la intro', async ({ page }) => {
+    // REPARADO el 11/10/2026; antes: Mismo mecanismo que a 390 px.
     test.setTimeout(60_000);
     await abrirTest(page);
     for (let i = 0; i < 9; i++) {
@@ -875,4 +866,52 @@ test.describe('móvil 360 px', () => {
     await page.waitForTimeout(400);
     await expect(page.locator('[class*="recomendacionValor"]')).toBeVisible({ timeout: 1_000 });
   });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 8. Motor, sin navegador: el barrido entero (331.776 perfiles), 11/10/2026
+// ─────────────────────────────────────────────────────────────────────────────
+
+test('motor: ninguna restricción declarada recibe un patrón que la incumpla, y todo empate se dice', () => {
+  const CON_ANIMALES = ['mediterranea', 'cetogenica', 'dash'];
+  const indices = PREGUNTAS.map(() => 0);
+  const incumplen: string[] = [];
+  let total = 0;
+  let empates = 0;
+  let empatesCallados = 0;
+  for (;;) {
+    const respuestas = Object.fromEntries(PREGUNTAS.map((p, i) => [p.id, p.opciones[indices[i]].valor]));
+    const r = calcularResultado(respuestas);
+    total++;
+    const veg = respuestas.restricciones;
+    if (veg === 'vegano' && !['vegana', 'ayuno-intermitente'].includes(r.dieta)) incumplen.push(`vegano → ${r.dieta}`);
+    if (veg === 'vegetariano' && CON_ANIMALES.includes(r.dieta)) incumplen.push(`vegetariano → ${r.dieta}`);
+    if (respuestas.salud === 'cardiovascular' && r.dieta === 'cetogenica') incumplen.push('cardiovascular → cetogénica');
+    // Las empatadas son exactamente las admitidas con los puntos de la ganadora.
+    const admitidas = ORDEN_DIETAS.filter((d) => !r.descartadas.includes(d));
+    const enCabeza = admitidas.filter((d) => r.puntos[d] === r.puntos[r.dieta]);
+    if (enCabeza.length > 1) empates++;
+    if (enCabeza.length - 1 !== r.empatadas.length) empatesCallados++;
+    if (incumplen.length > 5) break;
+    // Siguiente perfil (contador en base mixta).
+    let i = indices.length - 1;
+    while (i >= 0 && ++indices[i] === PREGUNTAS[i].opciones.length) indices[i--] = 0;
+    if (i < 0) break;
+  }
+  expect(total).toBe(331_776);
+  expect(incumplen).toEqual([]);
+  expect(empatesCallados).toBe(0);
+  expect(empates).toBeGreaterThan(0);
+});
+
+test('motor: las notas solo salen cuando lo declarado choca con el patrón', () => {
+  const base = { objetivo: 'salud_general', restricciones: 'ninguna', actividad: 'moderado', salud: 'ninguna', cocina: 'basico', presupuesto: 'normal', relacion_comida: 'equilibrada', sostenibilidad: 'algo', plazo: 'largo', variedad: 'moderada' };
+  // 30, 21, 20, 18, 25, 20 → mediterránea, sin notas ni empate.
+  expect(calcularResultado(base)).toMatchObject({ dieta: 'mediterranea', empatadas: [], notas: [] });
+  // Sin gluten: 29, 20, 20, 18, 23, 19 → mediterránea con la nota del gluten.
+  const sinGluten = calcularResultado({ ...base, restricciones: 'sin_gluten' });
+  expect(sinGluten.dieta).toBe('mediterranea');
+  expect(sinGluten.notas.join(' ')).toContain('Has declarado que evitas el gluten');
+  // La ficha vegetariana y el FAQPage dicen lo mismo de la B12 (hallazgo 3159).
+  expect(DIETAS.vegetariana.consejos.join(' ')).not.toContain('suplementación recomendable');
 });
