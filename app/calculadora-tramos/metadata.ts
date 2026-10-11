@@ -62,7 +62,7 @@ export const PREGUNTAS_FRECUENTES: FAQItem[] = [
   {
     question: '¿Qué diferencia hay entre calcular por tramos y al tramo alcanzado?',
     answer:
-      'Por tramos (progresivo) cada parte de la cantidad paga el tipo de su propio tramo: con 0 % hasta 10.000 y 15 % después, 12.000 pagan 15 % solo sobre los 2.000 que pasan del límite, es decir 300. Al tramo alcanzado (escalonado) toda la cantidad paga el tipo del tramo al que llega: 12.000 al 15 % son 1.800. El primero no da saltos al cruzar un límite; el segundo sí.',
+      'Por tramos (progresivo) cada parte de la cantidad paga el tipo de su propio tramo: con 0 % hasta 10.000 y 15 % después, 12.000 pagan 15 % solo sobre los 2000 que pasan del límite, es decir 300. Al tramo alcanzado (escalonado) toda la cantidad paga el tipo del tramo al que llega: 12.000 al 15 % son 1800. El primero no da saltos al cruzar un límite; el segundo sí.',
   },
   {
     question: '¿Es verdad que subir de tramo puede hacer que me quede menos dinero?',
