@@ -136,6 +136,7 @@ export default function PaisesDelMundoPage() {
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={clearSearch}
                   className={styles.clearButton}
                   aria-label="Limpiar búsqueda"
@@ -177,6 +178,7 @@ export default function PaisesDelMundoPage() {
             <div className={styles.filterButtons}>
               {continents.map((continent) => (
                 <button
+                  type="button"
                   key={continent}
                   onClick={() => {
                     setSelectedContinent(continent);
@@ -292,9 +294,10 @@ export default function PaisesDelMundoPage() {
                 rel="noopener noreferrer"
                 className={styles.mapButton}
               >
-                🗺️ Ver en mapa
+                <span aria-hidden="true">🗺️</span> Ver en mapa
               </a>
               <button
+                type="button"
                 onClick={clearSearch}
                 className={styles.backButton}
               >
@@ -313,6 +316,7 @@ export default function PaisesDelMundoPage() {
             <div className={styles.gridList}>
               {filteredCountries.map((country) => (
                 <button
+                  type="button"
                   key={country.name}
                   onClick={() => handleSelectCountry(country)}
                   className={styles.gridItem}
@@ -334,13 +338,13 @@ export default function PaisesDelMundoPage() {
         <section>
           <h4>Los récords geográficos del mundo</h4>
           <ul>
-            <li><strong>🏆 País más grande</strong>: Rusia (17,1 millones km²) — equivale a casi dos veces EE.UU. o 34 veces España.</li>
-            <li><strong>🔬 País más pequeño</strong>: Ciudad del Vaticano (0,44 km²) — cabe 11 veces en el Parque del Retiro de Madrid.</li>
-            <li><strong>👥 Más poblado</strong>: India (1.450 millones, superó a China en 2023).</li>
-            <li><strong>🏜️ Menos poblado (continente)</strong>: Nauru en Oceanía (unos 10.000 habitantes) es el estado independiente menos poblado.</li>
-            <li><strong>🏔️ País más alto</strong>: Lesotho — su punto más bajo está a 1.400 m sobre el nivel del mar, completamente rodeado por Sudáfrica.</li>
-            <li><strong>📐 Mayor densidad de población</strong>: Mónaco (~26.000 hab/km²), seguido de Singapur y Bahréin.</li>
-            <li><strong>🌊 Mayor número de islas</strong>: Suecia (221.800 islas), seguida de Noruega y Finlandia.</li>
+            <li><strong><span aria-hidden="true">🏆</span> País más grande</strong>: Rusia (17,1 millones km²) — equivale a casi dos veces EE.UU. o 34 veces España.</li>
+            <li><strong><span aria-hidden="true">🔬</span> País más pequeño</strong>: Ciudad del Vaticano (0,44 km²) — cabe 11 veces en el Parque del Retiro de Madrid.</li>
+            <li><strong><span aria-hidden="true">👥</span> Más poblado</strong>: India (1.450 millones, superó a China en 2023).</li>
+            <li><strong><span aria-hidden="true">🏜️</span> Menos poblado (continente)</strong>: Nauru en Oceanía (unos 10.000 habitantes) es el estado independiente menos poblado.</li>
+            <li><strong><span aria-hidden="true">🏔️</span> País más alto</strong>: Lesotho — su punto más bajo está a 1.400 m sobre el nivel del mar, completamente rodeado por Sudáfrica.</li>
+            <li><strong><span aria-hidden="true">📐</span> Mayor densidad de población</strong>: Mónaco (~26.000 hab/km²), seguido de Singapur y Bahréin.</li>
+            <li><strong><span aria-hidden="true">🌊</span> Mayor número de islas</strong>: Suecia (221.800 islas), seguida de Noruega y Finlandia.</li>
           </ul>
         </section>
 
@@ -359,11 +363,11 @@ export default function PaisesDelMundoPage() {
         <section>
           <h4>Los 5 continentes en cifras</h4>
           <ul>
-            <li><strong>🌍 África</strong>: 54 países, 1.400 millones de habitantes, el continente con mayor crecimiento demográfico. Nigeria será el 3.er país más poblado del mundo en 2050.</li>
-            <li><strong>🌏 Asia</strong>: 48 países, 4.700 millones de habitantes (60% de la humanidad). Incluye las dos civilizaciones más antiguas continuas (China e India) y el país con la economía que más rápido creció en el siglo XXI.</li>
-            <li><strong>🌎 América</strong>: 35 países, 1.000 millones de habitantes. Brasil es el 5.º país más grande del mundo y tiene el mayor número de hablantes de portugués.</li>
-            <li><strong>🌍 Europa</strong>: 45 países en apenas 10,5 millones km². Alta densidad media (~71 hab/km²). Tiene la mayor integración supranacional del mundo (UE).</li>
-            <li><strong>🌏 Oceanía</strong>: 14 países. Australia ocupa el 92% del área continental. Muchos estados son pequeñas islas del Pacífico con soberanía sobre grandes zonas económicas exclusivas (ZEE).</li>
+            <li><strong><span aria-hidden="true">🌍</span> África</strong>: 54 países, 1.400 millones de habitantes, el continente con mayor crecimiento demográfico. Nigeria será el 3.er país más poblado del mundo en 2050.</li>
+            <li><strong><span aria-hidden="true">🌏</span> Asia</strong>: 48 países, 4.700 millones de habitantes (60% de la humanidad). Incluye las dos civilizaciones más antiguas continuas (China e India) y el país con la economía que más rápido creció en el siglo XXI.</li>
+            <li><strong><span aria-hidden="true">🌎</span> América</strong>: 35 países, 1.000 millones de habitantes. Brasil es el 5.º país más grande del mundo y tiene el mayor número de hablantes de portugués.</li>
+            <li><strong><span aria-hidden="true">🌍</span> Europa</strong>: 45 países en apenas 10,5 millones km². Alta densidad media (~71 hab/km²). Tiene la mayor integración supranacional del mundo (UE).</li>
+            <li><strong><span aria-hidden="true">🌏</span> Oceanía</strong>: 14 países. Australia ocupa el 92% del área continental. Muchos estados son pequeñas islas del Pacífico con soberanía sobre grandes zonas económicas exclusivas (ZEE).</li>
           </ul>
         </section>
 
@@ -379,7 +383,7 @@ export default function PaisesDelMundoPage() {
         </section>
 
         <section>
-          <h3>📊 Los 5 Continentes: Comparativa Completa</h3>
+          <h3><span aria-hidden="true">📊</span> Los 5 Continentes: Comparativa Completa</h3>
           <p>Datos actualizados de los 5 grandes continentes habitados del planeta:</p>
           <div className={styles.eduTableWrapper}>
             <table className={styles.eduTable}>
@@ -395,7 +399,7 @@ export default function PaisesDelMundoPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>🌍 África</strong></td>
+                  <td><strong><span aria-hidden="true">🌍</span> África</strong></td>
                   <td>54</td>
                   <td>1.460 millones</td>
                   <td>30,4 M km²</td>
@@ -403,7 +407,7 @@ export default function PaisesDelMundoPage() {
                   <td>Nigeria (223 M)</td>
                 </tr>
                 <tr>
-                  <td><strong>🌏 Asia</strong></td>
+                  <td><strong><span aria-hidden="true">🌏</span> Asia</strong></td>
                   <td>48</td>
                   <td>4.750 millones</td>
                   <td>44,6 M km²</td>
@@ -411,7 +415,7 @@ export default function PaisesDelMundoPage() {
                   <td>India (1.450 M)</td>
                 </tr>
                 <tr>
-                  <td><strong>🌎 América</strong></td>
+                  <td><strong><span aria-hidden="true">🌎</span> América</strong></td>
                   <td>35</td>
                   <td>1.040 millones</td>
                   <td>42,5 M km²</td>
@@ -419,7 +423,7 @@ export default function PaisesDelMundoPage() {
                   <td>EE.UU. (340 M)</td>
                 </tr>
                 <tr>
-                  <td><strong>🌍 Europa</strong></td>
+                  <td><strong><span aria-hidden="true">🌍</span> Europa</strong></td>
                   <td>45</td>
                   <td>745 millones</td>
                   <td>10,5 M km²</td>
@@ -427,7 +431,7 @@ export default function PaisesDelMundoPage() {
                   <td>Rusia (144 M)</td>
                 </tr>
                 <tr>
-                  <td><strong>🌏 Oceanía</strong></td>
+                  <td><strong><span aria-hidden="true">🌏</span> Oceanía</strong></td>
                   <td>14</td>
                   <td>46 millones</td>
                   <td>8,5 M km²</td>
@@ -440,7 +444,7 @@ export default function PaisesDelMundoPage() {
         </section>
 
         <section>
-          <h3>🎯 ¿Para Qué Necesitas Conocer los Países del Mundo?</h3>
+          <h3><span aria-hidden="true">🎯</span> ¿Para Qué Necesitas Conocer los Países del Mundo?</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>🎓</span>
@@ -466,7 +470,7 @@ export default function PaisesDelMundoPage() {
         </section>
 
         <section>
-          <h3>❓ Preguntas Frecuentes sobre los Países del Mundo</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre los Países del Mundo</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Por qué hay exactamente 196 países y no otra cifra?</summary>
@@ -504,7 +508,7 @@ export default function PaisesDelMundoPage() {
         </section>
 
         <section>
-          <h3>📋 Cómo Entender la Geopolítica de un País Desconocido</h3>
+          <h3><span aria-hidden="true">📋</span> Cómo Entender la Geopolítica de un País Desconocido</h3>
           <ol className={styles.eduStepsList}>
             <li className={styles.eduStep}>
               <span className={styles.eduStepNum}>1</span>
@@ -552,7 +556,7 @@ export default function PaisesDelMundoPage() {
         </section>
 
         <section>
-          <h3>💡 Claves para Estudiar Geografía Política</h3>
+          <h3><span aria-hidden="true">💡</span> Claves para Estudiar Geografía Política</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon}>🗺️</span>
@@ -604,7 +608,7 @@ export default function PaisesDelMundoPage() {
 
         {/* ── SECCIÓN 1: Tabla Comparativa Continentes (patrón v2.0) ── */}
         <section>
-          <h3>📊 Los 5 Continentes: Ficha Comparativa Completa</h3>
+          <h3><span aria-hidden="true">📊</span> Los 5 Continentes: Ficha Comparativa Completa</h3>
           <p>Comparativa detallada de los cinco continentes habitados, con récords, países destacados y datos de curiosidad:</p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -621,7 +625,7 @@ export default function PaisesDelMundoPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>🌍 Europa</strong></td>
+                  <td><strong><span aria-hidden="true">🌍</span> Europa</strong></td>
                   <td>44</td>
                   <td>10,5 M km²</td>
                   <td>745 millones</td>
@@ -630,7 +634,7 @@ export default function PaisesDelMundoPage() {
                   <td>La UE agrupa 27 países con moneda y fronteras comunes</td>
                 </tr>
                 <tr>
-                  <td><strong>🌏 Asia</strong></td>
+                  <td><strong><span aria-hidden="true">🌏</span> Asia</strong></td>
                   <td>49</td>
                   <td>44,6 M km²</td>
                   <td>4.750 millones</td>
@@ -639,7 +643,7 @@ export default function PaisesDelMundoPage() {
                   <td>El 60 % de la humanidad vive aquí; alberga 7 de las 10 ciudades más pobladas</td>
                 </tr>
                 <tr>
-                  <td><strong>🌎 América</strong></td>
+                  <td><strong><span aria-hidden="true">🌎</span> América</strong></td>
                   <td>35</td>
                   <td>42,5 M km²</td>
                   <td>1.040 millones</td>
@@ -648,7 +652,7 @@ export default function PaisesDelMundoPage() {
                   <td>El español es el idioma más hablado en todo el continente</td>
                 </tr>
                 <tr>
-                  <td><strong>🌍 África</strong></td>
+                  <td><strong><span aria-hidden="true">🌍</span> África</strong></td>
                   <td>54</td>
                   <td>30,4 M km²</td>
                   <td>1.460 millones</td>
@@ -657,7 +661,7 @@ export default function PaisesDelMundoPage() {
                   <td>Tiene el mayor número de países del mundo; Nigeria superará a EE.UU. en población antes de 2050</td>
                 </tr>
                 <tr>
-                  <td><strong>🌏 Oceanía</strong></td>
+                  <td><strong><span aria-hidden="true">🌏</span> Oceanía</strong></td>
                   <td>14</td>
                   <td>8,5 M km²</td>
                   <td>46 millones</td>
@@ -672,7 +676,7 @@ export default function PaisesDelMundoPage() {
 
         {/* ── SECCIÓN 2: Casos de Uso — 4 perfiles (patrón v2.0) ── */}
         <section>
-          <h3>🎯 ¿Quién Usa el Buscador de Países del Mundo?</h3>
+          <h3><span aria-hidden="true">🎯</span> ¿Quién Usa el Buscador de Países del Mundo?</h3>
           <p>Cuatro perfiles que sacan el máximo partido a esta herramienta:</p>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
@@ -728,7 +732,7 @@ export default function PaisesDelMundoPage() {
 
         {/* ── SECCIÓN 3: FAQ — 8 preguntas (patrón v2.0) ── */}
         <section>
-          <h3>❓ Preguntas Frecuentes: Récords y Curiosidades Mundiales</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes: Récords y Curiosidades Mundiales</h3>
           <div className={styles.faqList}>
             <details className={styles.faqItem}>
               <summary>¿Cuántos países hay exactamente en el mundo?</summary>
@@ -775,7 +779,7 @@ export default function PaisesDelMundoPage() {
 
         {/* ── SECCIÓN 4: Guía Paso a Paso — 7 pasos (patrón v2.0) ── */}
         <section>
-          <h3>📋 Método para Aprender la Geografía Mundial en 4-8 Semanas</h3>
+          <h3><span aria-hidden="true">📋</span> Método para Aprender la Geografía Mundial en 4-8 Semanas</h3>
           <p>Sigue este método sistemático por continente para memorizar los 196 países y sus capitales de forma duradera:</p>
           <ol className={styles.stepGuide}>
             <li className={styles.step}>
@@ -832,7 +836,7 @@ export default function PaisesDelMundoPage() {
 
         {/* ── SECCIÓN 5: Mejores Prácticas — 6 tips (patrón v2.0) ── */}
         <section>
-          <h3>💡 6 Técnicas para Memorizar Países y Capitales</h3>
+          <h3><span aria-hidden="true">💡</span> 6 Técnicas para Memorizar Países y Capitales</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🏠</span>

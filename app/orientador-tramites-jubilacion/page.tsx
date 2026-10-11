@@ -122,6 +122,7 @@ export default function OrientadorTramitesJubilacionPage() {
         <div className={styles.figuraGrid}>
           {SITUACIONES.map(s => (
             <button
+              type="button"
               key={s.id}
               className={`${styles.figuraCard} ${situacion === s.id ? styles.figuraActiva : ''}`}
               onClick={() => setSituacion(s.id)}
@@ -144,6 +145,7 @@ export default function OrientadorTramitesJubilacionPage() {
             const activo = necesidades.includes(n.id);
             return (
               <button
+                type="button"
                 key={n.id}
                 className={`${styles.checkboxCard} ${activo ? styles.checkboxActivo : ''}`}
                 onClick={() => toggleNecesidad(n.id)}
@@ -169,6 +171,7 @@ export default function OrientadorTramitesJubilacionPage() {
             const activo = perfiles.includes(p.id);
             return (
               <button
+                type="button"
                 key={p.id}
                 className={`${styles.checkboxCard} ${activo ? styles.checkboxActivo : ''}`}
                 onClick={() => togglePerfil(p.id)}
@@ -414,7 +417,7 @@ export default function OrientadorTramitesJubilacionPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Lo que debes saber antes de iniciar un trámite</h2>
+          <h2><span aria-hidden="true">⚠️</span> Lo que debes saber antes de iniciar un trámite</h2>
           <div className={styles.warningGrid}>
             {[
               { titulo: 'No calcula tu pensión ni gestiona ningún trámite', desc: 'Esta herramienta describe tipos de trámite, complemento y servicio con carácter general. La cuantía real, la concesión de complementos y la resolución de cualquier prestación dependen de la Seguridad Social, la Agencia Tributaria o tu Comunidad Autónoma.' },

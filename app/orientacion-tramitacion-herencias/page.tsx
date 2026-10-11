@@ -263,7 +263,7 @@ export default function OrientacionTramitacionHerenciasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📋 Orientación para Tramitar una Herencia</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📋</span> Orientación para Tramitar una Herencia</h1>
         <p className={styles.subtitle}>
           Asistente paso a paso para gestionar una herencia en España
         </p>
@@ -312,6 +312,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <div className={styles.opciones}>
               {(['si', 'no', 'nose'] as const).map(v => (
                 <button
+                  type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.testamento === v ? styles.opcionActiva : ''}`}
                   onClick={() => handleRespuesta('testamento', v)}
@@ -322,7 +323,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             </div>
             {respuestas.testamento === 'nose' && (
               <p className={styles.ayudaPregunta}>
-                💡 El certificado de últimas voluntades te indicará si existe testamento y dónde está.
+                <span aria-hidden="true">💡</span> El certificado de últimas voluntades te indicará si existe testamento y dónde está.
               </p>
             )}
           </div>
@@ -333,6 +334,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <div className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
+                  type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.inmuebles === v ? styles.opcionActiva : ''}`}
                   onClick={() => handleRespuesta('inmuebles', v)}
@@ -349,6 +351,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <div className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
+                  type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.cuentas === v ? styles.opcionActiva : ''}`}
                   onClick={() => handleRespuesta('cuentas', v)}
@@ -365,6 +368,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <div className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
+                  type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.vehiculos === v ? styles.opcionActiva : ''}`}
                   onClick={() => handleRespuesta('vehiculos', v)}
@@ -381,6 +385,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <div className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
+                  type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.deudas === v ? styles.opcionActiva : ''}`}
                   onClick={() => handleRespuesta('deudas', v)}
@@ -391,7 +396,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             </div>
             {respuestas.deudas === 'si' && (
               <p className={styles.ayudaPregunta}>
-                ⚠️ Si las deudas superan el valor de los bienes, considera la aceptación a beneficio de inventario o la renuncia.
+                <span aria-hidden="true">⚠️</span> Si las deudas superan el valor de los bienes, considera la aceptación a beneficio de inventario o la renuncia.
               </p>
             )}
           </div>
@@ -402,6 +407,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <div className={styles.opciones}>
               {(['1', '2-3', '4+'] as const).map(v => (
                 <button
+                  type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.herederos === v ? styles.opcionActiva : ''}`}
                   onClick={() => handleRespuesta('herederos', v)}
@@ -418,6 +424,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <div className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
+                  type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.menores === v ? styles.opcionActiva : ''}`}
                   onClick={() => handleRespuesta('menores', v)}
@@ -428,7 +435,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             </div>
             {respuestas.menores === 'si' && (
               <p className={styles.ayudaPregunta}>
-                ⚠️ Se necesitará autorización judicial para aceptar la herencia en nombre de menores.
+                <span aria-hidden="true">⚠️</span> Se necesitará autorización judicial para aceptar la herencia en nombre de menores.
               </p>
             )}
           </div>
@@ -605,7 +612,7 @@ export default function OrientacionTramitacionHerenciasPage() {
 
         <div className={styles.costesGrid}>
           <div className={styles.costeCard}>
-            <h4>📋 Certificados (costes fijos)</h4>
+            <h4><span aria-hidden="true">📋</span> Certificados (costes fijos)</h4>
             <table className={styles.tablaCoste}>
               <tbody>
                 <tr><td>Certificado de defunción</td><td>~4 €</td></tr>
@@ -617,7 +624,7 @@ export default function OrientacionTramitacionHerenciasPage() {
           </div>
 
           <div className={styles.costeCard}>
-            <h4>⚖️ Notaría (orientativo)</h4>
+            <h4><span aria-hidden="true">⚖️</span> Notaría (orientativo)</h4>
             <p className={styles.costeNota}>Según valor total de la herencia:</p>
             <table className={styles.tablaCoste}>
               <thead><tr><th>Valor herencia</th><th>Coste aprox.</th></tr></thead>
@@ -633,7 +640,7 @@ export default function OrientacionTramitacionHerenciasPage() {
           </div>
 
           <div className={styles.costeCard}>
-            <h4>🏠 Registro de la Propiedad</h4>
+            <h4><span aria-hidden="true">🏠</span> Registro de la Propiedad</h4>
             <p className={styles.costeNota}>Según valor de los inmuebles:</p>
             <table className={styles.tablaCoste}>
               <thead><tr><th>Valor inmuebles</th><th>Coste aprox.</th></tr></thead>
@@ -648,16 +655,16 @@ export default function OrientacionTramitacionHerenciasPage() {
           </div>
 
           <div className={styles.costeCard}>
-            <h4>💰 Impuestos (usar estimadores)</h4>
+            <h4><span aria-hidden="true">💰</span> Impuestos (usar estimadores)</h4>
             <p className={styles.costeNota}>
               El Impuesto de Sucesiones varía enormemente según la Comunidad Autónoma y el grado de parentesco.
             </p>
             <div className={styles.enlacesCalculadoras}>
               <Link href="/estimador-impuesto-sucesiones/" className={styles.enlaceCalculadora}>
-                📊 Estimador Impuesto de Sucesiones (17 CCAA)
+                <span aria-hidden="true">📊</span> Estimador Impuesto de Sucesiones (17 CCAA)
               </Link>
               <Link href="/estimador-impuesto-donaciones/" className={styles.enlaceCalculadora}>
-                🎁 Estimador Impuesto de Donaciones (17 CCAA)
+                <span aria-hidden="true">🎁</span> Estimador Impuesto de Donaciones (17 CCAA)
               </Link>
             </div>
             <p className={styles.costeAviso}>
@@ -669,8 +676,8 @@ export default function OrientacionTramitacionHerenciasPage() {
 
       {/* Botón resetear */}
       <div className={styles.accionesContainer}>
-        <button onClick={resetearTodo} className={styles.btnResetear}>
-          🔄 Empezar de Nuevo
+        <button type="button" onClick={resetearTodo} className={styles.btnResetear}>
+          <span aria-hidden="true">🔄</span> Empezar de Nuevo
         </button>
         <p className={styles.ayudaResetear}>Esto borrará todas tus respuestas y el progreso del checklist</p>
       </div>
@@ -685,27 +692,27 @@ export default function OrientacionTramitacionHerenciasPage() {
 
           <div className={styles.conceptGrid}>
             <div className={styles.conceptCard}>
-              <h4>📜 ¿Qué es el testamento?</h4>
+              <h4><span aria-hidden="true">📜</span> ¿Qué es el testamento?</h4>
               <p>Documento donde una persona expresa su voluntad sobre el reparto de sus bienes tras su fallecimiento. Puede ser abierto (ante notario), cerrado u ológrafo (escrito a mano).</p>
             </div>
             <div className={styles.conceptCard}>
-              <h4>⚖️ Herencia sin testamento (abintestato)</h4>
+              <h4><span aria-hidden="true">⚖️</span> Herencia sin testamento (abintestato)</h4>
               <p>Si no hay testamento, la ley determina quiénes heredan: 1.º descendientes, 2.º ascendientes, 3.º cónyuge, 4.º colaterales (hermanos, sobrinos), 5.º el Estado.</p>
             </div>
             <div className={styles.conceptCard}>
-              <h4>👥 ¿Qué es la legítima?</h4>
+              <h4><span aria-hidden="true">👥</span> ¿Qué es la legítima?</h4>
               <p>Parte de la herencia que la ley reserva a los herederos forzosos (hijos, ascendientes, cónyuge). En derecho común, 2/3 de la herencia para los hijos.</p>
             </div>
             <div className={styles.conceptCard}>
-              <h4>💒 Usufructo del cónyuge viudo</h4>
+              <h4><span aria-hidden="true">💒</span> Usufructo del cónyuge viudo</h4>
               <p>El cónyuge viudo tiene derecho al usufructo de parte de la herencia: 1/3 si hay hijos, 1/2 si heredan ascendientes, o 2/3 si no hay descendientes ni ascendientes.</p>
             </div>
             <div className={styles.conceptCard}>
-              <h4>💸 ¿Se heredan las deudas?</h4>
+              <h4><span aria-hidden="true">💸</span> ¿Se heredan las deudas?</h4>
               <p>Sí. Al aceptar una herencia se asumen las deudas. Por eso existe la aceptación a beneficio de inventario: solo se pagan deudas hasta donde alcancen los bienes heredados.</p>
             </div>
             <div className={styles.conceptCard}>
-              <h4>❌ Renuncia a la herencia</h4>
+              <h4><span aria-hidden="true">❌</span> Renuncia a la herencia</h4>
               <p>Se puede renunciar si hay más deudas que bienes. La renuncia es irrevocable y debe hacerse ante notario. Si renuncias, tu parte pasa a los demás herederos.</p>
             </div>
           </div>
@@ -791,7 +798,7 @@ export default function OrientacionTramitacionHerenciasPage() {
               </p>
               <p><strong>Proceso:</strong> Estándar. Certificados → copia del testamento → inventario → escritura de adjudicación → pago IS (modelo 650) → inscripción en Registro.</p>
               <p className={styles.escenarioTip}>
-                ⏱ Duración estimada: <strong>3 – 4 meses</strong> si ambos herederos colaboran. Coste notarial orientativo para un piso de 200.000 €: ~450 € escritura + ~250 € Registro.
+                <span aria-hidden="true">⏱</span> Duración estimada: <strong>3 – 4 meses</strong> si ambos herederos colaboran. Coste notarial orientativo para un piso de 200.000 €: ~450 € escritura + ~250 € Registro.
               </p>
             </div>
 
@@ -805,7 +812,7 @@ export default function OrientacionTramitacionHerenciasPage() {
               </p>
               <p><strong>Proceso:</strong> Abintestato notarial. Certificados → acta de declaración de herederos (dos testigos) → inventario → escritura de adjudicación (proindiviso o venta acordada) → IS → Registro.</p>
               <p className={styles.escenarioTip}>
-                ⏱ Duración estimada: <strong>4 – 6 meses</strong>. Coste extra: ~250 – 400 € por el acta notarial de herederos. Si no se ponen de acuerdo en el destino del piso, puede alargarse mucho más.
+                <span aria-hidden="true">⏱</span> Duración estimada: <strong>4 – 6 meses</strong>. Coste extra: ~250 – 400 € por el acta notarial de herederos. Si no se ponen de acuerdo en el destino del piso, puede alargarse mucho más.
               </p>
             </div>
 
@@ -819,7 +826,7 @@ export default function OrientacionTramitacionHerenciasPage() {
               </p>
               <p><strong>Proceso:</strong> Aceptación a beneficio de inventario. Permite aceptar la herencia respondiendo solo con los bienes heredados, nunca con el patrimonio personal. Se tramita ante notario o ante el juzgado.</p>
               <p className={styles.escenarioTip}>
-                ⏱ Duración estimada: <strong>6 – 12 meses</strong> (el inventario notarial puede llevar tiempo). Coste adicional: honorarios notariales por el acta de inventario, variables según bienes.
+                <span aria-hidden="true">⏱</span> Duración estimada: <strong>6 – 12 meses</strong> (el inventario notarial puede llevar tiempo). Coste adicional: honorarios notariales por el acta de inventario, variables según bienes.
               </p>
             </div>
 
@@ -833,7 +840,7 @@ export default function OrientacionTramitacionHerenciasPage() {
               </p>
               <p><strong>Proceso:</strong> El heredero en el extranjero puede otorgar un poder notarial en su país (apostillado y traducido) para que otra persona firme en su nombre en España, o firmar mediante poder consular en el consulado español más próximo.</p>
               <p className={styles.escenarioTip}>
-                ⏱ Tiempo adicional: <strong>4 – 8 semanas</strong> para apostilla + traducción jurada. Coste orientativo: 100 – 300 € según país y volumen de documentos.
+                <span aria-hidden="true">⏱</span> Tiempo adicional: <strong>4 – 8 semanas</strong> para apostilla + traducción jurada. Coste orientativo: 100 – 300 € según país y volumen de documentos.
               </p>
             </div>
 
@@ -848,7 +855,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <details className={styles.faqItem}>
               <summary>¿Qué pasa si un heredero no quiere tramitar la herencia?</summary>
               <p>Si uno de los herederos se niega a participar o a firmar, los demás pueden solicitar al juzgado el nombramiento de un <strong>contador-partidor dativo</strong>. Este profesional realiza la partición de forma judicial, aunque el proceso puede tardar entre 1 y 3 años adicionales y generar costes judiciales significativos. Antes de llegar a ese extremo, es recomendable intentar la mediación.</p>
-              <p className={styles.faqTip}>💡 Si el heredero simplemente no aparece, puede tramitarse la herencia comunicando su paradero desconocido al notario.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Si el heredero simplemente no aparece, puede tramitarse la herencia comunicando su paradero desconocido al notario.</p>
             </details>
 
             <details className={styles.faqItem}>
@@ -881,7 +888,7 @@ export default function OrientacionTramitacionHerenciasPage() {
             <details className={styles.faqItem}>
               <summary>¿Cómo tributa la herencia si hay un seguro de vida?</summary>
               <p>Los seguros de vida <strong>no forman parte de la herencia</strong> sino que se perciben directamente por el beneficiario designado en la póliza. Sin embargo, sí tributan en el Impuesto de Sucesiones como si fueran parte de ella (base imponible del beneficiario). La reducción aplicable varía por CCAA: en muchas se aplica una reducción de hasta 9.195 € si el beneficiario es cónyuge, ascendiente o descendiente. La cantidad tributa en el plazo habitual de 6 meses.</p>
-              <p className={styles.faqTip}>💡 Es fundamental solicitar el certificado de contratos de seguro de cobertura de fallecimiento en el Ministerio de Justicia para detectar todas las pólizas.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Es fundamental solicitar el certificado de contratos de seguro de cobertura de fallecimiento en el Ministerio de Justicia para detectar todas las pólizas.</p>
             </details>
 
             <details className={styles.faqItem}>

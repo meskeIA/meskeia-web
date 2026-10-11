@@ -357,7 +357,7 @@ export default function VisualizadorColoresCielo() {
         <div className={styles.controlesPanel}>
           <div className={styles.turbidezControl}>
             <label htmlFor="turbidez" className={styles.turbidezLabel}>
-              <span>🌫️ Turbidez atmosférica</span>
+              <span><span aria-hidden="true">🌫️</span> Turbidez atmosférica</span>
               <span className={styles.turbidezValor}>{getTurbidezLabel(turbidez)}</span>
             </label>
             <div className={styles.sliderRow}>
@@ -419,49 +419,49 @@ export default function VisualizadorColoresCielo() {
             </thead>
             <tbody>
               <tr>
-                <td>🌑 Noche</td>
+                <td><span aria-hidden="true">🌑</span> Noche</td>
                 <td>&lt; -18°</td>
                 <td>— (sin Sol)</td>
                 <td>Airglow, luz zodiacal</td>
                 <td>Astrofotografía</td>
               </tr>
               <tr>
-                <td>🌌 Hora azul alba</td>
+                <td><span aria-hidden="true">🌌</span> Hora azul alba</td>
                 <td>-6° a -18°</td>
                 <td>~7000-10000 K</td>
                 <td>Absorción de ozono</td>
                 <td>Arquitectura, ciudad</td>
               </tr>
               <tr>
-                <td>🌅 Amanecer</td>
+                <td><span aria-hidden="true">🌅</span> Amanecer</td>
                 <td>0°</td>
                 <td>~2000-3000 K</td>
                 <td>Rayleigh máximo (masa aire 38)</td>
                 <td>Paisaje, contraste extremo</td>
               </tr>
               <tr>
-                <td>✨ Golden hour</td>
+                <td><span aria-hidden="true">✨</span> Golden hour</td>
                 <td>0°-6°</td>
                 <td>3000-4500 K</td>
                 <td>Rayleigh con masa aire 6-10</td>
                 <td>Retratos, paisaje, cine</td>
               </tr>
               <tr>
-                <td>☀️ Mañana</td>
+                <td><span aria-hidden="true">☀️</span> Mañana</td>
                 <td>10°-30°</td>
                 <td>5000-5500 K</td>
                 <td>Rayleigh dominante</td>
                 <td>Retratos con reflector</td>
               </tr>
               <tr>
-                <td>🌞 Mediodía</td>
+                <td><span aria-hidden="true">🌞</span> Mediodía</td>
                 <td>40°-70°</td>
                 <td>5500-6500 K</td>
                 <td>Rayleigh puro, masa aire ≈1</td>
                 <td>Patrones, color saturo</td>
               </tr>
               <tr>
-                <td>🌃 Hora azul ocaso</td>
+                <td><span aria-hidden="true">🌃</span> Hora azul ocaso</td>
                 <td>-4° a -6°</td>
                 <td>~7000-10000 K</td>
                 <td>Absorción de ozono</td>
@@ -494,27 +494,27 @@ export default function VisualizadorColoresCielo() {
           <div className={styles.faqItem}>
             <h4>¿Por qué el cielo nocturno no es negro puro?</h4>
             <p>El cielo nocturno emite luz propia llamada <em>airglow</em>: la recombinación de moléculas de O₂ ionizadas durante el día libera fotones por la noche a altitudes de 80-100 km. Añade ~250 Rayleigh de brillo, más la luz zodiacal (polvo interplanetario que dispersa el sol). En zonas sin contaminación lumínica, el cielo nunca llega al negro absoluto.</p>
-            <span className={styles.faqTip}>💡 Dato: el fundamento del límite de magnitud 21-22 en astrofotografía viene precisamente del airglow natural.</span>
+            <span className={styles.faqTip}><span aria-hidden="true">💡</span> Dato: el fundamento del límite de magnitud 21-22 en astrofotografía viene precisamente del airglow natural.</span>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Por qué los amaneceres y atardeceres son más rojos con calima?</h4>
             <p>Con polvo o humedad en suspensión, se añade dispersión de Mie (partículas grandes, efecto no selectivo) sobre la dispersión de Rayleigh. Pero en el horizonte al amanecer/atardecer, la luz ya llega con muy poco azul (dispersado completamente por la masa de aire). La dispersión de Mie amplifica y extiende los rojos-naranjas residuales, saturando aún más la gama cálida.</p>
-            <span className={styles.faqTip}>💡 Por eso los atardeceres tras erupciones volcánicas o con polvo sahariano son espectacularmente rojos.</span>
+            <span className={styles.faqTip}><span aria-hidden="true">💡</span> Por eso los atardeceres tras erupciones volcánicas o con polvo sahariano son espectacularmente rojos.</span>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Cuánto dura realmente la golden hour?</h4>
             <p>Depende de la latitud y la época del año. En el ecuador puede durar solo 20-25 minutos. En Madrid (40°N) en verano dura ~50-60 minutos. En el Círculo Polar en verano puede prolongarse horas porque el Sol avanza muy lentamente respecto al horizonte. La "regla" del nombre es simplificadora: en realidad se llama hora pero puede ser mucho menos.</p>
-            <span className={styles.faqTip}>💡 Para calcular la golden hour exacta de cualquier día y lugar, usa la app Golden Hour de meskeIA.</span>
+            <span className={styles.faqTip}><span aria-hidden="true">💡</span> Para calcular la golden hour exacta de cualquier día y lugar, usa la app Golden Hour de meskeIA.</span>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Por qué la hora azul tiene ese color tan específico?</h4>
             <p>La capa de ozono estratosférico (20-35 km) absorbe intensamente en el rango 500-700 nm (banda de Chappuis), eliminando los verdes, amarillos, naranjas y rojos residuales del crepúsculo. Solo las longitudes de onda cortas (400-500 nm, azul-índigo-violeta) atraviesan sin atenuarse. El resultado es ese azul saturado y homogéneo que distingue la hora azul de cualquier otra fase del día.</p>
-            <span className={styles.faqTip}>💡 La misma capa de ozono que nos protege del UV crea una de las fases más fotogénicas del día.</span>
+            <span className={styles.faqTip}><span aria-hidden="true">💡</span> La misma capa de ozono que nos protege del UV crea una de las fases más fotogénicas del día.</span>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Qué es el Cinturón de Venus que aparece al atardecer?</h4>
             <p>El Cinturón de Venus es la franja rosada-púrpura visible en el horizonte opuesto al Sol poniente, a unos 10-20° sobre el horizonte. Es literalmente la sombra de la Tierra proyectada en la atmósfera: la zona donde la atmósfera baja deja de estar iluminada directamente. El rosa se debe a la retroiluminación de la luz solar crepuscular sobre el horizonte oriental.</p>
-            <span className={styles.faqTip}>💡 Para fotografiarlo, gira 180° respecto al Sol poniente unos minutos después de que el disco solar desaparezca.</span>
+            <span className={styles.faqTip}><span aria-hidden="true">💡</span> Para fotografiarlo, gira 180° respecto al Sol poniente unos minutos después de que el disco solar desaparezca.</span>
           </div>
         </div>
 

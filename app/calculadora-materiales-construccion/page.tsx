@@ -220,6 +220,7 @@ export default function CalculadoraMaterialesPage() {
             { id: 'mortero', label: 'Mortero', emoji: '🏗️' },
           ] as { id: TabType; label: string; emoji: string }[]).map(t => (
             <button
+              type="button"
               key={t.id}
               role="tab"
               aria-selected={tabActiva === t.id}
@@ -500,7 +501,7 @@ export default function CalculadoraMaterialesPage() {
                     <td>Tarima, grandes formatos</td>
                   </tr>
                   <tr>
-                    <td><strong>Estándar</strong> ✅ Recomendado</td>
+                    <td><strong>Estándar</strong> <span aria-hidden="true">✅</span> Recomendado</td>
                     <td>10%</td>
                     <td>La mayoría de reformas</td>
                     <td>Azulejos, tarima, mortero</td>

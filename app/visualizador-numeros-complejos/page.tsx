@@ -607,7 +607,7 @@ export default function NumerosComplejosPage() {
       {/* Sección 6: Nota sobre fractales */}
       <div className={styles.notaFractales}>
         <p>
-          💡 El conjunto de Mandelbrot (z → z² + c) es otra aplicación fascinante de los números
+          <span aria-hidden="true">💡</span> El conjunto de Mandelbrot (z → z² + c) es otra aplicación fascinante de los números
           complejos. Si quieres explorar los fractales que generan →{' '}
           <a href="/visualizador-geometria-fractales/" className={styles.link}>
             Visualizador de Fractales
@@ -649,7 +649,7 @@ export default function NumerosComplejosPage() {
         </p>
 
         <div className={styles.warningBox}>
-          <strong>ℹ️ Nota:</strong> Los valores del plano son aproximaciones al paso de slider de
+          <strong><span aria-hidden="true">ℹ️</span> Nota:</strong> Los valores del plano son aproximaciones al paso de slider de
           0,5 unidades. Las fórmulas de operaciones son exactas.
         </div>
       </EducationalSection>

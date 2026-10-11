@@ -345,7 +345,7 @@ export default function QuizMetricaEstrofasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Quiz de Métrica 🎵</h1>
+        <h1 className={styles.title}>Quiz de Métrica <span aria-hidden="true">🎵</span></h1>
         <p className={styles.subtitle}>
           Tipos de verso, estrofas, rima y sinalefa · ESO, Bachillerato y Selectividad
         </p>
@@ -395,10 +395,10 @@ export default function QuizMetricaEstrofasPage() {
           <div className={styles.temasCubiertos}>
             <span className={styles.temasTitulo}>Temas que se evalúan</span>
             <div className={styles.temasGrid}>
-              <span className={styles.temaTag}>📏 Tipos de verso</span>
-              <span className={styles.temaTag}>🏛️ Estrofas clásicas</span>
-              <span className={styles.temaTag}>🎵 Esquemas de rima</span>
-              <span className={styles.temaTag}>✍️ Sinalefa y licencias</span>
+              <span className={styles.temaTag}><span aria-hidden="true">📏</span> Tipos de verso</span>
+              <span className={styles.temaTag}><span aria-hidden="true">🏛️</span> Estrofas clásicas</span>
+              <span className={styles.temaTag}><span aria-hidden="true">🎵</span> Esquemas de rima</span>
+              <span className={styles.temaTag}><span aria-hidden="true">✍️</span> Sinalefa y licencias</span>
             </div>
           </div>
         </div>
@@ -530,10 +530,10 @@ export default function QuizMetricaEstrofasPage() {
 
           <div className={styles.botonesResultado}>
             <button type="button" className={styles.btnRejugar} onClick={reiniciar}>
-              🔄 Jugar de nuevo
+              <span aria-hidden="true">🔄</span> Jugar de nuevo
             </button>
             <button type="button" className={styles.btnConfig} onClick={volverConfig}>
-              ⚙️ Cambiar nivel
+              <span aria-hidden="true">⚙️</span> Cambiar nivel
             </button>
           </div>
         </div>
@@ -569,19 +569,19 @@ export default function QuizMetricaEstrofasPage() {
 
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🎓 Estudiante de ESO</strong>
+            <strong><span aria-hidden="true">🎓</span> Estudiante de ESO</strong>
             <p>Céntrate en el nivel básico: tipos de verso más frecuentes (octosílabo y endecasílabo), sinalefa y la diferencia entre rima consonante y asonante. Son los contenidos mínimos evaluables en 3.º y 4.º de ESO.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📘 Estudiante de Bachillerato</strong>
+            <strong><span aria-hidden="true">📘</span> Estudiante de Bachillerato</strong>
             <p>El nivel intermedio cubre los contenidos del currículo de Lengua de 1.º y 2.º de Bachillerato: estrofas clásicas (soneto, décima, romance), corrección por acento final y esquemas de rima habituales.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🏛️ Preparación Selectividad</strong>
+            <strong><span aria-hidden="true">🏛️</span> Preparación Selectividad</strong>
             <p>El nivel avanzado incluye formas complejas (lira, octava real, silva), esquemas exactos (espinela) y distinciones finas (verso blanco vs. verso libre, sinéresis vs. diéresis). Habituales en comentarios de texto EBAU/PAES.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>✍️ Escritor de poesía</strong>
+            <strong><span aria-hidden="true">✍️</span> Escritor de poesía</strong>
             <p>Conocer los esquemas clásicos es necesario para subvertirlos con intención. Un poeta que usa endecasílabos rotos sabe que los está rompiendo; uno que no conoce la norma simplemente escribe al azar.</p>
           </div>
         </div>

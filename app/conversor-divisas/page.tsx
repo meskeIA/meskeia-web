@@ -92,7 +92,7 @@ export default function ConversionDivisas() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>💱 Conversor de Divisas</h1>
+        <h1><span aria-hidden="true">💱</span> Conversor de Divisas</h1>
         <p>Tipos de cambio del Banco Central Europeo, actualizados a diario</p>
       </header>
 

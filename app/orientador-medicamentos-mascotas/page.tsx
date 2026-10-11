@@ -205,7 +205,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>💊 Orientador Medicamentos Mascotas</h1>
+        <h1 className={styles.title}><span aria-hidden="true">💊</span> Orientador Medicamentos Mascotas</h1>
         <p className={styles.subtitle}>
           Guía de antiparasitarios para perros y gatos
         </p>
@@ -303,20 +303,20 @@ export default function CalculadoraMedicamentosMascotasPage() {
             {resultado && (
               <div className={styles.resultadoBox}>
                 <div className={styles.resultadoItem}>
-                  <span className={styles.resultadoLabel}>📦 Rango de producto:</span>
+                  <span className={styles.resultadoLabel}><span aria-hidden="true">📦</span> Rango de producto:</span>
                   <span className={styles.resultadoValor}>{resultado.rangoProducto}</span>
                 </div>
                 <div className={styles.resultadoItem}>
-                  <span className={styles.resultadoLabel}>🔄 Frecuencia:</span>
+                  <span className={styles.resultadoLabel}><span aria-hidden="true">🔄</span> Frecuencia:</span>
                   <span className={styles.resultadoValor}>{resultado.frecuencia}</span>
                 </div>
                 <div className={styles.resultadoItem}>
-                  <span className={styles.resultadoLabel}>📅 Próxima dosis:</span>
+                  <span className={styles.resultadoLabel}><span aria-hidden="true">📅</span> Próxima dosis:</span>
                   <span className={styles.resultadoValor}>{resultado.proximaDosis}</span>
                 </div>
 
                 <div className={styles.notasBox}>
-                  <h4>📝 Notas importantes:</h4>
+                  <h4><span aria-hidden="true">📝</span> Notas importantes:</h4>
                   <ul>
                     {resultado.notas.map((nota, i) => (
                       <li key={i}>{nota}</li>
@@ -341,7 +341,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
                   </div>
                   <p className={styles.productoDescripcion}>{producto.descripcion}</p>
                   <div className={styles.productoDuracion}>
-                    <strong>⏱️ Duración:</strong> {producto.duracion}
+                    <strong><span aria-hidden="true">⏱️</span> Duración:</strong> {producto.duracion}
                   </div>
                   <p className={styles.productoNotas}>💡 {producto.notas}</p>
                 </div>
@@ -354,7 +354,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
       {/* Tab: Frecuencia */}
       {activeTab === 'frecuencia' && (
         <div className={styles.frecuenciaContainer}>
-          <h2>📅 Calendario de Desparasitación</h2>
+          <h2><span aria-hidden="true">📅</span> Calendario de Desparasitación</h2>
 
           <div className={styles.calendarioGrid}>
             <div className={styles.calendarioCard}>
@@ -427,7 +427,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
           </div>
 
           <div className={styles.factoresBox}>
-            <h3>🔍 Factores que aumentan la frecuencia</h3>
+            <h3><span aria-hidden="true">🔍</span> Factores que aumentan la frecuencia</h3>
             <div className={styles.factoresGrid}>
               <div className={styles.factorItem}>
                 <span className={styles.factorIcon}>🏡</span>
@@ -461,7 +461,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
       {/* Tab: Síntomas */}
       {activeTab === 'sintomas' && (
         <div className={styles.sintomasContainer}>
-          <h2>🔍 Síntomas de Parasitosis</h2>
+          <h2><span aria-hidden="true">🔍</span> Síntomas de Parasitosis</h2>
           <p className={styles.sintomasIntro}>
             Estos síntomas pueden indicar la presencia de parásitos. Consulta con tu veterinario para un diagnóstico certero.
           </p>
@@ -502,14 +502,14 @@ export default function CalculadoraMedicamentosMascotasPage() {
       
 
       <DisclaimerCard variant="medical" severity="critical" collapsible={false} context="orientador-medicamentos-mascotas">
-        <p><strong>⚠️ NUNCA administres medicamentos sin consultar a tu veterinario:</strong></p>
+        <p><strong><span aria-hidden="true">⚠️</span> NUNCA administres medicamentos sin consultar a tu veterinario:</strong></p>
         <ul className={styles.disclaimerList}>
           <li><strong>Dosis incorrectas pueden ser tóxicas</strong>: Especialmente en cachorros, gatos o mascotas con enfermedades renales/hepáticas</li>
           <li><strong>Interacciones medicamentosas</strong>: Si tu mascota toma otros medicamentos, pueden haber incompatibilidades</li>
           <li><strong>Resistencias a antiparasitarios</strong>: El uso inadecuado genera resistencias en pulgas/garrapatas</li>
         </ul>
-        <p><strong>🚫 PELIGRO: La permetrina (presente en antiparasitarios de perro) es extremadamente tóxica para los gatos — puede causar convulsiones y la muerte. NUNCA uses productos de perro en gatos.</strong></p>
-        <p className={styles.highlight}><strong>🐾 Esta calculadora es orientativa. Solo el veterinario puede prescribir tratamientos según el peso exacto, estado de salud e historial de tu mascota.</strong></p>
+        <p><strong><span aria-hidden="true">🚫</span> PELIGRO: La permetrina (presente en antiparasitarios de perro) es extremadamente tóxica para los gatos — puede causar convulsiones y la muerte. NUNCA uses productos de perro en gatos.</strong></p>
+        <p className={styles.highlight}><strong><span aria-hidden="true">🐾</span> Esta calculadora es orientativa. Solo el veterinario puede prescribir tratamientos según el peso exacto, estado de salud e historial de tu mascota.</strong></p>
         <p>meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los resultados de esta herramienta, ni por un uso inadecuado de la misma.</p>
       </DisclaimerCard>
 
@@ -538,35 +538,35 @@ export default function CalculadoraMedicamentosMascotasPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>💊 Pastilla antiparasitaria interna</td>
+                  <td><span aria-hidden="true">💊</span> Pastilla antiparasitaria interna</td>
                   <td>Áscaris, tenias, ancilostomas</td>
                   <td>Cada 3 meses (adultos)</td>
                   <td>Perros y gatos</td>
                   <td>Mensual en cachorros hasta 6 meses</td>
                 </tr>
                 <tr>
-                  <td>💧 Pipeta antiparasitaria externa</td>
+                  <td><span aria-hidden="true">💧</span> Pipeta antiparasitaria externa</td>
                   <td>Pulgas, garrapatas, mosquitos (según producto)</td>
                   <td>Mensual o cada 3 meses</td>
                   <td>Perros y gatos</td>
                   <td>No bañar 48h antes/después</td>
                 </tr>
                 <tr>
-                  <td>🔵 Collar antiparasitario</td>
+                  <td><span aria-hidden="true">🔵</span> Collar antiparasitario</td>
                   <td>Pulgas, garrapatas, mosquitos</td>
                   <td>Cada 4-8 meses (según marca)</td>
                   <td>Perros (algunos gatos)</td>
                   <td>No combinar con pipeta del mismo principio activo</td>
                 </tr>
                 <tr>
-                  <td>💊 Comprimido antipulgas/garrapatas</td>
+                  <td><span aria-hidden="true">💊</span> Comprimido antipulgas/garrapatas</td>
                   <td>Pulgas y garrapatas sistémico</td>
                   <td>Mensual o cada 3 meses</td>
                   <td>Solo perros (Bravecto, NexGard...)</td>
                   <td>Muy efectivo. Consultar en razas MDR1</td>
                 </tr>
                 <tr>
-                  <td>💉 Vacuna leishmaniasis</td>
+                  <td><span aria-hidden="true">💉</span> Vacuna leishmaniasis</td>
                   <td>Leishmania (transmitida por flebotomos)</td>
                   <td>Anual</td>
                   <td>Perros</td>
@@ -625,7 +625,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🦟 Parásitos Externos Comunes</h2>
+          <h2><span aria-hidden="true">🦟</span> Parásitos Externos Comunes</h2>
           <div className={styles.parasitosGrid}>
             <div className={styles.parasitoCard}>
               <h4>Pulgas</h4>
@@ -643,7 +643,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🐛 Parásitos Internos</h2>
+          <h2><span aria-hidden="true">🐛</span> Parásitos Internos</h2>
           <div className={styles.parasitosGrid}>
             <div className={styles.parasitoCard}>
               <h4>Gusanos Redondos (Áscaris)</h4>

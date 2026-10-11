@@ -707,25 +707,25 @@ export default function ImpuestosDivorcioPage() {
               <tbody>
                 <tr>
                   <td><strong>Pensión compensatoria</strong></td>
-                  <td>✅ Sí (IRPF)</td>
+                  <td><span aria-hidden="true">✅</span> Sí (IRPF)</td>
                   <td>Pagador: reduce base. Cobrador: rendimiento del trabajo</td>
                   <td>Art. 55 LIRPF</td>
                 </tr>
                 <tr>
                   <td><strong>Pensión de alimentos (hijos)</strong></td>
-                  <td>⚠️ Parcial</td>
+                  <td><span aria-hidden="true">⚠️</span> Parcial</td>
                   <td>Pagador: art. 75 especial. Cobrador: no declara</td>
                   <td>Art. 75 LIRPF</td>
                 </tr>
                 <tr>
                   <td><strong>Liquidación de gananciales</strong></td>
-                  <td>❌ No tributa</td>
+                  <td><span aria-hidden="true">❌</span> No tributa</td>
                   <td>Ninguno (adjudicación, no transmisión)</td>
                   <td>Art. 33.2 LIRPF</td>
                 </tr>
                 <tr>
                   <td><strong>Imputación de rentas (vivienda)</strong></td>
-                  <td>✅ Sí (IRPF)</td>
+                  <td><span aria-hidden="true">✅</span> Sí (IRPF)</td>
                   <td>Propietario que no reside (salvo excepción hijos)</td>
                   <td>Art. 85 LIRPF</td>
                 </tr>
@@ -737,7 +737,7 @@ export default function ImpuestosDivorcioPage() {
                 </tr>
                 <tr>
                   <td><strong>Acciones y fondos (reparto)</strong></td>
-                  <td>❌ No tributa</td>
+                  <td><span aria-hidden="true">❌</span> No tributa</td>
                   <td>Nadie (cambio de titularidad sin plusvalía)</td>
                   <td>Art. 33.2 LIRPF</td>
                 </tr>
@@ -794,30 +794,30 @@ export default function ImpuestosDivorcioPage() {
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿La pensión compensatoria y la pensión de alimentos tributan igual?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿La pensión compensatoria y la pensión de alimentos tributan igual?</h4>
               <p>No. La pensión compensatoria (entre cónyuges) es una reducción de base imponible para el pagador y rendimiento del trabajo para el cobrador. La pensión de alimentos (para los hijos) tiene un tratamiento especial: el pagador puede tributar esa parte a los tipos mínimos (art. 75), y el hijo que la recibe no la declara en IRPF.</p>
               <p className={styles.faqTip}>💡 <strong>Importante:</strong> Confundir ambas pensiones es uno de los errores más frecuentes en la declaración del año del divorcio.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿El reparto de la vivienda en la liquidación de gananciales genera plusvalía?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿El reparto de la vivienda en la liquidación de gananciales genera plusvalía?</h4>
               <p>No. La adjudicación de bienes en la liquidación de la sociedad de gananciales no es una transmisión onerosa, por lo que no genera ganancia o pérdida patrimonial en IRPF (art. 33.2 LIRPF). Tampoco tributa en ITP. La futura venta de esos bienes sí tributará desde el precio de adquisición original.</p>
               <p className={styles.faqTip}>💡 <strong>Precaución:</strong> Si un cónyuge recibe bienes de valor significativamente mayor sin compensación en efectivo, el notario puede considerarlo donación parcial.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo presentar declaración conjunta el año del divorcio?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo presentar declaración conjunta el año del divorcio?</h4>
               <p>Depende del momento. En el año en que se inscribe el divorcio, ya no puedes hacer declaración conjunta por ese ejercicio completo. Si solo hay separación de hecho o separación legal sin divorcio, ambos cónyuges aún podrían optar por la declaración conjunta ese año si están de acuerdo. Es recomendable simular ambas opciones.</p>
               <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si uno tiene rendimientos muy superiores al otro, la declaración individual suele salir más a cuenta para ambos en conjunto.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué pasa con las acciones y fondos que repartimos?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué pasa con las acciones y fondos que repartimos?</h4>
               <p>El reparto de acciones y fondos de inversión en el marco del divorcio no genera hecho imponible. Solo cambia la titularidad manteniendo el valor y la fecha de adquisición originales. La plusvalía se generará en el momento en que el nuevo titular venda esos activos, calculada desde el precio de compra original.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Tengo que seguir declarando la imputación de rentas si me fui de casa?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Tengo que seguir declarando la imputación de rentas si me fui de casa?</h4>
               <p>Sí, salvo excepciones. Si mantienes la propiedad de la vivienda pero no resides en ella, debes imputar como renta el 2% (o 1,1% si el valor catastral fue revisado desde 2014) del valor catastral en proporción a tu porcentaje de propiedad. La excepción más importante: si la vivienda está asignada judicialmente a los hijos, el propietario ausente queda exento.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo deducir el 100% de la hipoteca si antes era al 50%?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo deducir el 100% de la hipoteca si antes era al 50%?</h4>
               <p>Si te quedas con la vivienda y la hipoteca, y la hipoteca es de antes de 2013, sí puedes aplicar la deducción sobre el 100% de lo que pagas tú (con el límite de base de 9.040 €/año). No es que el límite se duplique — es que antes cada uno deducía sobre su 50% de cuota, y ahora tú deduces sobre el 100% que pagas.</p>
               <p className={styles.faqTip}>💡 <strong>Comprueba:</strong> Si tu cuota anual supera los 9.040 €, la deducción se limita a ese importe base (1.356 €/año máximo al 15%).</p>
             </div>

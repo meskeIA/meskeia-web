@@ -363,7 +363,7 @@ function SeccionComparativa() {
       <h3 className={styles.subSeccionTitulo}>Comparativa rápida</h3>
       <div className={styles.comparativaDoble}>
         <div className={styles.comparativaCol} style={{ borderTopColor: datos.aguda.color }}>
-          <h4 className={styles.comparativaColTitulo} style={{ color: datos.aguda.color }}>Aguda ✅</h4>
+          <h4 className={styles.comparativaColTitulo} style={{ color: datos.aguda.color }}>Aguda <span aria-hidden="true">✅</span></h4>
           <ul className={styles.comparativaLista}>
             <li>Trigger claro y controlable</li>
             <li>Neutrófilos como vanguardia</li>
@@ -373,7 +373,7 @@ function SeccionComparativa() {
           </ul>
         </div>
         <div className={styles.comparativaCol} style={{ borderTopColor: datos.cronica.color }}>
-          <h4 className={styles.comparativaColTitulo} style={{ color: datos.cronica.color }}>Crónica ⚠️</h4>
+          <h4 className={styles.comparativaColTitulo} style={{ color: datos.cronica.color }}>Crónica <span aria-hidden="true">⚠️</span></h4>
           <ul className={styles.comparativaLista}>
             <li>Trigger persistente o inmunológico</li>
             <li>Macrófagos M1 bloqueados</li>
@@ -517,7 +517,7 @@ function SeccionFactores() {
       {/* Warning box */}
       <div className={styles.warningBox}>
         <p>
-          <strong>⚖️ La inflamación no es el enemigo:</strong> la respuesta inflamatoria
+          <strong><span aria-hidden="true">⚖️</span> La inflamación no es el enemigo:</strong> la respuesta inflamatoria
           aguda es esencial para sobrevivir a infecciones y reparar lesiones. El problema
           es la inflamación crónica de bajo grado, que el cuerpo no sabe apagar. Los hábitos
           de vida son el factor más modificable para mantenerla bajo control.
@@ -616,14 +616,14 @@ export default function VisualizadorInflamacionPage() {
                   <td>Horas – días</td>
                   <td>Neutrófilos, macrófagos M1</td>
                   <td>Histamina, bradiquinina, PGE2, IL-1β, TNF-α</td>
-                  <td>✅ Curación</td>
+                  <td><span aria-hidden="true">✅</span> Curación</td>
                 </tr>
                 <tr>
                   <td><strong>Crónica</strong></td>
                   <td>Meses – años</td>
                   <td>Macrófagos M1, linfocitos Th1/Th17</td>
                   <td>IL-6, TNF-α, IL-17, IFN-γ, ROS</td>
-                  <td>⚠️ Daño tisular</td>
+                  <td><span aria-hidden="true">⚠️</span> Daño tisular</td>
                 </tr>
               </tbody>
             </table>

@@ -168,7 +168,7 @@ export default function DetectorIdiomaPage() {
 
         <div className={styles.buttonRow}>
           <button type="button" onClick={detectarIdioma} className={styles.btnPrimary} disabled={!texto.trim()}>
-            🔍 Detectar Idioma
+            <span aria-hidden="true">🔍</span> Detectar Idioma
           </button>
           <button type="button" onClick={limpiar} className={styles.btnSecondary}>
             Limpiar
@@ -252,11 +252,11 @@ export default function DetectorIdiomaPage() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>Indoeuropea (Romance)</td><td>Español, Francés, Italiano, Portugués</td><td>~900M</td><td>Artículos, conjugaciones, vocales abiertas</td><td>✅ Alta</td></tr>
-              <tr><td>Indoeuropea (Germánica)</td><td>Inglés, Alemán, Holandés, Sueco</td><td>~500M</td><td>Compuestos, consonantes, th/sch</td><td>✅ Alta</td></tr>
-              <tr><td>Sino-Tibetana</td><td>Chino mandarín, Cantonés</td><td>~1.200M</td><td>Tonal, caracteres, sin espacios</td><td>✅ Muy alta (script único)</td></tr>
-              <tr><td>Semítica</td><td>Árabe, Hebreo</td><td>~400M</td><td>RTL, consonántica, raíces trilíteras</td><td>✅ Muy alta (script único)</td></tr>
-              <tr><td>Altaica / Urálica</td><td>Turco, Finés, Húngaro</td><td>~200M</td><td>Aglutinante, armonía vocálica</td><td>🟡 Media</td></tr>
+              <tr><td>Indoeuropea (Romance)</td><td>Español, Francés, Italiano, Portugués</td><td>~900M</td><td>Artículos, conjugaciones, vocales abiertas</td><td><span aria-hidden="true">✅</span> Alta</td></tr>
+              <tr><td>Indoeuropea (Germánica)</td><td>Inglés, Alemán, Holandés, Sueco</td><td>~500M</td><td>Compuestos, consonantes, th/sch</td><td><span aria-hidden="true">✅</span> Alta</td></tr>
+              <tr><td>Sino-Tibetana</td><td>Chino mandarín, Cantonés</td><td>~1.200M</td><td>Tonal, caracteres, sin espacios</td><td><span aria-hidden="true">✅</span> Muy alta (script único)</td></tr>
+              <tr><td>Semítica</td><td>Árabe, Hebreo</td><td>~400M</td><td>RTL, consonántica, raíces trilíteras</td><td><span aria-hidden="true">✅</span> Muy alta (script único)</td></tr>
+              <tr><td>Altaica / Urálica</td><td>Turco, Finés, Húngaro</td><td>~200M</td><td>Aglutinante, armonía vocálica</td><td><span aria-hidden="true">🟡</span> Media</td></tr>
             </tbody>
           </table>
         </div>
@@ -299,7 +299,7 @@ export default function DetectorIdiomaPage() {
 
         {/* 3. FAQ */}
         <details className={styles.faqList}>
-          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Detección de Idiomas</summary>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Detección de Idiomas</summary>
           <div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Cuántos caracteres son necesarios para detectar el idioma con fiabilidad?</div>

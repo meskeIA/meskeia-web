@@ -270,7 +270,7 @@ export default function CalculadoraInflacionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📈 Estimador de Inflación</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📈</span> Estimador de Inflación</h1>
         <p className={styles.subtitle}>
           Descubre cómo la inflación afecta tu dinero con datos históricos del INE
         </p>
@@ -426,7 +426,7 @@ export default function CalculadoraInflacionPage() {
 
               {/* Interpretación */}
               <div className={styles.interpretation}>
-                <h3>💡 Interpretación</h3>
+                <h3><span aria-hidden="true">💡</span> Interpretación</h3>
                 {añoOrigen < añoDestino ? (
                   <p>
                     Si en <strong>{añoOrigen}</strong> tenías <strong>{formatCurrency(parseSpanishNumber(cantidad))}</strong>,
@@ -455,7 +455,7 @@ export default function CalculadoraInflacionPage() {
       /* Modo Comparador */
       <div className={styles.comparadorContent}>
         <div className={styles.comparadorIntro}>
-          <h2 className={styles.panelTitle}>📊 Compara diferentes periodos históricos</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">📊</span> Compara diferentes periodos históricos</h2>
           <p className={styles.comparadorDesc}>
             Selecciona 3 periodos para comparar cómo evolucionó la inflación en cada uno
           </p>
@@ -574,7 +574,7 @@ export default function CalculadoraInflacionPage() {
 
         {/* Gráfico de evolución */}
         <div className={styles.chartSection}>
-          <h3 className={styles.chartTitle}>📈 Evolución del IPC (Base 100 = inicio de cada periodo)</h3>
+          <h3 className={styles.chartTitle}><span aria-hidden="true">📈</span> Evolución del IPC (Base 100 = inicio de cada periodo)</h3>
           <div className={styles.chartContainer}>
             <canvas ref={chartRef}></canvas>
           </div>
@@ -589,7 +589,7 @@ export default function CalculadoraInflacionPage() {
               style={{ borderTopColor: periodo.color }}
             >
               {periodoMayorInflacion?.nombre === periodo.nombre && (
-                <span className={styles.mejorBadge}>🔥 Mayor inflación</span>
+                <span className={styles.mejorBadge}><span aria-hidden="true">🔥</span> Mayor inflación</span>
               )}
               <h4 className={styles.resumenTitulo}>{periodo.nombre}</h4>
               <div className={styles.resumenValor}>
@@ -606,7 +606,7 @@ export default function CalculadoraInflacionPage() {
 
         {/* Tabla comparativa */}
         <div className={styles.tablaSection}>
-          <h3 className={styles.tablaTitle}>📋 Comparación detallada</h3>
+          <h3 className={styles.tablaTitle}><span aria-hidden="true">📋</span> Comparación detallada</h3>
           <div className={styles.tablaWrapper}>
             <table className={styles.tablaComparativa}>
               <thead>
@@ -665,7 +665,7 @@ export default function CalculadoraInflacionPage() {
 
       {/* Hitos históricos */}
       <div className={styles.historicalSection}>
-        <h2 className={styles.sectionTitle}>📅 Hitos históricos del IPC en España</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📅</span> Hitos históricos del IPC en España</h2>
         <div className={styles.timelineGrid}>
           {ejemplosHistoricos.map((item) => (
             <button
@@ -709,7 +709,7 @@ export default function CalculadoraInflacionPage() {
       >
         {/* TABLA COMPARATIVA */}
         <section className={styles.eduComparativa}>
-          <h2>📊 Tipos de inflación en España: características y efectos sobre tu economía</h2>
+          <h2><span aria-hidden="true">📊</span> Tipos de inflación en España: características y efectos sobre tu economía</h2>
           <p className={styles.eduIntro}>
             No toda inflación afecta igual a tu patrimonio. Conocer el tipo de inflación que estás viviendo te ayuda a tomar mejores decisiones de ahorro e inversión.
           </p>
@@ -730,7 +730,7 @@ export default function CalculadoraInflacionPage() {
                   <td><strong>Deflación</strong></td>
                   <td>&lt;0%</td>
                   <td>2009, 2014-2016 (España)</td>
-                  <td>✅ Aumenta valor real</td>
+                  <td><span aria-hidden="true">✅</span> Aumenta valor real</td>
                   <td>Efectivo, bonos soberanos, esperar compras grandes</td>
                   <td>Retraso consumo, espiral deflacionaria</td>
                 </tr>
@@ -738,7 +738,7 @@ export default function CalculadoraInflacionPage() {
                   <td><strong>Inflación baja/estable</strong></td>
                   <td>0-2%</td>
                   <td>2004-2006, 2018-2019</td>
-                  <td>⚠️ Pequeña pérdida anual</td>
+                  <td><span aria-hidden="true">⚠️</span> Pequeña pérdida anual</td>
                   <td>Fondos indexados, depósitos &gt;2%, IBEX diversificado</td>
                   <td>Ninguna (situación óptima según BCE)</td>
                 </tr>
@@ -746,7 +746,7 @@ export default function CalculadoraInflacionPage() {
                   <td><strong>Inflación moderada</strong></td>
                   <td>2-5%</td>
                   <td>2001-2003, 2021</td>
-                  <td>❌ Pérdida real notable</td>
+                  <td><span aria-hidden="true">❌</span> Pérdida real notable</td>
                   <td>Renta variable, inmuebles, bonos ligados IPC</td>
                   <td>Deuda variable sube, hipoteca euríbor encarecer</td>
                 </tr>
@@ -754,7 +754,7 @@ export default function CalculadoraInflacionPage() {
                   <td><strong>Inflación alta</strong></td>
                   <td>5-10%</td>
                   <td>2022 (8,3% media)</td>
-                  <td>🔴 Pérdida grave del poder adquisitivo</td>
+                  <td><span aria-hidden="true">🔴</span> Pérdida grave del poder adquisitivo</td>
                   <td>Activos reales (oro, materias primas, REITs), TIPS</td>
                   <td>BCE sube tipos → hipotecas variables +200 €/mes</td>
                 </tr>
@@ -762,7 +762,7 @@ export default function CalculadoraInflacionPage() {
                   <td><strong>Inflación muy alta</strong></td>
                   <td>10-50%</td>
                   <td>1977 (26,4%), 1977-1983</td>
-                  <td>🔴🔴 Destrucción masiva de ahorro</td>
+                  <td><span aria-hidden="true">🔴🔴</span> Destrucción masiva de ahorro</td>
                   <td>Diversificación máxima, activos indexados al IPC</td>
                   <td>Salarios reales negativos, malestar social</td>
                 </tr>
@@ -770,7 +770,7 @@ export default function CalculadoraInflacionPage() {
                   <td><strong>Hiperinflación</strong></td>
                   <td>&gt;50%/mes</td>
                   <td>No en España (sí Argentina, Zimbabwe)</td>
-                  <td>🔴🔴🔴 Moneda sin valor</td>
+                  <td><span aria-hidden="true">🔴🔴🔴</span> Moneda sin valor</td>
                   <td>Activos reales, divisas extranjeras, criptomonedas</td>
                   <td>Colapso económico, fin del sistema monetario</td>
                 </tr>
@@ -781,7 +781,7 @@ export default function CalculadoraInflacionPage() {
 
         {/* CASOS DE USO */}
         <section className={styles.eduEscenarios}>
-          <h2>💼 Cómo te afecta la inflación según tu situación financiera</h2>
+          <h2><span aria-hidden="true">💼</span> Cómo te afecta la inflación según tu situación financiera</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -854,59 +854,59 @@ export default function CalculadoraInflacionPage() {
 
         {/* FAQ */}
         <section className={styles.eduFaq}>
-          <h2>❓ Preguntas frecuentes sobre la inflación y tu economía</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre la inflación y tu economía</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia hay entre IPC general, IPC subyacente e IPCA?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre IPC general, IPC subyacente e IPCA?</h4>
               <p>
                 El <strong>IPC general</strong> incluye todos los bienes y servicios, incluyendo energía y alimentos frescos (los más volátiles). El <strong>IPC subyacente</strong> excluye energía y alimentos no elaborados, dando una imagen más estable de la tendencia real. El <strong>IPCA</strong> (Índice de Precios al Consumo Armonizado) es comparable entre países europeos y es el que usa el BCE para fijar la política monetaria.
               </p>
               <p className={styles.faqTip}>💡 <strong>Cuándo mirar cuál:</strong> Para negociar salario, usa el IPC general. Para entender tendencias de largo plazo, usa el IPC subyacente. Para comparar con Europa, usa el IPCA.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo calcula el INE el IPC y por qué no me representa?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo calcula el INE el IPC y por qué no me representa?</h4>
               <p>
                 El INE calcula el IPC usando una <strong>cesta de la compra promedio</strong> de los hogares españoles (unos 500 artículos con distintos pesos). El peso de la vivienda es del ~27%, el transporte ~15%, la alimentación ~20%. Si tus gastos difieren mucho de la media (por ejemplo, pagas alquiler alto en Madrid), tu inflación personal puede ser bastante superior a la oficial. La inflación que sientes es real, aunque el dato estadístico sea distinto.
               </p>
               <p className={styles.faqTip}>💡 <strong>Tip:</strong> Calcula tu IPC personal: haz una lista de tus gastos mensuales y compara los precios de hace 1 año. Tu &quot;cesta personal&quot; puede mostrar una inflación del 5-15% cuando el dato oficial es del 2%.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el BCE tiene un objetivo del 2% y no del 0%?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué el BCE tiene un objetivo del 2% y no del 0%?</h4>
               <p>
                 Un poco de inflación (2%) es beneficioso porque: incentiva el consumo y la inversión (si los precios van a subir, mejor comprar/invertir ahora), da margen al BCE para bajar tipos en crisis, y evita la deflación (que es más difícil de combatir). Cero inflación es peligroso porque puede derivar en deflación (espiral de precios a la baja → menos consumo → menos producción → desempleo → Japón 1990-2020).
               </p>
               <p className={styles.faqTip}>💡 <strong>Dato:</strong> El objetivo del 2% no es arbitrario: es el punto donde la inflación &quot;lubrica&quot; la economía sin erosionar el poder adquisitivo de forma perceptible en el día a día.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué activos protegen mejor contra la inflación en España?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué activos protegen mejor contra la inflación en España?</h4>
               <p>
                 Históricamente en España: <strong>Fondos indexados globales (MSCI World)</strong> han dado ~7% nominal (~4% real). <strong>Inmobiliario en grandes ciudades</strong>: rentabilidad variable pero buena cobertura a largo plazo. <strong>Bonos ligados al IPC (OBEIs)</strong>: rentabilidad garantizada sobre el IPC. <strong>Oro</strong>: buena cobertura en periodos de inflación extrema. Los <strong>depósitos y cuentas de ahorro</strong> solo protegen si la tasa supera el IPC.
               </p>
               <p className={styles.faqTip}>💡 <strong>Regla de oro:</strong> Tasa real = Tasa nominal - Inflación. Si el depósito da 2% y la inflación es 3%, tu tasa real es -1%: estás perdiendo dinero en términos reales.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo es mejor pedir una hipoteca: con inflación alta o baja?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo es mejor pedir una hipoteca: con inflación alta o baja?</h4>
               <p>
                 Con inflación alta, los tipos de interés (la tasa de interés que pagas por el crédito) suben (el BCE sube el euríbor para frenar la inflación), lo que encarece las hipotecas. Sin embargo, si la inflación es persistente y tu salario sube con ella, la cuota hipotecaria se vuelve relativamente más barata en términos reales con el tiempo. La lección del 2022: pedir hipoteca variable justo antes de una subida inflacionaria es muy arriesgado. Una hipoteca fija protege de este escenario.
               </p>
               <p className={styles.faqTip}>💡 <strong>Estrategia:</strong> En momentos de inflación baja y tipos bajos = hipoteca fija para asegurar condiciones. En momentos de tipos altos = hipoteca variable apostando a que bajen (más riesgo).</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo afecta la inflación a mi plan de jubilación?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo afecta la inflación a mi plan de jubilación?</h4>
               <p>
                 Si planeas jubilarte en 30 años con 1.000.000 € ahorrados, necesitas tener en cuenta que ese millón valdrá mucho menos en términos reales. Con inflación media del 2,5%, en 30 años ese millón equivaldrá en poder adquisitivo a unos <strong>475.000 € de hoy</strong>. Por eso los planes de pensiones deben invertir en activos que superen la inflación (renta variable) y no solo en depósitos o bonos de bajo rendimiento.
               </p>
               <p className={styles.faqTip}>💡 <strong>Calculadora:</strong> Usa la herramienta meskeIA de Calculadora Jubilación para simular tus necesidades ajustadas a la inflación.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es la &quot;inflación percibida&quot; y por qué suele ser mayor que la oficial?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es la &quot;inflación percibida&quot; y por qué suele ser mayor que la oficial?</h4>
               <p>
                 La inflación percibida es lo que sentimos que suben los precios, generalmente más alta que el IPC oficial. Razones: tendemos a recordar mejor los productos que más han subido (sesgo de negatividad), compramos más frecuentemente alimentos (que suelen subir más), y el IPC promedia toda España, no tu ciudad específica. En Madrid y Barcelona, el coste de la vivienda eleva la inflación personal muy por encima de la media nacional.
               </p>
               <p className={styles.faqTip}>💡 <strong>Tip:</strong> Usa la calculadora meskeIA para ver la inflación de periodos específicos relevantes para ti, no solo el dato anual promedio.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo ha sido más alta la inflación en España y qué pasó?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo ha sido más alta la inflación en España y qué pasó?</h4>
               <p>
                 El máximo histórico fue en <strong>1977: 26,4%</strong>, durante la crisis del petróleo y la transición política. En los años 80 se redujo gradualmente gracias a la política monetaria restrictiva. La entrada en la CEE en 1986 y más tarde el euro en 2002 ancló las expectativas inflacionarias. El segundo gran episodio fue <strong>2022: 8,3%</strong> por la crisis energética post-COVID y la guerra de Ucrania, el mayor en 40 años.
               </p>
@@ -917,7 +917,7 @@ export default function CalculadoraInflacionPage() {
 
         {/* GUÍA PASO A PASO */}
         <section className={styles.eduGuia}>
-          <h2>📋 Cómo proteger tus ahorros de la inflación: plan de acción</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo proteger tus ahorros de la inflación: plan de acción</h2>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
@@ -966,7 +966,7 @@ export default function CalculadoraInflacionPage() {
 
         {/* MEJORES PRÁCTICAS */}
         <section className={styles.eduTips}>
-          <h2>✅ Claves para interpretar y usar los datos de inflación</h2>
+          <h2><span aria-hidden="true">✅</span> Claves para interpretar y usar los datos de inflación</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>📅</span>
@@ -1008,12 +1008,12 @@ export default function CalculadoraInflacionPage() {
             <h3>Errores frecuentes al interpretar la inflación que te cuestan dinero</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Confundir inflación interanual con mensual:</strong> &quot;La inflación bajó al 2%&quot; puede significar que sigue subiendo, solo que más despacio. Bajada de inflación ≠ bajada de precios.</li>
-            <li><strong>❌ Dejar todo el ahorro en cuenta corriente &quot;para ver qué pasa&quot;:</strong> Con inflación media del 2,5%, en 10 años habrás perdido el 22% del valor real sin hacer nada. La inacción tiene coste.</li>
-            <li><strong>❌ Interpretar subida salarial nominal como ganancia real:</strong> Una subida del 3% con inflación del 4% es una pérdida de poder adquisitivo del 1%. Siempre resta la inflación para conocer la variación real.</li>
-            <li><strong>❌ Pensar que los inmuebles siempre superan la inflación:</strong> En periodos como 2007-2015, el inmobiliario en España cayó un 40% nominal mientras la inflación seguía acumulándose. La rentabilidad real fue devastadora para quienes compraron en el pico.</li>
-            <li><strong>❌ Ignorar la inflación al calcular la rentabilidad de inversiones:</strong> Un fondo que dio 5% nominal en un año con 4% de inflación solo dio 1% real. Los rankings de fondos casi siempre muestran rentabilidades nominales.</li>
-            <li><strong>❌ Asumir que las pensiones seguirán el IPC:</strong> Entre 2013 y 2022, las pensiones se revalorizaron al 0,25% anual mientras el IPC acumulaba ~15%. Los futuros jubilados deben planificar con ahorro complementario.</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir inflación interanual con mensual:</strong> &quot;La inflación bajó al 2%&quot; puede significar que sigue subiendo, solo que más despacio. Bajada de inflación ≠ bajada de precios.</li>
+            <li><strong><span aria-hidden="true">❌</span> Dejar todo el ahorro en cuenta corriente &quot;para ver qué pasa&quot;:</strong> Con inflación media del 2,5%, en 10 años habrás perdido el 22% del valor real sin hacer nada. La inacción tiene coste.</li>
+            <li><strong><span aria-hidden="true">❌</span> Interpretar subida salarial nominal como ganancia real:</strong> Una subida del 3% con inflación del 4% es una pérdida de poder adquisitivo del 1%. Siempre resta la inflación para conocer la variación real.</li>
+            <li><strong><span aria-hidden="true">❌</span> Pensar que los inmuebles siempre superan la inflación:</strong> En periodos como 2007-2015, el inmobiliario en España cayó un 40% nominal mientras la inflación seguía acumulándose. La rentabilidad real fue devastadora para quienes compraron en el pico.</li>
+            <li><strong><span aria-hidden="true">❌</span> Ignorar la inflación al calcular la rentabilidad de inversiones:</strong> Un fondo que dio 5% nominal en un año con 4% de inflación solo dio 1% real. Los rankings de fondos casi siempre muestran rentabilidades nominales.</li>
+            <li><strong><span aria-hidden="true">❌</span> Asumir que las pensiones seguirán el IPC:</strong> Entre 2013 y 2022, las pensiones se revalorizaron al 0,25% anual mientras el IPC acumulaba ~15%. Los futuros jubilados deben planificar con ahorro complementario.</li>
           </ul>
         </div>
       </EducationalSection>

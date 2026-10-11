@@ -160,6 +160,7 @@ export default function CalculadoraPorcentajesPage() {
       <div className={styles.modeSelector}>
         {MODES.map((m) => (
           <button
+            type="button"
             key={m.id}
             className={`${styles.modeBtn} ${mode === m.id ? styles.active : ''}`}
             aria-pressed={mode === m.id}
@@ -239,7 +240,7 @@ export default function CalculadoraPorcentajesPage() {
       <EducationalSection title="Guía completa de porcentajes" subtitle="Domina los cinco tipos de cálculo con porcentajes: descuentos, IVA, variaciones, aumentos y disminuciones">
 
         {/* Tabla comparativa */}
-        <h3 className={styles.eduTitle}>⚖️ Cuándo usar cada tipo de cálculo</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">⚖️</span> Cuándo usar cada tipo de cálculo</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -286,7 +287,7 @@ export default function CalculadoraPorcentajesPage() {
         </div>
 
         {/* Casos de uso */}
-        <h3 className={styles.eduTitle}>💼 Usos cotidianos de los porcentajes</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">💼</span> Usos cotidianos de los porcentajes</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
@@ -319,7 +320,7 @@ export default function CalculadoraPorcentajesPage() {
         </div>
 
         {/* FAQ */}
-        <h3 className={styles.eduTitle}>❓ Preguntas frecuentes</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">❓</span> Preguntas frecuentes</h3>
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
             <h4>¿Por qué un descuento del 30% + 20% no es un 50%?</h4>
@@ -348,7 +349,7 @@ export default function CalculadoraPorcentajesPage() {
         </div>
 
         {/* Guía paso a paso */}
-        <h3 className={styles.eduTitle}>📋 Cómo resolver cualquier problema de porcentajes</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">📋</span> Cómo resolver cualquier problema de porcentajes</h3>
         <div className={styles.stepGuide}>
           <div className={styles.step}>
             <div className={styles.stepNumber}>1</div>
@@ -388,7 +389,7 @@ export default function CalculadoraPorcentajesPage() {
         </div>
 
         {/* Tips */}
-        <h3 className={styles.eduTitle}>✅ 6 trucos mentales con porcentajes</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">✅</span> 6 trucos mentales con porcentajes</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon}>🔢</span>
@@ -429,11 +430,11 @@ export default function CalculadoraPorcentajesPage() {
             <h3>Errores frecuentes que cuestan dinero</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Sumar porcentajes de descuento directamente:</strong> Un 20% + 30% no es un 50% de descuento, sino un 44%. Siempre aplícalos en cadena sobre el precio resultante.</li>
-            <li><strong>❌ Confundir «subir un X%» con «volver al precio original»:</strong> Si un precio baja un 20% y luego sube un 20%, NO vuelve al inicio. Baja de 100 → 80; sube 20% de 80 = 16 → 96. Hay una pérdida del 4%.</li>
-            <li><strong>❌ No distinguir entre puntos porcentuales y porcentaje:</strong> Si el IPC pasa del 2% al 4%, ha subido 2 puntos porcentuales pero ha aumentado un 100% en términos relativos. En economía y finanzas esta distinción es crítica.</li>
-            <li><strong>❌ Calcular el IVA sobre el precio final en lugar de sobre el neto:</strong> El IVA del 21% se aplica sobre el precio sin impuestos, no sobre el precio final. Sobre 100 € netos, el IVA son 21 €. Pero el 21% de 121 € son 25,41 € — ese cálculo está mal.</li>
-            <li><strong>❌ Usar porcentajes sin especificar la base:</strong> «Ha subido un 50%» no dice nada sin saber de qué base. El 50% de 1.000 € son 500 €; el 50% de 10 € son 5 €. Siempre incluye el valor de referencia.</li>
+            <li><strong><span aria-hidden="true">❌</span> Sumar porcentajes de descuento directamente:</strong> Un 20% + 30% no es un 50% de descuento, sino un 44%. Siempre aplícalos en cadena sobre el precio resultante.</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir «subir un X%» con «volver al precio original»:</strong> Si un precio baja un 20% y luego sube un 20%, NO vuelve al inicio. Baja de 100 → 80; sube 20% de 80 = 16 → 96. Hay una pérdida del 4%.</li>
+            <li><strong><span aria-hidden="true">❌</span> No distinguir entre puntos porcentuales y porcentaje:</strong> Si el IPC pasa del 2% al 4%, ha subido 2 puntos porcentuales pero ha aumentado un 100% en términos relativos. En economía y finanzas esta distinción es crítica.</li>
+            <li><strong><span aria-hidden="true">❌</span> Calcular el IVA sobre el precio final en lugar de sobre el neto:</strong> El IVA del 21% se aplica sobre el precio sin impuestos, no sobre el precio final. Sobre 100 € netos, el IVA son 21 €. Pero el 21% de 121 € son 25,41 € — ese cálculo está mal.</li>
+            <li><strong><span aria-hidden="true">❌</span> Usar porcentajes sin especificar la base:</strong> «Ha subido un 50%» no dice nada sin saber de qué base. El 50% de 1.000 € son 500 €; el 50% de 10 € son 5 €. Siempre incluye el valor de referencia.</li>
           </ul>
         </div>
 

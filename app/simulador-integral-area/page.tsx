@@ -574,7 +574,7 @@ export default function SimuladorIntegralAreaPage() {
         {/* AVISOS */}
         {!valido && (
           <div className={styles.warningPanel} role="alert">
-            ⚠️ Algunos rectángulos están fuera del dominio de {funcion.expr}. La aproximación se ha calculado solo sobre los válidos.
+            <span aria-hidden="true">⚠️</span> Algunos rectángulos están fuera del dominio de {funcion.expr}. La aproximación se ha calculado solo sobre los válidos.
           </div>
         )}
         {!funcion.F && mostrarExacto && (
@@ -745,31 +745,31 @@ export default function SimuladorIntegralAreaPage() {
             <div className={styles.faqItem}>
               <h4>¿Diferencia entre integral indefinida y definida?</h4>
               <p>La <strong>indefinida</strong> ∫ f(x) dx es una <em>familia de funciones</em> F(x) + C cuya derivada es f. La <strong>definida</strong> ∫<sub>a</sub><sup>b</sup> f(x) dx es un <em>número</em> que representa el área con signo entre x = a y x = b.</p>
-              <p className={styles.faqTip}>💡 Conexión: definida = F(b) − F(a) (el +C se cancela al restar). Es el teorema fundamental del cálculo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Conexión: definida = F(b) − F(a) (el +C se cancela al restar). Es el teorema fundamental del cálculo.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué &quot;punto medio&quot; y &quot;trapecio&quot; son mejores que izquierda y derecha?</h4>
               <p>Izquierda y derecha tienen un <strong>error proporcional a Δx</strong> (orden 1). Punto medio y trapecio tienen error <strong>proporcional a Δx²</strong> (orden 2): para reducir el error a la cuarta parte solo necesitas duplicar n. Por eso convergen mucho más rápido.</p>
-              <p className={styles.faqTip}>💡 En el simulador: con n = 10 prueba los 4 métodos en x²: izquierda y derecha dan errores grandes, punto medio y trapecio dan errores 10× menores.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador: con n = 10 prueba los 4 métodos en x²: izquierda y derecha dan errores grandes, punto medio y trapecio dan errores 10× menores.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué hago si f no tiene primitiva elemental?</h4>
               <p>Hay funciones (e<sup>−x²</sup>, sen(x²)/x, sen(x)/x, e<sup>x</sup>/x...) cuyas integrales NO se pueden expresar con funciones elementales. En esos casos hay que <strong>aproximar numéricamente</strong> con métodos como los del simulador, o con métodos más sofisticados (Simpson, Gauss-Legendre).</p>
-              <p className={styles.faqTip}>💡 Es el caso de la gaussiana e<sup>−x²</sup>. Probablemente la integral más importante de toda la estadística no tiene primitiva elemental.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Es el caso de la gaussiana e<sup>−x²</sup>. Probablemente la integral más importante de toda la estadística no tiene primitiva elemental.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué pasa si f es negativa en parte del intervalo?</h4>
               <p>La integral suma áreas bajo el eje X con <strong>signo negativo</strong>. Por eso ∫<sub>0</sub><sup>2π</sup> sen(x) dx = 0: el área positiva del primer semiperiodo se cancela exactamente con la negativa del segundo. Para calcular el <em>área geométrica total</em> debes integrar |f(x)| o partir el dominio.</p>
-              <p className={styles.faqTip}>💡 En el simulador, prueba la cúbica con a = −1 y b = 1: la integral da 0, pero el área geométrica es 0,5.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, prueba la cúbica con a = −1 y b = 1: la integral da 0, pero el área geométrica es 0,5.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Cuál es la relación entre derivada e integral?</h4>
               <p>El <strong>Teorema Fundamental del Cálculo</strong>: si F(x) = ∫<sub>a</sub><sup>x</sup> f(t) dt, entonces F&apos;(x) = f(x). Es decir, derivar e integrar son operaciones <em>inversas</em>. Por eso, para calcular una integral definida, basta encontrar una primitiva y restar: F(b) − F(a).</p>
-              <p className={styles.faqTip}>💡 Esta es la razón por la que la tabla de integrales es prácticamente la tabla de derivadas leída al revés.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Esta es la razón por la que la tabla de integrales es prácticamente la tabla de derivadas leída al revés.</p>
             </div>
           </div>
         </section>

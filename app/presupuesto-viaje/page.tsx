@@ -198,7 +198,7 @@ export default function PresupuestoViaje() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1>🗺️ Presupuesto de Viaje</h1>
+        <h1><span aria-hidden="true">🗺️</span> Presupuesto de Viaje</h1>
         <p>Planifica gastos por categorías y divide entre el grupo</p>
       </header>
 
@@ -292,7 +292,7 @@ export default function PresupuestoViaje() {
               onClick={distribuirPresupuesto}
               aria-label="Distribuir presupuesto máximo automáticamente entre categorías"
             >
-              ✨ Distribuir automáticamente ({formatCurrency(presupuestoMaximo)})
+              <span aria-hidden="true">✨</span> Distribuir automáticamente ({formatCurrency(presupuestoMaximo)})
             </button>
           )}
         </section>

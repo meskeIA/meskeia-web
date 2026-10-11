@@ -207,7 +207,7 @@ export default function CreadorPaletasPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎨 Creador de Paletas</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎨</span> Creador de Paletas</h1>
         <p className={styles.subtitle}>
           Genera paletas de colores armónicas automáticamente
         </p>
@@ -243,8 +243,8 @@ export default function CreadorPaletasPage() {
               className={styles.hexInput}
               maxLength={7}
             />
-            <button onClick={randomColor} className={styles.randomBtn}>
-              🎲 Aleatorio
+            <button type="button" onClick={randomColor} className={styles.randomBtn}>
+              <span aria-hidden="true">🎲</span> Aleatorio
             </button>
           </div>
 
@@ -253,6 +253,7 @@ export default function CreadorPaletasPage() {
             <div className={styles.harmonyGrid}>
               {(Object.keys(HARMONY_INFO) as HarmonyType[]).map((type) => (
                 <button
+                  type="button"
                   key={type}
                   className={`${styles.harmonyBtn} ${harmonyType === type ? styles.harmonyActive : ''}`}
                   onClick={() => setHarmonyType(type)}
@@ -273,6 +274,7 @@ export default function CreadorPaletasPage() {
             <div className={styles.presetsGrid}>
               {PRESET_PALETTES.map((preset) => (
                 <button
+                  type="button"
                   key={preset.name}
                   className={styles.presetBtn}
                   onClick={() => applyPreset(preset.colors)}
@@ -305,6 +307,7 @@ export default function CreadorPaletasPage() {
                 const textColor = getContrastColor(color.hex);
                 return (
                   <button
+                    type="button"
                     key={i}
                     className={styles.colorCard}
                     onClick={() => copyColor(color.hex, `Color ${color.hex} (${color.name})`)}
@@ -331,6 +334,7 @@ export default function CreadorPaletasPage() {
             <div className={styles.shadesGrid}>
               {shades.map((shade) => (
                 <button
+                  type="button"
                   key={shade.name}
                   className={styles.shadeCard}
                   onClick={() => copyColor(shade.hex, `Tono ${shade.name}, ${shade.hex}`)}
@@ -352,18 +356,21 @@ export default function CreadorPaletasPage() {
               <h3 className={styles.sectionTitle}>Exportar</h3>
               <div className={styles.exportTabs}>
                 <button
+                  type="button"
                   className={`${styles.exportTab} ${exportFormat === 'css' ? styles.exportActive : ''}`}
                   onClick={() => setExportFormat('css')}
                 >
                   CSS
                 </button>
                 <button
+                  type="button"
                   className={`${styles.exportTab} ${exportFormat === 'scss' ? styles.exportActive : ''}`}
                   onClick={() => setExportFormat('scss')}
                 >
                   SCSS
                 </button>
                 <button
+                  type="button"
                   className={`${styles.exportTab} ${exportFormat === 'json' ? styles.exportActive : ''}`}
                   onClick={() => setExportFormat('json')}
                 >
@@ -374,7 +381,7 @@ export default function CreadorPaletasPage() {
             <pre className={styles.codeBlock}>
               <code>{exportCode}</code>
             </pre>
-            <button onClick={copyExport} className={styles.copyBtn}>
+            <button type="button" onClick={copyExport} className={styles.copyBtn}>
               {copiedColor === 'export' ? '✓ Código Copiado' : '📋 Copiar Código'}
             </button>
           </div>
@@ -416,7 +423,7 @@ export default function CreadorPaletasPage() {
       >
         {/* Tabla Comparativa: Tipos de Armonías */}
         <section className={styles.guideSection}>
-          <h2>⚖️ Comparativa de Tipos de Armonía Cromática</h2>
+          <h2><span aria-hidden="true">⚖️</span> Comparativa de Tipos de Armonía Cromática</h2>
           <p className={styles.introParagraph}>
             Elegir la armonía correcta define la personalidad visual de un proyecto. Esta tabla te ayuda a saber cuándo usar cada una según el objetivo del diseño.
           </p>
@@ -433,7 +440,7 @@ export default function CreadorPaletasPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>🔄 Complementario</strong></td>
+                  <td><strong><span aria-hidden="true">🔄</span> Complementario</strong></td>
                   <td>2 (opuestos en rueda)</td>
                   <td>Alto contraste, energético, llamativo</td>
                   <td>Media (equilibrar proporciones)</td>
@@ -461,7 +468,7 @@ export default function CreadorPaletasPage() {
                   <td>Proyectos artísticos, ilustración, branding complejo</td>
                 </tr>
                 <tr>
-                  <td><strong>⚔️ Split Comp.</strong></td>
+                  <td><strong><span aria-hidden="true">⚔️</span> Split Comp.</strong></td>
                   <td>3 (base + dos vecinos del complementario)</td>
                   <td>Contraste suavizado, sofisticado</td>
                   <td>Media-Baja (más seguro que complementario)</td>
@@ -481,7 +488,7 @@ export default function CreadorPaletasPage() {
 
         {/* Casos de Uso Prácticos */}
         <section className={styles.guideSection}>
-          <h2>💼 ¿Cómo usan las paletas los profesionales?</h2>
+          <h2><span aria-hidden="true">💼</span> ¿Cómo usan las paletas los profesionales?</h2>
           <p className={styles.introParagraph}>
             Cada perfil de diseño tiene necesidades distintas. El código exportable (CSS/SCSS/JSON) de esta herramienta encaja en todos estos flujos de trabajo.
           </p>
@@ -543,10 +550,10 @@ export default function CreadorPaletasPage() {
 
         {/* FAQ Ampliado */}
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes sobre Color y Diseño</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Color y Diseño</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuántos colores debe tener una paleta de diseño web?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuántos colores debe tener una paleta de diseño web?</h4>
               <p>
                 La regla del 60-30-10 es el estándar profesional: 60% color dominante (fondo), 30% color secundario (secciones, cards), 10% color de acento (CTAs, highlights). Para interfaces web, una paleta funcional mínima necesita: 1 primario, 1 secundario o acento, 1 neutro claro (fondo), 1 neutro oscuro (texto), 1 de alerta (rojo/amarillo para errores). Eso son 5 colores base con sus tonos. Más de 7-8 colores diferentes generalmente indican falta de sistema.
               </p>
@@ -555,7 +562,7 @@ export default function CreadorPaletasPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es el contraste de accesibilidad y por qué importa?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es el contraste de accesibilidad y por qué importa?</h4>
               <p>
                 La WCAG 2.1 establece ratios mínimos de contraste entre texto y fondo: 4.5:1 para texto normal (AA) y 7:1 para texto normal (AAA). Diversas normativas obligan a cumplir AA en webs del sector público (RD 1112/2018 en España, ADA Title III en EE.UU., AODA en Canadá, EAA en la UE desde 2025). Un texto gris claro sobre fondo blanco puede ser bonito pero completamente ilegible para personas con visión reducida o en pantallas con mucha luz.
               </p>
@@ -564,7 +571,7 @@ export default function CreadorPaletasPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué mi paleta se ve bien en pantalla pero mal impresa?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué mi paleta se ve bien en pantalla pero mal impresa?</h4>
               <p>
                 Las pantallas usan RGB (luz aditiva), la impresión usa CMYK (pigmentos sustractivos). Los colores saturados y brillantes de pantalla, especialmente azules eléctricos (#00AAFF), verdes neón o magentas, pierden mucha intensidad al imprimirse porque CMYK no puede reproducir todo el gamut RGB. Además, el papel no emite luz, solo la refleja. Solución: en proyectos de impresión, trabaja directamente con valores CMYK y usa el conversor de colores de meskeIA para ver la traducción.
               </p>
@@ -573,7 +580,7 @@ export default function CreadorPaletasPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo elegir un color para una marca desde cero?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo elegir un color para una marca desde cero?</h4>
               <p>
                 El color de marca comunica valores inconscientemente: azul (confianza, tecnología, salud), verde (naturaleza, sostenibilidad, finanzas), rojo (urgencia, energía, alimentación), amarillo (optimismo, advertencia), naranja (creatividad, accesibilidad), violeta (lujo, espiritualidad), negro (elegancia, exclusividad). El color debe diferenciarse de la competencia directa y funcionar en contextos muy distintos (blanco, negro, color, pantalla, impresión).
               </p>
@@ -582,7 +589,7 @@ export default function CreadorPaletasPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es la temperatura del color y cómo afecta al diseño?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es la temperatura del color y cómo afecta al diseño?</h4>
               <p>
                 Los colores cálidos (rojos, naranjas, amarillos) generan sensación de energía, urgencia y cercanía. Los colores fríos (azules, verdes, violetas) transmiten calma, profesionalidad y distancia. Los neutros (blancos, grises, beiges) son versátiles y no compiten con el contenido. La temperatura afecta también a la percepción de peso visual: los colores oscuros y cálidos "pesan" más visualmente que los claros y fríos.
               </p>
@@ -591,7 +598,7 @@ export default function CreadorPaletasPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo funciona el modo oscuro y qué colores debo evitar?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo funciona el modo oscuro y qué colores debo evitar?</h4>
               <p>
                 En dark mode, no uses negro puro (#000000) para fondos: es demasiado duro. Los mejores fondos oscuros van de #1A1A1A a #2D2D2D. Evita también colores muy saturados sobre fondos oscuros: cansan la vista. Las paletas análogas y monocromáticas con saturación media (S: 40-70%) funcionan especialmente bien en dark mode. Los tonos 100-300 de tu escala son los colores de texto sobre fondos oscuros.
               </p>
@@ -600,7 +607,7 @@ export default function CreadorPaletasPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Para qué sirven los shades 100-900 de la escala?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Para qué sirven los shades 100-900 de la escala?</h4>
               <p>
                 La escala de 9 tonos es el estándar de sistemas de diseño como Tailwind CSS, Material Design y Ant Design: 100 (fondo muy claro, highlights), 200-300 (bordes, separadores), 400-500 (colores secundarios, badges), 600-700 (color primario y hover), 800-900 (textos, colores sobre fondos claros). Esta nomenclatura permite a los equipos comunicarse sin ambigüedad: "usa primary-700 sobre primary-100" es inequívoco.
               </p>
@@ -609,7 +616,7 @@ export default function CreadorPaletasPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo saber si una paleta es accesible para personas daltónicas?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo saber si una paleta es accesible para personas daltónicas?</h4>
               <p>
                 El 8% de los hombres y el 0,5% de las mujeres tienen algún tipo de daltonismo (más común: deuteranopía, que confunde rojo y verde). Para paletas accesibles: evita depender solo del rojo/verde para transmitir información (éxito/error); añade iconos o texto. Los azules y amarillos son los más seguros porque son distinguibles por la mayoría de tipos de daltonismo. Herramientas como Stark (plugin de Figma) o Colour Contrast Analyser simulan cómo ve un daltónico tu diseño.
               </p>
@@ -622,7 +629,7 @@ export default function CreadorPaletasPage() {
 
         {/* Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>📋 Cómo Crear una Identidad Visual Cromática Profesional</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo Crear una Identidad Visual Cromática Profesional</h2>
           <p className={styles.introParagraph}>
             Proceso paso a paso para pasar de un color base a un sistema de diseño completo listo para implementar en cualquier proyecto web.
           </p>
@@ -686,7 +693,7 @@ export default function CreadorPaletasPage() {
 
         {/* Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>✅ Mejores Prácticas de Diseño de Paletas</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas de Diseño de Paletas</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>📐</span>
@@ -730,22 +737,22 @@ export default function CreadorPaletasPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Usar demasiados colores sin jerarquía:</strong> Más de 5-6 colores en una interfaz sin un sistema claro genera ruido visual. El usuario no sabe qué es importante. Limita la paleta principal a 3 colores (primario, secundario, acento) y usa la escala de tonos para las variaciones.
+                <strong><span aria-hidden="true">❌</span> Usar demasiados colores sin jerarquía:</strong> Más de 5-6 colores en una interfaz sin un sistema claro genera ruido visual. El usuario no sabe qué es importante. Limita la paleta principal a 3 colores (primario, secundario, acento) y usa la escala de tonos para las variaciones.
               </li>
               <li>
-                <strong>❌ Olvidar verificar el contraste de accesibilidad:</strong> Un gris claro sobre fondo blanco puede verse elegante pero tiene contraste 1.5:1 (el mínimo es 4.5:1). Esto viola las leyes de accesibilidad y hace el contenido ilegible para personas con baja visión o en pantallas bajo luz solar.
+                <strong><span aria-hidden="true">❌</span> Olvidar verificar el contraste de accesibilidad:</strong> Un gris claro sobre fondo blanco puede verse elegante pero tiene contraste 1.5:1 (el mínimo es 4.5:1). Esto viola las leyes de accesibilidad y hace el contenido ilegible para personas con baja visión o en pantallas bajo luz solar.
               </li>
               <li>
-                <strong>❌ Usar el mismo color para semántica de marca y de estado:</strong> Si el color primario de tu marca es rojo, usar rojo también para errores genera ambigüedad. El usuario no sabe si un elemento rojo es parte del diseño o una alerta. Define colores funcionales (error, éxito, warning) independientes de los de marca.
+                <strong><span aria-hidden="true">❌</span> Usar el mismo color para semántica de marca y de estado:</strong> Si el color primario de tu marca es rojo, usar rojo también para errores genera ambigüedad. El usuario no sabe si un elemento rojo es parte del diseño o una alerta. Define colores funcionales (error, éxito, warning) independientes de los de marca.
               </li>
               <li>
-                <strong>❌ No considerar la luz ambiental al elegir colores:</strong> Un azul oscuro que se ve perfecto en monitores calibrados puede parecer negro en laptops de presupuesto bajo o en exteriores con mucha luz. Prueba siempre tu paleta en diferentes dispositivos y condiciones de iluminación antes de aprobarla.
+                <strong><span aria-hidden="true">❌</span> No considerar la luz ambiental al elegir colores:</strong> Un azul oscuro que se ve perfecto en monitores calibrados puede parecer negro en laptops de presupuesto bajo o en exteriores con mucha luz. Prueba siempre tu paleta en diferentes dispositivos y condiciones de iluminación antes de aprobarla.
               </li>
               <li>
-                <strong>❌ Cambiar colores directamente en los componentes en lugar de en variables:</strong> Si defines el color en cada botón como <code>color: #2E86AB</code> y el cliente cambia el azul por verde, debes editar cientos de archivos. Usa siempre <code>color: var(--primary)</code> y cambia solo la variable. El código exportado de esta herramienta ya sigue este patrón.
+                <strong><span aria-hidden="true">❌</span> Cambiar colores directamente en los componentes en lugar de en variables:</strong> Si defines el color en cada botón como <code>color: #2E86AB</code> y el cliente cambia el azul por verde, debes editar cientos de archivos. Usa siempre <code>color: var(--primary)</code> y cambia solo la variable. El código exportado de esta herramienta ya sigue este patrón.
               </li>
               <li>
-                <strong>❌ Confundir armonía cromática con paleta completa:</strong> La armonía define los colores principales, pero una paleta funcional necesita también neutrales (blanco, gris, negro) para fondos, bordes y textos. Una paleta sin neutrales obliga a usar los colores de marca en roles para los que no están diseñados, deteriorando la identidad visual.
+                <strong><span aria-hidden="true">❌</span> Confundir armonía cromática con paleta completa:</strong> La armonía define los colores principales, pero una paleta funcional necesita también neutrales (blanco, gris, negro) para fondos, bordes y textos. Una paleta sin neutrales obliga a usar los colores de marca en roles para los que no están diseñados, deteriorando la identidad visual.
               </li>
             </ul>
           </div>

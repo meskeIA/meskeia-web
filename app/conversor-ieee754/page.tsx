@@ -602,7 +602,7 @@ export default function ConversorIEEE754Page() {
       >
         {/* 1. Tabla comparativa Half vs Single vs Double */}
         <div className={styles.eduComparativa}>
-          <h2>📊 Comparativa: Half vs Single vs Double (IEEE 754)</h2>
+          <h2><span aria-hidden="true">📊</span> Comparativa: Half vs Single vs Double (IEEE 754)</h2>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -669,7 +669,7 @@ export default function ConversorIEEE754Page() {
 
         {/* 2. Casos de uso prácticos */}
         <div className={styles.eduEscenarios}>
-          <h2>🌍 Casos de Uso Prácticos</h2>
+          <h2><span aria-hidden="true">🌍</span> Casos de Uso Prácticos</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -742,7 +742,7 @@ export default function ConversorIEEE754Page() {
 
         {/* 3. FAQ ampliado */}
         <div className={styles.eduFaq}>
-          <h2>❓ Preguntas Frecuentes sobre Punto Flotante</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Punto Flotante</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>¿Por qué 0,1 + 0,2 no es 0,3 exactamente?</h4>
@@ -813,7 +813,7 @@ export default function ConversorIEEE754Page() {
 
         {/* 4. Guía paso a paso */}
         <div className={styles.eduGuia}>
-          <h2>📖 Guía Paso a Paso: Convertir 3,14 a IEEE 754 Single</h2>
+          <h2><span aria-hidden="true">📖</span> Guía Paso a Paso: Convertir 3,14 a IEEE 754 Single</h2>
           <div className={styles.stepGuide}>
             <div className={styles.eduStep}>
               <span className={styles.stepNumber}>1</span>
@@ -872,7 +872,7 @@ export default function ConversorIEEE754Page() {
 
         {/* 5. Mejores prácticas */}
         <div className={styles.eduTips}>
-          <h2>✅ Mejores Prácticas con Punto Flotante</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas con Punto Flotante</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🎯</span>
@@ -927,7 +927,7 @@ export default function ConversorIEEE754Page() {
         <section className={styles.infoSection}>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>🔢 ¿Qué es IEEE 754?</h3>
+              <h3><span aria-hidden="true">🔢</span> ¿Qué es IEEE 754?</h3>
               <p>
                 Estándar internacional para representar números reales en computadores.
                 Divide el número en tres partes: signo, exponente y mantisa (fracción).
@@ -936,7 +936,7 @@ export default function ConversorIEEE754Page() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>📐 El Bit Implícito</h3>
+              <h3><span aria-hidden="true">📐</span> El Bit Implícito</h3>
               <p>
                 En números normalizados, siempre hay un "1" implícito antes del punto
                 decimal. Esto ahorra 1 bit de almacenamiento.
@@ -945,7 +945,7 @@ export default function ConversorIEEE754Page() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>⚖️ El Sesgo (Bias)</h3>
+              <h3><span aria-hidden="true">⚖️</span> El Sesgo (Bias)</h3>
               <p>
                 El exponente se almacena con un sesgo para evitar números negativos.
                 Se suma el sesgo al exponente real antes de almacenarlo.
@@ -957,7 +957,7 @@ export default function ConversorIEEE754Page() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>⚠️ Números Especiales</h3>
+              <h3><span aria-hidden="true">⚠️</span> Números Especiales</h3>
               <p>
                 <strong>Cero:</strong> Exp=0, Mantisa=0<br />
                 <strong>Infinito:</strong> Exp=máx, Mantisa=0<br />
@@ -967,7 +967,7 @@ export default function ConversorIEEE754Page() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>🎯 Precisión Limitada</h3>
+              <h3><span aria-hidden="true">🎯</span> Precisión Limitada</h3>
               <p>
                 No todos los decimales pueden representarse exactamente.
                 Por ejemplo, 0.1 en binario es periódico infinito.
@@ -976,7 +976,7 @@ export default function ConversorIEEE754Page() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>💻 En Programación</h3>
+              <h3><span aria-hidden="true">💻</span> En Programación</h3>
               <p>
                 <strong>float</strong> (C/Java): precisión simple (32 bits)<br />
                 <strong>double</strong> (C/Java): precisión doble (64 bits)<br />
