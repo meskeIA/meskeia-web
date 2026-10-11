@@ -17,6 +17,7 @@ import {
   RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
+import ProrrateoIbiComunidad from '@/components/ProrrateoIbiComunidad';
 import { RESPUESTA_IMPUESTO_COMPRA, PREGUNTA_RENUNCIA, RESPUESTA_RENUNCIA } from './metadata';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
@@ -2156,6 +2157,9 @@ export default function SimuladorLocalComercialPage() {
           )}
         </div>
       </section>
+
+      {/* Reparto del IBI y la comunidad del año de la venta (S0195) */}
+      <ProrrateoIbiComunidad />
 
       {/* Contenido educativo */}
       <EducationalSection

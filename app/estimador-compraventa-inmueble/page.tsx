@@ -5,6 +5,7 @@ import styles from './EstimadorCompraventa.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, ResultCard, LegalNotice, DisclaimerCard, DataReference, ShareCard, RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
+import ProrrateoIbiComunidad from '@/components/ProrrateoIbiComunidad';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
 import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from '@/data/fiscal';
@@ -2816,6 +2817,9 @@ export default function SimuladorCompraventaPage() {
           autonómicas según perfil (jóvenes, familias numerosas, discapacidad). <strong>Consulta con tu asesor fiscal.</strong>
         </p>
       </div>
+
+      {/* Reparto del IBI y la comunidad del año de la venta (S0195) */}
+      <ProrrateoIbiComunidad />
 
       {/* Contenido educativo */}
       <EducationalSection

@@ -17,6 +17,7 @@ import {
   RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
+import ProrrateoIbiComunidad from '@/components/ProrrateoIbiComunidad';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr, registrarEventoInteraccion } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
 
@@ -1926,6 +1927,9 @@ export default function SimuladorGarajeCompraventaPage() {
           )}
         </div>
       </section>
+
+      {/* Reparto del IBI y la comunidad del año de la venta (S0195) */}
+      <ProrrateoIbiComunidad />
 
       {/* Sección educativa */}
       <EducationalSection

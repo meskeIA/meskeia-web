@@ -1,0 +1,148 @@
+/* Reparto del IBI y la comunidad — usa los tokens de app/globals.css */
+
+.bloque {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin: var(--spacing-xl) 0;
+  color: var(--text-primary);
+}
+
+.titulo {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.intro {
+  margin: 0 0 var(--spacing-lg);
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+.campoFecha,
+.campoSelect {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.etiqueta {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.inputFecha,
+.select {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.inputFecha:focus-visible,
+.select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.grupoComunidad {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--spacing-sm);
+  align-items: start;
+}
+
+.error {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  background: rgba(244, 67, 54, 0.08);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  color: #b3261e;
+}
+
+.nota {
+  margin: var(--spacing-md) 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin-top: var(--spacing-lg);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.tabla th {
+  background: var(--primary-boton);
+  color: #ffffff;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.dias {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.total {
+  margin: var(--spacing-lg) 0 0;
+  font-size: 1.05rem;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[data-theme='dark'] .error {
+  background: rgba(239, 83, 80, 0.14);
+  border-color: rgba(239, 83, 80, 0.6);
+  color: #ffb4ab;
+}
+
+[data-theme='dark'] .tabla th {
+  background: var(--primary-boton);
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .bloque {
+    padding: var(--spacing-lg);
+  }
+
+  .grupoComunidad {
+    grid-template-columns: 1fr;
+  }
+}

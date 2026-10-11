@@ -1,0 +1,189 @@
+'use client';
+
+/**
+ * Reparto del IBI y de la comunidad del periodo de la escritura entre vendedor y comprador.
+ * Se monta en las siete apps de gastos de compraventa (semilla S0195, 11/10/2026): una sola
+ * pieza para las siete, porque la familia ya demostró que la lógica copiada siete veces se
+ * repara en una y sigue rota en las otras seis (cabecera de tests/familias/compraventa.spec.ts).
+ *
+ * Invariante de la familia que cumple también este bloque: un importe ILEGIBLE no es un cero.
+ * Si «Cuota anual del IBI» o «Cuota de comunidad» no se entienden, el bloque lo nombra y no
+ * publica ningún reparto; un campo VACÍO simplemente no se reparte.
+ */
+
+import { useMemo, useState } from 'react';
+import NumberInput from './NumberInput';
+import styles from './ProrrateoIbiComunidad.module.css';
+import { formatNumber, parseSpanishNumber } from '@/lib';
+import {
+  leerFechaISO,
+  repartoComunidad,
+  repartoIbi,
+  type Fecha,
+  type Periodicidad,
+  type Reparto,
+} from '@/lib/calculadoras/prorrateoCompraventa';
+
+interface Props {
+  /** Solar y finca rústica no suelen tener comunidad de propietarios */
+  conComunidad?: boolean;
+}
+
+const PERIODOS: { valor: Periodicidad; texto: string }[] = [
+  { valor: 'mensual', texto: 'Mensual' },
+  { valor: 'trimestral', texto: 'Trimestral' },
+  { valor: 'semestral', texto: 'Semestral' },
+  { valor: 'anual', texto: 'Anual' },
+];
+
+const fmtEuro = (n: number) => `${formatNumber(n, 2)} €`;
+const fmtFecha = (f: Fecha) => `${String(f.dia).padStart(2, '0')}/${String(f.mes).padStart(2, '0')}/${f.anio}`;
+
+type Lectura = { estado: 'vacio' } | { estado: 'ilegible' } | { estado: 'ok'; valor: number };
+
+function leerImporte(texto: string): Lectura {
+  if (texto.trim() === '') return { estado: 'vacio' };
+  const n = parseSpanishNumber(texto);
+  if (!Number.isFinite(n) || n < 0) return { estado: 'ilegible' };
+  return { estado: 'ok', valor: n };
+}
+
+export default function ProrrateoIbiComunidad({ conComunidad = true }: Props) {
+  const [fecha, setFecha] = useState('');
+  const [ibi, setIbi] = useState('');
+  const [comunidad, setComunidad] = useState('');
+  const [periodicidad, setPeriodicidad] = useState<Periodicidad>('mensual');
+
+  const resultado = useMemo(() => {
+    const lecturaIbi = leerImporte(ibi);
+    const lecturaCom = conComunidad ? leerImporte(comunidad) : ({ estado: 'vacio' } as Lectura);
+    const ilegibles = [
+      lecturaIbi.estado === 'ilegible' ? '«Cuota anual del IBI»' : null,
+      lecturaCom.estado === 'ilegible' ? '«Cuota de comunidad»' : null,
+    ].filter((x): x is string => x !== null);
+    if (ilegibles.length > 0) {
+      return {
+        tipo: 'error' as const,
+        texto: `No se entiende el importe de ${ilegibles.join(' y ')}: escríbelo como 450 o 450,80. Hasta corregirlo no se reparte nada, para no publicar una cifra calculada con un importe equivocado.`,
+      };
+    }
+    if (lecturaIbi.estado === 'vacio' && lecturaCom.estado === 'vacio') return { tipo: 'nada' as const };
+    const f = leerFechaISO(fecha);
+    if (!f) return { tipo: 'sinFecha' as const };
+    const filas: { concepto: string; r: Reparto }[] = [];
+    if (lecturaIbi.estado === 'ok') filas.push({ concepto: 'IBI del año', r: repartoIbi(lecturaIbi.valor, f) });
+    if (lecturaCom.estado === 'ok')
+      filas.push({ concepto: `Comunidad (cuota ${periodicidad})`, r: repartoComunidad(lecturaCom.valor, periodicidad, f) });
+    const totalComprador = filas.reduce((s, x) => s + x.r.importeComprador, 0);
+    return { tipo: 'ok' as const, filas, totalComprador, fecha: f };
+  }, [fecha, ibi, comunidad, periodicidad, conComunidad]);
+
+  return (
+    <section className={styles.bloque} aria-labelledby="titulo-prorrateo">
+      <h2 id="titulo-prorrateo" className={styles.titulo}>
+        <span aria-hidden="true">📅</span> Reparto del IBI{conComunidad ? ' y la comunidad' : ''} el año de la venta
+      </h2>
+      <p className={styles.intro}>
+        El IBI lo debe quien es propietario el <strong>1 de enero</strong>, normalmente el vendedor, que paga el
+        recibo de todo el año. Salvo pacto en contrario, puede repercutir al comprador la parte de los días en que
+        este ya es dueño (Tribunal Supremo, sentencia 409/2016, de 15 de junio).
+        {conComunidad && ' Con la comunidad se suele hacer lo mismo, por días del periodo de la cuota.'}
+      </p>
+
+      <div className={styles.campos}>
+        <label className={styles.campoFecha}>
+          <span className={styles.etiqueta}>Fecha de la escritura</span>
+          <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className={styles.inputFecha} />
+        </label>
+        <NumberInput
+          value={ibi}
+          onChange={setIbi}
+          label="Cuota anual del IBI"
+          suffix="€"
+          min={0}
+          acotarAlSalir={false}
+          helperText="El importe del último recibo"
+        />
+        {conComunidad && (
+          <div className={styles.grupoComunidad}>
+            <NumberInput
+              value={comunidad}
+              onChange={setComunidad}
+              label="Cuota de comunidad"
+              suffix="€"
+              min={0}
+              acotarAlSalir={false}
+              helperText="Déjalo vacío si no hay comunidad"
+            />
+            <label className={styles.campoSelect}>
+              <span className={styles.etiqueta}>Se paga</span>
+              <select
+                value={periodicidad}
+                onChange={(e) => setPeriodicidad(e.target.value as Periodicidad)}
+                className={styles.select}
+              >
+                {PERIODOS.map((p) => (
+                  <option key={p.valor} value={p.valor}>
+                    {p.texto}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
+      </div>
+
+      {resultado.tipo === 'error' && (
+        <div role="alert" className={styles.error}>
+          {resultado.texto}
+        </div>
+      )}
+      {resultado.tipo === 'sinFecha' && <p className={styles.nota}>Indica la fecha de la escritura para repartir los días.</p>}
+      {resultado.tipo === 'ok' && (
+        <>
+          <div className={styles.tablaWrapper}>
+            <table className={styles.tabla}>
+              <caption className={styles.srOnly}>
+                Días e importe que corresponden a vendedor y comprador, con escritura el {fmtFecha(resultado.fecha)}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Concepto</th>
+                  <th scope="col">Periodo</th>
+                  <th scope="col">Vendedor</th>
+                  <th scope="col">Comprador</th>
+                </tr>
+              </thead>
+              <tbody>
+                {resultado.filas.map(({ concepto, r }) => (
+                  <tr key={concepto}>
+                    <td>{concepto}</td>
+                    <td>
+                      {fmtFecha(r.inicio)} – {fmtFecha(r.fin)}
+                    </td>
+                    <td>
+                      {fmtEuro(r.importeVendedor)}
+                      <span className={styles.dias}> · {r.diasVendedor} días</span>
+                    </td>
+                    <td>
+                      {fmtEuro(r.importeComprador)}
+                      <span className={styles.dias}> · {r.diasComprador} días</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className={styles.total}>
+            Si el vendedor paga los recibos, el comprador le abona en la firma{' '}
+            <strong>{fmtEuro(resultado.totalComprador)}</strong>.
+          </p>
+          <p className={styles.nota}>
+            El vendedor cuenta hasta el día anterior a la escritura y el comprador desde ese día. El reparto se puede
+            pactar de otra manera en el contrato de arras o en la escritura: si hay pacto, manda el pacto.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}

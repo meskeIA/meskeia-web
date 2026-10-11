@@ -1456,3 +1456,36 @@ test.describe('Testigo de familia — la comisión del vendedor no se reescribe 
     });
   }
 });
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// Cuarto invariante (11/10/2026, semilla S0195): el reparto del IBI y la comunidad.
+//
+// Las siete montan el MISMO componente (`components/ProrrateoIbiComunidad`), que reparte entre
+// vendedor y comprador el IBI del año y la cuota de comunidad por días (STS 409/2016). Sus
+// campos viven en el componente y no en el page.tsx de cada app, así que la tabla de filas de
+// arriba no los ve: este bloque es su cobertura, y mide en las siete que el invariante de la
+// familia se cumple también aquí — un importe ILEGIBLE se nombra y no se reparte nada.
+//
+//   IBI 600 €, escritura 01/07/2026: el comprador es dueño 184 de 365 días → 302,465… → «302,47»
+// ─────────────────────────────────────────────────────────────────────────────────────────
+test.describe('Testigo de familia — el reparto del IBI en las 7 apps de compraventa', () => {
+  test.describe.configure({ timeout: 60_000 });
+
+  for (const app of HERMANAS) {
+    test(`${app.slug} · el reparto sale, y un IBI ilegible se nombra y no reparte nada`, async ({ page }) => {
+      await page.goto(`/${app.slug}/`);
+      await esperarHidratacion(page, [sel('Cuota anual del IBI')]);
+      const bloque = page.locator('section[aria-labelledby="titulo-prorrateo"]');
+
+      const fecha = bloque.locator('input[type="date"]');
+      await fecha.fill('2026-07-01');
+      await esperarValorEnReact(page, fecha, '2026-07-01');
+      await sembrar(page, 'Cuota anual del IBI', '600');
+      await expect(bloque).toContainText('302,47');
+
+      await sembrar(page, 'Cuota anual del IBI', ILEGIBLE);
+      await expect(bloque.getByRole('alert')).toContainText('Cuota anual del IBI');
+      await expect(bloque, 'Con el IBI ilegible no puede publicarse ningún reparto').not.toContainText('abona');
+    });
+  }
+});

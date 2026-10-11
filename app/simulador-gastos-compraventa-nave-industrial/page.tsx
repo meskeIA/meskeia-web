@@ -22,6 +22,7 @@ import {
   ShareCard,
   RegionBadge,
 } from '@/components';
+import ProrrateoIbiComunidad from '@/components/ProrrateoIbiComunidad';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import {
   ITP_CCAA,
@@ -927,6 +928,9 @@ export default function SimuladorNaveIndustrialPage() {
           )}
         </div>
       </section>
+
+      {/* Reparto del IBI y la comunidad del año de la venta (S0195) */}
+      <ProrrateoIbiComunidad />
 
       {/* Contenido educativo */}
       <EducationalSection

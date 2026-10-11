@@ -27,6 +27,7 @@ import {
   RegionBadge,
   AvisoTerritorioSinIva,
 } from '@/components';
+import ProrrateoIbiComunidad from '@/components/ProrrateoIbiComunidad';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import {
   ITP_CCAA,
@@ -869,6 +870,9 @@ export default function SimuladorTerrenoRusticoPage() {
           )}
         </div>
       </section>
+
+      {/* Reparto del IBI del año de la venta (S0195) */}
+      <ProrrateoIbiComunidad conComunidad={false} />
 
       {/* Contenido educativo */}
       <EducationalSection
