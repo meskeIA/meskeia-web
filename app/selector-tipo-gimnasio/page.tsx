@@ -88,6 +88,12 @@ const NOMBRE_TIPOS: Record<TipoGimnasio, string> = {
   aire_libre: 'Al Aire Libre',
 };
 
+/** Respuestas que descartan modalidades (índices de pregunta y de opción; hallazgos 3179 y 3182). */
+const DESCARTES: { pregunta: number; opcion: number; tipos: TipoGimnasio[]; motivo: string }[] = [
+  { pregunta: 3, opcion: 0, tipos: ['gimnasio_tradicional', 'crossfit_funcional', 'yoga_pilates'], motivo: 'prefieres opciones gratuitas' },
+  { pregunta: 4, opcion: 3, tipos: ['casa'], motivo: 'no tienes espacio en casa' },
+];
+
 // ─────────────────────────────────────────────────────────────
 // Preguntas
 // ─────────────────────────────────────────────────────────────
@@ -228,10 +234,57 @@ export default function SelectorTipoGimnasio() {
     return puntos;
   }
 
-  function ganador(puntos: Record<TipoGimnasio, number>): TipoGimnasio {
-    return (Object.keys(puntos) as TipoGimnasio[]).reduce((a, b) =>
-      puntos[a] >= puntos[b] ? a : b
-    );
+  /**
+   * Ganadora entre las modalidades que lo declarado admite. Reparación del 11/10/2026:
+   *   · «Nada, prefiero opciones gratuitas» y «No tengo espacio en casa» son imposibilidades, no
+   *     preferencias: solo sumaban puntos, y el 42,3 % de quien no quería pagar acababa en una
+   *     modalidad de pago (3179); a quien no tenía espacio se le recomendaba entrenar en casa
+   *     (3182). Ahora descartan, y la tarjeta dice qué habría salido sin el filtro.
+   *   · Lesiones crónicas o principiante absoluto con CrossFit: el FAQPage y la guía dicen que no
+   *     es lo más adecuado, y la tarjeta callaba (3180). No descarta (lo decide quien entrena con
+   *     su profesional sanitario), pero se dice en la tarjeta.
+   *   · Un empate lo deshacía en silencio el orden de declaración (13,6 % de los perfiles, 3181):
+   *     se sigue deshaciendo así, y se dice con quién empata.
+   */
+  function resolver(puntos: Record<TipoGimnasio, number>) {
+    const todas = Object.keys(puntos) as TipoGimnasio[];
+    const filtros = DESCARTES.filter((f) => respuestas[f.pregunta] === f.opcion);
+    const descartadas = todas.filter((t) => filtros.some((f) => f.tipos.includes(t)));
+    const admitidas = todas.filter((t) => !descartadas.includes(t));
+    const maximo = Math.max(...admitidas.map((t) => puntos[t]));
+    const enCabeza = admitidas.filter((t) => puntos[t] === maximo);
+    const tipo = enCabeza[0];
+    const notas: string[] = [];
+
+    const sinFiltro = todas.reduce((a, b) => (puntos[a] >= puntos[b] ? a : b));
+    if (descartadas.includes(sinFiltro)) {
+      const motivos = filtros.map((f) => f.motivo).join(' y ');
+      notas.push(
+        `Has dicho que ${motivos}: por eso quedan fuera ${descartadas.map((t) => `«${NOMBRE_TIPOS[t]}»`).join(', ')}. ` +
+        `Sin ese filtro habría salido «${RESULTADOS[sinFiltro].nombre}» (${puntos[sinFiltro]} puntos).`,
+      );
+    }
+    if (respuestas[3] === 1 && (tipo === 'crossfit_funcional' || tipo === 'yoga_pilates')) {
+      notas.push(
+        `Has dicho que tu presupuesto es de hasta 20 € al mes, y «${RESULTADOS[tipo].nombre}» suele costar más: compara precios en tu zona antes de decidir.`,
+      );
+    }
+    const lesion = respuestas[6] === 0;
+    const principiante = respuestas[1] === 0;
+    if (tipo === 'crossfit_funcional' && (lesion || principiante)) {
+      const declarado = [principiante && 'eres principiante absoluto', lesion && 'tienes lesiones crónicas o limitaciones importantes'].filter(Boolean).join(' y ');
+      notas.push(
+        `Has dicho que ${declarado}: el CrossFit es de alta intensidad y no es lo más indicado para empezar sin base ni con lesiones. ` +
+        'Si te atrae, habla antes con un profesional sanitario y busca un centro con sesiones de iniciación que adapten los ejercicios.',
+      );
+    }
+    if (enCabeza.length > 1) {
+      notas.push(
+        `Empate: ${enCabeza.slice(1).map((t) => `«${RESULTADOS[t].nombre}»`).join(' y ')} ${enCabeza.length > 2 ? 'tienen' : 'tiene'} los mismos puntos (${maximo}). ` +
+        `Sale en primer lugar solo por el orden de la lista, no por encajar mejor: mira también ${enCabeza.length > 2 ? 'las otras' : 'la otra'}.`,
+      );
+    }
+    return { tipo, descartadas, notas };
   }
 
   // Handlers
@@ -267,7 +320,7 @@ export default function SelectorTipoGimnasio() {
   // Resultado
   if (mostrarResultado) {
     const puntos = calcularPuntuaciones();
-    const tipoGanador = ganador(puntos);
+    const { tipo: tipoGanador, descartadas, notas } = resolver(puntos);
     const resultado = RESULTADOS[tipoGanador];
     const maxPuntos = Math.max(...Object.values(puntos));
 
@@ -288,13 +341,23 @@ export default function SelectorTipoGimnasio() {
             <h2>{resultado.nombre}</h2>
             <p>{resultado.descripcion}</p>
 
+            {/* Lo declarado que descarta o que choca con la recomendación, y el empate (3179-3182). */}
+            {notas.map((nota) => (
+              <p key={nota} className={styles.nota} role="note">
+                <span aria-hidden="true">⚠️</span> {nota}
+              </p>
+            ))}
+
             <div className={styles.marcador}>
               <h3>Compatibilidad con cada opción</h3>
               {(Object.keys(puntos) as TipoGimnasio[])
                 .sort((a, b) => puntos[b] - puntos[a])
                 .map((tipo) => (
                   <div key={tipo} className={styles.barraResultado}>
-                    <span className={styles.barraLabel}>{NOMBRE_TIPOS[tipo]}</span>
+                    <span className={styles.barraLabel}>
+                      {NOMBRE_TIPOS[tipo]}
+                      {descartadas.includes(tipo) && <span className={styles.barraFuera}> (fuera por lo declarado)</span>}
+                    </span>
                     <div className={styles.barraFondo} role="progressbar" aria-valuenow={puntos[tipo]} aria-valuemax={maxPuntos}>
                       <div
                         className={`${styles.barraRelleno} ${tipo === tipoGanador ? styles.ganador : ''}`}

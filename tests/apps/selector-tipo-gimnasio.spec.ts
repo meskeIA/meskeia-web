@@ -153,31 +153,41 @@ test.describe('casos resueltos a mano', () => {
     await expect(page.getByText('Aviso Médico Importante')).toBeVisible();
   });
 
-  test('caso límite (empate 12-12): el marcador lo muestra, pero la tarjeta nombra una sola ganadora', async ({ page }) => {
+  test('REPARADO 3179/3181: el empate 12-12 con «Nada» lo gana la gratuita, porque el presupuesto descarta las de pago', async ({ page }) => {
+    // Antes salía «Gimnasio Tradicional» por ir declarado antes, con «Nada, prefiero opciones
+    // gratuitas». Desde el 11/10 «Nada» deja fuera gimnasio, CrossFit y yoga/pilates: entre casa
+    // (6) y aire libre (12), aire libre. El marcador sigue enseñando los puntos de todas y marca
+    // las descartadas; la tarjeta dice qué habría salido sin el filtro.
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, EMPATE_NADA);
-    // Comportamiento OBSERVADO, que es el de la tabla de pesos: gimnasio por ir declarado antes.
-    await expect(nombreResultado(page)).toHaveText('Gimnasio Tradicional');
+    await expect(nombreResultado(page)).toHaveText('Entrenamiento al Aire Libre');
     expect(await marcador(page)).toEqual([
-      { etiqueta: 'Gimnasio Tradicional', puntos: '12', ancho: '100%', ganador: true },
-      { etiqueta: 'Al Aire Libre', puntos: '12', ancho: '100%', ganador: false },
-      { etiqueta: 'Yoga / Pilates', puntos: '7', ancho: '58%', ganador: false },
+      { etiqueta: 'Gimnasio Tradicional (fuera por lo declarado)', puntos: '12', ancho: '100%', ganador: false },
+      { etiqueta: 'Al Aire Libre', puntos: '12', ancho: '100%', ganador: true },
+      { etiqueta: 'Yoga / Pilates (fuera por lo declarado)', puntos: '7', ancho: '58%', ganador: false },
       { etiqueta: 'En Casa', puntos: '6', ancho: '50%', ganador: false },
-      { etiqueta: 'CrossFit / Funcional', puntos: '0', ancho: '0%', ganador: false },
+      { etiqueta: 'CrossFit / Funcional (fuera por lo declarado)', puntos: '0', ancho: '0%', ganador: false },
     ]);
+    const tarjeta = (await page.locator('[class*="resultadoCard"]').innerText()).replace(/\s+/g, ' ');
+    expect(tarjeta).toContain('Has dicho que prefieres opciones gratuitas: por eso quedan fuera «Gimnasio Tradicional», «CrossFit / Funcional», «Yoga / Pilates». Sin ese filtro habría salido «Gimnasio Tradicional» (12 puntos).');
   });
 
-  test('ABIERTO: el empate se dice (o se deshace con un criterio declarado) en vez de ganarlo el orden', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). 1.859.349 perfiles (13,6 %) empatan en cabeza y la app
-    // proclama la primera declarada sin decirlo. Aquí, además, con «Nada, prefiero opciones
-    // gratuitas», la de pago gana a la gratuita solo por ir antes en el objeto.
-    test.fail();
+  test('REPARADO 3181: el empate se dice en vez de ganarlo el orden en silencio', async ({ page }) => {
+    // 1.859.349 perfiles (13,6 %) empataban en cabeza y la app proclamaba la primera declarada sin
+    // decirlo. Perfil sin filtros, resuelto a mano (pesos de page.tsx):
+    // gimnasio 2+2+1+3+1+0+1+2+0+0 = 12 · aire 2+2+1+0+1+2+0+0+3+1 = 12 · yoga 1+1+0+1+0+1+1+0+0+2 = 7
+    // · casa 2+0+1+0+0+0+0+1+0+0 = 4 · CrossFit 0 → gimnasio por el orden, y el empate dicho.
     test.setTimeout(60_000);
     await abrir(page);
-    await responder(page, EMPATE_NADA);
+    await responder(page, [
+      'Mantener mi forma física actual', 'Básico, entreno de vez en cuando', 'Me da igual, me adapto', 'Entre 20 € y 50 €',
+      'No lo he considerado', 'Me motiva más el disfrute', 'No lo sé, nunca me he evaluado', 'A mediodía',
+      'La libertad y el contacto', 'Prefiero el interior pero cerca',
+    ]);
+    await expect(nombreResultado(page)).toHaveText('Gimnasio Tradicional');
     const tarjeta = (await page.locator('[class*="resultadoCard"]').innerText()).replace(/\s+/g, ' ');
-    expect(tarjeta).toMatch(/empat|mismos puntos|misma puntuaci/i);
+    expect(tarjeta).toContain('Empate: «Entrenamiento al Aire Libre» tiene los mismos puntos (12).');
   });
 
   test('rechazo: sin responder no se avanza ni se llega al resultado; «Anterior» conserva y «Repetir» borra', async ({ page }) => {
@@ -212,12 +222,11 @@ test.describe('casos resueltos a mano', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('respuestas que deberían descartar', () => {
-  test('ABIERTO: con «Nada, prefiero opciones gratuitas» no gana CrossFit sin una palabra del presupuesto', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Forma del 1678 de selector-smartphone: el presupuesto suma
-    // puntos (aire +3, casa +2) pero no descarta. CrossFit 20 · gimnasio 12 · aire 10 · casa 5 ·
-    // yoga 1 → «CrossFit / Entrenamiento Funcional», cuyo precio la propia guía pone en
-    // «60-120 €/mes». Esperado: una modalidad gratuita, o CrossFit con el desfase dicho.
-    test.fail();
+  test('REPARADO 3179: con «Nada, prefiero opciones gratuitas» no gana CrossFit sin una palabra del presupuesto', async ({ page }) => {
+    // Antes (inspector 10/10/2026): forma del 1678 de selector-smartphone, el presupuesto sumaba
+    // puntos (aire +3, casa +2) pero no descartaba. CrossFit 20 · gimnasio 12 · aire 10 · casa 5 ·
+    // yoga 1 → «CrossFit / Entrenamiento Funcional». Ahora «Nada» descarta las de pago: aire 10
+    // frente a casa 5 → aire libre (y además «No tengo espacio en casa» descarta casa).
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, NADA_CROSSFIT);
@@ -225,15 +234,17 @@ test.describe('respuestas que deberían descartar', () => {
     const tarjeta = await page.locator('[class*="resultadoCard"]').innerText();
     expect(nombre !== 'CrossFit / Entrenamiento Funcional' || /presupuesto|gratu/i.test(tarjeta),
       `recomendado «${nombre}» con presupuesto «Nada»`).toBe(true);
+    expect(nombre).toBe('Entrenamiento al Aire Libre');
+    expect(tarjeta.replace(/\s+/g, ' ')).toContain('Sin ese filtro habría salido «CrossFit / Entrenamiento Funcional» (20 puntos).');
   });
 
-  test('ABIERTO: a un principiante absoluto con lesiones crónicas no se le recomienda CrossFit sin más', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). CrossFit 18 · gimnasio 11 · yoga 8 · casa 5 · aire 5. El
+  test('REPARADO 3180: a un principiante absoluto con lesiones crónicas no se le recomienda CrossFit sin más', async ({ page }) => {
+    // Antes (inspector 10/10/2026): CrossFit 18 · gimnasio 11 · yoga 8 · casa 5 · aire 5. El
     // propio FAQPage dice que CrossFit «no es la opción más adecuada para personas sedentarias o
     // con lesiones articulares», y la guía, que es «ideal para personas con buena condición
     // física». La tarjeta solo dice «Sesiones intensas en grupo… para quienes buscan retos»; el
-    // recuadro «Recuerda» es genérico y sale con cualquier resultado.
-    test.fail();
+    // recuadro «Recuerda» es genérico y sale con cualquier resultado. Ahora no descarta (es
+    // decisión de quien entrena con su profesional), pero la tarjeta lo dice.
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, PRINCIPIANTE_LESION);
@@ -241,19 +252,21 @@ test.describe('respuestas que deberían descartar', () => {
     const tarjeta = await page.locator('[class*="resultadoCard"]').innerText();
     expect(nombre !== 'CrossFit / Entrenamiento Funcional' || /lesi[oó]n|principiante/i.test(tarjeta),
       `recomendado «${nombre}» a un principiante con lesiones crónicas`).toBe(true);
+    expect(tarjeta.replace(/\s+/g, ' ')).toContain('Has dicho que eres principiante absoluto y tienes lesiones crónicas o limitaciones importantes: el CrossFit es de alta intensidad');
   });
 
-  test('ABIERTO: con «No tengo espacio en casa» no se recomienda «Entrenamiento en Casa» sin más', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). casa 18 · gimnasio 14 · yoga 10 · aire 8 · CrossFit 1 →
-    // «Entrenamiento en Casa». «No tengo espacio» es una imposibilidad, no una preferencia, y
-    // la respuesta no le resta nada a casa: solo suma a gimnasio, aire y CrossFit.
-    test.fail();
+  test('REPARADO 3182: con «No tengo espacio en casa» no se recomienda «Entrenamiento en Casa» sin más', async ({ page }) => {
+    // Antes (inspector 10/10/2026): casa 18 · gimnasio 14 · yoga 10 · aire 8 · CrossFit 1 →
+    // «Entrenamiento en Casa». «No tengo espacio» es una imposibilidad, no una preferencia: ahora
+    // descarta casa y gana el gimnasio (14), con la tarjeta diciendo qué habría salido.
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, SIN_ESPACIO);
     const nombre = await nombreResultado(page).innerText();
     const tarjeta = await page.locator('[class*="resultadoCard"]').innerText();
     expect(nombre !== 'Entrenamiento en Casa' || /espacio/i.test(tarjeta), `recomendado «${nombre}» sin espacio en casa`).toBe(true);
+    expect(nombre).toBe('Gimnasio Tradicional');
+    expect(tarjeta.replace(/\s+/g, ' ')).toContain('Has dicho que no tienes espacio en casa: por eso quedan fuera «En Casa». Sin ese filtro habría salido «Entrenamiento en Casa» (18 puntos).');
   });
 });
 

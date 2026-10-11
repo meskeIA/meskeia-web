@@ -202,6 +202,16 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
 
+/* Lo declarado que descarta o choca con la recomendación, y el empate (hallazgos 3179-3182). */
+.nota {
+  margin: 0 0 1rem; padding: 0.85rem 1rem; border: 1px solid #f59e0b; border-left-width: 4px;
+  border-radius: 8px; background: #fef3c7; color: #78350f; font-size: 0.93rem; line-height: 1.5;
+}
+[data-theme='dark'] .nota { border-color: #b45309; background: #3a2a08; color: #fde68a; }
+
+/* Modalidad que lo declarado deja fuera, en el marcador. */
+.barraFuera { font-size: 0.78rem; font-style: italic; }
+
 .resultadoIcono {
   font-size: 3.5rem;
   text-align: center;
