@@ -711,6 +711,12 @@ export const COMPLEMENTO_BRECHA_GENERO_META = {
  */
 export const COMPLEMENTO_MATERNIDAD_DEROGADO = {
   norma: 'Art. 60 LGSS en su redacción anterior al RDL 3/2021 (dada por la Ley 48/2015)',
+  /**
+   * Pensiones causadas desde esta fecha: «será de aplicación […] a las pensiones contributivas
+   * que se causen a partir de 1 de enero de 2016» (RDLeg 8/2015, disposición final única,
+   * BOE-A-2015-11724; leída en el BOE el 11/10/2026, hallazgo 2929).
+   */
+  aplicableDesde: '2016-01-01',
   vigenteHasta: '2021-02-03',
   /** Porcentaje que se sumaba a la pensión, según el número de hijos */
   escala: [

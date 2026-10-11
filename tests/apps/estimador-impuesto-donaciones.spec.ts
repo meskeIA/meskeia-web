@@ -696,15 +696,17 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    *   Base imponible = base liquidable = 150.000 − 30.000 = 120.000,00 (arts. 9.1.b y 20.5 LISD)
    *   Cuota íntegra  = 15.606,22 + (120.000 − 119.757,67) × 18,70 % = 15.651,53571 (TARIFA_ESTATAL_ID)
    *   × 1,0000 (COEFICIENTES_ID['II'][0], patrimonio hasta 402.678,11 €)
-   *   − 75 % (BONIFICACIONES_CCAA_ID.valencia) = 3.912,883928                  → «3912,88 €»
-   *   Tipo efectivo sobre el valor bruto: 3.912,883928 / 150.000 = 2,6086 %    → «2,61 %»
+   *   − 99 % (BONIFICACIONES_CCAA_ID.valencia) = 156,5153571                   → «156,52 €»
+   *   Tipo efectivo sobre el valor bruto: 156,5153571 / 150.000 = 0,1043 %     → «0,10 %»
+   *   (Hasta el 11/10/2026 la bonificación era el 75 % y el caso esperaba 3912,88 € y 2,61 %:
+   *   el 99 % rige desde el 01/06/2025, art. 12 bis.1.b de la Ley 13/1997 valenciana.)
    */
-  test('Comunitat Valenciana, hijo, 150.000 € con 30.000 € de cargas: 3912,88 €', async ({ page }) => {
+  test('Comunitat Valenciana, hijo, 150.000 € con 30.000 € de cargas: 156,52 €', async ({ page }) => {
     await rellenar(page, { ccaa: 'valencia', grupo: 'II', valor: '150000', cargas: '30000' });
-    expect(await cuota(page)).toBe('3912,88 €');
+    expect(await cuota(page)).toBe('156,52 €');
     const texto = await panel(page);
     expect(texto).toContain('120.000,00');
-    expect(texto).toMatch(/Tipo efectivo sobre donación: 2,61\s%/);
+    expect(texto).toMatch(/Tipo efectivo sobre donación: 0,10\s%/);
   });
 
   /**
@@ -753,14 +755,15 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    *   Cuota íntegra            = 199.291,40 + (1.000.000 − 797.555,08) × 34 % = 268.122,6728
    *   Con el coeficiente entero = × 1,2000 = 321.747,21
    *   Tope del art. 22.2       = × 1,1000 (294.934,94) + (4.021.000 − 4.020.770,98 = 229,02) = 295.163,96
-   *   − 75 % (Valencia)        = 295.163,96 × 0,25 = 73.790,99                → «73.790,99 €»
-   *   La app da 80.436,80 € (321.747,21 × 0,25): 6.645,81 € de más.
+   *   − 99 % (Valencia)        = 295.163,96008 × 0,01 = 2.951,6396            → «2951,64 €»
+   *   La app daba 80.436,80 € (321.747,21 × 0,25): el tope no se aplicaba. Con el 75 % de
+   *   entonces el caso esperaba 73.790,99 €; el 99 % rige desde el 01/06/2025 (triaje 11/10/2026).
    */
-  test('HALLAZGO 04/10 (a): hijo con 4.021.000 € de patrimonio previo en Valencia paga 73.790,99 €', async ({ page }) => {
+  test('HALLAZGO 04/10 (a): hijo con 4.021.000 € de patrimonio previo en Valencia paga 2951,64 €', async ({ page }) => {
     await rellenar(page, { ccaa: 'valencia', grupo: 'II', valor: '1000000' });
     await ponerPatrimonio(page, '4021000', '4');
     await expect(page.getByText(/^Impuesto estimado en Comunitat Valenciana/)).toBeVisible();
-    expect(await cuota(page)).toBe('73.790,99 €');
+    expect(await cuota(page)).toBe('2951,64 €');
   });
 
   /**

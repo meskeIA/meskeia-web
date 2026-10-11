@@ -23,6 +23,24 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-10-11',
+    fichaSlug: 'impuesto-patrimonio',
+    texto:
+      'Comunitat Valenciana: el mínimo exento es de 1.000.000 € para el devengo del 31/12/2025 (art. 8 de la Ley 13/1997, en la redacción del art. 30 de la Ley 5/2025, BOE-A-2025-11959) y sube a 2.000.000 € para el del 31/12/2026 (art. 19 de la Ley 5/2026, de 31 de julio, BOE-A-2026-19331, en vigor el 11/08/2026). La tabla decía 500.000 €.',
+  },
+  {
+    fecha: '2026-10-11',
+    fichaSlug: 'donaciones-isd',
+    texto:
+      'Comunitat Valenciana: la bonificación en donaciones es del 99 % para cónyuge, padres, hijos, nietos y abuelos, con documento público, y del 25 % para hermanos, sobrinos y tíos consanguíneos; la tabla decía 75 %, superado desde el 01/06/2025 (art. 12 bis de la Ley 13/1997, en la redacción del art. 22 de la Ley 5/2026, BOE-A-2026-19331).',
+  },
+  {
+    fecha: '2026-10-11',
+    fichaSlug: 'cnae-iae',
+    texto:
+      'La CNAE-2025 rige desde la entrada en vigor del Real Decreto 10/2025, el 16/01/2025, no desde el 01/01/2026: se aplica a las estadísticas oficiales con fecha de referencia desde el 01/01/2025 y los registros públicos estatales deben estar codificados con ella antes del 01/01/2027 (arts. 5 y 6 y disposición final segunda, BOE-A-2025-587).',
+  },
+  {
     fecha: '2026-09-30',
     fichaSlug: 'pensiones-jubilacion',
     texto:

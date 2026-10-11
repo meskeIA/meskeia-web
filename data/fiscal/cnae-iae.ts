@@ -158,12 +158,20 @@ export const IAE_EXENCION = {
   nota: 'Estar exento del pago no exime de declarar el epígrafe en el alta censal (modelo 036/037).',
 } as const;
 
-/** Cambio de clasificación vigente, relevante para cualquier trámite en curso. */
+/**
+ * Cambio de clasificación vigente, relevante para cualquier trámite en curso.
+ *
+ * `desde` es la entrada en vigor del RD 10/2025 (BOE-A-2025-587, DF 2.ª: «el día siguiente al de
+ * su publicación», BOE del 15/01/2025). Hasta el 11/10/2026 decía '2026-01-01', una fecha que no
+ * está en la norma (hallazgo 2923, cotejado en el BOE en el triaje de ese día). Las otras fechas
+ * del RD van en la nota: no hay UNA fecha de sustitución, y el preámbulo dice expresamente que no
+ * deroga la CNAE-2009.
+ */
 export const CNAE_VIGENCIA = {
   vigente: 'CNAE-2025',
   anterior: 'CNAE-2009',
   normaVigente: 'RD 10/2025, de 14 de enero',
   normaAnterior: 'RD 475/2007, de 13 de abril',
-  desde: '2026-01-01',
-  nota: 'La CNAE-2025 sustituye a la CNAE-2009. El INE publica la tabla oficial de correspondencia entre ambas, incorporada al catálogo.',
+  desde: '2025-01-16',
+  nota: 'La CNAE-2025 sustituye a la CNAE-2009: se aplica a las estadísticas oficiales con fecha de referencia desde el 01/01/2025, las empresas inscritas en la Seguridad Social debían comunicar su código antes del 30/06/2025 y el resto de registros públicos estatales debe estar codificado antes del 01/01/2027 (RD 10/2025, arts. 5 y 6 y disposición adicional única). El INE publica la tabla oficial de correspondencia entre ambas, incorporada al catálogo.',
 } as const;

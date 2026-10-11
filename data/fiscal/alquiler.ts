@@ -12,8 +12,8 @@
  * - Publicado mensualmente
  * - Aplica a contratos firmados ANTES del 26 de mayo de 2023
  *
- * Versión: 1.1.2
- * Última verificación: 2026-09-11
+ * Versión: 1.1.3
+ * Última verificación: 2026-10-11
  * ⚠️ 2026-07-14: corregidos los valores de IPC de jun-2025 a feb-2026 (la serie
  *    anterior no coincidía con la oficial del INE, verificado mes a mes con varipc)
  *    y corregida la fuente del IRAV (la antigua tabla 25171 sirve hoy el IPV).
@@ -22,12 +22,18 @@
  * ⚠️ 2026-09-11: incorporado el IPC interanual de julio (3,6 %, nota de prensa del
  *    INE de 13/08/2026). El IRAV sigue al día: 2026-Q3 no puede cerrarse hasta que
  *    el INE publique septiembre, en octubre.
+ * ⚠️ 2026-10-11: cotejo completo contra la API del INE (npm run audit:series-oficiales):
+ *    corregidos jul-2024 (2,8) y ago-2024 (2,3) e incorporado ago-2026 (4,3 %, definitivo).
+ *    Septiembre (4,9) era aún el adelantado y no entra; el IRAV de 2026-Q3 sigue abierto.
+ *    El RDL 29/2026 (en vigor el 08/10/2026, PENDIENTE de convalidación) cambia el tope de
+ *    la actualización (art. 18 LAU) y añade otro extraordinario del 2 % (DF 6.ª): NO está
+ *    modelado a propósito hasta que se vote; lo decide el triaje de noviembre.
  * ⚠️ Verificar valores con el INE antes de aplicar en un contrato real.
  */
 
 export const ALQUILER_META = {
   fuente: 'INE — Índice de Referencia de Actualización de Vivienda (IRAV) + IPC Interanual · Ley 12/2023 de Vivienda',
-  verificado: '2026-09-11',
+  verificado: '2026-10-11',
   vigencia: '2026',
   urlOficial: 'https://www.ine.es/jaxiT3/Tabla.htm?t=72975',
   nota: 'El IRAV se publica trimestralmente. Contratos anteriores al 26/05/2023 usan IPC interanual. Verificar índice vigente en el INE.',
@@ -85,8 +91,10 @@ export const IPC_INTERANUAL_POR_MES: Record<string, number> = {
   '2024-04': 3.3,
   '2024-05': 3.6,
   '2024-06': 3.4,
-  '2024-07': 2.9,
-  '2024-08': 2.4,
+  // jul y ago 2024 decían 2,9 y 2,4: el INE publica 2,8 y 2,3 en la base 2021 y en la 2025
+  // (cotejo de audit:series-oficiales, 11/10/2026, cabo C0194)
+  '2024-07': 2.8,
+  '2024-08': 2.3,
   '2024-09': 1.5,
   '2024-10': 1.8,
   '2024-11': 2.4,
@@ -112,6 +120,7 @@ export const IPC_INTERANUAL_POR_MES: Record<string, number> = {
   '2026-05': 3.2,
   '2026-06': 3.2,
   '2026-07': 3.6,
+  '2026-08': 4.3,
 };
 
 /** Devuelve la clave del trimestre IRAV para un mes dado (1-12) */

@@ -236,15 +236,22 @@ export const BONIFICACIONES_CCAA_ID: Record<string, BonificacionCCAA_ID> = {
   'valencia': {
     nombre: 'Comunitat Valenciana',
     regimen: 'comun',
+    // Hasta el 11/10/2026 decía 75 %, superado desde el 01/06/2025. Cotejado ese día en el BOE:
+    // art. 12 bis de la Ley 13/1997 valenciana consolidado (BOE-A-1998-8202, versiones del
+    // 01/06/2025 en adelante) y su redacción por la Ley 5/2026, art. 22 (BOE-A-2026-19331). El
+    // 99 % alcanza a cónyuge, padres, hijos, nietos y abuelos (12 bis.1.b). El 25 % de los
+    // colaterales CONSANGUÍNEOS de 2.º y 3.er grado (12 bis.2.b) no se modela: excluye a los
+    // afines del mismo Grupo III y el módulo no los distingue; es trabajo de la revisión de enero.
+    // Una sola comunidad: el sello del módulo NO se mueve.
     bonificaciones: {
-      'I-conyuge':      { porcentaje: 0.75 },
-      'I-descendiente': { porcentaje: 0.75 },
-      'II':             { porcentaje: 0.75 },
-      'II-ascendiente': { porcentaje: 0.75 },
+      'I-conyuge':      { porcentaje: 0.99 },
+      'I-descendiente': { porcentaje: 0.99 },
+      'II':             { porcentaje: 0.99 },
+      'II-ascendiente': { porcentaje: 0.99 },
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 75 % para Grupos I y II en donaciones (menor que en sucesiones).',
+    notas: 'Bonificación 99 % para cónyuge, padres, hijos, nietos y abuelos, si la donación consta en documento público (o se eleva a él en plazo) y, en metálico, con justificación del origen de los fondos. Hermanos, sobrinos y tíos tienen un 25 % que esta estimación no aplica.',
   },
 
   'extremadura': {

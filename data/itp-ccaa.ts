@@ -906,10 +906,25 @@ export interface TramoArancel {
   exceso: number;    // Porcentaje sobre exceso del tramo anterior
 }
 
-// Aranceles notariales para escritura de compraventa
+/**
+ * Rebaja del 5 % sobre la escala del número 2.1 de los DOS aranceles, notarial y registral
+ * (RDL 8/2010, disposición adicional 8.ª, apartados Uno.1 y Uno.2, BOE-A-2010-8228): «Se
+ * aplicará una rebaja del 5% al importe de los derechos notariales resultantes de la aplicación
+ * de lo previsto en el Número 2.1 del arancel de los notarios», y lo mismo para los
+ * registradores, en cuyo arancel consolidado está además literal: «En todos los supuestos de
+ * este número se aplicará una rebaja del 5 por 100 del importe del arancel a percibir por el
+ * registrador de la propiedad» (RD 1427/1989, nº 2.1, BOE-A-1989-28112). Leídos los tres en el
+ * BOE el 11/10/2026. Hasta ese día no se aplicaba en ninguno de los dos y toda notaría y todo
+ * registro salían un 5,26 % altos en las siete apps de compraventa (hallazgos 2901 y 2902).
+ * NO alcanza a la presentación (nº 1) ni a la nota simple (nº 4) del registro.
+ */
+export const REBAJA_ARANCEL_CUANTIA = 0.05;
+
+// Aranceles notariales para escritura de compraventa. Solo se lee la `base` del primer tramo
+// (el resto se acumula por exceso), y va con los decimales del BOE: 90,151816 € (hallazgo 2901).
 export const ARANCELES_NOTARIO: TramoArancel[] = [
-  { hasta: 6010.12, base: 90.15, exceso: 0 },
-  { hasta: 30050.61, base: 90.15, exceso: 0.45 },
+  { hasta: 6010.12, base: 90.151816, exceso: 0 },
+  { hasta: 30050.61, base: 90.151816, exceso: 0.45 },
   { hasta: 60101.21, base: 198.33, exceso: 0.15 },
   { hasta: 150253.03, base: 243.40, exceso: 0.10 },
   { hasta: 601012.10, base: 333.56, exceso: 0.05 },
@@ -929,16 +944,17 @@ export const notariaDeLibreAcuerdo = (valor: number): boolean => valor > LIMITE_
 
 // Aranceles del Registro de la Propiedad
 export const ARANCELES_REGISTRO: TramoArancel[] = [
-  { hasta: 6010.12, base: 24.04, exceso: 0 },
-  { hasta: 30050.61, base: 24.04, exceso: 0.175 },
+  { hasta: 6010.12, base: 24.040484, exceso: 0 },
+  { hasta: 30050.61, base: 24.040484, exceso: 0.175 },
   { hasta: 60101.21, base: 66.11, exceso: 0.125 },
   { hasta: 150253.03, base: 103.68, exceso: 0.075 },
   { hasta: 601012.10, base: 171.29, exceso: 0.030 },
   { hasta: Infinity, base: 306.58, exceso: 0.020 },
 ];
 
-// Límite máximo de arancel por inscripción
-export const REGISTRO_MAXIMO = 2181.67;
+// Límite máximo de arancel por inscripción (nº 2.1, con los decimales del BOE). La rebaja del
+// 5 % se aplica DESPUÉS del tope: es una rebaja «del importe del arancel a percibir».
+export const REGISTRO_MAXIMO = 2181.673939;
 
 // ===== ELECCIÓN DEL TIPO REDUCIDO =====
 
@@ -1597,7 +1613,8 @@ export function calcularAJD(valor: number, ccaa: ComunidadAutonoma, contexto: Co
 }
 
 /**
- * Arancel notarial puro: número 2 del RD 1426/1989 (documentos de cuantía), más IVA donde rige.
+ * Arancel notarial puro: número 2 del RD 1426/1989 (documentos de cuantía), con la rebaja del 5 %
+ * de `REBAJA_ARANCEL_CUANTIA` y más IVA donde rige.
  * Es la parte normativa exacta, pero NO es lo que se acaba pagando — ver estimarFacturaNotarial.
  *
  * `ccaa` es el territorio del INMUEBLE: sin él se supone península o Baleares, como hasta el
@@ -1621,7 +1638,7 @@ export function calcularArancelNotarial(valor: number, ccaa?: ComunidadAutonoma)
     limiteAnterior = tramo.hasta;
   }
 
-  return conImpuestoHonorarios(total, ccaa);
+  return conImpuestoHonorarios(total * (1 - REBAJA_ARANCEL_CUANTIA), ccaa);
 }
 
 /**
@@ -1644,7 +1661,7 @@ export const FACTURA_NOTARIAL = {
   factorMax: 2,
   baseNormativa: 'RD 1426/1989, Arancel de los Notarios (números 2, 4, 6 y 7)',
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1989-28111',
-  verificado: '2026-08-20',
+  verificado: '2026-10-11',
   nota: 'El arancel cubre la matriz y una copia autorizada. Las copias adicionales, los folios y los suplidos se facturan aparte y dependen de la extensión de la escritura.',
 };
 
@@ -1684,7 +1701,7 @@ export const REGISTRO_CONCEPTOS = {
   notaSimple: 3.005061,    // nº 4 — publicidad formal
   baseNormativa: 'RD 1427/1989, Arancel de los Registradores de la Propiedad (números 1, 2 y 4)',
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1989-28112',
-  verificado: '2026-08-20',
+  verificado: '2026-10-11',
 };
 
 /**
@@ -1771,7 +1788,8 @@ export function horquillaEdadJoven(): { min: number; max: number } {
 }
 
 /**
- * Calcula gastos de registro de la propiedad: arancel del RD 1427/1989, más IVA donde rige.
+ * Calcula gastos de registro de la propiedad: arancel del RD 1427/1989 (nº 2.1 con su tope y la
+ * rebaja del 5 % de `REBAJA_ARANCEL_CUANTIA`; nº 1 y nº 4 sin rebaja), más IVA donde rige.
  * `ccaa` es el territorio del inmueble (el Registro es siempre el de la finca); ver
  * `honorariosLlevanIVA`.
  */
@@ -1791,8 +1809,8 @@ export function calcularRegistro(valor: number, ccaa?: ComunidadAutonoma): numbe
     limiteAnterior = tramo.hasta;
   }
 
-  // Aplicar límite máximo
-  total = Math.min(total, REGISTRO_MAXIMO);
+  // Aplicar límite máximo y, sobre él, la rebaja del 5 % del nº 2.1
+  total = Math.min(total, REGISTRO_MAXIMO) * (1 - REBAJA_ARANCEL_CUANTIA);
 
   // El nº 2 cubre la inscripción; presentación y nota simple van aparte y siempre se devengan
   total += REGISTRO_CONCEPTOS.presentacion + REGISTRO_CONCEPTOS.notaSimple;

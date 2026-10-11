@@ -302,8 +302,11 @@ export const PLAZO_ITP = {
   baseNormativa: 'art. 102.1 del Reglamento del ITPAJD, RD 828/1995',
   desde: 'el día en que se cause el acto o contrato',
   aviso: 'Plazo estatal supletorio: algunas comunidades autónomas fijan el suyo. Confirma el de la tuya antes de presentar.',
-  urlReferencia: 'https://www.boe.es/buscar/act.php?id=BOE-A-1995-14257',
-  verificado: '2026-09-11',
+  // Hasta el 11/10/2026 apuntaba a BOE-A-1995-14257, una convocatoria de plazas del Ayuntamiento
+  // de Burjassot (lo destapó audit:fiscal-fuentes). El art. 102.1 del RD 828/1995 se leyó ese día
+  // en el BOE: «treinta días hábiles a contar desde el momento en que se cause el acto o contrato».
+  urlReferencia: 'https://www.boe.es/buscar/act.php?id=BOE-A-1995-15071',
+  verificado: '2026-10-11',
   vigencia: '2026',
 };
 

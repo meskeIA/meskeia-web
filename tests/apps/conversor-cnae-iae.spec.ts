@@ -1001,14 +1001,13 @@ test('CASO 6 ter — el mismo código sin punto sí devuelve su equivalencia', a
 test.describe('Buscador CNAE-IAE — la fecha de vigencia vista desde América', () => {
   test.use({ timezoneId: 'America/Mexico_City', locale: 'es-ES' });
 
-  test('la CNAE-2025 rige desde el 01/01/2026 se lea desde donde se lea', async ({ page }) => {
-    // ⚠️ 06/10/2026 — este test fija la fecha que discute el hallazgo ABIERTO del 06/10 (la
-    // de CNAE_VIGENCIA.desde frente al RD 10/2025; bloque del final). Lo que vigila aquí es
-    // que la fecha no se deslice un día al oeste de Greenwich: al corregir el dato, se
-    // cambia el literal y se conserva el huso horario.
+  test('la CNAE-2025 rige desde el 16/01/2025 se lea desde donde se lea', async ({ page }) => {
+    // Lo que vigila es que la fecha no se deslice un día al oeste de Greenwich. El literal era
+    // «01/01/2026» hasta el triaje fiscal del 11/10/2026, que corrigió CNAE_VIGENCIA.desde a la
+    // entrada en vigor del RD 10/2025 (hallazgo 2923, bloque del final).
     await abrir(page);
     await buscarCnae(page, '4711');
-    await expect(avisoAntiguo(page)).toContainText('Desde el 01/01/2026');
+    await expect(avisoAntiguo(page)).toContainText('Desde el 16/01/2025');
   });
 });
 
@@ -1094,7 +1093,7 @@ test.describe('Buscador CNAE-IAE — re-verificación del 30/08/2026', () => {
     await expect(contador(page)).toHaveText(/^1 resultado/);
     await expect(avisoAntiguo(page)).toContainText('1411');
     await expect(avisoAntiguo(page)).toContainText('existe en la CNAE-2009');
-    await expect(avisoAntiguo(page)).toContainText('Desde el 01/01/2026');
+    await expect(avisoAntiguo(page)).toContainText('Desde el 16/01/2025');
     // Sin homónima vigente, el aviso NO puede insinuar que el número siga significando algo.
     await expect(avisoAntiguo(page)).not.toContainText('conserva el mismo número');
     await expect(avisoAntiguo(page)).not.toContainText('clase VIGENTE distinta');
@@ -1265,7 +1264,7 @@ test.describe('Buscador CNAE-IAE — re-verificación del 02/09/2026', () => {
     await buscarCnae(page, '4711');
     await expect(avisoAntiguo(page)).toContainText('4711');
     await expect(avisoAntiguo(page)).toContainText('existe en la CNAE-2009');
-    await expect(avisoAntiguo(page)).toContainText('Desde el 01/01/2026');
+    await expect(avisoAntiguo(page)).toContainText('Desde el 16/01/2025');
     await expect(avisoAntiguo(page)).toContainText('entre ellas 47.11');
     await expect(avisoAntiguo(page)).toContainText(
       'que conserva el mismo número en la clasificación nueva',
@@ -3243,10 +3242,9 @@ test.describe('Buscador CNAE-IAE — hallazgos del 26/09/2026, reparados', () =>
     //     bloque educativo y en la FAQ.
     //   · metadata.ts, FAQPage (el texto que citan las IAs): «(art. 82.1.c RDL 2/2004)», con
     //     IAE_EXENCION.normativa en el módulo; el umbral de la misma frase sí se deriva.
-    // ⚠️ 06/10/2026 — la línea siguiente fija el VALOR que discute el hallazgo ABIERTO del
-    // 06/10 (bloque del final): el RD 10/2025 no dice «desde el 01/01/2026». Lo que vigila
-    // este test es que la fecha se DERIVE; al corregir el dato, se cambia esta línea.
-    expect(CNAE_VIGENCIA.desde).toBe('2026-01-01');
+    // Lo que vigila este test es que la fecha se DERIVE. El valor era '2026-01-01' hasta el
+    // triaje fiscal del 11/10/2026 (hallazgo 2923): el RD 10/2025 entró en vigor el 16/01/2025.
+    expect(CNAE_VIGENCIA.desde).toBe('2025-01-16');
     expect(pagina).not.toMatch(/enero\s+de\s+2026/);
     expect(metadatos).not.toContain('82.1.c RDL 2/2004');
   });
@@ -3441,10 +3439,11 @@ test.describe('Buscador CNAE-IAE — re-inspección del 06/10/2026', () => {
 // su re-verificación está en el bloque del 07/10/2026.
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 06/10/2026', () => {
-  test('ABIERTO · MEDIO (dato) — la fecha de la CNAE-2025 no sale del RD 10/2025 que el módulo cita', async ({
+  test('REPARADO · MEDIO (dato) — la fecha de la CNAE-2025 no sale del RD 10/2025 que el módulo cita', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO en el triaje fiscal del 11/10/2026 (hallazgo 2923): CNAE_VIGENCIA.desde pasa a
+    // '2025-01-16' tras leer en el BOE la DF 2.ª, el art. 5, el art. 6 y la DA única del RD.
     // `CNAE_VIGENCIA` (data/fiscal/cnae-iae.ts) dice que la CNAE-2025 la aprobó el «RD 10/2025,
     // de 14 de enero» y que rige `desde: '2026-01-01'`, y la app lo pinta en el hero («la que
     // sustituyó a la CNAE-2009 el 1 de enero de 2026»), en el aviso de código antiguo («Desde el
