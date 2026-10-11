@@ -12,7 +12,7 @@ const FUNCIONES = [
   'Coberturas incluidas y recomendadas según lo que declaras',
   'Avisa cuando lo declarado (precio, objetos de valor) no encaja con la cobertura',
   'Explica la regla proporcional del infraseguro con un ejemplo',
-  '100% en el navegador, sin registro',
+  '100 % en el navegador, sin registro',
 ];
 
 /** El FAQPage describe los MISMOS niveles y precios que la pantalla (hallazgo 1516, forma h). */
@@ -105,7 +105,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula el valor del continente y del contenido para asegurar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El continente se asegura por el coste de reconstrucción de la vivienda (no el valor de mercado ni el precio de compra). Se estima multiplicando los metros cuadrados construidos por el módulo de construcción de la zona, que en España oscila entre 700 y 1.200 €/m² según la comunidad autónoma. El contenido se valora sumando el precio de reposición de muebles, electrodomésticos y objetos personales; muchas aseguradoras ofrecen tablas orientativas basadas en las habitaciones y metros cuadrados del hogar.',
+        text: 'El continente se asegura por el coste de reconstrucción de la vivienda (no el valor de mercado ni el precio de compra). Se estima multiplicando los metros cuadrados construidos por el coste de construcción por metro cuadrado de la zona, que varía según la comunidad autónoma, la calidad de la construcción y el tipo de vivienda: pide ese coste a la aseguradora o a un aparejador, porque un capital bajo es infraseguro y la regla proporcional (art. 30 de la Ley 50/1980) recorta la indemnización en la misma proporción. El contenido se valora sumando el precio de reposición de muebles, electrodomésticos y objetos personales; muchas aseguradoras ofrecen tablas orientativas basadas en las habitaciones y metros cuadrados del hogar.',
       },
     },
     {
@@ -113,7 +113,7 @@ export const faqJsonLd = {
       name: '¿Qué factores hacen que el seguro de hogar sea más caro?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los factores que más encarecen la prima son: vivienda en zona de riesgo (inundación, terremoto o alta criminalidad), valor alto de continente o contenido, vivienda vacacional o no habitual, edificios antiguos sin reformar y solicitar capital asegurado elevado en joyas u objetos de valor. Por el contrario, la instalación de alarma conectada a central, medidas antirrobo y la contratación combinada con otros seguros de la misma compañía suelen generar descuentos del 10-20%.',
+        text: 'Los factores que más encarecen la prima son: vivienda en zona de riesgo (inundación, terremoto o alta criminalidad), valor alto de continente o contenido, vivienda vacacional o no habitual, edificios antiguos sin reformar y solicitar capital asegurado elevado en joyas u objetos de valor. Por el contrario, la instalación de alarma conectada a central, medidas antirrobo y la contratación combinada con otros seguros de la misma compañía suelen generar descuentos, cuyo importe varía de una aseguradora a otra.',
       },
     },
     {
@@ -121,7 +121,7 @@ export const faqJsonLd = {
       name: '¿Vale la pena pagar más por la cobertura de responsabilidad civil en el seguro de hogar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí; la cobertura de responsabilidad civil es una de las más valiosas en el seguro de hogar y su coste marginal es bajo. Cubre los daños que tú o tu familia podáis causar accidentalmente a terceros dentro y fuera del hogar (un escape de agua que inunda al vecino, una rotura en una instalación comunitaria, etc.). Una indemnización por daños a terceros puede superar fácilmente los 30.000 €, mientras que el sobrecoste de incluir RC en la póliza suele ser inferior a 30 € anuales.',
+        text: 'Sí; la cobertura de responsabilidad civil es una de las más valiosas en el seguro de hogar y su coste marginal es bajo. Cubre los daños que tú o tu familia podáis causar accidentalmente a terceros dentro y fuera del hogar (un escape de agua que inunda al vecino, una rotura en una instalación comunitaria, etc.). Una indemnización por daños a terceros puede ser muy superior a lo que cuesta añadir la responsabilidad civil a la póliza, que suele ser una parte pequeña de la prima: compara el capital de RC que ofrece cada póliza, no solo si la incluye.',
       },
     },
   ],

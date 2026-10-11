@@ -19,35 +19,113 @@ export default function SelectorSeguroHogar() {
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLHeadingElement>(null);
 
-  // Al pulsar «Ver resultado» la sección del test se desmonta con el botón que tenía el foco, y
-  // el foco caía a <body> (hallazgo 1527): se lleva al encabezado del resultado.
+  // Al cambiar de pantalla o de pregunta se desmonta o se desactiva el botón que tenía el foco
+  // («Empezar», «Siguiente» sin respuesta aún, «Ver resultado»), y el foco caía a <body>: el
+  // siguiente Tab salía del cuestionario y, en móvil, el enunciado nuevo quedaba por encima de la
+  // vista (hallazgos 1527 y 3117; receta de selector-smartphone, 1680 y 2657). Se lleva al
+  // enunciado de la pregunta nueva o al encabezado del resultado, que con su scroll-margin-top
+  // quedan a la vista y libres de la barra del logo.
   useEffect(() => {
     if (pantalla === 'resultado') tituloResultado.current?.focus();
-  }, [pantalla]);
+    else if (pantalla === 'test') enunciado.current?.focus();
+  }, [pantalla, paso]);
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
   const progreso = (paso / totalPreguntas) * 100;
 
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 3116; receta `clicDeMas` de la familia, 2659 de
+   * selector-smartphone). El primer clic cambia la pantalla y el segundo caía sobre lo que hubiera
+   * debajo en la nueva: marcaba una respuesta que nadie había elegido (P5 → P6 marcaba «Nadie de
+   * forma habitual», con su aviso legal), abría una app relacionada o, tras «Ver resultado», la
+   * tarjeta de Delegum. Un clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el
+   * teclado no produce) Y el clic anterior de la app cambió de pantalla.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
+    e.detail > 1 && ultimoCambioPantallaRef.current;
+  const registrarClic = (cambiaPantalla: boolean) => {
+    ultimoCambioPantallaRef.current = cambiaPantalla;
+  };
+
+  // Lo que el segundo toque pisa no siempre es de esta app (Apps relacionadas, la tarjeta de
+  // Delegum, «Contacto»), y `clicDeMas` no alcanza un enlace ajeno. La misma regla, en fase de
+  // captura sobre window, antes de que el enlace o React lo vean (selector-alquiler-vs-compra,
+  // 7cc1064e). Un clic suelto (detail 1) no se toca y cierra la ráfaga.
+  useEffect(() => {
+    function filtrar(e: MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantallaRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantallaRef.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+
   function seleccionarOpcion(valor: string) {
+    registrarClic(false);
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
   }
 
-  function avanzar() {
+  function elegirOpcion(e: React.MouseEvent<HTMLButtonElement>, valor: string) {
+    if (clicDeMas(e)) return;
+    seleccionarOpcion(valor);
+  }
+
+  function empezar(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
+    setPantalla('test');
+  }
+
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG, hallazgo 3118; 1681 de selector-smartphone): las
+   * flechas mueven el foco a la opción vecina y la marcan, con vuelta al principio, e Inicio/Fin
+   * van a los extremos. El grupo es UNA parada de Tab (tabindex itinerante).
+   */
+  function teclaEnOpcion(e: React.KeyboardEvent<HTMLButtonElement>, indice: number) {
+    const total = preguntaActual.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(preguntaActual.opciones[destino].valor);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  }
+
+  // Avanza a la pregunta SIGUIENTE A LA PULSADA (`paso + 1` del render, no `p => p + 1`): dos
+  // clics antes de repintar no saltan una pregunta. Y solo con la pregunta respondida: el
+  // `disabled` lo pone el render, y un clic que llega antes de repintar no lo ve.
+  function avanzar(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || !respuestas[preguntaActual.id]) return;
+    registrarClic(true);
     if (paso < totalPreguntas - 1) {
-      setPaso(p => p + 1);
+      setPaso(paso + 1);
     } else {
       setResultado(calcularResultado(respuestas));
       setPantalla('resultado');
     }
   }
 
-  function retroceder() {
-    if (paso > 0) setPaso(p => p - 1);
+  function retroceder(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e) || paso === 0) return;
+    registrarClic(true);
+    setPaso(paso - 1);
   }
 
-  function reiniciar() {
+  function reiniciar(e: React.MouseEvent<HTMLButtonElement>) {
+    if (clicDeMas(e)) return;
+    registrarClic(true);
     setPantalla('inicio');
     setPaso(0);
     setRespuestas({});
@@ -124,7 +202,7 @@ export default function SelectorSeguroHogar() {
             <button
               type="button"
               className={styles.btnStart}
-              onClick={() => setPantalla('test')}
+              onClick={empezar}
             >
               Empezar el test →
             </button>
@@ -159,19 +237,26 @@ export default function SelectorSeguroHogar() {
 
           <div className={styles.preguntaCard}>
             <span className={styles.preguntaIcon} aria-hidden="true">{preguntaActual.icono}</span>
-            <h2 className={styles.preguntaTexto}>{preguntaActual.texto}</h2>
+            <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{preguntaActual.texto}</h2>
             <div className={styles.opcionesGrid} role="radiogroup" aria-label={preguntaActual.texto}>
-              {preguntaActual.opciones.map(op => (
+              {preguntaActual.opciones.map((op, indice) => (
                 <button
                   key={op.valor}
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
-                  onClick={() => seleccionarOpcion(op.valor)}
+                  onClick={e => elegirOpcion(e, op.valor)}
                   // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                   // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                   // radio dentro (selector-smartphone, hallazgo 950).
                   role="radio"
                   aria-checked={respuestas[preguntaActual.id] === op.valor}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (3118).
+                  tabIndex={
+                    respuestas[preguntaActual.id]
+                      ? respuestas[preguntaActual.id] === op.valor ? 0 : -1
+                      : indice === 0 ? 0 : -1
+                  }
+                  onKeyDown={e => teclaEnOpcion(e, indice)}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.descripcion}</span>
@@ -276,7 +361,31 @@ export default function SelectorSeguroHogar() {
             ))}
           </div>
 
-          {/* Sección educativa */}
+          {/* Botón repetir */}
+          <button
+            type="button"
+            className={styles.btnRepetir}
+            onClick={reiniciar}
+            aria-label="Repetir el test desde el principio"
+          >
+            ← Repetir el test
+          </button>
+
+          {/* Aviso orientativo */}
+          <div className={styles.warningBox}>
+            Esta herramienta es orientativa. Las coberturas y precios indicados son aproximados y pueden variar
+            significativamente según la aseguradora, la zona y las características específicas de tu vivienda.
+            Compara siempre varias pólizas antes de contratar.
+          </div>
+
+        </div>
+      )}
+
+      {/* Guía educativa, en TODAS las pantallas (hallazgo 3119; 2663 de selector-smartphone). Vivía
+          dentro de la rama del resultado: el HTML servido no traía ni una línea de ella, aunque
+          EducationalSection monta su contenido siempre «porque Googlebot no hace clic», y quien no
+          terminaba las 10 preguntas no podía abrirla. */}
+      <div className={styles.guiaContainer}>
           <EducationalSection
             title="Guía completa: seguros de hogar en España"
             subtitle="Continente, contenido, coberturas, infraseguro y cómo comparar sin errores"
@@ -299,13 +408,13 @@ export default function SelectorSeguroHogar() {
               El infraseguro ocurre cuando el capital asegurado es inferior al valor del interés asegurado: para el
               continente, lo que costaría reconstruir la vivienda, sin el suelo; para el contenido, el valor de tus
               bienes tal como lo defina la póliza. En caso de siniestro, la aseguradora aplica la <em>regla
-              proporcional</em> (art. 30 de la Ley 50/1980 de Contrato de Seguro): si tienes asegurado el 60 % de ese
-              valor, te indemnizará el 60 % del daño, aunque el daño sea parcial, salvo que la póliza la excluya.
+              proporcional</em> (art. 30 de la Ley 50/1980 de Contrato de Seguro): si tienes asegurado el 60&nbsp;% de ese
+              valor, te indemnizará el 60&nbsp;% del daño, aunque el daño sea parcial, salvo que la póliza la excluya.
             </p>
             <div className={styles.warningBox}>
               <strong>Ejemplo práctico:</strong> tu piso se vende por 200.000 €, pero reconstruirlo (sin el suelo, que
-              no se quema) costaría 150.000 €. Si lo tienes asegurado por 90.000 €, cubres el 60 % del valor de
-              reconstrucción: en un incendio con 40.000 € de daños, la aseguradora pagará 24.000 € (el 60 %). Si lo
+              no se quema) costaría 150.000 €. Si lo tienes asegurado por 90.000 €, cubres el 60&nbsp;% del valor de
+              reconstrucción: en un incendio con 40.000 € de daños, la aseguradora pagará 24.000 € (el 60&nbsp;%). Si lo
               aseguras por 150.000 €, no hay infraseguro y cobras los 40.000 €; asegurarlo por los 200.000 € del
               precio de venta sería pagar prima por el suelo. Actualiza el capital asegurado cada pocos años y cuando
               hagas reformas importantes.
@@ -315,10 +424,10 @@ export default function SelectorSeguroHogar() {
             {/* Antes: agua 45 %, robo 20 %, incendio 15 %, fenómenos 12 % y RC 8 %, sin fuente y sumando
                 exactamente 100 (hallazgo 1517). Cifras de ICEA, nota del 25/06/2025. */}
             <p>
-              Según ICEA (Análisis Técnico de los Seguros Multirriesgo, estadística del año 2024), el 38,2 % de los
-              siniestros de hogar fueron daños por agua, seguidos de los de asistencia, con un 15,2 %. Por importe,
-              los daños por agua supusieron el 42,4 % del total; los cristales, el 10,8 %, y los fenómenos
-              atmosféricos, el 9,3 %. Por siniestro, un incendio costó de media 3.719 €, frente a 718 € un robo.
+              Según ICEA (Análisis Técnico de los Seguros Multirriesgo, estadística del año 2024), el 38,2&nbsp;% de los
+              siniestros de hogar fueron daños por agua, seguidos de los de asistencia, con un 15,2&nbsp;%. Por importe,
+              los daños por agua supusieron el 42,4&nbsp;% del total; los cristales, el 10,8&nbsp;%, y los fenómenos
+              atmosféricos, el 9,3&nbsp;%. Por siniestro, un incendio costó de media 3.719 €, frente a 718 € un robo.
             </p>
             <ul>
               <li><strong>Daños por agua:</strong> fugas, roturas de tuberías, filtraciones desde pisos superiores y comunidades. Es el siniestro más habitual.</li>
@@ -346,33 +455,14 @@ export default function SelectorSeguroHogar() {
             <ul>
               <li><strong>No compares solo el precio:</strong> Una póliza barata con capital de robo de 3.000 € puede ser inútil si tu electrónica vale más. Compara capitales y coberturas, no solo primas.</li>
               <li><strong>Lee las exclusiones:</strong> Los seguros excluyen habitualmente daños por humedad ambiental, desgaste ordinario, obras sin permiso y siniestros por negligencia grave.</li>
-              <li><strong>Atención a las franquicias:</strong> Algunas pólizas económicas tienen franquicias (cantidad mínima que asumes tú) de 150-300 €, lo que hace inútil reclamar siniestros pequeños.</li>
+              <li><strong>Atención a las franquicias:</strong> Algunas pólizas económicas tienen franquicias (la cantidad de cada siniestro que asumes tú), y una franquicia alta hace inútil reclamar los siniestros pequeños: mira su importe antes de comparar primas.</li>
               <li><strong>Consorcio de Compensación de Seguros:</strong> Cualquier seguro de hogar en España incluye automáticamente cobertura del Consorcio para catástrofes naturales extraordinarias (terremotos, inundaciones graves, erupciones). No necesitas contratarlo por separado.</li>
               {/* Antes nombraba siete marcas y atribuía «mejores condiciones» a dos, en una app que promete
                   orientar «sin sesgos comerciales» (hallazgo 1519). */}
               <li><strong>Pide varios presupuestos:</strong> directamente a aseguradoras o a través de un mediador o un comparador, pero compara siempre las mismas coberturas y los mismos capitales, no solo la prima.</li>
             </ul>
           </EducationalSection>
-
-          {/* Botón repetir */}
-          <button
-            type="button"
-            className={styles.btnRepetir}
-            onClick={reiniciar}
-            aria-label="Repetir el test desde el principio"
-          >
-            ← Repetir el test
-          </button>
-
-          {/* Aviso orientativo */}
-          <div className={styles.warningBox}>
-            Esta herramienta es orientativa. Las coberturas y precios indicados son aproximados y pueden variar
-            significativamente según la aseguradora, la zona y las características específicas de tu vivienda.
-            Compara siempre varias pólizas antes de contratar.
-          </div>
-
-        </div>
-      )}
+      </div>
 
       <ShareCard appName="selector-seguro-hogar" />
       <RelatedApps />

@@ -251,9 +251,9 @@ test.describe('Reparación 24/09/2026 — restricciones declaradas, FAQ, guía y
     (await page.locator('p[role="note"][class*="aviso"]').allInnerTexts()).join(' ').replace(/\s+/g, ' ');
 
   /** La guía está en el DOM aunque plegada (display: none): textContent la lee entera. Sin
-   *  getByRole, que no ve lo oculto. */
+   *  getByRole, que no ve lo oculto. Vive fuera de las pantallas desde el hallazgo 3119. */
   async function textoGuia(page: Page): Promise<string> {
-    const titulo = page.locator('[class*="resultadosContainer"] h3').filter({ hasText: 'Diferencia entre seguro de continente y contenido' });
+    const titulo = page.locator('[class*="guiaContainer"] h3').filter({ hasText: 'Diferencia entre seguro de continente y contenido' });
     await expect(titulo).toHaveCount(1);
     return ((await titulo.locator('xpath=..').textContent()) ?? '').replace(/\s+/g, ' ');
   }
@@ -656,11 +656,10 @@ test.describe('Re-inspección 10/10/2026 — umbrales, foco, teclado, doble toqu
     await expect(page.getByText('Pregunta 10 de 10').first()).toBeVisible();
   });
 
-  // ── Hallazgos ABIERTOS ─────────────────────────────────────────────────────
+  // ── Hallazgos REPARADOS el 11/10/2026 (3116-3121) ──────────────────────────
 
-  test('ABIERTO (inspector 10/10/2026): tras «Empezar», «Siguiente» y «Anterior» el foco va al enunciado, no a <body>', async ({ page }) => {
-    test.fail();
-    // Medido: tras «Empezar» (Enter) → BODY; tras «Siguiente» (Enter) → BODY, porque el botón se
+  test('REPARADO 3117: tras «Empezar», «Siguiente» y «Anterior» el foco va al enunciado, no a <body>', async ({ page }) => {
+    // Medido antes de reparar: tras «Empezar» (Enter) → BODY; tras «Siguiente» (Enter) → BODY, porque el botón se
     // desactiva con el foco dentro (la pregunta nueva está sin contestar) y el Tab siguiente sale a
     // un enlace de «Apps relacionadas», DESPUÉS del cuestionario; tras «Anterior» de P2 a P1 → BODY
     // (el botón se desactiva) y de P3 a P2 se queda en «Anterior». La referencia lleva el foco al
@@ -683,8 +682,7 @@ test.describe('Re-inspección 10/10/2026 — umbrales, foco, teclado, doble toqu
     await expect.poll(() => foco(page), { timeout: 2_000 }).toBe('¿Eres propietario/a o inquilino/a?');
   });
 
-  test('ABIERTO (inspector 10/10/2026): teclado de radios (APG): las flechas mueven y marcan, y el grupo es una parada de Tab', async ({ page }) => {
-    test.fail();
+  test('REPARADO 3118: teclado de radios (APG): las flechas mueven y marcan, y el grupo es una parada de Tab', async ({ page }) => {
     // Referencia (selector-smartphone, hallazgo 1681): tabindex 0 / -1 / -1 / -1 y ArrowDown lleva
     // el foco a la opción siguiente y la marca. Medido aquí: los cuatro radios sin tabindex (cuatro
     // paradas de Tab) y ArrowDown deja el foco en el primero sin marcar nada.
@@ -698,9 +696,8 @@ test.describe('Re-inspección 10/10/2026 — umbrales, foco, teclado, doble toqu
     expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).not.toBe('radio');
   });
 
-  test('ABIERTO (inspector 10/10/2026): la guía educativa viene en el HTML servido, no solo en el resultado', async ({ page }) => {
-    test.fail();
-    // La EducationalSection vive dentro de la rama `pantalla === 'resultado'`: el HTML servido no trae
+  test('REPARADO 3119: la guía educativa viene en el HTML servido, no solo en el resultado', async ({ page }) => {
+    // La EducationalSection vivía dentro de la rama `pantalla === 'resultado'`: el HTML servido no trae
     // ni una línea de la guía (EducationalSection monta su contenido siempre «porque Googlebot no
     // hace clic») y quien no termina las 10 preguntas no la ve. Referencia: selector-smartphone,
     // hallazgo 2663 (guía fuera de las pantallas).
@@ -709,22 +706,24 @@ test.describe('Re-inspección 10/10/2026 — umbrales, foco, teclado, doble toqu
     expect(html).toContain('Qué es el infraseguro y cómo evitarlo');
   });
 
-  test('ABIERTO (inspector 10/10/2026): el «%» va separado con espacio duro (U+00A0), en la guía y en el JSON-LD', async ({ page }) => {
-    test.fail();
+  test('REPARADO 3121: el «%» va separado con espacio duro (U+00A0), en la guía y en el JSON-LD', async ({ page }) => {
     // Regla del 25/09/2026 (CLAUDE.md global §2): lo anterior se corrige cuando pasa el Inspector.
-    // Medido: en la guía «60 %» ×4, «38,2 %», «15,2 %», «42,4 %», «10,8 %» y «9,3 %», los nueve con
-    // espacio normal (U+0020); en el JSON-LD, «100%» (featureList) y «10-20%» (FAQPage) pegados.
+    // Medido antes de reparar: en la guía «60 %» ×4, «38,2 %», «15,2 %», «42,4 %», «10,8 %» y «9,3 %»,
+    // los nueve con espacio normal (U+0020); en el JSON-LD, «100%» (featureList) y «10-20%» (FAQPage)
+    // pegados. El «10-20%» se fue con el hallazgo 3120 (cifra sin fuente).
     await resultadoDe(page, [0, 0, 1, 1, 0, 1, 0, 0, 0, 1]);
     // Sin normalizar con /\s+/, que convertiría el U+00A0 en espacio y no mediría nada.
-    const guia = await page.locator('[class*="resultadosContainer"]').evaluate((el) => el.textContent ?? '');
+    const guia = `${await page.locator('[class*="resultadosContainer"]').evaluate((el) => el.textContent ?? '')} ${await page.locator('[class*="guiaContainer"]').evaluate((el) => el.textContent ?? '')}`;
+    expect(guia).toContain('60 % de ese');
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     const texto = `${guia} ${ld}`;
     expect([...texto.matchAll(/\d+(,\d+)? %/g)].map((m) => m[0])).toEqual([]);
     expect([...texto.matchAll(/[\d-]+%/g)].map((m) => m[0])).toEqual([]);
   });
 
-  test('ABIERTO (inspector 10/10/2026): el FAQPage no da sin fuente el módulo de construcción con el que fijar el capital', async ({ page }) => {
-    test.fail();
+  test('REPARADO 3120: el FAQPage no da sin fuente el módulo de construcción con el que fijar el capital', async ({ page }) => {
+    // Reparado sin cifra (no se pudo cotejar con fuente): el método, a quién pedir el coste y por qué
+    // importa. Lo mismo con «10-20%» (P4), «30.000 €» y «30 € anuales» (P5) y la franquicia de la guía.
     // Pregunta 3 del FAQPage («¿Cómo se calcula el valor del continente…?»): «oscila entre 700 y
     // 1.200 €/m² según la comunidad autónoma», sin fuente ni año. Es la cifra con la que el lector
     // fijaría el capital del continente, y un capital bajo es el infraseguro que la propia guía
@@ -735,6 +734,10 @@ test.describe('Re-inspección 10/10/2026 — umbrales, foco, teclado, doble toqu
     expect(respuesta).not.toBe('');
     const cifraSinFuente = /\d[\d.]* y \d[\d.]* €\/m²/.test(respuesta) && !/(según [A-ZÁÉÍÓÚ]|fuente|\b20\d\d\b)/.test(respuesta);
     expect(cifraSinFuente, respuesta).toBe(false);
+    const todo = JSON.stringify(faq);
+    for (const cifra of ['10-20%', '30.000 €', '30 € anuales', '700 y 1.200']) expect(todo).not.toContain(cifra);
+    const html = await (await page.request.get('/selector-seguro-hogar/')).text();
+    expect(html).not.toContain('de 150-300 €');
   });
 
   // ── Móvil ──────────────────────────────────────────────────────────────────
@@ -799,9 +802,8 @@ test.describe('Re-inspección 10/10/2026 — umbrales, foco, teclado, doble toqu
       }
     });
 
-    test('ABIERTO (inspector 10/10/2026): tras «Siguiente» el enunciado de la pregunta nueva se ve, debajo de la barra', async ({ page }) => {
-      test.fail();
-      // Medido: con «Siguiente» en el centro de la pantalla, el enunciado de la pregunta nueva queda
+    test('REPARADO 3117: tras «Siguiente» el enunciado de la pregunta nueva se ve, debajo de la barra', async ({ page }) => {
+      // Medido antes de reparar: con «Siguiente» en el centro de la pantalla, el enunciado de la pregunta nueva queda
       // por ENCIMA de la vista (de −26 a −260 px a 360 y 390 px; con el botón arriba, hasta −608):
       // nada lleva el foco a él ni desplaza la página. La referencia enfoca el enunciado, y con
       // scroll-margin-top de 80 px (7cc1064e, 250b8baa) para que no caiga bajo la barra de 52 px.
@@ -818,8 +820,7 @@ test.describe('Re-inspección 10/10/2026 — umbrales, foco, teclado, doble toqu
       expect((caja?.y ?? 9999) + (caja?.height ?? 0)).toBeLessThanOrEqual(740);
     });
 
-    test('ABIERTO (inspector 10/10/2026): un doble toque avanza UNA pregunta, sin contestar la siguiente ni sacar de la app', async ({ page }) => {
-      test.fail();
+    test('REPARADO 3116: un doble toque avanza UNA pregunta, sin contestar la siguiente ni sacar de la app', async ({ page }) => {
       test.setTimeout(180_000);
       // Doble toque REAL (mouse.dblclick: detail 1 y 2 en el mismo punto) en el centro del botón,
       // con la ÚLTIMA opción marcada. Medido el 10/10 a 360 y 390 px (las preguntas tienen 4, 4, 4,
