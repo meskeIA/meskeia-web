@@ -186,10 +186,10 @@ export default function MatrizEisenhowerPage() {
             className={styles.quadrantSelect}
             aria-label="Seleccionar cuadrante"
           >
-            <option value="hacer">🔥 Hacer (Urgente + Importante)</option>
-            <option value="planificar">📅 Planificar (Importante)</option>
-            <option value="delegar">👥 Delegar (Urgente)</option>
-            <option value="eliminar">🗑️ Eliminar (Ninguno)</option>
+            <option value="hacer" aria-label="Hacer (Urgente + Importante)">🔥 Hacer (Urgente + Importante)</option>{/* a11y-ok: <option> solo admite texto; el aria-label da el nombre sin el emoji */}
+            <option value="planificar" aria-label="Planificar (Importante)">📅 Planificar (Importante)</option>{/* a11y-ok: <option> solo admite texto; el aria-label da el nombre sin el emoji */}
+            <option value="delegar" aria-label="Delegar (Urgente)">👥 Delegar (Urgente)</option>{/* a11y-ok: <option> solo admite texto; el aria-label da el nombre sin el emoji */}
+            <option value="eliminar" aria-label="Eliminar (Ninguno)">🗑️ Eliminar (Ninguno)</option>{/* a11y-ok: <option> solo admite texto; el aria-label da el nombre sin el emoji */}
           </select>
           <button type="button" onClick={addTask} className={styles.addButton} aria-label="Añadir tarea">
             Añadir

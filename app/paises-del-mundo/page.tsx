@@ -186,6 +186,7 @@ export default function PaisesDelMundoPage() {
                     setSearchQuery('');
                   }}
                   className={`${styles.filterButton} ${selectedContinent === continent ? styles.filterButtonActive : ''}`}
+                  aria-pressed={selectedContinent === continent}
                 >
                   {continent}
                 </button>

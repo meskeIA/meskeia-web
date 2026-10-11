@@ -256,9 +256,10 @@ export default function CreadorPaletasPage() {
                   type="button"
                   key={type}
                   className={`${styles.harmonyBtn} ${harmonyType === type ? styles.harmonyActive : ''}`}
+                  aria-pressed={harmonyType === type}
                   onClick={() => setHarmonyType(type)}
                 >
-                  <span className={styles.harmonyIcon}>{HARMONY_INFO[type].icon}</span>
+                  <span className={styles.harmonyIcon} aria-hidden="true">{HARMONY_INFO[type].icon}</span>
                   <span className={styles.harmonyName}>{HARMONY_INFO[type].name}</span>
                 </button>
               ))}
@@ -358,6 +359,7 @@ export default function CreadorPaletasPage() {
                 <button
                   type="button"
                   className={`${styles.exportTab} ${exportFormat === 'css' ? styles.exportActive : ''}`}
+                  aria-pressed={exportFormat === 'css'}
                   onClick={() => setExportFormat('css')}
                 >
                   CSS
@@ -365,6 +367,7 @@ export default function CreadorPaletasPage() {
                 <button
                   type="button"
                   className={`${styles.exportTab} ${exportFormat === 'scss' ? styles.exportActive : ''}`}
+                  aria-pressed={exportFormat === 'scss'}
                   onClick={() => setExportFormat('scss')}
                 >
                   SCSS
@@ -372,6 +375,7 @@ export default function CreadorPaletasPage() {
                 <button
                   type="button"
                   className={`${styles.exportTab} ${exportFormat === 'json' ? styles.exportActive : ''}`}
+                  aria-pressed={exportFormat === 'json'}
                   onClick={() => setExportFormat('json')}
                 >
                   JSON
@@ -382,7 +386,9 @@ export default function CreadorPaletasPage() {
               <code>{exportCode}</code>
             </pre>
             <button type="button" onClick={copyExport} className={styles.copyBtn}>
-              {copiedColor === 'export' ? '✓ Código Copiado' : '📋 Copiar Código'}
+              {copiedColor === 'export'
+                ? <><span aria-hidden="true">✓</span> Código Copiado</>
+                : <><span aria-hidden="true">📋</span> Copiar Código</>}
             </button>
           </div>
         </div>
@@ -558,7 +564,7 @@ export default function CreadorPaletasPage() {
                 La regla del 60-30-10 es el estándar profesional: 60% color dominante (fondo), 30% color secundario (secciones, cards), 10% color de acento (CTAs, highlights). Para interfaces web, una paleta funcional mínima necesita: 1 primario, 1 secundario o acento, 1 neutro claro (fondo), 1 neutro oscuro (texto), 1 de alerta (rojo/amarillo para errores). Eso son 5 colores base con sus tonos. Más de 7-8 colores diferentes generalmente indican falta de sistema.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla práctica:</strong> Si necesitas más de 7 colores para describir tu marca, probablemente no tienes un sistema sino una colección. Simplifica hasta que cada color tenga un propósito único y claramente definido.
+                <span aria-hidden="true">💡</span> <strong>Regla práctica:</strong> Si necesitas más de 7 colores para describir tu marca, probablemente no tienes un sistema sino una colección. Simplifica hasta que cada color tenga un propósito único y claramente definido.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -567,7 +573,7 @@ export default function CreadorPaletasPage() {
                 La WCAG 2.1 establece ratios mínimos de contraste entre texto y fondo: 4.5:1 para texto normal (AA) y 7:1 para texto normal (AAA). Diversas normativas obligan a cumplir AA en webs del sector público (RD 1112/2018 en España, ADA Title III en EE.UU., AODA en Canadá, EAA en la UE desde 2025). Un texto gris claro sobre fondo blanco puede ser bonito pero completamente ilegible para personas con visión reducida o en pantallas con mucha luz.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Cómo verificar:</strong> Usa el WebAIM Contrast Checker (webaim.org/resources/contrastchecker) con los HEX de tu paleta. Como mínimo, texto de cuerpo y fondo deben superar 4.5:1. Los tonos 700-900 de la escala suelen funcionar bien sobre fondos claros.
+                <span aria-hidden="true">💡</span> <strong>Cómo verificar:</strong> Usa el WebAIM Contrast Checker (webaim.org/resources/contrastchecker) con los HEX de tu paleta. Como mínimo, texto de cuerpo y fondo deben superar 4.5:1. Los tonos 700-900 de la escala suelen funcionar bien sobre fondos claros.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -576,7 +582,7 @@ export default function CreadorPaletasPage() {
                 Las pantallas usan RGB (luz aditiva), la impresión usa CMYK (pigmentos sustractivos). Los colores saturados y brillantes de pantalla, especialmente azules eléctricos (#00AAFF), verdes neón o magentas, pierden mucha intensidad al imprimirse porque CMYK no puede reproducir todo el gamut RGB. Además, el papel no emite luz, solo la refleja. Solución: en proyectos de impresión, trabaja directamente con valores CMYK y usa el conversor de colores de meskeIA para ver la traducción.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Colores seguros para impresión:</strong> Paletas con saturación media-baja (S entre 30-70%) y luminosidad media (L entre 30-60%) se traducen mejor a CMYK. Evita colores con S {'>'} 90% si el proyecto será impreso.
+                <span aria-hidden="true">💡</span> <strong>Colores seguros para impresión:</strong> Paletas con saturación media-baja (S entre 30-70%) y luminosidad media (L entre 30-60%) se traducen mejor a CMYK. Evita colores con S {'>'} 90% si el proyecto será impreso.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -585,7 +591,7 @@ export default function CreadorPaletasPage() {
                 El color de marca comunica valores inconscientemente: azul (confianza, tecnología, salud), verde (naturaleza, sostenibilidad, finanzas), rojo (urgencia, energía, alimentación), amarillo (optimismo, advertencia), naranja (creatividad, accesibilidad), violeta (lujo, espiritualidad), negro (elegancia, exclusividad). El color debe diferenciarse de la competencia directa y funcionar en contextos muy distintos (blanco, negro, color, pantalla, impresión).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Proceso recomendado:</strong> 1) Lista 3 valores de marca (ej: innovador, accesible, confiable). 2) Busca el color que mejor comunica esos valores. 3) Comprueba que el principal competidor usa un color diferente. 4) Genera la paleta completa con esta herramienta.
+                <span aria-hidden="true">💡</span> <strong>Proceso recomendado:</strong> 1) Lista 3 valores de marca (ej: innovador, accesible, confiable). 2) Busca el color que mejor comunica esos valores. 3) Comprueba que el principal competidor usa un color diferente. 4) Genera la paleta completa con esta herramienta.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -594,7 +600,7 @@ export default function CreadorPaletasPage() {
                 Los colores cálidos (rojos, naranjas, amarillos) generan sensación de energía, urgencia y cercanía. Los colores fríos (azules, verdes, violetas) transmiten calma, profesionalidad y distancia. Los neutros (blancos, grises, beiges) son versátiles y no compiten con el contenido. La temperatura afecta también a la percepción de peso visual: los colores oscuros y cálidos "pesan" más visualmente que los claros y fríos.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Aplicación práctica:</strong> Usa colores cálidos en CTAs de compra ("Comprar ahora", "Añadir al carrito"). Usa fríos en secciones de confianza (testimonios, certificaciones, garantías). Esta distinción temperatura-acción está validada por miles de tests A/B.
+                <span aria-hidden="true">💡</span> <strong>Aplicación práctica:</strong> Usa colores cálidos en CTAs de compra ("Comprar ahora", "Añadir al carrito"). Usa fríos en secciones de confianza (testimonios, certificaciones, garantías). Esta distinción temperatura-acción está validada por miles de tests A/B.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -603,7 +609,7 @@ export default function CreadorPaletasPage() {
                 En dark mode, no uses negro puro (#000000) para fondos: es demasiado duro. Los mejores fondos oscuros van de #1A1A1A a #2D2D2D. Evita también colores muy saturados sobre fondos oscuros: cansan la vista. Las paletas análogas y monocromáticas con saturación media (S: 40-70%) funcionan especialmente bien en dark mode. Los tonos 100-300 de tu escala son los colores de texto sobre fondos oscuros.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Truco de dark mode:</strong> En lugar de invertir colores, desatura ligeramente y reduce la luminosidad un 15-20%. Un azul primario #2E86AB puede convertirse en #2478A0 para dark mode. Los contrastes se mantienen sin que los colores "griten".
+                <span aria-hidden="true">💡</span> <strong>Truco de dark mode:</strong> En lugar de invertir colores, desatura ligeramente y reduce la luminosidad un 15-20%. Un azul primario #2E86AB puede convertirse en #2478A0 para dark mode. Los contrastes se mantienen sin que los colores "griten".
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -612,7 +618,7 @@ export default function CreadorPaletasPage() {
                 La escala de 9 tonos es el estándar de sistemas de diseño como Tailwind CSS, Material Design y Ant Design: 100 (fondo muy claro, highlights), 200-300 (bordes, separadores), 400-500 (colores secundarios, badges), 600-700 (color primario y hover), 800-900 (textos, colores sobre fondos claros). Esta nomenclatura permite a los equipos comunicarse sin ambigüedad: "usa primary-700 sobre primary-100" es inequívoco.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Tailwind CSS:</strong> La escala de esta herramienta es compatible con la lógica de Tailwind (50-950). Puedes renombrar los valores exportados de 100-900 para usarlos directamente en <code>tailwind.config.js</code> como colores personalizados.
+                <span aria-hidden="true">💡</span> <strong>Tailwind CSS:</strong> La escala de esta herramienta es compatible con la lógica de Tailwind (50-950). Puedes renombrar los valores exportados de 100-900 para usarlos directamente en <code>tailwind.config.js</code> como colores personalizados.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -621,7 +627,7 @@ export default function CreadorPaletasPage() {
                 El 8% de los hombres y el 0,5% de las mujeres tienen algún tipo de daltonismo (más común: deuteranopía, que confunde rojo y verde). Para paletas accesibles: evita depender solo del rojo/verde para transmitir información (éxito/error); añade iconos o texto. Los azules y amarillos son los más seguros porque son distinguibles por la mayoría de tipos de daltonismo. Herramientas como Stark (plugin de Figma) o Colour Contrast Analyser simulan cómo ve un daltónico tu diseño.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla del "daltonismo-safe":</strong> Si tu diseño sigue siendo comprensible en escala de grises, es accesible para la mayoría de personas con daltonismo. Prueba captura de pantalla + desaturación 100% en Photoshop.
+                <span aria-hidden="true">💡</span> <strong>Regla del "daltonismo-safe":</strong> Si tu diseño sigue siendo comprensible en escala de grises, es accesible para la mayoría de personas con daltonismo. Prueba captura de pantalla + desaturación 100% en Photoshop.
               </p>
             </div>
           </div>

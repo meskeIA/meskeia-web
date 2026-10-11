@@ -796,17 +796,17 @@ export default function ImpuestosDivorcioPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿La pensión compensatoria y la pensión de alimentos tributan igual?</h4>
               <p>No. La pensión compensatoria (entre cónyuges) es una reducción de base imponible para el pagador y rendimiento del trabajo para el cobrador. La pensión de alimentos (para los hijos) tiene un tratamiento especial: el pagador puede tributar esa parte a los tipos mínimos (art. 75), y el hijo que la recibe no la declara en IRPF.</p>
-              <p className={styles.faqTip}>💡 <strong>Importante:</strong> Confundir ambas pensiones es uno de los errores más frecuentes en la declaración del año del divorcio.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Importante:</strong> Confundir ambas pensiones es uno de los errores más frecuentes en la declaración del año del divorcio.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿El reparto de la vivienda en la liquidación de gananciales genera plusvalía?</h4>
               <p>No. La adjudicación de bienes en la liquidación de la sociedad de gananciales no es una transmisión onerosa, por lo que no genera ganancia o pérdida patrimonial en IRPF (art. 33.2 LIRPF). Tampoco tributa en ITP. La futura venta de esos bienes sí tributará desde el precio de adquisición original.</p>
-              <p className={styles.faqTip}>💡 <strong>Precaución:</strong> Si un cónyuge recibe bienes de valor significativamente mayor sin compensación en efectivo, el notario puede considerarlo donación parcial.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Precaución:</strong> Si un cónyuge recibe bienes de valor significativamente mayor sin compensación en efectivo, el notario puede considerarlo donación parcial.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Puedo presentar declaración conjunta el año del divorcio?</h4>
               <p>Depende del momento. En el año en que se inscribe el divorcio, ya no puedes hacer declaración conjunta por ese ejercicio completo. Si solo hay separación de hecho o separación legal sin divorcio, ambos cónyuges aún podrían optar por la declaración conjunta ese año si están de acuerdo. Es recomendable simular ambas opciones.</p>
-              <p className={styles.faqTip}>💡 <strong>Consejo:</strong> Si uno tiene rendimientos muy superiores al otro, la declaración individual suele salir más a cuenta para ambos en conjunto.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Consejo:</strong> Si uno tiene rendimientos muy superiores al otro, la declaración individual suele salir más a cuenta para ambos en conjunto.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué pasa con las acciones y fondos que repartimos?</h4>
@@ -819,7 +819,7 @@ export default function ImpuestosDivorcioPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Puedo deducir el 100% de la hipoteca si antes era al 50%?</h4>
               <p>Si te quedas con la vivienda y la hipoteca, y la hipoteca es de antes de 2013, sí puedes aplicar la deducción sobre el 100% de lo que pagas tú (con el límite de base de 9.040 €/año). No es que el límite se duplique — es que antes cada uno deducía sobre su 50% de cuota, y ahora tú deduces sobre el 100% que pagas.</p>
-              <p className={styles.faqTip}>💡 <strong>Comprueba:</strong> Si tu cuota anual supera los 9.040 €, la deducción se limita a ese importe base (1.356 €/año máximo al 15%).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Comprueba:</strong> Si tu cuota anual supera los 9.040 €, la deducción se limita a ese importe base (1.356 €/año máximo al 15%).</p>
             </div>
           </div>
         </section>

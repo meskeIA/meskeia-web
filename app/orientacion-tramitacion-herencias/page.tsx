@@ -315,6 +315,7 @@ export default function OrientacionTramitacionHerenciasPage() {
                   type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.testamento === v ? styles.opcionActiva : ''}`}
+                  aria-pressed={respuestas.testamento === v}
                   onClick={() => handleRespuesta('testamento', v)}
                 >
                   {v === 'si' ? 'Sí' : v === 'no' ? 'No' : 'No lo sé'}
@@ -337,6 +338,7 @@ export default function OrientacionTramitacionHerenciasPage() {
                   type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.inmuebles === v ? styles.opcionActiva : ''}`}
+                  aria-pressed={respuestas.inmuebles === v}
                   onClick={() => handleRespuesta('inmuebles', v)}
                 >
                   {v === 'si' ? 'Sí' : 'No'}
@@ -354,6 +356,7 @@ export default function OrientacionTramitacionHerenciasPage() {
                   type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.cuentas === v ? styles.opcionActiva : ''}`}
+                  aria-pressed={respuestas.cuentas === v}
                   onClick={() => handleRespuesta('cuentas', v)}
                 >
                   {v === 'si' ? 'Sí' : 'No'}
@@ -371,6 +374,7 @@ export default function OrientacionTramitacionHerenciasPage() {
                   type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.vehiculos === v ? styles.opcionActiva : ''}`}
+                  aria-pressed={respuestas.vehiculos === v}
                   onClick={() => handleRespuesta('vehiculos', v)}
                 >
                   {v === 'si' ? 'Sí' : 'No'}
@@ -388,6 +392,7 @@ export default function OrientacionTramitacionHerenciasPage() {
                   type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.deudas === v ? styles.opcionActiva : ''}`}
+                  aria-pressed={respuestas.deudas === v}
                   onClick={() => handleRespuesta('deudas', v)}
                 >
                   {v === 'si' ? 'Sí' : 'No'}
@@ -410,6 +415,7 @@ export default function OrientacionTramitacionHerenciasPage() {
                   type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.herederos === v ? styles.opcionActiva : ''}`}
+                  aria-pressed={respuestas.herederos === v}
                   onClick={() => handleRespuesta('herederos', v)}
                 >
                   {v === '1' ? '1 heredero' : v === '2-3' ? '2-3 herederos' : '4 o más'}
@@ -427,6 +433,7 @@ export default function OrientacionTramitacionHerenciasPage() {
                   type="button"
                   key={v}
                   className={`${styles.opcion} ${respuestas.menores === v ? styles.opcionActiva : ''}`}
+                  aria-pressed={respuestas.menores === v}
                   onClick={() => handleRespuesta('menores', v)}
                 >
                   {v === 'si' ? 'Sí' : 'No'}
@@ -483,7 +490,7 @@ export default function OrientacionTramitacionHerenciasPage() {
                         />
                         <span className={styles.itemTexto}>{item.texto}</span>
                       </label>
-                      {item.ayuda && <p className={styles.itemAyuda}>💡 {item.ayuda}</p>}
+                      {item.ayuda && <p className={styles.itemAyuda}><span aria-hidden="true">💡</span> {item.ayuda}</p>}
                       {item.donde && (
                         <p className={styles.itemDonde}>
                           📍 <strong>Dónde obtenerlo:</strong> {item.donde}
@@ -552,7 +559,7 @@ export default function OrientacionTramitacionHerenciasPage() {
 
         <div className={styles.plazosGrid}>
           <div className={`${styles.plazoCard} ${styles.plazoCriticoCard}`}>
-            <div className={styles.plazoIcono}>🔴</div>
+            <div className={styles.plazoIcono} role="img" aria-label="Plazo crítico">🔴</div>
             <h4>Impuesto de Sucesiones</h4>
             <p className={styles.plazoPeriodo}>6 MESES desde fallecimiento</p>
             <ul>
@@ -569,7 +576,7 @@ export default function OrientacionTramitacionHerenciasPage() {
           </div>
 
           <div className={`${styles.plazoCard} ${styles.plazoCriticoCard}`}>
-            <div className={styles.plazoIcono}>🔴</div>
+            <div className={styles.plazoIcono} role="img" aria-label="Plazo crítico">🔴</div>
             <h4>Plusvalía Municipal</h4>
             <p className={styles.plazoPeriodo}>6 MESES desde fallecimiento</p>
             <ul>
@@ -579,7 +586,7 @@ export default function OrientacionTramitacionHerenciasPage() {
           </div>
 
           <div className={`${styles.plazoCard} ${styles.plazoMedioCard}`}>
-            <div className={styles.plazoIcono}>🟡</div>
+            <div className={styles.plazoIcono} role="img" aria-label="Plazo intermedio">🟡</div>
             <h4>Seguros de Vida</h4>
             <p className={styles.plazoPeriodo}>5 AÑOS para reclamar</p>
             <ul>
@@ -589,7 +596,7 @@ export default function OrientacionTramitacionHerenciasPage() {
           </div>
 
           <div className={`${styles.plazoCard} ${styles.plazoFlexibleCard}`}>
-            <div className={styles.plazoIcono}>🟢</div>
+            <div className={styles.plazoIcono} role="img" aria-label="Plazo flexible">🟢</div>
             <h4>Registro de la Propiedad</h4>
             <p className={styles.plazoPeriodo}>Sin plazo fijo</p>
             <ul>

@@ -335,8 +335,8 @@ export default function CalculadoraMedicamentosMascotasPage() {
                   <div className={styles.productoHeader}>
                     <span className={styles.productoNombre}>{producto.nombre}</span>
                     <span className={`${styles.productoBadge} ${styles[producto.tipo]}`}>
-                      {producto.tipo === 'interno' ? '🐛 Interno' :
-                       producto.tipo === 'externo' ? '🦟 Externo' : '🔄 Mixto'}
+                      {producto.tipo === 'interno' ? <><span aria-hidden="true">🐛</span> Interno</> :
+                       producto.tipo === 'externo' ? <><span aria-hidden="true">🦟</span> Externo</> : <><span aria-hidden="true">🔄</span> Mixto</>}
                     </span>
                   </div>
                   <p className={styles.productoDescripcion}>{producto.descripcion}</p>
@@ -476,8 +476,8 @@ export default function CalculadoraMedicamentosMascotasPage() {
                   <span className={styles.sintomaEmoji}>{sintoma.emoji}</span>
                   <span className={styles.sintomaNombre}>{sintoma.nombre}</span>
                   <span className={`${styles.urgenciaBadge} ${styles[sintoma.urgencia]}`}>
-                    {sintoma.urgencia === 'alta' ? '🔴 Urgente' :
-                     sintoma.urgencia === 'media' ? '🟡 Consultar' : '🟢 Vigilar'}
+                    {sintoma.urgencia === 'alta' ? <><span aria-hidden="true">🔴</span> Urgente</> :
+                     sintoma.urgencia === 'media' ? <><span aria-hidden="true">🟡</span> Consultar</> : <><span aria-hidden="true">🟢</span> Vigilar</>}
                   </span>
                 </div>
 

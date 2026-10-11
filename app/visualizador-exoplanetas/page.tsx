@@ -463,7 +463,7 @@ export default function VisualizadorExoplanetas() {
               ))}
               {/* Observador */}
               <text x="150" y="148" textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.4)">
-                👁 Observador (nosotros)
+                <tspan aria-hidden="true">👁</tspan> Observador (nosotros)
               </text>
               {/* Flechas blueshift/redshift */}
               <text x="30" y="90" fontSize="8" fill="#4A9EFF">← Blueshift</text>

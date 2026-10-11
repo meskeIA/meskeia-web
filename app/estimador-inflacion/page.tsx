@@ -861,56 +861,56 @@ export default function CalculadoraInflacionPage() {
               <p>
                 El <strong>IPC general</strong> incluye todos los bienes y servicios, incluyendo energía y alimentos frescos (los más volátiles). El <strong>IPC subyacente</strong> excluye energía y alimentos no elaborados, dando una imagen más estable de la tendencia real. El <strong>IPCA</strong> (Índice de Precios al Consumo Armonizado) es comparable entre países europeos y es el que usa el BCE para fijar la política monetaria.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Cuándo mirar cuál:</strong> Para negociar salario, usa el IPC general. Para entender tendencias de largo plazo, usa el IPC subyacente. Para comparar con Europa, usa el IPCA.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Cuándo mirar cuál:</strong> Para negociar salario, usa el IPC general. Para entender tendencias de largo plazo, usa el IPC subyacente. Para comparar con Europa, usa el IPCA.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo calcula el INE el IPC y por qué no me representa?</h4>
               <p>
                 El INE calcula el IPC usando una <strong>cesta de la compra promedio</strong> de los hogares españoles (unos 500 artículos con distintos pesos). El peso de la vivienda es del ~27%, el transporte ~15%, la alimentación ~20%. Si tus gastos difieren mucho de la media (por ejemplo, pagas alquiler alto en Madrid), tu inflación personal puede ser bastante superior a la oficial. La inflación que sientes es real, aunque el dato estadístico sea distinto.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Calcula tu IPC personal: haz una lista de tus gastos mensuales y compara los precios de hace 1 año. Tu &quot;cesta personal&quot; puede mostrar una inflación del 5-15% cuando el dato oficial es del 2%.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Tip:</strong> Calcula tu IPC personal: haz una lista de tus gastos mensuales y compara los precios de hace 1 año. Tu &quot;cesta personal&quot; puede mostrar una inflación del 5-15% cuando el dato oficial es del 2%.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Por qué el BCE tiene un objetivo del 2% y no del 0%?</h4>
               <p>
                 Un poco de inflación (2%) es beneficioso porque: incentiva el consumo y la inversión (si los precios van a subir, mejor comprar/invertir ahora), da margen al BCE para bajar tipos en crisis, y evita la deflación (que es más difícil de combatir). Cero inflación es peligroso porque puede derivar en deflación (espiral de precios a la baja → menos consumo → menos producción → desempleo → Japón 1990-2020).
               </p>
-              <p className={styles.faqTip}>💡 <strong>Dato:</strong> El objetivo del 2% no es arbitrario: es el punto donde la inflación &quot;lubrica&quot; la economía sin erosionar el poder adquisitivo de forma perceptible en el día a día.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Dato:</strong> El objetivo del 2% no es arbitrario: es el punto donde la inflación &quot;lubrica&quot; la economía sin erosionar el poder adquisitivo de forma perceptible en el día a día.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué activos protegen mejor contra la inflación en España?</h4>
               <p>
                 Históricamente en España: <strong>Fondos indexados globales (MSCI World)</strong> han dado ~7% nominal (~4% real). <strong>Inmobiliario en grandes ciudades</strong>: rentabilidad variable pero buena cobertura a largo plazo. <strong>Bonos ligados al IPC (OBEIs)</strong>: rentabilidad garantizada sobre el IPC. <strong>Oro</strong>: buena cobertura en periodos de inflación extrema. Los <strong>depósitos y cuentas de ahorro</strong> solo protegen si la tasa supera el IPC.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Regla de oro:</strong> Tasa real = Tasa nominal - Inflación. Si el depósito da 2% y la inflación es 3%, tu tasa real es -1%: estás perdiendo dinero en términos reales.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Regla de oro:</strong> Tasa real = Tasa nominal - Inflación. Si el depósito da 2% y la inflación es 3%, tu tasa real es -1%: estás perdiendo dinero en términos reales.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuándo es mejor pedir una hipoteca: con inflación alta o baja?</h4>
               <p>
                 Con inflación alta, los tipos de interés (la tasa de interés que pagas por el crédito) suben (el BCE sube el euríbor para frenar la inflación), lo que encarece las hipotecas. Sin embargo, si la inflación es persistente y tu salario sube con ella, la cuota hipotecaria se vuelve relativamente más barata en términos reales con el tiempo. La lección del 2022: pedir hipoteca variable justo antes de una subida inflacionaria es muy arriesgado. Una hipoteca fija protege de este escenario.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Estrategia:</strong> En momentos de inflación baja y tipos bajos = hipoteca fija para asegurar condiciones. En momentos de tipos altos = hipoteca variable apostando a que bajen (más riesgo).</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Estrategia:</strong> En momentos de inflación baja y tipos bajos = hipoteca fija para asegurar condiciones. En momentos de tipos altos = hipoteca variable apostando a que bajen (más riesgo).</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo afecta la inflación a mi plan de jubilación?</h4>
               <p>
                 Si planeas jubilarte en 30 años con 1.000.000 € ahorrados, necesitas tener en cuenta que ese millón valdrá mucho menos en términos reales. Con inflación media del 2,5%, en 30 años ese millón equivaldrá en poder adquisitivo a unos <strong>475.000 € de hoy</strong>. Por eso los planes de pensiones deben invertir en activos que superen la inflación (renta variable) y no solo en depósitos o bonos de bajo rendimiento.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Calculadora:</strong> Usa la herramienta meskeIA de Calculadora Jubilación para simular tus necesidades ajustadas a la inflación.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Calculadora:</strong> Usa la herramienta meskeIA de Calculadora Jubilación para simular tus necesidades ajustadas a la inflación.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué es la &quot;inflación percibida&quot; y por qué suele ser mayor que la oficial?</h4>
               <p>
                 La inflación percibida es lo que sentimos que suben los precios, generalmente más alta que el IPC oficial. Razones: tendemos a recordar mejor los productos que más han subido (sesgo de negatividad), compramos más frecuentemente alimentos (que suelen subir más), y el IPC promedia toda España, no tu ciudad específica. En Madrid y Barcelona, el coste de la vivienda eleva la inflación personal muy por encima de la media nacional.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Tip:</strong> Usa la calculadora meskeIA para ver la inflación de periodos específicos relevantes para ti, no solo el dato anual promedio.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Tip:</strong> Usa la calculadora meskeIA para ver la inflación de periodos específicos relevantes para ti, no solo el dato anual promedio.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuándo ha sido más alta la inflación en España y qué pasó?</h4>
               <p>
                 El máximo histórico fue en <strong>1977: 26,4%</strong>, durante la crisis del petróleo y la transición política. En los años 80 se redujo gradualmente gracias a la política monetaria restrictiva. La entrada en la CEE en 1986 y más tarde el euro en 2002 ancló las expectativas inflacionarias. El segundo gran episodio fue <strong>2022: 8,3%</strong> por la crisis energética post-COVID y la guerra de Ucrania, el mayor en 40 años.
               </p>
-              <p className={styles.faqTip}>💡 <strong>Dato histórico:</strong> Con la calculadora puedes ver que 1.000 € de 1977 equivalen a más de 45.000 € hoy. La inflación acumulada en España desde 1961 supera el 4.000%.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Dato histórico:</strong> Con la calculadora puedes ver que 1.000 € de 1977 equivalen a más de 45.000 € hoy. La inflación acumulada en España desde 1961 supera el 4.000%.</p>
             </div>
           </div>
         </section>
