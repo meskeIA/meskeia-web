@@ -1266,6 +1266,7 @@ export const implementedAppsUrls = [
   "/calculadora-congelacion/",            // Qué congelar/cuánto dura (tabla+filtro) — Coquinum conservación
   "/descongelacion-segura/",              // Tiempo descongelación por peso/método seguro — Coquinum conservación
   "/calculadora-mermelada/",              // Mermelada: fruta/azúcar/limón + pectina — Coquinum conservación
+  "/calculadora-jabon/",                 // Jabón casero: sosa/potasa, agua y sobreengrase por mezcla de aceites (S0196)
   "/calculadora-encurtidos/",             // Encurtido rápido: vinagre/agua/sal/azúcar — Coquinum conservación
   "/fermentados-vegetales/",              // Fermentados: sal % (chucrut/kimchi/salmuera) — Coquinum conservación
   "/escalado-cocteles/",                  // Escala cócteles + graduación de la mezcla — Coquinum bebidas

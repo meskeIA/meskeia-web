@@ -6842,6 +6842,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-cocina/', icon: '🍳', name: 'Calculadora de Cocina', description: 'Conversor general de unidades' },
     { url: '/conversor-onzas/', icon: '⚖️', name: 'Conversor de Onzas', description: 'Onzas a gramos, ml, libras y tazas' },
   ],
+  'calculadora-jabon': [
+    { url: '/conversor-onzas/', icon: '⚖️', name: 'Onzas a Gramos', description: 'Muchas recetas de jabón vienen en onzas' },
+    { url: '/simulador-disoluciones/', icon: '🧪', name: 'Simulador de Disoluciones', description: 'Qué significa la concentración de la lejía' },
+    { url: '/visualizador-ph-acidos-bases/', icon: '🧪', name: 'pH: Ácidos y Bases', description: 'Por qué la sosa es una base tan fuerte' },
+    { url: '/simulador-estequiometria/', icon: '⚗️', name: 'Estequiometría', description: 'La misma cuenta que el índice de saponificación' },
+  ],
   'conversor-onzas': [
     { url: '/conversor-tazas-gramos/', icon: '🥄', name: 'Tazas a Gramos por Ingrediente', description: 'El peso real de cada taza de ingrediente' },
     { url: '/densidad-liquidos/', icon: '💧', name: 'Conversor de Líquidos', description: 'ml a gramos según el líquido' },

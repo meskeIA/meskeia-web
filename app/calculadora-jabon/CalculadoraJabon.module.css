@@ -1,0 +1,705 @@
+/* Calculadora de Jabón — usa los tokens de app/globals.css (no se redeclaran aquí) */
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  min-height: 100vh;
+}
+
+/* ─── Hero ─── */
+.hero {
+  text-align: center;
+  margin: 80px 0 var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: #ffffff;
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  opacity: 0.95;
+  margin: 0 auto;
+  max-width: 700px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── Paneles ─── */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.panelTitulo {
+  margin: 0 0 var(--spacing-lg);
+  font-size: 1.3rem;
+  color: var(--text-primary);
+}
+
+.subtitulo {
+  margin: var(--spacing-xl) 0 var(--spacing-md);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.etiqueta {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.nota {
+  margin: var(--spacing-md) 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+/* ─── Ejemplos y conmutadores ─── */
+.ejemplos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.btnEjemplo,
+.btnSecundario {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.btnEjemplo:hover,
+.btnSecundario:hover {
+  border-color: var(--primary);
+  background: var(--hover);
+}
+
+.btnSecundario {
+  font-weight: 600;
+  color: var(--primary-texto);
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  align-self: flex-start;
+}
+
+.toggleBoton,
+.toggleActivo {
+  padding: 0.6rem 1rem;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.toggleBoton {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.toggleBoton:hover {
+  background: var(--hover);
+}
+
+.toggleActivo {
+  background: var(--primary-boton);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ─── Tabla de aceites ─── */
+.tablaWrapper,
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.tablaAceites,
+.tablaDesglose,
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.tablaAceites thead th,
+.tablaDesglose thead th,
+.comparativaTable th {
+  background: var(--primary-boton);
+  color: #ffffff;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  font-weight: 600;
+}
+
+.tablaAceites td,
+.tablaDesglose td,
+.comparativaTable td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.tablaAceites tfoot th,
+.tablaAceites tfoot td {
+  padding: 0.6rem 0.75rem;
+  font-weight: 700;
+  text-align: left;
+  border-top: 2px solid var(--border);
+}
+
+.tablaDesglose thead th:nth-child(n + 2),
+.tablaDesglose td:nth-child(n + 2) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.select,
+.inputGramos {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.select {
+  width: 100%;
+  min-width: 220px;
+}
+
+.inputGramos {
+  width: 110px;
+  text-align: right;
+}
+
+.celdaPct,
+.celdaTotal {
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.celdaTotal {
+  color: var(--text-primary);
+}
+
+.btnQuitar {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.btnQuitar:hover:not(:disabled) {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.btnQuitar:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.accionesAceites {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.escalar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.campoInline {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+/* ─── Ajustes ─── */
+.ajustes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-lg);
+  align-items: start;
+}
+
+.grupoAgua {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* ─── Resultados ─── */
+.error {
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  background: rgba(244, 67, 54, 0.08);
+  border: 1px solid rgba(244, 67, 54, 0.5);
+  color: #b3261e;
+}
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-md);
+}
+
+.cifra {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--secondary);
+  border-radius: var(--radius);
+}
+
+.cifraAlcali {
+  border-top-color: var(--primary);
+}
+
+.cifraEtiqueta {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.cifraValor {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.datos {
+  margin: var(--spacing-lg) 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-xs) var(--spacing-xl);
+}
+
+.datos div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  font-size: 0.95rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.datos dt {
+  color: var(--text-secondary);
+}
+
+.datos dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.seguridad {
+  margin: var(--spacing-lg) 0 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 4px solid var(--warning);
+  background: rgba(255, 152, 0, 0.1);
+  border-radius: 6px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.avisos {
+  margin: var(--spacing-md) 0 0;
+  padding-left: 1.2rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.avisos li + li {
+  margin-top: var(--spacing-xs);
+}
+
+/* ─── Propiedades ─── */
+.propiedades {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md) var(--spacing-xl);
+}
+
+.propiedad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.propiedadCabecera {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.propiedadNombre {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.propiedadValor {
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+}
+
+.estadoDentro,
+.estadoFuera {
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.estadoDentro {
+  color: var(--secondary-texto);
+}
+
+.estadoFuera {
+  color: #a8590b;
+}
+
+.barra {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.barraRango {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(72, 169, 166, 0.35);
+}
+
+.barraValor {
+  position: absolute;
+  left: 0;
+  top: 3px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--primary-texto);
+}
+
+.propiedadAyuda {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+/* ─── Contenido educativo (patrón v2.0) ─── */
+.guideSection {
+  padding: var(--spacing-lg) 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.guideSection h2 {
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md);
+}
+
+.comparativaTable {
+  margin-top: var(--spacing-md);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.escenarioCard {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.escenarioCard h3 {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.escenarioCard p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.stepGuide {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex: 0 0 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--primary-boton);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.stepContent h3 {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  background: rgba(72, 169, 166, 0.08);
+  border: 1px solid rgba(72, 169, 166, 0.3);
+}
+
+.tipCard p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.tipIcon {
+  font-size: 1.3rem;
+}
+
+.warningBox {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--warning);
+  background: rgba(255, 152, 0, 0.08);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.warningIcon {
+  font-size: 1.3rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-primary);
+}
+
+.warningList li + li {
+  margin-top: var(--spacing-xs);
+}
+
+.faqList {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+
+.faqItem h3 {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.faqItem p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ─── Foco y movimiento ─── */
+.btnEjemplo:focus-visible,
+.btnSecundario:focus-visible,
+.toggleBoton:focus-visible,
+.toggleActivo:focus-visible,
+.btnQuitar:focus-visible,
+.select:focus-visible,
+.inputGramos:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnEjemplo,
+  .btnSecundario {
+    transition: none;
+  }
+}
+
+/* ─── Modo oscuro ─── */
+[data-theme='dark'] .hero {
+  color: #ffffff;
+}
+
+[data-theme='dark'] .error {
+  background: rgba(239, 83, 80, 0.14);
+  border-color: rgba(239, 83, 80, 0.6);
+  color: #ffb4ab;
+}
+
+[data-theme='dark'] .seguridad {
+  background: rgba(255, 167, 38, 0.14);
+}
+
+[data-theme='dark'] .estadoFuera {
+  color: #ffb870;
+}
+
+[data-theme='dark'] .barraRango {
+  background: rgba(90, 189, 185, 0.35);
+}
+
+[data-theme='dark'] .tipCard {
+  background: rgba(90, 189, 185, 0.1);
+  border-color: rgba(90, 189, 185, 0.35);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 167, 38, 0.1);
+}
+
+[data-theme='dark'] .toggleActivo,
+[data-theme='dark'] .stepNumber {
+  background: var(--primary-boton);
+  color: #ffffff;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .panel {
+    padding: var(--spacing-lg);
+  }
+
+  .cifras {
+    grid-template-columns: 1fr;
+  }
+
+  .cifraValor {
+    font-size: 1.6rem;
+  }
+
+  .select {
+    min-width: 0;
+    max-width: 150px;
+    font-size: 0.9rem;
+    padding: 0.45rem 0.3rem;
+  }
+
+  .inputGramos {
+    width: 70px;
+  }
+
+  .celdaPct {
+    font-size: 0.85rem;
+  }
+
+  .tablaAceites td,
+  .tablaAceites th,
+  .tablaDesglose td,
+  .tablaDesglose th {
+    padding: 0.45rem 0.4rem;
+  }
+}
