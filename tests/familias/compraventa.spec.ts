@@ -215,7 +215,10 @@ const HERMANAS: readonly Hermana[] = [
       'COMPRADOR: precio 25.000 · Madrid · segunda mano · perfil General · gestoría 300. ' +
       'VENDEDOR: compra original 18.000 · gastos de aquella compra 1.800 · 8 años · ' +
       'catastral suelo 5.000 · catastral total 12.000 · comisión 3 % · gestoría 500. ' +
-      'Publica COSTE TOTAL 27.252,05 € y NETO 22.898,25 €. · ' +
+      // NETO con el coeficiente IIVTNU vigente (Inspector, 08/10/2026; el comentario decía
+      // 22.898,25, el de hace 8 años). El COSTE TOTAL cambió con la rebaja del arancel del
+      // 11/10/2026 (C0209): su cifra al día está en el spec de la app, no aquí.
+      'Publica COSTE TOTAL (ver su spec) y NETO 22.807,12 €. · ' +
       'BASE R = base + compra original 24.000 (gana el método real de la plusvalía, NETO 23.645,83).',
     pestanas: true,
     sinIva: { selectorTerritorio: '#select-ccaa', operaciones: [/Primera mano/] },
@@ -364,7 +367,10 @@ const HERMANAS: readonly Hermana[] = [
       'COMPRADOR: precio 15.000 · Madrid · segunda mano · perfil General · gestoría 300. ' +
       'VENDEDOR: compra original 10.000 · gastos de aquella compra 1.000 · 5 años · ' +
       'catastral suelo 4.000 · catastral total 9.000 · comisión 3 % · gestoría 500. ' +
-      'Publica COSTE TOTAL 16.535,58 € y NETO 13.332,80 €. · ' +
+      // NETO con el coeficiente 0,18 vigente (Inspector, 06/10/2026; el comentario decía
+      // 13.332,80, el anterior). El COSTE TOTAL cambió con la rebaja del arancel del
+      // 11/10/2026 (C0209): su cifra al día está en el spec de la app, no aquí.
+      'Publica COSTE TOTAL (ver su spec) y NETO 13.324,70 €. · ' +
       'BASE R = base + compra original 14.000 (gana el método real de la plusvalía, NETO 13.938,89).',
     pestanas: true,
     sinIva: { selectorTerritorio: '#select-ccaa', operaciones: [/Primera mano/] },
