@@ -247,6 +247,38 @@
   margin: 0 0 1.25rem;
 }
 
+/* Por qué sale lo que sale (presupuesto, «sin tablet»): va antes de la descripción */
+.porque {
+  text-align: left;
+  background: var(--bg-primary);
+  border-left: 4px solid var(--primary);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  margin: 0 0 1.25rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.caracteristicas {
+  text-align: left;
+  margin: 0 0 1.5rem;
+}
+
+.caracteristicas h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.caracteristicas ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
 .alternativas {
   background: var(--bg-card);
   border-radius: 12px;

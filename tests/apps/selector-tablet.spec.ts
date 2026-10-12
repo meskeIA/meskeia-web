@@ -1,4 +1,5 @@
 import { test, expect, Page, devices } from '@playwright/test';
+import { calcularResultado, motivosParaTablet, PREGUNTAS, TRAMO_MINIMO_IPADOS_NUEVO } from '../../app/selector-tablet/motor';
 
 /**
  * Selector de Tablet (selector-tablet) — primera inspección, 10/10/2026
@@ -27,6 +28,13 @@ import { test, expect, Page, devices } from '@playwright/test';
  * Índices de los perfiles: base 0 en el orden de las opciones de page.tsx. Cada valor esperado de
  * abajo se resolvió a mano con la tabla de puntos ANTES de abrir el navegador.
  * Los casos con test.fail() demuestran hallazgos ABIERTOS (inspector 10/10/2026).
+ *
+ * REPARADOS el 12/10/2026, con decisión del usuario (3195, 3196) y la pauta de marcas (3205):
+ *   el motor salió a app/selector-tablet/motor.ts. «Sin tablet» sale por el criterio de la propia
+ *   guía (ninguno de sus cuatro motivos y un portátil en uso), no por puntos; por debajo de
+ *   TRAMO_MINIMO_IPADOS_NUEVO (apple.com/es, 12/10/2026: «Desde 499 €») iPadOS se descarta y la
+ *   tarjeta lo dice; «iPad (iOS)» pasa a «Tablet con iPadOS» y no quedan marcas ni modelos.
+ *   La sección «motor» del final lo recorre sin navegador.
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -185,7 +193,7 @@ test.describe('casos resueltos a mano', () => {
     const r = await leerResultado(page);
     // 8 · 12 · 19 · 3 · 5 → Windows (19); alternativas: iPad (12), Android (8).
     expect(r.titulo).toBe('Tablet Windows (2 en 1)');
-    expect(r.alternativas).toEqual(['🍎 iPad (iOS)', '🤖 Tablet Android']);
+    expect(r.alternativas).toEqual(['🍎 Tablet con iPadOS', '🤖 Tablet Android']);
   });
 
   test('rechazo y robustez: sin respuesta no se avanza, «Anterior» conserva y recalcula, «Repetir» vuelve a cero', async ({ page }) => {
@@ -253,32 +261,33 @@ test.describe('casos resueltos a mano', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('hallazgos del motor', () => {
-  test('«Sin tablet» es inalcanzable: el perfil que la guía describe como «no la necesitas» sale Android', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). La guía de la app: «Una tablet aporta valor real cuando lees
-    // mucho en pantalla grande, dibujas digitalmente, tienes hijos en edad escolar o necesitas un
-    // segundo dispositivo más ligero para viajar». SIN_TABLET no cumple ninguna, y aun así:
-    // 17 · 5 · 2 · 10 · 11 → Android. En el barrido, sin_tablet no gana en ninguno de 174.960.
-    test.fail();
+  test('hallazgo 3195: el perfil que la guía describe como «no la necesitas» sale «Sin tablet», y dice por qué', async ({ page }) => {
+    // REPARADO (12/10/2026). La guía de la app: «Una tablet aporta valor real cuando lees mucho en
+    // pantalla grande, dibujas digitalmente, tienes hijos en edad escolar o necesitas un segundo
+    // dispositivo más ligero para viajar». SIN_TABLET no cumple ninguna y usa mucho un portátil
+    // Windows: por puntos daba 17 · 5 · 2 · 10 · 11 → Android; ahora decide el criterio de la guía.
+    // Alternativas, las dos con más puntos fuera de la ganadora: Android (17) y eReader (10).
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, SIN_TABLET);
     const r = await leerResultado(page);
     expect(r.titulo).toMatch(/sin tablet/i);
+    expect(r.texto).toMatch(/ninguno de los cuatro casos/);
+    expect(r.alternativas).toEqual(['🤖 Tablet Android', '📚 eReader']);
   });
 
-  test('C0016: el presupuesto solo suma puntos — iPad con «Menos de 150 €» y sin una palabra del precio', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Forma del 1678 de selector-smartphone (GAMA_MINIMA_IPHONE_NUEVO)
-    // y del 1407 de selector-portatil (MAC_GAMA_MINIMA): no hay iPad nuevo por debajo de 150 €, y la
-    // app lo recomienda sin decirlo. IPAD_150: 17 · 24 · 0 · 5 · 3 → iPad (6.481 perfiles así con
-    // «Menos de 150 €» y 6.528 con «Entre 150 € y 350 €»). Correcto: o no sale iPad, o la pantalla
-    // dice que en ese tramo no hay iPad nuevo.
-    test.fail();
+  test('hallazgo 3196 (C0016): con «Menos de 150 €» no sale iPadOS, y la tarjeta dice por qué', async ({ page }) => {
+    // REPARADO (12/10/2026). Forma del 1678 de selector-smartphone (GAMA_MINIMA_IPHONE_NUEVO) y del
+    // 1407 de selector-portatil (MAC_GAMA_MINIMA). apple.com/es, 12/10/2026: la de entrada, «Desde
+    // 499 €». IPAD_150: 17 · 24 · 0 · 5 · 3 → sin iPadOS gana Android (17); alternativas eReader (5)
+    // y Sin tablet (3). Tiene motivos (dibujo, adolescente, viaje), así que no es «Sin tablet».
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, IPAD_150);
     const r = await leerResultado(page);
-    const ipadSinAviso = r.titulo === 'iPad (iOS)' && !/presupuesto|150\s?€|reacondicionad|segunda mano/i.test(r.texto);
-    expect(ipadSinAviso, `resultado «${r.titulo}»`).toBe(false);
+    expect(r.titulo).toBe('Tablet Android');
+    expect(r.texto).toMatch(/habría salido una tablet con iPadOS, pero en tu presupuesto no hay ninguna nueva/);
+    expect(r.alternativas).toEqual(['📚 eReader', '📱 Sin tablet adicional']);
   });
 
   test('un requisito «imprescindible» solo suma: eReader a quien necesita software de escritorio', async ({ page }) => {
@@ -300,7 +309,8 @@ test.describe('hallazgos del motor', () => {
     // ABIERTO (inspector 10/10/2026). EMPATE: 17 · 17 · 5 · 4 · 2. El reduce con `>` estricto se
     // queda con 'android', la primera clave, y el iPad baja a «También podrías considerar» sin que
     // nada diga que empatan. 17.635 perfiles (10,1 %) tienen empate en cabeza. Medido hoy: «Tablet
-    // Android» y, primera de «También podrías considerar», «🍎 iPad (iOS)».
+    // Android» y, primera de «También podrías considerar», «🍎 iPad (iOS)» (desde el 12/10/2026,
+    // «🍎 Tablet con iPadOS»).
     test.fail();
     test.setTimeout(60_000);
     await abrir(page);
@@ -419,18 +429,20 @@ test.describe('contenido y HTML servido', () => {
     for (const c of contextos) expect(c).toMatch(/datePublished\\?":\\?"2025-01-22/);
   });
 
-  test('el resultado no nombra marcas ni modelos (pauta del catálogo, commit 81fd4bea)', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). La tarjeta del eReader dice «Dispositivos como Kindle o Kobo
-    // ofrecen la mejor experiencia de lectura posible» y la de Android «gamas altas como Samsung
-    // Galaxy Tab»; la guía añade «Kindle Paperwhite», «Surface, HP Spectre», «Samsung Galaxy Tab,
-    // Lenovo, Xiaomi», y el FAQPage «Surface» dos veces. La pauta: características a buscar, no
-    // marcas ni modelos. iPadOS / Android como plataforma no cuentan (como iOS en la referencia).
-    test.fail();
+  test('hallazgo 3205: ni el resultado, ni la guía, ni el FAQPage nombran marcas o modelos (pauta 81fd4bea)', async ({ page }) => {
+    // REPARADO (12/10/2026). Antes: «Kindle o Kobo» y «Samsung Galaxy Tab» en las tarjetas; «Kindle
+    // Paperwhite», «Surface, HP Spectre», «Samsung Galaxy Tab, Lenovo, Xiaomi» y «Apple Pencil» en la
+    // guía; «Surface» dos veces en el FAQPage. La pauta: características a buscar, no marcas ni
+    // modelos. iPadOS / Android / Windows como plataforma no cuentan (como iOS en la referencia).
     test.setTimeout(60_000);
+    const MARCAS = /Kindle|Kobo|Samsung|Galaxy|Surface|Spectre|Lenovo|Xiaomi|Pencil|Paperwhite/;
+    const html = await (await page.request.get('/selector-tablet/')).text();
+    expect(html).not.toMatch(MARCAS);
     await abrir(page);
     await responder(page, LECTOR);
-    const tarjeta = await page.locator('[class*="resultadoCard"]').innerText();
-    expect(tarjeta).not.toMatch(/Kindle|Kobo|Samsung|Galaxy|Surface|Spectre|Lenovo|Xiaomi/);
+    expect(await page.locator('main').innerText()).not.toMatch(MARCAS);
+    // Y en su lugar, las características a buscar.
+    await expect(page.locator('[class*="caracteristicas"] li')).toHaveCount(4);
   });
 
   test('con el presupuesto en euros, la app declara el ámbito de sus datos (RegionBadge es-data)', async ({ page }) => {
@@ -671,3 +683,38 @@ async function contrasteMinimo(page: Page, selector: string): Promise<number> {
     return min;
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. El motor, sin navegador: los 174.960 perfiles (5·3·4·3^6·4)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function* perfiles(p = 0, acum: number[] = []): Generator<number[]> {
+  if (p === PREGUNTAS.length) { yield acum; return; }
+  for (let i = 0; i < PREGUNTAS[p].opciones.length; i++) yield* perfiles(p + 1, [...acum, i]);
+}
+
+test('motor: «Sin tablet» sale si y solo si no hay motivo y hay portátil en uso; iPadOS nunca bajo su tramo', () => {
+  let total = 0;
+  let sinTablet = 0;
+  for (const r of perfiles()) {
+    total++;
+    const res = calcularResultado(r);
+    const sinMotivo = motivosParaTablet(r).length === 0;
+    const portatil = r[9] === 0 || r[9] === 1;
+    if ((res.ganador === 'sin_tablet') !== (sinMotivo && portatil)) {
+      throw new Error(`perfil ${r.join(',')}: ganador ${res.ganador}, sin motivo ${sinMotivo}, portátil ${portatil}`);
+    }
+    if (res.ganador === 'sin_tablet') sinTablet++;
+    if (r[2] < TRAMO_MINIMO_IPADOS_NUEVO && (res.ganador === 'ios_ipad' || res.alternativas.includes('ios_ipad'))) {
+      throw new Error(`perfil ${r.join(',')}: iPadOS con presupuesto ${r[2]}`);
+    }
+    if (res.alternativas.includes(res.ganador) || res.alternativas.length !== 2) {
+      throw new Error(`perfil ${r.join(',')}: alternativas ${res.alternativas.join(',')}`);
+    }
+  }
+  expect(total).toBe(174_960);
+  // A mano: P1 sin leer ni dibujo (3 de 5) · P5 sin lápiz principal (2 de 3) · P6 sin «Leo mucho»
+  // (2 de 3) · P8 adulto (1 de 3) · P9 sin viajar (2 de 3) · P10 portátil en uso (2 de 4), con P2,
+  // P3, P4 y P7 libres (3 · 4 · 3 · 3): 3·2·2·1·2·2 · 108 = 5.184 perfiles (el 3,0 %).
+  expect(sinTablet).toBe(5_184);
+});

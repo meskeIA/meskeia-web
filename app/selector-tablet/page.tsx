@@ -11,219 +11,120 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
+import {
+  calcularResultado,
+  PREGUNTAS,
+  type Motivo,
+  type ResultadoMotor,
+  type TipoTablet,
+} from './motor';
 
-// ─── Tipos ────────────────────────────────────────────────────────────────────
-
-type TipoTablet = 'android' | 'ios_ipad' | 'windows' | 'ereader' | 'sin_tablet';
-
-interface PuntajeMap {
-  android: number;
-  ios_ipad: number;
-  windows: number;
-  ereader: number;
-  sin_tablet: number;
-}
-
-interface Opcion {
-  texto: string;
-  icono: string;
-  puntaje: Partial<PuntajeMap>;
-}
-
-interface Pregunta {
-  id: number;
-  texto: string;
-  opciones: Opcion[];
-}
+// ─── Resultados ───────────────────────────────────────────────────────────────
+// Sin marcas, modelos ni precios concretos: la plataforma y las características a buscar, como en
+// selector-smartphone (pauta del catálogo, 81fd4bea; hallazgo 3205). Las preguntas, los puntos y
+// las reglas de descarte viven en ./motor.
 
 interface ResultadoInfo {
-  tipo: TipoTablet;
   emoji: string;
   titulo: string;
   descripcion: string;
+  /** Encabezado del bloque de características. */
+  queMirar: string;
+  caracteristicas: string[];
 }
-
-// ─── Datos ────────────────────────────────────────────────────────────────────
-
-const PREGUNTAS: Pregunta[] = [
-  {
-    id: 1,
-    texto: '¿Cuál será tu uso principal de la tablet?',
-    opciones: [
-      { texto: 'Leer libros, revistas o artículos', icono: '📚', puntaje: { ereader: 4, android: 1 } },
-      { texto: 'Entretenimiento: vídeo, música y redes sociales', icono: '🎬', puntaje: { android: 3, ios_ipad: 2 } },
-      { texto: 'Trabajo y productividad (documentos, correo, videollamadas)', icono: '💼', puntaje: { windows: 3, ios_ipad: 2, android: 1 } },
-      { texto: 'Dibujo digital y creatividad', icono: '🎨', puntaje: { ios_ipad: 4, android: 2 } },
-      { texto: 'Estudio (apuntes, PDFs, apps educativas)', icono: '🎓', puntaje: { ios_ipad: 3, android: 2, windows: 2 } },
-    ],
-  },
-  {
-    id: 2,
-    texto: '¿Tienes ya smartphone y cuál es su sistema operativo?',
-    opciones: [
-      { texto: 'Sí, tengo iPhone (iOS)', icono: '📱', puntaje: { ios_ipad: 3 } },
-      { texto: 'Sí, tengo Android', icono: '🤖', puntaje: { android: 2 } },
-      { texto: 'No tengo smartphone o tengo un modelo básico', icono: '📵', puntaje: { android: 1, ios_ipad: 1 } },
-    ],
-  },
-  {
-    id: 3,
-    texto: '¿Cuánto estás dispuesto/a a gastar en la tablet?',
-    opciones: [
-      { texto: 'Menos de 150 €', icono: '💶', puntaje: { android: 3, ereader: 3, sin_tablet: 2 } },
-      { texto: 'Entre 150 € y 350 €', icono: '💵', puntaje: { android: 3, ereader: 2 } },
-      { texto: 'Entre 350 € y 700 €', icono: '💴', puntaje: { ios_ipad: 2, android: 1, windows: 2 } },
-      { texto: 'Más de 700 €', icono: '💎', puntaje: { ios_ipad: 3, windows: 3 } },
-    ],
-  },
-  {
-    id: 4,
-    texto: '¿Necesitarás teclado físico para escribir documentos largos?',
-    opciones: [
-      { texto: 'Sí, es fundamental para mí', icono: '⌨️', puntaje: { windows: 4, ios_ipad: 2 } },
-      { texto: 'A veces, pero no es imprescindible', icono: '🤔', puntaje: { ios_ipad: 2, android: 1 } },
-      { texto: 'No, escribiré poco o usaré teclado táctil', icono: '👆', puntaje: { android: 2, ereader: 2, sin_tablet: 1 } },
-    ],
-  },
-  {
-    id: 5,
-    texto: '¿Piensas usar lápiz digital o stylus para dibujar o tomar apuntes?',
-    opciones: [
-      { texto: 'Sí, es una de mis razones principales para comprar tablet', icono: '✏️', puntaje: { ios_ipad: 4, android: 2 } },
-      { texto: 'Quizás lo use ocasionalmente', icono: '🖊️', puntaje: { ios_ipad: 1, android: 1 } },
-      { texto: 'No lo usaré', icono: '🚫', puntaje: { android: 1, ereader: 2, sin_tablet: 1 } },
-    ],
-  },
-  {
-    id: 6,
-    texto: '¿Cuánto lees actualmente (libros, artículos largos)?',
-    opciones: [
-      { texto: 'Leo mucho, es mi actividad principal en pantalla', icono: '📖', puntaje: { ereader: 4, android: 1 } },
-      { texto: 'Leo con regularidad, pero también hago otras cosas', icono: '📰', puntaje: { android: 2, ios_ipad: 1, ereader: 1 } },
-      { texto: 'Leo poco; prefiero vídeo y redes sociales', icono: '🎥', puntaje: { android: 2, ios_ipad: 2, sin_tablet: 1 } },
-    ],
-  },
-  {
-    id: 7,
-    texto: '¿Necesitas compatibilidad con software profesional de escritorio (Adobe CC, Office completo, programas específicos de tu sector)?',
-    opciones: [
-      { texto: 'Sí, es imprescindible', icono: '🖥️', puntaje: { windows: 4, sin_tablet: 1 } },
-      { texto: 'Prefiero versiones móviles o web de esas apps', icono: '☁️', puntaje: { ios_ipad: 2, android: 2 } },
-      { texto: 'No necesito software de escritorio', icono: '📲', puntaje: { android: 2, ereader: 1, sin_tablet: 1 } },
-    ],
-  },
-  {
-    id: 8,
-    texto: '¿Es para un niño o adolescente?',
-    opciones: [
-      { texto: 'Sí, para un niño menor de 10 años', icono: '👧', puntaje: { android: 3 } },
-      { texto: 'Sí, para un adolescente (10-17 años)', icono: '🧑', puntaje: { android: 2, ios_ipad: 2 } },
-      { texto: 'No, es para uso adulto', icono: '🧑‍💼', puntaje: { ios_ipad: 1, windows: 1, ereader: 1 } },
-    ],
-  },
-  {
-    id: 9,
-    texto: '¿Viajas frecuentemente y necesitas usarla fuera de casa durante horas?',
-    opciones: [
-      { texto: 'Sí, la usaré mucho en transporte y viajes', icono: '✈️', puntaje: { ereader: 2, ios_ipad: 2, android: 2 } },
-      { texto: 'Ocasionalmente, pero principalmente en casa', icono: '🏠', puntaje: { android: 1, ereader: 1, sin_tablet: 1 } },
-      { texto: 'Prácticamente siempre en casa o la oficina', icono: '🖥️', puntaje: { windows: 1, sin_tablet: 2 } },
-    ],
-  },
-  {
-    id: 10,
-    texto: '¿Ya tienes un portátil o PC que usas con frecuencia?',
-    opciones: [
-      { texto: 'Sí, tengo portátil Windows y lo uso mucho', icono: '💻', puntaje: { android: 2, ereader: 1, sin_tablet: 3 } },
-      { texto: 'Sí, tengo Mac y lo uso mucho', icono: '🍎', puntaje: { ios_ipad: 3, android: 1 } },
-      { texto: 'Tengo PC pero lo uso poco o quiero reemplazarlo', icono: '🖥️', puntaje: { windows: 2, ios_ipad: 1 } },
-      { texto: 'No tengo portátil o mi PC está anticuado', icono: '❌', puntaje: { windows: 3, ios_ipad: 2, android: 2 } },
-    ],
-  },
-];
 
 const RESULTADOS: Record<TipoTablet, ResultadoInfo> = {
   android: {
-    tipo: 'android',
     emoji: '🤖',
     titulo: 'Tablet Android',
     descripcion:
-      'Mayor variedad de precios y tamaños, ecosistema abierto, ideal para entretenimiento y uso general. Encontrarás opciones desde 100 € hasta gamas altas como Samsung Galaxy Tab.',
+      'Mayor variedad de precios y tamaños, ecosistema abierto, ideal para entretenimiento y uso general. Hay modelos de varios fabricantes en todas las gamas de precio.',
+    queMirar: 'Qué mirar al comprarla',
+    caracteristicas: [
+      'Los años de actualizaciones de sistema y de seguridad que el fabricante comprometa por escrito',
+      'Pantalla de 10-11 pulgadas para vídeo y estudio; de 8 si prima llevarla encima',
+      'Almacenamiento ampliable con tarjeta microSD si vas a guardar vídeo o libros',
+      'Control parental y perfiles de usuario si la va a usar un menor',
+    ],
   },
   ios_ipad: {
-    tipo: 'ios_ipad',
     emoji: '🍎',
-    titulo: 'iPad (iOS)',
+    titulo: 'Tablet con iPadOS',
     descripcion:
-      'La mejor opción para creatividad, dibujo digital y apps de productividad premium. Ofrece la mejor integración con iPhone y Mac, y una experiencia de usuario muy pulida.',
+      'La plataforma con más recorrido en creatividad, dibujo digital y apps de productividad. Se integra con iPhone y Mac, y ofrece una experiencia de usuario muy pulida.',
+    queMirar: 'Qué mirar al comprarla',
+    caracteristicas: [
+      'Qué lápiz admite cada modelo: no todos son compatibles con los mismos',
+      'Almacenamiento suficiente desde el principio: no se puede ampliar después',
+      'Solo Wi-Fi o también datos móviles, según dónde la vayas a usar',
+      'Una generación anterior o un equipo reacondicionado con garantía, si el precio aprieta',
+    ],
   },
   windows: {
-    tipo: 'windows',
     emoji: '🪟',
     titulo: 'Tablet Windows (2 en 1)',
     descripcion:
       'Para quienes necesitan un ordenador portátil compacto con compatibilidad total con programas de escritorio. Ideal si quieres sustituir tu portátil con flexibilidad táctil.',
+    queMirar: 'Qué mirar al comprarla',
+    caracteristicas: [
+      'Procesador y memoria RAM de portátil, no de tablet, si vas a usar programas de escritorio',
+      'Si el teclado acoplable viene incluido o se compra aparte',
+      'Autonomía declarada en uso real, no solo en reposo',
+      'Puertos (USB-C, carga, pantalla externa) para conectar lo que ya usas',
+    ],
   },
   ereader: {
-    tipo: 'ereader',
     emoji: '📚',
     titulo: 'eReader (lector de libros electrónicos)',
     descripcion:
-      'Para lectura intensiva con batería de semanas, sin distracciones y con pantalla sin reflejos. Dispositivos como Kindle o Kobo ofrecen la mejor experiencia de lectura posible.',
+      'Para lectura intensiva: pantalla de tinta electrónica sin reflejos, batería de semanas y sin distracciones. Los venden varios fabricantes, unos ligados a su propia tienda de libros y otros abiertos.',
+    queMirar: 'Qué mirar al comprarlo',
+    caracteristicas: [
+      'Luz frontal regulable, y temperatura de color si lees de noche',
+      'Los formatos que admite (EPUB, PDF) y si lee los de la tienda o la biblioteca que usas',
+      'Pantalla de 6-7 pulgadas para novela; más grande si vas a leer PDF o cómics',
+      'Resistencia al agua si lees en la playa o en la bañera',
+    ],
   },
   sin_tablet: {
-    tipo: 'sin_tablet',
     emoji: '📱',
     titulo: 'Sin Tablet — Tu Smartphone o Portátil son Suficientes',
     descripcion:
       'Si tu uso no justifica un dispositivo extra, el smartphone o portátil cubren tus necesidades perfectamente. Ahórrate el gasto y la complejidad de gestionar otro dispositivo.',
+    queMirar: 'Antes de descartarla del todo',
+    caracteristicas: [
+      'Si tu móvil tiene pantalla grande (6,5 pulgadas o más), cubre casi todo lo que haría una tablet pequeña',
+      'Si el portátil pesa poco, también te sirve fuera de casa',
+      'Si echas en falta leer en pantalla grande, un eReader es más barato que una tablet',
+    ],
   },
 };
 
 const ALTERNATIVAS_LABELS: Record<TipoTablet, string> = {
   android: '🤖 Tablet Android',
-  ios_ipad: '🍎 iPad (iOS)',
+  ios_ipad: '🍎 Tablet con iPadOS',
   windows: '🪟 Tablet Windows',
   ereader: '📚 eReader',
   sin_tablet: '📱 Sin tablet adicional',
 };
 
-// ─── Lógica de cálculo ────────────────────────────────────────────────────────
+const NOMBRE_MOTIVO: Record<Motivo, string> = {
+  leer: 'leer mucho',
+  dibujar: 'dibujar',
+  menores: 'uso infantil o adolescente',
+  viajar: 'viajar',
+};
 
-function calcularResultado(respuestas: (number | null)[]): TipoTablet {
-  const totales: PuntajeMap = { android: 0, ios_ipad: 0, windows: 0, ereader: 0, sin_tablet: 0 };
-
-  respuestas.forEach((respuestaIdx, preguntaIdx) => {
-    if (respuestaIdx === null) return;
-    const opcion = PREGUNTAS[preguntaIdx]?.opciones[respuestaIdx];
-    if (!opcion) return;
-    (Object.keys(opcion.puntaje) as TipoTablet[]).forEach((tipo) => {
-      totales[tipo] += opcion.puntaje[tipo] ?? 0;
-    });
-  });
-
-  return (Object.keys(totales) as TipoTablet[]).reduce(
-    (mejor, tipo) => (totales[tipo as TipoTablet] > totales[mejor] ? (tipo as TipoTablet) : mejor),
-    'android' as TipoTablet,
-  );
-}
-
-function calcularAlternativas(respuestas: (number | null)[], ganador: TipoTablet): TipoTablet[] {
-  const totales: PuntajeMap = { android: 0, ios_ipad: 0, windows: 0, ereader: 0, sin_tablet: 0 };
-
-  respuestas.forEach((respuestaIdx, preguntaIdx) => {
-    if (respuestaIdx === null) return;
-    const opcion = PREGUNTAS[preguntaIdx]?.opciones[respuestaIdx];
-    if (!opcion) return;
-    (Object.keys(opcion.puntaje) as TipoTablet[]).forEach((tipo) => {
-      totales[tipo as TipoTablet] += opcion.puntaje[tipo] ?? 0;
-    });
-  });
-
-  return (Object.keys(totales) as TipoTablet[])
-    .filter((t) => t !== ganador)
-    .sort((a, b) => totales[b as TipoTablet] - totales[a as TipoTablet])
-    .slice(0, 2) as TipoTablet[];
+/** Por qué sale lo que sale, cuando no se explica solo con la descripción. */
+function porQue(r: ResultadoMotor): string | null {
+  if (r.ganador === 'sin_tablet') {
+    const casos = (Object.values(NOMBRE_MOTIVO) as string[]).join(', ');
+    return `Tus respuestas no tocan ninguno de los cuatro casos en que una tablet suele aportar algo que no dan el móvil y el portátil (${casos}), y ya usas mucho un portátil.`;
+  }
+  if (r.ipadosHabriaSalido) {
+    return 'Por tus respuestas habría salido una tablet con iPadOS, pero en tu presupuesto no hay ninguna nueva: el modelo de entrada está por encima de 350 €. Si quieres esa plataforma, la vía en tu tramo es una reacondicionada o de segunda mano.';
+  }
+  return null;
 }
 
 // ─── Componente principal ────────────────────────────────────────────────────
@@ -233,7 +134,7 @@ export default function SelectorTabletPage() {
   const [respuestas, setRespuestas] = useState<(number | null)[]>(
     Array(PREGUNTAS.length).fill(null),
   );
-  const [resultado, setResultado] = useState<TipoTablet | null>(null);
+  const [resultado, setResultado] = useState<ResultadoMotor | null>(null);
 
   const totalPreguntas = PREGUNTAS.length;
   const pregunta = PREGUNTAS[preguntaActual];
@@ -251,8 +152,7 @@ export default function SelectorTabletPage() {
     if (preguntaActual < totalPreguntas - 1) {
       setPreguntaActual((p) => p + 1);
     } else {
-      const ganador = calcularResultado(respuestas);
-      setResultado(ganador);
+      setResultado(calcularResultado(respuestas));
     }
   };
 
@@ -268,8 +168,9 @@ export default function SelectorTabletPage() {
     setResultado(null);
   };
 
-  const info = resultado ? RESULTADOS[resultado] : null;
-  const alternativas = resultado ? calcularAlternativas(respuestas, resultado) : [];
+  const info = resultado ? RESULTADOS[resultado.ganador] : null;
+  const alternativas = resultado ? resultado.alternativas : [];
+  const explicacion = resultado ? porQue(resultado) : null;
 
   return (
     <div className={styles.container}>
@@ -334,7 +235,16 @@ export default function SelectorTabletPage() {
             <div className={styles.resultadoCard} role="region" aria-label={`Tu tablet ideal: ${info.titulo}`}>
               <span className={styles.resultadoEmoji} aria-hidden="true">{info.emoji}</span>
               <h2>{info.titulo}</h2>
+              {explicacion && <p className={styles.porque}>{explicacion}</p>}
               <p>{info.descripcion}</p>
+              <div className={styles.caracteristicas}>
+                <h3>{info.queMirar}</h3>
+                <ul>
+                  {info.caracteristicas.map((c) => (
+                    <li key={c}>{c}</li>
+                  ))}
+                </ul>
+              </div>
               <button type="button" className={styles.btnReiniciar} onClick={reiniciar}>
                 Repetir el test
               </button>
@@ -364,12 +274,12 @@ export default function SelectorTabletPage() {
           >
             <h3>Tipos de tablets: diferencias clave</h3>
             <p>
-              El mercado de tablets se divide principalmente en cuatro categorías: <strong>Android</strong> (Samsung Galaxy Tab, Lenovo, Xiaomi), <strong>iPad</strong> (Apple), <strong>Windows 2 en 1</strong> (Surface, HP Spectre) y <strong>eReaders</strong> (Kindle, Kobo). Cada una tiene un caso de uso ideal.
+              El mercado de tablets se divide principalmente en cuatro categorías: <strong>Android</strong> (de muchos fabricantes), <strong>iPadOS</strong> (solo la fabrica Apple), <strong>Windows 2 en 1</strong> (de varios fabricantes de portátiles) y <strong>eReaders</strong> de tinta electrónica. Cada una tiene un caso de uso ideal.
             </p>
 
-            <h3>¿Tablet Android o iPad?</h3>
+            <h3>¿Tablet Android o con iPadOS?</h3>
             <p>
-              Las tablets Android ofrecen una relación calidad-precio mejor en gamas medias y bajas, y mayor libertad para personalizar el sistema. Los iPads destacan en creatividad, dibujo con Apple Pencil y la calidad del ecosistema de apps, aunque su precio suele ser superior. Si ya tienes iPhone o Mac, el iPad se integra de forma natural.
+              Las tablets Android ofrecen una relación calidad-precio mejor en gamas medias y bajas, y mayor libertad para personalizar el sistema. Las tablets con iPadOS destacan en creatividad, dibujo con lápiz digital y la calidad del ecosistema de apps, aunque su precio suele ser superior. Si ya tienes iPhone o Mac, se integran de forma natural.
             </p>
 
             <h3>¿Cuándo elegir una tablet Windows?</h3>
@@ -379,7 +289,7 @@ export default function SelectorTabletPage() {
 
             <h3>eReaders: la opción olvidada</h3>
             <p>
-              Si tu uso principal es leer libros y artículos largos, un eReader como el Kindle Paperwhite ofrece ventajas que ninguna tablet puede igualar: pantalla de tinta electrónica sin reflejos, batería de semanas, peso mínimo y ausencia de distracciones. Son perfectos para lectores habituales.
+              Si tu uso principal es leer libros y artículos largos, un eReader ofrece ventajas que ninguna tablet puede igualar: pantalla de tinta electrónica sin reflejos, batería de semanas, peso mínimo y ausencia de distracciones. Son perfectos para lectores habituales.
             </p>
 
             <h3>¿Tablet o portátil (laptop/notebook)?</h3>

@@ -53,7 +53,7 @@ export const faqJsonLd = {
       name: '¿Qué tipo de tablet me conviene comprar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende de tu uso principal: si priorizas apps, juegos y multimedia, un iPad o tablet Android son las opciones más equilibradas. Si necesitas Office nativo y compatibilidad con software de escritorio, una tablet Windows (como Surface) es más adecuada. Para leer libros, una eReader con tinta electrónica ofrece mayor autonomía y menos fatiga visual.',
+        text: 'Depende de tu uso principal: si priorizas apps, juegos y multimedia, un iPad o tablet Android son las opciones más equilibradas. Si necesitas Office nativo y compatibilidad con software de escritorio, una tablet Windows es más adecuada. Para leer libros, una eReader con tinta electrónica ofrece mayor autonomía y menos fatiga visual.',
       },
     },
     {
@@ -61,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Es mejor un iPad o una tablet Android?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El iPad destaca por su ecosistema cerrado con mayor optimización de apps, mejor soporte a largo plazo y herramientas creativas como el Apple Pencil. Las tablets Android ofrecen más variedad de precios, mayor libertad de personalización y mejor integración con servicios de Google. La elección depende principalmente de si ya usas dispositivos Apple o Android en tu día a día.',
+        text: 'El iPad destaca por su ecosistema cerrado con mayor optimización de apps, mejor soporte a largo plazo y herramientas creativas como su lápiz digital. Las tablets Android ofrecen más variedad de precios, mayor libertad de personalización y mejor integración con servicios de Google. La elección depende principalmente de si ya usas dispositivos Apple o Android en tu día a día.',
       },
     },
     {
@@ -69,7 +69,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve una tablet Windows?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una tablet Windows (como las de la gama Surface o similares) ejecuta el mismo software que un ordenador de escritorio: Microsoft Office completo, programas de edición profesional y aplicaciones de empresa. Es ideal para quienes trabajan en movilidad y necesitan compatibilidad total con su entorno laboral, aunque suele tener mayor precio y menor autonomía que las tablets convencionales.',
+        text: 'Una tablet Windows ejecuta el mismo software que un ordenador de escritorio: Microsoft Office completo, programas de edición profesional y aplicaciones de empresa. Es ideal para quienes trabajan en movilidad y necesitan compatibilidad total con su entorno laboral, aunque suele tener mayor precio y menor autonomía que las tablets convencionales.',
       },
     },
     {
