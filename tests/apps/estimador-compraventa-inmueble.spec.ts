@@ -7520,7 +7520,8 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
    * nº 2.1 del Arancel de los Notarios. Vive en `calcularArancelNotarial` de data/itp-ccaa.ts y
    * alcanza a las siete apps de la familia, a «Estimar por mí», al bloque educativo y al FAQPage
    * («entre 650 € y 870 €» para 200.000 €). estimador-costes-divorcio ya la aplica con la misma
-   * escala (ARANCEL_NOTARIAL_DIVORCIO.rebajaEscala, data/fiscal/costas-judiciales.ts).
+   * escala (entonces ARANCEL_NOTARIAL_DIVORCIO.rebajaEscala; desde el 12/10/2026 lee la misma
+   * REBAJA_ARANCEL_CUANTIA de data/itp-ccaa.ts, cabo C0211).
    *
    * Madrid · 200.000 € · arancel (BOE, ver la cabecera de este describe):
    *   90,151816 + 24.040,49 × 4,5 ‰ (108,182205) + 30.050,60 × 1,5 ‰ (45,0759)

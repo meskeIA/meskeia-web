@@ -33,7 +33,8 @@ import {
   PORCENTAJES_IVA,
   UMBRALES_JUSTICIA_GRATUITA,
 } from '@/data/fiscal';
-import { ARANCELES_NOTARIO, LIMITE_ARANCEL_NOTARIAL } from '@/data/itp-ccaa';
+// La rebaja del 5 % del nº 2.1 sale de donde sale la escala, no de una copia (cabo C0211)
+import { ARANCELES_NOTARIO, LIMITE_ARANCEL_NOTARIAL, REBAJA_ARANCEL_CUANTIA } from '@/data/itp-ccaa';
 import { formatCurrency, formatPercentage } from '@/lib';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -150,7 +151,7 @@ export function escalaNotarial(valor: number): number {
     else total += (Math.min(reglado, tramo.hasta) - limiteAnterior) * (tramo.exceso / 100);
     limiteAnterior = tramo.hasta;
   }
-  return total * (1 - ARANCEL_NOTARIAL_DIVORCIO.rebajaEscala);
+  return total * (1 - REBAJA_ARANCEL_CUANTIA);
 }
 
 function cerrarPartida(conceptos: Concepto[], recargo: PartidaArancel['recargo']): PartidaArancel {
@@ -212,7 +213,7 @@ export function notarioArancel(e: Entrada): PartidaArancel | null {
   if (conBienes(e)) {
     // Norma general 4.ª.3: la escala se aplica a CADA cónyuge por lo que se le adjudica.
     const porConyuge = escalaNotarial(e.valorBienes / 2);
-    const rebaja = pct(ARANCEL_NOTARIAL_DIVORCIO.rebajaEscala);
+    const rebaja = pct(REBAJA_ARANCEL_CUANTIA);
     for (const n of [1, 2]) {
       conceptos.push({
         texto: `Liquidación de gananciales, cónyuge ${n}: escala del nº 2 sobre la mitad (${formatCurrency(e.valorBienes / 2)}), con la rebaja del ${rebaja}`,

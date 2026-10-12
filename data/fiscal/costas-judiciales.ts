@@ -174,8 +174,8 @@ export const ARANCEL_PROCURA_FAMILIA = {
 export const ARANCEL_NOTARIAL_DIVORCIO = {
   /** Anexo I, nº 1.1.h: «Demás documentos (estado civil…)», documento sin cuantía. */
   documentoSinCuantia: 30.050605,
-  /** Anexo I, nº 2.1, último párrafo: «se aplicará una rebaja del 5 por 100» a la escala. */
-  rebajaEscala: 0.05,
+  // La rebaja del 5 % de la escala del nº 2.1 NO va aquí: es REBAJA_ARANCEL_CUANTIA de
+  // data/itp-ccaa.ts, junto a la escala que rebaja (vivía dos veces hasta el 12/10/2026, C0211).
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1989-28111',
 } as const;
 
