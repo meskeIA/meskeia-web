@@ -323,7 +323,11 @@ test.describe('MOTOR · casos resueltos a mano', () => {
     expect(escalaProcura(4800)).toBe(187.42);
     expect(escalaProcura(150000)).toBe(1294.12);
     expect(escalaProcura(300000)).toBe(1472.62); // «no exceda de» 300.000: el escalón incluye el límite
-    expect(escalaNotarial(75000)).toBeCloseTo(245.39155, 4);
+    // 75.000 €, a mano con la base del BOE (90,151816; hasta el 11/10/2026 aquí se esperaba
+    // 245,39155, calculado con la base redondeada a 90,15 — hallazgo 2901):
+    //   90,151816 + 24.040,49 × 0,45 % (108,182205) + 30.050,60 × 0,15 % (45,0759)
+    //   + 14.898,79 × 0,10 % (14,89879) = 258,308711 → × 0,95 = 245,393275
+    expect(escalaNotarial(75000)).toBeCloseTo(245.393275, 4);
   });
 
   test('procurador y notario de los casos de la cabecera', () => {
