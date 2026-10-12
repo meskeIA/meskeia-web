@@ -39,7 +39,7 @@ const TABLAS = [
     riesgo              INTEGER,        -- 1 critico · 2 alto · 3 medio · 4 informativo
     usos                INTEGER DEFAULT 0,
     duracion_media      REAL    DEFAULT 0,
-    hash_codigo         TEXT,           -- huella de page/layout/metadata/css de la app
+    hash_codigo         TEXT,           -- huella de todos los .ts/.tsx/.module.css de app/<slug>/
     deps                TEXT,           -- JSON: modulos de data/fiscal y lib/calculadoras
     hash_deps           TEXT,           -- huella de esos modulos
     creada              TEXT,           -- alta en el repositorio (git)
@@ -73,6 +73,12 @@ const TABLAS = [
     estado        TEXT DEFAULT 'abierto',   -- abierto | arreglado | descartado
     fecha         TEXT,
     cerrado       TEXT      -- ISO con hora: cuando se cerro (nulo si abierto o anterior al 24/09/2026)
+  )`,
+  // Parámetros de la propia base. Hoy solo `esquema_huella` (12/10/2026): con qué receta se
+  // calcularon hash_codigo/hash_deps, para que `inspector:sync` migre una vez al cambiarla.
+  `CREATE TABLE IF NOT EXISTS meta (
+    clave TEXT PRIMARY KEY,
+    valor TEXT
   )`,
   `CREATE INDEX IF NOT EXISTS idx_insp_slug ON inspecciones(slug)`,
   `CREATE INDEX IF NOT EXISTS idx_hall_slug ON hallazgos(slug, estado)`,

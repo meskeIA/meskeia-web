@@ -72,15 +72,106 @@ function leerCatalogo() {
 
 // ─── Segmento y huellas ───────────────────────────────────────────────────────
 
-const FICHEROS_APP = ['page.tsx', 'layout.tsx', 'metadata.ts'];
+/**
+ * ESQUEMA DE LA HUELLA (versión 2, 12/10/2026, cabos C0147 y C0045)
+ * ──────────────────────────────────────────────────────────────────
+ * Hasta entonces (versión 1) `hash_codigo` solo leía page.tsx, layout.tsx, metadata.ts y los
+ * .module.css, y las dependencias solo se buscaban en page.tsx. Un motor.ts, casos.ts o
+ * cifras.ts que cambiara solo NO devolvía la app a la cola (C0147: 70e88f7f cambió el MEI en
+ * app/estimador-irpf/motor.ts y su hash_codigo no se movió), y es justo el patrón recomendado.
+ * Ahora entra todo .ts/.tsx/.module.css del árbol app/<slug>/.
+ *
+ * Y un `import { X } from '@/data/fiscal'` (el barril) se huelleaba como `data/fiscal/index`,
+ * cuyo contenido son solo las líneas `export * from './…'`: cambiar el módulo de verdad
+ * (irpf.ts) no movía nada, y añadir una línea al barril invalidaba TODAS las apps fiscales
+ * (C0045: conversor-cnae-iae volvió a la cola por `export * from './ayudas-vehiculo'`). Ahora
+ * cada nombre importado se resuelve al módulo que lo exporta; si alguno no se encuentra, se
+ * conserva el barril, que es lo prudente.
+ *
+ * Cambiar la receta cambia todas las huellas, y sin más volverían a la cola cientos de apps
+ * que nadie ha tocado (la forma de C0161). Por eso `migrarEsquema` re-ancla, UNA vez, las
+ * que seguían vigentes con la receta vieja: su hash_inspeccionado pasa a la receta nueva.
+ * Salvo si `git log` dice que, desde su inspección, algún commit tocó un fichero que solo
+ * mira la nueva (un motor.ts, el módulo de data/fiscal tras el barril): esas vuelven a la
+ * cola, porque es exactamente el cambio que la versión 1 se tragaba.
+ */
+const ESQUEMA_HUELLA = 2;
+const FICHEROS_APP_V1 = ['page.tsx', 'layout.tsx', 'metadata.ts'];
 
-function analizarApp(slug) {
+/** Ficheros de código de la app, recursivo y en orden estable. */
+function ficherosDeApp(dir) {
+  const salida = [];
+  const recorrer = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) recorrer(p);
+      else if (/\.(tsx?|module\.css)$/.test(e.name)) salida.push(p);
+    }
+  };
+  recorrer(dir);
+  return salida;
+}
+
+/** Nombre exportado → módulo de data/fiscal que lo exporta (sin pasar por el barril). */
+let exportsFiscales = null;
+function moduloFiscalDe(nombre) {
+  if (!exportsFiscales) {
+    exportsFiscales = new Map();
+    const dir = path.join(RAIZ, 'data', 'fiscal');
+    for (const f of fs.readdirSync(dir)) {
+      if (!f.endsWith('.ts') || f === 'index.ts') continue;
+      const mod = `data/fiscal/${f.replace(/\.ts$/, '')}`;
+      const t = fs.readFileSync(path.join(dir, f), 'utf8');
+      for (const m of t.matchAll(/export\s+(?:declare\s+)?(?:const|let|var|async\s+function\*?|function\*?|class|type|interface|enum)\s+([A-Za-z_$][\w$]*)/g)) {
+        if (!exportsFiscales.has(m[1])) exportsFiscales.set(m[1], mod);
+      }
+      for (const m of t.matchAll(/export\s+(?:type\s+)?\{([^}]*)\}(?!\s*from)/g)) {
+        for (const trozo of m[1].split(',')) {
+          const alias = trozo.trim().split(/\s+as\s+/).pop()?.replace(/^type\s+/, '').trim();
+          if (alias && !exportsFiscales.has(alias)) exportsFiscales.set(alias, mod);
+        }
+      }
+    }
+  }
+  return exportsFiscales.get(nombre) ?? null;
+}
+
+/** Dependencias de un texto de código: módulos de data/fiscal y lib/calculadoras. */
+function depsDe(texto) {
+  const deps = [];
+  for (const m of texto.matchAll(/@\/data\/fiscal\/([\w-]+)/g)) deps.push(`data/fiscal/${m[1]}`);
+  for (const m of texto.matchAll(/@\/lib\/calculadoras\/([\w-]+)/g)) deps.push(`lib/calculadoras/${m[1]}`);
+  // El barril: cada nombre importado, a su módulo
+  for (const m of texto.matchAll(/import\s+(type\s+)?([^;]*?)\s+from\s+['"]@\/data\/fiscal\/?['"]/g)) {
+    const llaves = m[2].match(/\{([^}]*)\}/);
+    if (!llaves) { deps.push('data/fiscal/index'); continue; } // import * as …: no se puede resolver
+    for (const trozo of llaves[1].split(',')) {
+      const nombre = trozo.trim().replace(/^type\s+/, '').split(/\s+as\s+/)[0].trim();
+      if (!nombre) continue;
+      deps.push(moduloFiscalDe(nombre) ?? 'data/fiscal/index');
+    }
+  }
+  return deps;
+}
+
+function hashDeDeps(unicas) {
+  if (!unicas.length) return '';
+  let acum = '';
+  for (const d of unicas) {
+    for (const ext of ['.ts', '.tsx', '/index.ts']) {
+      const p = path.join(RAIZ, d + ext);
+      if (fs.existsSync(p) && fs.statSync(p).isFile()) { acum += fs.readFileSync(p, 'utf8'); break; }
+    }
+  }
+  return huella(acum);
+}
+
+/** La receta de la versión 1, solo para migrar: ver ESQUEMA DE LA HUELLA. */
+function huellasV1(slug) {
   const dir = path.join(RAIZ, 'app', slug);
-  if (!fs.existsSync(dir)) return null;
-
   let codigo = '';
   let page = '';
-  for (const f of FICHEROS_APP) {
+  for (const f of FICHEROS_APP_V1) {
     const p = path.join(dir, f);
     if (!fs.existsSync(p)) continue;
     const t = fs.readFileSync(p, 'utf8');
@@ -90,25 +181,30 @@ function analizarApp(slug) {
   for (const f of fs.readdirSync(dir)) {
     if (f.endsWith('.module.css')) codigo += fs.readFileSync(path.join(dir, f), 'utf8');
   }
-  if (!page) return null;
-
   const deps = [
     ...[...page.matchAll(/@\/data\/fiscal\/?([\w-]*)/g)].map(m => `data/fiscal/${m[1] || 'index'}`),
     ...[...page.matchAll(/@\/lib\/calculadoras\/([\w-]+)/g)].map(m => `lib/calculadoras/${m[1]}`),
   ];
-  const unicas = [...new Set(deps)];
+  return `${huella(codigo)}|${hashDeDeps([...new Set(deps)])}`;
+}
 
-  let hashDeps = '';
-  if (unicas.length) {
-    let acum = '';
-    for (const d of unicas) {
-      for (const ext of ['.ts', '.tsx', '/index.ts']) {
-        const p = path.join(RAIZ, d + ext);
-        if (fs.existsSync(p) && fs.statSync(p).isFile()) { acum += fs.readFileSync(p, 'utf8'); break; }
-      }
-    }
-    hashDeps = huella(acum);
+function analizarApp(slug) {
+  const dir = path.join(RAIZ, 'app', slug);
+  if (!fs.existsSync(dir)) return null;
+  const pagina = path.join(dir, 'page.tsx');
+  if (!fs.existsSync(pagina)) return null;
+  const page = fs.readFileSync(pagina, 'utf8');
+
+  let codigo = '';
+  const deps = [];
+  for (const p of ficherosDeApp(dir)) {
+    const t = fs.readFileSync(p, 'utf8');
+    // La ruta entra en la huella: mover un trozo de un fichero a otro también es un cambio
+    codigo += `\n// ${path.relative(dir, p).replace(/\\/g, '/')}\n${t}`;
+    if (!p.endsWith('.css')) deps.push(...depsDe(t));
   }
+  const unicas = [...new Set(deps)].sort();
+  const hashDeps = hashDeDeps(unicas);
 
   // El segmento decide CÓMO se inspecciona, no si se inspecciona.
   let segmento;
@@ -179,10 +275,50 @@ const upsert = db.prepare(`
     deps = excluded.deps, hash_deps = excluded.hash_deps, creada = excluded.creada
 `);
 
+// Migración de la receta de la huella (ver ESQUEMA DE LA HUELLA): una sola vez por base
+const esquemaGuardado = Number(db.prepare("SELECT valor FROM meta WHERE clave = 'esquema_huella'").get()?.valor ?? 1);
+const migrar = esquemaGuardado < ESQUEMA_HUELLA;
+const leerInspeccionado = db.prepare('SELECT hash_inspeccionado, ultima_inspeccion FROM apps WHERE slug = ?');
+const reanclar = db.prepare('UPDATE apps SET hash_inspeccionado = ? WHERE slug = ?');
+let reancladas = 0;
+const destapadas = [];
+
+/** ¿Algún commit desde la inspección tocó un fichero que la huella v1 no miraba? */
+function cambioInvisibleV1(slug, depsV2, desde) {
+  if (!desde) return true; // sin fecha no se puede descartar: a la cola, que es lo prudente
+  const dir = path.join(RAIZ, 'app', slug);
+  const rutas = ficherosDeApp(dir)
+    .map(p => path.relative(RAIZ, p).replace(/\\/g, '/'))
+    .filter(r => !FICHEROS_APP_V1.includes(r.split('/').slice(2).join('/')) && !/^app\/[^/]+\/[^/]+\.module\.css$/.test(r));
+  for (const d of depsV2) {
+    for (const ext of ['.ts', '.tsx', '/index.ts']) {
+      if (fs.existsSync(path.join(RAIZ, d + ext))) { rutas.push(d + ext); break; }
+    }
+  }
+  if (!rutas.length) return false;
+  const salida = execFileSync('git', ['log', `--since=${desde.slice(0, 10)} 00:00`, '--format=%h', '--', ...rutas],
+    { cwd: RAIZ, encoding: 'utf8' });
+  return salida.trim() !== '';
+}
+
 let n = 0, sinCarpeta = 0, sinUso = 0;
 for (const [slug, app] of catalogo) {
   const a = analizarApp(slug);
   if (!a) { sinCarpeta++; continue; }
+  if (migrar) {
+    const fila = leerInspeccionado.get(slug);
+    if (fila?.hash_inspeccionado && fila.hash_inspeccionado === huellasV1(slug)) {
+      // Vigente con la receta vieja. Antes de re-anclarla, git dice si desde la inspección
+      // cambió algo que solo ve la nueva (un motor.ts, el módulo real tras el barril): entonces
+      // vuelve a la cola, que es justo lo que la versión 1 se tragaba.
+      if (cambioInvisibleV1(slug, a.deps, fila.ultima_inspeccion)) {
+        destapadas.push(slug);
+      } else {
+        reanclar.run(`${a.hash_codigo}|${a.hash_deps || ''}`, slug);
+        reancladas++;
+      }
+    }
+  }
   const riesgo = Math.min(...app.suites.map(s => RIESGO_SUITE[s] ?? 4), 4);
   const u = uso.porSlug.get(slug) || uso.porNombre.get(app.nombre) || null;
   if (!u) sinUso++;
@@ -195,6 +331,10 @@ for (const [slug, app] of catalogo) {
     altas.get(slug) || null,
   );
   n++;
+}
+if (migrar) {
+  db.prepare("INSERT INTO meta (clave, valor) VALUES ('esquema_huella', ?) ON CONFLICT(clave) DO UPDATE SET valor = excluded.valor")
+    .run(String(ESQUEMA_HUELLA));
 }
 
 // ─── Apps que ya no están en el catálogo ──────────────────────────────────────
@@ -245,6 +385,13 @@ if (rutaDump) {
 const cuenta = q => db.prepare(q).get().n;
 console.log(`\nBase del Inspector · _private/inspector/inspector.db`);
 console.log(`  ${n} apps sincronizadas` + (sinCarpeta ? ` · ${sinCarpeta} en el catálogo sin carpeta en app/` : ''));
+if (migrar) {
+  console.log(`  🔁 huella pasada a la versión ${ESQUEMA_HUELLA} (todos los ficheros de la app y el barril de data/fiscal resuelto): ` +
+    `${reancladas} app(s) que seguían vigentes se re-anclan y NO vuelven a la cola`);
+  if (destapadas.length) {
+    console.log(`  🔎 ${destapadas.length} vuelven a la cola por cambios posteriores a su inspección que la huella vieja no veía: ${destapadas.join(', ')}`);
+  }
+}
 if (retirables.length) {
   console.log(`  🗑️  ${retirables.length} retirada(s) del catálogo, sin inspeccionar: ${retirables.map(r => r.slug).join(', ')}`);
 }
