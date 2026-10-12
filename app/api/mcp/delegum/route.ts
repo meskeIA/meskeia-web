@@ -33,7 +33,7 @@ import { calcularPensionPublica } from '@/lib/calculadoras/pensionPublica';
 import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
 import { calcularComplementoBrechaGenero, FECHA_MINIMA_HECHO_CAUSANTE, type SexoBeneficiario as SexoBeneficiarioBG, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
 // Pagas y doctrina del complemento, citadas desde el módulo y no tecleadas (residuo de 2245/2246)
-import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META, PLAZO_AUTOLIQUIDACION_DONACIONES } from '@/data/fiscal';
+import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META, PLAZO_AUTOLIQUIDACION_DONACIONES, REDUCCION_SEGURO_VIDA_MAX_IS } from '@/data/fiscal';
 const PAGAS_BG = COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales;
 const DOCTRINA_BG = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 // Concurrencia entre progenitores y cómo se comparan las sumas (art. 60.7 LGSS, hallazgo 2538)
@@ -271,6 +271,12 @@ function errorMcp(err: unknown) {
 // Formato español de importes (1.234,56)
 const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const pct = (n: number) => n.toFixed(2).replace('.', ',');
+
+// El seguro va APARTE de valor_herencia y el motor lo acumula a la base (cabo C0027)
+const DESCRIPCION_SEGURO_VIDA =
+  'Importe cobrado como beneficiario de un seguro de vida del fallecido, APARTE de valor_herencia (no lo sumes en él): ' +
+  'se acumula a la porción hereditaria (art. 9.1.c LISD) y se le aplica la reducción del art. 20.2.b LISD ' +
+  `(100 %, hasta ${fmt(REDUCCION_SEGURO_VIDA_MAX_IS)} €, para cónyuge, descendientes y ascendientes).`;
 
 // Enums reutilizables
 const ENUM_CCAA = [
@@ -646,7 +652,7 @@ function crearServidorDelegum(): McpServer {
       convivio_dos_anios: z.boolean().optional()
         .describe('Si el heredero convivió con el fallecido los dos años anteriores. Solo se le exige al Grupo III (colateral) para la reducción por vivienda habitual (art. 20.2.c LISD).'),
       seguro_vida: z.number().nonnegative().optional()
-        .describe('Importe de seguro de vida recibido (reducción hasta 9.195,49 € para parientes directos)'),
+        .describe(DESCRIPCION_SEGURO_VIDA),
       discapacidad: z.enum(['0', '33', '65']).optional()
         .describe('Grado de discapacidad del heredero. Por defecto "0".'),
     },
@@ -668,6 +674,7 @@ function crearServidorDelegum(): McpServer {
           `⚖️ **Delegum — Impuesto de Sucesiones en ${r.ccaaNombre}**`,
           '',
           `💶 Herencia recibida: **${fmt(r.baseImponible)} €**`,
+          r.baseImponibleConAjuar !== r.baseImponible ? `➕ Con el seguro de vida, base imponible: ${fmt(r.baseImponibleConAjuar)} € (art. 9.1.c LISD)` : '',
           r.totalReducciones > 0 ? `➖ Reducciones aplicadas: ${fmt(r.totalReducciones)} €${r.reduccionAutonomicaBase > 0 ? ` (incluidos ${fmt(r.reduccionAutonomicaBase)} € de reducción autonómica en base)` : ''}` : '',
           r.reduccionViviendaNoAplicada ? `⚠️ Sin reducción por vivienda habitual: ${r.reduccionViviendaNoAplicada}` : '',
           `📦 Base liquidable: ${fmt(r.baseLiquidable)} €`,
@@ -1330,7 +1337,7 @@ function crearServidorDelegum(): McpServer {
       grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-descendiente', 'II-ascendiente', 'III', 'IV'])
         .describe('Grupo de parentesco. II=HIJO de 21 o más; II-descendiente=nieto/bisnieto de 21 o más (en Cataluña reducen distinto: 100.000 € frente a 50.000 €)'),
       vivienda_habitual: z.number().nonnegative().optional().describe('Valor de la vivienda habitual heredada (reducción 95%)'),
-      seguro_vida: z.number().nonnegative().optional().describe('Importe de seguro de vida recibido'),
+      seguro_vida: z.number().nonnegative().optional().describe(DESCRIPCION_SEGURO_VIDA),
       discapacidad: z.enum(['0', '33', '65']).optional().describe('Grado de discapacidad. Por defecto "0".'),
       // Los dos requisitos que el art. 20.2.c LISD le exige al pariente COLATERAL (Grupo III)
       // para la reducción por vivienda habitual. Antes no se podían ni expresar, así que la
@@ -1359,7 +1366,7 @@ function crearServidorDelegum(): McpServer {
         });
         const texto = [
           `⚖️ **Impuesto de Sucesiones — ${r.ccaaNombre}**`,
-          `💶 Herencia: ${fmt(r.baseImponible)} € · Reducciones: ${fmt(r.totalReducciones)} €`,
+          `💶 Herencia: ${fmt(r.baseImponible)} €${r.baseImponibleConAjuar !== r.baseImponible ? ` · Base imponible con el seguro de vida: ${fmt(r.baseImponibleConAjuar)} €` : ''} · Reducciones: ${fmt(r.totalReducciones)} €`,
           `📦 Base liquidable: ${fmt(r.baseLiquidable)} €`,
           // Un cero sin motivo se lee como «no te corresponde»: si se declaró vivienda
           // habitual y no se ha reducido nada, se dice por qué.

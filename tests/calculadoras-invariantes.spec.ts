@@ -1235,6 +1235,39 @@ test.describe('Golden — calcularSucesion (Capa 1 · tarifa ISD estatal + auton
     expect(res.esForal).toBe(false);
   });
 
+  /**
+   * Cabo C0027 (12/10/2026): el seguro de vida va APARTE de la base y se acumula a la porción
+   * hereditaria (art. 9.1.c LISD, BOE-A-1987-28141, consultado ese día), con la reducción del
+   * art. 20.2.b. Hasta entonces solo se restaba la reducción: con estos datos la base
+   * liquidable salía 174.847,64 € (200.000 − 15.956,87 − 9.195,49), reduciendo un seguro que
+   * no tributaba, y la cuota 262,96 € en vez de 326,71 €.
+   */
+  test('GOLDEN-AC2: Madrid, hijo de 45, 200.000 € + seguro de vida 30.000 € → base 230.000, cuota 326,71 €', () => {
+    // base imponible = 200.000 + 30.000 = 230.000
+    // reducciones = 15.956,87 (parentesco) + 9.195,49 (seguro, tope) = 25.152,36
+    // base liquidable = 204.847,64; tramo que abre en 159.634,83: 23.063,25 + 21,25 % de
+    // 45.212,81 = 23.063,25 + 9.607,72 = 32.670,97; bonificación 99 % = 32.344,26 → 326,71 €
+    const res = calcularSucesion({ baseImponible: 200000, ccaa: 'madrid', grupo: 'II', edadHeredero: 45, seguroVida: 30000 });
+    expect(res.baseImponible).toBe(200000);
+    expect(res.baseImponibleConAjuar).toBeCloseTo(230000, 2);
+    expect(res.reduccionSeguroVida).toBeCloseTo(9195.49, 2);
+    expect(res.baseLiquidable).toBeCloseTo(204847.64, 2);
+    expect(res.cuotaIntegra).toBeCloseTo(32670.97, 2);
+    expect(res.cuotaFinal).toBeCloseTo(326.71, 2);
+  });
+
+  test('C0027: sin reducción (Grupo III) el seguro tributa entero, y el ajuar no lo cuenta', () => {
+    const aparte = calcularSucesion({ baseImponible: 80000, ccaa: 'asturias', grupo: 'III', seguroVida: 20000 });
+    const sumado = calcularSucesion({ baseImponible: 100000, ccaa: 'asturias', grupo: 'III' });
+    expect(aparte.reduccionSeguroVida).toBe(0);
+    expect(aparte.baseLiquidable).toBeCloseTo(sumado.baseLiquidable, 2);
+    expect(aparte.cuotaFinal).toBeCloseTo(sumado.cuotaFinal, 2);
+    // Ajuar = 3 % del caudal relicto (80.000), no de los 100.000 con el seguro (art. 15 LISD)
+    const conAjuar = calcularSucesion({ baseImponible: 80000, ccaa: 'asturias', grupo: 'III', seguroVida: 20000, incluyeAjuar: true });
+    expect(conAjuar.ajuarDomestico).toBeCloseTo(2400, 2);
+    expect(conAjuar.baseImponibleConAjuar).toBeCloseTo(102400, 2);
+  });
+
   test('GOLDEN-AD: Asturias, Grupo IV (extraño), 50.000 € → coef×2 → cuotaFinal 9.897,86 €', () => {
     // Grupo IV (no pariente): sin reducción parentesco, coeficiente multiplicador 2,0.
     // baseLiquidable = 50.000; tramo que abre en 47.930,72: 4.685,10 + 12,75 % de 2.069,28

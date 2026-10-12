@@ -101,7 +101,16 @@ export interface ParametrosSucesiones {
    * años valía 14.741,88 € en la web y 4.883,57 € por MCP (hallazgo 462).
    */
   convivenciaDosAnios?: boolean;
-  /** Importe del seguro de vida recibido (reducción hasta 9.195,49 €) */
+  /**
+   * Importe del seguro de vida cobrado como beneficiario, APARTE de `baseImponible`: se acumula
+   * a la porción hereditaria (art. 9.1.c LISD) y sobre él se aplica la reducción del art. 20.2.b
+   * (100 %, tope 9.195,49 €, cónyuge, ascendientes y descendientes). No entra en el ajuar, que
+   * es un porcentaje del caudal relicto (art. 15 LISD; hallazgo 1824).
+   *
+   * Hasta el 12/10/2026 solo se restaba la reducción sin sumar el seguro a la base: quien lo
+   * pasaba aparte —el MCP y la API lo piden en un campo propio— se reducía algo que no tributaba
+   * (cabo C0027). Ningún consumidor lo pasaba incluido en la base: solo lo usan esos dos.
+   */
   seguroVida?: number;
   /** Si se incluye el ajuar doméstico en la base (3% masa hereditaria) */
   incluyeAjuar?: boolean;
@@ -434,7 +443,9 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
 
   // 1. Ajuar doméstico (3% de la base si se incluye)
   const ajuarDomestico = p.incluyeAjuar ? r(p.baseImponible * PORC_AJUAR_DOMESTICO_IS) : 0;
-  const baseConAjuar = r(p.baseImponible + ajuarDomestico);
+  // El seguro de vida se acumula a la porción hereditaria (art. 9.1.c LISD), fuera del ajuar
+  const seguroAcumulado = p.seguroVida && p.seguroVida > 0 ? r(p.seguroVida) : 0;
+  const baseConAjuar = r(p.baseImponible + ajuarDomestico + seguroAcumulado);
 
   // 2. Reducción por parentesco
   const reduccionParentesco = esCataluna
@@ -473,8 +484,8 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
 
   // 6. Reducción seguro de vida (100% cónyuge/descendientes/ascendientes, tope 9.195,49 €)
   let reduccionSeguroVida = 0;
-  if (p.seguroVida && (grupoBase === 'I' || grupoBase === 'II')) {
-    reduccionSeguroVida = r(Math.min(p.seguroVida, REDUCCION_SEGURO_VIDA_MAX_IS));
+  if (seguroAcumulado > 0 && (grupoBase === 'I' || grupoBase === 'II')) {
+    reduccionSeguroVida = r(Math.min(seguroAcumulado, REDUCCION_SEGURO_VIDA_MAX_IS));
   }
 
   // 6.bis Reducción autonómica sobre la BASE (hoy solo Asturias: 300.000 € para los Grupos I
@@ -542,7 +553,7 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
    * `estimador-impuesto-sucesiones` publicaba un tipo distinto del que el panel de la propia
    * herramienta imprime para los mismos datos, que sí divide por la base con ajuar.
    *
-   * Sin ajuar (`incluyeAjuar` ausente o false) `baseConAjuar` vale lo mismo que
+   * Sin ajuar (`incluyeAjuar` ausente o false) ni seguro de vida `baseConAjuar` vale lo mismo que
    * `p.baseImponible`, así que el resto de consumidores no se mueve.
    */
   const tipoEfectivo = r(baseConAjuar > 0 ? (cuotaFinal / baseConAjuar) * 100 : 0);

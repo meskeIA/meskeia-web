@@ -160,7 +160,7 @@
           "seguroVida": {
             "type": "number",
             "minimum": 0,
-            "description": "Importe del seguro de vida recibido (€). Reducción de hasta 9.195,49€ para cónyuge, descendientes y ascendientes."
+            "description": "Importe cobrado como beneficiario de un seguro de vida del fallecido (€), APARTE de baseImponible: se acumula a la base (art. 9.1.c LISD) y se le aplica la reducción de hasta 9.195,49 € para cónyuge, descendientes y ascendientes (art. 20.2.b LISD)."
           },
           "incluyeAjuar": {
             "type": "boolean",
