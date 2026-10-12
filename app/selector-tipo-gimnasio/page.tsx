@@ -464,7 +464,7 @@ export default function SelectorTipoGimnasio() {
 
         <RelatedApps />
         <ShareCard appName="selector-tipo-gimnasio" />
-        <Footer appName="selector-tipo-gimnasio" />
+        <Footer key="pie" appName="selector-tipo-gimnasio" />
       </div>
     );
   }
@@ -539,7 +539,9 @@ export default function SelectorTipoGimnasio() {
 
       <RelatedApps />
       <ShareCard appName="selector-tipo-gimnasio" />
-      <Footer appName="selector-tipo-gimnasio" />
+      {/* key="pie" en los dos Footer: sin ella React lo remonta al pasar al resultado y el
+          AnalyticsTracker registra otra visita (cabo C0042). */}
+      <Footer key="pie" appName="selector-tipo-gimnasio" />
     </div>
   );
 }

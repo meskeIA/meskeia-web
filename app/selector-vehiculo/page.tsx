@@ -748,7 +748,7 @@ export default function SelectorVehiculo() {
 
         <RelatedApps />
         <ShareCard appName="selector-vehiculo" />
-        <Footer appName="selector-vehiculo" />
+        <Footer key="pie" appName="selector-vehiculo" />
       </div>
     );
   }
@@ -828,7 +828,7 @@ export default function SelectorVehiculo() {
           </div>
         </main>
 
-        <Footer appName="selector-vehiculo" />
+        <Footer key="pie" appName="selector-vehiculo" />
       </div>
     );
   }
@@ -1098,7 +1098,9 @@ export default function SelectorVehiculo() {
           <ShareCard appName="selector-vehiculo" />
         </main>
 
-        <Footer appName="selector-vehiculo" />
+        {/* key="pie" en los tres Footer: sin ella React lo remonta al cambiar de paso y el
+            AnalyticsTracker registra otra visita (cabo C0042). */}
+        <Footer key="pie" appName="selector-vehiculo" />
       </div>
     );
   }

@@ -335,7 +335,7 @@ export default function PlanificadorRutinasPage() {
           )}
         </div>
 
-        <Footer appName="planificador-rutinas" />
+        <Footer key="pie" appName="planificador-rutinas" />
       </div>
     );
   }
@@ -495,7 +495,7 @@ export default function PlanificadorRutinasPage() {
           </button>
         </div>
 
-        <Footer appName="planificador-rutinas" />
+        <Footer key="pie" appName="planificador-rutinas" />
       </div>
     );
   }
@@ -843,7 +843,9 @@ export default function PlanificadorRutinasPage() {
 
       <RelatedApps />
       <ShareCard appName="planificador-rutinas" />
-      <Footer appName="planificador-rutinas" />
+      {/* key="pie" en los tres Footer: sin ella React lo remonta al cambiar de vista y el
+          AnalyticsTracker registra otra visita (cabo C0042). */}
+      <Footer key="pie" appName="planificador-rutinas" />
     </div>
   );
 }

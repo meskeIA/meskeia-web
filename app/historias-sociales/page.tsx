@@ -290,7 +290,7 @@ export default function HistoriasSocialesPage() {
           )}
         </div>
 
-        <Footer appName="historias-sociales" />
+        <Footer key="pie" appName="historias-sociales" />
       </div>
     );
   }
@@ -437,7 +437,7 @@ export default function HistoriasSocialesPage() {
           </div>
         </div>
 
-        <Footer appName="historias-sociales" />
+        <Footer key="pie" appName="historias-sociales" />
       </div>
     );
   }
@@ -759,7 +759,9 @@ export default function HistoriasSocialesPage() {
 
       <RelatedApps />
       <ShareCard appName="historias-sociales" />
-      <Footer appName="historias-sociales" />
+      {/* key="pie" en los tres Footer: sin ella React lo remonta al cambiar de vista y el
+          AnalyticsTracker registra otra visita (cabo C0042). */}
+      <Footer key="pie" appName="historias-sociales" />
     </div>
   );
 }

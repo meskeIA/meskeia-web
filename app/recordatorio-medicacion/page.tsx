@@ -501,7 +501,7 @@ export default function RecordatorioMedicacionPage() {
 
         <RelatedApps />
         <ShareCard appName="recordatorio-medicacion" />
-        <Footer appName="recordatorio-medicacion" />
+        <Footer key="pie" appName="recordatorio-medicacion" />
       </div>
     );
   }
@@ -570,7 +570,7 @@ export default function RecordatorioMedicacionPage() {
           ))}
         </div>
 
-        <Footer appName="recordatorio-medicacion" />
+        <Footer key="pie" appName="recordatorio-medicacion" />
       </div>
     );
   }
@@ -697,7 +697,9 @@ export default function RecordatorioMedicacionPage() {
         </div>
       </div>
 
-      <Footer appName="recordatorio-medicacion" />
+      {/* key="pie" en los tres Footer: sin ella React lo remonta al cambiar de vista y el
+          AnalyticsTracker registra otra visita (cabo C0042). */}
+      <Footer key="pie" appName="recordatorio-medicacion" />
     </div>
   );
 }
