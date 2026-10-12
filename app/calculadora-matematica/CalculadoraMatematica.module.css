@@ -847,7 +847,9 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr) y no 1fr: la pista 1fr crecía hasta el ancho mínimo de los cinco botones
+       de tipo y la página medía 449 px a 390 (cabo C0201, la forma de C0154) */
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -862,7 +864,14 @@
   }
 
   .tiposGrid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  /* En un móvil los cinco no caben en una fila sin cortar «Logaritmos»: tres y dos */
+  @media (max-width: 520px) {
+    .tiposGrid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .fraccionesContainer {

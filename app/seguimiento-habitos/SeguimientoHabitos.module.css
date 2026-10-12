@@ -1382,5 +1382,21 @@ details[open] .edu-faq-question::after {
   }
 }
 
+/* En un móvil, «← Anterior», el mes (min-width 140 px) y «Siguiente →» no caben en una fila:
+   la página medía 399-451 px a 390 (cabo C0200). El mes sube a su propia línea y los dos
+   botones quedan debajo, a cada lado. */
+@media (max-width: 480px) {
+  .calendarioNav {
+    flex-wrap: wrap;
+    row-gap: var(--spacing-sm);
+  }
+
+  .mesActual {
+    order: -1;
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}
+
 /* Marcador de profesionalización v2.0 */
 .warningBox { display: block; }
