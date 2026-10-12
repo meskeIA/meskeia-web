@@ -636,7 +636,7 @@ export default function SelectorCanalVenta() {
           <span>
             {preguntaActual + 1} / {totalPreguntas}
           </span>
-          <div className={styles.barraProgreso} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={1} aria-valuemax={totalPreguntas}>
+          <div className={styles.barraProgreso} role="progressbar" aria-valuenow={preguntaActual} aria-valuemin={0} aria-valuemax={totalPreguntas} aria-valuetext={`Pregunta ${preguntaActual + 1} de ${totalPreguntas}`}>
             <div className={styles.barraRelleno} style={{ width: `${progresoPct}%` }} />
           </div>
         </div>

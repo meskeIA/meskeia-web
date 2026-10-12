@@ -250,7 +250,7 @@ export default function QuizTiposPlantas() {
     return (
       <div className={styles.quizWrapper}>
         {/* Barra de progreso */}
-        <div className={styles.barraProgreso} role="progressbar" aria-valuenow={juego.indiceActual + 1} aria-valuemin={1} aria-valuemax={juego.preguntas.length}>
+        <div className={styles.barraProgreso} role="progressbar" aria-valuenow={juego.indiceActual + 1} aria-valuemin={0} aria-valuemax={juego.preguntas.length} aria-valuetext={`Pregunta ${juego.indiceActual + 1} de ${juego.preguntas.length}`}>
           <div className={styles.barraRelleno} style={{ width: `${progreso}%` }} />
         </div>
 

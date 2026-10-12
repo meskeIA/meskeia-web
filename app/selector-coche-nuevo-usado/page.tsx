@@ -288,7 +288,7 @@ export default function SelectorCocheNuevoUsado() {
       {!mostrarResultado ? (
         <main className={styles.testSection} aria-label="Test de selección de coche">
           {/* Barra de progreso */}
-          <div className={styles.progreso} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={1} aria-valuemax={PREGUNTAS.length} aria-label={`Pregunta ${preguntaActual + 1} de ${PREGUNTAS.length}`}>
+          <div className={styles.progreso} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={0} aria-valuemax={PREGUNTAS.length} aria-label={`Pregunta ${preguntaActual + 1} de ${PREGUNTAS.length}`}>
             <div className={styles.progresoBar}>
               <div
                 className={styles.progresoFill}

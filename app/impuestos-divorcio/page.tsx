@@ -218,7 +218,7 @@ export default function ImpuestosDivorcioPage() {
       <div className={styles.mainContent}>
         {paso < 5 ? (
           <div className={styles.wizardContainer}>
-            <div className={styles.progressBar} role="progressbar" aria-valuenow={paso + 1} aria-valuemin={1} aria-valuemax={5}>
+            <div className={styles.progressBar} role="progressbar" aria-valuenow={paso + 1} aria-valuemin={0} aria-valuemax={5} aria-valuetext={`Paso ${paso + 1} de 5`}>
               <div className={styles.progressFill} style={{ width: `${((paso + 1) / 5) * 100}%` }} />
             </div>
             <p className={styles.progressLabel}>

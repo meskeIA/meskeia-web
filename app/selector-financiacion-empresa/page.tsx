@@ -636,9 +636,12 @@ export default function SelectorFinanciacionEmpresa() {
           <div
             className={styles.barraProgreso}
             role="progressbar"
-            aria-valuenow={preguntaActual + 1}
-            aria-valuemin={1}
+            // El relleno pinta las respondidas (n − 1) / N: se anuncia eso, con el número de
+            // pregunta en el texto. Con mínimo 1 se anunciaba (n − 1) / (N − 1) (cabo C0040)
+            aria-valuenow={preguntaActual}
+            aria-valuemin={0}
             aria-valuemax={totalPreguntas}
+            aria-valuetext={`Pregunta ${preguntaActual + 1} de ${totalPreguntas}`}
           >
             <div className={styles.barraRelleno} style={{ width: `${progresoPct}%` }} />
           </div>

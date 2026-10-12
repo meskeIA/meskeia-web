@@ -282,7 +282,8 @@ export default function SelectorFormaJuridica() {
                 style={{ width: `${progresoPct}%` }}
                 role="progressbar"
                 aria-valuenow={preguntaActual + 1}
-                aria-valuemin={1}
+                // Mínimo 0: el relleno pinta n / N, y con mínimo 1 se anunciaba (n − 1) / (N − 1) (cabo C0040)
+                aria-valuemin={0}
                 aria-valuemax={PREGUNTAS.length}
               />
             </div>

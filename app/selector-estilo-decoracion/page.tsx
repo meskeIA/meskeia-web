@@ -382,7 +382,7 @@ export default function SelectorEstiloDecoracion() {
       {pantalla === 'test' && pregunta && (
         <div className={styles.quiz}>
           {/* Progreso */}
-          <div className={styles.progresoWrap} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={1} aria-valuemax={totalPreguntas}>
+          <div className={styles.progresoWrap} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={0} aria-valuemax={totalPreguntas} aria-valuetext={`Pregunta ${preguntaActual + 1} de ${totalPreguntas}`}>
             <div className={styles.progresoInfo}>
               <span className={styles.progresoPaso}>Pregunta {preguntaActual + 1} de {totalPreguntas}</span>
               <span className={styles.progresoCategoria}>{pregunta.categoria}</span>

@@ -507,7 +507,7 @@ export default function SelectorModalidadTrabajoPage() {
       {!mostrarResultado ? (
         /* ---- QUIZ ---- */
         <div className={styles.quiz}>
-          <div className={styles.progresoBar} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={1} aria-valuemax={PREGUNTAS.length} aria-label="Progreso del test">
+          <div className={styles.progresoBar} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={0} aria-valuemax={PREGUNTAS.length} aria-label="Progreso del test">
             <div
               className={styles.progresoRelleno}
               style={{ width: `${progresoPorcentaje}%` }}

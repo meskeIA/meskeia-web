@@ -772,9 +772,12 @@ export default function SelectorVehiculo() {
               className={styles.progresoBar}
               role="progressbar"
               aria-label={`Progreso: pregunta ${paso} de ${TOTAL}`}
-              aria-valuenow={paso}
-              aria-valuemin={1}
+              // El relleno pinta las respondidas (paso − 1) / TOTAL: se anuncia eso. Con
+              // valuenow = paso y mínimo 1 salía (paso − 1) / (TOTAL − 1) (cabo C0040)
+              aria-valuenow={paso - 1}
+              aria-valuemin={0}
               aria-valuemax={TOTAL}
+              aria-valuetext={`Pregunta ${paso} de ${TOTAL}`}
             >
               <div className={styles.progresoRelleno} style={{ width: `${progreso}%` } as React.CSSProperties} />
             </div>

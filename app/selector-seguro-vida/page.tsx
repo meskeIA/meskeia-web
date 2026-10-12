@@ -338,7 +338,7 @@ export default function SelectorSeguroVidaPage() {
       {!mostrarResultado && (
         <section className={styles.testSection} aria-label="Test selector de seguro de vida">
           {/* Progreso */}
-          <div className={styles.progreso} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={1} aria-valuemax={totalPreguntas} aria-label={`Pregunta ${preguntaActual + 1} de ${totalPreguntas}`}>
+          <div className={styles.progreso} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={0} aria-valuemax={totalPreguntas} aria-label={`Pregunta ${preguntaActual + 1} de ${totalPreguntas}`}>
             <div className={styles.progresoBar}>
               <div
                 className={styles.progresoFill}

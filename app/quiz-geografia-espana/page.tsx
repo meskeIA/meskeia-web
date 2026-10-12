@@ -216,7 +216,8 @@ export default function QuizGeografiaEspanaPage() {
               role="progressbar"
               aria-label={`Progreso: pregunta ${indice + 1} de ${preguntas.length}`}
               aria-valuenow={(indice + 1)}
-              aria-valuemin={1}
+              // Mínimo 0: el relleno pinta n / N, y con mínimo 1 se anunciaba (n − 1) / (N − 1) (cabo C0040)
+              aria-valuemin={0}
               aria-valuemax={preguntas.length}
             >
               <div

@@ -334,7 +334,7 @@ export default function SelectorTipoAhorro() {
       {!mostrarResultado && (
         <section className={styles.testSection} aria-label="Test de tipo de ahorro">
           {/* Barra de progreso */}
-          <div className={styles.progreso} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={1} aria-valuemax={totalPreguntas}>
+          <div className={styles.progreso} role="progressbar" aria-valuenow={preguntaActual + 1} aria-valuemin={0} aria-valuemax={totalPreguntas} aria-valuetext={`Pregunta ${preguntaActual + 1} de ${totalPreguntas}`}>
             <div className={styles.progresoBar}>
               <div className={styles.progresoFill} style={{ width: `${progresoPorc}%` }} />
             </div>
