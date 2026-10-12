@@ -148,6 +148,14 @@ const NIVEL_MANUAL = {
   'conversor-numeros-letras':   3,  // se usa para cheques y pagarés: aviso propio sobre la cifra
   'visualizador-geopolitica-energetica': 3,  // contenido político: medium desde su creación
   'visualizador-regimenes-politicos':    3,  // ídem (28/09/2026: juicio, no dato)
+
+  // ── Revisión del 12/10/2026 (audit-meskeia): las dos 🟡 nuevas, ninguna un descuido.
+  // Suite "juegos" (nivel 4), pero desde S0180 reparte el premio de una peña con el gravamen
+  // especial del IRPF y lleva su DataReference: componente fiscal → nivel 1 por la regla fiscal.
+  'generador-loteria':          1,
+  // Nació el 11/10/2026 (5bd2082c) con aviso químico propio: sosa y potasa cáusticas queman piel
+  // y ojos. Mismo caso que calculadora-piscinas: el riesgo no es el de su suite.
+  'calculadora-jabon':          2,
 };
 
 // Apps que importan de data/fiscal/ algo que NO es un dato normativo, y por eso no llevan
