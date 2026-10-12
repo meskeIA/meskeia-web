@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarPaginaAsentada } from './_hidratacion';
 
 /**
  * Inspector — visualizador-celula (segmento interactiva, riesgo 2, 46 usos reales)
@@ -91,6 +92,10 @@ async function irAlVisualizador(page: Page) {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('La Célula por Dentro', {
     timeout: 60_000,
   });
+  // El <h1> llega con el HTML del servidor, antes de que React monte los botones: un clic
+  // anterior a la hidratación se pierde. CASO 2 y CASO 3 móvil fallaban así en la suite
+  // entera bajo next dev y pasaban aislados (cabo C0049).
+  await esperarPaginaAsentada(page, { maximoMs: 15_000 });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
