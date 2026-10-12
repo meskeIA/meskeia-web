@@ -192,7 +192,8 @@ test('teclado — los 8 componentes y los 5 eventos se alcanzan con Tab', async 
       return a.getAttribute('aria-label') ?? a.textContent?.trim().slice(0, 40) ?? '';
     });
     focos.push(foco);
-    if (foco === 'Ver guía educativa') break;
+    // Desde 372bdcdd el botón no lleva aria-label y su texto empieza por la flecha (aria-hidden)
+    if (foco.includes('Ver guía educativa')) break;
   }
   const componentes = focos.filter((f) => f.startsWith('Ver detalles de '));
   const eventos = focos.filter((f) => f === 'EVENTO');
