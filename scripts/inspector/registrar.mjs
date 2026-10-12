@@ -138,6 +138,17 @@ const insHall = db.prepare(`INSERT INTO hallazgos (inspeccion_id, slug, tipo, se
 const actApp = db.prepare(`UPDATE apps SET ultima_inspeccion = ?, veredicto = ?, test_path = COALESCE(?, test_path),
                            hash_inspeccionado = hash_codigo || '|' || COALESCE(hash_deps, ''), validada = ? WHERE slug = ?`);
 
+/**
+ * El veredicto de la APP (apps.veredicto) sale de TODOS sus hallazgos abiertos, no solo de los
+ * de esta acta. El de la inspección (inspecciones.veredicto), que es el que cuenta el contador
+ * de veredicto repetido, sigue siendo el de su acta.
+ *
+ * Hasta el 12/10/2026 se copiaba el de la última acta, y un acta complementaria del mismo día
+ * lo pisaba: quiz-paises-capitales se registró con un alto abierto (América) y quedó en
+ * `con_hallazgos_menores` al registrar después un acta con un solo medio (cabo C0044).
+ */
+const abiertos = db.prepare(`SELECT severidad FROM hallazgos WHERE slug = ? AND estado = 'abierto'`);
+
 let nH = 0;
 for (const a of actas) {
   const veredicto = derivarVeredicto(a.veredicto, a.hallazgos || []);
@@ -149,7 +160,13 @@ for (const a of actas) {
     insHall.run(r.lastInsertRowid, a.slug, h.tipo, h.severidad, h.descripcion, h.caso, hoy);
     nH++;
   }
-  actApp.run(hoy, veredicto, a.test_path || null, ahora(), a.slug);
+  const deLaApp = veredicto === 'no_inspeccionable'
+    ? veredicto
+    : derivarVeredicto('con_hallazgos', abiertos.all(a.slug));
+  if (deLaApp !== veredicto) {
+    console.log(`   ${a.slug}: la app queda en "${deLaApp}" por sus hallazgos abiertos de antes (esta acta: "${veredicto}")`);
+  }
+  actApp.run(hoy, deLaApp, a.test_path || null, ahora(), a.slug);
 }
 
 console.log(`✓ ${actas.length} acta(s) registrada(s) · ${nH} hallazgo(s)`);
