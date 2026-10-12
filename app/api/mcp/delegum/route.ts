@@ -33,7 +33,7 @@ import { calcularPensionPublica } from '@/lib/calculadoras/pensionPublica';
 import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
 import { calcularComplementoBrechaGenero, FECHA_MINIMA_HECHO_CAUSANTE, type SexoBeneficiario as SexoBeneficiarioBG, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
 // Pagas y doctrina del complemento, citadas desde el módulo y no tecleadas (residuo de 2245/2246)
-import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META } from '@/data/fiscal';
+import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META, PLAZO_AUTOLIQUIDACION_DONACIONES } from '@/data/fiscal';
 const PAGAS_BG = COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales;
 const DOCTRINA_BG = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 // Concurrencia entre progenitores y cómo se comparan las sumas (art. 60.7 LGSS, hallazgo 2538)
@@ -1388,7 +1388,8 @@ function crearServidorDelegum(): McpServer {
     '"comparar_donacion_vs_herencia", que integra ISD, IRPF del donante y plusvalía municipal en una sola respuesta.',
     {
       valor_donacion: z.number().positive().describe('Valor de la donación en euros'),
-      ccaa: z.enum(ENUM_CCAA).describe('Comunidad autónoma del donatario (quien recibe)'),
+      // Punto de conexión (art. 32.2 Ley 22/2009), como en estimador-impuesto-donaciones (C0026)
+      ccaa: z.enum(ENUM_CCAA).describe('Comunidad autónoma competente: si se dona un inmueble, la comunidad donde está situado (art. 32.2.b Ley 22/2009); en el resto de bienes, la de residencia habitual del donatario, quien recibe (arts. 32.2.c y 28 Ley 22/2009)'),
       grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-ascendiente', 'III', 'IV']).describe('Grupo de parentesco'),
       escritura_publica: z.boolean().optional().describe('Si se formaliza en escritura pública (afecta a algunas CCAA). Por defecto true.'),
       discapacidad: z.enum(['0', '33', '65']).optional().describe('Grado de discapacidad. Por defecto "0".'),
@@ -1413,8 +1414,9 @@ function crearServidorDelegum(): McpServer {
           r.coeficienteMultiplicador !== 1 ? `✖️ Coeficiente por patrimonio preexistente: ×${r.coeficienteMultiplicador}` : '',
           r.correccionSalto > 0 ? `↘️ Corrección del salto de coeficiente (art. 22.2 LISD): −${fmt(r.correccionSalto)} €` : '',
           r.bonificacionCcaa > 0 ? `➖ ${r.detalleBonificacion}: −${fmt(r.bonificacionCcaa)} €` : `ℹ️ ${r.detalleBonificacion}`,
-          `💰 **Cuota a pagar: ${fmt(r.cuotaFinal)} €** (tipo efectivo ${pct(r.tipoEfectivo)}%)`,
-          `📌 Plazo: 1 mes desde la donación (Modelo 651).`,
+          `💰 **Cuota a pagar: ${fmt(r.cuotaFinal)} €** (tipo efectivo ${pct(r.tipoEfectivo)} %)`,
+          // Eran «1 mes»: el plazo general son 30 días hábiles (C0026)
+          `📌 Plazo: ${PLAZO_AUTOLIQUIDACION_DONACIONES.diasHabiles} días hábiles desde el día siguiente a la donación (${PLAZO_AUTOLIQUIDACION_DONACIONES.norma}; Modelo 651), salvo plazo propio de la comunidad.`,
         ].filter(l => l !== '').join('\n');
         return conAviso(texto, AVISO_FISCAL);
       } catch (err) {

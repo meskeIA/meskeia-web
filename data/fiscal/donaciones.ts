@@ -131,31 +131,17 @@ export const COEFICIENTES_CATALUNA_ID: Record<string, number[]> = {
 
 // ─── Reducciones del art. 20.2.a LISD — NO se aplican a las donaciones ────────
 /**
- * ⚠️ Estas cifras son las reducciones por parentesco y por discapacidad del art. 20.2.a LISD,
- * que la ley reserva a las adquisiciones «mortis causa». En una donación, si la comunidad no
+ * ⚠️ Este módulo NO tiene reducciones por parentesco ni por discapacidad: las del art. 20.2.a
+ * LISD la ley las reserva a las adquisiciones «mortis causa». En una donación, si la comunidad no
  * ha regulado una reducción propia, «la base liquidable coincidirá, en todo caso, con la
  * imponible» (art. 20.5 LISD, BOE-A-1987-28141, cotejado el 25/09/2026).
  *
  * Hasta el 25/09/2026 el estimador de donaciones y `lib/calculadoras/donaciones.ts` (MCP de
- * Delegum y GPT) las restaban de la base (hallazgo 1862). Ya NO las usa ningún motor; se
- * conservan porque `app/api/datos/[slug]/route.ts` las publica bajo la ficha de donaciones,
- * y retirar un export compartido rompe a quien lo importa. Esa ficha debería dejar de
- * publicarlas como si fueran de donaciones.
+ * Delegum y GPT) las restaban de la base (hallazgo 1862), y hasta el 12/10/2026
+ * `app/api/datos/[slug]/route.ts` las publicaba bajo la ficha de donaciones (cabo C0026). Ya
+ * no las lee nadie, así que se retiraron REDUCCIONES_PARENTESCO_ID y REDUCCION_DISCAPACIDAD_*_ID:
+ * las cifras viven, para lo que sí son, en el módulo de sucesiones.
  */
-export const REDUCCIONES_PARENTESCO_ID: Record<string, number> = {
-  'I-conyuge':      15956.87,
-  'I-descendiente': 15956.87,
-  'II':             15956.87,
-  'II-ascendiente': 15956.87,
-  'III':            7993.46,
-  'IV':             0,
-};
-
-// ─── Reducciones por discapacidad ────────────────────────────────────────────
-
-// 47.858,59 € (art. 20.2.a LISD). Hasta el 25/09/2026 decía 47.859,59: un euro de más.
-export const REDUCCION_DISCAPACIDAD_33_ID = 47858.59;  // Grado 33 %–64 % (solo mortis causa)
-export const REDUCCION_DISCAPACIDAD_65_ID = 150253.03; // Grado ≥ 65 % (solo mortis causa)
 
 // ─── Plazos (cotejados en el BOE consolidado el 25/09/2026) ───────────────────
 

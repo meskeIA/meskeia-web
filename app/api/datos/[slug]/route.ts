@@ -7,7 +7,7 @@ import {
   FISCAL_INTERESES_META, INTERES_LEGAL_DINERO_2025, TIPOS_DEMORA_COMERCIAL, INTERES_DEMORA_TRIBUTARIO_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   FISCAL_SUCESIONES_META, TARIFA_ESTATAL_IS, COEFICIENTES_IS, REDUCCIONES_PARENTESCO_IS, BONIFICACIONES_CCAA_IS,
-  FISCAL_DONACIONES_META, TARIFA_ESTATAL_ID, COEFICIENTES_ID, REDUCCIONES_PARENTESCO_ID, BONIFICACIONES_CCAA_ID,
+  FISCAL_DONACIONES_META, TARIFA_ESTATAL_ID, COEFICIENTES_ID, BONIFICACIONES_CCAA_ID, PLAZO_AUTOLIQUIDACION_DONACIONES,
   FISCAL_PATRIMONIO_META, ESCALA_PATRIMONIO_ESTATAL, BONIFICACIONES_CCAA_PATRIMONIO, MINIMO_EXENTO_ESTATAL, EXENCION_VIVIENDA_HABITUAL, UMBRAL_OBLIGACION_DECLARAR, ITSGF_UMBRAL,
   FISCAL_AMORTIZACION_META, TABLA_AMORTIZACION_2026, MULTIPLICADORES_DEGRESIVO_2026,
   FISCAL_SOCIEDADES_META, TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026, RETENCIONES_IS_2025, OBLIGACIONES_SL_2025,
@@ -117,14 +117,18 @@ const DATASETS: Record<string, Dataset> = {
   'donaciones-isd': {
     meta: {
       nombre: 'Impuesto de Donaciones por comunidad autónoma',
-      descripcion: 'Bonificaciones autonómicas del ISD en donaciones por CCAA, grupos de parentesco, tarifa estatal por tramos, coeficientes multiplicadores y reducciones por parentesco.',
+      descripcion: 'Bonificaciones autonómicas del ISD en donaciones por CCAA, grupos de parentesco, tarifa estatal por tramos, coeficientes multiplicadores y plazo de autoliquidación.',
       fuente: FISCAL_DONACIONES_META.fuente, verificado: FISCAL_DONACIONES_META.verificado, vigencia: FISCAL_DONACIONES_META.vigencia,
       urlOficial: FISCAL_DONACIONES_META.urlOficial, paginaHumana: `${BASE}/datos-fiscales/donaciones-isd`,
     },
+    // Hasta el 12/10/2026 publicaba las reducciones por parentesco del art. 20.2.a LISD, que son
+    // de las adquisiciones mortis causa: en una donación no hay reducción estatal (cabo C0026).
     datos: {
       tarifaEstatal: TARIFA_ESTATAL_ID,
       coeficientesMultiplicadores: COEFICIENTES_ID,
-      reduccionesPorParentesco: REDUCCIONES_PARENTESCO_ID,
+      reduccionesEstatales:
+        'No hay reducción estatal por parentesco ni por discapacidad en las donaciones: las del art. 20.2.a LISD son solo mortis causa, y sin reducción autonómica propia la base liquidable coincide con la imponible (art. 20.5 LISD).',
+      plazoAutoliquidacion: PLAZO_AUTOLIQUIDACION_DONACIONES,
       bonificacionesPorCCAA: BONIFICACIONES_CCAA_ID,
     },
   },

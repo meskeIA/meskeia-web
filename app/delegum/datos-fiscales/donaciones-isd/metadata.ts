@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { BONIFICACIONES_CCAA_ID, FISCAL_DONACIONES_META } from '@/data/fiscal';
+import { BONIFICACIONES_CCAA_ID, FISCAL_DONACIONES_META, PLAZO_AUTOLIQUIDACION_DONACIONES } from '@/data/fiscal';
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/donaciones-isd/';
 
@@ -56,7 +56,7 @@ export const jsonLd = {
   '@type': 'Dataset',
   name: 'Impuesto de Donaciones por comunidad autónoma (España)',
   description:
-    'Bonificaciones autonómicas del Impuesto de Sucesiones y Donaciones (ISD) en su modalidad de donaciones en cada comunidad autónoma española, grupos de parentesco, tarifa estatal por tramos y reducciones por parentesco.',
+    'Bonificaciones autonómicas del Impuesto de Sucesiones y Donaciones (ISD) en su modalidad de donaciones en cada comunidad autónoma española, grupos de parentesco, tarifa estatal por tramos y coeficientes multiplicadores.',
   url: URL_CANONICA,
   license: 'https://delegum.com/aviso-legal',
   creator: {
@@ -76,7 +76,8 @@ export const jsonLd = {
   variableMeasured: [
     'Bonificación autonómica donaciones (%)',
     'Tarifa estatal donaciones (tipo %)',
-    'Reducciones por parentesco (€)',
+    // Eran «Reducciones por parentesco (€)»: las del art. 20.2.a LISD son solo mortis causa (C0026)
+    'Coeficiente multiplicador por parentesco y patrimonio previo',
   ],
   keywords: Object.values(BONIFICACIONES_CCAA_ID).map((c) => `donaciones ${c.nombre}`),
 };
@@ -91,7 +92,7 @@ export const faqJsonLd = {
       name: '¿Qué es el Impuesto de Donaciones y quién lo paga?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Impuesto de Donaciones es la modalidad del Impuesto de Sucesiones y Donaciones (ISD) que grava lo que se recibe en vida de forma gratuita: dinero, un inmueble, acciones, etc. Lo paga quien recibe la donación (el donatario), no quien la hace. Está cedido a las comunidades autónomas y se autoliquida con el Modelo 651 en el plazo de 1 mes desde la donación.',
+        text: `El Impuesto de Donaciones es la modalidad del Impuesto de Sucesiones y Donaciones (ISD) que grava lo que se recibe en vida de forma gratuita: dinero, un inmueble, acciones, etc. Lo paga quien recibe la donación (el donatario), no quien la hace. Está cedido a las comunidades autónomas y se autoliquida con el Modelo 651 en el plazo general de ${PLAZO_AUTOLIQUIDACION_DONACIONES.diasHabiles} días hábiles desde el día siguiente a la donación (${PLAZO_AUTOLIQUIDACION_DONACIONES.norma}), salvo que la comunidad fije otro.`,
       },
     },
     {
@@ -123,7 +124,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la cuota del Impuesto de Donaciones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se parte del valor de lo donado, se restan las reducciones aplicables y sobre la base se aplica la tarifa progresiva (estatal del 7,65% al 34%, o la propia de Cataluña). El resultado se multiplica por el coeficiente según grupo de parentesco y patrimonio previo, y por último se aplica la bonificación de la comunidad autónoma del donatario (o del lugar del inmueble).',
+        text: 'Se parte del valor de lo donado, se restan las reducciones que procedan (en donaciones no existe la reducción estatal por parentesco de las herencias: solo las que regule cada comunidad y algunas específicas, como la de la empresa familiar) y sobre la base se aplica la tarifa progresiva (estatal del 7,65% al 34%, o la propia de Cataluña). El resultado se multiplica por el coeficiente según grupo de parentesco y patrimonio previo, y por último se aplica la bonificación de la comunidad autónoma del donatario (o del lugar del inmueble).',
       },
     },
   ],
