@@ -249,7 +249,7 @@ const METODOS_DATACION: MetodoDatacion[] = [
     icono: '⚛️',
     rango: 'Hasta ~50.000 años',
     descripcion: 'Para restos orgánicos recientes. Mide la desintegración del isótopo ¹⁴C.',
-    detalle: 'Todos los seres vivos absorben ¹⁴C del ambiente. Al morir, dejan de absorberlo y el ¹⁴C se desintegra con una vida media de 5.730 años. Midiendo cuánto ¹⁴C queda, se calcula cuándo murió el organismo. Después de ~50.000 años queda tan poco que no es medible.',
+    detalle: 'Todos los seres vivos absorben ¹⁴C del ambiente. Al morir, dejan de absorberlo y el ¹⁴C se desintegra con un periodo de semidesintegración de 5.730 años. Midiendo cuánto ¹⁴C queda, se calcula cuándo murió el organismo. Después de ~50.000 años queda tan poco que no es medible.',
   },
   {
     id: 'k-ar',
@@ -257,7 +257,7 @@ const METODOS_DATACION: MetodoDatacion[] = [
     icono: '🌋',
     rango: 'Miles a miles de millones de años',
     descripcion: 'Para rocas volcánicas. Mide la desintegración de ⁴⁰K en ⁴⁰Ar.',
-    detalle: 'El potasio-40 se desintegra en argón-40 con una vida media de 1.250 millones de años. Cuando la roca volcánica se solidifica, el argón queda atrapado. Midiendo la proporción K/Ar, se calcula la edad de la roca. Ideal para datar capas volcánicas que rodean fósiles.',
+    detalle: 'El potasio-40 se desintegra en argón-40 con un periodo de semidesintegración de 1.250 millones de años. Cuando la roca volcánica se solidifica, el argón queda atrapado. Midiendo la proporción K/Ar, se calcula la edad de la roca. Ideal para datar capas volcánicas que rodean fósiles.',
   },
   {
     id: 'estratigrafia',

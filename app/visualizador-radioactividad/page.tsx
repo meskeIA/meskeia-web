@@ -491,7 +491,9 @@ const TabDesintegracion = () => {
       <h2 className={styles.seccionTitulo}>Ley de Desintegración Exponencial</h2>
       <p className={styles.seccionDesc}>
         Cada isótopo radiactivo se desintegra según N(t) = N₀ · e<sup>−λt</sup>, donde λ = ln(2)/t½.
-        La vida media (t½) es el tiempo necesario para que la mitad de los núcleos se desintegren.
+        El periodo de semidesintegración o semivida (t½) es el tiempo necesario para que se
+        desintegre la mitad de los núcleos. Muchos textos lo llaman «vida media», pero en rigor la
+        vida media es otra magnitud: τ = t½ / ln(2) ≈ 1,44 · t½, el tiempo medio que sobrevive un núcleo.
       </p>
 
       {/* Fórmula destacada */}
@@ -524,7 +526,7 @@ const TabDesintegracion = () => {
       {/* Slider de tiempo */}
       <div className={styles.sliderGroup}>
         <label className={styles.sliderLabel}>
-          <span>Tiempo transcurrido (en vidas medias t½)</span>
+          <span>Tiempo transcurrido (en periodos de semidesintegración t½)</span>
           <span className={styles.sliderValor}>{tiempoVidas.toFixed(1)} t½</span>
         </label>
         <input
@@ -536,7 +538,7 @@ const TabDesintegracion = () => {
           step={0.1}
           value={tiempoVidas}
           onChange={(e) => setTiempoVidas(parseFloat(e.target.value))}
-          aria-label={`Tiempo: ${tiempoVidas} vidas medias`}
+          aria-label={`Tiempo: ${tiempoVidas} periodos de semidesintegración`}
         />
         <span className={styles.sliderDesc}>
           λ = {lambda.toFixed(4)} (por t½) — Actividad restante: {actividadPct.toFixed(2)}%
@@ -912,7 +914,7 @@ export default function VisualizadorRadioactividad() {
 
         <EducationalSection
           title="Radiactividad: núcleos inestables y sus emisiones"
-          subtitle="Desintegración espontánea, vida media y aplicaciones médicas e industriales"
+          subtitle="Desintegración espontánea, periodo de semidesintegración y aplicaciones médicas e industriales"
         >
           <h3>Comparativa de Tipos de Radiación</h3>
           <div className={styles.tableWrapper}>
@@ -981,9 +983,9 @@ export default function VisualizadorRadioactividad() {
               <p>Un núcleo es inestable cuando la relación n/p está fuera del rango de estabilidad, cuando hay exceso de energía, o cuando el núcleo es muy grande. La fuerza nuclear fuerte mantiene el núcleo unido, pero si protones o neutrones sobran, el sistema busca minimizar su energía emitiendo radiación.</p>
             </div>
             <div className={styles.faqItem}>
-              <strong>¿Por qué la vida media no cambia con la temperatura o presión?</strong>
+              <strong>¿Por qué el periodo de semidesintegración no cambia con la temperatura o presión?</strong>
               <p>La desintegración radiactiva depende de la estructura nuclear, no de factores externos como temperatura, presión o estado químico. Los electrones de los orbitales exteriores no afectan al núcleo. Solo la captura electrónica (un caso especial) tiene ligera dependencia del entorno.</p>
-              <div className={styles.faqTip}><span aria-hidden="true">💡</span> La vida media del C-14 en un diamante y en un ser vivo es idéntica: 5730 años.</div>
+              <div className={styles.faqTip}><span aria-hidden="true">💡</span> El periodo de semidesintegración del C-14 en un diamante y en un ser vivo es idéntico: 5.730 años.</div>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Cómo funciona exactamente la datación por C-14?</strong>
@@ -1012,7 +1014,7 @@ export default function VisualizadorRadioactividad() {
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepContent}>
                 <h4>Explora la curva de desintegración</h4>
-                <p>Selecciona un isótopo (C-14, I-131, etc.) y mueve el slider de tiempo. Observa cómo la curva exponencial cae a la mitad en cada vida media. Compara isótopos con vidas medias muy diferentes.</p>
+                <p>Selecciona un isótopo (C-14, I-131, etc.) y mueve el slider de tiempo. Observa cómo la curva exponencial cae a la mitad en cada periodo t½. Compara isótopos con periodos de semidesintegración muy diferentes.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -1043,8 +1045,8 @@ export default function VisualizadorRadioactividad() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <div>
-                <strong>Escala logarítmica para vidas medias</strong>
-                <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Las vidas medias van de microsegundos (Po-212: 299 ns) a miles de millones de años (U-238: 4.468 Ga). Compararlas requiere escala logarítmica — diferencias de 20 órdenes de magnitud.</p>
+                <strong>Escala logarítmica para los periodos t½</strong>
+                <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Los periodos de semidesintegración van de microsegundos (Po-212: 299 ns) a miles de millones de años (U-238: 4.468 Ga). Compararlas requiere escala logarítmica — diferencias de 20 órdenes de magnitud.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
@@ -1072,7 +1074,7 @@ export default function VisualizadorRadioactividad() {
               <li><strong>Radiactivo ≠ peligroso siempre</strong> — El K-40 en el plátano es radiactivo (t½ = 1,25 Ga), pero la dosis que aporta es insignificante. El peligro depende de la actividad (Bq), el tipo de radiación, el tiempo de exposición y si es interna o externa.</li>
               <li><strong>La radiación α no es inofensiva</strong> — Aunque no penetra piel, inhalada (radón, Ra-226) o ingerida (Po-210) causa daño celular severo: el factor Q = 20 la hace 20 veces más dañina por Gy que los rayos γ en tejido.</li>
               <li><strong>Los residuos nucleares no «se eliminan» fácilmente</strong> — El U-238 tiene t½ = 4468 Ma. Ningún proceso químico ni físico cambia eso. La única estrategia es el almacenamiento geológico profundo durante miles de años.</li>
-              <li><strong>La datación por C-14 no sirve para dinosaurios</strong> — La técnica es fiable hasta ~50.000 años. Los dinosaurios se extinguieron hace 66 Ma — para eso se usa U-Pb o Ar-Ar, con vidas medias de millones de años.</li>
+              <li><strong>La datación por C-14 no sirve para dinosaurios</strong> — La técnica es fiable hasta ~50.000 años. Los dinosaurios se extinguieron hace 66 Ma — para eso se usa U-Pb o Ar-Ar, con periodos de semidesintegración de millones de años.</li>
               <li><strong>Actividad (Bq) ≠ dosis (Sv)</strong> — Un becquerel mide desintegraciones por segundo, no daño biológico. 1 Bq de Po-210 (α) causa mucho más daño que 1 Bq de K-40 (β⁻) porque el factor Q del α es 20 veces mayor.</li>
             </ul>
           </div>

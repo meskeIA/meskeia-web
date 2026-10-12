@@ -479,7 +479,7 @@ function pasosEvaluar(tipo: TipoFuncion, p: ParametrosFuncion, x: number, valor:
     ];
     if (base < 1) {
       pasos.push(
-        `Como la base es menor que 1, la función DECRECE: cada periodo se queda en el ${f(base * 100)} % de lo que había. Eso es exactamente lo que significa una vida media.`,
+        `Como la base es menor que 1, la función DECRECE: cada periodo se queda en el ${f(base * 100)} % de lo que había. Con un factor de 0,5, ese periodo es lo que en radiactividad se llama periodo de semidesintegración (t½).`,
       );
     }
     return pasos;
@@ -781,9 +781,9 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
   },
   {
     id: 8,
-    titulo: 'Vida media de un isótopo',
+    titulo: 'Periodo de semidesintegración de un isótopo',
     enunciado:
-      'Una muestra de 800 gramos de un isótopo radiactivo tiene una vida media de 12 años: cada 12 años queda la mitad de lo que había. ¿Cuántos gramos quedan al cabo de 36 años?',
+      'Una muestra de 800 gramos de un isótopo radiactivo tiene un periodo de semidesintegración (t½) de 12 años: cada 12 años queda la mitad de lo que había. ¿Cuántos gramos quedan al cabo de 36 años?',
     categoria: 'aplicado',
     tipoFuncion: 'exponencial',
     calculo: 'evaluar',
@@ -791,7 +791,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     x: 36,
     expresion: 'M(x) = 800 · 0,5^(x/12)',
     etiquetaRespuesta: 'gramos',
-    pista: 'Es una exponencial con base menor que 1: decrece. En 36 años caben 3 vidas medias, y cada una parte por dos.',
+    pista: 'Es una exponencial con base menor que 1: decrece. En 36 años caben 3 periodos de 12, y cada uno parte por dos.',
     grafica: null,
   },
   {

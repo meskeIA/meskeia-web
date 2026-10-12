@@ -79,10 +79,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué es la vida media de un isótopo radiactivo?',
+      name: '¿Qué es el periodo de semidesintegración (la «vida media») de un isótopo radiactivo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La vida media (t½) es el tiempo necesario para que la mitad de los núcleos radiactivos de una muestra se desintegren. Varía enormemente según el isótopo: el tecnecio-99m tiene una vida media de 6 horas (útil en medicina nuclear), el carbono-14 de 5.730 años (base de la datación arqueológica) y el uranio-238 de 4.500 millones de años. La cantidad restante en cualquier instante sigue la ley exponencial N(t) = N₀ · e^(−λt), donde λ = ln2/t½.',
+        text: 'El periodo de semidesintegración o semivida (t½) es el tiempo necesario para que se desintegre la mitad de los núcleos radiactivos de una muestra; muchos textos lo llaman «vida media», aunque en rigor la vida media es τ = t½/ln 2 ≈ 1,44 · t½, el tiempo medio que sobrevive un núcleo. Varía enormemente según el isótopo: el tecnecio-99m tiene un periodo de semidesintegración de 6 horas (útil en medicina nuclear), el carbono-14 de 5.730 años (base de la datación arqueológica) y el uranio-238 de 4.500 millones de años. La cantidad restante en cualquier instante sigue la ley exponencial N(t) = N₀ · e^(−λt), donde λ = ln2/t½ = 1/τ.',
       },
     },
     {

@@ -443,13 +443,13 @@ export default function VisualizadorCarbono(): React.ReactNode {
             <div className={styles.c14Paso}>
               <span className={styles.c14PasoNum}>3</span>
               <div>
-                <strong>Muerte:</strong> Al morir, cesa la absorción. El C-14 se desintegra con vida media de <strong>5.730 años</strong>
+                <strong>Muerte:</strong> Al morir, cesa la absorción. El C-14 se desintegra con un periodo de semidesintegración (t½) de <strong>5.730 años</strong>
               </div>
             </div>
             <div className={styles.c14Paso}>
               <span className={styles.c14PasoNum}>4</span>
               <div>
-                <strong>Datación:</strong> Medir proporción C-14/C-12 → calcular cuántas vidas medias han pasado → edad del objeto
+                <strong>Datación:</strong> Medir proporción C-14/C-12 → calcular cuántos periodos t½ han pasado → edad del objeto
               </div>
             </div>
           </div>

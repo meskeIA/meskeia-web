@@ -124,7 +124,7 @@ const ELEMENTOS_ISOTOPOS: ElementoIsotopo[] = [
     isotopos: [
       { elemento: 'H', simbolo: '¹H', masico: 1, neutrones: 0, estable: true, nota: 'Protio — 99,98% del H natural' },
       { elemento: 'H', simbolo: '²H', masico: 2, neutrones: 1, estable: true, nota: 'Deuterio — agua pesada en reactores nucleares' },
-      { elemento: 'H', simbolo: '³H', masico: 3, neutrones: 2, estable: false, nota: 'Tritio — radiactivo, vida media 12,3 años' },
+      { elemento: 'H', simbolo: '³H', masico: 3, neutrones: 2, estable: false, nota: 'Tritio — radiactivo, periodo de semidesintegración 12,3 años' },
     ],
   },
   {
@@ -133,7 +133,7 @@ const ELEMENTOS_ISOTOPOS: ElementoIsotopo[] = [
     isotopos: [
       { elemento: 'C', simbolo: '¹²C', masico: 12, neutrones: 6, estable: true, nota: 'El más abundante (98,9%) — base de la vida' },
       { elemento: 'C', simbolo: '¹³C', masico: 13, neutrones: 7, estable: true, nota: 'Usado en resonancia magnética nuclear' },
-      { elemento: 'C', simbolo: '¹⁴C', masico: 14, neutrones: 8, estable: false, nota: 'Datación por radiocarbono — vida media 5.730 años' },
+      { elemento: 'C', simbolo: '¹⁴C', masico: 14, neutrones: 8, estable: false, nota: 'Datación por radiocarbono — periodo de semidesintegración 5.730 años' },
     ],
   },
   {
@@ -141,7 +141,7 @@ const ELEMENTOS_ISOTOPOS: ElementoIsotopo[] = [
     z: 92,
     isotopos: [
       { elemento: 'U', simbolo: '²³⁵U', masico: 235, neutrones: 143, estable: false, nota: 'Fisible — combustible nuclear (0,7% del U natural)' },
-      { elemento: 'U', simbolo: '²³⁸U', masico: 238, neutrones: 146, estable: false, nota: 'Vida media 4.500 millones de años — 99,3% del U natural' },
+      { elemento: 'U', simbolo: '²³⁸U', masico: 238, neutrones: 146, estable: false, nota: 'Periodo de semidesintegración 4.500 millones de años — 99,3% del U natural' },
     ],
   },
 ];

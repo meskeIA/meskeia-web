@@ -71,7 +71,7 @@ export const faqJsonLd = {
       name: '¿Cómo se data la edad de un fósil?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Existen varios métodos complementarios. La datación por carbono-14 funciona para fósiles de menos de 50.000 años, ya que este isótopo radiactivo tiene una vida media de 5.730 años. Para fósiles más antiguos se usa potasio-argón (hasta 4.500 Ma) o uranio-plomo. La estratigrafía ubica el fósil en una capa de roca cuya edad se conoce. Los fósiles guía son especies de vida breve y amplia distribución que permiten correlacionar capas de distintos lugares del mundo.',
+        text: 'Existen varios métodos complementarios. La datación por carbono-14 funciona para fósiles de menos de 50.000 años, ya que este isótopo radiactivo tiene un periodo de semidesintegración de 5.730 años. Para fósiles más antiguos se usa potasio-argón (hasta 4.500 Ma) o uranio-plomo. La estratigrafía ubica el fósil en una capa de roca cuya edad se conoce. Los fósiles guía son especies de vida breve y amplia distribución que permiten correlacionar capas de distintos lugares del mundo.',
       },
     },
     {

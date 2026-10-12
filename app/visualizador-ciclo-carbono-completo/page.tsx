@@ -783,7 +783,7 @@ export default function VisualizadorCicloCarbonoCompleto() {
             </h4>
             <p>
               El carbono tiene tres isótopos principales: ¹²C (98,9%), ¹³C (1,1%) y ¹⁴C (radiactivo,
-              vida media 5.730 años). Los combustibles fósiles no contienen ¹⁴C (demasiado antiguos).
+              periodo de semidesintegración de 5.730 años). Los combustibles fósiles no contienen ¹⁴C (demasiado antiguos).
               Midiendo la proporción de ¹⁴C en la atmósfera, los científicos confirman que el CO₂
               extra proviene de la quema de fósiles.
             </p>

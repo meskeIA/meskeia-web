@@ -67,7 +67,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona la datación por carbono 14?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El carbono 14 (C-14) es un isótopo radiactivo que se forma en la atmósfera por la acción de los rayos cósmicos y se incorpora a los organismos vivos mientras están vivos. Al morir, dejan de absorber C-14 y el que ya tenían empieza a desintegrarse con una vida media de 5.730 años. Midiendo la proporción de C-14 restante respecto al C-12 estable, se puede calcular cuándo murió el organismo. El método es fiable hasta unos 50.000 años.',
+        text: 'El carbono 14 (C-14) es un isótopo radiactivo que se forma en la atmósfera por la acción de los rayos cósmicos y se incorpora a los organismos vivos mientras están vivos. Al morir, dejan de absorber C-14 y el que ya tenían empieza a desintegrarse con un periodo de semidesintegración (t½) de 5.730 años. Midiendo la proporción de C-14 restante respecto al C-12 estable, se puede calcular cuándo murió el organismo. El método es fiable hasta unos 50.000 años.',
       },
     },
     {
