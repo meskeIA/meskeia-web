@@ -269,9 +269,8 @@ async function activarTemaOscuro(page: Page): Promise<void> {
 const botonSubir = (page: Page): Locator => page.locator('button', { hasText: 'Subir imagen' });
 
 async function abrirGuia(page: Page): Promise<void> {
-  // Por el texto visible y no por el nombre accesible: el botón compartido lleva aria-label
-  // «Ver guía educativa», distinto de lo que se ve (anotado en SOSPECHAS el 27/09/2026).
-  await page.locator('button[aria-expanded="false"]', { hasText: 'Ver Guía Completa' }).click();
+  // Desde el 12/10/2026 (cabo C0053) el nombre accesible del botón compartido es su texto visible
+  await page.getByRole('button', { name: 'Ver guía educativa', expanded: false }).click();
   await expect(page.locator('table th').first()).toBeVisible();
 }
 

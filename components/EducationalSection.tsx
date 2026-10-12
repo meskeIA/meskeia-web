@@ -44,14 +44,19 @@ export default function EducationalSection({
         </h3>
         <p className={styles.subtitle}>{subtitle}</p>
 
+        {/*
+          El nombre accesible ES el texto visible (WCAG 2.5.3, cabo C0053): hasta el 12/10/2026
+          el aria-label decía «Ver guía educativa» y se leía «Ver Guía Completa», y la flecha
+          no llevaba aria-hidden. El estado lo da aria-expanded.
+        */}
         <button
           type="button"
           onClick={toggleOpen}
           className={styles.toggleButton}
           aria-expanded={isOpen}
-          aria-label={isOpen ? 'Ocultar guía educativa' : 'Ver guía educativa'}
         >
-          {isOpen ? '⬆️ Ocultar Guía Educativa' : '⬇️ Ver Guía Completa'}
+          <span aria-hidden="true">{isOpen ? '⬆️' : '⬇️'}</span>{' '}
+          {isOpen ? 'Ocultar guía educativa' : 'Ver guía educativa'}
         </button>
       </div>
 
@@ -60,10 +65,14 @@ export default function EducationalSection({
         clic, así que un `isOpen && children` dejaba todo el contenido educativo
         invisible al crawler en el catálogo entero). Se oculta por CSS cuando está
         colapsado — mismo comportamiento visual (REGLA #7), pero ya es rastreable.
+
+        Sin región viva: lo abre quien pulsa el botón, que ya sabe que se despliega por
+        aria-expanded. Con aria-live="polite" el lector leía de un tirón el bloque entero
+        al desplegarlo (6.713 caracteres en buscador-palabras-patron; cabo C0053).
       */}
       <div
         className={`${styles.content} ${isOpen ? '' : styles.contentHidden}`}
-        aria-live="polite"
+        data-guia-educativa=""
       >
         {children}
       </div>

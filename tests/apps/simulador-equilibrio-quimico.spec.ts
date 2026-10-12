@@ -148,7 +148,7 @@ const valorDe = (page: Page, etiqueta: string) =>
 
 /**
  * La banda con la flecha de desplazamiento del panel 4. Se acota por sección porque
- * EducationalSection monta OTRO div con aria-live="polite" (su contenido colapsable).
+ * EducationalSection montaba OTRO div con aria-live="polite" hasta el 12/10/2026 (C0053).
  */
 const flecha = (page: Page) =>
   page.locator(
@@ -510,7 +510,8 @@ test('HALLAZGO [6] — los emojis decorativos propios de la app van sin aria-hid
     const titulo = [...document.querySelectorAll('h3')].find((h) =>
       h.textContent?.includes('Guía de Equilibrio Químico'),
     );
-    const contenido = titulo?.closest('div')?.parentElement?.querySelector('[aria-live="polite"]');
+    // El contenido de EducationalSection ya no es región viva (cabo C0053): se marca con data-guia-educativa
+    const contenido = titulo?.closest('div')?.parentElement?.querySelector('[data-guia-educativa]');
     if (!contenido) return [];
     return [...contenido.querySelectorAll('span')]
       .filter((s) => /^[\p{Extended_Pictographic}️]+$/u.test(s.textContent?.trim() ?? ''))
