@@ -326,7 +326,10 @@
 .envoltorioPuzzle {
   overflow-x: auto;
   display: flex;
+  /* safe: si el puzzle desborda, se alinea al principio y sus pistas de fila se alcanzan con
+     el scroll; con center a secas quedaban fuera (cabo C0060, forma del hallazgo 2298) */
   justify-content: center;
+  justify-content: safe center;
 }
 
 .tablaPuzzle {

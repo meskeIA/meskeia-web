@@ -13,8 +13,8 @@
 .title { font-size: 2.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
 .subtitle { font-size: 1.1rem; opacity: 0.92; max-width: 600px; margin: 0 auto; line-height: 1.5; }
 
-/* Timeline horizontal */
-.timeline { display: flex; gap: 0.3rem; justify-content: center; margin-bottom: var(--spacing-sm); overflow-x: auto; padding-bottom: 0.3rem; }
+/* Timeline horizontal · safe: si desborda, el primer paso se alcanza con el scroll (cabo C0060) */
+.timeline { display: flex; gap: 0.3rem; justify-content: center; justify-content: safe center; margin-bottom: var(--spacing-sm); overflow-x: auto; padding-bottom: 0.3rem; }
 .timelineStep { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; padding: 0.4rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.15s; min-width: 52px; color: var(--text-primary); }
 .timelineStep:hover { background: var(--hover); }
 .timelineActivo { background: rgba(46,134,171,0.06); }

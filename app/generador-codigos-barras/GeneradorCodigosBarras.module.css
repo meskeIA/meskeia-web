@@ -216,7 +216,10 @@
 
 .canvasContainer {
   display: flex;
+  /* safe: si el código desborda, se alinea al principio y su borde izquierdo se alcanza con el
+     scroll; con center a secas quedaba fuera (cabo C0060, forma del hallazgo 2298) */
   justify-content: center;
+  justify-content: safe center;
   align-items: center;
   min-height: 180px;
   padding: 20px;

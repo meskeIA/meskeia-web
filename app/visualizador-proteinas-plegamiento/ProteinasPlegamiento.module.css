@@ -70,8 +70,10 @@
 .nivelTitulo { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.2rem; }
 .nivelSubtitulo { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
 
+/* safe: si el dibujo desborda, se alinea al principio y su borde izquierdo se alcanza con el
+   scroll; con center a secas quedaba fuera (cabo C0060, forma del hallazgo 2298) */
 .nivelSvgWrap {
-  display: flex; justify-content: center; align-items: center;
+  display: flex; justify-content: center; justify-content: safe center; align-items: center;
   margin-bottom: var(--spacing-lg); overflow-x: auto;
 }
 .nivelDesc {

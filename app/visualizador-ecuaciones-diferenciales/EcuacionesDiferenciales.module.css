@@ -222,7 +222,10 @@
 /* ── SVG del campo de direcciones ── */
 .svgWrapper {
   display: flex;
+  /* safe: si el campo desborda, se alinea al principio y su borde izquierdo se alcanza con el
+     scroll; con center a secas quedaba fuera (cabo C0060, forma del hallazgo 2298) */
   justify-content: center;
+  justify-content: safe center;
   overflow-x: auto;
 }
 

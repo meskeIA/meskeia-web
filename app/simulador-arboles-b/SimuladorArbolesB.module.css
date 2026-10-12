@@ -280,7 +280,10 @@
   min-height: 240px;
   display: flex;
   align-items: center;
+  /* safe: si el árbol desborda, se alinea al principio y su borde izquierdo se alcanza con el
+     scroll; con center a secas quedaba fuera (cabo C0060, el hallazgo 2298 de su hermana) */
   justify-content: center;
+  justify-content: safe center;
 }
 
 .arbolEmpty {

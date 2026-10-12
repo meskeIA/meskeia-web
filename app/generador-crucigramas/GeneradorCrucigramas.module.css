@@ -259,7 +259,10 @@
 .envoltorioRejilla {
   overflow-x: auto;
   display: flex;
+  /* safe: si la rejilla desborda, se alinea al principio y su primera columna se alcanza con
+     el scroll; con center a secas quedaba fuera (cabo C0060, forma del hallazgo 2298) */
   justify-content: center;
+  justify-content: safe center;
   margin-bottom: var(--spacing-xl);
 }
 
