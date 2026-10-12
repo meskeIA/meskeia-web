@@ -163,7 +163,8 @@ export default function MatrizAlimentariaPage() {
           <h3>Espectro de procesamiento:</h3>
           <div className={styles.exampleGrid}>
             <div className={styles.exampleCard} style={{ borderTop: '4px solid #27AE60' }}>
-              <span className={styles.exampleIcon}>✅</span>
+              {/* El semáforo dice algo que el título no: va con nombre, no oculto (cabo C0222) */}
+              <span className={styles.exampleIcon} role="img" aria-label="Matriz intacta">✅</span>
               <h4 className={styles.exampleTitle}>Mínimo procesamiento</h4>
               <p className={styles.exampleDesc}>
                 Lavado, cortado, congelación, refrigeración.
@@ -171,7 +172,7 @@ export default function MatrizAlimentariaPage() {
               </p>
             </div>
             <div className={styles.exampleCard} style={{ borderTop: '4px solid #F39C12' }}>
-              <span className={styles.exampleIcon}>⚠️</span>
+              <span className={styles.exampleIcon} role="img" aria-label="Matriz alterada">⚠️</span>
               <h4 className={styles.exampleTitle}>Procesamiento culinario</h4>
               <p className={styles.exampleDesc}>
                 Cocción, fermentación, molienda casera.
@@ -179,7 +180,7 @@ export default function MatrizAlimentariaPage() {
               </p>
             </div>
             <div className={styles.exampleCard} style={{ borderTop: '4px solid #E74C3C' }}>
-              <span className={styles.exampleIcon}>⛔</span>
+              <span className={styles.exampleIcon} role="img" aria-label="Matriz destruida">⛔</span>
               <h4 className={styles.exampleTitle}>Ultraprocesamiento</h4>
               <p className={styles.exampleDesc}>
                 Extrusión, hidrogenación, aditivos.

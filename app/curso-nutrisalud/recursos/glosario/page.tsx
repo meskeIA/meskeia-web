@@ -360,6 +360,7 @@ export default function GlosarioPage() {
               type="button"
               key={category}
               onClick={() => setSelectedCategory(category)}
+              aria-pressed={selectedCategory === category}
               className={`${styles.categoryButton} ${
                 selectedCategory === category ? styles.categoryActive : ''
               }`}

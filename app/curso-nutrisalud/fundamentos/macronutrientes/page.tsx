@@ -196,7 +196,8 @@ export default function MacronutrientesPage() {
 
           <div className={styles.exampleGrid}>
             <div className={styles.exampleCard} style={{ borderTop: '4px solid #27AE60' }}>
-              <span className={styles.exampleIcon}>✅</span>
+              {/* El título ya dice el juicio: el emoji lo repite y se oculta (cabo C0222) */}
+              <span className={styles.exampleIcon} aria-hidden="true">✅</span>
               <h4 className={styles.exampleTitle}>Grasas Beneficiosas</h4>
               <p className={styles.exampleDesc}>
                 <strong>Omega-3:</strong> Salmón, sardinas, chía, nueces<br />
@@ -205,7 +206,7 @@ export default function MacronutrientesPage() {
               </p>
             </div>
             <div className={styles.exampleCard} style={{ borderTop: '4px solid #E74C3C' }}>
-              <span className={styles.exampleIcon}>⛔</span>
+              <span className={styles.exampleIcon} aria-hidden="true">⛔</span>
               <h4 className={styles.exampleTitle}>Grasas a Evitar</h4>
               <p className={styles.exampleDesc}>
                 <strong>Trans industriales:</strong> Margarinas, bollería<br />

@@ -161,7 +161,7 @@ export default function ChapterPage({ slug, sections }: ChapterPageProps) {
             >
               <div className={styles.bottomNavLabel}>← Anterior</div>
               <div className={styles.bottomNavTitle}>
-                {prevChapter.icon} {prevChapter.title}
+                <span aria-hidden="true">{prevChapter.icon}</span> {prevChapter.title}
               </div>
             </Link>
           ) : (
@@ -178,7 +178,7 @@ export default function ChapterPage({ slug, sections }: ChapterPageProps) {
             >
               <div className={styles.bottomNavLabel}>Siguiente →</div>
               <div className={styles.bottomNavTitle}>
-                {nextChapter.icon} {nextChapter.title}
+                <span aria-hidden="true">{nextChapter.icon}</span> {nextChapter.title}
               </div>
             </Link>
           ) : (
