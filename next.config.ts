@@ -101,7 +101,9 @@ const nextConfig: NextConfig = {
   // cliente no llega y NADA se hidrata: el test veía la página servida y ni un solo
   // registro, que parece exactamente lo mismo que el defecto que vigila. En producción
   // esta opción no interviene.
-  allowedDevOrigins: ['meskeia.com'],
+  // Los portales, por lo mismo: los specs que visitan stemum.com (o los otros) veían rechazado
+  // el WebSocket de HMR y la página no se hidrataba; seis lo puenteaban con `puenteHmr` (C0100).
+  allowedDevOrigins: ['meskeia.com', 'stemum.com', 'coquinum.com', 'cronicum.com', 'delegum.com'],
 
   // ============================================================================
   // IMÁGENES - Sin optimización por ahora (puede habilitarse en Vercel)
