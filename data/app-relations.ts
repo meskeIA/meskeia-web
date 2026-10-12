@@ -1150,7 +1150,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
     { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
     { url: '/visualizador-cerebro/', icon: '🧠', name: 'Cómo Piensa tu Cerebro', description: '86.000 millones de neuronas' },
-    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: 'Datos fascinantes' },
+    { url: '/simulador-osmosis/', icon: '🧫', name: 'Ósmosis', description: 'Qué le pasa a la célula en agua dulce o salada' },
   ],
   'visualizador-fotosintesis': [
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
@@ -1241,7 +1241,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-transporte-plantas': [
     { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
     { url: '/visualizador-anatomia-flor/', icon: '🌸', name: 'Anatomía de una Flor', description: 'Polinización y frutos' },
-    { url: '/visualizador-ciclo-agua/', icon: '💧', name: 'El Ciclo del Agua', description: 'Viaje infinito de cada gota' },
+    { url: '/simulador-osmosis/', icon: '🧫', name: 'Ósmosis', description: 'Por qué el agua entra en la raíz' },
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Célula vegetal' },
   ],
   'visualizador-ecosistema': [
@@ -1609,7 +1609,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-higado/', icon: '🫀', name: 'El Hígado', description: 'Primer órgano de detoxificación' },
     { url: '/visualizador-sangre-componentes/', icon: '🩸', name: 'La Sangre', description: 'El riñón la filtra continuamente' },
     { url: '/visualizador-sistema-endocrino/', icon: '🧬', name: 'Sistema Endocrino', description: 'Aldosterona, ADH, SRAA' },
-    { url: '/visualizador-cuerpo-numeros/', icon: '🫀', name: 'Tu Cuerpo en Números', description: '180L filtrados al día' },
+    { url: '/simulador-osmosis/', icon: '🧫', name: 'Ósmosis', description: 'El paso de agua que concentra la orina' },
   ],
   'visualizador-envejecimiento-celular': [
     { url: '/visualizador-cerebro-emociones/', icon: '🧠', name: 'Cerebro y Emociones', description: 'Neuroplasticidad y envejecimiento cerebral' },
@@ -6273,6 +6273,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-efecto-fotoelectrico/', icon: '💡', name: 'Efecto Fotoeléctrico', description: 'El mismo fotón E = h·f, ahora arrancando electrones de un metal' },
     { url: '/visualizador-espectro-electromagnetico/', icon: '🌈', name: 'Espectro Electromagnético', description: 'Dónde caen las series de Lyman, Balmer y Paschen' },
     { url: '/visualizador-estructura-atomo/', icon: '🔬', name: 'Estructura del Átomo', description: 'Partículas, orbitales e isótopos del átomo' },
+  ],
+  'simulador-osmosis': [
+    { url: '/visualizador-celula/', icon: '🔬', name: 'Célula animal y vegetal', description: 'La membrana, la pared y la vacuola que deciden qué le pasa a la célula' },
+    { url: '/visualizador-transporte-plantas/', icon: '🌱', name: 'Transporte en Plantas', description: 'La raíz absorbe agua por ósmosis' },
+    { url: '/visualizador-rinon-filtracion/', icon: '🫘', name: 'El Riñón', description: 'Cómo concentra la orina con un gradiente osmótico' },
+    { url: '/simulador-principio-pascal/', icon: '🛢️', name: 'Principio de Pascal', description: 'La presión osmótica, convertida en columna de agua: ρ·g·h' },
   ],
   'simulador-fluidos-bernoulli': [
     { url: '/simulador-conservacion-energia/', icon: '🎢', name: 'Conservación de la Energía', description: 'Bernoulli es conservación de energía en fluidos' },

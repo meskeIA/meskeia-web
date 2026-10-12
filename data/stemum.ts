@@ -1057,6 +1057,13 @@ export const STEMUM_APPS: StemumApp[] = [
     desc: 'Ajusta intensidad, umbral y duración del estímulo y observa en vivo en el canvas si la neurona dispara y a qué frecuencia (ley del todo o nada).',
     disciplina: 'biologia',
   },
+  {
+    slug: 'simulador-osmosis',
+    icon: '🧫',
+    titulo: 'Ósmosis y presión osmótica',
+    desc: 'Hacia dónde pasa el agua a través de una membrana semipermeable, π = i·M·R·T, y una célula animal o vegetal en un medio hipotónico, isotónico o hipertónico.',
+    disciplina: 'biologia',
+  },
   // Tierra y Espacio
   {
     slug: 'simulador-orbitas-kepler',

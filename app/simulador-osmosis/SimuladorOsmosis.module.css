@@ -1,0 +1,814 @@
+/* ============================================================
+   SimuladorOsmosis.module.css — paleta meskeIA
+   Base común con simulador-principio-pascal y simulador-flotabilidad. Los tokens (--primary,
+   --bg-card, --text-*) vienen de app/globals.css y ya cambian solos con el tema; aquí solo se
+   redeclaran en oscuro los colores literales.
+   ============================================================ */
+
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+.hero {
+  background: var(--hero-bg);
+  color: #fff;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1rem;
+  opacity: 0.92;
+  margin: 0 auto;
+  max-width: 720px;
+}
+
+/* ── Main ─────────────────────────────────────────────────── */
+.main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ── Paneles de datos ─────────────────────────────────────── */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-light);
+}
+
+.panelTitulo {
+  font-size: 1.15rem;
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+}
+
+.panelIntro {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: -0.4rem 0 1.1rem;
+}
+
+.grupo {
+  margin-bottom: 1.25rem;
+}
+
+.grupoTitulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+  color: var(--text-primary);
+}
+
+.subgrupo {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0.75rem 0 0.4rem;
+}
+
+/* Los dos lados de la membrana, uno al lado del otro */
+.lados {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.disolucion {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--bg-primary);
+  min-width: 0;
+}
+
+.panel > .disolucion {
+  margin-bottom: 0.25rem;
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.8rem;
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.preset:hover {
+  border-color: var(--primary);
+}
+
+.preset:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Seleccionado: texto blanco sobre --primary-boton (5,47:1), no sobre --primary (4,11:1) */
+.preset[aria-pressed='true'] {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #fff;
+}
+
+.presetDetalle {
+  font-weight: 400;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.preset[aria-pressed='true'] .presetDetalle {
+  color: #fff;
+}
+
+.entrada {
+  margin-top: 0.85rem;
+}
+
+.entradaCorta {
+  max-width: 340px;
+  margin-top: 0.85rem;
+}
+
+.nota {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Dibujo + resultados ──────────────────────────────────── */
+.simLayout {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+  gap: 1.25rem;
+  margin: 1.25rem 0 0;
+  align-items: start;
+}
+
+.dibujoCaja,
+.resultadosCaja {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--shadow-light);
+  min-width: 0;
+}
+
+.dibujo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.svgRecipiente {
+  stroke: var(--text-secondary);
+}
+
+.svgAgua {
+  fill: #D6ECF7;
+}
+
+.svgSoluto {
+  fill: #1a5278;
+}
+
+.svgMembrana {
+  stroke: #5B6470;
+}
+
+.svgFlechaAgua line {
+  stroke: #1565C0;
+}
+
+.svgFlechaAgua polygon {
+  fill: #1565C0;
+}
+
+.svgGlobulo {
+  fill: #D9534F;
+  stroke: #9B2C2C;
+  stroke-width: 2px;
+}
+
+.svgGlobuloCentro {
+  fill: #EBA09D;
+}
+
+.svgPared {
+  fill: none;
+  stroke: #2E7D32;
+}
+
+.svgCitoplasma {
+  fill: #A5D6A7;
+  stroke: #388E3C;
+  stroke-width: 2px;
+}
+
+.svgVacuola {
+  fill: #E3F2FD;
+  stroke: #64B5F6;
+  stroke-width: 1.5px;
+}
+
+/* Rótulos con halo del color de la tarjeta: se leen encima del agua */
+.svgEtiqueta,
+.svgRotulo,
+.svgRotuloSecundario {
+  paint-order: stroke;
+  stroke: var(--bg-card);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.svgEtiqueta {
+  fill: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.svgRotulo {
+  fill: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.svgRotuloSecundario {
+  fill: var(--text-muted);
+  font-size: 12px;
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0;
+  justify-content: center;
+}
+
+.leyenda > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.muestraPunto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1a5278;
+  flex-shrink: 0;
+}
+
+.muestraFlecha {
+  width: 18px;
+  height: 4px;
+  border-radius: 2px;
+  background: #1565C0;
+  flex-shrink: 0;
+}
+
+.resultados {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.tarjeta {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: var(--bg-primary);
+}
+
+.tarjetaNombre {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.tarjetaValor {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.aclaracion {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faltan {
+  border: 1.5px dashed var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  color: var(--text-primary);
+}
+
+.faltan p {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.destacado {
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: #E3F0F7;
+  border: 1.5px solid #7FB3D3;
+  color: #1a5278;
+}
+
+/* La tonicidad tiñe el recuadro: azul si entra agua, gris si no pasa, ámbar si sale */
+.destacado_hipotonico {
+  background: #E3F0F7;
+  border-color: #7FB3D3;
+  color: #1a5278;
+}
+
+.destacado_isotonico {
+  background: #EEF1F4;
+  border-color: #9AA5B1;
+  color: #2F3A45;
+}
+
+.destacado_hipertonico {
+  background: #FFF4E5;
+  border-color: #E0A040;
+  color: #7A3E00;
+}
+
+.destacadoNombre {
+  font-size: 0.85rem;
+}
+
+.destacadoValor {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.destacadoSub {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.formulaBox {
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.formulaLinea {
+  margin: 0 0 0.4rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.formulaLinea:last-child {
+  margin-bottom: 0;
+}
+
+.formulaBox code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: var(--primary-texto);
+  font-weight: 700;
+}
+
+.avisoConcentrada {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  border-left: 4px solid var(--secondary);
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+/* ── Educativo ────────────────────────────────────────────── */
+.eduIntro {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1rem;
+}
+
+.eduSubtitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.75rem;
+  border-bottom: 2px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  padding-bottom: 0.35rem;
+}
+
+.tablaWrapper {
+  overflow-x: auto;
+  margin-bottom: 0.5rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.tabla th {
+  background: var(--primary-boton);
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.tabla td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.tabla tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--primary) 5%, var(--bg-card));
+}
+
+.fuente {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 1.25rem;
+}
+
+.scenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.scenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.scenarioIcon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.scenarioCard h4 {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.scenarioCard p {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+}
+
+.faqPregunta {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.faqItem p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.step {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.stepNumber {
+  background: var(--primary-boton);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.stepContent {
+  flex: 1;
+}
+
+.stepContent strong {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.stepContent p {
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tipCard strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.tipCard p {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Warning box (errores típicos) ────────────────────────── */
+.warningBox {
+  background: #fff8f0;
+  border: 1.5px solid #f5a623;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #8f4c00;
+  margin-bottom: 0.6rem;
+}
+
+.warningIcon {
+  font-size: 1.1rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.warningList li {
+  font-size: 0.86rem;
+  color: #78400a;
+  line-height: 1.5;
+}
+
+/* ── Dark mode ────────────────────────────────────────────── */
+[data-theme='dark'] .svgAgua {
+  fill: #183447;
+}
+
+[data-theme='dark'] .svgSoluto,
+[data-theme='dark'] .muestraPunto {
+  fill: #8fd0ec;
+  background: #8fd0ec;
+}
+
+[data-theme='dark'] .svgMembrana {
+  stroke: #9aa5b1;
+}
+
+[data-theme='dark'] .svgFlechaAgua line {
+  stroke: #64B5F6;
+}
+
+[data-theme='dark'] .svgFlechaAgua polygon {
+  fill: #64B5F6;
+}
+
+[data-theme='dark'] .muestraFlecha {
+  background: #64B5F6;
+}
+
+[data-theme='dark'] .svgGlobulo {
+  fill: #B04A4A;
+  stroke: #E57373;
+}
+
+[data-theme='dark'] .svgGlobuloCentro {
+  fill: #C97370;
+}
+
+[data-theme='dark'] .svgPared {
+  stroke: #66BB6A;
+}
+
+[data-theme='dark'] .svgCitoplasma {
+  fill: #2E5D32;
+  stroke: #81C784;
+}
+
+[data-theme='dark'] .svgVacuola {
+  fill: #1E3A52;
+  stroke: #64B5F6;
+}
+
+[data-theme='dark'] .destacado,
+[data-theme='dark'] .destacado_hipotonico {
+  background: #1e3346;
+  border-color: #3FA5D1;
+  color: #8fd0ec;
+}
+
+[data-theme='dark'] .destacado_isotonico {
+  background: #262f3a;
+  border-color: #6b7785;
+  color: #d5dbe1;
+}
+
+[data-theme='dark'] .destacado_hipertonico {
+  background: #3a2a12;
+  border-color: #b07a20;
+  color: #f5c06b;
+}
+
+[data-theme='dark'] .formulaBox {
+  background: color-mix(in srgb, var(--primary) 12%, #1e2937);
+}
+
+/* Sobre el tinte de marca, el --primary-texto oscuro se queda corto: mismo ajuste que Pascal */
+[data-theme='dark'] .formulaBox code {
+  color: #8fd0ec;
+}
+
+[data-theme='dark'] .warningBox {
+  background: #2a1a00;
+  border-color: #8b5e00;
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #f5a623;
+}
+
+[data-theme='dark'] .warningList li {
+  color: #d4a050;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main {
+    padding: 1.5rem 1rem;
+  }
+
+  .panel {
+    padding: 1.1rem;
+  }
+
+  .lados,
+  .simLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .entradaCorta {
+    max-width: none;
+  }
+
+  .tipsGrid,
+  .scenariosGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .tarjetas {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* La barra fija de MeskeiaLogo tapa el principio del título hasta 1023px (mismo hueco que la plantilla) */
+@media (max-width: 1023px) {
+  .hero {
+    padding-top: 80px;
+  }
+}
+
+/* 100px arriba entre 769 y 1439px: por encima de 768px el logo crece y su barra baja hasta ~77px
+   (medido en simulador-flotabilidad). */
+@media (min-width: 769px) and (max-width: 1439px) {
+  .hero {
+    padding-top: 100px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preset {
+    transition: none;
+  }
+}
