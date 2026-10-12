@@ -22,8 +22,8 @@ export default function IntestinoPage() {
           <ul>
             <li><strong>Digestión:</strong> Fermentan fibras que no podemos digerir</li>
             <li><strong>Síntesis de vitaminas:</strong> K2, algunas vitaminas B</li>
-            <li><strong>Sistema inmune:</strong> 70% del sistema inmune está en el intestino</li>
-            <li><strong>Neurotransmisores:</strong> Producen 95% de la serotonina corporal</li>
+            <li><strong>Sistema inmune:</strong> 70 % del sistema inmune está en el intestino</li>
+            <li><strong>Neurotransmisores:</strong> Producen 95 % de la serotonina corporal</li>
             <li><strong>Protección:</strong> Compiten con patógenos por espacio y recursos</li>
             <li><strong>Metabolismo:</strong> Influyen en peso, glucemia, inflamación</li>
           </ul>

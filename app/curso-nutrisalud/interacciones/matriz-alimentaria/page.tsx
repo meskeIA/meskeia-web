@@ -43,7 +43,7 @@ export default function MatrizAlimentariaPage() {
           <h3>Caso 1: Frutos secos</h3>
           <p>
             Las almendras tienen ~576 kcal/100g en las tablas nutricionales, pero
-            estudios demuestran que absorbemos solo ~70% de esas calorías. La matriz
+            estudios demuestran que absorbemos solo ~70 % de esas calorías. La matriz
             (fibra, paredes celulares) impide la absorción completa de las grasas.
           </p>
 

@@ -186,9 +186,9 @@ export default function ComerVsNutrirsePage() {
         <>
           <div className={styles.highlightBox}>
             <p>
-              <strong><span aria-hidden="true">🎯</span> Regla del 80/20 nutricional:</strong> Busca que el 80% de tus
+              <strong><span aria-hidden="true">🎯</span> Regla del 80/20 nutricional:</strong> Busca que el 80 % de tus
               calorías provengan de alimentos nutricionalmente densos (verduras, frutas,
-              proteínas completas, grasas saludables). El 20% restante puede ser más
+              proteínas completas, grasas saludables). El 20 % restante puede ser más
               flexible sin comprometer tu salud general.
             </p>
           </div>

@@ -132,9 +132,9 @@ export default function LecturaEtiquetasPage() {
 
           <h3>Azúcares &quot;saludables&quot; que siguen siendo azúcar:</h3>
           <ul>
-            <li><strong>Azúcar de coco:</strong> 70-80% sacarosa. No es mejor.</li>
+            <li><strong>Azúcar de coco:</strong> 70-80 % sacarosa. No es mejor.</li>
             <li><strong>Miel:</strong> Nutrientes mínimos. Metabolismo igual que azúcar.</li>
-            <li><strong>Sirope de agave:</strong> 90% fructosa. Peor para el hígado.</li>
+            <li><strong>Sirope de agave:</strong> 90 % fructosa. Peor para el hígado.</li>
             <li><strong>Panela:</strong> Azúcar de caña sin refinar. Sigue siendo azúcar.</li>
           </ul>
         </>
@@ -178,7 +178,7 @@ export default function LecturaEtiquetasPage() {
               </tr>
               <tr>
                 <td>&quot;Integral&quot;</td>
-                <td>100% grano completo</td>
+                <td>100 % grano completo</td>
                 <td>Puede ser mayormente harina refinada</td>
               </tr>
               <tr>

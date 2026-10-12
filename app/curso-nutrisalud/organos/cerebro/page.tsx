@@ -12,13 +12,13 @@ export default function CerebroPage() {
       content: (
         <>
           <p>
-            Tu cerebro representa solo el 2% de tu peso corporal pero consume
-            el <strong>20% de tu energía total</strong>. Es el órgano más
+            Tu cerebro representa solo el 2 % de tu peso corporal pero consume
+            el <strong>20 % de tu energía total</strong>. Es el órgano más
             exigente metabólicamente, y su función depende directamente de los
             nutrientes que le proporcionas.
           </p>
           <p>
-            La composición del cerebro es principalmente grasa (60% de su peso
+            La composición del cerebro es principalmente grasa (60 % de su peso
             seco), lo que explica la importancia crucial de los ácidos grasos
             esenciales, especialmente omega-3, para su funcionamiento óptimo.
           </p>
@@ -129,7 +129,7 @@ export default function CerebroPage() {
         <>
           <p>
             El <strong>DHA</strong> (ácido docosahexaenoico) es un omega-3 que
-            constituye el 30-40% de los ácidos grasos en la corteza cerebral.
+            constituye el 30-40 % de los ácidos grasos en la corteza cerebral.
             Es esencial para la fluidez de las membranas neuronales, la
             transmisión sináptica y la neurogénesis.
           </p>
@@ -158,7 +158,7 @@ export default function CerebroPage() {
               <h4 className={styles.exampleTitle}>Fuentes vegetales (ALA)</h4>
               <p className={styles.exampleDesc}>
                 Chía, lino, nueces. Conversión a DHA
-                es baja (&lt;10%). Suplementar si vegano.
+                es baja (&lt;10 %). Suplementar si vegano.
               </p>
             </div>
           </div>
@@ -296,7 +296,7 @@ export default function CerebroPage() {
               </tr>
               <tr>
                 <td>Cacao flavanoles</td>
-                <td>Chocolate negro 70%+</td>
+                <td>Chocolate negro 70 %+</td>
                 <td>Flujo sanguíneo, función cognitiva</td>
               </tr>
               <tr>
@@ -327,7 +327,7 @@ export default function CerebroPage() {
             <li>Huevos a diario (colina)</li>
             <li>Arándanos y frutos rojos frecuentemente</li>
             <li>Té verde como bebida habitual</li>
-            <li>Chocolate negro 70%+ como snack ocasional</li>
+            <li>Chocolate negro 70 %+ como snack ocasional</li>
             <li>Verduras de hoja verde (folato, nitratos)</li>
             <li>Frutos secos como snack (omega-3, vitamina E)</li>
             <li>Cúrcuma en comidas (con pimienta y grasa)</li>
@@ -337,8 +337,8 @@ export default function CerebroPage() {
             <p>
               <strong><span aria-hidden="true">🧠</span> Dieta MIND:</strong> Combina mediterránea y DASH, diseñada
               específicamente para salud cerebral. El estudio observacional de Morris et al.
-              (2015, Rush University) encontró asociaciones de hasta 53% de reducción de
-              riesgo de Alzheimer en alta adherencia y 35% en adherencia moderada, aunque
+              (2015, Rush University) encontró asociaciones de hasta 53 % de reducción de
+              riesgo de Alzheimer en alta adherencia y 35 % en adherencia moderada, aunque
               estos datos provienen de un único estudio observacional que no establece
               causalidad. Prioriza bayas, verduras de hoja, pescado y nueces.
             </p>

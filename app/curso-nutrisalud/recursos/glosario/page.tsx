@@ -174,7 +174,7 @@ const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     term: 'DHA',
-    definition: 'Ácido docosahexaenoico, omega-3 que constituye 30-40% de los ácidos grasos de la corteza cerebral. Esencial para función cognitiva.',
+    definition: 'Ácido docosahexaenoico, omega-3 que constituye 30-40 % de los ácidos grasos de la corteza cerebral. Esencial para función cognitiva.',
     category: 'Cerebro',
     relatedChapter: 'organos/cerebro',
   },
@@ -270,7 +270,7 @@ const GLOSSARY_TERMS: GlossaryTerm[] = [
   },
   {
     term: 'Regla 80/20',
-    definition: 'Principio de flexibilidad: si el 80% de tu alimentación es nutritiva, el 20% puede ser más flexible sin impacto significativo en salud.',
+    definition: 'Principio de flexibilidad: si el 80 % de tu alimentación es nutritiva, el 20 % puede ser más flexible sin impacto significativo en salud.',
     category: 'Práctica',
     relatedChapter: 'aplicacion/planificacion',
   },

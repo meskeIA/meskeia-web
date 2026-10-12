@@ -21,13 +21,13 @@ export default function MicronutrientesPage() {
             El concepto clave aquí es la <strong>biodisponibilidad</strong>: no basta con
             consumir un nutriente, lo importante es cuánto de ese nutriente tu cuerpo
             puede realmente absorber y utilizar. Un suplemento puede contener 1000mg de
-            un mineral, pero si solo absorbes el 5%, estás obteniendo 50mg reales.
+            un mineral, pero si solo absorbes el 5 %, estás obteniendo 50mg reales.
           </p>
 
           <div className={styles.highlightBox}>
             <p>
               <strong><span aria-hidden="true">🧪</span> Realidad de absorción:</strong> El hierro de la carne (hemo) se
-              absorbe hasta un 35%, mientras que el hierro vegetal (no-hemo) solo un 2-20%.
+              absorbe hasta un 35 %, mientras que el hierro vegetal (no-hemo) solo un 2-20 %.
               Pero combinar hierro vegetal con vitamina C puede triplicar su absorción.
             </p>
           </div>
@@ -214,7 +214,7 @@ export default function MicronutrientesPage() {
             <li><strong>Vitamina C + Hierro:</strong> Aumenta absorción 2-3x</li>
             <li><strong>Grasas + Vitaminas liposolubles:</strong> Esencial para absorción</li>
             <li><strong>Vitamina D + Calcio:</strong> Optimiza fijación ósea</li>
-            <li><strong>Piperina (pimienta) + Curcumina:</strong> Aumenta absorción 2000%</li>
+            <li><strong>Piperina (pimienta) + Curcumina:</strong> Aumenta absorción 2000 %</li>
             <li><strong>Fermentación:</strong> Reduce antinutrientes, aumenta biodisponibilidad</li>
           </ul>
 

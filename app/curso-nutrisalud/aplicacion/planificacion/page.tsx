@@ -93,9 +93,9 @@ export default function PlanificacionPage() {
             Una guía visual simple para cada comida principal:
           </p>
           <ul>
-            <li><strong>50% verduras/hortalizas:</strong> La base de cada comida</li>
-            <li><strong>25% proteína:</strong> Animal o vegetal</li>
-            <li><strong>25% carbohidratos:</strong> Preferiblemente integrales</li>
+            <li><strong>50 % verduras/hortalizas:</strong> La base de cada comida</li>
+            <li><strong>25 % proteína:</strong> Animal o vegetal</li>
+            <li><strong>25 % carbohidratos:</strong> Preferiblemente integrales</li>
             <li><strong>+ Grasas saludables:</strong> Aceite de oliva, aguacate, frutos secos</li>
           </ul>
 
@@ -308,15 +308,15 @@ export default function PlanificacionPage() {
             <li><strong>Cambios pequeños y graduales:</strong> Un hábito nuevo cada 2-3 semanas</li>
             <li><strong>Identidad, no fuerza de voluntad:</strong> &quot;Soy alguien que come bien&quot; vs. &quot;Estoy a dieta&quot;</li>
             <li><strong>Entorno facilitador:</strong> Ten opciones saludables accesibles</li>
-            <li><strong>Flexibilidad sin culpa:</strong> Un 80% bueno es excelente</li>
+            <li><strong>Flexibilidad sin culpa:</strong> Un 80 % bueno es excelente</li>
             <li><strong>Conexión con el &quot;por qué&quot;:</strong> Recuerda tus motivaciones profundas</li>
           </ul>
 
           <h3>Regla del 80/20:</h3>
           <div className={styles.highlightBox}>
             <p>
-              <strong><span aria-hidden="true">🎯</span> Principio práctico:</strong> Si el 80% de tu alimentación
-              está basada en alimentos nutritivos y poco procesados, el 20% restante
+              <strong><span aria-hidden="true">🎯</span> Principio práctico:</strong> Si el 80 % de tu alimentación
+              está basada en alimentos nutritivos y poco procesados, el 20 % restante
               puede ser lo que quieras sin impacto significativo en tu salud.
               Esto permite disfrutar de la vida social, celebraciones y antojos
               ocasionales sin culpa.

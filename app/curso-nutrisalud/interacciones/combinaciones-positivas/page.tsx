@@ -25,10 +25,11 @@ export default function CombinacionesPositivasPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong><span aria-hidden="true">🔬</span> Ciencia de las sinergias:</strong> La curcumina del cúrcuma
-              sola tiene una biodisponibilidad de solo 1-2%. Combinada con piperina
-              (pimienta negra), la absorción aumenta un 2000%. Una simple pizca de
-              pimienta transforma completamente el valor de tu cúrcuma.
+              <strong><span aria-hidden="true">🔬</span> Ciencia de las sinergias:</strong> La curcumina de la cúrcuma
+              se absorbe poco por sí sola. En un estudio con voluntarios (Shoba y cols., 1998),
+              2 g de curcumina con 20 mg de piperina, el compuesto de la pimienta negra,
+              multiplicaron por unas 20 la cantidad que llegaba a la sangre. Son dosis de
+              suplemento: no está medido cuánto cambia una pizca de pimienta en una comida.
             </p>
           </div>
         </>
@@ -41,7 +42,7 @@ export default function CombinacionesPositivasPage() {
         <>
           <p>
             El hierro no-hemo (de origen vegetal) tiene baja absorción por sí solo
-            (2-20%). La vitamina C puede <strong>triplicar o cuadruplicar</strong>
+            (2-20 %). La vitamina C puede <strong>triplicar o cuadruplicar</strong>
             esta absorción al convertir el hierro férrico (Fe³⁺) en ferroso (Fe²⁺),
             que es la forma absorbible.
           </p>
@@ -166,7 +167,7 @@ export default function CombinacionesPositivasPage() {
 
           <h3>Cómo funciona la sinergia:</h3>
           <ol>
-            <li><strong>Vitamina D:</strong> Aumenta absorción intestinal de calcio de 10% a 40%</li>
+            <li><strong>Vitamina D:</strong> Aumenta absorción intestinal de calcio de 10 % a 40 %</li>
             <li><strong>Vitamina K2:</strong> Activa proteínas que depositan calcio en huesos</li>
             <li><strong>Magnesio:</strong> Cofactor necesario para la activación de vitamina D</li>
           </ol>
@@ -224,9 +225,9 @@ export default function CombinacionesPositivasPage() {
         <>
           <h3>Cúrcuma + Pimienta Negra + Grasa</h3>
           <p>
-            La curcumina necesita piperina para absorberse (+2000%) y grasa para
-            llegar a las células (es liposoluble). Un &quot;golden milk&quot; con pimienta
-            y aceite de coco es óptimo.
+            La curcumina se absorbe mejor con piperina (Shoba y cols., 1998, con dosis
+            de suplemento) y con grasa, porque es liposoluble. Un &quot;golden milk&quot; con
+            pimienta y algo de grasa reúne las dos cosas.
           </p>
 
           <h3>Proteínas Complementarias (vegetales)</h3>

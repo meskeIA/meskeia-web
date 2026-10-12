@@ -61,7 +61,7 @@ export default function CombinacionesNegativasPage() {
               <span className={styles.exampleIcon}>💧</span>
               <h4 className={styles.exampleTitle}>Remojo</h4>
               <p className={styles.exampleDesc}>
-                Remojar legumbres 8-12h reduce fitatos 20-50%.
+                Remojar legumbres 8-12h reduce fitatos 20-50 %.
                 Descartar el agua de remojo.
               </p>
             </div>
@@ -70,7 +70,7 @@ export default function CombinacionesNegativasPage() {
               <h4 className={styles.exampleTitle}>Germinación</h4>
               <p className={styles.exampleDesc}>
                 Germinar semillas y legumbres activa fitasa,
-                reduciendo fitatos hasta 75%.
+                reduciendo fitatos hasta 75 %.
               </p>
             </div>
             <div className={styles.exampleCard}>
@@ -125,7 +125,7 @@ export default function CombinacionesNegativasPage() {
           <div className={styles.warningBox}>
             <p>
               <strong><span aria-hidden="true">⚠️</span> Mito de las espinacas:</strong> Aunque las espinacas contienen
-              calcio, su alto contenido en oxalatos hace que solo se absorba un 5%
+              calcio, su alto contenido en oxalatos hace que solo se absorba un 5 %
               del calcio presente. Para calcio, el kale y el brócoli son mejores
               opciones (oxalatos bajos).
             </p>
@@ -134,7 +134,7 @@ export default function CombinacionesNegativasPage() {
           <h3>Taninos</h3>
           <p>
             Presentes en té, café, vino tinto y algunos frutos. Se unen al hierro
-            no-hemo reduciendo su absorción hasta un 60%.
+            no-hemo reduciendo su absorción hasta un 60 %.
           </p>
 
           <table className={styles.comparisonTable}>
@@ -149,17 +149,17 @@ export default function CombinacionesNegativasPage() {
               <tr>
                 <td>Té negro</td>
                 <td>Alto</td>
-                <td>Hasta 60%</td>
+                <td>Hasta 60 %</td>
               </tr>
               <tr>
                 <td>Café</td>
                 <td>Moderado</td>
-                <td>35-40%</td>
+                <td>35-40 %</td>
               </tr>
               <tr>
                 <td>Té verde</td>
                 <td>Moderado</td>
-                <td>25-35%</td>
+                <td>25-35 %</td>
               </tr>
               <tr>
                 <td>Vino tinto</td>
@@ -197,7 +197,7 @@ export default function CombinacionesNegativasPage() {
               <span className={styles.exampleIcon}>⚔️</span>
               <h4 className={styles.exampleTitle}>Calcio vs Hierro</h4>
               <p className={styles.exampleDesc}>
-                500mg+ de calcio reducen absorción de hierro 50%.
+                500mg+ de calcio reducen absorción de hierro 50 %.
                 Separar suplementos 2-3h.
               </p>
             </div>

@@ -32,7 +32,7 @@ export default function HigadoPage() {
           <div className={styles.highlightBox}>
             <p>
               <strong><span aria-hidden="true">🔬</span> Capacidad de regeneración:</strong> El hígado es el único
-              órgano interno que puede regenerarse. Si se extirpa hasta el 75%,
+              órgano interno que puede regenerarse. Si se extirpa hasta el 75 %,
               puede volver a su tamaño original en semanas. Esto demuestra su
               importancia evolutiva y su resiliencia.
             </p>
@@ -103,7 +103,7 @@ export default function HigadoPage() {
         <>
           <p>
             El <strong>hígado graso no alcohólico (NAFLD)</strong> afecta a cerca del
-            25% de la población adulta. Es la acumulación de grasa en el hígado por
+            25 % de la población adulta. Es la acumulación de grasa en el hígado por
             causas no relacionadas con el alcohol, principalmente dieta y estilo de vida.
           </p>
 

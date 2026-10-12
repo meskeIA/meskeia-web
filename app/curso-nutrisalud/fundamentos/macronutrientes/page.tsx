@@ -195,7 +195,7 @@ export default function MacronutrientesPage() {
           </ul>
 
           <div className={styles.exampleGrid}>
-            <div className={styles.exampleCard} style={{ borderTop: '4px solid #27AE60' }}>
+            <div className={styles.exampleCard} style={{ borderTop: '4px solid var(--success)' }}>
               {/* El título ya dice el juicio: el emoji lo repite y se oculta (cabo C0222) */}
               <span className={styles.exampleIcon} aria-hidden="true">✅</span>
               <h4 className={styles.exampleTitle}>Grasas Beneficiosas</h4>
@@ -205,7 +205,7 @@ export default function MacronutrientesPage() {
                 <strong>MCT:</strong> Aceite de coco
               </p>
             </div>
-            <div className={styles.exampleCard} style={{ borderTop: '4px solid #E74C3C' }}>
+            <div className={styles.exampleCard} style={{ borderTop: '4px solid var(--error)' }}>
               <span className={styles.exampleIcon} aria-hidden="true">⛔</span>
               <h4 className={styles.exampleTitle}>Grasas a Evitar</h4>
               <p className={styles.exampleDesc}>
@@ -234,15 +234,18 @@ export default function MacronutrientesPage() {
       ),
     },
     {
-      title: 'Principios de Optimización de Macronutrientes',
+      title: 'Cómo repartir los macronutrientes',
       icon: '🎯',
       content: (
         <>
           <div className={styles.highlightBox}>
             <p>
-              <strong><span aria-hidden="true">🕐</span> Timing de macronutrientes:</strong> Los carbohidratos tienen mejor
-              partición nutricional post-entrenamiento (ventana anabólica). Las proteínas
-              se absorben mejor distribuyendo 20-40g cada 3-4 horas. Las grasas no interfieren
+              <strong><span aria-hidden="true">🕐</span> Cuándo tomarlos:</strong> Se ha propuesto que tras
+              entrenar hay una «ventana anabólica» en la que conviene tomar carbohidratos y proteína.
+              Las revisiones posteriores (Aragon y Schoenfeld, 2013) indican que esa ventana es mucho
+              más amplia de lo que se creía y que pesa más la cantidad total de proteína del día que
+              el momento exacto. Repartir la proteína en tomas de 20-40 g a lo largo del día es una
+              pauta habitual. Las grasas no interfieren
               con la absorción si se separan de carbohidratos de alto IG.
             </p>
           </div>
@@ -267,10 +270,10 @@ export default function MacronutrientesPage() {
 
           <h3>Distribución recomendada general:</h3>
           <ul>
-            <li><strong>Mantenimiento:</strong> 40% carbs, 30% proteína, 30% grasas</li>
-            <li><strong>Pérdida de grasa:</strong> 25% carbs, 40% proteína, 35% grasas</li>
-            <li><strong>Ganancia muscular:</strong> 45% carbs, 30% proteína, 25% grasas</li>
-            <li><strong>Rendimiento deportivo:</strong> 55% carbs, 25% proteína, 20% grasas</li>
+            <li><strong>Mantenimiento:</strong> 40 % carbs, 30 % proteína, 30 % grasas</li>
+            <li><strong>Pérdida de grasa:</strong> 25 % carbs, 40 % proteína, 35 % grasas</li>
+            <li><strong>Ganancia muscular:</strong> 45 % carbs, 30 % proteína, 25 % grasas</li>
+            <li><strong>Rendimiento deportivo:</strong> 55 % carbs, 25 % proteína, 20 % grasas</li>
           </ul>
 
           <div className={styles.infoBox}>

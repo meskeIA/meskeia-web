@@ -28,7 +28,7 @@ export default function SistemaDigestivoPage() {
             <p>
               <strong><span aria-hidden="true">🧬</span> Dato fascinante:</strong> Tu intestino tiene más neuronas que
               la médula espinal (500 millones), por eso se le llama &quot;el segundo cerebro&quot;.
-              Produce el 95% de la serotonina de tu cuerpo, el neurotransmisor del bienestar.
+              Produce el 95 % de la serotonina de tu cuerpo, el neurotransmisor del bienestar.
             </p>
           </div>
         </>
@@ -56,7 +56,7 @@ export default function SistemaDigestivoPage() {
 
           <h3>2. Estómago (2-4 horas)</h3>
           <ul>
-            <li><strong>Ácido clorhídrico (pH 1.5-3.5):</strong> Desnaturaliza proteínas, mata patógenos</li>
+            <li><strong>Ácido clorhídrico (pH 1,5-3,5):</strong> Desnaturaliza proteínas, mata patógenos</li>
             <li><strong>Pepsina:</strong> Rompe proteínas en péptidos</li>
             <li><strong>Lipasa gástrica:</strong> Continúa digestión de grasas</li>
             <li><strong>Factor intrínseco:</strong> Necesario para absorber B12</li>
@@ -64,7 +64,7 @@ export default function SistemaDigestivoPage() {
 
           <h3>3. Intestino Delgado (3-5 horas)</h3>
           <p>
-            Aquí ocurre el 90% de la absorción de nutrientes. Mide unos 6 metros
+            Aquí ocurre el 90 % de la absorción de nutrientes. Mide unos 6 metros
             pero su superficie interna, gracias a las vellosidades, equivale a una
             cancha de tenis.
           </p>
@@ -163,7 +163,7 @@ export default function SistemaDigestivoPage() {
               <span className={styles.exampleIcon}>👅</span>
               <h4 className={styles.exampleTitle}>Boca</h4>
               <p className={styles.exampleDesc}>
-                pH 6.5-7.5 (neutro)<br />
+                pH 6,5-7,5 (neutro)<br />
                 Óptimo para amilasa salival
               </p>
             </div>
@@ -171,7 +171,7 @@ export default function SistemaDigestivoPage() {
               <span className={styles.exampleIcon}>🫃</span>
               <h4 className={styles.exampleTitle}>Estómago</h4>
               <p className={styles.exampleDesc}>
-                pH 1.5-3.5 (muy ácido)<br />
+                pH 1,5-3,5 (muy ácido)<br />
                 Activa pepsina, mata patógenos
               </p>
             </div>
@@ -187,7 +187,7 @@ export default function SistemaDigestivoPage() {
               <span className={styles.exampleIcon}>🦠</span>
               <h4 className={styles.exampleTitle}>Colon</h4>
               <p className={styles.exampleDesc}>
-                pH 5.5-7 (ligeramente ácido)<br />
+                pH 5,5-7 (ligeramente ácido)<br />
                 Fermentación bacteriana
               </p>
             </div>
@@ -204,9 +204,10 @@ export default function SistemaDigestivoPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong><span aria-hidden="true">💡</span> Apoyo natural:</strong> Un poco de vinagre de manzana (1 cucharada
-              diluida en agua) antes de las comidas puede ayudar a acidificar el estómago.
-              El jengibre y las hierbas amargas también estimulan la producción de jugos gástricos.
+              <strong><span aria-hidden="true">💡</span> Apoyo natural:</strong> A veces se recomienda vinagre de manzana antes de las
+              comidas, pero no hay pruebas de que acidifique el estómago: su pH es parecido o mayor
+              que el del jugo gástrico. Si notas digestiones pesadas a menudo, coméntalo con un
+              profesional sanitario. El jengibre y las hierbas amargas también estimulan la producción de jugos gástricos.
             </p>
           </div>
         </>

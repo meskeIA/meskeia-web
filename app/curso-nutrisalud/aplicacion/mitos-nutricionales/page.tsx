@@ -114,8 +114,8 @@ export default function MitosNutricionalesPage() {
               &quot;Todos deberíamos evitar el gluten&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> Solo el 1% tiene celiaquía y ~6% tiene
-              sensibilidad no celíaca. Para el 93% restante, el gluten no es un
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> Solo el 1 % tiene celiaquía y ~6 % tiene
+              sensibilidad no celíaca. Para el 93 % restante, el gluten no es un
               problema. Los productos &quot;sin gluten&quot; no son más saludables
               (a menudo son más procesados).
             </p>

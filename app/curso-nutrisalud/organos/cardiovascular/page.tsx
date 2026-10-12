@@ -48,8 +48,8 @@ export default function CardiovascularPage() {
         <>
           <p>
             El colesterol dietético tuvo mala fama durante décadas, pero la ciencia
-            actual muestra un panorama más complejo. El hígado produce el 80% del
-            colesterol que necesitas; solo el 20% viene de la dieta.
+            actual muestra un panorama más complejo. El hígado produce el 80 % del
+            colesterol que necesitas; solo el 20 % viene de la dieta.
           </p>
 
           <h3>Lo que realmente eleva el colesterol LDL &quot;malo&quot;:</h3>
@@ -238,8 +238,8 @@ export default function CardiovascularPage() {
 
           <h3>Reducción de sodio:</h3>
           <ul>
-            <li>Limitar a &lt;2.3g sodio/día (ideal &lt;1.5g si hipertenso)</li>
-            <li>El 75% del sodio viene de alimentos procesados, no del salero</li>
+            <li>Limitar a &lt;2,3 g sodio/día (ideal &lt;1,5 g si hipertenso)</li>
+            <li>El 75 % del sodio viene de alimentos procesados, no del salero</li>
             <li>Usar hierbas y especias en lugar de sal</li>
             <li>Leer etiquetas: evitar &gt;600mg sodio por ración</li>
           </ul>
@@ -323,7 +323,7 @@ export default function CardiovascularPage() {
             <p>
               <strong><span aria-hidden="true">💡</span> Estudio PREDIMED:</strong> La dieta mediterránea suplementada
               con aceite de oliva virgen extra o nueces redujo los eventos
-              cardiovasculares un 30% comparado con dieta baja en grasas. La calidad
+              cardiovasculares un 30 % comparado con dieta baja en grasas. La calidad
               de las grasas importa más que la cantidad.
             </p>
           </div>

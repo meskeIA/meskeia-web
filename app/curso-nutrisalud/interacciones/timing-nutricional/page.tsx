@@ -27,7 +27,7 @@ export default function TimingNutricionalPage() {
           <div className={styles.highlightBox}>
             <p>
               <strong><span aria-hidden="true">🔬</span> Dato científico:</strong> La misma comida consumida por la
-              mañana produce un pico de glucosa 20-30% menor que si se consume por
+              mañana produce un pico de glucosa 20-30 % menor que si se consume por
               la noche. La sensibilidad a la insulina es naturalmente mayor en las
               primeras horas del día.
             </p>
@@ -240,7 +240,7 @@ export default function TimingNutricionalPage() {
           <div className={styles.highlightBox}>
             <p>
               <strong><span aria-hidden="true">📊</span> Resultado:</strong> Comer vegetales antes que carbohidratos
-              puede reducir el pico de glucosa postprandial hasta un 40%. Mismo
+              puede reducir el pico de glucosa postprandial hasta un 40 %. Mismo
               alimento, mismo contenido calórico, diferente impacto metabólico.
             </p>
           </div>
