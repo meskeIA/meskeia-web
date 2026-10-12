@@ -78,11 +78,35 @@ const botonDetener = (page: Page) => page.getByRole('button', { name: /Detener y
 const tablaRegistro = (page: Page) => page.locator('[class*="tablaRegistro"]');
 const filas = (page: Page) => tablaRegistro(page).locator('tbody tr');
 
-/** Mide durante `segundos` y detiene guardando. */
+/** Segundos que la app dice haber medido («de los 3 s medidos»), o −1 si no se ve. */
+async function segundosMedidos(page: Page): Promise<number> {
+  const nota = page.locator('[class*="laeqNota"] strong').nth(1);
+  if ((await nota.count()) === 0) return -1;
+  const m = /(?:(\d+) min )?(\d+) s/.exec(await nota.innerText());
+  return m ? Number(m[1] ?? 0) * 60 + Number(m[2]) : -1;
+}
+
+/**
+ * Mide durante `segundos` y detiene guardando.
+ *
+ * ⚠️ 12/10/2026 (cabo C0032) — esperar el reloj de pared no basta. La app anota el tiempo de
+ * audio que su bucle llegó a analizar (`tiempoMedidoRef`, hallazgo 1700), no el del reloj:
+ * con la máquina cargada (la suite entera) se pierden fotogramas, y 3,5 s de pared se
+ * quedaban por debajo de los 3 s mínimos y la medición se descartaba. Por eso, cuando la
+ * medición debe registrarse, se espera además a que la APP diga que lleva esos segundos.
+ */
 async function medirYGuardar(page: Page, segundos: number): Promise<void> {
   await botonIniciar(page).click();
   await expect(page.locator('[class*="dbValue"]')).not.toHaveText('--', { timeout: 15000 });
   await page.waitForTimeout(segundos * 1000);
+  if (segundos >= 3) {
+    await expect
+      .poll(() => segundosMedidos(page), {
+        timeout: 15000,
+        message: 'la app no llegó a medir los segundos pedidos',
+      })
+      .toBeGreaterThanOrEqual(Math.floor(segundos));
+  }
   await botonDetener(page).click();
 }
 
