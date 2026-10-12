@@ -101,7 +101,15 @@ export default function DisclaimerCard({
     .join(' ');
 
   return (
-    <div className={cardClasses} role={severity === 'critical' ? 'alert' : 'note'}>
+    // role="note" en todas las severidades, también la crítica. «alert» es para lo que aparece
+    // de repente y pide atención (un error al calcular): un aviso fijo presente al cargar lo
+    // anunciaban al entrar unos lectores (JAWS) y otros no. Lo crítico se distingue por el
+    // nombre accesible, y sigue siempre desplegado (cabo C0117, decidido el 12/10/2026).
+    <div
+      className={cardClasses}
+      role="note"
+      aria-label={severity === 'critical' ? 'Aviso importante' : undefined}
+    >
       <div
         className={styles.header}
         onClick={isCollapsibleAllowed ? handleToggle : undefined}

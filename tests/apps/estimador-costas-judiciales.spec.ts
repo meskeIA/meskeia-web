@@ -228,8 +228,8 @@ test.beforeEach(async ({ page }) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 test('CASO 1 (normal) · ordinario, persona física, 30.000 €: el desglose suma el total CON IVA', async ({ page }) => {
-  // Riesgo 1: el disclaimer crítico va SIEMPRE desplegado y con role="alert".
-  const disclaimer = page.locator('[role="alert"]').first();
+  // Riesgo 1: el disclaimer crítico va SIEMPRE desplegado, como nota «Aviso importante» (C0117).
+  const disclaimer = page.getByRole('note', { name: 'Aviso importante' });
   await expect(disclaimer).toContainText('carácter exclusivamente orientativo');
   await expect(disclaimer).toContainText('no constituye asesoramiento financiero, fiscal ni jurídico');
   expect(await disclaimer.locator('button').count()).toBe(0); // no colapsable

@@ -368,7 +368,7 @@ test.beforeEach(async ({ page }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 test('CASO 1 (normal) · mutuo acuerdo judicial, sin hijos, sin bienes: 601,94 € – 1301,94 €', async ({ page }) => {
   // Riesgo 1: el disclaimer crítico va SIEMPRE desplegado (no colapsable).
-  const disclaimer = page.locator('[role="alert"]').first();
+  const disclaimer = page.getByRole('note', { name: 'Aviso importante' });
   await expect(disclaimer).toContainText('orientativ');
   expect(await disclaimer.locator('button').count()).toBe(0);
 

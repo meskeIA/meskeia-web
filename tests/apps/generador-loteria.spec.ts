@@ -1512,7 +1512,7 @@ test.describe('S0180 · reparto del premio de una peña', () => {
   });
 
   test('aviso crítico no plegable y referencia a la DA 33.ª', async ({ page }) => {
-    await expect(page.getByRole('alert').filter({ hasText: 'carácter exclusivamente orientativo' })).toBeVisible();
+    await expect(page.getByRole('note', { name: 'Aviso importante' }).filter({ hasText: 'carácter exclusivamente orientativo' })).toBeVisible();
     const ref = page.getByRole('note', { name: 'Datos de referencia normativos' });
     await expect(ref).toContainText('disposición adicional 33.ª');
     await expect(ref).toContainText('05/10/2026');

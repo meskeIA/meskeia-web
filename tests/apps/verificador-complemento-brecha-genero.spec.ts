@@ -153,8 +153,8 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Verificador del complemento por brecha de género', () => {
   test('el marco legal obligatorio está presente y no es colapsable', async ({ page }) => {
-    // Nivel 1 CRÍTICO: DisclaimerCard severity="critical" → role="alert" y siempre expandido.
-    const aviso = page.locator('[role="alert"]').first();
+    // Nivel 1 CRÍTICO: DisclaimerCard severity="critical" → nota «Aviso importante» (C0117), siempre expandida.
+    const aviso = page.getByRole('note', { name: 'Aviso importante' });
     await expect(aviso).toBeVisible();
     await expect(aviso).toHaveClass(/severity-critical/);
 

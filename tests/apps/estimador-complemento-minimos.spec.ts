@@ -258,10 +258,11 @@ test.describe('Estimador de Complemento a Mínimos', () => {
   test('las tres piezas obligatorias de una app fiscal de riesgo 1', async ({ page }) => {
     await abrir(page);
 
-    // DisclaimerCard nivel 1 CRÍTICO: role="alert" y NUNCA colapsable.
+    // DisclaimerCard nivel 1 CRÍTICO: role="note" con nombre «Aviso importante» y NUNCA colapsable (C0117).
     const disclaimer = page.locator('[class*="severity-critical"]').first();
     await expect(disclaimer).toBeVisible();
-    await expect(disclaimer).toHaveAttribute('role', 'alert');
+    await expect(disclaimer).toHaveAttribute('role', 'note');
+    await expect(disclaimer).toHaveAttribute('aria-label', 'Aviso importante');
     await expect(disclaimer).toContainText('no constituye asesoramiento');
     expect(await disclaimer.locator('details, summary, button').count()).toBe(0);
 

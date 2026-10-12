@@ -425,7 +425,7 @@ test.describe('Simulador Módulos vs Estimación Directa — rendimiento de mód
     // contrastar…» en todas las apps) ni en el bloque educativo, que nace plegado.
     const texto = await page.evaluate(() => {
       const copia = document.body.cloneNode(true) as HTMLElement;
-      copia.querySelectorAll('script, [role="alert"][class*="severity-critical"]').forEach((n) => n.remove());
+      copia.querySelectorAll('script, [role="note"][class*="severity-critical"]').forEach((n) => n.remove());
       return copia.textContent ?? '';
     });
     expect(texto).toContain('Rendimiento neto de módulos (tu dato)');
@@ -645,7 +645,7 @@ test.describe('Simulador Módulos vs Estimación Directa — fuentes, avisos y m
   test('DisclaimerCard crítico y DataReference con el META re-sellado y fecha en formato español', async ({
     page,
   }) => {
-    const disclaimer = page.locator('[role="alert"][class*="severity-critical"]');
+    const disclaimer = page.locator('[role="note"][aria-label="Aviso importante"][class*="severity-critical"]');
     await expect(disclaimer).toHaveCount(1);
 
     // 02/10/2026 — la fuente del IRPF suma el art. 32.2.3.º (hallazgo 2608; antes «arts. 19, 20,

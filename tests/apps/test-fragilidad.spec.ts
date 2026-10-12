@@ -214,7 +214,7 @@ test('CASO 7 — el aviso médico es crítico, no se puede plegar y trae las pie
 }) => {
   await abrir(page);
 
-  const aviso = page.locator('[role="alert"]').first();
+  const aviso = page.getByRole('note', { name: 'Aviso importante' });
   await expect(aviso).toContainText('Aviso Médico Importante');
   await expect(aviso).toContainText('Valoración Geriátrica Integral');
   // Nivel 1 CRÍTICO (_private/DISCLAIMER-POLICY.md §5): nunca colapsable, así que el

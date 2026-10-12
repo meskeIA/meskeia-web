@@ -307,7 +307,8 @@ test('MARCO LEGAL · el aviso médico es crítico, no colapsable y niega el diag
 
   // Política de disclaimers de meskeIA: salud orientativa → nivel 1, jamás colapsable.
   await expect(aviso).toBeVisible();
-  await expect(aviso).toHaveAttribute('role', 'alert');
+  await expect(aviso).toHaveAttribute('role', 'note');
+  await expect(aviso).toHaveAttribute('aria-label', 'Aviso importante');
   await expect(aviso).toHaveClass(/severity-critical/);
   await expect(aviso).toHaveClass(/variant-medical/);
   await expect(aviso.getByRole('button')).toHaveCount(0);

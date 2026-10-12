@@ -1262,7 +1262,7 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
   });
 
   /**
-   * AVISOS Y EJERCICIO · DisclaimerCard con severity="critical" (nivel 1, fiscal: role="alert" y
+   * AVISOS Y EJERCICIO · DisclaimerCard con severity="critical" (nivel 1, fiscal: role="note" «Aviso importante» y
    * no colapsable) y los dos DataReference con su META: FISCAL_IRPF_META (escala, mínimos, arts.
    * 19-20 y DA 61.ª) y FISCAL_SS_CUENTA_AJENA_META (Orden PJC/297/2026). Las fechas, en
    * DD/MM/AAAA. El hero anuncia FISCAL_IRPF_META.vigencia (2026) y el cálculo es de 2026: el MEI
@@ -1271,7 +1271,8 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
   test('AVISOS · DisclaimerCard crítico, DataReference con el META de IRPF y de SS, y ejercicio 2026', async ({ page }) => {
     const critico = page.locator('[class*="severity-critical"]');
     await expect(critico).toHaveCount(1);
-    await expect(critico).toHaveAttribute('role', 'alert');
+    await expect(critico).toHaveAttribute('role', 'note');
+    await expect(critico).toHaveAttribute('aria-label', 'Aviso importante');
 
     const fecha = (iso: string) => iso.split('-').reverse().join('/');
     const referencias = page.getByRole('note', { name: 'Datos de referencia normativos' });

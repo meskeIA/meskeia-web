@@ -261,12 +261,12 @@ test.describe('Planificador de Chequeos Médicos Preventivos', () => {
 
     await expect(page.locator('h1')).toHaveText('Chequeos Médicos Preventivos');
 
-    // DisclaimerCard nivel 1 CRÍTICO: role="alert", variante médica y NUNCA colapsable.
-    // Se localiza por la clase de severidad: `getByRole('alert')` casaría también con el
-    // anunciador de rutas de Next (#__next-route-announcer__).
+    // DisclaimerCard nivel 1 CRÍTICO: role="note" «Aviso importante» (C0117), variante médica y
+    // NUNCA colapsable. Se localiza por la clase de severidad.
     const aviso = page.locator('[class*="severity-critical"]').first();
     await expect(aviso).toBeVisible();
-    await expect(aviso).toHaveAttribute('role', 'alert');
+    await expect(aviso).toHaveAttribute('role', 'note');
+    await expect(aviso).toHaveAttribute('aria-label', 'Aviso importante');
     await expect(aviso).toHaveClass(/variant-medical/);
     await expect(aviso).toContainText('no sustituye');
     await expect(aviso).toContainText('médico de cabecera');

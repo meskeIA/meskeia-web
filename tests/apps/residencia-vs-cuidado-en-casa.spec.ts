@@ -283,10 +283,11 @@ test.describe('Residencia vs Cuidado en Casa', () => {
   test('las piezas obligatorias de una app de riesgo 1', async ({ page }) => {
     await abrir(page);
 
-    // DisclaimerCard nivel 1 CRÍTICO: role="alert" y NUNCA colapsable.
+    // DisclaimerCard nivel 1 CRÍTICO: role="note" «Aviso importante» (C0117) y NUNCA colapsable.
     const disclaimer = page.locator('[class*="severity-critical"]').first();
     await expect(disclaimer).toBeVisible();
-    await expect(disclaimer).toHaveAttribute('role', 'alert');
+    await expect(disclaimer).toHaveAttribute('role', 'note');
+    await expect(disclaimer).toHaveAttribute('aria-label', 'Aviso importante');
     await expect(disclaimer).toContainText('estimaciones orientativas');
     expect(await disclaimer.locator('details, summary, button').count()).toBe(0);
 

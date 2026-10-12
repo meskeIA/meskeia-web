@@ -88,8 +88,8 @@ test.describe('orientador-grado-dependencia', () => {
   test('monta el aviso legal y un disclaimer crítico visible fuera del bloque educativo', async ({ page }) => {
     await abrir(page);
     await expect(page.getByRole('link', { name: /Términos/ }).first()).toBeVisible();
-    // Severidad critical → DisclaimerCard se pinta con role="alert"; se acota por su texto.
-    const aviso = page.getByRole('alert').filter({ hasText: 'SOLO indicativo' });
+    // Severidad critical → DisclaimerCard es una nota «Aviso importante» (C0117); se acota por su texto.
+    const aviso = page.getByRole('note', { name: 'Aviso importante' }).filter({ hasText: 'SOLO indicativo' });
     await expect(aviso).toBeVisible();
     await expect(aviso).toContainText('solo puede determinarlo un técnico');
   });
