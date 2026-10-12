@@ -187,9 +187,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         valorMaximo: 250000,
       },
       {
-        nombre: 'Discapacidad ≥33%',
+        nombre: 'Discapacidad ≥33 %',
         tipo: 3.5,
-        condiciones: ['Discapacidad ≥ 33%', 'Vivienda habitual', 'Valor ≤ 250.000 €'],
+        condiciones: ['Discapacidad ≥ 33 %', 'Vivienda habitual', 'Valor ≤ 250.000 €'],
         valorMaximo: 250000,
       },
       {
@@ -202,7 +202,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     // Era «Bonificación del 3,5%…»: es un TIPO reducido (tipo: 3.5), no una rebaja de la cuota, y
     // solo de la vivienda habitual; la nota se pinta también en garaje, solar, nave y finca rústica
     // (hallazgos 2917, 2920 y 2921, 06/10/2026).
-    notas: 'Tipo reducido del 3,5% en la vivienda habitual para jóvenes, familias numerosas, personas con discapacidad y municipios con problemas de despoblación.',
+    notas: 'Tipo reducido del 3,5 % en la vivienda habitual para jóvenes, familias numerosas, personas con discapacidad y municipios con problemas de despoblación.',
   },
 
   /**
@@ -250,9 +250,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
       {
         // Art. 121-4.b) — mismo 12,5 %.
-        nombre: 'Discapacidad ≥65%',
+        nombre: 'Discapacidad ≥65 %',
         tipo: 7,
-        condiciones: ['Discapacidad ≥ 65%', 'Vivienda habitual', 'Valor real ≤ 100.000 €'],
+        condiciones: ['Discapacidad ≥ 65 %', 'Vivienda habitual', 'Valor real ≤ 100.000 €'],
         valorMaximo: 100000,
       },
       {
@@ -274,7 +274,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
           'Familia numerosa',
           'Vivienda habitual',
           'Vender la anterior vivienda habitual entre 2 años antes y 4 después',
-          'Superficie útil superior en más de un 10% a la anterior',
+          'Superficie útil superior en más de un 10 % a la anterior',
           'Renta ≤ 35.000 € (+6.000 € por hijo que exceda del mínimo legal)',
           'Incompatible con las demás bonificaciones autonómicas',
         ],
@@ -293,7 +293,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Aragón aplica bonificaciones sobre la cuota, no tipos reducidos, y solo en la compra de la vivienda habitual: el 12,5 % del art. 121-4 para menores de 35 años, discapacidad ≥65 % y víctimas de violencia de género (inmueble ≤100.000 €, compatibles entre sí), y el 50 % del art. 121-5 para familias numerosas, que sube al 60 % en medio rural. En una compra en proindiviso donde no todos los compradores cumplan los requisitos, la bonificación se aplica en proporción a la participación de quien sí los cumple (art. 121-4.4). Esta app no calcula dos casos que sí existen: el 1 % por adquirir un inmueble para iniciar una actividad económica (art. 121-11, 0,75 % en medio rural) y el 100 % en la cesión de derechos sobre VPO (art. 121-8).',
+    notas: 'Aragón aplica bonificaciones sobre la cuota, no tipos reducidos, y solo en la compra de la vivienda habitual: el 12,5 % del art. 121-4 para menores de 35 años, discapacidad ≥65 % y víctimas de violencia de género (inmueble ≤100.000 €, compatibles entre sí), y el 50 % del art. 121-5 para familias numerosas, que sube al 60 % en medio rural. En una compra en proindiviso donde no todos los compradores cumplan los requisitos, la bonificación se aplica en proporción a la participación de quien sí los cumple (art. 121-4.4). Esta app no calcula dos casos que sí existen: el 1 % por adquirir un inmueble para iniciar una actividad económica (art. 121-11, 0,75 % en medio rural) y el 100 % en la cesión de derechos sobre VPO (art. 121-8).',
   },
 
   'asturias': {
@@ -325,7 +325,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.2,
-    notas: 'Escala progresiva. Tipo reducido del 4% en la vivienda habitual (valor ≤150.000 €) para jóvenes y familias numerosas, ampliado a las monoparentales desde 2025.',
+    notas: 'Escala progresiva. Tipo reducido del 4 % en la vivienda habitual (valor ≤150.000 €) para jóvenes y familias numerosas, ampliado a las monoparentales desde 2025.',
   },
 
   'baleares': {
@@ -346,9 +346,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         valorMaximo: 270151,
       },
       {
-        nombre: 'Jóvenes < 30 años o discapacidad ≥33% (1ª vivienda)',
+        nombre: 'Jóvenes < 30 años o discapacidad ≥33 % (1ª vivienda)',
         tipo: 0,
-        condiciones: ['Menor de 30 años o discapacidad ≥ 33%', 'Primera vivienda habitual', 'Residente en Baleares 3 años', 'Valor ≤ 270.151 €'],
+        condiciones: ['Menor de 30 años o discapacidad ≥ 33 %', 'Primera vivienda habitual', 'Residente en Baleares 3 años', 'Valor ≤ 270.151 €'],
         valorMaximo: 270151,
       },
       {
@@ -365,7 +365,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Una de las escalas más altas de España (hasta 13%). Bonificación 100% (tipo 0%) para menores de 30 años o discapacidad ≥33% en primera vivienda habitual (valor ≤270.151 €).',
+    notas: 'Una de las escalas más altas de España (hasta 13 %). Bonificación 100 % (tipo 0 %) para menores de 30 años o discapacidad ≥33 % en primera vivienda habitual (valor ≤270.151 €).',
   },
 
   'canarias': {
@@ -429,9 +429,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         valorMaximo: 300000,
       },
       {
-        nombre: 'Discapacidad ≥65%',
+        nombre: 'Discapacidad ≥65 %',
         tipo: 3,
-        condiciones: ['Discapacidad ≥ 65%', 'Vivienda habitual', 'Valor ≤ 300.000 €'],
+        condiciones: ['Discapacidad ≥ 65 %', 'Vivienda habitual', 'Valor ≤ 300.000 €'],
         valorMaximo: 300000,
       },
       {
@@ -476,9 +476,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         condiciones: ['Familia numerosa', 'Vivienda habitual'],
       },
       {
-        nombre: 'Discapacidad ≥65%',
+        nombre: 'Discapacidad ≥65 %',
         tipo: 4,
-        condiciones: ['Discapacidad ≥ 65%', 'Vivienda habitual'],
+        condiciones: ['Discapacidad ≥ 65 %', 'Vivienda habitual'],
       },
       {
         nombre: 'VPO',
@@ -493,7 +493,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Tipo casi 0% para jóvenes en municipios rurales. Gran incentivo contra despoblación.',
+    notas: 'Tipo casi 0 % para jóvenes en municipios rurales. Gran incentivo contra despoblación.',
   },
 
   'castilla-mancha': {
@@ -503,7 +503,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       {
         nombre: 'Vivienda habitual (primera compra)',
         tipo: 6,
-        condiciones: ['Primera vivienda', 'Valor ≤ 180.000 €', 'Hipoteca > 50% del valor'],
+        condiciones: ['Primera vivienda', 'Valor ≤ 180.000 €', 'Hipoteca > 50 % del valor'],
         valorMaximo: 180000,
       },
       {
@@ -553,9 +553,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         condiciones: ['Familia monoparental', 'Vivienda habitual'],
       },
       {
-        nombre: 'Discapacidad ≥65%',
+        nombre: 'Discapacidad ≥65 %',
         tipo: 5,
-        condiciones: ['Discapacidad ≥ 65%', 'Vivienda habitual'],
+        condiciones: ['Discapacidad ≥ 65 %', 'Vivienda habitual'],
       },
       {
         nombre: 'VPO',
@@ -564,7 +564,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'ITP elevado (10-13% en escala progresiva desde el 27/06/2025, Decreto-ley 5/2025). Tipo reducido del 5% en la vivienda habitual para colectivos específicos, con el límite de edad de los jóvenes en 35 años desde esa misma fecha (antes 32). La ATC reconoce además un 5% para víctimas de violencia machista, un 4% en municipios rurales (3% en los de especial atención) y un 20% para grandes tenedores, que esta app no distingue.',
+    notas: 'ITP elevado (10-13 % en escala progresiva desde el 27/06/2025, Decreto-ley 5/2025). Tipo reducido del 5 % en la vivienda habitual para colectivos específicos, con el límite de edad de los jóvenes en 35 años desde esa misma fecha (antes 32). La ATC reconoce además un 5 % para víctimas de violencia machista, un 4 % en municipios rurales (3 % en los de especial atención) y un 20 % para grandes tenedores, que esta app no distingue.',
   },
 
   'valencia': {
@@ -618,7 +618,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     ajd: 1.4,
     ajdViviendaHabitual: 0.1,
     ajdRenuncia: 2,
-    notas: 'Tipo general 9% desde el 01/06/2026 (antes 10%); si el valor supera 1.000.000 €, el 11% sobre TODO el valor. Tipos reducidos en la vivienda habitual para varios colectivos. AJD 1,4% (0,1% en vivienda habitual y 2% con renuncia a la exención del IVA).',
+    notas: 'Tipo general 9 % desde el 01/06/2026 (antes 10 %); si el valor supera 1.000.000 €, el 11 % sobre TODO el valor. Tipos reducidos en la vivienda habitual para varios colectivos. AJD 1,4 % (0,1 % en vivienda habitual y 2 % con renuncia a la exención del IVA).',
   },
 
   'extremadura': {
@@ -637,23 +637,23 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         valorMaximo: 180000,
       },
       {
-        nombre: 'Jóvenes < 35 años (bonif. 20%)',
+        nombre: 'Jóvenes < 35 años (bonif. 20 %)',
         tipo: 6.4,
-        condiciones: ['Menor de 35 años', 'Vivienda habitual', 'Bonificación 20% sobre tipo'],
+        condiciones: ['Menor de 35 años', 'Vivienda habitual', 'Bonificación 20 % sobre tipo'],
       },
       {
-        nombre: 'Familia numerosa (bonif. 20%)',
+        nombre: 'Familia numerosa (bonif. 20 %)',
         tipo: 6.4,
-        condiciones: ['Familia numerosa', 'Vivienda habitual', 'Bonificación 20% sobre tipo'],
+        condiciones: ['Familia numerosa', 'Vivienda habitual', 'Bonificación 20 % sobre tipo'],
       },
       {
-        nombre: 'Discapacidad (bonif. 20%)',
+        nombre: 'Discapacidad (bonif. 20 %)',
         tipo: 6.4,
-        condiciones: ['Persona con discapacidad', 'Vivienda habitual', 'Bonificación 20% sobre tipo'],
+        condiciones: ['Persona con discapacidad', 'Vivienda habitual', 'Bonificación 20 % sobre tipo'],
       },
     ],
     ajd: 1.5,
-    notas: 'Escala progresiva 8/10/11%. Dato orientativo: los tipos reducidos de la vivienda habitual para jóvenes/familia numerosa varían entre fuentes (7%, 6,4% por bonificación 20% o 3%) según valor y límites de renta — verifica la tarifa vigente en gobiernodeextremadura.es',
+    notas: 'Escala progresiva 8/10/11 %. Dato orientativo: los tipos reducidos de la vivienda habitual para jóvenes/familia numerosa varían entre fuentes (7 %, 6,4 % por bonificación 20 % o 3 %) según valor y límites de renta — verifica la tarifa vigente en gobiernodeextremadura.es',
   },
 
   'galicia': {
@@ -678,9 +678,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         valorMaximo: 150000,
       },
       {
-        nombre: 'Discapacidad ≥65%',
+        nombre: 'Discapacidad ≥65 %',
         tipo: 3,
-        condiciones: ['Discapacidad ≥ 65%', 'Vivienda habitual', 'Valor ≤ 150.000 €'],
+        condiciones: ['Discapacidad ≥ 65 %', 'Vivienda habitual', 'Valor ≤ 150.000 €'],
         valorMaximo: 150000,
       },
       {
@@ -693,7 +693,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     ajd: 1.5,
     // Todos los reducidos exigen vivienda habitual, y la nota se pinta también en una finca rústica
     // (hallazgo 2920, 06/10/2026).
-    notas: 'Tipo reducido del 3% en la vivienda habitual para jóvenes, familias numerosas, personas con discapacidad y víctimas de violencia de género.',
+    notas: 'Tipo reducido del 3 % en la vivienda habitual para jóvenes, familias numerosas, personas con discapacidad y víctimas de violencia de género.',
   },
 
   'madrid': {
@@ -706,7 +706,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         condiciones: ['Familia numerosa', 'Vivienda habitual'],
       },
       {
-        nombre: 'Vivienda habitual (bonif. 10%)',
+        nombre: 'Vivienda habitual (bonif. 10 %)',
         tipo: 5.4,
         condiciones: ['Vivienda habitual', 'Valor ≤ 250.000 €'],
         valorMaximo: 250000,
@@ -719,7 +719,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 0.75,
-    notas: 'ITP más bajo de España peninsular (6%). Bonificación 100% para jóvenes en pueblos pequeños desde nov/2024.',
+    notas: 'ITP más bajo de España peninsular (6 %). Bonificación 100 % para jóvenes en pueblos pequeños desde nov/2024.',
   },
 
   'murcia': {
@@ -743,14 +743,14 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         rentaMaxima: 44000,
       },
       {
-        nombre: 'Discapacidad ≥65%',
+        nombre: 'Discapacidad ≥65 %',
         tipo: 3,
-        condiciones: ['Discapacidad ≥ 65%', 'Vivienda habitual', 'Renta < 40.000 €'],
+        condiciones: ['Discapacidad ≥ 65 %', 'Vivienda habitual', 'Renta < 40.000 €'],
         rentaMaxima: 40000,
       },
     ],
     ajd: 1.5,
-    notas: 'Tipo general 7,75% desde el 25/07/2025 (Ley 3/2025, antes 8%). Tipo reducido del 3% en la vivienda habitual para jóvenes de hasta 40 años, familias numerosas y personas con discapacidad ≥65%. Fuente: ATRM (agenciatributaria.carm.es).',
+    notas: 'Tipo general 7,75 % desde el 25/07/2025 (Ley 3/2025, antes 8 %). Tipo reducido del 3 % en la vivienda habitual para jóvenes de hasta 40 años, familias numerosas y personas con discapacidad ≥65 %. Fuente: ATRM (agenciatributaria.carm.es).',
   },
 
   'navarra': {
@@ -770,7 +770,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 0.5,
-    notas: 'Régimen foral propio. ITP bajo (6%). AJD muy reducido (0,5%).',
+    notas: 'Régimen foral propio. ITP bajo (6 %). AJD muy reducido (0,5 %).',
   },
 
   'pais-vasco': {
@@ -801,7 +801,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     // AJD (hallazgos 1583 y 1592).
     ajd: 0.5,
     ajdVivienda: 0,
-    notas: 'Régimen foral propio. ITP del 4% en vivienda (el más bajo de España) y del 7% en el resto de inmuebles. AJD del 0,5%, del que está exenta la primera transmisión de vivienda.',
+    notas: 'Régimen foral propio. ITP del 4 % en vivienda (el más bajo de España) y del 7 % en el resto de inmuebles. AJD del 0,5 %, del que está exenta la primera transmisión de vivienda.',
   },
 
   'rioja': {
@@ -829,13 +829,13 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         condiciones: ['Familia numerosa', 'Vivienda habitual'],
       },
       {
-        nombre: 'Discapacidad ≥33%',
+        nombre: 'Discapacidad ≥33 %',
         tipo: 5,
-        condiciones: ['Discapacidad ≥ 33%', 'Vivienda habitual'],
+        condiciones: ['Discapacidad ≥ 33 %', 'Vivienda habitual'],
       },
     ],
     ajd: 1,
-    notas: 'ITP moderado (7%). Jóvenes menores de 40 años en primera vivienda habitual: 4% (3% en los municipios del anexo I de la Ley 10/2017), por la Ley 1/2025 de medidas urgentes para el acceso a la vivienda, con efectos desde el 03/03/2025. Dato orientativo: la familia numerosa baja del 5% al 3% con requisitos adicionales de renta (≤30.600 €) que esta app no pregunta — verifica la tarifa vigente en larioja.org',
+    notas: 'ITP moderado (7 %). Jóvenes menores de 40 años en primera vivienda habitual: 4 % (3 % en los municipios del anexo I de la Ley 10/2017), por la Ley 1/2025 de medidas urgentes para el acceso a la vivienda, con efectos desde el 03/03/2025. Dato orientativo: la familia numerosa baja del 5 % al 3 % con requisitos adicionales de renta (≤30.600 €) que esta app no pregunta — verifica la tarifa vigente en larioja.org',
   },
 
   'ceuta': {
@@ -844,13 +844,13 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     tipoGeneral: 6,
     tiposReducidos: [
       {
-        nombre: 'Bonificación general 50%',
+        nombre: 'Bonificación general 50 %',
         tipo: 3,
-        condiciones: ['Inmueble situado en Ceuta', 'Bonificación automática 50%'],
+        condiciones: ['Inmueble situado en Ceuta', 'Bonificación automática 50 %'],
       },
     ],
     ajd: 0.5,
-    notas: 'Bonificación automática del 50% para inmuebles en Ceuta.',
+    notas: 'Bonificación automática del 50 % para inmuebles en Ceuta.',
   },
 
   'melilla': {
@@ -859,13 +859,13 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     tipoGeneral: 6,
     tiposReducidos: [
       {
-        nombre: 'Bonificación general 50%',
+        nombre: 'Bonificación general 50 %',
         tipo: 3,
-        condiciones: ['Inmueble situado en Melilla', 'Bonificación automática 50%'],
+        condiciones: ['Inmueble situado en Melilla', 'Bonificación automática 50 %'],
       },
     ],
     ajd: 0.5,
-    notas: 'Bonificación automática del 50% para inmuebles en Melilla.',
+    notas: 'Bonificación automática del 50 % para inmuebles en Melilla.',
   },
 };
 

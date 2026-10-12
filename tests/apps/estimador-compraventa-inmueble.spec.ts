@@ -4801,9 +4801,10 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
    * Todos legibles: ni un aviso de ilegible puede aparecer (el aviso nuevo no se dispara solo).
    */
   test('CASO 52 (normal) — La Rioja, perfil discapacidad, 180.000 €: las dos pestañas', async ({ page }) => {
-    const discapacidad = ITP_CCAA['rioja'].tiposReducidos.find((t) => t.nombre === 'Discapacidad ≥33%');
+    // El «%» lleva espacio duro en data/ desde el 12/10/2026 (cabo C0028)
+    const discapacidad = ITP_CCAA['rioja'].tiposReducidos.find((t) => t.nombre === 'Discapacidad ≥33 %');
     expect(discapacidad?.tipo, 'el reducido sale de la tabla').toBe(5);
-    expect(discapacidad?.condiciones).toEqual(['Discapacidad ≥ 33%', 'Vivienda habitual']);
+    expect(discapacidad?.condiciones).toEqual(['Discapacidad ≥ 33 %', 'Vivienda habitual']);
     expect(ITP_CCAA['rioja'].tipoGeneral).toBe(7);
     expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 7)?.coeficiente).toBe(0.2);
     expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);

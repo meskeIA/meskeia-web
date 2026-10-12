@@ -87,7 +87,8 @@ test.describe('Aragón — bonificaciones en cuota como tipo efectivo', () => {
   test('art. 121-4: los tres colectivos del 12,5 % quedan en el 7 %', () => {
     // 8 % × (1 − 0,125) = 7 %. Exacto mientras el techo de 100.000 € del propio artículo
     // mantenga la operación dentro del primer tramo, que llega a 400.000 €.
-    for (const nombre of ['Jóvenes < 35 años', 'Discapacidad ≥65%', 'Víctimas de violencia de género']) {
+    // El «%» con espacio duro desde el 12/10/2026 (cabo C0028: se separa en data/, en la fuente)
+    for (const nombre of ['Jóvenes < 35 años', 'Discapacidad ≥65 %', 'Víctimas de violencia de género']) {
       expect(reducido(nombre).tipo, nombre).toBe(7);
       expect(reducido(nombre).valorMaximo, nombre).toBe(100000);
     }
@@ -118,7 +119,7 @@ test.describe('Aragón — bonificaciones en cuota como tipo efectivo', () => {
     expect(condiciones).not.toContain('rural');
     // Y los requisitos de verdad, que antes no estaban, sí tienen que aparecer.
     expect(condiciones).toContain('vender la anterior vivienda habitual');
-    expect(condiciones).toContain('10%');
+    expect(condiciones).toContain('10 %');
   });
 });
 
