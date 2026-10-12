@@ -352,7 +352,8 @@ export default function GuiaSeguroViaje() {
                     onClick={() => toggleNota(c.id)}
                     aria-expanded={notasAbiertas.has(c.id)}
                   >
-                    {notasAbiertas.has(c.id) ? '▲ Ocultar detalle' : '▼ Ver detalle'}
+                    <span aria-hidden="true">{notasAbiertas.has(c.id) ? '▲' : '▼'}</span>{' '}
+                    {notasAbiertas.has(c.id) ? 'Ocultar detalle' : 'Ver detalle'}
                   </button>
                   {notasAbiertas.has(c.id) && (
                     <p className={styles.coberturaNota}>{c.nota}</p>
