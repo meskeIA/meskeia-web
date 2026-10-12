@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
-import { FISCAL_CNAE_IAE_META, SECCIONES_IAE } from '@/data/fiscal';
-import { formatPercentage } from '@/lib';
+import { CNAE_VIGENCIA, FISCAL_CNAE_IAE_META, SECCIONES_IAE } from '@/data/fiscal';
+import { formatFechaLarga, formatPercentage } from '@/lib';
 
 // La retención de la sección 2ª sale del módulo, no tecleada (residuo del hallazgo 2227).
 const SECCION_PROFESIONAL = SECCIONES_IAE.find((s) => s.tipoRetencion !== null);
@@ -113,7 +113,10 @@ export const faqJsonLd = {
       name: '¿Mi código CNAE-2009 sigue siendo válido?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La CNAE-2025, aprobada por el RD 10/2025, sustituye a la CNAE-2009 (RD 475/2007) y es la clasificación operativa desde enero de 2026. Un código CNAE-2009 anotado en un trámite anterior no queda sin valor: el INE publica la tabla oficial de correspondencia entre ambas versiones, con la que se traduce al código equivalente de la CNAE-2025.',
+        // Norma y fecha desde CNAE_VIGENCIA (hasta el 12/10/2026 decía «operativa desde enero
+        // de 2026», una fecha que el RD 10/2025 no contiene: hallazgo 2923)
+        text: `La ${CNAE_VIGENCIA.vigente}, aprobada por el ${CNAE_VIGENCIA.normaVigente}, sustituye a la ${CNAE_VIGENCIA.anterior} (${CNAE_VIGENCIA.normaAnterior}) y está en vigor desde el ${formatFechaLarga(CNAE_VIGENCIA.desde)}. ` +
+          'Un código CNAE-2009 anotado en un trámite anterior no queda sin valor: el INE publica la tabla oficial de correspondencia entre ambas versiones, con la que se traduce al código equivalente de la CNAE-2025.',
       },
     },
     {

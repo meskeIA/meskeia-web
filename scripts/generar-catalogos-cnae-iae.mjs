@@ -280,7 +280,9 @@ const salida = {
     cnae: {
       fuente: 'CNAE-2025 — RD 10/2025 (INE)',
       urlOficial: 'https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177032',
-      nota: 'CNAE-2025 sustituye a CNAE-2009 desde enero de 2026. La correspondencia entre ambas es la tabla oficial del INE.',
+      // Sin fecha: la de la sustitución vive en CNAE_VIGENCIA (data/fiscal/cnae-iae.ts), de la
+      // que la página deriva su nota; aquí estaba tecleada y se quedó atrás (hallazgo 2924).
+      nota: 'CNAE-2025 sustituye a CNAE-2009 (RD 10/2025). La correspondencia entre ambas es la tabla oficial del INE.',
     },
     advertencia:
       'No existe tabla oficial de equivalencia entre CNAE e IAE: son clasificaciones de organismos y finalidades distintas (INE, estadística / AEAT, tributaria). Este catálogo permite localizar cada código en su propia clasificación; el encaje de una actividad concreta lo decide quien se da de alta, con el literal oficial delante.',

@@ -3468,8 +3468,19 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 06/10/2026', () => {
     expect(ldJson).not.toContain('01/01/2026');
   });
 
-  test('ABIERTO · BAJO (dato) — la nota del sello de la CNAE no teclea la fecha: el generador la escribe a mano', async () => {
-    test.fail();
+  test('REPARADO · BAJO (dato) — la nota del sello de la CNAE no teclea la fecha: el generador la escribe a mano', async ({
+    page,
+  }) => {
+    // REPARADO el 12/10/2026 (cabo C0210): la página deriva la nota del DataReference de
+    // CNAE_VIGENCIA, y el generador ya no escribe fecha en `meta.cnae.nota`.
+    await abrirHidratado(page);
+    const fecha = new Date(`${CNAE_VIGENCIA.desde}T00:00:00`).toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    await expect(page.getByText(`rige desde el ${fecha}`)).toBeVisible();
+    await expect(page.getByText(/sustituye a CNAE-2009 desde enero de 2026/)).toHaveCount(0);
     // Residuo del hallazgo 2228, con su misma forma: la página deriva la fecha de
     // CNAE_VIGENCIA.desde en el hero, el aviso, la introducción, la FAQ y «Errores frecuentes»,
     // pero el DataReference de la CNAE pinta `meta.cnae.nota` del catálogo servido («CNAE-2025
@@ -3480,6 +3491,23 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 06/10/2026', () => {
     const { join } = await import('node:path');
     const generador = readFileSync(join(process.cwd(), 'scripts', 'generar-catalogos-cnae-iae.mjs'), 'utf8');
     expect(generador).not.toMatch(/sustituye a CNAE-2009 desde [a-záéíóú]+ de \d{4}/i);
+  });
+
+  test('REPARADO (12/10/2026, cabo C0210) — la FAQ de la ficha de Delegum deriva la fecha de CNAE_VIGENCIA', async ({
+    page,
+  }) => {
+    // Decía «es la clasificación operativa desde enero de 2026», la fecha del hallazgo 2923
+    // que el RD 10/2025 no contiene. Ahora sale de CNAE_VIGENCIA, como en el conversor.
+    const fecha = new Date(`${CNAE_VIGENCIA.desde}T00:00:00`).toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    await page.goto('/delegum/datos-fiscales/cnae-iae/');
+    const ldJson = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(ldJson).toContain(`en vigor desde el ${fecha}`);
+    expect(ldJson).toContain(CNAE_VIGENCIA.normaVigente);
+    expect(ldJson).not.toContain('desde enero de 2026');
   });
 
   test('REPARADO · MEDIO (operativa) — una cifra dentro de una descripción no puede convertir la búsqueda en búsqueda por código', async ({

@@ -1002,7 +1002,9 @@ export default function ConversorCnaeIaePage() {
             fuente={sinPrefijo(meta.cnae.fuente, CNAE_VIGENCIA.vigente)}
             verificado={FISCAL_CNAE_IAE_META.verificado}
             urlOficial={meta.cnae.urlOficial}
-            nota={meta.cnae.nota}
+            // La nota sale de CNAE_VIGENCIA y no de `meta.cnae.nota`, que la escribía el
+            // generador con la fecha tecleada, y caducada (hallazgo 2924)
+            nota={`La ${CNAE_VIGENCIA.vigente} sustituye a la ${CNAE_VIGENCIA.anterior} y rige desde el ${formatFechaLarga(CNAE_VIGENCIA.desde)} (${CNAE_VIGENCIA.normaVigente}). La correspondencia entre ambas es la tabla oficial del INE.`}
           />
           <DataReference
             normativa="Tarifas del IAE"
