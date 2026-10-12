@@ -48,7 +48,7 @@
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-large);
+  box-shadow: var(--shadow-lg); /* era --shadow-large, que no existe (C0052) */
 }
 
 .cardTitle {

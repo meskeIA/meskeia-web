@@ -30,7 +30,8 @@ export default function GlobalError({
         className="container-md"
         style={{
           textAlign: 'center',
-          padding: 'var(--spacing-4xl) var(--spacing-md)',
+          // Era --spacing-4xl, que no existe en globals y anulaba el padding entero (C0052)
+          padding: 'var(--spacing-3xl) var(--spacing-md)',
           maxWidth: '600px',
           margin: '0 auto',
         }}

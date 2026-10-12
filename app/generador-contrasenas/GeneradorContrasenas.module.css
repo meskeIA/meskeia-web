@@ -185,7 +185,7 @@
   padding: 32px;
   border-radius: var(--radius-large);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-small);
+  box-shadow: var(--shadow-sm);
   margin-bottom: 32px;
 }
 
@@ -356,7 +356,7 @@
 
 .historyItem:hover {
   background: var(--hover);
-  box-shadow: var(--shadow-small);
+  box-shadow: var(--shadow-sm);
 }
 
 .historyPassword {
@@ -564,7 +564,7 @@
   padding: 20px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-small);
+  box-shadow: var(--shadow-sm);
 }
 
 .faqItem h4 {

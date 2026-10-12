@@ -1056,7 +1056,7 @@
 
 .aulaVeredictoKo {
   background: rgba(239, 68, 68, 0.12);
-  border-left-color: var(--danger);
+  border-left-color: var(--error); /* --danger no existe en globals: anulaba la declaración (C0052) */
   color: var(--text-primary);
 }
 
