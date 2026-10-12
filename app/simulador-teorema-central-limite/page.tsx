@@ -4,6 +4,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTeoremaCentralLimite.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { formatNumber } from '@/lib';
 import CasosAula from './CasosAula';
 import { construirHistograma, type Reticula } from './histograma';
 // μ y σ de cada población NO se escriben aquí: vienen de `./casos.ts`, que es también donde se
@@ -183,9 +184,11 @@ const NUM_MUESTRAS_VALORES = [100, 500, 1000, 5000];
 // ============================================
 // UTILIDADES
 // ============================================
+// formatNumber y no toFixed().replace (CLAUDE.md global §2; decidido el 10/10/2026, cabo C0071):
+// agrupa los millares, no escribe «-0,000» y marca «≈0» lo que no es un cero exacto.
 function fmt(n: number, decimales = 3): string {
   if (!isFinite(n)) return '∞';
-  return n.toFixed(decimales).replace('.', ',');
+  return formatNumber(n, decimales);
 }
 
 function generarMuestras(dist: DistribucionDef, n: number, numMuestras: number): number[] {
