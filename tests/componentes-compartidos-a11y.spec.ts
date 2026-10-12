@@ -73,6 +73,49 @@ test.describe('Componentes compartidos · accesibilidad', () => {
     }
   });
 
+  for (const ruta of ['/quiz-simbolos-quimicos/', '/quiz-tabla-periodica/', '/estimador-costas-judiciales/', RUTA])
+  test(`«¿Te resultó útil?» y «Compártela» llegan a 4,5:1 en tema oscuro (cabo C0054) · ${ruta}`, async ({ page }) => {
+    // Antes: en oscuro el pie pintaba «Compártela» con var(--primary), y el pie vive dentro del
+    // .container de la app: quiz-simbolos-quimicos redeclara ahí --primary: #2E86AB sin
+    // variante oscura, y sobre el fondo del pie (rgba(42, 42, 42, 0,95) encima del de la
+    // página) daba 3,53:1. Es texto normal: exige 4,5. Las otras rutas son las del acta.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(ruta);
+    const conmutador = page.getByRole('button', { name: /Cambiar a modo oscuro/ });
+    await expect(async () => {
+      await conmutador.click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 1000 });
+    }).toPass({ timeout: 15000 });
+    await page.waitForTimeout(500); // transiciones de color de globals.css
+
+    const ratios = await page.evaluate(() => {
+      const rgba = (c: string): number[] => (c.match(/[\d.]+/g) ?? []).map(Number);
+      const sobre = (arriba: number[], abajo: number[]): number[] => {
+        const a = arriba[3] ?? 1;
+        return [0, 1, 2].map((i) => arriba[i] * a + abajo[i] * (1 - a));
+      };
+      const lum = (c: number[]): number => {
+        const [r, g, b] = c.map((v) => {
+          const s = v / 255;
+          return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const pie = document.querySelector('footer[class*="Footer"]') as HTMLElement;
+      const fondoPagina = rgba(getComputedStyle(document.body).backgroundColor);
+      const fondo = sobre(rgba(getComputedStyle(pie).backgroundColor), fondoPagina);
+      return ['shareText', 'shareButton'].map((clase) => {
+        const el = pie.querySelector(`[class*="${clase}"]`) as HTMLElement;
+        const texto = sobre(rgba(getComputedStyle(el).color), fondo);
+        const [l1, l2] = [lum(texto), lum(fondo)].sort((x, y) => y - x);
+        return { clase, ratio: Math.round(((l1 + 0.05) / (l2 + 0.05)) * 100) / 100 };
+      });
+    });
+    for (const { clase, ratio } of ratios) {
+      expect(ratio, `${clase} en oscuro`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
   test('el aviso de «enlace copiado» es una región live, no solo un cartel', async ({ page }) => {
     await page.goto(RUTA);
     // Aparece sin mover el foco: sin `role="status"`, quien no lo ve no se entera de que

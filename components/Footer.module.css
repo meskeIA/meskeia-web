@@ -219,12 +219,15 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
+/* No --primary: el pie vive dentro del .container de cada app, y los módulos que lo
+   redeclaran sin variante oscura (quiz-simbolos-quimicos: #2E86AB) lo dejaban a 3,53:1 en
+   oscuro (cabo C0054). --primary-texto cambia con el tema (#3FA5D1, 5,19:1 aquí). */
 [data-theme='dark'] .shareText {
-  color: var(--primary);
+  color: var(--primary-texto, #3FA5D1);
 }
 
 [data-theme='dark'] .shareButton {
-  color: var(--primary);
+  color: var(--primary-texto, #3FA5D1);
 }
 
 [data-theme='dark'] .copyright {
