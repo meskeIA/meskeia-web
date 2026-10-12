@@ -249,9 +249,15 @@ export default function PopulationSimulator({
               <div className={styles.chiSquareInterpretation}>
                 {/* Con 0 grados de libertad no hay p-valor que dar: la interpretación lo
                     explica sola y anteponerle una «p» diría justo lo contrario (hallazgo 832). */}
+                {/* Con el aviso de «no fiable», el p se queda a la vista pero SIN negrita: en
+                    negrita junto al aviso se leía como conclusión (decidido el 10/10/2026, cabo C0071). */}
                 {chiSquareResult.pValue !== 'no procede' && (
                   <>
-                    <strong>p {chiSquareResult.pValue}</strong>
+                    {avisoNoFiable ? (
+                      <span>p {chiSquareResult.pValue}</span>
+                    ) : (
+                      <strong>p {chiSquareResult.pValue}</strong>
+                    )}
                     <br />
                   </>
                 )}

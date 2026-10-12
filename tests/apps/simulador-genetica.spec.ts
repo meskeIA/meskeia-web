@@ -2721,6 +2721,10 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     const interpretacion = page.locator('[class*="chiSquareInterpretation"]');
     await expect(interpretacion).toContainText('El contraste no es fiable con esta muestra: se esperan 2,5 de Verde');
     await expect(interpretacion).not.toContainText(/ajuste|diferencia significativa/i);
+    // Cabo C0071 (decidido el 10/10/2026): con el aviso, el p sigue a la vista pero sin negrita,
+    // que lo presentaba como conclusión junto a un «no fiable».
+    await expect(interpretacion).toContainText(/p [<>=≥≤]/);
+    await expect(interpretacion.locator('strong')).toHaveCount(0);
 
     // El borde: con N = 20 se esperan 15 y 5 → ya es fiable y hay veredicto.
     await campo.fill('20');
@@ -2728,6 +2732,8 @@ test.describe('Re-inspección 25/09/2026 · hallazgos abiertos', () => {
     await page.getByRole('button', { name: /Simular/ }).click();
     await expect(page.locator('[class*="populationIndividual"]')).toHaveCount(20);
     await expect(interpretacion).not.toContainText('no es fiable');
+    // Con veredicto fiable, el p vuelve a ir en negrita
+    await expect(interpretacion.locator('strong')).toHaveCount(1);
     // Sin distinguir mayúsculas: la muestra es aleatoria y el veredicto puede ser «Buen ajuste…»
     // (hasta el 25/09/2026 la regex exigía «Ajuste» y fallaba según el sorteo).
     await expect(interpretacion).toContainText(/ajuste|diferencia significativa/i);
