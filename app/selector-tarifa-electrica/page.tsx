@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { formatCurrency } from '@/lib';
 
 // ─── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -30,28 +29,16 @@ interface Resultado {
   recomendacion: 'pvpc' | 'libre' | 'ambas';
   puntosPvpc: number;
   puntosLibre: number;
-  costeAnualPvpc: number;
-  costeAnualLibre: number;
   factores: string[];
   consejos: string[];
 }
 
-// ─── Datos de precios de referencia ────────────────────────────────────────────
-
-const PRECIOS = {
-  pvpc: {
-    punta: 0.22,  // media 2024-2025
-    llano: 0.16,
-    valle: 0.10,
-  },
-  libre: {
-    plano: 0.18,  // precio fijo medio mercado libre
-  },
-  potencia: {
-    p1: 0.10, // precio potencia periodo 1 (dia)
-    p2: 0.04, // precio potencia periodo 2 (noche)
-  },
-};
+// ─── Sin estimación de coste (hallazgos 3166, 3167 y 3174, decisión del usuario 12/10/2026) ───
+// La app estimaba un «~X €/año» y marcaba una opción como «Más barata» con precios escritos a mano
+// («media 2024-2025») y la potencia sin multiplicar por los kW: esa estimación contradecía la
+// recomendación en el 82 % de los perfiles que recibían «Mercado libre». Se retiró hasta tener los
+// precios en un módulo de data/ con fuente, fecha y <DataReference>; la recomendación es por
+// perfil de consumo y la pantalla dice que no compara precios.
 
 // ─── Preguntas del test ────────────────────────────────────────────────────────
 
@@ -225,54 +212,6 @@ function calcularResultado(respuestas: Record<number, number>): Resultado {
   consejos.push('Revisa tu factura actual para conocer tu consumo real por franjas horarias');
   consejos.push('Consulta el comparador de la CNMC (comparador.cnmc.gob.es) para ofertas actualizadas');
 
-  // Estimar costes anuales
-  const consumoMensualIdx = r[9] ?? 1;
-  const consumoMensual = consumoMensualIdx === 0 ? 150 : consumoMensualIdx === 1 ? 300 : 500;
-
-  // Distribucion de consumo segun perfil
-  let pctPunta = 0.35;
-  let pctLlano = 0.30;
-  let pctValle = 0.35;
-
-  // Ajustar segun respuestas
-  if (r[4] === 0) { // Siempre electrodomesticos en valle
-    pctPunta = 0.25;
-    pctLlano = 0.25;
-    pctValle = 0.50;
-  } else if (r[4] === 2) { // Nunca en valle
-    pctPunta = 0.45;
-    pctLlano = 0.35;
-    pctValle = 0.20;
-  }
-
-  if (r[7] === 0) { // Teletrabajo siempre
-    pctPunta += 0.10;
-    pctValle -= 0.10;
-  }
-
-  if (r[6] === 0) { // Coche electrico
-    pctValle += 0.15;
-    pctPunta -= 0.08;
-    pctLlano -= 0.07;
-  }
-
-  // Normalizar porcentajes
-  const total = pctPunta + pctLlano + pctValle;
-  pctPunta /= total;
-  pctLlano /= total;
-  pctValle /= total;
-
-  const consumoAnual = consumoMensual * 12;
-  const costeAnualPvpc =
-    consumoAnual * pctPunta * PRECIOS.pvpc.punta +
-    consumoAnual * pctLlano * PRECIOS.pvpc.llano +
-    consumoAnual * pctValle * PRECIOS.pvpc.valle +
-    (PRECIOS.potencia.p1 + PRECIOS.potencia.p2) * 365;
-
-  const costeAnualLibre =
-    consumoAnual * PRECIOS.libre.plano +
-    (PRECIOS.potencia.p1 + PRECIOS.potencia.p2) * 365;
-
   // Determinar recomendacion
   let recomendacion: 'pvpc' | 'libre' | 'ambas';
   if (puntosPvpc >= 4) {
@@ -289,8 +228,6 @@ function calcularResultado(respuestas: Record<number, number>): Resultado {
     recomendacion,
     puntosPvpc: Math.max(0, puntosPvpc),
     puntosLibre: Math.max(0, puntosLibre),
-    costeAnualPvpc: Math.round(costeAnualPvpc * 100) / 100,
-    costeAnualLibre: Math.round(costeAnualLibre * 100) / 100,
     factores,
     consejos,
   };
@@ -380,18 +317,17 @@ export default function SelectorTarifaElectricaPage() {
               </p>
             </div>
 
-            {/* Barras comparativas */}
+            {/* Barras comparativas: miden cuánto apunta el perfil a cada opción, no precios */}
             <div className={styles.barsContainer}>
+              <p className={styles.barsNota}>
+                Cuánto apunta tu perfil de consumo a cada opción. No es una comparación de
+                precios: para saber cuál te sale más barata, compara tu factura con las ofertas
+                del comparador de la CNMC.
+              </p>
               <div className={styles.barRow}>
                 <div className={styles.barLabel}>
                   <span>
                     <span aria-hidden="true">🏛️</span> PVPC (regulada)
-                    {resultado.costeAnualPvpc < resultado.costeAnualLibre && (
-                      <span className={styles.winnerTag}>Mas barata</span>
-                    )}
-                  </span>
-                  <span className={styles.barLabelCost}>
-                    ~{formatCurrency(resultado.costeAnualPvpc)}/ano
                   </span>
                 </div>
                 <div className={styles.barTrack}>
@@ -410,12 +346,6 @@ export default function SelectorTarifaElectricaPage() {
                 <div className={styles.barLabel}>
                   <span>
                     <span aria-hidden="true">🏪</span> Mercado libre
-                    {resultado.costeAnualLibre < resultado.costeAnualPvpc && (
-                      <span className={styles.winnerTag}>Mas barata</span>
-                    )}
-                  </span>
-                  <span className={styles.barLabelCost}>
-                    ~{formatCurrency(resultado.costeAnualLibre)}/ano
                   </span>
                 </div>
                 <div className={styles.barTrack}>
@@ -578,7 +508,7 @@ export default function SelectorTarifaElectricaPage() {
                 <h4>Precio fijo pactado</h4>
                 <p>
                   En el mercado libre, la comercializadora te ofrece un precio fijo por kWh
-                  (normalmente entre 0,16 y 0,20 euros) que no varia con el mercado mayorista.
+                  que no varia con el mercado mayorista.
                   Sabes exactamente cuanto pagaras cada mes por tu consumo.
                 </p>
               </div>
@@ -679,8 +609,8 @@ export default function SelectorTarifaElectricaPage() {
                   <code>Carga coche electrico de noche. Pone lavadora y lavavajillas en fin de semana. Consume poco entre semana de dia.</code>
                 </div>
                 <p className={styles.profileRecommendation}>
-                  <strong>Recomendacion:</strong> PVPC. Puede ahorrar entre un 20% y un 35% respecto
-                  al mercado libre al concentrar el consumo en las horas mas baratas.
+                  <strong>Recomendacion:</strong> PVPC. Concentrar el consumo en las horas mas
+                  baratas es justo lo que el precio por franjas premia.
                 </p>
               </div>
 
@@ -695,7 +625,7 @@ export default function SelectorTarifaElectricaPage() {
                 </div>
                 <p className={styles.profileRecommendation}>
                   <strong>Recomendacion:</strong> Mercado libre. Al tener consumo en todas las
-                  franjas, el precio fijo suele ser mas ventajoso que pagar punta a 0,22 euros/kWh.
+                  franjas, el precio fijo suele ser mas ventajoso que pagar la franja punta, la mas cara.
                 </p>
               </div>
 
@@ -839,7 +769,7 @@ export default function SelectorTarifaElectricaPage() {
                 <h3>Revisa tu potencia</h3>
                 <p>
                   Muchos hogares tienen mas potencia contratada de la que necesitan.
-                  Bajar de 5,75 a 4,6 kW puede ahorrar 40-60 euros al ano.
+                  Ajustarla a lo que de verdad usas baja el termino fijo de todas las facturas.
                 </p>
               </div>
             </div>
@@ -872,7 +802,7 @@ export default function SelectorTarifaElectricaPage() {
               </li>
               <li>
                 <strong>&quot;Solo importa el precio del kWh&quot;.</strong> El termino de
-                potencia supone entre el 30% y el 40% de la factura. Optimizar la potencia
+                potencia es una parte fija de la factura que pagas aunque no consumas. Optimizar la potencia
                 contratada puede ahorrar mas que cambiar de tarifa. Revisa si tu potencia
                 P1 y P2 estan bien ajustadas.
               </li>

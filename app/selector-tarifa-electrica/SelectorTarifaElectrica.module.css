@@ -274,10 +274,11 @@
   font-weight: 600;
 }
 
-.barLabelCost {
+.barsNota {
   color: var(--text-secondary);
-  font-weight: 400;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 var(--spacing-md);
 }
 
 .barTrack {
@@ -316,22 +317,6 @@
   font-weight: 700;
   color: white;
   min-width: 40px;
-}
-
-.winnerTag {
-  display: inline-block;
-  background: rgba(34, 197, 94, 0.15);
-  color: #16a34a;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 20px;
-  margin-left: var(--spacing-sm);
-}
-
-[data-theme='dark'] .winnerTag {
-  background: rgba(34, 197, 94, 0.25);
-  color: #4ade80;
 }
 
 /* Factores clave */

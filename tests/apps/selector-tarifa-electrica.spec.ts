@@ -1,5 +1,4 @@
 import { test, expect, Page, devices } from '@playwright/test';
-import { parseSpanishNumber } from '../../lib/formatters';
 
 /**
  * Selector de Tarifa Eléctrica (selector-tarifa-electrica) — inspección del 10/10/2026
@@ -28,6 +27,12 @@ import { parseSpanishNumber } from '../../lib/formatters';
  *           libre = kWh·año × 0,18 + (0,10 + 0,04) × 365          [potencia = 51,10 € fijos]
  *   Precios escritos a mano en page.tsx:41-54 («media 2024-2025»): no hay módulo de
  *   electricidad en data/fiscal, así que el esperado se ancla al motor de la propia app.
+ *
+ * REPARADO el 12/10/2026 (hallazgos 3166, 3167 y 3174, opción A que decidió el usuario): la
+ * estimación de coste de arriba, la etiqueta «Más barata» y los precios escritos a mano se
+ * RETIRARON hasta tener los precios en data/ con fuente y <DataReference>. Las barras siguen
+ * midiendo puntos y la pantalla dice que no compara precios. La tabla de coste se deja arriba
+ * como registro de lo que la app hacía.
  *
  * Los casos que demuestran un hallazgo ABIERTO van con test.fail().
  */
@@ -88,8 +93,7 @@ async function leerResultado(page: Page) {
     recomendacion: ((await rs.locator('[class*="resultProfile"]').textContent()) ?? '').trim(),
     filaPvpc: ((await filas.nth(0).textContent()) ?? '').replace(/\s+/g, ' '),
     filaLibre: ((await filas.nth(1).textContent()) ?? '').replace(/\s+/g, ' '),
-    costePvpc: ((await filas.nth(0).locator('[class*="barLabelCost"]').textContent()) ?? '').trim(),
-    costeLibre: ((await filas.nth(1).locator('[class*="barLabelCost"]').textContent()) ?? '').trim(),
+    texto: ((await rs.textContent()) ?? '').replace(/\s+/g, ' '),
     barras: await rs.locator('[role="img"]').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label'))),
     factores: await rs
       .locator('[class*="factorItem"]')
@@ -97,13 +101,10 @@ async function leerResultado(page: Page) {
   };
 }
 
-/** Euros de un «~1173,10 €/ano» con el parser canónico. */
-function euros(texto: string): number {
-  const m = texto.match(/([\d.]+,\d{2})\s*€/);
-  return m ? parseSpanishNumber(m[1]) : Number.NaN;
-}
-
 const MAS_BARATA = /M[aá]s barata/;
+/** Un importe en euros: desde el 12/10/2026 el resultado no debe llevar ninguno. */
+const IMPORTE = /\d\s*€/;
+const NO_COMPARA = /No es una comparación de precios/;
 
 // Perfiles (índice de opción por pregunta), cada uno con su suma calculada a mano.
 // «Amante del valle»: +1 +2 0 +3 +1 +3 +1 +2 +2 0 = 15 → PVPC.
@@ -124,21 +125,18 @@ const UMBRAL_MENOS_3: Perfil = [2, 2, 1, 1, 1, 1, 1, 2, 1, 1];
 // 1. Caso normal
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('caso normal: «amante del valle» → PVPC, 287,26 € frente a 375,10 € y sus tres factores', async ({ page }) => {
-  // A mano: 15 puntos → PVPC. P9 <200 → 150 kWh/mes = 1.800 kWh/año.
-  // Reparto: P4 siempre 0,25/0,25/0,50 y coche (P6): punta 0,17 · llano 0,18 · valle 0,65.
-  // PVPC = 1.800 × (0,17·0,22 + 0,18·0,16 + 0,65·0,10) = 1.800 × 0,1312 = 236,16 + 51,10 = 287,26 €
-  // libre = 1.800 × 0,18 = 324,00 + 51,10 = 375,10 €
+test('caso normal: «amante del valle» → PVPC, sin importes, y sus tres factores', async ({ page }) => {
+  // A mano: 15 puntos → PVPC. Hasta el 12/10/2026 mostraba «~287,26 €» frente a «~375,10 €» con
+  // la PVPC «Más barata»; la estimación se retiró (hallazgos 3166, 3167, 3174).
   await abrir(page);
   await responder(page, AMANTE_VALLE);
   await verResultado(page);
   const r = await leerResultado(page);
 
   expect(r.recomendacion).toBe('PVPC (tarifa regulada)');
-  expect(euros(r.costePvpc)).toBeCloseTo(287.26, 2);
-  expect(euros(r.costeLibre)).toBeCloseTo(375.1, 2);
-  expect(r.filaPvpc).toMatch(MAS_BARATA);
-  expect(r.filaLibre).not.toMatch(MAS_BARATA);
+  expect(r.texto).not.toMatch(IMPORTE);
+  expect(r.texto).not.toMatch(MAS_BARATA);
+  expect(r.texto).toMatch(NO_COMPARA);
   expect(r.barras).toEqual(['Puntuacion PVPC: 15', 'Puntuacion mercado libre: 0']);
   // P6 Sí → coche · P4 siempre → electrodomésticos · P9 <200 → consumo bajo (en ese orden)
   expect(r.factores).toEqual([
@@ -152,39 +150,31 @@ test('caso normal: «amante del valle» → PVPC, 287,26 € frente a 375,10 €
 // 2. Caso límite: umbrales y extremo
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('caso límite: 4 puntos es PVPC y 3 es «Ambas»; el mínimo (−15) es libre y libre sale más barata', async ({ page }) => {
+test('caso límite: 4 puntos es PVPC y 3 es «Ambas»; el mínimo (−15) es libre', async ({ page }) => {
   test.setTimeout(60_000);
   await abrir(page);
 
-  // 4 puntos. P9 <200 → 1.800 kWh; reparto base (P4 a veces, sin P7 siempre ni coche):
-  // 0,35·0,22 + 0,30·0,16 + 0,35·0,10 = 0,160 → PVPC 288,00 + 51,10 = 339,10 € · libre 375,10 €
+  // 4 puntos → PVPC.
   await responder(page, UMBRAL_4);
   await verResultado(page);
   let r = await leerResultado(page);
   expect(r.recomendacion).toBe('PVPC (tarifa regulada)');
-  expect(euros(r.costePvpc)).toBeCloseTo(339.1, 2);
-  expect(euros(r.costeLibre)).toBeCloseTo(375.1, 2);
 
-  // 3 puntos: solo cambia P1, que no toca el coste → mismos euros, otra recomendación.
+  // 3 puntos: solo cambia P1 → «Ambas».
   await repetir(page);
   await responder(page, UMBRAL_3);
   await verResultado(page);
   r = await leerResultado(page);
   expect(r.recomendacion).toBe('Ambas pueden funcionar para ti');
-  expect(euros(r.costePvpc)).toBeCloseTo(339.1, 2);
-  expect(euros(r.costeLibre)).toBeCloseTo(375.1, 2);
 
-  // −15 puntos. P9 >400 → 6.000 kWh; P4 nunca 0,45/0,35/0,20 + P7 siempre → 0,55/0,35/0,10:
-  // 0,121 + 0,056 + 0,010 = 0,187 → PVPC 1.122,00 + 51,10 = 1.173,10 € · libre 1.080 + 51,10 = 1.131,10 €
+  // −15 puntos → Mercado libre, sin ningún importe ni «Más barata».
   await repetir(page);
   await responder(page, MINIMO);
   await verResultado(page);
   r = await leerResultado(page);
   expect(r.recomendacion).toBe('Mercado libre (precio fijo)');
-  expect(euros(r.costePvpc)).toBeCloseTo(1173.1, 2);
-  expect(euros(r.costeLibre)).toBeCloseTo(1131.1, 2);
-  expect(r.filaLibre).toMatch(MAS_BARATA);
-  expect(r.filaPvpc).not.toMatch(MAS_BARATA);
+  expect(r.texto).not.toMatch(IMPORTE);
+  expect(r.texto).not.toMatch(MAS_BARATA);
   expect(r.barras).toEqual(['Puntuacion PVPC: 0', 'Puntuacion mercado libre: 15']);
 });
 
@@ -233,8 +223,9 @@ test('las opciones son radios: aria-checked, sin aria-pressed, y una sola marcad
 // 4. Hallazgos ABIERTOS (inspector 10/10/2026)
 // ─────────────────────────────────────────────────────────────────────────────
 
-test('la pantalla no recomienda «Mercado libre» mientras marca PVPC como «Más barata»', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). La recomendación sale de la suma de puntos y la etiqueta
+test('hallazgo 3166: la pantalla no recomienda «Mercado libre» mientras marca PVPC como «Más barata»', async ({ page }) => {
+  // REPARADO (12/10/2026), opción A del usuario: se retiró la estimación de coste y la etiqueta,
+  // y la pantalla dice que no compara precios. Antes (inspector 10/10/2026): La recomendación sale de la suma de puntos y la etiqueta
   // «Mas barata», del coste estimado: son dos motores que no se miran. Con los precios de la
   // propia app el PVPC sale más barato en 11 de los 12 repartos posibles, así que en 6.256 de
   // los 7.599 perfiles que reciben «Mercado libre» (82 %) la misma pantalla dice que el PVPC es
@@ -244,14 +235,13 @@ test('la pantalla no recomienda «Mercado libre» mientras marca PVPC como «Má
   // P7 siempre → 0,45/0,30/0,25 → 0,099 + 0,048 + 0,025 = 0,172 → PVPC 619,20 + 51,10 = 670,30 €
   // · libre 648,00 + 51,10 = 699,10 €. Es el perfil «Pico en punta» de la guía, que afirma que
   // ahí «el PVPC [es] significativamente mas caro que un precio fijo plano».
-  test.fail();
   await abrir(page);
   await responder(page, TELETRABAJO);
   await verResultado(page);
   let r = await leerResultado(page);
   expect(r.recomendacion).toBe('Mercado libre (precio fijo)');
-  expect(euros(r.costePvpc)).toBeCloseTo(670.3, 2);
-  expect(euros(r.costeLibre)).toBeCloseTo(699.1, 2);
+  expect(r.texto).not.toMatch(IMPORTE);
+  expect(r.texto).toMatch(NO_COMPARA);
   expect(/Mercado libre/.test(r.recomendacion) && MAS_BARATA.test(r.filaPvpc), 'recomienda libre y llama más barata a PVPC').toBe(false);
 
   // UMBRAL_MENOS_3 (−3 → libre), 3.600 kWh con reparto base 0,160 → PVPC 627,10 € · libre 699,10 €,
@@ -263,22 +253,23 @@ test('la pantalla no recomienda «Mercado libre» mientras marca PVPC como «Má
   expect(/Mercado libre/.test(r.recomendacion) && MAS_BARATA.test(r.filaPvpc), 'umbral −3').toBe(false);
 });
 
-test('el coste anual cuenta la potencia contratada, no 51,10 € fijos', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). El término de potencia se suma como (0,10 + 0,04) × 365 =
+test('hallazgo 3167: no se muestra un coste anual con la potencia en 51,10 € fijos', async ({ page }) => {
+  // REPARADO (12/10/2026) al retirar la estimación (opción A de 3166): ya no hay coste anual que
+  // pueda contar mal la potencia, ni la guía da cifras de potencia sin fuente. Antes (inspector
+  // 10/10/2026): El término de potencia se suma como (0,10 + 0,04) × 365 =
   // 51,10 € sin multiplicar por los kW contratados, que la app ni pregunta. La propia guía fija
   // la unidad: «Bajar de 5,75 a 4,6 kW puede ahorrar 40-60 euros al ano» solo cuadra si son
   // €/kW·día (1,15 kW × 0,14 × 365 = 58,77 €). Con esos precios y los 4,6 kW de su ejemplo, la
   // potencia son 4,6 × 51,10 = 235,06 €/año; la app cobra 51,10 en cualquier perfil.
   // TELETRABAJO: libre 699,10 € − 3.600 kWh × 0,18 = 51,10 € de potencia implícita.
-  test.fail();
   await abrir(page);
   await responder(page, TELETRABAJO);
   await verResultado(page);
   const r = await leerResultado(page);
-  const potenciaImplicita = euros(r.costeLibre) - 3600 * 0.18;
-  // El defecto es de orden 4×: 51 € frente a 235 € (y frente a ≥ 150 € con cualquier potencia
-  // doméstica de 3 kW o más). Un umbral de 100 € lo separa sin depender de decimales.
-  expect(potenciaImplicita).toBeGreaterThan(100);
+  expect(r.texto).not.toMatch(IMPORTE);
+  const html = await (await page.request.get('/selector-tarifa-electrica/')).text();
+  expect(html).not.toContain('5,75 a 4,6 kW');
+  expect(html).not.toMatch(/Estimaci[oó]n de coste anual/i);
 });
 
 test('ortografía: «€/año», «España» y «Eléctrica» con sus tildes y eñes', async ({ page }) => {
@@ -291,8 +282,8 @@ test('ortografía: «€/año», «España» y «Eléctrica» con sus tildes y e
   await expect(page.locator('h1')).toContainText('Eléctrica');
   await responder(page, AMANTE_VALLE);
   await verResultado(page);
-  const r = await leerResultado(page);
-  expect(r.costePvpc).toMatch(/€\/año/);
+  // Desde el 12/10/2026 el resultado ya no lleva «€/año»: el encabezado tiene la tilde de antes.
+  await expect(page.locator('[class*="resultTitle"]')).toContainText('recomendación');
 });
 
 test('con una sola pregunta pendiente el botón no dice «las 1 preguntas restantes»', async ({ page }) => {
@@ -418,7 +409,6 @@ test('textos pequeños de marca llegan a 4,5:1 en los dos temas', async ({ page 
   for (const tema of ['light', 'dark'] as const) {
     await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
     await quieto();
-    medidas[`Más barata, ${tema}`] = await contrasteMinimo(page, '[class*="winnerTag"]');
     medidas[`Consejos para tu perfil, ${tema}`] = await contrasteMinimo(page, '[class*="tipsBox"] h3');
   }
   const bajos = Object.entries(medidas).filter(([, r]) => r < 4.5).map(([k, r]) => `${k}: ${r.toFixed(2)}:1`);
@@ -466,13 +456,13 @@ test('una app solo de España (PVPC, 2.0TD, CNMC) lo declara con RegionBadge', a
   await expect(page.locator('[role="note"][aria-label*="España"]')).toHaveCount(1);
 });
 
-test('los precios con los que se estima el coste llevan fecha y fuente (DataReference)', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). PRECIOS (page.tsx:41-54) lleva el comentario «media
-  // 2024-2025» y alimenta el «~X €/ano» y la etiqueta «Mas barata»; en pantalla no hay ni año
-  // ni fuente, y data/fiscal no tiene módulo de electricidad.
-  test.fail();
-  await abrir(page);
-  await expect(page.getByText('Última verificación')).toHaveCount(1);
+test('hallazgo 3174: no quedan precios de la luz sin fecha ni fuente', async ({ page }) => {
+  // REPARADO (12/10/2026) por retirada (opción A de 3166). Antes: PRECIOS (page.tsx:41-54), con el
+  // comentario «media 2024-2025», alimentaba el «~X €/ano» y la etiqueta «Mas barata», y la guía
+  // repetía «0,22 euros/kWh» y «entre 0,16 y 0,20 euros», sin año ni fuente en pantalla. Cuando
+  // vuelvan, será desde un módulo de data/ con <DataReference> («Última verificación»).
+  const html = await (await page.request.get('/selector-tarifa-electrica/')).text();
+  expect(html).not.toMatch(/0,\d{2} euros|€\/kWh|euros\/kWh/);
 });
 
 test('el Bono Social se describe como en data/fiscal y con su fuente oficial', async ({ page }) => {

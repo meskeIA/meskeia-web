@@ -42,12 +42,12 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Selector de Tarifa Electrica',
   description:
-    'Herramienta interactiva con 10 preguntas para analizar tu patron de consumo electrico y recomendarte la mejor tarifa: PVPC regulada (2.0TD con discriminacion horaria) o mercado libre con precio fijo. Incluye estimacion de coste anual y consejos personalizados.',
+    'Herramienta interactiva con 10 preguntas para analizar tu patron de consumo electrico y recomendarte la mejor tarifa: PVPC regulada (2.0TD con discriminacion horaria) o mercado libre con precio fijo. Incluye los factores de tu perfil y consejos personalizados.',
   url: 'https://meskeia.com/selector-tarifa-electrica/',
   features: [
     'Test de 10 preguntas sobre habitos de consumo electrico',
     'Recomendacion personalizada entre PVPC y mercado libre',
-    'Estimacion de coste anual para cada opcion',
+    'Factores clave de tu perfil y consejos personalizados',
     'Explicacion de franjas horarias 2.0TD (punta, llano, valle)',
     'Disponible en espanol',
   ],
