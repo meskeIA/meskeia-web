@@ -4,6 +4,7 @@ import {
   TOTAL_CASOS,
   comprobarRespuesta,
   convergeSerieGeometrica,
+  formatearFlexible,
   generarEjercicioAleatorio,
   identificarProgresion,
   parsearListaNumeros,
@@ -324,5 +325,15 @@ test.describe('Corrección de la respuesta del alumno', () => {
     const v = comprobarRespuesta(NaN, 19);
     expect(v.correcto).toBe(false);
     expect(v.motivo).toBe('no-numerico');
+  });
+});
+
+test.describe('Notación científica (cabo C0039)', () => {
+  test('una mantisa que redondea a 10 sube el exponente: nunca «10,00 · 10ⁿ»', () => {
+    // 9,996·10²⁰ con dos decimales es 1,00·10²¹. Antes salía «10,00 · 10²⁰».
+    expect(formatearFlexible(9.996e20)).toBe('1,00 · 10²¹');
+    expect(formatearFlexible(-9.999e17)).toBe('-1,00 · 10¹⁸');
+    // Control: la que no llega a 10 se queda en su exponente.
+    expect(formatearFlexible(9.994e20)).toBe('9,99 · 10²⁰');
   });
 });

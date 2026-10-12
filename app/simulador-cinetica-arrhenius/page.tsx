@@ -87,8 +87,13 @@ function fmtCientifico(n: number, decimales = 2): string {
   if (Math.abs(n) >= 0.001 && Math.abs(n) < 10000) {
     return fmt(n, decimales);
   }
-  const exp = Math.floor(Math.log10(Math.abs(n)));
-  const mantisa = n / Math.pow(10, exp);
+  let exp = Math.floor(Math.log10(Math.abs(n)));
+  let mantisa = n / Math.pow(10, exp);
+  // Si la mantisa redondeada llega a 10 («9,996» → «10,00»), sube el exponente (cabo C0039)
+  if (Math.abs(Number(mantisa.toFixed(decimales))) >= 10) {
+    mantisa /= 10;
+    exp += 1;
+  }
   return `${fmt(mantisa, decimales)} × 10^${exp}`;
 }
 

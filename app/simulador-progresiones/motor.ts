@@ -180,8 +180,13 @@ const UMBRAL_CIENTIFICA = 1e15;
 export function formatearFlexible(valor: number, maxDecimales = 4): string {
   if (!Number.isFinite(valor)) return 'no definido';
   if (Math.abs(valor) >= UMBRAL_CIENTIFICA) {
-    const exponente = Math.floor(Math.log10(Math.abs(valor)));
-    const mantisa = valor / 10 ** exponente;
+    let exponente = Math.floor(Math.log10(Math.abs(valor)));
+    let mantisa = valor / 10 ** exponente;
+    // Si la mantisa redondeada llega a 10 («9,996» → «10,00»), sube el exponente (cabo C0039)
+    if (Math.abs(Number(mantisa.toFixed(2))) >= 10) {
+      mantisa /= 10;
+      exponente += 1;
+    }
     return `${formatNumber(mantisa, 2)} · 10${superindice(exponente)}`;
   }
   for (let d = 0; d < maxDecimales; d++) {

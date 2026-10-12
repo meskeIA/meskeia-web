@@ -422,8 +422,13 @@ const superindice = (n: number): string =>
  * en vez de delegar en formatNumber para este rango.
  */
 function notacionCientifica(v: number, decimalesMantisa: number): string {
-  const exponente = Math.floor(Math.log10(v));
-  const mantisa = v / Math.pow(10, exponente);
+  let exponente = Math.floor(Math.log10(v));
+  let mantisa = v / Math.pow(10, exponente);
+  // Si la mantisa redondeada llega a 10 («9,996» → «10,00»), sube el exponente (cabo C0039)
+  if (Number(mantisa.toFixed(decimalesMantisa)) >= 10) {
+    mantisa /= 10;
+    exponente += 1;
+  }
   return `${formatNumber(mantisa, decimalesMantisa)}×10${superindice(exponente)}`;
 }
 

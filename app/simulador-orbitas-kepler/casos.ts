@@ -161,8 +161,13 @@ const SUPERINDICES: Record<string, string> = {
 export function cientifico(n: number, cifras = 4): string {
   if (!Number.isFinite(n)) return '—';
   if (n === 0) return '0';
-  const exponente = Math.floor(Math.log10(Math.abs(n)));
-  const mantisa = n / 10 ** exponente;
+  let exponente = Math.floor(Math.log10(Math.abs(n)));
+  let mantisa = n / 10 ** exponente;
+  // Si la mantisa redondeada llega a 10 («9,99996» → «10,0000»), sube el exponente (cabo C0039)
+  if (Math.abs(Number(mantisa.toFixed(cifras))) >= 10) {
+    mantisa /= 10;
+    exponente += 1;
+  }
   const sup = String(exponente)
     .split('')
     .map((c) => SUPERINDICES[c] ?? c)

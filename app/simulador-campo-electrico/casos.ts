@@ -131,8 +131,13 @@ const SUPERINDICES = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸'
 function cientifica(n: number): string {
   if (!Number.isFinite(n)) return '—';
   if (n === 0) return '0';
-  const exp = Math.floor(Math.log10(Math.abs(n)));
-  const mantisa = n / 10 ** exp;
+  let exp = Math.floor(Math.log10(Math.abs(n)));
+  let mantisa = n / 10 ** exp;
+  // Si la mantisa redondeada (cifra: 4 decimales) llega a 10, sube el exponente (cabo C0039)
+  if (Math.abs(Number(mantisa.toFixed(4))) >= 10) {
+    mantisa /= 10;
+    exp += 1;
+  }
   const signo = exp < 0 ? '⁻' : '';
   const sup = String(Math.abs(exp))
     .split('')

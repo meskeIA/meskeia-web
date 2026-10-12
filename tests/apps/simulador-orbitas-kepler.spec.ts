@@ -39,6 +39,7 @@ import {
   toleranciaDe,
   generarEjercicioAleatorio,
   configuracionSimulador,
+  cientifico,
 } from '../../app/simulador-orbitas-kepler/casos';
 import {
   G,
@@ -642,4 +643,12 @@ test.describe('Inspector 28/09/2026 — cálculo, límites, rechazo y la «Media
     await page.keyboard.press('ArrowLeft');
     await expect.soft(etiqueta).toContainText('0,966');
   });
+});
+
+// Cabo C0039 (12/10/2026): el exponente se fijaba antes de redondear la mantisa, y
+// 9,99996·10¹⁴ con 4 decimales salía «10,0000·10¹⁴». Ahora sube a 10¹⁵.
+test('REPARADO · la notación científica no escribe una mantisa de 10', () => {
+  const texto = cientifico(9.99996e14, 4);
+  expect(texto).toMatch(/^1(,0+)?·10¹⁵$/);
+  expect(cientifico(3.9856e14)).toMatch(/^3,9856·10¹⁴$/);
 });
