@@ -187,7 +187,6 @@
   margin: 0;
   padding: 0.6rem 0.75rem;
   border-left: 3px solid var(--primary);
-  background: var(--bg-secondary);
   border-radius: 0 6px 6px 0;
   color: var(--text-secondary);
   font-size: 0.85rem;

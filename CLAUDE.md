@@ -531,6 +531,29 @@ porque un valor se decide midiendo contra el fondo REAL.
 > 2,48–2,81:1. Crónica: cabecera de `scripts/check-token-oscuro.mjs` · pruebas:
 > `npm run oscuro:probar-candado`.
 
+### Candado de la variable CSS que no existe
+
+`npm run check:var-css` — en el build, y **rompe el build** si un `.module.css` usa `var(--x)`
+**sin reserva** y `--x` no se declara en globals, en el módulo, en el TSX de su app ni en un
+`layout.tsx`: la declaración entera se anula (tarjeta sin fondo, esquina en ángulo recto) y
+nada avisa. Barre `app/` y `components/`, **sin pasivo** · Escape: `var-ok: <razón>`, razón
+obligatoria.
+> Salió del hallazgo 2367 y el cabo C0052: `--card-bg` de transportador-angulos (48c24779,
+> 12/10/2026) fue el último. Crónica: cabecera de `scripts/check-var-css.mjs` · pruebas:
+> `npm run var-css:probar-candado`.
+
+### Candado del pie que cuenta dos veces
+
+`npm run check:footer-tracker` — en el build, y **rompe el build** si un `.tsx` de `app/` monta
+más de un `<Footer appName>` (un `return` por fase) sin la **misma** `key` en todos: React lo
+remonta al cambiar de fase y su `AnalyticsTracker` registra otra visita. **Sin pasivo** ·
+Escape: `footer-ok: <razón>`, razón obligatoria.
+⚠️ No ve un pie que DESAPARECE en una fase (quiz-tipos-plantas): eso lo mide
+`tests/apps/footer-una-visita-por-carga.spec.ts`.
+> Salió de los hallazgos 2175/2176 de test-perfil-inversor (6 visitas por carga) y el cabo
+> C0042. Crónica: cabecera de `scripts/check-footer-tracker.mjs` · pruebas:
+> `npm run footer-tracker:probar-candado`.
+
 ### Candado del parser numérico
 
 `npm run check:parser` — en el build, y **rompe el build** si el commit escribe

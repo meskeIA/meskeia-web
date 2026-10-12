@@ -33,7 +33,7 @@ export default function ChapterPage({ slug, sections }: ChapterPageProps) {
         <div className={styles.hero}>
           <h1>Capítulo no encontrado</h1>
         </div>
-        <Footer appName="curso-emprendimiento" />
+        <Footer key="pie" appName="curso-emprendimiento" />
       </div>
     );
   }
@@ -125,7 +125,7 @@ export default function ChapterPage({ slug, sections }: ChapterPageProps) {
         )}
       </nav>
 
-      <Footer appName="curso-emprendimiento" />
+      <Footer key="pie" appName="curso-emprendimiento" />
     </div>
   );
 }
