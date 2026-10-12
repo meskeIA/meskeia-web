@@ -1530,6 +1530,8 @@ function crearServidorDelegum(): McpServer {
           '',
           r.tieneDerechoComplemento ? `ℹ️ ${r.motivo}` : null,
           `👉 ${r.pasoSiguiente}`,
+          // Las advertencias del motor no llegaban al MCP: una futura se habría perdido (cabo C0099)
+          ...(r.advertencias.length ? ['', '⚠️ **A tener en cuenta**', ...r.advertencias.map(a => `  • ${a}`)] : []),
         ].filter(l => l !== null);
         return conAviso(lineas.join('\n'), AVISO_LABORAL);
       } catch (err) {
