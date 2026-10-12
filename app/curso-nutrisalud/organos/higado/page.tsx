@@ -31,7 +31,7 @@ export default function HigadoPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🔬 Capacidad de regeneración:</strong> El hígado es el único
+              <strong><span aria-hidden="true">🔬</span> Capacidad de regeneración:</strong> El hígado es el único
               órgano interno que puede regenerarse. Si se extirpa hasta el 75%,
               puede volver a su tamaño original en semanas. Esto demuestra su
               importancia evolutiva y su resiliencia.
@@ -119,7 +119,7 @@ export default function HigadoPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ La fructosa y el hígado:</strong> A diferencia de la glucosa
+              <strong><span aria-hidden="true">⚠️</span> La fructosa y el hígado:</strong> A diferencia de la glucosa
               (que todo el cuerpo puede usar), la fructosa solo se metaboliza en el
               hígado. El exceso de fructosa (especialmente jarabe de maíz alto en
               fructosa) sobrecarga el hígado y se convierte directamente en grasa.
@@ -136,7 +136,7 @@ export default function HigadoPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Buena noticia:</strong> Las primeras etapas son completamente
+              <strong><span aria-hidden="true">💡</span> Buena noticia:</strong> Las primeras etapas son completamente
               reversibles con cambios en la alimentación y ejercicio. El hígado puede
               regenerarse si se eliminan las causas del daño.
             </p>
@@ -198,7 +198,7 @@ export default function HigadoPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🍵 Combinación óptima:</strong> Té verde + cúrcuma + pimienta
+              <strong><span aria-hidden="true">🍵</span> Combinación óptima:</strong> Té verde + cúrcuma + pimienta
               negra + aceite de oliva. Sinergias antioxidantes, antiinflamatorias y
               hepatoprotectoras en una bebida.
             </p>
@@ -263,7 +263,7 @@ export default function HigadoPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 El hígado no duele:</strong> No tiene receptores de dolor,
+              <strong><span aria-hidden="true">💡</span> El hígado no duele:</strong> No tiene receptores de dolor,
               por lo que la enfermedad hepática puede avanzar silenciosamente.
               Los análisis de sangre (transaminasas ALT, AST) son la forma de
               detectar problemas tempranamente.

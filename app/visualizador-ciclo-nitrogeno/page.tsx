@@ -730,6 +730,7 @@ export default function VisualizadorCicloNitrogenoPage() {
         <nav className={styles.tabNav} role="tablist" aria-label="Secciones del visualizador">
           {TABS.map(tab => (
             <button
+              type="button"
               key={tab.id}
               role="tab"
               aria-selected={tabActiva === tab.id}

@@ -143,6 +143,7 @@ export default function ChapterPage({ slug, sections }: ChapterPageProps) {
         {/* Complete Button */}
         <div className={styles.completeSection}>
           <button
+            type="button"
             onClick={handleComplete}
             className={`${styles.completeButton} ${isCompleted ? styles.completed : ''}`}
             disabled={isCompleted}
@@ -166,7 +167,7 @@ export default function ChapterPage({ slug, sections }: ChapterPageProps) {
           ) : (
             <Link href="/curso-nutrisalud" className={styles.bottomNavLink}>
               <div className={styles.bottomNavLabel}>← Volver</div>
-              <div className={styles.bottomNavTitle}>🥗 Inicio del curso</div>
+              <div className={styles.bottomNavTitle}><span aria-hidden="true">🥗</span> Inicio del curso</div>
             </Link>
           )}
 
@@ -186,7 +187,7 @@ export default function ChapterPage({ slug, sections }: ChapterPageProps) {
               className={`${styles.bottomNavLink} ${styles.next}`}
             >
               <div className={styles.bottomNavLabel}>Siguiente →</div>
-              <div className={styles.bottomNavTitle}>📖 Glosario Nutricional</div>
+              <div className={styles.bottomNavTitle}><span aria-hidden="true">📖</span> Glosario Nutricional</div>
             </Link>
           )}
         </div>

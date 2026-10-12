@@ -269,6 +269,7 @@ export default function GuiaSeguroViaje() {
             <div className={styles.opcionesGrid}>
               {ZONAS.map(z => (
                 <button
+                  type="button"
                   key={z.id}
                   onClick={() => setZona(z.id)}
                   className={`${styles.opcionBtn} ${zona === z.id ? styles.opcionActiva : ''}`}
@@ -287,6 +288,7 @@ export default function GuiaSeguroViaje() {
             <div className={styles.opcionesGrid}>
               {TIPOS.map(t => (
                 <button
+                  type="button"
                   key={t.id}
                   onClick={() => setTipo(t.id)}
                   className={`${styles.opcionBtn} ${tipo === t.id ? styles.opcionActiva : ''}`}
@@ -345,6 +347,7 @@ export default function GuiaSeguroViaje() {
                   </div>
                   <p className={styles.coberturaDesc}>{c.descripcion}</p>
                   <button
+                    type="button"
                     className={styles.notaToggle}
                     onClick={() => toggleNota(c.id)}
                     aria-expanded={notasAbiertas.has(c.id)}
@@ -402,7 +405,7 @@ export default function GuiaSeguroViaje() {
 
           {checked.size === CHECKLIST.length && (
             <p className={styles.checklistCompleto} role="status">
-              ✅ ¡Checklist completo! Has verificado todos los puntos clave antes de contratar.
+              <span aria-hidden="true">✅</span> ¡Checklist completo! Has verificado todos los puntos clave antes de contratar.
             </p>
           )}
         </section>

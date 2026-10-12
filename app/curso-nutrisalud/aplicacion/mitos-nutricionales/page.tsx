@@ -25,7 +25,7 @@ export default function MitosNutricionalesPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🎯 Criterio para evaluar afirmaciones:</strong> Una afirmación
+              <strong><span aria-hidden="true">🎯</span> Criterio para evaluar afirmaciones:</strong> Una afirmación
               nutricional es sospechosa si: (1) promete resultados milagrosos,
               (2) demoniza o glorifica un solo alimento, (3) ignora el contexto
               individual, o (4) viene de fuentes con conflictos de interés.
@@ -39,13 +39,13 @@ export default function MitosNutricionalesPage() {
       icon: '🧈',
       content: (
         <>
-          <h3>❌ MITO: &quot;Las grasas engordan y son malas&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;Las grasas engordan y son malas&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;Debes evitar las grasas para perder peso y estar sano&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> Las grasas son esenciales y no engordan
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> Las grasas son esenciales y no engordan
               más que otros macronutrientes a igual cantidad de calorías. Lo que
               importa es el <em>tipo</em> de grasa y el contexto dietético total.
             </p>
@@ -59,13 +59,13 @@ export default function MitosNutricionalesPage() {
             <li>Omega-3 tiene efectos antiinflamatorios demostrados</li>
           </ul>
 
-          <h3>❌ MITO: &quot;El colesterol dietético sube el colesterol en sangre&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;El colesterol dietético sube el colesterol en sangre&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;Evita los huevos porque tienen mucho colesterol&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> El hígado regula el colesterol. Para la
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> El hígado regula el colesterol. Para la
               mayoría de personas, el colesterol dietético tiene poco impacto en
               el colesterol sanguíneo. Los huevos son un alimento muy nutritivo.
             </p>
@@ -73,7 +73,7 @@ export default function MitosNutricionalesPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Dato:</strong> Las guías dietéticas de EE.UU. eliminaron
+              <strong><span aria-hidden="true">💡</span> Dato:</strong> Las guías dietéticas de EE.UU. eliminaron
               en 2015 el límite de 300mg de colesterol diario porque la evidencia
               no lo justificaba. Un huevo tiene ~186mg y puede consumirse a diario
               sin problemas para la mayoría de personas.
@@ -87,13 +87,13 @@ export default function MitosNutricionalesPage() {
       icon: '🍞',
       content: (
         <>
-          <h3>❌ MITO: &quot;Los carbohidratos engordan&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;Los carbohidratos engordan&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;Elimina los carbohidratos para perder peso&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> Los carbohidratos no engordan per se.
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> Los carbohidratos no engordan per se.
               El exceso calórico engorda, venga de donde venga. Los carbohidratos
               complejos (integrales, legumbres, verduras) son parte de dietas
               saludables en todo el mundo.
@@ -108,13 +108,13 @@ export default function MitosNutricionalesPage() {
             <li>Los deportistas necesitan carbohidratos para rendimiento</li>
           </ul>
 
-          <h3>❌ MITO: &quot;El gluten es malo para todos&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;El gluten es malo para todos&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;Todos deberíamos evitar el gluten&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> Solo el 1% tiene celiaquía y ~6% tiene
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> Solo el 1% tiene celiaquía y ~6% tiene
               sensibilidad no celíaca. Para el 93% restante, el gluten no es un
               problema. Los productos &quot;sin gluten&quot; no son más saludables
               (a menudo son más procesados).
@@ -123,7 +123,7 @@ export default function MitosNutricionalesPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Importante:</strong> Si sospechas intolerancia al gluten,
+              <strong><span aria-hidden="true">⚠️</span> Importante:</strong> Si sospechas intolerancia al gluten,
               NO elimines el gluten antes de hacerte las pruebas. Las pruebas
               requieren que estés consumiendo gluten para ser precisas.
             </p>
@@ -136,37 +136,37 @@ export default function MitosNutricionalesPage() {
       icon: '💪',
       content: (
         <>
-          <h3>❌ MITO: &quot;Necesitas suplementos de proteína&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;Necesitas suplementos de proteína&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;Sin batidos de proteína no ganarás músculo&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> La mayoría de personas obtiene suficiente
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> La mayoría de personas obtiene suficiente
               proteína de la dieta. Los suplementos son convenientes, no mágicos.
               Un huevo, 100g de pollo o 200g de legumbres aportan 15-25g de proteína.
             </p>
           </div>
 
-          <h3>❌ MITO: &quot;Demasiada proteína daña los riñones&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;Demasiada proteína daña los riñones&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;Las dietas altas en proteína causan problemas renales&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> En personas con riñones sanos, no hay
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> En personas con riñones sanos, no hay
               evidencia de daño con proteína alta (hasta 2-3g/kg). Solo quienes
               ya tienen enfermedad renal deben limitar proteína.
             </p>
           </div>
 
-          <h3>❌ MITO: &quot;Los multivitamínicos son necesarios&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;Los multivitamínicos son necesarios&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;Toma un multivitamínico como seguro&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> Los estudios no muestran beneficios
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> Los estudios no muestran beneficios
               de multivitamínicos en personas con dieta variada. Excepciones:
               B12 en veganos, vitamina D en deficiencia, folato en embarazo.
               Mejor suplementar específicamente si hay carencia demostrada.
@@ -175,7 +175,7 @@ export default function MitosNutricionalesPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Suplementos con evidencia sólida:</strong> Vitamina D
+              <strong><span aria-hidden="true">💡</span> Suplementos con evidencia sólida:</strong> Vitamina D
               (si hay deficiencia), Omega-3 (si no comes pescado), B12 (veganos),
               Creatina (deportistas), y poco más. El resto generalmente es dinero
               tirado.
@@ -189,38 +189,38 @@ export default function MitosNutricionalesPage() {
       icon: '🍎',
       content: (
         <>
-          <h3>❌ MITO: &quot;Desayunar es obligatorio&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;Desayunar es obligatorio&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;El desayuno es la comida más importante del día&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> El desayuno no es más importante que
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> El desayuno no es más importante que
               otras comidas. Si no tienes hambre por la mañana, no pasa nada por
               saltártelo. Lo que importa es la calidad y cantidad total del día.
             </p>
           </div>
 
-          <h3>❌ MITO: &quot;Los superalimentos curan todo&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;Los superalimentos curan todo&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;La chía/quinoa/açaí son milagrosos&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> &quot;Superalimento&quot; es un término de
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> &quot;Superalimento&quot; es un término de
               marketing, no científico. Estos alimentos son nutritivos, pero no
               más que alternativas locales más baratas. Las lentejas son tan
               &quot;super&quot; como la quinoa.
             </p>
           </div>
 
-          <h3>❌ MITO: &quot;El zumo de fruta es sano&quot;</h3>
+          <h3><span aria-hidden="true">❌</span> MITO: &quot;El zumo de fruta es sano&quot;</h3>
           <div className={styles.mythCard}>
             <p className={styles.mythStatement}>
               &quot;Un zumo natural es tan sano como la fruta&quot;
             </p>
             <p className={styles.truthStatement}>
-              <strong>✅ REALIDAD:</strong> Al exprimir, pierdes la fibra y concentras
+              <strong><span aria-hidden="true">✅</span> REALIDAD:</strong> Al exprimir, pierdes la fibra y concentras
               el azúcar. Un vaso de zumo tiene el azúcar de 3-4 naranjas sin la
               fibra que modula su absorción. Mejor comer la fruta entera.
             </p>
@@ -259,7 +259,7 @@ export default function MitosNutricionalesPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🧠 Principio general:</strong> Desconfía de afirmaciones
+              <strong><span aria-hidden="true">🧠</span> Principio general:</strong> Desconfía de afirmaciones
               extremas. La nutrición rara vez es blanco o negro. Casi todo
               depende del contexto: cantidad, frecuencia, qué más comes, tu
               genética, tu actividad, tus objetivos. La moderación y variedad

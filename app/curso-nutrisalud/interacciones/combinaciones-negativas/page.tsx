@@ -26,7 +26,7 @@ export default function CombinacionesNegativasPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Perspectiva importante:</strong> Los antinutrientes no son
+              <strong><span aria-hidden="true">⚠️</span> Perspectiva importante:</strong> Los antinutrientes no son
               &quot;venenos&quot;. En una dieta variada, su impacto es menor. Pero si tienes
               deficiencias específicas (ej: anemia), prestarles atención puede
               marcar una diferencia significativa.
@@ -93,7 +93,7 @@ export default function CombinacionesNegativasPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Nota positiva:</strong> Los fitatos también tienen propiedades
+              <strong><span aria-hidden="true">💡</span> Nota positiva:</strong> Los fitatos también tienen propiedades
               antioxidantes y anticancerígenas. No hay que eliminarlos completamente,
               solo gestionarlos cuando la absorción mineral es crítica.
             </p>
@@ -124,7 +124,7 @@ export default function CombinacionesNegativasPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Mito de las espinacas:</strong> Aunque las espinacas contienen
+              <strong><span aria-hidden="true">⚠️</span> Mito de las espinacas:</strong> Aunque las espinacas contienen
               calcio, su alto contenido en oxalatos hace que solo se absorba un 5%
               del calcio presente. Para calcio, el kale y el brócoli son mejores
               opciones (oxalatos bajos).
@@ -171,7 +171,7 @@ export default function CombinacionesNegativasPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>☕ Regla práctica:</strong> Si tienes tendencia a anemia o
+              <strong><span aria-hidden="true">☕</span> Regla práctica:</strong> Si tienes tendencia a anemia o
               tomas suplementos de hierro, consume té y café al menos 1-2 horas
               antes o después de las comidas principales, no durante.
             </p>
@@ -237,7 +237,7 @@ export default function CombinacionesNegativasPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Alimentos vs Suplementos:</strong> La competición es más
+              <strong><span aria-hidden="true">💡</span> Alimentos vs Suplementos:</strong> La competición es más
               relevante con suplementos concentrados. En alimentos, las dosis son
               menores y las interacciones menos significativas.
             </p>
@@ -300,7 +300,7 @@ export default function CombinacionesNegativasPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🔑 Mensaje clave:</strong> No te obsesiones con estas interacciones.
+              <strong><span aria-hidden="true">🔑</span> Mensaje clave:</strong> No te obsesiones con estas interacciones.
               Si sigues una dieta variada, el impacto es menor. Pero si tienes deficiencias
               específicas diagnosticadas, aplicar estas estrategias puede acelerar
               significativamente la recuperación.

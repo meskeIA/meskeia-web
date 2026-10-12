@@ -879,7 +879,7 @@ export default function VisualizadorPolimerosMateriales() {
               <span className={styles.tipIcon} aria-hidden="true">♻️</span>
               <div>
                 <strong>Lee el código de reciclaje</strong>
-                <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Antes de tirar un plástico, busca el símbolo ♻️ con número en el fondo. Los códigos 1 (PET) y 2 (HDPE) son los más aceptados globalmente. El 6 (PS) y el 7 rara vez se reciclan.</p>
+                <p style={{margin:'0.25rem 0 0', fontSize:'0.875rem'}}>Antes de tirar un plástico, busca el símbolo <span aria-hidden="true">♻️</span> con número en el fondo. Los códigos 1 (PET) y 2 (HDPE) son los más aceptados globalmente. El 6 (PS) y el 7 rara vez se reciclan.</p>
               </div>
             </div>
             <div className={styles.tipCard}>

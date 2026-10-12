@@ -388,19 +388,19 @@ export default function VisualizadorNarratologiaPage() {
         <h3>Para qué tipo de lector es esta guía</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🎓 Estudiante de literatura</strong>
+            <strong><span aria-hidden="true">🎓</span> Estudiante de literatura</strong>
             <p>Usar los modelos de Genette y Greimas para analizar textos en exámenes y trabajos. La terminología precisa distingue el análisis superficial del riguroso.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>✍️ Escritor creativo</strong>
+            <strong><span aria-hidden="true">✍️</span> Escritor creativo</strong>
             <p>Entender qué decides cuando eliges un POV, un orden narrativo o una frecuencia. Las decisiones técnicas inconscientes se vuelven conscientes y controlables.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📖 Lector avanzado</strong>
+            <strong><span aria-hidden="true">📖</span> Lector avanzado</strong>
             <p>Entender por qué ciertos relatos funcionan a un nivel que va más allá de "está bien escrito". Los conceptos narratológicos dan vocabulario a intuiciones ya existentes.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🏫 Docente</strong>
+            <strong><span aria-hidden="true">🏫</span> Docente</strong>
             <p>Los modelos de Genette y Greimas son herramientas pedagógicas probadas para enseñar análisis narrativo en secundaria y universidad.</p>
           </div>
         </div>

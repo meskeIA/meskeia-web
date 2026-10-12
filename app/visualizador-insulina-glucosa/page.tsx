@@ -324,9 +324,9 @@ export default function VisualizadorInsulinaGlucosa() {
         <p className={styles.perfilDesc}>{INFO_PERFILES[perfilActivo].descripcion}</p>
 
         <div className={styles.marcadoresComidas} aria-hidden="true">
-          <span>🍳 Desayuno 8:30</span>
-          <span>🥗 Almuerzo 14:00</span>
-          <span>🍽️ Cena 20:30</span>
+          <span><span aria-hidden="true">🍳</span> Desayuno 8:30</span>
+          <span><span aria-hidden="true">🥗</span> Almuerzo 14:00</span>
+          <span><span aria-hidden="true">🍽️</span> Cena 20:30</span>
         </div>
 
         <div className={styles.chartContainer}>

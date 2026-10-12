@@ -30,7 +30,7 @@ export default function IntestinoPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🧠 El eje intestino-cerebro:</strong> Tu intestino y tu cerebro
+              <strong><span aria-hidden="true">🧠</span> El eje intestino-cerebro:</strong> Tu intestino y tu cerebro
               están conectados por el nervio vago y señales químicas. El estado de
               tu microbiota afecta directamente el ánimo, ansiedad, e incluso el
               comportamiento alimentario.
@@ -73,7 +73,7 @@ export default function IntestinoPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Meta semanal:</strong> El proyecto American Gut descubrió
+              <strong><span aria-hidden="true">💡</span> Meta semanal:</strong> El proyecto American Gut descubrió
               que las personas que comen 30+ plantas diferentes por semana tienen
               microbiota significativamente más diversa. Incluye vegetales, frutas,
               legumbres, cereales integrales, frutos secos, semillas y hierbas.
@@ -173,7 +173,7 @@ export default function IntestinoPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Importante:</strong> Los alimentos fermentados industriales
+              <strong><span aria-hidden="true">⚠️</span> Importante:</strong> Los alimentos fermentados industriales
               a menudo están pasteurizados, lo que mata los probióticos. Busca
               productos refrigerados que digan &quot;con cultivos vivos&quot; o hazlos en casa.
             </p>
@@ -243,7 +243,7 @@ export default function IntestinoPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🧈 Butirato:</strong> Ácido graso de cadena corta que tus
+              <strong><span aria-hidden="true">🧈</span> Butirato:</strong> Ácido graso de cadena corta que tus
               bacterias producen al fermentar fibra. Es el principal combustible
               de las células del colon y fortalece la barrera intestinal. Más
               fibra = más butirato = intestino más sano.
@@ -283,7 +283,7 @@ export default function IntestinoPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Transición gradual:</strong> Si actualmente comes poca fibra,
+              <strong><span aria-hidden="true">💡</span> Transición gradual:</strong> Si actualmente comes poca fibra,
               aumenta gradualmente durante 2-3 semanas. Un aumento brusco puede
               causar gases e hinchazón temporales mientras tu microbiota se adapta.
             </p>

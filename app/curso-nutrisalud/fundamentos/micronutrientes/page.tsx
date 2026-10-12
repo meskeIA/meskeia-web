@@ -26,7 +26,7 @@ export default function MicronutrientesPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🧪 Realidad de absorción:</strong> El hierro de la carne (hemo) se
+              <strong><span aria-hidden="true">🧪</span> Realidad de absorción:</strong> El hierro de la carne (hemo) se
               absorbe hasta un 35%, mientras que el hierro vegetal (no-hemo) solo un 2-20%.
               Pero combinar hierro vegetal con vitamina C puede triplicar su absorción.
             </p>
@@ -64,7 +64,7 @@ export default function MicronutrientesPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Tip de absorción:</strong> Siempre consume verduras ricas en
+              <strong><span aria-hidden="true">💡</span> Tip de absorción:</strong> Siempre consume verduras ricas en
               vitaminas liposolubles con una fuente de grasa saludable. Un poco de
               aceite de oliva en la ensalada puede aumentar la absorción hasta 10 veces.
             </p>
@@ -137,7 +137,7 @@ export default function MicronutrientesPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Competición mineral:</strong> El hierro, zinc y calcio compiten
+              <strong><span aria-hidden="true">⚠️</span> Competición mineral:</strong> El hierro, zinc y calcio compiten
               por los mismos transportadores intestinales. Evita tomar suplementos de
               estos minerales juntos. Sepáralos al menos 2 horas.
             </p>
@@ -195,7 +195,7 @@ export default function MicronutrientesPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🌈 Regla del arcoíris:</strong> Cada color representa diferentes
+              <strong><span aria-hidden="true">🌈</span> Regla del arcoíris:</strong> Cada color representa diferentes
               fitonutrientes. Rojo = licopeno. Naranja = betacaroteno. Verde = clorofila
               y luteína. Morado = antocianinas. Blanco = alicina. Come el arcoíris
               diariamente.
@@ -238,7 +238,7 @@ export default function MicronutrientesPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Recuerda:</strong> Un alimento con &quot;menos nutrientes&quot; pero alta
+              <strong><span aria-hidden="true">💡</span> Recuerda:</strong> Un alimento con &quot;menos nutrientes&quot; pero alta
               biodisponibilidad puede ser más nutritivo que uno con &quot;más nutrientes&quot;
               pero mala absorción. La forma en que preparas y combinas importa tanto
               como lo que comes.

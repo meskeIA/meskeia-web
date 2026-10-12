@@ -28,7 +28,7 @@ export default function MacronutrientesPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🔬 Realidad metabólica:</strong> 100 calorías de glucosa pura
+              <strong><span aria-hidden="true">🔬</span> Realidad metabólica:</strong> 100 calorías de glucosa pura
               producen un pico de insulina mucho mayor que 100 calorías de almendras,
               aunque ambas aporten la misma energía. La diferencia no está en las calorías,
               sino en cómo cada macronutriente interactúa con tu sistema hormonal.
@@ -108,7 +108,7 @@ export default function MacronutrientesPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Clave:</strong> El índice glucémico mide la velocidad de absorción,
+              <strong><span aria-hidden="true">💡</span> Clave:</strong> El índice glucémico mide la velocidad de absorción,
               pero la carga glucémica considera la cantidad real consumida. La sandía tiene
               IG alto pero CG baja porque tiene mucha agua y poca glucosa por porción.
             </p>
@@ -167,7 +167,7 @@ export default function MacronutrientesPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🥣 Combinaciones proteicas vegetales:</strong> Legumbres + cereales
+              <strong><span aria-hidden="true">🥣</span> Combinaciones proteicas vegetales:</strong> Legumbres + cereales
               (lentejas con arroz, hummus con pan) proporcionan un perfil completo de
               aminoácidos comparable a la proteína animal.
             </p>
@@ -224,7 +224,7 @@ export default function MacronutrientesPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Importante:</strong> El exceso de omega-6 (aceites vegetales refinados)
+              <strong><span aria-hidden="true">⚠️</span> Importante:</strong> El exceso de omega-6 (aceites vegetales refinados)
               compite con omega-3 por las mismas enzimas, reduciendo la producción de
               compuestos antiinflamatorios. Reduce aceites de girasol, maíz y soja.
             </p>
@@ -239,7 +239,7 @@ export default function MacronutrientesPage() {
         <>
           <div className={styles.highlightBox}>
             <p>
-              <strong>🕐 Timing de macronutrientes:</strong> Los carbohidratos tienen mejor
+              <strong><span aria-hidden="true">🕐</span> Timing de macronutrientes:</strong> Los carbohidratos tienen mejor
               partición nutricional post-entrenamiento (ventana anabólica). Las proteínas
               se absorben mejor distribuyendo 20-40g cada 3-4 horas. Las grasas no interfieren
               con la absorción si se separan de carbohidratos de alto IG.
@@ -248,7 +248,7 @@ export default function MacronutrientesPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>⚖️ Sinergia de macronutrientes:</strong> Combinar proteínas con
+              <strong><span aria-hidden="true">⚖️</span> Sinergia de macronutrientes:</strong> Combinar proteínas con
               carbohidratos mejora la síntesis proteica. Las grasas ralentizan el vaciado
               gástrico, estabilizando glucosa. La fibra soluble reduce el índice glucémico
               efectivo de cualquier comida.
@@ -257,7 +257,7 @@ export default function MacronutrientesPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🧬 Calidad sobre cantidad:</strong> 30g de proteína de huevo tienen
+              <strong><span aria-hidden="true">🧬</span> Calidad sobre cantidad:</strong> 30g de proteína de huevo tienen
               mayor valor biológico que 40g de proteína de trigo. 20g de omega-3 son más
               valiosos que 200g de omega-6. 50g de carbohidratos de legumbres impactan
               menos que 30g de azúcar refinado.
@@ -274,7 +274,7 @@ export default function MacronutrientesPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>📊 Monitorización inteligente:</strong> En lugar de solo contar calorías,
+              <strong><span aria-hidden="true">📊</span> Monitorización inteligente:</strong> En lugar de solo contar calorías,
               evalúa: saciedad post-comida (3-4h), estabilidad energética, calidad del sueño,
               rendimiento cognitivo. Estos indicadores revelan si tus ratios son óptimos para TI.
             </p>

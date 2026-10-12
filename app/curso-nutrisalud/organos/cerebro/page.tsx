@@ -35,7 +35,7 @@ export default function CerebroPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🔬 Barrera hematoencefálica:</strong> No todo lo que comes
+              <strong><span aria-hidden="true">🔬</span> Barrera hematoencefálica:</strong> No todo lo que comes
               llega al cerebro. Esta barrera selectiva protege pero también limita.
               Por eso ciertos nutrientes (omega-3, aminoácidos específicos) son
               especialmente valiosos: atraviesan esta barrera eficientemente.
@@ -113,7 +113,7 @@ export default function CerebroPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 El triptófano y los carbohidratos:</strong> El triptófano
+              <strong><span aria-hidden="true">💡</span> El triptófano y los carbohidratos:</strong> El triptófano
               compite con otros aminoácidos para entrar al cerebro. Los carbohidratos
               (al estimular insulina) facilitan su entrada. Por eso los carbohidratos
               pueden mejorar el ánimo temporalmente.
@@ -165,7 +165,7 @@ export default function CerebroPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Ratio omega-6/omega-3:</strong> El exceso de omega-6
+              <strong><span aria-hidden="true">⚠️</span> Ratio omega-6/omega-3:</strong> El exceso de omega-6
               (aceites vegetales refinados) compite con omega-3 e interfiere
               con su incorporación al cerebro. Reduce aceites de girasol, maíz
               y soja; aumenta pescado graso y fuentes de omega-3.
@@ -212,7 +212,7 @@ export default function CerebroPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🔥 El cerebro y las cetonas:</strong> Cuando los carbohidratos
+              <strong><span aria-hidden="true">🔥</span> El cerebro y las cetonas:</strong> Cuando los carbohidratos
               son bajos, el hígado produce cetonas a partir de grasas. El cerebro
               puede usar cetonas como combustible alternativo. Algunas personas
               reportan mayor claridad mental en cetosis o ayuno intermitente.
@@ -314,7 +314,7 @@ export default function CerebroPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Combinación sinérgica:</strong> El té verde combina
+              <strong><span aria-hidden="true">💡</span> Combinación sinérgica:</strong> El té verde combina
               naturalmente cafeína con L-teanina, produciendo un estado de
               &quot;alerta relajada&quot; ideal para trabajo cognitivo. 2-3 tazas/día
               son seguras para la mayoría.
@@ -335,7 +335,7 @@ export default function CerebroPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🧠 Dieta MIND:</strong> Combina mediterránea y DASH, diseñada
+              <strong><span aria-hidden="true">🧠</span> Dieta MIND:</strong> Combina mediterránea y DASH, diseñada
               específicamente para salud cerebral. El estudio observacional de Morris et al.
               (2015, Rush University) encontró asociaciones de hasta 53% de reducción de
               riesgo de Alzheimer en alta adherencia y 35% en adherencia moderada, aunque

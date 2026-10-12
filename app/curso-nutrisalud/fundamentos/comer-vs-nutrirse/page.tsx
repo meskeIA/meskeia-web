@@ -34,7 +34,7 @@ export default function ComerVsNutrirsePage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🧬 Paradoja moderna:</strong> Un adulto promedio puede consumir más de
+              <strong><span aria-hidden="true">🧬</span> Paradoja moderna:</strong> Un adulto promedio puede consumir más de
               3.000 calorías diarias pero tener deficiencias de vitamina D, magnesio, omega-3
               y fibra. Su cuerpo está energéticamente saturado pero nutricionalmente hambriento,
               generando inflamación crónica, fatiga y antojos constantes.
@@ -138,7 +138,7 @@ export default function ComerVsNutrirsePage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Dato clave:</strong> Una comida con alta densidad nutricional
+              <strong><span aria-hidden="true">💡</span> Dato clave:</strong> Una comida con alta densidad nutricional
               mantiene la saciedad hasta el doble de tiempo porque tu cuerpo recibe
               lo que realmente necesita, reduciendo las señales de hambre prematuras.
             </p>
@@ -186,7 +186,7 @@ export default function ComerVsNutrirsePage() {
         <>
           <div className={styles.highlightBox}>
             <p>
-              <strong>🎯 Regla del 80/20 nutricional:</strong> Busca que el 80% de tus
+              <strong><span aria-hidden="true">🎯</span> Regla del 80/20 nutricional:</strong> Busca que el 80% de tus
               calorías provengan de alimentos nutricionalmente densos (verduras, frutas,
               proteínas completas, grasas saludables). El 20% restante puede ser más
               flexible sin comprometer tu salud general.
@@ -197,7 +197,7 @@ export default function ComerVsNutrirsePage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>🌈 Diversidad cromática:</strong> Cada color en frutas y verduras
+              <strong><span aria-hidden="true">🌈</span> Diversidad cromática:</strong> Cada color en frutas y verduras
               representa diferentes fitonutrientes. Una comida que incluya 4-5 colores
               diferentes garantiza un espectro amplio de antioxidantes y compuestos bioactivos.
             </p>
@@ -205,7 +205,7 @@ export default function ComerVsNutrirsePage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>⏱️ Test de saciedad:</strong> Una comida nutritiva debe mantenerte
+              <strong><span aria-hidden="true">⏱️</span> Test de saciedad:</strong> Una comida nutritiva debe mantenerte
               saciado durante 3-4 horas sin antojos. Si tienes hambre antes, probablemente
               necesites más proteína, grasas saludables o fibra en tu próxima comida.
             </p>
@@ -213,7 +213,7 @@ export default function ComerVsNutrirsePage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🧠 Pregunta clave:</strong> Antes de cada comida pregúntate:
+              <strong><span aria-hidden="true">🧠</span> Pregunta clave:</strong> Antes de cada comida pregúntate:
               &quot;¿Esto va a nutrir mis células o solo va a llenar mi estómago?&quot;
               Esta simple reflexión puede transformar gradualmente tus elecciones alimentarias.
             </p>

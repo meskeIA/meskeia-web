@@ -25,7 +25,7 @@ export default function CombinacionesPositivasPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🔬 Ciencia de las sinergias:</strong> La curcumina del cúrcuma
+              <strong><span aria-hidden="true">🔬</span> Ciencia de las sinergias:</strong> La curcumina del cúrcuma
               sola tiene una biodisponibilidad de solo 1-2%. Combinada con piperina
               (pimienta negra), la absorción aumenta un 2000%. Una simple pizca de
               pimienta transforma completamente el valor de tu cúrcuma.
@@ -84,7 +84,7 @@ export default function CombinacionesPositivasPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Tip:</strong> Solo 25-50mg de vitamina C son suficientes para
+              <strong><span aria-hidden="true">💡</span> Tip:</strong> Solo 25-50mg de vitamina C son suficientes para
               potenciar significativamente la absorción de hierro. Un kiwi, medio
               pimiento o unas fresas junto a tu comida rica en hierro lo consiguen.
             </p>
@@ -145,7 +145,7 @@ export default function CombinacionesPositivasPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Error común:</strong> Ensaladas &quot;light&quot; sin aceite o con
+              <strong><span aria-hidden="true">⚠️</span> Error común:</strong> Ensaladas &quot;light&quot; sin aceite o con
               aliños sin grasa desaprovechan los nutrientes de las verduras. Un poco
               de aceite de oliva virgen extra es más saludable que evitar la grasa.
             </p>
@@ -209,7 +209,7 @@ export default function CombinacionesPositivasPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🦴 Comida sinérgica ideal:</strong> Salmón (D + omega-3) con
+              <strong><span aria-hidden="true">🦴</span> Comida sinérgica ideal:</strong> Salmón (D + omega-3) con
               ensalada de kale (K1 + calcio) aliñada con aceite de oliva, acompañado
               de queso parmesano (K2 + calcio) y semillas de calabaza (magnesio).
             </p>
@@ -252,7 +252,7 @@ export default function CombinacionesPositivasPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Resumen práctico:</strong> No necesitas memorizar cada sinergia.
+              <strong><span aria-hidden="true">💡</span> Resumen práctico:</strong> No necesitas memorizar cada sinergia.
               Simplemente: come colores variados, incluye grasas saludables, combina
               fuentes vegetales de proteína, y añade cítricos o pimientos a comidas
               con hierro vegetal.
@@ -261,7 +261,7 @@ export default function CombinacionesPositivasPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🍽️ Regla simple:</strong> Una comida colorida con verduras,
+              <strong><span aria-hidden="true">🍽️</span> Regla simple:</strong> Una comida colorida con verduras,
               proteína, grasa saludable y algo ácido (limón, vinagre) naturalmente
               activa múltiples sinergias sin necesidad de planificación compleja.
             </p>

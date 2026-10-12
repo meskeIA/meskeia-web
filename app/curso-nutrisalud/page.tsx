@@ -51,7 +51,7 @@ function ConsentModal() {
 
         <div className={styles.consentBody}>
           <div className={styles.importantNotice}>
-            <h3>⚠️ Aviso Médico Importante</h3>
+            <h3><span aria-hidden="true">⚠️</span> Aviso Médico Importante</h3>
             <p>
               Este Curso de Nutrición es una herramienta educativa e informativa que proporciona
               conocimiento nutricional basado en literatura científica. El contenido
@@ -118,7 +118,7 @@ function ConsentModal() {
             </div>
 
             <div className={styles.emergencyNotice}>
-              <strong>🚨 En caso de emergencia médica:</strong> Contacta inmediatamente
+              <strong><span aria-hidden="true">🚨</span> En caso de emergencia médica:</strong> Contacta inmediatamente
               con servicios de emergencia (112 en España) o acude al centro de salud
               más cercano. No utilices esta información para autodiagnóstico.
             </div>
@@ -138,10 +138,11 @@ function ConsentModal() {
         </div>
 
         <div className={styles.consentFooter}>
-          <button onClick={declineConsent} className={styles.btnDecline}>
+          <button type="button" onClick={declineConsent} className={styles.btnDecline}>
             No acepto, salir
           </button>
           <button
+            type="button"
             onClick={acceptConsent}
             className={styles.btnAccept}
             disabled={!allChecked}
@@ -245,7 +246,7 @@ export default function CursoNutrisaludPage() {
 
       {/* Módulos y Capítulos */}
       <section className={styles.modulesSection}>
-        <h2 className={styles.sectionTitle}>📚 Contenido del Curso</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📚</span> Contenido del Curso</h2>
 
         {MODULES.map((module) => {
           const moduleChapters = getChaptersByModule(module.slug);
@@ -296,7 +297,7 @@ export default function CursoNutrisaludPage() {
 
       {/* Recursos */}
       <section className={styles.resourcesSection}>
-        <h2 className={styles.sectionTitle}>📖 Recursos Adicionales</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📖</span> Recursos Adicionales</h2>
         <div className={styles.resourcesGrid}>
           {RESOURCES.map((resource) => (
             <Link

@@ -470,7 +470,7 @@ export default function CalculadoraHuellaCarbono() {
               </div>
             </div>
 
-            <h3 className={styles.subtitulo}>✈️ Vuelos (ida y vuelta)</h3>
+            <h3 className={styles.subtitulo}><span aria-hidden="true">✈️</span> Vuelos (ida y vuelta)</h3>
             <div className={styles.inputGrid}>
               <div className={styles.inputGroup}>
                 <label className={styles.label}>Cortos (&lt;1500km)</label>
@@ -782,10 +782,10 @@ export default function CalculadoraHuellaCarbono() {
       >
         {/* ── SECCIÓN 1: TABLA COMPARATIVA ── */}
         <section>
-          <h3>📊 Comparativa de Emisiones por Actividad y Categoría</h3>
+          <h3><span aria-hidden="true">📊</span> Comparativa de Emisiones por Actividad y Categoría</h3>
           <p>Datos reales para entender qué opciones tienen mayor impacto en tu huella de carbono:</p>
 
-          <h4 style={{ marginTop: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>🚗 Transporte (kg CO₂ por km recorrido)</h4>
+          <h4 style={{ marginTop: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}><span aria-hidden="true">🚗</span> Transporte (kg CO₂ por km recorrido)</h4>
           <div className={styles.eduTableWrapper}>
             <table className={styles.eduTable}>
               <thead>
@@ -798,43 +798,43 @@ export default function CalculadoraHuellaCarbono() {
               </thead>
               <tbody>
                 <tr>
-                  <td>✈️ Avión (corto, &lt;1.500 km)</td>
+                  <td><span aria-hidden="true">✈️</span> Avión (corto, &lt;1.500 km)</td>
                   <td>0,255 kg</td>
                   <td>3.825 kg</td>
                   <td>121% más</td>
                 </tr>
                 <tr>
-                  <td>🚗 Coche diésel</td>
+                  <td><span aria-hidden="true">🚗</span> Coche diésel</td>
                   <td>0,170 kg</td>
                   <td>2.550 kg</td>
                   <td>19% menos</td>
                 </tr>
                 <tr>
-                  <td>🚗 Coche gasolina</td>
+                  <td><span aria-hidden="true">🚗</span> Coche gasolina</td>
                   <td>0,210 kg</td>
                   <td>3.150 kg</td>
                   <td>referencia</td>
                 </tr>
                 <tr>
-                  <td>🚗 Coche híbrido</td>
+                  <td><span aria-hidden="true">🚗</span> Coche híbrido</td>
                   <td>0,120 kg</td>
                   <td>1.800 kg</td>
                   <td>43% menos</td>
                 </tr>
                 <tr>
-                  <td>⚡ Coche eléctrico (mix ES 2024)</td>
+                  <td><span aria-hidden="true">⚡</span> Coche eléctrico (mix ES 2024)</td>
                   <td>0,050 kg</td>
                   <td>750 kg</td>
                   <td>76% menos</td>
                 </tr>
                 <tr>
-                  <td>🚌 Autobús interurbano</td>
+                  <td><span aria-hidden="true">🚌</span> Autobús interurbano</td>
                   <td>0,089 kg</td>
                   <td>1.335 kg</td>
                   <td>58% menos</td>
                 </tr>
                 <tr>
-                  <td>🚄 Tren AVE/Cercanías</td>
+                  <td><span aria-hidden="true">🚄</span> Tren AVE/Cercanías</td>
                   <td>0,041 kg</td>
                   <td>615 kg</td>
                   <td>80% menos</td>
@@ -843,7 +843,7 @@ export default function CalculadoraHuellaCarbono() {
             </table>
           </div>
 
-          <h4 style={{ marginTop: '1.5rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>🥗 Alimentación (t CO₂ por persona y año)</h4>
+          <h4 style={{ marginTop: '1.5rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}><span aria-hidden="true">🥗</span> Alimentación (t CO₂ por persona y año)</h4>
           <div className={styles.eduTableWrapper}>
             <table className={styles.eduTable}>
               <thead>
@@ -856,31 +856,31 @@ export default function CalculadoraHuellaCarbono() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🥩 Omnívora alta en carne roja</td>
+                  <td><span aria-hidden="true">🥩</span> Omnívora alta en carne roja</td>
                   <td>3,3 t</td>
                   <td>44% de 7,5 t</td>
                   <td>referencia</td>
                 </tr>
                 <tr>
-                  <td>🍽️ Omnívora equilibrada</td>
+                  <td><span aria-hidden="true">🍽️</span> Omnívora equilibrada</td>
                   <td>2,5 t</td>
                   <td>33%</td>
                   <td>−24%</td>
                 </tr>
                 <tr>
-                  <td>🐟 Flexitariana (menos carne)</td>
+                  <td><span aria-hidden="true">🐟</span> Flexitariana (menos carne)</td>
                   <td>1,7 t</td>
                   <td>23%</td>
                   <td>−48%</td>
                 </tr>
                 <tr>
-                  <td>🥦 Vegetariana</td>
+                  <td><span aria-hidden="true">🥦</span> Vegetariana</td>
                   <td>1,2 t</td>
                   <td>16%</td>
                   <td>−64%</td>
                 </tr>
                 <tr>
-                  <td>🌱 Vegana</td>
+                  <td><span aria-hidden="true">🌱</span> Vegana</td>
                   <td>0,9 t</td>
                   <td>12%</td>
                   <td>−73%</td>
@@ -889,7 +889,7 @@ export default function CalculadoraHuellaCarbono() {
             </table>
           </div>
 
-          <h4 style={{ marginTop: '1.5rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>🏠 Calefacción del hogar (kg CO₂ por kWh térmico producido)</h4>
+          <h4 style={{ marginTop: '1.5rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}><span aria-hidden="true">🏠</span> Calefacción del hogar (kg CO₂ por kWh térmico producido)</h4>
           <div className={styles.eduTableWrapper}>
             <table className={styles.eduTable}>
               <thead>
@@ -902,31 +902,31 @@ export default function CalculadoraHuellaCarbono() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🔥 Caldera de gas natural</td>
+                  <td><span aria-hidden="true">🔥</span> Caldera de gas natural</td>
                   <td>0,202 kg</td>
                   <td>medio</td>
                   <td>Rendimiento ~98% (condensación)</td>
                 </tr>
                 <tr>
-                  <td>🛢️ Gasoil / Gasóleo C</td>
+                  <td><span aria-hidden="true">🛢️</span> Gasoil / Gasóleo C</td>
                   <td>0,287 kg</td>
                   <td>variable (precio petróleo)</td>
                   <td>En desuso en zonas urbanas</td>
                 </tr>
                 <tr>
-                  <td>⚡ Resistencia eléctrica</td>
+                  <td><span aria-hidden="true">⚡</span> Resistencia eléctrica</td>
                   <td>0,250 kg</td>
                   <td>alto (precio kWh)</td>
                   <td>Rendimiento 100% → COP 1</td>
                 </tr>
                 <tr>
-                  <td>♨️ Bomba de calor aerotérmica</td>
+                  <td><span aria-hidden="true">♨️</span> Bomba de calor aerotérmica</td>
                   <td>0,062 kg</td>
                   <td>bajo (COP 3-4)</td>
                   <td>Por cada kWh eléctrico produce 3-4 kWh calor</td>
                 </tr>
                 <tr>
-                  <td>🌞 Aerotermia + energía solar</td>
+                  <td><span aria-hidden="true">🌞</span> Aerotermia + energía solar</td>
                   <td>~0 kg</td>
                   <td>mínimo (amortización paneles)</td>
                   <td>Combinación óptima actual</td>
@@ -938,7 +938,7 @@ export default function CalculadoraHuellaCarbono() {
 
         {/* ── SECCIÓN 2: CASOS DE USO (4 PERFILES) ── */}
         <section>
-          <h3>👥 Casos de Uso: 4 Perfiles Reales</h3>
+          <h3><span aria-hidden="true">👥</span> Casos de Uso: 4 Perfiles Reales</h3>
           <p>Situaciones concretas en las que esta calculadora aporta valor accionable:</p>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
@@ -970,7 +970,7 @@ export default function CalculadoraHuellaCarbono() {
 
         {/* ── SECCIÓN 3: FAQ (8 PREGUNTAS) ── */}
         <section>
-          <h3>❓ Preguntas Frecuentes (FAQ) — Huella de Carbono</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes (FAQ) — Huella de Carbono</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Cuál es la huella de carbono media de un español?</summary>
@@ -1009,7 +1009,7 @@ export default function CalculadoraHuellaCarbono() {
 
         {/* ── SECCIÓN 4: GUÍA PASO A PASO (7 PASOS) ── */}
         <section>
-          <h3>📋 Cómo Reducir tu Huella un 30-50% en 12 Meses (7 Pasos)</h3>
+          <h3><span aria-hidden="true">📋</span> Cómo Reducir tu Huella un 30-50% en 12 Meses (7 Pasos)</h3>
           <ol className={styles.eduStepsList}>
             <li className={styles.eduStep}>
               <span className={styles.eduStepNum}>1</span>
@@ -1065,7 +1065,7 @@ export default function CalculadoraHuellaCarbono() {
 
         {/* ── SECCIÓN 5: MEJORES PRÁCTICAS (6 TIPS) ── */}
         <section>
-          <h3>💡 6 Cambios de Alto Impacto (Accionables Hoy)</h3>
+          <h3><span aria-hidden="true">💡</span> 6 Cambios de Alto Impacto (Accionables Hoy)</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon}>✈️</span>
@@ -1129,28 +1129,28 @@ export default function CalculadoraHuellaCarbono() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🌡️ ¿Por qué importa?</h4>
+              <h4><span aria-hidden="true">🌡️</span> ¿Por qué importa?</h4>
               <p>
                 El exceso de GEI en la atmósfera provoca el calentamiento global. Para limitar el aumento de temperatura
                 a 1,5°C, cada persona debería emitir máximo 2 toneladas de CO₂ al año. La media española actual es de 7,5 toneladas.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📊 Principales fuentes</h4>
+              <h4><span aria-hidden="true">📊</span> Principales fuentes</h4>
               <p>
                 En España, el transporte representa el 27% de las emisiones, seguido del sector industrial (24%),
                 generación eléctrica (17%), agricultura (12%) y sector residencial (10%).
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🎯 Objetivo 2030</h4>
+              <h4><span aria-hidden="true">🎯</span> Objetivo 2030</h4>
               <p>
                 La Unión Europea se ha comprometido a reducir sus emisiones un 55% para 2030 respecto a 1990,
                 y alcanzar la neutralidad climática para 2050.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🌱 Acciones individuales</h4>
+              <h4><span aria-hidden="true">🌱</span> Acciones individuales</h4>
               <p>
                 Aunque las grandes empresas son responsables de la mayoría de emisiones, las acciones individuales
                 suman y pueden influir en políticas y mercados a través de la demanda.
@@ -1235,7 +1235,7 @@ export default function CalculadoraHuellaCarbono() {
         </section>
 
         <section>
-          <h3>🌍 Huella de Carbono por País: Comparativa Mundial</h3>
+          <h3><span aria-hidden="true">🌍</span> Huella de Carbono por País: Comparativa Mundial</h3>
           <p>Perspectiva global de emisiones per cápita para contextualizar tu resultado:</p>
           <div className={styles.eduTableWrapper}>
             <table className={styles.eduTable}>
@@ -1285,14 +1285,14 @@ export default function CalculadoraHuellaCarbono() {
                   <td>→ Estable/alto</td>
                 </tr>
                 <tr>
-                  <td><strong>🌍 Media mundial</strong></td>
+                  <td><strong><span aria-hidden="true">🌍</span> Media mundial</strong></td>
                   <td>4,7 t</td>
                   <td>2,35× el límite</td>
                   <td>Varía por región</td>
                   <td>→ Muy lento descenso</td>
                 </tr>
                 <tr>
-                  <td><strong>🎯 Objetivo 2°C</strong></td>
+                  <td><strong><span aria-hidden="true">🎯</span> Objetivo 2°C</strong></td>
                   <td>2,0 t</td>
                   <td>✓ Sostenible</td>
                   <td>—</td>
@@ -1304,7 +1304,7 @@ export default function CalculadoraHuellaCarbono() {
         </section>
 
         <section>
-          <h3>🎯 ¿Quién Usa las Calculadoras de Huella de Carbono?</h3>
+          <h3><span aria-hidden="true">🎯</span> ¿Quién Usa las Calculadoras de Huella de Carbono?</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>👤</span>
@@ -1330,7 +1330,7 @@ export default function CalculadoraHuellaCarbono() {
         </section>
 
         <section>
-          <h3>❓ Preguntas Frecuentes sobre Huella de Carbono</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Huella de Carbono</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Qué es el CO₂ equivalente (CO₂e)?</summary>
@@ -1368,7 +1368,7 @@ export default function CalculadoraHuellaCarbono() {
         </section>
 
         <section>
-          <h3>📋 Plan de Acción para Reducir tu Huella de Carbono</h3>
+          <h3><span aria-hidden="true">📋</span> Plan de Acción para Reducir tu Huella de Carbono</h3>
           <ol className={styles.eduStepsList}>
             <li className={styles.eduStep}>
               <span className={styles.eduStepNum}>1</span>
@@ -1416,7 +1416,7 @@ export default function CalculadoraHuellaCarbono() {
         </section>
 
         <section>
-          <h3>💡 Hábitos de Alto Impacto para Reducir Emisiones</h3>
+          <h3><span aria-hidden="true">💡</span> Hábitos de Alto Impacto para Reducir Emisiones</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon}>✈️</span>

@@ -309,22 +309,22 @@ export default function CalculadoraTemperaturaMasaPage() {
             </thead>
             <tbody>
               <tr>
-                <td>🙌 Manual</td>
+                <td><span aria-hidden="true">🙌</span> Manual</td>
                 <td>0°C</td>
                 <td>El amasado a mano no calienta la masa de forma significativa</td>
               </tr>
               <tr>
-                <td>🌀 Espiral profesional</td>
+                <td><span aria-hidden="true">🌀</span> Espiral profesional</td>
                 <td>+5°C</td>
                 <td>Menor fricción que las domésticas por su diseño de gancho lento</td>
               </tr>
               <tr>
-                <td>🔧 KitchenAid / pie</td>
+                <td><span aria-hidden="true">🔧</span> KitchenAid / pie</td>
                 <td>+8°C</td>
                 <td>Gancho estándar doméstico a velocidad media</td>
               </tr>
               <tr>
-                <td>⚙️ Thermomix</td>
+                <td><span aria-hidden="true">⚙️</span> Thermomix</td>
                 <td>+12°C</td>
                 <td>Alta fricción por velocidad y resistencia del vaso</td>
               </tr>

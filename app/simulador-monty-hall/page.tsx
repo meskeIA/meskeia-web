@@ -488,21 +488,21 @@ export default function SimuladorMontyHallPage() {
                   <td>2/3 ≈ 66,7 %</td>
                   <td>~667 victorias</td>
                   <td>Parece arriesgado</td>
-                  <td>✅ Sí</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
                 </tr>
                 <tr>
                   <td>No cambiar nunca</td>
                   <td>1/3 ≈ 33,3 %</td>
                   <td>~333 victorias</td>
                   <td>Parece &quot;leal&quot; a tu elección</td>
-                  <td>❌ No</td>
+                  <td><span aria-hidden="true">❌</span> No</td>
                 </tr>
                 <tr>
                   <td>Cambiar aleatoriamente</td>
                   <td>1/2 = 50,0 %</td>
                   <td>~500 victorias</td>
                   <td>Parece justo</td>
-                  <td>⚠️ Intermedia</td>
+                  <td><span aria-hidden="true">⚠️</span> Intermedia</td>
                 </tr>
               </tbody>
             </table>
@@ -549,7 +549,7 @@ export default function SimuladorMontyHallPage() {
                 entre las otras dos. Quedan dos puertas físicas, pero su peso probabilístico es diferente.
               </p>
               <p className={styles.faqTip}>
-                💡 Piénsalo así: si eligieras aleatoriamente entre las dos puertas restantes, sí sería 50/50.
+                <span aria-hidden="true">💡</span> Piénsalo así: si eligieras aleatoriamente entre las dos puertas restantes, sí sería 50/50.
                 Pero &quot;no cambiar&quot; no es elegir aleatoriamente: es quedarte con tu elección original, que siempre tuvo 1/3.
               </p>
             </div>
@@ -563,7 +563,7 @@ export default function SimuladorMontyHallPage() {
                 Si Monty eligiera al azar y a veces abriera el coche, el problema sería diferente.
               </p>
               <p className={styles.faqTip}>
-                💡 Esta asimetría de información aparece constantemente en economía (mercados, subastas),
+                <span aria-hidden="true">💡</span> Esta asimetría de información aparece constantemente en economía (mercados, subastas),
                 medicina (diagnósticos diferenciales) y teoría de juegos.
               </p>
             </div>
@@ -577,7 +577,7 @@ export default function SimuladorMontyHallPage() {
                 Hoy puedes reproducirlo con este simulador en segundos.
               </p>
               <p className={styles.faqTip}>
-                💡 El debate de 1990–1991 es un caso de libro de texto sobre cómo la intuición humana falla
+                <span aria-hidden="true">💡</span> El debate de 1990–1991 es un caso de libro de texto sobre cómo la intuición humana falla
                 sistemáticamente con la probabilidad condicional.
               </p>
             </div>
@@ -591,7 +591,7 @@ export default function SimuladorMontyHallPage() {
                 actualiza nuestras creencias sobre dónde está el coche, y lo hace de forma asimétrica.
               </p>
               <p className={styles.faqTip}>
-                💡 Bayes: P(coche en j | Monty abre k) = P(Monty abre k | coche en j) · P(coche en j) / P(Monty abre k).
+                <span aria-hidden="true">💡</span> Bayes: P(coche en j | Monty abre k) = P(Monty abre k | coche en j) · P(coche en j) / P(Monty abre k).
                 Para la puerta no elegida, P(Monty abre k | coche en j) = 1 (Monty siempre abre la única cabra disponible),
                 lo que eleva la probabilidad posterior a 2/3.
               </p>
@@ -606,7 +606,7 @@ export default function SimuladorMontyHallPage() {
                 es completamente aleatoria y simétrica, lo que no ocurre en el problema original.
               </p>
               <p className={styles.faqTip}>
-                💡 En el caso límite c = k−1 (solo una cabra), cambiar siempre pierde: Monty revelaría
+                <span aria-hidden="true">💡</span> En el caso límite c = k−1 (solo una cabra), cambiar siempre pierde: Monty revelaría
                 k−2 coches y la única cabra estaría en la puerta que no elegiste. Aquí sí conviene quedarse.
               </p>
             </div>

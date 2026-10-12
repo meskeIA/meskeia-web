@@ -26,7 +26,7 @@ export default function SistemaDigestivoPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🧬 Dato fascinante:</strong> Tu intestino tiene más neuronas que
+              <strong><span aria-hidden="true">🧬</span> Dato fascinante:</strong> Tu intestino tiene más neuronas que
               la médula espinal (500 millones), por eso se le llama &quot;el segundo cerebro&quot;.
               Produce el 95% de la serotonina de tu cuerpo, el neurotransmisor del bienestar.
             </p>
@@ -48,7 +48,7 @@ export default function SistemaDigestivoPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Tip práctico:</strong> Masticar cada bocado 20-30 veces aumenta
+              <strong><span aria-hidden="true">💡</span> Tip práctico:</strong> Masticar cada bocado 20-30 veces aumenta
               la superficie de contacto con enzimas y mejora la señalización de saciedad
               al cerebro. Comer despacio = absorber mejor y comer menos.
             </p>
@@ -140,7 +140,7 @@ export default function SistemaDigestivoPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Sobre los antiácidos:</strong> Reducir el ácido estomacal puede
+              <strong><span aria-hidden="true">⚠️</span> Sobre los antiácidos:</strong> Reducir el ácido estomacal puede
               parecer alivio, pero impide la digestión de proteínas y la absorción de
               minerales (hierro, calcio, B12). Usa solo cuando sea médicamente necesario.
             </p>
@@ -204,7 +204,7 @@ export default function SistemaDigestivoPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Apoyo natural:</strong> Un poco de vinagre de manzana (1 cucharada
+              <strong><span aria-hidden="true">💡</span> Apoyo natural:</strong> Un poco de vinagre de manzana (1 cucharada
               diluida en agua) antes de las comidas puede ayudar a acidificar el estómago.
               El jengibre y las hierbas amargas también estimulan la producción de jugos gástricos.
             </p>
@@ -242,7 +242,7 @@ export default function SistemaDigestivoPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🍽️ Orden de consumo:</strong> Estudios recientes sugieren que comer
+              <strong><span aria-hidden="true">🍽️</span> Orden de consumo:</strong> Estudios recientes sugieren que comer
               vegetales y proteínas ANTES de los carbohidratos en la misma comida reduce
               significativamente el pico de glucosa postprandial. El orden importa.
             </p>
@@ -257,7 +257,7 @@ export default function SistemaDigestivoPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 El tiempo de tránsito ideal:</strong> Desde que comes hasta que
+              <strong><span aria-hidden="true">💡</span> El tiempo de tránsito ideal:</strong> Desde que comes hasta que
               eliminas debería ser 24-48 horas. Más lento indica estreñimiento; más rápido
               puede significar malabsorción. La fibra, hidratación y movimiento lo regulan.
             </p>

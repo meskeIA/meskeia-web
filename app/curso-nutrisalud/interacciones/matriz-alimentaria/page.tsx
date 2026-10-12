@@ -26,7 +26,7 @@ export default function MatrizAlimentariaPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🍎 Ejemplo clásico:</strong> Una manzana entera contiene fibra,
+              <strong><span aria-hidden="true">🍎</span> Ejemplo clásico:</strong> Una manzana entera contiene fibra,
               agua, vitaminas y polifenoles en una matriz que ralentiza la liberación
               de azúcar. El zumo de manzana ha perdido la fibra y concentra el azúcar,
               produciendo un pico glucémico similar al de un refresco.
@@ -79,7 +79,7 @@ export default function MatrizAlimentariaPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Concepto clave:</strong> La molienda destruye la matriz.
+              <strong><span aria-hidden="true">💡</span> Concepto clave:</strong> La molienda destruye la matriz.
               Un grano integral molido en harina fina pierde parte de sus beneficios
               aunque técnicamente tenga los mismos nutrientes. La textura importa.
             </p>
@@ -140,7 +140,7 @@ export default function MatrizAlimentariaPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Cuidado con el exceso:</strong> Los suplementos pueden causar
+              <strong><span aria-hidden="true">⚠️</span> Cuidado con el exceso:</strong> Los suplementos pueden causar
               toxicidad porque carecen de los mecanismos de autorregulación de los
               alimentos. Nadie ha desarrollado toxicidad por vitamina A comiendo
               zanahorias, pero sí por suplementos en exceso.
@@ -199,7 +199,7 @@ export default function MatrizAlimentariaPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Regla práctica:</strong> Si tu abuela no lo reconocería como
+              <strong><span aria-hidden="true">💡</span> Regla práctica:</strong> Si tu abuela no lo reconocería como
               comida, o si no podrías hacerlo en tu cocina, probablemente es
               ultraprocesado. Prioriza alimentos con lista de ingredientes corta
               o sin lista (productos frescos).
@@ -258,7 +258,7 @@ export default function MatrizAlimentariaPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🛒 Estrategia de compra:</strong> Haz la mayor parte de tu compra
+              <strong><span aria-hidden="true">🛒</span> Estrategia de compra:</strong> Haz la mayor parte de tu compra
               en el perímetro del supermercado (frescos, refrigerados) y minimiza
               los pasillos centrales (ultraprocesados envasados). Tu matriz
               alimentaria te lo agradecerá.

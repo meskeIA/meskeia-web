@@ -618,7 +618,7 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
                 <span className={styles.stepNumber}>6</span>
                 <div className={styles.stepContent}>
                   <h4>Genera el badge y añádelo al encabezado</h4>
-                  <p>Usa el botón &quot;Copiar badge&quot; para obtener el texto &quot;⏱️ X min de lectura&quot;. Colócalo en el encabezado del artículo, justo debajo del título o del autor. Mejora el CTR y reduce la tasa de rebote.</p>
+                  <p>Usa el botón &quot;Copiar badge&quot; para obtener el texto &quot;<span aria-hidden="true">⏱️</span> X min de lectura&quot;. Colócalo en el encabezado del artículo, justo debajo del título o del autor. Mejora el CTR y reduce la tasa de rebote.</p>
                 </div>
               </div>
               <div className={styles.step}>

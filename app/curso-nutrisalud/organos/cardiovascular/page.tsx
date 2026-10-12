@@ -32,7 +32,7 @@ export default function CardiovascularPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>📊 Más allá del colesterol total:</strong> El colesterol total
+              <strong><span aria-hidden="true">📊</span> Más allá del colesterol total:</strong> El colesterol total
               es un marcador incompleto. Lo importante es el perfil: ratio triglicéridos/HDL
               (ideal &lt;2), número de partículas LDL, y nivel de Lp(a). Pide un
               análisis completo de lípidos, no solo el básico.
@@ -113,7 +113,7 @@ export default function CardiovascularPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Sobre los huevos:</strong> Estudios recientes muestran que
+              <strong><span aria-hidden="true">💡</span> Sobre los huevos:</strong> Estudios recientes muestran que
               para la mayoría de personas, comer huevos (incluso diariamente) no
               eleva significativamente el riesgo cardiovascular. La yema contiene
               colina, nutriente esencial para el cerebro.
@@ -164,7 +164,7 @@ export default function CardiovascularPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Ratio omega-6/omega-3:</strong> La dieta occidental típica
+              <strong><span aria-hidden="true">⚠️</span> Ratio omega-6/omega-3:</strong> La dieta occidental típica
               tiene ratio 20:1 o peor. El ideal es 1:1 a 4:1. Reduce aceites de
               girasol, maíz, soja. Aumenta pescado graso, nueces, chía.
             </p>
@@ -229,7 +229,7 @@ export default function CardiovascularPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🥤 Zumo de remolacha:</strong> Estudios demuestran que 250ml
+              <strong><span aria-hidden="true">🥤</span> Zumo de remolacha:</strong> Estudios demuestran que 250ml
               de zumo de remolacha pueden reducir la presión sistólica 4-10 mmHg
               en pocas horas. Los nitratos se convierten en óxido nítrico, que
               dilata los vasos sanguíneos.
@@ -321,7 +321,7 @@ export default function CardiovascularPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Estudio PREDIMED:</strong> La dieta mediterránea suplementada
+              <strong><span aria-hidden="true">💡</span> Estudio PREDIMED:</strong> La dieta mediterránea suplementada
               con aceite de oliva virgen extra o nueces redujo los eventos
               cardiovasculares un 30% comparado con dieta baja en grasas. La calidad
               de las grasas importa más que la cantidad.

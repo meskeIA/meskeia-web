@@ -26,7 +26,7 @@ export default function TimingNutricionalPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🔬 Dato científico:</strong> La misma comida consumida por la
+              <strong><span aria-hidden="true">🔬</span> Dato científico:</strong> La misma comida consumida por la
               mañana produce un pico de glucosa 20-30% menor que si se consume por
               la noche. La sensibilidad a la insulina es naturalmente mayor en las
               primeras horas del día.
@@ -114,7 +114,7 @@ export default function TimingNutricionalPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Realidad sobre la &quot;ventana anabólica&quot;:</strong> No es tan
+              <strong><span aria-hidden="true">💡</span> Realidad sobre la &quot;ventana anabólica&quot;:</strong> No es tan
               estrecha como se creía. Si has comido proteína antes del ejercicio,
               la síntesis proteica ya está activa. Lo importante es el total
               diario de proteína, no el timing exacto post-ejercicio.
@@ -210,7 +210,7 @@ export default function TimingNutricionalPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ El ayuno no es para todos:</strong> Personas con historial
+              <strong><span aria-hidden="true">⚠️</span> El ayuno no es para todos:</strong> Personas con historial
               de trastornos alimentarios, embarazadas, diabéticos tipo 1, o quienes
               toman ciertos medicamentos deben consultar con un profesional antes
               de practicar ayuno intermitente.
@@ -239,7 +239,7 @@ export default function TimingNutricionalPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>📊 Resultado:</strong> Comer vegetales antes que carbohidratos
+              <strong><span aria-hidden="true">📊</span> Resultado:</strong> Comer vegetales antes que carbohidratos
               puede reducir el pico de glucosa postprandial hasta un 40%. Mismo
               alimento, mismo contenido calórico, diferente impacto metabólico.
             </p>
@@ -283,7 +283,7 @@ export default function TimingNutricionalPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Bonus:</strong> Caminar 10-15 minutos después de comer
+              <strong><span aria-hidden="true">💡</span> Bonus:</strong> Caminar 10-15 minutos después de comer
               también reduce significativamente el pico de glucosa. Combinado
               con el orden correcto, el control glucémico mejora notablemente.
             </p>

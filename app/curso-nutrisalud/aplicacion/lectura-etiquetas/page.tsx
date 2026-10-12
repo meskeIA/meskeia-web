@@ -25,7 +25,7 @@ export default function LecturaEtiquetasPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🔍 Regla fundamental:</strong> Los ingredientes se listan por
+              <strong><span aria-hidden="true">🔍</span> Regla fundamental:</strong> Los ingredientes se listan por
               peso, de mayor a menor. Si el azúcar o una grasa refinada aparece
               entre los primeros tres ingredientes, ese producto es probablemente
               más postre que alimento nutritivo.
@@ -123,7 +123,7 @@ export default function LecturaEtiquetasPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Truco del azúcar fragmentado:</strong> Un producto puede
+              <strong><span aria-hidden="true">⚠️</span> Truco del azúcar fragmentado:</strong> Un producto puede
               listar &quot;harina de trigo&quot; primero, pero si sumas jarabe de glucosa +
               azúcar + miel + dextrosa, el total de azúcares supera a cualquier otro
               ingrediente. Lee toda la lista.
@@ -196,7 +196,7 @@ export default function LecturaEtiquetasPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🎯 Regla de oro:</strong> Cuanto más grita un producto sus
+              <strong><span aria-hidden="true">🎯</span> Regla de oro:</strong> Cuanto más grita un producto sus
               beneficios en el frente del paquete, más debes sospechar. Los
               alimentos realmente nutritivos (verduras, huevos, pescado) no
               necesitan marketing agresivo.
@@ -270,7 +270,7 @@ export default function LecturaEtiquetasPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Perspectiva:</strong> No te obsesiones con cada E-número.
+              <strong><span aria-hidden="true">💡</span> Perspectiva:</strong> No te obsesiones con cada E-número.
               Lo más importante es reducir ultraprocesados en general. Si comes
               principalmente alimentos frescos, tu exposición a aditivos será
               naturalmente baja.

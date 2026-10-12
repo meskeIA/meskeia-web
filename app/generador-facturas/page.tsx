@@ -1162,7 +1162,7 @@ export default function GeneradorFacturasPage() {
                 <tr>
                   <td><strong>Estándar (con IVA)</strong></td>
                   <td>21% / 10% / 4%</td>
-                  <td>❌ No aplica</td>
+                  <td><span aria-hidden="true">❌</span> No aplica</td>
                   <td>Autónomo o empresa → cliente español</td>
                   <td>Venta de productos, servicios técnicos, consultoría a particulares</td>
                   <td>Mayoría de autónomos y SLs</td>
@@ -1170,7 +1170,7 @@ export default function GeneradorFacturasPage() {
                 <tr>
                   <td><strong>Con IVA + retención IRPF</strong></td>
                   <td>21%</td>
-                  <td>✅ 15% (7% nuevos)</td>
+                  <td><span aria-hidden="true">✅</span> 15% (7% nuevos)</td>
                   <td>Autónomo profesional → empresa/autónomo español</td>
                   <td>Diseñador web, consultor, abogado que factura a empresa</td>
                   <td>Autónomos con actividad profesional</td>
@@ -1186,7 +1186,7 @@ export default function GeneradorFacturasPage() {
                 <tr>
                   <td><strong>Intracomunitaria (UE)</strong></td>
                   <td>0% inversión sujeto pasivo</td>
-                  <td>❌ No aplica</td>
+                  <td><span aria-hidden="true">❌</span> No aplica</td>
                   <td>B2B entre países de la UE (cliente con VAT number)</td>
                   <td>Servicios de software a empresa alemana con DE123456789</td>
                   <td>Freelances y empresas con clientes europeos</td>
@@ -1194,7 +1194,7 @@ export default function GeneradorFacturasPage() {
                 <tr>
                   <td><strong>Exportación (fuera UE)</strong></td>
                   <td>0% (exportación)</td>
-                  <td>❌ No aplica</td>
+                  <td><span aria-hidden="true">❌</span> No aplica</td>
                   <td>Cliente en país no perteneciente a la UE</td>
                   <td>SaaS vendido a empresa de EE.UU. o cliente en Japón</td>
                   <td>Empresas con clientes globales</td>
@@ -1210,7 +1210,7 @@ export default function GeneradorFacturasPage() {
                 <tr>
                   <td><strong>Factura simplificada (ticket)</strong></td>
                   <td>21% / 10% / 4%</td>
-                  <td>❌ No aplica</td>
+                  <td><span aria-hidden="true">❌</span> No aplica</td>
                   <td>Venta directa al público (B2C) en comercio minorista</td>
                   <td>Tienda física, restaurante, bar con TPV</td>
                   <td>Comercios minoristas al público</td>
@@ -1456,14 +1456,14 @@ export default function GeneradorFacturasPage() {
             <h3>Errores de facturación que generan sanciones o pérdida de derechos</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Saltarse números en la secuencia:</strong> Hacienda lo interpreta como ocultación de ingresos. Sanción mínima 300 € y puede derivar en inspección completa.</li>
-            <li><strong>❌ Modificar una factura ya entregada:</strong> Es falsificación de documento mercantil (delito penal). La corrección correcta es siempre mediante factura rectificativa.</li>
-            <li><strong>❌ Aplicar IRPF del 7% fuera de plazo:</strong> El tipo reducido solo es válido durante el año de alta y los dos siguientes. Pasado ese plazo, usar 7% es error y Hacienda regularizará con intereses.</li>
-            <li><strong>❌ Facturar a empresa UE sin verificar VAT number:</strong> Si el VAT del cliente es incorrecto o ficticio, la exención de IVA es inválida. Deberás regularizar el IVA más intereses de demora.</li>
-            <li><strong>❌ No declarar facturas en el trimestre correcto:</strong> La factura debe declararse en el trimestre en que se emite (criterio de devengo), no cuando se cobra. Declarar en trimestre incorrecto = sanción por extemporaneidad.</li>
-            <li><strong>❌ Omitir datos obligatorios:</strong> Una factura sin NIF del cliente, sin descripción suficiente o sin fecha es una factura inválida. El cliente no puede deducir el IVA y tú puedes ser sancionado entre 150 y 600 € por factura.</li>
-            <li><strong>❌ No conservar facturas el tiempo mínimo:</strong> Destruir facturas antes de 4 años (tributario) o 6 años (mercantil) impide defenderte en una inspección y puede considerarse obstrucción.</li>
-            <li><strong>❌ Usar facturas sin numeración propia como SL:</strong> Las sociedades mercantiles deben llevar libros contables oficiales. Usar hojas sueltas sin registro contable formal puede invalidar la contabilidad completa.</li>
+            <li><strong><span aria-hidden="true">❌</span> Saltarse números en la secuencia:</strong> Hacienda lo interpreta como ocultación de ingresos. Sanción mínima 300 € y puede derivar en inspección completa.</li>
+            <li><strong><span aria-hidden="true">❌</span> Modificar una factura ya entregada:</strong> Es falsificación de documento mercantil (delito penal). La corrección correcta es siempre mediante factura rectificativa.</li>
+            <li><strong><span aria-hidden="true">❌</span> Aplicar IRPF del 7% fuera de plazo:</strong> El tipo reducido solo es válido durante el año de alta y los dos siguientes. Pasado ese plazo, usar 7% es error y Hacienda regularizará con intereses.</li>
+            <li><strong><span aria-hidden="true">❌</span> Facturar a empresa UE sin verificar VAT number:</strong> Si el VAT del cliente es incorrecto o ficticio, la exención de IVA es inválida. Deberás regularizar el IVA más intereses de demora.</li>
+            <li><strong><span aria-hidden="true">❌</span> No declarar facturas en el trimestre correcto:</strong> La factura debe declararse en el trimestre en que se emite (criterio de devengo), no cuando se cobra. Declarar en trimestre incorrecto = sanción por extemporaneidad.</li>
+            <li><strong><span aria-hidden="true">❌</span> Omitir datos obligatorios:</strong> Una factura sin NIF del cliente, sin descripción suficiente o sin fecha es una factura inválida. El cliente no puede deducir el IVA y tú puedes ser sancionado entre 150 y 600 € por factura.</li>
+            <li><strong><span aria-hidden="true">❌</span> No conservar facturas el tiempo mínimo:</strong> Destruir facturas antes de 4 años (tributario) o 6 años (mercantil) impide defenderte en una inspección y puede considerarse obstrucción.</li>
+            <li><strong><span aria-hidden="true">❌</span> Usar facturas sin numeración propia como SL:</strong> Las sociedades mercantiles deben llevar libros contables oficiales. Usar hojas sueltas sin registro contable formal puede invalidar la contabilidad completa.</li>
           </ul>
         </div>
       </EducationalSection>

@@ -974,7 +974,7 @@ export default function GuiaInfusiones() {
               descanso. Consultar siempre el apartado de contraindicaciones de cada planta.
             </p>
             <span className={styles.faqTip}>
-              💡 Variar las plantas según la temporada es una práctica tradicional sabia.
+              <span aria-hidden="true">💡</span> Variar las plantas según la temporada es una práctica tradicional sabia.
             </span>
           </li>
           <li className={styles.faqItem}>
@@ -1013,7 +1013,7 @@ export default function GuiaInfusiones() {
               al farmacéutico si se toma medicación habitual.
             </p>
             <span className={styles.faqTip}>
-              ⚠️ Tener especial precaución con anticoagulantes, hipoglucemiantes y sedantes.
+              <span aria-hidden="true">⚠️</span> Tener especial precaución con anticoagulantes, hipoglucemiantes y sedantes.
             </span>
           </li>
           <li className={styles.faqItem}>

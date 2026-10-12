@@ -357,6 +357,7 @@ export default function GlosarioPage() {
         <div className={styles.categoryFilters}>
           {CATEGORIES.map((category) => (
             <button
+              type="button"
               key={category}
               onClick={() => setSelectedCategory(category)}
               className={`${styles.categoryButton} ${
@@ -404,6 +405,7 @@ export default function GlosarioPage() {
           <div className={styles.noResults}>
             <p>No se encontraron términos que coincidan con tu búsqueda.</p>
             <button
+              type="button"
               onClick={() => {
                 setSearch('');
                 setSelectedCategory('Todos');

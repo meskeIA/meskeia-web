@@ -25,7 +25,7 @@ export default function PlanificacionPage() {
 
           <div className={styles.highlightBox}>
             <p>
-              <strong>🎯 Objetivo:</strong> Una alimentación que puedas mantener
+              <strong><span aria-hidden="true">🎯</span> Objetivo:</strong> Una alimentación que puedas mantener
               de por vida, que te haga sentir bien, que respete tus preferencias
               y que se adapte a tu ritmo de vida. No una dieta temporal de 30 días.
             </p>
@@ -101,7 +101,7 @@ export default function PlanificacionPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Flexibilidad:</strong> Estas proporciones son orientativas.
+              <strong><span aria-hidden="true">💡</span> Flexibilidad:</strong> Estas proporciones son orientativas.
               No necesitas medir ni pesar. Con el tiempo desarrollas intuición
               para saber si una comida está equilibrada.
             </p>
@@ -180,7 +180,7 @@ export default function PlanificacionPage() {
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Trampa del marketing:</strong> &quot;Light&quot;, &quot;fitness&quot;,
+              <strong><span aria-hidden="true">⚠️</span> Trampa del marketing:</strong> &quot;Light&quot;, &quot;fitness&quot;,
               &quot;natural&quot;, &quot;sin azúcar añadido&quot; no garantizan que sea saludable.
               Siempre lee los ingredientes, no solo el frente del paquete.
             </p>
@@ -284,7 +284,7 @@ export default function PlanificacionPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>💡 Duración:</strong> Los cereales y legumbres cocidos duran
+              <strong><span aria-hidden="true">💡</span> Duración:</strong> Los cereales y legumbres cocidos duran
               4-5 días en nevera. Las proteínas 3-4 días. Las verduras asadas
               5-6 días. Congela lo que no vayas a usar en 3 días.
             </p>
@@ -315,7 +315,7 @@ export default function PlanificacionPage() {
           <h3>Regla del 80/20:</h3>
           <div className={styles.highlightBox}>
             <p>
-              <strong>🎯 Principio práctico:</strong> Si el 80% de tu alimentación
+              <strong><span aria-hidden="true">🎯</span> Principio práctico:</strong> Si el 80% de tu alimentación
               está basada en alimentos nutritivos y poco procesados, el 20% restante
               puede ser lo que quieras sin impacto significativo en tu salud.
               Esto permite disfrutar de la vida social, celebraciones y antojos
@@ -325,17 +325,17 @@ export default function PlanificacionPage() {
 
           <h3>Señales de una relación sana con la comida:</h3>
           <ul>
-            <li>✅ Comes cuando tienes hambre, paras cuando estás satisfecho</li>
-            <li>✅ Disfrutas tanto una ensalada como una pizza ocasional</li>
-            <li>✅ No te castigas después de &quot;comer mal&quot;</li>
-            <li>✅ No piensas constantemente en comida</li>
-            <li>✅ Puedes adaptar tu alimentación a situaciones sociales</li>
-            <li>✅ La comida es una parte de tu vida, no tu vida entera</li>
+            <li><span aria-hidden="true">✅</span> Comes cuando tienes hambre, paras cuando estás satisfecho</li>
+            <li><span aria-hidden="true">✅</span> Disfrutas tanto una ensalada como una pizza ocasional</li>
+            <li><span aria-hidden="true">✅</span> No te castigas después de &quot;comer mal&quot;</li>
+            <li><span aria-hidden="true">✅</span> No piensas constantemente en comida</li>
+            <li><span aria-hidden="true">✅</span> Puedes adaptar tu alimentación a situaciones sociales</li>
+            <li><span aria-hidden="true">✅</span> La comida es una parte de tu vida, no tu vida entera</li>
           </ul>
 
           <div className={styles.warningBox}>
             <p>
-              <strong>⚠️ Atención:</strong> Si te obsesionas con comer &quot;perfecto&quot;,
+              <strong><span aria-hidden="true">⚠️</span> Atención:</strong> Si te obsesionas con comer &quot;perfecto&quot;,
               evitas situaciones sociales por la comida, o te angustias por cada
               elección alimentaria, podrías estar desarrollando una relación
               problemática con la comida. Considera hablar con un profesional.
@@ -352,7 +352,7 @@ export default function PlanificacionPage() {
 
           <div className={styles.infoBox}>
             <p>
-              <strong>🎓 Felicidades:</strong> Has completado el Curso de Nutrición. Ahora tienes
+              <strong><span aria-hidden="true">🎓</span> Felicidades:</strong> Has completado el Curso de Nutrición. Ahora tienes
               los conocimientos para tomar decisiones alimentarias informadas.
               Recuerda: el mejor plan es el que puedes mantener. La perfección
               no existe, pero la mejora continua sí. ¡Buen viaje nutricional!

@@ -413,7 +413,7 @@ export default function TestMadurezDigitalPage() {
 
         {/* Warning */}
         <section className={styles.warningBox}>
-          <h2>⚠️ Sobre este test de madurez digital</h2>
+          <h2><span aria-hidden="true">⚠️</span> Sobre este test de madurez digital</h2>
           <p>
             La &quot;madurez digital&quot; óptima depende del sector. Hay negocios artesanos, profesionales y de servicios donde la digitalización avanzada aporta poco valor real. No interpretes &quot;baja puntuación&quot; como problema automático — interprétalo como dato sobre el grado de digitalización, no sobre la calidad del negocio.
           </p>
