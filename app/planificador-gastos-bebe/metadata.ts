@@ -48,7 +48,7 @@ export const jsonLd = generateWebAppSchema({
     'Tres niveles de gasto: ajustado, medio y confortable',
     'Selector global y ajuste individual por categoría',
     'Resumen con total anual, mensual y distribución visual',
-    'Datos orientativos para España 2025',
+    'Importes orientativos de estimación propia, con precios de España',
   ],
 });
 

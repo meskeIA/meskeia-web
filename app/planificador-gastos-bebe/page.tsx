@@ -11,7 +11,8 @@ import {
   DisclaimerCard,
   LegalNotice, RegionBadge
 } from '@/components';
-import { GASTOS_PRIMER_ANO_BEBE } from '@/data/fiscal';
+// Estimación propia sin fuente citable: vive fuera de data/fiscal (cabo C0165)
+import { GASTOS_PRIMER_ANO_BEBE, GASTOS_BEBE_META } from '@/data/gastos-bebe';
 import { formatCurrency } from '@/lib';
 
 type NivelGasto = 'min' | 'med' | 'alto';
@@ -101,7 +102,7 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
           severity="high"
           context="planificador-gastos-bebe"
         >
-          Los importes mostrados son estimaciones medias para España 2025. Los gastos reales
+          Los importes mostrados son una estimación orientativa propia, sin estudio de origen. Los gastos reales
           varían según la zona, estilo de vida y opciones personales. Esta herramienta es una
           ayuda de planificación, no un presupuesto exacto.
         </DisclaimerCard>
@@ -188,6 +189,11 @@ export default function PlanificadorGastosBebePage(): React.JSX.Element {
               </span>
             </div>
           </div>
+
+          {/* Junto a las cifras: de dónde salen (decidido el 11/10/2026, cabo C0165) */}
+          <p className={styles.avisoEstimacion}>
+            <span aria-hidden="true">ℹ️</span> {GASTOS_BEBE_META.aviso}
+          </p>
 
           {/* Barra de distribución */}
           <h3 className={styles.distributionTitle}>Distribución por categoría</h3>

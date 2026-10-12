@@ -155,10 +155,8 @@ const NIVEL_MANUAL = {
 // ponerles el sello de su módulo atribuiría el dato a una norma que no lo fija.
 // Formato: slug → motivo
 const SIN_DATA_REFERENCE_OK = {
-  // GASTOS_PRIMER_ANO_BEBE son estimaciones de precios (pañales, leche…) que viven en
-  // data/fiscal/maternidad.ts; el sello de ese módulo es el RDL 9/2025 del permiso por
-  // nacimiento. Revisado el 28/09/2026.
-  'planificador-gastos-bebe': 'estimaciones de gasto, no normativa',
+  // Vacía desde el 12/10/2026: planificador-gastos-bebe, la única que había, ya no importa de
+  // data/fiscal (sus estimaciones de precios se mudaron a data/gastos-bebe.ts, cabo C0165).
 };
 
 // Palabras en URL/nombre que elevan a Nivel 1 CRÍTICO

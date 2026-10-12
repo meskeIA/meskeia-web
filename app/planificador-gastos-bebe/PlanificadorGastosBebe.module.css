@@ -264,6 +264,15 @@
   color: var(--secondary);
 }
 
+/* De dónde salen las cifras (cabo C0165): mismo color que .salaryComparison, en el mismo panel */
+.avisoEstimacion {
+  margin: var(--spacing-md) 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
 /* Barra de distribución */
 .distributionTitle {
   font-size: 1rem;
