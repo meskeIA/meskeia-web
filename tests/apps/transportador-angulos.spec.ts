@@ -181,3 +181,77 @@ test.describe('transportador-angulos · hoja imprimible', () => {
     await expect(page.getByText(/debe medir exactamente 100 mm/)).toBeVisible();
   });
 });
+
+/**
+ * Cabo C0052 (12/10/2026) — las tarjetas usaban `var(--card-bg)`, una variable que no existe:
+ * sin reserva, la declaración entera se anula y el fondo quedaba transparente (el de la página).
+ * Ahora usan `--bg-card` (#FFFFFF / #2D2D2D). Al cambiar el fondo, el texto que llevan encima
+ * tiene que seguir llegando a 4,5:1 en los dos temas: se mide componiendo los fondos de verdad.
+ */
+test.describe('transportador-angulos · fondo de las tarjetas (C0052)', () => {
+  for (const tema of ['light', 'dark'] as const) {
+    test(`tema ${tema}: las tarjetas tienen fondo de tarjeta y su texto llega a 4,5:1`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await abrir(page);
+      if (tema === 'dark') {
+        const conmutador = page.getByRole('button', { name: /Cambiar a modo oscuro/ });
+        await expect(async () => {
+          await conmutador.click();
+          await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 1000 });
+        }).toPass({ timeout: 15000 });
+      }
+      await page.waitForTimeout(500); // transiciones de color
+
+      const r = await page.evaluate(() => {
+        const rgba = (c: string): number[] => {
+          const v = (c.match(/[\d.]+/g) ?? []).map(Number);
+          return [v[0] ?? 0, v[1] ?? 0, v[2] ?? 0, v.length > 3 ? v[3] : 1];
+        };
+        const sobre = (a: number[], b: number[]): number[] => [0, 1, 2].map((i) => a[i] * a[3] + b[i] * (1 - a[3])).concat(1);
+        const fondoDe = (el: Element): number[] => {
+          const capas: number[][] = [];
+          for (let n: Element | null = el; n; n = n.parentElement) capas.push(rgba(getComputedStyle(n).backgroundColor));
+          return capas.reverse().reduce((abajo, capa) => sobre(capa, abajo), [255, 255, 255, 1]);
+        };
+        const lum = (c: number[]): number => {
+          const [x, y, z] = c.slice(0, 3).map((v) => {
+            const s = v / 255;
+            return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+          });
+          return 0.2126 * x + 0.7152 * y + 0.0722 * z;
+        };
+        const ratio = (a: number[], b: number[]): number => {
+          const [l1, l2] = [lum(a), lum(b)].sort((p, q) => q - p);
+          return (l1 + 0.05) / (l2 + 0.05);
+        };
+        const tarjetas = Array.from(
+          document.querySelectorAll('[class*="herramienta"], [class*="hojaSection"], [class*="tipCard"]'),
+        ).filter((t) => /(^|\s)\S*(herramienta|hojaSection|tipCard)\S*/.test(t.className));
+        const fondos = tarjetas.map((t) => getComputedStyle(t).backgroundColor);
+        const malos: string[] = [];
+        for (const t of tarjetas) {
+          for (const el of Array.from(t.querySelectorAll('*'))) {
+            // Solo nodos con texto propio, visibles, y fuera del papel blanco imprimible. Los
+            // tiradores V/A/B del lienzo (blanco sobre naranja) van aparte: cabo C0225.
+            const propio = Array.from(el.childNodes).some((n) => n.nodeType === 3 && n.textContent!.trim());
+            if (!propio || el.closest('svg, [class*="hojaPapel"], [class*="punto"]')) continue;
+            const caja = el.getBoundingClientRect();
+            if (caja.width === 0 || caja.height === 0) continue;
+            const estilo = getComputedStyle(el);
+            const fondo = fondoDe(el);
+            const texto = sobre(rgba(estilo.color), fondo);
+            const q = ratio(texto, fondo);
+            // Texto grande (≥ 24 px, o ≥ 18,66 px en negrita): WCAG le pide 3:1
+            const px = parseFloat(estilo.fontSize);
+            const grande = px >= 24 || (px >= 18.66 && Number(estilo.fontWeight) >= 700);
+            if (q < (grande ? 3 : 4.5)) malos.push(`${(el.textContent ?? '').trim().slice(0, 30)} → ${q.toFixed(2)}`);
+          }
+        }
+        return { cuantas: tarjetas.length, fondos, malos };
+      });
+      expect(r.cuantas, 'tarjetas encontradas').toBeGreaterThanOrEqual(3);
+      for (const f of r.fondos) expect(f, 'fondo de la tarjeta').not.toBe('rgba(0, 0, 0, 0)');
+      expect(r.malos, 'texto bajo 4,5:1 dentro de las tarjetas').toEqual([]);
+    });
+  }
+});

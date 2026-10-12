@@ -64,7 +64,7 @@
 .herramienta {
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-lg);
-  background: var(--card-bg);
+  background: var(--bg-card); /* era --card-bg, que no existe: fondo transparente (C0052) */
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
@@ -104,7 +104,8 @@
   align-items: center;
   gap: 6px;
   padding: 10px 18px;
-  background: var(--primary);
+  /* --primary-boton: blanco sobre --primary daba 4,11:1 en claro y 2,79:1 en oscuro (C0070) */
+  background: var(--primary-boton);
   color: #ffffff;
   border: none;
   border-radius: var(--radius);
@@ -333,7 +334,7 @@
 .hojaSection {
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-lg);
-  background: var(--card-bg);
+  background: var(--bg-card); /* era --card-bg, que no existe: fondo transparente (C0052) */
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
@@ -524,7 +525,7 @@
   display: flex;
   gap: var(--spacing-sm);
   padding: var(--spacing-md);
-  background: var(--card-bg);
+  background: var(--bg-card); /* era --card-bg, que no existe: fondo transparente (C0052) */
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
