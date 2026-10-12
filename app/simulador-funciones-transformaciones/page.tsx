@@ -163,7 +163,10 @@ export default function SimuladorFuncionesTransformacionesPage() {
       const pxO = xToPx(c);
       const pyO = yToPx(d);
       if (pxO >= pad.left && pxO <= pad.left + plotW && pyO >= pad.top && pyO <= pad.top + plotH) {
-        ctx.fillStyle = '#48A9A6';
+        // Objeto gráfico: exige 3:1 con el fondo. #48A9A6 daba ≈ 2,7:1 sobre #FAFAFA; en claro va
+        // el teal oscuro de la marca (#327874, --secondary-boton: 4,93:1) y en oscuro el teal
+        // de siempre (5,12:1 sobre #2A2A2A). Decidido el 10/10/2026 (cabo C0071).
+        ctx.fillStyle = isDark ? '#48A9A6' : '#327874';
         ctx.beginPath();
         ctx.arc(pxO, pyO, 5, 0, 2 * Math.PI);
         ctx.fill();

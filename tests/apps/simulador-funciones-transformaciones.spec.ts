@@ -282,7 +282,9 @@ test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', 
   }
 
   const AZUL: Rgb = [46, 134, 171]; // #2E86AB, `colorTransf` de dibujar()
-  const TEAL: Rgb = [72, 169, 166]; // #48A9A6, el punto (c, d)
+  // El punto (c, d) en tema claro: #327874 desde el 12/10/2026 (cabo C0071; antes #48A9A6, a
+  // ≈ 2,7:1 del fondo #FAFAFA). Sigue a 57 de distancia del azul de la curva: < 20 los separa.
+  const TEAL: Rgb = [50, 120, 116];
   const ES_CURVA = 20;
   const NO_ES_CURVA = 60;
 
@@ -499,6 +501,38 @@ test.describe('Inspector 28/09/2026 — ecuación, lienzo, textos y contraste', 
     expect(await distanciaColor(page, 2, 2, AZUL), 'f(2) = cos 0 + 1 = 2').toBeLessThan(ES_CURVA);
     expect(await distanciaColor(page, 2 + Math.PI / 2, 1, AZUL), 'cruce con y = d').toBeLessThan(ES_CURVA);
   });
+
+  // Cabo C0071 (decidido el 10/10/2026): el punto (c, d) es un objeto gráfico y exige 3:1 con el
+  // fondo del lienzo en los dos temas. #48A9A6 sobre #FAFAFA daba ≈ 2,7:1.
+  for (const tema of ['light', 'dark'] as const) {
+    test(`C0071 · el punto (c, d) llega a 3:1 con el fondo en tema ${tema}`, async ({ page }) => {
+      await abrir(page, tema);
+      await escenario(page, 'cos(x)', { a: 1, b: 1, c: 2, d: 1 });
+      const leer = (x: number, y: number) =>
+        lienzo(page).evaluate(
+          (el, a) => {
+            const cv = el as HTMLCanvasElement;
+            const rect = cv.getBoundingClientRect();
+            const dpr = cv.width / rect.width;
+            const px = 50 + ((a.x + 10) / 20) * (rect.width - 80);
+            const py = 30 + ((8 - a.y) / 16) * (rect.height - 70);
+            const d = cv.getContext('2d')!.getImageData(Math.round(px * dpr), Math.round(py * dpr), 1, 1).data;
+            return [d[0], d[1], d[2]] as [number, number, number];
+          },
+          { x, y },
+        );
+      const lum = ([r, g, b]: number[]) => {
+        const f = (c: number) => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+        return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+      };
+      await expect.poll(async () => {
+        const punto = await leer(2, 1);
+        const fondo = await leer(-9.5, 7.5); // entre líneas de la cuadrícula: el fondo puro
+        const [a, b] = [lum(punto), lum(fondo)].sort((p, q) => q - p);
+        return (a + 0.05) / (b + 0.05);
+      }).toBeGreaterThanOrEqual(3);
+    });
+  }
 
   test('x² con b = 1 y c = 2 se escribe (x − 2)², sin paréntesis de más', async ({ page }) => {
     await abrir(page);
