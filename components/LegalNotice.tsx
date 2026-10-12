@@ -50,14 +50,14 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
           <span className={styles.linkTextShort}>Términos</span>
         </a>
 
-        <span className={styles.separator}>|</span>
+        <span className={styles.separator} aria-hidden="true">|</span>
 
         <a href={URL_PRIVACIDAD} className={styles.link}>
           <span className={styles.linkTextFull}>Política de Privacidad</span>
           <span className={styles.linkTextShort}>Privacidad</span>
         </a>
 
-        <span className={styles.separator}>|</span>
+        <span className={styles.separator} aria-hidden="true">|</span>
 
         <Link href="/contacto" className={styles.link}>
           Contacto
@@ -66,7 +66,7 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
 
       {lastUpdated && (
         <>
-          <span className={styles.separator}>|</span>
+          <span className={styles.separator} aria-hidden="true">|</span>
           <span className={styles.lastUpdated}>
             <span className={styles.lastUpdatedFull}>
               Última actualización: {formatDate(lastUpdated)}
@@ -78,7 +78,7 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
         </>
       )}
 
-      <span className={styles.separator}>|</span>
+      <span className={styles.separator} aria-hidden="true">|</span>
 
       <span className={styles.copyright}>
         <span className={styles.copyrightFull}>© {new Date().getFullYear()} meskeIA</span>
