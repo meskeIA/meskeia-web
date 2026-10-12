@@ -587,7 +587,7 @@
 }
 
 .cuentaTNombre {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 0.7rem var(--spacing-md);
   font-weight: 700;

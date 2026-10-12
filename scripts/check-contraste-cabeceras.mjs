@@ -86,6 +86,12 @@
  *   · Los botones, badges y números de paso con fondo de marca (2.042 bloques medidos el
  *     22/09/2026, 1.004 de ellos botones, en 782 apps): campaña aparte, porque cambiarlos
  *     altera el aspecto de la interacción.
+ *   · Las cabeceras hechas con una CLASE cualquiera (`.comparativaHeader`, `.dayHeader`…).
+ *     El censo del 12/10/2026 (cabo C0014) dio 120 bloques con blanco sobre la marca fuera de
+ *     th/thead/.th, y solo 15 eran cabeceras: el resto, números de paso, contadores, celdas
+ *     activas y burbujas. El nombre de la clase no las separa, así que la forma del código no
+ *     lo demuestra y aquí no hay candado: las 15 se drenaron a `--primary-boton` ese día, y
+ *     las demás son de la campaña de los botones (cabo C0070).
  *
  * ESCAPE
  * ──────

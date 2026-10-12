@@ -225,7 +225,7 @@
 }
 
 .gridHeader {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
   font-size: 0.85rem;
@@ -537,7 +537,7 @@
 }
 
 .mobileDayTitle {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 0.5rem var(--spacing-md);
   font-size: 1rem;
