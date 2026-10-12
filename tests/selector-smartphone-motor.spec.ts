@@ -154,7 +154,11 @@ test.describe('Hallazgo 945 — el pliego de características cuadra con la gama
   });
 });
 
-test.describe('El sistema operativo se decide aparte del presupuesto', () => {
+// Matiz (cabo C0111): lo que es independiente del presupuesto es `os`, el sistema que PIDE el
+// ecosistema. El que se RECOMIENDA (`osRecomendado`) pasa a Android cuando el tramo no tiene
+// iPhone nuevo y se prefiere nuevo (hallazgo 2660); ese caso lo barre
+// tests/apps/selector-smartphone.spec.ts («esos 24.576 se recomiendan Android»).
+test.describe('El sistema que pide el ecosistema (os) se decide aparte del presupuesto', () => {
   test('tres o más puntos de ecosistema Apple llevan a iOS', () => {
     // si_muchos (+3) con un ordenador que no resta: 3 puntos.
     expect(calcularResultado({ ...EXIGENTE, 9: 'medio', 4: 'si_muchos', 5: 'otro' }).os).toBe('ios');
