@@ -9,6 +9,7 @@ import {
   RelatedApps,
   ShareCard,
   EducationalSection,
+  AnalyticsTracker,
 } from '@/components';
 import styles from './QuizTiposPlantas.module.css';
 
@@ -173,7 +174,22 @@ const ESTADO_INICIAL: EstadoJuego = {
 // COMPONENTE PRINCIPAL
 // ============================================================================
 
+/**
+ * El AnalyticsTracker va aquí, una sola vez y fuera de las fases, y los Footer de la app no
+ * lo llevan (sin appName). Durante el juego la app quita el pie a propósito; si el tracker
+ * viviera en él, al llegar a los resultados se montaría otra vez y contaría otra visita por
+ * partida (cabo C0224, testigo en tests/apps/footer-una-visita-por-carga.spec.ts).
+ */
 export default function QuizTiposPlantas() {
+  return (
+    <>
+      <AnalyticsTracker appName="quiz-tipos-plantas" />
+      <QuizPorFases />
+    </>
+  );
+}
+
+function QuizPorFases() {
   const [juego, setJuego] = useState<EstadoJuego>(ESTADO_INICIAL);
 
   // Opciones de la pregunta actual (re-generadas al cambiar de pregunta)
@@ -526,7 +542,7 @@ export default function QuizTiposPlantas() {
           <RelatedApps />
           <ShareCard appName="quiz-tipos-plantas" />
         </main>
-        <Footer appName="quiz-tipos-plantas" />
+        <Footer />
       </div>
     );
   }
@@ -729,7 +745,7 @@ export default function QuizTiposPlantas() {
         <RelatedApps />
         <ShareCard appName="quiz-tipos-plantas" />
       </main>
-      <Footer appName="quiz-tipos-plantas" />
+      <Footer />
     </div>
   );
 }

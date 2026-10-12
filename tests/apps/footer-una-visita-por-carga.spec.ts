@@ -93,3 +93,25 @@ test('selector-tipo-gimnasio: cuestionario → resultado no registra una visita 
   await page.getByRole('heading', { name: 'Tu resultado', level: 1 }).waitFor();
   await sinMontajesNuevos(page, montajes, base);
 });
+
+/**
+ * Cabo C0224 (12/10/2026): durante el juego quiz-tipos-plantas devuelve otra raíz SIN Footer a
+ * propósito («sin header ni footer»), así que la `key` no basta: el pie desaparece y, al ver los
+ * resultados, se monta otra vez y cuenta otra visita por partida. La reparación que decidió el
+ * usuario no cambia nada en pantalla: el tracker se monta una vez, fuera de las fases, y los
+ * Footer de la app no lo llevan.
+ */
+test('quiz-tipos-plantas: portada → partida entera → resultados no registra una visita nueva', async ({ page }) => {
+  const montajes = await cargar(page, '/quiz-tipos-plantas/');
+  const base = montajes();
+  await page.getByRole('button', { name: /^Modo rápido/ }).click();
+  const siguiente = page.getByRole('button', { name: /^(Siguiente|Ver resultados) →$/ });
+  for (let i = 0; i < 20; i++) {
+    await expect(page.getByText(`Pregunta ${i + 1} / 20`)).toBeVisible();
+    await page.locator('[class*="opcionesGrid"] button').first().click();
+    await siguiente.click();
+  }
+  await expect(page.getByText(`Pregunta 20 / 20`)).toHaveCount(0);
+  await expect(page.locator('footer').first()).toBeVisible();
+  await sinMontajesNuevos(page, montajes, base);
+});
