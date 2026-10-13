@@ -22,12 +22,12 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   por arriba (`score <= 16` es Conservador), así que 16, 22, 28 y 34 pertenecen al tramo
  *   de ABAJO — eso es lo que ancla el caso 2.
  *
- *   Nota: el campo `range` de `PROFILES` no se pinta en ninguna parte ni lo lee `getProfile`;
- *   es dato muerto. Si alguien lo edita creyendo mover un corte, no se moverá nada. Por eso
- *   aquí los tramos se anclan por la PANTALLA, no por esa constante.
+ *   Nota (20/08/2026, DESFASADA): entonces el campo `range` de `PROFILES` no se pintaba ni lo
+ *   leía nadie. Desde las reparaciones del 21/08 y el 22/09 se pinta («tramo X–Y») y lo usa
+ *   `getBarPosition`; `getProfile` sigue sin leerlo, así que los tramos se anclan por la PANTALLA.
  *
- *   Barra del resultado: `getBarPosition(score) = (score - 10) / 30 * 100`, sobre cinco
- *   segmentos del 20 % cada uno.
+ *   Barra del resultado (20/08/2026, DESFASADO desde el 21/08): `getBarPosition(score) =
+ *   (score - 10) / 30 * 100`. La fórmula vigente está en la re-inspección del 22/09, más abajo.
  *
  * LAS CARTERAS (`PROFILES[*].allocation`, RV/RF/Liquidez/Alternativos)
  *   Conservador 15/60/20/5 · Moderado 30/50/15/5 · Equilibrado 50/35/10/5
@@ -36,9 +36,11 @@ import { esperarPaginaAsentada } from './_hidratacion';
  *   adonde apunta el botón «Simular esta Cartera» con `?perfil=<slug>`: comprobado que el
  *   traspaso existe y cuadra.
  *
- * HALLAZGOS ABIERTOS: al final, marcados con `test.fail()` — afirman lo que debería pasar y
- * hoy fallan a propósito. El día que se reparen se ponen en verde: quitar entonces la línea
- * `test.fail()` y quedan como regresión.
+ * HALLAZGOS: cada inspección los escribe con `test.fail()` —afirman lo que debería pasar y fallan
+ * a propósito mientras el defecto siga— y al repararlos se quita esa línea y quedan como
+ * regresión. Los del 20/08, el 22/09 y el 26/09/2026 están REPARADOS (la base no tenía ninguno
+ * abierto el 12/10/2026); los únicos `test.fail()` vivos son los de la re-inspección del
+ * 12/10/2026, al final del fichero.
  */
 
 const RUTA = '/test-perfil-inversor/';
@@ -254,9 +256,9 @@ test.describe('Caso a rechazar: cuestionario incompleto', () => {
 });
 
 // ============================================================
-// HALLAZGOS ABIERTOS del 20/08/2026. Todos fallan HOY a propósito.
+// HALLAZGOS del 20/08/2026 — los siete REPARADOS el 21/08/2026. Los comentarios de cada caso
+// cuentan el defecto tal como se vio entonces; hoy son regresiones y pasan en verde.
 // ============================================================
-// REGRESIONES — los siete hallazgos del 20/08/2026, reparados el 21/08/2026.
 test.describe('Test de perfil inversor — regresiones', () => {
   test('los datos estructurados prometen tres perfiles y la app asigna cinco', async ({ page }) => {
     await page.goto(RUTA);
@@ -504,15 +506,15 @@ test.describe('re-inspección 22/09/2026', () => {
   });
 
   // ---------- CASO 3: lo que debe rechazarse ----------
-  // La sesión guardada no es legible y la app NO se repone: se queda en la pantalla de
-  // error, y como nadie borra la clave, cada recarga vuelve a caer en la misma piedra.
+  // REPARADO (1213). El 22/09 una sesión guardada ilegible dejaba la app en la pantalla de
+  // error, y como nadie borraba la clave, cada recarga volvía a caer en la misma piedra.
   test('1213 — una sesión guardada ilegible empieza de cero y no rompe la app', async ({
     page,
   }) => {
     await conSesionLimpia(page);
-    // `leerSesion` solo comprueba la FORMA: `typeof currentQuestion === 'number'` y
-    // `typeof answers === 'object'`. Un índice de pregunta fuera de rango pasa el filtro,
-    // y luego `QUESTIONS[42]` es undefined → `question.id` revienta el render.
+    // Entonces `leerSesion` solo comprobaba la FORMA: `typeof currentQuestion === 'number'` y
+    // `typeof answers === 'object'`. Un índice de pregunta fuera de rango pasaba el filtro,
+    // y luego `QUESTIONS[42]` era undefined → `question.id` reventaba el render.
     await page.evaluate(() =>
       sessionStorage.setItem(
         'meskeia:test-perfil-inversor:v1',
@@ -543,15 +545,16 @@ test.describe('re-inspección 22/09/2026', () => {
     );
     await page.goto(RUTA);
     await esperarHidratacion(page);
-    // `Object.keys(null)` lanza dentro del useEffect de recuperación.
+    // Antes de la reparación, `Object.keys(null)` lanzaba dentro del useEffect de recuperación.
     await expect(page.getByText('Algo salió mal')).toHaveCount(0);
   });
 
-  // ---------- Hallazgos abiertos de esta re-inspección ----------
+  // ---------- Hallazgos de esta re-inspección (1214-1221): REPARADOS, hoy son regresiones ----------
+  // Los comentarios de cada caso cuentan el defecto tal como se vio el 22/09/2026.
   test('1220 (regresión) — el aviso de borde NO sale en los dos extremos de la escala', async ({ page }) => {
     await conSesionLimpia(page);
     // 10 puntos es el MÍNIMO teórico (todo A): no existe un 9, así que «con un punto de
-    // diferencia el resultado sería el perfil de al lado» es falso. Pasa igual con 40.
+    // diferencia el resultado sería el perfil de al lado» era falso. Pasaba igual con 40.
     await empezar(page);
     await responder(page, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     await expect(puntuacion(page)).toContainText('10 puntos');
@@ -565,20 +568,20 @@ test.describe('re-inspección 22/09/2026', () => {
     await empezar(page);
     await opcion(page, 1).click();
     await botonSiguiente(page).click();
-    // «Siguiente →» se deshabilita al cambiar de pregunta (la nueva no tiene respuesta),
-    // así que el navegador suelta el foco: activeElement pasa a ser BODY y el siguiente
-    // Tab aterriza en el pie («catálogo de meskeIA»), no en las opciones de la pregunta
-    // que se acaba de abrir. Hay que retroceder con Shift+Tab para contestarla. Y nada
-    // anuncia el cambio: el único [aria-live] de la página es el de rutas de Next.
+    // «Siguiente →» se deshabilita al cambiar de pregunta (la nueva no tiene respuesta), y
+    // antes de la reparación el navegador soltaba el foco: activeElement pasaba a ser BODY y el
+    // siguiente Tab aterrizaba en el pie («catálogo de meskeIA»), no en las opciones de la
+    // pregunta recién abierta. Y nada anunciaba el cambio: el único [aria-live] de la página
+    // era el de rutas de Next. Hoy el foco va a la tarjeta, que es `aria-live`.
     expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
   });
 
   test('1216 (regresión) — los datos estructurados no llaman «validadas» a las 10 preguntas', async ({ page }) => {
     await page.goto(RUTA);
-    // `featureList` del WebApplication dice «10 preguntas validadas para evaluar tolerancia
+    // `featureList` del WebApplication decía «10 preguntas validadas para evaluar tolerancia
     // al riesgo». No hay validación de ninguna clase: el cuestionario y sus puntuaciones
-    // están escritos inline en `page.tsx`, sin fuente ni referencia. Es la frase que se
-    // llevan los asistentes de IA, en una app de riesgo financiero.
+    // están escritos inline en `page.tsx`, sin fuente ni referencia. Era la frase que se
+    // llevaban los asistentes de IA, en una app de riesgo financiero.
     const estructurados = (
       await page.locator('script[type="application/ld+json"]').allInnerTexts()
     ).join(' ');
@@ -592,10 +595,10 @@ test.describe('re-inspección 22/09/2026', () => {
     const reglasDeOro = page.locator('[class*="tipsSection"]');
     const erroresComunes = page.locator('[class*="warningBox"]');
     // La reparación del 21/08/2026 quitó «MSCI World» y el «60/40» del RESULTADO y le puso
-    // la nota de «ejemplos ilustrativos», pero la guía educativa de la misma página sigue
+    // la nota de «ejemplos ilustrativos», pero la guía educativa de la misma página seguía
     // dando una regla en imperativo con el índice dentro —«Diversifica globalmente. No
     // concentres en España ni en Europa. Un ETF global (MSCI World)…»— y una cifra de
-    // comportamiento sin fuente ni año («obtienen un 2–4% menos anual»).
+    // comportamiento sin fuente ni año («obtienen un 2–4% menos anual»). REPARADO.
     await expect(reglasDeOro).not.toContainText('MSCI World');
     await expect(erroresComunes).not.toContainText('2–4% menos anual');
   });
@@ -607,11 +610,12 @@ test.describe('re-inspección 22/09/2026', () => {
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const cuerpo = page.locator('body');
     // CLAUDE.md §1.bis: datos de referencia de España con metodología universal →
-    // <RegionBadge variant="es-data" />. La app no monta ninguno, y en cambio:
+    // <RegionBadge variant="es-data" />. El 22/09 la app no montaba ninguno, y en cambio:
     //   · «Los bancos hacen el test de MiFID II por obligación legal» (norma de la UE,
     //     enunciada como lo que hacen «los bancos», sin más).
     //   · ocho importes en €, «pensión pública», «cuenta remunerada».
     //   · en el faqJsonLd que leen las IAs, «letras del Tesoro» para el conservador.
+    // REPARADO: hoy monta el badge `es-data` y la frase de MiFID habla de la UE.
     expect(await page.locator('[class*="egionBadge"]').count()).toBeGreaterThan(0);
     await expect(cuerpo).not.toContainText('Los bancos hacen el test de MiFID II');
   });
@@ -620,11 +624,11 @@ test.describe('re-inspección 22/09/2026', () => {
     page,
   }) => {
     await conSesionLimpia(page);
-    // El estado restaurado no se valida: basta con que `answers` sea un objeto. Con dos
-    // respuestas y el índice en la última pregunta, la app deja pedir el resultado y
-    // emite un juicio sobre la persona con una puntuación IMPOSIBLE en su propia escala:
-    // «3 puntos · tramo 10–16» —el tramo no contiene la puntuación que él mismo imprime—
-    // y la flecha se va a left: -16,6667 %, fuera de la barra.
+    // El 22/09 el estado restaurado no se validaba: bastaba con que `answers` fuera un objeto.
+    // Con dos respuestas y el índice en la última pregunta, la app dejaba pedir el resultado y
+    // emitía un juicio sobre la persona con una puntuación IMPOSIBLE en su propia escala:
+    // «3 puntos · tramo 10–16» —el tramo no contenía la puntuación que él mismo imprimía—
+    // y la flecha se iba a left: -16,6667 %, fuera de la barra. REPARADO.
     await page.evaluate(() =>
       sessionStorage.setItem(
         'meskeia:test-perfil-inversor:v1',
@@ -663,8 +667,9 @@ test.describe('re-inspección 22/09/2026', () => {
     // Irse y volver en la misma pestaña (el logo lleva a la home) es un recorrido normal.
     await page.goto(RUTA);
     await expect(enunciado(page)).toHaveCount(1); // la recuperación funciona…
-    // …pero no hay ni aviso de que se ha recuperado un test a medias ni forma de empezar
-    // de nuevo: los únicos botones de la fase son A-D, «Anterior» y «Siguiente».
+    // …y el 22/09 no había ni aviso de que se había recuperado un test a medias ni forma de
+    // empezar de nuevo: los únicos botones de la fase eran A-D, «Anterior» y «Siguiente».
+    // REPARADO: aviso con «Empezar de cero».
     await expect(page.getByRole('button', { name: /Comenzar Test|Repetir Test|empezar/i })).toHaveCount(
       1,
     );
@@ -1142,5 +1147,428 @@ test.describe('re-inspección 26/09/2026 · móvil', () => {
     await esperarPaginaAsentada(page);
     await expect(page.getByText(/Hemos recuperado el test/)).toBeVisible();
     expect(await page.evaluate(() => document.activeElement?.tagName)).toBe('BODY');
+  });
+});
+
+// ============================================================
+// RE-INSPECCIÓN 12/10/2026 — FIRMA DE ROTURA (nivel) y cabo C0158
+//
+// LA FIRMA. Analytics: 76,2 % de visitas cortas (catálogo 62,8 %) y 33,3 % de recargas
+// (catálogo 3,2 %) en 63 visitas de los 30 días hasta el 11/10. Partida en dos con el dump del
+// 12/10 y la misma definición que `scripts/inspector/firma.mjs`:
+//   12/09–26/09 (antes de bbb70c9b): 46 visitas · 84,8 % cortas · 45,7 % recargas
+//   27/09–11/10 (después):           17 visitas · 52,9 % cortas ·  0,0 % recargas
+//                                    (resto del catálogo en esa ventana: 64,9 % · 2,9 %)
+// Y en el navegador, creyendo estar en https://meskeia.com (todas las peticiones contestadas en
+// local, ninguna salió): UNA carga = 1 POST /api/analytics/track/, en escritorio y en móvil
+// táctil; 0 más con Comenzar → 10 respuestas → Ver Resultado → Revisar → Ver Resultado →
+// Repetir → Comenzar → 2 respuestas; y un F5 con el test a medias, 1 más (no 2). La firma era el
+// pie remontado de 2175/2176, y su testigo es el test 2175 de arriba.
+//
+// LOS CASOS, resueltos a mano antes de abrir el navegador (A=1 · B=2 · C=3 · D=4):
+//   normal  → D,D,C,D,D,C,D,D,C,D = 4·7 + 3·3 = 37 → Agresivo (escritorio)
+//             A,C,B,B,A,C,B,D,A,B = 1+3+2+2+1+3+2+4+1+2 = 21 → Moderado (móvil 390×844)
+//   límite  → C×8 + B×2 = 28, tope de Equilibrado; desde «Revisar», la 10 de B a C = 29, suelo de
+//             Dinámico: un punto cambia el perfil y los dos llevan aviso de borde (móvil 360×740)
+//   rechazo → seis sesiones guardadas que `leerSesion` debe tirar y RETIRAR
+//
+// EL ESTIMADOR (cabo C0158). «Simular esta Cartera» lleva a /estimador-cartera-inversion/ con
+// ?perfil=<slug>, que carga la MISMA cartera (90/5/0/5 para Agresivo) y la pasa por su motor:
+// σ de RV 16 %, RF 5 %, liquidez 0,5 %, alternativos 12 %, con su matriz de correlaciones
+// (RV-RF 0,25 · RV-liq 0,10 · RV-alt 0,40 · RF-liq 0,05 · RF-alt 0,15 · liq-alt 0,05).
+// A mano, σp = √(Σ wi·wj·σi·σj·ρij):
+//   Conservador 15/60/20/5 → √0,0020506 = 4,53 %    Moderado 30/50/15/5 → √0,0038505 = 6,21 %
+//   Equilibrado 50/35/10/5 → √0,0078672 = 8,87 %    Dinámico 70/20/5/5  → √0,0138017 = 11,75 %
+//   Agresivo    90/5/0/5   → √0,0216540 = 14,72 %
+// y rentabilidad Σ wi·μi (μ = 7 · 3 · 1,5 · 5 %): 3,40 · 4,08 · 4,95 · 5,83 · 6,70 %.
+// El test anuncia para esas mismas carteras 5–8 · 8–12 · 12–15 · 15–20 · 20–25 % de volatilidad:
+// ninguna de las cinco cifras del estimador cae dentro del tramo que anuncia el test.
+// ============================================================
+
+/** Carga la app con el almacenamiento de sesión vacío y espera a que React haya hidratado. */
+async function cargarSinSesion(page: Page): Promise<void> {
+  await page.goto(RUTA);
+  await page.evaluate(() => {
+    try {
+      sessionStorage.clear();
+    } catch {
+      /* ventana privada */
+    }
+  });
+  await page.goto(RUTA);
+  await esperarPaginaAsentada(page);
+}
+
+/** Como `responder`, pero tocando (móvil). */
+async function tocarRespuestas(page: Page, indices: number[]): Promise<void> {
+  for (const i of indices) {
+    await opcion(page, i).tap();
+    await botonSiguiente(page).tap();
+  }
+}
+
+/** «14,72» → 14.72. Cifras que pinta la propia app, en formato español y sin millares. */
+function cifraEspanola(texto: string): number {
+  const [entera, decimales = ''] = texto.trim().split(',');
+  return Number(entera) + (decimales ? Number(decimales) / 10 ** decimales.length : 0);
+}
+
+/** Tramo «a–b %» → [a, b]; un «+» final («20–25 %+») deja el techo abierto. */
+function tramoPorcentual(texto: string): [number, number] {
+  const m = texto.match(/(\d+(?:,\d+)?)\s*[-–]\s*(\d+(?:,\d+)?)/);
+  if (!m) throw new Error(`«${texto}» no es un tramo a–b`);
+  return [cifraEspanola(m[1]), texto.includes('+') ? Infinity : cifraEspanola(m[2])];
+}
+
+/** El FAQPage que se sirve en el <head>: pregunta → respuesta. */
+async function faqPage(page: Page): Promise<Map<string, string>> {
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faq = bloques
+    .map((b) => JSON.parse(b) as { '@type'?: string; mainEntity?: Array<{ name: string; acceptedAnswer: { text: string } }> })
+    .find((b) => b['@type'] === 'FAQPage');
+  expect(faq, 'la página no sirve un FAQPage').toBeTruthy();
+  return new Map(faq!.mainEntity!.map((q) => [q.name, q.acceptedAnswer.text]));
+}
+
+const sinEspacios = (s: string) => s.replace(/\s+/g, ' ').trim();
+
+test.describe('re-inspección 12/10/2026', () => {
+  const puntuacion = (page: Page) => page.locator('p[class*="resultScore"]');
+  const avisoDeBorde = (page: Page) => page.locator('[class*="resultScoreBorde"]');
+
+  // ---------- CASO 1 (normal), escritorio, y el traspaso al estimador ----------
+  test('caso normal: D,D,C,D,D,C,D,D,C,D suma 37 → Agresivo, y «Simular esta Cartera» abre su 90/5/0/5 en el estimador', async ({
+    page,
+  }) => {
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [3, 3, 2, 3, 3, 2, 3, 3, 2, 3]); // 4·7 + 3·3 = 37
+    await expect(perfilMostrado(page)).toHaveText('Agresivo');
+    await expect(puntuacion(page)).toContainText('37 puntos · tramo 35–40');
+    await expect(avisoDeBorde(page)).toHaveCount(0); // 37 no es extremo de 35–40
+    // 4·20 + 2 + (37−35)/(40−35)·16 = 88,4 %
+    expect(await flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left))).toBeCloseTo(88.4, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(4);
+    // PROFILES.agresivo.traits
+    await expect(rasgo(page, 0)).toHaveText('Muy alto');
+    await expect(rasgo(page, 1)).toHaveText('> 15 años');
+    await expect(rasgo(page, 2)).toHaveText('20-25 %');
+    await expect(rasgo(page, 3)).toHaveText('Máxima rentabilidad');
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (90 %)',
+      'Renta Fija (5 %)',
+      'Liquidez (0 %)',
+      'Alternativos (5 %)',
+    ]);
+
+    await page.getByRole('link', { name: /Simular esta Cartera/ }).click();
+    await page.waitForURL(/\/estimador-cartera-inversion\/\?perfil=agresivo/);
+    await esperarPaginaAsentada(page);
+    // `[class*="perfilBanner"]` casa también con su icono y su enlace: el primero es el contenedor
+    await expect(page.locator('[class*="perfilBanner"]').first()).toContainText(
+      'Simulando con tu perfil Agresivo del test',
+    );
+    // Fila «Agresivo» de su tabla: 6,70 % de rentabilidad y 14,72 % de volatilidad, a mano
+    // en la cabecera de este bloque (90/5/0/5 por su motor).
+    const fila = page
+      .locator('table', { has: page.locator('th', { hasText: 'Volatilidad' }) })
+      .locator('tr', { has: page.locator('td strong', { hasText: /^Agresivo$/ }) });
+    await expect(fila).toContainText('6,70');
+    await expect(fila).toContainText('14,72');
+  });
+
+  // ---------- Hallazgo C0158 ----------
+  test.fail('C0158 — la volatilidad que el test anuncia para cada cartera no contradice la que da el estimador al que enlaza', async ({
+    page,
+  }) => {
+    // Esperado: el σ que calcula el estimador para cada cartera cae dentro del tramo que el test
+    // anuncia para ella. No se juzga cuál de las dos cifras es la buena: basta con que las dos
+    // páginas, enlazadas por «Simular esta Cartera», no se contradigan.
+    // Obtenido (12/10/2026): 4,53 ∉ 5–8 · 6,21 ∉ 8–12 · 8,87 ∉ 12–15 · 11,75 ∉ 15–20 · 14,72 ∉ 20–25.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const celdas = await page
+      .locator('[class*="comparativaTable"] tr', { hasText: 'Volatilidad' })
+      .locator('td')
+      .allTextContents();
+    const tramos = celdas.slice(1).map(tramoPorcentual);
+    expect(tramos).toHaveLength(5);
+
+    await page.goto('/estimador-cartera-inversion/');
+    await esperarPaginaAsentada(page);
+    const perfiles = ['Conservador', 'Moderado', 'Equilibrado', 'Dinámico', 'Agresivo'];
+    const tablaDelEstimador = page.locator('table', { has: page.locator('th', { hasText: 'Volatilidad' }) });
+    const volatilidades = await tablaDelEstimador.locator('tr').evaluateAll((filas, nombres) => {
+      const porNombre = new Map(
+        filas.map((f) => {
+          const tds = Array.from(f.querySelectorAll('td')).map((td) => td.textContent ?? '');
+          return [tds[0]?.trim(), tds[3] ?? ''] as const;
+        }),
+      );
+      return nombres.map((n) => (porNombre.get(n) ?? '').replace(/[^\d,]/g, ''));
+    }, perfiles);
+    expect(volatilidades.every((v) => v.length > 0)).toBe(true);
+
+    const contradicciones = perfiles
+      .map((p, i) => ({ p, sigma: cifraEspanola(volatilidades[i]), tramo: tramos[i] }))
+      .filter(({ sigma, tramo }) => sigma < tramo[0] || sigma > tramo[1])
+      .map(({ p, sigma, tramo }) => `${p}: estimador ${sigma} % fuera de ${tramo[0]}–${tramo[1]} %`);
+    expect(contradicciones).toEqual([]);
+  });
+
+  // ---------- CASO 3 (rechazo) ----------
+  test('caso a rechazar: seis sesiones guardadas ilegibles empiezan de cero y se retiran', async ({ page }) => {
+    test.setTimeout(60_000);
+    const CLAVE = 'meskeia:test-perfil-inversor:v1';
+    // Cada una la rechaza un control distinto de `leerSesion`; esperado en todas: portada con
+    // «Comenzar Test», sin «Algo salió mal», sin aviso de test recuperado y la clave RETIRADA.
+    const ilegibles: Record<string, string> = {
+      'respuesta que no es opción (la 2 solo admite 1-4)': JSON.stringify({ currentQuestion: 4, answers: { 1: 2, 2: 5 } }),
+      'índice de pregunta no entero': JSON.stringify({ currentQuestion: 2.5, answers: { 1: 2 } }),
+      'pregunta que no existe (la 11)': JSON.stringify({ currentQuestion: 3, answers: { 11: 2 } }),
+      'respuestas como array': JSON.stringify({ currentQuestion: 3, answers: [2, 3] }),
+      'puntos como texto': JSON.stringify({ currentQuestion: 3, answers: { 1: '2' } }),
+      'JSON cortado': '{"currentQuestion": 3, "answers": {1: 2',
+    };
+    for (const [caso, valor] of Object.entries(ilegibles)) {
+      await page.goto(RUTA);
+      await page.evaluate(([k, v]) => sessionStorage.setItem(k, v), [CLAVE, valor]);
+      await page.goto(RUTA);
+      await esperarPaginaAsentada(page);
+      await expect(page.getByRole('button', { name: /Comenzar Test/ }), caso).toBeVisible();
+      await expect(enunciado(page), caso).toHaveCount(0);
+      await expect(page.getByText(/Hemos recuperado el test/), caso).toHaveCount(0);
+      await expect(page.getByText('Algo salió mal'), caso).toHaveCount(0);
+      expect(await page.evaluate((k) => sessionStorage.getItem(k), CLAVE), caso).toBeNull();
+    }
+    // Control: una sesión VÁLIDA sí se recupera (el rechazo no es «nunca recupera nada»).
+    await page.evaluate(
+      (k) => sessionStorage.setItem(k, JSON.stringify({ currentQuestion: 2, answers: { 1: 2, 2: 3 } })),
+      CLAVE,
+    );
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+    await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+    await expect(page.getByText(/con 2 de 10 respuestas/)).toBeVisible();
+  });
+
+  // ---------- Hallazgos de contenido ----------
+  test.fail('HALLAZGO — la guía no presenta este test como «más objetivo» que el de idoneidad del banco', async ({
+    page,
+  }) => {
+    // La FAQ avanzada dice del test MiFID II del banco que «a veces está sesgado […] para reducir
+    // reclamaciones» y que «el de este test busca darte una imagen más objetiva de tu situación
+    // real». La propia app reconoce en metadata.ts (hallazgo 1216) que su cuestionario, sus
+    // pesos 1-4 y sus cinco tramos no tienen fuente, referencia ni validación.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const respuesta = page
+      .locator('[class*="faqSectionItem"]')
+      .filter({ hasText: '¿Qué pasa si el banco me asigna un perfil diferente?' });
+    await expect(respuesta).toHaveCount(1);
+    await expect(respuesta).not.toContainText('más objetiva');
+  });
+
+  test.fail('HALLAZGO — «cada cuánto revisar el perfil» tiene UNA respuesta en el FAQPage y en la FAQ visible', async ({
+    page,
+  }) => {
+    // FAQPage: «…al menos una vez al año, y además ante cambios significativos en la situación
+    // personal: proximidad a la jubilación, cambio de empleo, herencia, matrimonio, divorcio o
+    // cambio en los objetivos financieros. El perfil puede evolucionar a lo largo de la vida.»
+    // Visible: «…al menos una vez al año y siempre que ocurra un cambio vital significativo: nuevo
+    // trabajo, matrimonio, nacimiento de hijos, herencia, compra de vivienda o jubilación próxima.
+    // Los mercados también cambian tu exposición real…»
+    await page.goto(RUTA);
+    const faq = await faqPage(page);
+    const enFaqPage = faq.get('¿Cada cuánto tiempo se debe revisar el perfil inversor?');
+    expect(enFaqPage).toBeTruthy();
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const visible = await page
+      .locator('[class*="faqSectionItem"]')
+      .filter({ hasText: '¿Con qué frecuencia debo revisar mi perfil?' })
+      .locator('p')
+      .first()
+      .textContent();
+    expect(sinEspacios(visible ?? '')).toBe(sinEspacios(enFaqPage ?? ''));
+  });
+
+  test.fail('HALLAZGO — el FAQPage describe al perfil agresivo con lo que la página le asocia', async ({ page }) => {
+    // FAQPage: «invierte principalmente en renta variable: acciones individuales, fondos de bolsa,
+    // ETFs sectoriales y mercados emergentes». La página, para Agresivo: «ETFs 100 % renta
+    // variable global», «Exposición significativa a mercados emergentes», factores; su tabla,
+    // «100 % acciones globales»; y su regla de oro, «Diversifica globalmente». Acciones sueltas y
+    // ETFs de un sector son concentración, lo contrario de lo que la página asocia a ese perfil.
+    await page.goto(RUTA);
+    const faq = await faqPage(page);
+    const agresivo = faq.get('¿En qué invierte un perfil agresivo?') ?? '';
+    expect(agresivo.length).toBeGreaterThan(0);
+    expect(agresivo).not.toMatch(/acciones individuales|ETFs sectoriales/);
+  });
+
+  test.fail('HALLAZGO — la tabla comparativa nombra los rasgos como el resultado y no da al Equilibrado otro reparto', async ({
+    page,
+  }) => {
+    // El resultado pinta «Volatilidad esperada» y «Horizonte ideal»; la tabla de la guía da los
+    // MISMOS tramos como «Volatilidad máxima» y «Horizonte mínimo». Y la tabla pone al
+    // Equilibrado «ETFs globales 60/40» cuando su cartera es 50/35/10/5.
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]); // 20 → Moderado
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    const rotulos = (await page.locator('[class*="traitLabel"]').allTextContents()).filter((r) =>
+      /Volatilidad|Horizonte/.test(r),
+    );
+    expect(rotulos).toHaveLength(2);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const tabla = page.locator('[class*="comparativaTable"]');
+    const cabecerasDeFila = (await tabla.locator('tbody tr td:first-child').allTextContents()).map(sinEspacios);
+    expect(cabecerasDeFila).toEqual(expect.arrayContaining(rotulos));
+    const activos = await tabla.locator('tr', { hasText: 'Activos típicos' }).locator('td').allTextContents();
+    expect(activos[3]).not.toContain('60/40'); // columna Equilibrado
+  });
+});
+
+test.describe('re-inspección 12/10/2026 · móvil 390×844', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso normal tocando: A,C,B,B,A,C,B,D,A,B suma 21 → Moderado, sin aviso de borde', async ({ page }) => {
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await tocarRespuestas(page, [0, 2, 1, 1, 0, 2, 1, 3, 0, 1]); // 1+3+2+2+1+3+2+4+1+2 = 21
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('21 puntos · tramo 17–22');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(0); // ni 17 ni 22
+    // 1·20 + 2 + (21−17)/(22−17)·16 = 34,8 %
+    expect(await flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left))).toBeCloseTo(34.8, 1);
+    // PROFILES.moderado
+    await expect(rasgo(page, 0)).toHaveText('Bajo');
+    await expect(rasgo(page, 1)).toHaveText('3-5 años');
+    await expect(rasgo(page, 2)).toHaveText('8-12 %');
+    await expect(rasgo(page, 3)).toHaveText('Batir inflación');
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (30 %)',
+      'Renta Fija (50 %)',
+      'Liquidez (15 %)',
+      'Alternativos (5 %)',
+    ]);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=moderado',
+    );
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});
+
+test.describe('re-inspección 12/10/2026 · móvil 360×740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  // ---------- CASO 2 (límite) ----------
+  test('caso límite tocando: 28 es el tope de Equilibrado y, revisando la 10 de B a C, 29 ya es Dinámico', async ({
+    page,
+  }) => {
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await tocarRespuestas(page, [2, 2, 2, 2, 2, 2, 2, 2, 1, 1]); // C×8 + B×2 = 24 + 4 = 28
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('28 puntos · tramo 23–28');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(1); // tope de su tramo
+    // 2·20 + 2 + (28−23)/(28−23)·16 = 58 %
+    expect(await flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left))).toBeCloseTo(58, 1);
+
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).tap();
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    // La 10 conserva la B (2 puntos): «Acepto algo de riesgo si la posible ganancia lo justifica»
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toContainText('Acepto algo de riesgo');
+    await opcion(page, 2).tap(); // B → C: +1
+    await botonSiguiente(page).tap();
+    await expect(perfilMostrado(page)).toHaveText('Dinámico');
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('29 puntos · tramo 29–34');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(1); // suelo de su tramo
+    // 3·20 + 2 + (29−29)/(34−29)·16 = 62 %
+    expect(await flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left))).toBeCloseTo(62, 1);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=dinamico',
+    );
+  });
+
+  // ---------- Hallazgos de operativa en móvil ----------
+  test.fail('HALLAZGO — la flecha de la barra señala la etiqueta del perfil que se nombra (31 y 37 puntos)', async ({
+    page,
+  }) => {
+    // Las cinco etiquetas van con `justify-content: space-between` y sin hueco: a 360 px suman
+    // 297 px sobre una barra de 264, se pegan («ConservadorModeradoEquilibradoDinámicoAgresivo»)
+    // y se salen 33 px por la derecha. La flecha se coloca por SEGMENTO (20 % cada uno), así que
+    // con 31 puntos (Dinámico, 68,4 %) cae sobre «Equilibrado», y con 37 (Agresivo, 88,4 %),
+    // sobre «Dinámico».
+    test.setTimeout(60_000);
+    const casos = [
+      { indices: [3, 2, 3, 1, 2, 3, 2, 1, 3, 1], perfil: 'Dinámico' }, // 4+3+4+2+3+4+3+2+4+2 = 31
+      { indices: [3, 3, 2, 3, 3, 2, 3, 3, 2, 3], perfil: 'Agresivo' }, // 4·7 + 3·3 = 37
+    ];
+    const problemas: string[] = [];
+    for (const { indices, perfil } of casos) {
+      await cargarSinSesion(page);
+      await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+      await tocarRespuestas(page, indices);
+      await expect(perfilMostrado(page)).toHaveText(perfil);
+      // La flecha anima `left`: medir cuando ha terminado
+      await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined))));
+      const g = await page.evaluate(() => {
+        const f = document.querySelector('[class*="profileArrow"]')!.getBoundingClientRect();
+        const barra = document.querySelector('[class*="profileBar"]')!.getBoundingClientRect();
+        const etiquetas = Array.from(document.querySelectorAll('[class*="profileLabels"] span')).map((e) => {
+          const r = e.getBoundingClientRect();
+          return { texto: e.textContent ?? '', izq: r.left, der: r.right };
+        });
+        return { cx: f.left + f.width / 2, derBarra: barra.right, etiquetas };
+      });
+      const bajoLaFlecha = g.etiquetas.find((e) => g.cx >= e.izq && g.cx <= e.der)?.texto ?? '(hueco)';
+      if (bajoLaFlecha !== perfil) problemas.push(`${perfil}: la flecha señala «${bajoLaFlecha}»`);
+      const derEtiquetas = Math.max(...g.etiquetas.map((e) => e.der));
+      if (derEtiquetas > g.derBarra + 1) problemas.push(`etiquetas ${Math.round(derEtiquetas - g.derBarra)} px más allá de la barra`);
+    }
+    expect(problemas).toEqual([]);
+  });
+
+  test.fail('HALLAZGO — un doble toque en «Siguiente» avanza una pregunta y no toca nada de la nueva', async ({
+    page,
+  }) => {
+    // «Anterior» y «Siguiente» van apilados y la tarjeta cambia de alto entre preguntas sin
+    // recolocar la vista: de la 1 a la 2, «Siguiente» baja 75 px y «← Anterior» ocupa su sitio.
+    // Con «Siguiente» al pie de la pantalla, el segundo toque de un doble toque (90 ms) devuelve
+    // a la pregunta 1. (Con «Siguiente» a media pantalla, el segundo toque marcaba una opción de
+    // la pregunta 2.)
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await opcion(page, 1).tap();
+    await botonSiguiente(page).evaluate((el) => {
+      window.scrollBy(0, el.getBoundingClientRect().bottom - (window.innerHeight - 24));
+    });
+    await page.waitForTimeout(200);
+    const caja = await botonSiguiente(page).boundingBox();
+    expect(caja).not.toBeNull();
+    const x = caja!.x + caja!.width / 2;
+    const y = caja!.y + caja!.height / 2;
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(90);
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(300);
+    await expect(page.getByText('Pregunta 2 de 10')).toBeVisible();
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(0);
   });
 });

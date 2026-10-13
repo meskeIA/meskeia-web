@@ -1720,10 +1720,21 @@ test.describe('06/10 · móvil 390×844 — la firma de rotura: el flujo entero 
   });
 
   test('generar tres veces, guardar y repartir: sin recarga, sin desbordar y con «Le llega» a la vista', async ({ page }) => {
-    let navegaciones = 0;
-    page.on('framenavigated', (f) => { if (f === page.mainFrame()) navegaciones++; });
+    // C0172 (diagnosticado el 12/10/2026): el fallo intermitente «navegaciones = 1» era del TEST,
+    // no de la app. Contaba `framenavigated`, que Playwright emite también en una navegación DENTRO
+    // del mismo documento, y el router de Next hace una al hidratar: history.replaceState con las
+    // claves __NA y __PRIVATE_NEXTJS_INTERNALS_TREE, sobre la misma URL, desde la fase de commit
+    // de React. Si la hidratación terminaba después de poner la escucha (bajo next dev, 1 de cada
+    // 2), contaba 1 sin que ningún toque hiciera nada. Medido: con la CPU a ×1, ×4 y ×8, ese
+    // replaceState cae tras resolver `goto` en 9 de 9 cargas sin tocar nada, y en el flujo entero
+    // (5 vueltas) no hay ninguna otra navegación y la marca puesta en `window` sobrevive.
+    // Ahora se cuenta lo que SÍ es recargar o navegar: un documento nuevo (`domcontentloaded`),
+    // una marca en `window` que un documento nuevo no conservaría, y la ruta (un #ancla la cambia).
+    let documentosNuevos = 0;
+    page.on('domcontentloaded', () => { documentosNuevos++; });
     await esperarInteractiva(page);
     await esperarHidratacion(page, ['section[aria-labelledby="pena-titulo"] input']);
+    await page.evaluate(() => { (window as unknown as { __sinRecarga?: boolean }).__sinRecarga = true; });
     await page.getByRole('button', { name: '3', exact: true }).tap();
     for (let i = 1; i <= 3; i++) {
       await botonGenerar(page).scrollIntoViewIfNeeded();
@@ -1746,12 +1757,16 @@ test.describe('06/10 · móvil 390×844 — la firma de rotura: el flujo entero 
     expect(await recibeElClic(leLlega)).toBe(true); // ni la barra del logo ni nada encima
     // La tabla (6 columnas) se desliza dentro de su envoltorio; la página no desborda
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
-    expect(navegaciones).toBe(0); // ningún toque recargó la página
+    // Ningún toque recargó la página ni navegó a otra parte
+    expect(documentosNuevos).toBe(0);
+    expect(await page.evaluate(() => (window as unknown as { __sinRecarga?: boolean }).__sinRecarga)).toBe(true);
+    const url = new URL(page.url());
+    expect(url.pathname + url.hash).toBe(RUTA);
   });
 
   test('elegir lotería en la primera vista deja el botón Generar a la vista', async ({ page }) => {
     // REPARADO el 06/10/2026 (hallazgo 2899): elegir lotería desplaza la vista hasta el botón
-    // Generar si no se ve (`block: 'nearest'`). Era así (inspector 06/10/2026, operativa). A 390×844 la primera vista es el hero, el aviso
+    // Generar si no se ve (`elegirLoteria`, `block: 'center'`). Era así (inspector 06/10/2026, operativa). A 390×844 la primera vista es el hero, el aviso
     // legal y las cinco loterías en columna (472-844 px); el panel de la modalidad empieza en
     // 876 px y el botón Generar en 1251-1353 px. Tocar «Euromillones» solo cambia el color del
     // botón: la vista no se mueve y lo que cambia (ficha y texto de Generar) queda fuera de la
@@ -1776,5 +1791,357 @@ test.describe('06/10 · contenido', () => {
     expect(pasos).toContain('Dos boletos iguales');
     expect(pasos).not.toMatch(/no aumentan las probabilidades de manera significativa/);
     expect(pasos).toMatch(/no aumentan nada la probabilidad/);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 12/10/2026 — re-inspección (segmento fiscal, riesgo 1; vuelve INVALIDADA) tras
+ * 05020a07 (comprobador, S0176), 1b6dd902, e885f6e5 (reparto de la peña, S0180), 77981798 y
+ * f3cdeb6d (nivel 1 de disclaimer).
+ *
+ * NORMA — data/fiscal/premios-loterias.ts (DA 33.ª LIRPF, cotejada el 05/10/2026): exentos
+ * 40.000 € por décimo o apuesta; 20 % sobre el exceso; si el décimo o la apuesta cuesta menos de
+ * 0,50 €, la exención se reduce en proporción (40.000 × precio / 0,50); en un premio compartido,
+ * exención y base se prorratean por cuotas.
+ * CATEGORÍAS — las que declara app/generador-loteria/comprobar.ts: Bonoloto 1.ª 6 · 2.ª 5 +
+ * complementario · 3.ª 5 · 4.ª 4 · 5.ª 3 · reintegro aparte, SIN categoría especial;
+ * Euromillones 1.ª 5+2 … 6.ª 3+2 · 7.ª 4+0 … 11.ª 1+2 · 12.ª 2+1 · 13.ª 2+0; Lototurf
+ * 1.ª 6+caballo · 2.ª 6 · 3.ª 5+caballo · 4.ª 5 · 5.ª 4+caballo · 6.ª 4 · 7.ª 3+caballo.
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (céntimos por el mayor resto, reparto.ts):
+ *   1. Normal — Ana 12 €, Bea 8 €, Carlos 4 € (cuotas 1/2, 1/3, 1/6), décimos de 60.000 y
+ *      125.000 € a 20 €. Décimo 1: exento 40.000, retención 4000; décimo 2: 40.000 y 17.000.
+ *      Totales 185.000 / 80.000 / 21.000 / se cobran 164.000. Bruto 18.500.000 c → 9.250.000 /
+ *      6.166.666,67 / 3.083.333,33: el céntimo que sobra va a Bea (resto ,67) → 92.500,00 /
+ *      61.666,67 / 30.833,33. Retención 10.500 / 7000 / 3500. Le llega 82.000,00 / 54.666,67 /
+ *      27.333,33 (suman 164.000,00). Parte 50,00 / 33,33 / 16,67 %.
+ *      Bonoloto 5 11 19 26 38 44 · complementario 30 · reintegro 2, contra siete guardadas:
+ *        b1  5 11 19 26 38 44 · R2 → 6 + R      → 1.ª y reintegro (no hay especial)  7 bolas
+ *        b2  5 11 19 26 30 38 · R7 → 5 + el 30  → 2.ª                               5 + compl.
+ *        b3  5 11 19 26 38 49 · R2 → 5 + R      → 3.ª y reintegro                    6
+ *        b4  1  5 11 19 30 47 · R0 → 3          → 5.ª (el 30 no cuenta con 3)        3
+ *        b5  2  3  4  6  7  8 · R2 → 0 + R      → solo reintegro                     1
+ *        b6  5 11 20 27 30 40 · R9 → 2          → sin premio                         2
+ *        b7  1  2  5 11 19 26 · R5 → 4          → 4.ª                                4
+ *      → «5 de tus 7 combinaciones de Bonoloto tienen premio de categoría; 3 aciertan el reintegro.»
+ *   2. Límite — precio 0,49 €, justo por debajo de 0,50: exención 40.000 × 0,49 / 0,50 = 39.200;
+ *      un premio de 40.000 € (exento entero a 0,50) deja base 800, retención 160 y se cobran
+ *      39.840 (peña de partida 10/5/5: 19.920 / 9960 / 9960). Con 0,50 €, retención 0,00 €.
+ *      Euromillones 7 15 23 34 46 · estrellas 4 9: e1 5+2 → 1.ª · e2 2+0 → 13.ª (la última) ·
+ *      e3 1+1 → sin premio · e4 0+2 → sin premio · e5 1+2 → 11.ª · e6 3+2 → 6.ª · e7 4+0 → 7.ª
+ *      → «5 de tus 7 combinaciones de Euromillones tienen premio de categoría.»
+ *   3. Rechazo — aportación «diez» (el aviso nombra a Persona 2), premio «1e6» (no es un importe)
+ *      y precio «0,00»: aviso y sin tabla. Lototurf con caballo 13 o con un 32: aviso y ningún
+ *      veredicto; corregido (3 8 12 19 25 31 · caballo 7): 1.ª, 4.ª, 7.ª y sin premio.
+ * Los tres casos dieron en el navegador exactamente lo calculado (29 de 29 comprobaciones).
+ *
+ * HALLAZGOS ABIERTOS de esta inspección, con `test.fail()` al final del bloque: afirman lo que
+ * DEBE pasar. Al repararlos empezarán a pasar y Playwright avisará: entonces se quita el
+ * `test.fail()` y su comentario pasa a «REPARADO».
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('Inspector 12/10/2026', () => {
+  const T_1210 = '2026-10-10T10:00:00.000Z';
+  const guardada = (id: string, type: Modalidad, mainNumbers: number[], extraNumbers: number[]) =>
+    ({ id, type, mainNumbers, extraNumbers, timestamp: T_1210 });
+  const eur = (s: string) => `${s} €`;
+  const pct = (s: string) => `${s} %`;
+  const SELECTOR_PENA = 'section[aria-labelledby="pena-titulo"]';
+
+  const pena = (page: Page) => page.locator(SELECTOR_PENA);
+  const campoPremio = (page: Page, n = 0) => pena(page).getByLabel(/Premio del décimo o apuesta/).nth(n);
+  const campoPone = (page: Page, n: number) => pena(page).getByLabel('Pone (€)').nth(n);
+  const campoPrecio = (page: Page) => pena(page).getByLabel('Precio de cada décimo o apuesta (€)');
+  const avisoPena = (page: Page) => pena(page).locator('[class*="comprobadorError"]');
+  const desglose = (page: Page) => pena(page).locator('[class*="penaResultado"] > p');
+
+  async function escribir(page: Page, campo: Locator, valor: string) {
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+
+  /** Totales del reparto como pares [rótulo, cifra]. */
+  const totalesPena = (page: Page) => pena(page).locator('[class*="penaTotales"] > div').evaluateAll((divs) =>
+    divs.map((d) => [d.querySelector('dt')?.textContent ?? '', d.querySelector('dd')?.textContent ?? '']));
+
+  /** Filas de la tabla: persona y sus cinco celdas (Pone, Le llega, Parte, Premio, Retención). */
+  const filasPena = (page: Page) => pena(page).locator('tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => [
+      tr.querySelector('th')?.textContent ?? '',
+      ...Array.from(tr.querySelectorAll('td')).map((td) => td.textContent ?? ''),
+    ]));
+
+  const veredictos = (page: Page) => zonaComprobador(page).locator('[class*="comprobadaVeredicto"]');
+  const bolasMarcadas = (page: Page) => zonaComprobador(page).locator('ul li').evaluateAll((lis) =>
+    lis.map((li) => li.querySelectorAll('[class*="bolaAcertada"]').length));
+
+  /** Teclea un sorteo: los números principales y luego cada casilla aparte por su etiqueta. */
+  async function teclearSorteo(page: Page, numeros: string[], otras: Array<[string, string]>) {
+    const zona = zonaComprobador(page);
+    for (let i = 0; i < numeros.length; i++) {
+      await escribirCasilla(page, zona.getByLabel(`Número ${i + 1} de la combinación ganadora`), numeros[i]);
+    }
+    for (const [etiqueta, valor] of otras) {
+      await escribirCasilla(page, zona.getByLabel(etiqueta, { exact: true }), valor);
+    }
+  }
+
+  test.describe('caso 1 (normal) — peña 12/8/4 € con dos décimos, y Bonoloto en el comprobador', () => {
+    test('reparto: 164.000 € netos → 82.000,00 / 54.666,67 / 27.333,33 €, y el céntimo que sobra a Bea', async ({ page }) => {
+      await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
+      const nombres = pena(page).getByLabel('Nombre');
+      await escribir(page, nombres.nth(0), 'Ana');
+      await escribir(page, nombres.nth(1), 'Bea');
+      await escribir(page, nombres.nth(2), 'Carlos');
+      await escribir(page, campoPone(page, 0), '12');
+      await escribir(page, campoPone(page, 1), '8');
+      await escribir(page, campoPone(page, 2), '4');
+      await escribir(page, campoPremio(page, 0), '60.000');
+      await pena(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+      await escribir(page, campoPremio(page, 1), '125.000');
+
+      // Exención por décimo (DA 33.ª.1): 2 × 40.000; retención (20.000 + 85.000) × 20 %
+      await expect.poll(() => totalesPena(page)).toEqual([
+        ['Premio íntegro', eur('185.000,00')],
+        ['Exento', eur('80.000,00')],
+        [`Retención del ${pct('20')}`, eur('21.000,00')],
+        ['Lo que se cobra', eur('164.000,00')],
+      ]);
+      await expect(desglose(page)).toHaveText(
+        new RegExp(`60\\.000,00 €, retención 4000,00 € · .*125\\.000,00 €, retención 17\\.000,00 €`));
+      expect(await filasPena(page)).toEqual([
+        ['Ana', eur('12,00'), eur('82.000,00'), pct('50,00'), eur('92.500,00'), eur('10.500,00')],
+        ['Bea', eur('8,00'), eur('54.666,67'), pct('33,33'), eur('61.666,67'), eur('7000,00')],
+        ['Carlos', eur('4,00'), eur('27.333,33'), pct('16,67'), eur('30.833,33'), eur('3500,00')],
+      ]);
+    });
+
+    test('comprobador de Bonoloto: siete guardadas, siete veredictos y ninguna «categoría especial»', async ({ page }) => {
+      const errores: string[] = [];
+      page.on('pageerror', (e) => errores.push(e.message));
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([
+          guardada('b1', 'bonoloto', [5, 11, 19, 26, 38, 44], [2]),
+          guardada('b2', 'bonoloto', [5, 11, 19, 26, 30, 38], [7]),
+          guardada('b3', 'bonoloto', [5, 11, 19, 26, 38, 49], [2]),
+          guardada('b4', 'bonoloto', [1, 5, 11, 19, 30, 47], [0]),
+          guardada('b5', 'bonoloto', [2, 3, 4, 6, 7, 8], [2]),
+          guardada('b6', 'bonoloto', [5, 11, 20, 27, 30, 40], [9]),
+          guardada('b7', 'bonoloto', [1, 2, 5, 11, 19, 26], [5]),
+        ]),
+      });
+      const zona = zonaComprobador(page);
+      await expect(zona.locator('legend')).toHaveText('Combinación ganadora de Bonoloto');
+      await teclearSorteo(page, ['5', '11', '19', '26', '38', '44'], [['Complementario', '30'], ['Reintegro', '2']]);
+      await zona.getByRole('button', { name: 'Comprobar mis combinaciones de Bonoloto' }).click();
+
+      await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveText(
+        '5 de tus 7 combinaciones de Bonoloto tienen premio de categoría; 3 aciertan el reintegro.');
+      await expect(veredictos(page)).toHaveText([
+        '1.ª categoría (6 aciertos) y reintegro',
+        '2.ª categoría (5 aciertos + complementario)',
+        '3.ª categoría (5 aciertos) y reintegro',
+        '5.ª categoría (3 aciertos)',
+        'Reintegro (0 aciertos, sin premio de categoría)',
+        'Sin premio (2 aciertos)',
+        '4.ª categoría (4 aciertos)',
+      ]);
+      expect(await bolasMarcadas(page)).toEqual([7, 5, 6, 3, 1, 2, 4]);
+      // El complementario solo se marca donde decide algo: en b2, con 5 aciertos (no en b4 ni b6)
+      await expect(zona.locator('[class*="bolaComplementario"]')).toHaveText(['30 complementario']);
+      await expect(zona).not.toContainText('Categoría especial');
+      expect(errores).toEqual([]);
+    });
+  });
+
+  test.describe('caso 2 (límite) — décimo de 0,49 € frente a 0,50 €, y el borde de las categorías de Euromillones', () => {
+    test('precio 0,49 €: exentos 39.200 € y 160,00 € de retención sobre 40.000; con 0,50 €, nada', async ({ page }) => {
+      await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
+      await escribir(page, campoPrecio(page), '0,49');
+      // DA 33.ª.2: «inferior a 0,50» → exención reducida en proporción: 40.000 × 0,49 / 0,50
+      await expect(pena(page).locator('#pena-precio-ayuda')).toContainText(
+        `cada décimo o apuesta tiene ${eur('39.200,00')} exentos`);
+      await escribir(page, campoPremio(page), '40.000');
+      await expect.poll(() => totalesPena(page)).toEqual([
+        ['Premio íntegro', eur('40.000,00')],
+        ['Exento', eur('39.200,00')],
+        [`Retención del ${pct('20')}`, eur('160,00')],
+        ['Lo que se cobra', eur('39.840,00')],
+      ]);
+      expect(await filasPena(page)).toEqual([
+        ['Persona 1', eur('10,00'), eur('19.920,00'), pct('50,00'), eur('20.000,00'), eur('80,00')],
+        ['Persona 2', eur('5,00'), eur('9960,00'), pct('25,00'), eur('10.000,00'), eur('40,00')],
+        ['Persona 3', eur('5,00'), eur('9960,00'), pct('25,00'), eur('10.000,00'), eur('40,00')],
+      ]);
+      // Un céntimo más y ya no es «inferior a 0,50»: exento entero
+      await escribir(page, campoPrecio(page), '0,50');
+      await expect.poll(() => totalesPena(page)).toEqual([
+        ['Premio íntegro', eur('40.000,00')],
+        ['Exento', eur('40.000,00')],
+        [`Retención del ${pct('20')}`, eur('0,00')],
+        ['Lo que se cobra', eur('40.000,00')],
+      ]);
+      await expect(pena(page).locator('#pena-precio-ayuda')).not.toContainText('Con este precio');
+    });
+
+    test('Euromillones: 2+0 es la 13.ª y última; 1+1 y 0+2 sin premio; 1+2 la 11.ª; 3+2 (6.ª) antes que 4+0 (7.ª)', async ({ page }) => {
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([
+          guardada('e1', 'euromillones', [7, 15, 23, 34, 46], [4, 9]),
+          guardada('e2', 'euromillones', [1, 2, 3, 7, 15], [1, 2]),
+          guardada('e3', 'euromillones', [1, 2, 3, 5, 7], [4, 10]),
+          guardada('e4', 'euromillones', [1, 2, 3, 5, 6], [4, 9]),
+          guardada('e5', 'euromillones', [1, 2, 3, 5, 7], [4, 9]),
+          guardada('e6', 'euromillones', [1, 2, 7, 15, 23], [4, 9]),
+          guardada('e7', 'euromillones', [1, 7, 15, 23, 34], [1, 2]),
+        ]),
+      });
+      const zona = zonaComprobador(page);
+      await teclearSorteo(page, ['7', '15', '23', '34', '46'], [['Estrella 1', '4'], ['Estrella 2', '9']]);
+      await zona.getByRole('button', { name: 'Comprobar mis combinaciones de Euromillones' }).click();
+      await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveText(
+        '5 de tus 7 combinaciones de Euromillones tienen premio de categoría.');
+      await expect(veredictos(page)).toHaveText([
+        '1.ª categoría (5 aciertos + 2 estrellas)',
+        '13.ª categoría (2 aciertos)',
+        'Sin premio (1 acierto + 1 estrella)',
+        'Sin premio (0 aciertos + 2 estrellas)',
+        '11.ª categoría (1 acierto + 2 estrellas)',
+        '6.ª categoría (3 aciertos + 2 estrellas)',
+        '7.ª categoría (4 aciertos)',
+      ]);
+      expect(await bolasMarcadas(page)).toEqual([7, 2, 2, 2, 3, 5, 4]);
+      // Las que no tienen premio no se resaltan aunque lleven bolas acertadas
+      const conPremio = await zona.locator('ul li').evaluateAll((lis) => lis.map((li) => /comprobadaPremio/.test(li.className)));
+      expect(conPremio).toEqual([true, true, false, false, true, true, true]);
+    });
+  });
+
+  test.describe('caso 3 (rechazo) — lo que no es un importe ni un sorteo posible', () => {
+    test('reparto: aportación «diez», premio «1e6» y precio «0,00» avisan y no reparten', async ({ page }) => {
+      await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
+      await escribir(page, campoPone(page, 1), 'diez');
+      await escribir(page, campoPremio(page), '125.000');
+      await expect(avisoPena(page)).toHaveText(
+        'Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Persona 2.');
+      await expect(pena(page).locator('input[aria-invalid="true"]')).toHaveCount(1);
+      await expect(campoPone(page, 1)).toHaveAttribute('aria-invalid', 'true');
+      await expect(pena(page).locator('tbody tr')).toHaveCount(0);
+
+      await escribir(page, campoPone(page, 1), '5');
+      // parseSpanishNumber no admite notación científica: «1e6» no es un millón
+      await escribir(page, campoPremio(page), '1e6');
+      await expect(avisoPena(page)).toHaveText('Indica el premio de cada décimo o apuesta premiados, mayor que 0 €.');
+      await expect(campoPremio(page)).toHaveAttribute('aria-invalid', 'true');
+      await expect(pena(page).locator('tbody tr')).toHaveCount(0);
+
+      await escribir(page, campoPremio(page), '125.000');
+      await escribir(page, campoPrecio(page), '0,00');
+      await expect(avisoPena(page)).toHaveText('Indica lo que costó cada décimo o apuesta, mayor que 0 €.');
+      await expect(campoPrecio(page)).toHaveAttribute('aria-invalid', 'true');
+      await expect(pena(page).locator('[class*="penaTotales"]')).toHaveCount(0);
+    });
+
+    test('Lototurf: caballo 13 y un 32 se rechazan sin veredicto; corregido, 1.ª, 4.ª, 7.ª y sin premio', async ({ page }) => {
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([
+          guardada('l1', 'lototurf', [3, 8, 12, 19, 25, 31], [7]),
+          guardada('l2', 'lototurf', [3, 8, 12, 19, 25, 30], [2]),
+          guardada('l3', 'lototurf', [1, 2, 3, 4, 8, 12], [7]),
+          guardada('l4', 'lototurf', [1, 2, 3, 4, 8, 12], [5]),
+        ]),
+      });
+      const zona = zonaComprobador(page);
+      const boton = zona.getByRole('button', { name: 'Comprobar mis combinaciones de Lototurf' });
+      await teclearSorteo(page, ['3', '8', '12', '19', '25', '31'], [['Caballo', '13']]);
+      await boton.click();
+      await expect(zona.getByRole('alert')).toHaveText('Caballo: 13 está fuera de rango, va del 1 al 12.');
+      await expect(veredictos(page)).toHaveCount(0);
+
+      await escribirCasilla(page, zona.getByLabel('Caballo', { exact: true }), '7');
+      await escribirCasilla(page, zona.getByLabel('Número 6 de la combinación ganadora'), '32');
+      await boton.click();
+      await expect(zona.getByRole('alert')).toHaveText('El número 6 (32) está fuera de rango: va del 1 al 31.');
+      await expect(veredictos(page)).toHaveCount(0);
+
+      await escribirCasilla(page, zona.getByLabel('Número 6 de la combinación ganadora'), '31');
+      await boton.click();
+      await expect(zona.getByRole('alert')).toHaveCount(0);
+      await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveText(
+        '3 de tus 4 combinaciones de Lototurf tienen premio de categoría.');
+      await expect(veredictos(page)).toHaveText([
+        '1.ª categoría (6 aciertos + caballo)',
+        '4.ª categoría (5 aciertos)',
+        '7.ª categoría (3 aciertos + caballo)',
+        'Sin premio (3 aciertos)',
+      ]);
+      await expect(zona).toContainText('El reintegro de Lototurf va impreso en tu resguardo');
+    });
+  });
+
+  test.describe('hallazgos ABIERTOS (inspector 12/10/2026)', () => {
+    test('ABIERTO (contenido, bajo) · el desglose por décimo numera los décimos como el formulario', async ({ page }) => {
+      // Con el campo 1 vacío y premios en los campos 2 y 3 («Premio del décimo o apuesta 2/3 (€)»),
+      // el desglose decía «Décimo 1: 60.000,00 €… · Décimo 2: 125.000,00 €…»: numera solo los
+      // campos escritos, así que la retención de 17.000 € se atribuye al «décimo 2», que en el
+      // formulario es el de 60.000 €. Los avisos de error sí usan la numeración del formulario.
+      test.fail();
+      await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
+      await pena(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+      await pena(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+      await expect(pena(page).getByLabel('Premio del décimo o apuesta 3 (€)')).toHaveCount(1);
+      await escribir(page, campoPremio(page, 1), '60.000');
+      await escribir(page, campoPremio(page, 2), '125.000');
+      await expect(desglose(page)).toContainText(`retención ${eur('17.000,00')}`); // hay desglose
+      await expect(desglose(page)).toHaveText(new RegExp(`\\b2: 60\\.000,00 €.*\\b3: 125\\.000,00 €`));
+    });
+
+    test('ABIERTO (accesibilidad, bajo) · los botones 1/3/5/10 dicen de qué son (WCAG 1.3.1)', async ({ page }) => {
+      // «Combinaciones a generar:» es un <label> sin control (ni htmlFor ni input dentro): no
+      // nombra nada. Los botones se anuncian «1», «3», «5», «10», conmutadores sin grupo ni
+      // descripción, y al tabular hasta ellos un lector de pantalla no dice qué cuentan.
+      test.fail();
+      const botones = page.locator('[class*="quantityButtons"] button');
+      await expect(botones).toHaveCount(4);
+      const enGrupo = await page.getByRole('group', { name: /combinaciones a generar/i }).getByRole('button').count();
+      const contexto = await botones.nth(1).evaluate((b) => {
+        const textos = (ids: string | null) => (ids ?? '').split(/\s+/).filter(Boolean)
+          .map((id) => document.getElementById(id)?.textContent ?? '').join(' ');
+        return `${b.getAttribute('aria-label') ?? ''} ${textos(b.getAttribute('aria-labelledby'))} ${textos(b.getAttribute('aria-describedby'))}`;
+      });
+      expect(enGrupo === 4 || /combinaci/i.test(contexto)).toBe(true);
+    });
+
+    test('ABIERTO (contenido, bajo) · el reparto dice que su gravamen es el español', async ({ page }) => {
+      // La sección calcula el gravamen de la DA 33.ª de la LIRPF (40.000 € exentos, 20 %) y no dice
+      // en ningún sitio que es el de España; tampoco hay RegionBadge «es-only», que CLAUDE.md
+      // (1.bis) exige a las apps fiscales-España. Con media audiencia en Latinoamérica, una peña
+      // de otro país leería como suyas la exención y la retención españolas.
+      test.fail();
+      const texto = ((await pena(page).textContent()) ?? '').replace(/\s+/g, ' ');
+      expect(texto).toContain('Hacienda'); // la sección habla de impuestos
+      const insignia = await page.getByRole('note', { name: /únicamente a España/ }).count();
+      expect(/Españ/.test(texto) || insignia > 0).toBe(true);
+    });
+
+    test('ABIERTO (contenido, bajo) · la pregunta del generador aleatorio tiene UNA respuesta', async ({ page }) => {
+      // El FAQPage pregunta «¿Usar un generador aleatorio mejora mis probabilidades en la lotería?»
+      // y la FAQ visible «¿Los números generados aleatoriamente tienen más probabilidad de ganar?»:
+      // la misma pregunta con dos respuestas redactadas aparte. La reparación es UNA constante en
+      // metadata.ts que importen las dos (como app/simulador-gastos-compraventa-garaje).
+      test.fail();
+      interface PreguntaFaq { name: string; acceptedAnswer: { text: string } }
+      interface BloqueLd { '@type'?: string; mainEntity?: PreguntaFaq[] }
+      const normal = (s: string) => s.replace(/\s+/g, ' ').trim();
+      const visible = page.locator('[class*="faqList"] details')
+        .filter({ has: page.locator('summary', { hasText: 'generados aleatoriamente tienen más probabilidad' }) });
+      await expect(visible).toHaveCount(1);
+      const textoVisible = normal((await visible.textContent()) ?? '');
+      const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+      const faq = bloques.map((b) => JSON.parse(b) as BloqueLd).find((j) => j['@type'] === 'FAQPage');
+      const gemela = (faq?.mainEntity ?? []).find((q) =>
+        /generador aleatorio mejora|aleatoriamente tienen más probabilidad/i.test(q.name));
+      if (gemela) expect(textoVisible).toContain(normal(gemela.acceptedAnswer.text));
+    });
   });
 });
