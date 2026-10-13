@@ -440,10 +440,12 @@ export default function GeneradorLoteriaPage() {
 
   /** Contenido del botón Copiar: el icono, o la confirmación durante unos segundos. */
   const contenidoCopiar = (clave: string) => {
-    if (copia?.clave !== clave) return '📋';
+    // Un <span> con key por estado, no texto suelto: con la página traducida React no
+    // encontraba el «📋» o el « Copiada» que retiraba (cabo C0233).
+    if (copia?.clave !== clave) return <span key="copiar">📋</span>;
     return copia.ok
-      ? <><span aria-hidden="true">✓</span> Copiada</>
-      : <><span aria-hidden="true">✕</span> No copiada</>;
+      ? <span key="copiada"><span aria-hidden="true">✓</span> Copiada</span>
+      : <span key="no-copiada"><span aria-hidden="true">✕</span> No copiada</span>;
   };
 
   // Limpiar historial
@@ -524,9 +526,12 @@ export default function GeneradorLoteriaPage() {
             className={styles.generateButton}
             disabled={isGenerating}
           >
+            {/* Cada estado en su <span> con key: como fragmentos, React retiraba un texto
+                suelto que un traductor del navegador ya había cambiado por <font>, y la app
+                caía con NotFoundError al pulsar Generar (cabo C0233). */}
             {isGenerating
-              ? <><span aria-hidden="true">🎲</span> Generando...</>
-              : <><span aria-hidden="true">🎯</span> {`Generar ${quantity} ${quantity > 1 ? 'combinaciones' : 'combinación'} de ${config.name}`}</>}
+              ? <span key="generando"><span aria-hidden="true">🎲</span> Generando...</span>
+              : <span key="generar"><span aria-hidden="true">🎯</span> {`Generar ${quantity} ${quantity > 1 ? 'combinaciones' : 'combinación'} de ${config.name}`}</span>}
           </button>
         </div>
 

@@ -2145,3 +2145,93 @@ test.describe('Inspector 12/10/2026', () => {
     });
   });
 });
+
+/**
+ * Página traducida por el navegador (cabo C0233, 13/10/2026). El dump de errores reunía en
+ * esta app 5 NotFoundError. Un traductor sustituye cada nodo de texto por
+ * <font><font>…</font></font>, y React cae cuando RETIRA un nodo de texto suelto que ya no
+ * está: (1) el botón Generar pasaba de «🎯 Generar…» (dos textos) a «🎲 Generando...» (uno),
+ * (2) Copiar pasaba de «📋» a «✓ Copiada» y vuelta, (3) la frase de la exención reducida del
+ * precio era un texto condicional pegado al de la ayuda. REPARADO (13/10/2026): cada estado en
+ * su propio <span> con su key, que React cambia entero.
+ */
+test.describe('13/10 · página traducida por el navegador', () => {
+  test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+  test('generar, copiar, guardar y bajar el precio con la página traducida no tumba la app', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    /** Imita al traductor: cada nodo de texto visible pasa a <font><font>texto</font></font>. */
+    const traducir = () =>
+      page.evaluate(() => {
+        const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+          acceptNode: (n) => {
+            const padre = n.parentElement;
+            if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+            if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          },
+        });
+        const nodos: Text[] = [];
+        while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+        for (const nodo of nodos) {
+          const exterior = document.createElement('font');
+          const interior = document.createElement('font');
+          interior.textContent = nodo.nodeValue;
+          exterior.appendChild(interior);
+          nodo.parentNode?.replaceChild(exterior, nodo);
+        }
+      });
+    const enPie = async () => {
+      await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+      await expect(botonGenerar(page)).toBeVisible();
+    };
+
+    await esperarInteractiva(page);
+    await esperarHidratacion(page, ['section[aria-labelledby="pena-titulo"] input']);
+    await traducir();
+
+    // (1) Generar: el botón pasa por «Generando...» y vuelve.
+    await botonGenerar(page).click();
+    await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
+    await expect(botonGenerar(page)).toContainText('Generar 1');
+    await enPie();
+
+    // (2) Copiar: «📋» → «✓ Copiada» → «📋».
+    await traducir();
+    await page.getByRole('button', { name: 'Copiar combinación' }).click();
+    await expect(page.locator('[class*="resultCard"]').getByText('Copiada')).toBeVisible();
+    await traducir();
+    await expect(page.locator('[class*="resultCard"]').getByText('Copiada')).toHaveCount(0, { timeout: 8000 });
+    await enPie();
+
+    // Y generar otra vez sobre el botón ya traducido.
+    await traducir();
+    await botonGenerar(page).click();
+    await expect(page.locator('[class*="resultCard"]')).toHaveCount(2);
+    await enPie();
+
+    // Guardar la primera: aparece la sección de guardadas y su comprobador.
+    await traducir();
+    await page.getByRole('button', { name: 'Guardar esta combinación en este navegador' }).first().click();
+    await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(1);
+    await enPie();
+
+    // (3) El precio por debajo del mínimo añade la frase de la exención reducida, y quitarla.
+    const pena = page.locator('section[aria-labelledby="pena-titulo"]');
+    const precio = pena.getByLabel('Precio de cada décimo o apuesta (€)');
+    await precio.fill('0,25');
+    await esperarValorEnReact(page, precio, '0,25');
+    await expect(pena.locator('#pena-precio-ayuda')).toContainText('20.000,00 € exentos');
+    await traducir();
+    await precio.fill('5');
+    await esperarValorEnReact(page, precio, '5');
+    await expect(pena.locator('#pena-precio-ayuda')).not.toContainText('exentos');
+    await enPie();
+
+    expect(errores).toEqual([]);
+  });
+});

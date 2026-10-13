@@ -186,8 +186,11 @@ export default function RepartoPena() {
         <p id="pena-precio-ayuda" className={styles.penaAyuda}>
           Solo cambia el cálculo si es menor de {MINIMO_TEXTO}: entonces la exención se reduce en
           proporción.
-          {exencionReducida &&
-            ` Con este precio, cada décimo o apuesta tiene ${formatNumber(exencionPorImporteJugado(jugadoNumero), 2)} € exentos.`}
+          {/* En su <span>: como texto suelto, con la página traducida React no lo encontraba
+              al retirarlo y la app caía con NotFoundError (cabo C0233). */}
+          {exencionReducida && <span>{
+            ` Con este precio, cada décimo o apuesta tiene ${formatNumber(exencionPorImporteJugado(jugadoNumero), 2)} € exentos.`
+          }</span>}
         </p>
         <ul className={styles.penaLista}>
           {premios.map((p, i) => (
