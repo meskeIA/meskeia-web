@@ -3475,3 +3475,94 @@ test.describe('Inspector 28/09/2026 — hallazgos reparados', () => {
     expect(leible).toBe('Diferente en machos y hembras');
   });
 });
+
+// ============================================================
+// Página traducida por el navegador (cabo C0233, 13/10/2026)
+// ============================================================
+/**
+ * El dump de errores del 13/10/2026 reunía en esta app 12 de los 33 NotFoundError con ruta
+ * (Chrome, Safari y Edge), con ~2,6 % del tráfico. Un traductor sustituye cada nodo de texto
+ * por <font><font>…</font></font>; el <p> del modo de herencia tenía fragmentos condicionales
+ * de texto suelto junto a la descripción, también suelta, y React, al poner o quitar el
+ * prefijo, buscaba un nodo de texto que ya no estaba: «insertBefore» y pantalla de error.
+ * REPARADO (13/10/2026): cada pieza en su <span>. NO con translate="no"
+ * (project_caidas_pantalla_error §2): el público no es solo hispanohablante.
+ */
+test.describe('simulador-genetica · página traducida por el navegador', () => {
+  /** Imita al traductor: cada nodo de texto visible pasa a <font><font>texto</font></font>. */
+  async function traducir(page: Page): Promise<number> {
+    return page.evaluate(() => {
+      const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => {
+          const padre = n.parentElement;
+          if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+          if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const nodos: Text[] = [];
+      while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+      for (const nodo of nodos) {
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = nodo.nodeValue;
+        exterior.appendChild(interior);
+        nodo.parentNode?.replaceChild(exterior, nodo);
+      }
+      return nodos.length;
+    });
+  }
+
+  async function prepararTraducida(page: Page): Promise<string[]> {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    await page.goto(RUTA);
+    // Hidratado: React ya cuelga sus props del <select> del rasgo.
+    await page.waitForFunction(() => {
+      const sel = document.querySelector('select');
+      return Boolean(sel && Object.keys(sel).some((k) => k.startsWith('__reactProps$')));
+    });
+    await expect(selectorGenotipo(page, 0)).toHaveValue('Aa');
+    expect(await traducir(page)).toBeGreaterThan(50);
+    return errores;
+  }
+
+  async function sigueEnPie(page: Page, errores: string[]): Promise<void> {
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+    await expect(selectorRasgo(page, 0)).toBeVisible();
+    expect(errores).toEqual([]);
+  }
+
+  test('Humanos → Daltonismo (pone el prefijo «Ligada al sexo») no tumba la app', async ({ page }) => {
+    const errores = await prepararTraducida(page);
+    await page.getByRole('button', { name: /Humanos/ }).click();
+    await traducir(page);
+    await selectorRasgo(page, 0).selectOption('daltonismo');
+    await expect(page.locator('[class*="inheritanceInfo"]').first()).toContainText('Ligada al sexo');
+    await traducir(page);
+    // Y de vuelta a un rasgo sin prefijo: React lo retira.
+    await selectorRasgo(page, 0).selectOption({ index: 0 });
+    await sigueEnPie(page, errores);
+  });
+
+  test('Humanos → Grupo ABO (prefijo de codominancia) no tumba la app', async ({ page }) => {
+    const errores = await prepararTraducida(page);
+    await page.getByRole('button', { name: /Humanos/ }).click();
+    await traducir(page);
+    await selectorRasgo(page, 0).selectOption('grupo-abo');
+    await expect(page.locator('[class*="inheritanceInfo"]').first()).toContainText('Codominancia');
+    await sigueEnPie(page, errores);
+  });
+
+  test('Guisantes → Flores (prefijo de dominancia incompleta) no tumba la app', async ({ page }) => {
+    const errores = await prepararTraducida(page);
+    await page.getByRole('button', { name: /Flores/ }).click();
+    await expect(page.locator('[class*="inheritanceInfo"]').first()).toContainText('Dominancia incompleta');
+    await traducir(page);
+    await page.getByRole('button', { name: /Guisantes/ }).click();
+    await sigueEnPie(page, errores);
+  });
+});

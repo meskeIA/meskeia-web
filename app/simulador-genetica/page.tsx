@@ -269,24 +269,28 @@ export default function SimuladorGeneticaPage() {
               {/* Los emojis del modo de herencia, en su propio nodo con aria-hidden: dentro del
                   literal de cadena el lector de pantalla anunciaba «gota de sangre» delante de
                   «Codominancia» (hallazgo 1591), y el candado check:a11y-jsx no mira dentro de
-                  las expresiones. Los tres modos, porque los tres tenían la misma forma. */}
+                  las expresiones. Los tres modos, porque los tres tenían la misma forma.
+                  Cada pieza va en su propio <span>, sin texto suelto en el <p>: un traductor
+                  del navegador sustituye cada nodo de texto por <font>, y React, al poner o
+                  quitar el prefijo antes de un texto suelto, ya no lo encontraba y la app caía
+                  con NotFoundError (cabo C0233, 12 de los 33 del dump). */}
               <p className={styles.inheritanceInfo}>
                 {selectedTrait1.inheritanceMode === 'sex-linked' && (
-                  <>
+                  <span>
                     <span aria-hidden="true">🔗</span> Ligada al sexo -{' '}
-                  </>
+                  </span>
                 )}
                 {selectedTrait1.inheritanceMode === 'incomplete' && (
-                  <>
+                  <span>
                     <span aria-hidden="true">🎨</span> Dominancia incompleta -{' '}
-                  </>
+                  </span>
                 )}
                 {selectedTrait1.inheritanceMode === 'codominant' && (
-                  <>
+                  <span>
                     <span aria-hidden="true">🩸</span> Codominancia y alelos múltiples -{' '}
-                  </>
+                  </span>
                 )}
-                {selectedTrait1.description}
+                <span>{selectedTrait1.description}</span>
               </p>
             </div>
 
