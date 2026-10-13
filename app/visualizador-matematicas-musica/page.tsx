@@ -35,12 +35,32 @@ type WaveType = 'sine' | 'triangle' | 'square' | 'sawtooth';
 const RAMPA_S = 0.02;
 /** Antelación con que se programa lo que empieza «ya», para que el reloj de audio no lo pase. */
 const ANTELACION_S = 0.01;
+/**
+ * Antelación del corte de una voz que suena. El hilo de audio calcula por delante de
+ * `ctx.currentTime` (≈ 16 ms medidos en Chromium): una rampa de salida que empieza en
+ * `currentTime` llega ya empezada y se salta casi entera, y la voz caía un 79 % en 3 ms
+ * (cabo C0207, la forma que quedó viva del hallazgo 1937). Con 30 ms la rampa entera cae
+ * por delante de lo ya calculado.
+ */
+const MARGEN_CORTE_S = 0.03;
 
 interface Voz {
   osc: OscillatorNode;
   gain: GainNode;
   /** Instante (reloj de audio) en que empieza a sonar. */
   inicio: number;
+  /** Duración de la rampa de entrada, del pico y de la voz entera, en segundos. */
+  ataque: number;
+  volumen: number;
+  duracion: number;
+}
+
+/** Ganancia que da la envolvente de `programarVoz` en el instante t. */
+function envolventeEn(v: Voz, t: number): number {
+  if (t <= v.inicio) return 0;
+  if (t < v.inicio + v.ataque) return (v.volumen * (t - v.inicio)) / v.ataque;
+  const fraccion = Math.min(1, (t - v.inicio - v.ataque) / (v.duracion - v.ataque));
+  return v.volumen * Math.pow(0.001 / v.volumen, fraccion);
 }
 
 /** Programa una voz con rampa de entrada y caída exponencial hasta el silencio. */
@@ -64,16 +84,24 @@ function programarVoz(
   gain.connect(ctx.destination);
   osc.start(inicio);
   osc.stop(inicio + duracion);
-  return { osc, gain, inicio };
+  return { osc, gain, inicio, ataque, volumen, duracion };
 }
 
 /**
- * Silencia las voces: la que ya suena baja en rampa desde su valor en curso y se para al final
- * de la rampa; la que estaba programada para más tarde no llega a empezar.
+ * Silencia las voces: la que ya suena sigue su envolvente hasta el corte (MARGEN_CORTE_S por
+ * delante del reloj), baja en rampa desde ahí y se para al final de la rampa; la que estaba
+ * programada para más tarde no llega a empezar.
+ *
+ * El tramo hasta el corte se REPONE con la misma curva: `cancelScheduledValues(corte)` borra la
+ * caída exponencial en curso (su evento es el de su final), y sin reponerla la ganancia volvería
+ * al pico entre el presente y el corte. Así no hace falta `cancelAndHoldAtTime`, que Firefox no
+ * tiene. `g.value` tampoco sirve: es el valor del último bloque calculado, no el del corte.
  */
 function silenciarVoces(ctx: AudioContext, voces: Voz[]): void {
   const ahora = ctx.currentTime;
-  voces.forEach(({ osc, gain, inicio }) => {
+  const corte = ahora + MARGEN_CORTE_S;
+  voces.forEach((voz) => {
+    const { osc, gain, inicio, ataque, duracion } = voz;
     try {
       if (inicio > ahora) {
         gain.gain.cancelScheduledValues(0);
@@ -81,11 +109,15 @@ function silenciarVoces(ctx: AudioContext, voces: Voz[]): void {
         osc.stop(ahora);
         return;
       }
+      // Acaba sola (en 0,001) antes del corte: no hay nada que bajar.
+      if (inicio + duracion <= corte) return;
       const g = gain.gain;
-      g.cancelScheduledValues(ahora);
-      g.setValueAtTime(g.value, ahora);
-      g.linearRampToValueAtTime(0, ahora + RAMPA_S);
-      osc.stop(ahora + RAMPA_S);
+      const valor = envolventeEn(voz, corte);
+      g.cancelScheduledValues(corte);
+      if (corte < inicio + ataque) g.linearRampToValueAtTime(valor, corte);
+      else g.exponentialRampToValueAtTime(valor, corte);
+      g.linearRampToValueAtTime(0, corte + RAMPA_S);
+      osc.stop(corte + RAMPA_S);
     } catch {
       // La voz ya había terminado
     }
@@ -134,7 +166,7 @@ function useAudio() {
         ctx.close().catch(() => {
           // El contexto ya estaba cerrado
         });
-      }, RAMPA_S * 1000 + 50);
+      }, (MARGEN_CORTE_S + RAMPA_S) * 1000 + 50);
     };
   }, []);
 

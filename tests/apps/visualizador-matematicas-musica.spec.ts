@@ -547,6 +547,10 @@ test('HALLAZGO — ir y volver sonando no acumula AudioContext vivos', async ({ 
  * Medido: La4 (1 s, ganancia 0,3) y, a los 0,24-0,27 s, «Grave (110 Hz)» → stop() sin argumento
  * sobre osc0, ninguna automatización nueva de gain0; su voz pasa de ≈ 0,077 a 0 en una muestra
  * (caída en 3 ms del 84-86 % del nivel; umbral 45 %, una rampa de 10 ms daría ≈ 27 %).
+ * El 26/09 se añadió la rampa, pero empezaba en ctx.currentTime: el hilo de audio calcula
+ * ≈ 16 ms por delante, la rampa llegaba ya empezada y la voz seguía cayendo un 79 % en 3 ms en
+ * la mitad de las ejecuciones (cabo C0207, 3 de 6 en rojo). REPARADO (13/10/2026): el corte va
+ * 30 ms por delante del reloj y el tramo hasta él repone la misma envolvente; 10 de 10 en verde.
  */
 test('HALLAZGO — encadenar dos sonidos: el que sonaba sale con rampa, no con stop() en seco', async ({ page }) => {
   await abrir(page);
