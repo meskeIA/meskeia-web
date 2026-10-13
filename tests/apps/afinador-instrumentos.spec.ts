@@ -156,3 +156,78 @@ test.describe('Lo que la página promete', () => {
     await expect(boton).toHaveAttribute('aria-pressed', 'false');
   });
 });
+
+/**
+ * Página traducida por el navegador (cabo C0233, 13/10/2026). El dump de errores reunía en
+ * esta app 4 NotFoundError: el aviso «Subir / Bajar tensión / Afinado» eran tres textos
+ * condicionales sueltos, hermanos en el mismo <div>. Un traductor sustituye cada nodo de
+ * texto por <font><font>…</font></font>, y React, al quitar el texto del estado anterior,
+ * buscaba un nodo que ya no estaba (removeChild) y la app caía a la pantalla de error.
+ * REPARADO (13/10/2026): cada texto en su <span>. El micrófono es un oscilador cuyo tono
+ * mueve el test: 430 Hz queda 40 cents bajo el La4 y 450 Hz, 39 por encima.
+ */
+test.describe('Página traducida por el navegador', () => {
+  test('pasar de «Subir tensión» a «Bajar tensión» y volver no tumba la app', async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as { __tono: (f: number) => void };
+      let osc: OscillatorNode | null = null;
+      let ctx: AudioContext | null = null;
+      w.__tono = (f) => {
+        if (osc && ctx) osc.frequency.setValueAtTime(f, ctx.currentTime);
+      };
+      navigator.mediaDevices.getUserMedia = async () => {
+        ctx = new AudioContext();
+        osc = ctx.createOscillator();
+        osc.frequency.value = 430;
+        const destino = ctx.createMediaStreamDestination();
+        osc.connect(destino);
+        osc.start();
+        return destino.stream;
+      };
+    });
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+
+    /** Imita al traductor: cada nodo de texto visible pasa a <font><font>texto</font></font>. */
+    const traducir = () =>
+      page.evaluate(() => {
+        const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+          acceptNode: (n) => {
+            const padre = n.parentElement;
+            if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+            if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          },
+        });
+        const nodos: Text[] = [];
+        while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+        for (const nodo of nodos) {
+          const exterior = document.createElement('font');
+          const interior = document.createElement('font');
+          interior.textContent = nodo.nodeValue;
+          exterior.appendChild(interior);
+          nodo.parentNode?.replaceChild(exterior, nodo);
+        }
+      });
+
+    await page.goto(RUTA);
+    await seleccionarInstrumento(page, 'Guitarra estándar');
+    await page.getByRole('button', { name: /Iniciar afinador/i }).click();
+    const aviso = page.locator('[class*="estadoAfinacion"]');
+    await expect(aviso).toContainText('Subir tensión');
+
+    await traducir();
+    await page.evaluate(() => (window as unknown as { __tono: (f: number) => void }).__tono(450));
+    await expect(aviso).toContainText('Bajar tensión');
+    await traducir();
+    await page.evaluate(() => (window as unknown as { __tono: (f: number) => void }).__tono(430));
+    await expect(aviso).toContainText('Subir tensión');
+
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Detener/i })).toBeVisible();
+    expect(errores).toEqual([]);
+  });
+});

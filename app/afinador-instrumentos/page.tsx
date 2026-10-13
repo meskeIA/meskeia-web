@@ -254,12 +254,14 @@ export default function AfinadorInstrumentosPage() {
           </span>
         </div>
 
-        {/* Estado de afinación */}
+        {/* Estado de afinación. Cada texto en su <span>: sueltos y hermanos, un traductor
+            del navegador los cambia por <font> y React, al retirar el del estado anterior,
+            no encontraba su nodo y la app caía con NotFoundError (cabo C0233). */}
         {estado && (
           <div className={`${styles.estadoAfinacion} ${styles[estado]}`}>
-            {estado === 'afinado' && '✓ Afinado'}
-            {estado === 'bajo' && '↓ Subir tensión'}
-            {estado === 'alto' && '↑ Bajar tensión'}
+            {estado === 'afinado' && <span>✓ Afinado</span>}
+            {estado === 'bajo' && <span>↓ Subir tensión</span>}
+            {estado === 'alto' && <span>↑ Bajar tensión</span>}
           </div>
         )}
 
