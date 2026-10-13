@@ -2,6 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
 import { parseSpanishNumber } from '../../lib/formatters';
 import { REFRACTARIO_ABSOLUTO } from '../../app/simulador-potencial-accion/motor';
+import { PUERTO } from './_puerto';
 
 /**
  * simulador-potencial-accion — 3 casos resueltos a mano antes de abrir el navegador.
@@ -672,10 +673,38 @@ test.describe('móvil 390×844, con el dedo', () => {
       const respuesta = await route.fetch({ url: `${baseURL}${url.pathname}${url.search}` });
       await route.fulfill({ response: respuesta });
     });
+    // context.route no ve los WebSocket: bajo `next dev` el de HMR salía a wss://meskeia.com, el
+    // de producción, y sin él la página no se hidrataba en 15 s (cabo C0171). Se reenvía al
+    // servidor local; con `next start` no hay HMR y esto no hace nada.
+    const abiertos: WebSocket[] = [];
+    page.on('close', () => abiertos.forEach((s) => s.close()));
+    await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
+      const u = new URL(ws.url());
+      const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
+      arriba.binaryType = 'arraybuffer';
+      abiertos.push(arriba);
+      const cola: (string | Buffer)[] = [];
+      arriba.onopen = () => {
+        for (const m of cola) arriba.send(m);
+        cola.length = 0;
+      };
+      ws.onMessage((m) => {
+        if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
+        else cola.push(m);
+      });
+      arriba.onmessage = (e: MessageEvent) =>
+        ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
+      ws.onClose(() => arriba.close());
+    });
 
     await page.goto('https://meskeia.com/simulador-potencial-accion/');
     await esperarHidratacion(page, [INTENSIDAD, UMBRAL, DURACION]);
-    await expect.poll(() => visitas.length).toBe(1);
+    // Por MONTAJE, como simulador-teorema-central-limite: bajo `next dev` el modo estricto de
+    // React ejecuta cada efecto dos veces y el rastreador emite dos avisos por carga. Un remontaje
+    // de verdad daría 4 en desarrollo y 2 en producción, y sigue fallando en los dos.
+    const enDesarrollo = await page.evaluate(() => document.querySelector('nextjs-portal') !== null);
+    const porCarga = enDesarrollo ? 2 : 1;
+    await expect.poll(() => visitas.length).toBe(porCarga);
 
     // Uso normal: intensidad al tope, modo sostenido, intervalo, vuelta al único, bloque educativo
     await arrastrarConElDedo(page, INTENSIDAD, 'derecha');
@@ -693,7 +722,9 @@ test.describe('móvil 390×844, con el dedo', () => {
     // rebote, components/ZonaHerramienta.tsx): va al mismo endpoint pero no es una visita
     // (modo 'bot', prefijo `evt:`). Se separan por nombre y se exige UNO de cada.
     const nombres = visitas.map((v) => (JSON.parse(v) as { aplicacion: string }).aplicacion);
-    expect(nombres.filter((n) => !n.startsWith('evt:'))).toEqual(['simulador-potencial-accion']);
+    expect(nombres.filter((n) => !n.startsWith('evt:'))).toEqual(
+      Array<string>(porCarga).fill('simulador-potencial-accion'),
+    );
     expect(nombres.filter((n) => n === 'evt:primer-uso')).toHaveLength(1);
   });
 });
