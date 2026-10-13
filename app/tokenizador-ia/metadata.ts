@@ -77,7 +77,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula el coste de usar la API de un LLM?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los proveedores cobran por millón de tokens ($/1M), con tarifas distintas para tokens de entrada (el prompt que envías) y tokens de salida (la respuesta que genera). El coste total = (tokens_entrada × precio_entrada + tokens_salida × precio_salida) / 1.000.000. Por ejemplo, con GPT-4o a $2,50/1M entrada y $10/1M salida, un prompt de 500 tokens con respuesta de 500 tokens cuesta aproximadamente $0,00625.',
+        text: 'Los proveedores cobran por millón de tokens ($/1M), con tarifas distintas para tokens de entrada (el prompt que envías) y tokens de salida (la respuesta que genera). El coste total = (tokens_entrada × precio_entrada + tokens_salida × precio_salida) / 1.000.000. Por ejemplo, con GPT-4o a 2,50 $/1M de entrada y 10 $/1M de salida, un prompt de 500 tokens con respuesta de 500 tokens cuesta aproximadamente 0,00625 $.',
       },
     },
     {

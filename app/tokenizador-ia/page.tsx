@@ -10,6 +10,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import { DataReference } from '@/components';
+import { formatNumber } from '@/lib';
 
 // ─── Tipos ───
 
@@ -68,12 +69,13 @@ function tokenizar(texto: string): Token[] {
   return tokens;
 }
 
+// Dólares con formato español: símbolo detrás y espacio duro, como el euro
 function formatUSD(n: number): string {
-  if (n === 0) return '$0,000000';
-  if (n < 0.000001) return `$${n.toExponential(2)}`;
-  if (n < 0.01) return `$${n.toFixed(6)}`;
-  if (n < 1) return `$${n.toFixed(4)}`;
-  return `$${n.toFixed(3)}`;
+  if (n === 0) return '0 $';
+  if (n < 0.000001) return `${n.toExponential(2).replace('.', ',')} $`;
+  if (n < 0.01) return `${formatNumber(n, 6)} $`;
+  if (n < 1) return `${formatNumber(n, 4)} $`;
+  return `${formatNumber(n, 3)} $`;
 }
 
 function formatContextoPct(tokens: number, contexto: number): string {
@@ -327,12 +329,12 @@ export default function TokenizadorIa() {
               <tr><th>Modelo</th><th>Contexto</th><th>Equivale a</th><th>Entrada</th><th>Salida</th></tr>
             </thead>
             <tbody>
-              <tr><td>GPT-4o</td><td>128.000 tokens</td><td>~350 págs.</td><td>$2,50/1M</td><td>$10,00/1M</td></tr>
-              <tr><td>GPT-4o mini</td><td>128.000 tokens</td><td>~350 págs.</td><td>$0,15/1M</td><td>$0,60/1M</td></tr>
-              <tr><td>Claude Sonnet 4.6</td><td>200.000 tokens</td><td>~550 págs.</td><td>$3,00/1M</td><td>$15,00/1M</td></tr>
-              <tr><td>Claude Haiku 4.5</td><td>200.000 tokens</td><td>~550 págs.</td><td>$1,00/1M</td><td>$5,00/1M</td></tr>
-              <tr><td>Gemini 1.5 Pro</td><td>1.048.576 tokens</td><td>~2.800 págs.</td><td>$1,25/1M</td><td>$5,00/1M</td></tr>
-              <tr><td>Gemini 1.5 Flash</td><td>1.048.576 tokens</td><td>~2.800 págs.</td><td>$0,075/1M</td><td>$0,30/1M</td></tr>
+              <tr><td>GPT-4o</td><td>128.000 tokens</td><td>~350 págs.</td><td>2,50 $/1M</td><td>10,00 $/1M</td></tr>
+              <tr><td>GPT-4o mini</td><td>128.000 tokens</td><td>~350 págs.</td><td>0,15 $/1M</td><td>0,60 $/1M</td></tr>
+              <tr><td>Claude Sonnet 4.6</td><td>200.000 tokens</td><td>~550 págs.</td><td>3,00 $/1M</td><td>15,00 $/1M</td></tr>
+              <tr><td>Claude Haiku 4.5</td><td>200.000 tokens</td><td>~550 págs.</td><td>1,00 $/1M</td><td>5,00 $/1M</td></tr>
+              <tr><td>Gemini 1.5 Pro</td><td>1.048.576 tokens</td><td>~2.800 págs.</td><td>1,25 $/1M</td><td>5,00 $/1M</td></tr>
+              <tr><td>Gemini 1.5 Flash</td><td>1.048.576 tokens</td><td>~2.800 págs.</td><td>0,075 $/1M</td><td>0,30 $/1M</td></tr>
             </tbody>
           </table>
         </div>
@@ -355,7 +357,7 @@ export default function TokenizadorIa() {
           </div>
           <div className={styles.escenarioCard}>
             <strong><span aria-hidden="true">🏢</span> Escala empresarial</strong>
-            <p>1.000 conv./día × 500 tokens = 500K tokens/día. Con GPT-4o mini: ~$0,075/día = ~$27/año.</p>
+            <p>1.000 conv./día × 500 tokens = 500K tokens/día. Con GPT-4o mini: ~0,075 $/día = ~27 $/año.</p>
           </div>
         </div>
 
