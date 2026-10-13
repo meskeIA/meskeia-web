@@ -1,4 +1,5 @@
 import { test, expect, devices, type Page } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 /**
  * Lupa Digital — test de regresión (Inspector, 20/08/2026)
@@ -21,9 +22,11 @@ import { test, expect, devices, type Page } from '@playwright/test';
  * Que el elemento <video> exista NO prueba nada: en los tres casos se comprueba que el medio
  * arranca de verdad (`readyState >= 2`, `videoWidth > 0` y `paused === false`).
  *
- * Los HALLAZGOS ABIERTOS van al final, marcados con `test.fail()`: afirman lo que la app
- * debería hacer y hoy fallan a propósito. El día que se reparen se pondrán en ROJO
- * («expected to fail, but passed») y habrá que quitarles la marca, quedando como regresión.
+ * Los hallazgos de la inspección del 20/08/2026 (72, 73 y 74) se repararon el 21/08/2026 y sus
+ * tests quedan al final como regresión normal. Los hallazgos NUEVOS de la re-inspección del
+ * 13/10/2026 van en su propio bloque, marcados con `test.fail()`: afirman lo que la app debería
+ * hacer y hoy fallan a propósito. El día que se reparen se pondrán en ROJO («expected to fail,
+ * but passed») y habrá que quitarles la marca, quedando como regresión.
  */
 
 test.use({
@@ -418,19 +421,19 @@ test.describe('lupa-digital — lote mecánico 18/08/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS (Inspector, 20/08/2026)
+// HALLAZGOS 72, 73 y 74 (Inspector, 20/08/2026) — REPARADOS el 21/08/2026
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ⚠️ HALLAZGO ABIERTO — accesibilidad. Los tres <input type="range"> de la app (zoom, brillo
-// y contraste) no tienen id, ni aria-label, ni aria-labelledby, y el <label> que acompaña a
-// brillo y contraste es un hermano suelto sin htmlFor (page.tsx: «<label>☀️ Brillo: {brillo}%
-// </label>» seguido del input); el de zoom ni siquiera tiene <label>, solo un <h3>. El árbol
-// de accesibilidad de Chromium devuelve name:"" para los tres, así que un lector de pantalla
-// anuncia «control deslizante, 100» sin decir de cuál se trata — y hay dos idénticos seguidos.
+// ✓ HALLAZGO 72 REPARADO (21/08/2026) — accesibilidad. Los tres <input type="range"> de la app
+// (zoom, brillo y contraste) no tenían id, ni aria-label, ni aria-labelledby, y el <label> que
+// acompañaba a brillo y contraste era un hermano suelto sin htmlFor (page.tsx: «<label>☀️ Brillo:
+// {brillo}%</label>» seguido del input); el de zoom ni siquiera tenía <label>, solo un <h3>. El
+// árbol de accesibilidad de Chromium devolvía name:"" para los tres, así que un lector de pantalla
+// anunciaba «control deslizante, 100» sin decir de cuál se trataba — y había dos idénticos seguidos.
 // Pesa más de lo normal porque esta app se vende como herramienta de accesibilidad para baja
 // visión («Filtros de accesibilidad», keywords «accesibilidad, baja visión»).
 // Caso: cargar /lupa-digital/ y leer el nombre accesible del 2º deslizador
-//       → esperado «Brillo: 100%» · obtenido "" (vacío).
+//       → esperado «Brillo: 100%» · obtenido entonces "" (vacío). Hoy, regresión.
 test('REGRESIÓN (accesibilidad) — los tres deslizadores deben tener nombre accesible', async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('slider').nth(0)).toHaveAccessibleName(/Zoom/i);
@@ -438,12 +441,12 @@ test('REGRESIÓN (accesibilidad) — los tres deslizadores deben tener nombre ac
   await expect(page.getByRole('slider').nth(2)).toHaveAccessibleName(/Contraste/i);
 });
 
-// ⚠️ HALLAZGO ABIERTO — contenido/formato. El único zoom con decimal se pinta con punto en
-// los tres sitios de la interfaz (el preajuste «1.5x», el título «Zoom: 1.5x» y el indicador
-// del visor «1.5x»), porque salen de interpolar el number directamente. La propia tabla del
-// bloque educativo de la app escribe «1,5x» con coma, así que la app se contradice a sí misma
+// ✓ HALLAZGO 73 REPARADO (21/08/2026) — contenido/formato. El único zoom con decimal se pintaba
+// con punto en los tres sitios de la interfaz (el preajuste «1.5x», el título «Zoom: 1.5x» y el
+// indicador del visor «1.5x»), porque salían de interpolar el number directamente. La propia
+// tabla del bloque educativo escribe «1,5x» con coma, así que la app se contradecía a sí misma
 // dentro de la misma página, y el formato español es obligatorio en el proyecto.
-// Caso: pulsar el preajuste de 1,5x → esperado «Zoom: 1,5x» · obtenido «Zoom: 1.5x».
+// Caso: pulsar el preajuste de 1,5x → esperado «Zoom: 1,5x» · obtenido entonces «Zoom: 1.5x».
 test('REGRESIÓN (contenido) — el zoom decimal se escribe con coma, igual que en su tabla educativa', async ({
   page,
 }) => {
@@ -461,15 +464,15 @@ test('REGRESIÓN (contenido) — el zoom decimal se escribe con coma, igual que 
   await expect(page.locator('[class*=zoomIndicador]')).toHaveText('1,5x');
 });
 
-// ⚠️ HALLAZGO ABIERTO — operativa. Con la lupa apagada, el visor (un 4:3 que ocupa el ancho
-// entero) muestra «Pulsa para activar la lupa», pero ese placeholder es un <div role="status">
-// sin onClick, sin botón dentro y con cursor:auto: pulsar ahí —lo que invita a hacer el
-// texto, y el blanco más grande de la pantalla en un móvil— no hace absolutamente nada. El
-// botón que sí activa está debajo. La invariante admite las dos reparaciones posibles (hacer
-// pulsable el visor o cambiar el texto por «Pulsa el botón…»), y por eso se comprueba así.
+// ✓ HALLAZGO 74 REPARADO (21/08/2026) — operativa. Con la lupa apagada, el visor (un 4:3 que
+// ocupa el ancho entero) mostraba «Pulsa para activar la lupa», pero ese placeholder era un
+// <div role="status"> sin onClick, sin botón dentro y con cursor:auto: pulsar ahí —lo que invita
+// a hacer el texto, y el blanco más grande de la pantalla en un móvil— no hacía nada. Se reparó
+// convirtiendo el placeholder en un <button>. La invariante admite las dos reparaciones posibles
+// (hacer pulsable el visor o cambiar el texto por «Pulsa el botón…»), y por eso se comprueba así.
 // Caso: pulsar sobre el texto «Pulsa para activar la lupa» → esperado que la lupa se active
-//       (o que el visor no invite a pulsarlo) · obtenido: el placeholder sigue ahí y el
-//       <video> sigue con display:none.
+//       (o que el visor no invite a pulsarlo) · obtenido entonces: el placeholder seguía ahí y
+//       el <video> seguía con display:none.
 test('REGRESIÓN (operativa) — si el visor dice «Pulsa», pulsarlo tiene que activar la lupa', async ({
   page,
 }) => {
@@ -483,3 +486,419 @@ test('REGRESIÓN (operativa) — si el visor dice «Pulsa», pulsarlo tiene que 
 // El hallazgo 8 (equipo sin cámara) vive en `lupa-digital-sin-camara.spec.ts`: exige
 // arrancar Chromium sin dispositivo simulado, y `launchOptions` solo admite el nivel
 // superior de un spec.
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN (Inspector, 13/10/2026)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Visor y lienzo, en coordenadas de pantalla. */
+function cajas(page: Page) {
+  return page.evaluate(() => {
+    const lienzo = document.querySelector('canvas') as HTMLCanvasElement;
+    const c = lienzo.getBoundingClientRect();
+    const v = (lienzo.parentElement as HTMLElement).getBoundingClientRect();
+    return { lienzo: { izq: c.left, der: c.right }, visor: { x: v.x, y: v.y, ancho: v.width, alto: v.height } };
+  });
+}
+
+/**
+ * Gesto con el dedo de verdad (touch nativo por CDP): parte de un punto del visor
+ * (`fx`, `fy` en fracción de su caja, o `fy > 1` para empezar por debajo) y se desplaza
+ * `dx`, `dy` px. Centra antes el visor en la ventana para que el dedo caiga donde se dice, y
+ * devuelve cuánto se desplazó la página DURANTE el gesto (medido después de centrar: el
+ * propio centrado mueve la página y no cuenta).
+ */
+async function deslizarDesdeElVisor(page: Page, dx: number, dy: number, fx = 0.5, fy = 0.5): Promise<number> {
+  await page.evaluate(() => document.querySelector('canvas')?.parentElement?.scrollIntoView({ block: 'center' }));
+  await page.waitForTimeout(300);
+  const antes = await page.evaluate(() => window.scrollY);
+  const { visor } = await cajas(page);
+  const x0 = Math.round(visor.x + visor.ancho * fx);
+  const y0 = Math.round(visor.y + visor.alto * fy);
+  const cdp = await page.context().newCDPSession(page);
+  const dedo = (x: number, y: number) => [{ x, y, radiusX: 6, radiusY: 6, force: 1, id: 1 }];
+  const pasos = 12;
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: dedo(x0, y0) });
+  for (let i = 1; i <= pasos; i++) {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: dedo(Math.round(x0 + (dx * i) / pasos), Math.round(y0 + (dy * i) / pasos)),
+    });
+    await page.waitForTimeout(16);
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+  await page.waitForTimeout(400);
+  return (await page.evaluate(() => window.scrollY)) - antes;
+}
+
+/**
+ * Contraste WCAG del color del texto contra su fondo COMPUESTO real (las capas rgba de los
+ * antepasados, sobre blanco). Se mide en el navegador, no leyendo el CSS con regex.
+ */
+function contrasteDe(page: Page, selector: string): Promise<{ ratio: number; luzFondo: number }> {
+  return page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return { ratio: -1, luzFondo: -1 };
+    type Rgba = { r: number; g: number; b: number; a: number };
+    const parse = (s: string): Rgba | null => {
+      const m = s.match(/rgba?\(([^)]+)\)/);
+      if (!m) return null;
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    const sobre = (t: Rgba, f: Rgba): Rgba => ({
+      r: t.r * t.a + f.r * (1 - t.a), g: t.g * t.a + f.g * (1 - t.a), b: t.b * t.a + f.b * (1 - t.a), a: 1,
+    });
+    const capas: Rgba[] = [];
+    for (let e: Element | null = el; e; e = e.parentElement) {
+      const c = parse(getComputedStyle(e).backgroundColor);
+      if (c && c.a > 0) {
+        capas.push(c);
+        if (c.a >= 1) break;
+      }
+    }
+    let fondo: Rgba = { r: 255, g: 255, b: 255, a: 1 };
+    for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
+    const color = parse(getComputedStyle(el).color) as Rgba;
+    const texto = color.a < 1 ? sobre(color, fondo) : color;
+    const lum = ({ r, g, b }: Rgba) => {
+      const f = (c: number) => ((c /= 255) <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+    };
+    const [a, b] = [lum(texto), lum(fondo)];
+    return {
+      ratio: Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100,
+      luzFondo: b,
+    };
+  }, selector);
+}
+
+test.describe('re-inspección 13/10/2026', () => {
+  test.describe('en móvil (Pixel 7)', () => {
+    // Opciones enumeradas: `...devices['Pixel 7']` arrastra `defaultBrowserType` y fuerza un
+    // worker nuevo, que Playwright no admite dentro de un describe.
+    const P7 = devices['Pixel 7'];
+    test.use({
+      viewport: P7.viewport,
+      userAgent: P7.userAgent,
+      deviceScaleFactor: P7.deviceScaleFactor,
+      isMobile: P7.isMobile,
+      hasTouch: P7.hasTouch,
+    });
+
+    test('CASO 1 — la cámara arranca de verdad y el zoom ×N enseña N veces menos campo (se mide la caja del vídeo, no el rótulo)', async ({
+      page,
+    }) => {
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      const arranque = await estadoDelVideo(page);
+      expect(arranque?.readyState).toBeGreaterThanOrEqual(2);
+      expect(arranque?.ancho).toBeGreaterThan(0);
+      expect(arranque?.pausado).toBe(false);
+
+      // Visor del Pixel 7: 412 px de viewport − 2 × 10 de padding (≤ 600 px) = 392, en 4:3 → 294
+      // de alto. El vídeo se amplía con transform: scale(N), así que a zoom N su caja mide
+      // 392·N × 294·N y por la ventana del visor cabe 1/N del campo en cada eje.
+      expect(await cajas(page)).toMatchObject({ visor: { ancho: 392, alto: 294 } });
+      const anchoDelVideo = () =>
+        page.locator('video').evaluate((v) => {
+          const r = v.getBoundingClientRect();
+          return `${Math.round(r.width)}×${Math.round(r.height)}`;
+        });
+      const ESPERADO: [string, string][] = [
+        ['1x', '392×294'],
+        ['1,5x', '588×441'],
+        ['2x', '784×588'],
+        ['3x', '1176×882'],
+        ['4x', '1568×1176'],
+        ['5x', '1960×1470'],
+      ];
+      for (const [preajuste, caja] of ESPERADO) {
+        await page.getByRole('button', { name: preajuste, exact: true }).click();
+        await expect.poll(anchoDelVideo, { message: `zoom ${preajuste}` }).toBe(caja);
+      }
+
+      // Los topes del control (min 1, max 5, paso 0,5 en page.tsx): a 5x «+» queda inactivo y
+      // «−» baja medio punto (4,5x → 392 × 4,5 = 1764); a 1x es «−» el que queda inactivo.
+      await expect(page.getByRole('button', { name: '+', exact: true })).toBeDisabled();
+      await page.getByRole('button', { name: '−', exact: true }).click();
+      await expect.poll(anchoDelVideo).toBe('1764×1323');
+      await expect(page.locator('h3', { hasText: /^Zoom/ })).toHaveText('Zoom: 4,5x');
+      await page.getByRole('button', { name: '1x', exact: true }).click();
+      await expect(page.getByRole('button', { name: '−', exact: true })).toBeDisabled();
+    });
+
+    test('CASO 2 — «Congelar» deja la imagen QUIETA, las flechas la recorren dentro de su tope y «Reanudar» vuelve al directo', async ({
+      page,
+    }) => {
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      await page.getByRole('button', { name: '2x', exact: true }).click();
+
+      // En directo, la cámara simulada se mueve: dos capturas del visor separadas no coinciden.
+      // Es el testigo de que la comparación de abajo puede detectar movimiento.
+      const visor = page.locator('canvas').locator('..');
+      await visor.scrollIntoViewIfNeeded();
+      const vivo1 = await visor.screenshot();
+      await page.waitForTimeout(800);
+      const vivo2 = await visor.screenshot();
+      expect(vivo1.equals(vivo2)).toBe(false);
+
+      // Congelada: 1,5 s después la imagen es la misma, píxel a píxel.
+      await page.getByRole('button', { name: /Congelar/i }).click();
+      const lienzo = page.locator('canvas');
+      await expect(lienzo).toBeVisible();
+      await page.waitForTimeout(300);
+      const quieta1 = await visor.screenshot();
+      await page.waitForTimeout(1500);
+      const quieta2 = await visor.screenshot();
+      expect(quieta1.equals(quieta2)).toBe(true);
+      // Mientras está congelada no se ofrece cambiar de cámara (el botón solo vive en directo).
+      await expect(page.getByRole('button', { name: /Cambiar cámara/i })).toHaveCount(0);
+
+      // Teclado (FAQ: «se recorre arrastrándola con el dedo o con las flechas del teclado»):
+      // paso 20 px, 60 con Mayúsculas (moverConTeclado). A 2x el tope es 392 × (2 − 1) / 2 = 196.
+      await lienzo.focus();
+      await page.keyboard.press('ArrowLeft');
+      await expect(lienzo).toHaveAttribute('style', /translate\(20px, 0px\) scale\(2\)/);
+      await page.keyboard.press('Shift+ArrowRight');
+      await expect(lienzo).toHaveAttribute('style', /translate\(-40px, 0px\) scale\(2\)/);
+      for (let i = 0; i < 4; i++) await page.keyboard.press('Shift+ArrowRight');
+      await expect(lienzo).toHaveAttribute('style', /translate\(-196px, 0px\) scale\(2\)/);
+      await page.keyboard.press('ArrowUp');
+      await expect(lienzo).toHaveAttribute('style', /translate\(-196px, 20px\) scale\(2\)/);
+
+      await page.getByRole('button', { name: /Reanudar/i }).click();
+      await expect(page.locator('video')).toBeVisible();
+      await expect.poll(async () => (await estadoDelVideo(page))?.pausado).toBe(false);
+    });
+
+    // ⚠️ HALLAZGO NUEVO — operativa (13/10/2026). El tope del recorrido de la imagen congelada
+    // sale del ancho del visor (acotarDesplazamiento), pero solo se vuelve a aplicar al cambiar
+    // el zoom o al congelar (useEffect [zoom, congelado]); girar el móvil cambia el ancho del
+    // visor y nadie reacota. En horizontal (863 × 360) el visor mide 660 px y a 4x se puede
+    // recorrer hasta 660 × 3 / 2 = 990 px; al volver a vertical el visor mide 392 y el tope es
+    // 588, pero el translate se queda en −990: la imagen entera queda fuera del visor y se ve
+    // NEGRO (medido: 89 % de píxeles negros, el resto son las insignias superpuestas). Se
+    // arregla solo al tocar la imagen o cambiar el zoom, pero hasta entonces parece perdida.
+    // Caso: congelar a 4x en horizontal, arrastrar al tope, girar a vertical → esperado que la
+    //       imagen cubra el visor de lado a lado · obtenido: translate(−990px), visor en negro.
+    test('HALLAZGO NUEVO (operativa) — al girar el móvil con la imagen congelada y recorrida, el visor se queda en negro', async ({
+      page,
+    }) => {
+      test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      await page.getByRole('button', { name: '4x', exact: true }).click();
+      await page.getByRole('button', { name: /Congelar/i }).click();
+      const lienzo = page.locator('canvas');
+      await expect(lienzo).toBeVisible();
+
+      // Horizontal: devices['Pixel 7 landscape'] es 863 × 360. Por encima de 600 px el padding
+      // es de 20 px y el contenedor tiene max-width 700 → visor de 660 px.
+      await page.setViewportSize({ width: 863, height: 360 });
+      await expect.poll(async () => (await cajas(page)).visor.ancho).toBe(660);
+      await deslizarDesdeElVisor(page, -3000, 0);
+      await expect(lienzo).toHaveAttribute('style', /translate\(-990px, 0px\) scale\(4\)/);
+
+      // De vuelta a vertical: visor de 392 px.
+      await page.setViewportSize({ width: 412, height: 839 });
+      await expect.poll(async () => (await cajas(page)).visor.ancho).toBe(392);
+
+      // DEBERÍA: la imagen ampliada sigue cubriendo el visor de lado a lado (|x| ≤ 588).
+      const { lienzo: l, visor: v } = await cajas(page);
+      expect({ cubreIzquierda: l.izq <= v.x + 0.5, cubreDerecha: l.der >= v.x + v.ancho - 0.5 }).toEqual({
+        cubreIzquierda: true,
+        cubreDerecha: true,
+      });
+    });
+
+    test('CASO 3 — permiso denegado o cámara ocupada: el visor lo dice (no se queda en negro), no aparecen controles de una cámara que no hay y, al conceder, arranca', async ({
+      page,
+    }) => {
+      // La denegación se simula con el mismo error que da el navegador (NotAllowedError):
+      // este fichero arranca Chromium con --use-fake-ui-for-media-stream, que concede siempre.
+      // En la inspección se comprobó también con --use-fake-ui-for-media-stream=deny (denegación
+      // real del navegador): el mismo aviso, palabra por palabra.
+      await page.addInitScript(() => {
+        const w = window as unknown as { __falloCamara: string | null };
+        w.__falloCamara = 'NotAllowedError';
+        const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+        navigator.mediaDevices.getUserMedia = (c?: MediaStreamConstraints) =>
+          w.__falloCamara ? Promise.reject(new DOMException('simulado', w.__falloCamara)) : original(c);
+      });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      const activar = page.getByRole('button', { name: /Activar lupa/i });
+      // Acotado al visor: getByRole('alert') casaría también con el anunciador de rutas de Next.
+      const aviso = page.locator('[class*=lupaPlaceholder] [role="alert"]');
+
+      await activar.click();
+      // Textos de AVISOS_CAMARA en page.tsx: cada motivo con su consejo.
+      await expect(aviso).toContainText('Permiso de cámara denegado');
+      await expect(aviso).toContainText('Activa la cámara en la configuración del navegador');
+      await expect(page.locator('video')).toBeHidden();
+      expect((await estadoDelVideo(page))?.readyState).toBe(0);
+      await expect(page.getByRole('button', { name: /Congelar|Cambiar cámara|linterna/i })).toHaveCount(0);
+      await expect(activar).toHaveAttribute('aria-pressed', 'false');
+
+      // Cámara ocupada por otra aplicación: otro motivo, otro consejo.
+      await page.evaluate(() => {
+        (window as unknown as { __falloCamara: string | null }).__falloCamara = 'NotReadableError';
+      });
+      await activar.click();
+      await expect(aviso).toContainText('No se ha podido abrir la cámara');
+      await expect(aviso).toContainText('Puede que otra aplicación la esté usando');
+
+      // Resuelto el problema, el mismo botón arranca la cámara y el aviso desaparece.
+      await page.evaluate(() => {
+        (window as unknown as { __falloCamara: string | null }).__falloCamara = null;
+      });
+      await activar.click();
+      await esperarCamaraEnMarcha(page);
+      await expect(aviso).toHaveCount(0);
+    });
+  });
+
+  test.describe('a 360 px con el dedo (cabo C0067)', () => {
+    // C0067: «deslizar desde el lienzo no desplaza la página». El lienzo de la imagen congelada
+    // lleva touch-action: none. Medido el 13/10/2026: el visor deja 10 px libres por lado (padding
+    // del contenedor), pero ocupa 255 de 780 px de alto y deja ~260 px por encima y por debajo
+    // desde donde el gesto desplaza; y sobre la imagen congelada el gesto vertical hace lo que la
+    // app promete (recorrerla). Descartado como hallazgo; esto fija las condiciones medidas.
+    test.use({
+      viewport: { width: 360, height: 780 },
+      userAgent: devices['Pixel 7'].userAgent,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('C0067 — en directo el gesto vertical sobre el vídeo desplaza la página; congelada, recorre la imagen y no la página; bajo el visor, desplaza', async ({
+      page,
+    }) => {
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+
+      // 360 − 2 × 10 de padding = 340 px de visor; 4:3 → 255 de alto.
+      expect(await cajas(page)).toMatchObject({ visor: { x: 10, ancho: 340, alto: 255 } });
+
+      // En directo el vídeo no lleva touch-action: none → un gesto de 150 px hacia arriba
+      // desde el visor desplaza la página (medido: 135 px).
+      expect(await deslizarDesdeElVisor(page, 0, -150, 0.5, 0.8)).toBeGreaterThan(100);
+
+      // Congelada a 2x: el mismo gesto no desplaza la página y recorre la imagen hasta su tope
+      // vertical, 255 × (2 − 1) / 2 = 127,5 px.
+      await page.getByRole('button', { name: /Congelar/i }).click();
+      await expect(page.locator('canvas')).toBeVisible();
+      expect(await deslizarDesdeElVisor(page, 0, -150, 0.5, 0.8)).toBe(0);
+      await expect(page.locator('canvas')).toHaveAttribute('style', /translate\(0px, -127\.5px\) scale\(2\)/);
+
+      // Empezando por debajo del visor (sobre «Detener»), el gesto vuelve a desplazar la página.
+      expect(await deslizarDesdeElVisor(page, 0, -150, 0.5, 1.2)).toBeGreaterThan(100);
+    });
+  });
+
+  // ⚠️ HALLAZGO NUEVO — accesibilidad (13/10/2026). Los seis rótulos de «Usos comunes» llevan el
+  // emoji pegado al texto sin <span aria-hidden="true"> (page.tsx: «<div …usoItem>📖 Leer letra
+  // pequeña</div>» y los otros cinco), así que el lector de pantalla lee «libro abierto Leer letra
+  // pequeña», «píldora Ver prospectos», «silla de ruedas Accesibilidad»… (CLAUDE.md §5, regla 3).
+  // Caso: árbol AX de «Usos comunes» → esperado sin pictogramas · obtenido «📖 Leer letra pequeña
+  //       💊 Ver prospectos 🏷️ Leer etiquetas 🔧 Trabajos de precisión 📱 Ver componentes ♿ Accesibilidad».
+  test('HALLAZGO NUEVO (accesibilidad) — los emojis de «Usos comunes» no deben llegar al lector de pantalla', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+    await page.goto(RUTA);
+    const usos = page.locator('[class*=usosGrid]');
+    await expect(usos).toContainText('Leer letra pequeña'); // la sección está donde se busca
+    // DEBERÍA: ni un pictograma en lo que expone el árbol de accesibilidad.
+    expect(await usos.ariaSnapshot()).not.toMatch(/\p{Extended_Pictographic}/u);
+  });
+
+  // ⚠️ HALLAZGO NUEVO — accesibilidad (13/10/2026). Tres textos usan el color de marca LITERAL
+  // en LupaDigital.module.css en vez de --primary-texto / --secondary-texto, y no llegan a 4,5:1
+  // (WCAG 1.4.3; los tres son texto pequeño, 13-14 px): el preajuste de zoom ACTIVO
+  // (.zoomPresetActivo, #2E86AB, 3,65:1 en claro y 3,01:1 en oscuro), los consejos de los
+  // escenarios (.escenarioTip, #2E86AB, 3,74 / 2,94) y el dato de la FAQ (.faqTip, #48A9A6,
+  // 2,60 / 4,09). Pesa más en una app que se vende para baja visión.
+  // Caso: medir el contraste de los tres sobre su fondo compuesto, en los dos temas → esperado
+  //       ≥ 4,5:1 · obtenido 3,65 / 3,74 / 2,60 en claro y 3,01 / 2,94 / 4,09 en oscuro.
+  test('HALLAZGO NUEVO (accesibilidad) — el texto en color de marca debe llegar a 4,5:1 en los dos temas', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const SELECTORES = ['[class*=zoomPresetActivo]', '[class*=escenarioTip]', '[class*=faqTip]'];
+    const bajoMinimo: string[] = [];
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') {
+        // Con el botón de la propia página: sembrar data-theme a mano puede medir otro estado.
+        await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      }
+      for (const sel of SELECTORES) {
+        // Los fondos cambian de tema con transición: se espera a que el fondo compuesto sea el
+        // del tema (luminancia relativa > 0,7 en claro, < 0,06 en oscuro; la tarjeta oscura
+        // #2D2D2D da 0,026) y a que dos lecturas seguidas den la misma cifra.
+        let previo = -1;
+        let ratio = -1;
+        await expect
+          .poll(
+            async () => {
+              const medida = await contrasteDe(page, sel);
+              const enTema = tema === 'claro' ? medida.luzFondo > 0.7 : medida.luzFondo >= 0 && medida.luzFondo < 0.06;
+              const quieto = medida.ratio === previo;
+              previo = ratio = medida.ratio;
+              return enTema && quieto;
+            },
+            { intervals: [150], message: `${sel} existe y su fondo es el del tema ${tema}` },
+          )
+          .toBe(true);
+        if (ratio < 4.5) bajoMinimo.push(`${tema} ${sel} ${ratio}:1`);
+      }
+    }
+    // DEBERÍA: ninguno por debajo de 4,5:1.
+    expect(bajoMinimo).toEqual([]);
+  });
+
+  // ⚠️ HALLAZGO NUEVO — contenido (13/10/2026). La misma pregunta se responde dos veces con
+  // textos distintos: la FAQ visible «¿Puedo dejar la imagen fija para leerla con calma?» y el
+  // FAQPage de metadata.ts «¿Se puede dejar la imagen fija en vez de sostener el móvil?». No se
+  // contradicen, pero cada una añade lo suyo (la visible, «haz una captura de pantalla»; la del
+  // FAQPage, «a partir de 4× el temblor de la mano…»), y dos textos a mano acaban divergiendo.
+  // Caso: comparar las dos respuestas → esperado una sola (UNA constante en metadata.ts que
+  //       importen las dos bocas, como app/simulador-gastos-compraventa-garaje) · obtenido dos.
+  test('HALLAZGO NUEVO (contenido) — la pregunta de la imagen fija debe tener UNA respuesta en la FAQ visible y en el FAQPage', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+    await page.goto(RUTA);
+    const preguntas = await page.evaluate(() => {
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        const datos = JSON.parse(s.textContent || '{}');
+        if (datos['@type'] === 'FAQPage')
+          return datos.mainEntity as { name: string; acceptedAnswer: { text: string } }[];
+      }
+      return [];
+    });
+    const enFaqPage = preguntas.find((p) => /imagen fija/i.test(p.name));
+    expect(enFaqPage, 'el FAQPage tiene la pregunta de la imagen fija').toBeTruthy();
+    const visible = page.locator('details', { has: page.locator('summary', { hasText: /imagen fija/i }) });
+    await expect(visible).toHaveCount(1); // y la FAQ visible también
+    const textoVisible = ((await visible.textContent()) ?? '').replace(/\s+/g, ' ');
+    // DEBERÍA: la respuesta del FAQPage es la que se ve, palabra por palabra.
+    expect(textoVisible).toContain(enFaqPage?.acceptedAnswer.text ?? '∅');
+  });
+});

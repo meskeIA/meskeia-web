@@ -56,6 +56,11 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   · SOSPECHA (a) del 29/09, CONFIRMADA: un clic de unos 10 ms se da por «Lectura estable» y
  *     sustituye la retenida (HALLAZGO R1, id 2615, abajo; nació con `test.fail()` y se REPARÓ el
  *     mismo 02/10/2026).
+ *
+ * ── INSPECTOR 13/10/2026 (al final del fichero) ──
+ * El rechazo por ARRIBA del rango (21.000 y 20.050 Hz: ninguna cifra) y el HALLAZGO J4, ABIERTO, con
+ * `test.fail()`: un silbido de 0,3 s ya es «Lectura estable» y la página dice que eso pide medio
+ * segundo. Los demás casos de esa tanda, en generador-tonos.spec.ts.
  */
 
 const RUTA = '/generador-tonos/';
@@ -816,4 +821,94 @@ test('HALLAZGO R1 (REPARADO) — un golpe de 250 Hz sobre el ruido de la sala no
   expect(r.filter((x) => x.estado === 'Lectura estable').map((x) => x.cifra)).toEqual([]);
   expect(r.filter((x) => x.retenida !== '').map((x) => x.retenida)).toEqual([]);
   await expect(page.getByRole('button', { name: 'Llevar la lectura al generador' })).toHaveCount(0);
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 13/10/2026 — re-inspección (invalidada por 3d5c5db0, la <ZonaHerramienta>)
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Los casos con micrófono de la tanda van aquí y no en generador-tonos.spec.ts porque este fichero
+ * ya lleva los launchOptions del micrófono falso (que son por fichero); la señal se fabrica en la
+ * página con `microfonoSintetico`, como en la re-inspección del 02/10.
+ *
+ * CASO R (rechazo), resuelto a mano: el medidor busca entre FREC_MIN = 20 Hz y FREC_MAX = 20.000 Hz,
+ * el rango que la app declara («Frecuencias de audio de 20 Hz a 20 kHz»). Un tono de 21.000 Hz o de
+ * 20.050 Hz (por encima del techo y por debajo de Nyquist: 22.050 Hz a 44,1 kHz, 24.000 a 48 kHz)
+ * llega entero al analizador, pero no es del rango: esperado «— Hz» todo el rato, sin «Lectura
+ * estable» ni retenida. Es el simétrico por arriba del hallazgo 2412 (15 Hz leídos como 17,6).
+ * Ciclos enteros en el búfer (2 s · 21.000 = 42.000; 2 s · 20.050 = 40.100): el bucle no mete salto.
+ * Comprobado también por el camino de verdad, con un WAV de 21 kHz por el micrófono falso: «— Hz»,
+ * salvo una cifra suelta («19.657 Hz · Leyendo…») justo a los 2 s, en la vuelta del fichero, que es
+ * el chasquido del dispositivo falso que describe generador-tonos-medidor-grave.spec.ts.
+ */
+test.describe('Inspector 13/10/2026 — el medidor', () => {
+  for (const hz of [21000, 20050]) {
+    test(`CASO R — un tono de ${hz.toLocaleString('es-ES')} Hz, por encima del rango, no da ninguna cifra`, async ({ page }) => {
+      await page.addInitScript(() => {
+        const w = window as VentanaAudio;
+        w.__analizadoresInspeccion = [];
+        const crear = AudioContext.prototype.createAnalyser;
+        AudioContext.prototype.createAnalyser = function (this: AudioContext) {
+          const a = crear.call(this);
+          w.__analizadoresInspeccion?.push(a);
+          return a;
+        };
+      });
+      await medirSintetico(page, { segundos: 2, componentes: [{ tipo: 'tono', hz, amp: 0.5, desde: 0, hasta: 2 }] });
+      await esperarDesdeElMicrofono(page, 3000);
+      // El tono llega de verdad al analizador del medidor: no es un caso vacío.
+      const nivel = await page.evaluate((f: number) => {
+        const an = ((window as VentanaAudio).__analizadoresInspeccion ?? []).find((a) => a.fftSize === 16384);
+        if (!an) return null;
+        const d = new Float32Array(an.frequencyBinCount);
+        an.getFloatFrequencyData(d);
+        const c = Math.round(f / (an.context.sampleRate / an.fftSize));
+        return Math.max(...Array.from(d.slice(c - 3, c + 4)));
+      }, hz);
+      expect(nivel, 'no se creó el analizador del medidor').not.toBeNull();
+      expect(nivel ?? -Infinity, `el tono de ${hz} Hz tenía que llegar al analizador`).toBeGreaterThan(-40);
+      await comprobarSinCifra(page);
+    });
+  }
+
+  /**
+   * HALLAZGO J4 [bajo · contenido] — ABIERTO (13/10/2026). El bloque «Qué mide y qué no» dice que
+   * «"estable" pide medio segundo a la misma frecuencia con un sonido que no se esté apagando», y un
+   * silbido de 0,3 s ya se da por «Lectura estable» y queda retenido. La propia app lo sabe: el
+   * comentario de `iniciarMedidor` y el de CAIDA_MAXIMA_ESTABLE_DB (motor-medidor.ts) dicen «en la
+   * práctica pide unos 0,3 s» y «de 0,3 s, una [lectura estable]». Cinco lecturas cada 100 ms abarcan
+   * 0,4 s, pero la ventana de la FFT (0,34-0,37 s) guarda el sonido mientras tanto.
+   *   entrada   silbido de 432 Hz de 0,30 s (amplitud 0,3, rampa de salida de 20 ms) sobre ruido a
+   *             −65 dBFS, en un búfer de 3 s
+   *   esperado  (lo que dice la página) ninguna «Lectura estable»: el sonido dura menos de medio segundo
+   *   obtenido  «432 Hz · La4 (−32 cents) · Lectura estable» y «Última lectura estable: 432 Hz · La4
+   *             (−32 cents)»; igual con 0,40 s
+   * Se acepta cualquiera de las dos reparaciones: que el texto diga lo que pide de verdad, o que
+   * pida de verdad medio segundo.
+   */
+  test('HALLAZGO J4 — un silbido de 0,3 s no se da por «estable» mientras la página diga que eso pide medio segundo', async ({
+    page,
+  }) => {
+    // ABIERTO: comprobado el 13/10/2026 que cae en la última aserción (una «Lectura estable» de
+    // 432 Hz), no en la precondición de que el silbido se lea.
+    test.fail();
+    await medirSintetico(page, {
+      segundos: 3,
+      fondo: 0.001,
+      semilla: 777,
+      componentes: [{ tipo: 'tono', hz: 432, amp: 0.3, desde: 0.6, hasta: 0.9, rampa: 0.02 }],
+    });
+    // Hasta que el silbido (0,6-0,9 s del búfer) ha salido de la ventana, antes de la vuelta (3 s).
+    await esperarDesdeElMicrofono(page, 2600);
+    const r = await registro(page);
+    expect(r.some((x) => /^43[123] Hz$/.test(x.cifra)), 'el silbido tenía que leerse').toBe(true);
+    const limites = (await seccion(page).locator('[class*="medidaLimites"]').textContent()) ?? '';
+    const prometeMedioSegundo = /medio segundo/.test(limites);
+    const estables = r.filter((x) => x.estado === 'Lectura estable').map((x) => x.cifra);
+    expect(
+      prometeMedioSegundo ? estables : [],
+      'la página dice que «estable» pide medio segundo, y el silbido dura 0,3 s',
+    ).toEqual([]);
+  });
 });

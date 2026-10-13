@@ -45,10 +45,14 @@
  * y registral recalculados tramo a tramo por un script propio que NO llama al código de la
  * app; el desarrollo va comentado junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS ABIERTOS: cuatro desde el Inspector del 08/10/2026 ([08/10-a] a [08/10-d]), con
- * `test.fail()` en el último describe del fichero (la coma antes de «ni», el nombre de Ceuta y
- * Melilla sin artículo, cuatro preguntas de la FAQ escritas dos veces y el IVA deducible sin «no
- * exenta»). Los cuatro de la re-inspección del 06/10/2026 (2916-2919: el pegado que NumberInput
+ * HALLAZGOS: a 13/10/2026 hay tres ABIERTOS, del Inspector de ese día ([13/10-a] a [13/10-c], con
+ * `test.fail()` en el último describe: la tarjeta «Promotora compra suelo para construir» da el
+ * IVA por deducible sin condición —residuo del 3089—, el FAQPage de la finca rústica sin la
+ * renuncia del art. 20.Dos LIVA y la plusvalía «no es un coste del comprador» sin el sustituto del
+ * art. 106.2 TRLRHL). Los cuatro del Inspector del 08/10/2026 ([08/10-a] a [08/10-d], hallazgos
+ * 3089-3092: la coma antes de «ni», el nombre de Ceuta y Melilla sin artículo, cuatro preguntas de
+ * la FAQ escritas dos veces y el IVA deducible sin «no exenta») se REPARARON ese mismo día y quedan
+ * como regresión, sin marca. Los cuatro de la re-inspección del 06/10/2026 (2916-2919: el pegado que NumberInput
  * descartaba, la nota de Canarias, el FAQPage sin IGIC/IPSI y el ITP «al tipo general») se
  * repararon ese mismo día y quedaron como regresión, sin marca. Ninguno a 26/09/2026 (tarde): los de ese día
  * (2208-2213) están reparados y sin marca en el describe «Reparación 26/09/2026», con la receta de la familia
@@ -3584,5 +3588,325 @@ test.describe('Inspector 08/10/2026 — casos a mano, el invariante campo a camp
       .filter(([, tx]) => !/no exent/.test(tx))
       .map(([k, tx]) => `${k}: «${tx}»`);
     expect(sinExencion).toEqual([]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 13/10/2026 — RE-INSPECCIÓN tras la rebaja del 5 % de los aranceles (11/10), con el
+// reparto del IBI (S0195) y los textos del cabo C0164.
+//
+// Primeros casos de este fichero que FIJAN la notaría y el registro con la rebaja del 5 % del nº 2.1
+// de los dos aranceles. Los describe anteriores que los fijaban sin ella pueden estar en rojo por
+// eso (cabo C0209, destino reparar): no se tocan aquí.
+//
+// De dónde sale cada cifra esperada (resuelta a mano ANTES de abrir el navegador, con un script
+// propio que no llama a ninguna función de la app):
+//   · ITP de un solar → TIPOS_ITP_CCAA_2025 (data/fiscal/inmuebles.ts): Murcia 7,75 % (sin escala
+//     en ITP_CCAA); Asturias, escala de ITP_CCAA.asturias.tramosProgresivos: 8 % hasta 300.000,
+//     9 % hasta 500.000, 10 % el resto.
+//   · AJD de un solar → ITP_CCAA.asturias.ajd = 1,2. IVA → PORCENTAJES_IVA.general = 21.
+//   · Notaría → ARANCELES_NOTARIO (RD 1426/1989, nº 2.1), acumulado por exceso desde 90,151816 €:
+//     4,5 ‰ hasta 30.050,61 · 1,5 ‰ hasta 60.101,21 · 1 ‰ hasta 150.253,03 · 0,5 ‰ hasta 601.012,10
+//     · 0,3 ‰ hasta 6.010.121,04; × (1 − REBAJA_ARANCEL_CUANTIA = 0,05) × 1,21 de IVA; factura
+//     FACTURA_NOTARIAL ×1,5 a ×2 y la tarjeta enseña el punto medio (×1,75).
+//       145.000,50 → arancel 328,309211 → 377,39 con rebaja e IVA → 566,09–754,78, medio 660,44
+//       800.000,00 → arancel 618,637646 → 711,12 → 1066,69–1422,25, medio 1244,47
+//   · Registro → ARANCELES_REGISTRO (RD 1427/1989, nº 2.1: 24,040484 € y 1,75/1,25/0,75/0,30/0,20 ‰),
+//     tope 2.181,673939, × 0,95, + 6,010121 (nº 1) + 3,005061 (nº 4), × 1,21:
+//       145.000,50 → 167,349059 → 203,28 · 800.000,00 → 346,313958 → 409,00
+//   · Reparto del IBI → lib/calculadoras/prorrateoCompraventa (STS 409/2016): por días del año
+//     natural; el vendedor hasta el día anterior a la escritura. 2028 es bisiesto (366 días).
+//   · Textos: Ley 37/1992, art. 20.Uno.20.º, 20.Dos y 20.Uno.23.º.b (BOE-A-1992-28740) y
+//     TRLRHL, art. 106.1.b y 106.2 (BOE-A-2004-4214), consolidados, leídos en el BOE el 13/10/2026.
+//
+// Los hallazgos van con `test.fail()` salvo con `VER_HUECOS=1`. Al repararlos, quitar la marca y
+// reescribir el comentario en pasado.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 13/10/2026 — aranceles con la rebaja del 5 %, el reparto del IBI y los textos de C0164', () => {
+  test.describe.configure({ timeout: 90_000 });
+  const SEL_PRECIO = `input[aria-label="${PRECIO}"]`;
+  const SEL_GESTORIA = `input[aria-label="${GESTORIA}"]`;
+  const SEL_IBI = 'input[aria-label="Cuota anual del IBI"]';
+  const n = (s: string | null | undefined): string => (s ?? '').replace(/\s+/g, ' ').trim();
+  /** El marcador del panel sin cifra (no el anunciador de rutas de Next). */
+  const marcador = (page: Page) => page.locator('[class*="placeholder"] p');
+  const bloqueIbi = (page: Page) => page.locator('section[aria-labelledby="titulo-prorrateo"]');
+
+  interface I13Tarjeta {
+    titulo: string;
+    valor: string;
+    desc: string;
+  }
+
+  /** Las tarjetas del panel de resultados, en orden, con el texto normalizado (U+00A0 → espacio). */
+  const leer = (page: Page): Promise<I13Tarjeta[]> =>
+    page.evaluate(() => {
+      const cont = document.querySelector('[class*="resultados"]');
+      const norm = (s: string | undefined) => (s ?? '').replace(/\s+/g, ' ').trim();
+      return [...(cont?.querySelectorAll('h3') ?? [])].map((h) => {
+        const card = h.parentElement!.parentElement!;
+        const valor = card.querySelector(':scope > div:nth-of-type(2) > p') as HTMLElement | null;
+        const ps = card.querySelectorAll(':scope > p');
+        return {
+          titulo: norm(h.innerText),
+          valor: norm(valor?.innerText),
+          desc: ps.length ? norm((ps[ps.length - 1] as HTMLElement).innerText) : '',
+        };
+      });
+    });
+
+  const tarjeta = (ts: I13Tarjeta[], re: RegExp): I13Tarjeta => {
+    const x = ts.find((c) => re.test(c.titulo));
+    if (!x) throw new Error(`No hay tarjeta ${re} entre: ${ts.map((c) => c.titulo).join(' | ')}`);
+    return x;
+  };
+
+  async function abrir(page: Page, ccaa: string, vende: 'particular' | 'promotor'): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA, SEL_IBI]);
+    await page.selectOption('#select-ccaa', ccaa);
+    await expect(page.locator('#select-ccaa')).toHaveValue(ccaa);
+    await elegir(page, vende);
+  }
+
+  async function elegir(page: Page, vende: 'particular' | 'promotor'): Promise<void> {
+    const boton = page.getByRole('button', { name: vende === 'particular' ? /Un particular/ : /Promotor \/ Empresa/ });
+    await boton.click();
+    await expect(boton).toHaveAttribute('aria-pressed', 'true');
+  }
+
+  /** El FAQPage servido, pregunta → respuesta normalizada. */
+  async function faqLd(page: Page): Promise<Map<string, string>> {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = JSON.parse(bloques.find((b) => b.includes('"FAQPage"')) ?? '{"mainEntity":[]}') as {
+      mainEntity: Array<{ name: string; acceptedAnswer: { text: string } }>;
+    };
+    return new Map(faq.mainEntity.map((q): [string, string] => [q.name, n(q.acceptedAnswer.text)]));
+  }
+
+  /**
+   * CASO 1 (NORMAL) — Región de Murcia, vende un PARTICULAR, «145.000,50» € (millar con punto y
+   * céntimos con coma), gestoría 600 €.
+   *   ITP = 145.000,50 × 7,75 % = 11.237,53875 → 11.237,54 → «ITP (7,75 %)»; sin AJD ni IVA.
+   *   Notaría 660,44 (566,09–754,78) · registro 203,28 · gestoría 600,00
+   *   Total = 11.237,54 + 660,44 + 203,28 + 600,00 = 12.701,26 → 12.701,26 / 145.000,50 = 8,76 %
+   *   Coste = 145.000,50 + 12.701,26 = 157.701,76, cierre completo.
+   */
+  test('CASO 1 (normal) — Murcia, particular, 145.000,50 €: ITP 7,75 %, notaría y registro con la rebaja, total 12.701,26 €', async ({ page }) => {
+    await abrir(page, 'murcia', 'particular');
+    await sembrarValor(page, SEL_GESTORIA, '600');
+    await sembrarValor(page, SEL_PRECIO, '145.000,50');
+    const ts = await leer(page);
+    expect(tarjeta(ts, /^Precio del solar/).valor).toBe('145.000,50 €');
+    expect(tarjeta(ts, /^ITP \(/).titulo).toBe('ITP (7,75 %)');
+    expect(tarjeta(ts, /^ITP \(/).valor).toBe('11.237,54 €');
+    expect(ts.some((c) => /^(AJD|IVA|IGIC|IPSI)/.test(c.titulo))).toBe(false);
+    expect(tarjeta(ts, /^Gastos de notaría/).titulo).toBe('Gastos de notaría (IVA incluido)');
+    expect(tarjeta(ts, /^Gastos de notaría/).valor).toBe('660,44 €');
+    expect(tarjeta(ts, /^Gastos de notaría/).desc).toMatch(/^Factura estimada entre 566,09 € y 754,78 €\./);
+    expect(tarjeta(ts, /^Registro de la Propiedad/).valor).toBe('203,28 €');
+    expect(tarjeta(ts, /^Gastos de gestoría/).valor).toBe('600,00 €');
+    expect(tarjeta(ts, /^Total gastos/).titulo).toBe('Total gastos adicionales');
+    expect(tarjeta(ts, /^Total gastos/).valor).toBe('12.701,26 €');
+    expect(tarjeta(ts, /^Total gastos/).desc).toBe('8,76 % sobre el precio de compra');
+    expect(tarjeta(ts, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(tarjeta(ts, /^COSTE TOTAL/).valor).toBe('157.701,76 €');
+    expect(tarjeta(ts, /^COSTE TOTAL/).desc).toBe('Precio + todos los gastos de la operación');
+    const recuadro = n(await page.locator('[class*="infoCcaa"]').first().innerText());
+    expect(recuadro).toContain('ITP General 7,75 %');
+    expect(recuadro).toContain('AJD 1,5 %');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Asturias, 800.000 €, la gestoría de 500 € que trae el campo. Dos límites:
+   *   a) PARTICULAR: los tres tramos de la escala, el último al 10 %.
+   *      ITP = 300.000 × 8 % + 200.000 × 9 % + 300.000 × 10 % = 24.000 + 18.000 + 30.000 = 72.000
+   *      → efectivo 9,00 %. Notaría 1244,47 (1066,69–1422,25, sexto tramo del arancel), registro
+   *      409,00 (sexto tramo). Total 72.000 + 1244,47 + 409,00 + 500 = 74.153,47 (9,27 %), coste
+   *      874.153,47.
+   *   b) PROMOTOR, mismo precio: IVA 800.000 × 21 % = 168.000,00 + AJD 800.000 × 1,2 % = 9600,00
+   *      (sin escala ni ITP). Total 179.753,47 (22,47 %), coste 979.753,47, con la salvedad del IVA
+   *      deducible y la del art. 30.1.
+   *   c) INVARIANTE: la gestoría «1.250,00.5» no se lee → total y coste BAJAN 500,00 € (179.253,47,
+   *      22,41 %; 979.253,47), los dos se rotulan parciales y el coste dice «será mayor».
+   */
+  test('CASO 2 (límite) — Asturias, 800.000 €: escala hasta el 10 % (72.000 €), y con promotor IVA 168.000 € + AJD 1,2 %', async ({ page }) => {
+    await abrir(page, 'asturias', 'particular');
+    await sembrarValor(page, SEL_PRECIO, '800000');
+    const a = await leer(page);
+    expect(tarjeta(a, /^ITP \(/).titulo).toBe('ITP (9,00 %)');
+    expect(tarjeta(a, /^ITP \(/).valor).toBe('72.000,00 €');
+    expect(tarjeta(a, /^Gastos de notaría/).valor).toBe('1244,47 €');
+    expect(tarjeta(a, /^Gastos de notaría/).desc).toMatch(/^Factura estimada entre 1066,69 € y 1422,25 €\./);
+    expect(tarjeta(a, /^Registro de la Propiedad/).valor).toBe('409,00 €');
+    expect(tarjeta(a, /^Gastos de gestoría/).valor).toBe('500,00 €');
+    expect(tarjeta(a, /^Total gastos/).valor).toBe('74.153,47 €');
+    expect(tarjeta(a, /^Total gastos/).desc).toBe('9,27 % sobre el precio de compra');
+    expect(tarjeta(a, /^COSTE TOTAL/).valor).toBe('874.153,47 €');
+    expect(n(await page.locator('[class*="infoCcaa"]').first().innerText())).toContain(
+      'aplica escala progresiva (8 % → 9 % → 10 %): cada tramo del valor tributa a su tipo',
+    );
+
+    await elegir(page, 'promotor');
+    const b = await leer(page);
+    expect(b.some((c) => /^ITP/.test(c.titulo))).toBe(false);
+    expect(tarjeta(b, /^IVA \(/).titulo).toBe('IVA (21,00 %)');
+    expect(tarjeta(b, /^IVA \(/).valor).toBe('168.000,00 €');
+    expect(tarjeta(b, /^AJD \(/).titulo).toBe('AJD (1,20 %)');
+    expect(tarjeta(b, /^AJD \(/).valor).toBe('9600,00 €');
+    expect(tarjeta(b, /^Gastos de notaría/).valor).toBe('1244,47 €');
+    expect(tarjeta(b, /^Registro de la Propiedad/).valor).toBe('409,00 €');
+    expect(tarjeta(b, /^Total gastos/).titulo).toBe('Total gastos adicionales');
+    expect(tarjeta(b, /^Total gastos/).valor).toBe('179.753,47 €');
+    expect(tarjeta(b, /^Total gastos/).desc).toBe('22,47 % sobre el precio de compra');
+    expect(tarjeta(b, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(tarjeta(b, /^COSTE TOTAL/).valor).toBe('979.753,47 €');
+    expect(tarjeta(b, /^COSTE TOTAL/).desc).toBe(
+      `Precio + todos los gastos (antes de deducir el IVA si tienes derecho). ${AVISO_BASE_AJD}`,
+    );
+
+    await sembrarValor(page, SEL_GESTORIA, '1.250,00.5');
+    const c = await leer(page);
+    expect(tarjeta(c, /^Gastos de gestoría/).valor).toBe('Sin leer');
+    expect(tarjeta(c, /^Total gastos/).titulo).toBe('Total gastos adicionales (parcial)');
+    expect(tarjeta(c, /^Total gastos/).valor).toBe('179.253,47 €');
+    expect(tarjeta(c, /^Total gastos/).desc).toBe(
+      '22,41 % sobre el precio de compra — SIN la gestoría, que no se ha podido leer',
+    );
+    expect(tarjeta(c, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL (PARCIAL)');
+    expect(tarjeta(c, /^COSTE TOTAL/).valor).toBe('979.253,47 €');
+    expect(tarjeta(c, /^COSTE TOTAL/).desc).toBe(
+      `No incluye la gestoría, que no se ha podido leer: el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho). ${AVISO_BASE_AJD}`,
+    );
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — Galicia, vende un particular.
+   *   Precio «12..000», «120.00.000» y «-»: no son números (el punto solo agrupa en grupos de tres)
+   *   → ninguna cifra, y el marcador nombra lo escrito. «0,001» se pinta 0,00 € y «-0» es 0 → «no
+   *   vale», con lo escrito entre comillas (patrón 5).
+   *   Reparto del IBI (el bloque que el testigo de la familia mide solo con un ilegible): 600 € con
+   *   escritura el 01/03/2028, año bisiesto → vendedor 31 + 29 = 60 días, 600 × 60 / 366 = 98,36;
+   *   comprador 306 días, 600 − 98,3607 = 501,64. Con la cuota «2.000.50» no se reparte nada y se
+   *   nombra el campo; con una fecha fuera del rango que el motor acepta (1899) tampoco se publica
+   *   reparto.
+   */
+  test('CASO 3 (rechazo) — Galicia: precios que no se leen o no valen no publican cifra; el IBI de un bisiesto y el ilegible', async ({ page }) => {
+    await abrir(page, 'galicia', 'particular');
+    const cierre = page.locator('h3', { hasText: /^COSTE TOTAL/ });
+    for (const v of ['12..000', '120.00.000', '-']) {
+      await sembrarValor(page, SEL_PRECIO, v);
+      await expect(cierre).toHaveCount(0);
+      await expect(marcador(page)).toHaveText(
+        `No se ha podido leer el precio «${v}». Introduce el precio del solar para ver el desglose de gastos, con coma decimal (120.000 o 120000,50)`,
+      );
+    }
+    await sembrarValor(page, SEL_PRECIO, '0,001');
+    await expect(cierre).toHaveCount(0);
+    await expect(marcador(page)).toHaveText(
+      'El precio escrito («0,001») se queda en 0,00 € al céntimo, y tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del solar.',
+    );
+    await sembrarValor(page, SEL_PRECIO, '-0');
+    await expect(cierre).toHaveCount(0);
+    await expect(marcador(page)).toHaveText(
+      'El precio escrito («-0») tiene que ser mayor que 0: corrígelo para ver el desglose de gastos del solar.',
+    );
+
+    const bloque = bloqueIbi(page);
+    const fecha = bloque.locator('input[type="date"]');
+    await fecha.fill('2028-03-01');
+    await esperarValorEnReact(page, fecha, '2028-03-01');
+    await sembrarValor(page, SEL_IBI, '600');
+    const fila = n(await bloque.locator('tbody tr').first().innerText());
+    expect(fila).toBe('IBI del año 01/01/2028 – 31/12/2028 98,36 € · 60 días 501,64 € · 306 días');
+    await expect(bloque).toContainText('el comprador le abona en la firma 501,64 €.');
+
+    await sembrarValor(page, SEL_IBI, '2.000.50');
+    await expect(bloque.locator('[role="alert"]')).toContainText('No se entiende el importe de «Cuota anual del IBI»');
+    await expect(bloque).not.toContainText('abona');
+
+    await sembrarValor(page, SEL_IBI, '600');
+    await expect(bloque).toContainText('el comprador le abona en la firma 501,64 €.');
+    await fecha.fill('1899-12-31');
+    await esperarValorEnReact(page, fecha, '1899-12-31');
+    await expect(bloque).not.toContainText('abona');
+    await expect(bloque.locator('table')).toHaveCount(0);
+  });
+
+  /**
+   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-a] Residuo del hallazgo 3089 (cabo C0164), que
+   * se reparó en sus cuatro bocas (aviso del promotor, tarjeta del IVA, fila de la tabla y FAQ, todas
+   * ya con «sujeta y no exenta»). La quinta no estaba en aquella lista: la tarjeta de casos de uso
+   * «Promotora compra suelo para construir» dice «Si compra a otro empresario, paga IVA 21 %
+   * deducible en el modelo 303», sin condición. Es justo el caso que la FAQ de la misma página
+   * excluye: quien levanta viviendas para alquilarlas no deduce, porque el arrendamiento de vivienda
+   * está exento (Ley 37/1992, art. 20.Uno.23.º.b, y art. 94.Uno.1.º.a: «sujetas y no exentas»).
+   *   Guía abierta → esperado: la tarjeta condiciona la deducción (actividad sujeta y no exenta) ·
+   *   obtenido «…paga IVA 21 % deducible en el modelo 303 (en Canarias, Ceuta y Melilla…)».
+   */
+  test('[13/10-a] la tarjeta «Promotora compra suelo para construir» condiciona el IVA deducible a una actividad sujeta y no exenta', async ({ page }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    // La referencia: la FAQ de la misma página excluye a la promotora de vivienda en alquiler.
+    const ld = await faqLd(page);
+    expect(ld.get('¿Puedo deducir el IVA de la compra de un solar?')).toContain(
+      'es el caso de quien levanta en él viviendas para alquilarlas, porque ese arrendamiento está exento',
+    );
+    const card = n(
+      await page.locator('strong', { hasText: 'Promotora compra suelo para construir' }).locator('xpath=..').innerText(),
+    );
+    expect(card).toContain('deducible en el modelo 303');
+    expect(card, `tarjeta: «${card}»`).toMatch(/no exent/);
+  });
+
+  /**
+   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-b] El FAQPage («¿Qué diferencia hay entre
+   * comprar un solar y una finca rústica?», solo en el JSON-LD, lo que leen los asistentes de IA)
+   * dice que la finca rústica «está exenta de IVA (tributa por ITP incluso vendiéndola un
+   * empresario)». Falta la renuncia: el art. 20.Dos de la Ley 37/1992 permite renunciar a la exención
+   * del 20.º cuando el adquirente es un empresario con derecho a deducir, y entonces la entrega va por
+   * IVA (con AJD), que es lo que la hermana terreno-rústico calcula con «Con renuncia a la exención
+   * IVA». La tarjeta de apps relacionadas de esta misma página repite «Terreno rústico: solo ITP»
+   * (data/app-relations.ts, entrada de solar).
+   *   Esperado: la renuncia nombrada (o al menos «salvo renuncia») · obtenido la regla sin excepción.
+   */
+  test('[13/10-b] el FAQPage de la finca rústica no la da por «ITP incluso vendiéndola un empresario» sin la renuncia del art. 20.Dos LIVA', async ({ page }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
+    const ld = await faqLd(page);
+    const rustica = ld.get('¿Qué diferencia hay entre comprar un solar y una finca rústica?') ?? '';
+    expect(rustica).toContain('La finca rústica no edificable está exenta de IVA');
+    expect(rustica, `FAQPage: «${rustica}»`).toMatch(/renuncia/i);
+    const relacionada = n(
+      await page.locator('section[aria-label="Aplicaciones relacionadas"] a', { hasText: 'Finca Rústica' }).innerText(),
+    );
+    expect(relacionada, `tarjeta relacionada: «${relacionada}»`).not.toContain('solo ITP');
+  });
+
+  /**
+   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-c] La plusvalía municipal se presenta como
+   * ajena al comprador sin excepción: FAQ visible y FAQPage («Sí, pero la paga el vendedor, no el
+   * comprador»), la nota «Recuerda» bajo el resultado y la tarjeta de casos de uso («No es (un) coste
+   * del comprador»). El TRLRHL, art. 106.2 (BOE-A-2004-4214, consolidado, leído el 13/10/2026),
+   * hace al ADQUIRENTE sujeto pasivo sustituto en las transmisiones onerosas cuando el transmitente
+   * es una persona física no residente en España: quien compra un solar a un no residente la debe
+   * ingresar. Ninguna app de la familia ni estimador-plusvalia-municipal lo nombra.
+   *   Esperado: la salvedad del no residente en la respuesta (las dos bocas) · obtenido la regla sola.
+   */
+  test('[13/10-c] la plusvalía «la paga el vendedor» nombra al comprador sustituto cuando vende un no residente (art. 106.2 TRLRHL)', async ({ page }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const pregunta = '¿Hay plusvalía municipal al comprar o vender un solar?';
+    const visible = n(await page.locator('strong', { hasText: pregunta }).locator('xpath=../p').innerText());
+    const servida = (await faqLd(page)).get(pregunta) ?? '';
+    expect(visible).toContain('la paga el vendedor, no el comprador');
+    expect(visible, `FAQ visible: «${visible}»`).toMatch(/no residente|sustitut/i);
+    expect(servida, `FAQPage: «${servida}»`).toMatch(/no residente|sustitut/i);
   });
 });

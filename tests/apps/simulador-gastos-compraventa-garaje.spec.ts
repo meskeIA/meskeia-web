@@ -49,11 +49,19 @@
  *  24. INSPECTOR 08/10/2026 — la familia entera, una hermana por agente: Baleares con el
  *      perfil General, el millón EXACTO de Valencia anclado en la ley, la reventa a un mes
  *      con la ganancia en el tramo del 30 %, la comprobación de 99e1ee7e (relacionadas) y
- *      cuatro hallazgos con `test.fail()` (al final del fichero).
+ *      cuatro hallazgos (3074-3077) que se escribieron con `test.fail()` y se REPARARON el
+ *      mismo 08/10/2026: ya no llevan la marca. Después, la reparación del 10/10/2026 (Ceuta,
+ *      Melilla y la plusvalía foral).
+ *  25. INSPECTOR 13/10/2026 — tras la rebaja del 5 % de los aranceles (a3c3ecb0): Galicia con
+ *      las cifras de la rebaja, Melilla en las dos pestañas, el rechazo de los años negativos en
+ *      Melilla, el ejemplo de Luis (2901/2902, abiertos por C0209) y cinco hallazgos con
+ *      `test.fail()` (al final del fichero).
  *
  * ⚠️ 06/10/2026 — los bloques «✅ REPARADO» (antes «❌ ABIERTO») describen el defecto TAL
- * COMO SE VIO el día de su inspección, con los verbos de entonces. A 08/10/2026 la base no
- * tenía ninguno abierto en esta app: los únicos `test.fail()` vivos son los de la sección 24.
+ * COMO SE VIO el día de su inspección, con los verbos de entonces. A 13/10/2026 la base no
+ * tenía ninguno abierto en esta app: los únicos `test.fail()` vivos son los de la sección 25.
+ * ⚠️ 13/10/2026 — las secciones que fijan la notaría y el registro de ANTES del 11/10/2026
+ * (371,84 €, 80,21 €…) fallan desde a3c3ecb0: su puesta al día es el cabo C0209.
  *
  * ⚠️ Desde el 09/09/2026 las preguntas de la FAQ son `<h3>` (reparación del 626) y
  * `EducationalSection` monta su contenido SIEMPRE en el DOM, así que un
@@ -99,6 +107,18 @@ import {
 // Siembra con testigo: ver la cabecera de `_hidratacion.ts`. El `rellenar` de este fichero
 // es anterior (fill() a secas) y se conserva para no reescribir 2.900 líneas de casos válidos.
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+// Sección 25 (Inspector 13/10/2026): los aranceles con la rebaja del 5 % del nº 2.1 y las dos
+// normas de Ceuta y Melilla de la pestaña Vendedor, leídas de los módulos que aplican la app.
+import {
+  REBAJA_ARANCEL_CUANTIA,
+  ARANCELES_NOTARIO,
+  ARANCELES_REGISTRO,
+  REGISTRO_CONCEPTOS,
+  FACTURA_NOTARIAL,
+  BONIFICACION_CUOTA_CEUTA_MELILLA,
+  honorariosLlevanIVA,
+} from '../../data/itp-ccaa';
+import { BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from '../../data/fiscal/inmuebles';
 
 const RUTA = '/simulador-gastos-compraventa-garaje/';
 
@@ -7325,5 +7345,407 @@ test.describe('Reparación 10/10/2026 — Ceuta, Melilla y la plusvalía foral',
     expect(neto).not.toMatch(/\.\s*para obtenerlo/);
     await page.selectOption('#select-ccaa', 'pais-vasco');
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('norma foral de cada territorio histórico');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 25. INSPECTOR 13/10/2026 — RE-INSPECCIÓN tras a3c3ecb0 (rebaja del 5 % de los aranceles, 11/10),
+//     183f367a (Ceuta y Melilla en la pestaña Vendedor, 10/10) y eda487ab (reparto del IBI).
+//
+// Los tres casos se resolvieron a mano ANTES de abrir la app y cuadraron al céntimo:
+//   EA (normal)  — Galicia · segunda mano · 18.500 €: el ITP de la ficha y la notaría y el registro
+//                  CON la rebaja del nº 2.1, que ninguna sección medía con literal en esta app.
+//   EB (límite)  — Melilla en las dos pestañas: ITP bonificado, honorarios sin IPSI y un vendedor
+//                  con 27 años (tope «20 o más años»), el método REAL ganando, la bonificación del
+//                  50 % de la cuota del IIVTNU y la deducción del 60 % del IRPF. Ceuta tenía su
+//                  caso (reparación del 10/10); Melilla, ninguno.
+//   EC (rechazo) — el mismo vendedor con años «-2»: no se liquida la plusvalía y el neto sale PARCIAL.
+// Y la regresión del motor en el caso de Luis (Madrid 25.000 €), con las cifras de la rebaja.
+//
+// Hallazgos NUEVOS, con `test.fail()` (afirman lo que DEBERÍA pasar), al final del bloque:
+//   [13/10-a] la deducción del 60 % de Ceuta y Melilla desaparece del texto del IRPF en cuanto la
+//             tarjeta lleva otro aviso, y la cuota queda por debajo del 19 % sin explicación;
+//   [13/10-b] la FAQ «¿Qué ITP paga un garaje de segunda mano?» da el 6-13 % sin Ceuta y Melilla;
+//   [13/10-c] la FAQ de la plusvalía da por universales las reglas del TRLRHL (y su 30 %), sin el
+//             régimen foral que la tarjeta ya nombra;
+//   [13/10-d] el sello atribuye la bonificación del ITP al art. 57 bis.1 TRLITPAJD (es el 3.a);
+//   [13/10-e] la nota de Madrid: «ITP más bajo de España peninsular (6 %)».
+// El ejemplo de Luis, que sigue con los aranceles SIN la rebaja, NO es nuevo: es el 2901/2902 de la
+// referencia, que sigue ABIERTO por el cabo C0209 («casos de las specs y textos de las hermanas»).
+//
+// ⚠️ A 13/10/2026 las secciones anteriores que fijan la notaría y el registro de antes del 11/10
+// (371,84 €, 80,21 €, 27.252,05 €…) están en rojo: es el «siguen abiertos por las specs» del commit
+// a3c3ecb0 (C0209). Esta sección no las toca.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//   · ITP → `ITP_CCAA.galicia.tipoGeneral` (TIPOS_ITP_CCAA_2025: Galicia 8) y, en Melilla, su
+//     «Bonificación general 50 %» (tipo 3: el 6 % del art. 11 TRLITPAJD con el 50 % de la cuota del
+//     art. 57 bis.3.a, leído en el BOE el 13/10/2026, BOE-A-1993-25359).
+//   · Notaría → `ARANCELES_NOTARIO` (RD 1426/1989, nº 2.1) × (1 − `REBAJA_ARANCEL_CUANTIA`) × 1,21
+//     (sin el IVA en Melilla: `honorariosLlevanIVA`) y la horquilla de `FACTURA_NOTARIAL` (×1,5 a ×2,
+//     la tarjeta enseña ×1,75).
+//   · Registro → `ARANCELES_REGISTRO` (RD 1427/1989, nº 2.1) × (1 − `REBAJA_ARANCEL_CUANTIA`) +
+//     `REGISTRO_CONCEPTOS` (6,010121 + 3,005061), × 1,21 donde rige el IVA.
+//   · Plusvalía → `COEFICIENTES_IIVTNU_2025` («20 o más años»: 0,40) × 25 % (`tipoOrientativo`) ×
+//     50 % de `BONIFICACION_IIVTNU_CEUTA_MELILLA` (art. 159.2 TRLRHL).
+//   · IRPF → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 €, 21 % después) − 60 % de
+//     `DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA` (art. 68.4 LIRPF).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Melilla · vendedor del CASO EB, sobre la página ya cargada con el precio escrito. */
+const I13_VENDEDOR_MELILLA: readonly [string, string][] = [
+  ['Precio de compra original del garaje', '31000'],
+  ['Impuestos y gastos que pagaste al comprarlo (€)', '1200'],
+  ['Años de propiedad', '27'],
+  ['Valor catastral del suelo (€)', '9000'],
+  ['Valor catastral total (suelo + construcción) (€)', '24000'],
+  ['Comisión inmobiliaria del vendedor (%)', '3'],
+  ['Gestoría y certificados del vendedor (€)', '150'],
+];
+
+/** Abre la app en Melilla con 40.000 €, pasa a Vendedor y siembra el vendedor del CASO EB. */
+async function i13VendedorMelilla(page: Page): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+  await page.selectOption('#select-ccaa', 'melilla');
+  await sembrarImporte(page, 'Precio del garaje / plaza de parking', '40000');
+  await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+  for (const [etiqueta, valor] of I13_VENDEDOR_MELILLA) await sembrarImporte(page, etiqueta, valor);
+}
+
+/** La respuesta de una pregunta de la FAQ VISIBLE (montada siempre, aunque nazca plegada). */
+async function i13FaqVisible(page: Page, pregunta: string): Promise<string> {
+  const item = page.locator('[class*="faqItem"]').filter({ hasText: pregunta }).first();
+  return i24Normaliza((await item.locator('p').first().textContent()) ?? '');
+}
+
+/** La respuesta de una pregunta del FAQPage servido (lo que leen buscadores y asistentes de IA). */
+async function i13FaqPage(html: string, pregunta: string): Promise<string> {
+  const bloques = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) =>
+    JSON.parse(m[1]),
+  );
+  const faq = bloques.find((b) => b['@type'] === 'FAQPage') as
+    | { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }
+    | undefined;
+  return faq?.mainEntity.find((q) => q.name === pregunta)?.acceptedAnswer.text ?? '';
+}
+
+test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las dos pestañas y los textos territoriales', () => {
+  /**
+   * CASO EA (NORMAL) — GALICIA · segunda mano · 18.500 € · perfil General · gestoría 250.
+   *   ITP: 18.500 × 8 % = 1.480,00 € (sin escala; los reducidos gallegos son de colectivo o exigen
+   *     vivienda habitual, así que no hay aviso «Podrías pagar menos»). Recuadro 8,00 % · AJD 1,5 %.
+   *   Notaría: 90,151816 + (18.500 − 6.010,12) × 0,45 % (56,20446) = 146,356276 × 0,95 =
+   *     139,038462 × 1,21 = 168,236539 → ×1,5 = 252,35 · ×2 = 336,47 · ×1,75 = 294,41 €
+   *   Registro: 24,040484 + 12.489,88 × 0,175 % (21,85729) = 45,897774 × 0,95 = 43,602885 +
+   *     9,015182 = 52,618067 × 1,21 = 63,67 €
+   *   Total: 1.480 + 294,41 + 63,67 + 250 = 2.088,08 € (11,29 % de 18.500) · coste 20.588,08 €.
+   * Sin la rebaja la notaría sería 309,91 € y el registro 66,44 €: el defecto que vigila es de
+   * unos 15 € y 3 €, así que las cifras van al céntimo.
+   */
+  test('CASO EA (normal) — Galicia 18.500 €: ITP al 8 % y la notaría y el registro con la rebaja del 5 %', async ({ page }) => {
+    expect(ITP_CCAA.galicia.tipoGeneral).toBe(8);
+    expect(ITP_CCAA.galicia.tramosProgresivos).toBeUndefined();
+    expect(REBAJA_ARANCEL_CUANTIA).toBe(0.05);
+    expect(ARANCELES_NOTARIO[0].base).toBe(90.151816);
+    expect(ARANCELES_NOTARIO[1]).toEqual({ hasta: 30050.61, base: 90.151816, exceso: 0.45 });
+    expect(ARANCELES_REGISTRO[0].base).toBe(24.040484);
+    expect(ARANCELES_REGISTRO[1].exceso).toBe(0.175);
+    expect([REGISTRO_CONCEPTOS.presentacion, REGISTRO_CONCEPTOS.notaSimple]).toEqual([6.010121, 3.005061]);
+    expect([FACTURA_NOTARIAL.factorMin, FACTURA_NOTARIAL.factorMax]).toEqual([1.5, 2]);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'galicia');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '18500');
+    await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', '250');
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('8,00 %');
+    expect(await valorPanelCcaa(page, 'AJD')).toBe('1,5 %');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (8,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('1480,00 €');
+    expect(await i24Titulo(page, /^Gastos de notaría/)).toBe('Gastos de notaría (IVA incluido)');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('294,41 €');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('Factura estimada entre 252,35 € y 336,47 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('63,67 €');
+    expect(await i24Valor(page, /^Gastos de gestoría/)).toBe('250,00 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('2088,08 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe('11,29 % sobre el precio');
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('20.588,08 €');
+    expect(await i24Desc(page, /^COSTE TOTAL/)).toBe('Precio + todos los gastos');
+    await expect(page.locator('[role="note"]', { hasText: 'Podrías pagar menos' })).toHaveCount(0);
+  });
+
+  /**
+   * REGRESIÓN del motor en el caso de Luis (Madrid · 25.000 € · gestoría 300 por defecto), con la
+   * rebaja del 11/10/2026 (a3c3ecb0):
+   *   Notaría: 90,151816 + 18.989,88 × 0,45 % (85,45446) = 175,606276 × 0,95 × 1,21 = 201,859414
+   *     → ×1,5 = 302,79 · ×2 = 403,72 · ×1,75 = 353,25 €
+   *   Registro: 24,040484 + 18.989,88 × 0,175 % (33,23229) = 57,272774 × 0,95 + 9,015182 =
+   *     63,424317 × 1,21 = 76,74 €
+   *   Total: 1.500 + 353,25 + 76,74 + 300 = 2.229,99 € (8,92 %) · coste 27.229,99 €.
+   * El CASO 1 de la sección 1 sigue esperando 371,84 / 80,21 / 27.252,05 (C0209).
+   */
+  test('Regresión — Madrid 25.000 € (el caso de Luis) con la rebaja del arancel', async ({ page }) => {
+    expect(ITP_CCAA.madrid.tipoGeneral).toBe(6);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '25000');
+    expect(await i24Valor(page, /^ITP/)).toBe('1500,00 €');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('353,25 €');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('Factura estimada entre 302,79 € y 403,72 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('76,74 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('2229,99 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe('8,92 % sobre el precio');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('27.229,99 €');
+  });
+
+  /**
+   * CASO EB (LÍMITE) — MELILLA · segunda mano · 40.000 € · General · gestoría 300, y un vendedor.
+   * Comprador:
+   *   ITP: 40.000 × 3 % = 1.200,00 € (6 % con el 50 % de la cuota, art. 57 bis.3.a TRLITPAJD).
+   *   Notaría SIN IVA (allí IPSI, que no se calcula): 90,151816 + 24.040,49 × 0,45 % (108,182205) +
+   *     9.949,39 × 0,15 % (14,924085) = 213,258106 × 0,95 = 202,595201 → ×1,5 = 303,89 · ×2 = 405,19 ·
+   *     ×1,75 = 354,54 €
+   *   Registro SIN IVA: 24,040484 + 24.040,49 × 0,175 % (42,0708575) + 9.949,39 × 0,125 % (12,4367375)
+   *     = 78,548079 × 0,95 = 74,620675 + 9,015182 = 83,64 €
+   *   Total (parcial): 1.200 + 354,54 + 83,64 + 300 = 1.938,18 € (4,85 %) · COSTE TOTAL (PARCIAL)
+   *     41.938,18 €, con la frase común del IPSI de las facturas.
+   * Vendedor: compra 31.000 · gastos 1.200 · 27 años · suelo 9.000 · total 24.000 · comisión 3 % ·
+   *   gestoría 150.
+   *   Plusvalía: objetivo 9.000 × 0,40 × 25 % × 50 % = 450,00 · real 9.000 × (9.000/24.000) × 25 % ×
+   *     50 % = 421,875 → gana el real: 421,88 €, con la bonificación nombrada.
+   *   Adquisición 32.200,00 · transmisión 40.000 − 1.200 − 150 − 421,875 = 38.228,13 · ganancia 6.028,13
+   *   IRPF: 6.000 × 19 % + 28,125 × 21 % = 1.145,90625; − 60 % (687,54) = 458,36 €
+   *   Total gastos 421,88 + 1.200 + 150 + 458,36 = 2.230,24 € · neto 37.769,76 € (definitivo).
+   */
+  test('CASO EB (límite) — Melilla: ITP bonificado, honorarios sin IPSI y vendedor con 27 años, método real y la deducción del 60 %', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.melilla.tipoGeneral).toBe(6);
+    // Una sola entrada, la de la bonificación por el SITIO (se aplica sin perfil): el 6 % al 50 %.
+    expect(ITP_CCAA.melilla.tiposReducidos).toHaveLength(1);
+    expect(ITP_CCAA.melilla.tiposReducidos[0].tipo).toBe(3);
+    expect(ITP_CCAA.melilla.tiposReducidos[0].condiciones[0]).toBe('Inmueble situado en Melilla');
+    expect(BONIFICACION_CUOTA_CEUTA_MELILLA).toBe(0.5);
+    expect(honorariosLlevanIVA('melilla')).toBe(false);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.4);
+    expect(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje).toBe(50);
+    expect(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje).toBe(60);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'melilla');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '40000');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (3,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('1200,00 €');
+    expect(await i24Titulo(page, /^Gastos de notaría/)).toBe('Gastos de notaría (sin IPSI)');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('354,54 €');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('Factura estimada entre 303,89 € y 405,19 €');
+    expect(await i24Titulo(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IPSI)');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('83,64 €');
+    expect(await i24Titulo(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('1938,18 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe(
+      '4,85 % sobre el precio — SIN el IPSI de las facturas de notaría y registro',
+    );
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('41.938,18 €');
+    expect(await i24Desc(page, /^COSTE TOTAL/)).toBe(
+      'Las facturas de notaría y registro llevan además IPSI, que esta herramienta no calcula, así que cuestan más de lo que se muestra.',
+    );
+    await expect(page.locator('[role="note"]', { hasText: 'Podrías pagar menos' })).toHaveCount(0);
+
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    for (const [etiqueta, valor] of I13_VENDEDOR_MELILLA) await sembrarImporte(page, etiqueta, valor);
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('421,88 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe(
+      'Método real (más favorable), con la bonificación del 50 % de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)',
+    );
+    expect(await i24Valor(page, /^Valor de adquisición/)).toBe('32.200,00 €');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('38.228,13 €');
+    expect(await i24Titulo(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('6028,13 €');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('458,36 €');
+    expect(await i24Desc(page, /^IRPF sobre ganancia/)).toBe(
+      'Tributación en base del ahorro (del 19 % al 30 %), con la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 687,54 € menos',
+    );
+    expect(await i24Valor(page, /^Comisión inmobiliaria/)).toBe('1200,00 €');
+    expect(await i24Valor(page, /^Gestoría y certificados del vendedor/)).toBe('150,00 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('2230,24 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('37.769,76 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes tras gastos e impuestos');
+  });
+
+  /**
+   * CASO EC (RECHAZO) — el vendedor del CASO EB con «Años de propiedad» = «-2», saliendo del campo
+   * (no acota al salir: el 0 es un dato válido, la reventa antes del año). Un año negativo no se
+   * convierte en un supuesto fiscal: la plusvalía queda «Sin calcular» y el neto, PARCIAL.
+   *   Transmisión 40.000 − 1.200 − 150 = 38.650,00 (sin plusvalía) · ganancia (máximo) 6.450,00
+   *   IRPF (máximo): (6.000 × 19 % + 450 × 21 %) × 40 % = 1.234,50 × 0,40 = 493,80 €
+   *   Total gastos (parcial) 1.200 + 150 + 493,80 = 1.843,80 · neto (PARCIAL) 38.156,20 €.
+   * Lo que el texto del IRPF CALLA aquí (la deducción ya restada) es el hallazgo [13/10-a], aparte.
+   */
+  test('CASO EC (rechazo) — Melilla con años «-2»: la plusvalía no se liquida y el neto sale parcial', async ({ page }) => {
+    await i13VendedorMelilla(page);
+    await sembrarImporte(page, 'Años de propiedad', '-2');
+    await expect(page.locator('input[aria-label="Años de propiedad"]')).toHaveValue('-2');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('No calculada (los años de propiedad no pueden ser negativos)');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('38.650,00 €');
+    expect(await i24Titulo(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial (máximo)');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('6450,00 €');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('493,80 €');
+    expect(await i24Titulo(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('1843,80 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('38.156,20 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toBe(
+      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. Corrige los años de propiedad (no pueden ser negativos) para obtenerlo.',
+    );
+  });
+
+  /**
+   * ❌ ABIERTO (hallazgo 2901/2902 de la referencia, por el cabo C0209: «textos de las hermanas»).
+   * El ejemplo de Luis del bloque educativo lleva los aranceles TECLEADOS de antes de la rebaja
+   * (page.tsx: «notaría (371,84 €, dentro de una horquilla de 318,72 € a 424,96 €), registro
+   * (80,21 €)… 27.252,05 €» y «ITP + gastos = 9,01 % del precio»), y la calculadora de al lado da,
+   * con esa misma entrada, 353,25 € (302,79-403,72), 76,74 €, 27.229,99 € y 8,92 % (test de
+   * regresión de arriba). Esperado: que el ejemplo repita las cifras del motor.
+   */
+  test('ABIERTO 2901/2902 (C0209) — el ejemplo de Luis repite las cifras de la calculadora con la rebaja', async ({ page }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    const tarjeta = page.locator('[class*="casoCard"]').filter({ hasText: 'Luis compra una plaza de parking' });
+    const texto = i24Normaliza((await tarjeta.textContent()) ?? '');
+    expect(texto).toContain('353,25 €');
+    expect(texto).toContain('302,79 € a 403,72 €');
+    expect(texto).toContain('76,74 €');
+    expect(texto).toContain('27.229,99 €');
+    expect(texto).toContain('8,92 %');
+  });
+
+  /**
+   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-a] En Ceuta y Melilla la cuota del IRPF ya
+   * lleva restada la deducción del 60 % del art. 68.4 LIRPF, pero la tarjeta solo lo dice cuando no
+   * tiene otro aviso: `avisoTarjeta(...)` SUSTITUYE la descripción entera («No resta la plusvalía
+   * municipal…», «No se han podido leer…»), y la frase de la deducción va en la rama de reserva.
+   * La cuota publicada queda entonces por debajo del 19 % mínimo que la página anuncia (sello: «del
+   * 19 % al 30 %»), sin explicación.
+   *   Años «-2» (o el suelo vacío): IRPF (máximo) 493,80 € sobre 6.450,00 € = 7,66 %; la escala
+   *     da 1.234,50 € y la deducción, 740,70 € que no se nombran.
+   *   Años 27 con los gastos de aquella compra «1.200.50»: IRPF 559,16 € (techo) sobre 7.228,13 €;
+   *     la escala da 1.397,91 € y la deducción, 838,74 € que no se nombran.
+   * Esperado: la deducción nombrada también junto a esos avisos, como en el CASO EB.
+   */
+  test('[13/10-a] Melilla: la tarjeta del IRPF nombra la deducción del 60 % también cuando lleva otro aviso', async ({ page }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await i13VendedorMelilla(page);
+    await sembrarImporte(page, 'Años de propiedad', '-2');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('493,80 €');
+    expect(await i24Desc(page, /^IRPF sobre ganancia/)).toMatch(/deducción del 60 % por rentas obtenidas en Ceuta o Melilla/);
+    await sembrarImporte(page, 'Años de propiedad', '27');
+    await sembrarImporte(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '1.200.50');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('559,16 €');
+    expect(await i24Desc(page, /^IRPF sobre ganancia/)).toMatch(/deducción del 60 % por rentas obtenidas en Ceuta o Melilla/);
+  });
+
+  /**
+   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-b] La forma del 1593 de solar, aquí en la
+   * pregunta que más la necesita. RESPUESTA_ITP_GARAJE_SEGUNDA_MANO (metadata.ts, la FAQ visible y
+   * el FAQPage) dice que el garaje suelto paga el ITP «al tipo general de su comunidad autónoma,
+   * que va del 6 % al 13 %», sin la salvedad de Ceuta y Melilla, donde la app cobra el 3 %: el 6 %
+   * con el 50 % de la cuota (art. 57 bis.3.a TRLITPAJD). La respuesta «escriturar» de la MISMA FAQ
+   * sí lo dice («la mitad en Ceuta y Melilla»).
+   *   Ceuta · segunda mano · 25.000 € → tarjeta «ITP (3,00 %)» 750,00 € · FAQ «del 6 % al 13 %».
+   */
+  test('[13/10-b] la FAQ del ITP de segunda mano dice que en Ceuta y Melilla se paga la mitad', async ({ page, request }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '25000');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (3,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('750,00 €');
+    const pregunta = '¿Qué ITP paga un garaje de segunda mano?';
+    const visible = await i13FaqVisible(page, pregunta);
+    const servida = await i13FaqPage(await (await request.get(RUTA)).text(), pregunta);
+    expect(visible).toContain('del 6 % al 13 %');
+    expect(visible).toMatch(/Ceuta y Melilla/);
+    expect(servida).toMatch(/Ceuta y Melilla/);
+  });
+
+  /**
+   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-c] Residuo del 3071 (10/10/2026), que llegó al
+   * motor y a la tarjeta pero no a RESPUESTA_PLUSVALIA_GARAJE (la FAQ visible y el FAQPage). La
+   * respuesta da por universales las reglas del TRLRHL —«Desde 2021, puede elegir entre el método
+   * objetivo y el real», el art. 104.5 y «Esta calculadora aplica un tipo del 25 %…, con un máximo
+   * legal del 30 %»—, cuando el art. 1.2 TRLRHL deja fuera a los territorios forales y la propia app,
+   * en Navarra y el País Vasco, no calcula la plusvalía («se rige por la Ley Foral 2/1995…»). En
+   * Navarra el tipo máximo es el 25 %, no el 30 % (Ley Foral 2/1995, art. 176.2: «ni el tipo máximo
+   * pueda superar el 25 por 100», BOE-A-1995-16401, consolidado, leído el 13/10/2026).
+   *   Navarra · venta 25.000 · compra 18.000 · 8 años · suelo 5.000 · total 12.000 → tarjeta «Sin
+   *   calcular — …Ley Foral 2/1995…» · FAQ «…máximo legal del 30 %», sin ninguna mención foral.
+   */
+  test('[13/10-c] la FAQ de la plusvalía nombra el régimen foral que la tarjeta ya aplica', async ({ page, request }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.selectOption('#select-ccaa', 'navarra');
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '25000');
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    await sembrarImporte(page, 'Precio de compra original del garaje', '18000');
+    await sembrarImporte(page, 'Años de propiedad', '8');
+    await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');
+    await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '12000');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toContain('Ley Foral 2/1995 de Haciendas Locales de Navarra');
+    const pregunta = '¿El vendedor de un garaje paga plusvalía municipal?';
+    const visible = await i13FaqVisible(page, pregunta);
+    const servida = await i13FaqPage(await (await request.get(RUTA)).text(), pregunta);
+    expect(visible).toContain('Esta calculadora aplica un tipo del 25 %');
+    expect(visible).toMatch(/foral|Navarra/);
+    expect(servida).toMatch(/foral|Navarra/);
+  });
+
+  /**
+   * ❌ ABIERTO 13/10/2026 (dato, bajo) — [13/10-d] El sello de ITP/AJD/IVA (NOTA_DATOS de page.tsx)
+   * dice «en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un 50 % (art. 57 bis.1
+   * TRLITPAJD)». El art. 57 bis.1 es el de la cuota gradual de AJD de los documentos notariales; la
+   * de las transmisiones de inmuebles es el 57 bis.3.a (TRLITPAJD, BOE-A-1993-25359, leído el
+   * 13/10/2026; así lo citan ya data/itp-ccaa.ts, local-comercial, solar y nave). Mismo texto en
+   * trastero. Esperado: que la bonificación del ITP no se atribuya al apartado 1.
+   */
+  test('[13/10-d] el sello no atribuye la bonificación del ITP al art. 57 bis.1 TRLITPAJD', async ({ page }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    const sello = page.locator('[role="note"][aria-label="Datos de referencia normativos"]').filter({ hasText: 'ITP/AJD/IVA' });
+    const nota = i24Normaliza((await sello.textContent()) ?? '');
+    expect(nota).toMatch(/Ceuta y Melilla/);
+    expect(nota).not.toMatch(/cuota del ITP y la del AJD se bonifican un 50 % \(art\. 57 bis\.1 TRLITPAJD\)/);
+  });
+
+  /**
+   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-e] La forma del 2915/2917/2921 (la nota de
+   * Canarias, corregida el 06/10) en la nota de MADRID, que se pinta por defecto: «ITP más bajo de
+   * España peninsular (6 %)». Navarra, peninsular, tiene el mismo 6 % (TIPOS_ITP_CCAA_2025, y el
+   * recuadro de esta app lo rotula así), y en la vivienda el País Vasco cobra el 4 %: la nota vive en
+   * data/itp-ccaa.ts y la pintan las siete apps. Esperado: una nota que no declare a Madrid el ITP
+   * más bajo de la España peninsular.
+   */
+  test('[13/10-e] la nota de Madrid no le atribuye el ITP más bajo de la España peninsular', async ({ page }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('6,00 %');
+    const notaMadrid = i24Normaliza((await page.locator('[class*="infoCcaaNote"]').allTextContents()).join(' '));
+    await page.selectOption('#select-ccaa', 'navarra');
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('6,00 %');
+    expect(notaMadrid).toContain('Bonificación 100 %');
+    expect(notaMadrid).not.toMatch(/ITP más bajo de España peninsular/);
   });
 });

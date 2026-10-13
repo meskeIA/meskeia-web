@@ -123,10 +123,20 @@
  *      52-54 al final del fichero: Galicia con perfil discapacidad (comprador y vendedor, y
  *      una pérdida con los gastos de aquella compra ilegibles), el UMBRAL valenciano del
  *      millón al céntimo (Ley 13/1997, art. 13.Uno) y el 0 escrito en el precio y en el valor
- *      catastral del suelo. Y seis hallazgos ABIERTOS con `test.fail()` y etiqueta
- *      [08/10-a] … [08/10-f]: el 0 del precio y el del suelo anunciados como si faltaran, la
- *      coma antes de «ni», el nombre de la comunidad sin artículo, «existe:» delante de una
- *      lista de varios tipos y el ⚠️ sin aria-hidden del tope de valor.
+ *      catastral del suelo. Y seis hallazgos que nacieron con `test.fail()` y etiqueta
+ *      [08/10-a] … [08/10-f] (3078-3083), REPARADOS el 08/10/2026 y hoy regresión: el 0 del
+ *      precio y el del suelo anunciados como si faltaran, la coma antes de «ni», el nombre de
+ *      la comunidad sin artículo, «existe:» delante de una lista de varios tipos y el ⚠️ sin
+ *      aria-hidden del tope de valor.
+ *
+ *  20. REPARACIÓN 10/10/2026 — Ceuta, Melilla y la plusvalía foral (bloque propio al final).
+ *
+ *  21. INSPECTOR 13/10/2026 (re-inspección, app INVALIDADA) — CASOS 55-57 al final del
+ *      fichero: Cantabria con perfil joven (comprador y vendedor), Melilla con el coeficiente
+ *      más alto del IIVTNU (≥ 20 años), el método real, la bonificación del 50 % y la
+ *      deducción del 60 % del IRPF, y una comisión del 150 % en Ceuta. Las cifras de notaría y
+ *      registro ya llevan la rebaja del 5 % que el motor aplica desde el 11/10/2026. Y cuatro
+ *      hallazgos ABIERTOS con `test.fail()` y etiqueta [13/10-a] … [13/10-d].
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -6427,10 +6437,10 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
     );
   });
 
-  // ─── HALLAZGOS del 08/10/2026, ABIERTOS ──────────────────────────────────────────────
-  // Cada uno con `test.fail()` y la aserción de FONDO primero (dentro de un test.fail() basta
-  // con que falle cualquiera, así que la primera es la que de verdad se comprueba). El escenario
-  // de los dos primeros lo sujeta en verde el CASO 54.
+  // ─── HALLAZGOS del 08/10/2026, REPARADOS (3078-3083) ─────────────────────────────────
+  // Nacieron con `test.fail()` y la aserción de FONDO primero; al repararlos el 08/10/2026 se
+  // les quitó la marca y quedan como regresión (re-inspección del 13/10/2026: la base los tiene
+  // cerrados). El escenario de los dos primeros lo sujeta en verde el CASO 54.
 
   // HALLAZGO [08/10-a] (bajo, contenido) — ✅ REPARADO el 08/10/2026 (3078). Patrón 5 en el PRECIO principal: es el 2960
   // de la referencia y el 3062 de local-comercial. Con el precio escrito «0», o «-5000» con el foco
@@ -6598,5 +6608,287 @@ test.describe('Reparación 10/10/2026 — Ceuta, Melilla y la plusvalía foral',
     const neto = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
     expect(neto).toContain('No descuenta la plusvalía municipal');
     expect(neto).not.toMatch(/[Rr]ellena/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  INSPECTOR 13/10/2026 — re-inspección (la app estaba INVALIDADA por la reparación del 10/10,
+//  la rebaja de los aranceles del 11/10 y el reparto del IBI del 11/10).
+//
+//  Tres casos resueltos a mano ANTES de abrir el navegador, en lo que la reparación del 10/10
+//  estrenó y ningún caso había combinado: Cantabria con perfil joven, Melilla con el tramo MÁS
+//  ALTO del coeficiente del IIVTNU (≥ 20 años), el método REAL, la bonificación del 50 % de la
+//  cuota y la deducción del 60 % del IRPF, y una comisión imposible en Ceuta. Después, cuatro
+//  hallazgos ABIERTOS con `test.fail()` y la aserción de FONDO primero.
+//
+//  De dónde sale cada cifra (ninguna de memoria):
+//   · ITP de Cantabria 9 %, sin escala → `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts), leído
+//     por `ITP_CCAA.cantabria`; su reducido «Jóvenes < 36 años» (4 %, vivienda habitual, ≤ 300.000 €)
+//     y «Municipios despoblados» (4 %) → `ITP_CCAA.cantabria.tiposReducidos` (data/itp-ccaa.ts).
+//   · Notaría → `ARANCELES_NOTARIO` + `REBAJA_ARANCEL_CUANTIA` (5 %, DA 8.ª RDL 8/2010) + IVA 21 %
+//     + `FACTURA_NOTARIAL` (×1,5 a ×2, se publica ×1,75). Registro → `ARANCELES_REGISTRO` con la
+//     misma rebaja + `REGISTRO_CONCEPTOS` (6,010121 + 3,005061) + IVA 21 %. RD 1426/1989 y 1427/1989.
+//   · Coeficientes del IIVTNU → `COEFICIENTES_IIVTNU_2025` (art. 107.4 TRLRHL, RDL 8/2023):
+//     3 años 0,14 · 8 años 0,19 · ≥ 20 años 0,40; tipo `PLUSVALIA_MUNICIPAL_META.tipoOrientativo`
+//     = 25 %; en Ceuta y Melilla la cuota × 50 % (`BONIFICACION_IIVTNU_CEUTA_MELILLA`, art. 159.2).
+//   · IRPF → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000, 21 % hasta 50.000) y en Ceuta
+//     y Melilla × (1 − 60 %) (`DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA`, art. 68.4 LIRPF).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** Melilla, ≥ 20 años, método real: la base del CASO 56 y de los hallazgos [13/10-a/b/c]. */
+const BASE_1310_MELILLA = {
+  ccaa: 'melilla',
+  venta: '40000',
+  compra: '29000',
+  gastos: '1500',
+  anios: '22',
+  suelo: '9000',
+  total: '30000',
+  comision: '3',
+  gestoria: '387,50',
+};
+
+test.describe('Inspector 13/10/2026 — Cantabria con perfil joven, Melilla a 20 años con método real y una comisión imposible en Ceuta', () => {
+  /**
+   * CASO 55 (normal) — Cantabria · segunda mano · perfil joven · 18.500 € · gestoría 250.
+   *   ITP = 18.500 × 9 % = 1.665,00 → «ITP (9,00 %)», «ITP Cantabria».
+   *   El reducido de jóvenes (4 %) exige vivienda habitual: no se aplica y se OFRECE con su
+   *   requisito; «Municipios despoblados» (4 %) no es de colectivo y no exige vivienda habitual:
+   *   se ofrece también. «Vivienda habitual < 200.000 €» se descarta (un trastero suelto no lo es).
+   *   Notaría: 90,151816 + 12.489,88 × 0,45 % = 146,356276 × 0,95 = 139,0384622 × 1,21 =
+   *     168,2365393 → ×1,5 = 252,35 · ×2 = 336,47 · ×1,75 = 294,41.
+   *   Registro: 24,040484 + 12.489,88 × 0,175 % = 45,897774 × 0,95 = 43,6028853 + 9,015182 =
+   *     52,6180673 × 1,21 = 63,67.
+   *   Total = 1.665,00 + 294,41 + 63,67 + 250,00 = 2.273,08 (12,29 %) · coste 20.773,08.
+   * VENDEDOR — compra 11.000 · gastos 900 · 8 años · suelo 3.600 de 8.000 · comisión 4 % · gestoría 150:
+   *   plusvalía: objetivo 3.600 × 0,19 × 25 % = 171,00 · real 7.500 × 0,45 × 25 % = 843,75 → 171,00
+   *   comisión 740,00 · transmisión 18.500 − 740 − 150 − 171 = 17.439,00 · adquisición 11.900,00
+   *   ganancia 5.539,00 · IRPF 5.539 × 19 % = 1.052,41 · total 171 + 740 + 150 + 1.052,41 = 2.113,41
+   *   neto 16.386,59, DEFINITIVO.
+   */
+  test('CASO 55 — Cantabria, 18.500 € con perfil joven: el 9 %, dos reducidos ofrecidos y un vendedor completo', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.locator('#select-ccaa').selectOption('cantabria');
+    await page.locator('#select-perfil').selectOption('joven');
+    await sembrar(page, 'Precio del trastero', '18500');
+    await sembrar(page, 'Gastos de gestoría del comprador (€)', '250');
+
+    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (9,00 %)');
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('1665,00 €');
+    expect(await descripcionTarjeta(page, /^ITP \(/)).toBe('ITP Cantabria');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('294,41 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 252,35 € y 336,47 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('63,67 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('250,00 €');
+    expect(await tituloTarjeta24(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2273,08 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('12,29 % sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('20.773,08 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio del trastero + todos los gastos');
+
+    const aviso = avisoReducidos0810(page);
+    await expect(aviso).toHaveCount(1);
+    expect(await texto(aviso)).toContain('En Cantabria existen:');
+    const lineas = (await aviso.locator('li').allInnerTexts()).map((s) => s.replace(ESPACIO_DURO, ' '));
+    expect(lineas).toHaveLength(2);
+    expect(lineas[0]).toContain('4,00 % — Jóvenes < 36 años');
+    expect(lineas[0]).toContain('Menor de 36 años · Vivienda habitual · Valor ≤ 300.000 €');
+    expect(lineas[0]).not.toContain('supera ese límite');
+    expect(lineas[1]).toContain('4,00 % — Municipios despoblados');
+
+    await vendedor0810(page, {
+      ccaa: 'cantabria',
+      venta: '18500',
+      compra: '11000',
+      gastos: '900',
+      anios: '8',
+      suelo: '3600',
+      total: '8000',
+      comision: '4',
+      gestoria: '150',
+    });
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('171,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('11.900,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('17.439,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('5539,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1052,41 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe('Tributación en base del ahorro (del 19 % al 30 %)');
+    expect(await tituloTarjeta24(page, /^Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (4 %)');
+    expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('740,00 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('150,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2113,41 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('16.386,59 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes tras los gastos');
+  });
+
+  /**
+   * CASO 56 (límite) — Melilla · venta 40.000 · compra 29.000 · gastos 1.500 · 22 años (el
+   * coeficiente se topa en el de «20 o más años», 0,40, el más alto de la tabla) · suelo 9.000 de
+   * 30.000 · comisión 3 % · gestoría 387,50.
+   *   plusvalía: objetivo 9.000 × 0,40 × 25 % × 50 % = 450,00 · real 11.000 × 0,3 × 25 % × 50 % =
+   *     412,50 → gana el REAL, 412,50, bonificado.
+   *   comisión 1.200,00 · transmisión 40.000 − 1.200 − 387,50 − 412,50 = 38.000,00 · adquisición
+   *     30.500,00 · ganancia 7.500,00 (cruza el tramo de 6.000)
+   *   cuota íntegra 6.000 × 19 % + 1.500 × 21 % = 1.455,00 · deducción 60 % = 873,00 · IRPF 582,00
+   *   total 412,50 + 1.200 + 387,50 + 582 = 2.582,00 · neto 37.418,00, DEFINITIVO.
+   * (Sin la bonificación serían 825,00 de plusvalía y sin la deducción 1.455,00 de IRPF.)
+   */
+  test('CASO 56 — Melilla, 22 años: método real bonificado al 50 % y el IRPF con la deducción del 60 %', async ({ page }) => {
+    await vendedor0810(page, BASE_1310_MELILLA);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('412,50 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método real (más favorable), con la bonificación del 50 % de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)',
+    );
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('30.500,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('38.000,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7500,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('582,00 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
+      'Tributación en base del ahorro (del 19 % al 30 %), con la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 873,00 € menos',
+    );
+    expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('387,50 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2582,00 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('37.418,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes tras los gastos');
+
+    // Con el total catastral «30.000.00» (ilegible): objetivo 450,00 · transmisión 37.962,50 ·
+    // ganancia 7.462,50 · IRPF (1.140 + 1.462,50 × 21 %) × 40 % = 578,85 · total 2.616,35 ·
+    // neto 37.383,65 (PARCIAL). Las cifras que SÍ cumplen el invariante de la familia: el neto, la
+    // ganancia y el IRPF nombran el ilegible y dicen que el real puede ser MAYOR.
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '30.000.00');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('450,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('37.962,50 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7462,50 €');
+    expect(await descripcionTarjeta(page, 'Ganancia patrimonial')).toContain('la ganancia real puede ser mayor');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('578,85 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('la cuota real puede ser mayor');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2616,35 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('37.383,65 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
+      'El valor catastral total (con él la plusvalía puede salir más barata por el método real) no se ha podido leer: el neto real puede ser MAYOR que este',
+    );
+  });
+
+  /**
+   * CASO 57 (debe rechazarse) — Ceuta · venta 12.000 · compra 9.000 · gastos 600 · 3 años · suelo
+   * 2.500 de 7.000 · comisión «150» (más del 100 % del precio) · sin gestoría de venta.
+   *   La comisión no se aplica ni se liquida nada con ella (patrón 5): sin ganancia ni IRPF.
+   *   plusvalía (no depende de la comisión): objetivo 2.500 × 0,14 × 25 % × 50 % = 43,75 · real
+   *     3.000 × (2.500 / 7.000) × 25 % × 50 % = 133,93 → 43,75, bonificada.
+   *   total 43,75 (PARCIAL: sin la comisión ni el IRPF) · neto 12.000 − 43,75 = 11.956,25 (PARCIAL).
+   *   Sin «Valor de adquisición», «Valor de transmisión» ni «Ganancia patrimonial».
+   */
+  test('CASO 57 — Ceuta, comisión del 150 %: no se aplica, no se liquida el IRPF y se pide corregirla', async ({ page }) => {
+    await vendedor0810(page, {
+      ccaa: 'ceuta',
+      venta: '12000',
+      compra: '9000',
+      gastos: '600',
+      anios: '3',
+      suelo: '2500',
+      total: '7000',
+      comision: '150',
+      gestoria: '',
+    });
+    const comision = page.locator('input[aria-label="Comisión inmobiliaria (%)"]');
+    await expect(comision).toHaveValue('150');
+    await expect(comision).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('p[role="alert"]', { hasText: 'La comisión no puede superar el 100' })).toHaveCount(1);
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('43,75 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (más favorable), con la bonificación del 50 % de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)',
+    );
+    await expect(page.locator('h3', { hasText: 'Valor de adquisición' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Valor de transmisión' })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Ganancia patrimonial' })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
+      'Corrige la comisión: no puede superar el 100 % del precio de venta. Este impuesto NO está incluido en el neto de abajo.',
+    );
+    expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('Sin aplicar');
+    expect(await tituloTarjeta24(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('43,75 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('11.956,25 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'No descuenta la comisión inmobiliaria ni el IRPF de la ganancia: el neto real puede ser menor que este. Corrige la comisión (no puede superar el 100 % del precio de venta) para obtenerlo.',
+    );
+  });
+
+  // ─── HALLAZGOS del 13/10/2026, ABIERTOS ──────────────────────────────────────────────
+  // Cada uno con `test.fail()` y la aserción de FONDO primero (dentro de un test.fail() basta
+  // con que falle cualquiera, así que la primera es la que de verdad se comprueba). Las cifras
+  // de sus escenarios las sujeta en verde el CASO 56.
+
+  // HALLAZGO [13/10-a] (bajo, operativa) — EFECTO FAMILIA del 2911 de local-comercial, que ya
+  // nombraba esta app. Con el valor catastral total ilegible y el método REAL más barato, la
+  // plusvalía se liquida por el objetivo y «Valor de transmisión» se publica por DEBAJO del real
+  // con su descripción fija «Precio de venta − comisión, gestoría y plusvalía municipal», sin
+  // nombrar el ilegible ni la dirección (page.tsx ~l. 1696-1705 solo distingue comisión y
+  // gestoría). La plusvalía, la ganancia, el IRPF y el neto sí lo nombran.
+  //   Melilla (CASO 56) con el total «30.000.00» → obtenido 37.962,50 € y la descripción fija;
+  //   con el total legible 30.000 es 38.000,00 € (real ≥ publicado: puede ser MAYOR).
+  test.fail('[13/10-a] «Valor de transmisión» nombra el valor catastral total ilegible', async ({ page }) => {
+    await vendedor0810(page, { ...BASE_1310_MELILLA, total: '30.000.00' });
+    // El defecto.
+    expect(await descripcionTarjeta(page, 'Valor de transmisión')).toMatch(/valor catastral total/i);
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('37.962,50 €');
+  });
+
+  // HALLAZGO [13/10-b] (bajo, contenido) — la deducción del 60 % del art. 68.4 LIRPF solo se dice
+  // en la rama por defecto de la tarjeta del IRPF (page.tsx ~l. 1800-1804). En cuanto hay otro
+  // aviso —un importe ilegible o la plusvalía pendiente— `avisoTarjeta` sustituye la descripción
+  // y la deducción desaparece, aunque la cifra la sigue llevando restada. La referencia
+  // (estimador, reparación del 3070) la añade SIEMPRE junto a la cuota (page.tsx ~l. 2620-2623).
+  //   Melilla (CASO 56) con los años VACÍOS → «IRPF sobre ganancia (máximo) 616,65 €» =
+  //   (1.140 + 1.912,50 × 21 %) × 40 %, descrito solo «No resta la plusvalía municipal, que falta,
+  //   así que la cuota real puede ser menor.» (con el total «30.000.00», 578,85 € e igual).
+  test.fail('[13/10-b] la tarjeta del IRPF dice la deducción de Ceuta y Melilla también cuando hay otro aviso', async ({ page }) => {
+    await vendedor0810(page, { ...BASE_1310_MELILLA, anios: '' });
+    // El defecto.
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(
+      /deducción del 60\s?% por rentas obtenidas en Ceuta o Melilla/,
+    );
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('616,65 €');
+  });
+
+  // HALLAZGO [13/10-c] (bajo, contenido) — la coletilla de la bonificación (page.tsx ~l. 726-728)
+  // se pega detrás de cualquier descripción de la plusvalía, y la del total catastral ilegible ya
+  // termina en frase completa con punto: sale «…Escríbelo con coma decimal (1.234,56)., con la
+  // bonificación del 50 % de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)». La referencia
+  // (~l. 1002-1007), garaje (~l. 700) y local-comercial (~l. 796) componen igual.
+  test.fail('[13/10-c] la bonificación de Ceuta y Melilla no se pega tras un punto final', async ({ page }) => {
+    await vendedor0810(page, { ...BASE_1310_MELILLA, total: '30.000.00' });
+    const desc = await descripcionTarjeta(page, 'Plusvalía municipal');
+    // El defecto.
+    expect(desc).not.toContain('.,');
+    expect(desc).toContain('bonificación del 50 % de la cuota de Ceuta y Melilla');
+  });
+
+  // HALLAZGO [13/10-d] (bajo, dato) — el selector rotula «Joven (< 35 años)», una edad escrita a
+  // mano que contradice a `ITP_CCAA` en ocho comunidades (Cantabria, Galicia y Castilla y León:
+  // menores de 36; Asturias y Cataluña: 35 o menos; Murcia: hasta 40; La Rioja: menores de 40;
+  // Baleares: menores de 30), y la app lo enseña en la misma pantalla. data/itp-ccaa.ts ya deriva la horquilla
+  // (`horquillaEdadJoven`, hallazgos 719 y 720). La referencia y garaje llevan la misma etiqueta.
+  //   Cantabria · segunda mano · perfil «Joven (< 35 años)» · 18.500 € → el aviso ofrece
+  //   «4,00 % — Jóvenes < 36 años · Requisitos: Menor de 36 años…»: quien tiene 35 años lee
+  //   que no es «joven» y elige General, con lo que la oportunidad no se le enseña.
+  test.fail('[13/10-d] la etiqueta del perfil joven no contradice la edad del reducido que ofrece', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.locator('#select-ccaa').selectOption('cantabria');
+    const etiqueta = (await page.locator('#select-perfil option[value="joven"]').innerText()).replace(ESPACIO_DURO, ' ');
+    // El defecto.
+    expect(etiqueta).not.toMatch(/<\s*35\s*años/);
+    await page.locator('#select-perfil').selectOption('joven');
+    await sembrar(page, 'Precio del trastero', '18500');
+    expect(await texto(avisoReducidos0810(page))).toContain('Menor de 36 años');
   });
 });

@@ -73,7 +73,14 @@
  *    el segundo tramo de su escala, Melilla en obra nueva a 7.000.000 € (IPSI sin calcular, AJD
  *    bonificado, notaría de libre acuerdo y gestoría ilegible a la vez) y la renuncia elegida en
  *    Galicia que Melilla rechaza; las relacionadas en el HTML servido y tras hidratar, y cinco
- *    hallazgos al final con `test.fail()` salvo con `VER_HUECOS=1`.
+ *    hallazgos al final con `test.fail()` salvo con `VER_HUECOS=1`. Los cinco (3084-3088) se
+ *    REPARARON ese mismo día y sus tests perdieron la marca.
+ *  · 13/10/2026 — RE-INSPECCIÓN (INVALIDADA tras la rebaja del 5 % de los aranceles del 11/10 y el
+ *    reparto del IBI, S0195). Casos nuevos: Extremadura 820.000 € en el tercer tramo de su escala,
+ *    Valencia a 10.000.000 € con la renuncia (AJD del 2 %, notaría de libre acuerdo y el registro
+ *    en su TOPE, con la rebaja aplicada después del tope) y el reparto del IBI y la comunidad, que el
+ *    testigo de familia solo mide con el IBI. Notaría y registro se fijan al céntimo CON la rebaja.
+ *    Cuatro hallazgos al final con `test.fail()` salvo con `VER_HUECOS=1`.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -109,9 +116,11 @@
  * junto a cada aserción, con los importes sin redondear.
  *
  * Los dos hallazgos de la re-inspección del 06/10/2026 (2914 y 2915) se repararon ese mismo día y
- * se quedaron como regresión. HALLAZGOS ABIERTOS a 08/10/2026: los cinco de la inspección de ese
- * día, al final del fichero con `test.fail()`. Todos se escriben igual, afirmando lo que DEBERÍA
- * pasar, y al repararse pierden la marca y se quedan como regresión en el bloque de su fecha.
+ * se quedaron como regresión. Los cinco de la inspección del 08/10/2026 (3084-3088) se escribieron
+ * con `test.fail()` y quedaron REPARADOS ese mismo día: hoy son regresión en el bloque de su fecha.
+ * HALLAZGOS ABIERTOS a 13/10/2026: los cuatro de la re-inspección de ese día, al final del fichero
+ * con `test.fail()`. Todos se escriben igual, afirmando lo que DEBERÍA pasar, y al repararse
+ * pierden la marca y se quedan como regresión en el bloque de su fecha.
  */
 import { test, expect, Page } from '@playwright/test';
 import {
@@ -126,7 +135,9 @@ import {
   LIMITE_ARANCEL_NOTARIAL,
   RANGO_AJD_OTROS,
   RANGO_ITP_OTROS,
+  REBAJA_ARANCEL_CUANTIA,
   REGISTRO_CONCEPTOS,
+  REGISTRO_MAXIMO,
 } from '../../data/itp-ccaa';
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
@@ -6226,5 +6237,371 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
   test('[08/10-e] la lista de territorios sin renuncia no se teclea en la página', async () => {
     const fuente = await leerFuente();
     expect(fuente).not.toMatch(/const\s+TERRITORIOS_SIN_RENUNCIA[^=]*=\s*\[/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 13/10/2026 — hermana de la familia «Compraventa inmobiliaria» (referencia:
+// estimador-compraventa-inmueble · testigo tests/familias/compraventa.spec.ts, 89/89 en verde al
+// empezar la tanda). La cola la sacó INVALIDADA tras la rebaja del 5 % de los dos aranceles
+// (11/10/2026, `REBAJA_ARANCEL_CUANTIA`) y el reparto del IBI (S0195, `ProrrateoIbiComunidad`).
+//
+// Cifras resueltas a mano ANTES de abrir el navegador, con un script propio que NO importa la app
+// (los tramos copiados del BOE tal como los transcribe data/itp-ccaa.ts):
+//  - Extremadura: `ITP_CCAA.extremadura.tramosProgresivos` 8 % hasta 360.000, 10 % hasta 600.000 y
+//    11 % el resto; `ajd: 1.5`.
+//  - Valencia: `umbralTipoUnico { superiorA: 1.000.000, tipo: 11 }`, `ajd: 1.4`, `ajdRenuncia: 2`
+//    (Ley 13/1997, arts. 13.Uno y 14, verificado en el BOE el 24/09/2026).
+//  - IVA de la nave: `IVA_INMUEBLES_2025.local = 21` (data/fiscal/inmuebles.ts).
+//  - Notaría: escala del RD 1426/1989, nº 2.1 (`ARANCELES_NOTARIO`), solo hasta
+//    `LIMITE_ARANCEL_NOTARIAL`; × (1 − `REBAJA_ARANCEL_CUANTIA`) (RDL 8/2010, DA 8.ª), × 1,21 de IVA
+//    y × 1,5 / 1,75 / 2 (`FACTURA_NOTARIAL`).
+//  - Registro: escala del RD 1427/1989, nº 2.1 (`ARANCELES_REGISTRO`), tope `REGISTRO_MAXIMO` y la
+//    rebaja DESPUÉS del tope («del importe del arancel a percibir»); más presentación (6,010121 €) y
+//    nota simple (3,005061 €), sin rebaja; × 1,21.
+//  - Reparto del IBI: STS 409/2016, por días naturales; el vendedor hasta el día ANTERIOR a la
+//    escritura (`lib/calculadoras/prorrateoCompraventa.ts`).
+//
+// A diferencia del 06/10 y el 08/10, aquí la notaría y el registro SÍ se fijan al céntimo: el motor
+// aplica ya la rebaja y estos casos la miden. Comparar la cadena exacta vigila un defecto de 5,26 %
+// (66 € en la notaría del caso 1) y uno de 5,34 € (la rebaja antes del tope, caso 2). Los casos
+// anteriores que fijan esas cifras SIN rebaja son el cabo C0209 (destino reparar): no se tocan.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** `VER_HUECOS=1` quita la marca de los hallazgos abiertos del 13/10 y enseña por qué fallan. */
+const I13_VER_HUECOS = Boolean(process.env.VER_HUECOS);
+
+const BLOQUE_REPARTO = 'section[aria-labelledby="titulo-prorrateo"]';
+const IBI = 'Cuota anual del IBI';
+const COMUNIDAD = 'Cuota de comunidad';
+const CAMPOS_REPARTO = [`input[aria-label="${IBI}"]`, `input[aria-label="${COMUNIDAD}"]`] as const;
+
+/** Una fila de la tabla del reparto, con los espacios normalizados. */
+async function filaReparto(page: Page, concepto: string): Promise<string> {
+  return ((await page.locator(BLOQUE_REPARTO).locator('tbody tr', { hasText: concepto }).first().innerText()) ?? '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+test.describe('Re-inspección 13/10/2026 — Extremadura en el tramo del 11 %, Valencia a 10.000.000 € con renuncia y el registro en su tope, y el reparto del IBI', () => {
+  test.describe.configure({ timeout: 90_000 });
+
+  /**
+   * CASO 1 (NORMAL) — Extremadura, segunda mano sin renuncia, 820.000 €, gestoría 650 €. Llega al
+   * tercer tramo de la escala, que ninguna vuelta anterior había cobrado con la rebaja del 11/10.
+   *   ITP = 360.000 × 8 % + 240.000 × 10 % + 220.000 × 11 % = 28.800 + 24.000 + 24.200 = 77.000,00 €
+   *   efectivo 77.000 / 820.000 = 9,3902 % → «ITP (9,39 %)»
+   *   Notaría: arancel 90,151816 + 108,182205 + 45,0759 + 90,15182 + 225,379535 + 65,69637
+   *            = 624,637646 € × 0,95 × 1,21 = 718,020974 € → ×1,5 = 1077,03 · ×1,75 = 1256,54 · ×2 = 1436,04
+   *   Registro: 24,040484 + 42,0708575 + 37,56325 + 67,613865 + 135,227721 + 43,79758 = 350,3137575
+   *            (bajo el tope) × 0,95 = 332,798070 + 9,015182 = 341,813252 × 1,21 = 413,59 €
+   *   Total = 77.000,00 + 1256,54 + 413,59 + 650,00 = 79.320,13 € (9,6732 % → «9,67 %»)
+   *   Coste = 899.320,13 €, definitivo (sin IGIC/IPSI, sin ilegibles y por debajo del límite notarial).
+   */
+  test('CASO 1 (normal) — Extremadura 820.000 €: ITP de escala 77.000,00 € (9,39 %), notaría 1256,54 € y registro 413,59 € con la rebaja del 5 %', async ({ page }) => {
+    expect(ITP_CCAA['extremadura'].tramosProgresivos).toEqual([
+      { hasta: 360000, tipo: 8 },
+      { hasta: 600000, tipo: 10 },
+      { hasta: Infinity, tipo: 11 },
+    ]);
+    expect(ITP_CCAA['extremadura'].ajd).toBe(1.5);
+    expect(REBAJA_ARANCEL_CUANTIA).toBe(0.05);
+    expect(FACTURA_NOTARIAL.factorMin).toBe(1.5);
+    expect(FACTURA_NOTARIAL.factorMax).toBe(2);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'extremadura');
+    await sembrar(page, PRECIO, '820000');
+    await sembrar(page, GESTORIA, '650');
+
+    await expect(page.getByRole('button', { name: /Segunda mano/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (9,39%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('77.000,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (')).toBe(
+      'Tipo general — las naves no tienen los reducidos de vivienda, pero alguna comunidad sí tiene tipos ligados a la ACTIVIDAD',
+    );
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await rotuloTarjeta(page, /^Gastos de notaría/)).toBe('Gastos de notaría (IVA incluido)');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1256,54 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 1077,03 € y 1436,04 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('413,59 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('650,00 €');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('79.320,13 €');
+    expect(sinEspacioPct(await descripcionTarjeta(page, 'Total gastos adicionales'))).toBe('9,67% sobre el precio de compra');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('899.320,13 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos (antes de deducir IVA si aplica)');
+
+    const recuadro = await recuadroCcaa(page);
+    expect(recuadro).toContain('ITP General 8%');
+    expect(recuadro).toContain('AJD 1,5%');
+    expect(recuadro).toContain('aplica escala progresiva (8% → 10% → 11%): cada tramo del valor tributa a su tipo');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Comunitat Valenciana, 2.ª mano CON RENUNCIA, 10.000.000 €, gestoría 800 €.
+   * Tres límites a la vez: el umbral del ITP (rotulado, no cobrado), la notaría por encima de
+   * 6.010.121,04 € (libre acuerdo) y el arancel registral por encima de su tope.
+   *   IVA (ISP) = 10.000.000 × 21 % = 2.100.000,00 € · AJD de la renuncia = 10.000.000 × 2 % = 200.000,00 €
+   *   Notaría: arancel hasta 6.010.121,04 € = 558,941276 + 5.409.108,94 × 0,03 % = 2181,673958 €
+   *            × 0,95 × 1,21 = 2507,834215 → ×1,5 = 3761,75 · ×1,75 = 4388,71 · ×2 = 5015,67
+   *   Registro: escala = 2186,3137575 > tope 2181,673939 → 2181,673939 × 0,95 = 2072,590242
+   *            + 9,015182 = 2081,605424 × 1,21 = 2518,74 € (con la rebaja ANTES del tope saldría
+   *            2524,08 €; sin rebaja, 2650,73 €)
+   *   Total = 2.100.000 + 200.000 + 4388,71 + 2518,74 + 800 = 2.307.707,45 € (23,0771 % → «23,08 %»),
+   *   PARCIAL por la notaría de libre acuerdo · coste 12.307.707,45 €.
+   *   Obra nueva al mismo precio: AJD general 1,4 % = 140.000,00 € → total 2.247.707,45 €.
+   *   Gestoría «2.000.50» con la renuncia: el total BAJA 800 € (2.306.907,45 €) → «será mayor».
+   */
+  test('CASO 2 (límite) — Valencia 10.000.000 € con renuncia: IVA ISP 2.100.000 €, AJD 2 %, notaría de libre acuerdo y registro en su tope 2518,74 €', async ({ page }) => {
+    const val = ITP_CCAA['valencia'];
+    expect(val.umbralTipoUnico).toEqual({ superiorA: 1_000_000, tipo: 11 });
+    expect(val.ajd).toBe(1.4);
+    expect(val.ajdRenuncia).toBe(2);
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+    expect(LIMITE_ARANCEL_NOTARIAL).toBe(6010121.04);
+    expect(REGISTRO_MAXIMO).toBeCloseTo(2181.673939, 6);
+    expect(REGISTRO_CONCEPTOS.presentacion + REGISTRO_CONCEPTOS.notaSimple).toBeCloseTo(9.015182, 6);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'valencia');
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    await sembrar(page, PRECIO, '10000000');
+    await sembrar(page, GESTORIA, '800');
+
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^IVA/))).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('2.100.000,00 €');
+    expect(await descripcionTarjeta(page, 'IVA (')).toBe(
+      'Lo autoliquida el comprador por inversión del sujeto pasivo (no se paga al vendedor) y es deducible si tienes derecho',
+    );
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD/))).toBe('AJD (2,00%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('200.000,00 €');
+    expect(await descripcionTarjeta(page, 'AJD (')).toBe('Tipo propio de la renuncia a la exención en la Comunidad Valenciana');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('4388,71 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('Arancel hasta 6.010.121,04 €: factura estimada entre 3761,75 € y 5015,67 €');
+    expect(notaria).toContain('libre acuerdo');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('2518,74 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('800,00 €');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2.307.707,45 €');
+    expect(sinEspacioPct(await descripcionTarjeta(page, 'Total gastos adicionales'))).toBe(
+      '23,08% sobre el precio de compra — SIN la parte de la notaría de libre acuerdo (el valor que excede de 6.010.121,04 €)',
+    );
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('12.307.707,45 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+      'No incluye la parte de la notaría de libre acuerdo: el coste real puede ser mayor (precio + gastos antes de deducir el IVA si tienes derecho)',
+    );
+    const recuadro = await recuadroCcaa(page);
+    expect(recuadro).toContain('ITP General 11%');
+    expect(sinEspacioPct(await ajdDelRecuadro(page))).toBe('2%');
+
+    // Obra nueva al mismo precio: el AJD general (1,4 %), no el de la renuncia.
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^IVA/))).toBe('IVA (21,00%)');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD/))).toBe('AJD (1,40%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('140.000,00 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('2518,74 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2.247.707,45 €');
+    expect(sinEspacioPct(await ajdDelRecuadro(page))).toBe('1,4%');
+
+    // De vuelta a la renuncia, la gestoría ilegible: se nombra, sale del total y la dirección es la medida.
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    const conDato = eurosDeTexto(await valorTarjeta(page, 'COSTE TOTAL'));
+    await sembrar(page, GESTORIA, '2.000.50');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2.306.907,45 €');
+    const sinDato = eurosDeTexto(await valorTarjeta(page, 'COSTE TOTAL'));
+    expect(conDato - sinDato).toBeCloseTo(800, 2);
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+      'No incluye la gestoría, que no se ha podido leer, ni la parte de la notaría de libre acuerdo: el coste real será mayor (precio + gastos antes de deducir el IVA si tienes derecho)',
+    );
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — el punto ciego del testigo: el reparto del IBI y la comunidad. El testigo de
+   * familia solo mide «Cuota anual del IBI»; aquí, la «Cuota de comunidad» y la periodicidad.
+   *   Escritura 13/10/2026, IBI 840 €, comunidad 120 € trimestral.
+   *   IBI (año natural, 365 días): vendedor 285 días (01/01–12/10) → 840 × 285 / 365 = 655,890411;
+   *   comprador 80 días → 184,109589 → «184,11 €».
+   *   Comunidad (01/10–31/12, 92 días): vendedor 12 días → 120 × 12 / 92 = 15,652174; comprador 80
+   *   días → 104,347826 → «104,35 €».
+   *   Abona en la firma 184,109589 + 104,347826 = 288,457415 → «288,46 €» (cuadra con las líneas:
+   *   184,11 + 104,35; el descuadre del 3239, abierto en la referencia, no salta con estos importes).
+   *   Comunidad «2.000.50» → ILEGIBLE: se nombra y no se reparte nada (ni el IBI, que sí se lee).
+   *   Comunidad vacía → solo el IBI: abona 184,11 €.
+   *   Nada de esto mueve el coste de la compra (Madrid, 500.000 €, gestoría 500): el reparto es un
+   *   ajuste entre las partes y no un gasto de la adquisición, así que aquí solo se exige que no cambie.
+   */
+  test('CASO 3 (rechazo) — reparto del IBI: la cuota de comunidad ilegible se nombra y no reparte nada; legible, 184,11 € + 104,35 € = 288,46 €', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [...CAMPOS, ...CAMPOS_REPARTO]);
+    await sembrar(page, PRECIO, '500000');
+    await sembrar(page, GESTORIA, '500');
+    const coste = await valorTarjeta(page, 'COSTE TOTAL');
+
+    const bloque = page.locator(BLOQUE_REPARTO);
+    const fecha = bloque.locator('input[type="date"]');
+    await fecha.fill('2026-10-13');
+    await esperarValorEnReact(page, fecha, '2026-10-13');
+    await sembrar(page, IBI, '840');
+    await sembrar(page, COMUNIDAD, '120');
+    await bloque.locator('select').selectOption('trimestral');
+
+    expect(await filaReparto(page, 'IBI del año')).toBe('IBI del año 01/01/2026 – 31/12/2026 655,89 € · 285 días 184,11 € · 80 días');
+    expect(await filaReparto(page, 'Comunidad')).toBe(
+      'Comunidad (cuota trimestral) 01/10/2026 – 31/12/2026 15,65 € · 12 días 104,35 € · 80 días',
+    );
+    await expect(bloque).toContainText('el comprador le abona en la firma 288,46 €');
+
+    // La cuota de comunidad ilegible: se nombra y no se publica ningún reparto, tampoco el del IBI.
+    await sembrar(page, COMUNIDAD, '2.000.50');
+    await expect(bloque.getByRole('alert')).toHaveText(
+      'No se entiende el importe de «Cuota de comunidad»: escríbelo como 450 o 450,80. Hasta corregirlo no se reparte nada, para no publicar una cifra calculada con un importe equivocado.',
+    );
+    await expect(bloque.locator('table')).toHaveCount(0);
+    await expect(bloque).not.toContainText('abona');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe(coste);
+
+    // Vacía: no hay comunidad que repartir, y el IBI vuelve solo.
+    await sembrar(page, COMUNIDAD, '');
+    await expect(bloque.getByRole('alert')).toHaveCount(0);
+    await expect(bloque.locator('tbody tr')).toHaveCount(1);
+    await expect(bloque).toContainText('el comprador le abona en la firma 184,11 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe(coste);
+  });
+
+  // ─── Hallazgos de la re-inspección del 13/10/2026, con `test.fail()` salvo con VER_HUECOS=1 ───
+
+  /**
+   * [13/10-a] (contenido, medio) — En Ceuta y Melilla el aviso de cabecera (`ivaAviso`, page.tsx
+   * ~l. 440-448) dice del IPSI que «El impuesto soportado también puede ser deducible, pero con las
+   * reglas del IPSI». La Ley 8/1991, art. 20.3 (BOE-A-1991-7645, consolidado, leído hoy): «Las
+   * cuotas soportadas o satisfechas en relación con las entregas de bienes inmuebles […] no podrán
+   * ser objeto de deducción». La propia app lo dice dos avisos más abajo en Ceuta y Melilla con
+   * «Segunda mano» («no deja deducir el IPSI soportado en la compra de un inmueble (art. 20.3)»),
+   * que es la reparación del 1584 (24/09); el aviso de cabecera es del 1177 (21/09) y no se
+   * actualizó. En Canarias la frase vale (el IGIC sí se deduce). Local-comercial tiene el mismo
+   * texto (page.tsx l. 1246), sin medir.
+   */
+  test('[13/10-a] en Ceuta y Melilla el aviso de cabecera no promete deducir el IPSI de la compra de la nave (Ley 8/1991, art. 20.3)', async ({ page }) => {
+    test.fail(!I13_VER_HUECOS, 'hallazgo abierto del 13/10/2026: el aviso de cabecera dice que el IPSI «también puede ser deducible»');
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await sembrar(page, PRECIO, '500000');
+    const cabecera = page.locator('[class*="ivaAviso"]');
+    const vistos: string[] = [];
+    for (const [ccaa, regimen] of [
+      ['ceuta', /Segunda mano/],
+      ['melilla', /Obra nueva/],
+    ] as const) {
+      await page.selectOption('#select-ccaa', ccaa);
+      await page.getByRole('button', { name: regimen }).click();
+      const texto = (await cabecera.innerText()).replace(/\s+/g, ' ');
+      expect(texto).toContain('IPSI');
+      if (regimen.source === 'Segunda mano') {
+        // La misma pantalla ya lo dice bien, con el artículo, en el aviso de la renuncia.
+        await expect(page.locator('[class*="avisoRenuncia"]')).toContainText('no deja deducir el IPSI soportado en la compra de un inmueble (art. 20.3)');
+      }
+      if (/puede ser deducible/.test(texto)) vistos.push(`${ccaa} · ${regimen.source}: «${texto}»`);
+    }
+    expect(vistos).toEqual([]);
+  });
+
+  /**
+   * [13/10-b] (contenido, medio) — cabo C0164, medido aquí. Art. 94.Uno.1.º.a) de la Ley 37/1992
+   * (BOE-A-1992-28740, leído hoy): dan derecho a deducir «Las entregas de bienes y prestaciones de
+   * servicios sujetas y no exentas del Impuesto sobre el Valor Añadido». La FAQ «¿Es deducible el
+   * IVA…?», el consejo «Consulta el régimen de IVA» y las limitaciones lo dicen así («sujeta y no
+   * exenta»; la FAQ añade «Si la actividad está exenta de IVA (por ejemplo, la sanitaria o la
+   * educativa), no es deducible»). Cinco bocas condicionan la deducción a la actividad «sujeta» sin
+   * «no exenta»: dos sin matiz —la tabla «IVA deducible: Sí (si actividad sujeta a IVA)» y el caso
+   * de uso «Si la empresa está dada de alta en actividades sujetas a IVA, puede deducir el IVA»— y
+   * tres matizadas que no por eso aciertan («puede ser deducible», «suele ser deducible»,
+   * «Potencialmente deducible»): a una clínica o un colegio, sujetos y exentos, les dicen que puede.
+   * Es la forma del hallazgo 3089 de solar (reparado el 08/10/2026).
+   */
+  test('[13/10-b] ningún texto condiciona la deducción del IVA a una actividad «sujeta» sin «no exenta» (art. 94.Uno.1.º.a LIVA)', async ({ page }) => {
+    test.fail(!I13_VER_HUECOS, 'hallazgo abierto del 13/10/2026 (cabo C0164): cinco bocas dicen «sujeta» sin «no exenta»');
+    const limpio = (s: string | null) => (s ?? '').replace(/\s+/g, ' ').trim();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await sembrar(page, PRECIO, '500000');
+
+    // La regla bien dicha, en la propia página.
+    const faq = (await faqVisible(page)).find((f) => /deducible el IVA/.test(f.q));
+    expect(faq?.a).toContain('sujeta y no exenta');
+
+    const textos: { donde: string; t: string }[] = [];
+    textos.push({ donde: 'aviso de cabecera', t: limpio(await page.locator('[class*="ivaAviso"]').innerText()) });
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    textos.push({ donde: 'tarjeta del IVA (obra nueva)', t: await descripcionTarjeta(page, 'IVA (') });
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    textos.push({ donde: 'aviso de la renuncia', t: limpio(await page.locator('[class*="avisoRenuncia"]').innerText()) });
+    textos.push({
+      donde: 'tabla comparativa',
+      t: limpio(await page.locator('tr', { hasText: 'IVA deducible' }).locator('td').nth(1).textContent()),
+    });
+    textos.push({
+      donde: 'caso de uso «Empresa compra nave nueva al promotor»',
+      t: limpio(
+        await page
+          .locator('strong', { hasText: 'Empresa compra nave nueva al promotor' })
+          .locator('xpath=following-sibling::p[1]')
+          .textContent(),
+      ),
+    });
+    const sinExenta = textos.filter(({ t }) => /deduc/i.test(t) && /sujet[ao]/.test(t) && !/no exent[ao]/.test(t));
+    expect(sinExenta.map(({ donde, t }) => `${donde}: «${t}»`)).toEqual([]);
+  });
+
+  /**
+   * [13/10-c] (contenido, bajo) — residuo del hallazgo 1267 (23/09/2026) en el FAQPage, que solo
+   * leen buscadores y asistentes de IA. «¿En qué se diferencia comprar una nave industrial de
+   * comprar un local comercial?» responde «IVA 21 % en primera transmisión e ITP al tipo general en
+   * segunda mano», sin las dos salvedades que la misma página da en RESPUESTA_IMPUESTO_COMPRA y que
+   * la calculadora aplica: en Canarias, Ceuta y Melilla no hay IVA (la tarjeta dice «IGIC/IPSI · No
+   * calculado») y, con la renuncia a la exención (la tercera opción), la segunda mano no paga ITP
+   * sino IVA. Tampoco dice que en Ceuta y Melilla la cuota del ITP se paga a la mitad.
+   */
+  test('[13/10-c] el FAQPage «¿En qué se diferencia… de un local comercial?» no da por universales el IVA del 21 % y el ITP', async ({ page }) => {
+    test.fail(!I13_VER_HUECOS, 'hallazgo abierto del 13/10/2026: la respuesta calla el IGIC/IPSI y la renuncia');
+    await page.goto(RUTA);
+    const respuesta = (await faqPage(page)).find((f) => /local comercial/.test(f.q));
+    expect(respuesta, 'el FAQPage tiene la pregunta').toBeDefined();
+    const a = respuesta!.a;
+    expect({
+      nombraIgicOIpsi: /IGIC|IPSI/.test(a),
+      nombraLaRenuncia: /renuncia/i.test(a),
+    }).toEqual({ nombraIgicOIpsi: true, nombraLaRenuncia: true });
+  });
+
+  /**
+   * [13/10-d] (contenido, bajo) — patrón 5 de la familia («no falta, no vale») en la FECHA del
+   * reparto, que el 3240 (cuotas negativas, abierto en la referencia) no cubre. `leerFechaISO`
+   * (lib/calculadoras/prorrateoCompraventa.ts) rechaza los años fuera de 1900-2200 y el bloque cae al
+   * estado «sin fecha»: «Indica la fecha de la escritura para repartir los días.», con la fecha
+   * escrita a la vista. Se llega tecleando el año en dos cifras: en Chromium, «13», «10», «26» deja
+   * el campo en 13/10/0026 (valor «0026-10-13»; medido con el teclado el 13/10/2026). No reparte
+   * nada, que es lo correcto; lo que falla es la frase. Vive en components/ProrrateoIbiComunidad, así
+   * que alcanza a las siete apps.
+   */
+  test('[13/10-d] una fecha escrita con un año imposible (13/10/0026) no se pide como si faltara', async ({ page }) => {
+    test.fail(!I13_VER_HUECOS, 'hallazgo abierto del 13/10/2026: el bloque pide «Indica la fecha…» con la fecha escrita');
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS_REPARTO);
+    const bloque = page.locator(BLOQUE_REPARTO);
+    await sembrar(page, IBI, '840');
+    const fecha = bloque.locator('input[type="date"]');
+    await fecha.fill('0026-10-13');
+    await esperarValorEnReact(page, fecha, '0026-10-13');
+    await expect(fecha).toHaveValue('0026-10-13');
+    await expect(bloque).not.toContainText('abona');
+    await expect(bloque.getByText('Indica la fecha de la escritura para repartir los días.')).toHaveCount(0);
   });
 });

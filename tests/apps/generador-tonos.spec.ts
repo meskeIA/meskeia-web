@@ -69,6 +69,11 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *      27/09/2026 (hallazgos 2306-2309, los I1-I4): hoy son regresión y ninguno lleva ya la
  *      marca. Y la SOSPECHA S2 (CASO 3 inestable con la
  *      CPU cargada): `abrir` espera ahora a la hidratación (ver su comentario).
+ *   7. INSPECTOR 13/10/2026 (al final): re-inspección tras la <ZonaHerramienta> (3d5c5db0). Casos
+ *      N (1.234,5 Hz triangular, medido en el sonido) y L (20.000 Hz al 100 %), la envoltura sin
+ *      efecto visible ni de teclado, y los hallazgos J1-J3, ABIERTOS, con `test.fail()`. El caso de
+ *      rechazo (un sonido por encima de 20 kHz en el medidor) y el J4, en
+ *      generador-tonos-medidor-inspector.spec.ts, que ya lleva el micrófono falso.
  */
 
 test.use({
@@ -2604,5 +2609,291 @@ test.describe('Inspector 27/09/2026 — medir con el tono sonando, en móvil (Pi
     const tabla = await tablaMedida(page);
     expect(tabla.get(1000)?.[0] ?? null, 'A en 1.000 Hz (null = «sin medida»)').not.toBeNull();
     await expect(resumenMedida(page)).toContainText('26 de 26 puntos medidos');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 13/10/2026 — re-inspección (invalidada por 3d5c5db0, la <ZonaHerramienta>)
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Resuelto a mano ANTES de ejecutar (los casos con micrófono, en generador-tonos-medidor-inspector,
+ * que es el fichero que ya lleva los launchOptions del micrófono falso):
+ *   · NORMAL: «1234,5» tecleado con coma decimal (formato español: la coma sola es decimal) y onda
+ *     triangular. Suena 1.234,5 Hz: el pico del sonido, afinado con la parábola sobre el bin más
+ *     alto de la FFT de 32.768, a menos de 0,2 Hz (el defecto que vigila es perder el decimal, que
+ *     da 0,5 Hz, o leer la coma como millar, que da 12.345). Triangular = serie de Fourier con solo
+ *     impares y amplitud 1/n²: 3.º = 20·log10(1/9) = −19,08 dB, 5.º = 20·log10(1/25) = −27,96 dB,
+ *     2.º enterrado. Campo «1234,5» (la app lo reescribe con coma; cuatro cifras sin punto, como
+ *     hace Intl en es-ES), franja «Medios - Voz humana» (su tabla: 500 Hz – 2 kHz) y el deslizador
+ *     anuncia «1234,5 Hz». Medido: 1.234,509 Hz · −18,85 · −28,33 · −144 dB.
+ *   · LÍMITE: el techo, 20.000 Hz, con el volumen al máximo (tecla Fin): el pico del sonido en
+ *     20.000 Hz ± 1 bin (1,35-1,46 Hz; Nyquist es 22.050 o 24.000, no satura), ganancia 1,0 y
+ *     «100 %» en el rótulo y en el aria-valuetext. Medido: 19.999,99 Hz y ganancia 1.
+ *   · ZonaHerramienta (3d5c5db0, `display: contents`): ninguna caja propia, el panel en la misma
+ *     columna que el hero, el Tab sigue el orden de siempre (campo → deslizador → «Ir a 20 Hz»), las
+ *     teclas responden (ArrowUp: 440 → 441; Espacio en Reproducir) y nada sale hacia /api/analytics.
+ */
+test.describe('Inspector 13/10/2026', () => {
+  /** Pico del sonido emitido cerca de `cerca`, afinado con la parábola (FFT de 32.768 de INSTRUMENTAR). */
+  const picoAfinado = (page: Page, cerca: number): Promise<number> =>
+    page.evaluate((fc) => {
+      const an = (window as unknown as { __analizador: AnalyserNode | null }).__analizador;
+      if (!an) return NaN;
+      const d = new Float32Array(an.frequencyBinCount);
+      an.getFloatFrequencyData(d);
+      const ancho = an.context.sampleRate / an.fftSize;
+      const c = Math.round(fc / ancho);
+      let k = c;
+      for (let i = c - 5; i <= c + 5; i++) if (d[i] > d[k]) k = i;
+      const delta = (d[k - 1] - d[k + 1]) / (2 * (d[k - 1] - 2 * d[k] + d[k + 1]));
+      return (k + (Number.isFinite(delta) && Math.abs(delta) <= 0.5 ? delta : 0)) * ancho;
+    }, cerca);
+
+  /** Escribe en un campo como un usuario y espera a que React lo tenga, antes de salir de él. */
+  async function teclear(page: Page, selector: string, texto: string): Promise<void> {
+    const campo = page.locator(selector);
+    await campo.click();
+    await campo.press('Control+a');
+    await campo.pressSequentially(texto, { delay: 30 });
+    await esperarValorEnReact(page, selector, texto);
+    await campo.blur();
+  }
+
+  test('CASO N — «1234,5» con coma y onda triangular: suena 1.234,5 Hz con los armónicos 1/n² de la triangular', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await teclear(page, CAMPO_FRECUENCIA, '1234,5');
+    await expect(campoFrecuencia(page)).toHaveValue('1234,5');
+    await page.getByRole('button', { name: /Triangular/ }).click();
+    await expect(page.getByRole('button', { name: /Triangular/ })).toHaveAttribute('aria-pressed', 'true');
+    await botonReproducir(page).click();
+    await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
+    const [osc] = await registros(page);
+    expect(osc.tipoAlArrancar).toBe('triangle');
+    expect(osc.frecuenciasAplicadas).toEqual([1234.5]);
+
+    // El SONIDO, no el parámetro: la ventana (0,68-0,74 s) se llena antes de que el pico sea fiable.
+    await expect
+      .poll(async () => Math.abs((await picoAfinado(page, 1234.5)) - 1234.5), {
+        timeout: 8000,
+        message: 'el pico del sonido emitido no cae en 1.234,5 Hz (± 0,2)',
+      })
+      .toBeLessThan(0.2);
+    const nivelDe = async (armonico: number): Promise<number> =>
+      (await armonicosRelativos(page, 1234.5, [armonico]))[0];
+    // ±1,5 dB: lo que se vigila es la LEY 1/n² (la cuadrada o la sierra darían −9,54 en el 3.º).
+    const dentro = async (armonico: number, esperado: number): Promise<string | number> => {
+      const v = await nivelDe(armonico);
+      return Math.abs(v - esperado) <= 1.5 ? 'dentro' : v;
+    };
+    await expect
+      .poll(() => dentro(3 * 1234.5, 20 * Math.log10(1 / 9)), { timeout: 8000, message: 'triangular: 3.er armónico (−19,08 dB)' })
+      .toBe('dentro');
+    await expect
+      .poll(() => dentro(5 * 1234.5, 20 * Math.log10(1 / 25)), { timeout: 8000, message: 'triangular: 5.º armónico (−27,96 dB)' })
+      .toBe('dentro');
+    expect(await nivelDe(2 * 1234.5), 'triangular: no tiene armónicos pares').toBeLessThan(-40);
+
+    await expect(page.getByText('Medios - Voz humana')).toBeVisible();
+    await expect(page.getByLabel('Seleccionar frecuencia')).toHaveAttribute('aria-valuetext', /^1234,5\sHz$/);
+  });
+
+  test('CASO L — 20.000 Hz al 100 % de volumen: el sonido tiene su pico en 20.000 Hz y la ganancia llega a 1', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Ir a 20.000 Hz' }).click();
+    await expect(campoFrecuencia(page)).toHaveValue('20000');
+    const volumen = page.getByRole('slider', { name: 'Volumen' });
+    await volumen.focus();
+    await volumen.press('End');
+    await expect(page.locator('[class*="volumenValor"]')).toHaveText('100 %');
+    await expect(volumen).toHaveAttribute('aria-valuetext', /^100\s%$/);
+
+    await botonReproducir(page).click();
+    await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
+    expect((await registros(page))[0].frecuenciasAplicadas).toEqual([20000]);
+    await expect.poll(async () => (await vivo(page))?.ganancia ?? -1, { timeout: 5000 }).toBeCloseTo(1, 2);
+    // ± 1 bin: un oscilador saturado en Nyquist o una frecuencia cambiada caen a miles de hercios.
+    await expect
+      .poll(async () => Math.abs((await picoAfinado(page, 20000)) - 20000), {
+        timeout: 8000,
+        message: 'el pico del sonido emitido no cae en 20.000 Hz (± 1,5)',
+      })
+      .toBeLessThan(1.5);
+    await expect(page.getByText('Umbral del ultrasonido - Inaudible para la mayoría')).toBeVisible();
+  });
+
+  test('ZonaHerramienta (3d5c5db0) — la envoltura no se ve, no cambia el teclado ni manda nada a /api/analytics', async ({
+    page,
+  }) => {
+    const enviadas: string[] = [];
+    await page.route('**/api/analytics/**', (ruta) => {
+      enviadas.push(ruta.request().postData() ?? '');
+      return ruta.fulfill({ status: 204, body: '' });
+    });
+    await abrir(page);
+
+    const zona = await page.evaluate(() => {
+      const z = document.querySelector('[data-zona-herramienta]');
+      const panel = z?.querySelector('[class*="mainPanel"]')?.getBoundingClientRect();
+      const hero = document.querySelector('header[class*="hero"]')?.getBoundingClientRect();
+      return {
+        app: z?.getAttribute('data-zona-herramienta') ?? null,
+        display: z ? getComputedStyle(z).display : null,
+        cajas: z?.getClientRects().length ?? -1,
+        mismaColumna: !!panel && !!hero && panel.left === hero.left && panel.width === hero.width,
+      };
+    });
+    expect(zona).toEqual({ app: 'generador-tonos', display: 'contents', cajas: 0, mismaColumna: true });
+
+    // El orden de tabulación es el del DOM, con la envoltura o sin ella.
+    await campoFrecuencia(page).focus();
+    await page.keyboard.press('Tab');
+    await expect(page.getByLabel('Seleccionar frecuencia')).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Ir a 20 Hz' })).toBeFocused();
+
+    // Las teclas llegan a los controles: 440 + ArrowUp = 441, y Espacio arranca el tono.
+    await page.getByLabel('Seleccionar frecuencia').focus();
+    await page.keyboard.press('ArrowUp');
+    await expect(campoFrecuencia(page)).toHaveValue('441');
+    await botonReproducir(page).focus();
+    await page.keyboard.press('Space');
+    await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
+    expect((await registros(page))[0].frecuenciasAplicadas).toEqual([441]);
+    await expect(botonDetener(page)).toHaveAttribute('aria-pressed', 'true');
+
+    // En localhost la medición no se emite (lib/trackingEvento.ts: solo dominios de producción).
+    expect(enviadas.filter((cuerpo) => cuerpo.includes('evt:'))).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO J1 [bajo · operativa] — ABIERTO (13/10/2026). El barrido no empieza en «Desde»:
+   * `iniciarSweep` arranca el oscilador con la frecuencia que hubiera en el campo (`iniciarAudio`
+   * usa `frecuencia`) y el primer paso del intervalo, a los 50 ms, ya suma el incremento: la primera
+   * vuelta va de «Desde» + incremento a «Hasta» − incremento, y «Desde» solo suena al dar la vuelta.
+   *   entrada   «Ir a 5.000 Hz» y, con el barrido por defecto (Desde 20 · Hasta 2.000 · 5 s),
+   *             «Iniciar barrido»
+   *   esperado  la primera frecuencia que suena es 20 Hz y ninguna sale de 20–2.000 Hz
+   *   obtenido  [5000, 40, 60, 79, 99, …]: 50 ms a 5.000 Hz (con la rampa de entrada subiendo) y
+   *             el primer peldaño en 40 Hz. Con el último tono en 20.000 Hz, como tras un test de
+   *             agudos, el barrido de graves empieza con un pitido de 20 kHz.
+   * El CASO 5 fija hoy ese primer valor («aplicadas[0] = 440»): al reparar, ese caso cambia.
+   */
+  test('HALLAZGO J1 — el barrido empieza en «Desde», sin sonar antes la frecuencia que había', async ({ page }) => {
+    // ABIERTO: afirma lo que DEBERÍA pasar. Comprobado el 13/10/2026 que cae en la aserción de la
+    // primera frecuencia (5000 en vez de 20), no en la precondición de que el barrido se mueva.
+    test.fail();
+    await abrir(page);
+    await page.getByRole('button', { name: 'Ir a 5.000 Hz' }).click();
+    await expect(campoFrecuencia(page)).toHaveValue('5000');
+    await expect(page.locator('#sweep-min')).toHaveValue('20');
+    await expect(page.locator('#sweep-max')).toHaveValue('2000');
+    await expect(page.locator('#sweep-dur')).toHaveValue('5');
+    await page.getByRole('button', { name: /Iniciar barrido/ }).click();
+    await expect(page.getByRole('button', { name: /Detener barrido/ })).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(400);
+    await page.getByRole('button', { name: /Detener barrido/ }).click();
+    const aplicadas = await frecuenciasAplicadas(page);
+    expect(aplicadas.length, 'el barrido tenía que moverse (pasos de 50 ms)').toBeGreaterThanOrEqual(4);
+    expect(aplicadas[0], `primera frecuencia que suena (todas: ${aplicadas.slice(0, 6).join(', ')}…)`).toBe(20);
+    expect(aplicadas.filter((f) => f < 20 || f > 2000), 'frecuencias fuera de Desde–Hasta').toEqual([]);
+  });
+
+  /**
+   * HALLAZGO J2 [bajo · contenido] — ABIERTO (13/10/2026). La guía propone el barrido para algo
+   * que su barrido no puede hacer en los graves. «Calibración de Sistemas de Audio»: «Usa el barrido
+   * (sweep) de 20 Hz a 20 kHz para detectar resonancias o "huecos" en la respuesta de frecuencia de
+   * altavoces, auriculares o una sala»; consejo: «Un barrido lento de 20 Hz a 20 kHz […] Las
+   * "montañas" son resonancias del altavoz o la sala», y la misma guía sitúa las de la sala por debajo
+   * de 100 Hz («Los graves <100 Hz dependen de la sala»). Pero el barrido es LINEAL en peldaños de
+   * 50 ms: incremento = (Hasta − Desde)/(Duración·20).
+   * Resuelto a mano con el más lento que admite (Duración 60 s, el máximo del campo): 19.980/1.200 =
+   * 16,65 Hz por peldaño, así que de 20 a 200 Hz hay 10 peldaños (37, 53, 70, 87, 103, 120, 137, 153,
+   * 170, 187) y se cruzan en 0,5 s, con 50 ms por peldaño (1,85 ciclos a 37 Hz); la octava de 10 a
+   * 20 kHz se lleva 30 s. Un barrido logarítmico de 60 s, el habitual en acústica (mismo tiempo por
+   * octava), dedicaría a 20–200 Hz 60·log(10)/log(1.000) = 20 s, y a los 1,5 s iría por
+   * 20·1.000^(1,5/60) = 23,8 Hz. Medido: a los 0,55 s ya suena 203 Hz.
+   * Se acepta cualquiera de las dos reparaciones: un barrido que no cruce los graves de un salto, o
+   * una guía que deje de proponerlo para las resonancias de sala.
+   */
+  test('HALLAZGO J2 — el barrido más lento de 20 Hz a 20 kHz no cruza los graves de un salto, o la guía no lo propone para ellos', async ({
+    page,
+  }) => {
+    // ABIERTO: comprobado el 13/10/2026 que cae en la última aserción (519 Hz a los 1,5 s, con la
+    // guía proponiéndolo), no en la precondición de que el barrido se mueva.
+    test.fail();
+    await abrir(page);
+    await teclear(page, '#sweep-min', '20');
+    await teclear(page, '#sweep-max', '20.000');
+    await teclear(page, '#sweep-dur', '60');
+    await expect(page.locator('#sweep-max')).toHaveValue('20000');
+    await expect(page.locator('#sweep-dur')).toHaveValue('60');
+    await page.getByRole('button', { name: /Iniciar barrido/ }).click();
+    await page.waitForTimeout(1500);
+    await page.getByRole('button', { name: /Detener barrido/ }).click();
+    // Sin la primera: es la que hubiera en el campo al arrancar (HALLAZGO J1).
+    const barrido = (await frecuenciasAplicadas(page)).slice(1);
+    expect(barrido.length, 'el barrido tenía que moverse (pasos de 50 ms)').toBeGreaterThanOrEqual(15);
+    const texto = (await page.locator('body').textContent()) ?? '';
+    const proponeResonanciasDeSala =
+      /barrido \(sweep\) de 20 Hz a 20 kHz para detectar resonancias/.test(texto) ||
+      /barrido lento de 20 Hz a 20 kHz/.test(texto);
+    const hastaDondeLlega = Math.max(...barrido);
+    expect(
+      proponeResonanciasDeSala ? hastaDondeLlega : 0,
+      `en 1,5 s de un barrido de 60 s ya suena ${hastaDondeLlega} Hz (peldaños: ${barrido.slice(0, 12).join(', ')}…)`,
+    ).toBeLessThanOrEqual(200);
+  });
+
+  /**
+   * HALLAZGO J3 [bajo · contenido] — ABIERTO (13/10/2026). Dos preguntas están en las dos FAQ (la
+   * visible de la guía y el FAQPage de metadata.ts, que leen buscadores e IAs) con respuestas
+   * distintas. No se contradicen: el FAQPage resume, y añade o quita frases sueltas.
+   *   «¿Cómo mido cuántos hercios tiene un sonido?» (visible) / «¿Cómo puedo medir la frecuencia de
+   *   un sonido en hercios?» (FAQPage)
+   *   «¿Qué diferencia hay entre onda senoidal, cuadrada, triangular y sierra?» (visible) / «¿Cuál es
+   *   la diferencia entre una onda senoidal, cuadrada, triangular y sierra?» (FAQPage)
+   * La reparación es UNA constante en metadata.ts de la que salgan las dos bocas (como
+   * app/simulador-gastos-compraventa-garaje): el test pide que, si la pregunta está en las dos, la
+   * respuesta sea la misma.
+   */
+  test('HALLAZGO J3 — una pregunta que está en las dos FAQ tiene la misma respuesta en las dos', async ({ page }) => {
+    // ABIERTO: comprobado el 13/10/2026 que cae en la comparación de respuestas (la de los hercios),
+    // no en las precondiciones de que la pregunta exista en las dos FAQ.
+    test.fail();
+    await abrir(page);
+    const delFaqPage = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        const j = JSON.parse(s.textContent ?? '{}') as {
+          '@type'?: string;
+          mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+        };
+        if (j['@type'] === 'FAQPage') return (j.mainEntity ?? []).map((q) => ({ pregunta: q.name, respuesta: q.acceptedAnswer.text }));
+      }
+      return [];
+    });
+    const visibles = await page.evaluate(() =>
+      [...document.querySelectorAll('details')]
+        .map((d) => ({ d, s: d.querySelector('summary') }))
+        .filter((x) => x.s !== null)
+        .map(({ d, s }) => ({
+          pregunta: (s?.textContent ?? '').trim(),
+          respuesta: (d.textContent ?? '').replace(s?.textContent ?? '', '').trim(),
+        })),
+    );
+    const normal = (t: string) => t.replace(/\s+/g, ' ').trim();
+    for (const tema of [/hercios/i, /senoidal, cuadrada, triangular y sierra/i]) {
+      const ld = delFaqPage.find((q) => tema.test(q.pregunta));
+      const vista = visibles.find((q) => tema.test(q.pregunta));
+      expect(ld, `el FAQPage tenía que tener la pregunta de ${tema}`).toBeTruthy();
+      expect(vista, `la FAQ visible tenía que tener la pregunta de ${tema}`).toBeTruthy();
+      expect(normal(ld?.respuesta ?? ''), `respuesta del FAQPage a «${ld?.pregunta}» frente a la visible «${vista?.pregunta}»`).toBe(
+        normal(vista?.respuesta ?? ''),
+      );
+    }
   });
 });
