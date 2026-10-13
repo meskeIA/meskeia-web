@@ -706,7 +706,7 @@ export const INSTRUMENTS: Instrument[] = [
     familia: 'Electrónico',
     subfamilia: 'Electrófono',
     origen: 'América',
-    epocaOrigen: 'Siglo XX (1960s)',
+    epocaOrigen: 'Siglo XX (años 60)',
     registro: 'Amplio',
     materiales: ['Circuitos electrónicos', 'Teclado'],
     descripcion: 'Instrumento electrónico que genera y modifica sonidos mediante osciladores, filtros y moduladores.',

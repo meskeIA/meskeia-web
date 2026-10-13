@@ -322,7 +322,7 @@ export const videojuegos: HistoriaData = {
       },
       {
         titulo: 'Identifica la polémica cultural del período',
-        cuerpo: 'Cada período generó una controversia cultural que reflejaba tensiones sociales más amplias: la violencia en arcades (1980s), Mortal Kombat y la clasificación por edades (1993), los loot boxes y la adicción (2010s), los esports como deporte legítimo (2015+). Las polémicas revelan cómo la sociedad procesa la irrupción de los videojuegos en la cultura.',
+        cuerpo: 'Cada período generó una controversia cultural que reflejaba tensiones sociales más amplias: la violencia en arcades (años 80), Mortal Kombat y la clasificación por edades (1993), los loot boxes y la adicción (años 2010), los esports como deporte legítimo (2015+). Las polémicas revelan cómo la sociedad procesa la irrupción de los videojuegos en la cultura.',
       },
       {
         titulo: 'Conecta con el período siguiente',
@@ -364,7 +364,7 @@ export const videojuegos: HistoriaData = {
       },
       {
         titulo: 'Subestimar el tamaño económico de la industria',
-        cuerpo: 'Los videojuegos generan más de 200.000 millones de dólares anuales — más que el cine (43.000M$) y la música grabada (26.000M$) juntos. Es la mayor industria del entretenimiento del mundo, y lleva siéndolo desde principios de los 2010s. Aun así, sigue siendo frecuentemente ignorada en los análisis culturales y económicos.',
+        cuerpo: 'Los videojuegos generan más de 200.000 millones de dólares anuales — más que el cine (43.000M$) y la música grabada (26.000M$) juntos. Es la mayor industria del entretenimiento del mundo, y lleva siéndolo desde principios de los años 2010. Aun así, sigue siendo frecuentemente ignorada en los análisis culturales y económicos.',
       },
     ],
   },

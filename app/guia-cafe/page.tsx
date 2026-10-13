@@ -270,7 +270,7 @@ const ORIGENES: OrigenCafe[] = [
     cosecha: 'Oct–Dic (principal), Jun–Ago (secundaria)',
     preparacionIdeal: ['V60', 'Chemex', 'Filtrado', 'Cold brew'],
     descripcion: 'El café keniano es posiblemente el más identificable del mundo por su acidez "jugosa" (juicy). El proceso de doble fermentación en agua desarrollado en Kenia genera una complejidad y vivacidad que muchos consideran la cima de lo que el café puede expresar.',
-    curiosidad: 'Kenia clasifica sus cafés por tamaño de grano: AA (>17 mesh) es el grado más buscado. Esta clasificación no garantiza calidad per se, pero históricamente los granos más grandes concentran más azúcares. El sistema data de la época colonial británica (1930s).',
+    curiosidad: 'Kenia clasifica sus cafés por tamaño de grano: AA (>17 mesh) es el grado más buscado. Esta clasificación no garantiza calidad per se, pero históricamente los granos más grandes concentran más azúcares. El sistema data de la época colonial británica (años 30).',
   },
   {
     nombre: 'Tanzania Kilimanjaro',

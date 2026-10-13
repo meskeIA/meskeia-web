@@ -95,7 +95,7 @@ export const modaEspanola: HistoriaData = {
       color: '#FF8C00',
       categoria: 'desarrollismo',
       descripcion: 'El Plan de Estabilización (1959) abre España al exterior: turismo, televisión y revistas internacionales traen nuevas modas. Pedro Rodríguez y Elio Berhanyer establecen la Alta Costura española. Loewe consolida su posición como casa de lujo con sus bolsos de piel. La llegada del prêt-à-porter democratiza la moda: deja de ser solo para la élite.',
-      obraIconica: 'Bolso Amazona de Loewe (1970s) — fundada en Madrid en 1846, primer icono del lujo español; en 1996 LVMH la adquiere',
+      obraIconica: 'Bolso Amazona de Loewe (años 70) — fundada en Madrid en 1846, primer icono del lujo español; en 1996 LVMH la adquiere',
       paises: ['España'],
     },
     {

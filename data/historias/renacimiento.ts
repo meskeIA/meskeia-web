@@ -170,7 +170,7 @@ export const renacimiento: HistoriaData = {
         'Cosimo de Medici funda el Banco Medici en Florencia (1397)',
         'Brunelleschi y Ghiberti compiten por las puertas del Baptisterio (1401)',
         'Concilio de Florencia: contacto entre la cultura griega byzantina y la occidental (1439)',
-        'Donatello esculpe el primer desnudo masculino en bronce desde la Antigüedad (1440s)',
+        'Donatello esculpe el primer desnudo masculino en bronce desde la Antigüedad (década de 1440)',
       ],
     },
     {
@@ -185,7 +185,7 @@ export const renacimiento: HistoriaData = {
       ],
       eventos: [
         'Lorenzo el Magnífico convierte Florencia en la capital cultural de Europa (1469–1492)',
-        'Botticelli pinta "La primavera" y "El nacimiento de Venus" (1480s)',
+        'Botticelli pinta "La primavera" y "El nacimiento de Venus" (década de 1480)',
         'Leonardo da Vinci pinta "La Última Cena" en Milán (1495–1498)',
         'El papa Julio II encarga a Miguel Ángel la Capilla Sixtina (1508)',
         'Rafael decora las Estancias del Vaticano (1508–1520)',
@@ -253,7 +253,7 @@ export const renacimiento: HistoriaData = {
         'El Sacco di Roma sacude el centro cultural italiano (1527)',
         'El Concilio de Trento define el arte de la Contrarreforma (1545–1563)',
         'Palladio publica los "Cuatro Libros de Arquitectura" (1570)',
-        'Claudio Monteverdi compone los primeros madrigales (1580s)',
+        'Claudio Monteverdi compone los primeros madrigales (década de 1580)',
         'Caravaggio revoluciona la pintura con el tenebrismo (ca. 1600)',
       ],
     },

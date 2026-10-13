@@ -90,8 +90,8 @@ export const historiaOcio: HistoriaData = {
       anioFin: 1950,
       color: '#FF8C00',
       categoria: 'masas',
-      descripcion: 'Los hermanos Lumière proyectan la primera película (1895). El cine mudo crea las primeras estrellas globales: Chaplin, Keaton, Valentino. Hollywood se convierte en la fábrica de sueños mundial (1920s). El cine sonoro (El cantante de jazz, 1927) y el color (El mago de Oz, 1939) perfeccionan el medio. Las vacaciones pagadas se generalizan en Francia (Frente Popular, 1936) y crean el primer turismo de masas. La radio (1920s) lleva el entretenimiento al hogar. El cine es el primer medio de masas verdaderamente global: Hollywood exporta el American way of life al mundo entero.',
-      obraIconica: 'Los Lumière (1895) y Hollywood (1920s): el cine como primera industria global del entretenimiento de masas',
+      descripcion: 'Los hermanos Lumière proyectan la primera película (1895). El cine mudo crea las primeras estrellas globales: Chaplin, Keaton, Valentino. Hollywood se convierte en la fábrica de sueños mundial (años 20). El cine sonoro (El cantante de jazz, 1927) y el color (El mago de Oz, 1939) perfeccionan el medio. Las vacaciones pagadas se generalizan en Francia (Frente Popular, 1936) y crean el primer turismo de masas. La radio (años 20) lleva el entretenimiento al hogar. El cine es el primer medio de masas verdaderamente global: Hollywood exporta el American way of life al mundo entero.',
+      obraIconica: 'Los Lumière (1895) y Hollywood (años 20): el cine como primera industria global del entretenimiento de masas',
       paises: ['Francia', 'Estados Unidos', 'Global'],
     },
     {
@@ -102,7 +102,7 @@ export const historiaOcio: HistoriaData = {
       color: '#FF8C00',
       categoria: 'masas',
       descripcion: 'La televisión entra en los hogares occidentales en los años 50: en 1960, el 90% de los hogares estadounidenses tiene TV. La coronación de Isabel II (1953) y el debate Kennedy-Nixon (1960) muestran el poder político del nuevo medio. Las retransmisiones deportivas (Mundial de fútbol 1966 en color) crean audiencias de cientos de millones. El ocio se privatiza: la familia en el salón frente al televisor reemplaza al cine, el bar y la plaza. El rock\'n\'roll, los festivales (Woodstock 1969) y la cultura pop crean por primera vez una cultura juvenil global diferenciada de la adulta.',
-      obraIconica: 'Televisión en el hogar (1950s) y Woodstock (1969): privatización del ocio y nacimiento de la cultura juvenil global',
+      obraIconica: 'Televisión en el hogar (años 50) y Woodstock (1969): privatización del ocio y nacimiento de la cultura juvenil global',
       paises: ['Estados Unidos', 'Europa Occidental', 'Global'],
     },
     {
@@ -304,7 +304,7 @@ export const historiaOcio: HistoriaData = {
     pasos: [
       {
         titulo: 'Observa los grandes saltos tecnológicos en la Línea del Tiempo',
-        cuerpo: 'Identifica los momentos en que una tecnología nueva redefine el ocio: el ferrocarril (1840s), el cine (1895), la televisión (1950s), el videojuego (1972), internet (1990s) y el smartphone (2007). Fíjate en que cada salto tecnológico acorta el tiempo hasta el siguiente: los cambios se aceleran.',
+        cuerpo: 'Identifica los momentos en que una tecnología nueva redefine el ocio: el ferrocarril (década de 1840), el cine (1895), la televisión (años 50), el videojuego (1972), internet (años 90) y el smartphone (2007). Fíjate en que cada salto tecnológico acorta el tiempo hasta el siguiente: los cambios se aceleran.',
       },
       {
         titulo: 'Compara quién tenía acceso al ocio en cada época',

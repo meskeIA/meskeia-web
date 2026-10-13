@@ -230,7 +230,7 @@ export const historiaArquitecturaModerna: HistoriaData = {
         'Reichstag remodelado por Norman Foster en Berlín (1999)',
         'Guggenheim Bilbao: el "Efecto Bilbao" cambia el paradigma (1997)',
         'Zaha Hadid: primera mujer en ganar el Premio Pritzker (2004)',
-        'Se populariza el CAD y el software CATIA para formas complejas (2000s)',
+        'Se populariza el CAD y el software CATIA para formas complejas (años 2000)',
         'El Centro Cultural Heydar Aliyev de Hadid en Bakú (2012)',
         'Grasshopper/Rhino democratiza el diseño paramétrico (2007)',
         'Bjarke Ingels Group: arquitectura lúdica y sostenible (2009–)',

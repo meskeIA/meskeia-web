@@ -668,7 +668,7 @@ export default function SimuladorCurvaPhillipsPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Puede haber deflación y desempleo a la vez?</h4>
-              <p>Sí, y es una de las combinaciones más peligrosas: <strong>deflación con recesión</strong>. Ocurre cuando la demanda colapsa tan violentamente que los precios caen y el desempleo sube al mismo tiempo. Japón vivió este escenario durante la &quot;década perdida&quot; (1990s). La trampa de deflación es difícil de salir: los consumidores posponen compras esperando precios menores, lo que perpetúa la caída de demanda y del empleo.</p>
+              <p>Sí, y es una de las combinaciones más peligrosas: <strong>deflación con recesión</strong>. Ocurre cuando la demanda colapsa tan violentamente que los precios caen y el desempleo sube al mismo tiempo. Japón vivió este escenario durante la &quot;década perdida&quot; (años 90). La trampa de deflación es difícil de salir: los consumidores posponen compras esperando precios menores, lo que perpetúa la caída de demanda y del empleo.</p>
               <p className={styles.faqTip}>💡 Fija piE en 0 %, shock en −2 pp y u en 14 %: obtendrás π ≈ −6 %, el cuadrante de deflación-recesión.</p>
             </div>
           </div>

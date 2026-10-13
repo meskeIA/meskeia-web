@@ -4,7 +4,7 @@ export const historiaDescubrimientosCientificos: HistoriaData = {
   slug: 'historia-descubrimientos-cientificos',
   titulo: 'Historia de los Descubrimientos Científicos: De Arquímedes al CRISPR',
   subtitulo: 'Dos milenios y medio de hallazgos que transformaron la comprensión humana del universo',
-  descripcionSEO: 'Cronología interactiva de los grandes descubrimientos científicos: de Arquímedes (250 a.C.) a la inteligencia artificial y el CRISPR (2020s). Revolución científica, Newton, Darwin, Einstein, ADN, Big Bang, genoma humano y AlphaFold en 10 hitos y 6 eras.',
+  descripcionSEO: 'Cronología interactiva de los grandes descubrimientos científicos: de Arquímedes (250 a.C.) a la inteligencia artificial y el CRISPR (años 2020). Revolución científica, Newton, Darwin, Einstein, ADN, Big Bang, genoma humano y AlphaFold en 10 hitos y 6 eras.',
   keywords: [
     'historia descubrimientos científicos cronología',
     'revolución científica Newton Galileo Copérnico',
@@ -319,7 +319,7 @@ export const historiaDescubrimientosCientificos: HistoriaData = {
     faq: [
       {
         pregunta: '¿Cuál es el descubrimiento científico más importante de la historia?',
-        respuesta: 'No hay consenso, pero los candidatos más citados son: la evolución por selección natural (Darwin, 1859), porque cambió la visión del lugar del ser humano en la naturaleza; la mecánica cuántica (1920s), porque describe el comportamiento de toda la materia; y la estructura del ADN (1953), porque explicó el mecanismo de la herencia. La relatividad de Einstein es tan famosa como transformadora, pero su impacto práctico cotidiano es menor que los tres anteriores.',
+        respuesta: 'No hay consenso, pero los candidatos más citados son: la evolución por selección natural (Darwin, 1859), porque cambió la visión del lugar del ser humano en la naturaleza; la mecánica cuántica (años 20), porque describe el comportamiento de toda la materia; y la estructura del ADN (1953), porque explicó el mecanismo de la herencia. La relatividad de Einstein es tan famosa como transformadora, pero su impacto práctico cotidiano es menor que los tres anteriores.',
         tip: 'La pregunta "¿cuál es el más importante?" revela tanto sobre quien la responde como sobre la ciencia misma.',
       },
       {

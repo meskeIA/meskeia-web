@@ -184,7 +184,7 @@ export const ilustracion: HistoriaData = {
         'Montesquieu publica las Cartas persas (1721), primer best-seller filosófico del siglo',
         'Voltaire se exilia en Inglaterra (1726–1729) y descubre la tolerancia inglesa',
         'Voltaire publica las Cartas filosóficas (1734), escándalo en Francia',
-        'Madame du Deffand abre su salón en París (1730s)',
+        'Madame du Deffand abre su salón en París (década de 1730)',
         'Hume publica el Tratado de la naturaleza humana (1739)',
         'Montesquieu publica El Espíritu de las Leyes (1748), obra cumbre del pensamiento político ilustrado',
       ],

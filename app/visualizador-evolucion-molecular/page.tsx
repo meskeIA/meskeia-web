@@ -787,7 +787,7 @@ export default function VisualizadorEvolucionMolecular() {
           <h3>De Darwin a Kimura: la síntesis moderna y la teoría neutralista</h3>
           <p>
             Darwin explicó la evolución por selección natural, pero no sabía nada de genes. La síntesis
-            moderna (1940s) unió la genética mendeliana con la teoría evolutiva. En 1968, Motoo Kimura
+            moderna (años 40) unió la genética mendeliana con la teoría evolutiva. En 1968, Motoo Kimura
             propuso un giro radical: la mayoría de las mutaciones que se fijan en las poblaciones no son
             beneficiosas ni perjudiciales, sino neutras. La selección natural las ignora; se fijan por puro
             azar en poblaciones finitas (deriva génica). Esta teoría neutralista no contradice a Darwin —

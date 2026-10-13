@@ -447,7 +447,7 @@ export default function VisualizadorMercadoInmobiliario() {
               <div className={styles.generacionHeader} style={{ background: 'rgba(239,68,68,0.10)' }}>
                 <span className={styles.generacionIcono} aria-hidden="true">🧑‍💻</span>
                 <h3 className={styles.generacionTitulo}>Millennials</h3>
-                <p className={styles.generacionEra}>Compran en los años 2020s</p>
+                <p className={styles.generacionEra}>Compran en los años 2020</p>
               </div>
               <ul className={styles.generacionLista}>
                 <li><strong>Precio medio:</strong> 8–12× el salario anual</li>

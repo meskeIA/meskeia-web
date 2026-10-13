@@ -265,7 +265,7 @@ export const energia: HistoriaData = {
       },
       {
         icono: '⚛️',
-        titulo: 'Fusión nuclear comercial en los 2030s',
+        titulo: 'Fusión nuclear comercial en los años 2030',
         perfil: 'Commonwealth Fusion Systems y ITER',
         texto: 'Si la fusión alcanza escala comercial en los años 2030-2040, cambiaría radicalmente el mix energético: combustible prácticamente ilimitado (hidrógeno del agua de mar), sin residuos de larga vida y sin riesgo de explosión. Sería la mayor revolución energética desde el carbón.',
       },

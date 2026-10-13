@@ -181,7 +181,7 @@ export const historiaElectricidad: HistoriaData = {
         'El embargo árabe de 1973 cuadruplica el precio del petróleo y lanza las renovables',
         'Accidente de Three Mile Island (1979) y Chernóbil (1986): frenazo a la expansión nuclear',
         'James Hansen testifica ante el Congreso sobre el calentamiento global antropogénico (1988)',
-        'Liberalización de los mercados eléctricos en Europa y EE.UU.: separación generación-distribución (1990s)',
+        'Liberalización de los mercados eléctricos en Europa y EE.UU.: separación generación-distribución (años 90)',
       ],
     },
     {

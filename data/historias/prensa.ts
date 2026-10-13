@@ -62,7 +62,7 @@ export const prensa: HistoriaData = {
       color: '#DC143C',
       categoria: 'amarillo',
       descripcion: 'Joseph Pulitzer (New York World) y William Randolph Hearst (New York Journal) libran la primera guerra de medios: sensacionalismo, titulares exagerados, ilustraciones dramáticas. El término "periodismo amarillo" nace de una tira cómica ("Yellow Kid"). Hearst contribuyó a instigar la Guerra Hispano-Estadounidense (1898). La fotografía llega a la prensa masivamente. Durante la Primera Guerra Mundial (1914–1918), los periódicos se convierten en instrumentos de propaganda estatal a escala continental.',
-      obraIconica: 'Guerra Hearst vs Pulitzer (1890s) — Hearst supuestamente: "Tú pon las fotos, que yo pondré la guerra"; primera manipulación mediática documentada a escala',
+      obraIconica: 'Guerra Hearst vs Pulitzer (década de 1890) — Hearst supuestamente: "Tú pon las fotos, que yo pondré la guerra"; primera manipulación mediática documentada a escala',
       paises: ['EE.UU.'],
     },
     {

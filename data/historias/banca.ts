@@ -62,7 +62,7 @@ export const banca: HistoriaData = {
       color: '#D2691E',
       categoria: 'industrial',
       descripcion: 'La Revolución Industrial requiere capital para fábricas, minas y ferrocarriles: nace la banca de inversión. Los Rothschild construyen una red bancaria pan-europea (Frankfurt, Londres, París, Viena, Nápoles), convirtiéndose en prestamistas de los Gobiernos europeos. Baring Brothers financia la Compañía de las Indias Orientales. El patrón oro emerge como sistema de referencia. Las primeras crisis bancarias modernas (1825, 1837) muestran el riesgo sistémico.',
-      obraIconica: 'Casa Rothschild (1800s) — red bancaria pan-europea; financiaron el bono de abolición esclavista en 1835: 20 millones de libras, pagado por el Reino Unido en 2015',
+      obraIconica: 'Casa Rothschild (siglo XIX) — red bancaria pan-europea; financiaron el bono de abolición esclavista en 1835: 20 millones de libras, pagado por el Reino Unido en 2015',
       paises: ['Reino Unido', 'Alemania', 'Francia', 'Austria'],
     },
     {

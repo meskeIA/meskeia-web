@@ -203,7 +203,7 @@ export const cuba: HistoriaData = {
       hitosDestacados: ['Institucionalización y Período Especial', 'Apertura Limitada y Raúl Castro'],
       eventos: [
         'Período Especial: contracción económica del 30-50% entre 1991 y 1995',
-        'Apertura al turismo y dolarización parcial de la economía (mediados 1990s)',
+        'Apertura al turismo y dolarización parcial de la economía (mediados de los años 90)',
         'Retirada de Fidel Castro por motivos de salud: Raúl Castro asume (2006-2008)',
         'Reforma del trabajo por cuenta propia y del mercado inmobiliario (2010-2013)',
         'Restablecimiento de relaciones diplomáticas Cuba-EEUU (diciembre 2015)',

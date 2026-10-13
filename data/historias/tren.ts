@@ -26,7 +26,7 @@ export const tren: HistoriaData = {
       anioFin: 1850,
       color: '#8B4513',
       categoria: 'vapor',
-      descripcion: 'Richard Trevithick construye la primera locomotora de vapor (Merthyr Tydfil, Gales, 1804). George Stephenson diseña el Blücher (1814) y funda Robert Stephenson & Company. La locomotora Locomotion No.1 inaugura el ferrocarril Stockton & Darlington (1825): primer ferrocarril público del mundo. Liverpool-Manchester (1830): primera línea interurbana con tracción de vapor exclusivamente. La Rocket de Stephenson ganó las Rainhill Trials (1829) a 47 km/h. Railway Mania en Gran Bretaña (1840s): especulación y construcción masiva. En España: Barcelona-Mataró (1848), primer ferrocarril peninsular.',
+      descripcion: 'Richard Trevithick construye la primera locomotora de vapor (Merthyr Tydfil, Gales, 1804). George Stephenson diseña el Blücher (1814) y funda Robert Stephenson & Company. La locomotora Locomotion No.1 inaugura el ferrocarril Stockton & Darlington (1825): primer ferrocarril público del mundo. Liverpool-Manchester (1830): primera línea interurbana con tracción de vapor exclusivamente. La Rocket de Stephenson ganó las Rainhill Trials (1829) a 47 km/h. Railway Mania en Gran Bretaña (década de 1840): especulación y construcción masiva. En España: Barcelona-Mataró (1848), primer ferrocarril peninsular.',
       obraIconica: 'Locomotora Rocket — George Stephenson (1829) — ganó las Rainhill Trials a 47 km/h y convenció a los inversores del futuro del ferrocarril',
       paises: ['Reino Unido', 'España', 'EE.UU.'],
     },

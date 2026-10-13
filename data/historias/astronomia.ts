@@ -104,7 +104,7 @@ export const astronomia: HistoriaData = {
       color: '#191970',
       categoria: 'contemporanea',
       descripcion: 'Einstein publicó la Relatividad General (1915). Hubble demostró en 1924 que Andrómeda era una galaxia externa —el universo era 100.000 veces mayor de lo creído. Lemaître propuso el "átomo primitivo" (Big Bang) en 1927. El Sputnik (1957) inició la era espacial; el Apollo 11 llevó humanos a la Luna (1969). Jocelyn Bell descubrió los pulsares (1967). Vera Rubin demostró que las galaxias contienen materia oscura (27% del universo).',
-      obraIconica: 'Hubble demuestra que Andrómeda es una galaxia (1924); Vera Rubin detecta materia oscura (1970s); Apollo 11 en la Luna (1969)',
+      obraIconica: 'Hubble demuestra que Andrómeda es una galaxia (1924); Vera Rubin detecta materia oscura (años 70); Apollo 11 en la Luna (1969)',
       paises: ['EE.UU.', 'Alemania', 'Bélgica', 'URSS'],
     },
     {
@@ -199,7 +199,7 @@ export const astronomia: HistoriaData = {
         '1927 — Lemaître propone el Big Bang (átomo primitivo)',
         '1957 — Sputnik: inicio de la era espacial',
         '1969 — Apollo 11: humanos en la Luna',
-        '1970s — Vera Rubin demuestra la existencia de materia oscura',
+        'Años 70 — Vera Rubin demuestra la existencia de materia oscura',
       ],
     },
     {

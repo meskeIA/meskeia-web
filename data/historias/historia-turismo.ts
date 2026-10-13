@@ -69,7 +69,7 @@ export const historiaTurismo: HistoriaData = {
       color: '#228B22',
       categoria: 'masas',
       descripcion: 'La aviación comercial, el aumento del poder adquisitivo y las vacaciones pagadas generalizadas crean el turismo de masas. El primer vuelo chárter de turistas (1949) conecta el Reino Unido con los destinos mediterráneos. La Costa Brava española y la Costa del Sol reciben millones de turistas del norte de Europa en los 50 y 60. El decreto de Stabilimento Balneare italiano inventa el turbolito de playa con sombrilla. El automóvil y las autopistas democratizan el turismo interior. El turismo se convierte en motor económico clave para España, Italia, Grecia y el Mediterráneo.',
-      obraIconica: 'El turismo de masas mediterráneo (1950s-60s): el sol, la playa y los vuelos chárter democratizan el viaje internacional',
+      obraIconica: 'El turismo de masas mediterráneo (años 50 y 60): el sol, la playa y los vuelos chárter democratizan el viaje internacional',
       paises: ['España', 'Italia', 'Grecia', 'Francia', 'Mediterráneo'],
     },
     {
@@ -137,10 +137,10 @@ export const historiaTurismo: HistoriaData = {
       icono: '🎩',
       hitosDestacados: ['El Grand Tour Europeo', 'Termalismo y Balnearios Aristocráticos'],
       eventos: [
-        'Los aristócratas ingleses inician el Grand Tour por Europa continental como rito de formación (1670s)',
+        'Los aristócratas ingleses inician el Grand Tour por Europa continental como rito de formación (década de 1670)',
         'Roma, Florencia, Venecia y Nápoles se convierten en los primeros "destinos turísticos" de la historia',
         'Bath y Baden-Baden inventan el turismo de salud termal para la aristocracia europea (siglo XVIII)',
-        'Los casinos de Monte Carlo fusionan turismo, lujo y juego para la élite continental (1800s)',
+        'Los casinos de Monte Carlo fusionan turismo, lujo y juego para la élite continental (siglo XIX)',
       ],
     },
     {
@@ -167,7 +167,7 @@ export const historiaTurismo: HistoriaData = {
         'La Primera Guerra Mundial interrumpe el turismo internacional europeo (1914-1918)',
         'Los primeros vuelos comerciales de pasajeros abren la era de la aviación civil (1919)',
         'El Frente Popular francés y el New Deal americano introducen las vacaciones pagadas obligatorias (1936)',
-        'Los Estados totalitarios (Nazi-Alemania, Italia fascista) organizan el turismo masivo de Estado como propaganda (1930s)',
+        'Los Estados totalitarios (Nazi-Alemania, Italia fascista) organizan el turismo masivo de Estado como propaganda (años 30)',
         'La Segunda Guerra Mundial paraliza de nuevo el turismo internacional (1939-1945)',
       ],
     },

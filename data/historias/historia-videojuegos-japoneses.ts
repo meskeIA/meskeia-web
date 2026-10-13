@@ -276,7 +276,7 @@ export const historiaVideojuegosJaponeses: HistoriaData = {
         icono: '🏆',
         titulo: '¿Y si FromSoftware hubiera abandonado tras el fracaso de Demon\'s Souls?',
         perfil: 'Hipótesis industrial',
-        texto: 'Demon\'s Souls (2009) fue rechazado por varios publicadores por ser "demasiado difícil". Atlus lo publicó en Norteamérica como proyecto de bajo perfil. Su éxito inesperado llevó a Dark Souls y toda la franquicia soulslike. Si hubiera fracasado, el género soulslike —uno de los más influyentes de los 2010s— no existiría, y Hidetaka Miyazaki quizás no habría llegado a Elden Ring.',
+        texto: 'Demon\'s Souls (2009) fue rechazado por varios publicadores por ser "demasiado difícil". Atlus lo publicó en Norteamérica como proyecto de bajo perfil. Su éxito inesperado llevó a Dark Souls y toda la franquicia soulslike. Si hubiera fracasado, el género soulslike —uno de los más influyentes de los años 2010— no existiría, y Hidetaka Miyazaki quizás no habría llegado a Elden Ring.',
       },
     ],
 
@@ -361,7 +361,7 @@ export const historiaVideojuegosJaponeses: HistoriaData = {
       },
       {
         titulo: 'Asumir que el videojuego japonés está en decadencia',
-        cuerpo: 'Es un error frecuente tras el dominio de Call of Duty y GTA en los 2010s. Pero Elden Ring (2022, GOTY global), The Legend of Zelda: Tears of the Kingdom (2023, récord de ventas Nintendo), y Monster Hunter World (20+ millones de copias) demuestran que Japón sigue siendo una potencia creativa de primer nivel. La diferencia es que hoy comparte el liderazgo con EE.UU. y China, no lo monopoliza como en 1990.',
+        cuerpo: 'Es un error frecuente tras el dominio de Call of Duty y GTA en los años 2010. Pero Elden Ring (2022, GOTY global), The Legend of Zelda: Tears of the Kingdom (2023, récord de ventas Nintendo), y Monster Hunter World (20+ millones de copias) demuestran que Japón sigue siendo una potencia creativa de primer nivel. La diferencia es que hoy comparte el liderazgo con EE.UU. y China, no lo monopoliza como en 1990.',
       },
       {
         titulo: 'Pensar que el modelo gacha es exclusivamente japonés',

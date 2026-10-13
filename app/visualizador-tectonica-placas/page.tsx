@@ -174,7 +174,7 @@ interface TimelineEvento {
 
 const TIMELINE: TimelineEvento[] = [
   { anio: '1912', autor: 'Alfred Wegener', aporte: 'Propone la teoría de la deriva continental. Ridiculizado por sus colegas.' },
-  { anio: '1960s', autor: 'Harry Hess', aporte: 'Descubre la expansión del fondo oceánico en las dorsales.' },
+  { anio: 'Años 60', autor: 'Harry Hess', aporte: 'Descubre la expansión del fondo oceánico en las dorsales.' },
   { anio: '1965', autor: 'Tuzo Wilson', aporte: 'Introduce el concepto de fallas transformantes y placas tectónicas.' },
   { anio: '1968', autor: 'Comunidad científica', aporte: 'La tectónica de placas se acepta como paradigma unificador de la geología.' },
 ];

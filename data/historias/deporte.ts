@@ -48,7 +48,7 @@ export const deporte: HistoriaData = {
       anioFin: 1800,
       color: '#8D6E63',
       categoria: 'medieval',
-      descripcion: 'Los torneos caballerescos combinan exhibición militar y entretenimiento cortesano. La pelota vasca, la lucha y la arquería se practican en toda Europa. Inglaterra codifica el cricket (1700s) y el golf en Escocia. El boxeo adopta las reglas del Marqués de Queensberry. La hípica se convierte en deporte aristocrático.',
+      descripcion: 'Los torneos caballerescos combinan exhibición militar y entretenimiento cortesano. La pelota vasca, la lucha y la arquería se practican en toda Europa. Inglaterra codifica el cricket (siglo XVIII) y el golf en Escocia. El boxeo adopta las reglas del Marqués de Queensberry. La hípica se convierte en deporte aristocrático.',
       obraIconica: 'Reglas del Marqués de Queensberry (1867) — primera codificación moderna del boxeo, base del deporte reglado',
       paises: ['Inglaterra', 'Escocia', 'España', 'Europa'],
     },
@@ -314,7 +314,7 @@ export const deporte: HistoriaData = {
       },
       {
         titulo: 'Sigue la tecnología: cada nueva tecnología crea un nuevo deporte de masas',
-        cuerpo: 'La radio (1920s) masificó el deporte sin presencia física. La televisión (1960s) lo convirtió en espectáculo global y en instrumento político. Internet y el streaming (2000s) fragmentaron la audiencia y crearon deportes nativos digitales. La IA y los wearables (2020s) transforman el entrenamiento en tiempo real. No hay revolución deportiva sin revolución tecnológica previa.',
+        cuerpo: 'La radio (años 20) masificó el deporte sin presencia física. La televisión (años 60) lo convirtió en espectáculo global y en instrumento político. Internet y el streaming (años 2000) fragmentaron la audiencia y crearon deportes nativos digitales. La IA y los wearables (años 2020) transforman el entrenamiento en tiempo real. No hay revolución deportiva sin revolución tecnológica previa.',
       },
       {
         titulo: 'Comprende el dinero: es el motor de todos los cambios',

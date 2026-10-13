@@ -69,7 +69,7 @@ export const historiaAgricultura: HistoriaData = {
       color: '#1E90FF',
       categoria: 'mecanizacion',
       descripcion: 'La segadora mecánica de McCormick (1831), la trilladora de vapor y el tractor de combustión interna transforman la agricultura americana y europea. Un agricultor con maquinaria hace el trabajo de 20 a mano. El éxodo rural masivo vacía el campo europeo: entre 1850 y 1950 más de 50 millones de europeos emigran a las ciudades o a América. La agricultura se especializa regionalmente: praderas americanas (trigo), pampa argentina (carne), Java (azúcar). El ferrocarril conecta granjas remotas con mercados globales. Europa pierde su autosuficiencia alimentaria e importa grano americano.',
-      obraIconica: 'Segadora mecánica de McCormick (1831) y el tractor (1900s): el fin del trabajo agrícola manual a gran escala',
+      obraIconica: 'Segadora mecánica de McCormick (1831) y el tractor (principios del siglo XX): el fin del trabajo agrícola manual a gran escala',
       paises: ['Estados Unidos', 'Europa', 'Argentina', 'Australia'],
     },
     {
@@ -79,7 +79,7 @@ export const historiaAgricultura: HistoriaData = {
       anioFin: 1970,
       color: '#228B22',
       categoria: 'moderno-sigloxx',
-      descripcion: 'Norman Borlaug (Premio Nobel de la Paz 1970) desarrolla variedades de trigo de alto rendimiento que triplican la producción en México, India y Pakistán. La Revolución Verde (1960s-70s) combina semillas mejoradas, fertilizantes sintéticos, pesticidas e irrigación: India pasa de importar grano a exportarlo. Se estima que salvó de la hambruna a mil millones de personas. Pero también tiene costes: dependencia de insumos químicos, pérdida de biodiversidad, contaminación de acuíferos, expulsión de pequeños agricultores por la mecanización intensiva.',
+      descripcion: 'Norman Borlaug (Premio Nobel de la Paz 1970) desarrolla variedades de trigo de alto rendimiento que triplican la producción en México, India y Pakistán. La Revolución Verde (años 60 y 70) combina semillas mejoradas, fertilizantes sintéticos, pesticidas e irrigación: India pasa de importar grano a exportarlo. Se estima que salvó de la hambruna a mil millones de personas. Pero también tiene costes: dependencia de insumos químicos, pérdida de biodiversidad, contaminación de acuíferos, expulsión de pequeños agricultores por la mecanización intensiva.',
       obraIconica: 'Norman Borlaug y el trigo de alto rendimiento (1963): la Revolución Verde que alimentó al mundo en desarrollo',
       paises: ['México', 'India', 'Pakistán', 'Global'],
     },
@@ -181,7 +181,7 @@ export const historiaAgricultura: HistoriaData = {
         'Enclosures ingleses: los campos comunales se cercan y los campesinos son expulsados (siglos XV-XIX)',
         'Rotación Norfolk de cuatro campos (nabo, trigo, cebada, pasto): duplica la productividad (siglo XVIII)',
         'Segadora mecánica de Cyrus McCormick: un hombre hace el trabajo de doce (1831)',
-        'El ferrocarril conecta las granjas del interior con los mercados urbanos y portuarios (1840s-1880s)',
+        'El ferrocarril conecta las granjas del interior con los mercados urbanos y portuarios (décadas de 1840 a 1880)',
       ],
     },
     {
@@ -191,11 +191,11 @@ export const historiaAgricultura: HistoriaData = {
       icono: '🚜',
       hitosDestacados: ['La Revolución Verde', 'Agroindustria y Globalización Alimentaria'],
       eventos: [
-        'El tractor de gasolina sustituye al caballo en las grandes explotaciones americanas (1900s-1920s)',
+        'El tractor de gasolina sustituye al caballo en las grandes explotaciones americanas (de 1900 a los años 20)',
         'Fritz Haber sintetiza el amoniaco: los fertilizantes sintéticos permiten alimentar al mundo industrializado (1909)',
         'Segunda Guerra Mundial acelera la mecanización: tractores, cosechadoras y pesticidas se generalizan',
         'Norman Borlaug y la Revolución Verde: variedades de trigo de alto rendimiento salvan millones de vidas (1943-1970)',
-        'La agroindustria global: Cargill, ADM y Nestlé controlan el comercio alimentario mundial (1970s-1990s)',
+        'La agroindustria global: Cargill, ADM y Nestlé controlan el comercio alimentario mundial (de los años 70 a los 90)',
       ],
     },
     {
@@ -206,8 +206,8 @@ export const historiaAgricultura: HistoriaData = {
       hitosDestacados: ['Transgénicos y Biotecnología Agrícola', 'Agricultura Ecológica y Soberanía Alimentaria', 'Agricultura de Precisión y Retos del Siglo XXI'],
       eventos: [
         'Flavr Savr: primer alimento transgénico aprobado para consumo humano en EE.UU. (1994)',
-        'La Vía Campesina y el movimiento global de soberanía alimentaria frente a la agroindustria (1993-2000s)',
-        'GPS y teledetección satelital: la agricultura de precisión optimiza insumos campo a campo (2000s)',
+        'La Vía Campesina y el movimiento global de soberanía alimentaria frente a la agroindustria (de 1993 a los años 2000)',
+        'GPS y teledetección satelital: la agricultura de precisión optimiza insumos campo a campo (años 2000)',
         'Beyond Meat y la carne cultivada en laboratorio: alternativas proteicas sin ganadería (2009-2013)',
         'El IPCC certifica que la agricultura produce el 23% de las emisiones globales de gases de efecto invernadero (2019)',
       ],

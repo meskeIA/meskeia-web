@@ -334,7 +334,7 @@ export const vejezLongevidad: HistoriaData = {
       {
         pregunta: '¿Es posible revertir el envejecimiento con la tecnología actual o futura?',
         respuesta: 'En organismos modelo (levaduras, gusanos, moscas, ratones) ya se han logrado extensiones de vida del 30-100% mediante restricción calórica, senolíticas, reprogramación de factores Yamanaka y otras intervenciones. En humanos, los ensayos clínicos de senolíticas están en fases iniciales. Empresas como Altos Labs investigan la reprogramación celular. El "longevity escape velocity" de Aubrey de Grey plantea que si vivimos lo suficiente, la ciencia resolverá el envejecimiento antes de que muramos. La mayoría de los investigadores serios son optimistas pero cautelosos: estamos en el principio, no al final.',
-        tip: 'Craig Venter (2013) y Aubrey de Grey (2000s) llevan décadas prediciendo avances en 10-20 años. La biología es más compleja de lo esperado, pero el progreso es real.',
+        tip: 'Craig Venter (2013) y Aubrey de Grey (años 2000) llevan décadas prediciendo avances en 10-20 años. La biología es más compleja de lo esperado, pero el progreso es real.',
       },
       {
         pregunta: '¿Cuál es el récord documentado de longevidad humana?',

@@ -292,7 +292,7 @@ export const historiaTrabajo: HistoriaData = {
       },
       {
         pregunta: '¿Qué fue el fordismo y por qué fue revolucionario?',
-        respuesta: 'El fordismo (1913-1970s) combinó tres elementos: cadena de montaje (máxima eficiencia), altos salarios para los trabajadores (que podían comprar lo que producían) y producción en masa de productos estandarizados. Fue revolucionario porque creó simultáneamente la clase obrera industrial y la sociedad de consumo de masas. Sin fordismo no hay clase media del siglo XX.',
+        respuesta: 'El fordismo (de 1913 a los años 70) combinó tres elementos: cadena de montaje (máxima eficiencia), altos salarios para los trabajadores (que podían comprar lo que producían) y producción en masa de productos estandarizados. Fue revolucionario porque creó simultáneamente la clase obrera industrial y la sociedad de consumo de masas. Sin fordismo no hay clase media del siglo XX.',
         tip: 'Ford pagó en 1914 el doble del salario medio industrial (5 dólares/día) para reducir la rotación. El resultado fue que sus trabajadores pudieron comprar el Model T que fabricaban.',
       },
       {

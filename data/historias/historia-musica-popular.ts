@@ -417,7 +417,7 @@ export const historiaMusicaPopular: HistoriaData = {
       {
         titulo: 'Explora los álbumes fundacionales de cada era',
         cuerpo:
-          'Cada era tiene sus discos canónicos. Décadas 50-60: "Hound Dog" de Elvis, "Please Please Me" de los Beatles. Años 70: "Never Mind the Bollocks" de los Sex Pistols, "Off the Wall" de Michael Jackson. Años 80: "Thriller", "Purple Rain". Años 90: "Nevermind", "The Chronic". 2000s: "The College Dropout", "Back to Black". Cada uno es un documento histórico tanto como artístico.',
+          'Cada era tiene sus discos canónicos. Décadas 50-60: "Hound Dog" de Elvis, "Please Please Me" de los Beatles. Años 70: "Never Mind the Bollocks" de los Sex Pistols, "Off the Wall" de Michael Jackson. Años 80: "Thriller", "Purple Rain". Años 90: "Nevermind", "The Chronic". Años 2000: "The College Dropout", "Back to Black". Cada uno es un documento histórico tanto como artístico.',
       },
       {
         titulo: 'Atiende al contexto histórico',
