@@ -85,17 +85,33 @@ async function cifrasCon15Hz(page: Page): Promise<string[]> {
   // fotograma a fotograma (se vieron «41 Hz» y «148 Hz» durante ese medio segundo). Lo que se
   // prueba es que, con el tono ya asentado, no quede una cifra: la del flanco que daba antes.
   await page.waitForTimeout(1500);
-  const vistas = new Set<string>();
+  const vistas: string[] = [];
   for (let i = 0; i < 30; i++) {
-    vistas.add(((await frecuencia(page).textContent()) ?? '').replace(/\s/g, ' ').trim());
+    vistas.push(((await frecuencia(page).textContent()) ?? '').replace(/\s/g, ' ').trim());
     await page.waitForTimeout(100);
   }
-  return [...vistas];
+  return vistas;
+}
+
+/**
+ * Lo que el defecto daba y no debe volver: una cifra del tono o de su flanco (15-16 Hz, por
+ * debajo de 25). Lo que SÍ se admite (cabo C0113, medido aislado contra next start el
+ * 13/10/2026): alguna cifra suelta por encima, porque el micrófono falso de Chromium pierde
+ * audio con la máquina cargada, y ese hueco es un sonido de banda ancha de verdad que el
+ * analizador en vivo enseña mientras su suavizado lo digiere (~0,5 s: hasta 6 muestras).
+ */
+function comprobarSinCifraDelTono(cifras: string[]): void {
+  const conCifra = cifras.filter((c) => c !== '-- Hz');
+  const graves = conCifra.filter((c) => {
+    const hz = Number(c.replace(/\./g, '').replace(',', '.').replace(/[^\d.]/g, ''));
+    return Number.isFinite(hz) && hz < 25;
+  });
+  expect(graves, 'ninguna cifra del tono ni de su flanco (por debajo de 25 Hz)').toEqual([]);
+  expect(conCifra.length, `cifras sueltas de un hueco del micrófono falso: ${conCifra.join(' · ')}`).toBeLessThanOrEqual(6);
 }
 
 test('un tono de 15 Hz a 48 kHz no da cifra (antes: «15 Hz», fuera del rango de 20 Hz–20 kHz)', async ({ page }) => {
-  const cifras = await cifrasCon15Hz(page);
-  expect(cifras).toEqual(['-- Hz']);
+  comprobarSinCifraDelTono(await cifrasCon15Hz(page));
   await expect(nota(page)).toHaveText('--');
 });
 
@@ -111,6 +127,6 @@ test('el mismo WAV con el contexto a 44,1 kHz tampoco (antes: el flanco, en 16 H
   });
   const cifras = await cifrasCon15Hz(page);
   expect(await page.evaluate(() => new AudioContext().sampleRate)).toBe(44100);
-  expect(cifras).toEqual(['-- Hz']);
+  comprobarSinCifraDelTono(cifras);
   await expect(nota(page)).toHaveText('--');
 });

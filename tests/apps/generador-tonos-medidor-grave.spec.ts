@@ -105,7 +105,9 @@ async function vigilarMicrofono(page: Page) {
  * cada 100 ms, con la ventana llena en 0,37 s). Devuelve todo lo que la cifra grande ha llegado a
  * mostrar, muestreado cada 100 ms, y el texto de la retenida si aparece.
  */
-async function medirQuinceHz(page: Page): Promise<{ cifras: string[]; retenida: string | null }> {
+async function medirQuinceHz(
+  page: Page,
+): Promise<{ cifras: string[]; estables: number; retenida: string | null }> {
   await vigilarMicrofono(page);
   await page.goto(RUTA);
   await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
@@ -119,14 +121,40 @@ async function medirQuinceHz(page: Page): Promise<{ cifras: string[]; retenida: 
     .toEqual(['live']);
 
   const cifra = page.locator('#medir-frecuencia [class*="medidorCifra"]');
-  const cifras = new Set<string>();
+  const estable = page.locator('#medir-frecuencia [class*="medidorEstable"]');
+  const cifras: string[] = [];
+  let estables = 0;
   for (let i = 0; i < 30; i++) {
-    cifras.add(((await cifra.textContent()) ?? '').replace(/ /g, ' ').trim());
+    estables += await estable.count();
+    cifras.push(((await cifra.textContent()) ?? '').replace(/ /g, ' ').trim());
     await page.waitForTimeout(100);
   }
   const retenida = page.locator('#medir-frecuencia').getByText(/Última lectura estable:/);
   const textoRetenida = (await retenida.count()) > 0 ? ((await retenida.textContent()) ?? '') : null;
-  return { cifras: [...cifras], retenida: textoRetenida };
+  return { cifras, estables, retenida: textoRetenida };
+}
+
+/**
+ * Lo que el defecto M1 daba y no debe volver: «Lectura estable», retenida, o una cifra por
+ * debajo de 25 Hz (el flanco del tono, 17,6 o 18,8 Hz). Lo que SÍ se admite (cabo C0113,
+ * medido aislado contra next start el 13/10/2026): alguna lectura suelta «Leyendo…» por
+ * encima, porque el micrófono falso de Chromium pierde audio con la máquina cargada (un hueco
+ * de 412 ceros en 2 de 11 sesiones) y ese hueco es un sonido de banda ancha de verdad: un WAV
+ * con un hueco de 10 ms da 150-157 Hz y la app hace bien en leerlo y en no darlo por estable.
+ * Un clic así sigue en la ventana del análisis (0,37 s) más lo que tarda el suavizado: medido
+ * el 13/10, «143 Hz · Leyendo…» en 5 muestras seguidas, nunca estable (su nivel cae, y el motor
+ * no da por estable un clic: hallazgo 2615). El tope es un episodio de esos, 8 muestras.
+ */
+function comprobarSinCifraDelTono(r: { cifras: string[]; estables: number; retenida: string | null }): void {
+  expect(r.retenida, 'no debe quedar una «Última lectura estable» de un tono de 15 Hz').toBeNull();
+  expect(r.estables, 'ninguna lectura de un tono de 15 Hz puede darse por estable').toBe(0);
+  const conCifra = r.cifras.filter((c) => c !== '— Hz');
+  const graves = conCifra.filter((c) => {
+    const hz = Number(c.replace(/\./g, '').replace(',', '.').replace(/[^\d.]/g, ''));
+    return Number.isFinite(hz) && hz < 25;
+  });
+  expect(graves, 'ninguna cifra del tono ni de su flanco (por debajo de 25 Hz)').toEqual([]);
+  expect(conCifra.length, `lecturas sueltas de un hueco del micrófono falso: ${conCifra.join(' · ')}`).toBeLessThanOrEqual(8);
 }
 
 /*
@@ -142,9 +170,7 @@ async function medirQuinceHz(page: Page): Promise<{ cifras: string[]; retenida: 
  * re-inspeccionó en verde el 02/10/2026 (los bordes, en generador-tonos-medidor-inspector).
  */
 test('HALLAZGO M1 (REPARADO) — un tono de 15 Hz a 48 kHz no da ninguna cifra', async ({ page }) => {
-  const { cifras, retenida } = await medirQuinceHz(page);
-  expect(retenida, 'no debe quedar una «Última lectura estable» de un tono de 15 Hz').toBeNull();
-  expect(cifras, 'la cifra grande no debe mostrar nada más que «— Hz»').toEqual(['— Hz']);
+  comprobarSinCifraDelTono(await medirQuinceHz(page));
 });
 
 test('HALLAZGO M1 (REPARADO) — el mismo WAV con el contexto a 44,1 kHz: tampoco da cifra', async ({ page }) => {
@@ -159,8 +185,7 @@ test('HALLAZGO M1 (REPARADO) — el mismo WAV con el contexto a 44,1 kHz: tampoc
     }
     window.AudioContext = Contexto441;
   });
-  const { cifras, retenida } = await medirQuinceHz(page);
+  const resultado = await medirQuinceHz(page);
   expect(await page.evaluate(() => new AudioContext().sampleRate)).toBe(44100);
-  expect(retenida, 'no debe quedar una «Última lectura estable» de un tono de 15 Hz').toBeNull();
-  expect(cifras, 'la cifra grande no debe mostrar nada más que «— Hz»').toEqual(['— Hz']);
+  comprobarSinCifraDelTono(resultado);
 });
