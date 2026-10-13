@@ -735,6 +735,27 @@ test.describe('Invariantes de composición — comparar_donacion_vs_herencia', (
     expect(() => compararDonacionHerencia({ ...base, mesAdquisicion: 13 })).toThrow();
   });
 
+  test('C0187: transmitir en el MISMO mes de la compra son 0 meses completos, y la plusvalía municipal es 0', () => {
+    // Art. 107.4 TRLRHL: por debajo del año, el coeficiente anual se prorratea por meses
+    // COMPLETOS. Comprado este mismo mes: 0 meses → 0,15 × 0/12 = 0 → base 0 → cuota 0,00 €.
+    // Antes el motor recibía 0 años, no podía distinguir «0 meses» de «sin dato» y usaba 11, la
+    // cota superior: 60.000 × 0,15 × 11/12 = 8.250 → 30 % = 2.475,00 €.
+    const hoy = new Date();
+    const mismoMes = compararDonacionHerencia({
+      valorInmueble: 300000, valorAdquisicion: 250000, anioAdquisicion: hoy.getFullYear(),
+      mesAdquisicion: hoy.getMonth() + 1, ccaa: 'madrid', grupo: 'II',
+      valorCatastralSuelo: 60000, valorCatastralTotal: 150000,
+    });
+    expect(mismoMes.donacion.plusvaliaMunicipal).toBe(0);
+
+    // En el motor: con los meses manda el prorrateo exacto; sin ellos, sigue la cota superior.
+    const comun = { valorCatastralSuelo: 60000, valorCatastralTotal: 150000, aniosTenencia: 0 };
+    expect(calcularIIVTNU({ ...comun, mesesTenencia: 0 }).cuotaIIVTNU).toBe(0);
+    expect(calcularIIVTNU({ ...comun, mesesTenencia: 3 }).cuotaIIVTNU).toBe(675); // 60.000 × 0,15 × 3/12 × 30 %
+    expect(calcularIIVTNU(comun).cuotaIIVTNU).toBe(2475);
+    expect(() => calcularIIVTNU({ ...comun, mesesTenencia: -1 })).toThrow();
+  });
+
   test('COHERENCIA: la recomendación concuerda con el total más barato', () => {
     expect(r.ahorroEstimado).toBeCloseTo(Math.abs(r.donacion.total - r.herencia.total), 2);
     if (r.opcionRecomendada === 'donacion') {

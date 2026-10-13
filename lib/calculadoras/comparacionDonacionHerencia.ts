@@ -222,6 +222,10 @@ export function compararDonacionHerencia(
       precioAdquisicion: p.valorAdquisicion,
       precioTransmision: p.valorInmueble,
       aniosTenencia,
+      // Los meses también: con 0 años, sin ellos el motor no distingue «comprado este mismo
+      // mes» (coeficiente 0) de «sin dato» y liquidaba 11/12 del coeficiente (cabo C0187).
+      // Sin el mes de compra se cuenta desde enero y la nota de arriba ya lo advierte.
+      mesesTenencia,
       tipoImpositivo: p.tipoMunicipalIIVTNU,
     });
     plusvalia = r2(iiv.cuotaIIVTNU);

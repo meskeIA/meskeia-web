@@ -62,11 +62,11 @@ const TIPO_MAX_IIVTNU = PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal; // % máximo l
  *   - Suelo en 0: la fila `anios: 0` es «Menos de 1 año» (0,14), y ahí entra también
  *     medio año, que antes no casaba con la comparación `=== 0`.
  */
-function coeficienteMaximoEstatal(aniosTenencia: number): CoeficienteIIVTNUAplicado {
+function coeficienteMaximoEstatal(aniosTenencia: number, mesesTenencia?: number): CoeficienteIIVTNUAplicado {
   // Desde el 24/09/2026 la tabla no se consulta aquí: `coeficienteIIVTNU` aplica las mismas
   // reglas (años completos, tope en 20) y además el prorrateo por meses por debajo del año,
   // que este motor no hacía (hallazgo 1560).
-  return coeficienteIIVTNU(aniosTenencia);
+  return coeficienteIIVTNU(aniosTenencia, mesesTenencia);
 }
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────
@@ -85,6 +85,13 @@ export interface ParametrosIIVTNU {
   precioTransmision?: number;
   /** Años completos de tenencia (diferencia entre fecha adquisición y transmisión) */
   aniosTenencia: number;
+  /**
+   * Meses COMPLETOS de tenencia, si se conocen. Solo cuenta por debajo del año, donde el art.
+   * 107.4 prorratea por meses: con `aniosTenencia: 0` no se distingue «0 meses» (mismo mes,
+   * coeficiente 0) de «sin dato» (se usa 11, la cota superior), y quien tiene las fechas debe
+   * pasarlos (cabo C0187: una transmisión en el mes de la compra liquidaba 11/12 del coeficiente).
+   */
+  mesesTenencia?: number;
   /**
    * Tipo impositivo municipal aplicable (%).
    * Si no se indica, se usa el máximo legal del 30%.
@@ -158,6 +165,7 @@ export function calcularIIVTNU(p: ParametrosIIVTNU): ResultadoIIVTNU {
   if (!Number.isFinite(p.valorCatastralTotal) || p.valorCatastralTotal <= 0) throw new Error('El valor catastral total debe ser un número finito mayor que cero.');
   if (p.valorCatastralSuelo > p.valorCatastralTotal) throw new Error('El valor catastral del suelo no puede superar el total.');
   if (!Number.isFinite(p.aniosTenencia) || p.aniosTenencia < 0) throw new Error('Los años de tenencia deben ser un número finito y no negativo.');
+  if (p.mesesTenencia !== undefined && (!Number.isFinite(p.mesesTenencia) || p.mesesTenencia < 0)) throw new Error('Los meses de tenencia deben ser un número finito y no negativo.');
   if (p.tipoImpositivo !== undefined && (!Number.isFinite(p.tipoImpositivo) || p.tipoImpositivo < 0)) throw new Error(`El tipo impositivo municipal debe ser un número finito entre 0 y ${TIPO_MAX_IIVTNU} %.`);
   if (p.coeficienteMunicipal !== undefined && (!Number.isFinite(p.coeficienteMunicipal) || p.coeficienteMunicipal < 0)) throw new Error('El coeficiente municipal debe ser un número finito y no negativo.');
   if (p.precioAdquisicion !== undefined && (!Number.isFinite(p.precioAdquisicion) || p.precioAdquisicion < 0)) throw new Error('El precio de adquisición debe ser un número finito y no negativo.');
@@ -166,7 +174,7 @@ export function calcularIIVTNU(p: ParametrosIIVTNU): ResultadoIIVTNU {
   const r = (n: number) => Math.round(n * 100) / 100;
   const advertencias: string[] = [];
 
-  const coefEstatal = coeficienteMaximoEstatal(p.aniosTenencia);
+  const coefEstatal = coeficienteMaximoEstatal(p.aniosTenencia, p.mesesTenencia);
   const coefMax = coefEstatal.coeficiente;
 
   // El coeficiente municipal solo puede ser IGUAL O INFERIOR al máximo estatal
