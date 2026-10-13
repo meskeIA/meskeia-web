@@ -50,8 +50,8 @@ export default function SelectorCalefaccion() {
   // «Repetir»), y el foco caía a <body>: el siguiente Tab salía a «Apps relacionadas» y hacían
   // falta 18 Tab para volver a la primera opción (hallazgo 2675, forma del 1680 de
   // selector-smartphone). Se lleva al enunciado de la pregunta nueva, al encabezado del
-  // resultado o al título de la intro, que además lo desplaza a la vista (con scroll-margin-top
-  // para no dejarlo bajo la barra fija del logo).
+  // resultado o al título de la intro, que además lo desplaza a la vista (el scroll-padding
+  // de globals.css lo deja bajo la barra fija del logo, no detrás).
   useEffect(() => {
     if (pantalla === 'resultado') tituloResultado.current?.focus();
     else if (pantalla === 'test') enunciado.current?.focus();

@@ -300,6 +300,42 @@ body {
   overflow-x: hidden;
 }
 
+/* Cromo fijo: la barra de MeskeiaLogo (arriba, en todos los anchos) y la píldora del Footer
+   (abajo, solo por encima de 768 px) tapaban lo que una app lleva a la vista con scrollIntoView
+   o un salto a ancla (cabos C0090 y C0116, 13/10/2026). El scroll-padding del documento lo
+   respetan los dos, y también focus(). Alturas MEDIDAS, no supuestas: la caja de la barra
+   acaba en 62 px hasta 768 px de ancho y en 92 px por encima (la píldora, en 52 y 77; los
+   10-15 px de debajo son su relleno transparente y hacen de respiro), y MeskeiaLogo afina el
+   valor en vivo: bajo coquinum.com, por debajo de 414 px, la píldora parte la categoría en dos
+   líneas y la caja llega a 88. Los sticky de las apps usan las mismas variables.
+   Abajo, la píldora del pie (fija solo por encima de 768 px) más 0,5rem; en móvil, solo el
+   0,5rem, para que 'nearest' no deje el destino pegado al borde con medio píxel fuera.
+   :has() limita el hueco a las páginas que montan el cromo; sin :has(), sin hueco, como antes. */
+:root {
+  --alto-barra-logo: 0px;
+  --alto-pildora-pie: 0px;
+}
+
+html:has([data-barra-logo]) {
+  --alto-barra-logo: 62px;
+  scroll-padding-top: calc(var(--alto-barra-logo) + 0.25rem);
+}
+
+html:has([data-pildora-pie]) {
+  scroll-padding-bottom: calc(var(--alto-pildora-pie) + 0.5rem);
+}
+
+@media (min-width: 769px) {
+  html:has([data-barra-logo]) {
+    --alto-barra-logo: 92px;
+  }
+
+  /* La píldora del Footer: 45 px de alto a 10 px del borde, igual bajo los tres dominios */
+  html:has([data-pildora-pie]) {
+    --alto-pildora-pie: 55px;
+  }
+}
+
 body {
   color: var(--text-primary);
   background: var(--bg-primary);

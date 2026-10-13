@@ -240,11 +240,6 @@
   margin-bottom: 0;
 }
 
-.detalle {
-  /* Deja sitio al logo fijo de arriba a la izquierda: si no, tapa «← Todos los movimientos» */
-  scroll-margin-top: 6rem;
-}
-
 .detalleHeader {
   border-radius: 16px;
   padding: 2rem;

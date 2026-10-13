@@ -36,7 +36,6 @@
 
 /* ── Quiz ──────────────────────────────────────────────────── */
 .quiz {
-  scroll-margin-top: 88px; /* hueco del logo fijo (ver MARGEN_LOGO en page.tsx) */
   max-width: 760px;
   margin: 0 auto;
   padding: 2rem 1.25rem;
@@ -93,7 +92,6 @@
 }
 
 .preguntaTexto {
-  scroll-margin-top: 88px;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-primary, #1a1a1a);
@@ -215,7 +213,6 @@
 }
 
 .resultadoCard {
-  scroll-margin-top: 88px;
   background: var(--bg-card, #fff);
   border-radius: 20px;
   padding: 2.5rem 2rem;
@@ -234,7 +231,6 @@
   font-weight: 700;
   color: var(--primary-texto);
   margin: 0 0 0.5rem;
-  scroll-margin-top: 88px;
 }
 
 /* Encabezados que reciben el foco al cambiar de pregunta o de pantalla (2064, 2065) */

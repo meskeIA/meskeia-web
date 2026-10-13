@@ -188,9 +188,6 @@
   border-radius: var(--radius-large);
   padding: 1.5rem;
   text-align: center;
-  /* Al verificar, el veredicto se lleva a la vista y recibe el foco (hallazgo 2247):
-     el margen evita que quede bajo el logo fijo. */
-  scroll-margin-top: 90px;
 }
 .resultHeroPositivo:focus, .resultHeroNegativo:focus,
 .resultHeroSinCalcular:focus, .resultHeroCondicionado:focus { outline: none; }

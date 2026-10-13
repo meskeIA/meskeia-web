@@ -1268,7 +1268,7 @@ export default function GeneradorTonosPage() {
         que viene buscando quien llega por «medidor de frecuencia hz» (S0170): bajo la
         respuesta del altavoz quedaba a cinco pantallas.
       */}
-      <div className={`${styles.section} ${styles.seccionMedidor}`} id="medir-frecuencia">
+      <div className={styles.section} id="medir-frecuencia">
         <h3 className={styles.sectionTitle}>Medir la frecuencia de un sonido</h3>
         <p className={styles.medidaIntro}>
           Acerca el micrófono al sonido —un pitido, un silbido, un diapasón, una nota sostenida— y la

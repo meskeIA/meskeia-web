@@ -1313,6 +1313,10 @@ test.describe('re-inspección 02/10/2026 · móvil 360 px', () => {
     await page.goto('/selector-mascota/');
     await esperarHidratacionBotones(page);
     await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    // Medio segundo, como tras «Siguiente»: desde el scroll-padding global (13/10/2026) la última
+    // opción queda en el punto de la pantalla donde se tocó «Empezar», y Chrome contaría los dos
+    // toques como ráfaga, que tras un cambio de pantalla se ignora a propósito (2671).
+    await page.waitForTimeout(500);
     const contestadas: string[] = [];
     for (let i = 1; i <= 10; i++) {
       const radios = page.locator(OPCIONES_EN_PANTALLA);
@@ -1371,6 +1375,10 @@ test.describe('re-inspección 02/10/2026 · móvil 360 px', () => {
     await page.goto('/selector-mascota/');
     await esperarHidratacionBotones(page);
     await page.getByRole('button', { name: /Empezar el test/ }).tap();
+    // Medio segundo, como tras «Siguiente»: desde el scroll-padding global (13/10/2026) la última
+    // opción queda en el punto de la pantalla donde se tocó «Empezar», y Chrome contaría los dos
+    // toques como ráfaga, que tras un cambio de pantalla se ignora a propósito (2671).
+    await page.waitForTimeout(500);
     const malas: string[] = [];
     for (let i = 1; i <= 4; i++) {
       await expect(page.getByText(`Pregunta ${i} de 10`).first()).toBeVisible();

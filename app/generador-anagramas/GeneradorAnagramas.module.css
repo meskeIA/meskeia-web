@@ -780,10 +780,10 @@
   margin-top: var(--spacing-sm);
 }
 
-/* Destino del desplazamiento tras buscar desde el teclado táctil; el margen salva el logo fijo */
+/* Destino del desplazamiento tras buscar desde el teclado táctil;
+   el hueco de la barra fija del logo lo deja el scroll-padding de globals.css */
 .anclaResultados {
   height: 0;
-  scroll-margin-top: 5rem;
 }
 
 /* ------------------------------------------------------------------ */

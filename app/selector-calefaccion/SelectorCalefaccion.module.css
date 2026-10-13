@@ -500,13 +500,6 @@
   }
 }
 
-/* Lo que recibe el foco al cambiar de pantalla o de pregunta (hallazgo 2675): focus() lo
-   desplaza a la vista, y sin este margen podía quedar bajo la barra fija del logo. */
-.preguntaTexto,
-.heroTitleSm,
-.introTitulo {
-  scroll-margin-top: 80px;
-}
 .preguntaTexto:focus,
 .introTitulo:focus { outline: none; }
 .preguntaTexto:focus-visible,

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import styles from './SelectorPortatil.module.css';
+import { margenBarraLogo } from '@/lib';
 import {
   MeskeiaLogo,
   Footer,
@@ -39,13 +40,6 @@ function enumerar(items: string[]): string {
 
 type Pantalla = 'intro' | 'test' | 'resultado';
 
-/**
- * Lo que ocupa la barra fija de MeskeiaLogo (~52 px en móvil, ~77 px desde 769 px) más un
- * respiro: el mismo hueco de 80 px que los lotes 586a4d61 y a1d72a9c dieron al hero. Va también
- * como `scroll-margin-top` del enunciado y del título del resultado, en el CSS.
- */
-const HUECO_BARRA_LOGO = 80;
-
 export default function SelectorPortatil() {
   const [pantalla, setPantalla] = useState<Pantalla>('intro');
   const [paso, setPaso] = useState(0);
@@ -65,15 +59,15 @@ export default function SelectorPortatil() {
   // (hallazgo 2705, forma del 1680 de selector-smartphone). Se lleva al enunciado de la pregunta
   // nueva o al título del resultado. Y en móvil la página no se movía al avanzar: el enunciado
   // nuevo quedaba por encima de la pantalla o bajo la barra fija del logo. Si no está entero a la
-  // vista y por debajo de la barra, se sube a su sitio; el hueco lo da su `scroll-margin-top`
-  // (receta de selector-mascota, hallazgo 2670).
+  // vista y por debajo de la barra, se sube a su sitio; el hueco lo da el scroll-padding
+  // del documento (receta de selector-mascota, hallazgo 2670).
   useEffect(() => {
     const destino = pantalla === 'resultado' ? tituloResultado.current
       : pantalla === 'test' ? enunciado.current
         : null;
     if (!destino) return;
     const caja = destino.getBoundingClientRect();
-    if (caja.top < HUECO_BARRA_LOGO || caja.bottom > window.innerHeight) {
+    if (caja.top < margenBarraLogo() || caja.bottom > window.innerHeight) {
       destino.scrollIntoView({ block: 'start', behavior: 'instant' });
     }
     destino.focus({ preventScroll: true });

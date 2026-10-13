@@ -78,7 +78,8 @@ export default function ComprobadorSorteo({ guardadas, modalidades, onAnunciar }
    * Cuenta de pulsaciones de «Comprobar»: cada una lleva a la vista lo que ha salido, el
    * resumen o el aviso (hallazgo 2733). Los dos se pintan debajo del botón y, con el botón al
    * pie de la pantalla, quedaban fuera: pulsar parecía no hacer nada. Es el mismo patrón que
-   * el generador (hallazgo 1632) y con los mismos márgenes (`scroll-margin` en el CSS).
+   * el generador (hallazgo 1632); la barra del logo y la píldora del pie las salva el
+   * scroll-padding del documento (globals.css, cabos C0090 y C0116).
    */
   const [pulsacion, setPulsacion] = useState(0);
   const resumenRef = useRef<HTMLParagraphElement>(null);

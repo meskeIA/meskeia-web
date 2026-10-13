@@ -33,8 +33,8 @@ export default function SelectorFormacionPostgradoPage() {
   // Al cambiar de pregunta o de pantalla se desactiva o se desmonta el botón que tenía el foco, y el
   // foco caía a <body>: el siguiente Tab salía del cuestionario y, en móvil, el enunciado nuevo
   // quedaba fuera de la vista (hallazgo 3100; antes 1458 para el resultado). Se lleva al enunciado
-  // de la pregunta nueva o al título del resultado, que además los desplaza a la vista con su
-  // scroll-margin-top (receta de selector-smartphone, 1680 y 2657).
+  // de la pregunta nueva o al título del resultado, que además los desplaza a la vista bajo la
+  // barra del logo (receta de selector-smartphone, 1680 y 2657).
   useEffect(() => {
     const vista = `${paso}-${preguntaActual}`;
     if (vista === vistaAnterior.current) return;

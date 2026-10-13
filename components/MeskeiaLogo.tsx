@@ -16,7 +16,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTheme } from 'next-themes';
-import { useEffect, useState, useId } from 'react';
+import { useEffect, useRef, useState, useId } from 'react';
 import { useStemumHost } from '@/lib/useStemumHost';
 import { useCoquinumHost } from '@/lib/useCoquinumHost';
 import {
@@ -48,6 +48,28 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Alto real de la barra fija → --alto-barra-logo (globals.css lo usa para el scroll-padding y
+  // los sticky de las apps). globals trae el medido en meskeia (62 / 92 px) para el primer
+  // pintado; aquí se afina, porque depende del texto: bajo coquinum.com la píldora parte la
+  // categoría en dos líneas por debajo de 414 px y la caja llega a 88 (cabo C0090). Se mide la
+  // caja entera, con el relleno transparente bajo la píldora, que hace de respiro.
+  const barraRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const barra = barraRef.current;
+    if (!barra || typeof ResizeObserver === 'undefined') return;
+    const raiz = document.documentElement;
+    const publicar = () => {
+      const abajo = barra.getBoundingClientRect().bottom;
+      if (abajo > 0) raiz.style.setProperty('--alto-barra-logo', `${Math.ceil(abajo)}px`);
+    };
+    const observador = new ResizeObserver(publicar);
+    observador.observe(barra);
+    return () => {
+      observador.disconnect();
+      raiz.style.removeProperty('--alto-barra-logo');
+    };
+  }, [isStemum, isCoquinum, inline, showThemeToggle, disableLink]);
 
   // Variante de marca Stemum: cuando la app se sirve bajo stemum.com, el chrome
   // compartido muestra el logo Stemum (onda + punto) en vez del de meskeIA.
@@ -178,7 +200,7 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
     const discLabel = discSlug ? STEMUM_DISCIPLINAS[discSlug] : null;
 
     return (
-      <div className={styles.headerBar}>
+      <div ref={barraRef} className={styles.headerBar} data-barra-logo="">
         <div className={`${styles.logoContainer} ${styles.stemumPill}`}>
           <Link href="/" className={styles.stemumCrumb} aria-label="Stemum — inicio">
             <span className={styles.logoIcon}>
@@ -216,7 +238,7 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
     const catLabel = catSlug ? COQUINUM_CATEGORIAS[catSlug] : null;
 
     return (
-      <div className={styles.headerBar}>
+      <div ref={barraRef} className={styles.headerBar} data-barra-logo="">
         <div className={`${styles.logoContainer} ${styles.coquinumPill}`}>
           <Link href="/" className={styles.coquinumCrumb} aria-label="Coquinum — inicio">
             <span className={styles.logoIcon}>
@@ -248,7 +270,7 @@ export default function MeskeiaLogo({ disableLink = false, inline = false, showT
 
   // En otros casos, usar el headerBar wrapper
   return (
-    <div className={styles.headerBar}>
+    <div ref={barraRef} className={styles.headerBar} data-barra-logo="">
       {logoElement}
       {themeToggle}
     </div>

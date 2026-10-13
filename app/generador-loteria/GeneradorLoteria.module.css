@@ -27,10 +27,6 @@
   /* Borde de las casillas del comprobador (hallazgo 2737): es lo único que dice dónde se
      escribe, así que pide 3:1 contra --bg-card (WCAG 1.4.11). --border daba 1,26:1. */
   --borde-campo: #858585;
-  /* Holgura al llevar algo a la vista (hallazgos 2732 y 2733). Arriba, la barra fija del logo;
-     abajo, la píldora fija del Footer en escritorio (bottom 10 px + 45 px de alto, medido). */
-  --margen-vista-arriba: 96px;
-  --margen-vista-abajo: 80px;
 
   max-width: 1000px;
   margin: 0 auto;
@@ -285,17 +281,6 @@
   padding: var(--spacing-md);
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s;
-}
-
-/* Lo que se lleva a la vista con scrollIntoView (la combinación recién generada, el resumen y
-   el aviso del comprobador) deja libres la barra fija del logo y la píldora fija del Footer:
-   con `block: 'nearest'` el borde inferior quedaba pegado al pie, debajo de la píldora, y el
-   clic en la estrella caía en el Footer (hallazgo 2732). */
-.resultCard,
-.comprobadorResumen,
-.comprobadorError {
-  scroll-margin-top: var(--margen-vista-arriba);
-  scroll-margin-bottom: var(--margen-vista-abajo);
 }
 
 .resultCard.latest {
@@ -1269,9 +1254,6 @@
 @media (max-width: 768px) {
   .container {
     padding: var(--spacing-md);
-    /* En móvil el Footer es estático: abajo basta un respiro. Arriba, la barra del logo (62 px). */
-    --margen-vista-arriba: 76px;
-    --margen-vista-abajo: 16px;
   }
 
   .hero {

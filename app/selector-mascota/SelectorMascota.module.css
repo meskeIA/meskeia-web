@@ -18,9 +18,6 @@
 .heroSubtitleSm { font-size: 1rem; opacity: 0.88; margin: 0; }
 /* Recibe el foco al mostrarse el resultado (tabIndex -1): anillo solo con teclado */
 .heroTitleSm:focus { outline: none; }
-/* scroll-margin-top: al recibir el foco se sube a la vista sin quedar bajo la barra fija del logo
-   (hallazgos 2669 y 2670; el mismo hueco de 80 px del hero, HUECO_BARRA_LOGO en page.tsx). */
-.heroTitleSm, .preguntaTexto { scroll-margin-top: 80px; }
 .heroTitleSm:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 
 /* ─── Intro ────────────────────────────────────────────────────── */

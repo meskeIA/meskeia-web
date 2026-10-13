@@ -180,12 +180,6 @@
   font-weight: 500;
 }
 
-/* ⚠️ 26/09/2026 (hallazgo 2177) — punto de llegada al cambiar de fase. El margen deja sitio a
-   la barra fija del logo (MeskeiaLogo, position: fixed), que si no taparía el principio. */
-.destinoDeFase {
-  scroll-margin-top: 96px;
-}
-
 /* Los encabezados que reciben el foco por programa no pintan el anillo tras un clic; con
    teclado sí (:focus-visible), que es a quien le sirve para saber dónde ha caído. */
 .destinoDeFase:focus:not(:focus-visible),
@@ -679,10 +673,6 @@
   .hero {
     margin-top: 70px;
     padding: var(--spacing-lg);
-  }
-
-  .destinoDeFase {
-    scroll-margin-top: 80px;
   }
 
   .questionCard {

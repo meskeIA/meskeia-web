@@ -172,10 +172,6 @@
 /* ── JUGANDO ── */
 .quizPanel { display: flex; flex-direction: column; gap: 1.25rem; }
 
-/* Al empezar y al pasar de pregunta la vista sube al principio del quiz (o del resultado): este
-   margen deja la barra fija del logo por encima sin tapar la pregunta (hallazgo 2105). */
-.quizPanel,
-.finPanel { scroll-margin-top: 88px; }
 
 /* Reciben el foco por programa (tabIndex=-1): no son controles, sin anillo (hallazgo 2104). */
 .preguntaTexto:focus,

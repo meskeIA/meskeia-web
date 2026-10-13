@@ -188,17 +188,12 @@
 .heroResultados { padding-top: 80px; }
 
 /* Reciben el foco al cambiar de pregunta o al llegar al resultado (tabIndex=-1, hallazgos 3148-3150):
-   no son controles. scroll-margin-top deja 80 px libres para que focus() no los deje bajo la barra
-   fija del logo (hasta y 62 en móvil). */
+   no son controles. Que focus() no los deje bajo la barra fija del logo lo hace el scroll-padding
+   de globals.css. */
 .preguntaTexto:focus,
 .recomendacionValor:focus { outline: none; }
 .preguntaTexto:focus-visible,
 .recomendacionValor:focus-visible { outline: 2px solid var(--primary-texto); outline-offset: 4px; border-radius: 4px; }
-.preguntaTexto,
-.recomendacionValor {
-  scroll-margin-top: 80px;
-}
-
 /* Empates y lo declarado que el patrón no recoge (hallazgos 3142-3146). */
 .nota {
   margin: 0 0 1.25rem; padding: 0.85rem 1rem; border: 1px solid #f59e0b; border-left-width: 4px;

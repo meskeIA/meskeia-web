@@ -11,7 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { formatPercentage } from '@/lib';
+import { formatPercentage, margenBarraLogo } from '@/lib';
 import {
   PREGUNTAS_HISTORIA,
   PREGUNTAS_FACIL,
@@ -56,11 +56,8 @@ const BANCO_POR_NIVEL: Record<DificultadHistoria, PreguntaHistoria[]> = {
   dificil: PREGUNTAS_DIFICIL,
 };
 
-/** Hueco que deja arriba la barra fija del logo; igual que el scroll-margin-top del CSS. */
-const MARGEN_LOGO = 88;
-
 /**
- * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si su
+ * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si su
  * cabecera queda tapada por la barra del logo o por encima del borde, o si `clave` no cabe
  * por abajo. Patrón de quiz-literatura-universal (hallazgo 1716).
  */
@@ -68,7 +65,7 @@ function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
   if (!bloque || !clave) return;
   const arriba = bloque.getBoundingClientRect().top;
   const abajo = clave.getBoundingClientRect().bottom;
-  if (arriba >= MARGEN_LOGO && abajo <= window.innerHeight) return;
+  if (arriba >= margenBarraLogo() && abajo <= window.innerHeight) return;
   bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 

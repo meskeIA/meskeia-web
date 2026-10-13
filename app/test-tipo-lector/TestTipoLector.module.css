@@ -192,13 +192,6 @@
 .repartoRelleno { display: block; height: 100%; background: var(--perfil-acento); border-radius: 4px; }
 .repartoCifra { text-align: right; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 
-/* Foco al cambiar de pantalla (hallazgos 2617 y 2618): focus() y scrollIntoView() dejan libres
-   los 80 px de la barra fija del logo, el mismo hueco que el padding-top del hero. */
-.pregunta,
-.resultado {
-  scroll-margin-top: 80px;
-}
-
 /* ── Dark mode ── */
 [data-theme='dark'] .testBox { border-color: rgba(255,255,255,0.08); }
 [data-theme='dark'] .opcion { border-color: rgba(255,255,255,0.12); color: var(--text-primary); }

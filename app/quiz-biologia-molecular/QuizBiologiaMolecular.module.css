@@ -234,13 +234,6 @@
   gap: 1.5rem;
 }
 
-/* Al avanzar, la vista se lleva al principio del quiz o del resultado: este margen deja la
-   barra del logo fijo por encima, sin taparlo (hallazgo 1750). */
-.quizArea,
-.resultadoCard {
-  scroll-margin-top: 88px;
-}
-
 /* Reciben el foco por programa al avanzar (tabIndex=-1): no son controles, no se les pinta
    el anillo de foco. */
 .preguntaTexto:focus,

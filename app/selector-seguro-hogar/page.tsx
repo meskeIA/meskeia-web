@@ -25,8 +25,8 @@ export default function SelectorSeguroHogar() {
   // («Empezar», «Siguiente» sin respuesta aún, «Ver resultado»), y el foco caía a <body>: el
   // siguiente Tab salía del cuestionario y, en móvil, el enunciado nuevo quedaba por encima de la
   // vista (hallazgos 1527 y 3117; receta de selector-smartphone, 1680 y 2657). Se lleva al
-  // enunciado de la pregunta nueva o al encabezado del resultado, que con su scroll-margin-top
-  // quedan a la vista y libres de la barra del logo.
+  // enunciado de la pregunta nueva o al encabezado del resultado, que con el scroll-padding
+  // del documento quedan a la vista y libres de la barra del logo.
   useEffect(() => {
     if (pantalla === 'resultado') tituloResultado.current?.focus();
     else if (pantalla === 'test') enunciado.current?.focus();

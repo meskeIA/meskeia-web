@@ -93,8 +93,6 @@
   color: var(--text-primary);
   margin: 0 0 1.25rem;
   line-height: 1.4;
-  /* Recibe el foco al avanzar (2073): que no quede bajo una barra fija en móvil. */
-  scroll-margin-top: 5rem;
 }
 
 .preguntaTexto:focus-visible,
@@ -297,7 +295,6 @@
   font-weight: 700;
   margin: 0 0 0.3rem;
   color: var(--text-primary);
-  scroll-margin-top: 5rem;
 }
 
 /* ── Avisos del resultado: empate (2070) y presupuesto (2069) ── */

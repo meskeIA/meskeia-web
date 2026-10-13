@@ -342,14 +342,6 @@
   color: #FC8181 !important;
 }
 
-/* Al empezar, al pasar de pregunta o al acabar, la vista sube al principio del quiz o del
-   resultado: este margen deja la barra fija del logo (≈62 px) por encima, sin taparlo
-   (hallazgos 2269 y 2277). */
-.quizPanel,
-.resultadoPanel {
-  scroll-margin-top: 88px;
-}
-
 /* Reciben el foco por programa (tabIndex=-1): no son controles, sin anillo de foco (hallazgo 2264). */
 .preguntaCard:focus,
 .resultadoPanel:focus,

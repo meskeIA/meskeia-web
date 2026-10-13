@@ -10,6 +10,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import styles from './QuizTablaPeriodica.module.css';
+import { margenBarraLogo } from '@/lib';
 
 
 /**
@@ -40,18 +41,15 @@ function mezclarArray<T>(arr: T[]): T[] {
   return copia;
 }
 
-/** Hueco que deja arriba la barra del logo fijo; igual que el scroll-margin-top del CSS. */
-const MARGEN_LOGO = 88;
-
 /**
- * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si `clave`
+ * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si `clave`
  * no se ve entero: tapado por el logo fijo, por encima del borde o por debajo del final.
  * Salto instantáneo, sin animación: es el sitio donde ya estaba el usuario hace un momento.
  */
 function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
   if (!bloque || !clave) return;
   const r = clave.getBoundingClientRect();
-  if (r.top >= MARGEN_LOGO && r.bottom <= window.innerHeight) return;
+  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
   bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 

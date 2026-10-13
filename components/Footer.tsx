@@ -94,7 +94,7 @@ export default function Footer({ appName }: FooterProps) {
         </div>
       </aside>
 
-      <footer className={styles.footer}>
+      <footer className={styles.footer} data-pildora-pie="">
         <div className={styles.shareSection}>
           <span className={styles.shareText}><span aria-hidden="true">💡</span> ¿Te resultó útil?</span>
           <button

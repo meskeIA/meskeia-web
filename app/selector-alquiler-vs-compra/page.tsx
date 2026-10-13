@@ -93,7 +93,7 @@ export default function SelectorAlquilerVsCompra() {
   // siguiente Tab salía del cuestionario y, en móvil, la pregunta nueva quedaba bajo la barra o
   // fuera de la vista (hallazgos 3108 y 3110; la receta de selector-smartphone, 1680 y 2657). Se
   // lleva al enunciado de la pregunta nueva o al encabezado del resultado, que además lo desplaza a
-  // la vista con su scroll-margin-top.
+  // la vista bajo la barra del logo (scroll-padding de globals.css).
   const encabezadoResultado = useRef<HTMLHeadingElement>(null);
   const enunciado = useRef<HTMLHeadingElement>(null);
   useEffect(() => {

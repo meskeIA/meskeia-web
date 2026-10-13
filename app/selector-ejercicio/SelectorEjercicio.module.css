@@ -258,12 +258,6 @@
 /* .heroResultados se quedó fuera de los lotes 586a4d61 y a1d72a9c, y la píldora del logo pisaba
    «Tu ejercicio recomendado» a 360 y 390 px (hallazgo 2686): mismo trato que .hero. */
 
-/* Al cambiar de pantalla, el bloque que recibe el foco se desplaza bajo la barra fija del logo,
-   no detrás (hallazgo 2684); mismo valor que MARGEN_LOGO en page.tsx. */
-.introContainer,
-.testContainer,
-.preguntaTexto,
-.heroTitleSm { scroll-margin-top: 80px; }
 
 /* Los enunciados y el título de la intro reciben el foco (tabIndex=-1): visible solo con teclado. */
 .preguntaTexto:focus,

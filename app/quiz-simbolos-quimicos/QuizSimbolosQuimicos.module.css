@@ -221,13 +221,6 @@
 }
 
 /* ── QUIZ ── */
-/* Al empezar o al acabar, la vista se lleva al principio del quiz o del resultado: este margen
-   deja la barra del logo fijo por encima, sin taparlo (hallazgo 1813). */
-.quizPanel,
-.finPanel {
-  scroll-margin-top: 88px;
-}
-
 /* Reciben el foco por programa al avanzar (tabIndex=-1): no son controles, no se les pinta el
    anillo de foco (hallazgo 1812). */
 .preguntaCard:focus,

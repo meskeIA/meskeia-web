@@ -120,8 +120,6 @@
 
 .marcadorSeccion {
   margin-bottom: var(--spacing-lg);
-  /* Tras anotar se lleva la vista aquí; el margen salva la barra fija del logo */
-  scroll-margin-top: 5rem;
 }
 
 .marcadorAviso {
@@ -675,10 +673,9 @@
 
 /* ---------- Resultados ---------- */
 
-/* Destino del desplazamiento tras buscar; el margen salva la barra fija del logo */
+/* Destino del desplazamiento tras buscar; el hueco de la barra fija del logo lo deja el scroll-padding de globals.css */
 .anclaResultados {
   height: 0;
-  scroll-margin-top: 5rem;
 }
 
 .estado {

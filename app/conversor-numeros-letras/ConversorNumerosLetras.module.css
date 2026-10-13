@@ -102,12 +102,9 @@
   min-width: 0;
 }
 
-/* scroll-margin-top: al enfocar el campo en móvil se sube hasta aquí, y la barra fija del logo
-   (MeskeiaLogo, ~62 px) no debe taparlo (hallazgo 1538). */
 .campoPrincipal {
   flex: 2 1 20rem;
   min-width: 0;
-  scroll-margin-top: 72px;
 }
 
 .label {

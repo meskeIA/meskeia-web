@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { countries, Country } from '@/data/countries';
 import EducationalSection from '@/components/EducationalSection';
-import { formatPercentage } from '@/lib';
+import { formatPercentage, margenBarraLogo } from '@/lib';
 
 type ModoJuego = 'capital' | 'pais' | 'bandera';
 type Dificultad = 'facil' | 'normal' | 'dificil' | 'experto' | 'maestro';
@@ -123,11 +123,8 @@ function generarPreguntas(modo: ModoJuego, dificultad: Dificultad): PreguntaQuiz
   });
 }
 
-/** Hueco que deja arriba la barra fija del logo; igual que el scroll-margin-top del CSS. */
-const MARGEN_LOGO = 88;
-
 /**
- * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si alguna de
+ * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si alguna de
  * las `claves` no se ve entera: tapada por el logo fijo, por encima del borde o por debajo del
  * final. Mismo patrón que quiz-historia-espana y quiz-verbos-irregulares.
  */
@@ -136,7 +133,7 @@ function traerALaVista(bloque: HTMLElement | null, claves: (HTMLElement | null)[
   const tapada = claves.some(clave => {
     if (!clave) return false;
     const r = clave.getBoundingClientRect();
-    return r.top < MARGEN_LOGO || r.bottom > window.innerHeight;
+    return r.top < margenBarraLogo() || r.bottom > window.innerHeight;
   });
   if (tapada) bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }

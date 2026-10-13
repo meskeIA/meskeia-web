@@ -416,8 +416,8 @@ export default function TestPerfilInversorPage() {
    * la fase anterior: en un móvil de 360×740, tras «Comenzar Test» solo se veían la opción D,
    * «Anterior», «Siguiente» y el pie (el enunciado quedaba en top −351 px); tras «Revisar», en
    * −644 px, y tras «Repetir», «Comenzar Test» en −948 px. Cada fase tiene ahora un punto de
-   * llegada —donde empieza su contenido, con `scroll-margin-top` para que la barra fija del
-   * logo no lo tape— y un encabezado que recibe el foco, para que quien usa lector de pantalla
+   * llegada —donde empieza su contenido, y el scroll-padding de globals.css evita que la barra
+   * fija del logo lo tape— y un encabezado que recibe el foco, para que quien usa lector de pantalla
    * o teclado sepa dónde ha caído.
    */
   const destinoPortada = useRef<HTMLHeadingElement>(null);

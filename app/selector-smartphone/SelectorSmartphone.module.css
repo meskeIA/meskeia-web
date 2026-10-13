@@ -568,16 +568,6 @@
 .preguntaTexto:focus-visible { outline: 2px solid var(--primary-texto); outline-offset: 4px; border-radius: 4px; }
 .heroTitleSm:focus { outline: none; }
 
-/* Lo que recibe el foco al cambiar de pantalla no puede quedar bajo la barra fija del logo
-   (hallazgo 2657). focus() desplaza lo justo para que el elemento se vea: si estaba cortado por
-   arriba, lo dejaba en y 0, y la barra (hasta y 52-62 en móvil, 77 desde 769 px) tapaba sus
-   primeras letras. scroll-margin-top hace que ese desplazamiento deje 80 px libres, el mismo hueco
-   que el padding-top del hero. Va en todos los anchos: en escritorio la barra también es fija. */
-.preguntaTexto,
-.heroTitleSm {
-  scroll-margin-top: 80px;
-}
-
 /* La guía vive fuera de las tres pantallas (hallazgo 2663): mismo ancho que el resultado. */
 .guiaContainer {
   max-width: 800px;

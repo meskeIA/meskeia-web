@@ -190,13 +190,6 @@
   outline: none;
 }
 
-/* Al avanzar, la vista se lleva al principio del quiz o del resultado: este margen deja la
-   barra del logo fijo (hasta ~70 px en escritorio) por encima, sin taparlo. */
-.quizArea,
-.resultadoCard {
-  scroll-margin-top: 88px;
-}
-
 .opcionesGrid {
   display: flex;
   flex-direction: column;

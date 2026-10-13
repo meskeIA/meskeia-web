@@ -277,10 +277,9 @@
 }
 
 /* Destino del desplazamiento tras pulsar Intro en el teclado táctil (hallazgo 2441);
-   el margen salva la barra fija del logo */
+   el hueco de la barra fija del logo lo deja el scroll-padding de globals.css */
 .anclaResultados {
   height: 0;
-  scroll-margin-top: 5rem;
 }
 
 /* ── Filtros ──────────────────────────────────────────────────────────── */

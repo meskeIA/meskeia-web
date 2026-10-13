@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import styles from './QuizLiteraturaUniversal.module.css';
 import { POOL, preguntasDeNivel, type Nivel, type Categoria, type Pregunta } from './preguntas';
+import { margenBarraLogo } from '@/lib';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
@@ -81,17 +82,14 @@ function seleccionarPreguntas(nivel: Nivel | 'todos'): PreguntaEnJuego[] {
     .map(barajarOpciones);
 }
 
-/** Hueco que deja arriba la barra del logo fijo; igual que el scroll-margin-top del CSS. */
-const MARGEN_LOGO = 88;
-
 /**
- * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si `clave`
+ * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si `clave`
  * no se ve entero: tapado por el logo fijo, por encima del borde o por debajo del final.
  */
 function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
   if (!bloque || !clave) return;
   const r = clave.getBoundingClientRect();
-  if (r.top >= MARGEN_LOGO && r.bottom <= window.innerHeight) return;
+  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
   bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 

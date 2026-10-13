@@ -25,8 +25,8 @@ export default function SelectorDieta() {
   // («Comenzar», «Siguiente» sin respuesta aún, «Ver resultado»), y el foco caía a <body>: el
   // siguiente Tab salía del cuestionario (3150), el enunciado nuevo quedaba fuera de la vista o
   // bajo la barra del logo (3149) y el resultado, dos mil píxeles por encima (3148). Se lleva al
-  // enunciado de la pregunta nueva o al nombre del patrón recomendado, que con su
-  // scroll-margin-top quedan a la vista (receta de selector-smartphone, 1680 y 2657).
+  // enunciado de la pregunta nueva o al nombre del patrón recomendado, que con el
+  // scroll-padding del documento quedan a la vista (receta de selector-smartphone, 1680 y 2657).
   useEffect(() => {
     if (pantalla === 'resultado') nombreResultado.current?.focus();
     else if (pantalla === 'test') enunciado.current?.focus();

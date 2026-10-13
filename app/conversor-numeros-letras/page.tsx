@@ -194,7 +194,7 @@ export default function ConversorNumerosLetrasPage() {
    *
    * Hallazgo 1538, el que mejor explica la firma de rotura en móvil: al tocar el campo, el
    * teclado virtual tapa media pantalla y el resultado quedaba debajo. En pantallas estrechas
-   * se sube el campo hasta arriba (bajo la barra fija del logo, `scroll-margin-top`), de modo
+   * se sube el campo hasta arriba (bajo la barra fija del logo: scroll-padding de globals.css), de modo
    * que el resultado, que va justo detrás, queda en la mitad que el teclado deja libre.
    * Instantáneo y no suave: un desplazamiento animado lo interrumpe el del propio navegador
    * al abrir el teclado.

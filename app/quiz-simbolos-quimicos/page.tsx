@@ -4,7 +4,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import styles from './QuizSimbolosQuimicos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, ShareCard, LegalNotice, RelatedApps } from '@/components';
-import { formatPercentage } from '@/lib';
+import { formatPercentage, margenBarraLogo } from '@/lib';
 import { ELEMENTOS, TOTAL_ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
 
 type Modo = 'simbolo-nombre' | 'nombre-simbolo';
@@ -78,18 +78,15 @@ function calcularMedalla(aciertos: number, total: number): { emoji: string; text
   return { emoji: '📚', texto: 'Sigue practicando' };
 }
 
-/** Hueco que deja arriba la barra del logo fijo; igual que el scroll-margin-top del CSS. */
-const MARGEN_LOGO = 88;
-
 /**
- * Lleva `bloque` al principio de la pantalla (respetando su scroll-margin-top) solo si `clave`
+ * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si `clave`
  * no se ve entera: tapada por el logo fijo, por encima del borde o por debajo del final.
  * Mismo patrón que quiz-literatura-universal y quiz-biologia-molecular.
  */
 function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
   if (!bloque || !clave) return;
   const r = clave.getBoundingClientRect();
-  if (r.top >= MARGEN_LOGO && r.bottom <= window.innerHeight) return;
+  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
   bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 

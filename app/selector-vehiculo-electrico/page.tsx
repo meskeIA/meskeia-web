@@ -18,7 +18,7 @@ import {
   FISCAL_AYUDAS_VEHICULO_META,
   MOVES_III_HISTORICO,
 } from '@/data/fiscal';
-import { formatDate, formatNumber, formatPercentage, parseISODateLocal } from '@/lib';
+import { formatDate, formatNumber, formatPercentage, parseISODateLocal, margenBarraLogo } from '@/lib';
 import {
   CANDIDATOS,
   NOMBRE,
@@ -142,14 +142,11 @@ const ETIQUETAS: Record<TipoVehiculo, string> = {
   esperar: 'Esperar',
 };
 
-/** Hueco que deja arriba la barra del logo fijo; igual que el scroll-margin-top del CSS. */
-const MARGEN_LOGO = 88;
-
 /** Lleva `bloque` arriba de la pantalla solo si `clave` no se ve entera bajo el logo fijo. */
 function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
   if (!bloque || !clave) return;
   const r = clave.getBoundingClientRect();
-  if (r.top >= MARGEN_LOGO && r.bottom <= window.innerHeight) return;
+  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
   bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 

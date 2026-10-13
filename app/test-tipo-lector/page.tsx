@@ -317,7 +317,7 @@ export default function TestTipoLector() {
    * lleva al enunciado de la pregunta nueva o al encabezado del resultado. Además, al mostrar el
    * resultado, el anclaje de desplazamiento del navegador dejaba en pantalla lo que había DEBAJO
    * del cuestionario y el perfil quedaba hasta 1.400 px por encima: se lleva la vista a la
-   * tarjeta. `scroll-margin-top` (CSS) deja libres los 80 px de la barra fija del logo.
+   * tarjeta. El scroll-padding de globals.css deja libre la barra fija del logo.
    */
   useEffect(() => {
     if (!huboInteraccionRef.current) return;

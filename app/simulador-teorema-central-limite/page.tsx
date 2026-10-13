@@ -4,7 +4,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTeoremaCentralLimite.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, margenBarraLogo } from '@/lib';
 import CasosAula from './CasosAula';
 import { construirHistograma, type Reticula } from './histograma';
 // μ y σ de cada población NO se escriben aquí: vienen de `./casos.ts`, que es también donde se
@@ -285,19 +285,34 @@ export default function SimuladorTeoremaCentralLimitePage() {
     // aviso, ~570 px en escritorio—, que cabe en esas ventanas. Si no cabe (el móvil, donde las
     // tarjetas van en columna), manda el histograma: se alinea su borde superior con el de la
     // ventana y las tarjetas que quepan quedan debajo; y si ya se ve entero, no se mueve.
-    // Los dos llevan `scroll-margin-top` (la barra fija del logo, 62 px en móvil, tapaba el
-    // rótulo del histograma), así que el alto útil es la ventana menos ese margen.
+    // scrollIntoView deja libres la barra fija del logo arriba y, en escritorio, la píldora del
+    // Footer abajo (scroll-padding del documento, globals.css): el alto útil es la ventana menos
+    // los dos huecos. A 1366×657 el bloque (571 px) no cabe entre los dos (498), pero sí entre
+    // el borde VISIBLE de la píldora del logo (la caja de la barra lleva 15 px de relleno
+    // transparente debajo) y el de la ventana: se coloca ahí a mano, como lo dejaba el antiguo
+    // `scroll-margin-top` de 72 px. La píldora del pie solo roza la esquina inferior derecha,
+    // lejos del centro de las tarjetas.
     const reducirMovimiento =
       typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const behavior: ScrollBehavior = reducirMovimiento ? 'auto' : 'smooth';
     const bloque = resultadoRef.current;
     const histograma = histogramaRef.current;
-    const margenCabecera = bloque ? parseFloat(getComputedStyle(bloque).scrollMarginTop) || 0 : 0;
-    if (bloque && bloque.getBoundingClientRect().height <= window.innerHeight - margenCabecera) {
+    const margenCabecera = margenBarraLogo();
+    const margenPie = parseFloat(getComputedStyle(document.documentElement).scrollPaddingBottom) || 0;
+    const bajoUtil = window.innerHeight - margenPie;
+    const barra = document.querySelector('[data-barra-logo]');
+    const topeVisible = barra
+      ? Math.max(0, ...[...barra.children].map((h) => h.getBoundingClientRect().bottom)) + 4
+      : 0;
+    const caja = bloque?.getBoundingClientRect();
+    if (bloque && caja && caja.height <= bajoUtil - margenCabecera) {
       bloque.scrollIntoView({ behavior, block: 'nearest' });
+    } else if (caja && caja.height <= window.innerHeight - topeVisible) {
+      const delta = caja.top < topeVisible ? caja.top - topeVisible : Math.max(0, caja.bottom - window.innerHeight);
+      if (delta !== 0) window.scrollBy({ top: delta, behavior });
     } else if (histograma) {
       const r = histograma.getBoundingClientRect();
-      if (r.top < margenCabecera || r.bottom > window.innerHeight) histograma.scrollIntoView({ behavior, block: 'start' });
+      if (r.top < margenCabecera || r.bottom > bajoUtil) histograma.scrollIntoView({ behavior, block: 'start' });
     }
 
     const FRAMES = 40;
@@ -764,9 +779,9 @@ export default function SimuladorTeoremaCentralLimitePage() {
 
         {/* BLOQUE DEL RESULTADO — histograma, cifras y aviso de fin: lo que `lanzar` lleva a la
             vista, junto (hallazgo 2466). */}
-        <div ref={resultadoRef} className={styles.anclaResultado}>
+        <div ref={resultadoRef}>
         {/* CANVAS HISTOGRAMA MEDIAS */}
-        <div className={`${styles.canvasWrapper} ${styles.anclaResultado}`} ref={histogramaRef}>
+        <div className={styles.canvasWrapper} ref={histogramaRef}>
           <div className={styles.canvasLabel}><span aria-hidden="true">📊</span> Distribución de la media muestral X̄</div>
           <canvas ref={canvasMedRef} className={styles.canvasMedias} aria-label="Histograma de las medias muestrales" />
         </div>

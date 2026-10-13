@@ -352,15 +352,6 @@
   background: rgba(63, 165, 209, 0.12);
 }
 
-/* Lo que recibe el foco al cambiar de pantalla no puede quedar bajo la barra fija del logo
-   (hallazgo 2705, forma del 2657 de selector-smartphone): al subirlo a la vista se dejan 80 px
-   libres, el mismo hueco que el padding-top del hero (HUECO_BARRA_LOGO en page.tsx). Va en todos
-   los anchos: en escritorio la barra también es fija. */
-.preguntaTexto,
-.heroTitleSm {
-  scroll-margin-top: 80px;
-}
-
 /* La guía vive fuera de las tres pantallas (hallazgo 2709): mismo ancho que el resultado. */
 .guiaContainer {
   max-width: 800px;

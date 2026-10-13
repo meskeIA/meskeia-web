@@ -142,15 +142,12 @@
 .btnCalcular:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* ── Lo que produce cada botón (aviso o resultados) ──
-   Se lleva a la vista al pulsar (hallazgo 2738). El margen deja sitio a la barra fija del logo
-   arriba (~52 px en móvil, ~77 px en escritorio) y a la píldora fija del Footer abajo (~50 px
-   a 10 px del borde): sin él, scrollIntoView dejaba el principio o el final debajo de ellas. */
+   Se lleva a la vista al pulsar (hallazgo 2738). La barra fija del logo arriba y la píldora
+   fija del Footer abajo las salva el scroll-padding de globals.css (cabos C0090 y C0116). */
 .salida {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  scroll-margin-top: 96px;
-  scroll-margin-bottom: 80px;
 }
 .salida .avisoError { margin: 0; }
 

@@ -536,7 +536,10 @@ test.describe('en móvil (Pixel 7)', () => {
     };
     for (const [sel, valor] of Object.entries(valores)) {
       await page.locator(sel).evaluate((el) => el.scrollIntoView({ block: 'center' }));
-      const v = await page.evaluate((selector) => {
+      // Se sondea: la copia fija la pinta el oyente de scroll de la app un fotograma DESPUÉS del
+      // desplazamiento, y medir en el mismo instante juzga la muestra en línea que está saliendo
+      // por arriba (se notó el 13/10/2026, al cambiar con el scroll-padding global dónde queda).
+      const medir = () => page.evaluate((selector) => {
         const s = document.querySelector(selector)!.getBoundingClientRect();
         const caja =
           document.querySelector('[data-muestra="fija"]') ?? document.querySelector('[data-muestra="en-linea"]');
@@ -549,7 +552,9 @@ test.describe('en móvil (Pixel 7)', () => {
           noLaTapaNada: !!enMedio?.closest('[class*="muestraTexto"]'),
         };
       }, sel);
-      expect(v, `con ${sel} en el centro`).toEqual({ aLaVista: true, noTapaAlPomo: true, noLaTapaNada: true });
+      await expect
+        .poll(medir, { message: `con ${sel} en el centro`, timeout: 2000 })
+        .toEqual({ aLaVista: true, noTapaAlPomo: true, noLaTapaNada: true });
       await sembrarValor(page, sel, valor);
     }
     // Y la muestra lleva lo que se acaba de poner, igual que la vista previa.
