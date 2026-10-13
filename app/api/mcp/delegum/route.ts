@@ -215,6 +215,16 @@ const AVISO_LABORAL =
   'No sustituye el asesoramiento de un abogado laboralista, un graduado social ni la consulta al SEPE. ' +
   'Los importes definitivos dependen del convenio aplicable y del caso concreto.*';
 
+// Para las prestaciones que resuelve el INSS (complemento de brecha de género, nacimiento,
+// incapacidad temporal y permanente, viudedad, jubilación anticipada): salen de la LGSS, no del
+// Estatuto de los Trabajadores, y no las tramita el SEPE (cabo C0148). Sin año a propósito: cada
+// tool lleva el de sus cuantías en su línea de fuente.
+const AVISO_SEGURIDAD_SOCIAL =
+  '\n\n---\n⚖️ *Delegum es un asistente orientativo, no un organismo oficial. ' +
+  'Cálculo basado en la Ley General de la Seguridad Social (Real Decreto Legislativo 8/2015). ' +
+  'No sustituye la resolución del Instituto Nacional de la Seguridad Social (INSS) ni el asesoramiento de un graduado social. ' +
+  'La cuantía definitiva depende de tu vida laboral y de lo que resuelva tu expediente.*';
+
 const AVISO_FINANCIERO =
   '\n\n---\n⚖️ *Delegum es un asistente orientativo, no un asesor financiero registrado. ' +
   'Resultado generado automáticamente. No constituye recomendación de inversión ni de contratación. ' +
@@ -1533,7 +1543,7 @@ function crearServidorDelegum(): McpServer {
           // Las advertencias del motor no llegaban al MCP: una futura se habría perdido (cabo C0099)
           ...(r.advertencias.length ? ['', '⚠️ **A tener en cuenta**', ...r.advertencias.map(a => `  • ${a}`)] : []),
         ].filter(l => l !== null);
-        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+        return conAviso(lineas.join('\n'), AVISO_SEGURIDAD_SOCIAL);
       } catch (err) {
         return errorMcp(err);
       }
@@ -2447,7 +2457,7 @@ function crearServidorDelegum(): McpServer {
           ...r.advertencias.map(a => `⚠️ ${a}`),
           `📚 ${r.fuenteDatos}`,
         ].filter(l => l !== '');
-        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+        return conAviso(lineas.join('\n'), AVISO_SEGURIDAD_SOCIAL);
       } catch (err) {
         return errorMcp(err);
       }
@@ -2540,7 +2550,7 @@ function crearServidorDelegum(): McpServer {
           `📆 Equivalente mensual: ${fmt(r.subsidioMensualEquivalente)} €`,
           `📉 Pérdida frente al salario habitual: ${fmt(r.perdidaEstimada)} €/mes`,
         ];
-        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+        return conAviso(lineas.join('\n'), AVISO_SEGURIDAD_SOCIAL);
       } catch (err) {
         return errorMcp(err);
       }
@@ -2642,7 +2652,7 @@ function crearServidorDelegum(): McpServer {
           ...r.notas.map(n => `ℹ️ ${n}`),
           `📚 ${r.fuenteDatos}`,
         ].filter(l => l !== '');
-        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+        return conAviso(lineas.join('\n'), AVISO_SEGURIDAD_SOCIAL);
       } catch (err) {
         return errorMcp(err);
       }
@@ -2691,7 +2701,7 @@ function crearServidorDelegum(): McpServer {
           );
         }
         lineas.push('', `📚 ${r.fuenteDatos}`);
-        return conAviso(lineas.filter(l => l !== '').join('\n'), AVISO_LABORAL);
+        return conAviso(lineas.filter(l => l !== '').join('\n'), AVISO_SEGURIDAD_SOCIAL);
       } catch (err) {
         return errorMcp(err);
       }
@@ -2745,7 +2755,7 @@ function crearServidorDelegum(): McpServer {
           ...r.advertencias.map(a => `⚠️ ${a}`),
           `📚 ${r.fuenteDatos}`,
         ].filter(l => l !== '');
-        return conAviso(lineas.join('\n'), AVISO_LABORAL);
+        return conAviso(lineas.join('\n'), AVISO_SEGURIDAD_SOCIAL);
       } catch (err) {
         return errorMcp(err);
       }

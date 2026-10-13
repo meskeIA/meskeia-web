@@ -4038,15 +4038,15 @@ test.describe('Re-inspección 06/10/2026', () => {
   });
 
   /**
-   * ABIERTO (06/10/2026) — BAJO (contenido). El gemelo de la app, la tool
-   * `calcular_complemento_brecha_genero` del MCP Delegum, cierra con AVISO_LABORAL: «Cálculo
+   * REPARADO (13/10/2026, cabo C0148) — BAJO (contenido). El gemelo de la app, la tool
+   * `calcular_complemento_brecha_genero` del MCP Delegum, cerraba con AVISO_LABORAL: «Cálculo
    * basado en el Estatuto de los Trabajadores y normativa laboral 2025 … ni la consulta al
-   * SEPE». El cálculo sale del art. 60 LGSS con la cuantía de 2026 y lo gestiona el INSS.
+   * SEPE». El cálculo sale del art. 60 LGSS con la cuantía de 2026 y lo gestiona el INSS. Ahora
+   * cierra con AVISO_SEGURIDAD_SOCIAL, como las otras cinco tools de prestaciones del INSS.
    */
-  test('ABIERTO (06/10): la tool del MCP no se ampara en el Estatuto de los Trabajadores ni en la normativa de 2025', async ({
+  test('la tool del MCP no se ampara en el Estatuto de los Trabajadores ni en la normativa de 2025', async ({
     request,
   }) => {
-    test.fail();
     const mcp = await porMcpDelegum(request, {
       sexo: 'mujer',
       num_hijos: 2,
@@ -4056,6 +4056,8 @@ test.describe('Re-inspección 06/10/2026', () => {
     expect(mcp).toContain('73,80 €/mes (1033,20 €/año, 14 pagas)');
     expect(mcp).not.toContain('Estatuto de los Trabajadores');
     expect(mcp).not.toContain('normativa laboral 2025');
+    expect(mcp).toContain('Ley General de la Seguridad Social');
+    expect(mcp).toContain('(INSS)');
   });
 });
 
