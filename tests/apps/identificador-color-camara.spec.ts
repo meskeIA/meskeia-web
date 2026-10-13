@@ -515,3 +515,63 @@ test('REGRESIÓN 393 · la paleta tiene azules medios y el azul acero se llama a
   // Esperado: un nombre de la familia del azul. Obtenido: «Gris».
   await expect(NOMBRE_COLOR(page)).toContainText(/[Aa]zul|[Cc]eleste/);
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASO 4 — «¿Son el mismo color?» (semilla S0202, 13/10/2026)
+//
+// El par #9D7181 (rosa grisáceo) / #578D7F (verde grisáceo) NO sale de la app: lo construye
+// `tests/diferencia-color-motor.spec.ts` desplazando un gris a lo largo del núcleo de la
+// matriz de deuteranopía de Machado, así que es un par de confusión por construcción. Con
+// visión típica, ΔE00 = 39,8 (distintos); con deuteranopía, 0 (iguales). Ninguna otra de las
+// visiones comparadas baja de 1, de modo que el aviso tiene que nombrar solo la deuteranopía.
+// ═══════════════════════════════════════════════════════════════════════════
+test('caso 4 · comparar A y B: veredicto con ΔE00 y aviso de la visión que los confunde', async ({ page }) => {
+  await page.goto(RUTA);
+  await page.getByRole('tab', { name: 'Desde una foto' }).click();
+
+  // Sin nada guardado no hay sección de comparación
+  await expect(page.getByRole('heading', { name: '¿Son el mismo color?' })).toHaveCount(0);
+
+  await cargarFoto(page, 0x9d, 0x71, 0x81);
+  await page.locator('canvas[role=button]').click({ position: { x: 40, y: 30 } });
+  await page.getByRole('button', { name: 'Guardar como color A' }).click();
+
+  const seccion = page.locator('section[aria-labelledby="titulo-comparar"]');
+  await expect(seccion).toContainText('#9D7181');
+  await expect(seccion).toContainText('Falta: guarda un color como B');
+  await expect(seccion.locator('table')).toHaveCount(0);
+
+  await cargarFoto(page, 0x57, 0x8d, 0x7f);
+  await page.locator('canvas[role=button]').click({ position: { x: 40, y: 30 } });
+  await page.getByRole('button', { name: 'Guardar como color B' }).click();
+
+  await expect(seccion).toContainText('#578D7F');
+  await expect(seccion.getByRole('status')).toHaveText(
+    'Colores distintos (diferencia ΔE00 de 39,8 con visión típica). Atención: con deuteranopía se verían prácticamente iguales.',
+  );
+
+  // Una fila por visión, en el orden del motor, y la de deuteranopía marcada como confusión
+  const filas = seccion.locator('tbody tr');
+  await expect(filas).toHaveCount(6);
+  await expect(filas.nth(0)).toContainText('Visión típica');
+  await expect(filas.nth(0)).toContainText('39,8');
+  const deutan = filas.filter({ hasText: 'Deuteranopía' });
+  await expect(deutan).toContainText('No se distinguen');
+  await expect(deutan.locator('td').last()).toHaveClass(/celdaConfusion/);
+
+  // En 412 px la tabla cabe entera: la columna del resultado, la que importa, no se esconde
+  // detrás de un desplazamiento lateral (así salía en la primera versión, con frases largas).
+  const tabla = await seccion.locator('table').evaluate((t) => [t.parentElement!.scrollWidth, t.parentElement!.clientWidth]);
+  expect(tabla[0]).toBeLessThanOrEqual(tabla[1]);
+
+  // Guardar el MISMO color en los dos lados: iguales en todas las visiones, sin aviso
+  await page.getByRole('button', { name: 'Guardar como color A' }).click();
+  await expect(seccion.getByRole('status')).toHaveText('No se distinguen (diferencia ΔE00 de 0,0 con visión típica).');
+
+  await page.getByRole('button', { name: 'Vaciar comparación' }).click();
+  await expect(seccion).toHaveCount(0);
+
+  // Nada desborda en 412 px
+  const ancho = await page.evaluate(() => [document.documentElement.scrollWidth, window.innerWidth]);
+  expect(ancho[0]).toBe(ancho[1]);
+});

@@ -44,6 +44,7 @@ export const jsonLd = generateWebAppSchema({
     'Modo imagen: sube una foto o captura y toca cualquier punto para leer su color',
     'Congelar la lectura para leer con calma un color inestable por la luz',
     'Historial de los últimos colores identificados para reutilizarlos',
+    'Comparar dos colores: diferencia ΔE00 (CIEDE2000) y cómo los vería cada tipo de daltonismo',
     'Procesamiento 100% en el dispositivo: la cámara y las imágenes nunca salen del navegador',
   ],
   keywords: ['identificar color', 'nombre de color', 'codigo hex', 'rgb', 'daltonismo', 'cuentagotas'],

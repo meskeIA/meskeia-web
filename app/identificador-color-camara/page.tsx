@@ -12,6 +12,26 @@ import {
   ShareCard,
 } from '@/components';
 import { type RGB, hexARgb, rgbAHex, nombreDeColor } from '@/data/colores-nombrados';
+import { formatNumber } from '@/lib';
+import { compararColores, type NivelDiferencia, type ComparacionVision } from '@/lib/calculadoras/diferenciaColor';
+
+/** Qué significa cada tramo de ΔE00 dicho en palabras (umbrales en `diferenciaColor.ts`). */
+const TEXTO_NIVEL: Record<NivelDiferencia, string> = {
+  iguales: 'No se distinguen',
+  'casi-iguales': 'Casi iguales: solo se nota juntos y fijándose',
+  parecidos: 'Parecidos, pero se nota la diferencia',
+  distintos: 'Colores distintos',
+};
+
+/** Lo mismo, en corto, para la tabla: en un móvil de 412 px la frase larga no cabe. */
+const TEXTO_NIVEL_CORTO: Record<NivelDiferencia, string> = {
+  iguales: 'No se distinguen',
+  'casi-iguales': 'Casi iguales',
+  parecidos: 'Parecidos',
+  distintos: 'Distintos',
+};
+
+const seConfunden = (n: NivelDiferencia) => n === 'iguales' || n === 'casi-iguales';
 
 function rgbAHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
   const rn = r / 255, gn = g / 255, bn = b / 255;
@@ -66,6 +86,8 @@ export default function IdentificadorColorPage() {
   const [hayImagen, setHayImagen] = useState(false);
   const [calibracion, setCalibracion] = useState<Calibracion | null>(null);
   const [avisoCalib, setAvisoCalib] = useState<string | null>(null);
+  // Los dos colores que se comparan, en HEX ya corregido por la calibración
+  const [comparacion, setComparacion] = useState<{ a: string | null; b: string | null }>({ a: null, b: null });
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -300,6 +322,20 @@ export default function IdentificadorColorPage() {
   const nombre = colorMostrado ? nombreDeColor(colorMostrado.r, colorMostrado.g, colorMostrado.b) : null;
   const textoContraste = colorMostrado ? textoSobre(colorMostrado.r, colorMostrado.g, colorMostrado.b) : '#FFFFFF';
 
+  // Comparación A/B: ¿son el mismo color, y lo serían para cada tipo de daltonismo?
+  let filasComparacion: ComparacionVision[] | null = null;
+  if (comparacion.a && comparacion.b) {
+    const a = hexARgb(comparacion.a);
+    const b = hexARgb(comparacion.b);
+    filasComparacion = compararColores([a.r, a.g, a.b], [b.r, b.g, b.b]);
+  }
+  const filaTipica = filasComparacion?.[0] ?? null;
+  // Solo se avisa de una confusión cuando una visión típica SÍ los distingue
+  const visionesQueConfunden =
+    filasComparacion && filaTipica && !seConfunden(filaTipica.nivel)
+      ? filasComparacion.slice(1).filter(f => seConfunden(f.nivel)).map(f => f.nombre.toLowerCase())
+      : [];
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -445,6 +481,24 @@ export default function IdentificadorColorPage() {
             </button>
           </div>
 
+          {/* GUARDAR PARA COMPARAR */}
+          <div className={styles.compararBotones}>
+            <button
+              type="button"
+              className={styles.btnGuardarComparar}
+              onClick={() => setComparacion(c => ({ ...c, a: hex }))}
+            >
+              Guardar como color A
+            </button>
+            <button
+              type="button"
+              className={styles.btnGuardarComparar}
+              onClick={() => setComparacion(c => ({ ...c, b: hex }))}
+            >
+              Guardar como color B
+            </button>
+          </div>
+
           {/* CALIBRACIÓN DE BLANCO */}
           <div className={styles.calibracion}>
             {calibracion ? (
@@ -470,6 +524,93 @@ export default function IdentificadorColorPage() {
           <div className={styles.copiadoAviso} role="status" aria-live="polite">
             {copiado ? '✓ Copiado al portapapeles' : ' '}
           </div>
+        </section>
+      )}
+
+      {/* COMPARACIÓN A/B — semilla S0202 */}
+      {(comparacion.a || comparacion.b) && (
+        <section className={styles.compararSeccion} aria-labelledby="titulo-comparar">
+          <h2 id="titulo-comparar" className={styles.compararTitulo}>¿Son el mismo color?</h2>
+          <div className={styles.compararMuestras}>
+            {(['a', 'b'] as const).map(clave => {
+              const h = comparacion[clave];
+              const c = h ? hexARgb(h) : null;
+              return (
+                <div
+                  key={clave}
+                  className={`${styles.compararMuestra} ${h ? '' : styles.compararPendiente}`}
+                  style={c && h ? { backgroundColor: h, color: textoSobre(c.r, c.g, c.b) } : undefined}
+                >
+                  <span className={styles.compararLetra}>{clave.toUpperCase()}</span>
+                  {c && h ? (
+                    <>
+                      <span className={styles.compararNombre}>{nombreDeColor(c.r, c.g, c.b)}</span>
+                      <span className={styles.compararHex}>{h}</span>
+                    </>
+                  ) : (
+                    <span className={styles.compararNombre}>Falta: guarda un color como {clave.toUpperCase()}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <div role="status" aria-live="polite">
+            {filasComparacion && filaTipica && (
+              <p className={styles.compararVeredicto}>
+                <strong>{TEXTO_NIVEL[filaTipica.nivel]}</strong>
+                {' '}(diferencia ΔE00 de {formatNumber(filaTipica.deltaE, 1)} con visión típica).
+                {visionesQueConfunden.length > 0 && (
+                  <> Atención: con {new Intl.ListFormat('es', { type: 'conjunction' }).format(visionesQueConfunden)} se verían prácticamente iguales.</>
+                )}
+              </p>
+            )}
+          </div>
+
+          {filasComparacion && (
+            <div className={styles.tableWrapper}>
+              <table className={`${styles.comparativaTable} ${styles.tablaComparar}`}>
+                <caption className={styles.compararCaption}>Cómo vería los dos colores cada tipo de visión</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Visión</th>
+                    <th scope="col">A y B</th>
+                    <th scope="col">ΔE00</th>
+                    <th scope="col">Resultado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filasComparacion.map(f => (
+                    <tr key={f.tipo}>
+                      <th scope="row" className={styles.compararVision}>{f.nombre}</th>
+                      <td>
+                        <span className={styles.miniMuestras} aria-hidden="true">
+                          <span className={styles.miniMuestra} style={{ backgroundColor: rgbAHex(f.a[0], f.a[1], f.a[2]) }} />
+                          <span className={styles.miniMuestra} style={{ backgroundColor: rgbAHex(f.b[0], f.b[1], f.b[2]) }} />
+                        </span>
+                      </td>
+                      <td className={styles.compararDeltaE}>{formatNumber(f.deltaE, 1)}</td>
+                      <td className={seConfunden(f.nivel) && !seConfunden(filasComparacion[0].nivel) ? styles.celdaConfusion : undefined}>
+                        {TEXTO_NIVEL_CORTO[f.nivel]}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <p className={styles.compararNota}>
+            ΔE00 (CIEDE2000) es la medida de la CIE para la diferencia entre dos colores: por debajo
+            de 1 no se aprecia y por encima de 6 se ve a simple vista; los tramos intermedios son
+            orientativos. La cámara no es un colorímetro, así que compara los dos objetos con la
+            misma luz y a la misma distancia, o mejor aún, dentro de la misma foto. Las filas de
+            daltonismo simulan cada visión con el modelo de Machado y otros (2009): en las
+            anomalías, con un grado moderado; la tritanopía es la menos fiable del modelo.
+          </p>
+          <button type="button" className={styles.calibQuitar} onClick={() => setComparacion({ a: null, b: null })}>
+            Vaciar comparación
+          </button>
         </section>
       )}
 
@@ -578,7 +719,7 @@ export default function IdentificadorColorPage() {
             <div className={styles.escenarioCard}>
               <span className={styles.escenarioIcono} aria-hidden="true">👁️</span>
               <h3>Personas con daltonismo</h3>
-              <p>Poner nombre objetivo a un color ayuda a decidir qué ropa combina, leer indicadores de colores o distinguir cables y piezas. El código exacto elimina cualquier duda sobre el tono.</p>
+              <p>Poner nombre objetivo a un color ayuda a decidir qué ropa combina, leer indicadores de colores o distinguir cables y piezas. El código exacto elimina cualquier duda sobre el tono, y guardar dos lecturas como A y B dice si dos prendas o dos cables son del mismo color.</p>
             </div>
             <div className={styles.escenarioCard}>
               <span className={styles.escenarioIcono} aria-hidden="true">🔎</span>
