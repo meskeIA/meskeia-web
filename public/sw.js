@@ -1,10 +1,29 @@
 // Service Worker para meskeIA PWA
-// Versión: 1.2.0
+// Versión: 2.0.0 (13/10/2026)
+//
+// Qué guarda, y por qué tan poco (cabo C0237). Hasta la 1.2.0 guardaba en caché CADA GET que no
+// fuera /api/ (chunks, imágenes, páginas, y también lo de otros orígenes) sin límite ni
+// caducidad. Se notaba poco porque el registro fallaba en buena parte de las cargas; al
+// repararlo, el almacenamiento de cada visitante habría crecido con cada app visitada.
+// Ahora solo intercepta, del propio origen:
+//   · navegaciones (el HTML de cada página): red primero, copia para recargar sin conexión;
+//   · /_next/static/ (los chunks, con hash y por tanto inmutables): los que esa página necesita
+//     para funcionar sin conexión.
+// Todo lo demás (imágenes, /api/, otros orígenes, peticiones RSC, rangos de audio y vídeo) va
+// directo a la red, sin pasar por aquí. Cada caché tiene tope de entradas y se recorta por la
+// más antigua: un despliegue nuevo cambia los hashes y los chunks viejos salen solos.
+// Testigo: tests/service-worker.spec.ts.
 
-const CACHE_NAME = 'meskeia-pwa-v3';
-const STATIC_CACHE = 'meskeia-static-v3';
+const VERSION = 'v4';
+const CACHE_ESTATICOS = `meskeia-static-${VERSION}`;
+const CACHE_PAGINAS = `meskeia-paginas-${VERSION}`;
+const CACHE_CHUNKS = `meskeia-chunks-${VERSION}`;
+const CACHES_VIGENTES = [CACHE_ESTATICOS, CACHE_PAGINAS, CACHE_CHUNKS];
 
-// Archivos estáticos para cachear
+const MAX_PAGINAS = 40;
+const MAX_CHUNKS = 300;
+
+// Archivos que se guardan al instalar
 const STATIC_FILES = [
   '/',
   '/offline.html',
@@ -14,109 +33,84 @@ const STATIC_FILES = [
   '/icon_meskeia.png',
 ];
 
-// Instalación del Service Worker
 self.addEventListener('install', (event) => {
-  console.log('[SW] Instalando Service Worker...');
-
   event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('[SW] Cacheando archivos estáticos');
-        return cache.addAll(STATIC_FILES);
-      })
+    caches.open(CACHE_ESTATICOS)
+      .then((cache) => cache.addAll(STATIC_FILES))
       .then(() => self.skipWaiting())
   );
 });
 
-// Activación del Service Worker
+// Al activarse borra toda caché que no sea de esta versión (incluida la meskeia-pwa-v3 sin límite)
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activando Service Worker...');
-
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== STATIC_CACHE) {
-            console.log('[SW] Eliminando caché antigua:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches.keys()
+      .then((nombres) => Promise.all(
+        nombres
+          .filter((nombre) => !CACHES_VIGENTES.includes(nombre))
+          .map((nombre) => caches.delete(nombre))
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-// Estrategia de fetch: Network First, luego Cache
+/** Deja la caché en `maximo` entradas, retirando las más antiguas (keys() va en orden de alta) */
+async function recortar(nombreCache, maximo) {
+  const cache = await caches.open(nombreCache);
+  const claves = await cache.keys();
+  const sobran = claves.length - maximo;
+  for (let i = 0; i < sobran; i++) {
+    await cache.delete(claves[i]);
+  }
+}
+
+/** Red primero; si responde 200, se guarda la copia (y se recorta). Sin red, la copia guardada. */
+async function redPrimero(request, nombreCache, maximo, clave) {
+  try {
+    const respuesta = await fetch(request);
+    if (respuesta && respuesta.status === 200 && respuesta.type === 'basic') {
+      const copia = respuesta.clone();
+      const cache = await caches.open(nombreCache);
+      // Se borra antes de guardar para que la entrada pase al final y el recorte quite las viejas
+      await cache.delete(clave);
+      await cache.put(clave, copia);
+      await recortar(nombreCache, maximo);
+    }
+    return respuesta;
+  } catch (error) {
+    const guardada = await caches.match(clave);
+    if (guardada) return guardada;
+    throw error;
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
+  if (request.method !== 'GET') return;
 
-  // Solo cachear requests GET
-  if (request.method !== 'GET') {
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/')) return;
+  if (request.headers.has('range')) return;
+
+  // Navegaciones: la página entera. La clave va sin query para no guardar una copia por cada
+  // ?from=… o ?utm=… de la misma página.
+  if (request.mode === 'navigate') {
+    const clave = url.origin + url.pathname;
+    event.respondWith(
+      redPrimero(request, CACHE_PAGINAS, MAX_PAGINAS, clave)
+        .catch(() => caches.match('/offline.html'))
+        .then((r) => r || Response.error())
+    );
     return;
   }
 
-  // No cachear requests a APIs externas
-  if (request.url.includes('/api/') ||
-      request.url.includes('meskeia.com/api/')) {
-    return;
-  }
-
-  event.respondWith(
-    fetch(request)
-      .then((response) => {
-        // Si la respuesta es válida, cachearla
-        if (response && response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
-          });
-        }
-        return response;
-      })
-      .catch(() => {
-        // Si falla la red, intentar desde caché
-        return caches.match(request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-
-          // Si es una navegación (HTML), mostrar página offline
-          if (request.headers.get('accept').includes('text/html')) {
-            return caches.match('/offline.html');
-          }
-
-          // Para otros recursos, intentar la página principal
-          return caches.match('/');
-        });
-      })
-  );
-});
-
-// Sincronización en background (para futuras mejoras)
-self.addEventListener('sync', (event) => {
-  console.log('[SW] Sync event:', event.tag);
-
-  if (event.tag === 'sync-analytics') {
-    event.waitUntil(
-      // Aquí se pueden sincronizar analytics pendientes
-      Promise.resolve()
+  // Chunks y estáticos de Next: con hash, así que la URL completa es la clave
+  if (url.pathname.startsWith('/_next/static/')) {
+    event.respondWith(
+      redPrimero(request, CACHE_CHUNKS, MAX_CHUNKS, request.url)
+        .catch(() => Response.error())
     );
   }
-});
-
-// Notificaciones push (para futuras mejoras)
-self.addEventListener('push', (event) => {
-  if (event.data) {
-    const data = event.data.json();
-    const options = {
-      body: data.body,
-      icon: '/icon-192x192.png',
-      badge: '/icon-72x72.png',
-      vibrate: [200, 100, 200],
-    };
-
-    event.waitUntil(
-      self.registration.showNotification(data.title, options)
-    );
-  }
+  // Todo lo demás: sin respondWith, el navegador lo pide a la red como si no hubiera SW
 });

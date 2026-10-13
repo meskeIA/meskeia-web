@@ -46,6 +46,12 @@ export default defineConfig({
 
     // Capturar trace solo en reintentos
     trace: 'on-first-retry',
+
+    // Sin service worker por defecto: una página que controla el SW no pasa sus peticiones por
+    // page.route, y desde el 13/10/2026 se registra en TODAS las cargas (cabo C0237). El único
+    // spec que lo quiere vivo lo pide con test.use({ serviceWorkers: 'allow' }):
+    // tests/service-worker.spec.ts.
+    serviceWorkers: 'block',
   },
 
   // Proyectos (navegadores)
