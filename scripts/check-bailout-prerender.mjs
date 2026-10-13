@@ -52,6 +52,14 @@ const MARCA = 'BAILOUT_TO_CLIENT_SIDE_RENDERING';
 /** Por debajo de esto no es el árbol de un build completo, y callar sería mentir. */
 const MINIMO_HTML = 50;
 
+// En Vercel no se ejecuta: allí `next build` no deja los .html del prerender en .next/server/app
+// (el primer deploy con este candado, 13/10/2026, encontró 0 y se plantó). El build local de
+// /push, que es donde manda el flujo del proyecto, ya lo ha pasado antes del push.
+if (process.env.VERCEL && iDir === -1) {
+  console.log('✓ bailout del prerender: omitido en Vercel (se valida en el build local de /push)');
+  process.exit(0);
+}
+
 if (!fs.existsSync(DIR)) {
   console.error(`\n✗ bailout del prerender: no existe ${DIR} — ¿ha corrido next build?\n`);
   process.exit(1);

@@ -585,7 +585,8 @@ de `.next/server/app/` lleva una frontera `BAILOUT_TO_CLIENT_SIDE_RENDERING` y s
 en `ACEPTADOS` del script con su razón: lo de dentro no está en el HTML servido.
 ⚠️ `next dev` no genera el bailout: un spec de «está en el HTML servido» pasa en dev y falla en
 producción. Por eso se mira aquí, el único momento con el HTML de producción, y no en los tests.
-Se planta si no ve un build completo · sin escape en la app: se decide en `ACEPTADOS`.
+Se planta si no ve un build completo · en Vercel se omite (allí no hay .html) · sin escape en la
+app: se decide en `ACEPTADOS`.
 > Salió del cabo C0160 (CASO 15 de estimador-cartera-inversion, 08/10/2026). Crónica: cabecera de
 > `scripts/check-bailout-prerender.mjs` · pruebas: `npm run bailout:probar-candado`.
 
