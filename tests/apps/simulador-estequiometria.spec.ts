@@ -51,41 +51,13 @@ const barra = (page: Page, reactivo: string) =>
 const aviso = (page: Page) => page.locator('[class*="resultadoPanel"][role="alert"]');
 
 /**
- * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
- * admite meskeia.com) y, sin él, la página NO se hidrata. El puente reenvía el socket a
- * localhost:3050, que sí se acepta; no toca ninguna petición HTTP. Con `next start` no hay HMR y
- * no hace nada. Copiado de tests/apps/simulador-mas-resorte.spec.ts (y este de simulador-punnett).
- */
-async function puenteHmr(page: Page): Promise<void> {
-  const abiertos: WebSocket[] = [];
-  page.on('close', () => abiertos.forEach((s) => s.close()));
-  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
-    const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
-    arriba.binaryType = 'arraybuffer';
-    abiertos.push(arriba);
-    const cola: (string | Buffer)[] = [];
-    arriba.onopen = () => {
-      for (const m of cola) arriba.send(m);
-      cola.length = 0;
-    };
-    ws.onMessage((m) => {
-      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
-      else cola.push(m);
-    });
-    arriba.onmessage = (e: MessageEvent) =>
-      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
-    ws.onClose(() => arriba.close());
-  });
-}
-
-/**
  * Abre la app (en meskeia.com o, con la URL de stemum.com, como la sirve el portal) y apaga las
  * transiciones: globals.css anima color y fondo 0,3 s al cambiar de tema, y medir el contraste
  * a medio camino daba cifras que no son ni las de un tema ni las del otro.
  */
 async function abrir(page: Page, url = RUTA): Promise<void> {
-  if (url.includes('stemum.com')) await puenteHmr(page);
+  // Bajo stemum.com basta con que el host esté en allowedDevOrigins (e10155aa): el puente de
+  // HMR que había aquí sobraba desde entonces (cabo C0227).
   await page.goto(url);
   await esperarHidratacion(page, ['#inputA', '#sliderRendimiento']);
   await prepararParaMedir(page);

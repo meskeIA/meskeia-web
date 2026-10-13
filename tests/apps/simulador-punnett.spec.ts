@@ -1284,44 +1284,13 @@ async function porcentajesHuerfanos(page: Page): Promise<string[]> {
   });
 }
 
-/**
- * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
- * admite meskeia.com) y, sin él, la página NO se hidrata: la píldora «Stemum › Biología» no
- * llega a montarse (useStemumHost corre en un efecto) y `esperarPaginaAsentada` agota su espera.
- * Medido el 01/10/2026: con el puente, la página hidrata y la píldora aparece; sin él, el bloque
- * entero de Stemum falla antes de medir nada. El puente reenvía el socket a localhost:3050, que
- * sí se acepta; no toca ninguna petición HTTP, así que lo que se mide es la página real.
- * (En producción no hay HMR: el puente solo existe para el servidor de desarrollo.)
- */
-async function puenteHmr(page: Page): Promise<void> {
-  const abiertos: WebSocket[] = [];
-  page.on('close', () => abiertos.forEach((s) => s.close()));
-  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
-    const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
-    arriba.binaryType = 'arraybuffer';
-    abiertos.push(arriba);
-    const cola: (string | Buffer)[] = [];
-    arriba.onopen = () => {
-      for (const m of cola) arriba.send(m);
-      cola.length = 0;
-    };
-    ws.onMessage((m) => {
-      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
-      else cola.push(m);
-    });
-    arriba.onmessage = (e: MessageEvent) =>
-      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
-    ws.onClose(() => arriba.close());
-  });
-}
-
 // ============================================================
 // Bajo stemum.com: la marca del portal y su píldora «Stemum › Biología»
 // ============================================================
 test.describe('Cuadro de Punnett · stemum.com · re-inspección 01/10/2026', () => {
   test.beforeEach(async ({ page }) => {
-    await puenteHmr(page);
+    // Hasta e10155aa aquí había un puente de HMR: sin él la página no hidrataba bajo stemum.com
+    // (medido el 01/10/2026). Desde que stemum.com está en allowedDevOrigins sobra (cabo C0227).
     await page.goto('http://stemum.com/simulador-punnett/');
     await esperarPaginaAsentada(page);
     await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');

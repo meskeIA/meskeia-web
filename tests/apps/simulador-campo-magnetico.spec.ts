@@ -897,35 +897,6 @@ async function tituloBajoLaBarra(page: Page): Promise<{ total: number; tapados: 
 }
 
 /**
- * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
- * admite meskeia.com) y, sin él, la página NO se hidrata: la píldora «Stemum › Física» no llega
- * a montarse. El puente reenvía el socket a localhost:3050. Copiado de
- * `visualizador-volumenes.spec.ts`. Bajo `next start` no hay HMR y no hace nada.
- */
-async function puenteHmr(page: Page): Promise<void> {
-  const abiertos: WebSocket[] = [];
-  page.on('close', () => abiertos.forEach((s) => s.close()));
-  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
-    const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
-    arriba.binaryType = 'arraybuffer';
-    abiertos.push(arriba);
-    const cola: (string | Buffer)[] = [];
-    arriba.onopen = () => {
-      for (const m of cola) arriba.send(m);
-      cola.length = 0;
-    };
-    ws.onMessage((m) => {
-      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
-      else cola.push(m);
-    });
-    arriba.onmessage = (e: MessageEvent) =>
-      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
-    ws.onClose(() => arriba.close());
-  });
-}
-
-/**
  * 586a4d61 y a1d72a9c dejan 80 px de hueco arriba hasta 1023 px. Medido el 04/10/2026 en
  * meskeia.com (localhost): 0 puntos del h1 tapados a 360, 390, 768, 769, 800, 1023, 1024 y
  * 1280 px (a 1024 el título empieza en x = 221 y el logo acaba en x = 202).
@@ -943,7 +914,7 @@ test.describe('hero en meskeia.com — re-inspección 04/10/2026', () => {
 
 test.describe('hero bajo stemum.com — re-inspección 04/10/2026', () => {
   test.beforeEach(async ({ page }) => {
-    await puenteHmr(page);
+    // Sin puente de HMR: stemum.com está en allowedDevOrigins desde e10155aa (cabo C0227).
     await page.goto('http://stemum.com/simulador-campo-magnetico/');
     await esperarPaginaAsentada(page);
     await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');

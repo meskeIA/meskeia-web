@@ -697,34 +697,6 @@ test.describe('Sospecha (a) descartada — y en móvil (390 px)', () => {
   });
 });
 
-/**
- * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR y sin él la página no se
- * hidrata: la píldora no llega a montarse. El puente reenvía el socket a localhost:3050. Copiado
- * de `visualizador-volumenes.spec.ts`; bajo `next start` no hay HMR y no hace nada.
- */
-async function puenteHmr(page: Page): Promise<void> {
-  const abiertos: WebSocket[] = [];
-  page.on('close', () => abiertos.forEach((s) => s.close()));
-  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
-    const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
-    arriba.binaryType = 'arraybuffer';
-    abiertos.push(arriba);
-    const cola: (string | Buffer)[] = [];
-    arriba.onopen = () => {
-      for (const m of cola) arriba.send(m);
-      cola.length = 0;
-    };
-    ws.onMessage((m) => {
-      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
-      else cola.push(m);
-    });
-    arriba.onmessage = (e: MessageEvent) =>
-      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
-    ws.onClose(() => arriba.close());
-  });
-}
-
 /** Cuántos puntos del texto del h1 caen bajo la barra fija del logo (la píldora, en Stemum). */
 async function tituloBajoLaBarra(page: Page): Promise<{ total: number; tapados: number }> {
   await page.evaluate(
@@ -755,7 +727,7 @@ test.describe('Sospecha (b) descartada — la barra fija no tapa el título', ()
   }) => {
     // El corte de 1023 px de a1d72a9c se midió con el logo de meskeia.com. Con la píldora, medido
     // el 03/10/2026: acaba en x = 231-232 y el título empieza en x = 258 a 1024 px (306 a 1120).
-    await puenteHmr(page);
+    // Sin puente de HMR: stemum.com está en allowedDevOrigins desde e10155aa (cabo C0227).
     await page.goto('http://stemum.com/simulador-proyectiles/');
     await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
     await expect(page.locator('[class*="stemumPill"]')).toContainText('Física');
@@ -1040,7 +1012,6 @@ test.describe('Hallazgos abiertos — accesibilidad y dibujo', () => {
   });
 
   test('y bajo stemum.com, con el violeta del portal, también', async ({ page }) => {
-    await puenteHmr(page);
     await page.goto('http://stemum.com/simulador-proyectiles/');
     await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
     await esperarHidratacion(page, ['#v0', '#angulo', '#altura']);

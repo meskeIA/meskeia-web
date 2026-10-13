@@ -953,40 +953,9 @@ test.describe('Péndulo · re-inspección 02/10/2026', () => {
   });
 });
 
-/**
- * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
- * admite meskeia.com) y, sin él, la página NO se hidrata: la píldora «Stemum › Física» no llega
- * a montarse (useStemumHost corre en un efecto). El puente reenvía el socket a localhost:3050,
- * que sí se acepta; no toca ninguna petición HTTP, así que lo que se mide es la página real.
- * Copiado de tests/apps/simulador-punnett.spec.ts (01/10/2026). Bajo `next start` no hay HMR y
- * el puente no intercepta nada.
- */
-async function puenteHmr(page: Page): Promise<void> {
-  const abiertos: WebSocket[] = [];
-  page.on('close', () => abiertos.forEach((s) => s.close()));
-  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
-    const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
-    arriba.binaryType = 'arraybuffer';
-    abiertos.push(arriba);
-    const cola: (string | Buffer)[] = [];
-    arriba.onopen = () => {
-      for (const m of cola) arriba.send(m);
-      cola.length = 0;
-    };
-    ws.onMessage((m) => {
-      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
-      else cola.push(m);
-    });
-    arriba.onmessage = (e: MessageEvent) =>
-      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
-    ws.onClose(() => arriba.close());
-  });
-}
-
 test.describe('Péndulo · stemum.com · re-inspección 02/10/2026', () => {
   test.beforeEach(async ({ page }) => {
-    await puenteHmr(page);
+    // Sin puente de HMR: stemum.com está en allowedDevOrigins desde e10155aa (cabo C0227).
     await page.goto('http://stemum.com/simulador-pendulo/');
     await esperarPaginaAsentada(page);
     await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');

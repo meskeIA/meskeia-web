@@ -1041,36 +1041,6 @@ async function tituloBajoLaBarra(page: Page): Promise<{ total: number; tapados: 
   });
 }
 
-/**
- * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
- * admite meskeia.com) y, sin él, la página NO se hidrata: la píldora «Stemum › Matemáticas» no
- * llega a montarse (useStemumHost corre en un efecto). El puente reenvía el socket a
- * localhost:3050, que sí se acepta; no toca ninguna petición HTTP. Copiado de
- * `simulador-punnett.spec.ts` (01/10/2026). Bajo `next start` no hay HMR y no hace nada.
- */
-async function puenteHmr(page: Page): Promise<void> {
-  const abiertos: WebSocket[] = [];
-  page.on('close', () => abiertos.forEach((s) => s.close()));
-  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
-    const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
-    arriba.binaryType = 'arraybuffer';
-    abiertos.push(arriba);
-    const cola: (string | Buffer)[] = [];
-    arriba.onopen = () => {
-      for (const m of cola) arriba.send(m);
-      cola.length = 0;
-    };
-    ws.onMessage((m) => {
-      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
-      else cola.push(m);
-    });
-    arriba.onmessage = (e: MessageEvent) =>
-      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
-    ws.onClose(() => arriba.close());
-  });
-}
-
 // ============================================================
 // HERO — ni el logo ni la píldora de Stemum tapan el título (02/10/2026)
 // ============================================================
@@ -1094,7 +1064,7 @@ test.describe('hero en meskeia.com — re-inspección 02/10/2026', () => {
 
 test.describe('hero bajo stemum.com — re-inspección 02/10/2026', () => {
   test.beforeEach(async ({ page }) => {
-    await puenteHmr(page);
+    // Sin puente de HMR: stemum.com está en allowedDevOrigins desde e10155aa (cabo C0227).
     await page.goto('http://stemum.com/visualizador-volumenes/');
     await esperarPaginaAsentada(page);
     await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
@@ -1132,7 +1102,6 @@ test.describe('hero bajo stemum.com — re-inspección 02/10/2026', () => {
 //       1100; 0 desde 1106.
 test.describe('hero bajo stemum.com — hallazgo 2651, reparado 02/10/2026', () => {
   test.beforeEach(async ({ page }) => {
-    await puenteHmr(page);
     await page.goto('http://stemum.com/visualizador-volumenes/');
     await esperarPaginaAsentada(page);
     await expect(page.locator('[class*="stemumPill"]')).toBeVisible();

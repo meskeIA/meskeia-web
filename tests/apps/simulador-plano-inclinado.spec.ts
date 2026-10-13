@@ -856,7 +856,7 @@ test.describe('Re-inspección 03/10/2026 — el hero (sospecha b, descartada)', 
   // 1024 px (255 a 1040, 295 a 1120): 0 puntos del h1 tapados de 1024 a 1120 y a 800 px. Con
   // «Física» la píldora es más corta que la de «Matemáticas» (x = 287, visualizador-volumenes).
   test('bajo stemum.com, de 1024 a 1120 px y a 800, la píldora no pisa el título', async ({ page }) => {
-    await puenteHmr(page);
+    // Sin puente de HMR: stemum.com está en allowedDevOrigins desde e10155aa (cabo C0227).
     await page.goto('http://stemum.com/simulador-plano-inclinado/');
     await esperarPaginaAsentada(page);
     await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
@@ -1173,7 +1173,6 @@ test.describe('Re-inspección 03/10/2026 — contraste y rótulos (escritorio)',
   test('2786 · bajo stemum.com los textos de marca también llegan a 4,5:1 en los dos temas', async ({
     page,
   }) => {
-    await puenteHmr(page);
     await page.goto('http://stemum.com/simulador-plano-inclinado/');
     await esperarHidratacion(page, DESLIZADORES);
     await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
@@ -1441,34 +1440,5 @@ async function tituloBajoLaBarra(page: Page): Promise<{ total: number; tapados: 
       }
     }
     return { total, tapados };
-  });
-}
-
-/**
- * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
- * admite meskeia.com) y, sin él, la página no se hidrata: la píldora no llega a montarse. El
- * puente reenvía el socket a localhost:3050. Copiado de `visualizador-volumenes.spec.ts`; bajo
- * `next start` no hay HMR y no hace nada.
- */
-async function puenteHmr(page: Page): Promise<void> {
-  const abiertos: WebSocket[] = [];
-  page.on('close', () => abiertos.forEach((s) => s.close()));
-  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
-    const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
-    arriba.binaryType = 'arraybuffer';
-    abiertos.push(arriba);
-    const cola: (string | Buffer)[] = [];
-    arriba.onopen = () => {
-      for (const m of cola) arriba.send(m);
-      cola.length = 0;
-    };
-    ws.onMessage((m) => {
-      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
-      else cola.push(m);
-    });
-    arriba.onmessage = (e: MessageEvent) =>
-      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
-    ws.onClose(() => arriba.close());
   });
 }

@@ -1211,38 +1211,10 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · contrast
   });
 });
 
-/**
- * Bajo stemum.com, el `next dev` local rechaza el WebSocket de HMR (`allowedDevOrigins` solo
- * admite meskeia.com) y, sin él, la página NO se hidrata. El puente reenvía el socket a
- * localhost:3050. Copiado de tests/apps/simulador-mas-resorte.spec.ts, donde está medido.
- */
-async function puenteHmr(page: Page): Promise<void> {
-  const abiertos: WebSocket[] = [];
-  page.on('close', () => abiertos.forEach((s) => s.close()));
-  await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
-    const u = new URL(ws.url());
-    const arriba = new WebSocket(`ws://localhost:${PUERTO}${u.pathname}${u.search}`);
-    arriba.binaryType = 'arraybuffer';
-    abiertos.push(arriba);
-    const cola: (string | Buffer)[] = [];
-    arriba.onopen = () => {
-      for (const m of cola) arriba.send(m);
-      cola.length = 0;
-    };
-    ws.onMessage((m) => {
-      if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
-      else cola.push(m);
-    });
-    arriba.onmessage = (e: MessageEvent) =>
-      ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
-    ws.onClose(() => arriba.close());
-  });
-}
-
 test.describe('simulador-lentes-opticas · bajo stemum.com (hallazgos 2749 y 2750)', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(90000);
-    await puenteHmr(page);
+    // Sin puente de HMR: stemum.com está en allowedDevOrigins desde e10155aa (cabo C0227).
     await page.addInitScript(instrumentarLienzo);
     await page.goto('http://stemum.com/simulador-lentes-opticas/');
     await esperarHidratacion(page, [SLIDER_F]);
