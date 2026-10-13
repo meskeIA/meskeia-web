@@ -600,12 +600,15 @@ test.describe('lienzo en móvil 390 × 844', () => {
     const lienzo = page.locator(LIENZO);
     await lienzo.evaluate((el) => el.scrollIntoView({ block: 'center' }));
     // Antes: puntos de 4,1 px de diámetro y centroides de 7,3 px
-    const punto = await puntos(page).first().boundingBox();
-    const centroide = await page.locator(`${LIENZO} rect[class*="centroideMarker"]`).first().boundingBox();
-    if (!punto || !centroide) throw new Error('Sin cajas');
+    // Con espera: el radio mínimo sale de la escala que se mide al montar, y el círculo lo
+    // alcanza con `transition: r 0.2s`. Bajo next dev la medida llega más tarde y el test leía
+    // 7,58 px a mitad de la transición (C0160, 3 de 4). Un mínimo que no se aplica sigue fallando.
+    const anchoPunto = async () => (await puntos(page).first().boundingBox())?.width ?? 0;
+    const anchoCentroide = async () =>
+      (await page.locator(`${LIENZO} rect[class*="centroideMarker"]`).first().boundingBox())?.width ?? 0;
     // Mínimos de 8 y 16 px; la caja se ajusta a píxeles de dispositivo (⅓ de px a DPR 3), medido 7,88
-    expect(punto.width).toBeGreaterThanOrEqual(7.6);
-    expect(centroide.width).toBeGreaterThanOrEqual(15.6);
+    await expect.poll(anchoPunto).toBeGreaterThanOrEqual(7.6);
+    await expect.poll(anchoCentroide).toBeGreaterThanOrEqual(15.6);
   });
 
   test('HALLAZGO 2452 (REPARADO el 29/09/2026): en «Arrastrar», un dedo a 6 px del centro coge el punto', async ({ page }) => {
