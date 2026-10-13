@@ -300,6 +300,14 @@ body {
   overflow-x: hidden;
 }
 
+/* Con hidden en html Y en body, el body pasaba a ser contenedor de desplazamiento (overflow-y
+   computaba auto) que nunca se desplaza, y ningún position: sticky del catálogo pegaba (cabo
+   C0125, 13/10/2026: 41 módulos). clip recorta igual sin crear contenedor; el hidden de arriba
+   queda para los navegadores sin clip. */
+body {
+  overflow-x: clip;
+}
+
 /* Cromo fijo: la barra de MeskeiaLogo (arriba, en todos los anchos) y la píldora del Footer
    (abajo, solo por encima de 768 px) tapaban lo que una app lleva a la vista con scrollIntoView
    o un salto a ancla (cabos C0090 y C0116, 13/10/2026). El scroll-padding del documento lo

@@ -259,8 +259,12 @@
 
 /* Results Panel */
 .resultsPanel {
+  /* Pega bajo la barra fija del logo y, si no cabe entre ella y la píldora del pie, se
+     desplaza por dentro (C0125: medía 1.035 px en una ventana de 800) */
   position: sticky;
-  top: 100px;
+  top: var(--alto-barra-logo);
+  max-height: calc(100vh - var(--alto-barra-logo) - var(--alto-pildora-pie) - 1rem);
+  overflow-y: auto;
   height: fit-content;
   background: var(--bg-card);
   border-radius: var(--radius-large);

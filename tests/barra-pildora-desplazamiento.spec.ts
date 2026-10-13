@@ -150,3 +150,89 @@ test('C0116 · en móvil la píldora no es fija: abajo solo queda el respiro de 
   const caja = await cajaDestino(page);
   expect(Math.round(844 - caja.bottom)).toBe(8);
 });
+
+// ─── C0125 · los sticky pegan, y pegan bajo la barra ───────────────────────────────────────
+test('C0125 · un sticky sembrado en el documento pega (el body ya no es contenedor de desplazamiento)', async ({ page }) => {
+  await cargar(page, '/calculadora-notas/', 1280);
+  const r = await page.evaluate(
+    () =>
+      new Promise<{ top: number; overflowYBody: string }>((resolver) => {
+        document.documentElement.style.scrollBehavior = 'auto';
+        const s = document.createElement('div');
+        s.style.cssText = 'position:sticky;top:120px;height:30px';
+        const relleno = document.createElement('div');
+        relleno.style.height = '2400px';
+        const bloque = document.createElement('div');
+        bloque.append(s, relleno);
+        document.body.appendChild(bloque);
+        window.scrollTo(0, s.getBoundingClientRect().top + window.scrollY - 120 + 400);
+        requestAnimationFrame(() =>
+          resolver({ top: s.getBoundingClientRect().top, overflowYBody: getComputedStyle(document.body).overflowY }),
+        );
+      }),
+  );
+  expect(r.overflowYBody, 'el body no debe computar overflow-y auto').toBe('visible');
+  expect(Math.round(r.top)).toBe(120);
+});
+
+/** Las tres formas que corrigió la campaña: panel a la izquierda, a la derecha y sobre la píldora del pie. */
+const STICKY_REALES = [
+  { slug: 'adaptador-dislexia', selector: '[class*="controlesPanel"]', forma: 'panel lateral a la izquierda (bajo la píldora del logo)' },
+  { slug: 'estimador-impuesto-sucesiones', selector: '[class*="resultsPanel"]', forma: 'panel lateral a la derecha (bajo el botón de tema)' },
+  { slug: 'generador-gitignore', selector: '[class*="previewPanel"]', forma: 'panel lateral bajo el botón de tema y sobre la píldora del pie' },
+];
+
+for (const c of STICKY_REALES) {
+  test(`C0125 · ${c.slug} a 1280 px: ${c.forma} pega bajo la barra y no la cruza`, async ({ page }) => {
+    await cargar(page, `/${c.slug}/`, 1280);
+    const cromo = await medirCromo(page);
+    const r = await page.evaluate((sel) => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      const el = document.querySelector(sel) as HTMLElement;
+      const top = parseFloat(getComputedStyle(el).top);
+      const natural = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo(0, natural - top + 120);
+      return new Promise<{ caja: Caja; top: number; posicion: string }>((resolver) =>
+        requestAnimationFrame(() => {
+          const b = el.getBoundingClientRect();
+          resolver({ caja: { top: b.top, bottom: b.bottom, left: b.left, right: b.right }, top, posicion: getComputedStyle(el).position });
+        }),
+      );
+    }, c.selector);
+    expect(r.posicion).toBe('sticky');
+    expect(Math.round(r.caja.top), 'pega en su top').toBe(Math.round(r.top));
+    expect(r.caja.top, `pega a ${r.caja.top} px y la barra acaba en ${cromo.barraAbajo}`).toBeGreaterThanOrEqual(cromo.barraAbajo);
+    if (cromo.pildoraArriba !== null) {
+      const pie = await page.evaluate(() => {
+        const f = [...document.querySelectorAll('footer')].find((x) => getComputedStyle(x).position === 'fixed')!;
+        const b = f.getBoundingClientRect();
+        return { left: b.left, right: b.right };
+      });
+      const cruzaEnX = r.caja.right > pie.left && r.caja.left < pie.right;
+      if (cruzaEnX) expect(r.caja.bottom, 'no acaba bajo la píldora del pie').toBeLessThanOrEqual(cromo.pildoraArriba);
+    }
+  });
+}
+
+test('C0125 · a 390 px ningún sticky de las tres apps queda bajo la barra del logo', async ({ page }) => {
+  for (const c of STICKY_REALES) {
+    await cargar(page, `/${c.slug}/`, 390);
+    const cromo = await medirCromo(page);
+    const choques = await page.evaluate((barra) => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      const fuera: string[] = [];
+      for (const el of [...document.querySelectorAll('body *')].filter((e) => getComputedStyle(e).position === 'sticky')) {
+        // Sin sticky quedaría 200 px por encima de la pantalla; si pega, en su top
+        window.scrollTo(0, 0);
+        const natural = el.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo(0, natural + 200);
+        const b = el.getBoundingClientRect();
+        if (b.height === 0) continue;
+        if (barra.some((p) => b.left < p.right && b.right > p.left && b.top < p.bottom && b.bottom > p.top))
+          fuera.push(`${el.tagName.toLowerCase()} a ${Math.round(b.top)} px`);
+      }
+      return fuera;
+    }, cromo.barra);
+    expect(choques, `${c.slug}: ${choques.join(' · ')}`).toEqual([]);
+  }
+});

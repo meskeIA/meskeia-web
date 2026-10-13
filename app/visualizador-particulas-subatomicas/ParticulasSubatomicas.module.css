@@ -49,9 +49,8 @@
 .tabsWrapper {
   background: var(--bg-card);
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  /* Sin sticky (cabo C0125, 13/10/2026): nunca llegó a pegar, y pegada deja cambiar de pestaña
+     desde abajo con el contenido nuevo entero por encima de la pantalla. */
 }
 
 .tabs {

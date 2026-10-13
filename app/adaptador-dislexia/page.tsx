@@ -154,11 +154,11 @@ export default function AdaptadorDislexiaPage() {
   const [cargadas, setCargadas] = useState(false);
 
   /**
-   * Muestra fija del móvil (hallazgo 2725). No es `position: sticky` porque en este sitio
-   * no pega: globals.css pone `overflow-x: hidden` a `html` Y a `body`, y eso convierte a
-   * `body` en un contenedor de desplazamiento que nunca se desplaza, así que todo lo
-   * «sticky» queda atado a él y no se mueve (medido: con el deslizador de letras en el
-   * centro, la muestra sticky ya había salido por arriba). Se hace a mano: cuando la muestra
+   * Muestra fija del móvil (hallazgo 2725). No se hizo con `position: sticky` porque entonces
+   * no pegaba en ningún sitio: globals.css ponía `overflow-x: hidden` a `html` Y a `body`, y
+   * `body` era un contenedor de desplazamiento que nunca se desplaza. Desde el 13/10/2026
+   * (cabo C0125, `body { overflow-x: clip }`) ya pegaría, pero la copia a mano se queda: está
+   * probada (CASO 9 del spec) y sale solo mientras queda panel debajo. Se hace así: cuando la muestra
    * en línea empieza a meterse bajo la barra del logo y aún queda panel de ajustes por
    * debajo, se pinta una copia con `position: fixed`.
    */

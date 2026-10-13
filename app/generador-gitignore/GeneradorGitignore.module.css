@@ -246,9 +246,11 @@
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
+  /* Pega bajo la barra fija del logo y cabe entre ella y la píldora del pie: con top 20px
+     el botón de tema tapaba «Descargar» y la píldora, el consejo final (C0125) */
   position: sticky;
-  top: 20px;
-  max-height: calc(100vh - 40px);
+  top: var(--alto-barra-logo);
+  max-height: calc(100vh - var(--alto-barra-logo) - var(--alto-pildora-pie) - 1rem);
 }
 
 .previewHeader {

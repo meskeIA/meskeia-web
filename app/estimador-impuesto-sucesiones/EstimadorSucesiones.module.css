@@ -301,8 +301,13 @@
 
 /* Panel resultados */
 .resultsPanel {
+  /* Pega bajo la barra fija del logo (con 1rem quedaba bajo el botón de tema) y, si no cabe
+     entre ella y la píldora del pie, se desplaza por dentro: con un caso calculado medía 738 px
+     en una ventana de 800 (C0125) */
   position: sticky;
-  top: 1rem;
+  top: var(--alto-barra-logo);
+  max-height: calc(100vh - var(--alto-barra-logo) - var(--alto-pildora-pie) - 1rem);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
