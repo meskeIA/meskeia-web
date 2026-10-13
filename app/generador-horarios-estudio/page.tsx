@@ -740,7 +740,7 @@ export default function GeneradorHorariosPage() {
               </>
             ) : (
               <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>📆</div>
+                <div className={styles.emptyIcon} aria-hidden="true">📆</div>
                 <p className={styles.emptyTitle}>No hay horario generado</p>
                 <p className={styles.emptyText}>
                   Configura tus asignaturas y disponibilidad,<br />
@@ -937,7 +937,7 @@ export default function GeneradorHorariosPage() {
 
             {entregas.length === 0 ? (
               <div className={styles.emptyState}>
-                <div className={styles.emptyIcon}>📋</div>
+                <div className={styles.emptyIcon} aria-hidden="true">📋</div>
                 <p className={styles.emptyTitle}>No hay entregas registradas</p>
                 <p className={styles.emptyText}>
                   Añade tus trabajos y exámenes para no olvidar ninguna fecha importante
@@ -1142,7 +1142,7 @@ export default function GeneradorHorariosPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏛️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏛️</span>
                 <h4>Opositor con 8 meses para el examen</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1156,7 +1156,7 @@ export default function GeneradorHorariosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📚</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
                 <h4>Universitario con exámenes en 3 semanas</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1170,7 +1170,7 @@ export default function GeneradorHorariosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌍</span>
                 <h4>Estudiante de idiomas con trabajo y academia</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1184,7 +1184,7 @@ export default function GeneradorHorariosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h4>Adolescente de bachillerato con 8 asignaturas</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1378,7 +1378,7 @@ export default function GeneradorHorariosPage() {
           <h2>Mejores Prácticas para Estudiar Eficientemente</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>⏱️</div>
+              <div className={styles.tipIcon} aria-hidden="true">⏱️</div>
               <h4>Sesiones de 45–90 min</h4>
               <p>
                 Es el rango óptimo de duración para el máximo rendimiento cognitivo.
@@ -1387,7 +1387,7 @@ export default function GeneradorHorariosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🧠</div>
+              <div className={styles.tipIcon} aria-hidden="true">🧠</div>
               <h4>La materia difícil, con la mente descansada</h4>
               <p>
                 Estudia siempre la asignatura más exigente al inicio de la sesión,
@@ -1396,7 +1396,7 @@ export default function GeneradorHorariosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🔀</div>
+              <div className={styles.tipIcon} aria-hidden="true">🔀</div>
               <h4>Alterna asignaturas distintas</h4>
               <p>
                 Cambiar de materia entre sesiones reduce la fatiga mental y mejora
@@ -1405,7 +1405,7 @@ export default function GeneradorHorariosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🔁</div>
+              <div className={styles.tipIcon} aria-hidden="true">🔁</div>
               <h4>10 minutos de repaso inicial</h4>
               <p>
                 Comienza cada sesión repasando brevemente lo estudiado el día anterior.
@@ -1414,7 +1414,7 @@ export default function GeneradorHorariosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>😴</div>
+              <div className={styles.tipIcon} aria-hidden="true">😴</div>
               <h4>Duerme mínimo 7–8 horas</h4>
               <p>
                 El sueño es cuando el cerebro consolida la memoria. Dormir menos para
@@ -1423,7 +1423,7 @@ export default function GeneradorHorariosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>📆</div>
+              <div className={styles.tipIcon} aria-hidden="true">📆</div>
               <h4>Deja días libres para imprevistos</h4>
               <p>
                 Un horario sin margen es un horario que se incumple en la primera
@@ -1438,7 +1438,7 @@ export default function GeneradorHorariosPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores frecuentes que arruinan el horario de estudio</h3>
             </div>
             <ul className={styles.warningList}>

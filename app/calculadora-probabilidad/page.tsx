@@ -309,7 +309,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {!resultados ? (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>📐</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">📐</span>
               <p>Ingresa los valores para calcular</p>
             </div>
           ) : (
@@ -583,7 +583,7 @@ export default function CalculadoraProbabilidadPage() {
             <h2><span aria-hidden="true">👥</span> ¿Quién usa esta calculadora?</h2>
             <div className={styles.casosUsoGrid}>
               <div className={styles.casoCard}>
-                <div className={styles.casoIcon}>🎓</div>
+                <div className={styles.casoIcon} aria-hidden="true">🎓</div>
                 <div className={styles.casoTitle}>Estudiante de Bachillerato</div>
                 <div className={styles.casoSubtitle}>Preparando selectividad / EvAU</div>
                 <div className={styles.casoDesc}>
@@ -593,7 +593,7 @@ export default function CalculadoraProbabilidadPage() {
                 </div>
               </div>
               <div className={styles.casoCard}>
-                <div className={styles.casoIcon}>🏫</div>
+                <div className={styles.casoIcon} aria-hidden="true">🏫</div>
                 <div className={styles.casoTitle}>Estudiante Universitario</div>
                 <div className={styles.casoSubtitle}>Estadística, Matemáticas, Física</div>
                 <div className={styles.casoDesc}>
@@ -603,7 +603,7 @@ export default function CalculadoraProbabilidadPage() {
                 </div>
               </div>
               <div className={styles.casoCard}>
-                <div className={styles.casoIcon}>🎲</div>
+                <div className={styles.casoIcon} aria-hidden="true">🎲</div>
                 <div className={styles.casoTitle}>Aficionado a Juegos Estratégicos</div>
                 <div className={styles.casoSubtitle}>Póker, dados, loterías</div>
                 <div className={styles.casoDesc}>
@@ -613,7 +613,7 @@ export default function CalculadoraProbabilidadPage() {
                 </div>
               </div>
               <div className={styles.casoCard}>
-                <div className={styles.casoIcon}>💻</div>
+                <div className={styles.casoIcon} aria-hidden="true">💻</div>
                 <div className={styles.casoTitle}>Analista de Datos / ML</div>
                 <div className={styles.casoSubtitle}>Machine Learning y estadística aplicada</div>
                 <div className={styles.casoDesc}>
@@ -948,7 +948,7 @@ export default function CalculadoraProbabilidadPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🧮</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🧮</span>
                   <div>
                     <strong>Estudiante de ESO/Bachillerato</strong>
                     <p>Combinatoria y probabilidad clásica</p>
@@ -965,7 +965,7 @@ export default function CalculadoraProbabilidadPage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🩺</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🩺</span>
                   <div>
                     <strong>Médico o Profesional de la Salud</strong>
                     <p>Interpretación de tests diagnósticos</p>
@@ -982,7 +982,7 @@ export default function CalculadoraProbabilidadPage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏭</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏭</span>
                   <div>
                     <strong>Gestor de Riesgos</strong>
                     <p>Evaluación de fallos y fiabilidad</p>
@@ -999,7 +999,7 @@ export default function CalculadoraProbabilidadPage() {
 
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎰</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎰</span>
                   <div>
                     <strong>Aficionado a Juegos de Azar</strong>
                     <p>Entender la ventaja de la banca</p>
@@ -1147,32 +1147,32 @@ export default function CalculadoraProbabilidadPage() {
             <h2><span aria-hidden="true">💡</span> Mejores Prácticas: 6 Tips Accionables</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcon}>🌳</div>
+                <div className={styles.tipIcon} aria-hidden="true">🌳</div>
                 <strong>Usa diagramas de árbol para probabilidad compuesta</strong>
                 <p>Cuando hay varios pasos (extraer bolita, luego otra), dibuja el árbol de probabilidades. Las ramas representan resultados y sus etiquetas son probabilidades. La probabilidad de un camino completo es el producto de sus ramas: P(rojo, luego azul) = P(rojo) × P(azul|rojo).</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcon}>📊</div>
+                <div className={styles.tipIcon} aria-hidden="true">📊</div>
                 <strong>Construye tablas de contingencia para Bayes</strong>
                 <p>Antes de aplicar Bayes, construye una tabla 2×2 con valores absolutos (no porcentajes). Con población hipotética de 10.000 personas: enfermedad presente/ausente × test positivo/negativo. Esto hace visible el número de falsos positivos y facilita el cálculo mental.</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcon}>✅</div>
+                <div className={styles.tipIcon} aria-hidden="true">✅</div>
                 <strong>Verifica siempre que las probabilidades sumen 1</strong>
                 <p>Después de calcular todas las probabilidades de un espacio muestral, su suma debe ser exactamente 1. Si no, hay un error en el modelo. Ejemplo binomial: Σ P(X=k) para k de 0 a n siempre da 1. Es la prueba de coherencia básica de cualquier modelo probabilístico.</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcon}>🔄</div>
+                <div className={styles.tipIcon} aria-hidden="true">🔄</div>
                 <strong>Usa el complementario para simplificar</strong>
                 <p>P(al menos 1 éxito en n ensayos) = 1 − P(ningún éxito) = 1 − (1−p)ⁿ. Casi siempre es más sencillo calcular el complementario. Ejemplo: P(al menos un 6 en 4 lanzamientos) = 1 − (5/6)⁴ ≈ 1 − 0,482 = 0,518 (51,8%).</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcon}>🔢</div>
+                <div className={styles.tipIcon} aria-hidden="true">🔢</div>
                 <strong>Verifica la independencia antes de multiplicar</strong>
                 <p>P(A∩B) = P(A) × P(B) solo si A y B son independientes. Con extracción sin reposición, la segunda probabilidad cambia: extraer 2 ases de 52 cartas → P = (4/52) × (3/51) = 12/2652 ≈ 0,45%. No uses (4/52)² ya que los eventos son dependientes.</p>
               </div>
               <div className={styles.tipCard}>
-                <div className={styles.tipIcon}>📐</div>
+                <div className={styles.tipIcon} aria-hidden="true">📐</div>
                 <strong>Redondea al final, no en pasos intermedios</strong>
                 <p>En cálculos con múltiples pasos (Bayes, binomial acumulada), mantén todos los decimales hasta el resultado final. Redondear en cada paso acumula error. Ejemplo: P(A∩B) = 0,95 × 0,01 = 0,0095 (no 0,01 redondeado), luego calcular el denominador completo y redondear solo al presentar el resultado.</p>
               </div>
@@ -1184,7 +1184,7 @@ export default function CalculadoraProbabilidadPage() {
             <h2><span aria-hidden="true">⚠️</span> Errores Clásicos que Debes Evitar</h2>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>🚨</span>
+                <span className={styles.warningIcon} aria-hidden="true">🚨</span>
                 <strong>6 errores frecuentes en cálculo de probabilidades</strong>
               </div>
               <ul className={styles.warningList}>

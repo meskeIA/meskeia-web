@@ -427,28 +427,28 @@ export default function VisualizadorRecursosLiterariosPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>📖</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">📖</span>
                   <h4>Estudiante de ESO</h4>
                 </div>
                 <p>Repasa las 10 figuras básicas (metáfora, símil, hipérbole, personificación, anáfora, antítesis, ironía, epíteto, aliteración, hipérbaton) antes de un examen de Lengua y Literatura.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🎓</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🎓</span>
                   <h4>Estudiante de Bachillerato</h4>
                 </div>
                 <p>Amplía con las 10 figuras de nivel intermedio (oxímoron, paradoja, gradación, elipsis, polisíndeton, asíndeton, eufemismo, perífrasis, metonimia, sinécdoque) para el comentario de texto.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>🏆</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">🏆</span>
                   <h4>Preparando Selectividad</h4>
                 </div>
                 <p>Domina las 7 figuras avanzadas (alegoría, apóstrofe, lítotes, quiasmo, paronomasia, zeugma) y repasa los pares confundidos que más aparecen en los exámenes.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcono}>✍️</span>
+                  <span className={styles.escenarioIcono} aria-hidden="true">✍️</span>
                   <h4>Escritor o creador</h4>
                 </div>
                 <p>Usa las figuras de forma deliberada en tus textos: saber qué efecto produce cada una (ritmo, contraste, imagen) permite elegir la figura adecuada para cada momento.</p>
@@ -528,32 +528,32 @@ export default function VisualizadorRecursosLiterariosPage() {
             <h3>Claves para el comentario de texto</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🎯</span>
+                <span className={styles.tipIcono} aria-hidden="true">🎯</span>
                 <h4>Nombra y explica</h4>
                 <p>En el examen no basta con decir "hay una metáfora": explica qué compara, qué término real sustituye y qué efecto produce en el lector.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>📍</span>
+                <span className={styles.tipIcono} aria-hidden="true">📍</span>
                 <h4>Ubica en el texto</h4>
                 <p>Cita el fragmento exacto donde aparece la figura antes de analizarla. Los correctores necesitan saber a qué parte del texto te refieres.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🔗</span>
+                <span className={styles.tipIcono} aria-hidden="true">🔗</span>
                 <h4>Relaciona con el tema</h4>
                 <p>Las mejores respuestas conectan la figura con el tema o la intención del autor. Una hipérbole en un poema de amor intensifica el sentimiento central.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>⚡</span>
+                <span className={styles.tipIcono} aria-hidden="true">⚡</span>
                 <h4>Agrupa por función</h4>
                 <p>Si hay varias figuras del mismo grupo (imagen, repetición, contraste), analízalas juntas: "el autor usa recursos de repetición (anáfora y aliteración) para crear musicalidad".</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>🧩</span>
+                <span className={styles.tipIcono} aria-hidden="true">🧩</span>
                 <h4>Aprende el mecanismo, no la definición</h4>
                 <p>Lo importante no es memorizar la definición de diccionario sino entender el mecanismo: ¿qué hace exactamente esta figura con las palabras o las ideas?</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcono}>📚</span>
+                <span className={styles.tipIcono} aria-hidden="true">📚</span>
                 <h4>Lee poesía en voz alta</h4>
                 <p>Muchas figuras (aliteración, anáfora, gradación) se detectan más fácilmente oyendo el texto que leyéndolo en silencio. Leer en voz alta activa el oído retórico.</p>
               </div>
@@ -562,7 +562,7 @@ export default function VisualizadorRecursosLiterariosPage() {
             {/* Warning Box */}
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcono}>⚠️</span>
+                <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
                 <h4>Errores frecuentes en el examen</h4>
               </div>
               <ul className={styles.warningList}>

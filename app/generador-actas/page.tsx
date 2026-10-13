@@ -315,7 +315,7 @@ export default function GeneradorActasPage() {
 
       {/* Hero Section - Solo visible en pantalla */}
       <header className={`${styles.hero} ${styles.noPrint}`}>
-        <span className={styles.heroIcon}>📋</span>
+        <span className={styles.heroIcon} aria-hidden="true">📋</span>
         <h1 className={styles.title}>Generador de Actas de Reunión</h1>
         <p className={styles.subtitle}>
           Crea actas profesionales con plantillas predefinidas, gestión de asistentes y seguimiento de tareas
@@ -370,7 +370,7 @@ export default function GeneradorActasPage() {
                     <button type="button" onClick={() => loadDraft(draft)} className={styles.btnSmall}>
                       Cargar
                     </button>
-                    <button type="button" onClick={() => deleteDraft(draft.id)} className={styles.btnSmallDanger}>
+                    <button type="button" onClick={() => deleteDraft(draft.id)} className={styles.btnSmallDanger} aria-label="Eliminar borrador" title="Eliminar borrador">
                       🗑️
                     </button>
                   </div>
@@ -565,7 +565,7 @@ export default function GeneradorActasPage() {
 
             {acta.asistentes.length === 0 ? (
               <div className={styles.emptyState}>
-                <span className={styles.emptyIcon}>👤</span>
+                <span className={styles.emptyIcon} aria-hidden="true">👤</span>
                 <p>No hay asistentes añadidos</p>
                 <button type="button" onClick={addAsistente} className={styles.btnPrimary}>
                   Añadir primer asistente
@@ -599,7 +599,8 @@ export default function GeneradorActasPage() {
                           className={styles.checkbox}
                         />
                         <span className={asistente.presente ? styles.presente : styles.ausente}>
-                          {asistente.presente ? '✅ Presente' : '❌ Ausente'}
+                          <span aria-hidden="true">{asistente.presente ? '✅' : '❌'}</span>{' '}
+                          {asistente.presente ? 'Presente' : 'Ausente'}
                         </span>
                       </label>
                     </div>
@@ -608,6 +609,7 @@ export default function GeneradorActasPage() {
                       onClick={() => removeAsistente(asistente.id)}
                       className={styles.btnRemove}
                       title="Eliminar asistente"
+                      aria-label="Eliminar asistente"
                     >
                       🗑️
                     </button>
@@ -643,7 +645,7 @@ export default function GeneradorActasPage() {
 
             {acta.puntosOrdenDia.length === 0 ? (
               <div className={styles.emptyState}>
-                <span className={styles.emptyIcon}>📝</span>
+                <span className={styles.emptyIcon} aria-hidden="true">📝</span>
                 <p>No hay puntos en el orden del día</p>
                 <button type="button" onClick={addPuntoOrdenDia} className={styles.btnPrimary}>
                   Añadir primer punto
@@ -660,6 +662,7 @@ export default function GeneradorActasPage() {
                         onClick={() => removePuntoOrdenDia(punto.id)}
                         className={styles.btnRemove}
                         title="Eliminar punto"
+                        aria-label="Eliminar punto"
                       >
                         🗑️
                       </button>
@@ -738,7 +741,7 @@ export default function GeneradorActasPage() {
 
             {acta.tareas.length === 0 ? (
               <div className={styles.emptyState}>
-                <span className={styles.emptyIcon}>✅</span>
+                <span className={styles.emptyIcon} aria-hidden="true">✅</span>
                 <p>No hay tareas asignadas</p>
                 <button type="button" onClick={addTarea} className={styles.btnPrimary}>
                   Añadir primera tarea
@@ -755,6 +758,7 @@ export default function GeneradorActasPage() {
                         onClick={() => removeTarea(tarea.id)}
                         className={styles.btnRemove}
                         title="Eliminar tarea"
+                        aria-label="Eliminar tarea"
                       >
                         🗑️
                       </button>
@@ -797,9 +801,9 @@ export default function GeneradorActasPage() {
                             onChange={(e) => updateTarea(tarea.id, 'prioridad', e.target.value)}
                             className={styles.select}
                           >
-                            <option value="alta">🔴 Alta</option>
-                            <option value="media">🟡 Media</option>
-                            <option value="baja">🟢 Baja</option>
+                            <option value="alta">Alta</option>
+                            <option value="media">Media</option>
+                            <option value="baja">Baja</option>
                           </select>
                         </div>
                       </div>
@@ -862,7 +866,7 @@ export default function GeneradorActasPage() {
               {/* Cabecera del acta */}
               <header className={styles.actaHeader}>
                 <div className={styles.actaLogo}>
-                  <span className={styles.actaLogoIcon}>{currentTemplate.icon}</span>
+                  <span className={styles.actaLogoIcon} aria-hidden="true">{currentTemplate.icon}</span>
                 </div>
                 <h1 className={styles.actaTitle}>
                   {acta.titulo || `Acta de ${currentTemplate.nombre}`}
@@ -923,7 +927,8 @@ export default function GeneradorActasPage() {
                           <td>{asistente.nombre || '-'}</td>
                           <td>{asistente.cargo || '-'}</td>
                           <td className={asistente.presente ? styles.presente : styles.ausente}>
-                            {asistente.presente ? '✅ Presente' : '❌ Ausente'}
+                            <span aria-hidden="true">{asistente.presente ? '✅' : '❌'}</span>{' '}
+                            {asistente.presente ? 'Presente' : 'Ausente'}
                           </td>
                         </tr>
                       ))}
@@ -981,7 +986,8 @@ export default function GeneradorActasPage() {
                           <td>{tarea.responsable || '-'}</td>
                           <td>{tarea.fechaLimite ? formatDate(tarea.fechaLimite) : '-'}</td>
                           <td className={styles[`prioridad${tarea.prioridad.charAt(0).toUpperCase() + tarea.prioridad.slice(1)}`]}>
-                            {tarea.prioridad === 'alta' ? '🔴 Alta' : tarea.prioridad === 'media' ? '🟡 Media' : '🟢 Baja'}
+                            <span aria-hidden="true">{tarea.prioridad === 'alta' ? '🔴' : tarea.prioridad === 'media' ? '🟡' : '🟢'}</span>{' '}
+                            {tarea.prioridad === 'alta' ? 'Alta' : tarea.prioridad === 'media' ? 'Media' : 'Baja'}
                           </td>
                         </tr>
                       ))}
@@ -1049,22 +1055,22 @@ export default function GeneradorActasPage() {
 
           <div className={styles.benefitsGrid}>
             <div className={styles.benefitCard}>
-              <span className={styles.benefitIcon}>📋</span>
+              <span className={styles.benefitIcon} aria-hidden="true">📋</span>
               <h4>Registro Oficial</h4>
               <p>Documenta formalmente lo acordado para futuras referencias y seguimiento.</p>
             </div>
             <div className={styles.benefitCard}>
-              <span className={styles.benefitIcon}>✅</span>
+              <span className={styles.benefitIcon} aria-hidden="true">✅</span>
               <h4>Seguimiento de Tareas</h4>
               <p>Permite dar seguimiento a las acciones asignadas con responsables y plazos.</p>
             </div>
             <div className={styles.benefitCard}>
-              <span className={styles.benefitIcon}>🤝</span>
+              <span className={styles.benefitIcon} aria-hidden="true">🤝</span>
               <h4>Compromiso</h4>
               <p>Genera compromiso al dejar por escrito las responsabilidades de cada participante.</p>
             </div>
             <div className={styles.benefitCard}>
-              <span className={styles.benefitIcon}>📊</span>
+              <span className={styles.benefitIcon} aria-hidden="true">📊</span>
               <h4>Transparencia</h4>
               <p>Mantiene informados a quienes no pudieron asistir sobre lo tratado.</p>
             </div>
@@ -1217,7 +1223,7 @@ export default function GeneradorActasPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👥</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👥</span>
                 <h3>Equipo de proyecto interno</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -1231,7 +1237,7 @@ export default function GeneradorActasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏘️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏘️</span>
                 <h3>Comunidad de propietarios</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -1245,7 +1251,7 @@ export default function GeneradorActasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h3>Pyme con consejo de administración</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -1260,7 +1266,7 @@ export default function GeneradorActasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🤝</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🤝</span>
                 <h3>ONG y asociaciones</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -1447,7 +1453,7 @@ export default function GeneradorActasPage() {
           <h2>6 Mejores Prácticas para Actas Profesionales</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏱️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <h4>Redacta en tiempo real</h4>
               <p>
                 Toma notas durante la reunión, no horas después. Los detalles se olvidan rápidamente
@@ -1455,7 +1461,7 @@ export default function GeneradorActasPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h4>Solo acuerdos, no transcripciones</h4>
               <p>
                 El acta recoge decisiones y acuerdos, no una transcripción literal del debate.
@@ -1463,7 +1469,7 @@ export default function GeneradorActasPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <h4>Cabecera completa siempre</h4>
               <p>
                 Incluye sin excepción: fecha, hora de inicio y fin, lugar o plataforma virtual,
@@ -1472,7 +1478,7 @@ export default function GeneradorActasPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <h4>Numera los acuerdos</h4>
               <p>
                 Numera cada acuerdo correlativamente dentro del acta y usa una numeración anual para
@@ -1481,7 +1487,7 @@ export default function GeneradorActasPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📤</span>
+              <span className={styles.tipIcon} aria-hidden="true">📤</span>
               <h4>Borrador en menos de 24 horas</h4>
               <p>
                 Envía un borrador del acta a los asistentes dentro de las 24 horas siguientes a la
@@ -1490,7 +1496,7 @@ export default function GeneradorActasPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔒</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔒</span>
               <h4>Archiva con firma digital</h4>
               <p>
                 Guarda las actas en PDF/A con firma electrónica cualificada. Este formato garantiza
@@ -1504,7 +1510,7 @@ export default function GeneradorActasPage() {
         {/* ── SECCIÓN 6: Warning Box — Errores Comunes ── */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>6 Errores que Pueden Invalidar tu Acta</h3>
           </div>
           <ul className={styles.warningList}>

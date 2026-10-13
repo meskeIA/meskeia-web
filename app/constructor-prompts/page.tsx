@@ -247,7 +247,7 @@ export default function ConstructorPrompts() {
       <main className={styles.main}>
         {/* Indicador de pasos */}
         <nav className={styles.pasoNav} aria-label="Progreso del constructor">
-          {([1, 2, 3, 4, 5, 6] as Paso[]).map((n) => (
+          {([1, 2, 3, 4, 5, 6] as Paso[]).map((n) => ( // a11y-ok: indicador de pasos, ya lleva aria-current="step"; aria-pressed sería incorrecto
             <button
               key={n}
               type="button"

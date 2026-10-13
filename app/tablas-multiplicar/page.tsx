@@ -243,7 +243,7 @@ export default function TablasMultiplicarPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>✖️</span>
+        <span className={styles.heroIcon} aria-hidden="true">✖️</span>
         <h1 className={styles.title}>Entrenador Tablas de Multiplicar</h1>
         <p className={styles.subtitle}>
           ¡Aprende las tablas de multiplicar jugando! Gana puntos, consigue rachas y colecciona medallas.
@@ -273,9 +273,9 @@ export default function TablasMultiplicarPage() {
               </div>
             </div>
             <div className={styles.medalsRow}>
-              <span className={styles.medalBadge}>🥇 {estadisticas.medallasOro}</span>
-              <span className={styles.medalBadge}>🥈 {estadisticas.medallasPlata}</span>
-              <span className={styles.medalBadge}>🥉 {estadisticas.medallasBronce}</span>
+              <span className={styles.medalBadge}><span aria-hidden="true">🥇</span><span className="sr-only">Medallas de oro:</span> {estadisticas.medallasOro}</span>
+              <span className={styles.medalBadge}><span aria-hidden="true">🥈</span><span className="sr-only">Medallas de plata:</span> {estadisticas.medallasPlata}</span>
+              <span className={styles.medalBadge}><span aria-hidden="true">🥉</span><span className="sr-only">Medallas de bronce:</span> {estadisticas.medallasBronce}</span>
             </div>
           </div>
 
@@ -362,7 +362,7 @@ export default function TablasMultiplicarPage() {
 
           {/* Timer */}
           <div className={`${styles.timer} ${tiempoRestante <= 3 ? styles.timerUrgent : ''}`}>
-            ⏱️ {tiempoRestante}s
+            <span aria-hidden="true">⏱️</span> {tiempoRestante}s
           </div>
 
           {/* Pregunta */}
@@ -426,7 +426,7 @@ export default function TablasMultiplicarPage() {
               </>
             ) : (
               <>
-                <span className={styles.resultMedal}>💪</span>
+                <span className={styles.resultMedal} aria-hidden="true">💪</span>
                 <h2 className={styles.resultTitle}>¡Sigue practicando!</h2>
               </>
             )}
@@ -514,7 +514,7 @@ export default function TablasMultiplicarPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores Comunes al Aprender las Tablas de Multiplicar</h3>
           </div>
           <ul className={styles.warningList}>

@@ -294,6 +294,7 @@ export default function VisualizadorTerremotosTsunamis() {
                     <text x="95" y="170" textAnchor="middle" fill="white" fontSize="13" fontWeight="600">Bloque superior</text>
                     <text x="295" y="170" textAnchor="middle" fill="white" fontSize="13" fontWeight="600">Bloque inferior</text>
                     <text x="215" y="35" fill="#D62839" fontSize="11" fontWeight="bold">Plano de falla</text>
+                    {/* a11y-ok: <text> de un <svg> que ya es aria-hidden entero; ahí no cabe <span> */}
                     <text x="30" y="85" fill="#650000" fontSize="11">⚠ Máx. energía</text>
                   </svg>
                 )}
