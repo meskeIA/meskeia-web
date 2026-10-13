@@ -381,7 +381,7 @@ export default function ConversorTextoPage() {
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">📋</span>
                 <h4>Copiar al portapapeles</h4>
-                <p>El botón &quot;📋 Copiar&quot; copia el resultado directamente al portapapeles del sistema. No necesitas seleccionar el texto manualmente. Funciona en todos los navegadores modernos sobre HTTPS.</p>
+                <p>El botón &quot;<span aria-hidden="true">📋</span> Copiar&quot; copia el resultado directamente al portapapeles del sistema. No necesitas seleccionar el texto manualmente. Funciona en todos los navegadores modernos sobre HTTPS.</p>
               </div>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">🔤</span>

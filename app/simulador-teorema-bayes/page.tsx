@@ -676,31 +676,31 @@ export default function SimuladorTeoremaBayesPage() {
             <div className={styles.faqItem}>
               <h4>¿Cómo es posible que un test del 99% acierte poco?</h4>
               <p>Porque cuando la <strong>prevalencia es muy baja</strong>, los falsos positivos arrasan. Si tienes 1 enfermo en 10000 sanos (prev 0,01 %) y un test 99 % preciso, te dará ~100 falsos positivos por cada verdadero positivo: VPP ≈ 1 %. El test &quot;funciona bien&quot;, pero un positivo aislado significa muy poco.</p>
-              <p className={styles.faqTip}>💡 En el simulador, fija sensibilidad = 99 % y especificidad = 99 %, baja la prevalencia y mira cómo se desploma el VPP.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, fija sensibilidad = 99 % y especificidad = 99 %, baja la prevalencia y mira cómo se desploma el VPP.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Sensibilidad o especificidad: cuál es más importante?</h4>
               <p>Depende del contexto. <strong>Sensibilidad alta</strong> es crucial cuando NO querer perder ningún caso es prioritario (cribado oncológico, COVID en pico). <strong>Especificidad alta</strong> es crucial cuando un falso positivo causa daño (biopsia innecesaria, alarma de drogas en deportistas). El equilibrio depende del coste de cada error.</p>
-              <p className={styles.faqTip}>💡 Curva ROC: la herramienta para visualizar el trade-off sensibilidad ↔ especificidad al variar el umbral.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Curva ROC: la herramienta para visualizar el trade-off sensibilidad ↔ especificidad al variar el umbral.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Qué es la falacia del fiscal?</h4>
               <p>Confundir <strong>P(evidencia|inocente)</strong> con <strong>P(inocente|evidencia)</strong>. Si una prueba ADN tiene tasa de coincidencia 1 entre 1 millón en inocentes, y hay 30 millones de inocentes potenciales, podrías esperar ~30 coincidencias inocentes. La probabilidad de que el sospechoso concreto sea inocente NO es 1 entre 1 millón. Bayes lo corrige.</p>
-              <p className={styles.faqTip}>💡 Casos famosos como Sally Clark (UK) o el de Lucia de Berk (NL) tuvieron condenas con esta falacia que después fueron anuladas.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Casos famosos como Sally Clark (UK) o el de Lucia de Berk (NL) tuvieron condenas con esta falacia que después fueron anuladas.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Por qué se hacen tests de confirmación tras un positivo?</h4>
               <p>Porque dos tests independientes con el mismo positivo elevan muchísimo el VPP combinado. Si un primer test da 50 % VPP, hacer un segundo test independiente del 95 % de especificidad eleva el VPP combinado por encima del 95 %. Es Bayes aplicado iterativamente: el primer positivo es el nuevo prior del segundo test.</p>
-              <p className={styles.faqTip}>💡 Por eso un test rápido COVID positivo se confirmaba con PCR antes de tomar decisiones clínicas.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Por eso un test rápido COVID positivo se confirmaba con PCR antes de tomar decisiones clínicas.</p>
             </div>
 
             <div className={styles.faqItem}>
               <h4>¿Estadística clásica (frecuentista) vs bayesiana?</h4>
               <p>Frecuentista: probabilidad como frecuencia a largo plazo, no admite probabilidades sobre hipótesis. Bayesiana: probabilidad como grado de creencia, sí admite P(hipótesis). Bayes permite actualizar creencias con nueva evidencia (prior → posterior). Hoy se complementan; el debate filosófico está prácticamente cerrado.</p>
-              <p className={styles.faqTip}>💡 La inferencia bayesiana ha resurgido enormemente con la potencia de cálculo moderna (MCMC, computación). Stan, PyMC, brms son frameworks populares.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La inferencia bayesiana ha resurgido enormemente con la potencia de cálculo moderna (MCMC, computación). Stan, PyMC, brms son frameworks populares.</p>
             </div>
           </div>
         </section>

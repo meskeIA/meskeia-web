@@ -869,7 +869,7 @@ export default function GeneradorHorariosPage() {
           {/* Próximas entregas */}
           {entregasProximas.length > 0 && (
             <div className={styles.proximasSection}>
-              <h3 className={styles.subsectionTitle}>⏰ Próximas entregas</h3>
+              <h3 className={styles.subsectionTitle}><span aria-hidden="true">⏰</span> Próximas entregas</h3>
               <div className={styles.entregasList}>
                 {entregasProximas.map(entrega => {
                   const dias = diasHastaEntrega(entrega.fechaEntrega);
@@ -933,7 +933,7 @@ export default function GeneradorHorariosPage() {
 
           {/* Todas las entregas */}
           <div className={styles.todasSection}>
-            <h3 className={styles.subsectionTitle}>📋 Todas las entregas</h3>
+            <h3 className={styles.subsectionTitle}><span aria-hidden="true">📋</span> Todas las entregas</h3>
 
             {entregas.length === 0 ? (
               <div className={styles.emptyState}>
@@ -1029,28 +1029,28 @@ export default function GeneradorHorariosPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🍅 Técnica Pomodoro</h4>
+              <h4><span aria-hidden="true">🍅</span> Técnica Pomodoro</h4>
               <p>
                 Estudia en bloques de 25 minutos con descansos de 5 minutos.
                 Cada 4 pomodoros, toma un descanso más largo de 15-30 minutos.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📊 Prioriza por urgencia</h4>
+              <h4><span aria-hidden="true">📊</span> Prioriza por urgencia</h4>
               <p>
                 Usa la sección de entregas para identificar qué es más urgente.
                 Dedica más tiempo a las asignaturas con exámenes próximos.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🔄 Intercala materias</h4>
+              <h4><span aria-hidden="true">🔄</span> Intercala materias</h4>
               <p>
                 Alterna entre diferentes asignaturas para mejorar la retención
                 y evitar la fatiga mental de una sola materia.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📅 Planifica con antelación</h4>
+              <h4><span aria-hidden="true">📅</span> Planifica con antelación</h4>
               <p>
                 Registra todos tus exámenes y trabajos en cuanto los conozcas.
                 Así podrás ajustar tu horario de estudio según las fechas.

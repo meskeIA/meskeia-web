@@ -342,19 +342,19 @@ export default function TokenizadorIa() {
         </h4>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>💬 Conversación cotidiana</strong>
+            <strong><span aria-hidden="true">💬</span> Conversación cotidiana</strong>
             <p>50-300 tokens por turno. Con historial de 10 mensajes: 500-3.000 tokens. Cualquier modelo lo gestiona sin problema.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📄 Análisis de documento</strong>
+            <strong><span aria-hidden="true">📄</span> Análisis de documento</strong>
             <p>Un contrato de 10 páginas ≈ 6.000-8.000 tokens. Un informe de 50 páginas ≈ 30.000-40.000 tokens.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>💻 Generación de código</strong>
+            <strong><span aria-hidden="true">💻</span> Generación de código</strong>
             <p>1 función de 50 líneas ≈ 250-750 tokens. El output de código suele superar al input.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🏢 Escala empresarial</strong>
+            <strong><span aria-hidden="true">🏢</span> Escala empresarial</strong>
             <p>1.000 conv./día × 500 tokens = 500K tokens/día. Con GPT-4o mini: ~$0,075/día = ~$27/año.</p>
           </div>
         </div>

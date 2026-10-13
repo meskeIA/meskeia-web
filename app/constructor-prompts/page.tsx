@@ -695,19 +695,19 @@ export default function ConstructorPrompts() {
         </h4>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🎓 Estudiante</strong>
+            <strong><span aria-hidden="true">🎓</span> Estudiante</strong>
             <p>Explicación de conceptos, resúmenes de apuntes, preparación de exámenes con preguntas de práctica.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>💼 Profesional independiente</strong>
+            <strong><span aria-hidden="true">💼</span> Profesional independiente</strong>
             <p>Propuestas comerciales, emails a clientes, análisis de contratos y generación de contenido para redes.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>⚙️ Desarrollador</strong>
+            <strong><span aria-hidden="true">⚙️</span> Desarrollador</strong>
             <p>Depuración de código, revisión de arquitectura, documentación técnica y explicación de errores.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🏢 Equipo empresarial</strong>
+            <strong><span aria-hidden="true">🏢</span> Equipo empresarial</strong>
             <p>Informes ejecutivos, actas de reuniones, traducciones y adaptación de comunicaciones internas.</p>
           </div>
         </div>

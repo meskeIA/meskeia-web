@@ -658,7 +658,7 @@ export default function VisualizadorHigado() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🫀 Visualizador del Hígado</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🫀</span> Visualizador del Hígado</h1>
         <p className={styles.subtitle}>El laboratorio del cuerpo: detoxificación, metabolismo y síntesis</p>
       </header>
 

@@ -174,7 +174,7 @@ export default function CalculadoraProbabilidadPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🎲 Calculadora de Probabilidad</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🎲</span> Calculadora de Probabilidad</h1>
         <p className={styles.subtitle}>
           Calcula probabilidades, combinaciones, permutaciones y distribuciones estadísticas
         </p>
@@ -520,7 +520,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* Tabla comparativa */}
           <section className={styles.guideSection}>
-            <h2>📊 Comparativa de los 6 Tipos de Cálculo</h2>
+            <h2><span aria-hidden="true">📊</span> Comparativa de los 6 Tipos de Cálculo</h2>
             <table className={styles.tablaComparativa}>
               <thead>
                 <tr>
@@ -580,7 +580,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* Casos de uso */}
           <section className={styles.guideSection}>
-            <h2>👥 ¿Quién usa esta calculadora?</h2>
+            <h2><span aria-hidden="true">👥</span> ¿Quién usa esta calculadora?</h2>
             <div className={styles.casosUsoGrid}>
               <div className={styles.casoCard}>
                 <div className={styles.casoIcon}>🎓</div>
@@ -627,7 +627,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* FAQ */}
           <section className={styles.guideSection}>
-            <h2>❓ Preguntas Frecuentes sobre Probabilidad</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Probabilidad</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <div className={styles.faqPregunta}>¿Cuándo uso combinaciones y cuándo permutaciones?</div>
@@ -705,7 +705,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* Guía paso a paso */}
           <section className={styles.guideSection}>
-            <h2>🗺️ Cómo resolver cualquier problema de probabilidad: 6 pasos</h2>
+            <h2><span aria-hidden="true">🗺️</span> Cómo resolver cualquier problema de probabilidad: 6 pasos</h2>
             <ol className={styles.pasosList}>
               <li className={styles.paso}>
                 <span className={styles.pasoNum}>1</span>
@@ -779,10 +779,10 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* Tips y Errores */}
           <section className={styles.guideSection}>
-            <h2>💡 Tips y Errores Frecuentes</h2>
+            <h2><span aria-hidden="true">💡</span> Tips y Errores Frecuentes</h2>
             <div className={styles.tipsErrorsSection}>
               <div className={styles.tipsColumn}>
-                <div className={styles.tipsHeader}>✅ Tips de Experto</div>
+                <div className={styles.tipsHeader}><span aria-hidden="true">✅</span> Tips de Experto</div>
                 <div className={styles.tipItem}>
                   Usa el complemento para simplificar: P(&ldquo;al menos 1&rdquo;) = 1 - P(&ldquo;ninguno&rdquo;).
                   Casi siempre es más fácil calcular el complemento.
@@ -809,7 +809,7 @@ export default function CalculadoraProbabilidadPage() {
                 </div>
               </div>
               <div className={styles.tipsColumn}>
-                <div className={styles.errorsHeader}>❌ Errores Frecuentes</div>
+                <div className={styles.errorsHeader}><span aria-hidden="true">❌</span> Errores Frecuentes</div>
                 <div className={styles.errorItem}>
                   Confundir &ldquo;y&rdquo; con &ldquo;o&rdquo;: P(A y B) = P(A∩B) ≠ P(A∪B) = P(A o B).
                   Son operaciones completamente distintas.
@@ -840,7 +840,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* Conceptos fundamentales (mantenido) */}
           <section className={styles.guideSection}>
-            <h2>📖 Conceptos Fundamentales</h2>
+            <h2><span aria-hidden="true">📖</span> Conceptos Fundamentales</h2>
             <p className={styles.introParagraph}>
               La probabilidad es la rama de las matemáticas que estudia la posibilidad de que ocurran eventos.
               Se expresa como un número entre 0 (imposible) y 1 (seguro), o como porcentaje entre 0% y 100%.
@@ -893,7 +893,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* SECCIÓN 1 — Tabla Comparativa: Enfoques de Probabilidad */}
           <section className={styles.guideSection}>
-            <h2>📐 Enfoques de la Probabilidad: Tabla Comparativa</h2>
+            <h2><span aria-hidden="true">📐</span> Enfoques de la Probabilidad: Tabla Comparativa</h2>
             <p className={styles.introParagraph}>
               Existen cuatro grandes enfoques para definir y calcular probabilidades. Cada uno se aplica en contextos distintos y parte de supuestos diferentes.
             </p>
@@ -944,7 +944,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* SECCIÓN 2 — Casos de Uso por Perfil */}
           <section className={styles.guideSection}>
-            <h2>👤 Quién Usa la Probabilidad: 4 Perfiles Reales</h2>
+            <h2><span aria-hidden="true">👤</span> Quién Usa la Probabilidad: 4 Perfiles Reales</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
@@ -1018,7 +1018,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* SECCIÓN 3 — FAQ Profesional */}
           <section className={styles.guideSection}>
-            <h2>❓ Preguntas Frecuentes: Probabilidad en Profundidad</h2>
+            <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes: Probabilidad en Profundidad</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <div className={styles.faqPregunta}>¿Qué diferencia hay entre probabilidad y estadística?</div>
@@ -1088,7 +1088,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* SECCIÓN 4 — Guía Paso a Paso (7 pasos) */}
           <section className={styles.guideSection}>
-            <h2>🗺️ Cómo Resolver Cualquier Problema de Probabilidad: 7 Pasos</h2>
+            <h2><span aria-hidden="true">🗺️</span> Cómo Resolver Cualquier Problema de Probabilidad: 7 Pasos</h2>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <div className={styles.stepNumber}>1</div>
@@ -1144,7 +1144,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* SECCIÓN 5 — Mejores Prácticas */}
           <section className={styles.guideSection}>
-            <h2>💡 Mejores Prácticas: 6 Tips Accionables</h2>
+            <h2><span aria-hidden="true">💡</span> Mejores Prácticas: 6 Tips Accionables</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
                 <div className={styles.tipIcon}>🌳</div>
@@ -1181,7 +1181,7 @@ export default function CalculadoraProbabilidadPage() {
 
           {/* SECCIÓN 6 — Warning Box: Errores Clásicos */}
           <section className={styles.guideSection}>
-            <h2>⚠️ Errores Clásicos que Debes Evitar</h2>
+            <h2><span aria-hidden="true">⚠️</span> Errores Clásicos que Debes Evitar</h2>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
                 <span className={styles.warningIcon}>🚨</span>

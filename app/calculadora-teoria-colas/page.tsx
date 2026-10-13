@@ -368,7 +368,7 @@ RESULTADOS DE SIMULACIÓN
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📊 Calculadora Teoría de Colas M/M/1</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📊</span> Calculadora Teoría de Colas M/M/1</h1>
         <p className={styles.subtitle}>
           Analiza sistemas de espera con métricas completas: utilización, longitud de cola y tiempos de espera
         </p>
@@ -436,12 +436,12 @@ RESULTADOS DE SIMULACIÓN
           <div className={metricas.estable ? styles.alertSuccess : styles.alertDanger}>
             {metricas.estable ? (
               <>
-                <strong>✅ Sistema Estable</strong>
+                <strong><span aria-hidden="true">✅</span> Sistema Estable</strong>
                 <p>La utilización (ρ = {formatNumber(metricas.rho * 100, 2)}%) es menor al 100%. El sistema puede manejar la carga.</p>
               </>
             ) : (
               <>
-                <strong>⚠️ Sistema Inestable</strong>
+                <strong><span aria-hidden="true">⚠️</span> Sistema Inestable</strong>
                 <p>La utilización (ρ = {formatNumber(metricas.rho * 100, 2)}%) es igual o mayor al 100%. La cola crecerá indefinidamente.</p>
               </>
             )}
@@ -506,7 +506,7 @@ RESULTADOS DE SIMULACIÓN
           {/* Interpretación */}
           {metricas.estable && (
             <div className={styles.interpretacion}>
-              <h3>📋 Interpretación de Resultados</h3>
+              <h3><span aria-hidden="true">📋</span> Interpretación de Resultados</h3>
               <ul>
                 <li>El servidor está ocupado el <strong>{formatNumber(metricas.rho * 100, 1)}%</strong> del tiempo.</li>
                 <li>En promedio hay <strong>{formatNumber(metricas.L, 1)}</strong> cliente(s) en el sistema.</li>
@@ -537,7 +537,7 @@ RESULTADOS DE SIMULACIÓN
       {/* Resultados de simulación */}
       {estadisticasSimulacion && (
         <div className={styles.simulacionSection}>
-          <h2 className={styles.panelTitle}>🎲 Resultados de Simulación</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">🎲</span> Resultados de Simulación</h2>
 
           <div className={styles.simulacionStats}>
             <div className={styles.statItem}>
@@ -617,7 +617,7 @@ RESULTADOS DE SIMULACIÓN
 
           <div className={styles.conceptGrid}>
             <div className={styles.conceptCard}>
-              <h4>🔤 Notación de Kendall</h4>
+              <h4><span aria-hidden="true">🔤</span> Notación de Kendall</h4>
               <p>
                 Los sistemas se clasifican con la notación A/S/c, donde:
               </p>
@@ -632,7 +632,7 @@ RESULTADOS DE SIMULACIÓN
             </div>
 
             <div className={styles.conceptCard}>
-              <h4>📐 Fórmulas M/M/1</h4>
+              <h4><span aria-hidden="true">📐</span> Fórmulas M/M/1</h4>
               <ul>
                 <li><strong>ρ = λ/μ</strong> - Utilización del sistema</li>
                 <li><strong>L = λ/(μ-λ)</strong> - Clientes en sistema</li>
@@ -644,7 +644,7 @@ RESULTADOS DE SIMULACIÓN
             </div>
 
             <div className={styles.conceptCard}>
-              <h4>⚠️ Condición de Estabilidad</h4>
+              <h4><span aria-hidden="true">⚠️</span> Condición de Estabilidad</h4>
               <p>
                 Para que el sistema sea <strong>estable</strong>, la tasa de llegadas debe ser
                 menor que la tasa de servicio:
@@ -658,7 +658,7 @@ RESULTADOS DE SIMULACIÓN
             </div>
 
             <div className={styles.conceptCard}>
-              <h4>🏪 Aplicaciones Prácticas</h4>
+              <h4><span aria-hidden="true">🏪</span> Aplicaciones Prácticas</h4>
               <ul>
                 <li>Cajas de supermercados</li>
                 <li>Call centers</li>
@@ -670,7 +670,7 @@ RESULTADOS DE SIMULACIÓN
             </div>
           </div>
 
-          <h3>📖 Ley de Little</h3>
+          <h3><span aria-hidden="true">📖</span> Ley de Little</h3>
           <p>
             Una de las fórmulas más importantes de la teoría de colas es la <strong>Ley de Little</strong>:
           </p>
@@ -680,7 +680,7 @@ RESULTADOS DE SIMULACIÓN
             multiplicada por el tiempo promedio en el sistema.</p>
           </div>
 
-          <h3>🎯 Ejemplo Práctico</h3>
+          <h3><span aria-hidden="true">🎯</span> Ejemplo Práctico</h3>
           <div className={styles.exampleBox}>
             <p><strong>Situación:</strong> Una ventanilla de banco recibe 5 clientes por hora (λ=5)
             y puede atender 8 clientes por hora (μ=8).</p>
@@ -695,7 +695,7 @@ RESULTADOS DE SIMULACIÓN
         {/* 1. TABLA COMPARATIVA DE MODELOS */}
         <section>
           <h2 className={styles.guideSection && ''} style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '1rem' }}>
-            📊 Comparativa de Modelos de Colas
+            <span aria-hidden="true">📊</span> Comparativa de Modelos de Colas
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: '1.6' }}>
             Elegir el modelo correcto es fundamental. Cada modelo tiene supuestos distintos y produce
@@ -777,7 +777,7 @@ RESULTADOS DE SIMULACIÓN
         {/* 2. CASOS DE USO */}
         <section>
           <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
-            👥 Casos de Uso por Perfil Profesional
+            <span aria-hidden="true">👥</span> Casos de Uso por Perfil Profesional
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
             La teoría de colas se aplica en sectores muy distintos. Estos son ejemplos reales con
@@ -849,7 +849,7 @@ RESULTADOS DE SIMULACIÓN
         {/* 3. FAQ */}
         <section>
           <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
-            ❓ Preguntas Frecuentes sobre Teoría de Colas
+            <span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Teoría de Colas
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
             Respuestas directas a las dudas más habituales al aplicar la teoría de colas en proyectos reales.
@@ -951,7 +951,7 @@ RESULTADOS DE SIMULACIÓN
         {/* 4. GUÍA PASO A PASO */}
         <section>
           <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
-            🗺️ Guía Paso a Paso: Dimensionar un Sistema de Atención al Cliente
+            <span aria-hidden="true">🗺️</span> Guía Paso a Paso: Dimensionar un Sistema de Atención al Cliente
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
             Sigue este proceso de 7 pasos para aplicar la teoría de colas a cualquier sistema real,
@@ -1052,7 +1052,7 @@ RESULTADOS DE SIMULACIÓN
         {/* 5. MEJORES PRÁCTICAS */}
         <section>
           <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
-            ✅ Mejores Prácticas para Dimensionar Sistemas de Colas
+            <span aria-hidden="true">✅</span> Mejores Prácticas para Dimensionar Sistemas de Colas
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
             Principios que aplican ingenieros y operadores experimentados para obtener sistemas

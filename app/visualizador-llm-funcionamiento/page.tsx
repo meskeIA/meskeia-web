@@ -319,7 +319,7 @@ export default function VisualizadorLlmFuncionamiento() {
       {/* Hero */}
       <header className={styles.hero}>
         <div className={styles.heroContent}>
-          <span className={styles.heroBadge}>🤖 Visualizador Interactivo</span>
+          <span className={styles.heroBadge}><span aria-hidden="true">🤖</span> Visualizador Interactivo</span>
           <h1 className={styles.heroTitle}>Cómo Funcionan los LLMs</h1>
           <p className={styles.heroSubtitle}>Tokens, embeddings, atención y temperatura</p>
           <p className={styles.heroDesc}>
@@ -748,7 +748,7 @@ export default function VisualizadorLlmFuncionamiento() {
                 onClick={handleGenerarToken}
                 aria-label="Generar siguiente token según la distribución actual"
               >
-                ▶ Generar siguiente token
+                <span aria-hidden="true">▶</span> Generar siguiente token
               </button>
               <button
                 type="button"

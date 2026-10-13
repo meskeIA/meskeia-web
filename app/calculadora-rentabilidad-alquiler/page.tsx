@@ -172,7 +172,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
 
       {/* HERO */}
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🏘️ Rentabilidad de Inversión en Alquiler</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🏘️</span> Rentabilidad de Inversión en Alquiler</h1>
         <p className={styles.heroSubtitle}>
           Calcula el ROI bruto y neto de comprar un piso para alquilar. Cash flow real, payback y análisis completo de gastos.
         </p>
@@ -417,7 +417,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
 
       {/* ===== BOTÓN CALCULAR ===== */}
       <div className={styles.btnWrapper}>
-        <button onClick={calcular} className={styles.btnCalcular} aria-label="Calcular rentabilidad">
+        <button type="button" onClick={calcular} className={styles.btnCalcular} aria-label="Calcular rentabilidad">
           Calcular rentabilidad
         </button>
       </div>
@@ -425,7 +425,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
       {/* ===== RESULTADOS ===== */}
       {resultado && semaforo && (
         <section className={styles.resultsSection} aria-live="polite" aria-label="Resultados de rentabilidad">
-          <h2 className={styles.resultsSectionTitle}>📊 Análisis de rentabilidad</h2>
+          <h2 className={styles.resultsSectionTitle}><span aria-hidden="true">📊</span> Análisis de rentabilidad</h2>
 
           {/* Tarjetas principales */}
           <div className={styles.resultsGrid}>
@@ -469,7 +469,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
 
           {/* Desglose ingresos */}
           <div className={styles.desgloceTable}>
-            <h3 className={styles.desgloceTitle}>📋 Desglose de la inversión</h3>
+            <h3 className={styles.desgloceTitle}><span aria-hidden="true">📋</span> Desglose de la inversión</h3>
             <div className={styles.tableRow}>
               <span className={styles.rowLabel}>Precio de compra</span>
               <span className={styles.rowValue}>{formatCurrency(resultado.precioCompra)}</span>
@@ -492,7 +492,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
 
           {/* Desglose ingresos vs gastos */}
           <div className={styles.desgloceTable}>
-            <h3 className={styles.desgloceTitle}>💰 Ingresos vs gastos anuales</h3>
+            <h3 className={styles.desgloceTitle}><span aria-hidden="true">💰</span> Ingresos vs gastos anuales</h3>
             <div className={styles.tableRow}>
               <span className={styles.rowLabel}>Alquiler bruto anual ({tasaOcupacion}% ocupación)</span>
               <span className={`${styles.rowValue} ${styles.green}`}>+ {formatCurrency(resultado.alquilerBrutoAnual)}</span>
@@ -532,7 +532,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
       {/* NOTA FISCAL */}
       {resultado && (
         <div className={styles.notaFiscal} role="note" aria-label="Nota sobre fiscalidad del alquiler">
-          <strong>🧾 Fiscalidad del alquiler (orientación)</strong>
+          <strong><span aria-hidden="true">🧾</span> Fiscalidad del alquiler (orientación)</strong>
           <ul>
             <li><strong>Amortización deducible:</strong> el 3% del valor de construcción del inmueble (excluido el suelo) reduce el rendimiento neto anual en IRPF.</li>
             <li><strong>Reducción por arrendamiento de vivienda habitual:</strong> el rendimiento neto positivo tiene una reducción del 50% en IRPF (60% en contratos anteriores a 2023 con el mismo arrendatario).</li>

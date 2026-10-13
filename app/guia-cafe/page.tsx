@@ -634,19 +634,19 @@ export default function GuiaCafe() {
                 <div className={styles.refContent}>
                   <div className={styles.procesadoGrid}>
                     <div className={styles.procesadoCard}>
-                      <h4>💧 Lavado (Wet)</h4>
+                      <h4><span aria-hidden="true">💧</span> Lavado (Wet)</h4>
                       <p>Se retira toda la pulpa antes del secado en agua. Resultado: sabor limpio, acidez brillante, origen muy expresado. Preferido en Colombia, Centroamérica y Kenia.</p>
                     </div>
                     <div className={styles.procesadoCard}>
-                      <h4>☀️ Natural (Dry / Sun-dried)</h4>
+                      <h4><span aria-hidden="true">☀️</span> Natural (Dry / Sun-dried)</h4>
                       <p>El grano se seca con la pulpa intacta al sol. Resultado: sabor frutal, dulce, complejo, con notas vínicas. Típico de Etiopía, Yemen y Brasil.</p>
                     </div>
                     <div className={styles.procesadoCard}>
-                      <h4>🍯 Honey / Semi-lavado</h4>
+                      <h4><span aria-hidden="true">🍯</span> Honey / Semi-lavado</h4>
                       <p>Se retira la pulpa pero se conserva parte del mucílago. Resultado: equilibrio entre lavado y natural, con dulzor extra. Muy usado en Costa Rica y El Salvador.</p>
                     </div>
                     <div className={styles.procesadoCard}>
-                      <h4>🌧️ Wet-hulled (Giling Basah)</h4>
+                      <h4><span aria-hidden="true">🌧️</span> Wet-hulled (Giling Basah)</h4>
                       <p>Método único indonesio: descascarado en húmedo con alta humedad residual. Resultado: terroso, bajo en acidez, cuerpo muy intenso. Solo en Sumatra y Sulawesi.</p>
                     </div>
                   </div>
@@ -657,17 +657,17 @@ export default function GuiaCafe() {
                 <div className={styles.refContent}>
                   <div className={styles.tuesteGrid}>
                     <div className={`${styles.tuesteCard} ${styles.tuesteClaro}`}>
-                      <h4>🟤 Claro (Light)</h4>
+                      <h4><span aria-hidden="true">🟤</span> Claro (Light)</h4>
                       <p><strong>196–205°C</strong></p>
                       <p>Color canela. El origen brilla: floral, cítrico, ácido. Sin aceites en superficie. Favorito del café de especialidad de tercera ola.</p>
                     </div>
                     <div className={`${styles.tuesteCard} ${styles.tuesteMedio}`}>
-                      <h4>🟫 Medio (Medium)</h4>
+                      <h4><span aria-hidden="true">🟫</span> Medio (Medium)</h4>
                       <p><strong>210–219°C</strong></p>
                       <p>Color avellana. Equilibrio entre acidez y dulzor. Caramelo, chocolate con leche. El más versátil para cualquier método.</p>
                     </div>
                     <div className={`${styles.tuesteCard} ${styles.tuesteOscuro}`}>
-                      <h4>⬛ Oscuro (Dark)</h4>
+                      <h4><span aria-hidden="true">⬛</span> Oscuro (Dark)</h4>
                       <p><strong>235–245°C</strong></p>
                       <p>Color negro-marrón. Aceites en superficie. Amargo intenso, ahumado, chocolate negro. El origen desaparece. Base del espresso tradicional italiano.</p>
                     </div>

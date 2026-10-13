@@ -355,7 +355,7 @@ export default function GeneradorActasPage() {
       {/* Panel de borradores */}
       {showDrafts && (
         <div className={`${styles.draftsPanel} ${styles.noPrint}`}>
-          <h3>📁 Borradores guardados</h3>
+          <h3><span aria-hidden="true">📁</span> Borradores guardados</h3>
           {drafts.length === 0 ? (
             <p className={styles.emptyMessage}>No hay borradores guardados</p>
           ) : (
@@ -384,7 +384,7 @@ export default function GeneradorActasPage() {
       {/* Panel de historial */}
       {showHistory && (
         <div className={`${styles.draftsPanel} ${styles.noPrint}`}>
-          <h3>📜 Actas generadas anteriormente</h3>
+          <h3><span aria-hidden="true">📜</span> Actas generadas anteriormente</h3>
           {history.length === 0 ? (
             <p className={styles.emptyMessage}>No hay actas en el historial</p>
           ) : (
@@ -430,7 +430,7 @@ export default function GeneradorActasPage() {
         {/* PASO 1: Información General */}
         {currentStep === 'info' && (
           <div className={`${styles.formSection} ${styles.noPrint}`}>
-            <h2 className={styles.sectionTitle}>📝 Información de la Reunión</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📝</span> Información de la Reunión</h2>
 
             {/* Selección de plantilla */}
             <div className={styles.templateSelector}>
@@ -552,7 +552,7 @@ export default function GeneradorActasPage() {
         {/* PASO 2: Asistentes */}
         {currentStep === 'asistentes' && (
           <div className={`${styles.formSection} ${styles.noPrint}`}>
-            <h2 className={styles.sectionTitle}>👥 Asistentes a la Reunión</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">👥</span> Asistentes a la Reunión</h2>
 
             <div className={styles.asistentesHeader}>
               <p className={styles.helperText}>
@@ -630,7 +630,7 @@ export default function GeneradorActasPage() {
         {/* PASO 3: Orden del Día */}
         {currentStep === 'orden' && (
           <div className={`${styles.formSection} ${styles.noPrint}`}>
-            <h2 className={styles.sectionTitle}>📋 Orden del Día</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Orden del Día</h2>
 
             <div className={styles.asistentesHeader}>
               <p className={styles.helperText}>
@@ -725,7 +725,7 @@ export default function GeneradorActasPage() {
         {/* PASO 4: Tareas */}
         {currentStep === 'tareas' && (
           <div className={`${styles.formSection} ${styles.noPrint}`}>
-            <h2 className={styles.sectionTitle}>✅ Tareas y Acciones</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">✅</span> Tareas y Acciones</h2>
 
             <div className={styles.asistentesHeader}>
               <p className={styles.helperText}>
@@ -872,7 +872,7 @@ export default function GeneradorActasPage() {
 
               {/* Información general */}
               <section className={styles.actaSection}>
-                <h2 className={styles.actaSectionTitle}>📌 Información de la Reunión</h2>
+                <h2 className={styles.actaSectionTitle}><span aria-hidden="true">📌</span> Información de la Reunión</h2>
                 <div className={styles.actaInfoGrid}>
                   <div className={styles.actaInfoItem}>
                     <strong>Fecha:</strong>
@@ -908,7 +908,7 @@ export default function GeneradorActasPage() {
               {/* Asistentes */}
               {acta.asistentes.length > 0 && (
                 <section className={styles.actaSection}>
-                  <h2 className={styles.actaSectionTitle}>👥 Asistentes</h2>
+                  <h2 className={styles.actaSectionTitle}><span aria-hidden="true">👥</span> Asistentes</h2>
                   <table className={styles.actaTable}>
                     <thead>
                       <tr>
@@ -935,7 +935,7 @@ export default function GeneradorActasPage() {
               {/* Orden del día */}
               {acta.puntosOrdenDia.length > 0 && (
                 <section className={styles.actaSection}>
-                  <h2 className={styles.actaSectionTitle}>📋 Orden del Día</h2>
+                  <h2 className={styles.actaSectionTitle}><span aria-hidden="true">📋</span> Orden del Día</h2>
                   {acta.puntosOrdenDia.map((punto, index) => (
                     <div key={punto.id} className={styles.actaPunto}>
                       <h3 className={styles.actaPuntoTitle}>
@@ -964,7 +964,7 @@ export default function GeneradorActasPage() {
               {/* Tareas */}
               {acta.tareas.length > 0 && (
                 <section className={styles.actaSection}>
-                  <h2 className={styles.actaSectionTitle}>✅ Tareas Asignadas</h2>
+                  <h2 className={styles.actaSectionTitle}><span aria-hidden="true">✅</span> Tareas Asignadas</h2>
                   <table className={styles.actaTable}>
                     <thead>
                       <tr>
@@ -993,7 +993,7 @@ export default function GeneradorActasPage() {
               {/* Observaciones */}
               {acta.observaciones && (
                 <section className={styles.actaSection}>
-                  <h2 className={styles.actaSectionTitle}>📝 Observaciones</h2>
+                  <h2 className={styles.actaSectionTitle}><span aria-hidden="true">📝</span> Observaciones</h2>
                   <p className={styles.actaObservaciones}>{acta.observaciones}</p>
                 </section>
               )}
@@ -1001,7 +1001,7 @@ export default function GeneradorActasPage() {
               {/* Próxima reunión */}
               {acta.proximaReunion && (
                 <section className={styles.actaSection}>
-                  <h2 className={styles.actaSectionTitle}>📅 Próxima Reunión</h2>
+                  <h2 className={styles.actaSectionTitle}><span aria-hidden="true">📅</span> Próxima Reunión</h2>
                   <p className={styles.actaProxima}>{acta.proximaReunion}</p>
                 </section>
               )}
@@ -1123,19 +1123,19 @@ export default function GeneradorActasPage() {
           <h2>Consejos para Reuniones Productivas</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <h4>⏰ Define duración máxima</h4>
+              <h4><span aria-hidden="true">⏰</span> Define duración máxima</h4>
               <p>Las reuniones más efectivas duran entre 30 y 60 minutos. Respeta el tiempo de todos.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>📝 Envía agenda previa</h4>
+              <h4><span aria-hidden="true">📝</span> Envía agenda previa</h4>
               <p>Comparte el orden del día antes de la reunión para que los asistentes se preparen.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>🎯 Un tema, una decisión</h4>
+              <h4><span aria-hidden="true">🎯</span> Un tema, una decisión</h4>
               <p>Cada punto debe terminar con una decisión clara o una tarea asignada.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>📤 Envía el acta en 24h</h4>
+              <h4><span aria-hidden="true">📤</span> Envía el acta en 24h</h4>
               <p>Distribuye el acta rápidamente mientras la información está fresca.</p>
             </div>
           </div>

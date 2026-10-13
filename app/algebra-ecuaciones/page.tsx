@@ -586,7 +586,7 @@ export default function AlgebraEcuacionesPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <h1 className={styles.title}>🧮 Calculadora de Ecuaciones Algebraicas</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🧮</span> Calculadora de Ecuaciones Algebraicas</h1>
         <p className={styles.subtitle}>
           Ecuaciones lineales, cuadráticas, sistemas 2x2 y polinomios de grado 3+ con la regla de
           Ruffini, paso a paso
@@ -1353,7 +1353,7 @@ export default function AlgebraEcuacionesPage() {
 
         {/* 3. FAQ */}
         <details className={styles.faqList}>
-          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Ecuaciones Algebraicas</summary>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Ecuaciones Algebraicas</summary>
           <div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Qué es el discriminante de una ecuación cuadrática y qué indica?</div>

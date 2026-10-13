@@ -257,7 +257,7 @@ export default function TablasMultiplicarPage() {
         <div className={styles.menuSection}>
           {/* Estadísticas */}
           <div className={styles.statsCard}>
-            <h3 className={styles.statsTitle}>📊 Tus estadísticas</h3>
+            <h3 className={styles.statsTitle}><span aria-hidden="true">📊</span> Tus estadísticas</h3>
             <div className={styles.statsGrid}>
               <div className={styles.statItem}>
                 <span className={styles.statValue}>{estadisticas.totalJugadas}</span>
@@ -281,7 +281,7 @@ export default function TablasMultiplicarPage() {
 
           {/* Selección de dificultad */}
           <div className={styles.configCard}>
-            <h3 className={styles.configTitle}>🎮 Elige dificultad</h3>
+            <h3 className={styles.configTitle}><span aria-hidden="true">🎮</span> Elige dificultad</h3>
             <div className={styles.difficultyGrid}>
               {(Object.keys(DIFICULTADES) as Dificultad[]).map((dif) => (
                 <button
@@ -308,7 +308,7 @@ export default function TablasMultiplicarPage() {
 
           {/* Selección de tablas específicas */}
           <div className={styles.configCard}>
-            <h3 className={styles.configTitle}>🎯 Practica tablas específicas (opcional)</h3>
+            <h3 className={styles.configTitle}><span aria-hidden="true">🎯</span> Practica tablas específicas (opcional)</h3>
             <p className={styles.configHint}>Selecciona las tablas que quieras practicar, o déjalo vacío para jugar con todas</p>
             <div className={styles.tablasGrid}>
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((tabla) => (
@@ -349,7 +349,7 @@ export default function TablasMultiplicarPage() {
             <div className={styles.progressInfo}>
               <span>Pregunta {preguntasRespondidas + 1} de {DIFICULTADES[dificultad].preguntas}</span>
               <span className={`${styles.streak} ${rachaActual >= 3 ? styles.streakHot : ''}`}>
-                🔥 Racha: {rachaActual}
+                <span aria-hidden="true">🔥</span> Racha: {rachaActual}
               </span>
             </div>
             <div className={styles.progressTrack}>
@@ -468,14 +468,14 @@ export default function TablasMultiplicarPage() {
           <h2>Trucos para las tablas</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔢 Tabla del 9</h4>
+              <h4><span aria-hidden="true">🔢</span> Tabla del 9</h4>
               <p>
                 Los resultados de la tabla del 9 suman siempre 9:
                 9×2=18 (1+8=9), 9×3=27 (2+7=9), 9×4=36 (3+6=9)...
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>✋ Tabla del 9 con los dedos</h4>
+              <h4><span aria-hidden="true">✋</span> Tabla del 9 con los dedos</h4>
               <p>
                 Baja el dedo de la posición que multiplicas.
                 Los dedos a la izquierda son decenas, a la derecha unidades.
@@ -489,7 +489,7 @@ export default function TablasMultiplicarPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🔄 La propiedad conmutativa</h4>
+              <h4><span aria-hidden="true">🔄</span> La propiedad conmutativa</h4>
               <p>
                 El orden no importa: 3×7 = 7×3.
                 ¡Así solo necesitas memorizar la mitad de las tablas!
@@ -518,10 +518,10 @@ export default function TablasMultiplicarPage() {
             <h3>Errores Comunes al Aprender las Tablas de Multiplicar</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Aprender de memoria sin entender el concepto:</strong> Memorizar 7×8=56 sin entender que es &quot;7 grupos de 8&quot; crea conocimiento frágil. Cuando el niño olvida la respuesta, no puede reconstruirla. La comprensión conceptual (multiplicar = sumar repetidamente) es la base que permite recuperar una respuesta olvidada.</li>
-            <li><strong>❌ Estudiar todas las tablas a la vez:</strong> Intentar aprender las tablas del 1 al 10 simultáneamente satura la memoria de trabajo. El método efectivo es dominar completamente una tabla antes de pasar a la siguiente, siguiendo el orden recomendado (1, 2, 5, 10, 4, 9, 3, 6, 7, 8).</li>
-            <li><strong>❌ No aprovechar la propiedad conmutativa:</strong> Si sabes 6×7=42, ya sabes 7×6=42. Esto reduce el número real de combinaciones a memorizar de 100 a 55. Muchos estudiantes ignoran esta simplificación y memorizan las 100 combinaciones por separado.</li>
-            <li><strong>❌ Practicar solo en orden secuencial:</strong> Recitar &quot;7×1=7, 7×2=14, 7×3=21...&quot; en orden es mucho más fácil que responder preguntas aleatorias. El objetivo final es la recuperación rápida en cualquier orden. Este entrenador aleatoriza las preguntas precisamente para desarrollar esa habilidad.</li>
+            <li><strong><span aria-hidden="true">❌</span> Aprender de memoria sin entender el concepto:</strong> Memorizar 7×8=56 sin entender que es &quot;7 grupos de 8&quot; crea conocimiento frágil. Cuando el niño olvida la respuesta, no puede reconstruirla. La comprensión conceptual (multiplicar = sumar repetidamente) es la base que permite recuperar una respuesta olvidada.</li>
+            <li><strong><span aria-hidden="true">❌</span> Estudiar todas las tablas a la vez:</strong> Intentar aprender las tablas del 1 al 10 simultáneamente satura la memoria de trabajo. El método efectivo es dominar completamente una tabla antes de pasar a la siguiente, siguiendo el orden recomendado (1, 2, 5, 10, 4, 9, 3, 6, 7, 8).</li>
+            <li><strong><span aria-hidden="true">❌</span> No aprovechar la propiedad conmutativa:</strong> Si sabes 6×7=42, ya sabes 7×6=42. Esto reduce el número real de combinaciones a memorizar de 100 a 55. Muchos estudiantes ignoran esta simplificación y memorizan las 100 combinaciones por separado.</li>
+            <li><strong><span aria-hidden="true">❌</span> Practicar solo en orden secuencial:</strong> Recitar &quot;7×1=7, 7×2=14, 7×3=21...&quot; en orden es mucho más fácil que responder preguntas aleatorias. El objetivo final es la recuperación rápida en cualquier orden. Este entrenador aleatoriza las preguntas precisamente para desarrollar esa habilidad.</li>
           </ul>
         </div>
       </EducationalSection>

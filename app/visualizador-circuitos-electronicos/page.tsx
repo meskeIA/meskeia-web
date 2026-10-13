@@ -366,7 +366,7 @@ export default function VisualizadorCircuitosElectronicos() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.heroTitle}>⚡ Circuitos Electrónicos</h1>
+          <h1 className={styles.heroTitle}><span aria-hidden="true">⚡</span> Circuitos Electrónicos</h1>
           <p className={styles.heroSubtitle}>
             De los componentes básicos al chip moderno: R, L, C, transistores, puertas lógicas (compuertas lógicas) y la jerarquía que hace posible la computación
           </p>
@@ -987,19 +987,19 @@ export default function VisualizadorCircuitosElectronicos() {
           <h3>Casos de Uso</h3>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <h4>📚 Estudiante de Electrónica</h4>
+              <h4><span aria-hidden="true">📚</span> Estudiante de Electrónica</h4>
               <p>Antes de conectar un circuito real, simula el comportamiento RLC para entender la resonancia, el factor Q y las impedancias. Ver la curva de respuesta ayuda más que memorizar fórmulas.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🔧 Maker / Hobbyist</h4>
+              <h4><span aria-hidden="true">🔧</span> Maker / Hobbyist</h4>
               <p>Verifica si un transistor NPN puede conducir suficiente corriente para activar un relé o un motor: la región de saturación (Vce_sat) dice si el transistor está «completamente abierto».</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>💻 Diseñador Digital</h4>
+              <h4><span aria-hidden="true">💻</span> Diseñador Digital</h4>
               <p>Las puertas lógicas (compuertas lógicas) NAND son universales: combinándolas puedes construir cualquier función lógica. El visualizador muestra cómo 4 NAND implementan un flip-flop RS, base de la memoria SRAM.</p>
             </div>
             <div className={styles.escenarioCard}>
-              <h4>🖥️ Arquitecto de CPUs</h4>
+              <h4><span aria-hidden="true">🖥️</span> Arquitecto de CPUs</h4>
               <p>Un procesador moderno tiene 50.000+ millones de transistores en 2 nm. Entender la jerarquía átomo→transistor→puerta→ALU→CPU es esencial para diseñar arquitecturas de silicio eficientes.</p>
             </div>
           </div>
@@ -1009,7 +1009,7 @@ export default function VisualizadorCircuitosElectronicos() {
             <div className={styles.faqItem}>
               <strong>¿Qué diferencia hay entre resistencia e impedancia?</strong>
               <p>La resistencia (R) se opone a la corriente siempre por igual. La impedancia (Z) incluye la oposición de condensadores e inductores, que depende de la frecuencia. En CC, Z = R. En CA, Z = √(R² + (XL - XC)²).</p>
-              <div className={styles.faqTip}>💡 A la frecuencia de resonancia (f₀ = 1/(2π√LC)), XL = XC y la impedancia es mínima (solo R).</div>
+              <div className={styles.faqTip}><span aria-hidden="true">💡</span> A la frecuencia de resonancia (f₀ = 1/(2π√LC)), XL = XC y la impedancia es mínima (solo R).</div>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Cómo amplifica un transistor si solo tiene 3 terminales?</strong>

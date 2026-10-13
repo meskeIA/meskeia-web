@@ -626,17 +626,17 @@ export default function VisualizadorGenerosNovelaPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>🔍 Novela Negra</td><td>Crimen y sociedad</td><td>Tensión, crítica social, personajes al límite</td><td>Ágil</td></tr>
-                  <tr><td>👻 Terror</td><td>Miedo y amenaza</td><td>Adrenalina, exploración psicológica del miedo</td><td>Variable (lento→rápido)</td></tr>
-                  <tr><td>🚀 Ciencia ficción</td><td>Extrapolación tecnológica</td><td>Sentido de la maravilla, reflexión sobre el futuro</td><td>Variable</td></tr>
-                  <tr><td>🐉 Fantasía épica</td><td>Mundo secundario y conflicto épico</td><td>Inmersión total, aventura y worldbuilding</td><td>Denso, largo</td></tr>
-                  <tr><td>🧠 Thriller psicológico</td><td>La mente y el engaño</td><td>Giros, incertidumbre, narrador no fiable</td><td>Muy rápido</td></tr>
-                  <tr><td>📜 Novela histórica</td><td>El pasado como escenario</td><td>Inmersión en otra época, contexto y emoción</td><td>Denso</td></tr>
-                  <tr><td>⚡ Distopía</td><td>Sociedad opresiva futura</td><td>Crítica política, atmósfera claustrofóbica</td><td>Medio</td></tr>
-                  <tr><td>⚔️ Aventura</td><td>Acción y movimiento</td><td>Emoción, viaje, superación de obstáculos</td><td>Muy rápido</td></tr>
-                  <tr><td>📚 Realismo literario</td><td>La condición humana</td><td>Verdad emocional, personajes complejos, prosa</td><td>Lento o medio</td></tr>
-                  <tr><td>💕 Novela romántica</td><td>La relación amorosa</td><td>Tensión emocional, final satisfactorio</td><td>Rápido</td></tr>
-                  <tr><td>🦇 Novela Gótica</td><td>Atmósfera y secretos</td><td>Lo sublime oscuro, misterio ancestral</td><td>Lento, denso</td></tr>
+                  <tr><td><span aria-hidden="true">🔍</span> Novela Negra</td><td>Crimen y sociedad</td><td>Tensión, crítica social, personajes al límite</td><td>Ágil</td></tr>
+                  <tr><td><span aria-hidden="true">👻</span> Terror</td><td>Miedo y amenaza</td><td>Adrenalina, exploración psicológica del miedo</td><td>Variable (lento→rápido)</td></tr>
+                  <tr><td><span aria-hidden="true">🚀</span> Ciencia ficción</td><td>Extrapolación tecnológica</td><td>Sentido de la maravilla, reflexión sobre el futuro</td><td>Variable</td></tr>
+                  <tr><td><span aria-hidden="true">🐉</span> Fantasía épica</td><td>Mundo secundario y conflicto épico</td><td>Inmersión total, aventura y worldbuilding</td><td>Denso, largo</td></tr>
+                  <tr><td><span aria-hidden="true">🧠</span> Thriller psicológico</td><td>La mente y el engaño</td><td>Giros, incertidumbre, narrador no fiable</td><td>Muy rápido</td></tr>
+                  <tr><td><span aria-hidden="true">📜</span> Novela histórica</td><td>El pasado como escenario</td><td>Inmersión en otra época, contexto y emoción</td><td>Denso</td></tr>
+                  <tr><td><span aria-hidden="true">⚡</span> Distopía</td><td>Sociedad opresiva futura</td><td>Crítica política, atmósfera claustrofóbica</td><td>Medio</td></tr>
+                  <tr><td><span aria-hidden="true">⚔️</span> Aventura</td><td>Acción y movimiento</td><td>Emoción, viaje, superación de obstáculos</td><td>Muy rápido</td></tr>
+                  <tr><td><span aria-hidden="true">📚</span> Realismo literario</td><td>La condición humana</td><td>Verdad emocional, personajes complejos, prosa</td><td>Lento o medio</td></tr>
+                  <tr><td><span aria-hidden="true">💕</span> Novela romántica</td><td>La relación amorosa</td><td>Tensión emocional, final satisfactorio</td><td>Rápido</td></tr>
+                  <tr><td><span aria-hidden="true">🦇</span> Novela Gótica</td><td>Atmósfera y secretos</td><td>Lo sublime oscuro, misterio ancestral</td><td>Lento, denso</td></tr>
                 </tbody>
               </table>
             </div>

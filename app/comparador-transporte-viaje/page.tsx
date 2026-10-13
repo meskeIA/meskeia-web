@@ -249,7 +249,7 @@ export default function ComparadorTransporteViaje() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🚄 Comparador de Transporte</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🚄</span> Comparador de Transporte</h1>
         <p className={styles.heroSubtitle}>
           Avión, tren, autobús o coche (carro o auto) — elige el transporte ideal para tu trayecto
         </p>
@@ -411,16 +411,16 @@ export default function ComparadorTransporteViaje() {
                   {/* Badges */}
                   <div className={styles.badgesRow} aria-label="Destacados">
                     {badges.masBarato === r.id && r.disponible && (
-                      <span className={`${styles.badge} ${styles.badgeBarato}`}>💰 Más barato</span>
+                      <span className={`${styles.badge} ${styles.badgeBarato}`}><span aria-hidden="true">💰</span> Más barato</span>
                     )}
                     {badges.masRapido === r.id && r.disponible && (
-                      <span className={`${styles.badge} ${styles.badgeRapido}`}>⚡ Más rápido</span>
+                      <span className={`${styles.badge} ${styles.badgeRapido}`}><span aria-hidden="true">⚡</span> Más rápido</span>
                     )}
                     {badges.masSostenible === r.id && r.disponible && (
-                      <span className={`${styles.badge} ${styles.badgeSostenible}`}>🌿 Más sostenible</span>
+                      <span className={`${styles.badge} ${styles.badgeSostenible}`}><span aria-hidden="true">🌿</span> Más sostenible</span>
                     )}
                     {badges.masFlexible === r.id && r.disponible && (
-                      <span className={`${styles.badge} ${styles.badgeFlexible}`}>🗺️ Más flexible</span>
+                      <span className={`${styles.badge} ${styles.badgeFlexible}`}><span aria-hidden="true">🗺️</span> Más flexible</span>
                     )}
                   </div>
 
@@ -487,7 +487,7 @@ export default function ComparadorTransporteViaje() {
 
         {/* ── Nota metodológica ── */}
         <div className={styles.notaMetodologica} role="note">
-          <strong>ℹ️ Nota sobre los datos</strong> — Los costes son estimaciones orientativas basadas en precios medios de mercado en España (2025). El avión incluye traslados al aeropuerto (~1 h + 1 h). El coche incluye combustible (8,5 cts/km) y peajes estimados. Las emisiones de CO₂ siguen valores de referencia del transporte europeo. Los precios reales pueden variar significativamente según fecha, operador y disponibilidad.
+          <strong><span aria-hidden="true">ℹ️</span> Nota sobre los datos</strong> — Los costes son estimaciones orientativas basadas en precios medios de mercado en España (2025). El avión incluye traslados al aeropuerto (~1 h + 1 h). El coche incluye combustible (8,5 cts/km) y peajes estimados. Las emisiones de CO₂ siguen valores de referencia del transporte europeo. Los precios reales pueden variar significativamente según fecha, operador y disponibilidad.
         </div>
       </main>
 
@@ -505,37 +505,37 @@ export default function ComparadorTransporteViaje() {
             <thead>
               <tr>
                 <th>Distancia</th>
-                <th>✈️ Avión</th>
-                <th>🚄 Tren</th>
-                <th>🚌 Autobús</th>
-                <th>🚗 Coche</th>
+                <th><span aria-hidden="true">✈️</span> Avión</th>
+                <th><span aria-hidden="true">🚄</span> Tren</th>
+                <th><span aria-hidden="true">🚌</span> Autobús</th>
+                <th><span aria-hidden="true">🚗</span> Coche</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td><strong>&lt; 150 km</strong></td>
                 <td className={styles.celdaMala}>No recomendable</td>
-                <td className={styles.celdaBuena}>✅ Ideal</td>
+                <td className={styles.celdaBuena}><span aria-hidden="true">✅</span> Ideal</td>
                 <td className={styles.celdaMedia}>Aceptable</td>
-                <td className={styles.celdaBuena}>✅ Ideal</td>
+                <td className={styles.celdaBuena}><span aria-hidden="true">✅</span> Ideal</td>
               </tr>
               <tr>
                 <td><strong>150–400 km</strong></td>
                 <td className={styles.celdaMedia}>Posible</td>
-                <td className={styles.celdaBuena}>✅ Mejor opción</td>
+                <td className={styles.celdaBuena}><span aria-hidden="true">✅</span> Mejor opción</td>
                 <td className={styles.celdaMedia}>Económico</td>
-                <td className={styles.celdaBuena}>✅ Bueno en grupo</td>
+                <td className={styles.celdaBuena}><span aria-hidden="true">✅</span> Bueno en grupo</td>
               </tr>
               <tr>
                 <td><strong>400–700 km</strong></td>
-                <td className={styles.celdaBuena}>✅ Competitivo</td>
-                <td className={styles.celdaBuena}>✅ AVE muy rápido</td>
+                <td className={styles.celdaBuena}><span aria-hidden="true">✅</span> Competitivo</td>
+                <td className={styles.celdaBuena}><span aria-hidden="true">✅</span> AVE muy rápido</td>
                 <td className={styles.celdaMedia}>Lento pero barato</td>
                 <td className={styles.celdaMedia}>Largo pero flexible</td>
               </tr>
               <tr>
                 <td><strong>&gt; 700 km</strong></td>
-                <td className={styles.celdaBuena}>✅ Más rápido</td>
+                <td className={styles.celdaBuena}><span aria-hidden="true">✅</span> Más rápido</td>
                 <td className={styles.celdaMedia}>Depende de ruta</td>
                 <td className={styles.celdaMala}>Muy largo</td>
                 <td className={styles.celdaMala}>No recomendable</td>
@@ -547,19 +547,19 @@ export default function ComparadorTransporteViaje() {
         <h3>Los 4 criterios clave para elegir transporte</h3>
         <div className={styles.criteriosGrid}>
           <div className={styles.criterioCard}>
-            <h4>💰 Presupuesto</h4>
+            <h4><span aria-hidden="true">💰</span> Presupuesto</h4>
             <p>El autobús es invariablemente el más barato. El coche es muy económico cuando viajas con 3-4 personas. El tren puede ser competitivo con antelación. El avión varía mucho según fecha y ruta.</p>
           </div>
           <div className={styles.criterioCard}>
-            <h4>⏱️ Tiempo real</h4>
+            <h4><span aria-hidden="true">⏱️</span> Tiempo real</h4>
             <p>El avión incluye: llegar al aeropuerto (+45 min), facturación/seguridad (+60 min), espera en puerta (+30 min), vuelo, recogida de equipaje (+20 min), traslado destino (+45 min). En total: 2,5-4 h extra.</p>
           </div>
           <div className={styles.criterioCard}>
-            <h4>🌿 Impacto ambiental</h4>
+            <h4><span aria-hidden="true">🌿</span> Impacto ambiental</h4>
             <p>El tren eléctrico emite 14 g CO₂/km/persona vs. 255 g del avión (18× más). El autobús (68 g) y el coche con varios ocupantes son opciones intermedias. Para viajes nacionales, el tren siempre gana en sostenibilidad.</p>
           </div>
           <div className={styles.criterioCard}>
-            <h4>🧳 Equipaje</h4>
+            <h4><span aria-hidden="true">🧳</span> Equipaje</h4>
             <p>El coche permite equipaje ilimitado. El tren: 2 bultos gratuitos (hasta 25 kg). El autobús: 1 maleta en bodega. El avión: solo cabina gratis; facturar cuesta 25-50 € según aerolínea y maleta.</p>
           </div>
         </div>
@@ -585,7 +585,7 @@ export default function ComparadorTransporteViaje() {
         </ul>
 
         <div className={styles.warningBox} role="note">
-          <strong>⚠️ Recuerda incluir los tiempos de traslado</strong>
+          <strong><span aria-hidden="true">⚠️</span> Recuerda incluir los tiempos de traslado</strong>
           El tiempo del avión en este comparador incluye los traslados al aeropuerto de origen (+45 min) y al centro de la ciudad de destino (+45 min), más 60 minutos de facturación y seguridad. Son aproximaciones conservadoras: en aeropuertos grandes como El Prat o Barajas, los tiempos pueden ser mayores. El tren parte y llega al centro de la ciudad, por lo que su ventaja real de tiempo es mayor de lo que indica el reloj de vuelo.
         </div>
       </EducationalSection>

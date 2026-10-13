@@ -301,7 +301,7 @@ export default function VisualizadorRecursosLiterariosPage() {
                 </section>
 
                 <section className={styles.modalSeccion}>
-                  <h3 className={styles.modalSeccionTitle}>⚠️ Cómo no confundirla</h3>
+                  <h3 className={styles.modalSeccionTitle}><span aria-hidden="true">⚠️</span> Cómo no confundirla</h3>
                   <p className={styles.modalDistincion}>{figuraActiva.distincion}</p>
                 </section>
 
@@ -412,12 +412,12 @@ export default function VisualizadorRecursosLiterariosPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>🖼️ Imagen</td><td>Crea comparaciones o representaciones visuales</td><td>Metáfora, Símil, Personificación, Alegoría</td><td>Visualizar ideas abstractas</td></tr>
-                  <tr><td>🔁 Repetición</td><td>Repite sonidos, palabras o estructuras</td><td>Anáfora, Aliteración, Polisíndeton, Paronomasia</td><td>Ritmo, énfasis y musicalidad</td></tr>
-                  <tr><td>⚡ Contraste</td><td>Opone ideas o términos contrarios</td><td>Antítesis, Oxímoron, Paradoja, Ironía</td><td>Tensión y profundidad de significado</td></tr>
-                  <tr><td>📢 Énfasis</td><td>Intensifica o atenúa una idea</td><td>Hipérbole, Epíteto, Gradación, Lítotes, Eufemismo</td><td>Impacto emocional o suavización</td></tr>
-                  <tr><td>🔧 Sintaxis</td><td>Altera el orden o la estructura gramatical</td><td>Hipérbaton, Elipsis, Asíndeton, Zeugma, Quiasmo</td><td>Agilidad, solemnidad o sorpresa</td></tr>
-                  <tr><td>🔗 Contigüidad</td><td>Sustituye un término por otro relacionado</td><td>Metonimia, Sinécdoque, Perífrasis</td><td>Elegancia y sugerencia indirecta</td></tr>
+                  <tr><td><span aria-hidden="true">🖼️</span> Imagen</td><td>Crea comparaciones o representaciones visuales</td><td>Metáfora, Símil, Personificación, Alegoría</td><td>Visualizar ideas abstractas</td></tr>
+                  <tr><td><span aria-hidden="true">🔁</span> Repetición</td><td>Repite sonidos, palabras o estructuras</td><td>Anáfora, Aliteración, Polisíndeton, Paronomasia</td><td>Ritmo, énfasis y musicalidad</td></tr>
+                  <tr><td><span aria-hidden="true">⚡</span> Contraste</td><td>Opone ideas o términos contrarios</td><td>Antítesis, Oxímoron, Paradoja, Ironía</td><td>Tensión y profundidad de significado</td></tr>
+                  <tr><td><span aria-hidden="true">📢</span> Énfasis</td><td>Intensifica o atenúa una idea</td><td>Hipérbole, Epíteto, Gradación, Lítotes, Eufemismo</td><td>Impacto emocional o suavización</td></tr>
+                  <tr><td><span aria-hidden="true">🔧</span> Sintaxis</td><td>Altera el orden o la estructura gramatical</td><td>Hipérbaton, Elipsis, Asíndeton, Zeugma, Quiasmo</td><td>Agilidad, solemnidad o sorpresa</td></tr>
+                  <tr><td><span aria-hidden="true">🔗</span> Contigüidad</td><td>Sustituye un término por otro relacionado</td><td>Metonimia, Sinécdoque, Perífrasis</td><td>Elegancia y sugerencia indirecta</td></tr>
                 </tbody>
               </table>
             </div>
