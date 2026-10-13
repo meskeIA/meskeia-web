@@ -567,6 +567,17 @@ y buena parte del pasivo no valida el resultado. El pasivo lo drena el Inspector
 > Salió de `conversor-numeros-letras` (24/08/2026) y `calculadora-masa-madre` (25/08). Crónica y
 > pasivo: cabecera de `scripts/check-parser-numerico.mjs` · casos: `scripts/pruebas/parser-numerico.tsx`.
 
+### Candado de las características del JSON-LD
+
+`npm run check:features` — en el build, y **rompe el build** si un `metadata.ts` o `layout.tsx`
+de `app/` añade o retoca una lista `features`/`featureList` con **menos de 4** literales (§1.ter).
+Juzga **las listas cuyas líneas toca el commit**: tocar el title de una app vieja no obliga ·
+Escape: `features-ok: <razón>`, razón obligatoria · `npm run check:features -- --todo` mide el pasivo.
+⚠️ Rellenar las 297 vacías en bloque NO: escritas a ciegas son promesas. El pasivo lo rellena
+el Inspector app por app, que comprueba qué hace la app.
+> Salió del cabo C0137 (etiqueta-dgt, 04/10/2026, reparado en a97f92ab). Crónica: cabecera de
+> `scripts/check-features-jsonld.mjs` · pruebas: `npm run features:probar-candado`.
+
 ### Candado de la hidratación en los tests
 
 `npm run check:hidratacion` — en el build, y **rompe el build** si un test escribe en un input

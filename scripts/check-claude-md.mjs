@@ -284,6 +284,11 @@ const OBLIGACIONES = [
     'El pasivo lo drena el Inspector app por app', 'parser-ok: <razón>',
     'npm run check:parser -- --todo', 'node scripts/check-parser-numerico.mjs <fichero>',
   ]],
+  ['Candado de las características del JSON-LD', [
+    'npm run check:features', 'rompe el build', 'menos de 4', 'las listas cuyas líneas toca el commit',
+    'features-ok: <razón>', 'razón obligatoria', 'npm run check:features -- --todo',
+    'Rellenar las 297 vacías en bloque NO', 'npm run features:probar-candado',
+  ]],
   ['Candado de la hidratación en los tests', [
     'npm run check:hidratacion', 'rompe el build', 'con el setter nativo',
     'HTMLInputElement.prototype', 'tests/apps/_hidratacion.ts', 'sembrarValor',
