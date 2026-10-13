@@ -557,18 +557,17 @@ test('el FAQPage y la FAQ visible dan la MISMA respuesta a «¿Qué significa la
 });
 
 test('el jsonLd no promete una «animación en tiempo real» que la app no tiene', async ({ page }) => {
-  test.fail(
-    true,
-    'ABIERTO (07/10/2026): featureList dice «Animación V_m(t) en tiempo real con las 5 fases» y el lienzo es un trazado estático',
-  );
-  // A mano: el trazo se recalcula al mover un control, pero sin tocar nada no se mueve.
-  const antes = await huellaLienzo(page);
-  await page.waitForTimeout(2000);
-  const despues = await huellaLienzo(page);
+  // Hallazgo 2956, REPARADO (13/10/2026): el featureList prometía «Animación V_m(t) en tiempo
+  // real» y «Detección de periodos refractarios», y el lienzo es un trazado que se recalcula al
+  // mover un control, sin animación ni marca de ningún periodo. Se bajó el texto a lo que hace.
+  // El testigo comparaba antes la huella del lienzo a los 0 y a los 2 s para decidir si mirar el
+  // texto, y la huella cambiaba a veces sin tocar nada: con el test.fail, salía «pasado» sin
+  // llegar a la aserción (cabo C0174). Ahora mira el texto siempre.
   const app = (await leerJsonLd(page)).find((b) => b['@type'] === 'WebApplication');
   const rasgos = ((app?.featureList as string[] | undefined) ?? []).join(' · ');
-  // Si algún día el lienzo se anima, la promesa pasa a ser cierta y este caso deja de fallar.
-  if (despues === antes) expect(rasgos).not.toMatch(/animaci[oó]n/i);
+  expect(rasgos).toContain('Trazado V_m(t)');
+  expect(rasgos).not.toMatch(/animaci[oó]n|tiempo real/i);
+  expect(rasgos).not.toMatch(/detecci[oó]n de periodos/i);
 });
 
 test('el bloque educativo no da una cifra redonda sin fuente («los 4 iones cubren 90 %»)', async ({ page }) => {
