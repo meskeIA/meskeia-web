@@ -1000,11 +1000,19 @@ test.describe('Re-inspección 01/10/2026 · en un móvil (Pixel 7)', () => {
     // internos salían a 2/3 de su altura. Esperado: el alto del dibujo es el alto mostrado.
     await page.goto('/analizador-espectro/');
     await esperarHidratacion(page, ['#sensitivity-slider']);
-    const medidas = await page.evaluate(() => {
-      const c = document.querySelector('canvas') as HTMLCanvasElement;
-      return { ancho: c.width, alto: c.height, anchoCss: c.clientWidth, altoCss: c.clientHeight };
-    });
-    expect(medidas.altoCss).toBeGreaterThan(0);
+    const medir = () =>
+      page.evaluate(() => {
+        const c = document.querySelector('canvas') as HTMLCanvasElement;
+        return { ancho: c.width, alto: c.height, anchoCss: c.clientWidth, altoCss: c.clientHeight };
+      });
+    // Con espera: la hidratación del input llega antes que los useEffect, y el lienzo se
+    // dimensiona en uno. Medido al instante, a veces aún tenía su 300×150 por defecto y el test
+    // fallaba 2 de 5 aislado (cabo C0216). El defecto (un alto fijo) sigue sin pasar.
+    await expect.poll(async () => {
+      const m = await medir();
+      return m.altoCss > 0 && m.alto === m.altoCss && m.ancho === m.anchoCss;
+    }).toBe(true);
+    const medidas = await medir();
     expect(medidas.alto).toBe(medidas.altoCss);
     expect(medidas.ancho).toBe(medidas.anchoCss);
   });
