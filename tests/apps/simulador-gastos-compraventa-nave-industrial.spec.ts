@@ -3046,11 +3046,19 @@ test.describe('Re-inspección 14/09/2026 — tres casos nuevos', () => {
 
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
-    // Los DOS únicos campos de la app.
+    // Los DOS únicos campos de la calculadora. Desde S0195 la página monta además el bloque
+    // compartido del reparto del IBI y la comunidad (fecha de la escritura, IBI, comunidad):
+    // reparte gastos del año entre las partes, tampoco calcula ninguna ganancia, y se cuenta
+    // aparte para que el test siga diciendo lo que decía (cabo C0234, 13/10/2026).
     const etiquetas = await page.evaluate(() =>
-      Array.from(document.querySelectorAll('input')).map((i) => i.getAttribute('aria-label')),
+      Array.from(document.querySelectorAll('input'))
+        .filter((i) => !i.closest('section[aria-labelledby="titulo-prorrateo"]'))
+        .map((i) => i.getAttribute('aria-label')),
     );
     expect(etiquetas).toEqual([PRECIO, GESTORIA]);
+    await expect(
+      page.locator('section[aria-labelledby="titulo-prorrateo"] input'),
+    ).toHaveCount(3);
 
     await sembrar(page, PRECIO, '500000');
     const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
