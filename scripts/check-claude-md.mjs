@@ -289,6 +289,11 @@ const OBLIGACIONES = [
     'features-ok: <razón>', 'razón obligatoria', 'npm run check:features -- --todo',
     'Rellenar las 297 vacías en bloque NO', 'npm run features:probar-candado',
   ]],
+  ['Candado del bailout en el prerender', [
+    'npm run check:bailout', 'después de next build', 'rompe el build', 'BAILOUT_TO_CLIENT_SIDE_RENDERING',
+    'ACEPTADOS', 'next dev no genera el bailout', 'Se planta si no ve un build completo',
+    'npm run bailout:probar-candado',
+  ]],
   ['Candado de la hidratación en los tests', [
     'npm run check:hidratacion', 'rompe el build', 'con el setter nativo',
     'HTMLInputElement.prototype', 'tests/apps/_hidratacion.ts', 'sembrarValor',

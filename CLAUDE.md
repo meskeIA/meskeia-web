@@ -578,6 +578,17 @@ el Inspector app por app, que comprueba qué hace la app.
 > Salió del cabo C0137 (etiqueta-dgt, 04/10/2026, reparado en a97f92ab). Crónica: cabecera de
 > `scripts/check-features-jsonld.mjs` · pruebas: `npm run features:probar-candado`.
 
+### Candado del bailout en el prerender
+
+`npm run check:bailout` — en el build, **después** de `next build`, y **rompe el build** si un HTML
+de `.next/server/app/` lleva una frontera `BAILOUT_TO_CLIENT_SIDE_RENDERING` y su página no está
+en `ACEPTADOS` del script con su razón: lo de dentro no está en el HTML servido.
+⚠️ `next dev` no genera el bailout: un spec de «está en el HTML servido» pasa en dev y falla en
+producción. Por eso se mira aquí, el único momento con el HTML de producción, y no en los tests.
+Se planta si no ve un build completo · sin escape en la app: se decide en `ACEPTADOS`.
+> Salió del cabo C0160 (CASO 15 de estimador-cartera-inversion, 08/10/2026). Crónica: cabecera de
+> `scripts/check-bailout-prerender.mjs` · pruebas: `npm run bailout:probar-candado`.
+
 ### Candado de la hidratación en los tests
 
 `npm run check:hidratacion` — en el build, y **rompe el build** si un test escribe en un input
