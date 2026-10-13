@@ -35,6 +35,33 @@ fallo que ningún testigo ve: sembrar el valor que el input YA tiene. Para encon
 `SIEMBRA_ESTRICTA=1 npx playwright test tests/apps`; cada línea «SIEMBRA INÚTIL» es un caso que
 hay que hacer partir de otro estado.
 
+## Trampas de la emulación ya medidas
+
+Ninguna es un defecto de la app; todas han dado rojos (o verdes) falsos. Antes de perseguir un
+rojo que no se reproduce aislado, mirar si es una de estas:
+
+- **Bajo `next dev` el modo estricto ejecuta cada efecto dos veces**: un rastreador emite dos
+  avisos por carga. Contar por montaje (2 en desarrollo, 1 en producción; se distingue con
+  `document.querySelector('nextjs-portal')`), como `simulador-teorema-central-limite` y
+  `simulador-potencial-accion` (C0073, C0171).
+- **`esperarHidratacion` vuelve antes que los `useEffect`**: lo que una app ajusta en un efecto
+  (el tamaño de un lienzo, una escala) se mide con `expect.poll`, no al instante (C0216).
+- **Una transición CSS** (`transition: r 0.2s`, `width…`) se mide a medias si el test lee justo
+  después del cambio: `expect.poll` hasta el valor final (C0160, kmeans).
+- **`context.route` no ve los WebSocket**: una página servida bajo `https://meskeia.com` saca el
+  de HMR a producción y bajo `next dev` no se hidrata. Puente con `page.routeWebSocket` al
+  servidor local (C0171).
+- **El micrófono falso de Chromium pierde audio** con la máquina cargada (huecos de ceros): un
+  hueco es un clic de banda ancha de verdad y la app hace bien en leerlo (C0113).
+- **Tras un deslizamiento con `Input.dispatchTouchEvent`, el primer `tap()` no genera click**, y un
+  `scrollIntoView` suave lanzado desde un botón que se pone `disabled` en el mismo clic se
+  cancela (C0073).
+- **Móvil emulado (`isMobile` + `hasTouch`)**: teclear en un campo con `keyboard.type`, tocar
+  otro y volver a teclear deja pulsaciones sin `input` (2 de 3 en `estimador-impuesto-sucesiones`):
+  sembrar el primer campo (C0091).
+- **Recorrer el texto del `body`** sin excluir `script, style` cuenta el payload de React, que
+  desde 99e1ee7e lleva los iconos de las relacionadas (C0175).
+
     npm run test:apps
 
 Estado de qué app se ha inspeccionado y cuándo: `npm run inspector:cola -- --resumen`.
