@@ -37,7 +37,7 @@ export const jsonLd = generateWebAppSchema({
   url: "https://meskeia.com/lupa-digital/",
   category: 'UtilityApplication',
   features: [
-    'Ampliación digital de 1× a 5× con la cámara del móvil o celular',
+    'Ampliación de 1× a 5× con la cámara del móvil o celular, usando el zoom de la propia cámara cuando el navegador lo permite',
     'Congelar la imagen para leerla sin sostener el teléfono, recorriéndola con el dedo o el teclado',
     'Filtros de accesibilidad: alto contraste, inversión, escala de grises y sepia',
     'Ajuste independiente de brillo y contraste en tiempo real',
@@ -57,7 +57,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona la lupa digital online?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La lupa digital accede a la cámara de tu dispositivo (móvil o celular, tablet, u ordenador o computadora con webcam) y muestra la imagen en pantalla con el nivel de ampliación que elijas. A diferencia del zoom óptico de una lupa física, aplica ampliación digital sobre la imagen de la cámara en tiempo real, permitiendo ver con mayor detalle textos pequeños, etiquetas, componentes electrónicos o cualquier objeto que coloquen frente al objetivo.',
+        text: 'La lupa digital accede a la cámara de tu dispositivo (móvil o celular, tablet, u ordenador o computadora con webcam) y muestra la imagen en pantalla con el nivel de ampliación que elijas. Si el navegador deja controlar el zoom de la cámara, como hacen muchos móviles Android con Chrome, se lo pide primero a ella, que amplía sobre la imagen completa del sensor y pierde menos nitidez; el resto del zoom se aplica en pantalla, en tiempo real, permitiendo ver con mayor detalle textos pequeños, etiquetas, componentes electrónicos o cualquier objeto que coloquen frente al objetivo.',
       },
     },
     {

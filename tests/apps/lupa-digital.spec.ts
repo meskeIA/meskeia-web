@@ -279,6 +279,97 @@ test('CASO 3 — «Detener» termina los tracks de la cámara y ninguna imagen v
   expect(peticiones.length).toBeGreaterThan(0); // el listener estaba puesto de verdad
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// CASO 4 — el zoom se pide primero a la CÁMARA y solo el resto se amplía en pantalla
+// (semilla S0201, 13/10/2026)
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * La cámara simulada de Chromium no expone `zoom`, así que se le pone una que amplía de 1x a
+ * 3x en pasos de 0,1, como la de un Android con Chrome, y se anota cada zoom que la app le
+ * pide. Con `falla: true`, applyConstraints rechaza el zoom, como cuando el usuario no
+ * concede el permiso de controlarlo.
+ */
+async function simularCamaraConZoom(page: Page, falla = false) {
+  await page.addInitScript((rechazar: boolean) => {
+    const w = window as unknown as { __zoomPedido: number[] };
+    w.__zoomPedido = [];
+    const proto = MediaStreamTrack.prototype;
+    const capacidadesOriginal = proto.getCapabilities;
+    const aplicarOriginal = proto.applyConstraints;
+    proto.getCapabilities = function (this: MediaStreamTrack) {
+      const c = capacidadesOriginal.call(this);
+      return this.kind === 'video' ? { ...c, zoom: { min: 1, max: 3, step: 0.1 } } : c;
+    };
+    proto.applyConstraints = function (this: MediaStreamTrack, c?: MediaTrackConstraints) {
+      const zoom = (c?.advanced?.[0] as { zoom?: number } | undefined)?.zoom;
+      if (typeof zoom !== 'number') return aplicarOriginal.call(this, c);
+      if (rechazar) return Promise.reject(new DOMException('Sin permiso de zoom', 'NotAllowedError'));
+      w.__zoomPedido.push(zoom);
+      return Promise.resolve();
+    };
+  }, falla);
+}
+
+const zoomPedido = (page: Page) =>
+  page.evaluate(() => (window as unknown as { __zoomPedido: number[] }).__zoomPedido);
+
+test('CASO 4 — con una cámara que amplía hasta 3x, la lupa le pide el zoom a ella y amplía en pantalla solo el resto', async ({
+  page,
+}) => {
+  await simularCamaraConZoom(page);
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Activar lupa/i }).click();
+  await esperarCamaraEnMarcha(page);
+
+  const video = page.locator('video');
+  const lienzo = page.locator('canvas');
+  const nota = page.locator('[class*=zoomNota]');
+
+  // 2x por defecto: entero dentro del rango de la cámara, la pantalla no amplía nada.
+  await expect.poll(async () => (await zoomPedido(page)).at(-1)).toBe(2);
+  await expect(video).toHaveAttribute('style', /transform: scale\(1\)/);
+  await expect(nota).toHaveText(/Los 2x los hace la propia cámara/);
+
+  // 5x: la cámara llega a 3 y faltan 5 / 3 = 1,667 en pantalla. El indicador sigue diciendo 5x.
+  await page.getByRole('button', { name: '5x', exact: true }).click();
+  await expect.poll(async () => (await zoomPedido(page)).at(-1)).toBe(3);
+  await expect(video).toHaveAttribute('style', /transform: scale\(1\.667\)/);
+  await expect(nota).toHaveText('La cámara hace 3x y el resto (1,7x) se amplía en pantalla.');
+  await expect(page.locator('[class*=zoomIndicador]')).toHaveText('5x');
+
+  // Congelada a 5x, la imagen ya trae dentro los 3x de la cámara: en pantalla va 1,667.
+  await page.getByRole('button', { name: /Congelar/i }).click();
+  await expect(lienzo).toHaveAttribute('style', /scale\(1\.667\)/);
+  const pedidosAlCongelar = (await zoomPedido(page)).length;
+
+  // Con la imagen quieta, bajar el zoom solo cambia la pantalla: a la cámara no se le pide
+  // nada (no hay nada que capturar). A 3x la imagen se ve tal cual se tomó, sin recorrido.
+  await page.getByRole('button', { name: '3x', exact: true }).click();
+  await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(1\)/);
+  await page.getByRole('button', { name: '2x', exact: true }).click();
+  await expect(lienzo).toHaveAttribute('style', /scale\(0\.667\)/);
+  expect((await zoomPedido(page)).length).toBe(pedidosAlCongelar);
+  await expect(nota).toBeHidden();
+
+  // Al reanudar, la cámara vuelve a recibir el zoom actual.
+  await page.getByRole('button', { name: /Reanudar/i }).click();
+  await expect.poll(async () => (await zoomPedido(page)).at(-1)).toBe(2);
+  await expect(video).toHaveAttribute('style', /transform: scale\(1\)/);
+});
+
+test('CASO 5 — si la cámara rechaza el zoom, todo vuelve a ampliarse en pantalla y la nota desaparece', async ({
+  page,
+}) => {
+  await simularCamaraConZoom(page, true);
+  await page.goto(RUTA);
+  await page.getByRole('button', { name: /Activar lupa/i }).click();
+  await esperarCamaraEnMarcha(page);
+
+  await page.getByRole('button', { name: '3x', exact: true }).click();
+  await expect(page.locator('video')).toHaveAttribute('style', /transform: scale\(3\)/);
+  await expect(page.locator('[class*=zoomNota]')).toHaveCount(0);
+});
+
 /**
  * REGRESIÓN heredada de la inspección anterior (lote mecánico del Inspector, 18/08/2026).
  * Estos tres hallazgos ya están reparados: se conservan tal cual porque cubren rincones que

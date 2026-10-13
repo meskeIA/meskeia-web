@@ -5,8 +5,15 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './LupaDigital.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
+import { leerRangoZoom, repartirZoom, type RangoZoomCamara } from './zoom';
 
-type FiltroTipo = 'ninguno' | 'alto-contraste' | 'invertir' | 'escala-grises' | 'sepia';
+/** Ni `zoom` ni `torch` están aún en los tipos de DOM de TypeScript. */
+type CapacidadesCamara = MediaTrackCapabilities & { torch?: boolean; zoom?: Partial<RangoZoomCamara> };
+
+/** 3 → «3», 1,667 → «1,7»: un decimal como mucho, el mismo criterio que el indicador. */
+const formatearZoom = (z: number) => formatNumber(z, Math.abs(z - Math.round(z)) < 0.05 ? 0 : 1);
+
+type FiltroTipo ='ninguno' | 'alto-contraste' | 'invertir' | 'escala-grises' | 'sepia';
 
 /**
  * Por qué no basta con «concedido / denegado»: un equipo sin webcam recibe un
@@ -45,6 +52,11 @@ export default function LupaDigitalPage() {
   const [camaraActual, setCamaraActual] = useState<'user' | 'environment'>('environment');
   const [congelado, setCongelado] = useState(false);
   const [desplazamiento, setDesplazamiento] = useState({ x: 0, y: 0 });
+  // Hasta dónde amplía la cámara por sí misma (null = no deja: todo el zoom va a la pantalla)
+  const [rangoZoomCamara, setRangoZoomCamara] = useState<RangoZoomCamara | null>(null);
+  // Zoom de cámara con el que se tomó la imagen congelada: la imagen quieta ya viene
+  // ampliada en esa medida y solo puede seguir ampliándose en pantalla.
+  const [zoomCamaraCongelado, setZoomCamaraCongelado] = useState(1);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -84,17 +96,26 @@ export default function LupaDigitalPage() {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
 
+      // `zoom: true` pide permiso para controlar el zoom de la cámara. Si la cámara no
+      // tiene zoom, Chrome muestra el aviso de cámara normal y no falla nada; los
+      // navegadores que no lo conocen lo ignoran.
       const constraints: MediaStreamConstraints = {
         video: {
           facingMode,
           width: { ideal: 1920 },
           height: { ideal: 1080 },
-        }
+          zoom: true,
+        } as MediaTrackConstraints,
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
       setPermisoCamara('granted');
+
+      const pista = stream.getVideoTracks()[0];
+      setRangoZoomCamara(
+        pista && 'getCapabilities' in pista ? leerRangoZoom(pista.getCapabilities() as CapacidadesCamara) : null,
+      );
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -133,6 +154,8 @@ export default function LupaDigitalPage() {
     setAvisoLinterna('');
     setCongelado(false);
     setDesplazamiento({ x: 0, y: 0 });
+    setRangoZoomCamara(null);
+    setZoomCamaraCongelado(1);
     liberarWakeLock();
   };
 
@@ -141,7 +164,7 @@ export default function LupaDigitalPage() {
 
     const track = streamRef.current.getVideoTracks()[0];
     const capabilities = track && 'getCapabilities' in track
-      ? track.getCapabilities() as MediaTrackCapabilities & { torch?: boolean }
+      ? track.getCapabilities() as CapacidadesCamara
       : undefined;
 
     // Salir en silencio dejaba al usuario pulsando un botón que no responde: las
@@ -198,15 +221,36 @@ export default function LupaDigitalPage() {
     return () => document.removeEventListener('visibilitychange', alCambiarVisibilidad);
   }, [activo, solicitarWakeLock]);
 
+  const reparto = repartirZoom(zoom, rangoZoomCamara);
+  // La imagen congelada ya trae dentro el zoom de cámara con que se tomó: en pantalla
+  // solo falta el resto. Por debajo de ese zoom se ve más pequeña, con borde negro.
+  const escalaCongelada = Math.round((zoom / zoomCamaraCongelado) * 1000) / 1000;
+
+  // Pedir a la cámara su parte del zoom. Con la imagen congelada no se toca: la
+  // cámara se queda como estaba y se ajusta al reanudar.
+  useEffect(() => {
+    if (!activo || congelado || !rangoZoomCamara) return;
+    const pista = streamRef.current?.getVideoTracks()[0];
+    if (!pista) return;
+    pista
+      .applyConstraints({ advanced: [{ zoom: reparto.camara } as MediaTrackConstraintSet] })
+      .catch(() => {
+        // Sin permiso para el zoom (o una cámara que lo anuncia y luego lo rechaza):
+        // se vuelve al zoom en pantalla, que funciona en cualquier dispositivo.
+        setRangoZoomCamara(null);
+      });
+  }, [activo, congelado, rangoZoomCamara, reparto.camara]);
+
   /**
    * Al ampliar z veces, la imagen sobresale del visor (z - 1) / 2 por cada lado:
    * ese es el margen que se puede recorrer. Más allá solo habría fondo negro.
+   * Solo se recorre la imagen congelada, así que z es su escala en pantalla.
    */
   const acotarDesplazamiento = (x: number, y: number) => {
     const visor = visorRef.current;
     if (!visor) return { x: 0, y: 0 };
-    const maxX = (visor.clientWidth * (zoom - 1)) / 2;
-    const maxY = (visor.clientHeight * (zoom - 1)) / 2;
+    const maxX = Math.max(0, (visor.clientWidth * (escalaCongelada - 1)) / 2);
+    const maxY = Math.max(0, (visor.clientHeight * (escalaCongelada - 1)) / 2);
     return {
       x: Math.max(-maxX, Math.min(maxX, x)),
       y: Math.max(-maxY, Math.min(maxY, y)),
@@ -229,6 +273,7 @@ export default function LupaDigitalPage() {
     // El vídeo se pausa (deja de consumir batería) pero el stream sigue abierto,
     // de modo que reanudar es inmediato y no vuelve a pedir permiso de cámara.
     video.pause();
+    setZoomCamaraCongelado(reparto.camara);
     setDesplazamiento({ x: 0, y: 0 });
     setCongelado(true);
   };
@@ -358,7 +403,7 @@ export default function LupaDigitalPage() {
           className={styles.lupaVideo}
           style={{
             display: activo && !congelado ? 'block' : 'none',
-            transform: `scale(${zoom})`,
+            transform: `scale(${reparto.pantalla})`,
             filter: getFiltroStyle(),
           }}
         />
@@ -372,7 +417,7 @@ export default function LupaDigitalPage() {
           aria-label="Imagen congelada: arrástrala o usa las flechas del teclado para recorrerla"
           style={{
             display: congelado ? 'block' : 'none',
-            transform: `translate(${desplazamiento.x}px, ${desplazamiento.y}px) scale(${zoom})`,
+            transform: `translate(${desplazamiento.x}px, ${desplazamiento.y}px) scale(${escalaCongelada})`,
             filter: getFiltroStyle(),
           }}
           onPointerDown={iniciarArrastre}
@@ -480,6 +525,15 @@ export default function LupaDigitalPage() {
             </button>
           ))}
         </div>
+        {activo && !congelado && rangoZoomCamara && (
+          <p className={styles.zoomNota} role="status" aria-live="polite">
+            {reparto.camara <= 1
+              ? `Esta cámara puede ampliar por sí misma hasta ${formatearZoom(Math.min(rangoZoomCamara.max, 5))}x: al subir el zoom lo hará ella, sobre la imagen completa del sensor, y se pierde menos nitidez que ampliando en pantalla.`
+              : reparto.pantalla < 1.05
+                ?`Los ${formatearZoom(reparto.camara)}x los hace la propia cámara, sobre la imagen completa del sensor: se pierde menos nitidez que ampliando en pantalla.`
+                : `La cámara hace ${formatearZoom(reparto.camara)}x y el resto (${formatearZoom(reparto.pantalla)}x) se amplía en pantalla.`}
+          </p>
+        )}
       </div>
 
       {/* Filtros */}
@@ -575,12 +629,12 @@ export default function LupaDigitalPage() {
       <div className={styles.usosSection}>
         <h3>Usos comunes</h3>
         <div className={styles.usosGrid}>
-          <div className={styles.usoItem}>📖 Leer letra pequeña</div>
-          <div className={styles.usoItem}>💊 Ver prospectos</div>
-          <div className={styles.usoItem}>🏷️ Leer etiquetas</div>
-          <div className={styles.usoItem}>🔧 Trabajos de precisión</div>
-          <div className={styles.usoItem}>📱 Ver componentes</div>
-          <div className={styles.usoItem}>♿ Accesibilidad</div>
+          <div className={styles.usoItem}><span aria-hidden="true">📖</span> Leer letra pequeña</div>
+          <div className={styles.usoItem}><span aria-hidden="true">💊</span> Ver prospectos</div>
+          <div className={styles.usoItem}><span aria-hidden="true">🏷️</span> Leer etiquetas</div>
+          <div className={styles.usoItem}><span aria-hidden="true">🔧</span> Trabajos de precisión</div>
+          <div className={styles.usoItem}><span aria-hidden="true">📱</span> Ver componentes</div>
+          <div className={styles.usoItem}><span aria-hidden="true">♿</span> Accesibilidad</div>
         </div>
       </div>
 
@@ -609,28 +663,28 @@ export default function LupaDigitalPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🔍 1,5x</td>
+                  <td><span aria-hidden="true">🔍</span> 1,5x</td>
                   <td>Muy amplio</td>
                   <td>Ver mejor sin perder de vista el conjunto</td>
                   <td>Texto de 8–10 pt</td>
                   <td>Amplía poco: solo ayuda con letra ya casi legible</td>
                 </tr>
                 <tr>
-                  <td>🔍 2x</td>
+                  <td><span aria-hidden="true">🔍</span> 2x</td>
                   <td>Amplio</td>
                   <td>Leer etiquetas y texto normal</td>
                   <td>Letras de 6–8 pt</td>
                   <td>Poco útil para detalles muy finos</td>
                 </tr>
                 <tr>
-                  <td>🔍 3x</td>
+                  <td><span aria-hidden="true">🔍</span> 3x</td>
                   <td>Medio</td>
                   <td>Manuales, mapas, prospectos</td>
                   <td>Letras de 4–5 pt, líneas finas</td>
                   <td>El pulso leve ya causa desenfoque</td>
                 </tr>
                 <tr>
-                  <td>🔍 4x–5x <span className={styles.notaMaximo}>(máximo)</span></td>
+                  <td><span aria-hidden="true">🔍</span> 4x–5x <span className={styles.notaMaximo}>(máximo)</span></td>
                   <td>Reducido</td>
                   <td>Ingredientes, números de serie, marcas pequeñas</td>
                   <td>Detalles de 1–2 mm</td>
@@ -706,16 +760,18 @@ export default function LupaDigitalPage() {
                 <summary>¿La lupa digital tiene la misma calidad que una lupa física?</summary>
                 <p>
                   No exactamente. Una lupa óptica de calidad ofrece imagen nítida sin
-                  degradación. La lupa digital amplía mediante software, por lo que a
-                  partir de cierto zoom la imagen puede pixelarse: en esta lupa se nota
-                  al acercarse a su máximo de 5x.
+                  degradación. La lupa digital amplía la imagen de la cámara, y a partir
+                  de cierto zoom puede pixelarse: se nota al acercarse a su máximo de 5x.
                   Para usos cotidianos (leer etiquetas, manuales) la calidad es más que
                   suficiente y tiene la ventaja de añadir filtros de contraste y
                   ajustar el brillo.
                 </p>
                 <p className={styles.faqTip}>
-                  Dato: los smartphones modernos con zoom óptico integrado obtienen
-                  resultados significativamente mejores que el zoom digital puro.
+                  Dato: si el navegador deja controlar el zoom de la cámara (muchos móviles
+                  Android con Chrome lo permiten), la lupa se lo pide primero a ella, que
+                  amplía sobre la imagen completa del sensor y pierde menos nitidez. Debajo
+                  del control de zoom verás cuánto hace la cámara y cuánto la pantalla; si
+                  no aparece esa línea, todo el zoom se hace en pantalla.
                 </p>
               </details>
             </li>

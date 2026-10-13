@@ -877,6 +877,22 @@
   background: rgba(46, 134, 171, 0.18);
 }
 
+/* Cuánto del zoom hace la cámara y cuánto la pantalla (solo si la cámara amplía) */
+.zoomNota {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+[data-theme='dark'] .zoomNota {
+  background: rgba(46, 134, 171, 0.18);
+}
+
 /* Marca el tope real del control en la tabla de niveles de zoom */
 .notaMaximo {
   font-size: 0.85em;
