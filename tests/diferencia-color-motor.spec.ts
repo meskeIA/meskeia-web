@@ -7,6 +7,7 @@ import {
   VISIONES_COMPARADAS,
 } from '@/lib/calculadoras/diferenciaColor';
 import { MATRICES_CVD, srgbALineal, linealASrgb } from '@/lib/calculadoras/daltonismo';
+import { nombreDeColor } from '@/data/colores-nombrados';
 
 /**
  * Motor de diferencia de color — sRGB → CIELAB → ΔE00 (semilla S0202, 13/10/2026)
@@ -140,3 +141,40 @@ test('nivelDiferencia: los cuatro tramos y sus fronteras', () => {
   expect(nivelDiferencia(6)).toBe('distintos');
   expect(nivelDiferencia(40)).toBe('distintos');
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// nombreDeColor (data/colores-nombrados.ts) — el vecino más cercano por ΔE00
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Hasta el 13/10/2026 el nombre salía de la distancia «redmean» en RGB, que pesa sobre todo
+ * la luminosidad y llamaba gris a uno de cada diez colores con croma claro: #23418C, un azul
+ * evidente, era «Gris oscuro», y #9D7181 y #578D7F (el par del caso 4 del identificador),
+ * «Gris» los dos. Al comparar dos prendas, la app decía que eran distintas y las llamaba igual.
+ */
+test.describe('nombreDeColor — un color con croma claro no se llama gris', () => {
+  test('los tres casos que lo destaparon', () => {
+    expect(nombreDeColor(0x23, 0x41, 0x8c)).toBe('Azul');
+    expect(nombreDeColor(0x57, 0x8d, 0x7f)).toBe('Verde azulado');
+    expect(NEUTROS).not.toContain(nombreDeColor(0x9d, 0x71, 0x81));
+  });
+
+  /**
+   * Rejilla de paso 15 (5.832 colores). Con redmean salían ~10 % de cromáticos con nombre de
+   * gris y ~18 % de grises con nombre de color; con ΔE00, ~1-2 % y ~1 %. Los topes dejan margen
+   * para que una entrada nueva en la paleta no rompa esto sin motivo, pero no para volver atrás.
+   */
+  test('cobertura: pocos cromáticos con nombre de gris y pocos grises con nombre de color', () => {
+    let cromaticos = 0, cromaticosGris = 0, grises = 0, grisesColor = 0;
+    for (let r = 0; r <= 255; r += 15) for (let g = 0; g <= 255; g += 15) for (let b = 0; b <= 255; b += 15) {
+      const { L, a, b: bb } = srgbALab([r, g, b]);
+      const C = Math.hypot(a, bb);
+      const esGris = NEUTROS.includes(nombreDeColor(r, g, b));
+      if (C >= 15 && L > 8 && L < 97) { cromaticos++; if (esGris) cromaticosGris++; }
+      if (C < 5) { grises++; if (!esGris) grisesColor++; }
+    }
+    expect(cromaticosGris / cromaticos, `${cromaticosGris} de ${cromaticos} cromáticos con nombre de gris`).toBeLessThan(0.03);
+    expect(grisesColor / grises, `${grisesColor} de ${grises} grises con nombre de color`).toBeLessThan(0.05);
+  });
+});
+
+const NEUTROS = ['Negro', 'Gris oscuro', 'Gris', 'Gris claro', 'Blanco'];

@@ -650,10 +650,11 @@ export default function IdentificadorColorPage() {
           </p>
           <p>
             Con ese RGB medio, la app busca en una paleta de colores con nombre en español cuál es el
-            más parecido. La comparación no usa una simple resta de valores RGB, sino una fórmula de
-            <strong> distancia perceptual (redmean)</strong> que pesa más el verde y ajusta el rojo y
-            el azul según el tono, acercándose a cómo el ojo humano percibe las diferencias. Por eso el
-            nombre resultante suele coincidir con el que diría una persona.
+            más parecido. La comparación no usa una simple resta de valores RGB: pasa los dos colores a
+            un espacio pensado para la visión humana (CIELAB) y mide su diferencia con la fórmula
+            <strong> CIEDE2000 (ΔE00)</strong> de la CIE, que pesa el tono, la saturación y la luminosidad
+            como los percibe el ojo. Por eso un azul apagado se llama azul y no gris, y el nombre
+            suele coincidir con el que diría una persona.
           </p>
 
           <h2>HEX, RGB y HSL: qué es cada código</h2>

@@ -65,7 +65,7 @@ test('caso 1 · la tabla de colores es íntegra y el conjunto de cobertura no se
 
 test('caso 1.bis · los cinco nombres que fija la app de cámara siguen saliendo igual', () => {
   // Mismos valores que `tests/apps/identificador-color-camara.spec.ts`, resueltos a mano
-  // allí con la fórmula redmean. Se repiten aquí porque quien toque ESTA tabla no tiene
+  // allí (con ΔE00 desde el 13/10/2026; antes, con redmean). Se repiten aquí porque quien toque ESTA tabla no tiene
   // por qué saber que hay otra app viviendo de ella.
   expect(nombreDeColor(255, 0, 0)).toBe('Rojo');
   expect(nombreDeColor(128, 128, 128)).toBe('Gris');

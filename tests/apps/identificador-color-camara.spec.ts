@@ -11,7 +11,7 @@ import zlib from 'node:zlib';
  *   - <h1> «🎨 Identificador de Color» + subtítulo: «descubre el nombre del color y sus
  *     códigos HEX, RGB y HSL en tiempo real. Pensado para daltonismo, baja visión y diseño».
  *   - metadata.ts → jsonLd.features: «Nombre del color en español calculado por vecino más
- *     cercano (distancia perceptual redmean)», «Códigos HEX, RGB y HSL con botón de copia»,
+ *     cercano (diferencia de color CIEDE2000)», «Códigos HEX, RGB y HSL con botón de copia»,
  *     «Modo imagen: sube una foto y toca cualquier punto para leer su color», «Procesamiento
  *     100% en el dispositivo: la cámara y las imágenes nunca salen del navegador».
  *   - FAQ: «¿Por qué la cámara trasera y no la frontal? La herramienta abre por defecto la
@@ -156,26 +156,30 @@ const NOMBRE_COLOR = (page: Page) =>
 // CASO 1 — VERDAD DURA DEL COLOR: RGB → HEX → HSL → nombre, con el píxel forzado
 //
 // Los cinco esperados están resueltos a mano ANTES de ejecutar, con las fórmulas del
-// propio page.tsx (rgbAHex, rgbAHsl con Math.round, y nombreDeColor por distancia
-// redmean de compuphase sobre la PALETA de 46 colores del fichero):
+// propio page.tsx (rgbAHex, rgbAHsl con Math.round) y, para el nombre, con nombreDeColor sobre
+// el conjunto de cobertura de data/colores-nombrados.ts. Desde el 13/10/2026 el vecino más
+// cercano se mide con ΔE00 (CIEDE2000, motor validado contra los pares de Sharma et al. 2005
+// en tests/diferencia-color-motor.spec.ts); hasta entonces era la distancia redmean, cuyas
+// cifras se conservan entre corchetes porque explican el hallazgo 393:
 //
 //  RGB(255,0,0)     → #FF0000 · HSL: l=0,5 → s=d/(max+min)=1 → 0°,100%,50%
-//                   · redmean: «Rojo» #E01B24 d=8.407,5 gana a «Carmesí» #DC143C d=12.632,6
+//                   · ΔE00: «Rojo» #E01B24 7,80 gana a «Carmesí» #DC143C 13,76
+//                     [redmean: 8.407,5 frente a 12.632,6]
 //  RGB(128,128,128) → #808080 · max=min → h=0, s=0; l=round(50,196)=50 → 0°,0%,50%
-//                   · redmean: «Gris» #808080 d=0 (coincidencia exacta)
+//                   · «Gris» #808080, ΔE00 = 0 (coincidencia exacta)
 //  RGB(46,134,171)  → #2E86AB · h=(4+(rn-gn)/d)/6=0,549333 → 197,76° → round 198
 //                   · s=0,490196/0,850980=0,576 → 58 · l=42,549 → 43 → 198°,58%,43%
-//                   · redmean: «Azul petróleo» #2E86AB d=0 (coincidencia exacta desde que la
+//                   · «Azul petróleo» #2E86AB, ΔE00 = 0 (coincidencia exacta desde que la
 //                     paleta tiene azules medios — hallazgo 393). Antes ganaba «Verde
-//                     azulado» #008080 con d=9.939,8, y el azul de marca de meskeIA se
+//                     azulado» #008080 [redmean d=9.939,8], y el azul de marca de meskeIA se
 //                     llamaba verde.
 //  RGB(70,130,180)  → #4682B4 · h=(4-0,545455)/6=0,575758 → 207,27° → 207
 //                   · s=0,431373/0,980392=0,44 → 44 · l=49,0196 → 49 → 207°,44%,49%
-//                   · redmean: «Azul acero» #4682B4 d=0 (coincidencia exacta). Antes ganaba
-//                     «Gris» con d=15.100,6: un azul con 44 % de saturación se llamaba gris,
+//                   · «Azul acero» #4682B4, ΔE00 = 0 (coincidencia exacta). Antes ganaba
+//                     «Gris» [redmean d=15.100,6]: un azul con 44 % de saturación se llamaba gris,
 //                     y esta app existe para poner NOMBRE al color a quien no lo distingue.
 //  RGB(0,128,0)     → #008000 · l=0,250980 → 25 · s=d/(max+min)=1 → 100 · h=120°
-//                   · redmean: «Verde» #008000 d=0 (coincidencia exacta)
+//                   · «Verde» #008000, ΔE00 = 0 (coincidencia exacta)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CASOS_COLOR = [
@@ -546,6 +550,11 @@ test('caso 4 · comparar A y B: veredicto con ΔE00 y aviso de la visión que lo
   await page.getByRole('button', { name: 'Guardar como color B' }).click();
 
   await expect(seccion).toContainText('#578D7F');
+  // Hasta el 13/10/2026 las dos muestras se llamaban «Gris»: la app decía que eran distintas
+  // y les daba el mismo nombre. Con ΔE00 son «Lila» y «Verde azulado».
+  await expect(seccion).toContainText('Lila');
+  await expect(seccion).toContainText('Verde azulado');
+  await expect(seccion).not.toContainText('Gris');
   await expect(seccion.getByRole('status')).toHaveText(
     'Colores distintos (diferencia ΔE00 de 39,8 con visión típica). Atención: con deuteranopía se verían prácticamente iguales.',
   );

@@ -39,7 +39,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [
     'Identificación del color en el centro del encuadre en tiempo real mediante la cámara',
-    'Nombre del color en español calculado por vecino más cercano (distancia perceptual redmean)',
+    'Nombre del color en español calculado por vecino más cercano (diferencia de color CIEDE2000)',
     'Códigos HEX, RGB y HSL con botón de copia al portapapeles',
     'Modo imagen: sube una foto o captura y toca cualquier punto para leer su color',
     'Congelar la lectura para leer con calma un color inestable por la luz',
@@ -59,7 +59,7 @@ export const faqJsonLd = {
       name: '¿Cómo se identifica el nombre de un color con la cámara?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Al activar la cámara, la herramienta toma la zona central del encuadre (marcada con una mira), promedia los píxeles de esa región y obtiene su valor RGB medio. Después compara ese valor con una paleta de colores con nombre en español y devuelve el más parecido usando una fórmula de distancia perceptual (redmean), que se aproxima mejor a cómo el ojo humano percibe las diferencias de color que una simple distancia matemática entre valores RGB. La lectura se actualiza varias veces por segundo, así que basta con apuntar al objeto.',
+        text: 'Al activar la cámara, la herramienta toma la zona central del encuadre (marcada con una mira), promedia los píxeles de esa región y obtiene su valor RGB medio. Después compara ese valor con una paleta de colores con nombre en español y devuelve el más parecido usando la fórmula CIEDE2000 (ΔE00), la que la CIE propone para medir cuánto se diferencian dos colores tal como los percibe el ojo humano, en lugar de una simple distancia matemática entre valores RGB. La lectura se actualiza varias veces por segundo, así que basta con apuntar al objeto.',
       },
     },
     {

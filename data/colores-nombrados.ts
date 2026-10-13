@@ -37,6 +37,8 @@
  * tenemos. Si alguien pide añadirlos, esta es la razón por la que no están.
  */
 
+import { ciede2000, srgbALab } from '@/lib/calculadoras/diferenciaColor';
+
 export type FamiliaColor =
   | 'neutro'
   | 'rojo'
@@ -188,28 +190,29 @@ export function rgbAHex(r: number, g: number, b: number): string {
   );
 }
 
-/** Conjunto de cobertura con el RGB ya calculado, para no repetirlo en cada comparación. */
-const COLORES_BASE_RGB = COLORES_BASE.map((c) => ({ ...c, ...hexARgb(c.hex) }));
+/** Conjunto de cobertura con su CIELAB ya calculado, para no repetirlo en cada comparación. */
+const COLORES_BASE_LAB = COLORES_BASE.map((c) => {
+  const { r, g, b } = hexARgb(c.hex);
+  return { ...c, lab: srgbALab([r, g, b]) };
+});
 
 /**
- * Distancia de color «redmean»: aproximación perceptual barata pero mucho mejor que la
- * distancia euclídea plana en RGB. Devuelve el cuadrado (basta para comparar).
- * Referencia: https://www.compuphase.com/cmetric.htm
+ * Nombre del color del conjunto de cobertura más cercano al RGB dado. Nunca devuelve vacío.
+ *
+ * La cercanía se mide con ΔE00 (CIEDE2000) sobre CIELAB. Hasta el 13/10/2026 era la distancia
+ * «redmean» en RGB, que pesa sobre todo la luminosidad: medida sobre una rejilla de 140.608
+ * colores sRGB (paso 5), llamaba GRIS al 10,4 % de los colores con croma claro (C* ≥ 15),
+ * como #23418C, un azul evidente, que salía «Gris oscuro», o #9D7181 y #578D7F, rosa y verde
+ * grisáceos, los dos «Gris». Con ΔE00 y la misma paleta: 1,6 %, ningún color nombrado con
+ * un tono a más de 60° del suyo (antes 2,3 %), y los grises de verdad (C* < 5) con nombre de
+ * color pasan de 124 de 691 a 8. Los cinco nombres que fijan los tests no cambian.
  */
-export function distanciaColor(r: number, g: number, b: number, c: RGB): number {
-  const rmedia = (r + c.r) / 2;
-  const dr = r - c.r;
-  const dg = g - c.g;
-  const db = b - c.b;
-  return (2 + rmedia / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rmedia) / 256) * db * db;
-}
-
-/** Nombre del color del conjunto de cobertura más cercano al RGB dado. Nunca devuelve vacío. */
 export function nombreDeColor(r: number, g: number, b: number): string {
-  let mejor = COLORES_BASE_RGB[0];
+  const objetivo = srgbALab([r, g, b]);
+  let mejor = COLORES_BASE_LAB[0];
   let mejorDist = Infinity;
-  for (const c of COLORES_BASE_RGB) {
-    const d = distanciaColor(r, g, b, c);
+  for (const c of COLORES_BASE_LAB) {
+    const d = ciede2000(objetivo, c.lab);
     if (d < mejorDist) {
       mejorDist = d;
       mejor = c;
