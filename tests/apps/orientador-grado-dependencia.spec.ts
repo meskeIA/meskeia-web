@@ -252,6 +252,9 @@ test.describe('orientador-grado-dependencia', () => {
         const texto = n.textContent ?? '';
         if (!texto.includes('💡')) continue;
         if (n.parentElement?.closest('[aria-hidden="true"]')) continue;
+        // El payload de React (un <script> en el body) lleva desde 99e1ee7e los iconos de las
+        // relacionadas: no es texto que lea un lector de pantalla (cabo C0175).
+        if (n.parentElement?.closest('script, style')) continue;
         malos.push(texto.trim().slice(0, 60));
       }
       return malos;

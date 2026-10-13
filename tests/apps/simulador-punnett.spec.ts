@@ -1264,6 +1264,8 @@ async function porcentajesHuerfanos(page: Page): Promise<string[]> {
     const salida: string[] = [];
     const recorrido = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = recorrido.nextNode(); n; n = recorrido.nextNode()) {
+      // El payload de React (un <script> en el body) no es texto pintado (cabo C0175).
+      if (n.parentElement?.closest('script, style')) continue;
       const t = n.nodeValue ?? '';
       for (let i = 2; i < t.length; i++) {
         if (t[i] !== '%' || !/\s/.test(t[i - 1]) || !/\d/.test(t[i - 2])) continue;

@@ -491,6 +491,8 @@ async function nodosDeLaApp(page: Page): Promise<{ t: string; oculto: boolean }[
     const salida: { t: string; oculto: boolean }[] = [];
     const recorrido = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = recorrido.nextNode(); n; n = recorrido.nextNode()) {
+      // El payload de React (un <script> en el body) no es texto pintado (cabo C0175).
+      if (n.parentElement?.closest('script, style')) continue;
       const conClase = n.parentElement?.closest('[class]');
       if (!conClase || !/SimuladorTermodinamicaCarnot/.test(conClase.getAttribute('class') ?? '')) continue;
       salida.push({ t: n.textContent ?? '', oculto: Boolean(n.parentElement?.closest('[aria-hidden="true"]')) });
