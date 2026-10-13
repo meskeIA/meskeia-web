@@ -270,7 +270,8 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr): con 1fr la columna no baja del ancho mínimo de su contenido y el panel se recorta en móvil */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .configPanel {
@@ -294,6 +295,13 @@
 
   .resultsGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* En móvil, tres columnas no caben («Permutaciones» mide 121 px): dos */
+@media (max-width: 480px) {
+  .tiposGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

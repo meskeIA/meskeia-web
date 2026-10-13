@@ -201,6 +201,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -209,6 +210,8 @@
   gap: var(--spacing-sm);
   align-items: center;
   flex: 1;
+  /* sin esto el ítem flex no baja del ancho de los inputs y empuja la × fuera del panel en móvil */
+  min-width: 0;
 }
 
 .input {
@@ -1557,7 +1560,8 @@
 /* Responsive */
 @media (max-width: 1200px) {
   .mainContent {
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr): con 1fr la columna no baja del ancho mínimo de su contenido y el panel se recorta en móvil */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .resumenGrid {
