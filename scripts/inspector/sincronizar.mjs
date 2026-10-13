@@ -95,8 +95,24 @@ function leerCatalogo() {
  * mira la nueva (un motor.ts, el módulo de data/fiscal tras el barril): esas vuelven a la
  * cola, porque es exactamente el cambio que la versión 1 se tragaba.
  */
-const ESQUEMA_HUELLA = 2;
+/*
+ * VERSIÓN 3 (13/10/2026): finales de línea normalizados a LF antes de huellear.
+ * Con `core.autocrlf=true`, meskeia-web tiene los ficheros en LF y la copia del Inspector
+ * (C:\Users\jaceb\meskeia-inspector, creada con `git worktree add`) en CRLF. Las dos sincronizan
+ * contra la MISMA base y `registrar.mjs` guarda como huella inspeccionada la que dejó el último
+ * sync: lo inspeccionado en la tarea volvía a la cola al sincronizar desde meskeia-web y al
+ * revés. Se vio porque la familia compraventa, inspeccionada entera a las 08:27, volvía a salir
+ * 7 de 7 pendiente a las 12:20 sin un solo commit en sus apps. La migración re-ancla, una vez,
+ * las apps cuya huella inspeccionada es la versión CRLF del código de hoy: el código es el
+ * mismo, solo cambian los saltos de línea. Las demás siguen como estaban.
+ */
+const ESQUEMA_HUELLA = 3;
 const FICHEROS_APP_V1 = ['page.tsx', 'layout.tsx', 'metadata.ts'];
+
+/** Texto con los finales de línea en LF: la huella no puede depender de la carpeta. */
+const aLF = t => t.replace(/\r\n/g, '\n');
+/** Solo para migrar a la versión 3: el mismo texto tal como lo leía la copia en CRLF. */
+const aCRLF = t => aLF(t).replace(/\n/g, '\r\n');
 
 /** Ficheros de código de la app, recursivo y en orden estable. */
 function ficherosDeApp(dir) {
@@ -154,13 +170,13 @@ function depsDe(texto) {
   return deps;
 }
 
-function hashDeDeps(unicas) {
+function hashDeDeps(unicas, finLinea = aLF) {
   if (!unicas.length) return '';
   let acum = '';
   for (const d of unicas) {
     for (const ext of ['.ts', '.tsx', '/index.ts']) {
       const p = path.join(RAIZ, d + ext);
-      if (fs.existsSync(p) && fs.statSync(p).isFile()) { acum += fs.readFileSync(p, 'utf8'); break; }
+      if (fs.existsSync(p) && fs.statSync(p).isFile()) { acum += finLinea(fs.readFileSync(p, 'utf8')); break; }
     }
   }
   return huella(acum);
@@ -185,10 +201,10 @@ function huellasV1(slug) {
     ...[...page.matchAll(/@\/data\/fiscal\/?([\w-]*)/g)].map(m => `data/fiscal/${m[1] || 'index'}`),
     ...[...page.matchAll(/@\/lib\/calculadoras\/([\w-]+)/g)].map(m => `lib/calculadoras/${m[1]}`),
   ];
-  return `${huella(codigo)}|${hashDeDeps([...new Set(deps)])}`;
+  return `${huella(codigo)}|${hashDeDeps([...new Set(deps)], t => t)}`;
 }
 
-function analizarApp(slug) {
+function analizarApp(slug, finLinea = aLF) {
   const dir = path.join(RAIZ, 'app', slug);
   if (!fs.existsSync(dir)) return null;
   const pagina = path.join(dir, 'page.tsx');
@@ -198,13 +214,13 @@ function analizarApp(slug) {
   let codigo = '';
   const deps = [];
   for (const p of ficherosDeApp(dir)) {
-    const t = fs.readFileSync(p, 'utf8');
+    const t = finLinea(fs.readFileSync(p, 'utf8'));
     // La ruta entra en la huella: mover un trozo de un fichero a otro también es un cambio
     codigo += `\n// ${path.relative(dir, p).replace(/\\/g, '/')}\n${t}`;
     if (!p.endsWith('.css')) deps.push(...depsDe(t));
   }
   const unicas = [...new Set(deps)].sort();
-  const hashDeps = hashDeDeps(unicas);
+  const hashDeps = hashDeDeps(unicas, finLinea);
 
   // El segmento decide CÓMO se inspecciona, no si se inspecciona.
   let segmento;
@@ -277,7 +293,9 @@ const upsert = db.prepare(`
 
 // Migración de la receta de la huella (ver ESQUEMA DE LA HUELLA): una sola vez por base
 const esquemaGuardado = Number(db.prepare("SELECT valor FROM meta WHERE clave = 'esquema_huella'").get()?.valor ?? 1);
-const migrar = esquemaGuardado < ESQUEMA_HUELLA;
+const migrar = esquemaGuardado < 2;
+const migrarLF = esquemaGuardado < 3;
+let reancladasLF = 0;
 const leerInspeccionado = db.prepare('SELECT hash_inspeccionado, ultima_inspeccion FROM apps WHERE slug = ?');
 const reanclar = db.prepare('UPDATE apps SET hash_inspeccionado = ? WHERE slug = ?');
 let reancladas = 0;
@@ -319,6 +337,20 @@ for (const [slug, app] of catalogo) {
       }
     }
   }
+  if (migrarLF) {
+    const fila = leerInspeccionado.get(slug);
+    const actual = `${a.hash_codigo}|${a.hash_deps || ''}`;
+    if (fila?.hash_inspeccionado && fila.hash_inspeccionado !== actual) {
+      // Dos formas del MISMO código: todo en CRLF (lo inspeccionado en la copia) o los ficheros
+      // tal cual están en esta carpeta, donde también hay apps con CRLF o mezclado fichero a
+      // fichero (sonometro, calculadora-notas…): la normalización les cambia la huella sin más
+      const formas = [aCRLF, t => t].map(f => analizarApp(slug, f)).map(c => `${c.hash_codigo}|${c.hash_deps || ''}`);
+      if (formas.includes(fila.hash_inspeccionado)) {
+        reanclar.run(actual, slug);
+        reancladasLF++;
+      }
+    }
+  }
   const riesgo = Math.min(...app.suites.map(s => RIESGO_SUITE[s] ?? 4), 4);
   const u = uso.porSlug.get(slug) || uso.porNombre.get(app.nombre) || null;
   if (!u) sinUso++;
@@ -332,7 +364,7 @@ for (const [slug, app] of catalogo) {
   );
   n++;
 }
-if (migrar) {
+if (migrarLF) {
   db.prepare("INSERT INTO meta (clave, valor) VALUES ('esquema_huella', ?) ON CONFLICT(clave) DO UPDATE SET valor = excluded.valor")
     .run(String(ESQUEMA_HUELLA));
 }
@@ -386,11 +418,15 @@ const cuenta = q => db.prepare(q).get().n;
 console.log(`\nBase del Inspector · _private/inspector/inspector.db`);
 console.log(`  ${n} apps sincronizadas` + (sinCarpeta ? ` · ${sinCarpeta} en el catálogo sin carpeta en app/` : ''));
 if (migrar) {
-  console.log(`  🔁 huella pasada a la versión ${ESQUEMA_HUELLA} (todos los ficheros de la app y el barril de data/fiscal resuelto): ` +
+  console.log(`  🔁 huella pasada a la versión 2 (todos los ficheros de la app y el barril de data/fiscal resuelto): ` +
     `${reancladas} app(s) que seguían vigentes se re-anclan y NO vuelven a la cola`);
   if (destapadas.length) {
     console.log(`  🔎 ${destapadas.length} vuelven a la cola por cambios posteriores a su inspección que la huella vieja no veía: ${destapadas.join(', ')}`);
   }
+}
+if (migrarLF) {
+  console.log(`  🔁 huella pasada a la versión 3 (finales de línea en LF): ${reancladasLF} app(s) con el mismo código ` +
+    `y otros saltos de línea se re-anclan y NO vuelven a la cola`);
 }
 if (retirables.length) {
   console.log(`  🗑️  ${retirables.length} retirada(s) del catálogo, sin inspeccionar: ${retirables.map(r => r.slug).join(', ')}`);

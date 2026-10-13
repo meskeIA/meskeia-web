@@ -47,6 +47,10 @@ import { FAMILIAS, familiaDe, slugsHuerfanos } from './familias.mjs';
 const args = process.argv.slice(2);
 const RESUMEN = args.includes('--resumen');
 const CUANTAS = Number(args.find(a => /^\d+$/.test(a))) || 10;
+// --json: solo el total que saldrá de verdad y sus familias, para `inspector-tarea.mjs lanzar`,
+// que avisa cuando una familia desborda el cupo pedido (13/10/2026: cupo bajado de 10 a 5)
+const JSON_SALIDA = args.includes('--json');
+const log = JSON_SALIDA ? () => {} : console.log;
 
 const db = abrir();
 
@@ -108,23 +112,23 @@ if (RESUMEN) {
   const vistas = db.prepare('SELECT COUNT(*) n FROM apps WHERE ultima_inspeccion IS NOT NULL').get().n;
   const conTest = db.prepare('SELECT COUNT(*) n FROM apps WHERE test_path IS NOT NULL').get().n;
   const abiertos = db.prepare("SELECT COUNT(*) n FROM hallazgos WHERE estado = 'abierto'").get().n;
-  console.log(`\nEstado del Inspector`);
-  console.log(`  catálogo:        ${t} apps`);
-  console.log(`  inspeccionadas:  ${vistas} (${(100 * vistas / t).toFixed(1)} %)`);
-  console.log(`  con test propio: ${conTest}`);
-  console.log(`  hallazgos abiertos: ${abiertos}`);
+  log(`\nEstado del Inspector`);
+  log(`  catálogo:        ${t} apps`);
+  log(`  inspeccionadas:  ${vistas} (${(100 * vistas / t).toFixed(1)} %)`);
+  log(`  con test propio: ${conTest}`);
+  log(`  hallazgos abiertos: ${abiertos}`);
   for (const c of COLAS) {
     const n = db.prepare(c.sql.replace('SELECT *,', 'SELECT COUNT(*) AS n,').replace(/ORDER BY p DESC/, '')).get()?.n ?? 0;
-    console.log(`  cola ${c.clave.padEnd(11)} ${n}`);
+    log(`  cola ${c.clave.padEnd(11)} ${n}`);
   }
   // Cobertura del uso: la cifra que de verdad dice cuánto se ha protegido
   const total = db.prepare('SELECT SUM(usos) s FROM apps').get().s || 1;
   const cubierto = db.prepare('SELECT SUM(usos) s FROM apps WHERE ultima_inspeccion IS NOT NULL').get().s || 0;
-  console.log(`\n  uso del catálogo ya inspeccionado: ${(100 * cubierto / total).toFixed(1)} %`);
-  console.log(`  (es la cifra que importa, no el % de apps: el 80 % del uso está en 114 apps)`);
+  log(`\n  uso del catálogo ya inspeccionado: ${(100 * cubierto / total).toFixed(1)} %`);
+  log(`  (es la cifra que importa, no el % de apps: el 80 % del uso está en 114 apps)`);
 
   const huerf = slugsHuerfanos(db);
-  console.log(`\n  familias declaradas: ${FAMILIAS.length} (salen JUNTAS de la cola)`);
+  log(`\n  familias declaradas: ${FAMILIAS.length} (salen JUNTAS de la cola)`);
   for (const f of FAMILIAS) {
     const pend = f.slugs.filter((s) => {
       const r = db.prepare(
@@ -132,11 +136,11 @@ if (RESUMEN) {
       ).get(s);
       return !!r;
     }).length;
-    console.log(`    ${f.id.padEnd(14)} ${f.slugs.length} apps · ${pend} pendientes · ${f.testigo}`);
+    log(`    ${f.id.padEnd(14)} ${f.slugs.length} apps · ${pend} pendientes · ${f.testigo}`);
   }
   if (huerf.length) {
-    console.log(`  ⚠ ${huerf.length} slug(s) declarados que ya no existen — corrige familias.mjs:`);
-    for (const h of huerf) console.log(`      ${h.familia} → ${h.slug}`);
+    log(`  ⚠ ${huerf.length} slug(s) declarados que ya no existen — corrige familias.mjs:`);
+    for (const h of huerf) log(`      ${h.familia} → ${h.slug}`);
   }
   process.exit(0);
 }
@@ -165,13 +169,14 @@ const SQL_ESTADO = db.prepare(`
 
 const huerfanos = slugsHuerfanos(db);
 if (huerfanos.length) {
-  console.log('\n⚠ Familias con slugs que ya no existen en el catálogo (corrige familias.mjs):');
-  for (const h of huerfanos) console.log(`    ${h.familia} → ${h.slug}`);
+  log('\n⚠ Familias con slugs que ya no existen en el catálogo (corrige familias.mjs):');
+  for (const h of huerfanos) log(`    ${h.familia} → ${h.slug}`);
 }
 
 let quedan = CUANTAS;
 let mostradas = 0;
 const familiasYaSacadas = new Set();
+const familiasSacadas = [];
 
 for (const c of COLAS) {
   if (quedan <= 0) break;
@@ -198,26 +203,32 @@ for (const c of COLAS) {
   }
 
   if (!elegidas.length) continue;
-  console.log(`\n${c.titulo}`);
+  log(`\n${c.titulo}`);
 
   for (const e of elegidas) {
     if (e.tipo === 'app') {
-      console.log(linea(e.fila));
+      log(linea(e.fila));
       mostradas += 1;
       continue;
     }
     const pendientes = e.miembros.filter((m) => m.estado !== 'al día').length;
-    console.log(`\n  👯 FAMILIA «${e.familia.nombre}» — se inspeccionan JUNTAS ` +
+    log(`\n  👯 FAMILIA «${e.familia.nombre}» — se inspeccionan JUNTAS ` +
                 `(${pendientes} de ${e.miembros.length} pendientes)`);
-    console.log(`     testigo:    ${e.familia.testigo}`);
-    console.log(`     referencia: ${e.familia.referencia} — el patrón correcto, no rediseñar`);
-    console.log(`     invariante: ${e.familia.invariante}`);
+    log(`     testigo:    ${e.familia.testigo}`);
+    log(`     referencia: ${e.familia.referencia} — el patrón correcto, no rediseñar`);
+    log(`     invariante: ${e.familia.invariante}`);
     for (const m of e.miembros) {
-      console.log(linea(m, '      ') + `  · ${m.estado}`);
+      log(linea(m, '      ') + `  · ${m.estado}`);
     }
     mostradas += pendientes;
+    familiasSacadas.push({ nombre: e.familia.nombre, pendientes, miembros: e.miembros.length });
   }
 }
 
-if (!mostradas) console.log('\nNada en cola: todo el catálogo está inspeccionado y sin cambios desde entonces.');
-else console.log(`\n${mostradas} apps · npm run inspector:cola -- --resumen para el estado global`);
+if (JSON_SALIDA) {
+  console.log(JSON.stringify({ pedidas: CUANTAS, apps: mostradas, familias: familiasSacadas }));
+  process.exit(0);
+}
+
+if (!mostradas) log('\nNada en cola: todo el catálogo está inspeccionado y sin cambios desde entonces.');
+else log(`\n${mostradas} apps · npm run inspector:cola -- --resumen para el estado global`);
