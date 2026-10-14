@@ -783,6 +783,7 @@ ascensos y descensos: ficha `feedback_frontera_decisiones` de la memoria.
 | 1 | `alcance`: extender una reparación a la misma clase de defecto en apps hermanas | testigo de familia, `check:familias`, specs |
 | 2 | `candado`: nuevo sobre un defecto ya observado, o de avisar a romper | `*:probar-candado` reinyecta el caso de origen |
 | 2 | `escala`: el mismo patrón en más de 20 apps | «Candado tras cambio a escala» |
+| 2 | `turno-a11y`: aplicar el turno de noche de accesibilidad y resolver sus dudas, salvo las que cambian la información que da la app | `check:a11y-jsx`, `check:tipos` y la comparación mecánica de `turno-a11y.mjs` (`probar-mecanica` repite las noches reales). Ascendió el 14/10/2026: 10 de 10 aceptadas |
 | 2 | `retirar-muerto`: código sin lectores | `check:motores-consumidos`, `check:tipos` |
 | 2 | `promesa`: bajar a lo que la app hace un title, description o FAQ que promete más | el Inspector; el usuario lo decidió el 05/10/2026: «no tiene sentido prometer algo que no hacemos» |
 | 2 | `config-claude`: ajustes de Claude Code que no amplían lo que sale del PC | la sesión siguiente lo valida; copia del perfil |
