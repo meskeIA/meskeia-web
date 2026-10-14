@@ -439,7 +439,8 @@ la Agenda Operativa del Centro de Mando (`restauracion-turso-semestral`).
 ### Candado de accesibilidad JSX
 
 `npm run check:a11y-jsx` — en el build, y **rompe el build** si el commit escribe un `<button>`
-sin `type=` o un emoji junto a texto sin `aria-hidden` (las dos reglas del CLAUDE.md global §5
+sin `type=` o un emoji junto a texto sin `aria-hidden`, también en una cadena que se pinta
+(`{x ? '⏹️ Detener' : …}`, cabo C0249) (las dos reglas del CLAUDE.md global §5
 cuya corrección es unívoca). Las otras tres —`aria-pressed` que falta en un toggle,
 `aria-pressed` que **sobra** y emoji en nodo propio— **solo avisan**: un `aria-pressed` en un
 botón de acción es una regresión, no una mejora.

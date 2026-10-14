@@ -20,7 +20,8 @@
  * Solo dos de las tres reglas rompen el build, y a propósito:
  *
  *   ROMPE   1. <button> sin type=            → la corrección es unívoca: type="button"
- *   ROMPE   2. emoji JUNTO A TEXTO sin aria-hidden
+ *   ROMPE   2. emoji JUNTO A TEXTO sin aria-hidden, también dentro de una cadena que se pinta
+ *              ({x ? '⏹️ Detener' : '▶️ Iniciar'}) desde el 14/10/2026: ver `cadenaPintada`
  *   AVISA   3. botón con onClick + className condicional y sin ningún aria-* ni role
  *   AVISA   4. emoji en nodo propio, sin aria-hidden y sin aria-label
  *   AVISA   5. aria-pressed en un botón que al pulsarlo se deshabilita (no se despulsa)
@@ -179,6 +180,49 @@ function seDeshabilitaAlPulsarse(pressed, disabled) {
   return false;
 }
 
+/** Padres que no admiten un <span> dentro: ahí el emoji no se puede envolver (ver encargo). */
+const SIN_SPAN = new Set(['option', 'title', 'textarea']);
+
+/**
+ * El texto de una cadena literal SI se pinta como hijo JSX, o `null`.
+ *
+ * `{reproduciendo ? '⏹️ Detener' : '▶️ Iniciar'}` lo lee el lector de pantalla igual que un
+ * `<button>⏹️ Detener</button>`, pero no es un JsxText y la regla 2 no lo veía. Cuenta como
+ * pintada la cadena que llega a un `{…}` HIJO de un elemento (no de un atributo: `title={…}`
+ * y `aria-label={…}` quedan fuera) directamente, como rama de un ternario o a la derecha de
+ * un `&&`, con paréntesis o ternarios anidados por medio. Lo demás —una cadena guardada en
+ * una variable, concatenada o pasada a una función— no se sigue: ahí la corrección ya no es
+ * mecánica.
+ *
+ * DE DÓNDE SALE (14/10/2026, cabo C0249): el turno de noche del 13/10 dejó metronomo y
+ * convertidor-subtitulos «limpios» con «⏹️ Detener» y «📋 Copiar» sin tocar, porque el
+ * candado —y con él el turno, que solo trabaja lo que el candado lista— no los veía. Medidas
+ * entonces ~82 líneas en 61 ficheros. Casos: `scripts/pruebas/a11y-emoji-cadena.tsx`.
+ */
+function cadenaPintada(n) {
+  let texto;
+  if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) texto = n.text;
+  else if (ts.isTemplateExpression(n)) texto = n.head.text + n.templateSpans.map(s => ' ' + s.literal.text).join('');
+  else return null;
+
+  let hijo = n;
+  let p = n.parent;
+  for (;;) {
+    if (ts.isParenthesizedExpression(p)) { hijo = p; p = p.parent; continue; }
+    if (ts.isConditionalExpression(p) && p.condition !== hijo) { hijo = p; p = p.parent; continue; }
+    if (ts.isBinaryExpression(p) && p.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken &&
+        p.right === hijo) { hijo = p; p = p.parent; continue; }
+    break;
+  }
+  if (!ts.isJsxExpression(p)) return null;
+  const elemento = p.parent;
+  if (ts.isJsxFragment(elemento)) return texto;
+  if (!ts.isJsxElement(elemento)) return null;   // un atributo: title={…}, aria-label={…}
+  const at = atributos(elemento.openingElement).m;
+  if (at.has('aria-hidden') || SIN_SPAN.has(elemento.openingElement.tagName.getText())) return null;
+  return texto;
+}
+
 // ─── Qué ficheros mirar ───────────────────────────────────────────────────────
 
 const relevante = (f) => f.endsWith('.tsx') && (f.startsWith('app/') || f.startsWith('components/'));
@@ -333,6 +377,14 @@ for (const rel of objetivos()) {
           apuntar(errores, n, 'emoji junto a texto', '«' + txt + '» → <span aria-hidden="true">');
         }
       }
+    }
+
+    // Regla 2 también dentro de una CADENA que se pinta como hijo JSX (ver cadenaPintada)
+    const cadena = cadenaPintada(n);
+    if (cadena !== null && esEmoji(cadena) && cadena.replace(SOLO_EMOJI, '') !== '') {
+      const txt = cadena.trim().replace(/\s+/g, ' ').slice(0, 30);
+      apuntar(errores, n, 'emoji junto a texto',
+        '«' + txt + '» en una cadena → fragmento <><span aria-hidden="true">emoji</span> texto</>');
     }
 
     ts.forEachChild(n, visitar);
