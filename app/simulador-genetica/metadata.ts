@@ -34,6 +34,30 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Preguntas que están a la vez en la FAQ visible de page.tsx y en el FAQPage: UN texto que
+ * importan las dos bocas. Hasta el 14/10/2026 eran dos redacciones mantenidas aparte, y la del
+ * monohíbrido solo daba en el FAQPage la dominancia incompleta y el ABO (hallazgo 3298).
+ */
+export const FAQ_PROPORCIONES_MONOHIBRIDO = {
+  pregunta: '¿Qué proporciones fenotípicas da un cruce monohíbrido?',
+  respuesta: 'Un cruce monohíbrido entre dos heterocigotos (Aa × Aa) con dominancia completa da una proporción fenotípica de 3:1, es decir, 3 individuos con el rasgo dominante por cada 1 con el rasgo recesivo. La proporción genotípica subyacente es 1:2:1 (1 AA, 2 Aa, 1 aa). Con dominancia incompleta el heterocigoto muestra su propio fenotipo y la proporción fenotípica pasa a ser 1:2:1. En la codominancia depende de los alelos: en el grupo sanguíneo ABO, IᴬIᴮ × IᴬIᴮ da 1:2:1 (A, AB y B), pero Iᴬi × Iᴬi da 3:1 porque Iᴬ domina sobre i, e Iᴬi × Iᴮi da 1:1:1:1 (AB, A, B y O).',
+};
+export const FAQ_PROPORCIONES_DIHIBRIDO = {
+  pregunta: '¿Qué proporciones fenotípicas da un cruce dihíbrido?',
+  respuesta: 'Un cruce dihíbrido entre dos individuos heterocigotos para dos genes (AaBb × AaBb) da una proporción fenotípica de 9:3:3:1 cuando ambos genes están en cromosomas distintos y se transmiten de forma independiente (3ª ley de Mendel). Son 9 con ambos rasgos dominantes, 3 con el primero dominante y el segundo recesivo, 3 al revés y 1 con ambos rasgos recesivos.',
+};
+export const FAQ_CRUCE_PASO_A_PASO = {
+  pregunta: '¿Cómo se hace un cruce genético paso a paso?',
+  respuesta: '1) Identifica el modo de herencia y asigna símbolos a los alelos (mayúscula para el dominante, minúscula para el recesivo). 2) Determina el genotipo de cada progenitor. 3) Escribe los gametos posibles de cada uno. 4) Combínalos en el cuadro de Punnett. 5) Cuenta las proporciones genotípicas y agrúpalas por fenotipo para leer las proporciones fenotípicas (por ejemplo, 3:1 en un monohíbrido). Es el método de las leyes de Mendel, y este simulador construye el cuadro y calcula las proporciones automáticamente al elegir los genotipos.',
+};
+
+const preguntaFaq = ({ pregunta, respuesta }: { pregunta: string; respuesta: string }) => ({
+  '@type': 'Question',
+  name: pregunta,
+  acceptedAnswer: { '@type': 'Answer', text: respuesta },
+});
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -59,7 +83,8 @@ export const faqJsonLd = {
       name: '¿Qué es la herencia mendeliana?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La herencia mendeliana describe cómo los rasgos se transmiten de padres a hijos según las leyes de Gregor Mendel: la ley de la segregación (cada organismo tiene dos alelos para cada carácter que se separan al formarse los gametos) y la ley de la distribución independiente (alelos de genes distintos se transmiten de forma independiente).',
+        // Las tres leyes, como «¿Qué son las leyes de Mendel?» y la página (hallazgo 3298: aquí decía dos)
+        text: 'La herencia mendeliana describe cómo los rasgos se transmiten de padres a hijos según las tres leyes de Gregor Mendel: la de la uniformidad (al cruzar dos razas puras, toda la primera generación es igual), la de la segregación (cada organismo tiene dos alelos para cada carácter, que se separan al formarse los gametos) y la de la transmisión independiente (alelos de genes distintos se transmiten de forma independiente).',
       },
     },
     {
@@ -78,30 +103,9 @@ export const faqJsonLd = {
         text: 'La herencia ligada al sexo afecta a genes localizados en los cromosomas sexuales X o Y. Como los hombres tienen un solo cromosoma X (XY), un alelo recesivo en el X siempre se expresa en ellos. El daltonismo y la hemofilia son ejemplos clásicos: son más frecuentes en hombres porque las mujeres (XX) necesitan dos copias del alelo recesivo para manifestarlo.',
       },
     },
-    {
-      '@type': 'Question',
-      name: '¿Qué proporciones fenotípicas da un cruce monohíbrido?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Un cruce monohíbrido entre dos heterocigotos (Aa × Aa) con dominancia completa da una proporción fenotípica de 3:1, es decir, 3 individuos con el rasgo dominante por cada 1 con el rasgo recesivo. La proporción genotípica subyacente es 1:2:1 (1 AA, 2 Aa, 1 aa). Con dominancia incompleta el heterocigoto muestra su propio fenotipo y la proporción fenotípica pasa a ser 1:2:1. En la codominancia depende de los alelos: en el grupo sanguíneo ABO, IᴬIᴮ × IᴬIᴮ da 1:2:1 (A, AB y B), pero Iᴬi × Iᴬi da 3:1 porque Iᴬ domina sobre i, e Iᴬi × Iᴮi da 1:1:1:1 (AB, A, B y O).',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Qué proporciones fenotípicas da un cruce dihíbrido?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Un cruce dihíbrido entre dos individuos heterocigotos para dos genes (AaBb × AaBb) da una proporción fenotípica de 9:3:3:1 cuando ambos genes están en cromosomas distintos y se transmiten de forma independiente (3ª ley de Mendel). Son 9 con ambos rasgos dominantes, 3 con el primero dominante y el segundo recesivo, 3 al revés y 1 con ambos rasgos recesivos.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Cómo se hace un cruce genético paso a paso?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Para hacer un cruce genético: 1) identifica el modo de herencia y asigna símbolos a los alelos (mayúscula para el dominante, minúscula para el recesivo); 2) determina el genotipo de cada progenitor; 3) escribe los gametos posibles de cada uno; 4) combínalos en un cuadro de Punnett; 5) cuenta las proporciones genotípicas y agrúpalas por fenotipo para obtener las proporciones fenotípicas (por ejemplo 3:1 en un monohíbrido). El simulador construye el cuadro y calcula estas proporciones automáticamente.',
-      },
-    },
+    preguntaFaq(FAQ_PROPORCIONES_MONOHIBRIDO),
+    preguntaFaq(FAQ_PROPORCIONES_DIHIBRIDO),
+    preguntaFaq(FAQ_CRUCE_PASO_A_PASO),
     {
       '@type': 'Question',
       name: '¿Qué son las leyes de Mendel?',

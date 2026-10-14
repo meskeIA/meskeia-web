@@ -4050,16 +4050,16 @@ test.describe('Re-inspección 14/10/2026 · página traducida', () => {
 });
 
 test.describe('Re-inspección 14/10/2026 · FAQ', () => {
-  test('HALLAZGO (contenido, bajo) · las preguntas que están en la FAQ visible y en el FAQPage tienen UNA respuesta', async ({
+  test('REPARADO 3298 (contenido, bajo) · las preguntas que están en la FAQ visible y en el FAQPage tienen UNA respuesta', async ({
     page,
   }) => {
-    // Hallazgo nuevo de la tanda del 14/10/2026. «¿Cómo se hace un cruce genético paso a paso?»
-    // está en las dos bocas con dos redacciones casi iguales («(por ejemplo 3:1 en un
-    // monohíbrido)» solo en el FAQPage), y «¿Qué proporciones fenotípicas da un cruce
-    // monohíbrido?» del FAQPage añade la dominancia incompleta y el ABO que la visible, fundida
-    // con el dihíbrido, no dice. No se contradicen; la reparación es UNA constante en
-    // metadata.ts que importen las dos (como app/simulador-gastos-compraventa-garaje).
-    test.fail();
+    // Hallazgo 3298. «¿Cómo se hace un cruce genético paso a paso?» estaba en las dos bocas con
+    // dos redacciones casi iguales, y «¿Qué proporciones fenotípicas da un cruce monohíbrido?»
+    // del FAQPage añadía la dominancia incompleta y el ABO que la visible, fundida con el
+    // dihíbrido, no decía. REPARADO: tres constantes en metadata.ts (monohíbrido, dihíbrido y
+    // paso a paso) que importan la FAQ visible y el FAQPage; la visible separa las dos preguntas
+    // de proporciones, como el FAQPage. Y «¿Qué es la herencia mendeliana?» ya enumera las tres
+    // leyes, como «¿Qué son las leyes de Mendel?» y la página.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -4069,9 +4069,12 @@ test.describe('Re-inspección 14/10/2026 · FAQ', () => {
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b) as BloqueLd).find((j) => j['@type'] === 'FAQPage');
     const preguntas = faq?.mainEntity ?? [];
+    const mendeliana = preguntas.find((q) => q.name === '¿Qué es la herencia mendeliana?');
+    expect(mendeliana?.acceptedAnswer.text).toContain('tres leyes');
     for (const nombre of [
       '¿Cómo se hace un cruce genético paso a paso?',
       '¿Qué proporciones fenotípicas da un cruce monohíbrido?',
+      '¿Qué proporciones fenotípicas da un cruce dihíbrido?',
     ]) {
       const gemela = preguntas.find((q) => q.name === nombre);
       expect(gemela, nombre).toBeTruthy();

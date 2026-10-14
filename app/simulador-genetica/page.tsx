@@ -14,6 +14,7 @@ import {
   getSexLinkedGenotypes,
   notacionGenotipo,
 } from './components';
+import { FAQ_PROPORCIONES_MONOHIBRIDO, FAQ_PROPORCIONES_DIHIBRIDO, FAQ_CRUCE_PASO_A_PASO } from './metadata';
 
 type TabType = 'punnett' | 'stats' | 'population' | 'pedigree';
 
@@ -864,16 +865,19 @@ Hija portadora (XD Xd) × marido sano (XD Y):
         <div className={styles.faqSection}>
           <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Cruces Genéticos y Leyes de Mendel</h2>
           <div className={styles.faqList}>
+            {/* Estas tres preguntas salen de las mismas constantes que el FAQPage de metadata.ts:
+                eran dos redacciones mantenidas aparte (hallazgo 3298). */}
             <div className={styles.faqItem}>
-              <h4><span aria-hidden="true">❓</span> ¿Qué proporciones fenotípicas da un cruce monohíbrido? ¿Y un cruce dihíbrido?</h4>
+              <h4><span aria-hidden="true">❓</span> {FAQ_PROPORCIONES_MONOHIBRIDO.pregunta}</h4>
+              <p>{FAQ_PROPORCIONES_MONOHIBRIDO.respuesta}</p>
+            </div>
+
+            <div className={styles.faqItem}>
+              <h4><span aria-hidden="true">❓</span> {FAQ_PROPORCIONES_DIHIBRIDO.pregunta}</h4>
+              <p>{FAQ_PROPORCIONES_DIHIBRIDO.respuesta}</p>
               <p>
-                Un <strong>cruce monohíbrido</strong> entre dos heterocigotos (Aa × Aa) con
-                dominancia completa da una proporción fenotípica de <strong>3:1</strong>
-                (3 dominantes por cada 1 recesivo), con proporción genotípica 1:2:1. Un{' '}
-                <strong>cruce dihíbrido</strong> (AaBb × AaBb) da una proporción fenotípica de{' '}
-                <strong>9:3:3:1</strong> cuando los dos genes están en cromosomas distintos y se
-                transmiten de forma independiente. Estas son las proporciones que Mendel obtuvo con
-                sus guisantes y las que reproduce el simulador en la pestaña Estadísticas.
+                Son las proporciones que Mendel obtuvo con sus guisantes y las que reproduce el
+                simulador en la pestaña Estadísticas.
               </p>
               <p className={styles.faqTip}>
                 <span aria-hidden="true">💡</span> <strong>Tip:</strong> El 9:3:3:1 del dihíbrido es simplemente el resultado de
@@ -882,16 +886,8 @@ Hija portadora (XD Xd) × marido sano (XD Y):
             </div>
 
             <div className={styles.faqItem}>
-              <h4><span aria-hidden="true">❓</span> ¿Cómo se hace un cruce genético paso a paso?</h4>
-              <p>
-                1) Identifica el modo de herencia y asigna símbolos a los alelos (mayúscula para el
-                dominante, minúscula para el recesivo). 2) Determina el genotipo de cada progenitor.
-                3) Escribe los gametos posibles de cada uno. 4) Combínalos en el cuadro de Punnett.
-                5) Cuenta las proporciones genotípicas y agrúpalas por fenotipo para leer las
-                proporciones fenotípicas. Es el método de las leyes de Mendel, y este simulador
-                construye el cuadro y calcula las proporciones automáticamente al elegir los
-                genotipos.
-              </p>
+              <h4><span aria-hidden="true">❓</span> {FAQ_CRUCE_PASO_A_PASO.pregunta}</h4>
+              <p>{FAQ_CRUCE_PASO_A_PASO.respuesta}</p>
             </div>
 
             <div className={styles.faqItem}>
