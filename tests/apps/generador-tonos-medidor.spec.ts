@@ -99,7 +99,9 @@ test.describe('Medidor de frecuencia — mide lo que suena', () => {
     // cuatro cifras sin punto de millar (Ortografía de la RAE, 2010; lo mismo hace Intl es-ES).
     // Sale dos veces (en vivo y en la retenida): se mira la lectura en vivo, que va primero.
     await expect(s.getByText(/^(999|1000|1001)\u00A0Hz$/).first()).toBeVisible();
-    await expect(s.getByText(/^Si5 \(\+2[01]\u00A0cents\)$/)).toBeVisible();
+    // La nota sale tambi\u00E9n dos veces desde el hallazgo 3292: en vivo y en la regi\u00F3n sr-only que
+    // la anuncia con hist\u00E9resis. Se mira la de la vista, que va primero.
+    await expect(s.getByText(/^Si5 \(\+2[01]\u00A0cents\)$/).first()).toBeVisible();
     await expect(s.getByText(/Última lectura estable:/)).toBeVisible();
   });
 
