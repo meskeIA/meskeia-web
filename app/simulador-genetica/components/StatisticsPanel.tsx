@@ -101,7 +101,8 @@ export default function StatisticsPanel({ punnett, rasgos }: StatisticsPanelProp
             </div>
           ))}
         {genotypeRatioStr && (
-          <div className={styles.ratioSummary}>Ratio: {genotypeRatioStr}</div>
+          // Una sola cadena: como dos textos, con la página traducida seguía el ratio del cruce anterior (hallazgo 3297)
+          <div className={styles.ratioSummary}>{`Ratio: ${genotypeRatioStr}`}</div>
         )}
       </div>
 
@@ -133,7 +134,7 @@ export default function StatisticsPanel({ punnett, rasgos }: StatisticsPanelProp
             </div>
           ))}
         {phenotypeRatioStr && (
-          <div className={styles.ratioSummary}>Ratio: {phenotypeRatioStr}</div>
+          <div className={styles.ratioSummary}>{`Ratio: ${phenotypeRatioStr}`}</div>
         )}
       </div>
     </div>

@@ -107,9 +107,12 @@ export default function PunnettSquare({
                   transition: 'opacity 0.3s',
                 }}
               >
-                {notacionGenotipo(gamete, rasgos)}
+                {/* Gameto y porcentaje, cada uno único hijo de su elemento: la <th> se reutiliza
+                    por índice y, como textos sueltos, con la página traducida conservaba el
+                    gameto y el % del cruce anterior (hallazgo 3297). */}
+                <span>{notacionGenotipo(gamete, rasgos)}</span>
                 <br />
-                <small>({formatPercentage(1 / gametesColumna.length, 0)})</small>
+                <small>{`(${formatPercentage(1 / gametesColumna.length, 0)})`}</small>
               </th>
             ))}
           </tr>
@@ -123,9 +126,9 @@ export default function PunnettSquare({
                   transition: 'opacity 0.3s',
                 }}
               >
-                {notacionGenotipo(gamete2, rasgos)}
+                <span>{notacionGenotipo(gamete2, rasgos)}</span>
                 <br />
-                <small>({formatPercentage(1 / gametesFila.length, 0)})</small>
+                <small>{`(${formatPercentage(1 / gametesFila.length, 0)})`}</small>
               </th>
               {gametesColumna.map((_, colIndex) => {
                 // Mismo orden en el que el motor rellena `cells`: for (row) { for (col) }

@@ -201,8 +201,11 @@ export default function PopulationSimulator({
                 return (
                   <div key={phenotype} className={styles.resultRow}>
                     <span>{phenotype}</span>
+                    {/* Cada cifra, una sola cadena y único hijo de su <span>: como textos
+                        sueltos, con la página traducida se quedaban en la simulación anterior
+                        (hallazgo 3297). */}
                     <span>
-                      {data?.count ?? 0} ({formatPercentage((data?.percentage ?? 0) / 100, 1)})
+                      {`${data?.count ?? 0} (${formatPercentage((data?.percentage ?? 0) / 100, 1)})`}
                     </span>
                   </div>
                 );
@@ -219,8 +222,7 @@ export default function PopulationSimulator({
                     <span>
                       {/* La esperanza lleva decimal cuando lo tiene: son 112,5 plantas de 200,
                           no 113 (hallazgo 1204). */}
-                      {formatNumber(data?.count ?? 0, Number.isInteger(data?.count ?? 0) ? 0 : 1)} (
-                      {formatPercentage((data?.percentage ?? 0) / 100, 1)})
+                      {`${formatNumber(data?.count ?? 0, Number.isInteger(data?.count ?? 0) ? 0 : 1)} (${formatPercentage((data?.percentage ?? 0) / 100, 1)})`}
                     </span>
                   </div>
                 );
@@ -235,15 +237,14 @@ export default function PopulationSimulator({
                 <span aria-hidden="true">📐</span> Prueba Chi-cuadrado (χ²)
               </div>
               <div className={styles.chiSquareValue}>
-                χ² = {formatNumber(simulation.chiSquare ?? 0, 3)}
+                {`χ² = ${formatNumber(simulation.chiSquare ?? 0, 3)}`}
               </div>
               {/* Los grados de libertad y el valor crítico con que se juzga, a la vista: es la
                   comparación que el alumno hace con la tabla, y la que delata si el contraste
                   se hace con los grados de libertad del cruce (hallazgo 1586). */}
               {chiSquareResult.valorCritico !== null && (
                 <div className={styles.chiSquareGrados}>
-                  gl = {degreesOfFreedom} · valor crítico (α = {formatNumber(ALFA_CHI_CUADRADO, 2)}) ={' '}
-                  {formatNumber(chiSquareResult.valorCritico, 3)}
+                  {`gl = ${degreesOfFreedom} · valor crítico (α = ${formatNumber(ALFA_CHI_CUADRADO, 2)}) = ${formatNumber(chiSquareResult.valorCritico, 3)}`}
                 </div>
               )}
               <div className={styles.chiSquareInterpretation}>
@@ -254,19 +255,22 @@ export default function PopulationSimulator({
                 {chiSquareResult.pValue !== 'no procede' && (
                   <>
                     {avisoNoFiable ? (
-                      <span>p {chiSquareResult.pValue}</span>
+                      <span>{`p ${chiSquareResult.pValue}`}</span>
                     ) : (
-                      <strong>p {chiSquareResult.pValue}</strong>
+                      <strong>{`p ${chiSquareResult.pValue}`}</strong>
                     )}
                     <br />
                   </>
                 )}
+                {/* Aviso y veredicto, dos elementos con key y cada texto como único hijo: el
+                    veredicto como texto suelto lo retiraba React al llegar el aviso, y con la
+                    página traducida ya era un <font> → NotFoundError (hallazgo 3296). */}
                 {avisoNoFiable ? (
-                  <span className={styles.chiSquareNoFiable}>
-                    <span aria-hidden="true">⚠️</span> {avisoNoFiable}
+                  <span key="aviso" className={styles.chiSquareNoFiable}>
+                    <span aria-hidden="true">⚠️</span> <span>{avisoNoFiable}</span>
                   </span>
                 ) : (
-                  chiSquareResult.interpretation
+                  <span key="veredicto">{chiSquareResult.interpretation}</span>
                 )}
               </div>
             </div>

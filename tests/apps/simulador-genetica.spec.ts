@@ -3934,17 +3934,16 @@ test.describe('Re-inspección 14/10/2026 · página traducida', () => {
     expect(errores).toEqual([]);
   });
 
-  test('HALLAZGO (operativa, medio) · Población traducida: de un χ² con veredicto a uno con aviso, la app no cae', async ({
+  test('REPARADO 3296 (operativa, medio) · Población traducida: de un χ² con veredicto a uno con aviso, la app no cae', async ({
     page,
   }) => {
-    // Hallazgo nuevo de la tanda del 14/10/2026. En PopulationSimulator el veredicto
-    // («Ajuste excelente…») es un texto suelto junto al <strong> del p. Cuando la simulación
-    // siguiente trae el aviso de «no fiable», React retira ese texto para poner el <span> del
-    // aviso, pero el traductor ya lo cambió por <font>: NotFoundError en removeChild y la
-    // pantalla «Algo salió mal». La misma forma del cabo C0233, en otro nodo. Sin traducir, el
-    // mismo flujo deja el aviso. Calculado: N = 100 forzado 75 : 25 es el 3:1 exacto (χ² = 0,
-    // veredicto); N = 10 espera 2,5 verdes, por debajo de 5 → aviso.
-    test.fail();
+    // Hallazgo 3296. En PopulationSimulator el veredicto («Ajuste excelente…») era un texto
+    // suelto junto al <strong> del p. Cuando la simulación siguiente traía el aviso de «no
+    // fiable», React retiraba ese texto para poner el <span> del aviso, pero el traductor ya lo
+    // había cambiado por <font>: NotFoundError en removeChild y la pantalla «Algo salió mal».
+    // REPARADO: aviso y veredicto son dos <span> con key, cada texto como único hijo.
+    // Calculado: N = 100 forzado 75 : 25 es el 3:1 exacto (χ² = 0, veredicto); N = 10 espera
+    // 2,5 verdes, por debajo de 5 → aviso.
     const errores = vigilarCaidas(page);
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
@@ -3965,15 +3964,14 @@ test.describe('Re-inspección 14/10/2026 · página traducida', () => {
     expect(errores).toEqual([]);
   });
 
-  test('HALLAZGO (operativa, bajo) · Población traducida: la segunda simulación renueva cifras, χ², p y veredicto', async ({
+  test('REPARADO 3297 (operativa, bajo) · Población traducida: la segunda simulación renueva cifras, χ², p y veredicto', async ({
     page,
   }) => {
-    // Hallazgo nuevo de la tanda del 14/10/2026 (forma del cabo C0243). «{n} ({%})», «χ² = {x}»,
-    // «p {franja}» y el veredicto son textos con variable dentro del mismo nodo: traducidos, React
-    // escribe en el nodo que el traductor retiró y en pantalla sigue la PRIMERA simulación,
-    // mientras la rejilla de iconos sí es la nueva. Calculado: 70 : 30 frente a 75 : 25 da
+    // Hallazgo 3297 (a), forma del cabo C0243. «{n} ({%})», «χ² = {x}», «p {franja}» y el
+    // veredicto eran textos con variable dentro del mismo nodo: traducidos, React escribía en el
+    // nodo que el traductor retiró y en pantalla seguía la PRIMERA simulación. REPARADO: cada uno
+    // es una sola cadena, único hijo de su elemento. Calculado: 70 : 30 frente a 75 : 25 da
     // χ² = 5²/75 + 5²/25 = 1,333, p = erfc(√0,667) = 0,248 → «p > 0,1 · Buen ajuste».
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await pestana(page, 'Población').click();
@@ -3995,12 +3993,10 @@ test.describe('Re-inspección 14/10/2026 · página traducida', () => {
     await expect(interpretacionChi(page)).toContainText('Buen ajuste a las proporciones mendelianas');
   });
 
-  test('HALLAZGO (operativa, bajo) · Estadísticas traducida: la línea «Ratio:» sigue al cruce nuevo', async ({ page }) => {
-    // Hallazgo nuevo de la tanda del 14/10/2026 (forma del cabo C0243): «Ratio: {…}» es un texto
-    // con variable en el mismo nodo. Aa × aa (cruce prueba): genotipos Aa y aa, 1:1; fenotipos
-    // Amarillo y Verde, 1:1. Traducida, la línea se queda en el 1:2:1 y el 3:1 de Aa × Aa
-    // mientras las barras ya son las del cruce nuevo.
-    test.fail();
+  test('REPARADO 3297 (operativa, bajo) · Estadísticas traducida: la línea «Ratio:» sigue al cruce nuevo', async ({ page }) => {
+    // Hallazgo 3297 (b): «Ratio: {…}» era un texto con variable en el mismo nodo; REPARADO como
+    // una sola cadena. Aa × aa (cruce prueba): genotipos Aa y aa, 1:1; fenotipos Amarillo y
+    // Verde, 1:1. Antes, traducida, la línea se quedaba en el 1:2:1 y el 3:1 de Aa × Aa.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await pestana(page, 'Estadísticas').click();
@@ -4012,13 +4008,12 @@ test.describe('Re-inspección 14/10/2026 · página traducida', () => {
     await expect(resumenes).toHaveText(['Ratio: 1:1 (Aa · aa)', 'Ratio: 1:1 (Amarillo · Verde)']);
   });
 
-  test('HALLAZGO (operativa, bajo) · Punnett traducido: las cabeceras de gametos siguen al cruce', async ({ page }) => {
-    // Hallazgo nuevo de la tanda del 14/10/2026 (forma del cabo C0243): la cabecera es
-    // «{gameto}<br><small>({%})</small>», y la <th> se reutiliza por índice. Padre AA: sus dos
-    // gametos son A y A (las celdas lo dicen: AA, AA, Aa, Aa), pero traducida la segunda
-    // columna sigue rotulada «a». Y al pasar a dihíbrido (AA Rr × Aa Rr) las dos primeras
-    // deberían ser AR (25 %) y se quedan en «A (50 %)» y «a (50 %)».
-    test.fail();
+  test('REPARADO 3297 (operativa, bajo) · Punnett traducido: las cabeceras de gametos siguen al cruce', async ({ page }) => {
+    // Hallazgo 3297 (c): la cabecera era «{gameto}<br><small>({%})</small>» en una <th>
+    // reutilizada por índice; REPARADO con gameto y % como único hijo de su elemento. Padre AA:
+    // sus dos gametos son A y A (las celdas lo dicen: AA, AA, Aa, Aa); antes, traducida, la
+    // segunda columna seguía rotulada «a». Y al pasar a dihíbrido (AA Rr × Aa Rr) las dos
+    // primeras son AR (25 %).
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await expect(genotiposDeCelda(page)).toHaveText(['AA', 'Aa', 'Aa', 'aa']);
@@ -4032,14 +4027,13 @@ test.describe('Re-inspección 14/10/2026 · página traducida', () => {
     expect((await cabeceras(page))[0]).toEqual(['AR (25 %)', 'AR (25 %)', 'Ar (25 %)', 'Ar (25 %)']);
   });
 
-  test('HALLAZGO (operativa, bajo) · Casos para clase traducida: el botón dice «Ocultar solución» con la solución abierta', async ({
+  test('REPARADO 3297 (operativa, bajo) · Casos para clase traducida: el botón dice «Ocultar solución» con la solución abierta', async ({
     page,
   }) => {
-    // Hallazgo nuevo de la tanda del 14/10/2026 (forma del cabo C0243): el rótulo es
-    // «<span>🔑</span> {verSolucion ? 'Ocultar solución' : 'Ver solución'}», y el texto variable
-    // es un nodo suelto. Traducida, la solución se abre (aria-expanded = true) pero el botón
-    // sigue diciendo «Ver solución». Igual «Ver pista».
-    test.fail();
+    // Hallazgo 3297 (d): el rótulo era «<span>🔑</span> {verSolucion ? 'Ocultar solución' :
+    // 'Ver solución'}», con el texto variable como nodo suelto; traducida, la solución se abría
+    // pero el botón seguía diciendo «Ver solución». REPARADO con el rótulo en su <span>, aquí y
+    // en los CasosAula de las demás apps.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await traducirPagina(page);
