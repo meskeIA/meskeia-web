@@ -114,7 +114,10 @@ const PRESETS: FrecuenciaPreset[] = [
   // Tests de audio
   { nombre: 'Subgraves', frecuencia: 30, categoria: 'Tests' },
   { nombre: 'Graves', frecuencia: 100, categoria: 'Tests' },
-  { nombre: 'Medios-bajos', frecuencia: 500, categoria: 'Tests' },
+  // Emitía 500 Hz, el borde con «Medios», y la franja de la propia app lo rotulaba «Medios -
+  // Voz humana» (hallazgo 3294). 350 Hz cae en el centro de 250 – 500 Hz, como cada preset en
+  // la suya.
+  { nombre: 'Medios-bajos', frecuencia: 350, categoria: 'Tests' },
   { nombre: 'Medios', frecuencia: 1000, categoria: 'Tests' },
   { nombre: 'Medios-altos', frecuencia: 2000, categoria: 'Tests' },
   { nombre: 'Agudos', frecuencia: 5000, categoria: 'Tests' },
@@ -485,6 +488,13 @@ export default function GeneradorTonosPage() {
   const [lecturaEsEstable, setLecturaEsEstable] = useState(false);
   /** La última lectura estable: se queda a la vista cuando el sonido ya ha parado. */
   const [ultimaEstableHz, setUltimaEstableHz] = useState<number | null>(null);
+  /**
+   * Lo que se ANUNCIA de esa lectura en la región aria-live: solo cambia cuando el tono se mueve
+   * 10 cents o más, para que un lector de pantalla no la repita con cada décima de hercio. Hasta
+   * el 14/10/2026 esa histéresis la llevaba también la cifra que se ve y la que se lleva al
+   * generador, que podían ir 10 cents por detrás (2,5 Hz a 440 Hz; hallazgo 3292).
+   */
+  const [anunciadaHz, setAnunciadaHz] = useState<number | null>(null);
   const [avisoMedidor, setAvisoMedidor] = useState<string | null>(null);
   /** Aviso que NO impide medir (procesados del micrófono que el navegador no deja apagar). */
   const [notaMedidor, setNotaMedidor] = useState<string | null>(null);
@@ -961,11 +971,12 @@ export default function GeneradorTonosPage() {
       const estable = lecturaSostenida(ventana);
       setLecturaHz(estable ?? pico.frecuencia);
       setLecturaEsEstable(estable !== null);
-      // La retenida solo cambia si el tono se mueve más de 10 cents: vive en una región
-      // aria-live, y con cada décima de hercio de baile un lector de pantalla la anunciaría
+      // La retenida es siempre la última estable; lo anunciado solo cambia si el tono se mueve
+      // más de 10 cents: con cada décima de hercio de baile un lector de pantalla lo anunciaría
       // diez veces por segundo.
       if (estable !== null) {
-        setUltimaEstableHz((previa) =>
+        setUltimaEstableHz(estable);
+        setAnunciadaHz((previa) =>
           previa !== null && Math.abs(1200 * Math.log2(estable / previa)) < 10 ? previa : estable,
         );
       }
@@ -1305,12 +1316,19 @@ export default function GeneradorTonosPage() {
           </div>
         )}
 
+        {/* La cifra que se ve, fuera de la región viva: cambia con cada lectura estable. Lo que
+            se anuncia va aparte, con su histéresis de 10 cents (hallazgo 3292). */}
+        {ultimaEstableHz !== null && (
+          <p className={styles.medidorRetenida}>
+            Última lectura estable: <strong>{`${textoHzMedido(ultimaEstableHz)} Hz`}</strong>
+            {' · '}
+            <span>{textoNotaMedida(ultimaEstableHz)}</span>
+          </p>
+        )}
         <div role="status" aria-live="polite" aria-atomic="true">
-          {ultimaEstableHz !== null && (
-            <p className={styles.medidorRetenida}>
-              Última lectura estable: <strong>{textoHzMedido(ultimaEstableHz)}&nbsp;Hz</strong>
-              {' · '}
-              {textoNotaMedida(ultimaEstableHz)}
+          {anunciadaHz !== null && (
+            <p className="sr-only">
+              {`Lectura estable: ${textoHzMedido(anunciadaHz)} Hz, ${textoNotaMedida(anunciadaHz)}`}
             </p>
           )}
           {anuncioMedidor && <p className={styles.medidaProgreso}>{anuncioMedidor}</p>}
@@ -1351,8 +1369,13 @@ export default function GeneradorTonosPage() {
               mide el <Link href="/sonometro/">sonómetro</Link>.
             </li>
             <li>
-              Si hay varios sonidos a la vez o el sonido cambia sin parar, la cifra salta y no llega a
-              «estable». Tampoco un golpe o un clic, aunque suene a una nota: «estable» pide medio
+              {/* Decía que con varios sonidos a la vez la cifra «no llega a estable», y con dos
+                  sostenidos sí llega: da el que más destaca, y con dos de nivel parecido cuál
+                  gana depende del aparato (hallazgo 3293). */}
+              Si hay varios sonidos sostenidos a la vez, da el que más destaca, y puede darlo por
+              «estable»: que llegue a estable no quiere decir que solo suene uno. Con dos de
+              volumen parecido, cuál gana puede cambiar de un aparato a otro. Si el sonido cambia
+              sin parar, la cifra salta y no llega a «estable». Tampoco un golpe o un clic, aunque suene a una nota: «estable» pide medio
               segundo a la misma frecuencia con un sonido que no se esté apagando, así que la última
               lectura estable de un tono no la sustituye un toque en la mesa. El micrófono de un móvil capta peor los graves más profundos y los agudos
               extremos: ahí puede no leer nada. Para ver todas las frecuencias a la vez está el{' '}

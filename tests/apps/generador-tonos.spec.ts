@@ -3170,23 +3170,21 @@ test.describe('Inspector 14/10/2026', () => {
   });
 
   /**
-   * HALLAZGO K1 [medio · cálculo] — ABIERTO (14/10/2026), hallazgo nuevo de la tanda del 14/10/2026.
-   * La «Última lectura estable» no es la última: solo cambia si el tono nuevo se separa 10 cents o
-   * más de la retenida (`setUltimaEstableHz` en page.tsx, para no repetir el anuncio de la región
-   * aria-live con cada décima de hercio). Lo que se queda retenido —y lo que «Llevar la lectura al
-   * generador» escribe en el campo— puede ir hasta 10 cents por detrás de lo que el medidor acaba de
-   * dar por estable: 2,5 Hz a 440 Hz, 29 Hz a 5 kHz, frente al «menos de un hercio» que promete la
-   * página. Y la retenida no se borra al parar: pasa igual entre dos medidas.
+   * HALLAZGO K1 (3292) [medio · cálculo] — REPARADO el 14/10/2026.
+   * La «Última lectura estable» no era la última: solo cambiaba si el tono nuevo se separaba 10
+   * cents o más de la retenida (para no repetir el anuncio de la región aria-live con cada décima
+   * de hercio). Lo retenido —y lo que «Llevar la lectura al generador» escribe en el campo— podía
+   * ir hasta 10 cents por detrás: 2,5 Hz a 440 Hz, 29 Hz a 5 kHz, frente al «menos de un hercio»
+   * que promete la página. REPARADO: la retenida y lo que se lleva son siempre la última estable;
+   * la histéresis queda solo en lo que se anuncia, en una región viva aparte.
    *   entrada   micrófono: 440 Hz 2 s, 442 Hz 2 s, silencio (ruido a −65 dBFS)
    *   esperado  con «442 Hz · La4 (+8 cents) · Lectura estable» en pantalla, la retenida es
    *             «442 Hz · La4 (+8 cents)» y se lleva 442 al generador
-   *   obtenido  la retenida se queda en «440 Hz · La4 (0 cents)» y se lleva 440
+   *   antes     la retenida se quedaba en «440 Hz · La4 (0 cents)» y se llevaba 440
    */
-  test('HALLAZGO K1 — la «Última lectura estable» sigue al tono: 440 Hz y luego 442 Hz retiene 442 y lleva 442', async ({
+  test('REPARADO K1 (3292) — la «Última lectura estable» sigue al tono: 440 Hz y luego 442 Hz retiene 442 y lleva 442', async ({
     page,
   }) => {
-    // ABIERTO: comprobado el 14/10/2026 que cae en la retenida (440), no en las precondiciones.
-    test.fail();
     await microfonoSintetico(page, 8, [
       { hz: 440, amp: 0.3, desde: 0, hasta: 2 },
       { hz: 442, amp: 0.3, desde: 2, hasta: 4, rampa: 0.02 },
@@ -3207,12 +3205,15 @@ test.describe('Inspector 14/10/2026', () => {
     await expect(retenida, 'la última lectura estable es la de 442 Hz').toContainText(/442\sHz · La4 \(\+[78]\scents\)/, {
       timeout: 1500,
     });
+    // Lo anunciado conserva la histéresis: 442 está a 7,85 cents de 440, menos de 10, así que
+    // la región viva no se ha vuelto a anunciar y sigue diciendo 440.
+    await expect(seccionMedidor(page).getByRole('status')).toContainText(/Lectura estable: 440\sHz, La4 \(0\scents\)/);
     const llevado = await llevarAlGenerador(page);
     expect(Math.abs(llevado.hz - 442), `campo «${llevado.texto}»`).toBeLessThanOrEqual(0.5);
   });
 
   /**
-   * HALLAZGO K2 [bajo · contenido] — ABIERTO (14/10/2026), hallazgo nuevo de la tanda del 14/10/2026.
+   * HALLAZGO K2 (3293) [bajo · contenido] — REPARADO el 14/10/2026 corrigiendo el texto.
    * «Qué mide y qué no» dice: «Si hay varios sonidos a la vez o el sonido cambia sin parar, la cifra
    * salta y no llega a "estable"». Con dos sonidos SOSTENIDOS a la vez llega: gana siempre el mismo
    * pico y las cinco lecturas coinciden. Con dos de igual nivel decide el festoneo de la ventana, que
@@ -3223,11 +3224,11 @@ test.describe('Inspector 14/10/2026', () => {
    *   obtenido  «440 Hz · La4 (0 cents) · Lectura estable», retenida y ofrecida al generador
    * Vale corregir el texto o no dar por estable un pico con otro cerca de su nivel; el test admite las dos.
    */
-  test('HALLAZGO K2 — dos sonidos sostenidos a la vez no llegan a «estable» mientras la página diga que no llegan', async ({
+  test('REPARADO K2 (3293) — dos sonidos sostenidos a la vez no llegan a «estable» mientras la página diga que no llegan', async ({
     page,
   }) => {
-    // ABIERTO: comprobado el 14/10/2026 que cae en la última aserción, no en que el sonido se oiga.
-    test.fail();
+    // REPARADO por el lado del texto: ahora dice que con varios sostenidos da el que más destaca
+    // y que puede darlo por estable. La aserción de abajo admite las dos reparaciones.
     await microfonoSintetico(page, 4, [
       { hz: 440, amp: 0.3, desde: 0, hasta: 4 },
       { hz: 660, amp: 0.15, desde: 0, hasta: 4 },
@@ -3240,7 +3241,8 @@ test.describe('Inspector 14/10/2026', () => {
     // Tiempo de sobra para cinco lecturas (cada 100 ms) con la ventana llena.
     await page.waitForTimeout(1500);
     const limites = sinEspacioDuro((await s.locator('[class*="medidaLimites"]').allTextContents()).join(' ')).replace(/\s+/g, ' ');
-    const diceQueNoLlega = /varios sonidos a la vez[^.]*no llega a «estable»/.test(limites);
+    const diceQueNoLlega = /varios sonidos (sostenidos )?a la vez[^.]*no llega a «estable»/.test(limites);
+    expect(limites).toContain('Si hay varios sonidos sostenidos a la vez, da el que más destaca, y puede darlo por «estable»');
     const l = await lecturaMedidor(page);
     expect(
       diceQueNoLlega && l.estable,
@@ -3249,8 +3251,8 @@ test.describe('Inspector 14/10/2026', () => {
   });
 
   /**
-   * HALLAZGO K3 [bajo · contenido] — ABIERTO (14/10/2026), hallazgo nuevo de la tanda del 14/10/2026.
-   * El preset «Medios-bajos» emite 500 Hz, y el rótulo de franja de la propia app
+   * HALLAZGO K3 (3294) [bajo · contenido] — REPARADO el 14/10/2026: el preset emite 350 Hz, en el
+   * centro de 250 – 500 Hz. Antes: el preset «Medios-bajos» emitía 500 Hz, y el rótulo de franja de la propia app
    * (`getDescripcionFrecuencia`: «Medios-bajos» es < 500) dice entonces «Medios - Voz humana». Su
    * tabla pone 500 en el borde de las dos franjas («250 – 500 Hz» y «500 Hz – 2 kHz»). Es la forma del
    * hallazgo 692 (el preset «Ultrasonido» que su rótulo no llamaba así). Los demás presets con nombre
@@ -3259,9 +3261,7 @@ test.describe('Inspector 14/10/2026', () => {
    *   esperado  un rótulo «Medios-bajos - …»
    *   obtenido  «Medios - Voz humana»
    */
-  test('HALLAZGO K3 — cada preset de prueba con nombre de franja suena en esa franja', async ({ page }) => {
-    // ABIERTO: comprobado el 14/10/2026 que solo descuadra «Medios-bajos».
-    test.fail();
+  test('REPARADO K3 (3294) — cada preset de prueba con nombre de franja suena en esa franja', async ({ page }) => {
     await abrir(page);
     const descuadres: string[] = [];
     for (const nombre of ['Subgraves', 'Graves', 'Medios-bajos', 'Medios', 'Medios-altos', 'Agudos', 'Muy agudos']) {
@@ -3277,17 +3277,18 @@ test.describe('Inspector 14/10/2026', () => {
   });
 
   /**
-   * HALLAZGO K4 [bajo · contenido] — ABIERTO (14/10/2026), hallazgo nuevo de la tanda del 14/10/2026.
-   * La descripción del WebApplication (la que leen buscadores e IAs) dice «Útil para … ejercicios de
+   * HALLAZGO K4 (3295) [bajo · contenido] — REPARADO el 14/10/2026: la descripción ya no promete
+   * ejercicios, y og/twitter dejan de anunciar «tinnitus» como uso. Antes: la descripción del WebApplication (la que leen buscadores e IAs) dice «Útil para … ejercicios de
    * tinnitus», y la página no tiene ningún ejercicio ni nombra el tinnitus: solo el DisclaimerCard
    * habla de «cómo suena un pitido que ya tienes» y de consultar si hay «acúfenos persistentes». El
    * hallazgo 2309 citó esa frase como prueba de que la app orienta sobre salud (y trajo el
    * DisclaimerCard), pero nadie juzgó si la promesa se cumple.
    */
-  test('HALLAZGO K4 — el JSON-LD no promete «ejercicios de tinnitus» que la página no tiene', async ({ page }) => {
-    // ABIERTO: comprobado el 14/10/2026 que cae en la promesa, no en que el WebApplication exista.
-    test.fail();
+  test('REPARADO K4 (3295) — el JSON-LD no promete «ejercicios de tinnitus» que la página no tiene', async ({ page }) => {
     await abrir(page);
+    for (const sel of ['meta[property="og:description"]', 'meta[name="twitter:description"]']) {
+      expect(await page.locator(sel).getAttribute('content'), sel).not.toMatch(/tinnitus/i);
+    }
     const descripcion = await page.evaluate(() => {
       for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
         const j = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; description?: string };

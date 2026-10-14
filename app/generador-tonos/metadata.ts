@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Generador de Frecuencias Hz y Tonos Online (20-20.000 Hz)',
-    description: 'Tonos puros entre 20 Hz y 20.000 Hz. Ondas senoidal, cuadrada, triangular y sierra. Test de oído, tinnitus, calibrar altavoces.',
+    description: 'Tonos puros entre 20 Hz y 20.000 Hz. Ondas senoidal, cuadrada, triangular y sierra. Test de oído orientativo, calibrar altavoces y medir los hercios de un sonido.',
     url: 'https://meskeia.com/generador-tonos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -29,14 +29,15 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Generador de Frecuencias Hz y Tonos Online',
-    description: '20 Hz a 20.000 Hz. Test de oído, tinnitus y calibrar altavoces.',
+    description: '20 Hz a 20.000 Hz. Test de oído orientativo, calibrar altavoces y medir los hercios de un sonido.',
     images: ['https://meskeia.com/og-image.png']
   },
 };
 
 export const jsonLd = generateWebAppSchema({
   name: 'Generador de Tonos',
-  description: 'Generador online de tonos y frecuencias de audio entre 20 Hz y 20.000 Hz, con medidor de la frecuencia de un sonido por el micrófono. Útil para tests de audio, calibración de altavoces y auriculares, ejercicios de tinnitus y experimentos acústicos.',
+  // Prometía «ejercicios de tinnitus» que la página no tiene (hallazgo 3295)
+  description: 'Generador online de tonos y frecuencias de audio entre 20 Hz y 20.000 Hz, con medidor de la frecuencia de un sonido por el micrófono. Útil para tests de audio orientativos, calibración de altavoces y auriculares y experimentos acústicos.',
   url: 'https://meskeia.com/generador-tonos/',
   category: 'UtilityApplication',
   features: [
