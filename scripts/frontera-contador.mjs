@@ -115,9 +115,11 @@ function leerCommits() {
   });
   const n2 = [];
   const descensos = [];
+  // El tipo acaba en el primer espacio o raya, NO en un guion: `retirar-muerto` y `config-claude`
+  // salían como «retirar» y «config» (14/10/2026, al nacer `turno-a11y`)
   for (const c of commits) {
-    for (const m of c.cuerpo.matchAll(/^Frontera:\s*N2\s+([^\s—-]+)\s*[—-]?\s*(.*)$/gim)) n2.push({ ...c, tipo: m[1], porque: m[2] });
-    for (const m of c.cuerpo.matchAll(/^Frontera:\s*descenso\s+([^\s—-]+)\s*[—-]?\s*(.*)$/gim)) descensos.push({ ...c, tipo: m[1], porque: m[2] });
+    for (const m of c.cuerpo.matchAll(/^Frontera:\s*N2\s+([^\s—]+)\s*[—-]?\s*(.*)$/gim)) n2.push({ ...c, tipo: m[1], porque: m[2] });
+    for (const m of c.cuerpo.matchAll(/^Frontera:\s*descenso\s+([^\s—]+)\s*[—-]?\s*(.*)$/gim)) descensos.push({ ...c, tipo: m[1], porque: m[2] });
   }
   // Un revert de un commit N2 es una corrección aunque nadie escriba la línea de descenso
   for (const c of commits) {
