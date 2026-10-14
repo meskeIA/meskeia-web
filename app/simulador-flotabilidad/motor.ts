@@ -149,3 +149,56 @@ export function calcularFlotabilidad(
     fuerzaParaHundir: null,
   };
 }
+
+// ─── Densidad: ρ = m/V ───────────────────────────────────────────────────────
+//
+// La calculadora de la densidad despeja la incógnita que se pida de las otras dos:
+//
+//   ρ = m/V      m = ρ·V      V = m/ρ
+//
+// Trabaja en el SI (kg, m³, kg/m³). Las unidades de la pantalla se pasan con los factores de
+// abajo, que dicen cuánto vale UNA unidad en su unidad del SI.
+
+/** Factores a kg. */
+export const UNIDADES_MASA = { g: 0.001, kg: 1 } as const;
+/** Factores a m³. 1 cm³ = 1 mL. */
+export const UNIDADES_VOLUMEN = { cm3: 1e-6, L: 1e-3, m3: 1 } as const;
+/** Factores a kg/m³. 1 g/cm³ = 1000 kg/m³ (y 1 g/mL, y 1 kg/L). */
+export const UNIDADES_DENSIDAD = { 'g/cm3': 1000, 'kg/m3': 1 } as const;
+
+export type UnidadMasa = keyof typeof UNIDADES_MASA;
+export type UnidadVolumen = keyof typeof UNIDADES_VOLUMEN;
+export type UnidadDensidad = keyof typeof UNIDADES_DENSIDAD;
+
+export type IncognitaDensidad = 'densidad' | 'masa' | 'volumen';
+
+/** Las tres magnitudes, en el SI, con la incógnita ya despejada. */
+export interface ResultadoDensidad {
+  /** kg/m³ */
+  densidad: number;
+  /** kg */
+  masa: number;
+  /** m³ */
+  volumen: number;
+}
+
+/**
+ * Despeja la incógnita de ρ = m/V con los dos datos conocidos, en el SI. El dato de la propia
+ * incógnita se ignora. Si alguno de los dos datos no es un número positivo, devuelve null.
+ */
+export function resolverDensidad(
+  incognita: IncognitaDensidad,
+  datos: { densidad: number; masa: number; volumen: number },
+): ResultadoDensidad | null {
+  const { densidad, masa, volumen } = datos;
+  if (incognita === 'densidad') {
+    if (!esPositivo(masa) || !esPositivo(volumen)) return null;
+    return { densidad: masa / volumen, masa, volumen };
+  }
+  if (incognita === 'masa') {
+    if (!esPositivo(densidad) || !esPositivo(volumen)) return null;
+    return { densidad, masa: densidad * volumen, volumen };
+  }
+  if (!esPositivo(densidad) || !esPositivo(masa)) return null;
+  return { densidad, masa, volumen: masa / densidad };
+}

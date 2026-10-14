@@ -23,6 +23,7 @@ import {
 } from './motor';
 import { MATERIALES, LIQUIDOS } from './materiales';
 import CasosAula from './CasosAula';
+import CalculadoraDensidad from './CalculadoraDensidad';
 
 // ─── Sustancias de referencia ────────────────────────────────────────────────
 // Las listas MATERIALES y LIQUIDOS viven en ./materiales.ts: las leen también los «Casos
@@ -185,6 +186,21 @@ export default function SimuladorFlotabilidadPage() {
 
   // Lo que el deslizador refleja de la caja de texto
   const posicionDeslizador = posicionDesdeVolumen(volumen);
+
+  /**
+   * La calculadora de densidad lleva su resultado aquí: el cuerpo pasa a «Otra densidad» y, si
+   * el volumen cabe en el rango del simulador, también se toma. Devuelve si se tomó.
+   */
+  const probarEnSimulador = (densidadKgM3: number, volumenCm3: number): boolean => {
+    const formato = (v: number) => new Intl.NumberFormat('es-ES', { maximumSignificantDigits: 6 }).format(v);
+    setMaterialId(ID_OTRA);
+    setDensidadOtroCuerpo(formato(densidadKgM3));
+    const cabe = volumenCm3 >= VOLUMEN_MIN && volumenCm3 <= VOLUMEN_MAX;
+    if (cabe) setVolumenTexto(formato(volumenCm3));
+    const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById('titulo-datos')?.scrollIntoView({ behavior: reducirMovimiento ? 'auto' : 'smooth', block: 'start' });
+    return cabe;
+  };
 
   return (
     <div className={styles.container}>
@@ -602,6 +618,9 @@ export default function SimuladorFlotabilidadPage() {
           </div>
         </div>
 
+        {/* Calculadora de densidad (S0203): absorbida aquí en vez de en una URL propia */}
+        <CalculadoraDensidad onProbarEnSimulador={probarEnSimulador} />
+
         {/* Tarea de aula (skill /casos-aula-meskeia): tras los controles y FUERA de
             EducationalSection, que nace colapsada. */}
         <CasosAula />
@@ -735,6 +754,15 @@ export default function SimuladorFlotabilidadPage() {
               <p className={styles.faqTip}>
                 <span aria-hidden="true">💡</span> Midiendo el peso en el aire y el aparente en agua
                 se obtiene la densidad del cuerpo: ρc = ρagua · P / (P − P_aparente).
+              </p>
+            </div>
+            <div className={styles.faqItem}>
+              <strong>¿Cómo se calcula la densidad de un objeto?</strong>
+              <p>
+                Dividiendo su masa entre su volumen: ρ = m/V. Una pieza de 270 g que ocupa 100 cm³
+                tiene 2,7 g/cm³, o 2700 kg/m³: la densidad del aluminio. De la misma fórmula salen
+                la masa (m = ρ·V) y el volumen (V = m/ρ); la calculadora de densidad de esta página
+                despeja cualquiera de los tres.
               </p>
             </div>
             <div className={styles.faqItem}>

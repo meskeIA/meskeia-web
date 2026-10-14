@@ -3,8 +3,8 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Flotabilidad: Principio de Arquímedes y Densidad | meskeIA',
-  description: 'Elige el material, el volumen y el líquido y comprueba con el principio de Arquímedes si el cuerpo flota o se hunde: peso, empuje, porcentaje sumergido y peso aparente, con el dibujo del recipiente a escala.',
-  keywords: 'principio de arquimedes, empuje, flotabilidad, densidad, peso aparente, simulador, simulador de flotabilidad, por qué flota un barco, iceberg, fuerza de empuje, física, secundaria, preparatoria, educación media',
+  description: 'Elige el material, el volumen y el líquido y comprueba con el principio de Arquímedes si el cuerpo flota o se hunde: peso, empuje, porcentaje sumergido y peso aparente. Incluye una calculadora de densidad (ρ = m/V) que despeja la densidad, la masa o el volumen.',
+  keywords: 'principio de arquimedes, empuje, flotabilidad, densidad, calculadora de densidad, formula de la densidad, densidad masa volumen, peso aparente, simulador, simulador de flotabilidad, por qué flota un barco, iceberg, fuerza de empuje, física, secundaria, preparatoria, educación media',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -42,8 +42,9 @@ export const jsonLd = generateWebAppSchema({
     'Peso aparente (lo que marcaría un dinamómetro) cuando se hunde',
     'Dibujo del recipiente con el cuerpo en su línea de flotación real y flechas de fuerza proporcionales',
     'Fórmulas que cambian según el veredicto',
+    'Calculadora de densidad ρ = m/V: despeja la densidad, la masa o el volumen, en g, kg, cm³, L, m³, g/cm³ o kg/m³',
   ],
-  keywords: ['principio de Arquímedes', 'empuje', 'flotabilidad', 'densidad', 'peso aparente', 'simulador de física'],
+  keywords: ['principio de Arquímedes', 'empuje', 'flotabilidad', 'densidad', 'calculadora de densidad', 'peso aparente', 'simulador de física'],
 });
 
 export const faqJsonLd = {
@@ -80,6 +81,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Es lo que marca un dinamómetro cuando el cuerpo cuelga sumergido en un líquido: el peso real menos el empuje, P − E. Una pieza de hierro de 100 cm³ pesa 7,72 N en el aire, recibe 0,98 N de empuje en agua y marca un peso aparente de 6,74 N.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se calcula la densidad de un objeto?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Dividiendo su masa entre su volumen: ρ = m/V. Una pieza de 270 g que ocupa 100 cm³ tiene una densidad de 2,7 g/cm³, es decir, 2700 kg/m³, la del aluminio. De la misma fórmula salen la masa (m = ρ·V) y el volumen (V = m/ρ). Para pasar de g/cm³ a kg/m³ se multiplica por 1000.',
       },
     },
     {

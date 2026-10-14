@@ -27,6 +27,15 @@
  *   1.000 en 1.000 → EQUILIBRIO INDIFERENTE (peso aparente 0)
  *
  *   Densidad 0, negativa o NaN, o volumen 0 → null: no hay cifra que publicar.
+ *
+ * Calculadora de la densidad, ρ = m/V:
+ *
+ *   Aluminio: m = 270 g = 0,27 kg · V = 100 cm³ = 0,0001 m³
+ *     ρ = 0,27/0,0001 = 2.700 kg/m³ = 2,7 g/cm³
+ *   Agua: ρ = 1.000 kg/m³ · V = 2 L = 0,002 m³
+ *     m = 1000 · 0,002 = 2 kg
+ *   Oro: ρ = 19,3 g/cm³ = 19.300 kg/m³ · m = 1 kg
+ *     V = 1/19300 = 0,0000518135… m³ = 51,8135… cm³
  */
 
 import { test, expect } from '@playwright/test';
@@ -36,6 +45,10 @@ import {
   esPositivo,
   G,
   CM3_POR_M3,
+  resolverDensidad,
+  UNIDADES_MASA,
+  UNIDADES_VOLUMEN,
+  UNIDADES_DENSIDAD,
 } from '../app/simulador-flotabilidad/motor';
 
 test.describe('Constantes', () => {
@@ -136,5 +149,57 @@ test.describe('Validación: sin datos válidos no hay cifras', () => {
     expect(esPositivo(-1)).toBe(false);
     expect(esPositivo(Number.NaN)).toBe(false);
     expect(esPositivo(Number.POSITIVE_INFINITY)).toBe(false);
+  });
+});
+
+test.describe('Densidad ρ = m/V', () => {
+  test('factores de unidades: 1 g = 0,001 kg, 1 cm³ = 10⁻⁶ m³, 1 L = 10⁻³ m³, 1 g/cm³ = 1000 kg/m³', () => {
+    expect(UNIDADES_MASA.g).toBe(0.001);
+    expect(UNIDADES_MASA.kg).toBe(1);
+    expect(UNIDADES_VOLUMEN.cm3).toBe(1e-6);
+    expect(UNIDADES_VOLUMEN.L).toBe(1e-3);
+    expect(UNIDADES_VOLUMEN.m3).toBe(1);
+    expect(UNIDADES_DENSIDAD['g/cm3']).toBe(1000);
+    expect(UNIDADES_DENSIDAD['kg/m3']).toBe(1);
+  });
+
+  test('aluminio: 270 g en 100 cm³ → ρ = 2.700 kg/m³ (2,7 g/cm³)', () => {
+    const r = resolverDensidad('densidad', {
+      densidad: Number.NaN,
+      masa: 270 * UNIDADES_MASA.g,
+      volumen: 100 * UNIDADES_VOLUMEN.cm3,
+    });
+    expect(r).not.toBeNull();
+    expect(r!.densidad).toBeCloseTo(2700, 9);
+    expect(r!.densidad / UNIDADES_DENSIDAD['g/cm3']).toBeCloseTo(2.7, 12);
+  });
+
+  test('agua: 1.000 kg/m³ y 2 L → m = 2 kg', () => {
+    const r = resolverDensidad('masa', { densidad: 1000, masa: Number.NaN, volumen: 2 * UNIDADES_VOLUMEN.L });
+    expect(r).not.toBeNull();
+    expect(r!.masa).toBeCloseTo(2, 12);
+  });
+
+  test('oro: 19,3 g/cm³ y 1 kg → V = 51,8135 cm³', () => {
+    const r = resolverDensidad('volumen', {
+      densidad: 19.3 * UNIDADES_DENSIDAD['g/cm3'],
+      masa: 1,
+      volumen: Number.NaN,
+    });
+    expect(r).not.toBeNull();
+    expect(r!.volumen).toBeCloseTo(1 / 19300, 15);
+    expect(r!.volumen / UNIDADES_VOLUMEN.cm3).toBeCloseTo(51.8135, 4);
+  });
+
+  test('el dato de la propia incógnita se ignora', () => {
+    const r = resolverDensidad('densidad', { densidad: 999, masa: 0.27, volumen: 0.0001 });
+    expect(r!.densidad).toBeCloseTo(2700, 9);
+  });
+
+  test('sin los dos datos positivos no hay cifra', () => {
+    expect(resolverDensidad('densidad', { densidad: 1000, masa: 0, volumen: 1 })).toBeNull();
+    expect(resolverDensidad('densidad', { densidad: 1000, masa: 1, volumen: Number.NaN })).toBeNull();
+    expect(resolverDensidad('masa', { densidad: -1000, masa: 1, volumen: 1 })).toBeNull();
+    expect(resolverDensidad('volumen', { densidad: 1000, masa: Number.POSITIVE_INFINITY, volumen: 1 })).toBeNull();
   });
 });

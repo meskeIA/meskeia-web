@@ -147,6 +147,42 @@ test.describe('Simulador de Flotabilidad', () => {
     const relacionadas = page.locator('section[aria-label="Aplicaciones relacionadas"]');
     await expect(relacionadas.locator('a')).toHaveCount(4);
   });
+
+  /*
+   * CALCULADORA DE DENSIDAD (S0203, 14/10/2026), resuelta a mano:
+   *   7) Estado inicial: 270 g en 100 cm³ → ρ = 0,27 kg / 0,0001 m³ = 2700 kg/m³ = 2,7 g/cm³
+   *   8) Volumen con 1 kg de oro a 19,3 g/cm³ → V = 1/19300 m³ = 51,8135 cm³ = 0,0518135 L
+   *        con 4 cifras: «51,81 cm³ = 0,05181 L = 0,00005181 m³»
+   *   9) «Probar si flota»: el cuerpo pasa a «Otra densidad» con 2700 kg/m³ y 100 cm³ en agua dulce
+   *        P = 2700·0,0001·9,81 = 2,6487 N · E = 0,981 N → se hunde · aparente 1,6677 → «1,668 N»
+   */
+  test('7 · calculadora de densidad: 270 g en 100 cm³ → 2,7 g/cm³ = 2700 kg/m³', async ({ page }) => {
+    await expect(page.locator('#calculadora-densidad [role="status"]')).toContainText('ρ = 2,7 g/cm³ = 2700 kg/m³');
+  });
+
+  test('8 · calculadora de densidad: volumen de 1 kg de oro a 19,3 g/cm³', async ({ page }) => {
+    const calc = page.locator('#calculadora-densidad');
+    await calc.getByRole('button', { name: /^Volumen/ }).click();
+    await expect(calc.getByRole('button', { name: /^Volumen/ })).toHaveAttribute('aria-pressed', 'true');
+    const masa = calc.getByRole('textbox', { name: 'Masa del objeto' });
+    await masa.fill('1');
+    await esperarValorEnReact(page, masa, '1');
+    await calc.getByLabel('Unidad de la masa').selectOption('kg');
+    const densidad = calc.getByRole('textbox', { name: 'Densidad del objeto' });
+    await densidad.fill('19,3');
+    await esperarValorEnReact(page, densidad, '19,3');
+    await expect(calc.locator('[role="status"]')).toContainText('V = 51,81 cm³ = 0,05181 L = 0,00005181 m³');
+  });
+
+  test('9 · «Probar si flota» lleva 2700 kg/m³ y 100 cm³ al simulador → se hunde, aparente 1,668 N', async ({ page }) => {
+    await page.locator('#calculadora-densidad').getByRole('button', { name: 'Probar si flota en el simulador' }).click();
+    const otra = page.locator('#titulo-material').locator('..').getByRole('button', { name: 'Otra densidad' });
+    await expect(otra).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('textbox', { name: 'Densidad del cuerpo' })).toHaveValue('2700');
+    await expect(cajaVolumen(page)).toHaveValue('100');
+    await expect(resultados(page)).toContainText('Se hunde');
+    expect(await leerTarjeta(page, 'Peso aparente P − E (dinamómetro)')).toBe('1,668 N');
+  });
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════════
