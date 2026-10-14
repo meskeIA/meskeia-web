@@ -679,8 +679,8 @@ export default function CalculadoraDeudaPage() {
                   </tr>
                   <tr>
                     <td>Complejidad de seguimiento</td>
-                    <td>Fácil <span aria-hidden="true">✅</span></td>
-                    <td>Fácil <span aria-hidden="true">✅</span></td>
+                    <td>Fácil</td>
+                    <td>Fácil</td>
                     <td>Muy fácil</td>
                   </tr>
                 </tbody>

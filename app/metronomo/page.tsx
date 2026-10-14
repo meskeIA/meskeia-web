@@ -253,7 +253,7 @@ export default function MetronomoPage() {
               onClick={togglePlay}
               className={`${styles.playButton} ${isPlaying ? styles.playing : ''}`}
             >
-              {isPlaying ? '⏹️ Detener' : '▶️ Iniciar'}
+              {isPlaying ? <><span aria-hidden="true">⏹️</span> Detener</> : <><span aria-hidden="true">▶️</span> Iniciar</>}
             </button>
             <button type="button" onClick={handleTap} className={styles.tapButton}>
               <span aria-hidden="true">👆</span> Tap Tempo

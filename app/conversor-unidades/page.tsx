@@ -452,8 +452,8 @@ export default function ConversorUnidadesPage() {
             </div>
 
             {/* Botón intercambiar */}
-            <button type="button" onClick={intercambiar}className={styles.btnIntercambiar}>
-              ⇄
+            <button type="button" onClick={intercambiar} className={styles.btnIntercambiar} aria-label="Intercambiar origen y destino">
+              <span aria-hidden="true">⇄</span>
             </button>
 
             {/* Destino */}

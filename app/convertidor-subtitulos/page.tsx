@@ -673,7 +673,7 @@ export default function ConvertidorSubtitulosPage() {
               <span aria-hidden="true">⬇</span> Descargar .{EXTENSIONES[formatoDestino]}
             </button>
             <button type="button" className={styles.btnSecondary} onClick={copiar} disabled={!salida}>
-              {copiado ? '✓ Copiado' : '📋 Copiar'}
+              {copiado ? <><span aria-hidden="true">✓</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
             </button>
           </div>
         </section>
