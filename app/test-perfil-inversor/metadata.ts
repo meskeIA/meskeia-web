@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Test de Perfil Inversor - Descubre tu Tolerancia al Riesgo | meskeIA',
-  description: 'Test gratuito de perfil de inversor. Responde 10 preguntas y descubre cuál de los cinco perfiles te corresponde: conservador, moderado, equilibrado, dinámico o agresivo. Recomendaciones personalizadas de inversión.',
+  description: 'Test gratuito de perfil de inversor. Responde 10 preguntas y descubre cuál de los cinco perfiles te corresponde: conservador, moderado, equilibrado, dinámico o agresivo, con ejemplos ilustrativos de lo que suele asociarse a cada uno.',
   keywords: 'test perfil inversor, tolerancia riesgo, perfil riesgo inversión, test inversión, conservador moderado agresivo, cuestionario inversor',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

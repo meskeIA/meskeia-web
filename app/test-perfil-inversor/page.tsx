@@ -468,7 +468,25 @@ export default function TestPerfilInversorPage() {
       return;
     }
     if (preguntaAnterior.current !== null && preguntaAnterior.current !== currentQuestion) {
-      tarjetaPregunta.current?.focus();
+      /*
+       * 14/10/2026 (hallazgo 3285) — en un móvil pequeño «Siguiente» queda bajo el pliegue y, al
+       * tocarlo, la pregunta nueva aparecía con la vista abajo: se veían sus opciones y no su
+       * enunciado ni «Pregunta N de 10». El foco a la tarjeta no la movía porque la tarjeta es
+       * más alta que la pantalla. Si el progreso o el enunciado no se ven enteros, la vista va al
+       * principio del cuestionario, como en los cambios de fase (2177); si se ven, no se mueve.
+       */
+      const destino = destinoCuestionario.current;
+      const enunciado = encabezadoPregunta.current;
+      if (destino && enunciado) {
+        const estilo = getComputedStyle(document.documentElement);
+        const margenArriba = parseFloat(estilo.scrollPaddingTop) || 0;
+        const margenAbajo = parseFloat(estilo.scrollPaddingBottom) || 0;
+        const fueraDeVista =
+          destino.getBoundingClientRect().top < margenArriba - 1 ||
+          enunciado.getBoundingClientRect().bottom > window.innerHeight - margenAbajo;
+        if (fueraDeVista) destino.scrollIntoView({ block: 'start' });
+      }
+      tarjetaPregunta.current?.focus({ preventScroll: true });
     }
     preguntaAnterior.current = currentQuestion;
   }, [phase, currentQuestion]);
@@ -656,8 +674,8 @@ export default function TestPerfilInversorPage() {
           </h2>
           <p className={styles.startDescription}>
             Responde 10 preguntas sobre tu situación financiera, experiencia y actitud
-            ante el riesgo. Al final recibirás tu perfil personalizado con recomendaciones
-            de inversión adaptadas a ti.
+            ante el riesgo. Al final verás cuál de los cinco perfiles de inversor te
+            corresponde y ejemplos ilustrativos de lo que suele asociarse a él.
           </p>
 
           <div className={styles.featuresList}>
@@ -675,7 +693,9 @@ export default function TestPerfilInversorPage() {
             </div>
             <div className={styles.featureItem}>
               <span className={styles.featureIcon} aria-hidden="true">✓</span>
-              <span>Recomendaciones personalizadas</span>
+              {/* Prometía «Recomendaciones personalizadas», lo que el propio resultado niega:
+                  da ejemplos ilustrativos por tramo, no asesoramiento (hallazgo 3286). */}
+              <span>Ejemplos según tu perfil</span>
             </div>
             <div className={styles.featureItem}>
               <span className={styles.featureIcon} aria-hidden="true">✓</span>
@@ -1516,7 +1536,9 @@ function GuiaPerfilInversor() {
             entrar y salir del mercado («market timing») suele restar rentabilidad: quien vende en
             una caída y vuelve más tarde se pierde parte de la recuperación. La cifra concreta de
             cuánto resta depende del estudio, del periodo y del mercado que se mire, así que aquí
-            no se da ninguna (§1.quinquies: una cifra popular sin fuente es una cifra inventada).
+            no se da ninguna.
+            {/* Sin cifra a propósito: una cifra popular sin fuente es una cifra inventada
+                (CLAUDE.md §1.quinquies). La referencia estaba en el texto visible (hallazgo 3287). */}
           </li>
           <li>
             <strong>Invertir el fondo de emergencia:</strong> Mezclar el colchón de seguridad con inversiones

@@ -1813,10 +1813,10 @@ test.describe('re-inspección 14/10/2026 · escritorio', () => {
   });
 
   // ---------- Hallazgos nuevos de contenido ----------
-  test.fail('hallazgo nuevo de la tanda del 14/10/2026 — la portada y la description no prometen «recomendaciones personalizadas» que el resultado niega', async ({
+  test('REPARADO 3286 — la portada y la description no prometen «recomendaciones personalizadas» que el resultado niega', async ({
     page,
   }) => {
-    // La description dice «Recomendaciones personalizadas de inversión.» y la portada, «Al final
+    // REPARADO el 14/10/2026: prometen uno de cinco perfiles y ejemplos ilustrativos. Antes: la description decía «Recomendaciones personalizadas de inversión.» y la portada, «Al final
     // recibirás tu perfil personalizado con recomendaciones de inversión adaptadas a ti» y
     // «✓ Recomendaciones personalizadas». Lo que da la app son cinco listas fijas, una por tramo, y
     // el propio resultado las presenta como «ejemplos ilustrativos, no una recomendación de
@@ -1837,10 +1837,11 @@ test.describe('re-inspección 14/10/2026 · escritorio', () => {
     });
   });
 
-  test.fail('hallazgo nuevo de la tanda del 14/10/2026 — la guía no enseña al lector una nota interna («§1.quinquies»)', async ({
+  test('REPARADO 3287 — la guía no enseña al lector una nota interna («§1.quinquies»)', async ({
     page,
   }) => {
-    // «Errores comunes», 2.ª viñeta, en texto visible: «…así que aquí no se da ninguna
+    // REPARADO el 14/10/2026: la razón pasó a un comentario del JSX. Antes, «Errores comunes»,
+    // 2.ª viñeta, en texto visible: «…así que aquí no se da ninguna
     // (§1.quinquies: una cifra popular sin fuente es una cifra inventada).» El § remite a una
     // sección del CLAUDE.md del proyecto; la reparación del 1218 lo dejó en el JSX, no en un comentario.
     await page.goto(RUTA);
@@ -1905,16 +1906,17 @@ test.describe('re-inspección 14/10/2026 · móvil 360×740', () => {
     }
   });
 
-  test.fail('hallazgo nuevo de la tanda del 14/10/2026 — tras «Siguiente», el enunciado de la pregunta nueva se ve entero bajo la barra del logo', async ({
+  test('REPARADO 3285 — tras «Siguiente», el enunciado de la pregunta nueva se ve entero bajo la barra del logo', async ({
     page,
   }) => {
     // Como lo hace un dedo: en cada pregunta se toca la B, se desplaza la página hasta ver
     // «Siguiente» entero (a 20 px del borde; a 360×740 queda por debajo del pliegue desde la
-    // pregunta 1) y se toca en su centro. La app no recoloca la vista al cambiar de pregunta —solo
-    // da el foco a la tarjeta (1215), y la tarjeta, más alta que la pantalla, no se mueve—, así que
-    // la pregunta nueva aparece con la vista abajo: se ven sus opciones y no su enunciado. Los
-    // cambios de FASE sí se recolocan (2177); los de pregunta, no.
-    // Obtenido (14/10/2026): px del enunciado visibles bajo la barra (62 px) en las preguntas 2-10:
+    // pregunta 1) y se toca en su centro. La app no recolocaba la vista al cambiar de pregunta
+    // —solo daba el foco a la tarjeta (1215), y la tarjeta, más alta que la pantalla, no se
+    // movía—, así que la pregunta nueva aparecía con la vista abajo. REPARADO: si el progreso o el
+    // enunciado no se ven enteros, la vista va al principio del cuestionario, como en los cambios
+    // de FASE (2177).
+    // Obtenido antes (14/10/2026): px del enunciado visibles bajo la barra (62 px) en las preguntas 2-10:
     // 67/90 · 0/90 · 25/90 · 2/60 · 25/90 · 25/60 · 55/90 · 14/90 · 0/60, y «Pregunta N de 10»
     // fuera de la pantalla en las nueve. A 375×667, 0 px en las nueve.
     test.setTimeout(60_000);
@@ -1935,6 +1937,9 @@ test.describe('re-inspección 14/10/2026 · móvil 360×740', () => {
       await page.waitForTimeout(150);
       const barra = await bordeBarraLogo(page);
       const e = await enunciado(page).boundingBox();
+      // «Pregunta N de 10» también tiene que verse (antes, fuera de la pantalla en las nueve)
+      const p = await page.getByText(`Pregunta ${n} de 10`).boundingBox();
+      if (!p || p.y < barra - 0.5) tapadas.push(`pregunta ${n}: «Pregunta ${n} de 10» en ${Math.round(p?.y ?? NaN)} px`);
       if (!e || e.y < barra - 0.5 || e.y + e.height > 740) {
         tapadas.push(
           `pregunta ${n}: enunciado en ${Math.round(e?.y ?? NaN)}–${Math.round((e?.y ?? NaN) + (e?.height ?? 0))} px con la barra hasta ${Math.round(barra)}`,
