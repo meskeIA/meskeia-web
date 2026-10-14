@@ -234,10 +234,24 @@ export default function LupaDigitalPage() {
     if (!pista) return;
     pista
       .applyConstraints({ advanced: [{ zoom: reparto.camara } as MediaTrackConstraintSet] })
-      .catch(() => {
+      .catch(async () => {
         // Sin permiso para el zoom (o una cámara que lo anuncia y luego lo rechaza):
-        // se vuelve al zoom en pantalla, que funciona en cualquier dispositivo.
-        setRangoZoomCamara(null);
+        // se vuelve al zoom en pantalla, que funciona en cualquier dispositivo. Antes se
+        // devuelve la cámara a 1: si no, se quedaba en el último zoom ACEPTADO y el aumento
+        // se multiplicaba sin que nada lo dijera (2 × 3 = 6 con el indicador en 3x; hallazgo 3291).
+        try {
+          await pista.applyConstraints({ advanced: [{ zoom: 1 } as MediaTrackConstraintSet] });
+        } catch {
+          /* se mira abajo dónde se ha quedado */
+        }
+        const ajustes = pista.getSettings() as MediaTrackSettings & { zoom?: number };
+        const fijo = typeof ajustes.zoom === 'number' && ajustes.zoom > 1 ? ajustes.zoom : null;
+        // Si tampoco vuelve a 1, se reparte con el zoom en que se ha quedado, como un rango de
+        // un solo valor: la cámara pone ese y la pantalla el resto. Devolver el mismo objeto
+        // cuando ya está fijado evita repetir el efecto en bucle.
+        setRangoZoomCamara((previo) =>
+          fijo === null ? null : previo && previo.min === fijo && previo.max === fijo ? previo : { min: fijo, max: fijo, step: 0 },
+        );
       });
   }, [activo, congelado, rangoZoomCamara, reparto.camara]);
 

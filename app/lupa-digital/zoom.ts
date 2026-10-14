@@ -30,6 +30,10 @@ export function leerRangoZoom(capacidades: { zoom?: Partial<RangoZoomCamara> } |
   if (!z || typeof z.min !== 'number' || typeof z.max !== 'number') return null;
   // Una cámara que solo ofrece min = max (o un máximo por debajo de 1) no amplía nada.
   if (z.max <= Math.max(1, z.min)) return null;
+  // Un mínimo por encima de 1 no cabe en un aumento (1 = sin ampliar): es una cámara que da el
+  // zoom en sus propias unidades (100-500, por ejemplo). Tratarlo como aumentos dejaba el vídeo
+  // en scale(0,02) dentro del visor negro (hallazgo 3290); todo el zoom va a la pantalla.
+  if (z.min > 1) return null;
   return { min: z.min, max: z.max, step: typeof z.step === 'number' && z.step > 0 ? z.step : 0 };
 }
 

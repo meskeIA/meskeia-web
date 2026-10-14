@@ -1165,8 +1165,9 @@ test.describe('re-inspección 14/10/2026 — zoom de la cámara', () => {
     await expect(nota).toHaveText(/^Esta cámara puede ampliar por sí misma hasta 5x/);
   });
 
-  // ⚠️ HALLAZGO NUEVO — operativa (hallazgo nuevo de la tanda del 14/10/2026). leerRangoZoom
-  // (zoom.ts) acepta una capacidad de zoom cuyo MÍNIMO pasa de 1 y la trata como aumentos: con
+  // REPARADO 3290 (14/10/2026): leerRangoZoom descarta un rango con mínimo por encima de 1 y todo
+  // el zoom va a la pantalla. Antes: leerRangoZoom
+  // (zoom.ts) aceptaba una capacidad de zoom cuyo MÍNIMO pasa de 1 y la trataba como aumentos: con
   // {min 100, max 500, paso 1} repartirZoom(2) da cámara max(2, 100) = 100 y pantalla 2 / 100 =
   // 0,02. Un mínimo por encima de 1 no cabe en un aumento (1 = sin ampliar): es lo que anuncia una
   // cámara que expresa el zoom en sus propias unidades. El vídeo queda en 13 × 10 px dentro de un
@@ -1174,10 +1175,9 @@ test.describe('re-inspección 14/10/2026 — zoom de la cámara', () => {
   // el indicador en 2x. Con {min 2, max 6} pasa lo mismo a escala: a 1x, scale(0,5) y «Los 2x…».
   // Caso: cámara {100..500, paso 1}, activar (2x) → esperado vídeo que cubre el visor y nota sin
   //       «100x» · obtenido scale(0.02), caja 13 × 10 px, «Los 100x los hace la propia cámara…».
-  test('HALLAZGO NUEVO (operativa) — una cámara cuyo zoom mínimo pasa de 1 no debe encoger el vídeo a un punto ni anunciar «100x»', async ({
+  test('REPARADO 3290 (operativa) — una cámara cuyo zoom mínimo pasa de 1 no debe encoger el vídeo a un punto ni anunciar «100x»', async ({
     page,
   }) => {
-    test.fail(); // hallazgo nuevo de la tanda del 14/10/2026: el día que se repare, quitar esta línea
     await simularCamaraPorPista(page, { trasera: { min: 100, max: 500, step: 1 }, frontal: null });
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#control-zoom']);
@@ -1198,7 +1198,8 @@ test.describe('re-inspección 14/10/2026 — zoom de la cámara', () => {
     expect((await page.locator('[class*=zoomNota]').allTextContents()).join(' ')).not.toContain('100x');
   });
 
-  // ⚠️ HALLAZGO NUEVO — operativa (hallazgo nuevo de la tanda del 14/10/2026). Si applyConstraints
+  // REPARADO 3291 (14/10/2026): al rechazarse, el catch devuelve la cámara a 1 (y, si no vuelve,
+  // reparte con el zoom en que se quedó, leído de getSettings). Antes: si applyConstraints
   // rechaza el zoom DESPUÉS de haber aceptado otro, el catch de page.tsx pasa a «todo en pantalla»
   // (setRangoZoomCamara(null)) sin devolver la cámara a 1 ni leer su getSettings(): la cámara se
   // queda en el zoom anterior y el aumento real se multiplica. Es la «cámara que lo anuncia y luego
@@ -1206,10 +1207,9 @@ test.describe('re-inspección 14/10/2026 — zoom de la cámara', () => {
   // Caso: cámara {1..3, paso 0,1} que rechaza por encima de 2,5; 2x (aceptado, cámara 2) → 3x
   //       (pide 3, rechazado) → esperado aumento total 3 · obtenido cámara 2 × scale(3) = 6, sin
   //       nota (la FAQ dice que sin esa línea «todo el zoom se hace en pantalla»); a 5x, 10.
-  test('HALLAZGO NUEVO (operativa) — si la cámara rechaza el zoom tras haber aceptado otro, el aumento que se ve no debe multiplicarse', async ({
+  test('REPARADO 3291 (operativa) — si la cámara rechaza el zoom tras haber aceptado otro, el aumento que se ve no debe multiplicarse', async ({
     page,
   }) => {
-    test.fail(); // hallazgo nuevo de la tanda del 14/10/2026: el día que se repare, quitar esta línea
     await simularCamaraPorPista(page, { trasera: { min: 1, max: 3, step: 0.1 }, frontal: null, rechazarPorEncima: 2.5 });
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#control-zoom']);
@@ -1218,11 +1218,15 @@ test.describe('re-inspección 14/10/2026 — zoom de la cámara', () => {
     await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 1, total: 2 });
 
     await page.getByRole('button', { name: '3x', exact: true }).click();
-    await expect.poll(async () => (await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 3]);
+    // Pide 3 (rechazado) y devuelve la cámara a 1.
+    await expect.poll(async () => (await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 3, 1]);
     await expect(page.locator('[class*=zoomNota]')).toHaveCount(0); // la app ya cayó a «todo en pantalla»
     await expect(page.locator('[class*=zoomIndicador]')).toHaveText('3x');
-    // DEBERÍA: lo que se ve es lo que marca el indicador, 3x.
-    await expect.poll(async () => (await aumentoPintado(page)).total).toBe(3);
+    // Lo que se ve es lo que marca el indicador: cámara 1 × pantalla 3.
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 1, pantalla: 3, total: 3 });
+    // Y a 5x, 5 (antes, 2 × 5 = 10).
+    await page.getByRole('button', { name: '5x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 1, pantalla: 5, total: 5 });
   });
 
   test.describe('a 360 px con el dedo (cabo C0067, con zoom de cámara)', () => {
