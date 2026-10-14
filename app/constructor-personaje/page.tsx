@@ -540,19 +540,19 @@ export default function ConstructorPersonajePage() {
         <h3>Para qué tipo de escritor es esta herramienta</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>📖 Escritor de novela</strong>
+            <strong><span aria-hidden="true">📖</span> Escritor de novela</strong>
             <p>Rellena la ficha antes de escribir el primer capítulo. Las dimensiones de psicología y arco te evitarán incoherencias de carácter en el tercer acto.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🎬 Guionista</strong>
+            <strong><span aria-hidden="true">🎬</span> Guionista</strong>
             <p>El deseo y la necesidad son los dos motores del guión. Si tienes ambos claros desde el principio, el conflicto se escribe casi solo.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📝 Escritor de relato corto</strong>
+            <strong><span aria-hidden="true">📝</span> Escritor de relato corto</strong>
             <p>No tienes que rellenar los 19 campos: con nombre, deseo, miedo y un tic verbal ya tienes un personaje coherente para una historia corta.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🎲 Jugador o narrador de rol</strong>
+            <strong><span aria-hidden="true">🎲</span> Jugador o narrador de rol</strong>
             <p>La sección de Voz y el tic verbal son especialmente útiles para interpretar en mesa. El secreto y el evento formativo dan material para sesiones de trasfondo.</p>
           </div>
         </div>

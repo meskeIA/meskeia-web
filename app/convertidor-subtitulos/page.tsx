@@ -587,17 +587,17 @@ export default function ConvertidorSubtitulosPage() {
               </div>
             ) : (
               <div className={styles.warningBoxInline} role="alert">
-                ⚠ No se ha podido detectar el formato automáticamente. Selecciona uno manualmente arriba.
+                <span aria-hidden="true">⚠</span> No se ha podido detectar el formato automáticamente. Selecciona uno manualmente arriba.
               </div>
             )
           )}
 
           <div className={styles.buttonRow}>
             <button type="button" className={styles.btnSecondary} onClick={restaurarEjemplo}>
-              🔄 Ejemplo
+              <span aria-hidden="true">🔄</span> Ejemplo
             </button>
             <button type="button" className={styles.btnSecondary} onClick={limpiar} disabled={!inputText}>
-              🗑️ Limpiar
+              <span aria-hidden="true">🗑️</span> Limpiar
             </button>
           </div>
         </section>
@@ -670,7 +670,7 @@ export default function ConvertidorSubtitulosPage() {
 
           <div className={styles.buttonRow}>
             <button type="button" className={styles.btnPrimary} onClick={descargar} disabled={!salida}>
-              ⬇ Descargar .{EXTENSIONES[formatoDestino]}
+              <span aria-hidden="true">⬇</span> Descargar .{EXTENSIONES[formatoDestino]}
             </button>
             <button type="button" className={styles.btnSecondary} onClick={copiar} disabled={!salida}>
               {copiado ? '✓ Copiado' : '📋 Copiar'}

@@ -330,7 +330,7 @@ export default function ChecklistCoberturasSeguroPage() {
       >
         {/* ====== SECCIÓN 1: TABLA COMPARATIVA ====== */}
         <section className={styles.comparativaSection}>
-          <h2>📊 Los 8 seguros principales: comparativa rápida</h2>
+          <h2><span aria-hidden="true">📊</span> Los 8 seguros principales: comparativa rápida</h2>
           <p className={styles.comparativaSubtitle}>
             Referencia orientativa de seguros (incluido el seguro de coche, también llamado carro o auto). Los precios varían según edad, perfil y aseguradora.
           </p>
@@ -347,7 +347,7 @@ export default function ChecklistCoberturasSeguroPage() {
               <tbody>
                 <tr>
                   <td>Seguro de coche / carro / auto (RC)</td>
-                  <td><span className={styles.badgeObl}>⚠️ Sí (RC)</span></td>
+                  <td><span className={styles.badgeObl}><span aria-hidden="true">⚠️</span> Sí (RC)</span></td>
                   <td>300 – 800 €</td>
                   <td>Cualquier conductor</td>
                 </tr>
@@ -359,19 +359,19 @@ export default function ChecklistCoberturasSeguroPage() {
                 </tr>
                 <tr>
                   <td>Seguro de vida</td>
-                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><span className={styles.badgeNo}><span aria-hidden="true">❌</span> No</span></td>
                   <td>150 – 600 €</td>
                   <td>Padres con hijos, hipotecas</td>
                 </tr>
                 <tr>
                   <td>Seguro de salud</td>
-                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><span className={styles.badgeNo}><span aria-hidden="true">❌</span> No</span></td>
                   <td>400 – 1.200 €</td>
                   <td>Todos (especialmente autónomos)</td>
                 </tr>
                 <tr>
                   <td>Seguro de decesos</td>
-                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><span className={styles.badgeNo}><span aria-hidden="true">❌</span> No</span></td>
                   <td>50 – 150 €</td>
                   <td>Mayores de 50, familias</td>
                 </tr>
@@ -383,13 +383,13 @@ export default function ChecklistCoberturasSeguroPage() {
                 </tr>
                 <tr>
                   <td>Seguro de dependencia</td>
-                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><span className={styles.badgeNo}><span aria-hidden="true">❌</span> No</span></td>
                   <td>100 – 500 €</td>
                   <td>Mayores de 50 (mejor contratar joven)</td>
                 </tr>
                 <tr>
                   <td>Impago de alquiler</td>
-                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><span className={styles.badgeNo}><span aria-hidden="true">❌</span> No</span></td>
                   <td>3 – 5% renta anual</td>
                   <td>Propietarios que alquilan</td>
                 </tr>
@@ -400,7 +400,7 @@ export default function ChecklistCoberturasSeguroPage() {
 
         {/* ====== SECCIÓN 2: CASOS DE USO ====== */}
         <section className={styles.casosSection}>
-          <h2>💼 Situaciones reales: cuando el checklist marca la diferencia</h2>
+          <h2><span aria-hidden="true">💼</span> Situaciones reales: cuando el checklist marca la diferencia</h2>
           <div className={styles.casoGrid}>
 
             <div className={styles.casoCard}>
@@ -456,7 +456,7 @@ export default function ChecklistCoberturasSeguroPage() {
 
         {/* ====== SECCIÓN 3: FAQ ====== */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas frecuentes sobre seguros</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre seguros</h2>
           <div className={styles.faqGrid}>
 
             <div className={styles.faqItem}>
@@ -503,7 +503,7 @@ export default function ChecklistCoberturasSeguroPage() {
 
         {/* ====== SECCIÓN 4: GUÍA PASO A PASO ====== */}
         <section className={styles.guiaSection}>
-          <h2>📋 Cómo revisar y contratar seguros correctamente</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo revisar y contratar seguros correctamente</h2>
           <div className={styles.guiaSteps}>
             <div className={styles.guiaStep}>
               <span className={styles.guiaNum}>1</span>
@@ -552,30 +552,30 @@ export default function ChecklistCoberturasSeguroPage() {
 
         {/* ====== SECCIÓN 5: TIPS Y ERRORES ====== */}
         <section className={styles.tipsSection}>
-          <h2>💡 Tips y errores que debes evitar</h2>
+          <h2><span aria-hidden="true">💡</span> Tips y errores que debes evitar</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <h4>✅ Agrupa seguros en una aseguradora</h4>
+              <h4><span aria-hidden="true">✅</span> Agrupa seguros en una aseguradora</h4>
               <p>Tener hogar, vida y coche en la misma compañía puede dar descuentos de un 10-20% (multiproducto). Pregunta siempre por esta opción.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>✅ Revisa coberturas ante eventos vitales</h4>
+              <h4><span aria-hidden="true">✅</span> Revisa coberturas ante eventos vitales</h4>
               <p>Matrimonio, nacimiento de un hijo, hipoteca, jubilación: cada cambio vital puede requerir actualizar coberturas. Revisa el checklist en cada momento.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>✅ Actualiza beneficiarios del seguro de vida</h4>
+              <h4><span aria-hidden="true">✅</span> Actualiza beneficiarios del seguro de vida</h4>
               <p>Si tienes pareja nueva, hijos, o has vivido un divorcio, comprueba que los beneficiarios del seguro de vida están correctamente designados.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>❌ No canceles el seguro antiguo antes del nuevo</h4>
+              <h4><span aria-hidden="true">❌</span> No canceles el seguro antiguo antes del nuevo</h4>
               <p>Espera a tener la póliza nueva activa antes de cancelar la antigua. Incluso un día sin cobertura puede ser muy costoso si ocurre un siniestro.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>❌ Infraasegurarse en el hogar</h4>
+              <h4><span aria-hidden="true">❌</span> Infraasegurarse en el hogar</h4>
               <p>Si aseguras el contenido por 20.000€ pero tienes bienes por 50.000€, en un siniestro total solo cobras 20.000€ (o menos, por la regla de proporcionalidad).</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>❌ No declarar cambios de situación</h4>
+              <h4><span aria-hidden="true">❌</span> No declarar cambios de situación</h4>
               <p>Una reforma importante, un local en casa, una mascota nueva de raza peligrosa: no declarar cambios puede anular la cobertura en el momento del siniestro.</p>
             </div>
           </div>

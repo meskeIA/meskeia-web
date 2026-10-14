@@ -649,27 +649,27 @@ export default function SimuladorCurvaPhillipsPage() {
             <div className={styles.faqItem}>
               <h4>¿Por qué la curva de Phillips de largo plazo es vertical?</h4>
               <p>A largo plazo, los agentes económicos ajustan sus <strong>expectativas de inflación</strong>. Si el gobierno intenta reducir el desempleo por debajo de la NAIRU estimulando la demanda, la inflación sube. Los trabajadores y empresas lo anticipan y exigen salarios más altos, lo que elimina la ganancia de empleo. El desempleo vuelve a la NAIRU con más inflación. A largo plazo no hay trade-off: la curva es vertical.</p>
-              <p className={styles.faqTip}>💡 En el simulador, sube la inflación esperada π<sub>e</sub> y observa cómo toda la curva CP₀ se desplaza hacia arriba — la NAIRU no se mueve.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, sube la inflación esperada π<sub>e</sub> y observa cómo toda la curva CP₀ se desplaza hacia arriba — la NAIRU no se mueve.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué es la NAIRU?</h4>
               <p>La <strong>NAIRU</strong> (Non-Accelerating Inflation Rate of Unemployment) es la tasa de desempleo compatible con una inflación estable. No significa desempleo cero: incluye el paro friccional (gente buscando trabajo mejor) y el paro estructural (desajuste entre habilidades y vacantes). En España ha oscilado entre el 8 % y el 15 % históricamente. En Alemania o el norte de Europa, entre el 3 % y el 6 %.</p>
-              <p className={styles.faqTip}>💡 La NAIRU no es directamente observable y se estima con modelos. En este simulador está fijada en 5 % para simplificar.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La NAIRU no es directamente observable y se estima con modelos. En este simulador está fijada en 5 % para simplificar.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cómo la estanflación de los 70 acabó con la curva de Phillips original?</h4>
               <p>El modelo Phillips original predecía que alta inflación y alto desempleo no podían coexistir. En 1973, la crisis del petróleo demostró que sí podían. Friedman y Phelps ya habían advertido en 1968 que la curva no podía ser estable sin incorporar las expectativas. La estanflación validó empíricamente la hipótesis de la tasa natural y desacreditó el uso pasivo de la curva de Phillips para hacer política económica.</p>
-              <p className={styles.faqTip}>💡 Pruébalo: en el simulador, sube ε a +5 pp y u al 8 % — obtendrás estanflación exactamente como en 1973.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Pruébalo: en el simulador, sube ε a +5 pp y u al 8 % — obtendrás estanflación exactamente como en 1973.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué dijo Friedman sobre las expectativas adaptativas?</h4>
               <p>Milton Friedman (Nobel 1976) argumentó que los trabajadores forman sus <strong>expectativas de inflación</strong> basándose en la inflación pasada (expectativas adaptativas). Si el banco central sorprende con inflación inesperada, puede crear empleo temporalmente, pero los agentes aprenden y ajustan sus expectativas. El engaño solo funciona en el corto plazo. Esta idea evolucionó hacia las &quot;expectativas racionales&quot; (Lucas) en los años 80: los agentes anticipan la política y la neutralizan instantáneamente.</p>
-              <p className={styles.faqTip}>💡 Incrementa piE (expectativas): verás cómo la curva sube pero el punto de equilibrio en la NAIRU queda igual.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Incrementa piE (expectativas): verás cómo la curva sube pero el punto de equilibrio en la NAIRU queda igual.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Puede haber deflación y desempleo a la vez?</h4>
               <p>Sí, y es una de las combinaciones más peligrosas: <strong>deflación con recesión</strong>. Ocurre cuando la demanda colapsa tan violentamente que los precios caen y el desempleo sube al mismo tiempo. Japón vivió este escenario durante la &quot;década perdida&quot; (años 90). La trampa de deflación es difícil de salir: los consumidores posponen compras esperando precios menores, lo que perpetúa la caída de demanda y del empleo.</p>
-              <p className={styles.faqTip}>💡 Fija piE en 0 %, shock en −2 pp y u en 14 %: obtendrás π ≈ −6 %, el cuadrante de deflación-recesión.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Fija piE en 0 %, shock en −2 pp y u en 14 %: obtendrás π ≈ −6 %, el cuadrante de deflación-recesión.</p>
             </div>
           </div>
         </section>

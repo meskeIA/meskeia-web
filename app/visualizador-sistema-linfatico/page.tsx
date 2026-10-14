@@ -394,19 +394,19 @@ function SeccionOrganos() {
 
           <div className={styles.organoInfoGrid}>
             <div className={styles.organoInfoItem}>
-              <span className={styles.organoInfoLabel}>📍 Ubicación</span>
+              <span className={styles.organoInfoLabel}><span aria-hidden="true">📍</span> Ubicación</span>
               <span className={styles.organoInfoTexto}>{organo.ubicacion}</span>
             </div>
             <div className={styles.organoInfoItem}>
-              <span className={styles.organoInfoLabel}>⚙️ Función</span>
+              <span className={styles.organoInfoLabel}><span aria-hidden="true">⚙️</span> Función</span>
               <span className={styles.organoInfoTexto}>{organo.funcion}</span>
             </div>
             <div className={styles.organoInfoItem}>
-              <span className={styles.organoInfoLabel}>💡 Curiosidad</span>
+              <span className={styles.organoInfoLabel}><span aria-hidden="true">💡</span> Curiosidad</span>
               <span className={styles.organoInfoTexto}>{organo.curiosidad}</span>
             </div>
             <div className={styles.organoInfoItem}>
-              <span className={styles.organoInfoLabel}>📊 Dato</span>
+              <span className={styles.organoInfoLabel}><span aria-hidden="true">📊</span> Dato</span>
               <span className={styles.organoInfoTexto} style={{ color: organo.color, fontWeight: 700 }}>{organo.dato}</span>
             </div>
           </div>
@@ -554,7 +554,7 @@ function SeccionFallos() {
       </div>
 
       <div className={styles.warningBox}>
-        <strong>💡 Nota educativa:</strong> Este explicador describe mecanismos fisiológicos con fines divulgativos.
+        <strong><span aria-hidden="true">💡</span> Nota educativa:</strong> Este explicador describe mecanismos fisiológicos con fines divulgativos.
         Los ganglios inflamados son en la gran mayoría de casos una respuesta normal a una infección.
         Ante cualquier síntoma persistente, consulta siempre con un profesional sanitario.
       </div>

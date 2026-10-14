@@ -223,6 +223,7 @@ export default function MetronomoPage() {
           {/* Slider de BPM */}
           <div className={styles.sliderContainer}>
             <button
+              type="button"
               className={styles.bpmAdjust}
               onClick={() => setBpm(Math.max(40, bpm - 1))}
             >
@@ -237,6 +238,7 @@ export default function MetronomoPage() {
               className={styles.bpmSlider}
             />
             <button
+              type="button"
               className={styles.bpmAdjust}
               onClick={() => setBpm(Math.min(220, bpm + 1))}
             >
@@ -247,20 +249,21 @@ export default function MetronomoPage() {
           {/* Botones de control */}
           <div className={styles.controls}>
             <button
+              type="button"
               onClick={togglePlay}
               className={`${styles.playButton} ${isPlaying ? styles.playing : ''}`}
             >
               {isPlaying ? '⏹️ Detener' : '▶️ Iniciar'}
             </button>
-            <button onClick={handleTap} className={styles.tapButton}>
-              👆 Tap Tempo
+            <button type="button" onClick={handleTap} className={styles.tapButton}>
+              <span aria-hidden="true">👆</span> Tap Tempo
             </button>
           </div>
         </div>
 
         {/* Panel de configuración */}
         <div className={styles.configPanel}>
-          <h2 className={styles.sectionTitle}>⚙️ Configuración</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">⚙️</span> Configuración</h2>
 
           {/* Compás */}
           <div className={styles.configRow}>
@@ -268,6 +271,7 @@ export default function MetronomoPage() {
             <div className={styles.timeSignatures}>
               {TIME_SIGNATURES.map((ts) => (
                 <button
+                  type="button"
                   key={ts.label}
                   className={`${styles.tsButton} ${timeSignature.label === ts.label ? styles.selected : ''}`}
                   onClick={() => setTimeSignature(ts)}
@@ -282,6 +286,7 @@ export default function MetronomoPage() {
           <div className={styles.configRow}>
             <label className={styles.configLabel}>Acento en primer tiempo</label>
             <button
+              type="button"
               className={`${styles.toggleButton} ${accentFirst ? styles.on : ''}`}
               onClick={() => setAccentFirst(!accentFirst)}
             >
@@ -309,6 +314,7 @@ export default function MetronomoPage() {
             <div className={styles.presets}>
               {TEMPO_PRESETS.map((preset) => (
                 <button
+                  type="button"
                   key={preset.name}
                   className={styles.presetButton}
                   onClick={() => setBpm(preset.bpm)}
@@ -390,7 +396,7 @@ export default function MetronomoPage() {
 
         {/* 3. FAQ */}
         <details className={styles.faqList}>
-          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre el Metrónomo y el Tempo</summary>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre el Metrónomo y el Tempo</summary>
           <div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Qué son los BPM y cómo se miden?</div>

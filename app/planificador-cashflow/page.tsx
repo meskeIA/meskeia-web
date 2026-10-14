@@ -572,7 +572,7 @@ export default function PlanificadorCashFlowPage() {
 
             {calculos.mesesNegativos > 0 && (
               <div className={styles.alertaLiquidez}>
-                <h4>⚠️ Alerta de Liquidez</h4>
+                <h4><span aria-hidden="true">⚠️</span> Alerta de Liquidez</h4>
                 <p>
                   Con este escenario, tendrás <strong>{calculos.mesesNegativos} mes(es)</strong> con saldo negativo.
                   El mes más crítico es <strong>{MESES[calculos.mesCritico]}</strong> con un saldo de{' '}
@@ -668,7 +668,7 @@ export default function PlanificadorCashFlowPage() {
                 Tienda de surf: ingresa 80% de los ingresos en verano (junio-agosto) pero paga alquiler, nóminas y stock todo el año. En enero, las cuentas pueden estar en negativo aunque el año sea rentable.
                 <br /><strong>Solución: colchón de 3 meses de gastos fijos. Crédito ICO campaña estacional.</strong>
               </p>
-              <p className={styles.escenarioTip}>💡 Planifica el cash flow mensual con 6 meses de antelación en negocios estacionales.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Planifica el cash flow mensual con 6 meses de antelación en negocios estacionales.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -679,7 +679,7 @@ export default function PlanificadorCashFlowPage() {
                 Contrato de 200.000 € a cobrar en 3 hitos (40%, 40%, 20%). Los materiales y subcontratas hay que pagarlos antes. El cash flow puede ser negativo en las primeras semanas incluso con proyecto rentable.
                 <br /><strong>Solución: confirming a proveedores. Anticipo del 30% al firmar contrato.</strong>
               </p>
-              <p className={styles.escenarioTip}>💡 Negocia siempre un anticipo mínimo del 20-30% en contratos de obra.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Negocia siempre un anticipo mínimo del 20-30% en contratos de obra.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -690,7 +690,7 @@ export default function PlanificadorCashFlowPage() {
                 Factura 15.000 €/mes a clientes corporativos que pagan a 60-90 días. Las nóminas del equipo son el día 30. Durante los primeros 3 meses de crecimiento, el cash flow es negativo pese a ser rentable.
                 <br /><strong>Solución: factoring (cede las facturas al banco a cambio de cobro inmediato - 1-2% coste).</strong>
               </p>
-              <p className={styles.escenarioTip}>💡 El factoring es la solución más habitual para pymes B2B con clientes que pagan tarde.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> El factoring es la solución más habitual para pymes B2B con clientes que pagan tarde.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -701,7 +701,7 @@ export default function PlanificadorCashFlowPage() {
                 Tienda online compra stock en octubre (15.000 €) para el Black Friday y Navidad. Cobros en noviembre-enero. Tiene 2 meses de cash flow negativo por el ciclo stock-venta-cobro.
                 <br /><strong>Solución: línea de crédito revolving. Dropshipping parcial para reducir stock propio.</strong>
               </p>
-              <p className={styles.escenarioTip}>💡 El capital circulante (stock + clientes - proveedores) es el mayor consumidor de caja.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> El capital circulante (stock + clientes - proveedores) es el mayor consumidor de caja.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -712,7 +712,7 @@ export default function PlanificadorCashFlowPage() {
                 SaaS que crece un 20% mensual pero quema 30.000 €/mes de inversión en marketing y equipo. Sin financiación externa, el runway es de 4 meses. El cash flow negativo es esperado y planificado.
                 <br /><strong>Solución: ronda seed / Serie A. Hito: alcanzar cash flow positivo antes de 18 meses.</strong>
               </p>
-              <p className={styles.escenarioTip}>💡 En startups, el runway (meses de caja disponible) es la métrica de supervivencia clave.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> En startups, el runway (meses de caja disponible) es la métrica de supervivencia clave.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -723,7 +723,7 @@ export default function PlanificadorCashFlowPage() {
                 Diseñador freelance: meses de 4.000 € alternados con meses de 800 €. Los gastos fijos (cuota autónomos, alquiler, suscripciones) son ~1.500 €/mes siempre.
                 <br /><strong>Solución: colchón de 3 meses. &quot;Pagarse un sueldo fijo&quot; de los buenos meses para los malos.</strong>
               </p>
-              <p className={styles.escenarioTip}>💡 Crea una cuenta separada "empresa" y págate un sueldo fijo mensual.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Crea una cuenta separada "empresa" y págate un sueldo fijo mensual.</p>
             </div>
           </div>
         </section>
@@ -733,56 +733,56 @@ export default function PlanificadorCashFlowPage() {
           <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre cash flow y tesorería</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo puede quebrar una empresa que tiene beneficios?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo puede quebrar una empresa que tiene beneficios?</h4>
               <p>
                 La quiebra técnica ocurre cuando una empresa no puede pagar sus obligaciones inmediatas aunque sea rentable a largo plazo. Ejemplo: una empresa factura 100.000 € en enero pero cobra en abril. Las nóminas de febrero y marzo (30.000 €) vencen antes del cobro. Si no tiene caja o crédito, no puede pagar aunque el negocio sea sólido. El 82% de las quiebras de pymes en España son por problemas de liquidez, no de rentabilidad.
               </p>
               <p className={styles.faqTip}>💡 <strong>Prevención:</strong> Mantén siempre un colchón de tesorería equivalente a 2-3 meses de gastos fijos en una cuenta separada. Es intocable.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es el período medio de maduración y cómo mejorarlo?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es el período medio de maduración y cómo mejorarlo?</h4>
               <p>
                 El período medio de maduración (PMM) es el tiempo que tarda el ciclo completo: compra de materias primas → producción → venta → cobro. Cuanto más largo es el PMM, más capital circulante necesitas financiar. Para reducirlo: cobrar antes (anticipo, descuento por pronto pago), pagar más tarde (negociar 60-90 días con proveedores), reducir stock (producción just-in-time, dropshipping).
               </p>
               <p className={styles.faqTip}>💡 <strong>Fórmula:</strong> PMM = Días de stock + Días de cobro a clientes - Días de pago a proveedores. Objetivo: PMM lo más corto posible.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué herramientas de financiación de circulante existen?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué herramientas de financiación de circulante existen?</h4>
               <p>
                 Las principales: (1) Factoring: vendes tus facturas al banco, cobras al 98-99% inmediatamente. (2) Confirming: el banco paga a tus proveedores antes y te financia a ti. (3) Línea de crédito: dispones hasta un límite cuando la necesitas. (4) Descuento de pagarés: anticipas el cobro de pagarés de tus clientes. (5) ICO: créditos a tipos bajos para circulante. Cada opción tiene un coste (0.5-3%) y condiciones distintas.
               </p>
               <p className={styles.faqTip}>💡 <strong>Regla:</strong> El factoring es ideal si tus clientes pagan tarde. La línea de crédito es mejor para necesidades puntuales. No uses deuda a largo plazo para financiar circulante.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Con qué frecuencia debo hacer el plan de tesorería?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Con qué frecuencia debo hacer el plan de tesorería?</h4>
               <p>
                 Depende del tamaño y situación del negocio. Negocios pequeños estables: previsión mensual con horizonte de 3-6 meses. Negocios en crecimiento o con estacionalidad: previsión semanal con horizonte de 90 días. En situación de tensión de liquidez: previsión diaria con horizonte de 30 días. Lo más importante es la constancia: actualizar la previsión cada semana con los datos reales e incorporar los desvíos.
               </p>
               <p className={styles.faqTip}>💡 <strong>Señal de alarma:</strong> Si tu saldo previsto para dentro de 4 semanas está por debajo del colchón mínimo, actúa hoy. No esperes a tener la crisis encima.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo negociar mejores plazos con clientes y proveedores?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo negociar mejores plazos con clientes y proveedores?</h4>
               <p>
                 Con clientes: ofrece descuento por pronto pago (1-2% a 30 días vs. 0% a 90 días), exige anticipo en proyectos nuevos, usa domiciliación bancaria para cobros automáticos, y actúa rápido ante impagos (reclamación formal a los 10 días de vencimiento). Con proveedores: negocia en el momento de más poder (primera compra grande, final de año), paga siempre a tiempo para ganar reputación y luego pedir mejoras, busca proveedores alternativos para tener leverage.
               </p>
               <p className={styles.faqTip}>💡 <strong>Objetivo:</strong> Cobrar en 30 días o menos, pagar en 60-90 días. Esta diferencia financia parte de tu circulante sin coste.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué es el cash flow libre (Free Cash Flow) y para qué sirve?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué es el cash flow libre (Free Cash Flow) y para qué sirve?</h4>
               <p>
                 El Free Cash Flow (FCF) = Flujo de Caja Operativo - CAPEX (inversiones en activos fijos). Es el dinero que queda disponible después de mantener y hacer crecer el negocio. Un FCF positivo y creciente indica un negocio sano que genera valor sin necesidad de financiación externa. Las empresas cotizadas se valoran por múltiplos de FCF. Para pymes, un FCF &gt; 0 durante 12 meses consecutivos es el signo de madurez del negocio.
               </p>
               <p className={styles.faqTip}>💡 <strong>Distinción:</strong> Puedes tener FCF positivo aunque el beneficio neto sea negativo (amortizaciones altas). El FCF es la medida más honesta del valor generado.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo es mejor reinvertir vs. distribuir dividendos?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo es mejor reinvertir vs. distribuir dividendos?</h4>
               <p>
                 Reinvierte cuando: la rentabilidad sobre el capital invertido (ROIC) de tu negocio supera lo que podrías obtener en alternativas (&gt;8-10%), hay proyectos de crecimiento claros con VAN positivo, o el negocio todavía no ha alcanzado su escala óptima. Distribuye dividendos cuando: el negocio genera más caja de la que puede reinvertir con buena rentabilidad, o los socios tienen necesidades de liquidez personal. La decisión debe basarse en la rentabilidad marginal del capital, no en preferencias personales.
               </p>
               <p className={styles.faqTip}>💡 <strong>Test:</strong> Si no puedes identificar proyectos concretos donde invertir el exceso de caja con &gt;10% de rentabilidad esperada, distribúyelo.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo sé si mi negocio tiene un problema de cash flow o de rentabilidad?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo sé si mi negocio tiene un problema de cash flow o de rentabilidad?</h4>
               <p>
                 Son problemas distintos con soluciones distintas. Problema de cash flow: el negocio es rentable pero no tiene liquidez → solución: financiación de circulante, mejora de cobros/pagos, reducción de stock. Problema de rentabilidad: el negocio genera caja pero pierde dinero → solución: revisar precios, reducir costes, cambiar mix de productos. Lo más peligroso es confundirlos: inyectar caja a un negocio no rentable es posponer el problema. Usa el plan de tesorería meskeIA junto con la cuenta de resultados para diagnosticar correctamente.
               </p>
@@ -884,12 +884,12 @@ export default function PlanificadorCashFlowPage() {
             <h3>Errores frecuentes de tesorería que llevan a la quiebra técnica</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Confundir facturado con cobrado:</strong> Una factura emitida no es dinero en caja hasta que el cliente paga. Muchos autónomos y pymes calculan su situación con el total facturado, ignorando que tienen 30-90 días de espera real. El plan de tesorería trabaja siempre con fechas reales de cobro.</li>
-            <li><strong>❌ No provisionar los impuestos trimestrales:</strong> El IVA del Q1 (enero-marzo) se paga en abril. El IRPF trimestral en julio. El Impuesto de Sociedades en julio. Muchas empresas gastan el dinero del IVA sin saber que no es suyo. Separa el IVA en una cuenta aparte desde el momento de la factura.</li>
-            <li><strong>❌ Usar la línea de crédito como financiación permanente:</strong> La línea de crédito (póliza) es para tensiones de tesorería temporales. Usarla continuamente al límite máximo es señal de que el negocio tiene un problema estructural de rentabilidad, no solo de liquidez. El coste (5-8% TAE) erosiona el margen lentamente.</li>
-            <li><strong>❌ No hacer seguimiento de impagados:</strong> Un cliente que paga a 90 días en lugar de los 30 pactados te &quot;roba&quot; 60 días de cash flow. Un impagado definitivo puede ser catastrófico. Establece un proceso claro: recordatorio a +5 días, llamada a +15, carta burofax a +30, gestor de reclamaciones a +60.</li>
-            <li><strong>❌ Invertir en activos fijos con el fondo de maniobra:</strong> Comprar maquinaria, vehículos o reformar con la caja operativa puede dejarte sin liquidez para el día a día. Los activos fijos deben financiarse con recursos a largo plazo (préstamo, leasing), no con la tesorería operativa.</li>
-            <li><strong>❌ Planificar sin escenarios de riesgo:</strong> Un plan de tesorería con un solo escenario (el optimista) no es un plan, es un deseo. Siempre calcula qué pasa si los cobros se retrasan 30 días, si pierde tu cliente principal, o si surge un gasto imprevisto del 15% de tu facturación anual.</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir facturado con cobrado:</strong> Una factura emitida no es dinero en caja hasta que el cliente paga. Muchos autónomos y pymes calculan su situación con el total facturado, ignorando que tienen 30-90 días de espera real. El plan de tesorería trabaja siempre con fechas reales de cobro.</li>
+            <li><strong><span aria-hidden="true">❌</span> No provisionar los impuestos trimestrales:</strong> El IVA del Q1 (enero-marzo) se paga en abril. El IRPF trimestral en julio. El Impuesto de Sociedades en julio. Muchas empresas gastan el dinero del IVA sin saber que no es suyo. Separa el IVA en una cuenta aparte desde el momento de la factura.</li>
+            <li><strong><span aria-hidden="true">❌</span> Usar la línea de crédito como financiación permanente:</strong> La línea de crédito (póliza) es para tensiones de tesorería temporales. Usarla continuamente al límite máximo es señal de que el negocio tiene un problema estructural de rentabilidad, no solo de liquidez. El coste (5-8% TAE) erosiona el margen lentamente.</li>
+            <li><strong><span aria-hidden="true">❌</span> No hacer seguimiento de impagados:</strong> Un cliente que paga a 90 días en lugar de los 30 pactados te &quot;roba&quot; 60 días de cash flow. Un impagado definitivo puede ser catastrófico. Establece un proceso claro: recordatorio a +5 días, llamada a +15, carta burofax a +30, gestor de reclamaciones a +60.</li>
+            <li><strong><span aria-hidden="true">❌</span> Invertir en activos fijos con el fondo de maniobra:</strong> Comprar maquinaria, vehículos o reformar con la caja operativa puede dejarte sin liquidez para el día a día. Los activos fijos deben financiarse con recursos a largo plazo (préstamo, leasing), no con la tesorería operativa.</li>
+            <li><strong><span aria-hidden="true">❌</span> Planificar sin escenarios de riesgo:</strong> Un plan de tesorería con un solo escenario (el optimista) no es un plan, es un deseo. Siempre calcula qué pasa si los cobros se retrasan 30 días, si pierde tu cliente principal, o si surge un gasto imprevisto del 15% de tu facturación anual.</li>
           </ul>
         </div>
       </EducationalSection>

@@ -158,6 +158,7 @@ export default function GeneradorGradientesPage() {
             <div className={styles.codeHeader}>
               <span>CSS</span>
               <button
+                type="button"
                 onClick={copyToClipboard}
                 className={`${styles.copyBtn} ${copied ? styles.copied : ''}`}
                 aria-label="Copiar código CSS al portapapeles"
@@ -176,6 +177,7 @@ export default function GeneradorGradientesPage() {
             <div className={styles.presetsGrid}>
               {PRESETS.map((preset) => (
                 <button
+                  type="button"
                   key={preset.name}
                   className={styles.presetBtn}
                   onClick={() => applyPreset(preset)}
@@ -200,6 +202,7 @@ export default function GeneradorGradientesPage() {
             <label className={styles.label}>Tipo de Gradiente</label>
             <div className={styles.typeTabs}>
               <button
+                type="button"
                 className={`${styles.typeBtn} ${gradientType === 'linear' ? styles.typeActive : ''}`}
                 onClick={() => setGradientType('linear')}
                 aria-pressed={gradientType === 'linear'}
@@ -207,6 +210,7 @@ export default function GeneradorGradientesPage() {
                 <span aria-hidden="true">↗️</span> Lineal
               </button>
               <button
+                type="button"
                 className={`${styles.typeBtn} ${gradientType === 'radial' ? styles.typeActive : ''}`}
                 onClick={() => setGradientType('radial')}
                 aria-pressed={gradientType === 'radial'}
@@ -214,6 +218,7 @@ export default function GeneradorGradientesPage() {
                 <span aria-hidden="true">⭕</span> Radial
               </button>
               <button
+                type="button"
                 className={`${styles.typeBtn} ${gradientType === 'conic' ? styles.typeActive : ''}`}
                 onClick={() => setGradientType('conic')}
                 aria-pressed={gradientType === 'conic'}
@@ -241,6 +246,7 @@ export default function GeneradorGradientesPage() {
                 <div className={styles.anglePresets}>
                   {[0, 45, 90, 135, 180, 225, 270, 315].map(a => (
                     <button
+                      type="button"
                       key={a}
                       className={`${styles.angleBtn} ${angle === a ? styles.angleActive : ''}`}
                       onClick={() => setAngle(a)}
@@ -262,6 +268,7 @@ export default function GeneradorGradientesPage() {
                 <div className={styles.selectRow}>
                   {RADIAL_SHAPES.map(shape => (
                     <button
+                      type="button"
                       key={shape}
                       className={`${styles.shapeBtn} ${radialShape === shape ? styles.shapeActive : ''}`}
                       onClick={() => setRadialShape(shape)}
@@ -282,6 +289,7 @@ export default function GeneradorGradientesPage() {
               <div className={styles.positionGrid}>
                 {RADIAL_POSITIONS.map(pos => (
                   <button
+                    type="button"
                     key={pos}
                     className={`${styles.positionBtn} ${radialPosition === pos ? styles.positionActive : ''}`}
                     onClick={() => setRadialPosition(pos)}
@@ -310,6 +318,7 @@ export default function GeneradorGradientesPage() {
               <label className={styles.label}>Colores ({colorStops.length}/10)</label>
               <div className={styles.stopsActions}>
                 <button
+                  type="button"
                   onClick={reverseGradient}
                   className={styles.actionBtn}
                   aria-label="Invertir gradiente"
@@ -317,6 +326,7 @@ export default function GeneradorGradientesPage() {
                   <span aria-hidden="true">⇄</span>
                 </button>
                 <button
+                  type="button"
                   onClick={addColorStop}
                   className={styles.actionBtn}
                   disabled={colorStops.length >= 10}
@@ -356,6 +366,7 @@ export default function GeneradorGradientesPage() {
                   />
                   <span className={styles.percentSign}>%</span>
                   <button
+                    type="button"
                     onClick={() => removeColorStop(stop.id)}
                     className={styles.removeBtn}
                     disabled={colorStops.length <= 2}
@@ -410,11 +421,11 @@ export default function GeneradorGradientesPage() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>Linear</td><td>linear-gradient()</td><td>Línea recta</td><td>Fondos, botones, separadores</td><td>✅ Todos los navegadores</td></tr>
-              <tr><td>Radial</td><td>radial-gradient()</td><td>Desde un punto central</td><td>Efectos de luz, spotlight</td><td>✅ Todos los navegadores</td></tr>
-              <tr><td>Cónico</td><td>conic-gradient()</td><td>Alrededor de un punto</td><td>Gráficos circulares, ruedas de color</td><td>✅ Chrome 69+, Firefox 83+</td></tr>
-              <tr><td>Repetitivo linear</td><td>repeating-linear-gradient()</td><td>Líneas repetidas</td><td>Patrones, rayas, zebra</td><td>✅ Todos los navegadores</td></tr>
-              <tr><td>Repetitivo radial</td><td>repeating-radial-gradient()</td><td>Anillos concéntricos</td><td>Efectos de onda, diana</td><td>✅ Todos los navegadores</td></tr>
+              <tr><td>Linear</td><td>linear-gradient()</td><td>Línea recta</td><td>Fondos, botones, separadores</td><td><span aria-hidden="true">✅</span> Todos los navegadores</td></tr>
+              <tr><td>Radial</td><td>radial-gradient()</td><td>Desde un punto central</td><td>Efectos de luz, spotlight</td><td><span aria-hidden="true">✅</span> Todos los navegadores</td></tr>
+              <tr><td>Cónico</td><td>conic-gradient()</td><td>Alrededor de un punto</td><td>Gráficos circulares, ruedas de color</td><td><span aria-hidden="true">✅</span> Chrome 69+, Firefox 83+</td></tr>
+              <tr><td>Repetitivo linear</td><td>repeating-linear-gradient()</td><td>Líneas repetidas</td><td>Patrones, rayas, zebra</td><td><span aria-hidden="true">✅</span> Todos los navegadores</td></tr>
+              <tr><td>Repetitivo radial</td><td>repeating-radial-gradient()</td><td>Anillos concéntricos</td><td>Efectos de onda, diana</td><td><span aria-hidden="true">✅</span> Todos los navegadores</td></tr>
             </tbody>
           </table>
         </div>
@@ -457,7 +468,7 @@ export default function GeneradorGradientesPage() {
 
         {/* 3. FAQ */}
         <details className={styles.faqList}>
-          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Gradientes CSS</summary>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Gradientes CSS</summary>
           <div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Cuántos colores se pueden usar en un gradiente?</div>

@@ -340,7 +340,7 @@ export default function QuizReinosNaturalezaPage() {
       >
         {/* 1. TABLA COMPARATIVA */}
         <section aria-labelledby="edu-tabla">
-          <h4 id="edu-tabla">🗂️ Los 6 Reinos: Tabla Comparativa</h4>
+          <h4 id="edu-tabla"><span aria-hidden="true">🗂️</span> Los 6 Reinos: Tabla Comparativa</h4>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -402,7 +402,7 @@ export default function QuizReinosNaturalezaPage() {
 
         {/* 2. CASOS DE USO */}
         <section aria-labelledby="edu-escenarios">
-          <h4 id="edu-escenarios">👤 ¿Para quién es este quiz?</h4>
+          <h4 id="edu-escenarios"><span aria-hidden="true">👤</span> ¿Para quién es este quiz?</h4>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -441,7 +441,7 @@ export default function QuizReinosNaturalezaPage() {
 
         {/* 3. FAQ */}
         <section aria-labelledby="edu-faq">
-          <h4 id="edu-faq">❓ Preguntas Frecuentes sobre los Reinos</h4>
+          <h4 id="edu-faq"><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre los Reinos</h4>
           <dl className={styles.faqList}>
             <div className={styles.faqItem}>
               <dt>¿Cuántos reinos hay actualmente en biología?</dt>
@@ -480,7 +480,7 @@ export default function QuizReinosNaturalezaPage() {
 
         {/* 4. GUÍA PASO A PASO */}
         <section aria-labelledby="edu-guia">
-          <h4 id="edu-guia">🔍 Cómo Clasificar un Organismo Desconocido (7 pasos)</h4>
+          <h4 id="edu-guia"><span aria-hidden="true">🔍</span> Cómo Clasificar un Organismo Desconocido (7 pasos)</h4>
           <ol className={styles.stepGuide}>
             <li className={styles.step}>
               <span className={styles.stepNumber}>1</span>
@@ -536,7 +536,7 @@ export default function QuizReinosNaturalezaPage() {
 
         {/* 5. MEJORES PRÁCTICAS */}
         <section aria-labelledby="edu-tips">
-          <h4 id="edu-tips">💡 Consejos para Memorizar los Reinos</h4>
+          <h4 id="edu-tips"><span aria-hidden="true">💡</span> Consejos para Memorizar los Reinos</h4>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🎯</span>
@@ -567,7 +567,7 @@ export default function QuizReinosNaturalezaPage() {
 
         {/* 6. WARNING BOX */}
         <section aria-labelledby="edu-errores">
-          <h4 id="edu-errores">🚫 Errores Más Comunes en Biología</h4>
+          <h4 id="edu-errores"><span aria-hidden="true">🚫</span> Errores Más Comunes en Biología</h4>
           <div className={styles.warningBox} role="alert">
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>

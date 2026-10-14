@@ -656,31 +656,31 @@ export default function CalculadoraDeudaPage() {
                   <tr>
                     <td>Intereses totales</td>
                     <td>Medios</td>
-                    <td>Mínimos ✅</td>
-                    <td>Máximos ❌</td>
+                    <td>Mínimos <span aria-hidden="true">✅</span></td>
+                    <td>Máximos <span aria-hidden="true">❌</span></td>
                   </tr>
                   <tr>
                     <td>Tiempo de liquidación</td>
                     <td>Medio</td>
-                    <td>Más corto ✅</td>
-                    <td>Más largo ❌</td>
+                    <td>Más corto <span aria-hidden="true">✅</span></td>
+                    <td>Más largo <span aria-hidden="true">❌</span></td>
                   </tr>
                   <tr>
                     <td>Motivación psicológica</td>
-                    <td>Alta ✅</td>
+                    <td>Alta <span aria-hidden="true">✅</span></td>
                     <td>Media</td>
-                    <td>Baja ❌</td>
+                    <td>Baja <span aria-hidden="true">❌</span></td>
                   </tr>
                   <tr>
                     <td>Victorias rápidas</td>
-                    <td>Sí ✅</td>
+                    <td>Sí <span aria-hidden="true">✅</span></td>
                     <td>Depende</td>
-                    <td>No ❌</td>
+                    <td>No <span aria-hidden="true">❌</span></td>
                   </tr>
                   <tr>
                     <td>Complejidad de seguimiento</td>
-                    <td>Fácil ✅</td>
-                    <td>Fácil ✅</td>
+                    <td>Fácil <span aria-hidden="true">✅</span></td>
+                    <td>Fácil <span aria-hidden="true">✅</span></td>
                     <td>Muy fácil</td>
                   </tr>
                 </tbody>

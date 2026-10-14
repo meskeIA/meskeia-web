@@ -233,6 +233,7 @@ export default function RecordatorioMedicacionPage() {
                       const tomado = esTomado(med, hora);
                       return (
                         <button
+                          type="button"
                           key={med.id}
                           className={`${styles.medBtn} ${tomado ? styles.medBtnTomado : ''}`}
                           style={{ borderColor: med.color, '--med-color': med.color } as React.CSSProperties}
@@ -294,29 +295,29 @@ export default function RecordatorioMedicacionPage() {
                   <tr>
                     <td className={styles.celdaDestacada}>meskeIA Recordatorio</td>
                     <td>Alta</td>
-                    <td>✅ Sí</td>
-                    <td>✅ Emojis + colores</td>
+                    <td><span aria-hidden="true">✅</span> Sí</td>
+                    <td><span aria-hidden="true">✅</span> Emojis + colores</td>
                     <td>Autismo, TDAH, mayores</td>
                   </tr>
                   <tr>
                     <td>Pastillero físico</td>
                     <td>Media</td>
-                    <td>✅ Sí</td>
-                    <td>❌ Solo días</td>
+                    <td><span aria-hidden="true">✅</span> Sí</td>
+                    <td><span aria-hidden="true">❌</span> Solo días</td>
                     <td>Uso general</td>
                   </tr>
                   <tr>
                     <td>Apps de alarma</td>
                     <td>Media-Baja</td>
                     <td>Varía</td>
-                    <td>❌ Texto solo</td>
+                    <td><span aria-hidden="true">❌</span> Texto solo</td>
                     <td>Adultos sin dificultades cognitivas</td>
                   </tr>
                   <tr>
                     <td>Sin herramienta</td>
                     <td>Baja</td>
-                    <td>✅ Sí</td>
-                    <td>❌ No</td>
+                    <td><span aria-hidden="true">✅</span> Sí</td>
+                    <td><span aria-hidden="true">❌</span> No</td>
                     <td>Muy baja complejidad</td>
                   </tr>
                 </tbody>
@@ -331,7 +332,7 @@ export default function RecordatorioMedicacionPage() {
               <div className={styles.escenarioCard}>
                 <div aria-hidden="true" className={styles.escenarioIcono}>🧩</div>
                 <h3>Persona con autismo</h3>
-                <p>Los pictogramas y colores reducen la ansiedad asociada a rutinas de medicación poco predecibles. El refuerzo visual ("✅ tomado") proporciona certeza inmediata.</p>
+                <p>Los pictogramas y colores reducen la ansiedad asociada a rutinas de medicación poco predecibles. El refuerzo visual ("<span aria-hidden="true">✅</span> tomado") proporciona certeza inmediata.</p>
               </div>
               <div className={styles.escenarioCard}>
                 <div aria-hidden="true" className={styles.escenarioIcono}>⚡</div>
@@ -426,6 +427,7 @@ export default function RecordatorioMedicacionPage() {
                 <span className={styles.stepNumber}>5</span>
                 <div>
                   <strong>Practica juntos la primera vez</strong>
+                  {/* a11y-ok: el ✅ es el contenido de la frase; oculto, el lector diría «qué significa el verde» */}
                   <p>El primer día, acompaña a la persona mientras marca los medicamentos como tomados. Explica qué significa el ✅ verde.</p>
                 </div>
               </li>
@@ -453,6 +455,7 @@ export default function RecordatorioMedicacionPage() {
               <div className={styles.tipCard}>
                 <div aria-hidden="true" className={styles.tipIcono}>🎨</div>
                 <h3>Usa un emoji reconocible</h3>
+                {/* a11y-ok: los emojis son los ejemplos que se proponen; ocultos, el lector diría «quizás . … quizás o .» */}
                 <p>Elige el emoji que la persona ya asocie con ese medicamento. Si la pastilla es redonda y blanca, quizás 💊. Si es jarabe, quizás 🥄 o 💧.</p>
               </div>
               <div className={styles.tipCard}>

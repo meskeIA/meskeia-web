@@ -336,16 +336,16 @@ export default function AuditoriaReunionesPage() {
               <div className={styles.map}>
                 {/* Cuadrantes */}
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🌿 Cultura Sana, Ejecución Floja</span>
+                  <span><span aria-hidden="true">🌿</span> Cultura Sana, Ejecución Floja</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>⚡ Reuniones Optimizadas</span>
+                  <span><span aria-hidden="true">⚡</span> Reuniones Optimizadas</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🔴 Reunionitis Aguda</span>
+                  <span><span aria-hidden="true">🔴</span> Reunionitis Aguda</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>⏰ Eficientes pero Obligatorias</span>
+                  <span><span aria-hidden="true">⏰</span> Eficientes pero Obligatorias</span>
                 </div>
                 {/* Líneas de umbral */}
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />

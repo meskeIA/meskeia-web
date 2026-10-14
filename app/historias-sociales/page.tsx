@@ -276,7 +276,7 @@ export default function HistoriasSocialesPage() {
               onClick={() => setVista('lista')}
               className={styles.btnFinHistoria}
             >
-              ✅ ¡Fin de la historia!
+              <span aria-hidden="true">✅</span> ¡Fin de la historia!
             </button>
           ) : (
             <button
@@ -551,30 +551,30 @@ export default function HistoriasSocialesPage() {
               <tbody>
                 <tr>
                   <td className={styles.celdaDestacada}>meskeIA Historias Sociales</td>
-                  <td>✅ Emoji + texto</td>
-                  <td>✅ Totalmente</td>
-                  <td>✅ Sí</td>
+                  <td><span aria-hidden="true">✅</span> Emoji + texto</td>
+                  <td><span aria-hidden="true">✅</span> Totalmente</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
                   <td>Autismo, TDAH, discapacidad cognitiva</td>
                 </tr>
                 <tr>
                   <td>Explicación verbal</td>
-                  <td>❌ No</td>
-                  <td>✅ Sí</td>
-                  <td>✅ Sí</td>
+                  <td><span aria-hidden="true">❌</span> No</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
                   <td>Personas sin NEE o con comprensión verbal alta</td>
                 </tr>
                 <tr>
                   <td>Libros ilustrados</td>
-                  <td>✅ Alta</td>
-                  <td>❌ No</td>
-                  <td>✅ Sí</td>
+                  <td><span aria-hidden="true">✅</span> Alta</td>
+                  <td><span aria-hidden="true">❌</span> No</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
                   <td>Situaciones genéricas muy comunes</td>
                 </tr>
                 <tr>
                   <td>Role-play sin guión</td>
-                  <td>✅ Sí</td>
-                  <td>✅ Sí</td>
-                  <td>✅ Sí</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
+                  <td><span aria-hidden="true">✅</span> Sí</td>
                   <td>Necesita habilidades de generalización previas</td>
                 </tr>
               </tbody>

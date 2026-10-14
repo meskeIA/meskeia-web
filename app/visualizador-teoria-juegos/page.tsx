@@ -165,7 +165,7 @@ export default function TeoriaJuegosPage() {
                   onClick={() => jugar('C')}
                   aria-label="Cooperar: guardar silencio"
                 >
-                  🤝 Cooperar
+                  <span aria-hidden="true">🤝</span> Cooperar
                   <br />
                   <small>Guardar silencio</small>
                 </button>
@@ -175,7 +175,7 @@ export default function TeoriaJuegosPage() {
                   onClick={() => jugar('D')}
                   aria-label="Delatar: acusar al otro"
                 >
-                  🗣️ Delatar
+                  <span aria-hidden="true">🗣️</span> Delatar
                   <br />
                   <small>Acusar al otro</small>
                 </button>

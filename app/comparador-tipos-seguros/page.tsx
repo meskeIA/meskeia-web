@@ -586,49 +586,49 @@ export default function ComparadorTiposSegurosPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🚗 Auto (terceros)</td>
+                  <td><span aria-hidden="true">🚗</span> Auto (terceros)</td>
                   <td>Sí (legal)</td>
                   <td>200 – 500 €</td>
                   <td>Daños a terceros</td>
                   <td>Todo conductor</td>
                 </tr>
                 <tr>
-                  <td>🚗 Auto (todo riesgo)</td>
+                  <td><span aria-hidden="true">🚗</span> Auto (todo riesgo)</td>
                   <td>No</td>
                   <td>600 – 1.500 €</td>
                   <td>Daños propios + terceros</td>
                   <td>Vehículo nuevo/financiado</td>
                 </tr>
                 <tr>
-                  <td>🏠 Hogar</td>
+                  <td><span aria-hidden="true">🏠</span> Hogar</td>
                   <td>Con hipoteca sí</td>
                   <td>150 – 400 €</td>
                   <td>Continente + contenido</td>
                   <td>Propietarios e inquilinos</td>
                 </tr>
                 <tr>
-                  <td>❤️ Vida</td>
+                  <td><span aria-hidden="true">❤️</span> Vida</td>
                   <td>Con hipoteca recomendado</td>
                   <td>200 – 800 €</td>
                   <td>Capital a beneficiarios</td>
                   <td>Con cargas/dependientes</td>
                 </tr>
                 <tr>
-                  <td>🏥 Salud</td>
+                  <td><span aria-hidden="true">🏥</span> Salud</td>
                   <td>No</td>
                   <td>500 – 1.500 €</td>
                   <td>Médico especialista, cirugías</td>
                   <td>Quienes valoran rapidez</td>
                 </tr>
                 <tr>
-                  <td>⚖️ Defensa jurídica</td>
+                  <td><span aria-hidden="true">⚖️</span> Defensa jurídica</td>
                   <td>No</td>
                   <td>80 – 250 €</td>
                   <td>Gastos abogado y procurador</td>
                   <td>Autónomos, propietarios</td>
                 </tr>
                 <tr>
-                  <td>🦷 Dental</td>
+                  <td><span aria-hidden="true">🦷</span> Dental</td>
                   <td>No</td>
                   <td>100 – 300 €</td>
                   <td>Revisiones, empastes, ortodoncia</td>

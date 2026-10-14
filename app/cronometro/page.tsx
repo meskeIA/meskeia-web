@@ -241,11 +241,11 @@ export default function CronometroPage() {
               <div className={styles.controles}>
                 {!corriendo ? (
                   <button type="button" onClick={iniciarCronometro} className={styles.btnPrimario}>
-                    ▶ Iniciar
+                    <span aria-hidden="true">▶</span> Iniciar
                   </button>
                 ) : (
                   <button type="button" onClick={pausarCronometro} className={styles.btnPausar}>
-                    ⏸ Pausar
+                    <span aria-hidden="true">⏸</span> Pausar
                   </button>
                 )}
                 <button
@@ -374,11 +374,11 @@ export default function CronometroPage() {
               <div className={styles.controles}>
                 {!corriendo ? (
                   <button type="button" onClick={iniciarTemporizador} className={styles.btnPrimario}>
-                    ▶ Iniciar
+                    <span aria-hidden="true">▶</span> Iniciar
                   </button>
                 ) : (
                   <button type="button" onClick={pausarTemporizador} className={styles.btnPausar}>
-                    ⏸ Pausar
+                    <span aria-hidden="true">⏸</span> Pausar
                   </button>
                 )}
                 <button
@@ -448,28 +448,28 @@ export default function CronometroPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🏃 Deporte / Running</td>
+                  <td><span aria-hidden="true">🏃</span> Deporte / Running</td>
                   <td>Centésimas de segundo</td>
                   <td>Sí — cada vuelta o km</td>
                   <td>10 min – 4 h</td>
                   <td>Comparar ritmos por intervalo</td>
                 </tr>
                 <tr>
-                  <td>📚 Estudio Pomodoro</td>
+                  <td><span aria-hidden="true">📚</span> Estudio Pomodoro</td>
                   <td>Segundos</td>
                   <td>No</td>
                   <td>25 min (trabajo) / 5 min (descanso)</td>
                   <td>Mantener el foco y reducir la fatiga</td>
                 </tr>
                 <tr>
-                  <td>🍳 Cocina</td>
+                  <td><span aria-hidden="true">🍳</span> Cocina</td>
                   <td>Segundos</td>
                   <td>Opcional — varios platos</td>
                   <td>1 – 60 min</td>
                   <td>Evitar sobre o infra-cocción</td>
                 </tr>
                 <tr>
-                  <td>💼 Productividad laboral</td>
+                  <td><span aria-hidden="true">💼</span> Productividad laboral</td>
                   <td>Minutos</td>
                   <td>Sí — por tarea</td>
                   <td>15 min – 8 h</td>
@@ -599,7 +599,7 @@ export default function CronometroPage() {
               <div className={styles.stepContent}>
                 <strong>Pulsa Iniciar cuando empiece la actividad</strong>
                 <p>
-                  Haz clic en el botón <strong>▶ Iniciar</strong> en el momento exacto en que
+                  Haz clic en el botón <strong><span aria-hidden="true">▶</span> Iniciar</strong> en el momento exacto en que
                   arranca la actividad que quieres medir. El cronómetro empieza a contar desde cero.
                 </p>
               </div>
@@ -609,7 +609,7 @@ export default function CronometroPage() {
               <div className={styles.stepContent}>
                 <strong>Usa vueltas para marcar intervalos</strong>
                 <p>
-                  Pulsa <strong>🏁 Vuelta</strong> cada vez que termines un intervalo (una vuelta en
+                  Pulsa <strong><span aria-hidden="true">🏁</span> Vuelta</strong> cada vez que termines un intervalo (una vuelta en
                   pista, un pomodoro, un plato en cocina). Se guarda el tiempo parcial y la
                   diferencia respecto al intervalo anterior.
                 </p>
@@ -620,7 +620,7 @@ export default function CronometroPage() {
               <div className={styles.stepContent}>
                 <strong>Pausa si necesitas interrumpir</strong>
                 <p>
-                  Si surge una interrupción, pulsa <strong>⏸ Pausar</strong>. El tiempo se congela
+                  Si surge una interrupción, pulsa <strong><span aria-hidden="true">⏸</span> Pausar</strong>. El tiempo se congela
                   sin perder la medición. Reanuda cuando estés listo: el cronómetro continúa desde
                   donde lo dejaste.
                 </p>

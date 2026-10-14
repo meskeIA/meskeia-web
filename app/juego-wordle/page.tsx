@@ -332,6 +332,7 @@ export default function JuegoWordlePage() {
             <div key={i} className={styles.tecladoFila}>
               {fila.map((tecla) => (
                 <button
+                  type="button"
                   key={tecla}
                   onClick={() => handleTecla(tecla)}
                   className={`${styles.tecla} ${tecla.length > 1 ? styles.teclaEspecial : ''} ${estadoTeclas[tecla] ? styles[estadoTeclas[tecla]] : ''}`}

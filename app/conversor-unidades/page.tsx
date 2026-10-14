@@ -386,7 +386,7 @@ export default function ConversorUnidadesPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔄 Conversor de Unidades Científico</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔄</span> Conversor de Unidades Científico</h1>
         <p className={styles.subtitle}>
           13 categorías de conversión: longitud, masa, temperatura, presión, energía y más
         </p>
@@ -409,6 +409,7 @@ export default function ConversorUnidadesPage() {
           <div className={styles.categoriasGrid}>
             {(Object.keys(CATEGORIAS_INFO) as Categoria[]).map((cat) => (
               <button
+                type="button"
                 key={cat}
                 className={`${styles.categoriaBtn} ${categoria === cat ? styles.categoriaActiva : ''}`}
                 onClick={() => handleCategoriaChange(cat)}
@@ -451,7 +452,7 @@ export default function ConversorUnidadesPage() {
             </div>
 
             {/* Botón intercambiar */}
-            <button onClick={intercambiar} className={styles.btnIntercambiar}>
+            <button type="button" onClick={intercambiar}className={styles.btnIntercambiar}>
               ⇄
             </button>
 
@@ -523,12 +524,13 @@ export default function ConversorUnidadesPage() {
         <section className={styles.htmlSection}>
           <div className={styles.htmlHeader}>
             <div>
-              <h2>📋 Exportar Tabla de Equivalencias</h2>
+              <h2><span aria-hidden="true">📋</span> Exportar Tabla de Equivalencias</h2>
               <p className={styles.htmlSubtitle}>
                 Copia el código HTML para usar la tabla de conversión en tu web, blog o documento
               </p>
             </div>
             <button
+              type="button"
               onClick={() => setHtmlExpanded(!htmlExpanded)}
               className={styles.btnToggleCode}
               aria-label={htmlExpanded ? 'Ocultar código HTML' : 'Mostrar código HTML'}
@@ -543,11 +545,12 @@ export default function ConversorUnidadesPage() {
                 <code>{htmlCode}</code>
               </pre>
               <button
+                type="button"
                 onClick={copiarCodigo}
                 className={styles.btnCopyCode}
                 aria-label="Copiar código HTML al portapapeles"
               >
-                📋 Copiar código
+                <span aria-hidden="true">📋</span> Copiar código
               </button>
             </div>
           )}
@@ -563,7 +566,7 @@ export default function ConversorUnidadesPage() {
 
         {/* 1. Tabla Comparativa: Sistemas de Unidades */}
         <section className={styles.comparativaSection}>
-          <h2>⚖️ Comparativa de Sistemas de Unidades</h2>
+          <h2><span aria-hidden="true">⚖️</span> Comparativa de Sistemas de Unidades</h2>
           <p className={styles.comparativaSubtitle}>
             Principales diferencias entre el Sistema Internacional (SI), el Sistema Imperial y otros sistemas especializados:
           </p>
@@ -634,7 +637,7 @@ export default function ConversorUnidadesPage() {
 
         {/* 2. Casos de Uso Prácticos */}
         <section className={styles.escenariosSection}>
-          <h2>💡 Casos de Uso: ¿Cuándo necesitas convertir unidades?</h2>
+          <h2><span aria-hidden="true">💡</span> Casos de Uso: ¿Cuándo necesitas convertir unidades?</h2>
           <p className={styles.escenariosSubtitle}>
             5 situaciones reales donde las conversiones de unidades son imprescindibles:
           </p>
@@ -729,7 +732,7 @@ Cinta USA marca millas
 
         {/* 3. FAQ */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas Frecuentes sobre Conversión de Unidades</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Conversión de Unidades</h2>
 
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
@@ -746,7 +749,7 @@ Cinta USA marca millas
                 de transición hacia el sistema métrico.
               </p>
               <div className={styles.faqTip}>
-                💡 Aunque USA usa Imperial cotidianamente, la ciencia, medicina y ejército estadounidenses usan SI.
+                <span aria-hidden="true">💡</span> Aunque USA usa Imperial cotidianamente, la ciencia, medicina y ejército estadounidenses usan SI.
               </div>
             </div>
 
@@ -853,7 +856,7 @@ Cinta USA marca millas
 
         {/* 4. Guía Paso a Paso */}
         <section className={styles.guiaSection}>
-          <h2>🗺️ Guía Paso a Paso: Cómo Convertir Unidades Correctamente</h2>
+          <h2><span aria-hidden="true">🗺️</span> Guía Paso a Paso: Cómo Convertir Unidades Correctamente</h2>
           <p className={styles.escenariosSubtitle}>
             Sigue estos 6 pasos para realizar conversiones precisas en cualquier contexto:
           </p>
@@ -862,7 +865,7 @@ Cinta USA marca millas
             <div className={styles.stepItem}>
               <div className={styles.stepNumber}>1</div>
               <div className={styles.stepContent}>
-                <h3>📊 Identifica la magnitud física</h3>
+                <h3><span aria-hidden="true">📊</span> Identifica la magnitud física</h3>
                 <p>
                   Antes de convertir, asegúrate de conocer <strong>qué tipo de magnitud</strong> estás midiendo:
                 </p>
@@ -882,7 +885,7 @@ Cinta USA marca millas
             <div className={styles.stepItem}>
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepContent}>
-                <h3>🔍 Elige las unidades de origen y destino</h3>
+                <h3><span aria-hidden="true">🔍</span> Elige las unidades de origen y destino</h3>
                 <p>
                   Determina claramente cuál es tu <strong>unidad de partida</strong> y cuál es tu <strong>objetivo</strong>:
                 </p>
@@ -902,7 +905,7 @@ Cinta USA marca millas
             <div className={styles.stepItem}>
               <div className={styles.stepNumber}>3</div>
               <div className={styles.stepContent}>
-                <h3>⚙️ Aplica el factor de conversión</h3>
+                <h3><span aria-hidden="true">⚙️</span> Aplica el factor de conversión</h3>
                 <p>
                   Usa el <strong>factor de conversión</strong> apropiado. Hay 3 métodos:
                 </p>
@@ -923,7 +926,7 @@ Cinta USA marca millas
             <div className={styles.stepItem}>
               <div className={styles.stepNumber}>4</div>
               <div className={styles.stepContent}>
-                <h3>✅ Verifica que el resultado tenga sentido</h3>
+                <h3><span aria-hidden="true">✅</span> Verifica que el resultado tenga sentido</h3>
                 <p>
                   Haz una <strong>comprobación de cordura</strong> (sanity check):
                 </p>
@@ -942,7 +945,7 @@ Cinta USA marca millas
             <div className={styles.stepItem}>
               <div className={styles.stepNumber}>5</div>
               <div className={styles.stepContent}>
-                <h3>🎯 Redondea apropiadamente</h3>
+                <h3><span aria-hidden="true">🎯</span> Redondea apropiadamente</h3>
                 <p>
                   El número de decimales depende del <strong>contexto</strong>:
                 </p>
@@ -961,7 +964,7 @@ Cinta USA marca millas
             <div className={styles.stepItem}>
               <div className={styles.stepNumber}>6</div>
               <div className={styles.stepContent}>
-                <h3>📝 Documenta la conversión</h3>
+                <h3><span aria-hidden="true">📝</span> Documenta la conversión</h3>
                 <p>
                   Si usas la conversión en informes, proyectos o comunicaciones profesionales:
                 </p>
@@ -981,7 +984,7 @@ Cinta USA marca millas
 
         {/* 5. Mejores Prácticas */}
         <section className={styles.tipsSection}>
-          <h2>✨ Mejores Prácticas para Convertir Unidades</h2>
+          <h2><span aria-hidden="true">✨</span> Mejores Prácticas para Convertir Unidades</h2>
           <p className={styles.escenariosSubtitle}>
             6 consejos profesionales para dominar las conversiones de unidades:
           </p>
