@@ -74,6 +74,10 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *      efecto visible ni de teclado, y los hallazgos J1-J3, ABIERTOS, con `test.fail()`. El caso de
  *      rechazo (un sonido por encima de 20 kHz en el medidor) y el J4, en
  *      generador-tonos-medidor-inspector.spec.ts, que ya lleva el micrófono falso.
+ *   8. INSPECTOR 14/10/2026 (al final): re-inspección tras el cromo fijo (cd462414), que quitó el
+ *      `scroll-margin` de la sección del medidor. El salto del hero, en escritorio y a 360/390 px;
+ *      el motor del medidor con un micrófono SINTÉTICO (442 Hz, la frontera Si4 | Do5) y el rechazo
+ *      de una respuesta en zigzag; y los hallazgos K1-K4, ABIERTOS, con `test.fail()`.
  */
 
 test.use({
@@ -2410,11 +2414,18 @@ test('HALLAZGO I1 — la misma cadena medida dos veces da la misma curva, y plan
   await medir(page, 'B'); // el altavoz no se toca: la misma situación dos veces
   const tabla = await tablaMedida(page);
   const diferencias = TERCIOS_50_16K.map((f) => tabla.get(f)?.[2] ?? null);
-  expect(diferencias.every((d) => d !== null), 'en un bucle sin ruido se miden los 26 tercios').toBe(true);
+  // Cabo C0173 (14/10/2026): este caso ha fallado alguna vez en la suite entera y pasa suelto. Si
+  // vuelve a fallar, el mensaje lleva la tabla ENTERA —A y B por tercio, no solo B − A—, que es lo
+  // que hace falta para saber si se movió una medida o las dos.
+  const tablaEntera = TERCIOS_50_16K.map((f) => {
+    const [a, b, d] = tabla.get(f) ?? [];
+    return `${f} Hz: A ${a ?? '—'} · B ${b ?? '—'} · B−A ${d ?? '—'}`;
+  }).join(' | ');
+  expect(diferencias.every((d) => d !== null), `en un bucle sin ruido se miden los 26 tercios (${tablaEntera})`).toBe(true);
   const peor = Math.max(...diferencias.map((d) => Math.abs(d ?? Infinity)));
-  expect(peor, `B − A por tercio: ${diferencias.join(' · ')}`).toBeLessThanOrEqual(1);
+  expect(peor, `B − A por tercio: ${diferencias.join(' · ')} — tabla entera: ${tablaEntera}`).toBeLessThanOrEqual(1);
   const a50 = tabla.get(50)?.[0] ?? null;
-  expect(Math.abs(a50 ?? Infinity), 'el tercio de 50 Hz de una cadena plana, en dB rel.').toBeLessThanOrEqual(1.5);
+  expect(Math.abs(a50 ?? Infinity), `el tercio de 50 Hz de una cadena plana, en dB rel. (${tablaEntera})`).toBeLessThanOrEqual(1.5);
 });
 
 // ------------------------------------------------------------
@@ -2895,5 +2906,429 @@ test.describe('Inspector 13/10/2026', () => {
         normal(vista?.respuesta ?? ''),
       );
     }
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 14/10/2026 — re-inspección (invalidada por cd462414, el cromo fijo)
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * LO QUE LA INVALIDÓ. cd462414 quitó el `scroll-margin-top: 5rem` de `.seccionMedidor`, el destino
+ * del enlace del hero «Mídelo con el micrófono» (#medir-frecuencia, hallazgo 2414): ahora lo
+ * respeta el `scroll-padding-top` del documento (app/globals.css), que es la caja de la barra del
+ * logo + 0,25rem: 62 + 4 = 66 px hasta 768 px de ancho y 92 + 4 = 96 px por encima. Resuelto a mano:
+ * la sección queda con su borde de arriba a 66/96 px, y su título, debajo del relleno de la sección,
+ * fuera de la barra (que acaba en 62/92 px). Medido el 14/10/2026: sección a 96,2 px (1280×800),
+ * 66,1 (360×740) y 65,6 (390×844); título a 122, 92 y 92 px, y lo mismo al cargar la página con el
+ * hash. La app no lleva nada más a la vista (ni scrollIntoView ni focus()): la píldora del pie no
+ * entra en juego.
+ *
+ * El MOTOR del medidor (lib/calculadoras/frecuenciaDominante y afinacionInstrumentos) con un
+ * micrófono SINTÉTICO: `getUserMedia` devuelve un búfer fabricado en la página, como
+ * `microfonoSintetico` de generador-tonos-medidor-inspector.spec.ts, con un fondo de ruido blanco de
+ * ±0,001 (≈ −65 dBFS). Resueltos a mano ANTES de ejecutar (temperamento igual, La4 = 440 Hz;
+ * n = round(12·log2(f/440)); la nota cuenta desde La y la octava sube en Do; cents =
+ * 1200·log2(f/f_nota)):
+ *   · NORMAL — 442 Hz, el La de orquesta que cita la guía: 12·log2(442/440) = 0,0785 → n = 0 → La4,
+ *     +7,85 cents → «442 Hz · La4 (+8 cents)», y «Llevar la lectura al generador» escribe 442.
+ *   · LÍMITE — la frontera Si4 | Do5, donde cambia la nota Y sube la octava: 440·2^(2,5/12) =
+ *     508,36 Hz. 506 Hz → 2,4196 semitonos → n = 2 → Si4 (493,88 Hz), +42 cents · 510 Hz → 2,5559 →
+ *     n = 3 → Do5 (523,25 Hz; no Do4), −44 cents.
+ *   · RECHAZO — la medida de respuesta con un «altavoz» que alterna 0 y −20 dB entre tercios
+ *     contiguos: cada salto entre vecinos vale 20 dB, su media 20 > 12 (SALTO_MAXIMO_PLAUSIBLE_DB,
+ *     motor-respuesta.ts) → `pareceRuido` → se descarta con su aviso y no se dibuja nada.
+ * Medido el 14/10/2026 (a 44,1 kHz): los tres, como se resolvieron. Con −6 dB en vez de −20 (control,
+ * fuera del test) la medida se guarda: 26 de 26 puntos, ±2,6-3,6 dB.
+ * Tolerancias: los cents van con ±1 (±0,3 Hz de afinado entre bins ≈ ±1,2 cents) y lo que se lleva
+ * al generador, con ±0,5 Hz: el defecto que se vigila es el hercio que la app promete no fallar.
+ */
+
+/** Tras el enlace del hero: la caja de la barra del logo, la sección del medidor y su título. */
+async function saltoAlMedidor(page: Page, gesto: 'click' | 'tap') {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, [CAMPO_FRECUENCIA]);
+  const enlace = page.getByRole('link', { name: 'Mídelo con el micrófono' });
+  await (gesto === 'tap' ? enlace.tap() : enlace.click());
+  await expect(page).toHaveURL(/#medir-frecuencia$/);
+  // Que el salto haya terminado: dos lecturas iguales de scrollY, lejos de arriba.
+  await expect
+    .poll(async () => {
+      const a = await page.evaluate(() => scrollY);
+      await page.waitForTimeout(150);
+      return a > 0 && a === (await page.evaluate(() => scrollY));
+    })
+    .toBe(true);
+  return page.evaluate(() => {
+    const barra = document.querySelector('[data-barra-logo]');
+    const seccion = document.querySelector('#medir-frecuencia');
+    const titulo = seccion?.querySelector('h3') ?? null;
+    const r = titulo?.getBoundingClientRect();
+    const arranque = r ? document.elementFromPoint(r.left + 5, r.top + r.height / 2) : null;
+    return {
+      barraAbajo: barra ? barra.getBoundingClientRect().bottom : 0,
+      seccionArriba: seccion ? seccion.getBoundingClientRect().top : -1,
+      tituloArriba: r ? r.top : -1,
+      tituloLibre: !!titulo && !!arranque && (arranque === titulo || titulo.contains(arranque)),
+    };
+  });
+}
+
+function comprobarSalto(m: Awaited<ReturnType<typeof saltoAlMedidor>>): void {
+  expect(m.barraAbajo, 'la barra fija del logo existe').toBeGreaterThan(40);
+  expect(m.seccionArriba, `sección a ${m.seccionArriba} px con la barra hasta ${m.barraAbajo}`).toBeGreaterThanOrEqual(m.barraAbajo);
+  // Y sin pasarse: el scroll-padding es la barra + 0,25rem, no media pantalla (ni el antiguo
+  // scroll-margin SUMADO al padding, que la dejaba a 140-180 px).
+  expect(m.seccionArriba, 'la sección no queda lejos de la barra').toBeLessThan(m.barraAbajo + 24);
+  expect(m.tituloArriba, `título a ${m.tituloArriba} px con la barra hasta ${m.barraAbajo}`).toBeGreaterThanOrEqual(m.barraAbajo);
+  expect(m.tituloLibre, 'el arranque del título lo tapa otro elemento').toBe(true);
+}
+
+interface TonoSintetico {
+  hz: number;
+  amp: number;
+  /** Segundos del búfer entre los que suena. */
+  desde: number;
+  hasta: number;
+  /** Rampa de salida hasta `hasta`, en segundos. */
+  rampa?: number;
+}
+
+/**
+ * Sustituye el micrófono por un búfer en bucle: los tonos pedidos más ruido blanco de ±`fondo`, con
+ * un generador congruencial de semilla fija (el caso es el mismo cada vez). La pista dice haber
+ * apagado los tres procesados, como un micrófono que obedece.
+ */
+async function microfonoSintetico(page: Page, segundos: number, tonos: TonoSintetico[], fondo = 0.001): Promise<void> {
+  await page.addInitScript(
+    ({ s, ts, f }: { s: number; ts: TonoSintetico[]; f: number }) => {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        configurable: true,
+        value: async () => {
+          const ctx = new AudioContext();
+          await ctx.resume();
+          const n = Math.round(ctx.sampleRate * s);
+          const bufer = ctx.createBuffer(1, n, ctx.sampleRate);
+          const d = bufer.getChannelData(0);
+          let semilla = 12345;
+          for (let i = 0; i < n; i++) {
+            const t = i / ctx.sampleRate;
+            semilla = (Math.imul(semilla, 1664525) + 1013904223) >>> 0;
+            let v = f * ((semilla / 4294967296) * 2 - 1);
+            for (const k of ts) {
+              if (t >= k.desde && t < k.hasta) {
+                const envolvente = k.rampa ? Math.min(1, (k.hasta - t) / k.rampa) : 1;
+                v += k.amp * envolvente * Math.sin(2 * Math.PI * k.hz * (t - k.desde));
+              }
+            }
+            d[i] = Math.max(-1, Math.min(1, v));
+          }
+          const fuente = ctx.createBufferSource();
+          fuente.buffer = bufer;
+          fuente.loop = true;
+          const destino = ctx.createMediaStreamDestination();
+          fuente.connect(destino);
+          fuente.start();
+          const pista = destino.stream.getAudioTracks()[0];
+          pista.getSettings = (): MediaTrackSettings => ({
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+          });
+          return destino.stream;
+        },
+      });
+    },
+    { s: segundos, ts: tonos, f: fondo },
+  );
+}
+
+const seccionMedidor = (page: Page) => page.locator('#medir-frecuencia');
+const sinEspacioDuro = (t: string): string => t.replace(/ /g, ' ').trim();
+
+/** Lo que enseña el medidor ahora mismo (sin esperar: `allTextContents` no aguarda al elemento). */
+async function lecturaMedidor(page: Page) {
+  const s = seccionMedidor(page);
+  const texto = async (sel: string) => sinEspacioDuro((await s.locator(sel).allTextContents()).join(' '));
+  return {
+    cifra: await texto('[class*="medidorCifra"]'),
+    nota: await texto('[class*="medidorNota"]'),
+    estable: (await s.locator('[class*="medidorEstable"]').count()) > 0,
+    retenida: await texto('[class*="medidorRetenida"]'),
+  };
+}
+
+/** «La4 (+8 cents)» → { nota: 'La4', cents: 8 } (el menos de la app es U+2212). */
+function notaYCents(texto: string): { nota: string; cents: number } {
+  const m = texto.match(/^(\S+) \(([+−-]?\d+) cents\)$/);
+  return m ? { nota: m[1], cents: Number(m[2].replace('−', '-')) } : { nota: '', cents: NaN };
+}
+
+async function arrancarMedidor(page: Page): Promise<void> {
+  await abrir(page);
+  await page.getByRole('button', { name: /Medir la frecuencia/ }).click();
+  await expect(page.getByRole('button', { name: /Dejar de medir/ })).toHaveAttribute('aria-pressed', 'true');
+}
+
+/** La frecuencia que «Llevar la lectura al generador» deja escrita en el campo. */
+async function llevarAlGenerador(page: Page): Promise<{ texto: string; hz: number }> {
+  await page.getByRole('button', { name: 'Llevar la lectura al generador' }).click();
+  await expect(page.getByRole('button', { name: /Medir la frecuencia/ })).toHaveAttribute('aria-pressed', 'false');
+  const texto = await campoFrecuencia(page).inputValue();
+  // parser-ok: se lee el campo que la propia app acaba de escribir con coma decimal, no lo que teclea el usuario.
+  return { texto, hz: Number(texto.replace(',', '.')) };
+}
+
+test.describe('Inspector 14/10/2026', () => {
+  test('CROMO FIJO (cd462414) — en escritorio, el enlace del hero deja el título del medidor bajo la barra del logo, no debajo', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    comprobarSalto(await saltoAlMedidor(page, 'click'));
+  });
+
+  test('CASO 13 — un diapasón de 442 Hz por el micrófono: «442 Hz · La4 (+8 cents)», estable, y se lleva al generador', async ({
+    page,
+  }) => {
+    await microfonoSintetico(page, 4, [{ hz: 442, amp: 0.3, desde: 0, hasta: 4 }]);
+    await arrancarMedidor(page);
+    await expect(seccionMedidor(page).getByText('Lectura estable', { exact: true })).toBeVisible({ timeout: 6000 });
+    const l = await lecturaMedidor(page);
+    // Sin decimales por encima de 100 Hz: 442 ± 0,3 Hz se escribe «442».
+    expect(l.cifra).toBe('442 Hz');
+    const n = notaYCents(l.nota);
+    expect(n.nota, l.nota).toBe('La4');
+    expect(n.cents, l.nota).toBeGreaterThanOrEqual(7);
+    expect(n.cents, l.nota).toBeLessThanOrEqual(9);
+    expect(l.retenida).toMatch(/^Última lectura estable: 442 Hz · La4 \(\+[789] cents\)$/);
+
+    const llevado = await llevarAlGenerador(page);
+    expect(Math.abs(llevado.hz - 442), `campo «${llevado.texto}»`).toBeLessThanOrEqual(0.5);
+    await expect(
+      seccionMedidor(page).getByText(`Frecuencia puesta en el generador: ${llevado.texto} Hz. Pulsa Reproducir para oírla.`),
+    ).toBeVisible();
+  });
+
+  for (const c of [
+    { hz: 506, cifra: '506 Hz', nota: 'Si4', cents: [41, 43] },
+    { hz: 510, cifra: '510 Hz', nota: 'Do5', cents: [-45, -43] },
+  ]) {
+    test(`CASO 14 — a un lado y otro de la frontera Si4 | Do5 (508,36 Hz): ${c.hz} Hz es ${c.nota}`, async ({ page }) => {
+      await microfonoSintetico(page, 4, [{ hz: c.hz, amp: 0.3, desde: 0, hasta: 4 }]);
+      await arrancarMedidor(page);
+      await expect(seccionMedidor(page).getByText('Lectura estable', { exact: true })).toBeVisible({ timeout: 6000 });
+      const l = await lecturaMedidor(page);
+      expect(l.cifra).toBe(c.cifra);
+      const n = notaYCents(l.nota);
+      expect(n.nota, `nota «${l.nota}»`).toBe(c.nota);
+      expect(n.cents, `nota «${l.nota}»`).toBeGreaterThanOrEqual(c.cents[0]);
+      expect(n.cents, `nota «${l.nota}»`).toBeLessThanOrEqual(c.cents[1]);
+    });
+  }
+
+  test('CASO 15 — una «respuesta» en zigzag de 20 dB entre tercios vecinos se descarta y no se dibuja', async ({ page }) => {
+    test.setTimeout(90000);
+    // Antes que los instrumentadores: alterna la ganancia del bucle con cada tercio que la app pide,
+    // 0 dB en los pares y −20 dB (×0,1) en los impares.
+    await page.addInitScript((tercios: number[]) => {
+      const w = window as unknown as { __bucle?: { entrada: GainNode } | null; __zigzag: [number, number][] };
+      w.__zigzag = [];
+      const crear = AudioContext.prototype.createOscillator;
+      AudioContext.prototype.createOscillator = function (this: AudioContext): OscillatorNode {
+        const osc = crear.call(this);
+        const parametro = osc.frequency;
+        const fijar = parametro.setValueAtTime.bind(parametro);
+        parametro.setValueAtTime = (valor: number, cuando: number): AudioParam => {
+          const i = tercios.indexOf(valor);
+          if (i >= 0 && w.__bucle) {
+            const g = i % 2 === 0 ? 1 : 0.1;
+            w.__bucle.entrada.gain.value = g;
+            w.__zigzag.push([valor, g]);
+          }
+          return fijar(valor, cuando);
+        };
+        return osc;
+      };
+    }, TERCIOS_50_16K);
+    await abrirConMicro(page);
+
+    await page.getByRole('button', { name: 'Medir A', exact: true }).click();
+    await expect(avisoMedida(page)).toContainText(
+      'Los niveles saltan demasiado entre frecuencias vecinas para ser la respuesta de un altavoz',
+      { timeout: 45000 },
+    );
+    await expect(avisoMedida(page)).toContainText('La medida se descarta.');
+    // No es un caso vacío: se emitieron los 26 tonos y el «altavoz» alternó con cada uno.
+    expect((await registros(page))[0].frecuenciasAplicadas).toEqual([50, ...TERCIOS_50_16K]);
+    const zigzag = await page.evaluate(() => (window as unknown as { __zigzag: [number, number][] }).__zigzag);
+    expect(zigzag.slice(1)).toEqual(TERCIOS_50_16K.map((f, i) => [f, i % 2 === 0 ? 1 : 0.1]));
+    // Y no se guarda ni se dibuja nada; el micrófono se suelta.
+    await expect(graficaMedida(page)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Repetir medida A', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Medir A', exact: true })).toBeEnabled();
+    expect(await pistasMicro(page)).toEqual(['ended']);
+  });
+
+  /**
+   * HALLAZGO K1 [medio · cálculo] — ABIERTO (14/10/2026), hallazgo nuevo de la tanda del 14/10/2026.
+   * La «Última lectura estable» no es la última: solo cambia si el tono nuevo se separa 10 cents o
+   * más de la retenida (`setUltimaEstableHz` en page.tsx, para no repetir el anuncio de la región
+   * aria-live con cada décima de hercio). Lo que se queda retenido —y lo que «Llevar la lectura al
+   * generador» escribe en el campo— puede ir hasta 10 cents por detrás de lo que el medidor acaba de
+   * dar por estable: 2,5 Hz a 440 Hz, 29 Hz a 5 kHz, frente al «menos de un hercio» que promete la
+   * página. Y la retenida no se borra al parar: pasa igual entre dos medidas.
+   *   entrada   micrófono: 440 Hz 2 s, 442 Hz 2 s, silencio (ruido a −65 dBFS)
+   *   esperado  con «442 Hz · La4 (+8 cents) · Lectura estable» en pantalla, la retenida es
+   *             «442 Hz · La4 (+8 cents)» y se lleva 442 al generador
+   *   obtenido  la retenida se queda en «440 Hz · La4 (0 cents)» y se lleva 440
+   */
+  test('HALLAZGO K1 — la «Última lectura estable» sigue al tono: 440 Hz y luego 442 Hz retiene 442 y lleva 442', async ({
+    page,
+  }) => {
+    // ABIERTO: comprobado el 14/10/2026 que cae en la retenida (440), no en las precondiciones.
+    test.fail();
+    await microfonoSintetico(page, 8, [
+      { hz: 440, amp: 0.3, desde: 0, hasta: 2 },
+      { hz: 442, amp: 0.3, desde: 2, hasta: 4, rampa: 0.02 },
+    ]);
+    await arrancarMedidor(page);
+    const retenida = seccionMedidor(page).locator('[class*="medidorRetenida"]');
+    // Precondiciones: primero se retiene el 440, y después el medidor da el 442 por estable.
+    await expect(retenida).toContainText(/440\sHz · La4 \(0\scents\)/, { timeout: 6000 });
+    await expect
+      .poll(
+        async () => {
+          const l = await lecturaMedidor(page);
+          return l.estable && l.cifra === '442 Hz' && /^La4 \(\+[78] cents\)$/.test(l.nota);
+        },
+        { timeout: 6000, intervals: [100], message: 'el 442 Hz tenía que llegar a «Lectura estable»' },
+      )
+      .toBe(true);
+    await expect(retenida, 'la última lectura estable es la de 442 Hz').toContainText(/442\sHz · La4 \(\+[78]\scents\)/, {
+      timeout: 1500,
+    });
+    const llevado = await llevarAlGenerador(page);
+    expect(Math.abs(llevado.hz - 442), `campo «${llevado.texto}»`).toBeLessThanOrEqual(0.5);
+  });
+
+  /**
+   * HALLAZGO K2 [bajo · contenido] — ABIERTO (14/10/2026), hallazgo nuevo de la tanda del 14/10/2026.
+   * «Qué mide y qué no» dice: «Si hay varios sonidos a la vez o el sonido cambia sin parar, la cifra
+   * salta y no llega a "estable"». Con dos sonidos SOSTENIDOS a la vez llega: gana siempre el mismo
+   * pico y las cinco lecturas coinciden. Con dos de igual nivel decide el festoneo de la ventana, que
+   * depende de la frecuencia de muestreo del aparato: 440 + 660 Hz a 0,3 dieron «660 Hz · Mi5
+   * (+2 cents) · Lectura estable» a 44,1 kHz y «440 Hz · La4 (0 cents) · Lectura estable» a 48 kHz.
+   *   entrada   micrófono: 440 Hz (0,3) + 660 Hz (0,15) a la vez, sostenidos
+   *   esperado  (lo que dice la página) ninguna «Lectura estable»
+   *   obtenido  «440 Hz · La4 (0 cents) · Lectura estable», retenida y ofrecida al generador
+   * Vale corregir el texto o no dar por estable un pico con otro cerca de su nivel; el test admite las dos.
+   */
+  test('HALLAZGO K2 — dos sonidos sostenidos a la vez no llegan a «estable» mientras la página diga que no llegan', async ({
+    page,
+  }) => {
+    // ABIERTO: comprobado el 14/10/2026 que cae en la última aserción, no en que el sonido se oiga.
+    test.fail();
+    await microfonoSintetico(page, 4, [
+      { hz: 440, amp: 0.3, desde: 0, hasta: 4 },
+      { hz: 660, amp: 0.15, desde: 0, hasta: 4 },
+    ]);
+    await arrancarMedidor(page);
+    const s = seccionMedidor(page);
+    await expect(s.locator('[class*="medidorCifra"]'), 'el medidor tenía que oír los dos tonos').not.toHaveText('— Hz', {
+      timeout: 6000,
+    });
+    // Tiempo de sobra para cinco lecturas (cada 100 ms) con la ventana llena.
+    await page.waitForTimeout(1500);
+    const limites = sinEspacioDuro((await s.locator('[class*="medidaLimites"]').allTextContents()).join(' ')).replace(/\s+/g, ' ');
+    const diceQueNoLlega = /varios sonidos a la vez[^.]*no llega a «estable»/.test(limites);
+    const l = await lecturaMedidor(page);
+    expect(
+      diceQueNoLlega && l.estable,
+      `la página dice que con varios sonidos no llega a «estable», y da «${l.cifra} · ${l.nota} · Lectura estable»`,
+    ).toBe(false);
+  });
+
+  /**
+   * HALLAZGO K3 [bajo · contenido] — ABIERTO (14/10/2026), hallazgo nuevo de la tanda del 14/10/2026.
+   * El preset «Medios-bajos» emite 500 Hz, y el rótulo de franja de la propia app
+   * (`getDescripcionFrecuencia`: «Medios-bajos» es < 500) dice entonces «Medios - Voz humana». Su
+   * tabla pone 500 en el borde de las dos franjas («250 – 500 Hz» y «500 Hz – 2 kHz»). Es la forma del
+   * hallazgo 692 (el preset «Ultrasonido» que su rótulo no llamaba así). Los demás presets con nombre
+   * de franja caen en la suya.
+   *   entrada   pulsar el preset «Medios-bajos»
+   *   esperado  un rótulo «Medios-bajos - …»
+   *   obtenido  «Medios - Voz humana»
+   */
+  test('HALLAZGO K3 — cada preset de prueba con nombre de franja suena en esa franja', async ({ page }) => {
+    // ABIERTO: comprobado el 14/10/2026 que solo descuadra «Medios-bajos».
+    test.fail();
+    await abrir(page);
+    const descuadres: string[] = [];
+    for (const nombre of ['Subgraves', 'Graves', 'Medios-bajos', 'Medios', 'Medios-altos', 'Agudos', 'Muy agudos']) {
+      const boton = page
+        .locator('[class*="presetBtn"]')
+        .filter({ has: page.locator('[class*="presetNombre"]', { hasText: new RegExp(`^${nombre}$`) }) });
+      await boton.click();
+      await expect(boton).toHaveAttribute('aria-pressed', 'true');
+      const franja = ((await page.locator('[class*="descripcionFrecuencia"]').textContent()) ?? '').trim();
+      if (!franja.startsWith(`${nombre} - `)) descuadres.push(`«${nombre}» → «${franja}»`);
+    }
+    expect(descuadres).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO K4 [bajo · contenido] — ABIERTO (14/10/2026), hallazgo nuevo de la tanda del 14/10/2026.
+   * La descripción del WebApplication (la que leen buscadores e IAs) dice «Útil para … ejercicios de
+   * tinnitus», y la página no tiene ningún ejercicio ni nombra el tinnitus: solo el DisclaimerCard
+   * habla de «cómo suena un pitido que ya tienes» y de consultar si hay «acúfenos persistentes». El
+   * hallazgo 2309 citó esa frase como prueba de que la app orienta sobre salud (y trajo el
+   * DisclaimerCard), pero nadie juzgó si la promesa se cumple.
+   */
+  test('HALLAZGO K4 — el JSON-LD no promete «ejercicios de tinnitus» que la página no tiene', async ({ page }) => {
+    // ABIERTO: comprobado el 14/10/2026 que cae en la promesa, no en que el WebApplication exista.
+    test.fail();
+    await abrir(page);
+    const descripcion = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        const j = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; description?: string };
+        if (j['@type'] === 'WebApplication') return j.description ?? '';
+      }
+      return '';
+    });
+    expect(descripcion, 'la app tiene que servir su WebApplication').toMatch(/Generador online de tonos/);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const texto = sinEspacioDuro(await page.locator('body').innerText());
+    const paginaLosTiene = /tinnitus|acúfeno/i.test(texto) && /ejercicio/i.test(texto);
+    expect(/ejercicios? de tinnitus/i.test(descripcion) && !paginaLosTiene, `WebApplication.description: «${descripcion}»`).toBe(
+      false,
+    );
+  });
+});
+
+test.describe('Inspector 14/10/2026 — el salto del hero a 360 px', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('CROMO FIJO (cd462414) — a 360×740, el título del medidor queda bajo la barra del logo, no debajo', async ({ page }) => {
+    comprobarSalto(await saltoAlMedidor(page, 'tap'));
+  });
+});
+
+test.describe('Inspector 14/10/2026 — el salto del hero a 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('CROMO FIJO (cd462414) — a 390×844, el título del medidor queda bajo la barra del logo, no debajo', async ({ page }) => {
+    comprobarSalto(await saltoAlMedidor(page, 'tap'));
   });
 });

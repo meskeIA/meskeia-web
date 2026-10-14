@@ -27,6 +27,9 @@ import { esperarHidratacion } from './_hidratacion';
  * 13/10/2026 van en su propio bloque, marcados con `test.fail()`: afirman lo que la app debería
  * hacer y hoy fallan a propósito. El día que se reparen se pondrán en ROJO («expected to fail,
  * but passed») y habrá que quitarles la marca, quedando como regresión.
+ *
+ * La re-inspección del 14/10/2026 (zoom pedido a la cámara, e9435294) va al final, con una cámara
+ * simulada que expone zoom por cámara y recuerda el que ha aplicado: se mide el aumento que se VE.
  */
 
 test.use({
@@ -808,21 +811,41 @@ test.describe('re-inspección 13/10/2026', () => {
     });
   });
 
-  // ⚠️ HALLAZGO NUEVO — accesibilidad (13/10/2026). Los seis rótulos de «Usos comunes» llevan el
-  // emoji pegado al texto sin <span aria-hidden="true"> (page.tsx: «<div …usoItem>📖 Leer letra
-  // pequeña</div>» y los otros cinco), así que el lector de pantalla lee «libro abierto Leer letra
-  // pequeña», «píldora Ver prospectos», «silla de ruedas Accesibilidad»… (CLAUDE.md §5, regla 3).
-  // Caso: árbol AX de «Usos comunes» → esperado sin pictogramas · obtenido «📖 Leer letra pequeña
-  //       💊 Ver prospectos 🏷️ Leer etiquetas 🔧 Trabajos de precisión 📱 Ver componentes ♿ Accesibilidad».
-  test('HALLAZGO NUEVO (accesibilidad) — los emojis de «Usos comunes» no deben llegar al lector de pantalla', async ({
+  // ✓ HALLAZGO 3275 REPARADO (de paso, en e9435294, 13/10/2026) — accesibilidad. Los seis rótulos
+  // de «Usos comunes» llevaban el emoji pegado al texto sin <span aria-hidden="true"> (page.tsx:
+  // «<div …usoItem>📖 Leer letra pequeña</div>» y los otros cinco), y el lector de pantalla leía
+  // «libro abierto Leer letra pequeña», «silla de ruedas Accesibilidad»… (CLAUDE.md §5, regla 3).
+  // La re-inspección del 13/10 se hizo sobre el código ANTERIOR a e9435294; ese mismo commit los
+  // envolvió («De paso: 10 emojis decorativos…»), y por eso este test, aún con test.fail(), dio
+  // «expected to fail, but passed» en la tanda /reparar del 13/10 (cabo C0241). Re-inspección del
+  // 14/10/2026: el testigo SÍ mide lo que afirma —el selector casa con una sola rejilla, «Usos
+  // comunes» vive fuera de la guía plegable y el árbol es el mismo con la guía plegada o
+  // desplegada— y, si se quita el aria-hidden, el snapshot vuelve a traer los seis pictogramas.
+  // Por eso queda como regresión y se le añade esa prueba de sensibilidad al final.
+  test('REGRESIÓN (accesibilidad) — los emojis de «Usos comunes» no llegan al lector de pantalla (hallazgo 3275)', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
     await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
     const usos = page.locator('[class*=usosGrid]');
+    await expect(usos).toHaveCount(1);
     await expect(usos).toContainText('Leer letra pequeña'); // la sección está donde se busca
-    // DEBERÍA: ni un pictograma en lo que expone el árbol de accesibilidad.
+    // Ni un pictograma en lo que expone el árbol de accesibilidad: solo los seis rótulos.
+    expect(await usos.ariaSnapshot()).toBe(
+      '- text: Leer letra pequeña Ver prospectos Leer etiquetas Trabajos de precisión Ver componentes Accesibilidad',
+    );
+    // Igual con la guía educativa desplegada (la rejilla está fuera de ella, pero se comprueba).
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     expect(await usos.ariaSnapshot()).not.toMatch(/\p{Extended_Pictographic}/u);
+
+    // Sensibilidad del testigo: se reinyecta el defecto (emoji sin aria-hidden) y la misma
+    // lectura tiene que verlo. Si esto dejara de cumplirse, el test de arriba no probaría nada.
+    await page.evaluate(() => {
+      document
+        .querySelectorAll('[class*=usosGrid] span[aria-hidden="true"]')
+        .forEach((s) => s.removeAttribute('aria-hidden'));
+    });
+    expect(await usos.ariaSnapshot()).toMatch(/📖 Leer letra pequeña/u);
   });
 
   // ⚠️ HALLAZGO NUEVO — accesibilidad (13/10/2026). Tres textos usan el color de marca LITERAL
@@ -900,5 +923,336 @@ test.describe('re-inspección 13/10/2026', () => {
     const textoVisible = ((await visible.textContent()) ?? '').replace(/\s+/g, ' ');
     // DEBERÍA: la respuesta del FAQPage es la que se ve, palabra por palabra.
     expect(textoVisible).toContain(enFaqPage?.acceptedAnswer.text ?? '∅');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN (Inspector, 14/10/2026) — el zoom pedido a la CÁMARA (e9435294)
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * La promesa: el zoom que marca la app es el aumento TOTAL que se ve, repartido entre lo que
+ * amplía la propia cámara (applyConstraints) y lo que falta en pantalla (transform: scale). Todos
+ * los valores esperados salen de repartirZoom() en app/lupa-digital/zoom.ts, calculados a mano:
+ *   cámara = min(max(zoom, max(1, mín)), máx), redondeada HACIA ABAJO a su paso;
+ *   pantalla = zoom / cámara, a milésimas.
+ *
+ * La cámara simulada de Chromium no expone zoom: esta lleva una capacidad POR CÁMARA (trasera y
+ * frontal, según el facingMode que pide la app) y recuerda en cada pista el zoom que de verdad
+ * ha aplicado, que es lo que devuelve su getSettings(). Así se mide lo que VE el usuario —zoom
+ * aplicado por la cámara × escala pintada del vídeo— y no lo que la app cree haber pedido. La
+ * configuración vive en window.__cfgCamara y se lee en cada getUserMedia, de modo que un mismo
+ * test puede probar varias cámaras con «Detener» y «Activar lupa».
+ */
+interface RangoZoomSimulado {
+  min: number;
+  max: number;
+  step: number;
+}
+interface CamaraSimulada {
+  /** Capacidad de zoom de cada cámara; null = no expone zoom (todo va a la pantalla). */
+  trasera: RangoZoomSimulado | null;
+  frontal: RangoZoomSimulado | null;
+  /** La cámara rechaza todo zoom por encima de este valor, aunque lo anuncie en su máximo. */
+  rechazarPorEncima?: number;
+}
+interface PistaSimulada {
+  t: MediaStreamTrack;
+  facing: string | null;
+  zoom: number | null;
+}
+type VentanaConCamara = Window & {
+  __cfgCamara: CamaraSimulada;
+  __pistas: PistaSimulada[];
+  __zoomPedidoPista: { pista: number; zoom: number }[];
+};
+
+async function simularCamaraPorPista(page: Page, cfg: CamaraSimulada) {
+  await page.addInitScript((inicial: CamaraSimulada) => {
+    const w = window as unknown as VentanaConCamara;
+    w.__cfgCamara = inicial;
+    w.__pistas = [];
+    w.__zoomPedidoPista = [];
+    const rangoDe = (p: PistaSimulada) => (p.facing === 'user' ? w.__cfgCamara.frontal : w.__cfgCamara.trasera);
+    const rangos = new WeakMap<MediaStreamTrack, RangoZoomSimulado | null>();
+    const buscar = (t: MediaStreamTrack) => w.__pistas.find((p) => p.t === t);
+
+    const gum = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = async (c?: MediaStreamConstraints) => {
+      const s = await gum(c);
+      const v = (c && typeof c.video === 'object' ? c.video : {}) as MediaTrackConstraints;
+      const facing = typeof v.facingMode === 'string' ? v.facingMode : null;
+      for (const t of s.getVideoTracks()) {
+        const pista: PistaSimulada = { t, facing, zoom: null };
+        const rango = rangoDe(pista);
+        rangos.set(t, rango);
+        // Una cámara recién abierta empieza sin ampliar (o en su mínimo, si este pasa de 1).
+        pista.zoom = rango ? Math.max(1, rango.min) : null;
+        w.__pistas.push(pista);
+      }
+      return s;
+    };
+
+    const proto = MediaStreamTrack.prototype;
+    const capacidades0 = proto.getCapabilities;
+    const ajustes0 = proto.getSettings;
+    const aplicar0 = proto.applyConstraints;
+    proto.getCapabilities = function (this: MediaStreamTrack) {
+      const r = capacidades0.call(this);
+      const rango = rangos.get(this);
+      return (rango ? { ...r, zoom: { ...rango } } : r) as MediaTrackCapabilities;
+    };
+    proto.getSettings = function (this: MediaStreamTrack) {
+      const r = ajustes0.call(this);
+      const p = buscar(this);
+      return (rangos.get(this) && p ? { ...r, zoom: p.zoom } : r) as MediaTrackSettings;
+    };
+    proto.applyConstraints = function (this: MediaStreamTrack, c?: MediaTrackConstraints) {
+      const zoom = (c?.advanced?.[0] as { zoom?: number } | undefined)?.zoom;
+      if (typeof zoom !== 'number') return aplicar0.call(this, c);
+      const p = buscar(this);
+      w.__zoomPedidoPista.push({ pista: p ? w.__pistas.indexOf(p) : -1, zoom });
+      const tope = w.__cfgCamara.rechazarPorEncima;
+      if (tope !== undefined && zoom > tope) {
+        return Promise.reject(new DOMException('Zoom rechazado (simulado)', 'NotReadableError'));
+      }
+      if (p) p.zoom = zoom;
+      return Promise.resolve();
+    };
+  }, cfg);
+}
+
+/** Cambia la cámara simulada para el PRÓXIMO getUserMedia (tras «Detener»). */
+function cambiarCamaraSimulada(page: Page, cfg: CamaraSimulada) {
+  return page.evaluate((c) => {
+    (window as unknown as VentanaConCamara).__cfgCamara = c;
+  }, cfg);
+}
+
+/**
+ * Lo que se ve: el zoom que la cámara VIVA tiene aplicado (1 si no expone zoom) × la escala con
+ * que se pinta el vídeo. Se lee la escala computada, que es la que se ve tras la transición.
+ */
+function aumentoPintado(page: Page) {
+  return page.evaluate(() => {
+    const w = window as unknown as VentanaConCamara;
+    const viva = [...w.__pistas].reverse().find((p) => p.t.readyState === 'live');
+    const v = document.querySelector('video') as HTMLVideoElement;
+    const m = getComputedStyle(v).transform;
+    const pantalla = m === 'none' ? 1 : Number(m.match(/matrix\(([^,]+)/)?.[1]);
+    const camara = viva?.zoom ?? 1;
+    return {
+      facing: viva?.facing ?? null,
+      camara,
+      pantalla: Math.round(pantalla * 1000) / 1000,
+      total: Math.round(camara * pantalla * 1000) / 1000,
+    };
+  });
+}
+
+const zoomPedidoPorPista = (page: Page) =>
+  page.evaluate(() => (window as unknown as VentanaConCamara).__zoomPedidoPista);
+
+test.describe('re-inspección 14/10/2026 — zoom de la cámara', () => {
+  test.describe('en móvil (Pixel 7)', () => {
+    const P7 = devices['Pixel 7'];
+    test.use({
+      viewport: P7.viewport,
+      userAgent: P7.userAgent,
+      deviceScaleFactor: P7.deviceScaleFactor,
+      isMobile: P7.isMobile,
+      hasTouch: P7.hasTouch,
+    });
+
+    test('CASO 6 — trasera con zoom 1-2× y frontal sin él: 4× son 2× de cámara por 2× en pantalla, la imagen congelada lo conserva y cada cámara recibe su reparto', async ({
+      page,
+    }) => {
+      await simularCamaraPorPista(page, { trasera: { min: 1, max: 2, step: 0.1 }, frontal: null });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      const video = page.locator('video');
+      const lienzo = page.locator('canvas');
+      const nota = page.locator('[class*=zoomNota]');
+      const indicador = page.locator('[class*=zoomIndicador]');
+
+      // 2x por defecto: cámara min(2, 2) = 2 (20 pasos de 0,1); pantalla 2 / 2 = 1.
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 2, pantalla: 1, total: 2 });
+      await expect(nota).toHaveText(/^Los 2x los hace la propia cámara/);
+
+      // 4x: la cámara ya está en su tope (2) y no se le pide nada nuevo; en pantalla 4 / 2 = 2.
+      // Visor del Pixel 7: 392 × 294 → el vídeo a scale(2) mide 784 × 588.
+      await page.getByRole('button', { name: '4x', exact: true }).click();
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 2, pantalla: 2, total: 4 });
+      await expect(video).toHaveAttribute('style', /transform: scale\(2\)/);
+      await expect(indicador).toHaveText('4x');
+      await expect(nota).toHaveText('La cámara hace 2x y el resto (2x) se amplía en pantalla.');
+      expect(await zoomPedidoPorPista(page)).toEqual([{ pista: 0, zoom: 2 }]);
+
+      // Congelar a 4x: la imagen ya trae los 2x de la cámara y se copia a la resolución del
+      // sensor; en pantalla 4 / 2 = 2, y el tope del recorrido es 392 × (2 − 1) / 2 = 196 px
+      // (con todo el zoom en pantalla habría sido 392 × 3 / 2 = 588).
+      await page.getByRole('button', { name: /Congelar/i }).click();
+      await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(2\)/);
+      const anchos = await page.evaluate(() => ({
+        lienzo: (document.querySelector('canvas') as HTMLCanvasElement).width,
+        sensor: (document.querySelector('video') as HTMLVideoElement).videoWidth,
+      }));
+      expect(anchos.lienzo).toBe(anchos.sensor);
+      await deslizarDesdeElVisor(page, -3000, 0);
+      await expect(lienzo).toHaveAttribute('style', /translate\(-196px, 0px\) scale\(2\)/);
+
+      // Congelada, 5x: solo cambia la pantalla (5 / 2 = 2,5) y a la cámara no se le pide nada.
+      await page.getByRole('button', { name: '5x', exact: true }).click();
+      await expect(lienzo).toHaveAttribute('style', /scale\(2\.5\)/);
+      expect(await zoomPedidoPorPista(page)).toHaveLength(1);
+
+      // Reanudar: se vuelve a pedir su parte a la cámara (2) y la pantalla pone 2,5.
+      await page.getByRole('button', { name: /Reanudar/i }).click();
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 2, pantalla: 2.5, total: 5 });
+      await expect(nota).toHaveText('La cámara hace 2x y el resto (2,5x) se amplía en pantalla.');
+
+      // Frontal, sin zoom: todo a la pantalla (scale(5)), la nota desaparece y a esa pista no
+      // se le pide ningún zoom.
+      await page.getByRole('button', { name: /Cambiar cámara/i }).click();
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'user', camara: 1, pantalla: 5, total: 5 });
+      await expect(nota).toHaveCount(0);
+      expect((await zoomPedidoPorPista(page)).filter((p) => p.pista === 1)).toEqual([]);
+
+      // De vuelta a la trasera: pista NUEVA (la 2), que recibe su 2 desde cero.
+      await page.getByRole('button', { name: /Cambiar cámara/i }).click();
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 2, pantalla: 2.5, total: 5 });
+      expect((await zoomPedidoPorPista(page)).at(-1)).toEqual({ pista: 2, zoom: 2 });
+    });
+  });
+
+  test('CASO 7 — límites del reparto: una cámara de 1-10× hace sola el tope de la app; con paso 0,2 y máximo 2,5 hace 2,4× y la pantalla 1,25×; un mínimo de 0,5 no aleja', async ({
+    page,
+  }) => {
+    await simularCamaraPorPista(page, { trasera: { min: 1, max: 10, step: 0.1 }, frontal: null });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    const activar = page.getByRole('button', { name: /Activar lupa/i });
+    const nota = page.locator('[class*=zoomNota]');
+    await activar.click();
+    await esperarCamaraEnMarcha(page);
+
+    // {1..10, paso 0,1}: el tope de la app (5x) lo hace entero la cámara; «+» queda inactivo.
+    await page.getByRole('button', { name: '5x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 5, pantalla: 1, total: 5 });
+    await expect(nota).toHaveText(/^Los 5x los hace la propia cámara/);
+    await expect(page.getByRole('button', { name: '+', exact: true })).toBeDisabled();
+    // «−» baja a 4,5: 4,5 / 0,1 = 44,999… → el 1e-9 de zoom.ts lo deja en 45 pasos = 4,5 (no 4,4).
+    await page.getByRole('button', { name: '−', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 4.5, pantalla: 1, total: 4.5 });
+    await expect(page.locator('[class*=zoomIndicador]')).toHaveText('4,5x');
+
+    // {1..2,5, paso 0,2} pidiendo 3x: min(3, 2,5) = 2,5 → 12,5 pasos → 12 hacia abajo = 2,4;
+    // pantalla 3 / 2,4 = 1,25; total 2,4 × 1,25 = 3. La nota redondea a un decimal (1,3).
+    await page.getByRole('button', { name: /Detener/i }).click();
+    await cambiarCamaraSimulada(page, { trasera: { min: 1, max: 2.5, step: 0.2 }, frontal: null });
+    await page.getByRole('button', { name: '3x', exact: true }).click();
+    await activar.click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2.4, pantalla: 1.25, total: 3 });
+    await expect(nota).toHaveText('La cámara hace 2,4x y el resto (1,3x) se amplía en pantalla.');
+
+    // {0,5..8} a 1x: nunca por debajo de 1 (un gran angular alejaría en vez de ampliar).
+    await page.getByRole('button', { name: /Detener/i }).click();
+    await cambiarCamaraSimulada(page, { trasera: { min: 0.5, max: 8, step: 0.1 }, frontal: null });
+    await page.getByRole('button', { name: '1x', exact: true }).click();
+    await activar.click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 1, pantalla: 1, total: 1 });
+    await expect(nota).toHaveText(/^Esta cámara puede ampliar por sí misma hasta 5x/);
+  });
+
+  // ⚠️ HALLAZGO NUEVO — operativa (hallazgo nuevo de la tanda del 14/10/2026). leerRangoZoom
+  // (zoom.ts) acepta una capacidad de zoom cuyo MÍNIMO pasa de 1 y la trata como aumentos: con
+  // {min 100, max 500, paso 1} repartirZoom(2) da cámara max(2, 100) = 100 y pantalla 2 / 100 =
+  // 0,02. Un mínimo por encima de 1 no cabe en un aumento (1 = sin ampliar): es lo que anuncia una
+  // cámara que expresa el zoom en sus propias unidades. El vídeo queda en 13 × 10 px dentro de un
+  // visor de 660 × 495 (casi todo negro) y la nota dice «Los 100x los hace la propia cámara» con
+  // el indicador en 2x. Con {min 2, max 6} pasa lo mismo a escala: a 1x, scale(0,5) y «Los 2x…».
+  // Caso: cámara {100..500, paso 1}, activar (2x) → esperado vídeo que cubre el visor y nota sin
+  //       «100x» · obtenido scale(0.02), caja 13 × 10 px, «Los 100x los hace la propia cámara…».
+  test('HALLAZGO NUEVO (operativa) — una cámara cuyo zoom mínimo pasa de 1 no debe encoger el vídeo a un punto ni anunciar «100x»', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo nuevo de la tanda del 14/10/2026: el día que se repare, quitar esta línea
+    await simularCamaraPorPista(page, { trasera: { min: 100, max: 500, step: 1 }, frontal: null });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: /Activar lupa/i }).click();
+    await esperarCamaraEnMarcha(page);
+    await expect(page.locator('[class*=zoomIndicador]')).toHaveText('2x');
+    // DEBERÍA: el vídeo cubre el visor (escala en pantalla ≥ 1)…
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const v = (document.querySelector('video') as HTMLVideoElement).getBoundingClientRect();
+          const visor = (document.querySelector('canvas')?.parentElement as HTMLElement).getBoundingClientRect();
+          return v.width >= visor.width - 0.5 && v.height >= visor.height - 0.5;
+        }),
+      )
+      .toBe(true);
+    // …y ninguna nota atribuye a la cámara un aumento de 100x.
+    expect((await page.locator('[class*=zoomNota]').allTextContents()).join(' ')).not.toContain('100x');
+  });
+
+  // ⚠️ HALLAZGO NUEVO — operativa (hallazgo nuevo de la tanda del 14/10/2026). Si applyConstraints
+  // rechaza el zoom DESPUÉS de haber aceptado otro, el catch de page.tsx pasa a «todo en pantalla»
+  // (setRangoZoomCamara(null)) sin devolver la cámara a 1 ni leer su getSettings(): la cámara se
+  // queda en el zoom anterior y el aumento real se multiplica. Es la «cámara que lo anuncia y luego
+  // lo rechaza» que el propio comentario del catch prevé.
+  // Caso: cámara {1..3, paso 0,1} que rechaza por encima de 2,5; 2x (aceptado, cámara 2) → 3x
+  //       (pide 3, rechazado) → esperado aumento total 3 · obtenido cámara 2 × scale(3) = 6, sin
+  //       nota (la FAQ dice que sin esa línea «todo el zoom se hace en pantalla»); a 5x, 10.
+  test('HALLAZGO NUEVO (operativa) — si la cámara rechaza el zoom tras haber aceptado otro, el aumento que se ve no debe multiplicarse', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo nuevo de la tanda del 14/10/2026: el día que se repare, quitar esta línea
+    await simularCamaraPorPista(page, { trasera: { min: 1, max: 3, step: 0.1 }, frontal: null, rechazarPorEncima: 2.5 });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: /Activar lupa/i }).click();
+    await esperarCamaraEnMarcha(page);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 1, total: 2 });
+
+    await page.getByRole('button', { name: '3x', exact: true }).click();
+    await expect.poll(async () => (await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 3]);
+    await expect(page.locator('[class*=zoomNota]')).toHaveCount(0); // la app ya cayó a «todo en pantalla»
+    await expect(page.locator('[class*=zoomIndicador]')).toHaveText('3x');
+    // DEBERÍA: lo que se ve es lo que marca el indicador, 3x.
+    await expect.poll(async () => (await aumentoPintado(page)).total).toBe(3);
+  });
+
+  test.describe('a 360 px con el dedo (cabo C0067, con zoom de cámara)', () => {
+    test.use({
+      viewport: { width: 360, height: 780 },
+      userAgent: devices['Pixel 7'].userAgent,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('C0067 — con la cámara haciendo el zoom, el gesto vertical sobre el vídeo en directo sigue desplazando la página', async ({
+      page,
+    }) => {
+      await simularCamaraPorPista(page, { trasera: { min: 1, max: 3, step: 0.1 }, frontal: null });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      // 360 − 2 × 10 de padding = 340 px de visor; 4:3 → 255.
+      expect(await cajas(page)).toMatchObject({ visor: { x: 10, ancho: 340, alto: 255 } });
+
+      // 2x: todo en la cámara (pantalla 1). El gesto de 150 px hacia arriba desplaza la página.
+      await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 1 });
+      expect(await deslizarDesdeElVisor(page, 0, -150, 0.5, 0.8)).toBeGreaterThan(100);
+
+      // 4x: cámara 3 y pantalla 4 / 3 = 1,333. Con el vídeo ampliado en pantalla, igual.
+      await page.getByRole('button', { name: '4x', exact: true }).click();
+      await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 3, pantalla: 1.333 });
+      expect(await deslizarDesdeElVisor(page, 0, -150, 0.5, 0.8)).toBeGreaterThan(100);
+    });
   });
 });

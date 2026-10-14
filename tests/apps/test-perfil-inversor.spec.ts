@@ -1,5 +1,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
+import { ORIGEN } from './_puerto';
 
 /**
  * Inspector — test-perfil-inversor (segmento interactiva, riesgo 2, 524 usos reales)
@@ -39,8 +40,8 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * HALLAZGOS: cada inspección los escribe con `test.fail()` —afirman lo que debería pasar y fallan
  * a propósito mientras el defecto siga— y al repararlos se quita esa línea y quedan como
  * regresión. Los del 20/08, el 22/09 y el 26/09/2026 están REPARADOS (la base no tenía ninguno
- * abierto el 12/10/2026); los únicos `test.fail()` vivos son los de la re-inspección del
- * 12/10/2026, al final del fichero.
+ * abierto el 12/10/2026); los únicos `test.fail()` vivos son los de las re-inspecciones del
+ * 12/10/2026 (hallazgos 3227-3233) y del 14/10/2026, al final del fichero.
  */
 
 const RUTA = '/test-perfil-inversor/';
@@ -1183,6 +1184,11 @@ test.describe('re-inspección 26/09/2026 · móvil', () => {
 // y rentabilidad Σ wi·μi (μ = 7 · 3 · 1,5 · 5 %): 3,40 · 4,08 · 4,95 · 5,83 · 6,70 %.
 // El test anuncia para esas mismas carteras 5–8 · 8–12 · 12–15 · 15–20 · 20–25 % de volatilidad:
 // ninguna de las cinco cifras del estimador cae dentro del tramo que anuncia el test.
+//
+// Los `test.fail` de este bloque son, en la base: C0158 → 3227 · flecha y etiquetas de la barra
+// → 3228 · «más objetiva» que el banco → 3229 · «cada cuánto revisar» → 3230 · FAQPage del
+// agresivo → 3231 · tabla comparativa → 3232 · doble toque → 3233. Abiertos el 14/10/2026; el
+// 3228 y el 3233 se siguen reproduciendo tras cd462414 (ver la re-inspección de esa fecha).
 // ============================================================
 
 /** Carga la app con el almacenamiento de sesión vacío y espera a que React haya hidratado. */
@@ -1570,5 +1576,371 @@ test.describe('re-inspección 12/10/2026 · móvil 360×740', () => {
     await page.waitForTimeout(300);
     await expect(page.getByText('Pregunta 2 de 10')).toBeVisible();
     await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(0);
+  });
+});
+
+// ============================================================
+// RE-INSPECCIÓN 14/10/2026 — cromo fijo (cd462414) y FIRMA DE ROTURA (nivel)
+//
+// LO QUE LA INVALIDÓ. cd462414 retiró el `scroll-margin-top` propio de `.destinoDeFase` (96 px, y
+// 80 por debajo de 600 de ancho) y deja que lo resuelva el `scroll-padding` del documento
+// (globals.css: la barra del logo, 62 px hasta 768 de ancho y 92 por encima, + 0,25rem; abajo la
+// píldora del pie, fija solo por encima de 768, + 0,5rem). Medido: los cambios de FASE (Comenzar,
+// Ver Resultado, Revisar, Repetir) dejan su destino a 96 px con la barra hasta 92 (1280×800) y a
+// 66 px con la barra hasta 62 (390×844 y 360×740). Los cambios de PREGUNTA, no: ahí la app no
+// recoloca la vista (solo da el foco a la tarjeta, 1215) y en un móvil pequeño el enunciado nuevo
+// queda bajo la barra. Es el hallazgo nuevo del bloque de 360×740, y ya pasaba antes de cd462414:
+// anulando el scroll-padding salen las mismas posiciones, ±8 px.
+//
+// LA FIRMA. Con el navegador creyendo estar en https://meskeia.com (sus peticiones servidas desde
+// el servidor local, las de /api/analytics contestadas en el propio navegador y cualquier otro host
+// abortado): UNA carga = 1 POST /api/analytics/track/, 0 más con Comenzar → 10 respuestas → Ver
+// Resultado → Revisar → Ver Resultado → Repetir → Comenzar → 2 respuestas, y un F5 con el test a
+// medias, 1 más. Igual a 1280×800, 360×740 y 390×844. La firma (antes del 27/09: 46 visitas y 21
+// recargas; desde el 27/09: 17 visitas, 52,9 % cortas y 0 recargas) es el pie remontado de
+// 2175/2176, reparado el 26/09. Su testigo de red es el caso «firma» del bloque de escritorio.
+//
+// LOS CASOS, resueltos a mano antes de abrir el navegador (A=1 · B=2 · C=3 · D=4; flecha =
+// i·20 + 2 + (p − mín)/(máx − mín)·16 con el tramo del perfil, como en la re-inspección del 22/09):
+//   normal  → A,B,A,A,B,A,B,A,A,C = 1+2+1+1+2+1+2+1+1+3 = 15 → Conservador (10–16), sin aviso de
+//             borde, flecha 2 + 5/6·16 = 15,33 % (móvil 390×844, tocando)
+//   límite  → A×4 + B×6 = 4 + 12 = 16, tope de Conservador; «Revisar», la 10 de B a C = 17, suelo de
+//             Moderado: aviso de borde en los dos, flechas 18 % y 22 % (escritorio 1280×800)
+//   rechazo → «Siguiente» sin contestar y «Ver Resultado» con 9 de 10 no avanzan; dos sesiones
+//             imposibles (índice −1; 0 puntos, que no es opción) se tiran y se retiran (360×740)
+// ============================================================
+
+/** Borde inferior de la barra fija del logo (MeskeiaLogo la marca con `data-barra-logo`). */
+async function bordeBarraLogo(page: Page): Promise<number> {
+  return page.evaluate(
+    () => document.querySelector('[data-barra-logo]')?.getBoundingClientRect().bottom ?? 0,
+  );
+}
+
+/**
+ * El elemento se ve ENTERO: por debajo de la barra fija del logo y por encima del borde de la
+ * ventana o, si la píldora del pie es fija (escritorio), de la píldora. `toBeInViewport` da por
+ * bueno lo que la barra tapa. Reintenta: el destino se coloca en un efecto, tras el render.
+ */
+async function enteroALaVista(page: Page, loc: Locator): Promise<void> {
+  await expect(async () => {
+    const limites = await page.evaluate(() => {
+      const barra = document.querySelector('[data-barra-logo]')?.getBoundingClientRect().bottom ?? 0;
+      const pildora = document.querySelector('[data-pildora-pie]');
+      const suelo =
+        pildora && getComputedStyle(pildora).position === 'fixed'
+          ? pildora.getBoundingClientRect().top
+          : window.innerHeight;
+      return { barra, suelo };
+    });
+    const caja = await loc.boundingBox();
+    expect(caja, 'el elemento no está en la página').not.toBeNull();
+    expect(caja!.y, 'empieza bajo la barra del logo').toBeGreaterThanOrEqual(limites.barra - 0.5);
+    expect(caja!.y + caja!.height, 'acaba antes del pie de la ventana').toBeLessThanOrEqual(limites.suelo + 0.5);
+  }).toPass({ timeout: 3000 });
+}
+
+const UA_MOVIL_1410 =
+  'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Mobile Safari/537.36';
+const izquierdaFlecha = (page: Page) =>
+  flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left));
+
+// ---------- CASO 1 (normal), móvil 390×844 ----------
+test.describe('re-inspección 14/10/2026 · móvil 390×844', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: UA_MOVIL_1410,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso normal tocando: A,B,A,A,B,A,B,A,A,C suma 15 → Conservador, y cada cambio de fase deja lo que abre bajo la barra del logo', async ({
+    page,
+  }) => {
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    // Destino de la fase: el progreso y el enunciado, enteros bajo la barra (que acaba en 62 px).
+    await enteroALaVista(page, page.getByText('Pregunta 1 de 10'));
+    await enteroALaVista(page, enunciado(page));
+
+    await tocarRespuestas(page, [0, 1, 0, 0, 1, 0, 1, 0, 0, 2]); // 1+2+1+1+2+1+2+1+1+3 = 15
+    await expect(perfilMostrado(page)).toHaveText('Conservador');
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('15 puntos · tramo 10–16');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(0); // ni 10 ni 16
+    // 0·20 + 2 + (15−10)/(16−10)·16 = 15,33 %; un error de segmento movería la flecha 20 puntos
+    expect(await izquierdaFlecha(page)).toBeCloseTo(15.33, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(0);
+    // PROFILES.conservador
+    await expect(rasgo(page, 0)).toHaveText('Muy bajo');
+    await expect(rasgo(page, 1)).toHaveText('< 3 años');
+    await expect(rasgo(page, 2)).toHaveText('5-8 %');
+    await expect(rasgo(page, 3)).toHaveText('Preservar capital');
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (15 %)',
+      'Renta Fija (60 %)',
+      'Liquidez (20 %)',
+      'Alternativos (5 %)',
+    ]);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=conservador',
+    );
+    await enteroALaVista(page, page.getByRole('heading', { name: 'Tu perfil es:' }));
+    await enteroALaVista(page, perfilMostrado(page));
+
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).tap();
+    await enteroALaVista(page, page.getByText('Pregunta 10 de 10'));
+    await enteroALaVista(page, enunciado(page));
+    await botonSiguiente(page).tap(); // «Ver Resultado» otra vez: los mismos 15 puntos
+    await expect(perfilMostrado(page)).toHaveText('Conservador');
+    await enteroALaVista(page, page.getByRole('heading', { name: 'Tu perfil es:' }));
+
+    await page.getByRole('button', { name: /Repetir Test/ }).tap();
+    await enteroALaVista(page, page.getByRole('heading', { name: '¿Qué tipo de inversor eres?' }));
+    await enteroALaVista(page, page.getByRole('button', { name: /Comenzar Test/ }));
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});
+
+// ---------- CASO 2 (límite) y la firma, escritorio 1280×800 ----------
+test.describe('re-inspección 14/10/2026 · escritorio', () => {
+  test.use({
+    viewport: { width: 1280, height: 800 },
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  });
+  const puntuacion = (page: Page) => page.locator('p[class*="resultScore"]');
+  const avisoDeBorde = (page: Page) => page.locator('[class*="resultScoreBorde"]');
+
+  test('caso límite: 16 es el tope de Conservador y, revisando la 10 de B a C, 17 ya es Moderado; los destinos quedan bajo la barra de 92 px', async ({
+    page,
+  }) => {
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await enteroALaVista(page, page.getByText('Pregunta 1 de 10'));
+    await responder(page, [0, 0, 0, 0, 1, 1, 1, 1, 1, 1]); // A×4 + B×6 = 4 + 12 = 16
+    await expect(perfilMostrado(page)).toHaveText('Conservador');
+    await expect(puntuacion(page)).toContainText('16 puntos · tramo 10–16');
+    await expect(avisoDeBorde(page)).toHaveCount(1); // 16 = range[1] y 16 < 40
+    // 0·20 + 2 + (16−10)/(16−10)·16 = 18 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(18, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(0);
+    await enteroALaVista(page, page.getByRole('heading', { name: 'Tu perfil es:' }));
+    await enteroALaVista(page, perfilMostrado(page));
+
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
+    await enteroALaVista(page, enunciado(page));
+    await expect(enunciado(page)).toHaveText('¿Qué afirmación te representa mejor?');
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toContainText(
+      'Acepto algo de riesgo',
+    ); // la B de la 10 (2 puntos) sigue marcada
+    await opcion(page, 2).click(); // B → C: +1
+    await botonSiguiente(page).click();
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    await expect(puntuacion(page)).toContainText('17 puntos · tramo 17–22');
+    await expect(avisoDeBorde(page)).toHaveCount(1); // 17 = range[0] y 17 > 10
+    // 1·20 + 2 + (17−17)/(22−17)·16 = 22 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(22, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(1);
+    // PROFILES.moderado
+    await expect(rasgo(page, 0)).toHaveText('Bajo');
+    await expect(rasgo(page, 1)).toHaveText('3-5 años');
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (30 %)',
+      'Renta Fija (50 %)',
+      'Liquidez (15 %)',
+      'Alternativos (5 %)',
+    ]);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=moderado',
+    );
+    await enteroALaVista(page, page.getByRole('heading', { name: 'Tu perfil es:' }));
+
+    await page.getByRole('button', { name: /Repetir Test/ }).click();
+    await enteroALaVista(page, page.getByRole('heading', { name: '¿Qué tipo de inversor eres?' }));
+  });
+
+  test('firma: una carga en «meskeia.com» registra UNA visita aunque recorra todas las fases, y un F5 a medias, una más', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    // El tracker solo envía en los hosts de producción y si `navigator.webdriver` es falso. Todo lo
+    // de meskeia.com se sirve desde el servidor de pruebas; /api/analytics se contesta aquí mismo
+    // y cualquier otro host se aborta: no sale ninguna petición de la máquina.
+    await page.addInitScript(() => {
+      Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true });
+    });
+    await page.route('**/*', async (route) => {
+      const url = new URL(route.request().url());
+      if (url.hostname !== 'meskeia.com') return route.abort();
+      if (url.pathname.startsWith('/api/analytics/')) {
+        return route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+      }
+      return route.fulfill({ response: await route.fetch({ url: ORIGEN + url.pathname + url.search }) });
+    });
+    const altas: string[] = [];
+    page.on('request', (r) => {
+      if (r.method() === 'POST' && new URL(r.url()).pathname === '/api/analytics/track/') {
+        altas.push((JSON.parse(r.postData() ?? '{}') as { aplicacion?: string }).aplicacion ?? '');
+      }
+    });
+    const visitas = () => altas.filter((a) => a === 'test-perfil-inversor').length;
+
+    await page.goto('https://meskeia.com/test-perfil-inversor/');
+    await esperarPaginaAsentada(page);
+    await expect.poll(visitas, { message: 'el testigo existe: la carga sí se registra' }).toBeGreaterThan(0);
+    const porCarga = visitas(); // 1 en producción (en `next dev` el modo estricto la duplica)
+
+    await page.evaluate(() => sessionStorage.removeItem('meskeia:test-perfil-inversor:v1'));
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]); // 26 → Equilibrado
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
+    await botonSiguiente(page).click();
+    await page.getByRole('button', { name: /Repetir Test/ }).click();
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [1, 1]);
+    await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+    await esperarPaginaAsentada(page);
+    expect(visitas(), 'visitas nuevas al recorrer las fases sin recargar').toBe(porCarga);
+
+    await page.reload(); // F5 con el test a medias: se recupera y cuenta como UNA carga más
+    await esperarPaginaAsentada(page);
+    await expect(page.getByText(/Hemos recuperado el test/)).toBeVisible();
+    await expect.poll(visitas).toBe(2 * porCarga);
+  });
+
+  // ---------- Hallazgos nuevos de contenido ----------
+  test.fail('hallazgo nuevo de la tanda del 14/10/2026 — la portada y la description no prometen «recomendaciones personalizadas» que el resultado niega', async ({
+    page,
+  }) => {
+    // La description dice «Recomendaciones personalizadas de inversión.» y la portada, «Al final
+    // recibirás tu perfil personalizado con recomendaciones de inversión adaptadas a ti» y
+    // «✓ Recomendaciones personalizadas». Lo que da la app son cinco listas fijas, una por tramo, y
+    // el propio resultado las presenta como «ejemplos ilustrativos, no una recomendación de
+    // inversión ni de producto»; el disclaimer, «no constituye asesoramiento financiero». La
+    // reparación del 104 retituló el bloque del resultado y dejó la promesa en la portada.
+    await cargarSinSesion(page);
+    const promesa = /recomendaciones (de inversión )?(personalizadas|adaptadas a ti)/i;
+    const descripcion = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+    const portada = sinEspacios(await page.locator('[class*="startScreen"]').innerText());
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]); // 26 → Equilibrado
+    await expect(page.locator('[class*="recomendacionesNota"]')).toContainText(
+      'no una recomendación de inversión',
+    );
+    expect({ descripcion: promesa.test(descripcion), portada: promesa.test(portada) }).toEqual({
+      descripcion: false,
+      portada: false,
+    });
+  });
+
+  test.fail('hallazgo nuevo de la tanda del 14/10/2026 — la guía no enseña al lector una nota interna («§1.quinquies»)', async ({
+    page,
+  }) => {
+    // «Errores comunes», 2.ª viñeta, en texto visible: «…así que aquí no se da ninguna
+    // (§1.quinquies: una cifra popular sin fuente es una cifra inventada).» El § remite a una
+    // sección del CLAUDE.md del proyecto; la reparación del 1218 lo dejó en el JSX, no en un comentario.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const vineta = page
+      .locator('[class*="warningBox"] li')
+      .filter({ hasText: 'Cambiar a conservador en cada caída' });
+    await expect(vineta).toBeVisible();
+    expect(await vineta.innerText()).not.toContain('§');
+  });
+});
+
+// ---------- CASO 3 (rechazo) y la pregunta nueva bajo la barra, móvil 360×740 ----------
+test.describe('re-inspección 14/10/2026 · móvil 360×740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: UA_MOVIL_1410,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso a rechazar tocando: sin contestar no se avanza, con 9 de 10 no hay resultado, y dos sesiones imposibles se tiran', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    const CLAVE = 'meskeia:test-perfil-inversor:v1';
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+    // Sin respuesta, «Siguiente» está deshabilitado y tocarlo no avanza ni marca nada.
+    await expect(botonSiguiente(page)).toBeDisabled();
+    await botonSiguiente(page).tap({ force: true }).catch(() => {});
+    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(0);
+
+    // Nueve B (18 puntos) y la décima en blanco: «Ver Resultado» deshabilitado y sin resultado.
+    await tocarRespuestas(page, [1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    await expect(botonSiguiente(page)).toHaveText('Ver Resultado');
+    await expect(botonSiguiente(page)).toBeDisabled();
+    await botonSiguiente(page).tap({ force: true }).catch(() => {});
+    await expect(perfilMostrado(page)).toHaveCount(0);
+    await expect(enunciado(page)).toHaveText('¿Qué afirmación te representa mejor?');
+
+    // Sesiones imposibles: `leerSesion` las tira y RETIRA la clave (1213). Esperado en las dos:
+    // portada con «Comenzar Test», sin aviso de test recuperado ni «Algo salió mal».
+    const imposibles: Record<string, string> = {
+      'índice de pregunta negativo': JSON.stringify({ currentQuestion: -1, answers: { 1: 2 } }),
+      '0 puntos, que no es opción de la pregunta 1 (1-4)': JSON.stringify({ currentQuestion: 3, answers: { 1: 0 } }),
+    };
+    for (const [caso, valor] of Object.entries(imposibles)) {
+      await page.goto(RUTA);
+      await page.evaluate(([k, v]) => sessionStorage.setItem(k, v), [CLAVE, valor]);
+      await page.goto(RUTA);
+      await esperarPaginaAsentada(page);
+      await expect(page.getByRole('button', { name: /Comenzar Test/ }), caso).toBeVisible();
+      await expect(enunciado(page), caso).toHaveCount(0);
+      await expect(page.getByText(/Hemos recuperado el test/), caso).toHaveCount(0);
+      await expect(page.getByText('Algo salió mal'), caso).toHaveCount(0);
+      expect(await page.evaluate((k) => sessionStorage.getItem(k), CLAVE), caso).toBeNull();
+    }
+  });
+
+  test.fail('hallazgo nuevo de la tanda del 14/10/2026 — tras «Siguiente», el enunciado de la pregunta nueva se ve entero bajo la barra del logo', async ({
+    page,
+  }) => {
+    // Como lo hace un dedo: en cada pregunta se toca la B, se desplaza la página hasta ver
+    // «Siguiente» entero (a 20 px del borde; a 360×740 queda por debajo del pliegue desde la
+    // pregunta 1) y se toca en su centro. La app no recoloca la vista al cambiar de pregunta —solo
+    // da el foco a la tarjeta (1215), y la tarjeta, más alta que la pantalla, no se mueve—, así que
+    // la pregunta nueva aparece con la vista abajo: se ven sus opciones y no su enunciado. Los
+    // cambios de FASE sí se recolocan (2177); los de pregunta, no.
+    // Obtenido (14/10/2026): px del enunciado visibles bajo la barra (62 px) en las preguntas 2-10:
+    // 67/90 · 0/90 · 25/90 · 2/60 · 25/90 · 25/60 · 55/90 · 14/90 · 0/60, y «Pregunta N de 10»
+    // fuera de la pantalla en las nueve. A 375×667, 0 px en las nueve.
+    test.setTimeout(60_000);
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    const tapadas: string[] = [];
+    for (let n = 2; n <= 10; n++) {
+      await opcion(page, 1).tap();
+      const siguiente = botonSiguiente(page);
+      await siguiente.evaluate((el) => {
+        const abajo = el.getBoundingClientRect().bottom;
+        if (abajo > window.innerHeight - 20) window.scrollBy(0, abajo - (window.innerHeight - 20));
+      });
+      const caja = await siguiente.boundingBox();
+      expect(caja).not.toBeNull();
+      await page.touchscreen.tap(caja!.x + caja!.width / 2, caja!.y + caja!.height / 2);
+      await expect(page.getByText(`Pregunta ${n} de 10`)).toHaveCount(1);
+      await page.waitForTimeout(150);
+      const barra = await bordeBarraLogo(page);
+      const e = await enunciado(page).boundingBox();
+      if (!e || e.y < barra - 0.5 || e.y + e.height > 740) {
+        tapadas.push(
+          `pregunta ${n}: enunciado en ${Math.round(e?.y ?? NaN)}–${Math.round((e?.y ?? NaN) + (e?.height ?? 0))} px con la barra hasta ${Math.round(barra)}`,
+        );
+      }
+    }
+    expect(tapadas).toEqual([]);
   });
 });

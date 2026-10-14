@@ -242,8 +242,11 @@ test.describe('CASO 1 (móvil) — la puerta del hero y la lectura en un Pixel 7
   });
 
   /**
-   * HALLAZGO M3 [bajo · operativa] (id 2414) — REPARADO el 29/09/2026: la sección lleva
-   * `scroll-margin-top: 5rem` (.seccionMedidor), 80 px, por encima de los 62 px de la barra. El enlace nuevo del hero («Mídelo con el
+   * HALLAZGO M3 [bajo · operativa] (id 2414) — REPARADO el 29/09/2026 con un
+   * `scroll-margin-top: 5rem` en la sección (.seccionMedidor), 80 px, por encima de los 62 px de la
+   * barra. Desde cd462414 (13/10/2026) ese margen ya no está en la app: lo da el `scroll-padding-top`
+   * del documento (app/globals.css, la barra + 0,25rem = 66 px en móvil), y el salto en escritorio y a
+   * 360/390 px lo vigila el bloque «Inspector 14/10/2026» de generador-tonos.spec.ts. El enlace nuevo del hero («Mídelo con el
    * micrófono», ce2dfa44) salta a #medir-frecuencia sin `scroll-margin-top`, y la barra del logo
    * es `position: fixed`. En el Pixel 7 (412×839) el título de la sección queda a 26-49 px de
    * arriba y la píldora del logo lo tapa hasta los 62 px: se lee «frecuencia de un sonido» con

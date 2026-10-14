@@ -2080,6 +2080,9 @@ test.describe('Inspector 12/10/2026', () => {
   });
 
   test.describe('hallazgos ABIERTOS (inspector 12/10/2026)', () => {
+    // En la base, por orden: 3234 (desglose), 3235 (botones 1/3/5/10), 3236 (gravamen español) y
+    // 3237 (FAQ duplicada). Siguen abiertos en la re-inspección del 14/10/2026: los cuatro
+    // `test.fail()` fallan como se espera.
     test('ABIERTO (contenido, bajo) · el desglose por décimo numera los décimos como el formulario', async ({ page }) => {
       // Con el campo 1 vacío y premios en los campos 2 y 3 («Premio del décimo o apuesta 2/3 (€)»),
       // el desglose decía «Décimo 1: 60.000,00 €… · Décimo 2: 125.000,00 €…»: numera solo los
@@ -2233,5 +2236,463 @@ test.describe('13/10 · página traducida por el navegador', () => {
     await enPie();
 
     expect(errores).toEqual([]);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 14/10/2026 — re-inspección (segmento fiscal, riesgo 1; vuelve INVALIDADA) tras
+ * 26e70898 (página traducida: Generar, Copiar y la frase del precio, cada estado en su <span>
+ * con key; cabo C0233) y cd462414 (cromo fijo: el scroll-padding de app/globals.css sustituye a
+ * los scroll-margin de la app; cabos C0090 y C0116).
+ *
+ * NORMA — data/fiscal/premios-loterias.ts (DA 33.ª LIRPF): 40.000 € exentos por décimo o apuesta
+ * (reducidos en proporción si cuesta menos de 0,50 €), 20 % sobre el exceso, prorrateo por cuotas.
+ * CATEGORÍAS de La Primitiva — las que declara comprobar.ts: especial 6 + reintegro · 1.ª 6 ·
+ * 2.ª 5 + complementario · 3.ª 5 · 4.ª 4 · 5.ª 3 · reintegro aparte.
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (céntimos por el mayor resto, reparto.ts):
+ *   1. Normal — sorteo de La Primitiva 2 9 17 28 36 45 · complementario 11 · reintegro 4:
+ *        p1  2  9 17 28 36 45 · R4 → 6 + R               → categoría especial     7 bolas
+ *        p2  2  9 17 28 36 45 · R3 → 6                   → 1.ª                    6
+ *        p3  2  9 11 17 28 36 · R1 → 5, el 6.º es el 11  → 2.ª                    5 + compl.
+ *        p4  1  2  9 17 28 36 · R4 → 5 + R               → 3.ª y reintegro        6
+ *        p5  1  3  5  7 11 13 · R0 → 0 (el 11 no cuenta) → sin premio             0
+ *      → «4 de tus 5 combinaciones de La Primitiva tienen premio de categoría; 2 aciertan el
+ *      reintegro.» Peña de cuatro que ponen 8, 6, 4 y 2 € (40/30/20/10 %) y un décimo de
+ *      250.000 € a 20 €: exento 40.000 · base 210.000 · retención 42.000 · se cobran 208.000. Por
+ *      persona, exacto: premio 100.000 / 75.000 / 50.000 / 25.000; retención 16.800 / 12.600 /
+ *      8400 / 4200; le llega 83.200 / 62.400 / 41.600 / 20.800.
+ *   2. Límite — 40.000,05 €, el primer importe por encima de la exención que deja retención:
+ *      base 0,05 €, retención 0,05 × 20 % = 0,01 €, se cobran 40.000,04 €. Peña de partida
+ *      10/5/5 €: bruto 4.000.005 c → 2.000.002,5 / 1.000.001,25 / 1.000.001,25, y el céntimo que
+ *      sobra va a Persona 1 (resto ,5): 20.000,03 / 10.000,01 / 10.000,01; retención 1 c → 0,5 /
+ *      0,25 / 0,25 → 0,01 / 0,00 / 0,00; le llega 20.000,02 / 10.000,01 / 10.000,01.
+ *      Una sola guardada, 2 9 40 41 42 43 · R4, contra el mismo sorteo: 2 aciertos + reintegro →
+ *      «Reintegro (2 aciertos, sin premio de categoría)», 3 bolas marcadas, la fila resaltada y el
+ *      resumen en singular: «Tu combinación de La Primitiva no tiene premio de categoría, pero
+ *      acierta el reintegro.»
+ *   3. Rechazo — comprobador: complementario 0 (fuera de 1-49), complementario 45 (uno de los
+ *      seis), reintegro vacío y «-3» en la 1.ª casilla: un aviso cada uno y ningún veredicto.
+ *      Reparto: Persona 1 pone «-3» (el aviso la nombra y su campo va aria-invalid) y, arreglada,
+ *      precio «-1» (aviso del precio, sin tabla ni totales).
+ * Los tres casos dieron en el navegador exactamente lo calculado.
+ *
+ * PÁGINA TRADUCIDA (el mismo traductor simulado que el bloque del 13/10): Generar, Copiar y el
+ * precio ya no caen. Tampoco el comprobador (comprobar, cambiar una casilla, avisos, cambiar de
+ * lotería), las guardadas (estrella, quitar, vaciar), la cantidad, el selector, la guía educativa
+ * ni el reparto (añadir y quitar personas y décimos). SÍ cae el aviso del reparto cuando pierde
+ * su detalle sin desaparecer: «{resultado.error}{detalleError}» son dos textos sueltos y React
+ * retira el segundo, que el traductor ya cambió por <font> (hallazgo nuevo, abajo). Y el texto
+ * que cambia DENTRO del mismo nodo no cae pero se queda viejo: React escribe en el nodo que el
+ * traductor retiró (hallazgo nuevo, abajo).
+ *
+ * CROMO FIJO (scroll-padding del documento): medido a 1280×800, 1024×768, 360×800 y 390×844. La
+ * tarjeta nueva, el resumen y el aviso del comprobador acaban 8 px por encima de la píldora del
+ * pie en escritorio (737 frente a 745; 705 frente a 713) y a 8 px del borde en móvil; el ancla
+ * #generador-lototurf deja su título por debajo de la barra (155 frente a 92; 125 frente a 62).
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('Inspector 14/10/2026', () => {
+  const T_1410 = '2026-10-12T10:00:00.000Z';
+  const g = (id: string, type: Modalidad, mainNumbers: number[], extraNumbers: number[]) =>
+    ({ id, type, mainNumbers, extraNumbers, timestamp: T_1410 });
+  const PRIMITIVA_1410 = [
+    g('p1', 'primitiva', [2, 9, 17, 28, 36, 45], [4]),
+    g('p2', 'primitiva', [2, 9, 17, 28, 36, 45], [3]),
+    g('p3', 'primitiva', [2, 9, 11, 17, 28, 36], [1]),
+    g('p4', 'primitiva', [1, 2, 9, 17, 28, 36], [4]),
+    g('p5', 'primitiva', [1, 3, 5, 7, 11, 13], [0]),
+    g('e1', 'euromillones', [5, 14, 23, 37, 44], [3, 7]),
+  ];
+  /** Sorteo inventado de La Primitiva: los seis, el complementario y el reintegro. */
+  const SORTEO_1410: [string[], string, string] = [['2', '9', '17', '28', '36', '45'], '11', '4'];
+
+  const SELECTOR_PENA = 'section[aria-labelledby="pena-titulo"]';
+  const pena = (page: Page) => page.locator(SELECTOR_PENA);
+  const campoPremio = (page: Page, n = 0) => pena(page).getByLabel(/Premio del décimo o apuesta/).nth(n);
+  const campoPone = (page: Page, n: number) => pena(page).getByLabel('Pone (€)').nth(n);
+  const campoPrecio = (page: Page) => pena(page).getByLabel('Precio de cada décimo o apuesta (€)');
+  const avisoPena = (page: Page) => pena(page).locator('[class*="comprobadorError"]');
+  // formatCurrency y formatPercentage ponen espacio duro (U+00A0) delante del símbolo
+  const eur = (s: string) => `${s} €`;
+  const pct = (s: string) => `${s} %`;
+
+  async function escribir(page: Page, campo: Locator, valor: string) {
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+
+  const totalesPena = (page: Page) => pena(page).locator('[class*="penaTotales"] > div').evaluateAll((divs) =>
+    divs.map((d) => [d.querySelector('dt')?.textContent ?? '', d.querySelector('dd')?.textContent ?? '']));
+  const filasPena = (page: Page) => pena(page).locator('tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => [
+      tr.querySelector('th')?.textContent ?? '',
+      ...Array.from(tr.querySelectorAll('td')).map((td) => td.textContent ?? ''),
+    ]));
+
+  const veredictos = (page: Page) => zonaComprobador(page).locator('[class*="comprobadaVeredicto"]');
+  const bolasMarcadas = (page: Page) => zonaComprobador(page).locator('ul li').evaluateAll((lis) =>
+    lis.map((li) => li.querySelectorAll('[class*="bolaAcertada"]').length));
+  const avisoComprobador = (page: Page) => zonaComprobador(page).locator('[class*="comprobadorError"]');
+
+  async function teclearSorteo(page: Page, [numeros, complementario, reintegro]: [string[], string, string]) {
+    const zona = zonaComprobador(page);
+    for (let i = 0; i < 6; i++) {
+      await escribirCasilla(page, zona.getByLabel(`Número ${i + 1} de la combinación ganadora`), numeros[i]);
+    }
+    await escribirCasilla(page, zona.getByLabel('Complementario'), complementario);
+    await escribirCasilla(page, zona.getByLabel('Reintegro'), reintegro);
+  }
+
+  /** El traductor del navegador, como en el bloque del 13/10: cada texto pasa a <font><font>…. */
+  const traducir = (page: Page) =>
+    page.evaluate(() => {
+      const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => {
+          const padre = n.parentElement;
+          if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+          if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const nodos: Text[] = [];
+      while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+      for (const nodo of nodos) {
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = nodo.nodeValue;
+        exterior.appendChild(interior);
+        nodo.parentNode?.replaceChild(exterior, nodo);
+      }
+    });
+
+  /** Errores de React al tocar nodos que el traductor ya cambió. */
+  function vigilarErrores(page: Page): string[] {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    return errores;
+  }
+
+  const sinCaida = async (page: Page) => {
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+    await expect(botonGenerar(page)).toBeVisible();
+  };
+
+  test.describe('caso 1 (normal)', () => {
+    test('comprobador de La Primitiva: categoría especial, 1.ª, 2.ª, 3.ª con reintegro y sin premio', async ({ page }) => {
+      await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(PRIMITIVA_1410) });
+      const zona = zonaComprobador(page);
+      await expect(zona.getByRole('button', { name: 'La Primitiva', exact: true })).toHaveAttribute('aria-pressed', 'true');
+      await teclearSorteo(page, SORTEO_1410);
+      await zona.getByRole('button', { name: 'Comprobar mis combinaciones de La Primitiva' }).click();
+
+      await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveText(
+        '4 de tus 5 combinaciones de La Primitiva tienen premio de categoría; 2 aciertan el reintegro.');
+      await expect(veredictos(page)).toHaveText([
+        'Categoría especial (6 aciertos + reintegro)',
+        '1.ª categoría (6 aciertos)',
+        '2.ª categoría (5 aciertos + complementario)',
+        '3.ª categoría (5 aciertos) y reintegro',
+        'Sin premio (0 aciertos)',
+      ]);
+      expect(await bolasMarcadas(page)).toEqual([7, 6, 5, 6, 0]);
+      // El 11 solo se marca como complementario en p3 (5 aciertos); en p5 no decide nada
+      await expect(zona.locator('[class*="bolaComplementario"]')).toHaveText(['11 complementario']);
+    });
+
+    test('peña de cuatro que pone 8, 6, 4 y 2 € con un décimo de 250.000 €: 83.200 / 62.400 / 41.600 / 20.800 €', async ({ page }) => {
+      await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
+      await escribir(page, campoPone(page, 0), '8');
+      await escribir(page, campoPone(page, 1), '6');
+      await escribir(page, campoPone(page, 2), '4');
+      await pena(page).getByRole('button', { name: /Añadir persona/ }).click();
+      await escribir(page, campoPone(page, 3), '2');
+      await escribir(page, campoPremio(page), '250.000');
+      // DA 33.ª: exentos 40.000; (250.000 − 40.000) × 20 % = 42.000 de retención
+      await expect.poll(() => totalesPena(page)).toEqual([
+        ['Premio íntegro', eur('250.000,00')],
+        ['Exento', eur('40.000,00')],
+        [`Retención del ${pct('20')}`, eur('42.000,00')],
+        ['Lo que se cobra', eur('208.000,00')],
+      ]);
+      expect(await filasPena(page)).toEqual([
+        ['Persona 1', eur('8,00'), eur('83.200,00'), pct('40,00'), eur('100.000,00'), eur('16.800,00')],
+        ['Persona 2', eur('6,00'), eur('62.400,00'), pct('30,00'), eur('75.000,00'), eur('12.600,00')],
+        ['Persona 3', eur('4,00'), eur('41.600,00'), pct('20,00'), eur('50.000,00'), eur('8400,00')],
+        ['Persona 4', eur('2,00'), eur('20.800,00'), pct('10,00'), eur('25.000,00'), eur('4200,00')],
+      ]);
+    });
+  });
+
+  test.describe('caso 2 (límite)', () => {
+    test('40.000,05 €: 0,01 € de retención, y el céntimo que sobra va a quien más puso', async ({ page }) => {
+      await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
+      await escribir(page, campoPremio(page), '40.000,05');
+      // base 0,05 € → retención 0,01 €; peña de partida 10/5/5 €
+      await expect.poll(() => totalesPena(page)).toEqual([
+        ['Premio íntegro', eur('40.000,05')],
+        ['Exento', eur('40.000,00')],
+        [`Retención del ${pct('20')}`, eur('0,01')],
+        ['Lo que se cobra', eur('40.000,04')],
+      ]);
+      expect(await filasPena(page)).toEqual([
+        ['Persona 1', eur('10,00'), eur('20.000,02'), pct('50,00'), eur('20.000,03'), eur('0,01')],
+        ['Persona 2', eur('5,00'), eur('10.000,01'), pct('25,00'), eur('10.000,01'), eur('0,00')],
+        ['Persona 3', eur('5,00'), eur('10.000,01'), pct('25,00'), eur('10.000,01'), eur('0,00')],
+      ]);
+    });
+
+    test('una sola guardada con 2 aciertos y el reintegro: solo reintegro, y el resumen en singular', async ({ page }) => {
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([g('s1', 'primitiva', [2, 9, 40, 41, 42, 43], [4])]),
+      });
+      const zona = zonaComprobador(page);
+      await expect(zona.getByRole('group', { name: 'Lotería que quieres comprobar' })).toHaveCount(0);
+      await teclearSorteo(page, SORTEO_1410);
+      await zona.getByRole('button', { name: 'Comprobar mis combinaciones de La Primitiva' }).click();
+      const resumen = 'Tu combinación de La Primitiva no tiene premio de categoría, pero acierta el reintegro.';
+      await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveText(resumen);
+      await expect(veredictos(page)).toHaveText(['Reintegro (2 aciertos, sin premio de categoría)']);
+      expect(await bolasMarcadas(page)).toEqual([3]);
+      await expect(zona.locator('ul li')).toHaveClass(/comprobadaPremio/);
+      await expect(page.getByRole('status').filter({ hasText: resumen })).toHaveCount(1);
+    });
+  });
+
+  test.describe('caso 3 (rechazo)', () => {
+    test('comprobador: complementario 0 o repetido, reintegro vacío y «-3» se rechazan sin veredicto', async ({ page }) => {
+      await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(PRIMITIVA_1410.slice(0, 1)) });
+      const boton = zonaComprobador(page).getByRole('button', { name: 'Comprobar mis combinaciones de La Primitiva' });
+      const seis = ['2', '9', '17', '28', '36', '45'];
+      const casos: Array<[[string[], string, string], string]> = [
+        [[seis, '0', '4'], 'El complementario (0) está fuera de rango: va del 1 al 49.'],
+        [[seis, '45', '4'], 'El complementario (45) no puede ser uno de los seis de la combinación ganadora: sale del mismo bombo, después.'],
+        [[seis, '11', ''], 'Falta el reintegro: es una sola cifra, del 0 al 9.'],
+        [[['-3', ...seis.slice(1)], '11', '4'], 'Falta el número 1 de la combinación ganadora, o no es un número entero.'],
+      ];
+      for (const [sorteo, aviso] of casos) {
+        await teclearSorteo(page, sorteo);
+        await boton.click();
+        await expect(avisoComprobador(page)).toHaveText(aviso);
+        await expect(veredictos(page)).toHaveCount(0);
+      }
+    });
+
+    test('reparto: una aportación negativa y un precio negativo avisan y no reparten', async ({ page }) => {
+      await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
+      await escribir(page, campoPone(page, 0), '-3');
+      await escribir(page, campoPremio(page), '125.000');
+      await expect(avisoPena(page)).toHaveText(
+        'Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Persona 1.');
+      await expect(pena(page).locator('input[aria-invalid="true"]')).toHaveCount(1);
+      await expect(campoPone(page, 0)).toHaveAttribute('aria-invalid', 'true');
+      await expect(pena(page).locator('tbody tr')).toHaveCount(0);
+
+      await escribir(page, campoPone(page, 0), '10');
+      await escribir(page, campoPrecio(page), '-1');
+      await expect(avisoPena(page)).toHaveText('Indica lo que costó cada décimo o apuesta, mayor que 0 €.');
+      await expect(campoPrecio(page)).toHaveAttribute('aria-invalid', 'true');
+      await expect(pena(page).locator('tbody tr')).toHaveCount(0);
+      await expect(pena(page).locator('[class*="penaTotales"]')).toHaveCount(0);
+    });
+  });
+
+  test.describe('página traducida — los controles que 26e70898 no tocó', () => {
+    test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+    test('comprobador: comprobar, cambiar una casilla, los avisos y cambiar de lotería no tumban la app', async ({ page }) => {
+      const errores = vigilarErrores(page);
+      await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(PRIMITIVA_1410) });
+      const zona = zonaComprobador(page);
+      const boton = zona.getByRole('button', { name: /Comprobar mis combinaciones/ });
+      await traducir(page);
+      await teclearSorteo(page, SORTEO_1410);
+      await boton.click();
+      await expect(veredictos(page)).toHaveCount(5);
+      await traducir(page);
+      await escribirCasilla(page, zona.getByLabel('Complementario'), '12'); // retira el veredicto
+      await expect(veredictos(page)).toHaveCount(0);
+      await traducir(page);
+      await escribirCasilla(page, zona.getByLabel('Número 3 de la combinación ganadora'), '9');
+      await boton.click();
+      await expect(avisoComprobador(page)).toContainText('El 9 está repetido');
+      await traducir(page);
+      await escribirCasilla(page, zona.getByLabel('Número 3 de la combinación ganadora'), '17');
+      await expect(avisoComprobador(page)).toHaveCount(0);
+      await boton.click();
+      await expect(veredictos(page)).toHaveCount(5);
+      await traducir(page);
+      await zona.getByRole('button', { name: 'Euromillones', exact: true }).click();
+      await expect(zona.getByLabel('Estrella 2')).toHaveCount(1);
+      await traducir(page);
+      await zona.getByRole('button', { name: 'La Primitiva', exact: true }).click();
+      await expect(zona.getByLabel('Complementario')).toHaveCount(1);
+      await sinCaida(page);
+      expect(errores).toEqual([]);
+    });
+
+    test('guardadas, cantidad, selector, guía educativa, Limpiar y Vaciar no tumban la app', async ({ page }) => {
+      const errores = vigilarErrores(page);
+      await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(PRIMITIVA_1410.slice(0, 2)) });
+      await traducir(page);
+      await page.getByRole('button', { name: '3', exact: true }).click();
+      await seleccionarLoteria(page, 'euromillones');
+      await traducir(page);
+      await botonGenerar(page).click();
+      await expect(page.locator('[class*="resultCard"]')).toHaveCount(3);
+      await traducir(page);
+      const estrella = page.locator('[class*="resultCard"]').first().locator('[aria-pressed]');
+      await estrella.click();
+      await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(3);
+      await traducir(page);
+      await estrella.click();
+      await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(2);
+      await traducir(page);
+      await page.getByRole('button', { name: /^Quitar la combinación/ }).first().click();
+      await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(1);
+      await traducir(page);
+      const guia = page.getByRole('button', { name: /guía educativa/ });
+      await guia.click();
+      await traducir(page);
+      await guia.click();
+      await traducir(page);
+      await page.getByRole('button', { name: /Limpiar/ }).click();
+      await expect(page.locator('[class*="resultCard"]')).toHaveCount(0);
+      await traducir(page);
+      await page.getByRole('button', { name: /Vaciar/ }).click();
+      await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(0);
+      await traducir(page);
+      await page.getByRole('button', { name: 'Generar números de Lototurf' }).click();
+      await sinCaida(page);
+      expect(errores).toEqual([]);
+    });
+
+    test('reparto: añadir a alguien sin aportación, arreglarlo y añadir y quitar décimos no tumba la app', async ({ page }) => {
+      const errores = vigilarErrores(page);
+      await esperarInteractiva(page);
+      await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
+      await traducir(page);
+      await escribir(page, campoPremio(page), '125.000');
+      await expect(pena(page).locator('tbody tr')).toHaveCount(3);
+      await traducir(page);
+      await pena(page).getByRole('button', { name: /Añadir persona/ }).click();
+      await expect(avisoPena(page)).toContainText('Revisa lo que pone Persona 4.');
+      await traducir(page);
+      await escribir(page, campoPone(page, 3), '5'); // el aviso desaparece entero: no cae
+      await expect(pena(page).locator('tbody tr')).toHaveCount(4);
+      await traducir(page);
+      await pena(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+      await escribir(page, campoPremio(page, 1), '50.000');
+      await traducir(page);
+      await pena(page).getByRole('button', { name: 'Quitar el premio 2' }).click();
+      await traducir(page);
+      await pena(page).getByRole('button', { name: 'Quitar a Persona 4 de la peña' }).click();
+      await expect(pena(page).locator('tbody tr')).toHaveCount(3);
+      await sinCaida(page);
+      expect(errores).toEqual([]);
+    });
+  });
+
+  test.describe('cromo fijo — lo que la app lleva a la vista', () => {
+    test('1280×800: el resumen y el aviso del comprobador acaban por encima de la píldora fija del pie', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(PRIMITIVA_1410) });
+      const cromo = () => page.evaluate(() => {
+        const pie = document.querySelector('[data-pildora-pie]')!;
+        return {
+          barra: document.querySelector('[data-barra-logo]')!.getBoundingClientRect().bottom,
+          pildora: pie.getBoundingClientRect().top,
+          pildoraFija: getComputedStyle(pie).position === 'fixed',
+        };
+      });
+      const caja = (sel: string) => page.evaluate((s) => {
+        const r = document.querySelector(s)!.getBoundingClientRect();
+        return { top: r.top, bottom: r.bottom };
+      }, sel);
+      const zona = zonaComprobador(page);
+      await teclearSorteo(page, SORTEO_1410);
+
+      // Acotado al comprobador: el aviso del reparto de la peña usa la misma clase
+      const dentro = 'section[aria-labelledby="titulo-comprobador"]';
+      for (const [complementario, selector] of [
+        ['11', `${dentro} [class*="comprobadorResumen"]`],
+        ['45', `${dentro} [class*="comprobadorError"]`],
+      ] as const) {
+        await escribirCasilla(page, zona.getByLabel('Complementario'), complementario);
+        await botonAlPie(page, '[class*="comprobadorBoton"]', 70);
+        const b = (await zona.getByRole('button', { name: /Comprobar mis combinaciones/ }).boundingBox())!;
+        expect(b.y + b.height).toBeLessThanOrEqual(800); // precondición: el botón se ve
+        await zona.getByRole('button', { name: /Comprobar mis combinaciones/ }).click();
+        await expect(page.locator(selector)).toHaveCount(1);
+        await esperarDesplazamientoQuieto(page);
+        const c = await cromo();
+        expect(c.pildoraFija).toBe(true); // si no, el caso no probaría nada
+        const r = await caja(selector);
+        expect(r.top).toBeGreaterThanOrEqual(c.barra);
+        expect(r.bottom).toBeLessThanOrEqual(c.pildora); // medido: 737 frente a 745
+      }
+    });
+
+    for (const vista of [{ width: 1280, height: 800 }, { width: 360, height: 800 }]) {
+      test(`${vista.width}×${vista.height}: el ancla #generador-lototurf deja su título por debajo de la barra del logo`, async ({ page }) => {
+        await page.setViewportSize(vista);
+        // Carga nueva con el ancla, como quien llega por un enlace de fuera
+        await page.goto('about:blank');
+        await page.goto(`${RUTA}#generador-lototurf`);
+        await esperarInteractiva(page);
+        await esperarDesplazamientoQuieto(page);
+        const medida = await page.evaluate(() => ({
+          barra: document.querySelector('[data-barra-logo]')!.getBoundingClientRect().bottom,
+          titulo: document.querySelector('#generador-lototurf h2')!.getBoundingClientRect().top,
+          alto: window.innerHeight,
+        }));
+        expect(medida.titulo).toBeGreaterThanOrEqual(medida.barra); // medido: 155 / 92 y 125 / 62
+        expect(medida.titulo).toBeLessThan(medida.alto);
+      });
+    }
+  });
+
+  test.describe('hallazgos nuevos de la tanda del 14/10/2026', () => {
+    test('ABIERTO (operativa, medio) · con la página traducida, el aviso del reparto que pierde su detalle no tumba la app', async ({ page }) => {
+      // Hallazgo nuevo de la tanda del 14/10/2026. El aviso es <p>{resultado.error}{detalleError}</p>:
+      // dos textos sueltos, y el segundo («Revisa lo que pone Persona 4.») desaparece cuando el
+      // error que queda no nombra a nadie. React lo retira con removeChild, pero el traductor ya
+      // lo cambió por <font>: NotFoundError y la pantalla «Algo salió mal», con lo tecleado de la
+      // peña perdido. Sin traducir, el mismo flujo deja «Indica el premio de cada décimo…».
+      test.fail();
+      const errores = vigilarErrores(page);
+      await esperarInteractiva(page);
+      await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
+      await pena(page).getByRole('button', { name: /Añadir persona/ }).click();
+      await escribir(page, campoPremio(page), '-5');
+      await expect(avisoPena(page)).toHaveText(
+        'Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Persona 4.');
+      await traducir(page);
+      await campoPone(page, 3).fill('5');
+      await expect(avisoPena(page)).toHaveText('Indica el premio de cada décimo o apuesta premiados, mayor que 0 €.');
+      await sinCaida(page);
+      expect(errores).toEqual([]);
+    });
+
+    test('ABIERTO (operativa, bajo) · con la página traducida, el botón Generar y la ficha dicen la lotería y la cantidad elegidas', async ({ page }) => {
+      // Hallazgo nuevo de la tanda del 14/10/2026. No cae: se queda viejo. El texto que cambia
+      // dentro del mismo nodo («Generar {n} … de {lotería}», la descripción, los días y el precio
+      // de la ficha) React lo escribe en el nodo que el traductor retiró, y en pantalla sigue el
+      // de antes. Medido: con la página traducida, elegir Euromillones y 3 deja «Generar 1
+      // combinación de La Primitiva» y la ficha «⭐ Euromillones · 6 números del 1 al 49 +
+      // Reintegro (0-9) · Lunes, jueves y sábados · 1,00 €», y Generar da 3 de Euromillones.
+      test.fail();
+      await esperarInteractiva(page);
+      await traducir(page);
+      await seleccionarLoteria(page, 'euromillones');
+      await page.getByRole('button', { name: '3', exact: true }).click();
+      await expect(page.locator('[class*="lotteryInfo"] h2')).toHaveText('Euromillones'); // el título sí cambia
+      await expect(botonGenerar(page)).toContainText('Generar 3 combinaciones de Euromillones');
+      await expect(page.locator('[class*="lotteryInfo"]')).toContainText('5 números del 1 al 50 + 2 Estrellas (1-12)');
+      await expect(page.locator('[class*="lotteryInfo"]')).not.toContainText('6 números del 1 al 49');
+    });
   });
 });
