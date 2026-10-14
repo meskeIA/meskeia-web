@@ -1146,7 +1146,7 @@ function SeccionCasosAula() {
               aria-expanded={verPista}
               onClick={() => setVerPista(!verPista)}
             >
-              <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
+              <span aria-hidden="true">💡</span> <span>{verPista ? 'Ocultar pista' : 'Ver pista'}</span>
             </button>
           )}
           <button
@@ -1156,7 +1156,7 @@ function SeccionCasosAula() {
             onClick={() => setVerSolucion(!verSolucion)}
           >
             <span aria-hidden="true">🔑</span>{' '}
-            {verSolucion ? 'Ocultar solución' : 'Ver solución paso a paso'}
+            <span>{verSolucion ? 'Ocultar solución' : 'Ver solución paso a paso'}</span>
           </button>
         </div>
 

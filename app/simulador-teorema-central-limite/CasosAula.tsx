@@ -189,7 +189,7 @@ export default function CasosAula() {
               aria-expanded={verPista}
               onClick={() => setVerPista(!verPista)}
             >
-              <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
+              <span aria-hidden="true">💡</span> <span>{verPista ? 'Ocultar pista' : 'Ver pista'}</span>
             </button>
           )}
           <button
@@ -199,7 +199,7 @@ export default function CasosAula() {
             onClick={() => setVerMecanismo(!verMecanismo)}
           >
             <span aria-hidden="true">🔑</span>{' '}
-            {verMecanismo ? 'Ocultar explicación' : 'Ver por qué'}
+            <span>{verMecanismo ? 'Ocultar explicación' : 'Ver por qué'}</span>
           </button>
         </div>
 

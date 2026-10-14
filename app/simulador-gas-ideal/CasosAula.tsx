@@ -174,7 +174,7 @@ export default function CasosAula() {
               aria-controls="casos-pista"
               onClick={() => setVerPista(!verPista)}
             >
-              <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
+              <span aria-hidden="true">💡</span> <span>{verPista ? 'Ocultar pista' : 'Ver pista'}</span>
             </button>
           )}
           {hayComprobar && (
@@ -186,7 +186,7 @@ export default function CasosAula() {
               onClick={() => setVerComprobar(!verComprobar)}
             >
               <span aria-hidden="true">🔬</span>{' '}
-              {verComprobar ? 'Ocultar cómo verlo en el simulador' : 'Verlo en el simulador'}
+              <span>{verComprobar ? 'Ocultar cómo verlo en el simulador' : 'Verlo en el simulador'}</span>
             </button>
           )}
           <button
@@ -196,7 +196,7 @@ export default function CasosAula() {
             aria-controls="casos-solucion"
             onClick={() => setVerSolucion(!verSolucion)}
           >
-            <span aria-hidden="true">🔑</span> {verSolucion ? 'Ocultar solución' : 'Ver solución'}
+            <span aria-hidden="true">🔑</span> <span>{verSolucion ? 'Ocultar solución' : 'Ver solución'}</span>
           </button>
         </div>
 

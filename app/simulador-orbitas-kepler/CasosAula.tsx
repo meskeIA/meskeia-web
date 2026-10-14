@@ -199,7 +199,7 @@ export default function CasosAula({ onCargar }: Props) {
               aria-controls="casos-pista"
               onClick={() => setVerPista(!verPista)}
             >
-              <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
+              <span aria-hidden="true">💡</span> <span>{verPista ? 'Ocultar pista' : 'Ver pista'}</span>
             </button>
           )}
           <button
@@ -209,7 +209,7 @@ export default function CasosAula({ onCargar }: Props) {
             aria-controls="casos-solucion"
             onClick={() => setVerSolucion(!verSolucion)}
           >
-            <span aria-hidden="true">🔑</span> {verSolucion ? 'Ocultar solución' : 'Ver solución'}
+            <span aria-hidden="true">🔑</span> <span>{verSolucion ? 'Ocultar solución' : 'Ver solución'}</span>
           </button>
         </div>
 

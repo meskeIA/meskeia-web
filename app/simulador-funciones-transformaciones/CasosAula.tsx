@@ -259,7 +259,7 @@ export default function CasosAula({ onCargar }: Props) {
               aria-controls={idPista}
               onClick={() => setVerPista(!verPista)}
             >
-              <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
+              <span aria-hidden="true">💡</span> <span>{verPista ? 'Ocultar pista' : 'Ver pista'}</span>
             </button>
           )}
         </div>

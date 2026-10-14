@@ -193,7 +193,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
               aria-expanded={verPista}
               onClick={() => setVerPista(!verPista)}
             >
-              <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
+              <span aria-hidden="true">💡</span> <span>{verPista ? 'Ocultar pista' : 'Ver pista'}</span>
             </button>
           )}
           <button
@@ -202,7 +202,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
             aria-expanded={verSolucion}
             onClick={() => setVerSolucion(!verSolucion)}
           >
-            <span aria-hidden="true">🔑</span> {verSolucion ? 'Ocultar solución' : 'Ver solución'}
+            <span aria-hidden="true">🔑</span> <span>{verSolucion ? 'Ocultar solución' : 'Ver solución'}</span>
           </button>
         </div>
 

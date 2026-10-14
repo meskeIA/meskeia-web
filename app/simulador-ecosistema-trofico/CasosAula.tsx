@@ -264,7 +264,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
               aria-controls={idPista}
               onClick={() => setVerPista(!verPista)}
             >
-              <span aria-hidden="true">💡</span> {verPista ? 'Ocultar pista' : 'Ver pista'}
+              <span aria-hidden="true">💡</span> <span>{verPista ? 'Ocultar pista' : 'Ver pista'}</span>
             </button>
           )}
           {bloqueada && (
@@ -280,7 +280,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
                 onClick={() => setVerExplicacion(!verExplicacion)}
               >
                 <span aria-hidden="true">🔎</span>{' '}
-                {verExplicacion ? 'Ocultar la explicación' : 'Ver por qué pasa'}
+                <span>{verExplicacion ? 'Ocultar la explicación' : 'Ver por qué pasa'}</span>
               </button>
             </>
           )}
