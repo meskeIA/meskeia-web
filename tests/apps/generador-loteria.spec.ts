@@ -2714,3 +2714,418 @@ test.describe('Inspector 14/10/2026', () => {
     });
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Re-inspección 14/10/2026 (tarde) — tras 0293f6ec (hallazgos 3288 y 3289, página traducida:
+ * cada texto variable, único hijo de su elemento) y 26e70898. Segmento fiscal, riesgo 1.
+ *
+ * NORMA — data/fiscal/premios-loterias.ts (DA 33.ª LIRPF, BOE-A-2006-20764): 40.000 € exentos
+ * POR décimo o apuesta (ap. 1 y 2), 20 % sobre el exceso (ap. 4 y 6), prorrateo por cuotas. La
+ * app lo importa de ahí en page.tsx, RepartoPena.tsx, reparto.ts y metadata.ts (cabo C0124).
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (céntimos por el mayor resto, reparto.ts):
+ *   1. Normal — Ana, Bea y Carlos ponen 3 € cada uno; décimos de 35.000 € y 100.000,01 € a 20 €.
+ *      Décimo 1: exento 35.000 (todo), retención 0. Décimo 2: exento 40.000, base 60.000,01,
+ *      retención 12.000,002 → 12.000,00. Los 5.000 € de exención que el décimo 1 no usa NO pasan
+ *      al 2 (si pasaran, la retención sería 11.000). Totales 135.000,01 / 75.000,00 / 12.000,00 /
+ *      se cobran 123.000,01. Bruto 13.500.001 c / 3 = 4.500.000,33 c para cada uno: los tres
+ *      restos empatan y el céntimo va al primero de la lista → 45.000,01 / 45.000,00 / 45.000,00.
+ *      Retención 1.200.000 c / 3 = 4000,00 justos. Le llega 41.000,01 / 41.000,00 / 41.000,00.
+ *   2. Límite — (a) el máximo de décimos, 20, de 40.001 € cada uno (peña de partida 10/5/5): base
+ *      1 € y retención 0,20 € por décimo; totales 800.020,00 / 800.000,00 / 4,00 / 800.016,00 (con
+ *      la exención aplicada una sola vez al total serían 152.004 € de retención). Por persona:
+ *      premio 400.010 / 200.005 / 200.005, retención 2,00 / 1,00 / 1,00, le llega 400.008 /
+ *      200.004 / 200.004. «Añadir otro décimo» queda deshabilitado en el 20.º.
+ *      (b) Comprobador de Euromillones tecleado como lo publica el sorteo, con ceros delante y en
+ *      los topes de rango: 03 07 15 49 50 · estrellas 01 y 12. Guardadas 3 7 15 49 50 + 1 12 →
+ *      5 + 2 → 1.ª (7 bolas) y 3 7 15 49 50 + 2 11 → 5 + 0 → 3.ª (5 bolas) → «2 de tus 2
+ *      combinaciones de Euromillones tienen premio de categoría.»
+ *   3. Rechazo — Euromillones: un 51 (va del 1 al 50), «4.» (no es entero), estrella 0 y estrella
+ *      13 (van del 1 al 12) y las dos estrellas iguales: un aviso cada uno y ningún veredicto.
+ *      Reparto: el precio vacío avisa, marca su campo y no reparte.
+ * Los tres casos dieron en el navegador exactamente lo calculado.
+ *
+ * PÁGINA TRADUCIDA (cabo C0243, la app ENTERA con el traductor simulado): 3288 y 3289 se
+ * SOSTIENEN — ni NotFoundError ni textos viejos en el botón Generar (5 loterías × 1/3/5/10), la
+ * ficha, «Generar números de…», las tarjetas, la estrella, Copiar (resultados y guardadas), el
+ * tope de 20 y su aviso, el cupo, el comprobador (con aciertos, sin ellos, de un aviso a otro,
+ * cambiando de lotería y quitando guardadas con el resultado a la vista), los totales, la tabla,
+ * el desglose y todas las transiciones del aviso del reparto. SÍ se queda viejo un nodo hermano
+ * que la reparación no tocó: el rótulo de cada campo de premio, «{texto}<input>» en el mismo
+ * <label> (hallazgo nuevo, abajo con test.fail()).
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('re-inspección 14/10/2026 (tarde)', () => {
+  const SEL_PENA = 'section[aria-labelledby="pena-titulo"]';
+  const penaT = (page: Page) => page.locator(SEL_PENA);
+  const premioT = (page: Page, n = 0) => penaT(page).getByLabel(/Premio del décimo o apuesta/).nth(n);
+  const poneT = (page: Page, n: number) => penaT(page).getByLabel('Pone (€)').nth(n);
+  const nombreT = (page: Page, n: number) => penaT(page).getByLabel('Nombre').nth(n);
+  const precioT = (page: Page) => penaT(page).getByLabel('Precio de cada décimo o apuesta (€)');
+  const avisoPenaT = (page: Page) => penaT(page).locator('[class*="comprobadorError"]');
+  const eurT = (s: string) => `${s} €`;
+  const pctT = (s: string) => `${s} %`;
+  const T_TARDE = '2026-10-12T10:00:00.000Z';
+  const gT = (id: string, type: Modalidad, mainNumbers: number[], extraNumbers: number[]) =>
+    ({ id, type, mainNumbers, extraNumbers, timestamp: T_TARDE });
+
+  async function escribirT(page: Page, campo: Locator, valor: string) {
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+  const totalesT = (page: Page) => penaT(page).locator('[class*="penaTotales"] > div').evaluateAll((divs) =>
+    divs.map((d) => [d.querySelector('dt')?.textContent ?? '', d.querySelector('dd')?.textContent ?? '']));
+  const filasT = (page: Page) => penaT(page).locator('tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => [
+      tr.querySelector('th')?.textContent ?? '',
+      ...Array.from(tr.querySelectorAll('td')).map((td) => td.textContent ?? ''),
+    ]));
+  /** Texto del <label> de cada campo de premio (el rótulo visible y el nombre accesible del input). */
+  const rotulosPremio = (page: Page) => penaT(page).getByLabel(/Premio del décimo o apuesta/).evaluateAll((ins) =>
+    ins.map((i) => ((i as HTMLInputElement).labels?.[0]?.textContent ?? '').replace(/\s+/g, ' ').trim()));
+
+  /** El traductor del navegador, como en los bloques del 13/10 y del 14/10: cada texto a <font><font>…. */
+  const traducirT = (page: Page) =>
+    page.evaluate(() => {
+      const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => {
+          const padre = n.parentElement;
+          if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+          if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const nodos: Text[] = [];
+      while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+      for (const nodo of nodos) {
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = nodo.nodeValue;
+        exterior.appendChild(interior);
+        nodo.parentNode?.replaceChild(exterior, nodo);
+      }
+    });
+  function erroresT(page: Page): string[] {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    return errores;
+  }
+  const enPieT = async (page: Page) => {
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+    await expect(botonGenerar(page)).toBeVisible();
+  };
+
+  test.describe('caso 1 (normal)', () => {
+    test('peña 3/3/3 con décimos de 35.000 y 100.000,01 €: la exención que sobra no pasa al otro décimo, y el céntimo empatado va al primero', async ({ page }) => {
+      await esperarHidratacion(page, [`${SEL_PENA} input`]);
+      await escribirT(page, nombreT(page, 0), 'Ana');
+      await escribirT(page, nombreT(page, 1), 'Bea');
+      await escribirT(page, nombreT(page, 2), 'Carlos');
+      for (let i = 0; i < 3; i++) await escribirT(page, poneT(page, i), '3');
+      await escribirT(page, premioT(page, 0), '35.000');
+      await penaT(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+      await escribirT(page, premioT(page, 1), '100.000,01');
+      // DA 33.ª.1 y .2: exención POR décimo → 35.000 + 40.000; retención (100.000,01 − 40.000) × 20 %
+      await expect.poll(() => totalesT(page)).toEqual([
+        ['Premio íntegro', eurT('135.000,01')],
+        ['Exento', eurT('75.000,00')],
+        [`Retención del ${pctT('20')}`, eurT('12.000,00')],
+        ['Lo que se cobra', eurT('123.000,01')],
+      ]);
+      await expect(penaT(page).locator('[class*="penaResultado"] > p')).toHaveText(
+        `Décimo 1: ${eurT('35.000,00')}, retención ${eurT('0,00')} · Décimo 2: ${eurT('100.000,01')}, retención ${eurT('12.000,00')}`);
+      // 13.500.001 c entre tres restos iguales: el céntimo, al primero de la lista (Ana)
+      expect(await filasT(page)).toEqual([
+        ['Ana', eurT('3,00'), eurT('41.000,01'), pctT('33,33'), eurT('45.000,01'), eurT('4000,00')],
+        ['Bea', eurT('3,00'), eurT('41.000,00'), pctT('33,33'), eurT('45.000,00'), eurT('4000,00')],
+        ['Carlos', eurT('3,00'), eurT('41.000,00'), pctT('33,33'), eurT('45.000,00'), eurT('4000,00')],
+      ]);
+    });
+  });
+
+  test.describe('caso 2 (límite)', () => {
+    test('el máximo de 20 décimos de 40.001 €: 0,20 € de retención cada uno, 4,00 € en total, y no deja añadir un 21.º', async ({ page }) => {
+      await esperarHidratacion(page, [`${SEL_PENA} input`]);
+      const anadir = penaT(page).getByRole('button', { name: /Añadir otro décimo/ });
+      for (let i = 1; i < 20; i++) await anadir.click();
+      await expect(penaT(page).getByLabel(/Premio del décimo o apuesta/)).toHaveCount(20);
+      await expect(anadir).toBeDisabled(); // MAX_PREMIOS = 20
+      for (let i = 0; i < 20; i++) await escribirT(page, premioT(page, i), '40.001');
+      // 20 × (40.001 − 40.000) × 20 % = 4,00 € (con la exención una sola vez al total: 152.004 €)
+      await expect.poll(() => totalesT(page)).toEqual([
+        ['Premio íntegro', eurT('800.020,00')],
+        ['Exento', eurT('800.000,00')],
+        [`Retención del ${pctT('20')}`, eurT('4,00')],
+        ['Lo que se cobra', eurT('800.016,00')],
+      ]);
+      expect(await filasT(page)).toEqual([
+        ['Persona 1', eurT('10,00'), eurT('400.008,00'), pctT('50,00'), eurT('400.010,00'), eurT('2,00')],
+        ['Persona 2', eurT('5,00'), eurT('200.004,00'), pctT('25,00'), eurT('200.005,00'), eurT('1,00')],
+        ['Persona 3', eurT('5,00'), eurT('200.004,00'), pctT('25,00'), eurT('200.005,00'), eurT('1,00')],
+      ]);
+      const desglose = penaT(page).locator('[class*="penaResultado"] > p span');
+      await expect(desglose).toHaveCount(20);
+      await expect(desglose).toHaveText(Array.from({ length: 20 }, (_, i) =>
+        `${i > 0 ? '· ' : ''}Décimo ${i + 1}: ${eurT('40.001,00')}, retención ${eurT('0,20')}`));
+    });
+
+    test('Euromillones tecleado con ceros delante y en los topes (50 y estrella 12): 1.ª y 3.ª', async ({ page }) => {
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([
+          gT('x1', 'euromillones', [3, 7, 15, 49, 50], [1, 12]),
+          gT('x2', 'euromillones', [3, 7, 15, 49, 50], [2, 11]),
+        ]),
+      });
+      const zona = zonaComprobador(page);
+      const numeros = ['03', '07', '15', '49', '50'];
+      for (let i = 0; i < 5; i++) await escribirCasilla(page, zona.getByLabel(`Número ${i + 1} de la combinación ganadora`), numeros[i]);
+      await escribirCasilla(page, zona.getByLabel('Estrella 1'), '01');
+      await escribirCasilla(page, zona.getByLabel('Estrella 2'), '12');
+      await zona.getByRole('button', { name: 'Comprobar mis combinaciones de Euromillones' }).click();
+      await expect(zona.locator('[class*="comprobadorError"]')).toHaveCount(0);
+      await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveText(
+        '2 de tus 2 combinaciones de Euromillones tienen premio de categoría.');
+      await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveText([
+        '1.ª categoría (5 aciertos + 2 estrellas)',
+        '3.ª categoría (5 aciertos)',
+      ]);
+      expect(await zona.locator('ul li').evaluateAll((lis) =>
+        lis.map((li) => li.querySelectorAll('[class*="bolaAcertada"]').length))).toEqual([7, 5]);
+    });
+  });
+
+  test.describe('caso 3 (rechazo)', () => {
+    test('Euromillones: un 51, «4.», estrella 0 o 13 y dos estrellas iguales avisan sin veredicto', async ({ page }) => {
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([gT('x1', 'euromillones', [3, 7, 15, 49, 50], [1, 12])]),
+      });
+      const zona = zonaComprobador(page);
+      const boton = zona.getByRole('button', { name: 'Comprobar mis combinaciones de Euromillones' });
+      // Mensajes de validarSorteo (comprobar.ts): rango 1-50, estrellas 1-12, sin repetir
+      const casos: Array<[string[], [string, string], string]> = [
+        [['51', '07', '15', '49', '50'], ['01', '12'], 'El número 1 (51) está fuera de rango: va del 1 al 50.'],
+        [['03', '4.', '15', '49', '50'], ['01', '12'], 'Falta el número 2 de la combinación ganadora, o no es un número entero.'],
+        [['03', '07', '15', '49', '50'], ['0', '12'], 'Estrellas: 0 está fuera de rango, va del 1 al 12.'],
+        [['03', '07', '15', '49', '50'], ['5', '5'], 'Las dos estrellas no pueden ser la misma: el 5 está repetido.'],
+        [['03', '07', '15', '49', '50'], ['1', '13'], 'Estrellas: 13 está fuera de rango, va del 1 al 12.'],
+      ];
+      for (const [numeros, [e1, e2], aviso] of casos) {
+        for (let i = 0; i < 5; i++) await escribirCasilla(page, zona.getByLabel(`Número ${i + 1} de la combinación ganadora`), numeros[i]);
+        await escribirCasilla(page, zona.getByLabel('Estrella 1'), e1);
+        await escribirCasilla(page, zona.getByLabel('Estrella 2'), e2);
+        await boton.click();
+        await expect(zona.locator('[class*="comprobadorError"]')).toHaveText(aviso);
+        await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveCount(0);
+      }
+    });
+
+    test('reparto: el precio vacío avisa, marca su campo y no reparte', async ({ page }) => {
+      await esperarHidratacion(page, [`${SEL_PENA} input`]);
+      await escribirT(page, premioT(page), '125.000');
+      await expect(penaT(page).locator('tbody tr')).toHaveCount(3); // precondición: con 20 € reparte
+      await escribirT(page, precioT(page), '');
+      await expect(avisoPenaT(page)).toHaveText('Indica lo que costó cada décimo o apuesta, mayor que 0 €.');
+      await expect(precioT(page)).toHaveAttribute('aria-invalid', 'true');
+      await expect(precioT(page)).toHaveAttribute('aria-describedby', 'pena-error pena-precio-ayuda');
+      await expect(penaT(page).locator('tbody tr')).toHaveCount(0);
+      await expect(penaT(page).locator('[class*="penaTotales"]')).toHaveCount(0);
+    });
+  });
+
+  test.describe('página traducida — la app entera (cabo C0243): 3288 y 3289 se sostienen', () => {
+    test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+    test('traducida UNA vez: las cinco loterías × 1/3/5/10, la ficha y «Generar números de…» dicen lo elegido', async ({ page }) => {
+      const errores = erroresT(page);
+      await esperarInteractiva(page);
+      await traducirT(page);
+      const datos: Record<Modalidad, string[]> = {
+        euromillones: ['5 números del 1 al 50 + 2 Estrellas (1-12)', 'Martes y viernes', '2,50 € / apuesta'],
+        bonoloto: ['6 números del 1 al 49 + Reintegro (0-9)', 'Lunes a domingo (todos los días)', '0,50 € / apuesta'],
+        gordo: ['5 números del 1 al 54 + Clave (0-9)', 'Domingos', '1,50 € / apuesta'],
+        lototurf: ['6 números del 1 al 31 + Caballo ganador (1-12)', 'Domingos', '1,00 € / apuesta'],
+        primitiva: ['6 números del 1 al 49 + Reintegro (0-9)', 'Lunes, jueves y sábados', '1,00 € / apuesta'],
+      };
+      const fichaDatos = page.locator('[class*="lotteryInfo"] [class*="infoItem"] > span:not([aria-hidden])');
+      for (const tipo of ['euromillones', 'bonoloto', 'gordo', 'lototurf', 'primitiva'] as Modalidad[]) {
+        await seleccionarLoteria(page, tipo);
+        for (const n of [3, 5, 10, 1] as const) {
+          await ponerCantidad(page, n);
+          await expect(botonGenerar(page)).toContainText(
+            `Generar ${n} ${n > 1 ? 'combinaciones' : 'combinación'} de ${NOMBRE_BOTON[tipo]}`);
+        }
+        await expect(page.locator('[class*="lotteryInfo"] h2')).toHaveText(NOMBRE_BOTON[tipo]);
+        await expect(fichaDatos).toHaveText(datos[tipo]);
+      }
+      for (const tipo of ['lototurf', 'bonoloto'] as Modalidad[]) {
+        await traducirT(page);
+        await page.getByRole('button', { name: `Generar números de ${NOMBRE_BOTON[tipo]}` }).click();
+        await expect(botonGenerar(page)).toContainText(`Generar 1 combinación de ${NOMBRE_BOTON[tipo]}`);
+        await expect(fichaDatos).toHaveText(datos[tipo]);
+      }
+      await enPieT(page);
+      expect(errores).toEqual([]);
+    });
+
+    test('guardadas traducidas: el tope de 20 y su aviso, quitar, el cupo y copiar una guardada', async ({ page }) => {
+      const errores = erroresT(page);
+      const veinte = Array.from({ length: 20 }, (_, i) => gT(`g${i}`, 'primitiva', [1, 2, 3, 4, 5, 10 + i], [i % 10]));
+      await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(veinte) });
+      await traducirT(page);
+      await botonGenerar(page).click();
+      await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
+      await traducirT(page);
+      const estrella = page.locator('[class*="resultCard"]').first().locator('[aria-pressed]');
+      await estrella.click();
+      await expect(page.locator('[class*="avisoTope"]')).toHaveCount(1); // lista llena: no entra
+      await traducirT(page);
+      await page.getByRole('button', { name: /^Quitar la combinación/ }).first().click();
+      await expect(page.locator('[class*="avisoTope"]')).toHaveCount(0);
+      await expect(page.locator('[class*="favoritesCupo"]')).toHaveText('Caben hasta 20: llevas 19.');
+      await traducirT(page);
+      await estrella.click();
+      await expect(estrella).toHaveText('⭐');
+      await expect(page.locator('[class*="favoritesCupo"]')).toHaveText('Caben hasta 20: llevas 20.');
+      await traducirT(page);
+      const guardada = page.locator('[class*="favoriteCard"]').first();
+      await guardada.getByRole('button', { name: /^Copiar la combinación guardada/ }).click();
+      await expect(guardada.getByText('Copiada')).toBeVisible();
+      await traducirT(page);
+      await expect(guardada.getByText('Copiada')).toHaveCount(0, { timeout: 8000 });
+      await enPieT(page);
+      expect(errores).toEqual([]);
+    });
+
+    test('comprobador traducido: quitar guardadas con el resultado a la vista, sin aciertos y de un aviso a otro', async ({ page }) => {
+      const errores = erroresT(page);
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([
+          gT('p1', 'primitiva', [2, 9, 17, 28, 36, 45], [4]),
+          gT('p2', 'primitiva', [1, 3, 5, 7, 11, 13], [0]),
+          gT('p3', 'primitiva', [2, 9, 17, 40, 41, 42], [7]),
+          gT('l1', 'lototurf', [3, 8, 12, 19, 25, 31], [7]),
+        ]),
+      });
+      const zona = zonaComprobador(page);
+      const casilla = (n: number) => zona.getByLabel(`Número ${n} de la combinación ganadora`);
+      const boton = zona.getByRole('button', { name: /Comprobar mis combinaciones/ });
+      const resumen = zona.locator('[class*="comprobadorResumen"]');
+      async function primitiva(seis: string[], comp: string, rein: string) {
+        for (let i = 0; i < 6; i++) await escribirCasilla(page, casilla(i + 1), seis[i]);
+        await escribirCasilla(page, zona.getByLabel('Complementario'), comp);
+        await escribirCasilla(page, zona.getByLabel('Reintegro'), rein);
+      }
+      await traducirT(page);
+      // p1 6 + R → especial · p2 0 (el 11 no cuenta) → sin premio · p3 3 → 5.ª
+      await primitiva(['2', '9', '17', '28', '36', '45'], '11', '4');
+      await boton.click();
+      await expect(resumen).toHaveText('2 de tus 3 combinaciones de La Primitiva tienen premio de categoría; 1 acierta el reintegro.');
+      await traducirT(page);
+      await page.getByRole('button', { name: 'Quitar la combinación 1, 3, 5, 7, 11, 13 de las guardadas' }).click();
+      await expect(resumen).toHaveText('2 de tus 2 combinaciones de La Primitiva tienen premio de categoría; 1 acierta el reintegro.');
+      await traducirT(page);
+      await primitiva(['20', '21', '22', '23', '24', '25'], '26', '5');
+      await boton.click();
+      await expect(resumen).toHaveText('Ninguna de tus 2 combinaciones de La Primitiva tiene premio de categoría.');
+      await traducirT(page);
+      await escribirCasilla(page, casilla(2), '20');
+      await boton.click();
+      await expect(zona.locator('[class*="comprobadorError"]')).toHaveText('El 20 está repetido en la combinación ganadora: en un sorteo no sale dos veces.');
+      await traducirT(page);
+      await escribirCasilla(page, casilla(2), '50');
+      await boton.click();
+      await expect(zona.locator('[class*="comprobadorError"]')).toHaveText('El número 2 (50) está fuera de rango: va del 1 al 49.');
+      await traducirT(page);
+      // Con Lototurf elegida, quitar su única guardada: vuelve a La Primitiva, sin selector
+      await zona.getByRole('button', { name: 'Lototurf', exact: true }).click();
+      await expect(zona.locator('legend')).toHaveText('Combinación ganadora de Lototurf');
+      await traducirT(page);
+      await page.getByRole('button', { name: 'Quitar la combinación 3, 8, 12, 19, 25, 31 de las guardadas' }).click();
+      await expect(zona.locator('legend')).toHaveText('Combinación ganadora de La Primitiva');
+      await expect(boton).toHaveText('Comprobar mis combinaciones de La Primitiva');
+      await expect(zona.getByRole('group', { name: 'Lotería que quieres comprobar' })).toHaveCount(0);
+      await enPieT(page);
+      expect(errores).toEqual([]);
+    });
+
+    test('reparto traducido: el aviso pasa por persona, premio sin detalle, precio, suma 0 y nombre sin caer ni quedarse viejo', async ({ page }) => {
+      const errores = erroresT(page);
+      await esperarInteractiva(page);
+      await esperarHidratacion(page, [`${SEL_PENA} input`]);
+      await traducirT(page);
+      await escribirT(page, premioT(page), '30.000');
+      await expect.poll(() => totalesT(page)).toContainEqual([`Retención del ${pctT('20')}`, eurT('0,00')]);
+      await traducirT(page);
+      await escribirT(page, premioT(page), '125.000');
+      await expect.poll(() => totalesT(page)).toContainEqual([`Retención del ${pctT('20')}`, eurT('17.000,00')]);
+      await traducirT(page);
+      await penaT(page).getByRole('button', { name: /Añadir persona/ }).click();
+      await expect(avisoPenaT(page)).toHaveText('Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Persona 4.');
+      await traducirT(page);
+      await escribirT(page, premioT(page), 'abc');
+      await escribirT(page, poneT(page, 3), '0');
+      await expect(avisoPenaT(page)).toHaveText('Indica el premio de cada décimo o apuesta premiados, mayor que 0 €.');
+      await traducirT(page);
+      await escribirT(page, premioT(page), '125.000');
+      await escribirT(page, precioT(page), '0');
+      await expect(avisoPenaT(page)).toHaveText('Indica lo que costó cada décimo o apuesta, mayor que 0 €.');
+      await traducirT(page);
+      await escribirT(page, precioT(page), '20');
+      for (let i = 0; i < 4; i++) await escribirT(page, poneT(page, i), '0');
+      await expect(avisoPenaT(page)).toHaveText('Indica lo que puso cada persona: ahora la peña suma 0 €.');
+      await traducirT(page);
+      await escribirT(page, poneT(page, 0), '-2');
+      await expect(avisoPenaT(page)).toHaveText('Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Persona 1.');
+      await traducirT(page);
+      await escribirT(page, nombreT(page, 0), 'Ana');
+      await expect(avisoPenaT(page)).toHaveText('Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Ana.');
+      await traducirT(page);
+      await escribirT(page, poneT(page, 0), '10');
+      await expect(avisoPenaT(page)).toHaveCount(0);
+      await expect(penaT(page).locator('tbody tr th').first()).toHaveText('Ana');
+      // La ayuda del precio: 0,25 → 20.000 € exentos; 0,3 → 40.000 × 0,3 / 0,50 = 24.000
+      await traducirT(page);
+      await escribirT(page, precioT(page), '0,25');
+      await expect(penaT(page).locator('#pena-precio-ayuda')).toContainText('tiene 20.000,00 € exentos');
+      await traducirT(page);
+      await escribirT(page, precioT(page), '0,3');
+      await expect(penaT(page).locator('#pena-precio-ayuda')).toContainText('tiene 24.000,00 € exentos');
+      await expect(penaT(page).locator('#pena-precio-ayuda')).not.toContainText('20.000,00');
+      await enPieT(page);
+      expect(errores).toEqual([]);
+    });
+
+    test('ABIERTO 3303 (operativa, bajo) · traducida, el rótulo de cada campo de premio sigue la numeración al añadir y quitar décimos', async ({ page }) => {
+      // Hallazgo nuevo de esta re-inspección. El rótulo del campo es «{texto}<input>» dentro del
+      // mismo <label> (RepartoPena.tsx): el texto no es el único hijo, así que con la página
+      // traducida React escribe el número nuevo en el nodo que el traductor retiró y el rótulo
+      // (que es también el nombre accesible del campo) se queda con el de antes. Medido: al añadir
+      // un 2.º décimo el 1.º sigue «Premio del décimo o apuesta (€)»; con tres y quitado el 1.º,
+      // los dos que quedan dicen «2» y «3», y el aviso «Revisa el premio del décimo o apuesta 2.»
+      // marca el campo rotulado «3». Sin traducir, el mismo flujo numera bien.
+      test.fail();
+      await esperarInteractiva(page);
+      await esperarHidratacion(page, [`${SEL_PENA} input`]);
+      await escribirT(page, premioT(page, 0), '125.000');
+      await traducirT(page);
+      await penaT(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+      await expect(penaT(page).getByLabel(/Premio del décimo o apuesta/)).toHaveCount(2);
+      expect(await rotulosPremio(page)).toEqual(['Premio del décimo o apuesta 1 (€)', 'Premio del décimo o apuesta 2 (€)']);
+      await escribirT(page, premioT(page, 1), '50.000');
+      await penaT(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+      await escribirT(page, premioT(page, 2), '-1');
+      await traducirT(page);
+      await penaT(page).getByRole('button', { name: 'Quitar el premio 1' }).click();
+      await expect(avisoPenaT(page)).toHaveText(
+        'Indica el premio de cada décimo o apuesta premiados, mayor que 0 €. Revisa el premio del décimo o apuesta 2.');
+      expect(await rotulosPremio(page)).toEqual(['Premio del décimo o apuesta 1 (€)', 'Premio del décimo o apuesta 2 (€)']);
+      // El campo que el aviso señala (aria-invalid) es el que se rotula «2»
+      expect(await penaT(page).locator('input[aria-invalid="true"]').evaluateAll((ins) =>
+        ins.map((i) => ((i as HTMLInputElement).labels?.[0]?.textContent ?? '').replace(/\s+/g, ' ').trim())))
+        .toEqual(['Premio del décimo o apuesta 2 (€)']);
+    });
+  });
+});

@@ -1780,6 +1780,31 @@ test.describe('re-inspección 14/10/2026 · escritorio', () => {
       }
       return route.fulfill({ response: await route.fetch({ url: ORIGEN + url.pathname + url.search }) });
     });
+    // Cabo C0247 (14/10/2026, tarde) — `page.route` no ve los WebSocket. Bajo `next dev` el de HMR
+    // salía a wss://meskeia.com, el de producción, y sin él la página no se hidrataba:
+    // `esperarPaginaAsentada` agotaba sus 15 s (es el C0171 de tests/apps/README.md, resuelto igual
+    // en simulador-potencial-accion). Se reenvía al servidor local; bajo `next start` no hay HMR y
+    // esto no hace nada (allí el caso ya pasaba). `allowedDevOrigins` ya admite meskeia.com.
+    const abiertos: WebSocket[] = [];
+    page.on('close', () => abiertos.forEach((s) => s.close()));
+    await page.routeWebSocket(/\/_next\/(webpack-)?hmr/, (ws) => {
+      const u = new URL(ws.url());
+      const arriba = new WebSocket(`${ORIGEN.replace(/^http/, 'ws')}${u.pathname}${u.search}`);
+      arriba.binaryType = 'arraybuffer';
+      abiertos.push(arriba);
+      const cola: (string | Buffer)[] = [];
+      arriba.onopen = () => {
+        for (const m of cola) arriba.send(m);
+        cola.length = 0;
+      };
+      ws.onMessage((m) => {
+        if (arriba.readyState === WebSocket.OPEN) arriba.send(m);
+        else cola.push(m);
+      });
+      arriba.onmessage = (e: MessageEvent) =>
+        ws.send(typeof e.data === 'string' ? e.data : Buffer.from(e.data as ArrayBuffer));
+      ws.onClose(() => arriba.close());
+    });
     const altas: string[] = [];
     page.on('request', (r) => {
       if (r.method() === 'POST' && new URL(r.url()).pathname === '/api/analytics/track/') {
@@ -1895,6 +1920,11 @@ test.describe('re-inspección 14/10/2026 · móvil 360×740', () => {
     };
     for (const [caso, valor] of Object.entries(imposibles)) {
       await page.goto(RUTA);
+      // 14/10/2026 (tarde) — esta carga RECUPERA el test a medias de arriba (nueve B), y el efecto
+      // que lo guarda corre tras hidratar: sembrar antes de que se asiente dejaba que la app
+      // reescribiera la sesión válida encima de la imposible, y la carga siguiente caía en la
+      // pregunta 10 («con 9 de 10 respuestas») en vez de en la portada. Era el test, no la app.
+      await esperarPaginaAsentada(page);
       await page.evaluate(([k, v]) => sessionStorage.setItem(k, v), [CLAVE, valor]);
       await page.goto(RUTA);
       await esperarPaginaAsentada(page);
@@ -1947,5 +1977,366 @@ test.describe('re-inspección 14/10/2026 · móvil 360×740', () => {
       }
     }
     expect(tapadas).toEqual([]);
+  });
+});
+
+// ============================================================
+// RE-INSPECCIÓN 14/10/2026 (tarde) — tras 53b0bb48 (3285, 3286 y 3287) y cd462414
+//
+// LAS REPARACIONES DE HOY.
+//   3285 SE SOSTIENE: tocando B y «Siguiente» al pie (20 px del borde) en las nueve transiciones,
+//   el progreso queda en 66–89 px y el enunciado entero bajo la barra (62 px) a 360×740, 375×667,
+//   390×844, 412×915 y 740×360 (horizontal); «← Anterior» al pie, igual; y en 1280×800 la vista no
+//   se mueve (no hacía falta). Vecino nuevo, en el caso 2: el salto de «Completar las que faltan».
+//   3286 SE SOSTIENE en su caso (description y portada); su hermano en el featureList del JSON-LD
+//   («Recomendaciones orientativas según el perfil obtenido») queda abierto aparte, abajo.
+//   3287 SE SOSTIENE: ni «§» ni notas internas en el texto visible ni en los JSON-LD.
+//
+// EFECTO DE 53b0bb48 SOBRE EL 3233 (abierto). Al recolocar la vista, lo que queda bajo el dedo tras
+// tocar «Siguiente» al pie es una opción de la pregunta nueva: a 360×740, con dos toques a 90 ms, el
+// segundo marcó C o D (3 o 4 puntos) en 9 de 9 transiciones (antes, en 2: la 1→2 y la 7→8). Su
+// test.fail del 12/10 sigue fallando, ahora por la opción marcada y no por «← Anterior».
+//
+// CABO C0247. El caso «firma» del bloque de escritorio de la mañana pasa aquí (next start, 3052).
+// Bajo `next dev` fallaba porque `page.route` no ve el WebSocket de HMR (ver el comentario dentro).
+//
+// LOS CASOS, resueltos a mano antes de abrir el navegador (A=1 · B=2 · C=3 · D=4; flecha =
+// i·20 + 2 + (p − mín)/(máx − mín)·16 con el tramo del perfil):
+//   normal  → SOLO TECLADO (1280×800): D,A,C,A; en la 5, sin contestar, «← Anterior» y la 4 de A a C;
+//             luego B,A,C,B,B,C = 4+1+3+3+2+1+3+2+2+3 = 24 → Equilibrado (23–28), sin aviso de borde,
+//             flecha 40 + 2 + 1/5·16 = 45,2 %. Sin la corrección serían 22 → Moderado con aviso.
+//   límite  → sesión recuperada {pregunta 10; 1, 2 y 4-9 = D} (sin la 3 ni la 10) a 375×667, tocando:
+//             A en la 10 → «Completar las que faltan →» → la 3, B → 4·8 + 2 + 1 = 35, suelo de
+//             Agresivo (35–40) con aviso de borde, flecha 80 + 2 + 0 = 82 %. Con A en la 3: 34, Dinámico.
+//   rechazo → dos activaciones seguidas de «Comenzar Test» (dos clics a 250 ms en 1280×800; dos
+//             toques a 90 ms en 360×740): esperado «Pregunta 1 de 10» sin opción marcada y
+//             «Siguiente» deshabilitado. HALLAZGO: el segundo cae sobre una opción de la pregunta 1.
+// ============================================================
+
+// ---------- CASO 1 (normal) y CASO 3 (rechazo) en escritorio, y el contenido ----------
+test.describe('re-inspección 14/10/2026 (tarde) · escritorio', () => {
+  test.use({
+    viewport: { width: 1280, height: 800 },
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  });
+  const puntuacion = (page: Page) => page.locator('p[class*="resultScore"]');
+  const avisoDeBorde = (page: Page) => page.locator('[class*="resultScoreBorde"]');
+  const marcadas = (page: Page) => page.locator('[class*="optionButton"][aria-pressed="true"]');
+
+  test('caso normal, solo con teclado: D,A,C,A, «← Anterior» desde la 5 para pasar la 4 de A a C, y B,A,C,B,B,C suma 24 → Equilibrado', async ({
+    page,
+  }) => {
+    await cargarSinSesion(page);
+    // El punto de partida es el botón; desde ahí, nada más que teclas.
+    await page.getByRole('button', { name: /Comenzar Test/ }).focus();
+    await page.keyboard.press('Enter');
+    // 2177: el foco va al enunciado de la pregunta 1
+    await expect(enunciado(page)).toBeFocused();
+
+    /**
+     * Desde el enunciado o la tarjeta (los dos con tabIndex −1, fuera del orden de tabulación),
+     * Tab ×(i+1) llega a la opción i; Espacio la marca; Tab hasta «Siguiente» —pasando por las
+     * opciones que quedan y por «← Anterior», que en la 1 está deshabilitado— y Enter.
+     */
+    const contestar = async (n: number, i: number): Promise<void> => {
+      await expect(page.getByText(`Pregunta ${n} de 10`)).toBeVisible();
+      for (let k = 0; k <= i; k++) await page.keyboard.press('Tab');
+      await expect(opcion(page, i)).toBeFocused();
+      await page.keyboard.press('Space');
+      await expect(opcion(page, i)).toHaveAttribute('aria-pressed', 'true');
+      const pasos = 3 - i + (n > 1 ? 1 : 0) + 1;
+      for (let k = 0; k < pasos; k++) await page.keyboard.press('Tab');
+      await expect(botonSiguiente(page)).toBeFocused();
+      await page.keyboard.press('Enter');
+    };
+
+    await contestar(1, 3); // D = 4
+    await contestar(2, 0); // A = 1
+    await contestar(3, 2); // C = 3
+    await contestar(4, 0); // A = 1
+    // En la 5, sin contestar: «Siguiente» deshabilitado, así que Tab ×5 (A-D y «← Anterior»)
+    await expect(page.getByText('Pregunta 5 de 10')).toBeVisible();
+    await expect(botonSiguiente(page)).toBeDisabled();
+    for (let k = 0; k < 5; k++) await page.keyboard.press('Tab');
+    await expect(botonAnterior(page)).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 4 de 10')).toBeVisible();
+    await expect(opcion(page, 0)).toHaveAttribute('aria-pressed', 'true'); // la A de la 4 sigue
+    await contestar(4, 2); // A → C: +2
+    await expect(page.getByText('Pregunta 5 de 10')).toBeVisible();
+    await expect(marcadas(page)).toHaveCount(0); // la 5 sigue sin contestar
+    const resto: Array<[number, number]> = [
+      [5, 1], // B = 2
+      [6, 0], // A = 1
+      [7, 2], // C = 3
+      [8, 1], // B = 2
+      [9, 1], // B = 2
+      [10, 2], // C = 3
+    ];
+    for (const [n, i] of resto) await contestar(n, i);
+
+    // 4 + 1 + 3 + 3 + 2 + 1 + 3 + 2 + 2 + 3 = 24 → tramo 23–28
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(puntuacion(page)).toContainText('24 puntos · tramo 23–28');
+    await expect(avisoDeBorde(page)).toHaveCount(0); // ni 23 ni 28
+    // 2·20 + 2 + (24−23)/(28−23)·16 = 45,2 %; con la 4 sin corregir (22) estaría en el segmento 1
+    expect(await izquierdaFlecha(page)).toBeCloseTo(45.2, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(2);
+    // PROFILES.equilibrado
+    await expect(rasgo(page, 0)).toHaveText('Medio');
+    await expect(rasgo(page, 1)).toHaveText('5-10 años');
+    await expect(rasgo(page, 2)).toHaveText('12-15 %');
+    await expect(rasgo(page, 3)).toHaveText('Crecimiento sostenido');
+    // El % va con espacio duro (U+00A0), como manda la norma del 25/09/2026 (hallazgo 2180)
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (50 %)',
+      'Renta Fija (35 %)',
+      'Liquidez (10 %)',
+      'Alternativos (5 %)',
+    ]);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=equilibrado',
+    );
+    // El foco acaba en el encabezado del resultado, y la sesión a medias se ha retirado
+    await expect(page.getByRole('heading', { name: 'Tu perfil es:' })).toBeFocused();
+    expect(await page.evaluate(() => sessionStorage.getItem('meskeia:test-perfil-inversor:v1'))).toBeNull();
+  });
+
+  test.fail('HALLAZGO 3299 — dos clics seguidos en «Comenzar Test» no contestan la pregunta 1', async ({ page }) => {
+    // Esperado: «Pregunta 1 de 10» sin opción marcada y «Siguiente» deshabilitado.
+    // Obtenido (14/10/2026, tarde): «B · 2 a 5 años - Plazo medio» marcada (aria-pressed) y
+    // «Siguiente» habilitado, con 120 y con 250 ms entre clics. El primer clic cambia de fase y
+    // lleva la vista al cuestionario (2177); bajo el puntero queda la opción B, y el segundo clic
+    // la elige. Mismo mecanismo que el 3233 con «Siguiente».
+    await cargarSinSesion(page);
+    const comenzar = page.getByRole('button', { name: /Comenzar Test/ });
+    await comenzar.scrollIntoViewIfNeeded();
+    const caja = await comenzar.boundingBox();
+    expect(caja).not.toBeNull();
+    const x = caja!.x + caja!.width / 2;
+    const y = caja!.y + caja!.height / 2;
+    await page.mouse.click(x, y);
+    await page.waitForTimeout(250);
+    await page.mouse.click(x, y);
+    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+    await page.waitForTimeout(200);
+    await expect(marcadas(page)).toHaveCount(0);
+    await expect(botonSiguiente(page)).toBeDisabled();
+  });
+
+  // ---------- Contenido ----------
+  test.fail('HALLAZGO 3300 — el featureList del JSON-LD no promete «recomendaciones» que el resultado niega', async ({
+    page,
+  }) => {
+    // Hermano del 3286 en el tercer canal: la description y la portada ya no prometen
+    // recomendaciones, pero el featureList que leen buscadores e IAs dice «Recomendaciones
+    // orientativas según el perfil obtenido», y el resultado: «Son ejemplos ilustrativos, no una
+    // recomendación de inversión ni de producto».
+    await cargarSinSesion(page);
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const app = bloques
+      .map((b) => JSON.parse(b) as { '@type'?: string; featureList?: string[] })
+      .find((b) => b['@type'] === 'WebApplication');
+    expect(app, 'la página no sirve un WebApplication').toBeTruthy();
+    const caracteristicas = app!.featureList ?? [];
+    expect(caracteristicas.length).toBeGreaterThanOrEqual(4); // §1.ter
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]); // 3+2+3+1+4+2+3+3+2+3 = 26 → Equilibrado
+    await expect(page.locator('[class*="recomendacionesNota"]')).toContainText(
+      'no una recomendación de inversión',
+    );
+    expect(caracteristicas.filter((c) => /recomendaci/i.test(c))).toEqual([]);
+  });
+
+  test.fail('HALLAZGO 3301 — la guía no pega palabras entre sí al cerrar o abrir una negrita', async ({ page }) => {
+    // En el JSX, un salto de línea pegado a una etiqueta se come el espacio: «</strong>⏎(3–6 meses»
+    // se pinta «emergencia(3–6 meses». Obtenido (14/10/2026, tarde), en el texto visible de la guía:
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    await expect(page.locator('[class*="stepGuideSection"]')).toBeVisible();
+    const texto = await page.locator('body').innerText();
+    const pegadas = [
+      'emergencia(3–6', // «¿Puedo tener dos perfiles…?»: «…fondo de emergencia(3–6 meses…»
+      'jubilación(que', // la misma: «…dinámico para la jubilación(que queda a 30+ años)»
+      'adquisitivoen', // «¿Cómo afecta la inflación…?»: «…perder poder adquisitivoen términos reales»
+      'reclamaciones.El', // «¿Qué pasa si el banco…?»: «…reducir reclamaciones.El perfil del banco…»
+      'pánicodurante', // «¿Existe un perfil perfecto…?»: «…sin vender en pánicodurante una crisis»
+      'más?Tu', // paso 4: «¿Vendes, mantienes o compras más?Tu respuesta honesta…»
+    ];
+    expect(pegadas.filter((p) => texto.includes(p))).toEqual([]);
+  });
+
+  test.fail('HALLAZGO 3302 — «Familia con hipoteca» no da 20–25 años como el horizonte de Equilibrado (5–10) y Dinámico (10–15)', async ({
+    page,
+  }) => {
+    // «…el dinero de la jubilación no se toca en 20–25 años, y ese horizonte es el de los perfiles
+    // Equilibrado (5–10 años) y Dinámico (10–15).» 20–25 no cae en ninguno de los dos tramos que la
+    // misma frase cita; el resultado de la app da «Horizonte ideal > 15 años» al Agresivo.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const tarjeta = page.locator('[class*="escenarioCard"]').filter({ hasText: 'Familia con hipoteca' });
+    await expect(tarjeta).toHaveCount(1);
+    const texto = sinEspacios(await tarjeta.innerText());
+    const letra = '[A-Za-zÁÉÍÓÚáéíóú]+';
+    const m = texto.match(
+      new RegExp(`(\\d+)–(\\d+) años, y ese horizonte es el de los perfiles (${letra}) \\((\\d+)–(\\d+) años\\) y (${letra}) \\((\\d+)–(\\d+)\\)`),
+    );
+    const contradicciones: string[] = [];
+    if (m) {
+      const [desde, hasta] = [Number(m[1]), Number(m[2])];
+      for (const [nombre, a, b] of [
+        [m[3], Number(m[4]), Number(m[5])],
+        [m[6], Number(m[7]), Number(m[8])],
+      ] as const) {
+        if (desde > b || hasta < a) contradicciones.push(`${desde}–${hasta} años no es el horizonte de ${nombre} (${a}–${b})`);
+      }
+    }
+    expect(contradicciones).toEqual([]);
+  });
+
+  test('REPARADO 3287 (vecinos) — ninguna nota interna en el texto visible ni en los JSON-LD, en portada, guía y resultado', async ({
+    page,
+  }) => {
+    const interna = /§|CLAUDE\.md|hallazgo \d|cabo C\d|Inspector/;
+    await cargarSinSesion(page);
+    const estructurados = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(estructurados).not.toMatch(interna);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    await expect(page.locator('[class*="stepGuideSection"]')).toBeVisible();
+    expect(await page.locator('body').innerText()).not.toMatch(interna);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responder(page, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]); // 20 → Moderado
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    expect(await page.locator('[class*="resultScreen"]').innerText()).not.toMatch(interna);
+  });
+});
+
+// ---------- CASO 2 (límite) y los vecinos del 3285, móvil 375×667 ----------
+test.describe('re-inspección 14/10/2026 (tarde) · móvil 375×667', () => {
+  test.use({
+    viewport: { width: 375, height: 667 },
+    userAgent: UA_MOVIL_1410,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const marcadas = (page: Page) => page.locator('[class*="optionButton"][aria-pressed="true"]');
+
+  /** Como un dedo: desplaza hasta ver el botón entero a 20 px del borde y lo toca en su centro. */
+  async function tocarAlPie(page: Page, boton: Locator): Promise<void> {
+    await boton.evaluate((el) => {
+      const abajo = el.getBoundingClientRect().bottom;
+      if (abajo > window.innerHeight - 20) window.scrollBy(0, abajo - (window.innerHeight - 20));
+    });
+    const caja = await boton.boundingBox();
+    expect(caja).not.toBeNull();
+    await page.touchscreen.tap(caja!.x + caja!.width / 2, caja!.y + caja!.height / 2);
+  }
+
+  test('caso límite tocando: sesión recuperada sin la 3 ni la 10 (ocho D), A en la 10, «Completar las que faltan», B en la 3 → 35, suelo de Agresivo', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    const CLAVE = 'meskeia:test-perfil-inversor:v1';
+    await cargarSinSesion(page);
+    await page.evaluate(
+      ([k, v]) => sessionStorage.setItem(k, v),
+      [CLAVE, JSON.stringify({ currentQuestion: 9, answers: { 1: 4, 2: 4, 4: 4, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4 } })],
+    );
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+    await expect(page.getByText(/Hemos recuperado el test/)).toContainText('con 8 de 10 respuestas');
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    await expect(marcadas(page)).toHaveCount(0);
+    await expect(botonSiguiente(page)).toHaveText('Ver Resultado');
+    await expect(botonSiguiente(page)).toBeDisabled();
+
+    await opcion(page, 0).tap(); // A = 1 en la 10; faltan la 3
+    await expect(botonSiguiente(page)).toHaveText('Completar las que faltan →');
+    await tocarAlPie(page, botonSiguiente(page));
+    // Sin resultado: a la primera sin contestar, la 3, con la vista arriba (3285 en el salto)
+    await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+    await expect(perfilMostrado(page)).toHaveCount(0);
+    await expect(marcadas(page)).toHaveCount(0);
+    await expect(botonSiguiente(page)).toBeDisabled();
+    await enteroALaVista(page, page.getByText('Pregunta 3 de 10'));
+    await enteroALaVista(page, enunciado(page));
+
+    await opcion(page, 1).tap(); // B = 2 en la 3
+    for (let n = 4; n <= 10; n++) {
+      await tocarAlPie(page, botonSiguiente(page));
+      await expect(page.getByText(`Pregunta ${n} de 10`)).toBeVisible();
+      await expect(marcadas(page)).toHaveCount(1); // D de la sesión en la 4-9; la A recién puesta en la 10
+      // 3285 a 375×667 (antes, 0 px visibles en las nueve): progreso y enunciado enteros
+      await enteroALaVista(page, page.getByText(`Pregunta ${n} de 10`));
+      await enteroALaVista(page, enunciado(page));
+    }
+    await expect(botonSiguiente(page)).toHaveText('Ver Resultado');
+    await tocarAlPie(page, botonSiguiente(page));
+
+    // 4·8 + 2 + 1 = 35 → tramo 35–40, y 35 es su suelo (35 > 10): aviso de borde
+    await expect(perfilMostrado(page)).toHaveText('Agresivo');
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('35 puntos · tramo 35–40');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(1);
+    // 4·20 + 2 + (35−35)/(40−35)·16 = 82 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(82, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(4);
+    // PROFILES.agresivo
+    await expect(rasgo(page, 0)).toHaveText('Muy alto');
+    await expect(rasgo(page, 1)).toHaveText('> 15 años');
+    await expect(rasgo(page, 2)).toHaveText('20-25 %');
+    await expect(rasgo(page, 3)).toHaveText('Máxima rentabilidad');
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (90 %)',
+      'Renta Fija (5 %)',
+      'Liquidez (0 %)',
+      'Alternativos (5 %)',
+    ]);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=agresivo',
+    );
+    expect(await page.evaluate((k) => sessionStorage.getItem(k), CLAVE)).toBeNull();
+
+    // Vecino del 3285: «← Anterior» al pie también deja la pregunta nueva a la vista
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).tap();
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    await tocarAlPie(page, botonAnterior(page));
+    await expect(page.getByText('Pregunta 9 de 10')).toBeVisible();
+    await enteroALaVista(page, page.getByText('Pregunta 9 de 10'));
+    await enteroALaVista(page, enunciado(page));
+  });
+});
+
+// ---------- CASO 3 (rechazo) tocando, móvil 360×740 ----------
+test.describe('re-inspección 14/10/2026 (tarde) · móvil 360×740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: UA_MOVIL_1410,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test.fail('HALLAZGO 3299 — un doble toque en «Comenzar Test» no contesta la pregunta 1', async ({ page }) => {
+    // Esperado: «Pregunta 1 de 10» sin opción marcada y «Siguiente» deshabilitado.
+    // Obtenido (14/10/2026, tarde): con 90 ms entre toques, «A · Menos de 2 años» marcada a 360×740
+    // (y «B · 2 a 5 años» a 390×844, con 150 ms).
+    await cargarSinSesion(page);
+    const comenzar = page.getByRole('button', { name: /Comenzar Test/ });
+    await comenzar.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    const caja = await comenzar.boundingBox();
+    expect(caja).not.toBeNull();
+    const x = caja!.x + caja!.width / 2;
+    const y = caja!.y + caja!.height / 2;
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(90);
+    await page.touchscreen.tap(x, y);
+    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+    await page.waitForTimeout(200);
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(0);
+    await expect(botonSiguiente(page)).toBeDisabled();
   });
 });

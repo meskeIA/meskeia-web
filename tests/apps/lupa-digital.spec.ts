@@ -1260,3 +1260,323 @@ test.describe('re-inspección 14/10/2026 — zoom de la cámara', () => {
     });
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN (Inspector, 14/10/2026, tarde) — tras bcba03bb (hallazgos 3290 y 3291)
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Lo que no cubrían las inspecciones anteriores: la pantalla retenida (wake lock) y «Detener»
+ * con la imagen congelada y el zoom de cámara activo (CASO 8, en móvil); la cámara que acepta un
+ * zoom y después no vuelve a 1, que es la rama NUEVA de bcba03bb («se reparte con el zoom en que
+ * se ha quedado», CASO 9); y la cámara que rechaza ya el PRIMER zoom (CASO 10). Mismo simulador de
+ * cámara por pista que el bloque anterior; los valores esperados salen de repartirZoom()
+ * (app/lupa-digital/zoom.ts) y del catch del efecto de page.tsx, calculados a mano.
+ */
+type VentanaConWakeLock = Window & { __wake: { tipo: string; liberado: boolean }[] };
+
+/** Wake lock simulado: anota cada petición y cada liberación (Chromium headless no lo concede). */
+async function simularWakeLock(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as unknown as VentanaConWakeLock;
+    w.__wake = [];
+    Object.defineProperty(navigator, 'wakeLock', {
+      configurable: true,
+      value: {
+        request: async (tipo: string) => {
+          const n = w.__wake.push({ tipo, liberado: false }) - 1;
+          return {
+            type: tipo,
+            released: false,
+            release: async () => {
+              w.__wake[n].liberado = true;
+            },
+          };
+        },
+      },
+    });
+  });
+}
+
+const wakeLocks = (page: Page) => page.evaluate(() => (window as unknown as VentanaConWakeLock).__wake);
+
+test.describe('re-inspección 14/10/2026 (tarde)', () => {
+  test.describe('en móvil (Pixel 7)', () => {
+    // Opciones enumeradas: `...devices['Pixel 7']` arrastra `defaultBrowserType` y fuerza un
+    // worker nuevo, que Playwright no admite dentro de un describe.
+    const P7 = devices['Pixel 7'];
+    test.use({
+      viewport: P7.viewport,
+      userAgent: P7.userAgent,
+      deviceScaleFactor: P7.deviceScaleFactor,
+      isMobile: P7.isMobile,
+      hasTouch: P7.hasTouch,
+    });
+
+    test('CASO 8 — la pantalla se retiene mientras la lupa está encendida (también congelada); «Detener» desde la imagen congelada apaga y libera todo, y al volver a activar la pista nueva recibe su zoom', async ({
+      page,
+    }) => {
+      await simularCamaraPorPista(page, { trasera: { min: 1, max: 3, step: 0.1 }, frontal: null });
+      await simularWakeLock(page);
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      expect(await wakeLocks(page)).toEqual([]); // sin lupa no se retiene nada
+
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      await expect.poll(() => wakeLocks(page)).toEqual([{ tipo: 'screen', liberado: false }]);
+
+      // 4x con una cámara de 1-3x en pasos de 0,1: cámara min(4, 3) = 3 (30 pasos); pantalla
+      // 4 / 3 = 1,333 (repartirZoom redondea a milésimas).
+      await page.getByRole('button', { name: '4x', exact: true }).click();
+      await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 3, pantalla: 1.333 });
+
+      // Congelada a 4x: la imagen ya trae los 3x de la cámara → en pantalla 4 / 3 = 1,333. La
+      // pantalla sigue retenida: es justo cuando se suelta el móvil.
+      await page.getByRole('button', { name: /Congelar/i }).click();
+      const lienzo = page.locator('canvas');
+      await expect(lienzo).toHaveAttribute('style', /scale\(1\.333\)/);
+      expect(await wakeLocks(page)).toEqual([{ tipo: 'screen', liberado: false }]);
+
+      // «Detener» desde la imagen congelada (detenerCamara): pista terminada, pantalla liberada,
+      // sin lienzo ni controles de una cámara apagada, y el visor vuelve a invitar a activar.
+      await page.getByRole('button', { name: /Detener/i }).click();
+      await expect(page.getByText('Pulsa para activar la lupa')).toBeVisible();
+      await expect(lienzo).toBeHidden();
+      await expect(page.locator('video')).toBeHidden();
+      await expect(page.getByRole('button', { name: /Congelar|Reanudar|Cambiar cámara/i })).toHaveCount(0);
+      expect(await wakeLocks(page)).toEqual([{ tipo: 'screen', liberado: true }]);
+      expect(
+        await page.evaluate(() => (window as unknown as VentanaConCamara).__pistas.map((p) => p.t.readyState)),
+      ).toEqual(['ended']);
+
+      // Activar otra vez: pista NUEVA (la 1) que recibe su 3 desde cero; el vídeo, que se pausó al
+      // congelar, vuelve a reproducirse (esperarCamaraEnMarcha exige paused === false) y el 4x se
+      // mantiene: 3 × 1,333. Se vuelve a retener la pantalla.
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      await expect.poll(async () => (await zoomPedidoPorPista(page)).at(-1)).toEqual({ pista: 1, zoom: 3 });
+      await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 3, pantalla: 1.333 });
+      await expect(page.locator('[class*=zoomIndicador]')).toHaveText('4x');
+      await expect(page.locator('[class*=zoomNota]')).toHaveText(
+        'La cámara hace 3x y el resto (1,3x) se amplía en pantalla.',
+      );
+      await expect(lienzo).toBeHidden();
+      await expect.poll(() => wakeLocks(page)).toEqual([
+        { tipo: 'screen', liberado: true },
+        { tipo: 'screen', liberado: false },
+      ]);
+    });
+  });
+
+  test('CASO 9 — una cámara que acepta 2x y después no se mueve (ni para volver a 1): se reparte con los 2x en que se quedó, lo que se ve es lo que marca el indicador y no entra en bucle', async ({
+    page,
+  }) => {
+    const camaras = { trasera: { min: 1, max: 3, step: 0.1 }, frontal: { min: 1, max: 3, step: 0.1 } };
+    await simularCamaraPorPista(page, camaras);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: /Activar lupa/i }).click();
+    await esperarCamaraEnMarcha(page);
+    const nota = page.locator('[class*=zoomNota]');
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 1, total: 2 });
+
+    // Desde aquí la cámara rechaza cualquier zoom (rechazarPorEncima: 0), también el 1.
+    await cambiarCamaraSimulada(page, { ...camaras, rechazarPorEncima: 0 });
+
+    // 3x: pide 3 (rechazado), intenta volver a 1 (rechazado) y getSettings dice 2 → rango {2..2}:
+    // cámara 2 y pantalla 3 / 2 = 1,5. El efecto se repite una vez con el rango nuevo (2 y 1,
+    // rechazados) y, como el rango fijado ya no cambia, se para: [2, 3, 1, 2, 1] y ni uno más.
+    await page.getByRole('button', { name: '3x', exact: true }).click();
+    await expect.poll(async () => (await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 3, 1, 2, 1]);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 1.5, total: 3 });
+    await expect(page.locator('[class*=zoomIndicador]')).toHaveText('3x');
+    await expect(nota).toHaveText('La cámara hace 2x y el resto (1,5x) se amplía en pantalla.');
+    await page.waitForTimeout(500);
+    expect(await zoomPedidoPorPista(page)).toHaveLength(5); // sin bucle
+
+    // 5x: 2 × 2,5. La parte de la cámara no cambia, así que no se le pide nada.
+    await page.getByRole('button', { name: '5x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 2.5, total: 5 });
+    await expect(nota).toHaveText('La cámara hace 2x y el resto (2,5x) se amplía en pantalla.');
+    expect(await zoomPedidoPorPista(page)).toHaveLength(5);
+
+    // Congelada a 5x: la imagen trae los 2x de la cámara → en pantalla 5 / 2 = 2,5.
+    await page.getByRole('button', { name: /Congelar/i }).click();
+    await expect(page.locator('canvas')).toHaveAttribute('style', /scale\(2\.5\)/);
+    // Reanudar: se le vuelve a pedir su 2 (rechazado → 1, rechazado) y queda igual: 7 y se para.
+    await page.getByRole('button', { name: /Reanudar/i }).click();
+    await expect.poll(async () => (await zoomPedidoPorPista(page)).length).toBe(7);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 2.5, total: 5 });
+    await page.waitForTimeout(500);
+    expect(await zoomPedidoPorPista(page)).toHaveLength(7);
+
+    // Frontal (pista 1, recién abierta sin ampliar, que también lo rechaza todo): pide min(5, 3) = 3
+    // → rechazado → 1 → rechazado; getSettings dice 1 → sin rango: todo en pantalla y sin nota.
+    await page.getByRole('button', { name: /Cambiar cámara/i }).click();
+    await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'user', camara: 1, pantalla: 5, total: 5 });
+    expect((await zoomPedidoPorPista(page)).filter((p) => p.pista === 1).map((p) => p.zoom)).toEqual([3, 1]);
+    await expect(nota).toHaveCount(0);
+  });
+
+  test('CASO 10 — si la cámara rechaza ya el PRIMER zoom, todo va a la pantalla y la nota no aparece; al volver a activar se le pide otra vez', async ({
+    page,
+  }) => {
+    await simularCamaraPorPista(page, {
+      trasera: { min: 1, max: 3, step: 0.1 },
+      frontal: null,
+      rechazarPorEncima: 1.5,
+    });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    const activar = page.getByRole('button', { name: /Activar lupa/i });
+    const nota = page.locator('[class*=zoomNota]');
+    await activar.click();
+    await esperarCamaraEnMarcha(page);
+
+    // 2x por defecto: pide 2 (rechazado), vuelve a 1 (aceptado), getSettings dice 1 → sin rango.
+    // Todo en pantalla: cámara 1 × scale(2). Sin nota, que es como la FAQ dice que se reconoce
+    // («si no aparece esa línea, todo el zoom se hace en pantalla»).
+    await expect.poll(async () => (await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 1]);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 1, pantalla: 2, total: 2 });
+    await expect(nota).toHaveCount(0);
+
+    // 1,5x: sin rango no se le pide nada más a la cámara; pantalla 1,5.
+    await page.getByRole('button', { name: '1,5x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 1, pantalla: 1.5, total: 1.5 });
+    expect(await zoomPedidoPorPista(page)).toHaveLength(2);
+    // Congelada: la cámara estaba en 1 → en pantalla 1,5 / 1 = 1,5.
+    await page.getByRole('button', { name: /Congelar/i }).click();
+    await expect(page.locator('canvas')).toHaveAttribute('style', /scale\(1\.5\)/);
+
+    // Detener y activar: pista nueva (la 1), rango leído otra vez {1..3}; a 1,5x pide 1,5, que esta
+    // cámara sí acepta (no pasa de 1,5) → la cámara hace los 1,5x y la pantalla nada.
+    await page.getByRole('button', { name: /Detener/i }).click();
+    await activar.click();
+    await esperarCamaraEnMarcha(page);
+    await expect.poll(async () => (await zoomPedidoPorPista(page)).at(-1)).toEqual({ pista: 1, zoom: 1.5 });
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 1.5, pantalla: 1, total: 1.5 });
+    await expect(nota).toHaveText(/^Los 1,5x los hace la propia cámara/);
+  });
+
+  // ⚠️ HALLAZGO NUEVO — operativa (14/10/2026, tarde). La rama nueva de bcba03bb (reparación de
+  // 3291): si la cámara no vuelve a 1, el rango se fija en el zoom en que se quedó ({2..2}). Con
+  // el usuario por DEBAJO de ese zoom, repartirZoom da pantalla < 1 (a 1x, 1 / 2 = 0,5: el vídeo a
+  // la mitad del visor, con borde negro) y la nota cae en la rama «pantalla < 1,05»: «Los 2x los
+  // hace la propia cámara…» con el indicador en 1x. Es el mismo síntoma que la ficha de 3290
+  // describía para un mínimo de 2, reintroducido por otra vía. Lo que se ve sí es 1x (2 × 0,5).
+  // Caso: cámara {1..3} que acepta 2x y luego lo rechaza todo; 3x y después 1x → esperado: la nota
+  //       no atribuye a la cámara más aumento del que marca el indicador · obtenido «Los 2x los
+  //       hace la propia cámara, sobre la imagen completa del sensor…» con el indicador en «1x».
+  test('HALLAZGO 3304 (operativa) — con la cámara clavada en 2x, a 1x la nota no debe decir que «Los 2x los hace la propia cámara»', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+    const camaras = { trasera: { min: 1, max: 3, step: 0.1 }, frontal: null };
+    await simularCamaraPorPista(page, camaras);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: /Activar lupa/i }).click();
+    await esperarCamaraEnMarcha(page);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 1 });
+    await cambiarCamaraSimulada(page, { ...camaras, rechazarPorEncima: 0 });
+    await page.getByRole('button', { name: '3x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 1.5, total: 3 });
+
+    // 1x: cámara 2 (no baja) y pantalla 1 / 2 = 0,5. Lo que se ve es 1x, como marca el indicador.
+    await page.getByRole('button', { name: '1x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 0.5, total: 1 });
+    await expect(page.locator('[class*=zoomIndicador]')).toHaveText('1x');
+    // DEBERÍA: la nota no contradice al indicador.
+    await expect(page.locator('[class*=zoomNota]')).not.toHaveText(/^Los 2x los hace la propia cámara/);
+  });
+
+  // ⚠️ HALLAZGO 3306, vecino del 3290 (cuyo caso, 100-500, sí se sostiene) — operativa (14/10/2026,
+  // tarde). bcba03bb descarta un rango con mínimo por encima de 1 (zoom.ts: «Un mínimo por
+  // encima de 1 no cabe en un aumento»), pero no
+  // uno que empieza en 0, que tampoco cabe (0 no es un aumento: la app nunca pide menos de 1) y es
+  // la otra forma de dar el zoom en unidades propias (0-10, por ejemplo). Se trata como aumentos:
+  // a 2x pide zoom 2 a la cámara, no amplía nada en pantalla y la nota dice «Los 2x los hace la
+  // propia cámara»; a 1x pide 1, un paso por encima del suelo de esa cámara.
+  // Caso: cámara {0..10, paso 1}, activar (2x) → esperado, como con 100-500: nada pedido a la
+  //       cámara, vídeo a scale(2) y sin nota · obtenido applyConstraints({zoom: 2}), scale(1) y
+  //       «Los 2x los hace la propia cámara…».
+  test('HALLAZGO 3306 (operativa, vecino del 3290) — una cámara que da el zoom en unidades propias desde 0 (0-10) tampoco debe tratarse como aumentos', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+    await simularCamaraPorPista(page, { trasera: { min: 0, max: 10, step: 1 }, frontal: null });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: /Activar lupa/i }).click();
+    await esperarCamaraEnMarcha(page);
+    await expect(page.locator('[class*=zoomIndicador]')).toHaveText('2x');
+    await page.waitForTimeout(500);
+    // DEBERÍA: rango descartado → todo en pantalla.
+    expect(await zoomPedidoPorPista(page)).toEqual([]);
+    await expect(page.locator('video')).toHaveAttribute('style', /transform: scale\(2\)/);
+    await expect(page.locator('[class*=zoomNota]')).toHaveCount(0);
+  });
+
+  // ⚠️ HALLAZGO NUEVO — accesibilidad (14/10/2026, tarde). Dos botones de ESTADO pintan texto
+  // blanco sobre un color escrito a mano en LupaDigital.module.css, sin variante oscura:
+  // «⏹️ Detener» (.btnPrincipal.activo, #EF4444; 19,2 px con peso 600, que no es negrita para
+  // WCAG/axe —700—, así que exige 4,5:1) da 3,76:1, y «🔦 Linterna ON» (.linternaActiva,
+  // #F59E0B; 16 px) da 2,15:1, por debajo incluso del 3:1 del texto grande. Fuera del 3274 (que
+  // recoge texto EN color de marca) y de la campaña C0070 (blanco sobre la marca): rojo y ámbar.
+  // Caso: activar, encender la linterna (cámara con torch simulada) y medir en los dos temas →
+  //       esperado ≥ 4,5:1 · obtenido 3,76:1 y 2,15:1 en claro y en oscuro.
+  test('HALLAZGO 3305 (accesibilidad) — «Detener» y «Linterna ON» deben llegar a 4,5:1 en los dos temas', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+    // La cámara simulada de Chromium no tiene linterna: esta dice tenerla y acepta encenderla.
+    await page.addInitScript(() => {
+      const proto = MediaStreamTrack.prototype;
+      const capacidades0 = proto.getCapabilities;
+      const aplicar0 = proto.applyConstraints;
+      proto.getCapabilities = function (this: MediaStreamTrack) {
+        const r = capacidades0.call(this);
+        return (this.kind === 'video' ? { ...r, torch: true } : r) as MediaTrackCapabilities;
+      };
+      proto.applyConstraints = function (this: MediaStreamTrack, c?: MediaTrackConstraints) {
+        const extra = c?.advanced?.[0] as { torch?: boolean } | undefined;
+        if (extra && 'torch' in extra) return Promise.resolve();
+        return aplicar0.call(this, c);
+      };
+    });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: /Activar lupa/i }).click();
+    await esperarCamaraEnMarcha(page);
+    await page.getByRole('button', { name: /Activar linterna/i }).click();
+    await expect(page.getByRole('button', { name: /Linterna ON/i })).toHaveAttribute('aria-pressed', 'true');
+
+    const SELECTORES = ['[class*=btnPrincipal]', '[class*=linternaActiva]'];
+    const bajoMinimo: string[] = [];
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') {
+        await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      }
+      for (const sel of SELECTORES) {
+        // Los botones cambian de color con transición: se espera a dos lecturas iguales.
+        let previo = -1;
+        let ratio = -1;
+        await expect
+          .poll(
+            async () => {
+              const medida = await contrasteDe(page, sel);
+              const quieto = medida.ratio > 0 && medida.ratio === previo;
+              previo = ratio = medida.ratio;
+              return quieto;
+            },
+            { intervals: [150], message: `${sel} existe y su color está quieto (${tema})` },
+          )
+          .toBe(true);
+        if (ratio < 4.5) bajoMinimo.push(`${tema} ${sel} ${ratio}:1`);
+      }
+    }
+    // DEBERÍA: ninguno por debajo de 4,5:1.
+    expect(bajoMinimo).toEqual([]);
+  });
+});
