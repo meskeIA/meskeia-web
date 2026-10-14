@@ -171,7 +171,9 @@ export default function ComprobadorSorteo({ guardadas, modalidades, onAnunciar }
       )}
 
       <fieldset className={styles.comprobadorCampos}>
-        <legend>Combinación ganadora de {datos.name}</legend>
+        {/* Una sola cadena por nodo: con la página traducida, un texto suelto que cambia se
+            quedaba con la lotería anterior (hallazgo 3289) */}
+        <legend>{`Combinación ganadora de ${datos.name}`}</legend>
         <div className={styles.comprobadorFila}>
           {campos.principales.map((valor, i) => (
             <input
@@ -249,7 +251,7 @@ export default function ComprobadorSorteo({ guardadas, modalidades, onAnunciar }
       </fieldset>
 
       <button type="button" onClick={comprobar} className={styles.comprobadorBoton}>
-        Comprobar mis combinaciones de {datos.name}
+        {`Comprobar mis combinaciones de ${datos.name}`}
       </button>
 
       {error && (

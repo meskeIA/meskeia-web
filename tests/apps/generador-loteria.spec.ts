@@ -2656,13 +2656,12 @@ test.describe('Inspector 14/10/2026', () => {
   });
 
   test.describe('hallazgos nuevos de la tanda del 14/10/2026', () => {
-    test('ABIERTO (operativa, medio) · con la página traducida, el aviso del reparto que pierde su detalle no tumba la app', async ({ page }) => {
-      // Hallazgo nuevo de la tanda del 14/10/2026. El aviso es <p>{resultado.error}{detalleError}</p>:
-      // dos textos sueltos, y el segundo («Revisa lo que pone Persona 4.») desaparece cuando el
-      // error que queda no nombra a nadie. React lo retira con removeChild, pero el traductor ya
-      // lo cambió por <font>: NotFoundError y la pantalla «Algo salió mal», con lo tecleado de la
-      // peña perdido. Sin traducir, el mismo flujo deja «Indica el premio de cada décimo…».
-      test.fail();
+    test('REPARADO 3288 (operativa, medio) · con la página traducida, el aviso del reparto que pierde su detalle no tumba la app', async ({ page }) => {
+      // Hallazgo 3288. El aviso era <p>{resultado.error}{detalleError}</p>: dos textos sueltos, y
+      // el segundo («Revisa lo que pone Persona 4.») desaparecía cuando el error que queda no
+      // nombra a nadie. React lo retiraba con removeChild, pero el traductor ya lo había cambiado
+      // por <font>: NotFoundError y la pantalla «Algo salió mal». REPARADO: el aviso es una sola
+      // cadena, único hijo del <p>, y React la sustituye entera.
       const errores = vigilarErrores(page);
       await esperarInteractiva(page);
       await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
@@ -2677,14 +2676,13 @@ test.describe('Inspector 14/10/2026', () => {
       expect(errores).toEqual([]);
     });
 
-    test('ABIERTO (operativa, bajo) · con la página traducida, el botón Generar y la ficha dicen la lotería y la cantidad elegidas', async ({ page }) => {
-      // Hallazgo nuevo de la tanda del 14/10/2026. No cae: se queda viejo. El texto que cambia
-      // dentro del mismo nodo («Generar {n} … de {lotería}», la descripción, los días y el precio
-      // de la ficha) React lo escribe en el nodo que el traductor retiró, y en pantalla sigue el
-      // de antes. Medido: con la página traducida, elegir Euromillones y 3 deja «Generar 1
-      // combinación de La Primitiva» y la ficha «⭐ Euromillones · 6 números del 1 al 49 +
-      // Reintegro (0-9) · Lunes, jueves y sábados · 1,00 €», y Generar da 3 de Euromillones.
-      test.fail();
+    test('REPARADO 3289 (operativa, bajo) · con la página traducida, el botón Generar y la ficha dicen la lotería y la cantidad elegidas', async ({ page }) => {
+      // Hallazgo 3289. No caía: se quedaba viejo. El texto que cambia dentro del mismo nodo
+      // («Generar {n} … de {lotería}», la descripción, los días y el precio de la ficha) React lo
+      // escribía en el nodo que el traductor retiró, y en pantalla seguía el de antes. Medido
+      // entonces: elegir Euromillones y 3 dejaba «Generar 1 combinación de La Primitiva» y la
+      // ficha de La Primitiva. REPARADO: cada texto variable es el único hijo de su elemento, y
+      // React lo sustituye entero (setTextContent) en vez de escribir en un nodo retirado.
       await esperarInteractiva(page);
       await traducir(page);
       await seleccionarLoteria(page, 'euromillones');
@@ -2692,7 +2690,27 @@ test.describe('Inspector 14/10/2026', () => {
       await expect(page.locator('[class*="lotteryInfo"] h2')).toHaveText('Euromillones'); // el título sí cambia
       await expect(botonGenerar(page)).toContainText('Generar 3 combinaciones de Euromillones');
       await expect(page.locator('[class*="lotteryInfo"]')).toContainText('5 números del 1 al 50 + 2 Estrellas (1-12)');
+      await expect(page.locator('[class*="lotteryInfo"]')).toContainText('Martes y viernes');
+      await expect(page.locator('[class*="lotteryInfo"]')).toContainText('2,50 € / apuesta');
       await expect(page.locator('[class*="lotteryInfo"]')).not.toContainText('6 números del 1 al 49');
+    });
+
+    test('REPARADO 3289 (operativa, bajo) · con la página traducida, el comprobador y el cupo de guardadas no se quedan viejos', async ({ page }) => {
+      // Las otras rutas del hallazgo 3289: la leyenda y el botón del comprobador al cambiar de
+      // lotería, y el «llevas N» de las guardadas al quitar una.
+      const errores = vigilarErrores(page);
+      await sembrarYRecargar(page, { [CLAVE_FAVORITAS]: JSON.stringify(PRIMITIVA_1410) });
+      const zona = zonaComprobador(page);
+      await expect(page.locator('[class*="favoritesCupo"]')).toContainText('llevas 6.');
+      await traducir(page);
+      await zona.getByRole('button', { name: 'Euromillones', exact: true }).click();
+      await expect(zona.locator('legend')).toHaveText('Combinación ganadora de Euromillones');
+      await expect(zona.locator('[class*="comprobadorBoton"]')).toHaveText('Comprobar mis combinaciones de Euromillones');
+      await traducir(page);
+      await page.getByRole('button', { name: /^Quitar la combinación/ }).first().click();
+      await expect(page.locator('[class*="favoritesCupo"]')).toContainText('llevas 5.');
+      await sinCaida(page);
+      expect(errores).toEqual([]);
     });
   });
 });

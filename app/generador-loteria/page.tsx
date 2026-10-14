@@ -493,10 +493,13 @@ export default function GeneradorLoteriaPage() {
             <span className={styles.infoBigIcon} aria-hidden="true">{config.icon}</span>
             <h2>{config.name}</h2>
           </div>
+          {/* Cada texto que cambia con la lotería, único hijo de su <span>: como texto suelto
+              junto al emoji, con la página traducida React lo escribía en el nodo que el
+              traductor había retirado y la ficha seguía con la lotería anterior (hallazgo 3289). */}
           <div className={styles.infoDetails}>
-            <span className={styles.infoItem}><span aria-hidden="true">📋</span> {config.description}</span>
-            <span className={styles.infoItem}><span aria-hidden="true">📅</span> {config.drawDays}</span>
-            <span className={styles.infoItem}><span aria-hidden="true">💰</span> {config.price} / apuesta</span>
+            <span className={styles.infoItem}><span aria-hidden="true">📋</span> <span>{config.description}</span></span>
+            <span className={styles.infoItem}><span aria-hidden="true">📅</span> <span>{config.drawDays}</span></span>
+            <span className={styles.infoItem}><span aria-hidden="true">💰</span> <span>{`${config.price} / apuesta`}</span></span>
           </div>
         </div>
 
@@ -531,7 +534,7 @@ export default function GeneradorLoteriaPage() {
                 caía con NotFoundError al pulsar Generar (cabo C0233). */}
             {isGenerating
               ? <span key="generando"><span aria-hidden="true">🎲</span> Generando...</span>
-              : <span key="generar"><span aria-hidden="true">🎯</span> {`Generar ${quantity} ${quantity > 1 ? 'combinaciones' : 'combinación'} de ${config.name}`}</span>}
+              : <span key="generar"><span aria-hidden="true">🎯</span> <span>{`Generar ${quantity} ${quantity > 1 ? 'combinaciones' : 'combinación'} de ${config.name}`}</span></span>}
           </button>
         </div>
 
@@ -636,7 +639,7 @@ export default function GeneradorLoteriaPage() {
               página. No se envían a ningún sitio: si vacías los datos del navegador o entras
               desde otro dispositivo, no aparecerán.{' '}
               <span className={styles.favoritesCupo}>
-                Caben hasta {MAX_FAVORITAS}: llevas {favorites.length}.
+                {`Caben hasta ${MAX_FAVORITAS}: llevas ${favorites.length}.`}
               </span>
             </p>
             <div className={styles.favoritesList}>

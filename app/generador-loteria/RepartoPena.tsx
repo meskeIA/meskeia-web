@@ -238,8 +238,10 @@ export default function RepartoPena() {
       <div aria-live="polite">
         {resultado && !resultado.ok && (
           <p className={styles.comprobadorError} id={ID_ERROR}>
-            {resultado.error}
-            {detalleError}
+            {/* Una sola cadena, único hijo del <p>: como dos textos sueltos, con la página
+                traducida React retiraba el detalle que el traductor ya había cambiado por <font>
+                y la app caía con NotFoundError (hallazgo 3288). */}
+            {`${resultado.error}${detalleError}`}
           </p>
         )}
 
@@ -267,9 +269,9 @@ export default function RepartoPena() {
             {resultado.porPremio.length > 1 && (
               <p className={styles.penaAyuda}>
                 {resultado.porPremio.map((p, i) => (
+                  // Una sola cadena: con la página traducida, los importes sueltos se quedaban viejos (hallazgo 3289)
                   <span key={i}>
-                    {i > 0 && ' · '}
-                    Décimo {i + 1}: {formatCurrency(p.premio)}, retención {formatCurrency(p.retencion)}
+                    {`${i > 0 ? ' · ' : ''}Décimo ${i + 1}: ${formatCurrency(p.premio)}, retención ${formatCurrency(p.retencion)}`}
                   </span>
                 ))}
               </p>
