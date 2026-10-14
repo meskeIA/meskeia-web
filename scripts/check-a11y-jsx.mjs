@@ -21,7 +21,8 @@
  *
  *   ROMPE   1. <button> sin type=            → la corrección es unívoca: type="button"
  *   ROMPE   2. emoji JUNTO A TEXTO sin aria-hidden, también dentro de una cadena que se pinta
- *              ({x ? '⏹️ Detener' : '▶️ Iniciar'}) desde el 14/10/2026: ver `cadenaPintada`
+ *              ({x ? '⏹️ Detener' : '▶️ Iniciar'}) desde el 14/10/2026: ver `cadenaPintada`;
+ *              y las banderas (🇪🇸), desde el mismo día: ver `BANDERA`
  *   AVISA   3. botón con onClick + className condicional y sin ningún aria-* ni role
  *   AVISA   4. emoji en nodo propio, sin aria-hidden y sin aria-label
  *   AVISA   5. aria-pressed en un botón que al pulsarlo se deshabilita (no se despulsa)
@@ -107,15 +108,28 @@ if (process.env.VERCEL) {
  */
 const PICTOGRAFICO = /\p{Extended_Pictographic}/u;
 const NO_SON_EMOJI = /[©®™←-⇿]/g;
-const esEmoji = (t) => PICTOGRAFICO.test(t.replace(NO_SON_EMOJI, ''));
+/**
+ * Una bandera NO es `Extended_Pictographic`: es un PAR de indicadores regionales
+ * (🇪🇸 = U+1F1EA U+1F1F8), así que la regla 2 no la veía. Un lector de pantalla la lee
+ * igual que cualquier emoji («bandera: España España: 5-10 %»).
+ * (Caso de origen: `calculadora-propinas`, que el turno de noche del 03/10/2026 anotó en su
+ * acta; 376 líneas en 61 ficheros al añadirla el 14/10. Casos: `scripts/pruebas/a11y-banderas.tsx`.)
+ * Las de subdivisión (🏴󠁧󠁢󠁳󠁣󠁴󠁿) ya se veían por su 🏴; aquí solo hay que descontar sus etiquetas.
+ */
+const BANDERA = /\p{Regional_Indicator}{2}/u;
+const esEmoji = (t) => {
+  const limpio = t.replace(NO_SON_EMOJI, '');
+  return PICTOGRAFICO.test(limpio) || BANDERA.test(limpio);
+};
 /**
  * Si al quitar todo esto no queda nada, el nodo es SOLO emoji (y entonces es un aviso, no
  * un error). Hay que descontar también las piezas que no son pictogramas pero forman parte
  * de uno: el ZWJ que une 🧑‍🔬, el selector de variación y el modificador de tono de piel.
  * Sin el ZWJ, 🧑‍🔬 en un nodo propio se clasificaba como «emoji junto a texto» y el candado
- * pedía envolverlo en un <span>, que es la corrección equivocada.
+ * pedía envolverlo en un <span>, que es la corrección equivocada. Por lo mismo van los
+ * indicadores regionales y las etiquetas (U+E0020–E007F) de las banderas.
  */
-const SOLO_EMOJI = /[\p{Extended_Pictographic}\p{Emoji_Modifier}️‍⃣\s]/gu;
+const SOLO_EMOJI = /[\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u{E0020}-\u{E007F}️‍⃣\s]/gu;
 const ARIA_ESTADO = ['aria-pressed', 'aria-selected', 'aria-checked', 'aria-expanded'];
 
 /**
@@ -373,6 +387,10 @@ for (const rel of objetivos()) {
           if (!at.has('aria-label'))
             apuntar(avisos, n, 'emoji en nodo propio',
               '«' + txt + '» ¿decorativo (aria-hidden) o informativo (aria-label)?');
+        } else if (apertura && SIN_SPAN.has(apertura.tagName.getText())) {
+          // <option>🇪🇸 España</option>: no admite un <span>, así que esa corrección no existe
+          apuntar(errores, n, 'emoji junto a texto',
+            '«' + txt + '» en <' + apertura.tagName.getText() + '>, que no admite <span> → quita el emoji del texto o a11y-ok: <razón>');
         } else {
           apuntar(errores, n, 'emoji junto a texto', '«' + txt + '» → <span aria-hidden="true">');
         }
