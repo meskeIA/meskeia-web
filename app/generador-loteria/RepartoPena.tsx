@@ -196,7 +196,12 @@ export default function RepartoPena() {
           {premios.map((p, i) => (
             <li key={p.id} className={styles.penaFila}>
               <label className={styles.penaEtiqueta}>
-                {premios.length > 1 ? `Premio del décimo o apuesta ${i + 1} (€)` : 'Premio del décimo o apuesta (€)'}
+                {/* En su propio <span>, único hijo: junto al <input>, React escribía el número
+                    nuevo en el nodo de texto que el traductor ya había cambiado por <font>, y el
+                    rótulo —que es el nombre del campo— se quedaba con el número viejo (hallazgo 3303). */}
+                <span>
+                  {premios.length > 1 ? `Premio del décimo o apuesta ${i + 1} (€)` : 'Premio del décimo o apuesta (€)'}
+                </span>
                 <input
                   type="text"
                   inputMode="decimal"

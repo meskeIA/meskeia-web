@@ -3098,7 +3098,7 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
       expect(errores).toEqual([]);
     });
 
-    test('ABIERTO 3303 (operativa, bajo) · traducida, el rótulo de cada campo de premio sigue la numeración al añadir y quitar décimos', async ({ page }) => {
+    test('REPARADO 3303 (operativa, bajo) · traducida, el rótulo de cada campo de premio sigue la numeración al añadir y quitar décimos', async ({ page }) => {
       // Hallazgo nuevo de esta re-inspección. El rótulo del campo es «{texto}<input>» dentro del
       // mismo <label> (RepartoPena.tsx): el texto no es el único hijo, así que con la página
       // traducida React escribe el número nuevo en el nodo que el traductor retiró y el rótulo
@@ -3106,7 +3106,7 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
       // un 2.º décimo el 1.º sigue «Premio del décimo o apuesta (€)»; con tres y quitado el 1.º,
       // los dos que quedan dicen «2» y «3», y el aviso «Revisa el premio del décimo o apuesta 2.»
       // marca el campo rotulado «3». Sin traducir, el mismo flujo numera bien.
-      test.fail();
+      // REPARADO (15/10/2026): el rótulo va en su propio <span>, como único hijo (RepartoPena.tsx).
       await esperarInteractiva(page);
       await esperarHidratacion(page, [`${SEL_PENA} input`]);
       await escribirT(page, premioT(page, 0), '125.000');
@@ -3126,6 +3126,10 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
       expect(await penaT(page).locator('input[aria-invalid="true"]').evaluateAll((ins) =>
         ins.map((i) => ((i as HTMLInputElement).labels?.[0]?.textContent ?? '').replace(/\s+/g, ' ').trim())))
         .toEqual(['Premio del décimo o apuesta 2 (€)']);
+      // Quitando otro y quedando uno solo, el rótulo vuelve a ir sin número
+      await traducirT(page);
+      await penaT(page).getByRole('button', { name: 'Quitar el premio 2' }).click();
+      expect(await rotulosPremio(page)).toEqual(['Premio del décimo o apuesta (€)']);
     });
   });
 });
