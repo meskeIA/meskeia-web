@@ -543,10 +543,13 @@ export default function LupaDigitalPage() {
           <p className={styles.zoomNota} role="status" aria-live="polite">
             {/* 3304 — con la cámara clavada por encima del zoom elegido (rango fijado en el catch
                 de arriba), la pantalla queda por debajo de 1 y caía en la rama «Los 2x los hace la
-                propia cámara» con el indicador en 1x. Ese caso tiene ahora su propia frase. */}
+                propia cámara» con el indicador en 1x. Ese caso tiene ahora su propia frase.
+                3315 — la frontera era 0,95, y entre 0,95 y 1 (cámara 2,1 a 2x) seguía cayendo en
+                «Los 2,1x los hace la propia cámara». Cualquier reducción en pantalla es este caso:
+                `pantalla` va redondeada a milésimas, así que una cámara igual al zoom da 1 justo. */}
             {reparto.camara <= 1
               ? `Esta cámara puede ampliar por sí misma hasta ${formatearZoom(Math.min(rangoZoomCamara.max, 5))}x: al subir el zoom lo hará ella, sobre la imagen completa del sensor, y se pierde menos nitidez que ampliando en pantalla.`
-              : reparto.pantalla < 0.95
+              : reparto.pantalla < 1
                 ? `La cámara se ha quedado en ${formatearZoom(reparto.camara)}x y no deja bajar de ahí: para ver ${formatearZoom(zoom)}x, la imagen se reduce en pantalla y queda un borde negro alrededor.`
               : reparto.pantalla < 1.05
                 ?`Los ${formatearZoom(reparto.camara)}x los hace la propia cámara, sobre la imagen completa del sensor: se pierde menos nitidez que ampliando en pantalla.`

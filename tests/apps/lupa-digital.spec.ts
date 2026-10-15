@@ -1801,10 +1801,10 @@ test.describe('re-inspección 15/10/2026', () => {
   //       todo, también el 1; 2x → esperado: la frase del 3304, «La cámara se ha quedado en 2,1x y
   //       no deja bajar de ahí: para ver 2x, la imagen se reduce…» · obtenido «Los 2,1x los hace la
   //       propia cámara, sobre la imagen completa del sensor…» con el indicador en «2x».
-  test('HALLAZGO 3315 — con la cámara clavada en 2,1x, a 2x la nota no debe decir «Los 2,1x los hace la propia cámara»', async ({
+  // REPARADO el 15/10/2026: la frase del 3304 sale con cualquier reducción en pantalla (< 1).
+  test('REPARADO 3315 — con la cámara clavada en 2,1x, a 2x la nota no debe decir «Los 2,1x los hace la propia cámara»', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
     const camaras = { trasera: { min: 1, max: 2.1, step: 0.1 }, frontal: null };
     await simularCamaraPorPista(page, camaras);
     await page.goto(RUTA);
