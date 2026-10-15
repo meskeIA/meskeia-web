@@ -1405,7 +1405,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                 <div className={styles.resumenItem}>
                   <span className={styles.resumenLabel}>Ley 49/2002</span>
                   <span className={styles.resumenValue}>
-                    {datosAsociacion.acogerLey49_2002 ? '✅ Sí, solicitar acogimiento' : '❌ No'}
+                    {datosAsociacion.acogerLey49_2002 ? <><span aria-hidden="true">✅</span> Sí, solicitar acogimiento</> : <><span aria-hidden="true">❌</span> No</>}
                   </span>
                 </div>
               </div>
@@ -1451,9 +1451,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             <div className={styles.documentPreview}>
               <div className={styles.documentHeader}>
                 <h3>
-                  {documentoActivo === 'acta' && '📋 Acta Fundacional'}
-                  {documentoActivo === 'estatutos' && '📜 Estatutos'}
-                  {documentoActivo === 'solicitud' && '📝 Solicitud de Inscripción'}
+                  {documentoActivo === 'acta' && <><span aria-hidden="true">📋</span> Acta Fundacional</>}
+                  {documentoActivo === 'estatutos' && <><span aria-hidden="true">📜</span> Estatutos</>}
+                  {documentoActivo === 'solicitud' && <><span aria-hidden="true">📝</span> Solicitud de Inscripción</>}
                 </h3>
                 <button
                   type="button"

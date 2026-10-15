@@ -636,7 +636,7 @@ export default function VisualizadorCicloEconomicoPage() {
               onClick={() => setAnimando((a) => !a)}
               aria-label={animando ? 'Pausar animación' : 'Reanudar animación'}
             >
-              {animando ? '⏸ Pausar' : '▶ Reanudar'}
+              {animando ? <><span aria-hidden="true">⏸</span> Pausar</> : <><span aria-hidden="true">▶</span> Reanudar</>}
             </button>
           </div>
 

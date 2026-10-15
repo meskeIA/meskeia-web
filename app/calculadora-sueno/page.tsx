@@ -172,8 +172,8 @@ export default function CalculadoraSuenoPage() {
             <>
               <h2 className={styles.resultsTitulo}>
                 {modo === 'despertar'
-                  ? '🌙 Horas recomendadas para ir a dormir'
-                  : '☀️ Horas recomendadas para despertar'}
+                  ? <><span aria-hidden="true">🌙</span> Horas recomendadas para ir a dormir</>
+                  : <><span aria-hidden="true">☀️</span> Horas recomendadas para despertar</>}
               </h2>
               <p className={styles.resultsSubtitulo}>
                 {modo === 'despertar'

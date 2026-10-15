@@ -614,7 +614,7 @@ export default function SimuladorTestHipotesisPage() {
               background: rechazaH0 ? 'rgba(72, 169, 166, 0.18)' : 'rgba(168, 46, 104, 0.18)',
               color: rechazaH0 ? '#48A9A6' : '#A82E68'
             }}>
-              {rechazaH0 ? '✅ Rechazar H₀' : '❌ NO rechazar H₀'}
+              {rechazaH0 ? <><span aria-hidden="true">✅</span> Rechazar H₀</> : <><span aria-hidden="true">❌</span> NO rechazar H₀</>}
             </span>
             <span className={styles.resultRange}>
               {rechazaH0

@@ -766,7 +766,7 @@ export default function CalculadoraIbanPage() {
                     className={styles.btnCopy}
                     onClick={() => copiar(resultado.ibanPlano, 'iban')}
                   >
-                    {copiado === 'iban' ? '✅ Copiado' : '📋 Copiar IBAN'}
+                    {copiado === 'iban' ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar IBAN</>}
                   </button>
                 </div>
 

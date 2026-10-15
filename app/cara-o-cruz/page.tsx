@@ -163,7 +163,7 @@ export default function CaraOCruzPage() {
             disabled={animando}
             className={styles.btnLanzar}
           >
-            {animando ? 'Lanzando...' : '🎲 Lanzar Moneda'}
+            {animando ? 'Lanzando...' : <><span aria-hidden="true">🎲</span> Lanzar Moneda</>}
           </button>
 
           {historial.length > 0 && (

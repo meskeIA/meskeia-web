@@ -558,7 +558,7 @@ export default function Page() {
             {animando && (
               <>
                 <button className={styles.controlBtn} onClick={pausar} type="button">
-                  {pausado ? '▶ Reanudar' : '⏸ Pausar'}
+                  {pausado ? <><span aria-hidden="true">▶</span> Reanudar</> : <><span aria-hidden="true">⏸</span> Pausar</>}
                 </button>
                 <button className={styles.controlBtn} onClick={acelerar} type="button">
                   <span aria-hidden="true">⏩</span> Velocidad {velocidad}x

@@ -198,19 +198,19 @@ function SeccionOperaciones() {
             <h4 className={styles.operacionNombre}>{op.nombre}</h4>
             <div className={styles.operacionComparacion}>
               <div className={styles.operacionFila}>
-                <span className={styles.operacionPais}>🇪🇸 Público</span>
+                <span className={styles.operacionPais}><span aria-hidden="true">🇪🇸</span> Público</span>
                 <span className={styles.operacionCosteGratis}>Gratuito</span>
               </div>
               <div className={styles.operacionFila}>
-                <span className={styles.operacionPais}>🇪🇸 Privado</span>
+                <span className={styles.operacionPais}><span aria-hidden="true">🇪🇸</span> Privado</span>
                 <span className={styles.operacionCoste}>{formatCurrency(op.espanaPrivado)}</span>
               </div>
               <div className={styles.operacionFila}>
-                <span className={styles.operacionPais}>🇩🇪 Alemania</span>
+                <span className={styles.operacionPais}><span aria-hidden="true">🇩🇪</span> Alemania</span>
                 <span className={styles.operacionCoste}>{formatCurrency(op.alemania)}</span>
               </div>
               <div className={`${styles.operacionFila} ${styles.operacionFilaRojo}`}>
-                <span className={styles.operacionPais}>🇺🇸 EE.UU.</span>
+                <span className={styles.operacionPais}><span aria-hidden="true">🇺🇸</span> EE.UU.</span>
                 <span className={styles.operacionCosteAlto}>{formatCurrency(op.eeuu)}</span>
               </div>
             </div>

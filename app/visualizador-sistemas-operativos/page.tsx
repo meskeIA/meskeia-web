@@ -764,9 +764,9 @@ export default function VisualizadorSistemasOperativos() {
                     <tr key={fila.virt} className={!fila.presente ? styles.filaPaginaFalta : ''}>
                       <td><code>{fila.virt}</code></td>
                       <td><code>{fila.marco}</code></td>
-                      <td>{fila.presente ? '✅ Sí' : '❌ Page Fault'}</td>
+                      <td>{fila.presente ? <><span aria-hidden="true">✅</span> Sí</> : <><span aria-hidden="true">❌</span> Page Fault</>}</td>
                       <td><code>{fila.acceso}</code></td>
-                      <td>{fila.mod ? '✏️ Sí' : 'No'}</td>
+                      <td>{fila.mod ? <><span aria-hidden="true">✏️</span> Sí</> : 'No'}</td>
                     </tr>
                   ))}
                 </tbody>

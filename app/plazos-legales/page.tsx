@@ -122,8 +122,8 @@ export default function PlazosLegalesPage() {
             {selectedCategory
               ? `📋 ${CATEGORIES.find(c => c.id === selectedCategory)?.name}`
               : searchQuery
-                ? `🔍 Resultados para "${searchQuery}"`
-                : '📚 Todos los plazos'}
+                ? <><span aria-hidden="true">🔍</span> Resultados para "{searchQuery}"</>
+                : <><span aria-hidden="true">📚</span> Todos los plazos</>}
           </h2>
           <span className={styles.resultsCount}>
             {filteredPlazos.length} {filteredPlazos.length === 1 ? 'resultado' : 'resultados'}

@@ -584,7 +584,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
 
       {/* Estado del balance */}
       <div className={`${styles.estadoBalance} ${balanceada ? styles.balanceOk : styles.balanceNo}`} role="alert" aria-live="polite">
-        {balanceada ? '✅ ¡Ecuación balanceada! Los átomos cuadran a ambos lados.' : '❌ Aún no cuadra. Sigue ajustando los coeficientes.'}
+        {balanceada ? <><span aria-hidden="true">✅</span> ¡Ecuación balanceada! Los átomos cuadran a ambos lados.</> : <><span aria-hidden="true">❌</span> Aún no cuadra. Sigue ajustando los coeficientes.</>}
       </div>
 
       {/* Botones de ayuda */}

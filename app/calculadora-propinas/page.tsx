@@ -282,21 +282,21 @@ export default function CalculadoraPropinas() {
             <h2>Conceptos Clave</h2>
             <div className={styles.contentGrid}>
               <div className={styles.contentCard}>
-                <h4>🇪🇸 España: 5-10%</h4>
+                <h4><span aria-hidden="true">🇪🇸</span> España: 5-10%</h4>
                 <p>
                   Opcional, solo para servicio excepcional. No es obligatorio ni esperado.
                   Redondear al alza es lo más común.
                 </p>
               </div>
               <div className={styles.contentCard}>
-                <h4>🇺🇸 Estados Unidos: 15-20%</h4>
+                <h4><span aria-hidden="true">🇺🇸</span> Estados Unidos: 15-20%</h4>
                 <p>
                   Obligatorio socialmente. Los camareros dependen de propinas ya que el
                   salario base es muy bajo. Menos del 15% es ofensivo.
                 </p>
               </div>
               <div className={styles.contentCard}>
-                <h4>🇯🇵 Japón: 0%</h4>
+                <h4><span aria-hidden="true">🇯🇵</span> Japón: 0%</h4>
                 <p>
                   Dejar propina se considera ofensivo. El buen servicio es parte de la
                   cultura y está incluido en el precio.

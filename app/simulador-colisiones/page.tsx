@@ -229,7 +229,7 @@ export default function SimuladorColisionesPage() {
             className={styles.btnSimular}
             aria-label="Lanzar simulación"
           >
-            {fase === 'idle' ? '▶ Simular colisión' : fase === 'done' ? '↺ Volver a simular' : '⏳ Simulando...'}
+            {fase === 'idle' ? <><span aria-hidden="true">▶</span> Simular colisión</> : fase === 'done' ? '↺ Volver a simular' : <><span aria-hidden="true">⏳</span> Simulando...</>}
           </button>
         </div>
 
@@ -383,8 +383,8 @@ export default function SimuladorColisionesPage() {
                 </div>
                 <p className={styles.resConservado}>
                   {Math.abs(resultado.p_antes - resultado.p_despues) < 0.001
-                    ? '✅ Conservado'
-                    : '⚠️ Diferencia numérica'}
+                    ? <><span aria-hidden="true">✅</span> Conservado</>
+                    : <><span aria-hidden="true">⚠️</span> Diferencia numérica</>}
                 </p>
               </div>
 

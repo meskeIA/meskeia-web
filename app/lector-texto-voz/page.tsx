@@ -374,7 +374,7 @@ export default function LectorTextoVozPage() {
               onClick={pausarReanudar}
               aria-label={estado === 'pausado' ? 'Reanudar lectura' : 'Pausar lectura'}
             >
-              {estado === 'pausado' ? '▶ Reanudar' : '⏸ Pausar'}
+              {estado === 'pausado' ? <><span aria-hidden="true">▶</span> Reanudar</> : <><span aria-hidden="true">⏸</span> Pausar</>}
             </button>
             <button
               type="button"

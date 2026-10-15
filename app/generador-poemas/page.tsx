@@ -498,7 +498,7 @@ export default function GeneradorPoemas() {
                     onClick={copiarPoema}
                     aria-label="Copiar poema al portapapeles"
                   >
-                    {copiado ? '✓ ¡Copiado!' : '📋 Copiar poema'}
+                    {copiado ? '✓ ¡Copiado!' : <><span aria-hidden="true">📋</span> Copiar poema</>}
                   </button>
                   <button
                     type="button"

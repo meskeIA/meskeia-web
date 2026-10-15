@@ -248,8 +248,8 @@ export default function ComparadorAutonomoVsSLPage() {
             <p className={styles.ganadorLabel}>Resultado orientativo de la comparativa</p>
             <p className={styles.ganadorTexto}>
               {resultados.convieneSL
-                ? '🏆 Con estos datos, la SL tiene menor carga fiscal'
-                : '🏆 Con estos datos, el Autónomo tiene menor carga fiscal'}
+                ? <><span aria-hidden="true">🏆</span> Con estos datos, la SL tiene menor carga fiscal</>
+                : <><span aria-hidden="true">🏆</span> Con estos datos, el Autónomo tiene menor carga fiscal</>}
             </p>
             {Math.abs(resultados.ahorroSL) > 0 && (
               <p className={styles.ganadorAhorro}>

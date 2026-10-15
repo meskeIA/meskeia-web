@@ -605,7 +605,7 @@ export default function VisualizadorFarmacocinetica() {
                         <span className={styles.cypFuente}>{c.fuente}</span>
                       </div>
                       <span className={`${styles.cypTipoBadge} ${c.tipo === 'inductor' ? styles.cypTipoInductor : styles.cypTipoInhibidor}`}>
-                        {c.tipo === 'inductor' ? '⚡ Inductor' : '🚫 Inhibidor'}
+                        {c.tipo === 'inductor' ? <><span aria-hidden="true">⚡</span> Inductor</> : <><span aria-hidden="true">🚫</span> Inhibidor</>}
                       </span>
                     </div>
                     <p className={styles.cypEfecto}>{c.efecto}</p>
