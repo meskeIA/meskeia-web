@@ -1205,9 +1205,16 @@ async function cargarSinSesion(page: Page): Promise<void> {
   await esperarPaginaAsentada(page);
 }
 
-/** Como `responder`, pero tocando (móvil). */
+/**
+ * Como `responder`, pero tocando (móvil).
+ *
+ * La pausa antes de cada opción es la de quien lee la pregunta (15/10/2026, 3299/3233): a 390×844
+ * la B de la pregunta 5 cae justo donde se tocó «Siguiente», y un toque ahí a los ~50 ms, sin
+ * desplazar la página, es la forma exacta de un doble toque, que la app absorbe a propósito.
+ */
 async function tocarRespuestas(page: Page, indices: number[]): Promise<void> {
   for (const i of indices) {
+    await page.waitForTimeout(500);
     await opcion(page, i).tap();
     await botonSiguiente(page).tap();
   }
@@ -1551,14 +1558,15 @@ test.describe('re-inspección 12/10/2026 · móvil 360×740', () => {
     expect(problemas).toEqual([]);
   });
 
-  test.fail('HALLAZGO — un doble toque en «Siguiente» avanza una pregunta y no toca nada de la nueva', async ({
+  test('REPARADO 3233 — un doble toque en «Siguiente» avanza una pregunta y no toca nada de la nueva', async ({
     page,
   }) => {
     // «Anterior» y «Siguiente» van apilados y la tarjeta cambia de alto entre preguntas sin
     // recolocar la vista: de la 1 a la 2, «Siguiente» baja 75 px y «← Anterior» ocupa su sitio.
     // Con «Siguiente» al pie de la pantalla, el segundo toque de un doble toque (90 ms) devuelve
     // a la pregunta 1. (Con «Siguiente» a media pantalla, el segundo toque marcaba una opción de
-    // la pregunta 2.)
+    // la pregunta 2.) REPARADO (15/10/2026, con el 3299): el segundo toque en el mismo punto, sobre
+    // otro control y dentro de 450 ms, se absorbe.
     await cargarSinSesion(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).tap();
     await opcion(page, 1).tap();
@@ -2104,12 +2112,14 @@ test.describe('re-inspección 14/10/2026 (tarde) · escritorio', () => {
     expect(await page.evaluate(() => sessionStorage.getItem('meskeia:test-perfil-inversor:v1'))).toBeNull();
   });
 
-  test.fail('HALLAZGO 3299 — dos clics seguidos en «Comenzar Test» no contestan la pregunta 1', async ({ page }) => {
+  test('REPARADO 3299 — dos clics seguidos en «Comenzar Test» no contestan la pregunta 1', async ({ page }) => {
     // Esperado: «Pregunta 1 de 10» sin opción marcada y «Siguiente» deshabilitado.
     // Obtenido (14/10/2026, tarde): «B · 2 a 5 años - Plazo medio» marcada (aria-pressed) y
     // «Siguiente» habilitado, con 120 y con 250 ms entre clics. El primer clic cambia de fase y
     // lleva la vista al cuestionario (2177); bajo el puntero queda la opción B, y el segundo clic
     // la elige. Mismo mecanismo que el 3233 con «Siguiente».
+    // REPARADO (15/10/2026): la segunda activación con puntero en el mismo punto, sobre otro
+    // control y dentro de 450 ms, se absorbe. Una opción elegida después, a propósito, sí cuenta.
     await cargarSinSesion(page);
     const comenzar = page.getByRole('button', { name: /Comenzar Test/ });
     await comenzar.scrollIntoViewIfNeeded();
@@ -2117,31 +2127,46 @@ test.describe('re-inspección 14/10/2026 (tarde) · escritorio', () => {
     expect(caja).not.toBeNull();
     const x = caja!.x + caja!.width / 2;
     const y = caja!.y + caja!.height / 2;
+    for (const pausa of [250, 120]) {
+      if (pausa === 120) {
+        // Segunda vuelta desde la portada, con la sesión limpia
+        await cargarSinSesion(page);
+        await comenzar.scrollIntoViewIfNeeded();
+      }
+      await page.mouse.click(x, y);
+      await page.waitForTimeout(pausa);
+      await page.mouse.click(x, y);
+      await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+      await page.waitForTimeout(200);
+      await expect(marcadas(page), `con ${pausa} ms entre clics`).toHaveCount(0);
+      await expect(botonSiguiente(page)).toBeDisabled();
+    }
+    // Pasada la ventana, un clic deliberado en el mismo punto sí elige lo que hay debajo
+    await page.waitForTimeout(500);
     await page.mouse.click(x, y);
-    await page.waitForTimeout(250);
-    await page.mouse.click(x, y);
-    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
-    await page.waitForTimeout(200);
-    await expect(marcadas(page)).toHaveCount(0);
-    await expect(botonSiguiente(page)).toBeDisabled();
+    await expect(marcadas(page)).toHaveCount(1);
+    await expect(botonSiguiente(page)).toBeEnabled();
   });
 
   // ---------- Contenido ----------
-  test.fail('HALLAZGO 3300 — el featureList del JSON-LD no promete «recomendaciones» que el resultado niega', async ({
+  test('REPARADO 3300 — el featureList del JSON-LD no promete «recomendaciones» que el resultado niega', async ({
     page,
   }) => {
     // Hermano del 3286 en el tercer canal: la description y la portada ya no prometen
     // recomendaciones, pero el featureList que leen buscadores e IAs dice «Recomendaciones
     // orientativas según el perfil obtenido», y el resultado: «Son ejemplos ilustrativos, no una
-    // recomendación de inversión ni de producto».
+    // recomendación de inversión ni de producto». REPARADO (15/10/2026): ocho características que
+    // la app cumple, sin «En español», y la description sin «orienta tu estrategia de inversión».
     await cargarSinSesion(page);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const app = bloques
-      .map((b) => JSON.parse(b) as { '@type'?: string; featureList?: string[] })
+      .map((b) => JSON.parse(b) as { '@type'?: string; featureList?: string[]; description?: string })
       .find((b) => b['@type'] === 'WebApplication');
     expect(app, 'la página no sirve un WebApplication').toBeTruthy();
     const caracteristicas = app!.featureList ?? [];
     expect(caracteristicas.length).toBeGreaterThanOrEqual(4); // §1.ter
+    expect(caracteristicas).not.toContain('En español');
+    expect(app!.description ?? '').not.toMatch(/orienta tu estrategia/);
     await page.getByRole('button', { name: /Comenzar Test/ }).click();
     await responder(page, [2, 1, 2, 0, 3, 1, 2, 2, 1, 2]); // 3+2+3+1+4+2+3+3+2+3 = 26 → Equilibrado
     await expect(page.locator('[class*="recomendacionesNota"]')).toContainText(
@@ -2150,9 +2175,10 @@ test.describe('re-inspección 14/10/2026 (tarde) · escritorio', () => {
     expect(caracteristicas.filter((c) => /recomendaci/i.test(c))).toEqual([]);
   });
 
-  test.fail('HALLAZGO 3301 — la guía no pega palabras entre sí al cerrar o abrir una negrita', async ({ page }) => {
+  test('REPARADO 3301 — la guía no pega palabras entre sí al cerrar o abrir una negrita', async ({ page }) => {
     // En el JSX, un salto de línea pegado a una etiqueta se come el espacio: «</strong>⏎(3–6 meses»
-    // se pinta «emergencia(3–6 meses». Obtenido (14/10/2026, tarde), en el texto visible de la guía:
+    // se pinta «emergencia(3–6 meses». Obtenido (14/10/2026, tarde), en el texto visible de la guía
+    // (reparado el 15/10/2026 con {' '} en los seis sitios):
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     await expect(page.locator('[class*="stepGuideSection"]')).toBeVisible();
@@ -2168,17 +2194,25 @@ test.describe('re-inspección 14/10/2026 (tarde) · escritorio', () => {
     expect(pegadas.filter((p) => texto.includes(p))).toEqual([]);
   });
 
-  test.fail('HALLAZGO 3302 — «Familia con hipoteca» no da 20–25 años como el horizonte de Equilibrado (5–10) y Dinámico (10–15)', async ({
+  test('REPARADO 3302 — «Familia con hipoteca» no da 20–25 años como el horizonte de Equilibrado (5–10) y Dinámico (10–15)', async ({
     page,
   }) => {
     // «…el dinero de la jubilación no se toca en 20–25 años, y ese horizonte es el de los perfiles
     // Equilibrado (5–10 años) y Dinámico (10–15).» 20–25 no cae en ninguno de los dos tramos que la
     // misma frase cita; el resultado de la app da «Horizonte ideal > 15 años» al Agresivo.
+    // REPARADO (15/10/2026): la tarjeta atribuye ese horizonte al Agresivo y baja el perfil por las
+    // obligaciones fijas, que es la razón que sí sostiene la conclusión; la FAQ «¿Puedo tener dos
+    // perfiles…?» da «dinámico o agresivo» a una jubilación a 30+ años, como su propio consejo.
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const tarjeta = page.locator('[class*="escenarioCard"]').filter({ hasText: 'Familia con hipoteca' });
     await expect(tarjeta).toHaveCount(1);
     const texto = sinEspacios(await tarjeta.innerText());
+    expect(texto).toContain('20–25 años');
+    expect(texto).toMatch(/Agresivo \(más de 15 años\)/);
+    expect(texto).toMatch(/obligaciones financieras fijas/);
+    const faqDosPerfiles = page.locator('[class*="faqSectionItem"]').filter({ hasText: '¿Puedo tener dos perfiles' });
+    await expect(faqDosPerfiles).toContainText('dinámico o agresivo para la jubilación (que queda a 30+ años)');
     const letra = '[A-Za-zÁÉÍÓÚáéíóú]+';
     const m = texto.match(
       new RegExp(`(\\d+)–(\\d+) años, y ese horizonte es el de los perfiles (${letra}) \\((\\d+)–(\\d+) años\\) y (${letra}) \\((\\d+)–(\\d+)\\)`),
@@ -2320,10 +2354,10 @@ test.describe('re-inspección 14/10/2026 (tarde) · móvil 360×740', () => {
     hasTouch: true,
   });
 
-  test.fail('HALLAZGO 3299 — un doble toque en «Comenzar Test» no contesta la pregunta 1', async ({ page }) => {
+  test('REPARADO 3299 — un doble toque en «Comenzar Test» no contesta la pregunta 1', async ({ page }) => {
     // Esperado: «Pregunta 1 de 10» sin opción marcada y «Siguiente» deshabilitado.
     // Obtenido (14/10/2026, tarde): con 90 ms entre toques, «A · Menos de 2 años» marcada a 360×740
-    // (y «B · 2 a 5 años» a 390×844, con 150 ms).
+    // (y «B · 2 a 5 años» a 390×844, con 150 ms). REPARADO el 15/10/2026: el segundo toque se absorbe.
     await cargarSinSesion(page);
     const comenzar = page.getByRole('button', { name: /Comenzar Test/ });
     await comenzar.evaluate((el) => el.scrollIntoView({ block: 'center' }));

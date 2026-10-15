@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, RegionBadge } from '@/components';
@@ -503,6 +503,60 @@ export default function TestPerfilInversorPage() {
 
   const olvidarSesion = borrarSesion;
 
+  /**
+   * ⚠️ 15/10/2026 (hallazgos 3299 y 3233) — la segunda mitad de un doble clic o doble toque.
+   *
+   * «Comenzar Test», «Siguiente →» y «← Anterior» cambian lo que hay bajo el puntero: la vista
+   * se recoloca (2177, 3285) o la tarjeta cambia de alto. Con dos activaciones seguidas, la
+   * segunda caía sobre lo que acababa de aparecer allí: marcaba una opción de la pregunta nueva
+   * sin que nadie la eligiera (a 250 ms con ratón, a 90 ms con el dedo) o pulsaba «← Anterior» y
+   * devolvía a la pregunta de antes.
+   *
+   * Se absorbe una activación con PUNTERO que llega poco después, en el mismo punto, sobre OTRO
+   * control y SIN que la página se haya desplazado desde que la app recolocó la vista: es la
+   * segunda mitad de la misma intención. Si la persona desplaza la página para buscar una opción
+   * y la toca, eso es elegirla, aunque caiga donde estaba el botón. Con teclado (`detail === 0`)
+   * no hay puntero que se quede encima, y pulsar dos veces el MISMO botón («Siguiente» repasando
+   * respuestas) sigue valiendo.
+   */
+  const ultimaActivacion = useRef<{
+    control: string;
+    x: number;
+    y: number;
+    t: number;
+    /** Desplazamiento tras recolocar la vista; null hasta el siguiente fotograma. */
+    scrollY: number | null;
+  } | null>(null);
+  const VENTANA_DOBLE_ACTIVACION_MS = 450;
+  const RADIO_DOBLE_ACTIVACION_PX = 12;
+
+  const esSegundaActivacion = (control: string, e: MouseEvent): boolean => {
+    const previa = ultimaActivacion.current;
+    if (!previa || e.detail === 0 || previa.control === control) return false;
+    const sinDesplazarse = previa.scrollY === null || Math.abs(window.scrollY - previa.scrollY) < 2;
+    return (
+      sinDesplazarse &&
+      e.timeStamp - previa.t < VENTANA_DOBLE_ACTIVACION_MS &&
+      Math.hypot(e.clientX - previa.x, e.clientY - previa.y) <= RADIO_DOBLE_ACTIVACION_PX
+    );
+  };
+
+  /** Anota la activación que acaba de cambiar lo que hay bajo el puntero. */
+  const anotarActivacion = (control: string, e: MouseEvent): void => {
+    if (e.detail === 0) {
+      ultimaActivacion.current = null;
+      return;
+    }
+    const registro = { control, x: e.clientX, y: e.clientY, t: e.timeStamp, scrollY: null };
+    ultimaActivacion.current = registro;
+    // Los efectos que recolocan la vista (2177, 3285) ya han corrido en el fotograma siguiente
+    requestAnimationFrame(() => {
+      if (ultimaActivacion.current === registro) {
+        ultimaActivacion.current = { ...registro, scrollY: window.scrollY };
+      }
+    });
+  };
+
   /** Cambio de fase pedido por la persona: además de cambiarla, lleva la vista a ella (2177). */
   const irAFase = (fase: Fase) => {
     llevarVistaAFase.current = true;
@@ -707,7 +761,15 @@ export default function TestPerfilInversorPage() {
             </div>
           </div>
 
-          <button type="button" className={styles.startButton} onClick={handleStart}>
+          <button
+            type="button"
+            className={styles.startButton}
+            onClick={(e) => {
+              if (esSegundaActivacion('comenzar', e)) return;
+              anotarActivacion('comenzar', e);
+              handleStart();
+            }}
+          >
             Comenzar Test →
           </button>
         </div>
@@ -737,7 +799,14 @@ export default function TestPerfilInversorPage() {
                 <span aria-hidden="true">↩️</span> Hemos recuperado el test que dejaste a medias en
                 esta pestaña, con {Object.keys(answers).length} de {QUESTIONS.length} respuestas.
               </p>
-              <button type="button" className={styles.reiniciarButton} onClick={handleRestart}>
+              <button
+                type="button"
+                className={styles.reiniciarButton}
+                onClick={(e) => {
+                  anotarActivacion('reiniciar', e);
+                  handleRestart();
+                }}
+              >
                 Empezar de cero
               </button>
             </div>
@@ -773,7 +842,10 @@ export default function TestPerfilInversorPage() {
                   // que quien no ve la pantalla no podía saber qué tenía marcado.
                   aria-pressed={selectedAnswer === option.points}
                   className={`${styles.optionButton} ${selectedAnswer === option.points ? styles.selected : ''}`}
-                  onClick={() => handleAnswer(question.id, option.points)}
+                  onClick={(e) => {
+                    if (esSegundaActivacion('opcion', e)) return;
+                    handleAnswer(question.id, option.points);
+                  }}
                 >
                   <span className={styles.optionLetter}>
                     {String.fromCharCode(65 + index)}
@@ -787,7 +859,11 @@ export default function TestPerfilInversorPage() {
               <button
                 type="button"
                 className={`${styles.navButton} ${styles.prev}`}
-                onClick={handlePrev}
+                onClick={(e) => {
+                  if (esSegundaActivacion('anterior', e)) return;
+                  anotarActivacion('anterior', e);
+                  handlePrev();
+                }}
                 disabled={currentQuestion === 0}
               >
                 ← Anterior
@@ -795,7 +871,11 @@ export default function TestPerfilInversorPage() {
               <button
                 type="button"
                 className={`${styles.navButton} ${styles.next}`}
-                onClick={handleNext}
+                onClick={(e) => {
+                  if (esSegundaActivacion('siguiente', e)) return;
+                  anotarActivacion('siguiente', e);
+                  handleNext();
+                }}
                 disabled={selectedAnswer === undefined}
               >
                 {/*
@@ -975,12 +1055,24 @@ export default function TestPerfilInversorPage() {
             </Link>
             <button
               type="button"
-              onClick={handleRevisar}
+              onClick={(e) => {
+                if (esSegundaActivacion('revisar', e)) return;
+                anotarActivacion('revisar', e);
+                handleRevisar();
+              }}
               className={`${styles.actionButton} ${styles.secondary}`}
             >
               <span aria-hidden="true">✏️</span> Revisar mis respuestas
             </button>
-            <button type="button" onClick={handleRestart} className={`${styles.actionButton} ${styles.secondary}`}>
+            <button
+              type="button"
+              onClick={(e) => {
+                if (esSegundaActivacion('repetir', e)) return;
+                anotarActivacion('repetir', e);
+                handleRestart();
+              }}
+              className={`${styles.actionButton} ${styles.secondary}`}
+            >
               <span aria-hidden="true">🔄</span> Repetir Test
             </button>
           </div>
@@ -1207,10 +1299,14 @@ function GuiaPerfilInversor() {
               <code>Pareja de 40 años, 2 hijos. Hipoteca de 1.000&nbsp;€/mes. Quieren complementar la jubilación.</code>
             </div>
             <p className={styles.escenarioTip}>
-              <strong>Perfil recomendado: Equilibrado o Dinámico.</strong> Tienen obligaciones financieras
-              fijas y no pueden permitirse grandes caídas en el corto plazo, pero el dinero de la jubilación
-              no se toca en 20–25 años, y ese horizonte es el de los perfiles Equilibrado (5–10 años) y
-              Dinámico (10–15). Cosa distinta es el colchón de emergencia, que va aparte y en liquidez.
+              {/* 3302 — decía que 20–25 años «es el horizonte de» Equilibrado (5–10) y Dinámico
+                  (10–15), que no lo contienen: por horizonte solo, sería el del Agresivo (> 15).
+                  Lo que baja el perfil son las obligaciones fijas, y así se dice. */}
+              <strong>Perfil recomendado: Equilibrado o Dinámico.</strong> El dinero de la jubilación no
+              se toca en 20–25 años, un horizonte que por sí solo admitiría incluso el Agresivo (más de 15
+              años). Lo que lo modera son las obligaciones financieras fijas: con una hipoteca y dos hijos,
+              una caída grande en el corto plazo pesa más, y por eso se quedan un escalón o dos por debajo.
+              Cosa distinta es el colchón de emergencia, que va aparte y en liquidez.
             </p>
           </div>
 
@@ -1268,8 +1364,11 @@ function GuiaPerfilInversor() {
           <div className={styles.faqSectionItem}>
             <h3>¿Puedo tener dos perfiles diferentes para distintos objetivos?</h3>
             <p>
-              Sí, y de hecho es lo más inteligente. Puedes ser <strong>conservador para tu fondo de emergencia</strong>
-              (3–6 meses de gastos en cuenta remunerada) y <strong>dinámico para la jubilación</strong>
+              {/* 3301 — un salto de línea pegado a una etiqueta se come el espacio en JSX: los {' '}
+                  de este bloque y de la guía no sobran. 3302 — la jubilación a 30+ años es un
+                  horizonte de más de 15, el del Agresivo en el resultado y en el consejo de abajo. */}
+              Sí, y de hecho es lo más inteligente. Puedes ser <strong>conservador para tu fondo de emergencia</strong>{' '}
+              (3–6 meses de gastos en cuenta remunerada) y <strong>dinámico o agresivo para la jubilación</strong>{' '}
               (que queda a 30+ años). Cada objetivo tiene su propio horizonte temporal y tolerancia al riesgo.
             </p>
             <p className={styles.faqTip}>
@@ -1282,7 +1381,7 @@ function GuiaPerfilInversor() {
             <h3>¿Cómo afecta la inflación a mi elección de perfil?</h3>
             <p>
               La inflación es el &quot;riesgo invisible&quot; que erosiona el poder adquisitivo del dinero parado.
-              Con una inflación del 3&nbsp;%, un perfil <strong>demasiado conservador puede perder poder adquisitivo</strong>
+              Con una inflación del 3&nbsp;%, un perfil <strong>demasiado conservador puede perder poder adquisitivo</strong>{' '}
               en términos reales aunque no pierda dinero nominalmente. Por eso, incluso los más conservadores
               deben buscar algo por encima de la inflación.
             </p>
@@ -1311,7 +1410,7 @@ function GuiaPerfilInversor() {
               En la Unión Europea, los bancos y las gestoras tienen que hacer un test de idoneidad
               (MiFID II) por obligación legal, y en otros países existen exigencias equivalentes con
               otro nombre. Ese test a veces está sesgado hacia productos propios o hacia perfiles más
-              conservadores para reducir reclamaciones.
+              conservadores para reducir reclamaciones.{' '}
               <strong>El perfil del banco es orientativo</strong>; el de este test busca darte una imagen más
               objetiva de tu situación real.
             </p>
@@ -1332,7 +1431,7 @@ function GuiaPerfilInversor() {
             <p>
               No. El perfil óptimo es personal y depende de factores únicos: tu edad, ingresos, deudas,
               dependientes a cargo, experiencia inversora y, sobre todo, cómo reaccionas emocionalmente
-              ante pérdidas. <strong>El mejor perfil es el que puedes mantener sin vender en pánico</strong>
+              ante pérdidas. <strong>El mejor perfil es el que puedes mantener sin vender en pánico</strong>{' '}
               durante una crisis de mercado.
             </p>
             <p className={styles.faqTip}>
@@ -1403,7 +1502,7 @@ function GuiaPerfilInversor() {
             <div className={styles.stepContent}>
               <h3>Evalúa tu tolerancia emocional honestamente</h3>
               <p>
-                Imagina que tu cartera de 10.000&nbsp;€ vale 6.000&nbsp;€ mañana. <strong>¿Vendes, mantienes o compras más?</strong>
+                Imagina que tu cartera de 10.000&nbsp;€ vale 6.000&nbsp;€ mañana. <strong>¿Vendes, mantienes o compras más?</strong>{' '}
                 Tu respuesta honesta vale más que cualquier teoría financiera. Muchos inversores creen ser
                 agresivos hasta que experimentan su primer mercado bajista real.
               </p>

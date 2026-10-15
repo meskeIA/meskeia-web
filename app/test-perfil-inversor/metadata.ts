@@ -88,7 +88,9 @@ export const faqJsonLd = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Test de Perfil Inversor',
-  description: 'Test gratuito que evalúa tu tolerancia al riesgo financiero mediante 10 preguntas. Sitúa tu perfil en una escala de cinco tramos —conservador, moderado, equilibrado, dinámico y agresivo— y orienta tu estrategia de inversión.',
+  // 3300 — terminaba en «y orienta tu estrategia de inversión»: el resultado da un perfil y
+  // ejemplos ilustrativos, y dice expresamente que no son una recomendación.
+  description: 'Test gratuito que evalúa tu tolerancia al riesgo financiero mediante 10 preguntas. Sitúa tu perfil en una escala de cinco tramos —conservador, moderado, equilibrado, dinámico y agresivo— con ejemplos ilustrativos de lo que suele asociarse a cada uno.',
   url: 'https://meskeia.com/test-perfil-inversor/',
   category: 'FinanceApplication',
   features: [
@@ -99,10 +101,19 @@ export const jsonLd = generateWebAppSchema({
       financiero, «validadas» es una credencial que la app no tiene, y este es el texto que
       leen los asistentes de IA sin el disclaimer al lado.
     */
-    '10 preguntas sobre horizonte temporal, experiencia y tolerancia al riesgo',
-    'Resultado: uno de los cinco perfiles (conservador, moderado, equilibrado, dinámico o agresivo)',
-    'Recomendaciones orientativas según el perfil obtenido',
-    'En español',
+    /*
+      15/10/2026 (hallazgo 3300) — decía «Recomendaciones orientativas según el perfil obtenido»,
+      que el resultado niega («Son ejemplos ilustrativos, no una recomendación de inversión ni de
+      producto»), y «En español», que no es una función. La lista es ahora lo que la app hace.
+    */
+    '10 preguntas sobre horizonte, reacción ante caídas, experiencia, ingresos y objetivos',
+    'Puntuación de 10 a 40 con su tramo y aviso cuando cae en el borde entre dos perfiles',
+    'Uno de cinco perfiles con nivel de riesgo, horizonte, volatilidad y objetivo orientativos',
+    'Distribución de activos de ejemplo para cada perfil',
+    'Ejemplos ilustrativos de lo que suele asociarse a cada perfil, sin aconsejar productos',
+    'Revisar y cambiar respuestas desde el resultado sin repetir el test',
+    'Recupera el test a medias tras recargar en la misma pestaña',
+    'Enlace para simular la cartera del perfil en el estimador de carteras',
   ],
   keywords: ['perfil inversor', 'tolerancia riesgo', 'test inversión', 'finanzas personales'],
 });
