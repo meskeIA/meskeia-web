@@ -80,7 +80,7 @@ export default function GlobalError({
               color: 'var(--text-primary)',
               marginBottom: 'var(--spacing-sm)',
             }}>
-              🔍 Detalles técnicos (desarrollo)
+              <span aria-hidden="true">🔍</span> Detalles técnicos (desarrollo)
             </summary>
             <pre style={{
               fontSize: '0.85rem',
@@ -108,14 +108,14 @@ export default function GlobalError({
             onClick={reset}
             variant="primary"
           >
-            🔄 Intentar de nuevo
+            <span aria-hidden="true">🔄</span> Intentar de nuevo
           </Button>
 
           <Button
             onClick={() => window.location.href = '/'}
             variant="secondary"
           >
-            🏠 Volver al inicio
+            <span aria-hidden="true">🏠</span> Volver al inicio
           </Button>
         </div>
 

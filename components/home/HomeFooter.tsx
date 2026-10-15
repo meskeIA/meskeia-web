@@ -52,7 +52,7 @@ export default function HomeFooter() {
             }}
             className={styles.shareButton}
           >
-            🔗 Compartir meskeIA
+            <span aria-hidden="true">🔗</span> Compartir meskeIA
           </button>
         </nav>
       </div>

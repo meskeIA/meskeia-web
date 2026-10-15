@@ -274,7 +274,7 @@ export default function ShareCard({ appName }: ShareCardProps) {
           type="button"
           aria-label="Copiar enlace al portapapeles"
         >
-          {copiado ? '✓ ¡Copiado!' : '🔗 Copiar enlace'}
+          {copiado ? '✓ ¡Copiado!' : <><span aria-hidden="true">🔗</span> Copiar enlace</>}
         </button>
 
         <button

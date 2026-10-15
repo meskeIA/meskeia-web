@@ -71,7 +71,7 @@ export default function CoquinumFooter() {
             Privacidad
           </a>
           <button type="button" className={styles.shareBtn} onClick={compartir} aria-live="polite">
-            {copiado ? '✓ Enlace copiado' : '🔗 Compartir'}
+            {copiado ? '✓ Enlace copiado' : <><span aria-hidden="true">🔗</span> Compartir</>}
           </button>
         </nav>
       </div>
