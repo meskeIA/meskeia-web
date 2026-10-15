@@ -4597,9 +4597,10 @@ test.describe('Re-inspección 14/10/2026 (tarde) · hallazgo reparado', () => {
     await expect(page.getByRole('combobox', { name: /Característica 2/ })).toHaveCount(1, { timeout: 2000 });
     await expect(page.getByRole('combobox', { name: /Padre/ })).toHaveCount(2, { timeout: 2000 });
     await expect(page.getByRole('combobox', { name: /Madre/ })).toHaveCount(2, { timeout: 2000 });
-    // Y los cuatro de genotipo se distinguen entre sí: cada nombre dice progenitor Y rasgo.
+    // Y los cuatro de genotipo se distinguen entre sí: cada nombre dice progenitor Y rasgo. Los del
+    // rasgo 2 empiezan por su rótulo visible desde el 15/10/2026 (3321): «Rasgo 2 - Padre: genotipo de…».
     const nombres = await page
-      .getByRole('combobox', { name: /^Genotipo/ })
+      .getByRole('combobox', { name: /genotipo/i })
       .evaluateAll((els) => els.map((el) => el.getAttribute('aria-label') ?? ''));
     expect(nombres).toHaveLength(4);
     expect(new Set(nombres).size).toBe(4);
@@ -4943,10 +4944,11 @@ test.describe('Re-inspección 15/10/2026 · página traducida', () => {
     await paso(() => page.getByRole('button', { name: 'Dihíbrido', exact: true }).click());
     await expect(rotulo1).toHaveText('Característica 1:');
     await expect(page.getByRole('combobox', { name: 'Característica 2:' })).toHaveCount(1);
-    await expect(selectorGenotipo(page, 2)).toHaveAttribute('aria-label', 'Genotipo del Padre · Forma de semilla');
+    // Los del rasgo 2 empiezan por su rótulo visible desde el 15/10/2026 (3321, WCAG 2.5.3)
+    await expect(selectorGenotipo(page, 2)).toHaveAttribute('aria-label', 'Rasgo 2 - Padre: genotipo de Forma de semilla');
     await paso(() => selectorRasgo(page, 1).selectOption('altura-planta'));
-    await expect(selectorGenotipo(page, 2)).toHaveAttribute('aria-label', 'Genotipo del Padre · Altura de planta');
-    await expect(selectorGenotipo(page, 3)).toHaveAttribute('aria-label', 'Genotipo de la Madre · Altura de planta');
+    await expect(selectorGenotipo(page, 2)).toHaveAttribute('aria-label', 'Rasgo 2 - Padre: genotipo de Altura de planta');
+    await expect(selectorGenotipo(page, 3)).toHaveAttribute('aria-label', 'Rasgo 2 - Madre: genotipo de Altura de planta');
     await paso(() => selectorRasgo(page, 0).selectOption('color-flor'));
     await expect(selectorGenotipo(page, 0)).toHaveAttribute('aria-label', 'Genotipo del Padre · Color de flor');
     await expect(selectorGenotipo(page, 1)).toHaveAttribute('aria-label', 'Genotipo de la Madre · Color de flor');
@@ -4985,15 +4987,14 @@ test.describe('Re-inspección 15/10/2026 · hallazgos abiertos', () => {
     await esperarHidratacion(page, ['#casos-respuesta']);
   });
 
-  test('HALLAZGO 3321 · accesibilidad, bajo — los desplegables del rasgo 2 no contienen su rótulo visible «Rasgo 2 - Padre/Madre» (WCAG 2.5.3)', async ({
+  test('REPARADO 3321 · accesibilidad, bajo — los desplegables del rasgo 2 contienen su rótulo visible «Rasgo 2 - Padre/Madre» (WCAG 2.5.3)', async ({
     page,
   }) => {
-    // ABIERTO. 003094f9 (3309) dio a los cuatro desplegables de genotipo un aria-label «Genotipo del
+    // 003094f9 (3309) dio a los cuatro desplegables de genotipo un aria-label «Genotipo del
     // Padre · <rasgo>», que SUSTITUYE al rótulo visible. En el rasgo 1 el rótulo visible es «Padre»
-    // y está dentro del nombre; en el rasgo 2 es «Rasgo 2 - Padre» y no: quien maneja la página por
-    // voz y dice lo que lee («Rasgo 2 Padre») no encuentra el control. Esperado: el nombre accesible
-    // de cada desplegable contiene el texto visible de su rótulo (sin el ♂/♀, que es aria-hidden).
-    test.fail();
+    // y está dentro del nombre; en el rasgo 2 era «Rasgo 2 - Padre» y no: quien maneja la página por
+    // voz y dice lo que lee («Rasgo 2 Padre») no encontraba el control. REPARADO el 15/10/2026: el
+    // nombre de los del rasgo 2 empieza por su rótulo («Rasgo 2 - Padre: genotipo de <rasgo>»).
     await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
     await expect(page.getByRole('combobox')).toHaveCount(6);
     const pares = await page.locator('[class*="parentCard"]').evaluateAll((tarjetas) =>
@@ -5010,6 +5011,9 @@ test.describe('Re-inspección 15/10/2026 · hallazgos abiertos', () => {
     for (const { rotulo, nombre } of pares) {
       expect.soft(nombre, `«${rotulo}»`).toContain(rotulo);
     }
+    // Y por voz se encuentra diciendo lo que se lee
+    await expect(page.getByRole('combobox', { name: 'Rasgo 2 - Padre' })).toHaveCount(1);
+    await expect(page.getByRole('combobox', { name: 'Rasgo 2 - Madre' })).toHaveCount(1);
   });
 
   test('HALLAZGO 3322 · calculo, bajo — el corrector da por buenas respuestas que no son el resultado ni un redondeo suyo (99 % en la 1ª ley)', async ({

@@ -395,9 +395,11 @@ export default function SimuladorGeneticaPage() {
               <div className={styles.parentsContainer}>
                 <div className={styles.parentCard}>
                   <div className={styles.parentLabel}>Rasgo 2 - Padre</div>
+                  {/* 3321 — el nombre accesible empieza por el rótulo visible (WCAG 2.5.3): quien
+                      maneja la página por voz dice lo que lee, «Rasgo 2 Padre». */}
                   <select
                     className={styles.genotypeSelect}
-                    aria-label={`Genotipo del Padre · ${selectedTrait2.name}`}
+                    aria-label={`Rasgo 2 - Padre: genotipo de ${selectedTrait2.name}`}
                     value={parent1Genotype2}
                     onChange={(e) => setParent1Genotype2(e.target.value)}
                   >
@@ -413,7 +415,7 @@ export default function SimuladorGeneticaPage() {
                   <div className={styles.parentLabel}>Rasgo 2 - Madre</div>
                   <select
                     className={styles.genotypeSelect}
-                    aria-label={`Genotipo de la Madre · ${selectedTrait2.name}`}
+                    aria-label={`Rasgo 2 - Madre: genotipo de ${selectedTrait2.name}`}
                     value={parent2Genotype2}
                     onChange={(e) => setParent2Genotype2(e.target.value)}
                   >
