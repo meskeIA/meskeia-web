@@ -3889,18 +3889,46 @@ test.describe('re-inspección 15/10/2026', () => {
    *             (el caso del 3307: se oye «La4 (0 cents)» con el tono a +8) y con 440 → 440 (la segunda
    *             nota no se anuncia).
    */
-  test('HALLAZGO M1 — un sonido nuevo tras un silencio, en la misma medida, se anuncia aunque quede a menos de 10 cents del anterior', async ({
+  test('REPARADO M1 (3318) — un sonido nuevo tras un silencio, en la misma medida, se anuncia aunque quede a menos de 10 cents del anterior', async ({
     page,
   }) => {
-    // ABIERTO: comprobado el 15/10/2026 que cae en la última aserción (ninguna escritura del 454),
-    // no en las precondiciones de apagaYVuelve ni en la de que el primer sonido se anuncie.
-    test.fail();
+    // REPARADO el 15/10/2026: tras LECTURAS_ENTRE_SONIDOS lecturas sin cifra estable la referencia
+    // de la histéresis se reinicia, y el sonido siguiente se anuncia tras asentarse 300 ms (para no
+    // anunciar la cola del viejo). Antes caía en la última aserción: ninguna escritura del 454.
     await apagaYVuelve(page);
     await page.waitForTimeout(500);
     const textos = (await escriturasRegion(page)).map((e) => e.texto);
     expect(lecturaDeTexto(textos[0] ?? '')?.nota, `primera escritura de la región: «${textos[0]}»`).toBe('La4');
     const delSegundo = textos.map(lecturaDeTexto).filter((l) => l !== null && l.nota === 'La#4');
     expect(delSegundo.length, `la región solo ha dicho: ${textos.join(' · ')}`).toBeGreaterThan(0);
+    // Y lo que dice del segundo es el 454, no la cola del 452 (el aviso del hallazgo)
+    expect(delSegundo[0]?.hz, `la región ha dicho: ${textos.join(' · ')}`).toBe('454');
+    // El primero se anunció una vez, no se repite tras el silencio
+    expect(textos.map(lecturaDeTexto).filter((l) => l !== null && l.nota === 'La4').length).toBe(1);
+  });
+
+  test('REPARADO M1 (3318) — con 1 s de silencio y 440 → 442 Hz, el segundo sonido también se anuncia, y con su cifra', async ({
+    page,
+  }) => {
+    // El silencio corto del aviso del hallazgo: la ventana del análisis aún arrastra el 440 cuando
+    // empieza el 442. 1200·log2(442/440) = 7,85 cents, menos que la histéresis. 442 → La4 (+8 cents).
+    await vigilarMedidor(page);
+    await vigilarRegionMedidor(page);
+    await microfonoPorApertura(page, [
+      {
+        segundos: 7,
+        tonos: [
+          { hz: 440, amp: 0.3, desde: 0, hasta: 2.5, rampa: 0.02 },
+          { hz: 442, amp: 0.3, desde: 3.5, hasta: 6, rampa: 0.02 },
+        ],
+      },
+    ]);
+    await arrancarMedidor(page);
+    await expect(retenida(page)).toHaveText(/^Última lectura estable: 442\sHz · La4 \(\+[789]\scents\)$/, { timeout: 9000 });
+    await page.waitForTimeout(800);
+    const textos = (await escriturasRegion(page)).map((e) => e.texto);
+    const lecturas = textos.map(lecturaDeTexto).filter((l) => l !== null);
+    expect(lecturas.map((l) => l?.hz), `la región ha dicho: ${textos.join(' · ')}`).toEqual(['440', '442']);
   });
 
   /**
@@ -3916,12 +3944,12 @@ test.describe('re-inspección 15/10/2026', () => {
    *   obtenido  24 escrituras en 5,3 s, una cada 200 ms (406 · 409 · 412 · 415 · 418 Hz…), con unos
    *             12 cents entre una y la siguiente; a 20 cents/s, una cada 0,6 s
    */
-  test('HALLAZGO M2 — un deslizamiento lento no reescribe la región viva más deprisa de lo que la app deja leer un anuncio', async ({
+  test('REPARADO M2 (3319) — un deslizamiento lento no reescribe la región viva más deprisa de lo que la app deja leer un anuncio', async ({
     page,
   }) => {
-    // ABIERTO: comprobado el 15/10/2026 que cae en la última aserción (escrituras a 200 ms), no en las
-    // precondiciones de que el glissando se lea como estable y se anuncie.
-    test.fail();
+    // REPARADO el 15/10/2026: mientras un anuncio está en la región, la lectura nueva espera y se
+    // anuncia al expirar (si se ha movido 10 cents). Antes caía en la última aserción: escrituras
+    // cada 200 ms.
     await vigilarMedidor(page);
     await vigilarRegionMedidor(page);
     await microfonoPorApertura(page, [
@@ -3959,9 +3987,9 @@ test.describe('re-inspección 15/10/2026', () => {
    *   obtenido  campo 440, el oscilador recibe 440, y el aviso sigue: «Frecuencia puesta en el
    *             generador: 442 Hz. Pulsa Reproducir para oírla.»
    */
-  test('HALLAZGO M3 — tras llevar la lectura y cambiar de frecuencia, el aviso no sigue diciendo la que se llevó', async ({ page }) => {
-    // ABIERTO: comprobado el 15/10/2026 que cae en la última aserción, no en las precondiciones.
-    test.fail();
+  test('REPARADO M3 (3320) — tras llevar la lectura y cambiar de frecuencia, el aviso no sigue diciendo la que se llevó', async ({ page }) => {
+    // REPARADO el 15/10/2026: el aviso se retira en cuanto el generador deja de tener la frecuencia
+    // llevada. Antes caía en la última aserción.
     await microfonoSintetico(page, 4, [{ hz: 442, amp: 0.3, desde: 0, hasta: 4 }]);
     await arrancarMedidor(page);
     await expect(seccionMedidor(page).getByText('Lectura estable', { exact: true })).toBeVisible({ timeout: 6000 });

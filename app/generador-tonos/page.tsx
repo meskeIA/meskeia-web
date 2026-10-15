@@ -231,6 +231,15 @@ const MS_LECTURA_MEDIDOR = 100;
  */
 const MS_ANUNCIO_VISIBLE = 1500;
 /**
+ * 15/10/2026 (hallazgo 3318) — lecturas seguidas sin lectura estable que separan dos SONIDOS dentro
+ * de la misma medida (0,5 s): tras ellas, el siguiente se anuncia aunque quede a menos de 10 cents
+ * del anterior. Y lo que se espera antes de anunciarlo: tras un silencio corto la ventana del
+ * análisis aún arrastra el sonido viejo, y la primera lectura estable del nuevo es la del viejo
+ * durante 100-200 ms; se anuncia la que haya pasado ese tiempo.
+ */
+const LECTURAS_ENTRE_SONIDOS = 5;
+const MS_ASENTAR_ANUNCIO = 300;
+/**
  * Cuánto tiene que sobresalir el pico de la mediana del espectro para contar como tono, en dB.
  * El ruido blanco solo se queda por debajo de 15 y un tono sobre ese mismo ruido pasa de 30
  * (tests/frecuencia-dominante-motor.spec.ts): 20 deja margen a los dos lados.
@@ -513,6 +522,24 @@ export default function GeneradorTonosPage() {
    */
   const referenciaAnuncioRef = useRef<number | null>(null);
   const temporizadorAnuncioRef = useRef<number | undefined>(undefined);
+  /**
+   * ⚠️ 15/10/2026 (hallazgos 3318 y 3319) — la histéresis sola no bastaba.
+   *
+   * 3319: con un sonido que se desliza despacio (60 cents/s, que el 3308 deja escrito que sí es
+   * «estable») los 10 cents se cumplían cada dos lecturas y la región se reescribía cada 0,2 s,
+   * cuando la app da 1,5 s a cada anuncio. Ahora, mientras un anuncio está en la región
+   * (`'anunciando'`), lo nuevo espera en `pendienteAnuncioRef` y se anuncia al expirar si se ha
+   * movido 10 cents.
+   * 3318: la referencia solo se reiniciaba al pulsar «Medir la frecuencia», así que un sonido nuevo
+   * dentro de la misma medida (tocar, parar, corregir la clavija y volver a tocar) a menos de 10
+   * cents del anterior no se anunciaba nunca. Ahora se reinicia cuando el sonido falta
+   * LECTURAS_ENTRE_SONIDOS lecturas, y el siguiente se anuncia tras asentarse (`'asentando'`).
+   */
+  const pendienteAnuncioRef = useRef<number | null>(null);
+  const faseAnuncioRef = useRef<'libre' | 'asentando' | 'anunciando'>('libre');
+  const lecturasSinEstableRef = useRef(0);
+  /** Tras un silencio dentro de la medida, el primer anuncio espera MS_ASENTAR_ANUNCIO (3318). */
+  const asentarAnuncioRef = useRef(false);
   const [avisoMedidor, setAvisoMedidor] = useState<string | null>(null);
   /** Aviso que NO impide medir (procesados del micrófono que el navegador no deja apagar). */
   const [notaMedidor, setNotaMedidor] = useState<string | null>(null);
@@ -540,6 +567,8 @@ export default function GeneradorTonosPage() {
     setLecturaEsEstable(false);
     // Con el medidor parado no queda ninguna lectura en la región viva (3307)
     window.clearTimeout(temporizadorAnuncioRef.current);
+    faseAnuncioRef.current = 'libre';
+    pendienteAnuncioRef.current = null;
     setAnunciadaHz(null);
     liberarWakeLock();
   }, [liberarWakeLock]);
@@ -895,6 +924,11 @@ export default function GeneradorTonosPage() {
     setNotaMedidor(null);
     setAnuncioMedidor('');
     referenciaAnuncioRef.current = null;
+    pendienteAnuncioRef.current = null;
+    faseAnuncioRef.current = 'libre';
+    lecturasSinEstableRef.current = 0;
+    // La primera lectura de una medida se anuncia en el acto: la ventana ya espera a llenarse (2412)
+    asentarAnuncioRef.current = false;
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setAvisoMedidor('Este navegador no da acceso al micrófono, así que aquí no se puede medir.');
@@ -970,6 +1004,50 @@ export default function GeneradorTonosPage() {
      */
     const finLlenado = ctx.currentTime + analizador.fftSize / ctx.sampleRate + MS_LECTURA_MEDIDOR / 1000;
 
+    // ── Lo que se anuncia en la región viva (3307, 3318, 3319) ──
+    const centsEntre = (a: number, b: number) => Math.abs(1200 * Math.log2(a / b));
+    /** Escribe el anuncio y lo deja MS_ANUNCIO_VISIBLE: hasta entonces no se escribe otro. */
+    function anunciar(hz: number) {
+      referenciaAnuncioRef.current = hz;
+      pendienteAnuncioRef.current = null;
+      faseAnuncioRef.current = 'anunciando';
+      setAnunciadaHz(hz);
+      window.clearTimeout(temporizadorAnuncioRef.current);
+      temporizadorAnuncioRef.current = window.setTimeout(alExpirarAnuncio, MS_ANUNCIO_VISIBLE);
+    }
+    /** Espera MS_ASENTAR_ANUNCIO y anuncia la última lectura estable de ese momento (3318). */
+    function asentarYAnunciar() {
+      faseAnuncioRef.current = 'asentando';
+      window.clearTimeout(temporizadorAnuncioRef.current);
+      temporizadorAnuncioRef.current = window.setTimeout(() => {
+        const pendiente = pendienteAnuncioRef.current;
+        if (pendiente !== null) anunciar(pendiente);
+        else faseAnuncioRef.current = 'libre';
+      }, MS_ASENTAR_ANUNCIO);
+    }
+    /** Al expirar un anuncio: el pendiente lo sustituye si se ha movido 10 cents; si no, se vacía. */
+    function alExpirarAnuncio() {
+      const pendiente = pendienteAnuncioRef.current;
+      const referencia = referenciaAnuncioRef.current;
+      if (pendiente !== null && referencia !== null && centsEntre(pendiente, referencia) >= 10) {
+        anunciar(pendiente);
+        return;
+      }
+      setAnunciadaHz(null);
+      // Empezó otro sonido mientras se leía el anuncio del anterior
+      if (pendiente !== null && referencia === null) asentarYAnunciar();
+      else faseAnuncioRef.current = 'libre';
+    }
+    /** Una lectura sin cifra estable; tras LECTURAS_ENTRE_SONIDOS seguidas, el sonido siguiente es otro. */
+    function sinLecturaEstable() {
+      lecturasSinEstableRef.current += 1;
+      if (lecturasSinEstableRef.current >= LECTURAS_ENTRE_SONIDOS && referenciaAnuncioRef.current !== null) {
+        referenciaAnuncioRef.current = null;
+        pendienteAnuncioRef.current = null;
+        asentarAnuncioRef.current = true;
+      }
+    }
+
     const intervalo = window.setInterval(() => {
       if (ctx.currentTime < finLlenado) return;
       analizador.getFloatFrequencyData(espectro);
@@ -985,6 +1063,7 @@ export default function GeneradorTonosPage() {
         ventana.length = 0;
         setLecturaHz(null);
         setLecturaEsEstable(false);
+        sinLecturaEstable();
         return;
       }
       // Con su NIVEL: la frecuencia sola no distingue un tono de un clic (hallazgo 2615)
@@ -995,16 +1074,22 @@ export default function GeneradorTonosPage() {
       setLecturaEsEstable(estable !== null);
       // La retenida es siempre la última estable; solo se anuncia si el tono se mueve 10 cents o
       // más desde lo último anunciado: con cada décima de hercio de baile un lector de pantalla lo
-      // anunciaría diez veces por segundo. El anuncio se vacía al poco (3307).
-      if (estable !== null) {
-        setUltimaEstableHz(estable);
-        const referencia = referenciaAnuncioRef.current;
-        if (referencia === null || Math.abs(1200 * Math.log2(estable / referencia)) >= 10) {
-          referenciaAnuncioRef.current = estable;
-          setAnunciadaHz(estable);
-          window.clearTimeout(temporizadorAnuncioRef.current);
-          temporizadorAnuncioRef.current = window.setTimeout(() => setAnunciadaHz(null), MS_ANUNCIO_VISIBLE);
-        }
+      // anunciaría diez veces por segundo. El anuncio se vacía al poco (3307), y mientras está en
+      // la región no se escribe otro: lo nuevo espera a que expire (3319).
+      if (estable === null) {
+        sinLecturaEstable();
+        return;
+      }
+      lecturasSinEstableRef.current = 0;
+      setUltimaEstableHz(estable);
+      pendienteAnuncioRef.current = estable;
+      if (faseAnuncioRef.current !== 'libre') return; // decide el temporizador en curso
+      const referencia = referenciaAnuncioRef.current;
+      if (referencia === null) {
+        if (asentarAnuncioRef.current) asentarYAnunciar();
+        else anunciar(estable);
+      } else if (centsEntre(estable, referencia) >= 10) {
+        anunciar(estable);
       }
     }, MS_LECTURA_MEDIDOR);
 
@@ -1021,8 +1106,22 @@ export default function GeneradorTonosPage() {
     // Un decimal: más finura que esa no la da la medida, y el campo la escribe tal cual.
     const v = Math.round(ultimaEstableHz * 10) / 10;
     aplicarFrecuencia(v);
+    frecuenciaLlevadaRef.current = acotarFrecuencia(v);
     setAnuncioMedidor(`Frecuencia puesta en el generador: ${cifraExacta(acotarFrecuencia(v))} Hz. Pulsa Reproducir para oírla.`);
   };
+
+  /**
+   * 15/10/2026 (hallazgo 3320) — el aviso de lo llevado solo se borraba al volver a medir: tras un
+   * preset, el deslizador, el campo o el barrido seguía diciendo «Frecuencia puesta en el generador:
+   * 442 Hz. Pulsa Reproducir para oírla.» y «Reproducir» emitía otra cosa. Se retira en cuanto el
+   * generador deja de tener la frecuencia llevada.
+   */
+  const frecuenciaLlevadaRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (frecuenciaLlevadaRef.current === null || frecuencia === frecuenciaLlevadaRef.current) return;
+    frecuenciaLlevadaRef.current = null;
+    setAnuncioMedidor('');
+  }, [frecuencia]);
 
   // El wake lock se libera solo al ocultar la pestaña; si se vuelve mientras el tono
   // sigue sonando, hay que volver a pedirlo.
