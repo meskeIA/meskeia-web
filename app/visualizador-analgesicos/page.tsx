@@ -462,7 +462,7 @@ export default function VisualizadorAnalgesicos() {
                   farmaco.esAntinflamatorio ? styles.badgePositivo : styles.badgeNegativo
                 }
               >
-                {farmaco.esAntinflamatorio ? '✅ Antiinflamatorio' : '❌ No antiinflamatorio'}
+                {farmaco.esAntinflamatorio ? <><span aria-hidden="true">✅</span> Antiinflamatorio</> : <><span aria-hidden="true">❌</span> No antiinflamatorio</>}
               </span>
               <span
                 className={

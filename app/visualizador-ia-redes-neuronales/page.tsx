@@ -518,10 +518,10 @@ export default function VisualizadorIaRedesNeuronales() {
                   />
                   <p className={styles.lrInfo}>
                     {learningRate < 0.01
-                      ? '⚠️ Muy bajo — convergencia lenta'
+                      ? <><span aria-hidden="true">⚠️</span> Muy bajo — convergencia lenta</>
                       : learningRate > 0.5
-                      ? '⚠️ Muy alto — puede oscilar o divergir'
-                      : '✅ Rango adecuado para este ejemplo'}
+                      ? <><span aria-hidden="true">⚠️</span> Muy alto — puede oscilar o divergir</>
+                      : <><span aria-hidden="true">✅</span> Rango adecuado para este ejemplo</>}
                   </p>
                 </div>
 

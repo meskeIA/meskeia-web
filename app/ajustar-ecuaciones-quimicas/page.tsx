@@ -1116,14 +1116,14 @@ export default function AjustarEcuacionesQuimicas() {
                         <td><strong>{c.elemento}</strong></td>
                         <td>{c.izq}</td>
                         <td>{c.der}</td>
-                        <td>{c.izq === c.der ? '✅ conservado' : '❌ descuadre'}</td>
+                        <td>{c.izq === c.der ? <><span aria-hidden="true">✅</span> conservado</> : <><span aria-hidden="true">❌</span> descuadre</>}</td>
                       </tr>
                     ))}
                     <tr>
                       <td><strong>Carga total</strong></td>
                       <td>{formatearEO(ajuste.cargaIzq)}</td>
                       <td>{formatearEO(ajuste.cargaDer)}</td>
-                      <td>{ajuste.cargaIzq === ajuste.cargaDer ? '✅ conservada' : '❌ descuadre'}</td>
+                      <td>{ajuste.cargaIzq === ajuste.cargaDer ? <><span aria-hidden="true">✅</span> conservada</> : <><span aria-hidden="true">❌</span> descuadre</>}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1390,14 +1390,14 @@ export default function AjustarEcuacionesQuimicas() {
                         <td><strong>{c.elemento}</strong></td>
                         <td>{c.izq}</td>
                         <td>{c.der}</td>
-                        <td>{c.izq === c.der ? '✅ conservado' : '❌ descuadre'}</td>
+                        <td>{c.izq === c.der ? <><span aria-hidden="true">✅</span> conservado</> : <><span aria-hidden="true">❌</span> descuadre</>}</td>
                       </tr>
                     ))}
                     <tr>
                       <td><strong>Carga total</strong></td>
                       <td>{formatearEO(redox.cargaIzq)}</td>
                       <td>{formatearEO(redox.cargaDer)}</td>
-                      <td>{redox.cargaIzq === redox.cargaDer ? '✅ conservada' : '❌ descuadre'}</td>
+                      <td>{redox.cargaIzq === redox.cargaDer ? <><span aria-hidden="true">✅</span> conservada</> : <><span aria-hidden="true">❌</span> descuadre</>}</td>
                     </tr>
                   </tbody>
                 </table>

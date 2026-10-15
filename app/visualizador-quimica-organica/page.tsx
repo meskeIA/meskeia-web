@@ -775,7 +775,7 @@ export default function VisualizadorQuimicaOrganica() {
                 <div className={styles.aromaticNombre}>{c.nombre}</div>
                 <div className={styles.aromaticFormula}>{c.formula}</div>
                 <div className={styles.aromaticHuckel}>
-                  {c.electrones}e⁻π · {c.aromatico ? `n=${c.n} ✅` : '4n=4 ❌'}
+                  {c.electrones}e⁻π · {c.aromatico ? <>n={c.n} <span aria-hidden="true">✅</span></> : <>4n=4 <span aria-hidden="true">❌</span></>}
                 </div>
                 <div className={styles.aromaticUso}>{c.uso}</div>
               </div>

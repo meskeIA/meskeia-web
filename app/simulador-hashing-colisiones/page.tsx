@@ -610,7 +610,7 @@ export default function SimuladorHashingColisiones() {
             <span
               className={factorCarga > 0.75 ? styles.alertaAlta : ''}
             >
-              {factorCarga > 0.75 ? '⚠ α > 0,75 — rendimiento degradado' : `α = ${factorCarga.toFixed(2)}`}
+              {factorCarga > 0.75 ? <><span aria-hidden="true">⚠</span> {'α > 0,75 — rendimiento degradado'}</> : `α = ${factorCarga.toFixed(2)}`}
             </span>
           </div>
           <div className={styles.factorBarraFondo}>
