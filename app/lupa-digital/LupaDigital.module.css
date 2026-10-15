@@ -163,8 +163,11 @@
   box-shadow: 0 6px 20px rgba(46, 134, 171, 0.4);
 }
 
+/* 15/10/2026 (hallazgo 3305) — blanco sobre #EF4444 daba 3,76:1 en «⏹️ Detener», que con
+   peso 600 es texto normal y exige 4,5:1. #B91C1C sigue siendo rojo y da 6,47:1, igual en los
+   dos temas porque el fondo no cambia con el tema. */
 .btnPrincipal.activo {
-  background: #EF4444;
+  background: #B91C1C;
 }
 
 .btnCambiarCamara {
@@ -425,10 +428,12 @@
   border-color: #F59E0B;
 }
 
+/* 3305 — blanco sobre ámbar daba 2,15:1 en «🔦 Linterna ON». El ámbar es el color de la luz
+   encendida y se queda; el texto pasa a casi negro (7,0:1), fijo en los dos temas como el fondo. */
 .btnLinterna.linternaActiva {
   background: #F59E0B;
   border-color: #F59E0B;
-  color: white;
+  color: #1F2937;
 }
 
 .btnReset {

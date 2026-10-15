@@ -34,6 +34,10 @@ export function leerRangoZoom(capacidades: { zoom?: Partial<RangoZoomCamara> } |
   // zoom en sus propias unidades (100-500, por ejemplo). Tratarlo como aumentos dejaba el vídeo
   // en scale(0,02) dentro del visor negro (hallazgo 3290); todo el zoom va a la pantalla.
   if (z.min > 1) return null;
+  // Lo mismo con un mínimo de 0 o menos (0-10, por ejemplo): 0 aumentos no existe, así que esa
+  // escala tampoco es de aumentos, y pedirle «2» no tiene por qué ampliar 2 veces (hallazgo 3306).
+  // Un mínimo de 0,5 (gran angular) sí es un aumento y se queda.
+  if (z.min <= 0) return null;
   return { min: z.min, max: z.max, step: typeof z.step === 'number' && z.step > 0 ? z.step : 0 };
 }
 

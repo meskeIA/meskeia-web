@@ -1467,10 +1467,11 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
   // Caso: cámara {1..3} que acepta 2x y luego lo rechaza todo; 3x y después 1x → esperado: la nota
   //       no atribuye a la cámara más aumento del que marca el indicador · obtenido «Los 2x los
   //       hace la propia cámara, sobre la imagen completa del sensor…» con el indicador en «1x».
-  test('HALLAZGO 3304 (operativa) — con la cámara clavada en 2x, a 1x la nota no debe decir que «Los 2x los hace la propia cámara»', async ({
+  // REPARADO (15/10/2026): con la pantalla por debajo de 1 la nota tiene su propia frase, que dice
+  // dónde se ha quedado la cámara y que la imagen se reduce en pantalla.
+  test('REPARADO 3304 (operativa) — con la cámara clavada en 2x, a 1x la nota no debe decir que «Los 2x los hace la propia cámara»', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
     const camaras = { trasera: { min: 1, max: 3, step: 0.1 }, frontal: null };
     await simularCamaraPorPista(page, camaras);
     await page.goto(RUTA);
@@ -1486,8 +1487,19 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
     await page.getByRole('button', { name: '1x', exact: true }).click();
     await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 0.5, total: 1 });
     await expect(page.locator('[class*=zoomIndicador]')).toHaveText('1x');
-    // DEBERÍA: la nota no contradice al indicador.
-    await expect(page.locator('[class*=zoomNota]')).not.toHaveText(/^Los 2x los hace la propia cámara/);
+    // La nota no contradice al indicador: dice dónde se ha quedado la cámara y que se reduce.
+    const nota = page.locator('[class*=zoomNota]');
+    await expect(nota).not.toHaveText(/^Los 2x los hace la propia cámara/);
+    await expect(nota).toHaveText(
+      'La cámara se ha quedado en 2x y no deja bajar de ahí: para ver 1x, la imagen se reduce en pantalla y queda un borde negro alrededor.',
+    );
+    // 1,5x: cámara 2 y pantalla 0,75, la misma situación
+    await page.getByRole('button', { name: '1,5x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 0.75, total: 1.5 });
+    await expect(nota).toHaveText(/^La cámara se ha quedado en 2x y no deja bajar de ahí: para ver 1,5x/);
+    // 2x vuelve a ser todo de la cámara
+    await page.getByRole('button', { name: '2x', exact: true }).click();
+    await expect(nota).toHaveText(/^Los 2x los hace la propia cámara/);
   });
 
   // ⚠️ HALLAZGO 3306, vecino del 3290 (cuyo caso, 100-500, sí se sostiene) — operativa (14/10/2026,
@@ -1500,10 +1512,10 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
   // Caso: cámara {0..10, paso 1}, activar (2x) → esperado, como con 100-500: nada pedido a la
   //       cámara, vídeo a scale(2) y sin nota · obtenido applyConstraints({zoom: 2}), scale(1) y
   //       «Los 2x los hace la propia cámara…».
-  test('HALLAZGO 3306 (operativa, vecino del 3290) — una cámara que da el zoom en unidades propias desde 0 (0-10) tampoco debe tratarse como aumentos', async ({
+  // REPARADO (15/10/2026): leerRangoZoom descarta también un mínimo ≤ 0; el 0,5 sigue valiendo.
+  test('REPARADO 3306 (operativa, vecino del 3290) — una cámara que da el zoom en unidades propias desde 0 (0-10) tampoco debe tratarse como aumentos', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
     await simularCamaraPorPista(page, { trasera: { min: 0, max: 10, step: 1 }, frontal: null });
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#control-zoom']);
@@ -1525,10 +1537,11 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
   // recoge texto EN color de marca) y de la campaña C0070 (blanco sobre la marca): rojo y ámbar.
   // Caso: activar, encender la linterna (cámara con torch simulada) y medir en los dos temas →
   //       esperado ≥ 4,5:1 · obtenido 3,76:1 y 2,15:1 en claro y en oscuro.
-  test('HALLAZGO 3305 (accesibilidad) — «Detener» y «Linterna ON» deben llegar a 4,5:1 en los dos temas', async ({
+  // REPARADO (15/10/2026): «Detener» sobre #B91C1C (6,47:1) y «Linterna ON» con texto #1F2937 sobre
+  // el mismo ámbar (7,0:1), fijos en los dos temas.
+  test('REPARADO 3305 (accesibilidad) — «Detener» y «Linterna ON» deben llegar a 4,5:1 en los dos temas', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
     // La cámara simulada de Chromium no tiene linterna: esta dice tenerla y acepta encenderla.
     await page.addInitScript(() => {
       const proto = MediaStreamTrack.prototype;
