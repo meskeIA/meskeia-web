@@ -723,11 +723,11 @@ export default function SimuladorTestHipotesisPage() {
                 <tr>
                   <td><strong>H₀ es cierta</strong></td>
                   <td><span aria-hidden="true">✅</span> Decisión correcta (1 − α)</td>
-                  <td>❌ <strong>Error tipo I</strong> (α). Rechazar H₀ siendo cierta.</td>
+                  <td><span aria-hidden="true">❌</span> <strong>Error tipo I</strong> (α). Rechazar H₀ siendo cierta.</td>
                 </tr>
                 <tr>
                   <td><strong>H₀ es falsa (H₁ cierta)</strong></td>
-                  <td>❌ <strong>Error tipo II</strong> (β). No rechazar H₀ siendo falsa.</td>
+                  <td><span aria-hidden="true">❌</span> <strong>Error tipo II</strong> (β). No rechazar H₀ siendo falsa.</td>
                   <td><span aria-hidden="true">✅</span> Decisión correcta (1 − β = potencia)</td>
                 </tr>
               </tbody>

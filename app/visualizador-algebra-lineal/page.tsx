@@ -380,8 +380,8 @@ function TabTransformaciones() {
             {det === 0
               ? <><span aria-hidden="true">⚠️</span> det = 0: la transformación colapsa el plano a una línea (o punto). No es invertible.</>
               : det < 0
-              ? '↩️ det < 0: la orientación se invierte (izquierda/derecha se intercambian).'
-              : '✓ det > 0: la orientación se preserva.'}
+              ? <><span aria-hidden="true">↩️</span> det &lt; 0: la orientación se invierte (izquierda/derecha se intercambian).</>
+              : <><span aria-hidden="true">✓</span> det &gt; 0: la orientación se preserva.</>}
           </div>
 
           <div className={styles.presets}>

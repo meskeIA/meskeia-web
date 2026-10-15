@@ -135,6 +135,7 @@ export default function CalculadoraPropinas() {
                 className={`${styles.btnPorcentaje} ${
                   porcentaje === 10 ? styles.activo : ''
                 }`}
+                aria-pressed={porcentaje === 10}
                 onClick={() => establecerPorcentaje(10)}
               >
                 10%
@@ -144,6 +145,7 @@ export default function CalculadoraPropinas() {
                 className={`${styles.btnPorcentaje} ${
                   porcentaje === 15 ? styles.activo : ''
                 }`}
+                aria-pressed={porcentaje === 15}
                 onClick={() => establecerPorcentaje(15)}
               >
                 15%
@@ -153,6 +155,7 @@ export default function CalculadoraPropinas() {
                 className={`${styles.btnPorcentaje} ${
                   porcentaje === 20 ? styles.activo : ''
                 }`}
+                aria-pressed={porcentaje === 20}
                 onClick={() => establecerPorcentaje(20)}
               >
                 20%
@@ -191,13 +194,13 @@ export default function CalculadoraPropinas() {
               value={paisSeleccionado}
               onChange={cambiarPais}
             >
-              <option value="es-10">🇪🇸 España (10%)</option>
-              <option value="us-18">🇺🇸 Estados Unidos (18%)</option>
-              <option value="mx-12">🇲🇽 México (12%)</option>
-              <option value="uk-10">🇬🇧 Reino Unido (10%)</option>
-              <option value="fr-8">🇫🇷 Francia (8%)</option>
-              <option value="de-8">🇩🇪 Alemania (8%)</option>
-              <option value="jp-0">🇯🇵 Japón (0% - No propina)</option>
+              <option value="es-10">🇪🇸 España (10%)</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el país */}
+              <option value="us-18">🇺🇸 Estados Unidos (18%)</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el país */}
+              <option value="mx-12">🇲🇽 México (12%)</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el país */}
+              <option value="uk-10">🇬🇧 Reino Unido (10%)</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el país */}
+              <option value="fr-8">🇫🇷 Francia (8%)</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el país */}
+              <option value="de-8">🇩🇪 Alemania (8%)</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el país */}
+              <option value="jp-0">🇯🇵 Japón (0% - No propina)</option>{/* a11y-ok: <option> solo admite texto, y el texto ya dice el país */}
               <option value="custom">Personalizado</option>
             </select>
           </div>

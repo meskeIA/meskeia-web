@@ -227,9 +227,8 @@ export default function SimuladorColisionesPage() {
             onClick={lanzarSimulacion}
             disabled={fase === 'pre' || fase === 'impact'}
             className={styles.btnSimular}
-            aria-label="Lanzar simulación"
           >
-            {fase === 'idle' ? <><span aria-hidden="true">▶</span> Simular colisión</> : fase === 'done' ? '↺ Volver a simular' : <><span aria-hidden="true">⏳</span> Simulando...</>}
+            {fase === 'idle' ? <><span aria-hidden="true">▶</span> Simular colisión</> : fase === 'done' ? <><span aria-hidden="true">↺</span> Volver a simular</> : <><span aria-hidden="true">⏳</span> Simulando...</>}
           </button>
         </div>
 

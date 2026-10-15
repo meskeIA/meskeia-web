@@ -566,7 +566,7 @@ export default function Page() {
               </>
             )}
             <button className={styles.controlBtn} onClick={reiniciar} type="button">
-              ⟲ Reiniciar
+              <span aria-hidden="true">⟲</span> Reiniciar
             </button>
           </div>
         </div>

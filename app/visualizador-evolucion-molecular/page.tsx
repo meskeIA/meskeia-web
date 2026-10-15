@@ -444,7 +444,7 @@ export default function VisualizadorEvolucionMolecular() {
             {ultimaMutacion && (
               <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                 <span className={`${styles.clasificacionBadge} ${ultimaMutacion.sinonima ? styles.badgeNeutra : styles.badgeSeleccion}`}>
-                  {ultimaMutacion.sinonima ? '✓ Mutación sinónima (neutra)' : <><span aria-hidden="true">⚠</span> Mutación no sinónima (cambia aminoácido)</>}
+                  {ultimaMutacion.sinonima ? <><span aria-hidden="true">✓</span> Mutación sinónima (neutra)</> : <><span aria-hidden="true">⚠</span> Mutación no sinónima (cambia aminoácido)</>}
                 </span>
                 <div className={styles.infoMutacion}>
                   Posición <strong>{ultimaMutacion.posicion + 1}</strong>:{' '}
