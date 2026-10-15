@@ -15,8 +15,8 @@ import { formatPercentage } from '@/lib';
  * el tamaño de la respuesta.
  *
  * Se repara por el lado de la CIFRA y no relajando el corrector: 6,25 % es lo que da el cuadro
- * de Punnett, y redondearlo a 6 % era perder justo la precisión que el ejercicio pide. El
- * corrector ya admite 0,01 de desvío, que cubre de sobra lo que aquí se publica.
+ * de Punnett, y redondearlo a 6 % era perder justo la precisión que el ejercicio pide. Desde el
+ * 15/10/2026 (hallazgo 3322) el corrector exige la cifra exacta, que es la que aquí se publica.
  */
 const porcentajeExacto = (valor: number): string =>
   // Con el % separado por espacio duro (formatPercentage, hallazgo 1698 del 25/09/2026).

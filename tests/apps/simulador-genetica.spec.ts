@@ -686,15 +686,18 @@ test.describe('simulador-genetica · casos para clase', () => {
     // 22/09/2026 (1207): la magnitud es un argumento OBLIGATORIO, para que nadie pueda volver
     // a corregir sin saber en qué unidad está la respuesta.
     expect(comprobarRespuesta(25, 25, 'porcentaje').correcto).toBe(true);
-    expect(comprobarRespuesta(25.2, 25, 'porcentaje').correcto).toBe(true); // dentro del 1 %
+    // 15/10/2026 (3322): política de REDONDEO. 25 es exacto, así que 25,2 ya no es un acierto
+    // (con la relativa del 1 % lo era, y no es un redondeo de 25 a ningún decimal).
+    expect(comprobarRespuesta(25.2, 25, 'porcentaje').correcto).toBe(false);
     expect(comprobarRespuesta(30, 25, 'porcentaje').correcto).toBe(false);
     expect(comprobarRespuesta(NaN, 25, 'porcentaje').correcto).toBe(false);
     expect(comprobarRespuesta(NaN, 25, 'porcentaje').motivo).toContain('número');
 
-    // La tolerancia nunca baja de 0,01, para que el 6,25 del caso 7 no se corrija a ciegas.
-    expect(toleranciaDe(0)).toBe(0.01);
-    expect(toleranciaDe(6.25)).toBe(0.0625);
-    expect(toleranciaDe(100)).toBe(1);
+    // Respuesta exacta a 2 decimales → tolerancia 0; si hubiera que redondear, media centésima.
+    expect(toleranciaDe(0)).toBe(0);
+    expect(toleranciaDe(6.25)).toBe(0);
+    expect(toleranciaDe(100)).toBe(0);
+    expect(toleranciaDe(100 / 3)).toBe(0.005);
 
     // Y un cruce que no produce el fenotipo pedido informa de lo que sí produce.
     const imposible = resolverCaso({
@@ -1501,15 +1504,17 @@ test.describe('Re-inspección 22/09/2026 · hallazgos reparados', () => {
   });
 
   test('1207 (regresión) — el corrector no da por buena una proporción imposible', async () => {
-    // Sin navegador: es aritmética de `comprobarRespuesta`. La tolerancia sigue siendo el mayor
-    // entre 0,01 y el 1 % del valor esperado —con esperado = 100 vale 1—, y eso NO se ha
-    // tocado: lo que se ha añadido es el DOMINIO de la magnitud, que se comprueba antes, porque
-    // un «101 %» de la descendencia no es una respuesta imprecisa sino una que no puede existir.
-    expect(toleranciaDe(100)).toBe(1);
+    // Sin navegador: es aritmética de `comprobarRespuesta`. Lo que añadió el 1207 es el DOMINIO de
+    // la magnitud, que se comprueba antes de la tolerancia, porque un «101 %» de la descendencia no
+    // es una respuesta imprecisa sino una que no puede existir.
+    // 15/10/2026 (3322, decidido por el usuario): la tolerancia pasa de la relativa (el 1 %, que con
+    // esperado = 100 valía 1) a la de redondeo, 0 con una respuesta exacta. Esta regresión afirmaba
+    // que «el 99 sigue aceptándose»: un 99 % supondría un 1 % de verdes que AA × aa no puede dar.
+    expect(toleranciaDe(100)).toBe(0);
     expect(comprobarRespuesta(101, 100, 'porcentaje').correcto).toBe(false);
     expect(comprobarRespuesta(-1, 100, 'porcentaje').correcto).toBe(false);
-    // Y el 99, que sí entra en la tolerancia, sigue aceptándose: el dominio no la sustituye.
-    expect(comprobarRespuesta(99, 100, 'porcentaje').correcto).toBe(true);
+    expect(comprobarRespuesta(99, 100, 'porcentaje').correcto).toBe(false);
+    expect(comprobarRespuesta(100, 100, 'porcentaje').correcto).toBe(true);
 
     // El mismo techo, en el caso 3 de verdad (AA × aa, toda la F1 amarilla).
     const caso3 = CASOS.find((c) => c.id === 3);
@@ -4834,8 +4839,9 @@ test.describe('Re-inspección 15/10/2026 · los tres casos', () => {
     // La menor respuesta de los 16 casos es 1/16 del total = 6,25 (casos 7 y 16).
     expect(Math.min(...CASOS.map((c) => c.respuesta))).toBe(6.25);
     for (const c of CASOS) {
-      // Manda siempre la tolerancia relativa (1 % del valor), nunca el suelo de 0,01.
-      expect(toleranciaDe(c.respuesta), `caso ${c.id}`).toBeCloseTo(c.respuesta * 0.01, 9);
+      // Desde el 15/10/2026 (3322) la política es la de redondeo: las 16 respuestas son exactas a
+      // 2 decimales, así que la tolerancia es 0 en todas (antes, el 1 % del valor).
+      expect(toleranciaDe(c.respuesta), `caso ${c.id}`).toBe(0);
       expect(comprobarRespuesta(c.respuesta, c.respuesta, c.datos.busca.magnitud).correcto, `caso ${c.id}`).toBe(true);
       expect(comprobarRespuesta(0, c.respuesta, c.datos.busca.magnitud).correcto, `caso ${c.id} con 0`).toBe(false);
     }
@@ -5016,24 +5022,22 @@ test.describe('Re-inspección 15/10/2026 · hallazgos abiertos', () => {
     await expect(page.getByRole('combobox', { name: 'Rasgo 2 - Madre' })).toHaveCount(1);
   });
 
-  test('HALLAZGO 3322 · calculo, bajo — el corrector da por buenas respuestas que no son el resultado ni un redondeo suyo (99 % en la 1ª ley)', async ({
+  test('REPARADO 3322 · calculo, bajo — el corrector no da por buenas respuestas que no son el resultado ni un redondeo suyo (99 % en la 1ª ley)', async ({
     page,
   }) => {
-    // ABIERTO. La tolerancia es el 1 % del valor (toleranciaRelativa del motor compartido), pero
-    // las 16 respuestas son exactas con dos decimales como mucho (k/4 o k/16 del total) y desde el
-    // 1206 Estadísticas las imprime exactas: no hay redondeo que el alumno deba arrastrar. Así, en el
-    // caso 3 (AA × aa, la uniformidad: 100 %) «99» y «99,5» salen «¡Correcto!», y en el 10 igual;
-    // en el 6 (56,25) «56,8», y en el 16 (6,25) «6,19» y «6,31», que no son redondeos de 6,25 a
-    // ningún decimal (6,3 · 6,2 · 6). Esperado: ninguna de ellas es «¡Correcto!».
-    // ⚠️ Al repararlo, la regresión del 1207 de este fichero afirma `comprobarRespuesta(99, 100)`
-    // = true («el 99 sigue aceptándose»): esa línea habrá que revisarla con la decisión.
-    test.fail();
+    // La tolerancia era el 1 % del valor (toleranciaRelativa del motor compartido), pero las 16
+    // respuestas son exactas con dos decimales como mucho (k/4 o k/16 del total) y desde el 1206
+    // Estadísticas las imprime exactas: no hay redondeo que el alumno deba arrastrar. Así, en el
+    // caso 3 (AA × aa, la uniformidad: 100 %) «99» y «99,5» salían «¡Correcto!», y en el 10 igual;
+    // en el 6 (56,25) «56,8», y en el 16 (6,25) «6,19» y «6,31». REPARADO el 15/10/2026 con la
+    // decisión del usuario: política de REDONDEO (toleranciaDeRedondeo), como simulador-punnett;
+    // «56,3» por 56,25 tampoco vale (consecuencia aceptada). Las respuestas exactas siguen valiendo.
     const campo = page.locator('#casos-respuesta');
     const veredicto = page.locator('[class*="casoVeredicto"]');
     const casos: Array<[number, string[]]> = [
       [3, ['99', '99,5']],
       [10, ['99']],
-      [6, ['56,8']],
+      [6, ['56,8', '56,3']],
       [16, ['6,19', '6,31']],
     ];
     for (const [id, entradas] of casos) {
@@ -5045,6 +5049,14 @@ test.describe('Re-inspección 15/10/2026 · hallazgos abiertos', () => {
         await expect(veredicto).toBeVisible();
         expect.soft(await veredicto.innerText(), `caso ${id}, «${texto}»`).not.toContain('¡Correcto!');
       }
+    }
+    // Las exactas, sí (también con el % escrito)
+    for (const [id, texto] of [[3, '100'], [6, '56,25'], [16, '6,25 %']] as const) {
+      await page.getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+      await campo.fill(texto);
+      await esperarValorEnReact(page, '#casos-respuesta', texto);
+      await page.getByRole('button', { name: 'Comprobar' }).click();
+      await expect(veredicto, `caso ${id}, «${texto}»`).toContainText('¡Correcto!');
     }
   });
 });

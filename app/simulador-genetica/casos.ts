@@ -64,7 +64,7 @@ import {
 } from './components/genetics';
 import type { Trait, PunnettResult } from './components/types';
 import { formatNumber } from '@/lib';
-import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Qué se pregunta: una clave del cuadro, y en qué unidad se responde. */
 export interface Busca {
@@ -250,9 +250,19 @@ function numero(v: number): string {
   return Number.isInteger(v) ? formatNumber(v, 0) : formatNumber(v, 2);
 }
 
-/** Tolerancia al corregir: el MAYOR entre 0,01 y el 1 % del valor esperado. */
+/**
+ * Tolerancia al corregir: la política de REDONDEO del motor compartido, a 2 decimales (la
+ * precisión máxima de los enunciados), como simulador-punnett (hallazgo 751).
+ *
+ * ⚠️ 15/10/2026 (hallazgo 3322, decidido por el usuario) — era la RELATIVA, el mayor entre 0,01 y
+ * el 1 % del esperado. Las 16 respuestas son exactas (k/4 o k/16 del total, o individuos enteros)
+ * y Estadísticas las imprime exactas desde el 1206: el margen no cubría ningún redondeo, solo abría
+ * hueco alrededor de la cifra. «99» y «99,5» pasaban por el 100 % de la uniformidad (casos 3 y 10),
+ * y «56,8» y «6,19» por 56,25 y 6,25. Con respuestas exactas la tolerancia es 0: «56,3» por 56,25
+ * tampoco vale (consecuencia aceptada). Solo en esta app: las demás con política relativa no cambian.
+ */
 export function toleranciaDe(valor: number): number {
-  return toleranciaRelativa(valor);
+  return toleranciaDeRedondeo(valor, 2);
 }
 
 /**
