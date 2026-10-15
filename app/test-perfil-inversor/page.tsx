@@ -287,6 +287,13 @@ const CLAVE_SESION = 'meskeia:test-perfil-inversor:v1';
 interface EstadoGuardado {
   currentQuestion: number;
   answers: Record<number, number>;
+  /**
+   * 15/10/2026 (hallazgo 3313) — `'result'` si el test se TERMINÓ. «Ver Resultado» borraba la
+   * sesión y el resultado vivía solo en el estado de React: volver con «Atrás» desde «Simular
+   * esta Cartera» o pulsar F5 devolvía a la portada y había que repetir las diez preguntas.
+   * Sin el campo (sesiones de antes), es un test a medias.
+   */
+  fase?: 'questions' | 'result';
 }
 
 /**
@@ -328,7 +335,11 @@ function leerSesion(): EstadoGuardado | null {
     const datos = JSON.parse(bruto) as unknown;
     if (!datos || typeof datos !== 'object') throw new Error('la sesión no es un objeto');
 
-    const { currentQuestion, answers } = datos as Partial<EstadoGuardado>;
+    const { currentQuestion, answers, fase } = datos as Partial<EstadoGuardado>;
+
+    if (fase !== undefined && fase !== 'questions' && fase !== 'result') {
+      throw new Error('fase desconocida');
+    }
 
     // El índice tiene que apuntar a una pregunta que existe: entero y dentro del cuestionario.
     if (
@@ -358,7 +369,12 @@ function leerSesion(): EstadoGuardado | null {
       limpias[id] = valor;
     }
 
-    return { currentQuestion, answers: limpias };
+    // Un resultado solo se restaura con las diez respuestas: es el mismo listón que el 1214.
+    if (fase === 'result' && !QUESTIONS.every((q) => limpias[q.id] !== undefined)) {
+      throw new Error('resultado guardado sin todas las respuestas');
+    }
+
+    return { currentQuestion, answers: limpias, fase: fase ?? 'questions' };
   } catch {
     // JSON corrupto o contenido que no se puede interpretar: se empieza de cero, y la clave se
     // RETIRA para que la siguiente carga no vuelva a tropezar con ella.
@@ -437,14 +453,22 @@ export default function TestPerfilInversorPage() {
    */
   const llevarVistaAFase = useRef(false);
 
-  /** Recupera el test a medio hacer tras un F5. Solo en el primer render del cliente. */
+  /** Recupera el test a medio hacer, o el resultado, tras un F5 o un «Atrás». Solo en el primer render del cliente. */
   useEffect(() => {
     const guardado = leerSesion();
     if (!guardado || Object.keys(guardado.answers).length === 0) return;
     setAnswers(guardado.answers);
     setCurrentQuestion(guardado.currentQuestion);
+    if (guardado.fase === 'result') {
+      // Un test terminado no es un test «a medias»: sin aviso de recuperado (3311, 3313).
+      setPhase('result');
+      return;
+    }
     setPhase('questions');
-    setRespuestasRecuperadas(Object.keys(guardado.answers).length);
+    // Con las diez contestadas es un test terminado que se estaba REVISANDO, no uno a medias:
+    // «Ver Resultado» ya es la salida, y el aviso diría «a medias» de un 10 de 10 (3311).
+    const recuperadas = Object.keys(guardado.answers).length;
+    if (recuperadas < QUESTIONS.length) setRespuestasRecuperadas(recuperadas);
   }, []);
 
   /** Lleva la vista al principio de la fase nueva y el foco a su encabezado (2177). */
@@ -602,10 +626,15 @@ export default function TestPerfilInversorPage() {
       irAFase('result');
       // Terminado, ya no es un test «a medias»: el aviso no vuelve al «Revisar» (3311).
       setRespuestasRecuperadas(null);
-      // El cuestionario ya está terminado: lo que se guardaba era el test A MEDIAS, para
-      // que un F5 no lo borrase. Conservarlo después haría que quien vuelve a entrar
-      // aterrizara en la última pregunta en vez de en la portada.
-      olvidarSesion();
+      // Se guarda como RESULTADO (3313), no como test a medias: quien vuelve con «Atrás» desde
+      // el estimador o pulsa F5 aterriza en su resultado, y no en la pregunta 10 (que era lo que
+      // evitaba el olvidarSesion de antes) ni en la portada. Aquí y no en un efecto, para que
+      // restaurarlo no lo reescriba. «Repetir Test» lo borra.
+      try {
+        sessionStorage.setItem(CLAVE_SESION, JSON.stringify({ currentQuestion, answers, fase: 'result' }));
+      } catch {
+        // Almacenamiento no disponible: el resultado se ve igual, solo no sobrevive al F5.
+      }
     }
   };
 

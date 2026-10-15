@@ -78,6 +78,11 @@ async function segmentoDeLaFlecha(page: Page): Promise<number> {
 const enunciado = (page: Page) => page.locator('[class*="questionText"]');
 
 async function empezar(page: Page): Promise<void> {
+  // Desde el 15/10/2026 (3313) el resultado sobrevive a la recarga en la misma pestaña: para
+  // empezar un test nuevo tras otro, la sesión se retira antes de volver a cargar.
+  if (page.url().includes('/test-perfil-inversor/')) {
+    await page.evaluate(() => sessionStorage.clear());
+  }
   await page.goto(RUTA);
   await page.getByRole('button', { name: /Comenzar Test/ }).click();
 }
@@ -2111,9 +2116,12 @@ test.describe('re-inspección 14/10/2026 (tarde) · escritorio', () => {
       'href',
       '/estimador-cartera-inversion/?perfil=equilibrado',
     );
-    // El foco acaba en el encabezado del resultado, y la sesión a medias se ha retirado
+    // El foco acaba en el encabezado del resultado, y la sesión ya no es un test a medias: desde el
+    // 15/10/2026 (3313) se guarda como RESULTADO, para que «Atrás» y F5 vuelvan a él.
     await expect(page.getByRole('heading', { name: 'Tu perfil es:' })).toBeFocused();
-    expect(await page.evaluate(() => sessionStorage.getItem('meskeia:test-perfil-inversor:v1'))).toBeNull();
+    expect(
+      JSON.parse((await page.evaluate(() => sessionStorage.getItem('meskeia:test-perfil-inversor:v1'))) ?? '{}').fase,
+    ).toBe('result');
   });
 
   test('REPARADO 3299 — dos clics seguidos en «Comenzar Test» no contestan la pregunta 1', async ({ page }) => {
@@ -2336,7 +2344,8 @@ test.describe('re-inspección 14/10/2026 (tarde) · móvil 375×667', () => {
       'href',
       '/estimador-cartera-inversion/?perfil=agresivo',
     );
-    expect(await page.evaluate((k) => sessionStorage.getItem(k), CLAVE)).toBeNull();
+    // Guardado como resultado, no como test a medias (3313, 15/10/2026).
+    expect(JSON.parse((await page.evaluate((k) => sessionStorage.getItem(k), CLAVE)) ?? '{}').fase).toBe('result');
 
     // Vecino del 3285: «← Anterior» al pie también deja la pregunta nueva a la vista
     await page.getByRole('button', { name: /Revisar mis respuestas/ }).tap();
@@ -2562,12 +2571,13 @@ test.describe('re-inspección 15/10/2026 · escritorio', () => {
     expect(problemas).toEqual([]);
   });
 
-  test.fail('HALLAZGO 3313 — el resultado sobrevive a «Atrás» desde «Simular esta Cartera» y a un F5', async ({ page }) => {
-    // Al pulsar «Ver Resultado» la app borra la sesión (olvidarSesion), así que el resultado solo vive
-    // en el estado de React. «Simular esta Cartera» —el botón principal del resultado— navega al
-    // estimador; al volver con «Atrás», la página se monta de nuevo en la PORTADA, sin respuestas, y
-    // hay que repetir las diez preguntas. Igual con «Estimador de Inversiones» y con un F5.
-    // Esperado: volver al resultado (o al menos al perfil obtenido) · obtenido: «Comenzar Test».
+  test('REPARADO 3313 — el resultado sobrevive a «Atrás» desde «Simular esta Cartera» y a un F5', async ({ page }) => {
+    // Al pulsar «Ver Resultado» la app borraba la sesión (olvidarSesion), así que el resultado solo
+    // vivía en el estado de React. «Simular esta Cartera» —el botón principal del resultado— navega al
+    // estimador; al volver con «Atrás», la página se montaba de nuevo en la PORTADA, sin respuestas, y
+    // había que repetir las diez preguntas. Igual con «Estimador de Inversiones» y con un F5.
+    // REPARADO el 15/10/2026: «Ver Resultado» guarda la sesión como resultado (fase 'result') y la
+    // carga lo restaura, sin aviso de test a medias. «Repetir Test» lo borra.
     test.setTimeout(60_000);
     await cargarSinSesion(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).click();
@@ -2586,9 +2596,31 @@ test.describe('re-inspección 15/10/2026 · escritorio', () => {
         : 'otra cosa';
     expect(trasAtras).toBe('resultado Agresivo');
 
+    await expect(puntuacion(page)).toContainText('37 puntos');
+    await expect(page.getByText(/Hemos recuperado el test/)).toHaveCount(0);
+
     await page.reload();
     await esperarPaginaAsentada(page);
     await expect(perfilMostrado(page)).toHaveText('Agresivo');
+    await expect(puntuacion(page)).toContainText('37 puntos');
+
+    // Lo mismo desde «Estimador de Inversiones».
+    await page.getByRole('link', { name: /Estimador de Inversiones/ }).click();
+    await page.waitForURL(/\/estimador-inversiones\//);
+    await esperarPaginaAsentada(page);
+    await page.goBack();
+    await page.waitForURL(/\/test-perfil-inversor\/$/);
+    await esperarPaginaAsentada(page);
+    await expect(perfilMostrado(page)).toHaveText('Agresivo');
+
+    // «Repetir Test» sí lo borra: tras un F5, la portada.
+    await page.waitForTimeout(500);
+    await page.getByRole('button', { name: /Repetir Test/ }).click();
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeVisible();
+    await page.reload();
+    await esperarPaginaAsentada(page);
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeVisible();
+    await expect(perfilMostrado(page)).toHaveCount(0);
   });
 });
 
