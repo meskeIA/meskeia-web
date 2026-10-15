@@ -803,6 +803,10 @@ export default function TestPerfilInversorPage() {
                 type="button"
                 className={styles.reiniciarButton}
                 onClick={(e) => {
+                  // 15/10/2026 (hallazgo 3310) — era el único botón sin la guarda, y el único que
+                  // BORRA: tras recolocar la vista queda bajo el dedo que acaba de tocar «Siguiente»
+                  // o «Revisar», y el segundo toque de un doble toque vaciaba el test.
+                  if (esSegundaActivacion('reiniciar', e)) return;
                   anotarActivacion('reiniciar', e);
                   handleRestart();
                 }}

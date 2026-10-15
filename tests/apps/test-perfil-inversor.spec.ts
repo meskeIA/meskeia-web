@@ -2720,13 +2720,15 @@ test.describe('re-inspección 15/10/2026 · móvil 360×740', () => {
     expect(fallos).toEqual([]);
   });
 
-  test.fail('HALLAZGO 3310 — un doble toque cuya segunda mitad cae en «Empezar de cero» no borra el test', async ({
+  test('REPARADO 3310 — un doble toque cuya segunda mitad cae en «Empezar de cero» no borra el test', async ({
     page,
   }) => {
-    // «Empezar de cero» (aviso de test recuperado) es el único botón de la app que no pasa por la
+    // «Empezar de cero» (aviso de test recuperado) era el único botón de la app que no pasaba por la
     // guarda de e903863e, y es el único que BORRA: handleRestart vacía las respuestas y la sesión.
     // Con la vista recolocada al principio del cuestionario (3285 al cambiar de pregunta; 2177 al
-    // volver con «Revisar»), queda a ~255 px de la ventana a 360×740.
+    // volver con «Revisar»), queda a ~255 px de la ventana a 360×740. REPARADO el 15/10/2026: lleva
+    // la misma guarda que los demás. (La parte 2 ya no encuentra el aviso tras terminar —3311—, y
+    // sigue comprobando que el doble toque en «Revisar» no lleva a la portada.)
     test.setTimeout(90_000);
     const problemas: string[] = [];
 
