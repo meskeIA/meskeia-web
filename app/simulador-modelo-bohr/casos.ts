@@ -43,6 +43,12 @@ import {
   energiaIonizacionDesde,
   radioOrbitaNm,
 } from './motor';
+import {
+  corregirNumero,
+  dentroDeTolerancia,
+  exigeRedondeo,
+  type Magnitud as MagnitudCorrector,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 /** Las constantes del libro de texto, las que declaran los enunciados. */
 export const LIBRO = {
@@ -114,11 +120,6 @@ function numero(n: number, decimales = 4): string {
 function redondear(valor: number, decimales: number): number {
   const factor = 10 ** decimales;
   return Math.round(valor * factor) / factor;
-}
-
-export function exigeRedondeo(valor: number, decimales: number): boolean {
-  if (!Number.isFinite(valor)) return false;
-  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
 }
 
 function textoRedondeo(decimales: number): string {
@@ -355,6 +356,26 @@ export function toleranciaDe(datos: DatosCaso): number {
   return 10 ** -(datos.decimales ?? 2) / 2;
 }
 
+/**
+ * Qué cosa es cada respuesta, para el corrector (hallazgo 1207). Un nivel n es un entero; lo
+ * demás, continuo. Un `Record` y no un `switch`: una magnitud nueva no compila sin decidirla.
+ */
+const DOMINIO: Record<Magnitud, MagnitudCorrector> = {
+  energiaNivel: 'real',
+  energiaFoton: 'real',
+  energiaFotonJulios: 'real',
+  longitudOnda: 'real',
+  frecuencia: 'real',
+  energiaIonizacion: 'real',
+  radioOrbita: 'real',
+  nivelDesdeLongitud: 'entero',
+  nivelDesdeEnergia: 'entero',
+};
+
+export function magnitudDe(datos: DatosCaso): MagnitudCorrector {
+  return DOMINIO[datos.magnitud];
+}
+
 export interface Veredicto {
   correcto: boolean;
   motivo: string;
@@ -364,9 +385,10 @@ export interface Veredicto {
 
 /** Corrige la respuesta del alumno. Nunca lanza. */
 export function comprobarRespuesta(usuario: number, esperado: number, datos: DatosCaso): Veredicto {
-  const tolerancia = toleranciaDe(datos);
+  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(datos), magnitud: magnitudDe(datos) });
+  const { diferencia, tolerancia } = c;
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal y el signo menos).',
@@ -375,14 +397,13 @@ export function comprobarRespuesta(usuario: number, esperado: number, datos: Dat
     };
   }
 
-  const RUIDO_BINARIO = 1e-9;
-  const diferencia = Math.abs(usuario - esperado);
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
   // La cifra está bien pero sin el signo: el error más típico con los niveles.
-  if (esperado < 0 && Math.abs(-usuario - esperado) <= tolerancia + RUIDO_BINARIO) {
+  if (esperado < 0 && dentroDeTolerancia(-usuario, esperado, tolerancia)) {
     return {
       correcto: false,
       motivo: 'La cifra es correcta, pero falta el signo: la energía de un nivel ligado es negativa.',

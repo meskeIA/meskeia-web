@@ -242,17 +242,17 @@ test.describe('Corrección de la respuesta del alumno', () => {
   });
 
   test('acepta el valor exacto y rechaza el error', () => {
-    expect(comprobarRespuesta(7, 7).correcto).toBe(true);
-    expect(comprobarRespuesta(-16, -16).correcto).toBe(true);
-    expect(comprobarRespuesta(16, -16).correcto).toBe(false); // olvidar el signo
+    expect(comprobarRespuesta(7, 7, 'real').correcto).toBe(true);
+    expect(comprobarRespuesta(-16, -16, 'real').correcto).toBe(true);
+    expect(comprobarRespuesta(16, -16, 'real').correcto).toBe(false); // olvidar el signo
   });
 
   test('dar la solución menor cuando se pide la mayor se marca como fallo', () => {
-    expect(comprobarRespuesta(2, 3).correcto).toBe(false);
+    expect(comprobarRespuesta(2, 3, 'real').correcto).toBe(false);
   });
 
   test('una entrada no numérica se distingue de una respuesta equivocada', () => {
-    const v = comprobarRespuesta(NaN, 7);
+    const v = comprobarRespuesta(NaN, 7, 'real');
     expect(v.correcto).toBe(false);
     expect(v.motivo).toBe('no-numerico');
   });

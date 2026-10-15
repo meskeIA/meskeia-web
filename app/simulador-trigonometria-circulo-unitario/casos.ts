@@ -59,6 +59,7 @@
  */
 
 import { formatNumber } from '@/lib';
+import { corregirNumero, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -152,6 +153,8 @@ export interface Comprobacion {
   motivo: 'acertado' | 'fallado' | 'no-numerico';
   diferencia: number;
   tolerancia: number;
+  /** Por qué la respuesta es IMPOSIBLE en su magnitud (hallazgo 1207), para que la vista lo diga. */
+  aviso?: string;
 }
 
 // ============================================================
@@ -564,7 +567,7 @@ export function resolverCaso(datos: DatosCaso): SolucionCaso {
  * 0,7071) y el porcentaje evita ser absurdamente estricto en las grandes.
  */
 export function toleranciaDe(valorEsperado: number): number {
-  return Math.max(0.01, Math.abs(valorEsperado) * 0.01);
+  return toleranciaRelativa(valorEsperado);
 }
 
 /**
@@ -572,23 +575,46 @@ export function toleranciaDe(valorEsperado: number): number {
  * distingue con el motivo `no-numerico`, para que la vista pueda decirlo con sus
  * palabras en vez de escribir «NaN» en pantalla.
  */
-export function comprobarRespuesta(valorUsuario: number, valorEsperado: number): Comprobacion {
-  const tolerancia = toleranciaDe(valorEsperado);
-  if (!Number.isFinite(valorUsuario) || !Number.isFinite(valorEsperado)) {
-    return { correcto: false, motivo: 'no-numerico', diferencia: NaN, tolerancia };
+export function comprobarRespuesta(
+  valorUsuario: number,
+  valorEsperado: number,
+  /** Obligatoria: sin ella no se distingue una respuesta imprecisa de una imposible (hallazgo 1207). */
+  magnitud: Magnitud,
+): Comprobacion {
+  if (!Number.isFinite(valorEsperado)) {
+    return { correcto: false, motivo: 'no-numerico', diferencia: NaN, tolerancia: toleranciaDe(valorEsperado) };
   }
-  const diferencia = Math.abs(valorUsuario - valorEsperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211, medido en simulador-movimiento-circular) — la comparación en
-   * el borde EXACTO decidía por el ±1 ulp de la resta en binario, así que la misma desviación
-   * se aceptaba por arriba y se rechazaba por abajo: con esperado 0,1 y tolerancia 0,01, «0,11»
-   * daba 0,009999999999999995 (dentro) y «0,09» daba 0,010000000000000009 (fuera). El margen de
-   * 1e-9 absorbe el ruido sin cambiar ninguna decisión real: está nueve órdenes por encima del
-   * ulp de estas cifras y siete por debajo de la tolerancia más pequeña (0,01).
-   */
-  const RUIDO_BINARIO = 1e-9;
-  const correcto = diferencia <= tolerancia + RUIDO_BINARIO;
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud });
+  const { diferencia, tolerancia } = c;
+  if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
+  if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
+  const correcto = c.estado === 'acierto';
   return { correcto, motivo: correcto ? 'acertado' : 'fallado', diferencia, tolerancia };
+}
+
+/**
+ * Qué cosa es la respuesta de cada magnitud que se pregunta (hallazgo 1207). Un seno o un
+ * coseno no pasa de ±1 y un cuadrante es un entero de 1 a 4: «1,009» o «3,03» no son
+ * respuestas imprecisas sino imposibles. La tangente no está acotada. Un `Record` y no un
+ * `switch`: una magnitud nueva no compila hasta que alguien decida la suya.
+ */
+const DOMINIO: Record<MagnitudCaso, Magnitud> = {
+  seno: 'seno-coseno',
+  coseno: 'seno-coseno',
+  'coseno-por-identidad': 'seno-coseno',
+  tangente: 'real',
+  radianes: 'real',
+  grados: 'real',
+  cuadrante: { entero: true, minimo: 1, maximo: 4, que: 'el número de cuadrante' },
+  'angulo-referencia': 'real',
+  'altura-tangente': 'real',
+  'sombra-tangente': 'real',
+  'proyeccion-seno': 'real',
+  'proyeccion-coseno': 'real',
+};
+
+export function magnitudDe(datos: DatosCaso): Magnitud {
+  return DOMINIO[datos.magnitud];
 }
 
 /** Redacta el veredicto. Vive aquí porque es texto derivado del cálculo, no maquetación. */
@@ -602,6 +628,9 @@ export function textoVeredicto(
   }
   if (veredicto.correcto) {
     return `Correcto: ${conUnidad(respuestaTexto, etiquetaRespuesta)}.`;
+  }
+  if (veredicto.aviso) {
+    return `${veredicto.aviso} La respuesta es ${conUnidad(respuestaTexto, etiquetaRespuesta)}.`;
   }
   return `Todavía no. La respuesta es ${conUnidad(respuestaTexto, etiquetaRespuesta)}; te has quedado a ${formatNumber(veredicto.diferencia, 4)} y se admite hasta ${formatNumber(veredicto.tolerancia, 4)}. Despliega la solución para ver dónde se tuerce.`;
 }

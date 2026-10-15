@@ -46,6 +46,12 @@
 
 import { formatNumber } from '@/lib';
 import { calcularImagen, potenciaDioptrias, redondearCifra, type ImagenLente } from './motor';
+import {
+  corregirNumero,
+  dentroDeTolerancia,
+  exigeRedondeo,
+  toleranciaDeRedondeo,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 /**
  * Altura de referencia para las preguntas en las que NO influye (s', M): el motor necesita
@@ -121,12 +127,11 @@ function redondear(valor: number, decimales: number): number {
 }
 
 /**
- * ¿La cifra exacta tiene más decimales de los que se piden? Holgura RELATIVA, como en
- * simulador-mas-resorte: 820 y 0,5 se juzgan con la misma vara.
+ * ¿La cifra exacta tiene más decimales de los que se piden? La del motor compartido, con el
+ * redondeo de esta app (`redondearCifra`, el mismo que pinta la vista).
  */
-export function exigeRedondeo(valor: number, decimales: number): boolean {
-  if (!Number.isFinite(valor)) return false;
-  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
+function requiereRedondear(valor: number, decimales: number): boolean {
+  return exigeRedondeo(valor, decimales, redondear);
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */
@@ -377,7 +382,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
   // El último paso muestra la cifra con los MISMOS decimales que pide el enunciado.
   const redondeado = redondear(valor, decimales);
   pasos.push(
-    exigeRedondeo(valor, decimales)
+    requiereRedondear(valor, decimales)
       ? `Redondeando ${textoRedondeo(decimales)}: ${conUnidad(redondeado, datos)}.`
       : `Resultado: ${conUnidad(redondeado, datos)}.`,
   );
@@ -406,7 +411,7 @@ export function toleranciaDe(datos: DatosCaso): number {
   const decimales = datos.decimales ?? 2;
   const r = resolverCaso(datos);
   if (!r.ok) return 0;
-  return exigeRedondeo(r.valor, decimales) ? 10 ** -decimales / 2 : 0;
+  return toleranciaDeRedondeo(r.valor, decimales, redondear);
 }
 
 export interface Veredicto {
@@ -443,21 +448,17 @@ export function comprobarRespuesta(usuario: number, datos: DatosCaso): Veredicto
   // El valor exacto, limpio del error de coma flotante (5,624999999999999 → 5,625): el mismo
   // que redondea `redondearCifra`.
   const esperado = Number(r.valor.toPrecision(12));
-  const diferencia = Math.abs(usuario - esperado);
-  /**
-   * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
-   * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp. 1e-9 absorbe ese ruido
-   * y queda seis órdenes de magnitud por debajo de la menor tolerancia no nula (0,005); con una
-   * respuesta exacta (tolerancia 0) es lo único que separa 10 de 9,999999999999998.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  // Distancias, aumentos y potencias son continuos, y el signo forma parte de la respuesta:
+  // ningún valor es imposible por sí mismo (sonda del 15/10/2026).
+  const c = corregirNumero(usuario, esperado, { tolerancia, magnitud: 'real' });
+  const { diferencia } = c;
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
   // El fallo más típico de este tema es acertar el número y equivocar el signo: se dice.
-  const signoCambiado =
-    esperado !== 0 && Math.abs(usuario + esperado) <= tolerancia + RUIDO_BINARIO;
+  const signoCambiado = esperado !== 0 && dentroDeTolerancia(-usuario, esperado, tolerancia);
   if (signoCambiado) {
     return {
       correcto: false,

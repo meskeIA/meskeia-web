@@ -212,17 +212,17 @@ test.describe('Corrección de la respuesta del alumno', () => {
   });
 
   test('acepta el redondeo razonable del interés compuesto', () => {
-    expect(comprobarRespuesta(3257.79, 3257.789253554883).correcto).toBe(true);
-    expect(comprobarRespuesta(3258, 3257.789253554883).correcto).toBe(true);
+    expect(comprobarRespuesta(3257.79, 3257.789253554883, 'real').correcto).toBe(true);
+    expect(comprobarRespuesta(3258, 3257.789253554883, 'real').correcto).toBe(true);
   });
 
   test('confundir la exponencial con una lineal se marca como fallo', () => {
     // 2.000 + 5 % · 10 años a interés SIMPLE daría 3.000, no 3.257,79.
-    expect(comprobarRespuesta(3000, 3257.79).correcto).toBe(false);
+    expect(comprobarRespuesta(3000, 3257.79, 'real').correcto).toBe(false);
   });
 
   test('una entrada no numérica se distingue de una respuesta equivocada', () => {
-    const v = comprobarRespuesta(NaN, 56);
+    const v = comprobarRespuesta(NaN, 56, 'real');
     expect(v.correcto).toBe(false);
     expect(v.motivo).toBe('no-numerico');
   });

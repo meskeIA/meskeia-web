@@ -60,6 +60,7 @@
  */
 
 import { parseSpanishNumber } from '@/lib';
+import { corregirNumero, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 export type EstadoFisico = 'g' | 'l' | 's' | 'aq';
 export type DireccionDesplazamiento = 'derecha' | 'izquierda' | 'equilibrio';
@@ -504,6 +505,8 @@ export interface Comprobacion {
   motivo: 'acierto' | 'fallo' | 'vacia' | 'no-numerico';
   diferencia?: number;
   tolerancia?: number;
+  /** Por qué la respuesta es IMPOSIBLE en su magnitud (hallazgo 1207), para que la vista lo diga. */
+  aviso?: string;
 }
 
 // ============================================================
@@ -685,7 +688,7 @@ export function simularPerturbacion(datos: DatosPrediccion): ResultadoPrediccion
 
 /** El mayor entre 0,01 y el 1 % del valor. Mismo convenio que el resto del catálogo. */
 export function toleranciaDe(valorEsperado: number): number {
-  return Math.max(0.01, Math.abs(valorEsperado) * 0.01);
+  return toleranciaRelativa(valorEsperado);
 }
 
 /**
@@ -695,28 +698,37 @@ export function toleranciaDe(valorEsperado: number): number {
  * se leería como 0 —se queda con el prefijo y tira el resto— y el alumno vería suspendida
  * una respuesta correcta escrita en el formato del propio enunciado.
  */
-export function comprobarRespuesta(respuestaUsuario: string, valorEsperado: number): Comprobacion {
+export function comprobarRespuesta(
+  respuestaUsuario: string,
+  valorEsperado: number,
+  /** Obligatoria: sin ella no se distingue una respuesta imprecisa de una imposible (hallazgo 1207). */
+  magnitud: Magnitud,
+): Comprobacion {
   if (respuestaUsuario.trim() === '') return { correcto: false, motivo: 'vacia' };
-  const valor = parseSpanishNumber(respuestaUsuario);
-  if (!Number.isFinite(valor)) return { correcto: false, motivo: 'no-numerico' };
-  const tolerancia = toleranciaDe(valorEsperado);
-  const diferencia = Math.abs(valor - valorEsperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211, medido en simulador-movimiento-circular) — la comparación en
-   * el borde EXACTO decidía por el ±1 ulp de la resta en binario, así que la misma desviación
-   * se aceptaba por arriba y se rechazaba por abajo: con esperado 0,1 y tolerancia 0,01, «0,11»
-   * daba 0,009999999999999995 (dentro) y «0,09» daba 0,010000000000000009 (fuera). El margen de
-   * 1e-9 absorbe el ruido sin cambiar ninguna decisión real: está nueve órdenes por encima del
-   * ulp de estas cifras y siete por debajo de la tolerancia más pequeña (0,01).
-   */
-  const RUIDO_BINARIO = 1e-9;
-  const correcto = diferencia <= tolerancia + RUIDO_BINARIO;
-  return {
-    correcto,
-    motivo: correcto ? 'acierto' : 'fallo',
-    diferencia,
-    tolerancia,
-  };
+  const c = corregirNumero(parseSpanishNumber(respuestaUsuario), valorEsperado, {
+    tolerancia: toleranciaDe(valorEsperado),
+    magnitud,
+  });
+  if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico' };
+  const { diferencia, tolerancia } = c;
+  if (c.motivoImposible) return { correcto: false, motivo: 'fallo', diferencia, tolerancia, aviso: c.motivoImposible };
+  const correcto = c.estado === 'acierto';
+  return { correcto, motivo: correcto ? 'acierto' : 'fallo', diferencia, tolerancia };
+}
+
+/**
+ * Qué cosa es la respuesta de cada magnitud pedida (hallazgo 1207). Δn resta coeficientes, y
+ * todas las reacciones de la app los tienen enteros: «−0,99» no está cerca de −1, no existe.
+ * Un `Record` y no un `switch`: una magnitud nueva no compila hasta que alguien decida la suya.
+ */
+const DOMINIO: Record<MagnitudPedida, Magnitud> = {
+  'cociente-Q': 'real',
+  'delta-n': 'entero',
+  'Kc-a-temperatura': 'real',
+};
+
+export function magnitudDe(datos: DatosNumericos): Magnitud {
+  return DOMINIO[datos.magnitud];
 }
 
 /** Compara la predicción elegida con la que da el modelo. */

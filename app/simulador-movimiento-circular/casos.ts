@@ -28,6 +28,8 @@
  * `resolverCaso` lo rechaza con un error legible en lugar de imprimir «∞» como resultado.
  */
 
+import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+
 /* ─────────────────────────── La física, compartida con la vista ─────────────────────────── */
 
 /** Velocidad lineal (tangencial) de un punto que gira a ω a distancia r del centro. */
@@ -231,7 +233,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
 /** El MAYOR entre 0,01 y el 1 % del valor: así un 0,1 no se corrige a ciegas. */
 export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+  return toleranciaRelativa(valor);
 }
 
 export interface Veredicto {
@@ -246,9 +248,12 @@ export interface Veredicto {
  * un veredicto, no con una excepción que tumbaría el render.
  */
 export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+  // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
+  // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
+  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
+  const { diferencia, tolerancia } = c;
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal).',
@@ -257,21 +262,8 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211) — la comparación en el borde EXACTO decidía por el ±1 ulp de
-   * la resta en binario, así que la misma desviación se aceptaba por arriba y se rechazaba por
-   * abajo: con esperado 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y
-   * «0,09» daba 0,010000000000000009 (fuera), y el mensaje de rechazo cifraba la desviación
-   * igual que la tolerancia —«te has desviado 0,01»—, que es la forma más desconcertante de
-   * suspender a alguien.
-   *
-   * El margen es 1e-9: nueve órdenes de magnitud por encima del ulp de las cifras que maneja
-   * esta app y siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido
-   * sin cambiar ninguna decisión real.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 

@@ -64,6 +64,7 @@
 import { formatNumber } from '@/lib';
 import { calcularFlotabilidad, CM3_POR_M3, G, type ResultadoFlotabilidad } from './motor';
 import { LIQUIDOS, MATERIALES } from './materiales';
+import { corregirNumero, exigeRedondeo, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Holgura relativa con la que una inversión tiene que reproducir el dato del enunciado. */
 const HOLGURA_INVERSION = 1e-9;
@@ -152,15 +153,6 @@ function porcentaje(fraccion: number, decimales = 2): string {
 function redondear(valor: number, decimales: number): number {
   const factor = 10 ** decimales;
   return Math.round(valor * factor) / factor;
-}
-
-/**
- * ¿La cifra exacta tiene más decimales de los que se piden? Holgura RELATIVA: 264,87 y 0,5 se
- * juzgan con la misma vara (una absoluta de 1e-9 trataría distinto una cifra grande).
- */
-export function exigeRedondeo(valor: number, decimales: number): boolean {
-  if (!Number.isFinite(valor)) return false;
-  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */
@@ -523,7 +515,7 @@ export function toleranciaDe(datos: DatosCaso): number {
   const decimales = datos.decimales ?? 2;
   const r = resolverCaso(datos);
   if (!r.ok) return 0;
-  return exigeRedondeo(r.valor, decimales) ? 10 ** -decimales / 2 : 0;
+  return toleranciaDeRedondeo(r.valor, decimales);
 }
 
 export interface Veredicto {
@@ -538,9 +530,12 @@ export interface Veredicto {
  * tolerancia depende de la pregunta (ver `toleranciaDe`), no de la cifra.
  */
 export function comprobarRespuesta(usuario: number, esperado: number, datos: DatosCaso): Veredicto {
-  const tolerancia = toleranciaDe(datos);
+  // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
+  // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
+  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(datos), magnitud: 'real' });
+  const { diferencia, tolerancia } = c;
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal).',
@@ -549,16 +544,8 @@ export function comprobarRespuesta(usuario: number, esperado: number, datos: Dat
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  /**
-   * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
-   * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp, así que la misma
-   * desviación se aceptaba por arriba y se rechazaba por abajo. 1e-9 absorbe ese ruido y queda
-   * seis órdenes de magnitud por debajo de la menor tolerancia no nula (0,005); con una
-   * respuesta exacta (tolerancia 0) es lo único que separa 91,7 de 91,69999999999999.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 

@@ -24,6 +24,9 @@
  *   4. UN MOTOR SIN LECTOR PERO CON `// motor-ok: <razón>` — el escape declarado. NO falla,
  *      porque la excepción está escrita y firmada. Sin la razón, sí falla (caso 5).
  *
+ * Y la regla de las copias (15/10/2026): una app que reescribe la huella declarada por un
+ * motor compartido FALLA (caso 6), con `// copia-ok: <razón>` pasa (7) y sin razón no (8).
+ *
  * Trabaja sobre COPIAS en un directorio temporal: no toca `lib/calculadoras/`.
  */
 
@@ -90,6 +93,33 @@ const CASOS = [
     debeFallar: true,
     esperado: /SIN LECTOR/,
   },
+  // Los tres siguientes no crean un motor: escriben en una app una línea con la huella de
+  // `correctorCasosAula.ts`. El 6 es el caso de origen (15/10/2026): un `casos.ts` nuevo que
+  // copia el margen de ruido binario en vez de importar el corrector, que es como se llegó a
+  // 33 copias con el 1211 en unas y no en otras.
+  {
+    n: 6,
+    nombre: 'una app COPIA el corrector compartido (el caso del 15/10/2026)',
+    app: 'zzz-prueba-copia-corrector/casos.ts',
+    contenido: `export function comprobar(u: number, e: number): boolean {\n  const RUIDO_BINARIO = 1e-9;\n  return Math.abs(u - e) <= Math.max(0.01, Math.abs(e) * 0.01) + RUIDO_BINARIO;\n}\n`,
+    debeFallar: true,
+    esperado: /COPIA DE UN MOTOR/,
+  },
+  {
+    n: 7,
+    nombre: 'la copia con «// copia-ok: <razón>» declarada',
+    app: 'zzz-prueba-copia-corrector/casos.ts',
+    contenido: `// copia-ok: prueba del candado, réplica deliberada para comparar\nexport const RUIDO_BINARIO = 1e-9;\n`,
+    debeFallar: false,
+  },
+  {
+    n: 8,
+    nombre: 'la copia con el escape SIN razón no vale',
+    app: 'zzz-prueba-copia-corrector/casos.ts',
+    contenido: `// copia-ok:\nexport const RUIDO_BINARIO = 1e-9;\n`,
+    debeFallar: true,
+    esperado: /COPIA DE UN MOTOR/,
+  },
 ];
 
 // Fichero que da lector a los casos que lo necesitan. Va en tests/ para no ensuciar app/.
@@ -102,7 +132,8 @@ try {
   console.log('Reinyectando al candado los casos de los que nació:\n');
 
   for (const caso of CASOS) {
-    const destino = path.join(DIR_MOTORES, caso.fichero);
+    const destino = caso.app ? path.join(RAIZ, 'app', caso.app) : path.join(DIR_MOTORES, caso.fichero);
+    fs.mkdirSync(path.dirname(destino), { recursive: true });
     fs.writeFileSync(destino, caso.contenido, 'utf8');
     creados.push(destino);
 
@@ -137,6 +168,7 @@ try {
 } finally {
   for (const f of creados) fs.rmSync(f, { force: true });
   fs.rmSync(LECTOR, { force: true });
+  fs.rmSync(path.join(RAIZ, 'app/zzz-prueba-copia-corrector'), { recursive: true, force: true });
 }
 
 // Y que tras retirar los ficheros de prueba el candado vuelva a estar en verde: si se quedara

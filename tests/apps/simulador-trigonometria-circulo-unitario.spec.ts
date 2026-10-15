@@ -567,6 +567,7 @@ import {
   resolverCaso,
   toleranciaDe,
   comprobarRespuesta,
+  magnitudDe,
   generarEjercicioAleatorio,
   gradosARadianes,
   radianesAGrados,
@@ -751,7 +752,7 @@ test.describe('Simulador del Círculo Trigonométrico · casos para clase', () =
     // Y quien teclea el valor redondeado, como se le pidió, acierta.
     for (const caso of CASOS) {
       const tecleado = redondear(caso.respuesta, 2);
-      expect(comprobarRespuesta(tecleado, caso.respuesta).correcto, `caso ${caso.id}`).toBe(true);
+      expect(comprobarRespuesta(tecleado, caso.respuesta, magnitudDe(caso.datos)).correcto, `caso ${caso.id}`).toBe(true);
     }
   });
 
@@ -760,12 +761,12 @@ test.describe('Simulador del Círculo Trigonométrico · casos para clase', () =
     expect(toleranciaDe(100)).toBeCloseTo(1, 10);
     expect(toleranciaDe(0.5)).toBeCloseTo(0.01, 10);
 
-    expect(comprobarRespuesta(0.5, 0.5).correcto).toBe(true);
+    expect(comprobarRespuesta(0.5, 0.5, 'seno-coseno').correcto).toBe(true);
     // Olvidar el signo en un cuadrante donde la razón es negativa es EL error del tema:
     // 0,5 en lugar de −0,5 tiene que suspender.
-    expect(comprobarRespuesta(0.5, -0.5).correcto).toBe(false);
-    expect(comprobarRespuesta(Number.NaN, 0.5).correcto).toBe(false);
-    expect(comprobarRespuesta(Number.NaN, 0.5).motivo).toBe('no-numerico');
+    expect(comprobarRespuesta(0.5, -0.5, 'seno-coseno').correcto).toBe(false);
+    expect(comprobarRespuesta(Number.NaN, 0.5, 'seno-coseno').correcto).toBe(false);
+    expect(comprobarRespuesta(Number.NaN, 0.5, 'seno-coseno').motivo).toBe('no-numerico');
   });
 });
 
@@ -991,9 +992,9 @@ test.describe('Re-inspección 25/09/2026 · los ejes y los radianes contra el mo
 
     // Corrección con lo que teclearía un alumno: «0» y «-0» aprueban cos 90°; «1» suspende.
     const cos90 = resolverCaso({ angulo: 90, magnitud: 'coseno' }).valor;
-    expect(comprobarRespuesta(parseSpanishNumber('0'), cos90).correcto).toBe(true);
-    expect(comprobarRespuesta(parseSpanishNumber('-0'), cos90).correcto).toBe(true);
-    expect(comprobarRespuesta(parseSpanishNumber('1'), cos90).correcto).toBe(false);
+    expect(comprobarRespuesta(parseSpanishNumber('0'), cos90, 'seno-coseno').correcto).toBe(true);
+    expect(comprobarRespuesta(parseSpanishNumber('-0'), cos90, 'seno-coseno').correcto).toBe(true);
+    expect(comprobarRespuesta(parseSpanishNumber('1'), cos90, 'seno-coseno').correcto).toBe(false);
   });
 
   test('los ejes en radianes: π/2 = 1,5708 · π = 3,1416 · 3π/2 = 4,7124', () => {
@@ -1006,11 +1007,11 @@ test.describe('Re-inspección 25/09/2026 · los ejes y los radianes contra el mo
     expect(CASOS[6].respuesta).toBe(150);
 
     const pi2 = resolverCaso({ angulo: 90, magnitud: 'radianes' }).valor;
-    expect(comprobarRespuesta(parseSpanishNumber('1,57'), pi2).correcto, '1,57 redondeado').toBe(true);
-    expect(comprobarRespuesta(parseSpanishNumber('90'), pi2).correcto, 'dejarlo en grados').toBe(false);
-    expect(comprobarRespuesta(parseSpanishNumber('3,14'), pi2).correcto, 'π en vez de π/2').toBe(false);
+    expect(comprobarRespuesta(parseSpanishNumber('1,57'), pi2, 'real').correcto, '1,57 redondeado').toBe(true);
+    expect(comprobarRespuesta(parseSpanishNumber('90'), pi2, 'real').correcto, 'dejarlo en grados').toBe(false);
+    expect(comprobarRespuesta(parseSpanishNumber('3,14'), pi2, 'real').correcto, 'π en vez de π/2').toBe(false);
     const tres2 = resolverCaso({ angulo: 270, magnitud: 'radianes' }).valor;
-    expect(comprobarRespuesta(parseSpanishNumber('4,71'), tres2).correcto).toBe(true);
+    expect(comprobarRespuesta(parseSpanishNumber('4,71'), tres2, 'real').correcto).toBe(true);
   });
 });
 

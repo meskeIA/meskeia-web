@@ -45,6 +45,7 @@ import {
   modulo,
   type CargaPuntual,
 } from './motor';
+import { corregirNumero, dentroDeTolerancia, exigeRedondeo, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── Datos de un caso ─────────────────────────── */
 
@@ -213,12 +214,6 @@ export function etiquetaDe(magnitud: Magnitud): string {
 export function textoRespuesta(valor: number, unidad: string, decimales = 2): string {
   if (!Number.isFinite(valor)) return '—';
   return `${formatNumber(valor, decimales)} ${unidad}`;
-}
-
-/** true si la cifra exacta tiene más decimales de los que se piden: el enunciado debe decirlo. */
-export function exigeRedondeo(valor: number, decimales: number): boolean {
-  if (!Number.isFinite(valor)) return false;
-  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
 }
 
 /* ─────────────────────────── Resolución ─────────────────────────── */
@@ -450,7 +445,7 @@ function pasoFinal(valor: number, magnitud: Magnitud, decimales: number): string
 
 /** El MAYOR entre 0,01 y el 1 % del valor: así un 0,1 no se corrige a ciegas. */
 export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+  return toleranciaRelativa(valor);
 }
 
 export interface Veredicto {
@@ -468,9 +463,12 @@ export interface Veredicto {
  * diferencia con la 8,99·10⁹ de la app).
  */
 export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+  // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
+  // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
+  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
+  const { diferencia, tolerancia } = c;
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal y el signo menos).',
@@ -479,19 +477,13 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  /**
-   * Margen de 1e-9 sobre la tolerancia: en el borde exacto la resta en binario decide por
-   * ±1 ulp, y la misma desviación se aceptaría por arriba y se rechazaría por abajo (hallazgo
-   * 1211 de `simulador-movimiento-circular`).
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
   // Una respuesta con el signo cambiado es el error típico del tema: se dice, no se esconde.
-  if (esperado !== 0 && Math.abs(usuario + esperado) <= tolerancia + RUIDO_BINARIO) {
+  if (esperado !== 0 && dentroDeTolerancia(-usuario, esperado, tolerancia)) {
     return {
       correcto: false,
       motivo: 'El valor es correcto, pero el SIGNO no: revisa hacia dónde apunta o qué signo tiene la carga.',

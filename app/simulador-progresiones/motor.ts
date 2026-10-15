@@ -38,6 +38,7 @@
  */
 
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { corregirNumero, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -104,6 +105,8 @@ export interface CasoProgresion {
   sucesion: readonly number[];
   /** Qué se escribe en la casilla: «€», «butacas», «a₂₀»… Nunca vacío. */
   etiquetaRespuesta: string;
+  /** Qué cosa es la respuesta: decide qué valores son IMPOSIBLES (hallazgo 1207). */
+  magnitud: Magnitud;
   respuesta: number;
   respuestaTexto: string;
   requiereRedondeo: boolean;
@@ -120,6 +123,8 @@ export interface EjercicioAleatorio {
   parametro: number;
   n: number;
   etiquetaRespuesta: string;
+  /** Qué cosa es la respuesta: decide qué valores son IMPOSIBLES (hallazgo 1207). */
+  magnitud: Magnitud;
   respuesta: number;
   respuestaTexto: string;
   requiereRedondeo: boolean;
@@ -132,6 +137,8 @@ export interface Comprobacion {
   motivo: 'acertado' | 'fallado' | 'no-numerico';
   diferencia: number;
   tolerancia: number;
+  /** Por qué la respuesta es IMPOSIBLE en su magnitud (hallazgo 1207), para que la vista lo diga. */
+  aviso?: string;
 }
 
 // ============================================================
@@ -773,22 +780,22 @@ export function parsearListaNumeros(texto: string): ListaNumerica {
  * exigir el céntimo en 204.800 no mide si se entendió la progresión.
  */
 export function toleranciaDe(valorEsperado: number): number {
-  return Math.max(0.01, Math.abs(valorEsperado) * 0.01);
+  return toleranciaRelativa(valorEsperado);
 }
 
 /** Compara la respuesta tecleada con la esperada. NaN cuenta como «no numérico». */
-export function comprobarRespuesta(valorUsuario: number, valorEsperado: number): Comprobacion {
-  const tolerancia = toleranciaDe(valorEsperado);
-  if (!Number.isFinite(valorUsuario)) {
-    return { correcto: false, motivo: 'no-numerico', diferencia: NaN, tolerancia };
-  }
-  const diferencia = Math.abs(valorUsuario - valorEsperado);
-  return {
-    correcto: diferencia <= tolerancia,
-    motivo: diferencia <= tolerancia ? 'acertado' : 'fallado',
-    diferencia,
-    tolerancia,
-  };
+export function comprobarRespuesta(
+  valorUsuario: number,
+  valorEsperado: number,
+  /** Obligatoria: sin ella no se distingue una respuesta imprecisa de una imposible (hallazgo 1207). */
+  magnitud: Magnitud,
+): Comprobacion {
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud });
+  const { diferencia, tolerancia } = c;
+  if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
+  if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
+  const correcto = c.estado === 'acierto';
+  return { correcto, motivo: correcto ? 'acertado' : 'fallado', diferencia, tolerancia };
 }
 
 // ============================================================
@@ -819,6 +826,8 @@ interface DefinicionCaso {
   n?: number;
   sucesion?: readonly number[];
   etiquetaRespuesta: string;
+  /** Qué cosa es la respuesta: decide qué valores son IMPOSIBLES (hallazgo 1207). */
+  magnitud: Magnitud;
   decimalesRespuesta?: number;
   comparacion?: ComparacionCaso;
   pista: string;
@@ -836,6 +845,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 7,
     n: 20,
     etiquetaRespuesta: 'a₂₀',
+    magnitud: 'real',
     pista: 'Del término 1 al 20 hay 19 saltos, no 20. Ese (n − 1) es el error más repetido.',
   },
   {
@@ -849,6 +859,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 5,
     n: 30,
     etiquetaRespuesta: 'S₃₀',
+    magnitud: 'real',
     pista: 'Primero calcula a₃₀; después aplica Sₙ = n·(a₁ + aₙ)/2. Son dos pasos, no uno.',
   },
   {
@@ -862,6 +873,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 1,
     n: 100,
     etiquetaRespuesta: 'S₁₀₀',
+    magnitud: 'real',
     pista: 'Empareja 1 con 100, 2 con 99, 3 con 98… Todas las parejas suman 101, y hay 50 parejas.',
   },
   {
@@ -875,6 +887,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: -6,
     n: 15,
     etiquetaRespuesta: 'a₁₅',
+    magnitud: 'real',
     pista: 'La diferencia negativa no cambia la fórmula: a₁ + (n − 1)·d con d = −6.',
   },
   {
@@ -888,6 +901,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 3,
     n: 8,
     etiquetaRespuesta: 'a₈',
+    magnitud: 'real',
     pista: 'El exponente es 7, no 8: aₙ = a₁·r^(n−1).',
   },
   {
@@ -901,6 +915,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 2,
     n: 10,
     etiquetaRespuesta: 'S₁₀',
+    magnitud: 'real',
     pista: 'Sₙ = a₁·(rⁿ − 1)/(r − 1). Aquí el exponente SÍ es n, no n − 1.',
   },
   {
@@ -912,6 +927,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     calculo: 'identificar',
     sucesion: [5, 15, 45, 135],
     etiquetaRespuesta: 'razón o diferencia',
+    magnitud: 'real',
     pista: 'Calcula primero las restas entre términos seguidos; si no salen iguales, prueba con las divisiones.',
   },
   {
@@ -925,6 +941,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 1.05,
     n: 11,
     etiquetaRespuesta: '€',
+    magnitud: 'real',
     decimalesRespuesta: 2,
     pista: 'Crecer un 5 % es multiplicar por 1,05, no sumar 5. La razón es 1,05.',
   },
@@ -939,6 +956,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 2,
     n: 13,
     etiquetaRespuesta: 'bacterias',
+    magnitud: 'recuento',
     pista: '4 horas son 240 minutos: 12 duplicaciones. Como el primer término es el instante inicial, el término que buscas es el 13.',
   },
   {
@@ -952,6 +970,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 2,
     n: 25,
     etiquetaRespuesta: 'butacas',
+    magnitud: 'recuento',
     pista: 'Te piden el TOTAL, así que es una suma, no un término suelto. La última fila tiene 66 butacas.',
   },
   {
@@ -965,6 +984,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 0.6,
     n: 0,
     etiquetaRespuesta: 'm',
+    magnitud: 'real',
     pista: 'El primer término no es 3 sino 1,8: te piden las alturas de SUBIDA. Como |r| < 1, la suma infinita existe.',
   },
   {
@@ -978,6 +998,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametro: 1.04,
     n: 10,
     etiquetaRespuesta: '€',
+    magnitud: 'real',
     decimalesRespuesta: 2,
     comparacion: {
       etiqueta: 'El mismo sueldo con una subida FIJA de 60 € al año, en el año 10',
@@ -1046,6 +1067,7 @@ function construirCaso(def: DefinicionCaso): CasoProgresion {
     n,
     sucesion,
     etiquetaRespuesta: def.etiquetaRespuesta,
+    magnitud: def.magnitud,
     respuesta,
     respuestaTexto,
     requiereRedondeo: Math.abs(respuesta - redondear(respuesta, 2)) > 1e-9,
@@ -1176,6 +1198,8 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioAleatorio 
     parametro,
     n,
     etiquetaRespuesta,
+    // Solo términos y sumas de sucesiones: números reales, sin recuentos.
+    magnitud: 'real',
     respuesta: solucion.valor,
     respuestaTexto: formatearFlexible(solucion.valor),
     requiereRedondeo: Math.abs(solucion.valor - redondear(solucion.valor, 2)) > 1e-9,

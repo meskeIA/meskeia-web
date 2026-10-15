@@ -22,6 +22,7 @@ import {
   formatearRespuesta,
   generarEjercicioAleatorio,
   gradosARadianes,
+  magnitudDe,
   obtenerCuadrante,
   radianesAGrados,
   redondear,
@@ -478,7 +479,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
     const valor = parseSpanishNumber(respuestasCasos[casoActivo.id] ?? '');
     setVeredictosCasos(previos => ({
       ...previos,
-      [casoActivo.id]: comprobarRespuesta(valor, casoActivo.respuesta),
+      [casoActivo.id]: comprobarRespuesta(valor, casoActivo.respuesta, magnitudDe(casoActivo.datos)),
     }));
   };
 
@@ -526,7 +527,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
   const comprobarPractica = () => {
     if (ejercicio === null) return;
     setVeredictoPractica(
-      comprobarRespuesta(parseSpanishNumber(respuestaPractica), ejercicio.respuesta),
+      comprobarRespuesta(parseSpanishNumber(respuestaPractica), ejercicio.respuesta, magnitudDe(ejercicio.datos)),
     );
   };
 

@@ -38,6 +38,7 @@
 
 import { formatNumber } from '@/lib';
 import { resolverOhm, resolverParalelo, resolverPotencia, resolverSerie, type Incognita } from './motor';
+import { corregirNumero, exigeRedondeo, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── Datos de un caso ─────────────────────────── */
 
@@ -102,12 +103,6 @@ function numero(n: number, decimales = 4): string {
 export function redondear(valor: number, decimales: number): number {
   const factor = 10 ** decimales;
   return Math.round(valor * factor) / factor;
-}
-
-/** true si la cifra exacta tiene más decimales de los que se muestran: el enunciado lo dice. */
-export function exigeRedondeo(valor: number, decimales: number): boolean {
-  if (!Number.isFinite(valor)) return false;
-  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */
@@ -418,7 +413,7 @@ export function toleranciaDe(datos: DatosCaso): number {
   const decimales = datos.decimales ?? 2;
   const r = resolverCaso(datos);
   if (!r.ok) return 0;
-  return exigeRedondeo(r.valor, decimales) ? 10 ** -decimales / 2 : 0;
+  return toleranciaDeRedondeo(r.valor, decimales);
 }
 
 export interface Veredicto {
@@ -433,9 +428,12 @@ export interface Veredicto {
  * tolerancia depende de la pregunta (ver `toleranciaDe`), no de la cifra.
  */
 export function comprobarRespuesta(usuario: number, esperado: number, datos: DatosCaso): Veredicto {
-  const tolerancia = toleranciaDe(datos);
+  // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
+  // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
+  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(datos), magnitud: 'real' });
+  const { diferencia, tolerancia } = c;
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal).',
@@ -444,16 +442,8 @@ export function comprobarRespuesta(usuario: number, esperado: number, datos: Dat
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  /**
-   * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
-   * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp, así que la misma
-   * desviación se aceptaba por arriba y se rechazaba por abajo. 1e-9 absorbe ese ruido y queda
-   * seis órdenes de magnitud por debajo de la menor tolerancia no nula (0,005); con una
-   * respuesta exacta (tolerancia 0) es lo único que separa 0,3 de 0,30000000000000004.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 

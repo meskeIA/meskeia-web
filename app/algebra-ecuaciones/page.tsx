@@ -20,8 +20,10 @@ import {
   fValor,
   frac,
   generarEjercicioAleatorio,
+  magnitudDe,
   polinomioATexto,
   type Comprobacion,
+  type DatosCaso,
   type EjercicioAleatorio,
   type Fraccion,
   type PasoRuffini,
@@ -100,9 +102,12 @@ export default function AlgebraEcuacionesPage() {
   const casosResueltos = Object.values(veredictosCasos).filter((v) => v.correcto).length;
   const porcentajeCasos = (casosResueltos / TOTAL_CASOS) * 100;
 
-  const comprobarCaso = (id: number, esperado: number) => {
+  const comprobarCaso = (id: number, esperado: number, datos: DatosCaso) => {
     const valor = parseSpanishNumber(respuestasCasos[id] ?? '');
-    setVeredictosCasos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado) }));
+    setVeredictosCasos((previos) => ({
+      ...previos,
+      [id]: comprobarRespuesta(valor, esperado, magnitudDe(datos)),
+    }));
   };
 
   const alternarSolucionCaso = (id: number) => {
@@ -128,7 +133,9 @@ export default function AlgebraEcuacionesPage() {
   const comprobarAleatorio = () => {
     if (!ejercicioAleatorio) return;
     const valor = parseSpanishNumber(respuestaAleatoria);
-    setVeredictoAleatorio(comprobarRespuesta(valor, ejercicioAleatorio.respuesta));
+    setVeredictoAleatorio(
+      comprobarRespuesta(valor, ejercicioAleatorio.respuesta, magnitudDe(ejercicioAleatorio.datos)),
+    );
   };
 
   // El veredicto en palabras. «no-numerico» se distingue del fallo a propósito: sin ese
@@ -139,6 +146,9 @@ export default function AlgebraEcuacionesPage() {
     }
     if (veredicto.correcto) {
       return `Correcto: ${respuestaTexto}.`;
+    }
+    if (veredicto.aviso) {
+      return `${veredicto.aviso} La respuesta correcta es ${respuestaTexto}.`;
     }
     return `Todavía no. La respuesta correcta es ${respuestaTexto}. Abre la solución para ver dónde se tuerce la cuenta.`;
   };
@@ -1141,7 +1151,7 @@ export default function AlgebraEcuacionesPage() {
                   <button
                     type="button"
                     className={styles.casosBtnPrimario}
-                    onClick={() => comprobarCaso(caso.id, caso.respuesta)}
+                    onClick={() => comprobarCaso(caso.id, caso.respuesta, caso.datos)}
                   >
                     Comprobar
                   </button>

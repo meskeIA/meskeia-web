@@ -38,6 +38,7 @@ import {
   type AnalisisPlano,
   type ParametrosPlano,
 } from './motor';
+import { corregirNumero, exigeRedondeo, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /**
  * Valores de referencia para lo que el enunciado no da porque NO influye en la respuesta (la
@@ -111,12 +112,11 @@ function redondear(valor: number, decimales: number): number {
 }
 
 /**
- * ¿La cifra exacta tiene más decimales de los que se piden? Holgura RELATIVA: 424,785 y 0,5 se
- * juzgan con la misma vara, y el ruido binario (4,904999999999999 por 4,905) no cuenta.
+ * ¿La cifra exacta tiene más decimales de los que se piden? La del motor compartido, con el
+ * redondeo de esta app (`redondearCifra`): el ruido binario (4,904999999999999 por 4,905) no cuenta.
  */
-export function exigeRedondeo(valor: number, decimales: number): boolean {
-  if (!Number.isFinite(valor)) return false;
-  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
+function requiereRedondear(valor: number, decimales: number): boolean {
+  return exigeRedondeo(valor, decimales, redondear);
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */
@@ -396,7 +396,7 @@ export function resolverCaso(datos: DatosCaso, g: number = G): Resolucion {
   // El último paso muestra la cifra con los MISMOS decimales que pide el enunciado.
   const redondeado = redondear(valor, decimales);
   pasos.push(
-    exigeRedondeo(valor, decimales)
+    requiereRedondear(valor, decimales)
       ? `Redondeando ${textoRedondeo(decimales)}: ${conUnidad(redondeado, datos)}.`
       : `Resultado: ${conUnidad(redondeado, datos)}.`,
   );
@@ -431,7 +431,7 @@ export function toleranciaDe(datos: DatosCaso): number {
   const decimales = datos.decimales ?? 2;
   const r = resolverCaso(datos);
   if (!r.ok) return 0;
-  return exigeRedondeo(r.valor, decimales) ? 10 ** -decimales / 2 : 0;
+  return toleranciaDeRedondeo(r.valor, decimales, redondear);
 }
 
 export interface Veredicto {
@@ -483,15 +483,12 @@ export function comprobarRespuesta(usuario: number, datos: DatosCaso): Veredicto
     };
   }
 
-  const diferencia = Math.abs(usuario - r.valor);
-  /**
-   * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
-   * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp. 1e-9 absorbe ese ruido
-   * y queda cinco órdenes de magnitud por debajo de la menor tolerancia no nula (0,0005); con
-   * una respuesta exacta (tolerancia 0) es lo único que separa 4,905 de 4,904999999999999.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  // Fuerzas, aceleraciones y ángulos continuos: ningún valor es imposible por sí mismo dentro
+  // de la tolerancia (sonda del 15/10/2026).
+  const c = corregirNumero(usuario, r.valor, { tolerancia, magnitud: 'real' });
+  const { diferencia } = c;
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 

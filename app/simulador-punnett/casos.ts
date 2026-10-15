@@ -42,6 +42,7 @@
  */
 
 import { formatNumber } from '@/lib';
+import { corregirNumero, dentroDeTolerancia } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── El motor de la app (movido de page.tsx) ─────────────────────────── */
 
@@ -435,11 +436,6 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
  * aceptaría «6» para un 6,25 %, que es el defecto que esta app ya tuvo (hallazgo 751).
  */
 const TOLERANCIA = 0.005;
-/**
- * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde EXACTO
- * de la tolerancia la resta en coma flotante decide por ±1 ulp.
- */
-const RUIDO_BINARIO = 1e-9;
 
 export function toleranciaDe(): number {
   return TOLERANCIA;
@@ -473,9 +469,15 @@ export interface Veredicto {
 
 /** Corrige la respuesta del alumno frente a la de un caso. Nunca lanza. */
 export function comprobarRespuesta(usuario: number, esperado: number, datos: DatosCaso): Veredicto {
-  const tolerancia = TOLERANCIA;
   const enPorcentaje = esPorcentaje(datos);
-  if (!Number.isFinite(usuario)) {
+  // Lo que no es un porcentaje es un recuento (semillas, genotipos, gametos): un 9,004 de
+  // «genotipos distintos» no está cerca de 9, no existe (hallazgo 1207).
+  const c = corregirNumero(usuario, esperado, {
+    tolerancia: TOLERANCIA,
+    magnitud: enPorcentaje ? 'porcentaje' : 'recuento',
+  });
+  const { diferencia, tolerancia } = c;
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: enPorcentaje
@@ -486,13 +488,13 @@ export function comprobarRespuesta(usuario: number, esperado: number, datos: Dat
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
   // 0,75 cuando se pide 75: el cuadro está bien leído, la unidad no.
-  if (enPorcentaje && esperado !== 0 && Math.abs(usuario * 100 - esperado) <= tolerancia + RUIDO_BINARIO) {
+  if (enPorcentaje && esperado !== 0 && dentroDeTolerancia(usuario * 100, esperado, tolerancia)) {
     return {
       correcto: false,
       motivo: 'Casi: has escrito la proporción en tanto por uno. Aquí se pide en porcentaje: multiplícala por 100.',

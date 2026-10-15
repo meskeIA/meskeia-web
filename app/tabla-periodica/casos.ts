@@ -53,6 +53,7 @@
  */
 
 import { parseSpanishNumber } from '@/lib';
+import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 import { elementos, type Elemento } from './elementos-data';
 
 // ============================================================
@@ -481,7 +482,7 @@ function formatearNumero(valor: number): string {
  * tienen tres decimales (55,845) y quien copia «55,85» del recuadro ha encontrado el dato.
  */
 export function toleranciaDe(valorEsperado: number): number {
-  return Math.max(0.01, Math.abs(valorEsperado) * 0.01);
+  return toleranciaRelativa(valorEsperado);
 }
 
 /**
@@ -514,21 +515,14 @@ export function comprobarRespuesta(
      * 2149 cerró en simulador-mitosis-meiosis. En un recuento solo vale el entero exacto
      * («19,0» sí: es 19 escrito de otra forma). La masa conserva su tolerancia.
      */
-    if (caso.respuestaEntera === true) {
-      const correcto = Number.isInteger(valor) && valor === caso.respuestaNumerica;
-      return { correcto, motivo: correcto ? 'acierto' : 'fallo' };
-    }
-    /**
-     * ⚠️ 22/09/2026 (hallazgo 1211, medido en simulador-movimiento-circular) — la comparación en
-     * el borde EXACTO decidía por el ±1 ulp de la resta en binario, así que la misma desviación
-     * se aceptaba por arriba y se rechazaba por abajo. El margen de 1e-9 absorbe el ruido sin
-     * cambiar ninguna decisión real: nueve órdenes por encima del ulp de estas cifras y siete
-     * por debajo de la tolerancia más pequeña (0,01).
-     */
-    const RUIDO_BINARIO = 1e-9;
-    const correcto =
-      Math.abs(valor - caso.respuestaNumerica) <=
-      toleranciaDe(caso.respuestaNumerica) + RUIDO_BINARIO;
+    const c = corregirNumero(
+      valor,
+      caso.respuestaNumerica,
+      caso.respuestaEntera === true
+        ? { tolerancia: 0, magnitud: 'recuento' }
+        : { tolerancia: toleranciaDe(caso.respuestaNumerica), magnitud: 'real' },
+    );
+    const correcto = c.estado === 'acierto';
     return { correcto, motivo: correcto ? 'acierto' : 'fallo' };
   }
 

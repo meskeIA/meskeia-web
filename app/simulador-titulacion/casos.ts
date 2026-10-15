@@ -59,6 +59,12 @@
 
 import { formatNumber } from '@/lib';
 import { calcularPH, volumenEquivalencia, type TipoTitulacion } from './motor';
+import {
+  corregirNumero,
+  dentroDeTolerancia,
+  exigeRedondeo,
+  toleranciaRelativa,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── Datos de un caso ─────────────────────────── */
 
@@ -194,13 +200,7 @@ export function textoRespuesta(valor: number, unidad: string, decimales = 2): st
   return unidad ? `${n} ${unidad}` : n;
 }
 
-/** true si la cifra exacta tiene más decimales de los que se piden: el enunciado debe decirlo. */
-export function exigeRedondeo(valor: number, decimales: number): boolean {
-  if (!Number.isFinite(valor)) return false;
-  return Math.abs(redondear(valor, decimales) - valor) > 1e-9 * Math.max(1, Math.abs(valor));
-}
-
-/* ─────────────────────────── Resolución ─────────────────────────── */
+/*─────────────────────────── Resolución ─────────────────────────── */
 
 function positivo(n: number | undefined): n is number {
   return n !== undefined && Number.isFinite(n) && n > 0;
@@ -502,7 +502,7 @@ export function configuracionDe(datos: DatosCaso): ConfiguracionSimulador | null
  */
 export function toleranciaDe(valor: number, magnitud: Magnitud): number {
   if (magnitud === 'pH') return 0.02;
-  if (magnitud === 'volumen') return Math.max(0.01, Math.abs(valor) * 0.01);
+  if (magnitud === 'volumen') return toleranciaRelativa(valor);
   return Math.max(0.0005, Math.abs(valor) * 0.01);
 }
 
@@ -514,20 +514,16 @@ export interface Veredicto {
 }
 
 /**
- * Margen de 1e-9 sobre la tolerancia: en el borde exacto la resta en binario decide por
- * ±1 ulp, y la misma desviación se aceptaría por arriba y se rechazaría por abajo (hallazgo
- * 1211 de `simulador-movimiento-circular`).
- */
-const RUIDO_BINARIO = 1e-9;
-
-/**
  * Corrige la respuesta del alumno. Nunca lanza: una entrada que no es número se responde con
  * un veredicto, no con una excepción que tumbaría el render.
  */
 export function comprobarRespuesta(usuario: number, esperado: number, magnitud: Magnitud): Veredicto {
-  const tolerancia = toleranciaDe(esperado, magnitud);
+  // pH, volumen y concentración son magnitudes continuas: ninguna es imposible por sí misma
+  // dentro de la tolerancia (sonda del 15/10/2026). Un pH negativo existe en ácidos fuertes.
+  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado, magnitud), magnitud: 'real' });
+  const { diferencia, tolerancia } = c;
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal, por ejemplo 8,73).',
@@ -536,8 +532,8 @@ export function comprobarRespuesta(usuario: number, esperado: number, magnitud: 
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
@@ -550,7 +546,7 @@ export function comprobarRespuesta(usuario: number, esperado: number, magnitud: 
       tolerancia,
     };
   }
-  if (magnitud === 'volumen' && esperado > 0 && Math.abs(usuario * 1000 - esperado) <= tolerancia + RUIDO_BINARIO) {
+  if (magnitud === 'volumen' && esperado > 0 && dentroDeTolerancia(usuario * 1000, esperado, tolerancia)) {
     return {
       correcto: false,
       motivo: 'El valor es correcto, pero en litros: se pide en mililitros (multiplica por 1000).',

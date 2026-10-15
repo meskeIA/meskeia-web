@@ -64,6 +64,7 @@ import {
 } from './components/genetics';
 import type { Trait, PunnettResult } from './components/types';
 import { formatNumber } from '@/lib';
+import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Qué se pregunta: una clave del cuadro, y en qué unidad se responde. */
 export interface Busca {
@@ -251,11 +252,13 @@ function numero(v: number): string {
 
 /** Tolerancia al corregir: el MAYOR entre 0,01 y el 1 % del valor esperado. */
 export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+  return toleranciaRelativa(valor);
 }
 
 /**
- * El DOMINIO de la magnitud que se pregunta (hallazgo 1207).
+ * Cómo se DICE que la respuesta es imposible en esta app (hallazgo 1207). Quién decide que lo
+ * es, desde el 15/10/2026, es el motor compartido (`corregirNumero`, con la magnitud del caso):
+ * estos textos solo ponen las palabras del tema —descendencia, plantas— a su veredicto.
  *
  * La tolerancia relativa del 1 % vale un punto porcentual cuando la respuesta es 100, así que
  * un «101 %» de la descendencia se corregía como acierto: no es un error de redondeo, es una
@@ -302,9 +305,13 @@ export function comprobarRespuesta(
    */
   magnitud: 'porcentaje' | 'individuos',
 ): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+  const c = corregirNumero(usuario, esperado, {
+    tolerancia: toleranciaDe(esperado),
+    magnitud: magnitud === 'porcentaje' ? 'porcentaje' : 'recuento',
+  });
+  const { diferencia, tolerancia } = c;
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal).',
@@ -313,31 +320,16 @@ export function comprobarRespuesta(
     };
   }
 
-  const imposible = fueraDeDominio(usuario, magnitud);
-  if (imposible) {
+  if (c.motivoImposible) {
     return {
       correcto: false,
-      motivo: imposible,
-      diferencia: Math.abs(usuario - esperado),
+      motivo: fueraDeDominio(usuario, magnitud) ?? c.motivoImposible,
+      diferencia,
       tolerancia,
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211) — la comparación en el borde EXACTO decidía por el ±1 ulp de
-   * la resta en binario, así que la misma desviación se aceptaba por arriba y se rechazaba por
-   * abajo: con esperado 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y
-   * «0,09» daba 0,010000000000000009 (fuera), y el mensaje de rechazo cifraba la desviación
-   * igual que la tolerancia —«te has desviado 0,01»—, que es la forma más desconcertante de
-   * suspender a alguien.
-   *
-   * El margen es 1e-9: nueve órdenes de magnitud por encima del ulp de las cifras que maneja
-   * esta app y siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido
-   * sin cambiar ninguna decisión real.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 

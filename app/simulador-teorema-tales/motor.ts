@@ -24,6 +24,7 @@
  */
 
 import { formatNumber } from '@/lib';
+import { corregirNumero, dentroDeTolerancia, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================
 // UTILIDADES BÁSICAS
@@ -762,11 +763,6 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioAleatorio 
 // 8. CORRECCIÓN DE RESPUESTAS
 // ============================================
 
-/** Margen absoluto mínimo: ±0,01 en la unidad del enunciado. */
-export const TOLERANCIA_ABSOLUTA = 0.01;
-/** Margen relativo: ±1 % del valor esperado, para que los resultados grandes no exijan cuatro decimales. */
-export const TOLERANCIA_RELATIVA = 0.01;
-
 export type MotivoVeredicto = 'correcta' | 'cerca' | 'incorrecta' | 'sin-numero';
 
 export interface Veredicto {
@@ -792,21 +788,23 @@ export function comprobarRespuesta(valorUsuario: number, valorEsperado: number):
     return { correcta: false, motivo: 'sin-numero', esperado: valorEsperado, desviacion: NaN, margen: NaN };
   }
 
-  const margen = Math.max(TOLERANCIA_ABSOLUTA, Math.abs(valorEsperado) * TOLERANCIA_RELATIVA);
+  const margen = toleranciaRelativa(valorEsperado);
+  // Longitudes y áreas son continuas: ningún valor es imposible por sí mismo dentro del margen.
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: margen, magnitud: 'real' });
 
-  if (!Number.isFinite(valorUsuario)) {
+  if (c.estado === 'no-numerico') {
     return { correcta: false, motivo: 'sin-numero', esperado: valorEsperado, desviacion: NaN, margen };
   }
 
-  const desviacion = Math.abs(valorUsuario - valorEsperado);
+  const desviacion = c.diferencia;
 
-  if (desviacion <= margen) {
+  if (c.estado === 'acierto') {
     return { correcta: true, motivo: 'correcta', esperado: valorEsperado, desviacion, margen };
   }
 
   // «Cerca» abarca hasta cinco veces el margen: casi siempre es un redondeo
   // intermedio, y merece un aviso distinto al de haber planteado mal la proporción.
-  if (desviacion <= margen * 5) {
+  if (dentroDeTolerancia(valorUsuario, valorEsperado, margen * 5)) {
     return { correcta: false, motivo: 'cerca', esperado: valorEsperado, desviacion, margen };
   }
 

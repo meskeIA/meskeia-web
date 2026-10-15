@@ -189,16 +189,16 @@ test.describe('Corrección de la respuesta del alumno', () => {
   test('confundir σ con s se marca como fallo', () => {
     // 2 frente a 2,138: la diferencia supera el 1 % y debe suspender, que es
     // justo lo que el par de casos 7 y 8 quiere enseñar.
-    expect(comprobarRespuesta(2.138, 2).correcto).toBe(false);
-    expect(comprobarRespuesta(2, 2.13809).correcto).toBe(false);
+    expect(comprobarRespuesta(2.138, 2, 'real').correcto).toBe(false);
+    expect(comprobarRespuesta(2, 2.13809, 'real').correcto).toBe(false);
   });
 
   test('acepta el redondeo a dos decimales cuando el caso lo pide', () => {
-    expect(comprobarRespuesta(2.14, 2.13809).correcto).toBe(true);
+    expect(comprobarRespuesta(2.14, 2.13809, 'real').correcto).toBe(true);
   });
 
   test('una entrada no numérica se distingue de una respuesta equivocada', () => {
-    const v = comprobarRespuesta(NaN, 7);
+    const v = comprobarRespuesta(NaN, 7, 'real');
     expect(v.correcto).toBe(false);
     expect(v.motivo).toBe('no-numerico');
   });

@@ -26,6 +26,7 @@
  */
 
 import { formatNumber } from '@/lib';
+import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -105,6 +106,8 @@ export interface Comprobacion {
   motivo: 'acertado' | 'fallado' | 'no-numerico';
   diferencia: number;
   tolerancia: number;
+  /** Por qué la respuesta es IMPOSIBLE en su magnitud (hallazgo 1207), para que la vista lo diga. */
+  aviso?: string;
 }
 
 // ============================================================
@@ -376,22 +379,19 @@ export function analizarReciproco(l1: number, l2: number, l3: number): AnalisisR
  * 2,2472) y el porcentaje evita ser absurdamente estricto en respuestas grandes.
  */
 export function toleranciaDe(valorEsperado: number): number {
-  return Math.max(0.01, Math.abs(valorEsperado) * 0.01);
+  return toleranciaRelativa(valorEsperado);
 }
 
 /** Compara la respuesta tecleada con la esperada. NaN cuenta como «no numérico». */
 export function comprobarRespuesta(valorUsuario: number, valorEsperado: number): Comprobacion {
-  const tolerancia = toleranciaDe(valorEsperado);
-  if (!Number.isFinite(valorUsuario)) {
-    return { correcto: false, motivo: 'no-numerico', diferencia: NaN, tolerancia };
-  }
-  const diferencia = Math.abs(valorUsuario - valorEsperado);
-  return {
-    correcto: diferencia <= tolerancia,
-    motivo: diferencia <= tolerancia ? 'acertado' : 'fallado',
-    diferencia,
-    tolerancia,
-  };
+  // Todas las respuestas de esta app son magnitudes continuas: ningún valor es imposible por sí
+  // mismo dentro de la tolerancia (sonda del 15/10/2026 sobre los casos y el modo práctica).
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud: 'real' });
+  const { diferencia, tolerancia } = c;
+  if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
+  if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
+  const correcto = c.estado === 'acierto';
+  return { correcto, motivo: correcto ? 'acertado' : 'fallado', diferencia, tolerancia };
 }
 
 // ============================================================

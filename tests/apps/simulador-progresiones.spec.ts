@@ -315,14 +315,14 @@ test.describe('Modo práctica aleatorio (para rehacerlo)', () => {
 
 test.describe('Corrección de la respuesta del alumno', () => {
   test('acepta el redondeo razonable y rechaza el error real', () => {
-    expect(comprobarRespuesta(5050, 5050).correcto).toBe(true);
-    expect(comprobarRespuesta(199, 199).correcto).toBe(true);
+    expect(comprobarRespuesta(5050, 5050, 'real').correcto).toBe(true);
+    expect(comprobarRespuesta(199, 199, 'real').correcto).toBe(true);
     // El fallo clásico de usar n en vez de n−1: 23 frente a 19. Debe suspender.
-    expect(comprobarRespuesta(23, 19).correcto).toBe(false);
+    expect(comprobarRespuesta(23, 19, 'real').correcto).toBe(false);
   });
 
   test('una entrada no numérica se distingue de una respuesta equivocada', () => {
-    const v = comprobarRespuesta(NaN, 19);
+    const v = comprobarRespuesta(NaN, 19, 'real');
     expect(v.correcto).toBe(false);
     expect(v.motivo).toBe('no-numerico');
   });

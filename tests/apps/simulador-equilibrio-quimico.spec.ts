@@ -718,7 +718,7 @@ test.describe('Simulador de Equilibrio Químico · casos para clase', () => {
   test('caso 6 · usar R = 8,31 en vez de 8,314 sigue cayendo dentro de la tolerancia', () => {
     // Un alumno que redondea la constante de los gases no puede suspender por eso.
     const conRmenosPreciso = 0.04 * Math.exp(-(88000 / 8.31) * (1 / 350 - 1 / 298));
-    expect(comprobarRespuesta(String(conRmenosPreciso).replace('.', ','), numericos[5].respuesta)
+    expect(comprobarRespuesta(String(conRmenosPreciso).replace('.', ','), numericos[5].respuesta, 'real')
       .correcto).toBe(true);
   });
 
@@ -933,18 +933,18 @@ test.describe('Simulador de Equilibrio Químico · casos para clase', () => {
 
   test('la coma decimal española se acepta, y «0,02» no se lee como 0', () => {
     // Es lo que pasaría con parseFloat: se queda con el prefijo y tira el resto.
-    expect(comprobarRespuesta('0,02', 0.02).correcto).toBe(true);
-    expect(comprobarRespuesta('0.02', 0.02).correcto).toBe(true);
-    expect(comprobarRespuesta('0,021', 0.02).correcto).toBe(true); // dentro de 0,01
-    expect(comprobarRespuesta('0,5', 0.02).correcto).toBe(false);
+    expect(comprobarRespuesta('0,02', 0.02, 'real').correcto).toBe(true);
+    expect(comprobarRespuesta('0.02', 0.02, 'real').correcto).toBe(true);
+    expect(comprobarRespuesta('0,021', 0.02, 'real').correcto).toBe(true); // dentro de 0,01
+    expect(comprobarRespuesta('0,5', 0.02, 'real').correcto).toBe(false);
   });
 
   test('una respuesta vacía o no numérica se distingue de un fallo', () => {
-    expect(comprobarRespuesta('', 4).motivo).toBe('vacia');
-    expect(comprobarRespuesta('   ', 4).motivo).toBe('vacia');
-    expect(comprobarRespuesta('cuatro', 4).motivo).toBe('no-numerico');
-    expect(comprobarRespuesta('12abc', 4).motivo).toBe('no-numerico');
-    expect(comprobarRespuesta('9', 4).motivo).toBe('fallo');
+    expect(comprobarRespuesta('', 4, 'real').motivo).toBe('vacia');
+    expect(comprobarRespuesta('   ', 4, 'real').motivo).toBe('vacia');
+    expect(comprobarRespuesta('cuatro', 4, 'real').motivo).toBe('no-numerico');
+    expect(comprobarRespuesta('12abc', 4, 'real').motivo).toBe('no-numerico');
+    expect(comprobarRespuesta('9', 4, 'real').motivo).toBe('fallo');
   });
 
   test('una predicción sin elegir no cuenta como fallo cualquiera', () => {

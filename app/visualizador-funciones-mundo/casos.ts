@@ -44,6 +44,7 @@
  */
 
 import { formatNumber } from '@/lib';
+import { corregirNumero, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -140,6 +141,8 @@ export interface CasoFuncion {
   tabla: readonly PuntoTabla[] | null;
   /** Unidad o naturaleza del número que se pide. Nunca vacía. */
   etiquetaRespuesta: string;
+  /** Qué cosa es la respuesta: decide qué valores son IMPOSIBLES (hallazgo 1207). */
+  magnitud: Magnitud;
   respuesta: number;
   respuestaTexto: string;
   requiereRedondeo: boolean;
@@ -157,6 +160,8 @@ export interface EjercicioFuncion {
   x: number | null;
   expresion: string;
   etiquetaRespuesta: string;
+  /** Qué cosa es la respuesta: decide qué valores son IMPOSIBLES (hallazgo 1207). */
+  magnitud: Magnitud;
   respuesta: number;
   respuestaTexto: string;
   requiereRedondeo: boolean;
@@ -170,6 +175,8 @@ export interface Comprobacion {
   motivo: 'acertado' | 'fallado' | 'no-numerico';
   diferencia: number;
   tolerancia: number;
+  /** Por qué la respuesta es IMPOSIBLE en su magnitud (hallazgo 1207), para que la vista lo diga. */
+  aviso?: string;
 }
 
 // ============================================================
@@ -349,35 +356,22 @@ export function razonConstante(tabla: readonly PuntoTabla[]): number {
  * Ver el punto 2 de la cabecera: los dos criterios juntos cubren toda la escala.
  */
 export function toleranciaDe(valorEsperado: number): number {
-  return Math.max(0.01, Math.abs(valorEsperado) * 0.01);
+  return toleranciaRelativa(valorEsperado);
 }
 
 /** Compara la respuesta tecleada con la esperada. NaN cuenta como «no numérico». */
-export function comprobarRespuesta(valorUsuario: number, valorEsperado: number): Comprobacion {
-  const tolerancia = toleranciaDe(valorEsperado);
-  if (!Number.isFinite(valorUsuario)) {
-    return { correcto: false, motivo: 'no-numerico', diferencia: NaN, tolerancia };
-  }
-  const diferencia = Math.abs(valorUsuario - valorEsperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211, medido en simulador-movimiento-circular) — la comparación en
-   * el borde EXACTO decidía por el ±1 ulp de la resta en binario, así que la misma desviación
-   * se aceptaba por arriba y se rechazaba por abajo: con esperado 0,1 y tolerancia 0,01, «0,11»
-   * daba 0,009999999999999995 (dentro) y «0,09» daba 0,010000000000000009 (fuera), y el mensaje
-   * de rechazo cifraba la desviación igual que la tolerancia.
-   *
-   * El margen es 1e-9: nueve órdenes por encima del ulp de las cifras que maneja esta app y
-   * siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido sin cambiar
-   * ninguna decisión real.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  const correcto = diferencia <= tolerancia + RUIDO_BINARIO;
-  return {
-    correcto,
-    motivo: correcto ? 'acertado' : 'fallado',
-    diferencia,
-    tolerancia,
-  };
+export function comprobarRespuesta(
+  valorUsuario: number,
+  valorEsperado: number,
+  /** Obligatoria: sin ella no se distingue una respuesta imprecisa de una imposible (hallazgo 1207). */
+  magnitud: Magnitud,
+): Comprobacion {
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud });
+  const { diferencia, tolerancia } = c;
+  if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
+  if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
+  const correcto = c.estado === 'acierto';
+  return { correcto, motivo: correcto ? 'acertado' : 'fallado', diferencia, tolerancia };
 }
 
 // ============================================================
@@ -399,6 +393,8 @@ export interface DefinicionCaso {
   xsTabla?: readonly number[];
   expresion: string;
   etiquetaRespuesta: string;
+  /** Qué cosa es la respuesta: decide qué valores son IMPOSIBLES (hallazgo 1207). */
+  magnitud: Magnitud;
   pista: string;
   grafica: SugerenciaGrafica | null;
 }
@@ -689,6 +685,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     x: 12,
     expresion: 'C(x) = 3·x + 20',
     etiquetaRespuesta: 'unidades monetarias',
+    magnitud: 'real',
     pista: 'La cuota fija se paga aunque no se consuma nada: es el valor de la función cuando x = 0.',
     grafica: { funcion: 'lineal', parametro: 3 },
   },
@@ -704,6 +701,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     x: 40,
     expresion: 'R(x) = m·x + 12',
     etiquetaRespuesta: 'unidades monetarias por metro cúbico',
+    magnitud: 'real',
     pista: 'La cuota fija no depende del consumo: réstala del total antes de repartir entre los metros cúbicos.',
     grafica: { funcion: 'lineal', parametro: 2 },
   },
@@ -718,6 +716,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametros: { m: -180, b: 4500 },
     expresion: 'V(x) = −180·x + 4.500',
     etiquetaRespuesta: 'horas',
+    magnitud: 'real',
     pista: 'Vaciarse significa que la función vale cero. La pendiente es negativa porque la cantidad baja.',
     grafica: null,
   },
@@ -732,6 +731,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametros: { a: -5, b: 30, c: 0 },
     expresion: 'h(t) = −5·t² + 30·t',
     etiquetaRespuesta: 'metros',
+    magnitud: 'real',
     pista: 'El punto más alto de una parábola es su vértice, y su abscisa sale de x = −b / (2·a).',
     grafica: { funcion: 'cuadratica', parametro: 5 },
   },
@@ -746,6 +746,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametros: { a: -1, b: 20, c: 0 },
     expresion: 'A(x) = −x² + 20·x',
     etiquetaRespuesta: 'metros (el lado x)',
+    magnitud: 'real',
     pista: 'Aquí no se pide el área, sino el lado que la hace máxima: la coordenada x del vértice.',
     grafica: { funcion: 'cuadratica', parametro: 3 },
   },
@@ -761,6 +762,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     x: 10,
     expresion: 'S(x) = 2.000 · 1,05^x',
     etiquetaRespuesta: 'unidades monetarias',
+    magnitud: 'real',
     pista: 'No es 2.000 más el 5 % diez veces: cada año los intereses también generan intereses. Redondea a 2 decimales.',
     grafica: { funcion: 'exponencial', parametro: 1 },
   },
@@ -776,6 +778,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     x: 12,
     expresion: 'N(x) = 500 · 2^(x/3)',
     etiquetaRespuesta: 'bacterias',
+    magnitud: 'recuento',
     pista: 'En 12 horas caben 12 / 3 = 4 duplicaciones. Duplicar cuatro veces es multiplicar por 2⁴, no por 8.',
     grafica: { funcion: 'exponencial', parametro: 10 },
   },
@@ -791,6 +794,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     x: 36,
     expresion: 'M(x) = 800 · 0,5^(x/12)',
     etiquetaRespuesta: 'gramos',
+    magnitud: 'real',
     pista: 'Es una exponencial con base menor que 1: decrece. En 36 años caben 3 periodos de 12, y cada uno parte por dos.',
     grafica: null,
   },
@@ -806,6 +810,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     x: 4,
     expresion: 'razón = 10^(diferencia de magnitudes)',
     etiquetaRespuesta: 'veces (cuántas veces mayor)',
+    magnitud: 'real',
     pista: 'La diferencia entre las dos magnitudes son 4 unidades. En una escala logarítmica esa diferencia no se suma: se convierte en potencia.',
     grafica: { funcion: 'logaritmica', parametro: 10 },
   },
@@ -821,6 +826,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     x: 3,
     expresion: 't(M) = log(M) / log(1,06)',
     etiquetaRespuesta: 'años',
+    magnitud: 'real',
     pista: 'La incógnita está en el exponente (1,06^t = 3), y lo que despeja un exponente es el logaritmo. Redondea a 2 decimales.',
     grafica: { funcion: 'logaritmica', parametro: 4 },
   },
@@ -836,6 +842,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     parametrosSecundarios: { m: 10, b: 100 },
     expresion: 'A(x) = 10·x + 100   ·   B(x) = 1 · 2^x',
     etiquetaRespuesta: 'número de semana',
+    magnitud: 'recuento',
     pista: 'Ve probando semanas enteras y compara las dos alturas. Durante muchas semanas la lineal gana con holgura: esa es la trampa.',
     grafica: { funcion: 'exponencial', parametro: 10 },
   },
@@ -851,6 +858,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
     xsTabla: [0, 1, 2, 3],
     expresion: 'y = a₀ · b^x   (hay que averiguar b)',
     etiquetaRespuesta: 'la razón (número sin unidad)',
+    magnitud: 'real',
     pista: 'Prueba primero a restar valores consecutivos. Si las restas no coinciden, prueba a dividirlos.',
     grafica: { funcion: 'exponencial', parametro: 8 },
   },
@@ -873,6 +881,7 @@ function construirCaso(def: DefinicionCaso): CasoFuncion {
     expresion: def.expresion,
     tabla,
     etiquetaRespuesta: def.etiquetaRespuesta,
+    magnitud: def.magnitud,
     respuesta: solucion.valor,
     respuestaTexto: formatearFlexible(solucion.valor, 2),
     requiereRedondeo: Math.abs(solucion.valor - redondear(solucion.valor, 2)) > 1e-9,
@@ -949,6 +958,7 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioFuncion {
       x,
       expresion: `C(x) = ${formatearFlexible(m)}·x + ${formatearFlexible(b)}`,
       etiquetaRespuesta: 'unidades monetarias',
+      magnitud: 'real',
       respuesta: valor,
       respuestaTexto: formatearFlexible(valor, 2),
       requiereRedondeo: Math.abs(valor - redondear(valor, 2)) > 1e-9,
@@ -972,6 +982,7 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioFuncion {
       parametros,
       expresion: '',
       etiquetaRespuesta: '',
+      magnitud: 'real',
       pista: '',
       grafica: null,
     };
@@ -984,6 +995,7 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioFuncion {
       x: null,
       expresion: `h(t) = −5·t² + ${formatearFlexible(v)}·t`,
       etiquetaRespuesta: 'metros',
+      magnitud: 'real',
       respuesta: vertice.y,
       respuestaTexto: formatearFlexible(vertice.y, 2),
       requiereRedondeo: Math.abs(vertice.y - redondear(vertice.y, 2)) > 1e-9,
@@ -1007,6 +1019,7 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioFuncion {
       x,
       expresion: `N(x) = ${formatearFlexible(a0)} · 2^(x/${formatearFlexible(periodo)})`,
       etiquetaRespuesta: 'bacterias',
+      magnitud: 'recuento',
       respuesta: valor,
       respuestaTexto: formatearFlexible(valor, 2),
       requiereRedondeo: Math.abs(valor - redondear(valor, 2)) > 1e-9,
@@ -1028,6 +1041,7 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioFuncion {
     x: unidades,
     expresion: '',
     etiquetaRespuesta: '',
+    magnitud: 'real',
     pista: '',
     grafica: null,
   };
@@ -1040,6 +1054,7 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioFuncion {
     x: unidades,
     expresion: 'razón = 10^(diferencia en la escala)',
     etiquetaRespuesta: 'veces (cuántas veces mayor)',
+    magnitud: 'real',
     respuesta: solucion.valor,
     respuestaTexto: formatearFlexible(solucion.valor, 2),
     requiereRedondeo: Math.abs(solucion.valor - redondear(solucion.valor, 2)) > 1e-9,

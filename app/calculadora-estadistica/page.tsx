@@ -10,6 +10,8 @@ import {
   calcularEstadisticas,
   comprobarRespuesta,
   generarEjercicioAleatorio,
+  magnitudDe,
+  type CasoEstadistica,
   type Comprobacion,
   type EjercicioEstadistica,
 } from './casos';
@@ -150,9 +152,12 @@ export default function CalculadoraEstadisticaPage() {
 
   // ---------------------------------------------------------- Casos para clase
 
-  const comprobarCaso = (id: number, esperado: number) => {
-    const valor = parseSpanishNumber(respuestasCasos[id] ?? '');
-    setVeredictos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado) }));
+  const comprobarCaso = (caso: CasoEstadistica) => {
+    const valor = parseSpanishNumber(respuestasCasos[caso.id] ?? '');
+    setVeredictos((previos) => ({
+      ...previos,
+      [caso.id]: comprobarRespuesta(valor, caso.respuesta, magnitudDe(caso)),
+    }));
   };
 
   const alternarSolucion = (id: number) => {
@@ -188,7 +193,9 @@ export default function CalculadoraEstadisticaPage() {
 
   const comprobarAleatorio = () => {
     if (!ejercicio) return;
-    setVeredictoAleatorio(comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.respuesta));
+    setVeredictoAleatorio(
+      comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.respuesta, magnitudDe(ejercicio)),
+    );
   };
 
   const textoVeredicto = (veredicto: Comprobacion, respuestaTexto: string, unidad: string) => {
@@ -197,6 +204,9 @@ export default function CalculadoraEstadisticaPage() {
     }
     if (veredicto.correcto) {
       return `Correcto: ${respuestaTexto} ${unidad}.`;
+    }
+    if (veredicto.aviso) {
+      return `${veredicto.aviso} La respuesta correcta es ${respuestaTexto} ${unidad}.`;
     }
     return `Todavía no. La respuesta correcta es ${respuestaTexto} ${unidad}. Abre la solución para ver dónde se tuerce la cuenta.`;
   };
@@ -581,7 +591,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
                   <button
                     type="button"
                     className={styles.aulaBtnPrimario}
-                    onClick={() => comprobarCaso(caso.id, caso.respuesta)}
+                    onClick={() => comprobarCaso(caso)}
                   >
                     Comprobar
                   </button>

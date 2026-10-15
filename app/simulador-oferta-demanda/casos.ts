@@ -41,6 +41,7 @@
  */
 
 import { formatNumber } from '@/lib';
+import { corregirNumero, dentroDeTolerancia, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── El motor de la app (movido de page.tsx) ─────────────────────────── */
 
@@ -311,14 +312,8 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
 /** El mayor entre 0,01 y el 1 % del valor (skill /casos-aula-meskeia, tipo A). */
 export function toleranciaDe(v: number): number {
-  return Math.max(0.01, Math.abs(v) * 0.01);
+  return toleranciaRelativa(v);
 }
-
-/**
- * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde EXACTO
- * de la tolerancia la resta en coma flotante decide por ±1 ulp.
- */
-const RUIDO_BINARIO = 1e-9;
 
 export interface Veredicto {
   correcto: boolean;
@@ -343,11 +338,14 @@ export function comprobarRespuesta(usuario: Respuesta | null, esperado: Respuest
   if (typeof usuario !== 'number' || !Number.isFinite(usuario) || typeof esperado !== 'number') {
     return { correcto: false, motivo: 'Escribe un número (puedes usar la coma decimal).' };
   }
-  const diferencia = Math.abs(usuario - esperado);
-  if (diferencia <= toleranciaDe(esperado) + RUIDO_BINARIO) return { correcto: true, motivo: '¡Correcto!' };
+  // Precio y cantidad del modelo lineal son continuos (el modelo no cuenta helados uno a uno):
+  // ningún valor es imposible por sí mismo dentro de la tolerancia.
+  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible };
+  if (c.estado === 'acierto') return { correcto: true, motivo: '¡Correcto!' };
 
   // Exceso de demanda u oferta escrito en negativo: el signo es el de «Qd − Qo» al revés.
-  if (datos.tipo === 'desajuste' && Math.abs(-usuario - esperado) <= toleranciaDe(esperado) + RUIDO_BINARIO) {
+  if (datos.tipo === 'desajuste' && dentroDeTolerancia(-usuario, esperado, c.tolerancia)) {
     return {
       correcto: false,
       motivo: 'Casi: la cantidad que falta o sobra se da en positivo. Resta la cantidad menor de la mayor.',

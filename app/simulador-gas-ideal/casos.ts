@@ -45,6 +45,7 @@
 
 import { formatNumber } from '@/lib';
 import { ATM_TO_PA, L_TO_M3, calcularGasIdeal, calcularProceso } from './motor';
+import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Paso de °C a K: la app resta este mismo 273,15 para mostrar los °C. */
 const CERO_CELSIUS_K = 273.15;
@@ -501,7 +502,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
 /** El MAYOR entre 0,01 y el 1 % del valor. */
 export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+  return toleranciaRelativa(valor);
 }
 
 export interface Veredicto {
@@ -513,9 +514,12 @@ export interface Veredicto {
 
 /** Corrige la respuesta del alumno. Nunca lanza. */
 export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
+  // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
+  // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
+  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
+  const { diferencia, tolerancia } = c;
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal).',
@@ -524,15 +528,8 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  /**
-   * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
-   * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp, así que la misma
-   * desviación se aceptaba por arriba y se rechazaba por abajo. 1e-9 absorbe ese ruido y queda
-   * siete órdenes de magnitud por debajo de la tolerancia más pequeña (0,01).
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 

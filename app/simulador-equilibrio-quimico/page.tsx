@@ -32,9 +32,11 @@ import {
   deltaN,
   equilibrioDePartida,
   esExotermicaDe,
+  magnitudDe,
   nuevoEquilibrio,
   nuevoKcConTemperatura,
   type Comprobacion,
+  type DatosNumericos,
   type DireccionDesplazamiento,
   type Perturbacion,
   type TipoPerturbacion,
@@ -103,10 +105,10 @@ export default function SimuladorEquilibrioQuimicoPage() {
 
   // ---------------------------------------------------------- Casos para clase
 
-  const comprobarCasoNumerico = (id: number, esperado: number) => {
+  const comprobarCasoNumerico = (id: number, esperado: number, datos: DatosNumericos) => {
     setVeredictos((previos) => ({
       ...previos,
-      [id]: comprobarRespuesta(respuestasCasos[id] ?? '', esperado),
+      [id]: comprobarRespuesta(respuestasCasos[id] ?? '', esperado, magnitudDe(datos)),
     }));
   };
 
@@ -792,7 +794,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
                       className={styles.aulaBtnPrimario}
                       onClick={() =>
                         caso.tipo === 'numerico'
-                          ? comprobarCasoNumerico(caso.id, caso.respuesta)
+                          ? comprobarCasoNumerico(caso.id, caso.respuesta, caso.datos)
                           : comprobarCasoPrediccion(caso.id, caso.respuesta)
                       }
                     >
@@ -839,7 +841,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
                             : 'Elige una de las tres opciones antes de comprobar.'
                           : veredicto.motivo === 'no-numerico'
                             ? 'Eso no es un número. Escribe solo la cifra, con coma decimal.'
-                            : 'Todavía no. Despliega la solución o vuelve a intentarlo.'}
+                            : (veredicto.aviso ?? 'Todavía no. Despliega la solución o vuelve a intentarlo.')}
                     </p>
                   )}
 

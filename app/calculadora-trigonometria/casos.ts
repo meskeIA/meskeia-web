@@ -31,6 +31,7 @@
  */
 
 import { formatNumber } from '@/lib';
+import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -105,6 +106,8 @@ export interface ComprobacionTrig {
   motivo: 'acertado' | 'fallado' | 'no-numerico';
   diferencia: number;
   tolerancia: number;
+  /** Por qué la respuesta es IMPOSIBLE en su magnitud (hallazgo 1207), para que la vista lo diga. */
+  aviso?: string;
 }
 
 // ============================================================
@@ -467,38 +470,19 @@ export function resolverCaso(
  * 0,8660) y el porcentaje evita ser absurdamente estricto en respuestas grandes.
  */
 export function toleranciaDe(valorEsperado: number): number {
-  return Math.max(0.01, Math.abs(valorEsperado) * 0.01);
+  return toleranciaRelativa(valorEsperado);
 }
 
 /** Compara la respuesta tecleada con la esperada. NaN cuenta como «no numérico». */
-export function comprobarRespuesta(
-  valorUsuario: number,
-  valorEsperado: number,
-): ComprobacionTrig {
-  const tolerancia = toleranciaDe(valorEsperado);
-  if (!Number.isFinite(valorUsuario)) {
-    return { correcto: false, motivo: 'no-numerico', diferencia: NaN, tolerancia };
-  }
-  const diferencia = Math.abs(valorUsuario - valorEsperado);
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1211, medido en simulador-movimiento-circular) — la comparación en
-   * el borde EXACTO decidía por el ±1 ulp de la resta en binario, así que la misma desviación
-   * se aceptaba por arriba y se rechazaba por abajo: con esperado 0,1 y tolerancia 0,01, «0,11»
-   * daba 0,009999999999999995 (dentro) y «0,09» daba 0,010000000000000009 (fuera), y el mensaje
-   * de rechazo cifraba la desviación igual que la tolerancia.
-   *
-   * El margen es 1e-9: nueve órdenes por encima del ulp de las cifras que maneja esta app y
-   * siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido sin cambiar
-   * ninguna decisión real.
-   */
-  const RUIDO_BINARIO = 1e-9;
-  const correcto = diferencia <= tolerancia + RUIDO_BINARIO;
-  return {
-    correcto,
-    motivo: correcto ? 'acertado' : 'fallado',
-    diferencia,
-    tolerancia,
-  };
+export function comprobarRespuesta(valorUsuario: number, valorEsperado: number): ComprobacionTrig {
+  // Todas las respuestas de esta app son magnitudes continuas: ningún valor es imposible por sí
+  // mismo dentro de la tolerancia (sonda del 15/10/2026 sobre los casos y el modo práctica).
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud: 'real' });
+  const { diferencia, tolerancia } = c;
+  if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
+  if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
+  const correcto = c.estado === 'acierto';
+  return { correcto, motivo: correcto ? 'acertado' : 'fallado', diferencia, tolerancia };
 }
 
 // ============================================================

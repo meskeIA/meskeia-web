@@ -23,6 +23,7 @@ import {
   type EjercicioFuncion,
   type SugerenciaGrafica,
 } from './casos';
+import type { Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ─────────────────────────────────────────────
 // Funciones
@@ -180,11 +181,11 @@ export default function VisualizadorFuncionesMundoPage() {
     [veredictos],
   );
 
-  const comprobarCaso = (id: number, esperado: number) => {
+  const comprobarCaso = (id: number, esperado: number, magnitud: Magnitud) => {
     // parseSpanishNumber admite coma o punto y devuelve NaN si no es un número:
     // por eso no hace falta validar antes, solo mirar el motivo del veredicto.
     const valor = parseSpanishNumber(respuestas[id] ?? '');
-    setVeredictos(previos => ({ ...previos, [id]: comprobarRespuesta(valor, esperado) }));
+    setVeredictos(previos => ({ ...previos, [id]: comprobarRespuesta(valor, esperado, magnitud) }));
   };
 
   const alternarSolucion = (id: number) => {
@@ -222,7 +223,7 @@ export default function VisualizadorFuncionesMundoPage() {
   const comprobarAleatorio = () => {
     if (!ejercicio) return;
     setVeredictoAleatorio(
-      comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.respuesta),
+      comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.respuesta, ejercicio.magnitud),
     );
   };
 
@@ -232,6 +233,9 @@ export default function VisualizadorFuncionesMundoPage() {
     }
     if (veredicto.correcto) {
       return `Correcto: ${respuestaTexto} ${etiqueta}.`;
+    }
+    if (veredicto.aviso) {
+      return `${veredicto.aviso} La respuesta correcta es ${respuestaTexto} ${etiqueta}.`;
     }
     return `Todavía no. La respuesta correcta es ${respuestaTexto} ${etiqueta}. Abre la solución para ver dónde se tuerce la cuenta.`;
   };
@@ -432,7 +436,7 @@ export default function VisualizadorFuncionesMundoPage() {
                     <button
                       type="button"
                       className={styles.casoBtnPrimario}
-                      onClick={() => comprobarCaso(caso.id, caso.respuesta)}
+                      onClick={() => comprobarCaso(caso.id, caso.respuesta, caso.magnitud)}
                     >
                       Comprobar
                     </button>

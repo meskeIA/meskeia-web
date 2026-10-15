@@ -127,6 +127,34 @@ for (const motor of motores) {
   }
 }
 
+/**
+ * COPIAS DE UN MOTOR. Un motor que nace para retirar copias declara en su cabecera la huella
+ * de la copia (`huella-de-copia: <regex>`), y aquí se rompe si reaparece fuera de él. Salió del
+ * corrector de «Casos para clase» (15/10/2026): 33 copias, un arreglo (hallazgo 1211) aplicado
+ * a mano en 16 y ausente en 3, y otro (1207) en una sola. Que el motor tenga lector no dice nada
+ * si la app nueva copia el cuerpo en vez de importarlo, que es como se llegó a 33.
+ * Mira app/, components/, lib/, server/ y data/; tests/ y scripts/ no, porque un test escribe
+ * a propósito su propia implementación para no fiarse de la de la app.
+ */
+const copias = [];
+for (const motor of motores) {
+  const propio = `lib/calculadoras/${motor}.ts`;
+  const src = contenidos.get(propio) ?? '';
+  const huellas = [...src.matchAll(/^[\s*/]*huella-de-copia:\s*(.+?)\s*$/gm)].map((m) => new RegExp(m[1]));
+  if (huellas.length === 0) continue;
+  for (const [rel, c] of contenidos) {
+    if (rel === propio || rel.startsWith('tests/') || rel.startsWith('scripts/')) continue;
+    if (!huellas.some((h) => h.test(c))) continue;
+    const lineas = c.split('\n');
+    lineas.forEach((l, i) => {
+      if (!huellas.some((h) => h.test(l))) return;
+      const escape = /copia-ok:\s*\S+/;
+      if (escape.test(l) || escape.test(lineas[i - 1] ?? '')) return;
+      copias.push({ motor, rel, n: i + 1, linea: l.trim().slice(0, 90) });
+    });
+  }
+}
+
 if (LISTA) {
   for (const motor of motores) {
     const l = consumidores.get(motor) ?? [];
@@ -158,6 +186,18 @@ if (cabeceraMiente.length) {
   console.error('\n  Registra la tool o corrige la cabecera para que diga quién lo usa de verdad.');
 }
 
+if (copias.length) {
+  falla = true;
+  console.error(`\n✗ COPIA DE UN MOTOR COMPARTIDO: ${copias.length} línea(s)\n`);
+  console.error('  Su motor declara esta firma como huella de una copia: importa el motor en vez de');
+  console.error('  reescribirlo, o el próximo arreglo llegará a él y no a la copia.\n');
+  for (const { motor, rel, n, linea } of copias) {
+    console.error(`    ${rel}:${n}  →  lib/calculadoras/${motor}.ts`);
+    console.error(`        ${linea}`);
+  }
+  console.error('\n  Si la copia es deliberada, «// copia-ok: <razón>» en esa línea o en la anterior.');
+}
+
 if (falla) process.exit(1);
 
-console.log(`✓ motores: los ${motores.length} tienen lector, y ninguna cabecera promete una tool que no existe`);
+console.log(`✓ motores: los ${motores.length} tienen lector, ninguna cabecera promete una tool que no existe y ningún motor compartido tiene copias`);

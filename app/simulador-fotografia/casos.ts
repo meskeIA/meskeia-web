@@ -31,6 +31,8 @@
  * justamente ese redondeo comercial, y lo dicen en el enunciado.
  */
 
+import { corregirNumero, dentroDeTolerancia, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+
 /* ─────────────────── Las escalas y la aritmética, compartidas con la vista ─────────────────── */
 
 export const ISO_VALUES = [100, 200, 400, 800, 1600, 3200, 6400] as const;
@@ -337,7 +339,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
 /** El MAYOR entre 0,01 y el 1 % del valor: así un 0,92 no se corrige a ciegas. */
 export function toleranciaDe(valor: number): number {
-  return Math.max(0.01, Math.abs(valor) * 0.01);
+  return toleranciaRelativa(valor);
 }
 
 export interface Veredicto {
@@ -346,21 +348,6 @@ export interface Veredicto {
   diferencia: number;
   tolerancia: number;
 }
-
-/**
- * ⚠️ 22/09/2026 (hallazgo 1211) — la comparación en el borde EXACTO decidía por el ±1 ulp de
- * la resta en binario, así que la misma desviación se aceptaba por arriba y se rechazaba por
- * abajo: con esperado 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y
- * «0,09» daba 0,010000000000000009 (fuera), y el mensaje de rechazo cifraba la desviación
- * igual que la tolerancia —«te has desviado 0,01»—, que es la forma más desconcertante de
- * suspender a alguien.
- *
- * El margen es 1e-9: nueve órdenes de magnitud por encima del ulp de las cifras que maneja
- * esta app y siete por debajo de la tolerancia más pequeña (0,01), así que absorbe el ruido
- * sin cambiar ninguna decisión real. Vale para TODAS las comparaciones del corrector, también
- * la del signo invertido (hallazgo 2407).
- */
-const RUIDO_BINARIO = 1e-9;
 
 /**
  * El valor EXACTO que redondea el rótulo de una velocidad: la serie real son potencias de dos,
@@ -396,9 +383,16 @@ export function comprobarRespuesta(
   pregunta: Pregunta = 'deltaEV',
 ): Veredicto {
   const esEscala = pregunta !== 'deltaEV';
-  const tolerancia = esEscala ? 0 : toleranciaDe(esperado);
+  // ΔEV es continuo y los puestos de la escala se corrigen por igualdad: ningún valor es
+  // imposible por sí mismo dentro de la tolerancia (un ISO que no existe ya lo rechaza la
+  // igualdad, y con su propio aviso, más abajo).
+  const c = corregirNumero(usuario, esperado, {
+    tolerancia: esEscala ? 0 : toleranciaDe(esperado),
+    magnitud: 'real',
+  });
+  const { diferencia, tolerancia } = c;
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal y el signo menos).',
@@ -407,15 +401,15 @@ export function comprobarRespuesta(
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
   if (esEscala) {
     if (pregunta === 'velocidad') {
       const real = denominadorReal(esperado);
-      if (real !== esperado && Math.abs(usuario - real) <= RUIDO_BINARIO) {
+      if (real !== esperado && dentroDeTolerancia(usuario, real, 0)) {
         return {
           correcto: true,
           motivo: `¡Correcto! 1/${numero(real, 0)} s es el valor exacto; la cámara lo rotula ${textoVelocidad(esperado)}.`,
@@ -426,7 +420,7 @@ export function comprobarRespuesta(
     }
     const escala: readonly number[] =
       pregunta === 'iso' ? ISO_VALUES : pregunta === 'apertura' ? APERTURE_VALUES : SHUTTER_DENOMINADORES;
-    const enLaEscala = escala.some((v) => Math.abs(v - usuario) <= RUIDO_BINARIO);
+    const enLaEscala = escala.some((v) => dentroDeTolerancia(usuario, v, 0));
     return {
       correcto: false,
       motivo: enLaEscala
@@ -438,7 +432,7 @@ export function comprobarRespuesta(
   }
 
   // El signo cambiado es EL error de este tema: quien viene del EV clásico lo invierte entero.
-  if (esperado !== 0 && Math.abs(usuario + esperado) <= tolerancia + RUIDO_BINARIO) {
+  if (esperado !== 0 && dentroDeTolerancia(-usuario, esperado, tolerancia)) {
     return {
       correcto: false,
       motivo:

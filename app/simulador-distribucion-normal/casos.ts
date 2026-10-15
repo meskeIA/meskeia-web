@@ -40,6 +40,7 @@
  */
 
 import { formatNumber } from '@/lib';
+import { corregirNumero, dentroDeTolerancia, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── La matemática de la app ─────────────────────────── */
 
@@ -482,10 +483,11 @@ export interface Veredicto {
  * se le dice así.
  */
 export function comprobarRespuesta(usuario: number, esperado: number, datos: DatosCaso): Veredicto {
-  const tolerancia = toleranciaDe(datos);
+  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(datos), magnitud: magnitudDe(datos) });
+  const { diferencia, tolerancia } = c;
   const enPorcentaje = esPorcentaje(datos);
 
-  if (!Number.isFinite(usuario)) {
+  if (c.estado === 'no-numerico') {
     return {
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal).',
@@ -494,18 +496,12 @@ export function comprobarRespuesta(usuario: number, esperado: number, datos: Dat
     };
   }
 
-  const diferencia = Math.abs(usuario - esperado);
-  /**
-   * Margen de ruido binario (hallazgo 1211 de `simulador-conservacion-energia`): en el borde
-   * EXACTO de la tolerancia la resta en coma flotante decide por ±1 ulp. 1e-9 absorbe ese ruido
-   * y queda siete órdenes de magnitud por debajo de la tolerancia más pequeña (0,01).
-   */
-  const RUIDO_BINARIO = 1e-9;
-  if (diferencia <= tolerancia + RUIDO_BINARIO) {
+  if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible, diferencia, tolerancia };
+  if (c.estado === 'acierto') {
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
-  if (enPorcentaje && Math.abs(usuario * 100 - esperado) <= tolerancia + RUIDO_BINARIO) {
+  if (enPorcentaje && dentroDeTolerancia(usuario * 100, esperado, tolerancia)) {
     return {
       correcto: false,
       motivo: `Casi: has escrito la probabilidad en tanto por uno. Aquí se pide en porcentaje: multiplícala por 100 (${fijo(usuario * 100, 2)}).`,
@@ -525,7 +521,7 @@ export function comprobarRespuesta(usuario: number, esperado: number, datos: Dat
     enPorcentaje &&
     Math.abs(usuario) <= 1 &&
     Math.abs(esperado) > 1 &&
-    Math.abs(usuario * 100 - esperado) <= MEDIO_PUNTO + RUIDO_BINARIO
+    dentroDeTolerancia(usuario * 100, esperado, MEDIO_PUNTO)
   ) {
     return {
       correcto: false,
@@ -682,6 +678,24 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
 /** ¿La respuesta de este caso es una probabilidad en %? Lo usa la vista para el aviso del tanto por uno. */
 export function esPorcentaje(datos: DatosCaso): boolean {
   return datos.pregunta === 'probabilidad' || datos.pregunta === 'fuera';
+}
+
+/**
+ * Qué cosa es cada respuesta, para que el corrector rechace lo imposible (hallazgo 1207): un
+ * 91,63 de «tornillos rechazados» no está cerca de 91, no existe. Un `Record` y no un `switch`:
+ * una pregunta nueva no compila hasta que alguien decida su magnitud.
+ */
+const MAGNITUD_POR_PREGUNTA: Record<Pregunta, Magnitud> = {
+  probabilidad: 'porcentaje',
+  fuera: 'porcentaje',
+  recuento: 'recuento',
+  z: 'real',
+  cuantil: 'real',
+  sigma: 'real',
+};
+
+export function magnitudDe(datos: DatosCaso): Magnitud {
+  return MAGNITUD_POR_PREGUNTA[datos.pregunta];
 }
 
 /**

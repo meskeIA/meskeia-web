@@ -36,6 +36,7 @@ import {
   type EjercicioAleatorio,
   type ResultadoIdentificacion,
 } from './motor';
+import type { Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS DE LA VISTA
@@ -326,9 +327,9 @@ export default function SimuladorProgresionesPage() {
     identificar(texto);
   };
 
-  const comprobarCaso = (id: number, esperado: number) => {
+  const comprobarCaso = (id: number, esperado: number, magnitud: Magnitud) => {
     const valor = parseSpanishNumber(respuestas[id] ?? '');
-    setVeredictos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado) }));
+    setVeredictos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado, magnitud) }));
   };
 
   const alternarSolucion = (id: number) => {
@@ -351,7 +352,7 @@ export default function SimuladorProgresionesPage() {
   const comprobarAleatorio = () => {
     if (!ejercicio) return;
     const valor = parseSpanishNumber(respuestaAleatoria);
-    setVeredictoAleatorio(comprobarRespuesta(valor, ejercicio.respuesta));
+    setVeredictoAleatorio(comprobarRespuesta(valor, ejercicio.respuesta, ejercicio.magnitud));
   };
 
   // ---------------------------------------------------------- Auxiliares de render
@@ -362,6 +363,9 @@ export default function SimuladorProgresionesPage() {
     }
     if (veredicto.correcto) {
       return `Correcto: ${respuestaTexto} (${etiqueta}).`;
+    }
+    if (veredicto.aviso) {
+      return `${veredicto.aviso} La respuesta correcta es ${respuestaTexto}.`;
     }
     return `Todavía no. La respuesta correcta es ${respuestaTexto}. Abre la solución para ver dónde se tuerce la cuenta.`;
   };
@@ -1018,7 +1022,7 @@ export default function SimuladorProgresionesPage() {
                       <button
                         type="button"
                         className={styles.btnPrimario}
-                        onClick={() => comprobarCaso(caso.id, caso.respuesta)}
+                        onClick={() => comprobarCaso(caso.id, caso.respuesta, caso.magnitud)}
                       >
                         Comprobar
                       </button>
