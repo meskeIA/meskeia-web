@@ -3210,9 +3210,10 @@ test.describe('Inspector 14/10/2026', () => {
     await expect(retenida, 'la última lectura estable es la de 442 Hz').toContainText(/442\sHz · La4 \(\+[78]\scents\)/, {
       timeout: 1500,
     });
-    // Lo anunciado conserva la histéresis: 442 está a 7,85 cents de 440, menos de 10, así que
-    // la región viva no se ha vuelto a anunciar y sigue diciendo 440.
-    await expect(seccionMedidor(page).getByRole('status')).toContainText(/Lectura estable: 440\sHz, La4 \(0\scents\)/);
+    // Lo anunciado conserva la histéresis: 442 está a 7,85 cents de 440, menos de 10, así que no se
+    // vuelve a anunciar. Desde el 3307 (15/10/2026) el anuncio del 440 ya no se queda en la región
+    // viva contradiciendo a la retenida: se vacía al poco de anunciarse.
+    await expect(seccionMedidor(page).getByRole('status')).not.toContainText(/Lectura estable: 440\sHz/);
     const llevado = await llevarAlGenerador(page);
     expect(Math.abs(llevado.hz - 442), `campo «${llevado.texto}»`).toBeLessThanOrEqual(0.5);
   });
@@ -3688,12 +3689,12 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
    * El K1 de arriba (REPARADO K1) afirma hoy que la región «sigue diciendo 440»: al reparar este, esa
    * línea cambia. Se acepta cualquier reparación que deje la región sin contradecir a la retenida.
    */
-  test('HALLAZGO L1 (3307) — lo que se anuncia de la lectura estable no contradice a la retenida que se ve y se lleva', async ({
+  // REPARADO (15/10/2026): el anuncio se escribe, se deja 1,5 s y se vacía; la histéresis se
+  // reinicia en cada medida, así que la primera lectura estable de la segunda pasada (442) se
+  // anuncia; al parar o al llevar la lectura, en la región no queda ninguna.
+  test('REPARADO L1 (3307) — lo que se anuncia de la lectura estable no contradice a la retenida que se ve y se lleva', async ({
     page,
   }) => {
-    // ABIERTO: comprobado el 14/10/2026 que cae en la comparación final (440 frente a 442), no en
-    // las precondiciones de las dos pasadas.
-    test.fail();
     await dosPasadas440y442(page);
     await expect(retenida(page)).toHaveText(/442\sHz · La4 \(\+[789]\scents\)/, { timeout: 1500 });
     const vista = lecturaDeTexto((await retenida(page).textContent()) ?? '');
@@ -3704,6 +3705,12 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
       anunciada === null || (anunciada.hz === vista?.hz && anunciada.nota === vista?.nota && anunciada.cents === vista?.cents),
       `retenida «${sinEspacioDuro((await retenida(page).textContent()) ?? '')}» · región que se anuncia «${sinEspacioDuro(region)}»`,
     ).toBe(true);
+    // Pasado el anuncio, la región no conserva ninguna lectura
+    await expect(seccionMedidor(page).getByRole('status')).not.toContainText(/Lectura estable/, { timeout: 4000 });
+    // Y al llevarla al generador solo se anuncia lo que se ha llevado, sin otra cifra delante
+    const llevado = await llevarAlGenerador(page);
+    expect(Math.abs(llevado.hz - 442)).toBeLessThanOrEqual(0.5);
+    await expect(seccionMedidor(page).getByRole('status')).toHaveText(/^Frecuencia puesta en el generador: 442(,\d)?\sHz\. Pulsa Reproducir para oírla\.$/);
   });
 
   /**
@@ -3723,12 +3730,12 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
    * Se acepta cualquiera de las dos reparaciones: que el texto diga que un cambio lento sí puede darse
    * por estable, o que el medidor no dé por estable un sonido que se desliza.
    */
-  test('HALLAZGO L2 (3308) — un sonido que se desliza 60 cents por segundo no llega a «estable» mientras la página diga que no llega', async ({
+  // REPARADO (15/10/2026) corrigiendo el texto: «Si el sonido cambia deprisa, la cifra salta…; pero
+  // uno que se desliza despacio —menos de un semitono por segundo…— sí puede darse por estable».
+  // Se comprueba además que la página dice lo que el medidor hace con este glissando.
+  test('REPARADO L2 (3308) — un sonido que se desliza 60 cents por segundo no llega a «estable» mientras la página diga que no llega', async ({
     page,
   }) => {
-    // ABIERTO: comprobado el 14/10/2026 que cae en la última aserción (lecturas «estables» del
-    // glissando con la frase en pie), no en la precondición de que la cifra se mueva.
-    test.fail();
     await vigilarMedidor(page);
     await microfonoPorApertura(page, [
       {
@@ -3754,5 +3761,8 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
       diceQueNoLlega ? estables : [],
       'la página dice que un sonido que cambia sin parar no llega a «estable», y este glissando llega',
     ).toEqual([]);
+    // Lo que la página dice ahora, y que este glissando (60 cents/s) lo cumple
+    expect(limites).toMatch(/se desliza despacio —menos de un semitono por segundo, .*— sí puede darse por estable/);
+    expect(estables.length, 'a 60 cents/s el medidor da lecturas estables, como dice la página').toBeGreaterThan(0);
   });
 });

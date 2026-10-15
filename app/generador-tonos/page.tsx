@@ -226,6 +226,11 @@ const FFT_MEDIDOR = 16384;
 /** Diez lecturas por segundo: sobran para una cifra que se lee a ojo. */
 const MS_LECTURA_MEDIDOR = 100;
 /**
+ * Lo que una lectura anunciada se queda en la región viva antes de vaciarse (3307): el lector de
+ * pantalla la recoge al escribirse; después solo serviría para contradecir a la retenida.
+ */
+const MS_ANUNCIO_VISIBLE = 1500;
+/**
  * Cuánto tiene que sobresalir el pico de la mediana del espectro para contar como tono, en dB.
  * El ruido blanco solo se queda por debajo de 15 y un tono sobre ese mismo ruido pasa de 30
  * (tests/frecuencia-dominante-motor.spec.ts): 20 deja margen a los dos lados.
@@ -495,6 +500,19 @@ export default function GeneradorTonosPage() {
    * generador, que podían ir 10 cents por detrás (2,5 Hz a 440 Hz; hallazgo 3292).
    */
   const [anunciadaHz, setAnunciadaHz] = useState<number | null>(null);
+  /**
+   * ⚠️ 15/10/2026 (hallazgo 3307) — lo anunciado ya no se QUEDA en la región viva.
+   *
+   * Era el texto de un párrafo sr-only que permanecía en la región role="status" (aria-atomic): un
+   * lector de pantalla tenía ahí una lectura hasta 10 cents vieja que contradecía a la retenida
+   * visible, y al «Llevar la lectura al generador» la región se leía entera con dos cifras
+   * distintas. Ahora el anuncio se escribe, se deja un momento para que el lector lo recoja y se
+   * vacía (retirar texto de una región viva no se anuncia). La histéresis de 10 cents se mide contra
+   * `referenciaAnuncioRef`, que se reinicia en cada medida para que su primera lectura estable se
+   * anuncie siempre.
+   */
+  const referenciaAnuncioRef = useRef<number | null>(null);
+  const temporizadorAnuncioRef = useRef<number | undefined>(undefined);
   const [avisoMedidor, setAvisoMedidor] = useState<string | null>(null);
   /** Aviso que NO impide medir (procesados del micrófono que el navegador no deja apagar). */
   const [notaMedidor, setNotaMedidor] = useState<string | null>(null);
@@ -520,6 +538,9 @@ export default function GeneradorTonosPage() {
     setMedidorActivo(false);
     setLecturaHz(null);
     setLecturaEsEstable(false);
+    // Con el medidor parado no queda ninguna lectura en la región viva (3307)
+    window.clearTimeout(temporizadorAnuncioRef.current);
+    setAnunciadaHz(null);
     liberarWakeLock();
   }, [liberarWakeLock]);
 
@@ -873,6 +894,7 @@ export default function GeneradorTonosPage() {
     setAvisoMedidor(null);
     setNotaMedidor(null);
     setAnuncioMedidor('');
+    referenciaAnuncioRef.current = null;
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setAvisoMedidor('Este navegador no da acceso al micrófono, así que aquí no se puede medir.');
@@ -971,14 +993,18 @@ export default function GeneradorTonosPage() {
       const estable = lecturaSostenida(ventana);
       setLecturaHz(estable ?? pico.frecuencia);
       setLecturaEsEstable(estable !== null);
-      // La retenida es siempre la última estable; lo anunciado solo cambia si el tono se mueve
-      // más de 10 cents: con cada décima de hercio de baile un lector de pantalla lo anunciaría
-      // diez veces por segundo.
+      // La retenida es siempre la última estable; solo se anuncia si el tono se mueve 10 cents o
+      // más desde lo último anunciado: con cada décima de hercio de baile un lector de pantalla lo
+      // anunciaría diez veces por segundo. El anuncio se vacía al poco (3307).
       if (estable !== null) {
         setUltimaEstableHz(estable);
-        setAnunciadaHz((previa) =>
-          previa !== null && Math.abs(1200 * Math.log2(estable / previa)) < 10 ? previa : estable,
-        );
+        const referencia = referenciaAnuncioRef.current;
+        if (referencia === null || Math.abs(1200 * Math.log2(estable / referencia)) >= 10) {
+          referenciaAnuncioRef.current = estable;
+          setAnunciadaHz(estable);
+          window.clearTimeout(temporizadorAnuncioRef.current);
+          temporizadorAnuncioRef.current = window.setTimeout(() => setAnunciadaHz(null), MS_ANUNCIO_VISIBLE);
+        }
       }
     }, MS_LECTURA_MEDIDOR);
 
@@ -1317,7 +1343,8 @@ export default function GeneradorTonosPage() {
         )}
 
         {/* La cifra que se ve, fuera de la región viva: cambia con cada lectura estable. Lo que
-            se anuncia va aparte, con su histéresis de 10 cents (hallazgo 3292). */}
+            se anuncia va aparte, con su histéresis de 10 cents (hallazgo 3292), y se vacía al
+            poco de anunciarse para no quedarse contradiciendo a esta cifra (3307). */}
         {ultimaEstableHz !== null && (
           <p className={styles.medidorRetenida}>
             Última lectura estable: <strong>{`${textoHzMedido(ultimaEstableHz)} Hz`}</strong>
@@ -1374,8 +1401,15 @@ export default function GeneradorTonosPage() {
                   gana depende del aparato (hallazgo 3293). */}
               Si hay varios sonidos sostenidos a la vez, da el que más destaca, y puede darlo por
               «estable»: que llegue a estable no quiere decir que solo suene uno. Con dos de
-              volumen parecido, cuál gana puede cambiar de un aparato a otro. Si el sonido cambia
-              sin parar, la cifra salta y no llega a «estable». Tampoco un golpe o un clic, aunque suene a una nota: «estable» pide medio
+              volumen parecido, cuál gana puede cambiar de un aparato a otro.{' '}
+              {/* Decía «si el sonido cambia sin parar, la cifra salta y no llega a estable», y eso
+                  solo vale para los cambios rápidos: cinco lecturas a ±20 cents admiten un
+                  deslizamiento de menos de 100 cents por segundo (hallazgo 3308). */}
+              Si el sonido cambia deprisa, la cifra salta y no llega a «estable»; pero uno que se
+              desliza despacio —menos de un semitono por segundo, como una sirena, un motor que
+              acelera o un silbido que sube— sí puede darse por estable, y la última lectura estable
+              lo va siguiendo: «estable» dice que la cifra no ha saltado, no que el sonido esté
+              quieto. Tampoco llega un golpe o un clic, aunque suene a una nota: «estable» pide medio
               segundo a la misma frecuencia con un sonido que no se esté apagando, así que la última
               lectura estable de un tono no la sustituye un toque en la mesa. El micrófono de un móvil capta peor los graves más profundos y los agudos
               extremos: ahí puede no leer nada. Para ver todas las frecuencias a la vez está el{' '}
