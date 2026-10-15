@@ -3746,13 +3746,13 @@ test.describe('re-inspección 15/10/2026', () => {
       await expect(nombreQ(page, 0)).toHaveValue('Ana');
     });
 
-    test('HALLAZGO 3314 (operativa, medio) · con la página traducida, «Copiar enlace» de la tarjeta de compartir no tumba la app', async ({ page }) => {
-      // components/ShareCard.tsx pinta el botón como {copiado ? '✓ ¡Copiado!' : <><span>🔗</span> Copiar enlace</>}:
-      // al copiar, React retira el texto « Copiar enlace», que el traductor ya cambió por <font>.
+    test('REPARADO 3314 (operativa, medio) · con la página traducida, «Copiar enlace» de la tarjeta de compartir no tumba la app', async ({ page }) => {
+      // components/ShareCard.tsx pintaba el botón como {copiado ? '✓ ¡Copiado!' : <><span>🔗</span> Copiar enlace</>}:
+      // al copiar, React retiraba el texto « Copiar enlace», que el traductor ya cambió por <font>.
       // Medido: NotFoundError en removeChild, la pantalla «Algo salió mal» y la peña escrita
-      // perdida, en escritorio y a 390×844. Sin traducir, el mismo flujo funciona (test anterior).
-      // Es la forma del cabo C0233 en un componente que monta TODO el catálogo.
-      test.fail();
+      // perdida, en escritorio y a 390×844. Sin traducir, el mismo flujo funcionaba (test anterior).
+      // Es la forma del cabo C0233 en un componente que monta TODO el catálogo. REPARADO el
+      // 15/10/2026: cada estado en su <span> con key, como el Copiar de esta app.
       test.setTimeout(45_000);
       const errores = erroresQ(page);
       const tarjeta = await abrirTarjeta(page);
@@ -3760,6 +3760,9 @@ test.describe('re-inspección 15/10/2026', () => {
       const copiar = tarjeta.getByRole('button', { name: 'Copiar enlace al portapapeles' });
       await copiar.click();
       await expect(copiar).toHaveText('✓ ¡Copiado!');
+      // Y la vuelta a «Copiar enlace» a los 2 s, con la confirmación también traducida.
+      await traducirQ(page);
+      await expect(copiar).toHaveText('🔗 Copiar enlace', { timeout: 5_000 });
       await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
       await expect(nombreQ(page, 0)).toHaveValue('Ana');
       expect(errores).toEqual([]);

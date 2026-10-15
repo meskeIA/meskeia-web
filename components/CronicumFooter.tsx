@@ -71,7 +71,10 @@ export default function CronicumFooter() {
             Privacidad
           </a>
           <button type="button" className={styles.shareBtn} onClick={compartir} aria-live="polite">
-            {copiado ? '✓ Enlace copiado' : <><span aria-hidden="true">🔗</span> Compartir</>}
+            {/* Un <span> con key por estado: con la página traducida, el texto suelto tumbaba la página (hallazgo 3314) */}
+            {copiado
+              ? <span key="copiado"><span aria-hidden="true">✓</span> Enlace copiado</span>
+              : <span key="compartir"><span aria-hidden="true">🔗</span> Compartir</span>}
           </button>
         </nav>
       </div>

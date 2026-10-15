@@ -274,7 +274,11 @@ export default function ShareCard({ appName }: ShareCardProps) {
           type="button"
           aria-label="Copiar enlace al portapapeles"
         >
-          {copiado ? '✓ ¡Copiado!' : <><span aria-hidden="true">🔗</span> Copiar enlace</>}
+          {/* Un <span> con key por estado, no texto suelto: con la página traducida React no
+              encontraba el « Copiar enlace» que retiraba y tumbaba la app (hallazgo 3314). */}
+          {copiado
+            ? <span key="copiado"><span aria-hidden="true">✓</span> ¡Copiado!</span>
+            : <span key="copiar"><span aria-hidden="true">🔗</span> Copiar enlace</span>}
         </button>
 
         <button
