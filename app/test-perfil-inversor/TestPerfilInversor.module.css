@@ -1306,6 +1306,23 @@
   color: var(--accent);
 }
 
+/* El horizonte limita el perfil (hallazgo 3312, 15/10/2026): visible, no colapsable */
+.resultTope {
+  margin: 0.75rem auto 0;
+  max-width: 36rem;
+  padding: 0.6rem 0.9rem;
+  border-left: 4px solid var(--primary);
+  background: var(--bg-primary);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+[data-theme='dark'] .resultTope {
+  border-left-color: var(--accent);
+}
+
 /* Encuadre de las ideas del resultado (hallazgo 104, 21/08/2026) */
 .recomendacionesNota {
   margin: 0 0 0.75rem;

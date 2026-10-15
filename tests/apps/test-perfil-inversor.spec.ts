@@ -160,9 +160,11 @@ test.describe('Caso límite: el corte 22 / 23 y los extremos de la escala', () =
 
   test('volver atrás y subir un punto recalcula: 22 → 23 pasa a Equilibrado', async ({ page }) => {
     await empezar(page);
-    // Mismas nueve primeras (B×8 + C = 19) y la décima C (22), pero antes de pedir el
-    // resultado se retrocede a la 9 y se sube de C (3) a D (4): 23, primer punto de Equilibrado.
-    for (const i of [1, 1, 1, 1, 1, 1, 1, 1, 2]) {
+    // Nueve primeras C + B×8 = 19 y la décima C (22), pero antes de pedir el resultado se
+    // retrocede a la 9 y se sube de B (2) a C (3): 23, primer punto de Equilibrado.
+    // 15/10/2026 (3312): la C va en la 1 y no en la 9, porque la 1 fija el perfil máximo y con
+    // una B ahí («2 a 5 años») el tope sería Moderado; la suma es la misma.
+    for (const i of [2, 1, 1, 1, 1, 1, 1, 1, 1]) {
       await opcion(page, i).click();
       await botonSiguiente(page).click();
     }
@@ -173,7 +175,7 @@ test.describe('Caso límite: el corte 22 / 23 y los extremos de la escala', () =
     );
     // La respuesta anterior sigue marcada al volver: una sola opción con la clase «selected».
     await expect(page.locator('[class*="optionButton"][class*="selected"]')).toHaveCount(1);
-    await opcion(page, 3).click(); // pregunta 9: C → D, +1 punto
+    await opcion(page, 2).click(); // pregunta 9: B → C, +1 punto
     await botonSiguiente(page).click();
     // Y la décima conserva lo ya contestado (C), sin volver a pedirla.
     await expect(page.locator('[class*="optionButton"][class*="selected"]')).toContainText(
@@ -476,7 +478,8 @@ test.describe('re-inspección 22/09/2026', () => {
     //   16 → B×6 + A×4 = 12 + 4  (tope de Conservador, `score <= 16`)
     //   17 → B×7 + A×3 = 14 + 3  (primer punto de Moderado)
     //   28 → C×8 + B×2 = 24 + 4  (tope de Equilibrado, `score <= 28`)
-    //   29 → C×9 + B   = 27 + 2  (primer punto de Dinámico)
+    //   29 → D + C×7 + B×2 = 4 + 21 + 4  (primer punto de Dinámico; la D en la 1 desde el
+    //        15/10/2026, 3312: con una C ahí, «5 a 10 años», el tope sería Equilibrado)
     //   34 → D×8 + A×2 = 32 + 2  (tope de Dinámico, `score <= 34`)
     //   35 → D×8 + B + A = 32 + 2 + 1 (primer punto de Agresivo)
     const cortes: Array<{
@@ -490,7 +493,7 @@ test.describe('re-inspección 22/09/2026', () => {
       { indices: [1, 1, 1, 1, 1, 1, 0, 0, 0, 0], puntos: 16, perfil: 'Conservador', tramo: '10–16', izquierda: 18, segmento: 0 },
       { indices: [1, 1, 1, 1, 1, 1, 1, 0, 0, 0], puntos: 17, perfil: 'Moderado', tramo: '17–22', izquierda: 22, segmento: 1 },
       { indices: [2, 2, 2, 2, 2, 2, 2, 2, 1, 1], puntos: 28, perfil: 'Equilibrado', tramo: '23–28', izquierda: 58, segmento: 2 },
-      { indices: [2, 2, 2, 2, 2, 2, 2, 2, 2, 1], puntos: 29, perfil: 'Dinámico', tramo: '29–34', izquierda: 62, segmento: 3 },
+      { indices: [3, 2, 2, 2, 2, 2, 2, 2, 1, 1], puntos: 29, perfil: 'Dinámico', tramo: '29–34', izquierda: 62, segmento: 3 },
       { indices: [3, 3, 3, 3, 3, 3, 3, 3, 0, 0], puntos: 34, perfil: 'Dinámico', tramo: '29–34', izquierda: 78, segmento: 3 },
       { indices: [3, 3, 3, 3, 3, 3, 3, 3, 1, 0], puntos: 35, perfil: 'Agresivo', tramo: '35–40', izquierda: 82, segmento: 4 },
     ];
@@ -803,7 +806,8 @@ test.describe('re-inspección 26/09/2026', () => {
     //        (el 1220 solo probaba el suelo, 10). Flecha = 4·20 + 2 + (40−35)/(40−35)·16 = 98 %.
     await cargarLimpia(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).click();
-    await responder(page, [1, 1, 1, 1, 1, 1, 1, 2, 2, 2]);
+    // La C en la 1 (15/10/2026, 3312): con una B ahí, «2 a 5 años», el tope sería Moderado.
+    await responder(page, [2, 1, 1, 1, 1, 1, 1, 1, 2, 2]);
     await expect(perfilMostrado(page)).toHaveText('Equilibrado');
     await expect(puntuacion(page)).toContainText('23 puntos · tramo 23–28');
     await expect(avisoDeBorde(page)).toHaveCount(1);
@@ -1053,14 +1057,16 @@ test.describe('re-inspección 26/09/2026 · móvil', () => {
   }
 
   // ---------- CASO 1 (normal), tocando ----------
-  test('caso normal tocando: B,C,B,C,D,B,C,A,C,D suma 27 y da Equilibrado, sin aviso de borde', async ({
+  test('caso normal tocando: C,C,B,C,D,B,C,A,B,D suma 27 y da Equilibrado, sin aviso de borde', async ({
     page,
   }) => {
-    // 2 + 3 + 2 + 3 + 4 + 2 + 3 + 1 + 3 + 4 = 27 → tramo 23–28 → Equilibrado. No es extremo
+    // 3 + 3 + 2 + 3 + 4 + 2 + 3 + 1 + 2 + 4 = 27 → tramo 23–28 → Equilibrado. No es extremo
     // de tramo (23 ni 28): sin aviso. Flecha = 2·20 + 2 + (27−23)/(28−23)·16 = 54,8 %.
+    // La 1 y la 9 cambian de sitio (15/10/2026, 3312): con la B en la 1, «2 a 5 años», el tope
+    // por horizonte daría Moderado. La suma es la misma.
     await cargarLimpia(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).tap();
-    await responderTocando(page, [1, 2, 1, 2, 3, 1, 2, 0, 2, 3]);
+    await responderTocando(page, [2, 2, 1, 2, 3, 1, 2, 0, 1, 3]);
     await expect(perfilMostrado(page)).toHaveText('Equilibrado');
     await expect(page.locator('p[class*="resultScore"]')).toContainText('27 puntos · tramo 23–28');
     await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(0);
@@ -1458,10 +1464,12 @@ test.describe('re-inspección 12/10/2026 · móvil 390×844', () => {
     hasTouch: true,
   });
 
-  test('caso normal tocando: A,C,B,B,A,C,B,D,A,B suma 21 → Moderado, sin aviso de borde', async ({ page }) => {
+  test('caso normal tocando: D,C,B,B,A,C,B,A,A,B suma 21 → Moderado, sin aviso de borde', async ({ page }) => {
     await cargarSinSesion(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).tap();
-    await tocarRespuestas(page, [0, 2, 1, 1, 0, 2, 1, 3, 0, 1]); // 1+3+2+2+1+3+2+4+1+2 = 21
+    // 15/10/2026 (3312): la D de la 8 y la A de la 1 cambian de sitio (misma suma); con la A en
+    // la 1, «Menos de 2 años», el tope por horizonte daría Conservador.
+    await tocarRespuestas(page, [3, 2, 1, 1, 0, 2, 1, 0, 0, 1]); // 4+3+2+2+1+3+2+1+1+2 = 21
     await expect(perfilMostrado(page)).toHaveText('Moderado');
     await expect(page.locator('p[class*="resultScore"]')).toContainText('21 puntos · tramo 17–22');
     await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(0); // ni 17 ni 22
@@ -1502,7 +1510,9 @@ test.describe('re-inspección 12/10/2026 · móvil 360×740', () => {
   }) => {
     await cargarSinSesion(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).tap();
-    await tocarRespuestas(page, [2, 2, 2, 2, 2, 2, 2, 2, 1, 1]); // C×8 + B×2 = 24 + 4 = 28
+    // D + C×6 + B×3 = 4 + 18 + 6 = 28. Era C×8 + B×2; desde el 15/10/2026 (3312) la 1 lleva la D,
+    // porque con una C ahí («5 a 10 años») el tope por horizonte no deja pasar de Equilibrado.
+    await tocarRespuestas(page, [3, 2, 2, 2, 2, 2, 2, 1, 1, 1]);
     await expect(perfilMostrado(page)).toHaveText('Equilibrado');
     await expect(page.locator('p[class*="resultScore"]')).toContainText('28 puntos · tramo 23–28');
     await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(1); // tope de su tramo
@@ -1734,7 +1744,9 @@ test.describe('re-inspección 14/10/2026 · escritorio', () => {
     await cargarSinSesion(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).click();
     await enteroALaVista(page, page.getByText('Pregunta 1 de 10'));
-    await responder(page, [0, 0, 0, 0, 1, 1, 1, 1, 1, 1]); // A×4 + B×6 = 4 + 12 = 16
+    // B + A×4 + B×5 = 2 + 4 + 10 = 16. Era A×4 + B×6: desde el 15/10/2026 (3312) la 1 lleva una
+    // B, porque con la A («Menos de 2 años») el tope por horizonte deja el 17 en Conservador.
+    await responder(page, [1, 0, 0, 0, 0, 1, 1, 1, 1, 1]);
     await expect(perfilMostrado(page)).toHaveText('Conservador');
     await expect(puntuacion(page)).toContainText('16 puntos · tramo 10–16');
     await expect(avisoDeBorde(page)).toHaveCount(1); // 16 = range[1] y 16 < 40
@@ -2474,10 +2486,12 @@ test.describe('re-inspección 15/10/2026 · escritorio', () => {
     }
   }
 
-  test('caso normal: B,D,C,B,C,C,D,B,C,D suma 30 → Dinámico, sin aviso de borde, flecha 65,2 %', async ({ page }) => {
+  test('caso normal: D,B,C,B,C,C,D,B,C,D suma 30 → Dinámico, sin aviso de borde, flecha 65,2 %', async ({ page }) => {
     await cargarSinSesion(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).click();
-    await responderLeyendo(page, [1, 3, 2, 1, 2, 2, 3, 1, 2, 3]); // 2+4+3+2+3+3+4+2+3+4 = 30
+    // La 1 y la 2 cambian de sitio (15/10/2026, 3312): con la B en la 1, «2 a 5 años», el tope
+    // por horizonte daría Moderado. La suma es la misma.
+    await responderLeyendo(page, [3, 1, 2, 1, 2, 2, 3, 1, 2, 3]); // 4+2+3+2+3+3+4+2+3+4 = 30
     await expect(perfilMostrado(page)).toHaveText('Dinámico');
     await expect(puntuacion(page)).toContainText('30 puntos · tramo 29–34');
     await expect(avisoDeBorde(page)).toHaveCount(0); // ni 29 ni 34
@@ -2535,9 +2549,12 @@ test.describe('re-inspección 15/10/2026 · escritorio', () => {
     await expect(marcadas(page)).toHaveCount(1);
   });
 
-  test.fail('HALLAZGO 3312 — el resultado no da «Horizonte ideal > 15 años» a quien necesita el dinero en menos de 2 años', async ({
+  test('REPARADO 3312 — el resultado no da «Horizonte ideal > 15 años» a quien necesita el dinero en menos de 2 años', async ({
     page,
   }) => {
+    // REPARADO el 15/10/2026 con lo que decidió el usuario: la pregunta 1 fija el perfil máximo
+    // (A → Conservador, B → Moderado, C → Equilibrado, D sin tope), una línea visible lo explica
+    // cuando actúa, y las descripciones describen el perfil y no a la persona.
     // La guía de la misma página, paso 3: «si necesitas el dinero en menos de 3 años → conservador
     // […] El horizonte temporal es el factor más objetivo para definir tu perfil». Pero la puntuación
     // es una suma sin topes: la 1 en A («Menos de 2 años - Necesitaré el dinero pronto», 1 punto) y las
@@ -2559,6 +2576,24 @@ test.describe('re-inspección 15/10/2026 · escritorio', () => {
     if (horizonte !== '< 3 años' && !/menos de 2 años/i.test(pantalla)) {
       problemas.push(`la 1 en «Menos de 2 años» → ${await perfilMostrado(page).textContent()}, «Horizonte ideal ${horizonte}», sin aviso`);
     }
+    // Lo decidido: Conservador, con la línea que explica el tope, la flecha en su segmento, el
+    // enlace al estimador con su perfil y sin aviso de borde (un punto más no cambia nada).
+    await expect(perfilMostrado(page)).toHaveText('Conservador');
+    await expect(page.locator('[class*="resultTope"]')).toHaveText(
+      'Tu horizonte de menos de 2 años limita el perfil a Conservador; el resto de tus respuestas apuntaba a Agresivo.',
+    );
+    expect(await segmentoDeLaFlecha(page)).toBe(0);
+    await expect(avisoDeBorde(page)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=conservador',
+    );
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (15 %)',
+      'Renta Fija (60 %)',
+      'Liquidez (20 %)',
+      'Alternativos (5 %)',
+    ]);
 
     await cargarSinSesion(page);
     await page.getByRole('button', { name: /Comenzar Test/ }).click();
@@ -2568,6 +2603,28 @@ test.describe('re-inspección 15/10/2026 · escritorio', () => {
     if (/Tienes experiencia|inversores experimentados/.test(descripcion)) {
       problemas.push(`la 3 en «Ninguna» → «${descripcion}»`);
     }
+    // Sin tope por experiencia (decisión del usuario): la 1 en D, así que Agresivo y sin línea de tope.
+    await expect(perfilMostrado(page)).toHaveText('Agresivo');
+    await expect(page.locator('[class*="resultTope"]')).toHaveCount(0);
+
+    // A,C×9 = 1 + 27 = 28 → por puntos Equilibrado; la 1 en A lo limita a Conservador.
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responderLeyendo(page, [0, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+    await expect(puntuacion(page)).toContainText('28 puntos · tramo 23–28');
+    await expect(perfilMostrado(page)).toHaveText('Conservador');
+    await expect(page.locator('[class*="resultTope"]')).toContainText('apuntaba a Equilibrado');
+
+    // C,D×9 = 3 + 36 = 39 → la 1 en C («5 a 10 años») limita a Equilibrado, «Horizonte ideal 5-10 años».
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responderLeyendo(page, [2, 3, 3, 3, 3, 3, 3, 3, 3, 3]);
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(rasgo(page, 1)).toHaveText('5-10 años');
+    await expect(page.locator('[class*="resultTope"]')).toHaveText(
+      'Tu horizonte de entre 5 y 10 años limita el perfil a Equilibrado; el resto de tus respuestas apuntaba a Agresivo.',
+    );
+    expect(await segmentoDeLaFlecha(page)).toBe(2);
     expect(problemas).toEqual([]);
   });
 

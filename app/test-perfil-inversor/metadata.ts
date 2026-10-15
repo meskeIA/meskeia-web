@@ -43,7 +43,8 @@ export const faqJsonLd = {
       name: '¿Qué tipos de perfil inversor existen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Este test distingue cinco perfiles según la puntuación obtenida: conservador (prioriza la seguridad y acepta menor rentabilidad), moderado, equilibrado (reparto similar entre renta fija y variable), dinámico y agresivo (acepta alta volatilidad buscando mayor rentabilidad a largo plazo). Cada perfil tiene asociada una distribución orientativa de activos (renta variable, renta fija, liquidez y alternativos).',
+        // 3312 (15/10/2026): el horizonte de la primera pregunta fija el perfil máximo.
+        text: 'Este test distingue cinco perfiles según la puntuación obtenida: conservador (prioriza la seguridad y acepta menor rentabilidad), moderado, equilibrado (reparto similar entre renta fija y variable), dinámico y agresivo (acepta alta volatilidad buscando mayor rentabilidad a largo plazo). El horizonte temporal pone un tope: si el dinero se va a necesitar en menos de 2 años, el perfil no pasa de conservador; entre 2 y 5 años, de moderado, y entre 5 y 10, de equilibrado. Cada perfil tiene asociada una distribución orientativa de activos (renta variable, renta fija, liquidez y alternativos).',
       },
     },
     {
@@ -108,11 +109,12 @@ export const jsonLd = generateWebAppSchema({
     */
     '10 preguntas sobre horizonte, reacción ante caídas, experiencia, ingresos y objetivos',
     'Puntuación de 10 a 40 con su tramo y aviso cuando cae en el borde entre dos perfiles',
+    'Tope del perfil según el horizonte temporal, explicado en el resultado cuando actúa',
     'Uno de cinco perfiles con nivel de riesgo, horizonte, volatilidad y objetivo orientativos',
     'Distribución de activos de ejemplo para cada perfil',
     'Ejemplos ilustrativos de lo que suele asociarse a cada perfil, sin aconsejar productos',
     'Revisar y cambiar respuestas desde el resultado sin repetir el test',
-    'Recupera el test a medias tras recargar en la misma pestaña',
+    'Recupera el test a medias, y el resultado, tras recargar o volver atrás en la misma pestaña',
     'Enlace para simular la cartera del perfil en el estimador de carteras',
   ],
   keywords: ['perfil inversor', 'tolerancia riesgo', 'test inversión', 'finanzas personales'],

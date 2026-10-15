@@ -149,7 +149,9 @@ const PROFILES: Record<ProfileType, Profile> = {
     name: 'Conservador',
     icon: '🛡️',
     range: [10, 16],
-    description: 'Priorizas la seguridad sobre la rentabilidad. Prefieres evitar pérdidas aunque eso signifique menores ganancias. Ideal para horizontes cortos o personas cercanas a la jubilación.',
+    // 3312 — las cinco descripciones describen el PERFIL, no a la persona: «Tienes experiencia»
+    // se leía tras haber contestado «Ninguna» en la 3 (decidido por el usuario, 15/10/2026).
+    description: 'Prioriza la seguridad sobre la rentabilidad: busca evitar pérdidas aunque eso suponga ganar menos. Pensado para horizontes cortos o para quien está cerca de necesitar el dinero, por ejemplo al jubilarse.',
     traits: {
       riesgo: 'Muy bajo',
       horizonte: '< 3 años',
@@ -168,7 +170,7 @@ const PROFILES: Record<ProfileType, Profile> = {
     name: 'Moderado',
     icon: '⚖️',
     range: [17, 22],
-    description: 'Buscas un equilibrio entre seguridad y crecimiento. Aceptas algo de volatilidad pero sin excesos. Perfil común para quienes empiezan a invertir con prudencia.',
+    description: 'Busca un equilibrio entre seguridad y crecimiento: acepta algo de volatilidad, sin excesos. Es un perfil habitual para empezar a invertir con prudencia.',
     traits: {
       riesgo: 'Bajo',
       horizonte: '3-5 años',
@@ -187,7 +189,7 @@ const PROFILES: Record<ProfileType, Profile> = {
     name: 'Equilibrado',
     icon: '📊',
     range: [23, 28],
-    description: 'Buscas crecimiento a largo plazo aceptando volatilidad moderada. Entiendes que las caídas son temporales y mantienes la calma. Perfil más común entre inversores experimentados.',
+    description: 'Busca crecimiento a largo plazo aceptando una volatilidad moderada. Pensado para quien asume que las caídas suelen ser temporales y puede mantener la calma durante ellas.',
     traits: {
       riesgo: 'Medio',
       horizonte: '5-10 años',
@@ -206,7 +208,7 @@ const PROFILES: Record<ProfileType, Profile> = {
     name: 'Dinámico',
     icon: '📈',
     range: [29, 34],
-    description: 'Priorizas el crecimiento y toleras bien la volatilidad. Las caídas no te asustan y sabes que son oportunidades. Horizonte largo y capacidad de aguantar malos años.',
+    description: 'Prioriza el crecimiento y tolera bien la volatilidad. Pensado para quien tiene un horizonte largo, ve las caídas como parte del camino y puede aguantar varios años malos.',
     traits: {
       riesgo: 'Alto',
       horizonte: '10-15 años',
@@ -225,7 +227,7 @@ const PROFILES: Record<ProfileType, Profile> = {
     name: 'Agresivo',
     icon: '🚀',
     range: [35, 40],
-    description: 'Buscas máxima rentabilidad asumiendo alto riesgo. Tienes experiencia, horizonte muy largo y capacidad de no vender en pánico durante crisis. Perfil para inversores experimentados.',
+    description: 'Busca la máxima rentabilidad asumiendo un riesgo alto. Pensado para quien tiene experiencia, un horizonte muy largo y capacidad de no vender en pánico durante una crisis.',
     traits: {
       riesgo: 'Muy alto',
       horizonte: '> 15 años',
@@ -251,6 +253,40 @@ function getProfile(score: number): ProfileType {
   return 'agresivo';
 }
 
+/** Los cinco perfiles de menos a más riesgo: el orden de la barra y el del tope por horizonte. */
+const ORDEN_PERFILES: ProfileType[] = ['conservador', 'moderado', 'equilibrado', 'dinamico', 'agresivo'];
+
+/**
+ * ⚠️ 15/10/2026 (hallazgo 3312, decidido por el usuario) — tope del perfil por el HORIZONTE.
+ *
+ * La puntuación es una suma sin topes: «Menos de 2 años - Necesitaré el dinero pronto» en la 1
+ * y D en las demás daba 37 → Agresivo, «Horizonte ideal > 15 años» y 90 % de renta variable,
+ * contra la propia guía (paso 3: «si necesitas el dinero en menos de 3 años → conservador […] El
+ * horizonte temporal es el factor más objetivo para definir tu perfil»). Ahora la respuesta de la
+ * pregunta 1 fija el perfil MÁXIMO, y cuando el tope actúa el resultado lo dice. Sin tope por
+ * experiencia: eso lo cubren las descripciones, que describen el perfil y no a la persona.
+ * La clave es la puntuación de la opción de la pregunta 1 (A = 1 … D = 4).
+ */
+const TOPE_POR_HORIZONTE: Record<number, { perfil: ProfileType; plazo: string }> = {
+  1: { perfil: 'conservador', plazo: 'menos de 2 años' },
+  2: { perfil: 'moderado', plazo: 'entre 2 y 5 años' },
+  3: { perfil: 'equilibrado', plazo: 'entre 5 y 10 años' },
+};
+
+/** El perfil que da la puntuación, rebajado al tope del horizonte si lo supera. */
+function perfilConTope(score: number, puntosHorizonte: number | undefined): {
+  tipo: ProfileType;
+  porPuntos: ProfileType;
+  tope: { perfil: ProfileType; plazo: string } | null;
+} {
+  const porPuntos = getProfile(score);
+  const tope = puntosHorizonte !== undefined ? TOPE_POR_HORIZONTE[puntosHorizonte] : undefined;
+  if (tope && ORDEN_PERFILES.indexOf(tope.perfil) < ORDEN_PERFILES.indexOf(porPuntos)) {
+    return { tipo: tope.perfil, porPuntos, tope };
+  }
+  return { tipo: porPuntos, porPuntos, tope: null };
+}
+
 /**
  * Posición de la flecha en la barra de cinco segmentos (0-100 %).
  *
@@ -260,17 +296,18 @@ function getProfile(score: number): ProfileType {
  * texto anunciaba el de abajo (Inspector, 20/08/2026). Se separa medio punto de cada
  * frontera para que la flecha caiga siempre DENTRO del segmento que se ha nombrado.
  */
-function getBarPosition(score: number): number {
+function getBarPosition(score: number, tipo: ProfileType = getProfile(score)): number {
   // El segmento se deriva del PERFIL, no de un mapeo lineal: con 10-40 → 0-100 los topes
   // de tramo caían clavados en las fronteras (22 → 40 %), y redondearlos hacia dentro con
   // Math.floor los mandaba al segmento de al lado, que es el error contrario.
-  const orden: ProfileType[] = ['conservador', 'moderado', 'equilibrado', 'dinamico', 'agresivo'];
-  const tipo = getProfile(score);
-  const indice = Math.max(0, orden.indexOf(tipo));
+  // Con el tope por horizonte (3312) el perfil puede ser más bajo que el de la puntuación: la
+  // flecha va al segmento del perfil NOMBRADO, en su extremo alto.
+  const indice = Math.max(0, ORDEN_PERFILES.indexOf(tipo));
   const [min, max] = PROFILES[tipo].range;
-  const anchoSegmento = 100 / orden.length;
+  const anchoSegmento = 100 / ORDEN_PERFILES.length;
   const margen = 2;
-  const proporcion = max > min ? (score - min) / (max - min) : 0.5;
+  const enTramo = Math.min(max, Math.max(min, score));
+  const proporcion = max > min ? (enTramo - min) / (max - min) : 0.5;
   return indice * anchoSegmento + margen + proporcion * (anchoSegmento - 2 * margen);
 }
 
@@ -654,8 +691,11 @@ export default function TestPerfilInversorPage() {
 
   // Calcular puntuación total
   const totalScore = Object.values(answers).reduce((sum, points) => sum + points, 0);
-  const profileType = getProfile(totalScore);
+  const resultadoPerfil = perfilConTope(totalScore, answers[1]);
+  const profileType = resultadoPerfil.tipo;
   const profile = PROFILES[profileType];
+  /** El tramo que da la PUNTUACIÓN, que con el tope por horizonte no es el del perfil nombrado. */
+  const tramoPorPuntos = PROFILES[resultadoPerfil.porPuntos].range;
 
   /**
    * Los extremos de la escala, derivados del cuestionario y no tecleados (hallazgo 1220): con
@@ -670,9 +710,11 @@ export default function TestPerfilInversorPage() {
     (suma, q) => suma + Math.max(...q.options.map((o) => o.points)),
     0,
   );
+  // Con el tope actuando, un punto más o menos no cambia el perfil: el aviso de borde mentiría.
   const enBordeDeTramo =
-    (totalScore === profile.range[0] && totalScore > PUNTUACION_MINIMA) ||
-    (totalScore === profile.range[1] && totalScore < PUNTUACION_MAXIMA);
+    resultadoPerfil.tope === null &&
+    ((totalScore === profile.range[0] && totalScore > PUNTUACION_MINIMA) ||
+      (totalScore === profile.range[1] && totalScore < PUNTUACION_MAXIMA));
 
   /**
    * ⚠️ 22/09/2026 (hallazgo 1214) — el resultado no comprobaba que hubiera diez respuestas.
@@ -956,7 +998,7 @@ export default function TestPerfilInversorPage() {
                 las respuestas quedan en el límite entre dos perfiles— y no la enseñaba
                 nunca: no había forma de saberse en el borde ni de rehacer la cuenta. */}
             <p className={styles.resultScore}>
-              {formatNumber(totalScore, 0)} puntos · tramo {formatNumber(profile.range[0], 0)}–{formatNumber(profile.range[1], 0)}
+              {formatNumber(totalScore, 0)} puntos · tramo {formatNumber(tramoPorPuntos[0], 0)}–{formatNumber(tramoPorPuntos[1], 0)}
               {/*
                 ⚠️ 22/09/2026 (hallazgo 1220) — la condición era `totalScore === range[0] ||
                 totalScore === range[1]` a secas, sin excluir el suelo y el techo de la ESCALA, así
@@ -970,6 +1012,15 @@ export default function TestPerfilInversorPage() {
                 </span>
               ) : null}
             </p>
+            {/* 3312 — cuando el horizonte rebaja el perfil, se dice: la puntuación y su tramo
+                apuntan a otro, y sin esta línea el resultado parecería contradecirse. */}
+            {resultadoPerfil.tope ? (
+              <p className={styles.resultTope}>
+                Tu horizonte de {resultadoPerfil.tope.plazo} limita el perfil a{' '}
+                {PROFILES[resultadoPerfil.tope.perfil].name}; el resto de tus respuestas apuntaba
+                a {PROFILES[resultadoPerfil.porPuntos].name}.
+              </p>
+            ) : null}
           </div>
 
           {/* Barra visual de perfil */}
@@ -983,7 +1034,7 @@ export default function TestPerfilInversorPage() {
           <div className={styles.profileMarker}>
             <span
               className={styles.profileArrow}
-              style={{ left: `${getBarPosition(totalScore)}%` }}
+              style={{ left: `${getBarPosition(totalScore, profileType)}%` }}
               aria-hidden="true"
             >
               ▼
