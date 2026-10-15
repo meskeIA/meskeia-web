@@ -144,7 +144,7 @@ const manifiesto = [
   'Contenido copiado:',
   ...registro,
   '',
-  'Los originales NO se modifican. La Rutina Matinal (05:30 diaria)',
+  'Los originales NO se modifican. La Rutina Matinal (05:50 diaria)',
   'actualiza esta carpeta y Proton la sube sola a la nube.',
 ].join('\n');
 writeFileSync(join(PREPARACION, 'LEEME.txt'), manifiesto, 'utf8');

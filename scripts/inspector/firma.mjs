@@ -148,7 +148,7 @@ const p = x => `${pct.format(x)} %`;
  * referencia se calcula sobre ese mismo conjunto.
  *
  * `hasta` es el último día COMPLETO que entra (por defecto, el anterior al último registro:
- * el dump se congela a las 05:30 y su último día va a medias).
+ * el dump se congela de madrugada (Rutina Matinal, 05:50) y su último día va a medias).
  */
 export function calcularFirma(db, { slugs, hasta } = {}) {
   const U = UMBRALES;

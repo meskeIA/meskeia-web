@@ -425,7 +425,7 @@ Turso es el **único dato de producción no reproducible desde GitHub**.
 
 | Control | Cadencia | Qué valida |
 |---------|----------|------------|
-| `scripts/backup-turso.mjs` | Diaria, en la Rutina Matinal (05:30) | Genera el dump (tablas + datos + índices/vistas/disparadores) |
+| `scripts/backup-turso.mjs` | Diaria, en la Rutina Matinal (05:50) | Genera el dump (tablas + datos + índices/vistas/disparadores) |
 | Verificador de Backups | Diaria, en la misma cadena, tras los backups | Que el dump carga y sus cifras son coherentes |
 | `npm run ensayo:restauracion` | **Semestral** | La vuelta atrás completa: esquema, índices, integridad y la app operando sobre la copia |
 

@@ -221,7 +221,7 @@ const OBLIGACIONES = [
   ]],
   ['Backups y recuperación de Turso', [
     'único dato de producción no reproducible desde GitHub',
-    'scripts/backup-turso.mjs | Diaria, en la Rutina Matinal (05:30)',
+    'scripts/backup-turso.mjs | Diaria, en la Rutina Matinal (05:50)',
     'Verificador de Backups | Diaria, en la misma cadena, tras los backups',
     'npm run ensayo:restauracion | Semestral',
     'Antes de ejecutar el ensayo, leer _private/RUNBOOK-RESTAURACION-TURSO.md',
