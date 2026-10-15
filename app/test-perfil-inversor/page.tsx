@@ -396,8 +396,13 @@ export default function TestPerfilInversorPage() {
    * cuestionario sin una palabra que lo explicara, y en esa fase los únicos botones son las
    * cuatro opciones, «Anterior» y «Siguiente»: la portada quedaba inalcanzable en esa pestaña
    * hasta terminar el test.
+   *
+   * 15/10/2026 (hallazgo 3311) — guarda CUÁNTAS respuestas se recuperaron, no un sí/no: la cifra
+   * del aviso era `Object.keys(answers).length`, que subía con cada respuesta nueva (y el
+   * role="status" lo releía cada vez), y el aviso seguía tras terminar, presentando como «a
+   * medias» un test de 10 de 10. Ahora dice lo recuperado y se retira al ver el resultado.
    */
-  const [sesionRecuperada, setSesionRecuperada] = useState(false);
+  const [respuestasRecuperadas, setRespuestasRecuperadas] = useState<number | null>(null);
   /**
    * La tarjeta de la pregunta, para devolverle el foco al avanzar (1215).
    *
@@ -439,7 +444,7 @@ export default function TestPerfilInversorPage() {
     setAnswers(guardado.answers);
     setCurrentQuestion(guardado.currentQuestion);
     setPhase('questions');
-    setSesionRecuperada(true);
+    setRespuestasRecuperadas(Object.keys(guardado.answers).length);
   }, []);
 
   /** Lleva la vista al principio de la fase nueva y el foco a su encabezado (2177). */
@@ -567,7 +572,7 @@ export default function TestPerfilInversorPage() {
     irAFase('questions');
     setCurrentQuestion(0);
     setAnswers({});
-    setSesionRecuperada(false);
+    setRespuestasRecuperadas(null);
     olvidarSesion();
   };
 
@@ -595,6 +600,8 @@ export default function TestPerfilInversorPage() {
       if (primeraSinRespuesta >= 0) setCurrentQuestion(primeraSinRespuesta);
     } else {
       irAFase('result');
+      // Terminado, ya no es un test «a medias»: el aviso no vuelve al «Revisar» (3311).
+      setRespuestasRecuperadas(null);
       // El cuestionario ya está terminado: lo que se guardaba era el test A MEDIAS, para
       // que un F5 no lo borrase. Conservarlo después haría que quien vuelve a entrar
       // aterrizara en la última pregunta en vez de en la portada.
@@ -612,7 +619,7 @@ export default function TestPerfilInversorPage() {
     irAFase('start');
     setCurrentQuestion(0);
     setAnswers({});
-    setSesionRecuperada(false);
+    setRespuestasRecuperadas(null);
     olvidarSesion();
   };
 
@@ -793,11 +800,11 @@ export default function TestPerfilInversorPage() {
             Test» ni «Repetir Test». Es el reverso de la reparación del 20/08/2026, que curó la
             pérdida de estado y no dejó salida.
           */}
-          {sesionRecuperada && (
+          {respuestasRecuperadas !== null && (
             <div className={styles.avisoRecuperado} role="status">
               <p>
                 <span aria-hidden="true">↩️</span> Hemos recuperado el test que dejaste a medias en
-                esta pestaña, con {Object.keys(answers).length} de {QUESTIONS.length} respuestas.
+                esta pestaña, con {respuestasRecuperadas} de {QUESTIONS.length} respuestas.
               </p>
               <button
                 type="button"

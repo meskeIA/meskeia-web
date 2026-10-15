@@ -2765,15 +2765,16 @@ test.describe('re-inspección 15/10/2026 · móvil 360×740', () => {
     expect(problemas).toEqual([]);
   });
 
-  test.fail('HALLAZGO 3311 — el aviso de test recuperado no cuenta las respuestas nuevas ni sigue tras terminar', async ({
+  test('REPARADO 3311 — el aviso de test recuperado no cuenta las respuestas nuevas ni sigue tras terminar', async ({
     page,
   }) => {
-    // El aviso dice lo que se RECUPERÓ («con 2 de 10 respuestas»), pero su cifra es
-    // Object.keys(answers).length, que sube con cada respuesta nueva, y `sesionRecuperada` solo se
-    // apaga con «Comenzar» o «Repetir»: sigue en la pregunta 10 tras «Ver Resultado» → «Revisar»,
+    // El aviso dice lo que se RECUPERÓ («con 2 de 10 respuestas»), pero su cifra era
+    // Object.keys(answers).length, que subía con cada respuesta nueva, y `sesionRecuperada` solo se
+    // apagaba con «Comenzar» o «Repetir»: seguía en la pregunta 10 tras «Ver Resultado» → «Revisar»,
     // diciendo «Hemos recuperado el test que dejaste a medias en esta pestaña, con 10 de 10
-    // respuestas». Va en role="status": un lector de pantalla lo vuelve a leer con cada respuesta
-    // nueva (8 veces de la 3 a la 10).
+    // respuestas». Va en role="status": un lector de pantalla lo volvía a leer con cada respuesta
+    // nueva (8 veces de la 3 a la 10). REPARADO el 15/10/2026: el aviso guarda la cifra recuperada
+    // y se retira al ver el resultado.
     test.setTimeout(90_000);
     const problemas: string[] = [];
     await sembrarSesion1510(page, { currentQuestion: 2, answers: { 1: 2, 2: 3 } });
