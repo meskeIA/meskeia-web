@@ -253,10 +253,14 @@ export default function SimuladorGeneticaPage() {
 
             {/* Selector de rasgo 1 */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>
+              {/* 3309 — los seis <select> del cruce no tenían nombre accesible: este <label> no
+                  llevaba htmlFor, y los de genotipo solo tenían al lado un <div> con «Padre» o
+                  «Madre». Un lector de pantalla anunciaba cuatro «cuadro combinado, Aa» iguales. */}
+              <label className={styles.label} htmlFor="caracteristica-1">
                 {crossType === 'dihybrid' ? 'Característica 1:' : 'Característica:'}
               </label>
               <select
+                id="caracteristica-1"
                 className={styles.select}
                 value={selectedTrait1.id}
                 onChange={(e) => setSelectedTrait1(e.target.value)}
@@ -298,8 +302,9 @@ export default function SimuladorGeneticaPage() {
             {/* Selector de rasgo 2 (dihíbrido) */}
             {crossType === 'dihybrid' && (
               <div className={styles.formGroup}>
-                <label className={styles.label}>Característica 2:</label>
+                <label className={styles.label} htmlFor="caracteristica-2">Característica 2:</label>
                 <select
+                  id="caracteristica-2"
                   className={styles.select}
                   value={selectedTrait2?.id || ''}
                   onChange={(e) => setSelectedTrait2(e.target.value)}
@@ -340,6 +345,7 @@ export default function SimuladorGeneticaPage() {
                 </div>
                 <select
                   className={styles.genotypeSelect}
+                  aria-label={`Genotipo ${parent1Sex === 'male' ? 'del Padre' : 'de la Madre'} · ${selectedTrait1.name}`}
                   value={parent1Genotype}
                   onChange={(e) => setParent1Genotype(e.target.value)}
                 >
@@ -367,6 +373,7 @@ export default function SimuladorGeneticaPage() {
                 </div>
                 <select
                   className={styles.genotypeSelect}
+                  aria-label={`Genotipo ${parent2Sex === 'male' ? 'del Padre' : 'de la Madre'} · ${selectedTrait1.name}`}
                   value={parent2Genotype}
                   onChange={(e) => setParent2Genotype(e.target.value)}
                 >
@@ -390,6 +397,7 @@ export default function SimuladorGeneticaPage() {
                   <div className={styles.parentLabel}>Rasgo 2 - Padre</div>
                   <select
                     className={styles.genotypeSelect}
+                    aria-label={`Genotipo del Padre · ${selectedTrait2.name}`}
                     value={parent1Genotype2}
                     onChange={(e) => setParent1Genotype2(e.target.value)}
                   >
@@ -405,6 +413,7 @@ export default function SimuladorGeneticaPage() {
                   <div className={styles.parentLabel}>Rasgo 2 - Madre</div>
                   <select
                     className={styles.genotypeSelect}
+                    aria-label={`Genotipo de la Madre · ${selectedTrait2.name}`}
                     value={parent2Genotype2}
                     onChange={(e) => setParent2Genotype2(e.target.value)}
                   >

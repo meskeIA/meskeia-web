@@ -4578,13 +4578,14 @@ test.describe('Re-inspección 14/10/2026 (tarde) · página traducida, la app en
   });
 });
 
-test.describe('Re-inspección 14/10/2026 (tarde) · hallazgo abierto', () => {
-  test('ABIERTO (accesibilidad, medio) · los desplegables del cruce tienen nombre accesible', async ({ page }) => {
+test.describe('Re-inspección 14/10/2026 (tarde) · hallazgo reparado', () => {
+  test('REPARADO 3309 (accesibilidad, medio) · los desplegables del cruce tienen nombre accesible', async ({ page }) => {
     // Hallazgo 3309, de esta re-inspección. Los seis <select> del cruce (característica 1 y 2, genotipo
     // de padre y madre en cada rasgo) no tienen nombre: el <label> «Característica:» no lleva
     // htmlFor ni envuelve al <select>, y «Padre» / «Madre» / «Rasgo 2 - Padre» son <div>. Un
     // lector de pantalla anuncia cuatro «cuadro combinado, Aa» iguales en el dihíbrido.
-    test.fail();
+    // REPARADO (15/10/2026): htmlFor + id en las dos características, y aria-label «Genotipo del
+    // Padre · <rasgo>» / «Genotipo de la Madre · <rasgo>» en los cuatro de genotipo.
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
     await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
@@ -4593,5 +4594,14 @@ test.describe('Re-inspección 14/10/2026 (tarde) · hallazgo abierto', () => {
     await expect(page.getByRole('combobox', { name: /Característica 2/ })).toHaveCount(1, { timeout: 2000 });
     await expect(page.getByRole('combobox', { name: /Padre/ })).toHaveCount(2, { timeout: 2000 });
     await expect(page.getByRole('combobox', { name: /Madre/ })).toHaveCount(2, { timeout: 2000 });
+    // Y los cuatro de genotipo se distinguen entre sí: cada nombre dice progenitor Y rasgo.
+    const nombres = await page
+      .getByRole('combobox', { name: /^Genotipo/ })
+      .evaluateAll((els) => els.map((el) => el.getAttribute('aria-label') ?? ''));
+    expect(nombres).toHaveLength(4);
+    expect(new Set(nombres).size).toBe(4);
+    // En el monohíbrido, la característica se llama como su rótulo visible
+    await page.getByRole('button', { name: 'Monohíbrido', exact: true }).click();
+    await expect(page.getByRole('combobox', { name: 'Característica:' })).toHaveCount(1);
   });
 });
