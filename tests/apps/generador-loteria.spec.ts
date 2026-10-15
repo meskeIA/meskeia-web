@@ -2081,8 +2081,9 @@ test.describe('Inspector 12/10/2026', () => {
 
   test.describe('hallazgos ABIERTOS (inspector 12/10/2026)', () => {
     // En la base, por orden: 3234 (desglose), 3235 (botones 1/3/5/10), 3236 (gravamen español) y
-    // 3237 (FAQ duplicada). Siguen abiertos en la re-inspección del 14/10/2026: los cuatro
-    // `test.fail()` fallan como se espera.
+    // 3237 (FAQ duplicada). Siguen abiertos en las re-inspecciones del 14/10/2026 y del 15/10/2026:
+    // los cuatro `test.fail()` fallan como se espera. 1e288cc3 (15/10) numeró bien los RÓTULOS de
+    // los campos, pero el desglose de 3234 sigue contando solo los premios escritos.
     test('ABIERTO (contenido, bajo) · el desglose por décimo numera los décimos como el formulario', async ({ page }) => {
       // Con el campo 1 vacío y premios en los campos 2 y 3 («Premio del décimo o apuesta 2/3 (€)»),
       // el desglose decía «Décimo 1: 60.000,00 €… · Décimo 2: 125.000,00 €…»: numera solo los
@@ -2280,11 +2281,12 @@ test.describe('13/10 · página traducida por el navegador', () => {
  * PÁGINA TRADUCIDA (el mismo traductor simulado que el bloque del 13/10): Generar, Copiar y el
  * precio ya no caen. Tampoco el comprobador (comprobar, cambiar una casilla, avisos, cambiar de
  * lotería), las guardadas (estrella, quitar, vaciar), la cantidad, el selector, la guía educativa
- * ni el reparto (añadir y quitar personas y décimos). SÍ cae el aviso del reparto cuando pierde
- * su detalle sin desaparecer: «{resultado.error}{detalleError}» son dos textos sueltos y React
- * retira el segundo, que el traductor ya cambió por <font> (hallazgo nuevo, abajo). Y el texto
- * que cambia DENTRO del mismo nodo no cae pero se queda viejo: React escribe en el nodo que el
- * traductor retiró (hallazgo nuevo, abajo).
+ * ni el reparto (añadir y quitar personas y décimos). SÍ caía el aviso del reparto cuando perdía
+ * su detalle sin desaparecer: «{resultado.error}{detalleError}» eran dos textos sueltos y React
+ * retiraba el segundo, que el traductor ya había cambiado por <font> (hallazgo 3288). Y el texto
+ * que cambiaba DENTRO del mismo nodo no caía pero se quedaba viejo: React escribía en el nodo que
+ * el traductor retiró (hallazgo 3289). Los dos, REPARADOS el 14/10/2026 (0293f6ec); la
+ * re-inspección del 15/10/2026 confirma que se sostienen.
  *
  * CROMO FIJO (scroll-padding del documento): medido a 1280×800, 1024×768, 360×800 y 390×844. La
  * tarjeta nueva, el resumen y el aviso del comprobador acaban 8 px por encima de la píldora del
@@ -2750,9 +2752,9 @@ test.describe('Inspector 14/10/2026', () => {
  * ficha, «Generar números de…», las tarjetas, la estrella, Copiar (resultados y guardadas), el
  * tope de 20 y su aviso, el cupo, el comprobador (con aciertos, sin ellos, de un aviso a otro,
  * cambiando de lotería y quitando guardadas con el resultado a la vista), los totales, la tabla,
- * el desglose y todas las transiciones del aviso del reparto. SÍ se queda viejo un nodo hermano
+ * el desglose y todas las transiciones del aviso del reparto. SÍ se quedaba viejo un nodo hermano
  * que la reparación no tocó: el rótulo de cada campo de premio, «{texto}<input>» en el mismo
- * <label> (hallazgo nuevo, abajo con test.fail()).
+ * <label> (hallazgo 3303, REPARADO el 15/10/2026 en 1e288cc3: el rótulo va en su propio <span>).
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 test.describe('re-inspección 14/10/2026 (tarde)', () => {
@@ -3130,6 +3132,637 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
       await traducirT(page);
       await penaT(page).getByRole('button', { name: 'Quitar el premio 2' }).click();
       expect(await rotulosPremio(page)).toEqual(['Premio del décimo o apuesta (€)']);
+    });
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Re-inspección 15/10/2026 — tras 1e288cc3 (hallazgo 3303: el rótulo de cada premio de la peña
+ * en su propio <span>) y 0293f6ec (3288 y 3289). Segmento fiscal, riesgo 1.
+ *
+ * NORMA — data/fiscal/premios-loterias.ts (DA 33.ª LIRPF, BOE-A-2006-20764):
+ * EXENCION_PREMIO_LOTERIA = 40.000 € por décimo o apuesta (ap. 1 y 2), entera con un precio de
+ * 0,50 € o más; TIPO_GRAVAMEN_PREMIO_LOTERIA = 20 % sobre el exceso (ap. 4 y 6); prorrateo de
+ * exención y base por cuotas (ap. 2 y 3). Céntimos por el mayor resto (reparto.ts).
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR:
+ *   1. Normal — Ana, Bea y Carlos ponen 6, 3 y 1 € (60/30/10 %); décimos de 10 € premiados con
+ *      30.000 € (por debajo de la exención) y 90.000 € (por encima). D1: exento 30.000, retención
+ *      0. D2: exento 40.000, base 50.000, retención 10.000. Totales 120.000,00 / 70.000,00 /
+ *      10.000,00 / se cobran 110.000,00. Por persona: premio 72.000 / 36.000 / 12.000; retención
+ *      6000 / 3000 / 1000; le llega 66.000 / 33.000 / 11.000. Igual con la página traducida.
+ *   2. Límite — (a) 40.000 € justos: todo exento, retención 0,00 €, se cobran 40.000,00 (20.000 /
+ *      10.000 / 10.000 con la peña de partida 10/5/5). (b) Premio 0: no es «mayor que 0 €», aviso
+ *      sin detalle (un solo campo) y ese campo marcado. (c) Tres campos 50.000 / vacío / 40.000:
+ *      el vacío no cuenta; retención 2000 (solo el de 50.000), totales 90.000 / 80.000 / 2000 /
+ *      88.000; por persona 45.000 / 22.500 / 22.500, retención 1000 / 500 / 500, le llega 44.000 /
+ *      22.000 / 22.000; rótulos 1, 2 y 3.
+ *   3. Rechazo — Bea pone «tres»: aviso que la nombra y SU campo marcado. Arreglada, el premio 2
+ *      = −100: aviso con «Revisa el premio del décimo o apuesta 2.» sobre el campo rotulado «2».
+ *      NO se rechaza que lo puesto (6 + 3 + 1 = 10 €) no sume el precio del décimo (20 €): la peña
+ *      puede haber jugado varios décimos y lo puesto solo decide las cuotas (reparto.ts). Con dos
+ *      décimos de 90.000 €: 180.000 / 80.000 / 20.000 / 160.000; le llega 96.000 / 48.000 / 16.000.
+ * Los tres casos dieron en el navegador exactamente lo calculado, traducida y sin traducir.
+ *
+ * PÁGINA TRADUCIDA, la app entera con un DETECTOR de texto viejo: el traductor simulado apunta
+ * cada nodo de texto que retira con su valor, y si React escribe después en uno de ellos (cambia
+ * su nodeValue) ese texto se ha quedado viejo en pantalla — la forma de 3289 y 3303, sin tener que
+ * adivinar dónde mirar. Su control positivo en la exploración fue el botón de la guía educativa
+ * (cabo C0250, componente compartido, ya anotado); aquí, uno sintético. En la app: 3288, 3289 y
+ * 3303 SE SOSTIENEN, y ni texto viejo ni caída en el generador, el comprobador ni el reparto. SÍ
+ * cae la tarjeta de compartir del pie (components/ShareCard.tsx, la monta todo el catálogo):
+ * HALLAZGO 3314, al final con test.fail().
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('re-inspección 15/10/2026', () => {
+  const SEL_Q = 'section[aria-labelledby="pena-titulo"]';
+  const penaQ = (page: Page) => page.locator(SEL_Q);
+  const premioQ = (page: Page, n = 0) => penaQ(page).getByLabel(/Premio del décimo o apuesta/).nth(n);
+  const poneQ = (page: Page, n: number) => penaQ(page).getByLabel('Pone (€)').nth(n);
+  const nombreQ = (page: Page, n: number) => penaQ(page).getByLabel('Nombre').nth(n);
+  const precioQ = (page: Page) => penaQ(page).getByLabel('Precio de cada décimo o apuesta (€)');
+  const avisoQ = (page: Page) => penaQ(page).locator('[class*="comprobadorError"]');
+  const anadirDecimoQ = (page: Page) => penaQ(page).getByRole('button', { name: /Añadir otro décimo/ });
+  // formatCurrency y formatPercentage ponen espacio duro (U+00A0) delante del símbolo
+  const eurQ = (s: string) => `${s} €`;
+  const pctQ = (s: string) => `${s} %`;
+
+  async function escribirQ(page: Page, campo: Locator, valor: string) {
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+  const totalesQ = (page: Page) => penaQ(page).locator('[class*="penaTotales"] > div').evaluateAll((divs) =>
+    divs.map((d) => [d.querySelector('dt')?.textContent ?? '', d.querySelector('dd')?.textContent ?? '']));
+  const filasQ = (page: Page) => penaQ(page).locator('tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => [
+      tr.querySelector('th')?.textContent ?? '',
+      ...Array.from(tr.querySelectorAll('td')).map((td) => td.textContent ?? ''),
+    ]));
+  /** Rótulo de cada campo de premio, tal como lo lee su <label> (es su nombre accesible). */
+  const rotulosQ = (page: Page) => penaQ(page).getByLabel(/Premio del décimo o apuesta/).evaluateAll((ins) =>
+    ins.map((i) => ((i as HTMLInputElement).labels?.[0]?.textContent ?? '').replace(/\s+/g, ' ').trim()));
+  /** Rótulo del campo que el aviso marca con aria-invalid. */
+  const marcadosQ = (page: Page) => penaQ(page).locator('input[aria-invalid="true"]').evaluateAll((ins) =>
+    ins.map((i) => ((i as HTMLInputElement).labels?.[0]?.textContent ?? '').replace(/\s+/g, ' ').trim()));
+
+  interface NodoTraducido { nodo: Text; valor: string | null; avisado: boolean }
+  type VentanaTraducida = Window & { __nodosTraducidos?: NodoTraducido[] };
+
+  /**
+   * El traductor de los bloques anteriores (cada texto a <font><font>…), que además APUNTA cada
+   * nodo que retira con su valor de ese momento, para el detector de texto viejo de abajo.
+   */
+  const traducirQ = (page: Page) =>
+    page.evaluate(() => {
+      const w = window as VentanaTraducida;
+      const apuntados = (w.__nodosTraducidos = w.__nodosTraducidos ?? []);
+      const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => {
+          const padre = n.parentElement;
+          if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+          if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const nodos: Text[] = [];
+      while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+      for (const nodo of nodos) {
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = nodo.nodeValue;
+        exterior.appendChild(interior);
+        apuntados.push({ nodo, valor: nodo.nodeValue, avisado: false });
+        nodo.parentNode?.replaceChild(exterior, nodo);
+      }
+    });
+
+  /**
+   * Detector de texto viejo: un nodo que el traductor ya retiró y en el que React ha vuelto a
+   * escribir (cambió su nodeValue). En pantalla sigue el <font> con el texto de antes.
+   */
+  const textoViejoQ = (page: Page) =>
+    page.evaluate(() => {
+      const r: string[] = [];
+      for (const t of (window as VentanaTraducida).__nodosTraducidos ?? []) {
+        if (!t.avisado && t.nodo.nodeValue !== t.valor) {
+          t.avisado = true;
+          r.push(`«${t.valor}» → «${t.nodo.nodeValue}» en <${t.nodo.parentElement?.tagName ?? 'retirado'}>`);
+        }
+      }
+      return r;
+    });
+
+  function erroresQ(page: Page): string[] {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    return errores;
+  }
+
+  /** Traduce, hace el paso y apunta lo que se haya quedado viejo con el nombre del paso. */
+  async function pasoQ(page: Page, viejos: string[], nombre: string, accion: () => Promise<void>) {
+    await traducirQ(page);
+    await accion();
+    await page.waitForTimeout(150); // el commit de React tras la última comprobación del paso
+    for (const v of await textoViejoQ(page)) viejos.push(`${nombre}: ${v}`);
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' }), nombre).toHaveCount(0);
+  }
+
+  test.describe('caso 1 (normal)', () => {
+    for (const traducida of [false, true]) {
+      test(`peña 6/3/1 € con décimos de 30.000 y 90.000 €: 66.000 / 33.000 / 11.000 €${traducida ? ', con la página traducida' : ''}`, async ({ page }) => {
+        const errores = erroresQ(page);
+        const viejos: string[] = [];
+        await esperarInteractiva(page);
+        await esperarHidratacion(page, [`${SEL_Q} input`]);
+        const paso = (nombre: string, accion: () => Promise<void>) =>
+          traducida ? pasoQ(page, viejos, nombre, accion) : accion();
+        await paso('nombres', async () => {
+          await escribirQ(page, nombreQ(page, 0), 'Ana');
+          await escribirQ(page, nombreQ(page, 1), 'Bea');
+          await escribirQ(page, nombreQ(page, 2), 'Carlos');
+        });
+        await paso('aportaciones', async () => {
+          await escribirQ(page, poneQ(page, 0), '6');
+          await escribirQ(page, poneQ(page, 1), '3');
+          await escribirQ(page, poneQ(page, 2), '1');
+        });
+        await paso('precio', () => escribirQ(page, precioQ(page), '10'));
+        await paso('décimo 1', () => escribirQ(page, premioQ(page, 0), '30.000'));
+        await paso('añadir décimo', () => anadirDecimoQ(page).click());
+        await paso('décimo 2', () => escribirQ(page, premioQ(page, 1), '90.000'));
+
+        // DA 33.ª: 30.000 todo exento; 90.000 → (90.000 − 40.000) × 20 % = 10.000
+        await expect.poll(() => totalesQ(page)).toEqual([
+          ['Premio íntegro', eurQ('120.000,00')],
+          ['Exento', eurQ('70.000,00')],
+          [`Retención del ${pctQ('20')}`, eurQ('10.000,00')],
+          ['Lo que se cobra', eurQ('110.000,00')],
+        ]);
+        await expect(penaQ(page).locator('[class*="penaResultado"] > p')).toHaveText(
+          `Décimo 1: ${eurQ('30.000,00')}, retención ${eurQ('0,00')} · Décimo 2: ${eurQ('90.000,00')}, retención ${eurQ('10.000,00')}`);
+        expect(await filasQ(page)).toEqual([
+          ['Ana', eurQ('6,00'), eurQ('66.000,00'), pctQ('60,00'), eurQ('72.000,00'), eurQ('6000,00')],
+          ['Bea', eurQ('3,00'), eurQ('33.000,00'), pctQ('30,00'), eurQ('36.000,00'), eurQ('3000,00')],
+          ['Carlos', eurQ('1,00'), eurQ('11.000,00'), pctQ('10,00'), eurQ('12.000,00'), eurQ('1000,00')],
+        ]);
+        expect(await rotulosQ(page)).toEqual(['Premio del décimo o apuesta 1 (€)', 'Premio del décimo o apuesta 2 (€)']);
+        expect(viejos).toEqual([]);
+        expect(errores).toEqual([]);
+      });
+    }
+  });
+
+  test.describe('caso 2 (límite)', () => {
+    test('40.000 € justos no retienen nada, 0 € se rechaza y un campo vacío entre dos premios no cuenta', async ({ page }) => {
+      await esperarHidratacion(page, [`${SEL_Q} input`]);
+      // (a) El umbral exacto: «igual o inferior a 40.000» → exento entero (DA 33.ª.2)
+      await escribirQ(page, premioQ(page, 0), '40.000');
+      await expect.poll(() => totalesQ(page)).toEqual([
+        ['Premio íntegro', eurQ('40.000,00')],
+        ['Exento', eurQ('40.000,00')],
+        [`Retención del ${pctQ('20')}`, eurQ('0,00')],
+        ['Lo que se cobra', eurQ('40.000,00')],
+      ]);
+      expect(await filasQ(page)).toEqual([
+        ['Persona 1', eurQ('10,00'), eurQ('20.000,00'), pctQ('50,00'), eurQ('20.000,00'), eurQ('0,00')],
+        ['Persona 2', eurQ('5,00'), eurQ('10.000,00'), pctQ('25,00'), eurQ('10.000,00'), eurQ('0,00')],
+        ['Persona 3', eurQ('5,00'), eurQ('10.000,00'), pctQ('25,00'), eurQ('10.000,00'), eurQ('0,00')],
+      ]);
+
+      // (b) Premio 0: no es «mayor que 0 €»; un solo campo, así que el aviso no lleva número
+      await escribirQ(page, premioQ(page, 0), '0');
+      await expect(avisoQ(page)).toHaveText('Indica el premio de cada décimo o apuesta premiados, mayor que 0 €.');
+      expect(await marcadosQ(page)).toEqual(['Premio del décimo o apuesta (€)']);
+      await expect(penaQ(page).locator('tbody tr')).toHaveCount(0);
+
+      // (c) 50.000 / vacío / 40.000: el vacío no se manda al cálculo
+      await escribirQ(page, premioQ(page, 0), '50.000');
+      await anadirDecimoQ(page).click();
+      await anadirDecimoQ(page).click();
+      await escribirQ(page, premioQ(page, 2), '40.000');
+      await expect.poll(() => totalesQ(page)).toEqual([
+        ['Premio íntegro', eurQ('90.000,00')],
+        ['Exento', eurQ('80.000,00')],
+        [`Retención del ${pctQ('20')}`, eurQ('2000,00')],
+        ['Lo que se cobra', eurQ('88.000,00')],
+      ]);
+      expect(await filasQ(page)).toEqual([
+        ['Persona 1', eurQ('10,00'), eurQ('44.000,00'), pctQ('50,00'), eurQ('45.000,00'), eurQ('1000,00')],
+        ['Persona 2', eurQ('5,00'), eurQ('22.000,00'), pctQ('25,00'), eurQ('22.500,00'), eurQ('500,00')],
+        ['Persona 3', eurQ('5,00'), eurQ('22.000,00'), pctQ('25,00'), eurQ('22.500,00'), eurQ('500,00')],
+      ]);
+      // La numeración del desglose es el hallazgo 3234 (abierto, test.fail arriba): aquí, las cifras
+      await expect(penaQ(page).locator('[class*="penaResultado"] > p')).toContainText(`${eurQ('50.000,00')}, retención ${eurQ('2000,00')}`);
+      await expect(penaQ(page).locator('[class*="penaResultado"] > p')).toContainText(`${eurQ('40.000,00')}, retención ${eurQ('0,00')}`);
+      expect(await rotulosQ(page)).toEqual([
+        'Premio del décimo o apuesta 1 (€)', 'Premio del décimo o apuesta 2 (€)', 'Premio del décimo o apuesta 3 (€)']);
+    });
+  });
+
+  test.describe('caso 3 (rechazo)', () => {
+    test('«tres» y −100 avisan sobre su campo; lo puesto que no suma el precio NO se rechaza', async ({ page }) => {
+      await esperarHidratacion(page, [`${SEL_Q} input`]);
+      await escribirQ(page, nombreQ(page, 1), 'Bea');
+      await escribirQ(page, poneQ(page, 1), 'tres');
+      await escribirQ(page, premioQ(page, 0), '90.000');
+      await expect(avisoQ(page)).toHaveText(
+        'Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Bea.');
+      await expect(poneQ(page, 1)).toHaveAttribute('aria-invalid', 'true');
+      await expect(penaQ(page).locator('input[aria-invalid="true"]')).toHaveCount(1);
+      await expect(penaQ(page).locator('tbody tr')).toHaveCount(0);
+
+      await escribirQ(page, poneQ(page, 1), '5');
+      await anadirDecimoQ(page).click();
+      await escribirQ(page, premioQ(page, 1), '-100');
+      await expect(avisoQ(page)).toHaveText(
+        'Indica el premio de cada décimo o apuesta premiados, mayor que 0 €. Revisa el premio del décimo o apuesta 2.');
+      expect(await marcadosQ(page)).toEqual(['Premio del décimo o apuesta 2 (€)']);
+      await expect(penaQ(page).locator('tbody tr')).toHaveCount(0);
+
+      // 6 + 3 + 1 = 10 € con décimos de 20 €: no es un error, lo puesto solo decide las cuotas
+      await escribirQ(page, premioQ(page, 1), '90.000');
+      await escribirQ(page, poneQ(page, 0), '6');
+      await escribirQ(page, poneQ(page, 1), '3');
+      await escribirQ(page, poneQ(page, 2), '1');
+      await expect(avisoQ(page)).toHaveCount(0);
+      await expect.poll(() => totalesQ(page)).toEqual([
+        ['Premio íntegro', eurQ('180.000,00')],
+        ['Exento', eurQ('80.000,00')],
+        [`Retención del ${pctQ('20')}`, eurQ('20.000,00')],
+        ['Lo que se cobra', eurQ('160.000,00')],
+      ]);
+      expect(await filasQ(page)).toEqual([
+        ['Persona 1', eurQ('6,00'), eurQ('96.000,00'), pctQ('60,00'), eurQ('108.000,00'), eurQ('12.000,00')],
+        ['Bea', eurQ('3,00'), eurQ('48.000,00'), pctQ('30,00'), eurQ('54.000,00'), eurQ('6000,00')],
+        ['Persona 3', eurQ('1,00'), eurQ('16.000,00'), pctQ('10,00'), eurQ('18.000,00'), eurQ('2000,00')],
+      ]);
+    });
+  });
+
+  test.describe('página traducida — la app entera con el detector de texto viejo', () => {
+    test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+    test('generador: las cinco loterías × 1/3/5/10, Generar, copiar, guardar, quitar, Vaciar y Limpiar', async ({ page }) => {
+      test.setTimeout(120_000);
+      const errores = erroresQ(page);
+      const viejos: string[] = [];
+      await esperarInteractiva(page);
+      for (const tipo of Object.keys(NOMBRE_BOTON) as Modalidad[]) {
+        await pasoQ(page, viejos, `selector ${tipo}`, async () => {
+          await seleccionarLoteria(page, tipo);
+          await expect(page.locator('[class*="lotteryInfo"] h2')).toHaveText(NOMBRE_BOTON[tipo]);
+        });
+        for (const n of [3, 5, 10, 1] as const) {
+          await pasoQ(page, viejos, `${tipo} × ${n}`, async () => {
+            await ponerCantidad(page, n);
+            await expect(botonGenerar(page)).toContainText(
+              `Generar ${n} ${n > 1 ? 'combinaciones' : 'combinación'} de ${NOMBRE_BOTON[tipo]}`);
+          });
+        }
+        await pasoQ(page, viejos, `generar ${tipo}`, async () => {
+          const antes = await page.locator('[class*="resultCard"]').count();
+          await botonGenerar(page).click();
+          await expect(page.locator('[class*="resultCard"]')).toHaveCount(antes + 1);
+        });
+      }
+      await pasoQ(page, viejos, 'cantidad 10', () => ponerCantidad(page, 10));
+      await pasoQ(page, viejos, 'generar 10', async () => {
+        await botonGenerar(page).click();
+        await expect(page.locator('[class*="resultCard"]')).toHaveCount(15);
+      });
+      await pasoQ(page, viejos, 'copiar', async () => {
+        await page.getByRole('button', { name: 'Copiar combinación' }).first().click();
+        await expect(page.locator('[class*="resultCard"]').first().getByText('Copiada')).toBeVisible();
+      });
+      await pasoQ(page, viejos, 'copiar otra mientras la primera dice Copiada', async () => {
+        await page.getByRole('button', { name: 'Copiar combinación' }).nth(3).click();
+        await expect(page.locator('[class*="resultCard"]').nth(3).getByText('Copiada')).toBeVisible();
+      });
+      await pasoQ(page, viejos, 'Copiada vuelve al icono', async () => {
+        await expect(page.locator('[class*="resultCard"]').getByText('Copiada')).toHaveCount(0, { timeout: 8000 });
+      });
+      for (let i = 0; i < 3; i++) {
+        await pasoQ(page, viejos, `estrella ${i}`, async () => {
+          await page.locator('[class*="resultCard"]').nth(i).locator('[aria-pressed]').click();
+          await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(i + 1);
+        });
+      }
+      await pasoQ(page, viejos, 'estrella que quita', async () => {
+        await page.locator('[class*="resultCard"]').nth(1).locator('[aria-pressed]').click();
+        await expect(page.locator('[class*="favoritesCupo"]')).toHaveText('Caben hasta 20: llevas 2.');
+      });
+      await pasoQ(page, viejos, 'quitar una guardada', async () => {
+        await page.getByRole('button', { name: /^Quitar la combinación/ }).first().click();
+        await expect(page.locator('[class*="favoritesCupo"]')).toHaveText('Caben hasta 20: llevas 1.');
+      });
+      await pasoQ(page, viejos, 'ficha «Generar números de Bonoloto»', async () => {
+        await page.getByRole('button', { name: 'Generar números de Bonoloto' }).click();
+        await expect(botonGenerar(page)).toContainText('Generar 10 combinaciones de Bonoloto');
+      });
+      await pasoQ(page, viejos, 'Vaciar', async () => {
+        await page.getByRole('button', { name: /Vaciar/ }).click();
+        await expect(page.locator('[class*="favoriteCard"]')).toHaveCount(0);
+      });
+      await pasoQ(page, viejos, 'Limpiar', async () => {
+        await page.getByRole('button', { name: /Limpiar/ }).click();
+        await expect(page.locator('[class*="resultCard"]')).toHaveCount(0);
+      });
+      expect(viejos).toEqual([]);
+      expect(errores).toEqual([]);
+
+      // Sensibilidad del detector: escribir en un nodo ya retirado tiene que salir
+      await traducirQ(page);
+      await page.evaluate(() => {
+        const t = ((window as VentanaTraducida).__nodosTraducidos ?? []).find((x) => !x.avisado);
+        if (t) t.nodo.nodeValue = `${t.valor ?? ''} (cambiado)`;
+      });
+      expect(await textoViejoQ(page)).toHaveLength(1);
+    });
+
+    test('comprobador: las cinco loterías, avisos, resultado, y quitar y AÑADIR guardadas con el resultado a la vista', async ({ page }) => {
+      test.setTimeout(120_000);
+      const errores = erroresQ(page);
+      const viejos: string[] = [];
+      const T_Q = '2026-10-12T10:00:00.000Z';
+      const gQ = (id: string, type: Modalidad, mainNumbers: number[], extraNumbers: number[]) =>
+        ({ id, type, mainNumbers, extraNumbers, timestamp: T_Q });
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([
+          gQ('p1', 'primitiva', [2, 9, 17, 28, 36, 45], [4]),
+          gQ('p2', 'primitiva', [1, 3, 5, 7, 11, 13], [0]),
+          gQ('e1', 'euromillones', [3, 7, 15, 49, 50], [1, 12]),
+          gQ('b1', 'bonoloto', [5, 11, 19, 26, 38, 44], [2]),
+          gQ('o1', 'gordo', [1, 2, 3, 4, 5], [6]),
+          gQ('l1', 'lototurf', [3, 8, 12, 19, 25, 31], [7]),
+        ]),
+      });
+      const zona = zonaComprobador(page);
+      const casilla = (n: number) => zona.getByLabel(`Número ${n} de la combinación ganadora`);
+      const boton = zona.getByRole('button', { name: /Comprobar mis combinaciones/ });
+      const aviso = zona.locator('[class*="comprobadorError"]');
+      const resumen = zona.locator('[class*="comprobadorResumen"]');
+      async function teclear(numeros: string[], otras: Array<[string, string]>) {
+        for (let i = 0; i < numeros.length; i++) await escribirCasilla(page, casilla(i + 1), numeros[i]);
+        for (const [etiqueta, valor] of otras) await escribirCasilla(page, zona.getByLabel(etiqueta, { exact: true }), valor);
+      }
+      for (const tipo of ['euromillones', 'bonoloto', 'gordo', 'lototurf', 'primitiva'] as Modalidad[]) {
+        await pasoQ(page, viejos, `comprobador → ${tipo}`, async () => {
+          await zona.getByRole('button', { name: NOMBRE_BOTON[tipo], exact: true }).click();
+          await expect(zona.locator('legend')).toHaveText(`Combinación ganadora de ${NOMBRE_BOTON[tipo]}`);
+          await expect(boton).toHaveText(`Comprobar mis combinaciones de ${NOMBRE_BOTON[tipo]}`);
+        });
+        await pasoQ(page, viejos, `comprobar vacío (${tipo})`, async () => {
+          await boton.click();
+          await expect(aviso).toHaveText('Falta el número 1 de la combinación ganadora, o no es un número entero.');
+        });
+      }
+      // p1 6 + reintegro → especial · p2 0 aciertos → sin premio
+      await pasoQ(page, viejos, 'La Primitiva comprobada', async () => {
+        await teclear(['2', '9', '17', '28', '36', '45'], [['Complementario', '11'], ['Reintegro', '4']]);
+        await boton.click();
+        await expect(resumen).toHaveText('1 de tus 2 combinaciones de La Primitiva tiene premio de categoría; 1 acierta el reintegro.');
+      });
+      await pasoQ(page, viejos, 'añadir una guardada con el resultado a la vista', async () => {
+        await seleccionarLoteria(page, 'primitiva');
+        await ponerCantidad(page, 1);
+        await botonGenerar(page).click();
+        await expect(page.locator('[class*="resultCard"]')).toHaveCount(1);
+        await page.locator('[class*="resultCard"]').first().locator('[aria-pressed]').click();
+        await expect(resumen).toContainText('de tus 3 combinaciones de La Primitiva');
+        await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveCount(3);
+      });
+      await pasoQ(page, viejos, 'quitar una guardada con el resultado a la vista', async () => {
+        await page.getByRole('button', { name: 'Quitar la combinación 1, 3, 5, 7, 11, 13 de las guardadas' }).click();
+        await expect(resumen).toContainText('de tus 2 combinaciones de La Primitiva');
+      });
+      await pasoQ(page, viejos, 'de resultado a aviso', async () => {
+        await escribirCasilla(page, casilla(2), '2');
+        await boton.click();
+        await expect(aviso).toHaveText('El 2 está repetido en la combinación ganadora: en un sorteo no sale dos veces.');
+      });
+      await pasoQ(page, viejos, 'de un aviso a otro', async () => {
+        await escribirCasilla(page, casilla(2), '60');
+        await boton.click();
+        await expect(aviso).toHaveText('El número 2 (60) está fuera de rango: va del 1 al 49.');
+      });
+      await pasoQ(page, viejos, 'de aviso a resultado', async () => {
+        await escribirCasilla(page, casilla(2), '9');
+        await boton.click();
+        await expect(aviso).toHaveCount(0);
+        await expect(resumen).toContainText('de tus 2 combinaciones de La Primitiva');
+      });
+      await pasoQ(page, viejos, 'Euromillones: 5 + 2', async () => {
+        await zona.getByRole('button', { name: 'Euromillones', exact: true }).click();
+        await teclear(['3', '7', '15', '49', '50'], [['Estrella 1', '1'], ['Estrella 2', '12']]);
+        await boton.click();
+        await expect(resumen).toHaveText('Tu combinación de Euromillones tiene premio de categoría.');
+      });
+      await pasoQ(page, viejos, 'Euromillones: estrellas iguales', async () => {
+        await escribirCasilla(page, zona.getByLabel('Estrella 2', { exact: true }), '1');
+        await boton.click();
+        await expect(aviso).toHaveText('Las dos estrellas no pueden ser la misma: el 1 está repetido.');
+      });
+      await pasoQ(page, viejos, 'El Gordo: 5 + clave', async () => {
+        await zona.getByRole('button', { name: 'El Gordo de la Primitiva', exact: true }).click();
+        await teclear(['1', '2', '3', '4', '5'], [['Clave', '6']]);
+        await boton.click();
+        await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveText(['1.ª categoría (5 aciertos + clave) y reintegro']);
+      });
+      await pasoQ(page, viejos, 'Lototurf: caballo 13', async () => {
+        await zona.getByRole('button', { name: 'Lototurf', exact: true }).click();
+        await teclear(['3', '8', '12', '19', '25', '31'], [['Caballo', '13']]);
+        await boton.click();
+        await expect(aviso).toHaveText('Caballo: 13 está fuera de rango, va del 1 al 12.');
+      });
+      await pasoQ(page, viejos, 'quitar la única de Lototurf con su aviso a la vista', async () => {
+        await page.getByRole('button', { name: 'Quitar la combinación 3, 8, 12, 19, 25, 31 de las guardadas' }).click();
+        await expect(zona.locator('legend')).toHaveText('Combinación ganadora de La Primitiva');
+      });
+      expect(viejos).toEqual([]);
+      expect(errores).toEqual([]);
+    });
+
+    test('reparto: personas y décimos que entran y salen, vaciar, el precio y todas las transiciones del aviso', async ({ page }) => {
+      test.setTimeout(120_000);
+      const errores = erroresQ(page);
+      const viejos: string[] = [];
+      await esperarInteractiva(page);
+      await esperarHidratacion(page, [`${SEL_Q} input`]);
+      const filas = penaQ(page).locator('tbody tr');
+      const AVISO_APORTACION = 'Revisa las aportaciones: tienen que ser cantidades de 0 € o más.';
+      const AVISO_PREMIO = 'Indica el premio de cada décimo o apuesta premiados, mayor que 0 €.';
+      const paso = (nombre: string, accion: () => Promise<void>) => pasoQ(page, viejos, nombre, accion);
+
+      await paso('premio', async () => { await escribirQ(page, premioQ(page), '125.000'); await expect(filas).toHaveCount(3); });
+      await paso('nombre', async () => { await escribirQ(page, nombreQ(page, 0), 'Ana'); await expect(filas.first().locator('th')).toHaveText('Ana'); });
+      await paso('añadir persona → aviso', async () => {
+        await penaQ(page).getByRole('button', { name: /Añadir persona/ }).click();
+        await expect(avisoQ(page)).toHaveText(`${AVISO_APORTACION} Revisa lo que pone Persona 4.`);
+      });
+      await paso('quitar a Ana con el aviso a la vista: renumera', async () => {
+        await penaQ(page).getByRole('button', { name: 'Quitar a Ana de la peña' }).click();
+        await expect(avisoQ(page)).toHaveText(`${AVISO_APORTACION} Revisa lo que pone Persona 3.`);
+      });
+      await paso('aviso → resultado', async () => { await escribirQ(page, poneQ(page, 2), '5'); await expect(filas).toHaveCount(3); });
+      await paso('quitar a Persona 1 con el resultado a la vista: renumera las filas', async () => {
+        await penaQ(page).getByRole('button', { name: 'Quitar a Persona 1 de la peña' }).click();
+        await expect(filas.locator('th')).toHaveText(['Persona 1', 'Persona 2']);
+      });
+      await paso('vaciar el premio → nada', async () => {
+        await escribirQ(page, premioQ(page), '');
+        await expect(filas).toHaveCount(0);
+        await expect(avisoQ(page)).toHaveCount(0);
+      });
+      await paso('premio otra vez', async () => { await escribirQ(page, premioQ(page), '60.000'); await expect(filas).toHaveCount(2); });
+      await paso('2.º décimo: aparece el desglose', async () => {
+        await anadirDecimoQ(page).click();
+        await escribirQ(page, premioQ(page, 1), '125.000');
+        await expect(penaQ(page).locator('[class*="penaResultado"] > p span')).toHaveCount(2);
+      });
+      await paso('3.º décimo', async () => {
+        await anadirDecimoQ(page).click();
+        await escribirQ(page, premioQ(page, 2), '30.000');
+        await expect(penaQ(page).locator('[class*="penaResultado"] > p span')).toHaveCount(3);
+      });
+      await paso('vaciar el 1.º', async () => {
+        await escribirQ(page, premioQ(page, 0), '');
+        await expect(penaQ(page).locator('[class*="penaResultado"] > p span')).toHaveCount(2);
+      });
+      await paso('el 2.º no es un número: aviso con detalle', async () => {
+        await escribirQ(page, premioQ(page, 1), 'abc');
+        await expect(avisoQ(page)).toHaveText(`${AVISO_PREMIO} Revisa el premio del décimo o apuesta 2.`);
+      });
+      await paso('quitar el 2.º: el aviso desaparece y vuelve el resultado', async () => {
+        await penaQ(page).getByRole('button', { name: 'Quitar el premio 2', exact: true }).click();
+        await expect(avisoQ(page)).toHaveCount(0);
+        await expect(filas).toHaveCount(2);
+        expect(await rotulosQ(page)).toEqual(['Premio del décimo o apuesta 1 (€)', 'Premio del décimo o apuesta 2 (€)']);
+      });
+      await paso('vaciar todos los décimos → nada', async () => {
+        await escribirQ(page, premioQ(page, 1), '');
+        await expect(filas).toHaveCount(0);
+      });
+      await paso('−5 en el 1.º de dos: aviso con detalle', async () => {
+        await escribirQ(page, premioQ(page, 0), '-5');
+        await expect(avisoQ(page)).toHaveText(`${AVISO_PREMIO} Revisa el premio del décimo o apuesta 1.`);
+      });
+      await paso('de dos campos a uno: el aviso pierde el detalle', async () => {
+        await penaQ(page).getByRole('button', { name: 'Quitar el premio 2', exact: true }).click();
+        await expect(avisoQ(page)).toHaveText(AVISO_PREMIO);
+        expect(await rotulosQ(page)).toEqual(['Premio del décimo o apuesta (€)']);
+      });
+      await paso('premio válido', async () => { await escribirQ(page, premioQ(page), '125.000'); await expect(filas).toHaveCount(2); });
+      // 40.000 × 0,3 / 0,50 = 24.000; 40.000 × 0,25 / 0,50 = 20.000 (DA 33.ª.2)
+      await paso('precio 0,3', async () => {
+        await escribirQ(page, precioQ(page), '0,3');
+        // toContainText normaliza los espacios (el duro incluido)
+        await expect(penaQ(page).locator('#pena-precio-ayuda')).toContainText('tiene 24.000,00 € exentos');
+      });
+      await paso('precio 0,25', async () => {
+        await escribirQ(page, precioQ(page), '0,25');
+        await expect(penaQ(page).locator('#pena-precio-ayuda')).toContainText('tiene 20.000,00 € exentos');
+      });
+      await paso('precio vacío: aviso del precio', async () => {
+        await escribirQ(page, precioQ(page), '');
+        await expect(avisoQ(page)).toHaveText('Indica lo que costó cada décimo o apuesta, mayor que 0 €.');
+        await expect(penaQ(page).locator('#pena-precio-ayuda')).not.toContainText('exentos');
+      });
+      await paso('precio 20', async () => { await escribirQ(page, precioQ(page), '20'); await expect(filas).toHaveCount(2); });
+      await paso('añadir persona con el resultado a la vista', async () => {
+        await penaQ(page).getByRole('button', { name: /Añadir persona/ }).click();
+        await expect(avisoQ(page)).toHaveText(`${AVISO_APORTACION} Revisa lo que pone Persona 3.`);
+      });
+      await paso('fila nueva', async () => { await escribirQ(page, poneQ(page, 2), '4'); await expect(filas).toHaveCount(3); });
+      await paso('suma 0', async () => {
+        for (let i = 0; i < 3; i++) await escribirQ(page, poneQ(page, i), '0');
+        await expect(avisoQ(page)).toHaveText('Indica lo que puso cada persona: ahora la peña suma 0 €.');
+      });
+      await paso('una negativa', async () => {
+        await escribirQ(page, poneQ(page, 1), '-1');
+        await expect(avisoQ(page)).toHaveText(`${AVISO_APORTACION} Revisa lo que pone Persona 2.`);
+      });
+      await paso('dos mal', async () => {
+        await escribirQ(page, poneQ(page, 2), 'x');
+        await expect(avisoQ(page)).toHaveText(`${AVISO_APORTACION} Revisa lo que pone Persona 2 y Persona 3.`);
+      });
+      await paso('una mal otra vez', async () => {
+        await escribirQ(page, poneQ(page, 2), '1');
+        await expect(avisoQ(page)).toHaveText(`${AVISO_APORTACION} Revisa lo que pone Persona 2.`);
+      });
+      await paso('nombre a la que está mal', async () => {
+        await escribirQ(page, nombreQ(page, 1), 'Bea');
+        await expect(avisoQ(page)).toHaveText(`${AVISO_APORTACION} Revisa lo que pone Bea.`);
+      });
+      await paso('arreglada', async () => { await escribirQ(page, poneQ(page, 1), '2'); await expect(filas).toHaveCount(3); });
+      await paso('hasta 20 décimos', async () => {
+        for (let i = 1; i < 20; i++) await anadirDecimoQ(page).click();
+        await expect(anadirDecimoQ(page)).toBeDisabled();
+        await escribirQ(page, premioQ(page, 19), '41.000');
+        await expect(penaQ(page).locator('[class*="penaResultado"] > p span')).toHaveCount(2);
+      });
+      await paso('quitar el 1.º de 20', async () => {
+        await penaQ(page).getByRole('button', { name: 'Quitar el premio 1', exact: true }).click();
+        await expect(anadirDecimoQ(page)).toBeEnabled();
+        await expect(filas).toHaveCount(3);
+        expect((await rotulosQ(page)).slice(0, 2)).toEqual(['Premio del décimo o apuesta 1 (€)', 'Premio del décimo o apuesta 2 (€)']);
+      });
+      expect(viejos).toEqual([]);
+      expect(errores).toEqual([]);
+    });
+  });
+
+  test.describe('tarjeta de compartir del pie (components/ShareCard.tsx)', () => {
+    test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+    /** Deja escrito algo en la peña y espera a la tarjeta: 10 s en la página y el final a la vista. */
+    async function abrirTarjeta(page: Page): Promise<Locator> {
+      await esperarInteractiva(page);
+      await esperarHidratacion(page, [`${SEL_Q} input`]);
+      await escribirQ(page, nombreQ(page, 0), 'Ana');
+      await escribirQ(page, premioQ(page), '125.000');
+      await page.waitForTimeout(10_500); // MIN_TIME_ON_PAGE_MS de ShareCard
+      const tarjeta = page.getByRole('complementary', { name: 'Compartir aplicación' });
+      await expect.poll(async () => {
+        await page.evaluate(() => {
+          window.scrollTo(0, document.documentElement.scrollHeight);
+          window.dispatchEvent(new Event('scroll'));
+        });
+        return tarjeta.count();
+      }, { timeout: 5_000 }).toBe(1);
+      return tarjeta;
+    }
+
+    test('sin traducir, «Copiar enlace» copia la dirección y lo confirma', async ({ page }) => {
+      test.setTimeout(45_000);
+      const tarjeta = await abrirTarjeta(page);
+      const copiar = tarjeta.getByRole('button', { name: 'Copiar enlace al portapapeles' });
+      await expect(copiar).toHaveText('🔗 Copiar enlace');
+      await copiar.click();
+      await expect(copiar).toHaveText('✓ ¡Copiado!');
+      await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toContain('/generador-loteria/?ref=share');
+      await expect(nombreQ(page, 0)).toHaveValue('Ana');
+    });
+
+    test('HALLAZGO 3314 (operativa, medio) · con la página traducida, «Copiar enlace» de la tarjeta de compartir no tumba la app', async ({ page }) => {
+      // components/ShareCard.tsx pinta el botón como {copiado ? '✓ ¡Copiado!' : <><span>🔗</span> Copiar enlace</>}:
+      // al copiar, React retira el texto « Copiar enlace», que el traductor ya cambió por <font>.
+      // Medido: NotFoundError en removeChild, la pantalla «Algo salió mal» y la peña escrita
+      // perdida, en escritorio y a 390×844. Sin traducir, el mismo flujo funciona (test anterior).
+      // Es la forma del cabo C0233 en un componente que monta TODO el catálogo.
+      test.fail();
+      test.setTimeout(45_000);
+      const errores = erroresQ(page);
+      const tarjeta = await abrirTarjeta(page);
+      await traducirQ(page);
+      const copiar = tarjeta.getByRole('button', { name: 'Copiar enlace al portapapeles' });
+      await copiar.click();
+      await expect(copiar).toHaveText('✓ ¡Copiado!');
+      await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+      await expect(nombreQ(page, 0)).toHaveValue('Ana');
+      expect(errores).toEqual([]);
     });
   });
 });

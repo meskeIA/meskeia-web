@@ -40,8 +40,9 @@ import { ORIGEN } from './_puerto';
  * HALLAZGOS: cada inspección los escribe con `test.fail()` —afirman lo que debería pasar y fallan
  * a propósito mientras el defecto siga— y al repararlos se quita esa línea y quedan como
  * regresión. Los del 20/08, el 22/09 y el 26/09/2026 están REPARADOS (la base no tenía ninguno
- * abierto el 12/10/2026); los únicos `test.fail()` vivos son los de las re-inspecciones del
- * 12/10/2026 (hallazgos 3227-3233) y del 14/10/2026, al final del fichero.
+ * abierto el 12/10/2026), y los del 14/10/2026 (3285-3287 y 3299-3302) y el 3233, REPARADOS el
+ * 14 y el 15/10/2026. A 15/10/2026 los únicos `test.fail()` vivos son los de la re-inspección del
+ * 12/10/2026 (hallazgos 3227-3232) y los de la del 15/10/2026, al final del fichero.
  */
 
 const RUTA = '/test-perfil-inversor/';
@@ -1187,8 +1188,9 @@ test.describe('re-inspección 26/09/2026 · móvil', () => {
 //
 // Los `test.fail` de este bloque son, en la base: C0158 → 3227 · flecha y etiquetas de la barra
 // → 3228 · «más objetiva» que el banco → 3229 · «cada cuánto revisar» → 3230 · FAQPage del
-// agresivo → 3231 · tabla comparativa → 3232 · doble toque → 3233. Abiertos el 14/10/2026; el
-// 3228 y el 3233 se siguen reproduciendo tras cd462414 (ver la re-inspección de esa fecha).
+// agresivo → 3231 · tabla comparativa → 3232 · doble toque → 3233. El 3233 se REPARÓ el 15/10/2026
+// (e903863e, con el 3299) y su caso es hoy regresión; 3227-3232 siguen abiertos y reproduciéndose
+// a 15/10/2026 (re-inspección de esa fecha, al final del fichero).
 // ============================================================
 
 /** Carga la app con el almacenamiento de sesión vacío y espera a que React haya hidratado. */
@@ -1997,13 +1999,15 @@ test.describe('re-inspección 14/10/2026 · móvil 360×740', () => {
 //   390×844, 412×915 y 740×360 (horizontal); «← Anterior» al pie, igual; y en 1280×800 la vista no
 //   se mueve (no hacía falta). Vecino nuevo, en el caso 2: el salto de «Completar las que faltan».
 //   3286 SE SOSTIENE en su caso (description y portada); su hermano en el featureList del JSON-LD
-//   («Recomendaciones orientativas según el perfil obtenido») queda abierto aparte, abajo.
+//   («Recomendaciones orientativas según el perfil obtenido») se abrió aparte (3300) y se REPARÓ el
+//   15/10/2026.
 //   3287 SE SOSTIENE: ni «§» ni notas internas en el texto visible ni en los JSON-LD.
 //
-// EFECTO DE 53b0bb48 SOBRE EL 3233 (abierto). Al recolocar la vista, lo que queda bajo el dedo tras
-// tocar «Siguiente» al pie es una opción de la pregunta nueva: a 360×740, con dos toques a 90 ms, el
-// segundo marcó C o D (3 o 4 puntos) en 9 de 9 transiciones (antes, en 2: la 1→2 y la 7→8). Su
-// test.fail del 12/10 sigue fallando, ahora por la opción marcada y no por «← Anterior».
+// EFECTO DE 53b0bb48 SOBRE EL 3233 (entonces abierto; REPARADO el 15/10/2026 con e903863e). Al
+// recolocar la vista, lo que queda bajo el dedo tras tocar «Siguiente» al pie es una opción de la
+// pregunta nueva: a 360×740, con dos toques a 90 ms, el segundo marcó C o D (3 o 4 puntos) en 9 de 9
+// transiciones (antes, en 2: la 1→2 y la 7→8). Su test.fail del 12/10 seguía fallando entonces, por
+// la opción marcada y no por «← Anterior»; hoy pasa como regresión.
 //
 // CABO C0247. El caso «firma» del bloque de escritorio de la mañana pasa aquí (next start, 3052).
 // Bajo `next dev` fallaba porque `page.route` no ve el WebSocket de HMR (ver el comentario dentro).
@@ -2372,5 +2376,420 @@ test.describe('re-inspección 14/10/2026 (tarde) · móvil 360×740', () => {
     await page.waitForTimeout(200);
     await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(0);
     await expect(botonSiguiente(page)).toBeDisabled();
+  });
+});
+
+// ============================================================
+// RE-INSPECCIÓN 15/10/2026 — tras 53b0bb48 y e903863e, con FIRMA DE ROTURA (nivel)
+//
+// LAS REPARACIONES. Se sostienen las siete (3285, 3286, 3287, 3299, 3300, 3301, 3302) y el 3233:
+//   3299 → dos clics en «Comenzar Test» a 250, 120 y 60 ms (1280×800 y 1366×768) y dos toques a 90,
+//          150 y 300 ms (360×740) y a 90 y 150 ms (390×844): «Pregunta 1 de 10» sin opción marcada,
+//          aunque bajo el puntero quede la A o la B.
+//   3233 → doble toque a 90 ms en «Siguiente» al pie, en las NUEVE transiciones, a 360×740, 375×667 y
+//          390×844: avanza una pregunta y no marca nada (bajo el dedo, C/D, «← Anterior» o nada).
+//   La guarda no se come lo legítimo: teclado (Enter y, sin pausa, Tab Tab Espacio) y un clic en
+//   OTRA opción a los 200 ms cuentan. Tras «Ver Resultado», «Revisar» y «Repetir» lo que queda bajo
+//   el puntero es texto, una opción o «Comenzar Test» (las dos últimas, con guarda) en 1280×800,
+//   1366×768, 1440×900, 1920×1080, 360×740, 390×844 y 412×915: ningún enlace del resultado.
+//   EL VECINO QUE NO CUBRE: «Empezar de cero», el único botón de la app sin la guarda y el único que
+//   BORRA. Y su aviso de test recuperado no se retira nunca (hallazgos 3310 y 3311, abajo).
+//
+// LA FIRMA (76,2 % cortas y 33,3 % recargas en los 30 días hasta el 14/10, casi todo antes de las dos
+// reparaciones; partida el 12/10: 0 recargas desde el 27/09). El testigo de red («firma», bloque de
+// escritorio del 14/10) sigue en 1 alta por carga. Lo que sí PIERDE trabajo a quien usa la app: el
+// resultado no sobrevive a «Atrás» desde «Simular esta Cartera» ni a un F5 (hallazgo 3313).
+//
+// LOS CASOS, resueltos a mano antes de abrir el navegador (A=1 · B=2 · C=3 · D=4; flecha =
+// i·20 + 2 + (p − mín)/(máx − mín)·16 con el tramo del perfil):
+//   normal  → B,D,C,B,C,C,D,B,C,D = 2+4+3+2+3+3+4+2+3+4 = 30 → Dinámico (29–34), sin aviso de borde,
+//             flecha 60 + 2 + 1/5·16 = 65,2 %, 70/20/5/5 (escritorio 1280×800)
+//   límite  → D×8 + A + A = 32 + 2 = 34, tope de Dinámico (flecha 78 %); «Revisar», la 10 de A a B = 35,
+//             suelo de Agresivo (flecha 82 %); aviso de borde en los dos (móvil 390×844, tocando)
+//   rechazo → dobles toques en «Revisar mis respuestas» y «Repetir Test» que NO deben tocar nada de lo
+//             que aparece debajo: todo B = 20 (Moderado, 17 + … → flecha 20 + 2 + 3/5·16 = 31,6 %), la
+//             10 sigue en B tras «Revisar» y «Repetir» acaba en la portada (móvil 360×740)
+//   horizonte → la 1 en A («Menos de 2 años») y las demás en D = 1 + 36 = 37 → Agresivo, «Horizonte
+//             ideal > 15 años»: lo que la propia guía (paso 3) manda a Conservador. HALLAZGO.
+// ============================================================
+
+const CLAVE_SESION_1510 = 'meskeia:test-perfil-inversor:v1';
+
+/** Siembra una sesión a medias DESPUÉS de que la app se asiente (si no, la reescribe al hidratar). */
+async function sembrarSesion1510(page: Page, sesion: { currentQuestion: number; answers: Record<number, number> }): Promise<void> {
+  await cargarSinSesion(page);
+  await page.evaluate(([k, v]) => sessionStorage.setItem(k, v), [CLAVE_SESION_1510, JSON.stringify(sesion)]);
+  await page.goto(RUTA);
+  await esperarPaginaAsentada(page);
+}
+
+/** Dónde quedará el centro de «Empezar de cero» cuando la vista vuelva al principio del cuestionario. */
+async function alturaDeEmpezarTrasRecolocar(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const destino = document.querySelector('[class*="destinoDeFase"]')!.getBoundingClientRect();
+    const margen = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    const boton = Array.from(document.querySelectorAll('button')).find((b) => /Empezar de cero/.test(b.textContent ?? ''))!;
+    const r = boton.getBoundingClientRect();
+    return r.top + r.height / 2 - destino.top + margen;
+  });
+}
+
+/** Desplaza la página hasta dejar el centro del control a la altura `y` y devuelve ese punto. */
+async function centroA(page: Page, loc: Locator, y: number): Promise<{ x: number; y: number }> {
+  await loc.evaluate((el, alto) => {
+    const r = el.getBoundingClientRect();
+    window.scrollBy(0, r.top + r.height / 2 - alto);
+  }, y);
+  await page.waitForTimeout(300);
+  const caja = await loc.boundingBox();
+  expect(caja).not.toBeNull();
+  return { x: caja!.x + caja!.width / 2, y: caja!.y + caja!.height / 2 };
+}
+
+test.describe('re-inspección 15/10/2026 · escritorio', () => {
+  test.use({
+    viewport: { width: 1280, height: 800 },
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36',
+  });
+  const puntuacion = (page: Page) => page.locator('p[class*="resultScore"]');
+  const avisoDeBorde = (page: Page) => page.locator('[class*="resultScoreBorde"]');
+  const marcadas = (page: Page) => page.locator('[class*="optionButton"][aria-pressed="true"]');
+
+  /** Como `responder`, pero con la pausa de quien lee: la guarda del 3299 absorbe lo de < 450 ms. */
+  async function responderLeyendo(page: Page, indices: number[]): Promise<void> {
+    for (const i of indices) {
+      await page.waitForTimeout(500);
+      await opcion(page, i).click();
+      await botonSiguiente(page).click();
+    }
+  }
+
+  test('caso normal: B,D,C,B,C,C,D,B,C,D suma 30 → Dinámico, sin aviso de borde, flecha 65,2 %', async ({ page }) => {
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responderLeyendo(page, [1, 3, 2, 1, 2, 2, 3, 1, 2, 3]); // 2+4+3+2+3+3+4+2+3+4 = 30
+    await expect(perfilMostrado(page)).toHaveText('Dinámico');
+    await expect(puntuacion(page)).toContainText('30 puntos · tramo 29–34');
+    await expect(avisoDeBorde(page)).toHaveCount(0); // ni 29 ni 34
+    // 3·20 + 2 + (30−29)/(34−29)·16 = 65,2 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(65.2, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(3);
+    // PROFILES.dinamico
+    await expect(rasgo(page, 0)).toHaveText('Alto');
+    await expect(rasgo(page, 1)).toHaveText('10-15 años');
+    await expect(rasgo(page, 2)).toHaveText('15-20 %');
+    await expect(rasgo(page, 3)).toHaveText('Maximizar crecimiento');
+    // PROFILES.dinamico.allocation = 70/20/5/5, con espacio duro antes del % (2180)
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (70 %)',
+      'Renta Fija (20 %)',
+      'Liquidez (5 %)',
+      'Alternativos (5 %)',
+    ]);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=dinamico',
+    );
+    await expect(page.getByRole('heading', { name: 'Tu perfil es:' })).toBeFocused();
+  });
+
+  test('REPARADO 3299 (rama nueva) — la guarda del doble clic no se come una activación legítima', async ({ page }) => {
+    // La guarda absorbe una SEGUNDA activación con puntero, en el mismo punto (≤ 12 px), sobre otro
+    // control, sin desplazamiento y en < 450 ms. Lo que no debe absorber:
+    // 1) Teclado: Enter en «Comenzar Test» y, sin pausa, Tab Tab Espacio → la B de la pregunta 1.
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).focus();
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Space');
+    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+    await expect(opcion(page, 1)).toHaveAttribute('aria-pressed', 'true');
+
+    // 2) Ratón: clic en «Comenzar Test» y, a los 200 ms, clic en la C (otro punto: > 100 px más abajo).
+    // La sesión a medias de arriba se retira AQUÍ, con la página asentada: si se deja a
+    // `cargarSinSesion`, la carga la recupera y el efecto que la guarda la reescribe tras el clear.
+    await page.evaluate(() => sessionStorage.clear());
+    await cargarSinSesion(page);
+    const comenzar = page.getByRole('button', { name: /Comenzar Test/ });
+    await comenzar.scrollIntoViewIfNeeded();
+    const c0 = await comenzar.boundingBox();
+    expect(c0).not.toBeNull();
+    await page.mouse.click(c0!.x + c0!.width / 2, c0!.y + c0!.height / 2);
+    await page.waitForTimeout(200);
+    const cC = await opcion(page, 2).boundingBox();
+    expect(cC).not.toBeNull();
+    expect(Math.abs(cC!.y + cC!.height / 2 - (c0!.y + c0!.height / 2))).toBeGreaterThan(12);
+    await page.mouse.click(cC!.x + cC!.width / 2, cC!.y + cC!.height / 2);
+    await expect(opcion(page, 2)).toHaveAttribute('aria-pressed', 'true');
+    await expect(marcadas(page)).toHaveCount(1);
+  });
+
+  test.fail('HALLAZGO 3312 — el resultado no da «Horizonte ideal > 15 años» a quien necesita el dinero en menos de 2 años', async ({
+    page,
+  }) => {
+    // La guía de la misma página, paso 3: «si necesitas el dinero en menos de 3 años → conservador
+    // […] El horizonte temporal es el factor más objetivo para definir tu perfil». Pero la puntuación
+    // es una suma sin topes: la 1 en A («Menos de 2 años - Necesitaré el dinero pronto», 1 punto) y las
+    // demás en D (9 × 4) = 37 → Agresivo, 90 % renta variable, «Horizonte ideal > 15 años» y «Tienes
+    // experiencia, horizonte muy largo…». Con la 3 en A («Ninguna - Soy completamente nuevo/a») y las
+    // demás en D, también 37 y el mismo «Tienes experiencia […] Perfil para inversores experimentados».
+    // Esperado: un resultado que no contradiga la respuesta (el horizonte del perfil cabe en «menos de
+    // 2 años», o el resultado avisa de que lo dicho en la 1 choca con él), y una descripción que no
+    // afirme una experiencia que la persona acaba de negar.
+    test.setTimeout(60_000);
+    const problemas: string[] = [];
+
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responderLeyendo(page, [0, 3, 3, 3, 3, 3, 3, 3, 3, 3]); // 1 + 9·4 = 37
+    await expect(puntuacion(page)).toContainText('37 puntos · tramo 35–40');
+    const horizonte = (await rasgo(page, 1).textContent()) ?? '';
+    const pantalla = await page.locator('[class*="resultScreen"]').innerText();
+    if (horizonte !== '< 3 años' && !/menos de 2 años/i.test(pantalla)) {
+      problemas.push(`la 1 en «Menos de 2 años» → ${await perfilMostrado(page).textContent()}, «Horizonte ideal ${horizonte}», sin aviso`);
+    }
+
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responderLeyendo(page, [3, 3, 0, 3, 3, 3, 3, 3, 3, 3]); // 4 + 4 + 1 + 7·4 = 37
+    await expect(puntuacion(page)).toContainText('37 puntos');
+    const descripcion = (await page.locator('[class*="profileDescription"] p').first().textContent()) ?? '';
+    if (/Tienes experiencia|inversores experimentados/.test(descripcion)) {
+      problemas.push(`la 3 en «Ninguna» → «${descripcion}»`);
+    }
+    expect(problemas).toEqual([]);
+  });
+
+  test.fail('HALLAZGO 3313 — el resultado sobrevive a «Atrás» desde «Simular esta Cartera» y a un F5', async ({ page }) => {
+    // Al pulsar «Ver Resultado» la app borra la sesión (olvidarSesion), así que el resultado solo vive
+    // en el estado de React. «Simular esta Cartera» —el botón principal del resultado— navega al
+    // estimador; al volver con «Atrás», la página se monta de nuevo en la PORTADA, sin respuestas, y
+    // hay que repetir las diez preguntas. Igual con «Estimador de Inversiones» y con un F5.
+    // Esperado: volver al resultado (o al menos al perfil obtenido) · obtenido: «Comenzar Test».
+    test.setTimeout(60_000);
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await responderLeyendo(page, [3, 3, 2, 3, 3, 2, 3, 3, 2, 3]); // 4·7 + 3·3 = 37 → Agresivo
+    await expect(perfilMostrado(page)).toHaveText('Agresivo');
+    await page.getByRole('link', { name: /Simular esta Cartera/ }).click();
+    await page.waitForURL(/\/estimador-cartera-inversion\/\?perfil=agresivo/);
+    await esperarPaginaAsentada(page);
+    await page.goBack();
+    await page.waitForURL(/\/test-perfil-inversor\/$/);
+    await esperarPaginaAsentada(page);
+    const trasAtras = (await perfilMostrado(page).count())
+      ? `resultado ${await perfilMostrado(page).textContent()}`
+      : (await page.getByRole('button', { name: /Comenzar Test/ }).count())
+        ? 'portada'
+        : 'otra cosa';
+    expect(trasAtras).toBe('resultado Agresivo');
+
+    await page.reload();
+    await esperarPaginaAsentada(page);
+    await expect(perfilMostrado(page)).toHaveText('Agresivo');
+  });
+});
+
+// ---------- CASO 2 (límite), móvil 390×844 tocando ----------
+test.describe('re-inspección 15/10/2026 · móvil 390×844', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: UA_MOVIL_1410,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso límite tocando: D×8 + A + A = 34 es el tope de Dinámico y, revisando la 10 de A a B, 35 ya es Agresivo', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await tocarRespuestas(page, [3, 3, 3, 3, 3, 3, 3, 3, 0, 0]); // 4·8 + 1 + 1 = 34
+    await expect(perfilMostrado(page)).toHaveText('Dinámico');
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('34 puntos · tramo 29–34');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(1); // 34 = range[1] y 34 < 40
+    // 3·20 + 2 + (34−29)/(34−29)·16 = 78 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(78, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(3);
+
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).tap();
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toContainText('Prefiero ganar poco');
+    await page.waitForTimeout(500);
+    await opcion(page, 1).tap(); // A → B: +1
+    await botonSiguiente(page).tap();
+    await expect(perfilMostrado(page)).toHaveText('Agresivo');
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('35 puntos · tramo 35–40');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(1); // 35 = range[0] y 35 > 10
+    // 4·20 + 2 + (35−35)/(40−35)·16 = 82 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(82, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(4);
+    // PROFILES.agresivo
+    await expect(rasgo(page, 1)).toHaveText('> 15 años');
+    // PROFILES.agresivo.allocation = 90/5/0/5, con espacio duro antes del % (2180)
+    expect(await reparto(page)).toEqual([
+      'Renta Variable (90 %)',
+      'Renta Fija (5 %)',
+      'Liquidez (0 %)',
+      'Alternativos (5 %)',
+    ]);
+    await page.getByRole('link', { name: /Simular esta Cartera/ }).tap();
+    await page.waitForURL(/\/estimador-cartera-inversion\/\?perfil=agresivo/);
+  });
+});
+
+// ---------- CASO 3 (rechazo) y los vecinos de la guarda, móvil 360×740 ----------
+test.describe('re-inspección 15/10/2026 · móvil 360×740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: UA_MOVIL_1410,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const marcadas = (page: Page) => page.locator('[class*="optionButton"][aria-pressed="true"]');
+  const aviso = (page: Page) => page.locator('[class*="avisoRecuperado"]');
+
+  test('caso a rechazar tocando: dobles toques en «Revisar mis respuestas» y «Repetir Test» no tocan lo que aparece debajo', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await tocarRespuestas(page, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]); // 10 × 2 = 20
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('20 puntos · tramo 17–22');
+    // 1·20 + 2 + (20−17)/(22−17)·16 = 31,6 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(31.6, 1);
+
+    // «Revisar» a media pantalla y abajo: tras el primer toque, bajo el dedo queda una opción de la 10
+    for (const alto of [370, 629]) {
+      const p = await centroA(page, page.getByRole('button', { name: /Revisar mis respuestas/ }), alto);
+      await page.touchscreen.tap(p.x, p.y);
+      await page.waitForTimeout(90);
+      await page.touchscreen.tap(p.x, p.y);
+      await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+      await page.waitForTimeout(300);
+      await expect(marcadas(page), `doble toque en «Revisar» a ${alto} px`).toHaveCount(1);
+      await expect(marcadas(page)).toContainText('Acepto algo de riesgo'); // la B de la 10, intacta
+      await page.waitForTimeout(500);
+      await botonSiguiente(page).tap(); // «Ver Resultado»
+      await expect(perfilMostrado(page)).toHaveText('Moderado');
+    }
+
+    // «Repetir Test» abajo: tras el primer toque, bajo el dedo queda «Comenzar Test» (con guarda)
+    const p = await centroA(page, page.getByRole('button', { name: /Repetir Test/ }), 629);
+    await page.touchscreen.tap(p.x, p.y);
+    await page.waitForTimeout(90);
+    await page.touchscreen.tap(p.x, p.y);
+    await page.waitForTimeout(400);
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeVisible();
+    await expect(enunciado(page)).toHaveCount(0);
+  });
+
+  test('REPARADO 3233 (vecinos) — el doble toque en «Siguiente» al pie no toca nada en ninguna de las nueve transiciones', async ({
+    page,
+  }) => {
+    // El testigo del 12/10 solo mira la 1→2. Tras 53b0bb48 el segundo toque marcaba C o D en 9 de 9.
+    test.setTimeout(90_000);
+    await cargarSinSesion(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    const fallos: string[] = [];
+    for (let n = 1; n <= 9; n++) {
+      await page.waitForTimeout(500);
+      await opcion(page, 1).tap();
+      const sig = botonSiguiente(page);
+      await sig.evaluate((el) => window.scrollBy(0, el.getBoundingClientRect().bottom - (window.innerHeight - 24)));
+      await page.waitForTimeout(200);
+      const caja = await sig.boundingBox();
+      expect(caja).not.toBeNull();
+      const x = caja!.x + caja!.width / 2;
+      const y = caja!.y + caja!.height / 2;
+      await page.touchscreen.tap(x, y);
+      await page.waitForTimeout(90);
+      await page.touchscreen.tap(x, y);
+      await page.waitForTimeout(350);
+      const progreso = await page.locator('[class*="progressText"]').textContent();
+      const n2 = await marcadas(page).count();
+      if (progreso !== `Pregunta ${n + 1} de 10` || n2 !== 0) fallos.push(`${n}→${n + 1}: «${progreso}», ${n2} marcada(s)`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  test.fail('HALLAZGO 3310 — un doble toque cuya segunda mitad cae en «Empezar de cero» no borra el test', async ({
+    page,
+  }) => {
+    // «Empezar de cero» (aviso de test recuperado) es el único botón de la app que no pasa por la
+    // guarda de e903863e, y es el único que BORRA: handleRestart vacía las respuestas y la sesión.
+    // Con la vista recolocada al principio del cuestionario (3285 al cambiar de pregunta; 2177 al
+    // volver con «Revisar»), queda a ~255 px de la ventana a 360×740.
+    test.setTimeout(90_000);
+    const problemas: string[] = [];
+
+    // 1) Test a medias recuperado (B en la 1, C en la 2); B en la 3 y «Siguiente» tocado a esa altura.
+    await sembrarSesion1510(page, { currentQuestion: 2, answers: { 1: 2, 2: 3 } });
+    await expect(aviso(page)).toContainText('con 2 de 10 respuestas');
+    await page.waitForTimeout(500);
+    await opcion(page, 1).tap();
+    const yEmpezar = await alturaDeEmpezarTrasRecolocar(page);
+    const s = await centroA(page, botonSiguiente(page), yEmpezar);
+    await page.touchscreen.tap(s.x, s.y);
+    await page.waitForTimeout(90);
+    await page.touchscreen.tap(s.x, s.y);
+    await page.waitForTimeout(500);
+    if (await page.getByRole('button', { name: /Comenzar Test/ }).count()) {
+      problemas.push(`doble toque en «Siguiente» a ${Math.round(s.y)} px → portada, sesión ${await page.evaluate((k) => sessionStorage.getItem(k), CLAVE_SESION_1510)}`);
+    }
+
+    // 2) Test recuperado y TERMINADO (C en las diez = 30): «Revisar» tocado a la altura del botón.
+    await sembrarSesion1510(page, { currentQuestion: 9, answers: { 1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3 } });
+    await opcion(page, 2).tap();
+    await page.waitForTimeout(500);
+    await botonSiguiente(page).tap(); // «Ver Resultado»
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('30 puntos');
+    await page.waitForTimeout(500);
+    const r = await centroA(page, page.getByRole('button', { name: /Revisar mis respuestas/ }), yEmpezar);
+    await page.touchscreen.tap(r.x, r.y);
+    await page.waitForTimeout(90);
+    await page.touchscreen.tap(r.x, r.y);
+    await page.waitForTimeout(500);
+    if (await page.getByRole('button', { name: /Comenzar Test/ }).count()) {
+      problemas.push(`doble toque en «Revisar mis respuestas» a ${Math.round(r.y)} px → portada con las 10 respuestas borradas`);
+    }
+    expect(problemas).toEqual([]);
+  });
+
+  test.fail('HALLAZGO 3311 — el aviso de test recuperado no cuenta las respuestas nuevas ni sigue tras terminar', async ({
+    page,
+  }) => {
+    // El aviso dice lo que se RECUPERÓ («con 2 de 10 respuestas»), pero su cifra es
+    // Object.keys(answers).length, que sube con cada respuesta nueva, y `sesionRecuperada` solo se
+    // apaga con «Comenzar» o «Repetir»: sigue en la pregunta 10 tras «Ver Resultado» → «Revisar»,
+    // diciendo «Hemos recuperado el test que dejaste a medias en esta pestaña, con 10 de 10
+    // respuestas». Va en role="status": un lector de pantalla lo vuelve a leer con cada respuesta
+    // nueva (8 veces de la 3 a la 10).
+    test.setTimeout(90_000);
+    const problemas: string[] = [];
+    await sembrarSesion1510(page, { currentQuestion: 2, answers: { 1: 2, 2: 3 } });
+    await expect(aviso(page)).toContainText('con 2 de 10 respuestas');
+    await page.waitForTimeout(500);
+    await opcion(page, 2).tap(); // C en la 3
+    await page.waitForTimeout(200);
+    const trasLa3 = (await aviso(page).count()) ? sinEspacios(await aviso(page).innerText()) : '';
+    if (/con 3 de 10/.test(trasLa3)) problemas.push(`tras contestar la 3: «${trasLa3}»`);
+    await botonSiguiente(page).tap();
+    await tocarRespuestas(page, [2, 2, 2, 2, 2, 2, 2]); // 4 a 10 en C: 2 + 3 + 8·3 = 29
+    await expect(page.locator('p[class*="resultScore"]')).toContainText('29 puntos');
+    await page.waitForTimeout(500);
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).tap();
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    if (await aviso(page).count()) {
+      problemas.push(`tras terminar y «Revisar»: «${sinEspacios(await aviso(page).innerText())}»`);
+    }
+    expect(problemas).toEqual([]);
   });
 });

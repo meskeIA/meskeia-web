@@ -30,6 +30,8 @@ import { esperarHidratacion } from './_hidratacion';
  *
  * La re-inspección del 14/10/2026 (zoom pedido a la cámara, e9435294) va al final, con una cámara
  * simulada que expone zoom por cámara y recuerda el que ha aplicado: se mide el aumento que se VE.
+ * La del 15/10/2026 (tras f3e9c635) añade, también al final, el reparto con rangos raros, la imagen
+ * congelada con la cámara haciendo todo el zoom y tres hallazgos nuevos con `test.fail()`.
  */
 
 test.use({
@@ -1458,17 +1460,18 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
     await expect(nota).toHaveText(/^Los 1,5x los hace la propia cámara/);
   });
 
-  // ⚠️ HALLAZGO NUEVO — operativa (14/10/2026, tarde). La rama nueva de bcba03bb (reparación de
-  // 3291): si la cámara no vuelve a 1, el rango se fija en el zoom en que se quedó ({2..2}). Con
-  // el usuario por DEBAJO de ese zoom, repartirZoom da pantalla < 1 (a 1x, 1 / 2 = 0,5: el vídeo a
-  // la mitad del visor, con borde negro) y la nota cae en la rama «pantalla < 1,05»: «Los 2x los
-  // hace la propia cámara…» con el indicador en 1x. Es el mismo síntoma que la ficha de 3290
-  // describía para un mínimo de 2, reintroducido por otra vía. Lo que se ve sí es 1x (2 × 0,5).
+  // ✓ HALLAZGO 3304 REPARADO (f3e9c635, 15/10/2026) — operativa (14/10/2026, tarde). La rama nueva
+  // de bcba03bb (reparación de 3291): si la cámara no vuelve a 1, el rango se fija en el zoom en que
+  // se quedó ({2..2}). Con el usuario por DEBAJO de ese zoom, repartirZoom daba pantalla < 1 (a 1x,
+  // 1 / 2 = 0,5: el vídeo a la mitad del visor, con borde negro) y la nota caía en la rama
+  // «pantalla < 1,05»: «Los 2x los hace la propia cámara…» con el indicador en 1x. Era el mismo
+  // síntoma que la ficha de 3290 describía para un mínimo de 2, reintroducido por otra vía.
   // Caso: cámara {1..3} que acepta 2x y luego lo rechaza todo; 3x y después 1x → esperado: la nota
-  //       no atribuye a la cámara más aumento del que marca el indicador · obtenido «Los 2x los
-  //       hace la propia cámara, sobre la imagen completa del sensor…» con el indicador en «1x».
-  // REPARADO (15/10/2026): con la pantalla por debajo de 1 la nota tiene su propia frase, que dice
-  // dónde se ha quedado la cámara y que la imagen se reduce en pantalla.
+  //       no atribuye a la cámara más aumento del que marca el indicador · obtenido entonces «Los 2x
+  //       los hace la propia cámara, sobre la imagen completa del sensor…» con el indicador en «1x».
+  // Reparado con una frase propia para la pantalla por debajo de 0,95, que dice dónde se ha quedado
+  // la cámara y que la imagen se reduce. La re-inspección del 15/10/2026 confirma que se sostiene;
+  // la franja de 0,95 a 1 quedó fuera (HALLAZGO de esa re-inspección, al final del fichero).
   test('REPARADO 3304 (operativa) — con la cámara clavada en 2x, a 1x la nota no debe decir que «Los 2x los hace la propia cámara»', async ({
     page,
   }) => {
@@ -1502,17 +1505,17 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
     await expect(nota).toHaveText(/^Los 2x los hace la propia cámara/);
   });
 
-  // ⚠️ HALLAZGO 3306, vecino del 3290 (cuyo caso, 100-500, sí se sostiene) — operativa (14/10/2026,
-  // tarde). bcba03bb descarta un rango con mínimo por encima de 1 (zoom.ts: «Un mínimo por
-  // encima de 1 no cabe en un aumento»), pero no
-  // uno que empieza en 0, que tampoco cabe (0 no es un aumento: la app nunca pide menos de 1) y es
-  // la otra forma de dar el zoom en unidades propias (0-10, por ejemplo). Se trata como aumentos:
-  // a 2x pide zoom 2 a la cámara, no amplía nada en pantalla y la nota dice «Los 2x los hace la
-  // propia cámara»; a 1x pide 1, un paso por encima del suelo de esa cámara.
+  // ✓ HALLAZGO 3306 REPARADO (f3e9c635, 15/10/2026), vecino del 3290 — operativa (14/10/2026,
+  // tarde). bcba03bb descartaba un rango con mínimo por encima de 1 (zoom.ts: «Un mínimo por
+  // encima de 1 no cabe en un aumento»), pero no uno que empieza en 0, que tampoco cabe (0 no es un
+  // aumento: la app nunca pide menos de 1) y es la otra forma de dar el zoom en unidades propias
+  // (0-10, por ejemplo). Se trataba como aumentos: a 2x pedía zoom 2 a la cámara, no ampliaba nada
+  // en pantalla y la nota decía «Los 2x los hace la propia cámara»; a 1x pedía 1.
   // Caso: cámara {0..10, paso 1}, activar (2x) → esperado, como con 100-500: nada pedido a la
-  //       cámara, vídeo a scale(2) y sin nota · obtenido applyConstraints({zoom: 2}), scale(1) y
-  //       «Los 2x los hace la propia cámara…».
-  // REPARADO (15/10/2026): leerRangoZoom descarta también un mínimo ≤ 0; el 0,5 sigue valiendo.
+  //       cámara, vídeo a scale(2) y sin nota · obtenido entonces applyConstraints({zoom: 2}),
+  //       scale(1) y «Los 2x los hace la propia cámara…».
+  // Reparado: leerRangoZoom descarta también un mínimo ≤ 0; el 0,5 sigue valiendo. Re-inspección del
+  // 15/10/2026: se sostiene (también a 1x y 5x, CASO 12).
   test('REPARADO 3306 (operativa, vecino del 3290) — una cámara que da el zoom en unidades propias desde 0 (0-10) tampoco debe tratarse como aumentos', async ({
     page,
   }) => {
@@ -1529,16 +1532,18 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
     await expect(page.locator('[class*=zoomNota]')).toHaveCount(0);
   });
 
-  // ⚠️ HALLAZGO NUEVO — accesibilidad (14/10/2026, tarde). Dos botones de ESTADO pintan texto
-  // blanco sobre un color escrito a mano en LupaDigital.module.css, sin variante oscura:
-  // «⏹️ Detener» (.btnPrincipal.activo, #EF4444; 19,2 px con peso 600, que no es negrita para
-  // WCAG/axe —700—, así que exige 4,5:1) da 3,76:1, y «🔦 Linterna ON» (.linternaActiva,
-  // #F59E0B; 16 px) da 2,15:1, por debajo incluso del 3:1 del texto grande. Fuera del 3274 (que
-  // recoge texto EN color de marca) y de la campaña C0070 (blanco sobre la marca): rojo y ámbar.
+  // ✓ HALLAZGO 3305 REPARADO (f3e9c635, 15/10/2026) — accesibilidad (14/10/2026, tarde). Dos botones
+  // de ESTADO pintaban texto blanco sobre un color escrito a mano en LupaDigital.module.css, sin
+  // variante oscura: «⏹️ Detener» (.btnPrincipal.activo, #EF4444; 19,2 px con peso 600, que no es
+  // negrita para WCAG/axe —700—, así que exige 4,5:1) daba 3,76:1, y «🔦 Linterna ON»
+  // (.linternaActiva, #F59E0B; 16 px) 2,15:1. Fuera del 3274 (texto EN color de marca) y de la
+  // campaña C0070 (blanco sobre la marca): rojo y ámbar.
   // Caso: activar, encender la linterna (cámara con torch simulada) y medir en los dos temas →
-  //       esperado ≥ 4,5:1 · obtenido 3,76:1 y 2,15:1 en claro y en oscuro.
-  // REPARADO (15/10/2026): «Detener» sobre #B91C1C (6,47:1) y «Linterna ON» con texto #1F2937 sobre
-  // el mismo ámbar (7,0:1), fijos en los dos temas.
+  //       esperado ≥ 4,5:1 · obtenido entonces 3,76:1 y 2,15:1 en claro y en oscuro.
+  // Reparado: «Detener» sobre #B91C1C y «Linterna ON» con texto #1F2937 sobre el mismo ámbar. Medido
+  // en la re-inspección del 15/10/2026 sobre el fondo compuesto, en Pixel 7: 6,47:1 y 6,83:1, iguales
+  // en claro y en oscuro. El mismo #EF4444 sigue como TEXTO en «Restablecer ajustes» al tocarlo
+  // (HALLAZGO de esa re-inspección, al final del fichero).
   test('REPARADO 3305 (accesibilidad) — «Detener» y «Linterna ON» deben llegar a 4,5:1 en los dos temas', async ({
     page,
   }) => {
@@ -1591,5 +1596,272 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
     }
     // DEBERÍA: ninguno por debajo de 4,5:1.
     expect(bajoMinimo).toEqual([]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN (Inspector, 15/10/2026) — tras f3e9c635 (hallazgos 3304, 3305 y 3306)
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Mismo simulador de cámara por pista que los bloques del 14/10. Los valores esperados salen de
+ * repartirZoom() y leerRangoZoom() (app/lupa-digital/zoom.ts), calculados a mano antes de ejecutar:
+ *   leerRangoZoom: null si máx ≤ max(1, mín), si mín > 1 (3290) o si mín ≤ 0 (3306);
+ *   cámara = min(max(zoom, max(1, mín)), máx), redondeada HACIA ABAJO a su paso (con 1e-9);
+ *   pantalla = zoom / cámara, a milésimas. Imagen congelada: escala = zoom / cámara al congelar,
+ *   y su recorrido máximo, ancho del visor × (escala − 1) / 2.
+ */
+test.describe('re-inspección 15/10/2026', () => {
+  test.describe('en móvil (Pixel 7)', () => {
+    // Opciones enumeradas: `...devices['Pixel 7']` arrastra `defaultBrowserType` y fuerza un
+    // worker nuevo, que Playwright no admite dentro de un describe.
+    const P7 = devices['Pixel 7'];
+    test.use({
+      viewport: P7.viewport,
+      userAgent: P7.userAgent,
+      deviceScaleFactor: P7.deviceScaleFactor,
+      isMobile: P7.isMobile,
+      hasTouch: P7.hasTouch,
+    });
+
+    test('CASO 11 — cámara de 1-10× a 4x: la cámara hace los 4x y el vídeo cubre el visor justo; congelada no se recorre (escala 1) y a 5x se recorre 49 px; al reanudar la cámara hace los 5x', async ({
+      page,
+    }) => {
+      await simularCamaraPorPista(page, { trasera: { min: 1, max: 10, step: 0.1 }, frontal: null });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      const video = page.locator('video');
+      const lienzo = page.locator('canvas');
+      const nota = page.locator('[class*=zoomNota]');
+
+      // 4x: cámara min(max(4, 1), 10) = 4 (40 pasos de 0,1); pantalla 4 / 4 = 1. El vídeo mide lo
+      // mismo que el visor del Pixel 7 (412 − 2 × 10 de padding = 392, en 4:3 → 294).
+      await page.getByRole('button', { name: '4x', exact: true }).click();
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 4, pantalla: 1, total: 4 });
+      expect(await cajas(page)).toMatchObject({ visor: { ancho: 392, alto: 294 } });
+      await expect
+        .poll(() => video.evaluate((v) => `${Math.round(v.getBoundingClientRect().width)}×${Math.round(v.getBoundingClientRect().height)}`))
+        .toBe('392×294');
+      await expect(nota).toHaveText(
+        'Los 4x los hace la propia cámara, sobre la imagen completa del sensor: se pierde menos nitidez que ampliando en pantalla.',
+      );
+
+      // Congelada a 4x con los 4x hechos por la cámara: escala 4 / 4 = 1 y recorrido 392 × 0 / 2 = 0.
+      await page.getByRole('button', { name: /Congelar/i }).click();
+      await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(1\)/);
+      await deslizarDesdeElVisor(page, -3000, 0);
+      await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(1\)/);
+
+      // Congelada, 5x: escala 5 / 4 = 1,25 y a la cámara no se le pide nada (siguen [2, 4]);
+      // recorrido 392 × 0,25 / 2 = 49 px.
+      await page.getByRole('button', { name: '5x', exact: true }).click();
+      await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(1\.25\)/);
+      expect((await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 4]);
+      await deslizarDesdeElVisor(page, -3000, 0);
+      await expect(lienzo).toHaveAttribute('style', /translate\(-49px, 0px\) scale\(1\.25\)/);
+
+      // Reanudar: se pide 5 a la cámara y la pantalla vuelve a 1.
+      await page.getByRole('button', { name: /Reanudar/i }).click();
+      await esperarCamaraEnMarcha(page);
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 5, pantalla: 1, total: 5 });
+      expect((await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 4, 5]);
+      await expect(nota).toHaveText(/^Los 5x los hace la propia cámara/);
+    });
+
+    // ⚠️ HALLAZGO 3316 (15/10/2026) — accesibilidad. La reparación del 3305 cambió el #EF4444
+    // del fondo de «Detener», pero el mismo rojo sigue como COLOR DE TEXTO en
+    // `.btnReset:hover` (LupaDigital.module.css), sin variante oscura. En un móvil el :hover se
+    // queda pegado tras el toque, así que después de pulsar «Restablecer ajustes» su rótulo
+    // (15,2 px, peso 600: texto normal, exige 4,5:1) queda en rojo hasta que se toca otra cosa.
+    // Caso: Pixel 7, tocar «Restablecer ajustes» y medir sobre el fondo compuesto, en claro y en
+    //       oscuro → esperado ≥ 4,5:1 · obtenido 3,76:1 (sobre #FFFFFF) y 3,66:1 (sobre #2D2D2D).
+    test('HALLAZGO 3316 — tras tocar «Restablecer ajustes» su rótulo se queda en el rojo #EF4444 y no llega a 4,5:1', async ({
+      page,
+    }) => {
+      test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      const boton = page.locator('[class*=btnReset]');
+      const bajoMinimo: string[] = [];
+      for (const tema of ['claro', 'oscuro']) {
+        if (tema === 'oscuro') {
+          await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+          await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+        }
+        await boton.tap();
+        // El toque deja el botón en :hover (lo que pinta el rojo); sin eso no se mide lo que se ve.
+        await expect.poll(() => boton.evaluate((b) => b.matches(':hover'))).toBe(true);
+        let previo = -1;
+        let ratio = -1;
+        await expect
+          .poll(
+            async () => {
+              const medida = await contrasteDe(page, '[class*=btnReset]');
+              const enTema = tema === 'claro' ? medida.luzFondo > 0.7 : medida.luzFondo >= 0 && medida.luzFondo < 0.06;
+              const quieto = medida.ratio > 0 && medida.ratio === previo;
+              previo = ratio = medida.ratio;
+              return enTema && quieto;
+            },
+            { intervals: [150], message: `«Restablecer ajustes» tocado, con el fondo del tema ${tema}` },
+          )
+          .toBe(true);
+        if (ratio < 4.5) bajoMinimo.push(`${tema} ${ratio}:1`);
+      }
+      // DEBERÍA: ninguno por debajo de 4,5:1.
+      expect(bajoMinimo).toEqual([]);
+    });
+  });
+
+  test('CASO 12 — rangos raros: mín 0 y mín > 1 no se tratan como aumentos; mín 1 con paso 1 a 1,5x deja la cámara en 1; máx < pedido y paso 0,3 redondean hacia abajo; sin paso, la cámara hace el zoom exacto', async ({
+    page,
+  }) => {
+    await simularCamaraPorPista(page, { trasera: { min: 0, max: 10, step: 1 }, frontal: null });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    const activar = page.getByRole('button', { name: /Activar lupa/i });
+    const detener = page.getByRole('button', { name: /Detener/i });
+    const video = page.locator('video');
+    const nota = page.locator('[class*=zoomNota]');
+    const pedidosDe = async (pista: number) =>
+      (await zoomPedidoPorPista(page)).filter((p) => p.pista === pista).map((p) => p.zoom);
+
+    // Pista 0 · {0..10, paso 1}, 2x: mín ≤ 0 → sin rango (3306). Nada a la cámara, scale(2), sin nota.
+    await activar.click();
+    await esperarCamaraEnMarcha(page);
+    await expect(video).toHaveAttribute('style', /transform: scale\(2\)/);
+    await page.getByRole('button', { name: '5x', exact: true }).click();
+    await expect(video).toHaveAttribute('style', /transform: scale\(5\)/);
+    expect(await pedidosDe(0)).toEqual([]);
+    await expect(nota).toHaveCount(0);
+
+    // Pista 1 · {1..10, paso 1}, 1,5x: cámara min(1,5; 10) = 1,5 → 1 paso de 1 = 1; pantalla 1,5.
+    // Como la cámara queda en 1, la nota ofrece su zoom «al subir».
+    await detener.click();
+    await cambiarCamaraSimulada(page, { trasera: { min: 1, max: 10, step: 1 }, frontal: null });
+    await page.getByRole('button', { name: '1,5x', exact: true }).click();
+    await activar.click();
+    await esperarCamaraEnMarcha(page);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 1, pantalla: 1.5, total: 1.5 });
+    expect(await pedidosDe(1)).toEqual([1]);
+    await expect(nota).toHaveText(/^Esta cámara puede ampliar por sí misma hasta 5x/);
+
+    // Pista 2 · {2..6, paso 0,1}, 1x: mín > 1 → sin rango (3290). Nada a la cámara, scale(1), sin nota.
+    await detener.click();
+    await cambiarCamaraSimulada(page, { trasera: { min: 2, max: 6, step: 0.1 }, frontal: null });
+    await page.getByRole('button', { name: '1x', exact: true }).click();
+    await activar.click();
+    await esperarCamaraEnMarcha(page);
+    await expect(video).toHaveAttribute('style', /transform: scale\(1\)/);
+    expect(await pedidosDe(2)).toEqual([]);
+    await expect(nota).toHaveCount(0);
+
+    // Pista 3 · {1..2,5, paso 0,2}, 5x: cámara min(5; 2,5) = 2,5 → 12,5 pasos → 12 = 2,4;
+    // pantalla 5 / 2,4 = 2,083 (la nota lo redondea a 2,1).
+    await detener.click();
+    await cambiarCamaraSimulada(page, { trasera: { min: 1, max: 2.5, step: 0.2 }, frontal: null });
+    await page.getByRole('button', { name: '5x', exact: true }).click();
+    await activar.click();
+    await esperarCamaraEnMarcha(page);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2.4, pantalla: 2.083 });
+    await expect(nota).toHaveText('La cámara hace 2,4x y el resto (2,1x) se amplía en pantalla.');
+
+    // Pista 4 · {1..10, paso 0,3}: 2x → 2 / 0,3 = 6,67 → 6 pasos = 1,8; pantalla 2 / 1,8 = 1,111.
+    // 4x → 13,33 → 13 pasos = 3,9; pantalla 4 / 3,9 = 1,026 (por debajo de 1,05: nota de «la cámara»).
+    await detener.click();
+    await cambiarCamaraSimulada(page, { trasera: { min: 1, max: 10, step: 0.3 }, frontal: null });
+    await page.getByRole('button', { name: '2x', exact: true }).click();
+    await activar.click();
+    await esperarCamaraEnMarcha(page);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 1.8, pantalla: 1.111 });
+    await expect(nota).toHaveText('La cámara hace 1,8x y el resto (1,1x) se amplía en pantalla.');
+    await page.getByRole('button', { name: '4x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 3.9, pantalla: 1.026 });
+    await expect(nota).toHaveText(/^Los 3,9x los hace la propia cámara/);
+    expect(await pedidosDe(4)).toEqual([1.8, 3.9]);
+
+    // Pista 5 · {1..10} sin paso (0 = sin redondeo), 1,5x: la cámara hace 1,5 exacto y la pantalla 1.
+    await detener.click();
+    await cambiarCamaraSimulada(page, { trasera: { min: 1, max: 10, step: 0 }, frontal: null });
+    await page.getByRole('button', { name: '1,5x', exact: true }).click();
+    await activar.click();
+    await esperarCamaraEnMarcha(page);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 1.5, pantalla: 1, total: 1.5 });
+    await expect(nota).toHaveText(/^Los 1,5x los hace la propia cámara/);
+  });
+
+  // ⚠️ HALLAZGO 3315 (15/10/2026) — operativa, vecino del 3304 que su reparación (f3e9c635)
+  // no cubrió. La frase nueva («La cámara se ha quedado en Nx y no deja bajar de ahí…») solo sale
+  // con la pantalla por debajo de 0,95; entre 0,95 y 1 la nota sigue cayendo en la rama
+  // «pantalla < 1,05» y dice «Los 2,1x los hace la propia cámara…» con el indicador en 2x, y el
+  // vídeo se reduce (scale(0,952): 628 × 471 en un visor de 660 × 495, 16 px de borde negro por
+  // lado). Pasa con la cámara clavada en cualquier zoom entre z y z / 0,95 por encima del elegido:
+  // medido también con 3,1 a 3x (0,968) y 4,2 a 4x (0,952).
+  // Caso: cámara {1..2,1, paso 0,1}; 3x (cámara 2,1 aceptado, pantalla 1,429); desde ahí lo rechaza
+  //       todo, también el 1; 2x → esperado: la frase del 3304, «La cámara se ha quedado en 2,1x y
+  //       no deja bajar de ahí: para ver 2x, la imagen se reduce…» · obtenido «Los 2,1x los hace la
+  //       propia cámara, sobre la imagen completa del sensor…» con el indicador en «2x».
+  test('HALLAZGO 3315 — con la cámara clavada en 2,1x, a 2x la nota no debe decir «Los 2,1x los hace la propia cámara»', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+    const camaras = { trasera: { min: 1, max: 2.1, step: 0.1 }, frontal: null };
+    await simularCamaraPorPista(page, camaras);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: /Activar lupa/i }).click();
+    await esperarCamaraEnMarcha(page);
+    const nota = page.locator('[class*=zoomNota]');
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 1 });
+
+    // 3x: cámara min(3; 2,1) = 2,1 (21 pasos de 0,1), pantalla 3 / 2,1 = 1,429.
+    await page.getByRole('button', { name: '3x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2.1, pantalla: 1.429 });
+    await expect(nota).toHaveText('La cámara hace 2,1x y el resto (1,4x) se amplía en pantalla.');
+
+    // Desde aquí la cámara lo rechaza todo. 2x: pide 2 (rechazado), 1 (rechazado), getSettings dice
+    // 2,1 → rango {2,1..2,1}: cámara 2,1 y pantalla 2 / 2,1 = 0,952; el efecto se repite una vez
+    // (2,1 y 1, rechazados) y se para. Lo que se ve es 2,1 × 0,952 = 2, como marca el indicador.
+    await cambiarCamaraSimulada(page, { ...camaras, rechazarPorEncima: 0 });
+    await page.getByRole('button', { name: '2x', exact: true }).click();
+    await expect.poll(async () => (await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 2.1, 2, 1, 2.1, 1]);
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2.1, pantalla: 0.952 });
+    await expect(page.locator('[class*=zoomIndicador]')).toHaveText('2x');
+
+    // DEBERÍA: la nota no atribuye a la cámara más aumento del que marca el indicador (criterio del
+    // 3304) y, como la imagen se reduce, lo dice con la frase que la reparación escribió para eso.
+    await expect(nota).not.toHaveText(/^Los 2,1x los hace la propia cámara/);
+    await expect(nota).toHaveText(
+      'La cámara se ha quedado en 2,1x y no deja bajar de ahí: para ver 2x, la imagen se reduce en pantalla y queda un borde negro alrededor.',
+    );
+  });
+
+  // ⚠️ HALLAZGO 3317 (15/10/2026) — contenido. Los rótulos de los deslizadores pegan el
+  // porcentaje al número («☀️ Brillo: 100%», «◐ Contraste: 100%»: page.tsx pinta
+  // `{formatNumber(brillo, 0)}%`), mientras la guía de la misma página lo separa («brillo al 130 %»,
+  // «140–160 %»), aunque con un espacio normal (U+0020). La regla del 25/09/2026 (CLAUDE.md global
+  // §2) es separarlo con espacio duro U+00A0, que es lo que pone formatPercentage de @/lib.
+  // Al repararlo, el CASO 1 (que espera «☀️ Brillo: 160%») tendrá que pasar a la grafía nueva.
+  // Caso: cargar la página, desplegar la guía y leer el separador de los cuatro porcentajes →
+  //       esperado U+00A0 en los cuatro · obtenido pegado, pegado, U+0020, U+0020.
+  test('HALLAZGO 3317 — el porcentaje de brillo y contraste va separado del número con espacio duro, como pide el formato español', async ({
+    page,
+  }) => {
+    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const separadores = await page.evaluate(() =>
+      ['label[for=control-brillo]', 'label[for=control-contraste]', '[class*=escenarioTip]', '[class*=stepGuide]'].flatMap(
+        (sel) =>
+          [...(document.querySelector(sel)?.textContent ?? '').matchAll(/\d(\s?)%/g)].map((m) =>
+            m[1] === ' ' ? 'U+00A0' : m[1] === '' ? 'pegado' : `U+${m[1].codePointAt(0)?.toString(16).toUpperCase().padStart(4, '0')}`,
+          ),
+      ),
+    );
+    // Brillo, contraste, «130 %» (primer consejo de la guía) y «140–160 %» (paso 5).
+    expect(separadores).toHaveLength(4);
+    // DEBERÍA: los cuatro con espacio duro.
+    expect(separadores).toEqual(['U+00A0', 'U+00A0', 'U+00A0', 'U+00A0']);
   });
 });
