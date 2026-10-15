@@ -1676,10 +1676,10 @@ test.describe('re-inspección 15/10/2026', () => {
     // (15,2 px, peso 600: texto normal, exige 4,5:1) queda en rojo hasta que se toca otra cosa.
     // Caso: Pixel 7, tocar «Restablecer ajustes» y medir sobre el fondo compuesto, en claro y en
     //       oscuro → esperado ≥ 4,5:1 · obtenido 3,76:1 (sobre #FFFFFF) y 3,66:1 (sobre #2D2D2D).
-    test('HALLAZGO 3316 — tras tocar «Restablecer ajustes» su rótulo se queda en el rojo #EF4444 y no llega a 4,5:1', async ({
+    // REPARADO el 15/10/2026: #B91C1C en claro y #FCA5A5 en oscuro.
+    test('REPARADO 3316 — tras tocar «Restablecer ajustes» su rótulo en rojo llega a 4,5:1 en los dos temas', async ({
       page,
     }) => {
-      test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
       await page.goto(RUTA);
       await esperarHidratacion(page, ['#control-zoom']);
       const boton = page.locator('[class*=btnReset]');

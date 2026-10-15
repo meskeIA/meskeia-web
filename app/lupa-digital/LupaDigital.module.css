@@ -449,9 +449,17 @@
   transition: all 0.2s;
 }
 
+/* 15/10/2026 (hallazgo 3316) — el #EF4444 del 3305 seguía aquí como COLOR DE TEXTO, y en un
+   móvil el :hover se queda pegado tras el toque: 3,76:1 sobre blanco y 3,66:1 sobre #2D2D2D,
+   bajo los 4,5:1 del texto normal. #B91C1C da 6,47:1 en claro; en oscuro, #FCA5A5 da 7,25:1. */
 .btnReset:hover {
-  border-color: #EF4444;
-  color: #EF4444;
+  border-color: #B91C1C;
+  color: #B91C1C;
+}
+
+[data-theme='dark'] .btnReset:hover {
+  border-color: #FCA5A5;
+  color: #FCA5A5;
 }
 
 /* Usos */
