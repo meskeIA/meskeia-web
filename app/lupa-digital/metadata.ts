@@ -44,7 +44,7 @@ export const jsonLd = generateWebAppSchema({
     'Restablecer todos los ajustes de un toque',
     'Compatibilidad con cámara frontal y trasera',
     'Activación de linterna integrada en dispositivos compatibles',
-    'Procesado 100 % local en el navegador, sin envío de imágenes',
+    'Procesado 100 % local en el navegador, sin envío de imágenes',
   ],
 });
 

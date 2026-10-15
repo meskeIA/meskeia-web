@@ -110,7 +110,8 @@ test('CASO 1 — zoom, filtro, brillo y «Restablecer» modifican la imagen en v
   // Brillo: el paso 5 de la guía recomienda «sube el brillo al 140–160 %».
   // Los tres <input type="range"> van en orden: zoom, brillo, contraste.
   await page.getByRole('slider').nth(1).fill('160');
-  await expect(page.locator('label', { hasText: /Brillo/ })).toHaveText('☀️ Brillo: 160%');
+  // Con espacio duro antes del % desde el 15/10/2026 (3317): «160%» consagraba la grafía pegada.
+  await expect(page.locator('label', { hasText: /Brillo/ })).toHaveText('☀️ Brillo: 160 %');
   await expect(video).toHaveAttribute('style', /filter: brightness\(160%\) contrast\(100%\) contrast\(200%\)/);
 
   // Contraste, que la ficha promete como ajuste INDEPENDIENTE del brillo.
@@ -1844,10 +1845,10 @@ test.describe('re-inspección 15/10/2026', () => {
   // Al repararlo, el CASO 1 (que espera «☀️ Brillo: 160%») tendrá que pasar a la grafía nueva.
   // Caso: cargar la página, desplegar la guía y leer el separador de los cuatro porcentajes →
   //       esperado U+00A0 en los cuatro · obtenido pegado, pegado, U+0020, U+0020.
-  test('HALLAZGO 3317 — el porcentaje de brillo y contraste va separado del número con espacio duro, como pide el formato español', async ({
+  // REPARADO el 15/10/2026: formatPercentage en los rótulos y &nbsp; en la guía y el jsonLd.
+  test('REPARADO 3317 — el porcentaje de brillo y contraste va separado del número con espacio duro, como pide el formato español', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#control-zoom']);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();

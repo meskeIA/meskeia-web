@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './LupaDigital.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatPercentage } from '@/lib';
 import { leerRangoZoom, repartirZoom, type RangoZoomCamara } from './zoom';
 
 /** Ni `zoom` ni `torch` están aún en los tipos de DOM de TypeScript. */
@@ -589,7 +589,8 @@ export default function LupaDigitalPage() {
 
         <div className={styles.ajuste}>
           <label htmlFor="control-brillo">
-            <span aria-hidden="true">☀️</span> Brillo: {formatNumber(brillo, 0)}%
+            {/* 3317 — el % iba pegado: espacio duro, como manda el formato español */}
+            <span aria-hidden="true">☀️</span> Brillo: {formatPercentage(brillo / 100, 0)}
           </label>
           <input
             id="control-brillo"
@@ -604,7 +605,7 @@ export default function LupaDigitalPage() {
 
         <div className={styles.ajuste}>
           <label htmlFor="control-contraste">
-            <span aria-hidden="true">◐</span> Contraste: {formatNumber(contraste, 0)}%
+            <span aria-hidden="true">◐</span> Contraste: {formatPercentage(contraste / 100, 0)}
           </label>
           <input
             id="control-contraste"
@@ -736,7 +737,7 @@ export default function LupaDigitalPage() {
                 de un producto o el texto de un contrato impreso en cuerpo 8.
               </p>
               <p className={styles.escenarioTip}>
-                Consejo: usa el zoom 3x–4x con brillo al 130 % para leer etiquetas
+                Consejo: usa el zoom 3x–4x con brillo al 130&nbsp;% para leer etiquetas
                 de supermercado sin esfuerzo visual.
               </p>
             </div>
@@ -891,7 +892,7 @@ export default function LupaDigitalPage() {
               <div className={styles.stepContent}>
                 <strong>Aumentar brillo si la iluminación es baja</strong>
                 <p>
-                  En entornos con poca luz, sube el brillo al 140–160 % y activa la
+                  En entornos con poca luz, sube el brillo al 140–160&nbsp;% y activa la
                   linterna integrada si tu dispositivo la soporta. El filtro de alto
                   contraste también ayuda a distinguir texto en superficies oscuras.
                 </p>
