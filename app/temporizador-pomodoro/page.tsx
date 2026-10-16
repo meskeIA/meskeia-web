@@ -436,7 +436,7 @@ export default function TemporizadorPomodoroPage() {
               onClick={toggleTimer}
               className={`${styles.mainBtn} ${isRunning ? styles.pause : styles.play}`}
             >
-              {isRunning ? '⏸ Pausar' : '▶ Iniciar'}
+              {isRunning ? <><span aria-hidden="true">⏸</span> Pausar</> : <><span aria-hidden="true">▶</span> Iniciar</>}
             </button>
             <button type="button" onClick={skipSession} className={styles.controlBtn} title="Saltar" aria-label="Saltar sesión">
               ⏭

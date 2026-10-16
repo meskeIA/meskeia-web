@@ -190,8 +190,8 @@ export default function OrientadorTramitesJubilacionPage() {
       <section className={styles.section}>
         <h2 className={styles.sectionTitle} aria-live="polite">
           {situacion
-            ? `📋 ${totalEspecificas} categorías para tu situación + recursos generales`
-            : '📋 Recursos generales — selecciona tu situación para ver más'}
+            ? <><span aria-hidden="true">📋</span> {totalEspecificas} categorías para tu situación + recursos generales</>
+            : <><span aria-hidden="true">📋</span> Recursos generales — selecciona tu situación para ver más</>}
         </h2>
         {!situacion && (
           <div className={styles.pendienteMsg}>

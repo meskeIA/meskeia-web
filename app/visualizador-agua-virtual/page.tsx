@@ -251,7 +251,7 @@ function SeccionPlato() {
           onClick={() => setOrdenAsc(!ordenAsc)}
           aria-label={`Ordenar de ${ordenAsc ? 'mayor a menor' : 'menor a mayor'}`}
         >
-          {ordenAsc ? '\u2B06\uFE0F De menor a mayor' : '\u2B07\uFE0F De mayor a menor'}
+          {ordenAsc ? <><span aria-hidden="true">{'\u2B06\uFE0F'}</span> De menor a mayor</> : <><span aria-hidden="true">{'\u2B07\uFE0F'}</span> De mayor a menor</>}
         </button>
       </div>
 

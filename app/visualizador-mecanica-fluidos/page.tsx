@@ -777,7 +777,7 @@ export default function VisualizadorMecanikaFluidos() {
               className={`${styles.toggleBtn} ${bernoulli.modoRealidad ? styles.toggleBtnOn : ''}`}
               aria-pressed={bernoulli.modoRealidad}
             >
-              {bernoulli.modoRealidad ? '✅ Modo Realidad (Kutta-Joukowski)' : '⚠️ Modo Mito (Solo Bernoulli)'}
+              {bernoulli.modoRealidad ? <><span aria-hidden="true">✅</span> Modo Realidad (Kutta-Joukowski)</> : <><span aria-hidden="true">⚠️</span> Modo Mito (Solo Bernoulli)</>}
             </button>
           </div>
 

@@ -523,7 +523,7 @@ export default function CifradoTransposicionPage() {
             className={styles.btnPrimary}
             disabled={!texto.trim()}
           >
-            {modo === 'cifrar' ? '🔒 Cifrar' : '🔓 Descifrar'}
+            {modo === 'cifrar' ? <><span aria-hidden="true">🔒</span> Cifrar</> : <><span aria-hidden="true">🔓</span> Descifrar</>}
           </button>
         </section>
 
@@ -536,7 +536,7 @@ export default function CifradoTransposicionPage() {
             <div className={styles.panelHeader}>
               <h2 className={styles.sectionTitle}>Resultado</h2>
               <button type="button" onClick={copiarResultado} className={styles.btnCopy}>
-                {copiado ? '✅ Copiado' : '📋 Copiar'}
+                {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
               </button>
             </div>
             <div className={styles.resultBox}>
@@ -566,7 +566,7 @@ export default function CifradoTransposicionPage() {
                 </p>
                 <pre className={styles.htmlPre}>{htmlCode}</pre>
                 <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyHtml}>
-                  {htmlCopiado ? '✅ ¡Copiado!' : '📋 Copiar código HTML'}
+                  {htmlCopiado ? <><span aria-hidden="true">✅</span> ¡Copiado!</> : <><span aria-hidden="true">📋</span> Copiar código HTML</>}
                 </button>
               </div>
             )}

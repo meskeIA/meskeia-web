@@ -755,7 +755,7 @@ export default function ConversorTallasPage() {
           <h2>Sistemas de Tallas Principales</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🇪🇸 España/Europa (ES/EU)</h4>
+              <h4><span aria-hidden="true">🇪🇸</span> España/Europa (ES/EU)</h4>
               <p>
                 <strong>Sistema métrico</strong> basado en centímetros. Usado en toda la Unión
                 Europea. Para ropa usa medidas directas del cuerpo, para calzado longitud en
@@ -763,7 +763,7 @@ export default function ConversorTallasPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🇺🇸 Estados Unidos (US)</h4>
+              <h4><span aria-hidden="true">🇺🇸</span> Estados Unidos (US)</h4>
               <p>
                 <strong>Sistema imperial</strong> basado en pulgadas. Usa letras (XS, S, M, L, XL) y
                 números. Las tallas americanas suelen ser más grandes que las europeas para la misma
@@ -771,7 +771,7 @@ export default function ConversorTallasPage() {
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>🇬🇧 Reino Unido (UK)</h4>
+              <h4><span aria-hidden="true">🇬🇧</span> Reino Unido (UK)</h4>
               <p>
                 <strong>Sistema mixto</strong> que combina elementos imperiales y propios. Similar al
                 americano pero con diferencias significativas en calzado y ropa formal.

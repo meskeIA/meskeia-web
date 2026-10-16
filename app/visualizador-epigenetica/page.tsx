@@ -265,7 +265,7 @@ const SeccionNucleosoma = () => {
         {/* Panel lateral descriptivo */}
         <div className={styles.estadoPanel}>
           <p className={styles.estadoTitulo}>
-            {esActivo ? '✅ Estado activo: Acetilación de histonas' : '🔴 Estado silenciado: Metilación del ADN'}
+            {esActivo ? <><span aria-hidden="true">✅</span> Estado activo: Acetilación de histonas</> : <><span aria-hidden="true">🔴</span> Estado silenciado: Metilación del ADN</>}
           </p>
           {esActivo ? (
             <p className={styles.estadoTexto}>

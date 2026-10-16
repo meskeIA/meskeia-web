@@ -559,7 +559,7 @@ export default function VisualizadorLlmFuncionamiento() {
             aria-pressed={mostrarAnalogia}
             aria-label={mostrarAnalogia ? 'Ocultar analogía Rey→Reina' : 'Mostrar analogía Rey→Reina'}
           >
-            {mostrarAnalogia ? '🙈 Ocultar analogía' : '👑 Mostrar analogía Rey→Reina'}
+            {mostrarAnalogia ? <><span aria-hidden="true">🙈</span> Ocultar analogía</> : <><span aria-hidden="true">👑</span> Mostrar analogía Rey→Reina</>}
           </button>
 
           <div className={styles.analogiaBox}>

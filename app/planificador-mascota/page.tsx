@@ -628,9 +628,9 @@ export default function PlanificadorMascotaPage() {
                   {perfil.esterilizado && <span className={styles.badge}>✓ Esterilizado</span>}
                   {perfil.tipo === 'perro' && (
                     <span className={styles.badge}>
-                      {perfil.tamano === 'pequeno' ? '🐕 Pequeño' :
-                       perfil.tamano === 'mediano' ? '🐕 Mediano' :
-                       perfil.tamano === 'grande' ? '🐕 Grande' : '🐕 Gigante'}
+                      {perfil.tamano === 'pequeno' ? <><span aria-hidden="true">🐕</span> Pequeño</> :
+                       perfil.tamano === 'mediano' ? <><span aria-hidden="true">🐕</span> Mediano</> :
+                       perfil.tamano === 'grande' ? <><span aria-hidden="true">🐕</span> Grande</> : <><span aria-hidden="true">🐕</span> Gigante</>}
                     </span>
                   )}
                 </div>

@@ -350,7 +350,7 @@ export default function GuiaRespiracionPage() {
             aria-pressed={vozActiva}
             aria-label={vozActiva ? 'Voz guiada activada, pulsar para desactivar' : 'Voz guiada desactivada, pulsar para activar'}
           >
-            {vozActiva ? '🔊 Voz activada' : '🔇 Voz desactivada'}
+            {vozActiva ? <><span aria-hidden="true">🔊</span> Voz activada</> : <><span aria-hidden="true">🔇</span> Voz desactivada</>}
           </button>
         </div>
       </section>

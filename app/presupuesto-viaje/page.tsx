@@ -336,7 +336,7 @@ export default function PresupuestoViaje() {
                   <>
                     <div className={styles.presupuestoMaxHeader}>
                       <span className={styles.presupuestoMaxLabel}>
-                        {sobrePresupuesto ? '⚠️ Sobre presupuesto' : '✅ Dentro del presupuesto'}
+                        {sobrePresupuesto ? <><span aria-hidden="true">⚠️</span> Sobre presupuesto</> : <><span aria-hidden="true">✅</span> Dentro del presupuesto</>}
                       </span>
                       <span className={`${styles.presupuestoMaxValor} ${sobrePresupuesto ? styles.sobrePresupuesto : ''}`}>
                         {formatNumber(totalGeneral, 2)} / {formatNumber(presupuestoMaximo, 2)} {simboloDivisa}

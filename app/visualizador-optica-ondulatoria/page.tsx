@@ -270,7 +270,7 @@ function TabInterferencia() {
             aria-label={animando ? 'Pausar animación de ondas' : 'Iniciar animación de ondas'}
             aria-pressed={animando}
           >
-            {animando ? '⏸ Pausar animación' : '▶ Animar ondas'}
+            {animando ? <><span aria-hidden="true">⏸</span> Pausar animación</> : <><span aria-hidden="true">▶</span> Animar ondas</>}
           </button>
         </div>
       </div>

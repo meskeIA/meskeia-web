@@ -427,7 +427,7 @@ export default function SimuladorModeloOsi() {
               aria-pressed={auto}
               disabled={frameIdx >= totalFrames - 1}
             >
-              {auto ? 'Pausar' : 'Auto ▶▶'}
+              {auto ? 'Pausar' : <>Auto <span aria-hidden="true">▶▶</span></>}
             </button>
             <button type="button" className={`${styles.ctrlBtn} ${styles.ctrlBtnDanger}`} onClick={handleReiniciar}>
               Reiniciar

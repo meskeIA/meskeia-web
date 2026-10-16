@@ -553,7 +553,7 @@ export default function EstructuraAtomoPage() {
                       <div className={styles.isotopoHeader}>
                         <span className={styles.isotopoSimbolo}>{iso.simbolo}</span>
                         <span className={`${styles.isotopoEstado} ${iso.estable ? '' : styles.radiactivo}`}>
-                          {iso.estable ? '✅ Estable' : '☢️ Radiactivo'}
+                          {iso.estable ? <><span aria-hidden="true">✅</span> Estable</> : <><span aria-hidden="true">☢️</span> Radiactivo</>}
                         </span>
                       </div>
                       <div className={styles.isotopoComposicion}>

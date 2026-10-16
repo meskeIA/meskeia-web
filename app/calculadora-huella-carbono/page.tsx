@@ -1250,35 +1250,35 @@ export default function CalculadoraHuellaCarbono() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>🇶🇦 Qatar</strong></td>
+                  <td><strong><span aria-hidden="true">🇶🇦</span> Qatar</strong></td>
                   <td>35,6 t</td>
                   <td>18× el límite</td>
                   <td>Industria petrolífera</td>
                   <td>↑ Creciendo</td>
                 </tr>
                 <tr>
-                  <td><strong>🇺🇸 EE.UU.</strong></td>
+                  <td><strong><span aria-hidden="true">🇺🇸</span> EE.UU.</strong></td>
                   <td>14,4 t</td>
                   <td>7× el límite</td>
                   <td>Transporte + industria</td>
                   <td>↓ Bajando lento</td>
                 </tr>
                 <tr>
-                  <td><strong>🇪🇺 Unión Europea</strong></td>
+                  <td><strong><span aria-hidden="true">🇪🇺</span> Unión Europea</strong></td>
                   <td>6,4 t</td>
                   <td>3,2× el límite</td>
                   <td>Transporte + calefacción</td>
                   <td>↓ Bajando</td>
                 </tr>
                 <tr>
-                  <td><strong>🇪🇸 España</strong></td>
+                  <td><strong><span aria-hidden="true">🇪🇸</span> España</strong></td>
                   <td>7,5 t</td>
                   <td>3,75× el límite</td>
                   <td>Transporte + turismo</td>
                   <td>↓ Bajando</td>
                 </tr>
                 <tr>
-                  <td><strong>🇨🇳 China</strong></td>
+                  <td><strong><span aria-hidden="true">🇨🇳</span> China</strong></td>
                   <td>8,2 t</td>
                   <td>4,1× el límite</td>
                   <td>Carbón + industria</td>

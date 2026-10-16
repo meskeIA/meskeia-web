@@ -660,7 +660,7 @@ export default function TransformadaFourierPage() {
             onClick={() => setEpiciclosActivos((v) => !v)}
             aria-pressed={epiciclosActivos}
           >
-            {epiciclosActivos ? '⏸ Pausar animación' : '▶ Iniciar epiciclos'}
+            {epiciclosActivos ? <><span aria-hidden="true">⏸</span> Pausar animación</> : <><span aria-hidden="true">▶</span> Iniciar epiciclos</>}
           </button>
           {!epiciclosActivos && (
             <p className={styles.epiciclosHint}>

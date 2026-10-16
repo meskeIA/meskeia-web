@@ -792,7 +792,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                             onClick={() => toggleSeLleva(objeto.id)}
                             aria-pressed={objeto.seLleva}
                           >
-                            {objeto.seLleva ? '🚚 Se lleva' : '🚫 No se lleva'}
+                            {objeto.seLleva ? <><span aria-hidden="true">🚚</span> Se lleva</> : <><span aria-hidden="true">🚫</span> No se lleva</>}
                           </button>
                         </div>
                       ))}

@@ -579,7 +579,7 @@ RESULTADOS DE SIMULACIÓN
                     <tr key={idx} className={evento.tipo === 'llegada' ? styles.llegada : styles.salida}>
                       <td>{idx + 1}</td>
                       <td>{formatNumber(evento.tiempo, 4)}</td>
-                      <td>{evento.tipo === 'llegada' ? '📥 Llegada' : '📤 Salida'}</td>
+                      <td>{evento.tipo === 'llegada' ? <><span aria-hidden="true">📥</span> Llegada</> : <><span aria-hidden="true">📤</span> Salida</>}</td>
                       <td>{evento.clientesEnSistema}</td>
                       <td>{evento.clientesEnCola}</td>
                     </tr>
