@@ -34,6 +34,16 @@ import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 import { activarTema, desplegarTodo, prepararParaMedir } from '../contraste-text-muted-auxiliares';
 import { PUERTO } from './_puerto';
+import {
+  CASOS as CASOS_AULA,
+  TOTAL_CASOS,
+  coincideConLibro,
+  comprobarRespuesta,
+  decimalesDe,
+  generarEjercicioAleatorio,
+  resolverCaso,
+  type DatosCaso,
+} from '../../app/simulador-estequiometria/casos';
 
 /**
  * stemum.com → el servidor local, para medir la app como la sirve el portal (data-brand="stemum",
@@ -659,5 +669,244 @@ test.describe('contenido', () => {
     await expect(truco).toHaveCount(1);
     await expect(truco).not.toContainText('debe igual a');
     await expect(truco).toContainText('debe ser igual a la masa de productos');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// CASOS PARA CLASE (16/10/2026, semilla S0199; skill /casos-aula-meskeia)
+//
+// Las respuestas se derivan AQUÍ con una estequiometría propia, escrita desde la definición y sin
+// importar `motor.ts`: masas molares sumadas desde los pesos atómicos (IUPAC abreviados, con la
+// masa molar redondeada a los decimales del elemento menos preciso, que es el convenio de la
+// app), n = m ÷ M, razón n ÷ coeficiente, producto con la razón menor. Resueltas a mano
+// (calculadora, 16/10/2026):
+//   1  40 ÷ 16,043 = 2,4933 mol                                          → 2,493 mol
+//   2  32 ÷ 16,043 = 1,99464 · × 2 = 3,98928 mol O₂ × 31,998            → 127,65 g
+//   3  CH₄ 0,49866 ÷ 1 · O₂ 1,25008 ÷ 2 = 0,62504 → CH₄; × 44,009        → 21,95 g
+//   4  CH₄ 1,24665 · O₂ 1,50009 ÷ 2 = 0,75005 → O₂; 0,75005 × 44,009    → 33,01 g
+//   5  H₂ 2,97619 ÷ 2 = 1,48810 · O₂ 1,25008 → O₂; × 2 × 18,015         → 45,04 g
+//   6  N₂ 2,49875 · H₂ 14,88095 ÷ 3 = 4,96032 → N₂; × 2 × 17,031        → 85,11 g
+//   7  HCl 2,00219 · NaOH 1,50011 → NaOH; sobran 0,50208 × 36,46        → 18,31 g
+//   8  CH₄ 1,49598 · O₂ 2,00013 ÷ 2 = 1,00006 → O₂; sobran 0,49592 × 16,043 → 7,96 g
+//   9  Fe 5,01388 ÷ 4 · O₂ 1,50009 ÷ 3 = 0,50003 → O₂; se gastan 2,00013; sobran 3,01375 × 55,845 → 168,30 g
+//  10  0,49957 × 2 × 46,069 = 46,0292 × 0,85                            → 39,12 g
+//  11  N₂ 0,99950 · H₂ 5,95238 ÷ 3 → N₂; × 2 × 17,031 = 34,0450 × 0,15  → 5,11 g
+//  12  HCl 1,09709 · NaOH 1,50011 → HCl; × 58,44 = 64,1141; 52 ÷ 64,1141 × 100 → 81,11 %
+//
+// EL CONVENIO que se fija: las masas molares. Los libros de secundaria usan pesos atómicos
+// redondeados (H = 1, C = 12, N = 14, O = 16, Na = 23, Cl = 35,5, Fe = 56); el simulador, los
+// de la IUPAC. Los datos se eligieron para que las dos tablas den el mismo limitante y una
+// respuesta dentro de la tolerancia, con margen: la invariante 7 lo comprueba con la tabla de
+// libro de este fichero, no con la de `casos.ts`.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
+type Tabla = Record<'H' | 'C' | 'N' | 'O' | 'Na' | 'Cl' | 'Fe', number>;
+const IUPAC: Tabla = { H: 1.008, C: 12.011, N: 14.007, O: 15.999, Na: 22.99, Cl: 35.45, Fe: 55.845 };
+const LIBRO: Tabla = { H: 1, C: 12, N: 14, O: 16, Na: 23, Cl: 35.5, Fe: 56 };
+type Composicion = Partial<Record<keyof Tabla, number>>;
+
+function masaMolarDe(c: Composicion, t: Tabla): number {
+  const suma = Object.entries(c).reduce((s, [el, n]) => s + t[el as keyof Tabla] * (n ?? 0), 0);
+  if (t === LIBRO) return suma;
+  const decimales = 'Cl' in c ? 2 : 3;
+  return Math.round(suma * 10 ** decimales) / 10 ** decimales;
+}
+
+interface ReaccionTest {
+  A: { c: Composicion; k: number };
+  B: { c: Composicion; k: number } | null;
+  P: { c: Composicion; k: number };
+}
+const R: Record<string, ReaccionTest> = {
+  'combustion-metano': { A: { c: { C: 1, H: 4 }, k: 1 }, B: { c: { O: 2 }, k: 2 }, P: { c: { C: 1, O: 2 }, k: 1 } },
+  'sintesis-agua': { A: { c: { H: 2 }, k: 2 }, B: { c: { O: 2 }, k: 1 }, P: { c: { H: 2, O: 1 }, k: 2 } },
+  neutralizacion: { A: { c: { H: 1, Cl: 1 }, k: 1 }, B: { c: { Na: 1, O: 1, H: 1 }, k: 1 }, P: { c: { Na: 1, Cl: 1 }, k: 1 } },
+  'haber-bosch': { A: { c: { N: 2 }, k: 1 }, B: { c: { H: 2 }, k: 3 }, P: { c: { N: 1, H: 3 }, k: 2 } },
+  'oxidacion-hierro': { A: { c: { Fe: 1 }, k: 4 }, B: { c: { O: 2 }, k: 3 }, P: { c: { Fe: 2, O: 3 }, k: 2 } },
+  fermentacion: { A: { c: { C: 6, H: 12, O: 6 }, k: 1 }, B: null, P: { c: { C: 2, H: 6, O: 1 }, k: 2 } },
+};
+
+/** Respuesta exacta (sin redondear) y limitante, con la tabla de pesos que se le pase. */
+function estequiometriaPropia(d: DatosCaso, t: Tabla): { valor: number; limitante: 'A' | 'B' } {
+  const r = R[d.reaccionId];
+  const MA = masaMolarDe(r.A.c, t);
+  const MP = masaMolarDe(r.P.c, t);
+  const nA = d.gramosA / MA;
+  if (d.pregunta === 'moles' && d.reactivo !== 'B') return { valor: nA, limitante: 'A' };
+  const MB = r.B ? masaMolarDe(r.B.c, t) : NaN;
+  const nB = r.B ? d.gramosB / MB : NaN;
+  if (d.pregunta === 'moles') return { valor: nB, limitante: 'A' };
+  if (d.pregunta === 'masa-necesaria') return { valor: (nA / r.A.k) * (r.B?.k ?? NaN) * MB, limitante: 'A' };
+  const ratioA = nA / r.A.k;
+  const ratioB = r.B ? nB / r.B.k : Infinity;
+  const limitante = ratioA <= ratioB ? 'A' : 'B';
+  const ratio = Math.min(ratioA, ratioB);
+  const teorica = ratio * r.P.k * MP;
+  switch (d.pregunta) {
+    case 'masa-teorica':
+      return { valor: teorica, limitante };
+    case 'masa-real':
+      return { valor: (teorica * (d.rendimiento ?? 100)) / 100, limitante };
+    case 'rendimiento':
+      return { valor: ((d.masaObtenida ?? NaN) / teorica) * 100, limitante };
+    case 'exceso':
+      return limitante === 'A'
+        ? { valor: (nB - ratio * (r.B?.k ?? NaN)) * MB, limitante }
+        : { valor: (nA - ratio * r.A.k) * MA, limitante };
+  }
+}
+
+const redondearTest = (v: number, d: number): number => Math.round(v * 10 ** d) / 10 ** d;
+const RESUELTAS_A_MANO = [2.493, 127.65, 21.95, 33.01, 45.04, 85.11, 18.31, 7.96, 168.3, 39.12, 5.11, 81.11];
+
+test.describe('casos para clase · lógica (sin navegador)', () => {
+  test('1 · doce casos con ids 1..12 sin huecos', () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS_AULA.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · deterministas: dos resoluciones dan lo mismo', () => {
+    for (const caso of CASOS_AULA) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta coincide con la resuelta a mano y con una estequiometría propia', () => {
+    CASOS_AULA.forEach((caso, i) => {
+      expect(caso.respuesta, `caso ${caso.id} frente a la cuenta a mano`).toBe(RESUELTAS_A_MANO[i]);
+      const propia = estequiometriaPropia(caso.datos, IUPAC).valor;
+      expect(caso.respuesta, `caso ${caso.id} frente a la estequiometría del test`).toBe(
+        redondearTest(propia, decimalesDe(caso.datos.pregunta)),
+      );
+    });
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita, desarrollo y pista', () => {
+    for (const caso of CASOS_AULA) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta) && caso.respuesta > 0, `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.respuestaTexto, `caso ${caso.id}`).toContain(caso.unidad);
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos (mexicanos|colombianos|argentinos|chilenos))\b/i;
+    for (const caso of CASOS_AULA) {
+      expect(PROHIBIDO.test(`${caso.titulo} ${caso.enunciado}`), `caso ${caso.id}`).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA, y el % va con espacio duro', () => {
+    for (const caso of CASOS_AULA) {
+      const ultimo = caso.pasos[caso.pasos.length - 1];
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(caso.respuestaTexto);
+      if (caso.requiereRedondeo) {
+        const pedidos = decimalesDe(caso.datos.pregunta) === 3 ? /tres decimales/ : /dos decimales/;
+        expect(caso.enunciado, `caso ${caso.id}: exige redondeo y no lo pide`).toMatch(pedidos);
+      }
+      for (const texto of [caso.enunciado, caso.pista, caso.respuestaTexto, ...caso.pasos]) {
+        expect(texto, `caso ${caso.id}`).not.toMatch(/\d ?%/);
+      }
+    }
+  });
+
+  test('5.ter · cada caso se puede montar con los controles de la app y no es una mezcla estequiométrica', () => {
+    for (const caso of CASOS_AULA) {
+      const d = caso.datos;
+      expect(Number.isInteger(d.gramosA) && Number.isInteger(d.gramosB), `caso ${caso.id}: gramos enteros`).toBe(true);
+      if (d.rendimiento !== undefined) expect(Number.isInteger(d.rendimiento), `caso ${caso.id}`).toBe(true);
+      const r = R[d.reaccionId];
+      if (r.B && d.pregunta !== 'moles' && d.pregunta !== 'masa-necesaria') {
+        const ratioA = d.gramosA / masaMolarDe(r.A.c, IUPAC) / r.A.k;
+        const ratioB = d.gramosB / masaMolarDe(r.B.c, IUPAC) / r.B.k;
+        expect(Math.abs(ratioA - ratioB) / Math.max(ratioA, ratioB), `caso ${caso.id}`).toBeGreaterThan(0.15);
+      }
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', () => {
+    const a = generarEjercicioAleatorio(12345);
+    expect(generarEjercicioAleatorio(12345)).toEqual(a);
+    const ejercicios = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(ejercicios.map((e) => e.respuesta)).size, 'respuestas distintas').toBeGreaterThanOrEqual(10);
+    expect(new Set(ejercicios.map((e) => e.datos.pregunta)).size, 'tipos de pregunta').toBeGreaterThanOrEqual(5);
+    expect(new Set(ejercicios.map((e) => e.datos.reaccionId)).size, 'reacciones').toBeGreaterThanOrEqual(5);
+    for (const e of ejercicios) {
+      const propia = estequiometriaPropia(e.datos, IUPAC).valor;
+      expect(e.respuesta, `semilla ${e.semilla}`).toBe(redondearTest(propia, decimalesDe(e.datos.pregunta)));
+      expect(comprobarRespuesta(e.respuesta, e.respuesta, e.datos).correcto, `semilla ${e.semilla}`).toBe(true);
+      expect(e.enunciado, `semilla ${e.semilla}`).not.toMatch(/\d ?%/);
+    }
+  });
+
+  test('7 · convenio: con las masas de LIBRO sale el mismo limitante y una respuesta que se da por buena', () => {
+    const ejercicios = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    for (const { datos, respuesta, origen } of [
+      ...CASOS_AULA.map((c) => ({ datos: c.datos, respuesta: c.respuesta, origen: `caso ${c.id}` })),
+      ...ejercicios.map((e) => ({ datos: e.datos, respuesta: e.respuesta, origen: `semilla ${e.semilla}` })),
+    ]) {
+      const iupac = estequiometriaPropia(datos, IUPAC);
+      const libro = estequiometriaPropia(datos, LIBRO);
+      expect(libro.limitante, `${origen}: el limitante cambia con las masas de libro`).toBe(iupac.limitante);
+      // Lo escrito con sus decimales por quien usa las masas de su libro se acepta.
+      const delLibro = redondearTest(libro.valor, decimalesDe(datos.pregunta));
+      expect(comprobarRespuesta(delLibro, respuesta, datos).correcto, `${origen}: suspende ${delLibro}, la cuenta con masas de libro`).toBe(true);
+      expect(coincideConLibro(datos), origen).toBe(true);
+    }
+  });
+
+  test('7.bis · el corrector: errores típicos con nombre, lo imposible y lo que no es número', () => {
+    const caso = (id: number) => CASOS_AULA[id - 1];
+    // caso 4 con el reactivo en exceso (el CH₄): 1,24665 mol × 44,009 = 54,86 g
+    expect(comprobarRespuesta(54.86, caso(4).respuesta, caso(4).datos).motivo).toMatch(/reactivo en exceso/);
+    // caso 10 sin aplicar el rendimiento: 46,03 g
+    expect(comprobarRespuesta(46.03, caso(10).respuesta, caso(10).datos).motivo).toMatch(/masa teórica/);
+    // caso 12 en tanto por uno
+    expect(comprobarRespuesta(0.8111, caso(12).respuesta, caso(12).datos).motivo).toMatch(/tanto por uno/);
+    // caso 12: un rendimiento del 101 % no existe
+    expect(comprobarRespuesta(101, caso(12).respuesta, caso(12).datos).correcto).toBe(false);
+    // caso 7 en moles: 0,50208 mol
+    expect(comprobarRespuesta(0.502, caso(7).respuesta, caso(7).datos).motivo).toMatch(/moles que sobran/);
+    // caso 1 multiplicando: 40 × 16,043 = 641,72
+    expect(comprobarRespuesta(641.72, caso(1).respuesta, caso(1).datos).motivo).toMatch(/m ÷ M/);
+    // lo que no es número
+    expect(comprobarRespuesta(NaN, caso(3).respuesta, caso(3).datos).motivo).not.toContain('NaN');
+    // un fallo cualquiera dice cuánto se ha desviado, con espacio duro antes de la unidad
+    const v = comprobarRespuesta(30, caso(3).respuesta, caso(3).datos);
+    expect(v.correcto).toBe(false);
+    expect(v.motivo).toMatch(/desviado 8,05 g/);
+  });
+});
+
+test.describe('casos para clase · en la página', () => {
+  test('se corrige un caso, avisa del reactivo en exceso y «Cargar en el simulador» pone sus datos', async ({ page }) => {
+    await abrir(page);
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: /^Caso 4:/ }).click();
+    await expect(seccion.getByRole('button', { name: /^Caso 4:/ })).toHaveAttribute('aria-pressed', 'true');
+
+    const casilla = seccion.locator('#casos-respuesta');
+    await casilla.fill('54,86');
+    await seccion.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion.getByRole('alert')).toContainText('reactivo en exceso');
+
+    await casilla.fill('33,01');
+    await seccion.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion.getByRole('alert')).toContainText('¡Correcto!');
+
+    await seccion.getByRole('button', { name: 'Cargar en el simulador' }).click();
+    await expect(page.locator('#inputA')).toHaveValue('20');
+    await expect(page.locator('#inputB')).toHaveValue('48');
+    // y el simulador da lo mismo que el caso
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Oxígeno');
+    await expect(tarjeta(page, 'Masa teórica')).toContainText('33,009 g');
   });
 });

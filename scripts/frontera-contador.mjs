@@ -87,7 +87,8 @@ function leerPreguntas() {
             pendientes.delete(c.tool_use_id);
             const respuesta = typeof c.content === 'string' ? c.content : textoDe(c.content);
             const fuente = String(p.input.metadata?.source || '');
-            const tipo = fuente.startsWith('frontera:') ? fuente.slice('frontera:'.length).trim() : '';
+            const crudo = fuente.startsWith('frontera:') ? fuente.slice('frontera:'.length).trim() : '';
+            const tipo = SINONIMOS[crudo] || crudo;
             for (const q of p.input.questions || []) {
               preguntas.push({ ...p, tipo, header: q.header || '', pregunta: q.question || '', ...clasificar(q, respuesta) });
             }
@@ -131,6 +132,36 @@ function leerCommits() {
   return { n2, descensos };
 }
 
+// ── Tipos: sinónimos, ya delegados y fuera del ascenso ──────────────────────────────────────
+// El 16/10/2026 el recuento marcaba dos candidatos falsos: `turno-noche` (5/5), que son las mismas
+// preguntas por las que `turno-a11y` ya subió a N2 el 14/10, y `que` (9/5), que es el qué y no
+// asciende nunca. Y partía rachas en sinónimos (`neutralidad` / `neutralidad-editorial`…).
+// Un ⬆️ que sale siempre deja de informar (Candados de juicio §3).
+const SINONIMOS = {
+  'turno-noche': 'turno-a11y',
+  'formato-ritual': 'formato-rituales',
+  'neutralidad-editorial': 'neutralidad',
+  'que-se-construye': 'que',
+  'prioridad-inspector': 'prioridad',
+};
+// Nivel 3 por definición: ningún candado puede comprobarlos (CLAUDE.md global §9)
+const FUERA_DEL_ASCENSO = {
+  que: 'es el qué', prioridad: 'es el qué', neutralidad: 'es el qué',
+  'ampliar-promesa': 'es el qué', 'formato-rituales': 'es el qué',
+  fiscal: 'ningún candado sabe si un valor está vigente',
+  push: 'sale del PC', borrar: 'irreversible', turso: 'datos reales',
+};
+// Los tipos ya en nivel 1 o 2 se leen de la tabla del CLAUDE.md, no se copian aquí
+function nivelesDeLaTabla() {
+  const niveles = new Map();
+  try {
+    const texto = readFileSync(path.join(REPO, 'CLAUDE.md'), 'utf8');
+    for (const m of texto.matchAll(/^\|\s*([12])\s*\|\s*`([a-z0-9-]+)`/gm)) niveles.set(m[2], Number(m[1]));
+  } catch { /* sin tabla: ningún tipo se da por delegado */ }
+  return niveles;
+}
+const NIVELES = nivelesDeLaTabla();
+
 // ── Informe ─────────────────────────────────────────────────────────────────────────────────
 const ACEPTA = new Set(['recomendada', 'decide-tu']);
 const ETIQUETA = { recomendada: '✓', 'decide-tu': '✓?', otra: '✗', opcion: '·', libre: '…', rechazada: '⛔' };
@@ -148,7 +179,9 @@ function imprimirGrupo(titulo, grupos) {
     const r = racha(serie);
     const cuenta = (k) => serie.filter((s) => s.resultado === k).length;
     const marcas = serie.slice(-10).map((s) => ETIQUETA[s.resultado]).join(' ');
-    const aviso = r >= UMBRAL_ASCENSO ? `  ⬆️  CANDIDATO A ASCENSO (${titulo === 'etiquetadas' ? 'proponer al usuario si hay candado' : 'orientativo'})` : '';
+    let aviso = r >= UMBRAL_ASCENSO ? `  ⬆️  CANDIDATO A ASCENSO (${titulo === 'etiquetadas' ? 'proponer al usuario si hay candado' : 'orientativo'})` : '';
+    if (titulo === 'etiquetadas' && FUERA_DEL_ASCENSO[tipo]) aviso = `  (nivel 3 fijo: ${FUERA_DEL_ASCENSO[tipo]})`;
+    else if (titulo === 'etiquetadas' && NIVELES.has(tipo)) aviso = `  (ya en nivel ${NIVELES.get(tipo)} en la tabla: sin ascenso pendiente)`;
     console.log(`   ${tipo.padEnd(26)} ${String(serie.length).padStart(3)} · racha ${r}/${UMBRAL_ASCENSO} · ` +
       `recom. ${cuenta('recomendada')} · decide-tú ${cuenta('decide-tu')} · otra ${cuenta('otra')} · libre ${cuenta('libre')} · rechazo ${cuenta('rechazada')}   [${marcas}]${aviso}`);
   }

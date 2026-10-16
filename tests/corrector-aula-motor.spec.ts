@@ -53,6 +53,7 @@ import * as normal from '../app/simulador-distribucion-normal/casos';
 import * as genetica from '../app/simulador-genetica/casos';
 import * as bohr from '../app/simulador-modelo-bohr/casos';
 import * as periodica from '../app/tabla-periodica/casos';
+import * as estequiometria from '../app/simulador-estequiometria/casos';
 
 const CUADRANTE: Magnitud = { entero: true, minimo: 1, maximo: 4, que: 'el número de cuadrante' };
 
@@ -200,6 +201,13 @@ const APPS: Record<string, () => Pregunta[]> = {
       bohr.generarEjercicioAleatorio,
       (c) => ({ origen: `caso ${c.id}`, esperado: c.respuesta, tolerancia: bohr.toleranciaDe(c.datos), magnitud: bohr.magnitudDe(c.datos), acierta: (v) => bohr.comprobarRespuesta(v, c.respuesta, c.datos).correcto }),
       (e, s) => ({ origen: `semilla ${s}`, esperado: e.respuesta, tolerancia: bohr.toleranciaDe(e.datos), magnitud: bohr.magnitudDe(e.datos), acierta: (v) => bohr.comprobarRespuesta(v, e.respuesta, e.datos).correcto }),
+    ),
+  'simulador-estequiometria': () =>
+    conPractica(
+      estequiometria.CASOS,
+      estequiometria.generarEjercicioAleatorio,
+      (c) => ({ origen: `caso ${c.id}`, esperado: c.respuesta, tolerancia: estequiometria.toleranciaDe(c.respuesta), magnitud: estequiometria.magnitudDe(c.datos.pregunta), acierta: (v) => estequiometria.comprobarRespuesta(v, c.respuesta, c.datos).correcto }),
+      (e, s) => ({ origen: `semilla ${s}`, esperado: e.respuesta, tolerancia: estequiometria.toleranciaDe(e.respuesta), magnitud: estequiometria.magnitudDe(e.datos.pregunta), acierta: (v) => estequiometria.comprobarRespuesta(v, e.respuesta, e.datos).correcto }),
     ),
   'tabla-periodica': () =>
     periodica.CASOS.flatMap((c) => {
