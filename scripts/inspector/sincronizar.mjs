@@ -51,6 +51,18 @@ const RIESGO_SUITE = {
 
 const huella = txt => crypto.createHash('sha256').update(txt).digest('hex').slice(0, 16);
 
+// ─── Apps CONGELADAS: publicadas, pero fuera de la base ──────────────────────
+// Los 13 cursos (`curso-*`, ~200 páginas de capítulo) se congelaron el 16/10/2026 (semilla
+// S0208, decisión del usuario): 49 usos en 90 días entre todos y casi ninguna demanda de
+// buscador, pero se quedan en la web. Congelar = no reciben trabajo DEDICADO. Al no entrar en
+// la base, la limpieza de abajo los retira (ninguno se había inspeccionado nunca) y dejan de
+// salir en las dos colas que leen de aquí: la del Inspector y la del turno nocturno de
+// accesibilidad (`Vigilancia/ActasNocturnas/turno-a11y.mjs`), que es la que les dedicaba
+// commits. Siguen vigilados por la Ronda (que cargan) y por los candados del build.
+// Para descongelar: quitar el prefijo de la lista y `npm run inspector:sync`.
+const PREFIJOS_CONGELADOS = ['curso-'];
+const congelada = slug => PREFIJOS_CONGELADOS.some(p => slug.startsWith(p));
+
 // ─── Catálogo ─────────────────────────────────────────────────────────────────
 
 function leerCatalogo() {
@@ -60,6 +72,7 @@ function leerCatalogo() {
     const url = m[3];
     const slug = url.replace(/^\/|\/$/g, '');
     if (!slug || slug.includes('/')) continue; // subrutas y portales quedan fuera
+    if (congelada(slug)) continue; // publicadas pero congeladas (cabecera de PREFIJOS_CONGELADOS)
     apps.set(slug, {
       slug,
       nombre: m[1].replace(/\\"/g, '"'),
