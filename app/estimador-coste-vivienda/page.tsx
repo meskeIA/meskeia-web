@@ -614,7 +614,7 @@ export default function CalculadoraCosteViviendaPage() {
               <p className={styles.eduEscenarioExample}>
                 Piso de 180.000 € (hipoteca 80%, 30 años, euríbor + 0,8%). Hipoteca: 720 €/mes. IBI: 35 €. Comunidad: 80 €. Seguros: 30 €. Suministros: 150 €. Fondo mantenimiento: 50 €. Total: ~1.065 €/mes.
               </p>
-              <p className={styles.eduEscenarioTip}><span aria-hidden="true">💡</span> Necesita mínimo 3.550 € netos/mes para cumplir la regla del 30% de salario dedicado a vivienda.</p>
+              <p className={styles.eduEscenarioTip}><span aria-hidden="true">💡</span> Con la referencia orientativa habitual del 30&nbsp;% de los ingresos netos para vivienda, harían falta unos 3.550 € netos/mes. Es una pauta, no una norma.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
@@ -660,7 +660,7 @@ export default function CalculadoraCosteViviendaPage() {
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Qué porcentaje del salario debería dedicar a vivienda?</h4>
-              <p>La regla del 30%: el total de gastos de vivienda (hipoteca + todos los gastos) no debería superar el 30% de tus ingresos netos. El Banco de España recomienda no superar el 35% incluyendo otras deudas. Con un total de 1.000 €/mes en vivienda, necesitas mínimo 3.333 € netos/mes.</p>
+              <p>No hay una cifra oficial que valga para todos. Una referencia orientativa habitual es que el total de gastos de vivienda (hipoteca o alquiler más el resto de gastos) no supere el 30&nbsp;% de los ingresos netos: con 1.000 €/mes en vivienda, serían unos 3.333 € netos/mes. Es una pauta de planificación que circula en la divulgación financiera, no una norma. Su límite: con ingresos bajos, el 70&nbsp;% restante puede no cubrir los gastos básicos, así que lo útil es comprobar cuánto te queda después de pagar la vivienda.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cómo puedo reducir la factura de electricidad?</h4>
