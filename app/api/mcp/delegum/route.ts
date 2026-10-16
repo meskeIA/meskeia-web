@@ -501,11 +501,13 @@ function crearServidorDelegum(): McpServer {
           `💶 Precio: **${fmt(c.precioInmueble)} €**`,
           '',
           `🧾 **Impuestos y gastos de compra**`,
-          `  • ${c.tipoImpuesto} (${pct(c.porcentajeImpuesto)}%): ${fmt(c.importeImpuesto)} €`,
+          c.impuestoNoCalculado
+            ? `  • ${c.tipoImpuesto}: ${c.notaITP}`
+            : `  • ${c.tipoImpuesto} (${pct(c.porcentajeImpuesto)}%): ${fmt(c.importeImpuesto)} €`,
           `  • AJD: ${fmt(c.ajd)} € · Notaría: ${fmt(c.notaria)} € · Registro: ${fmt(c.registro)} € · Gestoría: ${fmt(c.gestoria)} €`,
-          `  • **Total gastos: ${fmt(c.totalGastos)} €** (${pct((c.totalGastos / c.precioInmueble) * 100)}% del precio)`,
+          `  • **Total gastos${c.impuestoNoCalculado ? ' (sin el impuesto indirecto)' : ''}: ${fmt(c.totalGastos)} €** (${pct((c.totalGastos / c.precioInmueble) * 100)}% del precio)`,
           '',
-          `🏦 **Ahorro total necesario (precio + gastos): ${fmt(c.totalOperacion)} €**`,
+          `🏦 **Ahorro total necesario (precio + gastos${c.impuestoNoCalculado ? ', sin el impuesto indirecto' : ''}): ${fmt(c.totalOperacion)} €**`,
         ];
 
         // Si hay ahorro y plazo, estimamos la hipoteca
@@ -613,12 +615,14 @@ function crearServidorDelegum(): McpServer {
           `💶 Precio: **${fmt(g.precio)} €**`,
           '',
           `🧾 **Impuestos y gastos**`,
-          `  • ${g.tipoImpuesto} (${pct(g.porcentajeImpuesto)}%): ${fmt(g.importeImpuesto)} €`,
+          g.impuestoNoCalculado
+            ? `  • ${g.tipoImpuesto}: sin cifra (ver la nota)`
+            : `  • ${g.tipoImpuesto} (${pct(g.porcentajeImpuesto)}%): ${fmt(g.importeImpuesto)} €`,
           ...(g.ajd > 0 ? [`  • AJD: ${fmt(g.ajd)} €`] : []),
           `  • Notaría: ${fmt(g.notaria)} € · Registro: ${fmt(g.registro)} € · Gestoría: ${fmt(g.gestoria)} €`,
-          `  • **Total gastos: ${fmt(g.totalGastos)} €** (${pct((g.totalGastos / g.precio) * 100)}% del precio)`,
+          `  • **Total gastos${g.impuestoNoCalculado ? ' (sin el impuesto indirecto)' : ''}: ${fmt(g.totalGastos)} €** (${pct((g.totalGastos / g.precio) * 100)}% del precio)`,
           '',
-          `💳 **Coste total de adquisición: ${fmt(g.totalOperacion)} €**`,
+          `💳 **Coste total de adquisición${g.impuestoNoCalculado ? ' (sin el impuesto indirecto)' : ''}: ${fmt(g.totalOperacion)} €**`,
           '',
           `📌 ${g.nota}`,
         ];

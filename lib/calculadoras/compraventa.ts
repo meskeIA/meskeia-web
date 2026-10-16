@@ -32,6 +32,7 @@ import {
   tipoAJD,
   describirSubidaITP,
   CIUDADES_CON_BONIFICACION,
+  TERRITORIOS_SIN_IVA,
   normaliza,
   type ComunidadAutonoma,
   type ContextoAJD,
@@ -77,6 +78,11 @@ export interface GastosComprador {
   tipoImpuesto: string;
   porcentajeImpuesto: number;
   importeImpuesto: number;
+  /**
+   * Obra nueva o VPO en Canarias, Ceuta o Melilla: no rige el IVA sino el IGIC o el IPSI, que no
+   * se calcula. `importeImpuesto` vale 0 y el total va sin él (cabo C0184).
+   */
+  impuestoNoCalculado: boolean;
   ajd: number;
   notaria: number;
   registro: number;
@@ -201,8 +207,19 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
   let porcentajeImpuesto: number;
   let importeImpuesto: number;
   let notaITP: string;
+  let impuestoNoCalculado = false;
+  /** Canarias (IGIC), Ceuta y Melilla (IPSI): allí no se cobra IVA (hallazgo 156 de las apps) */
+  const sinIva = TERRITORIOS_SIN_IVA[ccaa];
 
-  if (p.tipoTransmision === 'vpo') {
+  if (p.tipoTransmision !== 'segunda_mano' && sinIva) {
+    // Hasta el 16/10/2026 cobraba el 10 o el 4 % de IVA también aquí (cabo C0184). Como las
+    // apps: se nombra el impuesto que corresponde y no se inventa cifra. El AJD sí se devenga.
+    tipoImpuesto = `${sinIva.impuesto} (no calculado)`;
+    porcentajeImpuesto = 0;
+    importeImpuesto = 0;
+    impuestoNoCalculado = true;
+    notaITP = `En ${ccaaNombre} no rige el IVA: la ${p.tipoTransmision === 'vpo' ? 'vivienda protegida' : 'obra nueva'} tributa por el ${sinIva.impuesto} (${sinIva.nombre}), con sus propios tipos, que este cálculo no incluye. El total de gastos va sin él.`;
+  } else if (p.tipoTransmision === 'vpo') {
     tipoImpuesto = 'IVA (VPO)';
     porcentajeImpuesto = IVA_INMUEBLES_2025.viviendaProtegida;
     importeImpuesto = r(p.precioInmueble * porcentajeImpuesto / 100);
@@ -259,6 +276,7 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
     tipoImpuesto,
     porcentajeImpuesto,
     importeImpuesto,
+    impuestoNoCalculado,
     ajd,
     notaria,
     registro,

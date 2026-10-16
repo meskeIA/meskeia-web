@@ -3352,6 +3352,62 @@ test.describe('Invariantes de ramas fiscales — calcular_gastos_compra_inmueble
   test('ESTRUCTURAL: precio no positivo lanza error en lugar de devolver ceros', () => {
     expect(() => calcularGastosCompraInmueble({ ...base, precio: 0, tipoInmueble: 'vivienda' })).toThrow();
   });
+
+  // Cabo C0184: hasta el 16/10/2026 cobraba IVA donde no rige (IGIC en Canarias, IPSI en Ceuta
+  // y Melilla), que las apps ya resolvían con TERRITORIOS_SIN_IVA (hallazgo 156).
+  test('SIN IVA: local de obra nueva en Canarias no cobra el 21 %: nombra el IGIC sin cifra, el AJD sí', () => {
+    const g = calcularGastosCompraInmueble({ precio: 100000, ccaa: 'canarias', tipoInmueble: 'local_comercial', obraNueva: true });
+    expect(g.impuestoNoCalculado).toBe(true);
+    expect(g.importeImpuesto).toBe(0);
+    expect(g.tipoImpuesto).toContain('IGIC');
+    expect(g.ivaDeducible).toBe(false);
+    expect(g.ajd).toBeGreaterThan(0);
+    expect(g.totalGastos).toBeCloseTo(g.ajd + g.notaria + g.registro + g.gestoria, 2);
+  });
+
+  test('SIN IVA: garaje anejo de obra nueva en Melilla nombra el IPSI sin cifra', () => {
+    const g = calcularGastosCompraInmueble({ precio: 20000, ccaa: 'melilla', tipoInmueble: 'garaje', obraNueva: true });
+    expect(g.impuestoNoCalculado).toBe(true);
+    expect(g.tipoImpuesto).toContain('IPSI');
+    expect(g.importeImpuesto).toBe(0);
+  });
+
+  test('SIN RENUNCIA: en Ceuta la renuncia a la exención no existe y el local paga ITP (hallazgo 1584)', () => {
+    const conRenuncia = calcularGastosCompraInmueble({ precio: 100000, ccaa: 'ceuta', tipoInmueble: 'local_comercial', renunciaExencionIva: true });
+    const sinRenuncia = calcularGastosCompraInmueble({ precio: 100000, ccaa: 'ceuta', tipoInmueble: 'local_comercial' });
+    expect(conRenuncia.tipoImpuesto).toContain('ITP');
+    expect(conRenuncia.importeImpuesto).toBe(sinRenuncia.importeImpuesto);
+    expect(conRenuncia.ajd).toBe(0);
+    expect(conRenuncia.advertencias.join(' ')).toContain('no existe la renuncia');
+  });
+
+  test('CON IVA: en Madrid nada cambia (control)', () => {
+    const g = calcularGastosCompraInmueble({ precio: 100000, ccaa: 'madrid', tipoInmueble: 'local_comercial', obraNueva: true });
+    expect(g.impuestoNoCalculado).toBe(false);
+    expect(g.importeImpuesto).toBe(21000);
+  });
+});
+
+test.describe('Sin IVA donde no rige — calcularCompraventa (cabo C0184)', () => {
+  test('obra nueva y VPO en Canarias, Ceuta y Melilla: sin cifra de IVA, el AJD sí', () => {
+    for (const ccaa of ['canarias', 'ceuta', 'melilla']) {
+      for (const tipoTransmision of ['obra_nueva', 'vpo'] as const) {
+        const { comprador: c } = calcularCompraventa({ precioInmueble: 200000, ccaa, tipoTransmision });
+        expect(c.impuestoNoCalculado, `${ccaa} ${tipoTransmision}`).toBe(true);
+        expect(c.importeImpuesto, `${ccaa} ${tipoTransmision}`).toBe(0);
+        expect(c.ajd, `${ccaa} ${tipoTransmision}`).toBeGreaterThan(0);
+        expect(c.tipoImpuesto).toContain(ccaa === 'canarias' ? 'IGIC' : 'IPSI');
+      }
+    }
+  });
+
+  test('segunda mano en Canarias sigue con su ITP, y la obra nueva de Madrid con su 10 % de IVA', () => {
+    const itp = calcularCompraventa({ precioInmueble: 200000, ccaa: 'canarias', tipoTransmision: 'segunda_mano' }).comprador;
+    expect(itp.impuestoNoCalculado).toBe(false);
+    expect(itp.importeImpuesto).toBeGreaterThan(0);
+    const iva = calcularCompraventa({ precioInmueble: 200000, ccaa: 'madrid', tipoTransmision: 'obra_nueva' }).comprador;
+    expect(iva.importeImpuesto).toBe(20000);
+  });
 });
 
 // ════════════════════════════════════════════════════════════════════════════

@@ -29,7 +29,13 @@ import {
   COSTES_COMPRAVENTA_2025,
   FISCAL_INMUEBLES_META,
 } from '@/data/fiscal';
-import { ITP_CCAA, tipoAJD, type ObjetoTransmision } from '@/data/itp-ccaa';
+import {
+  ITP_CCAA,
+  tipoAJD,
+  TERRITORIOS_SIN_IVA,
+  TERRITORIOS_SIN_RENUNCIA,
+  type ObjetoTransmision,
+} from '@/data/itp-ccaa';
 import { formatNumber } from '@/lib/formatters';
 import { claveCCAA, itpSegunApps, ajdSegunApps, type PerfilCompradorMCP } from './compraventa';
 
@@ -80,6 +86,11 @@ export interface ResultadoGastosCompra {
   tipoImpuesto: string;
   porcentajeImpuesto: number;
   importeImpuesto: number;
+  /**
+   * La operación tributaría por IVA, pero en Canarias, Ceuta y Melilla no rige: allí va IGIC o
+   * IPSI, que no se calcula. `importeImpuesto` vale 0 y el total va sin él (cabo C0184).
+   */
+  impuestoNoCalculado: boolean;
   ajd: number;
   notaria: number;
   registro: number;
@@ -114,9 +125,12 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
   let tipoImpuesto = '';
   let porcentajeImpuesto = 0;
   let importeImpuesto = 0;
+  let impuestoNoCalculado = false;
   let ajd = 0;
   let ivaDeducible = false;
   let nota = '';
+  /** Canarias (IGIC), Ceuta y Melilla (IPSI): allí no se cobra IVA (hallazgo 156 de las apps) */
+  const sinIva = TERRITORIOS_SIN_IVA[ccaa];
 
   // La plusvalía municipal (IIVTNU) grava el incremento de valor del SUELO URBANO:
   // la finca rústica queda fuera del hecho imponible.
@@ -143,13 +157,27 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
   };
 
   const aplicarIVA = (porcentaje: number, etiqueta: string, motivo: string, renunciaExencionIVA = false) => {
+    ajd = ajdSegunApps(p.precio, ccaa, { objeto, renunciaExencionIVA });
+    if (sinIva) {
+      // Hasta el 16/10/2026 cobraba aquí el 10 o el 21 % de IVA en Canarias, Ceuta y Melilla,
+      // que las apps ya resolvían con TERRITORIOS_SIN_IVA (cabo C0184). Como ellas, se nombra
+      // el impuesto que corresponde y no se inventa cifra. El AJD sí se devenga.
+      tipoImpuesto = `${sinIva.impuesto} (no calculado)`;
+      porcentajeImpuesto = 0;
+      importeImpuesto = 0;
+      impuestoNoCalculado = true;
+      nota = `En ${ccaaNombre} no rige el IVA: la operación tributa por el ${sinIva.impuesto} (${sinIva.nombre}), con sus propios tipos, que este cálculo no incluye. El total de gastos va sin él.`;
+      return;
+    }
     tipoImpuesto = etiqueta;
     porcentajeImpuesto = porcentaje;
     importeImpuesto = r(p.precio * porcentaje / 100);
-    ajd = ajdSegunApps(p.precio, ccaa, { objeto, renunciaExencionIVA });
     ivaDeducible = porcentaje === IVA_INMUEBLES_2025.local;
     nota = motivo;
   };
+  /** En Ceuta y Melilla no existe la renuncia a la exención: la segunda mano paga ITP (hallazgo 1584) */
+  const renunciaPosible = !TERRITORIOS_SIN_RENUNCIA.includes(ccaa);
+  const avisoSinRenuncia = `En ${ccaaNombre} no existe la renuncia a la exención del art. 20.Dos LIVA: allí rige el IPSI, que no la regula, y la segunda transmisión paga siempre ITP, bonificado al 50 % (art. 57 bis TRLITPAJD).`;
 
   switch (p.tipoInmueble) {
     case 'vivienda':
@@ -187,6 +215,9 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
       if (obraNueva) {
         aplicarIVA(IVA_INMUEBLES_2025.local, 'IVA (obra nueva)',
           `Primera entrega de ${bien}: IVA general del 21% más AJD.`);
+      } else if (p.renunciaExencionIva && !renunciaPosible) {
+        aplicarITP(`Segunda transmisión de ${bien}: tributa por ITP.`);
+        advertencias.push(avisoSinRenuncia);
       } else if (p.renunciaExencionIva) {
         aplicarIVA(IVA_INMUEBLES_2025.local, 'IVA (renuncia a la exención · inversión del sujeto pasivo)',
           `Segunda transmisión de ${bien} con renuncia a la exención de IVA (art. 20.Dos LIVA): tributa por IVA al 21% en lugar de por ITP.`, true);
@@ -194,6 +225,8 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
         advertencias.push(tipoAJD(ccaa, { objeto, renunciaExencionIVA: true }).motivo === 'renuncia'
           ? `Con renuncia a la exención, ${ccaaNombre} aplica un AJD propio del ${pct(tipoAJD(ccaa, { objeto, renunciaExencionIVA: true }).tipo)}.`
           : `Se aplica el AJD general de ${ccaaNombre} (${pct(tipoAJD(ccaa, { objeto }).tipo)}); algunas comunidades lo incrementan cuando hay renuncia a la exención.`);
+      } else if (!renunciaPosible) {
+        aplicarITP(`Segunda transmisión de ${bien}: tributa por ITP.`);
       } else {
         aplicarITP(`Segunda transmisión de ${bien}: exenta de IVA (art. 20.Uno.22º LIVA), tributa por ITP.`);
         advertencias.push('Si comprador y vendedor son empresarios con derecho a deducción, puede convenir renunciar a la exención de IVA: el ITP es un coste no recuperable, mientras que el IVA autoliquidado se deduce.');
@@ -215,7 +248,10 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
 
     case 'finca_rustica':
       // La entrega de terrenos rústicos está EXENTA de IVA aunque venda un empresario.
-      if (p.renunciaExencionIva) {
+      if (p.renunciaExencionIva && !renunciaPosible) {
+        aplicarITP('La finca rústica tributa por ITP.');
+        advertencias.push(avisoSinRenuncia);
+      } else if (p.renunciaExencionIva) {
         aplicarIVA(IVA_INMUEBLES_2025.local, 'IVA (renuncia a la exención · inversión del sujeto pasivo)',
           'Finca rústica con renuncia a la exención de IVA (art. 20.Dos LIVA) entre empresarios o profesionales con derecho a deducción.', true);
         advertencias.push('La renuncia solo cabe entre empresarios o profesionales con derecho a deducción; en una compraventa entre particulares no es posible.');
@@ -251,6 +287,7 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
     tipoImpuesto,
     porcentajeImpuesto,
     importeImpuesto,
+    impuestoNoCalculado,
     ajd,
     notaria,
     registro,
