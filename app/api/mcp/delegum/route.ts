@@ -294,7 +294,10 @@ const ENUM_CCAA = [
   'canarias', 'castilla-leon', 'rioja', 'castilla-mancha', 'cantabria',
   'aragon', 'baleares', 'asturias', 'cataluna', 'pais-vasco', 'navarra',
 ] as const;
-const ENUM_SITUACION = ['soltero', 'casado_sin_ingresos', 'casado_con_ingresos'] as const;
+// Para dónde está un inmueble que se VENDE: Ceuta y Melilla cambian la plusvalía y el IRPF del
+// vendedor (cabo C0193). Las tools de compra no las ofrecen porque su motor no las cubre (C0184).
+const ENUM_CCAA_INMUEBLE_VENTA = [...ENUM_CCAA, 'ceuta', 'melilla'] as const;
+const ENUM_SITUACION =['soltero', 'casado_sin_ingresos', 'casado_con_ingresos'] as const;
 
 // ---------------------------------------------------------------------------
 // Creación del servidor Delegum con su personalidad de «gestoría».
@@ -914,9 +917,10 @@ function crearServidorDelegum(): McpServer {
       reinvierte_en_vivienda: z.boolean().optional().describe('¿Va a reinvertir el importe en una nueva vivienda habitual? (exención total/parcial del IRPF, art. 38 LIRPF). Por defecto false.'),
       importe_reinversion: z.number().min(0).optional().describe('Importe concreto que se reinvierte, en euros. Si se omite y reinvierte_en_vivienda es true, se asume reinversión total. Si es parcial, la exención es proporcional (art. 41 RIRPF).'),
       hipoteca_pendiente: z.number().min(0).optional().describe('Principal de la hipoteca pendiente de amortizar al vender, en euros. Minora el importe total obtenido a efectos de la reinversión (art. 41.1 RIRPF), así que reinvertir el resto ya basta para la exención total.'),
+      ccaa: z.enum(ENUM_CCAA_INMUEBLE_VENTA).optional().describe('Comunidad o ciudad autónoma donde está el inmueble. En Ceuta y Melilla aplica la bonificación del 50 % de la plusvalía municipal y la deducción del 60 % del IRPF de la ganancia; en el País Vasco y Navarra la plusvalía es foral y no se calcula (ni el IRPF si es la vivienda habitual del vendedor, que entonces reside allí). Si se omite, no se aplica nada de eso.'),
     },
     { title: 'Consulta de venta de vivienda (IRPF de la ganancia + plusvalía municipal + neto)', readOnlyHint: true },
-    async ({ precio_venta, precio_compra, anios_tenencia, gastos_compra_original, valor_catastral_suelo, valor_catastral_total, mejoras, tipo_municipal_iivtnu, comision_inmobiliaria, gastos_gestoria, vendedor_mayor_65, es_vivienda_habitual, reinvierte_en_vivienda, importe_reinversion, hipoteca_pendiente }, extra) => {
+    async ({ precio_venta, precio_compra, anios_tenencia, gastos_compra_original, valor_catastral_suelo, valor_catastral_total, mejoras, tipo_municipal_iivtnu, comision_inmobiliaria, gastos_gestoria, vendedor_mayor_65, es_vivienda_habitual, reinvierte_en_vivienda, importe_reinversion, hipoteca_pendiente, ccaa }, extra) => {
       await registrarUsoDelegum('consulta_venta_vivienda', getCaller(extra));
       try {
         const r = calcularVentaInmueble({
@@ -935,8 +939,25 @@ function crearServidorDelegum(): McpServer {
           reinvierteTotalEnVivienda: reinvierte_en_vivienda,
           importeReinversion: importe_reinversion,
           hipotecaPendiente: hipoteca_pendiente,
+          ccaa,
         });
         const gananciaLabel = r.hayGanancia ? '📈 Ganancia patrimonial' : '📉 Pérdida patrimonial';
+        const lineaPlusvalia = r.iivtnuCalculable
+          ? `  • Plusvalía municipal (IIVTNU): ${fmt(r.plusvaliaMunicipal)} € (método ${r.metodoPlusvalia})`
+          : r.plusvaliaForal
+            ? `  • Plusvalía municipal: ${r.metodoPlusvalia}`
+            : `  • Plusvalía municipal: no calculada (indica el valor catastral del suelo)`;
+        const lineaIRPF = r.irpfForal
+          ? `  • IRPF de la ganancia: no calculado (régimen foral)`
+          : r.exentoIRPF
+            ? `  • IRPF de la ganancia: ✅ EXENTO — ${r.motivoExencion}`
+            : `  • IRPF de la ganancia: ${fmt(r.irpfGanancia)} € (tipo efectivo ${pct(r.tipoEfectivoIRPF)}%)`;
+        // En territorio foral el neto no lleva la plusvalía (ni el IRPF del residente): se dice.
+        const faltan = [
+          r.plusvaliaForal ? 'la plusvalía municipal foral' : null,
+          r.irpfForal ? 'el IRPF' : null,
+        ].filter((x): x is string => x !== null);
+        const sinFaltan = faltan.length > 0 ? ` (sin ${faltan.join(' ni ')})` : '';
         const lineas = [
           `🏠 **Delegum — Vender tu vivienda**`,
           '',
@@ -947,17 +968,14 @@ function crearServidorDelegum(): McpServer {
           '',
           `🧾 **Impuestos y gastos del vendedor**`,
           `  • Comisión inmobiliaria: ${fmt(r.comisionInmobiliaria)} € · Gestoría y otros: ${fmt(r.gastosGestoria)} €`,
-          r.iivtnuCalculable
-            ? `  • Plusvalía municipal (IIVTNU): ${fmt(r.plusvaliaMunicipal)} € (método ${r.metodoPlusvalia})`
-            : `  • Plusvalía municipal: no calculada (indica el valor catastral del suelo)`,
-          r.exentoIRPF
-            ? `  • IRPF de la ganancia: ✅ EXENTO — ${r.motivoExencion}`
-            : `  • IRPF de la ganancia: ${fmt(r.irpfGanancia)} € (tipo efectivo ${pct(r.tipoEfectivoIRPF)}%)`,
+          lineaPlusvalia,
+          lineaIRPF,
           '',
-          `💰 **Total impuestos y gastos: ${fmt(r.totalGastosVendedor)} €**`,
-          `✅ **Neto que recibes: ${fmt(r.netoVendedor)} €**`,
-          `📊 Rentabilidad neta sobre la inversión: ${r.rentabilidadNeta >= 0 ? '+' : ''}${pct(r.rentabilidadNeta)}%`,
+          `💰 **Total impuestos y gastos${sinFaltan}: ${fmt(r.totalGastosVendedor)} €**`,
+          `✅ **Neto que recibes${sinFaltan}: ${fmt(r.netoVendedor)} €**`,
+          `📊 Rentabilidad neta sobre la inversión${sinFaltan}: ${r.rentabilidadNeta >= 0 ? '+' : ''}${pct(r.rentabilidadNeta)}%`,
           '',
+          ...r.avisosTerritorio.map(a => `📍 *${a}*`),
           `📌 *La plusvalía municipal usa un tipo orientativo; confirma el de tu ayuntamiento. Si tienes pérdidas patrimoniales de otros años, pueden reducir el IRPF.*`,
           `📚 ${r.fuenteDatos}`,
         ].filter(l => l !== '');

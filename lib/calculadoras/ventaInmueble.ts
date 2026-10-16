@@ -15,7 +15,19 @@ import {
   FISCAL_IRPF_META,
   calcularGananciaInmueble,
   desglosarCuotaBaseAhorro,
+  BONIFICACION_IIVTNU_CEUTA_MELILLA,
+  DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA,
 } from '@/data/fiscal';
+import {
+  CIUDADES_CON_BONIFICACION,
+  TERRITORIOS_IIVTNU_FORAL,
+  TERRITORIOS_IRPF_FORAL,
+  AVISO_IRPF_FORAL,
+  motivoPlusvaliaForal,
+  avisoIrpfForalResidente,
+  type ComunidadAutonoma,
+} from '@/data/itp-ccaa';
+import { formatCurrency } from '@/lib/formatters';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -50,6 +62,16 @@ export interface ParametrosVentaInmueble {
   importeReinversion?: number;
   /** Principal de la hipoteca pendiente al transmitir (€) — art. 41.1 RIRPF */
   hipotecaPendiente?: number;
+  /**
+   * Comunidad o ciudad donde está el inmueble (cabo C0193, aprobado por el usuario el
+   * 15/10/2026). Con ella se aplica lo mismo que en las apps desde el 10/10/2026: en Ceuta y
+   * Melilla, la bonificación del 50 % de la plusvalía (art. 159.2 TRLRHL) y la deducción del
+   * 60 % del IRPF (art. 68.4 LIRPF); en el País Vasco y Navarra la plusvalía es foral y no se
+   * liquida, y si es la vivienda habitual del vendedor tampoco se publica la cuota del IRPF,
+   * que no es la de la escala estatal. Sin ella, el cálculo de siempre y un aviso de lo que no
+   * se ha podido aplicar.
+   */
+  ccaa?: ComunidadAutonoma;
 }
 
 export interface TramoIRPFVenta {
@@ -99,6 +121,17 @@ export interface ResultadoVentaInmueble {
   netoVendedor: number;
   /** Rentabilidad neta de la inversión (%) */
   rentabilidadNeta: number;
+  /** País Vasco o Navarra: la plusvalía municipal es foral y no se ha calculado */
+  plusvaliaForal: boolean;
+  /**
+   * La cuota del IRPF no se publica porque el vendedor reside en territorio foral (vende su
+   * vivienda habitual allí): `irpfGanancia` vale 0 y no es una exención.
+   */
+  irpfForal: boolean;
+  /** Deducción del 60 % del art. 68.4 LIRPF ya restada de `irpfGanancia` (0 fuera de Ceuta y Melilla) */
+  deduccionIRPFCeutaMelilla: number;
+  /** Lo que el territorio cambia o deja sin aplicar, para mostrarlo con el resultado */
+  avisosTerritorio: string[];
   /** Fuente normativa */
   fuenteDatos: string;
 }
@@ -132,7 +165,14 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
   const valorCatastralTotal = p.valorCatastralTotal ?? 0;
   const incrementoBruto = p.precioVenta - p.precioCompra;
 
-  if (valorCatastralSuelo > 0) {
+  // En el País Vasco y Navarra la plusvalía es foral: no se liquida con el TRLRHL (hallazgo
+  // 3071 de las apps; en Navarra la cuota salía 4,8 veces por debajo). Mejor sin cifra.
+  const plusvaliaForal = p.ccaa !== undefined && TERRITORIOS_IIVTNU_FORAL.includes(p.ccaa);
+  const enCeutaMelilla = p.ccaa !== undefined && CIUDADES_CON_BONIFICACION.includes(p.ccaa);
+
+  if (plusvaliaForal && p.ccaa) {
+    metodoPlusvalia = `No calculada: ${motivoPlusvaliaForal(p.ccaa)}`;
+  } else if (valorCatastralSuelo > 0) {
     iivtnuCalculable = true;
 
     // Método objetivo (art. 107.4 TRLHL): valor catastral del suelo × coeficiente
@@ -166,14 +206,21 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
       metodoPlusvalia = 'No sujeta (sin incremento de valor)';
     } else if (plusvaliaReal < plusvaliaObjetivo) {
       plusvaliaMunicipal = plusvaliaReal;
-      metodoPlusvalia = `Método real (más favorable): ${r(plusvaliaReal)} €`;
+      metodoPlusvalia = `Método real (más favorable): ${formatCurrency(plusvaliaReal)}`;
     } else {
       plusvaliaMunicipal = plusvaliaObjetivo;
       metodoPlusvalia = metodoRealDisponible
-        ? `Método objetivo (más favorable): ${r(plusvaliaObjetivo)} €`
+        ? `Método objetivo (más favorable): ${formatCurrency(plusvaliaObjetivo)}`
         : parCatastralImposible
-          ? `Método objetivo: ${r(plusvaliaObjetivo)} € (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI, porque con esos valores el método real no puede calcularse)`
-          : `Método objetivo: ${r(plusvaliaObjetivo)} € (sin valor catastral total no puede compararse con el método real)`;
+          ? `Método objetivo: ${formatCurrency(plusvaliaObjetivo)} (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI, porque con esos valores el método real no puede calcularse)`
+          : `Método objetivo: ${formatCurrency(plusvaliaObjetivo)} (sin valor catastral total no puede compararse con el método real)`;
+    }
+
+    // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL). Va sobre la cuota que
+    // resulte, y como reduce los dos métodos en la misma proporción no cambia cuál es el menor.
+    if (enCeutaMelilla && plusvaliaMunicipal > 0) {
+      plusvaliaMunicipal = r(plusvaliaMunicipal * (1 - BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje / 100));
+      metodoPlusvalia += `, con la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje} % de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL): ${formatCurrency(plusvaliaMunicipal)}`;
     }
   }
 
@@ -196,6 +243,8 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
           principalPendiente: p.hipotecaPendiente,
         }
       : undefined,
+    // Ceuta y Melilla: la deducción del 60 % del art. 68.4 LIRPF, resida donde resida el vendedor.
+    inmuebleEnCeutaMelilla: enCeutaMelilla,
   });
 
   const valorTransmision = r(g.valorTransmision);
@@ -203,11 +252,36 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
   const gananciaPatrimonial = r(g.ganancia);
   const hayGanancia = !g.esPerdida && g.ganancia > 0;
 
-  const exentoIRPF = hayGanancia && g.cuotaIRPF === 0;
-  const motivoExencion = g.motivoExencion ?? undefined;
-  const irpfGanancia = r(g.cuotaIRPF);
-  const tipoEfectivoIRPF = r(g.tipoEfectivo);
-  const desgloseIRPF: TramoIRPFVenta[] = desglosarCuotaBaseAhorro(g.baseImponible).map(t => ({
+  // Vende su vivienda habitual en el País Vasco o Navarra, así que reside allí: su IRPF es foral
+  // y la cuota de la escala estatal no es la suya. No se publica (hallazgo 3072 de las apps).
+  const avisoIrpfResidente = p.ccaa ? avisoIrpfForalResidente(p.ccaa, !!p.esViviendaHabitual) : null;
+  // Tampoco la exención: la de la LIRPF no es la de su norma foral, que este cálculo no aplica.
+  const irpfForal = avisoIrpfResidente !== null && hayGanancia;
+
+  const exentoIRPF = !irpfForal && hayGanancia && g.cuotaIRPF === 0;
+  const motivoExencion = irpfForal ? undefined : g.motivoExencion ?? undefined;
+  const irpfGanancia = irpfForal ? 0 : r(g.cuotaIRPF);
+  const tipoEfectivoIRPF = irpfForal ? 0 : r(g.tipoEfectivo);
+  const deduccionIRPFCeutaMelilla = irpfForal ? 0 : r(g.deduccionCeutaMelilla);
+
+  const avisosTerritorio: string[] = [];
+  if (p.ccaa === undefined) {
+    avisosTerritorio.push(
+      'No se ha indicado dónde está el inmueble: no se aplican la bonificación del 50 % de la plusvalía ni la deducción del 60 % del IRPF de Ceuta y Melilla, y en el País Vasco y Navarra la plusvalía y el IRPF son forales y no los de este cálculo.',
+    );
+  } else {
+    if (deduccionIRPFCeutaMelilla > 0) {
+      avisosTerritorio.push(
+        `IRPF con la deducción del ${DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje} % por ganancias de inmuebles situados en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(deduccionIRPFCeutaMelilla)} menos.`,
+      );
+    }
+    if (irpfForal && avisoIrpfResidente) {
+      avisosTerritorio.push(`IRPF no calculado: ${avisoIrpfResidente}.`);
+    } else if (TERRITORIOS_IRPF_FORAL.includes(p.ccaa) && hayGanancia && g.cuotaIRPF > 0) {
+      avisosTerritorio.push(AVISO_IRPF_FORAL);
+    }
+  }
+  const desgloseIRPF: TramoIRPFVenta[] = irpfForal ? [] : desglosarCuotaBaseAhorro(g.baseImponible).map(t => ({
     desde: t.desde,
     hasta: t.hasta,
     tipo: t.tipo,
@@ -241,6 +315,10 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
     totalGastosVendedor,
     netoVendedor,
     rentabilidadNeta,
+    plusvaliaForal,
+    irpfForal,
+    deduccionIRPFCeutaMelilla,
+    avisosTerritorio,
     fuenteDatos: `${PLUSVALIA_MUNICIPAL_META.baseNormativa} | ${FISCAL_IRPF_META.fuente}`,
   };
 }

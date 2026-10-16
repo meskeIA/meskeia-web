@@ -377,3 +377,84 @@ test.describe('Coherencia entre la tool MCP y el motor de las apps web', () => {
     expect(v.exentoIRPF).toBe(true);
   });
 });
+
+/**
+ * Cabo C0193 (aprobado por el usuario el 15/10/2026): la tool del MCP pregunta dónde está el
+ * inmueble y aplica lo que las apps aplican desde el 10/10/2026. Caso común, hecho a mano:
+ * venta 200.000, compra 100.000, 10 años, suelo 40.000 sin valor total, sin comisión ni gestoría.
+ *   plusvalía objetivo = 40.000 × 0,12 (10 años) × 25 % = 1.200 €
+ *   escala del ahorro: 6.000 × 19 % + 44.000 × 21 % + resto × 23 %
+ */
+test.describe('Venta vía MCP según dónde está el inmueble (cabo C0193)', () => {
+  const base = {
+    precioVenta: 200000,
+    precioCompra: 100000,
+    aniosTenencia: 10,
+    valorCatastralSuelo: 40000,
+    comisionInmobiliaria: 0,
+    gastosGestoria: 0,
+  };
+
+  test('Ceuta: plusvalía al 50 % (art. 159.2 TRLRHL) y deducción del 60 % del IRPF (art. 68.4 LIRPF)', () => {
+    const v = calcularVentaInmueble({ ...base, ccaa: 'ceuta' });
+    // 1.200 × 50 % = 600
+    expect(v.plusvaliaMunicipal).toBe(600);
+    // ganancia = 200.000 − 600 − 100.000 = 99.400
+    expect(v.gananciaPatrimonial).toBe(99400);
+    // cuota íntegra = 1.140 + 9.240 + 49.400 × 23 % (11.362) = 21.742; × 40 % = 8.696,80
+    expect(v.irpfGanancia).toBe(8696.8);
+    expect(v.deduccionIRPFCeutaMelilla).toBe(13045.2);
+    expect(v.avisosTerritorio.join(' ')).toContain('68.4 LIRPF');
+  });
+
+  test('Madrid: el cálculo de siempre, sin avisos de territorio', () => {
+    const v = calcularVentaInmueble({ ...base, ccaa: 'madrid' });
+    expect(v.plusvaliaMunicipal).toBe(1200);
+    // ganancia 98.800: 1.140 + 9.240 + 48.800 × 23 % (11.224) = 21.604
+    expect(v.irpfGanancia).toBe(21604);
+    expect(v.deduccionIRPFCeutaMelilla).toBe(0);
+    expect(v.avisosTerritorio).toEqual([]);
+  });
+
+  test('sin comunidad: el cálculo de siempre y un aviso de lo que no se ha aplicado', () => {
+    const v = calcularVentaInmueble(base);
+    expect(v.plusvaliaMunicipal).toBe(1200);
+    expect(v.irpfGanancia).toBe(21604);
+    expect(v.avisosTerritorio).toHaveLength(1);
+    expect(v.avisosTerritorio[0]).toContain('Ceuta y Melilla');
+  });
+
+  test('País Vasco, vivienda habitual: ni plusvalía (foral) ni cuota del IRPF (reside allí)', () => {
+    const v = calcularVentaInmueble({ ...base, ccaa: 'pais-vasco', esViviendaHabitual: true });
+    expect(v.plusvaliaForal).toBe(true);
+    expect(v.iivtnuCalculable).toBe(false);
+    expect(v.plusvaliaMunicipal).toBe(0);
+    expect(v.metodoPlusvalia).toContain('norma foral');
+    expect(v.irpfForal).toBe(true);
+    expect(v.irpfGanancia).toBe(0);
+    // Un 0 que no es una exención
+    expect(v.exentoIRPF).toBe(false);
+    expect(v.desgloseIRPF).toEqual([]);
+    expect(v.avisosTerritorio.join(' ')).toContain('IRPF no calculado');
+  });
+
+  test('Navarra, no habitual: plusvalía foral sin calcular, IRPF de la escala estatal con su aviso', () => {
+    const v = calcularVentaInmueble({ ...base, ccaa: 'navarra' });
+    expect(v.plusvaliaForal).toBe(true);
+    expect(v.plusvaliaMunicipal).toBe(0);
+    expect(v.metodoPlusvalia).toContain('Ley Foral 2/1995');
+    expect(v.irpfForal).toBe(false);
+    // ganancia 100.000: 1.140 + 9.240 + 50.000 × 23 % (11.500) = 21.880
+    expect(v.irpfGanancia).toBe(21880);
+    expect(v.avisosTerritorio.join(' ')).toContain('escala estatal');
+  });
+
+  test('País Vasco, habitual de un mayor de 65: tampoco se publica la exención de la LIRPF, que no es su norma', () => {
+    const v = calcularVentaInmueble({
+      ...base, ccaa: 'pais-vasco', esViviendaHabitual: true, vendedorMayor65: true,
+    });
+    expect(v.irpfForal).toBe(true);
+    expect(v.exentoIRPF).toBe(false);
+    expect(v.motivoExencion).toBeUndefined();
+  });
+});
