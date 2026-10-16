@@ -25,7 +25,7 @@ const db = new DatabaseSync(':memory:');
 db.prepare(`CREATE TABLE uso_aplicaciones (
   id INTEGER PRIMARY KEY AUTOINCREMENT, aplicacion TEXT, navegador TEXT, resolucion TEXT,
   duracion_segundos INTEGER, ip_address TEXT, modo TEXT, sesion_id TEXT, es_propio INTEGER DEFAULT 0,
-  created_at TEXT)`).run();
+  created_at TEXT, host TEXT DEFAULT 'meskeia.com')`).run();
 db.prepare(`CREATE TABLE analytics_config (clave TEXT, valor TEXT)`).run();
 db.prepare(`INSERT INTO analytics_config VALUES ('ip_excluida', '10.0.0.1')`).run();
 
@@ -96,8 +96,31 @@ for (let k = 0; k < 45; k++) {
 }
 sembrar('ida-y-vuelta', { n: 60, cortas: 0.7, reintentos: 0 });
 
+// Las dos idas y vueltas que el detector no veía (cabo C0155, simulador-potencial-accion): a
+// Términos (`pag:terminos`, misma sesión, pero el filtro humano la quitaba) y a stemum.com desde
+// DescubreVertical (otro origen: otra sesión, misma IP, navegador y resolución, otro host).
+// Con ellas contadas como recarga, las dos apps saldrían «rotas».
+const insertarConHost = db.prepare(`INSERT INTO uso_aplicaciones
+  (aplicacion, navegador, resolucion, duracion_segundos, ip_address, modo, sesion_id, created_at, host)
+  VALUES (?, 'Chrome', '1920x1080', ?, ?, 'web', ?, ?, ?)`);
+for (let k = 0; k < 45; k++) {
+  const s = `s${++sesiones}`;
+  insertar.run('ida-a-terminos', 8, `100.2.${k}.1`, 'web', s, momento(k % 30, 0));
+  insertar.run('pag:terminos', 40, `100.2.${k}.1`, 'web', s, momento(k % 30, 1));
+  insertar.run('ida-a-terminos', 15, `100.2.${k}.1`, 'web', s, momento(k % 30, 3));
+}
+sembrar('ida-a-terminos', { n: 60, cortas: 0.7, reintentos: 0 });
+for (let k = 0; k < 45; k++) {
+  const s = `s${++sesiones}`;
+  insertarConHost.run('ida-a-stemum', 8, `100.3.${k}.1`, s, momento(k % 30, 0), 'meskeia.com');
+  insertarConHost.run('stemum', 40, `100.3.${k}.1`, `s${++sesiones}`, momento(k % 30, 1), 'stemum.com');
+  insertarConHost.run('ida-a-stemum', 15, `100.3.${k}.1`, s, momento(k % 30, 3), 'meskeia.com');
+}
+sembrar('ida-a-stemum', { n: 60, cortas: 0.7, reintentos: 0 });
+
 const catalogo = [...Array.from({ length: 10 }, (_, k) => `normal-${k + 1}`),
-  'rota', 'consulta-rapida', 'aula', 'pocas', 'bot', 'se-rompe', 'estable', 'ida-y-vuelta'];
+  'rota', 'consulta-rapida', 'aula', 'pocas', 'bot', 'se-rompe', 'estable', 'ida-y-vuelta',
+  'ida-a-terminos', 'ida-a-stemum'];
 const r = calcularFirma(db, { slugs: catalogo, hasta: HASTA });
 
 let fallos = 0;
@@ -117,6 +140,8 @@ exigir('aula', null, 'misma IP y navegador, pero cada alumno en su sesión');
 exigir('pocas', null, 'por debajo de 60 visitas no se juzga');
 exigir('estable', null, 'más cortas que el catálogo, pero sin reintentos ni cambio');
 exigir('ida-y-vuelta', null, 'vuelve tras pasar por otra app: es navegación, no recarga');
+exigir('ida-a-terminos', null, 'vuelve tras pasar por Términos (pag:*): navegación, no recarga');
+exigir('ida-a-stemum', null, 'vuelve tras pasar por stemum.com (otro origen): navegación, no recarga');
 exigir('normal-1', null, 'una app corriente');
 if (r.apps.has('portada')) { fallos++; console.log('  ✗ portada: está fuera del catálogo y no debe evaluarse'); }
 else console.log('  ✓ portada          fuera        — no está en el catálogo');

@@ -117,16 +117,25 @@ export function cargarDump(ruta) {
 }
 
 /**
- * Filtro humano, el mismo que el digest diario: sin bots, sin la IP propia, sin los agentes
- * que renderizan para llevarse el texto, y sin las pseudo-apps (`mcp:`, `pag:`, `meskeIA`).
+ * Filtro de persona: sin bots, sin la IP propia y sin los agentes que renderizan para llevarse
+ * el texto. Deja dentro las pseudo-apps, porque para saber si alguien pasó por OTRA página entre
+ * dos cargas cuentan también Términos, Privacidad o Contacto (`pag:*`).
  */
-function filtroHumano(db) {
+function filtroPersona(db) {
   const tieneConfig = db.prepare(`SELECT 1 x FROM sqlite_master WHERE name = 'analytics_config'`).get();
   const ip = tieneConfig ? db.prepare(`SELECT valor v FROM analytics_config WHERE clave = 'ip_excluida'`).get()?.v : null;
   const ipSegura = ip ? String(ip).replace(/'/g, "''") : null;
   return `modo <> 'bot' AND COALESCE(es_propio, 0) = 0
     AND COALESCE(navegador, '') NOT LIKE '%NotebookLM%'
-    ${ipSegura ? `AND (ip_address IS NULL OR ip_address <> '${ipSegura}')` : ''}
+    ${ipSegura ? `AND (ip_address IS NULL OR ip_address <> '${ipSegura}')` : ''}`;
+}
+
+/**
+ * Filtro humano, el mismo que el digest diario: el de persona y sin las pseudo-apps (`mcp:`,
+ * `pag:`, `meskeIA`), que no son apps del catálogo.
+ */
+function filtroHumano(db) {
+  return `${filtroPersona(db)}
     AND aplicacion NOT LIKE 'mcp:%' AND aplicacion NOT LIKE 'pag:%' AND aplicacion <> 'meskeIA'`;
 }
 
@@ -153,16 +162,46 @@ const p = x => `${pct.format(x)} %`;
 export function calcularFirma(db, { slugs, hasta } = {}) {
   const U = UMBRALES;
   const HUM = filtroHumano(db);
+  const PERSONA = filtroPersona(db);
   if (!hasta) {
     hasta = db.prepare(`SELECT date(MAX(created_at), '-1 day') d FROM uso_aplicaciones`).get().d;
   }
   db.prepare('CREATE INDEX IF NOT EXISTS ix_firma ON uso_aplicaciones(sesion_id, aplicacion, created_at)').run();
+  db.prepare('CREATE INDEX IF NOT EXISTS ix_firma_ip ON uso_aplicaciones(ip_address, created_at)').run();
+  const tieneHost = db.prepare(`SELECT 1 x FROM pragma_table_info('uso_aplicaciones') WHERE name = 'host'`).get();
   const dentro = slugs ? new Set(slugs) : null;
+
+  /**
+   * SIN OTRA PÁGINA EN MEDIO, AUNQUE SEA DE OTRO DOMINIO (cabo C0155, 16/10/2026)
+   * En simulador-potencial-accion, 4 de sus 14 «recargas» eran idas y vueltas que el detector no
+   * veía: a Términos, Privacidad o Contacto (`pag:*`, que el filtro humano quita, así que tampoco
+   * contaban como «otra app en medio») o a stemum.com desde DescubreVertical, que es otro origen y
+   * por eso otro `sesion_id`. Sin ellas, 10/219 = 4,6 %, bajo el umbral. Ahora la página de en
+   * medio se busca en `nav` (con las `pag:*`) y, para el salto de dominio, por la misma IP,
+   * navegador y resolución en OTRO `host`. Esto último no puede inventar recargas, solo
+   * descontarlas: en un aula con veinte equipos iguales, la visita de un compañero a otro
+   * dominio puede tapar una recarga de verdad, que es el lado seguro.
+   */
+  const otroDominio = tieneHost ? `
+          OR EXISTS (
+            SELECT 1 FROM nav y
+            WHERE y.ip_address = v.ip_address AND y.navegador IS v.navegador AND y.resolucion IS v.resolucion
+              AND y.created_at >= w.created_at AND y.created_at <= v.created_at
+              AND y.sesion_id IS NOT v.sesion_id
+              AND COALESCE(y.host, '') <> COALESCE(v.host, '')
+          )` : '';
 
   // ── Nivel: 30 días, visitas cortas y recargas tras visita corta ──
   const nivel = db.prepare(`
-    WITH v AS (
-      SELECT id, aplicacion, created_at, sesion_id, duracion_segundos
+    WITH nav AS (
+      SELECT id, aplicacion, created_at, sesion_id, ip_address, navegador, resolucion${tieneHost ? ', host' : ''}
+      FROM uso_aplicaciones
+      WHERE ${PERSONA}
+        AND created_at >= date(:hasta, '-${U.DIAS_NIVEL} days')
+        AND created_at < date(:hasta, '+1 day')
+    ),
+    v AS (
+      SELECT id, aplicacion, created_at, sesion_id, duracion_segundos, ip_address, navegador, resolucion${tieneHost ? ', host' : ''}
       FROM uso_aplicaciones
       WHERE ${HUM}
         AND created_at >= date(:hasta, '-${U.DIAS_NIVEL - 1} days')
@@ -175,10 +214,13 @@ export function calcularFirma(db, { slugs, hasta } = {}) {
         WHERE w.sesion_id = v.sesion_id AND w.aplicacion = v.aplicacion AND w.id < v.id
           AND w.created_at >= datetime(v.created_at, '-${U.MINUTOS_REINTENTO} minutes')
           AND (w.duracion_segundos IS NULL OR w.duracion_segundos < ${U.SEGUNDOS_CORTA})
-          -- Sin otra app entre las dos cargas: ir a otra herramienta y volver es navegación
-          AND NOT EXISTS (
-            SELECT 1 FROM v x
-            WHERE x.sesion_id = v.sesion_id AND x.id > w.id AND x.id < v.id AND x.aplicacion <> v.aplicacion
+          -- Sin otra página entre las dos cargas: ir a otra herramienta (o a Términos, o a otro
+          -- dominio) y volver es navegación
+          AND NOT (
+            EXISTS (
+              SELECT 1 FROM nav x
+              WHERE x.sesion_id = v.sesion_id AND x.id > w.id AND x.id < v.id AND x.aplicacion <> v.aplicacion
+            )${otroDominio}
           )
       )) AS reintentos
     FROM v GROUP BY aplicacion`).all({ hasta }).filter(f => !dentro || dentro.has(f.slug));
