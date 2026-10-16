@@ -143,7 +143,11 @@ test.describe('Calculadora de tamaño adulto del perro', () => {
     await expect(referencia).toHaveCount(1);
     await expect(referencia).toContainText('no es un estándar veterinario');
     await expect(referencia).toContainText('no cubre perros de más de 40 kg de adulto');
-    await expect(referencia).toContainText('nunca para decidir dosis, dietas ni tratamientos');
+    // Desde el 16/10/2026 (S0207) la app da una ración orientativa, así que «dietas» salió de la
+    // lista: lo que se sigue exigiendo es que la estimación no decida dosis ni tratamientos y que
+    // la ración se presente como punto de partida, no como dieta.
+    await expect(referencia).toContainText('nunca para decidir dosis ni tratamientos');
+    await expect(referencia).toContainText('punto de partida que se ajusta con el peso real');
 
     // (c) Techo de peso: 120 kg es el máximo admitido y se calcula. Antes el tope eran 50 kg,
     //     que dejaba inservible la categoría gigante entera (la propia app da 45-90 kg de
@@ -403,5 +407,81 @@ test.describe('Calculadora de tamaño adulto del perro — regresiones', () => {
     expect(d).not.toBeNull();
     const x0 = parseFloat((d as string).match(/^M([\d.]+),/)![1]);
     expect(x0, `la curva empieza en x=${x0} y el área de dibujo en x=52`).toBeLessThan(53);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// RACIÓN DIARIA ORIENTATIVA (16/10/2026, semilla S0207) — `motor.ts` y su sección.
+//
+// Ecuación de crecimiento del NRC (2006), reproducida en Bradley et al. (2021), Animals
+// 11(5):1380: EM (kcal/día) = 130 × PV^0,75 × 3,2 × (e^(−0,87·p) − 0,1), p = peso actual ÷
+// peso adulto. Casos resueltos a mano, término a término (16/10/2026):
+//   A  10 kg, p = 0,5:  10^0,75 = 5,62341 · e^(−0,435) = 0,64726 · (0,64726 − 0,1) × 3,2 × 130
+//      = 227,662 kcal/kg^0,75 → × 5,62341 = 1.280,24 kcal/día. Con 3.800 kcal/kg: 336,91 g.
+//   B  2 kg, p = 0,25:  2^0,75 = 1,68179 · e^(−0,2175) = 0,80453 → 293,083 × 1,68179 = 492,91
+//   C  30 kg, p = 1:    30^0,75 = 12,81861 · e^(−0,87) = 0,41895 → 132,684 × 12,81861 = 1.700,82
+//   Página: grande, 10 kg, 24 semanas → la curva da p = 0,55 (razas.ts). 5,62341 ·
+//      e^(−0,4785) = 0,61972 → 216,20 × 5,62341 = 1215,8 kcal → «≈ 1220 kcal» (a la decena; con cuatro cifras no se agrupa, RAE 2010);
+//      con 3800 kcal/kg, 319,9 g → «≈ 320 g» (a 5 g). Se teclea «3.800» a propósito: también vale.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
+test.describe('ración diaria orientativa · motor', () => {
+  test('la ecuación de crecimiento del NRC, en tres casos a mano', async () => {
+    const { energiaCrecimientoKcal, gramosDePienso } = await import('../../app/calculadora-tamano-adulto-perro/motor');
+    expect(energiaCrecimientoKcal(10, 0.5)).toBeCloseTo(1280.24, 1);
+    expect(energiaCrecimientoKcal(2, 0.25)).toBeCloseTo(492.91, 1);
+    expect(energiaCrecimientoKcal(30, 1)).toBeCloseTo(1700.82, 1);
+    expect(gramosDePienso(1280.24, 3800)).toBeCloseTo(336.91, 1);
+  });
+
+  test('más lejos del peso adulto, más energía por kilo metabólico', async () => {
+    const { energiaCrecimientoKcal } = await import('../../app/calculadora-tamano-adulto-perro/motor');
+    const porKilo = (p: number) => energiaCrecimientoKcal(10, p) / Math.pow(10, 0.75);
+    expect(porKilo(0.2)).toBeGreaterThan(porKilo(0.5));
+    expect(porKilo(0.5)).toBeGreaterThan(porKilo(0.9));
+  });
+
+  test('lo imposible da NaN, no una cifra', async () => {
+    const { energiaCrecimientoKcal, gramosDePienso } = await import('../../app/calculadora-tamano-adulto-perro/motor');
+    for (const [pv, p] of [[0, 0.5], [-3, 0.5], [10, 0], [10, 1.2], [NaN, 0.5], [10, NaN]]) {
+      expect(energiaCrecimientoKcal(pv, p), `${pv} kg, p = ${p}`).toBeNaN();
+    }
+    // 380 es la energía en kcal/100 g escrita como si fuera por kilo: fuera de rango, sin gramos
+    expect(gramosDePienso(1000, 380)).toBeNaN();
+    expect(gramosDePienso(1000, 7000)).toBeNaN();
+    expect(gramosDePienso(NaN, 3800)).toBeNaN();
+  });
+});
+
+test.describe('ración diaria orientativa · en la página', () => {
+  test('grande, 10 kg con 24 semanas: ≈ 1220 kcal, y con su pienso ≈ 320 g', async ({ page }) => {
+    await page.goto(RUTA);
+    await calcular(page, { peso: '10', edad: '24', tamano: 'Grande' });
+    const seccion = page.locator('section[aria-labelledby="tituloRacion"]');
+    await expect(seccion).toContainText('el 55 % de su');
+    await expect(seccion.locator('[class*="racionNumero"]')).toHaveText('≈ 1220 kcal');
+    await expect(seccion.locator('[class*="racionGramos"]')).toHaveCount(0);
+
+    await seccion.locator('#kcal-pienso').fill('3.800');
+    await expect(seccion.locator('[class*="racionGramos"]')).toContainText('320 g de pienso al día');
+
+    // kcal/100 g escritas como kcal/kg: aviso y ninguna cifra de gramos
+    await seccion.locator('#kcal-pienso').fill('380');
+    await expect(seccion.getByRole('alert')).toContainText('kcal por kilo');
+    await expect(seccion.locator('[class*="racionGramos"]')).toHaveCount(0);
+
+    // el aviso de que es un punto de partida está siempre a la vista, no plegado
+    await expect(seccion.locator('[class*="racionAviso"]')).toBeVisible();
+  });
+
+  test('si ya terminó de crecer, no da ración de cachorro: remite a la de adultos', async ({ page }) => {
+    await page.goto(RUTA);
+    await calcular(page, { peso: '30', edad: '100', tamano: 'Grande' });
+    const seccion = page.locator('section[aria-labelledby="tituloRacion"]');
+    await expect(seccion.locator('[class*="racionNumero"]')).toHaveCount(0);
+    await expect(seccion.getByRole('link', { name: 'calculadora de alimentación de mascotas' })).toHaveAttribute(
+      'href',
+      '/calculadora-alimentacion-mascotas/',
+    );
   });
 });

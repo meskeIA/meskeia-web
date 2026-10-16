@@ -44,6 +44,7 @@ export const jsonLd = generateWebAppSchema({
     'Tabla de referencia con más de 25 razas y su peso adulto típico',
     'Indicación de la edad de maduración esperada según el tamaño',
     'Filtros por categoría de tamaño en la tabla de razas',
+    'Ración diaria orientativa del cachorro en kcal y en gramos de su pienso (ecuación de crecimiento NRC 2006)',
   ],
 });
 

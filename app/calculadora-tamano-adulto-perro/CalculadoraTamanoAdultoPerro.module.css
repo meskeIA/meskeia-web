@@ -1188,3 +1188,105 @@
     transform: none;
   }
 }
+
+/* ============================================
+   RACIÓN DIARIA ORIENTATIVA (16/10/2026, semilla S0207)
+   Mismo marco que la curva de crecimiento. Ninguna clase contiene «resultadoValor»,
+   «rangoValor», «detalleValor» ni «coherencia»: el acta del Inspector localiza por ellas.
+   ============================================ */
+.racionContainer {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.racionContainer h2 {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.racionContainer a {
+  color: var(--primary-texto);
+  text-decoration: underline;
+}
+
+.racionCifra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.racionNumero {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-texto);
+}
+
+.racionUnidad {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.racionGramos {
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(46, 134, 171, 0.1);
+  border-left: 4px solid var(--primary);
+  color: var(--text-primary);
+  font-size: 1.05rem;
+}
+
+.racionAviso {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.12);
+  border-left: 4px solid #F59E0B;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .racionContainer {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+[data-theme='dark'] .racionContainer h2,
+[data-theme='dark'] .racionGramos {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .racionNumero,
+[data-theme='dark'] .racionContainer a {
+  color: var(--primary-texto);
+}
+
+[data-theme='dark'] .racionUnidad,
+[data-theme='dark'] .racionAviso {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .racionGramos {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .racionAviso {
+  background: rgba(245, 158, 11, 0.18);
+}
+
+@media (max-width: 480px) {
+  .racionContainer {
+    padding: 18px;
+  }
+
+  .racionNumero {
+    font-size: 1.6rem;
+  }
+}

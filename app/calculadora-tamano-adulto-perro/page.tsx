@@ -3,7 +3,8 @@
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
+import { energiaCrecimientoKcal, gramosDePienso, KCAL_POR_KG_MIN, KCAL_POR_KG_MAX } from './motor';
 import {
   razasReferencia,
   rangosTipicos,
@@ -86,6 +87,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
   const [tamanoRaza, setTamanoRaza] = useState<TamanoRaza>('mediano');
   const [filtroRaza, setFiltroRaza] = useState<TamanoRaza | 'todas'>('todas');
   const [error, setError] = useState<string | null>(null);
+  /** Energía del pienso en kcal/kg, tal como la escribe el usuario. Opcional: sin ella sale solo la energía. */
+  const [kcalPienso, setKcalPienso] = useState('');
   const [resultado, setResultado] = useState<{
     pesoAdultoMin: number;
     pesoAdultoMax: number;
@@ -188,6 +191,27 @@ export default function CalculadoraTamanoAdultoPerroPage() {
 
     return { puntos, hitos, finSemanas, rango, coherencia };
   }, [resultado]);
+
+  /**
+   * Ración diaria orientativa (S0207): la ecuación de crecimiento del NRC (2006) con p = el
+   * crecimiento actual que ya da la curva. La cuenta vive en ./motor.ts; aquí solo se redondea
+   * para enseñarla: kcal a la decena y gramos a 5 g, porque más precisión prometería una
+   * exactitud que la ecuación no tiene (sobrestima en razas pequeñas, ver motor.ts).
+   */
+  const racion = useMemo(() => {
+    if (!resultado) return null;
+    const p = resultado.porcentajeCrecimiento / 100;
+    if (p >= 0.999) return { adulto: true as const };
+    const kcal = energiaCrecimientoKcal(resultado.peso, p);
+    const densidad = kcalPienso.trim() === '' ? NaN : parseSpanishNumber(kcalPienso);
+    const gramos = gramosDePienso(kcal, densidad);
+    return {
+      adulto: false as const,
+      kcal: Math.round(kcal / 10) * 10,
+      gramos: Number.isFinite(gramos) ? Math.round(gramos / 5) * 5 : NaN,
+      piensoFueraDeRango: kcalPienso.trim() !== '' && !Number.isFinite(gramos),
+    };
+  }, [resultado, kcalPienso]);
 
   const grafico = useMemo(() => {
     if (!resultado || !curva) return null;
@@ -526,6 +550,73 @@ export default function CalculadoraTamanoAdultoPerroPage() {
         </section>
       )}
 
+      {/* Ración diaria orientativa (S0207) */}
+      {resultado && racion && (
+        <section className={styles.racionContainer} aria-labelledby="tituloRacion">
+          <h2 id="tituloRacion"><span aria-hidden="true">🥣</span> Ración diaria orientativa</h2>
+          {racion.adulto ? (
+            <p className={styles.curvaIntro}>
+              Según la curva de su tamaño, con {formatNumber(resultado.edad, 0)} semanas ya ha terminado de crecer, así
+              que su ración es la de un perro adulto. La calcula la{' '}
+              <a href="/calculadora-alimentacion-mascotas/">calculadora de alimentación de mascotas</a>, con su peso, su
+              actividad y su condición corporal.
+            </p>
+          ) : (
+            <>
+              <p className={styles.curvaIntro}>
+                Un cachorro necesita más energía por kilo cuanto más lejos está de su peso adulto. Con{' '}
+                {formatNumber(resultado.peso, 1)} kg y el {formatNumber(resultado.porcentajeCrecimiento, 0)}&nbsp;% de su
+                peso adulto ya alcanzado, la ecuación de crecimiento del NRC (2006) da:
+              </p>
+              <p className={styles.racionCifra}>
+                <span className={styles.racionNumero}>≈ {formatNumber(racion.kcal, 0)} kcal</span>{' '}
+                <span className={styles.racionUnidad}>al día</span>
+              </p>
+
+              <div className={styles.inputGroup}>
+                <label htmlFor="kcal-pienso">Energía de tu pienso (opcional)</label>
+                <div className={styles.inputConUnidad}>
+                  <input
+                    id="kcal-pienso"
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    value={kcalPienso}
+                    onChange={(e) => setKcalPienso(e.target.value)}
+                    placeholder="3800"
+                    className={styles.input}
+                  />
+                  <span className={styles.unidad}>kcal/kg</span>
+                </div>
+                <span className={styles.hint}>
+                  En la etiqueta, como «energía metabolizable». Si la da en kcal/100 g, multiplica por 10.
+                </span>
+              </div>
+
+              {Number.isFinite(racion.gramos) && (
+                <p className={styles.racionGramos}>
+                  ≈ <strong>{formatNumber(racion.gramos, 0)} g de pienso al día</strong>, repartidos en varias tomas.
+                </p>
+              )}
+              {racion.piensoFueraDeRango && (
+                <p className={styles.errorMsg} role="alert">
+                  <span aria-hidden="true">⚠️</span> Escribe la energía en kcal por kilo, entre{' '}
+                  {formatNumber(KCAL_POR_KG_MIN, 0)} y {formatNumber(KCAL_POR_KG_MAX, 0)}: un pienso seco suele rondar las
+                  3500-4200 kcal/kg.
+                </p>
+              )}
+
+              <p className={styles.racionAviso}>
+                <span aria-hidden="true">⚠️</span> Es un punto de partida, no una dieta. En dos estudios con razas pequeñas
+                (Yorkshire y Norfolk terrier) los cachorros comieron menos de lo que da esta ecuación, sobre todo antes de
+                las 20 semanas. Lo que manda es su peso: pésalo cada semana, compáralo con la curva de arriba y ajusta la
+                ración con tu veterinario y con la tabla de tu pienso.
+              </p>
+            </>
+          )}
+        </section>
+      )}
+
       {/* Tabla de razas */}
       <div className={styles.razasContainer}>
         <h2><span aria-hidden="true">📋</span> Tabla de Razas de Referencia</h2>
@@ -608,7 +699,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
         fuente="Referencia de contraste: Salt et al. (2017), PLoS ONE 12(9):e0182064 — base de las WALTHAM Puppy Growth Charts"
         verificado="2026-08-20"
         urlOficial="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0182064"
-        nota="Los porcentajes que usa esta calculadora son una aproximación propia, no una tabla publicada. El estándar veterinario de referencia no cubre perros de más de 40 kg de adulto, así que en razas gigantes la estimación es especialmente indicativa. Sirve para hacerse una idea del tamaño final, nunca para decidir dosis, dietas ni tratamientos."
+        nota="Los porcentajes que usa esta calculadora son una aproximación propia, no una tabla publicada. El estándar veterinario de referencia no cubre perros de más de 40 kg de adulto, así que en razas gigantes la estimación es especialmente indicativa. Sirve para hacerse una idea del tamaño final, nunca para decidir dosis ni tratamientos; la ración diaria que se calcula con ella es un punto de partida que se ajusta con el peso real del cachorro."
       />
 
       <RelatedApps
@@ -915,7 +1006,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
                 <strong>Ajusta la alimentación a la etapa actual</strong>
-                <p>Usa el peso adulto estimado (no el actual) para calcular la ración diaria con pienso de cachorro. Esto evita la sobrealimentación en razas grandes, que puede provocar un crecimiento demasiado rápido y problemas articulares.</p>
+                <p>Las tablas de los piensos de cachorro se leen con el peso adulto estimado, no con el actual, y la «Ración diaria orientativa» de arriba hace la cuenta con los dos. Esto evita la sobrealimentación en razas grandes, que puede provocar un crecimiento demasiado rápido y problemas articulares.</p>
               </div>
             </li>
             <li className={styles.step}>
