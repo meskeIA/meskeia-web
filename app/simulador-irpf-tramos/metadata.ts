@@ -1,10 +1,27 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FISCAL_IRPF_META } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, MINIMOS_IRPF_2025 } from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
 // y no se escribe a mano (lo exige check:anio-titulo).
 const anio = FISCAL_IRPF_META.vigencia;
+
+/**
+ * Los tramos del FAQPage, de la misma escala que pinta la app. Hasta el 16/10/2026 iban
+ * tecleados «para 2025» y la respuesta decía que eran «los tipos del tramo estatal», cuando son
+ * estatal + autonómico medio: la escala estatal del art. 63 LIRPF acaba en el 24,50 % (leído en el
+ * BOE ese día). Y la base liquidable se obtenía «restando los mínimos», que no se restan (art.
+ * 63.1.2.º LIRPF: se gravan a tipo cero). Cabo C0092.
+ */
+const euros = (n: number) => `${formatNumber(n, 0)} €`;
+const pct = (n: number) => `${formatNumber(n, 0)} %`;
+const textoTramos = TRAMOS_IRPF_2025.map((t, i) => {
+  const desde = i === 0 ? 0 : TRAMOS_IRPF_2025[i - 1].hasta;
+  if (i === 0) return `${pct(t.tipo)} hasta ${euros(t.hasta)}`;
+  if (t.hasta === Infinity) return `y ${pct(t.tipo)} por encima de ${euros(desde)}`;
+  return `${pct(t.tipo)} de ${euros(desde)} a ${euros(t.hasta)}`;
+}).join(', ');
 
 export const metadata: Metadata = {
   title: `Simulador Visual IRPF Tramos ${anio} - "¿Qué pasa si subo X €?" | meskeIA`,
@@ -44,7 +61,7 @@ export const jsonLd = generateWebAppSchema({
     'Slider "qué pasa si subo X €"',
     '3 modos: por tramos, escalera de tipos, comparativa',
     'Cálculo de tipo marginal y tipo medio efectivo',
-    'Datos basados en Ley 35/2006 y LPGE 2025',
+    'Escala estatal + autonómica media de la Ley 35/2006',
     'Solo orientativo — verifica con la AEAT',
     'En español',
   ],
@@ -57,10 +74,10 @@ export const faqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cómo funcionan los tramos del IRPF en España en 2025?',
+      name: `¿Cómo funcionan los tramos del IRPF en España en ${anio}?`,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El IRPF español es un impuesto progresivo dividido en 6 tramos para 2025: 19% hasta 12.450 €, 24% de 12.450 € a 20.200 €, 30% de 20.200 € a 35.200 €, 37% de 35.200 € a 60.000 €, 45% de 60.000 € a 300.000 €, y 47% por encima de 300.000 €. Cada tipo solo se aplica a la parte de renta que cae dentro de ese tramo, no a la totalidad del salario. Estos son los tipos del tramo estatal; las comunidades autónomas aplican sus propios tipos adicionales.',
+        text: `El IRPF español es un impuesto progresivo. Sumando la escala estatal y una autonómica media, la base liquidable general tributa en ${TRAMOS_IRPF_2025.length} tramos en ${anio}: ${textoTramos}. Cada tipo solo se aplica a la parte de renta que cae dentro de ese tramo, no a la totalidad del salario. La mitad aproximada de cada tipo es estatal (la escala del Estado acaba en el 24,50 %) y el resto lo fija cada comunidad autónoma, así que el tipo real cambia según dónde se resida.`,
       },
     },
     {
@@ -84,7 +101,7 @@ export const faqJsonLd = {
       name: '¿Estos datos del simulador son válidos para todas las comunidades autónomas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Este simulador muestra exclusivamente los tramos estatales del IRPF, que son iguales para toda España. Sin embargo, la cuota total del IRPF incluye también la parte autonómica, cuyos tipos varían según la comunidad autónoma de residencia. Para conocer tu cuota completa con los tipos de tu comunidad, debes consultar la tabla IRPF completa (estatal + autonómica) de tu comunidad o usar el simulador de la AEAT.',
+        text: 'No exactamente. Este simulador usa la escala estatal, que es igual en toda España, sumada a una escala autonómica media orientativa. Cada comunidad autónoma fija su propia escala, con tramos y tipos distintos, así que tu cuota real puede ser mayor o menor. Para conocerla con los tipos de tu comunidad, consulta su escala autonómica o el simulador de la AEAT.',
       },
     },
     {
@@ -92,7 +109,7 @@ export const faqJsonLd = {
       name: '¿Qué es la base liquidable y sobre qué se calculan los tramos del IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La base liquidable es la cantidad sobre la que se aplican los tramos del IRPF. Se obtiene restando al rendimiento neto del trabajo o renta los mínimos personales, familiares y otras deducciones previstas en la ley (mínimo del contribuyente 5.550 €, más reducciones por hijos, mayores, discapacidad, aportaciones a planes de pensiones, etc.). No es lo mismo que el salario bruto: la base liquidable suele ser significativamente inferior.',
+        text: `La base liquidable es la cantidad sobre la que se aplican los tramos del IRPF: la base imponible (rendimientos netos y demás rentas) menos las reducciones previstas en la ley, como las aportaciones a planes de pensiones o la de tributación conjunta. El mínimo personal y familiar (${euros(MINIMOS_IRPF_2025.personal)} el del contribuyente, más lo que corresponda por hijos, mayores o discapacidad) no se resta de la base: se grava a tipo cero, aplicando la escala también a su importe y restando esa cuota (art. 63.1 LIRPF). No es lo mismo que el salario bruto: la base liquidable suele ser bastante inferior.`,
       },
     },
   ],

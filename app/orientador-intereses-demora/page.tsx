@@ -18,12 +18,17 @@ import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   TIPOS_DEMORA_COMERCIAL,
   INTERES_LEGAL_DINERO_2025,
+  INTERES_DEMORA_TRIBUTARIO_2025,
   FISCAL_INTERESES_META,
   getTipoDemoraComercialParaFecha,
   PLAZOS_RECLAMACION_COMERCIAL,
 } from '@/data/fiscal';
 
 type TipoDeuda = 'comercial' | 'civil';
+
+/** El tipo del semestre del ejemplo del autónomo (vencimiento el 30/01/2025). Decía 11,10 %, que
+ *  no es el de ningún semestre del módulo, y 27,75 €/mes (cabo C0092). */
+const TIPO_EJEMPLO_AUTONOMO = getTipoDemoraComercialParaFecha(new Date('2025-01-31'));
 
 interface Resultado {
   diasDemora: number;
@@ -197,7 +202,7 @@ export default function OrientadorInteresesDemoraPage() {
             {tipoDeuda === 'civil' && (
               <p className={styles.helperText}>
                 Tipo actual: <strong>{formatNumber(INTERES_LEGAL_DINERO_2025.tipo, 2)}%</strong> anual
-                (interés legal del dinero 2025)
+                (interés legal del dinero {INTERES_LEGAL_DINERO_2025.vigencia})
               </p>
             )}
           </div>
@@ -378,7 +383,7 @@ export default function OrientadorInteresesDemoraPage() {
           <h2>Interés legal del dinero (art. 1108 CC)</h2>
           <p>
             Para deudas civiles o sin pacto expreso se aplica el interés legal del dinero, fijado anualmente
-            por la Ley de Presupuestos Generales del Estado. En 2025 es del <strong>{formatNumber(INTERES_LEGAL_DINERO_2025.tipo, 2)}%</strong> anual
+            por la Ley de Presupuestos Generales del Estado. En {INTERES_LEGAL_DINERO_2025.vigencia} es del <strong>{formatNumber(INTERES_LEGAL_DINERO_2025.tipo, 2)}%</strong> anual
             (prórroga del ejercicio anterior por no haberse aprobado PGE). Es notablemente inferior al interés
             comercial, por lo que conviene verificar qué norma aplica a tu situación.
           </p>
@@ -427,7 +432,7 @@ export default function OrientadorInteresesDemoraPage() {
           <h2>Comparativa de tipos de interés de demora</h2>
           <p>
             No todos los intereses de demora se calculan igual. La norma aplicable depende del tipo de relación jurídica
-            y de quiénes son las partes. Esta tabla resume las diferencias clave para 2025:
+            y de quiénes son las partes. Esta tabla resume las diferencias clave para {FISCAL_INTERESES_META.vigencia}:
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -447,10 +452,12 @@ export default function OrientadorInteresesDemoraPage() {
                   <td>Hacienda (AEAT, CCAA)</td>
                 </tr>
                 <tr>
-                  <td><strong>Tipo 2025</strong></td>
-                  <td><strong>11,10%</strong> (1T/2025: BCE 3,10% + 8 pp)</td>
-                  <td><strong>3,25%</strong> anual (prórroga PGE)</td>
-                  <td><strong>4,0625%</strong> anual (LPE 2023 prorrogada)</td>
+                  {/* Del módulo, no tecleados: hasta el 16/10/2026 decía «11,10 % (1T/2025: BCE
+                      3,10 %)», un tipo que no casaba ni con su propio módulo (cabo C0092). */}
+                  <td><strong>Tipo {FISCAL_INTERESES_META.vigencia}</strong></td>
+                  <td><strong>{formatNumber(TIPOS_DEMORA_COMERCIAL[0].tipoTotal, 2)}&nbsp;%</strong> ({TIPOS_DEMORA_COMERCIAL[0].semestre}: BCE {formatNumber(TIPOS_DEMORA_COMERCIAL[0].tipoBCE, 2)}&nbsp;% + 8 pp)</td>
+                  <td><strong>{formatNumber(INTERES_LEGAL_DINERO_2025.tipo, 2)}&nbsp;%</strong> anual (prórroga PGE)</td>
+                  <td><strong>{formatNumber(INTERES_DEMORA_TRIBUTARIO_2025.tipo, 4)}&nbsp;%</strong> anual (LPE 2023 prorrogada)</td>
                 </tr>
                 <tr>
                   <td><strong>Se aplica automáticamente</strong></td>
@@ -496,8 +503,8 @@ export default function OrientadorInteresesDemoraPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Un diseñador freelance emite factura a una empresa el 1 de enero de 2025 con vencimiento 30 de enero.
-                La empresa no paga. Aplica la <strong>Ley 3/2004</strong>: tipo del 11,10% anual + <strong>40 € mínimos</strong> por costes de cobro
-                (independientemente de los intereses calculados). Por cada mes de retraso se generan aprox. 27,75 € de intereses.
+                La empresa no paga. Aplica la <strong>Ley 3/2004</strong>: tipo del {formatNumber(TIPO_EJEMPLO_AUTONOMO.tipoTotal, 2)}&nbsp;% anual ({TIPO_EJEMPLO_AUTONOMO.semestre}) + <strong>40 € mínimos</strong> por costes de cobro
+                (independientemente de los intereses calculados). Por cada mes de retraso se generan aprox. {formatCurrency(3000 * TIPO_EJEMPLO_AUTONOMO.tipoTotal / 100 / 12)} de intereses.
               </p>
               <p className={styles.escenarioTip}>
                 Consejo: emite la factura de intereses tan pronto como sea posible; los 40 € se reclaman al mismo tiempo.

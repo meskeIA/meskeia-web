@@ -66,7 +66,7 @@ export const jsonLd = generateWebAppSchema({
     'Modo simple (agrupado) y detallado',
     '4 ejemplos preconfigurados (mileurista, mediano, alto, directivo)',
     'Soporte 12, 14 o 15 pagas',
-    'Datos basados en LPGE 2025 y Orden PJC/51/2025',
+    'Cotizaciones de 2026 según la Orden PJC/297/2026',
     'Solo orientativo — no sustituye al asesor fiscal',
     'En español',
   ],

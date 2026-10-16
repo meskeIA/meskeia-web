@@ -429,7 +429,7 @@ export default function SimuladorDesgloseNominaPage() {
       <DisclaimerCard variant="financial" severity="critical" />
 
       <DataReference
-        normativa="IRPF y Seguridad Social 2025"
+        normativa={`IRPF y Seguridad Social ${FISCAL_IRPF_META.vigencia}`}
         fuente={FISCAL_IRPF_META.fuente}
         verificado={FISCAL_IRPF_META.verificado}
         urlOficial={FISCAL_IRPF_META.urlOficial}
@@ -757,25 +757,25 @@ export default function SimuladorDesgloseNominaPage() {
                   <td><strong>SS Contingencias Comunes</strong></td>
                   <td>Bruto × {pctTexto(SS_TRAB.contingenciasComunes)}</td>
                   <td>Trabajador (también empresa: {pctTexto(SS_EMPR.contingenciasComunes)})</td>
-                  <td>LGSS art. 145; Orden PJC/51/2025</td>
+                  <td>LGSS art. 145; Orden PJC/297/2026, art. 4.a</td>
                 </tr>
                 <tr>
                   <td><strong>SS Desempleo</strong></td>
                   <td>Bruto × {pctTexto(SS_TRAB.desempleo)}</td>
                   <td>Trabajador (también empresa: {pctTexto(SS_EMPR.desempleoIndefinido)})</td>
-                  <td>LGSS art. 273; LPGE 2025</td>
+                  <td>LGSS art. 273; Orden PJC/297/2026, art. 33.2</td>
                 </tr>
                 <tr>
                   <td><strong>SS Formación Profesional</strong></td>
                   <td>Bruto × {pctTexto(SS_TRAB.formacionProfesional)}</td>
                   <td>Trabajador (también empresa: {pctTexto(SS_EMPR.formacionProfesional)})</td>
-                  <td>Ley 30/2015 de Formación Profesional</td>
+                  <td>Orden PJC/297/2026, art. 33.2.c</td>
                 </tr>
                 <tr>
                   <td><strong>SS MEI</strong></td>
                   <td>Bruto × {pctTexto(SS_TRAB.mef)}</td>
                   <td>Trabajador (también empresa: {pctTexto(SS_EMPR.mei)})</td>
-                  <td>RDL 2/2023 — Mecanismo Equidad Intergeneracional</td>
+                  <td>RDL 2/2023 (DT 43.ª LGSS); Orden PJC/297/2026, art. 16</td>
                 </tr>
                 <tr>
                   <td><strong>Retención IRPF</strong></td>

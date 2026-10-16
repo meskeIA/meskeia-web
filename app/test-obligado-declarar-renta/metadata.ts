@@ -82,7 +82,7 @@ export const faqJsonLd = {
       name: '¿Cuándo empieza y acaba la campaña de la Renta 2025?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La campaña de la Renta 2025 (declaración del ejercicio 2024) se inicia habitualmente en abril de 2026 con la apertura de Renta WEB de la AEAT, y el plazo ordinario de presentación finaliza el 30 de junio de 2026. El plazo para declaraciones con resultado a ingresar domiciliadas en cuenta concluye antes, normalmente el 25 de junio. Las fechas exactas las publica la AEAT cada año.',
+        text: 'La campaña de la Renta 2025 (declaración del ejercicio 2025) se inicia habitualmente en abril de 2026 con la apertura de Renta WEB de la AEAT, y el plazo ordinario de presentación finaliza el 30 de junio de 2026. El plazo para declaraciones con resultado a ingresar domiciliadas en cuenta concluye antes, normalmente el 25 de junio. Las fechas exactas las publica la AEAT cada año.',
       },
     },
     {

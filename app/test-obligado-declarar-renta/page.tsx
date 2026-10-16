@@ -262,7 +262,7 @@ function evaluarObligacion(respuestas: Respuestas): Resultado {
   };
 
   const explicaciones: Record<ResultadoTipo, string> = {
-    'obligado': 'Según los datos que has indicado, estás obligado a presentar la declaración de la Renta 2025. La campaña está abierta desde el 8 de abril de 2026 hasta el 30 de junio de 2026.',
+    'obligado': 'Según los datos que has indicado, estás obligado a presentar la declaración de la Renta 2025. El plazo ordinario, del 8 de abril al 30 de junio de 2026, ya ha terminado: si no la presentaste, todavía puedes hacerlo fuera de plazo (mira más abajo qué pasa si no declaras estando obligado).',
     'no-obligado': 'Según los datos que has indicado, no estarías obligado a presentar la declaración de la Renta 2025. Sin embargo, revisa siempre tu borrador en la AEAT por si te corresponde devolución.',
     'recomendado': 'No estás obligado a presentar la declaración, pero podría interesarte hacerlo. Muchos contribuyentes no obligados tienen derecho a devolución porque les retuvieron de más durante el año. Consulta tu borrador en Renta Web para comprobarlo.',
   };
@@ -565,7 +565,7 @@ export default function TestObligadoDeclararRentaPage() {
             <p>Sí, siempre puedes presentar la declaración voluntariamente. Es recomendable si te retuvieron de más y te corresponde devolución.</p>
 
             <h3>¿Cuándo puedo presentar la declaración?</h3>
-            <p>Desde el 8 de abril de 2026 (online) hasta el 30 de junio de 2026. Por teléfono desde el 6 de mayo y presencial desde el 1 de junio.</p>
+            <p>La campaña de la Renta 2025 fue del 8 de abril de 2026 (por internet) al 30 de junio de 2026; por teléfono, desde el 6 de mayo, y en persona, desde el 1 de junio. El plazo ordinario ya ha terminado: quien estaba obligado y no la presentó puede hacerlo fuera de plazo. La de la Renta 2026 se abrirá en la primavera de 2027, en las fechas que publique la autoridad fiscal.</p>
 
             <h3>¿Las letras del Tesoro obligan a declarar?</h3>
             <p>Las letras del Tesoro se incluyen en el grupo de rentas imputadas. Si junto con otros rendimientos de este grupo superan 1.000 €, obligan a declarar.</p>
@@ -582,7 +582,7 @@ export default function TestObligadoDeclararRentaPage() {
             <h2><span aria-hidden="true">📝</span> Guía paso a paso para presentar la Renta</h2>
             <ol>
               <li><strong>Prepara tu acceso:</strong> Activa Cl@ve PIN, certificado digital o DNI electrónico antes de la campaña.</li>
-              <li><strong>Revisa el borrador:</strong> Entra en Renta Web desde el 8 de abril y comprueba que los datos son correctos.</li>
+              <li><strong>Revisa el borrador:</strong> Entra en Renta Web en cuanto abra la campaña (en 2026 fue el 8 de abril) y comprueba que los datos son correctos.</li>
               <li><strong>Corrige errores:</strong> Si faltan ingresos, deducciones o datos personales, modifícalos antes de confirmar.</li>
               <li><strong>Aplica deducciones:</strong> Vivienda (pre-2013), planes de pensiones, donativos, maternidad, familia numerosa...</li>
               <li><strong>Confirma y presenta:</strong> Si estás conforme, confirma el borrador. Recibirás un PDF de justificante.</li>
