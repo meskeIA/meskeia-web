@@ -1565,3 +1565,352 @@ test.describe('Inspector 28/09/2026 — motor, equipotenciales, sonda escrita y 
     });
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR 16/10/2026 — CUARTA PASADA (re-inspección: app INVALIDADA)
+ *
+ * Qué cambió desde la tercera: 33c10c79 (posición de la sonda escribible, ceros por simetría y
+ * rótulos más grandes por debajo de 900 px), 84d598da (la mantisa de `cientifica` de casos.ts sube
+ * a 10ⁿ⁺¹ si al redondear llega a 10; el `sufijoNotacion` del panel ya lo hacía), 4fc83bcd
+ * (rótulos Ver/Ocultar con la página traducida) y 2221d315 (el corrector, al motor compartido
+ * lib/calculadoras/correctorCasosAula.ts, con la política RELATIVA: el mayor entre 0,01 y el 1 %).
+ * Los tests de las tres pasadas anteriores siguen en verde.
+ *
+ * CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (k = 8,99·10⁹, el que declara la app; el
+ * CODATA 8,9875·10⁹ difiere un 0,027 %, invisible a dos decimales en estos casos)
+ *
+ *   CASO I (normal) — el caso de aula 10 «Cargar en el simulador»: +6 nC en (0; 0), −5 nC en
+ *   (1,5; 0) y la sonda en (0; 2).
+ *     carga +6: r = 2 → |E₁| = 8,99·6/4 = 13,485 N/C, se ALEJA (hacia +y) → (0; +13,485)
+ *               V₁ = 8,99·6/2 = 26,97 V
+ *     carga −5: r = √(1,5² + 2²) = 2,5 → |E₂| = 8,99·5/6,25 = 7,192 N/C, apunta HACIA ella:
+ *               unitario (1,5; −2)/2,5 = (0,6; −0,8) → (+4,3152; −5,7536) · V₂ = −8,99·5/2,5 = −17,98 V
+ *     Eₓ = 4,3152 → «4,32 N/C» · Eᵧ = 13,485 − 5,7536 = 7,7314 → «7,73 N/C»
+ *     |E| = √(18,620951 + 59,774546) = √78,395497 = 8,854123 → «8,85 N/C»
+ *     V = 26,97 − 17,98 = 8,99 → «8,99 V» · F = 8,854123·10⁻⁹ → «8,85 × 10⁻⁹ N» · U → «8,99 × 10⁻⁹ J»
+ *     Corrector (tolerancia = máx(0,01; 1 % de 8,99) = 0,0899): «8,99» y «8.99» bien; «9» (el
+ *     9·10⁹ del libro: 9·(3 − 2)) bien, a 0,01; «8,8» mal (0,19); «44,95» —sumar los potenciales
+ *     sin signo, 26,97 + 17,98— mal; «−8,99», error de SIGNO.
+ *
+ *   CASO II (límite) — la frontera de la notación científica (84d598da). Carga puntual +5 nC en el
+ *   origen y la sonda en (0,4497; 0):
+ *     V = 44,95/0,4497 = 99,955526 V → «99,96 V» · U = 9,9955526·10⁻⁸ J: la mantisa 9,9956
+ *     redondea a 10,00, así que debe salir «1,00 × 10⁻⁷ J» y no «10,00 × 10⁻⁸ J».
+ *     |E| = 44,95/0,20223009 = 222,271572 → «222,27 N/C» · F → «2,22 × 10⁻⁷ N».
+ *     Y en la MITAD exacta: con x = 0,44972486243121568 (el double que deja la mantisa de U en el
+ *     double de 9,995, buscado con el motor real) toFixed(2) da «9.99» —el double está por debajo
+ *     de la mitad— pero formatNumber (Intl) redondea la representación corta «9,995» a «10,00».
+ *     Esperado: una mantisa entre 1 y 10 («9,99 × 10⁻⁸» o «1,00 × 10⁻⁷»). → H5
+ *
+ *   CASO III (rechazo) — el corrector, caso 1 (|E| = 44,95 N/C, tolerancia 0,4495): «44,5» mal
+ *   (0,45 > 0,4495) · «44,6» bien (0,35, dentro del 1 %) · «abc» y «4,495e1» no son número.
+ *   Caso 9 (x = 0,50 m exacto; tolerancia 0,01 por el suelo absoluto, ±2 %): «0,9» —d = D·q₁/(q₁+q₂)
+ *   sin la raíz— mal; «2» —olvidar sumar la x de la carga— mal. Y un MÓDULO negativo
+ *   («−44,95» en |E|) es imposible, no un error de sentido. → H6
+ *
+ *   «+++» EN SU CENTRO (0; 0) — ahí está la carga central de +4 nC: E y V divergen y el panel
+ *   da «—» con el aviso de singularidad. La tarjeta «Universitario de ingeniería» dice lo
+ *   contrario: «en el centro del preset «+++» el campo es 0 pero el potencial no». → H1
+ *
+ *   CABO C0067 (lienzo de viewBox fijo), medido en navegador:
+ *     (a) rótulo efectivo = font-size × escala del lienzo (getScreenCTM().a):
+ *           1280 px → 11 × 0,8192 = 9,01 px · 1024 → 8,31 · 920 → 7,36 · 901 → 7,19 ·
+ *           900 → 16 × 1 = 16 · 768 → 13,68 · 390 → 26 × 0,3825 = 9,95 (q₀ 10,71) · 360 → 8,97 (q₀ 9,66)
+ *         El propio módulo fija «~9-14 px de pantalla»: entre 901 y ~1270 px no se cumple. → H3
+ *     (b) a 390 y 360 px el lienzo mide 308 × 193 y 278 × 175 px y deja 41 px libres a cada
+ *         lado. Un deslizamiento vertical que EMPIEZA sobre el lienzo no desplaza la página
+ *         (touch-action: none) y crea una carga de +5 nC (pointerdown en modo «Añadir +», el de
+ *         arranque); desde el margen lateral la página baja 135 px y no crea nada. → H2
+ *     (c) dianas: carga de 5 nC (r = 17) 13,01 px a 390 y 11,73 a 360; sonda (r = 10) 7,65 y
+ *         6,90; ✕ de «Eliminar» (r = 9) ~6,9 px. A 1280: 27,85 y 16,38. → H4
+ *
+ * HALLAZGOS de esta pasada (ABIERTOS a 16/10/2026: sus tests van con test.fail()):
+ *   H1 medio · contenido      · «en el centro del preset «+++» el campo es 0»: hay una carga.
+ *   H2 medio · operativa      · en móvil, deslizar el dedo sobre el lienzo crea una carga.
+ *   H3 bajo  · accesibilidad  · rótulos del lienzo a 7,2-8,3 px entre 901 y 1024 px.
+ *   H4 bajo  · accesibilidad  · dianas de las cargas de 11,7-13 px en móvil (WCAG 2.5.8: 24 px).
+ *   H5 bajo  · cálculo        · «10,00 × 10⁻⁸ J» en la mitad exacta (toFixed frente a Intl).
+ *   H6 bajo  · cálculo        · un módulo negativo se corrige como «el valor es correcto, pero el SIGNO no».
+ *   H7 bajo  · contenido      · la pregunta de las equipotenciales, en el FAQPage y en la FAQ
+ *                               visible con dos respuestas distintas.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la notación, corrector y lienzo', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  /** Corrige una respuesta en «Casos para clase» y devuelve SU aviso (no el anunciador de rutas de Next). */
+  async function corregir(page: Page, respuesta: string) {
+    await seccion(page).locator('#casos-respuesta').fill(respuesta);
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    return seccion(page).locator('[role="alert"]');
+  }
+
+  /** Escribe la posición entera de la sonda (como un pegado) y espera a que React la tenga. */
+  async function sondaEn(page: Page, x: string, y: string): Promise<void> {
+    for (const [campo, v] of [
+      ['#sonda-x', x],
+      ['#sonda-y', y],
+    ] as const) {
+      await page.locator(campo).fill(v);
+      await esperarValorEnReact(page, campo, v);
+    }
+  }
+
+  test('CASO I · el caso de aula 10 en el panel: V = 8,99 V con |E| = 8,85 N/C, y su corrección', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 10:/ }).click();
+    await seccion(page).getByRole('button', { name: 'Cargar en el simulador' }).click();
+    await expect(valor(page, 'Posición x')).toHaveText('0,00 m');
+    await expect(valor(page, 'Posición y')).toHaveText('2,00 m');
+    // E₁ = (0; +13,485) de la +6 nC · E₂ = 7,192·(0,6; −0,8) = (+4,3152; −5,7536) hacia la −5 nC
+    await expect(valor(page, 'Eₓ')).toHaveText('4,32 N/C');
+    await expect(valor(page, 'Eᵧ')).toHaveText('7,73 N/C'); // 13,485 − 5,7536 = 7,7314
+    await expect(valor(page, '|E| (campo)')).toHaveText('8,85 N/C'); // √78,395497 = 8,854123
+    await expect(valor(page, 'V (potencial)')).toHaveText('8,99 V'); // 26,97 − 17,98
+    await expect(valor(page, '|F| sobre q₀')).toHaveText('8,85 × 10⁻⁹ N'); // 1e-9 · 8,854123
+    await expect(valor(page, 'U (energía)')).toHaveText('8,99 × 10⁻⁹ J'); // 1e-9 · 8,99
+
+    // Tolerancia = máx(0,01; 0,0899) = 0,0899 V
+    await expect(await corregir(page, '8,99')).toContainText('Correcto');
+    await expect(await corregir(page, '8.99')).toContainText('Correcto'); // punto decimal (Latam)
+    await expect(await corregir(page, '9')).toContainText('Correcto'); // k = 9·10⁹: 9·(6/2 − 5/2,5)
+    await expect(await corregir(page, '8,8')).toContainText('No es correcto'); // a 0,19
+    // Sumar los potenciales sin su signo (26,97 + 17,98) es el error que el caso quiere cazar
+    await expect(await corregir(page, '44,95')).toContainText('No es correcto');
+    await expect(await corregir(page, '-8,99')).toContainText('SIGNO');
+  });
+
+  test('CASO II · frontera de la notación: con la mantisa 9,9956 sale «1,00 × 10⁻⁷ J», no «10,00 × 10⁻⁸»', async ({ page }) => {
+    await page.getByRole('button', { name: 'Carga puntual aislada' }).click();
+    await sondaEn(page, '0.4497', '0');
+    await expect(valor(page, 'Posición x')).toHaveText('0,45 m');
+    // V = 44,95/0,4497 = 99,955526 V · U = 9,9955526·10⁻⁸ J
+    await expect(valor(page, 'V (potencial)')).toHaveText('99,96 V');
+    await expect(valor(page, 'U (energía)')).toHaveText('1,00 × 10⁻⁷ J');
+    // |E| = 44,95/0,4497² = 222,271572 N/C · F = 2,2227·10⁻⁷ N
+    await expect(valor(page, '|E| (campo)')).toHaveText('222,27 N/C');
+    await expect(valor(page, '|F| sobre q₀')).toHaveText('2,22 × 10⁻⁷ N');
+  });
+
+  // HALLAZGO H5 (bajo, cálculo) · ABIERTO (16/10/2026).
+  // sufijoNotacion (page.tsx) decide si la mantisa sube a 10ⁿ⁺¹ con `toFixed(2)`, que redondea el
+  // double EXACTO, y la escribe con formatNumber (Intl), que redondea su representación CORTA. En
+  // la mitad exacta discrepan: el double de 9,995 es 9,99499999999999921…, toFixed da «9.99» (no
+  // sube) e Intl da «10,00». Es el mismo patrón de los seis sitios de 84d598da (casos.ts compara con
+  // toFixed(4) y escribe con cifra → formatNumber). Solo se alcanza en ese double: 9,996 ya sale bien.
+  // Caso: carga puntual, sonda x = 0.44972486243121568, y = 0 → esperado U con mantisa en [1, 10)
+  //       («9,99 × 10⁻⁸ J» o «1,00 × 10⁻⁷ J») · obtenido «10,00 × 10⁻⁸ J».
+  test('HALLAZGO H5 · en la mitad exacta de la mantisa el panel no escribe «10,00 × 10ⁿ»', async ({ page }) => {
+    test.fail(true, 'H5 abierto: toFixed y Intl redondean distinto el 9,995');
+    await page.getByRole('button', { name: 'Carga puntual aislada' }).click();
+    await sondaEn(page, '0.44972486243121568', '0');
+    await expect(valor(page, 'V (potencial)')).toHaveText('99,95 V'); // 44,95/0,449724862… = 99,95
+    await expect(valor(page, 'U (energía)')).toHaveText(/^[1-9],\d{2} × 10⁻[⁰¹²³⁴⁵⁶⁷⁸⁹]+ J$/);
+  });
+
+  test('CASO III · el corrector rechaza lo cercano fuera del 1 % y lo que no es número', async ({ page }) => {
+    // Caso 1: |E| = 44,95 N/C · tolerancia 0,4495
+    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
+    await expect(await corregir(page, '44,95')).toContainText('Correcto');
+    await expect(await corregir(page, '44,6')).toContainText('Correcto'); // a 0,35: dentro del 1 %
+    await expect(await corregir(page, '44,5')).toContainText('No es correcto'); // a 0,45 > 0,4495
+    await expect(await corregir(page, 'abc')).toContainText('Escribe un número');
+    // Ningún caso pide notación científica: la respuesta va en N/C, nN o nJ, sin exponente
+    await expect(await corregir(page, '4,495e1')).toContainText('Escribe un número');
+
+    // Caso 9: x = 0,50 m exacto (tolerancia 0,01)
+    await seccion(page).getByRole('button', { name: /^Caso 9:/ }).click();
+    await expect(await corregir(page, '0,5')).toContainText('Correcto');
+    await expect(await corregir(page, '0,9')).toContainText('No es correcto'); // d = 3·4/5, sin la raíz
+    await expect(await corregir(page, '2')).toContainText('No es correcto'); // d sin sumar −1,5
+  });
+
+  // HALLAZGO H6 (bajo, cálculo) · ABIERTO (16/10/2026).
+  // comprobarRespuesta (casos.ts) llama a corregirNumero con magnitud 'real' en los doce casos, y
+  // para |E| y |F| un negativo no es «el valor bien con el sentido al revés»: un módulo no tiene
+  // signo. El motor compartido admite un intervalo propio ({ entero: false, minimo: 0, … }).
+  // Caso: caso 1 (|E| = 44,95 N/C) y caso 7 (|F| = 431,52 nN), respuesta «−44,95» / «−431,52» →
+  //       esperado un rechazo que diga que un módulo no es negativo · obtenido «El valor es
+  //       correcto, pero el SIGNO no: revisa hacia dónde apunta o qué signo tiene la carga».
+  test('HALLAZGO H6 · un módulo negativo no se corrige como un error de sentido', async ({ page }) => {
+    test.fail(true, 'H6 abierto: magnitud real en los módulos');
+    for (const [caso, respuesta] of [
+      [1, '-44,95'], // |E| = 44,95 N/C
+      [7, '-431,52'], // |F| = 431,52 nN
+    ] as const) {
+      await seccion(page).getByRole('button', { name: new RegExp(`^Caso ${caso}:`) }).click();
+      const aviso = await corregir(page, respuesta);
+      await expect(aviso).toBeVisible();
+      await expect(aviso, `caso ${caso}`).not.toContainText('El valor es correcto');
+      await expect(aviso, `caso ${caso}`).toContainText(/módulo/i);
+    }
+  });
+
+  // HALLAZGO H1 (medio, contenido) · ABIERTO (16/10/2026).
+  // La tarjeta «Universitario de ingeniería» del bloque educativo dice que «la propia app lo
+  // desmiente: en el centro del preset «+++» el campo es 0 pero el potencial no». En el centro
+  // (0; 0) está la carga central de +4 nC: E y V divergen y la app da «—» con su aviso. Donde la
+  // app SÍ enseña lo que la frase quiere decir es fuera del eje, en (0; 0,5): Eₓ = 0 exacto con
+  // V = 136,25 V (CASO 2a), pero ahí |E| = 169,57 N/C, no 0.
+  // Caso: preset «3 cargas en línea», sonda en (0; 0) → esperado que la guía no afirme E = 0 ahí
+  //       · obtenido panel «—» + «La sonda está sobre una carga» frente a «el campo es 0».
+  test('HALLAZGO H1 · la guía no afirma que el campo sea 0 en el centro de «+++», donde hay una carga', async ({ page }) => {
+    test.fail(true, 'H1 abierto: la tarjeta afirma E = 0 sobre la carga central');
+    await page.getByRole('button', { name: '3 cargas en línea' }).click();
+    await sondaEn(page, '0', '0');
+    // Lo que la app enseña ahí: singularidad, sin cifras (esto se cumple hoy)
+    await expect(valor(page, '|E| (campo)')).toHaveText('—');
+    await expect(valor(page, 'V (potencial)')).toHaveText('—');
+    await expect(page.locator('[role="status"] p')).toContainText('sobre una carga');
+    const tarjeta = await page.evaluate(() => {
+      const h4 = [...document.querySelectorAll('h4')].find((h) => h.textContent?.includes('Universitario'));
+      return h4?.parentElement?.textContent?.replace(/\s+/g, ' ') ?? '';
+    });
+    expect(tarjeta).toContain('hilo cargado'); // la tarjeta existe y es esta
+    expect(tarjeta).not.toMatch(/centro del preset «\+\+\+» el campo es 0/);
+  });
+
+  // HALLAZGO H7 (bajo, contenido) · ABIERTO (16/10/2026).
+  // La misma pregunta vive en dos bocas con dos respuestas: el FAQPage (faqJsonLd de metadata.ts,
+  // el que leen buscadores y asistentes) «¿Qué son las superficies equipotenciales?» y la FAQ
+  // visible de page.tsx «¿Qué son las equipotenciales?». No se contradicen —la visible es un
+  // resumen de la otra, que añade las esferas concéntricas y ΔW = 0— pero son dos textos que
+  // envejecen por separado (CLAUDE.md §1.ter: una sola constante que importen las dos).
+  test('HALLAZGO H7 · la pregunta de las equipotenciales responde lo mismo en el FAQPage y en pantalla', async ({ page }) => {
+    test.fail(true, 'H7 abierto: dos respuestas para la misma pregunta');
+    const faqLd = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        try {
+          const d = JSON.parse(s.textContent ?? '');
+          if (d['@type'] === 'FAQPage') {
+            const q = d.mainEntity.find((e: { name: string }) => /equipotencial/i.test(e.name));
+            return q ? { pregunta: q.name as string, respuesta: q.acceptedAnswer.text as string } : null;
+          }
+        } catch {
+          /* otro bloque */
+        }
+      }
+      return null;
+    });
+    expect(faqLd, 'el FAQPage trae la pregunta de las equipotenciales').not.toBeNull();
+    const visible = await page.evaluate(() => {
+      const s = [...document.querySelectorAll('strong')].find((e) => /^¿Qué son las (superficies )?equipotenciales\?$/.test(e.textContent?.trim() ?? ''));
+      return s ? { pregunta: s.textContent!.trim(), respuesta: s.nextElementSibling?.textContent?.replace(/\s+/g, ' ').trim() ?? '' } : null;
+    });
+    expect(visible, 'la FAQ visible trae la pregunta de las equipotenciales').not.toBeNull();
+    expect(visible!.respuesta).toBe(faqLd!.respuesta);
+  });
+
+  // HALLAZGO H3 (bajo, accesibilidad) · ABIERTO (16/10/2026) · cabo C0067.
+  // 33c10c79 agrandó los rótulos del lienzo por debajo de 900 px «para quedar en ~9-14 px de
+  // pantalla». Por encima, con el lienzo a dos columnas (2fr 1fr), siguen a 11 unidades del
+  // viewBox y el lienzo se encoge: 11 × 0,7558 = 8,31 px a 1024 y 11 × 0,6533 = 7,19 px a 901.
+  // Caso: 1024 × 900, dipolo de arranque → esperado rótulo «+5,0» y «q₀» ≥ 9 px en pantalla ·
+  //       obtenido 8,31 px (7,36 a 920 y 7,19 a 901).
+  test('HALLAZGO H3 · de 901 a 1024 px los rótulos del lienzo no bajan de 9 px en pantalla', async ({ page }) => {
+    test.fail(true, 'H3 abierto: rótulos de 7,2-8,3 px con el lienzo a dos columnas');
+    const rotulos = () =>
+      lienzo(page).evaluate((svg: SVGSVGElement) => {
+        const escala = svg.getScreenCTM()!.a;
+        const carga = svg.querySelector('text[class*="cargaLabel"]')!;
+        const q0 = [...svg.querySelectorAll('text')].find((t) => t.textContent?.trim() === 'q₀')!;
+        const px = (t: Element) => parseFloat(getComputedStyle(t).fontSize) * escala;
+        return Math.min(px(carga), px(q0));
+      });
+    for (const ancho of [1024, 920, 901]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      await expect.poll(rotulos, { message: `rótulo más pequeño a ${ancho} px` }).toBeGreaterThanOrEqual(9);
+    }
+  });
+
+  test.describe('móvil (390 px, táctil)', () => {
+    test.use({
+      viewport: { width: 390, height: 800 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0 Mobile Safari/537.36',
+      deviceScaleFactor: 2.625,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    /** Desliza un dedo de y0 a y1 en la x dada con eventos táctiles reales (CDP). */
+    async function deslizar(page: Page, x: number, y0: number, y1: number): Promise<void> {
+      const cdp = await page.context().newCDPSession(page);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: y0 }] });
+      for (let i = 1; i <= 10; i++) {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y0 + ((y1 - y0) * i) / 10 }] });
+        await page.waitForTimeout(16);
+      }
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await page.waitForTimeout(400);
+    }
+
+    /** Deja el lienzo a 300 px del borde superior, con recorrido de sobra para bajar la página. */
+    async function prepararLienzo(page: Page) {
+      await lienzo(page).scrollIntoViewIfNeeded();
+      await page.evaluate(() => {
+        const s = document.querySelector('svg[aria-label="Lienzo del campo eléctrico"]')!;
+        window.scrollTo(0, window.scrollY + s.getBoundingClientRect().top - 300);
+      });
+      await page.waitForTimeout(200);
+      return (await lienzo(page).boundingBox())!;
+    }
+
+    const cargas = (page: Page) => lienzo(page).locator('circle[data-tipo="carga"]');
+
+    test('REGRESIÓN 33c10c79 · a 390 px los rótulos de las cargas y de q₀ se leen (≥ 9 px)', async ({ page }) => {
+      const tam = await lienzo(page).evaluate((svg: SVGSVGElement) => {
+        const escala = svg.getScreenCTM()!.a;
+        const carga = svg.querySelector('text[class*="cargaLabel"]')!;
+        const q0 = [...svg.querySelectorAll('text')].find((t) => t.textContent?.trim() === 'q₀')!;
+        return {
+          carga: parseFloat(getComputedStyle(carga).fontSize) * escala,
+          q0: parseFloat(getComputedStyle(q0).fontSize) * escala,
+        };
+      });
+      // 26 × 0,3825 = 9,95 px y 28 × 0,3825 = 10,71 px (antes de 33c10c79, 11 × 0,3825 = 4,2 px)
+      expect(tam.carga).toBeGreaterThanOrEqual(9);
+      expect(tam.q0).toBeGreaterThanOrEqual(9);
+    });
+
+    test('control · un deslizamiento desde el margen lateral desplaza la página y no toca las cargas', async ({ page }) => {
+      const caja = await prepararLienzo(page);
+      await expect(cargas(page)).toHaveCount(2); // el dipolo de arranque
+      const antes = await page.evaluate(() => window.scrollY);
+      const y = caja.y + caja.height * 0.75;
+      await deslizar(page, caja.x / 2, y, y - 150); // 41 px libres a cada lado: x ≈ 20
+      expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(antes + 50);
+      await expect(cargas(page)).toHaveCount(2);
+    });
+
+    // HALLAZGO H2 (medio, operativa) · ABIERTO (16/10/2026) · cabo C0067.
+    // El lienzo crea la carga en `pointerdown` (handleSvgPointerDown) y lleva touch-action: none
+    // (.module.css, .canvasSvg). En el modo de arranque, «Añadir +», el dedo que se apoya en el
+    // lienzo para bajar la página no la desplaza y deja una carga de +5 nC donde tocó: la
+    // configuración —también la de un caso de aula recién cargado— cambia, y el panel con ella.
+    // A 390 px el lienzo ocupa 308 de los 390 px de ancho (41 libres a cada lado).
+    // Caso: 390 × 800 táctil, dipolo de arranque, deslizar 150 px hacia arriba empezando en la
+    //       zona vacía del lienzo (20 % del ancho, 75 % del alto) → esperado 2 cargas · obtenido
+    //       3 (y la página sin moverse: scrollY igual). Igual a 360 px.
+    test('HALLAZGO H2 · deslizar el dedo sobre el lienzo para bajar la página no crea una carga', async ({ page }) => {
+      test.fail(true, 'H2 abierto: la carga nace en pointerdown');
+      const caja = await prepararLienzo(page);
+      await expect(cargas(page)).toHaveCount(2);
+      const y = caja.y + caja.height * 0.75;
+      await deslizar(page, caja.x + caja.width * 0.2, y, y - 150);
+      await expect(cargas(page)).toHaveCount(2);
+    });
+
+    // HALLAZGO H4 (bajo, accesibilidad) · ABIERTO (16/10/2026) · cabo C0067.
+    // WCAG 2.2, 2.5.8 (AA): diana de 24 × 24 px. El radio de una carga son 14 + mín(8; 0,6·|q|)
+    // unidades del viewBox (17 con 5 nC), y a 390 px el lienzo va a escala 0,3825: 34 × 0,3825 =
+    // 13,0 px de diámetro (11,7 a 360). Moverla solo se puede arrastrándola y retirar UNA concreta
+    // solo tocándola (o su ✕, r = 9: 6,9 px): no hay control equivalente de 24 px. La sonda (7,65
+    // px) sí lo tiene: los campos «Posición exacta».
+    // Caso: 390 × 800, dipolo de arranque → esperado círculo de la carga ≥ 24 px · obtenido 13,01 px.
+    test('HALLAZGO H4 · en móvil la diana de una carga mide al menos 24 px', async ({ page }) => {
+      test.fail(true, 'H4 abierto: 13 px de diana a 390');
+      const diametro = await cargas(page).first().evaluate((c) => c.getBoundingClientRect().width);
+      expect(diametro).toBeGreaterThanOrEqual(24);
+    });
+  });
+});

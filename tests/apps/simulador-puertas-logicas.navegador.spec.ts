@@ -326,7 +326,8 @@ test.describe('CASO 2.bis · evaluador de expresiones', () => {
       // 1 cuando alguna pareja está entera a 1: filas 0011, 0111, 1011, 1100…
       ['(A AND B) OR (C AND D)', ['A', 'B', 'C', 'D'],
         [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1]],
-      // El símbolo ⊕ sí llega al evaluador (a diferencia de la palabra XOR: ver hallazgos).
+      // El símbolo ⊕ (hasta el 23/08/2026 era lo único que funcionaba: la palabra XOR daba una
+      // columna de ceros, hallazgo 135, REPARADO; ver abajo).
       ['A ⊕ B', ['A', 'B'], [0, 1, 1, 0]],
     ];
 
@@ -450,18 +451,19 @@ test.describe('CASO 3 · en móvil (Pixel 7)', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS — afirman lo correcto y hoy fallan a propósito (test.fail)
+// HALLAZGOS 135-139 del 21/08/2026, REPARADOS el 23/08/2026 (20cec2da, tanda 3).
+// Nacieron con test.fail(); hoy afirman lo correcto y sujetan la reparación.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('hallazgos abiertos', () => {
-  test('HALLAZGO 1 · la palabra XOR devuelve una columna de ceros en modo Expresiones', async ({ page }) => {
+test.describe('hallazgos reparados (135-139)', () => {
+  test('REPARADO 135 · la palabra XOR ya no devuelve una columna de ceros en modo Expresiones', async ({ page }) => {
     await abrir(page, 'Expresiones');
     const campo = page.getByLabel('Expresión Booleana');
     const tabla = page.locator(TABLA).first();
 
-    // En page.tsx la normalización sustituye OR por «|» ANTES que XOR por «^», así que
-    // «XOR» acaba convertido en «X|» y queda una X suelta; al evaluar salta un ReferenceError
-    // que el catch se traga y devuelve false. Resultado: TODA la columna a 0, y sin ningún
-    // aviso. A mano, XOR es 1 cuando las entradas son distintas.
+    // Antes de la reparación, page.tsx sustituía OR por «|» ANTES que XOR por «^», así que
+    // «XOR» acababa convertido en «X|» con una X suelta; al evaluar saltaba un ReferenceError
+    // que el catch se tragaba devolviendo false: TODA la columna a 0, sin aviso. Hoy lo evalúa
+    // motor.ts, que tokeniza. A mano, XOR es 1 cuando las entradas son distintas.
     await campo.fill('A XOR B');
     expect(await salidasDe(tabla)).toEqual([0, 1, 1, 0]);
     await expect(page.locator(ERROR_EXPRESION)).toHaveCount(0);
@@ -479,45 +481,41 @@ test.describe('hallazgos abiertos', () => {
     expect(await salidasDe(tabla)).toEqual([0, 1, 1, 0]);
   });
 
-  test('HALLAZGO 2 · «A NAND B» se inventa variables en vez de avisar', async ({ page }) => {
+  test('REPARADO 136 · «A NAND B» ya no se inventa variables', async ({ page }) => {
     await abrir(page, 'Expresiones');
     const campo = page.getByLabel('Expresión Booleana');
     const tabla = page.locator(TABLA).first();
 
-    // El hero, el <title> y la comparativa educativa presentan las SIETE puertas, y el modo
-    // Tablas las tiene todas; pero el evaluador solo entiende AND, OR, NOT y XOR. Con NAND
-    // no da error: extrae las letras N y D de la propia palabra como si fueran variables y
-    // pinta una tabla de 16 filas con la salida a 0 en todas.
+    // El hero, el <title> y la comparativa educativa presentan las SIETE puertas, pero hasta el
+    // 23/08/2026 el evaluador solo entendía AND, OR, NOT y XOR. Con NAND extraía las letras N y
+    // D de la propia palabra como si fueran variables y pintaba 16 filas con la salida a 0.
     await campo.fill('A NAND B');
     expect(await tabla.locator('thead th').allInnerTexts()).toEqual(['A', 'B', 'Y']);
     expect(await salidasDe(tabla)).toEqual([1, 1, 1, 0]); // NAND = AND negada
 
-    // NOR y XNOR al menos no mienten, pero el aviso que sale («Máximo 4 variables (A-D)»)
-    // no tiene nada que ver con lo que pasa: la expresión es de dos variables.
+    // Con NOR salía «Máximo 4 variables (A-D)», que no tenía nada que ver: son dos variables.
     await campo.fill('A NOR B');
     expect(await salidasDe(tabla)).toEqual([1, 0, 0, 0]);
   });
 
-  test('HALLAZGO 3 · el comparador rotula sus tres salidas con la misma letra', async ({ page }) => {
+  test('REPARADO 137 · el comparador ya no rotula sus tres salidas con la misma letra', async ({ page }) => {
     await abrir(page, 'Circuitos');
     await page.getByRole('button', { name: 'Comparador 1-bit' }).click();
 
-    // La cabecera de «Tabla Completa» recorta cada rótulo por el primer espacio
-    // (`output.split(' ')[0]`), así que «A > B», «A = B» y «A < B» quedan las tres en «A»:
-    // la tabla muestra A · B · A · A · A y no hay forma de saber qué columna es cuál.
-    // Los valores sí son correctos; lo que no se puede leer son los rótulos.
+    // Hasta el 23/08/2026 la cabecera de «Tabla Completa» recortaba cada rótulo por el primer
+    // espacio (`output.split(' ')[0]`), así que «A > B», «A = B» y «A < B» quedaban las tres en
+    // «A»: A · B · A · A · A. Los valores eran correctos; los rótulos, ilegibles.
     expect(await page.locator(TABLA).first().locator('thead th').allInnerTexts())
       .toEqual(['A', 'B', 'A > B', 'A = B', 'A < B']);
   });
 
-  test('HALLAZGO 5 · el LED de salida no está preparado para un lector de pantalla', async ({ page }) => {
+  test('REPARADO 139 · el LED de salida ya está preparado para un lector de pantalla', async ({ page }) => {
     await abrir(page, 'Circuitos');
     await page.getByRole('button', { name: 'Full Adder (Sumador Completo)' }).click();
 
-    // El conmutador de entrada sí marca su emoji como decorativo (aria-hidden="true");
-    // el LED de salida, que es el mismo patrón, no. Además es un <div> sin role ni
-    // aria-live: al conmutar una entrada, quien no ve la pantalla no se entera de que
-    // la salida ha cambiado, que es justamente lo que enseña este modo.
+    // Hasta el 23/08/2026 el emoji del LED de salida no llevaba aria-hidden (el del conmutador
+    // sí) y el LED era un <div> sin role ni aria-live: al conmutar una entrada, quien no ve la
+    // pantalla no se enteraba de que la salida cambiaba, que es lo que enseña este modo.
     const indicadores = await page.locator(`${LED} [class*="__ioIndicator"]`)
       .evaluateAll((els) => els.map((e) => e.getAttribute('aria-hidden')));
     expect(indicadores).toEqual(['true', 'true']);
@@ -525,20 +523,20 @@ test.describe('hallazgos abiertos', () => {
   });
 });
 
-test.describe('hallazgos abiertos · móvil', () => {
+test.describe('hallazgos reparados · móvil (138)', () => {
   test.use(COMO_MOVIL);
 
-  test('HALLAZGO 4 · la flecha tapa el centro del último conmutador', async ({ page }) => {
+  test('REPARADO 138 · la flecha ya no tapa el centro del último conmutador', async ({ page }) => {
     await abrir(page, 'Circuitos');
     await page.getByRole('button', { name: 'Full Adder (Sumador Completo)' }).click();
     await page.locator('[class*="__circuitPanel"]').scrollIntoViewIfNeeded();
 
-    // En vertical el panel apila entradas → flecha → salidas, y la flecha se gira 90°
-    // (transform: rotate). El giro NO cambia la caja de 252×51 que ocupa en el layout, así
-    // que su rectángulo pasa a medir 51×252 y se monta encima del conmutador de arriba:
-    // el centro de «Cin» —justo donde se pinta su 0/1— pertenece a la flecha, no al botón.
-    // Tocar ahí no hace nada; hay que acertar en la parte izquierda del control.
-    // Pasa igual con la 2.ª entrada del Half Adder y con la «S» del Multiplexor 2:1.
+    // En vertical el panel apila entradas → flecha → salidas, y hasta el 23/08/2026 se giraba
+    // 90° el CONTENEDOR de la flecha (transform: rotate). El giro no cambia la caja de 252×51
+    // del layout, así que su rectángulo pasaba a 51×252 y se montaba encima del conmutador de
+    // arriba: el centro de «Cin» pertenecía a la flecha y tocar ahí no hacía nada (igual con la
+    // 2.ª entrada del Half Adder y la «S» del Multiplexor). Hoy se gira el glifo y el contenedor
+    // lleva pointer-events: none.
     const duenoDelCentro = await page.locator(CONMUTADOR).evaluateAll((els) => els.map((e) => {
       const r = e.getBoundingClientRect();
       const encima = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);

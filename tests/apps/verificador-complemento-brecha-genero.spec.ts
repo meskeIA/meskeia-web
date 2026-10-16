@@ -3683,8 +3683,9 @@ test.describe('Re-inspección 01/10/2026 — móvil y oscuro', () => {
 // hallazgos que se marcaron con `test.fail()`, uno de ellos la sospecha del 01/10 sobre el
 // «reconocimiento automático», que las fuentes de arriba convierten en hallazgo.
 // Cuatro (2927, 2928, 2930 y 2931) se REPARARON el 06/10/2026 en 033ae27d y la
-// re-inspección del 07/10 los VERIFICÓ con su caso original; siguen ABIERTOS el 2929 y el de
-// la tool del MCP (este último, fuera del alcance de la app).
+// re-inspección del 07/10 los VERIFICÓ con su caso original. El de la tool del MCP (fuera del
+// alcance de la app, cabo C0148) se REPARÓ el 13/10/2026 (test más abajo); sigue ABIERTO el
+// 2929 (comprobado de nuevo el 16/10/2026).
 // ═════════════════════════════════════════════════════════════════════════════
 
 interface Respuestas06 extends Respuestas26 {
@@ -4366,4 +4367,388 @@ test.describe('Re-inspección 07/10/2026 — móvil', () => {
     await expect(page.getByText(/la DT 33\.ª LGSS te deja optar/)).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 16/10/2026 (Opus 5.5, xhigh)
+//
+// Volvió a la cola por cd462414 (13/10: se retira el `scroll-margin-top: 90px` del veredicto y
+// lo sustituye el `scroll-padding-top` global de globals.css), 99e1ee7e (relacionadas por
+// <ConRelacionadas>), a3c3ecb0 (11/10: COMPLEMENTO_MATERNIDAD_DEROGADO.aplicableDesde =
+// 2016-01-01, DF única del RDLeg 8/2015) y 033ae27d (ya verificado el 07/10).
+//
+//   · cd462414 se SOSTIENE. Con el botón «Verificar mi derecho» al pie de la ventana, el
+//     veredicto queda a 66 px en 360 y 390 px (la caja de la barra acaba en 62) y a 96 px en
+//     1280 y 1920 px (acaba en 92), con el foco. Un barrido de todo el recorrido de scroll no
+//     encuentra ninguna posición con el botón a la vista en la que el veredicto quede, sin
+//     desplazarse, bajo la barra o bajo la píldora fija del pie.
+//   · a3c3ecb0: el dato está en el módulo pero no tiene consumidor (grep de `aplicableDesde`:
+//     solo data/fiscal/pensiones.ts). El 2929 sigue ABIERTO con la misma forma, igual que el
+//     2983 y el 2984: sus test.fail, más arriba, siguen fallando.
+//   · 99e1ee7e: las relacionadas siguen saliendo, con sus 4 tarjetas.
+//
+// Fuentes oficiales consultadas en sesión (16/10/2026), BOE consolidado de la LGSS
+// (BOE-A-2015-11724):
+//   · Texto original, publicado el 31/10/2015 y en vigor el 02/01/2016: el art. 60 ya es el
+//     «Complemento por maternidad en las pensiones contributivas del sistema de la Seguridad
+//     Social», y su apartado 4 empieza «El complemento de pensión no será de aplicación en los
+//     casos de acceso anticipado a la jubilación»: excluye la jubilación anticipada por
+//     voluntad de la interesada (art. 208) y la parcial (art. 215), salvo el paso a la plena.
+//   · Notas de modificación del art. 60 en el consolidado: solo el RDL 3/2021 y el RDL 2/2023.
+//   · Disposición final única: el complemento del art. 60 se aplica «a las pensiones
+//     contributivas que se causen a partir de 1 de enero de 2016».
+//
+// Tres casos resueltos A MANO contra COMPLEMENTO_BRECHA_GENERO_2026 (cuantiaPorHijoMensual
+// 36,90 · maxHijos 4 · pagasAnuales 14 · prorrata del art. 60.3.f) antes de abrir el navegador:
+// coinciden los tres, en la web y por la tool del MCP. Cuatro hallazgos nuevos con test.fail().
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** Lleva el botón «Verificar mi derecho» al pie de la ventana, como queda tras contestar la P6. */
+async function botonAlPie(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    const b = Array.from(document.querySelectorAll('button')).find((x) =>
+      (x.textContent ?? '').includes('Verificar mi derecho'),
+    );
+    if (!b) throw new Error('Sin botón «Verificar mi derecho»');
+    window.scrollBy(0, b.getBoundingClientRect().bottom - window.innerHeight + 20);
+  });
+}
+
+/**
+ * ¿El veredicto está entero entre la barra fija del logo y el borde inferior útil de la
+ * ventana (la píldora del pie si es fija, que solo lo es por encima de 768 px)? Se mide la
+ * CAJA de la barra ([data-barra-logo]), que es la que usa el scroll-padding de globals.css.
+ */
+async function veredictoLibreDelCromo(page: Page): Promise<boolean> {
+  return page.evaluate((): boolean => {
+    const barra = document.querySelector('[data-barra-logo]');
+    const veredicto = document.querySelector('[class*="resultHero"]');
+    if (!barra || !veredicto) return false;
+    if (getComputedStyle(barra).position !== 'fixed') return false;
+    const pie = document.querySelector('[data-pildora-pie]');
+    const limite =
+      pie !== null && getComputedStyle(pie).position === 'fixed'
+        ? pie.getBoundingClientRect().top
+        : window.innerHeight;
+    const caja = veredicto.getBoundingClientRect();
+    return caja.top >= barra.getBoundingClientRect().bottom && caja.bottom <= limite;
+  });
+}
+
+test.describe('Re-inspección 16/10/2026', () => {
+  /**
+   * CASO 1 (NORMAL) — mujer · incapacidad permanente · desde el 4-feb-2021 · 3 hijos · pensión
+   * a prorrata «62,5» (coma decimal) · sin exclusión del 60.3.b · sin otro progenitor · sin
+   * denegación propia. Art. 60.3.f): la cuantía por hijo es el importe TEÓRICO y se cobra la
+   * prorrata de la pensión.
+   *
+   *   hijosComputables = mín(3, maxHijos 4) = 3
+   *   teórico  = 3 × 36,90 = 110,70 €/mes
+   *   mensual  = 110,70 × 0,625 = 69,1875 → 69,19 €/mes (al céntimo)
+   *   anual    = 69,19 × 14 = 968,66 €/año      (con el mensual sin redondear saldría 968,63)
+   *
+   * OBTENIDO el 16/10/2026: exactamente eso, y la tool del MCP da lo mismo.
+   */
+  test('caso 1 (16/10): mujer, IP, 3 hijos y prorrata «62,5» → 69,19 €/mes y 968,66 €/año, también por el MCP', async ({
+    page,
+    request,
+  }) => {
+    const { cuantiaPorHijoMensual, pagasAnuales } = COMPLEMENTO_BRECHA_GENERO_2026;
+    const mensual = Math.round(3 * cuantiaPorHijoMensual * 0.625 * 100) / 100;
+    expect(mensual).toBe(69.19);
+    // toBeCloseTo a 2 decimales: el defecto que vigila (anual sin redondear el mensual) es de 0,03 €
+    expect(mensual * pagasAnuales).toBeCloseTo(968.66, 2);
+
+    await responder06(page, {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '3',
+      sexo: 'Mujer',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+      prorrata: '62,5',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+69,19 €/mes');
+    expect(resultado).toContain('Cumples los requisitos básicos');
+    expect(resultado).toContain('Hijos computables 3 (máx. 4)');
+    expect(resultado).toContain('Cuantía por hijo (importe teórico) 36,90 €/mes');
+    // `textoResultado` normaliza el espacio duro del % a espacio normal
+    expect(resultado).toContain('Prorrata de tu pensión (art. 60.3.f) LGSS) 62,50 %');
+    expect(resultado).toContain('Mensual estimado 69,19 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 968,66 €/año');
+    expect(resultado).not.toContain('110,70 €/mes'); // el teórico no es lo que se cobra
+    expect(resultado).toContain('hay que solicitarlo ante el INSS');
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'mujer',
+      num_hijos: 3,
+      tipo_pension: 'incapacidad_permanente',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'no_aplica',
+      prorrata_porcentaje: 62.5,
+    });
+    expect(mcp).toContain('69,19 €/mes (968,66 €/año, 14 pagas)');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — todos los bordes a la vez: hombre · viudedad · 20 hijos (el último valor
+   * que admite el campo) · prorrata «0,5» (la cola baja) · el otro progenitor YA lo percibe y la
+   * suma menor es la PROPIA · con denegación propia.
+   *
+   *   hijosComputables = mín(20, 4) = 4
+   *   mensual = 4 × 36,90 × 0,005 = 0,738 → 0,74 €/mes;  anual = 0,74 × 14 = 10,36 €/año
+   *   Veredicto: procede como RECLAMACIÓN (denegación propia; doctrina de META.doctrina) y,
+   *   por la concurrencia a favor, el paso siguiente añade la extinción del art. 60.2 con la
+   *   audiencia y sus efectos.
+   *
+   * OBTENIDO el 16/10/2026: exactamente eso, en la web y por la tool del MCP.
+   */
+  test('caso 2 (16/10, límite): hombre, viudedad, 20 hijos, prorrata «0,5», suma menor propia y denegación → 0,74 €/mes como reclamación', async ({
+    page,
+    request,
+  }) => {
+    expect(Math.round(4 * COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual * 0.005 * 100) / 100).toBe(0.74);
+    expect(0.74 * COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales).toBeCloseTo(10.36, 2);
+
+    await responder06(page, {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '20',
+      sexo: 'Hombre',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'La mía es menor',
+      denegacionPropia: true,
+      prorrata: '0,5',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+0,74 €/mes');
+    expect(resultado).toContain('Posible reclamación retroactiva');
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)');
+    expect(resultado).toContain('Prorrata de tu pensión (art. 60.3.f) LGSS) 0,50 %');
+    expect(resultado).toContain('Anual (14 pagas) 10,36 €/año');
+    expect(resultado).not.toContain('147,60');
+    expect(resultado).toContain('tu suma de pensiones públicas es la menor, así que te corresponde a ti');
+    expect(resultado).toContain(COMPLEMENTO_BRECHA_GENERO_META.doctrina.stjue.asunto);
+    expect(resultado).toContain('Procede valorar reclamación');
+    expect(resultado).toContain('a quien el INSS da audiencia antes de resolver (art. 60.2 LGSS).');
+    expect(resultado).toContain('Produce efectos económicos el primer día del mes siguiente');
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'hombre',
+      num_hijos: 20,
+      tipo_pension: 'viudedad',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'percibe',
+      suma_pensiones_menor: 'propia',
+      denegacion_propia: true,
+      prorrata_porcentaje: 0.5,
+    });
+    expect(mcp).toContain('Posible reclamación retroactiva');
+    expect(mcp).toContain('0,74 €/mes (10,36 €/año, 14 pagas)');
+    expect(mcp).toContain('Se computan 4 hijos como máximo, aunque tengas 20.');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — pensión a prorrata con una prorrata que no está en (0, 100]: «0»,
+   * «-25» y el campo vacío. Mujer · jubilación · desde el 4-feb-2021 · 2 hijos. Sin prorrata
+   * válida no puede salir ninguna cifra (el íntegro, 73,80 €/mes, sería falso): «Sin calcular».
+   * La tool del MCP rechaza 0 en la validación de entrada.
+   *
+   * OBTENIDO el 16/10/2026: exactamente eso. (Lo que dice el aviso EN LÍNEA de «0» y «-25» es
+   * el hallazgo nuevo de más abajo.)
+   */
+  test('caso 3 (16/10, rechazo): prorrata «0», «-25» o vacía → «Sin calcular», sin cifra; el MCP rechaza 0', async ({
+    page,
+    request,
+  }) => {
+    const base = {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    };
+    for (const prorrata of ['0', '-25']) {
+      await responder06(page, { ...base, prorrata });
+      const resultado = await textoResultado(page);
+      expect(resultado).toContain('Sin calcular');
+      expect(resultado).toContain(
+        `«${prorrata}» no es una prorrata válida (un porcentaje mayor que 0 y no mayor que 100)`,
+      );
+      expect(resultado).not.toContain('€/mes');
+      expect(resultado).not.toContain('Desglose');
+      await expect(page.locator('#prorrata')).toHaveAttribute('aria-invalid', 'true');
+      await expect(page.locator('#prorrata ~ p[role="alert"]')).toContainText('mayor que 0 y no mayor que 100');
+    }
+    // Vacío, después de un valor: el campo cambia de verdad (sembrar '' sobre '' no probaría nada)
+    await responder06(page, { ...base, prorrata: '' });
+    const vacio = await textoResultado(page);
+    expect(vacio).toContain('Sin calcular');
+    expect(vacio).toContain('Falta la prorrata de tu pensión');
+    expect(vacio).not.toContain('€/mes');
+    await expect(page.locator('#prorrata ~ p[role="alert"]')).toHaveCount(0);
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'mujer',
+      num_hijos: 2,
+      tipo_pension: 'jubilacion',
+      fecha_hecho_causante: 'desde_2021',
+      prorrata_porcentaje: 0,
+    });
+    expect(mcp).toContain('prorrata_porcentaje');
+    expect(mcp).not.toContain('€/mes');
+  });
+
+  /**
+   * cd462414 — sin el `scroll-margin-top: 90px` propio, el veredicto se alinea con el
+   * `scroll-padding-top` global (caja de la barra + 4 px). Medido el 16/10/2026 a 1280 × 800:
+   * la barra acaba en 92 px y el veredicto empieza en 96, con la píldora del pie desde 745.
+   */
+  test('cd462414 (16/10): a 1280 px el veredicto llega a la vista por debajo de la barra fija del logo', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await botonAlPie(page);
+    await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
+    // Estado por defecto con la viudedad del beforeEach: 2 × 36,90 = 73,80 €/mes
+    await expect(page.locator('[class*="resultImporte"]')).toHaveText(/^\+73,80\s€\/mes$/);
+    await expect.poll(() => veredictoLibreDelCromo(page)).toBe(true);
+    expect(await page.evaluate(() => (document.activeElement?.className ?? '').toString())).toContain(
+      'resultHero',
+    );
+  });
+
+  /** 99e1ee7e: las relacionadas llegan por <ConRelacionadas> y siguen siendo 4 tarjetas. */
+  test('99e1ee7e (16/10): las relacionadas se pintan con sus 4 tarjetas', async ({ page }) => {
+    await expect(page.locator('section[aria-label="Aplicaciones relacionadas"] a')).toHaveCount(4);
+  });
+
+  /**
+   * ABIERTO (16/10/2026) — BAJO (contenido). El aviso en línea de la prorrata dice que «no se
+   * interpreta» un número que SÍ se lee: con «0» y con «-25», «⚠️ Escribe un porcentaje mayor
+   * que 0 y no mayor que 100: «0» no se interpreta.» El motivo del veredicto sí lo dice bien
+   * («no es una prorrata válida (un porcentaje mayor que 0 y no mayor que 100)»), y el campo de
+   * hijos de esta misma página ya separa «no es un número entero» de «supera el tope» desde el
+   * hallazgo 506. Es esa misma clase de defecto en el campo nuevo del 01/10 (hallazgo 2541).
+   */
+  test('ABIERTO (16/10): el aviso de la prorrata no dice «no se interpreta» de un número que sí se lee', async ({
+    page,
+  }) => {
+    test.fail(true, 'Hallazgo 16/10: «0» y «-25» se leen y el aviso en línea dice que «no se interpreta»');
+    for (const prorrata of ['0', '-25']) {
+      await responder06(page, {
+        pension: 'Jubilación (ordinaria o anticipada)',
+        fecha: 'El 4-feb-2021 o después',
+        hijos: '2',
+        sexo: 'Mujer',
+        otroProgenitor: 'No lo percibe ni lo ha solicitado',
+        prorrata,
+      });
+      const aviso = normalizar(await page.locator('#prorrata ~ p[role="alert"]').innerText());
+      expect(aviso).toContain('mayor que 0 y no mayor que 100');
+      expect(aviso).not.toContain(`«${prorrata}» no se interpreta`);
+    }
+  });
+
+  /**
+   * ABIERTO (16/10/2026) — BAJO (dato). La fila «Pensiones cubiertas» de la tabla comparativa
+   * dice del complemento de MATERNIDAD «Jubilación, IP, viudedad», sin excepción, mientras la
+   * columna de al lado sí anota la del régimen vigente («salvo la jubilación parcial, excluida
+   * por el Art. 60.4 LGSS»). El art. 60.4 del texto original (BOE-A-2015-11724, 31/10/2015)
+   * empezaba «El complemento de pensión no será de aplicación en los casos de acceso anticipado
+   * a la jubilación»: excluía la anticipada por voluntad de la interesada (art. 208) y la
+   * parcial (art. 215). COMPLEMENTO_MATERNIDAD_DEROGADO no recoge esas exclusiones.
+   */
+  test('ABIERTO (16/10): la tabla comparativa recoge las exclusiones del antiguo art. 60.4 (anticipada voluntaria y parcial)', async ({
+    page,
+  }) => {
+    test.fail(true, 'Hallazgo 16/10: la columna del régimen derogado dice «Jubilación, IP, viudedad» sin las exclusiones del 60.4');
+    await abrirGuia(page);
+    const fila = page
+      .locator('table tr')
+      .filter({ has: page.locator('td', { hasText: /^Pensiones cubiertas$/ }) });
+    const maternidad = normalizar(await fila.locator('td').nth(1).innerText());
+    expect(maternidad).toContain('Jubilación'); // control: es la celda que se busca
+    expect(maternidad).toMatch(/anticipad/i);
+    expect(maternidad).toMatch(/parcial/i);
+  });
+
+  /**
+   * ABIERTO (16/10/2026) — BAJO (dato). `COMPLEMENTO_MATERNIDAD_DEROGADO.norma` y la nota de la
+   * tabla dicen «Art. 60 LGSS en su redacción anterior al RDL 3/2021 (dada por la Ley
+   * 48/2015)». En el BOE consolidado, el art. 60 ya está en el TEXTO ORIGINAL del RDLeg 8/2015
+   * (publicado el 31/10/2015) como «Complemento por maternidad…», y sus únicas notas de
+   * modificación son el RDL 3/2021 y el RDL 2/2023: la redacción anterior al RDL 3/2021 es la
+   * original del RDLeg 8/2015, no una «dada por» la Ley 48/2015. El propio módulo cita la DF
+   * única del RDLeg 8/2015 para `aplicableDesde`.
+   */
+  test('ABIERTO (16/10): la nota de la tabla no atribuye a la Ley 48/2015 la redacción del art. 60 anterior al RDL 3/2021', async ({
+    page,
+  }) => {
+    test.fail(true, 'Hallazgo 16/10: la norma del régimen derogado dice «(dada por la Ley 48/2015)»');
+    expect(COMPLEMENTO_MATERNIDAD_DEROGADO.norma).toContain('Art. 60 LGSS'); // control
+    expect(COMPLEMENTO_MATERNIDAD_DEROGADO.norma).not.toMatch(/dada por la Ley 48\/2015/);
+    await abrirGuia(page);
+    expect(normalizar(await page.locator('body').innerText())).not.toContain('(dada por la Ley 48/2015)');
+  });
+
+  /**
+   * ABIERTO (16/10/2026) — BAJO (dato). La pregunta 1 del FAQPage afirma que el complemento
+   * «tributa como rendimiento del trabajo en el IRPF», y las advertencias del motor del MCP
+   * («El complemento tributa en IRPF como rendimiento del trabajo.») lo repiten: dos frases
+   * tecleadas, sin norma citada y sin campo en data/fiscal, así que la calificación fiscal queda
+   * fuera de /triaje-fiscal. Es el patrón del 2984 (DT 33.ª) y de los 472, 503 y 505. El test
+   * no juzga si la calificación es correcta: pide que viva en el módulo y que el FAQPage no la
+   * teclee.
+   */
+  test('ABIERTO (16/10): la tributación en el IRPF que afirma el FAQPage vive en data/fiscal, no tecleada', async () => {
+    test.fail(true, 'Hallazgo 16/10: «tributa como rendimiento del trabajo» va tecleado en metadata.ts y en el motor');
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const leer = (...partes: string[]): string =>
+      sinComentarios(readFileSync(join(process.cwd(), ...partes), 'utf8'));
+    const fiscal = leer('data', 'fiscal', 'pensiones.ts');
+    const meta = leer('app', 'verificador-complemento-brecha-genero', 'metadata.ts');
+    expect(meta).toContain('faqJsonLd'); // control: es el fichero del FAQPage
+    expect(meta).not.toMatch(/tributa como rendimiento del trabajo/);
+    expect(fiscal).toMatch(/rendimientos? del trabajo/i);
+  });
+});
+
+// Móvil: lo mismo que el caso de 1280 px de arriba, en 390 y en 360 px, y al pulsar OTRA vez
+// con el veredicto ya pintado (medido el 16/10/2026: 1.ª pulsación, veredicto a 66 px con la
+// barra hasta 62; 2.ª, el botón queda a 66 y el veredicto a 285, entero y con el foco).
+test.describe('Re-inspección 16/10/2026 — móvil', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  for (const visor of [
+    { width: 390, height: 844 },
+    { width: 360, height: 740 },
+  ]) {
+    test(`cd462414 (16/10) a ${visor.width} px: el veredicto queda por debajo de la barra del logo, también al pulsar otra vez`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(visor);
+      const boton = page.getByRole('button', { name: 'Verificar mi derecho' });
+      for (const pulsacion of [1, 2]) {
+        await botonAlPie(page);
+        await boton.click();
+        await expect(page.locator('[class*="resultImporte"]')).toHaveText(/^\+73,80\s€\/mes$/);
+        await expect
+          .poll(() => veredictoLibreDelCromo(page), { message: `pulsación ${pulsacion}` })
+          .toBe(true);
+        expect(await page.evaluate(() => (document.activeElement?.className ?? '').toString())).toContain(
+          'resultHero',
+        );
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(visor.width);
+    });
+  }
 });

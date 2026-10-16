@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
+import { PUERTO } from './_puerto';
 import {
   analizar,
   contarOperadores,
@@ -10,6 +11,11 @@ import {
   RETOS,
   type Reto,
 } from '../../app/simulador-puertas-logicas/motor-retos';
+
+// Al NIVEL DEL FICHERO porque `launchOptions` fuerza un worker nuevo: mapea meskeia.com al
+// servidor local para que el bloque de <ZonaHerramienta> (16/10/2026, al final) vea un host de
+// producción y emita `evt:primer-uso`. Al resto de tests no les afecta: van a localhost.
+test.use({ launchOptions: { args: [`--host-resolver-rules=MAP meskeia.com 127.0.0.1:${PUERTO}`] } });
 
 /**
  * Simulador de Puertas Lógicas — modo Retos (18/08/2026)
@@ -232,7 +238,7 @@ test.describe('Corrección de intentos', () => {
   const mayoria = RETOS.find((r) => r.id === 'mayoria-3')!;
 
   test('una solución equivalente pero distinta también se acepta', () => {
-    // XNOR negada es XOR: otra forma de llegar a la misma tabla.
+    // De Morgan sobre la referencia NOT A OR B: NOT (A AND NOT B) da la misma tabla [1,1,0,1].
     const reto = RETOS.find((r) => r.id === 'implicacion')!;
     const c = corregirIntento('NOT (A AND NOT B)', reto); // De Morgan sobre NOT A OR B
     expect(c.resuelto).toBe(true);
@@ -687,10 +693,9 @@ test.describe('RE-INSPECCIÓN · hallazgos reparados', () => {
     await campo.fill('A XNOR B');
     expect(await columnaSalida(page)).toEqual([1, 0, 0, 1]); // 1 si son iguales
 
-    // Pero el panel que se titula «Sintaxis válida» —y que por su título se lee como una
-    // lista cerrada— solo nombra AND, OR, NOT y XOR. El <h1> promete las siete, el modo
-    // Tablas ofrece las siete, la comparativa educativa compara las siete y el JSON-LD
-    // anuncia «7 tipos de puertas lógicas»; la ayuda del modo Retos sí las lista todas.
+    // REPARADO el 30/08/2026 (d749e6ac): el panel que se titula «Sintaxis válida» —y que por
+    // su título se lee como una lista cerrada— solo nombraba AND, OR, NOT y XOR, mientras el
+    // <h1>, el modo Tablas, la comparativa educativa y el JSON-LD presentaban las siete.
     const ayuda = page.locator('[class*="__syntaxHelp"]');
     for (const operador of ['NAND', 'NOR', 'XNOR']) {
       await expect(ayuda, `«Sintaxis válida» debería nombrar ${operador}`).toContainText(operador);
@@ -701,10 +706,10 @@ test.describe('RE-INSPECCIÓN · hallazgos reparados', () => {
     await abrirSimulador(page, 'Expresiones');
     const campo = page.getByLabel('Expresión Booleana');
 
-    // El modo Tablas rotula los botones «⊼ NAND», «⊽ NOR», «⊙ XNOR», y la comparativa
-    // educativa repite esos mismos símbolos. Copiarlos aquí devuelve «No entiendo el
-    // carácter «⊼»». El evaluador del modo Retos (motor-retos.ts) SÍ los acepta: dos
-    // parsers distintos en la misma app, con sintaxis distinta y sin decírselo al usuario.
+    // REPARADO el 30/08/2026 (d749e6ac): el modo Tablas rotula los botones «⊼ NAND», «⊽ NOR»,
+    // «⊙ XNOR», y copiarlos aquí devolvía «No entiendo el carácter «⊼»», mientras el evaluador
+    // del modo Retos (motor-retos.ts) sí los aceptaba: dos parsers con sintaxis distinta en la
+    // misma app. Hoy motor.ts admite lo mismo que motor-retos.ts.
     await campo.fill('A ⊼ B');
     expect(await columnaSalida(page)).toEqual([1, 1, 1, 0]);
     await campo.fill('A ⊽ B');
@@ -712,7 +717,8 @@ test.describe('RE-INSPECCIÓN · hallazgos reparados', () => {
     await campo.fill('A ⊙ B');
     expect(await columnaSalida(page)).toEqual([1, 0, 0, 1]);
 
-    // Lo mismo con la prima y el producto implícito, que la ayuda del modo Retos anuncia:
+    // Lo mismo con la prima y el producto implícito, que la ayuda del modo Retos anuncia
+    // (también rechazados hasta el 30/08/2026):
     await campo.fill("A'");
     expect(await columnaSalida(page)).toEqual([1, 0]);
     await campo.fill('AB');
@@ -723,8 +729,9 @@ test.describe('RE-INSPECCIÓN · hallazgos reparados', () => {
     await abrirSimulador(page, 'Expresiones');
     const campo = page.getByLabel('Expresión Booleana');
 
-    // «NOT» a secas está tan rota como «A AND» —que sí avisa—, y el propio motor tiene
-    // el mensaje preparado («La expresión termina antes de tiempo»): ahora se le pregunta.
+    // REPARADO el 30/08/2026 (d749e6ac): «NOT» a secas, tan rota como «A AND», no avisaba
+    // porque page.tsx cortaba antes de preguntar al motor cuando no había variables. Ahora se
+    // le pregunta, y el motor contesta «La expresión termina antes de tiempo».
     await campo.fill('NOT');
     await expect(page.locator(AVISO_EXPRESION), '«NOT» debería avisar como lo hace «A AND»').toHaveCount(1);
 
@@ -734,5 +741,555 @@ test.describe('RE-INSPECCIÓN · hallazgos reparados', () => {
     await campo.fill('1 AND 0');
     await expect(page.locator(AVISO_EXPRESION)).toHaveCount(0);
     expect(await columnaSalida(page)).toEqual([0]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 16/10/2026 — tras el piloto de «primer uso» (3d5c5db0), el contraste de las
+// cabeceras (b7733c6d) y las relacionadas servidas por el layout (99e1ee7e)
+// ═══════════════════════════════════════════════════════════════════════════════
+/**
+ * Todo resuelto A MANO antes de abrir el navegador; ningún valor copiado de la app.
+ * Filas con la primera variable como bit MÁS significativo, como en el resto del fichero.
+ *
+ * CASO 1 · NORMAL (escritorio) — paridad de 4 bits con tres XOR en cascada (lo que afirma la
+ *   tarjeta «Técnico en electrónica» del bloque educativo), un XNOR con prima y producto
+ *   implícito, y dos circuitos conmutados a mano: multiplexor 2:1 y comparador de 1 bit.
+ * CASO 2 · LÍMITE (móvil 360×740, táctil) — el decodificador 2:4 con el dedo, expresiones sin
+ *   ninguna variable (solo constantes), la doble prima y un reto resuelto desde el móvil.
+ * CASO 3 · RECHAZO — expresiones rotas que deben avisar sin pintar tabla y, en Retos, un
+ *   operador prohibido, una variable ajena y una expresión incompleta.
+ * Y además: <ZonaHerramienta> (evt:primer-uso, con /api/analytics interceptado: nada llega a
+ * Turso), el contraste de las tablas de verdad y el contenido (bloque educativo, FAQPage y
+ * featureList). Los hallazgos abiertos van con test.fail(): afirman lo correcto y hoy fallan.
+ */
+
+const MOVIL_360 = {
+  viewport: { width: 360, height: 740 },
+  userAgent: devices['Pixel 7'].userAgent,
+  deviceScaleFactor: 2,
+  isMobile: true,
+  hasTouch: true,
+};
+
+type Modo = 'Tablas de Verdad' | 'Circuitos' | 'Expresiones' | 'Retos';
+
+/** Pulsa un modo y espera a que quede pulsado: un clic antes de hidratar no hace nada. */
+async function elegirModo(page: Page, modo: Modo, conDedo = false): Promise<void> {
+  const boton = page.getByRole('button', { name: new RegExp(modo) }).first();
+  await expect(async () => {
+    if (conDedo) await boton.tap(); else await boton.click();
+    await expect(boton).toHaveAttribute('aria-pressed', 'true', { timeout: 1000 });
+  }).toPass({ timeout: 15000 });
+}
+
+/** Los valores 0/1 de los LED de salida (solo el valor: el rótulo «Y1» también lleva cifras). */
+const valoresLed = (page: Page): Promise<string[]> =>
+  page.locator('[class*="__ioLed"] [class*="__ioValue"]').allInnerTexts();
+
+const FILA_ACTUAL = 'tr[class*="__currentRow"]';
+const VEREDICTO = '[class*="__retoVeredicto"]';
+
+async function abrirGuiaEducativa(page: Page): Promise<void> {
+  const boton = page.getByRole('button', { name: /Ver guía educativa/ });
+  await expect(async () => {
+    await boton.click();
+    await expect(page.getByRole('heading', { name: 'Casos de Uso por Perfil' })).toBeVisible({ timeout: 1000 });
+  }).toPass({ timeout: 15000 });
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// CASO 1 · NORMAL (escritorio)
+// ───────────────────────────────────────────────────────────────────────────────
+test.describe('16/10 · CASO 1 · normal, en escritorio', () => {
+  test('paridad de 4 bits: A ⊕ B ⊕ C ⊕ D vale 1 cuando el número de unos es impar', async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Expresiones');
+    await page.getByLabel('Expresión Booleana').fill('A ⊕ B ⊕ C ⊕ D');
+
+    // A mano, contando los unos de ABCD de 0000 a 1111 (impar → 1):
+    //   0000:0→0 0001:1→1 0010:1→1 0011:2→0 0100:1→1 0101:2→0 0110:2→0 0111:3→1
+    //   1000:1→1 1001:2→0 1010:2→0 1011:3→1 1100:2→0 1101:3→1 1110:3→1 1111:4→0
+    // Es la afirmación del bloque educativo: «3 puertas XOR en cascada» dan la paridad de 4 bits.
+    expect(await cabeceraDe(page)).toEqual(['A', 'B', 'C', 'D', 'Y']);
+    expect(await columnaSalida(page)).toEqual([0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0]);
+  });
+
+  test("XNOR con prima y producto implícito: A'B ⊙ C", async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Expresiones');
+    await page.getByLabel('Expresión Booleana').fill("A'B ⊙ C");
+
+    // El AND implícito liga más que XNOR: (A'·B) ⊙ C, y ⊙ vale 1 cuando los dos lados son iguales.
+    //   000: A'B=0, C=0 → 1 · 001: 0 vs 1 → 0 · 010: A'B=1, C=0 → 0 · 011: 1 vs 1 → 1
+    //   100: A'=0 → A'B=0, C=0 → 1 · 101: 0 vs 1 → 0 · 110: 0 vs 0 → 1 · 111: 0 vs 1 → 0
+    expect(await cabeceraDe(page)).toEqual(['A', 'B', 'C', 'Y']);
+    expect(await columnaSalida(page)).toEqual([1, 0, 0, 1, 1, 0, 1, 0]);
+  });
+
+  test('multiplexor 2:1 conmutado a mano: Y copia D1 con S=1 y D0 con S=0', async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Circuitos');
+    await page.getByRole('button', { name: 'Multiplexor 2:1' }).click();
+    const conmutadores = page.locator('[class*="__ioSwitch"]'); // D0, D1, S
+
+    // Y = S ? D1 : D0. La fila resaltada se lee D0 D1 S | Y.
+    await conmutadores.nth(0).click(); // D0 = 1
+    await conmutadores.nth(2).click(); // S = 1  → copia D1 = 0
+    expect(await valoresLed(page)).toEqual(['0']);
+    await expect(page.locator(FILA_ACTUAL)).toHaveText('1010');
+
+    await conmutadores.nth(1).click(); // D1 = 1 → copia D1 = 1
+    expect(await valoresLed(page)).toEqual(['1']);
+    await expect(page.locator(FILA_ACTUAL)).toHaveText('1111');
+
+    await conmutadores.nth(2).click(); // S = 0  → copia D0 = 1
+    expect(await valoresLed(page)).toEqual(['1']);
+    await expect(page.locator(FILA_ACTUAL)).toHaveText('1101');
+  });
+
+  test('comparador de 1 bit con A=0 y B=1: solo se enciende «A < B»', async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Circuitos');
+    await page.getByRole('button', { name: 'Comparador 1-bit' }).click();
+    await page.locator('[class*="__ioSwitch"]').nth(1).click(); // B = 1
+
+    // Salidas en orden A>B, A=B, A<B. Con 0 frente a 1: 0, 0, 1. Fila «01» + «001».
+    expect(await valoresLed(page)).toEqual(['0', '0', '1']);
+    await expect(page.locator(FILA_ACTUAL)).toHaveText('01001');
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────────
+// CASO 2 · LÍMITE, en móvil (360×740, táctil)
+// ───────────────────────────────────────────────────────────────────────────────
+test.describe('16/10 · CASO 2 · límite, en móvil (360×740, táctil)', () => {
+  test.use(MOVIL_360);
+
+  test('decodificador 2:4 con el dedo: A1=1 activa Y2 y luego A0=1 activa Y3', async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Circuitos', true);
+    await page.getByRole('button', { name: 'Decodificador 2:4' }).tap();
+    const conmutadores = page.locator('[class*="__ioSwitch"]'); // A1, A0
+
+    // Se activa la salida número 2·A1 + A0, y solo esa.
+    expect(await valoresLed(page)).toEqual(['1', '0', '0', '0']); // 00 → 0 → Y0
+    await conmutadores.nth(0).tap(); // A1 = 1 → 2 → Y2
+    expect(await valoresLed(page)).toEqual(['0', '0', '1', '0']);
+    await expect(page.locator(FILA_ACTUAL)).toHaveText('100010');
+    await conmutadores.nth(1).tap(); // A0 = 1 → 3 → Y3
+    expect(await valoresLed(page)).toEqual(['0', '0', '0', '1']);
+    await expect(page.locator(FILA_ACTUAL)).toHaveText('110001');
+  });
+
+  test('sin variables: constantes y doble prima', async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Expresiones', true);
+    const campo = page.getByLabel('Expresión Booleana');
+
+    // 1 ⊕ 1: las dos entradas son iguales → 0. Sin variables: una fila y solo la columna Y.
+    await campo.fill('1 XOR 1');
+    expect(await cabeceraDe(page)).toEqual(['Y']);
+    expect(await filasDeTabla(page)).toEqual([['0']]);
+
+    // NOT liga más que NAND: (¬0) ⊼ 1 = 1 ⊼ 1 = ¬(1·1) = 0.
+    await campo.fill('NOT 0 NAND 1');
+    expect(await filasDeTabla(page)).toEqual([['0']]);
+
+    // Doble prima: ¬¬A = A → 0, 1.
+    await campo.fill("A''");
+    expect(await columnaSalida(page)).toEqual([0, 1]);
+  });
+
+  test('el reto de paridad impar se resuelve desde el móvil con 2 operadores', async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Retos', true);
+    await page.getByRole('button', { name: /Paridad impar/ }).tap();
+    await page.getByLabel('Tu expresión').fill('A^B^C');
+    await page.getByRole('button', { name: 'Comprobar' }).tap();
+
+    // A⊕B⊕C es 1 con un número impar de unos: es la tabla del reto. Dos «^» = dos operadores,
+    // los mismos que la referencia «A XOR B XOR C».
+    const veredicto = page.locator(VEREDICTO);
+    await expect(veredicto).toContainText('Resuelto.');
+    await expect(veredicto).toContainText('con 2 operadores');
+    await expect(veredicto).toContainText('Es la misma longitud que nuestra solución de referencia.');
+    await expect(page.getByText('Resueltos: 1 de 9')).toBeVisible(); // 9 retos en motor-retos.ts
+  });
+
+  // HALLAZGO ABIERTO (16/10/2026). A 360×740 el selector de modo se apila en una columna de
+  // 388 px (4 botones de ~85 px) y la herramienta empieza en y≈1008. Al tocar «Circuitos» lo
+  // que cambia (el selector de circuito, y≈996) queda por debajo de la pantalla: lo único que
+  // se ve es el borde del botón. Medido en la inspección: top 996 px con 740 px de alto.
+  test.fail('HALLAZGO · al tocar un modo, lo que cambia aparece en la pantalla', async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Circuitos', true);
+    const caja = await page.getByRole('button', { name: 'Half Adder (Semisumador)' }).evaluate((e) => {
+      const r = e.getBoundingClientRect();
+      return { bottom: r.bottom, alto: window.innerHeight };
+    });
+    expect(caja.bottom, 'el primer control del modo debe quedar a la vista').toBeLessThanOrEqual(caja.alto);
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────────
+// CASO 3 · RECHAZO
+// ───────────────────────────────────────────────────────────────────────────────
+test.describe('16/10 · CASO 3 · lo que debe rechazarse', () => {
+  test('«()» y «A NAND» dicen el motivo y no pintan tabla', async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Expresiones');
+    const campo = page.getByLabel('Expresión Booleana');
+
+    // «()»: el paréntesis se abre y lo primero que llega es «)», sin operando.
+    await campo.fill('()');
+    await expect(page.locator(AVISO_EXPRESION)).toHaveText('Falta un operando antes de «)».');
+    await expect(page.locator(TABLA_VERDAD)).toHaveCount(0);
+
+    // «A NAND»: falta el segundo operando.
+    await campo.fill('A NAND');
+    await expect(page.locator(AVISO_EXPRESION)).toHaveText('La expresión termina antes de tiempo.');
+    await expect(page.locator(TABLA_VERDAD)).toHaveCount(0);
+  });
+
+  test('Retos: operador prohibido, variable ajena y expresión incompleta no se dan por buenos', async ({ page }) => {
+    await abrirSimulador(page);
+    await elegirModo(page, 'Retos');
+    const comprobar = page.getByRole('button', { name: 'Comprobar' });
+    const campo = page.getByLabel('Tu expresión');
+    const veredicto = page.locator(VEREDICTO);
+
+    await expect(comprobar).toBeDisabled(); // sin nada escrito no hay qué corregir
+
+    // «AND usando solo NAND» admite solo NAND; NOT (A NAND B) da la tabla de AND, pero con NOT.
+    await page.getByRole('button', { name: /AND usando solo NAND/ }).click();
+    await campo.fill('NOT (A NAND B)');
+    await comprobar.click();
+    await expect(veredicto).toHaveText('No se puede evaluar. Este reto solo admite NAND. Has usado: NOT.');
+
+    // La implicación es de A y B: E no es una variable del reto.
+    await page.getByRole('button', { name: /Implicación/ }).click();
+    await campo.fill('A AND E');
+    await comprobar.click();
+    await expect(veredicto).toHaveText('No se puede evaluar. La variable «E» no es de este reto');
+
+    // Incompleta, enviada con Intro.
+    await campo.fill('A +');
+    await campo.press('Enter');
+    await expect(veredicto).toHaveText('No se puede evaluar. La expresión termina antes de tiempo');
+
+    await expect(page.getByText('Resueltos: 0 de 9')).toBeVisible();
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────────
+// <ZonaHerramienta> — evt:primer-uso (piloto del 09/10/2026, 3d5c5db0)
+// ───────────────────────────────────────────────────────────────────────────────
+// Mismo montaje que tests/primer-uso-zona.spec.ts: meskeia.com mapeado al servidor local (por
+// el `test.use` del nivel del fichero), `navigator.webdriver` falso y un UA sin «Headless». TODO
+// /api/analytics se contesta con page.route: el servidor local tiene las credenciales de Turso.
+const SLUG = 'simulador-puertas-logicas';
+const UA_ESCRITORIO =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36';
+
+interface Envio {
+  aplicacion: string;
+  datos_adicionales?: { app?: string; t?: number };
+}
+
+async function abrirConAnalytics(page: Page): Promise<Envio[]> {
+  const envios: Envio[] = [];
+  await page.addInitScript(() => {
+    Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', { get: () => false });
+    try { localStorage.setItem('meskeia_transparency_banner_dismissed', 'true'); } catch { /* modo privado */ }
+  });
+  await page.route('**/api/analytics/**', async (ruta) => {
+    const cuerpo = ruta.request().postData();
+    if (ruta.request().url().includes('/api/analytics/track') && cuerpo) envios.push(JSON.parse(cuerpo) as Envio);
+    await ruta.fulfill({ status: 200, contentType: 'application/json', body: '{"status":"success"}' });
+  });
+  await page.goto(`http://meskeia.com/${SLUG}/`, { waitUntil: 'domcontentloaded' });
+  // La visita la registra AnalyticsTracker en un efecto: que llegue prueba que React hidrató.
+  await expect.poll(() => envios.some((e) => e.aplicacion === SLUG), { timeout: 20000 }).toBe(true);
+  return envios;
+}
+
+const primerosUsos = (envios: Envio[]): Envio[] => envios.filter((e) => e.aplicacion === 'evt:primer-uso');
+
+/** Deslizamiento táctil REAL (CDP): desplaza la página como un pulgar, sin soltar en el sitio. */
+async function deslizarDesde(page: Page, x: number, y: number, pasos: number, paso: number): Promise<void> {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
+  for (let i = 1; i <= pasos; i++) {
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y - i * paso }] });
+    await page.waitForTimeout(16);
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  // Que acabe la inercia: un toque durante ella solo la frena y no pulsa nada.
+  let previo = -1;
+  for (let i = 0; i < 40; i++) {
+    await page.waitForTimeout(250);
+    const actual = await page.evaluate(() => window.scrollY);
+    if (actual === previo) break;
+    previo = actual;
+  }
+}
+
+test.describe('16/10 · ZonaHerramienta en escritorio', () => {
+  test.use({ userAgent: UA_ESCRITORIO });
+
+  test('no cambia la maquetación; desplazarse, pulsar texto y abrir la guía no emiten; un botón emite UNA vez', async ({ page }) => {
+    const envios = await abrirConAnalytics(page);
+
+    // display: contents → el envoltorio no tiene caja y el selector de modo sigue en 4 columnas.
+    const zona = await page.locator(`[data-zona-herramienta="${SLUG}"]`).evaluate((e) => ({
+      display: getComputedStyle(e).display, ancho: e.getBoundingClientRect().width,
+    }));
+    expect(zona).toEqual({ display: 'contents', ancho: 0 });
+    const columnas = await page.locator('[class*="__modeSelector"]').evaluate((e) =>
+      getComputedStyle(e).gridTemplateColumns.split(' ').length);
+    expect(columnas).toBe(4);
+
+    await page.mouse.wheel(0, 1200);
+    await page.mouse.wheel(0, -1200);
+    await page.locator('[class*="__gateDescription"]').click(); // texto, no un control
+    await abrirGuiaEducativa(page); // fuera de la zona: es leer, no usar
+    await page.waitForTimeout(500);
+    expect(primerosUsos(envios), 'emitió sin usar ningún control').toHaveLength(0);
+
+    await page.locator(BOTON_PUERTA).filter({ hasText: /^⊼\s*NAND$/ }).click();
+    await expect.poll(() => primerosUsos(envios).length).toBe(1);
+    expect(primerosUsos(envios)[0].datos_adicionales?.app).toBe(SLUG);
+    expect(typeof primerosUsos(envios)[0].datos_adicionales?.t).toBe('number');
+
+    // Más usos en la misma carga no vuelven a emitir.
+    await page.locator(BOTON_PUERTA).filter({ hasText: /^⊕\s*XOR$/ }).click();
+    await elegirModo(page, 'Expresiones');
+    await page.getByLabel('Expresión Booleana').fill('A AND B');
+    await page.waitForTimeout(500);
+    expect(primerosUsos(envios), 'se repitió en la misma carga').toHaveLength(1);
+  });
+
+  // HALLAZGO ABIERTO (16/10/2026): `svg` está en CONTROLES de ZonaHerramienta porque en otros
+  // simuladores es el lienzo donde se arrastra; aquí el «Símbolo» de la puerta es un dibujo
+  // estático y pulsarlo cuenta como uso.
+  test.fail('HALLAZGO · pulsar el dibujo estático del símbolo NO es usar la herramienta', async ({ page }) => {
+    const envios = await abrirConAnalytics(page);
+    const dibujo = page.locator('svg[class*="__gateSvg"]');
+    await dibujo.scrollIntoViewIfNeeded();
+    await dibujo.click();
+    await page.waitForTimeout(800);
+    expect(primerosUsos(envios)).toHaveLength(0);
+  });
+});
+
+test.describe('16/10 · ZonaHerramienta en móvil (360×740, táctil)', () => {
+  test.use(MOVIL_360);
+
+  test('deslizar sobre la tabla desplaza sin emitir; un toque en una puerta emite UNA vez', async ({ page }) => {
+    const envios = await abrirConAnalytics(page);
+    const tabla = page.locator(TABLA_VERDAD).first();
+    await tabla.evaluate((t) => t.scrollIntoView({ block: 'center' }));
+    await page.waitForTimeout(500);
+    const antes = await page.evaluate(() => window.scrollY);
+    const caja = await tabla.boundingBox();
+    if (!caja) throw new Error('la tabla no tiene caja');
+    await deslizarDesde(page, Math.round(caja.x + caja.width / 2), Math.round(caja.y + caja.height / 2), 6, 20);
+    expect(await page.evaluate(() => window.scrollY), 'el deslizamiento debe desplazar').toBeGreaterThan(antes);
+    expect(primerosUsos(envios), 'desplazarse no es usar').toHaveLength(0);
+
+    const or = page.locator(BOTON_PUERTA).filter({ hasText: /^∨\s*OR$/ });
+    await or.evaluate((b) => b.scrollIntoView({ block: 'center' }));
+    await expect(async () => { // repetir el toque es inocuo: vuelve a elegir OR
+      await or.tap();
+      await expect(or).toHaveAttribute('aria-pressed', 'true', { timeout: 1000 });
+    }).toPass({ timeout: 10000 });
+    expect(await columnaSalida(page)).toEqual([0, 1, 1, 1]); // OR: 1 si alguna es 1
+    await expect.poll(() => primerosUsos(envios).length).toBe(1);
+  });
+
+  // HALLAZGO ABIERTO (16/10/2026): ZonaHerramienta escucha `pointerdown`, que en táctil salta al
+  // POSAR el dedo, antes de saber si el gesto es un toque o un desplazamiento. Deslizar para bajar
+  // la página empezando sobre cualquier botón (los 4 de modo llenan la mitad baja de la primera
+  // pantalla en móvil) emite evt:primer-uso sin que se haya usado nada: la puerta activa no cambia.
+  test.fail('HALLAZGO · deslizar el dedo sobre un botón solo para desplazarse NO es usar', async ({ page }) => {
+    const envios = await abrirConAnalytics(page);
+    const not = page.locator(BOTON_PUERTA).filter({ hasText: /^¬\s*NOT$/ });
+    await not.evaluate((b) => b.scrollIntoView({ block: 'center' }));
+    await page.waitForTimeout(500);
+    const caja = await not.boundingBox();
+    if (!caja) throw new Error('el botón NOT no tiene caja');
+    await deslizarDesde(page, Math.round(caja.x + caja.width / 2), Math.round(caja.y + caja.height / 2), 8, 25);
+    expect(primerosUsos(envios)).toHaveLength(0);
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────────
+// Contraste de las tablas de verdad (hallazgo ABIERTO del 16/10/2026)
+// ───────────────────────────────────────────────────────────────────────────────
+/**
+ * El «1» de cada celda (.cellOne: #10b981 sobre ese mismo verde al 15 %) y la cabecera «Y»
+ * (.outputHeader: var(--primary) sobre el azul al 10 %) son texto de 17,6 px en negrita: texto
+ * PEQUEÑO, exige 4,5:1. Calculado a mano antes de medir: 2,20:1 y 3,65:1 en claro. El candado
+ * check:contraste-cabeceras no lo ve a propósito: mira blanco SOBRE la marca, no la marca como
+ * texto. Se mide el color ya compuesto sobre el fondo real, no se lee el CSS.
+ */
+async function contrastesDeLaTabla(page: Page): Promise<{ uno: number; cabeceraY: number }> {
+  return page.locator(TABLA_VERDAD).first().evaluate((t) => {
+    const leer = (c: string): number[] => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
+    };
+    const sobre = (a: number[], b: number[]): number[] => [0, 1, 2].map((i) => a[i] * a[3] + b[i] * (1 - a[3])).concat(1);
+    const fondo = (el: Element): number[] => {
+      const capas: number[][] = [];
+      for (let e: Element | null = el; e; e = e.parentElement) {
+        const c = leer(getComputedStyle(e).backgroundColor);
+        if (c[3] > 0) capas.push(c);
+        if (c[3] >= 1) break;
+      }
+      return capas.reverse().reduce((res, capa) => sobre(capa, res), [255, 255, 255, 1]);
+    };
+    const lum = (c: number[]): number => {
+      const f = (v: number): number => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4; };
+      return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+    };
+    const ratio = (el: Element): number => {
+      const bg = fondo(el);
+      const fg = sobre(leer(getComputedStyle(el).color), bg);
+      const [hi, lo] = [lum(fg), lum(bg)].sort((x, y) => y - x);
+      return Math.round(((hi + 0.05) / (lo + 0.05)) * 100) / 100;
+    };
+    const uno = t.querySelector('td[class*="__cellOne"]');
+    const y = t.querySelector('th[class*="__outputHeader"]');
+    if (!uno || !y) throw new Error('falta la celda «1» o la cabecera Y');
+    return { uno: ratio(uno), cabeceraY: ratio(y) };
+  });
+}
+
+/**
+ * Las dos trampas de medir color en navegador (tests/contraste-cabeceras-tabla.spec.ts): el
+ * overlay de Next en dev y las transiciones, que dejan leer colores intermedios (aquí, 1,49:1
+ * a mitad del cambio a oscuro). Se desactivan, y además se repite la lectura hasta que dos
+ * seguidas coinciden.
+ */
+async function contrastesEstables(page: Page): Promise<{ uno: number; cabeceraY: number }> {
+  await page.addStyleTag({
+    content: 'nextjs-portal { display: none !important; } *, *::before, *::after { animation: none !important; transition: none !important; }',
+  });
+  let previa = await contrastesDeLaTabla(page);
+  for (let i = 0; i < 20; i++) {
+    await page.waitForTimeout(150);
+    const actual = await contrastesDeLaTabla(page);
+    if (actual.uno === previa.uno && actual.cabeceraY === previa.cabeceraY) return actual;
+    previa = actual;
+  }
+  throw new Error('la medida de contraste no se estabiliza');
+}
+
+test.describe('16/10 · contraste de las tablas de verdad', () => {
+  test.fail('HALLAZGO · claro: el «1» y la cabecera «Y» llegan a 4,5:1', async ({ page }) => {
+    await abrirSimulador(page);
+    const c = await contrastesEstables(page); // medido el 16/10: 2,20 y 3,65
+    expect(c.uno, 'celda «1»').toBeGreaterThanOrEqual(4.5);
+    expect(c.cabeceraY, 'cabecera Y').toBeGreaterThanOrEqual(4.5);
+  });
+
+  test.fail('HALLAZGO · oscuro: el «1» y la cabecera «Y» llegan a 4,5:1', async ({ page }) => {
+    await abrirSimulador(page);
+    // Con el conmutador de la propia web, no sembrando data-theme (el gestor lo pisa y pasa en falso).
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await expect(async () => {
+      await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click({ timeout: 1000 });
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 1000 });
+    }).toPass({ timeout: 15000 });
+    const c = await contrastesEstables(page); // medido el 16/10: 3,59 y 4,42
+    expect(c.uno, 'celda «1»').toBeGreaterThanOrEqual(4.5);
+    expect(c.cabeceraY, 'cabecera Y').toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+// ───────────────────────────────────────────────────────────────────────────────
+// Contenido: bloque educativo, FAQPage y featureList (hallazgos ABIERTOS del 16/10/2026)
+// ───────────────────────────────────────────────────────────────────────────────
+test.describe('16/10 · contenido', () => {
+  test.fail('HALLAZGO · un multiplexor 4:1 en AND-OR lleva 4 puertas AND, no 3', async ({ page }) => {
+    await abrirSimulador(page);
+    await abrirGuiaEducativa(page);
+    // Y = S1'S0'·D0 + S1'S0·D1 + S1S0'·D2 + S1S0·D3: un AND por cada entrada de datos (4),
+    // un OR de 4 entradas y 2 NOT. Con 3 AND una de las cuatro fuentes no llega nunca a Y.
+    const tarjeta = page.locator('[class*="__escenarioCard"]').filter({ hasText: 'Multiplexor 4:1' });
+    await expect(tarjeta).toHaveCount(1);
+    await expect(tarjeta).not.toContainText('3 puertas AND');
+  });
+
+  test.fail('HALLAZGO · la FAQ no llama «universales» a las 7 puertas', async ({ page }) => {
+    await abrirSimulador(page);
+    await abrirGuiaEducativa(page);
+    // Dos preguntas más abajo la propia FAQ define «universal» (solo NAND y NOR lo son) y la
+    // comparativa marca «Universal: No» en AND, OR, NOT, XOR y XNOR.
+    const pregunta = page.locator('[class*="__faqItem"]').filter({ hasText: '¿Es lo mismo una puerta lógica' });
+    await expect(pregunta).toHaveCount(1);
+    await expect(pregunta).not.toContainText('son universales');
+  });
+
+  test.fail('HALLAZGO · los emojis decorativos del bloque educativo llevan aria-hidden', async ({ page }) => {
+    await abrirSimulador(page);
+    await abrirGuiaEducativa(page);
+    // 🎓 🔬 🔧 💻 junto al perfil de cada tarjeta y ⚠️ junto al título del recuadro de errores.
+    const sinOcultar = await page.locator('[class*="__escenarioIcon"], [class*="__warningIcon"]')
+      .evaluateAll((els) => els.filter((e) => e.getAttribute('aria-hidden') !== 'true').map((e) => e.textContent));
+    expect(sinOcultar).toEqual([]);
+  });
+
+  test.fail('HALLAZGO · featureList no promete una «visualización paso a paso de la propagación»', async ({ page }) => {
+    await abrirSimulador(page);
+    // Ningún modo enseña señales intermedias ni avanza paso a paso: los circuitos muestran la
+    // salida final y la tabla completa.
+    const features = await page.locator('script[type="application/ld+json"]').evaluateAll((els) => {
+      for (const el of els) {
+        const d = JSON.parse(el.textContent || '{}') as { '@type'?: string; featureList?: string[] };
+        if (d['@type'] === 'WebApplication') return d.featureList ?? [];
+      }
+      return null;
+    });
+    expect(features, 'no hay WebApplication en la página').not.toBeNull();
+    expect((features ?? []).filter((f) => /paso a paso|propagaci/i.test(f))).toEqual([]);
+  });
+
+  test.fail('HALLAZGO · el FAQPage y la FAQ visible dicen lo mismo (una sola constante)', async ({ page }) => {
+    await abrirSimulador(page);
+    await abrirGuiaEducativa(page);
+    const normal = (s: string): string => s.replace(/\s+/g, ' ').trim();
+    const faq = await page.locator('script[type="application/ld+json"]').evaluateAll((els) => {
+      for (const el of els) {
+        const d = JSON.parse(el.textContent || '{}') as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
+        if (d['@type'] === 'FAQPage') return (d.mainEntity ?? []).map((q) => ({ pregunta: q.name, respuesta: q.acceptedAnswer.text }));
+      }
+      return [];
+    });
+    expect(faq).toHaveLength(6);
+    const visibles = await page.locator('[class*="__faqItem"]').evaluateAll((items) => items.map((i) => ({
+      pregunta: i.querySelector('h4')?.textContent ?? '',
+      respuesta: i.querySelector('p')?.textContent ?? '',
+    })));
+    // Las 6 del FAQPage están también en pantalla, escritas otra vez. El 16/10/2026 divergían 4:
+    // puerta/compuerta, tabla de verdad, XOR/XNOR (solo mayúsculas) y hardware (otro enunciado).
+    const distintas = faq.filter((q) => {
+      const v = visibles.find((x) => normal(x.pregunta) === normal(q.pregunta));
+      return !v || normal(v.respuesta) !== normal(q.respuesta);
+    }).map((q) => q.pregunta);
+    expect(distintas).toEqual([]);
+  });
+
+  test.fail('HALLAZGO · el texto de «Sigue explorando» no promete «cualquier fórmula booleana»', async ({ page }) => {
+    await abrirSimulador(page);
+    // El evaluador admite 4 variables (A-D): cualquier expresión con una E se rechaza con
+    // ««E» no es una variable válida. Usa A, B, C o D.» (RECHAZOS del CASO 3 de 30/08, arriba).
+    const seccion = page.locator('section[class*="__relatedConcepts"]');
+    await expect(seccion).toHaveCount(1);
+    await expect(seccion).not.toContainText('cualquier fórmula booleana');
   });
 });
