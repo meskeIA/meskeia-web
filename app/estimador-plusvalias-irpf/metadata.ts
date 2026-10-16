@@ -1,10 +1,27 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { GANANCIAS_PATRIMONIALES_META } from '@/data/fiscal';
+import { GANANCIAS_PATRIMONIALES_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
 // y no se escribe a mano (lo exige check:anio-titulo).
 const anio = GANANCIAS_PATRIMONIALES_META.vigencia;
+
+/**
+ * Los tramos del FAQPage, de la misma escala con la que calcula la app. Hasta el 16/10/2026
+ * iban tecleados «en 2025» con el último al 28 %, el de 2023-2024: desde el 1/1/2025 es el
+ * 15 % estatal (art. 66 LIRPF) + 15 % autonómico (art. 76), redacción de la disposición final
+ * 7.1 de la Ley 7/2024, leída en el BOE ese día. La tabla de la página ya decía 30 %. Cabo C0092.
+ */
+const euros = (n: number) => `${formatNumber(n, 0)} €`;
+const pct = (n: number) => `${formatNumber(n, 0)} %`;
+const piezasTramos = TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t, i) => {
+  const desde = i === 0 ? 0 : TRAMOS_GANANCIAS_PATRIMONIALES_2025[i - 1].hasta;
+  if (i === 0) return `${pct(t.tipo)} hasta ${euros(t.hasta)}`;
+  if (t.hasta === Infinity) return `${pct(t.tipo)} a partir de ${euros(desde)}`;
+  return `${pct(t.tipo)} de ${euros(desde)} a ${euros(t.hasta)}`;
+});
+const textoTramos = `${piezasTramos.slice(0, -1).join(', ')} y ${piezasTramos[piezasTramos.length - 1]}`;
 
 export const metadata: Metadata = {
   title: `Estimador Plusvalías IRPF ${anio} - Ganancias Patrimoniales | meskeIA`,
@@ -56,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Qué impuesto se paga por vender un piso o inmueble en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La ganancia patrimonial obtenida al vender un inmueble tributa en el IRPF dentro de la base del ahorro. En 2025 los tramos son: 19% hasta 6.000 €, 21% de 6.001 a 50.000 €, 23% de 50.001 a 200.000 €, 27% de 200.001 a 300.000 € y 28% a partir de 300.000 €. La ganancia se calcula restando el precio de adquisición (más gastos e impuestos pagados al comprar) del precio de venta (menos gastos de transmisión).',
+        text: `La ganancia patrimonial obtenida al vender un inmueble tributa en el IRPF dentro de la base del ahorro. En ${anio} los tramos, sumando la parte estatal y la autonómica, son: ${textoTramos}. La ganancia se calcula restando el precio de adquisición (más gastos e impuestos pagados al comprar) del precio de venta (menos gastos de transmisión).`,
       },
     },
     {

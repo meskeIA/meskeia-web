@@ -29,7 +29,7 @@
  *   - De 6.000 € a 50.000 €: 21%
  *   - De 50.000 € a 200.000 €: 23%
  *   - De 200.000 € a 300.000 €: 27%
- *   - Más de 300.000 €: 28%
+ *   - Más de 300.000 €: 30% (28 % hasta 2024; Ley 7/2024, disp. final 7.ª)
  *
  * COMPENSACIÓN DE PÉRDIDAS:
  *   Las pérdidas de criptomonedas compensan ganancias patrimoniales de la base del ahorro.

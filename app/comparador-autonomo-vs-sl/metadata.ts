@@ -1,10 +1,21 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FISCAL_IRPF_META } from '@/data/fiscal';
+import { FISCAL_IRPF_META, TRAMOS_IRPF_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
 // y no se escribe a mano (lo exige check:anio-titulo).
 const anio = FISCAL_IRPF_META.vigencia;
+
+/**
+ * Los extremos de las dos escalas del FAQPage, de las mismas con las que calcula la app. Hasta
+ * el 16/10/2026 iban tecleados: «en España en 2025» y los dividendos «entre el 19 % y el 28 %»,
+ * el máximo de 2023-2024; desde el 1/1/2025 la base del ahorro acaba en el 15 % estatal (art. 66
+ * LIRPF) + 15 % autonómico (art. 76), Ley 7/2024, leída en el BOE ese día. Cabo C0092.
+ */
+const pct = (n: number) => `${formatNumber(n, 0)} %`;
+const extremos = (escala: { tipo: number }[]) =>
+  `${pct(escala[0].tipo)} al ${pct(escala[escala.length - 1].tipo)}`;
 
 export const metadata: Metadata = {
   title: `Comparador Autónomo vs SL ${anio} - ¿Qué conviene más fiscalmente? | meskeIA`,
@@ -64,7 +75,7 @@ export const faqJsonLd = {
       name: '¿Qué impuestos paga un autónomo frente a una SL?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un autónomo tributa por su rendimiento neto en IRPF (con tramos que van del 19 % al 47 % en España en 2025) y cotiza a la Seguridad Social por la cuota RETA, que varía según sus ingresos reales (sistema de cotización por ingresos reales desde 2023). Una SL paga Impuesto sobre Sociedades al tipo general del 25 % sobre el beneficio; cuando el socio se distribuye dividendos, estos tributan adicionalmente en IRPF como rendimiento del capital mobiliario (entre el 19 % y el 28 %).',
+        text: `Un autónomo tributa por su rendimiento neto en IRPF (con tramos que van del ${extremos(TRAMOS_IRPF_2025)} en España en ${anio}) y cotiza a la Seguridad Social por la cuota RETA, que varía según sus ingresos reales (sistema de cotización por ingresos reales desde 2023). Una SL paga Impuesto sobre Sociedades al tipo general del 25 % sobre el beneficio; cuando el socio se distribuye dividendos, estos tributan adicionalmente en IRPF como rendimiento del capital mobiliario, con la escala de la base del ahorro (del ${extremos(TRAMOS_GANANCIAS_PATRIMONIALES_2025)}).`,
       },
     },
     {
