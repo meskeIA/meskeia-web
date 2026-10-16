@@ -35,6 +35,13 @@ fallo que ningún testigo ve: sembrar el valor que el input YA tiene. Para encon
 `SIEMBRA_ESTRICTA=1 npx playwright test tests/apps`; cada línea «SIEMBRA INÚTIL» es un caso que
 hay que hacer partir de otro estado.
 
+## Medir contraste: `_contraste.ts`
+
+**`contrasteSobreFondoReal`** compone las capas semitransparentes de los ancestros, que es lo
+que hace falta para un texto sobre un tinte en oscuro. No copiar otra versión casera: hay 93, y
+las que buscan el primer fondo opaco aprueban de más (un 4,42:1 pasó por bueno, cabo C0120). Las
+copias se migran cuando su app pasa por el Inspector. Fondos con imagen o degradado: por píxel.
+
 ## Trampas de la emulación ya medidas
 
 Ninguna es un defecto de la app; todas han dado rojos (o verdes) falsos. Antes de perseguir un

@@ -1,5 +1,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { contrasteSobreFondoReal } from './_contraste';
 
 /**
  * Inspector — calculadora-potencia-ciclismo (segmento MOTOR de cálculo, riesgo 2)
@@ -1194,46 +1195,8 @@ async function teclearViendo(page: Page, selector: string, texto: string, tocar 
   }
 }
 
-/**
- * Contraste WCAG del texto contra el fondo que se VE: compone las capas semitransparentes de los
- * ancestros sobre la primera opaca. Hasta el 03/10/2026 `contraste()`, más arriba, saltaba las
- * semitransparentes y no veía tintes como el de `.warningBox` o `.vamGrid` en oscuro; hoy delega aquí.
- * Contrastado por píxel el 03/10/2026: el fondo real de la pista del desnivel en oscuro es
- * rgb(45, 54, 57) y el de «Errores frecuentes», rgb(69, 57, 49), los mismos que da esta suma.
- */
-async function contrasteSobreFondoReal(elemento: Locator): Promise<number> {
-  return elemento.evaluate((el) => {
-    const rgba = (s: string): number[] => {
-      const n = (s.match(/[\d.]+/g) ?? []).map(Number);
-      return [n[0], n[1], n[2], n.length > 3 ? n[3] : 1];
-    };
-    const lum = ([r, g, b]: number[]): number => {
-      const f = (c: number) => {
-        const x = c / 255;
-        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
-      };
-      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
-    };
-    const capas: number[][] = [];
-    for (let n: Element | null = el; n; n = n.parentElement) {
-      const c = rgba(getComputedStyle(n).backgroundColor);
-      if (c[3] > 0) {
-        capas.push(c);
-        if (c[3] >= 1) break;
-      }
-    }
-    let fondo = [255, 255, 255];
-    for (let i = capas.length - 1; i >= 0; i--) {
-      const [r, g, b, a] = capas[i];
-      fondo = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
-    }
-    const t = rgba(getComputedStyle(el).color);
-    const texto = [0, 1, 2].map((i) => t[i] * t[3] + fondo[i] * (1 - t[3]));
-    const a = lum(texto);
-    const b = lum(fondo);
-    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
-  });
-}
+// `contrasteSobreFondoReal` vivía aquí y se subió el 16/10/2026 a tests/apps/_contraste.ts
+// (cabo C0120), para que los specs nuevos lo importen en vez de copiarlo.
 
 test.describe('Inspector 03/10/2026', () => {
   test.use({ locale: 'es-ES' });
