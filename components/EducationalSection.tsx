@@ -48,6 +48,11 @@ export default function EducationalSection({
           El nombre accesible ES el texto visible (WCAG 2.5.3, cabo C0053): hasta el 12/10/2026
           el aria-label decía «Ver guía educativa» y se leía «Ver Guía Completa», y la flecha
           no llevaba aria-hidden. El estado lo da aria-expanded.
+
+          Cada estado va en su <span> con key (cabo C0250, la receta del hallazgo 3314): con el
+          rótulo como texto suelto, el traductor del navegador lo cambiaba por <font>, React
+          seguía actualizando el nodo viejo y el botón decía «Ver guía educativa» con la guía
+          abierta. Con la key, React retira el span entero y pinta el nuevo.
         */}
         <button
           type="button"
@@ -55,8 +60,10 @@ export default function EducationalSection({
           className={styles.toggleButton}
           aria-expanded={isOpen}
         >
-          <span aria-hidden="true">{isOpen ? '⬆️' : '⬇️'}</span>{' '}
-          {isOpen ? 'Ocultar guía educativa' : 'Ver guía educativa'}
+          <span key={isOpen ? 'abierta' : 'cerrada'}>
+            <span aria-hidden="true">{isOpen ? '⬆️' : '⬇️'}</span>{' '}
+            {isOpen ? 'Ocultar guía educativa' : 'Ver guía educativa'}
+          </span>
         </button>
       </div>
 

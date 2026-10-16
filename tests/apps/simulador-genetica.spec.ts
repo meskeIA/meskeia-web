@@ -4141,7 +4141,8 @@ test.describe('Re-inspección 14/10/2026 · FAQ', () => {
  * «Característica 1:», vista previa del fenotipo, descripción del rasgo 2, Animar/Reiniciar, avisos
  * del campo de tamaño, «no procede» → veredicto, rótulo y leyenda del árbol, enlace del ABO, título,
  * enunciado y veredicto de los casos. (El botón «Ver guía educativa» de EducationalSection sí se
- * queda viejo con la guía abierta, pero es un componente compartido: no es de esta app.)
+ * queda viejo con la guía abierta, pero es un componente compartido: no es de esta app. REPARADO el
+ * 16/10/2026, cabo C0250: su testigo es tests/apps/educational-section-traducida.spec.ts.)
  *
  * HALLAZGO 3309: los desplegables del cruce no tenían nombre accesible. REPARADO el 15/10/2026
  * (003094f9); su test, sin marca, en el bloque «hallazgo reparado».
@@ -4658,7 +4659,8 @@ test.describe('Re-inspección 14/10/2026 (tarde) · hallazgo reparado', () => {
  * cuatro pestañas, la animación, Población (veredicto → aviso → veredicto, «no procede» →
  * veredicto), el árbol, los 16 casos con pista y solución, Comprobar (imposible, fallo, acierto, no
  * número) y Practicar: 0 caídas y 0 textos viejos. 3296, 3297, 3298 y 3309 se SOSTIENEN. Control
- * positivo del método: el botón de EducationalSection sí se queda viejo (cabo C0250, compartido).
+ * positivo del método: el botón de EducationalSection sí se quedaba viejo (cabo C0250, compartido,
+ * REPARADO el 16/10/2026).
  *
  * HALLAZGOS ABIERTOS de esta re-inspección (`test.fail()`, último bloque):
  *   (1) accesibilidad, bajo — los desplegables del rasgo 2 no contienen su rótulo visible.
