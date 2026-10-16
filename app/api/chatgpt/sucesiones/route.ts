@@ -30,6 +30,9 @@ export async function POST(req: NextRequest) {
       edadHeredero:     body.edadHeredero !== undefined ? Number(body.edadHeredero) : undefined,
       discapacidad:     body.discapacidad ?? '0',
       patrimonioIdx:    body.patrimonioIdx !== undefined ? Number(body.patrimonioIdx) as 1 | 2 | 3 | 4 : 1,
+      // En euros manda sobre el índice y aplica la corrección del art. 22.2 LISD (cabo C0085),
+      // como ya hacía /api/chatgpt/donaciones.
+      patrimonioPreexistente: body.patrimonioPreexistente !== undefined ? Number(body.patrimonioPreexistente) : undefined,
       viviendaHabitual: body.viviendaHabitual !== undefined ? Number(body.viviendaHabitual) : undefined,
       convivenciaDosAnios: body.convivenciaDosAnios !== undefined ? Boolean(body.convivenciaDosAnios) : undefined,
       seguroVida:       body.seguroVida !== undefined ? Number(body.seguroVida) : undefined,

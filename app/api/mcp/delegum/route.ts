@@ -281,12 +281,24 @@ function errorMcp(err: unknown) {
 // Formato español de importes (1.234,56)
 const fmt = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const pct = (n: number) => n.toFixed(2).replace('.', ',');
+/** Coeficiente multiplicador del ISD en formato español: decía «×1.6676» (cabo C0085). */
+const coef = (n: number) => n.toLocaleString('es-ES', { maximumFractionDigits: 4 });
 
 // El seguro va APARTE de valor_herencia y el motor lo acumula a la base (cabo C0027)
 const DESCRIPCION_SEGURO_VIDA =
   'Importe cobrado como beneficiario de un seguro de vida del fallecido, APARTE de valor_herencia (no lo sumes en él): ' +
   'se acumula a la porción hereditaria (art. 9.1.c LISD) y se le aplica la reducción del art. 20.2.b LISD ' +
   `(100 %, hasta ${fmt(REDUCCION_SEGURO_VIDA_MAX_IS)} €, para cónyuge, descendientes y ascendientes).`;
+
+// El patrimonio del heredero fija el coeficiente del art. 22 LISD. Sin él las tools liquidaban el
+// primer tramo sin decirlo (cabo C0085); calcular_donaciones ya lo pedía.
+const DESCRIPCION_PATRIMONIO_HEREDERO =
+  'Patrimonio preexistente del heredero en euros (lo que ya tenía antes de heredar). Fija el coeficiente ' +
+  'multiplicador del art. 22 LISD, con la corrección del salto de tramo del art. 22.2. Si se omite, se ' +
+  'calcula con el coeficiente del primer tramo, el más bajo.';
+const AVISO_PATRIMONIO_HEREDERO =
+  '📌 *Calculado con el coeficiente del primer tramo de patrimonio preexistente (art. 22 LISD), el más bajo. ' +
+  'Si el heredero ya tenía un patrimonio importante, indícalo: el coeficiente puede subir la cuota.*';
 
 // Enums reutilizables
 const ENUM_CCAA = [
@@ -672,9 +684,11 @@ function crearServidorDelegum(): McpServer {
         .describe(DESCRIPCION_SEGURO_VIDA),
       discapacidad: z.enum(['0', '33', '65']).optional()
         .describe('Grado de discapacidad del heredero. Por defecto "0".'),
+      patrimonio_preexistente: z.number().nonnegative().optional()
+        .describe(DESCRIPCION_PATRIMONIO_HEREDERO),
     },
     { title: 'Consulta de herencia: Impuesto de Sucesiones por CCAA', readOnlyHint: true },
-    async ({ valor_herencia, ccaa, grupo_parentesco, edad_heredero, vivienda_habitual, convivio_dos_anios, seguro_vida, discapacidad }, extra) => {
+    async ({ valor_herencia, ccaa, grupo_parentesco, edad_heredero, vivienda_habitual, convivio_dos_anios, seguro_vida, discapacidad, patrimonio_preexistente }, extra) => {
       await registrarUsoDelegum('consulta_herencia', getCaller(extra));
       try {
         const r = calcularSucesion({
@@ -686,6 +700,7 @@ function crearServidorDelegum(): McpServer {
           viviendaHabitual: vivienda_habitual,
           convivenciaDosAnios: convivio_dos_anios,
           seguroVida: seguro_vida,
+          patrimonioPreexistente: patrimonio_preexistente,
         });
         const lineas = [
           `⚖️ **Delegum — Impuesto de Sucesiones en ${r.ccaaNombre}**`,
@@ -696,11 +711,13 @@ function crearServidorDelegum(): McpServer {
           r.reduccionViviendaNoAplicada ? `⚠️ Sin reducción por vivienda habitual: ${r.reduccionViviendaNoAplicada}` : '',
           `📦 Base liquidable: ${fmt(r.baseLiquidable)} €`,
           `🔢 Cuota íntegra: ${fmt(r.cuotaIntegra)} €`,
-          r.coeficienteMultiplicador !== 1 ? `✖️ Coeficiente patrimonio: ×${r.coeficienteMultiplicador}` : '',
+          r.coeficienteMultiplicador !== 1 ? `✖️ Coeficiente patrimonio: ×${coef(r.coeficienteMultiplicador)}` : '',
+          r.correccionSaltoCoeficiente > 0 ? `↘️ Corrección del salto de coeficiente (art. 22.2 LISD): −${fmt(r.correccionSaltoCoeficiente)} €` : '',
           r.bonificacionCcaa > 0 ? `➖ ${r.detalleBonificacion}: −${fmt(r.bonificacionCcaa)} €` : `ℹ️ ${r.detalleBonificacion}`,
           '',
           `💰 **Cuota a pagar: ${fmt(r.cuotaFinal)} €**`,
           `📈 Tipo efectivo: **${pct(r.tipoEfectivo)}%**`,
+          patrimonio_preexistente === undefined ? AVISO_PATRIMONIO_HEREDERO : '',
           r.notasCcaa ? `\nℹ️ ${r.notasCcaa}` : '',
           '',
           `📌 *Plazo de autoliquidación: 6 meses desde el fallecimiento (prorrogable otros 6). ` +
@@ -1381,9 +1398,10 @@ function crearServidorDelegum(): McpServer {
       convivio_dos_anios: z.boolean().optional().describe(
         'Si el heredero convivió con el fallecido los dos años anteriores. Solo se le exige al Grupo III ' +
         '(colateral) para la reducción por vivienda habitual (art. 20.2.c LISD).'),
+      patrimonio_preexistente: z.number().nonnegative().optional().describe(DESCRIPCION_PATRIMONIO_HEREDERO),
     },
     { title: 'Calcula el Impuesto de Sucesiones por comunidad autónoma', readOnlyHint: true },
-    async ({ valor_herencia, ccaa, grupo_parentesco, vivienda_habitual, seguro_vida, discapacidad, edad_heredero, convivio_dos_anios }, extra) => {
+    async ({ valor_herencia, ccaa, grupo_parentesco, vivienda_habitual, seguro_vida, discapacidad, edad_heredero, convivio_dos_anios, patrimonio_preexistente }, extra) => {
       await registrarUsoDelegum('calcular_sucesiones', getCaller(extra));
       try {
         const r = calcularSucesion({
@@ -1395,6 +1413,7 @@ function crearServidorDelegum(): McpServer {
           seguroVida: seguro_vida,
           edadHeredero: edad_heredero,
           convivenciaDosAnios: convivio_dos_anios,
+          patrimonioPreexistente: patrimonio_preexistente,
         });
         const texto = [
           `⚖️ **Impuesto de Sucesiones — ${r.ccaaNombre}**`,
@@ -1405,8 +1424,11 @@ function crearServidorDelegum(): McpServer {
           r.reduccionViviendaNoAplicada
             ? `⚠️ Sin reducción por vivienda habitual: ${r.reduccionViviendaNoAplicada}`
             : null,
+          r.coeficienteMultiplicador !== 1 ? `✖️ Coeficiente por patrimonio preexistente: ×${coef(r.coeficienteMultiplicador)}` : null,
+          r.correccionSaltoCoeficiente > 0 ? `↘️ Corrección del salto de coeficiente (art. 22.2 LISD): −${fmt(r.correccionSaltoCoeficiente)} €` : null,
           r.bonificacionCcaa > 0 ? `➖ ${r.detalleBonificacion}: −${fmt(r.bonificacionCcaa)} €` : `ℹ️ ${r.detalleBonificacion}`,
           `💰 **Cuota a pagar: ${fmt(r.cuotaFinal)} €** (tipo efectivo ${pct(r.tipoEfectivo)}%)`,
+          patrimonio_preexistente === undefined ? AVISO_PATRIMONIO_HEREDERO : null,
           `📚 ${r.fuenteDatos}`,
         ].filter(Boolean).join('\n');
         return conAviso(texto, AVISO_FISCAL);
@@ -1450,7 +1472,7 @@ function crearServidorDelegum(): McpServer {
           `🏛️ **Impuesto de Donaciones — ${r.ccaaNombre}**`,
           `💶 Donación: ${fmt(r.baseImponible)} €`,
           `🔢 Cuota íntegra: ${fmt(r.cuotaIntegra)} €`,
-          r.coeficienteMultiplicador !== 1 ? `✖️ Coeficiente por patrimonio preexistente: ×${r.coeficienteMultiplicador}` : '',
+          r.coeficienteMultiplicador !== 1 ? `✖️ Coeficiente por patrimonio preexistente: ×${coef(r.coeficienteMultiplicador)}` : '',
           r.correccionSalto > 0 ? `↘️ Corrección del salto de coeficiente (art. 22.2 LISD): −${fmt(r.correccionSalto)} €` : '',
           r.bonificacionCcaa > 0 ? `➖ ${r.detalleBonificacion}: −${fmt(r.bonificacionCcaa)} €` : `ℹ️ ${r.detalleBonificacion}`,
           `💰 **Cuota a pagar: ${fmt(r.cuotaFinal)} €** (tipo efectivo ${pct(r.tipoEfectivo)} %)`,
