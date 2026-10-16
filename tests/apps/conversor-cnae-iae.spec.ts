@@ -84,14 +84,16 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     «abogada», «médica» y «programadora» encuentran su grupo de la Sección 2ª, «plato»
  *     encabeza con 10.85, el % de la retención va con U+00A0 (8 de 8, ninguno con U+0020) y la
  *     fecha y el artículo de la exención salen de data/fiscal. Tres casos nuevos en
- *     «re-inspección del 06/10/2026» y 4 hallazgos en «hallazgos ABIERTOS del 06/10/2026», con
+ *     «re-inspección del 06/10/2026» y 4 hallazgos en «hallazgos del 06/10/2026», con
  *     `test.fail()`: la fecha de la CNAE-2025 que da el módulo contradice al RD 10/2025 que el
  *     propio módulo cita; la nota del sello de la CNAE la teclea el generador del catálogo;
  *     una cifra dentro de una descripción («tienda 24 horas», «impresión 3d») convierte la
  *     búsqueda en búsqueda por código y lista clases ajenas; y el femenino de los 44 oficios
  *     de VARIAS palabras del diccionario («diseñadora gráfica», «asesora fiscal») da cero.
  *     Los dos últimos (2925 y 2926) se REPARARON ese mismo día en 2f3e4c2b y d25abb5c; los dos
- *     de dato (2923 y 2924) siguen ABIERTOS a 07/10/2026.
+ *     de dato (2923 y 2924) seguían abiertos a 07/10/2026 y se REPARARON el 11 y el 12/10/2026
+ *     (a3c3ecb0, triaje fiscal: CNAE_VIGENCIA.desde '2026-01-01' → '2025-01-16'; y 95a18355:
+ *     la nota del sello sale de CNAE_VIGENCIA).
  *   · RE-VERIFICACIÓN 07/10/2026 → INVALIDADA tras 2f3e4c2b y d25abb5c. Las dos reparaciones
  *     se verifican con su caso original a 1280×800 y a 390×844 antes de escribir nada: «tienda
  *     24 horas» e «impresión 3d» dan 0 en los dos paneles, con la pista; los seis femeninos de
@@ -102,7 +104,18 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     existen como palabra). Tres casos nuevos en «re-verificación del 07/10/2026» y 7
  *     hallazgos en «hallazgos ABIERTOS del 07/10/2026», con `test.fail()`. Uno es la frontera
  *     de la reparación del 2925: un código presentado con dos palabras o con dos puntos
- *     («CNAE: 4711», «Epígrafe IAE 673.2») funcionaba antes de ella y ahora da cero.
+ *     («CNAE: 4711», «Epígrafe IAE 673.2») funcionaba antes de ella y ahora da cero. De esos
+ *     siete, 2947 (el singular de una profesión de varias palabras en el IAE) se REPARÓ el mismo
+ *     07/10 en bd844c6a.
+ *   · RE-inspección  16/10/2026 → INVALIDADA por su dependencia: data/fiscal/cnae-iae.ts cambió en
+ *     a3c3ecb0 y 95a18355. Las tres reparaciones cerradas desde la anterior se SOSTIENEN con su
+ *     caso (2923: «7410» avisa «Desde el 16/01/2025»; 2924: el sello dice «rige desde el 16 de
+ *     enero de 2025 (RD 10/2025, de 14 de enero)»; 2947: «agente comercial» da el 511 de la
+ *     Sección 2ª), y los seis abiertos del 07/10 se siguen reproduciendo. Casos nuevos y dos
+ *     hallazgos en el bloque «Inspector 16/10/2026», al final: la entrada en vigor del RD se
+ *     presenta como fecha de APLICACIÓN y de SUSTITUCIÓN (el art. 5 dice 01/01/2025 y el propio
+ *     módulo, en CNAE_VIGENCIA.nota, también), y la ficha de Delegum pinta la fecha un día antes
+ *     al oeste de Greenwich (el gotcha del 482, fuera del conversor).
  *
  *   Los bloques que esta crónica llama «hallazgos abiertos del …» son historia: a 07/10/2026
  *   la base no tiene abierto ninguno anterior al 06/10, y esos bloques se rotulan hoy como
@@ -142,9 +155,9 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * CÓMO SE LEEN LOS BLOQUES DE HALLAZGOS: mientras un hallazgo está ABIERTO su test lleva
  * `test.fail()` y falla a propósito; el día que se repare pasará a ROJO («expected to fail,
  * but passed»), y entonces se le quita la marca y se queda como regresión, sin reescribir el
- * valor esperado. Hoy (07/10/2026) los únicos ABIERTOS son los dos de dato del bloque del
- * 06/10/2026 (2923 y 2924; los otros dos de ese bloque, 2925 y 2926, están REPARADOS) y los
- * siete del bloque del 07/10/2026, al final.
+ * valor esperado. Hoy (16/10/2026) los ABIERTOS son seis de los siete del bloque del 07/10/2026
+ * (2945, 2946, 2948, 2949, 2950 y 2951; el 2947 está REPARADO) y los dos del bloque «Inspector
+ * 16/10/2026», al final. Los cuatro del bloque del 06/10/2026 (2923-2926) están REPARADOS.
  */
 
 const RUTA = '/conversor-cnae-iae/';
@@ -3434,11 +3447,12 @@ test.describe('Buscador CNAE-IAE — re-inspección del 06/10/2026', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 // HALLAZGOS del 06/10/2026 — escritos con `test.fail()` afirmando lo que DEBERÍA ocurrir. El
 // día que se reparen pasarán a ROJO («expected to fail, but passed»): entonces se les quita la
-// marca y quedan como regresión, SIN tocar el valor esperado. A 07/10/2026 siguen ABIERTOS los
-// dos de dato (2923 y 2924); los dos de operativa (2925 y 2926) se REPARARON el 06/10/2026 y
-// su re-verificación está en el bloque del 07/10/2026.
+// marca y quedan como regresión, SIN tocar el valor esperado. Los CUATRO están REPARADOS: los
+// dos de operativa (2925 y 2926) el 06/10/2026, con su re-verificación en el bloque del
+// 07/10/2026, y los dos de dato (2923 y 2924) el 11 y el 12/10/2026 (a3c3ecb0 y 95a18355),
+// re-verificados en el bloque «Inspector 16/10/2026».
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 06/10/2026', () => {
+test.describe('Buscador CNAE-IAE — hallazgos del 06/10/2026, reparados', () => {
   test('REPARADO · MEDIO (dato) — la fecha de la CNAE-2025 no sale del RD 10/2025 que el módulo cita', async ({
     page,
   }) => {
@@ -3998,5 +4012,290 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
       expect(enJsonLd, `pregunta del FAQPage de ${tema}`).toBeDefined();
       expect(enPantalla!.a).toBe(enJsonLd!.a);
     }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSPECTOR 16/10/2026 — RE-inspección por dependencia INVALIDADA: data/fiscal/cnae-iae.ts cambió
+// en a3c3ecb0 (11/10, triaje fiscal: CNAE_VIGENCIA.desde '2026-01-01' → '2025-01-16') y en
+// 95a18355 (12/10: la nota del sello de la CNAE y la FAQ de la ficha de Delegum derivan norma y
+// fecha de CNAE_VIGENCIA).
+//
+// Cada valor esperado se resolvió ANTES de abrir la app:
+//   · Literales, jerarquía y correspondencia: catálogo sellado
+//     (`public/datos/cnae-iae-catalogo.json`, meta.generado 2026-09-14), generado desde la
+//     CNAE-2025 del RD 10/2025 (INE) y el texto consolidado del RD Legislativo 1175/1990 (BOE).
+//   · Fecha y norma: CNAE_VIGENCIA de data/fiscal/cnae-iae.ts — desde '2025-01-16',
+//     normaVigente 'RD 10/2025, de 14 de enero'. Cotejado en el BOE (BOE-A-2025-587, BOE núm. 13
+//     de 15/01/2025): disposición final segunda, «entrará en vigor el día siguiente al de su
+//     publicación» → 16/01/2025. En formato corto (formatDate) «16/01/2025»; en prosa
+//     (formatFechaLarga) «16 de enero de 2025».
+//   · Retención por sección: SECCIONES_IAE del mismo módulo (importado arriba, no transcrito).
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Inspector 16/10/2026 — casos de la re-inspección', () => {
+  test('CASO 1 (normal) — «autoescuela» da 85.53 en la CNAE, y «conducción» separa en el IAE el 933.1 (Sección 1ª) del 825 (Sección 2ª)', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // ── CNAE-2025 ─────────────────────────────────────────────────────────
+    // «autoescuela» solo está entre los sinónimos de 85.53 (sinonimos['85.53'] = autoescuela ·
+    // carnet de conducir · clases de conducir · escuela náutica · profesor de autoescuela), y
+    // ningún título lo contiene: 1 resultado. Camino por el orden jerárquico del catálogo: la
+    // división 85 cuelga de la Sección Q. Procedencia: correspondenciaInversa['8553'] = ['85.53'].
+    await buscarCnaeVerificado(page, 'autoescuela');
+    await expect(contador(page)).toHaveText(/^1 resultado/);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    const clase = fichas(page).first();
+    await expect(clase.locator('[class*="codigoCnae"]')).toHaveText('85.53');
+    await expect(clase).toContainText('Actividades de las escuelas de conducción y pilotaje');
+    await expect(clase.locator('[class*="badgeNivel"]')).toHaveText('Clase');
+    await expect(clase).toContainText('Sección Q: EDUCACIÓN');
+    await expect(clase).toContainText('División 85: Educación');
+    await expect(clase).toContainText('Grupo 85.5: Otra educación');
+    await expect(clase.locator('[class*="sinonimosLinea"]')).toContainText(
+      'autoescuela · carnet de conducir · clases de conducir · escuela náutica · profesor de autoescuela',
+    );
+    await expect(clase).toContainText('En la CNAE-2009 esto correspondía a 8553.');
+
+    // ── Tarifas del IAE ───────────────────────────────────────────────────
+    // «conducción» está en el título de dos entradas (código + título + título del grupo padre):
+    // 1ª 933.1 «Enseñanza de conducción de vehículos terrestres, acuáticos, aeronáuticos, etc»
+    // (epígrafe) y 2ª 825 «Profesores de conducción de vehículos terrestres, acuáticos,
+    // aeronáuticos, etc» (grupo). Ninguno EMPIEZA por la palabra y en los dos es palabra
+    // completa: misma relevancia, y desempata el tipo (epígrafe antes que grupo).
+    await buscarIaeVerificado(page, 'conducción');
+    await expect(contador(page)).toHaveText(/^2 resultados/);
+    const escuela = fichas(page).nth(0);
+    await expect(escuela.locator('[class*="codigoCnae"]')).toHaveText('933.1');
+    await expect(escuela).toContainText('Enseñanza de conducción de vehículos terrestres, acuáticos, aeronáuticos, etc');
+    await expect(escuela.locator('[class*="badgeNivel"]')).toHaveText('Epígrafe');
+    await expect(escuela).toContainText('Sección 1ª');
+    await expect(escuela).toContainText('División 9: OTROS SERVICIOS');
+    await expect(escuela).toContainText('Agrupación 93: Educación e investigación');
+    await expect(escuela).toContainText('Grupo 933: Otras actividades de enseñanza');
+    await expect(escuela).toContainText(SECCION_1.retencion);
+    const profesor = fichas(page).nth(1);
+    await expect(profesor.locator('[class*="codigoCnae"]')).toHaveText('825');
+    await expect(profesor).toContainText('Profesores de conducción de vehículos terrestres, acuáticos, aeronáuticos, etc');
+    await expect(profesor.locator('[class*="badgeNivel"]')).toHaveText('Grupo');
+    await expect(profesor).toContainText('Sección 2ª');
+    await expect(profesor).toContainText('División 8: PROFESIONALES RELACIONADOS CON OTROS SERVICIOS');
+    await expect(profesor).toContainText('Agrupación 82: Profesionales de la enseñanza');
+    // La misma actividad, dos secciones y dos consecuencias opuestas en la factura
+    await expect(profesor).toContainText(SECCION_2.retencion);
+    expect(SECCION_1.retencionIrpf).toBe(false);
+    expect(SECCION_2.retencionIrpf).toBe(true);
+  });
+
+  test('CASO 3 (debe rechazarse) — «9999» no existe, una consulta de solo espacios no busca nada y el IAE «999.9» tampoco existe', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // «9999» no es clave de la correspondencia (correspondencia['9999'] no existe) ni prefijo de
+    // ningún código: la última clase de la CNAE-2025 es 99.00. Cero, con su mensaje, sin aviso.
+    await buscarCnaeVerificado(page, '9999');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje con lo que has escrito.',
+    );
+
+    // Solo espacios: normalizada es la cadena vacía, así que no hay criterio. Ni contador ni
+    // fichas: el texto que invita a escribir, no un «0 resultados» ni el catálogo entero.
+    await buscarCnaeVerificado(page, '   ');
+    await expect(panelActivo(page).locator('[class*="contador"]')).toHaveCount(0);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
+      'Escribe arriba a qué te dedicas para localizar tu código',
+    );
+
+    // IAE «999.9»: ningún código de las Tarifas empieza por 9999 (réplica del índice sobre el
+    // catálogo sellado: 0 entradas).
+    await buscarIaeVerificado(page, '999.9');
+    await expect(contador(page)).toHaveText(/^0 resultados/);
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
+      'Ningún epígrafe coincide con esa búsqueda.',
+    );
+  });
+
+  test('la fecha y la norma de la CNAE-2025 salen de CNAE_VIGENCIA en las tres bocas: pantalla, sello y JSON-LD', async ({
+    page,
+  }) => {
+    // Ancla: el valor del módulo es la entrada en vigor del RD 10/2025 (DF 2.ª, BOE de 15/01/2025).
+    expect(CNAE_VIGENCIA.desde).toBe('2025-01-16');
+    expect(CNAE_VIGENCIA.normaVigente).toBe('RD 10/2025, de 14 de enero');
+
+    await abrirHidratado(page);
+    // Pantalla: hero en prosa (formatFechaLarga)
+    await expect(page.locator('header p').first()).toContainText('16 de enero de 2025');
+    // Sello DataReference de la CNAE (hallazgo 2924, reparado en 95a18355)
+    await expect(
+      page.getByText('rige desde el 16 de enero de 2025 (RD 10/2025, de 14 de enero)'),
+    ).toBeVisible();
+    // Aviso de código antiguo (hallazgo 2923, reparado en a3c3ecb0)
+    await buscarCnaeVerificado(page, '7410');
+    await expect(avisoAntiguo(page)).toContainText(
+      'Desde el 16/01/2025 rige la CNAE-2025 (RD 10/2025, de 14 de enero)',
+    );
+    // JSON-LD: descripción del WebApplication y respuesta del FAQPage
+    const ldJson = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(ldJson).toContain('CNAE-2025 (RD 10/2025, de 14 de enero, INE)');
+    expect(ldJson).toContain('desde el 16/01/2025');
+    // Cabo C0150: la nota caducada del catálogo servido («desde enero de 2026», meta.cnae.nota)
+    // ya no llega a ninguna boca de la página.
+    const cuerpo = await page.evaluate(() => document.body.textContent ?? '');
+    for (const texto of [cuerpo, ldJson]) {
+      expect(texto).not.toContain('enero de 2026');
+      expect(texto).not.toContain('01/01/2026');
+    }
+  });
+});
+
+test.describe('Inspector 16/10/2026 — CASO 2 (límite) a 390 px: un código de la CNAE-2009 que no existe en la CNAE-2025', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('«5610», « 56.10 », «5.610» y «cnae 56.10» dan las dos clases de hoy con el aviso fechado el 16/01/2025', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // correspondencia['5610'] = ['56.11', '56.12'] y NO hay clase 56.10 en la CNAE-2025: sin
+    // homónima, el formato con punto no lo convierte en clase vigente, así que las cuatro formas
+    // son el código antiguo. Ningún código empieza por 5610 ni ningún texto contiene «56.10»: 2
+    // resultados, por orden de código. Las dos proceden de 5610 (correspondenciaInversa['5611']
+    // y ['5612'] = ['56.10']). La fecha del aviso: CNAE_VIGENCIA.desde = '2025-01-16'.
+    for (const consulta of ['5610', ' 56.10 ', '5.610', 'cnae 56.10']) {
+      await buscarCnaeVerificado(page, consulta);
+      await expect(contador(page)).toHaveText(/^2 resultados/);
+      await expect(avisoAntiguo(page)).toHaveText(
+        '5610 existe en la CNAE-2009, la clasificación anterior. Desde el 16/01/2025 rige la CNAE-2025 (RD 10/2025, de 14 de enero), y estas son las clases actuales que recogen esa actividad:',
+      );
+      const restaurantes = fichas(page).nth(0);
+      await expect(restaurantes.locator('[class*="codigoCnae"]')).toHaveText('56.11');
+      await expect(restaurantes).toContainText('Restaurantes');
+      await expect(restaurantes).toContainText('Sección I: HOSTELERÍA');
+      await expect(restaurantes).toContainText('En la CNAE-2009 esto correspondía a 5610.');
+      const puestos = fichas(page).nth(1);
+      await expect(puestos.locator('[class*="codigoCnae"]')).toHaveText('56.12');
+      await expect(puestos).toContainText('Puestos de comidas');
+      await expect(puestos).toContainText('En la CNAE-2009 esto correspondía a 5610.');
+    }
+
+    const desborde = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(desborde).toBe(0);
+  });
+});
+
+/**
+ * La ficha de Delegum es un componente de cliente: el HTML del servidor lleva la fecha en el huso
+ * del servidor y React la recalcula al hidratar en el del navegador. Se espera a que React haya
+ * enganchado sus props a la celda y a que el commit termine, o el test leería el HTML del
+ * servidor y pasaría en falso.
+ */
+async function abrirFichaDelegumHidratada(page: Page) {
+  await page.goto('/delegum/datos-fiscales/cnae-iae/');
+  await page.waitForFunction(() => {
+    const celda = [...document.querySelectorAll('td')].find((td) =>
+      (td.textContent ?? '').includes('Operativa desde'),
+    );
+    return Boolean(celda && Object.keys(celda).some((k) => k.startsWith('__reactProps$')));
+  });
+  await page.waitForTimeout(500);
+}
+
+test.describe('Inspector 16/10/2026 — la fecha de la CNAE-2025 vista desde América', () => {
+  test.use({ timezoneId: 'America/Mexico_City', locale: 'es-ES' });
+
+  test('conversor: el hero, el sello y el aviso dicen 16 de enero de 2025 también al oeste de Greenwich', async ({
+    page,
+  }) => {
+    // CNAE_VIGENCIA.desde = '2025-01-16' se lee con parseISODateLocal / formatFechaLarga: el día
+    // no se desliza (gotcha del hallazgo 482, reparado en la app).
+    await abrirHidratado(page);
+    await expect(page.locator('header p').first()).toContainText('16 de enero de 2025');
+    await expect(page.getByText('rige desde el 16 de enero de 2025 (RD 10/2025, de 14 de enero)')).toBeVisible();
+    await buscarCnaeVerificado(page, '5610');
+    await expect(avisoAntiguo(page)).toContainText('Desde el 16/01/2025');
+    await expect(avisoAntiguo(page)).not.toContainText('15/01/2025');
+  });
+
+  test('ABIERTO · BAJO (dato) — la ficha de Delegum pinta la vigencia de la CNAE-2025 y el sello un día antes al oeste de Greenwich', async ({
+    page,
+  }) => {
+    test.fail();
+    // app/delegum/datos-fiscales/cnae-iae/page.tsx calcula `fechaCnae` y `fechaVerificacion` con
+    // formatDate(new Date(ISO)): medianoche UTC, que en México es el día anterior. Es el gotcha
+    // del hallazgo 482, reparado en el conversor y en DataReference con parseISODateLocal, que
+    // sobrevive en la ficha de Delegum del MISMO dato. Lo esperado sale del módulo:
+    // CNAE_VIGENCIA.desde = '2025-01-16' → «16/01/2025»; FISCAL_CNAE_IAE_META.verificado =
+    // '2026-09-14' → «14/09/2026». Medido el 16/10/2026 con timezoneId America/Mexico_City:
+    // «Vigente. Operativa desde el 15/01/2025.» y «Verificado el 13/09/2026» (en Madrid, 16/01 y
+    // 14/09). Las fechas de «Novedades» de la ficha se deslizan igual (11/10/2026 → 10/10/2026).
+    expect(CNAE_VIGENCIA.desde).toBe('2025-01-16');
+    expect(FISCAL_CNAE_IAE_META.verificado).toBe('2026-09-14');
+    await abrirFichaDelegumHidratada(page);
+    const celda = page.locator('td', { hasText: 'Operativa desde' }).first();
+    await expect(celda).toContainText('16/01/2025', { timeout: 2000 });
+    await expect(page.getByText('Verificado el 14/09/2026').first()).toBeVisible({ timeout: 2000 });
+  });
+});
+
+test.describe('Inspector 16/10/2026 — hallazgos ABIERTOS', () => {
+  test('ABIERTO · BAJO (dato) — la entrada en vigor del RD 10/2025 se presenta como fecha de APLICACIÓN de la CNAE-2025 y de SUSTITUCIÓN de la CNAE-2009', async ({
+    page,
+  }) => {
+    test.fail();
+    // CNAE_VIGENCIA.desde es la ENTRADA EN VIGOR del RD 10/2025 (DF 2.ª: 16/01/2025), y el propio
+    // módulo lo advierte: «no hay UNA fecha de sustitución, y el preámbulo dice expresamente que
+    // no deroga la CNAE-2009». Su `nota` lleva las fechas de aplicación: «se aplica a las
+    // estadísticas oficiales con fecha de referencia desde el 01/01/2025, las empresas inscritas
+    // en la Seguridad Social debían comunicar su código antes del 30/06/2025 y el resto de
+    // registros públicos estatales debe estar codificado antes del 01/01/2027». Cotejado en el
+    // BOE (BOE-A-2025-587): art. 5, «La CNAE-2025 se aplicará en las estadísticas oficiales para
+    // fines estatales con fecha de referencia a partir del 1 de enero de 2025»; preámbulo, «este
+    // real decreto no incluye cláusulas derogatorias, en particular, en referencia con la
+    // CNAE-2009» y «es precisa la convivencia en el uso de ambas versiones»; DA única c), la
+    // codificación CNAE-2009 se sigue comunicando a la TGSS durante el periodo transitorio. Y el
+    // INE: «a partir del 1 de enero de 2025 de forma escalonada».
+    // La página, en cambio, usa la entrada en vigor como fecha de aplicación y de sustitución:
+    //   · FAQ visible: «se aplica desde el 16/01/2025, en sustitución de la CNAE-2009»;
+    //   · FAQPage, a la pregunta «¿Desde cuándo se aplica la CNAE-2025…?»: «sustituye a la
+    //     CNAE-2009 desde el 16/01/2025»;
+    //   · hero: «la que sustituyó a la CNAE-2009 el 16 de enero de 2025»;
+    //   · «Errores frecuentes»: «Usar un código de la CNAE-2009 como si siguiera vigente. Desde el
+    //     16 de enero de 2025 la clasificación aplicable es la CNAE-2025».
+    // Lo esperado: «en vigor desde el 16/01/2025» (como ya dice la ficha de Delegum), y la
+    // aplicación con las fechas de CNAE_VIGENCIA.nota.
+    await abrirHidratado(page);
+    const textos = await page.evaluate(() => {
+      const limpio = (t: string | null) => (t ?? '').replace(/\s+/g, ' ').trim();
+      return {
+        hero: limpio(document.querySelector('header p')?.textContent ?? ''),
+        faq: [...document.querySelectorAll('[class*="faqItem"]')]
+          .map((d) => limpio(d.textContent))
+          .find((t) => t.includes('Desde cuándo rige')) ?? '',
+        errores: [...document.querySelectorAll('[class*="warningList"] li')]
+          .map((li) => limpio(li.textContent))
+          .find((t) => t.includes('como si siguiera vigente')) ?? '',
+      };
+    });
+    const ldJson = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(textos.faq).not.toContain('se aplica desde el 16/01/2025');
+    expect(ldJson).not.toContain('sustituye a la CNAE-2009 desde el 16/01/2025');
+    expect(textos.hero).not.toContain('sustituyó a la CNAE-2009 el 16 de enero de 2025');
+    expect(textos.errores).not.toContain('Desde el 16 de enero de 2025 la clasificación aplicable es la CNAE-2025');
   });
 });

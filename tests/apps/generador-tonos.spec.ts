@@ -86,7 +86,12 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *      15/10/2026 (34046071, hallazgos 3307 y 3308): hoy son regresión.
  *  10. RE-INSPECCIÓN 15/10/2026, tras 34046071 (al final): un sonido que se apaga y vuelve cruzando
  *      la frontera La4 | La#4 en UNA medida (CASO 19), y los hallazgos M1-M3 (vecinos de lo que se
- *      anuncia y de lo que se lleva al generador), ABIERTOS, con `test.fail()`.
+ *      anuncia y de lo que se lleva al generador), que nacieron ABIERTOS con `test.fail()` y fueron
+ *      REPARADOS el mismo 15/10/2026 (56f27649, hallazgos 3318-3320): hoy son regresión.
+ *  11. INSPECTOR 16/10/2026, tras d72384b5, 34046071 y 56f27649 (al final): el preset Medios-bajos
+ *      medido por el micrófono (CASO 20), la misma nota dos veces en una medida (CASO 21), «Llevar» a
+ *      mitad de un deslizamiento lento (CASO 22), un deslizamiento rápido que no llega a «estable»
+ *      (CASO 23), el aviso de lo llevado en móvil (CASO 24) y el hallazgo N1, ABIERTO, con `test.fail()`.
  */
 
 test.use({
@@ -3875,9 +3880,10 @@ test.describe('re-inspección 15/10/2026', () => {
   });
 
   /**
-   * HALLAZGO M1 (3318) [bajo · accesibilidad] — ABIERTO (15/10/2026), vecino del 3307. La histéresis de lo
-   * que se anuncia compara cada lectura estable con lo ÚLTIMO ANUNCIADO, y esa referencia solo se
-   * reinicia al pulsar «Medir la frecuencia». Un sonido nuevo dentro de la misma medida —tocar, parar,
+   * HALLAZGO M1 (3318) [bajo · accesibilidad] — REPARADO el 15/10/2026 (56f27649), vecino del 3307. Tal
+   * como se midió antes de repararlo: la histéresis de lo
+   * que se anunciaba comparaba cada lectura estable con lo ÚLTIMO ANUNCIADO, y esa referencia solo se
+   * reiniciaba al pulsar «Medir la frecuencia». Un sonido nuevo dentro de la misma medida —tocar, parar,
    * corregir la clavija y volver a tocar, con el medidor encendido— que caiga a menos de 10 cents del
    * anunciado no se anuncia nunca: quien usa lector de pantalla no oye nada del segundo sonido, aunque
    * la retenida que se ve cambie (aquí, hasta de nota) y «Llevar» se lleve la cifra nueva. Es el 3307
@@ -3932,7 +3938,8 @@ test.describe('re-inspección 15/10/2026', () => {
   });
 
   /**
-   * HALLAZGO M2 (3319) [bajo · accesibilidad] — ABIERTO (15/10/2026), vecino del 3308. El 3308 deja escrito
+   * HALLAZGO M2 (3319) [bajo · accesibilidad] — REPARADO el 15/10/2026 (56f27649), vecino del 3308. Tal
+   * como se midió antes de repararlo: el 3308 deja escrito
    * que un sonido que se desliza despacio «sí puede darse por estable, y la última lectura estable lo va
    * siguiendo». Lo que se anuncia lo sigue también: la histéresis de 10 cents —puesta para que un lector
    * de pantalla no repita la cifra «diez veces por segundo» (comentario de iniciarMedidor)— se cumple
@@ -3976,8 +3983,8 @@ test.describe('re-inspección 15/10/2026', () => {
   });
 
   /**
-   * HALLAZGO M3 (3320) [bajo · contenido] — ABIERTO (15/10/2026), vecino del 3292 por lo que se lleva al
-   * generador. «Llevar la lectura al generador» escribe la cifra en el campo y deja en el medidor
+   * HALLAZGO M3 (3320) [bajo · contenido] — REPARADO el 15/10/2026 (56f27649), vecino del 3292 por lo que
+   * se lleva al generador. Tal como se midió antes de repararlo: «Llevar la lectura al generador» escribe la cifra en el campo y deja en el medidor
    * «Frecuencia puesta en el generador: 442 Hz. Pulsa Reproducir para oírla.». El aviso no se retira
    * cuando el generador pasa a otra frecuencia (un preset, el deslizador, el campo, el barrido): solo al
    * volver a medir. Sigue diciendo que el generador tiene 442 Hz y pidiendo pulsar «Reproducir» para
@@ -4006,5 +4013,394 @@ test.describe('re-inspección 15/10/2026', () => {
     await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
     expect((await registros(page))[0].frecuenciasAplicadas, 'lo que suena al pulsar «Reproducir»').toEqual([440]);
     await expect(aviso).toHaveCount(0, { timeout: 1000 });
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 16/10/2026 — re-inspección tras d72384b5, 34046071 y 56f27649
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * LO QUE LA INVALIDÓ. Tres reparaciones del medidor en dos días: d72384b5 (14/10, hallazgos
+ * 3292-3295: la retenida y lo llevado son siempre la última estable; el texto de varios sonidos; el
+ * preset Medios-bajos a 350 Hz; el JSON-LD sin «ejercicios de tinnitus»), 34046071 (15/10, 3307 y
+ * 3308: lo anunciado se vacía a los 1,5 s; un deslizamiento lento sí llega a «estable») y 56f27649
+ * (15/10, 3318-3320: tras 5 lecturas sin cifra estable el sonido siguiente se anuncia, asentado
+ * 300 ms; un anuncio no se sustituye antes de 1,5 s; el aviso de lo llevado se retira al cambiar la
+ * frecuencia del generador). Sus testigos (K1-K4, L1-L2 y M1-M3, arriba) siguen en verde; aquí lo
+ * que esos casos no cubren.
+ *
+ * Resueltos a mano ANTES de ejecutar (temperamento igual, La4 = 440 Hz; n = round(12·log2(f/440));
+ * cents = 1200·log2(f/f_nota); «estable» = cinco lecturas cada 100 ms a ±20 cents de su mediana y la
+ * última sin caer más de 4 dB del máximo de las cinco, motor-medidor.ts):
+ *   · NORMAL (CASO 20) — el preset «Medios-bajos» emite 350 Hz con el rótulo de su franja
+ *     (getDescripcionFrecuencia: 250 ≤ 350 < 500 → «Medios-bajos - Calidez»). Por el micrófono:
+ *     12·log2(350/440) = −3,9618 → n = −4 → Fa4 = 440·2^(−4/12) = 349,228 Hz; 1200·log2(350/349,228)
+ *     = +3,82 → «350 Hz · Fa4 (+4 cents)» (±1 cent: el afinado entre bins yerra menos de 0,2 Hz; sin
+ *     afinar, a 48 kHz saldrían los bins de 348,6 Hz, −3 cents, o 351,6 Hz, +12). «Llevar» escribe
+ *     350 (± 0,5 Hz), el preset vuelve a quedar pulsado y «Reproducir» pide 350 al oscilador. Y el medio
+ *     arranca DE VERDAD: el contexto del medidor corre, la pista está viva y su analizador recibe la
+ *     senoide (RMS = 0,3/√2 = 0,212).
+ *   · LÍMITE (CASO 21) — la MISMA nota dos veces en una medida: 440 Hz 2 s, 2,5 s de silencio y 440 Hz
+ *     2 s; La4, 0 cents las dos. La ficha del 3318 incluía «con 440 → 440 la segunda nota no se
+ *     anuncia»: la región tiene que decir «Lectura estable: 440 Hz, La4 (0 cents)» dos veces, la
+ *     segunda tras el silencio (más de 2 s después).
+ *   · LÍMITE (CASO 22) — «Llevar» a mitad de un deslizamiento lento (400 → 443,83 Hz en 3 s, 60 cents/s).
+ *     Desde el 3319 la región no se vacía mientras el sonido se desliza (cada anuncio lo sustituye el
+ *     siguiente a los 1,5 s), que es la situación del 3307: al llevar, la región atómica se leía entera
+ *     con dos cifras. Esperado: tras «Llevar», solo «Frecuencia puesta en el generador: X Hz. Pulsa
+ *     Reproducir para oírla.», con X la retenida congelada (un decimal frente a la cifra entera que se
+ *     ve: |X − retenida| ≤ 0,5) y dentro del deslizamiento (400–443,83 Hz).
+ *   · RECHAZO (CASO 23) — un deslizamiento de 300 cents/s (400 → 800 Hz en 4 s, en un solo sentido):
+ *     30 cents entre lecturas, 120 en cinco, desviación máxima de la mediana 60 > 20 → ninguna
+ *     «Lectura estable», ninguna retenida, ningún «Llevar» y nada anunciado. Es el triple del umbral
+ *     que da la página («menos de un semitono por segundo»), sin los puntos de giro del CASO 18.
+ *   · MÓVIL (CASO 24, Pixel 7) — 442 Hz → «Llevar» → «1k» (Ir a 1.000 Hz): el aviso de lo llevado se
+ *     retira y «Reproducir» pide [1000]. Otra vuelta con el deslizador (ArrowUp: 442 → 443) y otra con
+ *     el barrido: el aviso se retira también.
+ *   · HALLAZGO N1 — un sonido que SE APAGA, con envolvente e^(−t/τ), que cae 20·log10(e)/τ dB por
+ *     segundo. Con τ = 1 s (8,69 dB/s, una cuerda pulsada) cinco lecturas caen 4·0,869 = 3,47 dB ≤ 4:
+ *     el motor la da por estable, y la página dice que «estable» pide «un sonido que no se esté
+ *     apagando».
+ * Medido el 16/10/2026 (Chromium, 48 kHz): CASO 20 «350 Hz · Fa4 (+4 cents)», llevado «350», oscilador
+ * [350], contexto «running», pista «live», RMS 0,2122. CASO 21, dos escrituras «Lectura estable: 440 Hz,
+ * La4 (0 cents)» separadas 4,4 s. CASO 22, la región decía «Lectura estable: 428 Hz, La4 (−49 cents)»
+ * al pulsar y después solo «Frecuencia puesta en el generador: 430,7 Hz…», con la retenida en «431 Hz ·
+ * La4 (−37 cents)». CASO 23, 44 cifras distintas en 5 s y ninguna estable. CASO 24, como se resolvió.
+ * N1: «Lectura estable» de 440 Hz sin interrupción casi 4 s, mientras el sonido cae unos 34 dB; con
+ * τ = 0,25 s (35 dB/s), dos lecturas estables al empezar, retenida y «Llevar».
+ */
+
+interface Medio {
+  contextos: AudioContext[];
+  pistas: MediaStreamTrack[];
+  analizadores: AnalyserNode[];
+}
+
+/**
+ * Deja a la vista lo que el medidor recibe de verdad: el contexto que conecta el micrófono, las pistas
+ * que entrega getUserMedia y los analizadores (el del medidor es el de 16.384 muestras; los del test,
+ * de 32.768). Va DESPUÉS del micrófono sintético: envuelve su getUserMedia, no lo sustituye.
+ */
+async function vigilarMedio(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __medio: Medio };
+    w.__medio = { contextos: [], pistas: [], analizadores: [] };
+    const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+      configurable: true,
+      value: async (c?: MediaStreamConstraints) => {
+        const s = await original(c);
+        w.__medio.pistas.push(...s.getAudioTracks());
+        return s;
+      },
+    });
+    const fuente = AudioContext.prototype.createMediaStreamSource;
+    AudioContext.prototype.createMediaStreamSource = function (this: AudioContext, s: MediaStream): MediaStreamAudioSourceNode {
+      w.__medio.contextos.push(this);
+      return fuente.call(this, s);
+    };
+    const analizador = AudioContext.prototype.createAnalyser;
+    AudioContext.prototype.createAnalyser = function (this: AudioContext): AnalyserNode {
+      const a = analizador.call(this);
+      w.__medio.analizadores.push(a);
+      return a;
+    };
+  });
+}
+
+/** Estado del contexto y la pista del medidor, y el RMS de lo que llega a su analizador. */
+const estadoMedio = (page: Page): Promise<{ contextos: string[]; pistas: string[]; rms: number }> =>
+  page.evaluate(() => {
+    const m = (window as unknown as { __medio: Medio }).__medio;
+    const an = m.analizadores.find((a) => a.fftSize === 16384);
+    let rms = NaN;
+    if (an) {
+      const d = new Float32Array(an.fftSize);
+      an.getFloatTimeDomainData(d);
+      rms = Math.sqrt(d.reduce((s, v) => s + v * v, 0) / d.length);
+    }
+    return { contextos: m.contextos.map((c) => c.state), pistas: m.pistas.map((p) => p.readyState), rms };
+  });
+
+/** Micrófono con un tono que se apaga, amp·e^(−(t − desde)/τ), sobre el ruido de ±0,001 de semilla fija. */
+async function microfonoQueSeApaga(
+  page: Page,
+  segundos: number,
+  tono: { hz: number; amp: number; desde: number; tau: number },
+): Promise<void> {
+  await page.addInitScript(
+    ({ s, k }: { s: number; k: { hz: number; amp: number; desde: number; tau: number } }) => {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        configurable: true,
+        value: async () => {
+          const ctx = new AudioContext();
+          await ctx.resume();
+          const n = Math.round(ctx.sampleRate * s);
+          const bufer = ctx.createBuffer(1, n, ctx.sampleRate);
+          const d = bufer.getChannelData(0);
+          let semilla = 12345;
+          for (let i = 0; i < n; i++) {
+            const t = i / ctx.sampleRate;
+            semilla = (Math.imul(semilla, 1664525) + 1013904223) >>> 0;
+            let v = 0.001 * ((semilla / 4294967296) * 2 - 1);
+            if (t >= k.desde) v += k.amp * Math.exp(-(t - k.desde) / k.tau) * Math.sin(2 * Math.PI * k.hz * (t - k.desde));
+            d[i] = Math.max(-1, Math.min(1, v));
+          }
+          const fuente = ctx.createBufferSource();
+          fuente.buffer = bufer;
+          fuente.loop = true;
+          const destino = ctx.createMediaStreamDestination();
+          fuente.connect(destino);
+          fuente.start();
+          const pista = destino.stream.getAudioTracks()[0];
+          pista.getSettings = (): MediaTrackSettings => ({
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false,
+          });
+          return destino.stream;
+        },
+      });
+    },
+    { s: segundos, k: tono },
+  );
+}
+
+test.describe('Inspector 16/10/2026', () => {
+  const retenida = (page: Page) => seccionMedidor(page).locator('[class*="medidorRetenida"]');
+  const rotuloFranja = (page: Page) => page.locator('[class*="descripcionFrecuencia"]');
+  const presetMediosBajos = (page: Page) =>
+    page
+      .locator('[class*="presetBtn"]')
+      .filter({ has: page.locator('[class*="presetNombre"]', { hasText: /^Medios-bajos$/ }) });
+
+  test('CASO 20 — el preset «Medios-bajos» (350 Hz) medido por el micrófono: «350 Hz · Fa4 (+4 cents)», se lleva 350 y suena 350', async ({
+    page,
+  }) => {
+    await microfonoSintetico(page, 4, [{ hz: 350, amp: 0.3, desde: 0, hasta: 4 }]);
+    await vigilarMedio(page);
+    await abrir(page);
+
+    // El preset: 350 Hz en el botón, en el campo y con el rótulo de su franja
+    const preset = presetMediosBajos(page);
+    await expect(preset.locator('[class*="presetFrec"]')).toHaveText(/^350\sHz$/);
+    await preset.click();
+    await expect(preset).toHaveAttribute('aria-pressed', 'true');
+    await expect(campoFrecuencia(page)).toHaveValue('350');
+    await expect(rotuloFranja(page)).toHaveText('Medios-bajos - Calidez');
+    // Otra frecuencia en el generador, para que lo que se lleve tenga que cambiarla
+    await page.getByRole('button', { name: 'Ir a 1.000 Hz' }).click();
+    await expect(preset).toHaveAttribute('aria-pressed', 'false');
+
+    await page.getByRole('button', { name: /Medir la frecuencia/ }).click();
+    await expect(page.getByRole('button', { name: /Dejar de medir/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(seccionMedidor(page).getByText('Lectura estable', { exact: true })).toBeVisible({ timeout: 6000 });
+    const l = await lecturaMedidor(page);
+    expect(l.cifra).toBe('350 Hz');
+    const n = notaYCents(l.nota);
+    expect(n.nota, l.nota).toBe('Fa4');
+    expect(n.cents, l.nota).toBeGreaterThanOrEqual(3);
+    expect(n.cents, l.nota).toBeLessThanOrEqual(5);
+    expect(l.retenida).toMatch(/^Última lectura estable: 350 Hz · Fa4 \(\+[345] cents\)$/);
+
+    // El medio arrancó de verdad: contexto en marcha, pista viva y la senoide en el analizador
+    const medio = await estadoMedio(page);
+    expect(medio.contextos).toEqual(['running']);
+    expect(medio.pistas).toEqual(['live']);
+    expect(medio.rms, 'RMS de lo que recibe el analizador del medidor (0,3/√2 = 0,212)').toBeGreaterThan(0.18);
+    expect(medio.rms, 'RMS de lo que recibe el analizador del medidor (0,3/√2 = 0,212)').toBeLessThan(0.24);
+
+    const llevado = await llevarAlGenerador(page);
+    expect(Math.abs(llevado.hz - 350), `campo «${llevado.texto}»`).toBeLessThanOrEqual(0.5);
+    await expect(preset).toHaveAttribute('aria-pressed', 'true');
+    await expect(rotuloFranja(page)).toHaveText('Medios-bajos - Calidez');
+    await botonReproducir(page).click();
+    await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
+    const [osc] = await registros(page);
+    expect(osc.frecuenciasAplicadas, 'lo que suena al pulsar «Reproducir»').toEqual([llevado.hz]);
+    expect(osc.estadoCtx).toBe('running');
+  });
+
+  test('CASO 21 — la misma nota dos veces en una medida (440 Hz, 2,5 s de silencio, 440 Hz): la región la anuncia las dos veces', async ({
+    page,
+  }) => {
+    await vigilarMedidor(page);
+    await vigilarRegionMedidor(page);
+    await microfonoPorApertura(page, [
+      {
+        segundos: 10,
+        tonos: [
+          { hz: 440, amp: 0.3, desde: 0, hasta: 2, rampa: 0.02 },
+          { hz: 440, amp: 0.3, desde: 4.5, hasta: 6.5, rampa: 0.02 },
+        ],
+      },
+    ]);
+    await arrancarMedidor(page);
+    // Precondición: lectura estable, el medidor se queda sin sonido («— Hz») y vuelve a estable
+    const establesTrasSilencio = async (): Promise<boolean> => {
+      const a = await apuntesMedidor(page);
+      const primera = a.findIndex((x) => x.estado === 'Lectura estable');
+      if (primera < 0) return false;
+      const silencio = a.findIndex((x, i) => i > primera && x.cifra === '— Hz');
+      return silencio > 0 && a.some((x, i) => i > silencio && x.estado === 'Lectura estable');
+    };
+    await expect
+      .poll(establesTrasSilencio, {
+        timeout: 9000,
+        intervals: [200],
+        message: 'el segundo 440 Hz tenía que llegar a «Lectura estable» tras el silencio',
+      })
+      .toBe(true);
+    // Los 300 ms de asentamiento del anuncio, con margen
+    await page.waitForTimeout(800);
+    const escrituras = (await escriturasRegion(page)).map((e) => ({ t: e.t, texto: e.texto, l: lecturaDeTexto(e.texto) }));
+    const del440 = escrituras.filter((e) => e.l?.hz === '440' && e.l.nota === 'La4' && Math.abs(e.l.cents) <= 1);
+    expect(del440.length, `la región ha dicho: ${escrituras.map((e) => e.texto).join(' · ')}`).toBe(2);
+    expect(del440[1].t - del440[0].t, 'el segundo anuncio llega tras el silencio').toBeGreaterThan(2000);
+    await expect(retenida(page)).toHaveText(/^Última lectura estable: 440\sHz · La4 \((0|\+1|−1)\scents\)$/);
+  });
+
+  test('CASO 22 — «Llevar» a mitad de un deslizamiento lento: la región deja la lectura anunciada y solo dice lo llevado, que es la retenida', async ({
+    page,
+  }) => {
+    await microfonoPorApertura(page, [
+      {
+        segundos: 6,
+        glissandos: [
+          { f0: 400, f1: 443.83, amp: 0.3, desde: 0, hasta: 3 },
+          { f0: 443.83, f1: 400, amp: 0.3, desde: 3, hasta: 6 },
+        ],
+      },
+    ]);
+    await arrancarMedidor(page);
+    const region = seccionMedidor(page).getByRole('status');
+    // Precondición: la región tiene una lectura dentro al pulsar «Llevar». Tras el primer anuncio se
+    // espera al segundo (1,5 s después): subiendo a 60 cents/s, ya se ha movido 90 cents.
+    await expect(region).toContainText(/Lectura estable: \d+\sHz/, { timeout: 6000 });
+    await page.waitForTimeout(1600);
+    await expect(region).toContainText(/Lectura estable: \d+\sHz/);
+
+    const llevado = await llevarAlGenerador(page);
+    const vista = lecturaDeTexto((await retenida(page).textContent()) ?? '');
+    expect(vista, 'la retenida se queda a la vista').not.toBeNull();
+    expect(Math.abs(llevado.hz - Number(vista?.hz)), `llevado «${llevado.texto}» · retenida «${vista?.hz} Hz»`).toBeLessThanOrEqual(0.5);
+    expect(llevado.hz, 'dentro del deslizamiento').toBeGreaterThanOrEqual(400);
+    expect(llevado.hz, 'dentro del deslizamiento').toBeLessThanOrEqual(443.83);
+    await expect(region).toHaveText(
+      new RegExp(`^Frecuencia puesta en el generador: ${llevado.texto}\\sHz\\. Pulsa Reproducir para oírla\\.$`),
+    );
+  });
+
+  test('CASO 23 — un deslizamiento de 300 cents/s (400 → 800 Hz en 4 s) no llega a «estable»: nada se retiene, se lleva ni se anuncia', async ({
+    page,
+  }) => {
+    await vigilarMedidor(page);
+    await vigilarRegionMedidor(page);
+    await microfonoPorApertura(page, [{ segundos: 4, glissandos: [{ f0: 400, f1: 800, amp: 0.3, desde: 0, hasta: 4 }] }]);
+    await arrancarMedidor(page);
+    // Una vuelta entera del búfer y el principio de la siguiente
+    await page.waitForTimeout(5000);
+    const apuntes = await apuntesMedidor(page);
+    const cifras = apuntes.map((a) => a.cifra).filter((c) => /\d/.test(c));
+    // No es un caso vacío: el medidor oye el deslizamiento y la cifra lo sigue
+    expect(new Set(cifras).size, `cifras leídas: ${cifras.slice(0, 12).join(' · ')}`).toBeGreaterThanOrEqual(20);
+    expect(apuntes.filter((a) => a.estado === 'Lectura estable').map((a) => a.cifra), 'lecturas «estables» a 300 cents/s').toEqual([]);
+    expect(apuntes.filter((a) => a.retenida !== '').map((a) => a.retenida)).toEqual([]);
+    expect((await escriturasRegion(page)).map((e) => e.texto), 'lo que se anuncia').toEqual([]);
+    await expect(page.getByRole('button', { name: 'Llevar la lectura al generador' })).toHaveCount(0);
+  });
+
+  /**
+   * HALLAZGO N1 [bajo · contenido] — ABIERTO (16/10/2026). «Qué mide y qué no» dice: «"estable" pide
+   * medio segundo a la misma frecuencia con un sonido que no se esté apagando». La duración es el
+   * hallazgo 3284 (J4, en generador-tonos-medidor-inspector.spec.ts); esto es la otra mitad de la
+   * frase. El motor no pide que el sonido no se apague: pide que la última de cinco lecturas no caiga
+   * más de 4 dB del máximo (CAIDA_MAXIMA_ESTABLE_DB), es decir, menos de unos 10 dB por segundo, y su
+   * propio comentario lo dice: «una nota que se apaga a 8,7 dB/s (τ = 1 s), como una cuerda pulsada,
+   * tampoco [pierde ninguna lectura estable]» y «en la práctica, "estable" pide un sonido […] que no
+   * se esté apagando DEPRISA». Quien afina una guitarra lee en la página que su nota, que se apaga,
+   * no puede llegar a «estable».
+   *   entrada   micrófono: 440 Hz que se apaga con τ = 1 s (8,69 dB/s) desde amplitud 0,5
+   *   esperado  (lo que dice la página) ninguna «Lectura estable»: el sonido se está apagando
+   *   obtenido  «440 Hz · La4 (0 cents) · Lectura estable» casi 4 s seguidos mientras cae ~34 dB,
+   *             retenida y «Llevar»; con τ = 0,25 s (35 dB/s), dos lecturas estables al empezar
+   * Se acepta cualquiera de las dos reparaciones: que el texto diga lo que pide de verdad (que no se
+   * apague deprisa), o que el medidor no dé por estable un sonido que se apaga.
+   */
+  test('HALLAZGO N1 — un sonido que se apaga no llega a «estable» mientras la página diga que eso pide un sonido que no se esté apagando', async ({
+    page,
+  }) => {
+    // ABIERTO: comprobado el 16/10/2026 que cae en la última aserción (las lecturas «estables» del
+    // 440 Hz que se apaga), no en la precondición de que el sonido se lea.
+    test.fail();
+    await vigilarMedidor(page);
+    await microfonoQueSeApaga(page, 6, { hz: 440, amp: 0.5, desde: 0.5, tau: 1 });
+    await arrancarMedidor(page);
+    // Precondición: el sonido se lee, y es el 440
+    await expect(seccionMedidor(page).locator('[class*="medidorCifra"]')).toHaveText(/^440\sHz$/, { timeout: 6000 });
+    // Hasta que ha caído unos 30 dB (3,5 s · 8,69 dB/s), antes de que el búfer dé la vuelta (6 s)
+    await page.waitForTimeout(3500);
+    const limites = sinEspacioDuro((await seccionMedidor(page).locator('[class*="medidaLimites"]').allTextContents()).join(' ')).replace(
+      /\s+/g,
+      ' ',
+    );
+    const pideQueNoSeApague = /un sonido que no se esté apagando[,.;]/.test(limites);
+    const estables = (await apuntesMedidor(page)).filter((a) => a.estado === 'Lectura estable').map((a) => a.cifra);
+    expect(
+      pideQueNoSeApague ? estables : [],
+      'la página dice que «estable» pide un sonido que no se esté apagando, y este cae 8,7 dB por segundo',
+    ).toEqual([]);
+  });
+});
+
+test.describe('Inspector 16/10/2026 — en móvil (Pixel 7)', () => {
+  test.use({
+    viewport: devices['Pixel 7'].viewport,
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: devices['Pixel 7'].deviceScaleFactor,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('CASO 24 — tras llevar 442 Hz, «1k», el deslizador o el barrido retiran el aviso de lo llevado, y «Reproducir» emite 1.000 Hz', async ({
+    page,
+  }) => {
+    await microfonoSintetico(page, 4, [{ hz: 442, amp: 0.3, desde: 0, hasta: 4 }]);
+    await abrir(page);
+    const region = seccionMedidor(page).getByRole('status');
+    const medirYLlevar = async (): Promise<void> => {
+      await page.getByRole('button', { name: /Medir la frecuencia/ }).tap();
+      await expect(seccionMedidor(page).getByText('Lectura estable', { exact: true })).toBeVisible({ timeout: 6000 });
+      await page.getByRole('button', { name: 'Llevar la lectura al generador' }).tap();
+      await expect(campoFrecuencia(page)).toHaveValue(/^44[12](,\d)?$/);
+      await expect(region).toHaveText(/^Frecuencia puesta en el generador: 44[12](,\d)?\sHz\. Pulsa Reproducir para oírla\.$/);
+    };
+
+    // 1) «1k»: el aviso se retira y lo que suena es 1.000 Hz
+    await medirYLlevar();
+    await page.getByRole('button', { name: 'Ir a 1.000 Hz' }).tap();
+    await expect(campoFrecuencia(page)).toHaveValue('1000');
+    await expect(region).toHaveText('');
+    await botonReproducir(page).tap();
+    await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
+    expect((await registros(page))[0].frecuenciasAplicadas, 'lo que suena al pulsar «Reproducir»').toEqual([1000]);
+    expect((await registros(page))[0].estadoCtx).toBe('running');
+    await botonDetener(page).tap();
+    await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
+
+    // 2) el deslizador, con el teclado: 442 → 443 (el range redondea el 441,9/442,1 llevado a su paso de 1)
+    await medirYLlevar();
+    await page.getByRole('slider', { name: 'Seleccionar frecuencia' }).press('ArrowUp');
+    await expect(campoFrecuencia(page)).toHaveValue('443');
+    await expect(region).toHaveText('');
+
+    // 3) el barrido
+    await medirYLlevar();
+    await page.getByRole('button', { name: /Iniciar barrido/ }).tap();
+    await expect(region).toHaveText('', { timeout: 1000 });
+    await page.getByRole('button', { name: /Detener barrido/ }).tap();
+    // Y nada desborda a lo ancho en el móvil
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 });

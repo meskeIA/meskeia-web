@@ -41,8 +41,9 @@ import { ORIGEN } from './_puerto';
  * a propósito mientras el defecto siga— y al repararlos se quita esa línea y quedan como
  * regresión. Los del 20/08, el 22/09 y el 26/09/2026 están REPARADOS (la base no tenía ninguno
  * abierto el 12/10/2026), y los del 14/10/2026 (3285-3287 y 3299-3302) y el 3233, REPARADOS el
- * 14 y el 15/10/2026. A 15/10/2026 los únicos `test.fail()` vivos son los de la re-inspección del
- * 12/10/2026 (hallazgos 3227-3232) y los de la del 15/10/2026, al final del fichero.
+ * 14 y el 15/10/2026; los de la re-inspección del 15/10/2026 (3310-3313), REPARADOS ese mismo día.
+ * A 16/10/2026 los únicos `test.fail()` vivos son los de la re-inspección del 12/10/2026 (hallazgos
+ * 3227-3232) y los de la del 16/10/2026, al final del fichero.
  */
 
 const RUTA = '/test-perfil-inversor/';
@@ -1201,7 +1202,7 @@ test.describe('re-inspección 26/09/2026 · móvil', () => {
 // → 3228 · «más objetiva» que el banco → 3229 · «cada cuánto revisar» → 3230 · FAQPage del
 // agresivo → 3231 · tabla comparativa → 3232 · doble toque → 3233. El 3233 se REPARÓ el 15/10/2026
 // (e903863e, con el 3299) y su caso es hoy regresión; 3227-3232 siguen abiertos y reproduciéndose
-// a 15/10/2026 (re-inspección de esa fecha, al final del fichero).
+// a 15/10/2026 y a 16/10/2026 (re-inspecciones de esas fechas, al final del fichero).
 // ============================================================
 
 /** Carga la app con el almacenamiento de sesión vacío y espera a que React haya hidratado. */
@@ -2414,12 +2415,14 @@ test.describe('re-inspección 14/10/2026 (tarde) · móvil 360×740', () => {
 //   el puntero es texto, una opción o «Comenzar Test» (las dos últimas, con guarda) en 1280×800,
 //   1366×768, 1440×900, 1920×1080, 360×740, 390×844 y 412×915: ningún enlace del resultado.
 //   EL VECINO QUE NO CUBRE: «Empezar de cero», el único botón de la app sin la guarda y el único que
-//   BORRA. Y su aviso de test recuperado no se retira nunca (hallazgos 3310 y 3311, abajo).
+//   BORRA. Y su aviso de test recuperado no se retira nunca (hallazgos 3310 y 3311, abajo; REPARADOS
+//   el 15/10/2026 en e89a1b9a y 57343d4e).
 //
 // LA FIRMA (76,2 % cortas y 33,3 % recargas en los 30 días hasta el 14/10, casi todo antes de las dos
 // reparaciones; partida el 12/10: 0 recargas desde el 27/09). El testigo de red («firma», bloque de
 // escritorio del 14/10) sigue en 1 alta por carga. Lo que sí PIERDE trabajo a quien usa la app: el
-// resultado no sobrevive a «Atrás» desde «Simular esta Cartera» ni a un F5 (hallazgo 3313).
+// resultado no sobrevive a «Atrás» desde «Simular esta Cartera» ni a un F5 (hallazgo 3313, REPARADO el
+// 15/10/2026 en 8ec810fe: el estado vuelve; lo que se VE al volver, en la re-inspección del 16/10).
 //
 // LOS CASOS, resueltos a mano antes de abrir el navegador (A=1 · B=2 · C=3 · D=4; flecha =
 // i·20 + 2 + (p − mín)/(máx − mín)·16 con el tramo del perfil):
@@ -2431,7 +2434,8 @@ test.describe('re-inspección 14/10/2026 (tarde) · móvil 360×740', () => {
 //             que aparece debajo: todo B = 20 (Moderado, 17 + … → flecha 20 + 2 + 3/5·16 = 31,6 %), la
 //             10 sigue en B tras «Revisar» y «Repetir» acaba en la portada (móvil 360×740)
 //   horizonte → la 1 en A («Menos de 2 años») y las demás en D = 1 + 36 = 37 → Agresivo, «Horizonte
-//             ideal > 15 años»: lo que la propia guía (paso 3) manda a Conservador. HALLAZGO.
+//             ideal > 15 años»: lo que la propia guía (paso 3) manda a Conservador. Era el HALLAZGO
+//             3312, REPARADO el 15/10/2026 (192273c2): hoy, Conservador con la línea que explica el tope.
 // ============================================================
 
 const CLAVE_SESION_1510 = 'meskeia:test-perfil-inversor:v1';
@@ -2883,5 +2887,555 @@ test.describe('re-inspección 15/10/2026 · móvil 360×740', () => {
       problemas.push(`tras terminar y «Revisar»: «${sinEspacios(await aviso(page).innerText())}»`);
     }
     expect(problemas).toEqual([]);
+  });
+});
+
+// ============================================================
+// INSPECTOR 16/10/2026 — re-inspección tras e89a1b9a (3310), 57343d4e (3311), 8ec810fe (3313) y
+// 192273c2 (3312), con FIRMA DE ROTURA (75,4 % cortas y 32,3 % recargas en 65 visitas en los 30 días
+// hasta el 15/10/2026: una ventana ANTERIOR a las cuatro reparaciones, y con 11 días de antes del
+// 26/09, cuando cada cambio de fase contaba como visita nueva —2175/2176—).
+//
+// LAS REPARACIONES se sostienen en el ESTADO:
+//   3310 → «Empezar de cero» lleva la guarda: doble toque a 90 ms con el botón a 140, 300, 460 y 650 px
+//          (360×740) o 754 px (390×844) → portada y sesión vacía; con «Comenzar Test» bajo el dedo, el
+//          segundo toque se absorbe.
+//   3311 → el aviso dice lo recuperado y no vuelve tras terminar (su test del 15/10, en verde).
+//   3312 → tope por la pregunta 1 (A → Conservador, B → Moderado, C → Equilibrado, D sin tope), con la
+//          línea que lo explica, la flecha en el segmento nombrado y el enlace con el perfil limitado.
+//   3313 → «Atrás» desde los dos enlaces del resultado y F5 devuelven el MISMO resultado. Pero lo que se
+//          VE al volver no es el resultado: HALLAZGO de abajo, con su hermano del F5 a mitad.
+//
+// C0254 (familia «tests y cuestionarios por fases»; esta app es la referencia). La guarda cubre los
+// botones de las tres fases: «Comenzar Test», las cuatro opciones, «← Anterior», «Siguiente →» / «Ver
+// Resultado», «Empezar de cero», «Revisar mis respuestas» y «Repetir Test» (también con el resultado
+// restaurado por F5). Las reparaciones del 15/10 no añadieron botones: 192273c2 añade un <p>. Sin
+// guarda quedan solo los dos ENLACES del resultado, y tras «Ver Resultado» bajo el dedo queda texto. No
+// se come lo legítimo: «Siguiente» y, a los 200 ms, otra opción a 45-138 px cuenta, y corregir A → D a
+// los 200 ms también (el teclado lo cubre el bloque del 15/10).
+//
+// LOS CASOS, resueltos a mano antes de abrir el navegador (A=1 · B=2 · C=3 · D=4; tope por la 1;
+// flecha = i·20 + 2 + (p' − mín)/(máx − mín)·16 con el tramo del perfil NOMBRADO y p' la puntuación
+// acotada a ese tramo):
+//   normal  → D,C,B,C,B,C,C,B,C,B = 4+3+2+3+2+3+3+2+3+2 = 27 → Equilibrado (23–28); la 1 en D, sin
+//             tope ni aviso de borde; flecha 40 + 2 + 4/5·16 = 54,8 %; 50/35/10/5
+//             B,C×9 = 2 + 27 = 29 → por puntos Dinámico; la B («2 a 5 años») lo limita a Moderado:
+//             flecha 20 + 2 + 16 = 38 %, 30/50/15/5, ?perfil=moderado
+//   límite  → C,D,D,D,C,C,C,B,A,A = 3+4+4+4+3+3+3+2+1+1 = 28, techo del tope C: Equilibrado sin línea;
+//             la 10 de A a B = 29 → por puntos Dinámico, tope Equilibrado con su línea, flecha 58 %
+//             (y en móvil A,D×9 = 37 → Conservador, flecha 2 + 16 = 18 %)
+//   rechazo → sin contestar, «Siguiente» deshabilitado y un clic forzado no avanza; una sesión de
+//             resultado sin las diez respuestas, o con una fase desconocida, se retira: portada
+//   firma   → F5 a mitad, F5 con el resultado, «Atrás» desde el estimador, pestaña nueva
+// ============================================================
+
+const CLAVE_1610 = 'meskeia:test-perfil-inversor:v1';
+const UA_ESCRITORIO_1610 =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36';
+
+/**
+ * Carga la app sin sesión. La limpia desde una página del MISMO origen que no es la app: con la app
+ * cargada, su recuperación puede reescribir la sesión después del clear (medido en esta inspección:
+ * la siguiente carga aterrizaba en la pregunta, sin «Comenzar Test»).
+ */
+async function cargarLimpia1610(page: Page): Promise<void> {
+  await page.goto('/robots.txt');
+  await page.evaluate(() => sessionStorage.clear());
+  await page.goto(RUTA);
+  await esperarPaginaAsentada(page);
+}
+
+/** Contesta con la pausa de quien lee: la guarda del 3299 absorbe lo que llega a < 450 ms en el mismo punto. */
+async function contestar1610(page: Page, indices: number[], tocar = false): Promise<void> {
+  for (const i of indices) {
+    await page.waitForTimeout(500);
+    if (tocar) await opcion(page, i).tap();
+    else await opcion(page, i).click();
+    if (tocar) await botonSiguiente(page).tap();
+    else await botonSiguiente(page).click();
+  }
+}
+
+/** Píxeles del elemento que se ven entre la barra fija del logo y el pie de la ventana (−1 si no existe). */
+async function pxALaVista1610(page: Page, selector: string): Promise<{ px: number; caja: string }> {
+  return page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return { px: -1, caja: 'no existe' };
+    const r = el.getBoundingClientRect();
+    const barra = document.querySelector('[data-barra-logo]')?.getBoundingClientRect().bottom ?? 0;
+    const px = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, barra));
+    return { px: Math.round(px), caja: `${Math.round(r.top)}..${Math.round(r.bottom)}` };
+  }, selector);
+}
+
+/** Reparto de la leyenda con espacios normales (el % lleva espacio duro, 2180). */
+async function reparto1610(page: Page): Promise<string[]> {
+  return (await reparto(page)).map((s) => s.replace(/ /g, ' '));
+}
+
+test.describe('Inspector 16/10/2026 · escritorio', () => {
+  test.use({ viewport: { width: 1280, height: 800 }, userAgent: UA_ESCRITORIO_1610 });
+  const puntuacion = (page: Page) => page.locator('p[class*="resultScore"]');
+  const avisoDeBorde = (page: Page) => page.locator('[class*="resultScoreBorde"]');
+  const lineaDeTope = (page: Page) => page.locator('[class*="resultTope"]');
+
+  test('caso normal: D,C,B,C,B,C,C,B,C,B suma 27 → Equilibrado, sin tope ni aviso de borde, flecha 54,8 %', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await contestar1610(page, [3, 2, 1, 2, 1, 2, 2, 1, 2, 1]); // 4+3+2+3+2+3+3+2+3+2 = 27
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(puntuacion(page)).toHaveText('27 puntos · tramo 23–28');
+    await expect(avisoDeBorde(page)).toHaveCount(0); // ni 23 ni 28
+    await expect(lineaDeTope(page)).toHaveCount(0); // la 1 en D: sin tope
+    // 2·20 + 2 + (27 − 23)/(28 − 23)·16 = 54,8 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(54.8, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(2);
+    // PROFILES.equilibrado
+    await expect(rasgo(page, 0)).toHaveText('Medio');
+    await expect(rasgo(page, 1)).toHaveText('5-10 años');
+    await expect(rasgo(page, 2)).toHaveText('12-15 %');
+    await expect(rasgo(page, 3)).toHaveText('Crecimiento sostenido');
+    expect(await reparto1610(page)).toEqual([
+      'Renta Variable (50 %)',
+      'Renta Fija (35 %)',
+      'Liquidez (10 %)',
+      'Alternativos (5 %)',
+    ]);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=equilibrado',
+    );
+  });
+
+  test('tope intermedio: B,C×9 suma 29 (Dinámico por puntos) → Moderado por el horizonte de 2 a 5 años, flecha 38 %', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await contestar1610(page, [1, 2, 2, 2, 2, 2, 2, 2, 2, 2]); // 2 + 9·3 = 29
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    // El tramo que se pinta es el de la PUNTUACIÓN (29–34, Dinámico), y la línea explica el tope
+    await expect(puntuacion(page)).toHaveText('29 puntos · tramo 29–34');
+    await expect(lineaDeTope(page)).toHaveText(
+      'Tu horizonte de entre 2 y 5 años limita el perfil a Moderado; el resto de tus respuestas apuntaba a Dinámico.',
+    );
+    await expect(avisoDeBorde(page)).toHaveCount(0); // con el tope actuando no hay aviso de borde
+    // Segmento de Moderado, extremo alto: 1·20 + 2 + (22 − 17)/(22 − 17)·16 = 38 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(38, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(1);
+    // PROFILES.moderado
+    await expect(rasgo(page, 0)).toHaveText('Bajo');
+    await expect(rasgo(page, 1)).toHaveText('3-5 años');
+    await expect(rasgo(page, 2)).toHaveText('8-12 %');
+    await expect(rasgo(page, 3)).toHaveText('Batir inflación');
+    expect(await reparto1610(page)).toEqual([
+      'Renta Variable (30 %)',
+      'Renta Fija (50 %)',
+      'Liquidez (15 %)',
+      'Alternativos (5 %)',
+    ]);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=moderado',
+    );
+  });
+
+  test('caso límite: C + 25 = 28 es el techo del tope C (Equilibrado, sin línea); la 10 de A a B (29) ya lo limita el horizonte', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await contestar1610(page, [2, 3, 3, 3, 2, 2, 2, 1, 0, 0]); // 3+4+4+4+3+3+3+2+1+1 = 28
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(puntuacion(page)).toContainText('28 puntos · tramo 23–28');
+    await expect(lineaDeTope(page)).toHaveCount(0); // por puntos ya es Equilibrado: el tope no actúa
+    // 2·20 + 2 + (28 − 23)/(28 − 23)·16 = 58 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(58, 1);
+
+    await page.waitForTimeout(500);
+    await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    await page.waitForTimeout(500);
+    await opcion(page, 1).click(); // A → B: +1
+    await botonSiguiente(page).click();
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(puntuacion(page)).toHaveText('29 puntos · tramo 29–34');
+    await expect(lineaDeTope(page)).toHaveText(
+      'Tu horizonte de entre 5 y 10 años limita el perfil a Equilibrado; el resto de tus respuestas apuntaba a Dinámico.',
+    );
+    await expect(avisoDeBorde(page)).toHaveCount(0);
+    // Segmento de Equilibrado, extremo alto (29 acotado a 28): 58 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(58, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(2);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=equilibrado',
+    );
+  });
+
+  test('caso a rechazar: sin respuesta no se avanza; una sesión de resultado incompleta o con fase desconocida se retira', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await page.waitForTimeout(500);
+    await expect(botonSiguiente(page)).toBeDisabled();
+    await botonSiguiente(page).click({ force: true });
+    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(0);
+
+    const sembrarYCargar = async (sesion: object): Promise<string | null> => {
+      await page.evaluate(([k, v]) => sessionStorage.setItem(k, v), [CLAVE_1610, JSON.stringify(sesion)]);
+      await page.goto(RUTA);
+      await esperarPaginaAsentada(page);
+      return page.evaluate((k) => sessionStorage.getItem(k), CLAVE_1610);
+    };
+    const diezD = { 1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4, 7: 4, 8: 4, 9: 4, 10: 4 };
+
+    // Resultado con DOS respuestas: no hay resultado sin las diez (mismo listón que el 1214)
+    expect(await sembrarYCargar({ currentQuestion: 9, answers: { 1: 4, 2: 4 }, fase: 'result' })).toBeNull();
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeVisible();
+    await expect(perfilMostrado(page)).toHaveCount(0);
+
+    // Fase desconocida, aunque haya diez respuestas
+    expect(await sembrarYCargar({ currentQuestion: 9, answers: diezD, fase: 'resultado' })).toBeNull();
+    await expect(page.getByRole('button', { name: /Comenzar Test/ })).toBeVisible();
+
+    // Y la buena, para comparar: todo D = 40 → Agresivo, sin aviso de borde (40 es el techo de la ESCALA)
+    expect(await sembrarYCargar({ currentQuestion: 9, answers: diezD, fase: 'result' })).not.toBeNull();
+    await expect(perfilMostrado(page)).toHaveText('Agresivo');
+    await expect(puntuacion(page)).toHaveText('40 puntos · tramo 35–40');
+    await expect(avisoDeBorde(page)).toHaveCount(0);
+    await expect(page.getByText(/Hemos recuperado el test/)).toHaveCount(0);
+  });
+
+  test('pestaña nueva: la portada, aunque otra pestaña tenga el resultado guardado', async ({ page, context }) => {
+    // sessionStorage es de cada pestaña: quien abre la app en otra no hereda el resultado de esta.
+    await cargarLimpia1610(page);
+    await page.evaluate(
+      ([k, v]) => sessionStorage.setItem(k, v),
+      [CLAVE_1610, JSON.stringify({ currentQuestion: 9, answers: { 1: 4, 2: 3, 3: 2, 4: 3, 5: 2, 6: 3, 7: 3, 8: 2, 9: 3, 10: 2 }, fase: 'result' })],
+    );
+    const nueva = await context.newPage();
+    await nueva.goto(RUTA);
+    await esperarPaginaAsentada(nueva);
+    await expect(nueva.getByRole('button', { name: /Comenzar Test/ })).toBeVisible();
+    await expect(nueva.locator('[class*="resultProfile"]')).toHaveCount(0);
+    await nueva.close();
+  });
+
+  test.fail('HALLAZGO — en el techo de su tope, el aviso de borde no promete el perfil de al lado que un punto más no da', async ({
+    page,
+  }) => {
+    // 192273c2 quitó el aviso cuando el tope ACTÚA («Con el tope actuando, un punto más o menos no
+    // cambia el perfil: el aviso de borde mentiría»), pero no cuando la puntuación está justo en el
+    // techo del perfil máximo que permite el horizonte. Ahí el aviso dice «con un punto de diferencia el
+    // resultado sería el perfil de al lado», y un punto más en cualquiera de las preguntas 2 a 10 deja
+    // el MISMO perfil: solo cambiar la respuesta del horizonte lo movería.
+    // Resuelto a mano: A + 15 = 16 (Conservador, techo de A) → con la 10 de A a B, 17: Moderado por
+    // puntos, tope Conservador · B + 20 = 22 (Moderado, techo de B) → 23: tope Moderado · C + 25 = 28
+    // (Equilibrado, techo de C) → 29: tope Equilibrado.
+    test.setTimeout(120_000);
+    const problemas: string[] = [];
+    const casos: Array<{ indices: number[]; puntos: number; perfil: string }> = [
+      { indices: [0, 1, 1, 1, 1, 1, 1, 0, 0, 0], puntos: 16, perfil: 'Conservador' }, // 1 + 6·2 + 3·1
+      { indices: [1, 2, 2, 2, 1, 1, 1, 1, 1, 0], puntos: 22, perfil: 'Moderado' }, // 2 + 3·3 + 5·2 + 1
+      { indices: [2, 3, 3, 3, 2, 2, 2, 1, 0, 0], puntos: 28, perfil: 'Equilibrado' }, // 3 + 3·4 + 3·3 + 2 + 1 + 1
+    ];
+    for (const caso of casos) {
+      await cargarLimpia1610(page);
+      await page.getByRole('button', { name: /Comenzar Test/ }).click();
+      await contestar1610(page, caso.indices);
+      await expect(perfilMostrado(page)).toHaveText(caso.perfil);
+      await expect(puntuacion(page)).toContainText(`${caso.puntos} puntos`);
+      const aviso = (await avisoDeBorde(page).count()) ? sinEspacios(await avisoDeBorde(page).innerText()) : '';
+      await page.waitForTimeout(500);
+      await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
+      await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+      await page.waitForTimeout(500);
+      await opcion(page, 1).click(); // la 10 de A a B: un punto más
+      await botonSiguiente(page).click();
+      await expect(puntuacion(page)).toContainText(`${caso.puntos + 1} puntos`);
+      const conUnPuntoMas = (await perfilMostrado(page).textContent()) ?? '';
+      if (/con un punto de diferencia el resultado sería el perfil de al lado/.test(aviso) && conUnPuntoMas === caso.perfil) {
+        problemas.push(
+          `${caso.puntos} puntos (${caso.perfil}) avisa de «el perfil de al lado», y con ${caso.puntos + 1} sigue en ${conUnPuntoMas}`,
+        );
+      }
+    }
+    expect(problemas).toEqual([]);
+  });
+
+  test.fail('HALLAZGO (3313) — al volver con «Atrás» desde «Simular esta Cartera», o tras un F5, el resultado está en pantalla', async ({
+    page,
+  }) => {
+    // 8ec810fe restaura el ESTADO (lo comprueba «REPARADO 3313», más arriba), pero la fase guardada se
+    // monta en un efecto, tras el primer render, cuando el navegador ya ha restaurado el desplazamiento
+    // sobre la portada que sirve el servidor: la vista queda tan abajo como mide el resultado de más que
+    // la portada. Su propio comentario lo daba por imposible: «la página acaba de cargarse arriba del
+    // todo». Medido a 1280×800: «Simular esta Cartera» pulsado en scrollY 1706 → «Atrás» → scrollY 2846,
+    // en «Apps relacionadas», con el resultado en −2240..−587 px. F5 mirando «Tu perfil es: Equilibrado»
+    // (scrollY 510) → scrollY 1651, en «Ideas que suelen asociarse…», con el nombre del perfil 824 px
+    // por encima de la ventana. 5 de 5 en las dos.
+    test.setTimeout(90_000);
+    const problemas: string[] = [];
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await contestar1610(page, [3, 2, 1, 2, 1, 2, 2, 1, 2, 1]); // 27 → Equilibrado
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    const simular = page.getByRole('link', { name: /Simular esta Cartera/ });
+    await simular.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300);
+    await simular.click();
+    await page.waitForURL(/\/estimador-cartera-inversion\/\?perfil=equilibrado/);
+    await esperarPaginaAsentada(page);
+    await page.goBack();
+    await page.waitForURL(/\/test-perfil-inversor\/$/);
+    await esperarPaginaAsentada(page);
+    const trasAtras = await pxALaVista1610(page, '[class*="resultScreen"]');
+    if (trasAtras.px <= 0) {
+      problemas.push(`«Atrás»: el resultado en ${trasAtras.caja} px, scrollY ${await page.evaluate(() => Math.round(window.scrollY))}`);
+    }
+
+    await page.locator('[class*="resultScreen"]').evaluate((el) => el.scrollIntoView({ block: 'start' }));
+    await page.waitForTimeout(300);
+    const antes = await pxALaVista1610(page, '[class*="resultProfile"]');
+    await page.reload();
+    await esperarPaginaAsentada(page);
+    const trasF5 = await pxALaVista1610(page, '[class*="resultProfile"]');
+    if (antes.px > 0 && trasF5.px <= 0) problemas.push(`F5: el nombre del perfil en ${trasF5.caja} px (antes, en ${antes.caja})`);
+    expect(problemas).toEqual([]);
+  });
+
+  test.fail('HALLAZGO — tras un F5 a mitad del test, el aviso de recuperado y «Pregunta 4 de 10» están en pantalla', async ({
+    page,
+  }) => {
+    // La recuperación (105, 1221) monta la pregunta y el aviso «Hemos recuperado el test que dejaste a
+    // medias…» tras el primer render, con el desplazamiento ya restaurado por el navegador, y la vista
+    // queda unos 500 px más abajo de donde estaba. Medido a 1280×800: B, C, B y en la pregunta 4 (la
+    // app deja «Pregunta 4 de 10» en 96..119 px) → F5 → scrollY 510 → 1025, con el aviso en −340..−243,
+    // «Pregunta 4 de 10» en −419..−396 y el enunciado en −142..−112: se ven las opciones de una
+    // pregunta sin su enunciado y sin la explicación de lo recuperado. 9 de 9 en scripts sueltos (a
+    // 390×844, 8 de 9; a 360×740, 5 de 6), con service worker y sin él; en este runner, 3 de 4 a
+    // velocidad normal. Depende de que el navegador restaure el desplazamiento ANTES de que React
+    // monte la pregunta, así que el F5 se hace con la CPU a 1/4, como en un móvil, para que el caso
+    // no dependa de la carga de la máquina.
+    test.setTimeout(60_000);
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await contestar1610(page, [1, 2, 1]); // B, C, B
+    await expect(page.getByText('Pregunta 4 de 10')).toBeVisible();
+    expect((await pxALaVista1610(page, '[class*="progressText"]')).px).toBeGreaterThan(0);
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+    await page.reload();
+    await esperarPaginaAsentada(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+    await expect(page.locator('[class*="avisoRecuperado"]')).toContainText('con 3 de 10 respuestas');
+    const problemas: string[] = [];
+    const piezas: Array<[string, string]> = [
+      ['el aviso de recuperado', '[class*="avisoRecuperado"]'],
+      ['«Pregunta 4 de 10»', '[class*="progressText"]'],
+      ['el enunciado', '[class*="questionText"]'],
+    ];
+    for (const [nombre, selector] of piezas) {
+      const v = await pxALaVista1610(page, selector);
+      if (v.px <= 0) problemas.push(`${nombre} en ${v.caja} px`);
+    }
+    expect(problemas).toEqual([]);
+  });
+
+  test.fail('HALLAZGO — la guía da la misma regla de horizonte que el tope que aplica el resultado', async ({ page }) => {
+    // Resultado (192273c2, decidido por el usuario): la 1 en A («Menos de 2 años») → como mucho
+    // Conservador; B («2 a 5 años - Plazo medio») → Moderado; C («5 a 10 años») → Equilibrado.
+    // Guía, paso 3: «menos de 3 años → conservador; en 3–7 años → moderado/equilibrado», que da
+    // Conservador a quien tiene 2-3 años (el resultado le deja llegar a Moderado) y Equilibrado a quien
+    // tiene 3-5 (el resultado lo limita a Moderado). FAQ avanzada, técnica «bucket»: «medio plazo
+    // (equilibrado)», cuando el «Plazo medio» de la pregunta 1 no pasa de Moderado.
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const paso3 = sinEspacios(
+      await page.locator('[class*="stepItem"]').filter({ hasText: 'Determina cuándo necesitarás el dinero' }).innerText(),
+    );
+    const bucket = sinEspacios(
+      await page.locator('[class*="faqSectionItem"]').filter({ hasText: '¿Puedo tener dos perfiles diferentes' }).innerText(),
+    );
+    const problemas: string[] = [];
+    if (/menos de 3 años\s*→\s*conservador/i.test(paso3)) problemas.push('paso 3: «menos de 3 años → conservador»');
+    if (/3[–-]7 años\s*→\s*moderado\/equilibrado/i.test(paso3)) problemas.push('paso 3: «3–7 años → moderado/equilibrado»');
+    if (/medio plazo \(equilibrado\)/i.test(bucket)) problemas.push('bucket: «medio plazo (equilibrado)»');
+    expect(problemas).toEqual([]);
+  });
+});
+
+test.describe('Inspector 16/10/2026 · móvil 360×740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: UA_MOVIL_1410,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const marcadas = (page: Page) => page.locator('[class*="optionButton"][aria-pressed="true"]');
+
+  test('caso límite tocando: A,D×9 = 37 → Conservador por el horizonte, con la línea del tope en la primera pantalla', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await contestar1610(page, [0, 3, 3, 3, 3, 3, 3, 3, 3, 3], true); // 1 + 9·4 = 37
+    await expect(perfilMostrado(page)).toHaveText('Conservador');
+    await expect(page.locator('p[class*="resultScore"]')).toHaveText('37 puntos · tramo 35–40');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(0);
+    const tope = page.locator('[class*="resultTope"]');
+    await expect(tope).toHaveText(
+      'Tu horizonte de menos de 2 años limita el perfil a Conservador; el resto de tus respuestas apuntaba a Agresivo.',
+    );
+    await enteroALaVista(page, tope); // sin desplazarse: es lo que explica por qué no sale Agresivo
+    // Segmento de Conservador, extremo alto (37 acotado a 16): 0·20 + 2 + 16 = 18 %
+    expect(await izquierdaFlecha(page)).toBeCloseTo(18, 1);
+    expect(await segmentoDeLaFlecha(page)).toBe(0);
+    await expect(rasgo(page, 1)).toHaveText('< 3 años');
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=conservador',
+    );
+  });
+
+  test('C0254 — la guarda cubre «← Anterior», «Empezar de cero» y «Ver Resultado» tocados dos veces, sin comerse lo legítimo', async ({
+    page,
+  }) => {
+    test.setTimeout(300_000);
+    const problemas: string[] = [];
+    const alturas = [140, 300, 460, 650];
+    const dobleToque = async (p: { x: number; y: number }): Promise<void> => {
+      await page.touchscreen.tap(p.x, p.y);
+      await page.waitForTimeout(90);
+      await page.touchscreen.tap(p.x, p.y);
+      await page.waitForTimeout(450);
+    };
+
+    // «← Anterior» en la 3 (1 = B, 2 = C, 3 = D): queda la 2, con su C
+    for (const y of alturas) {
+      await cargarLimpia1610(page);
+      await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+      await contestar1610(page, [1, 2], true);
+      await page.waitForTimeout(500);
+      await opcion(page, 3).tap();
+      await page.waitForTimeout(500);
+      const p = await centroA(page, botonAnterior(page), y);
+      await dobleToque(p);
+      const progreso = await page.locator('[class*="progressText"]').textContent();
+      const m = await marcadas(page).allTextContents();
+      if (progreso !== 'Pregunta 2 de 10' || m.length !== 1 || !m[0].includes('Mantendría la posición')) {
+        problemas.push(`«← Anterior» a ${Math.round(p.y)} px → «${progreso}», marcadas: ${m.join(' | ')}`);
+      }
+    }
+
+    // «Empezar de cero» (test recuperado con 2 respuestas): portada y sesión vacía, también con
+    // «Comenzar Test» bajo el dedo tras el primer toque (a 650 px)
+    for (const y of alturas) {
+      await cargarLimpia1610(page);
+      await page.evaluate(
+        ([k, v]) => sessionStorage.setItem(k, v),
+        [CLAVE_1610, JSON.stringify({ currentQuestion: 2, answers: { 1: 2, 2: 3 } })],
+      );
+      await page.goto(RUTA);
+      await esperarPaginaAsentada(page);
+      const p = await centroA(page, page.getByRole('button', { name: /Empezar de cero/ }), y);
+      await dobleToque(p);
+      const enPortada = await page.getByRole('button', { name: /Comenzar Test/ }).count();
+      const sesion = await page.evaluate((k) => sessionStorage.getItem(k), CLAVE_1610);
+      if (!enPortada || sesion !== null) {
+        problemas.push(`«Empezar de cero» a ${Math.round(p.y)} px → ${enPortada ? 'portada' : 'sin portada'}, sesión ${sesion}`);
+      }
+    }
+
+    // «Ver Resultado» (B en las diez = 20, Moderado): el resultado, sin salir de la página
+    for (const y of alturas) {
+      await cargarLimpia1610(page);
+      await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+      await contestar1610(page, [1, 1, 1, 1, 1, 1, 1, 1, 1], true);
+      await page.waitForTimeout(500);
+      await opcion(page, 1).tap();
+      await page.waitForTimeout(500);
+      const p = await centroA(page, botonSiguiente(page), y);
+      await dobleToque(p);
+      const perfil = (await perfilMostrado(page).count()) ? await perfilMostrado(page).textContent() : null;
+      if (!page.url().endsWith('/test-perfil-inversor/') || perfil !== 'Moderado') {
+        problemas.push(`«Ver Resultado» a ${Math.round(p.y)} px → ${page.url()}, perfil ${perfil}`);
+      }
+    }
+
+    // Lo legítimo 1: «Siguiente» y, a los 200 ms, OTRA opción de la pregunta nueva, lejos del dedo
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await page.waitForTimeout(500);
+    await opcion(page, 1).tap();
+    await page.waitForTimeout(500);
+    const s = await centroA(page, botonSiguiente(page), 650);
+    await page.touchscreen.tap(s.x, s.y);
+    await page.waitForTimeout(200);
+    let elegida: { i: number; x: number; y: number } | null = null;
+    for (let i = 0; i < 4; i++) {
+      const c = await opcion(page, i).boundingBox();
+      if (!c) continue;
+      const cy = c.y + c.height / 2;
+      const dentro = c.y > 70 && c.y + c.height < 730;
+      if (dentro && Math.abs(cy - s.y) > 40 && (!elegida || Math.abs(cy - s.y) < Math.abs(elegida.y - s.y))) {
+        elegida = { i, x: c.x + c.width / 2, y: cy };
+      }
+    }
+    expect(elegida, 'ninguna opción de la pregunta 2 a la vista').not.toBeNull();
+    await page.touchscreen.tap(elegida!.x, elegida!.y);
+    await page.waitForTimeout(300);
+    await expect(page.getByText('Pregunta 2 de 10')).toBeVisible();
+    await expect(opcion(page, elegida!.i)).toHaveAttribute('aria-pressed', 'true');
+
+    // Lo legítimo 2: corregir la respuesta a los 200 ms (A y luego D) cuenta
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await page.waitForTimeout(600);
+    await opcion(page, 0).tap();
+    await page.waitForTimeout(200);
+    await opcion(page, 3).tap();
+    await page.waitForTimeout(300);
+    await expect(opcion(page, 3)).toHaveAttribute('aria-pressed', 'true');
+    await expect(marcadas(page)).toHaveCount(1);
+
+    expect(problemas).toEqual([]);
+  });
+
+  test.fail('HALLAZGO (3313) — en móvil, «Atrás» desde «Simular esta Cartera» deja el resultado en pantalla', async ({
+    page,
+  }) => {
+    // Medido a 360×740: «Simular esta Cartera» en scrollY 2354 → «Atrás» → scrollY 3962, en «Apps
+    // relacionadas», con el resultado en −3299..−884 px: 1.608 px más abajo, lo que mide la página con
+    // el resultado (5.089 px) sobre la portada que sirve el servidor (3.481). 6 de 6 (a 390×844, 5 de 5,
+    // +1.482 px). El estado sí vuelve: el resultado está, unos 900 px por encima de la ventana.
+    test.setTimeout(90_000);
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await contestar1610(page, [3, 2, 1, 2, 1, 2, 2, 1, 2, 1], true); // 27 → Equilibrado
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    const simular = page.getByRole('link', { name: /Simular esta Cartera/ });
+    await simular.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300);
+    await simular.tap();
+    await page.waitForURL(/\/estimador-cartera-inversion\/\?perfil=equilibrado/);
+    await esperarPaginaAsentada(page);
+    await page.goBack();
+    await page.waitForURL(/\/test-perfil-inversor\/$/);
+    await esperarPaginaAsentada(page);
+    const tras = await pxALaVista1610(page, '[class*="resultScreen"]');
+    expect(tras.px, `el resultado en ${tras.caja} px`).toBeGreaterThan(0);
   });
 });

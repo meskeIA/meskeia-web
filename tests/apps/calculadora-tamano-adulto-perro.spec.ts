@@ -1,4 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { contrasteSobreFondoReal } from './_contraste';
 
 /**
  * Inspector — calculadora-tamano-adulto-perro (segmento cálculo, riesgo 2, 776 usos reales)
@@ -280,7 +282,8 @@ test.describe('Calculadora de tamaño adulto del perro — la reparación del 20
 });
 
 /**
- * HALLAZGOS ABIERTOS del 20/08/2026. Todos fallan HOY a propósito.
+ * HALLAZGOS del 20/08/2026 — REPARADOS el 21/08/2026 (a716b338). Ya no llevan `test.fail()`:
+ * quedan como regresión, y los comentarios en presente de cada test describen el defecto de entonces.
  */
 // REGRESIONES — los seis hallazgos del 20/08/2026, reparados el 21/08/2026.
 test.describe('Calculadora de tamaño adulto del perro — regresiones', () => {
@@ -290,7 +293,9 @@ test.describe('Calculadora de tamaño adulto del perro — regresiones', () => {
     await page.goto(RUTA);
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allInnerTexts()).join(' ');
     // La app enseña grande 16-40, gigante 35-90, mediano 8-20 y pequeño 4-15 kg (derivados de
-    // sus razas). El FAQPage que se sirve a Google y a las IAs sigue diciendo lo de antes.
+    // sus razas). El FAQPage que se sirve a Google y a las IAs decía lo de antes (REPARADO el
+    // 21/08/2026 en la pregunta 2; la 4 lo sigue diciendo con otras palabras, «entre 25 y 45 kg»,
+    // que estos patrones no ven: ver el bloque «Inspector 16/10/2026» al final).
     expect(jsonLd).not.toContain('25-45 kg');
     expect(jsonLd).not.toContain('más de 45 kg');
     expect(jsonLd).not.toContain('10-25 kg');
@@ -483,5 +488,327 @@ test.describe('ración diaria orientativa · en la página', () => {
       'href',
       '/calculadora-alimentacion-mascotas/',
     );
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// Inspector 16/10/2026 — RE-inspección tras 5846e30c (ración diaria orientativa, semilla S0207).
+//
+// Valores esperados calculados APARTE, en un script propio que no importa motor.ts, con la
+// ecuación tal como la cita el commit: EM (kcal/día) = 130 × PV^0,75 × 3,2 × (e^(−0,87·p) − 0,1),
+// PV = peso ACTUAL en kg, p = peso actual ÷ peso adulto estimado = el porcentaje de la curva de
+// razas.ts (porque peso adulto = peso actual ÷ ese porcentaje). PV^0,75 = exp(0,75 · ln PV).
+//
+//   R1 mediano, 7,5 kg, 18 sem: p = 0,50 + 0,10 × 2/4 = 0,55 → adulto 13,636 → «13,6 kg»
+//      7,5^0,75 = 4,532063 · e^(−0,4785) = 0,619712 → 416 × 0,519712 = 216,2003 kcal/kg^0,75
+//      → 979,83 kcal → «≈ 980 kcal» (a la decena)
+//      3800 kcal/kg → 257,85 g → «260 g» · 500 → 1959,67 → «1960 g» (cuatro cifras: sin punto,
+//      RAE 2010) · 6000 → 163,31 → «165 g» (a 5 g)
+//   R2 grande, 12 kg, 14 sem (el ejemplo que publica el FAQPage): p = 0,30 + 0,10 × 2/4 = 0,35
+//      → «34,3 kg» · 12^0,75 = 6,447420 · e^(−0,3045) = 0,737492 → 265,1967 → 1709,83
+//      → «≈ 1710 kcal» · 3800 → 449,96 g → «450 g»
+//   L1 mini, 1,2 kg, 12 sem (raza pequeña antes de las 20 semanas): p = 0,50 → «2,4 kg»
+//      1,2^0,75 = 1,146531 · e^(−0,435) = 0,647265 → 227,6621 → 261,02 → «≈ 260 kcal»
+//      4000 → 65,26 g → «65 g»
+//   L2 mini, 3,5 kg, 40 sem: último nodo de la curva → p = 1 → sin ración de cachorro
+//   L3 mini, 3,5 kg, 39 sem: p = 0,98 + 0,02 × 7/8 = 0,9975, por debajo del umbral 0,999 → hay
+//      ración: 3,5^0,75 = 2,558887 · e^(−0,867825) = 0,419864 → 133,0633 → 340,49 → «≈ 340 kcal»
+//      ... pero 99,75 % se pinta «100 %» (HALLAZGO, abajo)
+//   Rechazos del pienso: el motor admite 500-6000 kcal/kg ambos incluidos; 499, 6001, 380
+//      (kcal/100 g), 3,8, «3800 kcal», 0, −3800 y texto dan aviso y ninguna cifra de gramos.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
+const NBSP = ' ';
+const seccionRacion = (page: Page) => page.locator('section[aria-labelledby="tituloRacion"]');
+const racionNumero = (page: Page) => seccionRacion(page).locator('[class*="racionNumero"]');
+const racionGramos = (page: Page) => seccionRacion(page).locator('[class*="racionGramos"]');
+/** El aviso del pienso, acotado a la sección: no casa con el anunciador de rutas de Next. */
+const avisoPienso = (page: Page) => seccionRacion(page).locator('p[role="alert"]');
+
+async function abrir(page: Page): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['#peso-actual', '#edad-cachorro']);
+}
+
+async function escribirPienso(page: Page, valor: string): Promise<void> {
+  await seccionRacion(page).locator('#kcal-pienso').fill(valor);
+  await esperarValorEnReact(page, '#kcal-pienso', valor);
+}
+
+/** Las preguntas del FAQPage tal como se sirven (el JSON-LD que leen buscadores e IAs). */
+async function preguntasFaqPage(page: Page): Promise<Array<{ name: string; text: string }>> {
+  const bloques = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((e) => e.textContent ?? ''));
+  for (const b of bloques) {
+    const j = JSON.parse(b) as {
+      '@type'?: string;
+      mainEntity?: Array<{ name: string; acceptedAnswer: { text: string } }>;
+    };
+    if (j['@type'] === 'FAQPage' && j.mainEntity) {
+      return j.mainEntity.map((q) => ({ name: q.name, text: q.acceptedAnswer.text }));
+    }
+  }
+  throw new Error('La página no sirve ningún FAQPage');
+}
+
+test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
+  test('R1 (normal) — mediano, 7,5 kg a las 18 semanas: ≈ 980 kcal; 260 g con 3800, 1960 g con 500 y 165 g con 6000', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await calcular(page, { peso: '7,5', edad: '18', tamano: 'Mediano' });
+    await expect(valorPrincipal(page)).toHaveText('13,6 kg');
+    // toContainText normaliza el espacio duro: el U+00A0 se comprueba sobre el texto crudo
+    const intro = (await seccionRacion(page).locator('p').first().textContent()) ?? '';
+    expect(intro).toContain(`Con 7,5 kg y el 55${NBSP}% de su peso adulto ya alcanzado`);
+    await expect(racionNumero(page)).toHaveText('≈ 980 kcal');
+    await expect(racionGramos(page)).toHaveCount(0);
+
+    // «3.800» con punto de millar: parseSpanishNumber lo lee 3800
+    await escribirPienso(page, '3.800');
+    await expect(racionGramos(page)).toContainText('≈ 260 g de pienso al día');
+    // los dos extremos del rango admitido dan gramos, no aviso
+    await escribirPienso(page, '500');
+    await expect(racionGramos(page)).toContainText('≈ 1960 g de pienso al día');
+    await expect(avisoPienso(page)).toHaveCount(0);
+    await escribirPienso(page, '6.000');
+    await expect(racionGramos(page)).toContainText('≈ 165 g de pienso al día');
+    await expect(avisoPienso(page)).toHaveCount(0);
+  });
+
+  test('R2 (normal) — el ejemplo del FAQPage, grande 12 kg a las 14 semanas: ≈ 1710 kcal y 450 g con 3800', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await calcular(page, { peso: '12', edad: '14', tamano: 'Grande' });
+    await expect(valorPrincipal(page)).toHaveText('34,3 kg');
+    await expect(racionNumero(page)).toHaveText('≈ 1710 kcal');
+    await escribirPienso(page, '3800');
+    await expect(racionGramos(page)).toContainText('≈ 450 g de pienso al día');
+  });
+
+  test('L1 (límite) — mini, 1,2 kg a las 12 semanas: ≈ 260 kcal, 65 g con 4000 y el aviso de razas pequeñas a la vista', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await calcular(page, { peso: '1,2', edad: '12', tamano: 'Mini' });
+    await expect(valorPrincipal(page)).toHaveText('2,4 kg');
+    await expect(racionNumero(page)).toHaveText('≈ 260 kcal');
+    await escribirPienso(page, '4000');
+    await expect(racionGramos(page)).toContainText('≈ 65 g de pienso al día');
+    const aviso = seccionRacion(page).locator('[class*="racionAviso"]');
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('Es un punto de partida, no una dieta');
+    await expect(aviso).toContainText('comieron menos de lo que da esta ecuación, sobre todo antes de las 20 semanas');
+  });
+
+  test('L2 (límite) — mini, 3,5 kg a las 40 semanas (p = 1): sin ración de cachorro, remite a la de adultos', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await calcular(page, { peso: '3,5', edad: '40', tamano: 'Mini' });
+    await expect(racionNumero(page)).toHaveCount(0);
+    await expect(seccionRacion(page).locator('#kcal-pienso')).toHaveCount(0);
+    await expect(seccionRacion(page)).toContainText('con 40 semanas ya ha terminado de crecer');
+    await expect(
+      seccionRacion(page).getByRole('link', { name: 'calculadora de alimentación de mascotas' }),
+    ).toHaveAttribute('href', '/calculadora-alimentacion-mascotas/');
+  });
+
+  test('rechazo — energía del pienso fuera de 500-6000 kcal/kg, en otra unidad o no numérica: aviso y sin gramos', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await calcular(page, { peso: '7,5', edad: '18', tamano: 'Mediano' });
+    for (const v of ['499', '499,9', '6001', '6000,1', '380', '3,8', '3800 kcal', '0', '-3800', 'abc']) {
+      await escribirPienso(page, v);
+      await expect(avisoPienso(page), `«${v}»`).toContainText('Escribe la energía en kcal por kilo, entre 500 y 6000');
+      await expect(racionGramos(page), `«${v}»`).toHaveCount(0);
+    }
+    // vaciar el campo retira el aviso: el pienso es opcional
+    await escribirPienso(page, '');
+    await expect(avisoPienso(page)).toHaveCount(0);
+    await expect(racionGramos(page)).toHaveCount(0);
+    // y la cifra en kcal no depende del pienso
+    await expect(racionNumero(page)).toHaveText('≈ 980 kcal');
+  });
+
+  // ── HALLAZGOS ABIERTOS del 16/10/2026: fallan HOY a propósito (test.fail) ───────────────────
+
+  test('HALLAZGO — con p = 0,9975 la página dice «el 100 % … ya alcanzado» y aun así da ración de crecimiento', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+    // L3 de la cabecera: mini, 3,5 kg, 39 semanas → p = 0,9975 < 0,999 → ración ≈ 340 kcal
+    await calcular(page, { peso: '3,5', edad: '39', tamano: 'Mini' });
+    await expect(racionNumero(page)).toHaveText('≈ 340 kcal');
+    // Esperado: o no afirma el 100 % (99,8 %), o lo trata como adulto. Hoy: formatNumber(99,75, 0)
+    // = «100» junto a «Un cachorro necesita más energía…» y una ración de crecimiento.
+    const intro = ((await seccionRacion(page).locator('p').first().textContent()) ?? '').replace(/ /g, ' ');
+    expect(intro).not.toContain('el 100 % de su peso adulto ya alcanzado');
+  });
+
+  test('HALLAZGO — el % va pegado a la cifra o con espacio normal, no con espacio duro (RAE 2010)', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+    await calcular(page, { peso: '10', edad: '24', tamano: 'Grande' });
+    // «Crecimiento actual»: hoy «55%», pegado (el CASO 1 de arriba lo fija así y habrá que cambiarlo)
+    expect(await detalle(page, 0).textContent()).toBe(`55${NBSP}%`);
+    // tabla de hitos: hoy «88 %» con U+0020
+    const celda = page
+      .locator('tr', { has: page.locator('th', { hasText: /^12 meses$/ }) })
+      .first()
+      .locator('td')
+      .nth(1);
+    expect(await celda.textContent()).toBe(`88${NBSP}%`);
+    // bloque educativo: hoy «20%», «80-90%», «±15%», «30-40%», «10-15%» y varios « %» con U+0020
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const guia = (await page.locator('[class*="guideSection"]').allTextContents()).join(' ');
+    expect(guia.match(/\d%/g) ?? []).toEqual([]);
+    expect(guia.match(/\d %/g) ?? []).toEqual([]);
+  });
+
+  test('HALLAZGO — la pregunta 4 del FAQPage publica otra clasificación por peso que la pregunta 2 y la página', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const faq = await preguntasFaqPage(page);
+    const q2 = faq.find((q) => q.name.includes('A qué edad dejan de crecer'))?.text ?? '';
+    const q4 = faq.find((q) => q.name.includes('Qué diferencia hay entre un perro de raza'))?.text ?? '';
+    // La 2 ya usa los rangos derivados de las razas (los del selector: grande 16-40 kg)...
+    expect(q2).toContain('Las razas grandes (16-40 kg)');
+    // ...y la 4, en el mismo FAQPage, publica los de antes de la reparación del 21/08/2026 con otra
+    // redacción, que los patrones «25-45 kg» / «10-25 kg» de la regresión de arriba no ven.
+    expect(q4).not.toContain('entre 25 y 45 kg');
+    expect(q4).not.toContain('entre 10 y 25 kg');
+    expect(q4).not.toContain('por encima de 45 kg');
+  });
+
+  test('HALLAZGO — dos preguntas del FAQPage están también en la FAQ visible con otra respuesta', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+    const faq = await preguntasFaqPage(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const pares: Array<[RegExp, string]> = [
+      [/¿Influye la alimentación en el tamaño final/, 'Influye la alimentación en el tamaño final'],
+      [/¿A qué edad deja/, 'A qué edad deja'],
+    ];
+    for (const [visible, enJsonLd] of pares) {
+      const item = page.locator('li[class*="faqItem"]', { has: page.locator('strong', { hasText: visible }) }).first();
+      const respuestaVisible = ((await item.locator('p').first().textContent()) ?? '').trim();
+      const respuestaJsonLd = faq.find((q) => q.name.includes(enJsonLd))?.text ?? '';
+      expect(respuestaVisible.length, `${visible}: no está en la FAQ visible`).toBeGreaterThan(0);
+      expect(respuestaJsonLd.length, `${enJsonLd}: no está en el FAQPage`).toBeGreaterThan(0);
+      // Esperado: la misma respuesta en las dos bocas (una constante en metadata.ts)
+      expect(respuestaVisible, String(visible)).toBe(respuestaJsonLd);
+    }
+  });
+
+  test('HALLAZGO — «12abc» como peso y «16abc» como edad se aceptan como 12 y 16 y dan peso adulto y ración', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+    // Hoy: parseFloat('12abc') = 12 → «21,8 kg» (12 ÷ 0,55) y «≈ 1390 kcal», sin aviso
+    await calcular(page, { peso: '12abc', edad: '24', tamano: 'Grande' });
+    await expect(page.locator('p[role="alert"]')).toContainText('Introduce un peso actual válido');
+    await expect(page.locator('[class*="resultadoValor"]')).toHaveCount(0);
+    await expect(racionNumero(page)).toHaveCount(0);
+    // Hoy: parseFloat('16abc') = 16 → «25,0 kg» (10 ÷ 0,40)
+    await calcular(page, { peso: '10', edad: '16abc', tamano: 'Grande' });
+    await expect(page.locator('p[role="alert"]')).toContainText('Introduce una edad válida');
+    await expect(page.locator('[class*="resultadoValor"]')).toHaveCount(0);
+  });
+
+  test('HALLAZGO — los gramos no se anuncian (fuera de toda región viva) y el role="alert" salta a mitad de teclear 3800', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+    await calcular(page, { peso: '7,5', edad: '18', tamano: 'Mediano' });
+    const campo = seccionRacion(page).locator('#kcal-pienso');
+    await campo.click();
+    const alertasAMitad: string[] = [];
+    for (const tecla of '3800') {
+      await page.keyboard.type(tecla);
+      await page.waitForTimeout(150);
+      if ((await avisoPienso(page).count()) > 0) alertasAMitad.push(await campo.inputValue());
+    }
+    await expect(racionGramos(page)).toContainText('≈ 260 g de pienso al día');
+    const enRegionViva = await racionGramos(page).evaluate((el) =>
+      Boolean(el.closest('[aria-live], [role="status"], [role="alert"], [role="log"]')),
+    );
+    expect(enRegionViva, 'los gramos aparecen sin anunciarse').toBe(true);
+    // Hoy: ['3', '38', '380'] — un error asertivo para un valor válido a medio escribir
+    expect(alertasAMitad, 'role="alert" con el valor a medio escribir').toEqual([]);
+  });
+
+  test('HALLAZGO — la guía sigue diciendo que usar el peso actual para la ración es un error, y la ración usa el actual', async ({
+    page,
+  }) => {
+    test.fail();
+    await abrir(page);
+    await calcular(page, { peso: '7,5', edad: '18', tamano: 'Mediano' });
+    // La ración de la app parte del peso ACTUAL (PV = 7,5 kg) y de p; no del adulto (13,6 kg)
+    await expect(seccionRacion(page).locator('p').first()).toContainText('Con 7,5 kg');
+    await expect(racionNumero(page)).toHaveText('≈ 980 kcal');
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const guia = (await page.locator('[class*="guideSection"]').allTextContents()).join(' ');
+    // El paso 5 se reescribió en 5846e30c por esto mismo; estos dos textos no.
+    expect(guia).not.toContain('Usar el peso actual lleva a subalimentación o sobrealimentación');
+    expect(guia).not.toContain('el consumo de alimento se estima sobre ese mismo peso');
+  });
+});
+
+test.describe('Inspector 16/10/2026 — ración en móvil (390 px) y tema oscuro', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('sin desborde horizontal y con contraste suficiente en la sección nueva', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await calcular(page, { peso: '7,5', edad: '18', tamano: 'Mediano' });
+    // el oscuro se pintó de verdad (fondo de la tarjeta medido el 16/10/2026), no solo el atributo
+    await expect
+      .poll(() => seccionRacion(page).evaluate((e) => getComputedStyle(e).backgroundColor))
+      .toBe('rgb(45, 45, 45)');
+    await escribirPienso(page, '3800');
+    await expect(racionGramos(page)).toContainText('≈ 260 g de pienso al día');
+
+    const [ancho, visible] = await page.evaluate(() => [
+      document.documentElement.scrollWidth,
+      document.documentElement.clientWidth,
+    ]);
+    expect(ancho, 'la página desborda en horizontal').toBeLessThanOrEqual(visible);
+
+    // Texto normal ≥ 4,5:1; la cifra (25,6 px en negrita) es texto grande, ≥ 3:1.
+    // Medido el 16/10/2026: intro 6,35 · cifra 4,93 · ayuda 4,96 · gramos 8,98 · aviso 4,52.
+    const medidas: Array<[string, ReturnType<Page['locator']>, number]> = [
+      ['intro', seccionRacion(page).locator('p').first(), 4.5],
+      ['cifra kcal', racionNumero(page), 3],
+      ['ayuda del pienso', seccionRacion(page).locator('[class*="hint"]'), 4.5],
+      ['gramos', racionGramos(page), 4.5],
+      ['aviso fijo', seccionRacion(page).locator('[class*="racionAviso"]'), 4.5],
+    ];
+    for (const [nombre, loc, minimo] of medidas) {
+      expect(await contrasteSobreFondoReal(loc), nombre).toBeGreaterThanOrEqual(minimo);
+    }
+    await escribirPienso(page, '380');
+    await expect(avisoPienso(page)).toBeVisible();
+    expect(await contrasteSobreFondoReal(avisoPienso(page)), 'aviso del pienso').toBeGreaterThanOrEqual(4.5);
   });
 });
