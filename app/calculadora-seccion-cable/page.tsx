@@ -10,23 +10,30 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
+import DataReference from '@/components/DataReference';
 import { formatNumber } from '@/lib';
+import {
+  INTENSIDADES_ITC_BT_19_META,
+  METODOS_ITC_BT_19,
+  type Aislamiento,
+  type MetodoInstalacion,
+} from '@/data/rebt-intensidades-admisibles';
+import {
+  calcularLinea,
+  conductoresDeSistema,
+  metodosDisponibles,
+  SECCIONES_NORMALIZADAS,
+  TEMPERATURA_SERVICIO,
+  type EntradaCarga,
+  type MaterialId,
+  type Modo,
+  type Sistema,
+} from './motor';
 import styles from './CalculadoraSeccionCable.module.css';
 
 // ============================================================
 // Tipos
 // ============================================================
-type Modo = 'seccion' | 'caida';
-type Sistema = 'monofasico' | 'trifasico';
-type EntradaCarga = 'potencia' | 'corriente';
-
-interface Material {
-  id: string;
-  nombre: string;
-  /** Conductividad en m/(Ω·mm²) por temperatura de servicio */
-  conductividad: Record<number, number>;
-}
-
 interface LimiteCaida {
   id: string;
   nombre: string;
@@ -34,51 +41,22 @@ interface LimiteCaida {
   detalle: string;
 }
 
-interface Resultado {
-  corriente: number; // A
-  caidaAdmisibleV: number; // V
-  seccionTeorica: number; // mm²
-  seccionNormalizada: number | null; // mm²
-  seccionUsada: number; // mm² — la que se emplea para el resto de resultados
-  caidaV: number; // V
-  caidaPorcentaje: number; // %
-  tensionReceptor: number; // V
-  densidadCorriente: number; // A/mm²
-  resistenciaLinea: number; // Ω (un conductor)
-  perdidas: number; // W
-  cumple: boolean;
-  fueraDeRango: boolean;
-}
-
 // ============================================================
-// Datos técnicos
-// La conductividad cae al calentarse el metal: usar la de la
-// temperatura de servicio y no la de 20 °C es lo que separa un
-// cálculo realista de uno optimista.
+// Datos técnicos — el cálculo vive en motor.ts y la tabla de
+// intensidades admisibles en data/rebt-intensidades-admisibles.ts
 // ============================================================
-const MATERIALES: Material[] = [
-  {
-    id: 'cobre',
-    nombre: 'Cobre',
-    conductividad: { 20: 56, 70: 48, 90: 44 },
-  },
-  {
-    id: 'aluminio',
-    nombre: 'Aluminio',
-    conductividad: { 20: 35, 70: 30, 90: 28 },
-  },
+const MATERIALES: { id: MaterialId; nombre: string }[] = [
+  { id: 'cobre', nombre: 'Cobre' },
+  { id: 'aluminio', nombre: 'Aluminio' },
 ];
 
-const TEMPERATURAS = [
-  { valor: 20, etiqueta: '20 °C', detalle: 'Referencia de tablas' },
-  { valor: 70, etiqueta: '70 °C', detalle: 'Servicio en PVC' },
-  { valor: 90, etiqueta: '90 °C', detalle: 'Servicio en XLPE o EPR' },
+const AISLAMIENTOS: { id: Aislamiento; nombre: string }[] = [
+  { id: 'PVC', nombre: 'PVC' },
+  { id: 'XLPE', nombre: 'XLPE o EPR' },
 ];
 
-// Secciones comerciales normalizadas para conductores de baja tensión
-const SECCIONES_NORMALIZADAS = [
-  1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120, 150, 185, 240, 300, 400,
-];
+// Secciones e intensidades de tabla sin decimales forzados: «10 mm²», «50 A», pero «2,5 mm²»
+const fmtValor = (v: number) => formatNumber(v, Number.isInteger(v) ? 0 : 1);
 
 const LIMITES: LimiteCaida[] = [
   { id: 'alumbrado', nombre: 'Alumbrado', porcentaje: 3, detalle: 'Circuitos de alumbrado en instalación interior' },
@@ -96,16 +74,20 @@ export default function CalculadoraSeccionCable() {
   const [corrienteManual, setCorrienteManual] = useState(16);
   const [cosPhi, setCosPhi] = useState(1);
   const [longitud, setLongitud] = useState(25);
-  const [materialId, setMaterialId] = useState('cobre');
-  const [temperatura, setTemperatura] = useState(70);
+  const [materialId, setMaterialId] = useState<MaterialId>('cobre');
+  const [aislamiento, setAislamiento] = useState<Aislamiento>('PVC');
+  const [metodoId, setMetodoId] = useState<MetodoInstalacion>('B');
   const [limiteId, setLimiteId] = useState('fuerza');
   const [limitePersonalizado, setLimitePersonalizado] = useState(5);
   const [seccionElegida, setSeccionElegida] = useState(2.5);
 
-  const material = useMemo(
-    () => MATERIALES.find((m) => m.id === materialId) ?? MATERIALES[0],
-    [materialId],
+  // F y G solo existen en la tabla con 3 conductores cargados: en monofásico se ocultan
+  const metodos = useMemo(
+    () => metodosDisponibles(aislamiento, conductoresDeSistema(sistema)),
+    [aislamiento, sistema],
   );
+  const metodo = metodos.includes(metodoId) ? metodoId : 'B';
+  const metodoTabla = METODOS_ITC_BT_19.find((m) => m.id === metodo);
 
   const limite = useMemo(() => {
     const encontrado = LIMITES.find((l) => l.id === limiteId) ?? LIMITES[1];
@@ -116,81 +98,117 @@ export default function CalculadoraSeccionCable() {
   }, [limiteId, limitePersonalizado]);
 
   // ── Cálculo eléctrico ───────────────────────────────────
-  const resultado: Resultado = useMemo(() => {
-    const gamma = material.conductividad[temperatura] ?? material.conductividad[70];
-    const V = Math.max(tension, 1);
-    const L = Math.max(longitud, 0.1);
-    const fp = Math.min(Math.max(cosPhi, 0.1), 1);
-    const esMono = sistema === 'monofasico';
-
-    // Corriente de cálculo
-    const corriente =
-      entradaCarga === 'corriente'
-        ? Math.max(corrienteManual, 0.01)
-        : esMono
-          ? Math.max(potencia, 1) / (V * fp)
-          : Math.max(potencia, 1) / (Math.sqrt(3) * V * fp);
-
-    // Caída admisible en voltios a partir del porcentaje
-    const porcentajeLimite = Math.min(Math.max(limite.porcentaje, 0.1), 20);
-    const caidaAdmisibleV = (porcentajeLimite / 100) * V;
-
-    // Sección mínima por caída de tensión
-    // Monofásico: la corriente recorre ida y vuelta → factor 2
-    // Trifásico equilibrado: factor √3
-    const factor = esMono ? 2 : Math.sqrt(3);
-    const seccionTeorica = (factor * L * corriente * fp) / (gamma * caidaAdmisibleV);
-
-    const seccionNormalizada =
-      SECCIONES_NORMALIZADAS.find((s) => s >= seccionTeorica) ?? null;
-
-    // En modo "caída" manda la sección que elige el usuario
-    const seccionUsada =
-      modo === 'caida' ? seccionElegida : (seccionNormalizada ?? seccionTeorica);
-
-    const caidaV = (factor * L * corriente * fp) / (gamma * seccionUsada);
-    const caidaPorcentaje = (caidaV / V) * 100;
-
-    // Resistencia de UN conductor y pérdidas por efecto Joule
-    const resistenciaLinea = L / (gamma * seccionUsada);
-    const perdidas = esMono
-      ? 2 * corriente * corriente * resistenciaLinea
-      : 3 * corriente * corriente * resistenciaLinea;
-
-    return {
-      corriente,
-      caidaAdmisibleV,
-      seccionTeorica,
-      seccionNormalizada,
-      seccionUsada,
-      caidaV,
-      caidaPorcentaje,
-      tensionReceptor: V - caidaV,
-      densidadCorriente: corriente / seccionUsada,
-      resistenciaLinea,
-      perdidas,
-      cumple: caidaPorcentaje <= porcentajeLimite,
-      fueraDeRango: seccionNormalizada === null,
-    };
-  }, [
-    material,
-    temperatura,
-    tension,
-    longitud,
-    cosPhi,
-    sistema,
-    entradaCarga,
-    corrienteManual,
-    potencia,
-    limite,
-    modo,
-    seccionElegida,
-  ]);
+  const resultado = useMemo(
+    () =>
+      calcularLinea({
+        modo,
+        sistema,
+        tension,
+        entradaCarga,
+        potencia,
+        corrienteManual,
+        cosPhi,
+        longitud,
+        material: materialId,
+        aislamiento,
+        metodo,
+        limitePorcentaje: limite.porcentaje,
+        seccionElegida,
+      }),
+    [
+      modo,
+      sistema,
+      tension,
+      entradaCarga,
+      potencia,
+      corrienteManual,
+      cosPhi,
+      longitud,
+      materialId,
+      aislamiento,
+      metodo,
+      limite,
+      seccionElegida,
+    ],
+  );
 
   const handleSistema = (nuevo: Sistema) => {
     setSistema(nuevo);
     setTension(nuevo === 'monofasico' ? 230 : 400);
   };
+
+  // ── Veredicto ───────────────────────────────────────────
+  const { intensidad } = resultado;
+  const amperios = `${fmtValor(resultado.corriente)} A`;
+  const instalacion = `método ${metodo} con aislamiento ${aislamiento === 'PVC' ? 'de PVC' : 'XLPE o EPR'}`;
+  const textoSinTabla =
+    intensidad.estado === 'sin-tabla'
+      ? intensidad.motivo === 'aluminio'
+        ? 'La tabla de intensidades admisibles del REBT (ITC-BT-19, Tabla 1) solo recoge conductores de cobre, así que falta comprobar que el aluminio no se calienta con esa corriente: consulta la UNE 20460-5-523.'
+        : intensidad.motivo === 'metodo'
+          ? 'La tabla de intensidades admisibles no recoge esta combinación de método, aislamiento y número de conductores.'
+          : `Con ${amperios} ninguna sección de la tabla aguanta la corriente con el ${instalacion} (el máximo es ${formatNumber(intensidad.izMaxima ?? 0, 0)} A). Hay que repartir la carga en varias líneas o cambiar el método de instalación.`
+      : '';
+
+  let veredictoTitulo: string;
+  let veredictoDetalle: string;
+  let veredictoTono: 'ok' | 'aviso' | 'error';
+  if (modo === 'seccion') {
+    if (resultado.seccionPorCaida === null) {
+      veredictoTono = 'error';
+      veredictoTitulo = 'La sección necesaria supera las secciones comerciales habituales';
+      veredictoDetalle = `La caída de tensión pide ${formatNumber(resultado.seccionTeorica, 1)} mm². Conviene reducir la longitud, subir la tensión o repartir la carga en varias líneas.`;
+    } else if (resultado.seccionRecomendada !== null && intensidad.estado === 'ok') {
+      const caida = formatNumber(resultado.caidaPorcentaje, 2);
+      veredictoTono = 'ok';
+      veredictoTitulo = `Sección recomendada: ${fmtValor(resultado.seccionRecomendada)} mm²`;
+      veredictoDetalle =
+        resultado.criterioDominante === 'intensidad'
+          ? `Por caída de tensión bastarían ${fmtValor(resultado.seccionPorCaida)} mm², pero con ${amperios} el cable se calentaría: con el ${instalacion}, la primera sección que admite esa corriente es ${fmtValor(intensidad.seccion)} mm² (${fmtValor(intensidad.iz)} A). La caída queda en el ${caida} %.`
+          : resultado.criterioDominante === 'caida'
+            ? `Por calentamiento bastarían ${fmtValor(intensidad.seccion)} mm² (admiten ${fmtValor(intensidad.iz)} A), pero la caída de tensión pide ${fmtValor(resultado.seccionRecomendada)} mm²: el cálculo teórico da ${formatNumber(resultado.seccionTeorica, 2)} mm² y con la sección comercial la caída queda en el ${caida} %.`
+            : `Los dos criterios piden la misma sección: admite ${fmtValor(intensidad.iz)} A con el ${instalacion} y la caída queda en el ${caida} %.`;
+    } else if (intensidad.estado === 'sin-tabla' && intensidad.motivo === 'excede') {
+      veredictoTono = 'error';
+      veredictoTitulo = 'La corriente supera la tabla de intensidades admisibles';
+      veredictoDetalle = textoSinTabla;
+    } else {
+      veredictoTono = 'aviso';
+      veredictoTitulo = `Sección por caída de tensión: ${fmtValor(resultado.seccionPorCaida)} mm²`;
+      veredictoDetalle = `No es una sección recomendada: solo cubre la caída de tensión. ${textoSinTabla}`;
+    }
+  } else {
+    const seccion = `${fmtValor(resultado.seccionUsada)} mm²`;
+    const caidaTexto = `pierde ${formatNumber(resultado.caidaV, 2)} V y al receptor le llegan ${formatNumber(resultado.tensionReceptor, 1)} V`;
+    if (resultado.cumpleIntensidad === false) {
+      veredictoTono = 'error';
+      veredictoTitulo = `${seccion} no aguanta ${amperios}: el cable se calienta`;
+      veredictoDetalle =
+        intensidad.estado === 'ok'
+          ? resultado.izSeccionUsada !== null
+            ? `Con el ${instalacion}, ${seccion} admite ${fmtValor(resultado.izSeccionUsada)} A. La sección mínima para esa corriente es ${fmtValor(intensidad.seccion)} mm² (${fmtValor(intensidad.iz)} A).`
+            : `La tabla no da valor para ${seccion} con el ${instalacion}: empieza en ${fmtValor(intensidad.seccion)} mm², que admite ${fmtValor(intensidad.iz)} A.`
+          : textoSinTabla;
+    } else if (!resultado.cumpleCaida) {
+      veredictoTono = 'error';
+      veredictoTitulo = `Caída del ${formatNumber(resultado.caidaPorcentaje, 2)} %: supera el ${formatNumber(limite.porcentaje, 1)} % admisible`;
+      veredictoDetalle = `Con ${seccion} la línea ${caidaTexto}.`;
+    } else if (resultado.cumpleIntensidad === null) {
+      veredictoTono = 'aviso';
+      veredictoTitulo = `Caída del ${formatNumber(resultado.caidaPorcentaje, 2)} %: dentro del límite`;
+      veredictoDetalle = `Con ${seccion} la línea ${caidaTexto}. ${textoSinTabla}`;
+    } else {
+      veredictoTono = 'ok';
+      veredictoTitulo = `Caída del ${formatNumber(resultado.caidaPorcentaje, 2)} % y ${fmtValor(resultado.izSeccionUsada ?? 0)} A admisibles: la sección cumple`;
+      veredictoDetalle = `Con ${seccion} la línea ${caidaTexto}, y el cable admite ${fmtValor(resultado.izSeccionUsada ?? 0)} A con el ${instalacion} frente a los ${amperios} que circulan.`;
+    }
+  }
+  const claseVeredicto =
+    veredictoTono === 'ok'
+      ? styles.veredictoOk
+      : veredictoTono === 'aviso'
+        ? styles.veredictoAviso
+        : styles.veredictoError;
 
   return (
     <div className={styles.container}>
@@ -206,42 +224,38 @@ export default function CalculadoraSeccionCable() {
       <main className={styles.main}>
         {/* Veredicto */}
         <section
-          className={`${styles.veredicto} ${resultado.cumple ? styles.veredictoOk : styles.veredictoError}`}
+          className={`${styles.veredicto} ${claseVeredicto}`}
           role="status"
           aria-live="polite"
         >
-          <strong>
-            {modo === 'seccion'
-              ? resultado.fueraDeRango
-                ? 'La sección necesaria supera las secciones comerciales habituales'
-                : `Sección recomendada: ${formatNumber(resultado.seccionUsada, 1)} mm²`
-              : resultado.cumple
-                ? `Caída del ${formatNumber(resultado.caidaPorcentaje, 2)} %: dentro del límite`
-                : `Caída del ${formatNumber(resultado.caidaPorcentaje, 2)} %: supera el ${formatNumber(limite.porcentaje, 1)} % admisible`}
-          </strong>
-          <span>
-            {modo === 'seccion'
-              ? resultado.fueraDeRango
-                ? `El cálculo pide ${formatNumber(resultado.seccionTeorica, 1)} mm². Conviene reducir la longitud, subir la tensión o repartir la carga en varias líneas.`
-                : `El cálculo teórico pide ${formatNumber(resultado.seccionTeorica, 2)} mm² y la primera sección comercial que lo cubre es ${formatNumber(resultado.seccionUsada, 1)} mm², con una caída del ${formatNumber(resultado.caidaPorcentaje, 2)} %.`
-              : `Con ${formatNumber(resultado.seccionUsada, 1)} mm² la línea pierde ${formatNumber(resultado.caidaV, 2)} V y al receptor le llegan ${formatNumber(resultado.tensionReceptor, 1)} V.`}
-          </span>
+          <strong>{veredictoTitulo}</strong>
+          <span>{veredictoDetalle}</span>
         </section>
 
         <DisclaimerCard variant="technical" severity="critical" collapsible={false}>
           <p>
-            Esta calculadora resuelve <strong>únicamente el criterio de caída de tensión</strong>. La
-            sección definitiva de una instalación es la mayor de tres comprobaciones: caída de
-            tensión, <strong>intensidad máxima admisible</strong> del conductor según su método de
-            instalación, agrupamiento y temperatura ambiente, y resistencia al cortocircuito. Las dos
-            últimas dependen de tablas normativas que hay que consultar en el reglamento aplicable.
+            La sección recomendada es la mayor de dos comprobaciones: la <strong>caída de
+            tensión</strong> y la <strong>intensidad máxima admisible</strong> del conductor de cobre
+            según la Tabla 1 de la ITC-BT-19, que vale para <strong>un solo circuito al aire a
+            40 °C</strong>. Si varios circuitos comparten tubo o bandeja, o el cable va enterrado o a
+            otra temperatura, la intensidad admisible baja y hay que aplicar los factores de
+            corrección de la UNE 20460-5-523. Tampoco se comprueba la resistencia al cortocircuito ni
+            la coordinación con la protección (la corriente del magnetotérmico no debe superar la
+            admisible del cable).
           </p>
           <p>
             El resultado es orientativo y no sustituye al proyecto o memoria técnica de un instalador
-            autorizado. Los porcentajes de caída propuestos corresponden al REBT español; en otros
-            países los fija su propia normativa.
+            autorizado. La tabla y los porcentajes de caída propuestos corresponden al REBT español;
+            en otros países los fija su propia normativa.
           </p>
         </DisclaimerCard>
+        <DataReference
+          normativa="REBT, ITC-BT-19 (Tabla 1)"
+          fuente={INTENSIDADES_ITC_BT_19_META.fuente}
+          verificado={INTENSIDADES_ITC_BT_19_META.verificado}
+          urlOficial={INTENSIDADES_ITC_BT_19_META.urlOficial}
+          nota={INTENSIDADES_ITC_BT_19_META.nota}
+        />
 
         {/* Modo de cálculo */}
         <section className={styles.panel}>
@@ -444,31 +458,64 @@ export default function CalculadoraSeccionCable() {
                 ))}
               </div>
               <span className={styles.inputHint}>
-                Conductividad aplicada: {formatNumber(material.conductividad[temperatura] ?? 0, 0)}{' '}
-                m/(Ω·mm²)
+                Conductividad aplicada: {formatNumber(resultado.gamma, 0)} m/(Ω·mm²)
               </span>
             </div>
 
             <div className={styles.inputGroup}>
-              <span className={styles.grupoEtiqueta}>Temperatura de servicio</span>
+              <span className={styles.grupoEtiqueta}>Aislamiento</span>
               <div className={styles.botonera}>
-                {TEMPERATURAS.map((t) => (
+                {AISLAMIENTOS.map((a) => (
                   <button
-                    key={t.valor}
+                    key={a.id}
                     type="button"
-                    className={`${styles.chip} ${temperatura === t.valor ? styles.chipActivo : ''}`}
-                    aria-pressed={temperatura === t.valor}
-                    onClick={() => setTemperatura(t.valor)}
+                    className={`${styles.chip} ${aislamiento === a.id ? styles.chipActivo : ''}`}
+                    aria-pressed={aislamiento === a.id}
+                    onClick={() => setAislamiento(a.id)}
                   >
-                    {t.etiqueta}
+                    {a.nombre}
                   </button>
                 ))}
               </div>
               <span className={styles.inputHint}>
-                {TEMPERATURAS.find((t) => t.valor === temperatura)?.detalle}
+                Trabaja hasta {formatNumber(TEMPERATURA_SERVICIO[aislamiento], 0)} °C: la caída se
+                calcula con la conductividad a esa temperatura.
               </span>
             </div>
           </div>
+        </section>
+
+        {/* Instalación */}
+        <section className={styles.panel}>
+          <h2 className={styles.panelTitle}>Cómo va instalado el cable</h2>
+          <div className={styles.botoneraGrupo}>
+            <span className={styles.grupoEtiqueta}>Método de instalación (ITC-BT-19)</span>
+            <div className={styles.botonera}>
+              {metodos.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  className={`${styles.chip} ${metodo === id ? styles.chipActivo : ''}`}
+                  aria-pressed={metodo === id}
+                  onClick={() => setMetodoId(id)}
+                >
+                  {id}
+                </button>
+              ))}
+            </div>
+            <span className={styles.inputHint}>
+              {metodoTabla?.descripcion}. Con {resultado.conductoresCargados} conductores cargados
+              ({sistema === 'monofasico' ? 'fase y neutro' : 'tres fases'}).
+              {sistema === 'monofasico' &&
+                ' Los métodos F y G solo aparecen en la tabla para líneas trifásicas.'}
+            </span>
+          </div>
+          <p className={styles.resultNota}>
+            Conductores sueltos en tubo empotrado en ladrillo o yeso, o en tubo o canaleta por
+            encima de la pared, son el método B. Si la pared lleva aislamiento térmico (un tabique
+            de placa con lana mineral, por ejemplo), es el A: el calor sale peor y el cable admite
+            menos corriente.
+          </p>
         </section>
 
         {/* Criterio */}
@@ -489,7 +536,7 @@ export default function CalculadoraSeccionCable() {
                     aria-pressed={seccionElegida === s}
                     onClick={() => setSeccionElegida(s)}
                   >
-                    {formatNumber(s, 1)} mm²
+                    {fmtValor(s)} mm²
                   </button>
                 ))}
               </div>
@@ -549,17 +596,37 @@ export default function CalculadoraSeccionCable() {
                 <span className={styles.resultValue}>{formatNumber(resultado.corriente, 2)} A</span>
               </div>
               <div className={styles.resultRow}>
-                <span className={styles.resultLabel}>Sección teórica mínima</span>
+                <span className={styles.resultLabel}>Sección teórica por caída</span>
                 <span className={styles.resultValue}>
                   {formatNumber(resultado.seccionTeorica, 2)} mm²
                 </span>
               </div>
               <div className={styles.resultRow}>
+                <span className={styles.resultLabel}>Mínima por intensidad admisible</span>
+                <span className={styles.resultValue}>
+                  {intensidad.estado === 'ok'
+                    ? `${fmtValor(intensidad.seccion)} mm²`
+                    : 'Sin tabla'}
+                </span>
+              </div>
+              <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>
-                  {modo === 'seccion' ? 'Sección normalizada' : 'Sección instalada'}
+                  {modo === 'caida'
+                    ? 'Sección instalada'
+                    : resultado.seccionRecomendada !== null
+                      ? 'Sección recomendada'
+                      : 'Sección por caída (normalizada)'}
                 </span>
                 <span className={styles.resultValueAccent}>
-                  {formatNumber(resultado.seccionUsada, 1)} mm²
+                  {fmtValor(resultado.seccionUsada)} mm²
+                </span>
+              </div>
+              <div className={styles.resultRow}>
+                <span className={styles.resultLabel}>Intensidad admisible de esa sección</span>
+                <span className={styles.resultValue}>
+                  {resultado.izSeccionUsada !== null
+                    ? `${fmtValor(resultado.izSeccionUsada)} A`
+                    : 'Sin tabla'}
                 </span>
               </div>
               <div className={styles.resultRow}>
@@ -740,8 +807,8 @@ export default function CalculadoraSeccionCable() {
               <h4>Tramo corto con mucha carga</h4>
               <p>
                 Pocos metros y decenas de amperios. Aquí la caída sale ridícula y el criterio que
-                decide es el térmico: la intensidad máxima admisible del conductor, que esta
-                calculadora no cubre.
+                decide es el térmico: 40 A en 5 metros apenas pierden tensión con 1,5 mm², pero ese
+                cable admite unos 15 A en tubo empotrado y se calentaría. Hacen falta 10 mm² con PVC.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -801,7 +868,8 @@ export default function CalculadoraSeccionCable() {
                 Las fórmulas y las conductividades son universales, porque son física. Lo que cambia
                 de un país a otro son los porcentajes de caída admisible, las tensiones normalizadas
                 y las tablas de intensidad máxima. Usa el modo personalizado para introducir el
-                criterio que aplique en tu país.
+                criterio de caída que aplique en tu país, y contrasta la intensidad admisible con su
+                tabla: la de aquí es la del REBT español.
               </p>
             </div>
           </div>
@@ -841,8 +909,10 @@ export default function CalculadoraSeccionCable() {
               <div className={styles.stepContent}>
                 <strong>Comprueba el criterio térmico y el cortocircuito</strong>
                 <p>
-                  Contrasta la sección obtenida con la tabla de intensidad admisible del reglamento
-                  para tu método de instalación. La sección final es la mayor de todas.
+                  La calculadora contrasta la sección con la tabla de intensidad admisible de la
+                  ITC-BT-19 para tu método de instalación. Si hay varios circuitos juntos, aplica
+                  además el factor de agrupamiento, y comprueba el cortocircuito. La sección final es
+                  la mayor de todas.
                 </p>
               </div>
             </div>
@@ -887,8 +957,9 @@ export default function CalculadoraSeccionCable() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                Quedarse solo con la caída de tensión. La sección definitiva es la mayor entre este
-                criterio, el térmico y el de cortocircuito.
+                Quedarse solo con la caída de tensión. En un tramo corto sale una sección diminuta
+                que se calentaría: la definitiva es la mayor entre este criterio, el térmico y el de
+                cortocircuito.
               </li>
               <li>
                 Introducir la longitud de ida y vuelta. La fórmula monofásica ya incluye el factor 2.

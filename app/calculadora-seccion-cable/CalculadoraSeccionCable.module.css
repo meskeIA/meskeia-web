@@ -63,6 +63,13 @@
   color: #991b1b;
 }
 
+/* Solo una parte del cálculo se ha podido comprobar (aluminio, combinación fuera de tabla) */
+.veredictoAviso {
+  background: #fffbeb;
+  border-color: #d97706;
+  color: #92400e;
+}
+
 /* Paneles */
 .panel {
   background: var(--bg-card);
@@ -535,6 +542,12 @@
   background: #3f1212;
   border-color: #dc2626;
   color: #fca5a5;
+}
+
+[data-theme='dark'] .veredictoAviso {
+  background: #3a2a05;
+  border-color: #d97706;
+  color: #fcd34d;
 }
 
 [data-theme='dark'] .modoBtn,

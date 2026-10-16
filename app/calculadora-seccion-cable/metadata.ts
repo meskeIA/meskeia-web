@@ -4,9 +4,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Sección de Cable y Caída de Tensión - Monofásico y Trifásico | meskeIA',
   description:
-    'Calcula la sección de cable necesaria en mm² y la caída de tensión de una línea eléctrica: monofásica o trifásica, cobre o aluminio, con la longitud, la potencia o la corriente y el porcentaje de caída admisible.',
+    'Calcula la sección de cable necesaria en mm² por caída de tensión y por intensidad admisible (ITC-BT-19) de una línea monofásica o trifásica, con la longitud, la potencia o la corriente y el método de instalación.',
   keywords:
-    'sección de cable, caída de tensión, calcular sección cable, mm2 cable, monofásico, trifásico, cobre, aluminio, conductividad, sección normalizada, pérdidas en el conductor, instalación eléctrica, densidad de corriente',
+    'sección de cable, caída de tensión, intensidad admisible, ITC-BT-19, calcular sección cable, mm2 cable, monofásico, trifásico, cobre, aluminio, conductividad, sección normalizada, pérdidas en el conductor, instalación eléctrica, densidad de corriente',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -35,14 +35,15 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Calculadora de Sección de Cable y Caída de Tensión',
   description:
-    'Calculadora de líneas eléctricas de baja tensión. Obtén la sección mínima de conductor en mm² para no superar una caída de tensión dada, o la caída que produce una sección concreta, en instalaciones monofásicas y trifásicas, con conductor de cobre o aluminio, indicando longitud, potencia o corriente, factor de potencia y temperatura de servicio. Devuelve además la sección normalizada, la tensión que llega al receptor, la densidad de corriente y las pérdidas por efecto Joule.',
+    'Calculadora de líneas eléctricas de baja tensión. Obtén la sección de conductor en mm² como la mayor de dos comprobaciones, la caída de tensión y la intensidad máxima admisible de la Tabla 1 de la ITC-BT-19 según el método de instalación y el aislamiento, o comprueba una sección concreta, en instalaciones monofásicas y trifásicas, indicando longitud, potencia o corriente y factor de potencia. Devuelve además la tensión que llega al receptor, la densidad de corriente y las pérdidas por efecto Joule.',
   url: 'https://meskeia.com/calculadora-seccion-cable/',
   category: 'UtilityApplication',
   features: [
-    'Sección mínima por caída de tensión y sección normalizada recomendada',
+    'Sección recomendada como la mayor entre caída de tensión e intensidad admisible',
+    'Intensidad admisible del cobre según la Tabla 1 de la ITC-BT-19 y el método de instalación',
     'Caída de tensión en voltios y en porcentaje para una sección dada',
     'Monofásico y trifásico con tensión configurable',
-    'Cobre y aluminio con la conductividad de la temperatura de servicio',
+    'Cobre y aluminio con la conductividad a la temperatura de servicio del aislamiento',
     'Entrada por potencia en vatios o por corriente en amperios',
     'Pérdidas por efecto Joule y densidad de corriente del conductor',
     'Límites de caída habituales: alumbrado, fuerza y derivación individual',
@@ -92,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Basta con calcular la sección por caída de tensión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. La sección definitiva es la mayor de las que resultan de tres comprobaciones: la caída de tensión, la intensidad máxima admisible del conductor según su método de instalación, agrupamiento y temperatura ambiente, y la resistencia al cortocircuito. Esta calculadora resuelve la primera, que es la que suele mandar en líneas largas; en tramos cortos con mucha corriente el criterio que manda es el térmico.',
+        text: 'No. La sección definitiva es la mayor de las que resultan de tres comprobaciones: la caída de tensión, la intensidad máxima admisible del conductor según su método de instalación, agrupamiento y temperatura ambiente, y la resistencia al cortocircuito. En líneas largas suele mandar la caída de tensión; en tramos cortos con mucha corriente manda el calentamiento: 40 A en 5 metros apenas pierden tensión con 1,5 mm², pero ese cable admite unos 15 A en tubo empotrado. Esta calculadora aplica las dos primeras, con la Tabla 1 de la ITC-BT-19 para el cobre.',
       },
     },
   ],
