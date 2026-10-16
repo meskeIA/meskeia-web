@@ -2772,6 +2772,54 @@ test.describe('Golden — calcularPensionIncapacidad (Capa 1 · LGSS arts. 194-2
     expect(pi.cuantiaEfectivaMensual).toBe(0);
   });
 
+  // Cabo C0121: la efectiva se elevaba SIEMPRE a la mínima con Math.max, sin prueba de rentas y
+  // sin el tope de la PNC (art. 59.4 LGSS, art. 9.5 RD 241/2026; TOPE_COMPLEMENTO_MINIMOS_2026).
+  test('C0121: IPA unipersonal de 200 € → contributiva 200; complemento topado en la PNC (628,80), no hasta 936,20', () => {
+    // BR = 22.400 / 112 = 200 €. Mínima IPA unipersonal = 936,20 → diferencia 736,20.
+    // Tope sin cónyuge = 8.803,20 / 14 = 628,80 → complemento 628,80 → con él, 828,80 €/mes.
+    const pi = calcularPensionIncapacidad({
+      gradoIncapacidad: 'absoluta', origenContingencia: 'comun', sumaBasesCotizacion: 22400, edad: 50,
+    });
+    expect(pi.cuantiaEfectivaMensual).toBeCloseTo(200, 2);
+    expect(pi.cuantiaAnual14Pagas).toBeCloseTo(2800, 2);
+    expect(pi.complementoMinimosMaximo).toBeCloseTo(628.80, 2);
+    expect(pi.cuantiaConComplementoMinimos).toBeCloseTo(828.80, 2);
+    expect(pi.limiteIngresosComplemento).toBe(9442);
+    expect(pi.advertencias.join(' ')).toContain('no contributiva');
+  });
+
+  test('C0121: IPA con cónyuge a cargo de 200 € → el tope (1.068,96) no muerde y llega a la mínima', () => {
+    // Mínima con cónyuge 1.256,60 → diferencia 1.056,60 < tope 14.965,44 / 14 = 1.068,96.
+    const pi = calcularPensionIncapacidad({
+      gradoIncapacidad: 'absoluta', origenContingencia: 'comun', sumaBasesCotizacion: 22400, edad: 50, tieneConyuge: true,
+    });
+    expect(pi.complementoMinimosMaximo).toBeCloseTo(1056.60, 2);
+    expect(pi.cuantiaConComplementoMinimos).toBeCloseTo(1256.60, 2);
+    expect(pi.limiteIngresosComplemento).toBe(11013);
+    expect(pi.advertencias.join(' ')).not.toContain('no contributiva');
+  });
+
+  test('C0121: gran incapacidad con complemento de tercera persona → sin tope de la PNC (art. 9.7 RD 241/2026)', () => {
+    // BR 200. Complemento GI = 45 % × 1.424,40 + 30 % × 1.200 = 640,98 + 360 = 1.000,98 → total 1.200,98.
+    // Mínima GI unipersonal 1.404,30 → diferencia 203,32, sin tope.
+    const pi = calcularPensionIncapacidad({
+      gradoIncapacidad: 'gran_invalidez', origenContingencia: 'comun', sumaBasesCotizacion: 22400, edad: 50,
+      ultimaBaseCotizacion: 1200,
+    });
+    expect(pi.cuantiaEfectivaMensual).toBeCloseTo(1200.98, 2);
+    expect(pi.complementoMinimosMaximo).toBeCloseTo(203.32, 2);
+    expect(pi.cuantiaConComplementoMinimos).toBeCloseTo(1404.30, 2);
+    expect(pi.explicacion).toContain('Gran incapacidad');
+  });
+
+  test('C0121: con la contributiva por encima de la mínima no hay complemento', () => {
+    const pi = calcularPensionIncapacidad({
+      gradoIncapacidad: 'total', origenContingencia: 'comun', sumaBasesCotizacion: 224000, edad: 50,
+    });
+    expect(pi.complementoMinimosMaximo).toBe(0);
+    expect(pi.cuantiaConComplementoMinimos).toBeCloseTo(pi.cuantiaEfectivaMensual, 2);
+  });
+
 });
 
 // ────────────────────────────────────────────────────────────────────────────

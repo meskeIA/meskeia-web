@@ -2733,23 +2733,25 @@ function crearServidorDelegum(): McpServer {
   // ── calcular_pension_incapacidad ─────────────────────────────────────────
   servidor.tool(
     'calcular_pension_incapacidad',
-    'Calcula la prestación por incapacidad permanente (parcial, total, absoluta o gran invalidez): base reguladora, ' +
-    'porcentaje aplicado, recargo por edad ≥55 años en la incapacidad total y complemento de gran invalidez. La IP ' +
-    'parcial se abona como indemnización a tanto alzado; el resto, como pensión mensual.',
+    'Calcula la prestación por incapacidad permanente (parcial, total, absoluta o gran incapacidad, la antigua gran invalidez): base reguladora, ' +
+    'porcentaje aplicado, recargo por edad ≥55 años en la incapacidad total y complemento de gran incapacidad. La IP ' +
+    'parcial se abona como indemnización a tanto alzado; el resto, como pensión mensual. Si la pensión no llega a la mínima, ' +
+    'da el complemento a mínimos máximo posible y el límite de ingresos que lo condiciona, sin sumarlo a la pensión.',
     {
-      grado_incapacidad: z.enum(['parcial', 'total', 'absoluta', 'gran_invalidez']).describe('Grado de incapacidad permanente declarado'),
+      // 'gran_invalidez' se conserva para quien ya llama con él; la Ley 2/2025 la rebautizó «gran incapacidad».
+      grado_incapacidad: z.enum(['parcial', 'total', 'absoluta', 'gran_incapacidad', 'gran_invalidez']).describe('Grado de incapacidad permanente declarado. "gran_incapacidad" y "gran_invalidez" son el mismo grado.'),
       origen_contingencia: z.enum(['comun', 'profesional']).describe('"comun" = enfermedad común o accidente no laboral. "profesional" = accidente de trabajo o enfermedad profesional.'),
       suma_bases_cotizacion: z.number().positive().describe('Suma de las bases de cotización del período de referencia (€). Comunes: últimas 112 mensualidades (8 años). Profesionales: últimas 12 mensualidades.'),
       edad: z.number().min(16).max(100).describe('Edad del beneficiario en años (relevante para el recargo del 20% en IP total con ≥55 años)'),
       tiene_conyuge: z.boolean().optional().describe('¿Tiene cónyuge a cargo? Afecta a la pensión mínima garantizada. Por defecto false.'),
-      ultima_base_cotizacion: z.number().positive().optional().describe('Última base de cotización mensual (€). Necesaria para el complemento de gran invalidez.'),
+      ultima_base_cotizacion: z.number().positive().optional().describe('Última base de cotización mensual (€). Necesaria para el complemento de gran incapacidad.'),
     },
     { title: 'Calcula la pensión de incapacidad permanente', readOnlyHint: true },
     async ({ grado_incapacidad, origen_contingencia, suma_bases_cotizacion, edad, tiene_conyuge, ultima_base_cotizacion }, extra) => {
       await registrarUsoDelegum('calcular_pension_incapacidad', getCaller(extra));
       try {
         const r = calcularPensionIncapacidad({
-          gradoIncapacidad: grado_incapacidad as GradoIncapacidad,
+          gradoIncapacidad: (grado_incapacidad === 'gran_incapacidad' ? 'gran_invalidez' : grado_incapacidad) as GradoIncapacidad,
           origenContingencia: origen_contingencia as OrigenContingencia,
           sumaBasesCotizacion: suma_bases_cotizacion,
           edad,
@@ -2757,7 +2759,7 @@ function crearServidorDelegum(): McpServer {
           ultimaBaseCotizacion: ultima_base_cotizacion,
         });
         const gradoDesc: Record<string, string> = {
-          parcial: 'IP Parcial', total: 'IP Total (IPT)', absoluta: 'IP Absoluta (IPA)', gran_invalidez: 'Gran Invalidez (GI)',
+          parcial: 'IP Parcial', total: 'IP Total (IPT)', absoluta: 'IP Absoluta (IPA)', gran_invalidez: 'Gran incapacidad',
         };
         const esParcial = r.gradoIncapacidad === 'parcial';
         const lineas = [
@@ -2768,9 +2770,11 @@ function crearServidorDelegum(): McpServer {
             ? `💰 **Indemnización a tanto alzado: ${fmt(r.indemnizacionTotalIPParcial ?? 0)} €**`
             : [
                 `📏 Porcentaje aplicado: **${r.porcentajeAplicado}%**${r.recargo55Anios ? ' (incluye recargo del 20% por edad ≥55)' : ''}`,
-                r.complementoGranInvalidez ? `➕ Complemento gran invalidez: ${fmt(r.complementoGranInvalidez)} €/mes` : '',
-                `🛡️ Pensión mínima garantizada: ${fmt(r.pensionMinimaGarantizada)} €/mes`,
-                `💰 **Pensión efectiva: ${fmt(r.cuantiaEfectivaMensual)} €/mes** (${fmt(r.cuantiaAnual14Pagas)} €/año, 14 pagas)`,
+                r.complementoGranInvalidez ? `➕ Complemento de gran incapacidad: ${fmt(r.complementoGranInvalidez)} €/mes` : '',
+                `💰 **Pensión contributiva: ${fmt(r.cuantiaEfectivaMensual)} €/mes** (${fmt(r.cuantiaAnual14Pagas)} €/año, 14 pagas)`,
+                r.complementoMinimosMaximo > 0
+                  ? `🛡️ Pensión mínima de su grado: ${fmt(r.pensionMinimaGarantizada)} €/mes. Complemento a mínimos: hasta ${fmt(r.complementoMinimosMaximo)} €/mes (${fmt(r.cuantiaConComplementoMinimos)} €/mes en total) SOLO si sus ingresos anuales no superan ${fmt(r.limiteIngresosComplemento)} €`
+                  : `🛡️ Pensión mínima de su grado: ${fmt(r.pensionMinimaGarantizada)} €/mes (la contributiva ya la alcanza)`,
               ].filter(l => l !== '').join('\n'),
           '',
           `ℹ️ ${r.explicacion}`,

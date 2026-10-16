@@ -12,7 +12,8 @@
  *     Prestación: 55% de la base reguladora (+ 20% si tiene ≥ 55 años y dificultad reempleo)
  *   - Absoluta (IPA): Imposibilidad de cualquier trabajo
  *     Prestación: 100% de la base reguladora
- *   - Gran Invalidez (GI): IPA + necesita asistencia de tercera persona
+ *   - Gran incapacidad (antes «gran invalidez», Ley 2/2025): IPA + necesita asistencia de
+ *     tercera persona. La clave interna sigue siendo `gran_invalidez`.
  *     Prestación: 100% BR + complemento (45% base mínima de cotización + 30% última
  *     base de cotización, con un mínimo del 45% de la pensión sin complemento)
  *
@@ -23,7 +24,7 @@
  *
  * Pensión mínima 2026: varía según grado, tramo de edad y situación familiar
  * (ver `PENSIONES_MINIMAS_2026` en `data/fiscal/pensiones.ts`, revalorizadas +2,8%).
- * Complemento de Gran Invalidez (art. 196.4 LGSS): 45% de la base mínima de
+ * Complemento de gran incapacidad (art. 196.4 LGSS): 45% de la base mínima de
  * cotización vigente (BASES_SS_2026.minima) + 30% de la última base de cotización
  * del trabajador, con un mínimo del 45% de la pensión sin complemento.
  *
@@ -34,7 +35,13 @@
  * Encadenable con: calcular_baja_medica, calcular_pension_publica, calcular_sueldo_neto
  */
 
-import { BASES_SS_2026, PENSIONES_MINIMAS_2026 } from '@/data/fiscal';
+import {
+  BASES_SS_2026,
+  PENSIONES_MINIMAS_2026,
+  COMPLEMENTO_MINIMOS_LIMITES_2026,
+  TOPE_COMPLEMENTO_MINIMOS_2026,
+} from '@/data/fiscal';
+import { formatCurrency } from '@/lib/formatters';
 
 // ─── Constantes ─────────────────────────────────────────────────────────────────
 
@@ -102,12 +109,25 @@ export interface ResultadoPensionIncapacidad {
   complementoGranInvalidez?: number;
   /** Cuantía bruta mensual total incluyendo complemento GI (€) */
   cuantiaBrutaTotalMensual: number;
-  /** Pensión mínima garantizada (€/mes) */
+  /** Pensión mínima de la tabla para ese grado (€/mes) */
   pensionMinimaGarantizada: number;
-  /** **Cuantía mensual efectiva (máximo de calculada y mínima) (€)** */
+  /**
+   * **Cuantía mensual de la pensión contributiva (€).** No incluye el complemento a mínimos:
+   * ese depende de los ingresos, que no se preguntan (cabo C0121).
+   */
   cuantiaEfectivaMensual: number;
-  /** Cuantía anual estimada (14 pagas) (€) */
+  /** Cuantía anual estimada (14 pagas) de la contributiva (€) */
   cuantiaAnual14Pagas: number;
+  /**
+   * Complemento a mínimos MÁXIMO que podría sumarse (€/mes): la diferencia hasta la mínima,
+   * topada por la PNC en la IPT y la IPA (art. 59.4 LGSS). Solo si los ingresos no superan
+   * `limiteIngresosComplemento`. 0 si la contributiva ya alcanza la mínima.
+   */
+  complementoMinimosMaximo: number;
+  /** Contributiva + complemento a mínimos máximo (€/mes): lo que cobraría con derecho al complemento */
+  cuantiaConComplementoMinimos: number;
+  /** Ingresos anuales máximos para tener derecho al complemento (€/año, art. 9.2 y 10.1.b RD 241/2026) */
+  limiteIngresosComplemento: number;
   /** Explicación del cálculo */
   explicacion: string;
   /** Advertencias */
@@ -157,6 +177,9 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
       pensionMinimaGarantizada: 0,
       cuantiaEfectivaMensual: 0,
       cuantiaAnual14Pagas: 0,
+      complementoMinimosMaximo: 0,
+      cuantiaConComplementoMinimos: 0,
+      limiteIngresosComplemento: 0,
       explicacion: `IP Parcial: indemnización única de ${indemnizacionTotal.toLocaleString('es-ES', { minimumFractionDigits: 2 })} € (24 × ${baseReguladora.toLocaleString('es-ES', { minimumFractionDigits: 2 })} € BR). No genera pensión mensual.`,
       advertencias,
       fuenteDatos: 'LGSS art. 196.1 — vigente 2026',
@@ -191,7 +214,7 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
     case 'gran_invalidez':
       porcentajeAplicado = 100;
       pensionMinimaGarantizada = pensionMinimaIncapacidad('gran_invalidez', tieneConyuge);
-      explicacion = `Gran Invalidez: 100% × ${baseReguladora.toLocaleString('es-ES', { minimumFractionDigits: 2 })} € BR + complemento tercera persona`;
+      explicacion = `Gran incapacidad: 100% × ${baseReguladora.toLocaleString('es-ES', { minimumFractionDigits: 2 })} € BR + complemento tercera persona`;
       break;
 
     default:
@@ -214,17 +237,49 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
     cuantiaBrutaTotalMensual = r(cuantiaBrutaMensual + complementoGranInvalidez);
   }
 
-  const cuantiaEfectivaMensual = Math.max(cuantiaBrutaTotalMensual, pensionMinimaGarantizada);
+  // Hasta el 16/10/2026 la cuantía efectiva era `Math.max(calculada, mínima)`: elevaba SIEMPRE
+  // al mínimo íntegro, sin la prueba de rentas del complemento (art. 59.1 LGSS) y sin su tope en
+  // la PNC para las pensiones causadas desde 2013 (art. 59.4 LGSS y art. 9.5 RD 241/2026), que
+  // en una IPA unipersonal de 200 € publicaba 936,20 € donde el máximo posible es 828,80 € (cabo
+  // C0121). Ahora la efectiva es la contributiva, y el complemento va aparte, como lo que PODRÍA
+  // sumarse si los ingresos no superan el límite.
+  const cuantiaEfectivaMensual = cuantiaBrutaTotalMensual;
   const cuantiaAnual14Pagas = r(cuantiaEfectivaMensual * 14);
 
+  const diferenciaHastaMinima = Math.max(0, r(pensionMinimaGarantizada - cuantiaBrutaTotalMensual));
+  // El tope no alcanza a la gran incapacidad que cobra el complemento de tercera persona (art.
+  // 9.7 RD 241/2026), que en este cálculo es siempre el caso.
+  const topeComplemento = p.gradoIncapacidad === 'gran_invalidez'
+    ? Infinity
+    : tieneConyuge ? TOPE_COMPLEMENTO_MINIMOS_2026.conConyugeMensual : TOPE_COMPLEMENTO_MINIMOS_2026.sinConyugeMensual;
+  const complementoMinimosMaximo = r(Math.min(diferenciaHastaMinima, topeComplemento));
+  const cuantiaConComplementoMinimos = r(cuantiaBrutaTotalMensual + complementoMinimosMaximo);
+  const limiteIngresosComplemento = tieneConyuge
+    ? COMPLEMENTO_MINIMOS_LIMITES_2026.conConyuge
+    : COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge;
+
+  if (complementoMinimosMaximo > 0) {
+    const topada = complementoMinimosMaximo < diferenciaHastaMinima;
+    advertencias.push(
+      `La pensión calculada no llega a la mínima (${formatCurrency(pensionMinimaGarantizada)}/mes). ` +
+      `El complemento a mínimos podría sumar hasta ${formatCurrency(complementoMinimosMaximo)}/mes ` +
+      `(${formatCurrency(cuantiaConComplementoMinimos)}/mes en total), pero solo si los ingresos anuales ` +
+      `—trabajo distinto de la pensión, capital, actividades y ganancias— no superan ` +
+      `${formatCurrency(limiteIngresosComplemento)}${tieneConyuge ? ' sumando los del cónyuge' : ''} ` +
+      `(art. 59 LGSS y RD 241/2026).` +
+      (topada
+        ? ` En las pensiones causadas desde 2013, el complemento no puede superar la pensión no contributiva (${formatCurrency(topeComplemento)}/mes), y por eso no llega a la mínima.`
+        : ''),
+    );
+  }
   advertencias.push('La base reguladora es orientativa. El INSS calcula la base con las cotizaciones reales de la TGSS. Consultar vida laboral.');
-  advertencias.push('Las pensiones de IP Absoluta y Gran Invalidez están exentas de IRPF (LIRPF art. 7.f). La IPT tributa salvo que se derive de accidente de trabajo o enfermedad profesional.');
+  advertencias.push('Las pensiones de incapacidad permanente absoluta y de gran incapacidad están exentas de IRPF (LIRPF art. 7.f). La IPT tributa salvo que se derive de accidente de trabajo o enfermedad profesional.');
   advertencias.push('La pensión de incapacidad es compatible con el trabajo, con limitaciones según el grado. Consultar con el INSS antes de reincorporarse.');
   if (p.gradoIncapacidad === 'total') {
     advertencias.push('La IPT puede complementarse con la prestación por desempleo si no se ha agotado. Verificar con el SEPE.');
   }
   if (p.gradoIncapacidad === 'gran_invalidez') {
-    advertencias.push(`Complemento de Gran Invalidez: ${PCT_COMPLEMENTO_GI_BASE_MINIMA}% de la base mínima de cotización 2026 (${BASES_SS_2026.minima.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €) + ${PCT_COMPLEMENTO_GI_BASE}% última base de cotización, con un mínimo del ${PCT_COMPLEMENTO_GI_MINIMO}% de la pensión sin complemento (art. 196.4 LGSS).`);
+    advertencias.push(`Complemento de gran incapacidad: ${PCT_COMPLEMENTO_GI_BASE_MINIMA}% de la base mínima de cotización 2026 (${BASES_SS_2026.minima.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €) + ${PCT_COMPLEMENTO_GI_BASE}% última base de cotización, con un mínimo del ${PCT_COMPLEMENTO_GI_MINIMO}% de la pensión sin complemento (art. 196.4 LGSS).`);
   }
 
   return {
@@ -239,6 +294,9 @@ export function calcularPensionIncapacidad(p: ParametrosPensionIncapacidad): Res
     pensionMinimaGarantizada,
     cuantiaEfectivaMensual: r(cuantiaEfectivaMensual),
     cuantiaAnual14Pagas,
+    complementoMinimosMaximo,
+    cuantiaConComplementoMinimos,
+    limiteIngresosComplemento,
     explicacion,
     advertencias,
     fuenteDatos: 'LGSS arts. 194-200 + base mínima de cotización 2026 (1.424,40 €/mes, Orden PJC/297/2026) + pensiones mínimas 2026 (+2,8% revalorización) — vigente 2026',
