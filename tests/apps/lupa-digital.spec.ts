@@ -1690,8 +1690,10 @@ test.describe('re-inspección 15/10/2026', () => {
           await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
           await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
         }
-        await boton.tap();
-        // El toque deja el botón en :hover (lo que pinta el rojo); sin eso no se mide lo que se ve.
+        // En el móvil real el toque deja el botón en :hover (lo que pinta el rojo). La emulación
+        // táctil de Chromium no lo garantiza tras tap() (1 de cada 3 aislado, cabo C0263), así que
+        // se pone el puntero encima: el color medido es el mismo, el de la regla .btnReset:hover.
+        await boton.hover();
         await expect.poll(() => boton.evaluate((b) => b.matches(':hover'))).toBe(true);
         let previo = -1;
         let ratio = -1;
