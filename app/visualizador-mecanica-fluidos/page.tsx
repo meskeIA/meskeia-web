@@ -409,7 +409,7 @@ function SvgBernoulli({ anguloAtaque, modoRealidad }: { anguloAtaque: number; mo
       <rect x={8} y={8} width={modoRealidad ? 210 : 180} height={42} rx={8}
         fill={modoRealidad ? '#27ae60' : '#F4A261'} opacity={0.15} />
       <text x={16} y={24} fontSize={11} fill={modoRealidad ? '#27ae60' : '#F4A261'} fontWeight="700">
-        {modoRealidad ? '✅ Realidad: Bernoulli + Kutta-Joukowski' : '⚠️ Mito: Solo Bernoulli (incompleto)'}
+        {modoRealidad ? <><tspan aria-hidden="true">✅</tspan> Realidad: Bernoulli + Kutta-Joukowski</> : <><tspan aria-hidden="true">⚠️</tspan> Mito: Solo Bernoulli (incompleto)</>}
       </text>
       <text x={16} y={42} fontSize={10} fill="var(--text-secondary)">
         {modoRealidad
@@ -538,7 +538,7 @@ function SvgCavitacion({ presionLocal }: { presionLocal: number }) {
       <rect x={W - 195} y={8} width={187} height={44} rx={8}
         fill={cavita ? '#E84A5F' : '#2E86AB'} opacity={0.12} />
       <text x={W - 101} y={26} textAnchor="middle" fontSize={12} fill={cavita ? '#E84A5F' : '#2E86AB'} fontWeight="700">
-        {cavita ? `⚠️ Cavitación activa` : '✅ Sin cavitación'}
+        {cavita ? <><tspan aria-hidden="true">⚠️</tspan> Cavitación activa</> : <><tspan aria-hidden="true">✅</tspan> Sin cavitación</>}
       </text>
       <text x={W - 101} y={44} textAnchor="middle" fontSize={10} fill="var(--text-secondary)">
         P local = {presionLocal.toLocaleString('es-ES')} Pa · P vapor = {PRESION_VAPOR_AGUA.toLocaleString('es-ES')} Pa

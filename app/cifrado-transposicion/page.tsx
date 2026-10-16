@@ -552,7 +552,6 @@ export default function CifradoTransposicionPage() {
               type="button"
               className={styles.htmlToggleBtn}
               onClick={() => setHtmlExpanded(!htmlExpanded)}
-              aria-pressed={htmlExpanded}
               aria-expanded={htmlExpanded}
             >
               <span><span aria-hidden="true">{htmlExpanded ? '▲' : '▼'}</span> Exportar como código HTML</span>

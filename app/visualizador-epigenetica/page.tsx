@@ -257,7 +257,7 @@ const SeccionNucleosoma = () => {
             <rect x="10" y="240" width="380" height="28" rx="6" fill={esActivo ? 'rgba(72,169,166,0.12)' : 'rgba(231,76,60,0.1)'} />
             <text x="200" y="259" textAnchor="middle" fontSize="11" fontWeight="700"
               fill={esActivo ? '#2a7c79' : '#c0392b'}>
-              {esActivo ? '🔓 Cromatina abierta — Gen accesible para transcripción' : '🔒 Cromatina compacta — Gen inaccesible (silenciado)'}
+              {esActivo ? <><tspan aria-hidden="true">🔓</tspan> Cromatina abierta — Gen accesible para transcripción</> : <><tspan aria-hidden="true">🔒</tspan> Cromatina compacta — Gen inaccesible (silenciado)</>}
             </text>
           </svg>
         </div>

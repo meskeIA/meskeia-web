@@ -540,7 +540,7 @@ function SeccionConveccionNaturaleza() {
 
             {/* Labels */}
             <text x="200" y="180" fill={ej.color} fontSize="11" textAnchor="middle" fontWeight="700">
-              {ej.id === 'manto' ? '🔥 Calor del núcleo' : ej.id === 'oceanicas' ? '🌊 Agua densa se hunde' : '☀️ Suelo caliente'}
+              {ej.id === 'manto' ? <><tspan aria-hidden="true">🔥</tspan> Calor del núcleo</> : ej.id === 'oceanicas' ? <><tspan aria-hidden="true">🌊</tspan> Agua densa se hunde</> : <><tspan aria-hidden="true">☀️</tspan> Suelo caliente</>}
             </text>
             <text x="200" y="30" fill={ej.color} fontSize="10" textAnchor="middle" fontWeight="600">
               {ej.id === 'manto' ? 'Roca caliente sube' : ej.id === 'oceanicas' ? 'Agua caliente en superficie' : 'Aire caliente sube'}
