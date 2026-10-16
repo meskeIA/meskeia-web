@@ -10,6 +10,8 @@
  *
  *   1. Las preguntas: cada AskUserQuestion de nivel 3 lleva `metadata.source: "frontera:<tipo>"`.
  *      Se leen de las transcripciones de Claude Code (~/.claude/projects/*meskeia-web/*.jsonl).
+ *      Desde el 16/10/2026, también las planteadas EN EL TEXTO con su marca de decisión
+ *      (`frontera-texto.mjs`); en la serie salen igual que las del cuestionario.
  *   2. Las decisiones de nivel 2: línea final `Frontera: N2 <tipo> — <por qué>` en el commit.
  *      Los descensos, `Frontera: descenso <tipo> — <qué se corrigió>`. Un `git revert` de un
  *      commit N2 cuenta como corrección aunque nadie escriba la línea.
@@ -30,6 +32,7 @@ import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
+import { decisionesDeTexto } from './frontera-texto.mjs';
 
 const INICIO = '2026-10-05';          // día en que se acordó la frontera y empezó el etiquetado
 const UMBRAL_ASCENSO = 5;
@@ -73,10 +76,12 @@ function leerPreguntas() {
   for (const dir of directoriosDeTranscripciones()) {
     for (const f of readdirSync(dir).filter((x) => x.endsWith('.jsonl'))) {
       const pendientes = new Map();
+      const entradas = [];
       for (const linea of readFileSync(path.join(dir, f), 'utf8').split('\n')) {
         if (!linea.trim()) continue;
         let e;
         try { e = JSON.parse(linea); } catch { continue; }   // la última línea de una sesión viva puede llegar a medias
+        entradas.push(e);
         if (e.isSidechain || !e.message || !Array.isArray(e.message.content)) continue;
         for (const c of e.message.content) {
           if (e.type === 'assistant' && c.type === 'tool_use' && c.name === 'AskUserQuestion') {
@@ -95,6 +100,8 @@ function leerPreguntas() {
           }
         }
       }
+      // Las planteadas en el texto, con su marca «**Decisión** · `frontera:<tipo>` · recomiendo: …»
+      for (const d of decisionesDeTexto(entradas, DECIDE_TU)) preguntas.push({ ...d, tipo: SINONIMOS[d.tipo] || d.tipo });
     }
   }
   return preguntas.sort((a, b) => a.ts.localeCompare(b.ts));
