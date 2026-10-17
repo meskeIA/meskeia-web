@@ -3172,7 +3172,9 @@ test.describe('Inspector 16/10/2026 · escritorio', () => {
     expect(problemas).toEqual([]);
   });
 
-  test.fail('HALLAZGO (3313) — al volver con «Atrás» desde «Simular esta Cartera», o tras un F5, el resultado está en pantalla', async ({
+  // REPARADO (hallazgo 3323, 17/10/2026): tras recuperar, si la fase quedó por encima de la ventana,
+  // la vista vuelve a su principio.
+  test('3323 (regresión) — al volver con «Atrás» desde «Simular esta Cartera», o tras un F5, el resultado está en pantalla', async ({
     page,
   }) => {
     // 8ec810fe restaura el ESTADO (lo comprueba «REPARADO 3313», más arriba), pero la fase guardada se
@@ -3213,7 +3215,8 @@ test.describe('Inspector 16/10/2026 · escritorio', () => {
     expect(problemas).toEqual([]);
   });
 
-  test.fail('HALLAZGO — tras un F5 a mitad del test, el aviso de recuperado y «Pregunta 4 de 10» están en pantalla', async ({
+  // REPARADO (hallazgo 3324, 17/10/2026): misma causa y misma reparación que el 3323.
+  test('3324 (regresión) — tras un F5 a mitad del test, el aviso de recuperado y «Pregunta 4 de 10» están en pantalla', async ({
     page,
   }) => {
     // La recuperación (105, 1221) monta la pregunta y el aviso «Hemos recuperado el test que dejaste a
@@ -3414,7 +3417,8 @@ test.describe('Inspector 16/10/2026 · móvil 360×740', () => {
     expect(problemas).toEqual([]);
   });
 
-  test.fail('HALLAZGO (3313) — en móvil, «Atrás» desde «Simular esta Cartera» deja el resultado en pantalla', async ({
+  // REPARADO (hallazgo 3323, 17/10/2026)
+  test('3323 (regresión) — en móvil, «Atrás» desde «Simular esta Cartera» deja el resultado en pantalla', async ({
     page,
   }) => {
     // Medido a 360×740: «Simular esta Cartera» en scrollY 2354 → «Atrás» → scrollY 3962, en «Apps

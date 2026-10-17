@@ -489,11 +489,23 @@ export default function TestPerfilInversorPage() {
    * acaba de cargarse arriba del todo y robarle el foco sería un salto que nadie ha pedido.
    */
   const llevarVistaAFase = useRef(false);
+  /**
+   * ⚠️ 17/10/2026 (hallazgos 3323 y 3324) — lo de arriba («la página acaba de cargarse arriba del
+   * todo») no es verdad tras un «Atrás» o un F5: el navegador ya ha restaurado el desplazamiento
+   * sobre la PORTADA que sirve el servidor cuando este efecto monta la fase recuperada, y el anclaje
+   * de desplazamiento deja la vista tanto más abajo como mide la fase de más (a 360×740, 1.608 px:
+   * se aterrizaba en «Apps relacionadas» con el resultado entero por encima; tras un F5 a mitad, con
+   * el aviso de recuperado y el enunciado por encima). Tras recuperar, si el principio de la fase
+   * ha quedado POR ENCIMA de la ventana, la vista vuelve a él; si está a la vista o por debajo
+   * (una llegada normal, arriba del todo), no se mueve. El foco no se toca.
+   */
+  const corregirVistaTrasRecuperar = useRef(false);
 
   /** Recupera el test a medio hacer, o el resultado, tras un F5 o un «Atrás». Solo en el primer render del cliente. */
   useEffect(() => {
     const guardado = leerSesion();
     if (!guardado || Object.keys(guardado.answers).length === 0) return;
+    corregirVistaTrasRecuperar.current = true;
     setAnswers(guardado.answers);
     setCurrentQuestion(guardado.currentQuestion);
     if (guardado.fase === 'result') {
@@ -520,6 +532,40 @@ export default function TestPerfilInversorPage() {
     const [vista, foco] = destinos[phase];
     vista?.scrollIntoView({ block: 'start' });
     foco?.focus({ preventScroll: true });
+  }, [phase]);
+
+  /** Tras recuperar la sesión, devuelve la vista al principio de la fase si quedó por encima (3323, 3324). */
+  useEffect(() => {
+    if (!corregirVistaTrasRecuperar.current || phase === 'start') return;
+    corregirVistaTrasRecuperar.current = false;
+    const destino = phase === 'result' ? destinoResultado.current : destinoCuestionario.current;
+    if (!destino) return;
+    // En una recarga o un «Atrás» del documento entero, la fase recuperada es lo que se estaba
+    // mirando: si quedó en la mitad baja de la ventana o más abajo, también se trae (el navegador
+    // puede restaurar el desplazamiento DESPUÉS del montaje: medido en la suite, nombre del perfil
+    // a 827 px en una ventana de 800). En una llegada normal no se mueve nada que esté por debajo.
+    const navegacion = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    const volvio = navegacion?.type === 'reload' || navegacion?.type === 'back_forward';
+    const corregir = () => {
+      const margenArriba = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      const arriba = destino.getBoundingClientRect().top;
+      if (arriba < margenArriba - 1 || (volvio && arriba > window.innerHeight / 2)) {
+        destino.scrollIntoView({ block: 'start' });
+      }
+    };
+    // Dos fotogramas: el anclaje de desplazamiento ajusta la vista en el layout que sigue al montaje.
+    let segundo = 0;
+    const primero = requestAnimationFrame(() => {
+      segundo = requestAnimationFrame(corregir);
+    });
+    // Y otra vez al terminar la carga, por si el navegador restaura el desplazamiento entonces.
+    const alCargar = () => requestAnimationFrame(corregir);
+    if (document.readyState !== 'complete') window.addEventListener('load', alCargar, { once: true });
+    return () => {
+      cancelAnimationFrame(primero);
+      cancelAnimationFrame(segundo);
+      window.removeEventListener('load', alCargar);
+    };
   }, [phase]);
 
   /**
