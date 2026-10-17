@@ -1224,3 +1224,12 @@
     padding-top: 80px;
   }
 }
+
+/* Bajo stemum.com la barra fija lleva la píldora «Stemum › Química», que llega a x = 254: de 1024
+   a 1092 px tapaba el principio del h1 (35 px a 1024; cabo C0101, la forma del 2589 de
+   simulador-punnett). El hueco llega a 1119 px para dejar aire. Solo bajo Stemum. */
+@media (min-width: 1024px) and (max-width: 1119px) {
+  :global([data-brand='stemum']) .hero {
+    padding-top: 80px;
+  }
+}

@@ -886,3 +886,12 @@
     padding-top: 80px;
   }
 }
+
+/* Bajo stemum.com la barra fija lleva la píldora «Stemum › Matemáticas», que llega a x = 287: de
+   1024 a 1134 px tapaba el principio del h1 (56 px a 1024; cabo C0101, la forma del 2651 de
+   visualizador-volumenes). El hueco llega a 1159 px para dejar aire. Solo bajo Stemum. */
+@media (min-width: 1024px) and (max-width: 1159px) {
+  :global([data-brand='stemum']) .hero {
+    padding-top: 80px;
+  }
+}
