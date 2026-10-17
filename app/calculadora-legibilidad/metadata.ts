@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Calculadora de Legibilidad - Índices Flesch para Español | meskeIA',
+  title: 'Calculadora de Legibilidad INFLESZ y Flesch-Szigriszt | meskeIA',
   description: 'Analiza la legibilidad de tus textos en español con índices Flesch-Szigriszt, Fernández Huerta e INFLESZ. Descubre el nivel educativo de tu contenido.',
   keywords: 'legibilidad, flesch, szigriszt, fernandez huerta, inflesz, readability, texto, español, nivel lectura, seo',
   authors: [{ name: 'meskeIA' }],
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Calculadora de Legibilidad - Índices Flesch para Español',
+    title: 'Calculadora de Legibilidad INFLESZ y Flesch-Szigriszt',
     description: 'Analiza la legibilidad de tus textos con fórmulas adaptadas al español',
     url: 'https://meskeia.com/calculadora-legibilidad/',
     siteName: 'meskeIA',
