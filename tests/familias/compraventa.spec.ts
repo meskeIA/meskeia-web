@@ -507,7 +507,9 @@ const HERMANAS: readonly Hermana[] = [
       'VENDEDOR con perfil «Local afecto a actividad» (OBLIGATORIO para que exista el campo ' +
       'de amortizaciones): compra original 150.000 · gastos de aquella compra 15.000 · ' +
       'amortizaciones 20.000 · 10 años · catastral suelo 40.000 · catastral total 100.000 · ' +
-      'comisión 3 % · gestoría 500. Publica COSTE TOTAL 213.495,20 € y NETO 182.803,00 €. · ' +
+      // COSTE TOTAL con la rebaja del 5 % del arancel (17/10/2026, C0209): 200.000 + 12.000 +
+      // notaría 721,04 + registro 224,96 + 500. Decía 213.495,20, de antes de la rebaja.
+      'comisión 3 % · gestoría 500. Publica COSTE TOTAL 213.446,00 € y NETO 182.803,00 €. · ' +
       'BASE R = base + compra original 195.000 (gana el método real de la plusvalía, NETO 192.430,00).',
     pestanas: true,
     sinIva: {
@@ -681,7 +683,9 @@ const HERMANAS: readonly Hermana[] = [
     slug: 'simulador-gastos-compraventa-nave-industrial',
     casoBase:
       'Precio 500.000 · Madrid · segunda mano · gestoría 500. ITP 6,00 %. ' +
-      'Publica Total gastos adicionales 31.921,73 € y COSTE TOTAL 531.921,73 €.',
+      // Con la rebaja del 5 % del arancel (17/10/2026, C0209): 30.000 + notaría 1.022,78 +
+      // registro 328,41 + 500. Decía 31.921,73 y 531.921,73, de antes de la rebaja.
+      'Publica Total gastos adicionales 31.851,19 € y COSTE TOTAL 531.851,19 €.',
     pestanas: false,
     sinIva: {
       selectorTerritorio: '#select-ccaa',
@@ -718,7 +722,9 @@ const HERMANAS: readonly Hermana[] = [
     slug: 'simulador-gastos-compraventa-solar',
     casoBase:
       'Precio 120.000 · Madrid · vende un particular · gestoría 500. ITP 6,00 %. ' +
-      'Publica Total gastos adicionales 8.532,96 € y COSTE TOTAL 128.532,96 €.',
+      // Con la rebaja del 5 % del arancel (17/10/2026, C0209): 7.200 + notaría 610,14 +
+      // registro 181,72 + 500. Decía 8.532,96 y 128.532,96, de antes de la rebaja.
+      'Publica Total gastos adicionales 8.491,86 € y COSTE TOTAL 128.491,86 €.',
     pestanas: false,
     sinIva: { selectorTerritorio: '#select-ccaa', operaciones: [/Promotor \/ Empresa/] },
     cifraComprador: /^COSTE TOTAL/,
@@ -752,7 +758,9 @@ const HERMANAS: readonly Hermana[] = [
     slug: 'simulador-gastos-compraventa-terreno-rustico',
     casoBase:
       'Precio 80.000 · Madrid · operación ITP · gestoría 400. ITP 6,00 %. ' +
-      'Publica Total gastos adicionales 5.911,96 € y COSTE TOTAL 85.911,96 €.',
+      // Con la rebaja del 5 % del arancel (17/10/2026, C0209): 4.800 + notaría 529,68 +
+      // registro 147,24 + 400. Decía 5.911,96 y 85.911,96, de antes de la rebaja.
+      'Publica Total gastos adicionales 5.876,92 € y COSTE TOTAL 85.876,92 €.',
     pestanas: false,
     sinIva: { selectorTerritorio: '#select-ccaa', operaciones: [/Con renuncia a la exención/] },
     cifraComprador: /^COSTE TOTAL/,
@@ -793,7 +801,9 @@ const HERMANAS: readonly Hermana[] = [
       'BASE B — Madrid · vivienda · segunda mano · perfil General · precio 200.000 · gestoría ' +
       'del comprador 300. VENDEDOR: compra original 150.000 · 10 años · catastral suelo ' +
       '50.000 · catastral total VACÍO · comisión 3 % · vivienda habitual MARCADA · sin >65 y ' +
-      'sin reinversión. Publica COSTE TOTAL 213.295,20 € y NETO 184.090,00 €. · ' +
+      // COSTE TOTAL con la rebaja del 5 % del arancel (17/10/2026, C0209): 200.000 + 12.000 +
+      // notaría 721,04 + registro 224,96 + 300. Decía 213.295,20, de antes de la rebaja.
+      'sin reinversión. Publica COSTE TOTAL 213.246,00 € y NETO 184.090,00 €. · ' +
       'BASE A = B + reinvierte 193.000 (exento, NETO 193.000,00). · ' +
       "BASE A' = B + reinvierte 150.000 + hipoteca 2.000,50 (NETO 191.181,64). · " +
       'BASE C = B + catastral total 700.000 (método real, NETO 184.174,64). · ' +
