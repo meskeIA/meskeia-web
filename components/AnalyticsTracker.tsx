@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 
+import { clasificarReferrer } from '@/lib/clasificarReferrer';
 import { urlSinMarcaFrom } from '@/lib/trackingFrom';
 
 interface AnalyticsTrackerProps {
@@ -91,20 +92,13 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
     const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
                   navegador.standalone === true;
 
-    // Detectar si la visita viene referida desde una plataforma de IA
+    // Detectar si la visita viene referida desde una plataforma de IA o una red social.
+    // Por DOMINIO, no por la URL entera: corte de instrumentación del 17/10/2026
+    // (lib/clasificarReferrer.ts). El hostname es lo único que se guarda (RGPD).
     const referrer = document.referrer;
-    const esReferralIA = /chatgpt\.com|perplexity\.ai|claude\.ai|gemini\.google|copilot\.microsoft\.com|you\.com|phind\.com|poe\.com/i.test(referrer);
-    const esReferralSocial = /t\.co|x\.com|twitter\.com|instagram\.com|facebook\.com|linkedin\.com/i.test(referrer);
-
-    // Extraer solo el hostname del referrer (RGPD: solo dominio, nunca la URL completa)
-    let referrerHostname: string | null = null;
-    if ((esReferralIA || esReferralSocial) && referrer) {
-      try {
-        referrerHostname = new URL(referrer).hostname;
-      } catch {
-        // Si el referrer no es una URL válida, ignorar
-      }
-    }
+    const { canal: canalReferrer, dominio: referrerHostname } = clasificarReferrer(referrer);
+    const esReferralIA = canalReferrer === 'ia';
+    const esReferralSocial = canalReferrer === 'social';
 
     // Atribución cross-dominio entre los verticales propios (fallback estructural
     // al parámetro ?from=, que depende de cablearlo a mano en cada CTA). Guardamos

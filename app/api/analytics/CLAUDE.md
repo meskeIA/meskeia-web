@@ -63,6 +63,13 @@ Umbral canónico, alineado con el digest: **app activa = ≥5 usos/30d** (⚠️
   y lo dice.
 - **`home-search` — 07/08/2026** (commit `ebeb3aa1`): la home no se medía. Afecta al share de
   RelatedApps, no al absoluto.
+- **`referral-social` y `referral-ia` — 17/10/2026, efectivo desde el push de ese lote**
+  (`lib/clasificarReferrer.ts`): el canal se decidía buscando el patrón en la URL entera del
+  referrer, y `t\.co` encajaba en «qwan·t.co·m», «padle·t.co·m», «microsof·t.co·m»… En el
+  histórico, 102 de 318 visitas `referral-social` (Qwant, Padlet, Blogspot, Yandex, Teams,
+  propias) y 17 `referral-ia` desde meskeia.com. Desde el corte pasan a `web`. **Si el canal
+  social cae alrededor de un tercio, o el foso un poco, es esto.** Padlet deja de verse:
+  el canal de aula no se instrumenta por decisión previa (`project_canal_aula_stem`).
 
 ## Al tocar el dashboard o el rollup
 
