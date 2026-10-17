@@ -40,7 +40,7 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Predicción del peso adulto a partir del peso y edad actuales del cachorro',
     'Curvas de crecimiento específicas para 5 tamaños de raza (mini a gigante)',
-    'Rango de peso probable con margen de error del ±15%',
+    'Rango de peso probable con margen de error del ±15 %',
     'Tabla de referencia con más de 25 razas y su peso adulto típico',
     'Indicación de la edad de maduración esperada según el tamaño',
     'Filtros por categoría de tamaño en la tabla de razas',
@@ -78,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Cómo puedo saber cuánto pesará mi cachorro de adulto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La calculadora divide el peso actual entre el porcentaje de peso adulto que corresponde a esa edad y a ese tamaño de raza. Una raza grande a las 14 semanas ronda el 35 % de su peso adulto, así que 12 kg a esa edad proyectan unos 34,3 kg. Circulan reglas más rápidas, como multiplicar por 2 el peso de una raza mediana a las 16 semanas, que coincide con la curva en ese punto concreto pero pierde precisión fuera de él. En todos los casos son estimaciones: la genética individual y la alimentación influyen en el resultado final.',
+        text: 'La calculadora divide el peso actual entre el porcentaje de peso adulto que corresponde a esa edad y a ese tamaño de raza. Una raza grande a las 14 semanas ronda el 35 % de su peso adulto, así que 12 kg a esa edad proyectan unos 34,3 kg. Circulan reglas más rápidas, como multiplicar por 2 el peso de una raza mediana a las 16 semanas, que coincide con la curva en ese punto concreto pero pierde precisión fuera de él. En todos los casos son estimaciones: la genética individual y la alimentación influyen en el resultado final.',
       },
     },
     {

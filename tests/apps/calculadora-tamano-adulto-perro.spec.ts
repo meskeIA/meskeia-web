@@ -89,7 +89,8 @@ test.describe('Calculadora de tamaño adulto del perro', () => {
     await expect(rangoProbable(page)).toHaveText('15,5 - 20,9 kg');
 
     // pct × 100 = 55 · maduración fija de la categoría grande
-    await expect(detalle(page, 0)).toHaveText('55%');
+    // con espacio duro antes del % (RAE 2010; hallazgo 3333, que comprueba el carácter exacto)
+    await expect(detalle(page, 0)).toHaveText('55 %');
     await expect(detalle(page, 1)).toHaveText('18-24 meses');
 
     // Hito 12 meses = 51,96 semanas → interpola 40:0,78 y 52:0,88
@@ -124,7 +125,7 @@ test.describe('Calculadora de tamaño adulto del perro', () => {
     await expect(valorPrincipal(page)).toHaveText('53,3 kg');
     // ±15 %: 53,33333 × 0,85 = 45,33333 · × 1,15 = 61,33333
     await expect(rangoProbable(page)).toHaveText('45,3 - 61,3 kg');
-    await expect(detalle(page, 0)).toHaveText('15%');
+    await expect(detalle(page, 0)).toHaveText('15 %');
     await expect(detalle(page, 1)).toHaveText('24-36 meses');
     await expect(page.locator('p[role="alert"]')).toHaveCount(0);
 
@@ -159,7 +160,7 @@ test.describe('Calculadora de tamaño adulto del perro', () => {
     await page.getByRole('button', { name: 'Calcular Peso Adulto' }).click();
     await expect(valorPrincipal(page)).toHaveText('120,0 kg');
     await expect(rangoProbable(page)).toHaveText('102,0 - 138,0 kg');
-    await expect(detalle(page, 0)).toHaveText('100%');
+    await expect(detalle(page, 0)).toHaveText('100 %');
     await expect(page.locator('p[role="alert"]')).toHaveCount(0);
     // 120 > 90 (techo del gigante derivado) → el contraste avisa en vez de callar
     await expect(avisoCoherencia(page)).toContainText('queda por encima del peso adulto habitual');
@@ -663,13 +664,13 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
     await expect(racionNumero(page)).toHaveCount(0);
   });
 
-  test('HALLAZGO — el % va pegado a la cifra o con espacio normal, no con espacio duro (RAE 2010)', async ({
+  // REPARADO (hallazgo 3333): todos los % de la app y del JSON-LD llevan U+00A0 delante.
+  test('3333 (regresión) — el % va con espacio duro, ni pegado a la cifra ni con espacio normal (RAE 2010)', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     await calcular(page, { peso: '10', edad: '24', tamano: 'Grande' });
-    // «Crecimiento actual»: hoy «55%», pegado (el CASO 1 de arriba lo fija así y habrá que cambiarlo)
+    // «Crecimiento actual»: antes «55%», pegado
     expect(await detalle(page, 0).textContent()).toBe(`55${NBSP}%`);
     // tabla de hitos: hoy «88 %» con U+0020
     const celda = page
@@ -683,6 +684,12 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
     const guia = (await page.locator('[class*="guideSection"]').allTextContents()).join(' ');
     expect(guia.match(/\d%/g) ?? []).toEqual([]);
     expect(guia.match(/\d %/g) ?? []).toEqual([]);
+    // y lo que leen buscadores e IAs (features «±15%» y la FAQ 1, «el 35 %» con U+0020)
+    const jsonLd = (
+      await page.locator('script[type="application/ld+json"]').evaluateAll((els) => els.map((e) => e.textContent ?? ''))
+    ).join(' ');
+    expect(jsonLd.match(/\d%/g) ?? []).toEqual([]);
+    expect(jsonLd.match(/\d %/g) ?? []).toEqual([]);
   });
 
   // REPARADO (hallazgo 3329): la 4 se deriva ahora de rangosTipicos, como la 2.

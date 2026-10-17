@@ -389,7 +389,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <div className={styles.detallesGrid}>
                 <div className={styles.detalleCard}>
                   <span className={styles.detalleIcon} aria-hidden="true">📊</span>
-                  <span className={styles.detalleValor}>{textoPorcentajeCrecimiento(resultado.porcentajeCrecimiento / 100)}%</span>
+                  <span className={styles.detalleValor}>{textoPorcentajeCrecimiento(resultado.porcentajeCrecimiento / 100)}&nbsp;%</span>
                   <span className={styles.detalleLabel}>Crecimiento actual</span>
                 </div>
                 <div className={styles.detalleCard}>
@@ -435,7 +435,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           <p className={styles.curvaIntro}>
             Peso esperado de un perro de tamaño <strong>{etiquetasTamano[resultado.tamano].toLowerCase()}</strong> desde
             las {EDAD_MINIMA} semanas hasta que deja de crecer, partiendo de los {formatNumber(resultado.pesoAdultoEstimado, 1)} kg
-            adultos estimados. La banda alrededor de la línea es el mismo margen de ±15 % del rango probable.
+            adultos estimados. La banda alrededor de la línea es el mismo margen de ±15&nbsp;% del rango probable.
           </p>
 
           <div className={styles.graficoWrap}>
@@ -499,7 +499,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                   >
                     <title>
                       {formatNumber(h.meses, 0)} meses: {formatNumber(h.peso, 1)} kg (
-                      {textoPorcentajeCrecimiento(h.porcentaje)} % de su peso adulto)
+                      {textoPorcentajeCrecimiento(h.porcentaje)}&nbsp;% de su peso adulto)
                     </title>
                   </circle>
                   <text
@@ -549,7 +549,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                   <tr key={h.semanas} className={Math.abs(h.semanas - resultado.edad) < 2.2 ? styles.filaActual : undefined}>
                     <th scope="row">{formatNumber(h.meses, 0)} meses</th>
                     <td>{formatNumber(h.peso, 1)} kg</td>
-                    <td>{textoPorcentajeCrecimiento(h.porcentaje)} %</td>
+                    <td>{textoPorcentajeCrecimiento(h.porcentaje)}&nbsp;%</td>
                   </tr>
                 ))}
               </tbody>
@@ -741,15 +741,15 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           <p>
             La cuenta es una sola división. A cada edad le corresponde un porcentaje del peso que
             el perro tendrá de adulto —a las {EDAD_MINIMA} semanas, un cachorro mediano ronda el
-            25 %—, así que basta con dividir lo que pesa hoy entre ese porcentaje:
+            25&nbsp;%—, así que basta con dividir lo que pesa hoy entre ese porcentaje:
           </p>
           <p className={styles.highlight}>
             <strong>peso adulto estimado = peso actual ÷ porcentaje de crecimiento alcanzado</strong>
           </p>
           <p>
             Un cachorro mediano de 5 kg a las {EDAD_MINIMA} semanas: 5 ÷ 0,25 = <strong>20 kg</strong>.
-            El rango que aparece debajo del resultado es ese número con un margen del 15 % arriba y
-            abajo. La curva no es una línea recta: cuanto mayor es la raza, más tarde llega al 100 %
+            El rango que aparece debajo del resultado es ese número con un margen del 15&nbsp;% arriba y
+            abajo. La curva no es una línea recta: cuanto mayor es la raza, más tarde llega al 100&nbsp;%
             —un gigante no lo alcanza hasta las 144 semanas, casi tres años—, y por eso hay que
             elegir bien el tamaño de la raza antes de calcular.
           </p>
@@ -912,7 +912,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 Tienes una camada de 8 semanas y quieres comprobar si el desarrollo de cada cachorro está dentro del rango esperado para la raza.
               </p>
               <p className={styles.escenarioTip}>
-                Pesa a cada cachorro y compara con la estimación. Una desviación superior al 20% del rango puede indicar problemas de salud o nutrición.
+                Pesa a cada cachorro y compara con la estimación. Una desviación superior al 20&nbsp;% del rango puede indicar problemas de salud o nutrición.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -969,7 +969,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cuándo cambiar de pienso junior a adulto?</strong>
-              <p>Cuando el cachorro alcanza aproximadamente el 80-90% de su tamaño adulto estimado. Para razas mini, hacia los 9-10 meses; para razas grandes, entre los 15-18 meses; para gigantes, no antes de los 18-24 meses.</p>
+              <p>Cuando el cachorro alcanza aproximadamente el 80-90&nbsp;% de su tamaño adulto estimado. Para razas mini, hacia los 9-10 meses; para razas grandes, entre los 15-18 meses; para gigantes, no antes de los 18-24 meses.</p>
               <p className={styles.faqTip}>Cambia de forma gradual (7-10 días mezclando ambos piensos) para evitar problemas digestivos.</p>
             </li>
             <li className={styles.faqItem}>
@@ -1024,7 +1024,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
                 <strong>Interpreta el rango estimado</strong>
-                <p>El resultado muestra un peso central estimado y un rango de ±15%. Considera el extremo superior si la raza tiene alta variabilidad genética o si el cachorro ya está en el percentil alto de su camada.</p>
+                <p>El resultado muestra un peso central estimado y un rango de ±15&nbsp;%. Considera el extremo superior si la raza tiene alta variabilidad genética o si el cachorro ya está en el percentil alto de su camada.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -1109,7 +1109,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 <strong>No ajustar la ración cuando alcanza el peso adulto:</strong> Una vez que el perro deja de crecer, sus necesidades calóricas disminuyen. Mantener la ración de cachorro lleva a obesidad. La transición a pienso adulto debe ir acompañada de una reducción de la cantidad diaria.
               </li>
               <li>
-                <strong>Usar la misma tabla de referencia para mestizos que para razas puras:</strong> Los mestizos tienen mayor variabilidad genética. Una estimación de tamaño basada únicamente en el peso a las 8 semanas puede tener un margen de error del 30-40% en mestizos frente al 10-15% en razas puras.
+                <strong>Usar la misma tabla de referencia para mestizos que para razas puras:</strong> Los mestizos tienen mayor variabilidad genética. Una estimación de tamaño basada únicamente en el peso a las 8 semanas puede tener un margen de error del 30-40&nbsp;% en mestizos frente al 10-15&nbsp;% en razas puras.
               </li>
               <li>
                 <strong>Ignorar un crecimiento asimétrico:</strong> Si un cachorro crece de forma desigual (una pata más que otra, un lado del cuerpo más desarrollado), no lo atribuyas a &quot;la postura&quot;. Puede ser señal de displasia, luxación de rótula o deformidades angulares que requieren intervención temprana.
