@@ -28,6 +28,21 @@
  * `selector-movilidad-urbana`, que anuncia porcentajes (0-100) y siempre cuadró, y como rota
  * cualquier barra que empiece en 1 aunque su `valuenow` «parezca» bien.
  *
+ * ── Las tres recetas que el invariante no veía (cabo C0196, 17/10/2026) ─────
+ * El 10/10 este testigo dio 22/22 en verde el día en que el Inspector midió en las tres
+ * seguro-* foco perdido, teclado sin patrón y doble toque sin guarda (3116-3139). Ahora mide:
+ *   · FOCO: tras «Empezar», «Siguiente» y «Anterior», el foco en el destino que la app prepara
+ *     (tabindex="-1", el enunciado o el título del resultado), no en <body>.
+ *   · TECLADO (APG): un solo radio con tabindex 0; ArrowDown y Fin mueven foco y marca.
+ *   · DOBLE TOQUE: ratón real, el 2.º clic de la ráfaga (`detail` 2) en el mismo punto cuando la
+ *     pantalla nueva ya está pintada, en cada «Siguiente» hasta el resultado, a 390×844.
+ * La guarda NO se fija por su forma: hay tres variantes en la familia (por botón, en captura
+ * sobre el contenedor y en captura sobre window, la de seguro-hogar) y se acepta cualquiera que
+ * pase el caso. La de window es la única que cubre un ENLACE ajeno bajo el dedo (Apps
+ * relacionadas, Delegum), que es lo que pasó en las seguro-*: es la que se copia en una nueva.
+ * Los huecos de salud y coche van con `falla` en su fila; el doble toque de salud, «omitido»
+ * porque su caso no es determinista (ver la fila).
+ *
  * Lo que NO mide: el motor de cada app (empates, razones, presupuesto). Esos son distintos en
  * cada hermana —puntos contra umbral en unas, reparto entre candidatas en otras— y los mide
  * el spec de cada una en `tests/apps/`.
@@ -41,10 +56,28 @@
 
 import { test, expect, type Page, type Locator } from '@playwright/test';
 
+/** Un hueco abierto y declarado: el caso se escribe ANTES de repararlo (`check:familias`). */
+interface Hueco {
+  /** Opcional solo para el candado, que cuenta cada `falla:` literal como hueco abierto. */
+  falla?: string;
+  omitido?: never;
+}
+
+/**
+ * Un hueco abierto cuyo caso NO es determinista: una marca `falla` en algo que cae en rojo
+ * 1 de cada 4 veces rompería el build las otras 3. Se omite con la razón y se quita al reparar.
+ */
+interface Omitido {
+  omitido: string;
+  falla?: never;
+}
+
 interface Hermana {
   slug: string;
   /** La app abre con una pantalla de presentación y un botón «Empezar el test». */
   empezar: boolean;
+  /** Las tres recetas que el invariante de radios no ve (cabo C0196), con su hueco si sigue abierto. */
+  recetas?: { foco?: Hueco; teclado?: Hueco; dobleToque?: Hueco | Omitido };
 }
 
 const HERMANAS: Hermana[] = [
@@ -83,6 +116,11 @@ const HERMANAS: Hermana[] = [
   {
     slug: 'selector-seguro-coche',
     empezar: false,
+    recetas: {
+      foco: { falla: 'hallazgo 3133: tras «Siguiente» y «Anterior» el foco cae a <body>' },
+      teclado: { falla: 'hallazgo 3132: los radios no tienen tabindex itinerante ni flechas (APG)' },
+      dobleToque: { falla: 'hallazgo 3134: sin guarda, el segundo clic contesta la pregunta nueva' },
+    },
   },
   {
     slug: 'selector-seguro-hogar',
@@ -91,6 +129,14 @@ const HERMANAS: Hermana[] = [
   {
     slug: 'selector-seguro-salud',
     empezar: true,
+    recetas: {
+      foco: { falla: 'hallazgo 3122: tras «Empezar», «Siguiente» y «Anterior» el foco cae a <body>' },
+      teclado: { falla: 'hallazgo 3123: los radios no tienen tabindex itinerante ni flechas (APG)' },
+      // Hallazgos 3125 y 3126, abiertos: sin guarda. Medido el 17/10/2026, 1 de 4 en rojo (el
+      // segundo toque tras «Ver resultado» cae en la tarjeta de Delegum según dónde quede la
+      // página): no determinista, así que no lleva `falla`. Al repararla, quitar `omitido`.
+      dobleToque: { omitido: 'hallazgos 3125 y 3126 abiertos; el caso cae en rojo 1 de 4 veces' },
+    },
   },
 ];
 
@@ -202,5 +248,107 @@ for (const h of HERMANAS) {
       await expect.poll(() => fraccionAnunciada(barra), { message: 'al avanzar, la barra avanza' }).toBeGreaterThan(inicio);
       await comprobarBarra(page, 'pregunta 2');
     });
+
+    // ── Las tres recetas que el invariante de radios no ve (cabo C0196, 17/10/2026) ──
+    // El 10/10 el testigo dio 22/22 en verde el mismo día en que el Inspector midió en las tres
+    // seguro-* foco perdido, teclado sin patrón y doble toque sin guarda (3116-3139). Receta de
+    // referencia: selector-seguro-hogar (y antes selector-smartphone, 1680, 1681, 2657 y 2659).
+
+    test('el foco va al enunciado (o al título del resultado) tras Empezar, Siguiente y Anterior', async ({ page }) => {
+      if (h.recetas?.foco?.falla) test.fail();
+      const grupo = await abrirTest(page, h);
+      if (h.empezar) await esperarFocoEnTitulo(page, 'tras «Empezar»');
+      await grupo.locator('button').first().click();
+      await botonSiguiente(page).click();
+      await esperarFocoEnTitulo(page, 'tras «Siguiente»');
+      await page.getByRole('button', { name: /anterior/i }).first().click();
+      await esperarFocoEnTitulo(page, 'tras «Anterior»');
+    });
+
+    test('teclado del patrón de radios: una sola parada de Tab y las flechas mueven foco y marca', async ({ page }) => {
+      if (h.recetas?.teclado?.falla) test.fail();
+      const grupo = await abrirTest(page, h);
+      const radios = grupo.locator('[role="radio"]');
+      const n = await radios.count();
+      const indices = await radios.evaluateAll((rs) => rs.map((r) => r.getAttribute('tabindex')));
+      expect(indices.filter((t) => t === '0'), 'tabindex itinerante: un solo radio con 0').toHaveLength(1);
+      expect(indices.filter((t) => t === '-1'), 'los demás, con -1').toHaveLength(n - 1);
+      const desde = indices.indexOf('0');
+      await radios.nth(desde).focus();
+      await page.keyboard.press('ArrowDown');
+      const destino = (desde + 1) % n;
+      await expect(radios.nth(destino), 'ArrowDown lleva el foco a la siguiente').toBeFocused();
+      await expect(radios.nth(destino), 'y la marca').toHaveAttribute('aria-checked', 'true');
+      await page.keyboard.press('End');
+      await expect(radios.nth(n - 1), 'Fin va a la última').toBeFocused();
+      await expect(radios.nth(n - 1)).toHaveAttribute('aria-checked', 'true');
+      await expect(grupo.locator('[aria-checked="true"]')).toHaveCount(1);
+    });
+
+    /**
+     * Ratón de verdad, no eventos sintéticos: pulsar, esperar lo que tarda en repintar (150 ms,
+     * dentro del intervalo de un doble toque) y el 2.º clic de la ráfaga EN EL MISMO PUNTO, que
+     * el navegador entrega con `detail` 2. Lo que haya debajo tras el primero es lo que pisa: así
+     * solo cae en rojo lo que le pasa a una persona, no una guarda «de otra variante». A 390×844,
+     * donde se midieron 3116, 3125-3126 y 3134. Se repite en CADA «Siguiente», el último incluido.
+     */
+    test('doble toque: el segundo clic de la ráfaga no contesta la pregunta nueva ni saca de la app', async ({ page }) => {
+      test.skip(Boolean(h.recetas?.dobleToque?.omitido), h.recetas?.dobleToque?.omitido);
+      if (h.recetas?.dobleToque?.falla) test.fail();
+      test.setTimeout(90_000);
+      await page.setViewportSize({ width: 390, height: 844 });
+      await abrirTest(page, h);
+      const url = page.url();
+      for (let paso = 1; paso <= 30; paso++) {
+        await page.locator('[role="radiogroup"]').first().locator('button').first().click(); // suelto: cierra la ráfaga
+        const opcionesDe = () => page.locator('[role="radiogroup"]').first().innerText();
+        const antes = await opcionesDe();
+        await botonSiguiente(page).scrollIntoViewIfNeeded();
+        await page.waitForTimeout(100);
+        const caja = (await botonSiguiente(page).boundingBox())!;
+        const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+        await page.mouse.move(x, y);
+        await page.mouse.down({ clickCount: 1 });
+        await page.mouse.up({ clickCount: 1 });
+        // El 2.º toque cae sobre la pantalla NUEVA: se espera a que esté pintada (y a que el foco
+        // la desplace), no un tiempo fijo, que daba un resultado u otro según la carga.
+        await expect
+          .poll(async () => ((await page.locator('[role="radiogroup"]').count()) === 0 ? 'fin' : await opcionesDe()), {
+            intervals: [20],
+            timeout: 3000,
+          })
+          .not.toBe(antes);
+        await page.waitForTimeout(80);
+        await page.mouse.down({ clickCount: 2 });
+        await page.mouse.up({ clickCount: 2 });
+        await page.waitForTimeout(400);
+        expect(page.url(), `paso ${paso}: la ráfaga no saca de la app`).toBe(url);
+        const grupos = page.locator('[role="radiogroup"]');
+        if ((await grupos.count()) === 0) return; // resultado
+        // Las opciones cambian de pregunta a pregunta (la barra no sirve: alguna cuenta respondidas)
+        expect(await opcionesDe(), `paso ${paso}: el primer clic avanzó`).not.toBe(antes);
+        await expect(grupos.first().locator('[aria-checked="true"]'), `paso ${paso}: la ráfaga no contesta la pregunta nueva`).toHaveCount(0);
+      }
+      throw new Error('30 pasos sin llegar al resultado');
+    });
   });
+}
+
+/**
+ * El foco, en el destino que la app le prepara (el enunciado o el título del resultado, con
+ * tabindex="-1"), no en <body> ni en un botón. No se exige encabezado: formacion-postgrado lleva
+ * el enunciado en un <p>, y cumple la receta igual.
+ */
+async function esperarFocoEnTitulo(page: Page, momento: string): Promise<void> {
+  await expect
+    .poll(
+      () =>
+        page.evaluate(() => {
+          const el = document.activeElement;
+          if (!el || el === document.body) return 'body';
+          return el.getAttribute('tabindex') === '-1' && el.tagName !== 'BUTTON' ? 'destino' : el.tagName;
+        }),
+      { message: `${momento}: dónde está el foco` },
+    )
+    .toBe('destino');
 }
