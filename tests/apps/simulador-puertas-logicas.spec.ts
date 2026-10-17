@@ -1190,14 +1190,15 @@ async function contrastesEstables(page: Page): Promise<{ uno: number; cabeceraY:
 }
 
 test.describe('16/10 · contraste de las tablas de verdad', () => {
-  test.fail('HALLAZGO · claro: el «1» y la cabecera «Y» llegan a 4,5:1', async ({ page }) => {
+  // REPARADO (hallazgo 3354, 17/10/2026): «Y» con --primary-texto; «1» en #047857 (claro) y #6ee7b7 (oscuro).
+  test('3354 · claro: el «1» y la cabecera «Y» llegan a 4,5:1', async ({ page }) => {
     await abrirSimulador(page);
     const c = await contrastesEstables(page); // medido el 16/10: 2,20 y 3,65
     expect(c.uno, 'celda «1»').toBeGreaterThanOrEqual(4.5);
     expect(c.cabeceraY, 'cabecera Y').toBeGreaterThanOrEqual(4.5);
   });
 
-  test.fail('HALLAZGO · oscuro: el «1» y la cabecera «Y» llegan a 4,5:1', async ({ page }) => {
+  test('3354 · oscuro: el «1» y la cabecera «Y» llegan a 4,5:1', async ({ page }) => {
     await abrirSimulador(page);
     // Con el conmutador de la propia web, no sembrando data-theme (el gestor lo pisa y pasa en falso).
     await page.emulateMedia({ colorScheme: 'dark' });

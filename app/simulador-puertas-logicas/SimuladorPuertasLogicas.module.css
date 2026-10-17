@@ -213,9 +213,12 @@
   color: var(--text-primary);
 }
 
+/* Hallazgo 3354 (16/10/2026): la «Y» y el «1» son texto PEQUEÑO (17,6 px) y exigen 4,5:1.
+   Con var(--primary) daban 3,65:1 y con #10b981, 2,20:1 en claro. --primary-texto es el
+   token de la marca para TEXTO, y el verde baja a #047857; en oscuro, #6EE7B7 (abajo). */
 .outputHeader {
   background: rgba(46, 134, 171, 0.1) !important;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
 }
 
 .cellZero {
@@ -225,7 +228,7 @@
 
 .cellOne {
   background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
+  color: #047857;
   font-weight: 600;
 }
 
@@ -574,6 +577,12 @@
 /* Dark Mode */
 [data-theme='dark'] .cellOne {
   background: rgba(16, 185, 129, 0.25);
+  color: #6ee7b7;
+}
+
+/* En oscuro --primary-texto sobre el azul al 10 % se queda en 4,42:1 (hallazgo 3354) */
+[data-theme='dark'] .outputHeader {
+  color: #6cbce0 !important;
 }
 
 [data-theme='dark'] .currentRow {
