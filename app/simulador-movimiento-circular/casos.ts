@@ -28,7 +28,7 @@
  * `resolverCaso` lo rechaza con un error legible en lugar de imprimir «∞» como resultado.
  */
 
-import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── La física, compartida con la vista ─────────────────────────── */
 
@@ -231,9 +231,21 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
 /* ─────────────────────────── Corrección ─────────────────────────── */
 
-/** El MAYOR entre 0,01 y el 1 % del valor: así un 0,1 no se corrige a ciegas. */
-export function toleranciaDe(valor: number): number {
-  return toleranciaRelativa(valor);
+/**
+ * Política de REDONDEO (hallazgo 3342, 16/10/2026), la de simulador-genetica desde el 3322: media
+ * unidad del último decimal pedido si la respuesta EXACTA exige redondear, y 0 si es exacta.
+ *
+ * Antes era la relativa (el mayor entre 0,01 y el 1 %), pensada para quien arrastra un redondeo
+ * intermedio. Aquí no hay nada que arrastrar: los casos 1, 2, 3, 6, 8, 9 y 10 y toda la práctica
+ * son exactos (ω entera, r y m con un decimal), y aprobaba «11,9» para 12, «0,11» para 0,1 o «713»
+ * para 720 N. Consecuencia aceptada: en el caso 12 (v = 1,6π = 5,0265 → 5,03) el «5,02» que sale
+ * con π ≈ 3,14 ya no vale, igual que no vale cualquier otro redondeo que no sea el pedido.
+ *
+ * `valor` es la respuesta SIN redondear (`exacto` del caso): con la ya redondeada, 9,42 no exigiría
+ * redondeo y la tolerancia sería 0, y un «9,425» más preciso que la consigna suspendería.
+ */
+export function toleranciaDe(valor: number, decimales = 2): number {
+  return toleranciaDeRedondeo(valor, decimales);
 }
 
 export interface Veredicto {
@@ -244,13 +256,14 @@ export interface Veredicto {
 }
 
 /**
- * Corrige la respuesta del alumno. Nunca lanza: una entrada que no es número se responde con
- * un veredicto, no con una excepción que tumbaría el render.
+ * Corrige la respuesta del alumno contra la respuesta EXACTA (sin redondear) y los decimales que
+ * pide el enunciado. Nunca lanza: una entrada que no es número se responde con un veredicto, no
+ * con una excepción que tumbaría el render.
  */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
+export function comprobarRespuesta(usuario: number, exacto: number, decimales = 2): Veredicto {
   // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
   // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
-  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
+  const c = corregirNumero(usuario, exacto, { tolerancia: toleranciaDe(exacto, decimales), magnitud: 'real' });
   const { diferencia, tolerancia } = c;
 
   if (c.estado === 'no-numerico') {
@@ -284,7 +297,11 @@ export interface Caso {
   categoria: 'abstracto' | 'aplicado';
   datos: DatosCaso;
   etiquetaRespuesta: string;
+  /** La respuesta redondeada a `decimales`: la que se enseña. */
   respuesta: number;
+  /** La respuesta sin redondear: contra ella se corrige (ver `toleranciaDe`). */
+  exacto: number;
+  decimales: number;
   respuestaTexto: string;
   pasos: string[];
   pista: string;
@@ -297,7 +314,7 @@ export interface Caso {
  * Sin ciudades, países ni monedas: el 91 % de este canal es de fuera de España y un
  * enunciado anclado excluye a la mayor parte del público que lo va a leer.
  */
-const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'pasos'>> = [
+const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'exacto' | 'decimales' | 'respuestaTexto' | 'pasos'>> = [
   {
     id: 1,
     titulo: 'De velocidad angular a velocidad lineal',
@@ -446,6 +463,8 @@ export const CASOS: readonly Caso[] = DEFINICIONES.map((def) => {
   return {
     ...def,
     respuesta: valor,
+    exacto: r.ok ? r.valor : NaN,
+    decimales,
     respuestaTexto: textoRespuesta(valor, def.etiquetaRespuesta, decimales),
     pasos: r.pasos,
   };
@@ -479,7 +498,10 @@ function aleatorioCon(semilla: number): () => number {
 export interface Ejercicio {
   enunciado: string;
   datos: DatosCaso;
+  /** Redondeada a dos decimales, para enseñarla. */
   respuesta: number;
+  /** Sin redondear, para corregir (ver `toleranciaDe`). */
+  exacto: number;
   etiquetaRespuesta: string;
   pasos: string[];
 }
@@ -515,6 +537,7 @@ export function generarEjercicioAleatorio(semilla = Date.now()): Ejercicio {
     enunciado: `${masaTexto} gira a ${numero(omega)} rad/s en una circunferencia de ${numero(radio)} m de radio. ${PREGUNTA[magnitud].texto}`,
     datos,
     respuesta: r.ok ? redondear(r.valor, 2) : NaN,
+    exacto: r.ok ? r.valor : NaN,
     etiquetaRespuesta: PREGUNTA[magnitud].etiqueta,
     pasos: r.pasos,
   };

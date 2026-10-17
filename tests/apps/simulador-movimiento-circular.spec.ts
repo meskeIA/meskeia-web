@@ -815,15 +815,19 @@ test.describe('simulador-movimiento-circular · casos para clase', () => {
 
   test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
     expect(comprobarRespuesta(6, 6).correcto).toBe(true);
-    expect(comprobarRespuesta(6.05, 6).correcto).toBe(true); // dentro del 1 %
+    // Hasta el 17/10/2026 (hallazgo 3342) esto aprobaba «dentro del 1 %». Con la política de
+    // redondeo, 6 es exacto y 6,05 no es ningún redondeo suyo.
+    expect(comprobarRespuesta(6.05, 6).correcto).toBe(false);
     expect(comprobarRespuesta(8, 6).correcto).toBe(false);
     expect(comprobarRespuesta(NaN, 6).correcto).toBe(false);
     expect(comprobarRespuesta(NaN, 6).motivo).toContain('número');
 
-    // La tolerancia nunca baja de 0,01, para que el 0,1 del caso 6 no se corrija a ciegas.
-    expect(toleranciaDe(0)).toBe(0.01);
-    expect(toleranciaDe(0.1)).toBe(0.01);
-    expect(toleranciaDe(100)).toBe(1);
+    // Tolerancia: 0 si la respuesta es exacta con dos decimales; media centésima si hay que redondear.
+    expect(toleranciaDe(0)).toBe(0);
+    expect(toleranciaDe(0.1)).toBe(0);
+    expect(toleranciaDe(100)).toBe(0);
+    expect(toleranciaDe(Math.PI)).toBe(0.005);
+    expect(toleranciaDe(Math.PI, 1)).toBe(0.05);
 
     // ω = 0 no produce «∞» en pantalla: se rechaza con un error legible.
     const parado = resolverCaso({ radio: 2, entrada: { via: 'omega', omega: 0 }, magnitud: 'periodo' });
@@ -1159,26 +1163,25 @@ test.describe('re-inspección 22/09/2026', () => {
   });
 
   test('1211 (regresión) — la tolerancia es simétrica en su borde exacto', async () => {
-    // El caso 6 vale 0,1 Hz y su tolerancia es el mínimo de 0,01 (el 10 % del valor).
-    expect(toleranciaDe(0.1)).toBe(0.01);
-
     /*
       ⚠️ 22/09/2026 (1211) — la comparación decidía por el ±1 ulp de la resta en binario:
       0,11 − 0,1 da 0,009999999999999995 (dentro) y 0,1 − 0,09 da 0,010000000000000009 (fuera),
-      así que la misma desviación se aceptaba por arriba y se rechazaba por abajo, con un mensaje
-      que cifraba la desviación igual que la tolerancia.
-    */
-    expect(comprobarRespuesta(0.11, 0.1).correcto, '+0,01').toBe(true);
-    expect(comprobarRespuesta(0.09, 0.1).correcto, '−0,01, la misma desviación').toBe(true);
+      así que la misma desviación se aceptaba por arriba y se rechazaba por abajo.
 
-    // El otro caso del acta: a_c = 8 con tolerancia 0,08 (8,08 − 8 = 0,08000000000000007).
-    expect(toleranciaDe(8)).toBeCloseTo(0.08, 10);
-    expect(comprobarRespuesta(8.08, 8).correcto).toBe(true);
-    expect(comprobarRespuesta(7.92, 8).correcto).toBe(true);
+      Desde el 17/10/2026 (hallazgo 3342) la política es la de redondeo y 0,1 es exacto (tolerancia
+      0), así que el borde se prueba donde ahora existe: 0,125 pide redondear a dos decimales y su
+      tolerancia es 0,005. 0,13 − 0,125 y 0,125 − 0,12 son la misma desviación en binario distinto.
+    */
+    expect(toleranciaDe(0.125)).toBe(0.005);
+    expect(comprobarRespuesta(0.13, 0.125).correcto, '+0,005').toBe(true);
+    expect(comprobarRespuesta(0.12, 0.125).correcto, '−0,005, la misma desviación').toBe(true);
 
     // Y el margen NO relaja la tolerancia: lo que está de verdad fuera sigue fuera.
-    expect(comprobarRespuesta(0.12, 0.1).correcto).toBe(false);
-    expect(comprobarRespuesta(8.2, 8).correcto).toBe(false);
+    expect(comprobarRespuesta(0.131, 0.125).correcto).toBe(false);
+    expect(comprobarRespuesta(0.119, 0.125).correcto).toBe(false);
+    // Con tolerancia 0 (respuesta exacta), el margen de ruido separa 0,3 de 0,30000000000000004.
+    expect(comprobarRespuesta(0.3, 0.1 + 0.2).correcto).toBe(true);
+    expect(comprobarRespuesta(0.11, 0.1).correcto).toBe(false);
   });
 
   test('1212 (regresión) — generar otro ejercicio de práctica se anuncia', async ({ page }) => {
@@ -1834,8 +1837,9 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
     expect(await contestar(page, '712')).toContain('No es correcto');
   });
 
-  test.fail(
-    'ABIERTO (calculo, medio) · la tolerancia del 1 % aprueba respuestas erróneas cuando la exacta no exige redondeo',
+  // REPARADO (hallazgo 3342, 17/10/2026): política de redondeo contra la respuesta sin redondear.
+  test(
+    '3342 (regresión) · la corrección ya no aprueba respuestas erróneas cuando la exacta no exige redondeo',
     async ({ page }) => {
       // casos.ts corrige con `toleranciaRelativa` (el mayor entre 0,01 y el 1 %) en los doce casos y
       // en la práctica. El motor compartido la describe como la política que «admite que el alumno
@@ -1858,9 +1862,20 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
       await expect(page.locator('[class*="casoEnunciado"]')).toContainText('Un objeto de 5 kg gira a 6 rad/s');
       expect(await contestar(page, '713'), 'práctica: 5 · 6² · 4 = 720 N exacto').toContain('No es correcto');
 
+      expect(await contestar(page, '720'), 'y lo exacto sigue aprobando').toContain('¡Correcto!');
+
       // Y en el módulo, sin navegador: lo mismo, sin depender de la semilla.
       expect(comprobarRespuesta(713, 720).correcto).toBe(false);
+      expect(comprobarRespuesta(727, 720).correcto).toBe(false);
       expect(comprobarRespuesta(11.9, 12).correcto).toBe(false);
+      expect(comprobarRespuesta(12.1, 12).correcto).toBe(false);
+      // Caso 7, contra la exacta 3π: «9,42» y «9,425» valen, «9,43» ya no es redondear 9,4248.
+      expect(comprobarRespuesta(9.42, 3 * Math.PI).correcto).toBe(true);
+      expect(comprobarRespuesta(9.425, 3 * Math.PI).correcto).toBe(true);
+      expect(comprobarRespuesta(9.43, 3 * Math.PI).correcto).toBe(false);
+      // Caso 12: v = 1,6π = 5,0265 → 5,03. El «5,02» del π escolar (3,14) no es el redondeo pedido.
+      expect(comprobarRespuesta(5.03, 1.6 * Math.PI).correcto).toBe(true);
+      expect(comprobarRespuesta(5.02, 1.6 * Math.PI).correcto).toBe(false);
     },
   );
 

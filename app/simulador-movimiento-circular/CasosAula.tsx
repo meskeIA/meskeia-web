@@ -31,6 +31,9 @@ export default function CasosAula() {
   const caso = CASOS[indice];
   const enunciado = practica ? practica.enunciado : caso.enunciado;
   const esperado = practica ? practica.respuesta : caso.respuesta;
+  /** Se corrige contra la respuesta SIN redondear y los decimales pedidos (hallazgo 3342). */
+  const exacto = practica ? practica.exacto : caso.exacto;
+  const decimales = practica ? 2 : caso.decimales;
   const etiqueta = practica ? practica.etiquetaRespuesta : caso.etiquetaRespuesta;
   const pasos = practica ? practica.pasos : caso.pasos;
   /** Solo los casos numerados traen pista: el ejercicio aleatorio no la tiene (1208). */
@@ -58,7 +61,7 @@ export default function CasosAula() {
     // parseSpanishNumber admite «9,42» y «9.42»; devuelve NaN con cualquier otra cosa, y de
     // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     const valor = parseSpanishNumber(respuesta);
-    const r = comprobarRespuesta(valor, esperado);
+    const r = comprobarRespuesta(valor, exacto, decimales);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 
