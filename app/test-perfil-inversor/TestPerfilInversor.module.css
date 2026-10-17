@@ -323,7 +323,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
+  /* Va DEBAJO del botón desde el cabo C0251: el aire, arriba */
+  margin-top: var(--spacing-xl);
   text-align: left;
 }
 

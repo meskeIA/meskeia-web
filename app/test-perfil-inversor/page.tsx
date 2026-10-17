@@ -856,6 +856,23 @@ export default function TestPerfilInversorPage() {
             corresponde y ejemplos ilustrativos de lo que suele asociarse a él.
           </p>
 
+          {/*
+            Cabo C0251 (decidido en el parte del 17/10/2026): el botón va justo tras el párrafo y
+            la lista de ventajas DEBAJO. Detrás de la lista quedaba en 1.369 px a 360×740 (1,94
+            pantallas), 1.276 a 412×915 y 1.017 a 1280×800: en ninguna se veía al cargar.
+          */}
+          <button
+            type="button"
+            className={styles.startButton}
+            onClick={(e) => {
+              if (esSegundaActivacion('comenzar', e)) return;
+              anotarActivacion('comenzar', e);
+              handleStart();
+            }}
+          >
+            Comenzar Test →
+          </button>
+
           <div className={styles.featuresList}>
             <div className={styles.featureItem}>
               <span className={styles.featureIcon} aria-hidden="true">✓</span>
@@ -884,18 +901,6 @@ export default function TestPerfilInversorPage() {
               <span>No requiere registro</span>
             </div>
           </div>
-
-          <button
-            type="button"
-            className={styles.startButton}
-            onClick={(e) => {
-              if (esSegundaActivacion('comenzar', e)) return;
-              anotarActivacion('comenzar', e);
-              handleStart();
-            }}
-          >
-            Comenzar Test →
-          </button>
         </div>
       )}
 

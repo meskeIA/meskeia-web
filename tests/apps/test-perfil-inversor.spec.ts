@@ -3443,3 +3443,38 @@ test.describe('Inspector 16/10/2026 · móvil 360×740', () => {
     expect(tras.px, `el resultado en ${tras.caja} px`).toBeGreaterThan(0);
   });
 });
+
+/**
+ * Cabo C0251 (decidido en el parte del 17/10/2026): «Comenzar Test» va justo tras el párrafo de la
+ * portada y la lista de seis ventajas, DEBAJO. Medido al cargar (borde inferior del botón, en px de
+ * la página): antes 1.438 a 360×740, 1.345 a 412×915 y 1.086 a 1280×800; después 1.180, 1.088 y
+ * 989. Sube lo que medía la lista (≈ 258 px en móvil, 97 en escritorio) y sigue fuera de la primera
+ * pantalla en las tres: por encima de la tarjeta hay 663 px de bloques comunes en el móvil. El
+ * testigo fija el orden y el ahorro, no la primera pantalla, que no es lo que se decidió.
+ */
+test.describe('C0251 · «Comenzar Test» por encima de la lista de ventajas', () => {
+  for (const [ancho, alto, antes] of [
+    [360, 740, 1438],
+    [412, 915, 1345],
+    [1280, 800, 1086],
+  ] as const) {
+    test(`${ancho}×${alto}: el botón va tras el párrafo y antes de la lista, más arriba que antes (${antes} px)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: ancho, height: alto });
+      await page.goto(RUTA);
+      await esperarPaginaAsentada(page);
+      const boton = page.getByRole('button', { name: /Comenzar Test/ });
+      const parrafo = page.locator('[class*="startDescription"]');
+      const lista = page.locator('[class*="featuresList"]');
+      const cajaBoton = (await boton.boundingBox())!;
+      const cajaParrafo = (await parrafo.boundingBox())!;
+      const cajaLista = (await lista.boundingBox())!;
+      expect(cajaBoton.y, 'el botón, debajo del párrafo').toBeGreaterThanOrEqual(cajaParrafo.y + cajaParrafo.height);
+      expect(cajaLista.y, 'la lista, debajo del botón').toBeGreaterThanOrEqual(cajaBoton.y + cajaBoton.height);
+      const scroll = await page.evaluate(() => window.scrollY);
+      const pie = cajaBoton.y + cajaBoton.height + scroll;
+      expect(pie, `el pie del botón en ${Math.round(pie)} px; antes, ${antes}`).toBeLessThan(antes - 90);
+    });
+  }
+});
