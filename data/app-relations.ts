@@ -2405,12 +2405,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'limpiador-texto': [...textoApps.filter(a => a.url !== '/limpiador-texto/'), textoExtraApps[2]],
   'comparador-textos': [...textoApps.filter(a => a.url !== '/comparador-textos/'), textoExtraApps[1]],
+  // Puerta de entrada al bloque de poesía (1.479 visitas en 90 d a 17/10/2026): quien
+  // llega mide un verso, así que sus cuatro tarjetas (RelatedApps solo pinta cuatro)
+  // van a métrica y rima, no a las utilidades de texto.
   'contador-silabas': [
     { url: '/diccionario-rimas/', icon: '🎵', name: 'Diccionario de Rimas', description: 'Palabras que riman en consonante o asonante' },
-    { url: '/conversor-numeros-letras/', icon: '✍️', name: 'Números a Letras', description: 'Escribe cifras e importes en palabras' },
-    scrabbleApp,
-    ...textoApps.filter(a => a.url !== '/contador-silabas/'),
-    textoExtraApps[1],
+    { url: '/guia-metrica-estrofas/', icon: '📜', name: 'Métrica y Estrofas', description: 'Tipos de verso, rima y estrofas clásicas' },
+    { url: '/generador-poemas/', icon: '✒️', name: 'Generador de Poemas', description: 'Haiku, soneto, romance y más con guía métrica' },
+    { url: '/quiz-metrica-estrofas/', icon: '🎶', name: 'Quiz de Métrica', description: 'Pon a prueba tipos de verso, estrofas y rima' },
   ],
   'diccionario-rimas': [
     { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Mide el verso con sinalefas y detecta la estrofa' },
