@@ -440,7 +440,9 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   CNAE-2009; el IAE es de 1990 con reformas esporádicas. La expectativa correcta es "casi nunca
   cambia, y cuando cambia es grande".
 - **Alerta metodológica**: **una clasificación nueva que sustituya a la vigente** (precedente
-  exacto: CNAE-2009 → CNAE-2025, RD 10/2025, operativa desde enero de 2026, que dejó desalineadas
+  exacto: CNAE-2009 → CNAE-2025, RD 10/2025, en vigor el 16/01/2025 y aplicable a las estadísticas
+  con fecha de referencia desde el 01/01/2025 (DF 2.ª y art. 5; la norma no trae ninguna fecha de
+  2026, y la fecha del módulo es `CNAE_VIGENCIA.desde`), que dejó desalineadas
   67 de las 110 entradas del dataset anterior). No es un cambio de cifras: obliga a remapear todo lo
   que dependa de los códigos. Señal de aviso: el INE publica la tabla de correspondencia entre
   versiones antes de la entrada en vigor.
@@ -452,7 +454,7 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   30/08/2026 no lo hizo y el mismo catálogo acabó publicando dos fechas distintas según la página
   (hallazgo 588 del Inspector). Desde entonces la app lee `FISCAL_CNAE_IAE_META.verificado`, no el
   `generado` del JSON, así que las dos páginas dicen lo mismo por construcción.
-- **Verificado**: 2026-08-30.
+- **Verificado**: 2026-09-14 (el sello `verificado` del módulo; aquí seguía el 2026-08-30).
 
 ### 3.7 Módulos EXENTOS de vigilancia normativa
 

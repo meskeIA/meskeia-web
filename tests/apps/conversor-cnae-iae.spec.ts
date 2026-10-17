@@ -4155,6 +4155,21 @@ test.describe('Inspector 16/10/2026 — casos de la re-inspección', () => {
   });
 });
 
+test.describe('Cabo C0150 (reparar 17/10/2026) — el catálogo servido', () => {
+  // La página ya no pintaba meta.cnae.nota, pero el JSON se sirve público y seguía diciendo
+  // «sustituye a CNAE-2009 desde enero de 2026», fecha que no está en el RD 10/2025 (BOE del
+  // 15/01/2025: DF 2.ª, vigor al día siguiente; art. 5, estadísticas desde el 01/01/2025).
+  test('meta.cnae.nota no trae fecha de 2026 y es la que escribe el generador', async ({ request }) => {
+    const respuesta = await request.get('/datos/cnae-iae-catalogo.json');
+    expect(respuesta.ok()).toBe(true);
+    const { meta } = await respuesta.json();
+    expect(meta.cnae.nota).not.toMatch(/2026/);
+    expect(meta.cnae.nota).toBe(
+      'CNAE-2025 sustituye a CNAE-2009 (RD 10/2025). La correspondencia entre ambas es la tabla oficial del INE.',
+    );
+  });
+});
+
 test.describe('Inspector 16/10/2026 — CASO 2 (límite) a 390 px: un código de la CNAE-2009 que no existe en la CNAE-2025', () => {
   test.use({
     viewport: { width: 390, height: 844 },
