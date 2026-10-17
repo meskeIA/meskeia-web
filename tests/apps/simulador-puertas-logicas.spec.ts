@@ -1215,7 +1215,8 @@ test.describe('16/10 · contraste de las tablas de verdad', () => {
 // Contenido: bloque educativo, FAQPage y featureList (hallazgos ABIERTOS del 16/10/2026)
 // ───────────────────────────────────────────────────────────────────────────────
 test.describe('16/10 · contenido', () => {
-  test.fail('HALLAZGO · un multiplexor 4:1 en AND-OR lleva 4 puertas AND, no 3', async ({ page }) => {
+  // REPARADO (hallazgo 3356, 17/10/2026)
+  test('3356 · un multiplexor 4:1 en AND-OR lleva 4 puertas AND, no 3', async ({ page }) => {
     await abrirSimulador(page);
     await abrirGuiaEducativa(page);
     // Y = S1'S0'·D0 + S1'S0·D1 + S1S0'·D2 + S1S0·D3: un AND por cada entrada de datos (4),
@@ -1223,9 +1224,12 @@ test.describe('16/10 · contenido', () => {
     const tarjeta = page.locator('[class*="__escenarioCard"]').filter({ hasText: 'Multiplexor 4:1' });
     await expect(tarjeta).toHaveCount(1);
     await expect(tarjeta).not.toContainText('3 puertas AND');
+    await expect(tarjeta).toContainText('4 puertas AND');
+    await expect(tarjeta).toContainText('1 puerta OR de 4 entradas');
   });
 
-  test.fail('HALLAZGO · la FAQ no llama «universales» a las 7 puertas', async ({ page }) => {
+  // REPARADO (hallazgo 3357, 17/10/2026)
+  test('3357 · la FAQ no llama «universales» a las 7 puertas', async ({ page }) => {
     await abrirSimulador(page);
     await abrirGuiaEducativa(page);
     // Dos preguntas más abajo la propia FAQ define «universal» (solo NAND y NOR lo son) y la

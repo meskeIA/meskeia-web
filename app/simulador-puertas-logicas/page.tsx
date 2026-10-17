@@ -1063,7 +1063,7 @@ export default function SimuladorPuertasLogicasPage() {
                 <strong>Diseñador de sistemas digitales</strong>
               </div>
               <p className={styles.escenarioExample}>
-                Multiplexor 4:1 para seleccionar entre 4 fuentes de datos: 3 puertas AND (con señales de selección) + 1 puerta OR. <strong>Base de los buses de datos en microprocesadores.</strong>
+                Multiplexor 4:1 para seleccionar entre 4 fuentes de datos: Y = S1&apos;S0&apos;·D0 + S1&apos;S0·D1 + S1S0&apos;·D2 + S1S0·D3, es decir, 4 puertas AND de 3 entradas (una por fuente, con su combinación de selección) + 1 puerta OR de 4 entradas + 2 NOT para negar S1 y S0. <strong>Base de los buses de datos en microprocesadores.</strong>
               </p>
               <p className={styles.escenarioTip}>
                 <span aria-hidden="true">💡</span> Entender la lógica subyacente permite optimizar el uso de LUTs en FPGAs y celdas estándar en ASICs.
@@ -1079,7 +1079,7 @@ export default function SimuladorPuertasLogicasPage() {
             <div className={styles.faqItem}>
               <h4>¿Es lo mismo una puerta lógica que una compuerta lógica?</h4>
               <p>Sí, son <strong>el mismo componente</strong>: un circuito que recibe entradas binarias (0 y 1) y devuelve una salida según una operación lógica. La única diferencia es el término regional: en España se dice <strong>puerta lógica</strong> y en buena parte de Hispanoamérica (México, Colombia, Argentina...) se dice <strong>compuerta lógica</strong>. Ambas traducen el inglés <em>logic gate</em>.</p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Este simulador funciona igual con cualquiera de los dos nombres: las 7 puertas (o compuertas) AND, OR, NOT, NAND, NOR, XOR y XNOR son universales.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Este simulador funciona igual con cualquiera de los dos nombres: las 7 puertas (o compuertas) AND, OR, NOT, NAND, NOR, XOR y XNOR se llaman igual en todos los países, porque sus nombres vienen del inglés.</p>
             </div>
 
             <div className={styles.faqItem}>
