@@ -45,6 +45,16 @@ function contarSilabas(palabra: string): number {
   return Math.max(silabas, 1);
 }
 
+// Escala INFLESZ (Barrio-Cantalejo y otros, An. Sist. Sanit. Navar. 2008;31(2):135-152):
+// cinco tramos sobre la puntuación Flesch-Szigriszt
+function getGradoInflesz(ifsz: number): string {
+  if (ifsz >= 80) return 'Muy fácil';
+  if (ifsz >= 65) return 'Bastante fácil';
+  if (ifsz >= 55) return 'Normal';
+  if (ifsz >= 40) return 'Algo difícil';
+  return 'Muy difícil';
+}
+
 // Función para contar palabras
 function contarPalabras(texto: string): number {
   const palabras = texto.trim().split(/\s+/).filter(p => p.length > 0);
@@ -75,8 +85,6 @@ export default function CalculadoraLegibilidadPage() {
     promedioPalabrasOracion: number;
     fleschSzigriszt: number;
     fernandezHuerta: number;
-    inflesz: number;
-    nivelEducativo: string;
     dificultad: string;
     palabrasLargas: number;
     porcentajeLargas: number;
@@ -107,41 +115,16 @@ export default function CalculadoraLegibilidadPage() {
     const promedioSilabasPalabra = palabras > 0 ? totalSilabas / palabras : 0;
     const promedioPalabrasOracion = oraciones > 0 ? palabras / oraciones : 0;
 
-    // Fórmula Flesch-Szigriszt (adaptada al español)
-    // IFSZ = 206.835 - 62.3 * (sílabas/palabras) - 1.02 * (palabras/oraciones)
-    const fleschSzigriszt = 206.835 - (62.3 * promedioSilabasPalabra) - (1.02 * promedioPalabrasOracion);
+    // Fórmula Flesch-Szigriszt (adaptada al español), tal como la recoge
+    // Barrio-Cantalejo y otros (2008): IFSZ = 206,835 − 62,3 × (sílabas/palabras) − (palabras/frases)
+    const fleschSzigriszt = 206.835 - (62.3 * promedioSilabasPalabra) - promedioPalabrasOracion;
 
     // Fórmula Fernández Huerta (español)
     // P = 206.84 - 60 * (sílabas/palabras) - 1.02 * (palabras/oraciones)
     const fernandezHuerta = 206.84 - (60 * promedioSilabasPalabra) - (1.02 * promedioPalabrasOracion);
 
-    // Escala INFLESZ (simplificada)
-    // Usa la fórmula de Szigriszt pero con interpretación diferente
-    const inflesz = fleschSzigriszt;
-
-    // Determinar nivel educativo
-    let nivelEducativo = '';
-    let dificultad = '';
-
-    if (fleschSzigriszt >= 80) {
-      nivelEducativo = 'Primaria (6-10 años)';
-      dificultad = 'Muy fácil';
-    } else if (fleschSzigriszt >= 65) {
-      nivelEducativo = 'ESO (11-14 años)';
-      dificultad = 'Fácil';
-    } else if (fleschSzigriszt >= 50) {
-      nivelEducativo = 'Bachillerato (15-18 años)';
-      dificultad = 'Normal';
-    } else if (fleschSzigriszt >= 35) {
-      nivelEducativo = 'Universitario';
-      dificultad = 'Algo difícil';
-    } else if (fleschSzigriszt >= 20) {
-      nivelEducativo = 'Especializado';
-      dificultad = 'Difícil';
-    } else {
-      nivelEducativo = 'Muy especializado';
-      dificultad = 'Muy difícil';
-    }
+    // INFLESZ no es otra fórmula: es la escala con la que se lee el IFSZ
+    const dificultad = getGradoInflesz(fleschSzigriszt);
 
     const porcentajeLargas = palabras > 0 ? (palabrasLargas / palabras) * 100 : 0;
 
@@ -153,28 +136,18 @@ export default function CalculadoraLegibilidadPage() {
       promedioPalabrasOracion,
       fleschSzigriszt: Math.max(0, Math.min(100, fleschSzigriszt)),
       fernandezHuerta: Math.max(0, Math.min(100, fernandezHuerta)),
-      inflesz: Math.max(0, Math.min(100, inflesz)),
-      nivelEducativo,
       dificultad,
       palabrasLargas,
       porcentajeLargas
     });
   };
 
+  // Colores por los tramos de la escala INFLESZ
   const getScoreColor = (score: number) => {
     if (score >= 65) return styles.facil;
-    if (score >= 50) return styles.normal;
-    if (score >= 35) return styles.dificil;
+    if (score >= 55) return styles.normal;
+    if (score >= 40) return styles.dificil;
     return styles.muyDificil;
-  };
-
-  const getScoreLabel = (score: number) => {
-    if (score >= 80) return 'Muy fácil';
-    if (score >= 65) return 'Fácil';
-    if (score >= 50) return 'Normal';
-    if (score >= 35) return 'Algo difícil';
-    if (score >= 20) return 'Difícil';
-    return 'Muy difícil';
   };
 
   const textoEjemplo = `La inteligencia artificial está transformando nuestra vida diaria. Desde los asistentes virtuales hasta los coches autónomos, esta tecnología avanza a pasos agigantados.
@@ -242,7 +215,11 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 </div>
                 <div className={styles.scoreDetails}>
                   <span className={styles.scoreLabel}>{analisis.dificultad}</span>
-                  <span className={styles.scoreNivel}>{analisis.nivelEducativo}</span>
+                  <span className={styles.scoreNivel}>
+                    {analisis.fleschSzigriszt >= 55
+                      ? 'Supera 55, el umbral de la escala INFLESZ para textos dirigidos a pacientes'
+                      : 'Por debajo de 55, el umbral de la escala INFLESZ para textos dirigidos a pacientes'}
+                  </span>
                 </div>
               </div>
 
@@ -305,11 +282,11 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 <div className={styles.indiceItem}>
                   <div className={styles.indiceHeader}>
                     <span className={styles.indiceName}>Escala INFLESZ</span>
-                    <span className={`${styles.indiceScore} ${getScoreColor(analisis.inflesz)}`}>
-                      {getScoreLabel(analisis.inflesz)}
+                    <span className={`${styles.indiceScore} ${getScoreColor(analisis.fleschSzigriszt)}`}>
+                      {analisis.dificultad}
                     </span>
                   </div>
-                  <span className={styles.indiceDesc}>Interpretación para textos sanitarios/divulgativos</span>
+                  <span className={styles.indiceDesc}>Grado de lectura de la puntuación Flesch-Szigriszt (no es otra fórmula)</span>
                 </div>
               </div>
 
@@ -337,7 +314,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                   {analisis.porcentajeLargas > 30 && (
                     <li>Tienes muchas palabras largas ({formatNumber(analisis.porcentajeLargas, 0)}%). Usa sinónimos más cortos cuando sea posible.</li>
                   )}
-                  {analisis.fleschSzigriszt < 50 && (
+                  {analisis.fleschSzigriszt < 55 && (
                     <li>El texto puede ser difícil para lectores generales. Simplifica si tu audiencia no es especializada.</li>
                   )}
                   {analisis.fleschSzigriszt >= 65 && (
@@ -357,37 +334,37 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
 
       {/* Guía de interpretación */}
       <div className={styles.guideSection}>
-        <h3>Interpretación de la puntuación</h3>
+        <h3>Interpretación de la puntuación: escala INFLESZ</h3>
+        <p className={styles.guideIntro}>
+          Barrio-Cantalejo y otros (2008) midieron 210 publicaciones reales en español y propusieron
+          estos cinco tramos para leer la puntuación Flesch-Szigriszt. Los textos sobre salud tienen
+          más probabilidad de leerse y comprenderse si superan los 55 puntos.
+        </p>
         <div className={styles.guideGrid}>
           <div className={`${styles.guideItem} ${styles.facil}`}>
             <span className={styles.guideRange}>80-100</span>
             <span className={styles.guideLabel}>Muy fácil</span>
-            <span className={styles.guideDesc}>Primaria</span>
+            <span className={styles.guideDesc}>Lectura muy ligera</span>
           </div>
           <div className={`${styles.guideItem} ${styles.facil}`}>
             <span className={styles.guideRange}>65-79</span>
-            <span className={styles.guideLabel}>Fácil</span>
-            <span className={styles.guideDesc}>ESO</span>
+            <span className={styles.guideLabel}>Bastante fácil</span>
+            <span className={styles.guideDesc}>Libros escolares: media 67,4</span>
           </div>
           <div className={`${styles.guideItem} ${styles.normal}`}>
-            <span className={styles.guideRange}>50-64</span>
+            <span className={styles.guideRange}>55-64</span>
             <span className={styles.guideLabel}>Normal</span>
-            <span className={styles.guideDesc}>Bachillerato</span>
+            <span className={styles.guideDesc}>Prensa de quiosco: media 60</span>
           </div>
           <div className={`${styles.guideItem} ${styles.dificil}`}>
-            <span className={styles.guideRange}>35-49</span>
+            <span className={styles.guideRange}>40-54</span>
             <span className={styles.guideLabel}>Algo difícil</span>
-            <span className={styles.guideDesc}>Universitario</span>
+            <span className={styles.guideDesc}>Bajo el umbral para pacientes</span>
           </div>
           <div className={`${styles.guideItem} ${styles.muyDificil}`}>
-            <span className={styles.guideRange}>20-34</span>
-            <span className={styles.guideLabel}>Difícil</span>
-            <span className={styles.guideDesc}>Especializado</span>
-          </div>
-          <div className={`${styles.guideItem} ${styles.muyDificil}`}>
-            <span className={styles.guideRange}>0-19</span>
+            <span className={styles.guideRange}>0-39</span>
             <span className={styles.guideLabel}>Muy difícil</span>
-            <span className={styles.guideDesc}>Muy técnico</span>
+            <span className={styles.guideDesc}>Revistas científicas: media 37,9</span>
           </div>
         </div>
       </div>
@@ -420,7 +397,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
             <div className={styles.formulaCard}>
               <h4>Índice Flesch-Szigriszt</h4>
               <p className={styles.formula}>
-                IFSZ = 206.835 - 62.3 × (sílabas/palabras) - 1.02 × (palabras/oraciones)
+                IFSZ = 206,835 − 62,3 × (sílabas/palabras) − (palabras/oraciones)
               </p>
               <p>
                 Adaptación al español de la fórmula original de Rudolf Flesch.
@@ -525,11 +502,11 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                   </tr>
                   <tr>
                     <td><strong>INFLESZ</strong></td>
-                    <td>Basada en Flesch-Szigriszt</td>
-                    <td>0–100</td>
+                    <td>Escala de lectura del Flesch-Szigriszt (no es otra fórmula)</td>
+                    <td>5 tramos sobre 0–100</td>
                     <td>Español</td>
                     <td>Textos sanitarios, folletos médicos, normativa</td>
-                    <td>55–65</td>
+                    <td>Más de 55</td>
                   </tr>
                   <tr>
                     <td><strong>Gunning Fog</strong></td>
@@ -593,7 +570,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 </div>
                 <p>Adapta el nivel de dificultad de sus textos al curso y edad del alumnado para maximizar la comprensión.</p>
                 <div className={styles.escenarioExample}>
-                  <strong>Ejemplo real:</strong> Un material de ESO debería tener una puntuación de 65-75. Para Bachillerato, 50-65 es adecuado.
+                  <strong>Ejemplo real:</strong> En el estudio que validó la escala INFLESZ, los libros escolares puntuaron de media 67,4 y las revistas científicas, 37,9.
                 </div>
                 <div className={styles.escenarioTip}>
                   Meta: ajustar la puntuación al nivel educativo del alumno. Usar la escala INFLESZ como referencia.
@@ -607,7 +584,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 </div>
                 <p>Cumple con las normativas de comunicación clara (Plain Language) en folletos, consentimientos y webs de pacientes.</p>
                 <div className={styles.escenarioExample}>
-                  <strong>Ejemplo real:</strong> El Ministerio de Sanidad recomienda que los folletos para pacientes alcancen una puntuación INFLESZ de al menos 55 (nivel &quot;algo difícil&quot; como mínimo).
+                  <strong>Ejemplo real:</strong> Barrio-Cantalejo y otros (2008), al validar la escala INFLESZ, concluyen que los textos sobre salud tienen más probabilidad de leerse y comprenderse si superan los 55 puntos (tramo &quot;normal&quot;).
                 </div>
                 <div className={styles.escenarioTip}>
                   Meta: INFLESZ superior a 55. Nunca usar jerga médica sin explicación inmediata.

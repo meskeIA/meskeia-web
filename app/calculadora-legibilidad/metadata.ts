@@ -56,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre Flesch-Szigriszt y Fernández Huerta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Ambas son adaptaciones de la fórmula original de Rudolf Flesch para el idioma español. Szigriszt ajustó los coeficientes en 1993 para el español estándar, mientras que Fernández Huerta realizó una adaptación anterior (1959) con una escala ligeramente diferente. La fórmula INFLESZ unifica ambos enfoques y es la más utilizada en entornos académicos y sanitarios españoles para evaluar documentos de pacientes y materiales educativos.',
+        text: 'Ambas son adaptaciones de la fórmula original de Rudolf Flesch para el idioma español. Fernández Huerta publicó la suya en 1959 y Szigriszt la suya en 1992, con un coeficiente de 62,3 por sílaba. INFLESZ no es una tercera fórmula: es la escala de cinco tramos que Barrio-Cantalejo y otros validaron en 2008 para leer la puntuación Flesch-Szigriszt, y es la referencia habitual en el ámbito sanitario español.',
       },
     },
     {
@@ -64,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Qué nivel de legibilidad debo buscar para mi blog o web?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para contenido web dirigido al público general se recomienda una puntuación INFLESZ de "Normal" o "Bastante fácil", equivalente a un nivel de bachillerato. Los textos de prensa generalista suelen situarse entre 60 y 70 puntos en la escala Flesch-Szigriszt. Los documentos técnicos o científicos pueden tener puntuaciones más bajas, pero en ese caso convienen resúmenes introductorios más accesibles.',
+        text: 'Para contenido web dirigido al público general conviene quedar en los tramos "Normal" (55-65) o "Bastante fácil" (65-80) de la escala INFLESZ. En el estudio que la validó, la prensa de quiosco puntuó de media 60 y los libros escolares 67,4. Los documentos técnicos o científicos pueden tener puntuaciones más bajas, pero en ese caso convienen resúmenes introductorios más accesibles.',
       },
     },
     {
