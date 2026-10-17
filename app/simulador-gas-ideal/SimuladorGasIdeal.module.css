@@ -1232,3 +1232,10 @@
     transition: none !important;
   }
 }
+
+/* El acento del resultado va en var(--primary): en oscuro, #3FA5D1 en meskeia.com (3,26:1) y
+   #C99BF5 en stemum.com (4,12:1) sobre el extremo #14532d del degradado de .resultBlock. Va en el
+   azul claro de simulador-pendulo, que da 5,05:1 y 6,39:1 en los dos extremos (cabo C0112). */
+[data-theme='dark'] .resultValueAccent {
+  color: #93c5fd;
+}

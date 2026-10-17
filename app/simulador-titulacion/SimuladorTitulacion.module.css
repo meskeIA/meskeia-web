@@ -646,6 +646,12 @@
   border-color: var(--primary);
 }
 
+/* La ecuación de la pestaña activa va en var(--primary) sobre ese degradado: 3,26:1 en
+   meskeia.com y 4,12:1 en stemum.com. El azul claro de pendulo da 5,05:1 (cabo C0112). */
+[data-theme='dark'] .tabActive span {
+  color: #93c5fd;
+}
+
 [data-theme='dark'] .inputGroup input[type="number"] {
   border-color: #4b5563;
   background: #1a1a1a;
@@ -1093,4 +1099,11 @@
   .hero {
     padding-top: 100px;
   }
+}
+
+/* El acento del resultado va en var(--primary): en oscuro, #3FA5D1 en meskeia.com (3,26:1) y
+   #C99BF5 en stemum.com (4,12:1) sobre el extremo #14532d del degradado de .resultBlock. Va en el
+   azul claro de simulador-pendulo, que da 5,05:1 y 6,39:1 en los dos extremos (cabo C0112). */
+[data-theme='dark'] .resultValueAccent {
+  color: #93c5fd;
 }

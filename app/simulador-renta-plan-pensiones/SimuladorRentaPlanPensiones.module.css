@@ -766,6 +766,14 @@
   color: #93c5fd;
 }
 
+/* El <em> del mensaje y el título de la forma de cobro elegida iban en var(--primary)
+   (#3FA5D1): 3,26:1 sobre el extremo #14532d del degradado y 4,03:1 sobre el fondo de la
+   opción activa. Con el azul claro del <strong> de al lado, 5,05:1 y 6,3:1 (cabo C0112). */
+[data-theme='dark'] .mensajePedagogico em,
+[data-theme='dark'] .formaActiva strong {
+  color: #93c5fd;
+}
+
 [data-theme='dark'] .comparativaTable td {
   border-color: #374151;
 }
