@@ -1020,7 +1020,7 @@ export default function SimuladorPuertasLogicasPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <strong>Estudiante preuniversitario</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -1033,7 +1033,7 @@ export default function SimuladorPuertasLogicasPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
                 <strong>Estudiante de ingeniería</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -1046,7 +1046,7 @@ export default function SimuladorPuertasLogicasPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔧</span>
                 <strong>Técnico en electrónica</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -1059,7 +1059,7 @@ export default function SimuladorPuertasLogicasPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <strong>Diseñador de sistemas digitales</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -1228,7 +1228,7 @@ export default function SimuladorPuertasLogicasPage() {
         {/* Sección 6: Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>6 errores conceptuales frecuentes en lógica digital</strong>
           </div>
           <ul className={styles.warningList}>

@@ -1239,7 +1239,8 @@ test.describe('16/10 · contenido', () => {
     await expect(pregunta).not.toContainText('son universales');
   });
 
-  test.fail('HALLAZGO · los emojis decorativos del bloque educativo llevan aria-hidden', async ({ page }) => {
+  // REPARADO (hallazgo 3355, 17/10/2026)
+  test('3355 · los emojis decorativos del bloque educativo llevan aria-hidden', async ({ page }) => {
     await abrirSimulador(page);
     await abrirGuiaEducativa(page);
     // 🎓 🔬 🔧 💻 junto al perfil de cada tarjeta y ⚠️ junto al título del recuadro de errores.
