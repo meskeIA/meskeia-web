@@ -67,6 +67,25 @@ const obtenerPorcentajeCrecimiento = (edad: number, tamano: TamanoRaza): number 
   return 1.0;
 };
 
+/**
+ * Fracción del peso adulto a partir de la cual el perro se da por crecido: la ración de cachorro
+ * deja de calcularse y el porcentaje puede decir «100».
+ */
+const UMBRAL_ADULTO = 0.999;
+
+/**
+ * El porcentaje de crecimiento tal como se escribe, sin el signo. Hallazgo 3331 (16/10/2026):
+ * redondeado a entero, un 99,75 % salía «100» mientras la ración seguía tratándolo como cachorro
+ * en crecimiento («el 100 % de su peso adulto ya alcanzado… Un cachorro necesita más energía»).
+ * Ahora solo se escribe 100 a partir del mismo umbral que lo da por adulto; por debajo, en la
+ * franja que redondearía a 100, lleva un decimal (99,8).
+ */
+const textoPorcentajeCrecimiento = (fraccion: number): string => {
+  if (fraccion >= UMBRAL_ADULTO) return formatNumber(100, 0);
+  const pct = fraccion * 100;
+  return pct >= 99.5 ? formatNumber(pct, 1) : formatNumber(pct, 0);
+};
+
 // Semana en la que la curva del tamaño llega al 100 % (fin del crecimiento)
 const semanaMadurez = (tamano: TamanoRaza): number => {
   const edades = Object.keys(curvasCrecimiento[tamano]).map(Number).sort((a, b) => a - b);
@@ -207,7 +226,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
   const racion = useMemo(() => {
     if (!resultado) return null;
     const p = resultado.porcentajeCrecimiento / 100;
-    if (p >= 0.999) return { adulto: true as const };
+    if (p >= UMBRAL_ADULTO) return { adulto: true as const };
     const kcal = energiaCrecimientoKcal(resultado.peso, p);
     const densidad = kcalPienso.trim() === '' ? NaN : parseSpanishNumber(kcalPienso);
     const gramos = gramosDePienso(kcal, densidad);
@@ -370,7 +389,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <div className={styles.detallesGrid}>
                 <div className={styles.detalleCard}>
                   <span className={styles.detalleIcon} aria-hidden="true">📊</span>
-                  <span className={styles.detalleValor}>{formatNumber(resultado.porcentajeCrecimiento, 0)}%</span>
+                  <span className={styles.detalleValor}>{textoPorcentajeCrecimiento(resultado.porcentajeCrecimiento / 100)}%</span>
                   <span className={styles.detalleLabel}>Crecimiento actual</span>
                 </div>
                 <div className={styles.detalleCard}>
@@ -480,7 +499,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                   >
                     <title>
                       {formatNumber(h.meses, 0)} meses: {formatNumber(h.peso, 1)} kg (
-                      {formatNumber(h.porcentaje * 100, 0)} % de su peso adulto)
+                      {textoPorcentajeCrecimiento(h.porcentaje)} % de su peso adulto)
                     </title>
                   </circle>
                   <text
@@ -530,7 +549,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                   <tr key={h.semanas} className={Math.abs(h.semanas - resultado.edad) < 2.2 ? styles.filaActual : undefined}>
                     <th scope="row">{formatNumber(h.meses, 0)} meses</th>
                     <td>{formatNumber(h.peso, 1)} kg</td>
-                    <td>{formatNumber(h.porcentaje * 100, 0)} %</td>
+                    <td>{textoPorcentajeCrecimiento(h.porcentaje)} %</td>
                   </tr>
                 ))}
               </tbody>
@@ -571,7 +590,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             <>
               <p className={styles.curvaIntro}>
                 Un cachorro necesita más energía por kilo cuanto más lejos está de su peso adulto. Con{' '}
-                {formatNumber(resultado.peso, 1)} kg y el {formatNumber(resultado.porcentajeCrecimiento, 0)}&nbsp;% de su
+                {formatNumber(resultado.peso, 1)} kg y el {textoPorcentajeCrecimiento(resultado.porcentajeCrecimiento / 100)}&nbsp;% de su
                 peso adulto ya alcanzado, la ecuación de crecimiento del NRC (2006) da:
               </p>
               <p className={styles.racionCifra}>

@@ -636,10 +636,11 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
 
   // ── HALLAZGOS ABIERTOS del 16/10/2026: fallan HOY a propósito (test.fail) ───────────────────
 
-  test('HALLAZGO — con p = 0,9975 la página dice «el 100 % … ya alcanzado» y aun así da ración de crecimiento', async ({
+  // REPARADO (hallazgo 3331): solo se escribe 100 a partir del umbral que lo da por adulto (0,999);
+  // en la franja que redondearía a 100 el porcentaje lleva un decimal.
+  test('3331 (regresión) — con p = 0,9975 la página no dice «el 100 % … ya alcanzado» si da ración de crecimiento', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     // L3 de la cabecera: mini, 3,5 kg, 39 semanas → p = 0,9975 < 0,999 → ración ≈ 340 kcal
     await calcular(page, { peso: '3,5', edad: '39', tamano: 'Mini' });
@@ -648,6 +649,18 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
     // = «100» junto a «Un cachorro necesita más energía…» y una ración de crecimiento.
     const intro = ((await seccionRacion(page).locator('p').first().textContent()) ?? '').replace(/ /g, ' ');
     expect(intro).not.toContain('el 100 % de su peso adulto ya alcanzado');
+    // 0,98 + 0,02 × 7/8 = 0,9975 → 99,75 → un decimal: «99,8» (o «99,7» si el double queda por debajo)
+    expect(intro).toMatch(/el 99,[78][\s ]%[\s ]de su peso adulto ya alcanzado/);
+    // la tarjeta «Crecimiento actual» dice lo mismo
+    await expect(detalle(page, 0)).toHaveText(/^99,[78] ?%$/);
+    // y la misma franja en gigante: 60 kg a las 143 semanas, p = 0,95 + 0,05 × 47/48 = 0,99896 < 0,999
+    await calcular(page, { peso: '60', edad: '143', tamano: 'Gigante' });
+    await expect(racionNumero(page)).toHaveCount(1);
+    await expect(detalle(page, 0)).toHaveText(/^99,9 ?%$/);
+    // a partir del umbral, adulto: 100 y sin ración de cachorro (L2 de la cabecera)
+    await calcular(page, { peso: '3,5', edad: '40', tamano: 'Mini' });
+    await expect(detalle(page, 0)).toHaveText(/^100 ?%$/);
+    await expect(racionNumero(page)).toHaveCount(0);
   });
 
   test('HALLAZGO — el % va pegado a la cifra o con espacio normal, no con espacio duro (RAE 2010)', async ({
