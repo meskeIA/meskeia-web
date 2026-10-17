@@ -103,9 +103,10 @@
   letter-spacing: -0.01em;
 }
 
-[data-theme='dark'] .stemumWordmark {
-  color: #C99BF5;
-}
+/* ⚠️ Sin variante oscura, a propósito (cabo C0112, 17/10/2026): la píldora es BLANCA en los dos
+   temas (.logoContainer, rgba(255,255,255,0.95)), así que el texto de dentro no sigue al tema.
+   Hasta hoy pasaba a #C99BF5 en oscuro, el violeta pensado para fondos oscuros, y sobre la
+   píldora daba 2,00:1 («Stemum › Física» en todo stemum.com en oscuro). Con #6B21A8, 7,9:1. */
 
 /* Breadcrumb Stemum (Stemum › Disciplina) dentro de la píldora flotante */
 .stemumPill {
@@ -125,7 +126,8 @@
 }
 
 .stemumSep {
-  color: var(--text-muted, #999);
+  /* Fijo, no var(--text-muted): en oscuro ese token es gris claro y la píldora sigue blanca */
+  color: #666;
   font-size: 1.2rem;
   line-height: 1;
 }
@@ -150,9 +152,6 @@
   border-radius: 4px;
 }
 
-[data-theme='dark'] .stemumDiscLink {
-  color: #C99BF5;
-}
 
 /* Variante de marca Coquinum (servida bajo coquinum.com) */
 .coquinumIcon {
@@ -166,9 +165,8 @@
   letter-spacing: -0.01em;
 }
 
-[data-theme='dark'] .coquinumWordmark {
-  color: #A9CC85;
-}
+/* Sin variante oscura por lo mismo que la de Stemum (cabo C0112): #A9CC85 sobre la píldora
+   blanca daba 1,9:1; #4F7A3A, 4,6:1. */
 
 /* Breadcrumb Coquinum (Coquinum › Categoría) dentro de la píldora flotante */
 .coquinumPill {
@@ -188,7 +186,8 @@
 }
 
 .coquinumSep {
-  color: var(--text-muted, #999);
+  /* Fijo, no var(--text-muted): en oscuro ese token es gris claro y la píldora sigue blanca */
+  color: #666;
   font-size: 1.2rem;
   line-height: 1;
 }
@@ -213,9 +212,6 @@
   border-radius: 4px;
 }
 
-[data-theme='dark'] .coquinumCatLink {
-  color: #A9CC85;
-}
 
 /* Toggle de tema */
 .themeToggle {
