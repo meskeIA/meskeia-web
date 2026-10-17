@@ -1265,7 +1265,8 @@ test.describe('16/10 · contenido', () => {
     expect((features ?? []).filter((f) => /paso a paso|propagaci/i.test(f))).toEqual([]);
   });
 
-  test.fail('HALLAZGO · el FAQPage y la FAQ visible dicen lo mismo (una sola constante)', async ({ page }) => {
+  // REPARADO (hallazgo 3359, 17/10/2026): PREGUNTAS_FRECUENTES en metadata.ts, que importan las dos.
+  test('3359 · el FAQPage y la FAQ visible dicen lo mismo (una sola constante)', async ({ page }) => {
     await abrirSimulador(page);
     await abrirGuiaEducativa(page);
     const normal = (s: string): string => s.replace(/\s+/g, ' ').trim();

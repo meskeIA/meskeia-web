@@ -7,6 +7,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
 import ZonaHerramienta from '@/components/ZonaHerramienta';
 import { evaluarExpresion, extraerVariables, MAX_VARIABLES } from './motor';
 import { RETOS, corregirIntento, type Correccion } from './motor-retos';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 // ============================================
 // TIPOS
@@ -1077,32 +1078,32 @@ export default function SimuladorPuertasLogicasPage() {
           <h3>Preguntas Frecuentes</h3>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>¿Es lo mismo una puerta lógica que una compuerta lógica?</h4>
-              <p>Sí, son <strong>el mismo componente</strong>: un circuito que recibe entradas binarias (0 y 1) y devuelve una salida según una operación lógica. La única diferencia es el término regional: en España se dice <strong>puerta lógica</strong> y en buena parte de Hispanoamérica (México, Colombia, Argentina...) se dice <strong>compuerta lógica</strong>. Ambas traducen el inglés <em>logic gate</em>.</p>
+              <h4>{PREGUNTAS_FRECUENTES.puertaCompuerta.pregunta}</h4>
+              <p>{PREGUNTAS_FRECUENTES.puertaCompuerta.respuesta}</p>
               <p className={styles.faqTip}><span aria-hidden="true">💡</span> Este simulador funciona igual con cualquiera de los dos nombres: las 7 puertas (o compuertas) AND, OR, NOT, NAND, NOR, XOR y XNOR se llaman igual en todos los países, porque sus nombres vienen del inglés.</p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Qué es el Álgebra de Boole y para qué sirve?</h4>
-              <p>El Álgebra de Boole (1854) es el sistema matemático que describe los circuitos digitales. Trabaja con solo dos valores (0 y 1) y tres operaciones básicas (AND, OR, NOT). Permite simplificar expresiones lógicas para reducir el número de puertas y ahorrar coste, energía y espacio en silicio.</p>
+              <h4>{PREGUNTAS_FRECUENTES.algebraBoole.pregunta}</h4>
+              <p>{PREGUNTAS_FRECUENTES.algebraBoole.respuesta}</p>
               <p className={styles.faqTip}><span aria-hidden="true">💡</span> Las leyes fundamentales son conmutativa (A·B = B·A), asociativa y distributiva (A·(B+C) = A·B + A·C).</p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Por qué NAND y NOR se llaman puertas universales?</h4>
-              <p>Porque cualquier función lógica puede implementarse usando <strong>únicamente puertas NAND</strong> (o únicamente NOR). NOT(A) = A NAND A; AND(A,B) = NOT(A NAND B); OR(A,B) = (NOT A) NAND (NOT B). Los fabricantes de chips simplifican la producción usando una sola celda estándar.</p>
+              <h4>{PREGUNTAS_FRECUENTES.universales.pregunta}</h4>
+              <p>{PREGUNTAS_FRECUENTES.universales.respuesta}</p>
               <p className={styles.faqTip}><span aria-hidden="true">💡</span> En FPGAs modernas, los &quot;Look-Up Tables&quot; (LUT) son la generalización de este concepto: una tabla de memoria que implementa cualquier función booleana.</p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Qué es una tabla de verdad y cómo se construye?</h4>
-              <p>Una tabla de verdad lista todas las combinaciones posibles de entradas (2<sup>n</sup> filas para n entradas) y la salida correspondiente. Para 2 entradas: 4 filas (00, 01, 10, 11). Para 3 entradas: 8 filas. Para 10 entradas: 1.024 filas.</p>
+              <h4>{PREGUNTAS_FRECUENTES.tablaVerdad.pregunta}</h4>
+              <p>{PREGUNTAS_FRECUENTES.tablaVerdad.respuesta}</p>
               <p className={styles.faqTip}><span aria-hidden="true">💡</span> Construye siempre las entradas en orden binario natural (de 0 a 2^n-1) para no omitir ninguna combinación.</p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Qué diferencia hay entre XOR y XNOR?</h4>
-              <p>XOR da salida 1 cuando las entradas son <strong>DIFERENTES</strong>. XNOR da 1 cuando son <strong>IGUALES</strong>. Son complementarias: si A XOR B = Y, entonces A XNOR B = NOT(Y). XOR se usa en sumadores y detectores de paridad; XNOR en comparadores de igualdad.</p>
+              <h4>{PREGUNTAS_FRECUENTES.xorXnor.pregunta}</h4>
+              <p>{PREGUNTAS_FRECUENTES.xorXnor.respuesta}</p>
               <p className={styles.faqTip}><span aria-hidden="true">💡</span> XOR detecta si el número de unos en la entrada es impar. Concatenando XORs se construyen generadores/verificadores de paridad.</p>
             </div>
 
@@ -1125,8 +1126,8 @@ export default function SimuladorPuertasLogicasPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Cómo se implementan las puertas en hardware real?</h4>
-              <p>Las puertas lógicas se implementan con <strong>transistores CMOS</strong>. Una puerta NAND básica usa 4 transistores (2 NMOS en serie + 2 PMOS en paralelo). Los microprocesadores modernos tienen miles de millones de transistores operando a frecuencias de GHz.</p>
+              <h4>{PREGUNTAS_FRECUENTES.hardware.pregunta}</h4>
+              <p>{PREGUNTAS_FRECUENTES.hardware.respuesta}</p>
               <p className={styles.faqTip}><span aria-hidden="true">💡</span> La tecnología CMOS domina porque solo consume energía durante las transiciones. Una puerta CMOS en reposo consume esencialmente cero potencia.</p>
             </div>
           </div>
