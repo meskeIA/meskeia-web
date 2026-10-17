@@ -930,7 +930,7 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 Vas a comprar transportín, arnés y cama para un cachorro de 10 semanas, y todo eso se elige por el tamaño que tendrá de adulto, no por el que tiene ahora.
               </p>
               <p className={styles.escenarioTip}>
-                El rango de peso adulto probable evita comprar dos veces: el transportín homologado para viajar y el arnés se escogen por talla final, y el consumo de alimento se estima sobre ese mismo peso.
+                El rango de peso adulto probable evita comprar dos veces: el transportín homologado para viajar y el arnés se escogen por talla final. La comida se calcula aparte, en la «Ración diaria orientativa», con su peso de hoy y lo que le queda por crecer.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -1062,8 +1062,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🍖</span>
-              <strong>Alimenta según el peso adulto estimado</strong>
-              <p>Los fabricantes de pienso indican las raciones en función del peso adulto previsto, no del peso actual. Usar el peso actual lleva a subalimentación o sobrealimentación según la etapa.</p>
+              <strong>Lee bien la tabla de tu pienso</strong>
+              <p>Las tablas de los piensos de cachorro suelen entrar por el peso adulto previsto, no por el actual: mira en la etiqueta cuál piden. La «Ración diaria orientativa» de arriba usa los dos —el peso actual y cuánto le queda por crecer—, y en ambos casos lo que manda es la báscula: ajusta la ración si se aparta de la curva.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🏋️</span>

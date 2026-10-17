@@ -776,10 +776,10 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
     expect(alertasAMitad, 'role="alert" con el valor a medio escribir').toEqual([]);
   });
 
-  test('HALLAZGO — la guía sigue diciendo que usar el peso actual para la ración es un error, y la ración usa el actual', async ({
+  // REPARADO (hallazgo 3332): la tarjeta y el escenario se reescribieron con el criterio del paso 5.
+  test('3332 (regresión) — la guía ya no dice que usar el peso actual para la ración es un error, que es lo que usa la ración', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     await calcular(page, { peso: '7,5', edad: '18', tamano: 'Mediano' });
     // La ración de la app parte del peso ACTUAL (PV = 7,5 kg) y de p; no del adulto (13,6 kg)
