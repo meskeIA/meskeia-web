@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './CalculadoraTamanoAdultoPerro.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
@@ -27,6 +27,9 @@ import {
 const PESO_MAXIMO = 120;
 const EDAD_MINIMA = 8;
 const EDAD_MAXIMA = 150;
+
+/** Pausa al teclear la energía del pienso antes de avisar de que está fuera de rango. */
+const PAUSA_AVISO_MS = 800;
 
 // Hitos que se etiquetan en la curva y en la tabla, en meses
 const hitosMeses = [2, 3, 4, 6, 9, 12, 18, 24, 36];
@@ -114,6 +117,16 @@ export default function CalculadoraTamanoAdultoPerroPage() {
   const [error, setError] = useState<string | null>(null);
   /** Energía del pienso en kcal/kg, tal como la escribe el usuario. Opcional: sin ella sale solo la energía. */
   const [kcalPienso, setKcalPienso] = useState('');
+  /**
+   * El mismo valor cuando lleva PAUSA_AVISO_MS sin cambiar. El aviso de fuera de rango espera a él
+   * (hallazgo 3335): validado en cada pulsación, el role="alert" saltaba con «3», «38» y «380»
+   * mientras se tecleaba un 3800 válido, y el lector de pantalla oía un error que nadie cometió.
+   */
+  const [kcalPiensoAsentado, setKcalPiensoAsentado] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => setKcalPiensoAsentado(kcalPienso), PAUSA_AVISO_MS);
+    return () => clearTimeout(t);
+  }, [kcalPienso]);
   const [resultado, setResultado] = useState<{
     pesoAdultoMin: number;
     pesoAdultoMax: number;
@@ -618,18 +631,22 @@ export default function CalculadoraTamanoAdultoPerroPage() {
                 </span>
               </div>
 
-              {Number.isFinite(racion.gramos) && (
-                <p className={styles.racionGramos}>
-                  ≈ <strong>{formatNumber(racion.gramos, 0)} g de pienso al día</strong>, repartidos en varias tomas.
-                </p>
-              )}
-              {racion.piensoFueraDeRango && (
-                <p className={styles.errorMsg} role="alert">
-                  <span aria-hidden="true">⚠️</span> Escribe la energía en kcal por kilo, entre{' '}
-                  {formatNumber(KCAL_POR_KG_MIN, 0)} y {formatNumber(KCAL_POR_KG_MAX, 0)}: un pienso seco suele rondar las
-                  3500-4200 kcal/kg.
-                </p>
-              )}
+              {/* Región viva siempre montada (hallazgo 3335): los gramos aparecen al escribir y, fuera de
+                  ella, el lector de pantalla no los anunciaba. */}
+              <div aria-live="polite">
+                {Number.isFinite(racion.gramos) && (
+                  <p className={styles.racionGramos}>
+                    ≈ <strong>{formatNumber(racion.gramos, 0)} g de pienso al día</strong>, repartidos en varias tomas.
+                  </p>
+                )}
+                {racion.piensoFueraDeRango && kcalPiensoAsentado === kcalPienso && (
+                  <p className={styles.errorMsg} role="alert">
+                    <span aria-hidden="true">⚠️</span> Escribe la energía en kcal por kilo, entre{' '}
+                    {formatNumber(KCAL_POR_KG_MIN, 0)} y {formatNumber(KCAL_POR_KG_MAX, 0)}: un pienso seco suele rondar las
+                    3500-4200 kcal/kg.
+                  </p>
+                )}
+              </div>
 
               <p className={styles.racionAviso}>
                 <span aria-hidden="true">⚠️</span> Es un punto de partida, no una dieta. En dos estudios con razas pequeñas

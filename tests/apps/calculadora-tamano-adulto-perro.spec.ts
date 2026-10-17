@@ -635,7 +635,7 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
     await expect(racionNumero(page)).toHaveText('≈ 980 kcal');
   });
 
-  // ── HALLAZGOS ABIERTOS del 16/10/2026: fallan HOY a propósito (test.fail) ───────────────────
+  // ── HALLAZGOS del 16/10/2026 (3329-3335) — REPARADOS el 17/10/2026: quedan como regresión ────
 
   // REPARADO (hallazgo 3331): solo se escribe 100 a partir del umbral que lo da por adulto (0,999);
   // en la franja que redondearía a 100 el porcentaje lleva un decimal.
@@ -753,10 +753,11 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
     await expect(page.locator('[class*="resultadoValor"]')).toHaveCount(0);
   });
 
-  test('HALLAZGO — los gramos no se anuncian (fuera de toda región viva) y el role="alert" salta a mitad de teclear 3800', async ({
+  // REPARADO (hallazgo 3335): los gramos viven en una región aria-live siempre montada y el aviso de
+  // fuera de rango espera a que el valor lleve 800 ms sin cambiar.
+  test('3335 (regresión) — los gramos se anuncian y el role="alert" no salta a mitad de teclear 3800', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     await calcular(page, { peso: '7,5', edad: '18', tamano: 'Mediano' });
     const campo = seccionRacion(page).locator('#kcal-pienso');
