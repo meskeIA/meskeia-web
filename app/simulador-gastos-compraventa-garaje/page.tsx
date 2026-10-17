@@ -2014,9 +2014,12 @@ export default function SimuladorGarajeCompraventaPage() {
                   Curiosamente, los ~400 € que este ejemplo anunciaba al principio estaban más
                   cerca de la verdad que el número exacto que los sustituyó. Un ejemplo que no
                   cuadra con la calculadora de al lado enseña a desconfiar del resultado correcto,
-                  así que si vuelve a cambiar el motor, esta cifra cambia con él. */}
-              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid ({formatTipoNominal(ITP_GENERAL_MADRID)}&nbsp;%) = 1.500 €, más notaría (371,84 €, dentro de una horquilla de 318,72 € a 424,96 €), registro (80,21 €) y gestoría (300 €). El coste total asciende a 27.252,05 €.</p>
-              <div className={styles.casoResultado}>ITP + gastos = 9,01&nbsp;% del precio</div>
+                  así que si vuelve a cambiar el motor, esta cifra cambia con él. Tercera vez el
+                  17/10/2026 (hallazgos 2901 y 2902, cabo C0209): la rebaja del 5 % del nº 2.1 de
+                  los dos aranceles bajó la notaría de 371,84 € a 353,25 € y el registro de 80,21 €
+                  a 76,74 €, y el ejemplo seguía con las de antes. */}
+              <p>Luis compra una plaza de parking en Madrid por 25.000 €. Paga el ITP general de Madrid ({formatTipoNominal(ITP_GENERAL_MADRID)}&nbsp;%) = 1.500 €, más notaría (353,25 €, dentro de una horquilla de 302,79 € a 403,72 €), registro (76,74 €) y gestoría (300 €). El coste total asciende a 27.229,99 €.</p>
+              <div className={styles.casoResultado}>ITP + gastos = 8,92&nbsp;% del precio</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>
