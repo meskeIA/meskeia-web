@@ -1081,7 +1081,8 @@ test.describe('16/10 · ZonaHerramienta en escritorio', () => {
   // HALLAZGO ABIERTO (16/10/2026): `svg` está en CONTROLES de ZonaHerramienta porque en otros
   // simuladores es el lienzo donde se arrastra; aquí el «Símbolo» de la puerta es un dibujo
   // estático y pulsarlo cuenta como uso.
-  test.fail('HALLAZGO · pulsar el dibujo estático del símbolo NO es usar la herramienta', async ({ page }) => {
+  // REPARADO (hallazgo 3353, 17/10/2026): el dibujo lleva data-zona-estatica, que ZonaHerramienta ignora.
+  test('3353 · pulsar el dibujo estático del símbolo NO es usar la herramienta', async ({ page }) => {
     const envios = await abrirConAnalytics(page);
     const dibujo = page.locator('svg[class*="__gateSvg"]');
     await dibujo.scrollIntoViewIfNeeded();
@@ -1120,7 +1121,9 @@ test.describe('16/10 · ZonaHerramienta en móvil (360×740, táctil)', () => {
   // POSAR el dedo, antes de saber si el gesto es un toque o un desplazamiento. Deslizar para bajar
   // la página empezando sobre cualquier botón (los 4 de modo llenan la mitad baja de la primera
   // pantalla en móvil) emite evt:primer-uso sin que se haya usado nada: la puerta activa no cambia.
-  test.fail('HALLAZGO · deslizar el dedo sobre un botón solo para desplazarse NO es usar', async ({ page }) => {
+  // REPARADO (hallazgo 3353, 17/10/2026): con el dedo, ZonaHerramienta cuenta al soltar (pointerup),
+  // que no llega cuando el navegador se queda el gesto para desplazar (pointercancel).
+  test('3353 · deslizar el dedo sobre un botón solo para desplazarse NO es usar', async ({ page }) => {
     const envios = await abrirConAnalytics(page);
     const not = page.locator(BOTON_PUERTA).filter({ hasText: /^¬\s*NOT$/ });
     await not.evaluate((b) => b.scrollIntoView({ block: 'center' }));

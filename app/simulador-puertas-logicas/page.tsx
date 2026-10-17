@@ -432,7 +432,8 @@ export default function SimuladorPuertasLogicasPage() {
           <div className={styles.gateDiagram}>
             <h3>Símbolo</h3>
             <div className={styles.diagramContainer}>
-              <svg viewBox="0 0 200 100" className={styles.gateSvg}>
+              {/* data-zona-estatica: dibujo, no lienzo; pulsarlo no es usar (hallazgo 3353) */}
+              <svg viewBox="0 0 200 100" className={styles.gateSvg} data-zona-estatica>
                 {/* Inputs */}
                 <line x1="10" y1="30" x2="50" y2="30" stroke="currentColor" strokeWidth="2" />
                 {GATES[selectedGate].inputs === 2 && (
