@@ -126,11 +126,11 @@ export default function CalculadoraTamanoAdultoPerroPage() {
   } | null>(null);
 
   const calcular = () => {
-    const peso = parseFloat(pesoActual.replace(',', '.'));
-    // La coma decimal también aquí: sin esto, parseFloat('8,5') devolvía 8 y la app
-    // daba un peso adulto que no correspondía a la edad tecleada, sin avisar de nada
-    // (Inspector, 20/08/2026).
-    const edad = parseFloat(edadSemanas.replace(',', '.'));
+    // parseSpanishNumber y no parseFloat: el parseo casero se quedaba con el número de delante
+    // de cualquier basura («12abc» → 12) y con él daba peso adulto y ración sin avisar
+    // (hallazgo 3334, 16/10/2026). La coma decimal la admite igual (Inspector, 20/08/2026).
+    const peso = parseSpanishNumber(pesoActual);
+    const edad = parseSpanishNumber(edadSemanas);
 
     if (isNaN(peso) || peso <= 0 || peso > PESO_MAXIMO) {
       setError(`Introduce un peso actual válido, mayor que 0 y hasta ${PESO_MAXIMO} kg.`);
@@ -320,8 +320,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <span className={styles.unidad}>semanas</span>
             </div>
             <span className={styles.hint}>
-              {edadSemanas && !isNaN(parseFloat(edadSemanas.replace(',', '.'))) ?
-                `≈ ${formatNumber(parseFloat(edadSemanas.replace(',', '.')) / 4.33, 1)} meses` : ''}
+              {edadSemanas && Number.isFinite(parseSpanishNumber(edadSemanas)) ?
+                `≈ ${formatNumber(parseSpanishNumber(edadSemanas) / 4.33, 1)} meses` : ''}
             </span>
           </div>
 

@@ -737,10 +737,10 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
     }
   });
 
-  test('HALLAZGO — «12abc» como peso y «16abc» como edad se aceptan como 12 y 16 y dan peso adulto y ración', async ({
+  // REPARADO (hallazgo 3334): peso y edad pasan por parseSpanishNumber.
+  test('3334 (regresión) — «12abc» como peso y «16abc» como edad se rechazan con su aviso', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     // Hoy: parseFloat('12abc') = 12 → «21,8 kg» (12 ÷ 0,55) y «≈ 1390 kcal», sin aviso
     await calcular(page, { peso: '12abc', edad: '24', tamano: 'Grande' });
