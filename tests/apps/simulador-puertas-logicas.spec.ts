@@ -921,14 +921,22 @@ test.describe('16/10 · CASO 2 · límite, en móvil (360×740, táctil)', () =>
   // 388 px (4 botones de ~85 px) y la herramienta empieza en y≈1008. Al tocar «Circuitos» lo
   // que cambia (el selector de circuito, y≈996) queda por debajo de la pantalla: lo único que
   // se ve es el borde del botón. Medido en la inspección: top 996 px con 740 px de alto.
-  test.fail('HALLAZGO · al tocar un modo, lo que cambia aparece en la pantalla', async ({ page }) => {
+  // REPARADO (hallazgo 3352, 17/10/2026): tras tocar un modo, si su contenido empieza en el último
+  // cuarto de la pantalla o más abajo, la página se desplaza (con suavidad: por eso se sondea).
+  test('3352 · al tocar un modo, lo que cambia aparece en la pantalla', async ({ page }) => {
     await abrirSimulador(page);
     await elegirModo(page, 'Circuitos', true);
-    const caja = await page.getByRole('button', { name: 'Half Adder (Semisumador)' }).evaluate((e) => {
+    const primerControl = page.getByRole('button', { name: 'Half Adder (Semisumador)' });
+    await expect.poll(
+      () => primerControl.evaluate((e) => e.getBoundingClientRect().bottom <= window.innerHeight && e.getBoundingClientRect().top >= 0),
+      { message: 'el primer control del modo debe quedar a la vista' },
+    ).toBe(true);
+    // Y el modo tocado sigue a la vista o justo encima, no se pierde a media pantalla
+    await elegirModo(page, 'Expresiones', true);
+    await expect.poll(() => page.getByLabel('Expresión Booleana').evaluate((e) => {
       const r = e.getBoundingClientRect();
-      return { bottom: r.bottom, alto: window.innerHeight };
-    });
-    expect(caja.bottom, 'el primer control del modo debe quedar a la vista').toBeLessThanOrEqual(caja.alto);
+      return r.top >= 0 && r.bottom <= window.innerHeight;
+    })).toBe(true);
   });
 });
 

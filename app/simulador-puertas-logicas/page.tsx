@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './SimuladorPuertasLogicas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import ZonaHerramienta from '@/components/ZonaHerramienta';
@@ -173,6 +173,31 @@ export default function SimuladorPuertasLogicasPage() {
   const [solucionVisible, setSolucionVisible] = useState(false);
   const [resueltos, setResueltos] = useState<string[]>([]);
 
+  /**
+   * Hallazgo 3352 (16/10/2026): en móvil el selector de modo se apila en una columna y lo que
+   * cambia al tocar un modo queda por debajo de la pantalla (a 360×740, el primer control en
+   * y≈1047): solo se veía cambiar el borde del botón. Tras un cambio de modo pedido por el
+   * usuario, si el contenido del modo empieza en el último cuarto de la pantalla o más abajo,
+   * se desplaza hasta dejarlo a la vista. En escritorio ya lo está y no se mueve nada.
+   */
+  const selectorModoRef = useRef<HTMLDivElement>(null);
+  const modoElegidoRef = useRef(false);
+  const elegirModo = (nuevo: SimulatorMode) => {
+    modoElegidoRef.current = true;
+    setMode(nuevo);
+  };
+  useEffect(() => {
+    if (!modoElegidoRef.current) return;
+    modoElegidoRef.current = false;
+    const contenido = selectorModoRef.current?.nextElementSibling;
+    if (!contenido) return;
+    const alto = window.innerHeight;
+    const arriba = contenido.getBoundingClientRect().top;
+    if (arriba < alto * 0.75) return;
+    const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollBy({ top: arriba - alto * 0.2, behavior: sinMovimiento ? 'auto' : 'smooth' });
+  }, [mode]);
+
   // ============================================
   // MODO 1: TABLAS DE VERDAD
   // ============================================
@@ -296,11 +321,11 @@ export default function SimuladorPuertasLogicasPage() {
       <ZonaHerramienta app="simulador-puertas-logicas">
 
       {/* Mode Selector */}
-      <div className={styles.modeSelector}>
+      <div className={styles.modeSelector} ref={selectorModoRef}>
         <button
           type="button"
           className={`${styles.modeBtn} ${mode === 'tablas' ? styles.modeBtnActive : ''}`}
-          onClick={() => setMode('tablas')}
+          onClick={() => elegirModo('tablas')}
           aria-pressed={mode === 'tablas'}
         >
           <span className={styles.modeIcon} aria-hidden="true">📊</span>
@@ -310,7 +335,7 @@ export default function SimuladorPuertasLogicasPage() {
         <button
           type="button"
           className={`${styles.modeBtn} ${mode === 'circuitos' ? styles.modeBtnActive : ''}`}
-          onClick={() => setMode('circuitos')}
+          onClick={() => elegirModo('circuitos')}
           aria-pressed={mode === 'circuitos'}
         >
           <span className={styles.modeIcon} aria-hidden="true">🔌</span>
@@ -320,7 +345,7 @@ export default function SimuladorPuertasLogicasPage() {
         <button
           type="button"
           className={`${styles.modeBtn} ${mode === 'expresiones' ? styles.modeBtnActive : ''}`}
-          onClick={() => setMode('expresiones')}
+          onClick={() => elegirModo('expresiones')}
           aria-pressed={mode === 'expresiones'}
         >
           <span className={styles.modeIcon} aria-hidden="true">🧮</span>
@@ -330,7 +355,7 @@ export default function SimuladorPuertasLogicasPage() {
         <button
           type="button"
           className={`${styles.modeBtn} ${mode === 'retos' ? styles.modeBtnActive : ''}`}
-          onClick={() => setMode('retos')}
+          onClick={() => elegirModo('retos')}
           aria-pressed={mode === 'retos'}
         >
           <span className={styles.modeIcon} aria-hidden="true">🎯</span>
