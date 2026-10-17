@@ -38,6 +38,12 @@ export interface Elemento {
   numero: number;
   simbolo: string;
   nombre: string;
+  /**
+   * Otros nombres admitidos que también se buscan y se aceptan como respuesta. Nace con el
+   * wolframio (hallazgo 3362, 16/10/2026): su forma preferida en español es «wolframio»
+   * (acuerdo RAC-RAE-RSEQ-Fundéu, An. Quím. 113, 2017, 65-67) y «tungsteno» la recoge el DLE.
+   */
+  otrosNombres?: readonly string[];
   masa: number;
   grupo: number;
   periodo: number;
@@ -178,7 +184,7 @@ const ELEMENTOS_SIN_RADIO: Omit<Elemento, 'radioAtomico'>[] = [
   // Continuación Período 6 (después de lantánidos)
   { numero: 72, simbolo: "Hf", nombre: "Hafnio", masa: 178.49, grupo: 4, periodo: 6, familia: "metales-transicion", estado: "solido", electronegatividad: 1.30, configuracionElectronica: "[Xe] 4f¹⁴ 5d² 6s²", usos: ["Reactores nucleares", "Procesadores", "Aleaciones"], datoCurioso: "Muy similar al circonio, difícil de separar." },
   { numero: 73, simbolo: "Ta", nombre: "Tántalo", masa: 180.95, grupo: 5, periodo: 6, familia: "metales-transicion", estado: "solido", electronegatividad: 1.50, configuracionElectronica: "[Xe] 4f¹⁴ 5d³ 6s²", usos: ["Electrónica", "Implantes quirúrgicos", "Capacitores"], datoCurioso: "Extremadamente resistente a la corrosión." },
-  { numero: 74, simbolo: "W", nombre: "Tungsteno", masa: 183.84, grupo: 6, periodo: 6, familia: "metales-transicion", estado: "solido", electronegatividad: 2.36, configuracionElectronica: "[Xe] 4f¹⁴ 5d⁴ 6s²", usos: ["Filamentos de bombillas", "Herramientas de corte"], datoCurioso: "Tiene el punto de fusión más alto de todos los elementos." },
+  { numero: 74, simbolo: "W", nombre: "Wolframio", otrosNombres: ["Tungsteno"], masa: 183.84, grupo: 6, periodo: 6, familia: "metales-transicion", estado: "solido", electronegatividad: 2.36, configuracionElectronica: "[Xe] 4f¹⁴ 5d⁴ 6s²", usos: ["Filamentos de bombillas", "Herramientas de corte"], datoCurioso: "Tiene el punto de fusión más alto de todos los elementos." },
   { numero: 75, simbolo: "Re", nombre: "Renio", masa: 186.21, grupo: 7, periodo: 6, familia: "metales-transicion", estado: "solido", electronegatividad: 1.90, configuracionElectronica: "[Xe] 4f¹⁴ 5d⁵ 6s²", usos: ["Motores de avión", "Catalizadores", "Termopares"], datoCurioso: "Último elemento estable descubierto (1925)." },
   { numero: 76, simbolo: "Os", nombre: "Osmio", masa: 190.23, grupo: 8, periodo: 6, familia: "metales-transicion", estado: "solido", electronegatividad: 2.20, configuracionElectronica: "[Xe] 4f¹⁴ 5d⁶ 6s²", usos: ["Puntas de plumas", "Implantes", "Catalizadores"], datoCurioso: "Es el elemento más denso conocido." },
   { numero: 77, simbolo: "Ir", nombre: "Iridio", masa: 192.22, grupo: 9, periodo: 6, familia: "metales-transicion", estado: "solido", electronegatividad: 2.20, configuracionElectronica: "[Xe] 4f¹⁴ 5d⁷ 6s²", usos: ["Bujías", "Crisoles", "Electrodos"], datoCurioso: "Segundo elemento más denso, muy resistente a corrosión." },

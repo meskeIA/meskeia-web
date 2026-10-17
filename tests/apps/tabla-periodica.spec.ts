@@ -2661,8 +2661,8 @@ test.describe('hallazgos · 16/10/2026 (ABIERTOS)', () => {
     expect(distintos).toEqual([]); // hoy: ['Pm', 'Eu', 'Tb', 'Rn', 'Lr']
   });
 
-  test('B · C0058 · el W se llama «Tungsteno» y buscar «wolframio», su nombre preferido, no encuentra nada', async ({ page }) => {
-    test.fail(true, 'ABIERTO (inspector 16/10/2026): «wolframio» → Mostrando 0 de 118 elementos');
+  // REPARADO (hallazgo 3362, 17/10/2026): «Wolframio» de nombre y «Tungsteno» en otrosNombres.
+  test('B · C0058 (3362) · el W se llama «Wolframio» y se encuentra por «wolframio» y por «tungsteno»', async ({ page }) => {
     // Fuente anclada en el repositorio: acuerdo RAC-RAE-RSEQ-Fundéu, An. Quím. 113 (2017) 65-67,
     // que citan tests/apps/simulador-tabla-periodica-tendencias.spec.ts y la FAQ visible de
     // quiz-simbolos-quimicos: la forma preferida es «wolframio». Ya la usan tendencias,
@@ -2678,7 +2678,14 @@ test.describe('hallazgos · 16/10/2026 (ABIERTOS)', () => {
     await expect(w).toBeEnabled();
     await sembrarValor(page, '#busqueda', '');
     await w.click();
-    await expect(page.locator('#titulo-ficha-elemento')).toHaveText('Wolframio'); // hoy: Tungsteno
+    await expect(page.locator('#titulo-ficha-elemento')).toHaveText('Wolframio'); // antes: Tungsteno
+    // Y como respuesta de una ficha o de la práctica valen los dos nombres
+    const ejercicio = {
+      enunciado: '', etiquetaRespuesta: 'Símbolo o nombre del elemento', respuestaTexto: 'Wolframio',
+      sinonimos: ['w', 'wolframio', 'tungsteno'], respuestaEntera: false, pasos: [],
+    };
+    expect(comprobarEjercicio('tungsteno', ejercicio).correcto).toBe(true);
+    expect(elementos.find((e) => e.simbolo === 'W')?.otrosNombres).toEqual(['Tungsteno']);
   });
 
   test('C · la tolerancia del 1 % acepta la masa de la casilla de al lado y cifras que no redondean el dato', async ({ page }) => {

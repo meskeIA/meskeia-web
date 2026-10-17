@@ -203,9 +203,16 @@ function comparable(texto: string): string {
   return normalizar(texto).replace(/\s+/g, '');
 }
 
-/** Los dos sinónimos que SIEMPRE valen para un elemento: su símbolo y su nombre. */
+/**
+ * Los sinónimos que SIEMPRE valen para un elemento: su símbolo, su nombre y sus otros nombres
+ * admitidos («tungsteno» para el wolframio, hallazgo 3362).
+ */
 function sinonimosDe(elemento: Elemento): readonly string[] {
-  return [normalizar(elemento.simbolo), normalizar(elemento.nombre)];
+  return [
+    normalizar(elemento.simbolo),
+    normalizar(elemento.nombre),
+    ...(elemento.otrosNombres ?? []).map(normalizar),
+  ];
 }
 
 // ============================================================

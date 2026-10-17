@@ -79,6 +79,7 @@ export default function TablaPerodicaPage() {
         const query = normalizaTexto(busqueda);
         return (
           normalizaTexto(el.nombre).includes(query) ||
+          (el.otrosNombres ?? []).some((n) => normalizaTexto(n).includes(query)) ||
           el.simbolo.toLowerCase().includes(query) ||
           el.numero.toString().includes(query)
         );
