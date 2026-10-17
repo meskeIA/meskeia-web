@@ -431,13 +431,8 @@ export default function SimuladorCampoElectrico() {
   }, []);
 
   // ----- Handlers de interacción -----
-  const handleSvgPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
-    const target = e.target as SVGElement;
-    if (target.dataset.tipo === 'carga' || target.dataset.tipo === 'prueba' || target.dataset.tipo === 'remove') {
-      // delegado por su propio handler
-      return;
-    }
-    const svgPt = pointerASvg(e.clientX, e.clientY);
+  const anadirCargaEn = (clientX: number, clientY: number) => {
+    const svgPt = pointerASvg(clientX, clientY);
     if (!svgPt) return;
     const { x, y } = svgToWorld(svgPt.x, svgPt.y);
     if (modo === 'add-pos') {
@@ -445,6 +440,45 @@ export default function SimuladorCampoElectrico() {
     } else if (modo === 'add-neg') {
       setCargas((prev) => [...prev, { id: generarId(), x, y, q: -magnitudNueva }]);
     }
+  };
+
+  /**
+   * Hallazgo 3346 (16/10/2026, cabo C0067): con el dedo, la carga nacía en `pointerdown`, y el
+   * lienzo llevaba `touch-action: none`. Quien apoyaba el dedo en él para bajar la página no la
+   * desplazaba y dejaba una carga de +5 nC donde tocó. Ahora el lienzo admite el desplazamiento
+   * vertical (`pan-y`; las cargas y la sonda siguen en `none` para arrastrarlas) y, con el dedo,
+   * la carga nace al SOLTAR un toque que no se ha movido: si el navegador se queda el gesto para
+   * desplazar, manda `pointercancel` y no hay `pointerup`. Con el ratón, igual que siempre.
+   */
+  const toqueEnLienzoRef = useRef<{ id: number; x: number; y: number } | null>(null);
+  const MOVIMIENTO_MAXIMO_TOQUE_PX = 10;
+
+  // Con el lienzo en pan-y, Chromium no aplica el `touch-action: none` de los círculos SVG
+  // (medido: arrastrar una carga con el dedo también bajaba la página 29 px). Un `touchstart` NO
+  // pasivo que empieza sobre lo que se arrastra cancela el desplazamiento de ese gesto; los
+  // eventos de puntero, que mueven la carga, siguen llegando.
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const alEmpezarToque = (e: TouchEvent) => {
+      const objetivo = e.target as Element | null;
+      if (objetivo?.closest?.('[data-tipo="carga"], [data-tipo="prueba"], [data-tipo="remove"]')) e.preventDefault();
+    };
+    svg.addEventListener('touchstart', alEmpezarToque, { passive: false });
+    return () => svg.removeEventListener('touchstart', alEmpezarToque);
+  }, []);
+
+  const handleSvgPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
+    const target = e.target as SVGElement;
+    if (target.dataset.tipo === 'carga' || target.dataset.tipo === 'prueba' || target.dataset.tipo === 'remove') {
+      // delegado por su propio handler
+      return;
+    }
+    if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+      toqueEnLienzoRef.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
+      return;
+    }
+    anadirCargaEn(e.clientX, e.clientY);
   };
 
   const handleCargaPointerDown = (e: React.PointerEvent<SVGCircleElement>, id: string) => {
@@ -486,9 +520,22 @@ export default function SimuladorCampoElectrico() {
     }
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e: React.PointerEvent<SVGSVGElement>) => {
     setArrastrandoId(null);
     setArrastrandoPrueba(false);
+    const toque = toqueEnLienzoRef.current;
+    toqueEnLienzoRef.current = null;
+    if (toque && toque.id === e.pointerId
+      && Math.hypot(e.clientX - toque.x, e.clientY - toque.y) <= MOVIMIENTO_MAXIMO_TOQUE_PX) {
+      anadirCargaEn(e.clientX, e.clientY);
+    }
+  };
+
+  /** Salir del lienzo o perder el gesto termina el arrastre y descarta el toque, sin crear nada. */
+  const handlePointerFuera = () => {
+    setArrastrandoId(null);
+    setArrastrandoPrueba(false);
+    toqueEnLienzoRef.current = null;
   };
 
   /**
@@ -865,7 +912,8 @@ export default function SimuladorCampoElectrico() {
                 onPointerDown={handleSvgPointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
-                onPointerLeave={handlePointerUp}
+                onPointerLeave={handlePointerFuera}
+                onPointerCancel={handlePointerFuera}
                 onKeyDown={handleCanvasKeyDown}
                 tabIndex={0}
                 role="application"
@@ -1247,7 +1295,9 @@ export default function SimuladorCampoElectrico() {
                 Explora cómo se distribuye el campo en un cuadrupolo o en un hilo cargado: eso es
                 lo que aproximan tres cargas del MISMO signo en línea. Un condensador es otra cosa
                 —exige dos placas de signo opuesto y da un campo uniforme entre ellas—, y la propia
-                app lo desmiente: en el centro del preset «+++» el campo es 0 pero el potencial no.
+                app lo desmiente: con el preset «+++» y la sonda en (0; 0,5), Eₓ se anula pero |E| y
+                V no, y al mover la sonda el campo cambia de valor y de dirección en vez de quedarse
+                uniforme.
                 Prepárate para electromagnetismo I.
               </p>
             </div>

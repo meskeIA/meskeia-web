@@ -1753,8 +1753,8 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
   // V = 136,25 V (CASO 2a), pero ahí |E| = 169,57 N/C, no 0.
   // Caso: preset «3 cargas en línea», sonda en (0; 0) → esperado que la guía no afirme E = 0 ahí
   //       · obtenido panel «—» + «La sonda está sobre una carga» frente a «el campo es 0».
-  test('HALLAZGO H1 · la guía no afirma que el campo sea 0 en el centro de «+++», donde hay una carga', async ({ page }) => {
-    test.fail(true, 'H1 abierto: la tarjeta afirma E = 0 sobre la carga central');
+  // REPARADO (hallazgo 3345, 17/10/2026): la tarjeta habla de (0; 0,5), donde Eₓ = 0 con |E| y V ≠ 0.
+  test('HALLAZGO H1 (3345) · la guía no afirma que el campo sea 0 en el centro de «+++», donde hay una carga', async ({ page }) => {
     await page.getByRole('button', { name: '3 cargas en línea' }).click();
     await sondaEn(page, '0', '0');
     // Lo que la app enseña ahí: singularidad, sin cifras (esto se cumple hoy)
@@ -1767,6 +1767,12 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
     });
     expect(tarjeta).toContain('hilo cargado'); // la tarjeta existe y es esta
     expect(tarjeta).not.toMatch(/centro del preset «\+\+\+» el campo es 0/);
+    // Y lo que dice ahora se cumple en la app: en (0; 0,5), Eₓ = 0 con |E| y V distintos de 0
+    expect(tarjeta).toContain('(0; 0,5)');
+    await sondaEn(page, '0', '0.5');
+    await expect(valor(page, 'Eₓ')).toHaveText(/^-?0(,00)? N\/C$/);
+    await expect(valor(page, '|E| (campo)')).toHaveText('169,57 N/C');
+    await expect(valor(page, 'V (potencial)')).toHaveText('136,25 V');
   });
 
   // HALLAZGO H7 (bajo, contenido) · ABIERTO (16/10/2026).
@@ -1891,13 +1897,40 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
     // Caso: 390 × 800 táctil, dipolo de arranque, deslizar 150 px hacia arriba empezando en la
     //       zona vacía del lienzo (20 % del ancho, 75 % del alto) → esperado 2 cargas · obtenido
     //       3 (y la página sin moverse: scrollY igual). Igual a 360 px.
-    test('HALLAZGO H2 · deslizar el dedo sobre el lienzo para bajar la página no crea una carga', async ({ page }) => {
-      test.fail(true, 'H2 abierto: la carga nace en pointerdown');
+    // REPARADO (hallazgo 3346, 17/10/2026): el lienzo admite pan-y y, con el dedo, la carga nace al
+    // soltar un toque quieto; un deslizamiento lo coge el navegador (pointercancel) y baja la página.
+    test('HALLAZGO H2 (3346) · deslizar el dedo sobre el lienzo para bajar la página no crea una carga', async ({ page }) => {
       const caja = await prepararLienzo(page);
       await expect(cargas(page)).toHaveCount(2);
+      const antes = await page.evaluate(() => window.scrollY);
       const y = caja.y + caja.height * 0.75;
       await deslizar(page, caja.x + caja.width * 0.2, y, y - 150);
       await expect(cargas(page)).toHaveCount(2);
+      expect(await page.evaluate(() => window.scrollY), 'la página baja').toBeGreaterThan(antes + 50);
+    });
+
+    test('3346 · un toque quieto en el lienzo sigue creando la carga, y una carga se sigue arrastrando con el dedo', async ({ page }) => {
+      const caja = await prepararLienzo(page);
+      await expect(cargas(page)).toHaveCount(2);
+      await page.touchscreen.tap(caja.x + caja.width * 0.2, caja.y + caja.height * 0.75);
+      await expect(cargas(page)).toHaveCount(3);
+
+      // Arrastrar la primera carga del dipolo con el dedo la mueve y no desplaza la página
+      const c = (await cargas(page).first().boundingBox())!;
+      const [cx, cy] = [c.x + c.width / 2, c.y + c.height / 2];
+      const antes = await page.evaluate(() => window.scrollY);
+      const xAntes = await cargas(page).first().getAttribute('cx');
+      const cdp = await page.context().newCDPSession(page);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: cx, y: cy }] });
+      for (let i = 1; i <= 10; i++) {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: cx + 4 * i, y: cy - 4 * i }] });
+        await page.waitForTimeout(16);
+      }
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await page.waitForTimeout(300);
+      expect(await cargas(page).first().getAttribute('cx')).not.toBe(xAntes);
+      expect(await page.evaluate(() => window.scrollY)).toBe(antes);
+      await expect(cargas(page)).toHaveCount(3);
     });
 
     // HALLAZGO H4 (bajo, accesibilidad) · ABIERTO (16/10/2026) · cabo C0067.

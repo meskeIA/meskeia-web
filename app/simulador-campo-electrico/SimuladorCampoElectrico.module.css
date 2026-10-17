@@ -244,7 +244,9 @@
   background: #f8fafc;
   border-radius: 10px;
   border: 1.5px solid #e5e7eb;
-  touch-action: none;
+  /* pan-y: el dedo apoyado en el lienzo puede bajar la página (hallazgo 3346). Lo que se arrastra
+     (cargas, sonda y la ✕ de eliminar) lleva touch-action: none en su propia regla. */
+  touch-action: pan-y;
   cursor: crosshair;
 }
 
@@ -259,6 +261,7 @@
 .cargaCircle {
   cursor: grab;
   transition: opacity 0.15s;
+  touch-action: none;
 }
 
 .cargaCircle:active {
@@ -281,6 +284,7 @@
   fill: #9ca3af;
   stroke: #1f2937;
   stroke-width: 2;
+  touch-action: none;
   cursor: grab;
 }
 
@@ -381,6 +385,7 @@
 
 .removeBtn {
   cursor: pointer;
+  touch-action: none;
   fill: #fff;
   stroke: #dc2626;
   stroke-width: 1.5;
