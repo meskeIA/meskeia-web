@@ -332,26 +332,26 @@ export default function TeoriaJuegosPage() {
                   <thead>
                     <tr>
                       <th></th>
-                      <th>✊</th>
-                      <th>✋</th>
-                      <th>✌️</th>
+                      <th><span role="img" aria-label="Piedra">✊</span></th>
+                      <th><span role="img" aria-label="Papel">✋</span></th>
+                      <th><span role="img" aria-label="Tijeras">✌️</span></th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <th>✊</th>
+                      <th><span role="img" aria-label="Piedra">✊</span></th>
                       <td>0, 0</td>
                       <td>−1, +1</td>
                       <td>+1, −1</td>
                     </tr>
                     <tr>
-                      <th>✋</th>
+                      <th><span role="img" aria-label="Papel">✋</span></th>
                       <td>+1, −1</td>
                       <td>0, 0</td>
                       <td>−1, +1</td>
                     </tr>
                     <tr>
-                      <th>✌️</th>
+                      <th><span role="img" aria-label="Tijeras">✌️</span></th>
                       <td>−1, +1</td>
                       <td>+1, −1</td>
                       <td>0, 0</td>

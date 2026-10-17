@@ -141,7 +141,7 @@ const PilaDaniellSvg = ({ cargaConectada }: { cargaConectada: boolean }) => (
       <>
         {/* Bombilla encendida */}
         <circle cx="260" cy="40" r="16" fill="#FEF08A" stroke="#EAB308" strokeWidth="2" />
-        <text x="260" y="46" fontSize="14" textAnchor="middle">💡</text>
+        <text x="260" y="46" fontSize="14" textAnchor="middle" aria-hidden="true">💡</text>
         {/* Línea derecha */}
         <line x1="276" y1="40" x2="429" y2="40" stroke="#374151" strokeWidth="2.5" />
       </>
@@ -353,7 +353,7 @@ const SeccionSerie = () => {
               </p>
             </div>
             <p className={styles.serieMnemonico}>
-              💡 <strong>Regla:</strong> el metal con E° más negativo se oxida (ánodo). El de E° más positivo se reduce (cátodo). FEM &gt; 0 → reacción espontánea.
+              <span aria-hidden="true">💡</span> <strong>Regla:</strong> el metal con E° más negativo se oxida (ánodo). El de E° más positivo se reduce (cátodo). FEM &gt; 0 → reacción espontánea.
             </p>
           </div>
         )}
@@ -613,7 +613,7 @@ const BateriaLiionSvg = ({ modoDescarga }: { modoDescarga: boolean }) => (
 
     {/* Circuito externo */}
     <text x="240" y="238" fontSize="9" fill="#6B7280" textAnchor="middle">
-      {modoDescarga ? '⚡ Descarga: e⁻ fluyen ánodo → cátodo (circuito externo)' : '🔌 Carga: e⁻ forzados cátodo → ánodo'}
+      {modoDescarga ? <><tspan aria-hidden="true">⚡</tspan> Descarga: e⁻ fluyen ánodo → cátodo (circuito externo)</> : <><tspan aria-hidden="true">🔌</tspan> Carga: e⁻ forzados cátodo → ánodo</>}
     </text>
   </svg>
 );

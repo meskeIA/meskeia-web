@@ -383,22 +383,22 @@ function SeccionCiclo() {
 
           {/* Nodo central: Magma */}
           <circle cx="200" cy="180" r="28" fill="#EF4444" opacity="0.15" />
-          <text x="200" y="176" textAnchor="middle" fontSize="10" fill="#EF4444" fontWeight="700">🌋</text>
+          <text x="200" y="176" textAnchor="middle" fontSize="10" fill="#EF4444" fontWeight="700" aria-hidden="true">🌋</text>
           <text x="200" y="192" textAnchor="middle" fontSize="10" fill="#EF4444" fontWeight="600">Magma</text>
 
           {/* Nodo: Ígneas (arriba) */}
           <circle cx="200" cy="60" r="36" fill="#DC2626" opacity="0.12" stroke="#DC2626" strokeWidth="2" />
-          <text x="200" y="56" textAnchor="middle" fontSize="11" fill="#DC2626" fontWeight="700">🔥 Ígneas</text>
+          <text x="200" y="56" textAnchor="middle" fontSize="11" fill="#DC2626" fontWeight="700"><tspan aria-hidden="true">🔥</tspan> Ígneas</text>
           <text x="200" y="72" textAnchor="middle" fontSize="8" fill="#DC2626">(enfriamiento)</text>
 
           {/* Nodo: Sedimentarias (abajo-izq) */}
           <circle cx="90" cy="300" r="36" fill="#D97706" opacity="0.12" stroke="#D97706" strokeWidth="2" />
-          <text x="90" y="296" textAnchor="middle" fontSize="10" fill="#D97706" fontWeight="700">📐 Sediment.</text>
+          <text x="90" y="296" textAnchor="middle" fontSize="10" fill="#D97706" fontWeight="700"><tspan aria-hidden="true">📐</tspan> Sediment.</text>
           <text x="90" y="310" textAnchor="middle" fontSize="8" fill="#D97706">(compactación)</text>
 
           {/* Nodo: Metamórficas (abajo-der) */}
           <circle cx="310" cy="300" r="36" fill="#7C3AED" opacity="0.12" stroke="#7C3AED" strokeWidth="2" />
-          <text x="310" y="296" textAnchor="middle" fontSize="10" fill="#7C3AED" fontWeight="700">💎 Metamórf.</text>
+          <text x="310" y="296" textAnchor="middle" fontSize="10" fill="#7C3AED" fontWeight="700"><tspan aria-hidden="true">💎</tspan> Metamórf.</text>
           <text x="310" y="310" textAnchor="middle" fontSize="8" fill="#7C3AED">(presión+calor)</text>
 
           {/* Flecha principal: Ígneas → Sedimentarias (erosión) */}

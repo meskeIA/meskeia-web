@@ -356,7 +356,7 @@ function SvgAlfaSinucleina() {
         <circle cx="222" cy="82" r="16" fill="#7d3c98" opacity="0.55" />
         <circle cx="208" cy="55" r="14" fill="#7d3c98" opacity="0.55" />
         <text x="208" y="110" textAnchor="middle" fill="#7d3c98" fontSize="10" fontWeight="600">Oligómeros</text>
-        <text x="208" y="123" textAnchor="middle" fill="#e74c3c" fontSize="9">⚠ tóxicos para la sinapsis</text>
+        <text x="208" y="123" textAnchor="middle" fill="#e74c3c" fontSize="9"><tspan aria-hidden="true">⚠</tspan> tóxicos para la sinapsis</text>
       </g>
 
       {/* Flecha 2 */}

@@ -538,8 +538,8 @@ export default function SimuladorAutomatasCelularesPage() {
               </div>
               <div className={styles.hint}>
                 Cada generación suaviza un poco más la cueva. «Generar cueva» siembra ruido aleatorio
-                y aplica {PASOS_SUAVIZADO_CUEVA} pasos de golpe. Después puedes seguir con ▶ o ⏭ para
-                ver cómo se estabiliza.
+                y aplica {PASOS_SUAVIZADO_CUEVA} pasos de golpe. Después puedes seguir con «<span aria-hidden="true">▶</span> Reproducir»
+                o «<span aria-hidden="true">⏭</span> Paso» para ver cómo se estabiliza.
               </div>
             </>
           )}

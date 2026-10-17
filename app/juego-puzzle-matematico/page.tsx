@@ -286,6 +286,7 @@ export default function JuegoPuzzleMatematicoPage() {
                 key={m.id}
                 className={`${styles.modoBtn} ${modo === m.id ? styles.active : ''}`}
                 onClick={() => setModo(m.id)}
+                aria-pressed={modo === m.id}
               >
                 {m.nombre}
                 <span>{m.descripcion}</span>
@@ -314,7 +315,7 @@ export default function JuegoPuzzleMatematicoPage() {
             </div>
             <div className={styles.stat}>
               <div className={styles.statLabel}>Racha</div>
-              <div className={styles.statValue}>🔥 {racha}</div>
+              <div className={styles.statValue}><span aria-hidden="true">🔥</span> {racha}</div>
             </div>
           </div>
 

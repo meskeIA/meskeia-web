@@ -379,7 +379,7 @@ function SeccionAnatomia() {
             onKeyDown={e => e.key === 'Enter' && setParteActiva(parteActiva === 'nariz' ? null : 'nariz')}
           >
             <ellipse cx="200" cy="50" rx="30" ry="20" className={styles.svgNariz} />
-            <text x="245" y="55" className={styles.svgLabel}>👃 Nariz</text>
+            <text x="245" y="55" className={styles.svgLabel}><tspan aria-hidden="true">👃</tspan> Nariz</text>
           </g>
 
           {/* Faringe */}
@@ -392,7 +392,7 @@ function SeccionAnatomia() {
             onKeyDown={e => e.key === 'Enter' && setParteActiva(parteActiva === 'faringe' ? null : 'faringe')}
           >
             <rect x="185" y="80" width="30" height="30" rx="5" className={styles.svgFaringe} />
-            <text x="230" y="100" className={styles.svgLabel}>🔽 Faringe</text>
+            <text x="230" y="100" className={styles.svgLabel}><tspan aria-hidden="true">🔽</tspan> Faringe</text>
           </g>
 
           {/* Laringe */}
@@ -405,7 +405,7 @@ function SeccionAnatomia() {
             onKeyDown={e => e.key === 'Enter' && setParteActiva(parteActiva === 'laringe' ? null : 'laringe')}
           >
             <polygon points="185,120 215,120 220,150 180,150" className={styles.svgLaringe} />
-            <text x="230" y="140" className={styles.svgLabel}>🗣️ Laringe</text>
+            <text x="230" y="140" className={styles.svgLabel}><tspan aria-hidden="true">🗣️</tspan> Laringe</text>
           </g>
 
           {/* Tráquea */}
@@ -422,7 +422,7 @@ function SeccionAnatomia() {
             {[0, 1, 2, 3, 4, 5].map(i => (
               <line key={i} x1="188" y1={165 + i * 12} x2="212" y2={165 + i * 12} className={styles.svgAnillo} />
             ))}
-            <text x="225" y="195" className={styles.svgLabel}>⭕ Tráquea</text>
+            <text x="225" y="195" className={styles.svgLabel}><tspan aria-hidden="true">⭕</tspan> Tráquea</text>
           </g>
 
           {/* Bronquios */}
@@ -436,7 +436,7 @@ function SeccionAnatomia() {
           >
             <path d="M200,235 Q170,260 140,280" className={styles.svgBronquio} fill="none" strokeWidth="8" />
             <path d="M200,235 Q230,260 260,280" className={styles.svgBronquio} fill="none" strokeWidth="8" />
-            <text x="60" y="265" className={styles.svgLabel}>🌳 Bronquios</text>
+            <text x="60" y="265" className={styles.svgLabel}><tspan aria-hidden="true">🌳</tspan> Bronquios</text>
           </g>
 
           {/* Bronquiolos */}
@@ -452,7 +452,7 @@ function SeccionAnatomia() {
             <path d="M140,280 Q150,310 145,330" className={styles.svgBronquiolo} fill="none" strokeWidth="4" />
             <path d="M260,280 Q280,300 290,320" className={styles.svgBronquiolo} fill="none" strokeWidth="4" />
             <path d="M260,280 Q250,310 255,330" className={styles.svgBronquiolo} fill="none" strokeWidth="4" />
-            <text x="295" y="310" className={styles.svgLabel}>🔬 Bronquiolos</text>
+            <text x="295" y="310" className={styles.svgLabel}><tspan aria-hidden="true">🔬</tspan> Bronquiolos</text>
           </g>
 
           {/* Alvéolos (racimos) */}
@@ -478,7 +478,7 @@ function SeccionAnatomia() {
             <circle cx="255" cy="340" r="12" className={styles.svgAlveolo} />
             <circle cx="250" cy="355" r="12" className={styles.svgAlveolo} />
             <circle cx="268" cy="365" r="12" className={styles.svgAlveolo} />
-            <text x="155" y="390" className={styles.svgLabel}>🫧 Alvéolos</text>
+            <text x="155" y="390" className={styles.svgLabel}><tspan aria-hidden="true">🫧</tspan> Alvéolos</text>
           </g>
 
           {/* Diafragma */}

@@ -531,7 +531,7 @@ export default function ValidadorJSONPage() {
                 u objetos - JavaScript las tolera, JSON estándar no.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Solución:</strong> Siempre valida en esta herramienta antes de usar
+                <span aria-hidden="true">💡</span> <strong>Solución:</strong> Siempre valida en esta herramienta antes de usar
                 <code>JSON.parse()</code>. Si falla aquí, fallará en producción. También evita copiar
                 JSON desde consolas de navegador - pueden añadir sintaxis no estándar.
               </p>
@@ -550,7 +550,7 @@ export default function ValidadorJSONPage() {
                 reduce latencia y costes de bandwidth.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla práctica:</strong> Formateado para humanos, minificado para máquinas.
+                <span aria-hidden="true">💡</span> <strong>Regla práctica:</strong> Formateado para humanos, minificado para máquinas.
                 En Next.js, tus builds automáticamente minifican JSON en producción.
               </p>
             </div>
@@ -563,7 +563,7 @@ export default function ValidadorJSONPage() {
                 (3) Comillas sin cerrar, (4) Llaves/corchetes desbalanceados.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Estrategia de debugging:</strong> Si el error no es obvio, <strong>divide
+                <span aria-hidden="true">💡</span> <strong>Estrategia de debugging:</strong> Si el error no es obvio, <strong>divide
                 el JSON a la mitad</strong> - prueba la primera mitad, si pasa, el error está en la
                 segunda. Repite hasta localizar la línea exacta. También usa un editor con syntax
                 highlighting como VS Code - colorea errores automáticamente.
@@ -578,7 +578,7 @@ export default function ValidadorJSONPage() {
                 Para archivos mayores (más de 100 MB), puede ralentizarse o causar out of memory.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Para archivos gigantes:</strong> Usa herramientas de línea de comandos
+                <span aria-hidden="true">💡</span> <strong>Para archivos gigantes:</strong> Usa herramientas de línea de comandos
                 como <code>jq</code> (Linux/Mac) o divide el archivo en chunks más pequeños.
                 También considera: ¿realmente necesitas un JSON tan grande? Quizás una base de
                 datos o formato binario (Parquet, MessagePack) sea más eficiente.
@@ -598,7 +598,7 @@ export default function ValidadorJSONPage() {
                 (HTML, SVG, Office docs).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Cuándo usar XML:</strong> Si necesitas validación estricta (contratos
+                <span aria-hidden="true">💡</span> <strong>Cuándo usar XML:</strong> Si necesitas validación estricta (contratos
                 financieros), compatibilidad con sistemas legacy (SOAP) o trabajas con formatos
                 basados en XML (RSS, SVG). Para APIs nuevas, siempre JSON.
               </p>
@@ -612,7 +612,7 @@ export default function ValidadorJSONPage() {
                 XML se mapean a propiedades JSON?
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Herramienta recomendada:</strong> Usa la app <strong>Conversor de Formatos</strong>
+                <span aria-hidden="true">💡</span> <strong>Herramienta recomendada:</strong> Usa la app <strong>Conversor de Formatos</strong>
                 de meskeIA (en Apps Relacionadas abajo) - convierte JSON ↔ XML ↔ CSV ↔ YAML con
                 opciones configurables. Para casos complejos, usa librerías como <code>xml2js</code>
                 (Node.js) o <code>dicttoxml</code> (Python).
@@ -627,7 +627,7 @@ export default function ValidadorJSONPage() {
                 tenemos servidor backend para procesar esto - es imposible que veamos tus datos.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Ventaja extra:</strong> Funciona sin internet después de cargar la página
+                <span aria-hidden="true">💡</span> <strong>Ventaja extra:</strong> Funciona sin internet después de cargar la página
                 (gracias a service workers). Puedes validar datos sensibles (tokens API, configs de
                 producción) sin preocuparte por seguridad.
               </p>
@@ -642,7 +642,7 @@ export default function ValidadorJSONPage() {
                 esté en el elemento raíz.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Ejemplo correcto:</strong> <code>&lt;rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"&gt;</code>.
+                <span aria-hidden="true">💡</span> <strong>Ejemplo correcto:</strong> <code>&lt;rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"&gt;</code>.
                 El prefijo <code>atom:</code> requiere la declaración xmlns. Para debugging, usa
                 un validador XML online específico (W3C Validator) si esta herramienta no es suficiente.
               </p>

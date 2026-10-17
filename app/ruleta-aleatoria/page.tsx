@@ -252,7 +252,7 @@ export default function RuletaAleatoriaPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🎡</span>
+        <span className={styles.heroIcon} aria-hidden="true">🎡</span>
         <h1 className={styles.title}>Ruleta Aleatoria</h1>
         <p className={styles.subtitle}>
           Crea tu ruleta personalizada para sorteos, decisiones o simplemente divertirte. Sin registro, sin límites.
@@ -296,7 +296,7 @@ export default function RuletaAleatoriaPage() {
           {/* Resultado */}
           {winner && (
             <div className={styles.resultCard}>
-              <span className={styles.resultIcon}>🎉</span>
+              <span className={styles.resultIcon} aria-hidden="true">🎉</span>
               <h2 className={styles.resultText}>{winner}</h2>
               <div className={styles.resultActions}>
                 <button type="button" onClick={spinWheel} className={styles.btnPrimary} disabled={isSpinning}>
@@ -412,7 +412,7 @@ export default function RuletaAleatoriaPage() {
           <div className={styles.historyList}>
             {history.map((result, index) => (
               <span key={index} className={styles.historyItem}>
-                {index === 0 && '🏆'} {result}
+                {index === 0 && <span role="img" aria-label="Último resultado">🏆</span>} {result}
               </span>
             ))}
           </div>
@@ -427,22 +427,22 @@ export default function RuletaAleatoriaPage() {
         <h3><span aria-hidden="true">💡</span> Ideas de uso</h3>
         <div className={styles.usesGrid}>
           <div className={styles.useCard}>
-            <span className={styles.useIcon}>👩‍🏫</span>
+            <span className={styles.useIcon} aria-hidden="true">👩‍🏫</span>
             <h4>Profesores</h4>
             <p>Selecciona alumnos al azar para participar en clase.</p>
           </div>
           <div className={styles.useCard}>
-            <span className={styles.useIcon}>🎁</span>
+            <span className={styles.useIcon} aria-hidden="true">🎁</span>
             <h4>Sorteos</h4>
             <p>Realiza sorteos justos entre participantes.</p>
           </div>
           <div className={styles.useCard}>
-            <span className={styles.useIcon}>🤔</span>
+            <span className={styles.useIcon} aria-hidden="true">🤔</span>
             <h4>Decisiones</h4>
             <p>¿No sabes qué cenar? Deja que la ruleta decida.</p>
           </div>
           <div className={styles.useCard}>
-            <span className={styles.useIcon}>🎮</span>
+            <span className={styles.useIcon} aria-hidden="true">🎮</span>
             <h4>Juegos</h4>
             <p>Añade retos o pruebas para fiestas y reuniones.</p>
           </div>

@@ -816,7 +816,7 @@ export default function CalculadoraFechas() {
               {/* Escenario 1: Legal y Administrativo */}
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>⚖️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                   <h3>Legal y Administrativo</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -836,7 +836,7 @@ export default function CalculadoraFechas() {
               {/* Escenario 2: Recursos Humanos */}
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>👔</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">👔</span>
                   <h3>Recursos Humanos</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -855,7 +855,7 @@ export default function CalculadoraFechas() {
               {/* Escenario 3: Finanzas e Inversiones */}
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>💰</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">💰</span>
                   <h3>Finanzas e Inversiones</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -874,7 +874,7 @@ export default function CalculadoraFechas() {
               {/* Escenario 4: Gestión de Proyectos */}
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📊</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
                   <h3>Gestión de Proyectos</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -892,7 +892,7 @@ export default function CalculadoraFechas() {
               {/* Escenario 5: Educación y Academia */}
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎓</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                   <h3>Educación y Academia</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -910,7 +910,7 @@ export default function CalculadoraFechas() {
               {/* Escenario 6: Personal y Salud */}
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏥</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏥</span>
                   <h3>Personal y Salud</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -1189,7 +1189,7 @@ export default function CalculadoraFechas() {
             <div className={styles.tipsGrid}>
               {/* Tip 1 */}
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📅</span>
+                <span className={styles.tipIcon} aria-hidden="true">📅</span>
                 <h3>Siempre especifica la unidad temporal</h3>
                 <p>
                   Al comunicar plazos, especifica la unidad: &quot;90 días naturales&quot;, &quot;3 meses calendario&quot;,
@@ -1199,7 +1199,7 @@ export default function CalculadoraFechas() {
 
               {/* Tip 2 */}
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚠️</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚠️</span>
                 <h3>Cuidado con los fines de mes al sumar meses</h3>
                 <p>
                   Sumar 1 mes al 31/01 puede desbordarse al mes siguiente si el día no existe (31/02 → 03/03). Si necesitas mantener el día exacto, usa días en lugar de meses (ej: +28 días para febrero).
@@ -1208,7 +1208,7 @@ export default function CalculadoraFechas() {
 
               {/* Tip 3 */}
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🌍</span>
+                <span className={styles.tipIcon} aria-hidden="true">🌍</span>
                 <h3>Contratos internacionales: especifica huso y normativa</h3>
                 <p>
                   Si trabajas con empresas extranjeras, especifica el huso horario (ej: CET, UTC-6, UTC-3) y qué calendario
@@ -1218,7 +1218,7 @@ export default function CalculadoraFechas() {
 
               {/* Tip 4 */}
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📊</span>
+                <span className={styles.tipIcon} aria-hidden="true">📊</span>
                 <h3>Usa meses exactos para antigüedad laboral</h3>
                 <p>
                   Para cálculos de RRHH (antigüedad, pagas extra prorrateadas), usa la opción de &quot;años, meses y días exactos&quot;
@@ -1228,7 +1228,7 @@ export default function CalculadoraFechas() {
 
               {/* Tip 5 */}
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔍</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔍</span>
                 <h3>Doble verificación en plazos críticos</h3>
                 <p>
                   Para vencimientos de contratos, alegaciones legales o trámites con consecuencias importantes,
@@ -1238,7 +1238,7 @@ export default function CalculadoraFechas() {
 
               {/* Tip 6 */}
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📆</span>
+                <span className={styles.tipIcon} aria-hidden="true">📆</span>
                 <h3>Añade tus festivos una sola vez</h3>
                 <p>
                   La mayoría de países hispanohablantes tienen entre 8 y 16 festivos nacionales, más
@@ -1252,7 +1252,7 @@ export default function CalculadoraFechas() {
           {/* 6. WARNING BOX - Errores comunes */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Comunes a Evitar</h3>
             </div>
             <ul className={styles.warningList}>
