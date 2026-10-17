@@ -178,7 +178,7 @@ export default function VisualizadorAtpSintasa() {
               onClick={() => setMotorActivo(prev => !prev)}
               aria-pressed={motorActivo}
             >
-              {motorActivo ? '⏸ Pausar motor' : '▶ Activar motor'}
+              {motorActivo ? <><span aria-hidden="true">⏸</span> Pausar motor</> : <><span aria-hidden="true">▶</span> Activar motor</>}
             </button>
             <span className={styles.motorEstado}>
               {motorActivo ? 'Motor en funcionamiento' : 'Motor detenido'}

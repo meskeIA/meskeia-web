@@ -205,7 +205,7 @@ const SeccionPila = () => {
             />
             <span className={styles.toggleSlider} />
           </label>
-          <span className={styles.toggleLabel}>{cargaConectada ? '💡 Encendido' : '○ Abierto'}</span>
+          <span className={styles.toggleLabel}>{cargaConectada ? <><span aria-hidden="true">💡</span> Encendido</> : '○ Abierto'}</span>
         </div>
 
         <div className={styles.pilaSvgWrapper}>
@@ -349,7 +349,7 @@ const SeccionSerie = () => {
                 {resultado.fem > 0 ? '+' : ''}{resultado.fem.toFixed(2)} V
               </p>
               <p className={`${styles.serieEspontaneo} ${resultado.fem > 0 ? styles.serieFemPos : styles.serieFemNeg}`}>
-                {resultado.fem > 0 ? '✅ Reacción espontánea (ΔG < 0)' : '❌ No espontánea (requiere energía externa)'}
+                {resultado.fem > 0 ? <><span aria-hidden="true">✅</span> {'Reacción espontánea (ΔG < 0)'}</> : <><span aria-hidden="true">❌</span> No espontánea (requiere energía externa)</>}
               </p>
             </div>
             <p className={styles.serieMnemonico}>
@@ -498,10 +498,10 @@ const SeccionElectrolisis = () => {
               />
               <p className={`${styles.voltajeInfo} ${voltaje >= 1.8 ? styles.voltajeOk : styles.voltajeBajo}`}>
                 {voltaje < 1.23
-                  ? '❌ Imposible: por debajo del potencial mínimo teórico (1,23 V)'
+                  ? <><span aria-hidden="true">❌</span> Imposible: por debajo del potencial mínimo teórico (1,23 V)</>
                   : voltaje < 1.8
-                  ? '⚠️ Posible teóricamente, pero ineficiente. La práctica necesita ~1,8-2,0 V'
-                  : '✅ Electrólisis activa. Las burbujas de H₂ y O₂ se generan eficientemente.'}
+                  ? <><span aria-hidden="true">⚠️</span> Posible teóricamente, pero ineficiente. La práctica necesita ~1,8-2,0 V</>
+                  : <><span aria-hidden="true">✅</span> Electrólisis activa. Las burbujas de H₂ y O₂ se generan eficientemente.</>}
               </p>
             </div>
           </>
@@ -640,7 +640,7 @@ const SeccionBateria = () => {
             onClick={() => setModoDescarga(true)}
             aria-pressed={modoDescarga}
           >
-            ⚡ Descarga
+            <span aria-hidden="true">⚡</span> Descarga
           </button>
           <button
             type="button"
@@ -648,7 +648,7 @@ const SeccionBateria = () => {
             onClick={() => setModoDescarga(false)}
             aria-pressed={!modoDescarga}
           >
-            🔌 Carga
+            <span aria-hidden="true">🔌</span> Carga
           </button>
         </div>
 

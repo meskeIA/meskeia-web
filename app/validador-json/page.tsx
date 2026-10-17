@@ -354,13 +354,13 @@ export default function ValidadorJSONPage() {
                 </tr>
                 <tr>
                   <td><strong>Datos anidados</strong></td>
-                  <td>✅ Soporte nativo con objetos y arrays</td>
-                  <td>✅ Soporte nativo con elementos anidados</td>
+                  <td><span aria-hidden="true">✅</span> Soporte nativo con objetos y arrays</td>
+                  <td><span aria-hidden="true">✅</span> Soporte nativo con elementos anidados</td>
                 </tr>
                 <tr>
                   <td><strong>Comentarios</strong></td>
-                  <td>❌ No soporta (requiere workarounds)</td>
-                  <td>✅ Soporta comentarios <code>&lt;!-- así --&gt;</code></td>
+                  <td><span aria-hidden="true">❌</span> No soporta (requiere workarounds)</td>
+                  <td><span aria-hidden="true">✅</span> Soporta comentarios <code>&lt;!-- así --&gt;</code></td>
                 </tr>
                 <tr>
                   <td><strong>Tamaño de archivo</strong></td>
@@ -523,7 +523,7 @@ export default function ValidadorJSONPage() {
           <h2>Preguntas Frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué mi JSON válido no funciona en JavaScript?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué mi JSON válido no funciona en JavaScript?</h4>
               <p>
                 Aunque tu JSON sea sintácticamente correcto, puede tener problemas de compatibilidad.
                 El error más común es usar <strong>comillas simples</strong> en lugar de dobles
@@ -538,7 +538,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuándo usar formatear vs minificar?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuándo usar formatear vs minificar?</h4>
               <p>
                 <strong>Formatear (pretty print):</strong> Úsalo en desarrollo para leer y debuggear.
                 Añade indentación, saltos de línea y espacios. Perfecto para archivos de configuración
@@ -556,7 +556,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo encuentro el error si el mensaje es confuso?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo encuentro el error si el mensaje es confuso?</h4>
               <p>
                 Esta herramienta te da línea y columna exactas del error. <strong>Errores comunes:</strong>
                 (1) Falta una coma entre elementos de array, (2) Coma extra al final de objeto,
@@ -571,7 +571,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo validar archivos JSON muy grandes?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo validar archivos JSON muy grandes?</h4>
               <p>
                 Sí, esta herramienta procesa todo en tu navegador (sin enviar datos a servidor).
                 Archivos de <strong>hasta 50 MB funcionan bien</strong> en navegadores modernos.
@@ -586,7 +586,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿XML es más lento que JSON?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿XML es más lento que JSON?</h4>
               <p>
                 Sí, en general. XML requiere más bytes (etiquetas de cierre) y más tiempo de parseo.
                 Tests muestran que <strong>JSON es ~2-3x más rápido</strong> de parsear en JavaScript
@@ -605,7 +605,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo convertir JSON a XML (o viceversa)?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo convertir JSON a XML (o viceversa)?</h4>
               <p>
                 Esta herramienta solo valida - no convierte entre formatos. La conversión requiere
                 decisiones: ¿los arrays JSON se convierten a elementos XML repetidos? ¿Los atributos
@@ -620,7 +620,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Esta herramienta envía mis datos a un servidor?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Esta herramienta envía mis datos a un servidor?</h4>
               <p>
                 <strong>No, 100% privado.</strong> Todo el procesamiento ocurre en tu navegador
                 usando JavaScript. Tus archivos JSON/XML nunca salen de tu dispositivo. Ni siquiera
@@ -634,7 +634,7 @@ export default function ValidadorJSONPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué hago si mi XML tiene un namespace?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué hago si mi XML tiene un namespace?</h4>
               <p>
                 Los namespaces XML (xmlns) son comunes en SOAP, RSS y SVG. Esta herramienta los valida
                 correctamente - el parser DOMParser de navegadores soporta namespaces estándar.
@@ -816,7 +816,7 @@ export default function ValidadorJSONPage() {
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>❌ Usar comillas simples en JSON:</strong> JSON estándar SOLO acepta comillas
+              <strong><span aria-hidden="true">❌</span> Usar comillas simples en JSON:</strong> JSON estándar SOLO acepta comillas
               dobles. JavaScript tolera simples, pero <code>JSON.parse()</code> falla. Esto rompe
               APIs y causa errores 500.
               <br/>
@@ -824,7 +824,7 @@ export default function ValidadorJSONPage() {
             </li>
 
             <li>
-              <strong>❌ Coma final en último elemento de array/objeto:</strong> <code>{`{"a": 1,}`}</code>
+              <strong><span aria-hidden="true">❌</span> Coma final en último elemento de array/objeto:</strong> <code>{`{"a": 1,}`}</code>
               es inválido en JSON estándar (aunque JavaScript lo acepta). Causa errores en parsers
               estrictos y validadores.
               <br/>
@@ -833,7 +833,7 @@ export default function ValidadorJSONPage() {
             </li>
 
             <li>
-              <strong>❌ Comillas sin cerrar en strings largos:</strong> Si tu string contiene
+              <strong><span aria-hidden="true">❌</span> Comillas sin cerrar en strings largos:</strong> Si tu string contiene
               saltos de línea o caracteres especiales, fácilmente olvidas cerrar comillas. El error
               aparece 100 líneas después del problema real.
               <br/>
@@ -842,7 +842,7 @@ export default function ValidadorJSONPage() {
             </li>
 
             <li>
-              <strong>❌ Mezclar tabs y espacios en indentación:</strong> JSON no tiene regla
+              <strong><span aria-hidden="true">❌</span> Mezclar tabs y espacios en indentación:</strong> JSON no tiene regla
               oficial de indentación, pero mezclar tabs y espacios confunde a humanos y algunos
               parsers. Causa diffs enormes en Git sin cambios reales.
               <br/>
@@ -851,7 +851,7 @@ export default function ValidadorJSONPage() {
             </li>
 
             <li>
-              <strong>❌ Caracteres especiales sin escapar:</strong> Si tu string JSON contiene
+              <strong><span aria-hidden="true">❌</span> Caracteres especiales sin escapar:</strong> Si tu string JSON contiene
               comillas dobles, barras invertidas o saltos de línea, debes escaparlas. <code>"texto con \"comillas\""</code>
               es válido, <code>"texto con "comillas""</code> rompe.
               <br/>
@@ -861,7 +861,7 @@ export default function ValidadorJSONPage() {
             </li>
 
             <li>
-              <strong>❌ Números con ceros a la izquierda:</strong> <code>{`{"edad": 007}`}</code> es
+              <strong><span aria-hidden="true">❌</span> Números con ceros a la izquierda:</strong> <code>{`{"edad": 007}`}</code> es
               inválido en JSON (interpretado como octal en JavaScript). Causa errores en parsers estrictos.
               <br/>
               <strong>Solución:</strong> Escribe números sin ceros a la izquierda: <code>7</code>, no <code>007</code>.
@@ -869,7 +869,7 @@ export default function ValidadorJSONPage() {
             </li>
 
             <li>
-              <strong>❌ XML sin declaración de encoding:</strong> Si tu XML contiene caracteres
+              <strong><span aria-hidden="true">❌</span> XML sin declaración de encoding:</strong> Si tu XML contiene caracteres
               especiales (ñ, á, €) y omites <code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;</code>,
               parsers pueden malinterpretar caracteres. Causa text corruption.
               <br/>
@@ -878,7 +878,7 @@ export default function ValidadorJSONPage() {
             </li>
 
             <li>
-              <strong>❌ Confiar en JSON de APIs externas sin validar:</strong> APIs de terceros
+              <strong><span aria-hidden="true">❌</span> Confiar en JSON de APIs externas sin validar:</strong> APIs de terceros
               pueden devolver JSON malformado, campos faltantes o tipos incorrectos. Si haces
               <code>JSON.parse()</code> directamente, tu app crashea.
               <br/>

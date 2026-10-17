@@ -471,7 +471,7 @@ function SeccionTiempos() {
               <span className={styles.etapaIcono} aria-hidden="true">{e.icono}</span>
               <strong className={styles.etapaNombre}>{e.nombre}</strong>
               <span className={styles.etapaTipo} data-tipo={e.tipo}>
-                {e.tipo === 'burocracia' ? '📋 Papeles' : '🏗️ Obra'}
+                {e.tipo === 'burocracia' ? <><span aria-hidden="true">📋</span> Papeles</> : <><span aria-hidden="true">🏗️</span> Obra</>}
               </span>
             </div>
             <div className={styles.etapaMeses}>

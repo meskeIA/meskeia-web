@@ -299,11 +299,11 @@ export default function RuletaAleatoriaPage() {
               <span className={styles.resultIcon}>🎉</span>
               <h2 className={styles.resultText}>{winner}</h2>
               <div className={styles.resultActions}>
-                <button onClick={spinWheel} className={styles.btnPrimary} disabled={isSpinning}>
-                  🔄 Girar otra vez
+                <button type="button" onClick={spinWheel} className={styles.btnPrimary} disabled={isSpinning}>
+                  <span aria-hidden="true">🔄</span> Girar otra vez
                 </button>
-                <button onClick={removeWinnerAndSpin} className={styles.btnSecondary} disabled={isSpinning || items.length < 2}>
-                  ❌ Eliminar y girar
+                <button type="button" onClick={removeWinnerAndSpin} className={styles.btnSecondary} disabled={isSpinning || items.length < 2}>
+                  <span aria-hidden="true">❌</span> Eliminar y girar
                 </button>
               </div>
             </div>
@@ -312,11 +312,12 @@ export default function RuletaAleatoriaPage() {
           {/* Botón girar */}
           {!winner && (
             <button
+              type="button"
               onClick={spinWheel}
               className={styles.spinButton}
               disabled={isSpinning || items.length < 2}
             >
-              {isSpinning ? '🎡 Girando...' : '🎯 ¡Girar!'}
+              {isSpinning ? <><span aria-hidden="true">🎡</span> Girando...</> : <><span aria-hidden="true">🎯</span> ¡Girar!</>}
             </button>
           )}
 
@@ -327,7 +328,7 @@ export default function RuletaAleatoriaPage() {
 
         {/* Panel de opciones */}
         <div className={styles.optionsPanel}>
-          <h2 className={styles.panelTitle}>📝 Opciones de la ruleta</h2>
+          <h2 className={styles.panelTitle}><span aria-hidden="true">📝</span> Opciones de la ruleta</h2>
 
           {/* Añadir nueva opción */}
           <div className={styles.addForm}>
@@ -340,7 +341,7 @@ export default function RuletaAleatoriaPage() {
               className={styles.input}
               maxLength={50}
             />
-            <button onClick={addItem} className={styles.btnAdd} disabled={!newItemText.trim()}>
+            <button type="button" onClick={addItem} className={styles.btnAdd} disabled={!newItemText.trim()}>
               + Añadir
             </button>
           </div>
@@ -355,6 +356,7 @@ export default function RuletaAleatoriaPage() {
                 />
                 <span className={styles.itemText}>{item.text}</span>
                 <button
+                  type="button"
                   onClick={() => removeItem(item.id)}
                   className={styles.btnRemove}
                   title="Eliminar"
@@ -367,21 +369,21 @@ export default function RuletaAleatoriaPage() {
 
           {/* Presets */}
           <div className={styles.presetsSection}>
-            <h3>⚡ Cargar plantilla</h3>
+            <h3><span aria-hidden="true">⚡</span> Cargar plantilla</h3>
             <div className={styles.presetButtons}>
-              <button onClick={() => loadPreset(PRESETS.siNo)} className={styles.btnPreset}>
+              <button type="button" onClick={() => loadPreset(PRESETS.siNo)} className={styles.btnPreset}>
                 Sí/No
               </button>
-              <button onClick={() => loadPreset(PRESETS.numeros)} className={styles.btnPreset}>
+              <button type="button" onClick={() => loadPreset(PRESETS.numeros)} className={styles.btnPreset}>
                 Números 1-10
               </button>
-              <button onClick={() => loadPreset(PRESETS.diasSemana)} className={styles.btnPreset}>
+              <button type="button" onClick={() => loadPreset(PRESETS.diasSemana)} className={styles.btnPreset}>
                 Días semana
               </button>
-              <button onClick={() => loadPreset(PRESETS.comida)} className={styles.btnPreset}>
+              <button type="button" onClick={() => loadPreset(PRESETS.comida)} className={styles.btnPreset}>
                 Comida
               </button>
-              <button onClick={() => loadPreset(PRESETS.colores)} className={styles.btnPreset}>
+              <button type="button" onClick={() => loadPreset(PRESETS.colores)} className={styles.btnPreset}>
                 Colores
               </button>
             </div>
@@ -389,14 +391,15 @@ export default function RuletaAleatoriaPage() {
 
           {/* Controles */}
           <div className={styles.controlsRow}>
-            <button onClick={clearAll} className={styles.btnDanger}>
-              🗑️ Limpiar todo
+            <button type="button" onClick={clearAll} className={styles.btnDanger}>
+              <span aria-hidden="true">🗑️</span> Limpiar todo
             </button>
             <button
+              type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
               className={`${styles.btnToggle} ${soundEnabled ? styles.active : ''}`}
             >
-              {soundEnabled ? '🔊 Sonido' : '🔇 Silencio'}
+              {soundEnabled ? <><span aria-hidden="true">🔊</span> Sonido</> : <><span aria-hidden="true">🔇</span> Silencio</>}
             </button>
           </div>
         </div>
@@ -405,7 +408,7 @@ export default function RuletaAleatoriaPage() {
       {/* Historial */}
       {history.length > 0 && (
         <div className={styles.historySection}>
-          <h3>📜 Historial de resultados</h3>
+          <h3><span aria-hidden="true">📜</span> Historial de resultados</h3>
           <div className={styles.historyList}>
             {history.map((result, index) => (
               <span key={index} className={styles.historyItem}>
@@ -413,7 +416,7 @@ export default function RuletaAleatoriaPage() {
               </span>
             ))}
           </div>
-          <button onClick={() => setHistory([])} className={styles.btnSmall}>
+          <button type="button" onClick={() => setHistory([])} className={styles.btnSmall}>
             Limpiar historial
           </button>
         </div>
@@ -421,7 +424,7 @@ export default function RuletaAleatoriaPage() {
 
       {/* Usos */}
       <div className={styles.usesSection}>
-        <h3>💡 Ideas de uso</h3>
+        <h3><span aria-hidden="true">💡</span> Ideas de uso</h3>
         <div className={styles.usesGrid}>
           <div className={styles.useCard}>
             <span className={styles.useIcon}>👩‍🏫</span>
@@ -471,7 +474,7 @@ export default function RuletaAleatoriaPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🎡 Ruleta digital</td>
+                  <td><span aria-hidden="true">🎡</span> Ruleta digital</td>
                   <td>2 – 100+</td>
                   <td>Alta</td>
                   <td>Inmediata</td>
@@ -479,7 +482,7 @@ export default function RuletaAleatoriaPage() {
                   <td>No válida legalmente sin certificación</td>
                 </tr>
                 <tr>
-                  <td>🎲 Dados</td>
+                  <td><span aria-hidden="true">🎲</span> Dados</td>
                   <td>2 – 6 (o múltiplos)</td>
                   <td>Alta</td>
                   <td>Inmediata</td>
@@ -487,7 +490,7 @@ export default function RuletaAleatoriaPage() {
                   <td>Limitado a 6 opciones por dado</td>
                 </tr>
                 <tr>
-                  <td>📋 Lista aleatoria</td>
+                  <td><span aria-hidden="true">📋</span> Lista aleatoria</td>
                   <td>Ilimitadas</td>
                   <td>Muy alta</td>
                   <td>Rápida</td>
@@ -495,7 +498,7 @@ export default function RuletaAleatoriaPage() {
                   <td>Necesita herramienta o app adicional</td>
                 </tr>
                 <tr>
-                  <td>🪙 Moneda (cara/cruz)</td>
+                  <td><span aria-hidden="true">🪙</span> Moneda (cara/cruz)</td>
                   <td>2 exactamente</td>
                   <td>Alta</td>
                   <td>Inmediata</td>

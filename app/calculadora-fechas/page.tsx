@@ -420,7 +420,7 @@ export default function CalculadoraFechas() {
         <div className={styles.calculatorGrid}>
           {/* 1. Diferencia entre fechas */}
           <article className={styles.card}>
-            <h2 className={styles.cardTitle}>📅 Diferencia entre fechas</h2>
+            <h2 className={styles.cardTitle}><span aria-hidden="true">📅</span> Diferencia entre fechas</h2>
 
             <div className={styles.formGroup}>
               <label htmlFor="startDate" className={styles.label}>
@@ -451,7 +451,7 @@ export default function CalculadoraFechas() {
             </div>
 
             <button type="button" onClick={calculateDifference} className={styles.btnPrimary}>
-              🔢 Calcular Diferencia
+              <span aria-hidden="true">🔢</span> Calcular Diferencia
             </button>
 
             {/* Festivos propios: afectan al recuento de días laborables */}
@@ -562,7 +562,7 @@ export default function CalculadoraFechas() {
 
           {/* 2. Sumar/Restar tiempo */}
           <article className={styles.card}>
-            <h2 className={styles.cardTitle}>➕ Sumar/Restar tiempo</h2>
+            <h2 className={styles.cardTitle}><span aria-hidden="true">➕</span> Sumar/Restar tiempo</h2>
 
             <div className={styles.formGroup}>
               <label htmlFor="baseDate" className={styles.label}>
@@ -628,7 +628,7 @@ export default function CalculadoraFechas() {
             </div>
 
             <button type="button" onClick={calculateAddSubtract} className={styles.btnPrimary}>
-              ⚡ Calcular
+              <span aria-hidden="true">⚡</span> Calcular
             </button>
 
             <div role="status" aria-live="polite" aria-atomic="true">
@@ -653,7 +653,7 @@ export default function CalculadoraFechas() {
 
           {/* 3. Día de la semana */}
           <article className={styles.card}>
-            <h2 className={styles.cardTitle}>📆 Día de la semana</h2>
+            <h2 className={styles.cardTitle}><span aria-hidden="true">📆</span> Día de la semana</h2>
 
             <div className={styles.formGroup}>
               <label htmlFor="dayDate" className={styles.label}>
@@ -670,7 +670,7 @@ export default function CalculadoraFechas() {
             </div>
 
             <button type="button" onClick={calculateDayOfWeek} className={styles.btnPrimary}>
-              🗓️ ¿Qué día era?
+              <span aria-hidden="true">🗓️</span> ¿Qué día era?
             </button>
 
             <div role="status" aria-live="polite" aria-atomic="true">
@@ -695,7 +695,7 @@ export default function CalculadoraFechas() {
 
           {/* 4. Calcular edad */}
           <article className={styles.card}>
-            <h2 className={styles.cardTitle}>🎂 Calcular edad exacta</h2>
+            <h2 className={styles.cardTitle}><span aria-hidden="true">🎂</span> Calcular edad exacta</h2>
 
             <div className={styles.formGroup}>
               <label htmlFor="birthDate" className={styles.label}>
@@ -725,7 +725,7 @@ export default function CalculadoraFechas() {
             </div>
 
             <button type="button" onClick={calculateAge} className={styles.btnPrimary}>
-              🎯 Calcular Edad
+              <span aria-hidden="true">🎯</span> Calcular Edad
             </button>
 
             <div role="status" aria-live="polite" aria-atomic="true">

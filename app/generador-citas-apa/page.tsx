@@ -1834,14 +1834,14 @@ export default function GeneradorCitasApaPage() {
                       className={styles.btnCopiar}
                       onClick={() => copiar(referenciaTexto, null, 'ref-texto')}
                     >
-                      {copiado === 'ref-texto' ? '✅ Copiado' : '📋 Texto plano'}
+                      {copiado === 'ref-texto' ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Texto plano</>}
                     </button>
                     <button
                       type="button"
                       className={styles.btnCopiar}
                       onClick={() => copiar(referenciaTexto, aHtml(referencia), 'ref-html')}
                     >
-                      {copiado === 'ref-html' ? '✅ Copiado' : '📝 Con cursivas'}
+                      {copiado === 'ref-html' ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📝</span> Con cursivas</>}
                     </button>
                   </div>
                 </div>
@@ -1872,7 +1872,7 @@ export default function GeneradorCitasApaPage() {
                       className={styles.btnCopiarMini}
                       onClick={() => copiar(aTexto(cita.parentetica), aHtml(cita.parentetica), 'cita-par')}
                     >
-                      {copiado === 'cita-par' ? '✅ Copiado' : '📋 Copiar'}
+                      {copiado === 'cita-par' ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
                     </button>
                   </div>
                   <div className={styles.citaCard}>
@@ -1888,7 +1888,7 @@ export default function GeneradorCitasApaPage() {
                       className={styles.btnCopiarMini}
                       onClick={() => copiar(aTexto(cita.narrativa), aHtml(cita.narrativa), 'cita-nar')}
                     >
-                      {copiado === 'cita-nar' ? '✅ Copiado' : '📋 Copiar'}
+                      {copiado === 'cita-nar' ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
                     </button>
                   </div>
                 </div>
@@ -1949,14 +1949,14 @@ export default function GeneradorCitasApaPage() {
                   className={styles.btnSecundario}
                   onClick={() => copiar(textoLista, null, 'lista-texto')}
                 >
-                  {copiado === 'lista-texto' ? '✅ Copiado' : '📋 Copiar lista (texto plano)'}
+                  {copiado === 'lista-texto' ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar lista (texto plano)</>}
                 </button>
                 <button
                   type="button"
                   className={styles.btnSecundario}
                   onClick={() => copiar(textoLista, htmlLista, 'lista-html')}
                 >
-                  {copiado === 'lista-html' ? '✅ Copiado' : '📝 Copiar con cursivas y sangría'}
+                  {copiado === 'lista-html' ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📝</span> Copiar con cursivas y sangría</>}
                 </button>
                 <button type="button" className={styles.btnSecundario} onClick={descargarTxt}>
                   <span aria-hidden="true">⬇️</span> Descargar .txt

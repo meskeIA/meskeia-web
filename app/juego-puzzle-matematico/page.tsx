@@ -267,7 +267,7 @@ export default function JuegoPuzzleMatematicoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🧮 Puzzle Matemático</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🧮</span> Puzzle Matemático</h1>
         <p className={styles.subtitle}>Resuelve operaciones contrarreloj</p>
       </header>
 
@@ -282,6 +282,7 @@ export default function JuegoPuzzleMatematicoPage() {
           <div className={styles.modoSelector}>
             {MODOS.map((m) => (
               <button
+                type="button"
                 key={m.id}
                 className={`${styles.modoBtn} ${modo === m.id ? styles.active : ''}`}
                 onClick={() => setModo(m.id)}
@@ -292,8 +293,8 @@ export default function JuegoPuzzleMatematicoPage() {
             ))}
           </div>
 
-          <button className={styles.btnComenzar} onClick={iniciarJuego}>
-            ▶️ Comenzar
+          <button type="button" className={styles.btnComenzar} onClick={iniciarJuego}>
+            <span aria-hidden="true">▶️</span> Comenzar
           </button>
         </div>
       )}
@@ -354,6 +355,7 @@ export default function JuegoPuzzleMatematicoPage() {
           <div className={styles.teclado}>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
               <button
+                type="button"
                 key={n}
                 className={styles.tecla}
                 onClick={() => agregarDigito(n.toString())}
@@ -361,18 +363,19 @@ export default function JuegoPuzzleMatematicoPage() {
                 {n}
               </button>
             ))}
-            <button className={`${styles.tecla} ${styles.especial}`} onClick={toggleNegativo}>
+            <button type="button" className={`${styles.tecla} ${styles.especial}`} onClick={toggleNegativo}>
               ±
             </button>
-            <button className={styles.tecla} onClick={() => agregarDigito('0')}>
+            <button type="button" className={styles.tecla} onClick={() => agregarDigito('0')}>
               0
             </button>
-            <button className={`${styles.tecla} ${styles.especial}`} onClick={borrar}>
+            <button type="button" className={`${styles.tecla} ${styles.especial}`} onClick={borrar}>
               ⌫
             </button>
           </div>
 
           <button
+            type="button"
             className={`${styles.tecla} ${styles.enviar}`}
             onClick={verificarRespuesta}
             style={{ width: '100%' }}
@@ -382,8 +385,8 @@ export default function JuegoPuzzleMatematicoPage() {
 
           {/* Acciones */}
           <div className={styles.acciones} style={{ marginTop: '15px' }}>
-            <button className={styles.btnAccion} onClick={() => setPantalla('inicio')}>
-              ✖ Salir
+            <button type="button" className={styles.btnAccion} onClick={() => setPantalla('inicio')}>
+              <span aria-hidden="true">✖</span> Salir
             </button>
           </div>
         </div>
@@ -418,10 +421,10 @@ export default function JuegoPuzzleMatematicoPage() {
           </div>
 
           <div className={styles.botonesResultado}>
-            <button className={styles.btnReintentar} onClick={iniciarJuego}>
-              🔄 Jugar de nuevo
+            <button type="button" className={styles.btnReintentar} onClick={iniciarJuego}>
+              <span aria-hidden="true">🔄</span> Jugar de nuevo
             </button>
-            <button className={styles.btnVolver} onClick={() => setPantalla('inicio')}>
+            <button type="button" className={styles.btnVolver} onClick={() => setPantalla('inicio')}>
               ← Cambiar modo
             </button>
           </div>
@@ -430,7 +433,7 @@ export default function JuegoPuzzleMatematicoPage() {
 
       {/* Estadísticas generales */}
       <div className={styles.estadisticas}>
-        <h3>📊 Estadísticas Globales</h3>
+        <h3><span aria-hidden="true">📊</span> Estadísticas Globales</h3>
         <div className={styles.statsGrid}>
           <div className={styles.statItem}>
             <div className={styles.valor}>{estadisticas.partidasTotales}</div>
@@ -469,28 +472,28 @@ export default function JuegoPuzzleMatematicoPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🧮 Cálculo mental</td>
+                  <td><span aria-hidden="true">🧮</span> Cálculo mental</td>
                   <td>Aritmética rápida, memoria de trabajo</td>
                   <td>Baja–Media</td>
                   <td>5–30 segundos</td>
                   <td>Primaria (8+)</td>
                 </tr>
                 <tr>
-                  <td>🔢 Secuencias numéricas</td>
+                  <td><span aria-hidden="true">🔢</span> Secuencias numéricas</td>
                   <td>Reconocimiento de patrones, inducción</td>
                   <td>Media</td>
                   <td>30 seg–2 min</td>
                   <td>Secundaria (12+)</td>
                 </tr>
                 <tr>
-                  <td>📐 Geometría</td>
+                  <td><span aria-hidden="true">📐</span> Geometría</td>
                   <td>Visualización espacial, razonamiento deductivo</td>
                   <td>Media–Alta</td>
                   <td>1–5 minutos</td>
                   <td>Secundaria/preparatoria (14+)</td>
                 </tr>
                 <tr>
-                  <td>🔣 Lógica numérica</td>
+                  <td><span aria-hidden="true">🔣</span> Lógica numérica</td>
                   <td>Razonamiento abstracto, álgebra básica</td>
                   <td>Alta</td>
                   <td>2–10 minutos</td>

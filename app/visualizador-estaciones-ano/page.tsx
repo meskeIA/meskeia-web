@@ -610,7 +610,7 @@ export default function VisualizadorEstacionesAno() {
                 <div key={i} className={`${styles.mitoCard} ${mito.verdad ? styles.mitoVerdadero : styles.mitoFalso}`}>
                   <div className={styles.mitoHeader}>
                     <span className={`${styles.mitoBadge} ${mito.verdad ? styles.mitoBadgeVerdadero : styles.mitoBadgeFalso}`}>
-                      {mito.verdad ? '✅ VERDADERO' : '❌ FALSO'}
+                      {mito.verdad ? <><span aria-hidden="true">✅</span> VERDADERO</> : <><span aria-hidden="true">❌</span> FALSO</>}
                     </span>
                   </div>
                   <p className={styles.mitoAfirmacion}>&ldquo;{mito.afirmacion}&rdquo;</p>

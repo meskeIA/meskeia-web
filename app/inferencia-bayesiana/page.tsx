@@ -494,7 +494,7 @@ export default function InferenciaBayesianaPage() {
                     + Añadir hipótesis
                   </button>
                 )}
-                <button onClick={() => loadExample('multiple')} className={styles.btnSecondary}>
+                <button type="button" onClick={() => loadExample('multiple')} className={styles.btnSecondary}>
                   Cargar ejemplo (diagnóstico)
                 </button>
               </div>
@@ -639,7 +639,7 @@ export default function InferenciaBayesianaPage() {
                 </div>
               </div>
 
-              <button onClick={() => loadExample('sequential')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => loadExample('sequential')} className={styles.btnSecondary}>
                 Cargar ejemplo
               </button>
             </div>
@@ -755,7 +755,7 @@ export default function InferenciaBayesianaPage() {
                 <span className={styles.helpText}>Tasa de verdaderos negativos (detecta sanos)</span>
               </div>
 
-              <button onClick={() => loadExample('diagnostic')} className={styles.btnSecondary}>
+              <button type="button" onClick={() => loadExample('diagnostic')} className={styles.btnSecondary}>
                 Cargar ejemplo típico
               </button>
             </div>
@@ -875,7 +875,7 @@ export default function InferenciaBayesianaPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🎯 El Teorema de Bayes</h4>
+              <h4><span aria-hidden="true">🎯</span> El Teorema de Bayes</h4>
               <p>
                 El teorema de Bayes permite actualizar creencias cuando recibimos nueva información.
                 Transforma la probabilidad previa (prior) en probabilidad posterior usando la
@@ -887,7 +887,7 @@ export default function InferenciaBayesianaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📊 Prior vs Posterior</h4>
+              <h4><span aria-hidden="true">📊</span> Prior vs Posterior</h4>
               <p>
                 <strong>Prior P(H)</strong>: Tu creencia inicial antes de ver datos. Puede basarse
                 en conocimiento previo, experiencia o ser &quot;no informativo&quot;.
@@ -899,7 +899,7 @@ export default function InferenciaBayesianaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📈 Likelihood (Verosimilitud)</h4>
+              <h4><span aria-hidden="true">📈</span> Likelihood (Verosimilitud)</h4>
               <p>
                 P(E|H) mide cuán probable es observar la evidencia E si la hipótesis H fuera cierta.
                 NO es lo mismo que P(H|E). Esta confusión es el &quot;error del fiscal&quot;.
@@ -907,7 +907,7 @@ export default function InferenciaBayesianaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🔢 Likelihood Ratio</h4>
+              <h4><span aria-hidden="true">🔢</span> Likelihood Ratio</h4>
               <p>
                 La razón P(E|H)/P(E|¬H) indica cuánto más probable es la evidencia bajo H
                 que bajo ¬H. Un LR de 10 significa que la evidencia es 10 veces más probable
@@ -916,7 +916,7 @@ export default function InferenciaBayesianaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🏥 La Paradoja del Test</h4>
+              <h4><span aria-hidden="true">🏥</span> La Paradoja del Test</h4>
               <p>
                 Un test con 99% de sensibilidad y 99% de especificidad parece excelente.
                 Pero si la prevalencia es 1%, ¡solo el 50% de los positivos están realmente enfermos!
@@ -925,7 +925,7 @@ export default function InferenciaBayesianaPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🔄 Actualización Secuencial</h4>
+              <h4><span aria-hidden="true">🔄</span> Actualización Secuencial</h4>
               <p>
                 La belleza de Bayes: cada nueva observación actualiza el posterior, que se convierte
                 en el nuevo prior. Con suficiente evidencia, incluso priors muy diferentes
@@ -968,7 +968,7 @@ export default function InferenciaBayesianaPage() {
 
           {/* Tabla Comparativa: Frecuentista vs Bayesiano vs ML */}
           <div className={styles.eduComparativaSection}>
-            <h3>⚖️ Frecuentista vs Bayesiano vs Machine Learning</h3>
+            <h3><span aria-hidden="true">⚖️</span> Frecuentista vs Bayesiano vs Machine Learning</h3>
             <p className={styles.eduComparativaSubtitle}>Tres paradigmas estadísticos: diferencias clave, cuándo usarlos y ejemplos reales</p>
             <div className={styles.eduTablaWrapper}>
               <table className={styles.eduTablaComparativa}>
@@ -985,7 +985,7 @@ export default function InferenciaBayesianaPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong>🔬 Frecuentista</strong></td>
+                    <td><strong><span aria-hidden="true">🔬</span> Frecuentista</strong></td>
                     <td>Frecuencia límite de experimentos repetidos</td>
                     <td>No (rechazado filosóficamente)</td>
                     <td>P-value: P(datos|H₀). Intervalo de confianza: 95% de experimentos contendrían el parámetro</td>
@@ -994,7 +994,7 @@ export default function InferenciaBayesianaPage() {
                     <td>t-test, ANOVA, chi-cuadrado, regresión logística con p-values</td>
                   </tr>
                   <tr>
-                    <td><strong>🧠 Bayesiano</strong></td>
+                    <td><strong><span aria-hidden="true">🧠</span> Bayesiano</strong></td>
                     <td>Grado de creencia, actualizable con evidencia</td>
                     <td>Sí (prior obligatorio; puede ser no informativo)</td>
                     <td>Posterior: probabilidad directa de la hipótesis dado los datos</td>
@@ -1003,7 +1003,7 @@ export default function InferenciaBayesianaPage() {
                     <td>Teorema de Bayes, redes bayesianas, MCMC, Stan/PyMC</td>
                   </tr>
                   <tr>
-                    <td><strong>🤖 Machine Learning</strong></td>
+                    <td><strong><span aria-hidden="true">🤖</span> Machine Learning</strong></td>
                     <td>Función de pérdida optimizada; no necesariamente probabilista</td>
                     <td>Implícitamente (arquitectura, hiperparámetros, regularización)</td>
                     <td>Predicción: output numeral o probabilístico sin interpretación causal directa</td>
@@ -1018,7 +1018,7 @@ export default function InferenciaBayesianaPage() {
 
           {/* Casos de Uso */}
           <div className={styles.eduEscenariosSection}>
-            <h3>💼 Casos de Uso por Perfil Profesional</h3>
+            <h3><span aria-hidden="true">💼</span> Casos de Uso por Perfil Profesional</h3>
             <p className={styles.eduEscenariosSubtitle}>Cómo aplica el teorema de Bayes en 4 disciplinas con ejemplos numéricos concretos</p>
             <div className={styles.eduEscenariosGrid}>
               <div className={styles.eduEscenarioCard}>
@@ -1058,42 +1058,42 @@ export default function InferenciaBayesianaPage() {
 
           {/* FAQ */}
           <div className={styles.eduFaqSection}>
-            <h3>❓ Preguntas Frecuentes sobre Inferencia Bayesiana</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Inferencia Bayesiana</h3>
             <p className={styles.eduFaqSubtitle}>8 preguntas clave con respuestas detalladas y ejemplos numéricos</p>
             <div className={styles.eduFaqList}>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Qué es la probabilidad a priori (prior)?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué es la probabilidad a priori (prior)?</h4>
                 <p>El <strong>prior P(H)</strong> es tu creencia inicial sobre la hipótesis H <em>antes</em> de observar ningún dato. Puede basarse en: (1) estadísticas poblacionales (ej: prevalencia de una enfermedad = 1% → prior = 0,01), (2) datos históricos (ej: 30% de proyectos similares fallaron → prior de fracaso = 0,30), o (3) ser &quot;no informativo&quot; (P(H) = 0,5 si no tienes ninguna información). El prior NO es arbitrario cuando existen datos: usar P(H) = 0,5 para una enfermedad con prevalencia del 0,001% es un error grave que inflará artificialmente el VPP.</p>
                 <p className={styles.faqTip}>Regla práctica: busca siempre la tasa base (base rate) del fenómeno que estudias antes de aplicar Bayes.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Cuál es la diferencia entre el enfoque bayesiano y el frecuentista?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cuál es la diferencia entre el enfoque bayesiano y el frecuentista?</h4>
                 <p>La diferencia es filosófica y práctica. <strong>Frecuentista:</strong> la probabilidad es la frecuencia límite en experimentos repetidos. Solo acepta que H es verdadera o falsa (no probabilística). Produce P-values: &quot;si H₀ fuera cierta, la probabilidad de observar estos datos o más extremos es 3%&quot;. <strong>Bayesiano:</strong> la probabilidad es grado de creencia, actualizable. Produce directamente P(H|datos): &quot;dado lo observado, hay 87% de probabilidad de que H sea cierta&quot;. Diferencia práctica: un bayesiano puede decir &quot;hay 92% de probabilidad de que el fármaco funcione&quot;; un frecuentista solo puede decir &quot;rechazamos H₀ con p=0,04&quot;. El intervalo creíble bayesiano es directamente interpretable; el intervalo de confianza frecuentista, no.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Cómo se elige el prior y cuándo importa su elección?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo se elige el prior y cuándo importa su elección?</h4>
                 <p>El prior importa <strong>mucho</strong> con pocos datos y <strong>poco</strong> con muchos datos. Criterios de elección: (1) <strong>Prior informativo:</strong> basado en literatura científica o datos históricos (ej: efectividad de vacunas similares). (2) <strong>Prior conjugado:</strong> elige la familia distribucional que hace el cálculo analítico (Beta para proporciones, Gamma para tasas). (3) <strong>Prior de Jeffreys:</strong> invariante ante transformaciones de escala, matemáticamente neutro. (4) <strong>Prior uniforme:</strong> P(H)=0,5, válido solo si genuinamente no sabes nada. Con n &gt; 100 observaciones, priors razonablemente distintos convergen al mismo posterior si los datos son informativos.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Qué es el teorema de Bayes aplicado al diagnóstico médico?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué es el teorema de Bayes aplicado al diagnóstico médico?</h4>
                 <p>En diagnóstico: P(enfermedad|test+) = P(test+|enfermedad) × P(enfermedad) / P(test+). Donde P(test+|enfermedad) = sensibilidad, P(enfermedad) = prevalencia, P(test+) = P(test+|enf)×P(enf) + P(test+|sano)×P(sano). Ejemplo numérico: test COVID, sensibilidad=95%, especificidad=90%, prevalencia=1%. P(COVID|+) = (0,95×0,01) / (0,95×0,01 + 0,10×0,99) = 0,0095/0,1085 = <strong>8,8%</strong>. Conclusión: en población de baja prevalencia, un positivo es mayoritariamente un falso positivo. Comparar: con prevalencia=50% → VPP=90,5%. El mismo test, completamente diferente utilidad clínica.</p>
                 <p className={styles.faqTip}>La paradoja del test: un test excelente en laboratorio puede ser clínicamente inútil en screening masivo de enfermedades raras.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Qué es la verosimilitud (likelihood) y en qué se diferencia del posterior?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué es la verosimilitud (likelihood) y en qué se diferencia del posterior?</h4>
                 <p><strong>Verosimilitud P(E|H):</strong> mide cuán compatible es la evidencia E con la hipótesis H. Es una función de H dados los datos, no una probabilidad de H. No suma 1 al variar H. <strong>Posterior P(H|E):</strong> probabilidad de H dados los datos, sí suma 1 al variar H. La confusión entre ambos es el &quot;error del fiscal&quot;: confundir P(match_ADN|inocente) = 0,000001 con P(inocente|match_ADN) = 0,000001. Son distintas porque ignora la prevalencia de culpables con ese perfil ADN en la población. El <strong>Likelihood Ratio</strong> LR = P(E|H)/P(E|¬H) es la medida de fuerza de evidencia: LR=10 significa que E es 10× más probable si H es cierta que si no lo es.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Cuándo usar inferencia bayesiana en lugar de tests estadísticos clásicos?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cuándo usar inferencia bayesiana en lugar de tests estadísticos clásicos?</h4>
                 <p>Usa inferencia <strong>bayesiana</strong> cuando: (1) tienes conocimiento previo relevante que sería un desperdicio ignorar, (2) necesitas probabilidades directas (&quot;87% de que el efecto sea positivo&quot;), (3) el tamaño muestral es pequeño y el prior mejora la estimación, (4) necesitas actualización continua (sistemas en tiempo real, A/B testing continuo), (5) quieres cuantificar evidencia a favor de H₀ (algo imposible con p-values). Usa tests <strong>frecuentistas</strong> cuando: (1) el campo exige p-values (reguladores farmacéuticos, publicaciones con estándares CONSORT), (2) no tienes justificación para priors informativos, (3) el n es grande y el prior tendrá poco impacto, (4) prefieres la objetividad percibida del procedimiento sin priors.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Qué son los intervalos creíbles y en qué se diferencian de los intervalos de confianza?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué son los intervalos creíbles y en qué se diferencian de los intervalos de confianza?</h4>
                 <p><strong>Intervalo creíble bayesiano al 95%:</strong> &quot;dado los datos observados, hay un 95% de probabilidad de que el parámetro esté en [a, b]&quot;. Interpretación directa y natural. <strong>Intervalo de confianza frecuentista al 95%:</strong> &quot;si repitiéramos el experimento infinitas veces, el 95% de los intervalos calculados contendría el verdadero parámetro&quot;. NO significa que el parámetro esté en ese intervalo con probabilidad 95%. Ejemplo: estimación de conversión de una campaña. IC frecuentista 95% = [2,3% ; 5,7%]. IC creíble bayesiano 95% = [2,1% ; 5,4%]. Numéricamente similares, pero el bayesiano tiene la interpretación que los profesionales quieren usar (y que a menudo usan erróneamente para el frecuentista).</p>
                 <p className={styles.faqTip}>El 95% del IC frecuentista es sobre el procedimiento, no sobre el parámetro. El 95% del IC creíble es sobre el parámetro.</p>
               </div>
               <div className={styles.eduFaqItem}>
-                <h4>❓ ¿Cómo afecta el tamaño muestral al posterior?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo afecta el tamaño muestral al posterior?</h4>
                 <p>Con <strong>n pequeño</strong>: el posterior está dominado por el prior; dos investigadores con priors distintos obtienen posteriors muy diferentes con los mismos datos. Con <strong>n grande</strong>: los datos dominan y el prior se &quot;lava&quot;; priors razonablemente distintos convergen al mismo posterior (fenómeno de &quot;consistencia bayesiana&quot;). Ejemplo numérico: prior P(moneda justa) = 0,5. Tras 10 lanzamientos con 7 caras → posterior = 65%. Tras 100 lanzamientos con 70 caras → posterior = 96,4%. Tras 1.000 lanzamientos con 700 caras → posterior &gt; 99,99%, independientemente del prior inicial (siempre que no fuera 0 o 1). Regla práctica: necesitas al menos n~10/P(H) observaciones para que los datos dominen sobre un prior informativo.</p>
               </div>
             </div>
@@ -1101,7 +1101,7 @@ export default function InferenciaBayesianaPage() {
 
           {/* Guía Paso a Paso */}
           <div className={styles.eduStepSection}>
-            <h3>📋 Test COVID con 95% Sensibilidad en Población con 1% de Prevalencia: Guía Paso a Paso</h3>
+            <h3><span aria-hidden="true">📋</span> Test COVID con 95% Sensibilidad en Población con 1% de Prevalencia: Guía Paso a Paso</h3>
             <p className={styles.eduComparativaSubtitle}>7 pasos para aplicar el teorema de Bayes a un problema diagnóstico real</p>
             <div className={styles.eduStepGuide}>
               <div className={styles.eduStepItem}>
@@ -1162,7 +1162,7 @@ export default function InferenciaBayesianaPage() {
 
           {/* Tips */}
           <div className={styles.eduTipsSection}>
-            <h3>✅ Mejores Prácticas en Inferencia Bayesiana</h3>
+            <h3><span aria-hidden="true">✅</span> Mejores Prácticas en Inferencia Bayesiana</h3>
             <div className={styles.eduTipsGrid}>
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon} aria-hidden="true">📊</span>
@@ -1204,12 +1204,12 @@ export default function InferenciaBayesianaPage() {
               <h3>Errores Conceptuales que Invalidan el Análisis Bayesiano</h3>
             </div>
             <ul className={styles.eduWarningList}>
-              <li><strong>❌ Confundir P(H|E) con P(E|H):</strong> El &quot;error del fiscal&quot; y la &quot;falacia del médico&quot;. P(cáncer|positivo) ≠ P(positivo|cáncer). La sensibilidad del test no es la probabilidad de estar enfermo.</li>
-              <li><strong>❌ Ignorar la prevalencia (base rate neglect):</strong> Un test del 99% de precisión tiene VPP = 50% para una enfermedad con prevalencia del 1%. La prevalencia multiplica cualquier test.</li>
-              <li><strong>❌ Usar el posterior como nuevo prior sin datos nuevos:</strong> Solo actualiza cuando tienes evidencia nueva e independiente. Reutilizar los mismos datos para actualizar el prior es &quot;double-dipping&quot; y viola la inferencia bayesiana.</li>
-              <li><strong>❌ Asumir independencia entre observaciones sin verificar:</strong> Si las obs. 2, 3 y 4 dependen de la obs. 1, multiplicar sus likelihoods sobreestima la evidencia. En epidemiología, los contagios violan la independencia.</li>
-              <li><strong>❌ Prior basado en deseos, no en datos:</strong> Un prior de 0,99 para &quot;mi hipótesis favorita&quot; hace casi imposible que los datos la rechacen. El prior debe reflejar el conocimiento real, no el sesgo de confirmación.</li>
-              <li><strong>❌ Interpretar el posterior como certeza:</strong> P(H|datos) = 0,95 significa &quot;95% de credibilidad&quot;, no certeza. Siempre hay incertidumbre del modelo, asunciones de independencia y errores de medición que el número no captura.</li>
+              <li><strong><span aria-hidden="true">❌</span> Confundir P(H|E) con P(E|H):</strong> El &quot;error del fiscal&quot; y la &quot;falacia del médico&quot;. P(cáncer|positivo) ≠ P(positivo|cáncer). La sensibilidad del test no es la probabilidad de estar enfermo.</li>
+              <li><strong><span aria-hidden="true">❌</span> Ignorar la prevalencia (base rate neglect):</strong> Un test del 99% de precisión tiene VPP = 50% para una enfermedad con prevalencia del 1%. La prevalencia multiplica cualquier test.</li>
+              <li><strong><span aria-hidden="true">❌</span> Usar el posterior como nuevo prior sin datos nuevos:</strong> Solo actualiza cuando tienes evidencia nueva e independiente. Reutilizar los mismos datos para actualizar el prior es &quot;double-dipping&quot; y viola la inferencia bayesiana.</li>
+              <li><strong><span aria-hidden="true">❌</span> Asumir independencia entre observaciones sin verificar:</strong> Si las obs. 2, 3 y 4 dependen de la obs. 1, multiplicar sus likelihoods sobreestima la evidencia. En epidemiología, los contagios violan la independencia.</li>
+              <li><strong><span aria-hidden="true">❌</span> Prior basado en deseos, no en datos:</strong> Un prior de 0,99 para &quot;mi hipótesis favorita&quot; hace casi imposible que los datos la rechacen. El prior debe reflejar el conocimiento real, no el sesgo de confirmación.</li>
+              <li><strong><span aria-hidden="true">❌</span> Interpretar el posterior como certeza:</strong> P(H|datos) = 0,95 significa &quot;95% de credibilidad&quot;, no certeza. Siempre hay incertidumbre del modelo, asunciones de independencia y errores de medición que el número no captura.</li>
             </ul>
           </div>
 

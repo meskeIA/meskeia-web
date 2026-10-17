@@ -256,10 +256,10 @@ export default function VisualizadorDeudaPublica() {
               </div>
               <p className={styles.yieldInterpretacion}>
                 {yieldNumerico > 3.5
-                  ? '⚠️ Yield alta: el mercado exige más rentabilidad → menor confianza o tipos de interés generales altos.'
+                  ? <><span aria-hidden="true">⚠️</span> Yield alta: el mercado exige más rentabilidad → menor confianza o tipos de interés generales altos.</>
                   : yieldNumerico < 2.5
-                  ? '✅ Yield baja: alta demanda del bono → el Estado puede financiarse barato.'
-                  : '📊 Yield en rango normal para el entorno actual de tipos europeos.'}
+                  ? <><span aria-hidden="true">✅</span> Yield baja: alta demanda del bono → el Estado puede financiarse barato.</>
+                  : <><span aria-hidden="true">📊</span> Yield en rango normal para el entorno actual de tipos europeos.</>}
               </p>
             </div>
           </div>

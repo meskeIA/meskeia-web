@@ -651,7 +651,7 @@ export default function VisualizadorCriptografia() {
                       <p>{paso.descripcion}</p>
                     </div>
                     {paso.cifrado && (
-                      <span className={styles.tlsCifradoBadge} aria-label="Datos cifrados">🔒 Cifrado</span>
+                      <span className={styles.tlsCifradoBadge} aria-label="Datos cifrados"><span aria-hidden="true">🔒</span> Cifrado</span>
                     )}
                   </div>
                 ))}

@@ -257,6 +257,7 @@ export default function ErroresEscrituraCreativaPage() {
         <div className={styles.filterGroup}>
           {FILTROS.map((f) => (
             <button
+              type="button"
               key={f.id}
               className={`${styles.filterBtn} ${filtro === f.id ? styles.filterBtnActive : ''}`}
               onClick={() => setFiltro(f.id)}
@@ -431,19 +432,19 @@ export default function ErroresEscrituraCreativaPage() {
         <h3>Para qué tipo de escritor es esta guía</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>✍️ Primer manuscrito</strong>
+            <strong><span aria-hidden="true">✍️</span> Primer manuscrito</strong>
             <p>Empieza por los errores de nivel básico: adjetivitis, redundancias, truco del espejo e inicio despertando. Son los más frecuentes y los más fáciles de corregir.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📖 Escritor con varios borradores</strong>
+            <strong><span aria-hidden="true">📖</span> Escritor con varios borradores</strong>
             <p>Presta atención a los errores de nivel intermedio y avanzado: head-hopping, diálogos de exposición, flashbacks y conflicto interno. Aparecen cuando el escritor ya controla lo básico.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📝 Escritor de relato corto</strong>
+            <strong><span aria-hidden="true">📝</span> Escritor de relato corto</strong>
             <p>El relato no perdona el exceso de backstory ni el deus ex machina. Cada frase debe justificar su presencia. El ritmo y los diálogos son especialmente críticos en textos breves.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🎯 Escritor que busca publicar</strong>
+            <strong><span aria-hidden="true">🎯</span> Escritor que busca publicar</strong>
             <p>Los errores de nivel básico en las primeras páginas son causa de descarte inmediato. Protagonista despertando, adjetivitis y espejo son señales de alerta para agentes y editores.</p>
           </div>
         </div>

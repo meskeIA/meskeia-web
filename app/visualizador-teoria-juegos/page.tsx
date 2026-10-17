@@ -186,11 +186,11 @@ export default function TeoriaJuegosPage() {
               <div className={styles.eleccionReveal}>
                 <span>
                   Tú elegiste:{' '}
-                  <strong>{eleccionJugador === 'C' ? '🤝 Cooperar' : '🗣️ Delatar'}</strong>
+                  <strong>{eleccionJugador === 'C' ? <><span aria-hidden="true">🤝</span> Cooperar</> : <><span aria-hidden="true">🗣️</span> Delatar</>}</strong>
                 </span>
                 <span>
                   B eligió:{' '}
-                  <strong>{eleccionPC === 'C' ? '🤝 Cooperar' : '🗣️ Delatar'}</strong>
+                  <strong>{eleccionPC === 'C' ? <><span aria-hidden="true">🤝</span> Cooperar</> : <><span aria-hidden="true">🗣️</span> Delatar</>}</strong>
                 </span>
               </div>
               <div className={styles.condenas}>
