@@ -922,12 +922,15 @@ test.describe('Tabla Periódica · fichas de búsqueda', () => {
     const ficha = CASOS[3];
     expect(buscarPorSimbolo('Cu')?.masa).toBe(63.546);
     expect(ficha.respuestaNumerica).toBe(63.546);
-    // El 1 % de 63,546 es 0,635: quien copia «63,5» del recuadro ha encontrado el dato.
-    expect(toleranciaDe(63.546)).toBeCloseTo(0.63546, 5);
-    for (const forma of ['63,546', '63,5', '64']) {
+    // Desde el 17/10/2026 (hallazgo 3363): media unidad de la última cifra que se escribe.
+    // Quien copia «63,5» del recuadro ha encontrado el dato; «64,1» no es redondear 63,546.
+    expect(toleranciaDe(0)).toBe(0.5);
+    expect(toleranciaDe(1)).toBeCloseTo(0.05, 12);
+    expect(toleranciaDe(3)).toBeCloseTo(0.0005, 12);
+    for (const forma of ['63,546', '63,55', '63,5', '64']) {
       expect(comprobarRespuesta(forma, ficha).correcto, `forma «${forma}»`).toBe(true);
     }
-    for (const forma of ['29', '65', 'cobre']) {
+    for (const forma of ['29', '65', 'cobre', '64,1', '64,18', '63', '63,6']) {
       expect(comprobarRespuesta(forma, ficha).correcto, `forma «${forma}»`).toBe(false);
     }
     // ⚠️ «63.546» con PUNTO no vale, y no es un descuido: `parseSpanishNumber` es el parser
@@ -1214,12 +1217,13 @@ test.describe('RE-INSPECCIÓN 12/09/2026 · la tarea de aula en el navegador', (
     expect(og).toContain('[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶');
   });
 
-  test('CASO 8 bis · la ficha 4 lee la masa del cobre con coma española y dentro del 1 %', async ({
+  test('CASO 8 bis · la ficha 4 lee la masa del cobre con coma española y la admite redondeada', async ({
     page,
   }) => {
     await abrirHidratada(page);
 
-    // Cu masa: 63.546 → respuestaNumerica 63,546 · tolerancia max(0,01; 1 % ) = 0,63546.
+    // Cu masa: 63.546 → respuestaNumerica 63,546 · tolerancia: media unidad de la última cifra
+    // escrita (hallazgo 3363; antes el 1 %, 0,63546).
     expect(await responderFicha(page, 4, '63,546')).toContain(ACIERTO);
     // «63,5» es el ejemplo que la propia app declara en su párrafo de convenio
     // («copiar 63,5 de un recuadro que pone 63,546 es haber encontrado el dato»).
@@ -1955,8 +1959,7 @@ test.describe('S1 · el 1 % no admite un entero vecino en ningún recuento de la
   test('las fichas numéricas son solo la 4 (masa) y la 10 (Z = 19)', () => {
     const numericas = CASOS.filter((c) => c.respuestaNumerica !== null);
     expect(numericas.map((c) => [c.id, c.respuestaNumerica])).toEqual([[4, 63.546], [10, 19]]);
-    // El 1 % de 19 es 0,19: 18 y 20 quedan a 1 de distancia, fuera.
-    expect(toleranciaDe(19)).toBeCloseTo(0.19, 10);
+    // 19 es un recuento y se compara exacto: 18 y 20 quedan fuera.
     expect(comprobarRespuesta('18', CASOS[9]).correcto).toBe(false);
     expect(comprobarRespuesta('20', CASOS[9]).correcto).toBe(false);
   });
@@ -2051,7 +2054,7 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
     expect(await veredictoLimpio(page, 10, '19,1')).toContain(FALLO);
     expect(await veredictoLimpio(page, 10, '19,19')).toContain(FALLO);
     expect(await veredictoLimpio(page, 10, '19,0')).toContain(ACIERTO);
-    // La masa (ficha 4) conserva el margen del 1 %: «63,5» sigue siendo encontrar el dato.
+    // La masa (ficha 4) conserva su margen (desde el 3363, el de redondeo): «63,5» sigue valiendo.
     expect(await veredictoLimpio(page, 4, '63,5')).toContain(ACIERTO);
   });
 
@@ -2140,6 +2143,10 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
     }
     const convenio = await page.locator('[class*="__aulaConvenio"]').innerText();
     expect(convenio).not.toMatch(/\d %/); // espacio normal; con el duro (U+00A0) no casa
+    expect(convenio).not.toMatch(/\d%/);
+    // Desde el 17/10/2026 (hallazgo 3363) el convenio ya no cita un «1 %»: la masa se corrige
+    // por redondeo. Se conserva lo que este test vigilaba (ningún % mal espaciado).
+    if (/%/.test(convenio))
     expect(convenio).toMatch(/1 %/);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     for (const seccion of [
@@ -2418,7 +2425,7 @@ test.describe('CASO 20 · límite: el bloque f (Ce y U), la cola de los actínid
     expect(await veredictoLimpio(page, 10, '-19')).toContain(FALLO);
     expect(await veredictoLimpio(page, 10, '0')).toContain(FALLO);
     expect(await veredictoLimpio(page, 10, '19')).toContain(ACIERTO);
-    // Ficha 4 · masa del cobre (63,546): ni cero ni negativa, ni fuera del 1 %.
+    // Ficha 4 · masa del cobre (63,546): ni cero ni negativa, ni algo que no la redondee.
     expect(await veredictoLimpio(page, 4, '0')).toContain(FALLO);
     expect(await veredictoLimpio(page, 4, '-63,546')).toContain(FALLO);
     expect(await veredictoLimpio(page, 4, '64,19')).toContain(FALLO);
@@ -2615,10 +2622,10 @@ test.describe('verificación 16/10/2026 · los commits posteriores a la inspecci
     ] as const) {
       expect(comprobarRespuesta(r, ficha10).correcto, `ficha 10 «${r}»`).toBe(ok);
     }
-    // El margen de la masa sigue siendo el de antes del refactor: max(0,01; 1 %) = 0,63546.
-    expect(toleranciaDe(63.546)).toBeCloseTo(0.63546, 4);
+    // El margen de la masa ya no es el 1 % (0,63546) sino el redondeo de lo escrito (hallazgo 3363).
+    expect(toleranciaDe(1)).toBeCloseTo(0.05, 12);
     for (const [r, ok] of [
-      ['63,546', true], ['63,5', true], ['-63,546', false], ['0', false], ['64,19', false],
+      ['63,546', true], ['63,5', true], ['64', true], ['-63,546', false], ['0', false], ['64,19', false], ['64,1', false],
     ] as const) {
       expect(comprobarRespuesta(r, ficha4).correcto, `ficha 4 «${r}»`).toBe(ok);
     }
@@ -2688,8 +2695,8 @@ test.describe('hallazgos · 16/10/2026 (ABIERTOS)', () => {
     expect(elementos.find((e) => e.simbolo === 'W')?.otrosNombres).toEqual(['Tungsteno']);
   });
 
-  test('C · la tolerancia del 1 % acepta la masa de la casilla de al lado y cifras que no redondean el dato', async ({ page }) => {
-    test.fail(true, 'ABIERTO (inspector 16/10/2026): cobalto ← 58,693 (la masa del níquel) da «¡Correcto!»');
+  // REPARADO (hallazgo 3363, 17/10/2026): media unidad de la última cifra escrita.
+  test('C (3363) · la masa ya no acepta la de la casilla de al lado ni cifras que no redondean el dato', async ({ page }) => {
     // Las respuestas de masa son un dato EXACTO que se copia de la tabla, y se corrigen con la
     // política relativa (max(0,01; 1 %)) de lib/calculadoras/correctorCasosAula.ts. Mismo
     // defecto que el hallazgo 3322 de simulador-genetica. El 1 % de 58,933 es 0,589, y el

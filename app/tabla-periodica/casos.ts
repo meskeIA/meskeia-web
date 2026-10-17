@@ -53,7 +53,7 @@
  */
 
 import { parseSpanishNumber } from '@/lib';
-import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero } from '@/lib/calculadoras/correctorCasosAula';
 import { elementos, type Elemento } from './elementos-data';
 
 // ============================================================
@@ -145,7 +145,7 @@ export interface EjercicioBusqueda {
   etiquetaRespuesta: string;
   respuestaTexto: string;
   sinonimos: readonly string[];
-  /** Igual que en las fichas: un recuento no admite el margen del 1 %. */
+  /** Igual que en las fichas: un recuento no admite el margen de redondeo de la masa. */
   respuestaEntera: boolean;
   pasos: readonly string[];
 }
@@ -483,13 +483,30 @@ function formatearNumero(valor: number): string {
 }
 
 /**
- * Tolerancia de las fichas numéricas: el mayor entre 0,01 y el 1 % del valor.
+ * Tolerancia de las fichas de masa: media unidad de la última cifra que ESCRIBE el alumno.
  *
- * Mismo convenio que el resto de la sistemática. Aquí importa porque las masas atómicas
- * tienen tres decimales (55,845) y quien copia «55,85» del recuadro ha encontrado el dato.
+ * Hallazgo 3363 (16/10/2026). Antes era la política relativa (el mayor entre 0,01 y el 1 %), y
+ * una masa es un dato exacto que se copia de la tabla: el 1 % daba por buena la masa de la
+ * casilla de AL LADO (cobalto ← 58,693 del níquel, argón ↔ calcio) y cifras como «64,1» o
+ * «64,18», que no son 63,546 redondeado a nada. Con esta regla vale el dato y cualquiera de
+ * sus redondeos —63,546, 63,55, 63,5 y 64 para el cobre— y nada más. Es la misma idea que la
+ * política de redondeo de `correctorCasosAula` (hallazgo 3322 de simulador-genetica), pero los
+ * decimales los pone quien responde y no el enunciado, porque la ficha no pide un redondeo.
  */
-export function toleranciaDe(valorEsperado: number): number {
-  return toleranciaRelativa(valorEsperado);
+export function toleranciaDe(decimalesEscritos: number): number {
+  return 10 ** -decimalesEscritos / 2;
+}
+
+/**
+ * Cuántos decimales lleva lo que escribió el alumno. «63,5» → 1, «64» → 0. Si el separador
+ * se leyó como de millares («1.008» es 1008 para `parseSpanishNumber`), no hay decimales.
+ */
+export function decimalesEscritos(texto: string, valor: number): number {
+  const limpio = texto.trim().replace(/\s/g, '').replace(/^[+-]/, '');
+  const decimales = /[.,](\d+)$/.exec(limpio);
+  if (!decimales) return 0;
+  if (Number.isInteger(valor) && Number(limpio.replace(/[.,]/g, '')) === Math.abs(valor)) return 0;
+  return decimales[1].length;
 }
 
 /**
@@ -527,7 +544,7 @@ export function comprobarRespuesta(
       caso.respuestaNumerica,
       caso.respuestaEntera === true
         ? { tolerancia: 0, magnitud: 'recuento' }
-        : { tolerancia: toleranciaDe(caso.respuestaNumerica), magnitud: 'real' },
+        : { tolerancia: toleranciaDe(decimalesEscritos(respuestaUsuario, valor)), magnitud: 'real' },
     );
     const correcto = c.estado === 'acierto';
     return { correcto, motivo: correcto ? 'acierto' : 'fallo' };

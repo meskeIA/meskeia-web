@@ -601,9 +601,11 @@ export default function TablaPerodicaPage() {
           piden un elemento vale tanto el <strong>símbolo</strong> como el <strong>nombre</strong>,
           con tildes o sin ellas y con artículo o sin él —«Fe», «fe», «hierro» y «el hierro» son
           la misma respuesta—, y una configuración vale con superíndices o sin ellos y con los
-          espacios que quieras. En las que piden una masa se admite un margen del 1&nbsp;%,
-          porque copiar 63,5 de un recuadro que pone 63,546 es haber encontrado el dato; un
-          número atómico, en cambio, es un recuento y tiene que ser el entero exacto. Lo que se
+          espacios que quieras. En las que piden una masa vale el dato redondeado a los
+          decimales que quieras —63,546, 63,55, 63,5 o 64 para el cobre—, porque copiar 63,5 de un
+          recuadro que pone 63,546 es haber encontrado el dato; pero no otra cifra: 64,1 no es
+          ningún redondeo de 63,546, y la masa de la casilla de al lado tampoco vale. Un número
+          atómico, en cambio, es un recuento y tiene que ser el entero exacto. Lo que se
           evalúa es si sabes buscarlo, no cómo lo tecleas.
         </p>
 
