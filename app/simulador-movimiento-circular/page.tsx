@@ -388,7 +388,9 @@ export default function SimuladorMovimientoCircularPage() {
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel} htmlFor="slider-radio">
             Radio (r){' '}
-            <span className={styles.sliderValue}>{formatNumber(radio, 1)} m</span>
+            {/* Una sola cadena, hijo único: con la página traducida, dos nodos de texto dejaban la
+                cifra vieja en el que el traductor ya había cambiado por <font> (hallazgo 3343). */}
+            <span className={styles.sliderValue}>{`${formatNumber(radio, 1)} m`}</span>
           </label>
           <input
             id="slider-radio"
@@ -408,7 +410,7 @@ export default function SimuladorMovimientoCircularPage() {
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel} htmlFor="slider-omega">
             Velocidad angular (ω){' '}
-            <span className={styles.sliderValue}>{formatNumber(omega, 1)} rad/s</span>
+            <span className={styles.sliderValue}>{`${formatNumber(omega, 1)} rad/s`}</span>
           </label>
           <input
             id="slider-omega"
@@ -428,7 +430,7 @@ export default function SimuladorMovimientoCircularPage() {
         <div className={styles.sliderGroup}>
           <label className={styles.sliderLabel} htmlFor="slider-masa">
             Masa (m){' '}
-            <span className={styles.sliderValue}>{formatNumber(masa, 1)} kg</span>
+            <span className={styles.sliderValue}>{`${formatNumber(masa, 1)} kg`}</span>
           </label>
           <input
             id="slider-masa"
@@ -460,7 +462,7 @@ export default function SimuladorMovimientoCircularPage() {
           <span aria-hidden="true">🔁</span> En MCNU las cifras del panel siguen a la animación:
           ω crece a {formatNumber(ALPHA_MCNU, 1)} rad/s² y, al llegar a{' '}
           {formatNumber(OMEGA_MAX_MCNU, 0)} rad/s, el simulador vuelve a empezar desde la ω₀
-          del deslizador ({formatNumber(omega, 1)} rad/s) para que el ciclo pueda verse entero.
+          del deslizador (<span>{formatNumber(omega, 1)}</span> rad/s) para que el ciclo pueda verse entero.
         </p>
       )}
 
@@ -623,7 +625,7 @@ export default function SimuladorMovimientoCircularPage() {
               <span className={styles.scenarioIcon} aria-hidden="true">🔬</span>
               <h4>Centrífuga de laboratorio</h4>
               <p>
-                Una microcentrífuga puede girar a 15.000 rpm (≈ 1.571 rad/s). La aceleración
+                Una microcentrífuga puede girar a 15.000 rpm (≈ 1571 rad/s). La aceleración
                 centrípeta alcanza miles de veces la g, separando componentes de diferente densidad.
               </p>
             </div>
@@ -756,7 +758,7 @@ export default function SimuladorMovimientoCircularPage() {
               <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <p>
                 <strong>Conversión rpm → rad/s:</strong> multiplica las rpm por 2π/60 (≈ 0,1047).
-                Ejemplo: 1.500 rpm = 1.500 × 2π/60 ≈ 157 rad/s.
+                Ejemplo: 1500 rpm = 1500 × 2π/60 ≈ 157 rad/s.
               </p>
             </div>
             <div className={styles.tipCard}>

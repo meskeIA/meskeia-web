@@ -1912,8 +1912,9 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
     expect(errores).toEqual([]);
   });
 
-  test.fail(
-    'ABIERTO (operativa, medio) · traducida, los rótulos de los deslizadores y la ω₀ del aviso MCNU se quedan viejos',
+  // REPARADO (hallazgo 3343, 17/10/2026): cada cifra variable es el único hijo de su elemento.
+  test(
+    '3343 (regresión) · traducida, los rótulos de los deslizadores y la ω₀ del aviso MCNU se actualizan',
     async ({ page }) => {
       // `<span className={styles.sliderValue}>{formatNumber(radio, 1)} m</span>` son DOS nodos de
       // texto («2,0» y « m»): React escribe la cifra nueva en el nodo que el traductor ya cambió por
@@ -1939,8 +1940,9 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
     },
   );
 
-  test.fail(
-    'ABIERTO (contenido, bajo) · la guía agrupa números de cuatro cifras: «1.500 rpm» y «1.571 rad/s»',
+  // REPARADO (hallazgo 3344, 17/10/2026)
+  test(
+    '3344 (regresión) · la guía no agrupa números de cuatro cifras: «1500 rpm» y «1571 rad/s»',
     async ({ page }) => {
       // CLAUDE.md §2 (Ortografía de la RAE, 2010): con cuatro cifras enteras no se agrupa. El panel
       // de la misma app lo cumple (F_c = 2500 N sale «2500,00»), pero la guía escribe a mano
