@@ -39,13 +39,16 @@ export const jsonLd = generateWebAppSchema({
   description: 'Simulador interactivo de puertas lógicas, también llamadas compuertas lógicas (AND, OR, NOT, NAND, NOR, XOR, XNOR), con tablas de verdad, circuitos digitales predefinidos (Half Adder, Full Adder, Multiplexor) y evaluador de expresiones booleanas.',
   url: 'https://meskeia.com/simulador-puertas-logicas/',
   category: 'EducationalApplication',
+  // Hallazgo 3358 (16/10/2026): prometía una «visualización paso a paso de la propagación de
+  // señales» que ningún modo hace. Cada línea dice ahora algo que la app hace, visto en ella.
   features: [
-    'Simulador interactivo de 7 tipos de puertas lógicas',
-    'Tablas de verdad generadas automáticamente',
-    'Circuitos predefinidos: Half Adder, Full Adder, Multiplexor',
-    'Evaluador de expresiones booleanas',
-    'Visualización paso a paso de la propagación de señales',
-    'En español',
+    'Tablas de verdad y símbolo de las 7 puertas: AND, OR, NOT, NAND, NOR, XOR y XNOR',
+    'Cinco circuitos con entradas conmutables y salidas al instante: semisumador, sumador completo, multiplexor 2:1, comparador de 1 bit y decodificador 2:4',
+    'Tabla completa de cada circuito con la fila de las entradas actuales resaltada',
+    'Evaluador de expresiones booleanas de hasta 4 variables (A-D), con palabras o con símbolos',
+    'Avisos que explican por qué una expresión no es válida',
+    '9 retos: encontrar la expresión que produce una tabla dada, con corrección fila a fila y recuento de operadores',
+    'Retos con puertas restringidas (solo NAND o solo NOR), con pista y solución de referencia',
   ],
   keywords: ['compuertas lógicas', 'puertas lógicas', 'electrónica digital', 'álgebra booleana', 'tablas verdad', 'universidad', 'FP'],
 });

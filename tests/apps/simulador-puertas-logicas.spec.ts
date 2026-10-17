@@ -1249,7 +1249,8 @@ test.describe('16/10 · contenido', () => {
     expect(sinOcultar).toEqual([]);
   });
 
-  test.fail('HALLAZGO · featureList no promete una «visualización paso a paso de la propagación»', async ({ page }) => {
+  // REPARADO (hallazgo 3358, 17/10/2026)
+  test('3358 · featureList no promete una «visualización paso a paso de la propagación»', async ({ page }) => {
     await abrirSimulador(page);
     // Ningún modo enseña señales intermedias ni avanza paso a paso: los circuitos muestran la
     // salida final y la tabla completa.
@@ -1289,12 +1290,14 @@ test.describe('16/10 · contenido', () => {
     expect(distintas).toEqual([]);
   });
 
-  test.fail('HALLAZGO · el texto de «Sigue explorando» no promete «cualquier fórmula booleana»', async ({ page }) => {
+  // REPARADO (hallazgo 3360, 17/10/2026)
+  test('3360 · el texto de «Sigue explorando» no promete «cualquier fórmula booleana»', async ({ page }) => {
     await abrirSimulador(page);
     // El evaluador admite 4 variables (A-D): cualquier expresión con una E se rechaza con
     // ««E» no es una variable válida. Usa A, B, C o D.» (RECHAZOS del CASO 3 de 30/08, arriba).
     const seccion = page.locator('section[class*="__relatedConcepts"]');
     await expect(seccion).toHaveCount(1);
     await expect(seccion).not.toContainText('cualquier fórmula booleana');
+    await expect(seccion).toContainText('hasta cuatro variables (A, B, C y D)');
   });
 });

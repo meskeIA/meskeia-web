@@ -1276,7 +1276,7 @@ export default function SimuladorPuertasLogicasPage() {
         <p className={styles.relatedConceptsTip}>
           <span aria-hidden="true">💡</span> ¿Buscabas una <strong>calculadora de compuertas lógicas</strong> o un{' '}
           <strong>sumador binario</strong>? Es esta misma herramienta: usa el modo «Expresiones»
-          para evaluar cualquier fórmula booleana, y el modo «Circuitos» para los sumadores
+          para evaluar fórmulas booleanas de hasta cuatro variables (A, B, C y D), y el modo «Circuitos» para los sumadores
           (half adder y full adder).
         </p>
       </section>
