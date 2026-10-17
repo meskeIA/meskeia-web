@@ -672,10 +672,10 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
     expect(guia.match(/\d %/g) ?? []).toEqual([]);
   });
 
-  test('HALLAZGO — la pregunta 4 del FAQPage publica otra clasificación por peso que la pregunta 2 y la página', async ({
+  // REPARADO (hallazgo 3329): la 4 se deriva ahora de rangosTipicos, como la 2.
+  test('3329 (regresión) — la pregunta 4 del FAQPage publica la misma clasificación por peso que la 2 y la página', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     const faq = await preguntasFaqPage(page);
     const q2 = faq.find((q) => q.name.includes('A qué edad dejan de crecer'))?.text ?? '';
@@ -687,12 +687,18 @@ test.describe('Inspector 16/10/2026 — ración diaria orientativa', () => {
     expect(q4).not.toContain('entre 25 y 45 kg');
     expect(q4).not.toContain('entre 10 y 25 kg');
     expect(q4).not.toContain('por encima de 45 kg');
+    expect(q4).not.toMatch(/menos de 5 kg|entre 5 y 10 kg/);
+    // Y en positivo: los cinco rangos del selector, los mismos que la 2
+    for (const r of ['1,5-4 kg', '4-15 kg', '8-20 kg', '16-40 kg', '35-90 kg']) expect(q4).toContain(r);
+    // El Husky (16-27 kg) y el Rottweiler (35-60 kg) están en la categoría donde los pone la app
+    expect(q4).toMatch(/16-40 kg \([^)]*Husky/);
+    expect(q4).toMatch(/35-90 kg \([^)]*Rottweiler/);
   });
 
-  test('HALLAZGO — dos preguntas del FAQPage están también en la FAQ visible con otra respuesta', async ({
+  // REPARADO (hallazgo 3330): una constante por pregunta en metadata.ts, que importan las dos bocas.
+  test('3330 (regresión) — las preguntas del FAQPage que están en la FAQ visible dan la misma respuesta', async ({
     page,
   }) => {
-    test.fail();
     await abrir(page);
     const faq = await preguntasFaqPage(page);
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();

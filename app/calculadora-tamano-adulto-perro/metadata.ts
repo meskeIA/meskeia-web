@@ -48,6 +48,27 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+/**
+ * Preguntas que se publican en DOS bocas: el FAQPage de abajo y la FAQ visible de `page.tsx`.
+ * Hallazgo 3330 (16/10/2026): cada boca tenía su respuesta escrita a mano y ya decían cosas
+ * distintas (la visible callaba los grandes y los pesos; la del JSON-LD, los mini). Una sola
+ * constante por pregunta, como en `simulador-gastos-compraventa-garaje` (§1.ter).
+ */
+export const PREGUNTA_EDAD_DEJA_DE_CRECER = '¿A qué edad dejan de crecer los perros según su tamaño?';
+export const RESPUESTA_EDAD_DEJA_DE_CRECER = `Depende del tamaño de la raza: cuanto mayor es el perro, más tarde madura. Los perros mini (${rangosTipicos.mini.etiqueta} de adulto) terminan de crecer hacia los 8-10 meses y los de razas pequeñas (${rangosTipicos.pequeno.etiqueta}), hacia los 10-12 meses. Las razas medianas (${rangosTipicos.mediano.etiqueta}) maduran entre los 12 y 15 meses. Las razas grandes (${rangosTipicos.grande.etiqueta}) tardan entre 18 y 24 meses, y las razas gigantes (${rangosTipicos.gigante.etiqueta}), como el Gran Danés o el San Bernardo, pueden seguir creciendo hasta los 24-36 meses. Los rangos salen de las razas de referencia de la propia calculadora y se solapan en los bordes, porque describen pesos reales de razas, no tramos administrativos.`;
+
+export const PREGUNTA_ALIMENTACION_TAMANO = '¿Influye la alimentación en el tamaño final de un perro?';
+export const RESPUESTA_ALIMENTACION_TAMANO = 'Sí, aunque la genética es el factor determinante: la alimentación no puede hacer que un perro supere su potencial genético, pero una dieta deficiente sí puede impedir que lo alcance. La sobrealimentación en cachorros de razas grandes acelera el desarrollo óseo y aumenta el riesgo de problemas articulares. Los piensos específicos para cachorros de raza grande o gigante están formulados para un crecimiento más controlado.';
+
+/**
+ * Hallazgo 3329 (16/10/2026): esta respuesta era la última copia de la clasificación por peso
+ * escrita a mano (mediano «entre 10 y 25 kg», grande «entre 25 y 45 kg»), la misma que el
+ * hallazgo 51 retiró de la pregunta 2. Con ella el Husky (16-27 kg) y el Rottweiler (desde
+ * 35 kg) quedaban fuera de la categoría en la que los pone la app. Ahora se deriva, como la 2,
+ * de `rangosTipicos`.
+ */
+const RESPUESTA_DIFERENCIA_TAMANOS = `La clasificación varía según la fuente. Esta calculadora la deriva del peso adulto típico de sus razas de referencia: razas mini, ${rangosTipicos.mini.etiqueta} (Chihuahua, Yorkshire, Pomerania); razas pequeñas, ${rangosTipicos.pequeno.etiqueta} (Bichón Frisé, Jack Russell, Shih Tzu); razas medianas, ${rangosTipicos.mediano.etiqueta} (Beagle, Cocker Spaniel, Border Collie); razas grandes, ${rangosTipicos.grande.etiqueta} (Labrador Retriever, Golden Retriever, Pastor Alemán, Husky Siberiano); y razas gigantes, ${rangosTipicos.gigante.etiqueta} (Gran Danés, San Bernardo, Terranova, Rottweiler). Los rangos se solapan en los bordes porque describen pesos reales de razas, no tramos excluyentes: un perro de 15 kg puede ser de raza pequeña o mediana según cuál sea.`;
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -62,10 +83,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿A qué edad dejan de crecer los perros según su tamaño?',
+      name: PREGUNTA_EDAD_DEJA_DE_CRECER,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Los perros de razas pequeñas (${rangosTipicos.pequeno.etiqueta} de adulto) alcanzan su tamaño adulto aproximadamente a los 10-12 meses. Las razas medianas (${rangosTipicos.mediano.etiqueta}) maduran entre los 12 y 15 meses. Las razas grandes (${rangosTipicos.grande.etiqueta}) tardan entre 18 y 24 meses, y las razas gigantes (${rangosTipicos.gigante.etiqueta}), como el Gran Danés o el San Bernardo, pueden seguir creciendo hasta los 24-36 meses. Los rangos salen de las razas de referencia de la propia calculadora y se solapan en los bordes, porque describen pesos reales de razas, no tramos administrativos.`,
+        text: RESPUESTA_EDAD_DEJA_DE_CRECER,
       },
     },
     {
@@ -81,15 +102,15 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre un perro de raza pequeña, mediana y grande?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La clasificación varía según la fuente, pero como referencia general: razas toy o miniatura pesan menos de 5 kg (Chihuahua, Yorkshire); razas pequeñas entre 5 y 10 kg (Bichón Frisé, Jack Russell); razas medianas entre 10 y 25 kg (Beagle, Cocker Spaniel, Border Collie); razas grandes entre 25 y 45 kg (Labrador Retriever, Golden Retriever, Pastor Alemán); y razas gigantes por encima de 45 kg (Gran Danés, San Bernardo, Terranova).',
+        text: RESPUESTA_DIFERENCIA_TAMANOS,
       },
     },
     {
       '@type': 'Question',
-      name: '¿Influye la alimentación en el tamaño final de un perro?',
+      name: PREGUNTA_ALIMENTACION_TAMANO,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, aunque la genética es el factor determinante, la nutrición durante el crecimiento tiene un impacto real. Una subnutrición severa puede limitar el crecimiento potencial, mientras que la sobrealimentación en razas grandes puede acelerar el desarrollo óseo y aumentar el riesgo de problemas articulares. Los piensos específicos para cachorros de raza grande o gigante están formulados para un crecimiento más controlado.',
+        text: RESPUESTA_ALIMENTACION_TAMANO,
       },
     },
   ],

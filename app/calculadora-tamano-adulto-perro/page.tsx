@@ -14,6 +14,12 @@ import {
   type TamanoRaza,
   type RazaReferencia,
 } from './razas';
+import {
+  PREGUNTA_EDAD_DEJA_DE_CRECER,
+  RESPUESTA_EDAD_DEJA_DE_CRECER,
+  PREGUNTA_ALIMENTACION_TAMANO,
+  RESPUESTA_ALIMENTACION_TAMANO,
+} from './metadata';
 
 // Límites de entrada. El techo de peso cubre a las razas gigantes de la propia tabla (el Gran
 // Danés y el San Bernardo llegan a 90 kg de adulto) y la edad mínima es la del primer punto de
@@ -928,8 +934,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
           <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes (v2)</h2>
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
-              <strong>¿A qué edad deja de crecer un perro?</strong>
-              <p>Depende del tamaño: los perros mini terminan de crecer hacia los 8-10 meses, los medianos hacia los 12-15 meses y los gigantes pueden no alcanzar su tamaño adulto completo hasta los 3 años.</p>
+              <strong>{PREGUNTA_EDAD_DEJA_DE_CRECER}</strong>
+              <p>{RESPUESTA_EDAD_DEJA_DE_CRECER}</p>
               <p className={styles.faqTip}>Regla práctica: cuanto mayor es el perro, más tarde madura.</p>
             </li>
             <li className={styles.faqItem}>
@@ -938,8 +944,8 @@ export default function CalculadoraTamanoAdultoPerroPage() {
               <p className={styles.faqTip}>Un test de ADN canino puede identificar las razas predominantes y mejorar la estimación.</p>
             </li>
             <li className={styles.faqItem}>
-              <strong>¿Influye la alimentación en el tamaño final?</strong>
-              <p>La alimentación no puede hacer que un perro supere su potencial genético, pero una dieta deficiente sí puede impedir que lo alcance. La sobrealimentación en cachorros de razas grandes es especialmente perjudicial para el desarrollo óseo.</p>
+              <strong>{PREGUNTA_ALIMENTACION_TAMANO}</strong>
+              <p>{RESPUESTA_ALIMENTACION_TAMANO}</p>
               <p className={styles.faqTip}>El objetivo no es maximizar el crecimiento, sino que sea gradual y constante.</p>
             </li>
             <li className={styles.faqItem}>
