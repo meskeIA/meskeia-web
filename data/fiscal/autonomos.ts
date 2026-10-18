@@ -138,7 +138,8 @@ export const GASTOS_GENERICOS_RETA = {
  * (ingresos − gastos − cuota) / 12, sin devolver la cuota ni restar el 7 %, y avisaba de un
  * déficit inexistente con rentas altas y callaba el real con rentas medias. Los demás
  * consumidores de `tramoRETA` (estimador-cuota-autonomo, comparador-autonomo-vs-sl y los
- * motores de lib/calculadoras) siguen buscando con su propia base: anotado en SOSPECHAS.
+ * motores de lib/calculadoras) buscaban con su propia base hasta el 18/10/2026: ahora pasan
+ * por `rendimientoComputableDesdeActividad` (cabo C0105).
  *
  * @param p.rendimientoNetoAnual Rendimiento neto anual de la actividad según el IRPF, en €
  *   (en objetiva, el rendimiento neto previo).
@@ -157,6 +158,31 @@ export function rendimientoComputableMensualRETA(p: {
   const base = p.metodo === 'directa' ? p.rendimientoNetoAnual + p.cuotasAnuales : p.rendimientoNetoAnual;
   const deduccion = p.societario ? GASTOS_GENERICOS_RETA.societarios : GASTOS_GENERICOS_RETA.general;
   return (base * (1 - deduccion)) / 12;
+}
+
+/**
+ * Rendimiento computable MENSUAL para quien da los ingresos y los gastos de la actividad SIN la
+ * cuota del RETA, que es lo que piden estimador-cuota-autonomo, comparador-autonomo-vs-sl y las
+ * herramientas del MCP («ingresos − gastos, antes de cuota»). En estimación directa esa resta
+ * YA es «el rendimiento neto, incrementado en el importe de las cuotas» de la regla 1.ª: la
+ * cuota se descuenta para el IRPF y se vuelve a sumar para el tramo, así que no hay punto fijo
+ * cuota → tramo → cuota. Solo falta la regla 2.ª, el 7 % (3 % societarios).
+ *
+ * ⚠️ 18/10/2026 — cabo C0105: hasta hoy esos cuatro consumidores buscaban el tramo con
+ * (ingresos − gastos) / 12, sin el 7 %. Con 30.000 € de ingresos y 4.500 € de gastos buscaban
+ * con 2.125 €/mes (general, tramo 6, cuota mínima 401,47 €); con la regla 2.ª son
+ * 25.500 × 0,93 / 12 = 1.976,25 €/mes (general, tramo 5, 380,88 €).
+ * NO aplica el 5 % de gastos de difícil justificación de la directa SIMPLIFICADA (art. 30.2.4.ª
+ * RIRPF), que rebajaría algo más el rendimiento: supone la directa normal, como el IRPF que
+ * calculan esos mismos consumidores.
+ */
+export function rendimientoComputableDesdeActividad(ingresosMenosGastosAnual: number, societario = false): number {
+  return rendimientoComputableMensualRETA({
+    rendimientoNetoAnual: ingresosMenosGastosAnual,
+    cuotasAnuales: 0, // ya están dentro: la resta no las descontó
+    metodo: 'directa',
+    societario,
+  });
 }
 
 // Bases de referencia 2026

@@ -1025,9 +1025,13 @@ test.describe('Golden — calcularHipoteca (Capa 1 · fórmula francesa)', () =>
 // encabezado del portal diga "31,40%" — texto de 2025 no actualizado).
 // ────────────────────────────────────────────────────────────────────────────
 
+// Desde el 18/10/2026 (cabo C0105) el tramo se busca con el rendimiento COMPUTABLE del
+// art. 308.1.c LGSS. Los goldens K, L, M y las fronteras miden la TABLA, así que entran por
+// `rendimientoComputableMensual` con sus cifras de siempre; el paso neto → computable (−7 %)
+// lo miden los casos C0105 del final del bloque.
 test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => {
   test('GOLDEN-K: rendimiento 1.600 €/mes → tramo 6, base 960,78 €, cuota 302,65 €/mes [SS ✓]', () => {
-    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 1600 });
+    const res = calcularCuotaAutonomo({ rendimientoComputableMensual: 1600 });
     expect(res.tramo).toBe(6);
     expect(res.baseMinima).toBeCloseTo(960.78, 2);
     expect(res.baseCotizacion).toBeCloseTo(960.78, 2);   // base mínima por defecto
@@ -1041,7 +1045,7 @@ test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => 
   test('GOLDEN-L: rendimiento 2.500 €/mes → tramo 10, base 1.356,21 €, cuota 427,21 €/mes [SS ✓]', () => {
     // Con la tabla 2023 (incorrecta) este caso daba 350 €/mes (base 1.111,11).
     // Con la tabla 2026 correcta la base mínima del tramo es 1.356,21.
-    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 2500 });
+    const res = calcularCuotaAutonomo({ rendimientoComputableMensual: 2500 });
     expect(res.tramo).toBe(10);
     expect(res.baseMinima).toBeCloseTo(1356.21, 2);
     expect(res.baseCotizacion).toBeCloseTo(1356.21, 2);
@@ -1052,7 +1056,7 @@ test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => 
   });
 
   test('GOLDEN-M: nuevo autónomo → tarifa plana 80 €/mes independiente del rendimiento', () => {
-    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 2500, esNuevoAutonomo: true });
+    const res = calcularCuotaAutonomo({ rendimientoComputableMensual: 2500, esNuevoAutonomo: true });
     expect(res.aplicaTarifaPlana).toBe(true);
     expect(res.cuotaEfectiva).toBeCloseTo(80, 2);
     expect(res.cuotaAnual).toBeCloseTo(960, 2);
@@ -1076,11 +1080,40 @@ test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => 
   ];
   for (const [rendimiento, tramo, base] of FRONTERAS) {
     test(`GOLDEN-M-frontera: ${rendimiento} €/mes → tramo ${tramo}, base mínima ${base} [Orden PJC/297/2026 art. 18]`, () => {
-      const res = calcularCuotaAutonomo({ rendimientoNetoMensual: rendimiento });
+      const res = calcularCuotaAutonomo({ rendimientoComputableMensual: rendimiento });
       expect(res.tramo).toBe(tramo);
       expect(res.baseMinima).toBeCloseTo(base, 2);
     });
   }
+
+  // Cabo C0105: hasta el 18/10/2026 el neto (ingresos − gastos, sin la cuota) se usaba tal cual.
+  // Caso del cabo, a mano: 30.000 € de ingresos y 4.500 € de gastos → neto 25.500 €/año =
+  // 2.125 €/mes → computable 2.125 × 0,93 = 1.976,25 €/mes (art. 308.1.c LGSS, regla 2.ª)
+  // → tramo 8 (> 1.850 y ≤ 2.030), base mínima 1.209,15 €, cuota 1.209,15 × 31,50 % = 380,88 €.
+  // Antes: 2.125 €/mes → tramo 9, base 1.274,51 €, cuota 401,47 €.
+  test('C0105: neto 2.125 €/mes → computable 1.976,25 €, tramo 8, cuota 380,88 € (no la 401,47 del tramo 9)', () => {
+    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 25500 / 12 });
+    expect(res.rendimientoComputableMensual).toBeCloseTo(1976.25, 2);
+    expect(res.tramo).toBe(8);
+    expect(res.baseMinima).toBeCloseTo(1209.15, 2);
+    expect(res.cuotaMensualGeneral).toBeCloseTo(380.88, 2);
+  });
+
+  test('C0105: el computable dado se usa tal cual, sin restarle otra vez el 7 % (simulador-modulos-vs-directa)', () => {
+    // 1.850,01 es tramo 8; con el 7 % restado dos veces (1.720,51) caería en el 7
+    expect(calcularCuotaAutonomo({ rendimientoComputableMensual: 1850.01 }).tramo).toBe(8);
+    expect(calcularCuotaAutonomo({ rendimientoNetoMensual: 1850.01 }).tramo).toBe(7);
+  });
+
+  test('C0105: sin ningún rendimiento lanza error', () => {
+    expect(() => calcularCuotaAutonomo({})).toThrow();
+  });
+
+  test('C0105: el comparador autónomo vs SL busca el mismo tramo — 30.000 y 4.500 → RETA 4.570,59 €/año', () => {
+    // 1.209,15 × 0,315 × 12 = 4.570,587 → 4.570,59 (antes 1.274,51 × 0,315 × 12 = 4.817,65)
+    const cmp = compararAutonomoVsSL({ beneficioAnual: 30000, gastosDeducibles: 4500, tipoIS: 'general', repartirDividendos: true });
+    expect(cmp.autonomo.cuotaSSAnual).toBeCloseTo(4570.59, 2);
+  });
 });
 
 // ────────────────────────────────────────────────────────────────────────────

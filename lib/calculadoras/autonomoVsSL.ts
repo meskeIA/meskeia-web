@@ -11,6 +11,7 @@
 import {
   calcularCuotaIntegraGeneral,
   tramoRETA,
+  rendimientoComputableDesdeActividad,
   TIPO_COTIZACION_RETA,
   MINIMOS_IRPF_2025,
   TIPOS_IS_2025,
@@ -78,8 +79,13 @@ function calcularCuotaAhorro(base: number): number {
   return cuota;
 }
 
-function calcularCuotaRetaAnual(rendimientoMensual: number): number {
-  const tramo = tramoRETA(rendimientoMensual);
+/**
+ * Cuota anual a la base mínima del tramo. El tramo se busca con el rendimiento computable del
+ * art. 308.1.c LGSS: (ingresos − gastos, sin la cuota) menos el 7 % de gastos genéricos. Hasta
+ * el 18/10/2026 (cabo C0105) se buscaba con (ingresos − gastos) / 12 sin el 7 %.
+ */
+function calcularCuotaRetaAnual(ingresosMenosGastosAnual: number): number {
+  const tramo = tramoRETA(rendimientoComputableDesdeActividad(ingresosMenosGastosAnual));
   return tramo.baseMinima * TIPO_COTIZACION_RETA * 12;
 }
 
@@ -104,8 +110,7 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
   // ─── AUTÓNOMO ───────────────────────────────────────────────────────────────
 
   const rendimientoNetoAutonomo = Math.max(0, p.beneficioAnual - gastosDeducibles);
-  const rendimientoMensualAutonomo = rendimientoNetoAutonomo / 12;
-  const cuotaRetaAnual = r(calcularCuotaRetaAnual(rendimientoMensualAutonomo));
+  const cuotaRetaAnual = r(calcularCuotaRetaAnual(rendimientoNetoAutonomo));
 
   // Rendimiento neto tras SS (base IRPF autónomo)
   const baseIRPFAutonomo = Math.max(0, rendimientoNetoAutonomo - cuotaRetaAnual);
@@ -181,7 +186,7 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
   for (let b = 30000; b <= 200000; b += 1000) {
     const gd = gastosDeducibles;
     const rnA = Math.max(0, b - gd);
-    const cuotaR = calcularCuotaRetaAnual(rnA / 12);
+    const cuotaR = calcularCuotaRetaAnual(rnA);
     const baseA = Math.max(0, rnA - cuotaR);
     const cargaA = cuotaR + calcularCuotaIntegraGeneral(baseA, MINIMOS_IRPF_2025.personal);
     const benefS = Math.max(0, b - gd);

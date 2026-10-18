@@ -59,32 +59,36 @@ test.beforeEach(async ({ page }) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 test('CASO 1 · 60.000 € de beneficio y 10.000 € de gastos', async ({ page }) => {
-  // Rendimiento antes de SS = 60.000 − 10.000 = 50.000 €/año → 4.166,67 €/mes
-  // Ese rendimiento cae en el tramo 14 de TRAMOS_RETA_2025 (4.050-6.000 €/mes), cuya base
-  // mínima es 1.732,03 €/mes:
-  //   cuota RETA anual = 1.732,03 × 31,50 % × 12 = 6.547,0734 → 6.547,07 €
-  // Base del IRPF = 50.000 − 6.547,0734 = 43.452,9266 €, CON el mínimo de 5.550 € dentro.
-  //   escala(43.452,93) = 2.365,50 + 1.860,00 + 4.500,00 + 8.252,9266×37 %
-  //                     = 8.725,50 + 3.053,5828 = 11.779,0828 €
+  // Rendimiento antes de SS = 60.000 − 10.000 = 50.000 €/año. El tramo lo decide el rendimiento
+  // COMPUTABLE del art. 308.1.c LGSS: 50.000 × (1 − 7 %) / 12 = 3.875,00 €/mes (cabo C0105,
+  // 18/10/2026; hasta entonces se buscaba con 4.166,67 €/mes y caía en el tramo 14, base
+  // 1.732,03, RETA 6.547,07, IRPF 10.724,58, total 17.271,66 y neto 32.728,34).
+  // 3.875,00 cae en el tramo 13 de TRAMOS_RETA_2025 (> 3.620 y ≤ 4.050 €/mes), base mínima
+  // 1.601,31 €/mes:
+  //   cuota RETA anual = 1.601,31 × 31,50 % × 12 = 6.052,9518 → 6.052,95 €
+  // Base del IRPF = 50.000 − 6.052,9518 = 43.947,0482 €, CON el mínimo de 5.550 € dentro.
+  //   escala(43.947,05) = 2.365,50 + 1.860,00 + 4.500,00 + 8.747,0482×37 %
+  //                     = 8.725,50 + 3.236,4078 = 11.961,9078 €
   //   escala(5.550)     = 1.054,50 €
-  //   cuota íntegra     = 10.724,5828 → 10.724,58 €
-  // Total cargas del autónomo = 6.547,07 + 10.724,58 = 17.271,66 €
-  // Neto anual = 50.000 − 17.271,66 = 32.728,34 €
+  //   cuota íntegra     = 10.907,4078 → 10.907,41 €
+  // Total cargas del autónomo = 6.052,9518 + 10.907,4078 = 16.960,3596 → 16.960,36 €
+  // Neto anual = 50.000 − 16.960,3596 = 33.039,6404 → 33.039,64 €
   //
-  // El método defectuoso daba escala(43.452,93 − 5.550) = escala(37.902,93) = 9.725,58 €:
-  // 999,00 € menos de IRPF, y por tanto 999,00 € de más en el neto del autónomo.
+  // El defecto del mínimo (12/09/2026) daba escala(43.947,05 − 5.550): el mínimo valorado al
+  // 37 % marginal y no al 19 %, 999,00 € menos de IRPF.
   await comparar(page, '60000', '10000');
 
-  expect(await fila(page, 'IRPF estimado')).toBe('- 10.724,58 €');
-  expect(await fila(page, 'Total cargas (SS + IRPF)')).toBe('17.271,66 €');
-  expect(await fila(page, 'Neto anual estimado')).toBe('32.728,34 €');
+  expect(await fila(page, 'IRPF estimado')).toBe('- 10.907,41 €');
+  expect(await fila(page, 'Total cargas (SS + IRPF)')).toBe('16.960,36 €');
+  expect(await fila(page, 'Neto anual estimado')).toBe('33.039,64 €');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 test('CASO 2 · 120.000 € de beneficio: el mínimo cae entero en el tramo del 45 %', async ({ page }) => {
   // Es donde el defecto valía su máximo: 5.550 × (45 − 19) % = 1.443,00 €/año.
   //
-  // Rendimiento antes de SS = 120.000 − 10.000 = 110.000 €/año → 9.166,67 €/mes
+  // Rendimiento antes de SS = 120.000 − 10.000 = 110.000 €/año → computable 110.000 × 0,93 / 12
+  // = 8.525,00 €/mes (art. 308.1.c LGSS; antes del 18/10/2026 se buscaba con 9.166,67: mismo tramo)
   // Tramo 15 de TRAMOS_RETA_2025 (desde 6.000 €/mes), base mínima 1.928,10 €/mes:
   //   cuota RETA anual = 1.928,10 × 31,50 % × 12 = 7.288,218 → 7.288,22 €
   // Base del IRPF = 110.000 − 7.288,218 = 102.711,782 €

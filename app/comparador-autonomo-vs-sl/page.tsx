@@ -13,6 +13,7 @@ import {
   calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
   tramoRETA,
+  rendimientoComputableDesdeActividad,
   TIPO_COTIZACION_RETA,
   RETENCIONES_IS_2025,
   AUTONOMO_SOCIETARIO_2025,
@@ -55,8 +56,13 @@ function calcularCuotaBaseAhorro(base: number): number {
   return cuota;
 }
 
-function calcularCuotaReta(rendimientoMensual: number): number {
-  const tramo = tramoRETA(rendimientoMensual);
+/**
+ * Cuota anual a la base mínima del tramo. El tramo se busca con el rendimiento computable del
+ * art. 308.1.c LGSS: (beneficio − gastos, sin la cuota) menos el 7 % de gastos genéricos. Hasta
+ * el 18/10/2026 (cabo C0105) se buscaba con (beneficio − gastos) / 12 sin el 7 %.
+ */
+function calcularCuotaReta(beneficioMenosGastosAnual: number): number {
+  const tramo = tramoRETA(rendimientoComputableDesdeActividad(beneficioMenosGastosAnual));
   return tramo.baseMinima * TIPO_COTIZACION_RETA * 12;
 }
 
@@ -73,8 +79,7 @@ interface ResultadoFiscal {
 }
 
 function calcularAutonomo(beneficio: number, gastosDeducibles: number): ResultadoFiscal {
-  const rendimientoMensual = Math.max(0, beneficio - gastosDeducibles) / 12;
-  const cuotaRetaAnual = calcularCuotaReta(rendimientoMensual);
+  const cuotaRetaAnual = calcularCuotaReta(Math.max(0, beneficio - gastosDeducibles));
 
   // Rendimiento neto = beneficio - gastos deducibles - cuota SS
   const rendimientoNeto = Math.max(0, beneficio - gastosDeducibles - cuotaRetaAnual);

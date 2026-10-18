@@ -64,7 +64,7 @@ export const faqJsonLd = {
       name: '¿Qué son los ingresos netos en el sistema de cotización de autónomos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En el sistema de cotización por ingresos reales, los ingresos netos son la diferencia entre los ingresos íntegros de la actividad y los gastos deducibles como materiales, alquiler, suministros, cuotas de colegios profesionales o parte del teléfono, sin incluir el propio importe de la cuota de autónomo pagada. Sobre esa cantidad neta se determina el tramo de cotización aplicable.',
+        text: 'En el sistema de cotización por ingresos reales, los ingresos netos son la diferencia entre los ingresos íntegros de la actividad y los gastos deducibles como materiales, alquiler, suministros, cuotas de colegios profesionales o parte del teléfono, sin incluir el propio importe de la cuota de autónomo pagada. A esa cantidad neta se le resta un 7 % de gastos genéricos (un 3 % los autónomos societarios), según el art. 308.1.c de la Ley General de la Seguridad Social, y el resultado mensual determina el tramo de cotización aplicable.',
       },
     },
     {

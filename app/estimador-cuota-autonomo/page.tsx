@@ -6,7 +6,9 @@ import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, Shar
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatDate, formatNumber, parseISODateLocal, parseSpanishNumber } from '@/lib';
-import { FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA, tramoRETA } from '@/data/fiscal';
+import {
+  FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA, tramoRETA, rendimientoComputableDesdeActividad,
+} from '@/data/fiscal';
 
 // Datos fiscales centralizados en data/fiscal/autonomos.ts
 // FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA importados al inicio
@@ -99,23 +101,21 @@ export default function EstimadorCuotaAutonomoPage() {
     // Rendimiento neto anual
     const rendimientoNetoAnual = Math.max(0, ingresos - gastos);
 
-    // Rendimiento neto mensual (para determinar tramo)
+    // Rendimiento neto mensual
     const rendimientoNetoMensual = rendimientoNetoAnual / 12;
 
-    // Encontrar el tramo correspondiente
-    const tramo = tramoRETA(rendimientoNetoMensual);
+    // El tramo lo decide el rendimiento COMPUTABLE (art. 308.1.c LGSS): el neto, sin la cuota,
+    // menos el 7 % de gastos genéricos. Hasta el 18/10/2026 (cabo C0105) se buscaba con el neto:
+    // 30.000 € de ingresos y 4.500 € de gastos caían en el tramo 9 (401,47 €) y no en el 8 (380,88 €).
+    const rendimientoComputableMensual = rendimientoComputableDesdeActividad(rendimientoNetoAnual);
+    const tramo = tramoRETA(rendimientoComputableMensual);
 
-    // Calcular base de cotización (proporcional al rendimiento dentro del tramo)
-    let baseCotizacion: number;
-    if (rendimientoNetoMensual <= tramo.baseMinima) {
-      baseCotizacion = tramo.baseMinima;
-    } else if (rendimientoNetoMensual >= tramo.baseMaxima) {
-      baseCotizacion = tramo.baseMaxima;
-    } else {
-      // La base puede elegirse entre la mínima y la máxima del tramo
-      // Por defecto usamos la mínima (cuota más baja)
-      baseCotizacion = tramo.baseMinima;
-    }
+    // La base puede elegirse entre la mínima y la máxima del tramo: se estima con la mínima
+    // (cuota más baja), como calcularCuotaAutonomo y comparador-autonomo-vs-sl. Hasta el 18/10/2026
+    // un rendimiento neto mayor que la base MÁXIMA del tramo saltaba a la máxima (con 7.000 €/mes,
+    // 1.606,88 € en vez de 607,35 €), y con el tramo buscado por el computable (cabo C0105) le
+    // pasaba también a 30.000/4.500: neto 2.125 €, tramo 8 de base máxima 2.030 €.
+    const baseCotizacion = tramo.baseMinima;
 
     // Cuota mensual
     const cuotaMensual = baseCotizacion * TIPO_COTIZACION_RETA;
@@ -130,6 +130,7 @@ export default function EstimadorCuotaAutonomoPage() {
     return {
       rendimientoNetoAnual,
       rendimientoNetoMensual,
+      rendimientoComputableMensual,
       tramo,
       baseCotizacion,
       cuotaMensual,
@@ -154,7 +155,7 @@ export default function EstimadorCuotaAutonomoPage() {
           <thead>
             <tr>
               <th>Tramo</th>
-              <th>Rendimiento Neto Mensual</th>
+              <th>Rendimiento computable mensual</th>
               <th>Base Mínima</th>
               <th>Base Máxima</th>
               <th>Cuota Mínima</th>
@@ -390,6 +391,10 @@ export default function EstimadorCuotaAutonomoPage() {
                   <span className={styles.desgloseLabel}>Rendimiento neto mensual</span>
                   <span className={styles.desgloseValor}>{formatCurrency(resultados.rendimientoNetoMensual)}</span>
                 </div>
+                <div className={styles.desgloseItem}>
+                  <span className={styles.desgloseLabel}>Rendimiento computable mensual (−7&nbsp;% de gastos genéricos)</span>
+                  <span className={styles.desgloseValor}>{formatCurrency(resultados.rendimientoComputableMensual)}</span>
+                </div>
                 <div className={styles.desgloseSeparador} />
                 <div className={styles.desgloseItem}>
                   <span className={styles.desgloseLabel}>Tramo aplicable</span>
@@ -432,7 +437,7 @@ export default function EstimadorCuotaAutonomoPage() {
               <div className={styles.infoTramo}>
                 <h4><span aria-hidden="true">📌</span> Tu tramo: {resultados.tramo?.id}</h4>
                 <p>
-                  Rendimiento neto mensual entre {formatCurrency(resultados.tramo?.rendimientoMin || 0)}
+                  Rendimiento computable mensual entre {formatCurrency(resultados.tramo?.rendimientoMin || 0)}
                   {resultados.tramo?.rendimientoMax
                     ? ` y ${formatCurrency(resultados.tramo.rendimientoMax)}`
                     : ' o más'
@@ -471,7 +476,9 @@ export default function EstimadorCuotaAutonomoPage() {
         <h3><span aria-hidden="true">📝</span> Notas importantes</h3>
         <ul>
           <li>
-            <strong>Rendimiento neto</strong> = Ingresos - Gastos deducibles. Es la base para determinar tu tramo.
+            <strong>Rendimiento neto</strong> = Ingresos - Gastos deducibles, sin contar tu cuota de autónomo.
+            El tramo lo decide el <strong>rendimiento computable</strong>: ese neto menos un 7&nbsp;% de gastos
+            genéricos (3&nbsp;% los autónomos societarios), art. 308.1.c LGSS.
           </li>
           <li>
             <strong>Base de cotización</strong>: Puedes elegir entre la mínima y la máxima de tu tramo.
@@ -599,8 +606,8 @@ export default function EstimadorCuotaAutonomoPage() {
                 </div>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Rendimiento mensual:</strong> 1.500 €/mes</p>
-                <p><strong>Tramo aplicable:</strong> Tramo 6 (1.500 – 1.700 €)</p>
+                <p><strong>Rendimiento computable:</strong> 1.395 €/mes (1.500 € menos el 7&nbsp;%)</p>
+                <p><strong>Tramo aplicable:</strong> Tramo 5 (1.300 – 1.500 €)</p>
                 <p><strong>Base mínima:</strong> 960,78 €</p>
                 <p><strong>Cuota mensual:</strong> 302,65 €/mes · 3.631,80 €/año</p>
               </div>
@@ -618,7 +625,7 @@ export default function EstimadorCuotaAutonomoPage() {
                 </div>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Rendimiento mensual:</strong> 4.000 €/mes</p>
+                <p><strong>Rendimiento computable:</strong> 3.720 €/mes (4.000 € menos el 7&nbsp;%)</p>
                 <p><strong>Tramo aplicable:</strong> Tramo 13 (3.620 – 4.050 €)</p>
                 <p><strong>Base mínima:</strong> 1.601,31 €</p>
                 <p><strong>Cuota mensual:</strong> 504,41 €/mes · 6.052,92 €/año</p>
@@ -633,11 +640,11 @@ export default function EstimadorCuotaAutonomoPage() {
                 <span className={styles.escenarioIcon}>🏢</span>
                 <div>
                   <strong>Autónomo societario</strong>
-                  <span>&gt; 6.000 €/mes rendimiento neto</span>
+                  <span>&gt; 6.000 €/mes de rendimiento computable</span>
                 </div>
               </div>
               <div className={styles.escenarioExample}>
-                <p><strong>Rendimiento mensual:</strong> &gt; 6.000 €</p>
+                <p><strong>Rendimiento computable:</strong> &gt; 6.000 €/mes (en un societario, el neto menos un 3&nbsp;%)</p>
                 <p><strong>Tramo aplicable:</strong> Tramo 15 (máximo)</p>
                 <p><strong>Base mínima:</strong> 1.928,10 €</p>
                 <p><strong>Cuota mínima:</strong> 607,35 €/mes · 7.288,20 €/año</p>
@@ -682,7 +689,9 @@ export default function EstimadorCuotaAutonomoPage() {
                 El rendimiento neto es el resultado de restar a tus ingresos brutos todos los gastos deducibles de la actividad:
                 material, suministros, cuotas profesionales, seguros, amortizaciones, etc. Para actividades en estimación directa,
                 es el resultado del modelo 130 (pagos fraccionados IRPF). Para módulos, se aplica una fórmula simplificada basada en índices.
-                <strong> La cuota de autónomo del propio ejercicio también es gasto deducible</strong>, lo que reduce ligeramente el rendimiento final.
+                <strong> La cuota de autónomo del propio ejercicio es gasto deducible en el IRPF, pero no baja el tramo</strong>:
+                para el RETA se vuelve a sumar, y a lo que queda se le resta un 7&nbsp;% de gastos genéricos
+                (3&nbsp;% los societarios). Eso es el rendimiento computable del art. 308.1.c LGSS, el que decide el tramo.
               </p>
             </div>
 
@@ -780,8 +789,9 @@ export default function EstimadorCuotaAutonomoPage() {
                 <p>
                   Suma todos los ingresos previstos (sin IVA) y réstalos los gastos deducibles de la actividad:
                   material, alquiler de espacio, suministros proporcionales, cuotas de colegios o asociaciones,
-                  seguros de responsabilidad civil, amortizaciones, etc. El resultado es tu <strong>rendimiento neto anual previsto</strong>.
-                  Divídelo entre 12 para obtener el mensual y localiza tu tramo en la tabla de 15 tramos RETA 2025.
+                  seguros de responsabilidad civil, amortizaciones, etc. (sin tu cuota de autónomo). El resultado es tu
+                  <strong> rendimiento neto anual previsto</strong>. Réstale un 7&nbsp;% de gastos genéricos (3&nbsp;% si eres
+                  societario), divídelo entre 12 y localiza tu tramo en la tabla de 15 tramos RETA 2025.
                 </p>
               </div>
             </div>
@@ -945,7 +955,8 @@ export default function EstimadorCuotaAutonomoPage() {
               <li>
                 <strong>Olvidar que los gastos deducibles reducen el tramo.</strong> Muchos autónomos cotizan
                 por un tramo superior al necesario porque no tienen en cuenta que los gastos (gestoría, material,
-                suministros, cuota propia) reducen el rendimiento neto. Revisa tu base con los gastos reales incluidos.
+                suministros) y el 7&nbsp;% de gastos genéricos reducen el rendimiento computable. La cuota propia no:
+                para el tramo se vuelve a sumar. Revisa tu base con los gastos reales incluidos.
               </li>
               <li>
                 <strong>Darse de alta tarde en el RETA.</strong> La Seguridad Social no retroactúa el alta,

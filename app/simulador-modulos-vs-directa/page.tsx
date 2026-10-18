@@ -128,7 +128,8 @@ function contrastarCuotaReta(retaMensual: number, ed: ResultadoRegimenED): Coher
     metodo: 'directa',
   });
   if (rendimientoMensual <= 0) return null;
-  const { cuotaEfectiva } = calcularCuotaAutonomo({ rendimientoNetoMensual: rendimientoMensual });
+  // Ya es el computable (con su 7 %): se pasa como tal para que la calculadora no lo reste otra vez.
+  const { cuotaEfectiva } = calcularCuotaAutonomo({ rendimientoComputableMensual: rendimientoMensual });
   if (retaMensual >= cuotaEfectiva) return null;
   const { tabla, numero } = nombreTramoRETA(tramoRETA(rendimientoMensual));
   return {
