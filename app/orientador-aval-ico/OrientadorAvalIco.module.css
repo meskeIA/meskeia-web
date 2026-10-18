@@ -166,12 +166,12 @@
   font-size: 0.9rem;
   text-align: left;
 }
-.siguientePasoBox strong { color: var(--primary); }
+.siguientePasoBox strong { color: var(--primary-texto); }
 .linkIco {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
   font-weight: 600;
 }
@@ -227,7 +227,7 @@
 .scenarioCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 .faqGrid { display: flex; flex-direction: column; gap: 1rem; }
 .faqItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
-.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary); }
+.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary-texto); }
 .faqItem p { font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.55; }
 .tipsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
 .tipCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }

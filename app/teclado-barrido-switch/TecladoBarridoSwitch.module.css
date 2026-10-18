@@ -105,7 +105,7 @@
 
 .botonSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .botonSecundario:focus-visible {
@@ -164,7 +164,7 @@
   border: 3px solid var(--primary);
   border-radius: 14px;
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
 }
 
@@ -263,7 +263,7 @@
 
 .aviso {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-top: 8px;
 }
 

@@ -71,7 +71,7 @@
 .sectionTitle {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -138,7 +138,7 @@
 .synthStepNum {
   font-size: 0.68rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -348,7 +348,7 @@
 .statNum {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -458,7 +458,7 @@
 
 .alimentoCantidad {
   font-size: 0.76rem;
-  color: var(--secondary, #48A9A6);
+  color: var(--secondary-texto);
   font-weight: 600;
 }
 

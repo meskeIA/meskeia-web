@@ -223,7 +223,7 @@ function TabVectores() {
         {/* Controles */}
         <div className={styles.controles}>
           <div className={styles.vectorGroup}>
-            <h4 className={styles.vectorLabel} style={{ color: '#2E86AB' }}>Vector u</h4>
+            <h4 className={styles.vectorLabel} style={{ color: 'var(--primary-texto)' }}>Vector u</h4>
             <label className={styles.sliderLabel}>
               u<sub>x</sub> = {u.x}
               <input type="range" min="-5" max="5" step="0.5" value={u.x}
@@ -239,7 +239,7 @@ function TabVectores() {
           </div>
 
           <div className={styles.vectorGroup}>
-            <h4 className={styles.vectorLabel} style={{ color: '#48A9A6' }}>Vector v</h4>
+            <h4 className={styles.vectorLabel} style={{ color: 'var(--secondary-texto)' }}>Vector v</h4>
             <label className={styles.sliderLabel}>
               v<sub>x</sub> = {v.x}
               <input type="range" min="-5" max="5" step="0.5" value={v.x}
@@ -295,7 +295,7 @@ function TabVectores() {
             <FlechaVector desde={{ x: 0, y: 0 }} hasta={suma} color="#E67E22" etiqueta="u+v" />
           </svg>
           <p className={styles.svgNota}>
-            La regla del paralelogramo: <strong style={{ color: '#E67E22' }}>u+v</strong> es la diagonal del paralelogramo formado por <strong style={{ color: '#2E86AB' }}>u</strong> y <strong style={{ color: '#48A9A6' }}>v</strong>.
+            La regla del paralelogramo: <strong style={{ color: '#E67E22' }}>u+v</strong> es la diagonal del paralelogramo formado por <strong style={{ color: 'var(--primary-texto)' }}>u</strong> y <strong style={{ color: 'var(--secondary-texto)' }}>v</strong>.
           </p>
         </div>
       </div>
@@ -418,7 +418,7 @@ function TabTransformaciones() {
               fontSize="12" fontWeight="700" fill="#48A9A6">Ae₂</text>
           </svg>
           <p className={styles.svgNota}>
-            La cuadrícula transformada revela cómo A estira/rota el plano. El <strong style={{ color: '#2E86AB' }}>azul</strong> y <strong style={{ color: '#48A9A6' }}>teal</strong> son los vectores base transformados.
+            La cuadrícula transformada revela cómo A estira/rota el plano. El <strong style={{ color: 'var(--primary-texto)' }}>azul</strong> y <strong style={{ color: 'var(--secondary-texto)' }}>teal</strong> son los vectores base transformados.
           </p>
         </div>
       </div>
@@ -461,7 +461,7 @@ function TabDeterminante() {
           <p className={styles.sliderDescripcion}>Los vectores columna v₁ y v₂ forman el paralelogramo cuya área es |det(A)|.</p>
 
           <div className={styles.vectorGroup}>
-            <h5 className={styles.vectorSubLabel} style={{ color: '#2E86AB' }}>v₁ = (a, c)</h5>
+            <h5 className={styles.vectorSubLabel} style={{ color: 'var(--primary-texto)' }}>v₁ = (a, c)</h5>
             <label className={styles.sliderLabel}>
               a = {a}
               <input type="range" min="-5" max="5" step="0.5" value={a}
@@ -477,7 +477,7 @@ function TabDeterminante() {
           </div>
 
           <div className={styles.vectorGroup}>
-            <h5 className={styles.vectorSubLabel} style={{ color: '#48A9A6' }}>v₂ = (b, d)</h5>
+            <h5 className={styles.vectorSubLabel} style={{ color: 'var(--secondary-texto)' }}>v₂ = (b, d)</h5>
             <label className={styles.sliderLabel}>
               b = {b}
               <input type="range" min="-5" max="5" step="0.5" value={b}
@@ -591,12 +591,12 @@ function TabEigenvalores() {
 
           <div className={styles.eigenResultados}>
             <div className={styles.eigenFila}>
-              <span className={styles.eigenIcon} style={{ color: '#2E86AB' }}>λ₁</span>
+              <span className={styles.eigenIcon} style={{ color: 'var(--primary-texto)' }}>λ₁</span>
               <span className={styles.eigenValor}>{lambda1.toFixed(3)}</span>
               <span className={styles.eigenVec}>v₁ = ({ev1.x.toFixed(2)}, {ev1.y.toFixed(2)})</span>
             </div>
             <div className={styles.eigenFila}>
-              <span className={styles.eigenIcon} style={{ color: '#48A9A6' }}>λ₂</span>
+              <span className={styles.eigenIcon} style={{ color: 'var(--secondary-texto)' }}>λ₂</span>
               <span className={styles.eigenValor}>{lambda2.toFixed(3)}</span>
               <span className={styles.eigenVec}>v₂ = ({ev2.x.toFixed(2)}, {ev2.y.toFixed(2)})</span>
             </div>
@@ -605,9 +605,9 @@ function TabEigenvalores() {
           <div className={styles.formulaBox}>
             <strong>Av = λv</strong>
             <br />
-            El eigenvector <span style={{ color: '#2E86AB' }}>v₁</span> solo escala: A·v₁ = {lambda1.toFixed(2)}·v₁
+            El eigenvector <span style={{ color: 'var(--primary-texto)' }}>v₁</span> solo escala: A·v₁ = {lambda1.toFixed(2)}·v₁
             <br />
-            El eigenvector <span style={{ color: '#48A9A6' }}>v₂</span> solo escala: A·v₂ = {lambda2.toFixed(2)}·v₂
+            El eigenvector <span style={{ color: 'var(--secondary-texto)' }}>v₂</span> solo escala: A·v₂ = {lambda2.toFixed(2)}·v₂
           </div>
         </div>
 
@@ -644,7 +644,7 @@ function TabEigenvalores() {
               color="#E67E22" dasharray="5 3" etiqueta="Av₂" />
           </svg>
           <p className={styles.svgNota}>
-            Los eigenvectores <strong style={{ color: '#2E86AB' }}>v₁</strong> y <strong style={{ color: '#48A9A6' }}>v₂</strong> no cambian de dirección. La transformación <strong style={{ color: '#E67E22' }}>Av</strong> (naranja punteado) queda siempre sobre el mismo eje.
+            Los eigenvectores <strong style={{ color: 'var(--primary-texto)' }}>v₁</strong> y <strong style={{ color: 'var(--secondary-texto)' }}>v₂</strong> no cambian de dirección. La transformación <strong style={{ color: '#E67E22' }}>Av</strong> (naranja punteado) queda siempre sobre el mismo eje.
           </p>
         </div>
       </div>

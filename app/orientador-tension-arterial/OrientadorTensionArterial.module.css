@@ -402,7 +402,7 @@
 
 .btnTabla:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnTabla:focus-visible {
@@ -825,7 +825,7 @@
 
 .escenarioCard h3 {
   font-size: 1rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
 }
 
@@ -854,7 +854,7 @@
 
 .faqItem h3 {
   font-size: 0.95rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }
@@ -927,7 +927,7 @@
 
 .tipCard h3 {
   font-size: 0.9rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }

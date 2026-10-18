@@ -72,14 +72,28 @@ async function activarTemaOscuro(page: Page): Promise<void> {
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 }
 
-type Medida = { ratio: number; texto: string; fondo: string; vistos: number };
+type Tinte = { ratio: number; umbral: number; texto: string; fondo: string } | null;
+type Medida = { ratio: number; texto: string; fondo: string; vistos: number; umbral?: number; color?: string; tinte?: Tinte };
 
 /**
  * Peor contraste entre los elementos con texto BLANCO sobre un fondo de MARCA. `selector`
  * restringe la búsqueda (para medir un estado concreto, como un hover).
  */
 async function peorBlancoSobreMarca(page: Page, selector = '*'): Promise<Medida> {
-  return page.evaluate((sel) => {
+  return medir(page, selector, 'blanco');
+}
+
+/**
+ * Tanda 2: peor contraste entre los elementos cuyo TEXTO es de un color de marca, contra su
+ * fondo compuesto. El umbral lo pone cada elemento: 3:1 si es texto grande (≥ 24 px, o
+ * ≥ 18,66 px en negrita), 4,5:1 si no. Se devuelve el MARGEN peor (ratio / umbral).
+ */
+async function peorTextoDeMarca(page: Page): Promise<Medida & { umbral: number }> {
+  return medir(page, '*', 'marca') as Promise<Medida & { umbral: number }>;
+}
+
+async function medir(page: Page, selector: string, modo: 'blanco' | 'marca'): Promise<Medida> {
+  return page.evaluate(([sel, modo]) => {
     const lienzo = document.createElement('canvas');
     lienzo.width = lienzo.height = 1;
     const ctx = lienzo.getContext('2d', { willReadFrequently: true })!;
@@ -103,39 +117,48 @@ async function peorBlancoSobreMarca(page: Page, selector = '*'): Promise<Medida>
     };
     // Marca de meskeIA antes y después de la campaña, en los dos temas, y el acento
     const MARCA = ['#2E86AB', '#48A9A6', '#3FA5D1', '#5ABDB9', '#26718F', '#327874', '#7FB3D3'].map((h) => normalizar(h)!);
-    const esMarca = (p: number[]) => MARCA.some((m) => Math.abs(m[0] - p[0]) + Math.abs(m[1] - p[1]) + Math.abs(m[2] - p[2]) < 24);
+    const cerca = (lista: number[][], p: number[]) => lista.some((m) => Math.abs(m[0] - p[0]) + Math.abs(m[1] - p[1]) + Math.abs(m[2] - p[2]) < 24);
+    const esMarca = (p: number[]) => cerca(MARCA, p);
+    // Como TEXTO no cuenta el acento: no tiene token y no entró en la campaña (se lista aparte)
+    const esTextoDeMarca = (p: number[]) => cerca(MARCA.slice(0, 6), p);
 
+    /**
+     * Fondos que se ven detrás de un elemento: las capas desde él hacia arriba hasta la primera
+     * opaca, compuestas de abajo arriba CON su alfa. Un degradado aporta cada parada (y multiplica
+     * las variantes). La primera versión tomaba las paradas como opacas y acusó a
+     * estimador-hipoteca de 1,33:1 por un rgba(46,134,171,0.06): la trampa 4 de la ficha.
+     */
+    /** Lo deja fondosDe: si detrás del último elemento medido hay un TINTE de marca translúcido. */
+    let ultimoTenido = false;
     const fondosDe = (el: Element): number[][] => {
-      let n: Element | null = el;
-      while (n) {
-        const img = getComputedStyle(n).backgroundImage;
-        if (img && /gradient/i.test(img)) {
-          const paradas = img.match(/(rgba?|color)\([^)]*\)/g) ?? [];
-          if (paradas.length) return paradas.map((p) => normalizar(p)!.slice(0, 3));
-        }
-        const propio = normalizar(getComputedStyle(n).backgroundColor)!;
-        if (propio[3] >= 1) break;
-        n = n.parentElement;
-      }
-      const capas: number[][] = [];
+      const pila: number[][][] = [];
       let m: Element | null = el;
       while (m) {
-        const c = normalizar(getComputedStyle(m).backgroundColor)!;
-        if (c[3] > 0) {
-          capas.push(c);
-          if (c[3] >= 1) break;
-        }
+        const cs = getComputedStyle(m);
+        const img = cs.backgroundImage;
+        // Varias capas: si la de ARRIBA es opaca, tapa las demás. Es el borde degradado de
+        // estimador-hipoteca: `linear-gradient(--bg-card) padding-box, linear-gradient(marca)
+        // border-box`; el degradado de marca solo asoma en el borde, nunca detrás del texto.
+        const capasImg = img && /gradient/i.test(img) ? img.split(/,\s*(?=(?:repeating-)?(?:linear|radial|conic)-gradient\()/) : [];
+        const paradasDe = (capa: string) => (capa.match(/(rgba?|color)\([^)]*\)/g) ?? []).map((p) => normalizar(p)!);
+        const arriba = capasImg.length ? paradasDe(capasImg[0]) : [];
+        const paradas = arriba.length && arriba.every((p) => p[3] >= 1) ? arriba : capasImg.flatMap(paradasDe);
+        if (paradas.length) pila.push(paradas); // la imagen se pinta ENCIMA del color del mismo elemento
+        const c = normalizar(cs.backgroundColor)!;
+        if (c[3] > 0) pila.push([c]);
+        if (c[3] >= 1 || (paradas.length && paradas.every((p) => p[3] >= 1))) break;
         m = m.parentElement;
       }
-      let base = [255, 255, 255];
-      for (let i = capas.length - 1; i >= 0; i--) {
-        const c = capas[i];
-        base = [0, 1, 2].map((k) => c[k] * c[3] + base[k] * (1 - c[3]));
+      ultimoTenido = pila.some((capa) => capa.some((c) => c[3] < 1 && esMarca(c)));
+      let bases = [[255, 255, 255]];
+      for (let i = pila.length - 1; i >= 0; i--) {
+        bases = bases.flatMap((b) => pila[i].map((c) => [0, 1, 2].map((k) => c[k] * c[3] + b[k] * (1 - c[3]))));
       }
-      return [base];
+      return bases;
     };
 
-    let peor: Medida | null = null;
+    let peor: (Medida & { umbral: number; color: string }) | null = null;
+    let peorTinte: { ratio: number; umbral: number; texto: string; fondo: string } | null = null;
     let vistos = 0;
     for (const el of Array.from(document.querySelectorAll(sel))) {
       if (el.closest('nextjs-portal, canvas, svg')) continue;
@@ -146,19 +169,38 @@ async function peorBlancoSobreMarca(page: Page, selector = '*'): Promise<Medida>
       const r = (el as HTMLElement).getBoundingClientRect();
       if (r.width === 0 || r.height === 0) continue;
       const fg = normalizar(cs.color)!;
-      if (fg[0] < 250 || fg[1] < 250 || fg[2] < 250) continue;
       const fondos = fondosDe(el);
-      if (!fondos.some(esMarca)) continue;
+      if (modo === 'blanco') {
+        if (fg[0] < 250 || fg[1] < 250 || fg[2] < 250) continue;
+        if (!fondos.some(esMarca)) continue;
+      } else if (!esTextoDeMarca(fg) || fg[3] < 1) continue;
+      const px = parseFloat(cs.fontSize);
+      const grande = px >= 24 || (px >= 18.66 && +cs.fontWeight >= 700);
+      const umbral = modo === 'marca' && grande ? 3 : 4.5;
+      // Texto de marca sobre un TINTE de marca: es la familia del cabo C0278 (medida hasta ahora
+      // solo en oscuro), no la sustitución de C0070. Se informa aparte y no cuenta en el veredicto.
+      if (modo === 'marca' && ultimoTenido) {
+        for (const f of fondos) {
+          const v = ratio(fg, f);
+          if (!peorTinte || v / umbral < peorTinte.ratio / peorTinte.umbral) {
+            peorTinte = { ratio: +v.toFixed(2), umbral, texto: (el.textContent ?? '').trim().slice(0, 40), fondo: `rgb(${f.map(Math.round).join(', ')})` };
+          }
+        }
+        continue;
+      }
       vistos++;
       for (const f of fondos) {
         const v = ratio(fg, f);
-        if (!peor || v < peor.ratio) {
-          peor = { ratio: +v.toFixed(2), texto: (el.textContent ?? '').trim().slice(0, 40), fondo: `rgb(${f.map(Math.round).join(', ')})`, vistos: 0 };
+        // Se compara el MARGEN sobre el umbral de cada elemento; se informa del ratio y su umbral
+        if (!peor || v / umbral < peor.ratio / peor.umbral) {
+          peor = { ratio: +v.toFixed(2), umbral, texto: (el.textContent ?? '').trim().slice(0, 40), fondo: `rgb(${f.map(Math.round).join(', ')})`, color: `rgb(${fg.slice(0, 3).join(', ')})`, vistos: 0 };
         }
       }
     }
-    return peor ? { ...peor, vistos } : { ratio: -1, texto: 'NINGÚN TEXTO BLANCO SOBRE LA MARCA', fondo: '', vistos };
-  }, selector);
+    return peor
+      ? { ...peor, vistos, tinte: peorTinte }
+      : { ratio: -1, umbral: 4.5, texto: modo === 'blanco' ? 'NINGÚN TEXTO BLANCO SOBRE LA MARCA' : 'NINGÚN TEXTO DE MARCA', fondo: '', color: '', vistos, tinte: peorTinte };
+  }, [selector, modo] as const);
 }
 
 for (const { slug, forma } of APPS) {
@@ -201,3 +243,46 @@ test('falsos-amigos-ingles: el chip en HOVER ya no es blanco sobre el acento', a
   // -1 = no queda texto blanco sobre la marca en los chips: es lo esperado tras la reparación
   expect(m.ratio === -1 || m.ratio >= UMBRAL, `chip en hover: ${JSON.stringify(m)}`).toBe(true);
 });
+
+// ─── Tanda 2: la marca como color de texto ────────────────────────────────────
+
+/**
+ * Una app por forma de la tanda 2 (6.142 reglas en 1.046 ficheros, 18/10/2026). En claro el
+ * texto pasa de #2E86AB a #26718F; en oscuro queda en #3FA5D1, y se aclara donde el módulo
+ * fijaba #2E86AB. Se mide en los DOS temas: al cambiar un token en uno, se mide el otro.
+ */
+const APPS_TEXTO = [
+  { slug: 'simulador-movimiento-circular', forma: 'caso de origen: los textos que 8f5eb9b7 dejó en --primary' },
+  { slug: 'vitaminas-minerales', forma: 'hexadecimal #2E86AB como texto' },
+  { slug: 'visualizador-adaptaciones-plantas', forma: 'var(--primary, #2e86ab) con valor de reserva' },
+  { slug: 'selector-tipo-gimnasio', forma: 'color: var(--primary)' },
+  { slug: 'estimador-hipoteca', forma: 'color: var(--primary) en muchos bloques' },
+  { slug: 'cifrado-playfair', forma: 'color: var(--primary)' },
+  { slug: 'calculadora-rentabilidad-alquiler', forma: 'estilo en línea style={{ color }}' },
+  { slug: 'curso-negociacion', forma: 'fondo claro FIJO: el CTA blanco pasa a -boton' },
+] as const;
+
+for (const { slug, forma } of APPS_TEXTO) {
+  test(`${slug} (${forma}): el texto de marca cumple en claro y en oscuro`, async ({ page }) => {
+    await page.goto(`/${slug}/`);
+    await prepararParaMedir(page);
+    await desplegarTodo(page);
+
+    const anotarTinte = (tema: string, m: Medida) => {
+      if (m.tinte && m.tinte.ratio < m.tinte.umbral) {
+        test.info().annotations.push({ type: 'C0278 · texto de marca sobre tinte', description: `${tema}: «${m.tinte.texto}» ${m.tinte.ratio}:1 sobre ${m.tinte.fondo}` });
+      }
+    };
+    const claro = await peorTextoDeMarca(page);
+    anotarTinte('claro', claro);
+    expect(claro.ratio, `claro: ${JSON.stringify(claro)}`).toBeGreaterThan(0);
+    expect(claro.ratio, `claro, peor: ${JSON.stringify(claro)}`).toBeGreaterThanOrEqual(claro.umbral);
+
+    await activarTemaOscuro(page);
+    await desplegarTodo(page);
+    const oscuro = await peorTextoDeMarca(page);
+    anotarTinte('oscuro', oscuro);
+    expect(oscuro.ratio, `oscuro: ${JSON.stringify(oscuro)}`).toBeGreaterThan(0);
+    expect(oscuro.ratio, `oscuro, peor: ${JSON.stringify(oscuro)}`).toBeGreaterThanOrEqual(oscuro.umbral);
+  });
+}

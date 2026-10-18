@@ -147,7 +147,7 @@
 .sistemaPct {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--sistema-color, var(--primary));
+  color: var(--sistema-color, var(--primary-texto));
 }
 
 /* Barra de contribución */
@@ -532,7 +532,7 @@
 
 .faq summary::before {
   content: '+ ';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 

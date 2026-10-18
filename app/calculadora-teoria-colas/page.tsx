@@ -694,7 +694,7 @@ RESULTADOS DE SIMULACIÓN
 
         {/* 1. TABLA COMPARATIVA DE MODELOS */}
         <section>
-          <h2 className={styles.guideSection && ''} style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '1rem' }}>
+          <h2 className={styles.guideSection && ''} style={{ color: 'var(--primary-texto)', fontSize: '1.5rem', marginBottom: '1rem' }}>
             <span aria-hidden="true">📊</span> Comparativa de Modelos de Colas
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: '1.6' }}>
@@ -776,7 +776,7 @@ RESULTADOS DE SIMULACIÓN
 
         {/* 2. CASOS DE USO */}
         <section>
-          <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+          <h2 style={{ color: 'var(--primary-texto)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
             <span aria-hidden="true">👥</span> Casos de Uso por Perfil Profesional
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
@@ -848,7 +848,7 @@ RESULTADOS DE SIMULACIÓN
 
         {/* 3. FAQ */}
         <section>
-          <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+          <h2 style={{ color: 'var(--primary-texto)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
             <span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Teoría de Colas
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
@@ -950,7 +950,7 @@ RESULTADOS DE SIMULACIÓN
 
         {/* 4. GUÍA PASO A PASO */}
         <section>
-          <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+          <h2 style={{ color: 'var(--primary-texto)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
             <span aria-hidden="true">🗺️</span> Guía Paso a Paso: Dimensionar un Sistema de Atención al Cliente
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
@@ -1051,7 +1051,7 @@ RESULTADOS DE SIMULACIÓN
 
         {/* 5. MEJORES PRÁCTICAS */}
         <section>
-          <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+          <h2 style={{ color: 'var(--primary-texto)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
             <span aria-hidden="true">✅</span> Mejores Prácticas para Dimensionar Sistemas de Colas
           </h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.6' }}>

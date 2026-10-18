@@ -871,7 +871,7 @@ export default function SimuladorArbolesBstAvl() {
               <ul className={styles.rotationList}>
                 {rotaciones.slice(-15).map((r, idx) => (
                   <li key={`rot-${idx}-${r}`}>
-                    <span style={{ color: 'var(--secondary)', fontWeight: 700 }}>#{rotaciones.length - rotaciones.slice(-15).length + idx + 1}</span>{' '}
+                    <span style={{ color: 'var(--secondary-texto)', fontWeight: 700 }}>#{rotaciones.length - rotaciones.slice(-15).length + idx + 1}</span>{' '}
                     {r}
                   </li>
                 ))}

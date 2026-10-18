@@ -118,7 +118,7 @@
 .panelTitle {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -190,7 +190,7 @@
 
 .enemyPoints {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
 }
 
@@ -568,7 +568,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   margin: 0;
   padding: var(--spacing-sm);
@@ -622,7 +622,7 @@
 .faqItem details summary::before {
   content: '▶';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }
@@ -645,7 +645,7 @@
 
 .faqTip {
   font-style: italic;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   padding: var(--spacing-sm) var(--spacing-md) !important;
   background: rgba(46, 134, 171, 0.06);
   border-left: 3px solid var(--primary);

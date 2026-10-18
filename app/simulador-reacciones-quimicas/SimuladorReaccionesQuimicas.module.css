@@ -52,8 +52,8 @@
   transition: color 0.15s, border-color 0.15s;
 }
 
-.tabBtn:hover { color: var(--primary); }
-.tabActive { color: var(--primary); border-bottom-color: var(--primary); }
+.tabBtn:hover { color: var(--primary-texto); }
+.tabActive { color: var(--primary-texto); border-bottom-color: var(--primary); }
 
 /* Filtros tipo */
 .filtros {
@@ -75,7 +75,7 @@
   transition: all 0.12s;
 }
 
-.filtroBtn:hover { border-color: var(--primary); color: var(--primary); }
+.filtroBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .filtroActivo { background: var(--primary-boton); color: white; border-color: var(--primary-boton); }
 
 /* Tipo badge */
@@ -145,7 +145,7 @@
 .ecuacion {
   font-size: 0.95rem;
   font-family: 'Courier New', monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -301,7 +301,7 @@
 .resultTable tr:nth-child(even) td { background: var(--bg-primary); }
 
 .rowBase { font-weight: 700; }
-.rowBase td:first-child { color: var(--primary); }
+.rowBase td:first-child { color: var(--primary-texto); }
 
 .tagR { color: #dc2626; font-size: 0.75rem; font-weight: 700; }
 .tagP { color: #059669; font-size: 0.75rem; font-weight: 700; }
@@ -430,7 +430,7 @@
   padding: 1rem;
 }
 
-.escenarioCard h4 { font-size: 0.95rem; font-weight: 700; color: var(--primary); margin: 0 0 0.5rem; }
+.escenarioCard h4 { font-size: 0.95rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 0.5rem; }
 .escenarioCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; }
 
 .faqList { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -444,7 +444,7 @@
 
 .faqItem strong { display: block; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.35rem; }
 .faqItem p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; }
-.faqTip { font-size: 0.8rem; color: var(--primary); margin-top: 0.35rem; font-style: italic; }
+.faqTip { font-size: 0.8rem; color: var(--primary-texto); margin-top: 0.35rem; font-style: italic; }
 
 .stepGuide { display: flex; flex-direction: column; gap: 0.75rem; }
 

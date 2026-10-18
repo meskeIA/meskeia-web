@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -36,11 +36,11 @@
 .pilarCard:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .pilarCard:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .pilarActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%); }
-.pilarNumero { position: absolute; top: 8px; left: 12px; font-size: 0.72rem; font-weight: 700; color: var(--primary); background: rgba(46,134,171,0.1); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.pilarNumero { position: absolute; top: 8px; left: 12px; font-size: 0.72rem; font-weight: 700; color: var(--primary-texto); background: rgba(46,134,171,0.1); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .pilarIcono { font-size: 2rem; margin-bottom: var(--spacing-sm); }
 .pilarNombre { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
 .pilarDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
-.pilarEjemplo { margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--primary); line-height: 1.4; text-align: left; }
+.pilarEjemplo { margin-top: var(--spacing-sm); padding-top: var(--spacing-sm); border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--primary-texto); line-height: 1.4; text-align: left; }
 
 /* ─── Simulación de población ─── */
 .simulacionZona { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-xl); margin-top: var(--spacing-lg); }
@@ -82,7 +82,7 @@
 .flujoEtapa { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; text-align: center; }
 .flujoCirculo { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; }
 .flujoCirculoPresion { width: 32px; height: 32px; border-radius: 50%; background: #FFA726; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
-.flujoLabel { font-size: 0.72rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.3px; }
+.flujoLabel { font-size: 0.72rem; font-weight: 700; color: var(--primary-texto); text-transform: uppercase; letter-spacing: 0.3px; }
 .flujoTexto { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
 .flujoFlecha { display: flex; align-items: center; font-size: 1.2rem; color: var(--text-muted); padding-top: 8px; }
 
@@ -102,7 +102,7 @@
 
 .comparativaPasos { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
 .paso { display: flex; gap: var(--spacing-sm); align-items: flex-start; }
-.pasoNumero { width: 28px; height: 28px; border-radius: 50%; background: var(--hover); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+.pasoNumero { width: 28px; height: 28px; border-radius: 50%; background: var(--hover); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; color: var(--primary-texto); flex-shrink: 0; }
 .pasoTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; padding-top: 3px; }
 
 .comparativaVeredicto { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; }
@@ -117,7 +117,7 @@
 .datoIcono { font-size: 1.5rem; flex-shrink: 0; }
 .datoTitulo { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .datoTexto { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
-.datoDetalle { font-size: 0.82rem; color: var(--primary); font-weight: 500; margin: var(--spacing-sm) 0 0 0; line-height: 1.4; }
+.datoDetalle { font-size: 0.82rem; color: var(--primary-texto); font-weight: 500; margin: var(--spacing-sm) 0 0 0; line-height: 1.4; }
 
 /* Tipos de selección */
 .tiposGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }

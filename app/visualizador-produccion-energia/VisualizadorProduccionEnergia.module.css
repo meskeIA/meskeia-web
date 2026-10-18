@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
@@ -40,7 +40,7 @@
 
 /* Detalle de fuente expandido */
 .fuenteDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
-.fuenteDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: var(--spacing-md); }
+.fuenteDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); margin-bottom: var(--spacing-md); }
 .fuentePasos { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
 .fuentePaso { display: flex; align-items: flex-start; gap: var(--spacing-sm); background: var(--hover); border-radius: 8px; padding: var(--spacing-sm) var(--spacing-md); }
 .fuentePasoNum { width: 24px; height: 24px; border-radius: 50%; background: var(--primary-boton); color: white; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -95,10 +95,10 @@
 
 /* Objetivos España */
 .objetivosCard { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); text-align: center; }
-.objetivosTitulo { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: var(--spacing-md); }
+.objetivosTitulo { font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); margin-bottom: var(--spacing-md); }
 .objetivosGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); }
 .objetivoItem { padding: var(--spacing-sm); }
-.objetivoValor { display: block; font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+.objetivoValor { display: block; font-size: 1.6rem; font-weight: 800; color: var(--primary-texto); }
 .objetivoLabel { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-top: 0.2rem; }
 
 /* Insight, warning */

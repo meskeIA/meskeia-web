@@ -47,7 +47,7 @@
   border: 2px solid var(--primary);
   border-radius: 2rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -79,7 +79,7 @@
 .seccionTitulo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -113,7 +113,7 @@
 
 .conceptoTab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .conceptoTabActivo {
@@ -210,7 +210,7 @@
 .paradojaCard h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -245,7 +245,7 @@
 
 .categoriaTab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .categoriaTabActiva {
@@ -485,7 +485,7 @@
 .insightCard h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 

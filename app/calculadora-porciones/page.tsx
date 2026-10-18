@@ -317,7 +317,7 @@ export default function CalculadoraPorcionesPage() {
               <li><span style={{ color: '#27AE60' }}>●</span> <strong>50% Verduras:</strong> 2 manos juntas de ensalada o 1 puño de verdura cocida</li>
               <li><span style={{ color: '#E74C3C' }}>●</span> <strong>25% Proteína:</strong> 1 palma de carne, pescado o legumbres</li>
               <li><span style={{ color: '#F39C12' }}>●</span> <strong>25% Carbohidratos:</strong> 1 puño de arroz, pasta o patata</li>
-              <li><span style={{ color: '#2E86AB' }}>●</span> <strong>+ Grasa:</strong> 1 pulgar de aceite de oliva</li>
+              <li><span style={{ color: 'var(--primary-texto)' }}>●</span> <strong>+ Grasa:</strong> 1 pulgar de aceite de oliva</li>
             </ul>
           </div>
         </div>

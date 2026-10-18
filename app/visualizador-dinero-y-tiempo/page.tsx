@@ -522,7 +522,7 @@ function SeccionInflacion() {
       <div className={styles.inflacionGrid}>
         <div className={styles.inflacionCard}>
           <span className={styles.inflacionTasa}>Al 2%</span>
-          <span className={styles.inflacionValor} style={{ color: '#48A9A6' }}>{formatCurrency(poderReal2pct)}</span>
+          <span className={styles.inflacionValor} style={{ color: 'var(--secondary-texto)' }}>{formatCurrency(poderReal2pct)}</span>
           <span className={styles.inflacionPerdida}>Pierdes {formatNumber(100 - (poderReal2pct / dineroInicial) * 100, 0)}%</span>
         </div>
         <div className={styles.inflacionCard}>

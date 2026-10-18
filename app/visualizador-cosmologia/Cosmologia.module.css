@@ -33,7 +33,7 @@
   background: var(--bg-card); cursor: pointer; font-size: 0.88rem; font-weight: 600;
   transition: all 0.2s; color: var(--text-secondary);
 }
-.navTab:hover { border-color: var(--primary); color: var(--primary); }
+.navTab:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navTab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navTabActivo {
   border-color: var(--primary-boton);
@@ -79,7 +79,7 @@
 .tartaLeyendaItemActivo { border-color: var(--primary); box-shadow: 0 2px 8px rgba(46,134,171,0.15); }
 .tartaLeyendaColor { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; }
 .tartaLeyendaLabel { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
-.tartaLeyendaPct { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-left: auto; }
+.tartaLeyendaPct { font-size: 1.4rem; font-weight: 800; color: var(--primary-texto); margin-left: auto; }
 
 /* Panel detalle componente */
 .componentePanel {
@@ -100,7 +100,7 @@
   border-left: 5px solid var(--secondary);
 }
 .timelineEventoTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem 0; }
-.timelineEventoTiempo { font-size: 0.82rem; color: var(--primary); font-weight: 600; margin-bottom: var(--spacing-sm); }
+.timelineEventoTiempo { font-size: 0.82rem; color: var(--primary-texto); font-weight: 600; margin-bottom: var(--spacing-sm); }
 .timelineEventoTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.55; margin: 0; }
 
 /* Expansión / slider */
@@ -128,7 +128,7 @@
   border-left: 5px solid; border-radius: var(--radius);
   padding: var(--spacing-md) var(--spacing-lg);
 }
-.hubbleCardValor { font-size: 1.6rem; font-weight: 800; color: var(--primary); margin-bottom: 0.3rem; }
+.hubbleCardValor { font-size: 1.6rem; font-weight: 800; color: var(--primary-texto); margin-bottom: 0.3rem; }
 .hubbleCardLabel { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
 
 /* Geometría */
@@ -138,7 +138,7 @@
   background: var(--bg-card); cursor: pointer; font-size: 0.88rem; font-weight: 600;
   transition: all 0.2s; color: var(--text-secondary);
 }
-.geometriaBtn:hover { border-color: var(--primary); color: var(--primary); }
+.geometriaBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .geometriaBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .geometriaBtnActivo {
   border-color: var(--primary-boton);
@@ -154,7 +154,7 @@
 .geometriaPanelTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
 .geometriaPanelTexto { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; margin: 0 0 var(--spacing-sm) 0; }
 .geometriaPanelImplicacion {
-  font-size: 0.88rem; color: var(--secondary); font-weight: 600;
+  font-size: 0.88rem; color: var(--secondary-texto); font-weight: 600;
   border-top: 1px solid var(--border); padding-top: var(--spacing-sm); margin-top: var(--spacing-sm);
 }
 
@@ -183,7 +183,7 @@
   padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg);
 }
 [data-theme='dark'] .highlightBox { background: rgba(46,134,171,0.08); border-color: rgba(46,134,171,0.3); }
-.highlightTitle { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0 0 var(--spacing-sm) 0; }
+.highlightTitle { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 var(--spacing-sm) 0; }
 .highlightBox p { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
 
 /* Warning box (indicador v2.0) */
@@ -202,7 +202,7 @@
 .infoLista li {
   font-size: 0.9rem; color: var(--text-primary); line-height: 1.7; padding-left: 1.4rem; position: relative;
 }
-.infoLista li::before { content: '→'; color: var(--primary); font-weight: 700; position: absolute; left: 0; }
+.infoLista li::before { content: '→'; color: var(--primary-texto); font-weight: 700; position: absolute; left: 0; }
 
 /* Animaciones */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }

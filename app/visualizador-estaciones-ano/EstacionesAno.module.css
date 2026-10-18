@@ -66,7 +66,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navBtn:focus-visible {
@@ -185,7 +185,7 @@
 .hemisferioEstacion {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .posicionExplicacion {
@@ -209,7 +209,7 @@
   font-size: 1.05rem;
   font-weight: 700;
   margin: 0 0 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .conceptoCard p {
@@ -431,7 +431,7 @@
 
 .eventoFecha {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -518,7 +518,7 @@
 
 .mitoBadgeVerdadero {
   background: color-mix(in srgb, var(--secondary) 15%, var(--bg-card));
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .mitoAfirmacion {
@@ -581,7 +581,7 @@
 .distanciaValor {
   font-size: 1.1rem !important;
   font-weight: 700 !important;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
 }
 
 .distanciaDetalle {
@@ -634,7 +634,7 @@
 .planetaInclinacion {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .planetaEstaciones {
@@ -678,7 +678,7 @@
 .guideSection h2 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 

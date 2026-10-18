@@ -157,7 +157,7 @@
 .optionBtnSelected {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -214,7 +214,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecondary:focus-visible {
@@ -250,7 +250,7 @@
 
 .resultProfile {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   margin: 0;
 }
@@ -369,7 +369,7 @@
 }
 
 .tipsBox h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
   font-size: 1.05rem;
 }
@@ -395,7 +395,7 @@
 
 .tipsList li::before {
   content: '\2714';
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: bold;
   flex-shrink: 0;
 }
@@ -439,7 +439,7 @@
 .contentCard h4 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 
@@ -589,7 +589,7 @@
   margin: 0 0 0.5rem;
   font-weight: 600;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .profileExample code {
@@ -611,7 +611,7 @@
 }
 
 .profileRecommendation strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* FAQ */
@@ -648,7 +648,7 @@
 .faqItem summary::after {
   content: '+';
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
 }
 

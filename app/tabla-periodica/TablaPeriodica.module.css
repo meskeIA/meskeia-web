@@ -234,7 +234,7 @@
 }
 
 .leyenda h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
   margin-bottom: 1rem;
   text-align: center;
@@ -271,7 +271,7 @@
 }
 
 .calculadoraPanel h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.3rem;
   margin-bottom: 0.5rem;
   text-align: center;
@@ -381,7 +381,7 @@
 }
 
 .masaTotal strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.4rem;
 }
 
@@ -582,7 +582,7 @@
 }
 
 .configuracion code {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Consolas', monospace;
   font-size: 1.1rem;
 }
@@ -632,7 +632,7 @@
 .faqSection h2,
 .guiaSection h2,
 .tipsSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.4rem;
   margin-bottom: 0.75rem;
 }
@@ -754,7 +754,7 @@
 }
 
 .escenarioHeader h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.3;
@@ -779,7 +779,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .escenarioTip {
@@ -809,7 +809,7 @@
 }
 
 .faqQuestion {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.97rem;
   font-weight: 700;
   margin-bottom: 0.75rem;
@@ -936,7 +936,7 @@
 }
 
 .tipCard h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-weight: 700;
   margin-bottom: 0.625rem;
@@ -1251,7 +1251,7 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   border: 1px solid var(--secondary);
   border-radius: 999px;
   padding: 2px 10px;
@@ -1335,7 +1335,7 @@
 
 .aulaBtnSecundario {
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
 }
 
@@ -1345,7 +1345,7 @@
 
 .aulaBtnCargar {
   background: transparent;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   border: 1px dashed var(--secondary);
   font-size: 0.82rem;
   padding: 0.4rem 0.75rem;

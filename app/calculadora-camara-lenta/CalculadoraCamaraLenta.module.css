@@ -81,7 +81,7 @@
 
 .valueBadge {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
   background: #eff6ff;
@@ -114,7 +114,7 @@
 
 .fpsBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .fpsBtn:focus-visible {
@@ -191,7 +191,7 @@
 .factorDestacado {
   font-size: clamp(3rem, 8vw, 5rem);
   font-weight: 900;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
@@ -390,7 +390,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -510,7 +510,7 @@
 }
 
 .tipCard a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 

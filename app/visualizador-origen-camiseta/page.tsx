@@ -139,7 +139,7 @@ export default function VisualizadorOrigenCamisetaPage() {
             <span className={styles.resumenIcono} aria-hidden="true">🏷️</span>
             <div>
               <p className={styles.resumenLabel}>Precio en tienda</p>
-              <p className={styles.resumenValor} style={{ color: '#2E86AB' }}>{PRECIO_TOTAL},00 €</p>
+              <p className={styles.resumenValor} style={{ color: 'var(--primary-texto)' }}>{PRECIO_TOTAL},00 €</p>
             </div>
           </div>
           <div className={styles.resumenSeparador} aria-hidden="true">→</div>

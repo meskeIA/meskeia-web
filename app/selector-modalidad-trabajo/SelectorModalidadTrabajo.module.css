@@ -246,7 +246,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecundario:focus-visible {
@@ -270,7 +270,7 @@
 
 .btnReiniciar:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnReiniciar:focus-visible {
@@ -308,7 +308,7 @@
 .resultadoTitulo {
   font-size: clamp(1.4rem, 3vw, 1.9rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
 }
 
@@ -377,7 +377,7 @@
 }
 
 .puntuacionLabelDestacado {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -428,7 +428,7 @@
 .seccionEducativa h3 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: var(--spacing-lg) 0 var(--spacing-sm);
 }
 
@@ -471,7 +471,7 @@
 .tarjetaModalidad h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 

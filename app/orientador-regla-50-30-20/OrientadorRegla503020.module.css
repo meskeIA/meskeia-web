@@ -204,7 +204,7 @@
 }
 
 .consejosCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -271,7 +271,7 @@
 }
 
 .contentCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 

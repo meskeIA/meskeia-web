@@ -163,7 +163,7 @@
 
 .identidadFarmacosLabel {
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -244,7 +244,7 @@
 }
 
 .timelineHitoActivo .timelineTiempo {
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-size: 0.78rem;
 }
 
@@ -261,7 +261,7 @@
 .timelineDetalletiempo {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin: 0 0 0.35rem;
@@ -294,7 +294,7 @@
 }
 
 .insightBox strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ─── Receptores Grid ─────────────────────── */
@@ -442,7 +442,7 @@
 }
 
 .medicamentoMecanismo strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ─── Nivel Chart ─────────────────────────── */

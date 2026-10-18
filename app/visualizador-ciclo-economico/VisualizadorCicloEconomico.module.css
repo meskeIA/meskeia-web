@@ -653,7 +653,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecundario:focus-visible {
@@ -750,7 +750,7 @@
 }
 
 .preguntaNum {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .preguntaDesc {

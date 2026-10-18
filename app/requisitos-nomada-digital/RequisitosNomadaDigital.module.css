@@ -196,7 +196,7 @@
   border: none;
   font-size: 1.3rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: background 0.2s;
 }
@@ -427,7 +427,7 @@
 .docsGrupo h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 

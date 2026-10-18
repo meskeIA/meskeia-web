@@ -84,13 +84,13 @@
 
 .calidadBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .calidadActiva {
   background: color-mix(in srgb, var(--primary) 10%, transparent);
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .calidadBtn:focus-visible {
@@ -244,7 +244,7 @@
 .precioInline {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex: 1;
   text-align: right;
   white-space: nowrap;
@@ -295,7 +295,7 @@
 
 .lineaPrecio {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -488,7 +488,7 @@
 
 .escenarioTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   padding: 0.45rem 0.7rem;
   background: color-mix(in srgb, var(--primary) 8%, transparent);
@@ -530,7 +530,7 @@
 }
 
 .faqTip {
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   font-style: italic;
   padding: 0.4rem 0.65rem;
   background: color-mix(in srgb, var(--primary) 7%, transparent);

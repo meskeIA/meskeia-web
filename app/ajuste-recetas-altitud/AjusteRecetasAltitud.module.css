@@ -105,7 +105,7 @@
   display: block;
   font-size: 2.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.1;
 }
 
@@ -138,7 +138,7 @@
 
 .bandaEtiqueta {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
   margin-bottom: 18px;
 }
@@ -161,7 +161,7 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.1;
 }
 
@@ -241,7 +241,7 @@
 .conceptoSection h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent);
@@ -320,7 +320,7 @@
 
 .escenarioTip {
   font-size: 0.78rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-style: italic;
 }
 

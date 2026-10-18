@@ -66,7 +66,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navBtnActivo {
@@ -95,7 +95,7 @@
 .seccionTitulo {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.5rem;
 }
 
@@ -118,7 +118,7 @@
 }
 
 .controlLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .slider {
@@ -251,7 +251,7 @@
 
 .infoBox strong {
   display: block;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-bottom: 0.25rem;
 }
 
@@ -326,7 +326,7 @@
 }
 
 .statsCapa strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .nodoInfoPlaceholder {
@@ -465,7 +465,7 @@
   display: block;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: monospace;
 }
 
@@ -531,7 +531,7 @@
 
 .btnReset:hover {
   border-color: var(--secondary);
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .conceptosClave {
@@ -557,7 +557,7 @@
 
 .conceptoTerm {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex-shrink: 0;
   min-width: 120px;
 }
@@ -703,7 +703,7 @@
 
 .warningBox strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
   font-size: 0.9rem;
 }
@@ -847,7 +847,7 @@
 }
 
 .comparativaTable td strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .comparativaTable tbody tr:hover {
@@ -928,7 +928,7 @@
 .faqPregunta {
   display: block;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
 }
 
@@ -941,7 +941,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin: 0;
   background-color: rgba(72, 169, 166, 0.08);
   border-radius: 6px;
@@ -1058,7 +1058,7 @@
 
 .tipTitulo {
   font-size: 0.875rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipDesc {

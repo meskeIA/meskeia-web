@@ -120,7 +120,7 @@
 .tempoName {
   display: block;
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin-top: var(--spacing-sm);
 }
@@ -152,7 +152,7 @@
 
 .bpmAdjust:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .bpmSlider {
@@ -234,7 +234,7 @@
 
 .tapButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tapButton:active {
@@ -367,7 +367,7 @@
 
 .presetButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--focus);
 }
 
@@ -510,7 +510,7 @@
 [data-theme='dark'] .escenarioCard { border-color: #374151; }
 .escenarioHeader { display: flex; align-items: center; gap: 0.5rem; }
 .escenarioIcon { font-size: 1.5rem; }
-.escenarioTip { font-size: 0.82rem; color: var(--primary); background: rgba(46,134,171,0.07); border-left: 3px solid var(--primary); padding: 0.4rem 0.75rem; border-radius: 0 6px 6px 0; margin-top: auto; }
+.escenarioTip { font-size: 0.82rem; color: var(--primary-texto); background: rgba(46,134,171,0.07); border-left: 3px solid var(--primary); padding: 0.4rem 0.75rem; border-radius: 0 6px 6px 0; margin-top: auto; }
 
 .faqList { margin: 1.5rem 0; }
 .faqItem { border-bottom: 1px solid #e5e7eb; padding: 1rem 0; }

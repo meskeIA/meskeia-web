@@ -103,7 +103,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
   padding: 0.25rem 0.65rem;
   border-radius: 6px;
@@ -145,7 +145,7 @@
   margin-top: 0.85rem;
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
   padding: 0.5rem 0.7rem;
   border-radius: 8px;

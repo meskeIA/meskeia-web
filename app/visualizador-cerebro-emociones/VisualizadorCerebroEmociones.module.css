@@ -73,7 +73,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   transform: translateY(-2px);
 }
 
@@ -206,7 +206,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 0.25rem;
-  color: var(--estructura-color, var(--primary));
+  color: var(--estructura-color, var(--primary-texto));
 }
 
 .estructuraDetalleEmocion {
@@ -236,7 +236,7 @@
 .datoClaveLabel {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -364,7 +364,7 @@
 .neuroNombre {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--neuro-color, var(--primary));
+  color: var(--neuro-color, var(--primary-texto));
 }
 
 .neuroEmocion {
@@ -390,7 +390,7 @@
 .neuroDetalleTitulo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--neuro-color, var(--primary));
+  color: var(--neuro-color, var(--primary-texto));
   margin: 0 0 1rem;
   display: flex;
   align-items: center;
@@ -458,7 +458,7 @@
 
 .circuitoSelectorBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .circuitoSelectorBtn:focus-visible {
@@ -555,7 +555,7 @@
 
 .circuitoPasoLento {
   background: color-mix(in srgb, var(--primary) 15%, var(--bg-card));
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
@@ -763,7 +763,7 @@
 .regulacionEjemploLabel {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -901,7 +901,7 @@
 .escenarioCard h4 {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -949,7 +949,7 @@
 
 .faqTip {
   font-size: 0.78rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-style: italic;
   padding-top: 0.15rem;
 }
@@ -1040,7 +1040,7 @@
 .tipCard h4 {
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 

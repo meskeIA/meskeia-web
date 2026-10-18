@@ -318,11 +318,11 @@
   margin-bottom: 0.25rem;
 }
 
-.tempFrio .resultadoTempC { color: #2E86AB; }
+.tempFrio .resultadoTempC { color: var(--primary-texto); }
 .tempTibio .resultadoTempC { color: #e67e22; }
 .tempCaliente .resultadoTempC { color: #e74c3c; }
 
-.resultadoFrio .resultadoTempC { color: #2E86AB; }
+.resultadoFrio .resultadoTempC { color: var(--primary-texto); }
 .resultadoTibio .resultadoTempC { color: #e67e22; }
 .resultadoCaliente .resultadoTempC { color: #e74c3c; }
 

@@ -49,7 +49,7 @@
   border: 2px solid var(--primary);
   border-radius: 12px;
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -103,7 +103,7 @@
 .panelTitulo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.85rem;
 }
 
@@ -181,7 +181,7 @@
   border: 1px solid var(--primary);
   border-radius: 10px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -222,7 +222,7 @@
   font-family: 'Courier New', monospace;
   font-size: 2.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.2;
   word-break: break-word;
   margin-bottom: 1.1rem;
@@ -291,7 +291,7 @@
 }
 
 .oxidacionChip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .oxidacionChip {
@@ -309,7 +309,7 @@
 .razonamiento h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-bottom: 0.6rem;
 }
 
@@ -411,7 +411,7 @@
 }
 
 .marcadorItem strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -425,7 +425,7 @@
 .enunciadoDestacado {
   font-family: 'Courier New', monospace;
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .botoneraPractica {
@@ -457,7 +457,7 @@
 }
 
 .veredictoMal strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ===== EJEMPLOS ===== */
@@ -493,7 +493,7 @@
 .alcancePanel h2 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 1rem;
 }
 
@@ -538,7 +538,7 @@
 .tipsSection h2 {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.9rem;
 }
 
@@ -689,7 +689,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* --- FAQ --- */
@@ -717,7 +717,7 @@
 .faqQuestion {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.5rem;
   line-height: 1.45;
 }

@@ -277,7 +277,7 @@ export default function MotorCombustionPage() {
                 <div className={styles.eficienciaBarra}>
                   <div className={styles.eficienciaBarraFill} style={{ width: `${eficienciaIdeal}%`, background: '#2E86AB' }} />
                 </div>
-                <span className={styles.eficienciaValor} style={{ color: '#2E86AB' }}>{eficienciaIdeal}%</span>
+                <span className={styles.eficienciaValor} style={{ color: 'var(--primary-texto)' }}>{eficienciaIdeal}%</span>
               </div>
               <div className={styles.eficienciaMetric}>
                 <span className={styles.eficienciaLabel}>Eficiencia real (con pérdidas)</span>
@@ -307,7 +307,7 @@ export default function MotorCombustionPage() {
             </div>
             <div className={styles.eficienciaCard}>
               <h3>Motor eléctrico (referencia)</h3>
-              <div className={styles.bigNumber} style={{ color: '#2E86AB' }}>~90%</div>
+              <div className={styles.bigNumber} style={{ color: 'var(--primary-texto)' }}>~90%</div>
               <p>Sin ciclo termodinámico: la conversión eléctrica→mecánica es directa. No hay límite de Carnot en la misma forma.</p>
             </div>
           </div>

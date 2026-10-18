@@ -77,7 +77,7 @@
 .sectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 20px;
   padding-bottom: 12px;
   border-bottom: 2px solid var(--primary);
@@ -202,7 +202,7 @@
 
 .cuotaBadge {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
 }
 
@@ -210,7 +210,7 @@
 .btnAddVecino {
   background: transparent;
   border: 2px dashed var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 8px 20px;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -317,7 +317,7 @@
 .resumenValue {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -383,7 +383,7 @@
 
 .colCuota {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: right;
 }
 
@@ -603,7 +603,7 @@
 
 .faqItem strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   margin-bottom: 8px;
 }

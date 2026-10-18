@@ -82,7 +82,7 @@
 
 .modeBtn.active {
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -141,7 +141,7 @@
 
 .exampleBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .errorMsg {
@@ -197,7 +197,7 @@
 
 .btnSwap:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecondary {
@@ -214,7 +214,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultSection {
@@ -247,7 +247,7 @@
 
 .btnCopy:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .conversionGrid {
@@ -273,7 +273,7 @@
   display: block;
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   word-break: break-all;
 }
 
@@ -309,7 +309,7 @@
 .asciiChar {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .asciiBin {
@@ -349,7 +349,7 @@
 }
 
 .infoCard h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -483,7 +483,7 @@
 .edu-escenario-card h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
 }
 
@@ -533,7 +533,7 @@
 .edu-faq-question::after {
   content: '+';
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex-shrink: 0;
   margin-left: 0.5rem;
 }
@@ -636,7 +636,7 @@ details[open] .edu-faq-question::after {
 .edu-tip-card h4 {
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.35rem;
 }
 

@@ -230,7 +230,7 @@ function VisualOfertaDemanda() {
         <text x="55" y="44" fontSize="6" fill="#48A9A6" fontWeight="bold">E</text>
       </svg>
       <p className={styles.visualLeyenda}>
-        La <strong style={{ color: '#2E86AB' }}>oferta</strong> sube con el precio; la{' '}
+        La <strong style={{ color: 'var(--primary-texto)' }}>oferta</strong> sube con el precio; la{' '}
         <strong style={{ color: '#e74c3c' }}>demanda</strong> baja con él. Se cruzan en el{' '}
         <strong>punto de equilibrio (E)</strong>: el precio donde lo que se quiere comprar iguala a lo que se quiere vender.
       </p>

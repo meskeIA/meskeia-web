@@ -160,7 +160,7 @@
 
 .clearBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Waveform */
@@ -203,7 +203,7 @@
 .timeValue {
   font-family: 'Monaco', 'Menlo', monospace;
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -217,7 +217,7 @@
 }
 
 .durationInfo strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-left: var(--spacing-sm);
   font-family: 'Monaco', 'Menlo', monospace;
 }
@@ -538,7 +538,7 @@
 
 .formatUse {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
   margin: 0;
   padding-top: var(--spacing-sm);

@@ -308,7 +308,7 @@
   display: block;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 
@@ -478,7 +478,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -522,7 +522,7 @@
   display: inline-block;
   margin-top: var(--spacing-sm);
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Responsive */
@@ -676,7 +676,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   margin: 0;
 }
@@ -724,7 +724,7 @@
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
   font-size: 0.85rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   border-left: 3px solid var(--secondary);
 }
 

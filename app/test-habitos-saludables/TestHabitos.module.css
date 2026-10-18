@@ -214,7 +214,7 @@
 
 .questionNumber {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-right: 0.5rem;
 }
 
@@ -436,7 +436,7 @@
   border: 2px solid var(--primary);
   border-radius: 10px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -461,7 +461,7 @@
 
 .disclaimer h3 {
   font-size: 1.1rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-bottom: 0.75rem;
 }
 

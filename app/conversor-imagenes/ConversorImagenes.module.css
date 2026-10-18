@@ -176,7 +176,7 @@
 
 .formatBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .formatActive {
@@ -356,7 +356,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Result */

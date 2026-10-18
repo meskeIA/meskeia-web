@@ -200,7 +200,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .instructionsSection {
@@ -231,7 +231,7 @@
 }
 
 .instructionCard h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1rem;
 }

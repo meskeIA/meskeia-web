@@ -155,7 +155,7 @@
 
 .addBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .errorMsg {
@@ -206,7 +206,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultsPanel {
@@ -252,7 +252,7 @@
 
 .factors {
   font-family: 'Courier New', monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -284,7 +284,7 @@
 .methodItem code {
   display: block;
   font-family: 'Courier New', monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -333,7 +333,7 @@
 }
 
 .infoCard h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -435,7 +435,7 @@
 }
 
 .escenarioHeader strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.97rem;
 }
 
@@ -508,7 +508,7 @@
 
 .faqItem dt {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   margin-bottom: 0.4rem;
   cursor: default;

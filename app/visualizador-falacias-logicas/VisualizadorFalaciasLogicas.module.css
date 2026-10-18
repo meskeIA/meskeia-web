@@ -128,7 +128,7 @@
   align-items: center;
   gap: 0.4rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   border-radius: 8px;
   padding: 0.6rem 1.3rem;
@@ -199,7 +199,7 @@
 
 .familiaCount {
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -216,7 +216,7 @@
 .familiaDetalleTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -305,7 +305,7 @@
 
 .falaciaExpand {
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -321,7 +321,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.2rem;
 }
 
@@ -366,7 +366,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
 }
 
@@ -398,7 +398,7 @@
 .ejemploFalacia {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.3rem;
 }
 
@@ -443,7 +443,7 @@
 .contadorNum {
   font-size: 2.5rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .contadorLabel {
@@ -520,7 +520,7 @@
 .pilarTitulo {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -585,7 +585,7 @@
 }
 
 .transformacionLabelBueno {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .transformacionTexto {

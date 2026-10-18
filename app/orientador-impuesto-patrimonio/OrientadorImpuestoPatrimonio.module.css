@@ -89,7 +89,7 @@
 .cardTitulo {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 
@@ -363,7 +363,7 @@
 .cuotaValor {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-variant-numeric: tabular-nums;
 }
 
@@ -424,7 +424,7 @@
 [data-theme='dark'] .cuotaFilaNeta { background: #1a3a4a; }
 
 .enlaceInline {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -448,7 +448,7 @@
 .guideSection h2 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
   padding-bottom: 0.4rem;
   border-bottom: 2px solid var(--border);
@@ -535,7 +535,7 @@
 
 .faqItem dt {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
   font-size: 0.92rem;
 }
@@ -552,7 +552,7 @@
   margin-top: 0.5rem;
   padding: 0.4rem 0.7rem;
   background: #e8f4fd;
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 8px;
   font-size: 0.83rem;
   font-style: italic;

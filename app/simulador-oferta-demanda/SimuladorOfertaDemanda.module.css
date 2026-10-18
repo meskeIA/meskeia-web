@@ -209,7 +209,7 @@
 .resultValue {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
 }
 
@@ -314,7 +314,7 @@
 .sliderValue {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   font-family: var(--font-mono, monospace);
   min-width: 32px;
@@ -425,7 +425,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -455,7 +455,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -510,7 +510,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -546,7 +546,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 

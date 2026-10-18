@@ -315,7 +315,7 @@ export default function GuiaRespiracionPage() {
 
         {/* Texto de fase */}
         <div className={styles.faseInfo} aria-live="assertive" aria-atomic="true">
-          <p className={styles.faseTitulo} style={{ color: corriendo ? configFase.color : '#2E86AB' }}>
+          <p className={styles.faseTitulo} style={{ color: corriendo ? configFase.color : 'var(--primary-texto)' }}>
             {corriendo ? configFase.texto : 'Preparado'}
           </p>
           <p className={styles.faseDesc}>{descripcionFase}</p>

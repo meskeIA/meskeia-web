@@ -192,7 +192,7 @@
 .exampleBtn:hover,
 .exampleBtn:focus-visible {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   outline: none;
 }
 
@@ -283,7 +283,7 @@
 .btnSecondary:hover,
 .btnSecondary:focus-visible {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   outline: none;
 }
 
@@ -300,7 +300,7 @@
 }
 
 .resultsHeader h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -362,7 +362,7 @@
 }
 
 .comparativaTable a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
 }
 
@@ -391,7 +391,7 @@
 }
 
 .escenarioCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1.05rem;
 }
@@ -431,7 +431,7 @@
   content: '▶';
   font-size: 0.75rem;
   margin-right: 8px;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
   display: inline-block;
 }
@@ -448,7 +448,7 @@
 }
 
 .faqAnswer a {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .stepGuide {
@@ -501,7 +501,7 @@
 }
 
 .stepContent a {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipsGrid {
@@ -524,7 +524,7 @@
 }
 
 .tipCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 6px;
   font-size: 1rem;
 }
@@ -582,7 +582,7 @@
 }
 
 .warningList a {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Responsive */

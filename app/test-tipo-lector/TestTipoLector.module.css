@@ -98,7 +98,7 @@
 
 .rasgosList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
 .rasgoItem { font-size: 0.86rem; color: var(--text-primary); padding-left: 1rem; position: relative; line-height: 1.45; }
-.rasgoItem::before { content: '▸'; position: absolute; left: 0; color: var(--primary); font-size: 0.72rem; }
+.rasgoItem::before { content: '▸'; position: absolute; left: 0; color: var(--primary-texto); font-size: 0.72rem; }
 
 .generosWrap { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
 .generoTag { font-size: 0.78rem; padding: 0.2rem 0.6rem; border: 1.5px solid var(--perfil-acento); color: var(--perfil-acento); border-radius: 12px; font-weight: 500; }

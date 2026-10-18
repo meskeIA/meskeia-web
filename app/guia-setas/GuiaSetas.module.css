@@ -135,7 +135,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroBtn:focus-visible {
@@ -323,7 +323,7 @@
   padding: 0.15rem 0.5rem;
   border-radius: 8px;
   background: rgba(46,134,171,0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
 }
 
@@ -404,7 +404,7 @@
 
 .curiosidadLabel {
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* ══════════════════════════════════════════════

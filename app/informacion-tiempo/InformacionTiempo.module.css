@@ -107,7 +107,7 @@
 
 .ciudadBtn:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--focus);
 }
 
@@ -145,7 +145,7 @@
 
 .historialBtn:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Botón ubicación */
@@ -157,7 +157,7 @@
   border: 2px solid var(--primary);
   border-radius: 10px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -342,7 +342,7 @@
 .forecastTemp {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .forecastDesc {
@@ -585,7 +585,7 @@
 .escenarioHeader h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -659,7 +659,7 @@
 .faqItem details summary::after {
   content: '+';
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 400;
   flex-shrink: 0;
 }
@@ -790,7 +790,7 @@
 .tipCard h4 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 

@@ -105,7 +105,7 @@
 
 .categoryBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .categoryActive {
@@ -228,7 +228,7 @@
 
 .sampleBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .sampleActive {
@@ -283,7 +283,7 @@
 
 .copyBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .codeBlock {
@@ -351,7 +351,7 @@
 
 .weightBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .weightActive {
@@ -379,12 +379,12 @@
 
 .sizeBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .sizeActive {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .alignGrid {
@@ -628,7 +628,7 @@
 .eduFaqPregunta::before {
   content: "▶";
   font-size: 0.65rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   transition: transform 0.2s;
   flex-shrink: 0;
 }

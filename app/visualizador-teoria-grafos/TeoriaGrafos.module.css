@@ -253,7 +253,7 @@
 .degreeBadge {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .konigNote {
@@ -320,7 +320,7 @@
 
 .arrow {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .modeRow {
@@ -341,7 +341,7 @@
 
 .modeBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .modeBtnActive {
@@ -386,7 +386,7 @@
 .btnSecondary {
   padding: var(--spacing-sm) var(--spacing-lg);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   cursor: pointer;
@@ -416,7 +416,7 @@
 .stepCounter {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 6px;
@@ -469,7 +469,7 @@
 .distanceValue {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ======== LEGEND ======== */
@@ -532,7 +532,7 @@
 .appCard h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm) 0;
 }
 
@@ -551,7 +551,7 @@
 .eduSectionTitle {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md) 0;
 }
 
@@ -579,7 +579,7 @@
 .conceptCard h4 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-xs) 0;
 }
 
@@ -731,7 +731,7 @@
 .typeCard h4 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin: 0 0 var(--spacing-xs) 0;
 }
 

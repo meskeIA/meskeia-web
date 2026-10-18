@@ -17,7 +17,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
@@ -36,7 +36,7 @@
 .flujoIcono { font-size: 2rem; flex-shrink: 0; }
 .flujoTexto { display: flex; flex-direction: column; gap: 0.1rem; }
 .flujoTitulo { font-size: 0.82rem; color: var(--text-secondary); font-weight: 600; }
-.flujoValor { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+.flujoValor { font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); }
 .flujoDesc { font-size: 0.78rem; color: var(--text-muted); }
 .flujoFlecha { font-size: 1.2rem; color: var(--text-muted); padding: 0.2rem 0; }
 
@@ -66,7 +66,7 @@
 .sliderZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .sliderHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); }
 .sliderLabel { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
-.sliderValor { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
+.sliderValor { font-weight: 700; color: var(--primary-texto); font-size: 1.2rem; }
 .slider { width: 100%; height: 8px; border-radius: 4px; background: var(--border); outline: none; appearance: none; cursor: pointer; }
 .slider::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 .slider::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
@@ -129,7 +129,7 @@
 .provincia_pequena { border-left: 4px solid var(--naranja); }
 .provinciaNombre { display: block; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
 .provinciaDatos { display: flex; justify-content: center; gap: var(--spacing-md); margin-bottom: 0.3rem; }
-.provinciaEscanos { font-size: 0.82rem; color: var(--primary); font-weight: 600; }
+.provinciaEscanos { font-size: 0.82rem; color: var(--primary-texto); font-weight: 600; }
 .provinciaPoblacion { font-size: 0.78rem; color: var(--text-muted); }
 .provinciaCoste { background: var(--hover); border-radius: 6px; padding: 0.3rem 0.5rem; margin-top: 0.3rem; }
 .provinciaCosteLabel { display: block; font-size: 0.68rem; color: var(--text-muted); }
@@ -140,7 +140,7 @@
 .dramaticaItem { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-xl); }
 .dramaticaIcono { font-size: 2rem; }
 .dramaticaLabel { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); }
-.dramaticaValor { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+.dramaticaValor { font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); }
 .dramaticaVs { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }
 
 /* Efecto grid */

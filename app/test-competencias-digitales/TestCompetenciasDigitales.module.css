@@ -263,7 +263,7 @@
 
 .competenciaLegend {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 0 0.4rem;
   font-size: 1rem;
 }
@@ -426,7 +426,7 @@
   border: 1px solid var(--accent);
   border-radius: var(--radius);
   padding: 0.75rem 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin-top: var(--spacing-lg);
 }
@@ -490,7 +490,7 @@
 .nivelGlobalValor {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .nivelGlobalValor {
@@ -605,7 +605,7 @@
 .gapNivel {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
   padding: 0.15rem 0.6rem;
   border-radius: 999px;
@@ -814,7 +814,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   margin: 0 0 0.5rem;
 }

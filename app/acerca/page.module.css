@@ -7,14 +7,14 @@
 }
 
 .title {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 2.5rem;
   margin-bottom: 30px;
   text-align: center;
 }
 
 .sectionTitle {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.8rem;
   margin-top: 40px;
   margin-bottom: 20px;
@@ -60,7 +60,7 @@
 .statNumber {
   font-size: 2.5rem;
   font-weight: bold;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: block;
 }
 
@@ -104,7 +104,7 @@
 }
 
 .caso h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
   margin-bottom: 10px;
 }
@@ -136,7 +136,7 @@
 
 .ventajas li::before {
   content: '✓';
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: bold;
   font-size: 1.2rem;
   flex-shrink: 0;
@@ -213,7 +213,7 @@
 }
 
 .faqItem h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
   margin-bottom: 10px;
 }
@@ -225,13 +225,13 @@
 
 /* Links */
 .link {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .link:hover {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   text-decoration: underline;
 }
 

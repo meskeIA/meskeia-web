@@ -53,7 +53,7 @@
 
 .tab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tab:focus-visible,
@@ -112,7 +112,7 @@
 
 .chip:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .chipActivo {
@@ -171,7 +171,7 @@
 
 .valueBadge {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -191,7 +191,7 @@
 
 .calcBtnGhost:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Lienzo */
@@ -457,7 +457,7 @@
 
 .resultValueAccent {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.98rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -515,7 +515,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -553,7 +553,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.35rem;
   font-style: italic;
 }

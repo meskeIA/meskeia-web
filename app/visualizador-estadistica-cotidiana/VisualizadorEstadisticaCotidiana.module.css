@@ -137,7 +137,7 @@
 }
 
 .sliderLabel strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -182,7 +182,7 @@
 .bayesValor {
   font-size: 3rem;
   font-weight: 800;
-  color: #2E86AB;
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -429,7 +429,7 @@
 
 .btnSecundario {
   background: transparent;
-  color: #2E86AB;
+  color: var(--primary-texto);
   border: 2px solid #2E86AB;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
@@ -481,7 +481,7 @@
   border: 2px solid #2E86AB;
   border-radius: 8px;
   background: transparent;
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
@@ -609,7 +609,7 @@
 }
 
 .celdaH {
-  color: #2E86AB !important;
+  color: var(--primary-texto) !important;
   font-weight: 600;
   text-align: center;
 }
@@ -772,7 +772,7 @@
 .statValor {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-variant-numeric: tabular-nums;
 }
 

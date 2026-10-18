@@ -110,7 +110,7 @@
   font-size: 1rem;
   border: none;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -175,7 +175,7 @@
 
 .flagBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .flagActive {
@@ -241,7 +241,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Results */
@@ -255,7 +255,7 @@
 .matchNumber {
   font-size: 3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .matchLabel {
@@ -287,7 +287,7 @@
 
 .highlightedText mark {
   background: rgba(46, 134, 171, 0.3);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 2px 4px;
   border-radius: 4px;
   font-weight: 600;
@@ -320,7 +320,7 @@
 .matchText {
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex: 1;
 }
 
@@ -402,7 +402,7 @@
 .libraryPattern {
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--bg-card);
   padding: 2px 6px;
   border-radius: 4px;
@@ -443,7 +443,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   margin: 0 0 var(--spacing-sm);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .cheatItem {
@@ -554,7 +554,7 @@
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.82rem;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 2px 6px;
   border-radius: 4px;
 }
@@ -626,7 +626,7 @@
 .escenarioExample code {
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex: 1;
   word-break: break-all;
 }
@@ -654,7 +654,7 @@
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.78rem;
   background: rgba(72, 169, 166, 0.1);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   padding: 1px 4px;
   border-radius: 3px;
 }
@@ -701,7 +701,7 @@
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.82rem;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 1px 5px;
   border-radius: 4px;
 }
@@ -778,7 +778,7 @@
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.82rem;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 1px 5px;
   border-radius: 4px;
 }

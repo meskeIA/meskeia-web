@@ -46,7 +46,7 @@
 .sectionTitle {
   font-size: clamp(1.3rem, 3vw, 1.9rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -364,7 +364,7 @@
 }
 
 .bucleFlecha {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-weight: 700;
 }
@@ -414,7 +414,7 @@
 .contextTitulo {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -461,7 +461,7 @@
 
 .parkinsonBadgeNormal {
   background: rgba(72, 169, 166, 0.15);
-  color: #48A9A6;
+  color: var(--secondary-texto);
   padding: 0.2rem 0.7rem;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -523,7 +523,7 @@
 }
 
 .flechaFuerte {
-  color: #48A9A6;
+  color: var(--secondary-texto);
   font-weight: 700;
   font-size: 1rem;
   letter-spacing: -2px;
@@ -617,7 +617,7 @@
 
 .badgeArriba {
   background: rgba(72, 169, 166, 0.15);
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 .badgeAbajo {

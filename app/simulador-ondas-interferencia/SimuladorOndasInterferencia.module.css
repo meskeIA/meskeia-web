@@ -75,11 +75,11 @@
 }
 
 .tabBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabActive {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
 }
 
@@ -149,7 +149,7 @@
 
 .valueBadge {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
 }
 
@@ -207,7 +207,7 @@
 
 .calcBtnGhost:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Presets */
@@ -232,7 +232,7 @@
 
 .presetBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .presetActive {
@@ -264,7 +264,7 @@
 
 .fronteraBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .fronteraActive {
@@ -295,7 +295,7 @@
 
 .modoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .modoActive {
@@ -463,7 +463,7 @@
 
 .resultValueAccent {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -485,7 +485,7 @@
 
 .armonicoItem strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
 }
 
@@ -544,7 +544,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -582,7 +582,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.35rem;
   font-style: italic;
 }

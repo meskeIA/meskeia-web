@@ -18,7 +18,7 @@
 .title {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.75rem;
 }
 
@@ -134,7 +134,7 @@
 
 .successBox h2 {
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -149,7 +149,7 @@
   background: none;
   border: 1.5px solid var(--primary);
   border-radius: 8px;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;

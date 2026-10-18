@@ -39,7 +39,7 @@
   border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
   color: var(--text-secondary);
 }
-.tab:hover { border-color: var(--primary); color: var(--primary); }
+.tab:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .tabActive { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .tabActive:hover { background: var(--primary-boton); color: white; }
@@ -117,7 +117,7 @@
   border-radius: var(--radius); font-size: 0.9rem; color: var(--text-primary); line-height: 1.5;
 }
 .warningBox span:first-child { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.1rem; }
-.warningBox strong { display: block; margin-bottom: 0.25rem; color: var(--primary); }
+.warningBox strong { display: block; margin-bottom: 0.25rem; color: var(--primary-texto); }
 .warningBox p { margin: 0; color: var(--text-secondary); }
 
 /* ─── Espiral ─── */
@@ -156,7 +156,7 @@
 .ponderacionNombre { font-size: 0.85rem; color: var(--text-primary); font-weight: 600; }
 .ponderacionBarra { background: var(--hover); border-radius: 20px; height: 10px; overflow: hidden; }
 .ponderacionFill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 20px; transition: width 0.5s ease; }
-.ponderacionPeso { font-size: 0.82rem; font-weight: 700; color: var(--primary); text-align: right; }
+.ponderacionPeso { font-size: 0.82rem; font-weight: 700; color: var(--primary-texto); text-align: right; }
 .ponderacionNota { font-size: 0.75rem; color: var(--text-muted); grid-column: 1 / -1; }
 
 /* ─── Sesgos ─── */
@@ -266,7 +266,7 @@
   padding: var(--spacing-lg); text-align: center;
 }
 .transmisionCardIcon { font-size: 1.6rem; margin-bottom: 0.4rem; }
-.transmisionCardVal { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; }
+.transmisionCardVal { font-size: 1.6rem; font-weight: 700; color: var(--primary-texto); margin-bottom: 0.3rem; }
 .transmisionCardLbl { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
 .sliderNota { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0; font-style: italic; }
 

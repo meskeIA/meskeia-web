@@ -35,10 +35,10 @@
   border-radius: var(--radius) var(--radius) 0 0; cursor: pointer;
   transition: all 0.18s; color: var(--text-secondary); font-size: 0.9rem;
 }
-.tab:hover { border-color: var(--primary); color: var(--primary); }
+.tab:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .tabActivo {
-  border-color: var(--primary); color: var(--primary); font-weight: 700;
+  border-color: var(--primary); color: var(--primary-texto); font-weight: 700;
   background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%);
 }
 .tabNombre { font-size: 0.82rem; }
@@ -80,7 +80,7 @@
   display: flex; flex-direction: column; gap: var(--spacing-sm);
 }
 .resultadoValor { display: flex; align-items: baseline; gap: var(--spacing-sm); }
-.resultadoNumero { font-size: 2.4rem; font-weight: 800; color: var(--primary); }
+.resultadoNumero { font-size: 2.4rem; font-weight: 800; color: var(--primary-texto); }
 .resultadoUnidad { font-size: 1rem; color: var(--text-secondary); }
 .resultadoBarraFondo {
   height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
@@ -140,8 +140,8 @@
 }
 .tabla tr:last-child td { border-bottom: none; }
 .tabla tr:hover td { background: var(--hover); }
-.tablaSimbolo { font-weight: 700; color: var(--primary); }
-.codigo { font-family: 'Courier New', monospace; background: var(--bg-primary); padding: 1px 5px; border-radius: 4px; font-size: 0.85rem; color: var(--primary); }
+.tablaSimbolo { font-weight: 700; color: var(--primary-texto); }
+.codigo { font-family: 'Courier New', monospace; background: var(--bg-primary); padding: 1px 5px; border-radius: 4px; font-size: 0.85rem; color: var(--primary-texto); }
 .reduccion { color: #2ECC71; font-weight: 700; }
 
 /* Eficiencia */
@@ -166,7 +166,7 @@
   display: flex; flex-direction: column; gap: 4px;
 }
 .resultadoCanalLabel { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
-.resultadoCanalValor { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
+.resultadoCanalValor { font-size: 2.2rem; font-weight: 800; color: var(--primary-texto); }
 .resultadoCanalDesc { font-size: 0.8rem; color: var(--text-secondary); font-family: 'Courier New', monospace; }
 
 .ejemplosGrid {
@@ -180,7 +180,7 @@
 }
 .ejemploNombre { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); }
 .ejemploMeta { font-size: 0.72rem; color: var(--text-muted); }
-.ejemploCapacidad { font-size: 0.92rem; font-weight: 700; color: var(--primary); }
+.ejemploCapacidad { font-size: 0.92rem; font-weight: 700; color: var(--primary-texto); }
 
 /* Pilares */
 .pilaresGrid {
@@ -271,7 +271,7 @@
 .faqTip {
   margin-top: var(--spacing-sm); padding: 0.4rem 0.75rem;
   background: rgba(72,169,166,0.1); border-radius: 6px;
-  font-size: 0.8rem; color: var(--secondary); font-style: italic;
+  font-size: 0.8rem; color: var(--secondary-texto); font-style: italic;
 }
 [data-theme='dark'] .faqItem { background: #2A2A2A; border-color: #404040; border-left-color: var(--secondary); }
 [data-theme='dark'] .faqTip { background: rgba(72,169,166,0.15); }

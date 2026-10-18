@@ -119,7 +119,7 @@
 
 .copyBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .copyBtn.copied {
@@ -219,7 +219,7 @@
 
 .typeBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .typeActive {
@@ -274,7 +274,7 @@
 
 .angleBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .angleActive {
@@ -308,7 +308,7 @@
 .shapeActive {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .positionGrid {
@@ -331,7 +331,7 @@
 
 .positionBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .positionActive {
@@ -367,7 +367,7 @@
 
 .actionBtn:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .actionBtn:disabled {
@@ -607,7 +607,7 @@
 .escenarioIcon { font-size: 1.5rem; }
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46,134,171,0.07);
   border-left: 3px solid var(--primary);
   padding: 0.4rem 0.75rem;

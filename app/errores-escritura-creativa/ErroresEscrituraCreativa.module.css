@@ -47,7 +47,7 @@
   border-radius: 20px;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 500;
@@ -183,7 +183,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.35rem;
 }
 
@@ -445,7 +445,7 @@
   border-radius: 6px;
   padding: 0.6rem 0.875rem;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.5rem;
   font-weight: 600;
 }

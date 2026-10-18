@@ -131,7 +131,7 @@
 .statValue {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -330,7 +330,7 @@
 
 .topicTag {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 2px 8px;
   border-radius: 100px;
   font-size: 0.75rem;
@@ -443,7 +443,7 @@
   display: inline-block;
   padding: var(--spacing-md) var(--spacing-xl);
   background: white;
-  color: var(--primary);
+  color: var(--primary-boton);
   text-decoration: none;
   border-radius: var(--radius);
   font-weight: 600;
@@ -527,7 +527,7 @@
 
 .navButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navButton.disabled {
@@ -548,7 +548,7 @@
 
 .navProgressText {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navProgressLabel {
@@ -760,7 +760,7 @@
 
 .timelineYear {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
 }
 
@@ -827,7 +827,7 @@
 
 .bottomNavLink:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .bottomNavLink.next {
@@ -953,7 +953,7 @@
 
 .categoryButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .categoryActive {
@@ -979,7 +979,7 @@
 .glossaryLetter {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-sm);
   border-bottom: 3px solid var(--primary);

@@ -171,13 +171,13 @@
 
 .navButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 
 .navButtonActive {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--focus);
 }
 
@@ -233,7 +233,7 @@
 
 .infoLinkActive {
   background: var(--focus);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Secciones */
@@ -314,7 +314,7 @@
 
 .navItemActive {
   background: var(--focus);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
 }
 

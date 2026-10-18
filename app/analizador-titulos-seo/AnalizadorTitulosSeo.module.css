@@ -174,7 +174,7 @@
 
 .ejemploBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Score Card */
@@ -416,7 +416,7 @@
 .palabraCard h4 {
   margin: 0 0 0.75rem;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: capitalize;
 }
 
@@ -444,7 +444,7 @@
 
 .eduSection h2 {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);
@@ -474,7 +474,7 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statCard .statLabel {
@@ -505,7 +505,7 @@
 .formulaExample {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
@@ -650,7 +650,7 @@
   border-radius: 0 var(--radius) var(--radius) 0;
   padding: 0.625rem 0.875rem;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
@@ -694,7 +694,7 @@
 .faqItem h4 {
   margin: 0 0 0.625rem;
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   line-height: 1.4;
 }
@@ -708,7 +708,7 @@
 
 .faqTip {
   font-size: 0.83rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   border-radius: var(--radius);
   padding: 0.5rem 0.875rem;

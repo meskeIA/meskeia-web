@@ -520,7 +520,7 @@ export default function VisualizadorAntibioticos() {
               <h4 className={styles.comparativaAspecto}>{item.aspecto}</h4>
               <div className={styles.comparativaFila}>
                 <div className={styles.comparativaColumna}>
-                  <span className={styles.comparativaBadge} style={{ background: 'rgba(46,134,171,0.12)', color: '#2E86AB' }}>
+                  <span className={styles.comparativaBadge} style={{ background: 'rgba(46,134,171,0.12)', color: 'var(--primary-texto)' }}>
                     <span aria-hidden="true">{item.iconoBacteria}</span> Bacteria
                   </span>
                   <p>{item.bacteria}</p>

@@ -188,12 +188,12 @@
 }
 
 .validationMessage.info {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Sugerencia de corrección */
 .suggestionLink {
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   text-decoration: underline;
   background: none;
@@ -305,7 +305,7 @@
 .lineaSubtotal {
   grid-column: 5;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: right;
   padding: 10px 0;
 }
@@ -337,7 +337,7 @@
   border: 2px dashed var(--border);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -403,7 +403,7 @@
   justify-content: space-between;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   padding-top: 10px;
   border-top: 2px solid var(--border);
   margin-top: 5px;
@@ -522,7 +522,7 @@
 
 .historialNumero {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
 }
 
@@ -611,7 +611,7 @@
 .previewEmisor h2 {
   font-size: 1.4rem;
   margin: 0 0 10px 0;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .previewEmisor p {
@@ -627,7 +627,7 @@
 .previewNumero h1 {
   font-size: 1.8rem;
   margin: 0;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .previewNumeroValor {
@@ -710,7 +710,7 @@
   padding: 15px 0;
   font-size: 1.2rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   border-top: 2px solid #2E86AB;
   margin-top: 10px;
 }
@@ -884,7 +884,7 @@
 .casoCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -912,7 +912,7 @@
 
 .faqItem h4 {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -1236,7 +1236,7 @@
   display: block;
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   white-space: pre-wrap;
   word-break: break-all;
 }
@@ -1279,7 +1279,7 @@
 .faqItem h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -1292,7 +1292,7 @@
 
 .faqTip {
   font-size: 0.875rem;
-  color: #48A9A6;
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   border-radius: 6px;
   padding: 0.5rem 0.75rem;

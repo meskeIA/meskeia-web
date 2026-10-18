@@ -38,7 +38,7 @@
 .section h2 {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -171,7 +171,7 @@
 .tarjetaValor {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.3rem;
   line-height: 1.1;
 }
@@ -224,7 +224,7 @@
 .barraPorcentaje {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 36px;
   text-align: right;
 }
@@ -243,7 +243,7 @@
 }
 
 .sliderValor {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -300,7 +300,7 @@
 .tarjetaAcuValor {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.3rem;
   word-break: break-all;
 }
@@ -340,7 +340,7 @@
 .brechaValor {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Tabla comparativa */
@@ -396,7 +396,7 @@
 .celdaReduccion {
   text-align: center;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .mensajeClave {
@@ -434,7 +434,7 @@
 .eduBloque h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 

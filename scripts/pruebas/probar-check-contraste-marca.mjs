@@ -153,6 +153,15 @@ const CASOS = [
     },
   },
   {
+    n: 16,
+    nombre: 'FONDO CLARO FIJO: el CTA blanco de los cursos con texto var(--primary) (en oscuro, -texto daría 2,6:1)',
+    tanda: 2,
+    debeFallar: true,
+    ficheros: {
+      'app/curso-x/CursoX.module.css': css('.container { --primary: #2E86AB; }', '.ctaButton {', '  background: white;', '  color: var(--primary);', '}'),
+    },
+  },
+  {
     n: 12,
     nombre: 'NO DEBE ENCENDER · hero-bg con blanco, tintes, color-mix, fondo sin blanco, deshabilitado',
     tanda: null,
@@ -242,6 +251,13 @@ for (const c of CASOS) {
   if (!bien) fallos++;
   console.log(`${bien ? '✅' : '❌'} tras la campaña, el candado calla en todo lo que sabía migrar — ${bien ? 'calla' : 'sigue fallando'}`);
   if (!bien) console.log((tras.stderr || tras.stdout).split('\n').slice(0, 10).map((l) => `      ${l}`).join('\n'));
+
+  // El CTA de fondo claro fijo (caso 16) tiene que acabar en -boton, no en -texto
+  const cta = fs.readdirSync(path.join(dir, 'app')).find((d) => d.startsWith('curso-x'));
+  const ctaCss = fs.readFileSync(path.join(dir, 'app', cta, 'CursoX.module.css'), 'utf8');
+  const bienCta = /color:\s*var\(--primary-boton\)/.test(ctaCss);
+  if (!bienCta) fallos++;
+  console.log(`${bienCta ? '✅' : '❌'} el texto sobre fondo claro fijo migra a --primary-boton, que no se aclara en oscuro — ${bienCta ? 'sí' : ctaCss.match(/color:[^;]*/)?.[0]}`);
   fs.rmSync(dir, { recursive: true, force: true });
 
   // Y en lo que NO sabe migrar sigue rompiendo: la campaña no lo toca y el candado lo ve

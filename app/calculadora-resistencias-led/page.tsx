@@ -329,7 +329,7 @@ export default function CalculadoraResistenciasLedPage() {
                 </div>
                 <div className={styles.resultItem}>
                   <div className={styles.resultLabel}>Valor E12 recomendado</div>
-                  <div className={styles.resultValorGrande} style={{ color: 'var(--secondary)' }}>
+                  <div className={styles.resultValorGrande} style={{ color: 'var(--secondary-texto)' }}>
                     {formatResistencia(resultadoLed.rE12)}
                   </div>
                 </div>

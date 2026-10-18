@@ -95,7 +95,7 @@
 .btnAnadir {
   display: block; width: 100%; padding: 0.65rem; margin-top: var(--spacing-sm);
   background: var(--bg-card); border: 2px dashed var(--border); border-radius: var(--radius);
-  cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--primary);
+  cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--primary-texto);
   transition: all 0.18s; text-align: center;
 }
 .btnAnadir:hover { border-color: var(--primary); background: rgba(46,134,171,0.04); }
@@ -124,7 +124,7 @@
 .btnToggle {
   padding: 0.65rem var(--spacing-lg); border-radius: var(--radius);
   border: 2px solid var(--primary); background: var(--bg-card);
-  cursor: pointer; font-size: 0.92rem; font-weight: 700; color: var(--primary);
+  cursor: pointer; font-size: 0.92rem; font-weight: 700; color: var(--primary-texto);
   transition: all 0.18s;
 }
 .btnToggle:hover { background: rgba(46,134,171,0.08); }
@@ -184,7 +184,7 @@
 .eduH3 { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: var(--spacing-lg) 0 var(--spacing-sm) 0; }
 .eduContent p { margin-bottom: var(--spacing-md); }
 .eduLista { list-style: none; padding: 0; margin: 0 0 var(--spacing-md) 0; display: flex; flex-direction: column; gap: 0.4rem; }
-.eduLista li::before { content: '→'; color: var(--primary); font-weight: 700; margin-right: 0.5rem; }
+.eduLista li::before { content: '→'; color: var(--primary-texto); font-weight: 700; margin-right: 0.5rem; }
 
 .comparativaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
 @media (max-width: 600px) { .comparativaGrid { grid-template-columns: 1fr; } }
@@ -192,7 +192,7 @@
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius); padding: var(--spacing-md);
 }
-.comparativaItem strong { font-size: 0.92rem; color: var(--primary); display: block; margin-bottom: var(--spacing-sm); }
+.comparativaItem strong { font-size: 0.92rem; color: var(--primary-texto); display: block; margin-bottom: var(--spacing-sm); }
 .comparativaItem p { font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
 
 .formulaBox {
@@ -203,7 +203,7 @@
 .formulaTitulo { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--spacing-sm); }
 .formula {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 1.1rem; color: var(--primary); font-weight: 700;
+  font-size: 1.1rem; color: var(--primary-texto); font-weight: 700;
   margin-bottom: var(--spacing-sm); letter-spacing: 0.02em;
 }
 .formulaDesc { font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }

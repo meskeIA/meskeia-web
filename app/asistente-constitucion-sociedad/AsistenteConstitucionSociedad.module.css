@@ -117,7 +117,7 @@
 .tipoSiglas {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
 }
 
@@ -153,7 +153,7 @@
 
 .progresoPct {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .progresoBar {
@@ -347,7 +347,7 @@
 
 .checkEnlace {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
 }
 
@@ -373,7 +373,7 @@
 .formSeccionTitulo {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -426,7 +426,7 @@
   background: rgba(46,134,171,0.06);
   border-radius: 6px;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .alertaCapital {
@@ -539,7 +539,7 @@
   border: 2px dashed var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   font-size: 0.88rem;
   width: 100%;
@@ -573,7 +573,7 @@
 .costesTitulo {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.25rem;
 }
 
@@ -610,7 +610,7 @@
 
 .costeValorTotal {
   text-align: right;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -639,7 +639,7 @@
   border-top: 1px solid rgba(46,134,171,0.2);
   padding-top: 0.4rem;
   margin-top: 0.15rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .costesNotas {
@@ -654,8 +654,8 @@
 
 /* Sección educativa */
 .guideSection { line-height: 1.7; }
-.guideSection h2 { font-size: 1.3rem; color: var(--primary); margin-top: 0; }
-.guideSection h3 { font-size: 1.05rem; color: var(--primary); margin-top: 1.5rem; }
+.guideSection h2 { font-size: 1.3rem; color: var(--primary-texto); margin-top: 0; }
+.guideSection h3 { font-size: 1.05rem; color: var(--primary-texto); margin-top: 1.5rem; }
 
 .ventajasGrid {
   display: grid;
@@ -672,7 +672,7 @@
   font-size: 0.9rem;
 }
 
-.ventajaCard h4 { margin: 0 0 0.5rem; font-size: 0.95rem; color: var(--primary); }
+.ventajaCard h4 { margin: 0 0 0.5rem; font-size: 0.95rem; color: var(--primary-texto); }
 .ventajaCard p { margin: 0; color: var(--text-secondary); }
 
 .comparativaTabla { overflow-x: auto; margin: 1rem 0; }
@@ -806,7 +806,7 @@
 
 .escenarioHeader strong {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioExample { margin: 0; color: var(--text-primary); }
@@ -856,7 +856,7 @@
 
 .faqTipPro {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.06);
   border-radius: 6px;
   padding: 0.3rem 0.65rem;

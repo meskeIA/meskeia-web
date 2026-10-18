@@ -642,7 +642,7 @@ export default function AdnCodigoGeneticoPage() {
                   <span aria-hidden="true"> → </span>
                   <span style={{ color: '#9B59B6', fontSize: '0.82rem' }}>Transcriptasa inversa</span>
                   <span aria-hidden="true"> → </span>
-                  <span style={{ color: '#2E86AB', fontWeight: 700 }}>ADN</span>
+                  <span style={{ color: 'var(--primary-texto)', fontWeight: 700 }}>ADN</span>
                 </div>
               </div>
             </div>

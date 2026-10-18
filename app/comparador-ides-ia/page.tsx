@@ -599,7 +599,7 @@ export default function ComparadorIdesIa() {
           Un aspecto crítico que suele pasarse por alto: <strong>el IDE y el asistente de IA son capas separables</strong>. Puedes usar Cursor (IDE) con Claude Code CLI (asistente en terminal) simultáneamente. Puedes usar VS Code (IDE) con GitHub Copilot (extensión IA) y también Claude Code (extensión o CLI). Entender esta separación ayuda a construir el flujo de trabajo óptimo para cada situación.
         </p>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Comparativa: IDE nativo IA vs IDE clásico con extensión
         </h4>
         <div className={styles.tableWrapper}>
@@ -619,7 +619,7 @@ export default function ComparadorIdesIa() {
           </table>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Perfiles y sus IDEs
         </h4>
         <div className={styles.escenariosGrid}>
@@ -641,7 +641,7 @@ export default function ComparadorIdesIa() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Preguntas frecuentes
         </h4>
         <ul className={styles.faqList}>
@@ -667,7 +667,7 @@ export default function ComparadorIdesIa() {
           </li>
         </ul>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Cómo evaluar un IDE nuevo antes de adoptarlo
         </h4>
         <div className={styles.stepGuide}>
@@ -697,7 +697,7 @@ export default function ComparadorIdesIa() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Buenas prácticas
         </h4>
         <div className={styles.tipsGrid}>

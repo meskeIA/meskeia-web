@@ -347,7 +347,7 @@ export default function VisualizadorCarbono(): React.ReactNode {
               </div>
             </div>
             <div className={styles.flujo}>
-              <span className={styles.flujoFlecha} style={{ color: '#2E86AB' }}>↓</span>
+              <span className={styles.flujoFlecha} style={{ color: 'var(--primary-texto)' }}>↓</span>
               <div>
                 <strong>Absorción oceánica neta:</strong> ~2,5 Gt C/año
               </div>

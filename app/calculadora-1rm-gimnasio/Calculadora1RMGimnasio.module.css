@@ -178,7 +178,7 @@
 }
 
 .tableSubtitle strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tableWrapper {
@@ -221,12 +221,12 @@
 }
 
 .rowMax .tdPct {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tdPct {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tdPeso {
@@ -280,7 +280,7 @@
   padding: 0.15em 0.4em;
   border-radius: 4px;
   font-size: 0.9em;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 

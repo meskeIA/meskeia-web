@@ -96,7 +96,7 @@
 
 .levelBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .levelBtn:focus-visible {
@@ -181,7 +181,7 @@
 
 .catLevelBtn:hover {
   border-color: var(--accent);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .catLevelBtn:focus-visible {
@@ -205,7 +205,7 @@
 .categoryAmount {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -255,13 +255,13 @@
   display: block;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .totalValueSmall {
   composes: totalValue;
   font-size: 1.5rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* De dónde salen las cifras (cabo C0165): mismo color que .salaryComparison, en el mismo panel */
@@ -330,7 +330,7 @@
 
 .salaryPercent {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -421,7 +421,7 @@
 }
 
 .tipCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1rem;
 }
@@ -463,7 +463,7 @@
 
 .scenarioTotal {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 

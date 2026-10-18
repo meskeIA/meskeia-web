@@ -801,7 +801,7 @@ export default function VisualizadorEmbriogenesis() {
             <tbody>
               <tr>
                 <td><strong>Ectodermo</strong></td>
-                <td><span style={{ color: '#2E86AB' }}>■</span> Azul</td>
+                <td><span style={{ color: 'var(--primary-texto)' }}>■</span> Azul</td>
                 <td>Cerebro, médula espinal, piel, esmalte dental, retina</td>
                 <td>Tejido nervioso, epidermis</td>
                 <td>Anencefalia, espina bífida, defectos del tubo neural</td>

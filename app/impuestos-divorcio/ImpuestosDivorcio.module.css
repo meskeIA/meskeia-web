@@ -244,7 +244,7 @@
 .btnSecundario {
   padding: 0.75rem 1.5rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   border-radius: 8px;
   font-size: 0.95rem;
@@ -340,7 +340,7 @@
 }
 
 .resultAmount strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 

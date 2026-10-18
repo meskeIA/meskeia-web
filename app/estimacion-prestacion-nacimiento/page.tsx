@@ -527,7 +527,7 @@ export default function EstimacionPrestacionNacimiento() {
             {resultado.detalleAmpliaciones.map((detalle, i) => (
               <div key={i} className={styles.breakdownItem}>
                 <span className={styles.breakdownLabel}>{detalle}</span>
-                <span className={styles.breakdownValue} style={{ color: 'var(--secondary)' }}>Extra</span>
+                <span className={styles.breakdownValue} style={{ color: 'var(--secondary-texto)' }}>Extra</span>
               </div>
             ))}
             <div className={styles.breakdownItem} style={{ fontWeight: 600 }}>

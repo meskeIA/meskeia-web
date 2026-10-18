@@ -16,7 +16,7 @@
 /* Navegación principal */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -74,7 +74,7 @@
 
 .pilaFem { text-align: center; padding: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border-radius: var(--radius); border: 1px solid var(--border); }
 .pilaFemFormula { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
-.pilaFemValor { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+.pilaFemValor { font-size: 1.8rem; font-weight: 800; color: var(--primary-texto); }
 .pilaFemNota { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
 .pilaReacciones { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-top: var(--spacing-md); }
 .pilaReaccion { padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius); text-align: center; }
@@ -130,7 +130,7 @@
 
 .electrolisisTabs { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
 .electroTab { flex: 1; padding: 0.5rem var(--spacing-md); background: var(--hover); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); transition: all 0.2s; }
-.electroTab:hover { border-color: var(--primary); color: var(--primary); }
+.electroTab:hover { border-color: var(--primary); color: var(--primary-texto); }
 .electroTab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .electroTabActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 
@@ -148,7 +148,7 @@
 
 .voltajeSliderWrap { margin-bottom: var(--spacing-md); }
 .voltajeLabel { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.4rem; display: flex; justify-content: space-between; }
-.voltajeValor { font-weight: 700; color: var(--primary); }
+.voltajeValor { font-weight: 700; color: var(--primary-texto); }
 .voltajeSlider { width: 100%; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--border); outline: none; cursor: pointer; }
 .voltajeSlider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; }
 .voltajeSlider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; border: none; }
@@ -160,7 +160,7 @@
 .electroplatingTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); }
 .electroplatingGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); }
 .electroplatingItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: var(--spacing-sm) var(--spacing-md); text-align: center; }
-.electroplatingMetal { font-size: 0.88rem; font-weight: 700; color: var(--primary); }
+.electroplatingMetal { font-size: 0.88rem; font-weight: 700; color: var(--primary-texto); }
 .electroplatingUso { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
 
 /* ─── Batería Li-ion ─── */
@@ -193,7 +193,7 @@
 }
 
 .bateriaVoltaje { text-align: center; margin-bottom: var(--spacing-lg); }
-.bateriaVoltajeValor { font-size: 2rem; font-weight: 800; color: var(--primary); }
+.bateriaVoltajeValor { font-size: 2rem; font-weight: 800; color: var(--primary-texto); }
 .bateriaVoltajeLabel { font-size: 0.82rem; color: var(--text-muted); }
 
 .bateriaComparativa { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); overflow-x: auto; }
@@ -202,7 +202,7 @@
 .bateriaTabla td { padding: 0.5rem var(--spacing-sm); color: var(--text-primary); border-bottom: 1px solid var(--border); }
 .bateriaTabla tr:last-child td { border-bottom: none; }
 .bateriaTabla tr:nth-child(even) td { background: rgba(46,134,171,0.03); }
-.bateriaTecnologia { font-weight: 600; color: var(--primary); }
+.bateriaTecnologia { font-weight: 600; color: var(--primary-texto); }
 
 /* ─── Comunes ─── */
 .insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }

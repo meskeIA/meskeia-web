@@ -137,7 +137,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroBtnActivo {
@@ -166,7 +166,7 @@
 }
 
 .resumenTexto strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -223,7 +223,7 @@
 .categoriaTitulo {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.9rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid color-mix(in srgb, var(--primary) 20%, transparent);
@@ -297,14 +297,14 @@
   padding: 0.15rem 0.5rem;
   border-radius: 12px;
   background: color-mix(in srgb, var(--primary) 12%, transparent);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   white-space: nowrap;
 }
 
 .badgeSexo {
   background: color-mix(in srgb, var(--secondary) 12%, transparent);
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .frecuencia {

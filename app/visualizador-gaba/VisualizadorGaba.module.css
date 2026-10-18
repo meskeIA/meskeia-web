@@ -75,7 +75,7 @@
 .sectionTitle {
   font-size: clamp(1.3rem, 3vw, 1.85rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -151,7 +151,7 @@
 
 .balanzaTipoInhibidor {
   background: rgba(46, 134, 171, 0.12);
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
@@ -325,7 +325,7 @@
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .diagPoro {
@@ -338,12 +338,12 @@
 .diagIon {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .diagFlecha {
   font-size: 1.2rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   line-height: 1;
 }
 
@@ -362,7 +362,7 @@
   padding: 0.4rem 1rem;
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .diagProteinaG {
@@ -382,7 +382,7 @@
   padding: 0.3rem 0.7rem;
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .receptorDetalle p {
@@ -466,7 +466,7 @@
   display: block;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.2rem;
 }
 
@@ -557,7 +557,7 @@
 .condicionNombre {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 

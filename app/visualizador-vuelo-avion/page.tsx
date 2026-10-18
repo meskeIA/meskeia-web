@@ -390,7 +390,7 @@ export default function VueloAvionPage() {
                 <span>Sustentación = Peso</span>
               </div>
               <div className={styles.equilibrioItem}>
-                <span className={styles.equilibrioIcono} style={{ color: '#2E86AB' }} aria-hidden="true">➡️</span>
+                <span className={styles.equilibrioIcono} style={{ color: 'var(--primary-texto)' }} aria-hidden="true">➡️</span>
                 <span>Empuje = Resistencia</span>
               </div>
             </div>

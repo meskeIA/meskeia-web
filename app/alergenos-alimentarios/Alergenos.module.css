@@ -18,8 +18,8 @@
 .cardEmoji { font-size: 2rem; line-height: 1; }
 .cardNombre { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); line-height: 1.25; }
 .cardBadges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.badge { display: inline-block; font-size: 0.74rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: color-mix(in srgb, var(--primary) 10%, var(--bg-card)); color: var(--primary); border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent); }
-.badgeSec { background: color-mix(in srgb, var(--secondary) 12%, var(--bg-card)); color: var(--secondary); border-color: color-mix(in srgb, var(--secondary) 30%, transparent); }
+.badge { display: inline-block; font-size: 0.74rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: color-mix(in srgb, var(--primary) 10%, var(--bg-card)); color: var(--primary-texto); border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent); }
+.badgeSec { background: color-mix(in srgb, var(--secondary) 12%, var(--bg-card)); color: var(--secondary-texto); border-color: color-mix(in srgb, var(--secondary) 30%, transparent); }
 .badgeAnimal { background: color-mix(in srgb, #e53935 12%, var(--bg-card)); color: #c62828; border-color: color-mix(in srgb, #e53935 30%, transparent); }
 .badgeVegetal { background: color-mix(in srgb, #4caf50 12%, var(--bg-card)); color: #2e7d32; border-color: color-mix(in srgb, #4caf50 30%, transparent); }
 .badgeAditivo { background: color-mix(in srgb, #8e24aa 12%, var(--bg-card)); color: #6a1b9a; border-color: color-mix(in srgb, #8e24aa 30%, transparent); }
@@ -36,7 +36,7 @@
 
 .educationalContent { padding: 8px 0; }
 .conceptoSection { margin-bottom: 40px; }
-.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
+.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary-texto); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
 .conceptoSection p { color: var(--text-secondary); line-height: 1.65; font-size: 0.95rem; }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 12px; }
 .comparativaTable th, .comparativaTable td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }

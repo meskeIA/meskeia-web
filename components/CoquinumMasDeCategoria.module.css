@@ -15,7 +15,7 @@
 }
 
 .categoria {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .grid {
@@ -64,7 +64,7 @@
   margin-top: 18px;
   font-size: 0.92rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
 }
 

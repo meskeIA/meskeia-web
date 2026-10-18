@@ -138,7 +138,7 @@ function SeccionPresion() {
           <span className={styles.explicacionBarra}>/</span>
         </div>
         <div className={styles.explicacionCard}>
-          <div className={styles.explicacionNumero} style={{ color: '#2E86AB' }}>80</div>
+          <div className={styles.explicacionNumero} style={{ color: 'var(--primary-texto)' }}>80</div>
           <h3 className={styles.explicacionTitulo}>Diastólica</h3>
           <p className={styles.explicacionDesc}>
             Presión <strong>mínima</strong> cuando el corazón descansa entre latidos.

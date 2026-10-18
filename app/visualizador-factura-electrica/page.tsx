@@ -223,12 +223,12 @@ export default function VisualizadorFacturaElectricaPage() {
         <div className={styles.resumenCats}>
           <div className={styles.catCard} style={{ borderTopColor: '#2E86AB' }}>
             <span className={styles.catNombre}>Energía</span>
-            <span className={styles.catValor} style={{ color: '#2E86AB' }}>{formatCurrency(totalEnergia)}</span>
+            <span className={styles.catValor} style={{ color: 'var(--primary-texto)' }}>{formatCurrency(totalEnergia)}</span>
             <span className={styles.catPct}>{formatNumber((totalEnergia / totalFactura) * 100, 0)}%</span>
           </div>
           <div className={styles.catCard} style={{ borderTopColor: '#48A9A6' }}>
             <span className={styles.catNombre}>Potencia</span>
-            <span className={styles.catValor} style={{ color: '#48A9A6' }}>{formatCurrency(totalPotencia)}</span>
+            <span className={styles.catValor} style={{ color: 'var(--secondary-texto)' }}>{formatCurrency(totalPotencia)}</span>
             <span className={styles.catPct}>{formatNumber((totalPotencia / totalFactura) * 100, 0)}%</span>
           </div>
           <div className={styles.catCard} style={{ borderTopColor: '#e67e22' }}>

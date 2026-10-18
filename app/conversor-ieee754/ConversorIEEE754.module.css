@@ -299,7 +299,7 @@
   font-family: 'Monaco', 'Consolas', monospace;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   word-break: break-all;
 }
 
@@ -310,7 +310,7 @@
 }
 
 /* Special values styling */
-.normal { color: var(--primary); }
+.normal { color: var(--primary-texto); }
 .denormalized { color: #f39c12; }
 .zero { color: var(--text-muted); }
 .infinity { color: #9b59b6; }
@@ -471,7 +471,7 @@
   display: block;
   font-family: 'Monaco', 'Consolas', monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
   padding: var(--spacing-sm);
   border-radius: var(--radius);
@@ -679,7 +679,7 @@
   background: var(--hover);
   padding: 2px 6px;
   border-radius: 4px;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .eduGuia {

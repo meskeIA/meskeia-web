@@ -227,7 +227,7 @@
 .speedValue {
   font-family: 'SF Mono', Monaco, monospace;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   min-width: 60px;
   text-align: center;
@@ -382,7 +382,7 @@
 .infoValue {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'SF Mono', Monaco, monospace;
 }
 
@@ -457,7 +457,7 @@
 }
 
 .statusMessage strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Responsive */
@@ -580,7 +580,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -611,7 +611,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
 }
@@ -624,7 +624,7 @@
 }
 
 .faqTip {
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   background: rgba(72, 169, 166, 0.08);
   padding: 0.4rem 0.75rem;
   border-radius: 6px;

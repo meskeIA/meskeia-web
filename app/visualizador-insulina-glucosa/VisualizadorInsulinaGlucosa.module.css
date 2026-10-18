@@ -53,7 +53,7 @@
 .sectionTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
   display: flex;
   align-items: center;
@@ -80,7 +80,7 @@
   border: 2px solid #2E86AB;
   border-radius: 20px;
   background: transparent;
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
@@ -159,7 +159,7 @@
 .stepTitulo {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0;
   text-align: center;
 }
@@ -191,7 +191,7 @@
   border: 2px solid #2E86AB;
   border-radius: 8px;
   background: transparent;
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -245,7 +245,7 @@
 
 .btnFiltro_todos {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .btnFiltro_todos.btnFiltroIGActivo {
@@ -413,7 +413,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .textoResistencia {
@@ -432,7 +432,7 @@
 .educContent h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 1.2rem 0 0.4rem;
 }
 
@@ -472,7 +472,7 @@
 }
 
 .warningBox strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ── Dark mode ── */

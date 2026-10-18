@@ -336,7 +336,7 @@
   border: 1.5px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -507,7 +507,7 @@
 .statValor {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statValorRojo {
@@ -690,7 +690,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
@@ -721,7 +721,7 @@
 .faqItem h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 

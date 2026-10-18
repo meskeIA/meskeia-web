@@ -725,15 +725,15 @@ export default function ConfiguradorNarrativoPage() {
                 </thead>
                 <tbody>
                   <tr><td>1ª</td><td>Protagonista</td><td>Pasado</td><td style={{ color: '#27AE60', fontWeight: 700 }}>Muy común</td><td>Intimidad + perspectiva retrospectiva</td></tr>
-                  <tr><td>1ª</td><td>Protagonista</td><td>Presente</td><td style={{ color: '#2E86AB', fontWeight: 700 }}>Común</td><td>Intimidad + urgencia radical</td></tr>
+                  <tr><td>1ª</td><td>Protagonista</td><td>Presente</td><td style={{ color: 'var(--primary-texto)', fontWeight: 700 }}>Común</td><td>Intimidad + urgencia radical</td></tr>
                   <tr><td>1ª</td><td>Testigo</td><td>Pasado</td><td style={{ color: '#8E44AD', fontWeight: 700 }}>Clásico</td><td>Misterio del protagonista observado</td></tr>
                   <tr><td>1ª</td><td>Testigo</td><td>Presente</td><td style={{ color: '#E67E22', fontWeight: 700 }}>Poco frecuente</td><td>Misterio + urgencia doble</td></tr>
-                  <tr><td>1ª</td><td>No fiable</td><td>Pasado</td><td style={{ color: '#2E86AB', fontWeight: 700 }}>Común</td><td>El lector interroga cada afirmación</td></tr>
+                  <tr><td>1ª</td><td>No fiable</td><td>Pasado</td><td style={{ color: 'var(--primary-texto)', fontWeight: 700 }}>Común</td><td>El lector interroga cada afirmación</td></tr>
                   <tr><td>1ª</td><td>No fiable</td><td>Presente</td><td style={{ color: '#E74C3C', fontWeight: 700 }}>Experimental</td><td>Estados mentales alterados en tiempo real</td></tr>
                   <tr><td>3ª</td><td>Omnisciente</td><td>Pasado</td><td style={{ color: '#8E44AD', fontWeight: 700 }}>Clásico</td><td>Visión total, ironía dramática ilimitada</td></tr>
                   <tr><td>3ª</td><td>Omnisciente</td><td>Presente</td><td style={{ color: '#E74C3C', fontWeight: 700 }}>Experimental</td><td>Efecto de mito o fábula performativa</td></tr>
                   <tr><td>3ª</td><td>Limitado</td><td>Pasado</td><td style={{ color: '#27AE60', fontWeight: 700 }}>Muy común</td><td>Intimidad + flexibilidad narrativa</td></tr>
-                  <tr><td>3ª</td><td>Limitado</td><td>Presente</td><td style={{ color: '#2E86AB', fontWeight: 700 }}>Común</td><td>Inmersión sensorial máxima</td></tr>
+                  <tr><td>3ª</td><td>Limitado</td><td>Presente</td><td style={{ color: 'var(--primary-texto)', fontWeight: 700 }}>Común</td><td>Inmersión sensorial máxima</td></tr>
                   <tr><td>3ª</td><td>Objetivo</td><td>Pasado</td><td style={{ color: '#8E44AD', fontWeight: 700 }}>Clásico</td><td>El lector como intérprete, subtexto central</td></tr>
                   <tr><td>3ª</td><td>Objetivo</td><td>Presente</td><td style={{ color: '#E74C3C', fontWeight: 700 }}>Experimental</td><td>Frialdad + urgencia, superficie pura</td></tr>
                   <tr><td>2ª</td><td>Participante</td><td>Presente</td><td style={{ color: '#E74C3C', fontWeight: 700 }}>Experimental</td><td>El lector como protagonista en tiempo real</td></tr>

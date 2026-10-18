@@ -145,7 +145,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnDanger {
@@ -199,7 +199,7 @@
 .cellHeader span:last-child {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .cellTextarea {
@@ -245,7 +245,7 @@
 
 .navLink:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Responsive */

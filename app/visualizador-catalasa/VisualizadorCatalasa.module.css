@@ -57,7 +57,7 @@
 .sectionTitulo {
   font-size: clamp(1.3rem, 3vw, 1.7rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -100,7 +100,7 @@
 }
 
 .flecha {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.8rem;
 }
 
@@ -117,7 +117,7 @@
 
 .catalasaLabel {
   font-style: italic;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin-right: 0.3rem;
 }
@@ -192,7 +192,7 @@
   display: block;
   font-size: clamp(1.8rem, 4vw, 2.6rem);
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-variant-numeric: tabular-nums;
   transition: color 0.3s ease;
 }
@@ -200,7 +200,7 @@
 .contadorMax {
   display: block;
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
   margin-top: 0.3rem;
 }
@@ -243,7 +243,7 @@
 .btnReiniciar {
   padding: 0.75rem 1.25rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1.5px solid var(--primary);
   border-radius: 8px;
   font-size: 0.95rem;
@@ -306,7 +306,7 @@
 .danoTitulo {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 
@@ -439,7 +439,7 @@
 }
 
 .barraActividadLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -532,7 +532,7 @@
 .aplicacionTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -547,7 +547,7 @@
 .educContent h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.5rem 0 0.5rem;
 }
 

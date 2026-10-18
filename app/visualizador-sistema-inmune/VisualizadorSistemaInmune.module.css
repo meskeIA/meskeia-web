@@ -80,7 +80,7 @@
 }
 
 .tabBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabBtn:focus-visible {
@@ -89,7 +89,7 @@
 }
 
 .tabBtnActive {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
   font-weight: 700;
 }
@@ -308,7 +308,7 @@
 .celulaTipo {
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin: 0 0 0.6rem;
@@ -339,7 +339,7 @@
 .celulaDato {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.1);
   border-radius: 6px;
   padding: 0.3rem 0.5rem;
@@ -666,7 +666,7 @@
 .guideSection h2 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
 }
 
@@ -776,7 +776,7 @@
 .faqItem h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 

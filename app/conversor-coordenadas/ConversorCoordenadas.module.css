@@ -142,7 +142,7 @@
   background: var(--bg-primary);
   border: 1px solid var(--accent);
   border-radius: 999px;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   font-size: 0.85rem;
   padding: 5px 12px;
@@ -189,7 +189,7 @@
 }
 
 .formatoDetectado {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.9rem;
   margin: var(--spacing-md) 0 var(--spacing-sm);
 }
@@ -244,7 +244,7 @@
   background: transparent;
   border: 1px solid var(--primary);
   border-radius: var(--radius);
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   flex-shrink: 0;
   font-size: 0.85rem;
@@ -322,7 +322,7 @@
 }
 
 .enlaceMapa {
-  color: var(--primary);
+  color: var(--primary-texto);
   display: inline-block;
   font-size: 0.9rem;
   font-weight: 600;
@@ -373,7 +373,7 @@
 }
 
 .tarjetaValor {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.5rem;
   font-weight: 700;
 }

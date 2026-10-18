@@ -162,7 +162,7 @@
   display: inline-block;
   margin-top: var(--spacing-sm);
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
 }
 
@@ -303,7 +303,7 @@
 .rangoPrecioDestacado {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .rangoPrecioDestacado {
@@ -465,7 +465,7 @@
 .metricaValor {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -566,7 +566,7 @@
 }
 
 .faqItem h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 

@@ -172,7 +172,7 @@
 .gateExpression {
   margin: 0;
   font-family: 'SF Mono', Monaco, monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -485,7 +485,7 @@
   padding: 2px 6px;
   border-radius: 4px;
   font-family: 'SF Mono', Monaco, monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Examples */
@@ -556,7 +556,7 @@
 .contentCard h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -777,7 +777,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -809,7 +809,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
 }
@@ -822,7 +822,7 @@
 }
 
 .faqTip {
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   background: rgba(72, 169, 166, 0.08);
   padding: 0.4rem 0.75rem;
   border-radius: 6px;
@@ -1040,7 +1040,7 @@
 .relatedConcepts p { color: var(--text-secondary); line-height: 1.6; }
 .relatedConcepts ul { margin: 0.75rem 0; padding-left: 1.25rem; }
 .relatedConcepts li { color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.6rem; }
-.relatedConcepts a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.relatedConcepts a { color: var(--primary-texto); font-weight: 600; text-decoration: none; }
 .relatedConcepts a:hover { text-decoration: underline; }
 .relatedConceptsTip {
   margin-top: 1rem;
@@ -1065,7 +1065,7 @@
 
 .retosTitulo {
   margin: 0 0 var(--spacing-sm);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.4rem;
 }
 
@@ -1142,7 +1142,7 @@
 
 .retoBtnCheck {
   flex-shrink: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
 }
 
@@ -1171,7 +1171,7 @@
 
 .retoEnunciado h3 {
   margin: 0 0 var(--spacing-sm);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .retoEnunciado p {
@@ -1322,7 +1322,7 @@
 .btnAyuda {
   padding: var(--spacing-xs) var(--spacing-md);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--border);
   border-radius: var(--radius);
   cursor: pointer;

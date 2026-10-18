@@ -189,7 +189,7 @@
 
 .btnSecundario:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .btnSecundario:disabled {
@@ -251,7 +251,7 @@
 .resultadoTitulo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -364,7 +364,7 @@
   border: 2px solid #2E86AB;
   border-radius: 8px;
   background: transparent;
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -442,7 +442,7 @@
 
 [data-theme='dark'] .btnSecundario:hover {
   border-color: #48A9A6;
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 /* ==========================================

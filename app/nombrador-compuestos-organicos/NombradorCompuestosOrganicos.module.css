@@ -49,7 +49,7 @@
   border: 2px solid var(--primary);
   border-radius: 12px;
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -96,7 +96,7 @@
 .panelTitulo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.85rem;
   margin-top: 1.5rem;
 }
@@ -145,7 +145,7 @@
 }
 
 .raizPista strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 
@@ -214,7 +214,7 @@
   border: 1px solid var(--primary);
   border-radius: 10px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -273,7 +273,7 @@
   font-family: 'Courier New', monospace;
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.14);
   padding: 0.12rem 0.4rem;
   border-radius: 6px;
@@ -347,7 +347,7 @@
   font-family: 'Courier New', monospace;
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   white-space: nowrap;
 }
 
@@ -407,7 +407,7 @@
 .nombreGrande {
   font-size: 1.85rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.25;
   word-break: break-word;
   margin-bottom: 0.6rem;
@@ -472,7 +472,7 @@
 .razonamiento h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-bottom: 0.5rem;
 }
 
@@ -591,7 +591,7 @@
 }
 
 .veredictoMal strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -628,7 +628,7 @@
 .alcancePanel h2 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 1rem;
 }
 
@@ -673,7 +673,7 @@
 .tipsSection h2 {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.9rem;
 }
 
@@ -823,7 +823,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* --- FAQ --- */
@@ -851,7 +851,7 @@
 .faqQuestion {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.5rem;
   line-height: 1.45;
 }

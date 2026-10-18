@@ -86,7 +86,7 @@
 .preguntaNumero {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.5rem;
@@ -220,7 +220,7 @@
 .btnReiniciar {
   background-color: transparent;
   border-color: var(--secondary);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   display: block;
   margin: 1.5rem auto 0;
 }
@@ -331,7 +331,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 
@@ -356,7 +356,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .perfilTexto {

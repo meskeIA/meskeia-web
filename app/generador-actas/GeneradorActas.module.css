@@ -106,7 +106,7 @@
 
 .btnAction:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnAction.active {
@@ -177,7 +177,7 @@
   border: 1px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -233,7 +233,7 @@
 
 .stepButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .stepButton.stepActive {
@@ -404,7 +404,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Asistentes Section */
@@ -431,7 +431,7 @@
   border: 2px dashed var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -559,7 +559,7 @@
 
 .puntoNumber {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .puntoFields {
@@ -591,7 +591,7 @@
 
 .tareaNumber {
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .tareaFields {
@@ -651,7 +651,7 @@
   font-size: 1.75rem;
   font-weight: 700;
   margin: 0 0 var(--spacing-sm);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .actaSubtitle {
@@ -668,7 +668,7 @@
 .actaSectionTitle {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
   padding-bottom: var(--spacing-sm);
   border-bottom: 1px solid #E5E5E5;
@@ -755,7 +755,7 @@
 .actaPuntoContent strong {
   display: block;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -1423,7 +1423,7 @@
 
   .actaTitle {
     font-size: 16pt;
-    color: #2E86AB;
+    color: var(--primary-texto);
   }
 
   .actaSubtitle {
@@ -1438,7 +1438,7 @@
 
   .actaSectionTitle {
     font-size: 12pt;
-    color: #2E86AB;
+    color: var(--primary-texto);
     margin-bottom: 5mm;
     padding-bottom: 2mm;
     border-bottom: 0.5pt solid #E5E5E5;
@@ -1494,7 +1494,7 @@
 
   .actaPuntoContent strong {
     font-size: 9pt;
-    color: #2E86AB;
+    color: var(--primary-texto);
   }
 
   /* Observaciones */

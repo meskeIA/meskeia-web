@@ -68,7 +68,7 @@
 
 [data-theme='dark'] .combinacionNota { background: rgba(46, 134, 171, 0.08); border-color: rgba(46, 134, 171, 0.2); }
 
-.linkInterno { color: var(--primary); text-decoration: none; font-weight: 600; }
+.linkInterno { color: var(--primary-texto); text-decoration: none; font-weight: 600; }
 .linkInterno:hover { text-decoration: underline; }
 
 /* ─── Tabs ─── */
@@ -91,7 +91,7 @@
   white-space: nowrap;
   transition: all 0.2s ease;
 }
-.tabBtn:hover { border-color: var(--primary); color: var(--primary); }
+.tabBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tabBtnActive { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .tabBtnActive:hover { color: white; }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
@@ -140,13 +140,13 @@
 }
 [data-theme='dark'] .detalleInner { background: rgba(46, 134, 171, 0.08); }
 .detalleDesc { font-size: 0.88rem; color: var(--text-secondary); margin: 0 0 var(--spacing-sm); line-height: 1.6; }
-.detalleNota { font-size: 0.82rem; color: #2E86AB; margin: 0 0 var(--spacing-sm); font-weight: 600; }
+.detalleNota { font-size: 0.82rem; color: var(--primary-texto); margin: 0 0 var(--spacing-sm); font-weight: 600; }
 .detalleGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 0; margin-bottom: var(--spacing-sm); }
 .detalleFila { display: flex; gap: var(--spacing-sm); font-size: 0.82rem; color: var(--text-secondary); flex-wrap: wrap; }
 .detalleEtiqueta { font-weight: 700; color: var(--text-primary); min-width: 140px; }
 .mejorParaRow { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--spacing-sm) 0; }
 .mejorTag { padding: 2px 8px; border: 1.5px solid; border-radius: 40px; font-size: 0.75rem; font-weight: 600; }
-.enlaceOficial { font-size: 0.82rem; color: var(--primary); text-decoration: none; }
+.enlaceOficial { font-size: 0.82rem; color: var(--primary-texto); text-decoration: none; }
 .enlaceOficial:hover { text-decoration: underline; }
 
 /* ─── Tab IA ─── */
@@ -162,7 +162,7 @@
 [data-theme='dark'] .iaModelos { background: var(--hover); }
 .iaModelosLabel { display: block; font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
 .iaModelosValor { font-size: 0.82rem; color: var(--text-secondary); }
-.iaNota { font-size: 0.8rem; color: var(--primary); margin: 0; font-weight: 600; }
+.iaNota { font-size: 0.8rem; color: var(--primary-texto); margin: 0; font-weight: 600; }
 
 .leyendaDisp { display: flex; gap: var(--spacing-lg); font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; }
 
@@ -227,7 +227,7 @@
 
 .escenariosGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
 .escenarioCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
-.escenarioCard strong { display: block; color: var(--primary); margin-bottom: 6px; font-size: 0.95rem; }
+.escenarioCard strong { display: block; color: var(--primary-texto); margin-bottom: 6px; font-size: 0.95rem; }
 .escenarioCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 [data-theme='dark'] .escenarioCard { background: var(--bg-card); border-color: var(--border); }
 

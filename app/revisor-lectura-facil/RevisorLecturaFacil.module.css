@@ -70,7 +70,7 @@
 .panelTitulo {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.85rem;
 }
 
@@ -165,7 +165,7 @@
   border: 1px solid var(--primary);
   border-radius: 10px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
@@ -201,7 +201,7 @@
 .metricaValor {
   font-size: 1.7rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.1;
 }
 
@@ -247,7 +247,7 @@
 
 .copiadoOk {
   font-size: 0.9rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
 }
 
@@ -387,7 +387,7 @@
 
 .fraseSinAvisos {
   font-size: 0.88rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
 }
 
@@ -473,7 +473,7 @@
 }
 
 .sustitucionesTable td strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* ===== CATÁLOGO DE REGLAS ===== */
@@ -519,7 +519,7 @@
 .tipsSection h2 {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.9rem;
 }
 
@@ -669,7 +669,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* --- FAQ --- */
@@ -697,7 +697,7 @@
 .faqQuestion {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.5rem;
   line-height: 1.45;
 }

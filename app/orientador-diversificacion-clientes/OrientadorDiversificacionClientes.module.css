@@ -238,7 +238,7 @@
   border: 2px dashed var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;

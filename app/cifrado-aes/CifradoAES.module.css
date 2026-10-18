@@ -65,7 +65,7 @@
 
 .modoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .modoBtn.active {
@@ -254,7 +254,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnCopy {
@@ -264,7 +264,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -545,7 +545,7 @@
 .faqItem h3 {
   font-size: 0.97rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 10px 0;
   line-height: 1.4;
 }
@@ -568,7 +568,7 @@
   padding: 1px 5px;
   font-size: 0.85em;
   font-family: 'SF Mono', Monaco, monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {
@@ -656,7 +656,7 @@
   padding: 1px 5px;
   font-size: 0.85em;
   font-family: 'SF Mono', Monaco, monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* --- Mejores Prácticas (Tips Grid) --- */

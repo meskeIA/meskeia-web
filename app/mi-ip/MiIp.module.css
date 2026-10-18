@@ -182,7 +182,7 @@
 .ipAddress {
   font-size: 2.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
   letter-spacing: 1px;
 }
@@ -554,7 +554,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -584,7 +584,7 @@
 
 .disclaimer h3 {
   margin: 0 0 var(--spacing-sm);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -682,7 +682,7 @@
 }
 
 .compIpv6 {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .compNote {
@@ -824,7 +824,7 @@
 [data-theme='dark'] .escenarioCard { border-color: #374151; }
 .escenarioHeader { display: flex; align-items: center; gap: 0.5rem; }
 .escenarioIcon { font-size: 1.5rem; }
-.escenarioTip { font-size: 0.82rem; color: var(--primary); background: rgba(46,134,171,0.07); border-left: 3px solid var(--primary); padding: 0.4rem 0.75rem; border-radius: 0 6px 6px 0; margin-top: auto; }
+.escenarioTip { font-size: 0.82rem; color: var(--primary-texto); background: rgba(46,134,171,0.07); border-left: 3px solid var(--primary); padding: 0.4rem 0.75rem; border-radius: 0 6px 6px 0; margin-top: auto; }
 
 .faqList { margin: 1.5rem 0; }
 .faqItem { border-bottom: 1px solid #e5e7eb; padding: 1rem 0; }

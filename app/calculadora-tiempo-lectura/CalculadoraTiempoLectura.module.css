@@ -136,7 +136,7 @@
 
 .ejemploBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Velocidad Section */
@@ -312,7 +312,7 @@
   display: block;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -357,7 +357,7 @@
 
 .metricaValue.denso { color: var(--warning); }
 .metricaValue.ligero { color: var(--success); }
-.metricaValue.normal { color: var(--primary); }
+.metricaValue.normal { color: var(--primary-texto); }
 
 /* Badge Section */
 .badgeSection {
@@ -459,7 +459,7 @@
 .referenciaPalabras {
   display: block;
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -478,7 +478,7 @@
 
 .eduSection h2 {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);
@@ -508,7 +508,7 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .factLabel {
@@ -633,7 +633,7 @@
 .escenarioHeader h4 {
   margin: 0;
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -652,7 +652,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 500;
   padding: 0.5rem 0.75rem;
   background: rgba(72, 169, 166, 0.08);
@@ -703,7 +703,7 @@
   display: inline-block;
   margin-top: 0.5rem;
   font-size: 0.82rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 500;
 }
 
@@ -791,7 +791,7 @@
 .tipCard h4 {
   margin: 0 0 0.4rem;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 

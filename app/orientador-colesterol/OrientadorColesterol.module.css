@@ -361,7 +361,7 @@
   font-family: monospace;
   font-size: 1rem;
   text-align: center;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin: var(--spacing-sm) 0;
 }
@@ -384,7 +384,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: bold;
   font-size: 1.2rem;
 }
@@ -506,7 +506,7 @@
 
 .escenarioCard h3 {
   font-size: 1rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
 }
 
@@ -535,7 +535,7 @@
 
 .faqItem h3 {
   font-size: 0.95rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }
@@ -608,7 +608,7 @@
 
 .tipCard h3 {
   font-size: 0.9rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }

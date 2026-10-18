@@ -106,7 +106,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navBtn:focus-visible {
@@ -196,7 +196,7 @@
 
 .btnSecundario {
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   padding: 0.6rem 1.2rem;
@@ -279,7 +279,7 @@
 
 .especieFecha {
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin-top: 0.2rem;
 }
@@ -318,7 +318,7 @@
 
 .especieDetallePeriodo {
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin: 0;
 }
@@ -345,7 +345,7 @@
 .especieDetalleDatoLabel {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.2rem;
@@ -380,7 +380,7 @@
 
 .anatomiaNavBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .anatomiaNavBtn:focus-visible {
@@ -438,7 +438,7 @@
 .anatomiaValor {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .anatomiaValorDesc {
@@ -449,7 +449,7 @@
 
 .anatomiaFlecha {
   font-size: 1.5rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .anatomiaBarraWrap {
@@ -644,7 +644,7 @@
 .hitoAnio {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }

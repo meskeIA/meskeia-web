@@ -79,7 +79,7 @@
 .sectionTitle {
   font-size: clamp(1.3rem, 2.5vw, 1.7rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.3rem;
 }
 
@@ -186,7 +186,7 @@
   text-align: center;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Doble rendija */
@@ -272,7 +272,7 @@
 
 .incertidumbreFlecha {
   font-size: 1.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   font-weight: bold;
 }
@@ -329,13 +329,13 @@
 .sliderValorActual {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .relacionFormula {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   text-align: center;
   padding: 0.5rem 1rem;
   background: rgba(72, 169, 166, 0.1);
@@ -503,7 +503,7 @@
 .superposicionLabel {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   margin-top: 2.5rem;
 }
@@ -526,7 +526,7 @@
 
 .abriendo {
   font-size: 2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   animation: girar 0.8s linear infinite;
 }
 
@@ -568,7 +568,7 @@
 .infoCardTitulo {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 
@@ -716,7 +716,7 @@
 
 .tunelDescBarrera {
   font-size: 0.88rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin: 0;
   text-align: center;
@@ -760,7 +760,7 @@
 .aplicacionTitulo {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -813,7 +813,7 @@
 .btnSecundario {
   padding: 0.6rem 1.4rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   border-radius: 8px;
   font-size: 0.9rem;
@@ -846,7 +846,7 @@
 .explicacionTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 

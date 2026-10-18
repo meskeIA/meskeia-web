@@ -191,7 +191,7 @@
   display: inline-block;
   min-width: 58px;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ---------- Sesión en curso ---------- */
@@ -217,7 +217,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .bloqueActualTitulo {
@@ -308,7 +308,7 @@
   cursor: pointer;
 }
 
-.btnTexto:hover { color: var(--primary); }
+.btnTexto:hover { color: var(--primary-texto); }
 
 .bloqueDescripcion {
   font-size: 1rem;
@@ -338,7 +338,7 @@
 .herramientaEnlace {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
 }
 
@@ -444,7 +444,7 @@
   display: block;
   font-size: 1.9rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.2;
 }
 
@@ -500,7 +500,7 @@
 .guideSection h3 {
   font-size: 1.1rem;
   margin: var(--spacing-xl) 0 var(--spacing-md);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .guideSection p {

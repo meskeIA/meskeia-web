@@ -172,7 +172,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnIcon {
@@ -202,7 +202,7 @@
 
 .btnNav:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ============ FORMULARIOS ============ */
@@ -434,7 +434,7 @@
 .disponibilidadActiva {
   background: rgba(46, 134, 171, 0.15);
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -883,7 +883,7 @@
 
 .contentCard h4 {
   margin: 0 0 var(--spacing-sm);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -1012,7 +1012,7 @@
 .escenarioHeader h3 {
   margin: 0;
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.4;
 }
 
@@ -1061,7 +1061,7 @@
 .faqItem h3 {
   margin: 0 0 var(--spacing-sm);
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.4;
 }
 

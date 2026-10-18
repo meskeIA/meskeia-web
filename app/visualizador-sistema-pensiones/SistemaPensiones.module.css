@@ -103,7 +103,7 @@
 
 .tabBoton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabActivo {
@@ -231,7 +231,7 @@
 
 .sliderValor {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.2rem;
 }
 
@@ -303,7 +303,7 @@
 
 .ratioNumero {
   font-size: 1.6rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .ratioIconos {
@@ -330,7 +330,7 @@
 .iconoExtra {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 0.2rem 0.5rem;
   background: rgba(46, 134, 171, 0.1);
   border-radius: 6px;
@@ -489,7 +489,7 @@
 .kpiValor {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.2;
 }
 
@@ -616,7 +616,7 @@
 .proyeccionValor {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex-shrink: 0;
 }
 
@@ -685,7 +685,7 @@
 
 .fondoEtiqueta {
   font-size: 0.65rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   text-align: center;
   margin-bottom: 2px;
@@ -696,7 +696,7 @@
 .fondoValor {
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .fondoAno {

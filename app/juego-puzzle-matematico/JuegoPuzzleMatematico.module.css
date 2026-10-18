@@ -547,7 +547,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   background: #EBF5FB;
   border-left: 3px solid #2E86AB;
   padding: 8px 10px;
@@ -620,7 +620,7 @@
 
 .faqTip {
   font-size: 0.82rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   background: #EBF5FB;
   border-left: 3px solid #2E86AB;
   padding: 8px 10px;

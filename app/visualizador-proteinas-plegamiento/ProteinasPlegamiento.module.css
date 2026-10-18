@@ -49,7 +49,7 @@
   border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
   color: var(--text-secondary);
 }
-.nivelTab:hover { border-color: var(--primary); color: var(--primary); }
+.nivelTab:hover { border-color: var(--primary); color: var(--primary-texto); }
 .nivelTab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .nivelTabActivo {
   border-color: var(--primary-boton); background: var(--primary-boton); color: white;
@@ -67,7 +67,7 @@
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
 .nivelHeader { text-align: center; margin-bottom: var(--spacing-lg); }
-.nivelTitulo { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.2rem; }
+.nivelTitulo { font-size: 1.2rem; font-weight: 700; color: var(--primary-texto); margin-bottom: 0.2rem; }
 .nivelSubtitulo { font-size: 0.9rem; color: var(--text-secondary); margin: 0; }
 
 /* safe: si el dibujo desborda, se alinea al principio y su borde izquierdo se alcanza con el
@@ -96,7 +96,7 @@
   border-radius: var(--radius); padding: var(--spacing-lg);
 }
 .funnelTexto { display: flex; flex-direction: column; gap: var(--spacing-md); }
-.funnelSubtitulo { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0 0 0.4rem; }
+.funnelSubtitulo { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 0.4rem; }
 .funnelTexto p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
 
 /* ─── Tipos funcionales ─── */
@@ -140,7 +140,7 @@
 .enfermedadIcono { font-size: 1.8rem; flex-shrink: 0; }
 .enfermedadInfo { flex: 1; }
 .enfermedadNombre { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem; }
-.enfermedadProteina { font-size: 0.82rem; color: var(--secondary); margin: 0; font-weight: 600; }
+.enfermedadProteina { font-size: 0.82rem; color: var(--secondary-texto); margin: 0; font-weight: 600; }
 .enfermedadToggle { font-size: 0.75rem; color: var(--text-muted); flex-shrink: 0; }
 
 .enfermedadDetalle {

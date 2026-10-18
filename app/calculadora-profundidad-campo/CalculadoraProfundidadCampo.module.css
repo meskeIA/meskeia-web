@@ -64,7 +64,7 @@
 
 .presetChip:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .presetChip:focus-visible {
@@ -156,7 +156,7 @@
 
 .valueBadge {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
   background: #eff6ff;
@@ -194,7 +194,7 @@
 
 .focalChip:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .chipActive {
@@ -235,7 +235,7 @@
 
 .aperturaBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .aperturaActive {
@@ -370,7 +370,7 @@
 }
 
 .guideParagraph a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 
@@ -418,7 +418,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -461,13 +461,13 @@
 }
 
 .faqItem a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 
 .faqTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
@@ -549,7 +549,7 @@
 }
 
 .tipCard a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 

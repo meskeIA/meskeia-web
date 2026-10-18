@@ -418,9 +418,9 @@ export default function SelectorFormaJuridica() {
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem', fontSize: '0.93rem' }}>
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: '0.5rem 0.75rem', borderBottom: '2px solid var(--primary)', color: 'var(--primary)' }}>Aspecto</th>
-              <th style={{ textAlign: 'left', padding: '0.5rem 0.75rem', borderBottom: '2px solid var(--primary)', color: 'var(--primary)' }}>Autónomo</th>
-              <th style={{ textAlign: 'left', padding: '0.5rem 0.75rem', borderBottom: '2px solid var(--primary)', color: 'var(--primary)' }}>Sociedad Limitada</th>
+              <th style={{ textAlign: 'left', padding: '0.5rem 0.75rem', borderBottom: '2px solid var(--primary)', color: 'var(--primary-texto)' }}>Aspecto</th>
+              <th style={{ textAlign: 'left', padding: '0.5rem 0.75rem', borderBottom: '2px solid var(--primary)', color: 'var(--primary-texto)' }}>Autónomo</th>
+              <th style={{ textAlign: 'left', padding: '0.5rem 0.75rem', borderBottom: '2px solid var(--primary)', color: 'var(--primary-texto)' }}>Sociedad Limitada</th>
             </tr>
           </thead>
           <tbody>
@@ -447,7 +447,7 @@ export default function SelectorFormaJuridica() {
           </tbody>
         </table>
 
-        <h3 style={{ marginTop: '1.5rem', color: 'var(--primary)', fontSize: '1rem' }}>
+        <h3 style={{ marginTop: '1.5rem', color: 'var(--primary-texto)', fontSize: '1rem' }}>
           ¿Cuándo puede el IS ser más favorable que el IRPF?
         </h3>
         <p>
@@ -459,7 +459,7 @@ export default function SelectorFormaJuridica() {
           cotizaciones a la Seguridad Social y los gastos de gestión de la SL.
         </p>
 
-        <h3 style={{ marginTop: '1.25rem', color: 'var(--primary)', fontSize: '1rem' }}>
+        <h3 style={{ marginTop: '1.25rem', color: 'var(--primary-texto)', fontSize: '1rem' }}>
           Capital mínimo desde 2023: 1 €
         </h3>
         <p>

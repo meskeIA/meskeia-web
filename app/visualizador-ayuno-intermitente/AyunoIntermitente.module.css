@@ -47,7 +47,7 @@
   border: 2px solid var(--primary);
   border-radius: 2rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -79,7 +79,7 @@
 .seccionTitulo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -160,7 +160,7 @@
 .faseTitulo {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.25rem;
 }
 
@@ -220,7 +220,7 @@
 }
 
 .procesoCheck {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -257,7 +257,7 @@
 .autofagiaCard h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -305,7 +305,7 @@
 .tipoNombre {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.2rem;
 }
 

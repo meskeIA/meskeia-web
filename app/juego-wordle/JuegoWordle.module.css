@@ -427,7 +427,7 @@
 
 .escenarioTip {
   font-size: 0.8rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-style: italic;
   margin: 0;
   padding: 8px 10px;
@@ -484,7 +484,7 @@
 
 .faqItem details summary::before {
   content: '+';
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-size: 1.1rem;
   font-weight: 700;
   flex-shrink: 0;
@@ -515,7 +515,7 @@
 
 .faqTip {
   margin-top: 8px !important;
-  color: #48A9A6 !important;
+  color: var(--secondary-texto) !important;
   font-style: italic;
   font-size: 0.82rem !important;
 }

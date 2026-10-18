@@ -648,7 +648,7 @@ export default function ConstructorPrompts() {
           La estructura más efectiva sigue el esquema <strong>ROL + CONTEXTO + TAREA + FORMATO + RESTRICCIONES</strong>. No es necesario incluir los cinco elementos en todos los prompts: para tareas simples basta con tarea y formato. Para tareas complejas o que requieren especialización, añadir rol y contexto mejora notablemente la calidad de la respuesta.
         </p>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Comparativa: prompt básico vs. prompt completo
         </h4>
         <div className={styles.tableWrapper}>
@@ -690,7 +690,7 @@ export default function ConstructorPrompts() {
           </table>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Perfiles de usuario y sus prompts más frecuentes
         </h4>
         <div className={styles.escenariosGrid}>
@@ -712,7 +712,7 @@ export default function ConstructorPrompts() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Preguntas frecuentes
         </h4>
         <ul className={styles.faqList}>
@@ -738,7 +738,7 @@ export default function ConstructorPrompts() {
           </li>
         </ul>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           5 técnicas avanzadas de prompting
         </h4>
         <div className={styles.stepGuide}>
@@ -774,7 +774,7 @@ export default function ConstructorPrompts() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Buenas prácticas
         </h4>
         <div className={styles.tipsGrid}>

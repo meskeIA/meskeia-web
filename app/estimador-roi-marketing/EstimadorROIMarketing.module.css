@@ -322,7 +322,7 @@
 }
 
 .valorBueno {
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
 }
 
 .valorMalo {
@@ -411,7 +411,7 @@
 .rankingPosicion {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 40px;
 }
 
@@ -504,7 +504,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -561,7 +561,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .tipsList li strong {
@@ -815,7 +815,7 @@
 
 .eduComparativaSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -885,7 +885,7 @@
 
 .eduEscenariosSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -940,7 +940,7 @@
 
 .eduEscenarioTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
   padding: var(--spacing-xs) var(--spacing-sm);
   background: rgba(46, 134, 171, 0.1);
@@ -957,7 +957,7 @@
 
 .eduFaqSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -1002,7 +1002,7 @@
 
 .eduStepSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -1060,7 +1060,7 @@
 
 .eduTipsSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-lg);
 }
 

@@ -397,7 +397,7 @@
 
 .escenarioTip {
   font-size: 0.825rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.08);
   border-left: 3px solid #2E86AB;
   padding: 8px 10px;
@@ -456,7 +456,7 @@
 .faqItem details summary::after {
   content: '+';
   font-size: 1.2rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   flex-shrink: 0;
 }
 
@@ -482,7 +482,7 @@
 
 .faqTip {
   font-size: 0.825rem !important;
-  color: #48A9A6 !important;
+  color: var(--secondary-texto) !important;
   background: rgba(72, 169, 166, 0.08);
   border-left: 3px solid #48A9A6;
   padding: 8px 10px !important;

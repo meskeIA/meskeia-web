@@ -68,12 +68,12 @@
 }
 
 .tab:hover {
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   background: var(--bg-card, #fff);
 }
 
 .tabActive {
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   border-color: var(--border-color, #E5E5E5);
   border-bottom-color: var(--bg-card, #fff);
   background: var(--bg-card, #fff);
@@ -255,7 +255,7 @@
 
 .reaccionBtn:hover {
   border-color: var(--primary, #2E86AB);
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .reaccionBtn:focus-visible {
@@ -279,7 +279,7 @@
 .reaccionTitulo {
   font-size: 1.3rem;
   margin: 0 0 1rem;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .reaccionEcuacion {
@@ -360,7 +360,7 @@
 .seccionTitulo {
   font-size: 1.4rem;
   margin: 0 0 0.5rem;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .subseccionTitulo {
@@ -406,7 +406,7 @@
 
 .toggleBtn:hover {
   border-color: var(--primary, #2E86AB);
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .toggleBtn:focus-visible {
@@ -511,7 +511,7 @@
 .seaNombre {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -550,7 +550,7 @@
 
 .isomeriaBtn:hover {
   border-color: var(--primary, #2E86AB);
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .isomeriaBtn:focus-visible {
@@ -574,7 +574,7 @@
 .isomeriaDetalle h3 {
   font-size: 1.2rem;
   margin: 0 0 0.75rem;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .isomeriaDetalle > p {

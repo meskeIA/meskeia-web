@@ -124,7 +124,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -153,7 +153,7 @@
 
 .btnSecundario:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecundario:disabled {
@@ -177,7 +177,7 @@
 
 .btnIntercambiar:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--focus);
 }
 
@@ -296,7 +296,7 @@
   display: block;
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 4px;
 }
 
@@ -350,7 +350,7 @@
 .faqQuestion::before {
   content: '▶ ';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqItem[open] .faqQuestion::before {
@@ -371,7 +371,7 @@
   border-radius: 4px;
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Casos de uso */
@@ -462,7 +462,7 @@
 .tipCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 8px;
 }
 

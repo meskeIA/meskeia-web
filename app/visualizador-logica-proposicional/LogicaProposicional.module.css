@@ -70,11 +70,11 @@
 }
 
 .tabBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabBtnActivo {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
   font-weight: 600;
 }
@@ -131,7 +131,7 @@
   align-self: flex-start;
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   padding: 0.4rem 0;
   border-bottom: 2px solid transparent;
@@ -146,7 +146,7 @@
 .sectionTitle {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -184,7 +184,7 @@
 .conectorSimbolo {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .conectorNombre {
@@ -200,7 +200,7 @@
   padding: 0.75rem 1rem;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
   margin: 0;
   word-break: break-word;
@@ -254,7 +254,7 @@
 .operadorDisplay {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 0 0.25rem;
 }
 
@@ -370,7 +370,7 @@
 }
 
 .filaActivaLeyenda {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -380,7 +380,7 @@
   border-radius: 8px;
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─── Evaluador ──────────────────────────────────── */
@@ -420,7 +420,7 @@
   border: 1px solid var(--primary);
   border-radius: 20px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
@@ -480,7 +480,7 @@
 
 .formaBtnActivo {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: #e8f4f9;
 }
 
@@ -504,7 +504,7 @@
   padding: 1rem;
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: pre-wrap;
   word-break: break-word;
   line-height: 1.7;
@@ -540,7 +540,7 @@
 .eduSectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.75rem 0 0.85rem;
   padding-bottom: 0.4rem;
   border-bottom: 2px solid #e5e7eb;
@@ -557,7 +557,7 @@
 
 .comparativaTable th {
   background: #f0f7fb;
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 0.55rem 0.75rem;
   text-align: left;
   font-weight: 600;
@@ -578,7 +578,7 @@
 .simboloCell {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   font-family: 'Courier New', monospace;
 }
@@ -657,7 +657,7 @@
   padding: 0.1em 0.35em;
   font-family: 'Courier New', monospace;
   font-size: 0.85em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {
@@ -665,7 +665,7 @@
   border-radius: 6px;
   padding: 0.35rem 0.75rem;
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
   margin-top: 0.35rem;
 }

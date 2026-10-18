@@ -71,7 +71,7 @@
 .fechasTitulo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
 }
 
@@ -105,7 +105,7 @@
 
 .fechaFecha {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
   min-width: 48px;
 }
@@ -224,7 +224,7 @@
 }
 
 .progresoPorcentaje {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -264,7 +264,7 @@
 
 .btnAccion:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnDescargar {
@@ -515,7 +515,7 @@
 .eduSectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);
@@ -626,7 +626,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   margin: 0;
   padding: 0.5rem 0.75rem;
@@ -670,7 +670,7 @@
 .faqTip {
   display: block;
   margin-top: 0.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 

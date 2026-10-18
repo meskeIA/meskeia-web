@@ -16,7 +16,7 @@
   text-align: center;
   display: flex; flex-direction: column; gap: 0.2rem;
 }
-.statNum { font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; }
+.statNum { font-size: 1.8rem; font-weight: 700; color: var(--primary-texto); line-height: 1; }
 .statLabel { font-size: 0.78rem; color: var(--text-secondary); }
 
 /* ── Filtros ── */
@@ -54,7 +54,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
 }
-.filtroBtn:hover { border-color: var(--primary); color: var(--primary); }
+.filtroBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .filtroBtnActivo { color: white !important; border-color: transparent !important; background: var(--primary-boton); }
 
 .resultadosInfo { font-size: 0.82rem; color: var(--text-secondary); margin: 0; }
@@ -99,7 +99,7 @@
 
 .figuraDefinicionPreview { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.5; margin: 0; flex: 1; }
 .figuraEjemploPreview { font-size: 0.8rem; color: var(--text-secondary); margin: 0; font-style: italic; }
-.figuraVerMas { font-size: 0.78rem; font-weight: 600; color: var(--primary); margin-top: auto; }
+.figuraVerMas { font-size: 0.78rem; font-weight: 600; color: var(--primary-texto); margin-top: auto; }
 
 /* ── Sin resultados ── */
 .sinResultados { text-align: center; padding: 3rem 1rem; color: var(--text-secondary); }
@@ -210,7 +210,7 @@
 
 .parClaves { display: flex; flex-direction: column; gap: 0.35rem; }
 .parClave { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.45; }
-.parClaveLabel { font-weight: 700; color: var(--primary); margin-right: 0.3rem; }
+.parClaveLabel { font-weight: 700; color: var(--primary-texto); margin-right: 0.3rem; }
 .parClaveTexto { font-style: italic; }
 
 /* ── CTA ── */
@@ -228,7 +228,7 @@
 .ctaBtn {
   white-space: nowrap;
   padding: 0.85rem 1.75rem;
-  background: white; color: var(--primary);
+  background: white; color: var(--primary-boton);
   border-radius: 10px;
   font-size: 0.95rem; font-weight: 700;
   text-decoration: none;

@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -51,7 +51,7 @@
 .timelineHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.4rem; flex-wrap: wrap; }
 .timelineIcono { font-size: 1.2rem; }
 .timelineNombre { font-size: 0.92rem; color: var(--text-primary); }
-.timelineDuracion { font-size: 0.78rem; color: var(--primary); font-weight: 600; margin-left: auto; }
+.timelineDuracion { font-size: 0.78rem; color: var(--primary-texto); font-weight: 600; margin-left: auto; }
 
 .duracionBarra { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 0.3rem; }
 .duracionRelleno { height: 100%; border-radius: 3px; transition: width 0.3s; min-width: 4px; }
@@ -63,7 +63,7 @@
 /* ─── Sección Oficios ─── */
 .filtroGrid { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); justify-content: center; }
 .filtroBtn { padding: 0.5rem 1rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.2s; color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; }
-.filtroBtn:hover { border-color: var(--filtro-color, var(--primary)); color: var(--filtro-color, var(--primary)); }
+.filtroBtn:hover { border-color: var(--filtro-color, var(--primary)); color: var(--filtro-color, var(--primary-texto)); }
 .filtroBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .filtroActivo { border-color: var(--filtro-color, var(--primary-boton)); background: var(--filtro-color, var(--primary-boton)); color: white; }
 .filtroActivo:hover { color: white; }
@@ -73,7 +73,7 @@
 .oficioHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
 .oficioIcono { font-size: 1.3rem; flex-shrink: 0; }
 .oficioNombre { display: block; font-size: 0.9rem; color: var(--text-primary); }
-.oficioFase { display: block; font-size: 0.72rem; color: var(--oficio-color, var(--primary)); font-weight: 600; }
+.oficioFase { display: block; font-size: 0.72rem; color: var(--oficio-color, var(--primary-texto)); font-weight: 600; }
 .oficioNum { margin-left: auto; font-size: 0.82rem; font-weight: 700; color: var(--text-muted); background: var(--hover); padding: 0.2rem 0.5rem; border-radius: 10px; white-space: nowrap; }
 .oficioDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
 
@@ -83,7 +83,7 @@
 .materialHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
 .materialIcono { font-size: 1.4rem; flex-shrink: 0; }
 .materialNombre { display: block; font-size: 0.92rem; color: var(--text-primary); }
-.materialCantidad { display: block; font-size: 0.82rem; color: var(--primary); font-weight: 600; }
+.materialCantidad { display: block; font-size: 0.82rem; color: var(--primary-texto); font-weight: 600; }
 .materialBarra { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: var(--spacing-sm); }
 .materialRelleno { height: 100%; border-radius: 3px; transition: width 0.3s; min-width: 4px; }
 .materialDetalle { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
@@ -119,7 +119,7 @@
 .etapaNombre { font-size: 0.85rem; color: var(--text-primary); flex: 1; }
 .etapaTipo { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; }
 .etapaMeses { display: flex; align-items: center; gap: var(--spacing-sm); }
-.etapaMesesValor { font-size: 0.82rem; font-weight: 700; color: var(--primary); white-space: nowrap; min-width: 80px; }
+.etapaMesesValor { font-size: 0.82rem; font-weight: 700; color: var(--primary-texto); white-space: nowrap; min-width: 80px; }
 .etapaBarra { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
 .etapaRelleno { height: 100%; border-radius: 3px; transition: width 0.3s; min-width: 3px; }
 .etapaDetalle { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0.4rem 0 0 0; padding-top: 0.4rem; border-top: 1px solid var(--border); }
@@ -129,7 +129,7 @@
 .totalHeader { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
 .totalIcono { font-size: 1.5rem; }
 .totalLabel { font-size: 0.95rem; color: var(--text-secondary); font-weight: 600; }
-.totalValor { display: block; font-size: 2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; }
+.totalValor { display: block; font-size: 2rem; font-weight: 700; color: var(--primary-texto); margin-bottom: 0.3rem; }
 .totalDetalle { display: block; font-size: 0.85rem; color: var(--text-muted); }
 
 .insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); color: var(--text-primary); line-height: 1.6; }

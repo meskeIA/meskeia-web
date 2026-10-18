@@ -15,7 +15,7 @@
 
 .resultadoGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px; }
 .resCard { background: color-mix(in srgb, var(--primary) 8%, var(--bg-card)); border: 2px solid color-mix(in srgb, var(--primary) 30%, transparent); border-radius: 14px; padding: 22px; text-align: center; }
-.resValor { display: block; font-size: 2rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+.resValor { display: block; font-size: 2rem; font-weight: 700; color: var(--primary-texto); line-height: 1.1; }
 .resLabel { display: block; font-size: 0.82rem; color: var(--text-secondary); margin-top: 6px; }
 .placeholder { margin-top: 20px; font-size: 0.95rem; color: var(--text-muted); text-align: center; }
 .regla { margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; text-align: center; }
@@ -28,12 +28,12 @@
 .tabla td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
 .tabla tbody tr:hover { background: var(--hover); }
 .celNombre { font-weight: 500; color: var(--text-primary); white-space: nowrap; }
-.celTemp { font-weight: 700; color: var(--primary); }
+.celTemp { font-weight: 700; color: var(--primary-texto); }
 .celNota { font-size: 0.83rem; }
 
 .educationalContent { padding: 8px 0; }
 .conceptoSection { margin-bottom: 40px; }
-.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
+.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary-texto); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
 .conceptoSection p { color: var(--text-secondary); line-height: 1.65; font-size: 0.95rem; }
 
 .tipsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }

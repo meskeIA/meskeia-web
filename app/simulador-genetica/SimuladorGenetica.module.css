@@ -270,7 +270,7 @@
 .crossSymbol {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Botón de Cruce */
@@ -479,7 +479,7 @@
   padding-top: var(--spacing-md);
   border-top: 1px solid var(--border);
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Simulación de Población */
@@ -603,7 +603,7 @@
 
 .chiSquareTitle {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -830,7 +830,7 @@
 .crossTypeBtn.active {
   background: rgba(46, 134, 171, 0.1);
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .crossTypeBtn {
@@ -889,11 +889,11 @@
 }
 
 .tab:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tab.active {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
 }
 
@@ -910,7 +910,7 @@
 
 .guideSection h3 {
   font-size: 1.05rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.25rem 0 0.5rem;
 }
 
@@ -1069,7 +1069,7 @@
   margin: 0 0 0.5rem;
   font-weight: 600;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioExample code {
@@ -1089,7 +1089,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ========================================
@@ -1126,7 +1126,7 @@
 
 .faqItem h4 {
   margin: 0 0 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   line-height: 1.5;
 }
@@ -1432,7 +1432,7 @@
 .casosTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casosIntro {
@@ -1464,7 +1464,7 @@
 
 .casoBoton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casoBoton:focus-visible {
@@ -1493,7 +1493,7 @@
 .casoTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.1rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .casoEnunciado {
@@ -1584,7 +1584,7 @@
   min-height: 44px;
   padding: var(--spacing-xs) var(--spacing-md);
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
   border: 1px solid var(--primary);
   border-radius: var(--radius);

@@ -77,7 +77,7 @@
   padding: 0.75rem 1.25rem; font-size: 0.9rem; color: var(--text-secondary);
   cursor: pointer; transition: border-color 0.18s, color 0.18s; min-width: 110px;
 }
-.btnAnterior:hover { border-color: var(--primary); color: var(--primary); }
+.btnAnterior:hover { border-color: var(--primary); color: var(--primary-texto); }
 .btnAnterior:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnSiguiente {
   background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
@@ -124,7 +124,7 @@
   font-size: 0.88rem; color: var(--text-primary); line-height: 1.5;
   padding: 0.3rem 0; display: flex; gap: 0.5rem;
 }
-.beneficioItem::before { content: '✓'; color: var(--secondary); font-weight: 700; flex-shrink: 0; }
+.beneficioItem::before { content: '✓'; color: var(--secondary-texto); font-weight: 700; flex-shrink: 0; }
 
 /* ─── Equipo/Materiales ────────────────────────────────────────── */
 .equipoSection {
@@ -139,7 +139,7 @@
   font-size: 0.88rem; color: var(--text-primary); line-height: 1.5;
   padding: 0.3rem 0; display: flex; gap: 0.5rem;
 }
-.equipoItem::before { content: '→'; color: var(--primary); font-weight: 700; flex-shrink: 0; }
+.equipoItem::before { content: '→'; color: var(--primary-texto); font-weight: 700; flex-shrink: 0; }
 
 /* ─── Consejos ─────────────────────────────────────────────────── */
 .consejosSection {

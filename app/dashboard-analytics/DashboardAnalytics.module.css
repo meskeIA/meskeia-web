@@ -62,7 +62,7 @@
 
 .title {
   font-size: 2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 10px;
   font-weight: 700;
   display: flex;
@@ -141,7 +141,7 @@
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -157,7 +157,7 @@
 }
 
 .filterActive {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.85rem;
   font-weight: 500;
 }
@@ -228,7 +228,7 @@
 .tabButton:hover {
   background: var(--hover);
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabButton.active {
@@ -307,7 +307,7 @@
 
 .statContent h3 {
   font-size: 1.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   margin: 0 0 4px 0;
 }
@@ -361,7 +361,7 @@
 
 .deviceCard strong {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .deviceCard span {
@@ -407,7 +407,7 @@
 
 .geoRank {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 30px;
 }
 
@@ -419,7 +419,7 @@
 
 .geoCount {
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* Table */
@@ -440,7 +440,7 @@
   padding: 12px 16px;
   text-align: left;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   border-bottom: 2px solid var(--primary);
   white-space: nowrap;
@@ -464,7 +464,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   background: var(--focus);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Status Bar */
@@ -636,7 +636,7 @@
 
 .comboboxOptionUsos {
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -851,7 +851,7 @@
 .appsDistintasValor {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .appsDistintasLabel {
@@ -935,7 +935,7 @@
 .comparativaValor {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 12px;
   line-height: 1;
 }
@@ -1028,7 +1028,7 @@
 
 .filtroModoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroModoActivo {
@@ -1049,7 +1049,7 @@
   border-radius: 10px;
   font-size: 0.75rem;
   background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .badgeMCP {
@@ -1058,7 +1058,7 @@
   border-radius: 10px;
   font-size: 0.75rem;
   background: rgba(72, 169, 166, 0.15);
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 .rowMCP {
@@ -1151,7 +1151,7 @@
   border-radius: 10px;
   font-size: 0.75rem;
   background: rgba(72, 169, 166, 0.12);
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 .rowShare {
@@ -1176,7 +1176,7 @@
 }
 
 .gateTitle {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.6rem;
   margin: 0 0 0.75rem;
 }
@@ -1340,7 +1340,7 @@
 }
 
 .thBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .thBtn:focus-visible {
@@ -1349,5 +1349,5 @@
 }
 
 .thBtnActivo {
-  color: var(--primary);
+  color: var(--primary-texto);
 }

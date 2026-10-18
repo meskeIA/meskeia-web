@@ -180,7 +180,7 @@
 .categoriaBadge {
   display: inline-block;
   background: rgba(46,134,171,0.12);
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 12px;
   padding: 0.2rem 0.75rem;
   font-size: 0.75rem;
@@ -316,7 +316,7 @@
   gap: 0.3rem;
 }
 
-.statValor { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+.statValor { font-size: 1.8rem; font-weight: 800; color: var(--primary-texto); }
 .statLabel { font-size: 0.8rem; color: var(--text-secondary); }
 
 .erroresSection { width: 100%; text-align: left; }
@@ -404,7 +404,7 @@
 
 .faqGrid { display: flex; flex-direction: column; gap: 1rem; }
 .faqItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
-.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary); }
+.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary-texto); }
 .faqItem p { font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.55; }
 
 .stepsGrid {

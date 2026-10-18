@@ -133,7 +133,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroBtn:focus-visible {
@@ -217,7 +217,7 @@
 .codigo {
   font-size: 1.15rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: monospace;
 }
 
@@ -227,7 +227,7 @@
   padding: 0.2rem 0.6rem;
   border-radius: 10px;
   background: rgba(46,134,171,0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -311,7 +311,7 @@
 .guideSection h2 {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
 }
 
@@ -443,7 +443,7 @@
 .faqItem h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -459,7 +459,7 @@
   border-radius: 8px;
   padding: 0.6rem 0.8rem;
   font-size: 0.85rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
 }
 
 /* ── Guía paso a paso ── */

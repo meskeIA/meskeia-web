@@ -96,7 +96,7 @@
 
 .limpiarBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .limpiarBtn:focus-visible {
@@ -236,12 +236,12 @@
 .expr {
   font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
 .exprValor {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .flecha {
@@ -259,7 +259,7 @@
   margin-top: 4px;
   margin-right: 4px;
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.12);
   border-radius: 4px;
   padding: 2px 6px;
@@ -287,7 +287,7 @@
 
 .detalle h3 {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-xs) 0;
 }
 
@@ -306,7 +306,7 @@
 }
 
 .tecnicaBox h3 {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .tecnicaBox p {
@@ -414,7 +414,7 @@
 }
 
 .guideSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.25rem;
   margin-bottom: var(--spacing-sm);
 }
@@ -490,7 +490,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -518,7 +518,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -571,7 +571,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -605,7 +605,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 

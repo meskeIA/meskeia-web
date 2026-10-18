@@ -45,7 +45,7 @@
 .tituloSeccion {
   font-size: clamp(1.3rem, 3vw, 1.7rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
   text-align: center;
 }

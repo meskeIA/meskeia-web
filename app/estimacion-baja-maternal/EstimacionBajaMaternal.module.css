@@ -62,7 +62,7 @@
 .cardTitle {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border);
@@ -122,7 +122,7 @@
 }
 
 .radioInput:checked + .radioText {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -226,7 +226,7 @@
   transition: all 0.3s ease;
 }
 
-.btnSecondary:hover { border-color: var(--primary); color: var(--primary); }
+.btnSecondary:hover { border-color: var(--primary); color: var(--primary-texto); }
 .btnSecondary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* Resultados */
@@ -248,7 +248,7 @@
 .resultadoValor {
   font-size: 3rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -256,7 +256,7 @@
   display: inline-block;
   padding: 0.3rem 1rem;
   background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -411,7 +411,7 @@
 .fechaValue {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultNote {
@@ -488,7 +488,7 @@
 
 .comparativaTable tbody td:first-child {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .comparativaTable thead th {
@@ -589,7 +589,7 @@
   margin: 0 0 0.6rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqItem p {
@@ -637,7 +637,7 @@
   margin: 0;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .stepCard p {
@@ -680,7 +680,7 @@
   margin: 0;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipCard p {

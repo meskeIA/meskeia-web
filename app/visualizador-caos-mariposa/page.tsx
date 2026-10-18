@@ -239,7 +239,7 @@ export default function CaosMariposaPage() {
 
         {/* Leyenda */}
         <div className={styles.leyenda}>
-          <span className={styles.leyendaItem} style={{ color: '#2E86AB' }}>
+          <span className={styles.leyendaItem} style={{ color: 'var(--primary-texto)' }}>
             ■ Trayectoria 1 (x₀ = 0.1)
           </span>
           <span className={styles.leyendaItem} style={{ color: '#E67E22' }}>

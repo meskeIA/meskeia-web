@@ -550,7 +550,7 @@
   display: block;
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
   padding: var(--spacing-sm);
   border-radius: var(--radius);
@@ -619,7 +619,7 @@
 .eduSectionTitle {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-lg) 0;
   padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--primary);
@@ -723,7 +723,7 @@
 }
 
 .scenarioTip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* FAQ */
@@ -743,7 +743,7 @@
 .faqQuestion {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm) 0;
 }
 
@@ -1041,7 +1041,7 @@
 .guiaPrincipio {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   margin: 0 0 var(--spacing-md) 0;
 }
 
@@ -1133,7 +1133,7 @@
 
 .guiaEnlace {
   font-size: 0.9rem;
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   text-decoration: underline;
 }
 

@@ -95,7 +95,7 @@
 
 .tabBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 
@@ -128,7 +128,7 @@
 
 [data-theme='dark'] .tabBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ── Tarjeta principal ── */
@@ -277,7 +277,7 @@
 .btnSecundario {
   padding: 0.55rem 1.2rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   border-radius: 8px;
   font-size: 0.9rem;
@@ -425,7 +425,7 @@
 
 .subtab:hover {
   border-color: var(--secondary);
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .subtab:focus-visible {
@@ -498,7 +498,7 @@
 .resultValor {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .ejemploBox {
@@ -603,14 +603,14 @@
 .escenarioHeader { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
 .escenarioIcon { font-size: 1.75rem; line-height: 1; }
 .escenarioHeader h3 { font-size: 1rem; font-weight: 600; color: var(--text-primary); margin: 0; }
-.escenarioTip { font-size: 0.875rem; color: var(--secondary); margin-top: 0.5rem; }
+.escenarioTip { font-size: 0.875rem; color: var(--secondary-texto); margin-top: 0.5rem; }
 [data-theme='dark'] .escenarioCard { border-color: #333; }
 
 .faqList { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
 .faqItem { background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-left: 3px solid var(--primary); border-radius: 8px; padding: 1.25rem; }
-.faqItem h4 { color: var(--primary); font-size: 0.95rem; margin: 0 0 0.5rem; }
+.faqItem h4 { color: var(--primary-texto); font-size: 0.95rem; margin: 0 0 0.5rem; }
 .faqItem p { color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; margin: 0 0 0.5rem; }
-.faqTip { font-size: 0.8rem; color: var(--secondary); background: rgba(72,169,166,0.08); border-radius: 6px; padding: 0.5rem 0.75rem; }
+.faqTip { font-size: 0.8rem; color: var(--secondary-texto); background: rgba(72,169,166,0.08); border-radius: 6px; padding: 0.5rem 0.75rem; }
 [data-theme='dark'] .faqItem { border-color: #333; border-left-color: var(--primary); }
 
 .stepGuide { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }

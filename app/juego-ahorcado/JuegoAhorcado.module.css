@@ -80,7 +80,7 @@
 
 .categoriaBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .categoriaBtn.active {
@@ -145,7 +145,7 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -174,7 +174,7 @@
 
 .estadoJugando {
   background: #EBF8FF;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .estadoGanado {
@@ -225,7 +225,7 @@
 }
 
 .letraRevelada {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .letraPerdida {
@@ -329,7 +329,7 @@
 
 .btnReset:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ── Sección educativa ── */
@@ -446,7 +446,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.08);
   border-left: 3px solid var(--primary);
   padding: 0.5rem 0.75rem;
@@ -501,7 +501,7 @@
 .faqItem details summary::before {
   content: '▶';
   font-size: 0.65rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }
@@ -526,7 +526,7 @@
 
 .faqTip {
   font-size: 0.85rem !important;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   background: rgba(46, 134, 171, 0.07);
   border-left: 3px solid var(--primary);
   padding: 0.5rem 0.75rem !important;

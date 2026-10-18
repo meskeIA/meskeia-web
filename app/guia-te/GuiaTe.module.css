@@ -93,7 +93,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroActivo {
@@ -280,7 +280,7 @@
 .prepValor {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Notas de sabor */
@@ -308,7 +308,7 @@
   display: inline-block;
   padding: 0.18rem 0.55rem;
   background: rgba(72, 169, 166, 0.1);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   border-radius: 10px;
   font-size: 0.78rem;
   font-weight: 500;
@@ -451,7 +451,7 @@
 .faqItem strong {
   display: block;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
 }
 
@@ -467,7 +467,7 @@
   margin-top: 0.4rem;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* Guía paso a paso */
@@ -620,7 +620,7 @@
 
 [data-theme='dark'] .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .card {

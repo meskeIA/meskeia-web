@@ -51,7 +51,7 @@
   padding: var(--spacing-xs, 0.25rem) var(--spacing-sm, 0.5rem);
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   background: transparent;
   border: 1px solid var(--primary, #2e86ab);
   border-radius: var(--radius, 12px);
@@ -114,7 +114,7 @@
 .changelogDate {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs, 0.25rem);
 }
 

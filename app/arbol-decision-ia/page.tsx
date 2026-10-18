@@ -521,7 +521,7 @@ export default function ArbolDecisionIa() {
           Gini mide qué tan mezcladas están las clases en un grupo. Si todos los ejemplos son de la misma clase, Gini = 0 (puro). Si hay un 50/50, Gini = 0,5 (máximo desorden). El algoritmo prueba todas las características disponibles y elige la que más reduce el Gini al dividir los datos. Este proceso se repite recursivamente hasta que los nodos son puros o se alcanza la profundidad máxima.
         </p>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Comparativa de algoritmos de árbol
         </h4>
         <div className={styles.tableWrapper}>
@@ -539,7 +539,7 @@ export default function ArbolDecisionIa() {
           </table>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Casos de uso reales
         </h4>
         <div className={styles.escenariosGrid}>
@@ -561,7 +561,7 @@ export default function ArbolDecisionIa() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Preguntas frecuentes
         </h4>
         <ul className={styles.faqList}>
@@ -587,7 +587,7 @@ export default function ArbolDecisionIa() {
           </li>
         </ul>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Ciclo completo de un árbol de decisión real
         </h4>
         <div className={styles.stepGuide}>
@@ -617,7 +617,7 @@ export default function ArbolDecisionIa() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Buenas prácticas
         </h4>
         <div className={styles.tipsGrid}>

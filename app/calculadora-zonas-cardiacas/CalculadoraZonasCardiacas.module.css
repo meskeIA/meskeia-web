@@ -256,7 +256,7 @@
 .resumenValue {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.2;
 }
 
@@ -469,7 +469,7 @@
 .formulaTex {
   font-family: 'Courier New', monospace;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: block;
   margin-bottom: 0.25rem;
 }

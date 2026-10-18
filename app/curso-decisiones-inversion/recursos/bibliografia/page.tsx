@@ -186,7 +186,7 @@ export default function BibliografiaPage() {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                     <h3 style={{
-                      color: 'var(--primary)',
+                      color: 'var(--primary-texto)',
                       fontSize: '1.1rem',
                       fontWeight: 600,
                       margin: 0,

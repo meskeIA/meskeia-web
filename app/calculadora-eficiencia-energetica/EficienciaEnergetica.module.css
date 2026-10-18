@@ -115,7 +115,7 @@
 .panelTitle {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-lg);
   display: flex;
   align-items: center;
@@ -217,7 +217,7 @@
 .resultValue {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultHighlight {
@@ -235,7 +235,7 @@
 }
 
 .resultGood .resultValue {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .emptyState {
@@ -267,7 +267,7 @@
 }
 
 .guideSection h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.5rem 0 0.5rem;
   font-size: 1.1rem;
 }
@@ -407,7 +407,7 @@
 .faqItem strong {
   display: block;
   margin-bottom: 0.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {

@@ -262,7 +262,7 @@
 
 .addFaqBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Code Panel */
@@ -349,7 +349,7 @@
 
 .eduSection h2 {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);
@@ -557,7 +557,7 @@
 
 .escenarioTip {
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 500;
   padding: 0.375rem 0.625rem;
   background: rgba(72, 169, 166, 0.1);
@@ -597,7 +597,7 @@
   display: block;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.4;
 }
 
@@ -610,7 +610,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 500;
   padding: 0.375rem 0.75rem;
   background: rgba(72, 169, 166, 0.1);

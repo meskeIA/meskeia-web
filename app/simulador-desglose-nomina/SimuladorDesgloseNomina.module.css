@@ -182,7 +182,7 @@
 
 .ejemploBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .ejemploActivo {
@@ -231,7 +231,7 @@
 
 .modoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .modoActivo {
@@ -577,7 +577,7 @@
 .guideSection h3 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.5rem 0 0.75rem;
 }
 
@@ -634,7 +634,7 @@
 }
 
 .escenarioCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioCard p {
@@ -644,7 +644,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   margin: 0.4rem 0 0;
 }

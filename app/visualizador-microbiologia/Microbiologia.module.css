@@ -35,7 +35,7 @@
   cursor: pointer; transition: all 0.2s; color: var(--text-secondary);
   font-size: 0.82rem; font-weight: 600;
 }
-.tab:hover { border-color: var(--primary); color: var(--primary); }
+.tab:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .tabActive { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .tabActive:hover { background: var(--primary-boton); color: white; }
@@ -109,7 +109,7 @@
   border-radius: 0 var(--radius) var(--radius) 0;
 }
 [data-theme='dark'] .parteInfo { background: #1C3A4A; }
-.parteInfo strong { color: var(--primary); display: block; margin-bottom: 0.4rem; }
+.parteInfo strong { color: var(--primary-texto); display: block; margin-bottom: 0.4rem; }
 .parteInfo p { margin: 0; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.55; }
 
 /* ─── Crecimiento ─── */
@@ -124,7 +124,7 @@
   font-size: 0.9rem; font-weight: 600; color: var(--text-primary);
 }
 .sliderValue {
-  font-size: 1rem; font-weight: 700; color: var(--primary);
+  font-size: 1rem; font-weight: 700; color: var(--primary-texto);
   background: #EBF5FB; padding: 0.2rem 0.6rem; border-radius: 6px;
 }
 [data-theme='dark'] .sliderValue { background: #1C3A4A; }
@@ -143,7 +143,7 @@
 .calcTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.4rem 0; }
 .calcDesc { font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 var(--spacing-md) 0; }
 .calcResultado { display: flex; align-items: baseline; gap: 0.5rem; justify-content: center; margin-bottom: 0.5rem; }
-.calcNumero { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
+.calcNumero { font-size: 2.5rem; font-weight: 800; color: var(--primary-texto); }
 .calcUnidad { font-size: 1rem; color: var(--text-secondary); }
 .calcFormula { font-size: 0.8rem; color: var(--text-muted); margin: 0; font-family: 'Courier New', monospace; }
 
@@ -156,7 +156,7 @@
   cursor: pointer; font-size: 0.9rem; font-weight: 600;
   color: var(--text-secondary); transition: all 0.2s;
 }
-.procesoBtn:hover { border-color: var(--primary); color: var(--primary); }
+.procesoBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .procesoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .procesoBtnActive { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .procesoBtnActive:hover { background: var(--primary-boton); color: white; }
@@ -166,7 +166,7 @@
   border-radius: var(--radius-large); padding: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
 }
-.procesoInfo h4 { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0 0 0.6rem 0; }
+.procesoInfo h4 { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 0.6rem 0; }
 .procesoInfo p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0 0 var(--spacing-md) 0; }
 .procesoSvg { width: 100%; max-width: 400px; height: auto; display: block; margin: 0 auto; }
 
@@ -238,7 +238,7 @@
   border-radius: var(--radius-large); padding: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
 }
-.endoTitulo { font-size: 1rem; font-weight: 700; color: var(--secondary); margin: 0 0 0.75rem 0; }
+.endoTitulo { font-size: 1rem; font-weight: 700; color: var(--secondary-texto); margin: 0 0 0.75rem 0; }
 .endosimbiosisCard p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0 0 var(--spacing-md) 0; }
 .endoLista {
   list-style: none; padding: 0; margin: 0;
@@ -248,7 +248,7 @@
   font-size: 0.88rem; color: var(--text-secondary); padding: 0.35rem 0.75rem;
   background: var(--hover); border-radius: 6px;
 }
-.endoLista li::before { content: '✓ '; color: var(--secondary); font-weight: 700; }
+.endoLista li::before { content: '✓ '; color: var(--secondary-texto); font-weight: 700; }
 
 /* Accesibilidad: solo lectura de pantalla */
 .srOnly {
@@ -350,7 +350,7 @@
 .escenarioTitulo {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 .escenarioDesc {
@@ -397,7 +397,7 @@
 .faqTip {
   display: block;
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   border-radius: 6px;
   padding: 0.3rem 0.65rem;
@@ -412,7 +412,7 @@
 }
 [data-theme='dark'] .faqTip {
   background: rgba(72, 169, 166, 0.12);
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 /* ── 4. Guía Paso a Paso ── */
@@ -494,7 +494,7 @@
 .tipCard h4 {
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 .tipCard p {

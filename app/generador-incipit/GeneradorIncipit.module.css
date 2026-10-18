@@ -67,7 +67,7 @@
   border-radius: 20px;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 500;
@@ -191,7 +191,7 @@
 
 .copyBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .copyBtnOk {
@@ -218,7 +218,7 @@
 .verTodosBtn {
   background: none;
   border: 2px solid var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 0.5rem 1.25rem;
   border-radius: 8px;
   cursor: pointer;
@@ -382,7 +382,7 @@
   border-radius: 6px;
   padding: 0.6rem 0.875rem;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.5rem;
   font-weight: 600;
 }

@@ -84,7 +84,7 @@
   border: 2px solid var(--primary, #2e86ab);
   border-radius: 10px;
   background: transparent;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: background 0.18s, color 0.18s, transform 0.12s;
 }
@@ -623,7 +623,7 @@
 .eduSubtitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   margin: 1.5rem 0 0.75rem;
   padding-bottom: 0.25rem;
   border-bottom: 2px solid var(--primary, #2e86ab);
@@ -654,7 +654,7 @@
 }
 
 .celdaValor {
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -768,7 +768,7 @@
 
 .faqPregunta::before {
   content: '▶ ';
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 details[open] .faqPregunta::before {
@@ -800,7 +800,7 @@ details[open] .faqPregunta::before {
 }
 
 .tip::marker {
-  color: var(--secondary, #48a9a6);
+  color: var(--secondary-texto);
 }
 
 /* Errores comunes */
@@ -877,7 +877,7 @@ details[open] .faqPregunta::before {
 }
 
 [data-theme='dark'] .btnModo {
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .btnModo:hover,

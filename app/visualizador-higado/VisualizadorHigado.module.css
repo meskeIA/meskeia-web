@@ -17,7 +17,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
@@ -35,7 +35,7 @@
 .cifrasGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .cifraCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
 .cifraIcono { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
-.cifraValor { display: block; font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+.cifraValor { display: block; font-size: 1.3rem; font-weight: 800; color: var(--primary-texto); }
 .cifraUnidad { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.2rem; }
 .cifraLabel { display: block; font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; }
 
@@ -50,7 +50,7 @@
 .zonaDato { font-size: 0.82rem; color: var(--text-muted); font-style: italic; margin: 0; }
 .zonaBotonesGrid { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); justify-content: center; }
 .zonaBtn { padding: 0.4rem 0.9rem; background: var(--bg-primary); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 0.82rem; color: var(--text-secondary); transition: all 0.2s; }
-.zonaBtn:hover { border-color: var(--primary); color: var(--primary); }
+.zonaBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .zonaBtnActivo { color: white; border-color: transparent; }
 .zonaBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
@@ -89,7 +89,7 @@
 .detoxFaseLista li { font-size: 0.85rem; color: var(--text-primary); line-height: 1.7; }
 .detoxBotones { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); justify-content: center; margin-bottom: var(--spacing-lg); }
 .detoxBtn { padding: 0.5rem 1.1rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); transition: all 0.2s; }
-.detoxBtn:hover { border-color: var(--primary); color: var(--primary); }
+.detoxBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .detoxBtnActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 .detoxBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .detoxCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
@@ -105,12 +105,12 @@
 /* ─── Metabolismo ─── */
 .metaSelectorGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
 .metaSelectorBtn { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); transition: all 0.2s; }
-.metaSelectorBtn:hover { border-color: var(--primary); color: var(--primary); }
+.metaSelectorBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .metaSelectorActivo { color: white; }
 .metaSelectorBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .metaEstadoToggle { display: flex; gap: var(--spacing-sm); justify-content: center; margin-bottom: var(--spacing-lg); }
 .metaEstadoBtn { padding: 0.6rem 1.5rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 0.9rem; color: var(--text-secondary); transition: all 0.2s; }
-.metaEstadoBtn:hover { border-color: var(--primary); color: var(--primary); }
+.metaEstadoBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .metaEstadoActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 .metaEstadoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .metaCicloCard { background: var(--bg-card); border: 2px solid; border-radius: var(--radius); padding: var(--spacing-lg); }
@@ -146,11 +146,11 @@
 /* 3. FAQ */
 .faqList { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
 .faqItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; }
-.faqPregunta { display: block; font-size: 0.92rem; font-weight: 700; color: var(--primary); margin-bottom: 0.4rem; }
+.faqPregunta { display: block; font-size: 0.92rem; font-weight: 700; color: var(--primary-texto); margin-bottom: 0.4rem; }
 .faqRespuesta { margin: 0 0 0.3rem 0; font-size: 0.87rem; color: var(--text-primary); line-height: 1.6; }
 .faqTip { margin: 0; font-size: 0.82rem; color: var(--text-muted); font-style: italic; }
 [data-theme='dark'] .faqItem { background: var(--bg-card); border-color: var(--border); }
-[data-theme='dark'] .faqPregunta { color: var(--secondary); }
+[data-theme='dark'] .faqPregunta { color: var(--secondary-texto); }
 [data-theme='dark'] .faqRespuesta { color: var(--text-primary); }
 
 /* 4. Guía paso a paso */

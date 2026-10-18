@@ -292,7 +292,7 @@
 .resultValueHighlight {
   font-size: 1.4rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultNote {
@@ -354,7 +354,7 @@
 
 .incrementNote {
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   text-align: center;
 }
@@ -391,7 +391,7 @@
 .savingAmount {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .savingLabel {
@@ -464,7 +464,7 @@
 
 .mesCell {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tableNote {
@@ -526,7 +526,7 @@
 .statNumber {
   font-size: 2.2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
   margin-bottom: 0.3rem;
 }
@@ -581,7 +581,7 @@
 }
 
 .faqItem h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   margin-bottom: var(--spacing-sm);
 }

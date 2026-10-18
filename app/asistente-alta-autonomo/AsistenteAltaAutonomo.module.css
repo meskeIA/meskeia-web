@@ -1266,7 +1266,7 @@
 .faqItemPro summary::before {
   content: '▶';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex-shrink: 0;
   transition: transform 0.2s;
 }

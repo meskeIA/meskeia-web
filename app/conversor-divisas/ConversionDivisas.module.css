@@ -118,7 +118,7 @@
   border-radius: 50%;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.2rem;
   cursor: pointer;
   display: flex;
@@ -151,7 +151,7 @@
 .resultadoValor {
   font-size: 2.2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.1;
   margin-bottom: 0.3rem;
 }

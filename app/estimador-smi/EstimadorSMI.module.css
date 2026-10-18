@@ -113,7 +113,7 @@
 }
 
 .tabActive {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
   background: var(--hover);
   font-weight: 600;
@@ -190,7 +190,7 @@
 }
 
 .desgloseHighlight {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -250,7 +250,7 @@
 .atrasosImporte {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.5rem;
 }
 
@@ -384,7 +384,7 @@
 }
 
 .tipBox strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Warning box (indicador v2.0) */

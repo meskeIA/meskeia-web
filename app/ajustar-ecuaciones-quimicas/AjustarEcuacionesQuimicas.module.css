@@ -100,7 +100,7 @@
   background: var(--bg-primary);
   padding: 1px 5px;
   border-radius: 4px;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.85rem;
 }
 
@@ -168,7 +168,7 @@
 
 .btnEjemplo:hover {
   border-color: var(--secondary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnEjemplo:focus-visible {
@@ -284,7 +284,7 @@
 
 .pasoItem strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.92rem;
   margin-bottom: 4px;
 }
@@ -351,7 +351,7 @@
   font-family: var(--font-mono, monospace);
   font-size: 1.45rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.5;
   overflow-x: auto;
   margin-bottom: var(--spacing-sm);
@@ -377,7 +377,7 @@
 .subtitulo {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: var(--spacing-lg) 0 var(--spacing-sm) 0;
 }
 
@@ -391,7 +391,7 @@
 .celdaEO {
   font-family: var(--font-mono, monospace);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ============================================
@@ -463,7 +463,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -490,7 +490,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -548,7 +548,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -582,7 +582,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
 }
 

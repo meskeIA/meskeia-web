@@ -281,7 +281,7 @@
 .resultadoNumero {
   font-size: 2.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultadoTol {
@@ -391,7 +391,7 @@
 .resultValorGrande {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .formulaBox {

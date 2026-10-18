@@ -96,7 +96,7 @@
 .presetActivo {
   border-color: var(--primary) !important;
   background: rgba(46, 134, 171, 0.1) !important;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .presetBtn {
@@ -115,7 +115,7 @@
 }
 
 .presetActivo .presetKm {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Controles */
@@ -278,7 +278,7 @@
 .resumenMedio {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resumenValor {
@@ -300,7 +300,7 @@
 
 .btnToggleComparativa {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: none;
   border: none;
   cursor: pointer;
@@ -427,7 +427,7 @@
 .metricaValor {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .metricaValorCo2 {
@@ -586,7 +586,7 @@
 .criterioCard h4 {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .criterioCard p {

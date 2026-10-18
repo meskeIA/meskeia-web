@@ -81,7 +81,7 @@
 }
 
 .sliderLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -184,7 +184,7 @@
 .casoLabel {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casoDesc {
@@ -545,7 +545,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .explicacionCard p {
@@ -638,7 +638,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -663,7 +663,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   background: #eff6ff;
   padding: 0.5rem 0.7rem;

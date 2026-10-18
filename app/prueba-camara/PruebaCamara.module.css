@@ -652,7 +652,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   font-style: italic;
   border-left: 3px solid var(--accent);
@@ -699,7 +699,7 @@
 .faqItem details summary::before {
   content: '▶';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s;
   flex-shrink: 0;
 }
@@ -717,7 +717,7 @@
 
 .faqTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-style: italic;
   margin-top: var(--spacing-xs) !important;
   padding-left: var(--spacing-sm);

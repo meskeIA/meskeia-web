@@ -87,7 +87,7 @@
 /* Slider días */
 .sliderRow { display: flex; align-items: center; gap: 0.75rem; }
 .sliderInput { flex: 1; accent-color: var(--primary); }
-.sliderValue { font-size: 1.3rem; font-weight: 800; color: var(--primary); min-width: 2.5rem; text-align: center; }
+.sliderValue { font-size: 1.3rem; font-weight: 800; color: var(--primary-texto); min-width: 2.5rem; text-align: center; }
 
 /* Input con €/día */
 .inputWrapper {
@@ -154,7 +154,7 @@
 
 .resultCard.ahorro .resultValor { color: var(--color-ok); }
 .resultCard.coste .resultValor { color: var(--color-fail); }
-.resultCard.neutro .resultValor { color: var(--primary); }
+.resultCard.neutro .resultValor { color: var(--primary-texto); }
 
 .resultLabel { font-size: 0.78rem; color: var(--text-secondary); }
 
@@ -230,7 +230,7 @@
 .scenarioCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 .faqGrid { display: flex; flex-direction: column; gap: 1rem; }
 .faqItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
-.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary); }
+.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary-texto); }
 .faqItem p { font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.55; }
 .stepsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
 .stepCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }

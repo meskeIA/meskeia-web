@@ -49,7 +49,7 @@
 .frecuenciaInput {
   font-size: 3.5rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   width: 200px;
   text-align: center;
   border: none;
@@ -139,7 +139,7 @@
 
 .escalaVisual button:hover {
   background: var(--bg-primary);
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .escalaVisual button:focus-visible {
@@ -330,7 +330,7 @@
   border: 2px solid #2E86AB;
   border-radius: 10px;
   background: transparent;
-  color: #2E86AB;
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -553,7 +553,7 @@
 .eduFaqPregunta::before {
   content: '▶';
   font-size: 0.65rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   transition: transform 0.2s;
   flex-shrink: 0;
 }
@@ -805,7 +805,7 @@
   border: 2px solid var(--primary);
   border-radius: 10px;
   background: transparent;
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }
@@ -845,7 +845,7 @@
 .medidaProgreso {
   text-align: center;
   font-weight: 600;
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   margin-bottom: 14px;
 }
 
@@ -948,7 +948,7 @@
 .medidaTabla > summary {
   cursor: pointer;
   font-weight: 600;
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   font-size: 0.9rem;
   padding: 8px 0;
 }
@@ -1024,7 +1024,7 @@
   font-size: 2.4rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   line-height: 1.1;
 }
 .medidorNota {

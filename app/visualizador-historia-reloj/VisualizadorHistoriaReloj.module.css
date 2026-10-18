@@ -92,7 +92,7 @@
   margin-bottom: var(--spacing-lg);
 }
 .hitoDatoLabel {
-  display: block; font-size: 0.75rem; font-weight: 700; color: var(--primary);
+  display: block; font-size: 0.75rem; font-weight: 700; color: var(--primary-texto);
   margin-bottom: 0.35rem; text-transform: uppercase; letter-spacing: 0.05em;
 }
 .hitoDatoBrillante p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.55; margin: 0; }

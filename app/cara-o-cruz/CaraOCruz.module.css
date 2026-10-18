@@ -205,7 +205,7 @@
 .resultadoTexto {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Buttons */
@@ -248,7 +248,7 @@
 
 .btnReiniciar:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Stats Area */
@@ -323,7 +323,7 @@
 .statPercent {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Distribution Bar */
@@ -499,7 +499,7 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: bold;
 }
 
@@ -677,7 +677,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin: 0;
   font-style: italic;
 }
@@ -721,7 +721,7 @@
 }
 
 .faqTip {
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   font-style: italic;
 }
 

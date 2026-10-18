@@ -96,7 +96,7 @@
 
 .limpiarBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .limpiarBtn:focus-visible {
@@ -313,7 +313,7 @@
 
 .exprFormula {
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -333,7 +333,7 @@
 
 .detalle h3 {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: var(--spacing-md) 0 var(--spacing-xs) 0;
 }
 
@@ -395,7 +395,7 @@
   font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   margin-bottom: var(--spacing-xs) !important;
 }
 
@@ -444,7 +444,7 @@
 }
 
 .propiedadesLista strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .notaGrupo {
@@ -490,7 +490,7 @@
 }
 
 .guideSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.25rem;
   margin-bottom: var(--spacing-sm);
 }
@@ -566,7 +566,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -594,7 +594,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -647,7 +647,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -681,7 +681,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -883,7 +883,7 @@
 }
 
 [data-theme='dark'] .aulaTitulo {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .aulaSubtitulo {
@@ -942,7 +942,7 @@
 }
 
 [data-theme='dark'] .aulaTabActiva {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .aulaSelector {
@@ -1019,7 +1019,7 @@
 }
 
 [data-theme='dark'] .aulaCasoNumero {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .aulaEtiquetaTipo,
@@ -1035,7 +1035,7 @@
 [data-theme='dark'] .aulaEtiquetaTipo,
 [data-theme='dark'] .aulaSemilla {
   background: rgba(72, 169, 166, 0.24);
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .aulaCasoTitulo {
@@ -1142,7 +1142,7 @@
 }
 
 [data-theme='dark'] .btnAulaSecundario:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .aulaVeredicto {
@@ -1208,7 +1208,7 @@
 }
 
 [data-theme='dark'] .aulaPasosTitulo {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .aulaPasosLista {

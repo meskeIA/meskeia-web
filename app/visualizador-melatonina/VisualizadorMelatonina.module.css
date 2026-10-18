@@ -126,7 +126,7 @@
 }
 
 .insightBox strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ─── Simulador de luz ──────────────────────── */
@@ -240,7 +240,7 @@
 }
 
 .escenarioMecanismo strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .escenarioDato {
@@ -370,7 +370,7 @@
 }
 
 .warningBox strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ─── Dark mode ──────────────────────────────── */

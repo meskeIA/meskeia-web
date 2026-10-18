@@ -124,7 +124,7 @@
 
 .btnModo:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnModo:focus-visible {
@@ -171,7 +171,7 @@
 
 .btnEjemplo:hover {
   border-color: var(--secondary);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: var(--bg-card);
 }
 
@@ -418,7 +418,7 @@
 .diagramaPMFCero span {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .diagramaTotalLabel {
@@ -499,7 +499,7 @@
 .metricaValor {
   font-size: 1.9rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -699,7 +699,7 @@
 .faqItem summary::after {
   content: '+';
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   flex-shrink: 0;
 }

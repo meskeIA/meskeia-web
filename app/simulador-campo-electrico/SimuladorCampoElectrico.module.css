@@ -74,7 +74,7 @@
 
 .toolBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Fondos de marca con texto blanco: --primary-boton (5,47:1), no var(--primary) (4,11:1 con
@@ -141,7 +141,7 @@
 
 .presetCard:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Inputs / sliders */
@@ -222,7 +222,7 @@
 
 .calcBtnGhost:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Canvas */

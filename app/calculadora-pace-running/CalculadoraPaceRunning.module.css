@@ -54,7 +54,7 @@
 .sectionTitle {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.25rem;
 }
 
@@ -209,7 +209,7 @@
 .paceDestacado {
   font-size: clamp(1.8rem, 5vw, 2.8rem);
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   letter-spacing: -0.03em;
   line-height: 1.1;
 }
@@ -217,7 +217,7 @@
 .velocidadDestacada {
   font-size: clamp(1.6rem, 4.5vw, 2.4rem);
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
@@ -286,7 +286,7 @@
 
 .tiempoProyeccion {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ── Tabla de splits ──────────────────────────────────────── */
@@ -340,7 +340,7 @@
 
 .tiempoSplit {
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* ── Sección educativa ────────────────────────────────────── */
@@ -352,7 +352,7 @@
 .guideSection h2 {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 

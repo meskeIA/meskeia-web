@@ -209,7 +209,7 @@
 
 .presetBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .presetActive {
@@ -406,7 +406,7 @@
 }
 
 .dimensionsChanged {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
 }
 
@@ -529,7 +529,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -651,7 +651,7 @@
 
 .formatUse {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
   margin: 0;
   padding-top: var(--spacing-sm);
@@ -815,7 +815,7 @@
 /* FAQ tip (subnota dentro del faqItem) */
 .faqTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.07);
   border-left: 3px solid var(--primary);
   padding: var(--spacing-xs) var(--spacing-md);
@@ -889,7 +889,7 @@
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.85em;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 1px 5px;
   border-radius: 4px;
 }
@@ -943,7 +943,7 @@
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.85em;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 1px 5px;
   border-radius: 4px;
 }

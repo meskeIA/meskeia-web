@@ -66,7 +66,7 @@
 }
 
 .tab:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-color: var(--primary);
 }
 
@@ -89,7 +89,7 @@
 .content h2 {
   font-size: 1.45rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1.25rem;
 }
 
@@ -117,7 +117,7 @@
 
 .navBox h3 {
   margin-top: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .formula {
@@ -135,7 +135,7 @@
 .formulaText {
   font-family: 'Courier New', monospace;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -188,7 +188,7 @@
 
 .flujoArrow {
   font-size: 1.4rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -217,7 +217,7 @@
 .actorCard h4 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -293,7 +293,7 @@
 }
 
 .tipoPasivo h4 {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
 }
@@ -329,7 +329,7 @@
 
 .spivaSection h3 {
   margin-top: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .spivaChart {
@@ -522,7 +522,7 @@
 .comisionTipoCard h4 {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -535,7 +535,7 @@
 
 .comisionEjemplo {
   font-size: 0.75rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-style: italic;
 }
 
@@ -647,7 +647,7 @@
   border: 1.5px solid var(--primary);
   border-radius: 2rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.88rem;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
@@ -706,7 +706,7 @@
 .resultValor {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultCardWarning .resultValor {
@@ -755,7 +755,7 @@
 }
 
 .realCard h3 {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 1rem;
   margin: 0 0 0.75rem;
   display: flex;
@@ -841,7 +841,7 @@
 
 .markowitzBox h3 {
   margin-top: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .markowitzVisual {

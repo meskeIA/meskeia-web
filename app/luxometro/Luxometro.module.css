@@ -229,7 +229,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnIcon {
@@ -254,7 +254,7 @@
 .btnIcon.active {
   border-color: var(--primary);
   background: var(--focus);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSmall {
@@ -428,7 +428,7 @@
   display: block;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -624,7 +624,7 @@
 .triangleCard h4 {
   margin: 0 0 var(--spacing-sm) 0;
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -659,7 +659,7 @@
 
 .sunny16Row span:last-child {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Responsive */
@@ -798,7 +798,7 @@
 
 .escenarioCard h3 {
   font-size: 1rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
 }
 
@@ -827,7 +827,7 @@
 
 .faqItem h3 {
   font-size: 0.95rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }
@@ -900,7 +900,7 @@
 
 .tipCard h3 {
   font-size: 0.9rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-weight: 600;
 }

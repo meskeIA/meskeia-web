@@ -143,7 +143,7 @@
 }
 
 .controlLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   font-family: var(--font-mono, monospace);
 }
@@ -327,7 +327,7 @@
 .resultValue {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
 }
 
@@ -433,7 +433,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -461,7 +461,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -514,7 +514,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -548,7 +548,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -672,7 +672,7 @@
 .casosTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casosIntro {
@@ -704,7 +704,7 @@
 
 .casoBoton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casoBoton:focus-visible {
@@ -733,7 +733,7 @@
 .casoTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.1rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .casoEnunciado {
@@ -847,7 +847,7 @@
   min-height: 44px;
   padding: var(--spacing-xs) var(--spacing-md);
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
   border: 1px solid var(--primary);
   border-radius: var(--radius);

@@ -132,7 +132,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -470,7 +470,7 @@
 .fiscalDate {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 4px;
 }
 

@@ -141,7 +141,7 @@
 .cifraDestacada {
   font-size: 1.5rem !important;
   font-weight: 700 !important;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   margin-bottom: 6px !important;
 }
 
@@ -201,7 +201,7 @@
 }
 
 .insightBox strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .insightFuente {

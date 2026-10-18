@@ -393,7 +393,7 @@ export default function IndiceGlucemicoPage() {
 
           <div className={styles.fibraGrid}>
             <div className={styles.fibraCard} style={{ borderTopColor: '#2E86AB' }}>
-              <h3 style={{ color: '#2E86AB' }}><span aria-hidden="true">💧</span> Fibra soluble (viscosa)</h3>
+              <h3 style={{ color: 'var(--primary-texto)' }}><span aria-hidden="true">💧</span> Fibra soluble (viscosa)</h3>
               <p><strong>Dónde se encuentra:</strong> Avena (beta-glucano), legumbres, manzana, cebada, psyllium.</p>
               <p><strong>Mecanismo:</strong> En contacto con el agua forma un gel viscoso en el intestino que:
               </p>
@@ -406,7 +406,7 @@ export default function IndiceGlucemicoPage() {
             </div>
 
             <div className={styles.fibraCard} style={{ borderTopColor: '#48A9A6' }}>
-              <h3 style={{ color: '#48A9A6' }}><span aria-hidden="true">🌾</span> Fibra insoluble</h3>
+              <h3 style={{ color: 'var(--secondary-texto)' }}><span aria-hidden="true">🌾</span> Fibra insoluble</h3>
               <p><strong>Dónde se encuentra:</strong> Salvado de trigo, piel de frutas y verduras, frutos secos.</p>
               <p><strong>Mecanismo:</strong> No forma gel. Su efecto sobre el IG es mucho menor que la fibra soluble. Principalmente:</p>
               <ul>

@@ -229,7 +229,7 @@
   justify-content: center;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex-shrink: 0;
 }
 
@@ -343,7 +343,7 @@
 .btnReiniciar {
   background: transparent;
   border: 2px solid var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 10px;
   padding: 0.7rem 1.5rem;
   font-size: 0.9rem;

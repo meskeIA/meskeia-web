@@ -78,7 +78,7 @@
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: background 0.2s, color 0.2s;
 }
 
@@ -110,7 +110,7 @@
 }
 
 .sliderLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
   font-size: 1.1rem;
 }
@@ -228,7 +228,7 @@
 
 .notableBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .notableBtn:focus-visible {
@@ -314,7 +314,7 @@
 .valuesPanelTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md) 0;
   padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--primary);
@@ -350,7 +350,7 @@
 }
 
 .valueRowCos .valueNum {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .valueIdentidad {
@@ -359,7 +359,7 @@
 
 .valueCuadrante {
   font-size: 1.2rem;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
 }
 
 .valueDivider {
@@ -485,7 +485,7 @@
 
 .velBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .velBtn:focus-visible {
@@ -563,7 +563,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -593,7 +593,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -648,7 +648,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -684,7 +684,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -809,7 +809,7 @@
 }
 
 [data-theme='dark'] .unitBtn {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .unitBtnActive {
@@ -918,7 +918,7 @@
   font-size: 0.9rem;
   font-family: inherit;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
   border: none;
   border-radius: 999px;
@@ -956,7 +956,7 @@
 }
 
 .aulaContadorTexto strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.15rem;
 }
 
@@ -990,7 +990,7 @@
   font-size: 0.95rem;
   font-family: inherit;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--bg-card);
   border: 2px solid var(--border);
   border-radius: 10px;
@@ -1066,7 +1066,7 @@
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
   background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -1169,7 +1169,7 @@
 
 .aulaBtnSecundario {
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
 }
 
@@ -1184,7 +1184,7 @@
 }
 
 .aulaBtnFantasma:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-color: var(--primary);
 }
 
@@ -1263,7 +1263,7 @@
 }
 
 .aulaResultado strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ---- Dark mode ---- */

@@ -113,7 +113,7 @@
 
 .questionNumber {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -351,7 +351,7 @@
 }
 
 .tipBox strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Warning box (indicador v2.0) */
@@ -421,7 +421,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.95rem;

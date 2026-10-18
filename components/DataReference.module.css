@@ -97,7 +97,7 @@
 }
 
 .enlace:hover {
-  color: #48a9a6;
+  color: var(--secondary-texto);
 }
 
 .enlace:focus-visible {
@@ -111,7 +111,7 @@
 }
 
 [data-theme='dark'] .enlace:hover {
-  color: #48a9a6;
+  color: var(--secondary-texto);
 }
 
 /* Nota aclaratoria */

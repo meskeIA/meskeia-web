@@ -37,7 +37,7 @@
   color: var(--text-secondary); transition: all 0.15s;
   white-space: nowrap; flex-shrink: 0;
 }
-.tabBtn:hover { border-color: var(--primary); color: var(--primary); }
+.tabBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .tabActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 
@@ -82,7 +82,7 @@
 }
 .macroFila { font-size: 0.85rem; line-height: 1.5; color: var(--text-primary); }
 .macroEtiqueta {
-  display: block; font-size: 0.72rem; font-weight: 700; color: var(--primary);
+  display: block; font-size: 0.72rem; font-weight: 700; color: var(--primary-texto);
   text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem;
 }
 
@@ -190,7 +190,7 @@
 .pasoIcono { font-size: 1.5rem; flex-shrink: 0; }
 .pasoInfo { display: flex; flex-direction: column; gap: 0.1rem; }
 .pasoLugar { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
-.pasoEnzima { font-size: 0.78rem; color: var(--secondary); font-weight: 600; }
+.pasoEnzima { font-size: 0.78rem; color: var(--secondary-texto); font-weight: 600; }
 
 .pasoResultado {
   display: flex; align-items: center; gap: var(--spacing-sm);
@@ -199,7 +199,7 @@
   margin-bottom: var(--spacing-sm);
   font-size: 0.88rem; font-weight: 600; color: var(--text-primary);
 }
-.pasoFlecha { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
+.pasoFlecha { color: var(--primary-texto); font-weight: 700; font-size: 1.1rem; }
 
 .pasoDetalle {
   font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin: 0;
@@ -209,7 +209,7 @@
   display: flex; justify-content: center; padding: 6px 0;
 }
 .pasoFlechaAbajo {
-  color: var(--primary); font-size: 0.9rem;
+  color: var(--primary-texto); font-size: 0.9rem;
 }
 
 /* ─── Sección 3: Micronutrientes ─── */
@@ -257,7 +257,7 @@
 
 .microFila { font-size: 0.82rem; line-height: 1.4; color: var(--text-primary); }
 .microEtiqueta {
-  display: block; font-size: 0.68rem; font-weight: 700; color: var(--primary);
+  display: block; font-size: 0.68rem; font-weight: 700; color: var(--primary-texto);
   text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.1rem;
 }
 .microDeficit { color: #DC2626; font-weight: 500; }
@@ -290,7 +290,7 @@
 .datoIcono { font-size: 1.6rem; flex-shrink: 0; }
 .datoTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); display: block; }
 .datoCifra {
-  font-size: 0.82rem; font-weight: 700; color: var(--primary);
+  font-size: 0.82rem; font-weight: 700; color: var(--primary-texto);
   display: block; margin-top: 0.1rem;
 }
 .datoContenido {
@@ -314,7 +314,7 @@
   font-size: 0.9rem; color: var(--text-secondary);
   margin-bottom: var(--spacing-xl);
 }
-.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a { color: var(--primary-texto); font-weight: 600; text-decoration: none; }
 .enlaceApp a:hover { text-decoration: underline; }
 
 /* Warning box (indicador v2.0) */

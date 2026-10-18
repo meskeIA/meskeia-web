@@ -43,7 +43,7 @@
   border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer;
   transition: all 0.2s; color: var(--text-secondary);
 }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -88,7 +88,7 @@
   display: flex; justify-content: space-between; align-items: center;
   font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm);
 }
-.sliderValor { font-weight: 600; color: var(--primary); }
+.sliderValor { font-weight: 600; color: var(--primary-texto); }
 .slider {
   width: 100%; accent-color: var(--primary); cursor: pointer;
   height: 6px; border-radius: 3px; margin-bottom: 0.5rem;
@@ -104,7 +104,7 @@
   border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-md);
 }
 .horarioHeader { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-sm); }
-.horarioHora { font-size: 1.2rem; font-weight: 700; color: var(--primary); min-width: 56px; }
+.horarioHora { font-size: 1.2rem; font-weight: 700; color: var(--primary-texto); min-width: 56px; }
 .horarioNivelBarra {
   flex: 1; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden;
 }
@@ -117,7 +117,7 @@
 .horarioActividades {
   font-size: 0.85rem; color: var(--text-secondary); display: flex; gap: 0.4rem; flex-wrap: wrap;
 }
-.horarioActividadesLabel { font-weight: 600; color: var(--secondary); }
+.horarioActividadesLabel { font-weight: 600; color: var(--secondary-texto); }
 
 /* ─── Toggle zona ─────────────────────────────────── */
 .toggleZona { margin-bottom: var(--spacing-lg); }
@@ -144,7 +144,7 @@
   cursor: pointer; transition: all 0.2s;
   background: var(--bg-card); border: 2px solid var(--border); color: var(--text-secondary);
 }
-.btnSecundario:hover { border-color: var(--primary); color: var(--primary); }
+.btnSecundario:hover { border-color: var(--primary); color: var(--primary-texto); }
 .btnSecundario:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .btnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
@@ -240,7 +240,7 @@
   border: 2px solid var(--border); background: var(--bg-card); color: var(--text-secondary);
   cursor: pointer; transition: all 0.2s;
 }
-.filtroBtn:hover { border-color: var(--primary); color: var(--primary); }
+.filtroBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .filtroBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .filtroActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 

@@ -174,7 +174,7 @@
 
 .copyBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .copyBtn.copied {
@@ -228,7 +228,7 @@
 
 .presetBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
 }
 
@@ -265,7 +265,7 @@
 
 .typeBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .typeActive {
@@ -289,7 +289,7 @@
   border: 1px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -568,7 +568,7 @@
 .escenarioIcon { font-size: 1.5rem; }
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46,134,171,0.07);
   border-left: 3px solid var(--primary);
   padding: 0.4rem 0.75rem;

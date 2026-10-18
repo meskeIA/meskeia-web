@@ -37,7 +37,7 @@
 .sectionTitle {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--primary);
@@ -78,7 +78,7 @@
 
 .toggleTab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .toggleTabActive {
@@ -218,7 +218,7 @@
 .sliderYear {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   width: 44px;
   text-align: center;
 }
@@ -464,7 +464,7 @@
 .statValue {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: block;
   margin-bottom: 0.25rem;
 }

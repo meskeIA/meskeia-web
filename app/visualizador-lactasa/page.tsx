@@ -238,14 +238,14 @@ export default function VisualizadorLactasa() {
                     <div className={styles.moleculaCirculo} style={{ background: '#2E86AB' }}>
                       <span>G</span>
                     </div>
-                    <div className={styles.moleculaEtiqueta} style={{ color: '#2E86AB' }}>GLUCOSA</div>
+                    <div className={styles.moleculaEtiqueta} style={{ color: 'var(--primary-texto)' }}>GLUCOSA</div>
                   </div>
                   <div className={styles.masSigno} aria-hidden="true">+</div>
                   <div className={styles.moleculaProducto}>
                     <div className={styles.moleculaCirculo} style={{ background: '#48A9A6' }}>
                       <span>G</span>
                     </div>
-                    <div className={styles.moleculaEtiqueta} style={{ color: '#48A9A6' }}>GALACTOSA</div>
+                    <div className={styles.moleculaEtiqueta} style={{ color: 'var(--secondary-texto)' }}>GALACTOSA</div>
                   </div>
                 </div>
               )}

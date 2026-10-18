@@ -279,7 +279,7 @@
 .btnSecundario {
   padding: 0.65rem 1.4rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1.5px solid var(--primary);
   border-radius: 10px;
   font-size: 0.95rem;
@@ -405,7 +405,7 @@
 .brujulaSur {
   font-size: 0.7rem;
   font-weight: 800;
-  color: #2E86AB;
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -501,7 +501,7 @@
 .formulaTexto {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Georgia', serif;
   margin-bottom: 0.6rem;
   letter-spacing: 0.05em;

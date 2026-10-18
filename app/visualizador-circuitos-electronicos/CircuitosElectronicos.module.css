@@ -36,7 +36,7 @@
   cursor: pointer; transition: all 0.2s; color: var(--text-secondary);
   font-size: 0.82rem; font-weight: 600; line-height: 1.3; text-align: center;
 }
-.tabBtn:hover { border-color: var(--primary); color: var(--primary); }
+.tabBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .tabBtnActivo {
   border-color: var(--primary-boton);
@@ -87,7 +87,7 @@
 }
 .componenteEmoji { font-size: 1.6rem; }
 .componenteNombre { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
-.componenteLey { font-size: 0.82rem; color: var(--primary); font-family: monospace; }
+.componenteLey { font-size: 0.82rem; color: var(--primary-texto); font-family: monospace; }
 
 /* Ley badge */
 .leyBadge {
@@ -113,7 +113,7 @@
   font-size: 0.88rem; font-weight: 600; color: var(--text-primary);
   display: flex; justify-content: space-between; align-items: baseline;
 }
-.sliderValor { font-size: 1rem; font-weight: 700; color: var(--primary); }
+.sliderValor { font-size: 1rem; font-weight: 700; color: var(--primary-texto); }
 .sliderDesc { font-size: 0.75rem; color: var(--text-muted); }
 .sliderInput {
   width: 100%; height: 6px; appearance: none; -webkit-appearance: none;
@@ -143,7 +143,7 @@
 .metricaOn { border-left-color: var(--verde); }
 .metricaOff { border-left-color: var(--rojo); opacity: 0.6; }
 .metricaLabel { font-size: 0.78rem; color: var(--text-muted); }
-.metricaValor { font-size: 1.05rem; font-weight: 700; color: var(--primary); }
+.metricaValor { font-size: 1.05rem; font-weight: 700; color: var(--primary-texto); }
 
 /* Warning boxes */
 .warningBox {
@@ -179,7 +179,7 @@
   background: var(--bg-card); color: var(--text-secondary); cursor: pointer;
   font-size: 0.88rem; font-weight: 600; transition: all 0.2s;
 }
-.modoBtn:hover { border-color: var(--primary); color: var(--primary); }
+.modoBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .modoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .modoBtnActivo {
   background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
@@ -194,10 +194,10 @@
 }
 .senalBox { flex: 1; text-align: center; }
 .senalLabel { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.25rem; }
-.senalValor { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem; }
+.senalValor { font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); margin-bottom: 0.25rem; }
 .flechaAmplificacion {
   display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
-  font-size: 0.9rem; font-weight: 700; color: var(--secondary);
+  font-size: 0.9rem; font-weight: 700; color: var(--secondary-texto);
 }
 
 /* Puertas lógicas */
@@ -210,7 +210,7 @@
   background: var(--bg-card); color: var(--text-secondary); cursor: pointer;
   font-size: 0.88rem; font-weight: 700; transition: all 0.2s; font-family: monospace;
 }
-.puertaBtn:hover { border-color: var(--primary); color: var(--primary); }
+.puertaBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .puertaBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .puertaBtnActivo {
   background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
@@ -301,7 +301,7 @@
 .nivelInfo { flex: 1; display: flex; flex-direction: column; gap: 0.2rem; }
 .nivelNombre { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); }
 .nivelTransistores { font-size: 0.78rem; color: var(--text-muted); }
-.nivelFlecha { color: var(--primary); font-size: 0.85rem; flex-shrink: 0; }
+.nivelFlecha { color: var(--primary-texto); font-size: 0.85rem; flex-shrink: 0; }
 
 .nivelDetalle { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin: var(--spacing-md) 0; }
 .nivelComposicion {
@@ -327,7 +327,7 @@
   border: 2px solid var(--primary); border-radius: 8px;
   padding: 0.5rem 0.75rem; display: flex; align-items: center; justify-content: center;
 }
-.flipFlopLabel { font-size: 0.78rem; font-weight: 700; color: var(--primary); font-family: monospace; }
+.flipFlopLabel { font-size: 0.78rem; font-weight: 700; color: var(--primary-texto); font-family: monospace; }
 
 /* Dato impactante */
 .datoImpactante {
@@ -351,7 +351,7 @@
 }
 .timelineInfo { display: flex; flex-direction: column; gap: 0.1rem; text-align: right; }
 .timelineChip { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); }
-.timelineT { font-size: 0.75rem; color: var(--primary); font-weight: 600; }
+.timelineT { font-size: 0.75rem; color: var(--primary-texto); font-weight: 600; }
 .timelineEscala { font-size: 0.7rem; color: var(--text-muted); }
 
 /* Responsive */

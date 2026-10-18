@@ -69,7 +69,7 @@
 .tabActive {
   background: #2E86AB15;
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -1028,7 +1028,7 @@
 .faqItem h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 

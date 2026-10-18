@@ -176,7 +176,7 @@
 
 .btnSecondary:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .errorMsg {
@@ -219,7 +219,7 @@
 .resultadoValor {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin-bottom: 5px;
 }
 
@@ -498,7 +498,7 @@
   font-size: 0.7rem;
   margin-right: 10px;
   transition: transform 0.2s;
-  color: #2E86AB;
+  color: var(--primary-texto);
   display: inline-block;
 }
 
@@ -649,7 +649,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0;
   font-style: italic;
 }
@@ -1001,7 +1001,7 @@
 
 .filaActual th,
 .filaActual td {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 

@@ -51,7 +51,7 @@
 
 .comprobadorTitulo {
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-xs) 0;
 }
 
@@ -105,7 +105,7 @@
 .masSigno {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   padding-bottom: 0.5rem;
 }
 
@@ -122,7 +122,7 @@
   margin: 0 0 var(--spacing-sm) 0;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
   overflow-wrap: anywhere;
 }
@@ -279,7 +279,7 @@
 
 .limpiarBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .limpiarBtn:focus-visible {
@@ -345,7 +345,7 @@
 
 .bloqueTitulo {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm) 0;
 }
 
@@ -424,7 +424,7 @@
   font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filaCarga {
@@ -464,7 +464,7 @@
   font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
   font-size: 1.02rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .chevron {
@@ -483,7 +483,7 @@
 
 .detalle h3 {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-xs) 0;
 }
 
@@ -559,7 +559,7 @@
 }
 
 .guideSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.25rem;
   margin-bottom: var(--spacing-sm);
 }
@@ -635,7 +635,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -663,7 +663,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -716,7 +716,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -750,7 +750,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 

@@ -156,7 +156,7 @@ export default function EnlacesUtilesPage() {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <h3 style={{
-                      color: 'var(--primary)',
+                      color: 'var(--primary-texto)',
                       fontSize: '1rem',
                       fontWeight: 600,
                       margin: 0,

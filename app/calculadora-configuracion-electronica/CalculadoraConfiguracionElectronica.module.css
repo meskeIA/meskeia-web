@@ -471,7 +471,7 @@
 
 .copiarBtn:hover {
   border-color: var(--primary);
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
 }
 
 .copiarBtn:focus-visible {
@@ -621,7 +621,7 @@
   text-align: center;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 

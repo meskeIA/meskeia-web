@@ -105,13 +105,13 @@
 
 .formatBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .formatBtn.active {
   border-color: var(--primary);
   background: var(--focus);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Panels */
@@ -211,7 +211,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnCopy {
@@ -221,7 +221,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -486,7 +486,7 @@
 .edu-escenario-card h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
 }
 
@@ -536,7 +536,7 @@
 .edu-faq-question::after {
   content: '+';
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex-shrink: 0;
   margin-left: 0.5rem;
 }
@@ -639,7 +639,7 @@ details[open] .edu-faq-question::after {
 .edu-tip-card h4 {
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.35rem;
 }
 

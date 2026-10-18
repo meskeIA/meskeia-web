@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
@@ -36,7 +36,7 @@
 .ecuacion { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--spacing-sm); }
 .ecuacionMol { padding: 0.4rem 0.7rem; border-radius: 8px; font-weight: 700; font-size: 1.1rem; }
 .ecuacionOp { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }
-.ecuacionFlecha { font-size: 1.5rem; color: var(--primary); font-weight: 700; }
+.ecuacionFlecha { font-size: 1.5rem; color: var(--primary-texto); font-weight: 700; }
 
 /* Colores de moléculas */
 .molLuz { background: #FEF3C7; color: #92400E; border: 1px solid #F59E0B; }
@@ -71,9 +71,9 @@
 [data-theme='dark'] .hojaMolFormula { color: inherit; }
 
 .hojaCentral { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-sm); position: relative; }
-.hojaFlechaEntrada, .hojaFlechaSalida { font-size: 1.5rem; color: var(--primary); animation: flujo 1.5s ease-in-out infinite; }
+.hojaFlechaEntrada, .hojaFlechaSalida { font-size: 1.5rem; color: var(--primary-texto); animation: flujo 1.5s ease-in-out infinite; }
 .hojaIcono { font-size: 3rem; }
-.hojaLabel { font-size: 0.82rem; font-weight: 700; color: var(--primary); }
+.hojaLabel { font-size: 0.82rem; font-weight: 700; color: var(--primary-texto); }
 
 .componenteDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
 .componenteHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
@@ -89,7 +89,7 @@
 .cloroplastoOuter { border: 3px solid var(--verde); border-radius: 50% / 40%; padding: var(--spacing-md); position: relative; min-width: 280px; }
 .cloroplastoLabel { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--bg-card); padding: 0 var(--spacing-sm); font-size: 0.72rem; color: var(--verde); font-weight: 600; }
 .cloroplastoInner { border: 2px dashed var(--secondary); border-radius: 40% / 30%; padding: var(--spacing-lg) var(--spacing-md); display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md); }
-.estromaLabel { font-size: 0.72rem; color: var(--secondary); font-weight: 600; }
+.estromaLabel { font-size: 0.72rem; color: var(--secondary-texto); font-weight: 600; }
 .tilacoidesStack { display: flex; flex-direction: column; gap: 4px; width: 100%; }
 .tilacoide { background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 20px; padding: 6px var(--spacing-md); text-align: center; }
 .tilacoideTxt { font-size: 0.68rem; color: white; font-weight: 600; }
@@ -108,7 +108,7 @@
 .pasoTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
 .pasoDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
 .pasoDetalle { margin-top: var(--spacing-md); border-top: 1px solid var(--border); padding-top: var(--spacing-md); font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
-.pasoFlecha { color: var(--primary); font-size: 1.2rem; padding: 0.3rem 0; }
+.pasoFlecha { color: var(--primary-texto); font-size: 1.2rem; padding: 0.3rem 0; }
 .flechaAnimada { animation: flujo 1.5s ease-in-out infinite; }
 
 /* Colores de pasos (bordes sutiles) */
@@ -125,7 +125,7 @@
 .productosGrid { display: flex; align-items: center; justify-content: center; gap: var(--spacing-md); flex-wrap: wrap; }
 .productoItem { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-radius: var(--radius); min-width: 100px; }
 .productoItemIcono { font-size: 1.5rem; }
-.productoItemNombre { font-size: 1rem; font-weight: 700; color: var(--primary); }
+.productoItemNombre { font-size: 1rem; font-weight: 700; color: var(--primary-texto); }
 .productoItemDesc { font-size: 0.75rem; color: var(--text-muted); }
 .productoItemFlecha { font-size: 1.2rem; font-weight: 700; color: var(--text-muted); }
 
@@ -181,8 +181,8 @@
 .vueltaNum { font-size: 0.68rem; font-weight: 700; color: var(--text-primary); }
 .vueltaCO2 { font-size: 0.65rem; color: var(--text-muted); }
 .vueltasResultado { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
-.vueltasIgual { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-.vueltasGlucosa { font-size: 1rem; font-weight: 700; color: var(--primary); }
+.vueltasIgual { font-size: 1.5rem; font-weight: 700; color: var(--primary-texto); }
+.vueltasGlucosa { font-size: 1rem; font-weight: 700; color: var(--primary-texto); }
 .vueltasNota { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0; font-style: italic; }
 
 /* ─── Sección 4: Datos de escala ─── */
@@ -191,7 +191,7 @@
 .datoCard:hover { border-color: var(--primary); transform: translateY(-2px); }
 .datoCardActivo { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); }
 .datoIcono { font-size: 1.8rem; }
-.datoCifra { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.datoCifra { font-size: 1.5rem; font-weight: 800; color: var(--primary-texto); }
 .datoEtiqueta { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.3; }
 .datoDetalle { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; margin-top: var(--spacing-sm); border-top: 1px solid var(--border); padding-top: var(--spacing-sm); }
 
@@ -202,7 +202,7 @@
 .arbolesIconos { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; justify-content: center; }
 .arbolIcono { font-size: 2.5rem; }
 .arbolesTexto { text-align: center; }
-.arbolesCifra { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-bottom: 0.3rem; }
+.arbolesCifra { display: block; font-size: 1.5rem; font-weight: 800; color: var(--primary-texto); margin-bottom: 0.3rem; }
 .arbolesDesc { font-size: 0.88rem; color: var(--text-secondary); }
 .arbolesNota { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0; font-style: italic; }
 

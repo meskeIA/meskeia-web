@@ -227,7 +227,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Results */
@@ -256,7 +256,7 @@
 .litrosValor {
   font-size: 4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -319,7 +319,7 @@
 .distCantidad {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipsSection {
@@ -369,7 +369,7 @@
 .formulaText {
   font-family: 'Courier New', monospace;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
   font-weight: 600;
 }
@@ -530,7 +530,7 @@
 .contentCard h4 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 

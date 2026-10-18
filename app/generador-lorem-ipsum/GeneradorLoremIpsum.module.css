@@ -73,7 +73,7 @@
 }
 
 .label strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -98,7 +98,7 @@
 
 .formatoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .formatoBtn.active {
@@ -187,7 +187,7 @@
 
 .btnSecondary:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecondary:disabled {
@@ -214,7 +214,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -346,7 +346,7 @@
 .timelineDate {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -408,7 +408,7 @@
 .faqQuestion::before {
   content: '▶ ';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqItem[open] .faqQuestion::before {
@@ -511,7 +511,7 @@
 .tipCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 8px;
 }
 

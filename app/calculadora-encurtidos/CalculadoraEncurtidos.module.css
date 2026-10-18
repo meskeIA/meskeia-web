@@ -24,7 +24,7 @@
 .chipGrid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
 .chip { padding: 10px 16px; border: 2px solid var(--border); border-radius: 20px; background: var(--bg-primary); color: var(--text-primary); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.18s; }
 .chip:hover { border-color: var(--secondary); }
-.chipActivo { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--bg-card)); color: var(--primary); }
+.chipActivo { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 10%, var(--bg-card)); color: var(--primary-texto); }
 .chip:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .campo { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
@@ -36,16 +36,16 @@
 .resultadoGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 .resCard { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 18px 12px; text-align: center; }
 .resCardDestacado { border: 2px solid var(--primary); background: color-mix(in srgb, var(--primary) 8%, var(--bg-card)); }
-.resValor { display: block; font-size: 1.5rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+.resValor { display: block; font-size: 1.5rem; font-weight: 700; color: var(--primary-texto); line-height: 1.1; }
 .resLabel { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-top: 6px; }
 .resultadoBig { margin-top: 4px; padding: 26px; background: color-mix(in srgb, var(--primary) 8%, var(--bg-card)); border: 2px solid color-mix(in srgb, var(--primary) 30%, transparent); border-radius: 16px; text-align: center; }
-.resBigValor { display: block; font-size: 2.4rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+.resBigValor { display: block; font-size: 2.4rem; font-weight: 700; color: var(--primary-texto); line-height: 1.1; }
 .resBigTexto { display: block; font-size: 0.92rem; color: var(--text-secondary); margin-top: 6px; }
 .ingredientesBox { margin-top: 4px; }
 .ingRow { display: flex; justify-content: space-between; align-items: center; padding: 13px 4px; border-bottom: 1px solid var(--border); }
 .ingRow:last-child { border-bottom: none; }
 .ingNombre { font-size: 0.95rem; color: var(--text-primary); font-weight: 500; }
-.ingCantidad { font-size: 1.05rem; font-weight: 700; color: var(--primary); }
+.ingCantidad { font-size: 1.05rem; font-weight: 700; color: var(--primary-texto); }
 
 .placeholder { font-size: 0.95rem; color: var(--text-muted); text-align: center; padding: 16px; }
 .notaBox { margin-top: 14px; padding: 13px 15px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
@@ -59,7 +59,7 @@
 .tabla td { padding: 11px 12px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
 .tabla tbody tr:hover { background: var(--hover); }
 .celNombre { font-weight: 500; color: var(--text-primary); white-space: nowrap; }
-.celTemp { font-weight: 700; color: var(--primary); }
+.celTemp { font-weight: 700; color: var(--primary-texto); }
 .celNota { font-size: 0.83rem; }
 .sinResultados { text-align: center; color: var(--text-muted); padding: 24px; }
 
@@ -73,7 +73,7 @@
 
 .educationalContent { padding: 8px 0; }
 .conceptoSection { margin-bottom: 40px; }
-.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
+.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary-texto); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
 .conceptoSection p { color: var(--text-secondary); line-height: 1.65; font-size: 0.95rem; }
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 12px; }
 .comparativaTable th, .comparativaTable td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); color: var(--text-secondary); }

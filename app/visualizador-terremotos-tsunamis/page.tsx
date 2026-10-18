@@ -776,7 +776,7 @@ export default function VisualizadorTerremotosTsunamis() {
                   <p>Epicentro a más de 500 km. El sistema de alerta tiene tiempo de funcionar. La evacuación ordenada siguiendo las vías señalizadas es posible.</p>
                 </div>
                 <div className={styles.tiempoCard} style={{ borderColor: '#48A9A6' }}>
-                  <div className={styles.tiempoValor} style={{ color: '#48A9A6' }}>Años</div>
+                  <div className={styles.tiempoValor} style={{ color: 'var(--secondary-texto)' }}>Años</div>
                   <h4>Preparación previa</h4>
                   <p>La mejor protección: conocer las vías de evacuación y los puntos de encuentro antes de que ocurra cualquier emergencia.</p>
                 </div>

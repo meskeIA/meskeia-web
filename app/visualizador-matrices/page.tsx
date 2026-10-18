@@ -266,10 +266,10 @@ function OperacionSuma() {
         </div>
       </div>
       <div className={styles.pasoAPaso}>
-        <span className={styles.paso}><span style={{ color: '#2E86AB' }}>1</span>+<span style={{ color: '#48A9A6' }}>4</span>=<strong>5</strong></span>
-        <span className={styles.paso}><span style={{ color: '#2E86AB' }}>3</span>+<span style={{ color: '#48A9A6' }}>1</span>=<strong>4</strong></span>
-        <span className={styles.paso}><span style={{ color: '#2E86AB' }}>2</span>+<span style={{ color: '#48A9A6' }}>0</span>=<strong>2</strong></span>
-        <span className={styles.paso}><span style={{ color: '#2E86AB' }}>0</span>+<span style={{ color: '#48A9A6' }}>5</span>=<strong>5</strong></span>
+        <span className={styles.paso}><span style={{ color: 'var(--primary-texto)' }}>1</span>+<span style={{ color: 'var(--secondary-texto)' }}>4</span>=<strong>5</strong></span>
+        <span className={styles.paso}><span style={{ color: 'var(--primary-texto)' }}>3</span>+<span style={{ color: 'var(--secondary-texto)' }}>1</span>=<strong>4</strong></span>
+        <span className={styles.paso}><span style={{ color: 'var(--primary-texto)' }}>2</span>+<span style={{ color: 'var(--secondary-texto)' }}>0</span>=<strong>2</strong></span>
+        <span className={styles.paso}><span style={{ color: 'var(--primary-texto)' }}>0</span>+<span style={{ color: 'var(--secondary-texto)' }}>5</span>=<strong>5</strong></span>
       </div>
       <div className={styles.insight}>
         <p>La suma de matrices es <strong>conmutativa</strong> (A + B = B + A) y <strong>asociativa</strong>. Igual que sumar números, pero con tablas enteras.</p>
@@ -360,17 +360,17 @@ function OperacionDeterminante() {
       </div>
       <div className={styles.determinanteVisual}>
         <div className={styles.detMatriz}>
-          <span className={styles.celdaDet} style={{ color: '#2E86AB' }}>{a}</span>
+          <span className={styles.celdaDet} style={{ color: 'var(--primary-texto)' }}>{a}</span>
           <span className={styles.celdaDet} style={{ color: '#e67e22' }}>{b}</span>
           <span className={styles.celdaDet} style={{ color: '#e67e22' }}>{c}</span>
-          <span className={styles.celdaDet} style={{ color: '#2E86AB' }}>{d}</span>
+          <span className={styles.celdaDet} style={{ color: 'var(--primary-texto)' }}>{d}</span>
         </div>
         <div className={styles.detFormula}>
           <div className={styles.detLinea}>
-            <span style={{ color: '#2E86AB' }}>{a}</span> × <span style={{ color: '#2E86AB' }}>{d}</span> − <span style={{ color: '#e67e22' }}>{b}</span> × <span style={{ color: '#e67e22' }}>{c}</span>
+            <span style={{ color: 'var(--primary-texto)' }}>{a}</span> × <span style={{ color: 'var(--primary-texto)' }}>{d}</span> − <span style={{ color: '#e67e22' }}>{b}</span> × <span style={{ color: '#e67e22' }}>{c}</span>
           </div>
           <div className={styles.detLinea}>
-            <span style={{ color: '#2E86AB' }}>{a * d}</span> − <span style={{ color: '#e67e22' }}>{b * c}</span> = <strong>{det}</strong>
+            <span style={{ color: 'var(--primary-texto)' }}>{a * d}</span> − <span style={{ color: '#e67e22' }}>{b * c}</span> = <strong>{det}</strong>
           </div>
         </div>
       </div>

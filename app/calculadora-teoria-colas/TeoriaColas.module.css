@@ -47,7 +47,7 @@
 }
 
 .panelTitle {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.4rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
@@ -272,7 +272,7 @@
 .metricValue {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.25rem;
 }
 
@@ -316,7 +316,7 @@
 }
 
 .interpretacion h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 1rem;
   font-size: 1.1rem;
 }
@@ -385,7 +385,7 @@
 
 .statValue {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -455,7 +455,7 @@
 
 /* Contenido educativo */
 .guideSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
@@ -517,7 +517,7 @@
 .formula {
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   padding: 0.5rem;
   background: var(--bg-card);
@@ -641,7 +641,7 @@
 
 .comparativaTable td:first-child {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Consolas', 'Monaco', monospace;
 }
 
@@ -717,7 +717,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   display: flex;
   align-items: flex-start;
@@ -830,7 +830,7 @@
 .stepContent code {
   font-family: 'Consolas', 'Monaco', monospace;
   background: var(--bg-primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
   font-size: 0.85rem;

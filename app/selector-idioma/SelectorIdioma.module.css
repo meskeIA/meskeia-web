@@ -81,7 +81,7 @@
 .preguntaNumero {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.6rem;
@@ -223,7 +223,7 @@
 
 .btnReiniciar {
   background-color: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   margin: 1.5rem auto 0;
   display: block;
@@ -346,7 +346,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -457,7 +457,7 @@
 }
 
 .warningBox strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ---- Dark mode ---- */

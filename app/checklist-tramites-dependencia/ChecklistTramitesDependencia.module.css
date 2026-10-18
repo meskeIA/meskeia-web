@@ -93,7 +93,7 @@
 }
 
 .progresoPorcentaje {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -379,7 +379,7 @@
 .eduSectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);

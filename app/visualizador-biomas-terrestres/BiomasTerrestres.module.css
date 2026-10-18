@@ -95,11 +95,11 @@
 }
 
 .tab:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabActivo {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
 }
 
@@ -840,7 +840,7 @@
 
 .faqTip {
   font-size: 0.82rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   border-radius: 6px;
   padding: 0.35rem 0.7rem;

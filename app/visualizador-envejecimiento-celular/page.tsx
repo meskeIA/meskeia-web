@@ -639,21 +639,21 @@ export default function VisualizadorEnvejecimientoCelularPage() {
               </tr>
               <tr>
                 <td>10</td>
-                <td><strong>Inflamación crónica</strong> <span style={{fontSize:'0.7rem', color:'var(--secondary)'}}>2023</span></td>
+                <td><strong>Inflamación crónica</strong> <span style={{fontSize:'0.7rem', color:'var(--secondary-texto)'}}>2023</span></td>
                 <td>Inflammaging: inflamación de baja intensidad sistémica</td>
                 <td>Niveles elevados de IL-6 en centenarios</td>
                 <td>Sí (dieta antiinflamatoria, senolíticos)</td>
               </tr>
               <tr>
                 <td>11</td>
-                <td><strong>Disbiosis</strong> <span style={{fontSize:'0.7rem', color:'var(--secondary)'}}>2023</span></td>
+                <td><strong>Disbiosis</strong> <span style={{fontSize:'0.7rem', color:'var(--secondary-texto)'}}>2023</span></td>
                 <td>Cambio del microbioma hacia perfil proinflamatorio</td>
                 <td>Reducción de Akkermansia y Lactobacillus con la edad</td>
                 <td>Sí (probióticos, FMT experimental)</td>
               </tr>
               <tr>
                 <td>12</td>
-                <td><strong>Alteración mecánica</strong> <span style={{fontSize:'0.7rem', color:'var(--secondary)'}}>2023</span></td>
+                <td><strong>Alteración mecánica</strong> <span style={{fontSize:'0.7rem', color:'var(--secondary-texto)'}}>2023</span></td>
                 <td>Cambios en lámina nuclear (laminas A/C)</td>
                 <td>Progeria: envejecimiento acelerado por mutación LMNA</td>
                 <td>Parcialmente (lonafarnib en progeria)</td>

@@ -133,7 +133,7 @@
 .ivaPercent {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 60px;
 }
 
@@ -181,7 +181,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultsPanel {
@@ -237,7 +237,7 @@
 }
 
 .infoCard h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -517,7 +517,7 @@
   margin: 0 0 0.5rem;
   font-weight: 600;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioExample code {
@@ -539,7 +539,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* 4. FAQ */
@@ -574,7 +574,7 @@
 .faqItem h3,
 .faqItem h4 {
   margin: 0 0 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   line-height: 1.5;
 }
@@ -676,7 +676,7 @@
 }
 
 .stepContent p strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 

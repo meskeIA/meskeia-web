@@ -151,7 +151,7 @@
 .statValue {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -221,7 +221,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroBtn.activo {
@@ -310,7 +310,7 @@
 
 .checkBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tareaItem.completada .checkBtn {
@@ -403,7 +403,7 @@
 
 .btnAccion:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnAccionDanger {
@@ -675,7 +675,7 @@
 .escenarioHeader h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   line-height: 1.4;
 }
@@ -754,7 +754,7 @@
 }
 
 .faqItem dd strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqItem dd em {
@@ -842,7 +842,7 @@
 
 .stepContent p em {
   font-style: italic;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .stepNumber {
@@ -882,7 +882,7 @@
 .tipCard h4 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   line-height: 1.4;
 }

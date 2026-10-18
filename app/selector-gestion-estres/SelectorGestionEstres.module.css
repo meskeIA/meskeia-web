@@ -244,7 +244,7 @@
 .resultadoTitulo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 
@@ -278,7 +278,7 @@
   border-color: var(--primary);
   background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .metodoBar.destacado {
@@ -296,7 +296,7 @@
 }
 
 .metodoBar.destacado .metodoPuntos {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .btnReiniciar {
@@ -307,7 +307,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
@@ -354,7 +354,7 @@
 .guideSection h2 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 

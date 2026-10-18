@@ -284,7 +284,7 @@ export default function OptimizadorRentas60() {
             <div className={styles.fuenteHeader}>
               <span aria-hidden="true">👷</span>
               <span className={styles.fuenteTitulo}>Rendimientos del trabajo</span>
-              <span className={styles.fuenteBadge} style={{ background: '#2E86AB20', color: '#2E86AB' }}>Escala general</span>
+              <span className={styles.fuenteBadge} style={{ background: '#2E86AB20', color: 'var(--primary-texto)' }}>Escala general</span>
             </div>
             <NumberInput
               value={fuentes.pension}
@@ -306,7 +306,7 @@ export default function OptimizadorRentas60() {
             <div className={styles.fuenteHeader}>
               <span aria-hidden="true">💰</span>
               <span className={styles.fuenteTitulo}>Rendimientos del capital mobiliario</span>
-              <span className={styles.fuenteBadge} style={{ background: '#48A9A620', color: '#48A9A6' }}>Escala ahorro 19-28%</span>
+              <span className={styles.fuenteBadge} style={{ background: '#48A9A620', color: 'var(--secondary-texto)' }}>Escala ahorro 19-28%</span>
             </div>
             <NumberInput
               value={fuentes.capitalMobiliario}

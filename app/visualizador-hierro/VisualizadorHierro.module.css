@@ -46,7 +46,7 @@
 .sectionTitle {
   font-size: clamp(1.3rem, 3vw, 1.9rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -304,7 +304,7 @@
 .absorptionValorDestacado {
   font-size: 1.4rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-variant-numeric: tabular-nums;
 }
 
@@ -409,7 +409,7 @@
 
 .escenarioBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioBtnActivo {

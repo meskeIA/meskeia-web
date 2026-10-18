@@ -324,7 +324,7 @@
 
 .coberturaItem::before {
   content: '✓';
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
   flex-shrink: 0;
 }

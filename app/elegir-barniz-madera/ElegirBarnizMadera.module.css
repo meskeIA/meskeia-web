@@ -228,7 +228,7 @@
 
 .fichaLabel {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .fichaValue {
@@ -319,7 +319,7 @@
 }
 
 .escenarioCard h3 {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
 }

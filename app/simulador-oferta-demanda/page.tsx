@@ -731,7 +731,7 @@ export default function SimuladorOfertaDemandaPage() {
         {/* DEMANDA */}
         <div className={styles.slidersGroup}>
           <h2 className={styles.slidersGroupTitle}>
-            <span aria-hidden="true" style={{ color: '#2E86AB' }}>↑↓</span> Desplazadores de Demanda
+            <span aria-hidden="true" style={{ color: 'var(--primary-texto)' }}>↑↓</span> Desplazadores de Demanda
           </h2>
 
           <div className={styles.sliderRow}>

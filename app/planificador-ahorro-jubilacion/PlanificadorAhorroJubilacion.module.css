@@ -62,7 +62,7 @@
 .cardTitle {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border);
@@ -129,8 +129,8 @@
 [data-theme='dark'] .resultItemSolution { background: #1a3a1a; }
 
 .resultLabel { color: var(--text-secondary); font-size: 0.9rem; }
-.resultValue { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
-.resultValueBig { font-weight: 700; color: var(--primary); font-size: 1.4rem; }
+.resultValue { font-weight: 700; color: var(--primary-texto); font-size: 1.1rem; }
+.resultValueBig { font-weight: 700; color: var(--primary-texto); font-size: 1.4rem; }
 .resultValueDanger { font-weight: 700; color: var(--danger); font-size: 1.1rem; }
 .resultValuePositive { font-weight: 700; color: var(--success); font-size: 1.1rem; }
 .resultNote { font-size: 0.85rem; color: var(--text-secondary); }
@@ -248,7 +248,7 @@
 
 .escenarioLabel { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
 .escenarioRent { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
-.escenarioCapital { font-weight: 700; color: var(--primary); font-size: 1.1rem; display: block; }
+.escenarioCapital { font-weight: 700; color: var(--primary-texto); font-size: 1.1rem; display: block; }
 .escenarioPension { font-size: 0.85rem; color: var(--success); margin-top: 0.25rem; }
 
 /* Tabla proyección */
@@ -323,9 +323,9 @@
 .faqList { list-style: none; padding: 0; margin: 1.5rem 0; display: flex; flex-direction: column; gap: 0.75rem; }
 .faqItem { background: var(--bg-card); border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.25rem; }
 [data-theme='dark'] .faqItem { border-color: #374151; }
-.faqItem strong { display: block; color: var(--primary); font-size: 0.95rem; margin-bottom: 0.5rem; }
+.faqItem strong { display: block; color: var(--primary-texto); font-size: 0.95rem; margin-bottom: 0.5rem; }
 .faqItem p { font-size: 0.875rem; color: var(--text-primary); margin: 0.25rem 0 0; }
-.faqTip { font-size: 0.8rem !important; color: var(--secondary) !important; font-style: italic; margin-top: 0.5rem !important; }
+.faqTip { font-size: 0.8rem !important; color: var(--secondary-texto) !important; font-style: italic; margin-top: 0.5rem !important; }
 
 .stepGuide { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
 .step { display: flex; gap: 1rem; align-items: flex-start; }

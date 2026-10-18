@@ -88,7 +88,7 @@
 }
 
 .tab:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 
@@ -159,7 +159,7 @@
 
 .copyBtn:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .copyBtn:disabled {
@@ -194,7 +194,7 @@
 
 .exampleBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Textarea */
@@ -260,7 +260,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Result Banner */
@@ -471,7 +471,7 @@
   margin: 0 0 0.5rem;
   font-weight: 600;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioExample code {
@@ -493,7 +493,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* FAQ Ampliado */
@@ -528,7 +528,7 @@
 .faqItem h3,
 .faqItem h4 {
   margin: 0 0 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   line-height: 1.5;
 }
@@ -554,7 +554,7 @@
   border-radius: 4px;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.85em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .faqItem p code {
@@ -580,7 +580,7 @@
   border-radius: 4px;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.9em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Guía Paso a Paso */
@@ -640,7 +640,7 @@
 }
 
 .stepContent p strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -650,7 +650,7 @@
   border-radius: 4px;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.85em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Mejores Prácticas (Tips Grid) */
@@ -710,7 +710,7 @@
   border-radius: 4px;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.85em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Warning Box */

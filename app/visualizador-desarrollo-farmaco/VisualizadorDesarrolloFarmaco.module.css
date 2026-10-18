@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
@@ -49,7 +49,7 @@
 .tiempoCard { display: flex; gap: var(--spacing-md); align-items: center; background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .tiempoIcono { font-size: 2rem; flex-shrink: 0; }
 .tiempoLabel { display: block; font-size: 0.82rem; color: var(--text-secondary); }
-.tiempoValor { display: block; font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+.tiempoValor { display: block; font-size: 1.3rem; font-weight: 700; color: var(--primary-texto); }
 
 /* ─── Ensayos clínicos (sección 2) ─── */
 .fasesTimeline { display: flex; align-items: flex-start; justify-content: space-around; position: relative; margin-bottom: var(--spacing-xl); padding: var(--spacing-lg) 0; }
@@ -86,7 +86,7 @@
 .aprobacionDot { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-card); border: 3px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; position: absolute; left: -40px; z-index: 1; }
 .aprobacionContenido { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); flex: 1; }
 .aprobacionNombre { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem 0; }
-.aprobacionDuracion { font-size: 0.78rem; color: var(--primary); font-weight: 600; }
+.aprobacionDuracion { font-size: 0.78rem; color: var(--primary-texto); font-weight: 600; }
 .aprobacionDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: var(--spacing-sm) 0 0 0; }
 
 .resumenTotal { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius-large); padding: var(--spacing-xl); margin-bottom: var(--spacing-lg); }
@@ -95,7 +95,7 @@
 .resumenTotalItem { text-align: center; }
 .resumenTotalIcono { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
 .resumenTotalLabel { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.2rem; }
-.resumenTotalValor { display: block; font-size: 1rem; font-weight: 700; color: var(--primary); }
+.resumenTotalValor { display: block; font-size: 1rem; font-weight: 700; color: var(--primary-texto); }
 
 .barraTemporalContainer { margin-top: var(--spacing-md); }
 .barraTemporal { display: flex; height: 44px; border-radius: 8px; overflow: hidden; }

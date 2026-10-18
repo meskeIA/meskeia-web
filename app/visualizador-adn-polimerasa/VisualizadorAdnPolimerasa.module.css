@@ -45,7 +45,7 @@
 .tituloSeccion {
   font-size: clamp(1.3rem, 3vw, 1.7rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
   text-align: center;
 }
@@ -236,7 +236,7 @@
 .tarjetaValor {
   font-size: 1.4rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
   letter-spacing: -0.02em;
 }
@@ -495,7 +495,7 @@
 
 .celdaNombre {
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
   font-size: 0.95rem;
 }
@@ -511,7 +511,7 @@
 
 .badgeNucleo {
   background: rgba(46, 134, 171, 0.15);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .badgeMito {
@@ -563,7 +563,7 @@
 .educationalItem h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 

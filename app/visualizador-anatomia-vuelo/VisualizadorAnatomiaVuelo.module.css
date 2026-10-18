@@ -16,7 +16,7 @@
 /* Navegacion */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
@@ -102,7 +102,7 @@
   align-items: center;
   gap: 0.2rem;
 }
-.flujoFlecha { font-size: 1.1rem; color: var(--primary); letter-spacing: 4px; }
+.flujoFlecha { font-size: 1.1rem; color: var(--primary-texto); letter-spacing: 4px; }
 .flujoTexto { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; }
 .flujoSuperior .flujoTexto { color: var(--verde); }
 .flujoInferior .flujoTexto { color: var(--rojo); }
@@ -206,7 +206,7 @@
 .faseMeta { font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.2rem; }
 .faseDetalle { margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid var(--border); }
 .faseDesc { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
-.faseDato { font-size: 0.82rem; color: var(--primary); margin: 0; line-height: 1.4; }
+.faseDato { font-size: 0.82rem; color: var(--primary-texto); margin: 0; line-height: 1.4; }
 
 /* ─────────────────────────────────────────
    Seccion 3: Ruta visual
@@ -223,7 +223,7 @@
   margin-bottom: var(--spacing-xl);
 }
 .rutaCiudad { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
-.rutaCode { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+.rutaCode { font-size: 1.4rem; font-weight: 800; color: var(--primary-texto); }
 .rutaNombre { font-size: 0.75rem; color: var(--text-secondary); }
 .rutaLinea {
   flex: 1;

@@ -121,7 +121,7 @@
 .tipoIcono {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipoNombre {
@@ -239,7 +239,7 @@
   display: block;
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
   margin-bottom: var(--spacing-md);
 }
@@ -317,7 +317,7 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 
@@ -350,7 +350,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -417,7 +417,7 @@
   display: block;
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 
@@ -521,7 +521,7 @@
   display: block;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 
@@ -570,7 +570,7 @@
 .tiempoItem span:last-child {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Tabla de factores */
@@ -682,7 +682,7 @@
 
 .tablaComparativaV2 tbody td:first-child {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.06);
   white-space: nowrap;
 }
@@ -748,7 +748,7 @@
 .escenarioTipLabel {
   display: block;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -888,7 +888,7 @@
 
 .tablaComparativa tbody td:first-child {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.06);
 }
 
@@ -926,7 +926,7 @@
 
 .casoSubtitle {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin-bottom: var(--spacing-sm);
 }

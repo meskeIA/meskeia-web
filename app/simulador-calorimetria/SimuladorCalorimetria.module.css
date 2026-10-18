@@ -233,7 +233,7 @@
 
 .avisoDestacado strong {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .avisoDestacado span {
@@ -296,7 +296,7 @@
 .totalValor {
   font-size: clamp(1.4rem, 4vw, 1.9rem);
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-variant-numeric: tabular-nums;
 }
 
@@ -336,7 +336,7 @@
 .resultTitle {
   font-size: 0.92rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.7rem;
 }
 
@@ -395,7 +395,7 @@
 .tramoCalor {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -435,7 +435,7 @@
 .cuerpoTitulo {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -542,7 +542,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -580,7 +580,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.35rem;
   font-style: italic;
 }

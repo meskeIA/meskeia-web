@@ -564,7 +564,7 @@ function SeccionDetox() {
           </div>
           <div className={styles.detoxCardFlechaInline} aria-hidden="true">↓</div>
           <div className={styles.detoxCardFase}>
-            <span className={styles.detoxCardFaseLabel} style={{ color: '#2E86AB' }}>RESULTADO</span>
+            <span className={styles.detoxCardFaseLabel} style={{ color: 'var(--primary-texto)' }}>RESULTADO</span>
             <p>{sustancia.resultado}</p>
           </div>
         </div>

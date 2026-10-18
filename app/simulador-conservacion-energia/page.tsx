@@ -484,7 +484,7 @@ export default function SimuladorConservacionEnergiaPage() {
           <div className={styles.energyBar}>
             <div className={styles.energyBarLabel}>
               <span><span aria-hidden="true">⚡</span> Cinética (E_c)</span>
-              <span className={styles.energyBarValue} style={{ color: '#2E86AB' }}>{fmt(data.eC, 2)} J</span>
+              <span className={styles.energyBarValue} style={{ color: 'var(--primary-texto)' }}>{fmt(data.eC, 2)} J</span>
             </div>
             <div className={styles.energyBarTrack}>
               <div
@@ -496,7 +496,7 @@ export default function SimuladorConservacionEnergiaPage() {
           <div className={styles.energyBar}>
             <div className={styles.energyBarLabel}>
               <span><span aria-hidden="true">🪜</span> Potencial (E_p)</span>
-              <span className={styles.energyBarValue} style={{ color: '#48A9A6' }}>{fmt(data.eP, 2)} J</span>
+              <span className={styles.energyBarValue} style={{ color: 'var(--secondary-texto)' }}>{fmt(data.eP, 2)} J</span>
             </div>
             <div className={styles.energyBarTrack}>
               <div

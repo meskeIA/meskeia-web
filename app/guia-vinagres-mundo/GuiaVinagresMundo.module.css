@@ -95,7 +95,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroBtn:focus-visible {
@@ -262,7 +262,7 @@
 .metricaValor {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .metricaValorTexto {
@@ -470,7 +470,7 @@
 }
 
 .escenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.98rem;
 }
 

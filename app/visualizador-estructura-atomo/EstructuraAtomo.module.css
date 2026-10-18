@@ -62,7 +62,7 @@
 
 .tab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tab:focus-visible {
@@ -72,7 +72,7 @@
 
 .tabActive {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.08);
   font-weight: 600;
 }
@@ -301,7 +301,7 @@
 .modeloTitulo {
   font-size: 1.05rem;
   margin: 0 0 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .atomoMini {
@@ -322,7 +322,7 @@
 
 .modeloLista li::before {
   content: '• ';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: bold;
 }
 
@@ -386,7 +386,7 @@
 .configSimbolo {
   font-weight: 800;
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 2rem;
   text-align: center;
 }
@@ -451,7 +451,7 @@
 .isotopoSimbolo {
   font-size: 1.2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .isotopoEstado {
@@ -523,7 +523,7 @@
 .ionResultado {
   font-size: 1.3rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .ionTipo {
@@ -619,7 +619,7 @@
 .datoNumero {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.2;
 }
 
@@ -649,7 +649,7 @@
 .meCard h4 {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .meItems {
@@ -716,7 +716,7 @@
 .hitoAnio {
   font-weight: 700;
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 5.5rem;
   white-space: nowrap;
 }
@@ -739,7 +739,7 @@
   background: rgba(46, 134, 171, 0.08);
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─── Educational ─── */
@@ -751,7 +751,7 @@
 .guideSection h2 {
   font-size: 1.05rem;
   margin: 1.25rem 0 0.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .guideSection h2:first-child {

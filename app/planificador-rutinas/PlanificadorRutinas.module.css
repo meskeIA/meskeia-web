@@ -228,7 +228,7 @@
 
 .btnEditarRutina:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnEditarRutina:focus-visible {
@@ -303,7 +303,7 @@
 .rutinaHeaderProgreso {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Tarea actual — tarjeta grande */
@@ -454,7 +454,7 @@
 }
 
 .tareaFlecha {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.8rem;
 }
 
@@ -499,7 +499,7 @@
 .finTitulo {
   font-size: clamp(1.6rem, 5vw, 2.2rem);
   font-weight: 900;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -550,7 +550,7 @@
 
 .btnFinSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ============================================
@@ -585,7 +585,7 @@
 
 .btnVolver:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnVolver:focus-visible {
@@ -714,7 +714,7 @@
 
 .btnOrden:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnOrden:disabled {
@@ -938,7 +938,7 @@
 .guiaSeccion h2 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.4rem 0 0.5rem;
 }
 
@@ -1018,7 +1018,7 @@
 
 .comparativaTable th {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   padding: 0.75rem 1rem;
   text-align: left;
@@ -1042,7 +1042,7 @@
 }
 
 .celdaDestacada {
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   font-weight: 700;
 }
 

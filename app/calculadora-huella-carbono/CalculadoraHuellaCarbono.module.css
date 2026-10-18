@@ -439,7 +439,7 @@
 .desgloseValor {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Recomendaciones */
@@ -729,7 +729,7 @@
 /* FAQ */
 .faqTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.5rem;
   font-style: italic;
 }
@@ -1011,7 +1011,7 @@
 
 .eduEscenarioCard h4 {
   margin: 0 0 0.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -1065,7 +1065,7 @@
 .eduFaqQuestion::before {
   content: '▶';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }

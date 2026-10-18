@@ -184,7 +184,7 @@
 
 .btnSlot:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSlotActivoA,
@@ -457,7 +457,7 @@
 .analisisTitleBlue {
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 
@@ -482,7 +482,7 @@
   content: '▸';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.7rem;
 }
 
@@ -607,13 +607,13 @@
 }
 
 .escenarioExample {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
 .escenarioTip {
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 500;
 }
 
@@ -648,7 +648,7 @@
   display: inline-block;
   margin-top: 0.4rem;
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
 }
 

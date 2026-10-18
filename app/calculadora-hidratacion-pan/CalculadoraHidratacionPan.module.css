@@ -104,7 +104,7 @@
 
 .modoBtn:hover {
   background: color-mix(in srgb, var(--primary) 8%, transparent);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .modoBtnActive {
@@ -260,7 +260,7 @@
 .refVal {
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .refHint {
@@ -328,7 +328,7 @@
 .resultValueBig {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .clasificacionBadge {
@@ -413,7 +413,7 @@
 .guideSection h2 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: var(--spacing-xl);
   margin-bottom: var(--spacing-sm);
 }
@@ -474,7 +474,7 @@
 .consejoCard h3 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
 }
 

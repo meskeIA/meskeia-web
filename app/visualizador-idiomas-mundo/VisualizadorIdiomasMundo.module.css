@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
@@ -93,7 +93,7 @@
 .curiosidadCard { display: flex; gap: var(--spacing-md); align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
 .curiosidadIcono { font-size: 1.8rem; flex-shrink: 0; }
 .curiosidadTitulo { display: block; font-weight: 700; font-size: 0.92rem; color: var(--text-primary); margin-bottom: 0.1rem; }
-.curiosidadDato { display: block; font-size: 0.82rem; color: var(--primary); font-weight: 600; margin-bottom: var(--spacing-sm); }
+.curiosidadDato { display: block; font-size: 0.82rem; color: var(--primary-texto); font-weight: 600; margin-bottom: var(--spacing-sm); }
 .curiosidadDetalle { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
 
 /* ─── Responsive ─── */

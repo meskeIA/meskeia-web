@@ -23,7 +23,7 @@
 .metricValue {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .metricLabel {

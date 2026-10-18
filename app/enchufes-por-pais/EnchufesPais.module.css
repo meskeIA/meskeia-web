@@ -144,7 +144,7 @@
 .datoValor {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: block;
 }
 
@@ -176,7 +176,7 @@
 
 .chipLetra {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -255,7 +255,7 @@
 .referenciaSummary::before {
   content: '▶';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s;
   flex-shrink: 0;
 }
@@ -287,7 +287,7 @@ details[open] .referenciaSummary::before {
 
 .itemTipoLetra {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
 }
 

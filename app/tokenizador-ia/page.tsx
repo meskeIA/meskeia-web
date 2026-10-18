@@ -320,7 +320,7 @@ export default function TokenizadorIa() {
           Cuando escribes un mensaje en ChatGPT, Claude o Gemini, lo primero que hace el modelo es convertir tu texto en <strong>tokens</strong> — fragmentos de texto que pueden ser palabras completas, partes de palabras, números o signos de puntuación. Este proceso usa <strong>BPE (Byte Pair Encoding)</strong>: las combinaciones de caracteres más frecuentes en el entrenamiento se convierten en tokens únicos. El español genera un 10-30% más de tokens que el inglés porque el vocabulario BPE tiene menos representación de morfemas en español.
         </p>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Comparativa de modelos: tokens y contexto
         </h4>
         <div className={styles.tableWrapper}>
@@ -339,7 +339,7 @@ export default function TokenizadorIa() {
           </table>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Casos de uso y tokens típicos
         </h4>
         <div className={styles.escenariosGrid}>
@@ -361,7 +361,7 @@ export default function TokenizadorIa() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Preguntas frecuentes
         </h4>
         <ul className={styles.faqList}>
@@ -387,7 +387,7 @@ export default function TokenizadorIa() {
           </li>
         </ul>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           5 estrategias para reducir el consumo de tokens
         </h4>
         <div className={styles.stepGuide}>
@@ -423,7 +423,7 @@ export default function TokenizadorIa() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Buenas prácticas
         </h4>
         <div className={styles.tipsGrid}>

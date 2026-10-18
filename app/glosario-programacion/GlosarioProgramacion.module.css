@@ -212,7 +212,7 @@
 
 .limpiarBtn:hover {
   background: var(--hover);
-  color: var(--primary);
+  color: var(--primary-texto);
   border-color: var(--primary);
 }
 
@@ -282,7 +282,7 @@
 
 .expandIcon {
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 300;
   line-height: 1;
 }
@@ -322,7 +322,7 @@
 .ejemploCodigo {
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   word-break: break-word;
 }
 
@@ -402,7 +402,7 @@
 .btnSecondary {
   background: var(--bg-card);
   border: 2px solid var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius);
   font-weight: 600;
@@ -605,7 +605,7 @@
 
 .faqItem h4 {
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
 }
 
@@ -626,7 +626,7 @@
   border-radius: 3px;
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 0.88em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {
@@ -727,7 +727,7 @@
   border-radius: 3px;
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 0.85em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Warning Box */

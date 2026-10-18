@@ -142,7 +142,7 @@
 
 .filterButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filterButton.active {
@@ -466,7 +466,7 @@
 }
 
 .typeCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-xs);
   font-size: 1.1rem;
 }
@@ -499,7 +499,7 @@
 }
 
 .divisionCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
   font-size: 1.1rem;
 }
@@ -710,7 +710,7 @@
 
 .faqItem h4 {
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
 }
 

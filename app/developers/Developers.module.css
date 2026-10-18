@@ -90,7 +90,7 @@
 .sectionTitle {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--primary);
@@ -278,7 +278,7 @@
 }
 
 .termsBox a {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   text-decoration: none;
 }

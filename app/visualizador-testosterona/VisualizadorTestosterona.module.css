@@ -52,7 +52,7 @@
 .tituloSeccion {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -76,7 +76,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -135,7 +135,7 @@
 }
 
 .panelFila strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -219,7 +219,7 @@
 
 .flechaEje {
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.2;
   padding: 0.2rem 0;
 }
@@ -438,7 +438,7 @@
 .educacional h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0.5rem 0 0.25rem;
 }
 

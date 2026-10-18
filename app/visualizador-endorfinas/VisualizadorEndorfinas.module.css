@@ -41,7 +41,7 @@
 .sectionTitle {
   font-size: clamp(1.25rem, 3vw, 1.75rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -133,7 +133,7 @@
 
 .tipoSubtitulo {
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
   margin: 0 0 0.75rem;
   text-transform: uppercase;
@@ -168,7 +168,7 @@
   content: '▸';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.75rem;
 }
 
@@ -277,7 +277,7 @@
 
 .anandamidaSubtitulo {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
   margin: 0;
 }
@@ -303,7 +303,7 @@
   content: '●';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.6rem;
   top: 0.45em;
 }
@@ -370,7 +370,7 @@
 
 .conclusionSeparador {
   font-size: 2rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -457,7 +457,7 @@
 
 .activadorMecanismo {
   font-size: 0.78rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   display: block;
   line-height: 1.4;
 }
@@ -534,7 +534,7 @@
 
 .tablaAspecto {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -578,7 +578,7 @@
 .educativo h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.25rem 0 0.5rem;
 }
 

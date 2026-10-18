@@ -217,7 +217,7 @@
 
 .popularButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.05);
 }
 
@@ -242,7 +242,7 @@
   font-size: 2rem;
   font-weight: 700;
   margin: 0 0 var(--spacing-md);
-  color: var(--primary);
+  color: var(--primary-texto);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -309,7 +309,7 @@
 }
 
 .modeTab:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 
@@ -342,7 +342,7 @@
   font-size: 1rem;
   font-weight: 600;
   margin: 0 0 var(--spacing-md);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   text-align: center;
 }
 
@@ -395,7 +395,7 @@
   background: var(--bg-primary);
   border: 2px solid var(--primary);
   border-radius: var(--radius);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -451,7 +451,7 @@
 
 .irregularButton:hover {
   border-color: var(--secondary);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.05);
 }
 
@@ -518,7 +518,7 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: bold;
 }
 
@@ -603,7 +603,7 @@
 
 .casoSubtitle {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
   margin-bottom: var(--spacing-sm);
 }
@@ -633,7 +633,7 @@
 
 .faqPregunta {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: var(--spacing-md);
   font-size: 0.95rem;
   border-bottom: 1px solid var(--border);

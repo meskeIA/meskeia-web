@@ -21,7 +21,7 @@
 
 .ttsButton:hover:not(:disabled) {
   border-color: var(--primary, #2E86AB);
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   background: var(--bg-card, #FFFFFF);
 }
 

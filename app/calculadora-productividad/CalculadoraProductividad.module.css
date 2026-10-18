@@ -250,7 +250,7 @@
   display: block;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultNote {
@@ -579,7 +579,7 @@
 .faqItem h3 {
   margin: 0 0 var(--spacing-sm);
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.4;
 }
 

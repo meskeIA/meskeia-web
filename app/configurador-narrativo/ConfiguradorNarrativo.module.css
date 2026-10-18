@@ -193,7 +193,7 @@
 .ctaDesc { font-size: 0.88rem; opacity: 0.9; margin: 0; }
 .ctaBtn {
   white-space: nowrap; padding: 0.85rem 1.75rem;
-  background: white; color: var(--primary);
+  background: white; color: var(--primary-boton);
   border-radius: 10px; font-size: 0.95rem; font-weight: 700;
   text-decoration: none; transition: opacity 0.15s ease; flex-shrink: 0;
 }

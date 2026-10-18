@@ -101,7 +101,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroBtn:focus-visible {
@@ -301,7 +301,7 @@
 
 .cantidadLabel {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-right: 0.35rem;
 }
 
@@ -418,7 +418,7 @@
 .escenarioTitulo {
   font-weight: 700;
   font-size: 0.92rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
 }
 
@@ -457,7 +457,7 @@
 
 .faqTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   margin-top: 0.25rem;
 }

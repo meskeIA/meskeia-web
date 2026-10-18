@@ -203,7 +203,7 @@
 
 .presetBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--focus);
 }
 
@@ -262,7 +262,7 @@
 
 .btnSecundario:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecundario:disabled {
@@ -304,7 +304,7 @@
 .vueltaNumero {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 50px;
 }
 
@@ -477,7 +477,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   border-left: 3px solid var(--secondary);
   padding: 8px 10px;
@@ -529,7 +529,7 @@
 .faqItem summary::after {
   content: '+';
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex-shrink: 0;
 }
 
@@ -548,7 +548,7 @@
 .faqItem details code {
   font-size: 0.82rem;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 1px 5px;
   border-radius: 4px;
 }
@@ -559,7 +559,7 @@
 
 .faqTip {
   font-size: 0.82rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   border-left: 3px solid var(--secondary);
   padding: 8px 10px;

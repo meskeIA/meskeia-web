@@ -125,7 +125,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroBtn:focus-visible {
@@ -178,7 +178,7 @@
   transition: all 0.15s;
 }
 
-.sosFiltroBtn:hover { border-color: var(--primary); color: var(--primary); }
+.sosFiltroBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .sosFiltroBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .sosFiltroActivo {
@@ -320,7 +320,7 @@
   padding: 0.18rem 0.55rem;
   border-radius: 8px;
   background: rgba(46,134,171,0.08);
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1px solid rgba(46,134,171,0.15);
   font-weight: 600;
 }
@@ -378,7 +378,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.72rem;
 }
 
@@ -407,7 +407,7 @@
 .guideSection h2 {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
 }
 
@@ -528,7 +528,7 @@
 .faqItem h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -544,7 +544,7 @@
   border-radius: 8px;
   padding: 0.6rem 0.8rem;
   font-size: 0.85rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
 }
 
 /* Guía paso a paso */

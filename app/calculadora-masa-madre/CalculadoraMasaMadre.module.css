@@ -193,7 +193,7 @@
 .sliderValue {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 3.5rem;
   text-align: right;
 }
@@ -256,7 +256,7 @@
 .resultValorGrande {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.1;
 }
 
@@ -301,7 +301,7 @@
 .ajusteValorPos {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* Equivalencia entre levaduras — el segundo camino de esta página (14/09/2026). */
@@ -316,7 +316,7 @@
 .equivalenciaTitulo {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-bottom: 0.6rem;
 }
 

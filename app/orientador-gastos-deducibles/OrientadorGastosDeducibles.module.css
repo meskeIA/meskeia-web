@@ -82,7 +82,7 @@
 }
 
 .infoBanner h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
   margin-bottom: var(--spacing-sm);
 }
@@ -412,7 +412,7 @@
 }
 
 .valorDestacado {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Desglose */
@@ -549,7 +549,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -614,7 +614,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: bold;
 }
 
@@ -856,7 +856,7 @@
 .faqItem dt {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   line-height: 1.5;
 }
@@ -874,7 +874,7 @@
 
 .faqTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   padding: var(--spacing-sm) var(--spacing-md);
   background: rgba(72, 169, 166, 0.08);
   border-left: 3px solid var(--secondary);

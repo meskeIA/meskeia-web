@@ -122,8 +122,8 @@ function SeccionOndas() {
             <thead>
               <tr>
                 <th>Característica</th>
-                <th style={{ color: '#2E86AB' }}>2,4 GHz</th>
-                <th style={{ color: '#48A9A6' }}>5 GHz</th>
+                <th style={{ color: 'var(--primary-texto)' }}>2,4 GHz</th>
+                <th style={{ color: 'var(--secondary-texto)' }}>5 GHz</th>
               </tr>
             </thead>
             <tbody>
@@ -346,7 +346,7 @@ function SeccionCanales() {
             <span className={styles.canalDetalle}>Solo caben 3 redes sin interferirse (1, 6, 11)</span>
           </div>
           <div className={styles.canalComparativa}>
-            <span className={styles.canalBanda} style={{ color: '#48A9A6' }}>5 GHz</span>
+            <span className={styles.canalBanda} style={{ color: 'var(--secondary-texto)' }}>5 GHz</span>
             <span className={styles.canalDato}>25+ canales sin solape</span>
             <span className={styles.canalDetalle}>Canales más anchos (40/80/160 MHz) y sin solape</span>
           </div>

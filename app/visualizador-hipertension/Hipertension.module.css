@@ -81,7 +81,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navBtn:focus-visible {
@@ -596,7 +596,7 @@
 
 .factoresTab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .factoresTab:focus-visible {

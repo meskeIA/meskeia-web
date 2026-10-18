@@ -297,7 +297,7 @@ export default function CalculadoraZonasEntrenamientoPage() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong style={{color:'#48A9A6'}}>Z1 — Recuperación</strong></td>
+                    <td><strong style={{color:'var(--secondary-texto)'}}>Z1 — Recuperación</strong></td>
                     <td>50–60%</td><td>Muy ligero</td>
                     <td>Quema de grasas, circulación</td><td>Recuperación, principiantes</td>
                   </tr>

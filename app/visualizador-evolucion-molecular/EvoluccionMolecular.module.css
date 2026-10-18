@@ -34,7 +34,7 @@
   border: 2px solid var(--border); border-radius: var(--radius);
   cursor: pointer; transition: all 0.2s; color: var(--text-secondary);
 }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -101,7 +101,7 @@
   background: var(--hover); border-radius: var(--radius);
   padding: var(--spacing-md); text-align: center;
 }
-.estadNumero { font-size: 1.6rem; font-weight: 700; color: var(--primary); }
+.estadNumero { font-size: 1.6rem; font-weight: 700; color: var(--primary-texto); }
 .estadLabel { font-size: 0.78rem; color: var(--text-secondary); }
 
 /* Mini gráfico de barras */
@@ -121,7 +121,7 @@
   padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.82rem; font-weight: 600;
   margin-bottom: var(--spacing-md);
 }
-.badgeNeutra { background: rgba(72,169,166,0.15); color: var(--secondary); }
+.badgeNeutra { background: rgba(72,169,166,0.15); color: var(--secondary-texto); }
 .badgeSeleccion { background: rgba(244,67,54,0.12); color: #C62828; }
 [data-theme='dark'] .badgeNeutra { background: rgba(72,169,166,0.25); color: #80CBC4; }
 [data-theme='dark'] .badgeSeleccion { background: rgba(244,67,54,0.2); color: #EF9A9A; }
@@ -140,7 +140,7 @@
 }
 .secuenciaBloque { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); }
 .secuenciaEspecie {
-  font-size: 0.82rem; font-weight: 700; color: var(--primary);
+  font-size: 0.82rem; font-weight: 700; color: var(--primary-texto);
   margin-bottom: var(--spacing-sm); text-align: center;
 }
 .secuenciaAa {
@@ -149,7 +149,7 @@
 .aa {
   width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
   border-radius: 5px; font-size: 0.75rem; font-weight: 700;
-  background: rgba(46,134,171,0.1); color: var(--primary);
+  background: rgba(46,134,171,0.1); color: var(--primary-texto);
   border: 1px solid rgba(46,134,171,0.2); font-family: monospace;
   transition: all 0.3s;
 }
@@ -165,7 +165,7 @@
   margin-bottom: 0.5rem;
 }
 .sliderTitulo { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
-.sliderValor { font-size: 1rem; font-weight: 700; color: var(--primary); }
+.sliderValor { font-size: 1rem; font-weight: 700; color: var(--primary-texto); }
 .inputRange {
   width: 100%; accent-color: var(--primary); cursor: pointer; height: 6px;
 }
@@ -176,7 +176,7 @@
   text-align: center;
 }
 .formulaTexto {
-  font-size: 1.2rem; font-weight: 700; color: var(--primary);
+  font-size: 1.2rem; font-weight: 700; color: var(--primary-texto);
   font-family: 'Courier New', monospace; margin-bottom: 0.5rem;
 }
 .formulaExplicacion { font-size: 0.82rem; color: var(--text-secondary); }
@@ -186,7 +186,7 @@
   margin-bottom: var(--spacing-lg);
 }
 .resultadoCard { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
-.resultadoValor { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+.resultadoValor { font-size: 1.4rem; font-weight: 700; color: var(--primary-texto); }
 .resultadoLabel { font-size: 0.75rem; color: var(--text-secondary); }
 
 .ejemplosProteinas {
@@ -198,7 +198,7 @@
   font-size: 0.85rem;
 }
 .proteínaLabel { color: var(--text-primary); font-weight: 600; }
-.proteínaValor { color: var(--secondary); font-weight: 700; font-family: monospace; }
+.proteínaValor { color: var(--secondary-texto); font-weight: 700; font-family: monospace; }
 
 /* ─── Árbol Filogenético ─── */
 .selectorConjunto {
@@ -211,9 +211,9 @@
   cursor: pointer; text-align: center; transition: all 0.2s;
   color: var(--text-secondary);
 }
-.conjuntoBtn:hover { border-color: var(--primary); color: var(--primary); }
+.conjuntoBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .conjuntoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.conjuntoActivo { border-color: var(--primary); background: rgba(46,134,171,0.06); color: var(--primary); }
+.conjuntoActivo { border-color: var(--primary); background: rgba(46,134,171,0.06); color: var(--primary-texto); }
 .conjuntoBtnNombre { font-size: 0.9rem; font-weight: 700; }
 .conjuntoBtnDesc { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; }
 
@@ -233,7 +233,7 @@
   width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
   border-radius: 4px; font-size: 0.68rem; font-weight: 700;
   font-family: monospace; background: rgba(46,134,171,0.1);
-  color: var(--primary); border: 1px solid rgba(46,134,171,0.2);
+  color: var(--primary-texto); border: 1px solid rgba(46,134,171,0.2);
 }
 .alineamientoBaseDif {
   background: rgba(244,67,54,0.12); color: #C62828; border-color: #EF9A9A;
@@ -251,7 +251,7 @@
   background: var(--bg-card); cursor: pointer; font-size: 0.82rem; font-weight: 600;
   color: var(--text-secondary); transition: all 0.2s;
 }
-.especieSelBtn:hover { border-color: var(--primary); color: var(--primary); }
+.especieSelBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .especieSelBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .especieSelActiva { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 
@@ -260,7 +260,7 @@
   border: 1px solid rgba(72,169,166,0.3); border-radius: var(--radius);
   padding: var(--spacing-md); text-align: center; margin-bottom: var(--spacing-lg);
 }
-.mrcaTitulo { font-size: 0.85rem; font-weight: 700; color: var(--secondary); margin-bottom: 0.3rem; }
+.mrcaTitulo { font-size: 0.85rem; font-weight: 700; color: var(--secondary-texto); margin-bottom: 0.3rem; }
 .mrcaDescripcion { font-size: 0.88rem; color: var(--text-secondary); }
 
 /* ─── Evidencia Molecular (Cards) ─── */
@@ -284,7 +284,7 @@
 .evidenciaEjemplo {
   margin-top: 0.5rem; padding: 0.5rem var(--spacing-md);
   background: var(--hover); border-radius: 8px; font-size: 0.8rem;
-  color: var(--primary); font-style: italic; border-left: 3px solid var(--secondary);
+  color: var(--primary-texto); font-style: italic; border-left: 3px solid var(--secondary);
 }
 
 /* Botones comunes */
@@ -313,7 +313,7 @@
   padding: var(--spacing-lg); margin: var(--spacing-lg) 0;
   font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6;
 }
-.warningBox strong { color: var(--primary); }
+.warningBox strong { color: var(--primary-texto); }
 [data-theme='dark'] .warningBox { border-color: rgba(72,169,166,0.3); }
 
 /* Responsive */

@@ -61,7 +61,7 @@
 }
 
 .tab:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
   background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
 }
 
@@ -71,7 +71,7 @@
 }
 
 .tabActive {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-color: var(--primary);
   background: var(--bg-card);
   font-weight: 700;
@@ -98,7 +98,7 @@
 .tabTitle {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -168,7 +168,7 @@
 .statValor {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: monospace;
 }
 
@@ -190,7 +190,7 @@
 .infoBox h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 
@@ -220,7 +220,7 @@
 .partCard h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0.5rem 0 0.5rem;
 }
 
@@ -246,7 +246,7 @@
 
 .partCard ul li::before {
   content: '▸';
-  color: var(--primary);
+  color: var(--primary-texto);
   position: absolute;
   left: 0;
 }
@@ -378,7 +378,7 @@
 .educationalContent h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.25rem 0 0.4rem;
 }
 

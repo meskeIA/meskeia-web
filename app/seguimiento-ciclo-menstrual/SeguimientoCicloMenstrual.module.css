@@ -60,7 +60,7 @@
 .sectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 20px;
   padding-bottom: 12px;
   border-bottom: 2px solid var(--primary);
@@ -120,7 +120,7 @@
   min-width: 36px;
   text-align: right;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -232,7 +232,7 @@
   font-size: 0.78rem;
   background: rgba(72, 169, 166, 0.1);
   border: 1px solid var(--secondary);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   border-radius: 20px;
   padding: 3px 10px;
   font-weight: 600;
@@ -263,7 +263,7 @@
 .faseTitulo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 4px;
 }
 
@@ -277,7 +277,7 @@
 .faseDia {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   flex-shrink: 0;
 }

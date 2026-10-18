@@ -224,7 +224,7 @@
 }
 
 .comparativaItem.destacado .comparativaValor {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 

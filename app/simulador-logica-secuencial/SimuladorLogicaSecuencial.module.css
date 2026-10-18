@@ -87,7 +87,7 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .circuitoBtnActive .familiaBadge {
@@ -122,7 +122,7 @@
   font-family: var(--font-mono, monospace);
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -409,7 +409,7 @@
 .panelTitulo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -446,7 +446,7 @@
   font-family: var(--font-mono, monospace);
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -500,7 +500,7 @@
   background: var(--bg-primary);
   padding: 2px 6px;
   border-radius: 4px;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .estadosRow {
@@ -530,7 +530,7 @@
   font-family: var(--font-mono, monospace);
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .estadoDesc {
@@ -688,7 +688,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -715,7 +715,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -773,7 +773,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -807,7 +807,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
 }
 

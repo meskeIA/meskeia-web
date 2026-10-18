@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -61,15 +61,15 @@
 /* Sección Bolsillo: componente nav */
 .componenteNav { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
 .componenteBtn { padding: 0.4rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 0.78rem; color: var(--text-secondary); transition: all 0.2s; display: flex; align-items: center; gap: 0.3rem; }
-.componenteBtn:hover { border-color: var(--primary); color: var(--primary); }
+.componenteBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .componenteBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .componenteBtnActivo { background: var(--primary-boton); color: white; border-color: var(--primary-boton); }
-.componenteTag { display: inline-block; font-size: 0.7rem; font-weight: 600; color: var(--primary); background: rgba(46, 134, 171, 0.1); padding: 0.15rem 0.5rem; border-radius: 10px; margin-bottom: 0.3rem; }
+.componenteTag { display: inline-block; font-size: 0.7rem; font-weight: 600; color: var(--primary-texto); background: rgba(46, 134, 171, 0.1); padding: 0.15rem 0.5rem; border-radius: 10px; margin-bottom: 0.3rem; }
 .smartphoneGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
 
 /* Dato destacado */
 .datoDestacado { display: flex; align-items: center; gap: var(--spacing-md); background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
-.datoNumero { font-size: 2.5rem; font-weight: 800; color: var(--primary); flex-shrink: 0; }
+.datoNumero { font-size: 2.5rem; font-weight: 800; color: var(--primary-texto); flex-shrink: 0; }
 .datoTexto { font-size: 0.95rem; color: var(--text-primary); line-height: 1.4; }
 
 /* Sección Casa: habitación nav */
@@ -90,7 +90,7 @@
 .abundanciaBarras { display: flex; flex-direction: column; gap: var(--spacing-sm); }
 .abundanciaBarra { display: flex; align-items: center; gap: var(--spacing-sm); }
 .abundanciaLabel { display: flex; align-items: center; gap: 0.3rem; min-width: 100px; flex-shrink: 0; }
-.abundanciaSimbolo { font-weight: 800; font-size: 1rem; color: var(--primary); min-width: 28px; }
+.abundanciaSimbolo { font-weight: 800; font-size: 1rem; color: var(--primary-texto); min-width: 28px; }
 .abundanciaNombre { font-size: 0.82rem; color: var(--text-secondary); }
 .barraContainer { flex: 1; height: 24px; background: var(--border); border-radius: 12px; overflow: hidden; }
 .barraFill { height: 100%; border-radius: 12px; transition: width 0.5s ease; min-width: 4px; }

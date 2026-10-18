@@ -39,7 +39,7 @@
   border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
   color: var(--text-secondary);
 }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -165,7 +165,7 @@
   font-size: 0.85rem; color: var(--text-primary); padding: 0.25rem 0;
   padding-left: 1rem; position: relative;
 }
-.procesoEjemplos li::before { content: '•'; color: var(--primary); position: absolute; left: 0; font-weight: 700; }
+.procesoEjemplos li::before { content: '•'; color: var(--primary-texto); position: absolute; left: 0; font-weight: 700; }
 .procesoDato {
   background: var(--hover); border-radius: 8px; padding: var(--spacing-sm) var(--spacing-md);
   font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;
@@ -199,7 +199,7 @@
 }
 .sraaEslabon strong { font-size: 0.82rem; }
 .sraaEslabon small { font-size: 0.72rem; color: var(--text-muted); }
-.sraaFlecha { font-size: 1.2rem; color: var(--primary); font-weight: 700; flex-shrink: 0; }
+.sraaFlecha { font-size: 1.2rem; color: var(--primary-texto); font-weight: 700; flex-shrink: 0; }
 
 /* Hormonas grid */
 .hormonasGrid {
@@ -337,7 +337,7 @@
 .escenarioCard strong {
   display: block;
   margin-bottom: 0.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
 }
 
@@ -384,7 +384,7 @@
 .faqTip {
   display: inline-block;
   background: linear-gradient(135deg, #e8f4fd, #e0f2f1);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.78rem;
   font-weight: 600;
   padding: 0.2rem 0.7rem;

@@ -41,7 +41,7 @@
 
 .secondary {
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
 }
 
@@ -58,7 +58,7 @@
 
 .outline:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 

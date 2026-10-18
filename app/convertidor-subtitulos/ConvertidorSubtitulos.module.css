@@ -191,7 +191,7 @@
 
 .btnSecondary {
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1.5px solid var(--primary);
 }
 
@@ -267,7 +267,7 @@
 
 .statValue {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 
@@ -284,7 +284,7 @@
 }
 
 .guideSection h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-sm);
 }

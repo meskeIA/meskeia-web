@@ -170,7 +170,7 @@
   display: block;
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Results Panel */
@@ -288,7 +288,7 @@
 
 .formula {
   font-family: 'Courier New', monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -315,7 +315,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -505,7 +505,7 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: 0 var(--radius) var(--radius) 0;
   font-size: 0.83rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 500;
 }
 

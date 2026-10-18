@@ -20,7 +20,7 @@
 /* Navegación décadas */
 .decadaNav { display: flex; gap: var(--spacing-sm); justify-content: center; margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
 .decadaBtn { padding: 0.6rem 1.2rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 999px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); transition: all 0.15s; }
-.decadaBtn:hover { border-color: var(--primary); color: var(--primary); }
+.decadaBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .decadaActiva { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 .decadaActiva:hover { background: var(--primary-boton); color: white; }
 
@@ -57,7 +57,7 @@
 .insight p { margin: 0; }
 
 .enlaceApp { text-align: center; padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-xl); }
-.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a { color: var(--primary-texto); font-weight: 600; text-decoration: none; }
 .enlaceApp a:hover { text-decoration: underline; }
 
 .warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }

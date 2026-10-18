@@ -1043,7 +1043,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                       <div key={fila.mes} style={{ marginBottom: '1rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.85rem' }}>
                           <span style={{ fontWeight: 600 }}>{fila.mes}</span>
-                          <span style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                          <span style={{ fontWeight: 700, color: 'var(--primary-texto)' }}>
                             {fila.pct}% LATAM
                           </span>
                         </div>
@@ -1872,7 +1872,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                                 <td style={{ textAlign: 'center' }}>{t.propio.semana > 0 ? t.propio.semana : '–'}</td>
                                 <td style={{ textAlign: 'center' }}>{t.propio.mes > 0 ? t.propio.mes : '–'}</td>
                                 <td style={{ textAlign: 'center' }}>{t.propio.total > 0 ? t.propio.total : '–'}</td>
-                                <td style={{ textAlign: 'center', fontWeight: 600, color: 'var(--primary)' }}>
+                                <td style={{ textAlign: 'center', fontWeight: 600, color: 'var(--primary-texto)' }}>
                                   {t.pctPortal == null ? '–' : `${t.pctPortal.toLocaleString('es-ES')}%`}
                                 </td>
                               </tr>
@@ -1941,7 +1941,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                             <td style={{ textAlign: 'center' }}>{dominioFusion.accesoPropios.semana || '–'}</td>
                             <td style={{ textAlign: 'center' }}>{dominioFusion.accesoPropios.mes || '–'}</td>
                             <td style={{ textAlign: 'center' }}>{dominioFusion.accesoPropios.total || '–'}</td>
-                            <td style={{ textAlign: 'center', fontWeight: 700, color: 'var(--primary)' }}>
+                            <td style={{ textAlign: 'center', fontWeight: 700, color: 'var(--primary-texto)' }}>
                               {dominioFusion.pctPortalGlobal == null ? '–' : `${dominioFusion.pctPortalGlobal.toLocaleString('es-ES')}%`}
                             </td>
                           </tr>

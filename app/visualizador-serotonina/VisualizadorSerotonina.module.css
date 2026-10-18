@@ -112,7 +112,7 @@
   display: block;
   font-size: 1.9rem;
   font-weight: 800;
-  color: #2E86AB;
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -182,7 +182,7 @@
 }
 
 .insightBox strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ─── Síntesis grid ──────────────────────── */
@@ -519,7 +519,7 @@
 }
 
 .sinapsisDesc strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ─── FAQ grid ──────────────────────────── */
@@ -545,7 +545,7 @@
 .faqPregunta {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
   line-height: 1.35;
 }
@@ -570,7 +570,7 @@
 }
 
 .warningBox strong {
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ─── Dark mode ──────────────────────────── */

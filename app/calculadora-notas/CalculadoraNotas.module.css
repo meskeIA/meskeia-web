@@ -215,7 +215,7 @@
 
 .btnAnadir:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.05);
 }
 
@@ -380,7 +380,7 @@
   display: block;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 
@@ -419,7 +419,7 @@
 .simuladorResultadoValor {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 
@@ -521,7 +521,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -665,7 +665,7 @@
   display: inline-block;
   margin-top: 0.5rem;
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -740,7 +740,7 @@
 .escenarioIcon { font-size: 1.5rem; }
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46,134,171,0.07);
   border-left: 3px solid var(--primary);
   padding: 0.4rem 0.75rem;

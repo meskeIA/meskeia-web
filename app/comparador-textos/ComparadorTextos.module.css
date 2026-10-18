@@ -173,7 +173,7 @@
 
 .statSimilitud strong {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statSimilitud span {
@@ -196,7 +196,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Diff Panel */

@@ -77,7 +77,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroBtnActivo,
@@ -232,7 +232,7 @@
 
 .btnVolver:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnVolverBottom {
@@ -520,13 +520,13 @@
 
 .escenarioExample {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
 .escenarioTip {
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 500;
   margin-top: 0.4rem;
 }
@@ -562,7 +562,7 @@
   display: inline-block;
   margin-top: 0.4rem;
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
 }
 

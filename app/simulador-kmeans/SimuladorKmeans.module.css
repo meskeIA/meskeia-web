@@ -157,7 +157,7 @@
 .controlValue {
   font-family: 'SF Mono', Monaco, monospace;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   min-width: 32px;
   text-align: right;
@@ -190,7 +190,7 @@
 .metodoActive {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -371,7 +371,7 @@
 .metricValue {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'SF Mono', Monaco, monospace;
 }
 
@@ -493,7 +493,7 @@
 }
 
 .codoSugerido strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 1rem;
 }
 
@@ -653,7 +653,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -685,7 +685,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
 }
@@ -703,11 +703,11 @@
   border-radius: 4px;
   font-family: 'SF Mono', Monaco, monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   background: rgba(72, 169, 166, 0.08);
   padding: 0.4rem 0.75rem;
   border-radius: 6px;
@@ -792,7 +792,7 @@
   border-radius: 4px;
   font-family: 'SF Mono', Monaco, monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .stepNumber {
@@ -839,7 +839,7 @@
   border-radius: 4px;
   font-family: 'SF Mono', Monaco, monospace;
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .tipCard {

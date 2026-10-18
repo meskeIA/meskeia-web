@@ -142,7 +142,7 @@
 
 .normaDetalle {
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -174,7 +174,7 @@
 
 .tipoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipoBtn.activo {
@@ -204,7 +204,7 @@
 
 .legend {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   padding: 0 var(--spacing-sm);
 }
@@ -337,7 +337,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnPeligro {
@@ -364,7 +364,7 @@
   border: 1px dashed var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: background 0.2s ease;
 }
@@ -412,7 +412,7 @@
 .btnCopiar:hover,
 .btnCopiarMini:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .confirmacion {
@@ -501,7 +501,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .citaTexto {
@@ -571,7 +571,7 @@
 
 .numeroVan {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ── Warning box (visible y en la sección educativa) ─────────────── */
@@ -774,7 +774,7 @@
 
 .escenarioExample code {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   word-break: break-word;
 }
 
@@ -786,7 +786,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* FAQ */
@@ -819,12 +819,12 @@
 
 .faqQuestion:hover {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqQuestion::before {
   content: '▶';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.7rem;
   margin-right: var(--spacing-sm);
 }

@@ -61,7 +61,7 @@
   padding: var(--spacing-xl);
 }
 .cardTitle {
-  font-size: 1.2rem; font-weight: 700; color: var(--primary);
+  font-size: 1.2rem; font-weight: 700; color: var(--primary-texto);
   margin: 0 0 var(--spacing-lg);
   padding-bottom: var(--spacing-md);
   border-bottom: 2px solid var(--border);
@@ -90,7 +90,7 @@
 }
 .optionDesc { font-size: 0.78rem; color: var(--text-secondary); }
 .optionBtn:hover { border-color: var(--primary); }
-.optionActivo { border-color: var(--primary); background: rgba(46, 134, 171, 0.07); color: var(--primary); font-weight: 600; }
+.optionActivo { border-color: var(--primary); background: rgba(46, 134, 171, 0.07); color: var(--primary-texto); font-weight: 600; }
 [data-theme='dark'] .optionActivo { background: rgba(46, 134, 171, 0.15); }
 
 .btn {
@@ -127,7 +127,7 @@
   padding: 0.85rem 1rem; border-radius: var(--radius); font-size: 0.85rem;
 }
 .margenCard { background: rgba(46, 134, 171, 0.06); border: 1px solid rgba(46, 134, 171, 0.15); }
-.margenCard strong { display: block; color: var(--primary); margin-bottom: 0.2rem; }
+.margenCard strong { display: block; color: var(--primary-texto); margin-bottom: 0.2rem; }
 .margenCard p { margin: 0; color: var(--text-secondary); }
 
 .alternativasCard { background: rgba(230, 126, 34, 0.06); border: 1px solid rgba(230, 126, 34, 0.15); }
@@ -153,7 +153,7 @@
 .umbralLabel { display: block; color: var(--text-secondary); margin-bottom: 0.2rem; }
 .umbralItem strong { color: var(--text-primary); font-size: 0.9rem; }
 .umbralActivo { border-color: var(--primary); background: rgba(46, 134, 171, 0.07); }
-.umbralActivo strong { color: var(--primary); }
+.umbralActivo strong { color: var(--primary-texto); }
 [data-theme='dark'] .umbralActivo { background: rgba(46, 134, 171, 0.15); }
 
 /* ─── Prestaciones ─────────────────────────────────────── */
@@ -174,7 +174,7 @@
 
 /* ===== PROFESIONALIZACIÓN v2.0 ===== */
 
-.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin: 1.5rem 0 0.75rem; }
+.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-texto); margin: 1.5rem 0 0.75rem; }
 .guideSection h2:first-child { margin-top: 0; }
 .guideSection p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin: 0 0 0.75rem; }
 
@@ -200,7 +200,7 @@
   display: flex; justify-content: space-between; align-items: center;
 }
 .faqItem summary::-webkit-details-marker { display: none; }
-.faqItem summary::after { content: '+'; font-size: 1.2rem; color: var(--primary); }
+.faqItem summary::after { content: '+'; font-size: 1.2rem; color: var(--primary-texto); }
 .faqItem[open] summary::after { content: '\2212'; }
 .faqItem p { padding: 0 1.25rem 1rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
 

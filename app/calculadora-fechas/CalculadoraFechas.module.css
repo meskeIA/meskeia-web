@@ -55,7 +55,7 @@
   font-size: 1.4em;
   font-weight: 600;
   margin-bottom: 24px;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -333,7 +333,7 @@
 }
 
 .guideSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.8em;
   margin-bottom: 20px;
   text-align: center;
@@ -369,7 +369,7 @@
 }
 
 .contentCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.15em;
   margin-bottom: 12px;
   font-weight: 600;
@@ -387,7 +387,7 @@
 }
 
 .contentCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -425,7 +425,7 @@
 .faqItem summary::after {
   content: '+';
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
 }
 
@@ -590,7 +590,7 @@
   margin: 0 0 0.5rem;
   font-weight: 600;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioExample code {
@@ -612,7 +612,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* 3. FAQ AMPLIADO (redefinido para estilo profesional) */
@@ -647,7 +647,7 @@
 .faqItem h3,
 .faqItem h4 {
   margin: 0 0 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   line-height: 1.5;
 }
@@ -751,7 +751,7 @@
 }
 
 .stepContent p strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 

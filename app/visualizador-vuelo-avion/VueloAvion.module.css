@@ -9,13 +9,13 @@
 .hero p { font-size: 1.1rem; opacity: 0.92; max-width: 640px; margin: 0 auto; }
 
 .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1.5rem 2rem; max-width: 900px; margin: 0 auto; }
-.tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: 2px solid var(--primary); border-radius: 2rem; background: transparent; color: var(--primary); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: 2px solid var(--primary); border-radius: 2rem; background: transparent; color: var(--primary-texto); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .tab:hover { background: var(--primary-boton); color: #fff; }
 .tabActiva { background: var(--primary-boton); color: #fff; }
 .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .seccion { max-width: 900px; margin: 0 auto; padding: 1rem 2rem 2rem; }
-.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 0 0 0.5rem; }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 0.5rem; }
 .seccionSubtitulo { color: var(--text-secondary); margin: 0 0 1.5rem; }
 
 /* Mitos */
@@ -39,7 +39,7 @@
 
 /* Slider */
 .sliderSection { background: var(--bg-card); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
-.sliderTitulo { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0 0 1rem; }
+.sliderTitulo { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 1rem; }
 .sliderWrapper { margin-bottom: 1rem; }
 .sliderLabel { display: block; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-primary); }
 .stallWarning { color: #DC2626; font-weight: 700; }
@@ -58,7 +58,7 @@
 /* Fuerzas */
 .fuerzasSelector { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.25rem; }
 .fuerzaBtn { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border: 2px solid var(--text-muted); border-radius: 2rem; background: transparent; color: var(--text-secondary); font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
-.fuerzaBtn:hover { border-color: var(--primary); color: var(--primary); }
+.fuerzaBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .fuerzaBtnActiva { font-weight: 600; }
 .fuerzaBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .fuerzasDiagrama { display: flex; justify-content: center; margin-bottom: 1.25rem; }
@@ -71,9 +71,9 @@
 .formulaBox { border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 0.6rem 0.9rem; }
 [data-theme='dark'] .formulaBox { border-color: #374151; }
 .formulaLabel { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); display: block; margin-bottom: 0.2rem; }
-.formula { font-family: monospace; font-size: 0.9rem; color: var(--primary); }
+.formula { font-family: monospace; font-size: 0.9rem; color: var(--primary-texto); }
 .equilibrioBox { background: var(--bg-card); border-radius: 12px; padding: 1.1rem; }
-.equilibrioBox h3 { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0 0 0.75rem; }
+.equilibrioBox h3 { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 0.75rem; }
 .equilibrioGrid { display: flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
 .equilibrioItem { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 600; }
 .equilibrioIcono { font-size: 1.3rem; }
@@ -84,7 +84,7 @@
 .casoCard { background: var(--bg-card); border-radius: 12px; padding: 1.25rem; }
 .casoHeader { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
 .casoIcono { font-size: 1.5rem; }
-.casoTitulo { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0; }
+.casoTitulo { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0; }
 .casoPregunta { font-size: 0.88rem; color: var(--text-primary); margin: 0 0 0.5rem; }
 .casoRespuesta { font-size: 0.88rem; color: #16A34A; font-weight: 600; margin: 0 0 0.5rem; }
 .casoDetalle { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }

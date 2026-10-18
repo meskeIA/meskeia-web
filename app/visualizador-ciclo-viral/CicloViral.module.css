@@ -45,7 +45,7 @@
 .tituloSeccion {
   font-size: clamp(1.3rem, 3vw, 1.7rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
   text-align: center;
 }
@@ -274,7 +274,7 @@
 .etapaNombre {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -327,7 +327,7 @@
   margin-top: auto;
   background: transparent;
   border: 1px solid var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 0.35rem 0.9rem;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -435,7 +435,7 @@
   border-radius: 24px;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
@@ -533,7 +533,7 @@
 .tipoCard h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -573,7 +573,7 @@
 .evasionTitulo {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -613,7 +613,7 @@
 .eduCard h4 {
   font-size: 0.97rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 

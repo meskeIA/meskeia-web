@@ -126,7 +126,7 @@ export default function OrientadorDeduccionObrasEnergeticasPage() {
             La normativa ha sido prorrogada varias veces y puede cambiar. Consulta siempre con un
             asesor fiscal y con la{' '}
             <a href="https://sede.agenciatributaria.gob.es/Sede/vivienda-otros-inmuebles/deducciones-obras-mejora-eficiencia-energetica-viviendas.html"
-              target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>
+              target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-texto)' }}>
               página oficial de la AEAT
             </a>{' '}
             antes de aplicar estas deducciones. <em>meskeIA no se responsabiliza de decisiones basadas en esta orientación.</em>

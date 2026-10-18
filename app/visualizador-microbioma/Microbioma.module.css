@@ -157,7 +157,7 @@
 
 .zonaCantidad {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin: 0;
 }
@@ -274,7 +274,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .ejeList {
@@ -303,7 +303,7 @@
 .ejeFlecha1,
 .ejeFlecha2 {
   font-size: 2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -548,7 +548,7 @@
 
 .faqQuestion::before {
   content: '+ ';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 

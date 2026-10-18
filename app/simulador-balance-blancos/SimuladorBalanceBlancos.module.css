@@ -56,11 +56,11 @@
 }
 
 .tabBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabActive {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
 }
 
@@ -130,7 +130,7 @@
 
 .valueBadge {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
   background: #eff6ff;
@@ -316,7 +316,7 @@
 
 .calcBtnGhost:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .calcBtnGhost:focus-visible {
@@ -533,7 +533,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -577,12 +577,12 @@
 
 .faqTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
 .faqItem a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 
@@ -664,7 +664,7 @@
 }
 
 .tipCard a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 

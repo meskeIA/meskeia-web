@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -118,7 +118,7 @@
 /* ─── Sección 3: Convección en la naturaleza ─── */
 .conveccionSelector { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
 .conveccionBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
-.conveccionBtn:hover { border-color: var(--primary); color: var(--primary); }
+.conveccionBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .conveccionBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .conveccionBtnActivo { background: var(--bg-card); font-weight: 700; color: var(--text-primary); }
 

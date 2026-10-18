@@ -102,7 +102,7 @@
 }
 
 .tipoBtnActivo .tipoNombre {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Entrada de datos */
@@ -172,7 +172,7 @@
 
 .btnEjemplo:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--focus);
 }
 
@@ -294,7 +294,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Info Card */
@@ -329,7 +329,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Info Panel */
@@ -566,7 +566,7 @@
 
 .escenarioTip {
   font-size: 0.83rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   line-height: 1.5;
   margin: 0;
@@ -625,7 +625,7 @@
 .faqItem summary::before {
   content: '▶';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s;
   flex-shrink: 0;
 }

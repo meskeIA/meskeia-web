@@ -51,7 +51,7 @@
 
 .pilaTitulo {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-xs) 0;
 }
 
@@ -135,7 +135,7 @@
 .veredictoValor {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
 }
 
@@ -182,7 +182,7 @@
 }
 
 .electrodoCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -209,7 +209,7 @@
 
 .bloqueCalculo h3 {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: var(--spacing-md) 0 var(--spacing-xs) 0;
 }
 
@@ -329,7 +329,7 @@
 
 .limpiarBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .limpiarBtn:focus-visible {
@@ -451,7 +451,7 @@
 .filaSemi {
   font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -459,7 +459,7 @@
   font-family: var(--font-mono, 'Cambria Math', Georgia, serif);
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   white-space: nowrap;
 }
 
@@ -479,7 +479,7 @@
 
 .detalle h3 {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: var(--spacing-md) 0 var(--spacing-xs) 0;
 }
 
@@ -510,7 +510,7 @@
 
 .badgeNeutro {
   background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .datosLista {
@@ -528,7 +528,7 @@
   padding: 0.55rem 1rem;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: var(--radius);
   cursor: pointer;
   font-size: 0.9rem;
@@ -569,7 +569,7 @@
 
 .serieTitulo {
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm) 0;
 }
 
@@ -601,7 +601,7 @@
 
 .serieSimbolo {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -647,7 +647,7 @@
 }
 
 .guideSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.25rem;
   margin-bottom: var(--spacing-sm);
 }
@@ -723,7 +723,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -751,7 +751,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -804,7 +804,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -838,7 +838,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 

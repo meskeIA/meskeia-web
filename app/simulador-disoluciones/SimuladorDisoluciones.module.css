@@ -157,7 +157,7 @@
 }
 
 .masaMolarNota strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .inlineInput {
@@ -184,7 +184,7 @@
 }
 
 .sliderFila label strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'SF Mono', Monaco, monospace;
 }
 
@@ -252,7 +252,7 @@
 }
 
 .resultDestacado .resultValor {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .formulaNota {
@@ -268,7 +268,7 @@
 }
 
 .formulaNota strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Dilución */
@@ -308,12 +308,12 @@
 }
 
 .dilucionDato strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .dilucionFlecha {
   font-size: 0.95rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
 }
 
@@ -443,7 +443,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -474,7 +474,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
 }
@@ -487,7 +487,7 @@
 }
 
 .faqTip {
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   background: rgba(72, 169, 166, 0.08);
   padding: 0.4rem 0.75rem;
   border-radius: 6px;

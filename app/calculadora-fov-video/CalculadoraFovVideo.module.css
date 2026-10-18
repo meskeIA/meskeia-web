@@ -308,7 +308,7 @@
 
 .anguloIcono {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: normal;
 }
 
@@ -477,7 +477,7 @@
 
 .planoFocal {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
 }

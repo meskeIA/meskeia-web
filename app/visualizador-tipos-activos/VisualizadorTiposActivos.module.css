@@ -261,7 +261,7 @@
 .tarjetaCta {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: auto;
 }
 
@@ -537,7 +537,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }

@@ -63,7 +63,7 @@
 }
 
 .tituloMudanza:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .editIcon {
@@ -234,7 +234,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroBtn.activo {
@@ -560,7 +560,7 @@
 .resumenValor {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resumenLabel {
@@ -657,7 +657,7 @@
 }
 
 .resumenPresupuesto .resumenCard.real .resumenValor {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resumenPresupuesto .resumenCard.positivo .resumenValor {
@@ -792,7 +792,7 @@
 
 .btnAccionSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ==================== MUDANZAS GUARDADAS ==================== */
@@ -1254,7 +1254,7 @@
 
 .escenarioTip {
   font-size: 0.875rem;
-  color: #48A9A6;
+  color: var(--secondary-texto);
   line-height: 1.5;
   margin: 0;
 }
@@ -1281,7 +1281,7 @@
 .faqItem h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.75rem 0;
 }
 
@@ -1294,7 +1294,7 @@
 
 .faqTip {
   font-size: 0.875rem !important;
-  color: #48A9A6 !important;
+  color: var(--secondary-texto) !important;
   background: rgba(72, 169, 166, 0.08);
   border-radius: 8px;
   padding: 0.5rem 0.75rem;

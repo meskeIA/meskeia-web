@@ -55,7 +55,7 @@
 .sectionTitle {
   font-size: clamp(1.4rem, 3vw, 1.8rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 2.5rem 0 0.5rem;
 }
 
@@ -150,7 +150,7 @@
 
 .tarjetaEtiqueta {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -317,7 +317,7 @@
 
 .tarjetaSistemaChevron {
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s;
 }
 
@@ -373,7 +373,7 @@
 .tarjetaSorpresaTitulo {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -453,7 +453,7 @@
 .etapaRango {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -512,7 +512,7 @@
 .educationalBlock h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 

@@ -31,7 +31,7 @@
 
 .infoTitle {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;

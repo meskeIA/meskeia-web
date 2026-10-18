@@ -55,7 +55,7 @@
 .panelTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1.25rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--primary);
@@ -119,7 +119,7 @@
   display: inline-block;
   font-size: 1.4rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 2.5rem;
   text-align: center;
 }
@@ -147,7 +147,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
@@ -177,7 +177,7 @@
   border-radius: 20px;
   border: 1.5px solid var(--secondary);
   background: transparent;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
@@ -258,7 +258,7 @@
   border-radius: 6px;
   border: 1.5px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -310,7 +310,7 @@
 
 .attackResult {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
   margin-top: 0.5rem;
 }
@@ -379,7 +379,7 @@
 .eduSubtitle {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.5rem 0 0.75rem;
 }
 
@@ -440,7 +440,7 @@
 .escenarioCard h4 {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 

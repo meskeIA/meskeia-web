@@ -101,7 +101,7 @@
 .chipEjemplo {
   background: transparent;
   border: 1px solid rgba(46, 134, 171, 0.35);
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 999px;
   padding: 0.3rem 0.8rem;
   font-size: 0.9rem;
@@ -251,7 +251,7 @@
 }
 
 .silabaTonica {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom: 3px solid var(--secondary);
 }
 
@@ -262,7 +262,7 @@
 }
 
 .fichaDatos strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* Se escribieron varias palabras: la ficha dice con cuál se rima (hallazgo 2443) */
@@ -360,7 +360,7 @@
 }
 
 .recuento strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnCopiar {
@@ -396,7 +396,7 @@
   min-width: 1.15rem;
   text-align: center;
   background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 999px;
   font-size: 0.72rem;
   font-weight: 700;
@@ -426,7 +426,7 @@
 }
 
 .palabraRima {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -455,7 +455,7 @@
 .btnSecundario {
   background: transparent;
   border: 2px solid var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 8px;
   padding: 0.55rem 1.2rem;
   font-size: 0.95rem;
@@ -634,7 +634,7 @@
 }
 
 [data-theme='dark'] .fichaDatos strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .recuento strong {

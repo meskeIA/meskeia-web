@@ -11,7 +11,7 @@
 .progressBar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 0.5rem; }
 .progressFill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.3s; }
 .progressInfo { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: var(--spacing-lg); }
-.progressCategoria { font-weight: 600; color: var(--primary); }
+.progressCategoria { font-weight: 600; color: var(--primary-texto); }
 
 /* ─── Pregunta ───────────────────────────── */
 .preguntaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-xl); }
@@ -44,12 +44,12 @@
 .resultadoHero { text-align: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-xl); margin-bottom: var(--spacing-lg); }
 .resultadoEmoji { font-size: 4rem; display: block; margin-bottom: 0.5rem; }
 .resultadoHero h2 { font-size: 1.5rem; color: var(--text-primary); margin: 0 0 0.5rem; }
-.resultadoPuntuacion { font-size: 2.5rem; font-weight: 900; color: var(--primary); margin-bottom: 0.5rem; }
+.resultadoPuntuacion { font-size: 2.5rem; font-weight: 900; color: var(--primary-texto); margin-bottom: 0.5rem; }
 .resultadoHero p { font-size: 0.95rem; color: var(--text-secondary); margin: 0; }
 
 /* ─── Resumen categorías ─────────────────── */
 .resumenCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-md); }
-.resumenTitle { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0 0 var(--spacing-md); padding-bottom: var(--spacing-md); border-bottom: 2px solid var(--border); }
+.resumenTitle { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 var(--spacing-md); padding-bottom: var(--spacing-md); border-bottom: 2px solid var(--border); }
 .categoriaItem { display: flex; align-items: center; gap: 0.75rem; padding: 0.4rem 0; }
 .categoriaNombre { width: 130px; font-size: 0.85rem; color: var(--text-secondary); flex-shrink: 0; }
 .categoriaBarra { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
@@ -57,22 +57,22 @@
 .categoriaScore { width: 2rem; text-align: right; font-size: 0.85rem; font-weight: 700; color: var(--text-primary); }
 
 /* ===== PROFESIONALIZACIÓN v2.0 ===== */
-.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin: 1.5rem 0 0.75rem; }
+.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-texto); margin: 1.5rem 0 0.75rem; }
 .guideSection h2:first-child { margin-top: 0; }
 
 .glosarioGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin: 1.5rem 0; }
 .glosarioItem { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid var(--secondary); border-radius: 8px; padding: 0.85rem; }
 [data-theme='dark'] .glosarioItem { border-color: #444; border-left-color: var(--secondary); }
-.glosarioItem strong { display: block; font-size: 0.92rem; color: var(--primary); margin-bottom: 0.2rem; }
+.glosarioItem strong { display: block; font-size: 0.92rem; color: var(--primary-texto); margin-bottom: 0.2rem; }
 .glosarioItem p { font-size: 0.82rem; color: var(--text-secondary); margin: 0; line-height: 1.4; }
 
 .warningBox { background: rgba(46, 134, 171, 0.06); border: 1px solid rgba(46, 134, 171, 0.15); border-radius: 10px; padding: 1.5rem; margin: 2rem 0; }
 [data-theme='dark'] .warningBox { background: rgba(46, 134, 171, 0.1); }
 .warningHeader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-.warningHeader strong { font-size: 1rem; color: var(--primary); }
+.warningHeader strong { font-size: 1rem; color: var(--primary-texto); }
 .warningIcon { font-size: 1.4rem; }
 .warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .warningList li { font-size: 0.88rem; color: var(--text-secondary); padding-left: 1.25rem; position: relative; line-height: 1.5; }
-.warningList li::before { content: '\2022'; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+.warningList li::before { content: '\2022'; position: absolute; left: 0; color: var(--primary-texto); font-weight: bold; }
 
 @media (max-width: 768px) { .title { font-size: 1.5rem; } .glosarioGrid { grid-template-columns: 1fr; } .categoriaNombre { width: 100px; } }

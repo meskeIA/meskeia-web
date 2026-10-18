@@ -113,7 +113,7 @@
   left: 50%;
   transform: translateX(-50%);
   font-size: 2.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   z-index: 10;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
@@ -729,7 +729,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   font-style: italic;
   line-height: 1.5;
@@ -779,7 +779,7 @@
 .faqItem summary::after {
   content: '+';
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex-shrink: 0;
 }
 
@@ -799,11 +799,11 @@
   padding: 0.1em 0.3em;
   border-radius: 4px;
   font-size: 0.85em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   font-style: italic;
 }
 

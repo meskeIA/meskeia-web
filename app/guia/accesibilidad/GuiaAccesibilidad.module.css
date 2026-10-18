@@ -277,7 +277,7 @@
 .toolCardCta {
   display: inline-flex;
   align-items: center;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   font-size: 0.9rem;
   transition: transform 0.2s ease;
@@ -477,7 +477,7 @@ a.resourceCard:focus-visible {
 .resourceCta {
   display: inline-flex;
   align-items: center;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   font-size: 0.9rem;
 }

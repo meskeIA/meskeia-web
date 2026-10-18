@@ -82,7 +82,7 @@
 
 .modeBtn.active {
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -148,7 +148,7 @@
 
 .quickBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .errorMsg {
@@ -197,7 +197,7 @@
 
 .btnSwap:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultSection {
@@ -225,7 +225,7 @@
 .resultValue {
   font-size: 3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Georgia', serif;
   letter-spacing: 4px;
 }
@@ -289,7 +289,7 @@
 .symbol {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Georgia', serif;
 }
 
@@ -340,7 +340,7 @@
 .ruleCard code {
   display: block;
   font-family: 'Courier New', monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
 }
 
@@ -378,7 +378,7 @@
 .comparativaCard h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -428,7 +428,7 @@
 .timelineDate {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -490,7 +490,7 @@
 .faqQuestion::before {
   content: '▶ ';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqItem[open] .faqQuestion::before {
@@ -593,7 +593,7 @@
 .tipCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 8px;
 }
 

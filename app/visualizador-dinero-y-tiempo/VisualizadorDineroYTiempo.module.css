@@ -87,7 +87,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 
@@ -176,7 +176,7 @@
 
 .sliderValor {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -299,7 +299,7 @@
 }
 
 .rojo { color: var(--rojo); }
-.azul { color: var(--primary); }
+.azul { color: var(--primary-texto); }
 .verde { color: var(--verde); }
 
 /* ─── Insight contextual ─── */
@@ -350,7 +350,7 @@
 }
 
 .enlaceApp a {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   text-decoration: none;
 }

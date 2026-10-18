@@ -607,12 +607,12 @@ export default function SimuladorTestHipotesisPage() {
         <div className={styles.resultsPanel}>
           <div className={rechazaH0 ? styles.resultCardOk : styles.resultCardBad}>
             <span className={styles.resultLabel}>p-valor</span>
-            <span className={styles.resultValueLarge} style={{ color: rechazaH0 ? '#48A9A6' : '#A82E68' }}>
+            <span className={styles.resultValueLarge} style={{ color: rechazaH0 ? 'var(--secondary-texto)' : '#A82E68' }}>
               {fmt(p, 5)}
             </span>
             <span className={styles.decisionBadge} style={{
               background: rechazaH0 ? 'rgba(72, 169, 166, 0.18)' : 'rgba(168, 46, 104, 0.18)',
-              color: rechazaH0 ? '#48A9A6' : '#A82E68'
+              color: rechazaH0 ? 'var(--secondary-texto)' : '#A82E68'
             }}>
               {rechazaH0 ? <><span aria-hidden="true">✅</span> Rechazar H₀</> : <><span aria-hidden="true">❌</span> NO rechazar H₀</>}
             </span>
@@ -650,7 +650,7 @@ export default function SimuladorTestHipotesisPage() {
               </div>
               <div className={styles.resultCard}>
                 <span className={styles.resultLabel}>Potencia (1 − β)</span>
-                <span className={styles.resultValue} style={{ color: potencia > 0.8 ? '#48A9A6' : '#E07A1F' }}>
+                <span className={styles.resultValue} style={{ color: potencia > 0.8 ? 'var(--secondary-texto)' : '#E07A1F' }}>
                   {fmt(potencia * 100, 2)} %
                 </span>
                 <span className={styles.resultRange}>P(rechazar | H₁ cierta)</span>

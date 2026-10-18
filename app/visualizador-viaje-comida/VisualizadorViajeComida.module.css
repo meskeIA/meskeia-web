@@ -119,7 +119,7 @@
 }
 .sorpresaLabel {
   display: block; font-size: 0.78rem; font-weight: 700;
-  color: var(--primary); margin-bottom: 0.3rem;
+  color: var(--primary-texto); margin-bottom: 0.3rem;
   text-transform: uppercase; letter-spacing: 0.05em;
 }
 .etapaSorpresa p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
@@ -149,7 +149,7 @@
   display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
 }
 .resumenIcono { font-size: 1.4rem; }
-.resumenCifra { font-size: 0.95rem; font-weight: 700; color: var(--primary); }
+.resumenCifra { font-size: 0.95rem; font-weight: 700; color: var(--primary-texto); }
 .resumenDesc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
 
 /* Insight y enlace */
@@ -169,7 +169,7 @@
   font-size: 0.9rem; color: var(--text-secondary);
   margin-bottom: var(--spacing-xl);
 }
-.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a { color: var(--primary-texto); font-weight: 600; text-decoration: none; }
 .enlaceApp a:hover { text-decoration: underline; }
 
 /* Warning box (indicador v2.0) */

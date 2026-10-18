@@ -117,7 +117,7 @@
 }
 
 .inputGroup label strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -301,7 +301,7 @@
 
 .resultValueAccent {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-family: 'Courier New', monospace;
   text-align: right;
@@ -371,7 +371,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -409,7 +409,7 @@
 
 .faqTip {
   font-size: 0.8rem !important;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   margin-top: 0.35rem !important;
   font-style: italic;
 }
@@ -476,7 +476,7 @@
 .tipIcon {
   font-size: 1.2rem;
   flex-shrink: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
 }
 

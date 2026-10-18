@@ -449,6 +449,16 @@ export function analizarCss(css) {
         }
       }
       const automatico = motivos.length === 0;
+      // Un fondo claro FIJO (un literal, sin override oscuro que lo cambie ni que cambie el color)
+      // sigue claro en oscuro, donde `-texto` se aclara a #3FA5D1: sobre blanco, 2,6:1. Ahí el
+      // token es `-boton`, el mismo #26718F en los dos temas (5,47:1). Salió de los 21 bloques
+      // `.ctaButton { background: white; color: var(--primary) }` de los cursos (18/10/2026).
+      const fondoClaroFijo =
+        !clipTexto &&
+        !ps.every((p) => p.oscuro) &&
+        [...fondoPropio.matchAll(/#[0-9a-f]{6}(?![0-9a-f])|#[0-9a-f]{3}(?![0-9a-f])|\bwhite\b/gi)].some((h) => luminancia(h[0].toLowerCase() === 'white' ? '#ffffff' : h[0]) > 0.5) &&
+        ps.every((p) => !fondoEnOscuro.has(p.sinTema) && !fondoEnOscuro.has(`base:${p.base}`) && !color.oscuro.has(p.sinTema) && !color.oscuro.has(`base:${p.base}`));
+      const sufijo = fondoClaroFijo ? 'boton' : 'texto';
       hallazgos.push({
         tanda: 2,
         linea: d.linea,
@@ -460,7 +470,7 @@ export function analizarCss(css) {
         automatico,
         escape: escape ?? escapeEn(lineas, d.linea, []),
         ediciones: automatico
-          ? marca.map((r) => ({ desde: d.desde + r.desde, hasta: d.desde + r.hasta, nuevo: sustituto(r.token, 'texto'), viejo: r.texto }))
+          ? marca.map((r) => ({ desde: d.desde + r.desde, hasta: d.desde + r.hasta, nuevo: sustituto(r.token, sufijo), viejo: r.texto }))
           : [],
       });
     }

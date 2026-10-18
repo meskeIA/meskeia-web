@@ -161,7 +161,7 @@
 
 .chip:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .chipActivo {
@@ -260,7 +260,7 @@
 }
 
 .valorSlider {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-variant-numeric: tabular-nums;
 }
 
@@ -372,7 +372,7 @@
   padding: 12px 20px;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
   border: 1px dashed var(--primary);
   border-radius: 10px;
@@ -470,7 +470,7 @@
   display: block;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 6px;
   font-variant-numeric: tabular-nums;
 }
@@ -519,7 +519,7 @@
 .resumenValor {
   font-size: 1.45rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-variant-numeric: tabular-nums;
 }
 
@@ -686,7 +686,7 @@
 .educationalContent h2 {
   font-size: 1.3rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 32px 0 14px;
 }
 

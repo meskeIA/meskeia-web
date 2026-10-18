@@ -79,7 +79,7 @@
 .preguntaNumero {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 0.6rem;
@@ -122,7 +122,7 @@
 .opcionBtn.selected {
   border-color: var(--primary);
   background-color: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -140,7 +140,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background-color: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -223,11 +223,11 @@
 }
 
 .veredicto_autonomo .veredictoTitulo {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .veredicto_sl .veredictoTitulo {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .veredicto_valorar .veredictoTitulo {
@@ -262,7 +262,7 @@
 .comparativaTitulo {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -291,7 +291,7 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
 }
 
@@ -331,7 +331,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background-color: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.97rem;
   font-weight: 600;
   cursor: pointer;

@@ -186,7 +186,7 @@ function ReceptoresGabaCard() {
       {/* GABA-A */}
       <div className={styles.receptorCard}>
         <div className={styles.receptorHeader}>
-          <span className={styles.receptorBadge} style={{ background: 'rgba(46,134,171,0.12)', color: '#2E86AB' }}>
+          <span className={styles.receptorBadge} style={{ background: 'rgba(46,134,171,0.12)', color: 'var(--primary-texto)' }}>
             GABA-A
           </span>
           <span className={styles.receptorTipo}>Ionotrópico</span>
@@ -222,7 +222,7 @@ function ReceptoresGabaCard() {
       {/* GABA-B */}
       <div className={styles.receptorCard}>
         <div className={styles.receptorHeader}>
-          <span className={styles.receptorBadge} style={{ background: 'rgba(72,169,166,0.12)', color: '#48A9A6' }}>
+          <span className={styles.receptorBadge} style={{ background: 'rgba(72,169,166,0.12)', color: 'var(--secondary-texto)' }}>
             GABA-B
           </span>
           <span className={styles.receptorTipo}>Metabotrópico (GPCR)</span>

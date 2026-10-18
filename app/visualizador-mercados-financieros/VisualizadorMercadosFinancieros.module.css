@@ -68,7 +68,7 @@
 
 .tabBtn:hover {
   border-color: var(--primary, #2E86AB);
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .tabBtnActivo {
@@ -200,7 +200,7 @@
 
 .badgeLiquidez {
   background: rgba(46, 134, 171, 0.12);
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .cardActivoDetalle {
@@ -265,7 +265,7 @@
 .spreadBid {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-bid, #48A9A6);
+  color: var(--color-bid, var(--secondary-texto));
 }
 
 .spreadAsk {
@@ -339,7 +339,7 @@
 
 .ordenPrecioBid {
   font-weight: 600;
-  color: var(--color-bid, #48A9A6);
+  color: var(--color-bid, var(--secondary-texto));
 }
 
 .ordenPrecioAsk {
@@ -438,7 +438,7 @@
 
 .indiceTab:hover {
   border-color: var(--primary, #2E86AB);
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .indiceTabActivo {
@@ -507,7 +507,7 @@
 .indiceBloque h4 {
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -939,7 +939,7 @@
 .stepGuide h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;

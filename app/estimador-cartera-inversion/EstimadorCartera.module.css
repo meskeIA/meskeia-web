@@ -75,7 +75,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   margin-bottom: var(--spacing-lg);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
 }
 
@@ -89,7 +89,7 @@
 }
 
 .perfilBannerLink {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   font-weight: 600;
   margin-left: auto;
@@ -209,7 +209,7 @@
 
 .perfilBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .perfilBtnActive {
@@ -254,7 +254,7 @@
 .pesoValor {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 40px;
   text-align: right;
 }
@@ -602,7 +602,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 

@@ -77,7 +77,7 @@
 
 .tabBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabBtnActivo {
@@ -321,7 +321,7 @@
 
 .periodoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .periodoBtnActivo {
@@ -422,7 +422,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -472,7 +472,7 @@
 
 .filtroCatBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroCatBtnActivo {
@@ -856,7 +856,7 @@
 .faqTip {
   display: block;
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 

@@ -215,7 +215,7 @@
 .rollFormula {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .rollRange {
@@ -404,7 +404,7 @@
 .totalValue {
   font-size: 3rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .criticalBadge {
@@ -572,7 +572,7 @@
 .statValue {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -589,7 +589,7 @@
 
 .eduSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -869,7 +869,7 @@
 }
 
 .faqTip {
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   font-weight: 600;
   font-size: 0.85rem !important;
 }

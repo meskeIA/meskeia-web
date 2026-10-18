@@ -144,7 +144,7 @@
 
 .controlValor {
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .slider {
@@ -195,7 +195,7 @@
 .resultadoItem .valor {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #2E86AB;
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -306,7 +306,7 @@
 
 .icContador strong {
   font-size: 1.1rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* ─── Warning box ─── */
@@ -361,7 +361,7 @@
 
 .btnSecundario:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .btnSecundario:focus-visible {

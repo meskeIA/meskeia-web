@@ -218,7 +218,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
           </div>
           <div className={styles.inputGroupFull}>
             <label className={styles.label} htmlFor="gastos-compra">
-              Gastos de compra: <strong style={{ color: 'var(--primary)' }}>{porcentajeGastosCompra}%</strong>
+              Gastos de compra: <strong style={{ color: 'var(--primary-texto)' }}>{porcentajeGastosCompra}%</strong>
               <span className={styles.labelHint}>(ITP/IVA, notaría, registro, gestoría)</span>
             </label>
             <div className={styles.rangeContainer}>
@@ -262,7 +262,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
           </div>
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="ocupacion">
-              Tasa de ocupación: <strong style={{ color: 'var(--primary)' }}>{tasaOcupacion}%</strong>
+              Tasa de ocupación: <strong style={{ color: 'var(--primary-texto)' }}>{tasaOcupacion}%</strong>
               <span className={styles.labelHint}>(meses ocupados / año)</span>
             </label>
             <div className={styles.rangeContainer}>
@@ -393,7 +393,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
               </div>
               <div className={styles.inputGroup}>
                 <label className={styles.label} htmlFor="anios-hipoteca">
-                  Plazo: <strong style={{ color: 'var(--primary)' }}>{aniosHipoteca} años</strong>
+                  Plazo: <strong style={{ color: 'var(--primary-texto)' }}>{aniosHipoteca} años</strong>
                 </label>
                 <div className={styles.rangeContainer}>
                   <input

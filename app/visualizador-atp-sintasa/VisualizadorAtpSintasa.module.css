@@ -129,7 +129,7 @@
   padding: 0.6rem 1.5rem;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -872,7 +872,7 @@
 .inhibidorItem strong {
   display: block;
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 0.3rem;
@@ -952,7 +952,7 @@
 .educItem h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 

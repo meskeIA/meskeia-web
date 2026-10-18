@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -33,7 +33,7 @@
 /* ─── Sección Evolución: Timeline ─── */
 .timeline { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-lg); padding: var(--spacing-md) 0; overflow-x: auto; gap: var(--spacing-sm); }
 .timelineBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); position: relative; min-width: 90px; flex-shrink: 0; }
-.timelineBtn:hover { border-color: var(--tech-color, var(--primary)); color: var(--tech-color, var(--primary)); }
+.timelineBtn:hover { border-color: var(--tech-color, var(--primary)); color: var(--tech-color, var(--primary-texto)); }
 .timelineBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .timelineActivo { border-color: var(--tech-color, var(--primary-boton)); background: var(--tech-color, var(--primary-boton)); color: white; }
 .timelineActivo:hover { color: white; }
@@ -49,7 +49,7 @@
 .techIcono { font-size: 2rem; }
 .techNombre { display: block; font-size: 1.2rem; color: var(--text-primary); }
 .techPrincipio { display: block; font-size: 0.85rem; color: var(--text-secondary); }
-.techAnio { margin-left: auto; font-size: 1.1rem; font-weight: 700; color: var(--tech-color, var(--primary)); }
+.techAnio { margin-left: auto; font-size: 1.1rem; font-weight: 700; color: var(--tech-color, var(--primary-texto)); }
 .techDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-md); }
 .techProsContras { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); }
 .techPros, .techContras { padding: var(--spacing-md); border-radius: var(--radius); font-size: 0.85rem; line-height: 1.5; }
@@ -93,7 +93,7 @@
 .comparativaTitulo { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); text-align: center; }
 .comparativaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); }
 .comparativaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); }
-.comparativaNombre { display: block; font-size: 1rem; color: var(--primary); text-align: center; margin-bottom: var(--spacing-sm); }
+.comparativaNombre { display: block; font-size: 1rem; color: var(--primary-texto); text-align: center; margin-bottom: var(--spacing-sm); }
 .pixelDiagrama { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--spacing-sm); }
 .diagramaCapa { padding: 0.5rem var(--spacing-sm); border-radius: 6px; text-align: center; font-size: 0.78rem; font-weight: 600; color: #333; }
 [data-theme='dark'] .diagramaCapa { color: #333; }
@@ -106,7 +106,7 @@
 .resNombre { font-size: 0.95rem; color: var(--text-primary); }
 .resDims { font-size: 0.78rem; color: var(--text-muted); font-family: monospace; }
 .resPixeles { display: flex; align-items: baseline; gap: 0.3rem; margin-bottom: 0.4rem; }
-.resNumero { font-size: 1.1rem; font-weight: 700; color: var(--res-color, var(--primary)); }
+.resNumero { font-size: 1.1rem; font-weight: 700; color: var(--res-color, var(--primary-texto)); }
 .resLabel { font-size: 0.78rem; color: var(--text-secondary); }
 .resBarra { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 0.4rem; }
 .resRelleno { height: 100%; border-radius: 3px; transition: width 0.3s; min-width: 2px; }
@@ -129,7 +129,7 @@
 .ppiIcono { font-size: 1.4rem; flex-shrink: 0; }
 .ppiNombre { display: block; font-size: 0.92rem; color: var(--text-primary); }
 .ppiDistancia { display: block; font-size: 0.75rem; color: var(--text-muted); }
-.ppiValor { margin-left: auto; font-size: 1.1rem; font-weight: 700; color: var(--primary); white-space: nowrap; }
+.ppiValor { margin-left: auto; font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); white-space: nowrap; }
 .ppiDetalle { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
 
 /* ─── Sección Salud visual ─── */
@@ -138,7 +138,7 @@
 .saludHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; }
 .saludIcono { font-size: 1.3rem; }
 .saludTitulo { font-size: 0.88rem; color: var(--text-primary); }
-.saludValor { display: block; font-size: 1.3rem; font-weight: 700; color: var(--salud-color, var(--primary)); margin-bottom: 0.3rem; }
+.saludValor { display: block; font-size: 1.3rem; font-weight: 700; color: var(--salud-color, var(--primary-texto)); margin-bottom: 0.3rem; }
 .saludDesc { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
 
 /* Espectro */

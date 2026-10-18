@@ -357,7 +357,7 @@ export default function VisualizadorSilicio() {
           <div className={styles.dopingInfo}>
             {dopado === 'N' ? (
               <>
-                <h3 className={styles.dopingTitulo} style={{ color: '#2E86AB' }}>Semiconductor Tipo N</h3>
+                <h3 className={styles.dopingTitulo} style={{ color: 'var(--primary-texto)' }}>Semiconductor Tipo N</h3>
                 <p>El <strong>fósforo (P)</strong> tiene 5 electrones de valencia. En la red de silicio solo necesita 4 para los enlaces covalentes con los vecinos. El <strong>quinto electrón queda libre</strong> y puede moverse por el cristal.</p>
                 <ul className={styles.dopingLista}>
                   <li>Portador mayoritario: <strong>electrón (carga negativa)</strong></li>

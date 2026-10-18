@@ -121,7 +121,7 @@
 .tipoIcono {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipoNombre {
@@ -214,7 +214,7 @@
 .elementos {
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.8;
 }
 
@@ -274,7 +274,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -357,7 +357,7 @@
 }
 
 .comparativaTable td strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .comparativaTable td {
@@ -421,7 +421,7 @@
 }
 
 .escenarioExample strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioTip {
@@ -436,7 +436,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .escenarioCard {
@@ -468,7 +468,7 @@
 .faqItem dt {
   font-size: 0.98rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 

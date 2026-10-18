@@ -78,7 +78,7 @@
 .preguntaNumero {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-bottom: 0.5rem;
@@ -160,7 +160,7 @@
 
 .btnAnterior:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnAnterior:disabled {
@@ -318,7 +318,7 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
 }
 
@@ -373,7 +373,7 @@
   background: transparent;
   border: 2px solid var(--primary);
   border-radius: 8px;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -424,7 +424,7 @@
 
 [data-theme='dark'] .btnAnterior:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .warningBox {
@@ -436,7 +436,7 @@
 }
 
 [data-theme='dark'] .btnReiniciar {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .btnReiniciar:hover {

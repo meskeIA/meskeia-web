@@ -126,7 +126,7 @@
   font-size: 0.78rem;
   font-weight: 700;
   background: #e8f4f8;
-  color: var(--primary);
+  color: var(--primary-boton);
   padding: 0.15rem 0.6rem;
   border-radius: 99px;
   width: fit-content;
@@ -169,7 +169,7 @@
 }
 
 .indiceBadge strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ── Panel de cálculo ─────────────────────── */
@@ -266,7 +266,7 @@
 .indiceValor {
   font-size: 1.2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Resultados */
@@ -323,7 +323,7 @@
 }
 
 .enlaceAeat {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 
@@ -335,7 +335,7 @@
 .eduSectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);
@@ -397,7 +397,7 @@
 }
 
 .tablaNota a {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Escenarios */
@@ -446,7 +446,7 @@
 
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   margin: 0;
   padding: 0.5rem 0.75rem;

@@ -87,7 +87,7 @@
 .configTitulo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -182,7 +182,7 @@
   margin-left: auto;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .sliderEtiquetas {
@@ -217,7 +217,7 @@
   transition: all 0.15s;
 }
 
-.btnSelector:hover { border-color: var(--primary); color: var(--primary); }
+.btnSelector:hover { border-color: var(--primary); color: var(--primary-texto); }
 .btnSelector:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .btnSelectorActivo {
@@ -315,8 +315,8 @@
   font-size: 0.82rem;
 }
 
-.leyendaBeneficio { color: #48A9A6; font-weight: 600; }
-.leyendaCaja { color: #2E86AB; font-weight: 600; }
+.leyendaBeneficio { color: var(--secondary-texto); font-weight: 600; }
+.leyendaCaja { color: var(--primary-texto); font-weight: 600; }
 
 .chartWrapper {
   height: 340px;
@@ -389,7 +389,7 @@
 
 .tdPositivo { color: var(--color-holgado); font-weight: 600; }
 .tdNegativo { color: var(--color-critico); font-weight: 600; }
-.tdBeneficio { color: #48A9A6; font-weight: 600; }
+.tdBeneficio { color: var(--secondary-texto); font-weight: 600; }
 .tdBrecha { color: var(--color-adecuado); }
 
 .filaNegativa { background: #fff5f5 !important; }
@@ -454,7 +454,7 @@
 .guideSection h2 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 1rem;
   padding-bottom: 0.4rem;
   border-bottom: 2px solid var(--border);
@@ -521,7 +521,7 @@
 
 [data-theme='dark'] .faqItem { background: #2A2A2A; }
 
-.faqItem dt { font-weight: 700; color: var(--primary); margin-bottom: 0.4rem; font-size: 0.92rem; }
+.faqItem dt { font-weight: 700; color: var(--primary-texto); margin-bottom: 0.4rem; font-size: 0.92rem; }
 .faqItem dd { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6; margin: 0; }
 
 .faqTip {
@@ -529,7 +529,7 @@
   margin-top: 0.5rem;
   padding: 0.4rem 0.7rem;
   background: #e8f4fd;
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 8px;
   font-size: 0.83rem;
   font-style: italic;

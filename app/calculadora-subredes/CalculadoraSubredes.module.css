@@ -169,7 +169,7 @@
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius);
@@ -221,7 +221,7 @@
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   word-break: break-all;
 }
 
@@ -454,7 +454,7 @@
   display: block;
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
   padding: var(--spacing-sm);
   border-radius: var(--radius);

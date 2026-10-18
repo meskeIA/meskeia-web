@@ -118,7 +118,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnDanger {
@@ -336,7 +336,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Navigation */
@@ -360,7 +360,7 @@
 
 .navLink:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Responsive */

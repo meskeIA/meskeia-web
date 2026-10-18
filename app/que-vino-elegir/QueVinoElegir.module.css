@@ -94,7 +94,7 @@
 .pasoTitulo {
   margin: 0 0 1.5rem 0;
   font-size: clamp(1.3rem, 3vw, 1.6rem);
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
 }
 
@@ -190,7 +190,7 @@
 
 .chip:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .chip:focus-visible {
@@ -248,7 +248,7 @@
 
 .btnSecundario {
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border-color: var(--primary);
 }
 
@@ -366,7 +366,7 @@
 
 .nota {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 0.2rem 0.55rem;
   border-radius: 8px;
   font-size: 0.78rem;
@@ -389,7 +389,7 @@
 .porQueBox strong {
   display: block;
   margin-bottom: 0.25rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.85rem;
 }
 
@@ -447,7 +447,7 @@
 
 .tipsBox h3 {
   margin: 0 0 0.75rem 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
 }
 

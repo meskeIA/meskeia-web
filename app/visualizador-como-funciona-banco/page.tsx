@@ -232,7 +232,7 @@ function SeccionMultiplicador() {
         <div className={styles.multSigno} aria-hidden="true">×</div>
         <div className={styles.multCard}>
           <span className={styles.multLabel}>Multiplicador</span>
-          <span className={styles.multValor} style={{ color: '#2E86AB' }}>{formatNumber(multiplicador, 1)}×</span>
+          <span className={styles.multValor} style={{ color: 'var(--primary-texto)' }}>{formatNumber(multiplicador, 1)}×</span>
         </div>
         <div className={styles.multSigno} aria-hidden="true">=</div>
         <div className={`${styles.multCard} ${styles.multCardDestacado}`}>

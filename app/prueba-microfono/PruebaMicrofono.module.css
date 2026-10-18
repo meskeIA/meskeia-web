@@ -704,7 +704,7 @@
 .escenarioTip {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   line-height: 1.4;
 }
@@ -751,7 +751,7 @@
 .faqItem details summary::after {
   content: '+';
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   flex-shrink: 0;
   font-weight: 700;
   line-height: 1;
@@ -777,7 +777,7 @@
   margin-top: var(--spacing-sm) !important;
   padding-top: var(--spacing-sm) !important;
   border-top: 1px solid var(--border);
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   font-style: italic;
   font-size: 0.85rem !important;
 }

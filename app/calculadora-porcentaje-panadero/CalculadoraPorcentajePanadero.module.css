@@ -336,7 +336,7 @@
   border: 2px dashed var(--border);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -479,7 +479,7 @@
 .summaryValue {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .summaryNote {
@@ -534,16 +534,16 @@
 }
 
 .rowAgua td {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .pct {
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .rowHarina .pct {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tableCaption {
@@ -599,7 +599,7 @@
 .guideSection h2 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: var(--spacing-xl);
   margin-bottom: var(--spacing-sm);
 }
@@ -720,7 +720,7 @@
 .pasoChevron {
   font-size: 1.3rem;
   line-height: 1;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .pasoBody {
@@ -790,7 +790,7 @@
   display: block;
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
 }
 
 .pasoResultadoNota {
@@ -814,7 +814,7 @@
 }
 
 .pasoEnlace a {
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   font-weight: 600;
 }
 

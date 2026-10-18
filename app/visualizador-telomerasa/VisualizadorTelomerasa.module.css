@@ -40,7 +40,7 @@
 .section h2 {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1.2rem;
 }
 

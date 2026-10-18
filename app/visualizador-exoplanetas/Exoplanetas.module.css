@@ -45,7 +45,7 @@
 .tituloSeccion {
   font-size: clamp(1.3rem, 3vw, 1.7rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
   text-align: center;
 }
@@ -116,7 +116,7 @@
 }
 
 .sliderLabel span {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -141,7 +141,7 @@
   padding: 0.35rem 0.9rem;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Animación órbita del planeta */
@@ -224,7 +224,7 @@
   border-radius: 20px;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
@@ -313,7 +313,7 @@
 
 .cardEjemplos {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -346,7 +346,7 @@
 
 .tooltipNombre {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.25rem;
 }
 
@@ -380,7 +380,7 @@
 }
 
 .warningBox strong {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   display: block;
   margin-bottom: 0.3rem;
   font-size: 0.9rem;

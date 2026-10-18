@@ -60,7 +60,7 @@
 
 .tab:hover {
   background: rgba(46, 134, 171, 0.08);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabActive {
@@ -84,7 +84,7 @@
 .content h2 {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -99,14 +99,14 @@
 .subheading {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 2rem 0 0.6rem;
 }
 
 .subheadingH2 {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 2.5rem 0 0.75rem;
 }
 
@@ -202,7 +202,7 @@
 
 .pkCell {
   font-weight: 700;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   font-family: monospace;
 }
 
@@ -219,7 +219,7 @@
 }
 
 .fkCell:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .fkCell:focus-visible {
@@ -242,13 +242,13 @@
 
 .flechaFK {
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   letter-spacing: 0.02em;
 }
 
 /* Tags PK y FK en intro */
 .pkTag {
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
   border-radius: 4px;
   padding: 0 4px;
@@ -279,7 +279,7 @@
 .conceptoCard h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -313,7 +313,7 @@
 
 .joinBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .joinBtnActivo {
@@ -394,7 +394,7 @@
 .joinRight h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -487,7 +487,7 @@
 
 .sliderBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .sliderBtnActivo {
@@ -593,7 +593,7 @@
 .tipoCard h4 {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -610,7 +610,7 @@
   padding: 1px 4px;
   font-family: monospace;
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─── ACID (Tab 4) ────────────────────────────────────────────────────────── */
@@ -626,7 +626,7 @@
 .escenarioBox h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -664,7 +664,7 @@
 .acidCard h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0.5rem 0 0.5rem;
 }
 
@@ -747,7 +747,7 @@
 }
 
 .warningBox strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─── Sección educativa ───────────────────────────────────────────────────── */
@@ -769,7 +769,7 @@
 .eduCard h3 {
   font-size: 0.92rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin: 0 0 0.45rem;
 }
 
@@ -786,7 +786,7 @@
   padding: 1px 4px;
   font-family: monospace;
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─── Dark Mode ───────────────────────────────────────────────────────────── */

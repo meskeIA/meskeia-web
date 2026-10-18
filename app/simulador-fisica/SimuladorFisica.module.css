@@ -178,7 +178,7 @@
 
 .controlBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .controlBtn:focus-visible {
@@ -234,7 +234,7 @@
 .infoValue {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .infoUnit {
@@ -276,7 +276,7 @@
 
 .controlValue {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .slider {
@@ -373,7 +373,7 @@
 
 .presetBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 
@@ -468,7 +468,7 @@
 }
 
 .contentCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1rem;
 }

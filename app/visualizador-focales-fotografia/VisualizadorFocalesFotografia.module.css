@@ -56,11 +56,11 @@
 }
 
 .tabBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabActive {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
 }
 
@@ -103,7 +103,7 @@
 
 .sensorBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .sensorActive {
@@ -135,7 +135,7 @@
 
 .sensorBtn:not(.sensorActive) .factorBadge {
   background: #f1f5f9;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .sensorDesc {
@@ -202,7 +202,7 @@
 .focalBig {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -356,7 +356,7 @@
 
 .equivList li::before {
   content: '→ ';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -376,7 +376,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -420,7 +420,7 @@
 
 .faqTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
@@ -502,7 +502,7 @@
 }
 
 .tipCard a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 

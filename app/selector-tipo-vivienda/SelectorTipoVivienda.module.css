@@ -195,7 +195,7 @@
 
 .btnAnterior:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnAnterior:disabled {

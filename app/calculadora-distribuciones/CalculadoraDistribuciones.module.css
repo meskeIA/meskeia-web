@@ -538,7 +538,7 @@
   background: var(--bg-card);
   padding: var(--spacing-sm);
   border-radius: 4px;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
 }
 
 .conceptsGrid {
@@ -556,7 +556,7 @@
 
 .conceptCard h4 {
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 
@@ -633,7 +633,7 @@
 
 .eduComparativaSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -701,7 +701,7 @@
 
 .eduEscenariosSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -756,7 +756,7 @@
 
 .eduEscenarioTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
   padding: var(--spacing-xs) var(--spacing-sm);
   background: rgba(46, 134, 171, 0.1);
@@ -772,7 +772,7 @@
 
 .eduFaqSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -816,7 +816,7 @@
 
 .eduStepSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -867,7 +867,7 @@
 
 .eduTipsSection h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -1063,7 +1063,7 @@
 .escenarioHeader h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -1109,7 +1109,7 @@
 
 .faqItem strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
   font-size: 0.95rem;
 }
@@ -1125,7 +1125,7 @@
   display: inline-block;
   margin-top: var(--spacing-xs);
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 500;
 }
 
@@ -1203,7 +1203,7 @@
 
 .tipCard strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   margin-bottom: var(--spacing-xs);
 }

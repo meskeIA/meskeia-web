@@ -98,7 +98,7 @@
 
 .filtroBtn:hover {
   border-color: var(--primary, #2e86ab);
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 .filtroBtnActivo {
@@ -128,7 +128,7 @@
 }
 
 .contador strong {
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -137,7 +137,7 @@
   font-size: 0.85rem;
   border: 1.5px solid var(--secondary, #48a9a6);
   background: transparent;
-  color: var(--secondary, #48a9a6);
+  color: var(--secondary-texto);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
@@ -200,7 +200,7 @@
   font-size: 1.4rem;
   font-weight: 700;
   margin: 0 0 0.25rem;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 .cardOriginal {
@@ -297,7 +297,7 @@
   display: inline-block;
   padding: 0.3rem 0.7rem;
   background: rgba(72, 169, 166, 0.15);
-  color: var(--secondary, #48a9a6);
+  color: var(--secondary-texto);
   border-radius: 999px;
   font-size: 0.82rem;
   font-weight: 600;
@@ -349,7 +349,7 @@
   font-size: 1.3rem;
   font-weight: 700;
   margin: 0 0 1rem;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 .tablaWrap {
@@ -408,7 +408,7 @@
 .casoCard h4 {
   margin: 0 0 0.5rem;
   font-size: 1.05rem;
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 .casoCard p {
@@ -434,7 +434,7 @@
 }
 
 .faqItem summary:hover {
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 .faqItem p {
@@ -462,7 +462,7 @@
 
 .pasosLista li::marker,
 .tipsLista li::marker {
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -575,7 +575,7 @@
 
 [data-theme='dark'] .filtroBtn:hover {
   border-color: var(--primary, #2e86ab);
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .filtroBtnActivo {

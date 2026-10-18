@@ -35,7 +35,7 @@
 .sectionTitle {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--primary);
@@ -267,7 +267,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Bloque 2: Dependencia EU */

@@ -755,7 +755,7 @@ export default function VisualizadorComparadorIA() {
           está optimizado para esa tarea específica.
         </p>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Marco de evaluación: 4 preguntas antes de elegir
         </h4>
         <div className={styles.escenariosGrid}>
@@ -777,7 +777,7 @@ export default function VisualizadorComparadorIA() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Preguntas frecuentes
         </h4>
         <ul className={styles.faqList}>
@@ -803,7 +803,7 @@ export default function VisualizadorComparadorIA() {
           </li>
         </ul>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Cómo elegir tu primera IA: 5 pasos
         </h4>
         <div className={styles.stepGuide}>
@@ -824,7 +824,7 @@ export default function VisualizadorComparadorIA() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Consejos prácticos
         </h4>
         <div className={styles.tipsGrid}>

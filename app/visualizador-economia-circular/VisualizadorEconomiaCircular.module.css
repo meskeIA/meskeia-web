@@ -125,7 +125,7 @@
 
 .btnSecundario {
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -168,7 +168,7 @@
 
 .btnToggle:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnToggle:focus-visible {
@@ -351,13 +351,13 @@
 }
 
 .tablaCircular {
-  color: #48A9A6;
+  color: var(--secondary-texto);
   font-weight: 600;
   text-align: center;
 }
 
 .tablaAhorro {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   text-align: center;
 }
@@ -472,7 +472,7 @@
 }
 
 .estrategiaGridItem strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -503,7 +503,7 @@
 .datoNumero {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -634,7 +634,7 @@
 .sliderResultadoNumero {
   font-size: 1.3rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .sliderResultadoLabel {
@@ -728,7 +728,7 @@
 
 .casoSeccion strong {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -751,7 +751,7 @@
 
 .casoSeccionDestacada strong {
   font-size: 0.8rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -780,7 +780,7 @@
 .eduCardTitulo {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
   line-height: 1.4;
 }

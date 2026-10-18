@@ -49,10 +49,10 @@
   white-space: nowrap;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
-.tabBtn:hover { border-color: var(--primary); color: var(--primary); }
+.tabBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tabBtnActiva {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46,134,171,0.06);
 }
 
@@ -184,7 +184,7 @@
 }
 .periodoRango {
   font-size: 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 .periodoHitos {
@@ -261,7 +261,7 @@
 .eventoHora {
   font-size: 1.1rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 .eventoNombre {
@@ -305,7 +305,7 @@
 .eventoItemHora {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
   min-width: 85px;
   flex-shrink: 0;
@@ -439,7 +439,7 @@
 .metodoRango {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 .metodoDesc {
   font-size: 0.82rem;

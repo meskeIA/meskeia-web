@@ -60,7 +60,7 @@
 
 .tabBtn:hover {
   background: #e8f4fb;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabBtnActivo {
@@ -208,7 +208,7 @@
 
 .primaDestacada {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -253,7 +253,7 @@
 
 .sliderValue {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.88rem;
 }
 
@@ -304,7 +304,7 @@
 
 .resultadoTotal .resultadoValor {
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultadoMensual {
@@ -441,7 +441,7 @@
 .conceptoTermino {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.35rem;
 }
 
@@ -469,7 +469,7 @@
 
 .conceptoToggle {
   font-size: 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -708,7 +708,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0.35rem 0 0.5rem;
 }
 
@@ -770,7 +770,7 @@
 .faqTip {
   display: block;
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   border-left: 3px solid var(--primary);
   padding-left: 0.6rem;

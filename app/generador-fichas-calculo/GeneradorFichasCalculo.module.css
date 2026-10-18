@@ -238,7 +238,7 @@
   font-size: 0.95rem;
   font-weight: 600;
   font-family: inherit;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: var(--bg-card);
   border: 2px solid var(--secondary);
   border-radius: var(--radius);
@@ -389,13 +389,13 @@
 }
 
 .solucion {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
 .restoSolucion {
   font-size: 0.75rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* Operación horizontal */
@@ -500,7 +500,7 @@
 
 .escenarioCard h3 {
   font-size: 1.05rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioCard p {
@@ -524,7 +524,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   margin-bottom: var(--spacing-sm);
 }

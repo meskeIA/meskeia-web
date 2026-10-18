@@ -233,7 +233,7 @@
 
 .controlBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 
@@ -324,7 +324,7 @@
   display: block;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -452,7 +452,7 @@
   border: 1px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   font-size: 0.9rem;
   margin-top: var(--spacing-sm);
@@ -497,7 +497,7 @@
 
 .contentCard h4 {
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm) 0;
 }
 
@@ -558,7 +558,7 @@
 }
 
 .tipsList li strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ══════════════════════════════════════════════
@@ -674,7 +674,7 @@
 .escenarioHeader h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   line-height: 1.4;
 }
@@ -753,7 +753,7 @@
 }
 
 .faqItem dd strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqItem dd em {
@@ -842,7 +842,7 @@
 
 .stepContent p em {
   font-style: italic;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .stepNumber {
@@ -882,7 +882,7 @@
 .tipCard h4 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   line-height: 1.4;
 }

@@ -91,7 +91,7 @@
   display: block;
   font-size: 2.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.1;
 }
 
@@ -148,7 +148,7 @@
 .refTemp {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 56px;
   flex-shrink: 0;
 }
@@ -183,7 +183,7 @@
 .conceptoSection h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent);

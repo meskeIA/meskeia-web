@@ -151,7 +151,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -245,7 +245,7 @@
 .toolFramework {
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: var(--spacing-xs) var(--spacing-sm);
   background: var(--focus);
   border-radius: var(--radius);
@@ -262,7 +262,7 @@
 .toolQuestion {
   font-size: 0.95rem;
   font-weight: 500;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-style: italic;
 }
@@ -278,7 +278,7 @@
 .toolCta {
   display: inline-flex;
   align-items: center;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
   font-size: 0.9rem;
   transition: transform 0.2s ease;
@@ -349,7 +349,7 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-xl);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   font-size: 1rem;

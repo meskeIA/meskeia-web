@@ -82,7 +82,7 @@
 .sectionTitle {
   font-size: clamp(1.2rem, 2.8vw, 1.65rem);
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -163,7 +163,7 @@
 
 .pasoConector {
   font-size: 1.25rem;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   opacity: 0.5;
   padding: 0.3rem 0;
   user-select: none;
@@ -348,7 +348,7 @@
 .situacionEficacia {
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--secondary, #48A9A6);
+  color: var(--secondary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -421,7 +421,7 @@
 .riesgoOrgano {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   flex: 1;
 }
 
@@ -455,7 +455,7 @@
 .riesgoSubtitulo {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin: 0;
@@ -515,7 +515,7 @@
 
 .coxibsNombre {
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   flex-shrink: 0;
   min-width: 180px;
 }
@@ -544,7 +544,7 @@
 .eduTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 

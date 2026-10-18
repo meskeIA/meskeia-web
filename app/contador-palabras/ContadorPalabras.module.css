@@ -128,7 +128,7 @@
   display: block;
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.2;
 }
 
@@ -191,7 +191,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnDensidad {
@@ -279,7 +279,7 @@
 
 .densidadPorcentaje {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
   min-width: 45px;
   text-align: right;

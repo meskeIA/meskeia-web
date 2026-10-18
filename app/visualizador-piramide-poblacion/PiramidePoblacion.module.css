@@ -60,7 +60,7 @@
   font-size: 0.95rem;
   transition: all 0.2s ease;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnAno:hover {
@@ -100,11 +100,11 @@
 }
 
 .leyendaHombres {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .leyendaMujeres {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .piramide {
@@ -190,7 +190,7 @@
 .indicadorValor {
   font-size: clamp(1.4rem, 3.5vw, 1.8rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: block;
 }
 
@@ -248,7 +248,7 @@
 }
 
 [data-theme='dark'] .btnAno {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-color: var(--primary);
 }
 

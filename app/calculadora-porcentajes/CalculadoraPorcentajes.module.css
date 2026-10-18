@@ -162,7 +162,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultsPanel {
@@ -193,7 +193,7 @@
 }
 
 .formulaBox h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm) 0;
   font-size: 0.9rem;
 }
@@ -224,7 +224,7 @@
   font-size: 4rem;
   margin-bottom: var(--spacing-md);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   opacity: 0.5;
 }
 
@@ -336,7 +336,7 @@
 .faqItem h4 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 8px 0;
 }
 

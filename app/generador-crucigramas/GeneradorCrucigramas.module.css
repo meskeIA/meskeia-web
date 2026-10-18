@@ -159,7 +159,7 @@
   font-size: 0.95rem;
   font-weight: 600;
   font-family: inherit;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: var(--bg-card);
   border: 2px solid var(--secondary);
   border-radius: var(--radius);
@@ -199,7 +199,7 @@
 .metricaValor {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .metricaEtiqueta {
@@ -309,7 +309,7 @@
 .letraSolucion {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .definiciones {
@@ -320,7 +320,7 @@
 
 .columnaDefiniciones h3 {
   font-size: 1.05rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   padding-bottom: 0.3rem;
   border-bottom: 2px solid var(--primary);
@@ -341,7 +341,7 @@
 }
 
 .listaDefiniciones strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .pieHoja {
@@ -446,7 +446,7 @@
 
 .escenarioCard h3 {
   font-size: 1.05rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioCard p {
@@ -470,7 +470,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   margin-bottom: var(--spacing-sm);
 }

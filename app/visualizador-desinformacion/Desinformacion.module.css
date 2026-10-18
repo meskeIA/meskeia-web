@@ -356,7 +356,7 @@
 .recursoChip {
   display: inline-block;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.82rem;
   font-weight: 600;
   padding: 5px 12px;

@@ -513,7 +513,7 @@ function SeccionFeedback() {
           <div className={styles.sliderBarraGrupo}>
             <div className={styles.sliderBarraLabel}>
               <span><span aria-hidden="true">🔵</span> Insulina (baja glucosa)</span>
-              <span className={styles.sliderBarraNivel} style={{ color: '#2E86AB' }}>
+              <span className={styles.sliderBarraNivel} style={{ color: 'var(--primary-texto)' }}>
                 {insulinaNivel > 50 ? 'Alta' : insulinaNivel > 15 ? 'Media' : 'Baja'}
               </span>
             </div>

@@ -371,7 +371,7 @@ function ExpansionAcelerada() {
     <div>
       <div className={styles.sliderWrap}>
         <p className={styles.sliderLabel}>
-          Mover el presente: <strong style={{ color: '#2E86AB' }}>t = {tPresente.toFixed(1)} Ga</strong>
+          Mover el presente: <strong style={{ color: 'var(--primary-texto)' }}>t = {tPresente.toFixed(1)} Ga</strong>
           {tPresente <= 9.8 ? ' — Expansión desacelerada (domina la materia)' : ' — Expansión acelerada (domina la energía oscura)'}
         </p>
         <input

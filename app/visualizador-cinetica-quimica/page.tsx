@@ -745,11 +745,11 @@ export default function VisualizadorCineticaQuimica() {
             <div className={styles.vidaMediaValores}>
               <div className={styles.vidaMediaItem}>
                 <span>Orden 0</span>
-                <span style={{ color: '#2E86AB' }}>{t12_0.toFixed(1)} s</span>
+                <span style={{ color: 'var(--primary-texto)' }}>{t12_0.toFixed(1)} s</span>
               </div>
               <div className={styles.vidaMediaItem}>
                 <span>Orden 1</span>
-                <span style={{ color: '#48A9A6' }}>{t12_1.toFixed(1)} s</span>
+                <span style={{ color: 'var(--secondary-texto)' }}>{t12_1.toFixed(1)} s</span>
               </div>
               <div className={styles.vidaMediaItem}>
                 <span>Orden 2</span>

@@ -131,7 +131,7 @@ export default function GlobalError({
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              color: 'var(--primary)',
+              color: 'var(--primary-texto)',
               textDecoration: 'underline',
             }}
           >

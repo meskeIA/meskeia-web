@@ -906,7 +906,7 @@ export default function VisualizadorTeoriaGrafosPage() {
           <h3 className={styles.eduSectionTitle}>Euler vs Hamilton: Dos Problemas Distintos</h3>
           <div className={styles.compareGrid}>
             <div className={styles.compareCard}>
-              <h4 className={styles.compareTitle} style={{ color: '#2E86AB' }}>Camino de Euler</h4>
+              <h4 className={styles.compareTitle} style={{ color: 'var(--primary-texto)' }}>Camino de Euler</h4>
               <p>Visita <strong>todas las aristas</strong> exactamente una vez. Los nodos pueden repetirse.</p>
               <p className={styles.compareComplexity}><strong>Complejidad:</strong> O(E) — resoluble en tiempo polinomial</p>
               <p><strong>Condición:</strong> 0 o 2 nodos con grado impar</p>

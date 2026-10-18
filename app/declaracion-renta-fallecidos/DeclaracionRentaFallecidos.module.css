@@ -291,7 +291,7 @@
 .ruleCard h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -313,7 +313,7 @@
 .checklistBox h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -355,7 +355,7 @@
 .resultSection h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -378,7 +378,7 @@
 
 .infoList li::before {
   content: '•';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   margin-right: var(--spacing-sm);
 }
@@ -403,7 +403,7 @@
 .casoCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -490,7 +490,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecondary:focus-visible {
@@ -504,7 +504,7 @@
 }
 
 .guideSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.2rem;
   margin-bottom: var(--spacing-sm);
   margin-top: var(--spacing-lg);

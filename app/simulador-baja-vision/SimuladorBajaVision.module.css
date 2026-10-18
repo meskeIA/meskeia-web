@@ -307,7 +307,7 @@
 
 .demoCta {
   background: white;
-  color: #2E86AB;
+  color: var(--primary-boton);
   border: none;
   padding: 0.5rem 1.25rem;
   border-radius: 6px;
@@ -355,7 +355,7 @@
 .demoResultado {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0;
 }
 

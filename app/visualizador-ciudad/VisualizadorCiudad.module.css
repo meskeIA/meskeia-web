@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -53,7 +53,7 @@
 .capaNombre { font-size: 0.92rem; color: var(--text-primary); }
 .capaFecha { font-size: 0.72rem; color: var(--text-muted); margin-left: auto; }
 .capaDetalles { display: flex; gap: var(--spacing-lg); margin-bottom: 0.3rem; }
-.capaProfundidad { font-size: 0.78rem; color: var(--primary); font-weight: 600; }
+.capaProfundidad { font-size: 0.78rem; color: var(--primary-texto); font-weight: 600; }
 .capaDato { font-size: 0.78rem; color: var(--text-secondary); }
 .capaDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
 
@@ -77,7 +77,7 @@
 .servicioHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
 .servicioIcono { font-size: 1.5rem; flex-shrink: 0; }
 .servicioNombre { display: block; font-size: 0.92rem; color: var(--text-primary); }
-.servicioCantidad { display: block; font-size: 0.78rem; color: var(--primary); font-weight: 600; }
+.servicioCantidad { display: block; font-size: 0.78rem; color: var(--primary-texto); font-weight: 600; }
 
 .servicioBarra { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: var(--spacing-sm); }
 .servicioRelleno { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.3s; }
@@ -107,7 +107,7 @@
 .totalHeader { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
 .totalIcono { font-size: 1.5rem; }
 .totalLabel { font-size: 0.95rem; color: var(--text-secondary); font-weight: 600; }
-.totalValor { display: block; font-size: 2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; }
+.totalValor { display: block; font-size: 2rem; font-weight: 700; color: var(--primary-texto); margin-bottom: 0.3rem; }
 .totalDetalle { display: block; font-size: 0.85rem; color: var(--text-muted); }
 
 /* Insight, warning */

@@ -295,7 +295,7 @@
 .marcadorPuntos {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 2.5ch;
   text-align: right;
 }
@@ -303,7 +303,7 @@
 .marcadorTurno {
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.12);
   padding: 2px 8px;
   border-radius: 999px;
@@ -355,7 +355,7 @@
 
 .marcadorHistorialPuntos {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnAnotar {
@@ -363,7 +363,7 @@
   padding: 0.45rem 0.8rem;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
   border: 1px solid var(--primary);
   border-radius: var(--radius);
@@ -403,7 +403,7 @@
 .contador {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
   padding: 2px 10px;
   border-radius: 999px;
@@ -737,7 +737,7 @@
 .jugadaPuntos {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -849,7 +849,7 @@
 .celdaPuntos {
   width: 80px;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .chipFicha {
@@ -886,7 +886,7 @@
 .guideSection h3 {
   font-size: 1.1rem;
   margin: var(--spacing-xl) 0 var(--spacing-md);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .guideSection p {

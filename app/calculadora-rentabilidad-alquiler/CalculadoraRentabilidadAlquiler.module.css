@@ -41,7 +41,7 @@
 .sectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 20px;
   padding-bottom: 12px;
   border-bottom: 2px solid var(--primary);
@@ -98,7 +98,7 @@
   min-width: 52px;
   text-align: right;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -226,7 +226,7 @@
 .metricValue {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 

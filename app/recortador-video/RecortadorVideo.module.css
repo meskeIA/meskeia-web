@@ -239,7 +239,7 @@
   text-align: center;
   color: var(--text-primary);
 }
-.duracionSel { color: var(--secondary); font-weight: 500; margin-left: auto; }
+.duracionSel { color: var(--secondary-texto); font-weight: 500; margin-left: auto; }
 
 .atajos { font-size: 0.8rem; color: var(--text-muted); margin: var(--spacing-md) 0 0; line-height: 1.7; }
 .atajos kbd {
@@ -364,7 +364,7 @@
   border-radius: var(--radius);
   padding: var(--spacing-md);
 }
-.escenarioCard h3 { font-size: 1rem; color: var(--primary); margin: 0 0 0.5rem; }
+.escenarioCard h3 { font-size: 1rem; color: var(--primary-texto); margin: 0 0 0.5rem; }
 .escenarioCard p { font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 
 .faqList { display: flex; flex-direction: column; gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
@@ -400,7 +400,7 @@
   border-radius: var(--radius);
   padding: var(--spacing-md) var(--spacing-lg);
 }
-.tipsBox h3 { font-size: 1rem; color: var(--secondary); margin: 0 0 var(--spacing-sm); }
+.tipsBox h3 { font-size: 1rem; color: var(--secondary-texto); margin: 0 0 var(--spacing-sm); }
 .tipsBox ul { margin: 0; padding-left: 1.2rem; }
 .tipsBox li { font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.4rem; line-height: 1.5; }
 

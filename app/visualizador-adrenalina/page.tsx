@@ -418,7 +418,7 @@ function BloqueEstres() {
 
       <div className={styles.comparativaEstres}>
         <div className={styles.comparativaCol}>
-          <h3 className={styles.comparativaTitulo} style={{ color: '#2E86AB' }}><span aria-hidden="true">⚡</span> Estrés agudo (adaptativo)</h3>
+          <h3 className={styles.comparativaTitulo} style={{ color: 'var(--primary-texto)' }}><span aria-hidden="true">⚡</span> Estrés agudo (adaptativo)</h3>
           <ul className={styles.comparativaLista}>
             <li>Mejora el rendimiento cognitivo a corto plazo</li>
             <li>Moviliza energía de forma eficiente</li>

@@ -109,7 +109,7 @@
   font-family: var(--font-mono, monospace);
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .funcPrimitiva {
@@ -215,7 +215,7 @@
 }
 
 .controlLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   font-family: var(--font-mono, monospace);
 }
@@ -382,14 +382,14 @@
 .resultValue {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
 }
 
 .resultValueLarge {
   font-size: 2.4rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
   line-height: 1;
   margin: var(--spacing-xs) 0;
@@ -489,7 +489,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -517,7 +517,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -570,7 +570,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -604,7 +604,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 

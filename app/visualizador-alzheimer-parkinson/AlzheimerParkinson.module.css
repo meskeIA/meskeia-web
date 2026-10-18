@@ -18,7 +18,7 @@
 /* Tabs de enfermedad */
 .tabNav { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .tabBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-lg); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-large); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); font-size: 1rem; font-weight: 600; }
-.tabBtn:hover { border-color: var(--primary); color: var(--primary); }
+.tabBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .tabBtnActivo { border-color: var(--primary-boton); background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%); color: white; }
 .tabBtnActivo:hover { color: white; }
@@ -54,17 +54,17 @@
 .infoCardTitle { font-size: 0.95rem; font-weight: 700; margin: 0 0 var(--spacing-sm) 0; }
 .infoCard p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.55; margin: 0; }
 .infoLista { list-style: none; padding: 0; margin: 0; font-size: 0.86rem; color: var(--text-primary); line-height: 1.8; }
-.infoLista li::before { content: '→'; color: var(--primary); font-weight: 700; margin-right: 0.5rem; }
+.infoLista li::before { content: '→'; color: var(--primary-texto); font-weight: 700; margin-right: 0.5rem; }
 
 /* Highlight box */
 .highlightBox { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border: 1px solid rgba(46,134,171,0.2); border-left: 5px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 [data-theme='dark'] .highlightBox { background: rgba(46,134,171,0.08); border-color: rgba(46,134,171,0.3); }
-.highlightTitle { font-size: 1rem; font-weight: 700; color: var(--primary); margin: 0 0 var(--spacing-sm) 0; }
+.highlightTitle { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 var(--spacing-sm) 0; }
 .highlightBox p { font-size: 0.9rem; color: var(--text-primary); line-height: 1.55; margin: 0; }
 
 /* Dato destacado (número grande) */
 .datoDestacado { display: flex; align-items: center; gap: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
-.datoDestacadoValor { font-size: 2.4rem; font-weight: 800; color: var(--primary); flex-shrink: 0; }
+.datoDestacadoValor { font-size: 2.4rem; font-weight: 800; color: var(--primary-texto); flex-shrink: 0; }
 .datoDestacadoLabel { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; }
 
 /* Switch normal/parkinson */

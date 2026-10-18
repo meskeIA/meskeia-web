@@ -63,7 +63,7 @@
 
 .tabBtn:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .tabBtn:focus-visible {
@@ -104,7 +104,7 @@
 .sectionTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 
@@ -138,7 +138,7 @@
 
 .btnEstructura:hover {
   border-color: #48A9A6;
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 .btnEstructura:focus-visible {
@@ -234,7 +234,7 @@
 
 .badgeInfo {
   background: rgba(127, 179, 211, 0.2);
-  color: #2E86AB;
+  color: var(--primary-texto);
   border: 1px solid #7FB3D3;
 }
 
@@ -353,7 +353,7 @@
 
 .btnEstrategia:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .btnEstrategia:focus-visible {
@@ -441,7 +441,7 @@
 }
 
 .valorDestacado {
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-weight: 700;
   font-size: 1rem;
 }
@@ -452,7 +452,7 @@
 }
 
 .optimalLabel {
-  color: #48A9A6;
+  color: var(--secondary-texto);
   font-weight: 600;
 }
 
@@ -495,7 +495,7 @@
 
 [data-theme='dark'] .btnEstructura:hover {
   border-color: #48A9A6;
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .btnEstructuraActivo {
@@ -539,7 +539,7 @@
 
 [data-theme='dark'] .badgeCantidad {
   background: rgba(72, 169, 166, 0.12);
-  color: #48A9A6;
+  color: var(--secondary-texto);
   border-color: rgba(72, 169, 166, 0.3);
 }
 
@@ -576,7 +576,7 @@
 
 [data-theme='dark'] .celda00 {
   background: rgba(72, 169, 166, 0.14);
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .celda01 {
@@ -717,7 +717,7 @@
 .escenarioCard h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -919,7 +919,7 @@
 [data-theme='dark'] .faqTip {
   background: rgba(72, 169, 166, 0.08);
   border-left-color: #48A9A6;
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .step {

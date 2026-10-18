@@ -93,7 +93,7 @@
 .pasoIndicador {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   display: block;
@@ -192,7 +192,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecundario:focus-visible {
@@ -252,7 +252,7 @@
 .contratoNombre {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 4px;
 }
 
@@ -503,7 +503,7 @@
 }
 
 .pasoItem strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqItem {
@@ -513,7 +513,7 @@
 .faqItem h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 

@@ -596,7 +596,7 @@ export default function ComparadorAsistentesCodigo() {
           Ningún asistente es mejor en todo. Claude Code destaca en tareas complejas de largo recorrido. Copilot destaca en completions rápidas y flujo de trabajo GitHub. Gemini Code es la opción gratuita más generosa. Y los modelos o3/o4-mini de OpenAI destacan en razonamiento lógico complejo. La elección óptima depende de tu flujo de trabajo, presupuesto y si trabajas en empresas con requisitos RGPD.
         </p>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Comparativa de formas de acceso
         </h4>
         <div className={styles.tableWrapper}>
@@ -650,7 +650,7 @@ export default function ComparadorAsistentesCodigo() {
           </table>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Perfiles y sus necesidades
         </h4>
         <div className={styles.escenariosGrid}>
@@ -672,7 +672,7 @@ export default function ComparadorAsistentesCodigo() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Preguntas frecuentes
         </h4>
         <ul className={styles.faqList}>
@@ -698,7 +698,7 @@ export default function ComparadorAsistentesCodigo() {
           </li>
         </ul>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Cómo empezar con cualquier asistente de código
         </h4>
         <div className={styles.stepGuide}>
@@ -734,7 +734,7 @@ export default function ComparadorAsistentesCodigo() {
           </div>
         </div>
 
-        <h4 style={{ color: 'var(--primary)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
+        <h4 style={{ color: 'var(--primary-texto)', marginTop: '1.5rem', marginBottom: '0.75rem' }}>
           Buenas prácticas
         </h4>
         <div className={styles.tipsGrid}>

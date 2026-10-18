@@ -148,7 +148,7 @@
 
 .bgTypeBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .bgTypeActive {
@@ -235,7 +235,7 @@
   border: 2px dashed var(--primary);
   border-radius: var(--radius);
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s ease;
   margin-bottom: var(--spacing-md);
@@ -852,7 +852,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.08);
   border-left: 3px solid var(--primary);
   border-radius: 0 6px 6px 0;
@@ -912,7 +912,7 @@
 .faqItem details summary::before {
   content: '▶';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }
@@ -931,7 +931,7 @@
 
 .faqTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   border-left: 3px solid var(--secondary);
   border-radius: 0 6px 6px 0;

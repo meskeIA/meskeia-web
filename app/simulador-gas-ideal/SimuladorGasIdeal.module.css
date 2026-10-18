@@ -75,11 +75,11 @@
 }
 
 .tabBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabActive {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
 }
 
@@ -160,7 +160,7 @@
 
 .valueBadge {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
 }
 
@@ -218,7 +218,7 @@
 
 .calcBtnGhost:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Moléculas (Tab 1) */
@@ -371,7 +371,7 @@
 
 .cicloCard:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .cicloCardActive {
@@ -499,7 +499,7 @@
 
 .resultValueAccent {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -560,7 +560,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -598,7 +598,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.35rem;
   font-style: italic;
 }

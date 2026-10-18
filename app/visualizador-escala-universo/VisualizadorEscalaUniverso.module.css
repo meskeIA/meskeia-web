@@ -79,7 +79,7 @@
 .tabla tbody tr:last-child td { border-bottom: none; }
 .filaActiva { background: rgba(46,134,171,0.06) !important; font-weight: 600; }
 .celdaNombre { font-weight: 500; }
-.celdaNotacion { font-family: 'Courier New', monospace; font-size: 0.82rem; color: var(--primary); background: rgba(46,134,171,0.08); padding: 0.1rem 0.4rem; border-radius: 4px; }
+.celdaNotacion { font-family: 'Courier New', monospace; font-size: 0.82rem; color: var(--primary-texto); background: rgba(46,134,171,0.08); padding: 0.1rem 0.4rem; border-radius: 4px; }
 .celdaObjeto { color: var(--text-secondary); font-size: 0.82rem; }
 
 /* ── Comparaciones ── */

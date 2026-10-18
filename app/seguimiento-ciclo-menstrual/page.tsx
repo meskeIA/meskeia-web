@@ -195,7 +195,7 @@ export default function SeguimientoCicloMenstrualPage() {
           </div>
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="duracion-ciclo">
-              Duración del ciclo: <strong style={{ color: 'var(--primary)' }}>{duracionCiclo} días</strong>
+              Duración del ciclo: <strong style={{ color: 'var(--primary-texto)' }}>{duracionCiclo} días</strong>
             </label>
             <div className={styles.rangeContainer}>
               <input
@@ -215,7 +215,7 @@ export default function SeguimientoCicloMenstrualPage() {
           </div>
           <div className={styles.inputGroup}>
             <label className={styles.label} htmlFor="duracion-periodo">
-              Duración del período: <strong style={{ color: 'var(--primary)' }}>{duracionPeriodo} días</strong>
+              Duración del período: <strong style={{ color: 'var(--primary-texto)' }}>{duracionPeriodo} días</strong>
             </label>
             <div className={styles.rangeContainer}>
               <input

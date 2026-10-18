@@ -90,7 +90,7 @@
 }
 
 .progressStepActive {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .progressStepSkipped {
@@ -231,7 +231,7 @@
   padding: 2px 8px;
   border-radius: 20px;
   background: rgba(72, 169, 166, 0.12);
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .dificultadFacil {
@@ -320,7 +320,7 @@
 
 .perspectivForma {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   background: none;
 }
@@ -343,7 +343,7 @@
   padding: 3px 8px;
   border-radius: 20px;
   background: rgba(72, 169, 166, 0.1);
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .ventajaBadge {
@@ -416,7 +416,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecundario:focus-visible {
@@ -680,7 +680,7 @@
 .hojaRutaTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -893,7 +893,7 @@
 
 .escenarioTip {
   font-size: 0.87rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   line-height: 1.5;
   margin: 0;
 }
@@ -924,7 +924,7 @@
 .faqItem h4 {
   font-size: 0.97rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
   line-height: 1.4;
 }
@@ -942,7 +942,7 @@
 
 .faqTip {
   font-size: 0.85rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   font-style: italic;
   padding: 0.5rem 0.75rem;
   background: rgba(72, 169, 166, 0.06);

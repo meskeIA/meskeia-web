@@ -465,7 +465,7 @@ function TabCelulas() {
             <h4 className={styles.celulaNombre}>{c.nombre}</h4>
             <span
               className={styles.celulaTipo}
-              style={{ color: c.tipo === 'Innata' ? '#e67e22' : '#2E86AB' }}
+              style={{ color: c.tipo === 'Innata' ? '#e67e22' : 'var(--primary-texto)' }}
             >
               {c.tipo}
             </span>

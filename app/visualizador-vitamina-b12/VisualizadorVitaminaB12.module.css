@@ -94,7 +94,7 @@
 }
 
 .insightBox strong {
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 /* ─── Warning box (v2.0 indicator) ──────────── */
@@ -403,7 +403,7 @@
 }
 
 .prevalenciaBox strong {
-  color: var(--secondary, #48A9A6);
+  color: var(--secondary-texto);
 }
 
 /* ─── Síntomas por nivel ─────────────────────── */
@@ -429,7 +429,7 @@
 
 .trackBtn:hover {
   border-color: var(--primary, #2E86AB);
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .trackBtn:focus-visible {
@@ -529,7 +529,7 @@
 .eduTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 1rem 0 0.25rem;
 }
 
@@ -557,7 +557,7 @@
 }
 
 .eduList li strong {
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 /* ─── Fuentes alimentarias ───────────────────── */

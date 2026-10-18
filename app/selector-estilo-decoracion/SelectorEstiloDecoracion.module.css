@@ -46,7 +46,7 @@
 .quiz { max-width: 620px; margin: 2rem auto 3rem; padding: 0 1rem; }
 .progresoWrap { margin-bottom: 1.75rem; }
 .progresoInfo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
-.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+.progresoPaso { font-size: 0.85rem; font-weight: 600; color: var(--primary-texto); }
 .progresoCategoria { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .progresoBar { height: 6px; background: var(--bg-card); border-radius: 3px; overflow: hidden; border: 1px solid rgba(0,0,0,0.06); }
 .progresoRelleno { height: 100%; background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 3px; transition: width 0.4s ease; }
@@ -76,7 +76,7 @@
   padding: 0.75rem 1.25rem; font-size: 0.9rem; color: var(--text-secondary);
   cursor: pointer; transition: border-color 0.18s, color 0.18s; min-width: 110px;
 }
-.btnAnterior:hover { border-color: var(--primary); color: var(--primary); }
+.btnAnterior:hover { border-color: var(--primary); color: var(--primary-texto); }
 .btnAnterior:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnPrimary {
   background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
@@ -97,8 +97,8 @@
 }
 .resultadoIcon { font-size: 4rem; margin-bottom: 0.75rem; display: block; }
 .resultadoLabel { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 0.4rem; }
-.resultadoNombre { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; }
-.resultadoPerfil { font-size: 1rem; color: var(--secondary); font-weight: 600; margin-bottom: 0.75rem; }
+.resultadoNombre { font-size: 1.6rem; font-weight: 700; color: var(--primary-texto); margin-bottom: 0.5rem; }
+.resultadoPerfil { font-size: 1rem; color: var(--secondary-texto); font-weight: 600; margin-bottom: 0.75rem; }
 .resultadoDesc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0; text-align: left; }
 
 /* ─── Stats grid ────────────────────────────────────────────────── */
@@ -106,16 +106,16 @@
 @media (max-width: 500px) { .statsGrid { grid-template-columns: 1fr; } }
 .statCard { background: var(--bg-card); border-radius: 12px; padding: 1.25rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
 .statLabel { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
-.statValor { font-size: 0.95rem; font-weight: 700; color: var(--primary); line-height: 1.4; }
+.statValor { font-size: 0.95rem; font-weight: 700; color: var(--primary-texto); line-height: 1.4; }
 
 /* ─── Elementos clave ───────────────────────────────────────────── */
 .elementosSection {
   background: rgba(72,169,166,0.07); border: 1px solid rgba(72,169,166,0.25);
   border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
 }
-.elementosTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary); margin: 0 0 0.75rem; }
+.elementosTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--secondary-texto); margin: 0 0 0.75rem; }
 .elementoItem { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; padding: 0.3rem 0; display: flex; gap: 0.5rem; }
-.elementoItem::before { content: '✓'; color: var(--secondary); font-weight: 700; flex-shrink: 0; }
+.elementoItem::before { content: '✓'; color: var(--secondary-texto); font-weight: 700; flex-shrink: 0; }
 
 /* ─── Evitar ────────────────────────────────────────────────────── */
 .evitarSection {
@@ -139,7 +139,7 @@
 .btnRepetir {
   display: block; width: 100%; max-width: 320px; margin: 0 auto 2rem;
   padding: 0.85rem 1.5rem; background: transparent; border: 2px solid var(--primary);
-  border-radius: 10px; color: var(--primary); font-size: 0.95rem; font-weight: 600;
+  border-radius: 10px; color: var(--primary-texto); font-size: 0.95rem; font-weight: 600;
   cursor: pointer; transition: background 0.18s, color 0.18s;
 }
 .btnRepetir:hover { background: var(--primary-boton); color: #fff; }

@@ -37,7 +37,7 @@
 
 /* Section Title */
 .sectionTitle {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 20px;
@@ -75,7 +75,7 @@
 
 .tipoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--focus);
 }
 
@@ -159,7 +159,7 @@
 
 .flecha {
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: bold;
   padding-bottom: 10px;
 }
@@ -172,7 +172,7 @@
   font-size: 1.2rem;
   font-weight: 600;
   background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   min-height: 52px;
   display: flex;
@@ -267,7 +267,7 @@
   border: 2px solid var(--secondary);
   border-radius: 10px;
   background: transparent;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -314,7 +314,7 @@
 }
 
 .explicacionBox h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
   margin-bottom: 15px;
 }
@@ -343,7 +343,7 @@
 }
 
 .conceptoSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 20px;
@@ -423,7 +423,7 @@
 }
 
 .listaConsejos li strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Responsive */
@@ -674,7 +674,7 @@
 
 .faqItem > strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   margin-bottom: 10px;
 }

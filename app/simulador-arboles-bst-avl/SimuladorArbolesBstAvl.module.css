@@ -262,7 +262,7 @@
 .speedValue {
   font-family: 'SF Mono', Monaco, monospace;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   min-width: 60px;
   text-align: center;
@@ -435,7 +435,7 @@
 .infoValue {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'SF Mono', Monaco, monospace;
 }
 
@@ -455,7 +455,7 @@
 
 .recorridoNombre {
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-bottom: var(--spacing-xs);
   font-size: 0.9rem;
   letter-spacing: 0.4px;
@@ -531,7 +531,7 @@
 }
 
 .statusMessage strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Responsive */
@@ -654,7 +654,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -685,7 +685,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
 }
@@ -698,7 +698,7 @@
 }
 
 .faqTip {
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   background: rgba(72, 169, 166, 0.08);
   padding: 0.4rem 0.75rem;
   border-radius: 6px;
@@ -922,7 +922,7 @@
 .casosTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casosIntro {
@@ -954,7 +954,7 @@
 
 .casoBoton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .casoBoton:focus-visible {
@@ -983,7 +983,7 @@
 .casoTitulo {
   margin: 0 0 var(--spacing-sm);
   font-size: 1.1rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .casoEnunciado {
@@ -1086,7 +1086,7 @@
   min-height: 44px;
   padding: var(--spacing-xs) var(--spacing-md);
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
   border: 1px solid var(--primary);
   border-radius: var(--radius);

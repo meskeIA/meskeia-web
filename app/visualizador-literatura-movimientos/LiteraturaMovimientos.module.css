@@ -66,7 +66,7 @@
 
 .tabBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabBtnActivo {
@@ -275,7 +275,7 @@
   padding: 0.2rem 0.65rem;
   background: var(--bg-primary);
   border: 1px solid var(--secondary);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   border-radius: 20px;
   font-size: 0.78rem;
   font-weight: 500;
@@ -337,7 +337,7 @@
 
 .movimientoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .movimientoBtnActivo {
@@ -403,7 +403,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -453,7 +453,7 @@
 
 .filtroCatBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .filtroCatBtnActivo {
@@ -877,7 +877,7 @@
 .faqTip {
   display: block;
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
@@ -1114,7 +1114,7 @@
 
 .eraEventoAnio {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 70px;
   flex-shrink: 0;
   font-size: 0.82rem;

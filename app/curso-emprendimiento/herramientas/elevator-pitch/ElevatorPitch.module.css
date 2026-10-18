@@ -152,7 +152,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Examples */
@@ -270,7 +270,7 @@
 
 .btnCopy:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Timer Section */
@@ -385,7 +385,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Navigation */
@@ -409,7 +409,7 @@
 
 .navLink:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Responsive */

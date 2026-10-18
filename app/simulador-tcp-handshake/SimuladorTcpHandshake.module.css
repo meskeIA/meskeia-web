@@ -45,7 +45,7 @@
 .seccionTitulo {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 1rem;
 }
 
@@ -111,7 +111,7 @@
 
 .velBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .velBtnActivo {
@@ -148,7 +148,7 @@
   border: 1.5px solid var(--primary);
   border-radius: 6px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -162,7 +162,7 @@
 
 [data-theme='dark'] .btnSecundario {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .btnSecundario:hover {
@@ -415,7 +415,7 @@
 
 .btnControl:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnControl:disabled {
@@ -573,7 +573,7 @@
 .faqItem h4 {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqItem p {

@@ -532,7 +532,7 @@ export default function VisualizadorIaRedesNeuronales() {
                   </div>
                   <div className={styles.statBox}>
                     <span className={styles.statLabel}>Loss</span>
-                    <span className={styles.statValor} style={{ color: loss < 0.1 ? '#48A9A6' : loss > 0.5 ? '#E07B39' : '#2E86AB' }}>
+                    <span className={styles.statValor} style={{ color: loss < 0.1 ? 'var(--secondary-texto)' : loss > 0.5 ? '#E07B39' : 'var(--primary-texto)' }}>
                       {loss.toFixed(4)}
                     </span>
                   </div>

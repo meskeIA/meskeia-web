@@ -109,7 +109,7 @@
 
 .ejemploBtn:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* Botones */
@@ -151,7 +151,7 @@
 
 .btnSecondary:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* Results Panel */
@@ -181,7 +181,7 @@
   display: block;
   font-size: 2rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .resumenLabel {
@@ -238,7 +238,7 @@
 .versoSilabas {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -254,7 +254,7 @@
 .versoArte {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   border: 1px solid var(--secondary);
   border-radius: 999px;
   padding: 1px 8px;
@@ -275,7 +275,7 @@
 
 .versoIgual {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -412,7 +412,7 @@
 
 .reglaCard h4 {
   font-size: 0.95rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin-bottom: 8px;
 }
 
@@ -609,7 +609,7 @@
 .eduFaqPregunta::before {
   content: "▶";
   font-size: 0.65rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   transition: transform 0.2s;
   flex-shrink: 0;
 }
@@ -858,7 +858,7 @@
 .estrofaNombre {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .estrofaDescripcion {

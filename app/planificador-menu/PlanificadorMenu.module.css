@@ -106,7 +106,7 @@
 
 .progressPercent {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .progressTrack {
@@ -371,7 +371,7 @@
 
 .shoppingTips h3 {
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 1rem;
 }
 
@@ -436,7 +436,7 @@
 
 .principleCard h4 {
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.5rem;
 }
 
@@ -461,7 +461,7 @@
 
 .disclaimer h3 {
   font-size: 1.1rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-bottom: 0.75rem;
 }
 
@@ -660,7 +660,7 @@
 
 .escenarioHeader strong {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.3;
 }
 
@@ -707,7 +707,7 @@
 
 .faqItem strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   margin-bottom: 0.5rem;
 }
@@ -815,7 +815,7 @@
 
 .tipCard strong {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.3;
 }
 

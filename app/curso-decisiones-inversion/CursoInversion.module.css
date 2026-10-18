@@ -125,7 +125,7 @@
 .statValue {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -347,7 +347,7 @@
 }
 
 .toolExternal {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.8rem;
   margin-top: var(--spacing-xs);
 }
@@ -422,7 +422,7 @@
   display: inline-block;
   padding: var(--spacing-md) var(--spacing-xl);
   background: white;
-  color: var(--primary);
+  color: var(--primary-boton);
   text-decoration: none;
   border-radius: var(--radius);
   font-weight: 600;
@@ -529,7 +529,7 @@
 
 .navButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navButton.disabled {
@@ -550,7 +550,7 @@
 
 .navProgressText {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navProgressLabel {
@@ -779,7 +779,7 @@
 
 .bottomNavLink:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .bottomNavLink.next {

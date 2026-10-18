@@ -138,7 +138,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultsSection {
@@ -209,7 +209,7 @@
 
 .resultPercent {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 50px;
   text-align: right;
 }
@@ -252,7 +252,7 @@
 
 .exampleBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .languagesSection {
@@ -367,7 +367,7 @@
 .escenarioIcon { font-size: 1.5rem; }
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46,134,171,0.07);
   border-left: 3px solid var(--primary);
   padding: 0.4rem 0.75rem;

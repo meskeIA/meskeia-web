@@ -181,7 +181,7 @@
 
 .btnSmall:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSmall:disabled {
@@ -334,7 +334,7 @@
 }
 
 .notaCategoria {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
 }
 
@@ -630,7 +630,7 @@
 
 .escenarioTip {
   font-size: 0.83rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.07);
   border-left: 3px solid var(--primary);
   padding: 8px 10px;
@@ -676,7 +676,7 @@
 .faqItem details summary::after {
   content: '+';
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 400;
   flex-shrink: 0;
 }
@@ -706,7 +706,7 @@
 
 .faqTip {
   font-size: 0.82rem !important;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   background: rgba(46, 134, 171, 0.07);
   border-left: 3px solid var(--primary);
   padding: 8px 10px !important;

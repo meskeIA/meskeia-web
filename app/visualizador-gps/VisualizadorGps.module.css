@@ -17,7 +17,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
@@ -34,7 +34,7 @@
 .statsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .statCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
 .statLabel { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 0.2rem; }
-.statValor { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+.statValor { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); }
 .statDetalle { display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
 
 /* Visualización orbital */
@@ -62,7 +62,7 @@
 
 .porqueGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }
 .porqueItem { display: flex; align-items: center; gap: var(--spacing-md); background: var(--hover); border-radius: var(--radius); padding: var(--spacing-md); }
-.porqueNumero { font-size: 1.8rem; font-weight: 800; color: var(--primary); flex-shrink: 0; min-width: 40px; text-align: center; }
+.porqueNumero { font-size: 1.8rem; font-weight: 800; color: var(--primary-texto); flex-shrink: 0; min-width: 40px; text-align: center; }
 .porqueTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.4; }
 
 /* Trilateración interactiva */
@@ -89,7 +89,7 @@
 
 .trilateraControles { display: flex; gap: var(--spacing-sm); justify-content: center; }
 .trilateraBtn { padding: var(--spacing-sm) var(--spacing-lg); background: var(--bg-card); border: 2px solid var(--border); border-radius: 30px; cursor: pointer; font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); transition: all 0.2s; }
-.trilateraBtn:hover { border-color: var(--primary); color: var(--primary); }
+.trilateraBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .trilateraBtnActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 
 /* Pasos explicativos */
@@ -102,7 +102,7 @@
 /* Fórmula */
 .formulaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; }
 .formulaLabel { display: block; font-size: 0.82rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm); }
-.formula { display: block; font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: var(--spacing-md); font-family: 'Georgia', serif; letter-spacing: 2px; }
+.formula { display: block; font-size: 2rem; font-weight: 800; color: var(--primary-texto); margin-bottom: var(--spacing-md); font-family: 'Georgia', serif; letter-spacing: 2px; }
 .formulaLeyenda { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.82rem; color: var(--text-secondary); margin-bottom: var(--spacing-md); }
 .formulaEjemplo { font-size: 0.82rem; color: var(--text-muted); margin: 0; font-style: italic; }
 
@@ -141,7 +141,7 @@
 .nivelCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; }
 .nivelIcono { font-size: 1.8rem; display: block; margin-bottom: var(--spacing-sm); }
 .nivelTipo { font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
-.nivelPrecision { display: block; font-size: 1.2rem; font-weight: 800; color: var(--primary); margin-bottom: var(--spacing-sm); }
+.nivelPrecision { display: block; font-size: 1.2rem; font-weight: 800; color: var(--primary-texto); margin-bottom: var(--spacing-sm); }
 .nivelUso { display: block; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
 
 /* Problemas */

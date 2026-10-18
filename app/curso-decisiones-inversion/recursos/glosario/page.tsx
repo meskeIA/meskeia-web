@@ -212,7 +212,7 @@ export default function GlosarioPage() {
                 }}
               >
                 <h3 style={{
-                  color: 'var(--primary)',
+                  color: 'var(--primary-texto)',
                   fontSize: '1.1rem',
                   fontWeight: 600,
                   marginBottom: '8px'

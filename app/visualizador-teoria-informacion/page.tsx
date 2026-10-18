@@ -214,12 +214,12 @@ function TabEntropia({
       <div className={styles.comparativasGrid}>
         <div className={styles.comparativaItem}>
           <span className={styles.comparativaLabel}>Lanzamiento de moneda</span>
-          <span className={styles.comparativaValor} style={{ color: '#2E86AB' }}>H = 1 bit</span>
+          <span className={styles.comparativaValor} style={{ color: 'var(--primary-texto)' }}>H = 1 bit</span>
           <span className={styles.comparativaDesc}>p(cara) = p(cruz) = 0,50</span>
         </div>
         <div className={styles.comparativaItem}>
           <span className={styles.comparativaLabel}>Dado de 6 caras</span>
-          <span className={styles.comparativaValor} style={{ color: '#48A9A6' }}>H ≈ 2,58 bits</span>
+          <span className={styles.comparativaValor} style={{ color: 'var(--secondary-texto)' }}>H ≈ 2,58 bits</span>
           <span className={styles.comparativaDesc}>6 resultados equiprobables</span>
         </div>
         <div className={styles.comparativaItem}>
@@ -358,8 +358,8 @@ function TabHuffman() {
             ))}
           </svg>
           <div className={styles.arbolLeyenda}>
-            <span style={{ color: '#2E86AB' }}>— Rama 0 (izquierda)</span>
-            <span style={{ color: '#48A9A6' }}>— Rama 1 (derecha)</span>
+            <span style={{ color: 'var(--primary-texto)' }}>— Rama 0 (izquierda)</span>
+            <span style={{ color: 'var(--secondary-texto)' }}>— Rama 1 (derecha)</span>
           </div>
         </div>
 
@@ -402,7 +402,7 @@ function TabHuffman() {
         </div>
         <div className={styles.eficienciaItem}>
           <span className={styles.eficienciaLabel}>Longitud media Huffman</span>
-          <span className={styles.eficienciaValor} style={{ color: '#2E86AB' }}>
+          <span className={styles.eficienciaValor} style={{ color: 'var(--primary-texto)' }}>
             {longitudMediaHuffman.toFixed(3)} bits/símbolo
           </span>
           <span className={styles.eficienciaDesc}>

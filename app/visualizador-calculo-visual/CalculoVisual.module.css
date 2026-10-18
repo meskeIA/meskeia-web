@@ -43,7 +43,7 @@
   border-radius: 20px;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
@@ -81,7 +81,7 @@
   border-radius: 16px;
   border: 2px solid var(--secondary);
   background: transparent;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
@@ -165,7 +165,7 @@
 .valor {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: monospace;
 }
 
@@ -201,7 +201,7 @@
 .limiteFinal {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: monospace;
 }
 
@@ -310,7 +310,7 @@
 }
 
 [data-theme='dark'] .btnFuncion {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   border-color: var(--secondary);
 }
 

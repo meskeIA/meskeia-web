@@ -185,7 +185,7 @@
 
 .btnAccion:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* Categorías */
@@ -203,7 +203,7 @@
 .categoriaTitulo {
   font-size: 1rem;
   font-weight: 600;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
@@ -255,7 +255,7 @@
   align-items: center;
   justify-content: center;
   font-size: 0.9rem;
-  color: #48A9A6;
+  color: var(--secondary-texto);
   font-weight: bold;
   flex-shrink: 0;
   transition: all 0.2s;
@@ -339,7 +339,7 @@
   border: 1.5px solid #2E86AB;
   border-radius: 6px;
   background: transparent;
-  color: #2E86AB;
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;

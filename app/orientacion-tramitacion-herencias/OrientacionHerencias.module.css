@@ -94,7 +94,7 @@
   gap: 0.75rem;
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -186,7 +186,7 @@
 
 .progresoPorcentaje {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .progresoBar {
@@ -384,7 +384,7 @@
 
 .pasoEnlace {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
 }
 
@@ -479,7 +479,7 @@
 .costeCard h4 {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .costeNota {
@@ -522,7 +522,7 @@
 }
 
 .enlaceCalculadora {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   font-size: 0.88rem;
   padding: 0.4rem 0.6rem;
@@ -570,13 +570,13 @@
 
 .guideSection h2 {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0;
 }
 
 .guideSection h3 {
   font-size: 1.05rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 1.5rem;
 }
 
@@ -598,7 +598,7 @@
 .conceptCard h4 {
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .conceptCard p {
@@ -727,7 +727,7 @@
 .escenarioHeader h4 {
   margin: 0;
   font-size: 0.93rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.4;
 }
 
@@ -848,7 +848,7 @@
 .stepContent h4 {
   margin: 0 0 0.35rem;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .stepContent p {
@@ -886,7 +886,7 @@
 .tipCard h4 {
   margin: 0;
   font-size: 0.92rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipCard p {

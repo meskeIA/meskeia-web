@@ -48,7 +48,7 @@
   border: 1px solid var(--primary);
   border-radius: 14px;
   background: var(--bg-card);
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
@@ -71,7 +71,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   font-size: 0.76rem;
   text-decoration: underline;
   cursor: pointer;

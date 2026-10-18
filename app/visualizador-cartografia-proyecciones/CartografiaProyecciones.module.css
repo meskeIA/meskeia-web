@@ -23,7 +23,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -55,12 +55,12 @@
 .propiedadIcono { font-size: 1.3rem; flex-shrink: 0; }
 .propiedadNombre { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
 .propiedadDesc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
-.propiedadEjemplo { font-size: 0.82rem; color: var(--primary); font-weight: 500; margin: var(--spacing-sm) 0 0 0; line-height: 1.4; }
+.propiedadEjemplo { font-size: 0.82rem; color: var(--primary-texto); font-weight: 500; margin: var(--spacing-sm) 0 0 0; line-height: 1.4; }
 
 /* ─── Sección 2: Proyecciones ─── */
 .proyeccionSelector { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); justify-content: center; }
 .proyeccionPill { padding: 0.5rem 1rem; border: 2px solid var(--border); border-radius: 999px; background: var(--bg-card); cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); transition: all 0.2s; white-space: nowrap; }
-.proyeccionPill:hover { border-color: var(--primary); color: var(--primary); }
+.proyeccionPill:hover { border-color: var(--primary); color: var(--primary-texto); }
 .proyeccionPill:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .proyeccionPillActiva { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .proyeccionPillActiva:hover { background: var(--primary-boton); color: white; }
@@ -103,7 +103,7 @@
 .coordCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); }
 .coordTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
 .coordDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin: 0 0 var(--spacing-md) 0; }
-.coordRango { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); background: rgba(46,134,171,0.06); border-radius: var(--radius); padding: var(--spacing-sm) var(--spacing-md); margin-bottom: var(--spacing-md); font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+.coordRango { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); background: rgba(46,134,171,0.06); border-radius: var(--radius); padding: var(--spacing-sm) var(--spacing-md); margin-bottom: var(--spacing-md); font-size: 0.85rem; font-weight: 600; color: var(--primary-texto); }
 .coordEjemplos { display: flex; flex-direction: column; gap: 0.3rem; }
 .coordEjemplo { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; }
 .coordLugar { color: var(--text-secondary); }
@@ -117,19 +117,19 @@
 .husosTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
 .husosDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0 0 var(--spacing-md) 0; }
 .husosSvg { width: 100%; max-width: 500px; margin: 0 auto var(--spacing-md); display: block; }
-.husosNota { font-size: 0.82rem; color: var(--primary); font-weight: 500; margin: 0; line-height: 1.4; text-align: center; }
+.husosNota { font-size: 0.82rem; color: var(--primary-texto); font-weight: 500; margin: 0; line-height: 1.4; text-align: center; }
 
 .fechaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .fechaTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
 .fechaDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0 0 var(--spacing-sm) 0; }
-.fechaExtra { font-size: 0.82rem; color: var(--primary); font-weight: 500; margin: 0; line-height: 1.4; }
+.fechaExtra { font-size: 0.82rem; color: var(--primary-texto); font-weight: 500; margin: 0; line-height: 1.4; }
 
 .gpsCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .gpsTitulo { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-sm) 0; }
 .gpsDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; margin: 0 0 var(--spacing-md) 0; }
 .gpsEjemplo { display: flex; flex-direction: column; gap: 0.2rem; background: rgba(46,134,171,0.06); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; }
 .gpsLabel { font-size: 0.82rem; color: var(--text-muted); }
-.gpsCoords { font-size: 1rem; font-weight: 700; color: var(--primary); font-family: 'Courier New', monospace; }
+.gpsCoords { font-size: 1rem; font-weight: 700; color: var(--primary-texto); font-family: 'Courier New', monospace; }
 
 /* ─── Sección 4: Datos y curiosidades ─── */
 .curiosidadesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
@@ -141,7 +141,7 @@
 .curiosidadIcono { font-size: 1.5rem; flex-shrink: 0; }
 .curiosidadTitulo { font-size: 0.92rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .curiosidadDesc { font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
-.curiosidadExtra { font-size: 0.82rem; color: var(--primary); font-weight: 500; margin: var(--spacing-sm) 0 0 0; line-height: 1.4; }
+.curiosidadExtra { font-size: 0.82rem; color: var(--primary-texto); font-weight: 500; margin: var(--spacing-sm) 0 0 0; line-height: 1.4; }
 
 /* Comparación final */
 .comparacionFinalCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }

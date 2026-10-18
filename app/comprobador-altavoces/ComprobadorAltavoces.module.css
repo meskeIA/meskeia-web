@@ -230,7 +230,7 @@
   background: var(--bg-primary);
   border: 2px solid var(--primary);
   border-radius: var(--radius);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 14px 18px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -386,7 +386,7 @@
   text-align: center;
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-variant-numeric: tabular-nums;
   margin-bottom: var(--spacing-sm);
 }
@@ -589,7 +589,7 @@
 }
 
 .eduEscenarioCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1rem;
 }
@@ -628,7 +628,7 @@
 }
 
 .eduFaqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1rem;
 }
@@ -727,7 +727,7 @@
 }
 
 .eduTipCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 6px;
   font-size: 0.95rem;
 }

@@ -77,7 +77,7 @@
 .sliderValue {
   font-weight: 700;
   font-size: 1.05rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
 }
 
@@ -292,7 +292,7 @@
 .resultadoValor {
   font-size: 2.6rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
   line-height: 1;
 }
@@ -474,7 +474,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -526,7 +526,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -559,7 +559,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -592,7 +592,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -687,7 +687,7 @@
 
 [data-theme='dark'] .badgeNormal {
   background: rgba(72, 169, 166, 0.22);
-  color: #48A9A6;
+  color: var(--secondary-texto);
   border-color: #48A9A6;
 }
 

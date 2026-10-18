@@ -9,7 +9,7 @@
 .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-top: 24px; box-shadow: var(--shadow-sm); }
 
 .moldesGrid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: start; }
-.flecha { font-size: 2rem; color: var(--primary); align-self: center; }
+.flecha { font-size: 2rem; color: var(--primary-texto); align-self: center; }
 
 .moldeCard { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
 .moldeTitulo { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 14px; }
@@ -25,7 +25,7 @@
 .presetSelect:focus { outline: none; border-color: var(--primary); }
 
 .resultado { margin-top: 24px; padding: 28px; background: color-mix(in srgb, var(--primary) 8%, var(--bg-card)); border: 2px solid color-mix(in srgb, var(--primary) 30%, transparent); border-radius: 16px; text-align: center; }
-.resultadoValor { display: block; font-size: 2.6rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+.resultadoValor { display: block; font-size: 2.6rem; font-weight: 700; color: var(--primary-texto); line-height: 1.1; }
 .resultadoTexto { display: block; font-size: 0.95rem; color: var(--text-secondary); margin-top: 6px; }
 .areas { font-size: 0.85rem; color: var(--text-muted); margin-top: 10px; }
 .notaTiempo { margin-top: 14px; padding: 12px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; font-size: 0.86rem; color: var(--text-secondary); line-height: 1.5; }
@@ -34,7 +34,7 @@
 
 .educationalContent { padding: 8px 0; }
 .conceptoSection { margin-bottom: 40px; }
-.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
+.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary-texto); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
 .conceptoSection p { color: var(--text-secondary); line-height: 1.65; font-size: 0.95rem; }
 
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 12px; }

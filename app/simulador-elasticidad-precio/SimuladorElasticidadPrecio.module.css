@@ -217,7 +217,7 @@
 .sliderValue {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 52px;
   text-align: right;
 }
@@ -366,7 +366,7 @@
   text-align: center;
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0.75rem 0;
 }
 
@@ -444,7 +444,7 @@
 
 .escenarioCard h4 {
   margin: 0 0 0.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
 }
 
@@ -494,7 +494,7 @@
 
 .faqTip {
   font-style: italic;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   border-left: 3px solid var(--secondary);
   padding-left: 0.5rem;
 }

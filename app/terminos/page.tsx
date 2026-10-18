@@ -175,7 +175,7 @@ export default function TerminosPage() {
           <h2>5. Privacidad y Datos</h2>
 
           <InfoBox type="info" title="COMPROMISO DE PRIVACIDAD" icon="🔒">
-            <p>Las herramientas funcionan <strong>completamente en su navegador</strong> para datos sensibles. Utilizamos un sistema de analytics propio (server-side, sin cookies) únicamente para estadísticas básicas de uso. Para más información, consulte nuestra <Link href="/privacidad" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>Política de Privacidad</Link>.</p>
+            <p>Las herramientas funcionan <strong>completamente en su navegador</strong> para datos sensibles. Utilizamos un sistema de analytics propio (server-side, sin cookies) únicamente para estadísticas básicas de uso. Para más información, consulte nuestra <Link href="/privacidad" style={{ color: 'var(--primary-texto)', textDecoration: 'underline' }}>Política de Privacidad</Link>.</p>
 
             <p><strong>DATOS DE SALUD:</strong> La información de salud que introduce en nuestra calculadora es especialmente sensible. Por esta razón, garantizamos que:</p>
             <ul>

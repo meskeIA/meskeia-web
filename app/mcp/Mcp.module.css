@@ -103,7 +103,7 @@
 
 .code {
   background: #f1f5f9;
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
   font-family: 'Courier New', monospace;
@@ -152,7 +152,7 @@
 .categoryName {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.25rem;
 }
 
@@ -184,7 +184,7 @@
 .exampleTag {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -218,12 +218,12 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
 .link {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 

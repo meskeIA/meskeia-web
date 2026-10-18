@@ -139,7 +139,7 @@
 
 .randomBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Harmony Selection */
@@ -381,7 +381,7 @@
 
 .exportTab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .exportActive {
@@ -410,7 +410,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -617,7 +617,7 @@
 
 .faqItem h4 {
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
 }
 
@@ -638,7 +638,7 @@
   border-radius: 3px;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 0.88em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {
@@ -699,7 +699,7 @@
   border-radius: 3px;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 0.88em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Tips Grid */
@@ -748,7 +748,7 @@
   border-radius: 3px;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 0.85em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Warning Box */

@@ -301,7 +301,7 @@
 .origenValor {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.2rem;
 }
 
@@ -408,7 +408,7 @@
 .equipGramos {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .equipHojas {
@@ -430,7 +430,7 @@
 .guideSection h2 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: var(--spacing-lg) 0 var(--spacing-sm);
 }
 

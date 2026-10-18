@@ -127,7 +127,7 @@
 .statValue {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -353,7 +353,7 @@
 .timer {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: var(--spacing-sm) var(--spacing-lg);
   background: var(--bg-card);
   border-radius: var(--radius);
@@ -392,7 +392,7 @@
 .questionNum {
   font-size: 4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .questionOp {
@@ -403,7 +403,7 @@
 .questionAnswer {
   font-size: 4rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   min-width: 80px;
 }
 
@@ -600,7 +600,7 @@
 .resultStatValue {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultStatLabel {
@@ -645,7 +645,7 @@
 
 .menuButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Educational Content */
@@ -705,7 +705,7 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: bold;
 }
 

@@ -205,7 +205,7 @@
 
 .ejemploPrecio {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
 }
 
@@ -335,7 +335,7 @@
 .detalleValor {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Consejo */
@@ -371,7 +371,7 @@
   content: "•";
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .consejoAlerta {
@@ -478,7 +478,7 @@
 .guideCard h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-xs);
 }
 
@@ -647,7 +647,7 @@
 
 .escenarioExample {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.08);
   border-radius: 4px;
   padding: 0.3rem 0.5rem;
@@ -685,7 +685,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 

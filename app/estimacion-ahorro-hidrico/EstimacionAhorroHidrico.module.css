@@ -261,7 +261,7 @@
   align-items: center;
   gap: 0.3rem;
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.85rem;
   font-weight: 600;
   padding: 0.3rem 0.7rem;
@@ -316,7 +316,7 @@
 .statValue {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: block;
 }
 
@@ -388,7 +388,7 @@
 }
 
 .equivText strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .noSelectionMsg {

@@ -182,7 +182,7 @@
 
 .controlBtn:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .controlBtn.active {
@@ -255,7 +255,7 @@
 .speedValue {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 40px;
   text-align: right;
 }
@@ -328,7 +328,7 @@
 .metricValue {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .metricLabel {
@@ -461,7 +461,7 @@
 .complexityValue {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Fira Code', monospace;
 }
 
@@ -609,7 +609,7 @@
 .comparativaComplejidad {
   margin-left: auto;
   font-family: 'Monaco', 'Consolas', monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -633,7 +633,7 @@
   border: 1px solid var(--primary);
   border-radius: 20px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
@@ -951,7 +951,7 @@
 
 .casoSubtitle {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin-bottom: var(--spacing-sm);
 }
@@ -1191,7 +1191,7 @@
 .escenarioCard:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(46,134,171,0.15); }
 .escenarioHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
 .escenarioIcon { font-size: 1.5rem; }
-.escenarioHeader h4 { font-size: 1rem; font-weight: 600; color: var(--primary); margin: 0; }
+.escenarioHeader h4 { font-size: 1rem; font-weight: 600; color: var(--primary-texto); margin: 0; }
 .escenarioExample { font-size: 0.875rem; color: var(--text-secondary); margin: var(--spacing-xs) 0; font-style: italic; }
 .escenarioTip {
   font-size: 0.875rem; color: var(--text-primary); margin: 0;
@@ -1203,7 +1203,7 @@
 .faqListV2 { display: flex; flex-direction: column; gap: var(--spacing-sm); margin: var(--spacing-lg) 0; }
 .faqItemV2 { background: var(--bg-card); border: 1px solid #e0e0e0; border-radius: 8px; padding: var(--spacing-md); }
 [data-theme='dark'] .faqItemV2 { border-color: #444; background: #2a2a2a; }
-.faqItemV2 strong { display: block; color: var(--primary); margin-bottom: var(--spacing-xs); font-size: 0.95rem; }
+.faqItemV2 strong { display: block; color: var(--primary-texto); margin-bottom: var(--spacing-xs); font-size: 0.95rem; }
 .faqItemV2 p { margin: 0; color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; }
 
 .stepGuide { display: flex; flex-direction: column; gap: var(--spacing-sm); margin: var(--spacing-lg) 0; }
@@ -1222,7 +1222,7 @@
 .tipsGridCard { background: var(--bg-card); border: 1px solid #e0e0e0; border-radius: 10px; padding: var(--spacing-md); text-align: center; }
 [data-theme='dark'] .tipsGridCard { border-color: #444; background: #2a2a2a; }
 .tipIconV2 { font-size: 1.75rem; margin-bottom: var(--spacing-sm); display: block; }
-.tipsGridCard strong { display: block; color: var(--primary); font-size: 0.9rem; margin-bottom: var(--spacing-xs); }
+.tipsGridCard strong { display: block; color: var(--primary-texto); font-size: 0.9rem; margin-bottom: var(--spacing-xs); }
 .tipsGridCard p { margin: 0; color: var(--text-secondary); font-size: 0.8rem; line-height: 1.5; }
 
 .warningBox {

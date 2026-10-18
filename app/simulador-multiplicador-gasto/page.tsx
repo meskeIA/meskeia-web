@@ -270,7 +270,7 @@ export default function SimuladorMultiplicadorGastoPage() {
           {t > 0 && verSimple && (
             <div className={styles.kCard}>
               <span className={styles.kLabel}>k con impuestos</span>
-              <span className={styles.kDisplay} style={{ color: 'var(--secondary)' }}>
+              <span className={styles.kDisplay} style={{ color: 'var(--secondary-texto)' }}>
                 {fmtK(calculo.kConT)}
               </span>
               <span className={styles.kFormula}>

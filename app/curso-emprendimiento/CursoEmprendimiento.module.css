@@ -64,7 +64,7 @@
 .sidebarTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -363,7 +363,7 @@
 .statValue {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .statLabel {
@@ -586,7 +586,7 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-xl);
   background: white;
-  color: var(--primary);
+  color: var(--primary-boton);
   border-radius: var(--radius);
   font-size: 1.1rem;
   font-weight: 600;
@@ -664,7 +664,7 @@
 }
 
 .chapterBreadcrumb a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
 }
 
@@ -715,7 +715,7 @@
 .contentSection h2 {
   font-size: 1.4rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-lg);
   display: flex;
   align-items: center;
@@ -775,7 +775,7 @@
 .quoteBox::before {
   content: '"';
   font-size: 4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   opacity: 0.2;
   position: absolute;
   top: -10px;
@@ -870,7 +870,7 @@
 
 .navArrow {
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Mark Complete Button */
@@ -978,7 +978,7 @@
 .canvasCellHeader {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   display: flex;
   align-items: center;

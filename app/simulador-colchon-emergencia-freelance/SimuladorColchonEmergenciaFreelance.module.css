@@ -210,7 +210,7 @@
 .insuficiente .semaforoMeses { color: #E8A838; }
 .minimo .semaforoMeses { color: #D4A76A; }
 .bueno .semaforoMeses { color: #5BAE7C; }
-.excelente .semaforoMeses { color: #2E86AB; }
+.excelente .semaforoMeses { color: var(--primary-texto); }
 
 .semaforoLabel {
   font-size: 1rem;
@@ -227,7 +227,7 @@
 .insuficiente .semaforoTexto { color: #E8A838; }
 .minimo .semaforoTexto { color: #D4A76A; }
 .bueno .semaforoTexto { color: #5BAE7C; }
-.excelente .semaforoTexto { color: #2E86AB; }
+.excelente .semaforoTexto { color: var(--primary-texto); }
 
 .semaforoDetalle {
   font-size: 0.9rem;
@@ -427,7 +427,7 @@
 }
 
 .objetivoValor {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 

@@ -74,11 +74,11 @@
 .statsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-md); }
 .statCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-md); text-align: center; }
 .statIcono { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
-.statValor { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+.statValor { font-size: 1.4rem; font-weight: 800; color: var(--primary-texto); }
 .statLabel { font-size: 0.8rem; color: var(--text-secondary); }
 
 /* ===== PROFESIONALIZACIÓN v2.0 ===== */
-.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin: 1.5rem 0 0.75rem; }
+.guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-texto); margin: 1.5rem 0 0.75rem; }
 .guideSection h2:first-child { margin-top: 0; }
 .guideSection p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin: 0 0 0.75rem; }
 
@@ -93,7 +93,7 @@
 [data-theme='dark'] .faqItem { border-color: #444; }
 .faqItem summary { padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center; }
 .faqItem summary::-webkit-details-marker { display: none; }
-.faqItem summary::after { content: '+'; font-size: 1.2rem; color: var(--primary); }
+.faqItem summary::after { content: '+'; font-size: 1.2rem; color: var(--primary-texto); }
 .faqItem[open] summary::after { content: '\2212'; }
 .faqItem p { padding: 0 1.25rem 1rem; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }
 

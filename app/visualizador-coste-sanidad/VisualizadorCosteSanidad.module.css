@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
@@ -74,7 +74,7 @@
 .costeOcultoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); }
 .costeAlto { border-color: var(--rojo); background: rgba(231, 76, 60, 0.03); }
 .costePais { display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
-.costeResumen { display: block; font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: var(--spacing-sm); }
+.costeResumen { display: block; font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin-bottom: var(--spacing-sm); }
 .costeAlto .costeResumen { color: var(--rojo); }
 .costeDetalle { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
 
@@ -83,7 +83,7 @@
 .financiacionCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
 .financiacionHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.4rem; }
 .financiacionFuente { flex: 1; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
-.financiacionPct { font-size: 1rem; font-weight: 700; color: var(--primary); }
+.financiacionPct { font-size: 1rem; font-weight: 700; color: var(--primary-texto); }
 .financiacionBarra { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 0.4rem; }
 .financiacionProgreso { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 3px; transition: width 0.3s; }
 .financiacionDetalle { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
@@ -92,7 +92,7 @@
 .sliderZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .sliderHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); }
 .sliderLabel { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
-.sliderValor { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
+.sliderValor { font-weight: 700; color: var(--primary-texto); font-size: 1.2rem; }
 .slider { width: 100%; height: 8px; border-radius: 4px; background: var(--border); outline: none; appearance: none; cursor: pointer; }
 .slider::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
 .slider::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
@@ -109,7 +109,7 @@
 .comparacionBarra { height: 100%; background: var(--text-muted); border-radius: 9px; transition: width 0.3s; }
 .comparacionBarraEspana { background: linear-gradient(90deg, var(--primary), var(--secondary)); }
 .comparacionDatos { display: flex; gap: var(--spacing-sm); min-width: 140px; justify-content: flex-end; }
-.comparacionPib { font-size: 0.82rem; font-weight: 700; color: var(--primary); }
+.comparacionPib { font-size: 0.82rem; font-weight: 700; color: var(--primary-texto); }
 .comparacionPerCapita { font-size: 0.78rem; color: var(--text-secondary); }
 
 /* Insight, pregunta, warning */

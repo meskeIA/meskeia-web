@@ -472,7 +472,7 @@ export default function VisualizadorEnergiaNuclear() {
                     <span className={styles.centralUbicacion}><span aria-hidden="true">📍</span> {c.ubicacion}</span>
                     <span
                       className={styles.centralEstado}
-                      style={{ color: c.estado === 'Cerrada 2021' ? '#999' : '#2E86AB' }}
+                      style={{ color: c.estado === 'Cerrada 2021' ? '#999' : 'var(--primary-texto)' }}
                     >
                       {c.estado}
                     </span>

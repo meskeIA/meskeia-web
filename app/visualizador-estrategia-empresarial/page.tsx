@@ -387,7 +387,7 @@ function VisModeloNegocio() {
       <div className={styles.matrizDetalle}>
         <div className={styles.miniCardTitulo}>Cómo gana dinero</div>
         <p className={styles.miniCardTexto} style={{ marginBottom: '0.6rem' }}>{m.comoGana}</p>
-        <p className={styles.miniCardTexto} style={{ fontWeight: 600, color: 'var(--primary)' }}>{m.palanca}</p>
+        <p className={styles.miniCardTexto} style={{ fontWeight: 600, color: 'var(--primary-texto)' }}>{m.palanca}</p>
       </div>
     </div>
   );
@@ -483,7 +483,7 @@ function VisEjecucion() {
           <div className={styles.meterTrack}>
             <div className={styles.meterFill} style={{ width: `${experimentar}%`, background: '#48A9A6' }} />
           </div>
-          <div className={styles.meterValor} style={{ color: '#48A9A6' }}>{experimentar}%</div>
+          <div className={styles.meterValor} style={{ color: 'var(--secondary-texto)' }}>{experimentar}%</div>
         </div>
       </div>
       <p className={styles.visualLeyenda} style={{ marginTop: '0.8rem' }}>{recomendacion}</p>

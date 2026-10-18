@@ -62,7 +62,7 @@
 
 .navBtn:hover {
   background: rgba(46, 134, 171, 0.08);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navBtnActivo {
@@ -229,7 +229,7 @@
   margin: 0 0 0.5rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .subcapasBox ul {
@@ -316,7 +316,7 @@
 .datoValor {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .datoLabel {
@@ -678,7 +678,7 @@
   margin: 0 0 0.6rem;
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .warningBox p {
@@ -703,7 +703,7 @@
   margin: 0 0 0.5rem;
   font-size: 0.93rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .infoBox p {
@@ -848,7 +848,7 @@
   margin: 1.25rem 0 0.6rem;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* 1. Tabla comparativa */
@@ -1109,7 +1109,7 @@
 
 .warningHeader strong {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .warningIcon {

@@ -104,7 +104,7 @@
 .sectionTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 0.3rem;
 }
 
@@ -144,7 +144,7 @@
 
 .btnSecundario {
   background: transparent;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   border: 1.5px solid var(--primary, #2E86AB);
   border-radius: 8px;
   padding: 0.5rem 1rem;
@@ -244,7 +244,7 @@
 .tokenStatNum {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .tokenStatLabel {
@@ -415,7 +415,7 @@
 
 .contextoBtn:hover {
   border-color: var(--primary, #2E86AB);
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .contextoBtnActivo {
@@ -494,7 +494,7 @@
   padding: 0.35rem 0.25rem;
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   text-align: center;
   display: flex;
   align-items: center;
@@ -545,7 +545,7 @@
   display: block;
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   line-height: 1;
   margin-bottom: 0.3rem;
 }
@@ -576,7 +576,7 @@
 }
 
 .tempEtiquetaFria {
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -610,7 +610,7 @@
 .tempValor {
   font-size: 1.4rem;
   font-weight: 800;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   min-width: 55px;
 }
 
@@ -666,7 +666,7 @@
   min-width: 38px;
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .generadorWrapper {
@@ -728,7 +728,7 @@
 .paramNombre {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 .paramAlias {
@@ -740,7 +740,7 @@
 .paramValorBadge {
   font-size: 1.2rem;
   font-weight: 800;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
   border-radius: 8px;
   padding: 0.15rem 0.6rem;
@@ -788,7 +788,7 @@
 .paramTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -833,7 +833,7 @@
   text-align: right;
 }
 
-.nucleoFilaActiva .nucleoBadge { color: var(--primary, #2E86AB); }
+.nucleoFilaActiva .nucleoBadge { color: var(--primary-texto); }
 .nucleoFilaFuera .nucleoBadge { color: var(--text-muted, #999); }
 
 /* Penalty */
@@ -980,7 +980,7 @@
 }
 
 [data-theme='dark'] .token0 { background: rgba(46, 134, 171, 0.22); color: #7FB3D3; border-color: rgba(46, 134, 171, 0.35); }
-[data-theme='dark'] .token1 { background: rgba(72, 169, 166, 0.22); color: #48A9A6; border-color: rgba(72, 169, 166, 0.35); }
+[data-theme='dark'] .token1 { background: rgba(72, 169, 166, 0.22); color: var(--secondary-texto); border-color: rgba(72, 169, 166, 0.35); }
 [data-theme='dark'] .token2 { background: rgba(230, 126, 34, 0.2); color: #e67e22; border-color: rgba(230, 126, 34, 0.32); }
 [data-theme='dark'] .token3 { background: rgba(39, 174, 96, 0.18); color: #27ae60; border-color: rgba(39, 174, 96, 0.32); }
 [data-theme='dark'] .token4 { background: rgba(142, 68, 173, 0.18); color: #8e44ad; border-color: rgba(142, 68, 173, 0.32); }

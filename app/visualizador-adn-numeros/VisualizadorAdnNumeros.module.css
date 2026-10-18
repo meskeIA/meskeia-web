@@ -149,7 +149,7 @@
 .escalaIcono { font-size: 1.5rem; width: 2.5rem; text-align: center; flex-shrink: 0; }
 .escalaInfo { display: flex; flex-direction: column; gap: 0.1rem; }
 .escalaEtiqueta { font-size: 0.82rem; color: var(--text-secondary); }
-.escalaValor { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+.escalaValor { font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); }
 .escalaDesc { font-size: 0.78rem; color: var(--text-muted); }
 
 /* Similitud genética */
@@ -170,7 +170,7 @@
 }
 .similitudIcono { font-size: 1.2rem; width: 1.8rem; text-align: center; }
 .similitudNombre { flex: 1; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
-.similitudPorcentaje { font-size: 0.9rem; font-weight: 700; color: var(--primary); }
+.similitudPorcentaje { font-size: 0.9rem; font-weight: 700; color: var(--primary-texto); }
 .similitudBarraFondo {
   height: 12px;
   background: var(--border);

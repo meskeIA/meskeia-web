@@ -51,7 +51,7 @@
 .seccionTitulo {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 8px;
 }
 
@@ -113,7 +113,7 @@
 .historiaCard h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 8px;
 }
 
@@ -172,7 +172,7 @@
   border-radius: 20px;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -222,7 +222,7 @@
 }
 
 .sliderLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .sliderItem input[type='range'] {
@@ -298,7 +298,7 @@
 }
 
 .polarLista strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─────────────────────────────────────────────
@@ -344,7 +344,7 @@
   font-family: 'Courier New', Courier, monospace;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 8px 0 !important;
 }
 
@@ -387,7 +387,7 @@
 .aplicacionCard h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 8px;
 }
 
@@ -417,7 +417,7 @@
 }
 
 .link {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 
@@ -441,7 +441,7 @@
 }
 
 .warningBox strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─────────────────────────────────────────────

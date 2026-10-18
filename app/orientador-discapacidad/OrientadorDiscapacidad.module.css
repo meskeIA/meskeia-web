@@ -94,7 +94,7 @@
 .introBox h2 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
 }
 
@@ -121,7 +121,7 @@
 
 .umbralChip {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -187,7 +187,7 @@
   display: inline-block;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
   padding: 4px 12px;
   border-radius: 20px;
@@ -207,7 +207,7 @@
 }
 
 .numPregunta {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   margin-right: 4px;
 }
@@ -252,7 +252,7 @@
 .opcionSeleccionada {
   border-color: var(--primary);
   background: rgba(46, 134, 171, 0.08);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -356,7 +356,7 @@
 
 .umbralTag {
   background: rgba(46, 134, 171, 0.12);
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1px solid rgba(46, 134, 171, 0.3);
   padding: 4px 14px;
   border-radius: 20px;
@@ -403,7 +403,7 @@
 .movilidadBox strong {
   display: block;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -440,7 +440,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -507,7 +507,7 @@
 .tablaComparativa th {
   background: rgba(46, 134, 171, 0.08);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tablaComparativa tr:hover td {
@@ -578,7 +578,7 @@
 .faqItem h3 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 

@@ -201,7 +201,7 @@
 
 .medioFlecha {
   font-size: 2rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .medioTexto {
@@ -232,7 +232,7 @@
 
 .bloqueDatos {
   background: rgba(46, 134, 171, 0.15);
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1px solid rgba(46, 134, 171, 0.4);
   flex: 1;
   min-width: 120px;
@@ -252,7 +252,7 @@
 
 .bloqueBits {
   background: rgba(72, 169, 166, 0.12);
-  color: var(--secondary);
+  color: var(--secondary-texto);
   border: 1px solid rgba(72, 169, 166, 0.4);
   letter-spacing: 2px;
   flex: 1;
@@ -269,7 +269,7 @@
 }
 
 .frameInfo strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Controles */
@@ -362,7 +362,7 @@
 .speedValue {
   font-family: 'SF Mono', Monaco, monospace;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   min-width: 60px;
   text-align: center;
@@ -516,7 +516,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: rgba(72, 169, 166, 0.08);
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -547,7 +547,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
 }
@@ -560,7 +560,7 @@
 }
 
 .faqTip {
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   background: rgba(72, 169, 166, 0.08);
   padding: 0.4rem 0.75rem;
   border-radius: 6px;

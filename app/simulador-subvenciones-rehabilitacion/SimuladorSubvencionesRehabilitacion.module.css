@@ -146,7 +146,7 @@
   font-weight: 800;
   margin: 0 0 1.5rem;
   text-align: center;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .programCard {
@@ -229,7 +229,7 @@
 
 .faqGrid { display: flex; flex-direction: column; gap: 1rem; }
 .faqItem { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
-.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary); }
+.faqItem h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; color: var(--primary-texto); }
 .faqItem p { font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.55; }
 
 .tipsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }

@@ -89,14 +89,14 @@
 
 .factorFlecha {
   font-size: 2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 300;
 }
 
 .factorValor {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
   padding: 4px 10px;
   border-radius: 8px;
@@ -259,7 +259,7 @@
   border: 2px dashed var(--border);
   border-radius: 10px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -344,7 +344,7 @@
 .resultadoTitulo {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -354,7 +354,7 @@
 
 .factorBadge {
   background: color-mix(in srgb, var(--primary) 12%, var(--bg-card));
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   padding: 4px 12px;
   border-radius: 20px;
@@ -417,7 +417,7 @@
 
 .celNueva {
   font-size: 1.05rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -515,7 +515,7 @@
 .conceptoSection h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent);
@@ -626,7 +626,7 @@
 
 .escenarioTip {
   font-size: 0.78rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-style: italic;
 }
 

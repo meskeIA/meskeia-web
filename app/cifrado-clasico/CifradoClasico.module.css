@@ -87,7 +87,7 @@
 }
 
 .methodBtn:hover:not(.active) {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Info del método seleccionado */
@@ -142,7 +142,7 @@
 
 .modeBtn.active {
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -202,7 +202,7 @@
 
 .presetBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .alphabetPreview {
@@ -314,7 +314,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultSection {
@@ -350,7 +350,7 @@
 
 .btnCopy:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ===== HTML CODE GENERATION ===== */
@@ -378,7 +378,7 @@
 
 .htmlToggleBtn:hover {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .htmlBadge {
@@ -425,7 +425,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnCopyHtml:hover {
@@ -595,12 +595,12 @@
 
 .faqQuestion:hover {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqQuestion::before {
   content: '▶';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.75rem;
   transition: transform 0.2s ease;
 }
@@ -684,14 +684,14 @@
 }
 
 .exampleArrow {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.2rem;
 }
 
 .exampleCifrado {
   font-family: 'Courier New', monospace;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -751,7 +751,7 @@
 .barLetra {
   font-family: 'Courier New', monospace;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   width: 18px;
   font-size: 0.9rem;
 }
@@ -782,7 +782,7 @@
 }
 
 .pasosList strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ===== SECCIÓN 6: WARNING BOX ===== */

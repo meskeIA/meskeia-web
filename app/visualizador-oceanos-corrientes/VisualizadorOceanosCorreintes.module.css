@@ -119,7 +119,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   transform: translateY(-2px);
 }
 
@@ -230,7 +230,7 @@
 
 .btnSecundario {
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 2px solid var(--primary);
   border-radius: 8px;
   padding: 0.5rem 1.25rem;
@@ -286,7 +286,7 @@
   font-weight: 600;
   border: none;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: background 0.2s ease;
 }
@@ -320,7 +320,7 @@
 
 .sliderValor {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -478,7 +478,7 @@
 .conveyorInfoTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -545,7 +545,7 @@
 .tempValor {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -654,7 +654,7 @@
 .phNum {
   font-size: 2.5rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .phAnio {
@@ -858,7 +858,7 @@
 .cifraNum {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   display: block;
   line-height: 1;
   margin-bottom: 0.25rem;

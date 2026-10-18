@@ -81,7 +81,7 @@
 
 .tabActiva {
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   box-shadow: var(--shadow-sm);
 }
 
@@ -244,7 +244,7 @@
 .estiloBtnActivo {
   border-color: var(--primary);
   background: var(--focus);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Colores */
@@ -395,7 +395,7 @@
 .infoCard h4 {
   margin: 0 0 var(--spacing-sm);
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .infoCard ul {
@@ -458,7 +458,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -492,7 +492,7 @@
 .btnDescarga:hover {
   border-color: var(--primary);
   background: var(--focus);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnCopiar {
@@ -541,7 +541,7 @@
 
 .conceptCard h4 {
   margin: 0 0 var(--spacing-sm);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -976,7 +976,7 @@
 
 .printInfo strong {
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Tarjeta de visita */
@@ -1010,7 +1010,7 @@
 
 .cardCargo {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
   margin: 0;
 }
@@ -1104,7 +1104,7 @@
 }
 
 .useCaseContent p strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -1209,7 +1209,7 @@
 }
 
 .stepContent p strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -1240,7 +1240,7 @@
 }
 
 .faqItem p strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 

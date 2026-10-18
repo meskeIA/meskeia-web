@@ -81,7 +81,7 @@
 
 .modeBtn.active {
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -140,7 +140,7 @@
 
 .exampleBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .buttonRow {
@@ -181,7 +181,7 @@
 
 .btnSwap:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecondary {
@@ -198,7 +198,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultSection {
@@ -299,7 +299,7 @@
 
 .btnCopy:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .alphabetSection {
@@ -343,7 +343,7 @@
 .alphabetLetter {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .alphabetBraille {
@@ -382,7 +382,7 @@
 }
 
 .infoCard h3 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -689,7 +689,7 @@
 }
 
 .eduEscenarioCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1rem;
 }
@@ -728,7 +728,7 @@
 }
 
 .eduFaqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   font-size: 1rem;
 }
@@ -827,7 +827,7 @@
 }
 
 .eduTipCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 6px;
   font-size: 0.95rem;
 }

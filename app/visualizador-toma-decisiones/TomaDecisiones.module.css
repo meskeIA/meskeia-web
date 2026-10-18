@@ -72,7 +72,7 @@
   text-align: center;
 }
 .tab:hover { background: var(--hover); border-color: var(--primary); color: var(--text-primary); }
-.tabActive { background: rgba(46, 134, 171, 0.07); border-color: var(--primary); color: var(--primary); }
+.tabActive { background: rgba(46, 134, 171, 0.07); border-color: var(--primary); color: var(--primary-texto); }
 .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* ── Contenido ── */
@@ -269,7 +269,7 @@
 .solucionNum {
   font-size: 1.4rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   opacity: 0.35;
   flex-shrink: 0;
   line-height: 1;
@@ -303,7 +303,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
@@ -368,7 +368,7 @@
   color: var(--text-muted);
   transition: all 0.15s;
 }
-.reiniciarBtn:hover { border-color: var(--primary); color: var(--primary); }
+.reiniciarBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 
 /* Tabla heurísticos */
 .tablaHeuristicos {
@@ -431,7 +431,7 @@
 .nudgeNum {
   font-size: 1.3rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   opacity: 0.4;
   line-height: 1;
 }

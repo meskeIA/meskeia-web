@@ -160,7 +160,7 @@
   padding: 0.7rem 1.5rem;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   font-weight: 600;
   border-radius: 8px;
@@ -236,7 +236,7 @@
 .resultadoCard h2 {
   font-size: 1.55rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 

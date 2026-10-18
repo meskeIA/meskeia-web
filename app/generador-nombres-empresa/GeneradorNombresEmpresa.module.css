@@ -435,7 +435,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -492,7 +492,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .tipsList li strong {
@@ -620,7 +620,7 @@
   border-radius: var(--radius);
   padding: var(--spacing-sm);
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .escenarioTip {

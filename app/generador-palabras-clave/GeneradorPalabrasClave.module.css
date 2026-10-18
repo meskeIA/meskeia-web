@@ -181,7 +181,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Results */
@@ -267,7 +267,7 @@
 
 .keywordTag:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Placeholder */
@@ -310,7 +310,7 @@
 
 .examples button:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Tips Section */
@@ -370,7 +370,7 @@
 
 .eduSection h2 {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);
@@ -646,7 +646,7 @@
   margin: 0 0 0.6rem;
   font-size: 0.975rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.4;
 }
 
@@ -663,7 +663,7 @@
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqTip {

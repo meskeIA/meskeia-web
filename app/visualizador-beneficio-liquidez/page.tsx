@@ -380,11 +380,11 @@ export default function VisualizadorBeneficioLiquidezPage() {
       {/* ── Métricas ── */}
       <div className={styles.metricasGrid}>
         <div className={styles.metricaCard}>
-          <div className={styles.metricaValor} style={{ color: '#48A9A6' }}>{fmtEur(beneficioFinal)}</div>
+          <div className={styles.metricaValor} style={{ color: 'var(--secondary-texto)' }}>{fmtEur(beneficioFinal)}</div>
           <div className={styles.metricaLabel}>Beneficio acumulado (mes 12)</div>
         </div>
         <div className={`${styles.metricaCard} ${cajaFinal < 0 ? styles.metricaCritica : ''}`}>
-          <div className={styles.metricaValor} style={{ color: cajaFinal < 0 ? '#dc2626' : '#2E86AB' }}>{fmtEur(cajaFinal)}</div>
+          <div className={styles.metricaValor} style={{ color: cajaFinal < 0 ? '#dc2626' : 'var(--primary-texto)' }}>{fmtEur(cajaFinal)}</div>
           <div className={styles.metricaLabel}>Caja acumulada (mes 12)</div>
         </div>
         <div className={styles.metricaCard}>

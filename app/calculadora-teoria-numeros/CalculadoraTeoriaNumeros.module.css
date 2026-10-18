@@ -121,7 +121,7 @@
 .tipoIcono {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipoNombre {
@@ -200,14 +200,14 @@
 .primos, .divisores, .pares {
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.8;
   word-break: break-all;
 }
 
 .pares {
   margin-top: var(--spacing-sm);
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 /* Antiprimos */
@@ -243,7 +243,7 @@
 
 .antiprimoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .antiprimoBtn:focus-visible {
@@ -297,7 +297,7 @@
   padding: 0;
   border: none;
   background: none;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: inherit;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -328,7 +328,7 @@
 .factorizacion {
   font-family: 'Courier New', monospace;
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -339,7 +339,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -457,7 +457,7 @@
 }
 
 .comparativaTable td strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -601,7 +601,7 @@
 .faqItem h4 {
   font-size: 0.98rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -621,7 +621,7 @@
   border-radius: var(--radius);
   padding: var(--spacing-sm) var(--spacing-md);
   font-size: 0.85rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   font-weight: 500;
   margin-top: var(--spacing-sm) !important;
   font-family: 'Courier New', monospace;
@@ -634,7 +634,7 @@
 
 [data-theme='dark'] .faqTip {
   background: rgba(72, 169, 166, 0.12);
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
 }
 
 /* --- Sección 4: Guía Paso a Paso --- */

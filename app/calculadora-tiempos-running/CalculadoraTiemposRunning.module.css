@@ -52,7 +52,7 @@
 .sectionTitle {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 1.25rem;
 }
 
@@ -211,7 +211,7 @@
 .resultValue {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
 }
 
 /* ─── Warning box ─────────────────────────────────────────────────────────── */

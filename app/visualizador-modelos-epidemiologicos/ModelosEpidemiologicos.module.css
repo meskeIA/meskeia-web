@@ -36,7 +36,7 @@
   cursor: pointer; transition: all 0.2s; color: var(--text-secondary);
   font-size: 0.82rem; font-weight: 600; line-height: 1.3; text-align: center;
 }
-.tabBtn:hover { border-color: var(--primary); color: var(--primary); }
+.tabBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .tabBtnActivo {
   border-color: var(--primary-boton);
@@ -58,7 +58,7 @@
 .slidersGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .sliderGroup { display: flex; flex-direction: column; gap: 0.4rem; }
 .sliderLabel { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); display: flex; justify-content: space-between; align-items: baseline; }
-.sliderValor { font-size: 1rem; font-weight: 700; color: var(--primary); }
+.sliderValor { font-size: 1rem; font-weight: 700; color: var(--primary-texto); }
 .sliderDesc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
 .sliderInput {
   width: 100%; height: 6px; appearance: none; -webkit-appearance: none;
@@ -89,7 +89,7 @@
   border-top: 4px solid var(--primary); border-radius: var(--radius);
   padding: var(--spacing-md); text-align: center;
 }
-.metricaValor { font-size: 1.6rem; font-weight: 800; color: var(--primary); line-height: 1; }
+.metricaValor { font-size: 1.6rem; font-weight: 800; color: var(--primary-texto); line-height: 1; }
 .metricaLabel { font-size: 0.76rem; color: var(--text-muted); margin-top: 0.3rem; line-height: 1.3; }
 .metricaAlerta { border-top-color: var(--rojo); }
 .metricaAlerta .metricaValor { color: var(--rojo); }
@@ -108,7 +108,7 @@
   background: var(--bg-card); cursor: pointer; font-size: 0.84rem; font-weight: 600;
   transition: all 0.2s; color: var(--text-secondary);
 }
-.modoBtnBase:hover { border-color: var(--primary); color: var(--primary); }
+.modoBtnBase:hover { border-color: var(--primary); color: var(--primary-texto); }
 .modoBtnBase:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .modoBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .modoBtnActivo:hover { color: white; }
@@ -122,7 +122,7 @@
 }
 .r0BoxAlerta { border-left-color: var(--rojo); }
 .r0BoxOk { border-left-color: var(--verde); }
-.r0Valor { font-size: 2.4rem; font-weight: 800; color: var(--primary); flex-shrink: 0; min-width: 80px; text-align: center; }
+.r0Valor { font-size: 2.4rem; font-weight: 800; color: var(--primary-texto); flex-shrink: 0; min-width: 80px; text-align: center; }
 .r0ValorAlerta { color: var(--rojo); }
 .r0ValorOk { color: var(--verde); }
 .r0Texto { font-size: 0.92rem; color: var(--text-primary); line-height: 1.55; }
@@ -140,14 +140,14 @@
 [data-theme='dark'] .tablaEnfermedades tbody tr.filaSeleccionada { background: rgba(46,134,171,0.15); }
 .r0Badge {
   display: inline-block; padding: 0.2rem 0.55rem; border-radius: 20px;
-  font-weight: 700; font-size: 0.82rem; background: rgba(46,134,171,0.12); color: var(--primary);
+  font-weight: 700; font-size: 0.82rem; background: rgba(46,134,171,0.12); color: var(--primary-texto);
 }
 .r0BadgeAlto { background: rgba(231,76,60,0.12); color: var(--rojo); }
 .r0BadgeMedio { background: rgba(243,156,18,0.12); color: var(--naranja); }
 .btnSeleccionar {
   padding: 0.3rem 0.8rem; border-radius: 20px; border: 1.5px solid var(--primary);
   background: transparent; cursor: pointer; font-size: 0.78rem; font-weight: 600;
-  color: var(--primary); transition: all 0.2s;
+  color: var(--primary-texto); transition: all 0.2s;
 }
 .btnSeleccionar:hover { background: var(--primary-boton); color: white; }
 .btnSeleccionar:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
@@ -159,7 +159,7 @@
   padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg);
 }
 [data-theme='dark'] .infoIncubacion { background: rgba(46,134,171,0.08); border-color: rgba(46,134,171,0.3); }
-.infoIncubacionTitle { font-size: 0.95rem; font-weight: 700; color: var(--primary); margin: 0 0 0.3rem 0; }
+.infoIncubacionTitle { font-size: 0.95rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 0.3rem 0; }
 .infoIncubacion p { font-size: 0.88rem; color: var(--text-primary); line-height: 1.55; margin: 0; }
 
 /* Warning box (indicador v2.0) */

@@ -67,7 +67,7 @@
 
 .tabBtnActive {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
 }
 
@@ -120,7 +120,7 @@
 
 .paraLabel {
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-right: 0.4rem;
 }
 
@@ -372,7 +372,7 @@
   border-radius: 6px;
   padding: 0.6rem 0.875rem;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.5rem;
   font-weight: 600;
 }
@@ -504,7 +504,7 @@
 }
 
 [data-theme='dark'] .tabBtnActive {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
 }
 

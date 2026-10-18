@@ -263,7 +263,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: var(--spacing-lg);
@@ -438,7 +438,7 @@
   transform: translateX(-50%);
   font-size: 0.7rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--bg-card);
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
@@ -471,7 +471,7 @@
 
 .scoreValue {
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .barTrack {
@@ -518,7 +518,7 @@
 .profileName {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .profileDescription {
@@ -581,7 +581,7 @@
 .actionsTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 

@@ -107,14 +107,14 @@
   align-items: center;
   gap: var(--spacing-sm);
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
 .cardArrow {
   margin-left: auto;
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
 }
 

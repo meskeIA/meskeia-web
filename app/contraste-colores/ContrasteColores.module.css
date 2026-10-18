@@ -233,7 +233,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -314,7 +314,7 @@
 
 .swapBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Presets */
@@ -404,7 +404,7 @@
 }
 
 .infoCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 @media (max-width: 1024px) {
@@ -691,7 +691,7 @@
   margin: 0 0 0.5rem;
   font-weight: 600;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioExample code {
@@ -713,7 +713,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* 4. FAQ AMPLIADO */
@@ -748,7 +748,7 @@
 .faqItem h3,
 .faqItem h4 {
   margin: 0 0 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
   line-height: 1.5;
 }
@@ -860,7 +860,7 @@
 }
 
 .stepContent p strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 

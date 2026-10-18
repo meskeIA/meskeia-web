@@ -114,7 +114,7 @@
 
 .categoriaTab:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .categoriaTab.activo {
@@ -216,7 +216,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Results Panel */
@@ -285,7 +285,7 @@
 .eqCantidad {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .eqNombre {
@@ -311,7 +311,7 @@
 .formulaText {
   font-family: 'Courier New', monospace;
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
   font-weight: 600;
 }
@@ -478,7 +478,7 @@
 .contentCard h4 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm);
 }
 
@@ -526,7 +526,7 @@
 .faqItem summary::after {
   content: '+';
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
 }
 
@@ -684,7 +684,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   margin: 0;
 }
@@ -731,7 +731,7 @@
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
   font-size: 0.85rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   border-left: 3px solid var(--secondary);
 }
 

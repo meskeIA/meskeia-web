@@ -110,7 +110,7 @@
   display: block;
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   line-height: 1.1;
 }
 
@@ -179,7 +179,7 @@
 
 .celTemp {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .avisoCrudo {
@@ -208,7 +208,7 @@
 .conceptoSection h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent);

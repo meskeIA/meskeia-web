@@ -365,7 +365,7 @@
 }
 
 .deltaNeg {
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -485,7 +485,7 @@
   padding: 5px 12px;
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: transparent;
   border: 1px solid var(--primary);
   border-radius: 999px;
@@ -632,7 +632,7 @@
 .eduFaqPregunta::before {
   content: '▶';
   font-size: 0.65rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }
@@ -668,7 +668,7 @@
 }
 
 .eduPasos li::marker {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 

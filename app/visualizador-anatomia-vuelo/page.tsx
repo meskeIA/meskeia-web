@@ -89,7 +89,7 @@ function SeccionVuela() {
           <span className={styles.flechaLabel} style={{ color: '#e74c3c' }}>Peso</span>
         </div>
         <div className={`${styles.fuerzaFlecha} ${styles.flechaDerecha}`}>
-          <span className={styles.flechaLabel} style={{ color: '#2E86AB' }}>Empuje</span>
+          <span className={styles.flechaLabel} style={{ color: 'var(--primary-texto)' }}>Empuje</span>
           <div className={styles.flechaLineaH} style={{ background: '#2E86AB' }} />
         </div>
         <div className={`${styles.fuerzaFlecha} ${styles.flechaIzquierda}`}>

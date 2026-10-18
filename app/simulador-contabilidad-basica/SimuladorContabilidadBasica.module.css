@@ -84,12 +84,12 @@
 }
 
 .tabBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
 }
 
 .tabActivo {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
   font-weight: 600;
 }
@@ -183,7 +183,7 @@
 
 .celdaHaber {
   padding-left: 2rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
 }
 
 .colImporte {
@@ -237,7 +237,7 @@
 .formularioTitulo {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -412,7 +412,7 @@
   border: 2px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
   display: inline-flex;
@@ -610,7 +610,7 @@
 
 .cuentaTHeaderDebe {
   background: #e8f4fd;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.06em;
@@ -621,7 +621,7 @@
 
 .cuentaTHeaderHaber {
   background: #e8f8f7;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.06em;
@@ -704,12 +704,12 @@
 
 .saldoDeudor {
   background: #e8f4fd;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .saldoAcreedor {
   background: #e8f8f7;
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 [data-theme='dark'] .saldoDeudor {
@@ -730,7 +730,7 @@
 .guideSection h2 {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);
@@ -834,7 +834,7 @@
 
 .faqItem dt {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.5rem;
   font-size: 0.95rem;
 }
@@ -851,7 +851,7 @@
   margin-top: 0.5rem;
   padding: 0.5rem 0.75rem;
   background: #e8f4fd;
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 8px;
   font-size: 0.85rem;
   font-style: italic;

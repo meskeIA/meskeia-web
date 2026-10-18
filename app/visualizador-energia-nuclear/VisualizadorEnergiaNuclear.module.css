@@ -64,7 +64,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.06);
 }
 
@@ -98,7 +98,7 @@
 .tituloSeccion {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -142,7 +142,7 @@
 
 .nucleoLabel {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -180,7 +180,7 @@
 }
 
 .energia {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -219,7 +219,7 @@
 .genLabel {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.25rem;
 }
 
@@ -301,7 +301,7 @@
 .datoValor {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.25rem;
 }
 
@@ -420,7 +420,7 @@
 .energiaFusion {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-left: 0.5rem;
 }
 
@@ -531,7 +531,7 @@
   position: absolute;
   bottom: -1.8rem;
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -580,7 +580,7 @@
 .iterNum {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .iterDato span:last-child {
@@ -605,7 +605,7 @@
 
 .eventoAño {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 45px;
   font-size: 0.9rem;
 }
@@ -620,7 +620,7 @@
 }
 
 .actual .eventoDesc {
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 600;
 }
 
@@ -650,7 +650,7 @@
 
 .reactorBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .reactorBtnActivo {
@@ -671,7 +671,7 @@
 .reactorInfo h3 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -713,7 +713,7 @@
 
 .drFlechas {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   white-space: nowrap;
 }
@@ -821,7 +821,7 @@
 
 .toggleBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .toggleActivo {
@@ -921,7 +921,7 @@
 
 .densidadValor {
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -1174,7 +1174,7 @@
 
 .escenarioTitulo {
   font-size: 0.92rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 

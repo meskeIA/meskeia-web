@@ -124,7 +124,7 @@
 
 .categoryButton:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .categoryButton.active {
@@ -489,7 +489,7 @@
 }
 
 .crystalCard h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-xs);
   font-size: 1rem;
 }

@@ -123,7 +123,7 @@
   border-radius: 20px;
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
@@ -641,7 +641,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 10px;
 }
 

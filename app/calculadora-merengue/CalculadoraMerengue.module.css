@@ -25,21 +25,21 @@
 .resultadoGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
 .resCard { background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 18px 12px; text-align: center; }
 .resCardDestacado { border: 2px solid var(--primary); background: color-mix(in srgb, var(--primary) 8%, var(--bg-card)); }
-.resValor { display: block; font-size: 1.5rem; font-weight: 700; color: var(--primary); line-height: 1.1; }
+.resValor { display: block; font-size: 1.5rem; font-weight: 700; color: var(--primary-texto); line-height: 1.1; }
 .resLabel { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-top: 6px; }
 
 .ingredientesBox { margin-top: 4px; }
 .ingRow { display: flex; justify-content: space-between; align-items: center; padding: 13px 4px; border-bottom: 1px solid var(--border); }
 .ingRow:last-child { border-bottom: none; }
 .ingNombre { font-size: 0.95rem; color: var(--text-primary); font-weight: 500; }
-.ingCantidad { font-size: 1.05rem; font-weight: 700; color: var(--primary); }
+.ingCantidad { font-size: 1.05rem; font-weight: 700; color: var(--primary-texto); }
 
 .placeholder { font-size: 0.95rem; color: var(--text-muted); text-align: center; padding: 16px; }
 .fuenteNota { margin-top: 16px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
 
 .educationalContent { padding: 8px 0; }
 .conceptoSection { margin-bottom: 40px; }
-.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
+.conceptoSection h2 { font-size: 1.25rem; font-weight: 600; color: var(--primary-texto); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent); }
 .conceptoSection p { color: var(--text-secondary); line-height: 1.65; font-size: 0.95rem; }
 
 .comparativaTable { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 12px; }

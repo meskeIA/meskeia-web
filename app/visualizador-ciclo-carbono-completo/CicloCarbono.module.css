@@ -103,12 +103,12 @@
 }
 
 .tab:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabActive {
   border-bottom-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -412,7 +412,7 @@
 .flujoValor {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .flujoRuta {
@@ -461,7 +461,7 @@
 .oceanoItem strong {
   display: block;
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
 }
 
@@ -512,7 +512,7 @@
 .emisionValor {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .emisionSub {
@@ -834,7 +834,7 @@
 
 .persistenciaConclusion {
   font-weight: 600;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
 }
 
 /* ─────────────────────────────────────────────

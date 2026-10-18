@@ -60,7 +60,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navBtnActivo {
@@ -93,7 +93,7 @@
   font-size: 1.3rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .seccionDesc {
@@ -187,7 +187,7 @@
 .carga {
   font-weight: 700;
   font-size: 1.1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .atraccion {
@@ -392,7 +392,7 @@
 .panelResumen {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
 }
 
@@ -417,7 +417,7 @@
 .panelInfoLabel {
   font-weight: 700;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -519,13 +519,13 @@
 .ejemploENDiff {
   margin-left: auto;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
 }
 
 .ejemploENTipo {
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.9rem;
   margin-bottom: 0.25rem;
 }
@@ -694,7 +694,7 @@
   display: inline-block;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
@@ -737,7 +737,7 @@
 .guideSection h2 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.5rem 0 0.5rem;
 }
 

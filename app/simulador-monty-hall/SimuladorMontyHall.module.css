@@ -180,7 +180,7 @@
 .doorNumber {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -293,7 +293,7 @@
 .statValue {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
   line-height: 1;
 }
@@ -314,7 +314,7 @@
 }
 
 .sesionHint strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ============================================
@@ -333,7 +333,7 @@
 }
 
 .sliderLabel strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.1rem;
   font-family: var(--font-mono, monospace);
 }
@@ -439,7 +439,7 @@
 .barValue {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
   text-align: right;
 }
@@ -468,7 +468,7 @@
 .resultValue {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: var(--font-mono, monospace);
   line-height: 1;
 }
@@ -559,7 +559,7 @@
 }
 
 .scenarioCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -589,7 +589,7 @@
 
 .faqItem h4 {
   margin: 0 0 var(--spacing-sm) 0;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -644,7 +644,7 @@
 .stepContent strong {
   display: block;
   margin-bottom: var(--spacing-xs);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.05rem;
 }
 
@@ -680,7 +680,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 

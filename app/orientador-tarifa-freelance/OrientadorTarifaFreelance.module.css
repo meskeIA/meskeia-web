@@ -218,7 +218,7 @@
 }
 
 .subtotal strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Config Grid */
@@ -276,7 +276,7 @@
 .resultsTitleMain {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-lg);
   text-align: center;
 }
@@ -421,7 +421,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -486,7 +486,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: bold;
 }
 

@@ -83,7 +83,7 @@
 
 .modeBtn.active {
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -237,7 +237,7 @@
 }
 
 .fileName {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin-top: var(--spacing-sm);
 }
@@ -245,7 +245,7 @@
 .procesando {
   text-align: center;
   padding: var(--spacing-md);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -292,7 +292,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Comparación resultado */
@@ -349,7 +349,7 @@
 
 .btnCopy:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resultBox {
@@ -436,14 +436,14 @@
   border-radius: var(--radius);
   font-family: 'Courier New', monospace;
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   word-break: break-all;
   margin-bottom: var(--spacing-md);
 }
 
 .ejemploNota {
   font-style: italic;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   margin-top: var(--spacing-md);
 }
@@ -472,7 +472,7 @@
   text-align: left;
 }
 
-.htmlToggleBtn:hover { background: rgba(46, 134, 171, 0.1); color: var(--primary); }
+.htmlToggleBtn:hover { background: rgba(46, 134, 171, 0.1); color: var(--primary-texto); }
 
 .htmlBadge {
   background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
@@ -510,7 +510,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnCopyHtml:hover { background: var(--primary-boton); color: white; }
@@ -574,8 +574,8 @@
   transition: background 0.2s ease;
 }
 
-.faqQuestion:hover { background: rgba(46, 134, 171, 0.1); color: var(--primary); }
-.faqQuestion::before { content: '▶'; color: var(--primary); font-size: 0.7rem; margin-right: var(--spacing-sm); }
+.faqQuestion:hover { background: rgba(46, 134, 171, 0.1); color: var(--primary-texto); }
+.faqQuestion::before { content: '▶'; color: var(--primary-texto); font-size: 0.7rem; margin-right: var(--spacing-sm); }
 .faqItem[open] .faqQuestion::before { content: '▼'; }
 
 .faqAnswer { padding: var(--spacing-md) var(--spacing-lg); color: var(--text-secondary); font-size: 0.92rem; line-height: 1.65; margin: 0; border-top: 1px solid var(--border); }
@@ -590,7 +590,7 @@
 }
 
 .ejemploLabel { color: var(--text-secondary); font-size: 0.88rem; margin-bottom: var(--spacing-sm); }
-.ejemploLabel code { color: var(--primary); font-weight: 600; }
+.ejemploLabel code { color: var(--primary-texto); font-weight: 600; }
 
 /* ===== SECCIÓN 5: TIPS ===== */
 .tipsSection {

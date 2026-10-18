@@ -111,7 +111,7 @@
 
 .modoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .modoBtn.active {
@@ -279,7 +279,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnCopy {
@@ -289,7 +289,7 @@
   border: 2px solid var(--primary);
   border-radius: 8px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -505,7 +505,7 @@
 
 .htmlToggleBtn:hover {
   background: rgba(46, 134, 171, 0.08);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .htmlBadge {
@@ -552,7 +552,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnCopyHtml:hover {
@@ -661,8 +661,8 @@
   transition: background 0.2s ease;
 }
 
-.faqQuestion:hover { background: rgba(46, 134, 171, 0.08); color: var(--primary); }
-.faqQuestion::before { content: '▶'; color: var(--primary); font-size: 0.7rem; margin-right: 0.5rem; }
+.faqQuestion:hover { background: rgba(46, 134, 171, 0.08); color: var(--primary-texto); }
+.faqQuestion::before { content: '▶'; color: var(--primary-texto); font-size: 0.7rem; margin-right: 0.5rem; }
 .faqItem[open] .faqQuestion::before { content: '▼'; }
 
 .faqAnswer {
@@ -736,7 +736,7 @@
   font-weight: 600;
 }
 
-.pasoResultado { color: var(--primary) !important; }
+.pasoResultado { color: var(--primary-texto) !important; }
 
 /* ===== SECCIÓN 5: TIPS ===== */
 .tipsSection {

@@ -195,7 +195,7 @@
 .previewContent h1 {
   font-size: 1.8rem;
   margin: 1.25rem 0 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .previewContent h1:first-child {
@@ -205,13 +205,13 @@
 .previewContent h2 {
   font-size: 1.5rem;
   margin: 1.25rem 0 0.625rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .previewContent h3 {
   font-size: 1.25rem;
   margin: 1rem 0 0.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .previewContent h4, .previewContent h5, .previewContent h6 {
@@ -232,12 +232,12 @@
 }
 
 .previewContent a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: underline;
 }
 
 .previewContent a:hover {
-  color: var(--secondary);
+  color: var(--secondary-texto);
 }
 
 .previewContent code {
@@ -440,7 +440,7 @@
 }
 
 .syntaxGuide h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
   text-align: center;
@@ -494,7 +494,7 @@
 }
 
 .infoSection h2 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
   text-align: center;
@@ -664,7 +664,7 @@
 .escenarioIcon { font-size: 1.5rem; }
 .escenarioTip {
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46,134,171,0.07);
   border-left: 3px solid var(--primary);
   padding: 0.4rem 0.75rem;

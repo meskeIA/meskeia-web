@@ -199,7 +199,7 @@ export default function OrientadorAlquilerHabitacionesPage() {
                   máximo 2% hasta fin de 2027). Si no estuvo alquilada, se aplica el valor SERPAVI.
                   Consulta el valor de tu vivienda en{' '}
                   <a href="https://www.mivau.gob.es/vivienda/alquila-bien-es-tu-derecho/serpavi"
-                    target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>
+                    target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-texto)' }}>
                     el portal SERPAVI del MIVAU
                   </a>.
                 </p>
@@ -235,7 +235,7 @@ export default function OrientadorAlquilerHabitacionesPage() {
             Madrid, Valencia, Andalucía, Murcia y Aragón no han declarado zonas tensionadas a fecha de abril 2026.
             Consulta el{' '}
             <a href="https://www.mivau.gob.es/vivienda/alquila-bien-es-tu-derecho/serpavi/consultar-zonas-de-mercado-residencial-tensionado"
-              target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>
+              target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-texto)' }}>
               mapa oficial del MIVAU
             </a>{' '}
             para el listado actualizado.

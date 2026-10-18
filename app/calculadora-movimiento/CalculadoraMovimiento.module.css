@@ -120,7 +120,7 @@
 
 .tipoIcono {
   font-size: 1.3rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipoNombre {
@@ -245,7 +245,7 @@
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
 }
 
@@ -280,7 +280,7 @@
   padding: var(--spacing-sm) var(--spacing-md);
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Placeholder */
@@ -306,7 +306,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -496,7 +496,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-style: italic;
   margin: 0 !important;
 }
@@ -528,7 +528,7 @@
 .faqItem h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -545,7 +545,7 @@
 
 .faqTip {
   font-size: 0.85rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   font-style: italic;
   background: rgba(72, 169, 166, 0.08);
   border-radius: var(--radius);

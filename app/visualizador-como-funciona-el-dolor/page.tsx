@@ -221,7 +221,7 @@ export default function ComoFuncionaElDolorPage() {
               <div className={styles.faseBody}>
                 <div className={styles.fibrasGrid}>
                   <div className={styles.fibraCard} style={{ borderColor: '#2E86AB' }}>
-                    <span className={styles.fibraLetra} style={{ color: '#2E86AB' }}>Aδ</span>
+                    <span className={styles.fibraLetra} style={{ color: 'var(--primary-texto)' }}>Aδ</span>
                     <span className={styles.fibraNombre}>Fibras A-delta</span>
                     <ul className={styles.fibraLista}>
                       <li>Mielínicas (con vaina)</li>
@@ -293,7 +293,7 @@ export default function ComoFuncionaElDolorPage() {
                 <div className={styles.cerebroGrid}>
                   <div className={styles.cerebroArea} style={{ borderColor: '#2E86AB' }}>
                     <span className={styles.cerebroIcono} aria-hidden="true">📍</span>
-                    <h4 style={{ color: '#2E86AB' }}>Corteza somatosensorial</h4>
+                    <h4 style={{ color: 'var(--primary-texto)' }}>Corteza somatosensorial</h4>
                     <p>Localización e intensidad del dolor. Procesa el componente <strong>sensorial-discriminativo</strong>: ¿dónde duele y cuánto?</p>
                   </div>
                   <div className={styles.cerebroArea} style={{ borderColor: '#9B59B6' }}>
@@ -303,7 +303,7 @@ export default function ComoFuncionaElDolorPage() {
                   </div>
                   <div className={styles.cerebroArea} style={{ borderColor: '#48A9A6' }}>
                     <span className={styles.cerebroIcono} aria-hidden="true">🔬</span>
-                    <h4 style={{ color: '#48A9A6' }}>Corteza prefrontal</h4>
+                    <h4 style={{ color: 'var(--secondary-texto)' }}>Corteza prefrontal</h4>
                     <p>Evaluación cognitiva: interpretación, expectativas, memoria de dolores anteriores. El placebo actúa aquí activando opioides endógenos reales.</p>
                   </div>
                 </div>

@@ -70,7 +70,7 @@
 
 .modoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .modoActive {
@@ -111,7 +111,7 @@
 }
 
 .inputGroup label strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -124,7 +124,7 @@
 .subtitleGroup {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1rem 0 0.5rem;
   border-bottom: 1.5px solid #e5e7eb;
   padding-bottom: 0.3rem;
@@ -173,7 +173,7 @@
 
 .controlBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Resultados */
@@ -216,7 +216,7 @@
 
 .resultValueAccent {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -245,7 +245,7 @@
 
 .metricValue {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   margin: 0;
 }
@@ -262,7 +262,7 @@
 .hwTitle {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -283,7 +283,7 @@
 
 .hwCell strong {
   display: block;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: 700;
   margin-bottom: 0.15rem;
 }
@@ -442,7 +442,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -480,7 +480,7 @@
 
 .faqTip {
   font-size: 0.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-top: 0.35rem;
   font-style: italic;
 }

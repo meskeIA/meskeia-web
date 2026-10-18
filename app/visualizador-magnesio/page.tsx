@@ -467,7 +467,7 @@ export default function VisualizadorMagnesio() {
               <div className={styles.nmdaLabel}>Con despolarización</div>
               <div className={styles.nmdaChannelOpen}>
                 <span className={styles.nmdaMgSale}>Mg²⁺ sale</span>
-                <span className={styles.ionCa} style={{ color: '#2E86AB' }}>Ca²⁺ entra</span>
+                <span className={styles.ionCa} style={{ color: 'var(--primary-texto)' }}>Ca²⁺ entra</span>
               </div>
               <div className={styles.nmdaPlasticidad}>Plasticidad sináptica (LTP)</div>
             </div>

@@ -1396,7 +1396,7 @@
   padding: 0.1rem 0.4rem;
   border-radius: 999px;
   background: rgba(46, 134, 171, 0.14);
-  color: var(--primary-texto, var(--primary));
+  color: var(--primary-texto, var(--primary-texto));
   font-size: 0.72rem;
   font-weight: 700;
 }

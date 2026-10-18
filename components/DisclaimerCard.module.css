@@ -286,14 +286,14 @@
 }
 
 .termsLink a {
-  color: var(--primary, #2e86ab);
+  color: var(--primary-texto);
   text-decoration: underline;
   font-weight: 600;
   transition: color 0.2s ease;
 }
 
 .termsLink a:hover {
-  color: var(--secondary, #48a9a6);
+  color: var(--secondary-texto);
 }
 
 .termsLink a:focus-visible {

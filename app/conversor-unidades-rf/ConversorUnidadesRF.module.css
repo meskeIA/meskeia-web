@@ -143,7 +143,7 @@
 
 .referenciaValor {
   font-family: 'SF Mono', Monaco, monospace;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 500;
 }
 
@@ -285,7 +285,7 @@
 }
 
 .formulaBox strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Sección Educativa */
@@ -323,7 +323,7 @@
 .contentCard h4 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
 }
 
@@ -409,7 +409,7 @@
 }
 
 .comparativaTable td strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -491,7 +491,7 @@
 .faqItem h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-sm) 0;
   line-height: 1.4;
 }
@@ -615,7 +615,7 @@
 .tipCard h3 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   line-height: 1.4;
 }

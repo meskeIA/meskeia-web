@@ -49,7 +49,7 @@
 .sectionTitle {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -95,7 +95,7 @@
 
 .stepIndicador:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .stepIndicadorActivo {
@@ -118,7 +118,7 @@
 .stepTitulo {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 
@@ -190,7 +190,7 @@
 
 .flechaAbajo {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .enzimaCaja {
@@ -361,7 +361,7 @@
 .flujoTitulo {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -374,7 +374,7 @@
 
 .flechaFlujo {
   font-size: 1.6rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   opacity: 0.6;
   flex-shrink: 0;
 }
@@ -423,7 +423,7 @@
 }
 
 .puntoTimelineDestacado .timelineAnio {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -505,7 +505,7 @@
 .educSection h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.2rem 0 0.3rem;
 }
 

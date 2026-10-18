@@ -174,7 +174,7 @@
 .resultadoTitulo {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 6px;
 }
 
@@ -207,7 +207,7 @@
 .sustProporcion {
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
   border-radius: 8px;
   padding: 8px 12px;
@@ -231,7 +231,7 @@
 .tag {
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: color-mix(in srgb, var(--secondary) 12%, var(--bg-card));
   border: 1px solid color-mix(in srgb, var(--secondary) 30%, transparent);
   padding: 3px 10px;
@@ -265,7 +265,7 @@
 .conceptoSection h2 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid color-mix(in srgb, var(--primary) 15%, transparent);

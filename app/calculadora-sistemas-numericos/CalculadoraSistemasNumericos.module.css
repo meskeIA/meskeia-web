@@ -179,7 +179,7 @@
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   word-break: break-all;
 }
 
@@ -330,7 +330,7 @@
 .opResultRow code {
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 1rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -422,7 +422,7 @@
   display: block;
   font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
   padding: var(--spacing-sm);
   border-radius: var(--radius);

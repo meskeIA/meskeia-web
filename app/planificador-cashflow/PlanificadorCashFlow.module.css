@@ -108,7 +108,7 @@
 
 .tabActivo {
   background: var(--bg-card);
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom: 2px solid var(--primary);
 }
 
@@ -559,7 +559,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -751,7 +751,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   margin: 0;
 }
@@ -798,7 +798,7 @@
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
   font-size: 0.85rem !important;
-  color: var(--secondary) !important;
+  color: var(--secondary-texto) !important;
   border-left: 3px solid var(--secondary);
 }
 

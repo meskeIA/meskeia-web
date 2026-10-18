@@ -124,7 +124,7 @@
 }
 
 .resumenCard.balance .resumenValor {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .resumenCard.ahorro .resumenValor {
@@ -519,7 +519,7 @@
 
 .guideSection h2 {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
 }
 
@@ -729,7 +729,7 @@
   border-radius: var(--radius);
   padding: var(--spacing-sm) var(--spacing-md);
   font-size: 0.82rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1.6;
   font-style: italic;
 }
@@ -763,7 +763,7 @@
 .faqItem h4 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
   line-height: 1.4;
 }
@@ -785,7 +785,7 @@
   background: rgba(72, 169, 166, 0.1);
   border-radius: var(--radius);
   font-size: 0.85rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   line-height: 1.6;
 }
 

@@ -140,7 +140,7 @@
   padding: 0.45rem 0.8rem;
   font-size: 0.9rem;
   font-family: inherit;
-  color: var(--primary);
+  color: var(--primary-texto);
   background: var(--hover);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -234,7 +234,7 @@
   font-size: 0.95rem;
   font-weight: 600;
   font-family: inherit;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: var(--bg-card);
   border: 2px solid var(--secondary);
   border-radius: var(--radius);
@@ -455,7 +455,7 @@
 
 .escenarioCard h3 {
   font-size: 1.05rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioCard p {
@@ -479,7 +479,7 @@
 }
 
 .faqItem h4 {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
   margin-bottom: var(--spacing-sm);
 }

@@ -45,7 +45,7 @@
 .tituloSeccion {
   font-size: clamp(1.3rem, 3vw, 1.7rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
   text-align: center;
 }
@@ -112,7 +112,7 @@
 .controlValor {
   font-size: 1.1rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .slider {
@@ -177,7 +177,7 @@
   border-radius: 20px;
   border: 1.5px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -246,7 +246,7 @@
 .formulaTeX {
   font-size: clamp(1.1rem, 2.5vw, 1.5rem);
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-family: 'Georgia', serif;
   letter-spacing: 0.03em;
 }
@@ -281,7 +281,7 @@
 .arrheniusValorBox span {
   font-size: 1.2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .reglaPractica {
@@ -328,7 +328,7 @@
 .ordenTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
   text-align: center;
 }
@@ -405,7 +405,7 @@
 .vidaMediaItem span:last-child {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ─── Factores ───────────────────────────────────── */
@@ -451,7 +451,7 @@
 .factorTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -491,7 +491,7 @@
 .eduCard h4 {
   font-size: 0.97rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.6rem;
 }
 

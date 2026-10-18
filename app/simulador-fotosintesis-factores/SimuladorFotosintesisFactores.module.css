@@ -70,7 +70,7 @@
 .ecuacionTexto {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   font-family: 'Courier New', monospace;
   letter-spacing: 0.02em;
 }
@@ -149,7 +149,7 @@
 
 .sliderValue {
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   font-size: 1rem;
   font-variant-numeric: tabular-nums;
 }
@@ -360,7 +360,7 @@
 .guideSection h2 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   border-bottom: 2px solid var(--primary, #2E86AB);
   padding-bottom: 0.4rem;
   margin-bottom: 1rem;
@@ -378,7 +378,7 @@
 
 .guideSection code {
   background: #e8f4f8;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   padding: 0.1em 0.4em;
   border-radius: 4px;
   font-size: 0.92em;
@@ -468,7 +468,7 @@
 
 .faqTip {
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   margin-bottom: 0.5rem;
   display: block;
@@ -584,7 +584,7 @@
 }
 
 .tipCard strong {
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   font-size: 0.95rem;
 }
 
@@ -631,7 +631,7 @@
 .scenarioCard h3 {
   font-size: 0.97rem;
   font-weight: 700;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -711,7 +711,7 @@
   padding: 0.75rem 1.1rem;
   font-family: 'Courier New', monospace;
   font-size: 0.92rem;
-  color: var(--primary, #2E86AB);
+  color: var(--primary-texto);
   margin: 0.8rem 0;
 }
 

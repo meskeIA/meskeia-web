@@ -156,7 +156,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .situacionActual {
@@ -203,7 +203,7 @@
 }
 
 .amortizacionInfo strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .opcionesGrid {
@@ -276,7 +276,7 @@
 }
 
 .highlight {
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   font-size: 1.1rem !important;
 }
 
@@ -368,7 +368,7 @@
 }
 
 .recomendacion strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .placeholder {

@@ -80,7 +80,7 @@
 
 .btnMini:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .opcionesGrid {
@@ -207,7 +207,7 @@
 }
 
 .statHighlight {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnUsar {
@@ -217,7 +217,7 @@
   border: 2px solid var(--primary);
   border-radius: 6px;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   cursor: pointer;
   transition: all 0.2s;
   margin-left: auto;
@@ -243,7 +243,7 @@
 
 .btnSecundario:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecundario:disabled {
@@ -408,7 +408,7 @@
 .eduInfoCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin-bottom: 8px;
 }
 
@@ -497,7 +497,7 @@
 .eduFaqQuestion::before {
   content: '▶ ';
   font-size: 0.7rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .eduFaqItem[open] .eduFaqQuestion::before {
@@ -518,7 +518,7 @@
   border-radius: 4px;
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* Múltiples pasadas */
@@ -609,7 +609,7 @@
 .eduTipCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin-bottom: 8px;
 }
 

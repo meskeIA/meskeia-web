@@ -63,7 +63,7 @@
 .sectionNum {
   font-size: 2rem;
   font-weight: 900;
-  color: var(--primary);
+  color: var(--primary-texto);
   opacity: 0.25;
   line-height: 1;
   flex-shrink: 0;
@@ -108,7 +108,7 @@
 .sliderValue {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .slider {
@@ -168,7 +168,7 @@
 .infoCardValue {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
   margin-bottom: 0.35rem;
 }
@@ -413,7 +413,7 @@
 .ejemploLabel {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin-bottom: 0.4rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;

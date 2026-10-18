@@ -482,13 +482,13 @@ export default function VisualizadorFarmacocinetica() {
                 </svg>
 
                 <div className={styles.curvaBadges}>
-                  <span className={styles.curvaBadge} style={{ background: 'rgba(46,134,171,0.12)', color: 'var(--primary)' }}>
+                  <span className={styles.curvaBadge} style={{ background: 'rgba(46,134,171,0.12)', color: 'var(--primary-texto)' }}>
                     AUC — Área bajo la curva (exposición total)
                   </span>
-                  <span className={styles.curvaBadge} style={{ background: 'rgba(72,169,166,0.12)', color: '#48A9A6' }}>
+                  <span className={styles.curvaBadge} style={{ background: 'rgba(72,169,166,0.12)', color: 'var(--secondary-texto)' }}>
                     Cmax — Concentración máxima
                   </span>
-                  <span className={styles.curvaBadge} style={{ background: 'rgba(72,169,166,0.12)', color: '#48A9A6' }}>
+                  <span className={styles.curvaBadge} style={{ background: 'rgba(72,169,166,0.12)', color: 'var(--secondary-texto)' }}>
                     Tmax — Tiempo hasta Cmax
                   </span>
                 </div>
@@ -519,7 +519,7 @@ export default function VisualizadorFarmacocinetica() {
                     {FARMACOS_VIDA_MEDIA.map((f) => (
                       <tr key={f.nombre}>
                         <td><strong>{f.nombre}</strong></td>
-                        <td style={{ color: 'var(--primary)', fontWeight: 600 }}>{f.vidaMedia}</td>
+                        <td style={{ color: 'var(--primary-texto)', fontWeight: 600 }}>{f.vidaMedia}</td>
                         <td>{f.categoria}</td>
                         <td className={styles.tdNota}>{f.nota}</td>
                       </tr>

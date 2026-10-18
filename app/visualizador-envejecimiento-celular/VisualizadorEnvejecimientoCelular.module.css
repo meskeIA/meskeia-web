@@ -69,7 +69,7 @@
 
 .navBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .navBtnActivo {
@@ -100,7 +100,7 @@
 .seccionTitulo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.75rem;
 }
 
@@ -148,7 +148,7 @@
 
 .telomeroLabel {
   font-size: 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -289,7 +289,7 @@
 }
 
 .factoresPositivo {
-  color: #48A9A6;
+  color: var(--secondary-texto);
 }
 
 .factoresList {
@@ -504,7 +504,7 @@
 
 .cicloFlecha {
   font-size: 1.25rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   margin: 0 0.25rem;
 }
@@ -608,7 +608,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Senoterapias */
@@ -650,7 +650,7 @@
 .senoterapiaCard h4 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.5rem;
 }
 
@@ -909,7 +909,7 @@
 .escenarioCard h5 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -927,7 +927,7 @@
 .escenarioTag {
   display: inline-block;
   background: #EFF9FF;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.72rem;
   font-weight: 600;
   padding: 0.2rem 0.6rem;
@@ -978,7 +978,7 @@
   border-left: 3px solid var(--primary);
   padding: 0.35rem 0.75rem;
   font-size: 0.78rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   border-radius: 0 6px 6px 0;
   font-style: italic;
 }

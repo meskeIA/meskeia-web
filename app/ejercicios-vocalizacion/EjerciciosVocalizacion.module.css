@@ -260,12 +260,12 @@
 }
 
 .modoBtn:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.06);
 }
 
 .modoBtnActivo {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
   background: rgba(46, 134, 171, 0.07);
 }
@@ -291,7 +291,7 @@
 .panelTitulo {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -351,7 +351,7 @@
 .vocalLetra {
   font-size: 2.4rem;
   font-weight: 900;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -392,7 +392,7 @@
 
 .vocalDestacada {
   font-size: 1.5rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Progreso circular */
@@ -423,7 +423,7 @@
 .progresoSegs {
   font-size: 2.2rem;
   font-weight: 900;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
 }
 
@@ -588,7 +588,7 @@
 
 .btnNavFrase:hover:not(:disabled) {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnNavFrase:disabled {
@@ -641,7 +641,7 @@
 .fraseActiva {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   line-height: 1.5;
   padding: 0 1rem;
@@ -756,7 +756,7 @@
 .guiaSeccion h2 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.4rem 0 0.5rem;
 }
 
@@ -842,7 +842,7 @@
 
 .comparativaTable th {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   padding: 0.75rem 1rem;
   text-align: left;
@@ -866,7 +866,7 @@
 }
 
 .celdaDestacada {
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   font-weight: 700;
 }
 

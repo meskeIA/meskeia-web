@@ -729,7 +729,7 @@ export default function VisualizadorMecanikaFluidos() {
           </div>
 
           <div className={styles.resultadoCard}>
-            <div className={styles.resultadoValor} style={{ color: magnus.omega >= 0 ? '#2E86AB' : '#E84A5F' }}>
+            <div className={styles.resultadoValor} style={{ color: magnus.omega >= 0 ? 'var(--primary-texto)' : '#E84A5F' }}>
               F Magnus = {Math.abs(calcularFuerzaMagnus(magnus.omega, magnus.velocidadTraslacion)).toFixed(3)} N
             </div>
             <div className={styles.resultadoLabel}>

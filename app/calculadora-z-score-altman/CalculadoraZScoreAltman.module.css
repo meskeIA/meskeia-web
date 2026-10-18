@@ -86,7 +86,7 @@
 .sectionTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 var(--spacing-md);
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border);
@@ -115,7 +115,7 @@
 
 .btnModelo:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
   background: #e8f4fd;
 }
 
@@ -445,7 +445,7 @@
 .guideSection h2 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-md);
   padding-bottom: 0.4rem;
   border-bottom: 2px solid var(--border);
@@ -538,7 +538,7 @@
 
 .faqItem dt {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.4rem;
   font-size: 0.92rem;
 }

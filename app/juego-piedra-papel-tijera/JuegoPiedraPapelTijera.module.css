@@ -549,7 +549,7 @@
 .faqItem details summary::before {
   content: '▶';
   font-size: 0.7rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s;
   flex-shrink: 0;
 }

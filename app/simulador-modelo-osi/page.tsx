@@ -386,7 +386,7 @@ export default function SimuladorModeloOsi() {
         {/* PDU actual */}
         <section className={styles.panel}>
           <h2 className={styles.panelTitle}>
-            Unidad de datos (PDU): <span style={{ color: 'var(--primary)' }}>{frame.pdu}</span>
+            Unidad de datos (PDU): <span style={{ color: 'var(--primary-texto)' }}>{frame.pdu}</span>
           </h2>
           <div className={styles.pduFila}>
             {frame.bloques.map((b, i) => {

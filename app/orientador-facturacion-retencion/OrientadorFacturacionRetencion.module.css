@@ -185,7 +185,7 @@
 .resultadoPorcentaje {
   font-size: 2.5rem;
   font-weight: 900;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
   min-width: 4rem;
   text-align: center;
@@ -241,7 +241,7 @@
 .detalleTitulo {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -282,7 +282,7 @@
   background: transparent;
   border: 1.5px solid var(--primary);
   border-radius: 8px;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -366,7 +366,7 @@
 
 .tablaPorcentaje {
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   text-align: center;
   white-space: nowrap;
 }
@@ -438,7 +438,7 @@
 
 .declaracionLista li::before {
   content: '→ ';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -536,7 +536,7 @@
 .faqItem summary::before {
   content: '▶';
   font-size: 0.65rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }

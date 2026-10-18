@@ -5,13 +5,13 @@
 .hero p { font-size: 1.1rem; opacity: 0.92; max-width: 640px; margin: 0 auto; }
 
 .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1.5rem 2rem; max-width: 900px; margin: 0 auto; }
-.tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: 2px solid var(--primary); border-radius: 2rem; background: transparent; color: var(--primary); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: 2px solid var(--primary); border-radius: 2rem; background: transparent; color: var(--primary-texto); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .tab:hover { background: var(--primary-boton); color: #fff; }
 .tabActiva { background: var(--primary-boton); color: #fff; }
 .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .seccion { max-width: 900px; margin: 0 auto; padding: 1rem 2rem 2rem; }
-.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--primary); margin: 0 0 0.5rem; }
+.seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 0.5rem; }
 .seccionSubtitulo { color: var(--text-secondary); margin: 0 0 1.5rem; }
 
 /* Ciclo Otto */

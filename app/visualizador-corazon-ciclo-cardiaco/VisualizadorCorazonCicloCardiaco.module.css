@@ -156,7 +156,7 @@
 .faseNombre {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.25rem;
 }
 
@@ -205,7 +205,7 @@
   align-items: center;
   gap: 0.5rem;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   border: 1.5px solid var(--primary);
   border-radius: 8px;
   padding: 0.65rem 1.4rem;
@@ -330,7 +330,7 @@
 .valvulaDetalleTitulo {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -349,7 +349,7 @@
 
 .valvulaDetalleItemLabel {
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   min-width: 80px;
   flex-shrink: 0;
 }
@@ -405,7 +405,7 @@
 
 .ecgRitmoBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .ecgRitmoBtn.ecgRitmoActivo {
@@ -452,7 +452,7 @@
 .ecgOndaLetra {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.2rem;
 }
 
@@ -489,7 +489,7 @@
 .gastoValor {
   font-size: 2.8rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--primary-texto);
   line-height: 1;
   margin-bottom: 0.25rem;
 }
@@ -551,7 +551,7 @@
 .gastoRefValor {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 0.15rem;
 }
 
@@ -613,7 +613,7 @@
 }
 
 .educacional em {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: normal;
   font-weight: 600;
 }

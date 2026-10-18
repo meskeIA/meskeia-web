@@ -536,7 +536,7 @@ export default function SimuladorTeoremaBayesPage() {
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Verdaderos positivos por 1000</span>
-            <span className={styles.resultValue} style={{ color: '#48A9A6' }}>{fmt(calculo.truePos, 1)}</span>
+            <span className={styles.resultValue} style={{ color: 'var(--secondary-texto)' }}>{fmt(calculo.truePos, 1)}</span>
             <span className={styles.resultRange}>{fmtPct(calculo.truePos / calculo.totalPos, 1)} de los positivos</span>
           </div>
           <div className={styles.resultCard}>

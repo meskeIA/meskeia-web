@@ -96,7 +96,7 @@
 }
 
 .info .icon {
-  color: var(--primary);
+  color: var(--primary-texto);
   background: rgba(46, 134, 171, 0.1);
 }
 

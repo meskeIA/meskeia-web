@@ -24,7 +24,7 @@
 .documentTitle {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: 1rem;
 }
 
@@ -36,7 +36,7 @@
 /* Tipografía */
 .legalDocument h2 {
   font-size: 1.8rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 2.5rem 0 1.5rem 0;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);

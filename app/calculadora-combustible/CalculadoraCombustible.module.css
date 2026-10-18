@@ -71,7 +71,7 @@
 .modoBtn.active {
   border-color: #2E86AB;
   background: rgba(46, 134, 171, 0.1);
-  color: #2E86AB;
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -165,7 +165,7 @@
 
 .btnSecondary:hover {
   border-color: #2E86AB;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 /* Results Panel */
@@ -194,7 +194,7 @@
 .resultadoValor {
   font-size: 2.2rem;
   font-weight: 700;
-  color: #2E86AB;
+  color: var(--primary-texto);
 }
 
 .resultadoLabel {
@@ -395,7 +395,7 @@
 .consejoItem strong {
   display: block;
   font-size: 0.9rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin-bottom: 6px;
 }
 
@@ -528,7 +528,7 @@
 .faqItem h4 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #2E86AB;
+  color: var(--primary-texto);
   margin: 0 0 8px 0;
 }
 

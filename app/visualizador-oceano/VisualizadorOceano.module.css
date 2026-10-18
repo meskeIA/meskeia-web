@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -38,7 +38,7 @@
 .cifraActiva { border-color: var(--primary); background: linear-gradient(135deg, rgba(46,134,171,0.04) 0%, rgba(72,169,166,0.04) 100%); }
 .cifraIcono { font-size: 1.8rem; }
 .cifraNumero { display: flex; align-items: baseline; gap: 0.3rem; justify-content: center; }
-.cifraValor { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+.cifraValor { font-size: 1.6rem; font-weight: 800; color: var(--primary-texto); }
 .cifraUnidad { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
 .cifraDesc { font-size: 0.82rem; color: var(--text-secondary); }
 .cifraBarraContainer { width: 100%; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 0.3rem; }
@@ -104,7 +104,7 @@
 .climaGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
 .climaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.4rem; }
 .climaIcono { font-size: 1.8rem; }
-.climaValor { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.climaValor { font-size: 1.5rem; font-weight: 800; color: var(--primary-texto); }
 .climaEtiqueta { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
 .climaDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
 
@@ -115,7 +115,7 @@
 .circulacionPaso { background: linear-gradient(135deg, rgba(46,134,171,0.08) 0%, rgba(72,169,166,0.08) 100%); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; display: flex; flex-direction: column; gap: 0.3rem; }
 .circulacionNum { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-boton); color: white; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
 .circulacionTexto { font-size: 0.78rem; color: var(--text-primary); line-height: 1.3; }
-.circulacionFlecha { font-size: 1.2rem; color: var(--primary); font-weight: 700; }
+.circulacionFlecha { font-size: 1.2rem; color: var(--primary-texto); font-weight: 700; }
 .circulacionNota { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; text-align: center; margin: 0; }
 
 .proyeccionesContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }

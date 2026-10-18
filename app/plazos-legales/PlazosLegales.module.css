@@ -168,7 +168,7 @@
 .importantPlazo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -182,14 +182,14 @@
 .importantLink {
   background: none;
   border: none;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-size: 0.85rem;
   cursor: pointer;
   text-decoration: underline;
 }
 
 .importantLink:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Results Section */
@@ -329,7 +329,7 @@
 .plazoPlazo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -382,7 +382,7 @@
 }
 
 .detailsLaw {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
 }
 
@@ -517,7 +517,7 @@
 
 .faqItem summary::before {
   content: '▶ ';
-  color: var(--primary);
+  color: var(--primary-texto);
   margin-right: var(--spacing-xs);
 }
 
@@ -586,7 +586,7 @@
 
 .comparativaTable td:nth-child(2) {
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 
@@ -691,7 +691,7 @@
 
 .faqItemPro summary::before {
   content: '▶';
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.75rem;
   flex-shrink: 0;
   transition: transform 0.2s ease;
@@ -715,7 +715,7 @@
   display: inline-block;
   margin-top: var(--spacing-xs);
   font-size: 0.82rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-style: italic;
 }
 

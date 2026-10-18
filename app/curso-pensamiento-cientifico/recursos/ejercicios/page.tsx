@@ -368,7 +368,7 @@ export default function EjerciciosPage() {
         <Link
           href="/curso-pensamiento-cientifico"
           style={{
-            color: 'var(--primary)',
+            color: 'var(--primary-texto)',
             textDecoration: 'none',
             fontWeight: 600
           }}

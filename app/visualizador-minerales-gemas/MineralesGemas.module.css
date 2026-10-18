@@ -16,7 +16,7 @@
 /* Navegación */
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
-.navBtn:hover { border-color: var(--primary); color: var(--primary); }
+.navBtn:hover { border-color: var(--primary); color: var(--primary-texto); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .navActivo:hover { background: var(--primary-boton); color: white; }
@@ -63,7 +63,7 @@
 .sliderTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-sm); }
 .sliderSubtitulo { font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: var(--spacing-md); }
 .sliderInput { width: 100%; accent-color: var(--primary); cursor: pointer; }
-.sliderValor { text-align: center; font-size: 1.4rem; font-weight: 800; color: var(--primary); margin: var(--spacing-sm) 0; }
+.sliderValor { text-align: center; font-size: 1.4rem; font-weight: 800; color: var(--primary-texto); margin: var(--spacing-sm) 0; }
 .sliderResultado { text-align: center; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
 .sliderListas { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-top: var(--spacing-md); }
 .sliderListaTitulo { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; }
@@ -90,12 +90,12 @@
 .cuatroCTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: var(--spacing-md); }
 .cuatroCGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); }
 .cuatroCItem { text-align: center; padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); }
-.cuatroCLetra { font-size: 1.6rem; font-weight: 800; color: var(--primary); display: block; margin-bottom: 0.2rem; }
+.cuatroCLetra { font-size: 1.6rem; font-weight: 800; color: var(--primary-texto); display: block; margin-bottom: 0.2rem; }
 .cuatroCNombre { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); display: block; margin-bottom: 0.2rem; }
 .cuatroCDesc { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.3; }
 
 .corindoncardContainer { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border: 1px solid rgba(46,134,171,0.2); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; }
-.corindoncardTitulo { font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: var(--spacing-sm); }
+.corindoncardTitulo { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin-bottom: var(--spacing-sm); }
 .corindoncardDesc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
 
 /* ─── Sección 3: Formación ─── */
@@ -109,7 +109,7 @@
 .formacionBreve { font-size: 0.72rem; color: var(--text-secondary); }
 
 .formacionDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
-.formacionDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: var(--spacing-sm); }
+.formacionDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); margin-bottom: var(--spacing-sm); }
 .formacionDetalleDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.5; margin-bottom: var(--spacing-md); }
 .formacionEjemplos { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
 .formacionEjemplo { font-size: 0.82rem; padding: 0.3rem 0.8rem; background: var(--hover); border-radius: 8px; color: var(--text-secondary); }
@@ -124,7 +124,7 @@
 .diamanteStepDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.4; }
 
 .timelineDestacado { text-align: center; background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border: 1px solid rgba(46,134,171,0.2); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
-.timelineValor { display: block; font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 0.3rem; }
+.timelineValor { display: block; font-size: 2.2rem; font-weight: 800; color: var(--primary-texto); margin-bottom: 0.3rem; }
 .timelineTexto { font-size: 0.95rem; color: var(--text-secondary); }
 
 /* ─── Sección 4: Usos y datos ─── */
@@ -142,7 +142,7 @@
 .smartphoneUso { font-size: 0.72rem; color: var(--text-secondary); }
 
 .datoDestacado { text-align: center; background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border: 1px solid rgba(46,134,171,0.2); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
-.datoDestacadoValor { display: block; font-size: 2.4rem; font-weight: 800; color: var(--primary); margin-bottom: 0.3rem; }
+.datoDestacadoValor { display: block; font-size: 2.4rem; font-weight: 800; color: var(--primary-texto); margin-bottom: 0.3rem; }
 .datoDestacadoTexto { font-size: 0.95rem; color: var(--text-secondary); }
 
 .colorImpurezas { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }

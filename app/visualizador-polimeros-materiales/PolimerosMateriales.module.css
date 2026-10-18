@@ -58,11 +58,11 @@
 }
 
 .tab:hover {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabActive {
-  color: var(--primary);
+  color: var(--primary-texto);
   border-bottom-color: var(--primary);
   font-weight: 700;
 }
@@ -77,7 +77,7 @@
 .seccionTitulo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1.5rem;
   border-bottom: 2px solid var(--accent);
   padding-bottom: 0.5rem;
@@ -108,7 +108,7 @@
 .mecanismoTitulo {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -214,7 +214,7 @@
 
 .flechaReaccion {
   font-size: 1.4rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
 }
 
@@ -316,7 +316,7 @@
 
 .polimeroBtn:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .polimeroBtnActive {
@@ -361,14 +361,14 @@
 .polimeroNombre {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
 .codigoReciclaje {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   background: var(--bg-primary);
   padding: 0.25rem 0.6rem;
   border-radius: 8px;
@@ -532,7 +532,7 @@
 
 .nodo:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .nodoActivo {
@@ -571,7 +571,7 @@
 .nodoDetalleTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -705,7 +705,7 @@
 .cicloLabel {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .cicloDesc {

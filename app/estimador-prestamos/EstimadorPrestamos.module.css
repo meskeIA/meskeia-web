@@ -144,7 +144,7 @@
 
 .btnSecondary:hover {
   border-color: var(--primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .taeBox {
@@ -165,7 +165,7 @@
 .taeValue {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .taeNote {
@@ -234,7 +234,7 @@
 }
 
 .statRow.highlight strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -439,7 +439,7 @@
 
 .glossaryItem strong {
   display: block;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.95rem;
   margin-bottom: 6px;
 }
@@ -618,7 +618,7 @@
 .sistemaActivo {
   border-color: var(--primary);
   background: linear-gradient(135deg, rgba(46, 134, 171, 0.1) 0%, rgba(72, 169, 166, 0.1) 100%);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* Grid de Inputs de Préstamos */
@@ -769,7 +769,7 @@
 }
 
 .resumenItem.destacado strong {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 1rem;
 }
 
@@ -1035,7 +1035,7 @@
 }
 
 .comparativaTable td strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 [data-theme='dark'] .comparativaTable tbody tr:hover {
@@ -1169,7 +1169,7 @@
   content: '▶';
   display: inline-block;
   margin-right: 0.75rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   transition: transform 0.3s ease;
 }
 

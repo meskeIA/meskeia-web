@@ -61,7 +61,7 @@
 
 .tab:hover {
   background: var(--bg-primary);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tab:focus-visible {
@@ -120,7 +120,7 @@
 }
 
 .sliderValue {
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 600;
 }
 
@@ -179,7 +179,7 @@
 .estadioInfo h2 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -198,7 +198,7 @@
 }
 
 .estadioMeta strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* ── Datos interesantes (fecundación) ── */
@@ -223,7 +223,7 @@
 .datoValor {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .datoLabel {
@@ -300,7 +300,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .seleccionaHint {
@@ -334,7 +334,7 @@
 .morfogenBox h2 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -356,7 +356,7 @@
 .induccionBox h2 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
 }
 
@@ -400,7 +400,7 @@
 .timelineOrganogenesis h2 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 1rem;
 }
 
@@ -415,7 +415,7 @@
 .eventosBox h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -439,7 +439,7 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-weight: bold;
 }
 
@@ -455,7 +455,7 @@
 .somitasBox h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   margin: 0 0 0.5rem;
 }
 
@@ -543,7 +543,7 @@
 .escenarioCard h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0;
 }
 
@@ -589,7 +589,7 @@
 
 .faqTip {
   font-size: 0.82rem;
-  color: var(--secondary);
+  color: var(--secondary-texto);
   font-style: italic;
 }
 
@@ -636,7 +636,7 @@
 
 .stepContent strong {
   font-size: 0.95rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .stepContent p {
@@ -670,7 +670,7 @@
 
 .tipCard strong {
   font-size: 0.9rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tipCard p {

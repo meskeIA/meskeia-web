@@ -840,7 +840,7 @@
   border: 1px solid var(--primary);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -991,7 +991,7 @@
 
 .escenarioTip {
   font-size: 0.85rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-style: italic;
   margin: 0;
   padding-top: var(--spacing-sm);
@@ -1044,7 +1044,7 @@
 .faqItem details summary::before {
   content: '+';
   font-size: 1.2rem;
-  color: var(--primary);
+  color: var(--primary-texto);
   font-weight: 700;
   flex-shrink: 0;
   width: 20px;
@@ -1074,7 +1074,7 @@
 
 .faqTip {
   font-size: 0.85rem !important;
-  color: var(--primary) !important;
+  color: var(--primary-texto) !important;
   font-style: italic;
   background: rgba(46, 134, 171, 0.08);
   border-radius: var(--radius);

@@ -104,7 +104,7 @@
 
 .tab:hover {
   background: var(--hover);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tab:focus-visible {
@@ -223,7 +223,7 @@
 .btnSecondary {
   border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .btnSecondary:hover {
@@ -358,7 +358,7 @@
   font-size: 2rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .claveIncognita {
@@ -550,7 +550,7 @@
   margin: 0 0 var(--spacing-xs);
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .escenarioExample code {
@@ -570,7 +570,7 @@
 }
 
 .escenarioTip strong {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 /* FAQ */
@@ -606,7 +606,7 @@
   margin: 0 0 0.75rem;
   font-size: 1.05rem;
   line-height: 1.5;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .faqItem p {

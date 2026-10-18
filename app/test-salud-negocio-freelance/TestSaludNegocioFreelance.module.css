@@ -305,12 +305,12 @@
 }
 
 .bueno {
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .scoreBadge.bueno {
   background: rgba(46, 134, 171, 0.1);
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .mejorable {
@@ -456,7 +456,7 @@
 .recomendacionApp {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   white-space: nowrap;
 }
 

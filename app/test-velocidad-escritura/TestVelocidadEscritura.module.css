@@ -265,7 +265,7 @@
   display: block;
   font-size: 5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-texto) 0%, var(--secondary-texto) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -460,7 +460,7 @@
 .eduFaqPregunta::before {
   content: "▶";
   font-size: 0.65rem;
-  color: #2E86AB;
+  color: var(--primary-texto);
   transition: transform 0.2s;
   flex-shrink: 0;
 }

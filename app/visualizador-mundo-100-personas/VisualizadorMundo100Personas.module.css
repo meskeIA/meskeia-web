@@ -43,7 +43,7 @@
 .insight { background: linear-gradient(135deg, rgba(46,134,171,0.06) 0%, rgba(72,169,166,0.06) 100%); border-left: 4px solid var(--primary); border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-xl); color: var(--text-primary); line-height: 1.6; }
 .insight p { margin: 0; }
 .enlaceApp { text-align: center; padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); font-size: 0.9rem; color: var(--text-secondary); margin-bottom: var(--spacing-xl); }
-.enlaceApp a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.enlaceApp a { color: var(--primary-texto); font-weight: 600; text-decoration: none; }
 .enlaceApp a:hover { text-decoration: underline; }
 .warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
 [data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }

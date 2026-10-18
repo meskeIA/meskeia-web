@@ -95,7 +95,7 @@
 .tabActive {
   border-color: var(--primary);
   background: color-mix(in srgb, var(--primary) 8%, var(--bg-card));
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .tabTitulo {
@@ -124,7 +124,7 @@
 .sectionTitle {
   font-size: 1.45rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.75rem;
 }
 
@@ -182,7 +182,7 @@
 .mecanismoCard h3 {
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 0 0 0.4rem;
 }
 
@@ -219,7 +219,7 @@
 .datoNumero {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .datoLabel {
@@ -541,7 +541,7 @@
   font-size: 1rem;
   font-weight: 600;
   margin: 0 0 0.6rem;
-  color: var(--primary);
+  color: var(--primary-texto);
 }
 
 .modelosCard p,
@@ -600,7 +600,7 @@
 .educSection h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--primary);
+  color: var(--primary-texto);
   margin: 1.1rem 0 0.4rem;
 }
 

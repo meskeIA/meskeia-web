@@ -276,7 +276,7 @@ function SeccionEinstein() {
           <div className={styles.balanceOperador}>+</div>
           <div className={styles.balanceItem}>
             <span className={styles.balanceLabel}>Relatividad general</span>
-            <span className={styles.balanceValor} style={{ color: '#2E86AB' }}>+45 μs/día</span>
+            <span className={styles.balanceValor} style={{ color: 'var(--primary-texto)' }}>+45 μs/día</span>
           </div>
           <div className={styles.balanceOperador}>=</div>
           <div className={`${styles.balanceItem} ${styles.balanceTotal}`}>
