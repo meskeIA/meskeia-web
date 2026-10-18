@@ -269,9 +269,10 @@ export const BONIFICACION_IIVTNU_CEUTA_MELILLA = {
  * inmuebles radicados en Ceuta o Melilla», y la exclusión de los no residentes del 2.º solo
  * alcanza a las letras a), e) e i). Depende del SITIO del inmueble, no de la residencia.
  *
- * Las apps calculan la cuota de la ganancia como si fuera la única renta de la base del ahorro, así
- * que la parte proporcional es la cuota entera. Hasta el 10/10/2026 no se aplicaba (hallazgos 3059
- * y 3070); lo decidió el usuario ese día, con la cita de arriba.
+ * La parte proporcional la calcula `calcularGananciaInmueble` (ganancia-inmueble.ts): la cuota
+ * total de la base del ahorro por la proporción que es la ganancia, que sin otras rentas del
+ * ahorro es la cuota entera (hallazgo 3368, 18/10/2026). Hasta el 10/10/2026 no se aplicaba
+ * (hallazgos 3059 y 3070); lo decidió el usuario ese día, con la cita de arriba.
  */
 export const DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA = {
   porcentaje: 60,

@@ -359,6 +359,18 @@ const HERMANAS: readonly Hermana[] = [
         delta: 405,
         nombra: /gestoría/i,
       },
+      {
+        // Hallazgo 3368 (18/10/2026): la escala del ahorro se aplica a la base ENTERA, así que las
+        // otras rentas del año suben la cuota de la venta. Ilegible cuenta como 0 y el neto queda
+        // POR ENCIMA del real. Con 6.000 € de otras rentas, a mano:
+        //   ganancia 3.712,50: 3.712,50 × 19 % = 705,38 → 3.712,50 × 21 % = 779,63 → 74,25
+        etiqueta: 'Otras rentas del ahorro de este año (€)',
+        panel: 'vendedor',
+        legible: '6000',
+        direccion: 'sube',
+        delta: 74.25,
+        nombra: /otras rentas del ahorro/i,
+      },
     ],
   },
   {
@@ -498,6 +510,18 @@ const HERMANAS: readonly Hermana[] = [
         delta: 405,
         nombra: /gestoría/i,
       },
+      {
+        // Hallazgo 3368 (18/10/2026): la escala del ahorro se aplica a la base ENTERA, así que las
+        // otras rentas del año suben la cuota de la venta. Ilegible cuenta como 0 y el neto queda
+        // POR ENCIMA del real. Con 6.000 € de otras rentas, a mano:
+        //   ganancia 2.870: 2.870 × 19 % = 545,30 → 2.870 × 21 % = 602,70 → 57,40
+        etiqueta: 'Otras rentas del ahorro de este año (€)',
+        panel: 'vendedor',
+        legible: '6000',
+        direccion: 'sube',
+        delta: 57.4,
+        nombra: /otras rentas del ahorro/i,
+      },
     ],
   },
   {
@@ -509,7 +533,7 @@ const HERMANAS: readonly Hermana[] = [
       'amortizaciones 20.000 · 10 años · catastral suelo 40.000 · catastral total 100.000 · ' +
       // COSTE TOTAL con la rebaja del 5 % del arancel (17/10/2026, C0209): 200.000 + 12.000 +
       // notaría 721,04 + registro 224,96 + 500. Decía 213.495,20, de antes de la rebaja.
-      'comisión 3 % · gestoría 500. Publica COSTE TOTAL 213.446,00 € y NETO 182.803,00 €. · ' +
+      'comisión 3 % · gestoría 500. Publica COSTE TOTAL 213.446,00 € y NETO 182.487,00 € (plusvalía 1.200, IRPF 9.813). · ' +
       'BASE R = base + compra original 195.000 (gana el método real de la plusvalía, NETO 192.430,00).',
     pestanas: true,
     sinIva: {
@@ -672,6 +696,19 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'sube',
         delta: 395,
         nombra: /gestoría/i,
+      },
+      {
+        // Hallazgo 3368 (18/10/2026): la escala del ahorro se aplica a la base ENTERA, así que las
+        // otras rentas del año suben la cuota de la venta. Ilegible cuenta como 0 y el neto queda
+        // POR ENCIMA del real. Con 6.000 € de otras rentas, a mano:
+        //   plusvalía 40.000 × 0,12 × 25 % = 1.200 · ganancia 47.300: sola, 1.140 + 41.300 × 21 % = 9.813;
+        //   con 6.000 delante, 44.000 × 21 % + 3.300 × 23 % = 9.999 → 186,00
+        etiqueta: 'Otras rentas del ahorro de este año (€)',
+        panel: 'vendedor',
+        legible: '6000',
+        direccion: 'sube',
+        delta: 186,
+        nombra: /otras rentas del ahorro/i,
       },
     ],
   },
@@ -972,6 +1009,18 @@ const HERMANAS: readonly Hermana[] = [
         direccion: 'baja',
         delta: -73.03, // -73,51 con los coeficientes del IIVTNU caducados (hallazgo 1559, 24/09/2026)
         nombra: /hipoteca/i,
+      },
+      {
+        // Hallazgo 3368 (18/10/2026): la escala del ahorro se aplica a la base ENTERA, así que las
+        // otras rentas del año suben la cuota de la venta. Ilegible cuenta como 0 y el neto queda
+        // POR ENCIMA del real. Con 6.000 € de otras rentas, a mano:
+        //   ganancia 43.000 (todo al 21 % encima de 6.000): 43.000 × 2 % = 120,00 más de cuota
+        etiqueta: 'Otras rentas del ahorro de este año (€)',
+        panel: 'vendedor',
+        legible: '6000',
+        direccion: 'sube',
+        delta: 120,
+        nombra: /otras rentas del ahorro/i,
       },
     ],
   },

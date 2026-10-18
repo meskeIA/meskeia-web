@@ -5352,7 +5352,7 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
     await vendedorSinAmortizar0810(page, 'madrid');
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('5613,00 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toBe(
-      'Base del ahorro (19–30 %). Un local no tiene exención por reinversión ni por edad.',
+      'Base del ahorro (19–30 %). Un local no tiene exención por reinversión ni por edad. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     // El defecto.
     // Todo el texto de la página, también lo plegado del bloque educativo, sin los scripts (el JSON-LD).

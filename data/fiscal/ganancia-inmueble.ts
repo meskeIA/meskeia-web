@@ -48,7 +48,29 @@
 import { calcularCuotaBaseAhorro, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from './inmuebles';
 // El motivo de la exención se PRESENTA al usuario, así que su porcentaje lleva coma decimal:
 // toFixed() escribía «51.8 %» en una app en español (CLAUDE.md global §2, hallazgo 433).
-import { formatNumber } from '@/lib/formatters';
+import { formatCurrency, formatNumber } from '@/lib/formatters';
+
+/**
+ * Las palabras del campo «Otras rentas del ahorro» en las cuatro apps con pestaña Vendedor
+ * (hallazgo 3368), escritas una vez para que no diverjan, que es la historia de esta familia.
+ * El nombre va en singular y masculino porque los avisos de ilegibles lo conjugan así
+ * («…no se ha podido leer. Escríbelo…»).
+ */
+export const NOMBRE_OTRAS_RENTAS_AHORRO = 'el importe de otras rentas del ahorro';
+
+export const AYUDA_OTRAS_RENTAS_AHORRO =
+  'Opcional. Intereses, dividendos y otras ganancias que declararás el mismo año: la escala del ahorro se aplica a todas juntas, así que con ellas la venta puede tributar a un tipo mayor';
+
+/**
+ * La frase que acompaña a la cuota publicada: con otras rentas, que es lo que la venta AÑADE;
+ * sin ellas, que se ha calculado como si fuera la única renta del ahorro y la real puede ser
+ * mayor. Es la cifra la que cambia con el dato; la frase solo dice sobre qué supuesto está.
+ */
+export function textoOtrasRentasAhorro(otrasRentasAhorro: number): string {
+  return otrasRentasAhorro > 0
+    ? `Es lo que esta venta añade a tu cuota, sumada a ${formatCurrency(otrasRentasAhorro)} de otras rentas del ahorro del año.`
+    : 'Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.';
+}
 
 export interface EntradaGananciaInmueble {
   /** Precio de venta escriturado (€) */
@@ -72,6 +94,16 @@ export interface EntradaGananciaInmueble {
    * LIRPF (`DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA`), resida donde resida el vendedor.
    */
   inmuebleEnCeutaMelilla?: boolean;
+  /**
+   * Las demás rentas de la base del ahorro del MISMO año, sin esta venta: intereses, dividendos,
+   * otras ganancias (€). La escala del art. 66 LIRPF se aplica a la base del ahorro ENTERA, así
+   * que con ellas la venta tributa a partir del tramo en que esas rentas la dejan.
+   *
+   * Hasta el 18/10/2026 no existía y la cuota se calculaba como si la ganancia fuera la única
+   * renta del ahorro: quien tenía otras pagaba por la venta más de lo publicado (hallazgo 3368;
+   * calcularlo, y no solo avisar, lo decidió el usuario ese día). Omitido = 0, el cálculo de antes.
+   */
+  otrasRentasAhorro?: number;
   /** Reinversión en nueva vivienda habitual (art. 38 LIRPF). Omitir si no aplica */
   reinversion?: {
     /** Importe que se reinvierte o se compromete a reinvertir en 2 años (€) */
@@ -118,8 +150,14 @@ export interface ResultadoGananciaInmueble {
   importeTotalObtenido: number;
   /** Ganancia sujeta y no exenta: la que tributa */
   baseImponible: number;
-  /** Cuota del IRPF sobre la base del ahorro, ya con la deducción de Ceuta y Melilla si aplica */
+  /**
+   * Lo que esta venta AÑADE a la cuota del ahorro, ya con la deducción de Ceuta y Melilla si
+   * aplica: cuota(otras rentas + ganancia) − cuota(otras rentas). Sin otras rentas, la cuota de
+   * la ganancia sola.
+   */
   cuotaIRPF: number;
+  /** Las otras rentas del ahorro con las que se ha calculado (0 si no se dieron). */
+  otrasRentasAhorro: number;
   /** Deducción del art. 68.4 LIRPF restada de la cuota (0 fuera de Ceuta y Melilla) */
   deduccionCeutaMelilla: number;
   /** Tipo efectivo sobre la ganancia total (%) */
@@ -134,6 +172,8 @@ export interface ResultadoGananciaInmueble {
  */
 export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoGananciaInmueble {
   const positivo = (n: number | undefined) => Math.max(0, n ?? 0);
+  // Un NaN (importe ilegible) entra como 0, como cualquier otro importe: lo avisa cada app.
+  const otrasRentasAhorro = Number.isFinite(e.otrasRentasAhorro) ? positivo(e.otrasRentasAhorro) : 0;
 
   const valorAdquisicion = Math.max(
     0,
@@ -164,6 +204,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
       importeTotalObtenido: valorTransmision,
       baseImponible: 0,
       cuotaIRPF: 0,
+      otrasRentasAhorro,
       deduccionCeutaMelilla: 0,
       tipoEfectivo: 0,
       motivoExencion: null,
@@ -184,6 +225,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
       importeTotalObtenido: valorTransmision,
       baseImponible: 0,
       cuotaIRPF: 0,
+      otrasRentasAhorro,
       deduccionCeutaMelilla: 0,
       tipoEfectivo: 0,
       motivoExencion: 'Mayor de 65 años que transmite su vivienda habitual (art. 33.4.b LIRPF)',
@@ -215,12 +257,23 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
   }
 
   const baseImponible = Math.max(0, ganancia - exentaPorReinversion);
-  // Con el inmueble en Ceuta o Melilla, el 60 % de la cuota que corresponde a esta ganancia, que
-  // aquí es la cuota entera: se calcula como la única renta de la base del ahorro (art. 68.4 LIRPF).
-  const cuotaIntegra = calcularCuotaBaseAhorro(baseImponible);
-  const deduccionCeutaMelilla = e.inmuebleEnCeutaMelilla
-    ? cuotaIntegra * (DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje / 100)
-    : 0;
+  // La escala se aplica a la base del ahorro entera: la venta paga lo que sube la cuota al
+  // sumarla a las otras rentas del año (hallazgo 3368). Sin ellas, la cuota de la ganancia sola.
+  const baseAhorroTotal = otrasRentasAhorro + baseImponible;
+  const cuotaTotal = calcularCuotaBaseAhorro(baseAhorroTotal);
+  const cuotaIntegra = cuotaTotal - calcularCuotaBaseAhorro(otrasRentasAhorro);
+  /**
+   * Ceuta y Melilla: el art. 68.4 LIRPF deduce el 60 % de «la parte de la suma de las cuotas
+   * íntegras […] que proporcionalmente corresponda» a las rentas obtenidas allí, es decir, de la
+   * cuota TOTAL por la proporción de la base que es esta ganancia. Sin otras rentas, la cuota
+   * entera, como antes. Se da por hecho que las otras rentas NO se obtienen en Ceuta o Melilla:
+   * si también lo fueran, su parte se deduciría igual y la venta costaría menos, así que lo
+   * publicado es la cota alta y no la baja.
+   */
+  const deduccionCeutaMelilla =
+    e.inmuebleEnCeutaMelilla && baseAhorroTotal > 0
+      ? cuotaTotal * (baseImponible / baseAhorroTotal) * (DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje / 100)
+      : 0;
   const cuotaIRPF = cuotaIntegra - deduccionCeutaMelilla;
 
   const motivoExencion = proporcionReinvertida >= 1 && cubiertoPorLaHipoteca
@@ -243,6 +296,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
     importeTotalObtenido,
     baseImponible,
     cuotaIRPF,
+    otrasRentasAhorro,
     deduccionCeutaMelilla,
     tipoEfectivo: ganancia > 0 ? (cuotaIRPF / ganancia) * 100 : 0,
     motivoExencion,

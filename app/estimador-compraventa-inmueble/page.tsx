@@ -8,7 +8,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, Resu
 import ProrrateoIbiComunidad from '@/components/ProrrateoIbiComunidad';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -236,6 +236,8 @@ const sujetoPlural = (partes: readonly string[]): boolean =>
 const sinRepetir = (partes: readonly string[]): string[] => Array.from(new Set(partes));
 /** «Escríbelo» detrás de un importe, «Escríbelos» detrás de dos o más (hallazgo 1555). */
 const escribelo = (partes: readonly string[]): string => (partes.length > 1 ? 'Escríbelos' : 'Escríbelo');
+/** Cómo se nombra en los avisos el campo de las otras rentas del ahorro (hallazgo 3368). */
+const OTRAS_RENTAS = NOMBRE_OTRAS_RENTAS_AHORRO;
 
 /** Cada inmueble con su artículo, para las frases que lo nombran. */
 const CON_ARTICULO: Record<TipoInmueble, string> = {
@@ -323,6 +325,8 @@ interface ResultadosVendedor {
   irpfForal: boolean;
   /** Deducción del 60 % del art. 68.4 LIRPF ya restada del IRPF (Ceuta y Melilla). */
   deduccionCeutaMelilla: number;
+  /** Las otras rentas del ahorro con las que se ha calculado la cuota (0 si no se dieron, 3368). */
+  otrasRentasAhorro: number;
   exentoIRPF: boolean;
   /** La exención del art. 33.4.b LIRPF es por dependencia severa o gran dependencia, no por edad */
   exentoPorDependencia: boolean;
@@ -441,6 +445,8 @@ interface EntradaVendedor {
   otrosVenta: number;
   gastosAdquisicion: number;
   mejoras: number;
+  /** Las demás rentas de la base del ahorro del año, sin esta venta (hallazgo 3368). */
+  otrasRentas: number;
   exentoPorEdad: boolean;
   /** undefined si no hay reinversión que aplicar (casilla sin marcar, no habitual o exento) */
   reinversion: { importeReinvertido: number; principalPendiente: number } | undefined;
@@ -506,6 +512,8 @@ function calcularVendedor(e: EntradaVendedor) {
     reinversion: e.reinversion,
     // Ceuta y Melilla: la deducción del 60 % del art. 68.4 LIRPF (hallazgo 3070).
     inmuebleEnCeutaMelilla: CIUDADES_CON_BONIFICACION.includes(e.ccaa),
+    // La escala del ahorro se aplica a la base entera: la venta paga lo que sube la cuota (3368).
+    otrasRentasAhorro: e.otrasRentas,
   });
   // Sin precio de compra no hay ganancia que calcular: el IRPF queda a 0, pero ese 0 NO es
   // una exención, es un dato que falta (hallazgo 428).
@@ -561,6 +569,8 @@ const EJEMPLO_ANA_CALCULO = calcularVendedor({
   otrosVenta: 0,
   gastosAdquisicion: 0,
   mejoras: 0,
+  // Ana no tiene otras rentas del ahorro ese año: su venta tributa sola (hallazgo 3368).
+  otrasRentas: 0,
   exentoPorEdad: false,
   reinversion: undefined,
   // El caso de Ana no dice dónde está la vivienda: ni Ceuta, ni Melilla, ni territorio foral.
@@ -700,6 +710,8 @@ export default function SimuladorCompraventaPage() {
   const [reinvierte, setReinvierte] = useState(false);
   const [importeReinversion, setImporteReinversion] = useState('');
   const [hipotecaPendiente, setHipotecaPendiente] = useState('');
+  // Las demás rentas del ahorro del año: la escala se aplica a todas juntas (hallazgo 3368).
+  const [otrasRentasAhorro, setOtrasRentasAhorro] = useState('');
 
   // Pestaña activa
   const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
@@ -929,6 +941,7 @@ export default function SimuladorCompraventaPage() {
     const reinversionLegible = esLegible(importeReinversion);
     const hipotecaLegible = esLegible(hipotecaPendiente);
     const valorTotalLegible = esLegible(valorCatastralTotal);
+    const otrasRentasLegible = esLegible(otrasRentasAhorro);
 
     /**
      * Las dos exenciones de la ganancia —mayores de 65 (art. 33.4.b LIRPF) y reinversión (art. 38
@@ -970,6 +983,7 @@ export default function SimuladorCompraventaPage() {
       otrosVenta,
       gastosAdquisicion: Math.max(0, parseSpanishNumberOr(gastosAdquisicion)),
       mejoras: Math.max(0, parseSpanishNumberOr(mejoras)),
+      otrasRentas: Math.max(0, parseSpanishNumberOr(otrasRentasAhorro)),
       exentoPorEdad: exentoIRPF,
       // parseSpanishNumberOr y no parseSpanishNumber: los dos campos son OPCIONALES y quien
       // vende sin hipoteca pendiente deja el segundo vacío. Con parseSpanishNumber eso daba
@@ -1079,6 +1093,14 @@ export default function SimuladorCompraventaPage() {
         grande: { ...entrada, valorTotal: valorSuelo * 1000 },
       });
     }
+    if (!otrasRentasLegible) {
+      // Solo pueden subir la cuota: la venta cae en tramos más altos de la escala (3368).
+      sondas.push({
+        nombre: OTRAS_RENTAS,
+        pequeno: { ...entrada, otrasRentas: 1 },
+        grande: { ...entrada, otrasRentas: precioV * 10 },
+      });
+    }
     const sondeadas = sondas.map((sd) => ({
       nombre: sd.nombre,
       pequeno: calcularVendedor(sd.pequeno),
@@ -1113,6 +1135,7 @@ export default function SimuladorCompraventaPage() {
       irpfCalculado: hayDatosGanancia && !entrada.irpfForal,
       irpfForal: hayDatosGanancia && entrada.irpfForal,
       deduccionCeutaMelilla: hayDatosGanancia && !entrada.irpfForal ? r.g.deduccionCeutaMelilla : 0,
+      otrasRentasAhorro: r.g.otrasRentasAhorro,
       exentoIRPF,
       exentoPorDependencia: exentoIRPF && !vendedorMayor65,
       exencionBloqueada41bis: pideExencion && !plazoResidenciaCumplido,
@@ -1153,7 +1176,7 @@ export default function SimuladorCompraventaPage() {
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioVenta, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble]);
+  }, [precioVenta, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble, otrasRentasAhorro]);
 
   /**
    * En Canarias, Ceuta y Melilla la obra nueva no pagó IVA sino IGIC o IPSI, que esta app no
@@ -1288,7 +1311,10 @@ export default function SimuladorCompraventaPage() {
    */
   const tipoMarginalAhorro =
     resultadosVendedor && resultadosVendedor.irpfGanancia > 0 && !resultadosVendedor.exencionParcial
-      ? (TRAMOS_GANANCIAS_PATRIMONIALES_2025.find((t) => resultadosVendedor.baseImponibleIRPF <= t.hasta)
+      ? // Sobre la base del ahorro ENTERA: las otras rentas suben el tramo de la venta (3368).
+        (TRAMOS_GANANCIAS_PATRIMONIALES_2025.find(
+          (t) => resultadosVendedor.baseImponibleIRPF + resultadosVendedor.otrasRentasAhorro <= t.hasta,
+        )
           ?.tipo ?? TIPO_AHORRO_MAX)
       : null;
 
@@ -1349,9 +1375,10 @@ export default function SimuladorCompraventaPage() {
           : tipoMarginalAhorro !== null
             ? ` (${enumerar(deducibles)} ${rebajan ? 'rebajan' : 'rebaja'} también el IRPF al descontar${pron}, hasta un ${formatNumber(tipoMarginalAhorro, 0)}\u00A0% de su importe)`
             : ` (${enumerar(deducibles)} ${rebajan ? 'rebajan' : 'rebaja'} también el IRPF al descontar${pron}, así que el neto real baja menos que su importe)`;
-      return v.seguro
+      // Las otras rentas del ahorro no son un gasto que «descontar»: suben el IRPF (3368).
+      return v.seguro && !v.campos.includes(OTRAS_RENTAS)
         ? `No descuenta ${enumerarNi(v.campos)}, que no se ${sujetoPlural(v.campos) ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
-        : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
+        : `${mayuscula(noSePudoLeer(v.campos))}: el neto real ${v.seguro ? 'es' : 'puede ser'} menor que este`;
     }
     const explica = v.campos.map((c) => EXPLICA_SUELO[c] ?? c);
     return `${mayuscula(noSePudoLeer(explica))}: el neto real ${v.seguro ? 'es' : 'puede ser'} MAYOR que este`;
@@ -2311,6 +2338,17 @@ export default function SimuladorCompraventaPage() {
                   min={0}
                 />
 
+                {/* La escala del ahorro grava todas las rentas del ahorro del año juntas: sin este
+                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368). */}
+                <NumberInput
+                  value={otrasRentasAhorro}
+                  onChange={setOtrasRentasAhorro}
+                  label="Otras rentas del ahorro de este año (€)"
+                  placeholder="0"
+                  helperText={AYUDA_OTRAS_RENTAS_AHORRO}
+                  min={0}
+                />
+
                 {/* Las dos exenciones de la ganancia son de la VIVIENDA habitual (arts. 33.4.b y
                     38 LIRPF): con otro inmueble las casillas no se ofrecen, en vez de venir
                     marcadas y eximir a un local, una nave o un terreno (hallazgo 1553, ALTO). */}
@@ -2620,6 +2658,12 @@ export default function SimuladorCompraventaPage() {
                             // Ceuta y Melilla: la deducción del art. 68.4 LIRPF, dicha junto a la cuota (3070).
                             resultadosVendedor.deduccionCeutaMelilla > 0
                               ? `Lleva la deducción del ${DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje}\u00A0% por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos`
+                              : null,
+                            // Sobre qué base del ahorro está calculada la cuota (hallazgo 3368), junto a
+                            // la descripción de la cuota y no detrás de un aviso, como en las hermanas.
+                            resultadosVendedor.irpfGanancia > 0 &&
+                            avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', true) === null
+                              ? textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)
                               : null,
                           ]
                             .filter((x): x is string => !!x)
@@ -3242,6 +3286,7 @@ export default function SimuladorCompraventaPage() {
             <li><strong>Ignorar el valor de referencia catastral:</strong> Si supera el precio escriturado, Hacienda aplicará ITP sobre ese valor mayor y podrás recibir una comprobación de valores.</li>
             <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
             <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>
+            <li><strong>Calcular el IRPF de la venta como si fuera tu única renta del ahorro:</strong> La escala del ahorro (del {TIPO_AHORRO_MIN}&nbsp;% al {TIPO_AHORRO_MAX}&nbsp;%) se aplica a todas las rentas del ahorro del año juntas: intereses, dividendos y otras ganancias. Escríbelas en la pestaña Vendedor y la cuota será la que esta venta añade. No se compensan pérdidas de otras operaciones.</li>
             <li><strong>No comprobar bonificaciones autonómicas:</strong> Cada comunidad tiene tipos reducidos para ciertos colectivos. Ignorarlos puede costar miles de euros en impuestos innecesarios.</li>
             <li><strong>Liquidar fuera de plazo:</strong> El ITP o, en obra nueva, el AJD debe pagarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la escritura ({PLAZO_ITP.baseNormativa}), y hay comunidades que fijan el suyo propio. Pasado ese plazo hay recargo automático
             desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase}&nbsp;% de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes}&nbsp;% por cada mes completo de retraso,

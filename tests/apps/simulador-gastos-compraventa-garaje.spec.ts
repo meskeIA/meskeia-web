@@ -65,8 +65,8 @@
  * ⚠️ 06/10/2026 — los bloques «✅ REPARADO» (antes «❌ ABIERTO») describen el defecto TAL
  * COMO SE VIO el día de su inspección, con los verbos de entonces. A 13/10/2026 la base no
  * tenía ninguno abierto en esta app: los únicos `test.fail()` vivos son los de la sección 25.
- * ⚠️ 18/10/2026 — siguen ABIERTOS en la base los cinco de la sección 25 (hallazgos 3247-3251), y se
- *    suma el [18/10-a] de la sección 26.
+ * ⚠️ 18/10/2026 — siguen ABIERTOS en la base los cinco de la sección 25 (hallazgos 3247-3251). El
+ *    [18/10-a] de la sección 26 (hallazgo 3368) se reparó ese mismo día.
  * ⚠️ 13/10/2026 — las secciones que fijan la notaría y el registro de ANTES del 11/10/2026
  * (371,84 €, 80,21 €…) fallan desde a3c3ecb0: su puesta al día es el cabo C0209.
  * ✅ 17/10/2026 (cabo C0209) — puestas al día: cada cifra se recalculó a mano con la base del BOE
@@ -2150,7 +2150,7 @@ test.describe('INSPECCIÓN 07/09/2026 — los tres casos, resueltos a mano antes
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('43.960,00 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
       // 26/09/2026 (hallazgo 2190): «(19%-30%)» pasa a «(del 19 % al 30 %)», con espacio duro.
-      'Tributación en base del ahorro (del 19 % al 30 %)',
+      'Tributación en base del ahorro (del 19 % al 30 %). Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
 
     // Sin comisión ni gestoría no se pinta su línea, y el total cuadra con lo que se ve
@@ -7671,7 +7671,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
     expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia');
     expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('458,36 €');
     expect(await i24Desc(page, /^IRPF sobre ganancia/)).toBe(
-      'Tributación en base del ahorro (del 19 % al 30 %), con la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 687,54 € menos',
+      'Tributación en base del ahorro (del 19 % al 30 %), con la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 687,54 € menos. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     expect(await i24Valor(page, /^Comisión inmobiliaria/)).toBe('1200,00 €');
     expect(await i24Valor(page, /^Gestoría y certificados del vendedor/)).toBe('150,00 €');
@@ -7873,7 +7873,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
 //                  rama IVA + AJD (la salvedad del AJD va detrás del aviso), años «1.0.5» en el vendedor
 //                  y la «Cuota de comunidad» del reparto (el testigo solo mide el IBI).
 //
-// Hallazgo NUEVO, con `test.fail()` (afirma lo que DEBERÍA pasar), al final del bloque:
+// Hallazgo NUEVO de esa inspección, REPARADO el mismo día (3368), al final del bloque:
 //   [18/10-a] el IRPF de la venta se calcula como si la ganancia fuera la única renta del ahorro del
 //             año, y la página no lo dice.
 //
@@ -8130,37 +8130,56 @@ test.describe('Inspector 18/10/2026 — obra nueva vinculada, el tope de los dos
   });
 
   /**
-   * ❌ ABIERTO 18/10/2026 (contenido, bajo) — [18/10-a] El IRPF de la pestaña Vendedor se calcula como
-   * si la ganancia fuera la ÚNICA renta de la base del ahorro del año —lo dice el propio módulo:
-   * «Las apps calculan la cuota de la ganancia como si fuera la única renta de la base del ahorro»
-   * (data/fiscal/inmuebles.ts, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA)—, y la página no lo dice en
-   * ningún sitio: ni la tarjeta («Tributación en base del ahorro (del 19 % al 30 %)»), ni el sello del
-   * IRPF, ni «Limitaciones de esta calculadora». La escala del art. 66 LIRPF se aplica a la base del
-   * ahorro ENTERA (intereses, dividendos, otras ganancias), así que con otras rentas del ahorro la
-   * cuota real de la venta es mayor.
-   *   Vendedor del CASO FA (ganancia 3.665 €): la app publica 696,35 € (3.665 × 19 %). Con 6.000 € de
-   *   intereses en el mismo año la base del ahorro pasa de 6.000 a 9.665 € y la cuota de 1.140,00 a
-   *   1.909,65 €: la venta añade 769,65 € (3.665 × 21 %), 73,30 € más de lo publicado.
-   * Esperado: que la página diga que la cuota supone que no hay otras rentas del ahorro (o que las
-   * pregunte). El test busca esa salvedad en el texto de la página, sin los <script>.
+   * ✅ REPARADO 18/10/2026 (hallazgo 3368, decidido por el usuario: calcularlo, no solo avisar) —
+   * [18/10-a] El IRPF de la pestaña Vendedor se calculaba como si la ganancia fuera la ÚNICA renta de
+   * la base del ahorro del año, y la página no lo decía. La escala del art. 66 LIRPF se aplica a la
+   * base del ahorro ENTERA (intereses, dividendos, otras ganancias), así que con otras rentas del
+   * ahorro la cuota real de la venta es mayor.
+   * Ahora la pestaña pregunta «Otras rentas del ahorro de este año (€)», opcional, y la cuota de la
+   * venta es cuota(otras + ganancia) − cuota(otras) (`calcularGananciaInmueble`, motor compartido).
+   *   Vendedor del CASO FA (ganancia 3.665 €):
+   *   · sin otras rentas: 3.665 × 19 % = 696,35 €, y la tarjeta dice que supone que la venta es la
+   *     única renta del ahorro. Neto: 36.000 − 245 − 1.440 − 250 − 696,35 = 33.368,65 €.
+   *   · con 6.000 € de intereses: cuota(9.665) = 1.140 + 3.665 × 21 % = 1.909,65, menos cuota(6.000)
+   *     = 1.140,00 → 769,65 € (73,30 € más). Neto: 36.000 − 245 − 1.440 − 250 − 769,65 = 33.295,35 €.
+   *   · con el importe ilegible («6.000.50»): se publica la cuota sin él (696,35 €) y se avisa de que
+   *     la real PUEDE ser mayor (con 1 € la venta sigue toda al 19 %: no es seguro) y el neto menor.
    */
-  test('[18/10-a] la página dice que el IRPF de la venta supone que no hay otras rentas del ahorro', async ({ page }) => {
-    if (!I08_VER_HUECOS) test.fail();
+  async function i18Vendedor(page: Page, otrasRentas?: string): Promise<void> {
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await sembrarImporte(page, 'Precio del garaje / plaza de parking', '36000');
     await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
     for (const [etiqueta, valor] of I18_VENDEDOR) await sembrarImporte(page, etiqueta, valor);
+    if (otrasRentas !== undefined) await sembrarImporte(page, 'Otras rentas del ahorro de este año (€)', otrasRentas);
+  }
+
+  test('[18/10-a] sin otras rentas del ahorro, la tarjeta dice que la venta se calcula como la única', async ({ page }) => {
+    await i18Vendedor(page);
     expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('696,35 €');
-    const texto = i24Normaliza(
-      await page.evaluate(() => {
-        const copia = document.body.cloneNode(true) as HTMLElement;
-        copia.querySelectorAll('script').forEach((s) => s.remove());
-        return copia.textContent ?? '';
-      }),
+    expect(await i18DescCruda(page, /^IRPF sobre ganancia/)).toContain(
+      'Calculado como si esta venta fuera tu única renta del ahorro del año',
     );
-    expect(texto).toMatch(
-      /(única|sola) renta (de la base )?del ahorro|otras rentas (de la base )?del ahorro|otros (rendimientos|ingresos) del ahorro|resto de (tu|la) base del ahorro/i,
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('33.368,65 €');
+  });
+
+  test('[18/10-a] con 6.000 € de otras rentas del ahorro, la venta tributa al 21 %: 769,65 €', async ({ page }) => {
+    await i18Vendedor(page, '6000');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('769,65 €');
+    expect(await i18DescCruda(page, /^IRPF sobre ganancia/)).toContain(
+      'Es lo que esta venta añade a tu cuota, sumada a 6000,00 € de otras rentas del ahorro del año',
+    );
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('33.295,35 €');
+  });
+
+  test('[18/10-a] con las otras rentas ilegibles, la cuota real puede ser mayor y el neto menor', async ({ page }) => {
+    await i18Vendedor(page, '6.000.50');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('696,35 €');
+    expect(await i18DescCruda(page, /^IRPF sobre ganancia/)).toContain(
+      'El importe de otras rentas del ahorro no se ha podido leer, así que la cuota real puede ser mayor',
+    );
+    expect(await i18DescCruda(page, /^IMPORTE NETO VENDEDOR/)).toContain(
+      'El importe de otras rentas del ahorro no se ha podido leer: el neto real puede ser menor que este',
     );
   });
 });

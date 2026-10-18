@@ -2220,7 +2220,7 @@ test.describe('Inspector 07/09/2026 — caminos nuevos', () => {
     expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('90.100,00 €');
     expect(await valorTarjeta(page, /IRPF sobre ganancia/)).toBe('19.603,00 €');
     expect(await descripcionTarjeta(page, /IRPF sobre ganancia/)).toBe(
-      'Tributación en base del ahorro',
+      'Tributación en base del ahorro. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('29.503,00 €');
     expect(await valorTarjeta(page, /IMPORTE NETO VENDEDOR/)).toBe('270.497,00 €');
@@ -4946,7 +4946,7 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('172.500,00 €');
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('40.000,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8280,00 €');
-    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe('Tributación en base del ahorro');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe('Tributación en base del ahorro. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.');
     expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('5400,00 €');
     expect(await valorTarjeta(page, 'Otros gastos de la venta')).toBe('600,00 €');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('15.780,00 €');
@@ -5114,7 +5114,7 @@ test.describe('Inspector 23/09/2026 — re-inspección de familia: las reparacio
     for (const [etiqueta, valor] of BASE_B) await sembrar23(page, etiqueta, valor);
 
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('8805,00 €');
-    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe('Tributación en base del ahorro');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe('Tributación en base del ahorro. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('183.695,00 €');
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes');
   });
@@ -6720,7 +6720,7 @@ test.describe('Inspector 26/09/2026 — la referencia de la familia: reinversió
     expect(await descripcionTarjeta(page, /^Ganancia patrimonial/)).toBe('Tributa 18.725,12 € tras aplicar la exención');
     expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('3812,28 €');
     expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
-      'Reinversión parcial: exento el 74,5 % de la ganancia (art. 41 RIRPF)',
+      'Reinversión parcial: exento el 74,5 % de la ganancia (art. 41 RIRPF). Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     expect(await valorTarjeta(page, /Comisión inmobiliaria \(3\s?%\)/)).toBe('7500,00 €');
     expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('12.437,28 €');
@@ -9026,7 +9026,7 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
     expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('468.250,00 €');
     expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('48.942,00 €');
     expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
-      'Tributación en base del ahorro. Lleva la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 73.413,00 € menos',
+      'Tributación en base del ahorro. Lleva la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 73.413,00 € menos. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('27.000,00 €');
     expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('80.692,00 €');

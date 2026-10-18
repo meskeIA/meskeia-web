@@ -6801,7 +6801,7 @@ test.describe('Inspector 13/10/2026 — Cantabria con perfil joven, Melilla a 20
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('17.439,00 €');
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('5539,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1052,41 €');
-    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe('Tributación en base del ahorro (del 19 % al 30 %)');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe('Tributación en base del ahorro (del 19 % al 30 %). Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.');
     expect(await tituloTarjeta24(page, /^Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (4 %)');
     expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('740,00 €');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('150,00 €');
@@ -6834,7 +6834,7 @@ test.describe('Inspector 13/10/2026 — Cantabria con perfil joven, Melilla a 20
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7500,00 €');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('582,00 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
-      'Tributación en base del ahorro (del 19 % al 30 %), con la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 873,00 € menos',
+      'Tributación en base del ahorro (del 19 % al 30 %), con la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 873,00 € menos. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('1200,00 €');
     expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('387,50 €');

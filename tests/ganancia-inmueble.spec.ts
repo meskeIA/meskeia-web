@@ -213,6 +213,59 @@ test.describe('Exenciones del vendedor', () => {
   });
 });
 
+/**
+ * Hallazgo 3368 (18/10/2026): la escala del art. 66 LIRPF se aplica a la base del ahorro ENTERA.
+ * La venta paga lo que sube la cuota al sumarla a las demás rentas del ahorro del año:
+ *   cuota de la venta = cuota(otras + ganancia) − cuota(otras)
+ * Caso de la ficha: ganancia 3.665 €. Sola, 3.665 × 19 % = 696,35. Con 6.000 € de intereses,
+ * cuota(9.665) = 1.140 + 3.665 × 21 % = 1.909,65, menos cuota(6.000) = 1.140 → 769,65.
+ */
+test.describe('Otras rentas del ahorro del año (hallazgo 3368)', () => {
+  const venta = { precioVenta: 10000, precioCompra: 6335 };
+
+  test('sin otras rentas, la cuota de la ganancia sola: 3.665 × 19 % = 696,35', () => {
+    const g = calcularGananciaInmueble(venta);
+    expect(g.ganancia).toBe(3665);
+    expect(r2(g.cuotaIRPF)).toBe(696.35);
+    expect(g.otrasRentasAhorro).toBe(0);
+  });
+
+  test('con 6.000 € de intereses la venta tributa toda al 21 %: 769,65', () => {
+    const g = calcularGananciaInmueble({ ...venta, otrasRentasAhorro: 6000 });
+    expect(r2(g.cuotaIRPF)).toBe(769.65);
+    expect(g.otrasRentasAhorro).toBe(6000);
+    // La ganancia y la base no cambian: solo el tramo en que cae.
+    expect(g.ganancia).toBe(3665);
+    expect(g.baseImponible).toBe(3665);
+  });
+
+  test('a caballo entre dos tramos: 4.000 de otras + 5.000 de ganancia = 2.000 × 19 % + 3.000 × 21 % = 1.010', () => {
+    const g = calcularGananciaInmueble({ precioVenta: 10000, precioCompra: 5000, otrasRentasAhorro: 4000 });
+    expect(r2(g.cuotaIRPF)).toBe(1010);
+  });
+
+  test('un importe ilegible (NaN) o negativo cuenta como 0, el cálculo de antes', () => {
+    expect(r2(calcularGananciaInmueble({ ...venta, otrasRentasAhorro: NaN }).cuotaIRPF)).toBe(696.35);
+    expect(r2(calcularGananciaInmueble({ ...venta, otrasRentasAhorro: -3000 }).cuotaIRPF)).toBe(696.35);
+  });
+
+  test('con pérdida o exención no hay cuota, haya o no otras rentas', () => {
+    expect(calcularGananciaInmueble({ precioVenta: 5000, precioCompra: 6000, otrasRentasAhorro: 9000 }).cuotaIRPF).toBe(0);
+    expect(calcularGananciaInmueble({ ...venta, exentoPorEdad: true, otrasRentasAhorro: 9000 }).cuotaIRPF).toBe(0);
+  });
+
+  test('Ceuta: el 60 % de la parte PROPORCIONAL de la cuota total (art. 68.4 LIRPF)', () => {
+    // Cuota total 1.909,65 × 3.665 / 9.665 = 724,1456… → deducción × 60 % = 434,49
+    // La venta añade 769,65 − 434,49 = 335,16
+    const g = calcularGananciaInmueble({ ...venta, otrasRentasAhorro: 6000, inmuebleEnCeutaMelilla: true });
+    expect(r2(g.deduccionCeutaMelilla)).toBe(434.49);
+    expect(r2(g.cuotaIRPF)).toBe(335.16);
+    // Sin otras rentas, la proporción es 1 y vuelve el cálculo de antes: 696,35 × 40 % = 278,54
+    const sola = calcularGananciaInmueble({ ...venta, inmuebleEnCeutaMelilla: true });
+    expect(r2(sola.cuotaIRPF)).toBe(278.54);
+  });
+});
+
 test.describe('Plusvalía municipal (IIVTNU)', () => {
   test('método objetivo: valor catastral del suelo × coeficiente × tipo', () => {
     // Sin valor catastral total el método real NO es calculable: se aplica el objetivo

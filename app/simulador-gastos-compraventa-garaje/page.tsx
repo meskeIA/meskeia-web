@@ -44,7 +44,7 @@ const AVISO_BASE_AJD =
 /** La salvedad del AJD detrás de un texto, con o sin punto final, solo si hay AJD. */
 const conAvisoBaseAjd = (texto: string, ajd: number): string =>
   ajd > 0 ? `${texto}${texto.endsWith('.') ? '' : '.'} ${AVISO_BASE_AJD}` : texto;
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -131,6 +131,8 @@ const sujetoPlural = (partes: readonly string[]): boolean =>
   partes.length > 1 || /^(los|las)\s/i.test(partes[0] ?? '');
 /** «Escríbelo» detrás de un importe, «Escríbelos» detrás de dos o más (hallazgo 1555). */
 const escribelo = (partes: readonly string[]): string => (partes.length > 1 ? 'Escríbelos' : 'Escríbelo');
+/** Cómo se nombra en los avisos el campo de las otras rentas del ahorro (hallazgo 3368). */
+const OTRAS_RENTAS = NOMBRE_OTRAS_RENTAS_AHORRO;
 
 /** Los meses completos del periodo inferior a un año, para el prorrateo del art. 107.4 TRLRHL. */
 const MESES_COMPLETOS = Array.from({ length: 12 }, (_, m) => m);
@@ -220,6 +222,8 @@ interface ResultadosVendedor {
   plusvaliaForal: boolean;
   /** Deducción del 60 % del art. 68.4 LIRPF ya restada del IRPF (Ceuta y Melilla). */
   deduccionCeutaMelilla: number;
+  /** Las otras rentas del ahorro con las que se ha calculado la cuota (0 si no se dieron, 3368). */
+  otrasRentasAhorro: number;
   exentoPlusvalia: boolean;
   comisionInmobiliaria: number;
   gastosGestoria: number;
@@ -332,6 +336,8 @@ interface EntradaVendedor {
   comisionPct: number;
   gestoria: number;
   gastosAdquisicion: number;
+  /** Las demás rentas de la base del ahorro del año, sin esta venta (hallazgo 3368). */
+  otrasRentas: number;
   /**
    * true con una comisión por encima del 100 %: la ganancia y el IRPF no se liquidan con un
    * dato imposible (patrón 5 de la familia, hallazgo 2191). Se nombran como pendientes.
@@ -388,6 +394,8 @@ function calcularVendedor(e: EntradaVendedor) {
     plusvaliaMunicipal: plusvalia,
     // Ceuta y Melilla: la deducción del 60 % del art. 68.4 LIRPF, resida donde resida el vendedor.
     inmuebleEnCeutaMelilla: CIUDADES_CON_BONIFICACION.includes(e.ccaa),
+    // La escala del ahorro se aplica a la base entera: la venta paga lo que sube la cuota (3368).
+    otrasRentasAhorro: e.otrasRentas,
   });
   const hayDatosGanancia = e.precioC > 0 && !e.sinGanancia;
   const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
@@ -454,6 +462,8 @@ export default function SimuladorGarajeCompraventaPage() {
   // los gastos «satisfechos por el transmitente», y un único campo compartido hacía que
   // los 300 € del comprador rebajaran el IRPF de la otra parte (Inspector 20/08/2026).
   const [gastosGestoriaVenta, setGastosGestoriaVenta] = useState('');
+  // Las demás rentas del ahorro del año: la escala se aplica a todas juntas (hallazgo 3368).
+  const [otrasRentasAhorro, setOtrasRentasAhorro] = useState('');
 
   // Pestaña activa
   const [pestanaActiva, setPestanaActiva] = useState<'comprador' | 'vendedor'>('comprador');
@@ -603,6 +613,7 @@ export default function SimuladorGarajeCompraventaPage() {
     const gestoriaLegible = esLegible(gastosGestoriaVenta);
     const gastosAdquisicionLegible = esLegible(gastosAdquisicion);
     const valorTotalLegible = esLegible(valorCatastralTotal);
+    const otrasRentasLegible = esLegible(otrasRentasAhorro);
     // Escrito, legible e imposible (patrón 5): no «falta» ni «no se lee», se corrige.
     const precioCompraNoValido = Number.isFinite(precioC) && precioC <= 0;
     const comisionImposible = comisionLegible && parseSpanishNumberOr(comisionInmobiliaria) > 100;
@@ -620,6 +631,7 @@ export default function SimuladorGarajeCompraventaPage() {
       comisionPct: comisionImposible ? 0 : Math.max(0, parseSpanishNumberOr(comisionInmobiliaria)) / 100,
       gestoria: Math.max(0, parseSpanishNumberOr(gastosGestoriaVenta)),
       gastosAdquisicion: Math.max(0, parseSpanishNumberOr(gastosAdquisicion)),
+      otrasRentas: Math.max(0, parseSpanishNumberOr(otrasRentasAhorro)),
       sinGanancia: comisionImposible,
       ccaa,
     };
@@ -738,6 +750,14 @@ export default function SimuladorGarajeCompraventaPage() {
         grande: { ...entrada, valorTotal: valorSuelo * 1000 },
       });
     }
+    if (!otrasRentasLegible) {
+      // Solo pueden subir la cuota: la venta cae en tramos más altos de la escala (3368).
+      sondas.push({
+        nombre: OTRAS_RENTAS,
+        pequeno: { ...entrada, otrasRentas: 1 },
+        grande: { ...entrada, otrasRentas: precioV * 10 },
+      });
+    }
     const sondeadas = sondas.map((s) => ({
       nombre: s.nombre,
       pequeno: calcularVendedor(s.pequeno),
@@ -772,6 +792,7 @@ export default function SimuladorGarajeCompraventaPage() {
       plusvaliaPendiente: rp === null && r.hayDatosGanancia,
       plusvaliaForal: r.plusvaliaForal,
       deduccionCeutaMelilla: r.hayDatosGanancia ? r.g.deduccionCeutaMelilla : 0,
+      otrasRentasAhorro: r.g.otrasRentasAhorro,
       exentoPlusvalia,
       comisionInmobiliaria: r.comision,
       gastosGestoria: entrada.gestoria,
@@ -794,7 +815,7 @@ export default function SimuladorGarajeCompraventaPage() {
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioGaraje, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion]);
+  }, [precioGaraje, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion, otrasRentasAhorro]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   /** El precio escrito, para rotular el tipo que le toca (0 mientras no se lea). */
@@ -884,7 +905,10 @@ export default function SimuladorGarajeCompraventaPage() {
    */
   const tipoMarginalAhorro =
     resultadosVendedor && resultadosVendedor.irpfGanancia > 0
-      ? (TRAMOS_GANANCIAS_PATRIMONIALES_2025.find((t) => resultadosVendedor.baseImponibleIRPF <= t.hasta)
+      ? // Sobre la base del ahorro ENTERA: las otras rentas suben el tramo de la venta (3368).
+        (TRAMOS_GANANCIAS_PATRIMONIALES_2025.find(
+          (t) => resultadosVendedor.baseImponibleIRPF + resultadosVendedor.otrasRentasAhorro <= t.hasta,
+        )
           ?.tipo ?? TIPO_AHORRO_MAX)
       : null;
 
@@ -909,9 +933,10 @@ export default function SimuladorGarajeCompraventaPage() {
         deducibles.length === 0 || tipoMarginalAhorro === null
           ? ''
           : ` (${enumerar(deducibles)} ${deducibles.length > 1 ? 'rebajan' : 'rebaja'} también el IRPF al descontar${deducibles.length > 1 ? 'las' : 'la'}, hasta un ${formatNumber(tipoMarginalAhorro, 0)}\u00A0% de su importe)`;
-      return v.seguro
+      // Las otras rentas del ahorro no son un gasto que «descontar»: suben el IRPF (3368).
+      return v.seguro && !v.campos.includes(OTRAS_RENTAS)
         ? `No descuenta ${enumerarNi(v.campos)}, que no se ${sujetoPlural(v.campos) ? 'han' : 'ha'} podido leer${matiz}: el neto real es menor que este`
-        : `${mayuscula(noSePudoLeer(v.campos))}: el neto real puede ser menor que este`;
+        : `${mayuscula(noSePudoLeer(v.campos))}: el neto real ${v.seguro ? 'es' : 'puede ser'} menor que este`;
     }
     const explica = v.campos.map((c) =>
       c === 'los impuestos y gastos de aquella compra'
@@ -1630,6 +1655,16 @@ export default function SimuladorGarajeCompraventaPage() {
                   helperText="Solo lo que pagas TÚ al vender (certificado energético, cédula, gestoría propia). La gestoría del comprador no reduce tu ganancia: art. 35.1 LIRPF"
                   min={0}
                 />
+                {/* La escala del ahorro grava todas las rentas del ahorro del año juntas: sin este
+                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368). */}
+                <NumberInput
+                  value={otrasRentasAhorro}
+                  onChange={setOtrasRentasAhorro}
+                  label="Otras rentas del ahorro de este año (€)"
+                  placeholder="0"
+                  helperText={AYUDA_OTRAS_RENTAS_AHORRO}
+                  min={0}
+                />
               </div>
 
               {resultadosVendedor ? (
@@ -1795,7 +1830,7 @@ export default function SimuladorGarajeCompraventaPage() {
                                   resultadosVendedor.deduccionCeutaMelilla > 0
                                     ? `, con la deducción del ${DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje}\u00A0% por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos`
                                     : ''
-                                }`))
+                                }. ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`))
                     }
                   />
                   {/* Un importe ilegible no hace desaparecer su línea: se ve «Sin leer» (hallazgo
@@ -2136,6 +2171,7 @@ export default function SimuladorGarajeCompraventaPage() {
           </div>
           <ul className={styles.warningList}>
             <li><strong>Estimaciones orientativas:</strong> Los importes reales pueden diferir según el valor de referencia catastral del inmueble (base mínima del ITP y, en la compra al promotor, también del AJD: art. 30.1 TRLITPAJD; aquí el AJD se calcula sobre el precio escrito), los coeficientes de plusvalía de cada municipio y los aranceles notariales concretos aplicados.</li>
+            <li><strong>IRPF de la venta junto a tus otras rentas del ahorro:</strong> La escala del ahorro (del {TIPO_AHORRO_MIN}&nbsp;% al {TIPO_AHORRO_MAX}&nbsp;%) se aplica a todas las rentas del ahorro del año juntas. Si no escribes las otras (intereses, dividendos, otras ganancias), la cuota es la de una venta que fuera tu única renta del ahorro, y la real puede ser mayor. No se compensan pérdidas de otras operaciones.</li>
             <li><strong>Sin exención IRPF por vivienda habitual:</strong> Esta calculadora no aplica la exención por reinversión en vivienda habitual ni la exención para mayores de 65 años, ya que estas exenciones aplican a vivienda, no a garajes independientes.</li>
             <li><strong>Tipos fiscales pueden cambiar:</strong> Los tipos de ITP, AJD e IVA corresponden a la normativa vigente indicada en el aviso de fuentes al inicio de la página. Verifica con tu comunidad autónoma antes de tomar decisiones.</li>
           </ul>
