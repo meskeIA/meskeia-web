@@ -24,6 +24,13 @@
   color: var(--text-primary);
 }
 
+/* En oscuro servía el valor del claro como texto, por debajo de 4,5:1 (C0226).
+   Medido por píxel, también sobre el tinte de su propio color. */
+[data-theme='dark'] .container {
+  --success: #86EFAC;
+  --danger: #FCA5A5;
+}
+
 [data-theme='dark'] .container {
   --bg-primary: #1A1A1A;
   --bg-card: #2A2A2A;
@@ -141,8 +148,10 @@
 .prioridadMedia { background: #fef9e7; color: #E67E22; border: 1px solid #E67E22; }
 .prioridadBaja { background: #f0f7fb; color: var(--primary-texto); border: 1px solid #2E86AB; }
 
-[data-theme='dark'] .badgeAyuda { background: #1a3a1a; }
-[data-theme='dark'] .prioridadAlta { background: #3a1a1a; }
+/* El verde #27AE60 del claro daba 4,39:1 sobre #1a3a1a (C0226) */
+[data-theme='dark'] .badgeAyuda { background: #1a3a1a; color: #86EFAC; }
+/* El rojo #E74C3C del claro daba 4,09:1 sobre #3a1a1a (C0226) */
+[data-theme='dark'] .prioridadAlta { background: #3a1a1a; color: #FCA5A5; }
 [data-theme='dark'] .prioridadMedia { background: #3a2a1a; }
 [data-theme='dark'] .prioridadBaja { background: #1a2a33; }
 

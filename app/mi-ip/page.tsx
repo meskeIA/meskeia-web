@@ -213,11 +213,13 @@ export default function MiIpPage() {
 
   // Obtener velocidad efectiva legible
   const getEffectiveTypeLabel = (type: string) => {
+    // Rojo y verde por los tokens del módulo: en claro valen lo mismo que los literales de antes,
+    // y en oscuro tienen variante (el #28a745 daba 4,03:1 sobre la tarjeta oscura, C0226)
     const types: Record<string, { label: string; color: string }> = {
-      'slow-2g': { label: '2G Lento', color: '#dc3545' },
+      'slow-2g': { label: '2G Lento', color: 'var(--danger)' },
       '2g': { label: '2G', color: '#fd7e14' },
       '3g': { label: '3G', color: '#ffc107' },
-      '4g': { label: '4G/LTE', color: '#28a745' }
+      '4g': { label: '4G/LTE', color: 'var(--success)' }
     };
     return types[type] || { label: type, color: '#6c757d' };
   };

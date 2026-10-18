@@ -190,6 +190,7 @@ export function parsearCss(css) {
           const hijo = { selector, decls: [], linea: lineaDe(css, pos), contexto };
           bloques.push(hijo);
           i = cuerpo(i + 1, hijo, selector, contexto);
+          hijo.fin = i; // justo detrás de su `}`: ahí inserta el reparador de C0226
         }
         inicio = i;
         continue;
@@ -212,7 +213,8 @@ export function parsearCss(css) {
     const k = trozo.indexOf(':');
     if (k === -1) return;
     const prop = trozo.slice(0, k).trim().toLowerCase();
-    if (!/^-?[a-z][a-z-]*$/.test(prop)) return;
+    // Las propiedades personalizadas (`--danger`) también: las lee el censo de C0226
+    if (!/^-?[a-z][a-z-]*$/.test(prop) && !/^--[\w-]+$/.test(prop)) return;
     let desde = a + k + 1;
     let hasta = b;
     while (desde < hasta && /\s/.test(t[desde])) desde++;

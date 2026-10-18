@@ -22,6 +22,13 @@
   background: var(--bg-primary);
   color: var(--text-primary);
 }
+
+/* En oscuro servía el valor del claro como texto, por debajo de 4,5:1 (C0226).
+   Medido por píxel, también sobre el tinte de su propio color. */
+[data-theme='dark'] .container {
+  --success: #86EFAC;
+  --danger: #FCA5A5;
+}
 [data-theme='dark'] .container {
   --bg-primary: #1A1A1A;
   --bg-card: #2A2A2A;
@@ -112,6 +119,11 @@
   border-radius: var(--radius-large); padding: 1.5rem; text-align: center;
 }
 .resultHeroPositivo { background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%); color: white; }
+
+/* Con --success aclarado en oscuro, el blanco de encima se hundía: fondo oscuro propio (C0226) */
+[data-theme='dark'] .resultHeroPositivo {
+  background: #15803D;
+}
 .resultHeroNegativo { background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-primary); }
 
 .resultIcon { font-size: 2rem; margin-bottom: 0.5rem; }

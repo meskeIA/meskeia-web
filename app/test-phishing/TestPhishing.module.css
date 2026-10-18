@@ -24,6 +24,13 @@
   color: var(--text-primary);
 }
 
+/* En oscuro servía el valor del claro como texto, por debajo de 4,5:1 (C0226).
+   Medido por píxel, también sobre el tinte de su propio color. */
+[data-theme='dark'] .container {
+  --danger: #FCA5A5;
+  --success: #86EFAC;
+}
+
 [data-theme='dark'] .container {
   --bg-primary: #1A1A1A;
   --bg-card: #2A2A2A;
@@ -204,6 +211,11 @@
   color: #fff;
 }
 
+/* Con --danger aclarado en oscuro, el blanco de encima se hundía: fondo oscuro propio (C0226) */
+[data-theme='dark'] .btnPhishing:hover {
+  background: #B91C1C;
+}
+
 .btnLegit {
   border-color: var(--success);
   color: var(--success);
@@ -212,6 +224,11 @@
 .btnLegit:hover {
   background: var(--success);
   color: #fff;
+}
+
+/* Con --success aclarado en oscuro, el blanco de encima se hundía: fondo oscuro propio (C0226) */
+[data-theme='dark'] .btnLegit:hover {
+  background: #15803D;
 }
 
 .btnPhishing:focus-visible,

@@ -33,6 +33,12 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* En oscuro servía el valor del claro como texto, por debajo de 4,5:1 (C0226).
+   Medido por píxel, también sobre el tinte de su propio color. */
+[data-theme='dark'] .container {
+  --danger: #FCA5A5;
+}
+
 /* Dark Mode */
 [data-theme='dark'] .container {
   --bg-primary: #1A1A1A;
@@ -253,6 +259,11 @@
   font-size: 1rem;
   cursor: pointer;
   opacity: 0.7;
+}
+
+/* Con --danger aclarado en oscuro, el blanco de encima se hundía: fondo oscuro propio (C0226) */
+[data-theme='dark'] .btnEliminar {
+  background: #B91C1C;
 }
 
 .btnEliminar:hover {

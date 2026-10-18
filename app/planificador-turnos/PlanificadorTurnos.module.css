@@ -34,6 +34,12 @@
   color: var(--text-primary);
 }
 
+/* En oscuro servía el valor del claro como texto, por debajo de 4,5:1 (C0226).
+   Medido por píxel, también sobre el tinte de su propio color. */
+[data-theme='dark'] .container {
+  --danger: #FCA5A5;
+}
+
 /* Dark Mode */
 [data-theme='dark'] .container {
   --bg-primary: #1A1A1A;

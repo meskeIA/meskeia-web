@@ -29,6 +29,12 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* En oscuro servía el valor del claro como texto, por debajo de 4,5:1 (C0226).
+   Medido por píxel, también sobre el tinte de su propio color. */
+[data-theme='dark'] .layoutContainer {
+  --danger: #FCA5A5;
+}
+
 /* Dark Mode */
 [data-theme='dark'] .layoutContainer {
   --bg-primary: #1A1A1A;
