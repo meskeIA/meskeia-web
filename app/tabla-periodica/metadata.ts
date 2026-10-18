@@ -67,7 +67,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre período y grupo en la tabla periódica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los grupos son las columnas verticales (del 1 al 18) y agrupan elementos con propiedades químicas similares porque tienen el mismo número de electrones en su capa exterior. Los períodos son las filas horizontales (del 1 al 7) y agrupan elementos con el mismo número de capas electrónicas.',
+        text: 'Los grupos son las columnas verticales (del 1 al 18) y agrupan elementos con propiedades químicas similares porque su capa exterior se parece: en los grupos principales tienen el mismo número de electrones en ella, salvo el helio, que tiene 2 en un grupo 18 donde los demás tienen 8. En los metales de transición la regla se relaja: varios llevan un electrón s en vez de dos, y el paladio no tiene ninguno en la capa 5. Los períodos son las filas horizontales (del 1 al 7) y su número es el de la capa electrónica más alta ocupada, con una sola excepción entre los 118 elementos: el paladio, del período 5, con configuración [Kr] 4d¹⁰.',
       },
     },
     {

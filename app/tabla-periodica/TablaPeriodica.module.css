@@ -1092,28 +1092,17 @@
   }
 }
 
+/* Por debajo de 480 px la letra NO encoge (hallazgo 3365): .tablaPeriodica conserva
+   min-width: 900px, así que la casilla sigue midiendo 48 px, como a 600 px, y la tabla se
+   recorre en horizontal. Encoger las columnas a 28 px no hacía nada, y encoger la letra dejaba
+   el número atómico a 6,4 px en una casilla del mismo tamaño. */
 @media (max-width: 480px) {
   .tablaPeriodica {
-    grid-template-columns: repeat(18, minmax(28px, 1fr));
     gap: 1px;
   }
 
   .elemento {
-    min-width: 28px;
     border-radius: 3px;
-  }
-
-  .simbolo {
-    font-size: 0.7rem;
-  }
-
-  .numeroAtomico {
-    font-size: 0.4rem;
-  }
-
-  .indicadorSerie {
-    font-size: 0.5rem;
-    padding: 2px;
   }
 }
 

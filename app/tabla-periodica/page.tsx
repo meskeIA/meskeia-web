@@ -1088,7 +1088,7 @@ export default function TablaPerodicaPage() {
               <div className={styles.stepContent}>
                 <h3>Localizar el elemento</h3>
                 <p>
-                  Busca el número atómico Z. El período (fila) indica cuántas capas electrónicas tiene (período 3 → 3 capas). El grupo indica los electrones de valencia.
+                  Busca el número atómico Z. El período (fila) indica cuántas capas electrónicas tiene (período 3 → 3 capas), con una sola excepción: el paladio, del período 5, llena hasta la capa 4 ([Kr] 4d¹⁰). El grupo indica los electrones de valencia.
                 </p>
               </div>
             </div>

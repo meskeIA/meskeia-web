@@ -44,7 +44,8 @@ import { formatNumber, parseSpanishNumber } from '../../lib/formatters';
  * cuatro casos nuevos (19-22, el 22 en un móvil de 360 px) y cinco hallazgos de ese día
  * (A-E), escritos con `test.fail()` (los cabos C0056 y C0058 entre ellos). B (3362, el
  * wolframio) y C (3363, el margen de la masa) se REPARARON el 17/10/2026 y ya son regresión;
- * A (3361), D (3364) y E (3365) siguen ABIERTOS.
+ * D (3364, las excepciones de período y grupo) y E (3365, la letra a 360 px), el 18/10/2026.
+ * A (3361) sigue ABIERTO: decidir las cifras de Pm, Eu y Tb exige la fuente.
  *
  * RE-INSPECCIÓN 18/10/2026: al final del fichero. Verifica las dos reparaciones del 17/10
  * (26e2e846 y f6314c1f) con tres casos nuevos (23-25) y uno en un móvil de 390 px (26), y deja
@@ -2552,8 +2553,8 @@ test.describe('CASO 22 · móvil (Galaxy S8, 360 × 740): la tabla y la ficha co
     await expect(dialogo).toHaveCount(0);
   });
 
+  // REPARADO (hallazgo 3365, 18/10/2026): se retiró la regla de 480 px, que solo encogía la letra.
   test('HALLAZGO E (16/10/2026) · a 360 px el número atómico de la casilla baja a 6,4 px aunque la casilla no encoge', async ({ page }) => {
-    test.fail(true, 'ABIERTO (inspector 16/10/2026): .numeroAtomico a 0,4rem = 6,4 px en una casilla de 48 px');
     // La regla @media (max-width: 480px) intenta encoger las columnas a minmax(28px, 1fr), pero
     // .tablaPeriodica conserva min-width: 900px, así que la casilla sigue midiendo 48 px —lo
     // mismo que a 600 px, donde el número va a 0,5rem = 8 px—. Lo único que encoge es la letra:
@@ -2654,10 +2655,10 @@ test.describe('verificación 16/10/2026 · los commits posteriores a la inspecci
 // HALLAZGOS de la re-inspección del 16/10/2026 — con `test.fail()` los ABIERTOS
 // Cada uno afirma lo que DEBERÍA pasar; al repararlos se retira la marca y quedan como
 // regresión. El E, que necesita el viewport de 360 px, vive dentro del CASO 22.
-// Estado a 18/10/2026: A (3361), D (3364) y E (3365) ABIERTOS; B (3362) y C (3363) REPARADOS
-// el 17/10/2026 (26e2e846 y f6314c1f), sin marca: hoy son regresión.
+// Estado a 18/10/2026: A (3361) ABIERTO; B (3362) y C (3363) REPARADOS el 17/10/2026
+// (26e2e846 y f6314c1f), y D (3364) y E (3365) el 18/10/2026, sin marca: hoy son regresión.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('hallazgos · 16/10/2026 (A, D y E abiertos; B y C reparados)', () => {
+test.describe('hallazgos · 16/10/2026 (A abierto; B, C, D y E reparados)', () => {
   test('A · C0056 · el radón y el lawrencio llevan una electronegatividad que las fuentes de tendencias no dan', async ({ page }) => {
     test.fail(true, 'ABIERTO (inspector 16/10/2026): Rn 2,20 y Lr 1,30; tendencias los deja sin dato');
     // Fuente que el repositorio cita y ancla: cabecera de app/simulador-tabla-periodica-
@@ -2784,8 +2785,8 @@ test.describe('hallazgos · 16/10/2026 (A, D y E abiertos; B y C reparados)', ()
   // tolerancia» (la ficha muestra «63,546», que es lo que se copia). Con dos decimales
   // («63.55») el punto ya se lee como decimal y entra.
 
+  // REPARADO (hallazgo 3364, 18/10/2026): el FAQPage y el paso 1 nombran al helio y al paladio.
   test('D · el FAQPage da «grupo = mismos electrones en la capa exterior» y «período = número de capas» sin las excepciones de sus fichas', async ({ page }) => {
-    test.fail(true, 'ABIERTO (inspector 16/10/2026): regla sin excepción en el FAQPage y en el paso 1 de la guía');
     // Datos de la propia app (elementos-data.ts):
     //  · grupo 18: He 1s² (2 electrones en la capa exterior) y Ne [He] 2s² 2p⁶ (8). La guía
     //    visible ya nombra al helio como excepción en su paso 2 (hallazgo 850); el FAQPage no.
@@ -2807,6 +2808,9 @@ test.describe('hallazgos · 16/10/2026 (A, D y E abiertos; B y C reparados)', ()
     const texto = respuesta!.acceptedAnswer.text;
     if (/mismo número de electrones/.test(texto)) expect(texto).toMatch(/helio|excepci|salvo/i); // hoy: sin excepción
     if (/mismo número de capas/.test(texto)) expect(texto).toMatch(/paladio|excepci|salvo/i);
+    // Reparado: las dos reglas siguen enunciadas, y con su excepción con nombre.
+    expect(texto).toMatch(/mismo número de electrones[^.]*salvo el helio/);
+    expect(texto).toMatch(/capa electrónica más alta[^]*paladio/);
 
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const paso1 = (await page.locator('[class*="__stepItem"]').first().innerText()).replace(/\s+/g, ' ');
