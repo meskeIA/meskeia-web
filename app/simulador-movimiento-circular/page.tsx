@@ -643,8 +643,9 @@ export default function SimuladorMovimientoCircularPage() {
               <h4>Lavadora en centrifugado</h4>
               <p>
                 El tambor gira en MCNU al inicio (α &gt; 0) hasta alcanzar la velocidad nominal
-                (MCU). La aceleración centrípeta lanza el agua fuera de la ropa hacia los orificios
-                del tambor.
+                (MCU). La pared del tambor empuja la ropa hacia el centro: esa es la fuerza
+                centrípeta. En los orificios nada empuja el agua, así que sigue por la tangente y
+                sale del tambor.
               </p>
             </div>
           </div>
