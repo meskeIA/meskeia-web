@@ -202,26 +202,11 @@ export function desglosarCuotaBaseAhorro(base: number): TramoDesgloseAhorro[] {
 }
 
 // ─── Otros costes de compraventa ─────────────────────────────────────────────
-
-export const COSTES_COMPRAVENTA_2025 = {
-  notaria: {
-    estimacion:    0.3,   // % aproximado sobre el precio (orientativo)
-    minimo:        400,   // € mínimo aproximado
-    maximo:        2500,  // € máximo aproximado en operaciones estándar
-    nota: 'Los honorarios notariales están regulados por arancel. Varían según el precio de la operación.',
-  },
-  registro: {
-    estimacion:    0.2,   // % aproximado sobre el precio (orientativo)
-    minimo:        150,   // € mínimo aproximado
-    maximo:        1000,  // € máximo aproximado
-    nota: 'Los honorarios de registro están regulados por arancel.',
-  },
-  gestoria: {
-    estimacion:    0.15,  // % aproximado (orientativo)
-    rango: '300 € - 800 €',
-    nota: 'Opcional. Necesaria para inscripción hipotecaria.',
-  },
-};
+//
+// Aquí vivía COSTES_COMPRAVENTA_2025: notaría y registro como un 0,3 % y un 0,2 % del precio con
+// mínimo y máximo. Se retiró el 18/10/2026 (cabo C0209) al quedarse sin lectores: la notaría y el
+// registro se calculan con los aranceles (calcularNotario y calcularRegistro de data/itp-ccaa.ts),
+// y la estimación porcentual no llevaba la rebaja del 5 % del nº 2.1 ni el territorio sin IVA.
 
 // ─── Plusvalía Municipal (IIVTNU) ─────────────────────────────────────────────
 
