@@ -95,8 +95,12 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
     // Detectar si la visita viene referida desde una plataforma de IA o una red social.
     // Por DOMINIO, no por la URL entera: corte de instrumentación del 17/10/2026
     // (lib/clasificarReferrer.ts). El hostname es lo único que se guarda (RGPD).
+    // Sin referrer, el `utm_source` de la URL (ChatGPT marca así sus enlaces): corte del
+    // 18/10/2026, cabo C0282, en el mismo fichero.
     const referrer = document.referrer;
-    const { canal: canalReferrer, dominio: referrerHostname } = clasificarReferrer(referrer);
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmSource = urlParams.get('utm_source');
+    const { canal: canalReferrer, dominio: referrerHostname } = clasificarReferrer(referrer, utmSource);
     const esReferralIA = canalReferrer === 'ia';
     const esReferralSocial = canalReferrer === 'social';
 
@@ -143,7 +147,6 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
     let isActive = true;
 
     // Detectar si llegó por un enlace compartido (?ref=share)
-    const urlParams = new URLSearchParams(window.location.search);
     const refParam = urlParams.get('ref');
 
     // Detectar origen de navegación (from=related-{slug}, from=continua-{slug}, etc.)
@@ -176,6 +179,10 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
         if (referrerHostname) extras.referrer_ia = referrerHostname;
         if (refDominio) extras.ref_dominio = refDominio;
         if (fromParam) extras.from = fromParam.slice(0, 80);
+        // La etiqueta de campaña, cualquiera, y si el canal salió de ella y no del referrer:
+        // separa en la serie lo que ya se veía de lo que entra con el corte del 18/10/2026.
+        if (utmSource) extras.utm_source = utmSource.slice(0, 80);
+        if (!referrer && canalReferrer) extras.canal_por = 'utm';
         // Los que aporta quien monta el componente (hoy solo app/error.tsx). Van los
         // últimos a propósito: no deben poder pisar la atribución que el tracker deduce.
         if (extraSerializado) {

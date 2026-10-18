@@ -96,6 +96,35 @@ test.describe('clasificarReferrer — ni IA ni red social', () => {
   });
 });
 
+// Cabo C0282 (18/10/2026): ChatGPT marca sus enlaces con ?utm_source=chatgpt.com, y una visita
+// suya sin Referer entraba como `web`. Sin referrer, el utm_source de la URL decide; con
+// referrer, no se mira (en navegación interna la URL propia puede arrastrar la etiqueta).
+test.describe('clasificarReferrer — sin referrer, el utm_source', () => {
+  test('sin referrer y utm_source=chatgpt.com es IA (antes, web sin rastro)', () => {
+    expect(clasificarReferrer('', 'chatgpt.com')).toEqual({ canal: 'ia', dominio: 'chatgpt.com' });
+    expect(clasificarReferrer('')).toEqual({ canal: null, dominio: null });
+  });
+
+  test('se compara como dominio: mayúsculas, espacios y subdominios', () => {
+    expect(clasificarReferrer('', ' ChatGPT.com ')).toEqual({ canal: 'ia', dominio: 'chatgpt.com' });
+    expect(clasificarReferrer('', 'www.perplexity.ai')).toEqual({ canal: 'ia', dominio: 'www.perplexity.ai' });
+    expect(clasificarReferrer('', 'notchatgpt.com').canal).toBeNull();
+    expect(clasificarReferrer('', 'chatgpt').canal).toBeNull();
+  });
+
+  test('un utm_source que no es de IA no da canal (tampoco social: solo la lista de IA)', () => {
+    for (const utm of ['newsletter', 'facebook.com', 't.co', 'google']) {
+      expect(clasificarReferrer('', utm)).toEqual({ canal: null, dominio: null });
+    }
+  });
+
+  test('con referrer manda el referrer, aunque la URL traiga utm_source de IA', () => {
+    expect(clasificarReferrer('https://meskeia.com/otra-app/', 'chatgpt.com')).toEqual({ canal: null, dominio: null });
+    expect(clasificarReferrer('https://www.bing.com/', 'chatgpt.com')).toEqual({ canal: null, dominio: null });
+    expect(clasificarReferrer('https://gemini.google.com/app', 'chatgpt.com')).toEqual({ canal: 'ia', dominio: 'gemini.google.com' });
+  });
+});
+
 test.describe('la regla antigua fallaba en los casos reinyectados', () => {
   for (const referrer of NO_SON_CANAL) {
     test(`antes: ${referrer} contaba como canal`, () => {
