@@ -147,6 +147,8 @@ export interface EjercicioBusqueda {
   sinonimos: readonly string[];
   /** Igual que en las fichas: un recuento no admite el margen de redondeo de la masa. */
   respuestaEntera: boolean;
+  /** Igual que en las fichas: «u» en la masa, para admitir la respuesta escrita con su unidad. */
+  unidad?: string;
   pasos: readonly string[];
 }
 
@@ -510,6 +512,28 @@ export function decimalesEscritos(texto: string, valor: number): number {
 }
 
 /**
+ * Cómo se escribe en clase cada unidad de las fichas. «u» es la de la ficha; «uma» y «Da»
+ * (dalton) son la misma unidad con otro nombre. Ninguna lleva caracteres especiales de regex.
+ */
+const GRAFIAS_UNIDAD: Readonly<Record<string, readonly string[]>> = { u: ['uma', 'Da', 'u'] };
+
+/**
+ * La respuesta sin la unidad de la ficha al final (hallazgo 3374, 18/10/2026). La ficha del
+ * cobre escribe «Masa atómica: 63,546 u», y quien lo copiaba tal cual recibía «Todavía no.
+ * Vuelve a la tabla»: `parseSpanishNumber` da NaN en cuanto hay una letra. Solo se quita la
+ * unidad de ESA ficha: una letra cualquiera sigue sin ser un número.
+ */
+function sinUnidad(texto: string, unidad: string | undefined): string {
+  const limpio = texto.trim();
+  const grafias = unidad ? (GRAFIAS_UNIDAD[unidad] ?? [unidad]) : [];
+  for (const grafia of grafias) {
+    const alFinal = new RegExp(`\\s*${grafia}\\.?$`, 'i');
+    if (alFinal.test(limpio)) return limpio.replace(alFinal, '');
+  }
+  return limpio;
+}
+
+/**
  * Compara la respuesta del alumno con la esperada.
  *
  * Dos caminos, y cuál se toma lo decide la ficha, no la entrada: si la ficha declara
@@ -521,6 +545,7 @@ export function comprobarRespuesta(
   respuestaUsuario: string,
   caso: Pick<CasoTablaPeriodica, 'respuestaTexto' | 'respuestaNumerica' | 'sinonimos'> & {
     respuestaEntera?: boolean;
+    unidad?: string;
   },
 ): ComprobacionBusqueda {
   const escrita = normalizar(respuestaUsuario);
@@ -530,7 +555,8 @@ export function comprobarRespuesta(
     // `parseSpanishNumber` y no `Number` ni `parseFloat`: lo que llega aquí lo teclea un
     // alumno, así que puede venir con coma decimal («63,546»), con punto, o no ser un número
     // en absoluto. `parseFloat` se quedaría con el prefijo de «63abc» y lo daría por bueno.
-    const valor = parseSpanishNumber(respuestaUsuario);
+    const numerica = sinUnidad(respuestaUsuario, caso.unidad);
+    const valor = parseSpanishNumber(numerica);
     if (!Number.isFinite(valor)) return { correcto: false, motivo: 'fallo' };
     /**
      * ⚠️ 27/09/2026 (hallazgo 2284) — el número atómico es un RECUENTO de protones, y se le
@@ -544,7 +570,7 @@ export function comprobarRespuesta(
       caso.respuestaNumerica,
       caso.respuestaEntera === true
         ? { tolerancia: 0, magnitud: 'recuento' }
-        : { tolerancia: toleranciaDe(decimalesEscritos(respuestaUsuario, valor)), magnitud: 'real' },
+        : { tolerancia: toleranciaDe(decimalesEscritos(numerica, valor)), magnitud: 'real' },
     );
     const correcto = c.estado === 'acierto';
     return { correcto, motivo: correcto ? 'acierto' : 'fallo' };
@@ -878,6 +904,7 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioBusqueda {
     respuestaTexto: resultado.texto,
     sinonimos: [normalizar(resultado.texto)],
     respuestaEntera: PROPIEDADES_ENTERAS.has(propiedad),
+    unidad: propiedad === 'masa' ? 'u' : '',
     pasos: [
       `Usa el buscador y escribe «${elemento.nombre}» o su símbolo, ${elemento.simbolo}.`,
       'Abre su ficha y localiza el dato que se pide.',
@@ -904,5 +931,6 @@ export function comprobarEjercicio(
     respuestaNumerica: Number.isFinite(numero) ? numero : null,
     sinonimos: ejercicio.sinonimos,
     respuestaEntera: ejercicio.respuestaEntera,
+    unidad: ejercicio.unidad,
   });
 }
