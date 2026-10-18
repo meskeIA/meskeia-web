@@ -289,7 +289,31 @@ export function resumen(db) {
     porDestino,
     masAntiguo: antiguo ? { id: codigo(antiguo.id), fecha: antiguo.fecha, dias: diasDesde(antiguo.fecha), destino: antiguo.destino } : null,
     cerrados: db.prepare("SELECT count(*) AS n FROM cabos WHERE estado = 'cerrado'").get().n,
+    semana: semana(db),
   };
+}
+
+/**
+ * Cuántos entran y salen de cada bandeja en los últimos 7 días (18/10/2026). /parte leía el
+ * resumen como «la línea que permite ver si la entrada se vacía o solo crece», y una foto al día
+ * no lo dice: ese día el destino inspector llevaba 66 altas y 11 cierres en dos semanas y la
+ * única pista era el total. Entra lo VISTO en esos días (`fecha`) y sale lo cerrado en ellos,
+ * con el destino que tiene ahora. Solo los destinos que se movieron.
+ */
+function semana(db) {
+  const d = new Date();
+  d.setDate(d.getDate() - 7);
+  const desde = d.toISOString().slice(0, 10);
+  const cuenta = {};
+  const sumar = (destino, campo) => {
+    const clave = destino ?? 'sin clasificar';
+    cuenta[clave] ??= { entran: 0, salen: 0 };
+    cuenta[clave][campo] += 1;
+  };
+  for (const c of db.prepare('SELECT destino FROM cabos WHERE fecha > ?').all(desde)) sumar(c.destino, 'entran');
+  for (const c of db.prepare("SELECT destino FROM cabos WHERE estado = 'cerrado' AND substr(cerrado, 1, 10) > ?").all(desde)) sumar(c.destino, 'salen');
+  const orden = [...Object.keys(DESTINOS), 'sin clasificar'];
+  return Object.fromEntries(orden.filter((k) => cuenta[k]).map((k) => [k, cuenta[k]]));
 }
 
 // ── presentación ────────────────────────────────────────────────────────────
@@ -313,6 +337,8 @@ function pintarResumen(r) {
   const lineas = [`Cabos abiertos: ${r.abiertos} · sin clasificar: ${r.sinClasificar}${destinos ? ` · ${destinos}` : ''}`];
   const m = r.masAntiguo;
   lineas.push(`  el más antiguo: ${m.id}, del ${fechaES(m.fecha)} (hace ${m.dias} ${m.dias === 1 ? 'día' : 'días'}) · ${m.destino ?? 'sin clasificar'}`);
+  const mov = Object.entries(r.semana ?? {}).map(([d, s]) => `${d} ${s.entran} → ${s.salen}`);
+  if (mov.length) lineas.push(`  en 7 días (entran → salen): ${mov.join(' · ')}`);
   return lineas.join('\n');
 }
 

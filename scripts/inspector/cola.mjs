@@ -21,9 +21,24 @@
  *                       tocar su código —una cabecera, un navegador nuevo— y que por eso
  *                       nunca la invalidaría. Sale de la cola al volver a inspeccionarla.
  *   3. INVALIDADA     — cambió su código o un dato de `data/fiscal` del que depende
- *                       DESPUÉS de inspeccionarla. Lo que rompe una app es un cambio,
+ *      O CON CABO       DESPUÉS de inspeccionarla. Lo que rompe una app es un cambio,
  *                       no el paso del tiempo: por eso la cola no va por calendario.
+ *                       En el mismo tramo, y por la misma prioridad, las apps que nombra un
+ *                       cabo abierto de destino `inspector` (una sospecha sin caso que dejó
+ *                       otra sesión). Ver «LOS CABOS COMPITEN», abajo.
  *   4. NUNCA VISTA    — por prioridad (uso real × riesgo), no por orden alfabético.
+ *
+ * LOS CABOS COMPITEN POR SU PRIORIDAD (18/10/2026)
+ * ────────────────────────────────────────────────
+ * Hasta ese día la cola no leía los cabos: la skill mandaba meter sus apps «detrás de las
+ * FIRMA e INVALIDADA» y lo hacía Claude a mano. Con 146 INVALIDADAS y 5 apps por tanda, ese
+ * bloque no se alcanzaba nunca y la bandeja crecía 6:1. La cola larga debía esperar (mediana
+ * de 17 usos, frente a 111 en las INVALIDADAS); lo malo eran las excepciones: `lupa-digital`
+ * (4.310 usos) y `conversor-braille` (3.714) esperaban detrás de 146 apps de menos uso.
+ * Decidido por el usuario: compiten en el tramo 3 por la prioridad de siempre, sin bonificación.
+ * Un cabo cuenta para una app si su sujeto ES el slug, si lo NOMBRA (`simulador-regresion/
+ * page.tsx:444`, «a y b») o si es `familia:<id>` de una familia declarada. Prueba:
+ * `npm run inspector:probar-cola-cabos`.
  *
  * LAS FAMILIAS SALEN JUNTAS
  * ─────────────────────────
@@ -41,8 +56,11 @@
  * esfuerzo al 20 % del uso. Con 114 apps se cubre el 80 % de lo que la gente toca.
  */
 
+import fs from 'node:fs';
+import { DatabaseSync } from 'node:sqlite';
 import { abrir, SQL_INVALIDADA } from './db.mjs';
 import { FAMILIAS, familiaDe, slugsHuerfanos } from './familias.mjs';
+import { RUTA_BASE as RUTA_CABOS, codigo } from '../cabos/cabos.mjs';
 
 const args = process.argv.slice(2);
 const RESUMEN = args.includes('--resumen');
@@ -53,6 +71,37 @@ const JSON_SALIDA = args.includes('--json');
 const log = JSON_SALIDA ? () => {} : console.log;
 
 const db = abrir();
+
+/**
+ * slug → códigos de sus cabos abiertos de destino `inspector`. Solo lectura: la base de cabos
+ * se abre aparte y no se crea si no existe (una máquina sin `_private/` sigue teniendo cola).
+ */
+function cabosPorApp() {
+  const ruta = process.env.CABOS_DB || RUTA_CABOS;
+  const mapa = new Map();
+  if (!fs.existsSync(ruta)) return mapa;
+  const cabos = new DatabaseSync(ruta, { readOnly: true });
+  try {
+    const slugs = new Set(db.prepare('SELECT slug FROM apps').all().map((a) => a.slug));
+    const filas = cabos.prepare("SELECT id, sujeto FROM cabos WHERE estado = 'abierto' AND destino = 'inspector' ORDER BY id").all();
+    for (const c of filas) {
+      const sujeto = c.sujeto.trim();
+      const fam = sujeto.startsWith('familia:') ? FAMILIAS.find((f) => f.id === sujeto.slice('familia:'.length).trim()) : null;
+      const nombra = fam ? fam.slugs : slugs.has(sujeto) ? [sujeto] : sujeto.split(/[^a-z0-9-]+/).filter((t) => slugs.has(t));
+      for (const s of new Set(nombra)) {
+        if (!mapa.has(s)) mapa.set(s, []);
+        mapa.get(s).push(codigo(c.id));
+      }
+    }
+  } finally {
+    cabos.close();
+  }
+  return mapa;
+}
+
+const CABOS = cabosPorApp();
+// Los slugs son [a-z0-9-] (los da la propia base): se pueden escribir en el SQL sin escapar
+const SQL_CABO = `slug IN (${[...CABOS.keys()].filter((s) => /^[a-z0-9-]+$/.test(s)).map((s) => `'${s}'`).join(', ') || "''"})`;
 
 /**
  * Prioridad = uso real + riesgo + sospecha de estar rota.
@@ -97,13 +146,17 @@ const COLAS = [
   },
   {
     clave: 'INVALIDADA',
-    titulo: 'Invalidada — su código o sus datos han cambiado desde la inspección',
-    sql: `SELECT *, ${PRIORIDAD} AS p FROM apps WHERE ${SQL_INVALIDADA} ORDER BY p DESC`,
+    titulo: 'Invalidada o con cabo — su código o sus datos han cambiado desde la inspección, o una sesión dejó una sospecha sobre ella',
+    // Las de cabo que ya salen arriba (rojo o firma) no se repiten aquí
+    sql: `SELECT *, ${PRIORIDAD} AS p FROM apps
+          WHERE (${SQL_INVALIDADA})
+             OR (${SQL_CABO} AND COALESCE(test_estado, '') <> 'rojo' AND NOT (${SQL_FIRMA_NUEVA}))
+          ORDER BY p DESC`,
   },
   {
     clave: 'NUEVA',
     titulo: 'Nunca inspeccionada — por uso real y riesgo',
-    sql: `SELECT *, ${PRIORIDAD} AS p FROM apps WHERE ultima_inspeccion IS NULL ORDER BY p DESC`,
+    sql: `SELECT *, ${PRIORIDAD} AS p FROM apps WHERE ultima_inspeccion IS NULL AND NOT (${SQL_CABO}) ORDER BY p DESC`,
   },
 ];
 
@@ -119,11 +172,19 @@ if (RESUMEN) {
   log(`  hallazgos abiertos: ${abiertos}`);
   for (const c of COLAS) {
     const n = db.prepare(c.sql.replace('SELECT *,', 'SELECT COUNT(*) AS n,').replace(/ORDER BY p DESC/, '')).get()?.n ?? 0;
-    log(`  cola ${c.clave.padEnd(11)} ${n}`);
+    if (c.clave !== 'INVALIDADA') {
+      log(`  cola ${c.clave.padEnd(11)} ${n}`);
+      continue;
+    }
+    // El tramo 3 mezcla dos poblaciones: que la cifra de INVALIDADAS siga diciendo solo eso
+    const inv = db.prepare(`SELECT COUNT(*) AS n FROM apps WHERE ${SQL_INVALIDADA}`).get().n;
+    log(`  cola ${c.clave.padEnd(11)} ${inv}${n > inv ? `  (+ ${n - inv} que entran por un cabo)` : ''}`);
   }
   // Cobertura del uso: la cifra que de verdad dice cuánto se ha protegido
   const total = db.prepare('SELECT SUM(usos) s FROM apps').get().s || 1;
   const cubierto = db.prepare('SELECT SUM(usos) s FROM apps WHERE ultima_inspeccion IS NOT NULL').get().s || 0;
+  const nCabos = [...CABOS.values()].reduce((s, l) => s + l.length, 0);
+  log(`  con cabo del Inspector: ${CABOS.size} apps (${nCabos} cabos; compiten en el tramo 3 por su prioridad)`);
   log(`\n  uso del catálogo ya inspeccionado: ${(100 * cubierto / total).toFixed(1)} %`);
   log(`  (es la cifra que importa, no el % de apps: el 80 % del uso está en 114 apps)`);
 
@@ -132,7 +193,7 @@ if (RESUMEN) {
   for (const f of FAMILIAS) {
     const pend = f.slugs.filter((s) => {
       const r = db.prepare(
-        `SELECT 1 x FROM apps WHERE slug = ? AND (test_estado = 'rojo' OR ${SQL_INVALIDADA} OR ultima_inspeccion IS NULL)`,
+        `SELECT 1 x FROM apps WHERE slug = ? AND (test_estado = 'rojo' OR ${SQL_INVALIDADA} OR ultima_inspeccion IS NULL OR ${SQL_CABO})`,
       ).get(s);
       return !!r;
     }).length;
@@ -152,6 +213,7 @@ function linea(f, sangria = '  ') {
     `${sangria}${String(Math.round(f.p)).padStart(3)}  ${f.slug.padEnd(44)} ` +
     `${f.segmento.padEnd(11)} riesgo ${f.riesgo}  ${String(f.usos).padStart(5)} usos` +
     (deps.length ? `  [${deps.length} dep]` : '') +
+    (CABOS.has(f.slug) ? `  · cabo ${CABOS.get(f.slug).join(', ')}` : '') +
     (f.firma ? `\n${sangria}     ⚠ firma de rotura (${f.firma}): ${f.firma_detalle}` : '')
   );
 }
@@ -164,6 +226,7 @@ const SQL_ESTADO = db.prepare(`
               WHEN ${SQL_FIRMA_NUEVA} AND NOT (${SQL_INVALIDADA}) THEN 'FIRMA'
               WHEN ${SQL_INVALIDADA} THEN 'INVALIDADA'
               WHEN ultima_inspeccion IS NULL THEN 'NUEVA'
+              WHEN ${SQL_CABO} THEN 'CABO'
               ELSE 'al día' END AS estado
   FROM apps WHERE slug = ?`);
 

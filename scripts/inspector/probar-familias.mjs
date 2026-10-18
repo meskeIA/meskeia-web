@@ -55,7 +55,9 @@ function baseDesechable(nombre) {
 function correrCola(ruta, args = ['12']) {
   return execFileSync('node', [COLA, ...args], {
     encoding: 'utf8',
-    env: { ...process.env, INSPECTOR_DB: ruta },
+    // Sin cabos: desde el 18/10/2026 los de destino `inspector` meten apps en la cola, y los
+    // reales sacarían apps que esta prueba no ha invalidado (CABOS_DB a una base que no existe)
+    env: { ...process.env, INSPECTOR_DB: ruta, CABOS_DB: path.join(os.tmpdir(), `cabos-inexistente-${Date.now()}.db`) },
     maxBuffer: 16 * 1024 * 1024,
   });
 }

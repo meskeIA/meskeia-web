@@ -126,6 +126,28 @@ console.log('\nCerrar');
   });
 }
 
+console.log('\nEntran y salen en 7 días (18/10/2026)');
+// Caso de origen: /parte leía el resumen como «la línea que permite ver si la entrada se vacía
+// o solo crece», y una foto al día no lo dice. Medido ese día: el destino inspector, 66 altas
+// y 11 cierres en dos semanas, con la cifra total como única pista.
+{
+  const db = nueva('semana');
+  const haceDias = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); };
+  alta(db, { sujeto: 'a', texto: 't', origen: 'o', destino: 'inspector', fecha: haceDias(1) });
+  alta(db, { sujeto: 'b', texto: 't', origen: 'o', destino: 'inspector', fecha: haceDias(3) });
+  alta(db, { sujeto: 'c', texto: 't', origen: 'o', destino: 'inspector', fecha: haceDias(30) });
+  alta(db, { sujeto: 'd', texto: 't', origen: 'o', destino: 'reparar', fecha: haceDias(20) });
+  cerrar(db, 4, { como: 'resuelto', motivo: 'm' });
+  caso('cuenta por destino lo visto en los últimos 7 días y lo cerrado en ellos', () => {
+    igual(resumen(db).semana, { inspector: { entran: 2, salen: 0 }, reparar: { entran: 0, salen: 1 } }, 'semana');
+  });
+  caso('el resumen impreso lo dice en una línea', () => {
+    const env = { ...process.env, CABOS_DB: path.join(TMP, 'semana.db') };
+    const salida = execFileSync(process.execPath, [path.join(RAIZ, 'scripts', 'cabos', 'cabos.mjs'), 'resumen'], { env, encoding: 'utf8' });
+    if (!/en 7 días \(entran → salen\): inspector 2 → 0 · reparar 0 → 1/.test(salida)) throw new Error(`no lo dice: «${salida.trim()}»`);
+  });
+}
+
 console.log('\nNúmeros de cabo');
 caso('C0012, c12 y 12 son el mismo', () => igual([leerId('C0012'), leerId('c12'), leerId('12')], [12, 12, 12], 'ids'));
 caso('un texto cualquiera no es un número', () => falla(() => leerId('doce'), 'no es un número'));
