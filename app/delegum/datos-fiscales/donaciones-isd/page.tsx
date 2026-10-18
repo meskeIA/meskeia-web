@@ -11,7 +11,7 @@ import {
   FISCAL_DONACIONES_META,
   type BonificacionGrupoID,
 } from '@/data/fiscal';
-import { formatCurrency, formatDate } from '@/lib';
+import { formatCurrency, formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -52,7 +52,7 @@ export default function DonacionesIsdPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_DONACIONES_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_DONACIONES_META.verificado));
     } catch {
       return FISCAL_DONACIONES_META.verificado;
     }

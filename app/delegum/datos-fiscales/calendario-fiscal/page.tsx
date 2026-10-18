@@ -6,7 +6,7 @@ import AnalyticsTracker from '@/components/AnalyticsTracker';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { getModelosCalendario, FISCAL_CALENDARIO_META, type ModeloFiscal } from '@/data/fiscal';
-import { formatDate } from '@/lib';
+import { formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -51,7 +51,7 @@ export default function CalendarioFiscalPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_CALENDARIO_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_CALENDARIO_META.verificado));
     } catch {
       return FISCAL_CALENDARIO_META.verificado;
     }

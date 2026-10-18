@@ -6,7 +6,7 @@ import AnalyticsTracker from '@/components/AnalyticsTracker';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { SMI_2026, SMI_2025, FISCAL_SMI_META } from '@/data/fiscal';
-import { formatCurrency, formatDate } from '@/lib';
+import { formatCurrency, formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -18,7 +18,7 @@ export default function SmiPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_SMI_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_SMI_META.verificado));
     } catch {
       return FISCAL_SMI_META.verificado;
     }

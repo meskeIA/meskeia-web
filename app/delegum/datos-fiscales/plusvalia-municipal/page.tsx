@@ -6,7 +6,7 @@ import AnalyticsTracker from '@/components/AnalyticsTracker';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { COEFICIENTES_IIVTNU_2025, PLUSVALIA_MUNICIPAL_META } from '@/data/fiscal';
-import { formatDate } from '@/lib';
+import { formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -23,7 +23,7 @@ export default function PlusvaliaMunicipalPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(PLUSVALIA_MUNICIPAL_META.verificado));
+      return formatDate(parseISODateLocal(PLUSVALIA_MUNICIPAL_META.verificado));
     } catch {
       return PLUSVALIA_MUNICIPAL_META.verificado;
     }

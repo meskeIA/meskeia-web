@@ -125,7 +125,7 @@ const SECCION_PROFESIONAL = SECCIONES_IAE.find((s) => s.seccion === '2ª')!;
  * fichero la seguía tecleando a mano en el JSON-LD que citan los asistentes de IA. Una sola
  * derivación para las dos bocas de la app.
  */
-import { NORMA_IAE } from './metadata';
+import { NORMA_IAE, APLICACION_CNAE, VIGENCIA_CNAE } from './metadata';
 
 const EJEMPLOS_CNAE: string[] = [
   'hago páginas web',
@@ -972,8 +972,8 @@ export default function ConversorCnaeIaePage() {
           {/* La fecha sale de CNAE_VIGENCIA.desde, como en el aviso, la introducción y la FAQ
               (hallazgo 2228): tecleada, coincidía con el módulo por casualidad. */}
           Dos catálogos completos y literales para localizar tu actividad: la{' '}
-          {CNAE_VIGENCIA.vigente} del INE (la que sustituyó a la {CNAE_VIGENCIA.anterior} el{' '}
-          {formatFechaLarga(CNAE_VIGENCIA.desde)}) y las Tarifas del Impuesto sobre
+          {CNAE_VIGENCIA.vigente} del INE (sucesora de la {CNAE_VIGENCIA.anterior}, en vigor desde
+          el {formatFechaLarga(CNAE_VIGENCIA.desde)}) y las Tarifas del Impuesto sobre
           Actividades Económicas. Búsqueda por palabras corrientes, por código y también por
           códigos antiguos de la CNAE-2009.
         </p>
@@ -1003,8 +1003,9 @@ export default function ConversorCnaeIaePage() {
             verificado={FISCAL_CNAE_IAE_META.verificado}
             urlOficial={meta.cnae.urlOficial}
             // La nota sale de CNAE_VIGENCIA y no de `meta.cnae.nota`, que la escribía el
-            // generador con la fecha tecleada, y caducada (hallazgo 2924)
-            nota={`La ${CNAE_VIGENCIA.vigente} sustituye a la ${CNAE_VIGENCIA.anterior} y rige desde el ${formatFechaLarga(CNAE_VIGENCIA.desde)} (${CNAE_VIGENCIA.normaVigente}). La correspondencia entre ambas es la tabla oficial del INE.`}
+            // generador con la fecha tecleada, y caducada (hallazgo 2924). Y lleva las fechas de
+            // APLICACIÓN, que la entrada en vigor no dice (hallazgo 3336).
+            nota={`La ${CNAE_VIGENCIA.vigente} rige desde el ${formatFechaLarga(CNAE_VIGENCIA.desde)} (${CNAE_VIGENCIA.normaVigente}) y se aplica de forma escalonada: ${APLICACION_CNAE}`}
           />
           <DataReference
             normativa="Tarifas del IAE"
@@ -1506,8 +1507,9 @@ export default function ConversorCnaeIaePage() {
           </p>
           <p className={styles.introText}>
             La CNAE vigente es la <strong>{CNAE_VIGENCIA.vigente}</strong>, aprobada por el{' '}
-            {CNAE_VIGENCIA.normaVigente}, que sustituye a la {CNAE_VIGENCIA.anterior} desde{' '}
-            {formatDate(parseISODateLocal(CNAE_VIGENCIA.desde))}. Muchos formularios, escrituras y
+            {CNAE_VIGENCIA.normaVigente} y en vigor desde el{' '}
+            {formatDate(parseISODateLocal(CNAE_VIGENCIA.desde))}; la {CNAE_VIGENCIA.anterior} no se
+            ha derogado y las dos conviven mientras se aplica la nueva. Muchos formularios, escrituras y
             contratos anteriores siguen citando códigos de la CNAE-2009: por eso este buscador los
             reconoce y muestra a qué clase equivalen hoy. Las Tarifas del IAE, en cambio, siguen
             siendo las de 1990 con sus modificaciones posteriores, y su lenguaje refleja esa fecha.
@@ -1661,9 +1663,7 @@ export default function ConversorCnaeIaePage() {
             <div className={styles.faqItem}>
               <h4>¿Desde cuándo rige la CNAE-2025 y qué pasa con mi código antiguo?</h4>
               <p>
-                La {CNAE_VIGENCIA.vigente} fue aprobada por el {CNAE_VIGENCIA.normaVigente} y se aplica
-                desde el {formatDate(parseISODateLocal(CNAE_VIGENCIA.desde))}, en
-                sustitución de la {CNAE_VIGENCIA.anterior}. Los códigos antiguos siguen apareciendo en documentos
+                {VIGENCIA_CNAE} Los códigos antiguos siguen apareciendo en documentos
                 previos; para saber a qué corresponden hoy basta con escribir los cuatro dígitos en
                 el buscador de esta página. En muchos casos la equivalencia es uno a uno, pero
                 algunas clases se han dividido o fusionado.
@@ -1850,10 +1850,11 @@ export default function ConversorCnaeIaePage() {
               </li>
               <li>
                 <strong>
-                  Usar un código de la {CNAE_VIGENCIA.anterior} como si siguiera vigente.
+                  Usar un código de la {CNAE_VIGENCIA.anterior} como si fuera el actual.
                 </strong>{' '}
-                Desde el {formatFechaLarga(CNAE_VIGENCIA.desde)} la clasificación aplicable es la{' '}
-                {CNAE_VIGENCIA.vigente}, y algunas clases antiguas se han dividido en varias nuevas.
+                La {CNAE_VIGENCIA.vigente} está en vigor desde el {formatFechaLarga(CNAE_VIGENCIA.desde)} y
+                los registros públicos se van recodificando con ella; algunas clases antiguas se han
+                dividido en varias nuevas, así que el código viejo no siempre dice cuál te toca.
               </li>
             </ul>
           </div>

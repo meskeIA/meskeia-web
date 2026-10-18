@@ -15,7 +15,7 @@ import {
   FISCAL_PATRIMONIO_META,
   type CCAAPatrimonio,
 } from '@/data/fiscal';
-import { formatCurrency, formatDate } from '@/lib';
+import { formatCurrency, formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -61,7 +61,7 @@ export default function ImpuestoPatrimonioPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_PATRIMONIO_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_PATRIMONIO_META.verificado));
     } catch {
       return FISCAL_PATRIMONIO_META.verificado;
     }

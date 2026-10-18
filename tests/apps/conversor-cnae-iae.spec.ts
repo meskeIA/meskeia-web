@@ -4247,10 +4247,11 @@ test.describe('Inspector 16/10/2026 — la fecha de la CNAE-2025 vista desde Am�
     await expect(avisoAntiguo(page)).not.toContainText('15/01/2025');
   });
 
-  test('ABIERTO · BAJO (dato) — la ficha de Delegum pinta la vigencia de la CNAE-2025 y el sello un día antes al oeste de Greenwich', async ({
+  // REPARADO (hallazgo 3337, 18/10/2026): las fichas de Delegum (las 20, con NovedadesFicha y el
+  // índice) leen las fechas ISO con parseISODateLocal.
+  test('REPARADO 3337 · BAJO (dato) — la ficha de Delegum pinta la vigencia de la CNAE-2025 y el sello un día antes al oeste de Greenwich', async ({
     page,
   }) => {
-    test.fail();
     // app/delegum/datos-fiscales/cnae-iae/page.tsx calcula `fechaCnae` y `fechaVerificacion` con
     // formatDate(new Date(ISO)): medianoche UTC, que en México es el día anterior. Es el gotcha
     // del hallazgo 482, reparado en el conversor y en DataReference con parseISODateLocal, que
@@ -4265,14 +4266,22 @@ test.describe('Inspector 16/10/2026 — la fecha de la CNAE-2025 vista desde Am�
     const celda = page.locator('td', { hasText: 'Operativa desde' }).first();
     await expect(celda).toContainText('16/01/2025', { timeout: 2000 });
     await expect(page.getByText('Verificado el 14/09/2026').first()).toBeVisible({ timeout: 2000 });
+    // Y las novedades de la ficha, que comparten las 20 fichas: la del 11/10/2026 no baja al 10/10.
+    // (novedades.ts trae una de cnae-iae fechada '2026-10-11')
+    const fechas = await page
+      .getByRole('region', { name: 'Últimas novedades de esta ficha' })
+      .locator('time')
+      .evaluateAll((ts) => ts.map((t) => [t.getAttribute('datetime') ?? '', t.textContent ?? '']));
+    expect(fechas).toContainEqual(['2026-10-11', '11/10/2026']);
+    for (const [iso, texto] of fechas) expect(texto).toBe(iso.split('-').reverse().join('/'));
   });
 });
 
-test.describe('Inspector 16/10/2026 — hallazgos ABIERTOS', () => {
-  test('ABIERTO · BAJO (dato) — la entrada en vigor del RD 10/2025 se presenta como fecha de APLICACIÓN de la CNAE-2025 y de SUSTITUCIÓN de la CNAE-2009', async ({
+test.describe('Inspector 16/10/2026 — hallazgos REPARADOS el 18/10/2026', () => {
+  // REPARADO (hallazgo 3336, 18/10/2026): VIGENCIA_CNAE y APLICACION_CNAE de metadata.ts.
+  test('REPARADO 3336 · BAJO (dato) — la entrada en vigor del RD 10/2025 se presenta como fecha de APLICACIÓN de la CNAE-2025 y de SUSTITUCIÓN de la CNAE-2009', async ({
     page,
   }) => {
-    test.fail();
     // CNAE_VIGENCIA.desde es la ENTRADA EN VIGOR del RD 10/2025 (DF 2.ª: 16/01/2025), y el propio
     // módulo lo advierte: «no hay UNA fecha de sustitución, y el preámbulo dice expresamente que
     // no deroga la CNAE-2009». Su `nota` lleva las fechas de aplicación: «se aplica a las
@@ -4302,9 +4311,16 @@ test.describe('Inspector 16/10/2026 — hallazgos ABIERTOS', () => {
         faq: [...document.querySelectorAll('[class*="faqItem"]')]
           .map((d) => limpio(d.textContent))
           .find((t) => t.includes('Desde cuándo rige')) ?? '',
+        // El rótulo era «como si siguiera vigente»: la CNAE-2009 no está derogada, así que hoy
+        // dice «como si fuera el actual».
         errores: [...document.querySelectorAll('[class*="warningList"] li')]
           .map((li) => limpio(li.textContent))
-          .find((t) => t.includes('como si siguiera vigente')) ?? '',
+          .find((t) => t.includes('Usar un código de la CNAE-2009')) ?? '',
+        sello: limpio(
+          [...document.querySelectorAll('p, div, span')]
+            .map((e) => e.textContent ?? '')
+            .find((t) => t.includes('rige desde el 16 de enero de 2025') && t.length < 600) ?? '',
+        ),
       };
     });
     const ldJson = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
@@ -4312,5 +4328,15 @@ test.describe('Inspector 16/10/2026 — hallazgos ABIERTOS', () => {
     expect(ldJson).not.toContain('sustituye a la CNAE-2009 desde el 16/01/2025');
     expect(textos.hero).not.toContain('sustituyó a la CNAE-2009 el 16 de enero de 2025');
     expect(textos.errores).not.toContain('Desde el 16 de enero de 2025 la clasificación aplicable es la CNAE-2025');
+    // Lo que dicen ahora: entrada en vigor, y la aplicación con las fechas de CNAE_VIGENCIA.nota.
+    expect(textos.hero).toContain('en vigor desde el 16 de enero de 2025');
+    expect(textos.errores).toContain('está en vigor desde el 16 de enero de 2025');
+    for (const [boca, texto] of [['FAQ visible', textos.faq], ['FAQPage', ldJson], ['sello', textos.sello]] as const) {
+      expect(texto, boca).toContain('desde el 01/01/2025');
+      expect(texto, boca).toContain('antes del 30/06/2025');
+      expect(texto, boca).toContain('antes del 01/01/2027');
+    }
+    expect(textos.faq).toContain('está en vigor desde el 16/01/2025, pero se aplica de forma escalonada');
+    expect(ldJson).toContain('no deroga la CNAE-2009');
   });
 });

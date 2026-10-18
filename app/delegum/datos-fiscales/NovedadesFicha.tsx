@@ -1,5 +1,5 @@
 import { getNovedades } from './novedades';
-import { formatDate } from '@/lib';
+import { formatDate, parseISODateLocal } from '@/lib';
 import styles from './Ficha.module.css';
 
 /**
@@ -23,7 +23,7 @@ export default function NovedadesFicha({ slug }: { slug: string }) {
         {novedades.map((n) => {
           let fecha = n.fecha;
           try {
-            fecha = formatDate(new Date(n.fecha));
+            fecha = formatDate(parseISODateLocal(n.fecha));
           } catch {
             /* se mantiene el valor ISO si la fecha no es válida */
           }

@@ -6,7 +6,7 @@ import AnalyticsTracker from '@/components/AnalyticsTracker';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { TIPOS_ITP_CCAA_2025, FISCAL_INMUEBLES_META } from '@/data/fiscal';
-import { formatDate } from '@/lib';
+import { formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from './ItpCcaa.module.css';
@@ -21,7 +21,7 @@ export default function ItpCcaaPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_INMUEBLES_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_INMUEBLES_META.verificado));
     } catch {
       return FISCAL_INMUEBLES_META.verificado;
     }

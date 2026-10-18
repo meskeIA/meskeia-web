@@ -33,6 +33,21 @@ export const NORMA_IAE: string = (() => {
 })();
 
 /**
+ * ENTRADA EN VIGOR no es APLICACIÓN (hallazgo 3336). `CNAE_VIGENCIA.desde` es la entrada en vigor
+ * del RD 10/2025 (DF 2.ª), y la página la presentaba como fecha de aplicación y de sustitución:
+ * «se aplica desde el 16/01/2025, en sustitución de la CNAE-2009». El propio módulo advierte que
+ * no hay UNA fecha de sustitución y que el preámbulo no deroga la CNAE-2009; las fechas de
+ * aplicación van en su `nota`. Aquí se leen de ella, sin su arranque («La CNAE-2025 sustituye a
+ * la CNAE-2009: »), y la FAQ visible, el FAQPage y el sello las publican con la MISMA frase.
+ */
+export const APLICACION_CNAE: string = CNAE_VIGENCIA.nota.replace(/^[^:]*:\s*/, '');
+export const VIGENCIA_CNAE: string =
+  `La ${CNAE_VIGENCIA.vigente} fue aprobada por el ${CNAE_VIGENCIA.normaVigente} y está en vigor ` +
+  `desde el ${formatearFecha(CNAE_VIGENCIA.desde)}, pero se aplica de forma escalonada: ` +
+  `${APLICACION_CNAE} El real decreto no deroga la ${CNAE_VIGENCIA.anterior}: durante la ` +
+  `transición conviven las dos.`;
+
+/**
  * Los tipos y el umbral se LEEN de data/fiscal, no se teclean.
  *
  * `page.tsx` ya los importa desde el 27/08 (hallazgo 425), pero el JSON-LD se quedó fuera de
@@ -146,7 +161,8 @@ export const faqJsonLd = {
         // La norma y la fecha de entrada en vigor salen de CNAE_VIGENCIA, como ya salían en
         // jsonLd.description: aquí iban tecleadas y coincidían con el módulo por casualidad,
         // no por construcción (hallazgo 843, residuo simétrico del 681).
-        text: `La ${CNAE_VIGENCIA.vigente} fue aprobada por el ${CNAE_VIGENCIA.normaVigente} y sustituye a la ${CNAE_VIGENCIA.anterior} desde el ${formatearFecha(CNAE_VIGENCIA.desde)}. Los códigos antiguos de cuatro dígitos siguen apareciendo en documentos anteriores; la tabla de correspondencia oficial del INE permite saber a qué clase o clases de la ${CNAE_VIGENCIA.vigente} equivalen. En muchos casos la equivalencia es uno a uno, pero algunas clases antiguas se han dividido entre varias nuevas y hay que leer los literales para elegir.`,
+        // Y la diferencia entre entrada en vigor y aplicación, de VIGENCIA_CNAE (hallazgo 3336).
+        text: `${VIGENCIA_CNAE} Los códigos antiguos de cuatro dígitos siguen apareciendo en documentos anteriores; la tabla de correspondencia del INE permite saber a qué clase o clases de la ${CNAE_VIGENCIA.vigente} equivalen. En muchos casos la equivalencia es uno a uno, pero algunas clases antiguas se han dividido entre varias nuevas y hay que leer los literales para elegir.`,
       },
     },
     {

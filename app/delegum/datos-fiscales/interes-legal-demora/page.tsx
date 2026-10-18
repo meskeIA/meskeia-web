@@ -12,7 +12,7 @@ import {
   PLAZOS_RECLAMACION_COMERCIAL,
   FISCAL_INTERESES_META,
 } from '@/data/fiscal';
-import { formatDate } from '@/lib';
+import { formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -24,7 +24,7 @@ export default function InteresLegalDemoraPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_INTERESES_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_INTERESES_META.verificado));
     } catch {
       return FISCAL_INTERESES_META.verificado;
     }

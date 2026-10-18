@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { formatDate } from '@/lib';
+import { formatDate, parseISODateLocal } from '@/lib';
 import { FICHAS } from './fichas';
 import styles from './DatosFiscales.module.css';
 
@@ -27,7 +27,7 @@ export default function DatosFiscalesIndex() {
         {FICHAS.map((f) => {
           let fecha = f.verificado;
           try {
-            fecha = formatDate(new Date(f.verificado));
+            fecha = formatDate(parseISODateLocal(f.verificado));
           } catch {
             /* se mantiene el valor ISO si la fecha no es válida */
           }

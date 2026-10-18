@@ -6,7 +6,7 @@ import AnalyticsTracker from '@/components/AnalyticsTracker';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import DataReference from '@/components/DataReference';
 import { IPREM_2026, FISCAL_IPREM_META } from '@/data/fiscal';
-import { formatCurrency, formatDate } from '@/lib';
+import { formatCurrency, formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -26,7 +26,7 @@ export default function IpremPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_IPREM_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_IPREM_META.verificado));
     } catch {
       return FISCAL_IPREM_META.verificado;
     }

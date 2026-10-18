@@ -13,7 +13,7 @@ import {
   LIMITES_PENSION_2025,
   FISCAL_PENSIONES_META,
 } from '@/data/fiscal';
-import { formatCurrency, formatDate } from '@/lib';
+import { formatCurrency, formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -67,7 +67,7 @@ export default function PensionesJubilacionPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_PENSIONES_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_PENSIONES_META.verificado));
     } catch {
       return FISCAL_PENSIONES_META.verificado;
     }
@@ -212,7 +212,7 @@ export default function PensionesJubilacionPage() {
             </div>
             <p className={styles.tableFoot}>
               Escala del porcentaje: {ESCALA_PORCENTAJE_PENSION_META.fuente}, verificada
-              el {formatDate(new Date(ESCALA_PORCENTAJE_PENSION_META.verificado))}.{' '}
+              el {formatDate(parseISODateLocal(ESCALA_PORCENTAJE_PENSION_META.verificado))}.{' '}
               La base reguladora es el promedio de las 300 últimas bases de cotización (25 años)
               dividido entre 350. Desde 2026 convive con un sistema dual que descarta los peores años
               de un periodo más amplio; la Seguridad Social aplica de oficio el cálculo más favorable.

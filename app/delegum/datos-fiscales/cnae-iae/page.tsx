@@ -11,7 +11,7 @@ import {
   CNAE_VIGENCIA,
   FISCAL_CNAE_IAE_META,
 } from '@/data/fiscal';
-import { formatNumber, formatDate, formatPercentage } from '@/lib';
+import { formatNumber, formatDate, formatPercentage, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -28,7 +28,7 @@ export default function CnaeIaePage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_CNAE_IAE_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_CNAE_IAE_META.verificado));
     } catch {
       return FISCAL_CNAE_IAE_META.verificado;
     }
@@ -36,7 +36,7 @@ export default function CnaeIaePage() {
 
   const fechaCnae = (() => {
     try {
-      return formatDate(new Date(CNAE_VIGENCIA.desde));
+      return formatDate(parseISODateLocal(CNAE_VIGENCIA.desde));
     } catch {
       return CNAE_VIGENCIA.desde;
     }

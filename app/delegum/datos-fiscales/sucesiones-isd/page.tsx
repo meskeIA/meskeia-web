@@ -11,7 +11,7 @@ import {
   FISCAL_SUCESIONES_META,
   type BonificacionGrupoIS,
 } from '@/data/fiscal';
-import { formatCurrency, formatDate } from '@/lib';
+import { formatCurrency, formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -57,7 +57,7 @@ export default function SucesionesIsdPage() {
 
   const fechaVerificacion = (() => {
     try {
-      return formatDate(new Date(FISCAL_SUCESIONES_META.verificado));
+      return formatDate(parseISODateLocal(FISCAL_SUCESIONES_META.verificado));
     } catch {
       return FISCAL_SUCESIONES_META.verificado;
     }
