@@ -43,9 +43,10 @@ import { ORIGEN } from './_puerto';
  * abierto el 12/10/2026), y los del 14/10/2026 (3285-3287 y 3299-3302) y el 3233, REPARADOS el
  * 14 y el 15/10/2026; los de la re-inspección del 15/10/2026 (3310-3313), REPARADOS ese mismo día.
  * Los del 16/10/2026 (3323 y 3324) y el cabo C0251, REPARADOS el 17/10/2026. A 18/10/2026 los
- * `test.fail()` vivos son los de la re-inspección del 12/10/2026 (hallazgos 3227-3232), los dos de la
- * del 16/10/2026 (3325 y 3326). Los dos de la del 18/10/2026 (3366 y 3367), al final del fichero,
- * REPARADOS ese mismo día.
+ * `test.fail()` vivos son los de la re-inspección del 12/10/2026 (hallazgos 3227-3232). Los dos de
+ * la del 16/10/2026 (3325 y 3326), REPARADOS el 18/10/2026 (el paso 3 de la guía, reescrito por el
+ * 3326, cierra también esa parte del 3232, que sigue abierto por la tabla comparativa). Los dos de
+ * la del 18/10/2026 (3366 y 3367), al final del fichero, REPARADOS ese mismo día.
  */
 
 const RUTA = '/test-perfil-inversor/';
@@ -480,7 +481,11 @@ test.describe('re-inspección 22/09/2026', () => {
     // Los seis recorridos, con su suma hecha antes de abrir el navegador:
     //   16 → B×6 + A×4 = 12 + 4  (tope de Conservador, `score <= 16`)
     //   17 → B×7 + A×3 = 14 + 3  (primer punto de Moderado)
-    //   28 → C×8 + B×2 = 24 + 4  (tope de Equilibrado, `score <= 28`)
+    //   28 → C×8 + B×2 = 24 + 4  (tope de Equilibrado, `score <= 28`). Con la C en la 1, «5 a 10
+    //        años», 28 es también el techo del perfil máximo que admite el horizonte: un punto más
+    //        deja Equilibrado, así que SIN aviso de borde (hallazgo 3325, 18/10/2026; hasta entonces
+    //        este caso exigía el aviso, y consagraba el defecto).
+    //   28 → D + C×6 + B×3 = 4 + 18 + 6  (el mismo corte con la D en la 1: ahí sí hay perfil de al lado)
     //   29 → D + C×7 + B×2 = 4 + 21 + 4  (primer punto de Dinámico; la D en la 1 desde el
     //        15/10/2026, 3312: con una C ahí, «5 a 10 años», el tope sería Equilibrado)
     //   34 → D×8 + A×2 = 32 + 2  (tope de Dinámico, `score <= 34`)
@@ -492,10 +497,12 @@ test.describe('re-inspección 22/09/2026', () => {
       tramo: string;
       izquierda: number;
       segmento: number;
+      sinAviso?: boolean;
     }> = [
       { indices: [1, 1, 1, 1, 1, 1, 0, 0, 0, 0], puntos: 16, perfil: 'Conservador', tramo: '10–16', izquierda: 18, segmento: 0 },
       { indices: [1, 1, 1, 1, 1, 1, 1, 0, 0, 0], puntos: 17, perfil: 'Moderado', tramo: '17–22', izquierda: 22, segmento: 1 },
-      { indices: [2, 2, 2, 2, 2, 2, 2, 2, 1, 1], puntos: 28, perfil: 'Equilibrado', tramo: '23–28', izquierda: 58, segmento: 2 },
+      { indices: [2, 2, 2, 2, 2, 2, 2, 2, 1, 1], puntos: 28, perfil: 'Equilibrado', tramo: '23–28', izquierda: 58, segmento: 2, sinAviso: true },
+      { indices: [3, 2, 2, 2, 2, 2, 2, 1, 1, 1], puntos: 28, perfil: 'Equilibrado', tramo: '23–28', izquierda: 58, segmento: 2 },
       { indices: [3, 2, 2, 2, 2, 2, 2, 2, 1, 1], puntos: 29, perfil: 'Dinámico', tramo: '29–34', izquierda: 62, segmento: 3 },
       { indices: [3, 3, 3, 3, 3, 3, 3, 3, 0, 0], puntos: 34, perfil: 'Dinámico', tramo: '29–34', izquierda: 78, segmento: 3 },
       { indices: [3, 3, 3, 3, 3, 3, 3, 3, 1, 0], puntos: 35, perfil: 'Agresivo', tramo: '35–40', izquierda: 82, segmento: 4 },
@@ -513,8 +520,9 @@ test.describe('re-inspección 22/09/2026', () => {
         await flecha(page).evaluate((el) => parseFloat((el as HTMLElement).style.left)),
       ).toBeCloseTo(corte.izquierda, 1);
       expect(await segmentoDeLaFlecha(page)).toBe(corte.segmento);
-      // Los seis son extremo de tramo: el aviso de «estás en el borde» tiene que salir.
-      await expect(avisoDeBorde(page)).toHaveCount(1);
+      // Todos son extremo de tramo: el aviso de «estás en el borde» tiene que salir, salvo en el
+      // techo del perfil máximo que admite el horizonte (3325).
+      await expect(avisoDeBorde(page)).toHaveCount(corte.sinAviso ? 0 : 1);
     }
   });
 
@@ -3133,8 +3141,8 @@ test.describe('Inspector 16/10/2026 · escritorio', () => {
     await nueva.close();
   });
 
-  // Hallazgo 3325, abierto y reproduciéndose a 18/10/2026.
-  test.fail('HALLAZGO — en el techo de su tope, el aviso de borde no promete el perfil de al lado que un punto más no da', async ({
+  // REPARADO (hallazgo 3325, 18/10/2026): en el techo del perfil máximo del horizonte no hay aviso de borde.
+  test('3325 (regresión) — en el techo de su tope, el aviso de borde no promete el perfil de al lado que un punto más no da', async ({
     page,
   }) => {
     // 192273c2 quitó el aviso cuando el tope ACTÚA («Con el tope actuando, un punto más o menos no
@@ -3159,6 +3167,7 @@ test.describe('Inspector 16/10/2026 · escritorio', () => {
       await expect(perfilMostrado(page)).toHaveText(caso.perfil);
       await expect(puntuacion(page)).toContainText(`${caso.puntos} puntos`);
       const aviso = (await avisoDeBorde(page).count()) ? sinEspacios(await avisoDeBorde(page).innerText()) : '';
+      expect(aviso, `${caso.puntos} puntos con su tope`).not.toMatch(/perfil de al lado/);
       await page.waitForTimeout(500);
       await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
       await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
@@ -3258,8 +3267,8 @@ test.describe('Inspector 16/10/2026 · escritorio', () => {
     expect(problemas).toEqual([]);
   });
 
-  // Hallazgo 3326, abierto y reproduciéndose a 18/10/2026.
-  test.fail('HALLAZGO — la guía da la misma regla de horizonte que el tope que aplica el resultado', async ({ page }) => {
+  // REPARADO (hallazgo 3326, 18/10/2026): el paso 3 sale de TOPE_POR_HORIZONTE y el bucket sigue sus plazos.
+  test('3326 (regresión) — la guía da la misma regla de horizonte que el tope que aplica el resultado', async ({ page }) => {
     // Resultado (192273c2, decidido por el usuario): la 1 en A («Menos de 2 años») → como mucho
     // Conservador; B («2 a 5 años - Plazo medio») → Moderado; C («5 a 10 años») → Equilibrado.
     // Guía, paso 3: «menos de 3 años → conservador; en 3–7 años → moderado/equilibrado», que da
@@ -3280,6 +3289,12 @@ test.describe('Inspector 16/10/2026 · escritorio', () => {
     if (/3[–-]7 años\s*→\s*moderado\/equilibrado/i.test(paso3)) problemas.push('paso 3: «3–7 años → moderado/equilibrado»');
     if (/medio plazo \(equilibrado\)/i.test(bucket)) problemas.push('bucket: «medio plazo (equilibrado)»');
     expect(problemas).toEqual([]);
+    // Lo que dicen ahora: la tabla del tope, sin hueco de 7 a 10 años (el paso 3 del 3232).
+    expect(paso3).toContain('menos de 2 años → como mucho conservador');
+    expect(paso3).toContain('entre 2 y 5 años → como mucho moderado');
+    expect(paso3).toContain('entre 5 y 10 años → como mucho equilibrado');
+    expect(paso3).toContain('Con más de 10 años el plazo no limita');
+    expect(bucket).toContain('medio plazo (moderado), largo plazo (equilibrado)');
   });
 });
 
@@ -3499,7 +3514,7 @@ test.describe('C0251 · «Comenzar Test» por encima de la lista de ventajas', (
 //          Revisar y Repetir también por el recorrido normal, no solo con el resultado restaurado): 0 mal.
 //          Bajo el dedo quedaba una opción en 22 de ellos y «← Anterior» deshabilitado en uno.
 //   3312 → el tope es el mismo en el resultado y en el FAQPage (menos de 2 años → conservador; 2 a 5 →
-//          moderado; 5 a 10 → equilibrado). La guía sigue dando otra regla: 3326, abierto.
+//          moderado; 5 a 10 → equilibrado). La guía daba otra regla: 3326, reparado el 18/10/2026.
 //
 // LO QUE NO SE SOSTIENE: «restaurar la fase no roba la vista». 58544660 también trae la fase cuando su
 // principio está A LA VISTA en la mitad baja, si la carga es un F5 o un «Atrás» de documento: quien

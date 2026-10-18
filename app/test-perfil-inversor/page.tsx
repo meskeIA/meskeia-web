@@ -815,10 +815,17 @@ export default function TestPerfilInversorPage() {
     0,
   );
   // Con el tope actuando, un punto más o menos no cambia el perfil: el aviso de borde mentiría.
+  // Tampoco en el TECHO del perfil máximo que admite el horizonte (hallazgo 3325): con la 1 en
+  // «5 a 10 años» y 28 puntos, un punto más deja el mismo Equilibrado, porque el tope lo impide.
+  // En el suelo sí hay perfil de al lado: un punto menos baja de verdad.
+  const perfilMaximoPorHorizonte =
+    answers[1] !== undefined ? TOPE_POR_HORIZONTE[answers[1]]?.perfil : undefined;
   const enBordeDeTramo =
     resultadoPerfil.tope === null &&
     ((totalScore === profile.range[0] && totalScore > PUNTUACION_MINIMA) ||
-      (totalScore === profile.range[1] && totalScore < PUNTUACION_MAXIMA));
+      (totalScore === profile.range[1] &&
+        totalScore < PUNTUACION_MAXIMA &&
+        perfilMaximoPorHorizonte !== profileType));
 
   /**
    * ⚠️ 22/09/2026 (hallazgo 1214) — el resultado no comprobaba que hubiera diez respuestas.
@@ -1383,7 +1390,10 @@ function GuiaPerfilInversor() {
             <p>
               Es normal. Los perfiles son un espectro, no categorías rígidas. Si estás entre
               &quot;moderado&quot; y &quot;equilibrado&quot;, puedes elegir una distribución intermedia. Además,
-              puedes ajustar según tu intuición personal y experiencia previa.
+              puedes ajustar según tu intuición personal y experiencia previa. La excepción es el
+              horizonte: tu respuesta a la pregunta 1 fija el perfil más alto al que llega el test, y
+              el de encima de ese no es una opción intermedia para tu plazo.
+              {/* Hallazgo 3325: sin esta frase, la FAQ animaba a subir un escalón que el tope no admite. */}
             </p>
           </details>
         </div>
@@ -1574,8 +1584,11 @@ function GuiaPerfilInversor() {
               (que queda a 30+ años). Cada objetivo tiene su propio horizonte temporal y tolerancia al riesgo.
             </p>
             <p className={styles.faqTip}>
-              <span aria-hidden="true">💡</span> Técnica &quot;bucket&quot;: Divide tu capital en cubos: corto plazo (conservador), medio plazo (equilibrado)
-              y largo plazo (agresivo).
+              {/* Hallazgo 3326: los cubos siguen los plazos de la pregunta 1 y el tope del resultado
+                  (medio plazo, de 2 a 5 años → moderado; largo plazo, de 5 a 10 → equilibrado). */}
+              <span aria-hidden="true">💡</span> Técnica &quot;bucket&quot;: Divide tu capital en cubos: corto plazo (conservador), medio plazo
+              (moderado), largo plazo (equilibrado) y el dinero que no necesitarás en más de 10 años
+              (dinámico o agresivo).
             </p>
           </div>
 
@@ -1691,10 +1704,23 @@ function GuiaPerfilInversor() {
             <div className={styles.stepNumber}>3</div>
             <div className={styles.stepContent}>
               <h3>Determina cuándo necesitarás el dinero</h3>
+              {/* Hallazgos 3326 y 3232 (paso 3): la regla era «menos de 3 años → conservador; 3–7 →
+                  moderado/equilibrado; más de 10 → dinámico/agresivo», que chocaba con el tope que
+                  aplica el resultado (3312) y dejaba sin perfil de 7 a 10 años. Ahora sale de
+                  TOPE_POR_HORIZONTE, la misma tabla que usa el resultado. */}
               <p>
-                Regla general: si necesitas el dinero en <strong>menos de 3 años → conservador</strong>;
-                en 3–7 años → moderado/equilibrado; en más de 10 años → dinámico/agresivo.
-                El horizonte temporal es el factor más objetivo para definir tu perfil.
+                Es la regla que aplica este test, según cuándo necesitarás el dinero:{' '}
+                {Object.values(TOPE_POR_HORIZONTE).map((t, i) => (
+                  <span key={t.plazo}>
+                    {i > 0 ? '; ' : ''}
+                    <strong>
+                      {t.plazo} → como mucho {PROFILES[t.perfil].name.toLowerCase()}
+                    </strong>
+                  </span>
+                ))}
+                . Con más de 10 años el plazo no limita, y deciden el resto de tus respuestas
+                (dinámico o agresivo si las sostienen). El horizonte temporal es el factor más
+                objetivo para definir tu perfil.
               </p>
             </div>
           </div>
