@@ -11,7 +11,23 @@ import { leerRangoZoom, repartirZoom, type RangoZoomCamara } from './zoom';
 type CapacidadesCamara = MediaTrackCapabilities & { torch?: boolean; zoom?: Partial<RangoZoomCamara> };
 
 /** 3 → «3», 1,667 → «1,7»: un decimal como mucho, el mismo criterio que el indicador. */
-const formatearZoom = (z: number) => formatNumber(z, Math.abs(z - Math.round(z)) < 0.05 ? 0 : 1);
+const decimalesZoom = (z: number) => (Math.abs(z - Math.round(z)) < 0.05 ? 0 : 1);
+const formatearZoom = (z: number) => formatNumber(z, decimalesZoom(z));
+
+/**
+ * La cifra de `z` con los decimales que hagan falta, hasta dos, para que no se lea igual que la
+ * de `otro` escrita con `formatearZoom`; null si ni con dos se distinguen (hallazgo 3327). Con la
+ * cámara clavada en 2,03 a 2x, la nota decía «se ha quedado en 2x… para ver 2x, la imagen se
+ * reduce»: la misma cifra a los dos lados, y aun así un borde negro.
+ */
+function formatearZoomFrente(z: number, otro: number): string | null {
+  const redondeo = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+  const leidoOtro = redondeo(otro, decimalesZoom(otro));
+  for (let d = decimalesZoom(z); d <= 2; d++) {
+    if (redondeo(z, d) !== leidoOtro) return formatNumber(z, d);
+  }
+  return null;
+}
 
 type FiltroTipo ='ninguno' | 'alto-contraste' | 'invertir' | 'escala-grises' | 'sepia';
 
@@ -550,7 +566,13 @@ export default function LupaDigitalPage() {
             {reparto.camara <= 1
               ? `Esta cámara puede ampliar por sí misma hasta ${formatearZoom(Math.min(rangoZoomCamara.max, 5))}x: al subir el zoom lo hará ella, sobre la imagen completa del sensor, y se pierde menos nitidez que ampliando en pantalla.`
               : reparto.pantalla < 1
-                ? `La cámara se ha quedado en ${formatearZoom(reparto.camara)}x y no deja bajar de ahí: para ver ${formatearZoom(zoom)}x, la imagen se reduce en pantalla y queda un borde negro alrededor.`
+                ? (() => {
+                    // 3327: la cifra de la cámara nunca se lee igual que la del zoom pedido.
+                    const camara = formatearZoomFrente(reparto.camara, zoom);
+                    return camara
+                      ? `La cámara se ha quedado en ${camara}x y no deja bajar de ahí: para ver ${formatearZoom(zoom)}x, la imagen se reduce en pantalla y queda un borde negro alrededor.`
+                      : `La cámara se ha quedado un poco por encima de ${formatearZoom(zoom)}x y no deja bajar de ahí: la imagen se reduce en pantalla y queda un borde negro alrededor.`;
+                  })()
               : reparto.pantalla < 1.05
                 ?`Los ${formatearZoom(reparto.camara)}x los hace la propia cámara, sobre la imagen completa del sensor: se pierde menos nitidez que ampliando en pantalla.`
                 : `La cámara hace ${formatearZoom(reparto.camara)}x y el resto (${formatearZoom(reparto.pantalla)}x) se amplía en pantalla.`}

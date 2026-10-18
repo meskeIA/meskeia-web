@@ -2113,7 +2113,8 @@ test.describe('Inspector 16/10/2026 — re-inspección tras 3b52f497, 00153144 y
   test('HALLAZGO NUEVO (operativa, vecino del 3315) — con la cámara clavada en 2,03x, a 2x la nota no debe decir que se ha quedado en 2x y que para ver 2x la imagen se reduce', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
+    // REPARADO (hallazgo 3327, 18/10/2026): formatearZoomFrente da a la cámara los decimales que la
+    // distinguen del zoom pedido («2,03x»), o la frase va sin cifra si ni con dos se distinguen.
     const camaras = { trasera: { min: 1, max: 2.03, step: 0.01 }, frontal: null };
     await simularCamaraPorPista(page, camaras);
     await page.goto(RUTA);
@@ -2140,5 +2141,7 @@ test.describe('Inspector 16/10/2026 — re-inspección tras 3b52f497, 00153144 y
     const texto = (await nota.textContent()) ?? '';
     const cifras = texto.match(/quedado en ([\d,]+)x[\s\S]*?ver ([\d,]+)x/);
     if (cifras) expect(cifras[1]).not.toBe(cifras[2]);
+    // Lo que dice ahora: la cámara con sus dos decimales.
+    expect(texto).toContain('La cámara se ha quedado en 2,03x y no deja bajar de ahí: para ver 2x');
   });
 });
