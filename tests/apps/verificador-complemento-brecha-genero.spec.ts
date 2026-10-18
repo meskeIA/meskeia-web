@@ -4633,11 +4633,11 @@ test.describe('Re-inspección 16/10/2026', () => {
    * hijos de esta misma página ya separa «no es un número entero» de «supera el tope» desde el
    * hallazgo 506. Es esa misma clase de defecto en el campo nuevo del 01/10 (hallazgo 2541).
    */
-  test('ABIERTO (16/10): el aviso de la prorrata no dice «no se interpreta» de un número que sí se lee', async ({
+  // REPARADO (hallazgo 3338, 18/10/2026): dos mensajes, «está fuera de rango» y «no se interpreta».
+  test('3338 (regresión): el aviso de la prorrata no dice «no se interpreta» de un número que sí se lee', async ({
     page,
   }) => {
-    test.fail(true, 'Hallazgo 16/10: «0» y «-25» se leen y el aviso en línea dice que «no se interpreta»');
-    for (const prorrata of ['0', '-25']) {
+    for (const [prorrata, esNumero] of [['0', true], ['-25', true], ['abc', false]] as const) {
       await responder06(page, {
         pension: 'Jubilación (ordinaria o anticipada)',
         fecha: 'El 4-feb-2021 o después',
@@ -4648,7 +4648,13 @@ test.describe('Re-inspección 16/10/2026', () => {
       });
       const aviso = normalizar(await page.locator('#prorrata ~ p[role="alert"]').innerText());
       expect(aviso).toContain('mayor que 0 y no mayor que 100');
-      expect(aviso).not.toContain(`«${prorrata}» no se interpreta`);
+      if (esNumero) {
+        expect(aviso).not.toContain(`«${prorrata}» no se interpreta`);
+        expect(aviso).toContain(`«${prorrata}» está fuera de rango`);
+      } else {
+        // Control: lo que no es un número sigue diciéndose así.
+        expect(aviso).toContain(`«${prorrata}» no se interpreta`);
+      }
     }
   });
 

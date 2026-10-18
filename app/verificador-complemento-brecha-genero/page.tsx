@@ -787,9 +787,14 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                     aria-invalid={prorrataTexto.trim() !== '' && !prorrataEsValida}
                     aria-describedby="prorrata-ayuda"
                   />
+                  {/* Hallazgo 3338: «0» o «-25» SÍ se leen como número; lo que pasa es que están
+                      fuera de (0, 100]. Dos mensajes, como el campo de hijos (hallazgo 506). */}
                   {prorrataTexto.trim() !== '' && !prorrataEsValida && (
                     <p className={styles.hint} role="alert">
-                      <span aria-hidden="true">⚠️</span> Escribe un porcentaje mayor que 0 y no mayor que 100: «{prorrataTexto}» no se interpreta.
+                      <span aria-hidden="true">⚠️</span>{' '}
+                      {Number.isFinite(prorrataLeida)
+                        ? `«${prorrataTexto}» está fuera de rango: la prorrata es un porcentaje mayor que 0 y no mayor que 100.`
+                        : `Escribe un porcentaje mayor que 0 y no mayor que 100: «${prorrataTexto}» no se interpreta.`}
                     </p>
                   )}
                   <p className={styles.hint} id="prorrata-ayuda">
