@@ -512,10 +512,24 @@ el teal (menos en oscuro). Vigila además que **un token
 Barre **`app/` y `components/`**, **sin pasivo** · Escape: `contraste-ok: <razón>`, y la razón es
 obligatoria.
 ⚠️ **Lo que NO mira**: el color de marca como TEXTO sobre fondo claro (se resuelve con
-`--primary-texto`), ni botones y badges con fondo de marca (campaña aparte).
+`--primary-texto`), ni botones y badges con fondo de marca (`check:contraste-marca`).
 > Salió del hallazgo 1175 (21/09/2026): el color del `<thead>` estaba en el FONDO. Crónica:
 > cabecera de `scripts/check-contraste-cabeceras.mjs` · pruebas: `npm run contraste:probar-candado`
 > · por píxel: `tests/contraste-cabeceras-tabla.spec.ts`.
+
+### Candado del contraste de la marca
+
+`npm run check:contraste-marca` — en el build, y **rompe el build** si un `.module.css` o un
+`style={{…}}` pone **texto blanco sobre la marca** (`var(--primary)`, `var(--secondary)`, su
+hexadecimal o su `rgb()`), también el que un hover hereda de su estado base: usar
+`--primary-boton` / `--secondary-boton`. Hoy con `--tanda 1`; la tanda 2 (la marca como color de
+texto → `--primary-texto`) entra al migrarla. Comparte criterio con `scripts/contraste-marca/campana.mjs`.
+Barre `app/`, `components/` y `styles/`, **sin pasivo** · Escape: `marca-ok: <razón>`, razón obligatoria.
+⚠️ No mira el texto de un `<canvas>`, el `fill` de un SVG ni un fondo de marca sin texto blanco a
+la vista; que el sustituto cumpla lo mide `tests/contraste-marca-botones.spec.ts`.
+> Salió del cabo C0070 (movimiento-circular, 8f5eb9b7): el censo del 12/10/2026 dio el patrón en
+> 891 apps. Crónica: cabecera de `scripts/check-contraste-marca.mjs` · pruebas:
+> `npm run contraste-marca:probar-candado`.
 
 ### Candado del token sin variante oscura
 

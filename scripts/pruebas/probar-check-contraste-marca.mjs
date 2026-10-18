@@ -4,8 +4,7 @@
  * nació (cabo C0070) y las trampas que salieron al escribir la campaña, y comprueba además que
  * la CAMPAÑA deja callado al candado.
  *
- * Ejecutar:  node scripts/pruebas/probar-check-contraste-marca.mjs
- *            (será `npm run contraste-marca:probar-candado` cuando se enganche al build)
+ * Ejecutar:  npm run contraste-marca:probar-candado
  *
  * POR QUÉ EXISTE
  * ──────────────

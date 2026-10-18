@@ -2,9 +2,9 @@
 /**
  * Script: check-contraste-marca.mjs
  *
- * Candado del CONTRASTE DE LA MARCA en botones, distintivos y texto (cabo C0070). Se ejecuta a
- * mano con `node scripts/check-contraste-marca.mjs [--tanda 1|2]`; todavía NO va en el build
- * (ver PASIVO, abajo).
+ * Candado del CONTRASTE DE LA MARCA en botones, distintivos y texto (cabo C0070). Se ejecuta
+ * antes de cada build (`npm run build`, hoy con `--tanda 1`: ver PASIVO, abajo) y a mano con
+ * `npm run check:contraste-marca` o `node scripts/check-contraste-marca.mjs [--tanda 1|2]`.
  *
  * QUÉ PROHÍBE
  * ───────────
@@ -38,8 +38,7 @@
  * caso (2,68:1). El censo del 12/10/2026 dio 1.989 reglas de fondo y 5.405 de texto en 891
  * apps: ya no era un descuido por app, era la plantilla. La nota del 14/10 (lupa-digital, el
  * blanco sobre `#2E86AB` y `rgba(46,134,171,0.85)` escritos a mano) es la razón de que mire
- * también los literales. `npm run contraste-marca:probar-candado` (cuando se enganche; hasta
- * entonces `node scripts/pruebas/probar-check-contraste-marca.mjs`) le reinyecta la hoja de
+ * también los literales. `npm run contraste-marca:probar-candado` le reinyecta la hoja de
  * movimiento-circular de antes de 8f5eb9b7 y exige que falle.
  *
  * RELACIÓN CON `check:contraste-cabeceras`
@@ -65,10 +64,10 @@
  *
  * PASIVO
  * ──────
- * Nace con todo el catálogo por migrar y por eso NO está en el build: lo rompería. Se engancha
- * por tandas, cada una tras su migración (fase 2 de C0070): primero `--tanda 1`, y cuando la
- * tanda 2 esté aplicada, sin la opción. Si algún día tuviera que juzgar solo las líneas
- * añadidas, decirlo AQUÍ con el motivo.
+ * Nació (c6458699) con todo el catálogo por migrar, fuera del build. Se engancha por tandas,
+ * cada una tras su migración: la tanda 1 (dfaf84a2, 18/10/2026) entró con `--tanda 1` y SIN
+ * pasivo; cuando la tanda 2 esté aplicada, el build lo llama sin la opción. Si algún día
+ * tuviera que juzgar solo las líneas añadidas, decirlo AQUÍ con el motivo.
  *
  * ESCAPE
  * ──────

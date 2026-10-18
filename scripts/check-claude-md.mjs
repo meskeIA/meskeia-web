@@ -266,8 +266,16 @@ const OBLIGACIONES = [
     'var(--hero-bg) (8,33:1) no lo enciende', 'exige 4,5:1', '4,11:1 el azul y 2,80:1 el teal',
     'Sin pasivo', 'contraste-ok: <razón>',
     'razón es obligatoria', 'Lo que NO mira', 'el color de marca como TEXTO sobre fondo claro',
-    'se resuelve con --primary-texto', 'campaña aparte', 'npm run contraste:probar-candado',
+    'se resuelve con --primary-texto', 'con fondo de marca (check:contraste-marca)', 'npm run contraste:probar-candado',
     'tests/contraste-cabeceras-tabla.spec.ts',
+  ]],
+  ['Candado del contraste de la marca', [
+    'npm run check:contraste-marca', 'rompe el build', 'texto blanco sobre la marca',
+    'también el que un hover hereda de su estado base', '--primary-boton / --secondary-boton',
+    'Hoy con --tanda 1', 'Comparte criterio con scripts/contraste-marca/campana.mjs',
+    'Barre app/, components/ y styles/, sin pasivo', 'marca-ok: <razón>', 'razón obligatoria',
+    'No mira el texto de un <canvas>', 'tests/contraste-marca-botones.spec.ts',
+    'npm run contraste-marca:probar-candado',
   ]],
   ['Candado del token sin variante oscura', [
     'npm run check:token-oscuro', 'rompe el build',
