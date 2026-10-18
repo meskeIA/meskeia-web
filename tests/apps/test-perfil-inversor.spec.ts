@@ -44,7 +44,8 @@ import { ORIGEN } from './_puerto';
  * 14 y el 15/10/2026; los de la re-inspección del 15/10/2026 (3310-3313), REPARADOS ese mismo día.
  * Los del 16/10/2026 (3323 y 3324) y el cabo C0251, REPARADOS el 17/10/2026. A 18/10/2026 los
  * `test.fail()` vivos son los de la re-inspección del 12/10/2026 (hallazgos 3227-3232), los dos de la
- * del 16/10/2026 (3325 y 3326) y los dos de la del 18/10/2026, al final del fichero.
+ * del 16/10/2026 (3325 y 3326). Los dos de la del 18/10/2026 (3366 y 3367), al final del fichero,
+ * REPARADOS ese mismo día.
  */
 
 const RUTA = '/test-perfil-inversor/';
@@ -1139,7 +1140,8 @@ test.describe('re-inspección 26/09/2026 · móvil', () => {
     // El resultado empieza por su encabezado, y el nombre del perfil queda también a la vista.
     await aLaVistaBajoLaBarra(page, page.getByRole('heading', { name: 'Tu perfil es:' }));
     await aLaVistaBajoLaBarra(page, perfilMostrado(page));
-    expect(await foco(page)).toBe('Tu perfil es:');
+    // Desde 3367 (18/10/2026) el encabezado enfocado incluye el perfil; antes decía solo «Tu perfil es:».
+    expect(await foco(page)).toBe('Tu perfil es: Moderado');
 
     await page.getByRole('button', { name: /Revisar mis respuestas/ }).tap();
     await aLaVistaBajoLaBarra(page, enunciado(page));
@@ -3661,8 +3663,9 @@ test.describe('Inspector 18/10/2026 · escritorio', () => {
     }
   });
 
-  test.fail('HALLAZGO — el encabezado que recibe el foco al ver el resultado dice qué perfil ha salido', async ({ page }) => {
-    // Al pulsar «Ver Resultado» el foco va al <h2> del resultado (2177), que dice «Tu perfil es:» y
+  test('REPARADO 3367 — el encabezado que recibe el foco al ver el resultado dice qué perfil ha salido', async ({ page }) => {
+    // REPARADO (18/10/2026): el nombre del perfil va dentro del <h2>, y los tres <h4> de debajo son
+    // <h3>. Antes: al pulsar «Ver Resultado» el foco va al <h2> del resultado (2177), que dice «Tu perfil es:» y
     // nada más: el perfil va en el <p> siguiente. Un lector de pantalla anuncia «Tu perfil es:,
     // encabezado de nivel 2» sin el resultado, y la lista de encabezados también; después de ese <h2>
     // vienen tres <h4> sin ningún <h3>.
@@ -3673,7 +3676,14 @@ test.describe('Inspector 18/10/2026 · escritorio', () => {
     await expect(perfilMostrado(page)).toHaveText('Conservador');
     await expect.poll(() => page.evaluate(() => document.activeElement?.tagName)).toBe('H2');
     const enfocado = await page.evaluate(() => (document.activeElement?.textContent ?? '').replace(/\s+/g, ' ').trim());
-    expect(enfocado, 'el encabezado enfocado nombra el perfil').toContain('Conservador');
+    expect(enfocado, 'el encabezado enfocado nombra el perfil').toBe('Tu perfil es: Conservador');
+    await expect(page.getByRole('heading', { level: 2, name: 'Tu perfil es: Conservador' })).toBeFocused();
+    // Bajo el <h2>, sus apartados son <h3>: ningún salto de nivel en el resultado
+    const niveles = await page
+      .locator('[class*="resultScreen"]')
+      .evaluate((el) => [...el.querySelectorAll('h1, h2, h3, h4, h5, h6')].map((h) => Number(h.tagName[1])));
+    expect(niveles[0]).toBe(2);
+    for (let i = 1; i < niveles.length; i++) expect(niveles[i] - niveles[i - 1], `encabezado ${i + 1}`).toBeLessThanOrEqual(1);
   });
 });
 
@@ -3686,8 +3696,9 @@ test.describe('Inspector 18/10/2026 · móvil 360×740', () => {
     hasTouch: true,
   });
 
-  test.fail('HALLAZGO — un F5 con la fase recuperada no se lleva la vista de quien miraba otra cosa', async ({ page }) => {
-    // 58544660 (3323, 3324) trae el principio de la fase recuperada si queda POR ENCIMA de la ventana
+  test('REPARADO 3366 — un F5 con la fase recuperada no se lleva la vista de quien miraba otra cosa', async ({ page }) => {
+    // REPARADO (18/10/2026): al irse (`pagehide`) se apunta a qué altura de la ventana quedaba el
+    // principio de la fase, y al volver se deja ahí. Antes: 58544660 (3323, 3324) trae el principio de la fase recuperada si queda POR ENCIMA de la ventana
     // o, en un F5 o un «Atrás» de documento, si queda en la mitad baja aunque esté A LA VISTA: da por
     // hecho que «la fase recuperada es lo que se estaba mirando». Medido (3 de 3 en cada uno): con el
     // resultado guardado y la página arriba del todo (aviso legal a la vista, resultado en 663 px),

@@ -340,8 +340,48 @@ interface EstadoGuardado {
 function borrarSesion(): void {
   try {
     sessionStorage.removeItem(CLAVE_SESION);
+    sessionStorage.removeItem(CLAVE_VISTA);
   } catch {
     // Nada que limpiar si no había dónde guardar.
+  }
+}
+
+/**
+ * ⚠️ 18/10/2026 (hallazgo 3366) — DÓNDE estaba la vista al irse, medida desde el principio de la
+ * fase. 58544660 (3323, 3324) daba por hecho que tras un F5 o un «Atrás» «la fase recuperada es lo
+ * que se estaba mirando» y la traía si quedaba en la mitad baja de la ventana: quien recargaba
+ * arriba del todo (aviso legal a la vista, resultado a 663 px) o leyendo el disclaimer de debajo
+ * aterrizaba en el principio del resultado, en scrollY 597. Ahora se apunta al irse (`pagehide`)
+ * a qué altura de la ventana quedaba el principio de la fase, y al volver se deja ahí: la vista
+ * vuelve a lo que se miraba, sea la fase, lo de encima o lo de debajo.
+ */
+const CLAVE_VISTA = 'meskeia:test-perfil-inversor:vista:v1';
+
+interface VistaGuardada {
+  fase: 'questions' | 'result';
+  /** `getBoundingClientRect().top` del principio de la fase al irse, en px de la ventana. */
+  arriba: number;
+}
+
+function guardarVista(vista: VistaGuardada): void {
+  try {
+    sessionStorage.setItem(CLAVE_VISTA, JSON.stringify(vista));
+  } catch {
+    // Sin almacenamiento, la vista se corrige como antes de 3366.
+  }
+}
+
+/** Lee la vista guardada para `fase` y la retira: sirve una vez, la de la carga que la sigue. */
+function tomarVista(fase: 'questions' | 'result'): number | null {
+  try {
+    const bruto = sessionStorage.getItem(CLAVE_VISTA);
+    sessionStorage.removeItem(CLAVE_VISTA);
+    if (!bruto) return null;
+    const datos = JSON.parse(bruto) as Partial<VistaGuardada> | null;
+    if (!datos || datos.fase !== fase || typeof datos.arriba !== 'number' || !Number.isFinite(datos.arriba)) return null;
+    return datos.arriba;
+  } catch {
+    return null;
   }
 }
 
@@ -546,9 +586,16 @@ export default function TestPerfilInversorPage() {
     // a 827 px en una ventana de 800). En una llegada normal no se mueve nada que esté por debajo.
     const navegacion = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
     const volvio = navegacion?.type === 'reload' || navegacion?.type === 'back_forward';
+    // Si al irse se apuntó dónde quedaba la fase (3366), se vuelve EXACTAMENTE ahí: la fase, lo de
+    // encima o lo de debajo, lo que se estuviera mirando. Lo de abajo es el respaldo sin ese dato.
+    const arribaAlIrse = volvio ? tomarVista(phase) : null;
     const corregir = () => {
       const margenArriba = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
       const arriba = destino.getBoundingClientRect().top;
+      if (arribaAlIrse !== null) {
+        if (Math.abs(arriba - arribaAlIrse) > 1) window.scrollBy(0, arriba - arribaAlIrse);
+        return;
+      }
       if (arriba < margenArriba - 1 || (volvio && arriba > window.innerHeight / 2)) {
         destino.scrollIntoView({ block: 'start' });
       }
@@ -566,6 +613,17 @@ export default function TestPerfilInversorPage() {
       cancelAnimationFrame(segundo);
       window.removeEventListener('load', alCargar);
     };
+  }, [phase]);
+
+  /** Al irse (F5, enlace, cerrar), apunta dónde quedaba el principio de la fase en la ventana (3366). */
+  useEffect(() => {
+    if (phase === 'start') return;
+    const alIrse = () => {
+      const destino = phase === 'result' ? destinoResultado.current : destinoCuestionario.current;
+      if (destino) guardarVista({ fase: phase, arriba: destino.getBoundingClientRect().top });
+    };
+    window.addEventListener('pagehide', alIrse);
+    return () => window.removeEventListener('pagehide', alIrse);
   }, [phase]);
 
   /**
@@ -1042,9 +1100,11 @@ export default function TestPerfilInversorPage() {
               ref={encabezadoResultado}
               tabIndex={-1}
             >
-              Tu perfil es:
+              {/* Hallazgo 3367: el perfil va dentro del encabezado, que es lo que anuncia el lector
+                  de pantalla al recibir el foco y lo que sale en la lista de encabezados. */}
+              Tu perfil es:{' '}
+              <span className={styles.resultProfile}>{profile.name}</span>
             </h2>
-            <p className={styles.resultProfile}>{profile.name}</p>
             {/* La app entera se apoya en la puntuación —su propia FAQ pregunta qué pasa si
                 las respuestas quedan en el límite entre dos perfiles— y no la enseñaba
                 nunca: no había forma de saberse en el borde ni de rehacer la cuenta. */}
@@ -1101,7 +1161,7 @@ export default function TestPerfilInversorPage() {
 
           {/* Descripción */}
           <div className={styles.profileDescription}>
-            <h4>Descripción de tu perfil</h4>
+            <h3>Descripción de tu perfil</h3>
             <p>{profile.description}</p>
           </div>
 
@@ -1131,9 +1191,9 @@ export default function TestPerfilInversorPage() {
 
           {/* Distribución recomendada */}
           <div className={styles.allocationSection}>
-            <h4>
+            <h3>
               <span aria-hidden="true">📊</span> Distribución de activos de ejemplo para este perfil
-            </h4>
+            </h3>
             {/*
               ⚠️ 26/09/2026 (hallazgo 2178) — las cifras iban en blanco sobre los cuatro colores de
               marca y ninguna llegaba a 4,5:1 (4,11 · 2,80 · 2,26 · 1,81). El azul pasa a
@@ -1168,7 +1228,7 @@ export default function TestPerfilInversorPage() {
 
           {/* Recomendaciones */}
           <div className={styles.profileDescription}>
-            <h4><span aria-hidden="true">💡</span> Ideas que suelen asociarse a este perfil</h4>
+            <h3><span aria-hidden="true">💡</span> Ideas que suelen asociarse a este perfil</h3>
             <p className={styles.recomendacionesNota}>
               Son <strong>ejemplos ilustrativos</strong>, no una recomendación de inversión ni
               de producto: los nombres concretos que aparecen sirven para reconocer categorías,

@@ -375,17 +375,20 @@
   margin-bottom: var(--spacing-md);
 }
 
+/* El nombre del perfil va DENTRO del <h2> (hallazgo 3367): el encabezado que recibe el foco decía
+   solo «Tu perfil es:». Se ve igual que cuando era un <p> aparte. */
 .resultTitle {
   font-size: 1.8rem;
   color: var(--text-primary);
-  margin: 0 0 var(--spacing-sm);
+  margin: 0;
 }
 
 .resultProfile {
+  display: block;
   font-size: 1.3rem;
   color: var(--primary-texto);
   font-weight: 700;
-  margin: 0;
+  margin: var(--spacing-sm) 0 0;
 }
 
 /* Barra de Perfil Visual */
@@ -453,8 +456,10 @@
   margin-bottom: var(--spacing-xl);
 }
 
-.profileDescription h4 {
+/* h3 y no h4 (hallazgo 3367): van bajo el <h2> del resultado. Con el tamaño que tenían de h4. */
+.profileDescription h3 {
   color: var(--text-primary);
+  font-size: 1rem;
   margin: 0 0 var(--spacing-sm);
 }
 
@@ -503,8 +508,9 @@
   margin-bottom: var(--spacing-xl);
 }
 
-.allocationSection h4 {
+.allocationSection h3 {
   color: var(--text-primary);
+  font-size: 1rem;
   margin: 0 0 var(--spacing-md);
 }
 
