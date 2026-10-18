@@ -426,8 +426,9 @@ export default function CalculadoraROIMarketingPage() {
                   key={preset.nombre}
                   className={`${styles.presetBtn} ${nuevoCanal.nombre === preset.nombre ? styles.presetActivo : ''}`}
                   onClick={() => seleccionarCanalPreset(preset)}
+                  aria-pressed={nuevoCanal.nombre === preset.nombre}
                 >
-                  <span>{preset.icono}</span>
+                  <span aria-hidden="true">{preset.icono}</span>
                   <span>{preset.nombre}</span>
                 </button>
               ))}
@@ -699,32 +700,32 @@ export default function CalculadoraROIMarketingPage() {
           <h2>Ejemplos reales de ROI por tipo de negocio</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🛒</span><h3>E-commerce de moda</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🛒</span><h3>E-commerce de moda</h3></div>
               <p className={styles.escenarioExample}>Inversión 2.000 € en Meta Ads. Ventas generadas: 8.500 €. Coste producto: 4.000 €. Margen bruto: 4.500 €. ROI = (4.500 − 2.000) / 2.000 × 100 = 125%. ROAS = 4,25x.</p>
               <span className={styles.escenarioTip}>ROAS mínimo viable para e-commerce: 3x</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏢</span><h3>B2B SaaS — Google Ads</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏢</span><h3>B2B SaaS — Google Ads</h3></div>
               <p className={styles.escenarioExample}>Inversión 5.000 €/mes. 20 leads cualificados. 3 cierres a 1.200 €/año (LTV 3 años = 3.600 €). Ingresos generados: 10.800 €. ROI = 116%. CAC = 1.667 €, LTV/CAC = 2,16x.</p>
               <span className={styles.escenarioTip}>LTV/CAC ratio saludable: &gt; 3x</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>📧</span><h3>Campaña de email reactivación</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">📧</span><h3>Campaña de email reactivación</h3></div>
               <p className={styles.escenarioExample}>Base 10.000 contactos inactivos. Coste campaña: 200 €. Tasa apertura 18%, click 4%, conversión 2% = 200 ventas a 45 € = 9.000 €. ROI = 4.400%. El canal más rentable.</p>
               <span className={styles.escenarioTip}>Email a base propia: el ROI más alto del marketing</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>📱</span><h3>Influencer micro en Instagram</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">📱</span><h3>Influencer micro en Instagram</h3></div>
               <p className={styles.escenarioExample}>Micro-influencer 15K seguidores nicho fitness: 500 €. Código descuento rastreable: 45 ventas a 35 € = 1.575 €. ROI = 215%. Mejor engagement que macro-influencers.</p>
               <span className={styles.escenarioTip}>Micro-influencers: mayor engagement, menor coste</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>📝</span><h3>Blog corporativo + SEO</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">📝</span><h3>Blog corporativo + SEO</h3></div>
               <p className={styles.escenarioExample}>Inversión 12 meses: 8.000 € (redactor + SEO técnico). Mes 18: 2.000 visitas orgánicas/mes. 40 leads/mes × 15% cierre × 800 € ticket = 4.800 €/mes. ROI acumulado año 2: 628%.</p>
               <span className={styles.escenarioTip}>SEO: bajo ROI año 1, exponencial del año 2</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🎯</span><h3>Campaña retargeting e-commerce</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🎯</span><h3>Campaña retargeting e-commerce</h3></div>
               <p className={styles.escenarioExample}>Audiencia: carritos abandonados (1.200 usuarios/mes). Inversión retargeting: 400 €. Recuperación: 8% = 96 ventas a 65 € = 6.240 €. ROI = 1.460%. El retargeting: ROI más alto en paid media.</p>
               <span className={styles.escenarioTip}>Retargeting: siempre antes que prospección fría</span>
             </div>
@@ -764,19 +765,19 @@ export default function CalculadoraROIMarketingPage() {
         <div className={styles.eduTips}>
           <h2>Claves para maximizar el ROI de tus campañas</h2>
           <div className={styles.tipsGrid}>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🎯</span><strong>Retargeting primero</strong><p>El retargeting a audiencias calientes (visitantes web, carritos abandonados) siempre tiene mejor ROI que la prospección fría. Empieza por ahí antes de escalar a nuevas audiencias.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📧</span><strong>Invierte en tu base de email</strong><p>La lista de email propia es el activo de marketing más rentable: no depende de algoritmos, no tienes que pagar por cada impacto y el ROI medio supera el 3.600%.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🧪</span><strong>A/B testing continuo</strong><p>Prueba un elemento a la vez (titular, imagen, CTA, audiencia). Una mejora del 20% en tasa de conversión duplica el ROI sin aumentar el presupuesto.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📊</span><strong>Mide el LTV, no solo la primera compra</strong><p>Una campaña con ROI negativo en la primera compra puede ser rentable si el LTV es alto. Los negocios con suscripciones o compras recurrentes deben evaluar el ROI a 12–24 meses.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🔄</span><strong>Optimiza la página de destino</strong><p>El 50% del ROI depende de la landing page, no del anuncio. Un anuncio mediocre a una landing excelente supera a un anuncio perfecto con landing deficiente.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>⏱️</span><strong>Define el horizonte temporal antes de evaluar</strong><p>SEO y content marketing tienen ROI negativo los primeros 6 meses. Evaluar demasiado pronto lleva a cancelar estrategias que serían muy rentables a largo plazo.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🎯</span><strong>Retargeting primero</strong><p>El retargeting a audiencias calientes (visitantes web, carritos abandonados) siempre tiene mejor ROI que la prospección fría. Empieza por ahí antes de escalar a nuevas audiencias.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📧</span><strong>Invierte en tu base de email</strong><p>La lista de email propia es el activo de marketing más rentable: no depende de algoritmos, no tienes que pagar por cada impacto y el ROI medio supera el 3.600%.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🧪</span><strong>A/B testing continuo</strong><p>Prueba un elemento a la vez (titular, imagen, CTA, audiencia). Una mejora del 20% en tasa de conversión duplica el ROI sin aumentar el presupuesto.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📊</span><strong>Mide el LTV, no solo la primera compra</strong><p>Una campaña con ROI negativo en la primera compra puede ser rentable si el LTV es alto. Los negocios con suscripciones o compras recurrentes deben evaluar el ROI a 12–24 meses.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🔄</span><strong>Optimiza la página de destino</strong><p>El 50% del ROI depende de la landing page, no del anuncio. Un anuncio mediocre a una landing excelente supera a un anuncio perfecto con landing deficiente.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">⏱️</span><strong>Define el horizonte temporal antes de evaluar</strong><p>SEO y content marketing tienen ROI negativo los primeros 6 meses. Evaluar demasiado pronto lleva a cancelar estrategias que serían muy rentables a largo plazo.</p></div>
           </div>
         </div>
 
         {/* 6. Warning box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores críticos al calcular y optimizar el ROI de marketing</strong>
           </div>
           <ul className={styles.warningList}>

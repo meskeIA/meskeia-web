@@ -274,9 +274,9 @@ export default function CifradoVigenerePage() {
               type="button"
               className={styles.htmlToggleBtn}
               onClick={() => setHtmlExpanded(!htmlExpanded)}
-              aria-pressed={htmlExpanded}
+              aria-expanded={htmlExpanded}
             >
-              <span>{htmlExpanded ? '▲' : '▼'} Exportar como código HTML</span>
+              <span><span aria-hidden="true">{htmlExpanded ? '▲' : '▼'}</span> Exportar como código HTML</span>
               <span className={styles.htmlBadge}>Nuevo</span>
             </button>
 
@@ -300,7 +300,7 @@ export default function CifradoVigenerePage() {
             type="button"
             onClick={() => setMostrarTabla(!mostrarTabla)}
             className={styles.btnTabla}
-            aria-pressed={mostrarTabla}
+            aria-expanded={mostrarTabla}
           >
             {mostrarTabla ? <><span aria-hidden="true">📊</span> Ocultar tabla Vigenère</> : <><span aria-hidden="true">📊</span> Mostrar tabla Vigenère</>}
           </button>

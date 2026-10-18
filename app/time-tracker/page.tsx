@@ -406,22 +406,22 @@ export default function TimeTrackerPage() {
 
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
-              <div className={styles.statIcon}>⏰</div>
+              <div className={styles.statIcon} aria-hidden="true">⏰</div>
               <div className={styles.statValue}>{formatHoursMinutes(stats.totalTiempo)}</div>
               <div className={styles.statLabel}>Tiempo total</div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statIcon}>💶</div>
+              <div className={styles.statIcon} aria-hidden="true">💶</div>
               <div className={styles.statValue}>{formatCurrency(stats.totalGanado)}</div>
               <div className={styles.statLabel}>Total ganado</div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statIcon}>📋</div>
+              <div className={styles.statIcon} aria-hidden="true">📋</div>
               <div className={styles.statValue}>{stats.numEntradas}</div>
               <div className={styles.statLabel}>Registros</div>
             </div>
             <div className={styles.statCard}>
-              <div className={styles.statIcon}>📁</div>
+              <div className={styles.statIcon} aria-hidden="true">📁</div>
               <div className={styles.statValue}>{stats.proyectosUnicos}</div>
               <div className={styles.statLabel}>Proyectos</div>
             </div>

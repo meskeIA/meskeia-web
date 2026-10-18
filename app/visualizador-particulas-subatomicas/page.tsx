@@ -398,7 +398,8 @@ export default function VisualizadorParticulasSubatomicas() {
                           type="button"
                           className={`${styles.particula} ${styles.particulaQuark} ${particulaSeleccionada?.simbolo === p.simbolo ? styles.particulaSeleccionada : ''}`}
                           onClick={() => setParticulaSeleccionada(p)}
-                          aria-label={`${mostrarAntiparticulas ? 'Anti-' : ''}${p.nombre}`}
+                          aria-pressed={particulaSeleccionada?.simbolo === p.simbolo}
+                          aria-label={`${mostrarAntiparticulas ? 'Anti-' : ''}${p.nombre}${p.nobel ? ', Nobel de Física' : ''}`}
                         >
                           <span className={styles.particulaSimbolo}>
                             {mostrarAntiparticulas ? p.simbolo.toUpperCase() : p.simbolo}
@@ -429,7 +430,8 @@ export default function VisualizadorParticulasSubatomicas() {
                           type="button"
                           className={`${styles.particula} ${styles.particulaLeptón} ${particulaSeleccionada?.simbolo === p.simbolo ? styles.particulaSeleccionada : ''}`}
                           onClick={() => setParticulaSeleccionada(p)}
-                          aria-label={`${mostrarAntiparticulas ? 'Anti-' : ''}${p.nombre}`}
+                          aria-pressed={particulaSeleccionada?.simbolo === p.simbolo}
+                          aria-label={`${mostrarAntiparticulas ? 'Anti-' : ''}${p.nombre}${p.nobel ? ', Nobel de Física' : ''}`}
                         >
                           <span className={styles.particulaSimbolo}>
                             {mostrarAntiparticulas ? `ā${p.simbolo}` : p.simbolo}
@@ -457,7 +459,8 @@ export default function VisualizadorParticulasSubatomicas() {
                       type="button"
                       className={`${styles.particula} ${p.tipo === 'higgs' ? styles.particulaHiggs : styles.particulaBosón} ${particulaSeleccionada?.simbolo === p.simbolo ? styles.particulaSeleccionada : ''}`}
                       onClick={() => setParticulaSeleccionada(p)}
-                      aria-label={p.nombre}
+                      aria-pressed={particulaSeleccionada?.simbolo === p.simbolo}
+                      aria-label={`${p.nombre}${p.nobel ? ', Nobel de Física' : ''}`}
                     >
                       <span className={styles.particulaSimbolo}>{p.simbolo}</span>
                       <span className={styles.particulaMasa}>{p.masa.split(' ')[0]}</span>

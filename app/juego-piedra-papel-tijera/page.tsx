@@ -164,7 +164,7 @@ export default function JuegoPiedraPapelTijeraPage() {
                 className={`${styles.opcionBtn} ${eleccionJugador === opcion.id ? styles.selected : ''}`}
                 disabled={animando}
               >
-                <span className={styles.opcionEmoji}>{opcion.emoji}</span>
+                <span className={styles.opcionEmoji} aria-hidden="true">{opcion.emoji}</span>
                 <span className={styles.opcionNombre}>{opcion.nombre}</span>
               </button>
             ))}
@@ -180,16 +180,16 @@ export default function JuegoPiedraPapelTijeraPage() {
                     {getOpcionInfo(eleccionJugador)?.emoji}
                   </span>
                 ) : (
-                  <span className={styles.esperando}>❓</span>
+                  <span className={styles.esperando} aria-hidden="true">❓</span>
                 )}
               </div>
             </div>
 
             <div className={styles.vs}>
               {animando ? (
-                <div className={styles.pensando}>🤔</div>
+                <div className={styles.pensando} aria-hidden="true">🤔</div>
               ) : resultado ? (
-                <div className={`${styles.resultadoIcono} ${styles[resultado]}`}>
+                <div className={`${styles.resultadoIcono} ${styles[resultado]}`} aria-hidden="true">
                   {resultado === 'ganaste' && '🎉'}
                   {resultado === 'perdiste' && '😢'}
                   {resultado === 'empate' && '🤝'}
@@ -203,13 +203,13 @@ export default function JuegoPiedraPapelTijeraPage() {
               <span className={styles.jugadorLabel}>PC</span>
               <div className={`${styles.eleccion} ${eleccionPC ? styles.mostrar : ''}`}>
                 {animando ? (
-                  <span className={styles.animandoEleccion}>🎲</span>
+                  <span className={styles.animandoEleccion} aria-hidden="true">🎲</span>
                 ) : eleccionPC ? (
                   <span className={styles.eleccionEmoji}>
                     {getOpcionInfo(eleccionPC)?.emoji}
                   </span>
                 ) : (
-                  <span className={styles.esperando}>❓</span>
+                  <span className={styles.esperando} aria-hidden="true">❓</span>
                 )}
               </div>
             </div>
@@ -265,11 +265,11 @@ export default function JuegoPiedraPapelTijeraPage() {
             </div>
             <div className={styles.statRow}>
               <span>Racha actual:</span>
-              <strong>{estadisticas.rachaActual} 🔥</strong>
+              <strong>{estadisticas.rachaActual} <span aria-hidden="true">🔥</span></strong>
             </div>
             <div className={styles.statRow}>
               <span>Mejor racha:</span>
-              <strong>{estadisticas.mejorRacha} 🏆</strong>
+              <strong>{estadisticas.mejorRacha} <span aria-hidden="true">🏆</span></strong>
             </div>
           </div>
 
@@ -298,15 +298,15 @@ export default function JuegoPiedraPapelTijeraPage() {
         <h3>Reglas del juego</h3>
         <div className={styles.reglas}>
           <div className={styles.regla}>
-            <span>🪨 → ✂️</span>
+            <span aria-hidden="true">🪨 → ✂️</span>
             <p>Piedra aplasta Tijera</p>
           </div>
           <div className={styles.regla}>
-            <span>✂️ → 📄</span>
+            <span aria-hidden="true">✂️ → 📄</span>
             <p>Tijera corta Papel</p>
           </div>
           <div className={styles.regla}>
-            <span>📄 → 🪨</span>
+            <span aria-hidden="true">📄 → 🪨</span>
             <p>Papel envuelve Piedra</p>
           </div>
         </div>

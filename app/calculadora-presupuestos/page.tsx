@@ -900,7 +900,7 @@ export default function CalculadoraPresupuestosPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuánto anticipo debo pedir?</h4>
               <p>El estándar para servicios freelance y agencias es entre el 30% y el 50% antes de empezar. Para proyectos pequeños (&lt;500 €) puedes pedir el 100% por adelantado. Para proyectos grandes (&gt;5.000 €): 30% al firmar, 40% a mitad del proyecto, 30% en entrega. El anticipo es práctica profesional estándar que el cliente sano acepta sin problema.</p>
-              <p className={styles.faqTip}>💡 <strong>Red flag:</strong> Un cliente que se niega a dar cualquier anticipo es un riesgo de impago. El anticipo alinea intereses.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Red flag:</strong> Un cliente que se niega a dar cualquier anticipo es un riesgo de impago. El anticipo alinea intereses.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Tengo que incluir el IVA en el presupuesto?</h4>
@@ -910,7 +910,7 @@ export default function CalculadoraPresupuestosPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué pasa si el cliente pide más trabajo del presupuestado?</h4>
               <p>Esto se llama &quot;scope creep&quot; y es el problema más común en proyectos freelance. Cuando el cliente pide algo extra, responde: &quot;Con mucho gusto, esto no estaba incluido en el presupuesto inicial. Te preparo un presupuesto adicional.&quot; Nunca hagas trabajo extra sin documentarlo y aprobarlo por escrito.</p>
-              <p className={styles.faqTip}>💡 <strong>Cláusula recomendada:</strong> &quot;Cualquier trabajo adicional no especificado será presupuestado y aprobado por separado antes de su ejecución.&quot;</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Cláusula recomendada:</strong> &quot;Cualquier trabajo adicional no especificado será presupuestado y aprobado por separado antes de su ejecución.&quot;</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuánto tiempo debe estar vigente un presupuesto?</h4>
@@ -925,7 +925,7 @@ export default function CalculadoraPresupuestosPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cómo negociar cuando el cliente dice que es muy caro?</h4>
               <p>Tres estrategias: (1) Reducir alcance: &quot;Podemos ajustar el precio si reducimos el proyecto a X, Y y Z&quot;. (2) Escalonar pagos: mantener el precio pero repartir en más plazos. (3) Justificar el valor: explicar qué problema resuelve. Nunca bajes el precio sin quitar algo del alcance.</p>
-              <p className={styles.faqTip}>💡 <strong>Táctica de anclaje:</strong> Presenta primero la opción más cara. Cuando la rechace, la opción media (tu objetivo real) parecerá razonable por contraste.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Táctica de anclaje:</strong> Presenta primero la opción más cara. Cuando la rechace, la opción media (tu objetivo real) parecerá razonable por contraste.</p>
             </div>
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Puedo incluir gastos de gestión o materiales con margen?</h4>
@@ -935,7 +935,7 @@ export default function CalculadoraPresupuestosPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Qué hago si un cliente no paga el presupuesto aceptado?</h4>
               <p>Proceso: (1) Recordatorio amable a los 5 días. (2) Llamada telefónica a los 15 días. (3) Burofax con requerimiento a los 30 días (valor probatorio). (4) Reclamación en juzgado de lo mercantil (proceso monitorio) para deudas &gt;2.000 €. El presupuesto aceptado + facturas emitidas es documentación suficiente para reclamación judicial.</p>
-              <p className={styles.faqTip}>💡 <strong>Prevención:</strong> El anticipo del 30-50% es tu mejor protección. Si el cliente no paga el final, al menos has cobrado la mayor parte del trabajo.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Prevención:</strong> El anticipo del 30-50% es tu mejor protección. Si el cliente no paga el final, al menos has cobrado la mayor parte del trabajo.</p>
             </div>
           </div>
         </section>

@@ -253,6 +253,7 @@ export default function JuegoTresEnRayaPage() {
                   key={d}
                   onClick={() => { setDificultad(d); reiniciar(); }}
                   className={`${styles.dificultadBtn} ${dificultad === d ? styles.active : ''}`}
+                  aria-pressed={dificultad === d}
                 >
                   {d === 'facil' && <><span aria-hidden="true">😊</span> Fácil</>}
                   {d === 'medio' && <><span aria-hidden="true">🤔</span> Medio</>}
@@ -286,6 +287,7 @@ export default function JuegoTresEnRayaPage() {
                 onClick={() => clickCasilla(index)}
                 className={`${styles.casilla} ${casilla ? styles.ocupada : ''} ${lineaGanadora.includes(index) ? styles.ganadora : ''}`}
                 disabled={!!casilla || !!ganador || empate || !turnoJugador}
+                aria-label={`Casilla ${index + 1}: ${casilla ?? 'vacía'}`}
               >
                 {casilla && (
                   <span className={casilla === 'X' ? styles.x : styles.o}>
@@ -306,7 +308,7 @@ export default function JuegoTresEnRayaPage() {
         <div className={styles.statsPanel}>
           <div className={styles.statsHeader}>
             <h2 className={styles.panelTitle}>Estadísticas</h2>
-            <button type="button" onClick={reiniciarStats} className={styles.resetBtn}>
+            <button type="button" onClick={reiniciarStats} className={styles.resetBtn} aria-label="Reiniciar estadísticas">
               🗑️
             </button>
           </div>

@@ -88,11 +88,11 @@ function DopplerSVG(): React.ReactNode {
       {waves}
       {/* Fuente */}
       <circle cx={sourceX} cy={sourceY} r={14} fill="var(--primary)" opacity={0.15} />
-      <text x={sourceX} y={sourceY + 5} textAnchor="middle" fontSize={18}>🚑</text>
+      <text x={sourceX} y={sourceY + 5} textAnchor="middle" fontSize={18} aria-hidden="true">🚑</text>
       {/* Observadores */}
-      <text x={18} y={sourceY + 5} textAnchor="middle" fontSize={16}>👂</text>
+      <text x={18} y={sourceY + 5} textAnchor="middle" fontSize={16} aria-hidden="true">👂</text>
       <text x={8} y={sourceY + 22} textAnchor="middle" fontSize={9} fill="var(--secondary)">Tono bajo</text>
-      <text x={svgW - 18} y={sourceY + 5} textAnchor="middle" fontSize={16}>👂</text>
+      <text x={svgW - 18} y={sourceY + 5} textAnchor="middle" fontSize={16} aria-hidden="true">👂</text>
       <text x={svgW - 18} y={sourceY + 22} textAnchor="middle" fontSize={9} fill="var(--primary)">Tono alto</text>
       {/* Etiquetas */}
       <text x={30} y={20} fontSize={9} fill="var(--text-secondary)" textAnchor="middle">Observador B</text>

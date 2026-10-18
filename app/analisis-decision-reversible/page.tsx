@@ -352,6 +352,7 @@ export default function AnalisisDecisionReversiblePage() {
                 <div
                   className={styles.mapDot}
                   style={{ left: `${posX}%`, top: `${posY}%` }}
+                  role="img"
                   aria-label={`Tu posición: Parálisis ${puntuacionParalisis}/25, Prudencia ${puntuacionPrudencia}/25`}
                 >
                   <span className={styles.mapDotLabel}>Tú</span>

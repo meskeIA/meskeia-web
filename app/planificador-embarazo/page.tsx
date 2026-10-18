@@ -474,7 +474,7 @@ export default function CalculadoraFechaPartoPage() {
             {resultado ? (
               <>
                 <div className={styles.resultadoPrincipal}>
-                  <span className={styles.resultadoIcon}>👶</span>
+                  <span className={styles.resultadoIcon} aria-hidden="true">👶</span>
                   <div className={styles.resultadoFecha}>
                     {formatearFecha(resultado.fechaParto)}
                   </div>
@@ -540,7 +540,7 @@ export default function CalculadoraFechaPartoPage() {
               </>
             ) : (
               <div className={styles.placeholder}>
-                <span className={styles.placeholderIcon}>🤰</span>
+                <span className={styles.placeholderIcon} aria-hidden="true">🤰</span>
                 <p>Introduce la fecha de tu última regla para calcular</p>
               </div>
             )}
@@ -756,7 +756,7 @@ export default function CalculadoraFechaPartoPage() {
         </p>
 
         <p className={styles.emergency}>
-          🚨 <strong>EMERGENCIAS OBSTÉTRICAS - Acude a urgencias inmediatamente si presentas:</strong><br/>
+          <span aria-hidden="true">🚨</span> <strong>EMERGENCIAS OBSTÉTRICAS - Acude a urgencias inmediatamente si presentas:</strong><br/>
           • Sangrado vaginal abundante • Pérdida de líquido amniótico • Dolor abdominal intenso<br/>
           • Disminución o ausencia de movimientos fetales • Contracciones regulares antes de semana 37<br/>
           • Dolor de cabeza severo con visión borrosa • Hinchazón súbita de cara/manos/pies

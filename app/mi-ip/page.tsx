@@ -233,7 +233,7 @@ export default function MiIpPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🌐</span>
+        <span className={styles.heroIcon} aria-hidden="true">🌐</span>
         <h1 className={styles.title}>Mi IP y Conexión</h1>
         <p className={styles.subtitle}>
           Descubre tu dirección IP pública, ubicación aproximada y datos de tu conexión a internet
@@ -252,7 +252,7 @@ export default function MiIpPage() {
             </div>
           ) : error ? (
             <div className={styles.error}>
-              <span className={styles.errorIcon}>⚠️</span>
+              <span className={styles.errorIcon} aria-hidden="true">⚠️</span>
               <p>{error}</p>
               <button type="button" onClick={fetchIpInfo} className={styles.retryBtn}>
                 <span aria-hidden="true">🔄</span> Reintentar
@@ -269,6 +269,7 @@ export default function MiIpPage() {
                     onClick={() => copyToClipboard(ipInfo.ip)}
                     className={styles.copyBtn}
                     title="Copiar IP"
+                    aria-label="Copiar IP"
                   >
                     {copied ? '✅' : '📋'}
                   </button>
@@ -286,6 +287,7 @@ export default function MiIpPage() {
                       onClick={() => copyToClipboard(ipv6)}
                       className={styles.copyBtnSmall}
                       title="Copiar IPv6"
+                      aria-label="Copiar IPv6"
                     >
                       📋
                     </button>
@@ -314,21 +316,21 @@ export default function MiIpPage() {
               <div className={styles.locationDetails}>
                 {ipInfo.zip && (
                   <div className={styles.detailItem}>
-                    <span className={styles.detailIcon}>📮</span>
+                    <span className={styles.detailIcon} aria-hidden="true">📮</span>
                     <span className={styles.detailLabel}>Código Postal</span>
                     <span className={styles.detailValue}>{ipInfo.zip}</span>
                   </div>
                 )}
                 {ipInfo.timezone && (
                   <div className={styles.detailItem}>
-                    <span className={styles.detailIcon}>🕐</span>
+                    <span className={styles.detailIcon} aria-hidden="true">🕐</span>
                     <span className={styles.detailLabel}>Zona Horaria</span>
                     <span className={styles.detailValue}>{ipInfo.timezone}</span>
                   </div>
                 )}
                 {ipInfo.lat && ipInfo.lon && (
                   <div className={styles.detailItem}>
-                    <span className={styles.detailIcon}>🗺️</span>
+                    <span className={styles.detailIcon} aria-hidden="true">🗺️</span>
                     <span className={styles.detailLabel}>Coordenadas</span>
                     <span className={styles.detailValue}>
                       {ipInfo.lat.toFixed(2)}°, {ipInfo.lon.toFixed(2)}°
@@ -346,7 +348,7 @@ export default function MiIpPage() {
             <h2 className={styles.sectionTitle}><span aria-hidden="true">🏢</span> Proveedor de Internet</h2>
             <div className={styles.ispGrid}>
               <div className={styles.ispItem}>
-                <span className={styles.ispIcon}>📡</span>
+                <span className={styles.ispIcon} aria-hidden="true">📡</span>
                 <div className={styles.ispInfo}>
                   <span className={styles.ispLabel}>ISP</span>
                   <span className={styles.ispValue}>{ipInfo.isp}</span>
@@ -354,7 +356,7 @@ export default function MiIpPage() {
               </div>
               {ipInfo.org && ipInfo.org !== ipInfo.isp && (
                 <div className={styles.ispItem}>
-                  <span className={styles.ispIcon}>🏛️</span>
+                  <span className={styles.ispIcon} aria-hidden="true">🏛️</span>
                   <div className={styles.ispInfo}>
                     <span className={styles.ispLabel}>Organización</span>
                     <span className={styles.ispValue}>{ipInfo.org}</span>
@@ -363,7 +365,7 @@ export default function MiIpPage() {
               )}
               {ipInfo.as && (
                 <div className={styles.ispItem}>
-                  <span className={styles.ispIcon}>🔢</span>
+                  <span className={styles.ispIcon} aria-hidden="true">🔢</span>
                   <div className={styles.ispInfo}>
                     <span className={styles.ispLabel}>Sistema Autónomo</span>
                     <span className={styles.ispValue}>{ipInfo.as}</span>
@@ -390,7 +392,7 @@ export default function MiIpPage() {
             <h2 className={styles.sectionTitle}><span aria-hidden="true">📶</span> Tu Conexión</h2>
             <div className={styles.connectionGrid}>
               <div className={styles.connectionCard}>
-                <span className={styles.connectionIcon}>
+                <span className={styles.connectionIcon} aria-hidden="true">
                   {getConnectionTypeLabel(connectionInfo.type).split(' ')[0]}
                 </span>
                 <span className={styles.connectionLabel}>Tipo</span>
@@ -400,7 +402,7 @@ export default function MiIpPage() {
               </div>
 
               <div className={styles.connectionCard}>
-                <span className={styles.connectionIcon}>⚡</span>
+                <span className={styles.connectionIcon} aria-hidden="true">⚡</span>
                 <span className={styles.connectionLabel}>Velocidad Est.</span>
                 <span className={styles.connectionValue}>
                   {connectionInfo.downlink > 0 ? `${connectionInfo.downlink} Mbps` : 'N/D'}
@@ -408,7 +410,7 @@ export default function MiIpPage() {
               </div>
 
               <div className={styles.connectionCard}>
-                <span className={styles.connectionIcon}>⏱️</span>
+                <span className={styles.connectionIcon} aria-hidden="true">⏱️</span>
                 <span className={styles.connectionLabel}>Latencia</span>
                 <span className={styles.connectionValue}>
                   {connectionInfo.rtt > 0 ? `${connectionInfo.rtt} ms` : 'N/D'}
@@ -418,6 +420,7 @@ export default function MiIpPage() {
               <div className={styles.connectionCard}>
                 <span
                   className={styles.connectionIcon}
+                  aria-hidden="true"
                   style={{ color: getEffectiveTypeLabel(connectionInfo.effectiveType).color }}
                 >
                   📊
@@ -532,7 +535,7 @@ export default function MiIpPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🔧</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🔧</span>
               <strong>Administrador de Sistemas</strong>
             </div>
             <p>Verifica la IP pública del servidor o de la red corporativa para configurar reglas de firewall, acceso remoto, VPN y whitelisting en servicios externos o APIs con restricción por IP.</p>
@@ -540,7 +543,7 @@ export default function MiIpPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🛡️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🛡️</span>
               <strong>Usuario preocupado por la privacidad</strong>
             </div>
             <p>Comprueba qué información revela tu IP: país, ciudad aproximada, ISP y organización. Evalúa si necesitas una VPN para proteger tu identidad en actividades sensibles online.</p>
@@ -548,7 +551,7 @@ export default function MiIpPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👨‍💻</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👨‍💻</span>
               <strong>Desarrollador Web</strong>
             </div>
             <p>Consulta tu IP para probar reglas de geolocalización, restricciones por país o configuraciones de CDN en tus aplicaciones. Verifica que el tráfico se enruta correctamente desde tu región.</p>
@@ -556,7 +559,7 @@ export default function MiIpPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎮</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎮</span>
               <strong>Gamer / Streamer</strong>
             </div>
             <p>Verifica tu IP antes de compartir streams o conectarte a servidores de juego para evitar exponer tu ubicación real. Comprueba si tu ISP te asigna IP estática (mejor para hosting de servidores) o dinámica.</p>
@@ -634,32 +637,32 @@ export default function MiIpPage() {
         {/* 5. TIPS GRID */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔒</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔒</span>
             <strong>No compartas tu IP</strong>
             <p>Evita compartir tu IP pública en foros, chats o juegos online. Con tu IP y herramientas básicas se puede intentar un ataque DDoS o explorar puertos abiertos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🌍</span>
+            <span className={styles.tipIcono} aria-hidden="true">🌍</span>
             <strong>VPN ≠ anonimato total</strong>
             <p>Una VPN cambia tu IP pero no te hace completamente anónimo. Las cookies, fingerprinting del navegador y cuentas logueadas también identifican a los usuarios.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>⚡</span>
+            <span className={styles.tipIcono} aria-hidden="true">⚡</span>
             <strong>IP estática para servidores</strong>
             <p>Si hospeadas un servidor web, de juegos o un sistema de cámaras en casa, una IP estática (de pago con tu ISP) simplifica mucho la configuración y el acceso remoto.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔄</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔄</span>
             <strong>Cambiar IP dinámica</strong>
             <p>Para cambiar tu IP dinámica: apaga el router 5-10 minutos. Si el ISP asigna IPs por tiempo de arrendamiento (lease time), tras reiniciar puede asignarte una distinta.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🛡️</span>
+            <span className={styles.tipIcono} aria-hidden="true">🛡️</span>
             <strong>Comprueba fugas WebRTC</strong>
             <p>Con VPN activa, los navegadores pueden filtrar tu IP real a través de WebRTC. Comprueba periódicamente que no tienes fugas desactivando WebRTC en el navegador o con extensiones.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📍</span>
+            <span className={styles.tipIcono} aria-hidden="true">📍</span>
             <strong>Geolocalización ≠ ubicación exacta</strong>
             <p>La geolocalización por IP tiene una precisión de ciudad o región, con errores frecuentes de decenas de kilómetros. No se usa para encontrar personas, sino para segmentar servicios.</p>
           </div>
@@ -668,7 +671,7 @@ export default function MiIpPage() {
         {/* 6. WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <strong>Lo que tu IP revela (y lo que no) sobre ti</strong>
           </div>
           <ul className={styles.warningList}>

@@ -245,7 +245,7 @@ export default function GuiaReclamarSeguroCochePage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🚗</span>
+        <span className={styles.heroIcon} aria-hidden="true">🚗</span>
         <h1 className={styles.title}>¿Cuándo Reclamar al Seguro del Coche?</h1>
         <p className={styles.subtitle}>
           Guía completa para tomar decisiones informadas ante siniestros, averías y situaciones imprevistas
@@ -489,52 +489,52 @@ export default function GuiaReclamarSeguroCochePage() {
               <tbody>
                 <tr>
                   <td>Daños a terceros</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
                 </tr>
                 <tr>
                   <td>Defensa jurídica</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
                 </tr>
                 <tr>
                   <td>Asistencia en carretera</td>
-                  <td>❌</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td><span role="img" aria-label="No incluido">❌</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
                 </tr>
                 <tr>
                   <td>Robo del vehículo</td>
-                  <td>❌</td>
-                  <td>✅</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td><span role="img" aria-label="No incluido">❌</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
                 </tr>
                 <tr>
                   <td>Daños propios (accidente)</td>
-                  <td>❌</td>
-                  <td>❌</td>
-                  <td><span aria-hidden="true">✅</span> (franquicia)</td>
-                  <td>✅</td>
+                  <td><span role="img" aria-label="No incluido">❌</span></td>
+                  <td><span role="img" aria-label="No incluido">❌</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span> (franquicia)</td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
                 </tr>
                 <tr>
                   <td>Fenómenos meteorológicos</td>
-                  <td>❌</td>
+                  <td><span role="img" aria-label="No incluido">❌</span></td>
                   <td>Depende</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
                 </tr>
                 <tr>
                   <td>Rotura de lunas</td>
-                  <td>❌</td>
+                  <td><span role="img" aria-label="No incluido">❌</span></td>
                   <td>Depende</td>
-                  <td>✅</td>
-                  <td>✅</td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
+                  <td><span role="img" aria-label="Incluido">✅</span></td>
                 </tr>
               </tbody>
             </table>
