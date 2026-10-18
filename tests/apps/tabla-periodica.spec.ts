@@ -48,7 +48,7 @@ import { formatNumber, parseSpanishNumber } from '../../lib/formatters';
  *
  * RE-INSPECCIÓN 18/10/2026: al final del fichero. Verifica las dos reparaciones del 17/10
  * (26e2e846 y f6314c1f) con tres casos nuevos (23-25) y uno en un móvil de 390 px (26), y deja
- * tres hallazgos ABIERTOS (F-H), escritos con `test.fail()`.
+ * tres hallazgos (F-H = 3373-3375), escritos con `test.fail()` y REPARADOS el 18/10/2026.
  *
  * QUÉ PROMETE
  *   <h1>      «⚛️ Tabla Periódica Interactiva»
@@ -3096,13 +3096,12 @@ test.describe('CASO 26 · móvil (iPhone 12, 390 × 664): buscar por el otro nom
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS de la re-inspección del 18/10/2026 — ABIERTOS, con `test.fail()`
-// Cada uno afirma lo que DEBERÍA pasar; al repararlo se retira la marca y queda como regresión.
+// HALLAZGOS de la re-inspección del 18/10/2026 — REPARADOS el 18/10/2026 por /reparar
+// (F = 3373, G = 3374, H = 3375). Se escribieron con `test.fail()`; hoy son regresión.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('hallazgos · 18/10/2026 (ABIERTOS)', () => {
+test.describe('hallazgos · 18/10/2026 (REPARADOS)', () => {
   test('F · el buscador no recorta los espacios: «hierro » (el que deja el teclado del móvil) da 0 de 118', async ({ page }) => {
-    test.fail(true, 'ABIERTO (inspector 18/10/2026): normalizaTexto no hace trim; «hierro » y « » dan 0 de 118');
-    // page.tsx filtra con normalizaTexto(busqueda), que no quita los espacios de los extremos, y
+    // REPARADO (3373): page.tsx recorta la búsqueda antes de normalizarla. Antes: page.tsx filtra con normalizaTexto(busqueda), que no quita los espacios de los extremos, y
     // `includes` busca la cadena CON el espacio. Los teclados de Android e iOS añaden un espacio
     // al aceptar una sugerencia, y el resultado es la tabla entera atenuada sin ningún aviso. El
     // corrector de las fichas de la misma app sí hace trim («normalizar» de casos.ts).
@@ -3112,12 +3111,22 @@ test.describe('hallazgos · 18/10/2026 (ABIERTOS)', () => {
     await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible({ timeout: 2000 }); // hoy: 0 de 118
     await expect.poll(() => titulosActivos(page), { timeout: 2000 }).toEqual(['Hierro (Fe)']);
     await sembrarValor(page, '#busqueda', ' ');
-    await expect(page.getByText('Mostrando 118 de 118 elementos')).toBeVisible({ timeout: 2000 }); // hoy: 0 de 118
+    await expect(page.getByText('Mostrando 118 de 118 elementos')).toBeVisible({ timeout: 2000 }); // antes: 0 de 118
+    // Y los demás del caso de la ficha: « hierro», «Fe », «26 » dan lo mismo que sin el espacio
+    // («Fe» encuentra 2: el símbolo y otro nombre que lo contiene; lo que se mide es que el espacio no cambie nada)
+    for (const [conEspacio, sinEspacio] of [[' hierro', 'hierro'], ['Fe ', 'Fe'], ['26 ', '26']] as const) {
+      await sembrarValor(page, '#busqueda', sinEspacio);
+      await expect(page.getByText(/^Mostrando [1-9]\d? de 118 elementos$/)).toBeVisible({ timeout: 2000 }); // ni 0 ni las 118 de antes
+      const esperado = await titulosActivos(page);
+      expect(esperado, `«${sinEspacio}» encuentra el hierro`).toContain('Hierro (Fe)');
+      await sembrarValor(page, '#busqueda', conEspacio);
+      await expect.poll(() => titulosActivos(page), { timeout: 2000, message: `«${conEspacio}»` }).toEqual(esperado);
+    }
   });
 
   test('G · ficha 4 · la masa copiada con su unidad («63,546 u», como la escribe la ficha) se da por fallo', async ({ page }) => {
-    test.fail(true, 'ABIERTO (inspector 18/10/2026): parseSpanishNumber no admite la unidad y el fallo manda a «volver a la tabla»');
-    // La ficha del cobre escribe «Masa atómica: 63,546 u», y el convenio de la sección promete
+    // REPARADO (3374): comprobarRespuesta quita la unidad de LA ficha («u», «uma», «Da») antes de
+    // leer el número; una letra cualquiera sigue siendo un fallo. Antes: la ficha del cobre escribe «Masa atómica: 63,546 u», y el convenio de la sección promete
     // «Lo que se evalúa es si sabes buscarlo, no cómo lo tecleas». Quien copia el dato con su
     // unidad recibe «Todavía no. Vuelve a la tabla y fíjate en la pista»: le manda a buscar lo
     // que ya encontró. Esperado: «63,546 u» y «64 u» valen igual que «63,546» y «64».
@@ -3125,13 +3134,17 @@ test.describe('hallazgos · 18/10/2026 (ABIERTOS)', () => {
     expect(await fichaDe(page, 'Cobre (Cu)')).toContain('Masa atómica: 63,546 u');
     await cerrarFicha(page);
     expect(await veredictoLimpio(page, 4, '63,546')).toContain(ACIERTO);
-    expect(await veredictoLimpio(page, 4, '63,546 u')).toContain(ACIERTO); // hoy: Todavía no
-    expect(await veredictoLimpio(page, 4, '64 u')).toContain(ACIERTO); // hoy: Todavía no
+    expect(await veredictoLimpio(page, 4, '63,546 u')).toContain(ACIERTO); // antes: Todavía no
+    expect(await veredictoLimpio(page, 4, '63,5 u')).toContain(ACIERTO);
+    expect(await veredictoLimpio(page, 4, '64 u')).toContain(ACIERTO); // antes: Todavía no
+    expect(await veredictoLimpio(page, 4, '63,546 uma')).toContain(ACIERTO);
+    // Lo que no es la unidad de la ficha sigue sin ser un número, y la unidad no salva una cifra mala
+    expect(await veredictoLimpio(page, 4, '63,546 x')).not.toContain(ACIERTO);
+    expect(await veredictoLimpio(page, 4, '58,693 u')).not.toContain(ACIERTO); // el níquel, al lado
   });
 
   test('H · el FAQPage dice que las masas atómicas «se expresan en gramos por mol», y la ficha las da en u', async ({ page }) => {
-    test.fail(true, 'ABIERTO (inspector 18/10/2026): FAQPage «se expresan en gramos por mol (g/mol)» frente a «Masa atómica: … u»');
-    // La pregunta 2 del FAQPage («¿Cómo se calcula la masa molar de un compuesto?») termina:
+    // REPARADO (3375): la respuesta dice u y que la masa molar en g/mol tiene el mismo valor. Antes: la pregunta 2 del FAQPage («¿Cómo se calcula la masa molar de un compuesto?») termina:
     // «Las masas atómicas de cada elemento aparecen en la tabla periódica y se expresan en gramos
     // por mol (g/mol)». La propia app las escribe en u (ficha «Masa atómica: 63,546 u», ficha 4
     // «Masa atómica (u)», solución «63,546 u») y reserva g/mol para la masa MOLAR de la
@@ -3148,6 +3161,7 @@ test.describe('hallazgos · 18/10/2026 (ABIERTOS)', () => {
     const preguntas = JSON.parse(faqPage).mainEntity as { name: string; acceptedAnswer: { text: string } }[];
     const respuesta = preguntas.find((q) => q.name === '¿Cómo se calcula la masa molar de un compuesto?');
     expect(respuesta, 'la pregunta de la masa molar en el FAQPage').toBeTruthy();
-    expect(respuesta!.acceptedAnswer.text).not.toMatch(/masas atómicas[^.]*se expresan en gramos por mol/); // hoy: sí
+    expect(respuesta!.acceptedAnswer.text).not.toMatch(/masas atómicas[^.]*se expresan en gramos por mol/); // antes: sí
+    expect(respuesta!.acceptedAnswer.text).toContain('unidades de masa atómica (u)');
   });
 });

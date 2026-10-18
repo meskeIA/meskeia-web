@@ -51,7 +51,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la masa molar de un compuesto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La masa molar de un compuesto se obtiene sumando las masas atómicas de todos sus átomos. Por ejemplo, el agua (H₂O) tiene masa molar = 2 × 1,008 + 15,999 = 18,015 g/mol. Las masas atómicas de cada elemento aparecen en la tabla periódica y se expresan en gramos por mol (g/mol).',
+        text: 'La masa molar de un compuesto se obtiene sumando las masas atómicas de todos sus átomos. Por ejemplo, el agua (H₂O) tiene masa molar = 2 × 1,008 + 15,999 = 18,015 g/mol. Las masas atómicas de cada elemento aparecen en la tabla periódica en unidades de masa atómica (u), y la masa molar en g/mol tiene el mismo valor numérico: 1,008 u de un átomo de hidrógeno equivalen a 1,008 g/mol.',
       },
     },
     {
