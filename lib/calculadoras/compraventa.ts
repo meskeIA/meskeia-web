@@ -14,11 +14,16 @@
  * condiciones. El AJD era un 1,5 % igual en todas partes. Ahora los dos salen de las mismas
  * funciones que las siete apps del clúster de compraventa (`itpSegunApps`, `ajdSegunApps`),
  * que usa también gastosCompraInmueble.ts.
+ *
+ * Hasta el 18/10/2026 (cabo C0209, decisión del usuario del 17/10) la notaría y el registro eran
+ * una estimación porcentual con mínimo y máximo (COSTES_COMPRAVENTA_2025: 0,3 % y 0,2 %), que no
+ * llevaba la rebaja del 5 % del nº 2.1 de los aranceles ni sabía que en Canarias, Ceuta y Melilla
+ * no se factura IVA: Madrid 200.000 € daba 600 € de notaría y 400 € de registro, y las apps, 721,04
+ * y 224,96 €. Ahora salen de las mismas funciones que ellas (`honorariosSegunApps`).
  */
 
 import {
   IVA_INMUEBLES_2025,
-  COSTES_COMPRAVENTA_2025,
   coeficienteIIVTNU,
   PLUSVALIA_MUNICIPAL_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
@@ -33,6 +38,11 @@ import {
   describirSubidaITP,
   CIUDADES_CON_BONIFICACION,
   TERRITORIOS_SIN_IVA,
+  calcularNotario,
+  calcularRegistro,
+  honorariosLlevanIVA,
+  notariaDeLibreAcuerdo,
+  LIMITE_ARANCEL_NOTARIAL,
   normaliza,
   type ComunidadAutonoma,
   type ContextoAJD,
@@ -90,6 +100,8 @@ export interface GastosComprador {
   totalGastos: number;
   totalOperacion: number;
   notaITP: string;
+  /** De dónde salen la notaría y el registro, y lo que dejan fuera (IGIC o IPSI, libre acuerdo). */
+  notaHonorarios: string;
 }
 
 export interface GastosVendedor {
@@ -167,6 +179,31 @@ export function itpSegunApps(
 /** AJD de la primera copia con el tipo de la comunidad (y la bonificación de Ceuta y Melilla). */
 export function ajdSegunApps(precio: number, ccaa: ComunidadAutonoma, contexto: ContextoAJD): number {
   return Math.round(calcularAJD(precio, ccaa, contexto) * 100) / 100;
+}
+
+/**
+ * Notaría y registro con el motor de las apps: la notaría es el punto medio de la horquilla de la
+ * factura (1,5 a 2 veces el arancel del RD 1426/1989, `calcularNotario`) y el registro, el arancel
+ * del RD 1427/1989 con presentación y nota simple (`calcularRegistro`); los dos con la rebaja del
+ * 5 % del nº 2.1 y con IVA solo donde rige. La nota dice lo que la cifra deja fuera.
+ */
+export function honorariosSegunApps(
+  precio: number,
+  ccaa: ComunidadAutonoma,
+): { notaria: number; registro: number; nota: string } {
+  const notaria = Math.round(calcularNotario(precio, ccaa) * 100) / 100;
+  const registro = Math.round(calcularRegistro(precio, ccaa) * 100) / 100;
+  const partes = [
+    'Notaría: punto medio de la factura habitual (1,5 a 2 veces el arancel del RD 1426/1989, por las copias y los folios); registro: arancel del RD 1427/1989.',
+  ];
+  if (!honorariosLlevanIVA(ccaa)) {
+    const impuesto = TERRITORIOS_SIN_IVA[ccaa]?.impuesto ?? 'impuesto indirecto';
+    partes.push(`En ${ITP_CCAA[ccaa].nombre} las dos facturas no llevan IVA sino ${impuesto}, que se cobra aparte y no está en estas cifras.`);
+  }
+  if (notariaDeLibreAcuerdo(precio)) {
+    partes.push(`Lo que el precio excede de ${formatNumber(LIMITE_ARANCEL_NOTARIAL, 2)} € es de libre acuerdo con el notario: esa parte no está en la cifra.`);
+  }
+  return { notaria, registro, nota: partes.join(' ') };
 }
 
 function calcularIRPFGanancia(ganancia: number): number {
@@ -251,19 +288,8 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
     }
   }
 
-  // Notaría: arancel regulado, estimación porcentual con límites
-  const notariaBase = p.precioInmueble * COSTES_COMPRAVENTA_2025.notaria.estimacion / 100;
-  const notaria = r(Math.min(
-    Math.max(notariaBase, COSTES_COMPRAVENTA_2025.notaria.minimo),
-    COSTES_COMPRAVENTA_2025.notaria.maximo,
-  ));
-
-  // Registro: arancel regulado, estimación porcentual con límites
-  const registroBase = p.precioInmueble * COSTES_COMPRAVENTA_2025.registro.estimacion / 100;
-  const registro = r(Math.min(
-    Math.max(registroBase, COSTES_COMPRAVENTA_2025.registro.minimo),
-    COSTES_COMPRAVENTA_2025.registro.maximo,
-  ));
+  // Notaría y registro: los aranceles, como las apps (cabo C0209)
+  const { notaria, registro, nota: notaHonorarios } = honorariosSegunApps(p.precioInmueble, ccaa);
 
   // Gestoría: orientativo
   const gestoria = 500;
@@ -284,6 +310,7 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
     totalGastos,
     totalOperacion,
     notaITP,
+    notaHonorarios,
   };
 
   // ── VENDEDOR (solo si se proporcionan datos) ──────────────────────────────────

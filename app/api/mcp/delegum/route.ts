@@ -517,6 +517,7 @@ function crearServidorDelegum(): McpServer {
             ? `  • ${c.tipoImpuesto}: ${c.notaITP}`
             : `  • ${c.tipoImpuesto} (${pct(c.porcentajeImpuesto)}%): ${fmt(c.importeImpuesto)} €`,
           `  • AJD: ${fmt(c.ajd)} € · Notaría: ${fmt(c.notaria)} € · Registro: ${fmt(c.registro)} € · Gestoría: ${fmt(c.gestoria)} €`,
+          `    ${c.notaHonorarios}`,
           `  • **Total gastos${c.impuestoNoCalculado ? ' (sin el impuesto indirecto)' : ''}: ${fmt(c.totalGastos)} €** (${pct((c.totalGastos / c.precioInmueble) * 100)}% del precio)`,
           '',
           `🏦 **Ahorro total necesario (precio + gastos${c.impuestoNoCalculado ? ', sin el impuesto indirecto' : ''}): ${fmt(c.totalOperacion)} €**`,

@@ -111,12 +111,18 @@ test.describe('Territorios donde no rige el IVA español', () => {
 // Registro es el de la finca y el notario presta un servicio relacionado con el inmueble
 // (art. 70.Uno.1.º LIVA): en Canarias se factura IGIC y en Ceuta y Melilla IPSI. El motor
 // no los calcula; devuelve el arancel sin impuesto indirecto y la app lo nombra.
+//
+// Cifras al día con la rebaja del 5 % del nº 2.1 (RDL 8/2010, DA 8.ª), que entró en el motor el
+// 11/10/2026 (hallazgo 2902) y este test no recogió hasta el 18/10 (cabo C0209). A mano:
+// 24,040484 + 24.040,49 × 0,175 % + 30.050,60 × 0,125 % + 89.898,79 × 0,075 % = 171,098684
+// → × 0,95 = 162,543750 → + presentación 6,010121 + nota simple 3,005061 = 171,558932 → 171,56 €
+// sin IVA; × 1,21 = 207,586307 → 207,59 € con IVA. Antes de la rebaja: 180,11 y 217,94 €.
 test.describe('Notaría y registro — sin IVA en Canarias, Ceuta y Melilla', () => {
-  test('Canarias, 150.000 €: registro 180,11 € (el 217,94 € de antes llevaba un 21 % inexistente)', () => {
-    expect(calcularRegistro(150000, 'canarias')).toBeCloseTo(180.11, 2);
-    expect(calcularRegistro(150000, 'madrid')).toBeCloseTo(217.94, 2);
+  test('Canarias, 150.000 €: registro 171,56 € sin el 21 % que allí no existe (207,59 € en Madrid)', () => {
+    expect(calcularRegistro(150000, 'canarias')).toBeCloseTo(171.56, 2);
+    expect(calcularRegistro(150000, 'madrid')).toBeCloseTo(207.59, 2);
     // Sin territorio, península: la firma antigua conserva su resultado.
-    expect(calcularRegistro(150000)).toBeCloseTo(217.94, 2);
+    expect(calcularRegistro(150000)).toBeCloseTo(207.59, 2);
   });
 
   test('la notaría de Ceuta y Melilla es la de Madrid sin el 21 %', () => {

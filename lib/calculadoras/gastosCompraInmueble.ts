@@ -21,12 +21,13 @@
  * compraventa. Fuente de los datos: data/fiscal/inmuebles.ts; el ITP y el AJD, del motor de
  * esas apps (data/itp-ccaa.ts) a través de `itpSegunApps`/`ajdSegunApps` de compraventa.ts
  * desde el 09/10/2026 (cabo C0004: el ITP era el tipo plano de la comunidad y el AJD un
- * 1,5 % igual en todas; un local en el País Vasco salía al 4 % y no al 7 %).
+ * 1,5 % igual en todas; un local en el País Vasco salía al 4 % y no al 7 %). La notaría y el
+ * registro, de los aranceles a través de `honorariosSegunApps` desde el 18/10/2026 (cabo C0209:
+ * eran un 0,3 % y un 0,2 % con mínimo y máximo, sin la rebaja del 5 % ni el territorio sin IVA).
  */
 
 import {
   IVA_INMUEBLES_2025,
-  COSTES_COMPRAVENTA_2025,
   FISCAL_INMUEBLES_META,
 } from '@/data/fiscal';
 import {
@@ -37,7 +38,7 @@ import {
   type ObjetoTransmision,
 } from '@/data/itp-ccaa';
 import { formatNumber } from '@/lib/formatters';
-import { claveCCAA, itpSegunApps, ajdSegunApps, type PerfilCompradorMCP } from './compraventa';
+import { claveCCAA, itpSegunApps, ajdSegunApps, honorariosSegunApps, type PerfilCompradorMCP } from './compraventa';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -263,17 +264,8 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
       break;
   }
 
-  const notariaBase = p.precio * COSTES_COMPRAVENTA_2025.notaria.estimacion / 100;
-  const notaria = r(Math.min(
-    Math.max(notariaBase, COSTES_COMPRAVENTA_2025.notaria.minimo),
-    COSTES_COMPRAVENTA_2025.notaria.maximo,
-  ));
-
-  const registroBase = p.precio * COSTES_COMPRAVENTA_2025.registro.estimacion / 100;
-  const registro = r(Math.min(
-    Math.max(registroBase, COSTES_COMPRAVENTA_2025.registro.minimo),
-    COSTES_COMPRAVENTA_2025.registro.maximo,
-  ));
+  const { notaria, registro, nota: notaHonorarios } = honorariosSegunApps(p.precio, ccaa);
+  advertencias.push(notaHonorarios);
 
   const gestoria = p.gestoria ?? 500;
   const totalGastos = r(importeImpuesto + ajd + notaria + registro + gestoria);

@@ -442,6 +442,50 @@ test.describe('Golden — ITP del MCP con el motor de las apps (C0004)', () => {
 });
 
 // ────────────────────────────────────────────────────────────────────────────
+// GOLDEN — notaría y registro del MCP con los aranceles de las apps (cabo C0209, 18/10/2026)
+// Antes: 0,3 % y 0,2 % del precio con mínimo y máximo (COSTES_COMPRAVENTA_2025), sin la rebaja
+// del 5 % del nº 2.1 (RDL 8/2010, DA 8.ª) ni el territorio sin IVA: Madrid 200.000 € daba 600 y
+// 400 €. Cuentas a mano con las escalas del BOE (RD 1426/1989 y RD 1427/1989, nº 2.1):
+//   notaría:  90,151816 + 24.040,49 × 0,45 % + 30.050,60 × 0,15 % + 90.151,82 × 0,10 %
+//             + 49.746,97 × 0,05 % = 358,435226 → × 0,95 = 340,513465 → IVA 412,021292
+//             → punto medio de la factura (× 1,75) = 721,037262 → 721,04 €
+//   registro: 24,040484 + 24.040,49 × 0,175 % + 30.050,60 × 0,125 % + 90.151,82 × 0,075 %
+//             + 49.746,97 × 0,03 % = 186,212548 → × 0,95 = 176,901920 → + 6,010121 + 3,005061
+//             = 185,917102 → IVA 224,959694 → 224,96 €
+//   Canarias (sin IVA en los honorarios, art. 70.Uno.1.º LIVA): 340,513465 × 1,75 = 595,90 € y
+//             185,917102 = 185,92 €
+// ────────────────────────────────────────────────────────────────────────────
+
+test.describe('Golden — notaría y registro del MCP con los aranceles (C0209)', () => {
+  test('Madrid 200.000 € → notaría 721,04 € y registro 224,96 €, las cifras de las apps', () => {
+    const c = calcularCompraventa({ precioInmueble: 200000, ccaa: 'madrid', tipoTransmision: 'segunda_mano' }).comprador;
+    expect(c.notaria).toBe(721.04);
+    expect(c.registro).toBe(224.96);
+    const g = calcularGastosCompraInmueble({ precio: 200000, ccaa: 'madrid', tipoInmueble: 'local_comercial' });
+    expect(g.notaria).toBe(721.04);
+    expect(g.registro).toBe(224.96);
+  });
+
+  test('Canarias 200.000 € → sin IVA en los honorarios: 595,90 € y 185,92 €, y la nota nombra el IGIC', () => {
+    const c = calcularCompraventa({ precioInmueble: 200000, ccaa: 'canarias', tipoTransmision: 'segunda_mano' }).comprador;
+    expect(c.notaria).toBe(595.9);
+    expect(c.registro).toBe(185.92);
+    expect(c.notaHonorarios).toContain('IGIC');
+    const g = calcularGastosCompraInmueble({ precio: 200000, ccaa: 'canarias', tipoInmueble: 'garaje' });
+    expect(g.notaria).toBe(595.9);
+    expect(g.advertencias.join(' ')).toContain('IGIC');
+  });
+
+  test('Madrid: la nota no habla de IGIC ni de libre acuerdo; por encima de 6.010.121,04 € sí avisa', () => {
+    const c = calcularCompraventa({ precioInmueble: 200000, ccaa: 'madrid', tipoTransmision: 'segunda_mano' }).comprador;
+    expect(c.notaHonorarios).not.toContain('IGIC');
+    expect(c.notaHonorarios).not.toContain('libre acuerdo');
+    const caro = calcularCompraventa({ precioInmueble: 7000000, ccaa: 'madrid', tipoTransmision: 'segunda_mano' }).comprador;
+    expect(caro.notaHonorarios).toContain('libre acuerdo');
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
 // COMPOSICIÓN — consulta_compra_vivienda (compraventa + hipoteca)
 // ────────────────────────────────────────────────────────────────────────────
 
