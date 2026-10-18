@@ -229,7 +229,7 @@ function TimelineENSO() {
           className={`${styles.eventoBase} ${evento.tipo === 'nino' ? styles.eventoNino : styles.eventoNinia}`}
         >
           <span className={styles.eventoAnio}>{evento.anio}</span>
-          <span className={styles.eventoTipo}>{evento.tipo === 'nino' ? '🔥 El Niño' : '❄️ La Niña'}</span>
+          <span className={styles.eventoTipo}>{evento.tipo === 'nino' ? <><span aria-hidden="true">🔥</span> El Niño</> : <><span aria-hidden="true">❄️</span> La Niña</>}</span>
           <span className={styles.eventoIntensidad}>
             {evento.intensidad === 'muy_fuerte' ? '★★★' : evento.intensidad === 'fuerte' ? '★★' : '★'}
           </span>
@@ -287,7 +287,7 @@ export default function VisualizadorElNino() {
         {tabActiva === 'normal' && (
           <section className={styles.content} aria-labelledby="tab-normal-titulo">
             <h2 id="tab-normal-titulo" className={styles.sectionTitle}>
-              🌊 Condiciones Normales (Estado Neutral)
+              <span aria-hidden="true">🌊</span> Condiciones Normales (Estado Neutral)
             </h2>
             <p className={styles.intro}>
               En condiciones de referencia, los vientos alisios soplan de este a oeste a lo largo del Pacífico tropical.
@@ -298,14 +298,14 @@ export default function VisualizadorElNino() {
 
             <div className={styles.mecanismosGrid}>
               <div className={styles.mecanismoCard}>
-                <h3>💨 Vientos Alisios</h3>
+                <h3><span aria-hidden="true">💨</span> Vientos Alisios</h3>
                 <p>
                   Soplan de este a oeste de forma estable. Arrastran la capa superficial de agua cálida hacia el Pacífico
                   Occidental (Indonesia, Filipinas, norte de Australia).
                 </p>
               </div>
               <div className={styles.mecanismoCard}>
-                <h3>🌊 Surgencia (Upwelling)</h3>
+                <h3><span aria-hidden="true">🌊</span> Surgencia (Upwelling)</h3>
                 <p>
                   En la costa de Perú y Ecuador, el arrastre del agua superficial crea un vacío que se rellena con agua
                   fría y rica en nutrientes procedente de capas profundas. Es la base de uno de los caladeros más
@@ -313,7 +313,7 @@ export default function VisualizadorElNino() {
                 </p>
               </div>
               <div className={styles.mecanismoCard}>
-                <h3>🌧️ Convección Tropical</h3>
+                <h3><span aria-hidden="true">🌧️</span> Convección Tropical</h3>
                 <p>
                   El agua cálida (~29-30°C) del Pacífico Occidental evapora enormes cantidades de vapor de agua, que sube
                   formando sistemas de convección profunda. Es la fuente de lluvias de Indonesia, Melanesia y norte de
@@ -321,7 +321,7 @@ export default function VisualizadorElNino() {
                 </p>
               </div>
               <div className={styles.mecanismoCard}>
-                <h3>☀️ Subsidencia en el Este</h3>
+                <h3><span aria-hidden="true">☀️</span> Subsidencia en el Este</h3>
                 <p>
                   El aire que sube en el Oeste diverge en altura, cruza el Pacífico y desciende sobre Perú y Ecuador,
                   creando condiciones de subsidencia (cielos despejados, poca lluvia). El ciclo vuelve a empezar.
@@ -350,7 +350,7 @@ export default function VisualizadorElNino() {
         {tabActiva === 'elnino' && (
           <section className={styles.content} aria-labelledby="tab-elnino-titulo">
             <h2 id="tab-elnino-titulo" className={styles.sectionTitle}>
-              🔥 El Niño — Calentamiento del Pacífico Central y Este
+              <span aria-hidden="true">🔥</span> El Niño — Calentamiento del Pacífico Central y Este
             </h2>
             <p className={styles.intro}>
               Cada 2-7 años, los vientos alisios se debilitan. El agua cálida acumulada en el oeste se desplaza hacia el
@@ -401,7 +401,7 @@ export default function VisualizadorElNino() {
         {tabActiva === 'lanina' && (
           <section className={styles.content} aria-labelledby="tab-lanina-titulo">
             <h2 id="tab-lanina-titulo" className={styles.sectionTitle}>
-              ❄️ La Niña — El Opuesto de El Niño
+              <span aria-hidden="true">❄️</span> La Niña — El Opuesto de El Niño
             </h2>
             <p className={styles.intro}>
               La Niña es el polo opuesto del ciclo ENSO. Los vientos alisios se intensifican por encima de lo normal,
@@ -444,7 +444,7 @@ export default function VisualizadorElNino() {
         {tabActiva === 'prediccion' && (
           <section className={styles.content} aria-labelledby="tab-prediccion-titulo">
             <h2 id="tab-prediccion-titulo" className={styles.sectionTitle}>
-              📊 Predicción y Seguimiento del ENSO
+              <span aria-hidden="true">📊</span> Predicción y Seguimiento del ENSO
             </h2>
             <p className={styles.intro}>
               ENSO es el sistema climático más predecible del planeta a escala estacional... pero solo hasta 6-9 meses de
@@ -453,26 +453,26 @@ export default function VisualizadorElNino() {
 
             <div className={styles.indicesGrid}>
               <div className={styles.indiceCard}>
-                <h3>🔵 Índice SOI</h3>
+                <h3><span aria-hidden="true">🔵</span> Índice SOI</h3>
                 <p className={styles.indiceSubtitulo}>Southern Oscillation Index</p>
                 <p>
                   Diferencia de presión atmosférica entre Tahití (alta presión) y Darwin, Australia (baja presión).
                 </p>
                 <div className={styles.indiceValores}>
-                  <span className={styles.valorNino}>SOI {'<'} 0 → El Niño 🔥</span>
-                  <span className={styles.valorNinia}>SOI {'>'} 0 → La Niña ❄️</span>
+                  <span className={styles.valorNino}>SOI {'<'} 0 → El Niño <span aria-hidden="true">🔥</span></span>
+                  <span className={styles.valorNinia}>SOI {'>'} 0 → La Niña <span aria-hidden="true">❄️</span></span>
                 </div>
               </div>
               <div className={styles.indiceCard}>
-                <h3>🟠 Índice ONI</h3>
+                <h3><span aria-hidden="true">🟠</span> Índice ONI</h3>
                 <p className={styles.indiceSubtitulo}>Oceanic Niño Index</p>
                 <p>
                   Anomalía de temperatura superficial del mar en la región Niño 3.4 (Pacífico Central), promedio de 3
                   meses consecutivos.
                 </p>
                 <div className={styles.indiceValores}>
-                  <span className={styles.valorNino}>ONI {'≥'} +0.5°C × 5 meses → El Niño 🔥</span>
-                  <span className={styles.valorNinia}>ONI {'≤'} -0.5°C × 5 meses → La Niña ❄️</span>
+                  <span className={styles.valorNino}>ONI {'≥'} +0.5°C × 5 meses → El Niño <span aria-hidden="true">🔥</span></span>
+                  <span className={styles.valorNinia}>ONI {'≤'} -0.5°C × 5 meses → La Niña <span aria-hidden="true">❄️</span></span>
                 </div>
               </div>
             </div>
@@ -481,7 +481,7 @@ export default function VisualizadorElNino() {
             <TimelineENSO />
 
             <div className={styles.modelosCard}>
-              <h3>🤖 Modelos de predicción</h3>
+              <h3><span aria-hidden="true">🤖</span> Modelos de predicción</h3>
               <p>
                 La NOAA y el IRI (International Research Institute) publican mensualmente los resultados de 20+ modelos
                 acoplados océano-atmósfera. Los modelos dinámicos calculan la evolución física del sistema; los
@@ -495,7 +495,7 @@ export default function VisualizadorElNino() {
             </div>
 
             <div className={styles.espanaCard}>
-              <h3>🇪🇸 Impacto de ENSO en España</h3>
+              <h3><span aria-hidden="true">🇪🇸</span> Impacto de ENSO en España</h3>
               <p>
                 España está demasiado lejos del Pacífico para recibir señales directas de ENSO. La influencia llega de
                 forma <em>indirecta</em>, mediada principalmente por la <strong>Oscilación del Atlántico Norte (NAO)</strong>:

@@ -1008,11 +1008,11 @@ export default function SeriesConvergenciaPage() {
             <h3>Errores Comunes con Series e Infinitos</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ &ldquo;Si los términos tienden a 0, la serie converge&rdquo;:</strong> ¡Falso! La serie armónica Σ1/n diverge aunque 1/n → 0. Es una condición necesaria pero no suficiente.</li>
-            <li><strong>❌ Usar la serie fuera de su radio de convergencia:</strong> La serie de Taylor de ln(1+x) solo converge para |x| ≤ 1. Usarla para x=2 da resultados incorrectos.</li>
-            <li><strong>❌ Confundir el resto con el error absoluto:</strong> El resto de la serie de Taylor es el error exacto. El criterio de Leibniz solo da una cota superior del error.</li>
-            <li><strong>❌ Intercambiar suma y límite sin verificar:</strong> Para series uniformemente convergentes es válido; para otras, puede cambiar el resultado.</li>
-            <li><strong>❌ Pensar que &ldquo;converge&rdquo; significa &ldquo;converge rápido&rdquo;:</strong> La serie de Leibniz para π converge, pero necesita 10⁵ términos para 5 decimales correctos. La de Nilakantha es mucho más eficiente.</li>
+            <li><strong><span aria-hidden="true">❌</span> &ldquo;Si los términos tienden a 0, la serie converge&rdquo;:</strong> ¡Falso! La serie armónica Σ1/n diverge aunque 1/n → 0. Es una condición necesaria pero no suficiente.</li>
+            <li><strong><span aria-hidden="true">❌</span> Usar la serie fuera de su radio de convergencia:</strong> La serie de Taylor de ln(1+x) solo converge para |x| ≤ 1. Usarla para x=2 da resultados incorrectos.</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir el resto con el error absoluto:</strong> El resto de la serie de Taylor es el error exacto. El criterio de Leibniz solo da una cota superior del error.</li>
+            <li><strong><span aria-hidden="true">❌</span> Intercambiar suma y límite sin verificar:</strong> Para series uniformemente convergentes es válido; para otras, puede cambiar el resultado.</li>
+            <li><strong><span aria-hidden="true">❌</span> Pensar que &ldquo;converge&rdquo; significa &ldquo;converge rápido&rdquo;:</strong> La serie de Leibniz para π converge, pero necesita 10⁵ términos para 5 decimales correctos. La de Nilakantha es mucho más eficiente.</li>
           </ul>
         </div>
       </EducationalSection>

@@ -257,7 +257,7 @@ export default function GuiaReclamarSeguroCochePage() {
       {/* Introducción */}
       <section className={styles.introSection}>
         <div className={styles.introCard}>
-          <h2>🤔 El dilema del conductor</h2>
+          <h2><span aria-hidden="true">🤔</span> El dilema del conductor</h2>
           <p>
             Ante un incidente con tu vehículo, surge la duda: <strong>¿reclamo al seguro o pago de mi bolsillo?</strong>
             La respuesta depende de muchos factores: tipo de incidente, coberturas contratadas, historial de siniestros
@@ -272,7 +272,7 @@ export default function GuiaReclamarSeguroCochePage() {
 
       {/* Selector de situaciones */}
       <section className={styles.situacionesSection}>
-        <h2 className={styles.sectionTitle}>📋 Selecciona tu situación</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Selecciona tu situación</h2>
         <p className={styles.sectionSubtitle}>Haz clic en la situación que mejor describe tu caso</p>
 
         <div className={styles.situacionesGrid}>
@@ -317,7 +317,7 @@ export default function GuiaReclamarSeguroCochePage() {
           <div className={styles.detalleGrid}>
             {/* Pasos a seguir */}
             <div className={styles.detalleBloque}>
-              <h3>📝 Pasos a seguir</h3>
+              <h3><span aria-hidden="true">📝</span> Pasos a seguir</h3>
               <ol className={styles.pasosList}>
                 {situacionSeleccionada.pasosASeguir.map((paso, index) => (
                   <li key={index}>{paso}</li>
@@ -327,7 +327,7 @@ export default function GuiaReclamarSeguroCochePage() {
 
             {/* Consejos clave */}
             <div className={styles.detalleBloque}>
-              <h3>💡 Consejos clave</h3>
+              <h3><span aria-hidden="true">💡</span> Consejos clave</h3>
               <ul className={styles.consejosList}>
                 {situacionSeleccionada.consejosClave.map((consejo, index) => (
                   <li key={index}>{consejo}</li>
@@ -337,7 +337,7 @@ export default function GuiaReclamarSeguroCochePage() {
 
             {/* Preguntas para la aseguradora */}
             <div className={`${styles.detalleBloque} ${styles.preguntasBloque}`}>
-              <h3>📞 Pregunta a tu aseguradora</h3>
+              <h3><span aria-hidden="true">📞</span> Pregunta a tu aseguradora</h3>
               <ul className={styles.preguntasList}>
                 {situacionSeleccionada.preguntasAseguradora.map((pregunta, index) => (
                   <li key={index}>{pregunta}</li>
@@ -348,7 +348,7 @@ export default function GuiaReclamarSeguroCochePage() {
 
           {situacionSeleccionada.requiereDenuncia && (
             <div className={styles.alertaDenuncia}>
-              <h4>⚠️ Importante: Denuncia obligatoria</h4>
+              <h4><span aria-hidden="true">⚠️</span> Importante: Denuncia obligatoria</h4>
               <p>
                 Para este tipo de siniestro, <strong>es imprescindible presentar denuncia</strong> ante la Guardia Civil
                 o Policía Local. Sin el número de denuncia, la aseguradora NO tramitará tu reclamación.
@@ -360,7 +360,7 @@ export default function GuiaReclamarSeguroCochePage() {
 
       {/* Factores a considerar */}
       <section className={styles.factoresSection}>
-        <h2 className={styles.sectionTitle}>⚖️ Factores a considerar antes de reclamar</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">⚖️</span> Factores a considerar antes de reclamar</h2>
 
         <div className={styles.factoresGrid}>
           <div className={styles.factorCard}>
@@ -398,7 +398,7 @@ export default function GuiaReclamarSeguroCochePage() {
 
       {/* FAQ */}
       <section className={styles.faqSection}>
-        <h2 className={styles.sectionTitle}>❓ Preguntas frecuentes</h2>
+        <h2 className={styles.sectionTitle}><span aria-hidden="true">❓</span> Preguntas frecuentes</h2>
 
         <div className={styles.faqGrid}>
           {faqData.map((faq, index) => (
@@ -425,7 +425,7 @@ export default function GuiaReclamarSeguroCochePage() {
       {/* Consejo final */}
       <section className={styles.consejoFinal}>
         <div className={styles.consejoFinalCard}>
-          <h2>📱 Consejo final</h2>
+          <h2><span aria-hidden="true">📱</span> Consejo final</h2>
           <p className={styles.consejoDestacado}>
             <strong>Ante la duda, llama a tu aseguradora y pregunta ANTES de abrir parte.</strong>
           </p>
@@ -519,7 +519,7 @@ export default function GuiaReclamarSeguroCochePage() {
                   <td>Daños propios (accidente)</td>
                   <td>❌</td>
                   <td>❌</td>
-                  <td>✅ (franquicia)</td>
+                  <td><span aria-hidden="true">✅</span> (franquicia)</td>
                   <td>✅</td>
                 </tr>
                 <tr>

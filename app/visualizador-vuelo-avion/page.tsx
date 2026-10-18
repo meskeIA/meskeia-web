@@ -267,7 +267,7 @@ export default function VueloAvionPage() {
             <div className={styles.sliderWrapper}>
               <label htmlFor="angulo-slider" className={styles.sliderLabel}>
                 Ángulo de ataque: <strong>{anguloAtaque}°</strong>
-                {anguloAtaque > 18 && <span className={styles.stallWarning}> ⚠️ ¡STALL!</span>}
+                {anguloAtaque > 18 && <span className={styles.stallWarning}> <span aria-hidden="true">⚠️</span> ¡STALL!</span>}
               </label>
               <input
                 id="angulo-slider"

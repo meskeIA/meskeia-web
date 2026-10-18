@@ -371,7 +371,7 @@ export default function TimeTrackerPage() {
               onClick={isTracking ? stopTracking : startTracking}
               className={`${styles.trackButton} ${isTracking ? styles.stop : styles.start}`}
             >
-              {isTracking ? '⏹ Detener' : '▶ Iniciar'}
+              {isTracking ? <><span aria-hidden="true">⏹</span> Detener</> : <><span aria-hidden="true">▶</span> Iniciar</>}
             </button>
           </div>
         </div>

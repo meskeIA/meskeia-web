@@ -249,13 +249,14 @@ export default function JuegoTresEnRayaPage() {
             <div className={styles.dificultadBtns}>
               {(['facil', 'medio', 'dificil'] as Dificultad[]).map((d) => (
                 <button
+                  type="button"
                   key={d}
                   onClick={() => { setDificultad(d); reiniciar(); }}
                   className={`${styles.dificultadBtn} ${dificultad === d ? styles.active : ''}`}
                 >
-                  {d === 'facil' && '😊 Fácil'}
-                  {d === 'medio' && '🤔 Medio'}
-                  {d === 'dificil' && '🧠 Difícil'}
+                  {d === 'facil' && <><span aria-hidden="true">😊</span> Fácil</>}
+                  {d === 'medio' && <><span aria-hidden="true">🤔</span> Medio</>}
+                  {d === 'dificil' && <><span aria-hidden="true">🧠</span> Difícil</>}
                 </button>
               ))}
             </div>
@@ -265,13 +266,13 @@ export default function JuegoTresEnRayaPage() {
           <div className={styles.estado}>
             {ganador ? (
               <span className={ganador === 'X' ? styles.victoria : styles.derrota}>
-                {ganador === 'X' ? '🎉 ¡Ganaste!' : '😔 Perdiste'}
+                {ganador === 'X' ? <><span aria-hidden="true">🎉</span> ¡Ganaste!</> : <><span aria-hidden="true">😔</span> Perdiste</>}
               </span>
             ) : empate ? (
-              <span className={styles.empate}>🤝 ¡Empate!</span>
+              <span className={styles.empate}><span aria-hidden="true">🤝</span> ¡Empate!</span>
             ) : (
               <span className={styles.turno}>
-                {turnoJugador ? '👤 Tu turno (X)' : '🤖 Pensando...'}
+                {turnoJugador ? <><span aria-hidden="true">👤</span> Tu turno (X)</> : <><span aria-hidden="true">🤖</span> Pensando...</>}
               </span>
             )}
           </div>
@@ -280,6 +281,7 @@ export default function JuegoTresEnRayaPage() {
           <div className={styles.tablero}>
             {tablero.map((casilla, index) => (
               <button
+                type="button"
                 key={index}
                 onClick={() => clickCasilla(index)}
                 className={`${styles.casilla} ${casilla ? styles.ocupada : ''} ${lineaGanadora.includes(index) ? styles.ganadora : ''}`}
@@ -295,8 +297,8 @@ export default function JuegoTresEnRayaPage() {
           </div>
 
           {/* Botón reiniciar */}
-          <button onClick={reiniciar} className={styles.reiniciarBtn}>
-            🔄 Nueva Partida
+          <button type="button" onClick={reiniciar} className={styles.reiniciarBtn}>
+            <span aria-hidden="true">🔄</span> Nueva Partida
           </button>
         </div>
 
@@ -304,7 +306,7 @@ export default function JuegoTresEnRayaPage() {
         <div className={styles.statsPanel}>
           <div className={styles.statsHeader}>
             <h2 className={styles.panelTitle}>Estadísticas</h2>
-            <button onClick={reiniciarStats} className={styles.resetBtn}>
+            <button type="button" onClick={reiniciarStats} className={styles.resetBtn}>
               🗑️
             </button>
           </div>
@@ -364,28 +366,28 @@ export default function JuegoTresEnRayaPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🎯 Clásico (Tic-Tac-Toe)</td>
+                  <td><span aria-hidden="true">🎯</span> Clásico (Tic-Tac-Toe)</td>
                   <td>3 × 3</td>
                   <td>3 en línea</td>
                   <td>Sí (con juego perfecto)</td>
                   <td>Baja — 255.168 partidas posibles</td>
                 </tr>
                 <tr>
-                  <td>🟢 Gomoku</td>
+                  <td><span aria-hidden="true">🟢</span> Gomoku</td>
                   <td>15 × 15</td>
                   <td>5 en línea</td>
                   <td>Muy raros</td>
                   <td>Muy alta — comparable al ajedrez</td>
                 </tr>
                 <tr>
-                  <td>🔵 Cuatro en Raya</td>
+                  <td><span aria-hidden="true">🔵</span> Cuatro en Raya</td>
                   <td>7 × 6 (vertical)</td>
                   <td>4 en línea</td>
                   <td>Posibles</td>
                   <td>Media — el primer jugador puede forzar victoria</td>
                 </tr>
                 <tr>
-                  <td>🌀 Ultimate Tic-Tac-Toe</td>
+                  <td><span aria-hidden="true">🌀</span> Ultimate Tic-Tac-Toe</td>
                   <td>9 tableros 3 × 3</td>
                   <td>Ganar 3 sub-tableros en línea</td>
                   <td>Raros</td>

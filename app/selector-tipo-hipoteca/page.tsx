@@ -457,7 +457,7 @@ export default function SelectorTipoHipotecaPage() {
 
       <header className={styles.hero}>
         <h1 className={styles.heroTitle}>
-          🏠 ¿Qué tipo de hipoteca te conviene?
+          <span aria-hidden="true">🏠</span> ¿Qué tipo de hipoteca te conviene?
         </h1>
         <p className={styles.heroSubtitle}>
           Test de 10 preguntas para encontrar la hipoteca adecuada a tu perfil: fija, variable,

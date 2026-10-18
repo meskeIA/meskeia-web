@@ -299,7 +299,7 @@ export default function MiIpPage() {
         {/* Información de ubicación */}
         {ipInfo && ipInfo.city && (
           <section className={styles.locationSection}>
-            <h2 className={styles.sectionTitle}>📍 Ubicación aproximada</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📍</span> Ubicación aproximada</h2>
             <div className={styles.locationGrid}>
               <div className={styles.locationMain}>
                 <span className={styles.countryFlag}>
@@ -343,7 +343,7 @@ export default function MiIpPage() {
         {/* ISP y Proveedor */}
         {ipInfo && ipInfo.isp && (
           <section className={styles.ispSection}>
-            <h2 className={styles.sectionTitle}>🏢 Proveedor de Internet</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🏢</span> Proveedor de Internet</h2>
             <div className={styles.ispGrid}>
               <div className={styles.ispItem}>
                 <span className={styles.ispIcon}>📡</span>
@@ -375,10 +375,10 @@ export default function MiIpPage() {
             {/* Indicadores de VPN/Proxy */}
             <div className={styles.securityIndicators}>
               <div className={`${styles.indicator} ${ipInfo.proxy ? styles.warning : styles.safe}`}>
-                {ipInfo.proxy ? '🔒 Proxy/VPN detectado' : '✅ Sin proxy detectado'}
+                {ipInfo.proxy ? <><span aria-hidden="true">🔒</span> Proxy/VPN detectado</> : <><span aria-hidden="true">✅</span> Sin proxy detectado</>}
               </div>
               <div className={`${styles.indicator} ${ipInfo.hosting ? styles.warning : styles.safe}`}>
-                {ipInfo.hosting ? '☁️ IP de hosting/datacenter' : '🏠 IP residencial'}
+                {ipInfo.hosting ? <><span aria-hidden="true">☁️</span> IP de hosting/datacenter</> : <><span aria-hidden="true">🏠</span> IP residencial</>}
               </div>
             </div>
           </section>
@@ -387,7 +387,7 @@ export default function MiIpPage() {
         {/* Información de conexión */}
         {connectionInfo && (
           <section className={styles.connectionSection}>
-            <h2 className={styles.sectionTitle}>📶 Tu Conexión</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📶</span> Tu Conexión</h2>
             <div className={styles.connectionGrid}>
               <div className={styles.connectionCard}>
                 <span className={styles.connectionIcon}>
@@ -434,7 +434,7 @@ export default function MiIpPage() {
 
             {connectionInfo.saveData && (
               <div className={styles.saveDataWarning}>
-                💾 Modo ahorro de datos activado
+                <span aria-hidden="true">💾</span> Modo ahorro de datos activado
               </div>
             )}
           </section>
@@ -443,7 +443,7 @@ export default function MiIpPage() {
         {/* Historial de IPs */}
         <section className={styles.historySection}>
           <div className={styles.historyHeader}>
-            <h2 className={styles.sectionTitle}>📜 Historial de IPs</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">📜</span> Historial de IPs</h2>
             <div className={styles.historyActions}>
               <button
                 type="button"
@@ -492,7 +492,7 @@ export default function MiIpPage() {
 
       {/* Disclaimer */}
       <div className={styles.disclaimer}>
-        <h3>ℹ️ Sobre esta herramienta</h3>
+        <h3><span aria-hidden="true">ℹ️</span> Sobre esta herramienta</h3>
         <p>
           La ubicación mostrada es <strong>aproximada</strong> y se basa en la geolocalización de tu IP,
           no en tu ubicación real (GPS). La precisión puede variar según tu proveedor de internet.
@@ -566,7 +566,7 @@ export default function MiIpPage() {
 
         {/* 3. FAQ */}
         <details className={styles.faqList}>
-          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Direcciones IP</summary>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Direcciones IP</summary>
           <div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Puede alguien saber mi dirección exacta a través de mi IP?</div>

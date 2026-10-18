@@ -731,8 +731,8 @@ export default function VisualizadorCombinatoriaPage() {
             <tbody>
               <tr>
                 <td>¿Importa el orden?</td>
-                <td>✅ Sí</td>
-                <td>❌ No</td>
+                <td><span aria-hidden="true">✅</span> Sí</td>
+                <td><span aria-hidden="true">❌</span> No</td>
               </tr>
               <tr>
                 <td>Fórmula</td>
@@ -912,11 +912,11 @@ export default function VisualizadorCombinatoriaPage() {
             <h3>Errores Comunes en Combinatoria</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ Usar combinación cuando el orden importa:</strong> El PIN 1234 ≠ PIN 4321. Si el orden importa, es permutación, no combinación.</li>
-            <li><strong>❌ Olvidar que 0! = 1:</strong> Es una definición, no un cálculo. Sin ella, C(n,0) = 1 (hay una sola forma de elegir 0 elementos: no elegir ninguno) no tendría sentido.</li>
-            <li><strong>❌ Confundir "con reposición" y "sin reposición":</strong> Lanzar un dado varias veces = con reposición. Sacar cartas de una baraja = sin reposición. Las fórmulas estándar asumen sin reposición.</li>
-            <li><strong>❌ Ignorar el principio multiplicativo cuando hay etapas:</strong> Si en cada etapa hay opciones independientes, el total es el PRODUCTO, no la suma.</li>
-            <li><strong>❌ Pensar que más combinaciones = más seguridad siempre:</strong> La seguridad de una contraseña depende del logaritmo del espacio (bits de entropía), no del número absoluto.</li>
+            <li><strong><span aria-hidden="true">❌</span> Usar combinación cuando el orden importa:</strong> El PIN 1234 ≠ PIN 4321. Si el orden importa, es permutación, no combinación.</li>
+            <li><strong><span aria-hidden="true">❌</span> Olvidar que 0! = 1:</strong> Es una definición, no un cálculo. Sin ella, C(n,0) = 1 (hay una sola forma de elegir 0 elementos: no elegir ninguno) no tendría sentido.</li>
+            <li><strong><span aria-hidden="true">❌</span> Confundir "con reposición" y "sin reposición":</strong> Lanzar un dado varias veces = con reposición. Sacar cartas de una baraja = sin reposición. Las fórmulas estándar asumen sin reposición.</li>
+            <li><strong><span aria-hidden="true">❌</span> Ignorar el principio multiplicativo cuando hay etapas:</strong> Si en cada etapa hay opciones independientes, el total es el PRODUCTO, no la suma.</li>
+            <li><strong><span aria-hidden="true">❌</span> Pensar que más combinaciones = más seguridad siempre:</strong> La seguridad de una contraseña depende del logaritmo del espacio (bits de entropía), no del número absoluto.</li>
           </ul>
         </div>
       </EducationalSection>

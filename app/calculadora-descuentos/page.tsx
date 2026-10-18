@@ -209,7 +209,7 @@ export default function CalculadoraDescuentosPage() {
         title="Guía de compras inteligentes con descuentos"
         subtitle="Entiende cómo funcionan los descuentos reales, detecta precios inflados y aprovecha mejor las rebajas y promociones"
       >
-        <h3 className={styles.eduTitle}>📊 Tipos de descuento y cómo funcionan</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">📊</span> Tipos de descuento y cómo funcionan</h3>
         <div className={styles.tableWrapper}>
           <table className={styles.comparativaTable}>
             <thead>
@@ -255,7 +255,7 @@ export default function CalculadoraDescuentosPage() {
           </table>
         </div>
 
-        <h3 className={styles.eduTitle}>🛍️ Situaciones habituales</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">🛍️</span> Situaciones habituales</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
@@ -287,7 +287,7 @@ export default function CalculadoraDescuentosPage() {
           </div>
         </div>
 
-        <h3 className={styles.eduTitle}>❓ Preguntas frecuentes sobre descuentos</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">❓</span> Preguntas frecuentes sobre descuentos</h3>
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
             <strong>¿Un 20% + 10% equivale a un 30% de descuento?</strong>
@@ -315,7 +315,7 @@ export default function CalculadoraDescuentosPage() {
           </div>
         </div>
 
-        <h3 className={styles.eduTitle}>📋 Cómo usar esta calculadora paso a paso</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">📋</span> Cómo usar esta calculadora paso a paso</h3>
         <div className={styles.stepGuide}>
           <div className={styles.step}>
             <span className={styles.stepNumber}>1</span>
@@ -354,7 +354,7 @@ export default function CalculadoraDescuentosPage() {
           </div>
         </div>
 
-        <h3 className={styles.eduTitle}>💡 Consejos para comprar con cabeza</h3>
+        <h3 className={styles.eduTitle}><span aria-hidden="true">💡</span> Consejos para comprar con cabeza</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔗</span>

@@ -180,7 +180,7 @@ export default function CifradoVigenerePage() {
         {/* Input de clave */}
         <div className={styles.inputGroup}>
           <label className={styles.label}>
-            🔑 Palabra clave
+            <span aria-hidden="true">🔑</span> Palabra clave
             {claveNormalizada && (
               <span className={styles.clavePreview}> → {claveNormalizada}</span>
             )}
@@ -228,7 +228,7 @@ export default function CifradoVigenerePage() {
         {/* Input de texto */}
         <div className={styles.inputGroup}>
           <label className={styles.label}>
-            {modo === 'cifrar' ? '📝 Mensaje a cifrar' : '📝 Mensaje a descifrar'}
+            {modo === 'cifrar' ? <><span aria-hidden="true">📝</span> Mensaje a cifrar</> : <><span aria-hidden="true">📝</span> Mensaje a descifrar</>}
           </label>
           <textarea
             value={texto}
@@ -287,7 +287,7 @@ export default function CifradoVigenerePage() {
                 </p>
                 <pre className={styles.htmlPre}>{htmlCode}</pre>
                 <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyHtml}>
-                  {htmlCopiado ? '✅ ¡Copiado!' : '📋 Copiar código HTML'}
+                  {htmlCopiado ? <><span aria-hidden="true">✅</span> ¡Copiado!</> : <><span aria-hidden="true">📋</span> Copiar código HTML</>}
                 </button>
               </div>
             )}

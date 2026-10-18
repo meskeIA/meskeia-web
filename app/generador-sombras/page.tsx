@@ -251,7 +251,7 @@ export default function GeneradorSombrasPage() {
                 onClick={copyToClipboard}
                 className={`${styles.copyBtn} ${copied ? styles.copied : ''}`}
               >
-                {copied ? '✓ Copiado' : '📋 Copiar'}
+                {copied ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
               </button>
             </div>
             <pre className={styles.codeBlock}>
@@ -481,11 +481,11 @@ export default function GeneradorSombrasPage() {
               </tr>
             </thead>
             <tbody>
-              <tr><td>box-shadow</td><td><code>x y blur spread color</code></td><td>Cualquier elemento de bloque</td><td>Sombra exterior o interior (inset)</td><td>✅ Todos los navegadores</td></tr>
-              <tr><td>text-shadow</td><td><code>x y blur color</code></td><td>Solo texto</td><td>Sombra bajo los caracteres</td><td>✅ Todos los navegadores</td></tr>
-              <tr><td>filter: drop-shadow()</td><td><code>x y blur color</code></td><td>Cualquier elemento, respeta forma</td><td>Sombra que sigue el contorno real (PNG, SVG)</td><td>✅ Chrome 18+, Firefox 35+</td></tr>
-              <tr><td>box-shadow inset</td><td><code>inset x y blur color</code></td><td>Elementos de bloque</td><td>Sombra interior (efecto hundido)</td><td>✅ Todos los navegadores</td></tr>
-              <tr><td>Múltiple (coma)</td><td><code>sombra1, sombra2</code></td><td>box-shadow y text-shadow</td><td>Capas de sombra apiladas</td><td>✅ Todos los navegadores</td></tr>
+              <tr><td>box-shadow</td><td><code>x y blur spread color</code></td><td>Cualquier elemento de bloque</td><td>Sombra exterior o interior (inset)</td><td><span aria-hidden="true">✅</span> Todos los navegadores</td></tr>
+              <tr><td>text-shadow</td><td><code>x y blur color</code></td><td>Solo texto</td><td>Sombra bajo los caracteres</td><td><span aria-hidden="true">✅</span> Todos los navegadores</td></tr>
+              <tr><td>filter: drop-shadow()</td><td><code>x y blur color</code></td><td>Cualquier elemento, respeta forma</td><td>Sombra que sigue el contorno real (PNG, SVG)</td><td><span aria-hidden="true">✅</span> Chrome 18+, Firefox 35+</td></tr>
+              <tr><td>box-shadow inset</td><td><code>inset x y blur color</code></td><td>Elementos de bloque</td><td>Sombra interior (efecto hundido)</td><td><span aria-hidden="true">✅</span> Todos los navegadores</td></tr>
+              <tr><td>Múltiple (coma)</td><td><code>sombra1, sombra2</code></td><td>box-shadow y text-shadow</td><td>Capas de sombra apiladas</td><td><span aria-hidden="true">✅</span> Todos los navegadores</td></tr>
             </tbody>
           </table>
         </div>

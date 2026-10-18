@@ -334,16 +334,16 @@ export default function AnalisisDecisionReversiblePage() {
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>♟️ Decisor Estratégico</span>
+                  <span><span aria-hidden="true">♟️</span> Decisor Estratégico</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🔄 Analista Ansioso</span>
+                  <span><span aria-hidden="true">🔄</span> Analista Ansioso</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>🎲 Impulso sin Filtro</span>
+                  <span><span aria-hidden="true">🎲</span> Impulso sin Filtro</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>🧊 Bloqueo Decisional</span>
+                  <span><span aria-hidden="true">🧊</span> Bloqueo Decisional</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
@@ -362,7 +362,7 @@ export default function AnalisisDecisionReversiblePage() {
             <div className={styles.scoresContainer}>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>🧊 Parálisis</span>
+                  <span><span aria-hidden="true">🧊</span> Parálisis</span>
                   <span className={styles.scoreValue}>{puntuacionParalisis}/25</span>
                 </div>
                 <div className={styles.barTrack}>
@@ -374,7 +374,7 @@ export default function AnalisisDecisionReversiblePage() {
               </div>
               <div className={styles.scoreBar}>
                 <div className={styles.scoreHeader}>
-                  <span>♟️ Prudencia</span>
+                  <span><span aria-hidden="true">♟️</span> Prudencia</span>
                   <span className={styles.scoreValue}>{puntuacionPrudencia}/25</span>
                 </div>
                 <div className={styles.barTrack}>

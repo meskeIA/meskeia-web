@@ -707,7 +707,7 @@ export default function CalculadoraFechaPartoPage() {
           </div>
 
           <div className={styles.vacunasNota}>
-            <h4>📝 Notas importantes:</h4>
+            <h4><span aria-hidden="true">📝</span> Notas importantes:</h4>
             <ul>
               <li>Consulta con tu pediatra el calendario específico de tu comunidad</li>
               <li>Algunas vacunas como el Rotavirus pueden variar según CCAA</li>
@@ -750,7 +750,7 @@ export default function CalculadoraFechaPartoPage() {
         </ul>
 
         <p className={styles.highlight}>
-          <strong>⚕️ Esta herramienta NO diagnostica complicaciones del embarazo ni problemas del bebé.</strong>
+          <strong><span aria-hidden="true">⚕️</span> Esta herramienta NO diagnostica complicaciones del embarazo ni problemas del bebé.</strong>
           El control prenatal es OBLIGATORIO para detectar a tiempo problemas como preeclampsia, diabetes gestacional,
           restricción del crecimiento fetal o malformaciones. Acude a TODAS las citas programadas.
         </p>
@@ -812,35 +812,35 @@ export default function CalculadoraFechaPartoPage() {
 
           <div className={styles.erroresGrid}>
             <div className={styles.errorCard}>
-              <strong>❌ Automedicarse</strong>
+              <strong><span aria-hidden="true">❌</span> Automedicarse</strong>
               <p>Consulta SIEMPRE con tu médico antes de tomar cualquier medicamento, incluso los de venta libre.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Saltarse citas prenatales</strong>
+              <strong><span aria-hidden="true">❌</span> Saltarse citas prenatales</strong>
               <p>Las revisiones son cruciales para detectar problemas a tiempo y garantizar el bienestar del bebé.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Comer por dos</strong>
+              <strong><span aria-hidden="true">❌</span> Comer por dos</strong>
               <p>Solo necesitas 300 calorías extra al día en el 2º y 3er trimestre. Calidad sobre cantidad.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Pintar la habitación del bebé</strong>
+              <strong><span aria-hidden="true">❌</span> Pintar la habitación del bebé</strong>
               <p>Evita exponerte a pinturas y disolventes. Si hay que pintar, que lo haga otra persona con ventilación.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Ignorar síntomas de alerta</strong>
+              <strong><span aria-hidden="true">❌</span> Ignorar síntomas de alerta</strong>
               <p>Sangrado, dolor intenso, fiebre alta, disminución de movimientos fetales: acude a urgencias.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Usar tacones muy altos</strong>
+              <strong><span aria-hidden="true">❌</span> Usar tacones muy altos</strong>
               <p>El centro de gravedad cambia. Usa calzado cómodo para evitar caídas y dolores de espalda.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Olvidar la hidratación</strong>
+              <strong><span aria-hidden="true">❌</span> Olvidar la hidratación</strong>
               <p>La deshidratación puede causar contracciones. Bebe agua regularmente durante el día.</p>
             </div>
             <div className={styles.errorCard}>
-              <strong>❌ Estrés excesivo</strong>
+              <strong><span aria-hidden="true">❌</span> Estrés excesivo</strong>
               <p>El estrés crónico afecta al bebé. Practica técnicas de relajación y pide ayuda si la necesitas.</p>
             </div>
           </div>

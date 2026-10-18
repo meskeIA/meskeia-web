@@ -358,7 +358,7 @@ export default function VisualizadorParticulasSubatomicas() {
                 onClick={() => setMostrarAntiparticulas(!mostrarAntiparticulas)}
                 aria-pressed={mostrarAntiparticulas}
               >
-                {mostrarAntiparticulas ? '🔵 Ver partículas' : '🔴 Ver antipartículas'}
+                {mostrarAntiparticulas ? <><span aria-hidden="true">🔵</span> Ver partículas</> : <><span aria-hidden="true">🔴</span> Ver antipartículas</>}
               </button>
               {mostrarAntiparticulas && (
                 <span className={styles.antiNote}>
@@ -377,7 +377,7 @@ export default function VisualizadorParticulasSubatomicas() {
               <span className={styles.leyendaLabel}>Bosones</span>
               <span className={`${styles.leyendaDot} ${styles.dotHiggs}`} />
               <span className={styles.leyendaLabel}>Higgs</span>
-              <span className={styles.leyendaLabel}>🏆 Nobel</span>
+              <span className={styles.leyendaLabel}><span aria-hidden="true">🏆</span> Nobel</span>
             </div>
 
             {/* Tabla */}
@@ -476,7 +476,7 @@ export default function VisualizadorParticulasSubatomicas() {
                     <h3 className={styles.panelTitulo}>{particulaSeleccionada.nombre}</h3>
                     <span className={styles.panelTipo}>{getEtiquetaTipo(particulaSeleccionada.tipo)}</span>
                     {particulaSeleccionada.nobel && (
-                      <span className={styles.panelNobel}>🏆 Nobel {particulaSeleccionada.nobelAnio}</span>
+                      <span className={styles.panelNobel}><span aria-hidden="true">🏆</span> Nobel {particulaSeleccionada.nobelAnio}</span>
                     )}
                   </div>
                   <button
@@ -1001,7 +1001,7 @@ export default function VisualizadorParticulasSubatomicas() {
           <div className={styles.faqItem}>
             <strong>¿Qué es el campo de Higgs y por qué es tan importante?</strong>
             <p>El campo de Higgs permea todo el espacio. Las partículas adquieren masa al interactuar con él: cuanto más interactúan, más masivas son. El fotón no interactúa en absoluto → masa cero → viaja a c. El bosón de Higgs es la excitación cuántica de ese campo, descubierta en el LHC en 2012.</p>
-            <div className={styles.faqTip}>💡 Sin el campo de Higgs, los bosones W y Z serían sin masa como el fotón y la fuerza débil alcanzaría grandes distancias, haciendo imposibles los núcleos atómicos.</div>
+            <div className={styles.faqTip}><span aria-hidden="true">💡</span> Sin el campo de Higgs, los bosones W y Z serían sin masa como el fotón y la fuerza débil alcanzaría grandes distancias, haciendo imposibles los núcleos atómicos.</div>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Cuál es la diferencia entre quarks y leptones?</strong>

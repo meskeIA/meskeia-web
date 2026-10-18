@@ -529,7 +529,7 @@ export default function CifradoClasicoPage() {
           <div className={styles.examplesList}>
             <div className={styles.exampleItem}>
               <div className={styles.exampleHeader}>
-                <span className={styles.exampleTag}>👑 César +3</span>
+                <span className={styles.exampleTag}><span aria-hidden="true">👑</span> César +3</span>
                 <span className={styles.exampleNote}>Julio César, ~50 a.C.</span>
               </div>
               <div className={styles.exampleRow}>
@@ -540,7 +540,7 @@ export default function CifradoClasicoPage() {
             </div>
             <div className={styles.exampleItem}>
               <div className={styles.exampleHeader}>
-                <span className={styles.exampleTag}>🔄 ROT13</span>
+                <span className={styles.exampleTag}><span aria-hidden="true">🔄</span> ROT13</span>
                 <span className={styles.exampleNote}>Uso habitual en foros y Usenet</span>
               </div>
               <div className={styles.exampleRow}>
@@ -551,7 +551,7 @@ export default function CifradoClasicoPage() {
             </div>
             <div className={styles.exampleItem}>
               <div className={styles.exampleHeader}>
-                <span className={styles.exampleTag}>🔀 Atbash hebreo</span>
+                <span className={styles.exampleTag}><span aria-hidden="true">🔀</span> Atbash hebreo</span>
                 <span className={styles.exampleNote}>Libro de Jeremías, ~600 a.C.</span>
               </div>
               <div className={styles.exampleRow}>
@@ -562,7 +562,7 @@ export default function CifradoClasicoPage() {
             </div>
             <div className={styles.exampleItem}>
               <div className={styles.exampleHeader}>
-                <span className={styles.exampleTag}>👑 Augusto +1</span>
+                <span className={styles.exampleTag}><span aria-hidden="true">👑</span> Augusto +1</span>
                 <span className={styles.exampleNote}>Emperador Augusto usaba desplazamiento 1</span>
               </div>
               <div className={styles.exampleRow}>

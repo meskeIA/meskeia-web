@@ -188,6 +188,7 @@ export default function VisualizadorEfectoDoppler(): React.ReactNode {
       <nav className={styles.tabs} role="tablist" aria-label="Secciones del efecto Doppler">
         {(['efecto', 'slider', 'aplicaciones', 'cosmos'] as Tab[]).map(t => (
           <button
+            type="button"
             key={t}
             role="tab"
             aria-selected={tab === t}

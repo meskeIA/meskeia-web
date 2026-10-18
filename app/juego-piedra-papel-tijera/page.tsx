@@ -158,6 +158,7 @@ export default function JuegoPiedraPapelTijeraPage() {
           <div className={styles.opciones}>
             {OPCIONES.map((opcion) => (
               <button
+                type="button"
                 key={opcion.id}
                 onClick={() => jugar(opcion.id)}
                 className={`${styles.opcionBtn} ${eleccionJugador === opcion.id ? styles.selected : ''}`}
@@ -218,9 +219,9 @@ export default function JuegoPiedraPapelTijeraPage() {
           {resultado && !animando && (
             <div className={`${styles.resultadoPanel} ${styles[resultado]}`}>
               <span className={styles.resultadoTexto}>
-                {resultado === 'ganaste' && '¡Ganaste! 🎊'}
-                {resultado === 'perdiste' && 'Perdiste 😔'}
-                {resultado === 'empate' && '¡Empate! 🤝'}
+                {resultado === 'ganaste' && <>¡Ganaste! <span aria-hidden="true">🎊</span></>}
+                {resultado === 'perdiste' && <>Perdiste <span aria-hidden="true">😔</span></>}
+                {resultado === 'empate' && <>¡Empate! <span aria-hidden="true">🤝</span></>}
               </span>
               <span className={styles.resultadoDetalle}>
                 {getOpcionInfo(eleccionJugador)?.nombre} vs {getOpcionInfo(eleccionPC)?.nombre}
@@ -233,8 +234,8 @@ export default function JuegoPiedraPapelTijeraPage() {
         <div className={styles.statsPanel}>
           <div className={styles.statsHeader}>
             <h2 className={styles.panelTitle}>Estadísticas</h2>
-            <button onClick={reiniciarStats} className={styles.resetBtn}>
-              🔄 Reiniciar
+            <button type="button" onClick={reiniciarStats} className={styles.resetBtn}>
+              <span aria-hidden="true">🔄</span> Reiniciar
             </button>
           </div>
 
@@ -336,28 +337,28 @@ export default function JuegoPiedraPapelTijeraPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🪨 Clásico</td>
+                  <td><span aria-hidden="true">🪨</span> Clásico</td>
                   <td>3</td>
                   <td>1/3 (33,3 %)</td>
                   <td>Aleatoriedad uniforme</td>
                   <td>Baja</td>
                 </tr>
                 <tr>
-                  <td>🖖 Piedra-Papel-Tijera-Lagarto-Spock</td>
+                  <td><span aria-hidden="true">🖖</span> Piedra-Papel-Tijera-Lagarto-Spock</td>
                   <td>5</td>
                   <td>1/5 (20 %)</td>
                   <td>Aleatoriedad uniforme</td>
                   <td>Media</td>
                 </tr>
                 <tr>
-                  <td>👥 Multijugador (3+ personas)</td>
+                  <td><span aria-hidden="true">👥</span> Multijugador (3+ personas)</td>
                   <td>3</td>
                   <td>Alta si todos coinciden</td>
                   <td>Observar tendencias del grupo</td>
                   <td>Media</td>
                 </tr>
                 <tr>
-                  <td>🏆 Torneo eliminatorio</td>
+                  <td><span aria-hidden="true">🏆</span> Torneo eliminatorio</td>
                   <td>3</td>
                   <td>Variable por ronda</td>
                   <td>Gestión psicológica por rondas</td>

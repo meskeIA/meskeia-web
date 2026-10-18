@@ -849,7 +849,7 @@ export default function CalculadoraPresupuestosPage() {
                 <h3>Diseñador freelance — web corporativa</h3>
               </div>
               <p className={styles.escenarioExample}>Diseño web 5 páginas: 1.200 €. Desarrollo WordPress: 800 €. SEO básico: 300 €. Formación cliente: 150 €. <strong>Total: 2.450 € + IVA. Anticipo 40% al firmar.</strong></p>
-              <p className={styles.escenarioTip}>💡 Desglosar en líneas separadas justifica el precio y reduce negociación por precio total.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Desglosar en líneas separadas justifica el precio y reduce negociación por precio total.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -857,7 +857,7 @@ export default function CalculadoraPresupuestosPage() {
                 <h3>Agencia de desarrollo — app móvil</h3>
               </div>
               <p className={styles.escenarioExample}>Análisis y diseño UX: 3.500 €. Desarrollo iOS: 8.000 €. Desarrollo Android: 7.500 €. QA: 2.000 €. Producción: 500 €. <strong>Total: 21.500 € en 3 hitos (30/40/30%).</strong></p>
-              <p className={styles.escenarioTip}>💡 Presupuestos grandes en hitos reducen el riesgo de impago y permiten ajustes tras cada fase.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Presupuestos grandes en hitos reducen el riesgo de impago y permiten ajustes tras cada fase.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -865,7 +865,7 @@ export default function CalculadoraPresupuestosPage() {
                 <h3>Consultor de marketing — retainer</h3>
               </div>
               <p className={styles.escenarioExample}>Gestión redes sociales (3 canales): 600 €/mes. Newsletter: 200 €/mes. Informe mensual: 150 €/mes. <strong>Total: 950 €/mes. Contrato mínimo 3 meses.</strong></p>
-              <p className={styles.escenarioTip}>💡 Los retainers con mínimo de meses protegen frente a cancelaciones y facilitan la planificación.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Los retainers con mínimo de meses protegen frente a cancelaciones y facilitan la planificación.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -873,7 +873,7 @@ export default function CalculadoraPresupuestosPage() {
                 <h3>Instalador / reformas — precio cerrado</h3>
               </div>
               <p className={styles.escenarioExample}>Materiales: 1.850 €. Mano de obra (3 días × 2 operarios): 1.440 €. Gestión residuos: 120 €. <strong>Total: 3.410 € + IVA. Anticipo 50% antes de inicio.</strong></p>
-              <p className={styles.escenarioTip}>💡 Especifica siempre qué materiales están incluidos y qué queda fuera del precio.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Especifica siempre qué materiales están incluidos y qué queda fuera del precio.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -881,7 +881,7 @@ export default function CalculadoraPresupuestosPage() {
                 <h3>Asesor fiscal — paquetes tiered</h3>
               </div>
               <p className={styles.escenarioExample}>Básico (IRPF simple): 120 €. Estándar (IRPF + actividad): 280 €. Premium (IRPF + sociedades + IVA trimestral): 850 €/año. <strong>El 70% elige el tier medio.</strong></p>
-              <p className={styles.escenarioTip}>💡 La estrategia de 3 opciones hace que el tier medio parezca la opción &quot;sensata&quot;. Diséñalo intencionalmente.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> La estrategia de 3 opciones hace que el tier medio parezca la opción &quot;sensata&quot;. Diséñalo intencionalmente.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -889,7 +889,7 @@ export default function CalculadoraPresupuestosPage() {
                 <h3>Fotógrafo — evento corporativo</h3>
               </div>
               <p className={styles.escenarioExample}>Sesión (6 horas): 900 €. Edición y retoque (80 fotos): 400 €. Álbum digital: 100 €. Derechos de uso: 200 €. <strong>Total: 1.600 € + IVA. 50% anticipo, 50% en entrega.</strong></p>
-              <p className={styles.escenarioTip}>💡 Especifica siempre los derechos de uso. Sin cláusula, el cliente asume uso libre ilimitado.</p>
+              <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Especifica siempre los derechos de uso. Sin cláusula, el cliente asume uso libre ilimitado.</p>
             </div>
           </div>
         </section>
@@ -898,42 +898,42 @@ export default function CalculadoraPresupuestosPage() {
           <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre presupuestos comerciales</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuánto anticipo debo pedir?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuánto anticipo debo pedir?</h4>
               <p>El estándar para servicios freelance y agencias es entre el 30% y el 50% antes de empezar. Para proyectos pequeños (&lt;500 €) puedes pedir el 100% por adelantado. Para proyectos grandes (&gt;5.000 €): 30% al firmar, 40% a mitad del proyecto, 30% en entrega. El anticipo es práctica profesional estándar que el cliente sano acepta sin problema.</p>
               <p className={styles.faqTip}>💡 <strong>Red flag:</strong> Un cliente que se niega a dar cualquier anticipo es un riesgo de impago. El anticipo alinea intereses.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Tengo que incluir el IVA en el presupuesto?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Tengo que incluir el IVA en el presupuesto?</h4>
               <p>Para empresas y autónomos (B2B): presenta precio sin IVA, añade el IVA por separado (pueden deducirlo). Para particulares (B2C): precio siempre con IVA incluido (obligatorio legalmente). Si tienes retención de IRPF (15%), indícala también para evitar sorpresas al cliente.</p>
-              <p className={styles.faqTip}>💡 Si eres profesional con retención, el cliente pagará el importe de la factura menos el 15% de IRPF que él ingresará en Hacienda.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Si eres profesional con retención, el cliente pagará el importe de la factura menos el 15% de IRPF que él ingresará en Hacienda.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué pasa si el cliente pide más trabajo del presupuestado?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué pasa si el cliente pide más trabajo del presupuestado?</h4>
               <p>Esto se llama &quot;scope creep&quot; y es el problema más común en proyectos freelance. Cuando el cliente pide algo extra, responde: &quot;Con mucho gusto, esto no estaba incluido en el presupuesto inicial. Te preparo un presupuesto adicional.&quot; Nunca hagas trabajo extra sin documentarlo y aprobarlo por escrito.</p>
               <p className={styles.faqTip}>💡 <strong>Cláusula recomendada:</strong> &quot;Cualquier trabajo adicional no especificado será presupuestado y aprobado por separado antes de su ejecución.&quot;</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuánto tiempo debe estar vigente un presupuesto?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuánto tiempo debe estar vigente un presupuesto?</h4>
               <p>Lo habitual es 15-30 días. Esto crea urgencia y te protege ante subidas de costes. Indica claramente la fecha de validez. Si el cliente acepta después del plazo, tienes derecho a revisar precios si han cambiado tus costes.</p>
-              <p className={styles.faqTip}>💡 Para proyectos con materiales volátiles (construcción, electrónica), considera validez de 7-10 días o indica que precios de materiales están sujetos a confirmación en el momento del pedido.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Para proyectos con materiales volátiles (construcción, electrónica), considera validez de 7-10 días o indica que precios de materiales están sujetos a confirmación en el momento del pedido.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Debo firmar contrato además del presupuesto?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Debo firmar contrato además del presupuesto?</h4>
               <p>Idealmente sí, especialmente para proyectos de más de 1.000 €. Un contrato añade: condiciones de cancelación, propiedad intelectual, garantías y plazos de corrección, penalizaciones por retrasos. Para proyectos pequeños, un presupuesto firmado con condiciones generales al dorso puede ser suficiente.</p>
-              <p className={styles.faqTip}>💡 El presupuesto aceptado por email tiene valor legal, pero un contrato firmado es más robusto. Invertir 200-400 € en un contrato básico revisado por abogado protege proyectos recurrentes.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> El presupuesto aceptado por email tiene valor legal, pero un contrato firmado es más robusto. Invertir 200-400 € en un contrato básico revisado por abogado protege proyectos recurrentes.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo negociar cuando el cliente dice que es muy caro?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo negociar cuando el cliente dice que es muy caro?</h4>
               <p>Tres estrategias: (1) Reducir alcance: &quot;Podemos ajustar el precio si reducimos el proyecto a X, Y y Z&quot;. (2) Escalonar pagos: mantener el precio pero repartir en más plazos. (3) Justificar el valor: explicar qué problema resuelve. Nunca bajes el precio sin quitar algo del alcance.</p>
               <p className={styles.faqTip}>💡 <strong>Táctica de anclaje:</strong> Presenta primero la opción más cara. Cuando la rechace, la opción media (tu objetivo real) parecerá razonable por contraste.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo incluir gastos de gestión o materiales con margen?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo incluir gastos de gestión o materiales con margen?</h4>
               <p>Sí, es práctica habitual y legítima. Los gastos de gestión se facturan normalmente con un margen del 10-20%. Los materiales suelen llevar un margen del 15-30% según el sector. Indica en el presupuesto &quot;materiales según especificación&quot; sin detallar precios de coste.</p>
-              <p className={styles.faqTip}>💡 En sectores regulados (farmacia, construcción con proyecto), los márgenes pueden estar más controlados. Consulta las normas de tu sector.</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En sectores regulados (farmacia, construcción con proyecto), los márgenes pueden estar más controlados. Consulta las normas de tu sector.</p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué hago si un cliente no paga el presupuesto aceptado?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué hago si un cliente no paga el presupuesto aceptado?</h4>
               <p>Proceso: (1) Recordatorio amable a los 5 días. (2) Llamada telefónica a los 15 días. (3) Burofax con requerimiento a los 30 días (valor probatorio). (4) Reclamación en juzgado de lo mercantil (proceso monitorio) para deudas &gt;2.000 €. El presupuesto aceptado + facturas emitidas es documentación suficiente para reclamación judicial.</p>
               <p className={styles.faqTip}>💡 <strong>Prevención:</strong> El anticipo del 30-50% es tu mejor protección. Si el cliente no paga el final, al menos has cobrado la mayor parte del trabajo.</p>
             </div>
@@ -1037,13 +1037,13 @@ export default function CalculadoraPresupuestosPage() {
             <h3>Errores frecuentes en presupuestos que cuestan clientes y dinero</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong>❌ No definir el alcance por escrito:</strong> Sin alcance claro, el cliente asumirá que todo lo que se le ocurra está incluido. El scope creep es la causa número uno de proyectos no rentables para freelances y agencias.</li>
-            <li><strong>❌ Presupuestar sin reunión previa:</strong> Un presupuesto sin entender el proyecto real acaba siendo demasiado caro o demasiado barato. 30 minutos de llamada previa pueden ahorrar semanas de trabajo mal pagado.</li>
-            <li><strong>❌ No pedir anticipo en proyectos nuevos:</strong> Sin anticipo, el cliente no tiene skin in the game. Los proyectos sin anticipo tienen mayor tasa de cancelación, cambios de criterio y retrasos en respuestas.</li>
-            <li><strong>❌ Hacer descuentos sin quitar alcance:</strong> Si bajas el precio sin reducir lo que entregas, creas un precedente: el cliente siempre intentará negociar. En su lugar: &quot;Puedo bajar el precio si eliminamos X parte del proyecto.&quot;</li>
-            <li><strong>❌ No incluir revisiones en el presupuesto:</strong> Las revisiones son trabajo. Si no las limitas explícitamente (ej: &quot;hasta 2 rondas de revisión incluidas&quot;), el cliente puede pedir cambios indefinidamente.</li>
-            <li><strong>❌ Olvidar el tiempo de gestión y comunicación:</strong> Las reuniones, emails, llamadas y gestión del proyecto pueden representar el 20-30% del tiempo total. Si no los incluyes en el presupuesto, estás regalando ese tiempo.</li>
-            <li><strong>❌ No hacer seguimiento:</strong> El 40-60% de los presupuestos aceptados requieren al menos un seguimiento. No hacer seguimiento es dejar dinero sobre la mesa.</li>
+            <li><strong><span aria-hidden="true">❌</span> No definir el alcance por escrito:</strong> Sin alcance claro, el cliente asumirá que todo lo que se le ocurra está incluido. El scope creep es la causa número uno de proyectos no rentables para freelances y agencias.</li>
+            <li><strong><span aria-hidden="true">❌</span> Presupuestar sin reunión previa:</strong> Un presupuesto sin entender el proyecto real acaba siendo demasiado caro o demasiado barato. 30 minutos de llamada previa pueden ahorrar semanas de trabajo mal pagado.</li>
+            <li><strong><span aria-hidden="true">❌</span> No pedir anticipo en proyectos nuevos:</strong> Sin anticipo, el cliente no tiene skin in the game. Los proyectos sin anticipo tienen mayor tasa de cancelación, cambios de criterio y retrasos en respuestas.</li>
+            <li><strong><span aria-hidden="true">❌</span> Hacer descuentos sin quitar alcance:</strong> Si bajas el precio sin reducir lo que entregas, creas un precedente: el cliente siempre intentará negociar. En su lugar: &quot;Puedo bajar el precio si eliminamos X parte del proyecto.&quot;</li>
+            <li><strong><span aria-hidden="true">❌</span> No incluir revisiones en el presupuesto:</strong> Las revisiones son trabajo. Si no las limitas explícitamente (ej: &quot;hasta 2 rondas de revisión incluidas&quot;), el cliente puede pedir cambios indefinidamente.</li>
+            <li><strong><span aria-hidden="true">❌</span> Olvidar el tiempo de gestión y comunicación:</strong> Las reuniones, emails, llamadas y gestión del proyecto pueden representar el 20-30% del tiempo total. Si no los incluyes en el presupuesto, estás regalando ese tiempo.</li>
+            <li><strong><span aria-hidden="true">❌</span> No hacer seguimiento:</strong> El 40-60% de los presupuestos aceptados requieren al menos un seguimiento. No hacer seguimiento es dejar dinero sobre la mesa.</li>
           </ul>
         </div>
       </EducationalSection>

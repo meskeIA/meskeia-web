@@ -422,6 +422,7 @@ export default function CalculadoraROIMarketingPage() {
             <div className={styles.presetsGrid}>
               {opcionesCanales.map(preset => (
                 <button
+                  type="button"
                   key={preset.nombre}
                   className={`${styles.presetBtn} ${nuevoCanal.nombre === preset.nombre ? styles.presetActivo : ''}`}
                   onClick={() => seleccionarCanalPreset(preset)}
@@ -432,10 +433,10 @@ export default function CalculadoraROIMarketingPage() {
               ))}
             </div>
             <div className={styles.nuevoCanalAcciones}>
-              <button className={styles.btnConfirmar} onClick={agregarCanal} disabled={!nuevoCanal.nombre}>
+              <button type="button" className={styles.btnConfirmar} onClick={agregarCanal} disabled={!nuevoCanal.nombre}>
                 Añadir {nuevoCanal.nombre || 'canal'}
               </button>
-              <button className={styles.btnCancelar} onClick={() => setMostrarFormNuevo(false)}>
+              <button type="button" className={styles.btnCancelar} onClick={() => setMostrarFormNuevo(false)}>
                 Cancelar
               </button>
             </div>
@@ -640,14 +641,14 @@ export default function CalculadoraROIMarketingPage() {
           {calculos.mejorCanal && calculos.peorCanal && calculos.mejorCanal.id !== calculos.peorCanal.id && (
             <div className={styles.insightsGrid}>
               <div className={styles.insightCard}>
-                <h4>🏆 Mejor rendimiento</h4>
+                <h4><span aria-hidden="true">🏆</span> Mejor rendimiento</h4>
                 <p>
                   <strong>{calculos.mejorCanal.nombre}</strong> tiene el mejor ROI ({formatNumber(calculos.mejorCanal.roi, 0)}%).
                   Considera aumentar la inversión en este canal.
                 </p>
               </div>
               <div className={styles.insightCard}>
-                <h4>⚠️ Necesita atención</h4>
+                <h4><span aria-hidden="true">⚠️</span> Necesita atención</h4>
                 <p>
                   <strong>{calculos.peorCanal.nombre}</strong> tiene el ROI más bajo ({formatNumber(calculos.peorCanal.roi, 0)}%).
                   Revisa la segmentación o considera redistribuir presupuesto.
