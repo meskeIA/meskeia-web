@@ -218,9 +218,15 @@ test.describe('CASO 1 · los datos de los elementos y la calculadora de masa mol
 // ═══════════════════════════════════════════════════════════════════════════
 // CASO 2 — OPERATIVA: los filtros filtran de verdad y el recuento cuadra
 // ═══════════════════════════════════════════════════════════════════════════
+// Cabo C0292 (18/10/2026): el primer test falló 1 vez en una pasada de 13 specs y pasó 5 de 5
+// (y 8 de 8) aislado. Los dos tests tocaban los controles nada más cargar, y «Mostrando 118 de
+// 118» ya está en el HTML del servidor, así que no prueba que React haya hidratado: un
+// selectOption o un fill anterior a la hidratación se pierde y el recuento esperado no llega.
+// Se espera a la hidratación con #busqueda de testigo (React no rastrea el valor de un <select>).
 test.describe('CASO 2 · filtros, buscador y recuento', () => {
   test('cada filtro deja exactamente los elementos que le tocan', async ({ page }) => {
     await page.goto(RUTA);
+    await esperarHidratacion(page, ['#busqueda']);
     await expect(page.getByText('Mostrando 118 de 118 elementos')).toBeVisible();
     await expect(page.locator(CELDA_ACTIVA)).toHaveCount(118);
 
@@ -260,6 +266,7 @@ test.describe('CASO 2 · filtros, buscador y recuento', () => {
 
   test('el buscador encuentra por nombre, por símbolo y por número atómico', async ({ page }) => {
     await page.goto(RUTA);
+    await esperarHidratacion(page, ['#busqueda']);
 
     // Por número atómico: «79» solo lo contiene el 79 (ningún otro Z de 1 a 118 lleva «79»
     // como subcadena), así que queda el oro y nada más.
