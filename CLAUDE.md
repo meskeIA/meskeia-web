@@ -522,8 +522,9 @@ obligatoria.
 `npm run check:contraste-marca` — en el build, y **rompe el build** si un `.module.css` o un
 `style={{…}}` pone **texto blanco sobre la marca** (`var(--primary)`, `var(--secondary)`, su
 hexadecimal o su `rgb()`), también el que un hover hereda de su estado base: usar
-`--primary-boton` / `--secondary-boton`. Hoy con `--tanda 1`; la tanda 2 (la marca como color de
-texto → `--primary-texto`) entra al migrarla. Comparte criterio con `scripts/contraste-marca/campana.mjs`.
+`--primary-boton` / `--secondary-boton`; o si usa **la marca como color de texto**: usar
+`--primary-texto` / `--secondary-texto`, o `-boton` sobre un fondo claro que no cambia con el
+tema. Comparte criterio con `scripts/contraste-marca/campana.mjs`.
 Barre `app/`, `components/` y `styles/`, **sin pasivo** · Escape: `marca-ok: <razón>`, razón obligatoria.
 ⚠️ No mira el texto de un `<canvas>`, el `fill` de un SVG ni un fondo de marca sin texto blanco a
 la vista; que el sustituto cumpla lo mide `tests/contraste-marca-botones.spec.ts`.

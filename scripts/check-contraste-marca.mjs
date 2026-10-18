@@ -3,7 +3,7 @@
  * Script: check-contraste-marca.mjs
  *
  * Candado del CONTRASTE DE LA MARCA en botones, distintivos y texto (cabo C0070). Se ejecuta
- * antes de cada build (`npm run build`, hoy con `--tanda 1`: ver PASIVO, abajo) y a mano con
+ * antes de cada build (`npm run build`, las dos tandas) y a mano con
  * `npm run check:contraste-marca` o `node scripts/check-contraste-marca.mjs [--tanda 1|2]`.
  *
  * QUÉ PROHÍBE
@@ -64,10 +64,15 @@
  *
  * PASIVO
  * ──────
- * Nació (c6458699) con todo el catálogo por migrar, fuera del build. Se engancha por tandas,
- * cada una tras su migración: la tanda 1 (dfaf84a2, 18/10/2026) entró con `--tanda 1` y SIN
- * pasivo; cuando la tanda 2 esté aplicada, el build lo llama sin la opción. Si algún día
- * tuviera que juzgar solo las líneas añadidas, decirlo AQUÍ con el motivo.
+ * Nació (c6458699) con todo el catálogo por migrar, fuera del build, y se enganchó por tandas,
+ * cada una tras su migración: la tanda 1 (dfaf84a2) con `--tanda 1`, y tras la tanda 2
+ * (4488bd1d, 18/10/2026) las dos, SIN pasivo. Si algún día tuviera que juzgar solo las líneas
+ * añadidas, decirlo AQUÍ con el motivo.
+ *
+ * Un texto de marca sobre un fondo claro FIJO (un literal sin override oscuro) migra a `-boton`
+ * y no a `-texto`: en oscuro `-texto` se aclara a #3FA5D1 y sobre blanco da 2,6:1 (los CTA de
+ * los cursos y el «IA» del logo, 18/10/2026). Y el texto de marca sobre un TINTE de marca
+ * (rgba 0,1-0,15) se queda en 4,36-4,48:1 aun con `-texto`: es del cabo C0278, no de aquí.
  *
  * ESCAPE
  * ──────

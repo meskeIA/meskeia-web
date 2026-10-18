@@ -272,7 +272,8 @@ const OBLIGACIONES = [
   ['Candado del contraste de la marca', [
     'npm run check:contraste-marca', 'rompe el build', 'texto blanco sobre la marca',
     'también el que un hover hereda de su estado base', '--primary-boton / --secondary-boton',
-    'Hoy con --tanda 1', 'Comparte criterio con scripts/contraste-marca/campana.mjs',
+    'la marca como color de texto', '--primary-texto / --secondary-texto',
+    'o -boton sobre un fondo claro que no cambia con el tema', 'Comparte criterio con scripts/contraste-marca/campana.mjs',
     'Barre app/, components/ y styles/, sin pasivo', 'marca-ok: <razón>', 'razón obligatoria',
     'No mira el texto de un <canvas>', 'tests/contraste-marca-botones.spec.ts',
     'npm run contraste-marca:probar-candado',
