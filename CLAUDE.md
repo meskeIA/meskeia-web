@@ -742,6 +742,9 @@ Tres reglas derivadas de clasificar las 29 entradas `feedback_*` de memoria (202
 1. **Verificar la salida, no la ejecución.** "El script terminó sin error" no dice nada sobre si las N salidas son correctas. Contar producidas vs esperadas y abrir 3 al azar.
 2. **Grepear la condición negativa**: lo que NO debe existir tras el cambio (la ruta vieja, el patrón antiguo, el archivo que falta). Un grep que devuelve 0 es la prueba; que el build pase, no.
 3. **Si la invariante puede repetirse** → dejarla como `scripts/check-*.mjs` enganchado a `npm run build`, igual que `check:verticales`, `check:enlaces` y `check:secrets`. Un candado que rompe el build vale más que cualquier recordatorio.
+4. **Si toca apps ya inspeccionadas**, el próximo `inspector:sync` las devolverá a la cola: tras el sync,
+   `npm run inspector:hallazgos -- --revalidar-commits <shas> --informe <json>` revalida las que SOLO
+   cambiaron por esos commits y tienen su spec en verde en ese informe de Playwright (C0161).
 
 **De dónde sale**: 2026-05-26 — 438 apps (52% del catálogo) eran client components sin `layout.tsx`, así que su `metadata` se ignoraba y todas servían el title de la home; Google las trató como contenido duplicado y salieron 125 "rastreadas sin indexar" en Search Console. **El fallo fue silencioso durante meses.** Agravante que motiva el punto 1: el script que creó los 438 layouts introdujo su propio defecto (26 apps sin `jsonLd`), y también pasó desapercibido. Segundo caso, 2026-07-18: renombrados que dejaron 3 404 internos (una URL anunciada en `sitemap.ts` sin ruta detrás, dos enlaces obsoletos en cursos).
 

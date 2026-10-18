@@ -12,6 +12,25 @@
  *            npm run inspector:hallazgos -- --revalidar lupa-digital,conversor-braille
  *            npm run inspector:hallazgos -- --revalidar-reparadas   (solo las que tienen un
  *                                              hallazgo ARREGLADO después de darse por buenas)
+ *            npm run inspector:hallazgos -- --revalidar-commits dfaf84a2,4488bd1d --informe <json>
+ *                                             (las que SOLO cambiaron por esos commits, con su
+ *                                              spec en verde en ese informe de Playwright)
+ *
+ * ── `--revalidar-commits` (18/10/2026, cabo C0161) ──
+ * Un cambio a escala (el refactor 99e1ee7e de las relacionadas el 08/10; las campañas de
+ * contraste del 18/10) cambia la huella de cientos de apps y, en el siguiente sync, todas las ya
+ * inspeccionadas vuelven a la cola por delante de las nunca vistas, aunque su código de cálculo
+ * no se haya movido. El 08/10 se arregló a mano: suite de sus specs y `--revalidar` de una lista.
+ *
+ * Ahora lo hace este comando, con dos condiciones que tienen que cumplirse las dos:
+ *   1. Esos commits explican TODO el cambio: la huella de la app calculada como si no se hubieran
+ *      hecho (`pasado.mjs` + la receta de `huella.mjs`, la misma del sync) es igual a la que
+ *      tenía al inspeccionarse. Si otro commit tocó también la app, o un fichero que tocaron
+ *      esos commits, no cuadra y se queda en la cola.
+ *   2. Su spec (`apps.test_path`) pasó en verde en el informe JSON de Playwright que se da con
+ *      `--informe` (`npx playwright test <specs> --reporter=json > informe.json`). Que un
+ *      commit sea «solo de color» no lo garantiza: un spec puede comprobar colores.
+ * Va DESPUÉS de `inspector:sync`, que es el que invalida. Casos: `npm run inspector:probar-revalidar-commits`.
  *
  * El Inspector NO repara: deja los hallazgos abiertos y el usuario decide el lote. Falta
  * entonces la otra mitad del ciclo — cerrarlos cuando se arreglen. Sin esto, la base
@@ -48,7 +67,11 @@
  * después. Casos: `npm run inspector:probar-revalidar`.
  */
 
-import { abrir, ahora, SQL_INVALIDADA } from './db.mjs';
+import fs from 'fs';
+import path from 'path';
+import { abrir, ahora, RAIZ, SQL_INVALIDADA } from './db.mjs';
+import { crearHuella } from './huella.mjs';
+import { lectorEnElPasado } from './pasado.mjs';
 
 const args = process.argv.slice(2);
 const valorDe = (n, d) => { const i = args.indexOf(`--${n}`); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
@@ -75,6 +98,10 @@ const REABRIR = valorDe('reabrir', '');
  */
 const REVALIDAR = valorDe('revalidar', '');
 const REVALIDAR_REPARADAS = args.includes('--revalidar-reparadas');
+const REVALIDAR_COMMITS = valorDe('revalidar-commits', '');
+const INFORME = valorDe('informe', '');
+/** Raíz del repositorio para git: la de siempre, u otra en la prueba (repo desechable). */
+const RAIZ_REPO = process.env.INSPECTOR_RAIZ ? path.resolve(process.env.INSPECTOR_RAIZ) : RAIZ;
 const MOTIVO = valorDe('motivo', '');
 const TODOS = args.includes('--todos');
 /**
@@ -193,6 +220,75 @@ function reparadaDespues(app) {
 if (REVALIDAR) {
   // La vía explícita: quien la usa dice que el cambio está verificado
   revalidar(REVALIDAR.split(',').map(s => s.trim()).filter(Boolean));
+  process.exit(0);
+}
+
+/**
+ * Specs en verde según un informe JSON de Playwright: ruta absoluta del spec → ¿todo verde?
+ * Verde = cada test `expected` o `skipped`. Un `flaky` (pasó al reintentar) no cuenta: aquí se
+ * decide sacar una app de la cola sin mirarla, y ante la duda se queda.
+ */
+function specsDelInforme(ruta) {
+  const j = JSON.parse(fs.readFileSync(ruta, 'utf8'));
+  const raizTests = j.config?.rootDir;
+  if (!raizTests) throw new Error(`${ruta} no parece un informe JSON de Playwright (falta config.rootDir)`);
+  // 'verde' | 'inestable' | 'rojo' por fichero; manda el peor de sus tests
+  const peso = { verde: 0, inestable: 1, rojo: 2 };
+  const verde = new Map();
+  const recorrer = (s) => {
+    for (const sp of s.specs ?? []) {
+      const f = path.resolve(raizTests, sp.file).toLowerCase();
+      for (const t of sp.tests) {
+        const e = t.status === 'expected' || t.status === 'skipped' ? 'verde' : t.status === 'flaky' ? 'inestable' : 'rojo';
+        if (peso[e] >= peso[verde.get(f) ?? 'verde']) verde.set(f, e);
+      }
+    }
+    for (const hija of s.suites ?? []) recorrer(hija);
+  };
+  for (const s of j.suites ?? []) recorrer(s);
+  return verde;
+}
+
+if (REVALIDAR_COMMITS) {
+  if (!INFORME) {
+    console.error('\n✗ --revalidar-commits exige --informe <json de Playwright> con los specs de esas apps en verde.\n');
+    process.exit(1);
+  }
+  const shas = REVALIDAR_COMMITS.split(',').map((s) => s.trim()).filter(Boolean);
+  const pasado = lectorEnElPasado(RAIZ_REPO, shas);
+  const { analizarApp } = crearHuella({ raiz: RAIZ_REPO, fsv: pasado.fsv });
+  const verde = specsDelInforme(INFORME);
+  const invalidadas = db
+    .prepare(`SELECT slug, hash_inspeccionado, deps, test_path FROM apps WHERE ${SQL_INVALIDADA} ORDER BY slug`)
+    .all();
+
+  const explicadas = [], ajenas = [], otroCambio = [], sinSpec = [], noTocadas = [];
+  for (const app of invalidadas) {
+    const deps = JSON.parse(app.deps || '[]');
+    const lee = (f) => f.startsWith(`app/${app.slug}/`) || deps.some((d) => ['.ts', '.tsx', '/index.ts'].some((e) => f === d + e));
+    if (![...pasado.tocados].some(lee)) { noTocadas.push(app.slug); continue; }
+    const ajeno = [...pasado.noExplicados].find(([f]) => lee(f));
+    if (ajeno) { ajenas.push(`${app.slug} (${ajeno[0]}: ${ajeno[1]})`); continue; }
+    const a = analizarApp(app.slug);
+    if (!a || `${a.hash_codigo}|${a.hash_deps || ''}` !== app.hash_inspeccionado) { otroCambio.push(app.slug); continue; }
+    const spec = app.test_path ? verde.get(path.resolve(RAIZ_REPO, app.test_path).toLowerCase()) : undefined;
+    if (spec !== 'verde') {
+      const por = !app.test_path ? 'sin test_path' : spec === 'rojo' ? 'spec en ROJO' : spec === 'inestable' ? 'spec INESTABLE: pasó al reintentar' : 'su spec no está en el informe';
+      sinSpec.push(`${app.slug} (${por})`);
+      continue;
+    }
+    explicadas.push(app.slug);
+  }
+
+  console.log(`\nRevalidar por commits ${pasado.commits.map((c) => c.slice(0, 8)).join(', ')} (pasado = ${pasado.base.slice(0, 8)})`);
+  console.log(`  ${invalidadas.length} invalidadas · ${noTocadas.length} no las tocan esos commits`);
+  if (explicadas.length) revalidar(explicadas);
+  else console.log('\nNinguna se puede revalidar por esos commits.');
+  const listar = (titulo, xs) => xs.length && console.log(`\n${titulo} (${xs.length}): se quedan en la cola\n  ${xs.join(' · ')}`);
+  listar('Un fichero que esos commits tocaron lo tocó también otro commit', ajenas);
+  listar('Esos commits no explican todo el cambio desde su inspección', otroCambio);
+  listar('Sin su spec en verde en el informe', sinSpec);
+  console.log('');
   process.exit(0);
 }
 

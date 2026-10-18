@@ -367,6 +367,7 @@ const OBLIGACIONES = [
   ['1. Candado tras cambio a escala', [
     'más de 20 apps', 'renombre, mueva o retire una URL', 'Verificar la salida, no la ejecución.',
     'Grepear la condición negativa', 'scripts/check-*.mjs enganchado a npm run build',
+    'Si toca apps ya inspeccionadas', '--revalidar-commits <shas> --informe <json>',
     '438 apps', '3 404 internos',
   ]],
   ['2. Nombrar el caso de origen', [

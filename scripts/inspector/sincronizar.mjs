@@ -25,10 +25,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import { execFileSync } from 'child_process';
 import { abrir, RAIZ } from './db.mjs';
 import { calcularFirma, cargarDump, dumpMasReciente, DIR_DUMPS } from './firma.mjs';
+import { aCRLF, crearHuella, huella } from './huella.mjs';
 
 // ─── Riesgo por suite ─────────────────────────────────────────────────────────
 // Derivado de _private/DISCLAIMER-POLICY.md. Cuando una app pertenece a varias
@@ -48,8 +48,6 @@ const RIESGO_SUITE = {
   diseno: 4,
   juegos: 4,
 };
-
-const huella = txt => crypto.createHash('sha256').update(txt).digest('hex').slice(0, 16);
 
 // ─── Apps CONGELADAS: publicadas, pero fuera de la base ──────────────────────
 // Los 13 cursos (`curso-*`, ~200 páginas de capítulo) se congelaron el 16/10/2026 (semilla
@@ -122,78 +120,9 @@ function leerCatalogo() {
 const ESQUEMA_HUELLA = 3;
 const FICHEROS_APP_V1 = ['page.tsx', 'layout.tsx', 'metadata.ts'];
 
-/** Texto con los finales de línea en LF: la huella no puede depender de la carpeta. */
-const aLF = t => t.replace(/\r\n/g, '\n');
-/** Solo para migrar a la versión 3: el mismo texto tal como lo leía la copia en CRLF. */
-const aCRLF = t => aLF(t).replace(/\n/g, '\r\n');
-
-/** Ficheros de código de la app, recursivo y en orden estable. */
-function ficherosDeApp(dir) {
-  const salida = [];
-  const recorrer = (d) => {
-    for (const e of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
-      const p = path.join(d, e.name);
-      if (e.isDirectory()) recorrer(p);
-      else if (/\.(tsx?|module\.css)$/.test(e.name)) salida.push(p);
-    }
-  };
-  recorrer(dir);
-  return salida;
-}
-
-/** Nombre exportado → módulo de data/fiscal que lo exporta (sin pasar por el barril). */
-let exportsFiscales = null;
-function moduloFiscalDe(nombre) {
-  if (!exportsFiscales) {
-    exportsFiscales = new Map();
-    const dir = path.join(RAIZ, 'data', 'fiscal');
-    for (const f of fs.readdirSync(dir)) {
-      if (!f.endsWith('.ts') || f === 'index.ts') continue;
-      const mod = `data/fiscal/${f.replace(/\.ts$/, '')}`;
-      const t = fs.readFileSync(path.join(dir, f), 'utf8');
-      for (const m of t.matchAll(/export\s+(?:declare\s+)?(?:const|let|var|async\s+function\*?|function\*?|class|type|interface|enum)\s+([A-Za-z_$][\w$]*)/g)) {
-        if (!exportsFiscales.has(m[1])) exportsFiscales.set(m[1], mod);
-      }
-      for (const m of t.matchAll(/export\s+(?:type\s+)?\{([^}]*)\}(?!\s*from)/g)) {
-        for (const trozo of m[1].split(',')) {
-          const alias = trozo.trim().split(/\s+as\s+/).pop()?.replace(/^type\s+/, '').trim();
-          if (alias && !exportsFiscales.has(alias)) exportsFiscales.set(alias, mod);
-        }
-      }
-    }
-  }
-  return exportsFiscales.get(nombre) ?? null;
-}
-
-/** Dependencias de un texto de código: módulos de data/fiscal y lib/calculadoras. */
-function depsDe(texto) {
-  const deps = [];
-  for (const m of texto.matchAll(/@\/data\/fiscal\/([\w-]+)/g)) deps.push(`data/fiscal/${m[1]}`);
-  for (const m of texto.matchAll(/@\/lib\/calculadoras\/([\w-]+)/g)) deps.push(`lib/calculadoras/${m[1]}`);
-  // El barril: cada nombre importado, a su módulo
-  for (const m of texto.matchAll(/import\s+(type\s+)?([^;]*?)\s+from\s+['"]@\/data\/fiscal\/?['"]/g)) {
-    const llaves = m[2].match(/\{([^}]*)\}/);
-    if (!llaves) { deps.push('data/fiscal/index'); continue; } // import * as …: no se puede resolver
-    for (const trozo of llaves[1].split(',')) {
-      const nombre = trozo.trim().replace(/^type\s+/, '').split(/\s+as\s+/)[0].trim();
-      if (!nombre) continue;
-      deps.push(moduloFiscalDe(nombre) ?? 'data/fiscal/index');
-    }
-  }
-  return deps;
-}
-
-function hashDeDeps(unicas, finLinea = aLF) {
-  if (!unicas.length) return '';
-  let acum = '';
-  for (const d of unicas) {
-    for (const ext of ['.ts', '.tsx', '/index.ts']) {
-      const p = path.join(RAIZ, d + ext);
-      if (fs.existsSync(p) && fs.statSync(p).isFile()) { acum += finLinea(fs.readFileSync(p, 'utf8')); break; }
-    }
-  }
-  return huella(acum);
-}
+// La receta vive en `huella.mjs` desde el 18/10/2026 (cabo C0161): la necesita también
+// `cerrar.mjs --revalidar-commits`, que la calcula sobre el pasado. Una sola receta para los dos.
+const { ficherosDeApp, hashDeDeps, analizarApp } = crearHuella({ raiz: RAIZ });
 
 /** La receta de la versión 1, solo para migrar: ver ESQUEMA DE LA HUELLA. */
 function huellasV1(slug) {
@@ -215,35 +144,6 @@ function huellasV1(slug) {
     ...[...page.matchAll(/@\/lib\/calculadoras\/([\w-]+)/g)].map(m => `lib/calculadoras/${m[1]}`),
   ];
   return `${huella(codigo)}|${hashDeDeps([...new Set(deps)], t => t)}`;
-}
-
-function analizarApp(slug, finLinea = aLF) {
-  const dir = path.join(RAIZ, 'app', slug);
-  if (!fs.existsSync(dir)) return null;
-  const pagina = path.join(dir, 'page.tsx');
-  if (!fs.existsSync(pagina)) return null;
-  const page = fs.readFileSync(pagina, 'utf8');
-
-  let codigo = '';
-  const deps = [];
-  for (const p of ficherosDeApp(dir)) {
-    const t = finLinea(fs.readFileSync(p, 'utf8'));
-    // La ruta entra en la huella: mover un trozo de un fichero a otro también es un cambio
-    codigo += `\n// ${path.relative(dir, p).replace(/\\/g, '/')}\n${t}`;
-    if (!p.endsWith('.css')) deps.push(...depsDe(t));
-  }
-  const unicas = [...new Set(deps)].sort();
-  const hashDeps = hashDeDeps(unicas, finLinea);
-
-  // El segmento decide CÓMO se inspecciona, no si se inspecciona.
-  let segmento;
-  if (/@\/data\/fiscal/.test(page)) segmento = 'fiscal';
-  else if (/@\/lib\/calculadoras/.test(page)) segmento = 'motor';
-  else if (/type=["']number["']|parseSpanishNumber|formatCurrency|toFixed\(/.test(page)) segmento = 'calculo';
-  else if (/useState|onClick|onChange/.test(page)) segmento = 'interactiva';
-  else segmento = 'contenido';
-
-  return { hash_codigo: huella(codigo), deps: unicas, hash_deps: hashDeps, segmento };
 }
 
 // ─── Uso real (dump de Turso) ─────────────────────────────────────────────────
