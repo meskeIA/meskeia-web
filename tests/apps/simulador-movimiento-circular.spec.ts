@@ -1046,7 +1046,8 @@ test.describe('re-inspección 22/09/2026', () => {
   }) => {
     await esperarHidratacion(page, [CAMPO_CASOS]);
 
-    // Caso 2: a_c = ω²·r = 4² · 0,5 = 8 m/s². Tolerancia = 1 % = 0,08.
+    // Caso 2: a_c = ω²·r = 4² · 0,5 = 8 m/s². Tolerancia: el 1 % (0,08) hasta el 17/10/2026; desde
+    // la política de redondeo (hallazgo 3342), 0, porque 8 es exacto.
     await page.getByRole('button', { name: /^Caso 2:/ }).click();
     expect(await responderTecleando(page, '2')).toContain('No es correcto'); // olvidar el cuadrado
     expect(await responderTecleando(page, '-8')).toContain('No es correcto'); // módulo negativo
@@ -1054,8 +1055,9 @@ test.describe('re-inspección 22/09/2026', () => {
     expect(await responderTecleando(page, '8')).toContain('¡Correcto!');
 
     // Caso 6: f = 6 vueltas/60 s = 0,1 Hz. Es el valor más pequeño de los doce, donde la
-    // tolerancia mínima de 0,01 equivale al 10 %: si una tolerancia relativa fuera a dejar
-    // pasar lo imposible, sería aquí.
+    // tolerancia mínima de 0,01 de la política relativa (la vigente hasta el 17/10/2026)
+    // equivalía al 10 %: si una tolerancia relativa fuera a dejar pasar lo imposible, sería aquí.
+    // Desde el hallazgo 3342 la tolerancia es 0, porque 0,1 es exacto.
     await page.getByRole('button', { name: /^Caso 6:/ }).click();
     expect(await responderTecleando(page, '0')).toContain('No es correcto');
     expect(await responderTecleando(page, '-0,1')).toContain('No es correcto');
@@ -1421,10 +1423,11 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
   test('CASO R (rechazo) — caso 11: las rpm tomadas por rad/s se suspenden', async ({ page }) => {
     await esperarHidratacion(page, [CAMPO]);
     await page.getByRole('button', { name: /^Caso 11:/ }).click();
-    // ω = 2π·45/60 = 4,712389 → 4,71; tolerancia 0,0471.
-    expect(await responder(page, '45')).toContain('Te has desviado 40,29'); // 45 − 4,71
+    // ω = 2π·45/60 = 4,712389 → 4,71; tolerancia 0,0471 hasta el 17/10/2026 y, desde la política
+    // de redondeo (hallazgo 3342), media centésima: 0,005.
+    expect(await responder(page, '45')).toContain('Te has desviado 40,29'); // 45 − 4,7124
     expect(await responder(page, '270')).toContain('No es correcto'); // 45 rpm en grados/s
-    expect(await responder(page, '4,76')).toContain('No es correcto'); // +0,05 > 0,0471
+    expect(await responder(page, '4,76')).toContain('No es correcto'); // +0,05 > 0,005
     expect(await responder(page, '4,66')).toContain('No es correcto'); // −0,05, igual de fuera
     expect(await responder(page, '4,71 rad/s')).toContain('Escribe un número');
     expect(await responder(page, '4,712')).toContain('¡Correcto!');
@@ -1677,12 +1680,15 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
  *       y los rótulos de los deslizadores «3,5 m», «4,4 rad/s» y «2,5 kg».
  *
  * RESULTADO: el panel, la animación y el MCNU coinciden con lo calculado; en móvil los tres
- * deslizadores responden al dedo y el canvas se redibuja. Tres hallazgos, con test.fail():
- *   · (calculo, medio)    la tolerancia RELATIVA aprueba respuestas erróneas cuando la exacta no
- *                          exige redondeo: «11,9» para 12, «9,5» para 9,42, «713» para 720.
- *   · (operativa, medio)  traducida, los rótulos de valor de los deslizadores y la ω₀ del aviso
- *                          del MCNU se quedan con el valor viejo.
- *   · (contenido, bajo)   «1.500 rpm» y «1.571 rad/s» agrupan cuatro cifras (CLAUDE.md §2).
+ * deslizadores responden al dedo y el canvas se redibuja. Tres hallazgos (3342-3344), que
+ * llevaron test.fail() y se REPARARON el 17/10/2026 (776a332a y 3c12a652); sus testigos, al
+ * final de este bloque, sujetan ahora la reparación como regresión:
+ *   · 3342 (calculo, medio)    la tolerancia RELATIVA aprobaba respuestas erróneas cuando la
+ *                              exacta no exigía redondeo: «11,9» para 12, «9,5» para 9,42, «713» para 720.
+ *   · 3343 (operativa, medio)  traducida, los rótulos de valor de los deslizadores y la ω₀ del
+ *                              aviso del MCNU se quedaban con el valor viejo.
+ *   · 3344 (contenido, bajo)   «1.500 rpm» y «1.571 rad/s» agrupaban cuatro cifras (CLAUDE.md §2).
+ * Re-verificados el 18/10/2026 (bloque siguiente).
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
 /** El traductor del navegador simulado: cada nodo de texto visible pasa a <font><font>…. */
@@ -1841,14 +1847,14 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
   test(
     '3342 (regresión) · la corrección ya no aprueba respuestas erróneas cuando la exacta no exige redondeo',
     async ({ page }) => {
-      // casos.ts corrige con `toleranciaRelativa` (el mayor entre 0,01 y el 1 %) en los doce casos y
-      // en la práctica. El motor compartido la describe como la política que «admite que el alumno
-      // arrastre un redondeo intermedio»; aquí no hay nada que arrastrar en los casos 1, 2, 3, 6, 8,
-      // 9 y 10 ni en ningún ejercicio de práctica (ω entera y r, m con un decimal: v, a_c y F_c son
-      // exactos), y en el caso 7 la propia consigna dice «Redondea a dos decimales». Es la forma del
-      // hallazgo 3322 de simulador-genetica (99 por 100 %, 56,8 por 56,25), reparado con la política
-      // de redondeo. Medido el 16/10/2026: «11,9» y «12,1» aprueban el caso 8, «9,5» el 7, «0,11» y
-      // «0,09» el 6, y «713» y «727» la práctica de 720 N.
+      // Hasta el 17/10/2026 casos.ts corregía con `toleranciaRelativa` (el mayor entre 0,01 y el 1 %)
+      // en los doce casos y en la práctica. El motor compartido la describe como la política que
+      // «admite que el alumno arrastre un redondeo intermedio»; aquí no había nada que arrastrar en los
+      // casos 1, 2, 3, 6, 8, 9 y 10 ni en ningún ejercicio de práctica (ω entera y r, m con un decimal:
+      // v, a_c y F_c son exactos), y en el caso 7 la propia consigna dice «Redondea a dos decimales».
+      // Era la forma del hallazgo 3322 de simulador-genetica (99 por 100 %, 56,8 por 56,25), reparado
+      // con la política de redondeo. Medido el 16/10/2026: «11,9» y «12,1» aprobaban el caso 8, «9,5»
+      // el 7, «0,11» y «0,09» el 6, y «713» y «727» la práctica de 720 N. Re-verificado el 18/10/2026.
       await esperarHidratacion(page, [CAMPO]);
       await page.getByRole('button', { name: /^Caso 8:/ }).click();
       expect(await contestar(page, '11,9'), 'caso 8: 12 m/s² es exacto').toContain('No es correcto');
@@ -1906,7 +1912,7 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
     await traducirPagina(page);
     expect(await contestar(page, '1,57')).toContain('¡Correcto!'); // ω = 2π/4 = 1,5708
     await traducirPagina(page);
-    expect(await contestar(page, '1,6')).toContain('No es correcto'); // 0,03 > 0,0157
+    expect(await contestar(page, '1,6')).toContain('No es correcto'); // 0,029 > 0,005 (media centésima: 2π/4 exige redondear)
 
     await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
     expect(errores).toEqual([]);
@@ -1916,13 +1922,13 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
   test(
     '3343 (regresión) · traducida, los rótulos de los deslizadores y la ω₀ del aviso MCNU se actualizan',
     async ({ page }) => {
-      // `<span className={styles.sliderValue}>{formatNumber(radio, 1)} m</span>` son DOS nodos de
-      // texto («2,0» y « m»): React escribe la cifra nueva en el nodo que el traductor ya cambió por
-      // <font>, y en pantalla sigue la vieja. Es la forma que 4fc83bcd reparó en los botones de
-      // CasosAula.tsx y que no llegó a page.tsx. Medido el 16/10/2026: con el deslizador en 3,5 m /
-      // 4,4 rad/s / 2,5 kg (aria-valuetext «3,5 metros», panel ya en 4,40 y 15,40) los rótulos
-      // siguen diciendo «2,0 m», «2,0 rad/s» y «1,0 kg»; y en MCNU, con ω₀ = 7,2, el aviso del
-      // ciclo dice «desde la ω₀ del deslizador (4,4 rad/s)».
+      // `<span className={styles.sliderValue}>{formatNumber(radio, 1)} m</span>` eran DOS nodos de
+      // texto («2,0» y « m»): React escribía la cifra nueva en el nodo que el traductor ya había
+      // cambiado por <font>, y en pantalla seguía la vieja. Era la forma que 4fc83bcd reparó en los
+      // botones de CasosAula.tsx y que no llegó a page.tsx. Medido el 16/10/2026: con el deslizador
+      // en 3,5 m / 4,4 rad/s / 2,5 kg (aria-valuetext «3,5 metros», panel ya en 4,40 y 15,40) los
+      // rótulos seguían diciendo «2,0 m», «2,0 rad/s» y «1,0 kg»; y en MCNU, con ω₀ = 7,2, el aviso
+      // del ciclo decía «desde la ω₀ del deslizador (4,4 rad/s)». Hoy cada cifra es hijo único.
       await esperarHidratacion(page, ['input[type="range"]']);
       await traducirPagina(page);
       await moverDeVerdad(page, RADIO, 3.5);
@@ -1945,7 +1951,7 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
     '3344 (regresión) · la guía no agrupa números de cuatro cifras: «1500 rpm» y «1571 rad/s»',
     async ({ page }) => {
       // CLAUDE.md §2 (Ortografía de la RAE, 2010): con cuatro cifras enteras no se agrupa. El panel
-      // de la misma app lo cumple (F_c = 2500 N sale «2500,00»), pero la guía escribe a mano
+      // de la misma app lo cumple (F_c = 2500 N sale «2500,00»), pero la guía escribía a mano
       // «15.000 rpm (≈ 1.571 rad/s)» y «1.500 rpm = 1.500 × 2π/60 ≈ 157 rad/s».
       await page.getByRole('button', { name: 'Ver guía educativa' }).click();
       const guia = page.locator('[class*="tipsGrid"], [class*="scenariosGrid"]');
@@ -1953,6 +1959,398 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
       const texto = (await guia.allTextContents()).join(' ');
       expect(texto, 'microcentrífuga').not.toContain('1.571 rad/s');
       expect(texto, 'truco rpm → rad/s').not.toContain('1.500 rpm');
+    },
+  );
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN 18/10/2026 — Inspector (la app volvió a la cola tras reparar 3342-3344)
+ *
+ * Commits desde la del 16/10: 776a332a (el corrector pasa a la política de REDONDEO contra la
+ * respuesta sin redondear, hallazgo 3342), 3c12a652 (cada cifra variable es hijo único de su
+ * elemento, 3343; la guía sin punto en cuatro cifras, 3344) y c111078b (la píldora de Stemum
+ * sobre el h1; la vigila tests/apps/stemum-pildora-hero.spec.ts y aquí no se repite).
+ *
+ * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ * (convenio de la app: ω en rad/s · v = ω·r · a_c = ω²·r · F_c = m·a_c · T = 2π/ω · f = ω/2π)
+ *
+ *   CASO 1 (normal) — r = 4,2 m · ω = 1,7 rad/s · m = 0,6 kg (terna que nadie había pedido)
+ *       v   = 1,7 · 4,2      = 7,14 m/s               → «7,14»
+ *       a_c = 2,89 · 4,2     = 12,138 m/s²            → «12,14»  (v²/r = 50,9796/4,2 = 12,138 ✔)
+ *       F_c = 0,6 · 12,138   = 7,2828 N               → «7,28»
+ *       T   = 2π/1,7         = 3,6959914 s            → «3,70»
+ *       f   = 1,7/2π         = 0,2705634 Hz           → «0,271»  (1/3,6959914 = 0,27056 ✔)
+ *
+ *   CASO 2 (límite, en MÓVIL a 375 px y con el TECLADO: Inicio/Fin y una flecha)
+ *       Inicio en ω, Fin en el radio y en la masa → ω = 0 · r = 5 m · m = 5 kg
+ *         v = a_c = F_c = 0 · T = 2π/0 → «∞» · f = «0,000»; otro Fin en el radio no pasa de 5.
+ *       Una flecha a la derecha en ω → 0,1 rad/s, el menor giro que admite el control:
+ *         v = 0,1 · 5 = 0,5 «0,50» · a_c = 0,01 · 5 = 0,05 «0,05» · F_c = 5 · 0,05 = 0,25 «0,25»
+ *         T = 2π/0,1 = 62,831853 «62,83» · f = 0,1/2π = 0,0159155 «0,016»
+ *       En MCNU desde ω₀ = 0,1: el aviso nombra «(0,1 rad/s)», y ω = 0,1 + 0,5·t pasa de 0,5 a
+ *       los 0,8 s.
+ *
+ *   CASO 3 (rechazo) — el corrector con la política de redondeo (3342)
+ *       caso 9  · a_c = 2²·2 = 8, EXACTO → «8» y «8,0» aprueban · «4» (doblar ω no dobla a_c: la
+ *                 trampa que nombra la pista) suspende con «desviado 4» · «8,01» suspende
+ *       caso 5  · ω = 2π/4 = 1,5707963 → 1,57 · «1,57», «1.57», «1,571» y «1,5708» (bien
+ *                 redondeados a los decimales que se escriben, con coma o con punto) aprueban ·
+ *                 «1,58» no es ningún redondeo de 1,5708 · «90» (grados por segundo, 360/4)
+ *                 suspende con «desviado 88,43» · «0,25» (la frecuencia, 1/4), «-1,57» y «1,6» (un
+ *                 decimal; la consigna pide dos) suspenden
+ *       caso 3  · F_c = 0,2 · 2² · 1,5 = 1,2 EXACTO → «1,2» y «1,20» aprueban · «0,6» (m·ω·r, sin el
+ *                 cuadrado) «desviado 0,6» · «6» (a_c sin la masa) «desviado 4,8» · «1,21» suspende
+ *       caso 11 · 45 vueltas por minuto → ω = 2π·0,75 = 4,712389 → 4,71 · «4,7124» y «4,71»
+ *                 aprueban · «0,75» (vueltas por segundo, sin el 2π) «desviado 3,96» · «4,72» suspende
+ *       práctica · semilla 1800000000211 → «Un objeto de 0,2 kg gira a 4 rad/s en una circunferencia
+ *                 de 1,5 m de radio» → F_c = 0,2 · 4² · 1,5 = 4,8 N, EXACTO · «4,8» y «4,80»
+ *                 aprueban · «1,2» (m·ω·r), «24» (a_c sin la masa, «desviado 19,2») y «4,81»
+ *                 suspenden · la solución dice «Respuesta: 4,8 N»
+ *
+ *   PÁGINA TRADUCIDA, la app ENTERA, con el detector de texto viejo de generador-loteria (un nodo
+ *   que el traductor retiró y en el que React vuelve a escribir): deslizadores, teclado, MCNU, ω₀ y
+ *   radio en MCNU, MCU, ω = 0, los doce casos, pista, solución, comprobar bien / mal / no-número,
+ *   Enter, práctica ×3, guía y tema.
+ *
+ * RESULTADO: todo coincide con lo calculado a mano, y las dos reparaciones se sostienen: el
+ * corrector suspende lo inexacto en los casos exactos sin rechazar lo bien redondeado (coma,
+ * punto, decimales de más), y con la página traducida ningún nodo se queda con texto viejo, ni a
+ * 1280 px ni a 375 px. Dos hallazgos nuevos, ABIERTOS, con test.fail() al final del bloque:
+ *   · (operativa, bajo)  en un caso EXACTO, una respuesta a menos de media centésima suspende
+ *                        diciendo «Te has desviado 0 de la respuesta» («8,004» en el caso 9). Nace
+ *                        de 776a332a: con la tolerancia relativa (≥ 0,01) no se podía alcanzar.
+ *   · (contenido, medio) la guía dice, de la lavadora, «La aceleración centrípeta lanza el agua
+ *                        fuera de la ropa»: a_c apunta al CENTRO, y la propia app enseña que la
+ *                        fuerza centrífuga es ficticia y que lo que sale lo hace por la tangente.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+interface NodoTraducido {
+  nodo: Text;
+  valor: string | null;
+  avisado: boolean;
+}
+type VentanaTraducida = Window & { __nodosTraducidos?: NodoTraducido[] };
+
+/** El traductor simulado de `traducirPagina`, que además APUNTA cada nodo que retira y su valor. */
+function traducirApuntando(page: Page): Promise<void> {
+  return page.evaluate(() => {
+    const w = window as VentanaTraducida;
+    const apuntados = (w.__nodosTraducidos = w.__nodosTraducidos ?? []);
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      apuntados.push({ nodo, valor: nodo.nodeValue, avisado: false });
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+}
+
+/** Nodos que el traductor ya retiró y en los que React ha vuelto a escribir: en pantalla sigue el viejo. */
+function textoViejo(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const r: string[] = [];
+    for (const t of (window as VentanaTraducida).__nodosTraducidos ?? []) {
+      if (!t.avisado && t.nodo.nodeValue !== t.valor) {
+        t.avisado = true;
+        r.push(`«${t.valor}» → «${t.nodo.nodeValue}»`);
+      }
+    }
+    return r;
+  });
+}
+
+test.describe('Inspector 18/10/2026 — re-inspección tras la política de redondeo y la página traducida', () => {
+  const CAMPO = '#casos-respuesta';
+  const veredicto = (page: Page) => page.locator('[class*="casoVeredicto"]');
+  const irACaso = (page: Page, n: number) =>
+    page.getByRole('button', { name: new RegExp(`^Caso ${n}:`) }).click();
+
+  /** Escribe la respuesta, espera a que React la tenga, comprueba y devuelve el veredicto. */
+  async function responder(page: Page, texto: string): Promise<string> {
+    await page.fill(CAMPO, texto);
+    await esperarValorEnReact(page, CAMPO, texto);
+    await page.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toBeVisible();
+    return ((await veredicto(page).textContent()) ?? '').trim();
+  }
+
+  test('CASO 1 (normal) — r = 4,2 m, ω = 1,7 rad/s, m = 0,6 kg', async ({ page }) => {
+    await configurar(page, 4.2, 1.7, 0.6);
+    await expect(rotuloDeslizador(page, RADIO)).toHaveText('4,2 m');
+    await expect(rotuloDeslizador(page, OMEGA)).toHaveText('1,7 rad/s');
+    await expect(rotuloDeslizador(page, MASA)).toHaveText('0,6 kg');
+    await expect(page.locator('input[type="range"]').nth(OMEGA)).toHaveAttribute(
+      'aria-valuetext',
+      '1,7 radianes por segundo',
+    );
+
+    await expect(magnitud(page, 'ω')).toHaveText('1,70');
+    await expect(magnitud(page, 'v tangencial')).toHaveText('7,14'); // 1,7 · 4,2
+    await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('12,14'); // 1,7² · 4,2 = 12,138
+    await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('7,28'); // 0,6 · 12,138 = 7,2828
+    await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('3,70'); // 2π/1,7 = 3,6959914
+    await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('0,271'); // 1,7/2π = 0,2705634
+  });
+
+  test.describe('en móvil (375 px, con el teclado)', () => {
+    test.use({
+      viewport: { width: 375, height: 812 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('CASO 2 (límite) — Inicio y Fin en los deslizadores: ω = 0 con r y m al tope, y el menor giro', async ({
+      page,
+    }) => {
+      // El beforeEach del fichero fija 1280 px: se vuelve a 375 y se recarga.
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['input[type="range"]']);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), 'sin desborde a 375 px').toBeLessThanOrEqual(375);
+
+      const deslizador = (i: number) => page.locator('input[type="range"]').nth(i);
+      const pulsar = async (i: number, tecla: string) => {
+        await deslizador(i).focus();
+        await page.keyboard.press(tecla);
+      };
+
+      // De r = 2, ω = 2, m = 1 a ω = 0 (Inicio) con el radio y la masa en su tope (Fin).
+      await pulsar(OMEGA, 'Home');
+      await pulsar(RADIO, 'End');
+      await pulsar(MASA, 'End');
+      await expect(rotuloDeslizador(page, RADIO)).toHaveText('5,0 m');
+      await expect(rotuloDeslizador(page, OMEGA)).toHaveText('0,0 rad/s');
+      await expect(rotuloDeslizador(page, MASA)).toHaveText('5,0 kg');
+      await expect(magnitud(page, 'ω')).toHaveText('0,00');
+      await expect(magnitud(page, 'v tangencial')).toHaveText('0,00'); // 0 · 5
+      await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('0,00'); // 0² · 5
+      await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('0,00'); // 5 · 0
+      await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('∞'); // 2π/0
+      await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('0,000'); // 0/2π
+
+      // El tope no se rebasa con otro Fin.
+      await pulsar(RADIO, 'End');
+      expect(await deslizador(RADIO).inputValue()).toBe('5');
+
+      // Una flecha en ω: el menor giro que admite el control, 0,1 rad/s.
+      await pulsar(OMEGA, 'ArrowRight');
+      await expect(rotuloDeslizador(page, OMEGA)).toHaveText('0,1 rad/s');
+      await expect(deslizador(OMEGA)).toHaveAttribute('aria-valuetext', '0,1 radianes por segundo');
+      await expect(magnitud(page, 'ω')).toHaveText('0,10');
+      await expect(magnitud(page, 'v tangencial')).toHaveText('0,50'); // 0,1 · 5
+      await expect(magnitud(page, 'Aceleración centrípeta')).toHaveText('0,05'); // 0,01 · 5
+      await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('0,25'); // 5 · 0,05
+      await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('62,83'); // 2π/0,1 = 62,831853
+      await expect(magnitud(page, 'Frecuencia \\(f\\)')).toHaveText('0,016'); // 0,1/2π = 0,0159155
+
+      // Y en MCNU desde ese ω₀: el aviso nombra la ω₀ del deslizador y ω = 0,1 + 0,5·t crece.
+      await page.getByRole('button', { name: /^MCNU/ }).click();
+      await expect(page.locator('[class*="avisoCiclo"]')).toContainText('desde la ω₀ del deslizador (0,1 rad/s)');
+      await expect.poll(async () => (await fotoPanel(page))['ω'], { timeout: 5000 }).toBeGreaterThan(0.5);
+      // v = ω·r con r = 5, leída de la MISMA foto: el redondeo a dos decimales de ω (±0,005, ×5) y
+      // el de v (±0,005) dejan como mucho 0,03 de holgura.
+      const foto = await fotoPanel(page);
+      expect(Math.abs(foto['v tangencial'] - 5 * foto['ω'])).toBeLessThanOrEqual(0.03 + 1e-9);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
+    });
+  });
+
+  test('CASO 3 (rechazo) — la política de redondeo suspende lo inexacto y aprueba lo bien redondeado', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, [CAMPO]);
+
+    // Caso 9: a_c = 2² · 2 = 8 m/s², exacto.
+    await irACaso(page, 9);
+    expect(await responder(page, '8')).toContain('¡Correcto!');
+    expect(await responder(page, '8,0')).toContain('¡Correcto!');
+    expect(await responder(page, '4')).toContain('Te has desviado 4 de la respuesta'); // doblar ω no dobla a_c
+    expect(await responder(page, '8,01')).toContain('No es correcto'); // 8 es exacto: ningún redondeo da 8,01
+
+    // Caso 5: ω = 2π/4 = 1,5707963 → «Redondea a dos decimales» = 1,57.
+    await irACaso(page, 5);
+    for (const bien of ['1,57', '1.57', '1,571', '1,5708']) {
+      expect(await responder(page, bien), `«${bien}» redondea bien 1,5708`).toContain('¡Correcto!');
+    }
+    expect(await responder(page, '1,58')).toContain('No es correcto'); // no es ningún redondeo de 1,5708
+    expect(await responder(page, '90')).toContain('Te has desviado 88,43'); // 360°/4 s: grados, no radianes
+    expect(await responder(page, '0,25')).toContain('No es correcto'); // la frecuencia, 1/4 Hz
+    expect(await responder(page, '-1,57')).toContain('No es correcto');
+    expect(await responder(page, '1,6')).toContain('No es correcto'); // un decimal: la consigna pide dos
+
+    // Caso 3: F_c = 0,2 · 2² · 1,5 = 1,2 N, exacto.
+    await irACaso(page, 3);
+    expect(await responder(page, '1,2')).toContain('¡Correcto!');
+    expect(await responder(page, '1,20')).toContain('¡Correcto!');
+    expect(await responder(page, '0,6')).toContain('Te has desviado 0,6'); // m·ω·r: sin el cuadrado
+    expect(await responder(page, '6')).toContain('Te has desviado 4,8'); // a_c = 6, sin la masa
+    expect(await responder(page, '1,21')).toContain('No es correcto');
+
+    // Caso 11: 45 vueltas por minuto → ω = 2π · 45/60 = 4,712389 → 4,71.
+    await irACaso(page, 11);
+    expect(await responder(page, '4,7124')).toContain('¡Correcto!');
+    expect(await responder(page, '4,71')).toContain('¡Correcto!');
+    expect(await responder(page, '0,75')).toContain('Te has desviado 3,96'); // f = 0,75 Hz, sin el 2π
+    expect(await responder(page, '4,72')).toContain('No es correcto'); // 4,7124 redondea a 4,71
+
+    // Práctica con la semilla fija: Date.now() = 1800000000211 → m = 0,2 kg, ω = 4 rad/s, r = 1,5 m.
+    await page.clock.setFixedTime(new Date(1800000000211));
+    await page.getByRole('button', { name: /Practicar/ }).click();
+    await expect(page.locator('[class*="casoEnunciado"]')).toHaveText(
+      'Un objeto de 0,2 kg gira a 4 rad/s en una circunferencia de 1,5 m de radio. ¿Qué fuerza centrípeta actúa sobre él?',
+    );
+    expect(await responder(page, '4,8')).toContain('¡Correcto!'); // 0,2 · 4² · 1,5
+    expect(await responder(page, '4,80')).toContain('¡Correcto!');
+    expect(await responder(page, '1,2')).toContain('No es correcto'); // m·ω·r
+    expect(await responder(page, '24')).toContain('Te has desviado 19,2'); // a_c = 16 · 1,5, sin la masa
+    expect(await responder(page, '4,81')).toContain('No es correcto'); // 4,8 es exacto
+    await page.getByRole('button', { name: /Ver solución/ }).click();
+    await expect(page.locator('[class*="casoResultado"]')).toHaveText('Respuesta: 4,8 N');
+  });
+
+  test('página traducida, la app ENTERA — ningún texto se queda viejo y nada se cae', async ({ page }) => {
+    // Extiende el testigo de 3343 a cada control, cada caso y cada estado: el hallazgo se vio en
+    // los rótulos de los deslizadores y en el aviso del MCNU, pero la forma (dos nodos de texto en
+    // un mismo elemento) puede estar en cualquier sitio que cambie (cabo C0243).
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    await esperarHidratacion(page, ['input[type="range"]', CAMPO]);
+
+    const viejos: string[] = [];
+    const paso = async (nombre: string, accion: () => Promise<unknown>) => {
+      await traducirApuntando(page);
+      await accion();
+      await page.waitForTimeout(150); // el commit de React tras la acción
+      for (const v of await textoViejo(page)) viejos.push(`${nombre}: ${v}`);
+      await expect(page.getByRole('heading', { name: 'Algo salió mal' }), nombre).toHaveCount(0);
+    };
+
+    await paso('deslizadores', async () => {
+      await moverDeVerdad(page, RADIO, 3.5);
+      await moverDeVerdad(page, OMEGA, 4.4);
+      await moverDeVerdad(page, MASA, 2.5);
+    });
+    await expect(rotuloDeslizador(page, RADIO)).toHaveText('3,5 m');
+    await expect(rotuloDeslizador(page, OMEGA)).toHaveText('4,4 rad/s');
+    await expect(rotuloDeslizador(page, MASA)).toHaveText('2,5 kg');
+    await expect(magnitud(page, 'Fuerza centrípeta')).toHaveText('169,40'); // 2,5 · 4,4² · 3,5
+
+    await paso('flecha en ω', async () => {
+      await page.locator('input[type="range"]').nth(OMEGA).focus();
+      await page.keyboard.press('ArrowRight');
+    });
+    await expect(rotuloDeslizador(page, OMEGA)).toHaveText('4,5 rad/s');
+    await expect(magnitud(page, 'v tangencial')).toHaveText('15,75'); // 4,5 · 3,5
+
+    await paso('MCNU', () => page.getByRole('button', { name: /^MCNU/ }).click());
+    await expect(page.locator('[class*="avisoCiclo"]')).toContainText('(4,5 rad/s)');
+    await expect(page.locator('[class*="legend"]').first()).toContainText('Vector aceleración tangencial (a_t)');
+    await paso('ω₀ en MCNU', () => mover(page, OMEGA, 7.2));
+    await expect(rotuloDeslizador(page, OMEGA)).toHaveText('7,2 rad/s');
+    await expect(page.locator('[class*="avisoCiclo"]')).toContainText('(7,2 rad/s)');
+    await paso('radio en MCNU', () => mover(page, RADIO, 1));
+    await expect(rotuloDeslizador(page, RADIO)).toHaveText('1,0 m');
+
+    await paso('MCU', () => page.getByRole('button', { name: /^MCU/ }).click());
+    await expect(page.locator('[class*="avisoCiclo"]')).toHaveCount(0);
+    await expect(magnitud(page, 'ω')).toHaveText('7,20');
+    await expect(magnitud(page, 'v tangencial')).toHaveText('7,20'); // 7,2 · 1
+    await paso('ω = 0', () => mover(page, OMEGA, 0));
+    await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('∞');
+    await paso('ω = 3', () => mover(page, OMEGA, 3));
+    await expect(magnitud(page, 'Período \\(T\\)')).toHaveText('2,09'); // 2π/3 = 2,0944
+
+    for (const caso of CASOS) {
+      await paso(`caso ${caso.id}`, () => irACaso(page, caso.id));
+      await expect(page.locator('[class*="casoTitulo"]')).toHaveText(`Caso ${caso.id} · ${caso.titulo}`);
+      await expect(page.locator('[class*="casoLabel"]')).toHaveText(caso.etiquetaRespuesta);
+    }
+    await paso('ver pista', () => page.getByRole('button', { name: /Ver pista/ }).click());
+    await expect(page.locator('[class*="casoAyudaBoton"]').first()).toHaveText(/Ocultar pista/);
+    await paso('ocultar pista', () => page.getByRole('button', { name: /Ocultar pista/ }).click());
+    await expect(page.locator('[class*="casoAyudaBoton"]').first()).toHaveText(/Ver pista/);
+    await paso('ver solución', () => page.getByRole('button', { name: /Ver solución/ }).click());
+    await expect(page.locator('[class*="casoResultado"]')).toHaveText('Respuesta: 5,03 m/s'); // caso 12: 2π/0,5 · 0,4
+    await paso('comprobar bien', async () => expect(await responder(page, '5,03')).toContain('¡Correcto!'));
+    await paso('comprobar mal con Enter', async () => {
+      await page.fill(CAMPO, '5,02');
+      await esperarValorEnReact(page, CAMPO, '5,02');
+      await page.locator(CAMPO).press('Enter');
+    });
+    await expect(veredicto(page)).toContainText('No es correcto'); // 5,0265 no redondea a 5,02
+    await paso('no es un número', async () => expect(await responder(page, 'cinco')).toContain('Escribe un número'));
+    await paso('ocultar solución', () => page.getByRole('button', { name: /Ocultar solución/ }).click());
+
+    for (let i = 1; i <= 3; i++) {
+      await paso(`practicar ${i}`, () => page.getByRole('button', { name: /Practicar/ }).click());
+      await expect(page.locator('[class*="casoTitulo"]')).toHaveText('Ejercicio de práctica');
+    }
+    await paso('solución de la práctica', () => page.getByRole('button', { name: /Ver solución/ }).click());
+    await expect(page.locator('[class*="casoResultado"]')).toContainText('Respuesta:');
+    await paso('volver al caso 1', () => irACaso(page, 1));
+    await expect(page.locator('[class*="casoTitulo"]')).toHaveText('Caso 1 · De velocidad angular a velocidad lineal');
+
+    await paso('abrir la guía', () => page.getByRole('button', { name: 'Ver guía educativa' }).click());
+    await expect(page.getByRole('button', { name: 'Ocultar guía educativa' })).toBeVisible();
+    await paso('cerrar la guía', () => page.getByRole('button', { name: 'Ocultar guía educativa' }).click());
+    await paso('tema oscuro', () => page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click());
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+
+    expect(viejos, 'ningún nodo puede quedarse con el texto de antes').toEqual([]);
+    expect(errores).toEqual([]);
+  });
+
+  /* ── Hallazgos del 18/10/2026, ABIERTOS ──────────────────────────────────────────────── */
+
+  test.fail(
+    'ABIERTO (operativa, bajo) — en un caso exacto, suspender una respuesta no puede decir «Te has desviado 0»',
+    async ({ page }) => {
+      // ABIERTO, hallazgo (inspector 18/10/2026). Desde 776a332a una respuesta EXACTA se corrige con
+      // tolerancia 0, así que una desviación menor que media centésima ya suspende —bien—, pero el
+      // motivo formatea la diferencia con dos decimales como máximo (`numero(diferencia)` de
+      // casos.ts) y la redondea a 0. Caso 9 (a_c = 2²·2 = 8): «8,004» → «No es correcto. Te has
+      // desviado 0 de la respuesta.»; práctica de 4,8 N → «4,803» dice lo mismo. Con la tolerancia
+      // relativa (≥ 0,01) esa frase no se podía alcanzar: todo lo que suspendía se desviaba más de 0,01.
+      await esperarHidratacion(page, [CAMPO]);
+      await irACaso(page, 9);
+      const texto = await responder(page, '8,004');
+      expect(texto).toContain('No es correcto'); // 8 es exacto: suspender es lo correcto
+      expect(texto, 'la desviación es 0,004, no 0').not.toMatch(/desviado 0 de/);
+    },
+  );
+
+  test.fail(
+    'ABIERTO (contenido, medio) — la lavadora no puede atribuir a la aceleración centrípeta que el agua salga hacia fuera',
+    async ({ page }) => {
+      // ABIERTO, hallazgo (inspector 18/10/2026). La tarjeta «Lavadora en centrifugado» de la guía
+      // dice «La aceleración centrípeta lanza el agua fuera de la ropa hacia los orificios del
+      // tambor». a_c apunta al CENTRO —es lo que dibuja el propio canvas y lo que dice la FAQ de la
+      // página—: el tambor empuja la ropa hacia dentro, y el agua sale por los orificios porque allí
+      // nada la empuja y sigue por la tangente, como la piedra de la honda de la misma FAQ. Es el
+      // error que la app enseña a evitar en su recuadro «Creer que la fuerza centrífuga es real».
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      const tarjeta = page.locator('[class*="scenarioCard"]').filter({ hasText: 'Lavadora en centrifugado' });
+      await expect(tarjeta).toBeVisible();
+      const texto = ((await tarjeta.textContent()) ?? '').replace(/\s+/g, ' ');
+      expect(texto).not.toMatch(/aceleración centrípeta lanza el agua/i);
     },
   );
 });

@@ -20,7 +20,7 @@ import { elementos } from '../../app/tabla-periodica/elementos-data';
 import { ELEMENTOS as ELEMENTOS_TENDENCIAS } from '../../app/simulador-tabla-periodica-tendencias/datos';
 import { RADIO_COVALENTE_PM, RADIO_SOLO_TEORICO_DESDE_Z } from '../../data/radios-atomicos';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
-import { parseSpanishNumber } from '../../lib/formatters';
+import { formatNumber, parseSpanishNumber } from '../../lib/formatters';
 
 /**
  * Inspector — tabla-periodica (segmento interactiva, riesgo 3, 1.182 usos reales)
@@ -41,8 +41,14 @@ import { parseSpanishNumber } from '../../lib/formatters';
  * RE-INSPECCIÓN 16/10/2026: al final del fichero, después de todo lo anterior. La app volvió
  * a la cola por cinco commits posteriores (0fd697b2, ac046fdc, 8bead7c7, cf2332d8 y
  * 2221d315, el corrector al motor compartido): se verifican los cuatro que cambian conducta,
- * cuatro casos nuevos (19-22, el 22 en un móvil de 360 px) y cinco hallazgos ABIERTOS ese día
- * (A-E), escritos con `test.fail()` (los cabos C0056 y C0058 entre ellos).
+ * cuatro casos nuevos (19-22, el 22 en un móvil de 360 px) y cinco hallazgos de ese día
+ * (A-E), escritos con `test.fail()` (los cabos C0056 y C0058 entre ellos). B (3362, el
+ * wolframio) y C (3363, el margen de la masa) se REPARARON el 17/10/2026 y ya son regresión;
+ * A (3361), D (3364) y E (3365) siguen ABIERTOS.
+ *
+ * RE-INSPECCIÓN 18/10/2026: al final del fichero. Verifica las dos reparaciones del 17/10
+ * (26e2e846 y f6314c1f) con tres casos nuevos (23-25) y uno en un móvil de 390 px (26), y deja
+ * tres hallazgos ABIERTOS (F-H), escritos con `test.fail()`.
  *
  * QUÉ PROMETE
  *   <h1>      «⚛️ Tabla Periódica Interactiva»
@@ -1101,9 +1107,11 @@ test.describe('Tabla Periódica · fichas de búsqueda', () => {
 //
 //     Y el límite de la ficha numérica: la ficha 4 pide la masa del cobre, que en los
 //     datos es 63.546. `comprobarRespuesta` la compara con `parseSpanishNumber`, así
-//     que «63,546» con coma española debe entrar; y la propia app declara un margen del
-//     1 % —max(0,01; 0,63546) = 0,63546—, así que «63,5» (diferencia 0,046) entra y
+//     que «63,546» con coma española debe entrar; y la propia app declaraba entonces un
+//     margen del 1 % —max(0,01; 0,63546) = 0,63546—, así que «63,5» (diferencia 0,046) entra y
 //     «29», el número atómico del cobre, que es el error que la pista nombra, no.
+//     (Desde el 17/10/2026, hallazgo 3363, el margen es media unidad de la última cifra
+//     escrita: 0,05 para «63,5», y la diferencia 0,046 sigue entrando.)
 //
 //   CASO 9 — LO QUE DEBE RECHAZARSE. Cuatro negativas y una búsqueda sin resultados:
 //       · campo vacío        → motivo 'vacia': «Escribe una respuesta antes de
@@ -1760,7 +1768,8 @@ test.describe('hallazgos reparados · 14/09/2026', () => {
 //       ficha 3  «flor»    → fallo: «flúor» mal escrito
 //       ficha 12 «F»       → fallo: el flúor es el MÁS electronegativo, no el menos
 //       ficha 11 «[Ne] 3s² 3p³» → fallo: es la configuración del fósforo
-//       ficha 10 «18», «20» → fallo: los vecinos del 19 (tolerancia 1 % de 19 = 0,19)
+//       ficha 10 «18», «20» → fallo: los vecinos del 19 (tolerancia 1 % de 19 = 0,19; desde
+//                             la reparación del 2284, el mismo día, un recuento es exacto)
 //       ficha 10 «39»      → fallo: es la masa del potasio redondeada, no su Z
 //     Y en el buscador «ununennio» (el nombre sistemático del 119) → 0 resultados.
 //
@@ -1908,7 +1917,8 @@ test.describe('CASO 18 · rechazo: las fichas no aprueban lo que no es la respue
     expect(await veredictoLimpio(page, 3, 'flor')).toContain(FALLO); // «flúor» mal escrito
     expect(await veredictoLimpio(page, 12, 'F')).toContain(FALLO); // el MÁS electronegativo
     expect(await veredictoLimpio(page, 11, '[Ne] 3s² 3p³')).toContain(FALLO); // la del fósforo
-    // Ficha 10 · Z del potasio = 19, tolerancia max(0,01; 0,19) = 0,19: los vecinos no entran.
+    // Ficha 10 · Z del potasio = 19, un recuento: entero exacto desde el 27/09/2026 (hallazgo
+    // 2284; antes, max(0,01; 0,19) = 0,19). Los vecinos no entran con ninguna de las dos reglas.
     expect(await veredictoLimpio(page, 10, '18')).toContain(FALLO);
     expect(await veredictoLimpio(page, 10, '20')).toContain(FALLO);
     expect(await veredictoLimpio(page, 10, '39')).toContain(FALLO); // su masa, no su Z
@@ -2281,7 +2291,8 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
 //       tendencias deja el grupo vacío sin citar fuente, así que no se ancla (ver el acta).
 //       ficha 10 (Z = 19, un recuento): «−19» y «0» se rechazan, «19» vale.
 //       ficha 4 (masa 63,546): «0» y «−63,546» se rechazan; «64,19» cae fuera de cualquier
-//       margen razonable (|64,19 − 63,546| = 0,644 > 1 % = 0,635) y se rechaza también.
+//       margen razonable (|64,19 − 63,546| = 0,644 > 1 % = 0,635) y se rechaza también
+//       (desde el 17/10/2026, hallazgo 3363, el margen de dos decimales es 0,005: más aún).
 //
 //   CASO 21 — RECHAZO. Fórmulas que el parser tiene que nombrar, respuestas que son la casilla
 //     de al lado y un nombre que no es de ningún elemento:
@@ -2633,11 +2644,13 @@ test.describe('verificación 16/10/2026 · los commits posteriores a la inspecci
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS de la re-inspección del 16/10/2026 — ABIERTOS, con `test.fail()`
+// HALLAZGOS de la re-inspección del 16/10/2026 — con `test.fail()` los ABIERTOS
 // Cada uno afirma lo que DEBERÍA pasar; al repararlos se retira la marca y quedan como
 // regresión. El E, que necesita el viewport de 360 px, vive dentro del CASO 22.
+// Estado a 18/10/2026: A (3361), D (3364) y E (3365) ABIERTOS; B (3362) y C (3363) REPARADOS
+// el 17/10/2026 (26e2e846 y f6314c1f), sin marca: hoy son regresión.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('hallazgos · 16/10/2026 (ABIERTOS)', () => {
+test.describe('hallazgos · 16/10/2026 (A, D y E abiertos; B y C reparados)', () => {
   test('A · C0056 · el radón y el lawrencio llevan una electronegatividad que las fuentes de tendencias no dan', async ({ page }) => {
     test.fail(true, 'ABIERTO (inspector 16/10/2026): Rn 2,20 y Lr 1,30; tendencias los deja sin dato');
     // Fuente que el repositorio cita y ancla: cabecera de app/simulador-tabla-periodica-
@@ -2679,7 +2692,7 @@ test.describe('hallazgos · 16/10/2026 (ABIERTOS)', () => {
     await abrirHidratada(page);
     const w = page.locator('[aria-label*="(W), número atómico 74"]');
     await sembrarValor(page, '#busqueda', 'wolframio');
-    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible(); // hoy: 0 de 118
+    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible(); // antes del 17/10: 0 de 118
     await expect(w).toBeEnabled();
     await sembrarValor(page, '#busqueda', 'tungsteno');
     await expect(w).toBeEnabled();
@@ -2697,15 +2710,16 @@ test.describe('hallazgos · 16/10/2026 (ABIERTOS)', () => {
 
   // REPARADO (hallazgo 3363, 17/10/2026): media unidad de la última cifra escrita.
   test('C (3363) · la masa ya no acepta la de la casilla de al lado ni cifras que no redondean el dato', async ({ page }) => {
-    // Las respuestas de masa son un dato EXACTO que se copia de la tabla, y se corrigen con la
-    // política relativa (max(0,01; 1 %)) de lib/calculadoras/correctorCasosAula.ts. Mismo
-    // defecto que el hallazgo 3322 de simulador-genetica. El 1 % de 58,933 es 0,589, y el
-    // níquel, la casilla de AL LADO (Z = 28), pesa 58,693: a 0,240. Así que quien lee la casilla
-    // equivocada recibe «¡Correcto! Lo has encontrado», que es justo lo que el ejercicio evalúa.
-    // Con las masas que sortea la práctica (Z ≤ 36) pasa en Co ↔ Ni y Ar ↔ Ca (39,95 / 40,078).
-    // En la ficha 4, asignable por número, entran «64,1» y «64,18», que no son 63,546 redondeado
-    // a ningún número de decimales. Esperado: valen el dato y sus redondeos (el de la ficha, el
-    // de la casilla, el entero y el «63,5» que pone de ejemplo el propio convenio), y nada más.
+    // Las respuestas de masa son un dato EXACTO que se copia de la tabla, y hasta el 17/10/2026
+    // se corregían con la política relativa (max(0,01; 1 %)) de lib/calculadoras/
+    // correctorCasosAula.ts. Mismo defecto que el hallazgo 3322 de simulador-genetica. El 1 % de
+    // 58,933 es 0,589, y el níquel, la casilla de AL LADO (Z = 28), pesa 58,693: a 0,240. Así que
+    // quien leía la casilla equivocada recibía «¡Correcto! Lo has encontrado», que es justo lo que
+    // el ejercicio evalúa. Con las masas que sortea la práctica (Z ≤ 36) pasaba en Co ↔ Ni y
+    // Ar ↔ Ca (39,95 / 40,078). En la ficha 4, asignable por número, entraban «64,1» y «64,18», que
+    // no son 63,546 redondeado a ningún número de decimales. Esperado (y hoy cumplido): valen el
+    // dato y sus redondeos (el de la ficha, el de la casilla, el entero y el «63,5» que pone de
+    // ejemplo el propio convenio), y nada más.
     await abrirHidratada(page);
 
     const semilla = semillaDe('Co', 'Masa atómica (u)');
@@ -2731,13 +2745,13 @@ test.describe('hallazgos · 16/10/2026 (ABIERTOS)', () => {
     for (const r of ['58,933', '58,93', '59']) {
       expect(await responderPractica(r), `cobalto «${r}»`).toContain('¡Correcto!');
     }
-    expect(await responderPractica('58,693'), 'la masa del níquel').toContain('Todavía no'); // hoy: ¡Correcto!
+    expect(await responderPractica('58,693'), 'la masa del níquel').toContain('Todavía no'); // antes del 17/10: ¡Correcto!
 
     for (const r of ['63,546', '63,55', '63,5', '64']) {
       expect(await veredictoLimpio(page, 4, r), `ficha 4 «${r}»`).toContain(ACIERTO);
     }
     for (const r of ['64,1', '64,18']) {
-      expect(await veredictoLimpio(page, 4, r), `ficha 4 «${r}»`).toContain(FALLO); // hoy: ¡Correcto!
+      expect(await veredictoLimpio(page, 4, r), `ficha 4 «${r}»`).toContain(FALLO); // antes del 17/10: ¡Correcto!
     }
 
     // Sin navegador: ninguna masa que sortea la práctica puede aceptar la de OTRO elemento.
@@ -2755,7 +2769,7 @@ test.describe('hallazgos · 16/10/2026 (ABIERTOS)', () => {
         }
       }
     }
-    expect(cuelan).toEqual([]); // hoy: ['Ar ← Ca', 'Ca ← Ar', 'Co ← Ni', 'Ni ← Co']
+    expect(cuelan).toEqual([]); // antes del 17/10: ['Ar ← Ca', 'Ca ← Ar', 'Co ← Ni', 'Ni ← Co']
   });
 
   // «63.546» con PUNTO en la ficha 4 sale «Todavía no» (parseSpanishNumber lo lee 63 546). NO
@@ -2791,5 +2805,349 @@ test.describe('hallazgos · 16/10/2026 (ABIERTOS)', () => {
     const paso1 = (await page.locator('[class*="__stepItem"]').first().innerText()).replace(/\s+/g, ' ');
     expect(paso1).toContain('Localizar el elemento');
     if (/capas/.test(paso1)) expect(paso1).toMatch(/paladio|excepci|salvo/i);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 18/10/2026
+//
+// Vuelve a la cola por las dos reparaciones del 17/10/2026: 26e2e846 (hallazgo 3362, el W se
+// llamaba «Tungsteno» y «wolframio» no encontraba nada) y f6314c1f (hallazgo 3363, el 1 % de la
+// masa aprobaba la casilla de al lado). Las dos aguantan: los tests B y C de arriba ya no llevan
+// marca y aquí se amplían con los bordes que no cubrían. El texto del veredicto de fallo es fijo
+// («Todavía no. Vuelve a la tabla y fíjate en la pista.»): no escribe ninguna desviación, así que
+// el defecto del hallazgo 3369 de simulador-movimiento-circular («Te has desviado 0») no tiene
+// dónde darse en esta app (lo vigila el CASO 25).
+//
+// LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR. Fuentes ancladas en el repositorio:
+// masas IUPAC/CIAAW 2021 (cabecera de elementos-data.ts) · radio covalente de Pyykkö y Atsumi
+// 2009 (data/radios-atomicos.ts) · electronegatividad de Pauling, grupo y período de la cabecera
+// de app/simulador-tabla-periodica-tendencias/datos.ts (cotejada el 26/09/2026 con el CRC
+// Handbook, WebElements y el Lange) · «wolframio» como forma preferida: acuerdo RAC-RAE-RSEQ-
+// Fundéu, An. Quím. 113 (2017) 65-67, que cita el spec de tendencias.
+//
+//   CASO 23 — NORMAL. El WOLFRAMIO por sus cuatro vías de búsqueda:
+//       «wolframio» → 1 · «tungsteno» → 1 (otro nombre) · «74» → 1 (ningún otro Z de 1 a 118
+//       contiene «74») · «W» → 2: el wolframio (símbolo y nombre) y el LaWrencio, que lleva una
+//       «w» en el nombre (la búsqueda es por subcadena, como «Co» → 6 en el CASO 13).
+//       W: Z 74 · 183,84 → «183,840 u» · grupo 6 · período 6 · metal de transición · sólido ·
+//          radio covalente 137 pm (Z = 74: fila Lu–Hg 162, 152, 146, 137) · χ 2,36 (tendencias) ·
+//          [Xe] 4f¹⁴ 5d⁴ 6s² · natural (sin fila «Origen»)
+//       WO₃ = 183,84 + 3 × 15,999 = 183,84 + 47,997 = 231,837 → «231,8370 g/mol»
+//       Ficha 1 (Z = 26, el hierro): «wolframio», «tungsteno» y «W» fallan; «hierro» acierta.
+//
+//   CASO 24 — LÍMITE. La regla de la masa en sus bordes (ficha 4, Cu = 63,546): margen = media
+//     unidad de la última cifra escrita (casos.ts, toleranciaDe).
+//       aciertos: «63,546» (3 dec, ±0,0005, dif 0) · «63,55» (±0,005, 0,004) · «63,5» (±0,05,
+//                 0,046) · «64» (±0,5, 0,454) · «63,5460» (4 dec, ±0,00005, 0) · «63.55» y
+//                 «63.5» (un punto con 1 o 2 cifras detrás es decimal) · « 63,55 » (espacios fuera)
+//       fallos:   «63,54» (truncar no es redondear: 0,006 > 0,005) · «63,6» (0,054 > 0,05) ·
+//                 «64,0» (un decimal escrito promete el 63,5: 0,454 > 0,05) · «63» (0,546 > 0,5) ·
+//                 «63,5461» (decimales de más con otra cifra: 0,0001 > 0,00005) · «63.546» (un
+//                 punto con 3 cifras es millar: 63 546, decisión escrita en «ficha 4 · la masa…»)
+//     Y los primeros de cada serie del bloque f, por número:
+//       «57» → Lantano: 138,91 → «138,910 u» · período 6 · lantánidos · 180 pm (Z 57: fila Sb–Nd
+//              140, 136, 133, 131, 232, 196, 180) · χ 1,10 (tendencias 1,1) · [Xe] 5d¹ 6s²
+//       «89» → Actinio: 227 entera → «[227] u» · período 7 · actínidos · 186 pm (Z 89: fila Tl–Th
+//              144, 144, 151, 145, 147, 142, 223, 201, 186) · χ 1,10 (tendencias 1,1) ·
+//              [Rn] 6d¹ 7s² · natural (lo sintético empieza en el 95)
+//       Los dos dicen «Grupo: 3», como los otros 28 del bloque f (cabo C0056, sin anclar): se
+//       observa y no se afirma.
+//       Búsqueda vacía → «Mostrando 118 de 118».
+//
+//   CASO 25 — RECHAZO. La masa del vecino en la ficha 4 (Zn 65,38, Z = 30; Ni 58,693, Z = 28),
+//     una negativa y el cero; el texto del fallo sin ninguna cifra; ficha 2 (grupo 16, período 3
+//     = azufre) con el elemento de DEBAJO (Se, período 4); «volframio» (con v) → 0.
+//
+//   CASO 26 — MÓVIL (iPhone 12, 390 × 664). La rejilla conserva min-width: 900 px → casilla de
+//     (900 − 2 × 8 − 17 × 1) / 18 = 48,17 px; la página no desborda; la ficha mide 390 − 2 × 16 =
+//     358 px de ancho y 0,9 × 664 = 597,6 de alto, y se recorre por dentro.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── CASO 23 — NORMAL: el wolframio por sus dos nombres, su símbolo y su número ─────────
+test.describe('CASO 23 · normal: el wolframio, buscado por sus dos nombres, su símbolo y su número', () => {
+  test('las cuatro vías del buscador llegan al W y su ficha, su casilla y la calculadora dicen «Wolframio»', async ({ page }) => {
+    await abrirHidratada(page);
+
+    for (const [busqueda, esperados] of [
+      ['wolframio', ['Wolframio (W)']],
+      ['tungsteno', ['Wolframio (W)']], // otrosNombres: el DLE lo recoge como sinónimo
+      ['74', ['Wolframio (W)']],
+      ['W', ['Wolframio (W)', 'Lawrencio (Lr)']], // subcadena: la «w» de laWrencio
+    ] as const) {
+      await sembrarValor(page, '#busqueda', busqueda);
+      await expect(page.getByText(`Mostrando ${esperados.length} de 118 elementos`), busqueda).toBeVisible();
+      await expect.poll(() => titulosActivos(page), { message: busqueda }).toEqual([...esperados]);
+    }
+    await sembrarValor(page, '#busqueda', '');
+
+    const w = page.locator('[title="Wolframio (W)"]');
+    await expect(w).toHaveAttribute('aria-label', 'Wolframio (W), número atómico 74');
+    const ficha = await fichaDe(page, 'Wolframio (W)');
+    await expect(page.locator('#titulo-ficha-elemento')).toHaveText('Wolframio');
+    for (const dato of [
+      'Número atómico: 74',
+      'Masa atómica: 183,840 u', // CIAAW 2021: 183,84
+      'Grupo: 6', // tendencias: grupo 6
+      'Período: 6',
+      'Familia: Metales de Transición',
+      'Estado: Sólido',
+      'Radio covalente: 137 pm', // Pyykkö y Atsumi 2009, Z = 74
+      'Electronegatividad: 2,36', // tendencias (Pauling, CRC/WebElements/Lange)
+      '[Xe] 4f¹⁴ 5d⁴ 6s²',
+    ]) {
+      expect(ficha, `W · ${dato}`).toContain(dato);
+    }
+    expect(ficha).not.toContain('Origen:');
+    expect(ficha).not.toContain('Tungsteno');
+    await page.getByRole('button', { name: 'Cerrar la ficha de Wolframio' }).click();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+
+    // WO₃ = 183,84 + 3 × 15,999 = 231,837
+    expect(await masaMolarDe(page, 'WO3')).toContain('231,8370 g/mol');
+    const desglose = page.locator('[class*="__desgloseMasa"]');
+    await expect(desglose).toContainText(/W \(Wolframio\)\s+×1\s+183,8400/, { useInnerText: true });
+    await expect(desglose).toContainText(/O \(Oxígeno\)\s+×3\s+47,9970/, { useInnerText: true });
+
+    // Ficha 1 (Z = 26): los dos nombres del W, y su símbolo, son otro elemento.
+    for (const r of ['wolframio', 'tungsteno', 'W']) {
+      expect(await veredictoLimpio(page, 1, r), `ficha 1 «${r}»`).toContain(FALLO);
+    }
+    expect(await veredictoLimpio(page, 1, 'hierro')).toContain(ACIERTO);
+  });
+
+  test('sin navegador: el motor resuelve el Z = 74 como «Wolframio», y ninguna ficha ni la práctica preguntan por él', () => {
+    expect(resolverCaso({ tipo: 'elemento-por-numero', numero: 74 }).texto).toBe('Wolframio');
+    expect(buscarPorSimbolo('W')?.otrosNombres).toEqual(['Tungsteno']);
+    // «tungsteno» aceptado como RESPUESTA vive en `sinonimosDe` (casos.ts), pero hoy no tiene
+    // camino en la interfaz: ninguna de las 12 fichas tiene el W de solución y la práctica solo
+    // sortea Z ≤ 36. Si un día lo tiene, este test avisa para que se pruebe en el formulario.
+    expect(CASOS.filter((c) => c.simboloSolucion === 'W')).toEqual([]);
+    for (let semilla = 1; semilla <= 200; semilla++) {
+      expect(generarEjercicioAleatorio(semilla).enunciado).not.toContain('(W)');
+    }
+  });
+});
+
+// ── CASO 24 — LÍMITE: los bordes de la regla de la masa y el principio del bloque f ─────
+test.describe('CASO 24 · límite: la regla de redondeo de la masa en sus bordes, y La y Ac', () => {
+  test('ficha 4 · vale el dato redondeado a los decimales escritos, con coma o punto, y nada más', async ({ page }) => {
+    await abrirHidratada(page);
+    // Cu = 63,546 · margen = media unidad de la última cifra escrita (toleranciaDe)
+    for (const r of ['63,546', '63,55', '63,5', '64', '63,5460', '63.55', '63.5', ' 63,55 ']) {
+      expect(await veredictoLimpio(page, 4, r), `ficha 4 «${r}»`).toContain(ACIERTO);
+    }
+    for (const r of ['63,54', '63,6', '64,0', '63', '63,5461', '63.546']) {
+      expect(await veredictoLimpio(page, 4, r), `ficha 4 «${r}»`).toContain(FALLO);
+    }
+  });
+
+  test('sin navegador: lo que la app ENSEÑA de cada masa (casilla y ficha) se acepta, y lo del vecino no', () => {
+    // Lo que se copia: la casilla escribe formatNumber(masa, 2) (o 0 si es entera) y la ficha
+    // formatNumber(masa, 3) (los enteros, entre corchetes: el número sin corchetes es el dato).
+    const casilla = (m: number) => formatNumber(m, m % 1 === 0 ? 0 : 2);
+    const deFicha = (m: number) => (Number.isInteger(m) ? String(m) : formatNumber(m, 3));
+    const comoFicha = (m: number) => ({
+      respuestaTexto: String(m).replace('.', ','),
+      respuestaNumerica: m,
+      sinonimos: [] as string[],
+      respuestaEntera: false,
+    });
+    const rechazados: string[] = [];
+    const cuelan: string[] = [];
+    for (const e of elementos) {
+      for (const forma of [casilla(e.masa), deFicha(e.masa)]) {
+        if (!comprobarRespuesta(forma, comoFicha(e.masa)).correcto) rechazados.push(`${e.simbolo} «${forma}»`);
+      }
+      for (const z of [e.numero - 1, e.numero + 1]) {
+        const vecino = elementos.find((x) => x.numero === z);
+        // Fuera los vecinos de masa ENTERA (sin peso atómico estándar): su dato «209» (Po) es
+        // también el redondeo a entero del bismuto (208,98), y coincidir con un redondeo legítimo
+        // no es colarse. Cm/Bk (247) y Ts/Og (294) son además el mismo número.
+        if (!vecino || vecino.masa === e.masa || Number.isInteger(vecino.masa)) continue;
+        for (const forma of [casilla(vecino.masa), deFicha(vecino.masa)]) {
+          if (comprobarRespuesta(forma, comoFicha(e.masa)).correcto) cuelan.push(`${e.simbolo} ← ${vecino.simbolo} «${forma}»`);
+        }
+      }
+    }
+    expect(rechazados).toEqual([]);
+    expect(cuelan).toEqual([]);
+  });
+
+  test('el lantano y el actinio, primeros del bloque f, se encuentran por su número y su ficha da los valores de las fuentes', async ({ page }) => {
+    await abrirHidratada(page);
+    await sembrarValor(page, '#busqueda', '57');
+    await expect.poll(() => titulosActivos(page)).toEqual(['Lantano (La)']);
+    await sembrarValor(page, '#busqueda', '89');
+    await expect.poll(() => titulosActivos(page)).toEqual(['Actinio (Ac)']);
+    await sembrarValor(page, '#busqueda', '');
+    await expect(page.getByText('Mostrando 118 de 118 elementos')).toBeVisible();
+
+    const la = await fichaDe(page, 'Lantano (La)');
+    for (const dato of [
+      'Número atómico: 57', 'Masa atómica: 138,910 u', 'Período: 6', 'Familia: Lantánidos',
+      'Estado: Sólido', 'Radio covalente: 180 pm', 'Electronegatividad: 1,10', '[Xe] 5d¹ 6s²',
+    ]) {
+      expect(la, `La · ${dato}`).toContain(dato);
+    }
+    expect(la).not.toContain('Origen:');
+    await cerrarFicha(page);
+
+    const ac = await fichaDe(page, 'Actinio (Ac)');
+    for (const dato of [
+      'Número atómico: 89', 'Masa atómica: [227] u', 'Período: 7', 'Familia: Actínidos',
+      'Estado: Sólido', 'Radio covalente: 186 pm', 'Electronegatividad: 1,10', '[Rn] 6d¹ 7s²',
+    ]) {
+      expect(ac, `Ac · ${dato}`).toContain(dato);
+    }
+    expect(ac).not.toContain('Origen:'); // natural: lo sintético empieza en el americio (95)
+    await cerrarFicha(page);
+  });
+});
+
+// ── CASO 25 — RECHAZO: la masa del vecino, el elemento de debajo y un nombre mal escrito ───
+test.describe('CASO 25 · rechazo: el vecino no aprueba y el fallo no escribe ninguna cifra', () => {
+  test('ficha 4 rechaza las masas del Zn y del Ni, y el veredicto de fallo es un texto fijo', async ({ page }) => {
+    await abrirHidratada(page);
+
+    // Zn (Z = 30) 65,38 · Ni (Z = 28) 58,693: las dos casillas de al lado del cobre.
+    for (const r of ['65,38', '58,693', '58,69', '-63,546', '0']) {
+      expect(await veredictoLimpio(page, 4, r), `ficha 4 «${r}»`).toContain(FALLO);
+    }
+    // A 0,0001 del dato: el fallo más fino que admite la regla. El texto no puede llevar una
+    // desviación redondeada («Te has desviado 0», hallazgo 3369 de movimiento-circular).
+    const fino = await veredictoLimpio(page, 4, '63,5461');
+    expect(fino).toBe(`❌ ${FALLO}`);
+    expect(fino).not.toMatch(/\d/);
+
+    // Ficha 2 · grupo 16, período 3 = azufre. El selenio está DEBAJO (período 4).
+    for (const r of ['Se', 'selenio']) {
+      expect(await veredictoLimpio(page, 2, r), `ficha 2 «${r}»`).toContain(FALLO);
+    }
+    expect(await veredictoLimpio(page, 2, 'azufre')).toContain(ACIERTO);
+
+    // La práctica sin final: su fallo tampoco escribe cifras.
+    const practica = page.locator('div[class*="__aulaPractica"]');
+    await page.getByRole('button', { name: /Generar un ejercicio nuevo/ }).click();
+    await sembrarValor(page, '#respuesta-practica', '999,123');
+    await practica.getByRole('button', { name: 'Comprobar' }).click();
+    const vPractica = practica.locator('[class*="__aulaVeredicto"]');
+    await expect(vPractica).toHaveText('❌ Todavía no. Busca el elemento en la tabla y abre su ficha.');
+
+    // «volframio», con v: no es ninguno de los dos nombres admitidos.
+    await sembrarValor(page, '#busqueda', 'volframio');
+    await expect(page.getByText('Mostrando 0 de 118 elementos')).toBeVisible();
+    await expect(page.locator(CELDA_ACTIVA)).toHaveCount(0);
+  });
+});
+
+// ── CASO 26 — MÓVIL (390 px) ───────────────────────────────────────────────────
+test.describe('CASO 26 · móvil (iPhone 12, 390 × 664): buscar por el otro nombre y abrir la ficha tocando', () => {
+  // Enumeradas en vez de `...devices['iPhone 12']`: el device trae `defaultBrowserType`
+  // (webkit), que obligaría a un worker nuevo y Playwright no lo admite dentro de un describe.
+  const IPHONE = devices['iPhone 12'];
+  test.use({
+    viewport: IPHONE.viewport,
+    userAgent: IPHONE.userAgent,
+    deviceScaleFactor: IPHONE.deviceScaleFactor,
+    isMobile: IPHONE.isMobile,
+    hasTouch: IPHONE.hasTouch,
+  });
+
+  test('«tungsteno» deja el W, la casilla se toca y la ficha «Wolframio» cabe y se recorre', async ({ page }) => {
+    await abrirHidratada(page);
+    expect(page.viewportSize()).toEqual({ width: 390, height: 664 });
+    const pagina = await page.evaluate(() => ({
+      ancho: window.innerWidth,
+      scroll: document.documentElement.scrollWidth,
+    }));
+    expect(pagina.scroll).toBeLessThanOrEqual(pagina.ancho + 1);
+
+    await sembrarValor(page, '#busqueda', 'tungsteno');
+    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible();
+    const w = page.locator('[title="Wolframio (W)"]');
+    await w.scrollIntoViewIfNeeded();
+    const caja = await w.boundingBox();
+    expect(caja!.width).toBeCloseTo(48.17, 0); // (900 − 16 − 17) / 18
+    await w.tap();
+
+    const dialogo = page.getByRole('dialog');
+    await expect(dialogo).toBeVisible();
+    await expect(page.locator('#titulo-ficha-elemento')).toHaveText('Wolframio');
+    const medidas = await page.locator(MODAL).first().evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.x, ancho: r.width, alto: r.height, contenido: el.scrollHeight };
+    });
+    expect(medidas.x).toBe(16);
+    expect(medidas.ancho).toBe(358); // 390 − 2 × 16
+    expect(medidas.alto).toBeCloseTo(597.6, 0); // max-height: 90vh de 664
+    expect(medidas.contenido).toBeGreaterThan(medidas.alto);
+    const dato = page.locator(MODAL).first().locator('[class*="__datoCurioso"]');
+    await dato.scrollIntoViewIfNeeded();
+    await expect(dato).toBeInViewport();
+
+    const cerrar = page.getByRole('button', { name: 'Cerrar la ficha de Wolframio' });
+    const cajaCerrar = await cerrar.boundingBox();
+    expect(cajaCerrar!.width).toBe(32);
+    expect(cajaCerrar!.height).toBe(32);
+    await cerrar.tap();
+    await expect(dialogo).toHaveCount(0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS de la re-inspección del 18/10/2026 — ABIERTOS, con `test.fail()`
+// Cada uno afirma lo que DEBERÍA pasar; al repararlo se retira la marca y queda como regresión.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('hallazgos · 18/10/2026 (ABIERTOS)', () => {
+  test('F · el buscador no recorta los espacios: «hierro » (el que deja el teclado del móvil) da 0 de 118', async ({ page }) => {
+    test.fail(true, 'ABIERTO (inspector 18/10/2026): normalizaTexto no hace trim; «hierro » y « » dan 0 de 118');
+    // page.tsx filtra con normalizaTexto(busqueda), que no quita los espacios de los extremos, y
+    // `includes` busca la cadena CON el espacio. Los teclados de Android e iOS añaden un espacio
+    // al aceptar una sugerencia, y el resultado es la tabla entera atenuada sin ningún aviso. El
+    // corrector de las fichas de la misma app sí hace trim («normalizar» de casos.ts).
+    // Esperado: «hierro » → el hierro (1 de 118) · « » → nada que buscar (118 de 118).
+    await abrirHidratada(page);
+    await sembrarValor(page, '#busqueda', 'hierro ');
+    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible({ timeout: 2000 }); // hoy: 0 de 118
+    await expect.poll(() => titulosActivos(page), { timeout: 2000 }).toEqual(['Hierro (Fe)']);
+    await sembrarValor(page, '#busqueda', ' ');
+    await expect(page.getByText('Mostrando 118 de 118 elementos')).toBeVisible({ timeout: 2000 }); // hoy: 0 de 118
+  });
+
+  test('G · ficha 4 · la masa copiada con su unidad («63,546 u», como la escribe la ficha) se da por fallo', async ({ page }) => {
+    test.fail(true, 'ABIERTO (inspector 18/10/2026): parseSpanishNumber no admite la unidad y el fallo manda a «volver a la tabla»');
+    // La ficha del cobre escribe «Masa atómica: 63,546 u», y el convenio de la sección promete
+    // «Lo que se evalúa es si sabes buscarlo, no cómo lo tecleas». Quien copia el dato con su
+    // unidad recibe «Todavía no. Vuelve a la tabla y fíjate en la pista»: le manda a buscar lo
+    // que ya encontró. Esperado: «63,546 u» y «64 u» valen igual que «63,546» y «64».
+    await abrirHidratada(page);
+    expect(await fichaDe(page, 'Cobre (Cu)')).toContain('Masa atómica: 63,546 u');
+    await cerrarFicha(page);
+    expect(await veredictoLimpio(page, 4, '63,546')).toContain(ACIERTO);
+    expect(await veredictoLimpio(page, 4, '63,546 u')).toContain(ACIERTO); // hoy: Todavía no
+    expect(await veredictoLimpio(page, 4, '64 u')).toContain(ACIERTO); // hoy: Todavía no
+  });
+
+  test('H · el FAQPage dice que las masas atómicas «se expresan en gramos por mol», y la ficha las da en u', async ({ page }) => {
+    test.fail(true, 'ABIERTO (inspector 18/10/2026): FAQPage «se expresan en gramos por mol (g/mol)» frente a «Masa atómica: … u»');
+    // La pregunta 2 del FAQPage («¿Cómo se calcula la masa molar de un compuesto?») termina:
+    // «Las masas atómicas de cada elemento aparecen en la tabla periódica y se expresan en gramos
+    // por mol (g/mol)». La propia app las escribe en u (ficha «Masa atómica: 63,546 u», ficha 4
+    // «Masa atómica (u)», solución «63,546 u») y reserva g/mol para la masa MOLAR de la
+    // calculadora. Esperado: que la respuesta diga u (y, si quiere, que coincide en número con la
+    // masa molar en g/mol), no que la masa atómica se expresa en g/mol.
+    await abrirHidratada(page);
+    expect(await fichaDe(page, 'Cobre (Cu)')).toContain('Masa atómica: 63,546 u');
+    await cerrarFicha(page);
+    await expect(tarjetaFicha(page, 4).locator('label')).toHaveText('Masa atómica (u)');
+
+    const faqPage = await page
+      .locator('script[type="application/ld+json"]')
+      .evaluateAll((ns) => ns.map((n) => n.textContent ?? '').find((t) => t.includes('"FAQPage"')) ?? '');
+    const preguntas = JSON.parse(faqPage).mainEntity as { name: string; acceptedAnswer: { text: string } }[];
+    const respuesta = preguntas.find((q) => q.name === '¿Cómo se calcula la masa molar de un compuesto?');
+    expect(respuesta, 'la pregunta de la masa molar en el FAQPage').toBeTruthy();
+    expect(respuesta!.acceptedAnswer.text).not.toMatch(/masas atómicas[^.]*se expresan en gramos por mol/); // hoy: sí
   });
 });

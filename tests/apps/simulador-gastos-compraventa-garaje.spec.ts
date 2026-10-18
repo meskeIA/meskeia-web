@@ -56,10 +56,17 @@
  *      las cifras de la rebaja, Melilla en las dos pestañas, el rechazo de los años negativos en
  *      Melilla, el ejemplo de Luis (2901/2902, abiertos por C0209; texto y test reparados el
  *      17/10/2026) y cinco hallazgos con `test.fail()` (al final del fichero).
+ *  26. INSPECTOR 18/10/2026 — re-inspección tras 70ed62a5 (el ejemplo de Luis con la rebaja): obra
+ *      nueva VINCULADA en Asturias (IVA 10 % + AJD 1,2 %) con un vendedor de 3 años, 10.000.000 €
+ *      en Madrid (la notaría en su último tramo con el exceso de libre acuerdo y el registro en su
+ *      tope de 2.181,673939 €), el invariante de la familia en la rama IVA + AJD y en la cuota de
+ *      comunidad del reparto, la FAQ «escriturar» contra el motor, y un hallazgo con `test.fail()`.
  *
  * ⚠️ 06/10/2026 — los bloques «✅ REPARADO» (antes «❌ ABIERTO») describen el defecto TAL
  * COMO SE VIO el día de su inspección, con los verbos de entonces. A 13/10/2026 la base no
  * tenía ninguno abierto en esta app: los únicos `test.fail()` vivos son los de la sección 25.
+ * ⚠️ 18/10/2026 — siguen ABIERTOS en la base los cinco de la sección 25 (hallazgos 3247-3251), y se
+ *    suma el [18/10-a] de la sección 26.
  * ⚠️ 13/10/2026 — las secciones que fijan la notaría y el registro de ANTES del 11/10/2026
  * (371,84 €, 80,21 €…) fallan desde a3c3ecb0: su puesta al día es el cabo C0209.
  * ✅ 17/10/2026 (cabo C0209) — puestas al día: cada cifra se recalculó a mano con la base del BOE
@@ -120,6 +127,9 @@ import {
   FACTURA_NOTARIAL,
   BONIFICACION_CUOTA_CEUTA_MELILLA,
   honorariosLlevanIVA,
+  // Sección 26 (Inspector 18/10/2026): el último tramo de la notaría y el tope del registro.
+  LIMITE_ARANCEL_NOTARIAL,
+  REGISTRO_MAXIMO,
 } from '../../data/itp-ccaa';
 import { BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from '../../data/fiscal/inmuebles';
 
@@ -7721,7 +7731,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-a] En Ceuta y Melilla la cuota del IRPF ya
+   * ❌ ABIERTO 13/10/2026 (hallazgo 3247; contenido, bajo; sigue abierto el 18/10) — [13/10-a] En Ceuta y Melilla la cuota del IRPF ya
    * lleva restada la deducción del 60 % del art. 68.4 LIRPF, pero la tarjeta solo lo dice cuando no
    * tiene otro aviso: `avisoTarjeta(...)` SUSTITUYE la descripción entera («No resta la plusvalía
    * municipal…», «No se han podido leer…»), y la frase de la deducción va en la rama de reserva.
@@ -7746,7 +7756,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-b] La forma del 1593 de solar, aquí en la
+   * ❌ ABIERTO 13/10/2026 (hallazgo 3248; contenido, bajo; sigue abierto el 18/10) — [13/10-b] La forma del 1593 de solar, aquí en la
    * pregunta que más la necesita. RESPUESTA_ITP_GARAJE_SEGUNDA_MANO (metadata.ts, la FAQ visible y
    * el FAQPage) dice que el garaje suelto paga el ITP «al tipo general de su comunidad autónoma,
    * que va del 6 % al 13 %», sin la salvedad de Ceuta y Melilla, donde la app cobra el 3 %: el 6 %
@@ -7771,7 +7781,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-c] Residuo del 3071 (10/10/2026), que llegó al
+   * ❌ ABIERTO 13/10/2026 (hallazgo 3249; contenido, bajo; sigue abierto el 18/10) — [13/10-c] Residuo del 3071 (10/10/2026), que llegó al
    * motor y a la tarjeta pero no a RESPUESTA_PLUSVALIA_GARAJE (la FAQ visible y el FAQPage). La
    * respuesta da por universales las reglas del TRLRHL —«Desde 2021, puede elegir entre el método
    * objetivo y el real», el art. 104.5 y «Esta calculadora aplica un tipo del 25 %…, con un máximo
@@ -7804,7 +7814,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (dato, bajo) — [13/10-d] El sello de ITP/AJD/IVA (NOTA_DATOS de page.tsx)
+   * ❌ ABIERTO 13/10/2026 (hallazgo 3250; dato, bajo; sigue abierto el 18/10) — [13/10-d] El sello de ITP/AJD/IVA (NOTA_DATOS de page.tsx)
    * dice «en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un 50 % (art. 57 bis.1
    * TRLITPAJD)». El art. 57 bis.1 es el de la cuota gradual de AJD de los documentos notariales; la
    * de las transmisiones de inmuebles es el 57 bis.3.a (TRLITPAJD, BOE-A-1993-25359, leído el
@@ -7821,7 +7831,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-e] La forma del 2915/2917/2921 (la nota de
+   * ❌ ABIERTO 13/10/2026 (hallazgo 3251; contenido, bajo; sigue abierto el 18/10) — [13/10-e] La forma del 2915/2917/2921 (la nota de
    * Canarias, corregida el 06/10) en la nota de MADRID, que se pinta por defecto: «ITP más bajo de
    * España peninsular (6 %)». Navarra, peninsular, tiene el mismo 6 % (TIPOS_ITP_CCAA_2025, y el
    * recuadro de esta app lo rotula así), y en la vivienda el País Vasco cobra el 4 %: la nota vive en
@@ -7838,5 +7848,319 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
     expect(await valorPanelCcaa(page, 'ITP General')).toBe('6,00 %');
     expect(notaMadrid).toContain('Bonificación 100 %');
     expect(notaMadrid).not.toMatch(/ITP más bajo de España peninsular/);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 26. INSPECTOR 18/10/2026 — RE-INSPECCIÓN tras 70ed62a5 (17/10/2026), que puso el ejemplo de Luis
+//     del bloque educativo con las cifras de la rebaja del 5 % del nº 2.1 de los dos aranceles.
+//
+// El ejemplo de Luis se recalculó entero a mano ANTES de abrir la app (Madrid · 25.000 € · gestoría
+// 300): ITP 25.000 × 6 % = 1.500 · notaría 90,151816 + 18.989,88 × 0,45 % = 175,606276 × 0,95 ×
+// 1,21 = 201,859414 → 302,79 / 403,72 / 353,25 € · registro 24,040484 + 18.989,88 × 0,175 % =
+// 57,272774 × 0,95 + 9,015182 = 63,424317 × 1,21 = 76,74 € · total 2.229,99 € (8,92 %) · coste
+// 27.229,99 €. El ejemplo, la calculadora y la FAQ «escriturar» (303-404 € y 77 €, que sin la rebaja
+// serían 319-425 € y 80 €) dicen lo mismo: lo vigilan el test de la sección 25 y el de abajo.
+//
+// Los tres casos, resueltos a mano antes de ejecutar, cuadraron al céntimo:
+//   FA (normal)  — Asturias · OBRA NUEVA VINCULADA · 36.000 €: IVA del anejo 10 % y AJD 1,2 % (ninguna
+//                  sección medía Asturias en primera mano), y un vendedor de 3 años con el objetivo
+//                  ganando y la ganancia en el primer tramo del ahorro.
+//   FB (límite)  — Madrid · 10.000.000 €: la notaría en el ÚLTIMO tramo de la escala (0,3 ‰ hasta
+//                  6.010.121,04 €, el resto de libre acuerdo) y el registro en su TOPE de 2.181,673939 €,
+//                  con la rebaja del 5 % detrás del tope. Ninguna sección los medía con cifra.
+//   FC (rechazo) — el invariante de la familia donde el testigo no mira: la gestoría «1.200.50» en la
+//                  rama IVA + AJD (la salvedad del AJD va detrás del aviso), años «1.0.5» en el vendedor
+//                  y la «Cuota de comunidad» del reparto (el testigo solo mide el IBI).
+//
+// Hallazgo NUEVO, con `test.fail()` (afirma lo que DEBERÍA pasar), al final del bloque:
+//   [18/10-a] el IRPF de la venta se calcula como si la ganancia fuera la única renta del ahorro del
+//             año, y la página no lo dice.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//   · IVA → `IVA_INMUEBLES_2025.anejoVinculado` (10) · AJD → `tipoAJD('asturias', { objeto:
+//     'vivienda' })` (1,2) · ITP → `TIPOS_ITP_CCAA_2025` (Madrid 6, Asturias 8).
+//   · Notaría → `ARANCELES_NOTARIO` (RD 1426/1989, nº 2.1: «Por lo que excede de 6.010.121,04 euros el
+//     Notario percibirá la cantidad que libremente acuerde», BOE-A-1989-28111, leído el 18/10/2026)
+//     × 0,95 (`REBAJA_ARANCEL_CUANTIA`) × 1,21 y la horquilla de `FACTURA_NOTARIAL`.
+//   · Registro → `ARANCELES_REGISTRO` con el tope `REGISTRO_MAXIMO` (RD 1427/1989, nº 2.1: «En todo
+//     caso, el arancel global aplicable regulado en el número 2 del arancel no podrá superar los
+//     2.181,673939 euros», y después «se aplicará una rebaja del 5 por 100 del importe del arancel»,
+//     BOE-A-1989-28112, leído el 18/10/2026) + `REGISTRO_CONCEPTOS`, × 1,21.
+//   · Plusvalía → `COEFICIENTES_IIVTNU_2025` (3 años: 0,14) × 25 % (`tipoOrientativo`).
+//   · IRPF → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 €).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** La descripción de una tarjeta TAL CUAL: `i24Desc` aparta la salvedad del AJD, y aquí se mide. */
+async function i18DescCruda(page: Page, titulo: RegExp): Promise<string> {
+  return i24Normaliza(await i24Rotulo(page, titulo).locator('xpath=../following-sibling::p[1]').innerText());
+}
+
+/** El vendedor de los casos FA y FC (y del [18/10-a]), sobre la pestaña Vendedor ya abierta. */
+const I18_VENDEDOR: readonly [string, string][] = [
+  ['Precio de compra original del garaje', '28000'],
+  ['Impuestos y gastos que pagaste al comprarlo (€)', '2400'],
+  ['Años de propiedad', '3'],
+  ['Valor catastral del suelo (€)', '7000'],
+  ['Valor catastral total (suelo + construcción) (€)', '16000'],
+  ['Comisión inmobiliaria del vendedor (%)', '4'],
+  ['Gestoría y certificados del vendedor (€)', '250'],
+];
+
+/** Asturias · primera mano (vinculado, por defecto) · 36.000 €, con la gestoría que se pida. */
+async function i18AsturiasObraNueva(page: Page, gestoria?: string): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+  await page.getByRole('button', { name: /Primera mano/ }).first().click();
+  await page.selectOption('#select-ccaa', 'asturias');
+  await sembrarImporte(page, 'Precio del garaje / plaza de parking', '36000');
+  if (gestoria !== undefined) await sembrarImporte(page, 'Gastos de gestoría del comprador (€)', gestoria);
+}
+
+test.describe('Inspector 18/10/2026 — obra nueva vinculada, el tope de los dos aranceles y el invariante en la rama del IVA', () => {
+  /**
+   * CASO FA (NORMAL) — ASTURIAS · primera mano · garaje VINCULADO · 36.000 € · gestoría 300.
+   *   IVA del anejo: 36.000 × 10 % = 3.600,00 · AJD (objeto vivienda, sin tipo propio): 36.000 × 1,2 %
+   *     = 432,00 (sin escala: el AJD es plano).
+   *   Notaría: 90,151816 + 24.040,49 × 0,45 % (108,182205) + 5.949,39 × 0,15 % (8,924085) = 207,258106
+   *     × 0,95 = 196,895201 × 1,21 = 238,243193 → ×1,5 = 357,36 · ×2 = 476,49 · ×1,75 = 416,93 €
+   *   Registro: 24,040484 + 24.040,49 × 0,175 % (42,0708575) + 5.949,39 × 0,125 % (7,4367375) =
+   *     73,548079 × 0,95 = 69,870675 + 9,015182 = 78,885857 × 1,21 = 95,45 €
+   *   Total: 3.600 + 432 + 416,93 + 95,45 + 300 = 4.844,38 € (13,46 %) · coste 40.844,38 €, con la
+   *     salvedad de la base del AJD (art. 30.1 TRLITPAJD) detrás de «Precio + todos los gastos».
+   * Vendedor: compra 28.000 · gastos 2.400 · 3 años · suelo 7.000 · total 16.000 · comisión 4 % ·
+   *   gestoría 250.
+   *   Plusvalía: objetivo 7.000 × 0,14 × 25 % = 245,00 · real 8.000 × (7.000/16.000) × 25 % = 875,00
+   *     → gana el objetivo.
+   *   Adquisición 30.400 · transmisión 36.000 − 1.440 − 250 − 245 = 34.065 · ganancia 3.665
+   *   IRPF 3.665 × 19 % = 696,35 · total gastos 245 + 1.440 + 250 + 696,35 = 2.631,35 · neto 33.368,65.
+   * Sin la rebaja la notaría sería 438,87 € y el registro 99,90 €: van al céntimo.
+   */
+  test('CASO FA (normal) — Asturias, obra nueva vinculada, 36.000 €: IVA 10 % + AJD 1,2 %, y un vendedor de 3 años con el objetivo ganando', async ({
+    page,
+  }) => {
+    expect(IVA_INMUEBLES_2025.anejoVinculado).toBe(10);
+    expect(tipoAJD('asturias', { objeto: 'vivienda' }).tipo).toBe(1.2);
+    expect(ITP_CCAA.asturias.tipoGeneral).toBe(8);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 3)?.coeficiente).toBe(0.14);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0]).toEqual({ hasta: 6000, tipo: 19 });
+
+    await i18AsturiasObraNueva(page);
+    await expect(page.getByRole('button', { name: /Vinculado a vivienda/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('8,00 %');
+    expect(await valorPanelCcaa(page, 'AJD')).toBe('1,2 %');
+    expect(await i24Titulo(page, /^IVA/)).toBe('IVA (10,00 %)');
+    expect(await i24Valor(page, /^IVA/)).toBe('3600,00 €');
+    expect(await i24Titulo(page, /^AJD/)).toBe('AJD (1,20 %)');
+    expect(await i24Valor(page, /^AJD/)).toBe('432,00 €');
+    expect(await i18DescCruda(page, /^AJD/)).toBe(AVISO_BASE_AJD);
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('416,93 €');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('Factura estimada entre 357,36 € y 476,49 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('95,45 €');
+    expect(await i24Valor(page, /^Gastos de gestoría/)).toBe('300,00 €');
+    expect(await i24Titulo(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('4844,38 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe('13,46 % sobre el precio');
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('40.844,38 €');
+    expect(await i18DescCruda(page, /^COSTE TOTAL/)).toBe(`Precio + todos los gastos. ${AVISO_BASE_AJD}`);
+
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    for (const [etiqueta, valor] of I18_VENDEDOR) await sembrarImporte(page, etiqueta, valor);
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('245,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método objetivo (más favorable)');
+    expect(await i24Valor(page, /^Valor de adquisición/)).toBe('30.400,00 €');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('34.065,00 €');
+    expect(await i24Titulo(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('3665,00 €');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('696,35 €');
+    expect(await i24Titulo(page, /^Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (4 %)');
+    expect(await i24Valor(page, /^Comisión inmobiliaria/)).toBe('1440,00 €');
+    expect(await i24Valor(page, /^Gestoría y certificados del vendedor/)).toBe('250,00 €');
+    expect(await i24Titulo(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('2631,35 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('33.368,65 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes tras gastos e impuestos');
+  });
+
+  /**
+   * CASO FB (LÍMITE) — MADRID · segunda mano · 10.000.000 € · General · gestoría 300.
+   *   ITP: 10.000.000 × 6 % = 600.000,00 (Madrid no tiene escala ni umbral).
+   *   Notaría, la escala ENTERA hasta el límite del nº 2.1 (lo que excede es de libre acuerdo):
+   *     90,151816 + 24.040,49 × 0,45 % (108,182205) + 30.050,60 × 0,15 % (45,0759) + 90.151,82 × 0,10 %
+   *     (90,15182) + 450.759,07 × 0,05 % (225,379535) + 5.409.108,94 × 0,03 % (1.622,732682) =
+   *     2.181,673958 × 0,95 = 2.072,590260 × 1,21 = 2.507,834215 → ×1,5 = 3.761,75 · ×2 = 5.015,67 ·
+   *     ×1,75 = 4.388,71 €
+   *   Registro: 24,040484 + 42,0708575 + 37,56325 + 67,613865 + 135,227721 + 9.398.987,90 × 0,02 %
+   *     (1.879,79758) = 2.186,313758 → TOPE 2.181,673939 × 0,95 = 2.072,590242 + 9,015182 = 2.081,605424
+   *     × 1,21 = 2.518,74 € (sin el tope serían 2.524,08 €; con la rebaja delante del tope, lo mismo:
+   *     2.186,31 × 0,95 queda por debajo del tope).
+   *   Total (parcial): 600.000 + 4.388,71 + 2.518,74 + 300 = 607.207,45 € (6,07 %) · COSTE TOTAL
+   *     (PARCIAL) 10.607.207,45 €, que nombra la parte de libre acuerdo y dice «puede ser mayor».
+   */
+  test('CASO FB (límite) — Madrid, 10.000.000 €: la notaría en su último tramo con el exceso de libre acuerdo, y el registro en su tope', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.madrid.tipoGeneral).toBe(6);
+    expect(LIMITE_ARANCEL_NOTARIAL).toBe(6010121.04);
+    expect(ARANCELES_NOTARIO[ARANCELES_NOTARIO.length - 1]).toEqual({ hasta: 6010121.04, base: 558.94, exceso: 0.03 });
+    expect(ARANCELES_REGISTRO[ARANCELES_REGISTRO.length - 1]).toEqual({ hasta: Infinity, base: 306.58, exceso: 0.02 });
+    expect(REGISTRO_MAXIMO).toBe(2181.673939);
+    expect(REBAJA_ARANCEL_CUANTIA).toBe(0.05);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '10000000');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (6,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('600.000,00 €');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('4388,71 €');
+    const notaria = await i24Desc(page, /^Gastos de notaría/);
+    expect(notaria).toContain('Factura estimada entre 3761,75 € y 5015,67 €');
+    expect(notaria).toContain(
+      'Por encima de 6.010.121,04 € el arancel no fija cantidad: lo que excede se cobra según lo que acuerdes con el notario (RD 1426/1989, nº 2.1), y esta estimación no lo incluye.',
+    );
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('2518,74 €');
+    expect(await i24Valor(page, /^Gastos de gestoría/)).toBe('300,00 €');
+    expect(await i24Titulo(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('607.207,45 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe(
+      '6,07 % sobre el precio — SIN la parte de la notaría que es de libre acuerdo',
+    );
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('10.607.207,45 €');
+    expect(await i24Desc(page, /^COSTE TOTAL/)).toBe(
+      'No incluye la parte de la notaría que excede de 6.010.121,04 €, que es de libre acuerdo: el coste real puede ser mayor',
+    );
+  });
+
+  /**
+   * CASO FC (RECHAZO) — el CASO FA con importes que no se leen, en los sitios que el testigo de la
+   * familia no recorre:
+   *   Comprador, gestoría «1.200.50» en la rama IVA + AJD: «Sin leer», fuera del total y nombrada.
+   *     Total (parcial) 3.600 + 432 + 416,93 + 95,45 = 4.544,38 € (12,62 %) · COSTE TOTAL (PARCIAL)
+   *     40.544,38 €, «será mayor» (la gestoría suma seguro), y DETRÁS la salvedad del AJD.
+   *   Vendedor, años «1.0.5»: la plusvalía no se liquida (ni 0, ni el coeficiente de un año).
+   *     Transmisión 36.000 − 1.440 − 250 = 34.310 · ganancia (máximo) 3.910 · IRPF (máximo) 3.910 ×
+   *     19 % = 742,90 · total (parcial) 1.440 + 250 + 742,90 = 2.432,90 · neto (PARCIAL) 33.567,10.
+   *   Reparto, «Cuota de comunidad» «45.50.0»: no se reparte nada y se nombra el campo, también con el
+   *     IBI legible al lado (que solo, sin comunidad, reparte 365 € → 226 días del comprador del
+   *     20/05 al 31/12/2026 = 226,00 €).
+   */
+  test('CASO FC (rechazo) — gestoría «1.200.50» en la rama IVA + AJD, años «1.0.5» en el vendedor y la cuota de comunidad ilegible', async ({
+    page,
+  }) => {
+    await i18AsturiasObraNueva(page, '1.200.50');
+    await expect(page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]')).toHaveValue('1.200.50');
+    expect(await i24Valor(page, /^Gastos de gestoría/)).toBe('Sin leer');
+    expect(await i24Desc(page, /^Gastos de gestoría/)).toBe(
+      'El importe escrito no se ha podido leer, así que NO está incluido en el total. Escríbelo con coma decimal (300,50).',
+    );
+    expect(await i24Titulo(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('4544,38 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe('12,62 % sobre el precio — SIN la gestoría, que no se ha podido leer');
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('40.544,38 €');
+    expect(await i18DescCruda(page, /^COSTE TOTAL/)).toBe(
+      `No incluye la gestoría, que no se ha podido leer: el coste real será mayor. ${AVISO_BASE_AJD}`,
+    );
+
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    for (const [etiqueta, valor] of I18_VENDEDOR) {
+      await sembrarImporte(page, etiqueta, etiqueta === 'Años de propiedad' ? '1.0.5' : valor);
+    }
+    await expect(page.locator('input[aria-label="Años de propiedad"]')).toHaveValue('1.0.5');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('No calculada (no se han podido leer los años de propiedad)');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('34.310,00 €');
+    expect(await i24Titulo(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial (máximo)');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('3910,00 €');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('742,90 €');
+    expect(await i24Titulo(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('2432,90 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('33.567,10 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toBe(
+      'No descuenta la plusvalía municipal: el neto real puede ser menor que este. No se han podido leer los años de propiedad. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
+    );
+
+    const reparto = page.locator('section[aria-labelledby="titulo-prorrateo"]');
+    await sembrarImporte(page, 'Cuota de comunidad', '45.50.0');
+    await expect(page.locator('input[aria-label="Cuota de comunidad"]')).toHaveValue('45.50.0');
+    await expect(reparto.getByRole('alert')).toHaveText(
+      'No se entiende el importe de «Cuota de comunidad»: escríbelo como 450 o 450,80. Hasta corregirlo no se reparte nada, para no publicar una cifra calculada con un importe equivocado.',
+    );
+    await expect(reparto.locator('table')).toHaveCount(0);
+    await reparto.locator('input[type="date"]').fill('2026-05-20');
+    await sembrarImporte(page, 'Cuota anual del IBI', '365');
+    await expect(reparto.getByRole('alert')).toHaveCount(1);
+    await expect(reparto.locator('table')).toHaveCount(0);
+    // Control: sin la comunidad, el IBI legible sí se reparte (y con la cifra hecha a mano).
+    await sembrarImporte(page, 'Cuota de comunidad', '');
+    await expect(reparto.locator('table')).toHaveCount(1);
+    await expect(reparto).toContainText('el comprador le abona en la firma 226,00 €');
+  });
+
+  /**
+   * El ejemplo de Luis no es la única cifra de notaría y registro de la página escrita para 25.000 €:
+   * la primera pregunta de la FAQ (`respuestaEscriturar`, también en el FAQPage) da «unos 303-404 €
+   * de notaría» y «unos 77 €» de registro. Salen del motor (302,79-403,72 y 76,74, redondeados al euro),
+   * así que llevan ya la rebaja del 11/10/2026; sin ella serían 319-425 € y 80 €.
+   */
+  test('Luis tras 70ed62a5 — la FAQ «escriturar», visible y servida, da la notaría y el registro de la calculadora', async ({
+    page,
+    request,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '25000');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('Factura estimada entre 302,79 € y 403,72 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('76,74 €');
+    const pregunta = '¿Cuánto cuesta escriturar una plaza de garaje?';
+    const visible = await i13FaqVisible(page, pregunta);
+    const servida = i24Normaliza(await i13FaqPage(await (await request.get(RUTA)).text(), pregunta));
+    for (const respuesta of [visible, servida]) {
+      expect(respuesta).toContain('para una plaza de garaje de 25.000 € salen unos 303-404 € de notaría');
+      expect(respuesta).toContain('(unos 77 € para ese mismo importe)');
+    }
+    expect(servida).toBe(visible);
+  });
+
+  /**
+   * ❌ ABIERTO 18/10/2026 (contenido, bajo) — [18/10-a] El IRPF de la pestaña Vendedor se calcula como
+   * si la ganancia fuera la ÚNICA renta de la base del ahorro del año —lo dice el propio módulo:
+   * «Las apps calculan la cuota de la ganancia como si fuera la única renta de la base del ahorro»
+   * (data/fiscal/inmuebles.ts, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA)—, y la página no lo dice en
+   * ningún sitio: ni la tarjeta («Tributación en base del ahorro (del 19 % al 30 %)»), ni el sello del
+   * IRPF, ni «Limitaciones de esta calculadora». La escala del art. 66 LIRPF se aplica a la base del
+   * ahorro ENTERA (intereses, dividendos, otras ganancias), así que con otras rentas del ahorro la
+   * cuota real de la venta es mayor.
+   *   Vendedor del CASO FA (ganancia 3.665 €): la app publica 696,35 € (3.665 × 19 %). Con 6.000 € de
+   *   intereses en el mismo año la base del ahorro pasa de 6.000 a 9.665 € y la cuota de 1.140,00 a
+   *   1.909,65 €: la venta añade 769,65 € (3.665 × 21 %), 73,30 € más de lo publicado.
+   * Esperado: que la página diga que la cuota supone que no hay otras rentas del ahorro (o que las
+   * pregunte). El test busca esa salvedad en el texto de la página, sin los <script>.
+   */
+  test('[18/10-a] la página dice que el IRPF de la venta supone que no hay otras rentas del ahorro', async ({ page }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '36000');
+    await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+    for (const [etiqueta, valor] of I18_VENDEDOR) await sembrarImporte(page, etiqueta, valor);
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('696,35 €');
+    const texto = i24Normaliza(
+      await page.evaluate(() => {
+        const copia = document.body.cloneNode(true) as HTMLElement;
+        copia.querySelectorAll('script').forEach((s) => s.remove());
+        return copia.textContent ?? '';
+      }),
+    );
+    expect(texto).toMatch(
+      /(única|sola) renta (de la base )?del ahorro|otras rentas (de la base )?del ahorro|otros (rendimientos|ingresos) del ahorro|resto de (tu|la) base del ahorro/i,
+    );
   });
 });

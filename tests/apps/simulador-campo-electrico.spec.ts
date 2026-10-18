@@ -1618,20 +1618,24 @@ test.describe('Inspector 28/09/2026 — motor, equipotenciales, sonda escrita y 
  *           900 → 16 × 1 = 16 · 768 → 13,68 · 390 → 26 × 0,3825 = 9,95 (q₀ 10,71) · 360 → 8,97 (q₀ 9,66)
  *         El propio módulo fija «~9-14 px de pantalla»: entre 901 y ~1270 px no se cumple. → H3
  *     (b) a 390 y 360 px el lienzo mide 308 × 193 y 278 × 175 px y deja 41 px libres a cada
- *         lado. Un deslizamiento vertical que EMPIEZA sobre el lienzo no desplaza la página
- *         (touch-action: none) y crea una carga de +5 nC (pointerdown en modo «Añadir +», el de
+ *         lado. Un deslizamiento vertical que EMPIEZA sobre el lienzo no desplazaba la página
+ *         (touch-action: none) y creaba una carga de +5 nC (pointerdown en modo «Añadir +», el de
  *         arranque); desde el margen lateral la página baja 135 px y no crea nada. → H2
+ *         (REPARADO el 17/10/2026 en 62f6e198; re-medido el 18/10 a 360 y 390 px)
  *     (c) dianas: carga de 5 nC (r = 17) 13,01 px a 390 y 11,73 a 360; sonda (r = 10) 7,65 y
  *         6,90; ✕ de «Eliminar» (r = 9) ~6,9 px. A 1280: 27,85 y 16,38. → H4
  *
- * HALLAZGOS de esta pasada (ABIERTOS a 16/10/2026: sus tests van con test.fail()):
- *   H1 medio · contenido      · «en el centro del preset «+++» el campo es 0»: hay una carga.
- *   H2 medio · operativa      · en móvil, deslizar el dedo sobre el lienzo crea una carga.
- *   H3 bajo  · accesibilidad  · rótulos del lienzo a 7,2-8,3 px entre 901 y 1024 px.
- *   H4 bajo  · accesibilidad  · dianas de las cargas de 11,7-13 px en móvil (WCAG 2.5.8: 24 px).
- *   H5 bajo  · cálculo        · «10,00 × 10⁻⁸ J» en la mitad exacta (toFixed frente a Intl).
- *   H6 bajo  · cálculo        · un módulo negativo se corrige como «el valor es correcto, pero el SIGNO no».
- *   H7 bajo  · contenido      · la pregunta de las equipotenciales, en el FAQPage y en la FAQ
+ * HALLAZGOS de esta pasada. H1 y H2, REPARADOS el 17/10/2026 (62f6e198): sus tests ya no llevan
+ * test.fail(). Los otros cinco siguen ABIERTOS a 18/10/2026 y sus tests van con test.fail():
+ *   H1 medio · contenido      · 3345 · decía «en el centro del preset «+++» el campo es 0»: hay una
+ *                               carga. REPARADO: la guía habla de (0; 0,5).
+ *   H2 medio · operativa      · 3346 · en móvil, deslizar el dedo sobre el lienzo creaba una carga.
+ *                               REPARADO: pan-y y la carga nace al soltar un toque quieto.
+ *   H3 bajo  · accesibilidad  · 3347 · rótulos del lienzo a 7,2-8,3 px entre 901 y 1024 px.
+ *   H4 bajo  · accesibilidad  · 3348 · dianas de las cargas de 11,7-13 px en móvil (WCAG 2.5.8: 24 px).
+ *   H5 bajo  · cálculo        · 3349 · «10,00 × 10⁻⁸ J» en la mitad exacta (toFixed frente a Intl).
+ *   H6 bajo  · cálculo        · 3350 · un módulo negativo se corrige como «el valor es correcto, pero el SIGNO no».
+ *   H7 bajo  · contenido      · 3351 · la pregunta de las equipotenciales, en el FAQPage y en la FAQ
  *                               visible con dos respuestas distintas.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
@@ -1745,8 +1749,8 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
     }
   });
 
-  // HALLAZGO H1 (medio, contenido) · ABIERTO (16/10/2026).
-  // La tarjeta «Universitario de ingeniería» del bloque educativo dice que «la propia app lo
+  // HALLAZGO H1 (medio, contenido) · hallado el 16/10/2026 y REPARADO el 17/10/2026 (3345, 62f6e198).
+  // La tarjeta «Universitario de ingeniería» del bloque educativo decía que «la propia app lo
   // desmiente: en el centro del preset «+++» el campo es 0 pero el potencial no». En el centro
   // (0; 0) está la carga central de +4 nC: E y V divergen y la app da «—» con su aviso. Donde la
   // app SÍ enseña lo que la frase quiere decir es fuera del eje, en (0; 0,5): Eₓ = 0 exacto con
@@ -1888,11 +1892,11 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
       await expect(cargas(page)).toHaveCount(2);
     });
 
-    // HALLAZGO H2 (medio, operativa) · ABIERTO (16/10/2026) · cabo C0067.
-    // El lienzo crea la carga en `pointerdown` (handleSvgPointerDown) y lleva touch-action: none
-    // (.module.css, .canvasSvg). En el modo de arranque, «Añadir +», el dedo que se apoya en el
-    // lienzo para bajar la página no la desplaza y deja una carga de +5 nC donde tocó: la
-    // configuración —también la de un caso de aula recién cargado— cambia, y el panel con ella.
+    // HALLAZGO H2 (medio, operativa) · hallado el 16/10/2026 y REPARADO el 17/10/2026 (3346, 62f6e198) · cabo C0067.
+    // El lienzo creaba la carga en `pointerdown` (handleSvgPointerDown) y llevaba touch-action: none
+    // (.module.css, .canvasSvg). En el modo de arranque, «Añadir +», el dedo que se apoyaba en el
+    // lienzo para bajar la página no la desplazaba y dejaba una carga de +5 nC donde tocó: la
+    // configuración —también la de un caso de aula recién cargado— cambiaba, y el panel con ella.
     // A 390 px el lienzo ocupa 308 de los 390 px de ancho (41 libres a cada lado).
     // Caso: 390 × 800 táctil, dipolo de arranque, deslizar 150 px hacia arriba empezando en la
     //       zona vacía del lienzo (20 % del ancho, 75 % del alto) → esperado 2 cargas · obtenido
@@ -1946,4 +1950,360 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
       expect(diametro).toBeGreaterThanOrEqual(24);
     });
   });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR 18/10/2026 — QUINTA PASADA (re-inspección tras 62f6e198 y 76dbda4e)
+ *
+ * Qué cambió: 62f6e198 (17/10) — el lienzo pasa a touch-action: pan-y; con el dedo la carga nace
+ * al SOLTAR un toque quieto (≤ 10 px); un touchstart NO pasivo hace preventDefault sobre lo que se
+ * arrastra (cargas, sonda y la ✕ de «Eliminar») para que arrastrarlo no baje la página; la guía
+ * habla de (0; 0,5) en vez del centro de «+++» (hallazgos 3346 y 3345). 76dbda4e (17/10) — en
+ * oscuro, las cifras de acento del panel en #93c5fd (cabo C0112).
+ * Los 57 tests de las cuatro pasadas anteriores siguen en verde (los test.fail de 3347-3351, en rojo).
+ *
+ * CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (k = 8,99·10⁹; k·5 nC = 44,95 N·m²/C)
+ *
+ *   CASO N (normal) — «Cuadrupolo» (+5 nC en (−0,6; −0,6) y (0,6; 0,6); −5 nC en (−0,6; 0,6) y
+ *   (0,6; −0,6)), sonda escrita en (1; 0,5). Ninguna contribución se cancela:
+ *     +5 (0,6; 0,6):   d = (0,4; −0,1), r = 0,41231056 → E = (+256,517090; −64,129273) · V = +109,019763
+ *     −5 (0,6; −0,6):  d = (0,4; 1,1),  r = 1,17046999 → E = (−11,212665; −30,834828)  · V = −38,403377
+ *     +5 (−0,6; −0,6): d = (1,6; 1,1),  r = 1,94164878 → E = (+9,825115; +6,754767)    · V = +23,150428
+ *     −5 (−0,6; 0,6):  d = (1,6; −0,1), r = 1,60312195 → E = (−17,456211; +1,091013)   · V = −28,039040
+ *     Eₓ = 237,673330 → «237,67 N/C» · Eᵧ = −87,118321 → «-87,12 N/C» · |E| = 253,136748 → «253,14 N/C»
+ *     V = 65,727775 → «65,73 V» · F = 2,5313675·10⁻⁷ → «2,53 × 10⁻⁷ N» · U = 6,5727775·10⁻⁸ → «6,57 × 10⁻⁸ J»
+ *
+ *   CASO L (límite) — los extremos de los dos controles: +10 nC (tope del deslizador, pidiendo 999)
+ *   en la esquina (−4; −2,5), −0,1 nC (su mínimo, pidiendo 0) en (4; −2,5) y la sonda en la tercera
+ *   esquina (4; 2,5). Las cargas, con el teclado; la sonda, escribiendo «±99», que se acota al borde.
+ *     +10 nC: d = (8; 5), r = √89 = 9,43398113 → |E| = 89,9/89 = 1,01011236 → E = (0,856574; 0,535358)
+ *             V = 89,9/9,43398113 = 9,529381
+ *     −0,1 nC: d = (0; 5), r = 5 → |E| = 0,899/25 = 0,03596, hacia ella (−y) · V = −0,899/5 = −0,1798
+ *     Eₓ = 0,856574 → «0,86 N/C» · Eᵧ = 0,535358 − 0,03596 = 0,499398 → «0,50 N/C»
+ *     |E| = 0,991523 → «0,99 N/C» · V = 9,349581 → «9,35 V» · F → «9,92 × 10⁻¹⁰ N» · U → «9,35 × 10⁻⁹ J»
+ *     Rótulos «+10,0» y «−0,1»; centros en el viewBox (0; 500) y (800; 500).
+ *
+ *   CASO R (rechazo) — errores típicos en «Casos para clase» (tolerancia = máx(0,01; 1 %)):
+ *     caso 5 (Eₓ = +35,96 N/C, tol 0,3596): «0» (creer que los campos opuestos se anulan) y «17,98»
+ *       (una sola carga) → mal; «36» (k = 9·10⁹: 2 × 9·2/1²) → bien; «-35,96» → error de SIGNO.
+ *     caso 4 (V = −17,98 V, tol 0,1798): «-11,99» (k·q/r², confundir V con E) → mal; «-18» (k = 9·10⁹) → bien.
+ *     caso 11 (Fₓ = −107,88 nN, tol 1,0788): «-53,94» (olvidar q₀ = 2 nC) → mal; «-1,0788e-7» (en N y con
+ *       exponente) y la casilla vacía → «Escribe un número».
+ *
+ *   MÓVIL (360 y 390 px, eventos táctiles reales por CDP), lo que prometía 62f6e198:
+ *     · deslizar 150 px en vertical empezando en el lienzo → la página baja 135 px y no nace carga ✔
+ *     · toque quieto → nace UNA carga de +5 nC exactamente donde se toca: su centro es la inversa de
+ *       getScreenCTM() del punto tocado (medido (158,43; 376,31) a 390 y (158,26; 376,45) a 360) ✔
+ *     · deriva de 6 px → crea (≤ 10 px) ✔ · deslizamiento HORIZONTAL de 60 px → no crea ✔
+ *     · arrastrar con el dedo una carga y la sonda → siguen al dedo y la página no se mueve ✔
+ *     · modo «Eliminar»: tocar la carga la retira ✔; tocar su ✕ NO hace nada → 18/10-A
+ *   La guía nueva: con «+++» y la sonda en (0; 0,5), Eₓ = 0, |E| = 169,57 N/C y V = 136,25 V; en
+ *   (0,5; 0,5), |E| = 107,13 N/C con Eₓ = 13,65: cambia de valor y de dirección. Es cierto (lo fija el
+ *   test de 3345, en verde).
+ *
+ * HALLAZGOS de esta pasada (ABIERTOS a 18/10/2026: sus tests van con test.fail()):
+ *   18/10-A medio · operativa     · con el dedo, la ✕ del modo «Eliminar» no retira la carga: el
+ *       touchstart no pasivo de 62f6e198 hace preventDefault también sobre [data-tipo="remove"], y eso
+ *       suprime el click sintético del que cuelga handleEliminar (llegan pointerdown y pointerup, no
+ *       mousedown ni click). Con ese listener anulado en el script de inspección, el mismo toque la
+ *       retira; con el ratón, también.
+ *   18/10-B bajo  · accesibilidad · en tema CLARO las cifras de acento del panel (|E|, V, |F|) van en
+ *       var(--primary) #2E86AB sobre el degradado #eff6ff → #f0fdf4: 3,77:1 (16 px, 700). 76dbda4e
+ *       solo arregló el oscuro. El mismo color de marca da 4,11:1 en el modo activo, la etiqueta
+ *       «5,0 nC», los <h4> de «Casos de uso reales» y los números de los pasos (cabo C0070).
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('Inspector 18/10/2026 — cuadrupolo, extremos de los controles, corrector, tacto y contraste', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const cargas = (page: Page) => lienzo(page).locator('circle[data-tipo="carga"]');
+
+  /** Escribe la posición entera de la sonda (como un pegado) y espera a que React la tenga. */
+  async function sondaEn(page: Page, x: string, y: string): Promise<void> {
+    for (const [campo, v] of [
+      ['#sonda-x', x],
+      ['#sonda-y', y],
+    ] as const) {
+      await page.locator(campo).fill(v);
+      await esperarValorEnReact(page, campo, v);
+    }
+  }
+
+  /** Pone una carga donde está la sonda, con el teclado, y espera a que aparezca. */
+  async function cargaConTeclado(page: Page, tecla: '+' | '-'): Promise<void> {
+    const antes = await cargas(page).count();
+    await lienzo(page).focus();
+    await page.keyboard.press(tecla);
+    await expect(cargas(page)).toHaveCount(antes + 1);
+  }
+
+  /** Corrige una respuesta en un caso de aula y devuelve SU aviso (no el anunciador de rutas de Next). */
+  async function corregir(page: Page, caso: number, respuesta: string) {
+    await seccion(page).getByRole('button', { name: new RegExp(`^Caso ${caso}:`) }).click();
+    await seccion(page).locator('#casos-respuesta').fill(respuesta);
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    return seccion(page).locator('[role="alert"]');
+  }
+
+  test('CASO N · cuadrupolo con la sonda en (1; 0,5): superposición de cuatro cargas sin cancelaciones', async ({ page }) => {
+    await page.getByRole('button', { name: /Cuadrupolo/ }).click();
+    await sondaEn(page, '1', '0,5');
+    await expect(valor(page, 'Posición x')).toHaveText('1,00 m');
+    await expect(valor(page, 'Posición y')).toHaveText('0,50 m');
+    // Eₓ = 256,517090 − 11,212665 + 9,825115 − 17,456211 = 237,673330
+    await expect(valor(page, 'Eₓ')).toHaveText('237,67 N/C');
+    // Eᵧ = −64,129273 − 30,834828 + 6,754767 + 1,091013 = −87,118321
+    await expect(valor(page, 'Eᵧ')).toHaveText('-87,12 N/C');
+    await expect(valor(page, '|E| (campo)')).toHaveText('253,14 N/C'); // √(237,673330² + 87,118321²)
+    // V = 109,019763 − 38,403377 + 23,150428 − 28,039040 = 65,727775 (escalar, con signo)
+    await expect(valor(page, 'V (potencial)')).toHaveText('65,73 V');
+    await expect(valor(page, '|F| sobre q₀')).toHaveText('2,53 × 10⁻⁷ N'); // 1e-9 · 253,136748
+    await expect(valor(page, 'U (energía)')).toHaveText('6,57 × 10⁻⁸ J'); // 1e-9 · 65,727775
+  });
+
+  test('CASO L · extremos de los controles: +10 nC y −0,1 nC en dos esquinas, la sonda en la tercera', async ({ page }) => {
+    await page.getByRole('button', { name: 'Limpiar todo' }).click();
+    await expect(cargas(page)).toHaveCount(0);
+
+    expect(await sembrarValorAcotado(page, '#magnitud', 999)).toBe('10'); // el deslizador satura en su máximo
+    await expect(page.locator('label[for="magnitud"]')).toContainText('10,0 nC');
+    await sondaEn(page, '-99', '-99'); // se acota a (−4; −2,5)
+    await expect(valor(page, 'Posición x')).toHaveText('-4,00 m');
+    await expect(valor(page, 'Posición y')).toHaveText('-2,50 m');
+    await cargaConTeclado(page, '+');
+
+    expect(await sembrarValorAcotado(page, '#magnitud', 0)).toBe('0.1'); // y en su mínimo: nunca una carga nula
+    await expect(page.locator('label[for="magnitud"]')).toContainText('0,1 nC');
+    await sondaEn(page, '99', '-99'); // (4; −2,5)
+    await cargaConTeclado(page, '-');
+
+    await sondaEn(page, '4', '2,5');
+    const centros = await cargas(page).evaluateAll((cs) =>
+      cs.map((c) => [Number(c.getAttribute('cx')), Number(c.getAttribute('cy'))]),
+    );
+    expect(centros).toEqual([
+      [0, 500],
+      [800, 500],
+    ]);
+    await expect(lienzo(page).locator('text').filter({ hasText: /^\+10,0$/ })).toHaveCount(1);
+    await expect(lienzo(page).locator('text').filter({ hasText: /^−0,1$/ })).toHaveCount(1);
+
+    await expect(valor(page, 'Posición x')).toHaveText('4,00 m');
+    await expect(valor(page, 'Posición y')).toHaveText('2,50 m');
+    // +10 nC a √89 m: |E| = 89,9/89 = 1,01011236 → (0,856574; 0,535358) · −0,1 nC a 5 m: (0; −0,03596)
+    await expect(valor(page, 'Eₓ')).toHaveText('0,86 N/C');
+    await expect(valor(page, 'Eᵧ')).toHaveText('0,50 N/C'); // 0,535358 − 0,03596 = 0,499398
+    await expect(valor(page, '|E| (campo)')).toHaveText('0,99 N/C'); // 0,991523
+    await expect(valor(page, 'V (potencial)')).toHaveText('9,35 V'); // 9,529381 − 0,1798 = 9,349581
+    await expect(valor(page, '|F| sobre q₀')).toHaveText('9,92 × 10⁻¹⁰ N'); // 1e-9 · 0,991523
+    await expect(valor(page, 'U (energía)')).toHaveText('9,35 × 10⁻⁹ J'); // 1e-9 · 9,349581
+  });
+
+  test('CASO R · el corrector rechaza los errores típicos y admite el 9·10⁹ del libro', async ({ page }) => {
+    // Caso 5: Eₓ = +35,96 N/C (las dos cargas empujan hacia +x), tolerancia 0,3596
+    await expect(await corregir(page, 5, '0')).toContainText('No es correcto'); // «se anulan»
+    await expect(await corregir(page, 5, '17,98')).toContainText('No es correcto'); // una sola carga
+    await expect(await corregir(page, 5, '36')).toContainText('Correcto'); // 2 × 9·2/1², a 0,04
+    await expect(await corregir(page, 5, '-35,96')).toContainText('SIGNO');
+    // Caso 4: V = −17,98 V, tolerancia 0,1798
+    await expect(await corregir(page, 4, '-11,99')).toContainText('No es correcto'); // k·q/r²: es E, no V
+    await expect(await corregir(page, 4, '-18')).toContainText('Correcto'); // 9·(−3)/1,5, a 0,02
+    // Caso 11: Fₓ = 2 · (−53,94) = −107,88 nN, tolerancia 1,0788
+    await expect(await corregir(page, 11, '-53,94')).toContainText('No es correcto'); // sin q₀ = 2 nC
+    await expect(await corregir(page, 11, '-1,0788e-7')).toContainText('Escribe un número'); // en N, con exponente
+    await expect(await corregir(page, 11, '')).toContainText('Escribe un número');
+  });
+
+  test('control 18/10-A · con el ratón, la ✕ del modo «Eliminar» retira su carga', async ({ page }) => {
+    await page.getByRole('button', { name: 'Eliminar' }).click();
+    await lienzo(page).scrollIntoViewIfNeeded();
+    await expect(cargas(page)).toHaveCount(2);
+    const equis = (await lienzo(page).locator('[class*="removeBtn"]').first().boundingBox())!;
+    await page.mouse.click(equis.x + equis.width / 2, equis.y + equis.height / 2);
+    await expect(cargas(page)).toHaveCount(1);
+  });
+
+  // HALLAZGO 18/10-B (bajo, accesibilidad) · ABIERTO (18/10/2026) · cabo C0070.
+  // 76dbda4e llevó a #93c5fd las cifras de acento del panel en tema OSCURO (C0112). En el CLARO, el
+  // que se carga por defecto, siguen en var(--primary) #2E86AB sobre el degradado #eff6ff → #f0fdf4:
+  // 3,77:1 con #eff6ff y 3,92:1 con #f0fdf4, con 16 px en negrita (texto normal: exige 4,5:1). Son
+  // |E|, V y |F|, las tres cifras destacadas. --primary-texto (#26718F) da 5,02:1 y 5,22:1.
+  // Caso: tema claro, dipolo de arranque → esperado ≥ 4,5:1 · obtenido 3,77:1.
+  test('HALLAZGO 18/10-B · en tema claro las cifras destacadas del panel llegan a 4,5:1', async ({ page }) => {
+    test.fail(true, '18/10-B abierto: var(--primary) sobre el degradado claro, 3,77:1');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    const peor = await page.evaluate(() => {
+      const lin = (c: number) => {
+        const s = c / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      };
+      const lum = (c: number[]) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+      const rgb = (s: string) =>
+        [...s.matchAll(/rgba?\(([^)]+)\)/g)].map((m) => m[1].split(/[ ,/]+/).filter(Boolean).map(Number));
+      const panel = document.querySelector('[role="status"]');
+      const cifras = [...document.querySelectorAll('[role="status"] [class*="resultValueAccent"]')];
+      if (!panel || cifras.length === 0) throw new Error('sin panel o sin cifras de acento');
+      const paradas = rgb(getComputedStyle(panel).backgroundImage);
+      if (paradas.length === 0) throw new Error('el panel ya no lleva degradado: revisar este test');
+      const ratios = cifras.flatMap((el) => {
+        const texto = rgb(getComputedStyle(el).color)[0];
+        return paradas.map((p) => {
+          const [a, b] = [lum(texto), lum(p)].sort((x, y) => y - x);
+          return (a + 0.05) / (b + 0.05);
+        });
+      });
+      return Math.min(...ratios);
+    });
+    expect(peor).toBeGreaterThanOrEqual(4.5);
+  });
+
+  for (const ancho of [390, 360] as const) {
+    test.describe(`móvil ${ancho} px, táctil (62f6e198)`, () => {
+      test.use({
+        viewport: { width: ancho, height: 800 },
+        userAgent:
+          'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0 Mobile Safari/537.36',
+        deviceScaleFactor: 2.625,
+        isMobile: true,
+        hasTouch: true,
+      });
+
+      /** Recorre los puntos con un dedo: eventos táctiles reales (CDP), no de puntero sintéticos. */
+      async function gesto(page: Page, puntos: readonly (readonly [number, number])[]): Promise<void> {
+        const cdp = await page.context().newCDPSession(page);
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: puntos[0][0], y: puntos[0][1] }] });
+        for (const [x, y] of puntos.slice(1)) {
+          await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y }] });
+          await page.waitForTimeout(16);
+        }
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        await page.waitForTimeout(400);
+      }
+      const recta = (x0: number, y0: number, x1: number, y1: number, pasos = 10) =>
+        Array.from({ length: pasos + 1 }, (_, i) => [x0 + ((x1 - x0) * i) / pasos, y0 + ((y1 - y0) * i) / pasos] as const);
+
+      /** Deja el lienzo a 300 px del borde superior, con recorrido de sobra para bajar la página. */
+      async function prepararLienzo(page: Page) {
+        await lienzo(page).scrollIntoViewIfNeeded();
+        await page.evaluate(() => {
+          const s = document.querySelector('svg[aria-label="Lienzo del campo eléctrico"]')!;
+          window.scrollTo(0, window.scrollY + s.getBoundingClientRect().top - 300);
+        });
+        await page.waitForTimeout(200);
+        return (await lienzo(page).boundingBox())!;
+      }
+      /** De pantalla a unidades del viewBox con la matriz del propio SVG: la geometría, no la app. */
+      const aViewBox = (page: Page, x: number, y: number) =>
+        lienzo(page).evaluate(
+          (svg: SVGSVGElement, p: { x: number; y: number }) => {
+            const m = svg.getScreenCTM()!;
+            return { x: (p.x - m.e) / m.a, y: (p.y - m.f) / m.d };
+          },
+          { x, y },
+        );
+      const centro = (loc: ReturnType<typeof cargas>) =>
+        loc.evaluate((c) => ({ x: Number(c.getAttribute('cx')), y: Number(c.getAttribute('cy')) }));
+      const scrollY = (page: Page) => page.evaluate(() => window.scrollY);
+
+      test(`${ancho} · deslizar en vertical desde el lienzo baja la página y no crea ninguna carga`, async ({ page }) => {
+        const caja = await prepararLienzo(page);
+        await expect(cargas(page)).toHaveCount(2);
+        const antes = await scrollY(page);
+        const x = caja.x + caja.width * 0.2;
+        const y = caja.y + caja.height * 0.75;
+        await gesto(page, recta(x, y, x, y - 150));
+        expect(await scrollY(page), 'la página baja').toBeGreaterThan(antes + 50); // medido: 135 px
+        await expect(cargas(page)).toHaveCount(2);
+      });
+
+      test(`${ancho} · un toque quieto crea la carga DONDE se toca; deslizar en horizontal no crea nada`, async ({ page }) => {
+        const caja = await prepararLienzo(page);
+        await expect(cargas(page)).toHaveCount(2);
+        const [tx, ty] = [caja.x + caja.width * 0.2, caja.y + caja.height * 0.75]; // zona vacía
+        const esperado = await aViewBox(page, tx, ty);
+        await page.touchscreen.tap(tx, ty);
+        await expect(cargas(page)).toHaveCount(3);
+        // A media unidad del viewBox (0,2 px de pantalla): soltar a 6 px ya desplazaría ~16 unidades
+        const nueva = await centro(cargas(page).nth(2));
+        expect(nueva.x).toBeCloseTo(esperado.x, 0);
+        expect(nueva.y).toBeCloseTo(esperado.y, 0);
+        await expect(lienzo(page).locator('text').filter({ hasText: /^\+5,0$/ })).toHaveCount(2); // la del dipolo y la nueva
+
+        // Una deriva de 6 px sigue siendo un toque (umbral 10 px): crea
+        const [dx, dy] = [caja.x + caja.width * 0.85, caja.y + caja.height * 0.2];
+        await gesto(page, recta(dx, dy, dx + 6, dy, 3));
+        await expect(cargas(page)).toHaveCount(4);
+        // Un deslizamiento horizontal de 60 px (pan-y no lo coge el navegador) no es un toque: no crea
+        const antes = await scrollY(page);
+        const yh = caja.y + caja.height * 0.5;
+        await gesto(page, recta(dx, yh, dx - 60, yh, 6));
+        await expect(cargas(page)).toHaveCount(4);
+        expect(await scrollY(page)).toBe(antes);
+      });
+
+      test(`${ancho} · con el dedo, una carga y la sonda se arrastran hasta donde se suelta, sin bajar la página`, async ({ page }) => {
+        await prepararLienzo(page);
+        const carga = cargas(page).first();
+        const c = (await carga.boundingBox())!;
+        const [cx, cy] = [c.x + c.width / 2, c.y + c.height / 2];
+        const destinoCarga = await aViewBox(page, cx + 40, cy - 40);
+        const antes = await scrollY(page);
+        await gesto(page, recta(cx, cy, cx + 40, cy - 40));
+        const movida = await centro(carga);
+        expect(movida.x).toBeCloseTo(destinoCarga.x, 0);
+        expect(movida.y).toBeCloseTo(destinoCarga.y, 0);
+        expect(await scrollY(page)).toBe(antes);
+        await expect(cargas(page)).toHaveCount(2); // arrastrar no crea
+
+        const sonda = lienzo(page).locator('circle[data-tipo="prueba"]');
+        const s = (await sonda.boundingBox())!;
+        const [sx, sy] = [s.x + s.width / 2, s.y + s.height / 2];
+        const destinoSonda = await aViewBox(page, sx - 30, sy + 20);
+        await gesto(page, recta(sx, sy, sx - 30, sy + 20));
+        const sMovida = await centro(sonda);
+        expect(sMovida.x).toBeCloseTo(destinoSonda.x, 0);
+        expect(sMovida.y).toBeCloseTo(destinoSonda.y, 0);
+        expect(await scrollY(page)).toBe(antes);
+        // El panel sigue a la sonda: x = (cx − 400)/100 m
+        await expect(valor(page, 'Posición x')).toHaveText(
+          `${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((sMovida.x - 400) / 100)} m`,
+        );
+      });
+
+      // HALLAZGO 18/10-A (medio, operativa) · ABIERTO (18/10/2026) · regresión de 62f6e198.
+      // Para que arrastrar no bajase la página, 62f6e198 añadió al <svg> un touchstart NO pasivo que
+      // hace preventDefault si el dedo empieza en [data-tipo="carga"], [data-tipo="prueba"] o
+      // [data-tipo="remove"]. La ✕ del modo «Eliminar» es el <g data-tipo="remove"> y retira la carga
+      // en onClick; cancelar el touchstart suprime el click sintético (y el mousedown): con el dedo
+      // llegan pointerdown y pointerup, no click, y la ✕ no hace nada. Anulando solo ese listener en
+      // el script de inspección, el mismo toque la retira; con el ratón la retira (control de arriba).
+      // Tocar la propia carga en «Eliminar» sí la retira (va en pointerdown).
+      // Caso: 390 × 800 táctil, dipolo, modo «Eliminar», toque en el centro de la ✕ de la primera
+      //       carga (elementFromPoint = .removeBtn) → esperado 1 carga · obtenido 2 (igual a 360).
+      test(`HALLAZGO 18/10-A · ${ancho} · con el dedo, la ✕ del modo «Eliminar» retira su carga`, async ({ page }) => {
+        test.fail(true, '18/10-A abierto: el preventDefault del touchstart se come el click de la ✕');
+        await page.getByRole('button', { name: 'Eliminar' }).click();
+        await prepararLienzo(page);
+        await expect(cargas(page)).toHaveCount(2);
+        const equis = (await lienzo(page).locator('[class*="removeBtn"]').first().boundingBox())!;
+        const [ex, ey] = [equis.x + equis.width / 2, equis.y + equis.height / 2];
+        // El toque cae de verdad en la ✕, no al lado (mide 7,5 px a 390: ese tamaño es el hallazgo 3348)
+        const tocado = await page.evaluate(
+          ([x, y]) => document.elementFromPoint(x, y)?.parentElement?.getAttribute('data-tipo') ?? null,
+          [ex, ey] as const,
+        );
+        expect(tocado).toBe('remove');
+        await page.touchscreen.tap(ex, ey);
+        await expect(cargas(page)).toHaveCount(1);
+      });
+
+      test(`control 18/10-A · ${ancho} · en «Eliminar», tocar la propia carga con el dedo la retira`, async ({ page }) => {
+        await page.getByRole('button', { name: 'Eliminar' }).click();
+        await prepararLienzo(page);
+        await expect(cargas(page)).toHaveCount(2);
+        const c = (await cargas(page).first().boundingBox())!;
+        await page.touchscreen.tap(c.x + c.width / 2, c.y + c.height / 2);
+        await expect(cargas(page)).toHaveCount(1);
+      });
+    });
+  }
 });
