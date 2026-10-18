@@ -457,12 +457,15 @@ export default function SimuladorCampoElectrico() {
   // (medido: arrastrar una carga con el dedo también bajaba la página 29 px). Un `touchstart` NO
   // pasivo que empieza sobre lo que se arrastra cancela el desplazamiento de ese gesto; los
   // eventos de puntero, que mueven la carga, siguen llegando.
+  // La ✕ del modo «Eliminar» ([data-tipo="remove"]) se queda FUERA (hallazgo 3371, 18/10/2026):
+  // no se arrastra, y cancelar su touchstart suprime el click sintético del que cuelga
+  // handleEliminar, así que con el dedo no retiraba la carga.
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const alEmpezarToque = (e: TouchEvent) => {
       const objetivo = e.target as Element | null;
-      if (objetivo?.closest?.('[data-tipo="carga"], [data-tipo="prueba"], [data-tipo="remove"]')) e.preventDefault();
+      if (objetivo?.closest?.('[data-tipo="carga"], [data-tipo="prueba"]')) e.preventDefault();
     };
     svg.addEventListener('touchstart', alEmpezarToque, { passive: false });
     return () => svg.removeEventListener('touchstart', alEmpezarToque);
