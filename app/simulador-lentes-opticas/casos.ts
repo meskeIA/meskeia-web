@@ -50,6 +50,7 @@ import {
   corregirNumero,
   dentroDeTolerancia,
   exigeRedondeo,
+  textoDesviacion,
   toleranciaDeRedondeo,
 } from '@/lib/calculadoras/correctorCasosAula';
 
@@ -471,7 +472,7 @@ export function comprobarRespuesta(usuario: number, datos: DatosCaso): Veredicto
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 4)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, 4, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

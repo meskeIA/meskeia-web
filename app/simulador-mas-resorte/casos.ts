@@ -52,7 +52,7 @@
 
 import { formatNumber } from '@/lib';
 import { calcularEstado, describirOscilador, energiaInicial } from './motor';
-import { corregirNumero, exigeRedondeo, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Holgura relativa con la que una inversión (k o m) tiene que reproducir el T o la f dados. */
 const HOLGURA_INVERSION = 1e-9;
@@ -484,7 +484,7 @@ export function comprobarRespuesta(usuario: number, esperado: number, datos: Dat
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 2)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, 2, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

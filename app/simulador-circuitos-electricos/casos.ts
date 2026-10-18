@@ -38,7 +38,7 @@
 
 import { formatNumber } from '@/lib';
 import { resolverOhm, resolverParalelo, resolverPotencia, resolverSerie, type Incognita } from './motor';
-import { corregirNumero, exigeRedondeo, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── Datos de un caso ─────────────────────────── */
 
@@ -449,7 +449,7 @@ export function comprobarRespuesta(usuario: number, esperado: number, datos: Dat
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 2)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, 2, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

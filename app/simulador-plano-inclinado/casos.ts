@@ -38,7 +38,7 @@ import {
   type AnalisisPlano,
   type ParametrosPlano,
 } from './motor';
-import { corregirNumero, exigeRedondeo, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /**
  * Valores de referencia para lo que el enunciado no da porque NO influye en la respuesta (la
@@ -494,7 +494,7 @@ export function comprobarRespuesta(usuario: number, datos: DatosCaso): Veredicto
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 3)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, 3, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

@@ -97,6 +97,23 @@ export function toleranciaDeRedondeo(
   return exigeRedondeo(valor, decimales, redondear) ? 10 ** -decimales / 2 : 0;
 }
 
+/**
+ * La desviación que se ENSEÑA al suspender, con los decimales que hagan falta para que no se lea
+ * como 0 (hallazgo 3369, 18/10/2026). Con la política de redondeo una respuesta exacta tiene
+ * tolerancia 0 y suspende a cualquier distancia: «8,004» para 8 se desvía 0,004, y escrito con
+ * dos decimales decía a la vez «No es correcto» y «Te has desviado 0». `formatear` es el de la
+ * app, para no cambiar su formato; solo recibe más decimales si los pedidos redondean a 0.
+ */
+export function textoDesviacion(
+  diferencia: number,
+  decimales: number,
+  formatear: (n: number, decimales: number) => string,
+): string {
+  let d = decimales;
+  while (diferencia > 0 && d < 12 && redondearA(diferencia, d) === 0) d += 1;
+  return formatear(diferencia, d);
+}
+
 /* ─────────────────────────────── Dominio ─────────────────────────────── */
 
 /**

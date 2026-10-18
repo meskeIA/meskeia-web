@@ -64,7 +64,7 @@ import {
 } from './components/genetics';
 import type { Trait, PunnettResult } from './components/types';
 import { formatNumber } from '@/lib';
-import { corregirNumero, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Qué se pregunta: una clave del cuadro, y en qué unidad se responde. */
 export interface Busca {
@@ -345,7 +345,7 @@ export function comprobarRespuesta(
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, 2, (n, d) => (d > 2 ? formatNumber(n, d) : numero(n)))} de la respuesta.`,
     diferencia,
     tolerancia,
   };

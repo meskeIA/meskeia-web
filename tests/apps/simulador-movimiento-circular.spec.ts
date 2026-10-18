@@ -2015,7 +2015,8 @@ test.describe('Inspector 16/10/2026 — re-inspección tras el motor compartido 
  * RESULTADO: todo coincide con lo calculado a mano, y las dos reparaciones se sostienen: el
  * corrector suspende lo inexacto en los casos exactos sin rechazar lo bien redondeado (coma,
  * punto, decimales de más), y con la página traducida ningún nodo se queda con texto viejo, ni a
- * 1280 px ni a 375 px. Dos hallazgos nuevos, ABIERTOS, con test.fail() al final del bloque:
+ * 1280 px ni a 375 px. Dos hallazgos nuevos (3369 y 3370, REPARADOS el 18/10/2026 por /reparar;
+ * sus testigos, al final del bloque, ya sin test.fail()):
  *   · (operativa, bajo)  en un caso EXACTO, una respuesta a menos de media centésima suspende
  *                        diciendo «Te has desviado 0 de la respuesta» («8,004» en el caso 9). Nace
  *                        de 776a332a: con la tolerancia relativa (≥ 0,01) no se podía alcanzar.
@@ -2318,12 +2319,14 @@ test.describe('Inspector 18/10/2026 — re-inspección tras la política de redo
     expect(errores).toEqual([]);
   });
 
-  /* ── Hallazgos del 18/10/2026, ABIERTOS ──────────────────────────────────────────────── */
+  /* ── Hallazgos del 18/10/2026 (3369 y 3370), REPARADOS el 18/10/2026 ─────────────────── */
 
-  test.fail(
-    'ABIERTO (operativa, bajo) — en un caso exacto, suspender una respuesta no puede decir «Te has desviado 0»',
+  test(
+    'REPARADO 3369 (operativa, bajo) — en un caso exacto, suspender una respuesta no puede decir «Te has desviado 0»',
     async ({ page }) => {
-      // ABIERTO, hallazgo (inspector 18/10/2026). Desde 776a332a una respuesta EXACTA se corrige con
+      // REPARADO (18/10/2026): el motivo escribe la desviación con `textoDesviacion` del corrector
+      // compartido, que añade decimales si los pedidos la redondean a 0; la familia de la política
+      // de redondeo la mide tests/corrector-aula-motor.spec.ts. Desde 776a332a una respuesta EXACTA se corrige con
       // tolerancia 0, así que una desviación menor que media centésima ya suspende —bien—, pero el
       // motivo formatea la diferencia con dos decimales como máximo (`numero(diferencia)` de
       // casos.ts) y la redondea a 0. Caso 9 (a_c = 2²·2 = 8): «8,004» → «No es correcto. Te has
@@ -2333,14 +2336,19 @@ test.describe('Inspector 18/10/2026 — re-inspección tras la política de redo
       await irACaso(page, 9);
       const texto = await responder(page, '8,004');
       expect(texto).toContain('No es correcto'); // 8 es exacto: suspender es lo correcto
-      expect(texto, 'la desviación es 0,004, no 0').not.toMatch(/desviado 0 de/);
+      expect(texto, 'la desviación es 0,004, no 0').toContain('Te has desviado 0,004 de la respuesta');
+      // La práctica de 4,8 N (semilla 1800000000211), con «4,803»
+      await page.clock.setFixedTime(new Date(1800000000211));
+      await page.getByRole('button', { name: /Practicar/ }).click();
+      expect(await responder(page, '4,803')).toContain('Te has desviado 0,003 de la respuesta');
     },
   );
 
-  test.fail(
-    'ABIERTO (contenido, medio) — la lavadora no puede atribuir a la aceleración centrípeta que el agua salga hacia fuera',
+  test(
+    'REPARADO 3370 (contenido, medio) — la lavadora no puede atribuir a la aceleración centrípeta que el agua salga hacia fuera',
     async ({ page }) => {
-      // ABIERTO, hallazgo (inspector 18/10/2026). La tarjeta «Lavadora en centrifugado» de la guía
+      // REPARADO (18/10/2026): la tarjeta dice que la pared empuja la ropa hacia el centro y que el
+      // agua, sin ese empuje en los orificios, sigue por la tangente. La tarjeta «Lavadora en centrifugado» de la guía
       // dice «La aceleración centrípeta lanza el agua fuera de la ropa hacia los orificios del
       // tambor». a_c apunta al CENTRO —es lo que dibuja el propio canvas y lo que dice la FAQ de la
       // página—: el tambor empuja la ropa hacia dentro, y el agua sale por los orificios porque allí
@@ -2351,6 +2359,9 @@ test.describe('Inspector 18/10/2026 — re-inspección tras la política de redo
       await expect(tarjeta).toBeVisible();
       const texto = ((await tarjeta.textContent()) ?? '').replace(/\s+/g, ' ');
       expect(texto).not.toMatch(/aceleración centrípeta lanza el agua/i);
+      expect(texto).not.toMatch(/centr[ií]fug[ao] (lanza|empuja|expulsa)/i);
+      expect(texto).toContain('hacia el centro');
+      expect(texto).toContain('por la tangente');
     },
   );
 });

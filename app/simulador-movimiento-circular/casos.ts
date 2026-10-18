@@ -28,7 +28,7 @@
  * `resolverCaso` lo rechaza con un error legible en lugar de imprimir «∞» como resultado.
  */
 
-import { corregirNumero, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── La física, compartida con la vista ─────────────────────────── */
 
@@ -282,7 +282,7 @@ export function comprobarRespuesta(usuario: number, exacto: number, decimales = 
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, 2, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

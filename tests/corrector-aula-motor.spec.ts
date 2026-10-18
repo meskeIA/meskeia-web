@@ -37,6 +37,7 @@ import {
   dentroDeTolerancia,
   exigeRedondeo,
   fueraDeDominio,
+  textoDesviacion,
   toleranciaDeRedondeo,
   toleranciaRelativa,
   type Magnitud,
@@ -54,6 +55,14 @@ import * as genetica from '../app/simulador-genetica/casos';
 import * as bohr from '../app/simulador-modelo-bohr/casos';
 import * as periodica from '../app/tabla-periodica/casos';
 import * as estequiometria from '../app/simulador-estequiometria/casos';
+import * as circular from '../app/simulador-movimiento-circular/casos';
+import * as plano from '../app/simulador-plano-inclinado/casos';
+import * as pascal from '../app/simulador-principio-pascal/casos';
+import * as resorte from '../app/simulador-mas-resorte/casos';
+import * as lentes from '../app/simulador-lentes-opticas/casos';
+import * as flotabilidad from '../app/simulador-flotabilidad/casos';
+import * as condensadores from '../app/simulador-condensadores/casos';
+import * as circuitos from '../app/simulador-circuitos-electricos/casos';
 
 const CUADRANTE: Magnitud = { entero: true, minimo: 1, maximo: 4, que: 'el número de cuadrante' };
 
@@ -114,7 +123,69 @@ test.describe('el motor', () => {
     expect(nada.estado).toBe('no-numerico');
     expect(Number.isNaN(nada.diferencia)).toBe(true);
   });
+
+  test('3369 — la desviación que se enseña al suspender no se redondea a 0', () => {
+    const conComa = (n: number, d: number) => n.toLocaleString('es-ES', { maximumFractionDigits: d });
+    // 8,004 − 8 = 0,004 (más el ulp): con dos decimales es «0»; hacen falta tres
+    expect(textoDesviacion(8.004 - 8, 2, conComa)).toBe('0,004');
+    expect(textoDesviacion(0.00004, 4, conComa)).toBe('0,00004');
+    // Lo que ya se leía bien no cambia: 88,43 y 4 siguen con los decimales pedidos
+    expect(textoDesviacion(90 - 1.5707963, 2, conComa)).toBe('88,43');
+    expect(textoDesviacion(4, 2, conComa)).toBe('4');
+    expect(textoDesviacion(0, 2, conComa)).toBe('0');
+  });
 });
+
+/* ──────── Familia de la política de redondeo: ninguna dice «Te has desviado 0» (3369) ──────── */
+
+/**
+ * Las apps que corrigen con `toleranciaDeRedondeo` dan tolerancia 0 a una respuesta exacta, así que
+ * suspenden a cualquier distancia. Se responde cada caso fijo y 40 prácticas a 0,00004 de la
+ * respuesta (cuatro decimales por debajo de lo que pide la que más pide, lentes): en los exactos
+ * suspende, y la cifra del motivo tiene que ser distinta de 0. Antes de 3369 decía «0» en todas.
+ * Fuera, simulador-efecto-fotoelectrico: también usa esa política, pero ninguno de sus casos ni de
+ * sus prácticas es exacto (h y e no dan cifras redondas), así que su tolerancia nunca es 0 y lo que
+ * suspende se desvía al menos media centésima (medido el 18/10/2026 con esta misma sonda).
+ */
+interface Respuesta {
+  correcto: boolean;
+  motivo: string;
+}
+const DESVIO = 0.00004;
+type Probar = () => Respuesta[];
+const conCasos = <C, E>(casos: readonly C[], generar: (s: number) => E, deCaso: (c: C) => Respuesta, deEjercicio: (e: E) => Respuesta): Respuesta[] => [
+  ...casos.map(deCaso),
+  ...SEMILLAS.map((s) => deEjercicio(generar(s))),
+];
+const FAMILIA_REDONDEO: Record<string, Probar> = {
+  'simulador-movimiento-circular': () =>
+    conCasos(circular.CASOS, circular.generarEjercicioAleatorio, (c) => circular.comprobarRespuesta(c.exacto + DESVIO, c.exacto, c.decimales), (e) => circular.comprobarRespuesta(e.exacto + DESVIO, e.exacto)),
+  'simulador-genetica': () =>
+    conCasos(genetica.CASOS, genetica.generarEjercicioAleatorio, (c) => genetica.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos.busca.magnitud), (e) => genetica.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos.busca.magnitud)),
+  'simulador-plano-inclinado': () =>
+    conCasos(plano.CASOS, plano.generarEjercicioAleatorio, (c) => plano.comprobarRespuesta(c.respuesta + DESVIO, c.datos), (e) => plano.comprobarRespuesta(e.respuesta + DESVIO, e.datos)),
+  'simulador-lentes-opticas': () =>
+    conCasos(lentes.CASOS, lentes.generarEjercicioAleatorio, (c) => lentes.comprobarRespuesta(c.respuesta + DESVIO, c.datos), (e) => lentes.comprobarRespuesta(e.respuesta + DESVIO, e.datos)),
+  'simulador-principio-pascal': () =>
+    conCasos(pascal.CASOS, pascal.generarEjercicioAleatorio, (c) => pascal.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => pascal.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
+  'simulador-mas-resorte': () =>
+    conCasos(resorte.CASOS, resorte.generarEjercicioAleatorio, (c) => resorte.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => resorte.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
+  'simulador-flotabilidad': () =>
+    conCasos(flotabilidad.CASOS, flotabilidad.generarEjercicioAleatorio, (c) => flotabilidad.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => flotabilidad.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
+  'simulador-condensadores': () =>
+    conCasos(condensadores.CASOS, condensadores.generarEjercicioAleatorio, (c) => condensadores.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => condensadores.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
+  'simulador-circuitos-electricos': () =>
+    conCasos(circuitos.CASOS, circuitos.generarEjercicioAleatorio, (c) => circuitos.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => circuitos.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
+};
+
+for (const [slug, probar] of Object.entries(FAMILIA_REDONDEO)) {
+  test(`${slug}: al suspender por una desviación diminuta, la cifra del motivo no es 0 (3369)`, () => {
+    const conDesvio = probar().filter((r) => !r.correcto && /desviado/.test(r.motivo));
+    expect(conDesvio.length, 'ningún caso exacto suspendió: la sonda no ha probado nada').toBeGreaterThan(0);
+    const enCero = conDesvio.map((r) => r.motivo).filter((m) => /desviado [−-]?0 de/.test(m));
+    expect(enCero).toEqual([]);
+  });
+}
 
 /* ───────────────────── Las apps con magnitud que cambia de un caso a otro ───────────────────── */
 
