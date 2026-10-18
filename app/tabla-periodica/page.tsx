@@ -75,8 +75,10 @@ export default function TablaPerodicaPage() {
     return elementos.filter(el => {
       if (filtroFamilia !== 'todos' && el.familia !== filtroFamilia) return false;
       if (filtroEstado !== 'todos' && el.estado !== filtroEstado) return false;
-      if (busqueda) {
-        const query = normalizaTexto(busqueda);
+      // Sin los espacios de los extremos (hallazgo 3373): el teclado del móvil añade uno al
+      // aceptar una sugerencia, y «hierro » dejaba la tabla en «Mostrando 0 de 118».
+      const query = normalizaTexto(busqueda.trim());
+      if (query) {
         return (
           normalizaTexto(el.nombre).includes(query) ||
           (el.otrosNombres ?? []).some((n) => normalizaTexto(n).includes(query)) ||
