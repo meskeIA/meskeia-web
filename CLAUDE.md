@@ -539,8 +539,9 @@ color literal un token que `globals.css` define distinto en cada tema (`--text-m
 `--bg-card`…) sin redeclararlo en la variante oscura de ese mismo selector, también en un
 `:root` de módulo. Saca la lista de tokens de globals y se planta si no la encuentra.
 **Al drenar un token en un tema, medir el otro.**
-**Sin pasivo** · Fuera, a propósito: `--primary`, `--secondary` y los semánticos (campaña aparte)
-· Escape: `oscuro-ok: <razón>`, razón obligatoria.
+**Sin pasivo** · Fuera, a propósito: `--primary` y `--secondary`; los semánticos (`--danger`,
+`--error`, `--success`, `--warning`) solo rompen si pintan texto por debajo de 4,5:1 en oscuro
+(C0226) · Escape: `oscuro-ok: <razón>`, razón obligatoria.
 ⚠️ Exige que la variante EXISTA, no que cumpla: eso lo miden `tests/contraste-text-muted-*.spec.ts`,
 porque un valor se decide midiendo contra el fondo REAL.
 > Salió del drenaje del claro del 22/09/2026 (`dd66add0`): en 4 módulos el oscuro cayó a

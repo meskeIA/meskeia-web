@@ -54,6 +54,7 @@ const GLOBALS = fs.readFileSync(path.join(RAIZ, 'app', 'globals.css'), 'utf8');
 const deGit = (rev, ruta) => execFileSync('git', ['show', `${rev}:${ruta}`], { cwd: RAIZ, encoding: 'utf8' });
 const ZSCORE = 'app/calculadora-z-score-altman/CalculadoraZScoreAltman.module.css';
 const CANAL = 'app/selector-canal-venta/SelectorCanalVenta.module.css';
+const SUCESIONES = 'app/estimador-impuesto-sucesiones/EstimadorSucesiones.module.css';
 
 const modulo = (css) => ({ 'app/prueba/Prueba.module.css': css });
 
@@ -108,6 +109,38 @@ const CASOS = [
     ficheros: modulo('.container { --text-muted: var(--text-secondary); }\n'),
   },
   { n: 16, nombre: 'SE PLANTA · ningún .module.css que leer', debeFallar: true, ficheros: {} },
+
+  // ── Los semánticos que pintan texto (C0226, 18/10/2026) ──
+  {
+    n: 17, nombre: 'CASO DE ORIGEN C0226 · sucesiones antes de d96e492c: --danger #C0392B como texto en oscuro', debeFallar: true,
+    debeDecir: /C0226/, ficheros: { [SUCESIONES]: deGit('d96e492c^', SUCESIONES) },
+  },
+  { n: 18, nombre: 'CASO DE ORIGEN C0226 REPARADO · sucesiones en d96e492c', debeFallar: false, ficheros: { [SUCESIONES]: deGit('d96e492c', SUCESIONES) } },
+  {
+    n: 19, nombre: 'semántico sin variante oscura usado SOLO como borde: no hay texto, no hay defecto', debeFallar: false,
+    ficheros: modulo('.container { --danger: #EF4444; }\n.aviso { border-left: 4px solid var(--danger); color: var(--text-primary); }\n'),
+  },
+  {
+    n: 20, nombre: 'semántico como texto cuyo valor claro YA cumple en oscuro (#F59E0B, ≥ 5,2:1)', debeFallar: false,
+    ficheros: modulo('.container { --warning: #F59E0B; }\n.aviso { color: var(--warning); }\n'),
+  },
+  {
+    n: 21, nombre: 'semántico como texto desde un style={{ color }} del TSX de la app', debeFallar: true, debeDecir: /C0226/,
+    ficheros: {
+      ...modulo('.container { --danger: #EF4444; }\n'),
+      'app/prueba/page.tsx': "export const A = () => <span style={{ color: 'var(--danger)' }}>x</span>;\n",
+    },
+  },
+  {
+    n: 22, nombre: 'el mismo con su variante oscura en [data-theme=dark] .container', debeFallar: false,
+    ficheros: {
+      ...modulo(".container { --danger: #EF4444; }\n[data-theme='dark'] .container { --danger: #FCA5A5; }\n.error { color: var(--danger); }\n"),
+    },
+  },
+  {
+    n: 23, nombre: 'semántico como texto con oscuro-ok y razón escrita', debeFallar: false,
+    ficheros: modulo('.container {\n  /* oscuro-ok: la app fuerza tema claro en su lienzo de impresión */\n  --danger: #EF4444;\n}\n.error { color: var(--danger); }\n'),
+  },
 ];
 
 let fallos = 0;
@@ -128,7 +161,8 @@ for (const c of CASOS) {
       fallo = true;
       salida = `${e.stdout ?? ''}${e.stderr ?? ''}`;
     }
-    const bien = fallo === c.debeFallar;
+    // Que falle no basta si puede fallar por OTRA regla: el caso dice por cuál debe hacerlo
+    const bien = fallo === c.debeFallar && (!c.debeDecir || c.debeDecir.test(salida));
     if (!bien) fallos++;
     console.log(`${bien ? '✅' : '❌'} ${String(c.n).padStart(2)}. ${c.nombre} — ${c.debeFallar ? 'debe FALLAR' : 'debe CALLAR'}, ${fallo ? 'falla' : 'calla'}`);
     if (!bien || process.env.VER) console.log(salida.split('\n').map((l) => `      ${l}`).join('\n'));

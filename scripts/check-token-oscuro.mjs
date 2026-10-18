@@ -50,12 +50,13 @@
  *
  * QUÉ NO MIRA, Y POR QUÉ
  * ──────────────────────
- *   · `--primary`, `--secondary`, `--success`, `--warning`, `--error`. También cambian de
- *     tema en globals, pero el 23/09/2026 había 472 módulos que redeclaran la marca en su
- *     `.container` sin variante oscura, y 24-113 los semánticos: son colores de identidad y
- *     de estado, no de texto ni de superficie, y cambiarlos altera el aspecto de 472 apps.
- *     Campaña aparte, como los 2.042 botones de `check:contraste-cabeceras`. Si se drena,
- *     se saca de `FUERA` y el candado pasa a exigirlo.
+ *   · `--primary`, `--secondary`, `--success`, `--warning`, `--error` en la regla GENERAL.
+ *     También cambian de tema en globals, pero el 23/09/2026 había 472 módulos que redeclaran
+ *     la marca en su `.container` sin variante oscura, y 24-113 los semánticos. La marca se
+ *     resolvió por otra vía (C0070, 18/10/2026: el texto y los botones usan ya `-texto` y
+ *     `-boton`, que no se redeclaran). Los semánticos tienen desde el 18/10/2026 su regla
+ *     PROPIA, más abajo (C0226): rompe solo si el token pinta texto por debajo de 4,5:1 en
+ *     oscuro, porque como borde o fondo no hay defecto y exigirlo ahí serían 149 de pasivo.
  *   · Si el valor oscuro que se declara CUMPLE contraste: eso lo miden los specs
  *     `tests/contraste-text-muted-*.spec.ts`. Este candado solo exige que exista. Un valor se
  *     decide midiendo contra el fondo REAL donde se usa: el #757575 de agosto se eligió contra
@@ -81,6 +82,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { semanticosSinOscuro } from './contraste-semanticos/censo.mjs';
+import { TEXTO_OSCURO } from './contraste-semanticos/reparar.mjs';
 
 const RAIZ_DEFECTO = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const iRaiz = process.argv.indexOf('--raiz');
@@ -261,6 +264,50 @@ if (hojas === 0) {
   process.exit(1);
 }
 
+// ─── Los semánticos que pintan TEXTO (cabo C0226) ─────────────────────────────
+/**
+ * `--danger`, `--error`, `--success` y `--warning` siguen en `FUERA` para la regla general: 149
+ * de sus declaraciones sin variante oscura solo hacen de borde o de fondo, y ahí no hay defecto.
+ * Lo que sí lo es —y esto lo exige sin pasivo desde el 18/10/2026— es el token declarado con un
+ * literal, sin variante oscura en el mismo selector, que la hoja (o un `style={{ color }}` de su
+ * app) usa como COLOR DE TEXTO y cuyo valor claro baja de 4,5:1 sobre algún fondo oscuro del
+ * sitio (#1A1A1A, #2A2A2A, #2D2D2D, #383838). `--danger` ni siquiera existe en globals: por eso
+ * no lo veía la lista de tokens temáticos. El criterio es el del censo de la campaña
+ * (`scripts/contraste-semanticos/censo.mjs`), importado y no copiado.
+ *
+ * Salió del hallazgo 2488 (estimador-impuesto-sucesiones, d96e492c, 30/09/2026): el título «Qué
+ * no incluye esta estimación» en el #C0392B del claro, 2,84:1 sobre #3D1A18 en oscuro. La
+ * campaña lo encontró en 85 declaraciones de 65 módulos.
+ */
+let semanticosVistos = 0;
+const tsxDeApp = new Map();
+for (const ruta of ARBOLES.flatMap((a) => recorrer(path.join(RAIZ, a), '.module.css'))) {
+  const rel = path.relative(RAIZ, ruta).replace(/\\/g, '/');
+  const dirApp = rel.startsWith('app/') && rel.split('/').length > 2 ? path.join(RAIZ, ...rel.split('/').slice(0, 2)) : path.dirname(ruta);
+  if (!tsxDeApp.has(dirApp)) tsxDeApp.set(dirApp, recorrer(dirApp, '.tsx').map((f) => fs.readFileSync(f, 'utf8')).join('\n'));
+  const txt = fs.readFileSync(ruta, 'utf8');
+  const lineas = txt.split('\n');
+  for (const c of semanticosSinOscuro(txt, tsxDeApp.get(dirApp))) {
+    semanticosVistos++;
+    if (!c.texto || c.peor >= 4.5) continue;
+    const esc = escapeEn(lineas, c.linea);
+    if (esc === 'firmado') {
+      exentas.push(`${rel}:${c.linea}`);
+      continue;
+    }
+    const porQue = esc === 'sin razón'
+      ? ' — lleva `oscuro-ok:` SIN razón escrita, y una excepción sin motivo no se puede revisar'
+      : '';
+    const ratio = c.peor.toFixed(2).replace('.', ',');
+    errores.push(
+      `${rel}:${c.linea} — \`${c.base} { ${c.token}: ${c.valor} }\` pinta TEXTO y no tiene variante oscura: ` +
+      `en oscuro sirve el valor del claro, ${ratio}:1 sobre los fondos oscuros del sitio (C0226). ` +
+      `Añade \`${c.token}: ${TEXTO_OSCURO[c.token]}\` a \`[data-theme='dark'] ${c.base}\`, el valor medido de la campaña ` +
+      `(\`node scripts/contraste-semanticos/reparar.mjs\` lo hace).${porQue}`,
+    );
+  }
+}
+
 // ─── Resultado ─────────────────────────────────────────────────────────────────
 if (errores.length) {
   const muestra = VERBOSO ? errores : errores.slice(0, 12);
@@ -274,4 +321,5 @@ if (errores.length) {
 console.log('✅ Token sin variante oscura: correcto');
 console.log(`   · ${hojas} hojas .module.css de app/ y components/, sin pasivo`);
 console.log(`   · ${declaraciones} declaraciones con color literal de ${tokens.size} tokens que cambian de tema, todas con su variante oscura`);
+console.log(`   · ${semanticosVistos} semánticos sin variante oscura, ninguno pintando texto por debajo de 4,5:1 en oscuro (C0226)`);
 if (exentas.length) console.log(`   · ${exentas.length} exenta(s) con \`oscuro-ok\`: ${exentas.slice(0, 5).join(', ')}`);
