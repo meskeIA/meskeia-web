@@ -2001,7 +2001,7 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
  *   (0,5; 0,5), |E| = 107,13 N/C con Eₓ = 13,65: cambia de valor y de dirección. Es cierto (lo fija el
  *   test de 3345, en verde).
  *
- * HALLAZGOS de esta pasada (ABIERTOS a 18/10/2026: sus tests van con test.fail()):
+ * HALLAZGOS de esta pasada (REPARADOS el 18/10/2026 por /reparar: 3371 y 3372):
  *   18/10-A medio · operativa     · con el dedo, la ✕ del modo «Eliminar» no retira la carga: el
  *       touchstart no pasivo de 62f6e198 hace preventDefault también sobre [data-tipo="remove"], y eso
  *       suprime el click sintético del que cuelga handleEliminar (llegan pointerdown y pointerup, no
@@ -2122,14 +2122,14 @@ test.describe('Inspector 18/10/2026 — cuadrupolo, extremos de los controles, c
     await expect(cargas(page)).toHaveCount(1);
   });
 
-  // HALLAZGO 18/10-B (bajo, accesibilidad) · ABIERTO (18/10/2026) · cabo C0070.
+  // HALLAZGO 18/10-B (bajo, accesibilidad) · REPARADO (18/10/2026, hallazgo 3372) · cabo C0070:
+  // las cifras van en --primary-texto y los fondos de marca con texto blanco en --primary-boton.
   // 76dbda4e llevó a #93c5fd las cifras de acento del panel en tema OSCURO (C0112). En el CLARO, el
   // que se carga por defecto, siguen en var(--primary) #2E86AB sobre el degradado #eff6ff → #f0fdf4:
   // 3,77:1 con #eff6ff y 3,92:1 con #f0fdf4, con 16 px en negrita (texto normal: exige 4,5:1). Son
   // |E|, V y |F|, las tres cifras destacadas. --primary-texto (#26718F) da 5,02:1 y 5,22:1.
   // Caso: tema claro, dipolo de arranque → esperado ≥ 4,5:1 · obtenido 3,77:1.
   test('HALLAZGO 18/10-B · en tema claro las cifras destacadas del panel llegan a 4,5:1', async ({ page }) => {
-    test.fail(true, '18/10-B abierto: var(--primary) sobre el degradado claro, 3,77:1');
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
     const peor = await page.evaluate(() => {
       const lin = (c: number) => {
@@ -2269,7 +2269,8 @@ test.describe('Inspector 18/10/2026 — cuadrupolo, extremos de los controles, c
         );
       });
 
-      // HALLAZGO 18/10-A (medio, operativa) · ABIERTO (18/10/2026) · regresión de 62f6e198.
+      // HALLAZGO 18/10-A (medio, operativa) · REPARADO (18/10/2026, hallazgo 3371) · regresión de 62f6e198:
+      // el touchstart ya no cancela el gesto sobre [data-tipo="remove"].
       // Para que arrastrar no bajase la página, 62f6e198 añadió al <svg> un touchstart NO pasivo que
       // hace preventDefault si el dedo empieza en [data-tipo="carga"], [data-tipo="prueba"] o
       // [data-tipo="remove"]. La ✕ del modo «Eliminar» es el <g data-tipo="remove"> y retira la carga
@@ -2280,7 +2281,6 @@ test.describe('Inspector 18/10/2026 — cuadrupolo, extremos de los controles, c
       // Caso: 390 × 800 táctil, dipolo, modo «Eliminar», toque en el centro de la ✕ de la primera
       //       carga (elementFromPoint = .removeBtn) → esperado 1 carga · obtenido 2 (igual a 360).
       test(`HALLAZGO 18/10-A · ${ancho} · con el dedo, la ✕ del modo «Eliminar» retira su carga`, async ({ page }) => {
-        test.fail(true, '18/10-A abierto: el preventDefault del touchstart se come el click de la ✕');
         await page.getByRole('button', { name: 'Eliminar' }).click();
         await prepararLienzo(page);
         await expect(cargas(page)).toHaveCount(2);
