@@ -65,13 +65,13 @@
 }
 
 .tabBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 700;
 }
 
 .tabBtnActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -507,12 +507,12 @@
 }
 
 .cicloBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
 .cicloBtnActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 .cicloDescripcion {
@@ -724,7 +724,7 @@
   width: 2rem;
   height: 2rem;
   min-width: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   font-size: 0.9rem;

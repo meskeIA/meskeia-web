@@ -192,7 +192,7 @@
 
 .btnSiguiente,
 .btnResultado {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   flex: 1;
   max-width: 220px;
@@ -201,7 +201,7 @@
 
 .btnSiguiente:hover:not(:disabled),
 .btnResultado:hover:not(:disabled) {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   transform: translateY(-1px);
 }
 

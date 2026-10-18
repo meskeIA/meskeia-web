@@ -268,7 +268,7 @@
   justify-content: center;
   width: 22px;
   height: 22px;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #FFFFFF;
   border-radius: 50%;
   font-size: 0.72rem;
@@ -438,8 +438,8 @@
 }
 
 .trackBtnActive {
-  border-color: var(--primary, #2E86AB);
-  background: var(--primary, #2E86AB);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #FFFFFF;
 }
 
@@ -484,7 +484,7 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #FFFFFF;
   border-radius: 50%;
   font-size: 0.78rem;

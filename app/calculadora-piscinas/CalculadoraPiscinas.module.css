@@ -98,8 +98,8 @@
 }
 
 .shapeBtnActive {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -243,7 +243,7 @@
 .btnPrimary {
   width: 100%;
   padding: 0.9rem 1.5rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -485,7 +485,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 2rem;
   height: 2rem;

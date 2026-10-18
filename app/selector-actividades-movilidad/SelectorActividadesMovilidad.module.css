@@ -122,7 +122,7 @@
 
 .btn {
   padding: 0.85rem 2rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -224,8 +224,8 @@
 }
 .filtroBtn:hover { border-color: var(--primary); color: var(--primary); }
 .filtroActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 

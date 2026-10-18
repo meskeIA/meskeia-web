@@ -109,7 +109,7 @@
 
 .questionNumber {
   display: inline-block;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: 20px;
@@ -171,7 +171,7 @@
   display: block;
   width: 100%;
   padding: var(--spacing-lg) var(--spacing-xl);
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -291,7 +291,8 @@
 
 .barFillPvpc {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
+  /* La cifra va pegada al extremo derecho: con --accent ahí, el blanco daba ~2,2:1 (C0070) */
+  background: linear-gradient(90deg, var(--primary-boton), var(--hero-bg));
   border-radius: var(--radius);
   transition: width 0.6s ease;
   display: flex;
@@ -306,7 +307,8 @@
 
 .barFillLibre {
   height: 100%;
-  background: linear-gradient(90deg, var(--secondary), #6bc4a6);
+  /* Ídem con el teal claro #6bc4a6 (~2,1:1): 5,15:1 y 6,16:1 (C0070) */
+  background: linear-gradient(90deg, var(--secondary-boton), #2C6B68);
   border-radius: var(--radius);
   transition: width 0.6s ease;
   display: flex;

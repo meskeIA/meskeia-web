@@ -17,8 +17,8 @@
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -73,7 +73,7 @@
 /* Sección 2: Pasos efecto invernadero */
 .pasosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
 .pasoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; position: relative; }
-.pasoNumero { position: absolute; top: -10px; left: -10px; width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.pasoNumero { position: absolute; top: -10px; left: -10px; width: 28px; height: 28px; border-radius: 50%; background: var(--primary-boton); color: white; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
 .pasoIcono { font-size: 2rem; display: block; margin-bottom: var(--spacing-sm); }
 .pasoTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
 .pasoDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
@@ -107,7 +107,7 @@
 .cintaDesc { font-size: 0.88rem; color: var(--text-secondary); text-align: center; line-height: 1.5; margin-bottom: var(--spacing-lg); }
 .cintaDiagrama { display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; justify-content: center; }
 .cintaPaso { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; background: var(--hover); border-radius: var(--radius); padding: var(--spacing-sm) var(--spacing-md); min-width: 120px; max-width: 160px; text-align: center; }
-.cintaPasoNum { font-size: 0.72rem; font-weight: 800; color: white; background: var(--primary); width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.cintaPasoNum { font-size: 0.72rem; font-weight: 800; color: white; background: var(--primary-boton); width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .cintaPasoIcono { font-size: 1.3rem; }
 .cintaPasoTexto { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.3; }
 .cintaFlecha { font-size: 1.2rem; color: var(--primary); font-weight: 800; }

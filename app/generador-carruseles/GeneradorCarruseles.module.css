@@ -136,7 +136,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.8rem;
@@ -174,9 +174,9 @@
 }
 
 .slideActionBtn:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .slideActionBtn:disabled {
@@ -344,7 +344,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -420,9 +420,9 @@
 }
 
 .navBtn:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .navBtn:disabled {
@@ -819,7 +819,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   display: flex;
   align-items: center;

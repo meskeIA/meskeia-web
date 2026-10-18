@@ -70,14 +70,14 @@
 }
 
 .navBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
 .navBtnActivo:hover {
-  background: var(--secondary);
-  border-color: var(--secondary);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: white;
 }
 
@@ -149,7 +149,7 @@
   width: 1.6rem;
   height: 1.6rem;
   border-radius: 50%;
-  background: var(--fase-color, var(--primary));
+  background: var(--fase-color, var(--primary-boton));
   color: white;
   font-size: 0.75rem;
   font-weight: 700;
@@ -455,8 +455,8 @@
 }
 
 .tipoBtnActivo {
-  background: var(--tipo-color, var(--primary));
-  border-color: var(--tipo-color, var(--primary));
+  background: var(--tipo-color, var(--primary-boton));
+  border-color: var(--tipo-color, var(--primary-boton));
   color: white;
 }
 
@@ -945,7 +945,7 @@
   height: 2rem;
   min-width: 2rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.82rem;
   font-weight: 700;

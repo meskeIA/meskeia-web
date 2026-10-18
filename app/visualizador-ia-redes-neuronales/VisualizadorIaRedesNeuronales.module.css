@@ -70,9 +70,9 @@
 }
 
 .navBtnActivo {
-  background-color: var(--primary);
+  background-color: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* ─── Main ─── */
@@ -498,7 +498,7 @@
 
 .btnSimular {
   flex: 1;
-  background-color: var(--primary);
+  background-color: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 8px;
@@ -982,7 +982,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-size: 0.8rem;
   font-weight: 700;

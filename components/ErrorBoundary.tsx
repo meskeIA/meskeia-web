@@ -65,7 +65,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             onClick={() => window.location.reload()}
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: 'var(--primary, #2E86AB)',
+              backgroundColor: 'var(--primary-boton)',
               color: 'white',
               border: 'none',
               borderRadius: '8px',

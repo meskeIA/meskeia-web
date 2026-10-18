@@ -116,8 +116,8 @@
 }
 
 .filtroActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -132,8 +132,8 @@
 }
 
 [data-theme='dark'] .filtroActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -746,7 +746,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   display: flex;
   align-items: center;
@@ -774,7 +774,7 @@
 }
 
 [data-theme='dark'] .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .stepContent strong {

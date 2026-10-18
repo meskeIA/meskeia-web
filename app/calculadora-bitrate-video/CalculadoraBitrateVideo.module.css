@@ -126,8 +126,8 @@
 }
 
 .resBtnActive {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -171,8 +171,8 @@
 }
 
 .fpsBtnActive {
-  border-color: var(--secondary);
-  background: var(--secondary);
+  border-color: var(--secondary-boton);
+  background: var(--secondary-boton);
   color: white;
 }
 
@@ -435,7 +435,7 @@
   height: 32px;
   min-width: 32px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 700;
   font-size: 0.9rem;

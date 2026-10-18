@@ -150,8 +150,8 @@
 }
 
 .filterChipActive {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -306,7 +306,7 @@
 .appCardCta {
   align-self: flex-start;
   padding: 0.6rem 1.25rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white !important;
   text-decoration: none;
   border-radius: 8px;

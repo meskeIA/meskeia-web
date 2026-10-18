@@ -101,9 +101,9 @@
 
 .tabActivo {
   padding: 0.55rem 1.1rem;
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-boton);
   border-radius: 8px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.9rem;
   font-weight: 600;
@@ -250,7 +250,7 @@
 
 .btnPrimario {
   padding: 0.55rem 1.2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 8px;
@@ -287,7 +287,7 @@
 }
 
 .btnSecundario:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -435,9 +435,9 @@
 
 .subtabActivo {
   padding: 0.45rem 1rem;
-  border: 2px solid var(--secondary);
+  border: 2px solid var(--secondary-boton);
   border-radius: 8px;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   font-size: 0.88rem;
   font-weight: 600;
@@ -615,7 +615,7 @@
 
 .stepGuide { display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0; }
 .step { display: flex; gap: 1rem; align-items: flex-start; }
-.stepNumber { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.stepNumber { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%); color: white; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
 .stepContent { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color, #e5e7eb); border-radius: 10px; padding: 1rem; }
 .stepContent h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin: 0 0 0.4rem; }
 .stepContent p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }

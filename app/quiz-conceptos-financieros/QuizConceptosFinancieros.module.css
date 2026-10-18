@@ -35,7 +35,7 @@
 .explicacionCard strong { display: block; margin-bottom: 0.25rem; color: var(--text-primary); }
 .explicacionCard p { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; margin: 0; }
 
-.btn { display: block; width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: var(--spacing-lg); transition: opacity 0.2s; }
+.btn { display: block; width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: var(--spacing-lg); transition: opacity 0.2s; }
 .btn:hover { opacity: 0.9; }
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 

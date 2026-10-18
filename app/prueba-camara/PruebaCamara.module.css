@@ -191,7 +191,7 @@
 
 .badge {
   padding: 2px 8px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -223,7 +223,7 @@
 }
 
 .btnPrimary {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -243,7 +243,7 @@
 }
 
 .btnAccent {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
 }
 
@@ -261,9 +261,9 @@
 
 .btnIcon:hover,
 .btnIcon.active {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Settings Panel */
@@ -352,7 +352,7 @@
   font-size: 0.85rem;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -751,7 +751,7 @@
   justify-content: center;
   min-width: 2rem;
   height: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-weight: 700;

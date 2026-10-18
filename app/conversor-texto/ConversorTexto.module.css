@@ -130,7 +130,7 @@
 }
 
 .btnAccion:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -281,7 +281,7 @@
 }
 
 .convencionBadge {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   font-family: 'Courier New', monospace;
   font-size: 0.8rem;

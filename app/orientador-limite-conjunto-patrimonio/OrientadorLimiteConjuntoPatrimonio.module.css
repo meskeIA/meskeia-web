@@ -191,7 +191,7 @@
 }
 
 .toggleBtn.toggleActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   box-shadow: 0 2px 4px rgba(46, 134, 171, 0.25);
 }
@@ -204,7 +204,7 @@
   font-weight: 700;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -585,7 +585,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

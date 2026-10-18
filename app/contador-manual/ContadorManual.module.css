@@ -54,8 +54,8 @@
 }
 
 .configBtn.activo {
-  background: #2E86AB;
-  border-color: #2E86AB;
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -232,7 +232,7 @@
   height: 140px;
   border: none;
   border-radius: 50%;
-  background: var(--contador-color, #2E86AB);
+  background: var(--contador-color, var(--primary-boton));
   color: white;
   cursor: pointer;
   transition: all 0.15s;
@@ -369,7 +369,7 @@
 
 /* Dark mode */
 [data-theme='dark'] .configBtn.activo {
-  background: #2E86AB;
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .valorDisplay {
@@ -556,7 +556,7 @@
   width: 2rem;
   height: 2rem;
   min-width: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

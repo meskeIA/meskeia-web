@@ -327,7 +327,7 @@
 
 .controlBtn {
   padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -378,7 +378,7 @@
 /* Calc button (Generar cueva) */
 .calcBtn {
   padding: var(--spacing-md) var(--spacing-lg);
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -655,7 +655,7 @@
   width: 2.5rem;
   height: 2.5rem;
   min-width: 2.5rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -687,7 +687,7 @@
 }
 
 [data-theme='dark'] .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 /* Tips */

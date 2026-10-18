@@ -82,8 +82,8 @@
 }
 
 .toggleTabActive {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -183,8 +183,8 @@
 }
 
 .compBtnActive {
-  background: var(--secondary);
-  border-color: var(--secondary);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: white;
 }
 

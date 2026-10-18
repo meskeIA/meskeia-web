@@ -225,7 +225,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -422,8 +422,8 @@
 }
 
 .btnCalib:hover:not(:disabled) {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -833,7 +833,7 @@
   justify-content: center;
   min-width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-weight: 700;
   font-size: 0.95rem;
@@ -1249,7 +1249,7 @@
 
 .btnImprimir {
   border: none;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -1264,7 +1264,7 @@
 }
 
 .btnCsv:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 

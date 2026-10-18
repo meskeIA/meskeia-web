@@ -91,7 +91,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.8rem;
   font-weight: 700;
@@ -668,7 +668,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.85rem;
   font-weight: 700;

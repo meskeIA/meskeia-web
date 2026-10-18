@@ -456,7 +456,7 @@
 }
 
 .btnSecondary:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   transform: translateY(-2px);
   box-shadow: var(--shadow-medium);
 }
@@ -875,7 +875,7 @@
 }
 
 .stepNumber {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   font-weight: 700;
   font-size: 1rem;

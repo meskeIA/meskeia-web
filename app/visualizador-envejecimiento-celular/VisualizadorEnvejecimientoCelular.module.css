@@ -73,8 +73,8 @@
 }
 
 .navBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -85,8 +85,8 @@
 }
 
 [data-theme='dark'] .navBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -384,7 +384,7 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: white;
-  background: var(--primary);
+  background: var(--primary-boton);
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -406,7 +406,7 @@
 }
 
 .badgeNuevo {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   font-size: 0.7rem;
   font-weight: 700;
@@ -663,7 +663,7 @@
 
 .evidenciaTag {
   display: inline-block;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   font-size: 0.72rem;
   font-weight: 600;
@@ -1006,7 +1006,7 @@
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

@@ -124,8 +124,8 @@
 }
 
 .navBtnActivo {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #fff;
   box-shadow: 0 4px 16px rgba(46, 134, 171, 0.3);
 }
@@ -207,7 +207,7 @@
    Botones
 ───────────────────────────────────────────── */
 .btnPrimario {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -241,7 +241,7 @@
 }
 
 .btnSecundario:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -251,7 +251,7 @@
 }
 
 .btnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -297,7 +297,7 @@
 }
 
 .toggleBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -491,7 +491,7 @@
 
 .tiempoTag {
   display: inline-block;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 20px;
   padding: 0.25rem 0.85rem;
@@ -800,7 +800,7 @@
 }
 
 .eutrofPasoNum {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   width: 22px;
@@ -1031,7 +1031,7 @@
 }
 
 .stepNumber {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: #fff;
   border-radius: 50%;
   width: 24px;
@@ -1204,7 +1204,7 @@
 }
 
 [data-theme='dark'] .stepNumber {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 [data-theme='dark'] .slider {

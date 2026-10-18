@@ -98,8 +98,8 @@
 }
 
 .tipoBtn.active {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -516,7 +516,7 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 700;
   font-size: 1rem;

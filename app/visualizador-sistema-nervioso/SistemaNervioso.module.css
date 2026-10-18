@@ -18,8 +18,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -104,7 +104,7 @@
 .sinapsisExplicacion { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
 .sinapsisPasos { display: flex; flex-direction: column; gap: var(--spacing-sm); }
 .sinapsisPaso { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: 8px; }
-.sinapsisPasoNum { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; flex-shrink: 0; }
+.sinapsisPasoNum { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-boton); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700; flex-shrink: 0; }
 .sinapsisPasoIcono { font-size: 1.2rem; flex-shrink: 0; }
 .sinapsisPasoTexto { font-size: 0.88rem; color: var(--text-primary); }
 

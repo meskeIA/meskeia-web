@@ -69,8 +69,8 @@
 }
 
 .modoBtn.active {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -224,7 +224,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -270,7 +270,7 @@
 }
 
 .btnCopy:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -614,7 +614,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.95rem;
   font-weight: 700;

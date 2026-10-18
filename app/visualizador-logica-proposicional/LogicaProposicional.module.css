@@ -428,7 +428,7 @@
 }
 
 .ejemploBtn:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -697,7 +697,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 700;
   font-size: 0.9rem;
@@ -923,9 +923,10 @@
   color: var(--accent);
 }
 
+/* Blanco sobre --accent (#7FB3D3) daba ~2,2:1; el acento es claro en todas las marcas y temas: texto oscuro (C0070) */
 [data-theme='dark'] .ejemploBtn:hover {
   background: var(--accent);
-  color: #fff;
+  color: #1A1A1A;
 }
 
 [data-theme='dark'] .salidaBtnV {
@@ -1032,8 +1033,10 @@
   border-color: #3a3a3a;
 }
 
+/* Blanco sobre --accent (#7FB3D3) daba ~2,2:1; el acento es claro en todas las marcas y temas: texto oscuro (C0070) */
 [data-theme='dark'] .stepNumber {
   background: var(--accent);
+  color: #1A1A1A;
 }
 
 [data-theme='dark'] .stepContent strong {

@@ -319,8 +319,8 @@
 }
 
 .cargaBtnActiva {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -331,8 +331,8 @@
 }
 
 [data-theme='dark'] .cargaBtnActiva {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
 }
 
 /* ── Resultado ────────────────────────────────────────── */
@@ -881,7 +881,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   display: flex;
   align-items: center;

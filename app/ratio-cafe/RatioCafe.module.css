@@ -17,7 +17,7 @@
 .modoTabs { display: flex; gap: 6px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: 12px; padding: 5px; margin-bottom: 16px; }
 .modoTab { flex: 1; padding: 10px 8px; border: none; border-radius: 9px; background: transparent; color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .modoTab:hover { color: var(--text-primary); }
-.modoTabActivo { background: var(--primary); color: white; }
+.modoTabActivo { background: var(--primary-boton); color: white; }
 .modoTab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .resultadoGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }

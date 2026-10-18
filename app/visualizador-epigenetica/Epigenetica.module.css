@@ -146,7 +146,7 @@
 }
 
 .toggleBtn:hover {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -156,7 +156,7 @@
 }
 
 .toggleBtnActive {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 

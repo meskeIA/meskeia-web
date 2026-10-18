@@ -169,8 +169,8 @@
 }
 
 .boolSelected {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -198,8 +198,8 @@
 }
 
 .numSelected {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -216,7 +216,7 @@
 
 .btnPrimary {
   padding: 0.75rem 2rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -254,7 +254,7 @@
 }
 
 .btnSecundario:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -521,7 +521,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   font-weight: 800;
   font-size: 0.95rem;

@@ -90,12 +90,12 @@
 }
 
 .navBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
 .navBtnActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -120,7 +120,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -911,8 +911,8 @@
 }
 
 .diaSemanaSeleccionado {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -1248,7 +1248,7 @@ details[open] .edu-faq-question::after {
 }
 
 .edu-step-number {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: #fff;
   font-weight: 700;
   font-size: 0.85rem;

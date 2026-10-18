@@ -64,7 +64,7 @@
 }
 
 .btnAno:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -74,7 +74,7 @@
 }
 
 .btnAnoActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -252,8 +252,15 @@
   border-color: var(--primary);
 }
 
+/* Misma especificidad que `.btnAno:hover` y va detrás: sin esto, en oscuro el hover pintaba el año
+   en --primary sobre fondo --primary (1:1, desaparecía) (C0070) */
+[data-theme='dark'] .btnAno:hover {
+  background: var(--primary-boton);
+  color: white;
+}
+
 [data-theme='dark'] .btnAnoActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 

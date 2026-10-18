@@ -169,9 +169,9 @@
 }
 
 .btnPausarAnim:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .btnPausarAnim:focus-visible {
@@ -360,9 +360,9 @@
 }
 
 .btnToggleActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .indicadoresColumnas {
@@ -615,7 +615,7 @@
   padding: 0.55rem 1.2rem;
   border: none;
   border-radius: var(--radius-sm);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.9rem;
   font-weight: 600;

@@ -65,7 +65,7 @@
 }
 
 .metodoBtn.active {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -115,8 +115,8 @@
 }
 
 .modoBtn.active {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -249,7 +249,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -295,7 +295,7 @@
 }
 
 .btnCopy:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -382,7 +382,7 @@
 }
 
 .railFilled {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -509,7 +509,7 @@
 }
 
 .htmlBadge {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-size: 0.7rem;
   padding: 2px 8px;
@@ -556,7 +556,7 @@
 }
 
 .btnCopyHtml:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -707,7 +707,7 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-weight: 700;
   display: flex;

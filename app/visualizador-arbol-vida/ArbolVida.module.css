@@ -18,8 +18,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -31,7 +31,7 @@
 /* Árbol filogenético */
 .arbolContainer { padding: var(--spacing-md); }
 .raiz { text-align: center; margin-bottom: var(--spacing-lg); }
-.raizLabel { display: inline-block; background: var(--primary); color: white; padding: 0.5rem 1.2rem; border-radius: 20px; font-weight: 700; font-size: 0.95rem; }
+.raizLabel { display: inline-block; background: var(--primary-boton); color: white; padding: 0.5rem 1.2rem; border-radius: 20px; font-weight: 700; font-size: 0.95rem; }
 .ramasPrincipales { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); position: relative; }
 .ramasPrincipales::before { content: ''; position: absolute; top: -16px; left: 50%; width: 2px; height: 16px; background: var(--primary); }
 .rama { position: relative; }

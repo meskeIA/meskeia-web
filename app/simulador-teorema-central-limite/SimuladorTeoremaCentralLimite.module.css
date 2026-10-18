@@ -179,9 +179,9 @@
 }
 
 .stepBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* ACTION BUTTONS */
@@ -196,7 +196,7 @@
   flex: 1;
   min-width: 200px;
   padding: var(--spacing-md) var(--spacing-lg);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -501,7 +501,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -714,8 +714,8 @@
 
 .casoBotonActivo,
 .casoBotonActivo:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -787,8 +787,8 @@
 
 .casoOpcionActiva,
 .casoOpcionActiva:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
   font-weight: 600;
 }
@@ -799,7 +799,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
-  background: var(--primary);
+  background: var(--primary-boton);
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
@@ -855,7 +855,7 @@
 }
 
 .casoAyudaBoton:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -913,8 +913,8 @@
 
 [data-theme='dark'] .casoBotonActivo,
 [data-theme='dark'] .casoBotonActivo:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -930,8 +930,8 @@
 
 [data-theme='dark'] .casoOpcionActiva,
 [data-theme='dark'] .casoOpcionActiva:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 

@@ -17,8 +17,8 @@
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -39,7 +39,7 @@
 @keyframes fadeInNum { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 
 .secuenciaBtns { display: flex; gap: var(--spacing-sm); justify-content: center; margin-bottom: var(--spacing-lg); }
-.btnPrimary { padding: 0.6rem 1.4rem; background: var(--primary); color: white; border: none; border-radius: var(--radius); cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; }
+.btnPrimary { padding: 0.6rem 1.4rem; background: var(--primary-boton); color: white; border: none; border-radius: var(--radius); cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; }
 .btnPrimary:hover { background: #256E8F; }
 .btnPrimary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnPrimary:disabled { opacity: 0.5; cursor: default; }
@@ -78,7 +78,7 @@
 .plantaInfo { flex: 1; }
 .plantaNombre { display: block; font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
 .plantaDetalle { display: block; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; }
-.plantaNum { display: inline-flex; align-items: center; justify-content: center; background: var(--primary); color: white; border-radius: 50%; width: 32px; height: 32px; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+.plantaNum { display: inline-flex; align-items: center; justify-content: center; background: var(--primary-boton); color: white; border-radius: 50%; width: 32px; height: 32px; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
 
 /* Ángulo dorado */
 .anguloCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; }
@@ -95,7 +95,7 @@
 .arteIcono { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
 .arteNombre { display: block; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
 .arteDetalle { display: block; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.4; }
-.arteCategoria { display: inline-block; font-size: 0.68rem; color: white; background: var(--secondary); padding: 0.15rem 0.5rem; border-radius: 20px; margin-bottom: 0.3rem; }
+.arteCategoria { display: inline-block; font-size: 0.68rem; color: white; background: var(--secondary-boton); padding: 0.15rem 0.5rem; border-radius: 20px; margin-bottom: 0.3rem; }
 
 /* Cuerpo humano */
 .cuerpoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); text-align: center; }

@@ -17,8 +17,8 @@
 .horizonteLabel { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
 .horizonteBtn { padding: 0.5rem 1.2rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 999px; cursor: pointer; font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); transition: all 0.15s; }
 .horizonteBtn:hover { border-color: var(--primary); color: var(--primary); }
-.horizonteActivo { background: var(--primary); border-color: var(--primary); color: white; }
-.horizonteActivo:hover { background: var(--primary); color: white; }
+.horizonteActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
+.horizonteActivo:hover { background: var(--primary-boton); color: white; }
 
 .decisionesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .decisionCard { display: flex; align-items: center; gap: var(--spacing-sm); background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid; border-radius: var(--radius); padding: var(--spacing-md); cursor: pointer; transition: all 0.15s; text-align: left; color: var(--text-primary); }

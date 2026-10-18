@@ -186,7 +186,7 @@
 
 /* ── Botón calcular ───────────────────────────────────────── */
 .btnCalcular {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 8px;
@@ -562,7 +562,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 700;
   font-size: 0.9rem;

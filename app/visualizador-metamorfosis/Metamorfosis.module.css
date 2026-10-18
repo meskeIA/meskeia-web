@@ -17,8 +17,8 @@
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -33,7 +33,7 @@
 .progreso { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); justify-content: center; flex-wrap: wrap; }
 .progresoFase { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); min-width: 80px; }
 .progresoFase:hover { border-color: var(--primary); }
-.progresoActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.progresoActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .progresoCompletado { border-color: var(--secondary); background: rgba(72, 169, 166, 0.1); color: var(--secondary); }
 .progresoIcono { font-size: 1.5rem; }
 .progresoNombre { font-size: 0.72rem; font-weight: 600; text-align: center; }

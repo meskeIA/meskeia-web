@@ -212,9 +212,9 @@
 }
 
 .fluidBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .toggleRow {
@@ -583,7 +583,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

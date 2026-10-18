@@ -52,9 +52,9 @@
 .nivelTab:hover { border-color: var(--primary); color: var(--primary); }
 .nivelTab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .nivelTabActivo {
-  border-color: var(--primary); background: var(--primary); color: white;
+  border-color: var(--primary-boton); background: var(--primary-boton); color: white;
 }
-.nivelTabActivo:hover { background: var(--primary); color: white; }
+.nivelTabActivo:hover { background: var(--primary-boton); color: white; }
 .nivelNum { font-size: 1.4rem; font-weight: 800; }
 .nivelLabel { font-size: 0.78rem; font-weight: 600; text-align: center; }
 

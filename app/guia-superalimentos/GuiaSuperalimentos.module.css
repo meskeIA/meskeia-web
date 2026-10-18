@@ -110,9 +110,9 @@
 }
 
 .filtroActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .filtroActivo:hover {
@@ -479,7 +479,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.82rem;
   font-weight: 700;
@@ -584,9 +584,9 @@
 }
 
 [data-theme='dark'] .filtroActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 [data-theme='dark'] .nutrientesTag {

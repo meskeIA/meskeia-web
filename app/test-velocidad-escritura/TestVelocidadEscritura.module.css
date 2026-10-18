@@ -99,8 +99,8 @@
 }
 
 .durationBtn.active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -110,7 +110,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -488,7 +488,7 @@
   align-items: flex-start;
 }
 .eduPasoNum {
-  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   width: 32px;
   height: 32px;

@@ -71,7 +71,7 @@
   font-size: 1.2rem;
   border: none;
   border-radius: 10px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -163,7 +163,7 @@
 }
 
 .ubicacionBtn:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -214,7 +214,7 @@
 }
 
 .weatherMain {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   padding: 30px;
   text-align: center;
@@ -733,7 +733,7 @@
   height: 32px;
   min-width: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-size: 0.9rem;
   font-weight: 700;

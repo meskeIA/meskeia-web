@@ -36,8 +36,8 @@
 .navTab:hover { border-color: var(--primary); color: var(--primary); }
 .navTab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navTabActivo {
-  border-color: var(--primary);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-color: var(--primary-boton);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
 }
 .navTabActivo:hover { color: white; }
@@ -141,8 +141,8 @@
 .geometriaBtn:hover { border-color: var(--primary); color: var(--primary); }
 .geometriaBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .geometriaBtnActivo {
-  border-color: var(--primary);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-color: var(--primary-boton);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
 }
 .geometriaBtnActivo:hover { color: white; }

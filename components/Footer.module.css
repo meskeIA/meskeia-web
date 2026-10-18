@@ -190,7 +190,7 @@
   position: fixed;
   bottom: 60px;
   right: 20px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 10px 15px;
   border-radius: 8px;

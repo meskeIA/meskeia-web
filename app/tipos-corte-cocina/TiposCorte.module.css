@@ -9,7 +9,7 @@
 .filtroBtns { display: flex; flex-wrap: wrap; gap: 8px; }
 .filtroBtn { padding: 9px 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.18s; }
 .filtroBtn:hover { border-color: var(--secondary); color: var(--text-primary); }
-.filtroBtnActivo { background: var(--primary); border-color: var(--primary); color: white; }
+.filtroBtnActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 .filtroBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }

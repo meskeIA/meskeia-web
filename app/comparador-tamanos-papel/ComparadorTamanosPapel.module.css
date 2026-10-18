@@ -115,8 +115,8 @@
 }
 
 .chipActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -470,7 +470,7 @@
   font-size: 0.82rem;
   font-weight: 600;
   color: #fff;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
@@ -495,7 +495,7 @@
 }
 
 .btnMini:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 

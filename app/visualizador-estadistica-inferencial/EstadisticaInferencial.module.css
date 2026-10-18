@@ -327,7 +327,7 @@
 
 /* ─── Botones ─── */
 .btnPrimario {
-  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -400,7 +400,7 @@
 .potenciaBarraFill {
   height: 100%;
   border-radius: 12px;
-  background: linear-gradient(90deg, #2E86AB, #48A9A6);
+  background: linear-gradient(90deg, var(--primary-boton), var(--secondary-boton));
   transition: width 0.3s ease;
   display: flex;
   align-items: center;

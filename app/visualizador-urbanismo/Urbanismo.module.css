@@ -71,14 +71,14 @@
 }
 
 .tabBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
   font-weight: 700;
 }
 
 .tabBtnActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -138,14 +138,14 @@
 }
 
 .modeloBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
   font-weight: 700;
 }
 
 .modeloBtnActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -693,7 +693,7 @@
   height: 2rem;
   min-width: 2rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.9rem;
   font-weight: 800;
@@ -795,7 +795,7 @@
 }
 
 [data-theme='dark'] .tabBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -809,7 +809,7 @@
 }
 
 [data-theme='dark'] .modeloBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 

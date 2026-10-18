@@ -85,7 +85,7 @@
 .casosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-lg); }
 .casoCard { display: flex; flex-direction: column; gap: var(--spacing-sm); background: var(--bg-primary); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); }
 .casoCabecera { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-sm); }
-.casoNumero { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; background: var(--primary); color: #FFFFFF; font-size: 0.9rem; font-weight: 700; }
+.casoNumero { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%; background: var(--primary-boton); color: #FFFFFF; font-size: 0.9rem; font-weight: 700; }
 .casoTituloCard { flex: 1 1 auto; font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
 .casoEtiqueta { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #2F7B79; background: rgba(72,169,166,0.14); border-radius: 999px; padding: 0.15rem 0.6rem; }
 .casoFamilia { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--text-muted); margin: 0; }
@@ -104,7 +104,7 @@
 .casoInput:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .casoAcciones { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
-.casoBtnPrimario { padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: #FFFFFF; background: var(--primary); border: 1px solid var(--primary); border-radius: 8px; cursor: pointer; }
+.casoBtnPrimario { padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: #FFFFFF; background: var(--primary-boton); border: 1px solid var(--primary-boton); border-radius: 8px; cursor: pointer; }
 .casoBtnPrimario:hover { background: #256E8D; border-color: #256E8D; }
 .casoBtnSecundario { padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
 .casoBtnSecundario:hover { background: var(--hover); color: var(--text-primary); }

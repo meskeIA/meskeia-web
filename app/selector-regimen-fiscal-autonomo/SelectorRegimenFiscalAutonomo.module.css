@@ -199,7 +199,7 @@
 
 .btnPrimary {
   padding: 0.75rem 1.75rem;
-  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: 8px;
@@ -372,7 +372,7 @@
 }
 
 .btnReset:hover {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
 }
 

@@ -253,7 +253,7 @@
 }
 
 .etapaNumero {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 2rem;
   height: 2rem;
@@ -337,7 +337,7 @@
 }
 
 .btnCerrar:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -408,7 +408,7 @@
 }
 
 .etapaBotonNum {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   min-width: 1.5rem;
   height: 1.5rem;
@@ -452,7 +452,7 @@
 }
 
 .tabActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 

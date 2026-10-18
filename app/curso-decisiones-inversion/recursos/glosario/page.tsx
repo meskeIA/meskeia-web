@@ -165,7 +165,7 @@ export default function GlosarioPage() {
                 padding: '8px 16px',
                 border: '1px solid var(--border)',
                 borderRadius: 'var(--radius)',
-                background: selectedLetter === null ? 'var(--primary)' : 'var(--bg-card)',
+                background: selectedLetter === null ? 'var(--primary-boton)' : 'var(--bg-card)',
                 color: selectedLetter === null ? 'white' : 'var(--text-primary)',
                 cursor: 'pointer',
               }}
@@ -180,7 +180,7 @@ export default function GlosarioPage() {
                   padding: '8px 12px',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--radius)',
-                  background: selectedLetter === letter ? 'var(--primary)' : 'var(--bg-card)',
+                  background: selectedLetter === letter ? 'var(--primary-boton)' : 'var(--bg-card)',
                   color: selectedLetter === letter ? 'white' : 'var(--text-primary)',
                   cursor: 'pointer',
                 }}

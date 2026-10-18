@@ -36,8 +36,8 @@
 }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -253,7 +253,7 @@
 }
 .especieSelBtn:hover { border-color: var(--primary); color: var(--primary); }
 .especieSelBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.especieSelActiva { border-color: var(--primary); background: var(--primary); color: white; }
+.especieSelActiva { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 
 .mrcaInfo {
   background: linear-gradient(135deg, rgba(72,169,166,0.08) 0%, rgba(46,134,171,0.08) 100%);
@@ -289,7 +289,7 @@
 
 /* Botones comunes */
 .btnPrimario {
-  padding: var(--spacing-sm) var(--spacing-lg); background: var(--primary);
+  padding: var(--spacing-sm) var(--spacing-lg); background: var(--primary-boton);
   color: white; border: none; border-radius: var(--radius);
   cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: opacity 0.2s;
 }

@@ -320,8 +320,8 @@
 }
 
 .biomaChipActivo {
-  border-color: var(--bioma-color, var(--primary));
-  background: var(--bioma-color, var(--primary));
+  border-color: var(--bioma-color, var(--primary-boton));
+  background: var(--bioma-color, var(--primary-boton));
   color: white;
 }
 
@@ -448,7 +448,7 @@
 }
 
 .latitudBiomaBtn {
-  background: var(--bioma-color, var(--primary));
+  background: var(--bioma-color, var(--primary-boton));
   border: none;
   border-radius: 20px;
   padding: 0.3rem 0.75rem;
@@ -888,7 +888,7 @@
   width: 32px;
   height: 32px;
   min-width: 32px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-size: 0.9rem;
   font-weight: 700;

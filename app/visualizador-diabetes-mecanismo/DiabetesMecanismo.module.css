@@ -122,7 +122,7 @@
 }
 
 .toggleBtnActivo {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -132,9 +132,9 @@
 }
 
 [data-theme='dark'] .toggleBtnActivo {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #ffffff;
-  border-color: #2E86AB;
+  border-color: var(--primary-boton);
 }
 
 /* ─── Layout páncreas ──────────────────────── */
@@ -233,7 +233,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.75rem;
   font-weight: 700;

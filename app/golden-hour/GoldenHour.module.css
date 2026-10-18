@@ -82,7 +82,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -786,7 +786,7 @@
 .eduStepNumber {
   min-width: 36px;
   height: 36px;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

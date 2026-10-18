@@ -92,7 +92,7 @@
 }
 
 .btnPerfilActivo {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -199,7 +199,7 @@
 }
 
 .btnNav:hover:not(:disabled) {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -249,7 +249,7 @@
 }
 
 .btnFiltro_todos.btnFiltroIGActivo {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -496,9 +496,9 @@
 }
 
 [data-theme='dark'] .btnPerfilActivo {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
-  border-color: #2E86AB;
+  border-color: var(--primary-boton);
 }
 
 [data-theme='dark'] .tablaIG {
@@ -545,9 +545,9 @@
 }
 
 [data-theme='dark'] .btnNav:hover:not(:disabled) {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
-  border-color: #2E86AB;
+  border-color: var(--primary-boton);
 }
 
 [data-theme='dark'] .educContent p,

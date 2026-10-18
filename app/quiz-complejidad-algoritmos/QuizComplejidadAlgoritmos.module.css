@@ -165,8 +165,8 @@
 }
 
 .btnModoActivo {
-  border-color: var(--primary) !important;
-  background: var(--primary) !important;
+  border-color: var(--primary-boton) !important;
+  background: var(--primary-boton) !important;
   color: white !important;
 }
 
@@ -244,7 +244,7 @@
 .btnPrimario {
   display: inline-block;
   padding: 0.85rem 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -475,7 +475,7 @@
 .btnSiguiente {
   display: inline-block;
   padding: 0.7rem 1.5rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -509,7 +509,7 @@
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   width: 120px;

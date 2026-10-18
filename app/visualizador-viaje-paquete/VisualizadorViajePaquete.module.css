@@ -18,8 +18,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -36,7 +36,7 @@
 .flujoTimeline { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--spacing-lg); }
 .flujoStep { display: flex; align-items: flex-start; gap: var(--spacing-md); position: relative; padding-bottom: var(--spacing-md); }
 .flujoStep:last-child { padding-bottom: 0; }
-.flujoNumero { width: 32px; height: 32px; border-radius: 50%; background: var(--step-color, var(--primary)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; z-index: 1; }
+.flujoNumero { width: 32px; height: 32px; border-radius: 50%; background: var(--step-color, var(--primary-boton)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; z-index: 1; }
 .flujoConector { position: absolute; left: 15px; top: 32px; bottom: 0; width: 2px; background: var(--border); }
 .flujoStep:last-child .flujoConector { display: none; }
 .flujoCard { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); transition: all 0.2s; cursor: default; }
@@ -52,7 +52,7 @@
 .etapaCard { display: flex; gap: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); transition: all 0.2s; }
 .etapaActiva { border-color: var(--etapa-color, var(--primary)); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .etapaOrden { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; flex-shrink: 0; min-width: 48px; }
-.etapaNumero { width: 28px; height: 28px; border-radius: 50%; background: var(--etapa-color, var(--primary)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; }
+.etapaNumero { width: 28px; height: 28px; border-radius: 50%; background: var(--etapa-color, var(--primary-boton)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; }
 .etapaDuracion { font-size: 0.7rem; font-weight: 600; color: var(--etapa-color, var(--primary)); white-space: nowrap; }
 .etapaBody { flex: 1; }
 .etapaHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; }

@@ -234,7 +234,7 @@
 .faqItem p { font-size: 0.88rem; color: var(--text-secondary); margin: 0; line-height: 1.55; }
 .stepsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
 .stepCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
-.stepNum { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; margin-bottom: 0.75rem; }
+.stepNum { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; margin-bottom: 0.75rem; }
 .stepCard h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.4rem; }
 .stepCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 .tipsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }

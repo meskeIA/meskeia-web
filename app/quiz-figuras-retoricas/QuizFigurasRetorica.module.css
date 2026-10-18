@@ -105,8 +105,8 @@
 }
 
 .nivelBtn.active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -144,8 +144,8 @@
 }
 
 .pregBtn.active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -154,7 +154,7 @@
   display: block;
   width: 100%;
   padding: 1rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -424,7 +424,7 @@
   display: block;
   width: 100%;
   padding: 0.9rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -511,7 +511,7 @@
 
 .btnRejugar {
   padding: 0.8rem 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -816,7 +816,7 @@
   justify-content: center;
   min-width: 2rem;
   height: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-weight: 700;

@@ -71,7 +71,7 @@
 
 .btnLimpiar {
   padding: 0.75rem 1.25rem;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: #fff;
   border: none;
   border-radius: 0.5rem;

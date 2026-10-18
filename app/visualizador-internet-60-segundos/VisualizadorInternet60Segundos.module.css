@@ -31,7 +31,7 @@
 .vistaToggle { display: flex; justify-content: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
 .vistaBtn { padding: 0.4rem 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 999px; cursor: pointer; font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); transition: all 0.15s; }
 .vistaBtn:hover { border-color: var(--primary); }
-.vistaActiva { background: var(--primary); border-color: var(--primary); color: white; }
+.vistaActiva { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 
 /* Detalle del paso */
 .pasoDetalle { background: var(--bg-card); border: 1px solid var(--border); border-left: 5px solid; border-radius: var(--radius); padding: var(--spacing-xl); margin-bottom: var(--spacing-xl); }
@@ -48,7 +48,7 @@
 /* Navegación entre pasos */
 .pasoNav { display: flex; align-items: center; justify-content: space-between; }
 .pasoNavBtn { padding: 0.5rem 1rem; background: var(--hover); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.85rem; color: var(--text-primary); transition: all 0.15s; }
-.pasoNavBtn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); }
+.pasoNavBtn:hover:not(:disabled) { background: var(--primary-boton); color: white; border-color: var(--primary-boton); }
 .pasoNavBtn:disabled { opacity: 0.3; cursor: not-allowed; }
 .pasoNavInfo { font-size: 0.82rem; color: var(--text-muted); }
 

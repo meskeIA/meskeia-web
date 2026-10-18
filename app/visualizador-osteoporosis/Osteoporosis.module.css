@@ -22,8 +22,8 @@
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -80,8 +80,8 @@
 .estadioSelector { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .estadioBtn { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); text-align: center; }
 .estadioBtn:hover { border-color: var(--primary); color: var(--text-primary); }
-.estadioBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.estadioBtnActivo:hover { background: var(--primary); color: white; }
+.estadioBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.estadioBtnActivo:hover { background: var(--primary-boton); color: white; }
 .estadioIcono { font-size: 1.5rem; }
 .estadioNombre { font-size: 0.82rem; font-weight: 700; }
 .estadioEdad { font-size: 0.72rem; opacity: 0.8; }
@@ -121,8 +121,8 @@
 .grupoToggle { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .grupoBtn { flex: 1; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
 .grupoBtn:hover { border-color: var(--primary); color: var(--text-primary); }
-.grupoBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.grupoBtnActivo:hover { background: var(--primary); color: white; }
+.grupoBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.grupoBtnActivo:hover { background: var(--primary-boton); color: white; }
 
 /* Lista de factores */
 .factoresList { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }
@@ -142,7 +142,7 @@
 .accionTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); display: flex; align-items: center; gap: 0.4rem; }
 .accionGrid { display: flex; flex-direction: column; gap: var(--spacing-md); }
 .accionItem { display: flex; align-items: flex-start; gap: var(--spacing-md); }
-.accionNum { display: inline-flex; align-items: center; justify-content: center; width: 1.8rem; height: 1.8rem; background: var(--primary); color: white; border-radius: 50%; font-weight: 800; font-size: 0.88rem; flex-shrink: 0; }
+.accionNum { display: inline-flex; align-items: center; justify-content: center; width: 1.8rem; height: 1.8rem; background: var(--primary-boton); color: white; border-radius: 50%; font-weight: 800; font-size: 0.88rem; flex-shrink: 0; }
 .accionTexto { font-size: 0.9rem; color: var(--text-primary); line-height: 1.5; }
 
 /* ─── Sección 4: Curva de densidad ─── */
@@ -151,8 +151,8 @@
 .sexoToggle { display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .sexoBtn { flex: 1; padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
 .sexoBtn:hover { border-color: var(--primary); color: var(--text-primary); }
-.sexoBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.sexoBtnActivo:hover { background: var(--primary); color: white; }
+.sexoBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.sexoBtnActivo:hover { background: var(--primary-boton); color: white; }
 
 /* Gráfica */
 .graficaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }

@@ -20,8 +20,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -79,7 +79,7 @@
 .fractalCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-md); transition: transform 0.2s; }
 .fractalCard:hover { transform: translateY(-2px); }
 .fractalNombre { display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
-.fractalDim { font-size: 0.72rem; font-weight: 600; color: white; background: var(--secondary); padding: 0.15rem 0.5rem; border-radius: 20px; }
+.fractalDim { font-size: 0.72rem; font-weight: 600; color: white; background: var(--secondary-boton); padding: 0.15rem 0.5rem; border-radius: 20px; }
 .fractalDesc { font-size: 0.78rem; color: var(--text-secondary); margin-bottom: var(--spacing-sm); }
 .fractalMetricas { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-muted); padding-top: var(--spacing-sm); border-top: 1px solid var(--border); }
 

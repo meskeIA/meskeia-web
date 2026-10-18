@@ -93,8 +93,8 @@
 }
 
 .presetBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -215,8 +215,8 @@
 }
 
 .modoBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -554,7 +554,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.95rem;
   font-weight: 700;
@@ -694,7 +694,7 @@
 }
 
 [data-theme='dark'] .presetBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 

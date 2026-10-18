@@ -64,9 +64,9 @@
 }
 
 .navBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .navBtn:focus-visible {
@@ -789,9 +789,9 @@
 }
 
 [data-theme='dark'] .navBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 [data-theme='dark'] .enlaceCard {

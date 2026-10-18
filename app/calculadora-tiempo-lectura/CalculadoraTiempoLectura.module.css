@@ -204,7 +204,7 @@
 
 /* Tiempo Card */
 .tiempoCard {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius-large);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -386,7 +386,7 @@
 .copyBtn {
   width: 100%;
   padding: 0.75rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -730,7 +730,7 @@
 .stepNumber {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -757,7 +757,7 @@
 }
 
 [data-theme='dark'] .stepNumber {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
 }
 
 /* 5. Mejores Prácticas */

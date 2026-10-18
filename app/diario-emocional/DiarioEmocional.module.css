@@ -33,7 +33,7 @@
 .textarea { width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--bg-card); color: var(--text-primary); font-size: 0.9rem; font-family: inherit; resize: vertical; box-sizing: border-box; }
 .textarea:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
 
-.btn { padding: 0.85rem 2.5rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.btn { padding: 0.85rem 2.5rem; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
 .btn:hover:not(:disabled) { opacity: 0.9; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }

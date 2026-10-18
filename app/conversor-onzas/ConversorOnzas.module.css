@@ -64,7 +64,7 @@
 }
 
 .modoTabActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -149,8 +149,8 @@
 }
 
 .sistemaBtnActivo {
-  background: var(--secondary);
-  border-color: var(--secondary);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: white;
 }
 

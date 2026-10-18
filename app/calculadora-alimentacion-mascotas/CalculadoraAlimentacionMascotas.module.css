@@ -60,7 +60,7 @@
 }
 
 .tab.active {
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
 }
 
@@ -241,7 +241,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s;
@@ -529,7 +529,7 @@
 .diaNumero {
   min-width: 80px;
   padding: 10px;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-weight: 600;
   font-size: 0.9rem;
@@ -560,7 +560,7 @@
 }
 
 .barraNuevo {
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -1081,7 +1081,7 @@
 
 .stepNumber {
   flex-shrink: 0; width: 2rem; height: 2rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white; border-radius: 50%; display: flex; align-items: center;
   justify-content: center; font-weight: 700; font-size: 0.875rem;
 }

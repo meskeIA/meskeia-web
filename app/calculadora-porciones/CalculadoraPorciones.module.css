@@ -619,7 +619,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   display: flex;
   align-items: center;

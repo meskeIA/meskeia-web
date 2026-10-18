@@ -108,8 +108,8 @@
 }
 
 .bienBtnActivo {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -174,8 +174,8 @@
 }
 
 .toggleBtnActivo {
-  border-color: var(--secondary);
-  background: var(--secondary);
+  border-color: var(--secondary-boton);
+  background: var(--secondary-boton);
   color: white;
   font-weight: 600;
 }
@@ -518,7 +518,7 @@
   width: 30px;
   height: 30px;
   min-width: 30px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-weight: 700;

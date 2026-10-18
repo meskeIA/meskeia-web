@@ -273,7 +273,7 @@
 }
 
 .resultHighlight {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius);
   padding: var(--spacing-lg);
   text-align: center;
@@ -835,7 +835,7 @@
 .eduStepNumber {
   min-width: 36px;
   height: 36px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1146,7 +1146,7 @@
   width: 32px;
   height: 32px;
   min-width: 32px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

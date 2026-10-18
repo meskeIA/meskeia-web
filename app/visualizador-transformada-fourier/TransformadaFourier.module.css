@@ -130,10 +130,10 @@
 .btnToggle:hover { background: rgba(46,134,171,0.08); }
 .btnToggle:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnToggleActivo {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white; border-color: transparent;
 }
-.btnToggleActivo:hover { opacity: 0.9; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); }
+.btnToggleActivo:hover { opacity: 0.9; background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%); }
 .epiciclosHint { font-size: 0.84rem; color: var(--text-muted); margin: 0; }
 
 .canvasEpiciclosWrapper { position: relative; border-radius: var(--radius); overflow: hidden; margin-bottom: var(--spacing-md); background: #0F1923; }

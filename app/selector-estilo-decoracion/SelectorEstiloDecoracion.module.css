@@ -13,7 +13,7 @@
 .heroSubtitle { font-size: clamp(1rem, 2vw, 1.2rem); opacity: 0.9; margin: 0; line-height: 1.5; }
 
 .heroResultados {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: #fff; text-align: center; padding: 2rem 1.5rem 1.75rem;
 }
 .heroTitleSm { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 700; margin: 0 0 0.4rem; }
@@ -35,7 +35,7 @@
 .introFeatures li span { font-size: 1.1rem; flex-shrink: 0; }
 
 .btnStart {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: #fff; border: none; border-radius: 10px; padding: 0.9rem 2.5rem;
   font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.15s; width: 100%;
 }
@@ -79,7 +79,7 @@
 .btnAnterior:hover { border-color: var(--primary); color: var(--primary); }
 .btnAnterior:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnPrimary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border: none; border-radius: 8px; padding: 0.75rem 1.5rem;
   font-size: 0.9rem; font-weight: 600; color: #fff; cursor: pointer; flex: 1; transition: opacity 0.2s;
 }
@@ -142,7 +142,7 @@
   border-radius: 10px; color: var(--primary); font-size: 0.95rem; font-weight: 600;
   cursor: pointer; transition: background 0.18s, color 0.18s;
 }
-.btnRepetir:hover { background: var(--primary); color: #fff; }
+.btnRepetir:hover { background: var(--primary-boton); color: #fff; }
 .btnRepetir:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* ─── Dark mode ─────────────────────────────────────────────────── */

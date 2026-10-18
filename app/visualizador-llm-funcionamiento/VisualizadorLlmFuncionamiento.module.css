@@ -120,7 +120,7 @@
    ───────────────────────────────────────────── */
 
 .btnPrimario {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -419,8 +419,8 @@
 }
 
 .contextoBtnActivo {
-  background: var(--primary, #2E86AB);
-  border-color: var(--primary, #2E86AB);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -453,8 +453,8 @@
 }
 
 .tokenAtencionActivo {
-  background: var(--primary, #2E86AB);
-  border-color: var(--primary, #2E86AB);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
   font-weight: 700;
 }

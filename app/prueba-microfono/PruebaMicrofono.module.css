@@ -268,7 +268,7 @@
 }
 
 .btnPrimary {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -360,9 +360,9 @@
 }
 
 .toggleBtn.active {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .slider {
@@ -470,7 +470,7 @@
   font-size: 0.85rem;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -815,7 +815,7 @@
   width: 2rem;
   height: 2rem;
   min-width: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   font-weight: 700;
   font-size: 0.9rem;

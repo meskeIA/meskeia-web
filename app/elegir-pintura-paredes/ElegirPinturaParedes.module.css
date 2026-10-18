@@ -90,7 +90,7 @@
   width: 1.9rem;
   height: 1.9rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 1rem;
   flex-shrink: 0;
@@ -245,7 +245,7 @@
 .ctaBtn {
   display: inline-block;
   padding: 0.8rem 1.6rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: var(--radius);
   text-decoration: none;
@@ -413,7 +413,7 @@
   width: 2.2rem;
   height: 2.2rem;
   border-radius: 50%;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   font-weight: 700;
   flex-shrink: 0;

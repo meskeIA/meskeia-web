@@ -140,9 +140,9 @@
 }
 
 .filtroActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .filtroActivo:hover { opacity: 0.9; color: #fff; }
@@ -530,7 +530,7 @@
   min-width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   display: flex;
   align-items: center;

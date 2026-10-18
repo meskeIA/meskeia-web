@@ -134,7 +134,7 @@
   justify-content: center;
   width: 2.2rem;
   height: 2.2rem;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 1rem;
@@ -235,7 +235,7 @@
   justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.72rem;
@@ -451,7 +451,7 @@
 
 .ctaBtn {
   padding: 0.75rem 1.5rem;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: white;
   border-radius: 12px;
   text-decoration: none;

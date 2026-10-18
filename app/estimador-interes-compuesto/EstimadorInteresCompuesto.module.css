@@ -207,7 +207,7 @@
 
 /* Resultado Principal */
 .resultadoPrincipal {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius-large);
   padding: var(--spacing-xl);
   text-align: center;
@@ -706,7 +706,7 @@
   flex-shrink: 0;
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1001,7 +1001,7 @@
 
 .eduEscenarioTip {
   display: inline-block;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: 20px;

@@ -57,7 +57,7 @@
 
 /* ─── Ruta visual ─── */
 .rutaVisual { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-bottom: var(--spacing-md); }
-.rutaPaso { background: var(--primary); color: white; font-size: 0.82rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 20px; }
+.rutaPaso { background: var(--primary-boton); color: white; font-size: 0.82rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 20px; }
 .rutaFlecha { color: var(--text-muted); font-size: 1.1rem; }
 
 /* ─── Teoría de la puerta ─── */
@@ -124,7 +124,7 @@
 /* ─── Pasos ─── */
 .pasosContainer { display: flex; flex-direction: column; gap: var(--spacing-sm); margin: var(--spacing-md) 0 var(--spacing-lg); }
 .pasoCard { display: flex; gap: var(--spacing-md); align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); }
-.pasoNumero { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pasoNumero { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-boton); color: white; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .pasoContenido { display: flex; flex-direction: column; gap: 0.2rem; }
 .pasoTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
 .pasoDesc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; }

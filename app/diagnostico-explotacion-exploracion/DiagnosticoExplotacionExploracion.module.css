@@ -142,7 +142,7 @@
 }
 
 .questionNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 28px;
   height: 28px;
@@ -222,14 +222,14 @@
 }
 
 .scaleButtonActive {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
 .scaleButtonActive:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
 }
 
 .scaleValue {
@@ -260,7 +260,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -297,7 +297,7 @@
 }
 
 .btnSecondary:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 

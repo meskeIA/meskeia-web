@@ -69,12 +69,12 @@
 }
 
 .tabActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
 .tabActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 .tabBtn:focus-visible {
@@ -120,12 +120,12 @@
 }
 
 .algActivo {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: #fff;
 }
 
 .algActivo:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .algBtn:focus-visible {
@@ -255,12 +255,12 @@
 }
 
 .modoActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
 .modoActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 .modoBtn:focus-visible {
@@ -635,12 +635,12 @@
 }
 
 .firmaTabActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
 .firmaTabActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 .firmaTab:focus-visible {
@@ -708,7 +708,7 @@
 }
 
 .firmaStepActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -869,7 +869,7 @@
 
 .tlsPlayBtn {
   padding: 0.7rem 1.8rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 0.5rem;
@@ -880,7 +880,7 @@
 }
 
 .tlsPlayBtn:hover:not(:disabled) {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .tlsPlayBtn:disabled {
@@ -1290,7 +1290,7 @@
   height: 32px;
   min-width: 32px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   display: flex;
   align-items: center;

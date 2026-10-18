@@ -104,9 +104,9 @@
 
 .variableBtnActive,
 .modeBtnActive {
-  background: var(--primary) !important;
+  background: var(--primary-boton) !important;
   color: white !important;
-  border-color: var(--primary) !important;
+  border-color: var(--primary-boton) !important;
 }
 
 .variableNames,
@@ -139,9 +139,9 @@
 }
 
 .exampleBtn:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Main Content */
@@ -457,7 +457,7 @@
 }
 
 .resultBox {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius);
   padding: var(--spacing-xl);
   color: white;
@@ -830,7 +830,7 @@
   width: 36px;
   height: 36px;
   min-width: 36px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   border-radius: 50%;
   display: flex;

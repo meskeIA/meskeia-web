@@ -126,9 +126,9 @@
 }
 
 .btnSectorActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
   font-weight: 700;
 }
 
@@ -149,7 +149,7 @@
 }
 
 [data-theme='dark'] .btnSectorActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -237,9 +237,9 @@
 }
 
 .btnReset:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .btnReset:focus-visible {
@@ -384,7 +384,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: var(--radius);
   padding: var(--spacing-md) var(--spacing-lg);
@@ -393,7 +393,7 @@
 }
 
 [data-theme='dark'] .consensoBadge {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .consensoBadgeNum {
@@ -629,7 +629,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 2rem;
   height: 2rem;

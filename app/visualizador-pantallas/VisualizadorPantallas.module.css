@@ -18,8 +18,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -35,7 +35,7 @@
 .timelineBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); position: relative; min-width: 90px; flex-shrink: 0; }
 .timelineBtn:hover { border-color: var(--tech-color, var(--primary)); color: var(--tech-color, var(--primary)); }
 .timelineBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.timelineActivo { border-color: var(--tech-color, var(--primary)); background: var(--tech-color, var(--primary)); color: white; }
+.timelineActivo { border-color: var(--tech-color, var(--primary-boton)); background: var(--tech-color, var(--primary-boton)); color: white; }
 .timelineActivo:hover { color: white; }
 .timelineAnio { font-size: 0.7rem; font-weight: 700; }
 .timelineDot { width: 10px; height: 10px; border-radius: 50%; background: var(--tech-color, var(--primary)); }

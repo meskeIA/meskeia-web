@@ -18,8 +18,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -70,7 +70,7 @@
 .flujoStep { display: flex; align-items: flex-start; gap: var(--spacing-md); margin-bottom: 0.3rem; position: relative; }
 .flujoIcono { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; flex-shrink: 0; width: 48px; }
 .flujoIcono span:first-child { font-size: 1.5rem; }
-.flujoNumero { font-size: 0.65rem; font-weight: 700; color: white; background: var(--viaje-color, var(--primary)); border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+.flujoNumero { font-size: 0.65rem; font-weight: 700; color: white; background: var(--viaje-color, var(--primary-boton)); border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
 .flujoInfo { flex: 1; padding-bottom: var(--spacing-sm); }
 .flujoFase { font-size: 0.92rem; color: var(--text-primary); display: block; margin-bottom: 0.1rem; }
 .flujoDesc { font-size: 0.82rem; color: var(--text-secondary); margin: 0; line-height: 1.4; }

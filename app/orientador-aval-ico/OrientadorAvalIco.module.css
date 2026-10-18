@@ -190,7 +190,7 @@
 .procesoNum {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border-radius: 50%;
   display: flex;

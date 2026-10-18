@@ -20,8 +20,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -55,7 +55,7 @@
 .tipoBtn { padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .tipoBtn:hover { border-color: var(--tipo-color, var(--primary)); color: var(--tipo-color, var(--primary)); }
 .tipoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.tipoBtnActivo { border-color: var(--tipo-color, var(--primary)); background: var(--tipo-color, var(--primary)); color: white; }
+.tipoBtnActivo { border-color: var(--tipo-color, var(--primary-boton)); background: var(--tipo-color, var(--primary-boton)); color: white; }
 .tipoBtnActivo:hover { color: white; }
 .tipoNombre { font-size: 0.85rem; font-weight: 600; }
 .tipoDetalle { display: flex; align-items: center; gap: var(--spacing-lg); justify-content: center; margin-bottom: var(--spacing-lg); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); }
@@ -70,7 +70,7 @@
 .opBtn { padding: 0.5rem 1rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); transition: all 0.2s; }
 .opBtn:hover { border-color: var(--primary); color: var(--primary); }
 .opBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.opBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.opBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .opBtnActivo:hover { color: white; }
 
 .operacionContenido { margin-bottom: var(--spacing-md); }
@@ -90,7 +90,7 @@
 .botonesSimulacion { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
 .btnPaso { padding: 0.4rem 0.8rem; background: var(--hover); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 0.8rem; color: var(--text-secondary); transition: all 0.15s; }
 .btnPaso:hover { border-color: var(--primary); color: var(--primary); }
-.btnPasoActivo { background: var(--primary); color: white; border-color: var(--primary); }
+.btnPasoActivo { background: var(--primary-boton); color: white; border-color: var(--primary-boton); }
 
 /* Determinante */
 .determinanteVisual { display: flex; align-items: center; justify-content: center; gap: var(--spacing-xl); margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
@@ -127,7 +127,7 @@
 .transBtn { display: flex; align-items: center; gap: var(--spacing-sm); padding: 0.5rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); transition: all 0.15s; text-align: left; }
 .transBtn:hover { border-color: var(--primary); color: var(--primary); }
 .transBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.transBtnActivo { border-color: var(--secondary); background: var(--secondary); color: white; }
+.transBtnActivo { border-color: var(--secondary-boton); background: var(--secondary-boton); color: white; }
 .transBtnActivo:hover { color: white; }
 .transDesc { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); font-size: 0.9rem; color: var(--text-primary); text-align: center; }
 

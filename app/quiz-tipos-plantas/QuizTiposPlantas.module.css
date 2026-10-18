@@ -91,14 +91,14 @@
 
 .btnModo:hover,
 .btnModo:focus-visible {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
   transform: translateY(-2px);
   outline: none;
 }
 
 .btnModoDestacado {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -145,7 +145,7 @@
 
 .btnGrupo:hover,
 .btnGrupo:focus-visible {
-  background: var(--grupo-color, #2e86ab);
+  background: var(--grupo-color, var(--primary-boton));
   color: #fff;
   transform: translateY(-2px);
   outline: none;
@@ -361,7 +361,7 @@
 
 .btnOpcion:hover:not(:disabled),
 .btnOpcion:focus-visible:not(:disabled) {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
   transform: translateY(-1px);
   outline: none;
@@ -446,7 +446,7 @@
   display: block;
   width: 100%;
   padding: 0.75rem;
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -592,7 +592,7 @@
 
 .btnPrimario {
   padding: 0.75rem 2rem;
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -679,7 +679,7 @@
 .pasoNumero {
   min-width: 2rem;
   height: 2rem;
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -882,7 +882,7 @@ details[open] .faqPregunta::before {
 
 [data-theme='dark'] .btnModo:hover,
 [data-theme='dark'] .btnModo:focus-visible {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
 }
 

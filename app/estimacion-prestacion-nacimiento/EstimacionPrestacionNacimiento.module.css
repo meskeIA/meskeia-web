@@ -169,7 +169,7 @@
 .submitButton {
   width: 100%;
   padding: 0.85rem var(--spacing-lg);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -304,7 +304,7 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: white;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
   margin-left: 0.5rem;
@@ -482,7 +482,7 @@
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   border-radius: 50%;
   display: flex;

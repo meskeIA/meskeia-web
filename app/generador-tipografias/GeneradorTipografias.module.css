@@ -109,8 +109,8 @@
 }
 
 .categoryActive {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -162,7 +162,7 @@
 .popularBadge {
   font-size: 0.65rem;
   padding: 2px 6px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50px;
 }
@@ -232,8 +232,8 @@
 }
 
 .sampleActive {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -355,8 +355,8 @@
 }
 
 .weightActive {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -656,7 +656,7 @@
   align-items: flex-start;
 }
 .eduPasoNum {
-  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   width: 32px;
   height: 32px;

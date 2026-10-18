@@ -160,9 +160,9 @@
 }
 
 .selectorActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .inputGroup {
@@ -280,7 +280,7 @@
 }
 
 .resistenciaChip {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius);
@@ -986,7 +986,7 @@
   width: 36px;
   height: 36px;
   min-width: 36px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

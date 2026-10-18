@@ -44,8 +44,8 @@
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
@@ -236,7 +236,7 @@
 }
 
 .sinapsisPasoNum {
-  width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white;
+  width: 28px; height: 28px; border-radius: 50%; background: var(--primary-boton); color: white;
   display: flex; align-items: center; justify-content: center;
   font-size: 0.82rem; font-weight: 700; flex-shrink: 0;
 }
@@ -392,7 +392,7 @@
 .step { display: flex; gap: 1rem; align-items: flex-start; }
 .stepNumber {
   min-width: 2rem; height: 2rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white; border-radius: 50%; display: flex; align-items: center;
   justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
 }

@@ -120,9 +120,9 @@
 }
 
 .clientTab.active {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .codeBlock {
@@ -241,7 +241,7 @@
 .stepNumber {
   width: 2.5rem;
   height: 2.5rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -298,8 +298,8 @@
 }
 
 [data-theme='dark'] .clientTab.active {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
 }
 
 /* ── Responsive ───────────────────────────────────────── */

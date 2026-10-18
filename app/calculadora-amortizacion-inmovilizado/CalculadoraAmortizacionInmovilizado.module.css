@@ -131,9 +131,9 @@
 }
 
 .btnTipoActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
   font-weight: 700;
 }
 
@@ -154,7 +154,7 @@
 }
 
 [data-theme='dark'] .btnTipoActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -255,9 +255,9 @@
 }
 
 .btnReset:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .btnReset:focus-visible {
@@ -641,7 +641,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 2rem;
   height: 2rem;

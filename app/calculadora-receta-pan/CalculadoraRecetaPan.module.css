@@ -70,7 +70,7 @@
   height: 28px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.95rem;
   font-weight: 700;
@@ -165,8 +165,8 @@
 }
 
 .chipActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -392,7 +392,7 @@
   height: 22px;
   padding: 0 6px;
   border-radius: 999px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.8rem;
 }
@@ -787,7 +787,7 @@
   height: 32px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 700;
 }

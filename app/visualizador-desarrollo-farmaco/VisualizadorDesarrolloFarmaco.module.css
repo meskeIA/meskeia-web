@@ -17,8 +17,8 @@
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -56,7 +56,7 @@
 .fasesLinea { position: absolute; top: 50%; left: 10%; right: 10%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--verde)); border-radius: 2px; z-index: 0; }
 .faseNodo { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; background: var(--bg-card); border: 3px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md); cursor: pointer; transition: all 0.2s; min-width: 100px; }
 .faseNodo:hover { border-color: var(--primary); transform: translateY(-2px); }
-.faseNodoActivo { border-color: var(--primary); background: var(--primary); color: white; transform: translateY(-4px); box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3); }
+.faseNodoActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; transform: translateY(-4px); box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3); }
 .faseNodoIcono { font-size: 1.5rem; }
 .faseNodoNombre { font-size: 0.88rem; font-weight: 700; }
 .faseNodoDuracion { font-size: 0.72rem; opacity: 0.8; }

@@ -83,9 +83,9 @@
 }
 
 .navBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .navBtnActivo:hover {
@@ -467,8 +467,8 @@
 }
 
 .circuitoSelectorBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -972,7 +972,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   font-size: 0.85rem;
   font-weight: 700;

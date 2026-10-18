@@ -224,8 +224,8 @@
 }
 
 .focalBtnActive {
-  background: var(--secondary);
-  border-color: var(--secondary);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: white;
 }
 
@@ -247,7 +247,7 @@
 .fovDestacado {
   text-align: center;
   padding: var(--spacing-xl);
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   border-radius: var(--radius-large);
   color: white;
   margin-bottom: var(--spacing-lg);

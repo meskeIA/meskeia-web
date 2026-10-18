@@ -186,8 +186,8 @@
 }
 
 .amasadoraBtnActivo {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 

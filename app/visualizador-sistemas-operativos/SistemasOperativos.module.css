@@ -226,8 +226,8 @@
 .btnReinicio {
   padding: 0.5rem 1.25rem;
   border-radius: 8px;
-  border: 2px solid var(--secondary, #48A9A6);
-  background: var(--secondary, #48A9A6);
+  border: 2px solid var(--secondary-boton);
+  background: var(--secondary-boton);
   color: #fff;
   cursor: pointer;
   font-size: 0.9rem;
@@ -369,8 +369,8 @@
 }
 
 .algoBtnActivo {
-  background: var(--primary, #2E86AB);
-  border-color: var(--primary, #2E86AB);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
   font-weight: 600;
 }
@@ -698,7 +698,7 @@
 }
 
 .permisoActivo {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -737,7 +737,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 700;
   font-size: 0.85rem;
@@ -866,8 +866,8 @@
 }
 
 [data-theme='dark'] .algoBtnActivo {
-  background: var(--secondary, #48A9A6);
-  border-color: var(--secondary, #48A9A6);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: #fff;
 }
 
@@ -886,7 +886,7 @@
 }
 
 [data-theme='dark'] .permisoActivo {
-  background: var(--secondary, #48A9A6);
+  background: var(--secondary-boton);
   color: #fff;
 }
 
@@ -1121,7 +1121,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary, #2E86AB), var(--secondary, #48A9A6));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   font-weight: 700;
   font-size: 0.9rem;

@@ -18,8 +18,8 @@
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
@@ -90,7 +90,7 @@
 .detoxBotones { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); justify-content: center; margin-bottom: var(--spacing-lg); }
 .detoxBtn { padding: 0.5rem 1.1rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); transition: all 0.2s; }
 .detoxBtn:hover { border-color: var(--primary); color: var(--primary); }
-.detoxBtnActivo { background: var(--primary); border-color: var(--primary); color: white; }
+.detoxBtnActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 .detoxBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .detoxCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .detoxCardHeader { display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-md) var(--spacing-lg); background: var(--hover); border-bottom: 1px solid var(--border); }
@@ -111,7 +111,7 @@
 .metaEstadoToggle { display: flex; gap: var(--spacing-sm); justify-content: center; margin-bottom: var(--spacing-lg); }
 .metaEstadoBtn { padding: 0.6rem 1.5rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 0.9rem; color: var(--text-secondary); transition: all 0.2s; }
 .metaEstadoBtn:hover { border-color: var(--primary); color: var(--primary); }
-.metaEstadoActivo { background: var(--primary); border-color: var(--primary); color: white; }
+.metaEstadoActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 .metaEstadoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .metaCicloCard { background: var(--bg-card); border: 2px solid; border-radius: var(--radius); padding: var(--spacing-lg); }
 .metaCicloTitulo { font-size: 1.1rem; font-weight: 700; margin: 0 0 var(--spacing-md) 0; }
@@ -158,7 +158,7 @@
 .stepGuideTitle { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin: 0 0 1rem 0; }
 .step { display: flex; align-items: flex-start; gap: 0.9rem; margin-bottom: 0.8rem; }
 .step:last-child { margin-bottom: 0; }
-.stepNumber { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; min-width: 1.75rem; border-radius: 50%; background: var(--primary); color: white; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+.stepNumber { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; min-width: 1.75rem; border-radius: 50%; background: var(--primary-boton); color: white; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
 .stepContent { margin: 0; font-size: 0.88rem; color: var(--text-primary); line-height: 1.6; }
 [data-theme='dark'] .stepGuide { background: var(--bg-card); border-color: var(--border); }
 [data-theme='dark'] .stepContent { color: var(--text-primary); }

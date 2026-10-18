@@ -99,13 +99,13 @@
 }
 
 .navBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
 .navBtnActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -286,7 +286,7 @@
 
 .btnAplicar {
   padding: 3px 10px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 6px;
@@ -379,7 +379,7 @@
 
 .btnPrimario {
   padding: 0.6rem 1.4rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -454,13 +454,13 @@
 }
 
 .consensoBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
 .consensoBtnActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -517,7 +517,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   display: flex;
   align-items: center;
@@ -785,13 +785,13 @@
 }
 
 .contratoBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
 .contratoBtnActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -861,7 +861,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   display: flex;
   align-items: center;
@@ -935,7 +935,7 @@
 
 .btnEjecutarPaso {
   padding: 5px 14px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 8px;
@@ -1280,7 +1280,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   display: flex;
   align-items: center;

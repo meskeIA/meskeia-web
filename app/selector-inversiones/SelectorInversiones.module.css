@@ -133,8 +133,8 @@
 }
 
 .opcionBtn.selected {
-  border-color: var(--primary);
-  background-color: var(--primary);
+  border-color: var(--primary-boton);
+  background-color: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -149,8 +149,8 @@
 }
 
 [data-theme='dark'] .opcionBtn.selected {
-  border-color: var(--primary);
-  background-color: var(--primary);
+  border-color: var(--primary-boton);
+  background-color: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -194,9 +194,9 @@
 
 .btnSiguiente,
 .btnResultado {
-  background-color: var(--primary);
+  background-color: var(--primary-boton);
   color: #ffffff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .btnSiguiente:hover,
@@ -226,7 +226,7 @@
 }
 
 .btnReiniciar:hover {
-  background-color: var(--secondary);
+  background-color: var(--secondary-boton);
   color: #ffffff;
 }
 

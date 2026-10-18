@@ -36,7 +36,7 @@
 .parteCardActivo { border-color: var(--primary); background: rgba(46,134,171,0.06); }
 .parteHeader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem; }
 .parteNombre { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
-.parteTag { font-size: 0.65rem; font-weight: 600; color: white; background: var(--primary); padding: 0.1rem 0.4rem; border-radius: 4px; }
+.parteTag { font-size: 0.65rem; font-weight: 600; color: white; background: var(--primary-boton); padding: 0.1rem 0.4rem; border-radius: 4px; }
 .parteDesc { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
 .parteDato { font-size: 0.78rem; color: var(--primary); font-weight: 600; margin-top: 0.3rem; display: block; }
 

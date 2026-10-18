@@ -73,7 +73,7 @@
 }
 
 .unidadTabActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 

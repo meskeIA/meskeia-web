@@ -169,7 +169,7 @@
 }
 
 .btnSiguiente {
-  background-color: var(--primary);
+  background-color: var(--primary-boton);
   color: #ffffff;
   margin-left: auto;
 }
@@ -184,7 +184,7 @@
 }
 
 .btnResultado {
-  background-color: var(--secondary);
+  background-color: var(--secondary-boton);
   color: #ffffff;
   margin-left: auto;
 }

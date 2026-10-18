@@ -324,9 +324,9 @@
 }
 
 .infoToggle:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .infoToggle:focus-visible {

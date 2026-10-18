@@ -74,7 +74,7 @@
 
 .versionBadge {
   display: inline-block;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   font-size: 0.75rem;
   padding: 4px 12px;
@@ -164,7 +164,7 @@
 
 .btnRefresh,
 .btnPrimary {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   padding: 12px 24px;
@@ -232,8 +232,8 @@
 }
 
 .tabButton.active {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
+  border-color: var(--primary-boton);
   color: white;
   box-shadow: 0 4px 12px rgba(46, 134, 171, 0.3);
 }
@@ -280,7 +280,7 @@
 }
 
 .statCard.highlight {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
 }
 
@@ -695,7 +695,7 @@
 
 /* Dark Mode */
 [data-theme='dark'] .statCard.highlight {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
 }
 
 [data-theme='dark'] .selectApp {
@@ -1032,15 +1032,15 @@
 }
 
 .filtroModoActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .filtroModoActivoMCP {
-  background: #48A9A6;
+  background: var(--secondary-boton);
   color: #fff;
-  border-color: #48A9A6;
+  border-color: var(--secondary-boton);
 }
 
 .badgeWeb {
@@ -1140,9 +1140,9 @@
 
 /* Compartido (emisión: clic en WhatsApp/Copiar/Email) — teal meskeIA */
 .filtroModoActivoShare {
-  background: #48A9A6;
+  background: var(--secondary-boton);
   color: #fff;
-  border-color: #48A9A6;
+  border-color: var(--secondary-boton);
 }
 
 .badgeShare {

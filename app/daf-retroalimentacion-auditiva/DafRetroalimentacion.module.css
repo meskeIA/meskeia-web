@@ -160,7 +160,7 @@
   min-width: 210px;
   font-size: 1.15rem;
   font-weight: 700;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -619,7 +619,7 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

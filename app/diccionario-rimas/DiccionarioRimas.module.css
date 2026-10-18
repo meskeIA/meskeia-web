@@ -110,7 +110,7 @@
 }
 
 .chipEjemplo:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -165,8 +165,8 @@
 }
 
 .tabActiva {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -333,8 +333,8 @@
 }
 
 .chipActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -364,7 +364,7 @@
 }
 
 .btnCopiar {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -465,7 +465,7 @@
 }
 
 .btnSecundario:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -599,7 +599,7 @@
 }
 
 [data-theme='dark'] .tabActiva {
-  background: var(--primary);
+  background: var(--primary-boton);
   border-color: var(--accent);
   color: #ffffff;
 }
@@ -610,7 +610,7 @@
 }
 
 [data-theme='dark'] .chipActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   border-color: var(--accent);
   color: #ffffff;
 }

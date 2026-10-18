@@ -66,12 +66,12 @@
 }
 
 .modoTabActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
 .modoTabActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 /* ===== PANELES ===== */
@@ -154,7 +154,7 @@
   padding: 0.7rem 1.5rem;
   border: none;
   border-radius: 10px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.98rem;
   font-weight: 600;
@@ -767,7 +767,7 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   display: flex;
   align-items: center;

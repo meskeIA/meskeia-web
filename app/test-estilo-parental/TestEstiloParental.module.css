@@ -109,7 +109,7 @@
 
 .questionNumber {
   display: inline-block;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: 20px;
@@ -172,7 +172,7 @@
   display: block;
   width: 100%;
   padding: var(--spacing-lg) var(--spacing-xl);
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border: none;
   border-radius: var(--radius);

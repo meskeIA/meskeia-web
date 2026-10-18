@@ -18,8 +18,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -90,7 +90,7 @@
 .nivelesContainer { margin-top: var(--spacing-lg); }
 .nivelesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); }
 .nivelCard { display: flex; align-items: center; gap: var(--spacing-sm); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-sm) var(--spacing-md); }
-.nivelNum { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; }
+.nivelNum { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--primary-boton); color: white; font-size: 0.78rem; font-weight: 800; flex-shrink: 0; }
 .nivelTexto { font-size: 0.82rem; color: var(--text-primary); line-height: 1.4; }
 
 /* ─── Composición (Sección 3) ─── */

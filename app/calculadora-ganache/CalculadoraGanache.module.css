@@ -59,7 +59,7 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.9rem;
@@ -220,7 +220,7 @@
   width: 100%;
   margin-top: 24px;
   padding: 16px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 12px;
@@ -231,7 +231,7 @@
 }
 
 .btnCalcular:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .btnCalcular:focus-visible {
@@ -536,7 +536,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.9rem;

@@ -22,7 +22,7 @@
 [data-theme='dark'] .opcionSeleccionada { background: rgba(46, 134, 171, 0.15); }
 
 .navBtns { display: flex; gap: 0.75rem; justify-content: center; margin-top: var(--spacing-lg); }
-.btn { padding: 0.85rem 2rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.btn { padding: 0.85rem 2rem; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
 .btn:hover { opacity: 0.9; }
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnSecundario { padding: 0.85rem 2rem; background: transparent; color: var(--primary); border: 1.5px solid var(--primary); border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }

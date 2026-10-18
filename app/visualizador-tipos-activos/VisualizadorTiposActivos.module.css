@@ -125,7 +125,7 @@
 }
 
 .tabBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -543,9 +543,9 @@
 }
 
 .navBtn:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .navBtn:disabled {
@@ -708,7 +708,7 @@
   border-radius: 20px;
   font-size: 0.78rem;
   font-weight: 600;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -941,7 +941,7 @@
   min-width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   display: flex;
   align-items: center;

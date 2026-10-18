@@ -93,8 +93,8 @@
 }
 
 .bandaBtnActivo {
-  border-color: var(--primary, #2E86AB);
-  background: var(--primary, #2E86AB);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -269,8 +269,8 @@
 }
 
 .dopingBtnN {
-  border-color: #2E86AB;
-  background: #2E86AB;
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -369,7 +369,7 @@
 }
 
 .electronLibreIcon {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   width: 28px;
@@ -708,7 +708,7 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.8rem;

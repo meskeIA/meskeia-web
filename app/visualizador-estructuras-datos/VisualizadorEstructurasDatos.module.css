@@ -78,9 +78,9 @@
 }
 
 .structureBtnActive {
-  background: var(--primary) !important;
+  background: var(--primary-boton) !important;
   color: white !important;
-  border-color: var(--primary) !important;
+  border-color: var(--primary-boton) !important;
 }
 
 .structureIcon {
@@ -144,7 +144,7 @@
 .cellIndex {
   font-size: 0.7rem;
   color: white;
-  background: var(--primary);
+  background: var(--primary-boton);
   width: 100%;
   text-align: center;
   padding: 2px;
@@ -187,7 +187,7 @@
 .stackCell {
   width: 80px;
   padding: var(--spacing-md);
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   text-align: center;
   font-weight: 600;
@@ -218,7 +218,7 @@
 .queueCell {
   width: 60px;
   padding: var(--spacing-md);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   text-align: center;
   font-weight: 600;
@@ -270,7 +270,7 @@
 
 .nodePointer {
   padding: var(--spacing-sm);
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   font-weight: 700;
 }
@@ -306,7 +306,7 @@
   width: 45px;
   height: 45px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   display: flex;
   align-items: center;
@@ -423,7 +423,7 @@
 }
 
 .btnPrimary {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -443,7 +443,7 @@
 }
 
 .btnSearch {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
 }
 
@@ -775,7 +775,7 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1111,7 +1111,7 @@
 }
 
 .guiaBtn {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   border: none;
   border-radius: var(--radius);
@@ -1123,7 +1123,7 @@
 }
 
 .guiaBtn:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .guiaBtn:focus-visible {

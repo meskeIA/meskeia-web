@@ -128,8 +128,8 @@
 }
 
 .btnOpcionActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
   font-weight: 600;
 }
@@ -145,8 +145,8 @@
 }
 
 [data-theme='dark'] .btnOpcionActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -308,7 +308,7 @@
   padding: 0.5rem 1.1rem;
   border: none;
   border-radius: 8px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 600;
@@ -344,7 +344,7 @@
 }
 
 .btnSecundario:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -386,9 +386,9 @@
 }
 
 [data-theme='dark'] .btnSecundario:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .inputPropio {
@@ -754,7 +754,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 700;
   font-size: 0.9rem;

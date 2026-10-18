@@ -20,8 +20,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -101,7 +101,7 @@
 .eqBtn { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); flex: 1; }
 .eqBtn:hover { border-color: var(--primary); }
 .eqBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.eqBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.eqBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .eqBtnDif { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
 .eqBtnNombre { font-size: 0.82rem; font-weight: 600; }
 
@@ -113,7 +113,7 @@
 
 .coefControl { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .coefBtn { width: 28px; height: 24px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); cursor: pointer; font-size: 1rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-.coefBtn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+.coefBtn:hover { background: var(--primary-boton); color: white; border-color: var(--primary-boton); }
 .coefBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
 .coefValor { font-size: 1.3rem; font-weight: 800; color: var(--primary); min-width: 20px; text-align: center; }
 

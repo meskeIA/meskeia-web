@@ -181,7 +181,7 @@
 .panelCeldaRegimen {
   font-size: 0.75rem;
   font-weight: 700;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
@@ -213,7 +213,7 @@
 }
 
 .btnCerrar:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -418,7 +418,7 @@
 
 .enlaceCurso a {
   display: inline-block;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 0.5rem 1.25rem;
   border-radius: 8px;
@@ -429,7 +429,7 @@
 }
 
 .enlaceCurso a:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 /* ─── Warning Box (indicador v2.0) ───────────────── */

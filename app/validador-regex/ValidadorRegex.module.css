@@ -179,13 +179,13 @@
 }
 
 .flagActive {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
 .flagActive:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -737,7 +737,7 @@
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   display: flex;

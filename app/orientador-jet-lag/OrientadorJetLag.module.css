@@ -412,7 +412,7 @@
 .faseNum {
   width: 1.6rem;
   height: 1.6rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -673,7 +673,7 @@
   width: 2rem;
   height: 2rem;
   min-width: 2rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   border-radius: 50%;
   display: flex;

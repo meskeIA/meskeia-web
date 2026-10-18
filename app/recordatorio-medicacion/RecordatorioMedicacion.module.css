@@ -266,7 +266,7 @@
    ============================================ */
 .btnPrimary {
   padding: 0.75rem 1.75rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -722,7 +722,7 @@
   min-width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   font-weight: 900;
   font-size: 1rem;

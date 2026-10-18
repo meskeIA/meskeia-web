@@ -149,7 +149,7 @@
 }
 
 .btnLimpiar:hover {
-  background-color: var(--primary);
+  background-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -532,7 +532,7 @@
   width: 2rem;
   height: 2rem;
   min-width: 2rem;
-  background-color: var(--primary);
+  background-color: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   font-size: 0.9rem;

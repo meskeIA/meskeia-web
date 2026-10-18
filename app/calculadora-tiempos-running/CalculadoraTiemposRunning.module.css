@@ -149,7 +149,7 @@
 .btnCalcular {
   width: 100%;
   padding: 0.85rem 1.5rem;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
@@ -161,7 +161,7 @@
 }
 
 .btnCalcular:hover {
-  background: var(--secondary, #48A9A6);
+  background: var(--secondary-boton);
 }
 
 .btnCalcular:active {

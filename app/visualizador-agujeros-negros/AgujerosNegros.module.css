@@ -413,7 +413,7 @@
 }
 
 .btnToggle {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -480,9 +480,9 @@
 }
 
 .tipoTabActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary) !important;
+  border-color: var(--primary-boton) !important;
 }
 
 .tipoContenido {

@@ -64,12 +64,12 @@
 }
 
 .tabActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
 .tabActive:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -317,13 +317,13 @@
 }
 
 .joinBtnActivo {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #fff;
 }
 
 .joinBtnActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -491,8 +491,8 @@
 }
 
 .sliderBtnActivo {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -651,7 +651,7 @@
   left: 16px;
   width: 28px;
   height: 28px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   font-weight: 800;

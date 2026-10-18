@@ -88,7 +88,7 @@
   justify-content: center;
   width: 1.7rem;
   height: 1.7rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   font-size: 0.95rem;
@@ -209,7 +209,7 @@
 }
 .btnControl { padding: 0.4rem 0.7rem; font-size: 1.1rem; }
 .btnControlMini { padding: 0.35rem 0.6rem; font-size: 0.8rem; }
-.btnSecundario { padding: 0.45rem 0.8rem; background: var(--secondary); color: #fff; border-color: var(--secondary); }
+.btnSecundario { padding: 0.45rem 0.8rem; background: var(--secondary-boton); color: #fff; border-color: var(--secondary-boton); }
 .btnControl:hover, .btnControlMini:hover, .btnSecundario:hover, .btnMarca:hover { filter: brightness(1.08); }
 .btnControl:focus-visible, .btnControlMini:focus-visible, .btnSecundario:focus-visible,
 .btnMarca:focus-visible, .btnExportar:focus-visible, .modoBtn:focus-visible, .btnDescargar:focus-visible {
@@ -228,7 +228,7 @@
   align-items: center;
 }
 .marca { display: flex; align-items: center; gap: 0.5rem; }
-.btnMarca { padding: 0.5rem 0.9rem; background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 500; }
+.btnMarca { padding: 0.5rem 0.9rem; background: var(--primary-boton); color: #fff; border-color: var(--primary-boton); font-weight: 500; }
 .valorMarca {
   font-variant-numeric: tabular-nums;
   background: var(--bg-inset);
@@ -286,7 +286,7 @@
 
 /* Exportar */
 .btnExportar {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: #fff;
   border: none;
   border-radius: var(--radius);
@@ -325,7 +325,7 @@
 }
 .btnDescargar {
   display: inline-block;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   text-decoration: none;
   border-radius: var(--radius);
@@ -383,7 +383,7 @@
   flex-shrink: 0;
   width: 2.2rem;
   height: 2.2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   display: flex;

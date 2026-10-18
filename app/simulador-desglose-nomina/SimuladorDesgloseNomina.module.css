@@ -186,9 +186,9 @@
 }
 
 .ejemploActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .ejemploActivo:hover {
@@ -235,9 +235,9 @@
 }
 
 .modoActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .modoActivo:hover {
@@ -423,7 +423,7 @@
   justify-content: center;
   font-weight: 800;
   font-size: 0.85rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   flex-shrink: 0;
 }
@@ -685,7 +685,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 32px;
   height: 32px;
@@ -817,8 +817,8 @@
 }
 
 [data-theme='dark'] .ejemploActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -829,8 +829,8 @@
 }
 
 [data-theme='dark'] .modoActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 

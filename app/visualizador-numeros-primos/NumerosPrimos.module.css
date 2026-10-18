@@ -19,8 +19,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -32,7 +32,7 @@
 
 /* Botones */
 .botonesSimulacion { display: flex; gap: var(--spacing-sm); justify-content: center; margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
-.btnSimular { padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: background 0.15s; }
+.btnSimular { padding: 0.5rem 1rem; background: var(--primary-boton); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: background 0.15s; }
 .btnSimular:hover { background: #256a8a; }
 .btnSimular:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnReset { padding: 0.5rem 1rem; background: var(--hover); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
@@ -51,7 +51,7 @@
 /* Contador primos */
 .contadorPrimos { text-align: center; margin-bottom: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; color: var(--text-primary); }
 .contadorDestacado { color: var(--primary); font-weight: 700; }
-.primoActualLabel { display: inline-block; margin-left: var(--spacing-md); padding: 0.2rem 0.6rem; background: var(--primary); color: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.primoActualLabel { display: inline-block; margin-left: var(--spacing-md); padding: 0.2rem 0.6rem; background: var(--primary-boton); color: white; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
 
 /* Grid de números (criba) */
 .gridNumeros { display: grid; gap: 2px; margin-bottom: var(--spacing-lg); justify-content: center; }
@@ -60,7 +60,7 @@
 .gridNumeros20 { grid-template-columns: repeat(20, 28px); }
 .gridNumeros25 { grid-template-columns: repeat(25, 28px); }
 .celda { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 600; border-radius: 3px; border: 1px solid var(--border); color: var(--text-primary); background: var(--bg-card); transition: background 0.15s, opacity 0.15s; }
-.celdaPrimo { background: var(--primary); color: white; border-color: var(--primary); font-weight: 700; }
+.celdaPrimo { background: var(--primary-boton); color: white; border-color: var(--primary-boton); font-weight: 700; }
 .celdaPrimoActual { background: #e74c3c; color: white; border-color: #e74c3c; box-shadow: 0 0 8px rgba(231, 76, 60, 0.5); }
 .celdaEliminada { opacity: 0.5; color: white; }
 .celdaUno { background: var(--hover); color: var(--text-muted); border-color: var(--border); }

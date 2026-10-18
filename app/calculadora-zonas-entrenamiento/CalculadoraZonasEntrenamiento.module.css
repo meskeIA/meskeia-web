@@ -96,7 +96,7 @@
 
 .btnWrapper { text-align: center; }
 .btnCalcular {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -205,7 +205,7 @@
 
 .stepGuide { display: flex; flex-direction: column; gap: 0.75rem; }
 .step { display: flex; gap: 1rem; align-items: flex-start; }
-.stepNumber { min-width: 2rem; height: 2rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+.stepNumber { min-width: 2rem; height: 2rem; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
 .stepContent { background: var(--bg-card); border: 1px solid #e0e0e0; border-radius: 10px; padding: 0.85rem 1rem; flex: 1; }
 .stepContent h4 { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem; }
 .stepContent p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }

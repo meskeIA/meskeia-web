@@ -1082,7 +1082,7 @@
   width: 2rem;
   height: 2rem;
   min-width: 2rem;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

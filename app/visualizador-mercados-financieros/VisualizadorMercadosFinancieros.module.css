@@ -72,14 +72,14 @@
 }
 
 .tabBtnActivo {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary, #2E86AB);
+  border-color: var(--primary-boton);
 }
 
 .tabBtnActivo:hover {
-  background: var(--secondary, #48A9A6);
-  border-color: var(--secondary, #48A9A6);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: #fff;
 }
 
@@ -378,7 +378,7 @@
 }
 
 .btnCompra {
-  background: var(--color-bid, #48A9A6);
+  background: var(--color-bid, var(--secondary-boton));
   color: #fff;
 }
 
@@ -442,14 +442,14 @@
 }
 
 .indiceTabActivo {
-  background: var(--primary, #2E86AB);
-  border-color: var(--primary, #2E86AB);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
 .indiceTabActivo:hover {
-  background: var(--secondary, #48A9A6);
-  border-color: var(--secondary, #48A9A6);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: #fff;
 }
 
@@ -645,7 +645,7 @@
 }
 
 [data-theme='dark'] .tabBtnActivo {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -710,8 +710,8 @@
 }
 
 [data-theme='dark'] .indiceTabActivo {
-  background: var(--primary, #2E86AB);
-  border-color: var(--primary, #2E86AB);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -961,7 +961,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   font-size: 0.8rem;
   font-weight: 700;

@@ -133,11 +133,12 @@
   transition: background 0.15s, color 0.15s;
 }
 
-.chip:hover { background: var(--accent); color: #fff; }
+/* Blanco sobre --accent (#7FB3D3) daba ~2,2:1; el acento es claro en todas las marcas y temas: texto oscuro (C0070) */
+.chip:hover { background: var(--accent); color: #1A1A1A; }
 
 .chipActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -253,7 +254,7 @@
 .practicaStats strong { display: block; font-size: 1.75rem; color: var(--primary); }
 
 .btnIniciarPractica {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 0.5rem;
@@ -264,7 +265,7 @@
   transition: background 0.2s;
 }
 
-.btnIniciarPractica:hover { background: var(--secondary); }
+.btnIniciarPractica:hover { background: var(--secondary-boton); }
 .btnIniciarPractica:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* Juego */
@@ -348,7 +349,7 @@
 .feedbackEjemplo { font-size: 0.85rem; color: var(--text-secondary); font-style: italic; margin: 0; }
 
 .btnSiguiente {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 0.5rem;
@@ -361,7 +362,7 @@
   margin-top: 0.25rem;
 }
 
-.btnSiguiente:hover { background: var(--secondary); }
+.btnSiguiente:hover { background: var(--secondary-boton); }
 .btnSiguiente:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* Fin */
@@ -377,12 +378,13 @@
 
 .finNum { font-size: 4rem; font-weight: 900; color: var(--primary); line-height: 1; }
 .finTotal { font-size: 1.75rem; color: var(--text-secondary); font-weight: 600; }
-.finPct { font-size: 1.1rem; background: var(--accent); color: #fff; padding: 0.2rem 0.65rem; border-radius: 2rem; font-weight: 700; margin-left: 0.5rem; }
+/* Blanco sobre --accent (#7FB3D3) daba ~2,2:1; el acento es claro en todas las marcas y temas: texto oscuro (C0070) */
+.finPct { font-size: 1.1rem; background: var(--accent); color: #1A1A1A; padding: 0.2rem 0.65rem; border-radius: 2rem; font-weight: 700; margin-left: 0.5rem; }
 
 .finBotones { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
 
 .btnRepetir {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 0.5rem;
@@ -393,7 +395,7 @@
   transition: background 0.2s;
 }
 
-.btnRepetir:hover { background: var(--secondary); }
+.btnRepetir:hover { background: var(--secondary-boton); }
 .btnRepetir:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .btnVerCatalogo {
@@ -446,7 +448,7 @@
 .faqTip { font-size: 0.8rem; color: var(--secondary); font-style: italic; border-top: 1px solid var(--accent); padding-top: 0.5rem; margin-top: 0.5rem; }
 .stepGuide { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
 .step { display: flex; gap: 1rem; align-items: flex-start; }
-.stepNumber { background: var(--primary); color: #fff; width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+.stepNumber { background: var(--primary-boton); color: #fff; width: 2rem; height: 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
 .stepContent h4 { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.3rem; }
 .stepContent p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.55; margin: 0; }
 .tipsGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }

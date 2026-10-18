@@ -293,7 +293,7 @@
 }
 
 .btnIniciar {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   box-shadow: 0 4px 16px rgba(46, 134, 171, 0.4);
 }
@@ -567,7 +567,7 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

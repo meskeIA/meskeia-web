@@ -130,7 +130,7 @@
 
 .swapButton {
   padding: 0.875rem 1rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -175,16 +175,16 @@
 }
 
 .presetBtn:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Results */
 .mainResult {
   text-align: center;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius-large);
   color: white;
   margin-bottom: 1.5rem;
@@ -460,7 +460,7 @@
 }
 
 .dataCard {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius);
   padding: 1.5rem;
   text-align: center;
@@ -506,7 +506,7 @@
 }
 
 .modoActivo {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-color: transparent;
   color: white;
 }
@@ -580,7 +580,7 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.9rem;
@@ -648,7 +648,7 @@
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
@@ -1034,7 +1034,7 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   display: flex;
   align-items: center;

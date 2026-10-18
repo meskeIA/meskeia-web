@@ -35,8 +35,8 @@
 }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -63,7 +63,7 @@
 }
 .ejemploBtn:hover { border-color: var(--primary); color: var(--primary); }
 .ejemploBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.ejemploBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.ejemploBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 
 .svgWrapper {
   background: var(--bg-card); border: 1px solid var(--border);
@@ -167,7 +167,7 @@
 
 /* ─── Sección 4: Le Chatelier ─── */
 .haberInfo {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg);
   margin-bottom: var(--spacing-lg); text-align: center;
 }
@@ -187,7 +187,7 @@
 }
 .pertBtn:hover { border-color: var(--secondary); color: var(--secondary); }
 .pertBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.pertBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.pertBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .pertIcono { font-size: 1.4rem; display: block; margin-bottom: 0.2rem; }
 
 .lechatResult {

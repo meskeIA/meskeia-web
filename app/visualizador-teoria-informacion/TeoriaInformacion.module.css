@@ -291,7 +291,7 @@
 }
 .stepNumber {
   width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: #fff; font-weight: 800; font-size: 0.88rem;
   display: flex; align-items: center; justify-content: center;
 }

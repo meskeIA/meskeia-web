@@ -70,7 +70,7 @@
 }
 
 .tabActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 600;
 }
@@ -154,15 +154,16 @@
   transition: background 0.15s, color 0.15s;
 }
 
+/* Blanco sobre --accent (#7FB3D3) daba ~2,2:1; el acento es claro en todas las marcas y temas: texto oscuro (C0070) */
 .tickBtn:hover {
   background: var(--accent);
-  color: #fff;
+  color: #1A1A1A;
 }
 
 .tickBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
   font-weight: 600;
 }
 
@@ -379,7 +380,7 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   font-size: 0.75rem;
   font-weight: 700;
@@ -618,7 +619,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   font-size: 0.875rem;
   font-weight: 700;
@@ -784,7 +785,7 @@
 }
 
 [data-theme='dark'] .tabActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 

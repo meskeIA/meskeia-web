@@ -325,8 +325,8 @@
 }
 
 .filtroBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -703,7 +703,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border-radius: 50%;
   display: flex;
@@ -856,7 +856,7 @@
 }
 
 [data-theme='dark'] .filtroBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 /* ============================================

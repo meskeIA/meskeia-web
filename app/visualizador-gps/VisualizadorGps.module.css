@@ -18,8 +18,8 @@
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -90,7 +90,7 @@
 .trilateraControles { display: flex; gap: var(--spacing-sm); justify-content: center; }
 .trilateraBtn { padding: var(--spacing-sm) var(--spacing-lg); background: var(--bg-card); border: 2px solid var(--border); border-radius: 30px; cursor: pointer; font-size: 0.88rem; font-weight: 600; color: var(--text-secondary); transition: all 0.2s; }
 .trilateraBtn:hover { border-color: var(--primary); color: var(--primary); }
-.trilateraBtnActivo { background: var(--primary); border-color: var(--primary); color: white; }
+.trilateraBtnActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 
 /* Pasos explicativos */
 .pasosGrid { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }

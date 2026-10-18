@@ -402,7 +402,7 @@
 }
 
 .tablaHeaderIbuprofeno {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #fff;
   border-bottom-color: #236b88;
 }
@@ -548,7 +548,7 @@
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  background: var(--dif-color, #2E86AB);
+  background: var(--dif-color, var(--primary-boton));
   color: #fff;
   border-radius: 50%;
   font-size: 1rem;

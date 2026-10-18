@@ -82,7 +82,7 @@
 .questionHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
 
 .questionNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 28px;
   height: 28px;
@@ -115,8 +115,8 @@
 
 .scaleButton:hover { border-color: var(--accent); background: var(--hover); }
 .scaleButton:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.scaleButtonActive { border-color: var(--primary); background: var(--primary); color: white; }
-.scaleButtonActive:hover { background: var(--primary); border-color: var(--primary); }
+.scaleButtonActive { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.scaleButtonActive:hover { background: var(--primary-boton); border-color: var(--primary-boton); }
 .scaleValue { font-size: 1.1rem; font-weight: 700; }
 .scaleLabel { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; }
 .progressInfo { text-align: center; color: var(--text-muted); margin: var(--spacing-lg) 0; font-size: 0.9rem; }
@@ -124,7 +124,7 @@
 .btnPrimary {
   display: block; width: 100%; padding: var(--spacing-md) var(--spacing-xl);
   font-size: 1.1rem; font-weight: 600; border: none; border-radius: var(--radius);
-  background: var(--primary); color: white; cursor: pointer; transition: all 0.3s ease;
+  background: var(--primary-boton); color: white; cursor: pointer; transition: all 0.3s ease;
 }
 
 .btnPrimary:hover:not(:disabled) { background: #256a8a; transform: translateY(-2px); }
@@ -137,7 +137,7 @@
   background: transparent; color: var(--primary); cursor: pointer; transition: all 0.3s ease; margin-top: var(--spacing-lg);
 }
 
-.btnSecondary:hover { background: var(--primary); color: white; }
+.btnSecondary:hover { background: var(--primary-boton); color: white; }
 .btnSecondary:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .resultSection { margin-bottom: var(--spacing-xl); }

@@ -94,7 +94,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -262,8 +262,8 @@
 }
 
 .itemChecked .checkbox {
-  background: #48A9A6;
-  border-color: #48A9A6;
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: white;
 }
 
@@ -346,7 +346,7 @@
 }
 
 .btnAdd:hover:not(:disabled) {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -573,7 +573,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   display: flex;
   align-items: center;

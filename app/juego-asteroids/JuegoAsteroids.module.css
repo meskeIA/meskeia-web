@@ -161,7 +161,7 @@
 }
 
 .keyBtn {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: 6px;
@@ -256,7 +256,7 @@
   font-weight: 600;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -395,7 +395,7 @@
   height: 55px;
   border: none;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   font-size: 1.3rem;
   font-weight: bold;
@@ -652,7 +652,7 @@
 }
 
 .stepNumber {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   width: 2rem;
   height: 2rem;

@@ -197,8 +197,8 @@
 .tab:hover { border-color: var(--primary); }
 
 .tabActivo {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -898,7 +898,7 @@
   height: 2rem;
   min-width: 2rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.85rem;
   font-weight: 700;

@@ -123,8 +123,8 @@
 }
 
 .copyBtn.copied {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -223,8 +223,8 @@
 }
 
 .typeActive {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -278,8 +278,8 @@
 }
 
 .angleActive {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -335,8 +335,8 @@
 }
 
 .positionActive {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -651,7 +651,7 @@
 }
 [data-theme='dark'] .paso { border-color: #374151; }
 .pasoNum {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   width: 2rem;
   height: 2rem;

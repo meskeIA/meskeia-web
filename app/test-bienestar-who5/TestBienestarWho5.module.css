@@ -28,7 +28,7 @@
 .opcionTexto { font-size: 0.72rem; color: var(--text-secondary); line-height: 1.2; }
 .opcionActiva .opcionTexto { color: var(--primary); font-weight: 600; }
 
-.btn { display: block; width: 100%; max-width: 400px; margin: var(--spacing-lg) auto 0; padding: 1rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.btn { display: block; width: 100%; max-width: 400px; margin: var(--spacing-lg) auto 0; padding: 1rem; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
 .btn:hover:not(:disabled) { opacity: 0.9; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
@@ -41,7 +41,7 @@
 
 .resultadoHero { text-align: center; border-radius: var(--radius-large); padding: var(--spacing-xl); margin-bottom: var(--spacing-lg); color: white; }
 .resultadoHero[data-nivel='alto'] { background: linear-gradient(135deg, var(--success), #2ecc71); }
-.resultadoHero[data-nivel='moderado'] { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+.resultadoHero[data-nivel='moderado'] { background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); }
 .resultadoHero[data-nivel='bajo'] { background: linear-gradient(135deg, var(--warning), #f39c12); }
 .resultadoHero[data-nivel='muy_bajo'] { background: linear-gradient(135deg, var(--danger), #c0392b); }
 

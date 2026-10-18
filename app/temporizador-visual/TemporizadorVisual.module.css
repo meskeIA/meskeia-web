@@ -176,7 +176,7 @@
 }
 
 .btnPersonalizado:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -278,7 +278,7 @@
 }
 
 .btnPrincipal {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   box-shadow: 0 4px 14px rgba(46, 134, 171, 0.35);
 }
@@ -537,7 +537,7 @@
   width: 2rem;
   height: 2rem;
   min-width: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

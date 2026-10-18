@@ -655,8 +655,8 @@
 }
 
 .pasoIndicadorActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -784,9 +784,9 @@
 }
 
 .pasoNavBtn:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .pasoNavBtn:focus-visible {

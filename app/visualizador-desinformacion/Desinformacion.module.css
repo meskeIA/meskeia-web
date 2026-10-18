@@ -307,7 +307,7 @@
   position: absolute;
   top: -10px;
   left: 16px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: 700;

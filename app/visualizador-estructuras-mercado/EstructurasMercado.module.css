@@ -72,8 +72,8 @@
 }
 
 .tabBtnActivo {
-  border-color: #2E86AB;
-  background: #2E86AB;
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -147,8 +147,8 @@
 }
 
 .btnEstructuraActivo {
-  border-color: #48A9A6;
-  background: #48A9A6;
+  border-color: var(--secondary-boton);
+  background: var(--secondary-boton);
   color: #ffffff;
 }
 
@@ -362,8 +362,8 @@
 }
 
 .btnEstrategiaActivo {
-  border-color: #2E86AB;
-  background: #2E86AB;
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -482,8 +482,8 @@
 }
 
 [data-theme='dark'] .tabBtnActivo {
-  border-color: #2E86AB;
-  background: #2E86AB;
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -499,8 +499,8 @@
 }
 
 [data-theme='dark'] .btnEstructuraActivo {
-  border-color: #48A9A6;
-  background: #48A9A6;
+  border-color: var(--secondary-boton);
+  background: var(--secondary-boton);
   color: #ffffff;
 }
 
@@ -561,8 +561,8 @@
 }
 
 [data-theme='dark'] .btnEstrategiaActivo {
-  border-color: #2E86AB;
-  background: #2E86AB;
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -803,7 +803,7 @@
   width: 32px;
   height: 32px;
   min-width: 32px;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #ffffff;
   border-radius: 50%;
   font-size: 0.88rem;

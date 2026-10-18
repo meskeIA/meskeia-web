@@ -529,8 +529,8 @@
 }
 
 .modoActivo {
-  background: var(--secondary);
-  border-color: var(--secondary);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: #ffffff;
 }
 

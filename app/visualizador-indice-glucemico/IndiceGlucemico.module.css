@@ -55,12 +55,12 @@
 }
 
 .tab:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
 .tabActiva {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -249,8 +249,8 @@
 }
 
 .categoriaTabActiva {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 

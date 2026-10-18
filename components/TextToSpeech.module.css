@@ -31,7 +31,7 @@
 }
 
 .ttsButton.ttsActive {
-  background: linear-gradient(135deg, var(--primary, #2E86AB), var(--secondary, #48A9A6));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border-color: transparent;
 }

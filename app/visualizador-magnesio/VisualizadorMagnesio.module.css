@@ -224,9 +224,9 @@
 }
 
 .muscleStateBtnActive {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary, #2E86AB);
+  border-color: var(--primary-boton);
 }
 
 .muscleStateBtn:focus-visible {

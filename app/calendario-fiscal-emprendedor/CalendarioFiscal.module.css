@@ -69,8 +69,8 @@
 }
 
 .btnTipo.activo {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -337,7 +337,7 @@
 
 .indicadorMas {
   font-size: 0.65rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   padding: 1px 4px;
   border-radius: 3px;
@@ -408,7 +408,7 @@
   justify-content: center;
   min-width: 50px;
   padding: var(--spacing-sm);
-  background: var(--primary);
+  background: var(--primary-boton);
   border-radius: var(--radius);
   color: white;
 }
@@ -1170,7 +1170,7 @@
   justify-content: center;
   min-width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-size: 1.2rem;
   font-weight: 700;

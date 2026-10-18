@@ -99,9 +99,9 @@
 
 .modeBtnActive,
 .precisionBtnActive {
-  background: var(--primary) !important;
+  background: var(--primary-boton) !important;
   color: white !important;
-  border-color: var(--primary) !important;
+  border-color: var(--primary-boton) !important;
 }
 
 .precisionBtn {
@@ -180,9 +180,9 @@
 }
 
 .exampleBtn:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Results Section */
@@ -627,7 +627,7 @@
 
 .escenarioTip {
   display: inline-block;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: 20px;
@@ -714,7 +714,7 @@
   justify-content: center;
   min-width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border-radius: 50%;
   font-weight: 700;

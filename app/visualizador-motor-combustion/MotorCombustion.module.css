@@ -6,8 +6,8 @@
 
 .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1.5rem 2rem; max-width: 900px; margin: 0 auto; }
 .tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.2rem; border: 2px solid var(--primary); border-radius: 2rem; background: transparent; color: var(--primary); font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-.tab:hover { background: var(--primary); color: #fff; }
-.tabActiva { background: var(--primary); color: #fff; }
+.tab:hover { background: var(--primary-boton); color: #fff; }
+.tabActiva { background: var(--primary-boton); color: #fff; }
 .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .seccion { max-width: 900px; margin: 0 auto; padding: 1rem 2rem 2rem; }

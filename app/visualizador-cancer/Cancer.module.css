@@ -40,8 +40,8 @@
 }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.5rem; }
 .navTexto { font-size: 0.76rem; font-weight: 600; text-align: center; }
 
@@ -98,7 +98,7 @@
   border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg);
 }
 .mutacionNum {
-  background: var(--primary); color: white; border-radius: 50%;
+  background: var(--primary-boton); color: white; border-radius: 50%;
   width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
   font-size: 0.78rem; font-weight: 700; flex-shrink: 0;
 }
@@ -202,7 +202,7 @@
 }
 .estadoBtn:hover { border-color: var(--primary); color: var(--primary); }
 .estadoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.estadoBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.estadoBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .inmunoSvgWrap {
   background: var(--bg-card); border: 1px solid var(--border);
   border-radius: var(--radius); padding: var(--spacing-lg);

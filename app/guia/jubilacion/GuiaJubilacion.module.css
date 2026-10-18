@@ -38,7 +38,7 @@
 .journeyGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--spacing-lg); }
 .journeyCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); padding: var(--spacing-xl); position: relative; transition: all 0.3s ease; }
 .journeyCard:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
-.journeyNumber { position: absolute; top: -15px; left: var(--spacing-lg); width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; font-weight: 700; }
+.journeyNumber { position: absolute; top: -15px; left: var(--spacing-lg); width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; font-weight: 700; }
 .journeyTitle { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: var(--spacing-sm); margin-top: var(--spacing-sm); }
 .journeyDescription { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: var(--spacing-md); }
 .journeyTip { display: flex; align-items: flex-start; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-md); background: var(--hover); border-radius: var(--radius); font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; }
@@ -51,7 +51,7 @@
 .caseStudySituation { font-size: 1rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: var(--spacing-xl); padding: var(--spacing-md); background: var(--hover); border-radius: var(--radius); }
 .caseStudySteps { display: flex; flex-direction: column; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
 .caseStudyStep { display: flex; align-items: flex-start; gap: var(--spacing-md); padding: var(--spacing-md); border-left: 3px solid var(--primary); background: var(--bg-primary); border-radius: 0 var(--radius) var(--radius) 0; }
-.caseStudyStepNumber { width: 28px; height: 28px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.85rem; font-weight: 600; flex-shrink: 0; }
+.caseStudyStepNumber { width: 28px; height: 28px; background: var(--primary-boton); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.85rem; font-weight: 600; flex-shrink: 0; }
 .caseStudyConclusion { display: flex; align-items: flex-start; gap: var(--spacing-md); padding: var(--spacing-lg); background: linear-gradient(135deg, rgba(46,134,171,0.1) 0%, rgba(72,169,166,0.1) 100%); border-radius: var(--radius); font-size: 1rem; line-height: 1.5; }
 .conclusionIcon { font-size: 1.25rem; flex-shrink: 0; }
 
@@ -87,7 +87,7 @@
 .ctaSection { text-align: center; padding: var(--spacing-2xl); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); margin-bottom: var(--spacing-2xl); }
 .ctaTitle { font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); }
 .ctaText { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: var(--spacing-xl); max-width: 500px; margin-left: auto; margin-right: auto; }
-.ctaButton { display: inline-flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-md) var(--spacing-2xl); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.3s ease; }
+.ctaButton { display: inline-flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-md) var(--spacing-2xl); background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%); color: white; border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.3s ease; }
 .ctaButton:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(46,134,171,0.3); }
 
 /* Other Guides */

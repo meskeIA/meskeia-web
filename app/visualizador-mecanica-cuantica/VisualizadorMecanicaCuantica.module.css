@@ -774,7 +774,7 @@
 /* ─── Botones ────────────────────────────────────────────────────────────────── */
 .btnPrimario {
   padding: 0.6rem 1.4rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -873,7 +873,7 @@
 }
 
 [data-theme='dark'] .btnPrimario {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .sliderBarraInversa {

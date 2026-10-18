@@ -372,9 +372,9 @@
 }
 
 .exportBtn:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* History Section */
@@ -776,7 +776,7 @@
   width: 2rem;
   height: 2rem;
   min-width: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-weight: 700;

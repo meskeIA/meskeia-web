@@ -227,7 +227,7 @@
 .chapterNumber {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border-radius: 50%;
   display: flex;
@@ -399,7 +399,7 @@
 
 /* CTA Section */
 .ctaSection {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius-large);
   padding: var(--spacing-xl);
   text-align: center;
@@ -479,7 +479,7 @@
   text-align: center;
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-xl);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius-large);
   color: white;
 }

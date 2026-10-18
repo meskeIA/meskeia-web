@@ -61,9 +61,9 @@
 }
 
 .tabActiva {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #ffffff;
-  border-color: #2E86AB;
+  border-color: var(--primary-boton);
   font-weight: 700;
 }
 
@@ -118,7 +118,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  background: var(--color-capa, #2E86AB);
+  background: var(--color-capa, var(--primary-boton));
   border: none;
   cursor: pointer;
   text-align: left;
@@ -280,7 +280,7 @@
 /* ── Botones ── */
 .btnPrimario {
   padding: 0.55rem 1.3rem;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -443,7 +443,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--color-dns, #2E86AB);
+  background: var(--color-dns, var(--primary-boton));
   color: #fff;
   font-size: 0.75rem;
   font-weight: 800;
@@ -619,12 +619,12 @@
 }
 
 .modoBtnActivo {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #fff;
 }
 
 .modoBtnActivo:hover {
-  background: #2E86AB;
+  background: var(--primary-boton);
 }
 
 .sliderLabel {
@@ -675,9 +675,9 @@
 }
 
 [data-theme='dark'] .tabActiva {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #fff;
-  border-color: #2E86AB;
+  border-color: var(--primary-boton);
 }
 
 [data-theme='dark'] .seccionTitulo,
@@ -1107,7 +1107,7 @@
   min-width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #fff;
   font-size: 0.9rem;
   font-weight: 800;

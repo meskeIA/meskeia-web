@@ -95,12 +95,12 @@
 }
 
 .tabBtn:hover { border-color: var(--primary); color: var(--primary); }
-.tabBtnActive { border-color: var(--primary); background: var(--primary); color: white; }
+.tabBtnActive { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .tabBtnActive:hover { color: white; }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 [data-theme='dark'] .tabBtn { background: var(--bg-card); border-color: var(--border); color: var(--text-secondary); }
-[data-theme='dark'] .tabBtnActive { background: var(--primary); color: white; border-color: var(--primary); }
+[data-theme='dark'] .tabBtnActive { background: var(--primary-boton); color: white; border-color: var(--primary-boton); }
 
 .tabContent { animation: fadeIn 0.15s ease; }
 
@@ -410,7 +410,7 @@
 .stepGuide { display: flex; flex-direction: column; gap: var(--spacing-md); margin-bottom: var(--spacing-lg); }
 .step { display: flex; gap: var(--spacing-md); align-items: flex-start; padding: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
 [data-theme='dark'] .step { background: var(--bg-card); border-color: var(--border); }
-.stepNumber { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: var(--primary); color: white; border-radius: 50%; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+.stepNumber { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; background: var(--primary-boton); color: white; border-radius: 50%; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
 .stepContent { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
 .stepContent strong { color: var(--text-primary); display: block; margin-bottom: 4px; }
 

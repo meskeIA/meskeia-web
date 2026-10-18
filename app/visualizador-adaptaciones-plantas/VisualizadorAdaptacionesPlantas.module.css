@@ -69,8 +69,8 @@
 }
 
 .tabBtnActivo {
-  background: var(--primary, #2e86ab);
-  border-color: var(--primary, #2e86ab);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -821,8 +821,8 @@
 }
 
 [data-theme='dark'] .tabBtnActivo {
-  background: var(--primary, #2e86ab);
-  border-color: var(--primary, #2e86ab);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 

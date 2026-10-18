@@ -45,8 +45,8 @@
 }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.5rem; }
 .navTexto { font-size: 0.74rem; font-weight: 600; text-align: center; line-height: 1.2; }
 
@@ -133,7 +133,7 @@
   display: inline-flex; align-items: center; gap: 0.5rem;
   padding: 0.65rem 1.4rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
   cursor: pointer; transition: all 0.2s; border: none;
-  background: var(--primary); color: white;
+  background: var(--primary-boton); color: white;
 }
 .btnPrimario:hover { filter: brightness(1.1); }
 .btnPrimario:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
@@ -147,7 +147,7 @@
 .btnSecundario:hover { border-color: var(--primary); color: var(--primary); }
 .btnSecundario:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-.btnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.btnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 
 /* ─── Simulador estrés ────────────────────────────── */
 .simuladorZona {
@@ -242,7 +242,7 @@
 }
 .filtroBtn:hover { border-color: var(--primary); color: var(--primary); }
 .filtroBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.filtroActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.filtroActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 
 .moduladoresGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .moduladoresColumna { display: flex; flex-direction: column; gap: var(--spacing-sm); }

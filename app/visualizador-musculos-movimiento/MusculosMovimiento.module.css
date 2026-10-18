@@ -18,8 +18,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -61,7 +61,7 @@
 .pasoItem:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .pasoItem:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .pasoActivo { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-.pasoNum { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+.pasoNum { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-boton); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
 .pasoIcono { font-size: 1.3rem; flex-shrink: 0; }
 .pasoTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.4; }
 .pasoDetalleTexto { font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.3rem; line-height: 1.4; }

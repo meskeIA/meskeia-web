@@ -132,8 +132,8 @@
 }
 
 .filtroActivo {
-  background: #2E86AB;
-  border-color: #2E86AB;
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -155,8 +155,8 @@
 }
 
 [data-theme='dark'] .filtroActivo {
-  background: #2E86AB;
-  border-color: #2E86AB;
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -745,7 +745,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   font-weight: 700;
   font-size: 0.9rem;

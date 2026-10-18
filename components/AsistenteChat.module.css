@@ -64,7 +64,7 @@
 }
 
 .mensajeUsuario .mensajeTexto {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   border-radius: 1rem 0.25rem 1rem 1rem;
 }
@@ -183,7 +183,7 @@
 
 .btnEnviar {
   padding: 0.875rem 1rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   border: none;
   border-radius: 0.875rem;

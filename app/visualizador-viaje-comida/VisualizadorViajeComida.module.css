@@ -90,7 +90,7 @@
   color: var(--text-secondary); transition: all 0.15s;
 }
 .vistaBtn:hover { border-color: var(--primary); }
-.vistaActiva { background: var(--primary); border-color: var(--primary); color: white; }
+.vistaActiva { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 
 /* Detalle etapa */
 .etapaDetalle {
@@ -132,7 +132,7 @@
   cursor: pointer; font-size: 0.85rem; color: var(--text-primary);
   transition: all 0.15s;
 }
-.etapaNavBtn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); }
+.etapaNavBtn:hover:not(:disabled) { background: var(--primary-boton); color: white; border-color: var(--primary-boton); }
 .etapaNavBtn:disabled { opacity: 0.3; cursor: not-allowed; }
 .etapaNavInfo { font-size: 0.82rem; color: var(--text-muted); }
 

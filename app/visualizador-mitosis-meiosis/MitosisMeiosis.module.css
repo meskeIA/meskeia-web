@@ -49,8 +49,8 @@
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .navBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -149,7 +149,8 @@
   position: absolute;
   bottom: 8%; left: 50%;
   transform: translateX(-50%);
-  background: rgba(46, 134, 171, 0.85);
+  /* Blanco sobre la marca translúcida quedaba por debajo de 4,11:1; --primary-boton sólido, 5,47:1 (C0070) */
+  background: var(--primary-boton);
   color: white;
   font-size: 0.7rem;
   padding: 2px 8px;
@@ -307,7 +308,7 @@
 }
 .flujoCelulaSmall {
   padding: 6px 14px;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   border-radius: 8px;
   font-weight: 700;

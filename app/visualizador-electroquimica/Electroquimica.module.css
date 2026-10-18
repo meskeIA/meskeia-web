@@ -18,8 +18,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -132,7 +132,7 @@
 .electroTab { flex: 1; padding: 0.5rem var(--spacing-md); background: var(--hover); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); transition: all 0.2s; }
 .electroTab:hover { border-color: var(--primary); color: var(--primary); }
 .electroTab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.electroTabActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.electroTabActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 
 .electrolisisSvgWrapper { width: 100%; overflow: hidden; border-radius: var(--radius); margin-bottom: var(--spacing-md); }
 .electrolisisSvg { width: 100%; height: auto; display: block; }
@@ -171,7 +171,7 @@
 .bateriaBtn { padding: 0.5rem 1.5rem; border: 2px solid var(--border); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 0.88rem; font-weight: 600; transition: all 0.2s; }
 .bateriaBtn:hover { border-color: var(--primary); }
 .bateriaBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.bateriaBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.bateriaBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 
 .bateriaSvgWrapper { width: 100%; overflow: hidden; border-radius: var(--radius); margin-bottom: var(--spacing-md); }
 .bateriaSvg { width: 100%; height: auto; display: block; }

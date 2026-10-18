@@ -151,8 +151,8 @@
 }
 
 .btnOpcionActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -175,7 +175,7 @@
   font-family: inherit;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -218,7 +218,7 @@
 }
 
 .btnSecundario:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
 }
 
@@ -243,7 +243,7 @@
   width: 5.5rem;
   height: 5.5rem;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 2.2rem;
   font-weight: 700;
@@ -274,7 +274,7 @@
 }
 
 .numeroCantado {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   font-weight: 700;
 }
@@ -362,9 +362,10 @@
   background: var(--hover);
 }
 
+/* Blanco sobre --accent (#7FB3D3) daba ~2,2:1; el acento es claro en todas las marcas y temas: texto oscuro (C0070) */
 .casillaLibre {
   background: var(--accent);
-  color: white;
+  color: #1A1A1A;
 }
 
 .pieHoja {

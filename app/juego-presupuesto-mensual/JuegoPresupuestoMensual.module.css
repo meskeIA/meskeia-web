@@ -47,7 +47,7 @@
 
 .resultadoHero { text-align: center; border-radius: var(--radius-large); padding: var(--spacing-xl); margin-bottom: var(--spacing-lg); }
 .resultadoHero[data-nota='A'] { background: linear-gradient(135deg, var(--success), #2ecc71); color: white; }
-.resultadoHero[data-nota='B'] { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+.resultadoHero[data-nota='B'] { background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; }
 .resultadoHero[data-nota='C'] { background: linear-gradient(135deg, var(--warning), #f39c12); color: white; }
 .resultadoHero[data-nota='D'] { background: linear-gradient(135deg, var(--danger), #c0392b); color: white; }
 
@@ -64,12 +64,12 @@
 .decisionItem { padding: 0.75rem 0; border-bottom: 1px solid rgba(229,229,229,0.4); }
 .decisionItem:last-child { border-bottom: none; }
 .decisionHeader { display: flex; gap: 0.75rem; align-items: flex-start; }
-.decisionNum { background: var(--primary); color: white; width: 1.6rem; height: 1.6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; margin-top: 0.1rem; }
+.decisionNum { background: var(--primary-boton); color: white; width: 1.6rem; height: 1.6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; margin-top: 0.1rem; }
 .decisionEvento { font-size: 0.85rem; color: var(--text-primary); margin: 0 0 0.15rem; font-weight: 600; }
 .decisionOpcion { font-size: 0.82rem; color: var(--text-secondary); margin: 0; }
 .decisionLeccion { font-size: 0.82rem; color: var(--primary); margin: 0.4rem 0 0 2.35rem; line-height: 1.4; font-style: italic; }
 
-.btn { display: block; width: 100%; max-width: 400px; margin: var(--spacing-md) auto 0; padding: 1rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.btn { display: block; width: 100%; max-width: 400px; margin: var(--spacing-md) auto 0; padding: 1rem; background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton)); color: white; border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
 .btn:hover { opacity: 0.9; }
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 

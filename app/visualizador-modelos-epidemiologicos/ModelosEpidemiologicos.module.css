@@ -39,8 +39,8 @@
 .tabBtn:hover { border-color: var(--primary); color: var(--primary); }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .tabBtnActivo {
-  border-color: var(--primary);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  border-color: var(--primary-boton);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
 }
 .tabBtnActivo:hover { color: white; }
@@ -110,7 +110,7 @@
 }
 .modoBtnBase:hover { border-color: var(--primary); color: var(--primary); }
 .modoBtnBase:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.modoBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.modoBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .modoBtnActivo:hover { color: white; }
 
 /* Highlight box R0 */
@@ -149,7 +149,7 @@
   background: transparent; cursor: pointer; font-size: 0.78rem; font-weight: 600;
   color: var(--primary); transition: all 0.2s;
 }
-.btnSeleccionar:hover { background: var(--primary); color: white; }
+.btnSeleccionar:hover { background: var(--primary-boton); color: white; }
 .btnSeleccionar:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* Zona SEIR - info periodo incubación */

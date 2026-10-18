@@ -70,9 +70,9 @@
 }
 
 .tabBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
   font-weight: 700;
 }
 
@@ -191,7 +191,7 @@
 .detalleCategoria {
   display: inline-block;
   padding: 0.2rem 0.7rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 20px;
   font-size: 0.78rem;
@@ -400,7 +400,7 @@
 
 .btnAnterior:hover:not(:disabled),
 .btnSiguiente:hover:not(:disabled) {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -651,7 +651,7 @@
 }
 
 [data-theme='dark'] .tabBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
 }
 
@@ -888,7 +888,7 @@
   justify-content: center;
   min-width: 2rem;
   height: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   font-size: 0.88rem;

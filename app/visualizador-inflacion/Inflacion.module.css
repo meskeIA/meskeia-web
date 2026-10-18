@@ -41,8 +41,8 @@
 }
 .tab:hover { border-color: var(--primary); color: var(--primary); }
 .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.tabActive { border-color: var(--primary); background: var(--primary); color: white; }
-.tabActive:hover { background: var(--primary); color: white; }
+.tabActive { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.tabActive:hover { background: var(--primary-boton); color: white; }
 .tabIcon { font-size: 1.5rem; }
 .tabTitulo { font-size: 0.82rem; font-weight: 700; text-align: center; }
 .tabSub { font-size: 0.72rem; text-align: center; opacity: 0.8; }
@@ -167,7 +167,7 @@
   border-radius: var(--radius); padding: var(--spacing-lg);
 }
 .sesgoNum {
-  width: 28px; height: 28px; background: var(--primary); color: white;
+  width: 28px; height: 28px; background: var(--primary-boton); color: white;
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
   font-size: 0.85rem; font-weight: 700; flex-shrink: 0;
 }

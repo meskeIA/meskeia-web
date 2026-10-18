@@ -87,7 +87,7 @@
 }
 
 .unitBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -237,9 +237,9 @@
 }
 
 .notableBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* ============================================
@@ -494,9 +494,9 @@
 }
 
 .velBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* ============================================
@@ -635,7 +635,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -772,9 +772,9 @@
 }
 
 [data-theme='dark'] .notableBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 [data-theme='dark'] .velBtn {
@@ -784,7 +784,7 @@
 }
 
 [data-theme='dark'] .velBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -927,7 +927,7 @@
 }
 
 .aulaTabActiva {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #FFFFFF;
 }
 
@@ -1003,8 +1003,8 @@
 }
 
 .aulaNumeroActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #FFFFFF;
 }
 
@@ -1044,7 +1044,7 @@
   height: 34px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #FFFFFF;
   font-weight: 700;
   font-size: 0.95rem;
@@ -1157,9 +1157,9 @@
 }
 
 .aulaBtnPrimario {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #FFFFFF;
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-boton);
 }
 
 .aulaBtnPrimario:hover {
@@ -1287,8 +1287,8 @@
 }
 
 [data-theme='dark'] .aulaNumeroActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #FFFFFF;
 }
 

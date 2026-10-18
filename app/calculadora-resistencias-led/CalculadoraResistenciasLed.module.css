@@ -87,7 +87,7 @@
 }
 
 .tabActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -149,7 +149,7 @@
 }
 
 .modoBtnActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -356,9 +356,9 @@
 }
 
 .presetBtn:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Resultado LED */
@@ -588,7 +588,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-weight: 700;
   font-size: 0.9rem;

@@ -17,8 +17,8 @@
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -62,7 +62,7 @@
 /* Urgencias flujo - Sección 3 */
 .flujoUrgencias { display: flex; flex-direction: column; gap: 0; margin-bottom: var(--spacing-lg); }
 .flujoUrgenciaItem { display: flex; gap: var(--spacing-md); align-items: flex-start; padding: var(--spacing-md) 0; border-left: 3px solid var(--primary); margin-left: var(--spacing-md); padding-left: var(--spacing-lg); position: relative; }
-.flujoUrgenciaNum { position: absolute; left: -14px; top: var(--spacing-md); width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+.flujoUrgenciaNum { position: absolute; left: -14px; top: var(--spacing-md); width: 26px; height: 26px; border-radius: 50%; background: var(--primary-boton); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
 .flujoUrgenciaContenido { flex: 1; }
 .flujoUrgenciaHeader { display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: 0.3rem; font-size: 0.95rem; color: var(--text-primary); }
 .flujoUrgenciaTexto { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }

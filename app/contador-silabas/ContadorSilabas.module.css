@@ -125,7 +125,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -349,7 +349,7 @@
 }
 
 .silaba {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   padding: 4px 8px;
   border-radius: 4px;
@@ -441,7 +441,7 @@
 }
 
 [data-theme='dark'] .silaba {
-  background: #48A9A6;
+  background: var(--secondary-boton);
 }
 
 [data-theme='dark'] .metricaBloque {
@@ -637,7 +637,7 @@
   align-items: flex-start;
 }
 .eduPasoNum {
-  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   width: 32px;
   height: 32px;
@@ -732,8 +732,8 @@
 }
 
 .ejemploBtnActivo {
-  background: #2E86AB;
-  border-color: #2E86AB;
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 .ejemploBtnActivo:hover {
@@ -941,12 +941,12 @@
   border-radius: 6px;
   font-weight: 700;
   font-size: 0.85rem;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #fff;
 }
 
 /* Cada rima, un color: se distinguen de un vistazo sin leer la letra */
-.rimaLetra[data-letra='B'] { background: #48A9A6; }
+.rimaLetra[data-letra='B'] { background: var(--secondary-boton); }
 .rimaLetra[data-letra='C'] { background: #B5548A; }
 .rimaLetra[data-letra='D'] { background: #E67E22; }
 .rimaLetra[data-letra='E'] { background: #7D5BA6; }
@@ -1015,7 +1015,7 @@
 }
 
 [data-theme='dark'] .ejemploBtnActivo {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #fff;
 }
 

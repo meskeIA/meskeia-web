@@ -320,7 +320,7 @@
 }
 
 .funcionBtnActivo {
-  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   border-color: transparent;
   color: #ffffff;
   box-shadow: 0 3px 10px rgba(46, 134, 171, 0.3);
@@ -378,7 +378,7 @@
 }
 
 .sinapsisTabActivo {
-  background: linear-gradient(135deg, #2E86AB, #48A9A6);
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   border-color: transparent;
   color: #ffffff;
 }

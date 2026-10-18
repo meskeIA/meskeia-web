@@ -266,7 +266,7 @@
 .lineaNumero {
   width: 28px;
   height: 28px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -438,7 +438,7 @@
 }
 
 .btnGenerar {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -747,7 +747,7 @@
   font-weight: 500;
   border: none;
   border-radius: 8px;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
 }
@@ -1330,7 +1330,7 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   display: flex;
   align-items: center;

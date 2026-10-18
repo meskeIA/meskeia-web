@@ -84,7 +84,7 @@
 /* ===== BOTONES ===== */
 
 .btnPrimario {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 10px;
@@ -97,7 +97,7 @@
 }
 
 .btnPrimario:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   transform: translateY(-1px);
 }
 
@@ -262,7 +262,7 @@
 }
 
 .btnSiguiente {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 8px;
@@ -274,7 +274,7 @@
 }
 
 .btnSiguiente:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .btnSiguiente:focus-visible {
@@ -499,7 +499,7 @@
 }
 
 .btnReiniciar:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -629,7 +629,7 @@
   width: 32px;
   height: 32px;
   min-width: 32px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-weight: 700;
@@ -807,7 +807,7 @@
 }
 
 [data-theme='dark'] .btnReiniciar:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 /* ===== RESPONSIVE ===== */

@@ -310,8 +310,8 @@
 }
 
 .botonSentidoActivo {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -949,7 +949,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #FFFFFF;
   font-weight: 700;
   font-size: 0.95rem;
@@ -1040,9 +1040,9 @@
 }
 
 .aulaBtnPrimario {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #FFFFFF;
-  border: 2px solid var(--primary);
+  border: 2px solid var(--primary-boton);
 }
 
 .aulaBtnPrimario:hover {

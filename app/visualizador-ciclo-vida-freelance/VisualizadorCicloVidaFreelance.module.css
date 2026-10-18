@@ -43,7 +43,7 @@
 .faseCard:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
 
 .faseCardHeader { display: flex; align-items: center; gap: var(--spacing-sm); flex: 1; }
-.faseNumero { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.faseNumero { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-boton); color: white; font-size: 0.78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .faseIcono { font-size: 1.3rem; flex-shrink: 0; }
 .faseNombre { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
 .faseDias { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; }

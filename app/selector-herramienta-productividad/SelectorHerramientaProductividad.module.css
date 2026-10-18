@@ -169,7 +169,7 @@
 }
 
 .btnSiguiente {
-  background-color: var(--primary);
+  background-color: var(--primary-boton);
   color: #ffffff;
   margin-left: auto;
 }
@@ -184,7 +184,7 @@
 }
 
 .btnResultado {
-  background-color: var(--secondary);
+  background-color: var(--secondary-boton);
   color: #ffffff;
   margin-left: auto;
 }
@@ -333,7 +333,7 @@
   min-width: 1.6rem;
   height: 1.6rem;
   border-radius: 50%;
-  background-color: var(--primary);
+  background-color: var(--primary-boton);
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: 700;

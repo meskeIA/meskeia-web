@@ -124,7 +124,7 @@
 
 .ctrlBtn {
   padding: 10px 16px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 6px;
@@ -291,7 +291,7 @@
 
 .hiloBtn {
   padding: 8px 12px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: 6px;
@@ -633,7 +633,7 @@
   width: 2.5rem;
   height: 2.5rem;
   min-width: 2.5rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -665,7 +665,7 @@
 }
 
 [data-theme='dark'] .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 .tipsGrid {

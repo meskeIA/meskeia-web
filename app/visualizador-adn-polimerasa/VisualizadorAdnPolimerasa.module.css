@@ -139,7 +139,7 @@
   width: 28px;
   height: 28px;
   min-width: 28px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.85rem;
@@ -162,7 +162,7 @@
 }
 
 .btnPaso {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   padding: 0.55rem 1.25rem;
@@ -174,7 +174,7 @@
 }
 
 .btnPaso:hover:not(:disabled) {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .btnPaso:disabled {
@@ -387,7 +387,7 @@
 }
 
 .resultadoPCR {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   border-radius: 12px;
   padding: 1.5rem;

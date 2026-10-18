@@ -20,7 +20,7 @@
 .tabBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-lg); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-large); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); font-size: 1rem; font-weight: 600; }
 .tabBtn:hover { border-color: var(--primary); color: var(--primary); }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.tabBtnActivo { border-color: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; }
+.tabBtnActivo { border-color: var(--primary-boton); background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%); color: white; }
 .tabBtnActivo:hover { color: white; }
 .tabBtnSub { font-size: 0.72rem; font-weight: 400; opacity: 0.85; }
 

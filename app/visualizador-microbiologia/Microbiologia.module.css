@@ -37,8 +37,8 @@
 }
 .tab:hover { border-color: var(--primary); color: var(--primary); }
 .tab:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.tabActive { border-color: var(--primary); background: var(--primary); color: white; }
-.tabActive:hover { background: var(--primary); color: white; }
+.tabActive { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.tabActive:hover { background: var(--primary-boton); color: white; }
 
 /* Cabeceras de sección */
 .seccionTitulo { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.3rem; }
@@ -158,8 +158,8 @@
 }
 .procesoBtn:hover { border-color: var(--primary); color: var(--primary); }
 .procesoBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.procesoBtnActive { border-color: var(--primary); background: var(--primary); color: white; }
-.procesoBtnActive:hover { background: var(--primary); color: white; }
+.procesoBtnActive { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.procesoBtnActive:hover { background: var(--primary-boton); color: white; }
 
 .procesoInfo {
   background: var(--bg-card); border: 1px solid var(--border);
@@ -440,7 +440,7 @@
   justify-content: center;
   min-width: 2rem;
   height: 2rem;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.9rem;

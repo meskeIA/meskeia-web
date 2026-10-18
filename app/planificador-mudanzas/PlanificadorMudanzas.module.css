@@ -132,12 +132,12 @@
 }
 
 .tabActiva {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
 .tabActiva:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -238,8 +238,8 @@
 }
 
 .filtroBtn.activo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -310,7 +310,7 @@
   padding: var(--spacing-md) var(--spacing-xl);
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 1rem;
   font-weight: 600;
@@ -430,7 +430,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-lg);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-size: 1.1rem;
   font-weight: 600;
@@ -495,8 +495,8 @@
 }
 
 .tareaItem.completada .checkBtn {
-  background: var(--secondary);
-  border-color: var(--secondary);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: white;
 }
 
@@ -765,7 +765,7 @@
   padding: var(--spacing-md) var(--spacing-xl);
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 1rem;
   font-weight: 500;
@@ -861,7 +861,7 @@
   padding: var(--spacing-sm);
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.9rem;
   cursor: pointer;
@@ -927,7 +927,7 @@
 }
 
 [data-theme='dark'] .filtroBtn.activo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -1322,7 +1322,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   display: flex;
   align-items: center;

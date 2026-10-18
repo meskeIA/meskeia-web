@@ -203,8 +203,8 @@
 }
 
 .btnAgregar:hover {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -342,7 +342,7 @@
 
 /* Días info */
 .diasInfo {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: var(--radius);
   padding: var(--spacing-md);
   color: white;
@@ -586,7 +586,7 @@
 
 .escenarioTip {
   display: inline-block;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: 20px;
@@ -664,7 +664,7 @@
   justify-content: center;
   min-width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border-radius: 50%;
   font-weight: 700;

@@ -151,7 +151,7 @@
 }
 
 .categoriaTag {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   padding: 8px 16px;
   border-radius: 20px;
@@ -172,7 +172,7 @@
 
 .ctaButton {
   display: inline-block;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   padding: 15px 40px;
   border-radius: 8px;

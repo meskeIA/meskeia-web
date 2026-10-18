@@ -114,8 +114,8 @@
 }
 
 .botonActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -145,7 +145,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   cursor: pointer;
 }
@@ -231,8 +231,8 @@
 }
 
 .teclaResaltada {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 

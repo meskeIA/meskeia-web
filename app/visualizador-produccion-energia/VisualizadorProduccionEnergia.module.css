@@ -17,8 +17,8 @@
 .navSecciones { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -43,7 +43,7 @@
 .fuenteDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: var(--spacing-md); }
 .fuentePasos { display: flex; flex-direction: column; gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
 .fuentePaso { display: flex; align-items: flex-start; gap: var(--spacing-sm); background: var(--hover); border-radius: 8px; padding: var(--spacing-sm) var(--spacing-md); }
-.fuentePasoNum { width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: white; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.fuentePasoNum { width: 24px; height: 24px; border-radius: 50%; background: var(--primary-boton); color: white; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .fuentePasoTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.4; }
 .fuenteDatos { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); }
 .fuenteDato { text-align: center; padding: var(--spacing-sm); background: var(--bg-primary); border-radius: 8px; }

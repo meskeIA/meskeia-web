@@ -133,7 +133,7 @@
 }
 
 .btnActual:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -307,7 +307,7 @@
 
 /* Reloj Panel */
 .relojPanel {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-radius: 12px;
   padding: 20px;
   color: white;
@@ -778,7 +778,7 @@
 .eduStepNumber {
   min-width: 36px;
   height: 36px;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;

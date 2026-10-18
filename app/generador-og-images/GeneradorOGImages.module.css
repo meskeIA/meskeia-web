@@ -110,12 +110,12 @@
 }
 
 .tabActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
 .tabActive:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -255,9 +255,9 @@
 }
 
 .bgTypeBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Gradients Grid */
@@ -321,9 +321,9 @@
 }
 
 .badgePreset:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Emoji Grid */
@@ -359,7 +359,7 @@
 .exportBtn {
   width: 100%;
   padding: var(--spacing-md) var(--spacing-lg);
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border: none;
   border-radius: var(--radius);
   color: white;
@@ -850,7 +850,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-weight: 700;
   font-size: 1rem;

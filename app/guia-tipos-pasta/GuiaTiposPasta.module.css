@@ -102,8 +102,8 @@
 }
 
 .filtroBtnActivo {
-  background: var(--primary, #2e86ab);
-  border-color: var(--primary, #2e86ab);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
@@ -144,7 +144,7 @@
 }
 
 .limpiarBtn:hover {
-  background: var(--secondary, #48a9a6);
+  background: var(--secondary-boton);
   color: #fff;
 }
 
@@ -579,7 +579,7 @@
 }
 
 [data-theme='dark'] .filtroBtnActivo {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: #fff;
 }
 

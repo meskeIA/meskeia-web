@@ -60,7 +60,7 @@
 }
 
 .changelogButton:hover {
-  background: var(--primary, #2e86ab);
+  background: var(--primary-boton);
   color: white;
 }
 

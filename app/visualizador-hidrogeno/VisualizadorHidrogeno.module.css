@@ -204,7 +204,7 @@
 .fusionStepNum {
   width: 24px;
   height: 24px;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -485,14 +485,14 @@
 }
 
 .toggleActivo {
-  background: var(--primary, #2E86AB);
-  border-color: var(--primary, #2E86AB);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #fff;
 }
 
 [data-theme='dark'] .toggleActivo {
-  background: var(--primary, #2E86AB);
-  border-color: var(--primary, #2E86AB);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
 }
 
 .densityChart {

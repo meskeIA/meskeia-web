@@ -142,8 +142,8 @@
 }
 
 .chipActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
   font-weight: 600;
 }
@@ -186,8 +186,8 @@
 }
 
 .btnOpcionActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
@@ -209,7 +209,7 @@
   font-family: inherit;
   border: none;
   border-radius: var(--radius);
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -247,7 +247,7 @@
 }
 
 .btnSecundario:hover {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
 }
 

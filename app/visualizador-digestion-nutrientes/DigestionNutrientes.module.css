@@ -39,7 +39,7 @@
 }
 .tabBtn:hover { border-color: var(--primary); color: var(--primary); }
 .tabBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.tabActivo { background: var(--primary); border-color: var(--primary); color: white; }
+.tabActivo { background: var(--primary-boton); border-color: var(--primary-boton); color: white; }
 
 /* Sección genérica */
 .seccion { margin-bottom: var(--spacing-xl); }
@@ -184,7 +184,7 @@
 .pasoNum {
   display: flex; align-items: center; justify-content: center;
   width: 26px; height: 26px; min-width: 26px;
-  background: var(--primary); color: white;
+  background: var(--primary-boton); color: white;
   border-radius: 50%; font-size: 0.75rem; font-weight: 700;
 }
 .pasoIcono { font-size: 1.5rem; flex-shrink: 0; }

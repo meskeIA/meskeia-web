@@ -30,7 +30,7 @@
 .equivalencias { margin-bottom: var(--spacing-xl); }
 .equivGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); }
 .equivCard { display: flex; gap: var(--spacing-sm); align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: var(--spacing-md); }
-.equivNum { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--primary); color: white; border-radius: 50%; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+.equivNum { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: var(--primary-boton); color: white; border-radius: 50%; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
 .equivTexto { font-size: 0.88rem; color: var(--text-primary); line-height: 1.4; margin: 0; }
 
 .datosGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }

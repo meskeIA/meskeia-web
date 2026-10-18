@@ -61,12 +61,12 @@
 }
 
 .tabActiva {
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
 }
 
 .tabActiva:hover {
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
 }
 
@@ -122,7 +122,7 @@
 }
 
 .mascotaBtn.active {
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-color: transparent;
   color: white;
 }
@@ -248,7 +248,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -511,7 +511,7 @@
 }
 
 .filtroBtn.activo {
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   border-color: transparent;
   color: white;
 }
@@ -575,8 +575,8 @@
 
 .checklistItem.completado .checkbox,
 .compraItem.comprado .checkbox {
-  background: #48A9A6;
-  border-color: #48A9A6;
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: white;
 }
 
@@ -677,7 +677,7 @@
 .vacunaEdad {
   min-width: 100px;
   padding: 6px 12px;
-  background: linear-gradient(135deg, #2E86AB 0%, #48A9A6 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-size: 0.85rem;
   font-weight: 600;
@@ -1278,7 +1278,7 @@
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   border-radius: 50%;
   display: flex;

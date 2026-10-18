@@ -406,7 +406,7 @@
 
 /* ─── Botones ─── */
 .btnPrimario {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #fff;
   border: none;
   padding: 0.65rem 1.5rem;
@@ -493,7 +493,7 @@
 }
 
 .toggleBtnActivo {
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: #fff;
 }
 

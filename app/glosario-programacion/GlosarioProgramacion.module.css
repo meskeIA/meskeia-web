@@ -134,9 +134,9 @@
 }
 
 .letraActiva {
-  background: var(--primary) !important;
+  background: var(--primary-boton) !important;
   color: white !important;
-  border-color: var(--primary) !important;
+  border-color: var(--primary-boton) !important;
 }
 
 .letraDisabled {
@@ -180,9 +180,9 @@
 }
 
 .categoriaActiva {
-  background: var(--secondary) !important;
+  background: var(--secondary-boton) !important;
   color: white !important;
-  border-color: var(--secondary) !important;
+  border-color: var(--secondary-boton) !important;
 }
 
 /* Info de resultados */
@@ -344,7 +344,7 @@
 }
 
 .relacionadoLink {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -371,7 +371,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius);
@@ -411,7 +411,7 @@
 }
 
 .btnSecondary:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -657,7 +657,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--primary-boton) 0%, var(--secondary-boton) 100%);
   color: white;
   font-size: 1.1rem;
   font-weight: 700;

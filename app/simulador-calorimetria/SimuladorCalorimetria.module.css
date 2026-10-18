@@ -62,8 +62,8 @@
 }
 
 .modoBtnActivo {
-  border-color: var(--primary);
-  background: var(--primary);
+  border-color: var(--primary-boton);
+  background: var(--primary-boton);
   color: #ffffff;
 }
 
@@ -173,7 +173,7 @@
 }
 
 .valueBadge {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: #ffffff;
   border-radius: 999px;
   padding: 0.1rem 0.6rem;
@@ -598,7 +598,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 28px;
   height: 28px;
@@ -738,8 +738,8 @@
 }
 
 [data-theme='dark'] .modoBtnActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: #ffffff;
 }
 

@@ -162,7 +162,7 @@
 }
 
 .calcBtn {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border: none;
   padding: 0.7rem 1.6rem;
@@ -178,7 +178,7 @@
 }
 
 .calcBtnSecondary {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   border: none;
   padding: 0.7rem 1.6rem;
@@ -236,9 +236,9 @@
 }
 
 .presetActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 /* Frontera selector */
@@ -268,9 +268,9 @@
 }
 
 .fronteraActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .modoControl {
@@ -299,16 +299,16 @@
 }
 
 .modoActive {
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
-  border-color: var(--secondary);
+  border-color: var(--secondary-boton);
 }
 
 .armonicoBadge {
   display: inline-block;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
-  background: var(--secondary);
+  background: var(--secondary-boton);
   color: white;
   font-size: 0.75rem;
   font-weight: 700;
@@ -600,7 +600,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 28px;
   height: 28px;

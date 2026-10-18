@@ -264,7 +264,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -701,7 +701,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: #2E86AB;
+  background: var(--primary-boton);
   color: white;
   font-weight: 700;
   font-size: 0.95rem;

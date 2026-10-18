@@ -643,7 +643,7 @@
   height: 28px;
   min-width: 28px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.8rem;
   font-weight: 800;

@@ -185,7 +185,7 @@
   font-weight: 600;
   border: none;
   border-radius: 10px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
@@ -232,9 +232,9 @@
 }
 
 .filtroBtn.activo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .checkboxLabel {
@@ -364,8 +364,8 @@
 }
 
 .itemRow.completado .checkBtn {
-  background: var(--secondary);
-  border-color: var(--secondary);
+  background: var(--secondary-boton);
+  border-color: var(--secondary-boton);
   color: white;
 }
 
@@ -426,7 +426,7 @@
 }
 
 .btnAccion:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -532,7 +532,7 @@
   font-weight: 500;
   border: none;
   border-radius: 6px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   cursor: pointer;
   transition: background 0.2s;
@@ -810,7 +810,7 @@
   height: 34px;
   min-width: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   font-weight: 700;
   font-size: 0.9rem;

@@ -68,9 +68,9 @@
 }
 
 .reactionBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .reactionIcon {
@@ -471,7 +471,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -573,7 +573,7 @@
 }
 
 [data-theme='dark'] .reactionBtnActive {
-  background: var(--primary);
+  background: var(--primary-boton);
 }
 
 [data-theme='dark'] .descriptionCard {

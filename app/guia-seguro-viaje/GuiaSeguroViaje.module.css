@@ -652,7 +652,7 @@
   flex-shrink: 0;
   width: 32px;
   height: 32px;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   border-radius: 50%;
   font-size: 0.85rem;

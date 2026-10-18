@@ -515,7 +515,7 @@
 }
 
 .stepNumber {
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   font-weight: 800;
   font-size: 0.95rem;

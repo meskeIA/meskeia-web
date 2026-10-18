@@ -97,13 +97,13 @@
 }
 
 .filtroActivo {
-  background: var(--primary);
-  border-color: var(--primary);
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
   color: white;
 }
 
 .filtroActivo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -472,7 +472,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.85rem;
   font-weight: 700;

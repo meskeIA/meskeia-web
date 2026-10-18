@@ -80,9 +80,9 @@
 }
 
 .filtroActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 .contador {
@@ -475,7 +475,7 @@
 .stepNumber {
   min-width: 2rem;
   height: 2rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: white;
   border-radius: 50%;
   display: flex;
@@ -595,9 +595,9 @@
 }
 
 [data-theme='dark'] .filtroActivo {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
-  border-color: var(--primary);
+  border-color: var(--primary-boton);
 }
 
 [data-theme='dark'] .familiaDigestiva {

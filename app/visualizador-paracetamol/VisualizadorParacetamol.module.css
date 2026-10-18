@@ -134,7 +134,7 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary, #2E86AB), var(--secondary, #48A9A6));
+  background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));
   color: #fff;
   font-size: 0.85rem;
   font-weight: 800;
@@ -217,7 +217,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--primary, #2E86AB);
+  background: var(--primary-boton);
   color: #fff;
   font-size: 0.8rem;
   font-weight: 800;

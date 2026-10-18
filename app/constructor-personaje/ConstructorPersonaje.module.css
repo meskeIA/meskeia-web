@@ -58,7 +58,7 @@
 }
 
 .btnEjemplo:hover {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
 }
 
@@ -445,7 +445,7 @@
 }
 
 .stepNumber {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   width: 32px;
   height: 32px;

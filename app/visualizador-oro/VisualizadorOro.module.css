@@ -171,7 +171,7 @@
 }
 
 .electronDestacado {
-  background: var(--primary);
+  background: var(--primary-boton);
   color: white;
   font-size: 0.6rem;
   padding: 2px 5px;

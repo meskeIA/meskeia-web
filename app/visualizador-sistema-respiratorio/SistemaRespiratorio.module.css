@@ -18,8 +18,8 @@
 .navBtn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: var(--spacing-md) var(--spacing-sm); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all 0.2s; color: var(--text-secondary); }
 .navBtn:hover { border-color: var(--primary); color: var(--primary); }
 .navBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.navActivo { border-color: var(--primary); background: var(--primary); color: white; }
-.navActivo:hover { background: var(--primary); color: white; }
+.navActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
+.navActivo:hover { background: var(--primary-boton); color: white; }
 .navIcono { font-size: 1.6rem; }
 .navTexto { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
@@ -80,7 +80,7 @@
 .mecanicaBtn { padding: var(--spacing-md); background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); cursor: pointer; font-weight: 600; font-size: 0.95rem; color: var(--text-secondary); transition: all 0.2s; }
 .mecanicaBtn:hover { border-color: var(--primary); color: var(--primary); }
 .mecanicaBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.mecanicaBtnActivo { border-color: var(--primary); background: var(--primary); color: white; }
+.mecanicaBtnActivo { border-color: var(--primary-boton); background: var(--primary-boton); color: white; }
 .mecanicaDetalle { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
 .mecanicaDesc { color: var(--text-primary); line-height: 1.6; margin-bottom: var(--spacing-md); }
 .mecanicaGrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-sm); }
