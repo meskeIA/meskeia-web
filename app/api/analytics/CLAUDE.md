@@ -70,6 +70,12 @@ Umbral canónico, alineado con el digest: **app activa = ≥5 usos/30d** (⚠️
   propias) y 17 `referral-ia` desde meskeia.com. Desde el corte pasan a `web`. **Si el canal
   social cae alrededor de un tercio, o el foso un poco, es esto.** Padlet deja de verse:
   el canal de aula no se instrumenta por decisión previa (`project_canal_aula_stem`).
+- **`utm_source` de IA sin referrer — 18/10/2026, efectivo desde el push de ese lote**
+  (commit `12c9f153`, `lib/clasificarReferrer.ts`, cabo C0282): sin Referer, un `utm_source`
+  que sea un dominio de `DOMINIOS_IA` (ChatGPT marca sus enlaces con `?utm_source=chatgpt.com`)
+  entra como `referral-ia`, y `datos_adicionales` lleva `utm_source` y `canal_por: 'utm'`.
+  **Si el canal IA sube alrededor de esa fecha, es esto**: para comparar con lo anterior,
+  descontar las filas con `canal_por = 'utm'`.
 
 ## Al tocar el dashboard o el rollup
 
