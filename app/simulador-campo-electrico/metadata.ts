@@ -46,6 +46,15 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['campo eléctrico', 'electrostática', 'Coulomb', 'física bachillerato'],
 });
 
+/**
+ * La pregunta de las equipotenciales, que se lee en el FAQPage de abajo y en la FAQ visible de
+ * page.tsx. Iban escritas dos veces con dos respuestas (hallazgo 3351): una sola constante para
+ * que no envejezcan por separado (CLAUDE.md §1.ter).
+ */
+export const PREGUNTA_EQUIPOTENCIALES = '¿Qué son las superficies equipotenciales?';
+export const RESPUESTA_EQUIPOTENCIALES =
+  'Las superficies equipotenciales son el conjunto de puntos donde el potencial eléctrico V tiene el mismo valor; en el plano del simulador se ven como curvas. Son siempre perpendiculares a las líneas de campo. Mover una carga a lo largo de una equipotencial no requiere trabajo (ΔW = 0), ya que el potencial no varía. Para una carga puntual son esferas concéntricas (circunferencias en el plano); para un dipolo tienen una geometría más compleja, que el simulador muestra de forma interactiva.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -68,10 +77,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué son las superficies equipotenciales?',
+      name: PREGUNTA_EQUIPOTENCIALES,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las superficies equipotenciales son el conjunto de puntos donde el potencial eléctrico V tiene el mismo valor. Son siempre perpendiculares a las líneas de campo. Mover una carga a lo largo de una equipotencial no requiere trabajo (ΔW = 0), ya que el potencial no varía. Para una carga puntual, las equipotenciales son esferas concéntricas; para un dipolo, tienen una geometría más compleja que el simulador muestra de forma interactiva.',
+        text: RESPUESTA_EQUIPOTENCIALES,
       },
     },
     {

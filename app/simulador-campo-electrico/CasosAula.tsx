@@ -69,7 +69,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
     // signo menos; parseSpanishNumber devuelve NaN con cualquier otra cosa, y de ese NaN se
     // encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     const valor = parseSpanishNumber(respuesta.replace(/[−–]/g, '-'));
-    const r = comprobarRespuesta(valor, esperado);
+    const r = comprobarRespuesta(valor, esperado, datos.magnitud);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 

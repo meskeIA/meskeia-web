@@ -10,7 +10,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import styles from './SimuladorCampoElectrico.module.css';
 import { CARACTERES_COORDENADA, alCentimetro, leerCoordenada, textoCoordenada } from './coordenada';
 import {
@@ -23,6 +23,7 @@ import {
   type CargaPuntual,
 } from './motor';
 import CasosAula from './CasosAula';
+import { PREGUNTA_EQUIPOTENCIALES, RESPUESTA_EQUIPOTENCIALES } from './metadata';
 
 // ============================================================
 // Tipos
@@ -52,6 +53,8 @@ const SVG_HEIGHT = 500;
 const ORIGIN_X = SVG_WIDTH / 2;
 const ORIGIN_Y = SVG_HEIGHT / 2;
 const SCALE = 100; // 1 metro = 100 px
+/** Diámetro mínimo de una diana en pantalla: los 24 px de WCAG 2.5.8, con 2 de margen para el redondeo. */
+const DIANA_MINIMA_PX = 26;
 
 // Conversores mundo <-> SVG
 /** Mitad del lienzo en metros: 800 px / 2 / 100 px·m⁻¹ = 4,00 m · 500 / 2 / 100 = 2,50 m */
@@ -417,6 +420,31 @@ export default function SimuladorCampoElectrico() {
 
   const svgRef = useRef<SVGSVGElement | null>(null);
 
+  /**
+   * Píxeles de pantalla por unidad del viewBox. Lo necesitan las dianas táctiles (hallazgo 3348,
+   * cabo C0067): el lienzo se dibuja a escala y en un móvil de 390 px una carga de 5 nC (r = 17)
+   * medía 13 px y su ✕, 7 px, por debajo de los 24 × 24 px de WCAG 2.2, criterio 2.5.8 (AA).
+   * Moverla solo se puede arrastrándola, así que no hay control equivalente que lo salve. El
+   * dibujo no cambia: encima va un círculo transparente que mide al menos DIANA_MINIMA_PX.
+   * Empieza en 1 (el servidor no mide), y con eso la diana es el propio círculo.
+   */
+  const [pxPorUnidad, setPxPorUnidad] = useState(1);
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const medir = () => {
+      const escala = svg.getScreenCTM()?.a ?? svg.getBoundingClientRect().width / SVG_WIDTH;
+      if (escala > 0) setPxPorUnidad(escala);
+    };
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(svg);
+    return () => observador.disconnect();
+  }, []);
+  /** Radio de la diana: el del dibujo, o el que llegue a DIANA_MINIMA_PX de diámetro en pantalla. */
+  const radioDiana = (radioDibujo: number): number =>
+    Math.max(radioDibujo, DIANA_MINIMA_PX / 2 / pxPorUnidad);
+
   // ----- Conversión coordenadas pointer → SVG → mundo -----
   const pointerASvg = useCallback((clientX: number, clientY: number): Punto | null => {
     const svg = svgRef.current;
@@ -739,8 +767,11 @@ export default function SimuladorCampoElectrico() {
     if (abs >= 1e6 || abs < 1e-3) {
       let exp = Math.floor(Math.log10(abs));
       let mant = n / Math.pow(10, exp);
-      // Si el redondeo a `decimales` eleva la mantisa a 10, normalizar (ej. 9,995 → 10,00 × 10^n se convierte en 1,00 × 10^(n+1))
-      if (Math.abs(Number(mant.toFixed(decimales))) >= 10) {
+      // Si el redondeo a `decimales` eleva la mantisa a 10, normalizar (ej. 9,995 → 10,00 × 10^n
+      // se convierte en 1,00 × 10^(n+1)). Se decide sobre la cifra YA ESCRITA: toFixed redondea
+      // el double exacto (9,99499999…) y formatNumber su forma corta (9,995), y en la mitad
+      // exacta discrepaban: salía «10,00 × 10⁻⁸ J» (hallazgo 3349).
+      if (parseSpanishNumber(formatNumber(Math.abs(mant), decimales)) >= 10) {
         mant /= 10;
         exp += 1;
       }
@@ -1019,24 +1050,37 @@ export default function SimuladorCampoElectrico() {
                   const claseColor = c.q >= 0 ? styles.cargaPos : styles.cargaNeg;
                   return (
                     <g key={c.id}>
+                      {/* El dibujo, sin eventos: los recibe la diana de encima (hallazgo 3348). */}
                       <circle
                         cx={c.svg.x}
                         cy={c.svg.y}
                         r={radio}
-                        className={`${styles.cargaCircle} ${claseColor}`}
-                        data-tipo="carga"
-                        onPointerDown={(e) => handleCargaPointerDown(e, c.id)}
+                        className={`${styles.cargaDibujo} ${claseColor}`}
                       />
                       <text x={c.svg.x} y={c.svg.y} className={styles.cargaLabel}>
                         {c.q >= 0 ? '+' : '−'}
                         {formatNumber(Math.abs(c.q), 1)}
                       </text>
+                      <circle
+                        cx={c.svg.x}
+                        cy={c.svg.y}
+                        r={radioDiana(radio)}
+                        className={`${styles.cargaCircle} ${styles.diana}`}
+                        data-tipo="carga"
+                        onPointerDown={(e) => handleCargaPointerDown(e, c.id)}
+                      />
                       {modo === 'delete' && (
                         <g
                           data-tipo="remove"
                           onClick={(e) => handleEliminar(e, c.id)}
                           style={{ cursor: 'pointer' }}
                         >
+                          <circle
+                            cx={c.svg.x + radio + 4}
+                            cy={c.svg.y - radio - 4}
+                            r={radioDiana(9)}
+                            className={styles.diana}
+                          />
                           <circle
                             cx={c.svg.x + radio + 4}
                             cy={c.svg.y - radio - 4}
@@ -1343,12 +1387,8 @@ export default function SimuladorCampoElectrico() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <strong>¿Qué son las equipotenciales?</strong>
-              <p>
-                Son curvas (superficies en 3D) donde el potencial V tiene el mismo valor. Mover una
-                carga a lo largo de una equipotencial no requiere trabajo. Las líneas de campo son
-                siempre perpendiculares a las equipotenciales.
-              </p>
+              <strong>{PREGUNTA_EQUIPOTENCIALES}</strong>
+              <p>{RESPUESTA_EQUIPOTENCIALES}</p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Cómo se relaciona E con V?</strong>

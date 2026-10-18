@@ -1625,8 +1625,8 @@ test.describe('Inspector 28/09/2026 — motor, equipotenciales, sonda escrita y 
  *     (c) dianas: carga de 5 nC (r = 17) 13,01 px a 390 y 11,73 a 360; sonda (r = 10) 7,65 y
  *         6,90; ✕ de «Eliminar» (r = 9) ~6,9 px. A 1280: 27,85 y 16,38. → H4
  *
- * HALLAZGOS de esta pasada. H1 y H2, REPARADOS el 17/10/2026 (62f6e198): sus tests ya no llevan
- * test.fail(). Los otros cinco siguen ABIERTOS a 18/10/2026 y sus tests van con test.fail():
+ * HALLAZGOS de esta pasada. H1 y H2, REPARADOS el 17/10/2026 (62f6e198), y los otros cinco el
+ * 18/10/2026 (/reparar): ninguno lleva ya test.fail(), todos son regresión.
  *   H1 medio · contenido      · 3345 · decía «en el centro del preset «+++» el campo es 0»: hay una
  *                               carga. REPARADO: la guía habla de (0; 0,5).
  *   H2 medio · operativa      · 3346 · en móvil, deslizar el dedo sobre el lienzo creaba una carga.
@@ -1695,7 +1695,8 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
     await expect(valor(page, '|F| sobre q₀')).toHaveText('2,22 × 10⁻⁷ N');
   });
 
-  // HALLAZGO H5 (bajo, cálculo) · ABIERTO (16/10/2026).
+  // HALLAZGO H5 (bajo, cálculo) · hallado el 16/10/2026 y REPARADO el 18/10/2026 (3349): se decide
+  // sobre la cifra ya escrita, aquí y en los otros cinco sitios de 84d598da.
   // sufijoNotacion (page.tsx) decide si la mantisa sube a 10ⁿ⁺¹ con `toFixed(2)`, que redondea el
   // double EXACTO, y la escribe con formatNumber (Intl), que redondea su representación CORTA. En
   // la mitad exacta discrepan: el double de 9,995 es 9,99499999999999921…, toFixed da «9.99» (no
@@ -1704,7 +1705,6 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
   // Caso: carga puntual, sonda x = 0.44972486243121568, y = 0 → esperado U con mantisa en [1, 10)
   //       («9,99 × 10⁻⁸ J» o «1,00 × 10⁻⁷ J») · obtenido «10,00 × 10⁻⁸ J».
   test('HALLAZGO H5 · en la mitad exacta de la mantisa el panel no escribe «10,00 × 10ⁿ»', async ({ page }) => {
-    test.fail(true, 'H5 abierto: toFixed y Intl redondean distinto el 9,995');
     await page.getByRole('button', { name: 'Carga puntual aislada' }).click();
     await sondaEn(page, '0.44972486243121568', '0');
     await expect(valor(page, 'V (potencial)')).toHaveText('99,95 V'); // 44,95/0,449724862… = 99,95
@@ -1728,7 +1728,7 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
     await expect(await corregir(page, '2')).toContainText('No es correcto'); // d sin sumar −1,5
   });
 
-  // HALLAZGO H6 (bajo, cálculo) · ABIERTO (16/10/2026).
+  // HALLAZGO H6 (bajo, cálculo) · hallado el 16/10/2026 y REPARADO el 18/10/2026 (3350).
   // comprobarRespuesta (casos.ts) llama a corregirNumero con magnitud 'real' en los doce casos, y
   // para |E| y |F| un negativo no es «el valor bien con el sentido al revés»: un módulo no tiene
   // signo. El motor compartido admite un intervalo propio ({ entero: false, minimo: 0, … }).
@@ -1736,7 +1736,6 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
   //       esperado un rechazo que diga que un módulo no es negativo · obtenido «El valor es
   //       correcto, pero el SIGNO no: revisa hacia dónde apunta o qué signo tiene la carga».
   test('HALLAZGO H6 · un módulo negativo no se corrige como un error de sentido', async ({ page }) => {
-    test.fail(true, 'H6 abierto: magnitud real en los módulos');
     for (const [caso, respuesta] of [
       [1, '-44,95'], // |E| = 44,95 N/C
       [7, '-431,52'], // |F| = 431,52 nN
@@ -1779,14 +1778,14 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
     await expect(valor(page, 'V (potencial)')).toHaveText('136,25 V');
   });
 
-  // HALLAZGO H7 (bajo, contenido) · ABIERTO (16/10/2026).
+  // HALLAZGO H7 (bajo, contenido) · hallado el 16/10/2026 y REPARADO el 18/10/2026 (3351): una
+  // constante en metadata.ts que importan el FAQPage y la FAQ visible.
   // La misma pregunta vive en dos bocas con dos respuestas: el FAQPage (faqJsonLd de metadata.ts,
   // el que leen buscadores y asistentes) «¿Qué son las superficies equipotenciales?» y la FAQ
   // visible de page.tsx «¿Qué son las equipotenciales?». No se contradicen —la visible es un
   // resumen de la otra, que añade las esferas concéntricas y ΔW = 0— pero son dos textos que
   // envejecen por separado (CLAUDE.md §1.ter: una sola constante que importen las dos).
   test('HALLAZGO H7 · la pregunta de las equipotenciales responde lo mismo en el FAQPage y en pantalla', async ({ page }) => {
-    test.fail(true, 'H7 abierto: dos respuestas para la misma pregunta');
     const faqLd = await page.evaluate(() => {
       for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
         try {
@@ -1810,14 +1809,14 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
     expect(visible!.respuesta).toBe(faqLd!.respuesta);
   });
 
-  // HALLAZGO H3 (bajo, accesibilidad) · ABIERTO (16/10/2026) · cabo C0067.
+  // HALLAZGO H3 (bajo, accesibilidad) · hallado el 16/10/2026 y REPARADO el 18/10/2026 (3347) ·
+  // cabo C0067: los rótulos van a 14 unidades por encima de 900 px.
   // 33c10c79 agrandó los rótulos del lienzo por debajo de 900 px «para quedar en ~9-14 px de
   // pantalla». Por encima, con el lienzo a dos columnas (2fr 1fr), siguen a 11 unidades del
   // viewBox y el lienzo se encoge: 11 × 0,7558 = 8,31 px a 1024 y 11 × 0,6533 = 7,19 px a 901.
   // Caso: 1024 × 900, dipolo de arranque → esperado rótulo «+5,0» y «q₀» ≥ 9 px en pantalla ·
   //       obtenido 8,31 px (7,36 a 920 y 7,19 a 901).
   test('HALLAZGO H3 · de 901 a 1024 px los rótulos del lienzo no bajan de 9 px en pantalla', async ({ page }) => {
-    test.fail(true, 'H3 abierto: rótulos de 7,2-8,3 px con el lienzo a dos columnas');
     const rotulos = () =>
       lienzo(page).evaluate((svg: SVGSVGElement) => {
         const escala = svg.getScreenCTM()!.a;
@@ -1937,7 +1936,8 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
       await expect(cargas(page)).toHaveCount(3);
     });
 
-    // HALLAZGO H4 (bajo, accesibilidad) · ABIERTO (16/10/2026) · cabo C0067.
+    // HALLAZGO H4 (bajo, accesibilidad) · hallado el 16/10/2026 y REPARADO el 18/10/2026 (3348) ·
+    // cabo C0067: una diana transparente de al menos 24 px encima de cada carga y de su ✕.
     // WCAG 2.2, 2.5.8 (AA): diana de 24 × 24 px. El radio de una carga son 14 + mín(8; 0,6·|q|)
     // unidades del viewBox (17 con 5 nC), y a 390 px el lienzo va a escala 0,3825: 34 × 0,3825 =
     // 13,0 px de diámetro (11,7 a 360). Moverla solo se puede arrastrándola y retirar UNA concreta
@@ -1945,9 +1945,25 @@ test.describe('Inspector 16/10/2026 — caso de aula en el panel, frontera de la
     // px) sí lo tiene: los campos «Posición exacta».
     // Caso: 390 × 800, dipolo de arranque → esperado círculo de la carga ≥ 24 px · obtenido 13,01 px.
     test('HALLAZGO H4 · en móvil la diana de una carga mide al menos 24 px', async ({ page }) => {
-      test.fail(true, 'H4 abierto: 13 px de diana a 390');
       const diametro = await cargas(page).first().evaluate((c) => c.getBoundingClientRect().width);
       expect(diametro).toBeGreaterThanOrEqual(24);
+      // El dibujo no cambia (13 px a 390): la diana es transparente y el círculo de color no
+      // recibe eventos, así que una carga sigue contándose UNA vez.
+      await expect(cargas(page)).toHaveCount(2);
+      // Y la ✕ del modo «Eliminar» también llega a 24 px, y tocarla en su borde retira la carga.
+      await page.getByRole('button', { name: 'Eliminar' }).click();
+      await prepararLienzo(page);
+      const caja = (await lienzo(page).locator('[data-tipo="remove"]').first().boundingBox())!;
+      expect(caja.width).toBeGreaterThanOrEqual(24);
+      // 10 px a la derecha del centro: fuera del círculo blanco (3,4 px de radio), dentro de la diana
+      const [ex, ey] = [caja.x + caja.width / 2 + 10, caja.y + caja.height / 2];
+      const tocado = await page.evaluate(
+        ([x, y]) => document.elementFromPoint(x, y)?.parentElement?.getAttribute('data-tipo') ?? null,
+        [ex, ey] as const,
+      );
+      expect(tocado).toBe('remove');
+      await page.touchscreen.tap(ex, ey);
+      await expect(cargas(page)).toHaveCount(1);
     });
   });
 });

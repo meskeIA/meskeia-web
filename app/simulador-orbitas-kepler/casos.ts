@@ -51,7 +51,7 @@
  *    exactamente lo que dice el enunciado.
  */
 
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   ANIO,
   DIA,
@@ -164,8 +164,10 @@ export function cientifico(n: number, cifras = 4): string {
   if (n === 0) return '0';
   let exponente = Math.floor(Math.log10(Math.abs(n)));
   let mantisa = n / 10 ** exponente;
-  // Si la mantisa redondeada llega a 10 («9,99996» → «10,0000»), sube el exponente (cabo C0039)
-  if (Math.abs(Number(mantisa.toFixed(cifras))) >= 10) {
+  // Si la mantisa redondeada llega a 10 («9,99996» → «10,0000»), sube el exponente (cabo C0039).
+  // Se decide sobre la cifra ya escrita: toFixed redondea el double exacto e Intl su forma corta,
+  // y en la mitad exacta discrepan (hallazgo 3349 de simulador-campo-electrico).
+  if (parseSpanishNumber(numero(Math.abs(mantisa), cifras)) >= 10) {
     mantisa /= 10;
     exponente += 1;
   }

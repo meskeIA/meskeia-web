@@ -61,8 +61,10 @@ function notacionCientifica(valor: number, decimales = 1): string {
   if (!Number.isFinite(valor) || valor === 0) return '—';
   let exponente = Math.floor(Math.log10(Math.abs(valor)));
   let mantisa = valor / Math.pow(10, exponente);
-  // Si la mantisa redondeada llega a 10 («9,96» → «10,0»), sube el exponente (cabo C0039)
-  if (Math.abs(Number(mantisa.toFixed(decimales))) >= 10) {
+  // Si la mantisa redondeada llega a 10 («9,96» → «10,0»), sube el exponente (cabo C0039).
+  // Se decide sobre la cifra ya escrita: toFixed redondea el double exacto e Intl su forma
+  // corta, y en la mitad exacta discrepan (hallazgo 3349 de simulador-campo-electrico).
+  if (parseSpanishNumber(formatNumber(Math.abs(mantisa), decimales)) >= 10) {
     mantisa /= 10;
     exponente += 1;
   }

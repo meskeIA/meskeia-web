@@ -189,8 +189,10 @@ export function formatearFlexible(valor: number, maxDecimales = 4): string {
   if (Math.abs(valor) >= UMBRAL_CIENTIFICA) {
     let exponente = Math.floor(Math.log10(Math.abs(valor)));
     let mantisa = valor / 10 ** exponente;
-    // Si la mantisa redondeada llega a 10 («9,996» → «10,00»), sube el exponente (cabo C0039)
-    if (Math.abs(Number(mantisa.toFixed(2))) >= 10) {
+    // Si la mantisa redondeada llega a 10 («9,996» → «10,00»), sube el exponente (cabo C0039).
+    // Se decide sobre la cifra ya escrita: toFixed redondea el double exacto e Intl su forma
+    // corta, y en la mitad exacta discrepan (hallazgo 3349 de simulador-campo-electrico).
+    if (parseSpanishNumber(formatNumber(Math.abs(mantisa), 2)) >= 10) {
       mantisa /= 10;
       exponente += 1;
     }

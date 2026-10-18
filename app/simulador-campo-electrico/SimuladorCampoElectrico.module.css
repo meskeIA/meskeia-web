@@ -270,6 +270,18 @@
   cursor: grabbing;
 }
 
+/* Hallazgo 3348: el círculo que se ve no recibe eventos; los recibe una diana transparente
+   encima, que en pantalla mide al menos 24 px (WCAG 2.5.8) aunque el dibujo mida 13. */
+.cargaDibujo {
+  pointer-events: none;
+}
+
+.diana {
+  fill: transparent;
+  stroke: none;
+  pointer-events: all;
+}
+
 .cargaPos {
   fill: #dc2626;
   stroke: #7f1d1d;
@@ -301,28 +313,33 @@
   pointer-events: none;
 }
 
+/* El lienzo se dibuja a escala (800 unidades en ~308 px a 390 de ancho, el 38,5 %) y los
+   rótulos de 11 unidades quedaban en ~4 px en el móvil: la magnitud de cada carga y el «q₀» no
+   se leían. Se escriben en unidades del propio lienzo y por tramos para quedar en ~9-14 px de
+   pantalla, y el de las cargas con un contorno oscuro para que se lea también donde desborda
+   el círculo. El contorno va igual en los dos temas: rodea texto blanco, no depende del fondo.
+   Por encima de 900 px el lienzo va a dos columnas (2fr 1fr) y vuelve a encoger: a 11 unidades
+   salían 7,2 px a 901 y 8,3 a 1024 (hallazgo 3347). Con 14, 9,1 px a 901 y 11,5 a 1280. */
 .cargaLabel {
-  font-size: 11px;
+  font-size: 14px;
   fill: white;
   font-weight: 700;
   pointer-events: none;
   text-anchor: middle;
   dominant-baseline: central;
+  paint-order: stroke;
+  stroke: #1f2937;
+  stroke-width: 4px;
+  stroke-linejoin: round;
 }
 
-/* El lienzo se dibuja a escala (800 unidades en ~308 px a 390 de ancho, el 38,5 %) y los
-   rótulos de 11 unidades quedaban en ~4 px en el móvil: la magnitud de cada carga y el «q₀» no
-   se leían. Donde el lienzo va a una columna (≤ 900 px) se escriben más grandes, en unidades
-   del propio lienzo y por tramos para quedar en ~9-14 px de pantalla, y el de las cargas con un
-   contorno oscuro para que se lea también donde desborda el círculo. El contorno va igual en
-   los dos temas: rodea texto blanco, no depende del fondo. */
+.etiquetaPrueba {
+  font-size: 14px;
+}
+
 @media (max-width: 900px) {
   .cargaLabel {
     font-size: 16px;
-    paint-order: stroke;
-    stroke: #1f2937;
-    stroke-width: 4px;
-    stroke-linejoin: round;
   }
 
   .etiquetaPrueba {

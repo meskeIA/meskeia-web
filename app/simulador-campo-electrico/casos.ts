@@ -36,7 +36,7 @@
  * imposibles devuelven `{ ok: false, error }` y un NaN.
  */
 
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   RADIO_SINGULARIDAD,
   calcularCampoEnPunto,
@@ -134,8 +134,10 @@ function cientifica(n: number): string {
   if (n === 0) return '0';
   let exp = Math.floor(Math.log10(Math.abs(n)));
   let mantisa = n / 10 ** exp;
-  // Si la mantisa redondeada (cifra: 4 decimales) llega a 10, sube el exponente (cabo C0039)
-  if (Math.abs(Number(mantisa.toFixed(4))) >= 10) {
+  // Si la mantisa redondeada (cifra: 4 decimales) llega a 10, sube el exponente (cabo C0039).
+  // Se decide sobre la cifra ya escrita: toFixed y formatNumber discrepan en la mitad exacta
+  // (hallazgo 3349).
+  if (parseSpanishNumber(cifra(Math.abs(mantisa))) >= 10) {
     mantisa /= 10;
     exp += 1;
   }
@@ -462,9 +464,10 @@ export interface Veredicto {
  * El 1 % de tolerancia es también lo que absorbe la k = 9·10⁹ de muchos libros (0,11 % de
  * diferencia con la 8,99·10⁹ de la app).
  */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
+export function comprobarRespuesta(usuario: number, esperado: number, magnitud?: Magnitud): Veredicto {
   // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
-  // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
+  // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica), salvo el signo
+  // de un módulo, que se mira abajo con su propio aviso.
   const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
   const { diferencia, tolerancia } = c;
 
@@ -473,6 +476,19 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
       correcto: false,
       motivo: 'Escribe un número (puedes usar la coma decimal y el signo menos).',
       diferencia: NaN,
+      tolerancia,
+    };
+  }
+
+  // |E| y |F| son módulos: un negativo no es «el valor bien con el sentido al revés», es
+  // imposible. Antes caía en el diagnóstico del signo y reforzaba la idea de que un módulo
+  // tiene sentido (hallazgo 3350). No se usa el intervalo del corrector compartido porque su
+  // aviso («va de 0 a …») necesita un máximo, y un módulo no lo tiene.
+  if ((magnitud === 'modulo-E' || magnitud === 'modulo-F') && usuario < 0) {
+    return {
+      correcto: false,
+      motivo: `${NOMBRE[magnitud]} es un módulo y nunca es negativo: escribe su valor sin signo. El sentido lo dan las componentes, no el módulo.`,
+      diferencia,
       tolerancia,
     };
   }

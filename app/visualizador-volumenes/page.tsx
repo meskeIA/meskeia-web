@@ -424,8 +424,10 @@ const superindice = (n: number): string =>
 function notacionCientifica(v: number, decimalesMantisa: number): string {
   let exponente = Math.floor(Math.log10(v));
   let mantisa = v / Math.pow(10, exponente);
-  // Si la mantisa redondeada llega a 10 («9,996» → «10,00»), sube el exponente (cabo C0039)
-  if (Number(mantisa.toFixed(decimalesMantisa)) >= 10) {
+  // Si la mantisa redondeada llega a 10 («9,996» → «10,00»), sube el exponente (cabo C0039).
+  // Se decide sobre la cifra ya escrita: toFixed redondea el double exacto e Intl su forma
+  // corta, y en la mitad exacta discrepan (hallazgo 3349 de simulador-campo-electrico).
+  if (parseSpanishNumber(formatNumber(mantisa, decimalesMantisa)) >= 10) {
     mantisa /= 10;
     exponente += 1;
   }

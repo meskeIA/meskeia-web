@@ -336,4 +336,12 @@ test.describe('Notación científica (cabo C0039)', () => {
     // Control: la que no llega a 10 se queda en su exponente.
     expect(formatearFlexible(9.994e20)).toBe('9,99 · 10²⁰');
   });
+
+  test('en la mitad exacta (9,995) decide con el mismo redondeo con que escribe (hallazgo 3349)', () => {
+    // La mantisa de 9,995·10²⁰ es el double 9,99499999…: toFixed(2) da «9.99» y no subía, pero
+    // formatNumber (Intl) redondea su forma corta, 9,995, y escribía «10,00 · 10²⁰».
+    expect((9.995e20 / 1e20).toFixed(2)).toBe('9.99'); // la trampa sigue ahí
+    expect(formatearFlexible(9.995e20)).toBe('1,00 · 10²¹');
+    expect(formatearFlexible(9.995e21)).toBe('1,00 · 10²²');
+  });
 });
