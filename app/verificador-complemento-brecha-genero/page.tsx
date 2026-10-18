@@ -7,15 +7,18 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard, DataReference, RegionBadge,
 } from '@/components';
-import { formatCurrency, formatFechaLarga, formatPercentage, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatFechaLarga, formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
 import {
   COMPLEMENTO_BRECHA_GENERO_2026,
   COMPLEMENTO_BRECHA_GENERO_META,
+  COMPLEMENTO_BRECHA_GENERO_SERIE_META,
   COMPLEMENTO_MATERNIDAD_DEROGADO,
+  EFECTOS_COMPLEMENTO_BRECHA_VARONES,
   FISCAL_PENSIONES_META,
   LIMITES_PENSION_2025,
   RECLAMACION_PREVIA_SS_META,
 } from '@/data/fiscal';
+import { calcularAtrasos, type ResultadoAtrasos } from './atrasos';
 /**
  * El recuento de requisitos se importa del MOTOR del MCP, que es el gemelo de esta app: así
  * la web, las dos tools del MCP y el FAQPage cuentan lo mismo por construcción (hallazgo
@@ -615,6 +618,39 @@ export default function VerificadorComplementoBrechaGeneroPage() {
     setEvaluado(false);
   };
 
+  /**
+   * Atrasos de una reclamación retroactiva (S0211). Solo donde la cita los ampara: hombre con
+   * pensión desde el 04/02/2021 y sin que el otro progenitor lo pidiera o lo cobre (Criterio
+   * interpretativo 11/2025, instrucción 1). Con el otro progenitor cobrándolo, las fechas son
+   * las de la instrucción 2 y no se da cifra: se dice por qué.
+   */
+  const [fechaEfectos, setFechaEfectos] = useState<string>('');
+  const atrasosAplica =
+    evaluado && resultado.procede && genero === 'hombre' && fecha === 'desde_2021' && otroProgenitor !== 'percibe';
+  const atrasosNoCubre =
+    evaluado && (resultado.procede || resultado.condicionado) && genero === 'hombre' &&
+    fecha === 'desde_2021' && otroProgenitor === 'percibe';
+  const ahora = new Date();
+  const hoyISO = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+  const atrasos: ResultadoAtrasos | null =
+    atrasosAplica && fechaEfectos !== ''
+      ? calcularAtrasos(
+          fechaEfectos, hoyISO, resultado.hijosComputables,
+          resultado.prorrata !== undefined ? resultado.prorrata / 100 : 1,
+        )
+      : null;
+  const errorAtrasos = (r: ResultadoAtrasos): string => {
+    if (r.ok) return '';
+    if (r.error === 'sin-cuantia') {
+      return `Falta la cuantía de ${r.anio} en los datos de esta herramienta, y sin ella no se suman los atrasos de ese año.`;
+    }
+    if (r.error === 'anterior-al-complemento') {
+      return `Esa fecha es anterior al ${FECHA_MINIMA}: a una pensión de antes le corresponde el antiguo complemento de maternidad, con otras reglas, y aquí no se calculan sus atrasos.`;
+    }
+    if (r.error === 'futura') return 'La fecha de efectos no puede ser posterior a hoy.';
+    return 'Elige una fecha válida.';
+  };
+
 
   return (
     <div className={styles.container}>
@@ -673,6 +709,13 @@ export default function VerificadorComplementoBrechaGeneroPage() {
         fuente={FISCAL_PENSIONES_META.fuente}
         verificado={FISCAL_PENSIONES_META.verificado}
         urlOficial={FISCAL_PENSIONES_META.urlOficial}
+      />
+
+      <DataReference
+        normativa={`Cuantías del complemento ${COMPLEMENTO_BRECHA_GENERO_SERIE_META.vigencia} y efectos de la reclamación`}
+        fuente={COMPLEMENTO_BRECHA_GENERO_SERIE_META.fuente}
+        verificado={COMPLEMENTO_BRECHA_GENERO_SERIE_META.verificado}
+        urlOficial={COMPLEMENTO_BRECHA_GENERO_SERIE_META.urlOficial}
       />
 
       <div className={styles.mainContent}>
@@ -1052,6 +1095,104 @@ export default function VerificadorComplementoBrechaGeneroPage() {
         </div>
       </div>
 
+      {/* ─── Atrasos de la reclamación (S0211) ─── */}
+      {atrasosAplica && (
+        <section className={`${styles.card} ${styles.atrasosCard}`} aria-labelledby="atrasos-titulo">
+          <h2 className={styles.cardTitle} id="atrasos-titulo">¿Cuánto te deben desde que cobras la pensión?</h2>
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="fecha-efectos">
+              Fecha de efectos económicos de tu pensión
+            </label>
+            <input
+              id="fecha-efectos"
+              type="date"
+              className={`${styles.input} ${styles.inputFecha}`}
+              value={fechaEfectos}
+              min={COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante}
+              max={hoyISO}
+              onChange={e => setFechaEfectos(e.target.value)}
+              aria-describedby="fecha-efectos-ayuda"
+              aria-invalid={atrasos !== null && !atrasos.ok}
+            />
+            <p className={styles.hint} id="fecha-efectos-ayuda">
+              Figura en la resolución que te reconoció la pensión. Según el{' '}
+              {EFECTOS_COMPLEMENTO_BRECHA_VARONES.criterio} ({EFECTOS_COMPLEMENTO_BRECHA_VARONES.instruccion}),
+              para un hombre {EFECTOS_COMPLEMENTO_BRECHA_VARONES.supuesto}: «{EFECTOS_COMPLEMENTO_BRECHA_VARONES.cita}»
+            </p>
+          </div>
+
+          <div role="status" aria-live="polite">
+            {atrasos === null ? (
+              <p className={styles.hint}>
+                Escribe la fecha y se suman los atrasos año a año, cada uno con la cuantía que
+                tuvo ese año.
+              </p>
+            ) : !atrasos.ok ? (
+              <p className={styles.hint}>
+                <span aria-hidden="true">⚠️</span> {errorAtrasos(atrasos)}
+              </p>
+            ) : (
+              <>
+                <div className={styles.tableWrapper}>
+                  <table className={styles.comparativaTable}>
+                    <caption className={styles.atrasosCaption}>
+                      Atrasos brutos por año: {resultado.hijosComputables}{' '}
+                      {resultado.hijosComputables === 1 ? 'hijo computable' : 'hijos computables'}
+                      {resultado.prorrata !== undefined ? `, prorrata del ${formatPercentage(resultado.prorrata / 100)}` : ''}
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Año</th>
+                        <th scope="col">Meses</th>
+                        <th scope="col">Cuantía por hijo</th>
+                        <th scope="col">Importe</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {atrasos.tramos.map((t) => (
+                        <tr key={t.anio}>
+                          <td>{t.anio}</td>
+                          <td>{formatNumber(t.meses, 1)}</td>
+                          <td>{formatCurrency(t.cuantiaPorHijoMensual)}/mes</td>
+                          <td>{formatCurrency(t.importe)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className={styles.desgloseCard}>
+                  <div className={`${styles.desgloseItem} ${styles.desgloseFinal}`}>
+                    <span>Atrasos hasta hoy</span>
+                    <strong>{formatCurrency(atrasos.total)}</strong>
+                  </div>
+                  <div className={styles.desgloseItem}>
+                    <span>Cada mes más que tarde la resolución</span>
+                    <strong>+{formatCurrency(atrasos.porMesMas)}</strong>
+                  </div>
+                </div>
+                <p className={styles.notaFinal}>
+                  <strong>Cómo se ha calculado:</strong> importe bruto, sin intereses y antes de la
+                  retención del IRPF. Las {PAGAS} pagas de cada año se reparten entre sus doce meses:
+                  un año completo da exactamente las {PAGAS} pagas, pero en el primer y el último
+                  tramo la cifra puede diferir de lo que pague el INSS en la parte de una paga extra.
+                  Si ya cobraste el complemento en algún periodo, eso se descuenta.
+                </p>
+              </>
+            )}
+          </div>
+        </section>
+      )}
+      {atrasosNoCubre && (
+        <div className={`${styles.card} ${styles.atrasosCard}`}>
+          <p className={styles.hint}>
+            <span aria-hidden="true">ℹ️</span> Aquí no se calculan los atrasos: cuando el otro
+            progenitor ya lo cobra, el {EFECTOS_COMPLEMENTO_BRECHA_VARONES.criterio} fija otras
+            fechas de efectos (su instrucción 2), que dependen de cuándo se le reconoció a él o a
+            ella.
+          </p>
+        </div>
+      )}
+
       {/* ─── Contenido educativo v2.0 ─── */}
       <EducationalSection
         title="Guía completa del complemento por brecha de género"
@@ -1266,6 +1407,12 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 Sí, tras la STJUE de {DOCTRINA.stjue.fecha} y la doctrina del TS de {DOCTRINA.ts.fecha}. La estrategia procesal
                 concreta (nueva solicitud, reclamación previa, demanda) depende de las fechas y de tu
                 resolución anterior. Es recomendable acudir a un abogado laboralista o al sindicato.
+              </p>
+              <p>
+                Si el otro progenitor no lo ha pedido ni lo cobra, el{' '}
+                {EFECTOS_COMPLEMENTO_BRECHA_VARONES.criterio} retrotrae los efectos económicos hasta la
+                fecha de efectos de tu pensión. Al verificar tu derecho, la herramienta suma esos
+                atrasos año a año con la cuantía de cada año.
               </p>
             </div>
             <div className={styles.faqItem}>

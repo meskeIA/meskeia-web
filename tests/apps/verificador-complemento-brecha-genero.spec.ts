@@ -17,6 +17,8 @@ import { NUM_REQUISITOS_ART60 } from '../../lib/calculadoras/complementoBrechaGe
 // (nunca con el setter nativo, que lo prohíbe `check:hidratacion`), y el contraste se mide
 // con la página asentada.
 import { sembrarValor, leerValorEnReact, esperarPaginaAsentada } from './_hidratacion';
+import { calcularAtrasos } from '../../app/verificador-complemento-brecha-genero/atrasos';
+import { formatCurrency } from '../../lib/formatters';
 
 /**
  * Inspector — verificador-complemento-brecha-genero (segmento FISCAL / Seguridad Social,
@@ -4751,4 +4753,104 @@ test.describe('Re-inspección 16/10/2026 — móvil', () => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(visor.width);
     });
   }
+});
+
+/**
+ * Atrasos de la reclamación retroactiva (semilla S0211, 18/10/2026).
+ *
+ * El motor está probado con casos a mano en tests/atrasos-brecha-motor.spec.ts; aquí se
+ * comprueba que la página lo monta SOLO donde la cita del Criterio interpretativo 11/2025 lo
+ * ampara (hombre, pensión desde el 04/02/2021, otro progenitor sin pedirlo ni cobrarlo), y que
+ * pinta las cifras de cada año. Los años cerrados se fijan a mano; el último depende de la
+ * fecha del día, así que el total se compara con el motor.
+ *
+ *   2 hijos, sin prorrata, efectos 04/02/2021 (cuantías del BOE por año):
+ *     2021 → 27 × 2 × 14/12 × (10 + 25/28) = 686,25 · 2022 → 28 × 2 × 14 = 784,00
+ *     2023 → 30,40 × 2 × 14 = 851,20 · 2024 → 33,20 × 2 × 14 = 929,60
+ *     2025 → 35,90 × 2 × 14 = 1005,20
+ *   1 hijo, prorrata 50 %, efectos 01/07/2024:
+ *     2024 → 33,20 × 0,5 × 14/12 × 6 = 116,20 · 2025 → 35,90 × 0,5 × 14 = 251,30
+ */
+test.describe('Atrasos de la reclamación (S0211)', () => {
+  const hoy = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  const euros = (n: number) => normalizar(formatCurrency(n));
+  const bloque = (page: Page) => page.locator('section', { hasText: '¿Cuánto te deben' });
+
+  test('hombre con pensión desde 2021 y 2 hijos: los años cerrados y el total cuadran', async ({ page }) => {
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    await page.getByLabel('Fecha de efectos económicos de tu pensión').fill('2021-02-04');
+    const texto = normalizar(await bloque(page).innerText());
+    expect(texto).toContain(`2021 10,9 27,00 €/mes ${euros(686.25)}`);
+    expect(texto).toContain(`2022 12,0 28,00 €/mes ${euros(784)}`);
+    expect(texto).toContain(`2023 12,0 30,40 €/mes ${euros(851.2)}`);
+    expect(texto).toContain(`2024 12,0 33,20 €/mes ${euros(929.6)}`);
+    expect(texto).toContain(`2025 12,0 35,90 €/mes ${euros(1005.2)}`);
+    const motor = calcularAtrasos('2021-02-04', hoy(), 2);
+    if (!motor.ok) throw new Error('el motor debía calcular');
+    expect(texto).toContain(`Atrasos hasta hoy ${euros(motor.total)}`);
+    expect(texto).toContain('Criterio interpretativo 11/2025');
+  });
+
+  test('con prorrata del 50 % y 1 hijo, el año 2024 y el 2025 salen reducidos', async ({ page }) => {
+    await elegir(page, 'Sí, a prorrata (totalización internacional)');
+    await page.locator('#prorrata').fill('50');
+    await responderYVerificar(page, {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 1,
+      sexo: 'Hombre',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+    });
+    await page.getByLabel('Fecha de efectos económicos de tu pensión').fill('2024-07-01');
+    const texto = normalizar(await bloque(page).innerText());
+    expect(texto).toContain(`2024 6,0 33,20 €/mes ${euros(116.2)}`);
+    expect(texto).toContain(`2025 12,0 35,90 €/mes ${euros(251.3)}`);
+  });
+
+  test('una fecha anterior al 04/02/2021 no da cifra y dice por qué', async ({ page }) => {
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    await page.getByLabel('Fecha de efectos económicos de tu pensión').fill('2021-01-15');
+    const texto = normalizar(await bloque(page).innerText());
+    expect(texto).toContain('antiguo complemento de maternidad');
+    expect(texto).not.toContain('Atrasos hasta hoy');
+  });
+
+  test('a una mujer no se le ofrece: el criterio de efectos es el de los hombres', async ({ page }) => {
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Mujer',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    await expect(page.getByText('¿Cuánto te deben')).toHaveCount(0);
+  });
+
+  test('si el otro progenitor lo cobra, no hay cifra: la instrucción 2 fija otras fechas', async ({ page }) => {
+    await responderYVerificar(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: 2,
+      sexo: 'Hombre',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'La mía es menor',
+    });
+    await expect(page.getByText('¿Cuánto te deben')).toHaveCount(0);
+    await expect(page.getByText('Aquí no se calculan los atrasos')).toBeVisible();
+  });
 });

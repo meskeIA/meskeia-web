@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META } from '@/data/fiscal';
+import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META, EFECTOS_COMPLEMENTO_BRECHA_VARONES } from '@/data/fiscal';
 import { formatCurrency } from '@/lib/formatters';
 import {
   NUM_REQUISITOS_ART60,
@@ -97,7 +97,7 @@ export const jsonLd = {
     `Cálculo del importe mensual y anual (${CUANTIA}/hijo, máx. ${MAX_HIJOS})`,
     `Aplica la ${DOCTRINA.stjue.corto} y la ${DOCTRINA.ts.corto}: igualdad de trato H/M`,
     'Resuelve la concurrencia entre progenitores por la suma de pensiones públicas (art. 60.1 LGSS)',
-    'Detecta casos de reclamación retroactiva (denegaciones previas)',
+    'Detecta reclamaciones retroactivas y suma los atrasos año a año con la cuantía de cada año',
     `Aplica la prorrata temporis del ${PRORRATA.norma} a las pensiones con cotizaciones en otro país`,
     `Datos normativos ${anio} verificados con fuente oficial`,
     // % con espacio duro U+00A0 (hallazgo 2244)
@@ -122,7 +122,7 @@ export const faqJsonLd = {
       name: '¿Pueden los hombres cobrar el complemento por brecha de género?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí. Tras la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), los ${NUM_REQUISITOS_ART60} requisitos son idénticos para hombres y mujeres: ${LISTA_REQUISITOS}. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de esas resoluciones por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social.`,
+        text: `Sí. Tras la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la doctrina del Tribunal Supremo (${DOCTRINA.ts.fecha}), los ${NUM_REQUISITOS_ART60} requisitos son idénticos para hombres y mujeres: ${LISTA_REQUISITOS}. Ya no se exige a los hombres ninguna condición adicional. Si a un hombre se le denegó el complemento antes de esas resoluciones por no cumplir esos requisitos adicionales hoy eliminados, puede reclamarlo de forma retroactiva ante el Instituto Nacional de la Seguridad Social. Si el otro progenitor no lo ha pedido ni lo cobra, el ${EFECTOS_COMPLEMENTO_BRECHA_VARONES.criterio} dice que el reconocimiento retrotrae sus efectos económicos hasta la fecha de efectos de la pensión, y los atrasos se suman con la cuantía de cada año.`,
       },
     },
     {

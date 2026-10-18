@@ -901,3 +901,104 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
   },
 };
 
+/**
+ * Serie histórica de la cuantía mensual por hijo del complemento, año a año desde que existe.
+ *
+ * Nace el 18/10/2026 (semilla S0211) para calcular los ATRASOS de una reclamación retroactiva:
+ * a un hombre con pensión causada desde el 04/02/2021 el INSS le reconoce el complemento con
+ * efectos desde la fecha de efectos de su pensión (`EFECTOS_COMPLEMENTO_BRECHA_VARONES`), así
+ * que lo que se le debe se suma con la cuantía de CADA año, no con la vigente.
+ *
+ * Cada cuantía la fija su norma de forma literal, no por encadenar porcentajes: de 2023 a
+ * 2025 el redondeo y el 5 % adicional del RDL 2/2023 hacen que aplicar la revalorización a la
+ * cifra anterior NO dé la publicada (30,40 × 1,088 = 33,08, y el BOE dice 33,20). Por eso no
+ * se cotejan cocientes como en las series de índices (data/CLAUDE.md): se coteja cada año con
+ * su cita. Las seis se leyeron en el BOE el 18/10/2026.
+ *
+ * 2026 NO se teclea: se lee de `COMPLEMENTO_BRECHA_GENERO_2026`, para que la revalorización de
+ * cada enero toque un solo sitio. Al sellar un año nuevo, añadir aquí su fila con su cita: el
+ * motor de atrasos se niega a sumar un año que no esté en la serie.
+ */
+export const COMPLEMENTO_BRECHA_GENERO_SERIE: readonly {
+  anio: number;
+  /** € al mes por hijo, en 14 pagas */
+  cuantiaPorHijoMensual: number;
+  norma: string;
+  boe: string;
+  cita: string;
+}[] = [
+  {
+    anio: 2021,
+    cuantiaPorHijoMensual: 27,
+    norma: 'RDL 3/2021, disposición adicional primera',
+    boe: 'BOE-A-2021-1529',
+    cita: 'será para el año 2021 de 27 euros mensuales',
+  },
+  {
+    anio: 2022,
+    cuantiaPorHijoMensual: 28,
+    norma: 'Ley 22/2021 (PGE 2022), disposición adicional trigésima novena, apartado Dos',
+    boe: 'BOE-A-2021-21653',
+    cita: 'Con efectos de 1 de enero de 2022, la cuantía del complemento de pensiones para la reducción de la brecha de género queda establecida en 28 euros mensuales.',
+  },
+  {
+    anio: 2023,
+    cuantiaPorHijoMensual: 30.40,
+    norma: 'RD 1058/2022, disposición adicional sexta, apartado 2',
+    boe: 'BOE-A-2022-22694',
+    cita: 'Con efectos de 1 de enero de 2023, la cuantía del complemento de pensiones para la reducción de la brecha de género queda establecida en 30,40 euros/mes.',
+  },
+  {
+    anio: 2024,
+    cuantiaPorHijoMensual: 33.20,
+    norma: 'RDL 8/2023, artículo 78.2',
+    boe: 'BOE-A-2023-26452',
+    cita: 'tendrá para 2024 un importe de 33,20 euros mensuales',
+  },
+  {
+    anio: 2025,
+    cuantiaPorHijoMensual: 35.90,
+    norma: 'RD 316/2025, artículo 12 (conforme al art. 65.2 del RDL 1/2025)',
+    boe: 'BOE-A-2025-7660',
+    cita: 'Con efectos de 1 de enero de 2025, la cuantía del complemento para la reducción de la brecha de género queda establecida en 35,90 euros mensuales',
+  },
+  {
+    anio: 2026,
+    cuantiaPorHijoMensual: COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual,
+    norma: 'RD 241/2026, artículo 12 (conforme al art. 2 del RDL 3/2026)',
+    boe: 'BOE-A-2026-6977',
+    cita: 'Con efectos de 1 de enero de 2026, la cuantía del complemento para la reducción de la brecha de género queda establecida en 36,90 euros mensuales',
+  },
+];
+
+/**
+ * Desde cuándo se le debe el complemento a un HOMBRE con pensión causada desde el 04/02/2021.
+ *
+ * Fuente: Criterio interpretativo 11/2025 de la Secretaría de Estado de la Seguridad Social,
+ * dictado para cumplir la STJUE de 15/05/2025 (C-623/23 y C-626/23). Leído el 18/10/2026 en
+ * el PDF oficial de seg-social.es. Instrucción 1, para cuando «no medie solicitud o previo
+ * reconocimiento del CRBG en favor del otro progenitor»: «El reconocimiento del CRBG
+ * retrotraerá sus efectos económicos hasta la fecha de efectos económicos de la pensión a la
+ * que complementa.»
+ *
+ * Solo cubre ese supuesto. Si el otro progenitor lo pidió o ya lo cobra, las fechas son las de
+ * su instrucción 2 (un periodo acotado si a ella se le reconoció antes del 15/05/2025), y la
+ * instrucción 4 descuenta lo ya cobrado antes de una extinción: el motor de atrasos NO calcula
+ * esos casos, y la app no da cifra en ellos.
+ */
+export const EFECTOS_COMPLEMENTO_BRECHA_VARONES = {
+  criterio: 'Criterio interpretativo 11/2025 de la Secretaría de Estado de la Seguridad Social',
+  instruccion: 'instrucción 1',
+  cita: 'El reconocimiento del CRBG retrotraerá sus efectos económicos hasta la fecha de efectos económicos de la pensión a la que complementa.',
+  supuesto: 'sin solicitud ni reconocimiento previo del complemento al otro progenitor',
+  url: 'https://www.seg-social.es/wps/wcm/connect/wss/2a479841-e2e4-4ea4-ac44-8c9fbcaa89f9/CI+11-2025+Complemento+Brecha+de+G%C3%A9nero+CBG.pdf?MOD=AJPERES',
+} as const;
+
+/** Sello propio de la serie y del criterio de efectos: se verificaron juntos, y aparte de 2026 */
+export const COMPLEMENTO_BRECHA_GENERO_SERIE_META = {
+  fuente: 'BOE (RDL 3/2021, Ley 22/2021, RD 1058/2022, RDL 8/2023, RD 316/2025 y RD 241/2026) + Criterio interpretativo 11/2025 de la Seguridad Social',
+  verificado: '2026-10-18',
+  vigencia: '2021-2026',
+  urlOficial: EFECTOS_COMPLEMENTO_BRECHA_VARONES.url,
+};
+
