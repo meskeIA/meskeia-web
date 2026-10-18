@@ -1508,9 +1508,15 @@ export default function GeneradorTonosPage() {
               desliza despacio —menos de un semitono por segundo, como una sirena, un motor que
               acelera o un silbido que sube— sí puede darse por estable, y la última lectura estable
               lo va siguiendo: «estable» dice que la cifra no ha saltado, no que el sonido esté
-              quieto. Tampoco llega un golpe o un clic, aunque suene a una nota: «estable» pide medio
-              segundo a la misma frecuencia con un sonido que no se esté apagando, así que la última
-              lectura estable de un tono no la sustituye un toque en la mesa. El micrófono de un móvil capta peor los graves más profundos y los agudos
+              quieto. Tampoco llega un golpe o un clic, aunque suene a una nota: «estable» pide unos
+              0,3 segundos a la misma frecuencia con un sonido que no se apague deprisa, así que la
+              última lectura estable de un tono no la sustituye un toque en la mesa. Una nota que se
+              va apagando poco a poco, como la de una cuerda de guitarra, sí llega.{' '}
+              {/* Decía «medio segundo» y «que no se esté apagando»: el motor pide cinco lecturas
+                  (~0,3 s de sonido, por la ventana de la FFT) y que la última no caiga más de 4 dB,
+                  unos 10 dB/s, y una cuerda pulsada (8,7 dB/s) sí llega (hallazgos 3284 y 3328;
+                  cifras en CAIDA_MAXIMA_ESTABLE_DB, ./motor-medidor). */}
+              El micrófono de un móvil capta peor los graves más profundos y los agudos
               extremos: ahí puede no leer nada. Para ver todas las frecuencias a la vez está el{' '}
               <Link href="/analizador-espectro/">analizador de espectro</Link>.
             </li>

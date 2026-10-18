@@ -58,9 +58,9 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     mismo 02/10/2026).
  *
  * ── INSPECTOR 13/10/2026 (al final del fichero) ──
- * El rechazo por ARRIBA del rango (21.000 y 20.050 Hz: ninguna cifra) y el HALLAZGO J4, ABIERTO, con
- * `test.fail()`: un silbido de 0,3 s ya es «Lectura estable» y la página dice que eso pide medio
- * segundo. Los demás casos de esa tanda, en generador-tonos.spec.ts.
+ * El rechazo por ARRIBA del rango (21.000 y 20.050 Hz: ninguna cifra) y el HALLAZGO J4: un silbido
+ * de 0,3 s ya es «Lectura estable» y la página decía que eso pide medio segundo. REPARADO el
+ * 18/10/2026 (3284) corrigiendo el texto. Los demás casos de esa tanda, en generador-tonos.spec.ts.
  */
 
 const RUTA = '/generador-tonos/';
@@ -876,7 +876,7 @@ test.describe('Inspector 13/10/2026 — el medidor', () => {
   }
 
   /**
-   * HALLAZGO J4 [bajo · contenido] — ABIERTO (13/10/2026). El bloque «Qué mide y qué no» dice que
+   * HALLAZGO J4 [bajo · contenido] — REPARADO (3284, 18/10/2026). El bloque «Qué mide y qué no» decía que
    * «"estable" pide medio segundo a la misma frecuencia con un sonido que no se esté apagando», y un
    * silbido de 0,3 s ya se da por «Lectura estable» y queda retenido. La propia app lo sabe: el
    * comentario de `iniciarMedidor` y el de CAIDA_MAXIMA_ESTABLE_DB (motor-medidor.ts) dicen «en la
@@ -893,9 +893,8 @@ test.describe('Inspector 13/10/2026 — el medidor', () => {
   test('HALLAZGO J4 — un silbido de 0,3 s no se da por «estable» mientras la página diga que eso pide medio segundo', async ({
     page,
   }) => {
-    // ABIERTO: comprobado el 13/10/2026 que cae en la última aserción (una «Lectura estable» de
-    // 432 Hz), no en la precondición de que el silbido se lea.
-    test.fail();
+    // REPARADO (hallazgo 3284, 18/10/2026) por el texto: ahora dice «unos 0,3 segundos», que es lo
+    // que pide el motor. Abajo se exige también eso, para que el test no quede vacío.
     await medirSintetico(page, {
       segundos: 3,
       fondo: 0.001,
@@ -913,5 +912,8 @@ test.describe('Inspector 13/10/2026 — el medidor', () => {
       prometeMedioSegundo ? estables : [],
       'la página dice que «estable» pide medio segundo, y el silbido dura 0,3 s',
     ).toEqual([]);
+    // Lo que dice ahora, y que se cumple: el silbido de 0,3 s llega a estable.
+    expect(limites.replace(/\s+/g, ' ')).toContain('«estable» pide unos 0,3 segundos');
+    expect(estables.length, 'el silbido de 0,3 s llega a «estable»').toBeGreaterThan(0);
   });
 });

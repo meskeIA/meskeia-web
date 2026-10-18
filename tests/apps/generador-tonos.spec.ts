@@ -4312,7 +4312,7 @@ test.describe('Inspector 16/10/2026', () => {
   });
 
   /**
-   * HALLAZGO N1 [bajo · contenido] — ABIERTO (16/10/2026). «Qué mide y qué no» dice: «"estable" pide
+   * HALLAZGO N1 [bajo · contenido] — REPARADO (3328, 18/10/2026). «Qué mide y qué no» decía: «"estable" pide
    * medio segundo a la misma frecuencia con un sonido que no se esté apagando». La duración es el
    * hallazgo 3284 (J4, en generador-tonos-medidor-inspector.spec.ts); esto es la otra mitad de la
    * frase. El motor no pide que el sonido no se apague: pide que la última de cinco lecturas no caiga
@@ -4331,9 +4331,9 @@ test.describe('Inspector 16/10/2026', () => {
   test('HALLAZGO N1 — un sonido que se apaga no llega a «estable» mientras la página diga que eso pide un sonido que no se esté apagando', async ({
     page,
   }) => {
-    // ABIERTO: comprobado el 16/10/2026 que cae en la última aserción (las lecturas «estables» del
-    // 440 Hz que se apaga), no en la precondición de que el sonido se lea.
-    test.fail();
+    // REPARADO (hallazgo 3328, 18/10/2026) por el texto: ahora dice «que no se apague deprisa» y que
+    // una cuerda que se apaga poco a poco sí llega, que es lo que hace el motor. Abajo se exige
+    // también eso, para que el test no quede vacío.
     await vigilarMedidor(page);
     await microfonoQueSeApaga(page, 6, { hz: 440, amp: 0.5, desde: 0.5, tau: 1 });
     await arrancarMedidor(page);
@@ -4351,6 +4351,10 @@ test.describe('Inspector 16/10/2026', () => {
       pideQueNoSeApague ? estables : [],
       'la página dice que «estable» pide un sonido que no se esté apagando, y este cae 8,7 dB por segundo',
     ).toEqual([]);
+    // Lo que dice ahora, y que se cumple: la nota que cae 8,7 dB/s llega a estable.
+    expect(limites).toContain('un sonido que no se apague deprisa');
+    expect(limites).toContain('como la de una cuerda de guitarra, sí llega');
+    expect(estables.length, 'la nota que se apaga poco a poco llega a «estable»').toBeGreaterThan(0);
   });
 });
 
