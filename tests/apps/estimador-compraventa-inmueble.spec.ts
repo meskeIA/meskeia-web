@@ -9213,3 +9213,260 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
     expect(texto).not.toMatch(/no se paga \(sentencia del Tribunal Constitucional de 26 de octubre de 2021\)/);
   });
 });
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Inspector 19/10/2026 — re-inspección tras 58ca4c50 (3238, el IRPF foral exige vivienda; lo
+// sujeta el caso «HALLAZGO IRPF foral» de arriba, ya en verde), 5f1b199a (3368, las otras rentas
+// del ahorro) y ca9ab312 (retirada de COSTES_COMPRAVENTA_2025, sin lectores en la app).
+//
+// Fuentes de las cifras de abajo, todas resueltas a mano ANTES de abrir la app:
+//  · TRAMOS_GANANCIAS_PATRIMONIALES_2025 (data/fiscal/inmuebles.ts, art. 66 LIRPF): 19 % hasta
+//    6.000 · 21 % hasta 50.000 · 23 % hasta 200.000 · 27 % hasta 300.000 · 30 % el resto.
+//  · Con otras rentas del ahorro, la venta paga lo que AÑADE: cuota(otras + ganancia) −
+//    cuota(otras) (calcularGananciaInmueble, data/fiscal/ganancia-inmueble.ts, hallazgo 3368).
+//  · COEFICIENTES_IIVTNU_2025 (10 años: 0,12) y PLUSVALIA_MUNICIPAL_META.tipoOrientativo (25 %).
+//  · BONIFICACION_IIVTNU_CEUTA_MELILLA (50 %, art. 159.2 TRLRHL) y
+//    DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA (60 % de la parte de la cuota que proporcionalmente
+//    corresponde a la venta, art. 68.4 LIRPF).
+//
+// BASE O (la de todos los casos): vivienda · segunda mano · precio 300.000 · VENDEDOR: compra
+// 200.000 · 10 años · suelo 60.000 · total 150.000 · comisión 3 % de fábrica · vivienda habitual
+// de fábrica, sin edad ni reinversión. En Madrid:
+//   Plusvalía: objetivo 60.000 × 0,12 × 25 % = 1.800 · real 100.000 × 60/150 × 25 % = 10.000 →
+//     el objetivo, 1800,00 € «Método objetivo (más favorable)»
+//   Comisión 9.000 · transmisión 300.000 − 9.000 − 1.800 = 289.200 · adquisición 200.000 ·
+//   ganancia 89.200 · sola: 6.000 × 19 % + 44.000 × 21 % + 39.200 × 23 % = 1.140 + 9.240 +
+//   9.016 = 19.396,00 € · neto 300.000 − 1.800 − 9.000 − 19.396 = 269.804,00 €
+// ══════════════════════════════════════════════════════════════════════════════
+test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama de obra nueva del vendedor', () => {
+  const CAMPO_PRECIO = 'input[aria-label="Precio de la vivienda"]';
+  const OTRAS = 'Otras rentas del ahorro de este año (€)';
+
+  /** Escribe como el usuario, comprueba que el ESTADO de React lo recogió y sale del campo. */
+  async function sembrar(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  /** La BASE O en la comunidad dada, con la pestaña Vendedor abierta. */
+  async function baseO(page: Page, ccaa: string, primeraMano = false): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO_PRECIO]);
+    await page.locator('#ccaa-inmueble').selectOption(ccaa);
+    if (primeraMano) await page.getByRole('button', { name: /Primera mano/ }).click();
+    await sembrar(page, 'Precio de la vivienda', '300000');
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+    await sembrar(page, 'Precio de compra original', '200000');
+    await sembrar(page, 'Años de propiedad', '10');
+    await sembrar(page, 'Valor catastral del suelo', '60000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '150000');
+  }
+
+  const rotulo = async (page: Page, titulo: RegExp): Promise<string> =>
+    (await page.locator('h3', { hasText: titulo }).first().innerText()).replace(ESPACIO_DURO, ' ');
+
+  /**
+   * CASO 76 (normal) — Madrid, BASE O, con otras rentas del ahorro que CRUZAN un tramo (3368):
+   *  · Sin ellas: 19.396,00 € (la cuota de la ganancia sola, cabecera del describe).
+   *  · 45.000 (cruza el de 50.000): base 134.200 → 1.140 + 9.240 + 84.200 × 23 % (19.366) =
+   *    29.746; sin la venta, 1.140 + 39.000 × 21 % (8.190) = 9.330 → 20.416,00 € (= 5.000 × 21 %
+   *    + 84.200 × 23 %) · total 1.800 + 9.000 + 20.416 = 31.216,00 · neto 268.784,00 €.
+   *  · 150.000 (cruza el de 200.000): 50.000 × 23 % (11.500) + 39.200 × 27 % (10.584) =
+   *    22.084,00 € · total 32.884,00 · neto 267.116,00 €.
+   */
+  test('CASO 76 (normal) — Madrid, 300.000: otras rentas de 45.000 y de 150.000 suben la cuota que la venta añade', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t) => [t.hasta, t.tipo])).toEqual([
+      [6000, 19],
+      [50000, 21],
+      [200000, 23],
+      [300000, 27],
+      [Infinity, 30],
+    ]);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.12);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    await baseO(page, 'madrid');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1800,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('289.200,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('89.200,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.396,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('269.804,00 €');
+
+    await sembrar(page, OTRAS, '45000');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('20.416,00 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'Tributación en base del ahorro. Es lo que esta venta añade a tu cuota, sumada a 45.000,00 € de otras rentas del ahorro del año.',
+    );
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('31.216,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('268.784,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+    // Las otras rentas no tocan la ganancia: solo el tramo en que tributa.
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('89.200,00 €');
+
+    await sembrar(page, OTRAS, '150000');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('22.084,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('32.884,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('267.116,00 €');
+  });
+
+  /**
+   * CASO 76 bis (normal) — Melilla, BASE O + otras rentas 45.000: la deducción del art. 68.4
+   * LIRPF con otras rentas, la rama que 5f1b199a reescribió (el 60 % de la parte PROPORCIONAL de la
+   * cuota total; las otras rentas, fuera de la ciudad).
+   *   Plusvalía 1.800 × 50 % = 900 · transmisión 300.000 − 9.000 − 900 = 290.100 · ganancia 90.100
+   *   Base 135.100 → cuota total 1.140 + 9.240 + 85.100 × 23 % (19.573) = 29.953 · sin la venta
+   *     9.330 → añade 20.623
+   *   Deducción 60 % × 29.953 × 90.100 / 135.100 = 11.985,634… → «11.985,63 € menos»
+   *   IRPF 20.623 − 11.985,634 = 8.637,366 → «8637,37 €» · total 900 + 9.000 + 8.637,37 =
+   *   18.537,37 · neto 281.462,63 €
+   */
+  test('CASO 76 bis (normal) — Melilla con otras rentas: la deducción del 60 % sobre la parte proporcional', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    expect(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje).toBe(50);
+    expect(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje).toBe(60);
+
+    await baseO(page, 'melilla');
+    await sembrar(page, OTRAS, '45000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('900,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('90.100,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8637,37 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'Tributación en base del ahorro. Lleva la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 11.985,63 € menos. Es lo que esta venta añade a tu cuota, sumada a 45.000,00 € de otras rentas del ahorro del año.',
+    );
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('18.537,37 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('281.462,63 €');
+  });
+
+  /**
+   * CASO 77 (límite) — Madrid, BASE O, las otras rentas en los bordes de la escala:
+   *  · 6.000 (fin exacto del tramo del 19 %): toda la ganancia empieza en el 21 % → 44.000 × 21 %
+   *    (9.240) + 45.200 × 23 % (10.396) = 19.636,00 € · neto 300.000 − 10.800 − 19.636 = 269.564,00
+   *  · 300.000 (principio exacto del tramo del 30 %): 89.200 × 30 % = 26.760,00 € · neto
+   *    300.000 − 10.800 − 26.760 = 262.440,00
+   *  · «0» escrito: es la venta sola, 19.396,00 €, y la frase vuelve a la de «única renta».
+   */
+  test('CASO 77 (límite) — otras rentas en 6.000, en 300.000 y en 0: los bordes de la escala del ahorro', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await baseO(page, 'madrid');
+
+    await sembrar(page, OTRAS, '6000');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.636,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('269.564,00 €');
+
+    await sembrar(page, OTRAS, '300000');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('26.760,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('37.560,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('262.440,00 €');
+
+    await sembrar(page, OTRAS, '0');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.396,00 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'Tributación en base del ahorro. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
+    );
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('269.804,00 €');
+  });
+
+  /**
+   * CASO 78 (debe rechazarse) — Madrid, BASE O, otras rentas «45.000.50» (millar y decimal a la
+   * estadounidense: NaN por diseño). No es un cero: la cuota se publica con 0 (19.396,00 €, la
+   * venta sola) y la tarjeta del IRPF tiene que NOMBRAR el importe y decir que la cuota real es
+   * MAYOR (con 45.000 legible son 20.416,00 €, CASO 76). El testigo de familia mide el NETO de este
+   * campo; aquí se mide la tarjeta del IRPF, que es la cifra que el campo mueve primero.
+   */
+  test('CASO 78 (debe rechazarse) — otras rentas ilegibles: la cuota se nombra como mínima, no como definitiva', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await baseO(page, 'madrid');
+    await sembrar(page, OTRAS, '45.000.50');
+    await expect(page.locator(`input[aria-label="${OTRAS}"]`)).toHaveValue('45.000.50');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.396,00 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'El importe de otras rentas del ahorro no se ha podido leer, así que la cuota real es mayor. Escríbelo con coma decimal (1.234,56).',
+    );
+    expect(await rotulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('269.804,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe(
+      'El importe de otras rentas del ahorro no se ha podido leer: el neto real es menor que este. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
+    );
+  });
+
+  /**
+   * CONTROL de montaje del hallazgo de obra nueva: va en VERDE antes y después de repararlo. Con
+   * «Primera mano» pulsado, la plusvalía municipal (que también paga la promotora) y el valor de
+   * transmisión son los de la BASE O: 1800,00 € y 289.200,00 €.
+   */
+  test('CONTROL de montaje — BASE O con «Primera mano»: la plusvalía y la transmisión no cambian', async ({ page }) => {
+    test.setTimeout(90_000);
+    await baseO(page, 'madrid', true);
+    await expect(page.getByRole('button', { name: /Primera mano/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1800,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('289.200,00 €');
+  });
+
+  // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
+
+  /**
+   * HALLAZGO [medio, calculo] — ABIERTO (19/10/2026; cabo C0284, visto primero en garaje). Con
+   * «Primera mano» —obra nueva, que esta misma página define como «primera transmisión del
+   * promotor» y que el selector del vendedor rotula «Obra nueva, a la promotora»— la pestaña
+   * Vendedor liquida la venta como ganancia patrimonial de un particular en la base del ahorro,
+   * ofrece las exenciones de vivienda habitual y publica un neto «Lo que realmente recibes». Quien
+   * hace una entrega sujeta a IVA es empresario (Ley 37/1992, arts. 4.Uno y 5.Uno.d: «la promoción,
+   * construcción o rehabilitación de edificaciones … aunque sea ocasionalmente»), y su renta es de
+   * actividad económica (Ley 35/2006, art. 27.1: «… de construcción …») o del Impuesto sobre
+   * Sociedades, no una ganancia patrimonial (art. 33.1: «salvo que por esta Ley se califiquen como
+   * rendimientos»). BOE-A-2006-20764 y BOE-A-1992-28740, leídos el 19/10/2026.
+   * Madrid · Primera mano · BASE O → esperado: el IRPF avisa de que esa venta no tributa como
+   * ganancia patrimonial (o no se publica) · obtenido «IRPF sobre ganancia 19.396,00 € ·
+   * Tributación en base del ahorro…» y neto 269.804,00 € «Lo que realmente recibes»; con «Soy
+   * mayor de 65 años», «EXENTO · Mayor de 65 años + vivienda habitual» y 289.200,00 €.
+   * Si avisa o se apaga lo decide el usuario: el caso acepta las dos reparaciones.
+   */
+  test.fail('HALLAZGO obra nueva — la pestaña Vendedor no liquida a la promotora como a un particular', async ({ page }) => {
+    test.setTimeout(90_000);
+    await baseO(page, 'madrid', true);
+    const irpf = page.locator('h3', { hasText: /^IRPF sobre ganancia/ });
+    const textoIrpf =
+      (await irpf.count()) === 0
+        ? ''
+        : `${await valorTarjeta(page, /^IRPF sobre ganancia/)} ${await descripcionTarjeta(page, /^IRPF sobre ganancia/)}`;
+    const textoNeto = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
+    expect(`${textoIrpf} ${textoNeto}`).toMatch(/promotor|actividad econ[oó]mica|Impuesto sobre Sociedades/i);
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (19/10/2026). La línea que 5f1b199a (3368) añadió a la caja
+   * «Errores comunes al calcular los gastos de compraventa» termina en «No se compensan pérdidas de
+   * otras operaciones.» En garaje la misma frase va en la lista de limitaciones y se lee como un
+   * límite de la herramienta; aquí, entre errores fiscales, se lee como regla, y es falsa: el art.
+   * 49.1.b LIRPF integra y compensa «exclusivamente entre sí» las ganancias y pérdidas patrimoniales
+   * del periodo. Y contradice la tarjeta del IRPF de esta página con pérdida: «la pérdida se
+   * compensa con otras ganancias del ahorro en tu declaración».
+   * Esperado: que diga que ESTA herramienta no las compensa · obtenido «… la cuota será la que esta
+   * venta añade. No se compensan pérdidas de otras operaciones.»
+   */
+  test.fail('HALLAZGO pérdidas — la caja de errores comunes no niega la compensación de pérdidas', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO_PRECIO]);
+    const linea = (
+      await page
+        .locator('li', { hasText: 'como si fuera tu única renta del ahorro' })
+        .first()
+        .evaluate((e) => e.textContent ?? '')
+    ).replace(/\s+/g, ' ');
+    expect(linea).toContain('la cuota será la que esta venta añade');
+    expect(linea).not.toContain('No se compensan pérdidas de otras operaciones');
+  });
+});

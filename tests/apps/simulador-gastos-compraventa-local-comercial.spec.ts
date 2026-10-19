@@ -5661,11 +5661,13 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
     expect(await avisoNeto2309(page)).toContain('Revisa las amortizaciones deducidas');
   });
 
-  // ─── HALLAZGOS del 13/10/2026, ABIERTOS ──────────────────────────────────────────────
-  // Con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la del defecto son
-  // cifras o textos que la reparación no debe mover; la del defecto lee y compara, sin reintento.
+  // ─── HALLAZGOS del 13/10/2026, REPARADOS el 19/10/2026 (8615e925, hallazgos 3256-3262) ─────────
+  // Se escribieron con `test.fail()`, afirmando lo que DEBERÍA ocurrir; al repararlos se les quitó la
+  // marca. Las aserciones previas a la del defecto son cifras o textos que la reparación no debía
+  // mover; la del defecto lee y compara, sin reintento. Los bloques describen el defecto TAL COMO SE
+  // VIO el 13/10, con los verbos de entonces (re-inspección del 19/10/2026: los siete en verde).
 
-  // HALLAZGO [13/10-a] (bajo, contenido) — ❌ ABIERTO. La forma del 3247 de garaje, aquí con su
+  // HALLAZGO [13/10-a] (bajo, contenido) — ✅ REPARADO (3258). La forma del 3247 de garaje, aquí con su
   // caso: en Ceuta y Melilla la cuota publicada ya lleva restada la deducción del 60 % del art. 68.4
   // LIRPF, pero la frase que lo dice vive en la rama `??` de la descripción de la tarjeta del IRPF
   // (page.tsx ~l. 2025-2034). Con un importe ilegible el aviso la sustituye, y la cuota queda en el
@@ -5695,7 +5697,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
     expect(desc).toMatch(/deducción del 60 %/);
   });
 
-  // HALLAZGO [13/10-b] (bajo, contenido) — ❌ ABIERTO. La forma del 3254 de trastero (sospecha (b)
+  // HALLAZGO [13/10-b] (bajo, contenido) — ✅ REPARADO (3259). La forma del 3254 de trastero (sospecha (b)
   // del coordinador, medida): la coletilla de la bonificación de Ceuta y Melilla (page.tsx l. 795-797)
   // se pega con «, con la…» detrás de la descripción del total catastral ilegible (l. 791), que ya
   // acaba en punto: sale «(1.234,56)., con la bonificación…».
@@ -5717,7 +5719,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
     expect(desc).not.toContain('.,');
   });
 
-  // HALLAZGO [13/10-c] (medio, contenido) — ❌ ABIERTO. Cabo C0164, medido aquí: la condición para
+  // HALLAZGO [13/10-c] (medio, contenido) — ✅ REPARADO (3257). Cabo C0164, medido aquí: la condición para
   // deducir el IVA de la compra se publica de dos maneras. El FAQPage («sujeta y no exenta») y las
   // «Limitaciones» («actividad sujeta y no exenta») la dan bien (art. 94.Uno.1.º.a LIVA). Sin la
   // exención, y SIN matiz: el caso de uso «Autónomo compra local nuevo al promotor» («Si está dado de
@@ -5754,7 +5756,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
     expect(sinExencion).toEqual([]);
   });
 
-  // HALLAZGO [13/10-d] (medio, dato) — ❌ ABIERTO. Exclusivo de esta hermana. Tres bocas niegan una
+  // HALLAZGO [13/10-d] (medio, dato) — ✅ REPARADO (3256). Exclusivo de esta hermana. Tres bocas niegan una
   // exención que la ley da: «Un local no tiene exención por reinversión ni por edad» (tarjeta del IRPF),
   // «No hay exención por reinversión ni por tener más de 65 años: esas dos ventajas son exclusivas de la
   // vivienda habitual» (bloque educativo) y «A diferencia de la vivienda habitual, no existe exención
@@ -5784,7 +5786,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
     expect(niegan).toEqual([]);
   });
 
-  // HALLAZGO [13/10-e] (bajo, contenido) — ❌ ABIERTO. La forma del 3248 de garaje, aquí con su caso:
+  // HALLAZGO [13/10-e] (bajo, contenido) — ✅ REPARADO (3260). La forma del 3248 de garaje, aquí con su caso:
   // el ITP de segunda mano se publica en las FAQ con el rango nominal «del 6 % al 13 %» sin la salvedad
   // de Ceuta y Melilla, donde la app cobra el 3 % (BONIFICACION_CUOTA_CEUTA_MELILLA). Pasa en
   // RESPUESTA_IMPUESTO_COMPRA (FAQ visible y FAQPage), que sí bonifica el AJD de las dos ciudades en la
@@ -5815,7 +5817,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
     expect(sinSalvedad).toEqual([]);
   });
 
-  // HALLAZGO [13/10-f] (bajo, accesibilidad) — ❌ ABIERTO. «Tipo de transmisión» es un <label> sin
+  // HALLAZGO [13/10-f] (bajo, accesibilidad) — ✅ REPARADO (3261). «Tipo de transmisión» era un <label> sin
   // control (page.tsx l. 1276: ni htmlFor ni control dentro; `label.control` es null), y los tres
   // botones de debajo no forman un grupo con nombre: el lector de pantalla oye «Segunda mano Paga ITP
   // (tipo general), botón, pulsado» sin la pregunta a la que responde (WCAG 1.3.1). Es la forma del
@@ -5832,7 +5834,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
     expect(await grupo.count()).toBe(1);
   });
 
-  // HALLAZGO [13/10-g] (medio, dato) — ❌ ABIERTO. Añadido por el Inspector principal de la tanda: es la
+  // HALLAZGO [13/10-g] (medio, dato) — ✅ REPARADO (3262). Añadido por el Inspector principal de la tanda: es la
   // forma del [13/10-a] de nave-industrial, que su subagente vio en el mismo texto de esta app (page.tsx
   // l. 1245-1247) y aquí se midió en el navegador. En Ceuta y Melilla el aviso de cabecera dice del IPSI
   // «El impuesto soportado también puede ser deducible, pero con las reglas del IPSI», y la Ley 8/1991,
@@ -5850,5 +5852,334 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
       // El defecto.
       await expect(aviso).not.toContainText('también puede ser deducible', { timeout: 1000 });
     }
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 19/10/2026 — RE-INSPECCIÓN (invalidada por 5f1b199a, 8615e925 y ca9ab312). Lo que
+// cambió desde el 13/10: el vendedor pregunta «Otras rentas del ahorro de este año» y la cuota es
+// lo que la venta AÑADE a la base del ahorro entera (hallazgo 3368, cabo C0283); y los siete
+// hallazgos del 13/10 (3256-3262), reparados.
+//
+// Base previa: 2911 ([06/10-a]) y 2966 ([07/10-a]) siguen ABIERTOS y con `test.fail()`; los siete
+// del 13/10 van en verde. El testigo de familia (tests/familias/compraventa.spec.ts) ya mide las
+// otras rentas ILEGIBLES en Madrid con 6.000 € (delta 186,00 en el neto): aquí no se repite. Lo que
+// él no pisa y se mide abajo: la venta cruzando los tramos del 27 % y del 30 % con las otras rentas
+// legibles, el tipo marginal del aviso de la comisión sobre la base ENTERA, la deducción del art.
+// 68.4 LIRPF sobre la parte proporcional en Melilla, y las otras rentas ilegibles o negativas en
+// Melilla, con la frase de la deducción detrás del aviso (3258).
+//
+// De dónde sale cada cifra (resuelta a mano ANTES de abrir la app, ninguna de memoria):
+//   · ITP: `TIPOS_ITP_CCAA_2025` — Murcia 7,75 (sin escala ni umbral en `ITP_CCAA.murcia`); Melilla
+//     6 con `BONIFICACION_CUOTA_CEUTA_MELILLA` = 0,5 (art. 57 bis.3.a TRLITPAJD) → 3 % efectivo.
+//   · Notaría: `ARANCELES_NOTARIO` (RD 1426/1989, nº 2.1; las bases acumuladas del primer tramo y los
+//     excesos) × (1 − `REBAJA_ARANCEL_CUANTIA`) × 1,21 de IVA donde rige (no en Melilla,
+//     `honorariosLlevanIVA`) × 1,75, punto medio de `FACTURA_NOTARIAL` (1,5 a 2).
+//   · Registro: `ARANCELES_REGISTRO` (RD 1427/1989) × 0,95 + `REGISTRO_CONCEPTOS` (6,010121 +
+//     3,005061) × 1,21 donde rige.
+//   · Plusvalía: `COEFICIENTES_IIVTNU_2025` (10 años 0,12) × `PLUSVALIA_MUNICIPAL_META.tipoOrientativo`
+//     (25); método real del art. 107.5 TRLRHL; en Melilla la cuota × 50 %
+//     (`BONIFICACION_IIVTNU_CEUTA_MELILLA`, art. 159.2 TRLRHL).
+//   · IRPF: `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000 · 21 % hasta 50.000 · 23 % hasta
+//     200.000 · 27 % hasta 300.000 · 30 % el resto) sobre la base del ahorro ENTERA (art. 66 LIRPF):
+//     la venta paga cuota(otras + ganancia) − cuota(otras).
+//     Cuotas acumuladas: cuota(6.000) = 1.140 · cuota(50.000) = 10.380 · cuota(200.000) = 44.880 ·
+//     cuota(300.000) = 71.880.
+//   · Melilla: − 60 % (`DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA`, art. 68.4 LIRPF) de «la parte de la suma
+//     de las cuotas íntegras […] que proporcionalmente corresponda» a la renta obtenida allí:
+//     cuota TOTAL × ganancia / base del ahorro (el supuesto del motor: las otras rentas, fuera).
+//
+// El vendedor de los tres casos es el de `vendedorSinAmortizar0810` (perfil «Local no afecto»):
+//   200.000 · compra 150.000 · gastos 15.000 · 10 años · suelo 40.000 · total 100.000 · comisión 3 % ·
+//   gestoría 500 → transmisión 200.000 − 6.000 − 500 − plusvalía · adquisición 165.000.
+//
+// Hallazgos NUEVOS, con `test.fail()` (afirman lo que DEBERÍA pasar), al final del bloque:
+//   [19/10-a] (cabo C0284) con «Obra nueva / Promotor» la pestaña Vendedor liquida al promotor como
+//             a un particular, en la base del ahorro.
+//   [19/10-b] (cabo C0314) cuatro bocas exigen derecho a deducir también al VENDEDOR para renunciar a
+//             la exención, y el art. 20.Dos LIVA solo se lo exige al adquirente.
+//   [19/10-c] con otras rentas escritas y un importe ilegible, la tarjeta del IRPF pierde la frase que
+//             dice sobre qué base está calculada la cuota (la forma del 3258).
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tramo, Melilla en el 30 % y lo que no se lee', () => {
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 48 (NORMAL) — MURCIA, local de segunda mano de 200.000 €, y el vendedor con 180.000 € de
+  // otras rentas del ahorro, que llevan la venta del tramo del 23 % al del 27 %.
+  //   COMPRADOR: ITP 200.000 × 7,75 % = 15.500,00 → «ITP (7,75 %)», sin AJD.
+  //     Notaría: 90,151816 + 24.040,49 × 0,45 % (108,182205) + 30.050,60 × 0,15 % (45,0759)
+  //       + 90.151,82 × 0,10 % (90,15182) + 49.746,97 × 0,05 % (24,873485) = 358,435226 ;
+  //       × 0,95 = 340,513465 ; × 1,21 = 412,021292 → × 1,75 = 721,04 (× 1,5 = 618,03 · × 2 = 824,04)
+  //     Registro: 24,040484 + 24.040,49 × 0,175 % (42,070858) + 30.050,60 × 0,125 % (37,56325)
+  //       + 90.151,82 × 0,075 % (67,613865) + 49.746,97 × 0,030 % (14,924091) = 186,212548 ;
+  //       × 0,95 = 176,901921 ; + 9,015182 = 185,917103 ; × 1,21 = 224,96
+  //     Total = 15.500 + 721,04 + 224,96 + 500 = 16.946,00 (8,47 %) · COSTE 216.946,00
+  //   VENDEDOR: plusvalía objetivo 40.000 × 0,12 × 25 % = 1200,00 (real 50.000 × 0,4 × 25 % = 5.000)
+  //     transmisión 192.300 · ganancia 27.300
+  //     sin otras rentas: 1.140 + 21.300 × 21 % = 5613,00 · neto 186.687,00
+  //     con 180.000: cuota(207.300) − cuota(180.000) = (44.880 + 7.300 × 27 %) − (10.380 + 130.000
+  //       × 23 %) = 46.851 − 40.280 = 6571,00 · total 1.200 + 6.000 + 500 + 6.571 = 14.271,00 ·
+  //       NETO 185.729,00
+  //   Y con la comisión ilegible («3.5.0», vale 0): transmisión 198.300 · ganancia 33.300 →
+  //     cuota(213.300) − cuota(180.000) = (44.880 + 13.300 × 27 %) − 40.280 = 8191,00 ·
+  //     NETO (PARCIAL) 200.000 − 1.200 − 500 − 8.191 = 190.109,00. Descontar la comisión rebaja el
+  //     IRPF a lo sumo al tipo MARGINAL de la base entera, 213.300 → 27 % (sin las otras rentas
+  //     sería el 21 %: eso es lo que 5f1b199a llevó al aviso).
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 48 (normal) — Murcia 200.000 €: ITP 7,75 %, y 180.000 € de otras rentas llevan la venta al 27 %', async ({ page }) => {
+    expect(TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === 'Murcia')?.tipo).toBe(7.75);
+    expect(ITP_CCAA.murcia.tramosProgresivos).toBeUndefined();
+    expect(ITP_CCAA.murcia.umbralTipoUnico).toBeUndefined();
+    expect(REBAJA_ARANCEL_CUANTIA).toBe(0.05);
+    expect(ARANCELES_NOTARIO.map((t) => t.exceso)).toEqual([0, 0.45, 0.15, 0.1, 0.05, 0.03]);
+    expect(ARANCELES_REGISTRO.map((t) => t.exceso).slice(0, 5)).toEqual([0, 0.175, 0.125, 0.075, 0.03]);
+    expect([FACTURA_NOTARIAL.factorMin, FACTURA_NOTARIAL.factorMax]).toEqual([1.5, 2]);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 10)?.coeficiente).toBe(0.12);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025).toEqual([
+      { hasta: 6000, tipo: 19 },
+      { hasta: 50000, tipo: 21 },
+      { hasta: 200000, tipo: 23 },
+      { hasta: 300000, tipo: 27 },
+      { hasta: Infinity, tipo: 30 },
+    ]);
+
+    await abrir0810(page);
+    await page.selectOption('#select-ccaa', 'murcia');
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    await esperarTarjeta2609(page, /^ITP/, '15.500,00 €');
+    expect(await tituloTarjeta24(page, /^ITP/)).toBe('ITP (7,75 %)');
+    await expect(page.locator('h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('721,04 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 618,03 € y 824,04 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('224,96 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('16.946,00 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('8,47 % sobre el precio de compra');
+    expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, /^COSTE TOTAL/)).toBe('216.946,00 €');
+
+    await vendedorSinAmortizar0810(page, 'murcia');
+    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '5613,00 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('192.300,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('27.300,00 €');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('186.687,00 €');
+
+    await sembrarImporte12(page, 'Otras rentas del ahorro de este año (€)', '180000');
+    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '6571,00 €');
+    // La ganancia no cambia: las otras rentas solo mueven el tramo en que tributa.
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('27.300,00 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain(
+      'Es lo que esta venta añade a tu cuota, sumada a 180.000,00 € de otras rentas del ahorro del año.',
+    );
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('14.271,00 €');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('185.729,00 €');
+
+    // El tipo marginal del aviso, sobre la base ENTERA (213.300 → 27 %), no sobre la venta sola (21 %).
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3.5.0');
+    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '8191,00 €');
+    expect(await valorTarjeta(page, 'Comisión de la inmobiliaria')).toBe('Sin leer');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('33.300,00 €');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('190.109,00 €');
+    const aviso = await avisoNeto2309(page);
+    expect(aviso).toContain('NETO QUE RECIBES (PARCIAL)');
+    expect(aviso).toContain(
+      'No descuenta la comisión inmobiliaria, que no se ha podido leer (la comisión inmobiliaria rebaja también el IRPF al descontarla, hasta un 27 % de su importe): el neto real es menor que este',
+    );
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 49 (LÍMITE) — MELILLA, 200.000 €: el comprador con la cuota del ITP a la mitad y los
+  // honorarios sin IPSI, y el vendedor con 290.000 € de otras rentas, que llevan la venta al ÚLTIMO
+  // tramo (del 27 % al 30 %), con la deducción del 60 % sobre la parte proporcional (art. 68.4 LIRPF).
+  //   COMPRADOR: ITP 200.000 × 6 % × 50 % = 6000,00 → «ITP (3,00 %)».
+  //     Notaría sin IPSI: 358,435226 × 0,95 = 340,513465 → × 1,75 = 595,90 (510,77 – 681,03)
+  //     Registro sin IPSI: 185,917103 → 185,92
+  //     Total = 6.000 + 595,90 + 185,92 + 500 = 7281,82 (parcial: sin el IPSI de las facturas) ·
+  //     COSTE (PARCIAL) 207.281,82
+  //   VENDEDOR: plusvalía objetivo 40.000 × 0,12 × 25 % × 50 % = 600,00 (real 5.000 × 50 % = 2.500)
+  //     transmisión 200.000 − 6.000 − 500 − 600 = 192.900 · ganancia 27.900
+  //     sin otras rentas: íntegra 1.140 + 21.900 × 21 % = 5.739 ; − 60 % (3443,40) = 2295,60
+  //     con 290.000: añade cuota(317.900) − cuota(290.000) = (71.880 + 17.900 × 30 %) − (44.880 +
+  //       90.000 × 27 %) = 77.250 − 69.180 = 8.070 ;
+  //       deducción 60 % × 77.250 × 27.900 / 317.900 = 60 % × 6779,726329 = 4067,84 ;
+  //       IRPF 8.070 − 4.067,835797 = 4002,16 · total 600 + 6.000 + 500 + 4.002,16 = 11.102,16 ·
+  //       NETO 188.897,84
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 49 (límite) — Melilla: 290.000 € de otras rentas llevan la venta al 30 %, con la deducción del 60 % proporcional', async ({ page }) => {
+    expect(ITP_CCAA.melilla.tipoGeneral).toBe(6);
+    expect(BONIFICACION_CUOTA_CEUTA_MELILLA).toBe(0.5);
+    expect(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje).toBe(50);
+    expect(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje).toBe(60);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[4]).toEqual({ hasta: Infinity, tipo: 30 });
+
+    await abrir0810(page);
+    await page.selectOption('#select-ccaa', 'melilla');
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    await esperarTarjeta2609(page, /^ITP/, '6000,00 €');
+    expect(await tituloTarjeta24(page, /^ITP/)).toBe('ITP (3,00 %)');
+    expect(await tituloTarjeta24(page, 'Gastos de notaría')).toBe('Gastos de notaría (sin IPSI)');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('595,90 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 510,77 € y 681,03 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('185,92 €');
+    expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('7281,82 €');
+    expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, /^COSTE TOTAL/)).toBe('207.281,82 €');
+
+    await vendedorSinAmortizar0810(page, 'melilla');
+    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '2295,60 €');
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('600,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('27.900,00 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain(
+      'Lleva la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 3443,40 € menos.',
+    );
+
+    await sembrarImporte12(page, 'Otras rentas del ahorro de este año (€)', '290000');
+    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '4002,16 €');
+    const desc = await descripcionTarjeta(page, 'IRPF sobre la ganancia');
+    expect(desc).toContain('Lleva la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 4067,84 € menos.');
+    expect(desc).toContain('Es lo que esta venta añade a tu cuota, sumada a 290.000,00 € de otras rentas del ahorro del año.');
+    expect(await valorTarjeta(page, 'Total gastos de la venta')).toBe('11.102,16 €');
+    expect(await tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('188.897,84 €');
+  });
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // CASO 50 (RECHAZO) — el vendedor de Melilla del CASO 49, con unas otras rentas que no valen:
+  //   (a) «-50000» con el foco dentro: un saldo negativo no rebaja la cuota (la app no compensa
+  //       pérdidas de otras operaciones, y lo dice en sus limitaciones) → IRPF 2295,60 y la frase de
+  //       «única renta»; al salir del campo queda en «0».
+  //   (b) «290.000.50» (millar y decimal a la estadounidense): no vale 0 en silencio. Se publica la
+  //       cuota sin ellas (2295,60), la tarjeta nombra el importe y dice que la real ES mayor (con 1 €
+  //       ya sube: cuota(27.901) − cuota(1) − 60 % × cuota(27.901) × 27.900/27.901 = 2295,62), conserva
+  //       la deducción (3258) y el neto 200.000 − 600 − 6.000 − 500 − 2.295,60 = 190.604,40 sale
+  //       (PARCIAL) con «el neto real es menor».
+  // ══════════════════════════════════════════════════════════════════════════
+  test('CASO 50 (rechazo) — Melilla: otras rentas negativas o ilegibles no rebajan la cuota ni valen 0 en silencio', async ({ page }) => {
+    await abrir0810(page);
+    await vendedorSinAmortizar0810(page, 'melilla');
+    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '2295,60 €');
+
+    // (a) Negativo con el foco dentro, y al salir.
+    const campo = page.locator('input[aria-label="Otras rentas del ahorro de este año (€)"]');
+    await sembrarImporte12(page, 'Otras rentas del ahorro de este año (€)', '-50000', { blur: false });
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('2295,60 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain(
+      'Calculado como si esta venta fuera tu única renta del ahorro del año',
+    );
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('190.604,40 €');
+    await campo.blur();
+    await expect(campo).toHaveValue('0');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('2295,60 €');
+
+    // (b) Ilegible.
+    await sembrarImporte12(page, 'Otras rentas del ahorro de este año (€)', '290.000.50');
+    await expect(campo).toHaveValue('290.000.50');
+    await expect.poll(() => tituloTarjeta24(page, /^NETO QUE RECIBES/)).toBe('NETO QUE RECIBES (PARCIAL)');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('2295,60 €');
+    const desc = await descripcionTarjeta(page, 'IRPF sobre la ganancia');
+    expect(desc).toContain('El importe de otras rentas del ahorro no se ha podido leer, así que la cuota real es mayor.');
+    expect(desc).toContain('Lleva la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 3443,40 € menos.');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('190.604,40 €');
+    expect(await avisoNeto2309(page)).toContain(
+      'El importe de otras rentas del ahorro no se ha podido leer: el neto real es menor que este',
+    );
+    expect(await tituloTarjeta24(page, /^Total gastos de la venta/)).toBe('Total gastos de la venta (parcial)');
+  });
+
+  // ─── HALLAZGOS del 19/10/2026, ABIERTOS ──────────────────────────────────────────────
+  // Con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la del defecto son
+  // cifras o textos que la reparación no debe mover; la del defecto lee y compara, sin reintento.
+
+  // HALLAZGO [19/10-a] (medio, cálculo) — ❌ ABIERTO. Cabo C0284, la forma de los hallazgos 3379
+  // (garaje) y 3377 (estimador), medida aquí. Con «Obra nueva / Promotor» la pestaña Vendedor sigue
+  // liquidando la venta como la ganancia patrimonial de un particular en la base del ahorro (19-30 %) y
+  // publica un neto con esa cuota: el cálculo del vendedor (`calcularVendedor`) no recibe el tipo de
+  // transmisión. En una primera entrega vende el promotor (LIVA art. 20.Uno.22.º A y 5.Uno.d,
+  // BOE-A-1992-28740), cuya renta es de actividad económica (LIRPF art. 27.1) o del IS, no una ganancia
+  // patrimonial (art. 33.1; BOE-A-2006-20764), leídos en el BOE el 19/10/2026 para garaje. La nota del
+  // panel solo habla de la SOCIEDAD vendedora y no nombra al promotor.
+  //   Madrid · Obra nueva / Promotor · 200.000 → comprador IVA 200.000 × 21 % = 42.000,00 ; vendedor
+  //   de la base → «IRPF sobre la ganancia 5613,00 €» (1.140 + 21.300 × 21 %) y neto 186.687,00.
+  test('[19/10-a] con «Obra nueva / Promotor», la pestaña Vendedor no liquida al promotor como a un particular', async ({ page }) => {
+    test.fail();
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+    await abrir0810(page);
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await expect(page.getByRole('button', { name: /Obra nueva/ })).toHaveAttribute('aria-pressed', 'true');
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    await esperarTarjeta2609(page, /^IVA \(21/, '42.000,00 €');
+    await vendedorSinAmortizar0810(page, 'madrid');
+    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '5613,00 €');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('186.687,00 €');
+    // El defecto (lee una vez, sin reintento): el panel del vendedor no nombra al promotor ni la
+    // actividad económica. «Impuesto sobre Sociedades» no cuenta: la nota fija lo dice de cualquier
+    // venta, con cualquier tipo de transmisión.
+    const panel = ((await page.locator('div[class*="resultsInner"]').first().textContent()) ?? '').replace(/\s+/g, ' ');
+    expect(panel).toMatch(/promotor|actividad económica/i);
+  });
+
+  // HALLAZGO [19/10-b] (medio, dato) — ❌ ABIERTO. Cabo C0314, medido aquí. Cuatro bocas exigen que
+  // el VENDEDOR también tenga derecho a deducir para renunciar a la exención: RESPUESTA_RENUNCIA de
+  // metadata.ts (FAQ visible y FAQPage: «si comprador y vendedor son empresarios o profesionales con
+  // derecho a deducir el IVA, el vendedor puede renunciar»), el aviso de la renuncia («solo es posible
+  // cuando comprador y vendedor son empresarios o profesionales con derecho a deducción») y el caso de
+  // uso «Empresa compra local usado a otra empresa» («Si ambas partes tienen derecho a deducción»). La
+  // Ley 37/1992, art. 20.Dos (BOE-A-1992-28740, leído el 19/10/2026): las exenciones «podrán ser objeto
+  // de renuncia por el sujeto pasivo» «cuando el adquirente sea un sujeto pasivo que actúe en el
+  // ejercicio de sus actividades empresariales o profesionales» y «se le atribuya el derecho a efectuar
+  // la deducción total o parcial del Impuesto soportado al realizar la adquisición» (o, si no, por el
+  // destino previsible de los bienes). El requisito de deducir es del ADQUIRENTE: una clínica o una
+  // academia (exentas) que venden su local a un comercio sí pueden renunciar.
+  test('[19/10-b] ninguna boca exige al vendedor derecho a deducir para renunciar a la exención (art. 20.Dos LIVA)', async ({ page }) => {
+    test.fail();
+    await abrir0810(page);
+    await page.getByRole('button', { name: /2ª mano con renuncia/ }).click();
+    await sembrarImporte12(page, 'Precio del local comercial', '200000');
+    await esperarTarjeta2609(page, /^IVA \(renuncia/, '42.000,00 €');
+    const avisoRenuncia = page.locator('[role="note"]', { hasText: 'Renuncia a la exención de IVA (Art. 20.Dos LIVA)' });
+    await expect(avisoRenuncia).toHaveCount(1);
+    const pregunta = '¿Qué es la renuncia a la exención de IVA y a quién le interesa?';
+    const bocas: Record<string, string> = {
+      'FAQ visible': await faqVisible0710(page, pregunta),
+      FAQPage: (await faqPage0710(page)).get(pregunta) ?? '',
+      'aviso de la renuncia': await textoDe1310(avisoRenuncia),
+      'caso de uso': await textoDe1310(
+        page.locator('strong', { hasText: 'Empresa compra local usado a otra empresa' }).locator('xpath=following-sibling::p[1]'),
+      ),
+    };
+    expect(bocas.FAQPage).toContain('artículo 20.Dos');
+    expect(bocas['caso de uso']).toContain('el vendedor puede renunciar a la exención de IVA');
+    // El defecto.
+    const exigenAlVendedor = Object.entries(bocas)
+      .filter(([, t]) => /comprador y vendedor son empresarios o profesionales con derecho a dedu|ambas partes tienen derecho a deducción/i.test(t))
+      .map(([b]) => b);
+    expect(exigenAlVendedor).toEqual([]);
+  });
+
+  // HALLAZGO [19/10-c] (bajo, contenido) — ❌ ABIERTO. La forma del 3258 (reparado en 8615e925 para la
+  // deducción de Ceuta y Melilla), en la frase que trajo 5f1b199a. «Es lo que esta venta añade a tu
+  // cuota, sumada a X € de otras rentas del ahorro del año» (y, sin ellas, «Calculado como si esta
+  // venta fuera tu única renta… la cuota puede ser mayor») vive solo en la rama de reserva de la
+  // descripción de la tarjeta del IRPF (page.tsx ~l. 2108): con cualquier importe ilegible el aviso la
+  // sustituye, y la cuota se publica sin decir sobre qué base del ahorro está calculada.
+  //   Madrid · vendedor de la base · otras rentas 180.000 · comisión «3.5.0» → transmisión 198.300 ·
+  //   ganancia 33.300 → cuota(213.300) − cuota(180.000) = 8191,00 (la venta sola daría 1.140 + 27.300 ×
+  //   21 % = 6873,00), y la tarjeta solo dice «La comisión inmobiliaria no se ha podido leer, así que la
+  //   cuota real es menor».
+  test('[19/10-c] con otras rentas y un importe ilegible, la tarjeta del IRPF sigue diciendo sobre qué base está la cuota', async ({ page }) => {
+    test.fail();
+    await abrir0810(page);
+    await vendedorSinAmortizar0810(page, 'madrid');
+    await sembrarImporte12(page, 'Otras rentas del ahorro de este año (€)', '180000');
+    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '6571,00 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain('sumada a 180.000,00 € de otras rentas del ahorro');
+    await sembrarImporte12(page, 'Comisión de la inmobiliaria (%)', '3.5.0');
+    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '8191,00 €');
+    const desc = await descripcionTarjeta(page, 'IRPF sobre la ganancia');
+    expect(desc).toContain('La comisión inmobiliaria no se ha podido leer, así que la cuota real es menor');
+    // El defecto.
+    expect(desc).toContain('180.000,00 € de otras rentas del ahorro');
   });
 });

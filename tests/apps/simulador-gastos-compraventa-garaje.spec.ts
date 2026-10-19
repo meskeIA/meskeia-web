@@ -61,12 +61,17 @@
  *      en Madrid (la notaría en su último tramo con el exceso de libre acuerdo y el registro en su
  *      tope de 2.181,673939 €), el invariante de la familia en la rama IVA + AJD y en la cuota de
  *      comunidad del reparto, la FAQ «escriturar» contra el motor, y un hallazgo con `test.fail()`.
+ *  27. INSPECTOR 19/10/2026 — re-inspección tras 5f1b199a (3368: las otras rentas del ahorro) y
+ *      ca9ab312: la venta cruzando tramo con otras rentas (La Rioja, del 21 % al 23 %), Ceuta en el
+ *      30 % con la deducción proporcional del art. 68.4 LIRPF, las otras rentas ilegibles en Ceuta y
+ *      un hallazgo con `test.fail()` (cabo C0284: el vendedor de la obra nueva es el promotor).
  *
  * ⚠️ 06/10/2026 — los bloques «✅ REPARADO» (antes «❌ ABIERTO») describen el defecto TAL
  * COMO SE VIO el día de su inspección, con los verbos de entonces. A 13/10/2026 la base no
  * tenía ninguno abierto en esta app: los únicos `test.fail()` vivos son los de la sección 25.
  * ⚠️ 18/10/2026 — siguen ABIERTOS en la base los cinco de la sección 25 (hallazgos 3247-3251). El
  *    [18/10-a] de la sección 26 (hallazgo 3368) se reparó ese mismo día.
+ * ⚠️ 19/10/2026 — los cinco de la sección 25 siguen abiertos; se suma el [19/10-a] de la sección 27.
  * ⚠️ 13/10/2026 — las secciones que fijan la notaría y el registro de ANTES del 11/10/2026
  * (371,84 €, 80,21 €…) fallan desde a3c3ecb0: su puesta al día es el cabo C0209.
  * ✅ 17/10/2026 (cabo C0209) — puestas al día: cada cifra se recalculó a mano con la base del BOE
@@ -8181,5 +8186,288 @@ test.describe('Inspector 18/10/2026 — obra nueva vinculada, el tope de los dos
     expect(await i18DescCruda(page, /^IMPORTE NETO VENDEDOR/)).toContain(
       'El importe de otras rentas del ahorro no se ha podido leer: el neto real puede ser menor que este',
     );
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 27. INSPECTOR 19/10/2026 — RE-INSPECCIÓN tras 5f1b199a (hallazgo 3368: el IRPF de la venta con las
+//     otras rentas del ahorro del año) y ca9ab312 (retira COSTES_COMPRAVENTA_2025, sin lectores).
+//
+// Los casos de la sección 26 ([18/10-a]) solo ponen 6.000 € de otras rentas: la venta empieza justo
+// en el 21 % y no CRUZA ningún tramo. Aquí la venta cae a caballo de dos tramos, y en Ceuta con la
+// deducción del art. 68.4 LIRPF, que con otras rentas ya no es el 60 % de la cuota de la venta sola.
+// Los tres casos se resolvieron a mano ANTES de abrir la app y cuadraron al céntimo:
+//   GA (normal)  — La Rioja · segunda mano · 32.000 €: el comprador entero (ninguna sección medía La
+//                  Rioja con cifra) y un vendedor con 45.000 € de otras rentas: la venta cruza los
+//                  50.000 € (del 21 % al 23 %).
+//   GB (límite)  — Ceuta · 60.000 € · vendedor con 290.000 € de otras rentas: la venta cruza los
+//                  300.000 € y entra en el 30 %, el TRAMO MÁS ALTO, con la deducción del 60 % sobre la
+//                  parte PROPORCIONAL de la cuota total.
+//   GC (rechazo) — el vendedor de GB con las otras rentas ilegibles («290.000.50»): no valen 0 en
+//                  silencio, se nombran y la dirección (cuota mayor, neto menor) sale del sondeo. Y un
+//                  negativo se acota a 0, como cualquier importe de la familia.
+//
+// Hallazgo NUEVO, con `test.fail()` (afirma lo que DEBERÍA pasar), al final del bloque:
+//   [19/10-a] (cabo C0284) con «Primera mano (obra nueva)» la pestaña Vendedor liquida la venta como
+//             la ganancia patrimonial de un particular en la base del ahorro, y quien vende en una
+//             primera entrega es el promotor.
+// Siguen abiertos los cinco de la sección 25 (3247-3251). El GC vuelve a mostrar el 3247: con las
+// otras rentas ilegibles en Ceuta la tarjeta del IRPF pierde la frase de la deducción.
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//   · ITP → `ITP_CCAA.rioja.tipoGeneral` (TIPOS_ITP_CCAA_2025: La Rioja 7) y, en Ceuta, su
+//     «Bonificación general 50 %» (tipo 3).
+//   · Notaría → `ARANCELES_NOTARIO` (RD 1426/1989, nº 2.1) × (1 − `REBAJA_ARANCEL_CUANTIA`) × 1,21 y
+//     la horquilla de `FACTURA_NOTARIAL` · Registro → `ARANCELES_REGISTRO` × 0,95 + `REGISTRO_CONCEPTOS`,
+//     × 1,21.
+//   · Plusvalía → `COEFICIENTES_IIVTNU_2025` (12 años 0,09 · 20 o más 0,40) × 25 % (`tipoOrientativo`),
+//     y en Ceuta × 50 % (`BONIFICACION_IIVTNU_CEUTA_MELILLA`, art. 159.2 TRLRHL).
+//   · IRPF → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` aplicada a la base del ahorro ENTERA (art. 66 LIRPF):
+//     lo que la venta añade es cuota(otras + ganancia) − cuota(otras).
+//   · Deducción de Ceuta → `DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA` (60 %) sobre «la parte de la suma de las
+//     cuotas íntegras […] que proporcionalmente corresponda» a las rentas obtenidas allí (art. 68.4
+//     LIRPF, la cita del módulo): cuota TOTAL × ganancia / base del ahorro.
+//   · [19/10-a] → LIVA, art. 20.Uno.22.º A) («se considerará primera entrega la realizada por el
+//     promotor que tenga por objeto una edificación cuya construcción o rehabilitación esté terminada»)
+//     y art. 5.Uno.d) (BOE-A-1992-28740); LIRPF, art. 33.1 («salvo que por esta Ley se califiquen como
+//     rendimientos») y art. 27.1 (BOE-A-2006-20764). Leídos en el BOE el 19/10/2026.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** El vendedor de GA (La Rioja), sobre la pestaña Vendedor ya abierta. */
+const I19_VENDEDOR_RIOJA: readonly [string, string][] = [
+  ['Precio de compra original del garaje', '20000'],
+  ['Impuestos y gastos que pagaste al comprarlo (€)', '1500'],
+  ['Años de propiedad', '12'],
+  ['Valor catastral del suelo (€)', '4000'],
+  ['Valor catastral total (suelo + construcción) (€)', '10000'],
+  ['Comisión inmobiliaria del vendedor (%)', '3'],
+  ['Gestoría y certificados del vendedor (€)', '200'],
+];
+
+/** El vendedor de GB y GC (Ceuta), sin gestoría de la venta. */
+const I19_VENDEDOR_CEUTA: readonly [string, string][] = [
+  ['Precio de compra original del garaje', '30000'],
+  ['Impuestos y gastos que pagaste al comprarlo (€)', '2000'],
+  ['Años de propiedad', '25'],
+  ['Valor catastral del suelo (€)', '10000'],
+  ['Valor catastral total (suelo + construcción) (€)', '40000'],
+  ['Comisión inmobiliaria del vendedor (%)', '3'],
+];
+
+const I19_OTRAS_RENTAS = 'Otras rentas del ahorro de este año (€)';
+
+/** Abre la app en una comunidad, escribe el precio y deja el comprador a la vista. */
+async function i19Abrir(page: Page, ccaa: string, precio: string): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+  await page.selectOption('#select-ccaa', ccaa);
+  await sembrarImporte(page, 'Precio del garaje / plaza de parking', precio);
+}
+
+/** Pasa a la pestaña Vendedor y siembra sus datos. */
+async function i19Vendedor(page: Page, datos: readonly [string, string][]): Promise<void> {
+  await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
+  for (const [etiqueta, valor] of datos) await sembrarImporte(page, etiqueta, valor);
+}
+
+test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tramo, Ceuta en el 30 % y el vendedor de la obra nueva', () => {
+  /**
+   * CASO GA (NORMAL) — LA RIOJA · segunda mano · 32.000 € · General · gestoría 300 (la de serie).
+   *   ITP: 32.000 × 7 % = 2.240,00 € (sin escala).
+   *   Notaría: 90,151816 + 24.040,49 × 0,45 % (108,182205) + 1.949,39 × 0,15 % (2,924085) = 201,258106
+   *     × 0,95 = 191,195201 × 1,21 = 231,346193 → ×1,5 = 347,02 · ×2 = 462,69 · ×1,75 = 404,86 €
+   *   Registro: 24,040484 + 24.040,49 × 0,175 % (42,0708575) + 1.949,39 × 0,125 % (2,4367375) =
+   *     68,548079 × 0,95 = 65,120675 + 9,015182 = 74,135857 × 1,21 = 89,70 €
+   *   Total: 2.240 + 404,86 + 89,70 + 300 = 3.034,56 € (9,48 %) · coste 35.034,56 €.
+   * Vendedor: compra 20.000 · gastos 1.500 · 12 años · suelo 4.000 · total 10.000 · comisión 3 % ·
+   *   gestoría 200.
+   *   Plusvalía: objetivo 4.000 × 0,09 × 25 % = 90,00 · real 12.000 × 0,4 × 25 % = 1.200 → el objetivo.
+   *   Adquisición 21.500 · transmisión 32.000 − 960 − 200 − 90 = 30.750 · ganancia 9.250.
+   *   · Sin otras rentas: 6.000 × 19 % + 3.250 × 21 % = 1.822,50 € · total 3.072,50 · neto 28.927,50.
+   *   · Con 45.000 € de otras rentas, la venta ocupa [45.000, 54.250]: 5.000 × 21 % + 4.250 × 23 % =
+   *     2.027,50 € (= cuota(54.250) 11.357,50 − cuota(45.000) 9.330,00) · total 3.277,50 · neto 28.722,50.
+   *   Lo que vigila: como única renta saldrían 1.822,50 (205 € menos); al 21 % plano, 1.942,50; al 23 %
+   *   sobre toda la ganancia, 2.127,50. Las cifras van al céntimo.
+   */
+  test('CASO GA (normal) — La Rioja 32.000 €, y un vendedor con 45.000 € de otras rentas: la venta cruza del 21 % al 23 %', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.rioja.tipoGeneral).toBe(7);
+    expect(ITP_CCAA.rioja.tramosProgresivos).toBeUndefined();
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 12)?.coeficiente).toBe(0.09);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.slice(0, 3)).toEqual([
+      { hasta: 6000, tipo: 19 },
+      { hasta: 50000, tipo: 21 },
+      { hasta: 200000, tipo: 23 },
+    ]);
+
+    await i19Abrir(page, 'rioja', '32000');
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('7,00 %');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (7,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('2240,00 €');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('404,86 €');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('Factura estimada entre 347,02 € y 462,69 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('89,70 €');
+    expect(await i24Valor(page, /^Gastos de gestoría/)).toBe('300,00 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('3034,56 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe('9,48 % sobre el precio');
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('35.034,56 €');
+
+    await i19Vendedor(page, I19_VENDEDOR_RIOJA);
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('90,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método objetivo (más favorable)');
+    expect(await i24Valor(page, /^Valor de adquisición/)).toBe('21.500,00 €');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('30.750,00 €');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('9250,00 €');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('1822,50 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('3072,50 €');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('28.927,50 €');
+
+    await sembrarImporte(page, I19_OTRAS_RENTAS, '45000');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('2027,50 €');
+    expect(await i18DescCruda(page, /^IRPF sobre ganancia/)).toBe(
+      'Tributación en base del ahorro (del 19 % al 30 %). Es lo que esta venta añade a tu cuota, sumada a 45.000,00 € de otras rentas del ahorro del año.',
+    );
+    // La ganancia no cambia con las otras rentas: solo la cuota.
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('9250,00 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('3277,50 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('28.722,50 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes tras gastos e impuestos');
+  });
+
+  /**
+   * CASO GB (LÍMITE) — CEUTA · segunda mano · 60.000 € · vendedor con 290.000 € de otras rentas.
+   *   Comprador: ITP 60.000 × 3 % (el 6 % con el 50 % de la cuota) = 1.800,00 €.
+   * Vendedor: compra 30.000 · gastos 2.000 · 25 años · suelo 10.000 · total 40.000 · comisión 3 %.
+   *   Plusvalía: objetivo 10.000 × 0,40 × 25 % × 50 % = 500,00 · real 30.000 × 0,25 × 25 % × 50 % =
+   *     937,50 → el objetivo. Adquisición 32.000 · transmisión 60.000 − 1.800 − 500 = 57.700 ·
+   *     ganancia 25.700.
+   *   · Sin otras rentas: cuota(25.700) = 1.140 + 19.700 × 21 % = 5.277,00; deducción 60 % = 3.166,20;
+   *     cuota 2.110,80 € · total 4.410,80 · neto 55.589,20.
+   *   · Con 290.000 €: cuota(315.700) = 1.140 + 9.240 + 34.500 + 27.000 + 15.700 × 30 % = 76.590,00;
+   *     cuota(290.000) = 69.180,00; la venta añade 7.410,00 (10.000 × 27 % + 15.700 × 30 %).
+   *     Deducción del art. 68.4: 60 % × 76.590 × 25.700 / 315.700 = 3.740,949636 → 3.740,95 €.
+   *     Cuota de la venta: 7.410 − 3.740,95 = 3.669,05 € · total 500 + 1.800 + 3.669,05 = 5.969,05 ·
+   *     neto 54.030,95 €.
+   *   Lo que vigila: el 60 % de lo que la venta añade daría 2.964,00; restar la deducción de la venta
+   *   sola (3.166,20), 4.243,80; sin deducción, 7.410,00. Todos a cientos de euros: van al céntimo.
+   */
+  test('CASO GB (límite) — Ceuta 60.000 €, con 290.000 € de otras rentas: la venta entra en el 30 % y la deducción del 60 % es la proporcional', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.ceuta.tiposReducidos[0].tipo).toBe(3);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 20)?.coeficiente).toBe(0.4);
+    expect(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje).toBe(50);
+    expect(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje).toBe(60);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.slice(3)).toEqual([
+      { hasta: 300000, tipo: 27 },
+      { hasta: Infinity, tipo: 30 },
+    ]);
+
+    await i19Abrir(page, 'ceuta', '60000');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (3,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('1800,00 €');
+
+    await i19Vendedor(page, I19_VENDEDOR_CEUTA);
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('500,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe(
+      'Método objetivo (más favorable), con la bonificación del 50 % de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)',
+    );
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('25.700,00 €');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('2110,80 €');
+    expect(await i18DescCruda(page, /^IRPF sobre ganancia/)).toContain(
+      'con la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 3166,20 € menos',
+    );
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('55.589,20 €');
+
+    await sembrarImporte(page, I19_OTRAS_RENTAS, '290000');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('3669,05 €');
+    expect(await i18DescCruda(page, /^IRPF sobre ganancia/)).toBe(
+      'Tributación en base del ahorro (del 19 % al 30 %), con la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 3740,95 € menos. Es lo que esta venta añade a tu cuota, sumada a 290.000,00 € de otras rentas del ahorro del año.',
+    );
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('5969,05 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('54.030,95 €');
+  });
+
+  /**
+   * CASO GC (RECHAZO) — el vendedor de GB con las otras rentas «290.000.50», que no se leen.
+   *   Se publica la cuota SIN ellas (2.110,80 €, la de GB sin otras rentas) y no puede pasar por
+   *   definitiva: con 1 € de otras rentas la venta ya sube, cuota(25.701) − cuota(1) − 60 % ×
+   *   cuota(25.701) × 25.700 / 25.701 = 5.277,02 − 3.166,20 = 2.110,82 €, así que la cuota real «es»
+   *   mayor (no «puede ser») y el neto 55.589,20 € es mayor que el real: (PARCIAL), «es menor».
+   *   Con Ceuta la dirección no era evidente —más otras rentas suben también la deducción—, pero la
+   *   cuota de la venta nunca baja de la que tendría sola: lo añadido va al tipo marginal, que nunca
+   *   es menor que el medio, y la deducción solo alcanza el 60 % del tipo medio.
+   *   Un negativo («-45000») no es una renta: con el foco dentro cuenta como 0 y al salir el campo se
+   *   reescribe a 0, como cualquier importe de la familia (hallazgo 474).
+   */
+  test('CASO GC (rechazo) — en Ceuta, las otras rentas «290.000.50» no valen 0 en silencio: la cuota real es mayor y el neto menor', async ({
+    page,
+  }) => {
+    await i19Abrir(page, 'ceuta', '60000');
+    await i19Vendedor(page, I19_VENDEDOR_CEUTA);
+    await sembrarImporte(page, I19_OTRAS_RENTAS, '290.000.50');
+    const campo = page.locator(`input[aria-label="${I19_OTRAS_RENTAS}"]`);
+    await expect(campo).toHaveValue('290.000.50');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('2110,80 €');
+    expect(await i18DescCruda(page, /^IRPF sobre ganancia/)).toContain(
+      'El importe de otras rentas del ahorro no se ha podido leer, así que la cuota real es mayor. Escríbelo con coma decimal (1.234,56).',
+    );
+    expect(await i24Titulo(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('4410,80 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('55.589,20 €');
+    expect(await i18DescCruda(page, /^IMPORTE NETO VENDEDOR/)).toBe(
+      'El importe de otras rentas del ahorro no se ha podido leer: el neto real es menor que este. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
+    );
+
+    await sembrarImporte(page, I19_OTRAS_RENTAS, '-45000', { blur: false });
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('2110,80 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    await campo.blur();
+    await expect(campo).toHaveValue('0');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('55.589,20 €');
+  });
+
+  /**
+   * ❌ ABIERTO 19/10/2026 (cabo C0284; cálculo, medio) — [19/10-a] Con «Primera mano (obra nueva)» la
+   * pestaña Vendedor liquida la venta como si quien vende fuera un particular: «IRPF sobre ganancia» en
+   * la base del ahorro (del 19 % al 30 %) y un neto con esa cuota. Pero esa operación paga IVA porque es
+   * una PRIMERA ENTREGA, y la primera entrega «es la realizada por el promotor» (LIVA, art. 20.Uno.22.º
+   * A), que es empresario aunque promueva una sola vez (art. 5.Uno.d). Lo que obtiene un promotor
+   * persona física al vender lo que ha promovido es rendimiento de actividad económica (LIRPF, art.
+   * 27.1), no ganancia patrimonial («salvo que por esta Ley se califiquen como rendimientos», art.
+   * 33.1), y una sociedad promotora no paga IRPF. La propia FAQ describe esa rama como «nuevo, del
+   * promotor». Medido: el cálculo del vendedor no mira el tipo de transmisión.
+   *   Madrid · primera mano · independiente · 30.000 € · compra 20.000 · 1 año · suelo 4.000 · total
+   *   12.000 · comisión 0 → hoy «IRPF sobre ganancia 1948,50 €» (6.000 × 19 % + 3.850 × 21 % sobre una
+   *   ganancia de 9.850) · «Tributación en base del ahorro (del 19 % al 30 %)…» · neto 27.901,50 €, y el
+   *   panel no nombra al promotor. Lo que DEBERÍA: avisar en esa rama de que el vendedor es el
+   *   promotor y su renta no es esa (o no liquidarla); decidir cuál es del usuario.
+   */
+  test('[19/10-a] con «Primera mano (obra nueva)», la pestaña Vendedor no liquida al promotor como a un particular', async ({
+    page,
+  }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, TESTIGOS_COMPRADOR);
+    await page.getByRole('button', { name: /Primera mano/ }).first().click();
+    await page.getByRole('button', { name: /Independiente/ }).first().click();
+    await sembrarImporte(page, 'Precio del garaje / plaza de parking', '30000');
+    expect(await i24Titulo(page, /^IVA/)).toBe('IVA (21,00 %)');
+    await i19Vendedor(page, [
+      ['Precio de compra original del garaje', '20000'],
+      ['Años de propiedad', '1'],
+      ['Valor catastral del suelo (€)', '4000'],
+      ['Valor catastral total (suelo + construcción) (€)', '12000'],
+      ['Comisión inmobiliaria del vendedor (%)', '0'],
+    ]);
+    const panel = i24Normaliza(await page.locator('#panel-vendedor').innerText());
+    expect(panel).toMatch(/promotor|actividad económica|Impuesto sobre Sociedades/i);
   });
 });

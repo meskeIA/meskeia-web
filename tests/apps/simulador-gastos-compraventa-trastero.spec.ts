@@ -138,6 +138,13 @@
  *      registro ya llevan la rebaja del 5 % que el motor aplica desde el 11/10/2026. Y cuatro
  *      hallazgos ABIERTOS con `test.fail()` y etiqueta [13/10-a] … [13/10-d].
  *
+ *  22. INSPECTOR 19/10/2026 (re-inspección, app INVALIDADA por 5f1b199a, hallazgo 3368: el IRPF
+ *      de la venta con las otras rentas del ahorro del año) — CASOS 58-60 al final del fichero:
+ *      Castilla-La Mancha con otras rentas que hacen CRUZAR a la venta el tramo de 50.000 €,
+ *      Melilla en el tramo MÁS ALTO de la escala (30 %) con la deducción del art. 68.4 LIRPF
+ *      sobre la parte PROPORCIONAL de la cuota, y esas otras rentas ilegibles en Melilla. Y
+ *      cuatro hallazgos ABIERTOS con `test.fail()` y etiqueta [19/10-a] … [19/10-d].
+ *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
  *    leído por `tipoGeneralDe()` en `data/itp-ccaa.ts` (Madrid = 6 %, Cataluña = 10 %,
@@ -6305,10 +6312,11 @@ test('HALLAZGO 06/10 (accesibilidad) — los subtítulos de los botones de trans
 //    de inmuebles […] No obstante, cuando el valor de los bienes inmuebles transmitidos […] sea
 //    superior a un millón de euros, el tipo aplicable será el 11 %». Vale para cualquier
 //    inmueble, no solo la vivienda: el trastero lo paga igual.
-//  - Notaría y registro: NO se fijan (hallazgos 2901 y 2902 de la referencia, abiertos: falta la
-//    rebaja del 5 % de los dos aranceles). Se leen de la pantalla y se comprueba que el total
-//    las sume. A mano, con el arancel tal como está en data/itp-ccaa.ts: 27.500 € → notaría
-//    395,66 (339,14 – 452,19) y registro 85,50; 1.000.000 € → 1437,01 y 478,35.
+//  - Notaría y registro: NO se fijan (hallazgos 2901 y 2902 de la referencia, abiertos aquel día
+//    y hoy REPARADOS: faltaba la rebaja del 5 % de los dos aranceles, que el motor aplica desde el
+//    11/10/2026). Se leen de la pantalla y se comprueba que el total las sume. A mano, con el
+//    arancel de ANTES de esa rebaja: 27.500 € → notaría 395,66 (339,14 – 452,19) y registro
+//    85,50; 1.000.000 € → 1437,01 y 478,35.
 //  - Plusvalía: `COEFICIENTES_IIVTNU_2025` (12 años 0,09; menos de 1 año 0,15 prorrateado) y
 //    `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` = 25 %.
 //  - IRPF: `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000, 21 % hasta 50.000).
@@ -6977,5 +6985,244 @@ test.describe('Inspector 13/10/2026 — Cantabria con perfil joven, Melilla a 20
     await page.locator('#select-perfil').selectOption('joven');
     await sembrar(page, 'Precio del trastero', '18500');
     expect(await texto(avisoReducidos0810(page))).toContain('Menor de 36 años');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  INSPECTOR 19/10/2026 — re-inspección (la app estaba INVALIDADA por 5f1b199a, hallazgo 3368,
+//  y por ca9ab312, que retiró COSTES_COMPRAVENTA_2025 sin lectores aquí).
+//
+//  Lo que 5f1b199a estrenó: el campo «Otras rentas del ahorro de este año (€)» y la cuota de la
+//  venta como lo que AÑADE a la base del ahorro, cuota(otras + ganancia) − cuota(otras). El
+//  testigo de familia (tests/familias/compraventa.spec.ts) lo mide en Madrid con 6.000 € de otras
+//  rentas y una ganancia que se queda en el tramo del 21 %; aquí, lo que no cubre: una venta que
+//  CRUZA un tramo por las otras rentas, el tramo más alto de la escala, y la deducción de Ceuta y
+//  Melilla, que va sobre la parte PROPORCIONAL de la cuota total y no sobre lo que la venta añade.
+//
+//  De dónde sale cada cifra (ninguna de memoria):
+//   · Escala del ahorro → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (data/fiscal/inmuebles.ts, art. 66
+//     LIRPF): 19 % hasta 6.000 · 21 % hasta 50.000 · 23 % hasta 200.000 · 27 % hasta 300.000 · 30 %.
+//   · Cuota de la venta → `calcularGananciaInmueble` (data/fiscal/ganancia-inmueble.ts):
+//     cuota(otras + ganancia) − cuota(otras); en Ceuta y Melilla menos el 60 %
+//     (`DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA`, art. 68.4 LIRPF: «la parte […] que proporcionalmente
+//     corresponda») de cuota(otras + ganancia) × ganancia / (otras + ganancia).
+//   · Plusvalía → `COEFICIENTES_IIVTNU_2025` (10 años 0,12 · 2 años 0,14 · ≥ 20 años 0,40) ×
+//     `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` (25 %), en Ceuta y Melilla × 50 %
+//     (`BONIFICACION_IIVTNU_CEUTA_MELILLA`, art. 159.2 TRLRHL).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const OTRAS_RENTAS_1910 = 'Otras rentas del ahorro de este año (€)';
+
+/** Melilla, ≥ 20 años, método objetivo: la base de los CASOS 59 y 60. */
+const BASE_1910_MELILLA = {
+  ccaa: 'melilla',
+  venta: '40000',
+  compra: '25000',
+  gastos: '1000',
+  anios: '22',
+  suelo: '6000',
+  total: '20000',
+  comision: '0',
+  gestoria: '',
+};
+
+test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cruzado, el 30 % en Melilla y un importe ilegible', () => {
+  /**
+   * CASO 58 (normal) — Castilla-La Mancha · venta 60.000 · compra 40.000 · gastos 3.000 · 10 años
+   * · suelo 15.000 de 40.000 · comisión 3 % · gestoría 400, primero SIN otras rentas y después con
+   * 45.000 €, que hacen cruzar a la venta el tramo de 50.000 €.
+   *   plusvalía: objetivo 15.000 × 0,12 × 25 % = 450,00 · real 20.000 × 0,375 × 25 % = 1.875 → 450,00
+   *   comisión 1.800,00 · transmisión 60.000 − 1.800 − 400 − 450 = 57.350,00 · adquisición 43.000,00
+   *   ganancia 14.350,00
+   *   SIN otras: 6.000 × 19 % + 8.350 × 21 % = 1.140 + 1.753,50 = 2.893,50 · total 5.543,50 · neto 54.456,50
+   *   CON 45.000: cuota(59.350) − cuota(45.000) = 12.530,50 − 9.330,00 = 3.200,50
+   *     (= 5.000 × 21 % + 9.350 × 23 % = 1.050 + 2.150,50) · total 5.850,50 · neto 54.149,50
+   *   Si la venta se cobrara sola (el defecto del 3368) seguiría en 2.893,50: 307,00 € de menos.
+   */
+  test('CASO 58 — Castilla-La Mancha: 45.000 € de otras rentas suben la venta al tramo del 23 %', async ({ page }) => {
+    await vendedor0810(page, {
+      ccaa: 'castilla-mancha',
+      venta: '60000',
+      compra: '40000',
+      gastos: '3000',
+      anios: '10',
+      suelo: '15000',
+      total: '40000',
+      comision: '3',
+      gestoria: '400',
+    });
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('450,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('43.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('57.350,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('14.350,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('2893,50 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain('Calculado como si esta venta fuera tu única renta del ahorro del año');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('54.456,50 €');
+
+    await sembrar(page, OTRAS_RENTAS_1910, '45000');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('14.350,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('3200,50 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
+      'Tributación en base del ahorro (del 19 % al 30 %). Es lo que esta venta añade a tu cuota, sumada a 45.000,00 € de otras rentas del ahorro del año.',
+    );
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('5850,50 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('54.149,50 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes tras los gastos');
+  });
+
+  /**
+   * CASO 59 (límite) — Melilla · el tramo MÁS ALTO de la escala: 295.000 € de otras rentas y una
+   * ganancia de 13.700 € que cruza los 300.000 €. Venta 40.000 · compra 25.000 · gastos 1.000 ·
+   * 22 años · suelo 6.000 de 20.000 · comisión 0 · sin gestoría.
+   *   plusvalía: objetivo 6.000 × 0,40 × 25 % × 50 % = 300,00 · real 15.000 × 0,3 × 25 % × 50 % =
+   *     562,50 → 300,00, bonificada
+   *   transmisión 40.000 − 300 = 39.700,00 · adquisición 26.000,00 · ganancia 13.700,00
+   *   cuota(308.700) = 1.140 + 9.240 + 34.500 + 27.000 + 8.700 × 30 % = 74.490,00
+   *   cuota(295.000) = 1.140 + 9.240 + 34.500 + 95.000 × 27 % = 70.530,00 → añade 3.960,00
+   *   deducción = 74.490 × 13.700 / 308.700 × 60 % = 1.983,504… → «1983,50 € menos»
+   *   IRPF = 3.960,00 − 1.983,50 = 1.976,50 · total 2.276,50 · neto 37.723,50, DEFINITIVO.
+   *   Las dos lecturas equivocadas dan otra cifra: deducir el 60 % de lo que la venta añade,
+   *   1.584,00; deducirlo de la cuota de la venta sola (2.757,00), 2.305,80.
+   */
+  test('CASO 59 — Melilla, tramo del 30 %: la deducción del 60 % sobre la parte proporcional de la cuota', async ({ page }) => {
+    await vendedor0810(page, BASE_1910_MELILLA);
+    await sembrar(page, OTRAS_RENTAS_1910, '295000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('300,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo (más favorable), con la bonificación del 50 % de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)',
+    );
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('39.700,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('13.700,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1976,50 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
+      'Tributación en base del ahorro (del 19 % al 30 %), con la deducción del 60 % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): 1983,50 € menos. Es lo que esta venta añade a tu cuota, sumada a 295.000,00 € de otras rentas del ahorro del año.',
+    );
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2276,50 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('37.723,50 €');
+  });
+
+  /**
+   * CASO 60 (debe rechazarse) — la base del CASO 59 con las otras rentas escritas «295.000.50»
+   * (el millar y el decimal a la estadounidense): no se leen, y no pueden ser un cero callado.
+   *   leídas como 0: cuota de la venta sola 6.000 × 19 % + 7.700 × 21 % = 2.757,00 × 40 % = 1.102,80
+   *   total 300 + 1.102,80 = 1.402,80 · neto 38.597,20 (PARCIAL)
+   *   Cualquier valor que quisiera escribir SUBE la cuota (con 1 €, 1.102,81), así que la cuota real
+   *   ES mayor y el neto real ES menor: lo dice el sondeo y lo nombra con el campo.
+   *   (Que la tarjeta pierda la frase de la deducción con este aviso es el hallazgo 3253, abierto.)
+   */
+  test('CASO 60 — Melilla, otras rentas «295.000.50»: no se leen como cero y se dice hacia dónde queda la cuota', async ({ page }) => {
+    await vendedor0810(page, BASE_1910_MELILLA);
+    await sembrar(page, OTRAS_RENTAS_1910, '295.000.50');
+    await expect(page.locator(`input[aria-label="${OTRAS_RENTAS_1910}"]`)).toHaveValue('295.000.50');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('13.700,00 €');
+    expect(await descripcionTarjeta(page, 'Ganancia patrimonial')).toBe('Base para IRPF (base del ahorro)');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1102,80 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
+      'El importe de otras rentas del ahorro no se ha podido leer, así que la cuota real es mayor. Escríbelo con coma decimal (1.234,56).',
+    );
+    expect(await tituloTarjeta24(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1402,80 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('38.597,20 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'El importe de otras rentas del ahorro no se ha podido leer: el neto real es menor que este. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para obtenerlo.',
+    );
+  });
+
+  // ─── HALLAZGOS del 19/10/2026, ABIERTOS ──────────────────────────────────────────────
+  // Cada uno con `test.fail()` y la aserción de FONDO primero.
+
+  // HALLAZGO [19/10-a] (medio, calculo) — la forma del 3379 (garaje) y el 3377 (estimador), cabo
+  // C0284. Con «Primera mano» la pestaña Vendedor liquida la venta como la ganancia patrimonial de
+  // un particular en la base del ahorro, pero en una primera entrega vende el promotor, que es
+  // empresario (LIVA art. 5.Uno.d y 20.Uno.22.º A) y cuya renta es de actividad económica (LIRPF
+  // art. 27.1) o del IS, no ganancia patrimonial (art. 33.1). `calcularVendedor` no recibe el tipo
+  // de transmisión. Valencia · Primera mano · vinculado · 25.000 · compra 18.000 · 2 años · suelo
+  // 3.000 de 9.000 · comisión 0: plusvalía 3.000 × 0,14 × 25 % = 105,00 · ganancia 25.000 − 105 −
+  // 18.000 = 6.895,00 · IRPF 1.140 + 895 × 21 % = 1.327,95 · neto 23.567,05, y nada en el panel
+  // nombra al promotor.
+  test.fail('[19/10-a] con «Primera mano», el vendedor no se liquida como un particular en la base del ahorro', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.locator('#select-ccaa').selectOption('valencia');
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.getByRole('button', { name: /Vinculado a vivienda/ }).click();
+    await sembrar(page, 'Precio del trastero', '25000');
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await sembrar(page, 'Precio de compra original', '18000');
+    await sembrar(page, 'Años de propiedad', '2');
+    await sembrar(page, 'Valor catastral del suelo', '3000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '0');
+    const panel = await texto(page.locator('[class*="resultsPanel"]'));
+    // El defecto.
+    expect(panel).toMatch(/promotor|actividad económica|Impuesto sobre Sociedades/i);
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1327,95 €');
+  });
+
+  // HALLAZGO [19/10-b] (bajo, contenido) — el ejemplo «Vender un trastero» del bloque educativo
+  // (page.tsx ~l. 2095-2101) sigue diciendo «Como máximo: ganancia de 6550,00 € → 1255,50 € de
+  // IRPF, antes de restar la plusvalía», sin el supuesto de que la venta sea la única renta del
+  // ahorro del año. Desde 5f1b199a la calculadora cobra lo que la venta AÑADE: con esos mismos datos
+  // y 6.000 € de otras rentas publica 6.550 × 21 % = 1.375,50 € (máximo), por encima del «como
+  // máximo» del ejemplo.
+  test.fail('[19/10-b] el ejemplo de la venta dice sobre qué base del ahorro está su «como máximo» de IRPF', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    const ejemplo = await page.evaluate(() => {
+      const tag = [...document.querySelectorAll('[class*="casoTag"]')].find((e) => e.textContent?.includes('Vender un trastero'));
+      return (tag?.closest('[class*="casoCard"]')?.textContent ?? '').replace(/ /g, ' ');
+    });
+    // El defecto.
+    expect(ejemplo).toMatch(/única renta del ahorro|otras rentas del ahorro/);
+    expect(ejemplo).toContain('Como máximo: ganancia de 6550,00 € → 1255,50 € de IRPF');
+    await sembrar(page, 'Precio del trastero', '15000');
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await sembrar(page, 'Precio de compra original', '8000');
+    await sembrar(page, OTRAS_RENTAS_1910, '6000');
+    expect(await tituloTarjeta24(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1375,50 €');
+  });
+
+  // HALLAZGO [19/10-c] (bajo, dato) — EFECTO FAMILIA del 3250, abierto en garaje, que ya nombraba
+  // esta app. El sello ITP/AJD/IVA (NOTA_DATOS, page.tsx l. 447) atribuye al art. 57 bis.1
+  // TRLITPAJD la bonificación del ITP y la del AJD; en el BOE (BOE-A-1993-25359, leído hoy) el
+  // apartado 1 es la cuota gradual de AJD y la transmisión de inmuebles es el apartado 3.a). La
+  // fila «AJD en primera mano» de la tabla educativa cita bien el 57 bis.1 (es AJD).
+  test.fail('[19/10-c] el sello no atribuye al art. 57 bis.1 la bonificación del ITP', async ({ page }) => {
+    await page.goto(RUTA);
+    const sello = (await page.locator('body').innerText()).replace(ESPACIO_DURO, ' ');
+    const i = sello.indexOf('El ITP de un trastero comprado por separado');
+    const nota = sello.slice(i, i + 400);
+    // El defecto.
+    expect(nota).toMatch(/57 bis(?:\.3| TRLITPAJD|\))/);
+    expect(nota).toContain('en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un 50 %');
+  });
+
+  // HALLAZGO [19/10-d] (bajo, contenido) — EFECTO FAMILIA del 3249, abierto en garaje, que ya
+  // nombraba RESPUESTA_PLUSVALIA_TRASTERO. La respuesta (FAQ visible y FAQPage, una sola constante)
+  // dice sin salvedad «Esta calculadora aplica un tipo del 25 %…», pero en Ceuta y Melilla la
+  // calculadora bonifica la cuota al 50 % (art. 159.2 TRLRHL, `BONIFICACION_IIVTNU_CEUTA_MELILLA`)
+  // y en Navarra y el País Vasco no la calcula. Melilla, base del CASO 59: quien rehaga la cuenta
+  // con el tipo escrito obtiene 6.000 × 0,40 × 25 % = 600,00 €; la tarjeta publica 300,00 €.
+  test.fail('[19/10-d] la FAQ de la plusvalía nombra la bonificación de Ceuta y Melilla y el régimen foral', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    const respuestas = await page.evaluate(() => {
+      const h4 = [...document.querySelectorAll('h4')].find((h) => h.textContent?.includes('plusvalía municipal al vender'));
+      const ld = [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => JSON.parse(s.textContent ?? '{}'));
+      const faq = ld.find((x) => x['@type'] === 'FAQPage');
+      const enLd = faq?.mainEntity.find((q: { name: string }) => q.name.includes('plusvalía'))?.acceptedAnswer.text ?? '';
+      return { visible: h4?.nextElementSibling?.textContent ?? '', ld: enLd as string };
+    });
+    // El defecto.
+    expect(respuestas.visible).toMatch(/Ceuta|Melilla/);
+    expect(respuestas.visible).toMatch(/foral|Navarra|País Vasco/);
+    expect(respuestas.ld).toMatch(/Ceuta|Melilla/);
+    await vendedor0810(page, BASE_1910_MELILLA);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('300,00 €');
   });
 });

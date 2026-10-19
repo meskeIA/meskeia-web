@@ -80,7 +80,14 @@
  *    Valencia a 10.000.000 € con la renuncia (AJD del 2 %, notaría de libre acuerdo y el registro
  *    en su TOPE, con la rebaja aplicada después del tope) y el reparto del IBI y la comunidad, que el
  *    testigo de familia solo mide con el IBI. Notaría y registro se fijan al céntimo CON la rebaja.
- *    Cuatro hallazgos al final con `test.fail()` salvo con `VER_HUECOS=1`.
+ *    Cuatro hallazgos al final con `test.fail()` salvo con `VER_HUECOS=1` (3263-3266), REPARADOS
+ *    el 19/10/2026 (98c7b32e y components/ProrrateoIbiComunidad): sus tests perdieron la marca.
+ *  · 19/10/2026 — INSPECCIÓN (la cola la sacó por los cabos C0314 y C0315). Las cuatro reparaciones
+ *    del 13/10 se sostienen. Casos nuevos: La Rioja a 345.678,90 € con decimales en los dos campos y
+ *    en los tres regímenes, Aragón en el último tramo de su escala (1.100.000 € y el corte exacto de
+ *    750.000 €, que la tabla oficial del art. 121-1 cifra en 64.500 €) con la gestoría a cero, y
+ *    Canarias con la renuncia al IGIC y la gestoría ilegible. Tres hallazgos al final con
+ *    `test.fail()` salvo con `VER_HUECOS=1`.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -118,9 +125,11 @@
  * Los dos hallazgos de la re-inspección del 06/10/2026 (2914 y 2915) se repararon ese mismo día y
  * se quedaron como regresión. Los cinco de la inspección del 08/10/2026 (3084-3088) se escribieron
  * con `test.fail()` y quedaron REPARADOS ese mismo día: hoy son regresión en el bloque de su fecha.
- * HALLAZGOS ABIERTOS a 13/10/2026: los cuatro de la re-inspección de ese día, al final del fichero
- * con `test.fail()`. Todos se escriben igual, afirmando lo que DEBERÍA pasar, y al repararse
- * pierden la marca y se quedan como regresión en el bloque de su fecha.
+ * Los cuatro de la re-inspección del 13/10/2026 (3263-3266) se escribieron con `test.fail()` y
+ * quedaron REPARADOS el 19/10/2026: hoy son regresión en el bloque de su fecha.
+ * HALLAZGOS ABIERTOS a 19/10/2026: los tres de la inspección de ese día, al final del fichero con
+ * `test.fail()`. Todos se escriben igual, afirmando lo que DEBERÍA pasar, y al repararse pierden la
+ * marca y se quedan como regresión en el bloque de su fecha.
  */
 import { test, expect, Page } from '@playwright/test';
 import {
@@ -6067,7 +6076,10 @@ test.describe('Re-inspección 06/10/2026 — familia: casos nuevos, invariante y
 // comprueba que el desglose CUADRA con ellas (`cuadraElDesglose`).
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/** `VER_HUECOS=1` quita la marca de los hallazgos abiertos y enseña por qué fallan. */
+/**
+ * `VER_HUECOS=1` quitaba la marca de los hallazgos abiertos del 08/10 y enseñaba por qué fallaban.
+ * Los cinco (3084-3088) se REPARARON ese mismo día y ya no llevan marca; la constante queda sin uso.
+ */
 const I08_VER_HUECOS = Boolean(process.env.VER_HUECOS);
 
 /** Las preguntas de la FAQ visible, leídas del DOM (la guía nace plegada, pero se renderiza). */
@@ -6293,7 +6305,8 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
     expect(errores).toEqual([]);
   });
 
-  // ─── Hallazgos de la inspección del 08/10/2026, con `test.fail()` salvo con VER_HUECOS=1 ───
+  // ─── Hallazgos de la inspección del 08/10/2026 (3084-3088): se escribieron con `test.fail()` y
+  //     quedaron REPARADOS ese mismo día; hoy son regresión, sin marca ───
 
   /**
    * [08/10-a] (contenido, bajo) — ✅ REPARADO el 08/10/2026 (3084, `nombreEnFrase` y `deNombreCcaa`). `ITP_CCAA[x].nombre` es el nombre oficial con su sustantivo
@@ -6428,7 +6441,10 @@ test.describe('Inspector 08/10/2026 — familia: Asturias en escala, Melilla en 
 // anteriores que fijan esas cifras SIN rebaja son el cabo C0209 (destino reparar): no se tocan.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/** `VER_HUECOS=1` quita la marca de los hallazgos abiertos del 13/10 y enseña por qué fallan. */
+/**
+ * `VER_HUECOS=1` quitaba la marca de los hallazgos abiertos del 13/10 y enseñaba por qué fallaban.
+ * Los cuatro se REPARARON el 19/10/2026 y ya no llevan marca; la constante queda sin uso.
+ */
 const I13_VER_HUECOS = Boolean(process.env.VER_HUECOS);
 
 const BLOQUE_REPARTO = 'section[aria-labelledby="titulo-prorrateo"]';
@@ -6636,7 +6652,8 @@ test.describe('Re-inspección 13/10/2026 — Extremadura en el tramo del 11 %, V
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe(coste);
   });
 
-  // ─── Hallazgos de la re-inspección del 13/10/2026, con `test.fail()` salvo con VER_HUECOS=1 ───
+  // ─── Hallazgos de la re-inspección del 13/10/2026 (3263-3266): se escribieron con `test.fail()`
+  //     y quedaron REPARADOS el 19/10/2026; hoy son regresión, sin marca ───
 
   /**
    * [13/10-a] (contenido, medio) — En Ceuta y Melilla el aviso de cabecera (`ivaAviso`, page.tsx
@@ -6766,5 +6783,340 @@ test.describe('Re-inspección 13/10/2026 — Extremadura en el tramo del 11 %, V
     await expect(bloque).not.toContainText('abona');
     await expect(bloque.getByText('Indica la fecha de la escritura para repartir los días.')).toHaveCount(0);
     await expect(bloque.getByRole('alert')).toContainText('La fecha de la escritura no es válida');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN 19/10/2026 — hermana de la familia «Compraventa inmobiliaria» (referencia:
+// estimador-compraventa-inmueble · testigo tests/familias/compraventa.spec.ts, 93/93 en verde al
+// empezar la tanda). La cola la sacó por los cabos C0314 (requisito de la renuncia, art. 20.Dos LIVA)
+// y C0315 (apartado del art. 57 bis TRLITPAJD que bonifica el AJD).
+//
+// Cifras resueltas a mano ANTES de abrir el navegador, con un script propio que NO importa la app
+// (.inspector-trabajo/nav-esperados.mjs, fuera del repositorio):
+//  - La Rioja: `ITP_CCAA.rioja` tipo general 7 (de `TIPOS_ITP_CCAA_2025`, data/fiscal/inmuebles.ts),
+//    sin escala ni umbral, `ajd: 1` y sin tipo propio de la renuncia.
+//  - Aragón: `ITP_CCAA.aragon.tramosProgresivos` 8 % hasta 400.000, 8,5 % hasta 450.000, 9 % hasta
+//    500.000, 9,5 % hasta 750.000 y 10 % el resto (art. 121-1 del DL 1/2005 de Aragón: la tabla oficial
+//    da 64.500 € a los 750.000, que es la comprobación de la escala); `ajd: 1.5`.
+//  - Canarias: `ajd: 0.75`; sin IVA en la operación ni en los honorarios (`TERRITORIOS_SIN_IVA`).
+//  - IVA de la nave: `IVA_INMUEBLES_2025.local = 21`.
+//  - Notaría: RD 1426/1989, nº 2.1 (`ARANCELES_NOTARIO`) × 0,95 (RDL 8/2010, DA 8.ª) × 1,21 donde hay
+//    IVA, y × 1,5 / 1,75 / 2 (`FACTURA_NOTARIAL`). Registro: RD 1427/1989, nº 2.1 con tope y × 0,95,
+//    más presentación (6,010121 €) y nota simple (3,005061 €), × 1,21 donde hay IVA.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** `VER_HUECOS=1` quita la marca de los hallazgos abiertos del 19/10 y enseña por qué fallan. */
+const I19_VER_HUECOS = Boolean(process.env.VER_HUECOS);
+
+/** Las tarjetas de la gestoría que hay en el panel de resultados (0 si no se pinta). */
+const tarjetasGestoria = (page: Page) => page.locator('[class*="resultados"] h3', { hasText: 'Gastos de gestoría' });
+
+test.describe('Inspección 19/10/2026 — La Rioja con decimales, Aragón en el último tramo y la gestoría ilegible con la renuncia al IGIC', () => {
+  test.describe.configure({ timeout: 90_000 });
+
+  /**
+   * CASO 1 (NORMAL) — La Rioja, 345.678,90 € y gestoría 475,50 €, escritos con coma decimal y punto de
+   * millar en los dos campos.
+   *   Segunda mano: ITP = 345.678,90 × 7 % = 24.197,523 → «24.197,52 €», «ITP (7,00 %)».
+   *   Notaría: 90,151816 + 108,182205 + 45,0759 + 90,15182 + (345.678,90 − 150.253,03) × 0,05 %
+   *            (= 97,712935) = 431,274676 × 0,95 × 1,21 = 495,750240 → ×1,5 = 743,63 · ×1,75 = 867,56
+   *            · ×2 = 991,50.
+   *   Registro: 24,040484 + 42,0708575 + 37,56325 + 67,613865 + 195.425,87 × 0,03 % (= 58,627761)
+   *            = 229,916218 × 0,95 = 218,420407 + 9,015182 = 227,435589 × 1,21 = 275,20 €.
+   *   Total = 24.197,52 + 867,56 + 275,20 + 475,50 = 25.815,78 € (7,4681 % → «7,47 %») · coste 371.494,68 €.
+   *   Obra nueva: IVA 21 % = 72.592,569 → 72.592,57 € · AJD 1 % = 3456,789 → 3456,79 € · total
+   *   72.592,57 + 3456,79 + 867,56 + 275,20 + 475,50 = 77.667,62 € (22,4681 % → «22,47 %») · coste 423.346,52 €.
+   *   Renuncia: las mismas cifras (La Rioja no tiene `ajdRenuncia`: AJD general con el aviso).
+   */
+  test('CASO 1 (normal) — La Rioja 345.678,90 €: ITP 24.197,52 € (7 %), y en obra nueva o con renuncia IVA 72.592,57 € + AJD 3456,79 €', async ({ page }) => {
+    const rioja = ITP_CCAA['rioja'];
+    expect(rioja.tipoGeneral).toBe(7);
+    expect(rioja.tramosProgresivos).toBeUndefined();
+    expect(rioja.umbralTipoUnico).toBeUndefined();
+    expect(rioja.ajd).toBe(1);
+    expect(rioja.ajdRenuncia).toBeUndefined();
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'rioja');
+    await sembrar(page, PRECIO, '345.678,90');
+    await sembrar(page, GESTORIA, '475,50');
+
+    await expect(page.getByRole('button', { name: /Segunda mano/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(await valorTarjeta(page, 'Precio de la nave industrial')).toBe('345.678,90 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (7,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('24.197,52 €');
+    await expect(page.locator('[class*="resultados"] h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('867,56 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 743,63 € y 991,50 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('275,20 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('475,50 €');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('25.815,78 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('7,47% sobre el precio de compra');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('371.494,68 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos (antes de deducir IVA si aplica)');
+    const recuadro = await recuadroCcaa(page);
+    expect(recuadro).toContain('ITP General 7%');
+    expect(recuadro).toContain('AJD 1%');
+    expect(recuadro).toContain('IVA (obra nueva) 21%');
+
+    // Obra nueva al mismo precio: IVA + AJD general, y el ITP fuera.
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await expect(page.locator('[class*="resultados"] h3', { hasText: /^ITP/ })).toHaveCount(0);
+    expect(await rotuloTarjeta(page, /^IVA \(/)).toBe('IVA (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('72.592,57 €');
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (1,00%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('3456,79 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('77.667,62 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('22,47% sobre el precio de compra');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('423.346,52 €');
+
+    // Con la renuncia: las mismas cifras, el IVA como ISP y el AJD general con su aviso.
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    expect(await rotuloTarjeta(page, /^IVA \(/)).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('72.592,57 €');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('3456,79 €');
+    expect(await descripcionTarjeta(page, 'AJD (')).toBe('Tipo general de la comunidad: algunas aplican uno incrementado cuando hay renuncia');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('77.667,62 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('423.346,52 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Aragón, segunda mano, gestoría 0: el corte exacto del último tramo de la escala
+   * (750.000 €) y el tramo más alto (1.100.000 €).
+   *   750.000: ITP = 400.000 × 8 % + 50.000 × 8,5 % + 50.000 × 9 % + 250.000 × 9,5 % = 32.000 + 4250 +
+   *            4500 + 23.750 = 64.500,00 € — la cifra de la tabla oficial del art. 121-1 — («ITP (8,60 %)»).
+   *            Notaría: 558,941276 + 148.987,90 × 0,03 % = 603,637646 × 0,95 × 1,21 = 693,881474 →
+   *            1040,82 / 1214,29 / 1387,76. Registro: 306,516178 + 148.987,90 × 0,02 % = 336,313758
+   *            × 0,95 + 9,015182 = 328,513252 × 1,21 = 397,50 €. Total 64.500 + 1214,29 + 397,50 =
+   *            66.111,79 € (8,8149 % → «8,81 %») · coste 816.111,79 €.
+   *   1.100.000: ITP = 64.500 + 350.000 × 10 % = 99.500,00 € (9,0455 % → «ITP (9,05 %)»).
+   *            Notaría: 558,941276 + 498.987,90 × 0,03 % = 708,637646 × 0,95 × 1,21 = 814,578974 →
+   *            1221,87 / 1425,51 / 1629,16. Registro: 306,516178 + 498.987,90 × 0,02 % = 406,313758
+   *            × 0,95 + 9,015182 = 395,013252 × 1,21 = 477,97 €. Total 99.500 + 1425,51 + 477,97 =
+   *            101.403,48 € (9,2185 % → «9,22 %») · coste 1.201.403,48 €.
+   *   Gestoría 0 o vacía: no se pinta su tarjeta y el cierre es DEFINITIVO (un 0 legible no falta).
+   */
+  test('CASO 2 (límite) — Aragón: 64.500,00 € en el corte de 750.000 € y 99.500,00 € (9,05 %) a 1.100.000 €, gestoría 0 sin tarjeta', async ({ page }) => {
+    const ar = ITP_CCAA['aragon'];
+    expect(ar.tramosProgresivos).toEqual([
+      { hasta: 400000, tipo: 8 },
+      { hasta: 450000, tipo: 8.5 },
+      { hasta: 500000, tipo: 9 },
+      { hasta: 750000, tipo: 9.5 },
+      { hasta: Infinity, tipo: 10 },
+    ]);
+    expect(ar.ajd).toBe(1.5);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'aragon');
+    await sembrar(page, GESTORIA, '0');
+    await sembrar(page, PRECIO, '750000');
+
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,60%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('64.500,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1214,29 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 1040,82 € y 1387,76 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('397,50 €');
+    await expect(tarjetasGestoria(page)).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('66.111,79 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('8,81% sobre el precio de compra');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('816.111,79 €');
+
+    await sembrar(page, PRECIO, '1100000');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (9,05%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('99.500,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1425,51 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 1221,87 € y 1629,16 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('477,97 €');
+    await expect(tarjetasGestoria(page)).toHaveCount(0);
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('101.403,48 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('9,22% sobre el precio de compra');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('1.201.403,48 €');
+    const recuadro = await recuadroCcaa(page);
+    expect(recuadro).toContain('ITP General 8%');
+    expect(recuadro).toContain('AJD 1,5%');
+    expect(recuadro).toContain('aplica escala progresiva (8% → 8,50% → 9% → 9,50% → 10%): cada tramo del valor tributa a su tipo');
+    expect(recuadro).toContain('art. 121-11');
+
+    // Vaciar la gestoría no cambia nada: vacía es «sin gestoría», no un dato ilegible.
+    await sembrar(page, GESTORIA, '');
+    await expect(tarjetasGestoria(page)).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('101.403,48 €');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — Canarias, 2.ª mano con renuncia al IGIC, 880.000 €: la gestoría «1.200,5,0»
+   * (dos comas decimales) no se puede leer. Tiene que nombrarse, salir del total y decir en qué
+   * dirección falta, en una pantalla donde el total ya es parcial por el IGIC.
+   *   IGIC sin cifra («No calculado»). AJD = 880.000 × 0,75 % = 6600,00 € («AJD (0,75 %)»).
+   *   Notaría sin IVA: 558,941276 + 278.987,90 × 0,03 % = 642,637646 × 0,95 = 610,505764 → 915,76 /
+   *   1068,39 / 1221,01. Registro sin IVA: 306,516178 + 278.987,90 × 0,02 % = 362,313758 × 0,95 +
+   *   9,015182 = 353,21 €.
+   *   Gestoría 1200: total 6600 + 1068,39 + 353,21 + 1200 = 9221,60 € (1,0479 % → «1,05 %») · coste
+   *   889.221,60 €, «No incluye el IGIC: el coste real puede ser mayor».
+   *   Gestoría «1.200,5,0»: «Sin leer», total 8021,60 € (0,9115 % → «0,91 %») · coste 888.021,60 €: baja
+   *   exactamente 1200 € y el aviso pasa a «será mayor».
+   */
+  test('CASO 3 (rechazo) — Canarias con renuncia, 880.000 €: la gestoría «1.200,5,0» se nombra, sale del total (−1200 €) y el coste «será mayor»', async ({ page }) => {
+    expect(ITP_CCAA['canarias'].ajd).toBe(0.75);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'canarias');
+    await page.getByRole('button', { name: /renuncia al IGIC/ }).click();
+    await expect(page.getByRole('button', { name: /renuncia al IGIC/ })).toHaveAttribute('aria-pressed', 'true');
+    await sembrar(page, PRECIO, '880000');
+    await sembrar(page, GESTORIA, '1200');
+
+    expect(await rotuloTarjeta(page, /^IGIC/)).toBe('IGIC');
+    expect(await valorTarjeta(page, 'IGIC')).toBe('No calculado');
+    expect(await descripcionTarjeta(page, 'IGIC')).toBe(
+      'En Canarias no rige el IVA: la renuncia a la exención del IGIC tributa por el IGIC, que este simulador no calcula',
+    );
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (0,75%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('6600,00 €');
+    expect(await rotuloTarjeta(page, /^Gastos de notaría/)).toBe('Gastos de notaría (sin IGIC)');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1068,39 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 915,76 € y 1221,01 €');
+    expect(await rotuloTarjeta(page, /^Registro de la Propiedad/)).toBe('Registro de la Propiedad (sin IGIC)');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('353,21 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('1200,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('9221,60 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '1,05% sobre el precio de compra — SIN el IGIC, que no está incluido — SIN el IGIC de las facturas de notaría y registro, que tampoco se calcula',
+    );
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('889.221,60 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('No incluye el IGIC: el coste real puede ser mayor');
+    await expect(page.locator('[class*="avisoHonorarios"]')).toContainText(
+      'Las facturas de notaría y registro llevan además IGIC, que esta herramienta no calcula',
+    );
+    const conDato = eurosDeTexto(await valorTarjeta(page, 'COSTE TOTAL'));
+
+    // La gestoría ilegible: se nombra, sale del total y el aviso dice en qué dirección.
+    await sembrar(page, GESTORIA, '1.200,5,0');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await descripcionTarjeta(page, 'Gastos de gestoría')).toBe(
+      'El importe escrito no se ha podido leer, así que NO está incluido en el total. Escríbelo con coma decimal (300,50).',
+    );
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('8021,60 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '0,91% sobre el precio de compra — SIN el IGIC, que no está incluido — SIN la gestoría, que no se ha podido leer — SIN el IGIC de las facturas de notaría y registro, que tampoco se calcula',
+    );
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('888.021,60 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+      'No incluye el IGIC ni la gestoría, que no se ha podido leer: el coste real será mayor',
+    );
+    const sinDato = eurosDeTexto(await valorTarjeta(page, 'COSTE TOTAL'));
+    // La dirección y el tamaño de lo que falta: exactamente la gestoría, al céntimo.
+    expect(conDato - sinDato).toBeCloseTo(1200, 2);
+  });
+
+  // ─── Hallazgos de la inspección del 19/10/2026, con `test.fail()` salvo con VER_HUECOS=1 ───
+
+  /**
+   * [19/10-a] (contenido, medio) — cabo C0314. Art. 20.Dos de la Ley 37/1992 (BOE-A-1992-28740, leído
+   * el 19/10/2026): «Las exenciones relativas a los números 20.º y 22.º del apartado anterior podrán
+   * ser objeto de renuncia por el sujeto pasivo, en la forma y con los requisitos que se determinen
+   * reglamentariamente, cuando el adquirente sea un sujeto pasivo que actúe en el ejercicio de sus
+   * actividades empresariales o profesionales y se le atribuya el derecho a efectuar la deducción
+   * total o parcial del Impuesto soportado al realizar la adquisición…». El derecho a deducir es del
+   * ADQUIRENTE, y renuncia el sujeto pasivo de la entrega (quien vende). Cuatro textos se lo piden a
+   * los dos («comprador y vendedor son empresarios con derecho a deducción», «entre empresarios con
+   * derecho a deducción») y la FAQ del AJD hace renunciar a los dos («si el comprador y el vendedor
+   * renuncian»). La 5.ª respuesta del FAQPage, reparada el 19/10 (3265), ya lo dice bien: «salvo que
+   * el vendedor renuncie a la exención del IVA porque el comprador es un empresario con derecho a
+   * deducirlo». El cálculo no exige nada a ninguno de los dos: la tercera opción es un botón.
+   */
+  test('[19/10-a] el derecho a deducir que exige la renuncia es del ADQUIRENTE, y renuncia quien vende (art. 20.Dos LIVA)', async ({ page }) => {
+    test.fail(!I19_VER_HUECOS, 'ABIERTO (inspector 19/10/2026): cuatro textos piden el derecho a deducir a comprador y vendedor, y uno hace renunciar a los dos');
+    const limpio = (s: string | null) => (s ?? '').replace(/\s+/g, ' ').trim();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await sembrar(page, PRECIO, '500000');
+
+    // La regla bien dicha, en la propia página (FAQPage, «¿En qué se diferencia… de un local comercial?»).
+    const local = (await faqPage(page)).find((f) => /local comercial/.test(f.q));
+    expect(local?.a).toContain('salvo que el vendedor renuncie a la exención del IVA porque el comprador es un empresario con derecho a deducirlo');
+
+    const textos: { donde: string; t: string }[] = [];
+    for (const f of await faqVisible(page)) {
+      if (/IVA o ITP|AJD/.test(f.q)) textos.push({ donde: `FAQ visible «${f.q}»`, t: f.a });
+    }
+    for (const f of await faqPage(page)) {
+      if (/IVA o ITP/.test(f.q)) textos.push({ donde: `FAQPage «${f.q}»`, t: f.a });
+    }
+    for (const ccaa of ['madrid', 'canarias'] as const) {
+      await page.selectOption('#select-ccaa', ccaa);
+      await page.getByRole('button', { name: /Segunda mano/ }).click();
+      textos.push({ donde: `aviso de «Segunda mano» (${ccaa})`, t: limpio(await page.locator('[class*="avisoRenuncia"]').first().innerText()) });
+    }
+    textos.push({
+      donde: 'consejo «Consulta el régimen de IVA antes de comprar»',
+      t: limpio(await page.locator('strong', { hasText: 'Consulta el régimen de IVA antes de comprar' }).first().locator('xpath=..').textContent()),
+    });
+    expect(textos.length).toBe(6);
+
+    const aLosDos = /comprador y vendedor son empresarios con derecho a deducción|entre empresarios con derecho a deducción|el comprador y el vendedor renuncian/i;
+    expect(textos.filter(({ t }) => aLosDos.test(t)).map(({ donde, t }) => `${donde}: «${t.match(aLosDos)![0]}»`)).toEqual([]);
+  });
+
+  /**
+   * [19/10-b] (contenido, bajo) — regresión de bd3f3e2a (08/10/2026, reparación del 3084). La nota del
+   * recuadro en Canarias, Ceuta y Melilla terminaba en «…en la administración tributaria» y la línea
+   * siguiente era el texto «de {nombre}»; al cambiar ese texto por la expresión `{deNombreCcaa(ccaa)}`,
+   * JSX se come el salto de línea entre texto y expresión, y se lee «consúltalo en la administración
+   * tributariade Canarias» (y «tributariade la Ciudad Autónoma de Ceuta/Melilla»). El aviso de cabecera
+   * de las mismas comunidades, con la expresión en la misma línea, sí dice «tributaria de Canarias».
+   */
+  test('[19/10-b] la nota del recuadro en Canarias, Ceuta y Melilla dice «administración tributaria de …», con su espacio', async ({ page }) => {
+    test.fail(!I19_VER_HUECOS, 'ABIERTO (inspector 19/10/2026): «administración tributariade Canarias», desde bd3f3e2a');
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    const vistos: string[] = [];
+    for (const [ccaa, de] of [
+      ['canarias', 'de Canarias'],
+      ['ceuta', 'de la Ciudad Autónoma de Ceuta'],
+      ['melilla', 'de la Ciudad Autónoma de Melilla'],
+    ] as const) {
+      await page.selectOption('#select-ccaa', ccaa);
+      const nota = ((await page.locator('[class*="infoCcaaNote"]', { hasText: 'no se aplica el IVA' }).first().textContent()) ?? '').replace(/\s+/g, ' ');
+      // En Canarias el aviso de cabecera de la misma pantalla ya lo escribe bien (en Ceuta y Melilla
+      // ese aviso no remite a la administración: dice que el IPSI de la compra no se deduce).
+      if (ccaa === 'canarias') {
+        expect((await page.locator('[class*="ivaAviso"]').innerText()).replace(/\s+/g, ' ')).toContain(`administración tributaria ${de}`);
+      }
+      if (!nota.includes(`administración tributaria ${de}.`)) vistos.push(`${ccaa}: «…${nota.slice(nota.indexOf('consúltalo'))}»`);
+    }
+    expect(vistos).toEqual([]);
+  });
+
+  /**
+   * [19/10-c] (contenido, bajo) — forma del hallazgo 1268 (el consejo «Consulta el régimen de IVA»,
+   * reparado el 23/09) en otra tarjeta. El caso de uso «Autónomo compra nave de segunda mano» dice
+   * «Paga ITP al tipo general de su CCAA — salvo en Ceuta y Melilla […] y en las comunidades con un
+   * tipo reducido para el inmueble con el que se inicia una actividad, como Aragón», y enumera las
+   * salvedades sin la que la propia página llama habitual para su público: la renuncia a la exención
+   * cuando el vendedor es empresario (art. 20.Dos LIVA), que la app calcula en su tercera opción y con
+   * la que no se paga ITP sino IVA autoliquidado y deducible.
+   */
+  test('[19/10-c] el caso de uso «Autónomo compra nave de segunda mano» nombra la renuncia a la exención', async ({ page }) => {
+    test.fail(!I19_VER_HUECOS, 'ABIERTO (inspector 19/10/2026): la tarjeta da el ITP por seguro sin la salvedad de la renuncia');
+    await page.goto(RUTA);
+    const tarjeta = (
+      (await page.locator('strong', { hasText: 'Autónomo compra nave de segunda mano' }).first().locator('xpath=following-sibling::p[1]').textContent()) ?? ''
+    ).replace(/\s+/g, ' ');
+    expect(tarjeta).toContain('Paga ITP al tipo general de su CCAA');
+    expect(tarjeta).toMatch(/renuncia/);
   });
 });

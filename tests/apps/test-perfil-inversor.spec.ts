@@ -46,7 +46,9 @@ import { ORIGEN } from './_puerto';
  * `test.fail()` vivos son los de la re-inspección del 12/10/2026 (hallazgos 3227-3232). Los dos de
  * la del 16/10/2026 (3325 y 3326), REPARADOS el 18/10/2026 (el paso 3 de la guía, reescrito por el
  * 3326, cierra también esa parte del 3232, que sigue abierto por la tabla comparativa). Los dos de
- * la del 18/10/2026 (3366 y 3367), al final del fichero, REPARADOS ese mismo día.
+ * la del 18/10/2026 (3366 y 3367), al final del fichero, REPARADOS ese mismo día. La re-inspección
+ * del 19/10/2026, al final del fichero, deja un `test.fail()` nuevo: las preguntas 4 y 8 puntúan la
+ * misma situación en sentidos opuestos.
  */
 
 const RUTA = '/test-perfil-inversor/';
@@ -1213,7 +1215,8 @@ test.describe('re-inspección 26/09/2026 · móvil', () => {
 // → 3228 · «más objetiva» que el banco → 3229 · «cada cuánto revisar» → 3230 · FAQPage del
 // agresivo → 3231 · tabla comparativa → 3232 · doble toque → 3233. El 3233 se REPARÓ el 15/10/2026
 // (e903863e, con el 3299) y su caso es hoy regresión; 3227-3232 siguen abiertos y reproduciéndose
-// a 15/10/2026, a 16/10/2026 y a 18/10/2026 (re-inspecciones de esas fechas, al final del fichero).
+// a 15/10/2026, a 16/10/2026, a 18/10/2026 y a 19/10/2026 (re-inspecciones de esas fechas, al final
+// del fichero; el 3232 solo por la tabla comparativa: su parte del paso 3 la cerró el 3326).
 // ============================================================
 
 /** Carga la app con el almacenamiento de sesión vacío y espera a que React haya hidratado. */
@@ -2915,7 +2918,8 @@ test.describe('re-inspección 15/10/2026 · móvil 360×740', () => {
 //   3312 → tope por la pregunta 1 (A → Conservador, B → Moderado, C → Equilibrado, D sin tope), con la
 //          línea que lo explica, la flecha en el segmento nombrado y el enlace con el perfil limitado.
 //   3313 → «Atrás» desde los dos enlaces del resultado y F5 devuelven el MISMO resultado. Pero lo que se
-//          VE al volver no es el resultado: HALLAZGO de abajo, con su hermano del F5 a mitad.
+//          VE al volver no es el resultado: HALLAZGO de abajo, con su hermano del F5 a mitad (3323 y
+//          3324, REPARADOS el 17/10/2026).
 //
 // C0254 (familia «tests y cuestionarios por fases»; esta app es la referencia). La guarda cubre los
 // botones de las tres fases: «Comenzar Test», las cuatro opciones, «← Anterior», «Siguiente →» / «Ver
@@ -3519,7 +3523,8 @@ test.describe('C0251 · «Comenzar Test» por encima de la lista de ventajas', (
 // LO QUE NO SE SOSTIENE: «restaurar la fase no roba la vista». 58544660 también trae la fase cuando su
 // principio está A LA VISTA en la mitad baja, si la carga es un F5 o un «Atrás» de documento: quien
 // recarga arriba del todo, o leyendo lo que hay debajo del resultado, aterriza en otro sitio. HALLAZGO
-// de abajo, con el del encabezado que recibe el foco al ver el resultado.
+// de abajo, con el del encabezado que recibe el foco al ver el resultado (3366 y 3367, REPARADOS el
+// 18/10/2026).
 //
 // LOS CASOS, resueltos a mano antes de abrir el navegador (A=1 · B=2 · C=3 · D=4; tope por la 1;
 // flecha = i·20 + 2 + (p' − mín)/(máx − mín)·16 con el tramo del perfil NOMBRADO y p' la puntuación
@@ -3868,5 +3873,264 @@ test.describe('Inspector 18/10/2026 · móvil 390×844', () => {
       }
     }
     expect(problemas).toEqual([]);
+  });
+});
+
+// ============================================================
+// INSPECTOR 19/10/2026 — re-inspección tras 59ef1ca8 (3325 y 3326) y b7cc85eb (3366 y 3367), con
+// FIRMA DE ROTURA (76,8 % cortas y 30,4 % recargas en 69 visitas de los 30 días hasta el 18/10/2026,
+// casi toda la ventana ANTERIOR a las reparaciones del 14 al 18/10).
+//
+// LAS REPARACIONES se sostienen:
+//   3325 → con otra combinación que la de su test: la 1 en B y 22 puntos (B,D,D,D,B,B,A,A,A,A), techo
+//          del tope B, sin aviso; la 10 de A a B (23) → Moderado por el tope, con su línea. Y el aviso no
+//          se ha apagado de más: la 1 en C y 22 (techo de Moderado, pero no del tope C) avisa, y 23
+//          (suelo de Equilibrado) también. La FAQ del límite nombra la excepción del horizonte.
+//   3326 → paso 3 y técnica «bucket» (su test, en verde).
+//
+// LA FIRMA: nada impide usar la app a 360×740, 390×844 ni 1280×800: ningún desbordamiento horizontal
+// en ninguna fase, ningún error de página, los toques responden. Al cargar a 360×740 no se ve nada del
+// test (la tarjeta de portada empieza en 663 px, «Comenzar Test» en 1.111), que es lo que el cabo
+// C0251 decidió y cerró el 17/10/2026 con esas mismas cifras.
+//
+// LOS CASOS, resueltos a mano antes de abrir el navegador (A=1 · B=2 · C=3 · D=4; tope por la 1;
+// flecha = i·20 + 2 + (p' − mín)/(máx − mín)·16 con el tramo del perfil NOMBRADO y p' acotada a él):
+//   normal  → (390×844, tocando) B,B,C,B,A,B,C,B,B,A = 2+2+3+2+1+2+3+2+2+1 = 20 → Moderado (17–22); la B
+//             limita a Moderado, que no rebaja nada: sin línea; sin aviso; flecha 20 + 2 + 3/5·16 = 31,6 %
+//   límite  → (escritorio) C,B,B,B,B,B,B,B,C,B = 3+14+3+2 = 22 → Moderado CON aviso (23 = Equilibrado,
+//             que la C admite), 38 %; la 10 de B a C = 23 → Equilibrado CON aviso (suelo), 42 %; de C a
+//             D = 24 → sin aviso, 45,2 %. B,D,D,D,B,B,A,A,A,A = 2+12+4+4 = 22 → Moderado SIN aviso
+//             (3325), 38 %; la 10 de A a B = 23 → Moderado por el tope B, con su línea, 38 %
+//   rechazo → (360×740) sin respuesta, «Siguiente» deshabilitado y un toque forzado no avanza; tres
+//             sesiones que `leerSesion` debe tirar y retirar: índice 10, una respuesta 0 y fase null. Y
+//             una válida para comparar: todo C = 30 → Dinámico por puntos, Equilibrado por el tope C, 58 %
+//   HALLAZGO → las preguntas 4 y 8 puntúan la misma situación en sentidos opuestos (abajo).
+// ============================================================
+
+const ORDEN_PERFILES_1910 = ['Conservador', 'Moderado', 'Equilibrado', 'Dinámico', 'Agresivo'];
+
+/** «30 puntos · tramo 29–34» → 30. */
+async function puntos1910(page: Page): Promise<number> {
+  const texto = (await page.locator('p[class*="resultScore"]').textContent()) ?? '';
+  const m = texto.match(/(\d+) puntos/);
+  expect(m, `«${texto}» no da la puntuación`).not.toBeNull();
+  return Number(m![1]);
+}
+
+/** Desde el resultado: «Revisar mis respuestas» (deja en la 10), otra opción en la 10 y «Ver Resultado». */
+async function cambiarLa10_1910(page: Page, indice: number): Promise<void> {
+  await page.waitForTimeout(500);
+  await page.getByRole('button', { name: /Revisar mis respuestas/ }).click();
+  await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+  await page.waitForTimeout(500);
+  await opcion(page, indice).click();
+  await page.waitForTimeout(500);
+  await botonSiguiente(page).click();
+}
+
+/** Leyenda de la cartera con el espacio duro del % (2180) cambiado por uno normal. */
+async function reparto1910(page: Page): Promise<string[]> {
+  return (await reparto(page)).map((s) => s.replace(/ /g, ' ').trim());
+}
+
+test.describe('Inspector 19/10/2026 · escritorio', () => {
+  test.use({ viewport: { width: 1280, height: 800 }, userAgent: UA_ESCRITORIO_1610 });
+  const puntuacion = (page: Page) => page.locator('p[class*="resultScore"]');
+  const avisoDeBorde = (page: Page) => page.locator('[class*="resultScoreBorde"]');
+  const lineaDeTope = (page: Page) => page.locator('[class*="resultTope"]');
+
+  test('caso límite: con la 1 en C avisa en 22 y en 23; con la 1 en B no avisa en 22, techo de su tope (3325), y en 23 la limita', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await contestar1610(page, [2, 1, 1, 1, 1, 1, 1, 1, 2, 1]); // 3 + 7·2 + 3 + 2 = 22
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    await expect(puntuacion(page)).toContainText('22 puntos · tramo 17–22');
+    // Techo de Moderado, pero la C admite Equilibrado: con 23 el perfil cambia y el aviso dice verdad
+    await expect(avisoDeBorde(page)).toContainText('con un punto de diferencia el resultado sería el perfil de al lado');
+    await expect(lineaDeTope(page)).toHaveCount(0);
+    expect(await izquierdaFlecha(page)).toBeCloseTo(38, 1); // 20 + 2 + 5/5·16
+
+    await cambiarLa10_1910(page, 2); // la 10 de B a C: 23
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(puntuacion(page)).toContainText('23 puntos · tramo 23–28');
+    await expect(avisoDeBorde(page)).toHaveCount(1); // suelo: con 22 sería Moderado
+    await expect(lineaDeTope(page)).toHaveCount(0); // por puntos ya es Equilibrado
+    expect(await izquierdaFlecha(page)).toBeCloseTo(42, 1); // 40 + 2 + 0
+
+    await cambiarLa10_1910(page, 3); // la 10 de C a D: 24
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(puntuacion(page)).toHaveText('24 puntos · tramo 23–28');
+    await expect(avisoDeBorde(page)).toHaveCount(0);
+    expect(await izquierdaFlecha(page)).toBeCloseTo(45.2, 1); // 40 + 2 + 1/5·16
+
+    // 3325 con otra combinación que la de su test
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).click();
+    await contestar1610(page, [1, 3, 3, 3, 1, 1, 0, 0, 0, 0]); // 2 + 3·4 + 2·2 + 4·1 = 22
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    await expect(puntuacion(page)).toHaveText('22 puntos · tramo 17–22'); // sin aviso: con 23 seguiría Moderado
+    await expect(avisoDeBorde(page)).toHaveCount(0);
+    await expect(lineaDeTope(page)).toHaveCount(0);
+    expect(await izquierdaFlecha(page)).toBeCloseTo(38, 1);
+
+    await cambiarLa10_1910(page, 1); // la 10 de A a B: 23
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    await expect(puntuacion(page)).toHaveText('23 puntos · tramo 23–28');
+    await expect(lineaDeTope(page)).toHaveText(
+      'Tu horizonte de entre 2 y 5 años limita el perfil a Moderado; el resto de tus respuestas apuntaba a Equilibrado.',
+    );
+    await expect(avisoDeBorde(page)).toHaveCount(0);
+    expect(await izquierdaFlecha(page)).toBeCloseTo(38, 1); // segmento de Moderado, extremo alto
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=moderado',
+    );
+
+    // 3325: la FAQ del límite entre dos perfiles nombra la excepción del horizonte
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const faqLimite = sinEspacios(
+      (await page.locator('[class*="faqItem"]').filter({ hasText: 'límite entre dos perfiles' }).textContent()) ?? '',
+    );
+    expect(faqLimite).toContain('La excepción es el horizonte: tu respuesta a la pregunta 1 fija el perfil más alto al que llega el test');
+  });
+
+  // HALLAZGO (19/10/2026): ABIERTO.
+  test.fail('HALLAZGO — poner en juego la mayor parte del ahorro (pregunta 4) no sube el perfil, igual que en la 8', async ({
+    page,
+  }) => {
+    // La 4 («¿Qué porcentaje de tus ahorros totales vas a destinar a inversiones?») da 4 puntos a «Más
+    // del 60 % - La mayor parte de mis ahorros» y 1 a «Menos del 20 % - Solo una pequeña parte»; la 8 da
+    // 1 punto a «No, este es todo mi ahorro» y 4 a «patrimonio diversificado». La misma situación, en
+    // sentidos opuestos. La guía razona como la 8: «Los 200.000 € son solo una parte. Puede asumir más
+    // riesgo en este capital específico» (empresario), «Si dependes de esta inversión para algo
+    // concreto, sé más conservador» (paso 6), «con un colchón pequeño lo prudente es invertir menos»
+    // (paso 1). Resuelto a mano: D,C,C,?,C,C,C,B,C,C = 27 + la 4 → A: 28, Equilibrado (50 % de renta
+    // variable) · D: 31, Dinámico (70 %). Y D,C,C,D,C,C,C,A,C,C («más del 60 %», «todo mi ahorro») =
+    // 30 = D,C,C,A,C,C,C,D,C,C («una pequeña parte» de un «patrimonio diversificado»): se anulan.
+    test.setTimeout(150_000);
+    const recorrer = async (indices: number[]): Promise<{ perfil: string; puntos: number }> => {
+      await cargarLimpia1610(page);
+      await page.getByRole('button', { name: /Comenzar Test/ }).click();
+      await contestar1610(page, indices);
+      await expect(perfilMostrado(page)).toBeVisible();
+      return { perfil: (await perfilMostrado(page).textContent()) ?? '', puntos: await puntos1910(page) };
+    };
+    const pocoAhorro = await recorrer([3, 2, 2, 0, 2, 2, 2, 1, 2, 2]); // la 4 en A: 28 → Equilibrado
+    const casiTodo = await recorrer([3, 2, 2, 3, 2, 2, 2, 1, 2, 2]); // la 4 en D: 31 → Dinámico
+    const todoMiAhorro = await recorrer([3, 2, 2, 3, 2, 2, 2, 0, 2, 2]); // la 4 en D y la 8 en A: 30
+    const unaParte = await recorrer([3, 2, 2, 0, 2, 2, 2, 3, 2, 2]); // la 4 en A y la 8 en D: 30
+    // Lo que se espera: más ahorro en juego no suma puntos ni sube el perfil
+    expect
+      .soft(casiTodo.puntos, 'la 4 en «Más del 60 %» frente a «Menos del 20 %»')
+      .toBeLessThanOrEqual(pocoAhorro.puntos);
+    expect
+      .soft(ORDEN_PERFILES_1910.indexOf(casiTodo.perfil), `${casiTodo.perfil} frente a ${pocoAhorro.perfil}`)
+      .toBeLessThanOrEqual(ORDEN_PERFILES_1910.indexOf(pocoAhorro.perfil));
+    expect
+      .soft(todoMiAhorro.puntos, '«todo mi ahorro» frente a «una pequeña parte» de un patrimonio diversificado')
+      .toBeLessThan(unaParte.puntos);
+  });
+});
+
+test.describe('Inspector 19/10/2026 · móvil 390×844', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: UA_MOVIL_1410,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso normal tocando: B,B,C,B,A,B,C,B,B,A suma 20 → Moderado, sin línea de tope ni aviso, flecha 31,6 %, sin desbordar en ninguna fase', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    const sinDesbordar = async (fase: string): Promise<void> => {
+      const { ancho, ventana } = await page.evaluate(() => ({
+        ancho: document.documentElement.scrollWidth,
+        ventana: window.innerWidth,
+      }));
+      expect(ancho, `${fase}: la página no se sale por la derecha`).toBeLessThanOrEqual(ventana);
+    };
+    await cargarLimpia1610(page);
+    await sinDesbordar('portada');
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+    await sinDesbordar('cuestionario');
+    await contestar1610(page, [1, 1, 2, 1, 0, 1, 2, 1, 1, 0], true); // 2+2+3+2+1+2+3+2+2+1 = 20
+    await expect(perfilMostrado(page)).toHaveText('Moderado');
+    await expect(page.locator('p[class*="resultScore"]')).toHaveText('20 puntos · tramo 17–22');
+    await expect(page.locator('[class*="resultScoreBorde"]')).toHaveCount(0); // ni 17 ni 22
+    await expect(page.locator('[class*="resultTope"]')).toHaveCount(0); // el tope de la B es Moderado: no rebaja
+    expect(await izquierdaFlecha(page)).toBeCloseTo(31.6, 1); // 20 + 2 + 3/5·16
+    expect(await segmentoDeLaFlecha(page)).toBe(1);
+    // PROFILES.moderado
+    await expect(rasgo(page, 0)).toHaveText('Bajo');
+    await expect(rasgo(page, 1)).toHaveText('3-5 años');
+    await expect(rasgo(page, 2)).toHaveText('8-12 %');
+    await expect(rasgo(page, 3)).toHaveText('Batir inflación');
+    expect(await reparto1910(page)).toEqual([
+      'Renta Variable (30 %)',
+      'Renta Fija (50 %)',
+      'Liquidez (15 %)',
+      'Alternativos (5 %)',
+    ]);
+    await expect(page.getByRole('link', { name: /Simular esta Cartera/ })).toHaveAttribute(
+      'href',
+      '/estimador-cartera-inversion/?perfil=moderado',
+    );
+    await sinDesbordar('resultado');
+  });
+});
+
+test.describe('Inspector 19/10/2026 · móvil 360×740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: UA_MOVIL_1410,
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso a rechazar tocando: sin respuesta no se avanza; un índice 10, una respuesta 0 y una fase null se tiran y se retiran', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await cargarLimpia1610(page);
+    await page.getByRole('button', { name: /Comenzar Test/ }).tap();
+    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+    await page.waitForTimeout(500);
+    await expect(botonSiguiente(page)).toBeDisabled();
+    await botonSiguiente(page).tap({ force: true });
+    await page.waitForTimeout(400);
+    await expect(page.getByText('Pregunta 1 de 10')).toBeVisible();
+    await expect(page.locator('[class*="optionButton"][aria-pressed="true"]')).toHaveCount(0);
+
+    const todoC: Record<string, number> = { 1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3, 10: 3 };
+    const sesiones: Array<[string, object]> = [
+      ['un índice de pregunta 10 (la 11, que no existe)', { currentQuestion: 10, answers: { 1: 2, 2: 3 } }],
+      ['una respuesta 0 en la 5 (no es ninguna de sus opciones)', { currentQuestion: 9, answers: { ...todoC, 5: 0 }, fase: 'result' }],
+      ['una fase null', { currentQuestion: 9, answers: todoC, fase: null }],
+    ];
+    for (const [nombre, sesion] of sesiones) {
+      await sembrarYCargar1810(page, sesion);
+      await expect(page.getByRole('button', { name: /Comenzar Test/ }), nombre).toBeVisible();
+      await expect(perfilMostrado(page), nombre).toHaveCount(0);
+      await expect(enunciado(page), nombre).toHaveCount(0);
+      await expect(page.getByText('Algo salió mal'), nombre).toHaveCount(0);
+      expect(await page.evaluate((k) => sessionStorage.getItem(k), CLAVE_1610), nombre).toBeNull();
+    }
+
+    // Y la válida, para comparar: todo C = 30 → Dinámico por puntos, Equilibrado por el tope de la C
+    await sembrarYCargar1810(page, { currentQuestion: 9, answers: todoC, fase: 'result' });
+    await expect(perfilMostrado(page)).toHaveText('Equilibrado');
+    await expect(page.locator('p[class*="resultScore"]')).toHaveText('30 puntos · tramo 29–34');
+    await expect(page.locator('[class*="resultTope"]')).toHaveText(
+      'Tu horizonte de entre 5 y 10 años limita el perfil a Equilibrado; el resto de tus respuestas apuntaba a Dinámico.',
+    );
+    expect(await izquierdaFlecha(page)).toBeCloseTo(58, 1); // 40 + 2 + 16, extremo alto de Equilibrado
   });
 });
