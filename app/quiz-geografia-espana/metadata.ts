@@ -43,6 +43,12 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La misma respuesta para la FAQ visible (page.tsx) y el FAQPage. Altitud del Teide del IGN
+// (3.715 m), ratificada por el usuario el 19/10/2026 (hallazgo 3220); 3.718 m es la cifra antigua.
+export const PREGUNTA_PICO_MAS_ALTO = '¿Cuál es el pico más alto de España?';
+export const RESPUESTA_PICO_MAS_ALTO =
+  'El Teide (Tenerife, Canarias) es el punto más alto de España con 3.715 metros sobre el nivel del mar. En la Península Ibérica, el pico más elevado es el Mulhacén (Sierra Nevada, Granada) con 3.479 metros.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -73,10 +79,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuál es el pico más alto de España?',
+      name: PREGUNTA_PICO_MAS_ALTO,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Teide (Tenerife, Canarias) es el punto más alto de España con 3.715 metros sobre el nivel del mar. En la Península Ibérica, el pico más elevado es el Mulhacén (Sierra Nevada, Granada) con 3.479 metros.',
+        text: RESPUESTA_PICO_MAS_ALTO,
       },
     },
     {

@@ -859,12 +859,9 @@ test.describe('Inspector 10/10/2026 · contenido', () => {
   });
 
   test('hallazgo · «¿Cuál es el pico más alto de España?» da la misma altitud del Teide en las dos FAQ', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026) · C0153. FAQPage (metadata.ts:79): «…con 3.715 metros sobre el
-    // nivel del mar…»; FAQ visible (page.tsx:438): «…con 3.718 m es el punto más alto de España…»;
-    // el banco (ids 5 y 51, «¿Cuál es la altitud exacta del Teide?») da 3.718 m. El repositorio no
-    // ancla la cifra del IGN en ningún sitio. Reparación: UNA constante en metadata.ts que importen
-    // las dos bocas, con la cifra decidida en la fuente.
-    test.fail();
+    // REPARADO el 19/10/2026 (3220, C0153): las dos FAQ salen de RESPUESTA_PICO_MAS_ALTO
+    // (metadata.ts) con la cifra del IGN, 3.715 m, ratificada por el usuario; el banco (ids 5 y 51)
+    // pasa también a 3.715. Antes: FAQPage 3.715 m, FAQ visible y banco 3.718 m.
     await abrir(page);
     const pregunta = '¿Cuál es el pico más alto de España?';
     const servida = (await faqServida(page))[pregunta];
@@ -873,6 +870,8 @@ test.describe('Inspector 10/10/2026 · contenido', () => {
     const altura = (t: string) => (t.match(/Teide[^.]*?(\d\.\d{3})\s?m/) ?? [])[1];
     expect(altura(servida)).toBe(altura(visible));
     expect(servida).toBe(visible);
+    // El banco da la misma altitud que las FAQ.
+    expect(fichaDe(/altitud exacta del Teide/).correcta).toBe(`${altura(servida)} m`);
   });
 
   test('hallazgo · «¿Cuántas provincias tiene España?» se contesta con el mismo texto en las dos FAQ', async ({ page }) => {

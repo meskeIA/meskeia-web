@@ -20,6 +20,7 @@ import {
   type DificultadGeografia,
   type PreguntaGeografia,
 } from '@/data/preguntas-geografia-espana';
+import { PREGUNTA_PICO_MAS_ALTO, RESPUESTA_PICO_MAS_ALTO } from './metadata';
 
 type Fase = 'inicio' | 'jugando' | 'respondida' | 'fin';
 
@@ -513,8 +514,8 @@ export default function QuizGeografiaEspanaPage() {
           <h2>Preguntas frecuentes sobre Geografía de España</h2>
           <div className={styles.faqGrid}>
             <div className={styles.faqItem}>
-              <h3>¿Cuál es el pico más alto de España?</h3>
-              <p>El Teide (Tenerife, Canarias) con 3.718 m es el punto más alto de España. En la Península, el más alto es el Mulhacén (Sierra Nevada, Granada) con 3.479 m.</p>
+              <h3>{PREGUNTA_PICO_MAS_ALTO}</h3>
+              <p>{RESPUESTA_PICO_MAS_ALTO}</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuántas provincias tiene España?</h3>
