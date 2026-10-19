@@ -3983,7 +3983,7 @@ test.describe('Re-inspección 06/10/2026', () => {
     const cuerpo = normalizar(await page.locator('body').innerText());
     expect(cuerpo).toMatch(/maternidad[^.]{0,250}incompatib|incompatib[^.]{0,250}maternidad/i);
     expect(cuerpo).toMatch(/optar|elegir entre/i);
-    expect(await jsonLdDeLaPagina(page)).toMatch(/incompatibles y hay que optar/);
+    expect(await jsonLdDeLaPagina(page)).toMatch(/incompatible[^.]{0,160}hay que optar/); // desde el 19/10, de la DT 33.ª del módulo
   });
 
   /**
@@ -3994,10 +3994,10 @@ test.describe('Re-inspección 06/10/2026', () => {
    * complemento por maternidad» (con al menos 2 hijos y sin haberlo tenido reconocido), y que
    * se puede pedir «en cualquier momento desde que te hayan concedido la pensión».
    */
-  test('ABIERTO (06/10): pensión anterior al 4-feb-2021 — el paso siguiente no dice que el de maternidad se puede solicitar', async ({
+  // REPARADO el 19/10/2026 (hallazgo 2929): PASO_MATERNIDAD_DEROGADO del motor, con las fechas del módulo.
+  test('REPARADO (2929): pensión anterior al 4-feb-2021 — el paso siguiente dice que el de maternidad se puede solicitar', async ({
     page,
   }) => {
-    test.fail();
     await responder06(page, {
       pension: 'Jubilación (ordinaria o anticipada)',
       fecha: 'Antes del 4-feb-2021',
@@ -4005,7 +4005,13 @@ test.describe('Re-inspección 06/10/2026', () => {
       sexo: 'Mujer',
       otroProgenitor: 'No lo percibe ni lo ha solicitado',
     });
-    expect(await textoResultado(page)).toMatch(/solicit\w*[^.]{0,80}complemento (de|por) maternidad/i);
+    // El esperado del acta pedía «solicitar … complemento de maternidad» en ese orden; la frase
+    // reparada lo dice al revés («te corresponde el antiguo complemento de maternidad: si nunca te
+    // lo reconocieron, puedes solicitarlo»), con la ventana de fechas y el trámite oficial.
+    const resultado = await textoResultado(page);
+    expect(resultado).toMatch(/complemento de maternidad[^.]{0,80}solicit/i);
+    expect(resultado).toMatch(/2016/);
+    expect(resultado).toContain('Solicitar un complemento por brecha de género o por maternidad');
   });
 
   /**
@@ -4296,8 +4302,8 @@ test.describe('Re-inspección 07/10/2026', () => {
    * oficina del INSS». En el portal de prestaciones de la SS el único trámite con «revisión»
    * es «Revisión de la última revalorización de la pensión», que no da el complemento.
    */
-  test('ABIERTO (07/10): el paso 3 de la guía nombra el trámite oficial, no la «revisión de pensión»', async ({ page }) => {
-    test.fail(true, 'Hallazgo 07/10: el paso 3 de «Cómo solicitarlo o reclamarlo» manda buscar «revisión de pensión»');
+  // REPARADO el 19/10/2026 (hallazgo 2983): el paso 3 lee COMPLEMENTO_BRECHA_GENERO_META.tramite.
+  test('REPARADO (2983): el paso 3 de la guía nombra el trámite oficial, no la «revisión de pensión»', async ({ page }) => {
     await abrirGuia(page);
     const pasos = page
       .locator('h2', { hasText: 'Cómo solicitarlo o reclamarlo' })
@@ -4320,8 +4326,8 @@ test.describe('Re-inspección 07/10/2026', () => {
    * de /triaje-fiscal. El test no fija el nombre del campo: pide que la norma esté en el
    * CÓDIGO del módulo y que page.tsx y metadata.ts no la tecleen.
    */
-  test('ABIERTO (07/10): la incompatibilidad de la DT 33.ª vive en data/fiscal, no tecleada en la página', async () => {
-    test.fail(true, 'Hallazgo 07/10: la DT 33.ª va tecleada en page.tsx y metadata.ts, sin campo en data/fiscal');
+  // REPARADO el 19/10/2026 (hallazgo 2984): COMPLEMENTO_MATERNIDAD_DEROGADO.transitoria.
+  test('REPARADO (2984): la incompatibilidad de la DT 33.ª vive en data/fiscal, no tecleada en la página', async () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const leer = (...partes: string[]): string =>
@@ -4366,7 +4372,8 @@ test.describe('Re-inspección 07/10/2026 — móvil', () => {
     expect(await page.evaluate(() => (document.activeElement?.className ?? '').toString())).toContain(
       'resultHeroPositivo',
     );
-    await expect(page.getByText(/la DT 33\.ª LGSS te deja optar/)).toBeVisible();
+    // Desde el 19/10/2026 la frase sale de COMPLEMENTO_MATERNIDAD_DEROGADO.transitoria (hallazgo 2984)
+    await expect(page.getByText(/hay que optar entre uno u otro \(DT 33\.ª LGSS\)/)).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 });
@@ -4667,10 +4674,10 @@ test.describe('Re-inspección 16/10/2026', () => {
    * a la jubilación»: excluía la anticipada por voluntad de la interesada (art. 208) y la
    * parcial (art. 215). COMPLEMENTO_MATERNIDAD_DEROGADO no recoge esas exclusiones.
    */
-  test('ABIERTO (16/10): la tabla comparativa recoge las exclusiones del antiguo art. 60.4 (anticipada voluntaria y parcial)', async ({
+  // REPARADO el 19/10/2026 (hallazgo 3339): COMPLEMENTO_MATERNIDAD_DEROGADO.exclusiones.
+  test('REPARADO (3339): la tabla comparativa recoge las exclusiones del antiguo art. 60.4 (anticipada voluntaria y parcial)', async ({
     page,
   }) => {
-    test.fail(true, 'Hallazgo 16/10: la columna del régimen derogado dice «Jubilación, IP, viudedad» sin las exclusiones del 60.4');
     await abrirGuia(page);
     const fila = page
       .locator('table tr')
@@ -4690,10 +4697,10 @@ test.describe('Re-inspección 16/10/2026', () => {
    * original del RDLeg 8/2015, no una «dada por» la Ley 48/2015. El propio módulo cita la DF
    * única del RDLeg 8/2015 para `aplicableDesde`.
    */
-  test('ABIERTO (16/10): la nota de la tabla no atribuye a la Ley 48/2015 la redacción del art. 60 anterior al RDL 3/2021', async ({
+  // REPARADO el 19/10/2026 (hallazgo 3340): la norma dice la redacción original del RDLeg 8/2015.
+  test('REPARADO (3340): la nota de la tabla no atribuye a la Ley 48/2015 la redacción del art. 60 anterior al RDL 3/2021', async ({
     page,
   }) => {
-    test.fail(true, 'Hallazgo 16/10: la norma del régimen derogado dice «(dada por la Ley 48/2015)»');
     expect(COMPLEMENTO_MATERNIDAD_DEROGADO.norma).toContain('Art. 60 LGSS'); // control
     expect(COMPLEMENTO_MATERNIDAD_DEROGADO.norma).not.toMatch(/dada por la Ley 48\/2015/);
     await abrirGuia(page);
@@ -4709,8 +4716,9 @@ test.describe('Re-inspección 16/10/2026', () => {
    * no juzga si la calificación es correcta: pide que viva en el módulo y que el FAQPage no la
    * teclee.
    */
-  test('ABIERTO (16/10): la tributación en el IRPF que afirma el FAQPage vive en data/fiscal, no tecleada', async () => {
-    test.fail(true, 'Hallazgo 16/10: «tributa como rendimiento del trabajo» va tecleado en metadata.ts y en el motor');
+  // REPARADO el 19/10/2026 (hallazgo 3341): COMPLEMENTO_BRECHA_GENERO_2026.tributacionIrpf, con la
+  // norma (art. 17.2.a) 1.ª LIRPF) y el criterio (DGT V0712-23).
+  test('REPARADO (3341): la tributación en el IRPF que afirma el FAQPage vive en data/fiscal, no tecleada', async () => {
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const leer = (...partes: string[]): string =>

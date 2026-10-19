@@ -44,7 +44,7 @@
  *   - Importe FIJO por hijo/a (no porcentaje), con un máximo de 4 hijos computables.
  *   - Se abona en las pagas de `COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales` (art. 60.3.c LGSS).
  *   - NO computa a efectos del límite máximo de pensiones públicas.
- *   - Tributa en IRPF como rendimiento del trabajo.
+ *   - Tributa en IRPF como rendimiento del trabajo: `TRIBUTACION_IRPF`, con norma y criterio.
  *   - Histórico de cuantías mensuales por hijo: 27,00 € (2021), 30,40 € (2023),
  *     33,20 € (2024), 35,90 € (2025), 36,90 € (2026).
  *
@@ -71,6 +71,38 @@ import { formatFechaLarga, formatNumber } from '@/lib/formatters';
 const EXCLUSION_JUBILACION_PARCIAL = COMPLEMENTO_BRECHA_GENERO_2026.exclusiones.find(
   e => e.supuesto === 'jubilacion_parcial',
 )!;
+
+/**
+ * El antiguo complemento de maternidad, para una pensión causada antes del 04/02/2021. Hasta el
+ * 19/10/2026 el paso siguiente solo hablaba a quien lo percibía o se lo habían denegado, y quien
+ * nunca lo pidió no sabía que aún puede solicitarlo (hallazgo 2929). Las fechas, el mínimo de
+ * hijos, las exclusiones del 60.4 original y el trámite salen del módulo fiscal. Lo leen la web
+ * y el MCP.
+ */
+const MATERNIDAD = COMPLEMENTO_MATERNIDAD_DEROGADO;
+export const PASO_MATERNIDAD_DEROGADO =
+  `Si tu pensión se causó entre el ${formatFechaLarga(MATERNIDAD.aplicableDesde)} y el ` +
+  `${formatFechaLarga(MATERNIDAD.vigenteHasta)} y tienes ${MATERNIDAD.minimoHijos} o más hijos, ` +
+  'te corresponde el antiguo complemento de maternidad: si nunca te lo reconocieron, puedes ' +
+  `solicitarlo ante el INSS con el trámite «${COMPLEMENTO_BRECHA_GENERO_META.tramite}». Cubría ` +
+  `jubilación, incapacidad permanente y viudedad, ${MATERNIDAD.exclusiones.resumen} ` +
+  `(${MATERNIDAD.exclusiones.norma}). Si se te denegó, consulta a un profesional: la ` +
+  `${MATERNIDAD.doctrinaAcceso} también afectó a aquel régimen. Antes del ` +
+  `${formatFechaLarga(MATERNIDAD.aplicableDesde)} no existía ninguno de los dos complementos.`;
+
+/**
+ * Incompatibilidad con el de maternidad que ya se cobre (DT 33.ª LGSS, párrafo segundo), leída
+ * del módulo fiscal (hallazgo 2984). Iba tecleada en cuatro sitios con cuatro redacciones.
+ */
+export const INCOMPATIBILIDAD_MATERNIDAD =
+  `Si ya se cobra el antiguo complemento de maternidad por otra pensión, ${MATERNIDAD.transitoria.incompatibilidad} ` +
+  `(${MATERNIDAD.transitoria.norma}).`;
+
+/** Calificación en el IRPF con su norma y su criterio, leída del módulo fiscal (hallazgo 3341) */
+const IRPF = COMPLEMENTO_BRECHA_GENERO_2026.tributacionIrpf;
+export const TRIBUTACION_IRPF =
+  `Tributa en el IRPF como ${IRPF.calificacion} (${IRPF.norma}; ${IRPF.criterio}): ${IRPF.exencion}, ` +
+  `y ${IRPF.retenciones}.`;
 
 /** Fecha mínima del hecho causante, leída del módulo fiscal (hallazgo 504) */
 export const FECHA_MINIMA_HECHO_CAUSANTE = formatFechaLarga(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante);
@@ -307,7 +339,7 @@ export function calcularComplementoBrechaGenero(
   const fuenteDatos = COMPLEMENTO_BRECHA_GENERO_META.fuente;
   const advertenciasBase = [
     `El complemento se abona en ${pagasAnuales} pagas y NO computa a efectos del límite máximo de pensiones públicas: se suma aunque ya se perciba la pensión máxima.`,
-    'El complemento tributa en IRPF como rendimiento del trabajo.',
+    TRIBUTACION_IRPF,
     `Desde la STJUE ${DOCTRINA.stjue.asunto} (${DOCTRINA.stjue.fecha}) y la STS de ${DOCTRINA.ts.fecha}, hombres y mujeres tienen derecho en igualdad de condiciones: ya no se exigen requisitos adicionales a los hombres.`,
   ];
 
@@ -368,8 +400,8 @@ export function calcularComplementoBrechaGenero(
   // Caso 2: hecho causante anterior al 04-feb-2021
   if (fecha === 'antes_2021') {
     return noProcede(
-      `La pensión se causó antes del ${FECHA_MINIMA_HECHO_CAUSANTE}, fecha de entrada en vigor del complemento por brecha de género (RDL 3/2021). Para hechos causantes anteriores se aplicaba el antiguo complemento de maternidad, con reglas distintas.`,
-      `Si entonces percibías o se te denegó el antiguo complemento de maternidad, consulta a un profesional: la ${COMPLEMENTO_MATERNIDAD_DEROGADO.doctrinaAcceso} también afectó a aquel régimen.`,
+      `La pensión se causó antes del ${FECHA_MINIMA_HECHO_CAUSANTE}, fecha de entrada en vigor del complemento por brecha de género (RDL 3/2021). Para hechos causantes anteriores, desde el ${formatFechaLarga(MATERNIDAD.aplicableDesde)}, se aplicaba el antiguo complemento de maternidad, con reglas distintas.`,
+      PASO_MATERNIDAD_DEROGADO,
     );
   }
   if (fecha === 'sin_iniciar') {
@@ -442,7 +474,7 @@ export function calcularComplementoBrechaGenero(
         : 'Recupera la resolución denegatoria y revisa su motivo con un abogado laboralista o con tu sindicato antes de volver a solicitarlo.')
     // Se SOLICITA, y es incompatible con el de maternidad que ya se cobre por otra pensión (DT
     // 33.ª LGSS): la misma reparación que el verificador web (hallazgos 2927 y 2928, 06/10/2026).
-    : 'El complemento hay que solicitarlo ante el INSS (trámite «Solicitar un complemento por brecha de género o por maternidad», en la Sede Electrónica de la SS): si no se pidió con la pensión, puede hacerse en cualquier momento después. Si ya se cobra el antiguo complemento de maternidad por otra pensión, es incompatible con este: la DT 33.ª LGSS permite optar entre uno u otro.';
+    : `El complemento hay que solicitarlo ante el INSS (trámite «${COMPLEMENTO_BRECHA_GENERO_META.tramite}», en la Sede Electrónica de la SS): si no se pidió con la pensión, puede hacerse en cualquier momento después. ${INCOMPATIBILIDAD_MATERNIDAD}`;
 
   // Concurrencia resuelta a favor del solicitante: se reconoce a él o a ella y se extingue
   // el del otro progenitor (art. 60.2 LGSS). El resto del veredicto no cambia.

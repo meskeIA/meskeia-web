@@ -651,6 +651,13 @@ export const COMPLEMENTO_BRECHA_GENERO_META = {
   vigencia: '2026',
   urlOficial: 'https://prestaciones.seg-social.es/servicio/complemento-brecha.html',
   /**
+   * Nombre del trámite oficial de `urlOficial`, el mismo para los dos complementos. Iba tecleado
+   * en el veredicto, el FAQPage y el motor del MCP, y la guía de la app mandaba a buscar otro
+   * («revisión de pensión»), que en el portal de prestaciones es la revisión de la
+   * revalorización y no da el complemento (hallazgo 2983, 19/10/2026).
+   */
+  tramite: 'Solicitar un complemento por brecha de género o por maternidad',
+  /**
    * La doctrina de igualdad de trato, DESGLOSADA en sus piezas para que la app pueda
    * citarla sin teclearla.
    *
@@ -708,9 +715,17 @@ export const COMPLEMENTO_BRECHA_GENERO_META = {
  *
  * NO necesita vigilancia: es la redacción de una norma DEROGADA, así que sus cifras no
  * pueden cambiar — solo dejarían de importar el día que no queden reclamaciones vivas.
+ * La DT 33.ª, que lo mantiene y lo declara incompatible con el vigente, sí es norma en vigor.
  */
 export const COMPLEMENTO_MATERNIDAD_DEROGADO = {
-  norma: 'Art. 60 LGSS en su redacción anterior al RDL 3/2021 (dada por la Ley 48/2015)',
+  /**
+   * ⚠️ Corregida el 19/10/2026 (hallazgo 3340). Decía «en su redacción anterior al RDL 3/2021
+   * (dada por la Ley 48/2015)». En el BOE consolidado (BOE-A-2015-11724, versión del texto
+   * original, publicado el 31/10/2015 y consultado ese día) el art. 60 ya está en el texto
+   * original del RDLeg 8/2015, y solo lo modifican el RDL 3/2021 y el RDL 2/2023. La Ley
+   * 48/2015 creó el complemento en la LGSS de 1994, que el texto refundido sustituyó.
+   */
+  norma: 'Art. 60 LGSS en la redacción original del RDLeg 8/2015 (vigente hasta el RDL 3/2021)',
   /**
    * Pensiones causadas desde esta fecha: «será de aplicación […] a las pensiones contributivas
    * que se causen a partir de 1 de enero de 2016» (RDLeg 8/2015, disposición final única,
@@ -727,6 +742,46 @@ export const COMPLEMENTO_MATERNIDAD_DEROGADO = {
   minimoHijos: 2,
   naturaleza: 'porcentaje sobre la pensión' as const,
   doctrinaAcceso: 'STJUE de 12 de diciembre de 2019 (C-450/18, caso WA)',
+  /**
+   * Modalidades que el art. 60.4 de la redacción original EXCLUÍA (hallazgo 3339, 19/10/2026).
+   * Hasta esa fecha la tabla comparativa daba «Jubilación, IP, viudedad» sin excepción para
+   * el régimen derogado, mientras la columna del vigente sí anotaba la suya. Texto literal
+   * (BOE-A-2015-11724, texto original del 31/10/2015, consultado el 19/10/2026): «El
+   * complemento de pensión no será de aplicación en los casos de acceso anticipado a la
+   * jubilación por voluntad de la interesada ni en los de jubilación parcial, a los que se
+   * refieren, respectivamente, los artículos 208 y 215. No obstante lo anterior, se asignará el
+   * complemento de pensión que proceda cuando desde la jubilación parcial se acceda a la
+   * jubilación plena, una vez cumplida la edad que en cada caso corresponda.»
+   */
+  exclusiones: {
+    norma: 'art. 60.4 LGSS, redacción original',
+    resumen: 'salvo la jubilación anticipada voluntaria y la parcial',
+    detalle:
+      'No se aplicaba a la jubilación anticipada por voluntad de la interesada (art. 208 LGSS) ' +
+      'ni a la jubilación parcial (art. 215 LGSS). Sí se asignaba al pasar de la jubilación ' +
+      'parcial a la plena, una vez cumplida la edad que correspondiera.',
+  },
+  /**
+   * DT 33.ª LGSS (añadida por el RDL 3/2021, art. 1.4), leída en el BOE consolidado el
+   * 19/10/2026 por la API de datos abiertos (bloque dt-4). Hasta esa fecha la regla iba
+   * tecleada en cuatro sitios —el paso siguiente y la nota de la tabla de la app, su FAQPage y
+   * el motor del MCP—, cada uno con su redacción y fuera de /triaje-fiscal (hallazgo 2984).
+   *   · Párrafo primero: «Quienes en la fecha de entrada en vigor de la modificación prevista en
+   *     el artículo 60, estuvieran percibiendo el complemento por maternidad por aportación
+   *     demográfica, mantendrán su percibo.»
+   *   · Párrafo segundo: «La percepción de dicho complemento de maternidad será incompatible
+   *     con el complemento de pensiones contributivas para la reducción de la brecha de género
+   *     que pudiera corresponder por el reconocimiento de una nueva pensión pública, pudiendo
+   *     las personas interesadas optar entre uno u otro.»
+   */
+  // En minúscula y sin punto: las dos van a mitad de frase.
+  transitoria: {
+    norma: 'DT 33.ª LGSS',
+    mantenimiento: 'quien lo estaba cobrando el 4 de febrero de 2021 lo conserva',
+    incompatibilidad:
+      'es incompatible con el complemento por brecha de género que pudiera corresponder por una ' +
+      'nueva pensión pública, y hay que optar entre uno u otro',
+  },
 };
 
 export const COMPLEMENTO_BRECHA_GENERO_2026 = {
@@ -742,6 +797,32 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
   fechaMinimaHechoCausante: '2021-02-04',
   /** Nº de pagas anuales en que se abona */
   pagasAnuales: 14,
+  /**
+   * Tributación en el IRPF (hallazgo 3341, 19/10/2026). Hasta esa fecha «tributa como
+   * rendimiento del trabajo» iba tecleado sin norma en el FAQPage de la app y en el motor del
+   * MCP, fuera de /triaje-fiscal.
+   *
+   * Norma: art. 17.2.a) 1.ª LIRPF (Ley 35/2006, BOE-A-2006-20764): «Las pensiones y haberes
+   * pasivos percibidos de los regímenes públicos de la Seguridad Social y clases pasivas y
+   * demás prestaciones públicas por situaciones de incapacidad, jubilación, accidente,
+   * enfermedad, viudedad, o similares, sin perjuicio de lo dispuesto en el art. 7 de esta Ley.»
+   *
+   * Criterio: DGT, consulta vinculante V0712-23, de 23/03/2023. Leída el 19/10/2026 en la
+   * reproducción íntegra de fiscal-impuestos.com (NFC085221, «Fuente: Sitio web del Ministerio
+   * de Hacienda»), porque la base de consultas de la DGT devolvía 502 ese día: «tanto la pensión
+   * de jubilación […] como el propio complemento de pensión contributiva para la reducción de
+   * la brecha de género […] están sujetos a tributación en el impuesto, y, por tanto, a su
+   * sistema de retenciones, tanto en lo que se refiere al abono de los atrasos […] como en lo
+   * que se refiere al abono de su prestación periódica, y sin que respecto al complemento […]
+   * resulte de aplicación la exención establecida en el artículo 7.h) de la LIRPF.»
+   */
+  tributacionIrpf: {
+    calificacion: 'rendimiento del trabajo',
+    norma: 'art. 17.2.a) 1.ª LIRPF',
+    criterio: 'DGT, consulta vinculante V0712-23, de 23 de marzo de 2023',
+    exencion: 'no le alcanza la exención de las prestaciones familiares del art. 7.h) LIRPF',
+    retenciones: 'lleva retención, también en los atrasos',
+  },
   /** Pensiones contributivas a las que se puede añadir el complemento */
   pensionesElegibles: ['jubilacion', 'incapacidad_permanente', 'viudedad'] as const,
   /**

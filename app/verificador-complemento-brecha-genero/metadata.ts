@@ -5,6 +5,8 @@ import {
   NUM_REQUISITOS_ART60,
   REQUISITOS_ART60,
   EXCLUSION_ART60_3B,
+  INCOMPATIBILIDAD_MATERNIDAD,
+  TRIBUTACION_IRPF,
   conCita,
 } from '@/lib/calculadoras/complementoBrechaGenero';
 
@@ -114,7 +116,7 @@ export const faqJsonLd = {
       name: `¿Qué es el complemento por brecha de género en la pensión y a cuánto asciende en ${anio}?`,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El complemento por brecha de género es un incremento en la pensión de jubilación, viudedad o incapacidad permanente reconocido por el artículo 60 de la Ley General de la Seguridad Social. Su importe vigente es de ${CUANTIA} al mes por cada hijo o hija, con un máximo de ${MAX_HIJOS} hijos (${MAX_MES}/mes). La cuantía se fija cada año en la Ley de Presupuestos o en el Real Decreto-ley de revalorización de pensiones, y tributa como rendimiento del trabajo en el IRPF.`,
+        text: `El complemento por brecha de género es un incremento en la pensión de jubilación, viudedad o incapacidad permanente reconocido por el artículo 60 de la Ley General de la Seguridad Social. Su importe vigente es de ${CUANTIA} al mes por cada hijo o hija, con un máximo de ${MAX_HIJOS} hijos (${MAX_MES}/mes). La cuantía se fija cada año en la Ley de Presupuestos o en el Real Decreto-ley de revalorización de pensiones. ${TRIBUTACION_IRPF}`,
       },
     },
     {
@@ -141,7 +143,7 @@ export const faqJsonLd = {
       name: '¿Cómo se solicita el complemento por brecha de género al INSS?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La solicitud se tramita ante el Instituto Nacional de la Seguridad Social (INSS) con el trámite «Solicitar un complemento por brecha de género o por maternidad». Puede presentarse de forma presencial en cualquier Centro de Atención e Información de la Seguridad Social, por sede electrónica con certificado digital o a través del servicio Tu Seguridad Social. No se añade solo: puede pedirse al solicitar la pensión o en cualquier momento después de que se conceda, siempre que se cumplan los requisitos, y conviene comprobar en la nómina que se está cobrando. Quien ya cobre el antiguo complemento de maternidad por otra pensión no puede sumar los dos: son incompatibles y hay que optar por uno (DT 33.ª LGSS).' +
+        text: `La solicitud se tramita ante el Instituto Nacional de la Seguridad Social (INSS) con el trámite «${COMPLEMENTO_BRECHA_GENERO_META.tramite}». Puede presentarse de forma presencial en cualquier Centro de Atención e Información de la Seguridad Social, por sede electrónica con certificado digital o a través del servicio Tu Seguridad Social. No se añade solo: puede pedirse al solicitar la pensión o en cualquier momento después de que se conceda, siempre que se cumplan los requisitos, y conviene comprobar en la nómina que se está cobrando. ${INCOMPATIBILIDAD_MATERNIDAD}` +
           // Hallazgo 2543: si lo cobra el otro progenitor, nunca es de oficio
           ` Si el otro progenitor ya lo cobra por los mismos hijos, hay que solicitarlo siempre: ${conCita(EXTINCION.detalle, EXTINCION.norma)}`,
       },

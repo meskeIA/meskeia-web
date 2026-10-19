@@ -32,6 +32,7 @@ import {
   PASO_EXCLUSION_ART60_3B,
   PASO_SOLICITUD_CONCURRENCIA,
   PASO_EXTINCION,
+  PASO_MATERNIDAD_DEROGADO,
 } from '@/lib/calculadoras/complementoBrechaGenero';
 
 /**
@@ -47,6 +48,10 @@ const MATERNIDAD = COMPLEMENTO_MATERNIDAD_DEROGADO;
 const PORCENTAJE = (n: number) => `${n} %`;
 const ESCALA_MATERNIDAD = MATERNIDAD.escala.map((t) => PORCENTAJE(t.porcentaje)).join(', ');
 const MAXIMO_MATERNIDAD = MATERNIDAD.escala[MATERNIDAD.escala.length - 1];
+/** Mantenimiento e incompatibilidad del de maternidad (DT 33.ª LGSS), leídos del módulo (hallazgo 2984) */
+const TRANSITORIA = MATERNIDAD.transitoria;
+/** Nombre del trámite oficial de la SS, leído del módulo (hallazgo 2983) */
+const TRAMITE = COMPLEMENTO_BRECHA_GENERO_META.tramite;
 
 /** Pagas en que se abona el complemento, leídas del módulo (hallazgo 2245) */
 const PAGAS = COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales;
@@ -304,16 +309,16 @@ function evaluar(
       importeAnual: 0,
       motivo:
         `Tu pensión se causó antes del ${FECHA_MINIMA}, fecha en que entró en vigor el ` +
-        'complemento por brecha de género. Para hechos causantes anteriores se aplicaba el antiguo ' +
-        'complemento de maternidad, con reglas distintas.',
+        'complemento por brecha de género. Para hechos causantes anteriores, desde el ' +
+        `${formatFechaLarga(MATERNIDAD.aplicableDesde)}, se aplicaba el antiguo complemento de ` +
+        'maternidad, con reglas distintas.',
       esReclamacion: false,
       // La cita del régimen derogado sale del módulo, como ya sale dos veces más abajo en esta
       // misma página: aquí iba tecleada y DEGRADADA —sin fecha y sin número de asunto— justo
       // donde se manda consultar a un profesional, que es cuando hace falta la cita completa
-      // (hallazgo 1172).
-      pasoSiguiente:
-        'Si entonces percibías o se te denegó el antiguo complemento de maternidad, consulta a un ' +
-        `profesional: la ${MATERNIDAD.doctrinaAcceso} también afectó a aquel régimen.`,
+      // (hallazgo 1172). Hasta el 19/10/2026 solo hablaba a quien lo percibía o se lo habían
+      // denegado: quien nunca lo pidió no sabía que aún puede solicitarlo (hallazgo 2929).
+      pasoSiguiente: PASO_MATERNIDAD_DEROGADO,
     };
   }
   if (fecha === 'sin_iniciar') {
@@ -486,13 +491,14 @@ function evaluar(
     // El complemento se SOLICITA (trámite «Solicitar un complemento por brecha de género o por
     // maternidad» de la SS: «Puedes solicitar el complemento en cualquier momento desde que te
     // hayan concedido la pensión») y es incompatible con el de maternidad que ya se cobre por una
-    // pensión anterior (DT 33.ª LGSS, párrafo segundo). Hallazgos 2927 y 2928, 06/10/2026.
+    // pensión anterior (DT 33.ª LGSS, párrafo segundo). Hallazgos 2927 y 2928, 06/10/2026. El
+    // trámite y la regla, leídos del módulo desde el 19/10/2026 (hallazgos 2983 y 2984).
     pasoSiguiente:
-      'El complemento hay que solicitarlo ante el INSS (trámite «Solicitar un complemento por ' +
-      'brecha de género o por maternidad», en la Sede Electrónica de la SS): si no lo pediste con ' +
-      'la pensión, puedes hacerlo en cualquier momento después. Si ya cobras el antiguo ' +
-      'complemento de maternidad por otra pensión, es incompatible con este: la DT 33.ª LGSS te ' +
-      'deja optar entre uno u otro, y conviene comparar los dos importes antes de elegir.',
+      `El complemento hay que solicitarlo ante el INSS (trámite «${TRAMITE}», en la Sede ` +
+      'Electrónica de la SS): si no lo pediste con la pensión, puedes hacerlo en cualquier ' +
+      'momento después. Si ya cobras el antiguo complemento de maternidad por otra pensión, ' +
+      `${TRANSITORIA.incompatibilidad} (${TRANSITORIA.norma}): conviene comparar los dos ` +
+      'importes antes de elegir.',
   });
 }
 
@@ -1230,10 +1236,8 @@ export default function VerificadorComplementoBrechaGeneroPage() {
           <p className={styles.tableNote}>
             Las cifras de la columna del régimen derogado son las del{' '}
             <strong>{MATERNIDAD.norma}</strong>, vigente hasta el{' '}
-            {formatFechaLarga(MATERNIDAD.vigenteHasta)}. Quien lo tuviera reconocido lo conserva
-            (DT 33.ª LGSS), y por eso sigue aquí. Esa misma disposición lo declara incompatible
-            con el de brecha de género que corresponda por una pensión nueva: quien cobre el de
-            maternidad y cause otra pensión desde el {FECHA_MINIMA_CORTA} tiene que optar por uno de los dos.
+            {formatFechaLarga(MATERNIDAD.vigenteHasta)}. La {TRANSITORIA.norma} dice que{' '}
+            {TRANSITORIA.mantenimiento}, y por eso sigue aquí; y que {TRANSITORIA.incompatibilidad}.
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
@@ -1274,7 +1278,12 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                 </tr>
                 <tr>
                   <td>Pensiones cubiertas</td>
-                  <td>Jubilación, IP, viudedad</td>
+                  {/* Sin excepción hasta el 19/10/2026, mientras la columna de al lado anotaba
+                      la suya (hallazgo 3339): el 60.4 original excluía dos modalidades. */}
+                  <td>
+                    Jubilación, IP, viudedad, {MATERNIDAD.exclusiones.resumen}, excluidas por el{' '}
+                    {MATERNIDAD.exclusiones.norma}
+                  </td>
                   <td>
                     Jubilación, IP, viudedad (contributivas), salvo la{' '}
                     <strong>jubilación parcial</strong>, excluida por el{' '}
@@ -1327,9 +1336,10 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <h3><span aria-hidden="true">🧓</span> Pensión anterior a feb-2021</h3>
               <p>
                 <strong>Situación:</strong> jubilación causada en 2019. <strong>Resultado:</strong>{' '}
-                no aplica el complemento actual. Si entonces percibía o se le denegó el antiguo
-                complemento de maternidad, conviene revisar la doctrina de la {MATERNIDAD.doctrinaAcceso}{' '}
-                con un profesional.
+                no aplica el complemento actual, sino el antiguo de maternidad, con{' '}
+                {MATERNIDAD.minimoHijos} o más hijos. Si nunca se le reconoció, puede solicitarlo
+                ante el INSS con el trámite &laquo;{TRAMITE}&raquo;; si se le denegó, conviene
+                revisar la doctrina de la {MATERNIDAD.doctrinaAcceso} con un profesional.
               </p>
             </div>
           </div>
@@ -1472,9 +1482,11 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               <div className={styles.stepContent}>
                 <h3>Presenta la solicitud en la Sede Electrónica de la SS</h3>
                 <p>
-                  Acceso con certificado digital, Cl@ve o DNI electrónico. Busca el trámite de
-                  &laquo;revisión de pensión&raquo; o solicítalo por escrito en una oficina del
-                  INSS, citando el art. 60 LGSS.
+                  {/* Mandaba a buscar «revisión de pensión», que en el portal de la SS es la
+                      revisión de la revalorización y no da el complemento (hallazgo 2983). */}
+                  Acceso con certificado digital, Cl@ve o DNI electrónico. Busca el trámite
+                  &laquo;{TRAMITE}&raquo; o solicítalo por escrito en una oficina del INSS,
+                  citando el art. 60 LGSS.
                 </p>
               </div>
             </li>
