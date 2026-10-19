@@ -859,16 +859,16 @@ test.describe('re-inspección 13/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ⚠️ HALLAZGO ABIERTO (13/10/2026) — emojis decorativos de la guía (cabo C0088)
+  // ✅ HALLAZGO 3280 REPARADO (19/10/2026) — emojis decorativos de la guía (cabo C0088)
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // Con la guía desplegada, el árbol accesible expone 22 emojis decorativos: 5 dentro del
+  // Con la guía desplegada, el árbol accesible exponía 22 emojis decorativos: 5 dentro del
   // nombre de los <h3> (📊 🎯 ❓ 📚 ✅: la lista de encabezados del lector los lee delante
   // de cada título), 6 dentro del <strong> de cada punto de «Limitaciones» (❌) y 11 en nodo
   // propio justo antes de su encabezado (eduEscenarioIcon 🎓 🏙️ 💻 📚, eduTipIcon 🔢 📐 💡
-  // 🏛️ 📱 🌍, warningIcon ⚠️). Ninguno lleva aria-hidden. Plegada no se expone
+  // 🏛️ 📱 🌍, warningIcon ⚠️). Ahora todos llevan aria-hidden. Plegada no se expone
   // (display: none): esto es lo que oye quien la abre.
-  test.fail('NUEVO — los emojis decorativos de la guía educativa llegan al lector de pantalla', async ({
+  test('3280 — los emojis decorativos de la guía educativa no llegan al lector de pantalla', async ({
     page,
   }) => {
     await page.goto(RUTA);

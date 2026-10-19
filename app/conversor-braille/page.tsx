@@ -1102,7 +1102,7 @@ export default function ConversorBraillePage() {
 
           {/* SECCIÓN 1: Tabla Comparativa */}
           <div className={styles.eduComparativaSection}>
-            <h3>📊 Comparativa: Grados y Tipos de Braille</h3>
+            <h3><span aria-hidden="true">📊</span> Comparativa: Grados y Tipos de Braille</h3>
             <div className={styles.eduTablaWrapper}>
               <table className={styles.eduTablaComparativa}>
                 <thead>
@@ -1157,25 +1157,25 @@ export default function ConversorBraillePage() {
 
           {/* SECCIÓN 2: Casos de Uso */}
           <div className={styles.eduEscenariosSection}>
-            <h3>🎯 El Braille en la Vida Real</h3>
+            <h3><span aria-hidden="true">🎯</span> El Braille en la Vida Real</h3>
             <div className={styles.eduEscenariosGrid}>
               <div className={styles.eduEscenarioCard}>
-                <div className={styles.eduEscenarioIcon}>🎓</div>
+                <div className={styles.eduEscenarioIcon} aria-hidden="true">🎓</div>
                 <h4>Educación Inclusiva</h4>
                 <p>En España, la ONCE garantiza materiales educativos en Braille para estudiantes con discapacidad visual. Libros de texto, exámenes y apuntes se transcriben mediante embosadoras. El Braille es una herramienta de alfabetización plena, no una alternativa de segunda categoría.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
-                <div className={styles.eduEscenarioIcon}>🏙️</div>
+                <div className={styles.eduEscenarioIcon} aria-hidden="true">🏙️</div>
                 <h4>Señalización y Entorno</h4>
                 <p>El Braille aparece en la vida cotidiana: carteles de ascensores (planta, nombre), envases de medicamentos (nombre y dosis en UE es obligatorio por la Directiva 2004/27/CE), monedas de euro (el 2€ tiene el valor en Braille desde 2022) y tarjetas de visita.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
-                <div className={styles.eduEscenarioIcon}>💻</div>
+                <div className={styles.eduEscenarioIcon} aria-hidden="true">💻</div>
                 <h4>Tecnología Asistiva</h4>
                 <p>Las líneas Braille (refreshable Braille displays) son periféricos que traducen texto digital a Braille en tiempo real mediante celdas piezoeléctricas. Tienen 40-80 celdas y se conectan al ordenador o smartphone. Los lectores de pantalla (NVDA, JAWS, VoiceOver) las controlan para permitir el acceso completo al escritorio.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
-                <div className={styles.eduEscenarioIcon}>📚</div>
+                <div className={styles.eduEscenarioIcon} aria-hidden="true">📚</div>
                 <h4>Cultura y Literatura</h4>
                 <p>La Biblioteca de la ONCE gestiona la mayor colección de libros en Braille en español del mundo, con más de 50.000 títulos. Un libro de 300 páginas en tinta puede ocupar 3-5 volúmenes en Braille. Los libros en relieve se fabrican en papel especial de 150 g/m² para que los puntos mantengan el relieve durante años de uso.</p>
               </div>
@@ -1184,7 +1184,7 @@ export default function ConversorBraillePage() {
 
           {/* SECCIÓN 3: FAQ */}
           <div className={styles.eduFaqSection}>
-            <h3>❓ Preguntas Frecuentes sobre el Braille</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre el Braille</h3>
             <div className={styles.eduFaqList}>
               <div className={styles.eduFaqItem}>
                 <h4>¿Cuántas personas en el mundo usan Braille?</h4>
@@ -1254,7 +1254,7 @@ export default function ConversorBraillePage() {
 
           {/* SECCIÓN 4: Guía Paso a Paso */}
           <div className={styles.eduStepSection}>
-            <h3>📚 Cómo Funciona el Sistema Braille: La Lógica Interna</h3>
+            <h3><span aria-hidden="true">📚</span> Cómo Funciona el Sistema Braille: La Lógica Interna</h3>
             <div className={styles.eduStepList}>
               <div className={styles.eduStepItem}>
                 <div className={styles.eduStepNumber}>1</div>
@@ -1303,35 +1303,35 @@ export default function ConversorBraillePage() {
 
           {/* SECCIÓN 5: Tips */}
           <div className={styles.eduTipsSection}>
-            <h3>✅ Claves para Entender y Usar el Braille</h3>
+            <h3><span aria-hidden="true">✅</span> Claves para Entender y Usar el Braille</h3>
             <div className={styles.eduTipsGrid}>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🔢</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🔢</span>
                 <h4>Aprende la primera década y el resto fluye</h4>
                 <p>Las letras a-j son la clave de todo el sistema. Memorizar esas 10 celdas + la regla de &quot;añadir punto 3 para la segunda década&quot; te da el 90% del alfabeto casi gratis.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>📐</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">📐</span>
                 <h4>La orientación de la celda es fija</h4>
                 <p>Puntos 1-2-3 siempre en la columna izquierda de arriba a abajo, 4-5-6 en la derecha. Una celda girada 180° es un símbolo completamente diferente. La orientación del papel/línea es crítica para la lectura correcta.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>💡</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">💡</span>
                 <h4>Los caracteres Unicode no son táctiles</h4>
                 <p>Los caracteres ⠁⠃⠉ en pantalla son representaciones visuales del Braille. Son útiles para aprendizaje y referencia, pero no activan ninguna celda táctil. Para Braille físico real se necesita hardware específico (embosadora o línea Braille).</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🏛️</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🏛️</span>
                 <h4>La ONCE: referencia en España</h4>
                 <p>La Organización Nacional de Ciegos Españoles (ONCE) es el organismo de referencia en España para todo lo relacionado con el Braille: transcripción, libros, formación y tecnología asistiva. Sus servicios de transcripción son gratuitos para material educativo.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>📱</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">📱</span>
                 <h4>Braille en smartphones sin hardware</h4>
                 <p>iOS (VoiceOver) y Android (TalkBack) permiten escribir Braille directamente en la pantalla táctil usando 6 dedos simultáneos como si fueran los 6 puntos de una celda. Esta función, llamada &quot;Braille Screen Input&quot;, no requiere ningún accesorio adicional.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🌍</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🌍</span>
                 <h4>El Braille sobrevive a la tecnología de voz</h4>
                 <p>Los estudios muestran que las personas ciegas alfabetizadas en Braille tienen un 44% más de probabilidad de estar empleadas que las que usan solo tecnología de voz. El Braille proporciona acceso a la ortografía, puntuación y formato textual que el audio no transmite.</p>
               </div>
@@ -1341,16 +1341,16 @@ export default function ConversorBraillePage() {
           {/* SECCIÓN 6: Warning Box */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Limitaciones y Errores Comunes al Usar Braille Digital</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ Este conversor es visual/educativo, no táctil:</strong> Los caracteres Braille Unicode en pantalla sirven para aprender y entender el sistema, pero no son equivalentes al Braille real en papel. Para producir Braille físico funcional (que una persona ciega pueda leer con los dedos) se necesita una embosadora Braille, no copiar y pegar caracteres Unicode.</li>
-              <li><strong>❌ Solo implementa Grado 1 (sin contracciones):</strong> El uso diario real del Braille utiliza el Grado 2, que incluye contracciones para palabras y sílabas frecuentes. La transcripción literal letra a letra del Grado 1 ocupa un 25-30% más de espacio. Para materiales de lectura real, un software de transcripción profesional (Duxbury DBT, Braille2000) con tablas de Grado 2 es imprescindible.</li>
-              <li><strong>❌ Las reglas de puntuación Braille varían por país y normativa:</strong> El Código Braille Español (ONCE, 2009) puede diferir en detalles del sistema usado en México, Argentina u otros países hispanohablantes. La puntuación, indicadores y algunos caracteres especiales no son completamente universales entre las normas nacionales.</li>
-              <li><strong>❌ Confundir &quot;leer Braille&quot; con &quot;reconocer caracteres Unicode&quot;:</strong> La habilidad real de leer Braille es táctil y requiere meses de entrenamiento. Reconocer visualmente que ⠁ es &quot;a&quot; es útil para diseñadores y educadores, pero no es leer Braille en el sentido funcional. Son circuitos cerebrales completamente distintos.</li>
-              <li><strong>❌ Los números Braille necesitan el indicador ⠼:</strong> Si introduces números sin el indicador numérico, un lector Braille los interpretará como letras (1→a, 2→b, etc.). Este conversor añade automáticamente ⠼ antes de secuencias numéricas, pero al copiar Braille generado hay que asegurarse de no perder el indicador.</li>
-              <li><strong>❌ No todos los caracteres especiales tienen equivalente en Braille Español:</strong> Emojis, símbolos matemáticos complejos, caracteres de otros alfabetos (cirílico, árabe, chino) no tienen representación en el Braille español estándar. Para esos contenidos existen sistemas Braille especializados (matemático, musical, informático) con sus propias tablas de conversión.</li>
+              <li><strong><span aria-hidden="true">❌</span>Este conversor es visual/educativo, no táctil:</strong> Los caracteres Braille Unicode en pantalla sirven para aprender y entender el sistema, pero no son equivalentes al Braille real en papel. Para producir Braille físico funcional (que una persona ciega pueda leer con los dedos) se necesita una embosadora Braille, no copiar y pegar caracteres Unicode.</li>
+              <li><strong><span aria-hidden="true">❌</span>Solo implementa Grado 1 (sin contracciones):</strong> El uso diario real del Braille utiliza el Grado 2, que incluye contracciones para palabras y sílabas frecuentes. La transcripción literal letra a letra del Grado 1 ocupa un 25-30% más de espacio. Para materiales de lectura real, un software de transcripción profesional (Duxbury DBT, Braille2000) con tablas de Grado 2 es imprescindible.</li>
+              <li><strong><span aria-hidden="true">❌</span>Las reglas de puntuación Braille varían por país y normativa:</strong> El Código Braille Español (ONCE, 2009) puede diferir en detalles del sistema usado en México, Argentina u otros países hispanohablantes. La puntuación, indicadores y algunos caracteres especiales no son completamente universales entre las normas nacionales.</li>
+              <li><strong><span aria-hidden="true">❌</span>Confundir &quot;leer Braille&quot; con &quot;reconocer caracteres Unicode&quot;:</strong> La habilidad real de leer Braille es táctil y requiere meses de entrenamiento. Reconocer visualmente que ⠁ es &quot;a&quot; es útil para diseñadores y educadores, pero no es leer Braille en el sentido funcional. Son circuitos cerebrales completamente distintos.</li>
+              <li><strong><span aria-hidden="true">❌</span>Los números Braille necesitan el indicador ⠼:</strong> Si introduces números sin el indicador numérico, un lector Braille los interpretará como letras (1→a, 2→b, etc.). Este conversor añade automáticamente ⠼ antes de secuencias numéricas, pero al copiar Braille generado hay que asegurarse de no perder el indicador.</li>
+              <li><strong><span aria-hidden="true">❌</span>No todos los caracteres especiales tienen equivalente en Braille Español:</strong> Emojis, símbolos matemáticos complejos, caracteres de otros alfabetos (cirílico, árabe, chino) no tienen representación en el Braille español estándar. Para esos contenidos existen sistemas Braille especializados (matemático, musical, informático) con sus propias tablas de conversión.</li>
             </ul>
           </div>
 
