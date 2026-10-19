@@ -417,8 +417,14 @@ test.describe('preset de partida', () => {
     await boton(page, 'Inicializar centroides').click();
     await expect(filasCluster(page)).toHaveCount(5);
     expect(await puntosConColorAjeno(page)).toBe(0);
+    // Hasta tres pasos, o menos si converge antes. Cabo C0300 (19/10/2026): la inicialización es
+    // k-means++ con Math.random, y con algunos sorteos converge en uno o dos pasos; entonces la
+    // app deshabilita «Iterar 1 paso», como debe, y el test que exigía tres fijos fallaba con
+    // «element is not enabled» (1 de 3 aislado). El primer paso siempre se puede dar.
     for (let i = 0; i < 3; i++) {
-      await boton(page, 'Iterar 1 paso').click();
+      const iterar = boton(page, 'Iterar 1 paso');
+      if (i > 0 && (await iterar.isDisabled())) break;
+      await iterar.click();
       await expect(valor(page, 'Iteración')).toHaveText(`${i + 1}/ 20`);
       expect(await puntosConColorAjeno(page)).toBe(0);
     }
