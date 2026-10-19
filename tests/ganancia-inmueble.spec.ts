@@ -502,6 +502,20 @@ test.describe('Venta vía MCP según dónde está el inmueble (cabo C0193)', () 
     expect(v.avisosTerritorio.join(' ')).toContain('escala estatal');
   });
 
+  test('con otras rentas del ahorro la venta sube de tramo, y el desglose empieza donde ellas la dejan (cabo C0293)', () => {
+    // Madrid, ganancia 98.800 € sobre 50.000 € de otras rentas: la base entera es 148.800 € y la
+    // venta ocupa de 50.000 a 148.800, todo en el tramo del 23 %: 98.800 × 23 % = 22.724 €.
+    // Sola eran 21.604 € (test de arriba): la tool publicaba 1.120 € de menos sin decirlo.
+    const v = calcularVentaInmueble({ ...base, ccaa: 'madrid', otrasRentasAhorro: 50000 });
+    expect(v.otrasRentasAhorro).toBe(50000);
+    expect(v.irpfGanancia).toBe(22724);
+    expect(v.desgloseIRPF).toEqual([{ desde: 50000, hasta: 148800, tipo: 23, cuota: 22724 }]);
+    // Sin el dato, el cálculo de antes: la venta como única renta del ahorro.
+    const sola = calcularVentaInmueble({ ...base, ccaa: 'madrid' });
+    expect(sola.otrasRentasAhorro).toBe(0);
+    expect(r2(sola.desgloseIRPF.reduce((s, t) => s + t.cuota, 0))).toBe(21604);
+  });
+
   test('País Vasco, habitual de un mayor de 65: tampoco se publica la exención de la LIRPF, que no es su norma', () => {
     const v = calcularVentaInmueble({
       ...base, ccaa: 'pais-vasco', esViviendaHabitual: true, vendedorMayor65: true,

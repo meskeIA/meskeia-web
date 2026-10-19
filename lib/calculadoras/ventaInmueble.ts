@@ -72,6 +72,13 @@ export interface ParametrosVentaInmueble {
    * se ha podido aplicar.
    */
   ccaa?: ComunidadAutonoma;
+  /**
+   * Las demás rentas del ahorro del mismo año, sin esta venta (€): intereses, dividendos, otras
+   * ganancias. La escala del ahorro se aplica a la base entera, así que con ellas la venta
+   * tributa desde el tramo en que la dejan (hallazgo 3368 en las apps; en la tool, cabo C0293,
+   * 19/10/2026). Omitido = 0: la venta como única renta del ahorro, y la tool lo dice.
+   */
+  otrasRentasAhorro?: number;
 }
 
 export interface TramoIRPFVenta {
@@ -108,8 +115,13 @@ export interface ResultadoVentaInmueble {
   irpfGanancia: number;
   /** Tipo efectivo IRPF sobre la ganancia (%) */
   tipoEfectivoIRPF: number;
-  /** Desglose por tramos base del ahorro */
+  /**
+   * Desglose por tramos de la base del ahorro de la parte que es esta venta: con otras rentas,
+   * los tramos empiezan donde ellas la dejan. Suma la cuota antes de la deducción de Ceuta y Melilla.
+   */
   desgloseIRPF: TramoIRPFVenta[];
+  /** Otras rentas del ahorro con las que se ha calculado el IRPF (0 si no se dieron) */
+  otrasRentasAhorro: number;
   // Resumen
   /** Comisión inmobiliaria (€) */
   comisionInmobiliaria: number;
@@ -245,6 +257,7 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
       : undefined,
     // Ceuta y Melilla: la deducción del 60 % del art. 68.4 LIRPF, resida donde resida el vendedor.
     inmuebleEnCeutaMelilla: enCeutaMelilla,
+    otrasRentasAhorro: p.otrasRentasAhorro,
   });
 
   const valorTransmision = r(g.valorTransmision);
@@ -281,12 +294,20 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
       avisosTerritorio.push(AVISO_IRPF_FORAL);
     }
   }
-  const desgloseIRPF: TramoIRPFVenta[] = irpfForal ? [] : desglosarCuotaBaseAhorro(g.baseImponible).map(t => ({
-    desde: t.desde,
-    hasta: t.hasta,
-    tipo: t.tipo,
-    cuota: r(t.cuota),
-  }));
+  // La venta se apila sobre las otras rentas del ahorro: de cada tramo de la base entera solo
+  // es suya la parte por encima de ellas. Sin otras rentas, el desglose de la ganancia sola.
+  const otras = g.otrasRentasAhorro;
+  const desgloseIRPF: TramoIRPFVenta[] = irpfForal ? [] : desglosarCuotaBaseAhorro(otras + g.baseImponible)
+    .filter(t => t.hasta > otras)
+    .map(t => {
+      const desde = Math.max(t.desde, otras);
+      return {
+        desde,
+        hasta: t.hasta,
+        tipo: t.tipo,
+        cuota: r((t.hasta - desde) * (t.tipo / 100)),
+      };
+    });
 
   // ─── Totales ──────────────────────────────────────────────────────────────
 
@@ -310,6 +331,7 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
     irpfGanancia,
     tipoEfectivoIRPF,
     desgloseIRPF,
+    otrasRentasAhorro: otras,
     comisionInmobiliaria,
     gastosGestoria: gastoGestoria,
     totalGastosVendedor,

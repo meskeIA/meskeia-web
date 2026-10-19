@@ -940,9 +940,10 @@ function crearServidorDelegum(): McpServer {
       importe_reinversion: z.number().min(0).optional().describe('Importe concreto que se reinvierte, en euros. Si se omite y reinvierte_en_vivienda es true, se asume reinversión total. Si es parcial, la exención es proporcional (art. 41 RIRPF).'),
       hipoteca_pendiente: z.number().min(0).optional().describe('Principal de la hipoteca pendiente de amortizar al vender, en euros. Minora el importe total obtenido a efectos de la reinversión (art. 41.1 RIRPF), así que reinvertir el resto ya basta para la exención total.'),
       ccaa: z.enum(ENUM_CCAA_INMUEBLE_VENTA).optional().describe('Comunidad o ciudad autónoma donde está el inmueble. En Ceuta y Melilla aplica la bonificación del 50 % de la plusvalía municipal y la deducción del 60 % del IRPF de la ganancia; en el País Vasco y Navarra la plusvalía es foral y no se calcula (ni el IRPF si es la vivienda habitual del vendedor, que entonces reside allí). Si se omite, no se aplica nada de eso.'),
+      otras_rentas_ahorro: z.number().min(0).optional().describe('Otras rentas del ahorro del vendedor en el MISMO año, sin esta venta (intereses, dividendos, otras ganancias), en euros. La escala del ahorro se aplica a todas juntas, así que con ellas la venta puede tributar a un tipo mayor. Si se omite, se calcula como si la venta fuera su única renta del ahorro y la respuesta lo dice.'),
     },
     { title: 'Consulta de venta de vivienda (IRPF de la ganancia + plusvalía municipal + neto)', readOnlyHint: true },
-    async ({ precio_venta, precio_compra, anios_tenencia, gastos_compra_original, valor_catastral_suelo, valor_catastral_total, mejoras, tipo_municipal_iivtnu, comision_inmobiliaria, gastos_gestoria, vendedor_mayor_65, es_vivienda_habitual, reinvierte_en_vivienda, importe_reinversion, hipoteca_pendiente, ccaa }, extra) => {
+    async ({ precio_venta, precio_compra, anios_tenencia, gastos_compra_original, valor_catastral_suelo, valor_catastral_total, mejoras, tipo_municipal_iivtnu, comision_inmobiliaria, gastos_gestoria, vendedor_mayor_65, es_vivienda_habitual, reinvierte_en_vivienda, importe_reinversion, hipoteca_pendiente, ccaa, otras_rentas_ahorro }, extra) => {
       await registrarUsoDelegum('consulta_venta_vivienda', getCaller(extra));
       try {
         const r = calcularVentaInmueble({
@@ -962,7 +963,14 @@ function crearServidorDelegum(): McpServer {
           importeReinversion: importe_reinversion,
           hipotecaPendiente: hipoteca_pendiente,
           ccaa,
+          otrasRentasAhorro: otras_rentas_ahorro,
         });
+        // Sobre qué supuesto está la cuota del IRPF: solo cuando hay una cuota publicada.
+        const lineaOtrasRentas = !r.irpfForal && !r.exentoIRPF && r.irpfGanancia > 0
+          ? r.otrasRentasAhorro > 0
+            ? `  ℹ️ Es lo que esta venta añade a la cuota del ahorro, sumada a ${fmt(r.otrasRentasAhorro)} € de otras rentas del ahorro del año.`
+            : `  ℹ️ Calculado como si esta venta fuera la única renta del ahorro del año: con intereses, dividendos u otras ganancias el mismo año la cuota puede ser mayor (indícalas en otras_rentas_ahorro).`
+          : '';
         const gananciaLabel = r.hayGanancia ? '📈 Ganancia patrimonial' : '📉 Pérdida patrimonial';
         const lineaPlusvalia = r.iivtnuCalculable
           ? `  • Plusvalía municipal (IIVTNU): ${fmt(r.plusvaliaMunicipal)} € (método ${r.metodoPlusvalia})`
@@ -992,6 +1000,7 @@ function crearServidorDelegum(): McpServer {
           `  • Comisión inmobiliaria: ${fmt(r.comisionInmobiliaria)} € · Gestoría y otros: ${fmt(r.gastosGestoria)} €`,
           lineaPlusvalia,
           lineaIRPF,
+          lineaOtrasRentas,
           '',
           `💰 **Total impuestos y gastos${sinFaltan}: ${fmt(r.totalGastosVendedor)} €**`,
           `✅ **Neto que recibes${sinFaltan}: ${fmt(r.netoVendedor)} €**`,
