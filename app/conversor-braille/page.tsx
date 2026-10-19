@@ -57,8 +57,30 @@ const textToBraille: { [key: string]: string } = {
   // descuido y no decisión se ve sin salir del fichero: dos líneas más arriba las comillas
   // tipográficas U+201C/D SÍ se normalizan, así que se contempló para la doble y no para la
   // simple. Y deja sin reparar justo el caso que aquella reparación nombraba: «l’Hospitalet».
-  "'": '⠄', '’': '⠄', '‘': '⠄',                        // apóstrofo — punto 3
+  //
+  // ⚠️ 19/10/2026 (hallazgo 3277) — el apóstrofo YA NO está en esta tabla: el § 6.2 da el punto 3
+  // como apóstrofo solo «precedido y seguido de una letra», y en cualquier otro sitio el punto 3
+  // es el punto ortográfico (§ 6.1). Al escribir ‘ ’ y ' siempre como punto 3, unas comillas
+  // simples —‘encima’, como marca la RAE los significados— salían ⠄⠑⠝⠉⠊⠍⠁⠄, que la propia vuelta
+  // de la app lee «.encima.». Lo decide `esApostrofo`, que mira las dos letras de alrededor.
 };
+
+/** Caracteres que, entre dos letras, son el apóstrofo del § 6.2 (punto 3). */
+const APOSTROFOS = new Set(["'", '’']);
+/** Las comillas simples, que no se escriben (ver `esApostrofo`) y tienen su propio aviso. */
+const COMILLAS_SIMPLES = new Set(["'", '’', '‘']);
+const CELDA_APOSTROFO = '⠄';
+const ES_LETRA = /^\p{L}$/u;
+
+/**
+ * ¿Es el carácter `i` un apóstrofo? Solo ’ y ' entre dos letras («d’Alacant», «l'Hospitalet»).
+ * ‘ (U+2018) nunca: abre unas comillas. Fuera de ese sitio son comillas simples, cuyo signo del
+ * § 6.2 esta app no escribe: se omiten y se avisa, en vez de escribir un punto 3 que se lee punto.
+ */
+const esApostrofo = (caracteres: string[], i: number): boolean =>
+  APOSTROFOS.has(caracteres[i]) &&
+  ES_LETRA.test(caracteres[i - 1] ?? '') &&
+  ES_LETRA.test(caracteres[i + 1] ?? '');
 
 /**
  * Signos del B 2 § 6.2 que ocupan DOS celdas. Van aparte de `textToBraille` porque la
@@ -165,12 +187,20 @@ const caracteresSinCelda = (texto: string): string[] => [
       (c) =>
         !textToBraille[c.toLowerCase()] &&
         !SIGNOS_COMPUESTOS[c] &&
+        // Las comillas simples llevan su propio aviso (`comillasSimplesOmitidas`)
+        !COMILLAS_SIMPLES.has(c) &&
         // El salto de línea sí se escribe: se convierte en separación de palabra
         c !== '\n' &&
         c !== '\r',
     ),
   ),
 ];
+
+/** ¿Hay en el texto alguna comilla simple que no sea un apóstrofo entre dos letras? */
+const comillasSimplesOmitidas = (texto: string): boolean => {
+  const caracteres = Array.from(texto);
+  return caracteres.some((c, i) => COMILLAS_SIMPLES.has(c) && !esApostrofo(caracteres, i));
+};
 
 /**
  * Cómo nombrar en el aviso un carácter que no se ve.
@@ -269,6 +299,11 @@ export default function ConversorBraillePage() {
     [mode, result, input],
   );
 
+  const omiteComillasSimples = useMemo(
+    () => mode === 'textToBraille' && result !== '' && comillasSimplesOmitidas(input),
+    [mode, result, input],
+  );
+
   /**
    * Celdas braille que esta app no sabe traducir a texto.
    *
@@ -280,14 +315,30 @@ export default function ConversorBraillePage() {
   const celdasSinTexto = useMemo(() => {
     if (mode !== 'brailleToText' || !result) return [];
     const conocidas = new Set([CAPITAL_INDICATOR, LATIN_PREFIX, NUMBER_INDICATOR, '⠀']);
-    const compuestas = new Set(Object.values(SIGNOS_COMPUESTOS).flatMap((c) => Array.from(c)));
+    /**
+     * ⚠️ 19/10/2026 (hallazgo 3279) — antes se descartaba de antemano TODA celda que apareciera en
+     * un signo compuesto, lo formara o no. ⠠ suelta no tiene equivalente (solo existe como primera
+     * mitad de la barra ⠠⠂) y pasaba al texto sin aviso; y es el signo de mayúscula del braille
+     * INGLÉS, así que la trae cualquier texto copiado de un traductor en inglés. Ahora una celda
+     * solo se da por buena como parte de un compuesto cuando lo forma de verdad, leyendo de
+     * izquierda a derecha igual que `convertBrailleToText`.
+     */
+    const celdas = Array.from(input);
+    const formanCompuesto = new Set<number>();
+    for (let i = 0; i < celdas.length - 1; i++) {
+      if (COMPUESTOS_INVERSO[celdas[i] + celdas[i + 1]]) {
+        formanCompuesto.add(i);
+        formanCompuesto.add(i + 1);
+        i++;
+      }
+    }
     return [
       ...new Set(
-        Array.from(input).filter(
-          (c) =>
+        celdas.filter(
+          (c, i) =>
             /[\u2800-\u28FF]/.test(c) &&
             !conocidas.has(c) &&
-            !compuestas.has(c) &&
+            !formanCompuesto.has(i) &&
             !brailleToText[c],
         ),
       ),
@@ -474,6 +525,14 @@ export default function ConversorBraillePage() {
       const compuesto = SIGNOS_COMPUESTOS[original];
       if (compuesto) {
         result += compuesto;
+        enExpresionNumerica = false;
+        continue;
+      }
+
+      // Hallazgo 3277: el apóstrofo solo entre dos letras; las comillas simples se omiten
+      // (las nombra el aviso de `comillasSimplesOmitidas`).
+      if (COMILLAS_SIMPLES.has(original)) {
+        if (esApostrofo(caracteres, i)) result += CELDA_APOSTROFO;
         enExpresionNumerica = false;
         continue;
       }
@@ -789,6 +848,15 @@ export default function ConversorBraillePage() {
                 <strong>{sinCelda.map(nombraCaracter).join(' · ')}</strong>. El resto del texto
                 sí está completo. Puede que el Código Braille Español sí les asigne celda fuera
                 de la signografía básica que cubre esta app.
+              </p>
+            )}
+
+            {omiteComillasSimples && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span> Las <strong>comillas simples</strong> (‘ ’)
+                no se han escrito. El punto 3 solo es apóstrofo entre dos letras
+                («d’Alacant»); al principio o al final de una palabra se lee como punto. El
+                Código Braille Español les da un signo propio que esta app no escribe.
               </p>
             )}
 

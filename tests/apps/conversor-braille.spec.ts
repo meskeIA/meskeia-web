@@ -754,20 +754,21 @@ test.describe('re-inspección 13/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ⚠️ HALLAZGO ABIERTO (13/10/2026) — lo que queda del hallazgo 62
+  // ✅ HALLAZGO 3279 REPARADO (19/10/2026) — lo que quedaba del hallazgo 62
   // ─────────────────────────────────────────────────────────────────────────
   //
   // El 62 (REPARADO el 21/08/2026) hizo que una celda sin equivalente pasara al resultado
-  // AVISANDO. Pero `celdasSinTexto` descarta de antemano toda celda que aparezca en
-  // `SIGNOS_COMPUESTOS` (⠠ y ⠂), forme o no el signo compuesto. ⠂ suelta es la coma y no
+  // AVISANDO. Pero `celdasSinTexto` descartaba de antemano toda celda que apareciera en
+  // `SIGNOS_COMPUESTOS` (⠠ y ⠂), formara o no el signo compuesto. ⠂ suelta es la coma y no
   // importa; ⠠ suelta no tiene ningún equivalente en la tabla de la app —solo existe como
-  // primera mitad de la barra ⠠⠂ (§ 6.2)— y pasa al texto sin una palabra.
+  // primera mitad de la barra ⠠⠂ (§ 6.2)— y pasaba al texto sin una palabra. Ahora solo se
+  // exime cuando forma la barra.
   //
   // No es una celda rara: ⠠ (punto 6) es el signo de mayúscula del braille INGLÉS (UEB), así
   // que cualquier texto copiado de un traductor en inglés —los más abundantes en la red— la
   // trae delante de cada mayúscula. El resultado sale con celdas braille mezcladas en el
   // texto y con el aspecto de una conversión que ha ido bien.
-  test.fail('NUEVO — una ⠠ suelta pasa al texto sin aviso, cuando otra celda desconocida sí avisa', async ({
+  test('3279 — una ⠠ suelta avisa como cualquier otra celda desconocida', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -780,16 +781,23 @@ test.describe('re-inspección 13/10/2026', () => {
     await page.goto(RUTA);
     await convertirHidratado(page, '⠠⠓⠕⠇⠁', 'braille');
     await expect(cajaResultado(page)).toContainText('hola'); // precondición: hubo conversión
-    // Lo que DEBERÍA pasar: el mismo aviso que con ⡀, nombrando la ⠠. Hoy sale «⠠hola» y
-    // ningún aviso.
+    // El mismo aviso que con ⡀, nombrando la ⠠ (antes salía «⠠hola» y ningún aviso).
     await expect(avisoSinTraducir(page)).toContainText('⠠');
+
+    // Control: formando la barra ⠠⠂ (§ 6.2) la ⠠ no se avisa.
+    await page.goto(RUTA);
+    await convertirHidratado(page, '⠼⠁⠃⠠⠂⠼⠚⠑', 'braille');
+    await expect(cajaResultado(page)).toHaveText('12/05');
+    await expect(avisoSinTraducir(page)).toHaveCount(0);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ⚠️ HALLAZGO ABIERTO (13/10/2026) — comillas simples escritas como punto 3
+  // ✅ HALLAZGO 3277 REPARADO (19/10/2026) — comillas simples escritas como punto 3
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // La tabla manda ‘ (U+2018) y ’ (U+2019) —y el ' recto— SIEMPRE al punto 3. El B 2 § 6.2
+  // REPARADO: ’ y ' son apóstrofo (punto 3) solo entre dos letras; ‘ nunca. Fuera de ese sitio
+  // se omiten con un aviso propio. Lo que había:
+  // La tabla mandaba ‘ (U+2018) y ’ (U+2019) —y el ' recto— SIEMPRE al punto 3. El B 2 § 6.2
   // define el punto 3 como apóstrofo solo «precedido y seguido de una letra»; en cualquier
   // otro sitio el punto 3 es el punto ortográfico (§ 6.1). Unas comillas simples, que es como
   // la RAE marca los significados (‘encima’), quedan así al principio y al final de la palabra
@@ -799,7 +807,7 @@ test.describe('re-inspección 13/10/2026', () => {
   // La celda correcta de las comillas simples no está citada en el repositorio, así que el
   // test no la fija: exige solo lo que sí está anclado, que no haya un punto 3 en un sitio
   // donde el B 2 no lo lee como apóstrofo. Valdría también no escribirlas y avisar.
-  test.fail('NUEVO — ‘encima’ sale con el punto 3 en los bordes de la palabra, que el B 2 lee como punto final', async ({
+  test('3277 — ‘encima’ no sale con el punto 3 en los bordes de la palabra, que el B 2 lee como punto final', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -817,9 +825,16 @@ test.describe('re-inspección 13/10/2026', () => {
     await convertirHidratado(page, '‘encima’');
     //   e ⠑ (1-5) · n ⠝ (1-3-4-5) · c ⠉ (1-4) · i ⠊ (2-4) · m ⠍ (1-3-4) · a ⠁ (1)
     await expect(cajaResultado(page)).toContainText('⠑⠝⠉⠊⠍⠁'); // precondición
-    // Lo que DEBERÍA pasar: ningún punto 3 al principio ni al final de la palabra. Hoy sale
-    // ⠄⠑⠝⠉⠊⠍⠁⠄ («.encima.») sin aviso.
+    // Ningún punto 3 al principio ni al final de la palabra (antes salía ⠄⠑⠝⠉⠊⠍⠁⠄,
+    // «.encima.», sin aviso), y el aviso de que las comillas no se han escrito.
     expect(await cajaResultado(page).innerText()).not.toMatch(/^⠄|⠄$/);
+    await expect(page.getByText('no se han escrito')).toBeVisible();
+
+    // Igual con las rectas del teclado: 'hola' → h ⠓ · o ⠕ · l ⠇ · a ⠁
+    await page.goto(RUTA);
+    await convertirHidratado(page, "'hola'");
+    await expect(cajaResultado(page)).toHaveText('⠓⠕⠇⠁');
+    await expect(page.getByText('no se han escrito')).toBeVisible();
   });
 
   // ─────────────────────────────────────────────────────────────────────────
