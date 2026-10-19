@@ -10,6 +10,7 @@ export { default as Footer } from './Footer';
 export { default as ThemeToggle } from './ThemeToggle';
 export { default as AnalyticsTracker } from './AnalyticsTracker';
 export { default as NumberInput } from './NumberInput';
+export { default as CampoNumerico } from './CampoNumerico';
 export { default as ResultCard } from './ResultCard';
 export { default as EducationalSection } from './EducationalSection';
 export { default as TextToSpeech } from './TextToSpeech';

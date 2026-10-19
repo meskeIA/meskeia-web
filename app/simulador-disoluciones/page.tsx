@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  CampoNumerico,
 } from '@/components';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorDisoluciones.module.css';
@@ -184,14 +185,14 @@ export default function SimuladorDisoluciones() {
               <p className={styles.masaMolarNota}>
                 Masa molar: <strong>{formatNumber(soluto.masaMolar, 2)} g/mol</strong>
                 {solutoId === 'custom' && (
-                  <input
-                    type="number"
+                  // Vaciar el `type="number"` lo rellenaba con «1» bajo el cursor (cabo C0069)
+                  <CampoNumerico
                     className={styles.inlineInput}
-                    value={masaMolarCustom}
+                    valor={masaMolarCustom}
                     min={1}
                     max={1000}
-                    onChange={(e) => setMasaMolarCustom(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
-                    aria-label="Masa molar personalizada en g/mol"
+                    onCambio={setMasaMolarCustom}
+                    ariaLabel="Masa molar personalizada en g/mol"
                   />
                 )}
               </p>

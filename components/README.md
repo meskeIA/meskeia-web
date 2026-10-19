@@ -88,6 +88,29 @@ const [valor, setValor] = useState('');
 - ✅ Dark mode completo
 - ✅ Accesibilidad (ARIA labels)
 
+### 4.bis **CampoNumerico** — el sustituto de `<input type="number">` con estado numérico
+
+Para una app que guarda el valor como `number` y lo pinta con su propio `<label>` y su propia
+clase. Se puede teclear de verdad: vaciarlo, escribir «-» o «14.» a medio camino, pegar
+«1.500». Un `type="number"` con `Number(e.target.value) || respaldo` rellena el campo bajo el
+cursor (cabos C0066, C0069 y C0081). Sin estilos propios.
+
+```tsx
+import { CampoNumerico } from '@/components';
+
+const [longitud, setLongitud] = useState(25);
+
+<label htmlFor="longitud">Longitud de la línea</label>
+<CampoNumerico id="longitud" valor={longitud} onCambio={setLongitud} min={0.1} paso={0.5} className={styles.numberInput} />
+```
+
+**Props:** `valor` y `onCambio` (requeridos) · `min`, `max` (lo de encima se topa al momento; lo
+de debajo se aplica acotado y se marca `aria-invalid` sin reescribir el campo) · `decimales`
+(redondeo de lo tecleado; 0 = entero) · `paso` (↑/↓) · `formatear` (cómo se ve sin foco) · `id`,
+`ariaLabel`, `ariaDescribedBy`, `className`, `title`, `placeholder`, `disabled`.
+Testigo de familia, que teclea tecla a tecla: `tests/apps/campo-numerico-familia.spec.ts`.
+Una app migrada se añade a su tabla `CAMPOS`.
+
 ---
 
 ### 5. **ResultCard** ⭐ NUEVO

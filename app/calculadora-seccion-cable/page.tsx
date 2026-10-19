@@ -9,6 +9,7 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
+  CampoNumerico,
 } from '@/components';
 import DataReference from '@/components/DataReference';
 import { formatNumber } from '@/lib';
@@ -314,14 +315,14 @@ export default function CalculadoraSeccionCable() {
                 Tensión
                 <span className={styles.valueBadge}>{formatNumber(tension, 0)} V</span>
               </label>
-              <input
+              {/* Campos de texto que se pueden teclear: con `type="number"` y `|| respaldo`,
+                  vaciar el campo lo rellenaba con el mínimo bajo el cursor (cabo C0069). */}
+              <CampoNumerico
                 id="tension"
-                type="number"
-                inputMode="decimal"
                 min={12}
-                step={1}
-                value={tension}
-                onChange={(ev) => setTension(Number(ev.target.value) || 12)}
+                paso={1}
+                valor={tension}
+                onCambio={setTension}
                 className={styles.numberInput}
               />
               <span className={styles.inputHint}>
@@ -336,14 +337,12 @@ export default function CalculadoraSeccionCable() {
                 Longitud de la línea
                 <span className={styles.valueBadge}>{formatNumber(longitud, 1)} m</span>
               </label>
-              <input
+              <CampoNumerico
                 id="longitud"
-                type="number"
-                inputMode="decimal"
                 min={0.1}
-                step={0.5}
-                value={longitud}
-                onChange={(ev) => setLongitud(Number(ev.target.value) || 0.1)}
+                paso={0.5}
+                valor={longitud}
+                onCambio={setLongitud}
                 className={styles.numberInput}
               />
               <span className={styles.inputHint}>
@@ -406,14 +405,12 @@ export default function CalculadoraSeccionCable() {
                   Potencia activa
                   <span className={styles.valueBadge}>{formatNumber(potencia, 0)} W</span>
                 </label>
-                <input
+                <CampoNumerico
                   id="potencia"
-                  type="number"
-                  inputMode="decimal"
                   min={1}
-                  step={100}
-                  value={potencia}
-                  onChange={(ev) => setPotencia(Number(ev.target.value) || 1)}
+                  paso={100}
+                  valor={potencia}
+                  onCambio={setPotencia}
                   className={styles.numberInput}
                 />
                 <span className={styles.inputHint}>
@@ -426,14 +423,12 @@ export default function CalculadoraSeccionCable() {
                   Corriente de cálculo
                   <span className={styles.valueBadge}>{formatNumber(corrienteManual, 1)} A</span>
                 </label>
-                <input
+                <CampoNumerico
                   id="corriente"
-                  type="number"
-                  inputMode="decimal"
                   min={0.01}
-                  step={1}
-                  value={corrienteManual}
-                  onChange={(ev) => setCorrienteManual(Number(ev.target.value) || 0.01)}
+                  paso={1}
+                  valor={corrienteManual}
+                  onCambio={setCorrienteManual}
                   className={styles.numberInput}
                 />
                 <span className={styles.inputHint}>
