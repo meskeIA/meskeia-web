@@ -64,6 +64,7 @@ import * as flotabilidad from '../app/simulador-flotabilidad/casos';
 import * as condensadores from '../app/simulador-condensadores/casos';
 import * as circuitos from '../app/simulador-circuitos-electricos/casos';
 import * as volumenes from '../app/visualizador-volumenes/casos';
+import * as contabilidad from '../app/simulador-contabilidad-basica/casos';
 
 const CUADRANTE: Magnitud = { entero: true, minimo: 1, maximo: 4, que: 'el número de cuadrante' };
 
@@ -179,6 +180,8 @@ const FAMILIA_REDONDEO: Record<string, Probar> = {
     conCasos(circuitos.CASOS, circuitos.generarEjercicioAleatorio, (c) => circuitos.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => circuitos.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
   'visualizador-volumenes': () =>
     conCasos(volumenes.CASOS, volumenes.generarEjercicioAleatorio, (c) => volumenes.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => volumenes.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
+  'simulador-contabilidad-basica': () =>
+    conCasos(contabilidad.CASOS, contabilidad.generarEjercicioAleatorio, (c) => contabilidad.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => contabilidad.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
 };
 
 for (const [slug, probar] of Object.entries(FAMILIA_REDONDEO)) {

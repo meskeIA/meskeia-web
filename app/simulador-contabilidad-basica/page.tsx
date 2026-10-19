@@ -12,39 +12,10 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-
-// ─── Tipos ───────────────────────────────────────────────────────────────────
-
-interface LineaAsiento {
-  id: string;
-  cuenta: string;
-  descripcion: string;
-  debe: string;
-  haber: string;
-}
-
-interface Asiento {
-  id: string;
-  fecha: string;
-  concepto: string;
-  lineas: LineaAsiento[];
-}
-
-interface MovimientoCuenta {
-  fecha: string;
-  concepto: string;
-  debe: number;
-  haber: number;
-}
-
-interface CuentaMayor {
-  nombre: string;
-  movimientos: MovimientoCuenta[];
-  totalDebe: number;
-  totalHaber: number;
-  saldo: number;
-  naturaleza: 'deudora' | 'acreedora';
-}
+// El libro mayor se calcula en ./motor.ts, el mismo módulo con que se corrigen los casos para
+// clase (./casos.ts, 19/10/2026): el saldo que enseña la pestaña y el del corrector no pueden divergir.
+import { calcularMayor, totalLineas, type Asiento, type LineaAsiento } from './motor';
+import CasosAula from './CasosAula';
 
 // ─── Ejemplos precargados ────────────────────────────────────────────────────
 
@@ -88,42 +59,6 @@ function crearAsientoVacio(): Omit<Asiento, 'id'> {
     concepto: '',
     lineas: [crearLineaVacia(`${p}-l1`), crearLineaVacia(`${p}-l2`)],
   };
-}
-
-function totalLineas(lineas: LineaAsiento[], campo: 'debe' | 'haber'): number {
-  return lineas.reduce((acc, l) => acc + (parseSpanishNumber(l[campo]) || 0), 0);
-}
-
-function calcularMayor(asientos: Asiento[]): Map<string, CuentaMayor> {
-  const mapa = new Map<string, CuentaMayor>();
-
-  for (const asiento of asientos) {
-    for (const linea of asiento.lineas) {
-      const nombre = linea.cuenta.trim();
-      if (!nombre) continue;
-
-      const debe = parseSpanishNumber(linea.debe) || 0;
-      const haber = parseSpanishNumber(linea.haber) || 0;
-      if (debe === 0 && haber === 0) continue;
-
-      if (!mapa.has(nombre)) {
-        mapa.set(nombre, { nombre, movimientos: [], totalDebe: 0, totalHaber: 0, saldo: 0, naturaleza: 'deudora' });
-      }
-
-      const cuenta = mapa.get(nombre)!;
-      cuenta.movimientos.push({ fecha: asiento.fecha, concepto: asiento.concepto, debe, haber });
-      cuenta.totalDebe += debe;
-      cuenta.totalHaber += haber;
-    }
-  }
-
-  for (const cuenta of mapa.values()) {
-    const saldoNeto = cuenta.totalDebe - cuenta.totalHaber;
-    cuenta.saldo = Math.abs(saldoNeto);
-    cuenta.naturaleza = saldoNeto >= 0 ? 'deudora' : 'acreedora';
-  }
-
-  return mapa;
 }
 
 // ─── Componente principal ────────────────────────────────────────────────────
@@ -546,6 +481,10 @@ export default function SimuladorContabilidadBasicaPage() {
           )}
         </section>
       )}
+
+      {/* Tarea de aula (skill /casos-aula-meskeia): fuera de las pestañas, para que se vea en las
+          dos, y FUERA de EducationalSection, que nace colapsada. */}
+      <CasosAula />
 
       {/* Sección educativa */}
       <EducationalSection
