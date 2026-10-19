@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './SelectorTablet.module.css';
+import { margenBarraLogo } from '@/lib';
 import {
   MeskeiaLogo,
   Footer,
@@ -15,6 +16,7 @@ import {
   calcularResultado,
   PREGUNTAS,
   type Motivo,
+  type Requisito,
   type ResultadoMotor,
   type TipoTablet,
 } from './motor';
@@ -127,6 +129,38 @@ function porQue(r: ResultadoMotor): string | null {
   return null;
 }
 
+/** Nombre de cada plataforma dentro de una frase, con artículo. */
+const CON_ARTICULO: Record<TipoTablet, string> = {
+  android: 'la tablet Android',
+  ios_ipad: 'la tablet con iPadOS',
+  windows: 'la tablet Windows (2 en 1)',
+  ereader: 'el eReader',
+  sin_tablet: 'quedarte sin tablet',
+};
+
+/** Lista legible: «A, B y C». */
+function enumerar(items: string[]): string {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
+}
+
+/**
+ * Lo declarado como imprescindible que la recomendación no cumple, dicho a la cara (hallazgo
+ * 3197). La respuesta se cita literal, de PREGUNTAS, para que no diverja del cuestionario.
+ */
+function textoRequisito(req: Requisito, r: ResultadoMotor): string {
+  const cita = (p: number, o: number) => `«${PREGUNTAS[p].opciones[o].texto}»`;
+  const quien = CON_ARTICULO[r.ganador];
+  switch (req) {
+    case 'software':
+      return `A la pregunta del software de escritorio has respondido ${cita(6, 0)}, y ${quien} no ejecuta programas de escritorio completos: para eso la opción es una tablet Windows (2 en 1), que con tus respuestas suma ${r.totales.windows} puntos frente a los ${r.totales[r.ganador]} de la recomendada.`;
+    case 'teclado':
+      return `A la pregunta del teclado físico has respondido ${cita(3, 0)}, y un eReader no está pensado para escribir documentos largos. Si eso pesa más que la lectura, mira ${CON_ARTICULO.windows} o una tablet con teclado acoplable.`;
+    case 'lapiz':
+      return `A la pregunta del lápiz digital has respondido ${cita(4, 0)}, y un eReader no sirve para dibujar. Si eso pesa más que la lectura, mira una tablet que admita lápiz.`;
+  }
+}
+
 // ─── Componente principal ────────────────────────────────────────────────────
 
 export default function SelectorTabletPage() {
@@ -135,6 +169,53 @@ export default function SelectorTabletPage() {
     Array(PREGUNTAS.length).fill(null),
   );
   const [resultado, setResultado] = useState<ResultadoMotor | null>(null);
+
+  // Al cambiar de pregunta «Siguiente» se desactiva (la nueva no tiene respuesta), «Anterior»
+  // desaparece en la 1 y «Ver resultado» y «Repetir» se desmontan: el foco caía a <body> y el Tab
+  // siguiente salía del cuestionario (hallazgo 3200, receta 1679/1680 de selector-smartphone). Se
+  // lleva al enunciado nuevo o al título del resultado. Y la página no se movía: en móvil el
+  // enunciado quedaba por encima del borde o bajo la barra fija del logo, y el título del
+  // resultado, cortado (hallazgo 3201). Si no está entero a la vista y por debajo de la barra, se
+  // sube a su sitio; el hueco lo da el scroll-padding del documento. Solo tras una navegación.
+  const enunciado = useRef<HTMLHeadingElement>(null);
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const navegado = useRef(false);
+  useEffect(() => {
+    if (!navegado.current) return;
+    const destino = resultado ? tituloResultado.current : enunciado.current;
+    if (!destino) return;
+    const caja = destino.getBoundingClientRect();
+    if (caja.top < margenBarraLogo() || caja.bottom > window.innerHeight) {
+      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+    destino.focus({ preventScroll: true });
+  }, [resultado, preguntaActual]);
+
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 3202; receta `clicDeMas` de selector-smartphone,
+   * 2659, con la guarda en captura sobre window de selector-alquiler-vs-compra, 3111). Las
+   * preguntas tienen 3, 4 o 5 opciones, la botonera se mueve bajo el dedo y el segundo toque caía
+   * en una opción de la pregunta nueva, en «Anterior» o en una tarjeta de Apps relacionadas, que
+   * sacaba de la app. Un clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el
+   * teclado no produce) Y el clic anterior de la app cambió de pantalla.
+   */
+  const ultimoCambioPantalla = useRef(false);
+  useEffect(() => {
+    function filtrar(e: MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantalla.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantalla.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+  const cambiaPantalla = () => {
+    ultimoCambioPantalla.current = true;
+    navegado.current = true;
+  };
 
   const totalPreguntas = PREGUNTAS.length;
   const pregunta = PREGUNTAS[preguntaActual];
@@ -147,10 +228,13 @@ export default function SelectorTabletPage() {
     setRespuestas(nuevasRespuestas);
   };
 
+  // Avanza desde la pregunta DEL RENDER (`preguntaActual + 1`): dos clics antes de repintar no
+  // saltan una pregunta.
   const avanzar = () => {
     if (respuestaActual === null) return;
+    cambiaPantalla();
     if (preguntaActual < totalPreguntas - 1) {
-      setPreguntaActual((p) => p + 1);
+      setPreguntaActual(preguntaActual + 1);
     } else {
       setResultado(calcularResultado(respuestas));
     }
@@ -158,11 +242,13 @@ export default function SelectorTabletPage() {
 
   const retroceder = () => {
     if (preguntaActual > 0) {
-      setPreguntaActual((p) => p - 1);
+      cambiaPantalla();
+      setPreguntaActual(preguntaActual - 1);
     }
   };
 
   const reiniciar = () => {
+    cambiaPantalla();
     setRespuestas(Array(PREGUNTAS.length).fill(null));
     setPreguntaActual(0);
     setResultado(null);
@@ -194,16 +280,20 @@ export default function SelectorTabletPage() {
 
           <div className={styles.pregunta}>
             <span className={styles.numeroPregunta} aria-hidden="true">Pregunta {preguntaActual + 1}</span>
-            <h2>{pregunta.texto}</h2>
+            {/* Recibe el foco por programa al cambiar de pregunta (tabIndex=-1, hallazgo 3200). */}
+            <h2 ref={enunciado} tabIndex={-1} className={styles.enunciado}>{pregunta.texto}</h2>
 
-            <div className={styles.opciones} role="group" aria-label={`Opciones para: ${pregunta.texto}`}>
+            <div className={styles.opciones} role="radiogroup" aria-label={pregunta.texto}>
               {pregunta.opciones.map((opcion, idx) => (
                 <button
                   key={idx}
                   type="button"
                   className={`${styles.opcion}${respuestaActual === idx ? ` ${styles.seleccionada}` : ''}`}
                   onClick={() => seleccionarOpcion(idx)}
-                  aria-pressed={respuestaActual === idx}
+                  // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre varias,
+                  // no un conmutador (hallazgo 3199; selector-smartphone, 950).
+                  role="radio"
+                  aria-checked={respuestaActual === idx}
                 >
                   <span className={styles.opcionIcono} aria-hidden="true">{opcion.icono}</span>
                   <span>{opcion.texto}</span>
@@ -234,8 +324,23 @@ export default function SelectorTabletPage() {
           {info && (
             <div className={styles.resultadoCard} role="region" aria-label={`Tu tablet ideal: ${info.titulo}`}>
               <span className={styles.resultadoEmoji} aria-hidden="true">{info.emoji}</span>
-              <h2>{info.titulo}</h2>
+              <h2 ref={tituloResultado} tabIndex={-1}>{info.titulo}</h2>
               {explicacion && <p className={styles.porque}>{explicacion}</p>}
+              {/* Un empate no se resuelve en silencio por el orden del código (hallazgo 3198). */}
+              {resultado && resultado.empatadas.length > 0 && (
+                <p className={styles.porque} role="note">
+                  <span aria-hidden="true">⚖️</span> Empate: con tus respuestas,{' '}
+                  {enumerar([resultado.ganador, ...resultado.empatadas].map((k) => CON_ARTICULO[k]))} suman
+                  los mismos puntos ({resultado.totales[resultado.ganador]}) y encajan igual de bien: el
+                  orden en que aparecen no las distingue.
+                </p>
+              )}
+              {/* Lo declarado como imprescindible que la recomendación no cumple (hallazgo 3197). */}
+              {resultado && resultado.requisitosIncumplidos.map((req) => (
+                <p key={req} className={styles.porque} role="note">
+                  <span aria-hidden="true">⚠️</span> {textoRequisito(req, resultado)}
+                </p>
+              ))}
               <p>{info.descripcion}</p>
               <div className={styles.caracteristicas}>
                 <h3>{info.queMirar}</h3>
@@ -267,7 +372,12 @@ export default function SelectorTabletPage() {
           </div>
 
           <DisclaimerCard variant="general" severity="low" />
+        </main>
+      )}
 
+      {/* Fuera de las pantallas: antes vivía dentro del resultado, así que el HTML servido no traía
+          la guía (ni la «comparativa tablet vs portátil» que promete la description) y quien no
+          terminaba el test no la veía (hallazgo 3204; forma del 2663 de selector-smartphone). */}
           <EducationalSection
             title="Todo lo que necesitas saber antes de comprar una tablet"
             subtitle="Guía práctica para elegir el dispositivo adecuado según tus necesidades reales"
@@ -302,9 +412,6 @@ export default function SelectorTabletPage() {
               Las tablets de 8-10 pulgadas son más portátiles y cómodas para leer. Las de 11-13 pulgadas ofrecen mejor experiencia para trabajar, dibujar y ver contenido. Las tablets Windows suelen ser de 12-14 pulgadas para competir con portátiles.
             </p>
           </EducationalSection>
-
-        </main>
-      )}
 
       <RelatedApps />
       <ShareCard appName="selector-tablet" />

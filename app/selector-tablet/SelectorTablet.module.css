@@ -85,6 +85,13 @@
   line-height: 1.45;
 }
 
+/* El enunciado y el título del resultado reciben el foco por programa (tabIndex −1, hallazgo
+   3200): no son controles, así que no se les pinta el anillo. */
+.enunciado:focus,
+.resultadoCard h2:focus {
+  outline: none;
+}
+
 .numeroPregunta {
   display: inline-block;
   background: linear-gradient(135deg, var(--primary-boton), var(--secondary-boton));

@@ -291,12 +291,11 @@ test.describe('hallazgos del motor', () => {
   });
 
   test('un requisito «imprescindible» solo suma: eReader a quien necesita software de escritorio', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). P7 «Sí, es imprescindible» (Adobe CC, Office completo…) y la
-    // app recomienda un eReader, que no ejecuta ningún programa de escritorio; la propia guía dice
-    // que para eso «la mejor opción» es la tablet Windows, y el FAQPage, que «es más adecuada».
-    // LECTOR_CON_SOFTWARE: 12 · 4 · 7 · 18 · 5 → eReader. Correcto: descartar lo que incumple el
-    // requisito declarado, o decirlo en el resultado.
-    test.fail();
+    // REPARADO el 19/10/2026 (3197): el resultado lo dice (requisitosIncumplidos del motor) y nombra
+    // la tablet Windows con sus puntos; los puntos no se tocan. Era: P7 «Sí, es imprescindible»
+    // (Adobe CC, Office completo…) y la app recomendaba un eReader, que no ejecuta ningún programa
+    // de escritorio; la propia guía dice que para eso «la mejor opción» es la tablet Windows, y el
+    // FAQPage, que «es más adecuada». LECTOR_CON_SOFTWARE: 12 · 4 · 7 · 18 · 5 → eReader.
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, LECTOR_CON_SOFTWARE);
@@ -310,8 +309,7 @@ test.describe('hallazgos del motor', () => {
     // queda con 'android', la primera clave, y el iPad baja a «También podrías considerar» sin que
     // nada diga que empatan. 17.635 perfiles (10,1 %) tienen empate en cabeza. Medido hoy: «Tablet
     // Android» y, primera de «También podrías considerar», «🍎 iPad (iOS)» (desde el 12/10/2026,
-    // «🍎 Tablet con iPadOS»).
-    test.fail();
+    // «🍎 Tablet con iPadOS»). REPARADO el 19/10/2026 (3198): el resultado anuncia el empate.
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, EMPATE);
@@ -327,10 +325,9 @@ test.describe('hallazgos del motor', () => {
 
 test.describe('accesibilidad y foco', () => {
   test('invariante de familia, mitad que NO cumple: las opciones son radios con aria-checked, sin aria-pressed', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Hoy: contenedor role="group" y cinco <button aria-pressed>
+    // REPARADO el 19/10/2026 (3199). Era: contenedor role="group" y cinco <button aria-pressed>
     // (un conmutador) para una elección ÚNICA. La referencia (selector-smartphone, hallazgo 950):
     // role="radiogroup" + role="radio" con aria-checked, uno solo marcado.
-    test.fail();
     await abrir(page);
     const grupo = page.locator('[role="radiogroup"]');
     expect(await grupo.count(), 'hay un radiogroup').toBe(1);
@@ -354,7 +351,7 @@ test.describe('accesibilidad y foco', () => {
     // ABIERTO (inspector 10/10/2026). «Siguiente» se desactiva al llegar la pregunta nueva y el foco
     // cae a <body>: el siguiente Tab va a «Selector de Smartphone» (Apps relacionadas), DESPUÉS del
     // cuestionario. Igual tras «Anterior» y «Ver resultado» (receta del 1680 de la referencia).
-    test.fail();
+    // REPARADO el 19/10/2026 (3200): foco al enunciado (h2 con tabIndex −1).
     await abrir(page);
     await opcion(page, 'Leer libros').click();
     await siguiente(page).focus();
@@ -367,7 +364,7 @@ test.describe('accesibilidad y foco', () => {
   test('al llegar al resultado, su título se ve y tiene el foco (escritorio 1280 × 720)', async ({ page }) => {
     // ABIERTO (inspector 10/10/2026). El resultado sustituye al cuestionario sin mover la página:
     // medido, scrollY 471 y el <h2> del resultado en y −20..13, cortado por arriba; foco en <body>.
-    test.fail();
+    // REPARADO el 19/10/2026 (3200 y 3201): foco y vista al título del resultado.
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, PROFESIONAL);
@@ -381,7 +378,8 @@ test.describe('accesibilidad y foco', () => {
     // --primary→--secondary) 3,26:1 claro · 2,45:1 oscuro · «← Anterior» (15,2 px/600, --primary)
     // 3,93:1 claro · píldora «Pregunta N» (12,5 px/700) 2,97 · 2,31 · «Repetir el test» 3,18 · 2,41.
     // Ninguno es texto grande. Reparado así en la referencia (1682): --primary-boton / --primary-texto.
-    test.fail();
+    // REPARADO (3203) por la campaña de contraste de marca C0070 (dfaf84a2 y 4488bd1d, en todo el
+    // catálogo): el test.fail ya pasaba en verde el 19/10/2026.
     test.setTimeout(60_000);
     await abrir(page);
     await opcion(page, 'Leer libros').click();
@@ -406,8 +404,7 @@ test.describe('contenido y HTML servido', () => {
   test('la guía educativa (con la «comparativa tablet vs portátil» que promete la description) está en el HTML servido', async ({ page }) => {
     // ABIERTO (inspector 10/10/2026). EducationalSection vive dentro de la rama del resultado: el HTML
     // servido no trae ni una línea de la guía, y quien no termina las 10 preguntas tampoco la ve.
-    // Forma del 2663 de selector-smartphone.
-    test.fail();
+    // Forma del 2663 de selector-smartphone. REPARADO el 19/10/2026 (3204): fuera de las pantallas.
     const html = await (await page.request.get('/selector-tablet/')).text();
     expect(html).toContain('Tipos de tablets: diferencias clave');
   });
@@ -487,7 +484,7 @@ test.describe('móvil 360 px', () => {
     // ABIERTO (inspector 10/10/2026). «Siguiente» está en y 920 con 740 de alto: hay que bajar para
     // tocarlo, y la pregunta nueva se pinta en el sitio sin mover la página. Medido tocando el botón a
     // media pantalla: P2 en y −161..−110 (fuera), P3-P7, P9 y P10 bajo la barra (hasta y 62).
-    test.fail();
+    // REPARADO el 19/10/2026 (3201).
     test.setTimeout(60_000);
     await abrir(page);
     const medidas: string[] = [];
@@ -505,8 +502,7 @@ test.describe('móvil 360 px', () => {
 
   test('al tocar «Ver resultado», el título del resultado se ve, no queda bajo la barra y tiene el foco', async ({ page }) => {
     // ABIERTO (inspector 10/10/2026). Medido: scrollY 481, <h2> del resultado en y −37..−5 (por
-    // encima del borde) y la tarjeta en y −175..256; foco en <body>.
-    test.fail();
+    // encima del borde) y la tarjeta en y −175..256; foco en <body>. REPARADO el 19/10/2026 (3201).
     test.setTimeout(60_000);
     await abrir(page);
     for (let i = 0; i < 9; i++) {
@@ -529,7 +525,7 @@ test.describe('móvil 360 px', () => {
     // ABIERTO (inspector 10/10/2026). P1 tiene 5 opciones y P2 tres: la botonera sube bajo el dedo y
     // el 2.º toque cae en la tarjeta «Selector de Smartphone» de Apps relacionadas. Medido con el
     // botón centrado (y 370): navega a /selector-smartphone/ y se pierde el test.
-    test.fail();
+    // REPARADO el 19/10/2026 (3202): guarda en captura sobre window.
     await abrir(page);
     await page.locator('main [class*="opciones"] button').last().tap();
     const p = await centrar(page, /^Siguiente/);
@@ -542,8 +538,7 @@ test.describe('móvil 360 px', () => {
     // ABIERTO (inspector 10/10/2026). P9 tiene 3 opciones y P10 cuatro: la botonera baja y el 2.º
     // toque marca «No tengo portátil o mi PC está anticuado» (+3 Windows, +2 iPad, +2 Android) sin que
     // nadie lo elija. A 360 px pasa lo mismo de P6 a P7 («No necesito software de escritorio»), y de
-    // P3 a P4 el 2.º toque cae en «Anterior» y devuelve a la P3.
-    test.fail();
+    // P3 a P4 el 2.º toque cae en «Anterior» y devuelve a la P3. REPARADO el 19/10/2026 (3202).
     test.setTimeout(60_000);
     await abrir(page);
     for (let i = 0; i < 8; i++) {
@@ -571,8 +566,7 @@ test.describe('móvil 390 px', () => {
 
   test('al tocar «Ver resultado», el título del resultado no queda bajo la barra del logo', async ({ page }) => {
     // ABIERTO (inspector 10/10/2026). Medido: scrollY 429 y el <h2> del resultado en y 15..47, bajo
-    // la píldora del logo (y 10..52); la barra acaba en y 62. Foco en <body>.
-    test.fail();
+    // la píldora del logo (y 10..52); la barra acaba en y 62. Foco en <body>. REPARADO el 19/10/2026 (3201).
     test.setTimeout(60_000);
     await abrir(page);
     for (let i = 0; i < 9; i++) {
@@ -590,8 +584,7 @@ test.describe('móvil 390 px', () => {
   });
 
   test('un doble toque en «Siguiente» de la pregunta 1 no saca de la app', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Igual que a 360 px: botón centrado en y 422 → /selector-smartphone/.
-    test.fail();
+    // REPARADO el 19/10/2026 (3202). Era, igual que a 360 px: botón centrado en y 422 → /selector-smartphone/.
     await abrir(page);
     await page.locator('main [class*="opciones"] button').last().tap();
     const p = await centrar(page, /^Siguiente/);
@@ -717,4 +710,32 @@ test('motor: «Sin tablet» sale si y solo si no hay motivo y hay portátil en u
   // (2 de 3) · P8 adulto (1 de 3) · P9 sin viajar (2 de 3) · P10 portátil en uso (2 de 4), con P2,
   // P3, P4 y P7 libres (3 · 4 · 3 · 3): 3·2·2·1·2·2 · 108 = 5.184 perfiles (el 3,0 %).
   expect(sinTablet).toBe(5_184);
+});
+
+test('motor (3197, 3198): ningún imprescindible incumplido ni empate en cabeza queda en silencio', () => {
+  let software = 0;
+  let empates = 0;
+  for (const r of perfiles()) {
+    const res = calcularResultado(r);
+    // P7 «Sí, es imprescindible» con una tablet que no es Windows: el resultado lo nombra.
+    const incumpleSoftware = r[6] === 0 && res.ganador !== 'windows' && res.ganador !== 'sin_tablet';
+    if (incumpleSoftware !== res.requisitosIncumplidos.includes('software')) {
+      throw new Error(`perfil ${r.join(',')}: ganador ${res.ganador}, avisos ${res.requisitosIncumplidos.join(',')}`);
+    }
+    if (incumpleSoftware) software++;
+    // Toda tablet admitida con los puntos de la ganadora figura como empatada.
+    if (res.ganador !== 'sin_tablet') {
+      const iguales = (['android', 'ios_ipad', 'windows', 'ereader'] as const)
+        .filter((t) => t !== res.ganador && res.totales[t] === res.totales[res.ganador])
+        .filter((t) => !(t === 'ios_ipad' && res.ipadosDescartada));
+      if (JSON.stringify(res.empatadas) !== JSON.stringify(iguales)) {
+        throw new Error(`perfil ${r.join(',')}: empatadas ${res.empatadas.join(',')} frente a ${iguales.join(',')}`);
+      }
+      if (iguales.length > 0) empates++;
+    }
+  }
+  // El barrido del Inspector (10/10/2026) dio 51.890 de 58.320 perfiles con P7 «imprescindible»
+  // sin Windows, antes de los descartes de «Sin tablet» y de iPadOS: ahora todos llevan el aviso.
+  expect(software).toBeGreaterThan(29_160);
+  expect(empates).toBeGreaterThan(0);
 });

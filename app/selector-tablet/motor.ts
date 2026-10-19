@@ -159,7 +159,29 @@ export interface ResultadoMotor {
   ipadosDescartada: boolean;
   /** Sin el filtro de presupuesto habría salido una tablet con iPadOS. */
   ipadosHabriaSalido: boolean;
+  /**
+   * Otras tablets con los MISMOS puntos que la ganadora. Un empate lo deshace el orden de
+   * declaración, que no dice nada de quien contesta: se anuncia (hallazgo 3198).
+   */
+  empatadas: TipoTablet[];
+  /**
+   * Requisitos declarados como imprescindibles que la ganadora no cumple (hallazgo 3197). Siguen
+   * siendo puntos, como en el resto de la familia salvo los descartes de presupuesto, pero ya no en
+   * silencio: el resultado los nombra y dice qué plataforma los cumple.
+   */
+  requisitosIncumplidos: Requisito[];
 }
+
+/**
+ * Lo que la ganadora no puede hacer y el usuario ha dicho que necesita. `software`: P7 «Sí, es
+ * imprescindible» con una tablet que no ejecuta programas de escritorio completos (la guía y el
+ * FAQPage de la app remiten a la tablet Windows). `teclado` y `lapiz`: P4 «fundamental» y P5
+ * «razón principal» con un eReader, que no admite ni teclado para escribir documentos ni dibujo.
+ */
+export type Requisito = 'software' | 'teclado' | 'lapiz';
+
+const P4_TECLADO_FUNDAMENTAL = 0;
+const P7_SOFTWARE_IMPRESCINDIBLE = 0;
 
 function sumar(respuestas: readonly (number | null)[]): PuntajeMap {
   const totales: PuntajeMap = { android: 0, ios_ipad: 0, windows: 0, ereader: 0, sin_tablet: 0 };
@@ -206,5 +228,16 @@ export function calcularResultado(respuestas: readonly (number | null)[]): Resul
     totales,
   ).slice(0, 2);
 
-  return { ganador, alternativas, totales, motivos, ipadosDescartada, ipadosHabriaSalido };
+  const empatadas = ganador === 'sin_tablet'
+    ? []
+    : candidatas.filter((t) => t !== ganador && totales[t] === totales[ganador]);
+
+  const requisitosIncumplidos: Requisito[] = [];
+  if (respuestas[6] === P7_SOFTWARE_IMPRESCINDIBLE && ganador !== 'windows' && ganador !== 'sin_tablet') {
+    requisitosIncumplidos.push('software');
+  }
+  if (ganador === 'ereader' && respuestas[3] === P4_TECLADO_FUNDAMENTAL) requisitosIncumplidos.push('teclado');
+  if (ganador === 'ereader' && respuestas[4] === P5_LAPIZ_PRINCIPAL) requisitosIncumplidos.push('lapiz');
+
+  return { ganador, alternativas, totales, motivos, ipadosDescartada, ipadosHabriaSalido, empatadas, requisitosIncumplidos };
 }
