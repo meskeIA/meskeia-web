@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  CampoNumerico,
 } from '@/components';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorEquilibrioQuimico.module.css';
@@ -415,14 +416,14 @@ export default function SimuladorEquilibrioQuimicoPage() {
                   <label htmlFor={`conc-${e.simbolo}`}>
                     [{e.simbolo}] <span className={styles.unitLabel}>({esReactivo ? 'reactivo' : 'producto'} · {e.estado})</span>
                   </label>
-                  <input
+                  {/* Cabo C0311: `|| 0` sobre type="number" escribía 0 al vaciar y «05» al
+                      teclear; y el valor salía con punto decimal («0.4635»). */}
+                  <CampoNumerico
                     id={`conc-${e.simbolo}`}
-                    type="number"
                     min={0}
-                    step={0.05}
-                    value={concentraciones[e.simbolo] ?? 0}
-                    onChange={(ev) => setConc(e.simbolo, parseFloat(ev.target.value) || 0)}
-                    inputMode="decimal"
+                    paso={0.05}
+                    valor={concentraciones[e.simbolo] ?? 0}
+                    onCambio={(v) => setConc(e.simbolo, v)}
                   />
                 </div>
               );
@@ -431,21 +432,18 @@ export default function SimuladorEquilibrioQuimicoPage() {
               <label htmlFor="temperatura">
                 Temperatura <span className={styles.unitLabel}>(K)</span>
               </label>
-              <input
+              {/* `parseFloat(v) || 298` hacía decorativos el min y el max, y además convertía el
+                  0 en 298 en silencio, porque 0 es falsy (hallazgo 174). La reparación acotaba
+                  en CADA pulsación, así que «3» se volvía 100 bajo el cursor y no se podía teclear
+                  «350» (cabo C0311): CampoNumerico acota lo aplicado sin reescribir lo tecleado
+                  por debajo del mínimo, y lo enseña al salir. */}
+              <CampoNumerico
                 id="temperatura"
-                type="number"
                 min={T_MIN_K}
                 max={T_MAX_K}
-                step={10}
-                value={temperaturaK}
-                onChange={(ev) => {
-                  // `parseFloat(v) || 298` hacía decorativos el min y el max, y además
-                  // convertía el 0 en 298 en silencio, porque 0 es falsy (hallazgo 174).
-                  const n = parseFloat(ev.target.value);
-                  if (!Number.isFinite(n)) return;
-                  setTemperaturaK(Math.min(Math.max(n, T_MIN_K), T_MAX_K));
-                }}
-                inputMode="decimal"
+                paso={10}
+                valor={temperaturaK}
+                onCambio={setTemperaturaK}
               />
             </div>
           </div>

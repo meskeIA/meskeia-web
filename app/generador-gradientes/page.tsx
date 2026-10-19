@@ -5,7 +5,7 @@ import { useState, useCallback, useMemo } from 'react';
 import styles from './GeneradorGradientes.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection, CampoNumerico } from '@/components';
 
 type GradientType = 'linear' | 'radial' | 'conic';
 
@@ -354,15 +354,15 @@ export default function GeneradorGradientesPage() {
                     className={styles.hexInput}
                     aria-label={`Color ${index + 1} (valor hexadecimal)`}
                   />
-                  <input
-                    type="number"
-                    value={stop.position}
-                    onChange={(e) => updateColorStop(stop.id, 'position', parseInt(e.target.value) || 0)}
-                    min="0"
-                    max="100"
+                  {/* Cabo C0311: `|| 0` sobre type="number" escribía 0 al vaciar y «05» al teclear */}
+                  <CampoNumerico
+                    valor={stop.position}
+                    onCambio={(v) => updateColorStop(stop.id, 'position', v)}
+                    min={0}
+                    max={100}
+                    decimales={0}
                     className={styles.positionInput}
-                    inputMode="numeric"
-                    aria-label={`Posición del color ${index + 1} en porcentaje`}
+                    ariaLabel={`Posición del color ${index + 1} en porcentaje`}
                   />
                   <span className={styles.percentSign}>%</span>
                   <button

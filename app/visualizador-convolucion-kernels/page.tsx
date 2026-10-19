@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  CampoNumerico,
 } from '@/components';
 import styles from './VisualizadorConvolucionKernels.module.css';
 
@@ -450,14 +451,14 @@ export default function VisualizadorConvolucionKernelsPage() {
                 const filaK = Math.floor(idx / 3) + 1;
                 const colK = (idx % 3) + 1;
                 return (
-                  <input
+                  // Cabo C0311: type="number" sin respaldo escribía 0 al vaciar, «05» al teclear y
+                  // no dejaba empezar un peso negativo (los de detección de bordes lo son).
+                  <CampoNumerico
                     key={idx}
-                    type="number"
-                    step="any"
                     className={styles.kernelInput}
-                    value={peso}
-                    onChange={(e) => editarPeso(idx, parseFloat(e.target.value))}
-                    aria-label={`Peso fila ${filaK} columna ${colK}`}
+                    valor={peso}
+                    onCambio={(v) => editarPeso(idx, v)}
+                    ariaLabel={`Peso fila ${filaK} columna ${colK}`}
                   />
                 );
               })}
@@ -479,15 +480,15 @@ export default function VisualizadorConvolucionKernelsPage() {
                 <label htmlFor="divisor-input" className={styles.controlLabel}>
                   Divisor (normalización):
                 </label>
-                <input
+                {/* Un divisor 0 no existe: se aplica 1, como antes, pero sin escribirlo bajo el
+                    cursor (con `|| 1`, vaciar dejaba «1» y teclear «9» daba «19»; cabo C0311). */}
+                <CampoNumerico
                   id="divisor-input"
-                  type="number"
-                  step="any"
                   className={styles.numInput}
-                  value={autoDivisor ? (sumaPesos === 0 ? 1 : sumaPesos) : divisorManual}
-                  onChange={(e) => {
+                  valor={autoDivisor ? (sumaPesos === 0 ? 1 : sumaPesos) : divisorManual}
+                  onCambio={(v) => {
                     setAutoDivisor(false);
-                    setDivisorManual(parseFloat(e.target.value) || 1);
+                    setDivisorManual(v === 0 ? 1 : v);
                   }}
                   disabled={autoDivisor}
                 />
@@ -497,13 +498,11 @@ export default function VisualizadorConvolucionKernelsPage() {
                 <label htmlFor="offset-input" className={styles.controlLabel}>
                   Desplazamiento (offset):
                 </label>
-                <input
+                <CampoNumerico
                   id="offset-input"
-                  type="number"
-                  step="any"
                   className={styles.numInput}
-                  value={offset}
-                  onChange={(e) => setOffset(parseFloat(e.target.value) || 0)}
+                  valor={offset}
+                  onCambio={setOffset}
                 />
               </div>
 

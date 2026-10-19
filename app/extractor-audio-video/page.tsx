@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import type { FFmpeg } from '@ffmpeg/ffmpeg';
 import styles from './ExtractorAudioVideo.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard,
-  DisclaimerCard,
+  DisclaimerCard, CampoNumerico,
 } from '@/components';
 
 type FormatoSalida = 'mp3' | 'wav';
@@ -365,33 +365,29 @@ export default function ExtractorAudioVideoPage() {
             <div className={styles.inputsManuales}>
               <div className={styles.inputManualGrupo}>
                 <label className={styles.etiqueta} htmlFor="inicio-seg">Inicio (segundos)</label>
-                <input
+                {/* Cabo C0311: type="number" con Number(''): vaciar escribía 0 (o 0,1 en el fin)
+                    bajo el cursor y teclear «5» daba «05» o «0.15»; y el valor salía con punto. */}
+                <CampoNumerico
                   id="inicio-seg"
-                  type="number"
                   min={0}
                   max={duracion || 86400}
-                  step={0.1}
-                  value={Number(inicio.toFixed(1))}
-                  onChange={(e) => {
-                    const v = Math.max(0, Number(e.target.value));
-                    setInicio(duracion > 0 ? Math.min(v, fin - 0.1) : v);
-                  }}
+                  paso={0.1}
+                  decimales={1}
+                  valor={inicio}
+                  onCambio={(v) => setInicio(duracion > 0 ? Math.min(v, fin - 0.1) : v)}
                   className={styles.inputNumero}
                 />
               </div>
               <div className={styles.inputManualGrupo}>
                 <label className={styles.etiqueta} htmlFor="fin-seg">Fin (segundos)</label>
-                <input
+                <CampoNumerico
                   id="fin-seg"
-                  type="number"
                   min={0}
                   max={duracion || 86400}
-                  step={0.1}
-                  value={Number(fin.toFixed(1))}
-                  onChange={(e) => {
-                    const v = Number(e.target.value);
-                    setFin(duracion > 0 ? Math.min(Math.max(v, inicio + 0.1), duracion) : Math.max(v, inicio + 0.1));
-                  }}
+                  paso={0.1}
+                  decimales={1}
+                  valor={fin}
+                  onCambio={(v) => setFin(duracion > 0 ? Math.min(Math.max(v, inicio + 0.1), duracion) : Math.max(v, inicio + 0.1))}
                   className={styles.inputNumero}
                 />
               </div>

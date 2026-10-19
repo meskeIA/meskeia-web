@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  CampoNumerico,
 } from '@/components';
 import { formatNumber } from '@/lib';
 import {
@@ -243,27 +244,23 @@ export default function SimuladorCalorimetria() {
         </div>
         <div className={styles.inputGroup}>
           <label htmlFor={`${idBase}-masa`}>Masa (g)</label>
-          <input
+          <CampoNumerico
             id={`${idBase}-masa`}
-            type="number"
-            inputMode="decimal"
-            min={1}
-            step={10}
+            min={0}
+            paso={10}
             className={styles.numberInput}
-            value={cuerpo.masaG}
-            onChange={(ev) => setCuerpo({ ...cuerpo, masaG: Math.max(Number(ev.target.value) || 0, 0) })}
+            valor={cuerpo.masaG}
+            onCambio={(v) => setCuerpo({ ...cuerpo, masaG: v })}
           />
         </div>
         <div className={styles.inputGroup}>
           <label htmlFor={`${idBase}-temp`}>Temperatura inicial (°C)</label>
-          <input
+          {/* Cabo C0311: con type="number" y `|| 0` no se podía teclear el signo menos */}
+          <CampoNumerico
             id={`${idBase}-temp`}
-            type="number"
-            inputMode="decimal"
-            step={1}
             className={styles.numberInput}
-            value={cuerpo.temperatura}
-            onChange={(ev) => setCuerpo({ ...cuerpo, temperatura: Number(ev.target.value) || 0 })}
+            valor={cuerpo.temperatura}
+            onCambio={(v) => setCuerpo({ ...cuerpo, temperatura: v })}
           />
           <span className={styles.inputHint}>
             Con datos entre {formatNumber(r.min, 1)} °C y {formatNumber(r.max, 0)} °C
@@ -367,29 +364,24 @@ export default function SimuladorCalorimetria() {
                     Masa
                     <span className={styles.valueBadge}>{formatNumber(masaG / 1000, 3)} kg</span>
                   </label>
-                  <input
+                  <CampoNumerico
                     id="masa"
-                    type="number"
-                    inputMode="decimal"
-                    min={1}
-                    step={10}
+                    min={0}
+                    paso={10}
                     className={styles.numberInput}
-                    value={masaG}
-                    onChange={(ev) => setMasaG(Math.max(Number(ev.target.value) || 0, 0))}
+                    valor={masaG}
+                    onCambio={setMasaG}
                   />
                   <span className={styles.inputHint}>En gramos. Un litro de agua son 1.000 g.</span>
                 </div>
 
                 <div className={styles.inputGroup}>
                   <label htmlFor="t-inicial">Temperatura inicial (°C)</label>
-                  <input
+                  <CampoNumerico
                     id="t-inicial"
-                    type="number"
-                    inputMode="decimal"
-                    step={1}
                     className={styles.numberInput}
-                    value={tInicial}
-                    onChange={(ev) => setTInicial(Number(ev.target.value) || 0)}
+                    valor={tInicial}
+                    onCambio={setTInicial}
                   />
                   <span className={styles.inputHint}>
                     Con datos entre {formatNumber(rango.min, 1)} °C y {formatNumber(rango.max, 0)} °C
@@ -398,14 +390,11 @@ export default function SimuladorCalorimetria() {
 
                 <div className={styles.inputGroup}>
                   <label htmlFor="t-final">Temperatura final (°C)</label>
-                  <input
+                  <CampoNumerico
                     id="t-final"
-                    type="number"
-                    inputMode="decimal"
-                    step={1}
                     className={styles.numberInput}
-                    value={tFinal}
-                    onChange={(ev) => setTFinal(Number(ev.target.value) || 0)}
+                    valor={tFinal}
+                    onCambio={setTFinal}
                   />
                   <span className={styles.inputHint}>
                     {sustancia.tFusion !== undefined
@@ -423,15 +412,13 @@ export default function SimuladorCalorimetria() {
                     Potencia del aparato
                     <span className={styles.valueBadge}>{formatNumber(potencia, 0)} W</span>
                   </label>
-                  <input
+                  <CampoNumerico
                     id="potencia"
-                    type="number"
-                    inputMode="decimal"
                     min={0}
-                    step={100}
+                    paso={100}
                     className={styles.numberInput}
-                    value={potencia}
-                    onChange={(ev) => setPotencia(Math.max(Number(ev.target.value) || 0, 0))}
+                    valor={potencia}
+                    onCambio={setPotencia}
                   />
                   <span className={styles.inputHint}>
                     Para estimar cuánto tardaría. Un hervidor doméstico ronda los 2.000 W.

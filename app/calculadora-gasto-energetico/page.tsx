@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalculadoraGastoEnergetico.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard, CampoNumerico } from '@/components';
 import { formatNumber, formatCurrency } from '@/lib';
 
 interface Electrodomestico {
@@ -414,43 +414,49 @@ export default function CalculadoraGastoEnergeticoPage() {
                   </div>
 
                   <div className={styles.electrodomesticoInputs}>
+                    {/* Cabo C0311: eran type="number" con `|| 0` / `|| 1`: vaciar escribía el
+                        respaldo bajo el cursor y teclear «5» dejaba «05» o «15». */}
                     <div className={styles.inputGroup}>
-                      <label>Potencia (W)</label>
-                      <input
-                        type="number"
-                        value={e.potencia}
-                        onChange={(ev) => actualizarElectrodomestico(e.id, 'potencia', parseInt(ev.target.value) || 0)}
-                        min="1"
+                      <label htmlFor={`potencia-${e.id}`}>Potencia (W)</label>
+                      <CampoNumerico
+                        id={`potencia-${e.id}`}
+                        valor={e.potencia}
+                        onCambio={(v) => actualizarElectrodomestico(e.id, 'potencia', v)}
+                        min={1}
+                        decimales={0}
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>Horas/día</label>
-                      <input
-                        type="number"
-                        value={e.horasDia}
-                        onChange={(ev) => actualizarElectrodomestico(e.id, 'horasDia', parseFloat(ev.target.value) || 0)}
-                        min="0"
-                        max="24"
-                        step="0.5"
+                      <label htmlFor={`horas-${e.id}`}>Horas/día</label>
+                      <CampoNumerico
+                        id={`horas-${e.id}`}
+                        valor={e.horasDia}
+                        onCambio={(v) => actualizarElectrodomestico(e.id, 'horasDia', v)}
+                        min={0}
+                        max={24}
+                        paso={0.5}
+                        decimales={2}
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>Días/mes</label>
-                      <input
-                        type="number"
-                        value={e.diasMes}
-                        onChange={(ev) => actualizarElectrodomestico(e.id, 'diasMes', parseInt(ev.target.value) || 0)}
-                        min="1"
-                        max="31"
+                      <label htmlFor={`dias-${e.id}`}>Días/mes</label>
+                      <CampoNumerico
+                        id={`dias-${e.id}`}
+                        valor={e.diasMes}
+                        onCambio={(v) => actualizarElectrodomestico(e.id, 'diasMes', v)}
+                        min={1}
+                        max={31}
+                        decimales={0}
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>Cantidad</label>
-                      <input
-                        type="number"
-                        value={e.cantidad}
-                        onChange={(ev) => actualizarElectrodomestico(e.id, 'cantidad', parseInt(ev.target.value) || 1)}
-                        min="1"
+                      <label htmlFor={`cantidad-${e.id}`}>Cantidad</label>
+                      <CampoNumerico
+                        id={`cantidad-${e.id}`}
+                        valor={e.cantidad}
+                        onCambio={(v) => actualizarElectrodomestico(e.id, 'cantidad', v)}
+                        min={1}
+                        decimales={0}
                       />
                     </div>
                   </div>

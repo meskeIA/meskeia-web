@@ -9,16 +9,28 @@ import {
   RelatedApps,
   ShareCard,
   EducationalSection,
+  CampoNumerico,
 } from '@/components';
 import { calcularPrediccionRunning, type ResultadoPrediccionRunning } from '@/lib/calculadoras/deporte';
 import { formatNumber } from '@/lib';
 
+/** Sin cifra todavía, el campo libre se queda vacío y enseña su ejemplo. */
+const distanciaLibreTexto = (v: number): string =>
+  v > 0 ? v.toLocaleString('es-ES', { maximumFractionDigits: 3 }) : '';
+
 export default function CalculadoraTiemposRunningPage() {
-  const [distanciaBase, setDistanciaBase] = useState<number>(10);
+  // Cabo C0311: la distancia personalizada vivía en el MISMO estado que el desplegable, con el
+  // 0 como marca de «personalizada»; al teclear «8» el estado dejaba de ser 0 y el campo
+  // desaparecía bajo los dedos. Ahora el desplegable y la cifra libre van por separado.
+  const [seleccionBase, setSeleccionBase] = useState<number>(10);
+  const [baseLibre, setBaseLibre] = useState<number>(0);
+  const distanciaBase = seleccionBase === 0 ? baseLibre : seleccionBase;
   const [horas, setHoras] = useState<number>(0);
   const [minutos, setMinutos] = useState<number>(50);
   const [segundos, setSegundos] = useState<number>(0);
-  const [distanciaObjetivo, setDistanciaObjetivo] = useState<number>(42.195);
+  const [seleccionObjetivo, setSeleccionObjetivo] = useState<number>(42.195);
+  const [objetivoLibre, setObjetivoLibre] = useState<number>(0);
+  const distanciaObjetivo = seleccionObjetivo === 0 ? objetivoLibre : seleccionObjetivo;
   const [resultado, setResultado] = useState<ResultadoPrediccionRunning | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -121,8 +133,8 @@ export default function CalculadoraTiemposRunningPage() {
             <select
               id="distanciaBase"
               className={styles.select}
-              value={distanciaBase}
-              onChange={(e) => setDistanciaBase(parseFloat(e.target.value))}
+              value={seleccionBase}
+              onChange={(e) => setSeleccionBase(Number(e.target.value))}
             >
               {distanciasEstandar.map((d) => (
                 <option key={d.valor} value={d.valor}>
@@ -131,14 +143,18 @@ export default function CalculadoraTiemposRunningPage() {
               ))}
               <option value="0">Distancia personalizada</option>
             </select>
-            {distanciaBase === 0 && (
-              <input
-                type="number"
+            {seleccionBase === 0 && (
+              <CampoNumerico
+                id="distanciaBaseLibre"
                 className={styles.input}
                 placeholder="Ej: 8"
-                min="0.1"
-                step="0.1"
-                onChange={(e) => setDistanciaBase(parseFloat(e.target.value) || 0)}
+                ariaLabel="Distancia base personalizada en km"
+                valor={baseLibre}
+                onCambio={setBaseLibre}
+                min={0}
+                paso={0.1}
+                decimales={3}
+                formatear={distanciaLibreTexto}
               />
             )}
           </div>
@@ -147,38 +163,41 @@ export default function CalculadoraTiemposRunningPage() {
             <label className={styles.label}>Tiempo de referencia</label>
             <div className={styles.timeInputs}>
               <div className={styles.timeField}>
-                <input
-                  type="number"
+                <CampoNumerico
+                  id="horas"
                   className={styles.timeInput}
-                  value={horas}
+                  valor={horas}
+                  onCambio={setHoras}
                   min={0}
                   max={23}
-                  onChange={(e) => setHoras(Math.max(0, parseInt(e.target.value) || 0))}
-                  aria-label="Horas"
+                  decimales={0}
+                  ariaLabel="Horas"
                 />
                 <span className={styles.timeLabel}>h</span>
               </div>
               <div className={styles.timeField}>
-                <input
-                  type="number"
+                <CampoNumerico
+                  id="minutos"
                   className={styles.timeInput}
-                  value={minutos}
+                  valor={minutos}
+                  onCambio={setMinutos}
                   min={0}
                   max={59}
-                  onChange={(e) => setMinutos(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-                  aria-label="Minutos"
+                  decimales={0}
+                  ariaLabel="Minutos"
                 />
                 <span className={styles.timeLabel}>min</span>
               </div>
               <div className={styles.timeField}>
-                <input
-                  type="number"
+                <CampoNumerico
+                  id="segundos"
                   className={styles.timeInput}
-                  value={segundos}
+                  valor={segundos}
+                  onCambio={setSegundos}
                   min={0}
                   max={59}
-                  onChange={(e) => setSegundos(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-                  aria-label="Segundos"
+                  decimales={0}
+                  ariaLabel="Segundos"
                 />
                 <span className={styles.timeLabel}>seg</span>
               </div>
@@ -192,8 +211,8 @@ export default function CalculadoraTiemposRunningPage() {
             <select
               id="distanciaObjetivo"
               className={styles.select}
-              value={distanciaObjetivo}
-              onChange={(e) => setDistanciaObjetivo(parseFloat(e.target.value))}
+              value={seleccionObjetivo}
+              onChange={(e) => setSeleccionObjetivo(Number(e.target.value))}
             >
               {distanciasEstandar.map((d) => (
                 <option key={d.valor} value={d.valor}>
@@ -202,14 +221,18 @@ export default function CalculadoraTiemposRunningPage() {
               ))}
               <option value="0">Distancia personalizada</option>
             </select>
-            {distanciaObjetivo === 0 && (
-              <input
-                type="number"
+            {seleccionObjetivo === 0 && (
+              <CampoNumerico
+                id="distanciaObjetivoLibre"
                 className={styles.input}
                 placeholder="Ej: 30"
-                min="0.1"
-                step="0.1"
-                onChange={(e) => setDistanciaObjetivo(parseFloat(e.target.value) || 0)}
+                ariaLabel="Distancia objetivo personalizada en km"
+                valor={objetivoLibre}
+                onCambio={setObjetivoLibre}
+                min={0}
+                paso={0.1}
+                decimales={3}
+                formatear={distanciaLibreTexto}
               />
             )}
           </div>

@@ -5,7 +5,7 @@ import styles from './CreadorThumbnails.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
-  DisclaimerCard,
+  DisclaimerCard, CampoNumerico,
 } from '@/components';
 
 // Constantes del canvas
@@ -956,13 +956,16 @@ export default function CreadorThumbnailsPage() {
                             onChange={(e) => updateSelected({ textStrokeColor: e.target.value })}
                             className={styles.colorPickerSmall}
                           />
-                          <input
-                            type="number"
-                            min="1"
-                            max="10"
-                            value={selectedElement.textStrokeWidth || 2}
-                            onChange={(e) => updateSelected({ textStrokeWidth: Number(e.target.value) })}
+                          {/* Cabo C0311: con `value={x || 2}`, vaciar ponía 0 en el estado y el
+                              campo pintaba «2» bajo el cursor; teclear «5» daba «25». */}
+                          <CampoNumerico
+                            min={1}
+                            max={10}
+                            decimales={0}
+                            valor={selectedElement.textStrokeWidth || 2}
+                            onCambio={(v) => updateSelected({ textStrokeWidth: v })}
                             className={styles.numberInput}
+                            ariaLabel="Grosor del contorno del texto"
                           />
                         </>
                       )}

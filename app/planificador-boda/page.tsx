@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './PlanificadorBoda.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 
 // Tipos
@@ -672,12 +672,14 @@ export default function PlanificadorBodaPage() {
                       placeholder="Nombre del evento"
                     />
                     <div className={styles.durationWrapper}>
-                      <input
-                        type="number"
-                        value={event.duration}
-                        onChange={(e) => updateTimelineEvent(event.id, 'duration', parseInt(e.target.value) || 0)}
+                      {/* Cabo C0311: `|| 0` sobre type="number" escribía 0 al vaciar y «045» al teclear */}
+                      <CampoNumerico
+                        valor={event.duration}
+                        onCambio={(v) => updateTimelineEvent(event.id, 'duration', v)}
                         className={styles.durationInput}
-                        min="0"
+                        min={0}
+                        decimales={0}
+                        ariaLabel={`Duración en minutos del evento ${index + 1}`}
                       />
                       <span className={styles.durationLabel}>min</span>
                     </div>

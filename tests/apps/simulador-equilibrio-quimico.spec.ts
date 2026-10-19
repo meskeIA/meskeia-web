@@ -212,8 +212,8 @@ test('CASO 1 (normal) — water-gas shift: Q, Kc, Δn y la ICE completa', async 
   //   ICE desde CO=1, H₂O=1, CO₂=0,5, H₂=0,5 con Kc=5:
   //   x = (√5 − 0,5)/(1 + √5) = 1,7360679/3,2360679 = 0,5364745
   //   CO = H₂O = 1 − x = 0,4635 · CO₂ = H₂ = 0,5 + x = 1,0365
-  await expect(page.locator('#conc-CO')).toHaveValue('0.4635');
-  await expect(page.locator('#conc-CO₂')).toHaveValue('1.0365');
+  await expect(page.locator('#conc-CO')).toHaveValue('0,4635');
+  await expect(page.locator('#conc-CO₂')).toHaveValue('1,0365');
 
   // Q = (1,0365)² / (0,4635)² = 1,074332 / 0,214832 = 5,0008 ≈ Kc
   await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('5,0008');
@@ -237,7 +237,7 @@ test('CASO 1 bis (normal) — Haber-Bosch: la ICE con coeficientes 1:3:2', async
   //   Partiendo de N₂=1, H₂=3, NH₃=0,5 con Kc=0,5, el avance ξ lleva a
   //   N₂ = 0,5964 · H₂ = 1,7893 · NH₃ = 1,3071
   //   Q = 1,3071² / (0,5964 · 1,7893³) = 1,70851 / 3,41655 = 0,5001 ≈ Kc ✓
-  await expect(page.locator('#conc-N₂')).toHaveValue('0.5964');
+  await expect(page.locator('#conc-N₂')).toHaveValue('0,5964');
   await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,5001');
   await expect(valorDe(page, 'Kc (a 298 K)')).toHaveText('0,5000');
   // Δn = 2 − (1+3) = −2
@@ -264,16 +264,16 @@ test('CASO 2 (límite) — con Δn = 0 la presión no mueve absolutamente nada',
   // ⚠️ Concentraciones actualizadas el 23/08/2026: se parte del equilibrio (hallazgo 171).
   // Lo que se comprueba es lo mismo: con Δn = 0 la presión no mueve NADA.
   await page.getByRole('button', { name: /Comprimir/ }).click();
-  await expect(page.locator('#conc-CO')).toHaveValue('0.4635');
-  await expect(page.locator('#conc-H₂O')).toHaveValue('0.4635');
-  await expect(page.locator('#conc-CO₂')).toHaveValue('1.0365');
-  await expect(page.locator('#conc-H₂')).toHaveValue('1.0365');
+  await expect(page.locator('#conc-CO')).toHaveValue('0,4635');
+  await expect(page.locator('#conc-H₂O')).toHaveValue('0,4635');
+  await expect(page.locator('#conc-CO₂')).toHaveValue('1,0365');
+  await expect(page.locator('#conc-H₂')).toHaveValue('1,0365');
   await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('5,0008');
   await expect(mensaje(page)).toContainText('Δn = 0 (igual número de moles de gas a cada lado)');
   await expect(mensaje(page)).toContainText('la presión no mueve el equilibrio');
 
   await page.getByRole('button', { name: /Expandir/ }).click();
-  await expect(page.locator('#conc-CO')).toHaveValue('0.4635');
+  await expect(page.locator('#conc-CO')).toHaveValue('0,4635');
   await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('5,0008');
   await expect(mensaje(page)).toContainText('Expandiste el sistema, pero Δn = 0');
   await expect(mensaje(page)).toContainText('la presión no mueve el equilibrio');
@@ -284,7 +284,7 @@ test('CASO 2 (límite) — con Δn = 0 la presión no mueve absolutamente nada',
   await page.getByRole('button', { name: /Comprimir/ }).click();
   // Equilibrio de partida: desde AcOH=EtOH=1 y éster=H₂O=0,2 con Kc=4,
   // (0,2+x)/(1−x) = 2 ⇒ x = 0,6 ⇒ AcOH = 0,4 y éster = 0,8 ⇒ Q = 0,8²/0,4² = 4
-  await expect(page.locator('#conc-CH₃COOH')).toHaveValue('0.4');
+  await expect(page.locator('#conc-CH₃COOH')).toHaveValue('0,4');
   await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('4,0000');
 });
 
@@ -293,9 +293,9 @@ test('CASO 2 (límite) — con Δn ≠ 0 comprimir sí mueve Q, y en el sentido 
   await reaccion(page, /Haber-Bosch/).click();
   await page.getByRole('button', { name: /Comprimir/ }).click();
   // ⚠️ Actualizado el 23/08/2026: se parte del equilibrio (N₂ 0,5964 · H₂ 1,7893 · NH₃ 1,3071).
-  await expect(page.locator('#conc-N₂')).toHaveValue('1.1928');
-  await expect(page.locator('#conc-H₂')).toHaveValue('3.5786');
-  await expect(page.locator('#conc-NH₃')).toHaveValue('2.6142');
+  await expect(page.locator('#conc-N₂')).toHaveValue('1,1928');
+  await expect(page.locator('#conc-H₂')).toHaveValue('3,5786');
+  await expect(page.locator('#conc-NH₃')).toHaveValue('2,6142');
   // Q = 2,6142² / (1,1928 · 3,5786³) = 6,83405 / 54,6620 = 0,1250
   // — exactamente Q/4 del 0,5001 de partida, que es la propiedad que Δn = −2 garantiza
   await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,1250');
@@ -348,19 +348,29 @@ test('el catalizador no toca ni el equilibrio ni Kc', async ({ page }) => {
 test('CASO 3 (rechazo) — negativo, vacío y texto no producen NaN ni resultado imposible', async ({ page }) => {
   await reaccion(page, /Haber-Bosch/).click();
 
+  // Desde el cabo C0311 el campo es un CampoNumerico: mientras tiene el foco enseña lo
+  // tecleado tal cual (vaciarlo no lo rellena con 0 bajo el cursor), y al salir enseña el valor
+  // que usa la app. Por eso cada caso se comprueba tras salir del campo (Tab).
+  const campoN2 = page.locator('#conc-N₂');
+
   // −5 mol/L no existe: debe quedarse en 0.
-  await page.locator('#conc-N₂').fill('-5');
-  await expect(page.locator('#conc-N₂')).toHaveValue('0');
+  await campoN2.fill('-5');
+  await expect(campoN2).toHaveAttribute('aria-valuenow', '0');
+  await campoN2.press('Tab');
+  await expect(campoN2).toHaveValue('0');
 
-  // Campo vacío: tampoco es una cantidad.
-  await page.locator('#conc-N₂').fill('');
-  await expect(page.locator('#conc-N₂')).toHaveValue('0');
+  // Campo vacío: tampoco es una cantidad, y no cambia el valor aplicado.
+  await campoN2.fill('');
+  await campoN2.press('Tab');
+  await expect(campoN2).toHaveValue('0');
 
-  // Texto tecleado de verdad (el input[type=number] lo descarta antes de llegar al estado).
-  await page.locator('#conc-N₂').click();
+  // Texto tecleado de verdad: las letras no entran en el campo.
+  await campoN2.click();
   await page.keyboard.press('Control+A');
   await page.keyboard.type('abc');
-  await expect(page.locator('#conc-N₂')).toHaveValue('0');
+  await expect(campoN2).not.toHaveValue(/abc/);
+  await campoN2.press('Tab');
+  await expect(campoN2).toHaveValue('0');
 
   // Y en ninguno de los tres el panel 5 emite basura.
   const panel = await panelCuantitativo(page).innerText();
@@ -475,11 +485,16 @@ test('HALLAZGO [4] — la temperatura no se valida: −100 K se acepta como esta
 
   // El input declara min={100} y max={2000}, pero el onChange hace `parseFloat(v) || 298`
   // sin acotar, así que esos límites nunca llegan al estado.
+  // Se lee al SALIR del campo (cabo C0311): con el foco, CampoNumerico enseña lo tecleado y
+  // solo acota lo aplicado, para no reescribir «3» como «100» cuando se va a teclear «350».
   await campo.fill('-100');
+  await campo.press('Tab');
   const bajoCero = await campo.inputValue();
   await campo.fill('99999');
-  const pasado = await campo.inputValue();
+  await campo.press('Tab');
+  const pasado = (await campo.inputValue()).replace(/\./g, '');
   await campo.fill('0');
+  await campo.press('Tab');
   const cero = await campo.inputValue();
 
   // Por debajo del cero absoluto no hay estado físico: debe acotarse al mínimo declarado.
@@ -1092,8 +1107,8 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
 
     // Punto de partida: la app arranca YA en equilibrio (reparación del hallazgo [1]).
     // x = (−0,24 + √0,1776)/2 = 0,0907131 ⇒ 0,9093 / 0,1907 / 0,1907, y Q = Kc = 0,0400.
-    await expect(page.locator('#conc-PCl₅')).toHaveValue('0.9093');
-    await expect(page.locator('#conc-PCl₃')).toHaveValue('0.1907');
+    await expect(page.locator('#conc-PCl₅')).toHaveValue('0,9093');
+    await expect(page.locator('#conc-PCl₃')).toHaveValue('0,1907');
     await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0400');
     await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('⇌ Equilibrio');
     await expect(valorDe(page, 'Δn (gas)')).toHaveText('1');
@@ -1188,7 +1203,8 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
 
     // El campo declara su techo, y el motor de los casos rechaza cualquier T fuera de
     // [100, 2000] con «Esa temperatura está fuera del rango del simulador».
-    await expect(page.locator('#temperatura')).toHaveAttribute('max', '2000');
+    // (Desde el cabo C0311 el campo es un CampoNumerico: el techo se declara con aria-valuemax.)
+    await expect(page.locator('#temperatura')).toHaveAttribute('aria-valuemax', '2000');
     await sembrarValor(page, '#temperatura', 2000);
 
     await page.getByRole('button', { name: /Subir T/ }).click();

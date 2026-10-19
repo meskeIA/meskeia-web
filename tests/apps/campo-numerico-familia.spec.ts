@@ -253,6 +253,155 @@ const CAMPOS: Campo[] = [
       await page.getByRole('tab', { name: 'Multiplicación y Newton' }).click();
     },
   },
+  // Lote 3 (cabo C0311, 19/10/2026): respaldo 0 (o 1, o 2) que el campo pintaba; el defecto
+  // más leve de la familia —vaciar escribe 0, «5» da «05», el signo menos no entra—
+  {
+    slug: 'calculadora-gasto-energetico',
+    campo: '[id^="horas-"] >> nth=0',
+    teclear: '2,5',
+    valor: 2.5,
+    alSalir: '2,5',
+    hidratado: 'input',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /Personalizado/ }).first().click();
+    },
+  },
+  {
+    // `|| 1`: vaciar escribía «1» y «3» daba «13»
+    slug: 'calculadora-gasto-energetico',
+    campo: '[id^="cantidad-"] >> nth=0',
+    teclear: '3',
+    valor: 3,
+    alSalir: '3',
+    hidratado: 'input',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /Personalizado/ }).first().click();
+    },
+  },
+  {
+    slug: 'calculadora-tiempos-running',
+    campo: '#minutos',
+    teclear: '45',
+    valor: 45,
+    alSalir: '45',
+  },
+  {
+    // Además el campo libre desaparecía al teclear: compartía estado con el desplegable
+    slug: 'calculadora-tiempos-running',
+    campo: '#distanciaBaseLibre',
+    teclear: '8',
+    valor: 8,
+    alSalir: '8',
+    hidratado: '#minutos',
+    preparar: async (page) => {
+      await page.locator('#distanciaBase').selectOption('0');
+    },
+  },
+  {
+    // Temperatura bajo cero: el signo menos no entraba
+    slug: 'simulador-calorimetria',
+    campo: '#t-inicial',
+    teclear: '-18',
+    valor: -18,
+    alSalir: '-18',
+  },
+  {
+    slug: 'simulador-calorimetria',
+    campo: '#masa',
+    teclear: '250',
+    valor: 250,
+    alSalir: '250',
+  },
+  {
+    slug: 'generador-facturas',
+    campo: '#cantidad-1',
+    teclear: '3',
+    valor: 3,
+    alSalir: '3',
+  },
+  {
+    slug: 'generador-gradientes',
+    campo: 'input[aria-label="Posición del color 2 en porcentaje"]',
+    teclear: '40',
+    valor: 40,
+    alSalir: '40',
+  },
+  {
+    slug: 'generador-horarios-estudio',
+    campo: 'input[aria-label="Horas por semana de Matemáticas"]',
+    teclear: '7',
+    valor: 7,
+    alSalir: '7',
+  },
+  {
+    slug: 'planificador-boda',
+    campo: 'input[aria-label="Duración en minutos del evento 1"]',
+    teclear: '45',
+    valor: 45,
+    alSalir: '45',
+    hidratado: 'input',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /Timeline|Cronograma|Programa/i }).first().click();
+    },
+  },
+  {
+    // Además acotaba en cada pulsación: «3» se volvía 100 y no se podía teclear «350»
+    slug: 'simulador-equilibrio-quimico',
+    campo: '#temperatura',
+    teclear: '350',
+    valor: 350,
+    alSalir: '350',
+  },
+  {
+    slug: 'simulador-equilibrio-quimico',
+    campo: '#conc-N₂',
+    teclear: '0,75',
+    valor: 0.75,
+    alSalir: '0,75',
+  },
+  {
+    slug: 'visualizador-convolucion-kernels',
+    campo: 'input[aria-label="Peso fila 1 columna 1"]',
+    teclear: '-1',
+    valor: -1,
+    alSalir: '-1',
+  },
+  {
+    slug: 'visualizador-convolucion-kernels',
+    campo: '#offset-input',
+    teclear: '-20',
+    valor: -20,
+    alSalir: '-20',
+  },
+  {
+    // Number(''): vaciar escribía 0 y «12» daba «012»; y el valor salía con punto decimal.
+    // El campo solo aparece con un vídeo: basta un fichero cualquiera (sin duración, el inicio
+    // no se acota por el fin).
+    slug: 'extractor-audio-video',
+    campo: '#inicio-seg',
+    teclear: '12,5',
+    valor: 12.5,
+    alSalir: '12,5',
+    hidratado: 'input[type="file"]',
+    preparar: async (page) => {
+      await page.locator('input[type="file"]').setInputFiles({
+        name: 'prueba.mp4', mimeType: 'video/mp4', buffer: Buffer.from('no es un vídeo'),
+      });
+    },
+  },
+  {
+    // `value={x || 2}`: vaciar pintaba «2» bajo el cursor y «5» daba «25»
+    slug: 'creador-thumbnails',
+    campo: 'input[aria-label="Grosor del contorno del texto"]',
+    teclear: '5',
+    valor: 5,
+    alSalir: '5',
+    hidratado: 'input',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /Texto/ }).first().click();
+      await page.getByRole('button', { name: /Añadir Texto/ }).click();
+    },
+  },
 ];
 
 for (const c of CAMPOS) {

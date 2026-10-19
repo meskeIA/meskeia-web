@@ -857,13 +857,13 @@ export default function GeneradorFacturasPage() {
                     </div>
                     <div className={styles.formGroup + ' ' + styles.cantidadField}>
                       <label htmlFor={`cantidad-${linea.id}`}>Cantidad</label>
-                      <input
+                      {/* Cabo C0311: `|| 0` sobre type="number" escribía 0 al vaciar y «05» al teclear */}
+                      <CampoNumerico
                         id={`cantidad-${linea.id}`}
-                        type="number"
-                        value={linea.cantidad}
-                        onChange={e => actualizarLinea(linea.id, 'cantidad', parseFloat(e.target.value) || 0)}
+                        valor={linea.cantidad}
+                        onCambio={(v) => actualizarLinea(linea.id, 'cantidad', v)}
                         min={0}
-                        step={0.01}
+                        decimales={2}
                         className={styles.input}
                       />
                     </div>

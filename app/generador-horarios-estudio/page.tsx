@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import styles from './GeneradorHorarios.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 
 // ============ TIPOS ============
 
@@ -509,13 +509,15 @@ export default function GeneradorHorariosPage() {
                         onChange={e => actualizarAsignatura(asig.id, 'nombre', e.target.value)}
                         placeholder="Nombre"
                       />
-                      <input
-                        type="number"
+                      {/* Cabo C0311: `|| 0` sobre type="number" escribía 0 al vaciar y «05» al teclear */}
+                      <CampoNumerico
                         className={styles.inputHoras}
-                        value={asig.horasSemana}
-                        onChange={e => actualizarAsignatura(asig.id, 'horasSemana', parseInt(e.target.value) || 0)}
+                        valor={asig.horasSemana}
+                        onCambio={v => actualizarAsignatura(asig.id, 'horasSemana', v)}
                         min={1}
                         max={20}
+                        decimales={0}
+                        ariaLabel={`Horas por semana de ${asig.nombre || 'la asignatura'}`}
                       />
                       <span className={styles.horasLabel}>h/sem</span>
                     </div>
