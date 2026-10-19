@@ -10,7 +10,8 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
-  DataReference, RegionBadge
+  DataReference, RegionBadge,
+  CampoNumerico,
 } from '@/components';
 import {
   FISCAL_MATERNIDAD_META,
@@ -281,13 +282,15 @@ export default function EstimacionBajaMaternalPage() {
                 <label className={styles.label} htmlFor="numBebes">
                   Numero de bebes
                 </label>
-                <input
+                {/* Con `type="number"`, vaciar el campo escribía el mínimo bajo el cursor (2 aquí,
+                    1 en los días: «30» daba «130») (cabo C0081) */}
+                <CampoNumerico
                   id="numBebes"
-                  type="number"
                   min={2}
                   max={6}
-                  value={numBebes}
-                  onChange={(e) => setNumBebes(Math.max(2, Math.min(6, Number(e.target.value))))}
+                  decimales={0}
+                  valor={numBebes}
+                  onCambio={setNumBebes}
                   className={styles.numberInput}
                 />
               </div>
@@ -327,13 +330,13 @@ export default function EstimacionBajaMaternalPage() {
                 <label className={styles.label} htmlFor="diasHosp">
                   Dias aproximados de hospitalizacion
                 </label>
-                <input
+                <CampoNumerico
                   id="diasHosp"
-                  type="number"
                   min={1}
                   max={91}
-                  value={diasHospitalizacion}
-                  onChange={(e) => setDiasHospitalizacion(Math.max(1, Math.min(91, Number(e.target.value))))}
+                  decimales={0}
+                  valor={diasHospitalizacion}
+                  onCambio={setDiasHospitalizacion}
                   className={styles.numberInput}
                 />
                 <p className={styles.helpText}>

@@ -187,6 +187,55 @@ const CAMPOS: Campo[] = [
     alSalir: '9',
   },
   {
+    slug: 'calculadora-fechas',
+    campo: '#timeValue',
+    teclear: '30',
+    valor: 30,
+    alSalir: '30',
+  },
+  {
+    // Antes: `|| 30`: vaciar escribía «30» y teclear «21» daba «3021»
+    slug: 'seguimiento-habitos',
+    campo: '#objetivo-dias',
+    teclear: '21',
+    valor: 21,
+    alSalir: '21',
+    hidratado: 'input',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /Nuevo Hábito/ }).click();
+    },
+  },
+  {
+    // Antes: la media no dejaba teclear «-»: vacío → `|| 0` → «0»
+    slug: 'simulador-intervalos-confianza',
+    campo: 'input[aria-label="Media muestral X̄"]',
+    teclear: '-2,5',
+    valor: -2.5,
+    alSalir: '-2,5',
+    hidratado: 'input',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /Modo calculadora/ }).click();
+    },
+  },
+  {
+    slug: 'estimacion-baja-maternal',
+    campo: '#diasHosp',
+    teclear: '30',
+    valor: 30,
+    alSalir: '30',
+    hidratado: 'input',
+    preparar: async (page) => {
+      await page.getByRole('checkbox', { name: /Hospitalizacion neonatal/ }).check();
+    },
+  },
+  {
+    slug: 'generador-facturas',
+    campo: '#configNumero',
+    teclear: '25',
+    valor: 25,
+    alSalir: '25',
+  },
+  {
     slug: 'simulador-programacion-dinamica',
     campo: 'input[aria-label="Peso del objeto 1"]',
     teclear: '5',

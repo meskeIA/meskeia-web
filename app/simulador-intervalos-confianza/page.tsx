@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorIntervalosConfianza.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 
 // ============================================
 // TIPOS
@@ -615,29 +615,28 @@ export default function SimuladorIntervalosConfianzaPage() {
                   <label className={styles.controlLabel}>
                     Media muestral (X̄ = <strong>{fmt(xBarCalc, 2)}</strong>)
                   </label>
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    value={xBarCalc}
-                    step={0.1}
-                    onChange={e => setXBarCalc(parseFloat(e.target.value) || 0)}
+                  {/* Los tres campos: con `type="number"` y `|| respaldo`, vaciar escribía el
+                      respaldo bajo el cursor (n: «2», y «30» daba «230») y la media no dejaba
+                      teclear «-» (cabo C0081) */}
+                  <CampoNumerico
+                    valor={xBarCalc}
+                    paso={0.1}
+                    onCambio={setXBarCalc}
                     className={styles.numberInput}
-                    aria-label="Media muestral X̄"
+                    ariaLabel="Media muestral X̄"
                   />
                 </div>
                 <div className={styles.controlGroup}>
                   <label className={styles.controlLabel}>
                     Desviación muestral (s = <strong>{fmt(sCalc, 2)}</strong>)
                   </label>
-                  <input
-                    type="number"
-                    inputMode="decimal"
-                    value={sCalc}
-                    step={0.1}
+                  <CampoNumerico
+                    valor={sCalc}
+                    paso={0.1}
                     min={0}
-                    onChange={e => setSCalc(Math.max(0, parseFloat(e.target.value) || 0))}
+                    onCambio={setSCalc}
                     className={styles.numberInput}
-                    aria-label="Desviación muestral s"
+                    ariaLabel="Desviación muestral s"
                   />
                 </div>
               </div>
@@ -647,15 +646,13 @@ export default function SimuladorIntervalosConfianzaPage() {
                   <label className={styles.controlLabel}>
                     Tamaño muestral (n = <strong>{nCalc}</strong>)
                   </label>
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    value={nCalc}
-                    step={1}
+                  <CampoNumerico
+                    valor={nCalc}
                     min={2}
-                    onChange={e => setNCalc(Math.max(2, parseInt(e.target.value) || 2))}
+                    decimales={0}
+                    onCambio={setNCalc}
                     className={styles.numberInput}
-                    aria-label="Tamaño muestral n"
+                    ariaLabel="Tamaño muestral n"
                   />
                 </div>
                 <div className={styles.controlGroup}>

@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 import { useState, useEffect } from 'react';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from './CalculadoraFechas.module.css';
 import { formatDate } from '@/lib';
@@ -598,14 +598,16 @@ export default function CalculadoraFechas() {
                 <label htmlFor="timeValue" className={styles.label}>
                   Cantidad:
                 </label>
-                <input
-                  type="number"
+                {/* Con `type="number"` y `|| 1`, vaciar el campo escribía «1» bajo el cursor y
+                    teclear «30» daba «130» (cabo C0081) */}
+                <CampoNumerico
                   id="timeValue"
                   className={styles.input}
-                  value={timeValue}
-                  onChange={(e) => setTimeValue(parseInt(e.target.value) || 1)}
+                  valor={timeValue}
+                  onCambio={setTimeValue}
                   min={1}
                   max={10000}
+                  decimales={0}
                 />
               </div>
 

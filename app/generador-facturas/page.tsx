@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneradorFacturas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
+import { RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard, CampoNumerico } from '@/components';
 import { formatCurrency, formatDate } from '@/lib';
 
 // Tipos
@@ -775,12 +775,14 @@ export default function GeneradorFacturasPage() {
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="configNumero">Número</label>
-                <input
+                {/* Con `type="number"` y `|| 1`, vaciar el campo escribía «1» bajo el cursor y
+                    teclear «25» daba «125» (cabo C0081) */}
+                <CampoNumerico
                   id="configNumero"
-                  type="number"
-                  value={config.numero}
-                  onChange={e => setConfig({ ...config, numero: parseInt(e.target.value) || 1 })}
+                  valor={config.numero}
+                  onCambio={(v) => setConfig({ ...config, numero: v })}
                   min={1}
+                  decimales={0}
                   className={styles.input}
                 />
               </div>

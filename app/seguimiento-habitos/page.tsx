@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './SeguimientoHabitos.module.css';
-import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard, CampoNumerico } from '@/components';
 
 // Tipos
 interface Habito {
@@ -876,14 +876,17 @@ export default function SeguimientoHabitosPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Objetivo de días consecutivos</label>
-              <input
-                type="number"
+              <label className={styles.formLabel} htmlFor="objetivo-dias">Objetivo de días consecutivos</label>
+              {/* Con `type="number"` y `|| 30`, vaciar el campo escribía «30» bajo el cursor y
+                  teclear «21» daba «3021» (cabo C0081). Sin htmlFor, el campo no tenía nombre. */}
+              <CampoNumerico
+                id="objetivo-dias"
                 className={styles.formInput}
-                value={formObjetivo}
-                onChange={e => setFormObjetivo(parseInt(e.target.value) || 30)}
+                valor={formObjetivo}
+                onCambio={setFormObjetivo}
                 min={1}
                 max={365}
+                decimales={0}
               />
             </div>
 
