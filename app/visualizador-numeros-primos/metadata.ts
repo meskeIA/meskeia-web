@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Los Números Primos - Criba de Eratóstenes y Espiral de Ulam | meskeIA',
-  description: 'Visualiza la criba de Eratóstenes animada, la espiral de Ulam, primos gemelos y por qué la criptografía RSA depende de los primos. Explicador visual interactivo.',
-  keywords: 'números primos, criba eratóstenes, espiral ulam, primos gemelos, RSA, criptografía, mersenne, riemann, matemáticas, explicador visual',
+  title: 'Números Primos: Criba de Eratóstenes del 1 al 1000, Imprimible | meskeIA',
+  description: 'Criba de Eratóstenes animada en el rango que pidas (del 1 al 100, del 101 al 200… hasta 1000) y hoja para hacerla a mano con su solucionario. Además, espiral de Ulam, primos gemelos y RSA.',
+  keywords: 'números primos, criba eratóstenes, números primos del 1 al 100, criba imprimible, espiral ulam, primos gemelos, RSA, criptografía, mersenne, riemann, matemáticas, explicador visual',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -38,6 +38,8 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/visualizador-numeros-primos/',
   features: [
     'Criba de Eratóstenes animada paso a paso con velocidad ajustable',
+    'Criba en cualquier rango entre 1 y 1000 (del 101 al 200, del 1 al 300…)',
+    'Hoja imprimible para cribar a mano, con solucionario en página aparte',
     'Espiral de Ulam con patrones diagonales de primos',
     'Explicación visual de criptografía RSA',
     'Primos gemelos, de Mersenne y récords mundiales',
@@ -86,6 +88,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Hay infinitos números primos; Euclides demostró esto hace más de 2.300 años con un argumento por contradicción. Sin embargo, se vuelven progresivamente más escasos: el teorema de los números primos establece que la densidad de primos cerca de N es aproximadamente 1/ln(N). El primo más grande conocido a 2024 es 2^136.279.841 − 1, un número de Mersenne con más de 41 millones de dígitos, descubierto por el proyecto distribuido GIMPS.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Cómo se hace la criba de Eratóstenes del 101 al 200?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Se tachan los múltiplos de los primos hasta la raíz cuadrada de 200, que ronda 14,1: el 2, el 3, el 5, el 7, el 11 y el 13. Ninguno de ellos está entre 101 y 200, pero sus múltiplos sí, y hay que tacharlos igual. Lo que queda sin tachar son los 21 primos del intervalo, del 101 al 199. Del 1 al 100 basta con el 2, el 3, el 5 y el 7, y quedan 25 primos.',
       },
     },
   ],

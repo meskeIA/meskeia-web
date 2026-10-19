@@ -2,6 +2,7 @@
 // @disclaimer: exempt
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import styles from './NumerosPrimos.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -9,8 +10,10 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
+  NumberInput,
 } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
+import { CRIBA_MAXIMO, resolverCriba, validarRango } from './motor';
 
 type Seccion = 'criba' | 'patrones' | 'criptografia' | 'datos';
 
@@ -107,8 +110,50 @@ interface CeldaCriba {
   estado: 'pendiente' | 'primo' | 'eliminado' | 'activo';
 }
 
+/**
+ * Rangos de ejercicio habituales. El 101-200 va el segundo porque es, con el 1-300, la
+ * consulta que trae la página: los ejercicios de criba rara vez empiezan en 1 más allá del
+ * primer centenar.
+ */
+const RANGOS_RAPIDOS = [
+  { desde: 1, hasta: 100 },
+  { desde: 101, hasta: 200 },
+  { desde: 1, hasta: 200 },
+  { desde: 1, hasta: 300 },
+  { desde: 1, hasta: 500 },
+  { desde: 1, hasta: CRIBA_MAXIMO },
+];
+
+/** La hoja de papel va siempre a 10 columnas: así los múltiplos de 2 y de 5 caen en columna. */
+const COLUMNAS_HOJA = 10;
+
+/** «2, 3, 5 y 7» */
+function listaConY(numeros: number[]): string {
+  const textos = numeros.map(n => formatNumber(n, 0));
+  if (textos.length <= 1) return textos.join('');
+  return `${textos.slice(0, -1).join(', ')} y ${textos[textos.length - 1]}`;
+}
+
+/**
+ * Filas de la hoja. Se rellena con huecos al principio para que cada número caiga en la
+ * columna de su última cifra (el 101 bajo el 1, el 110 bajo el 10), como en la tabla
+ * clásica del 1 al 100.
+ */
+function filasDeLaHoja(desde: number, hasta: number): (number | null)[][] {
+  const casillas: (number | null)[] = Array((desde - 1) % COLUMNAS_HOJA).fill(null);
+  for (let n = desde; n <= hasta; n++) casillas.push(n);
+  while (casillas.length % COLUMNAS_HOJA !== 0) casillas.push(null);
+  const filas: (number | null)[][] = [];
+  for (let i = 0; i < casillas.length; i += COLUMNAS_HOJA) filas.push(casillas.slice(i, i + COLUMNAS_HOJA));
+  return filas;
+}
+
 function SeccionCriba() {
-  const [limite, setLimite] = useState(100);
+  const [desdeTexto, setDesdeTexto] = useState('1');
+  const [hastaTexto, setHastaTexto] = useState('100');
+  // El último rango VÁLIDO: mientras lo escrito no lo es, la criba se queda en este y lo dice.
+  const [rango, setRango] = useState({ desde: 1, hasta: 100 });
+  const [conSolucionario, setConSolucionario] = useState(true);
   const [celdas, setCeldas] = useState<CeldaCriba[]>([]);
   const [primoActual, setPrimoActual] = useState<number | null>(null);
   const [animando, setAnimando] = useState(false);
@@ -117,6 +162,20 @@ function SeccionCriba() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pasoRef = useRef(0);
   const primosRef = useRef<number[]>([]);
+
+  const { desde, hasta } = rango;
+  const cantidad = hasta - desde + 1;
+  const resuelta = useMemo(() => resolverCriba(desde, hasta), [desde, hasta]);
+  const errorRango = validarRango(parseSpanishNumber(desdeTexto), parseSpanishNumber(hastaTexto));
+  const filasHoja = useMemo(() => filasDeLaHoja(desde, hasta), [desde, hasta]);
+
+  const cambiarRango = (nuevoDesde: string, nuevoHasta: string) => {
+    setDesdeTexto(nuevoDesde);
+    setHastaTexto(nuevoHasta);
+    const d = parseSpanishNumber(nuevoDesde);
+    const h = parseSpanishNumber(nuevoHasta);
+    if (validarRango(d, h) === null) setRango({ desde: d, hasta: h });
+  };
 
   // Inicializar grid
   const inicializar = useCallback(() => {
@@ -128,10 +187,10 @@ function SeccionCriba() {
     setPrimoActual(null);
     setPrimosEncontrados(0);
     pasoRef.current = 0;
-    primosRef.current = generarPrimosHasta(Math.sqrt(limite));
+    primosRef.current = resuelta.primosQueTachan;
 
     const nuevasCeldas: CeldaCriba[] = [];
-    for (let i = 1; i <= limite; i++) {
+    for (let i = resuelta.desde; i <= resuelta.hasta; i++) {
       nuevasCeldas.push({
         numero: i,
         esPrimo: i >= 2,
@@ -140,7 +199,7 @@ function SeccionCriba() {
       });
     }
     setCeldas(nuevasCeldas);
-  }, [limite]);
+  }, [resuelta]);
 
   useEffect(() => {
     inicializar();
@@ -232,7 +291,7 @@ function SeccionCriba() {
     }
   }, [velocidad, animando, ejecutarPaso]);
 
-  const columnas = limite <= 100 ? 10 : limite <= 200 ? 15 : limite <= 300 ? 20 : 25;
+  const columnas = cantidad <= 100 ? 10 : cantidad <= 200 ? 15 : cantidad <= 300 ? 20 : 25;
   const gridClass = columnas === 10 ? styles.gridNumeros10
     : columnas === 15 ? styles.gridNumeros15
     : columnas === 20 ? styles.gridNumeros20
@@ -247,25 +306,47 @@ function SeccionCriba() {
 
   return (
     <div className={styles.seccionContent}>
+      <div className={impresion.noImprimir}>
       <div className={styles.contexto}>
         <p>La <strong>Criba de Eratóstenes</strong> (siglo III a.C.) encuentra todos los primos eliminando múltiplos.
         Empieza por el 2: tacha sus múltiplos. Luego el 3, el 5... Lo que sobrevive es primo.</p>
       </div>
 
-      <div className={styles.controlesCriba}>
-        <div className={styles.controlGroup}>
-          <span className={styles.controlLabel}>Hasta:</span>
-          <select
-            className={styles.controlSelect}
-            value={limite}
-            onChange={e => setLimite(Number(e.target.value))}
-            aria-label="Límite de la criba"
+      <div className={styles.rangosRapidos} role="group" aria-label="Rangos habituales">
+        {RANGOS_RAPIDOS.map(r => (
+          <button
+            key={`${r.desde}-${r.hasta}`}
+            type="button"
+            className={`${styles.btnRango} ${desde === r.desde && hasta === r.hasta ? styles.btnRangoActivo : ''}`}
+            aria-pressed={desde === r.desde && hasta === r.hasta}
+            aria-label={`Del ${formatNumber(r.desde, 0)} al ${formatNumber(r.hasta, 0)}`}
+            onClick={() => cambiarRango(String(r.desde), String(r.hasta))}
           >
-            <option value={100}>100</option>
-            <option value={200}>200</option>
-            <option value={300}>300</option>
-            <option value={500}>500</option>
-          </select>
+            {formatNumber(r.desde, 0)}–{formatNumber(r.hasta, 0)}
+          </button>
+        ))}
+      </div>
+
+      <div className={styles.controlesCriba}>
+        <div className={styles.campoRango}>
+          <NumberInput
+            label="Desde"
+            value={desdeTexto}
+            onChange={v => cambiarRango(v, hastaTexto)}
+            min={1}
+            max={CRIBA_MAXIMO - 1}
+            placeholder="1"
+          />
+        </div>
+        <div className={styles.campoRango}>
+          <NumberInput
+            label="Hasta"
+            value={hastaTexto}
+            onChange={v => cambiarRango(desdeTexto, v)}
+            min={2}
+            max={CRIBA_MAXIMO}
+            placeholder="100"
+          />
         </div>
         <div className={styles.controlGroup}>
           <span className={styles.controlLabel}>Velocidad:</span>
@@ -299,8 +380,24 @@ function SeccionCriba() {
         </button>
       </div>
 
+      {errorRango !== null && (
+        <div className={styles.errorRango} role="alert">
+          {errorRango} La criba sigue mostrando del {formatNumber(desde, 0)} al {formatNumber(hasta, 0)}.
+        </div>
+      )}
+
+      {resuelta.primosFueraDeHoja.length > 0 && (
+        <p className={styles.notaRango}>
+          {resuelta.primosFueraDeHoja.length === 1 ? 'El' : 'Los'} primo{resuelta.primosFueraDeHoja.length === 1 ? '' : 's'}{' '}
+          {listaConY(resuelta.primosFueraDeHoja)} {resuelta.primosFueraDeHoja.length === 1 ? 'no está' : 'no están'} en
+          la cuadrícula porque {resuelta.primosFueraDeHoja.length === 1 ? 'es menor' : 'son menores'} que {formatNumber(desde, 0)},
+          pero sus múltiplos sí: se tachan igual.
+        </p>
+      )}
+
       <div className={styles.contadorPrimos}>
-        Primos encontrados: <span className={styles.contadorDestacado}>{primosEncontrados}</span> de {formatNumber(limite, 0)}
+        Primos encontrados: <span className={styles.contadorDestacado}>{formatNumber(primosEncontrados, 0)}</span> de{' '}
+        {formatNumber(cantidad, 0)} números (del {formatNumber(desde, 0)} al {formatNumber(hasta, 0)})
         {primoActual !== null && (
           <span className={styles.primoActualLabel}>Eliminando múltiplos de {primoActual}</span>
         )}
@@ -353,10 +450,85 @@ function SeccionCriba() {
 
       <div className={styles.insight}>
         <p>
-          Solo necesitas comprobar primos hasta <strong>√n</strong>. Para n = {formatNumber(limite, 0)},
-          basta con probar hasta {Math.floor(Math.sqrt(limite))}. Todo número compuesto ≤ n tiene
-          al menos un factor primo ≤ √n.
+          Solo necesitas comprobar primos hasta <strong>√n</strong>. Para n = {formatNumber(hasta, 0)},{' '}
+          {resuelta.primosQueTachan.length > 0
+            ? <>basta con tachar los múltiplos de {listaConY(resuelta.primosQueTachan)}.</>
+            : <>no hay ningún primo cuyo cuadrado quepa, así que no se tacha nada.</>}{' '}
+          Todo número compuesto ≤ n tiene al menos un factor primo ≤ √n.
         </p>
+      </div>
+      </div>
+
+      <div className={`${styles.bloqueHoja} ${impresion.noImprimir}`}>
+        <h3 className={styles.seccionTitulo}>Hoja para hacerla a mano</h3>
+        <p className={styles.hojaExplicacion}>
+          Imprime la cuadrícula del {formatNumber(desde, 0)} al {formatNumber(hasta, 0)} en blanco, con los
+          pasos y un hueco para el recuento. Sale solo la hoja: el resto de la página no se imprime.
+        </p>
+        <label className={styles.casillaSolucionario}>
+          <input
+            type="checkbox"
+            checked={conSolucionario}
+            onChange={e => setConSolucionario(e.target.checked)}
+          />
+          Añadir el solucionario en una página aparte
+        </label>
+        <button type="button" className={styles.btnSimular} onClick={() => window.print()}>
+          Imprimir la hoja
+        </button>
+      </div>
+
+      {/* Única parte que sale por la impresora (ver styles/impresion.module.css) */}
+      <div className={`${styles.hojaCriba} ${impresion.hoja}`} data-hoja-criba="">
+        <div className={impresion.bloque}>
+          <h2 className={styles.hojaTitulo}>
+            Criba de Eratóstenes del {formatNumber(desde, 0)} al {formatNumber(hasta, 0)}
+          </h2>
+          <p className={styles.hojaDatos}>Nombre: ______________________________ Fecha: ______________</p>
+          <ol className={styles.hojaPasos}>
+            {desde === 1 && <li>Tacha el 1: no es primo.</li>}
+            {resuelta.primosQueTachan.length > 0 && (
+              <li>
+                Para cada uno de estos primos —{listaConY(resuelta.primosQueTachan)}— tacha sus múltiplos
+                mayores que él. El propio primo no se tacha.
+              </li>
+            )}
+            {resuelta.primosFueraDeHoja.length > 0 && (
+              <li>
+                {listaConY(resuelta.primosFueraDeHoja)} {resuelta.primosFueraDeHoja.length === 1 ? 'no está' : 'no están'} en
+                la cuadrícula, pero sus múltiplos sí: táchalos igual.
+              </li>
+            )}
+            <li>Rodea los números que queden sin tachar: son los primos.</li>
+          </ol>
+        </div>
+        <table className={`${styles.tablaHoja} ${impresion.rejilla}`}>
+          <tbody>
+            {filasHoja.map((fila, i) => (
+              <tr key={i}>
+                {fila.map((n, j) => (
+                  <td key={j} className={n === null ? styles.casillaHojaVacia : undefined}>
+                    {n === null ? '' : n}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className={styles.hojaRecuento}>
+          ¿Cuántos primos hay del {formatNumber(desde, 0)} al {formatNumber(hasta, 0)}? ______________
+        </p>
+        {conSolucionario && (
+          <div className={styles.solucionario}>
+            <h2 className={styles.hojaTitulo}>
+              Solucionario: criba del {formatNumber(desde, 0)} al {formatNumber(hasta, 0)}
+            </h2>
+            <p className={styles.hojaDatos}>
+              Hay {formatNumber(resuelta.primos.length, 0)} primo{resuelta.primos.length === 1 ? '' : 's'}:
+            </p>
+            <p className={styles.listaPrimos}>{resuelta.primos.join(', ')}</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -692,7 +864,8 @@ export default function VisualizadorNumerosPrimosPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+        <div className={impresion.noImprimir}>
         <MeskeiaLogo />
         <header className={styles.hero}>
           <h1 className={styles.title}>Los Números Primos</h1>
@@ -718,9 +891,11 @@ export default function VisualizadorNumerosPrimosPage() {
           </h2>
           <p className={styles.seccionSub}>{SECCIONES.find(s => s.id === seccionActiva)?.subtitulo}</p>
         </div>
+        </div>
 
         {renderSeccion()}
 
+        <div className={impresion.noImprimir}>
         <div className={styles.enlaceApp}>
           <span aria-hidden="true">🔗</span> Más matemáticas →{' '}
           <a href="/visualizador-fibonacci-naturaleza/">Fibonacci en la Naturaleza</a> ·{' '}
@@ -749,8 +924,8 @@ export default function VisualizadorNumerosPrimosPage() {
             será gradual, pero los primos seguirán siendo fundamentales en muchas otras áreas.
           </p>
           <div className={styles.warningBox}>
-            <strong>Nota:</strong> La criba de Eratóstenes en esta app está limitada a 500 números
-            por rendimiento del navegador. En la práctica, se usan versiones optimizadas (criba
+            <strong>Nota:</strong> La criba de Eratóstenes en esta app llega hasta el{' '}
+            {formatNumber(CRIBA_MAXIMO, 0)} por rendimiento del navegador. En la práctica, se usan versiones optimizadas (criba
             segmentada) para trabajar con millones de números. Los datos de primos de Mersenne y
             récords se cotejaron con la lista de GIMPS (mersenne.org/primes) el 19/10/2026; el
             puesto 52 es provisional hasta que GIMPS descarte todos los candidatos anteriores.
@@ -760,6 +935,7 @@ export default function VisualizadorNumerosPrimosPage() {
         <RelatedApps />
         <ShareCard appName="visualizador-numeros-primos" />
         <Footer appName="visualizador-numeros-primos" />
+        </div>
     </div>
   );
 }
