@@ -649,6 +649,13 @@ export function calcularResultado(respuestas: readonly number[]): Resultado {
   if (tipo === 'combinacion' && descartes.bici_patinete === 'limitacion') {
     enContra.push(`Movilidad física: has respondido ${cita(10)}. En tu combinación quedan fuera la bici, el patinete y la moto.`);
   }
+  // El coche suma con la limitación porque no exige esfuerzo físico, pero la ficha da por hecho
+  // que conduces tú: a quien declara una condición que afecta al transporte se le dice que puede
+  // impedir conducir y qué hay sin conducir (hallazgo 3210, cabo C0011). La moto ya se descarta
+  // por lo mismo («riesgo de seguridad, no una preferencia»).
+  if (tipo === 'coche_propio' && respondio(10, P10_LIMITACION_IMPORTANTE)) {
+    enContra.push(`Movilidad física: has respondido ${cita(10)}. Esta recomendación da por hecho que conduces tú, y según la condición puede impedirte conducir o exigir un vehículo adaptado: consúltalo con tu médico antes de comprar. Si no puedes conducir, las alternativas son el taxi adaptado, el transporte a demanda de tu zona o que te lleve otra persona.`);
+  }
   if (esBici && respondio(3, P3_BULTOS_HABITUAL)) {
     enContra.push(`Carga y bultos: has respondido ${cita(3)}. En bici hace falta portabultos, alforjas o remolque, y el patinete apenas admite carga.`);
   }

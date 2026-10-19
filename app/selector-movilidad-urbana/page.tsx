@@ -74,6 +74,24 @@ export default function SelectorMovilidadUrbana() {
     if (cambiaPantalla) moverFoco.current = true;
   };
 
+  // Lo que el segundo toque pisa no siempre es de esta app: el foco al encabezado nuevo centra la
+  // vista, la página sube unos 500 px y bajo el dedo queda la fila de enlaces de <LegalNotice />
+  // («Política de Privacidad», «Contacto»), que `clicDeMas` no alcanza (hallazgo 3209). La misma
+  // regla, en fase de captura sobre window, antes de que el enlace o React lo vean, como en
+  // selector-alquiler-vs-compra (3111). Un clic suelto (detail 1) no se toca y cierra la ráfaga.
+  useEffect(() => {
+    function filtrar(e: MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantalla.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantalla.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+
   function seleccionarOpcion(indice: number): void {
     registrarClic(false);
     const nuevasRespuestas = [...respuestas];

@@ -1277,7 +1277,8 @@ test.describe('Re-inspección 10/10/2026 — casos del motor y el cabo C0011', (
     await expect(page.locator('[class*="resultadoTitulo"]')).toBeVisible();
   });
 
-  // ── ABIERTO (inspector 10/10/2026): cabo C0011 — el coche, a quien declara una condición que
+  // ── REPARADO el 19/10/2026 (3210): «Lo que juega en contra» lo dice y da alternativas sin
+  //    conducir. Era el cabo C0011 — el coche, a quien declara una condición que
   //    puede impedir conducir, sin aviso ni alternativa ──
   // La pregunta 10 dice «¿Tienes alguna limitación de movilidad física o condición de salud que
   // afecte al transporte?». «Sí, tengo limitaciones importantes» DESCARTA la moto, que también se
@@ -1289,7 +1290,7 @@ test.describe('Re-inspección 10/10/2026 — casos del motor y el cabo C0011', (
   // vehículo adaptado, ni una alternativa (taxi adaptado, transporte a demanda, que te lleve otra
   // persona). Recuento con el motor: el coche sale en 21.878 de los 34.992 perfiles con esa
   // respuesta, con esa razón en los 21.878 y sin ese aviso en ninguno; en 8.748 es lo único que queda.
-  test.fail('C0011: con «limitaciones importantes», el resultado del coche avisa de que la condición puede impedir conducir y da una alternativa', async ({ page }) => {
+  test('C0011: con «limitaciones importantes», el resultado del coche avisa de que la condición puede impedir conducir y da una alternativa', async ({ page }) => {
     await abrirTest(page);
     const texto = await responder(page, LIMITACION_SOLO_COCHE);
     await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Coche Propio');
@@ -1395,7 +1396,8 @@ async function alturasQueSacan(page: Page, alturas: number[], preparar: () => Pr
   return fuera;
 }
 
-// ── ABIERTO (inspector 10/10/2026): el 2.º toque de un doble toque cae en un ENLACE del aviso legal ──
+// ── REPARADO el 19/10/2026 (3209): la guarda va también en captura sobre window, que ve los
+//    enlaces. Era: el 2.º toque de un doble toque cae en un ENLACE del aviso legal ──
 // El guard de 2698 (`clicDeMas`) vive en los onClick de los botones de la app: un enlace no lo
 // tiene. Tras el 1.er toque, el foco va al encabezado nuevo (la pregunta siguiente, el título del
 // resultado o la pregunta 1) y, si ese encabezado está por encima de la pantalla, Chrome lo
@@ -1423,7 +1425,7 @@ test.describe('Re-inspección 10/10/2026 — doble toque a 360 px', () => {
     await recorridoConDobleToque(page, Math.round(780 * 0.6));
   });
 
-  test.fail('ABIERTO: el 2.º toque de «Siguiente» no saca de la app (botón entre 250 y 280 px)', async ({ page }) => {
+  test('REPARADO (3209): el 2.º toque de «Siguiente» no saca de la app (botón entre 250 y 280 px)', async ({ page }) => {
     test.setTimeout(90_000);
     const fuera = await alturasQueSacan(page, [250, 260, 270, 280],
       async () => { await page.locator('[role="radiogroup"] [role="radio"]').first().tap(); },
@@ -1431,14 +1433,14 @@ test.describe('Re-inspección 10/10/2026 — doble toque a 360 px', () => {
     expect(fuera).toEqual([]);
   });
 
-  test.fail('ABIERTO: el 2.º toque de «Ver mi resultado» no saca de la app (botón entre 210 y 240 px)', async ({ page }) => {
+  test('REPARADO (3209): el 2.º toque de «Ver mi resultado» no saca de la app (botón entre 210 y 240 px)', async ({ page }) => {
     test.setTimeout(150_000);
     const fuera = await alturasQueSacan(page, [210, 220, 230, 240], () => hastaVerResultado(page),
       () => page.getByRole('button', { name: 'Ver mi resultado' }));
     expect(fuera).toEqual([]);
   });
 
-  test.fail('ABIERTO: el 2.º toque de «Repetir el test» no saca de la app (botón entre 270 y 290 px)', async ({ page }) => {
+  test('REPARADO (3209): el 2.º toque de «Repetir el test» no saca de la app (botón entre 270 y 290 px)', async ({ page }) => {
     test.setTimeout(150_000);
     const fuera = await alturasQueSacan(page, [270, 280, 290],
       async () => {
@@ -1465,7 +1467,7 @@ test.describe('Re-inspección 10/10/2026 — doble toque a 390 px', () => {
     await recorridoConDobleToque(page, Math.round(844 * 0.6));
   });
 
-  test.fail('ABIERTO: el 2.º toque de «Siguiente» no saca de la app (botón entre 290 y 320 px)', async ({ page }) => {
+  test('REPARADO (3209): el 2.º toque de «Siguiente» no saca de la app (botón entre 290 y 320 px)', async ({ page }) => {
     test.setTimeout(90_000);
     const fuera = await alturasQueSacan(page, [290, 300, 310, 320],
       async () => { await page.locator('[role="radiogroup"] [role="radio"]').first().tap(); },
@@ -1473,7 +1475,7 @@ test.describe('Re-inspección 10/10/2026 — doble toque a 390 px', () => {
     expect(fuera).toEqual([]);
   });
 
-  test.fail('ABIERTO: el 2.º toque de «Ver mi resultado» no saca de la app (botón entre 240 y 260 px)', async ({ page }) => {
+  test('REPARADO (3209): el 2.º toque de «Ver mi resultado» no saca de la app (botón entre 240 y 260 px)', async ({ page }) => {
     test.setTimeout(150_000);
     const fuera = await alturasQueSacan(page, [240, 250, 260], () => hastaVerResultado(page),
       () => page.getByRole('button', { name: 'Ver mi resultado' }));
