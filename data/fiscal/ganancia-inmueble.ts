@@ -228,7 +228,10 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
       otrasRentasAhorro,
       deduccionCeutaMelilla: 0,
       tipoEfectivo: 0,
-      motivoExencion: 'Mayor de 65 años que transmite su vivienda habitual (art. 33.4.b LIRPF)',
+      // El art. 33.4.b alcanza también a la dependencia severa o gran dependencia (cabo C0047,
+      // leído en el BOE el 19/10/2026): el texto cubre los dos supuestos que activan `exentoPorEdad`.
+      motivoExencion:
+        'Transmisión de la vivienda habitual por mayor de 65 años o por persona en situación de dependencia severa o gran dependencia (art. 33.4.b LIRPF)',
     };
   }
 

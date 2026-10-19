@@ -1503,8 +1503,12 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
-                <h3>Espera la resolución (≈ {COMPLEMENTO_BRECHA_GENERO_2026.plazos.resolucionInssDiasOrientativo} días)</h3>
+                <h3>
+                  Espera la resolución (plazo máximo legal: {COMPLEMENTO_BRECHA_GENERO_2026.plazos.resolucionInssDias} días;{' '}
+                  {COMPLEMENTO_BRECHA_GENERO_2026.plazos.resolucionInssDiasIncapacidad} en incapacidad permanente)
+                </h3>
                 <p>
+                  Lo fija el {COMPLEMENTO_BRECHA_GENERO_2026.plazos.resolucionInssNorma}.{' '}
                   Si la respuesta es favorable, el complemento se abona con efectos desde la fecha
                   que reconozca la SS. Si es desfavorable, se puede plantear reclamación previa en{' '}
                   {COMPLEMENTO_BRECHA_GENERO_2026.plazos.reclamacionPreviaDias} días{' '}

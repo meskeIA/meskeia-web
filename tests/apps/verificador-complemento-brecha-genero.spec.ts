@@ -978,6 +978,20 @@ test.describe('Verificador del complemento por brecha de género', () => {
     expect(fiscal).toContain('60.3.e');
   });
 
+  /*
+   * CABO C0166 (triaje fiscal, 19/10/2026): el plazo de resolución del INSS se presentaba como
+   * «≈ 90 días» orientativo, con un comentario en data/fiscal que negaba que fuera legal. El
+   * anexo del RD 286/2003 (BOE-A-2003-7073) fija el plazo MÁXIMO de resolución y notificación:
+   * 90 días en jubilación y en muerte y supervivencia, 135 en incapacidad permanente.
+   */
+  test('REGRESIÓN: el paso 5 da el plazo máximo LEGAL del INSS, con los 135 días de la incapacidad', async ({ page }) => {
+    await abrirGuia(page);
+    const paso = page.locator('h3', { hasText: 'Espera la resolución' });
+    await expect(paso).toHaveText(/plazo máximo legal: 90 días;\s+135 en incapacidad permanente/);
+    await expect(paso.locator('..')).toContainText('Lo fija el anexo del RD 286/2003.');
+    await expect(paso).not.toContainText('≈');
+  });
+
   // ──────────────────────────────────────────────────────────────────────────
   // RE-INSPECCIÓN DE CIERRE — 28/08/2026
   //

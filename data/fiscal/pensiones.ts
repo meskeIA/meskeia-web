@@ -305,10 +305,13 @@ export function getCoeficienteAnticipada(anosCotizados: number, tabla: Coeficien
 // ─── Plan de Pensiones: límites fiscales 2025 ────────────────────────────────
 
 export const FISCAL_PLAN_PENSIONES_META = {
-  fuente: 'Ley 35/2006 IRPF art. 51 + LPGE 2025 (prórroga 2026)',
-  verificado: '2026-06-14',
+  // Re-sellado el 19/10/2026 (cabo C0024): las cinco cifras de LIMITES_PLAN_PENSIONES_2025,
+  // cotejadas con los arts. 52.1 y 53.1 del texto consolidado; el enlace apuntaba a la
+  // portada de la AEAT.
+  fuente: 'Ley 35/2006 IRPF arts. 51 a 53 + LPGE 2025 (prórroga 2026)',
+  verificado: '2026-10-19',
   vigencia: '2026',
-  urlOficial: 'https://sede.agenciatributaria.gob.es',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a52',
   nota: 'Límites orientativos 2026. Consulta con tu entidad gestora o asesor fiscal.',
 };
 
@@ -969,7 +972,13 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
    *
    * El trámite en sí NO es propio de esta prestación: vive en RECLAMACION_PREVIA_SS, y aquí
    * solo se le ponen los nombres con los que ya lo consume la página. Lo único propio del
-   * complemento es el orientativo de resolución de la solicitud inicial.
+   * complemento es el plazo de resolución de la solicitud inicial.
+   *
+   * ⚠️ Corregido el 19/10/2026 (triaje fiscal, cabo C0166): se presentaba como «orientativo»
+   * con la nota «NO es un plazo legal», y sí lo es. El anexo del RD 286/2003 (BOE-A-2003-7073,
+   * leído en el BOE ese día) fija el «plazo máximo de resolución y notificación» en 90 días
+   * para la pensión de jubilación y para las prestaciones de muerte y supervivencia, y en 135
+   * para las de incapacidad permanente: las tres pensiones que dan derecho al complemento.
    */
   plazos: {
     reclamacionPreviaDias: RECLAMACION_PREVIA_SS.dias,
@@ -977,8 +986,11 @@ export const COMPLEMENTO_BRECHA_GENERO_2026 = {
     reclamacionPreviaNorma: RECLAMACION_PREVIA_SS.norma,
     reclamacionPreviaReiterable: RECLAMACION_PREVIA_SS.reiteracion,
     reclamacionPreviaResolucion: RECLAMACION_PREVIA_SS.resolucion,
-    /** Orientativo: lo que suele tardar el INSS en resolver. NO es un plazo legal. */
-    resolucionInssDiasOrientativo: 90,
+    /** Plazo máximo legal de resolución: jubilación y muerte y supervivencia (anexo del RD 286/2003). */
+    resolucionInssDias: 90,
+    /** Plazo máximo legal de resolución de la incapacidad permanente (anexo del RD 286/2003). */
+    resolucionInssDiasIncapacidad: 135,
+    resolucionInssNorma: 'anexo del RD 286/2003',
   },
 };
 

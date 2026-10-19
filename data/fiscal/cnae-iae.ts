@@ -106,6 +106,10 @@ export interface SeccionIae {
   tipoRetencionInicio: number | null;
 }
 
+/** Retención de las actividades profesionales: general (art. 101.5.a LIRPF) y del inicio de actividad (art. 95.1 RIRPF). */
+const RETENCION_PROFESIONAL_GENERAL = 15;
+const RETENCION_PROFESIONAL_INICIO = 7;
+
 export const SECCIONES_IAE: readonly SeccionIae[] = [
   {
     seccion: '1ª',
@@ -126,10 +130,12 @@ export const SECCIONES_IAE: readonly SeccionIae[] = [
     retencion:
       // «15\u00A0%»: espacio duro entre la cifra y el signo, para que el % no abra línea él
       // solo (hallazgo 2227 del conversor CNAE-IAE; CLAUDE.md §2, desde el 25/09/2026).
-      'Las facturas a empresas y a otros profesionales llevan retención de IRPF: 15\u00A0% con carácter general y 7\u00A0% durante el año de inicio de la actividad y los dos siguientes.',
+      // Las cifras salen de las mismas constantes que `tipoRetencion` y `tipoRetencionInicio`:
+      // hasta el 19/10/2026 se tecleaban aquí y coincidían por casualidad (cabo C0048).
+      `Las facturas a empresas y a otros profesionales llevan retención de IRPF: ${RETENCION_PROFESIONAL_GENERAL}\u00A0% con carácter general y ${RETENCION_PROFESIONAL_INICIO}\u00A0% durante el año de inicio de la actividad y los dos siguientes.`,
     retencionIrpf: true,
-    tipoRetencion: 15,
-    tipoRetencionInicio: 7,
+    tipoRetencion: RETENCION_PROFESIONAL_GENERAL,
+    tipoRetencionInicio: RETENCION_PROFESIONAL_INICIO,
   },
   {
     seccion: '3ª',
