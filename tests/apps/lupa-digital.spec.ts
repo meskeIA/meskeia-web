@@ -854,18 +854,16 @@ test.describe('re-inspección 13/10/2026', () => {
     expect(await usos.ariaSnapshot()).toMatch(/📖 Leer letra pequeña/u);
   });
 
-  // ⚠️ HALLAZGO NUEVO — accesibilidad (13/10/2026). Tres textos usan el color de marca LITERAL
-  // en LupaDigital.module.css en vez de --primary-texto / --secondary-texto, y no llegan a 4,5:1
-  // (WCAG 1.4.3; los tres son texto pequeño, 13-14 px): el preajuste de zoom ACTIVO
+  // ✓ HALLAZGO 3274 REPARADO (19/10/2026) — accesibilidad. Tres textos usaban el color de marca
+  // LITERAL en LupaDigital.module.css en vez de --primary-texto / --secondary-texto, y no llegaban
+  // a 4,5:1 (WCAG 1.4.3; los tres son texto pequeño, 13-14 px): el preajuste de zoom ACTIVO
   // (.zoomPresetActivo, #2E86AB, 3,65:1 en claro y 3,01:1 en oscuro), los consejos de los
   // escenarios (.escenarioTip, #2E86AB, 3,74 / 2,94) y el dato de la FAQ (.faqTip, #48A9A6,
-  // 2,60 / 4,09). Pesa más en una app que se vende para baja visión.
-  // Caso: medir el contraste de los tres sobre su fondo compuesto, en los dos temas → esperado
-  //       ≥ 4,5:1 · obtenido 3,65 / 3,74 / 2,60 en claro y 3,01 / 2,94 / 4,09 en oscuro.
-  test('HALLAZGO NUEVO (accesibilidad) — el texto en color de marca debe llegar a 4,5:1 en los dos temas', async ({
+  // 2,60 / 4,09). La tanda 2 de C0070 (4488bd1d) los pasó a los tokens -texto, pero en oscuro el
+  // tinte de fondo los dejaba en 4,42 y 4,33: la reparación bajó ese tinte del 10-12 % al 5 %.
+  test('3274 — el texto en color de marca llega a 4,5:1 en los dos temas', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#control-zoom']);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();

@@ -331,6 +331,12 @@
   color: var(--primary-texto);
 }
 
+/* Hallazgo 3274 (19/10/2026): en oscuro el tinte del 10 % aclaraba el fondo y --primary-texto
+   se quedaba en 4,42:1. Con el 5 % pasa de 4,5:1; el estado activo lo marca además el borde. */
+[data-theme='dark'] .zoomPresetBtn.zoomPresetActivo {
+  background: rgba(46, 134, 171, 0.05);
+}
+
 /* Filtros */
 .filtrosGrid {
   display: grid;
@@ -600,8 +606,9 @@
   background: var(--bg-card);
 }
 
+/* Hallazgo 3274: con el 12 % el texto quedaba en 4,33:1 en oscuro; con el 5 % pasa de 4,5:1. */
 [data-theme='dark'] .escenarioTip {
-  background: rgba(46, 134, 171, 0.12);
+  background: rgba(46, 134, 171, 0.05);
 }
 
 /* ── EducationalSection: FAQ ── */
