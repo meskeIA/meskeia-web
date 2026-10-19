@@ -687,20 +687,20 @@ test.describe('re-inspección 13/10/2026', () => {
       await expect.poll(async () => (await estadoDelVideo(page))?.pausado).toBe(false);
     });
 
-    // ⚠️ HALLAZGO NUEVO — operativa (13/10/2026). El tope del recorrido de la imagen congelada
-    // sale del ancho del visor (acotarDesplazamiento), pero solo se vuelve a aplicar al cambiar
+    // ✓ HALLAZGO 3273 REPARADO (19/10/2026) — un ResizeObserver reacota al cambiar el visor.
+    // Lo que había — operativa (13/10/2026). El tope del recorrido de la imagen congelada
+    // sale del ancho del visor (acotarDesplazamiento), pero solo se volvía a aplicar al cambiar
     // el zoom o al congelar (useEffect [zoom, congelado]); girar el móvil cambia el ancho del
-    // visor y nadie reacota. En horizontal (863 × 360) el visor mide 660 px y a 4x se puede
+    // visor y nadie reacotaba. En horizontal (863 × 360) el visor mide 660 px y a 4x se puede
     // recorrer hasta 660 × 3 / 2 = 990 px; al volver a vertical el visor mide 392 y el tope es
     // 588, pero el translate se queda en −990: la imagen entera queda fuera del visor y se ve
     // NEGRO (medido: 89 % de píxeles negros, el resto son las insignias superpuestas). Se
     // arregla solo al tocar la imagen o cambiar el zoom, pero hasta entonces parece perdida.
     // Caso: congelar a 4x en horizontal, arrastrar al tope, girar a vertical → esperado que la
     //       imagen cubra el visor de lado a lado · obtenido: translate(−990px), visor en negro.
-    test('HALLAZGO NUEVO (operativa) — al girar el móvil con la imagen congelada y recorrida, el visor se queda en negro', async ({
+    test('3273 — al girar el móvil con la imagen congelada y recorrida, la imagen sigue cubriendo el visor', async ({
       page,
     }) => {
-      test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
       await page.goto(RUTA);
       await esperarHidratacion(page, ['#control-zoom']);
       await page.getByRole('button', { name: /Activar lupa/i }).click();
@@ -721,7 +721,8 @@ test.describe('re-inspección 13/10/2026', () => {
       await page.setViewportSize({ width: 412, height: 839 });
       await expect.poll(async () => (await cajas(page)).visor.ancho).toBe(392);
 
-      // DEBERÍA: la imagen ampliada sigue cubriendo el visor de lado a lado (|x| ≤ 588).
+      // La imagen ampliada sigue cubriendo el visor de lado a lado (|x| ≤ 588).
+      await expect(lienzo).toHaveAttribute('style', /translate\(-588px, 0px\) scale\(4\)/);
       const { lienzo: l, visor: v } = await cajas(page);
       expect({ cubreIzquierda: l.izq <= v.x + 0.5, cubreDerecha: l.der >= v.x + v.ancho - 0.5 }).toEqual({
         cubreIzquierda: true,
@@ -900,17 +901,17 @@ test.describe('re-inspección 13/10/2026', () => {
     expect(bajoMinimo).toEqual([]);
   });
 
-  // ⚠️ HALLAZGO NUEVO — contenido (13/10/2026). La misma pregunta se responde dos veces con
-  // textos distintos: la FAQ visible «¿Puedo dejar la imagen fija para leerla con calma?» y el
+  // ✓ HALLAZGO 3276 REPARADO (19/10/2026): PREGUNTA_IMAGEN_FIJA y RESPUESTA_IMAGEN_FIJA en
+  // metadata.ts, que leen las dos bocas. Lo que había — contenido (13/10/2026). La misma pregunta
+  // se respondía dos veces con textos distintos: la FAQ visible «¿Puedo dejar la imagen fija para leerla con calma?» y el
   // FAQPage de metadata.ts «¿Se puede dejar la imagen fija en vez de sostener el móvil?». No se
   // contradicen, pero cada una añade lo suyo (la visible, «haz una captura de pantalla»; la del
   // FAQPage, «a partir de 4× el temblor de la mano…»), y dos textos a mano acaban divergiendo.
   // Caso: comparar las dos respuestas → esperado una sola (UNA constante en metadata.ts que
   //       importen las dos bocas, como app/simulador-gastos-compraventa-garaje) · obtenido dos.
-  test('HALLAZGO NUEVO (contenido) — la pregunta de la imagen fija debe tener UNA respuesta en la FAQ visible y en el FAQPage', async ({
+  test('3276 — la pregunta de la imagen fija tiene UNA respuesta en la FAQ visible y en el FAQPage', async ({
     page,
   }) => {
-    test.fail(); // hallazgo abierto: el día que se repare, quitar esta línea
     await page.goto(RUTA);
     const preguntas = await page.evaluate(() => {
       for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {

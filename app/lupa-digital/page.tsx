@@ -6,6 +6,7 @@ import styles from './LupaDigital.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber, formatPercentage } from '@/lib';
 import { leerRangoZoom, repartirZoom, type RangoZoomCamara } from './zoom';
+import { PREGUNTA_IMAGEN_FIJA, RESPUESTA_IMAGEN_FIJA } from './metadata';
 
 /** Ni `zoom` ni `torch` están aún en los tipos de DOM de TypeScript. */
 type CapacidadesCamara = MediaTrackCapabilities & { torch?: boolean; zoom?: Partial<RangoZoomCamara> };
@@ -359,6 +360,28 @@ export default function LupaDigitalPage() {
     setDesplazamiento(d => acotarDesplazamiento(d.x, d.y));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoom, congelado]);
+
+  /**
+   * ⚠️ 19/10/2026 (hallazgo 3273) — el tope sale del ANCHO del visor, y girar el móvil lo cambia
+   * sin tocar el zoom. En horizontal (visor de 660 px) a 4x se recorría hasta 990 px; al volver a
+   * vertical (392 px, tope 588) el translate se quedaba en −990 y el visor se veía negro hasta
+   * tocar la imagen. Ahora se reacota cada vez que el visor cambia de tamaño.
+   */
+  useEffect(() => {
+    const visor = visorRef.current;
+    if (!congelado || !visor || typeof ResizeObserver === 'undefined') return;
+    const observador = new ResizeObserver(() => {
+      const maxX = Math.max(0, (visor.clientWidth * (escalaCongelada - 1)) / 2);
+      const maxY = Math.max(0, (visor.clientHeight * (escalaCongelada - 1)) / 2);
+      setDesplazamiento((d) => {
+        const x = Math.max(-maxX, Math.min(maxX, d.x));
+        const y = Math.max(-maxY, Math.min(maxY, d.y));
+        return x === d.x && y === d.y ? d : { x, y };
+      });
+    });
+    observador.observe(visor);
+    return () => observador.disconnect();
+  }, [congelado, escalaCongelada]);
 
   const getFiltroStyle = (): string => {
     const filtros: string[] = [];
@@ -822,18 +845,9 @@ export default function LupaDigitalPage() {
             </li>
             <li className={styles.faqItem}>
               <details>
-                <summary>¿Puedo dejar la imagen fija para leerla con calma?</summary>
-                <p>
-                  Sí: el botón «Congelar» detiene la imagen en el fotograma que estés
-                  viendo, y a partir de ahí puedes soltar el teléfono. Sobre la imagen
-                  quieta siguen funcionando el zoom, los filtros y el brillo, y se
-                  recorre arrastrándola con el dedo o con las flechas del teclado.
-                </p>
-                <p className={styles.faqTip}>
-                  Se congela a la resolución de la cámara, no a la de la pantalla: por eso
-                  puedes ampliar después de congelar sin perder el detalle que ya estaba
-                  captado. Si además quieres guardarla, haz una captura de pantalla.
-                </p>
+                <summary>{PREGUNTA_IMAGEN_FIJA}</summary>
+                {/* Hallazgo 3276: la misma respuesta que el FAQPage, de una sola constante */}
+                <p>{RESPUESTA_IMAGEN_FIJA}</p>
               </details>
             </li>
             <li className={styles.faqItem}>

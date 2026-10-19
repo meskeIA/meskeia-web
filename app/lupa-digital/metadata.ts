@@ -48,6 +48,15 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+/**
+ * Hallazgo 3276 (19/10/2026): la pregunta de la imagen fija se respondía dos veces con textos
+ * escritos a mano por separado —la FAQ visible de page.tsx y este FAQPage—, y cada uno añadía
+ * algo distinto. Ahora las dos bocas leen estas constantes (CLAUDE.md §1.ter).
+ */
+export const PREGUNTA_IMAGEN_FIJA = '¿Puedo dejar la imagen fija para leerla con calma?';
+export const RESPUESTA_IMAGEN_FIJA =
+  'Sí. El botón «Congelar» detiene la imagen en el fotograma que estés viendo y a partir de ahí puedes apoyar o soltar el teléfono. Sobre la imagen quieta siguen funcionando el zoom, los filtros de contraste y el brillo, y se recorre arrastrándola con el dedo o con las flechas del teclado. La captura se hace a la resolución de la cámara y no a la de la pantalla, así que ampliar después de congelar conserva el detalle. Es la forma más cómoda de leer un prospecto entero, porque con mucho aumento cualquier temblor de la mano mueve la imagen. Si además quieres guardarla, haz una captura de pantalla.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -86,10 +95,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Se puede dejar la imagen fija en vez de sostener el móvil?',
+      name: PREGUNTA_IMAGEN_FIJA,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El botón «Congelar» detiene la imagen en el fotograma que estés viendo y a partir de ahí puedes apoyar o soltar el teléfono. Sobre la imagen quieta siguen funcionando el zoom, los filtros de contraste y el brillo, y se recorre arrastrándola con el dedo o con las flechas del teclado. La captura se hace a la resolución de la cámara y no a la de la pantalla, así que ampliar después de congelar conserva el detalle. Es la forma más cómoda de leer un prospecto entero, porque a partir de 4× el temblor de la mano es lo que más dificulta la lectura.',
+        text: RESPUESTA_IMAGEN_FIJA,
       },
     },
     {
