@@ -69,7 +69,10 @@ export default function ProrrateoIbiComunidad({ conComunidad = true }: Props) {
     }
     if (lecturaIbi.estado === 'vacio' && lecturaCom.estado === 'vacio') return { tipo: 'nada' as const };
     const f = leerFechaISO(fecha);
-    if (!f) return { tipo: 'sinFecha' as const };
+    // Hallazgo 3266 (19/10/2026): una fecha ESCRITA pero imposible (el año tecleado en dos
+    // cifras deja el campo en 13/10/0026) caía al estado «sin fecha» y se pedía como si faltara,
+    // con la fecha a la vista. No falta: no vale, y así se dice («no falta, no vale»).
+    if (!f) return fecha.trim() !== '' ? { tipo: 'fechaNoValida' as const } : { tipo: 'sinFecha' as const };
     const filas: { concepto: string; r: Reparto }[] = [];
     if (lecturaIbi.estado === 'ok') filas.push({ concepto: 'IBI del año', r: repartoIbi(lecturaIbi.valor, f) });
     if (lecturaCom.estado === 'ok')
@@ -139,6 +142,12 @@ export default function ProrrateoIbiComunidad({ conComunidad = true }: Props) {
         </div>
       )}
       {resultado.tipo === 'sinFecha' && <p className={styles.nota}>Indica la fecha de la escritura para repartir los días.</p>}
+      {resultado.tipo === 'fechaNoValida' && (
+        <div role="alert" className={styles.error}>
+          La fecha de la escritura no es válida: el año tiene que ir con sus cuatro cifras, entre 1900 y
+          2200. Hasta corregirla no se reparte nada.
+        </div>
+      )}
       {resultado.tipo === 'ok' && (
         <>
           <div className={styles.tablaWrapper}>
