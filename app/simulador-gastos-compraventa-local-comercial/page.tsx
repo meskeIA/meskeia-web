@@ -808,7 +808,12 @@ export default function SimuladorLocalComercialPage() {
             ? `Método real (más favorable), ${tipoMunicipal}`
             : `Método objetivo (más favorable), ${tipoMunicipal}`;
       if (!rp.exento && rp.bonificadaCiudad) {
-        metodoPlusvalia += `, con la bonificación del ${conPct(formatNumber(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje, 0))} de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+        const bonificacion = `la bonificación del ${conPct(formatNumber(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje, 0))} de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+        // Hallazgo 3259 (19/10/2026): pegada con «, con…» detrás de una descripción que ya acaba
+        // en punto (la del total catastral ilegible), salía «(1.234,56)., con la bonificación».
+        metodoPlusvalia = metodoPlusvalia.endsWith('.')
+          ? `${metodoPlusvalia} Lleva ${bonificacion}.`
+          : `${metodoPlusvalia}, con ${bonificacion}`;
       }
     }
 
@@ -1270,9 +1275,22 @@ export default function SimuladorLocalComercialPage() {
           <>
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
             {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
-            ({territorioActualSinIva.nombre}), que esta calculadora no cifra. El impuesto soportado
-            también puede ser <strong>deducible</strong>, pero con las reglas del{' '}
-            {territorioActualSinIva.impuesto}.{' '}
+            ({territorioActualSinIva.nombre}), que esta calculadora no cifra.{' '}
+            {/* Hallazgo 3262 (19/10/2026): en Ceuta y Melilla prometía deducir el IPSI soportado, y
+                la Ley 8/1991, art. 20.3 (BOE-A-1991-7645, leído el 19/10/2026) dice que las cuotas
+                soportadas en las entregas de bienes inmuebles «no podrán ser objeto de deducción».
+                En Canarias el IGIC sí se deduce y la frase se queda. */}
+            {territorioActualSinIva.impuesto === 'IPSI' ? (
+              <>
+                El IPSI soportado en la compra de un inmueble <strong>no se puede deducir</strong>{' '}
+                (Ley 8/1991, art. 20.3).
+              </>
+            ) : (
+              <>
+                El impuesto soportado también puede ser <strong>deducible</strong>, pero con las reglas
+                del {territorioActualSinIva.impuesto}.
+              </>
+            )}{' '}
             {/* Decía que la renuncia «no existe allí» en los tres territorios, y en Canarias sí:
                 es a la exención del IGIC (art. 50.Cinco Ley canaria 4/2012). En Ceuta y Melilla el
                 IPSI no la regula (Ley 8/1991, arts. 7 y 20.3). Decisión común de la familia con
@@ -1287,8 +1305,9 @@ export default function SimuladorLocalComercialPage() {
         ) : (
           <>
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de un local comercial
-            puede ser <strong>deducible</strong> si tu actividad está sujeta a IVA. Por eso, en segunda mano entre
-            profesionales, muchas veces conviene <strong>renunciar a la exención de IVA</strong> para no pagar un ITP
+            puede ser <strong>deducible</strong> si lo destinas a una actividad sujeta y no exenta de IVA (una
+            consulta médica o una academia, exentas, no lo deducen). Por eso, en segunda mano entre
+            profesionales con derecho a deducir, muchas veces conviene <strong>renunciar a la exención de IVA</strong> para no pagar un ITP
             que no se recupera. Consulta con tu asesor fiscal antes de decidir.
           </>
         )}
@@ -1301,8 +1320,11 @@ export default function SimuladorLocalComercialPage() {
 
           {/* Tipo de transmisión */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tipo de transmisión</label>
-            <div className={styles.transmisionGrid}>
+            {/* Hallazgo 3261 (19/10/2026): era un <label> sin control y los botones no formaban
+                grupo, así que el lector de pantalla no decía a qué pregunta respondían. Como en
+                nave-industrial: role="group" con aria-labelledby. */}
+            <span className={styles.label} id="etiqueta-transmision">Tipo de transmisión</span>
+            <div className={styles.transmisionGrid} role="group" aria-labelledby="etiqueta-transmision">
               <button
                 type="button"
                 className={`${styles.transmisionBtn} ${transmision === 'segunda-mano' ? styles.active : ''}`}
@@ -1571,7 +1593,7 @@ export default function SimuladorLocalComercialPage() {
                     : esRenuncia
                       ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
                       : resultadosComprador.ivaRecuperable
-                        ? 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
+                        ? 'Potencialmente deducible si el local se destina a una actividad sujeta y no exenta de IVA'
                         : resultadosComprador.bonificado
                           ? `Tipo general con la bonificación del ${conPct(formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100))} de la cuota ya aplicada (art. 57 bis.3.a TRLITPAJD)`
                           : 'Tipo general — los locales no tienen los reducidos de vivienda, pero alguna comunidad sí tiene tipos ligados a la ACTIVIDAD'
@@ -2061,16 +2083,30 @@ export default function SimuladorLocalComercialPage() {
                           : // Se dice aquí, donde se lee la cuota, y no solo en el neto; la
                             // dirección la da el sondeo (hallazgo 1260).
                             // Sin ganancia no hay nada que tribute (la forma del hallazgo 1554).
-                            (avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0) ??
-                            (resultadosVendedor.gananciaPatrimonial < 0
-                              ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
-                              : resultadosVendedor.gananciaPatrimonial === 0
-                                ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
-                                : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). Un local no tiene exención por reinversión ni por edad.${
-                                  resultadosVendedor.deduccionCeutaMelilla > 0
-                                    ? ` Lleva la deducción del ${conPct(formatNumber(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje, 0))} por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos.`
-                                    : ''
-                                } ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`))
+                            //
+                            // Hallazgo 3258 (19/10/2026): la frase de la deducción de Ceuta y Melilla
+                            // vivía solo en la rama de reserva, y un aviso (importe ilegible,
+                            // plusvalía que falta) la sustituía: la cuota quedaba por debajo del 19 %
+                            // anunciado sin una palabra. Ahora va también detrás del aviso.
+                            //
+                            // Hallazgo 3256 (19/10/2026): decía «Un local no tiene exención por
+                            // reinversión ni por edad», y el art. 38.3 LIRPF (BOE-A-2006-20764, leído
+                            // el 19/10/2026) excluye la ganancia de la transmisión de CUALQUIER
+                            // elemento patrimonial de un mayor de 65 que destine lo obtenido, en seis
+                            // meses, a una renta vitalicia asegurada (hasta 240.000 €).
+                            (() => {
+                              const fraseCeutaMelilla =
+                                resultadosVendedor.deduccionCeutaMelilla > 0
+                                  ? ` Lleva la deducción del ${conPct(formatNumber(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje, 0))} por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos.`
+                                  : '';
+                              const aviso = avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0);
+                              if (aviso) return `${aviso}${fraseCeutaMelilla}`;
+                              return resultadosVendedor.gananciaPatrimonial < 0
+                                ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
+                                : resultadosVendedor.gananciaPatrimonial === 0
+                                  ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
+                                  : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en seis meses (art. 38.3 LIRPF), que esta calculadora no aplica.${fraseCeutaMelilla} ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`;
+                            })()
                     }
                   />
 
@@ -2226,7 +2262,7 @@ export default function SimuladorLocalComercialPage() {
                   <td style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí</td>
                   {/* Colores de la tabla con variante oscura (hallazgo 1580): el #27ae60 literal
                       daba 2,64:1 en claro, y el #c0392b de abajo 3,20:1 en oscuro. */}
-                  <td className={styles.celdaFavorable} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí (si sujeto pasivo)</td>
+                  <td className={styles.celdaFavorable} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--bg-primary)' }}>Sí (si actividad sujeta y no exenta)</td>
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid #e0e0e0' }}>Segunda mano (regla general)</td>
@@ -2238,7 +2274,7 @@ export default function SimuladorLocalComercialPage() {
                   <td style={{ padding: '8px 10px' }}>Segunda mano con renuncia a la exención</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center', fontWeight: 700, color: 'var(--primary-texto)' }}>IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} (ISP)</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (incrementado en algunas comunidades)</td>
-                  <td className={styles.celdaFavorable} style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (si sujeto pasivo)</td>
+                  <td className={styles.celdaFavorable} style={{ padding: '8px 10px', textAlign: 'center' }}>Sí (si actividad sujeta y no exenta)</td>
                 </tr>
               </tbody>
             </table>
@@ -2252,8 +2288,9 @@ export default function SimuladorLocalComercialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🆕</span> Autónomo compra local nuevo al promotor</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Paga IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} + AJD. Si está dado de alta en una actividad sujeta a IVA, deduce el IVA
-                soportado en la declaración trimestral (modelo 303).
+                Paga IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} + AJD. Si lo destina a una actividad sujeta y no exenta de IVA, deduce el IVA
+                soportado en la declaración trimestral (modelo 303); una actividad exenta, como la
+                sanitaria o la educativa, no lo deduce.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
@@ -2355,8 +2392,11 @@ export default function SimuladorLocalComercialPage() {
             <li>
               <strong>IRPF de la ganancia patrimonial.</strong> Tributa en la base del ahorro con los
               tramos del {conPct(formatNumber(TIPO_AHORRO_MIN, 0))} al {conPct(formatNumber(TIPO_AHORRO_MAX, 0))} de 2025.{' '}
-              <strong>No hay exención por reinversión ni por tener más
-              de 65 años</strong>: esas dos ventajas son exclusivas de la vivienda habitual.
+              {/* Hallazgo 3256: el art. 38.3 LIRPF vale para cualquier elemento patrimonial. */}
+              <strong>No hay exención por reinversión</strong>, que es exclusiva de la vivienda
+              habitual. Los mayores de 65 años sí tienen otra vía, que esta calculadora no aplica:
+              la ganancia queda excluida si destinan lo obtenido, en seis meses, a constituir una
+              renta vitalicia asegurada a su favor, hasta 240.000 € (art. 38.3 LIRPF).
             </li>
             <li>
               <strong>Amortizaciones si el local estuvo afecto a una actividad o alquilado.</strong> Si lo usaste en

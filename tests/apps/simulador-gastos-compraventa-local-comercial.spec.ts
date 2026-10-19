@@ -3480,7 +3480,8 @@ test.describe('Inspección 24/09/2026 — Castilla y León, amortizaciones frent
         const [l1, l2] = [lum(color), lum(fondo)];
         return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
       }, texto);
-    expect(await contraste('Sí (si sujeto pasivo)')).toBeGreaterThanOrEqual(4.5);
+    // Texto de la celda desde el hallazgo 3257 (19/10/2026): «sujeta y no exenta».
+    expect(await contraste('Sí (si actividad sujeta y no exenta)')).toBeGreaterThanOrEqual(4.5);
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(26, 26, 26)');
     expect(await contraste('No (ITP no se recupera)')).toBeGreaterThanOrEqual(4.5);
@@ -5352,7 +5353,8 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
     await vendedorSinAmortizar0810(page, 'madrid');
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('5613,00 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toBe(
-      'Base del ahorro (19–30 %). Un local no tiene exención por reinversión ni por edad. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
+      // Desde el hallazgo 3256 (19/10/2026) nombra la vía del art. 38.3 LIRPF en vez de negarla.
+      'Base del ahorro (19–30 %). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en seis meses (art. 38.3 LIRPF), que esta calculadora no aplica. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     // El defecto.
     // Todo el texto de la página, también lo plegado del bloque educativo, sin los scripts (el JSON-LD).
@@ -5673,7 +5675,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
   //   transmisión 192.900 ; adquisición 150.000 (el ilegible vale 0) ; ganancia 42.900 → íntegra
   //   1.140 + 36.900 × 21 % = 8.889 ; − 60 % (5333,40) = 3555,60.
   test('[13/10-a] Melilla con un importe ilegible: la tarjeta del IRPF sigue nombrando la deducción del 60 % que lleva restada', async ({ page }) => {
-    test.fail();
+    // REPARADO el 19/10/2026 (hallazgo 3258): la frase va también detrás del aviso.
     expect(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje).toBe(50);
     await abrir0810(page);
     await page.selectOption('#select-ccaa', 'melilla');
@@ -5700,7 +5702,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
   //   Ceuta · 200.000 · compra 150.000 · gastos 15.000 · 10 años · suelo 40.000 · total «100.000.00»
   //   → objetivo 40.000 × 0,12 × 25 % × 50 % = 600,00 (el real no se compara).
   test('[13/10-b] Ceuta con el valor catastral total ilegible: la bonificación de la plusvalía no se pega tras un punto', async ({ page }) => {
-    test.fail();
+    // REPARADO el 19/10/2026 (hallazgo 3259).
     await abrir0810(page);
     await page.selectOption('#select-ccaa', 'ceuta');
     await vendedor1310(page, {
@@ -5726,7 +5728,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
   // —consulta médica, clínica dental, academia— ejerce una actividad sujeta y EXENTA (art. 20.Uno LIVA)
   // y no deduce el 21 %.
   test('[13/10-c] todas las bocas condicionan el IVA deducible a una actividad sujeta y no exenta', async ({ page }) => {
-    test.fail();
+    // REPARADO el 19/10/2026 (hallazgo 3257, cabo C0164).
     await abrir0810(page);
     await sembrarImporte12(page, 'Precio del local comercial', '200000');
     await page.getByRole('button', { name: /Obra nueva/ }).click();
@@ -5765,7 +5767,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
   //   ni por edad.» Para un vendedor de 70 años que reinvierta los 192.300 € en una renta vitalicia, la
   //   ganancia de 27.300 € queda excluida entera.
   test('[13/10-d] ninguna boca niega la exclusión por renta vitalicia de los mayores de 65 (art. 38.3 LIRPF)', async ({ page }) => {
-    test.fail();
+    // REPARADO el 19/10/2026 (hallazgo 3256; art. 38.3 leído en el BOE ese día).
     await abrir0810(page);
     await vendedorSinAmortizar0810(page, 'madrid');
     await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '5613,00 €');
@@ -5791,7 +5793,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
   // (respuestaEscriturar, hallazgo 1593) sí dice «la mitad en Ceuta y Melilla».
   //   Ceuta · 2ª mano · 200.000 → «ITP (3,00 %)» 6000,00 € (200.000 × 6 % × 50 %).
   test('[13/10-e] las respuestas sobre el ITP de segunda mano dicen que en Ceuta y Melilla se paga la mitad', async ({ page }) => {
-    test.fail();
+    // REPARADO el 19/10/2026 (hallazgo 3260).
     await abrir0810(page);
     await page.selectOption('#select-ccaa', 'ceuta');
     await sembrarImporte12(page, 'Precio del local comercial', '200000');
@@ -5819,7 +5821,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
   // (tipo general), botón, pulsado» sin la pregunta a la que responde (WCAG 1.3.1). Es la forma del
   // 3235 de generador-loteria.
   test('[13/10-f] los botones del tipo de transmisión forman un grupo con el nombre «Tipo de transmisión»', async ({ page }) => {
-    test.fail();
+    // REPARADO el 19/10/2026 (hallazgo 3261).
     await abrir0810(page);
     await expect(page.getByRole('button', { name: /^Segunda mano/ })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('button', { name: /^Obra nueva/ })).toHaveCount(1);
@@ -5838,7 +5840,7 @@ test.describe('Inspector 13/10/2026 — Andalucía con el arancel rebajado, Meli
   // inmuebles «no podrán ser objeto de deducción». En Canarias la frase sí vale (el IGIC se deduce), y
   // por eso el test solo mira Ceuta y Melilla.
   test('[13/10-g] en Ceuta y Melilla el aviso de cabecera no promete deducir el IPSI de la compra del local', async ({ page }) => {
-    test.fail();
+    // REPARADO el 19/10/2026 (hallazgo 3262; art. 20.3 Ley 8/1991 leído en el BOE ese día).
     await abrir0810(page);
     for (const ciudad of ['ceuta', 'melilla']) {
       await page.selectOption('#select-ccaa', ciudad);
