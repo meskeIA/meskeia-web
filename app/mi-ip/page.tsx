@@ -213,15 +213,16 @@ export default function MiIpPage() {
 
   // Obtener velocidad efectiva legible
   const getEffectiveTypeLabel = (type: string) => {
-    // Rojo y verde por los tokens del módulo: en claro valen lo mismo que los literales de antes,
-    // y en oscuro tienen variante (el #28a745 daba 4,03:1 sobre la tarjeta oscura, C0226)
+    // Todos por los tokens del módulo, con variante en cada tema: en oscuro el #28a745 daba
+    // 4,03:1 sobre la tarjeta (C0226), y en claro el #ffc107 del 3G 1,6:1 y el naranja del 2G
+    // 2,4:1 (C0296). Los valores, medidos, en MiIp.module.css.
     const types: Record<string, { label: string; color: string }> = {
       'slow-2g': { label: '2G Lento', color: 'var(--danger)' },
-      '2g': { label: '2G', color: '#fd7e14' },
-      '3g': { label: '3G', color: '#ffc107' },
+      '2g': { label: '2G', color: 'var(--aviso-2g)' },
+      '3g': { label: '3G', color: 'var(--warning-texto)' },
       '4g': { label: '4G/LTE', color: 'var(--success)' }
     };
-    return types[type] || { label: type, color: '#6c757d' };
+    return types[type] || { label: type, color: 'var(--text-muted)' };
   };
 
   // Limpiar historial

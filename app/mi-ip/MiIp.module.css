@@ -21,9 +21,17 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --success: #28A745;
+  /*
+   * Solo pintan TEXTO. En claro no llegaban a 4,5:1 (cabo C0296, 19/10/2026): #28A745 daba
+   * 3,1:1 sobre blanco y 2,8:1 sobre su tinte, #DC3545 3,9:1, el #FFC107 del 3G 1,6:1, el
+   * #b38600 de los avisos 3,1:1 y el naranja del 2G 2,4:1 sobre la tarjeta. Los de abajo, en el
+   * peor de sus fondos (tinte o tarjeta #F5F5F5): 6,1 · 5,6 · 6,5 · 6,5:1.
+   */
+  --success: #166534;
   --warning: #FFC107;
-  --danger: #DC3545;
+  --warning-texto: #92400E;
+  --aviso-2g: #9A3412;
+  --danger: #B91C1C;
 
   max-width: 900px;
   margin: 0 auto;
@@ -38,6 +46,9 @@
 [data-theme='dark'] .container {
   --success: #86EFAC;
   --danger: #FCA5A5;
+  /* Los del claro de antes, que en oscuro sí cumplen: 7,8:1 y 4,9:1 sobre #333 */
+  --warning-texto: #FFC107;
+  --aviso-2g: #fd7e14;
 }
 
 /* Dark Mode */
@@ -396,7 +407,7 @@
 
 .indicator.warning {
   background: rgba(255, 193, 7, 0.15);
-  color: #b38600;
+  color: var(--warning-texto);
 }
 
 [data-theme='dark'] .indicator.warning {
@@ -453,7 +464,7 @@
   border-radius: var(--radius);
   text-align: center;
   font-size: 0.9rem;
-  color: #b38600;
+  color: var(--warning-texto);
 }
 
 [data-theme='dark'] .saveDataWarning {
