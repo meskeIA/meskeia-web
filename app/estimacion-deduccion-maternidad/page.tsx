@@ -35,10 +35,10 @@ import {
 // práctico Renta 2025, «Límites de la deducción»: el incremento «no podrá superar PARA CADA HIJO»
 // los 1.000 €—, así que el 09/09 se corrigió el motor, no la página.
 //
-// Al unificar aparecen dos datos que esta página nunca pidió y el art. 81 sí exige: los MESES en
-// que cada hijo da derecho (no todos los bebés nacen en enero) y las COTIZACIONES del año, que
-// son el techo legal de la deducción. Se preguntan ahora: sin ellos la página publicaba 1.200 €
-// por hijo a cualquiera, que es la cifra máxima y rara vez la de nadie.
+// Al unificar apareció un dato que esta página nunca pidió y el art. 81 sí exige: los MESES en
+// que cada hijo da derecho (no todos los bebés nacen en enero). Del 10/09 al 19/10/2026 pidió
+// también las cotizaciones del año como techo de la deducción; ese tope era de la redacción
+// anterior a 2023 y la Ley 31/2022 lo suprimió (cabo C0051), así que se retiró el campo.
 
 interface HijoData {
   tieneGuarderia: boolean;
@@ -64,7 +64,6 @@ export default function EstimacionDeduccionMaternidadPage() {
 
   const [numHijos, setNumHijos] = useState(1);
   const [situacion, setSituacion] = useState<SituacionLaboral>('alta');
-  const [cotizaciones, setCotizaciones] = useState('');
   const [hijos, setHijos] = useState<HijoData[]>([{ ...HIJO_NUEVO }]);
   const [resultado, setResultado] = useState<ResultadoDeduccionMaternidadIRPF | null>(null);
   const [error, setError] = useState('');
@@ -99,22 +98,12 @@ export default function EstimacionDeduccionMaternidadPage() {
   const calcular = useCallback(() => {
     setError('');
 
-    const cotizacionesAnuales = parseSpanishNumber(cotizaciones);
-    if (Number.isNaN(cotizacionesAnuales) || cotizacionesAnuales < 0) {
-      setResultado(null);
-      setError(
-        'Indica cuanto has cotizado a la Seguridad Social en el ejercicio: el articulo 81.1 limita la deduccion a esa cantidad, asi que sin el dato no se puede saber cuanto se cobra.',
-      );
-      return;
-    }
-
     // El motor resuelve TODO el cálculo, incluidas las tres vías del art. 81.1 y el caso sin
     // derecho: aquí no se decide nada, solo se traducen los campos del formulario.
     try {
       setResultado(
         calcularDeduccionMaternidadIRPF({
           situacion,
-          cotizacionesSSTotalesAnio: cotizacionesAnuales,
           hijos: hijos.slice(0, numHijos).map((h) => {
             const gasto = parseSpanishNumber(h.gastoGuarderia);
             return {
@@ -132,12 +121,11 @@ export default function EstimacionDeduccionMaternidadPage() {
       setResultado(null);
       setError(e instanceof Error ? e.message : 'No ha sido posible estimar la deduccion con estos datos.');
     }
-  }, [numHijos, situacion, hijos, cotizaciones]);
+  }, [numHijos, situacion, hijos]);
 
   const limpiar = useCallback(() => {
     setNumHijos(1);
     setSituacion('alta');
-    setCotizaciones('');
     setHijos([{ ...HIJO_NUEVO }]);
     setResultado(null);
     setError('');
@@ -271,19 +259,6 @@ export default function EstimacionDeduccionMaternidadPage() {
               menor, y a quien se da de alta despues con 30 dias cotizados.
             </p>
           </fieldset>
-
-          {/* Cotizaciones: es el TECHO legal de la deduccion (art. 81.1), no un dato accesorio */}
-          <div className={styles.formGroup}>
-            <NumberInput
-              label="Cotizaciones a la Seguridad Social del ejercicio"
-              value={cotizaciones}
-              onChange={setCotizaciones}
-              placeholder="0"
-              min={0}
-              suffix="euro"
-              helperText="Cuota obrera del Regimen General o cuota de autonomos pagadas en el ano. La deduccion no puede superar esta cantidad (art. 81.1 LIRPF)."
-            />
-          </div>
 
           {/* Datos por hijo */}
           {hijos.map((hijo, index) => (
@@ -440,18 +415,6 @@ export default function EstimacionDeduccionMaternidadPage() {
                     {formatCurrency(resultado.deduccionMaternidadEfectiva)}
                   </span>
                 </div>
-                {/* El limite por cotizaciones solo se nombra cuando ha recortado algo: decirlo
-                    siempre lo convertiria en ruido, y callarlo cuando muerde ocultaria por que
-                    la cifra final no es la suma de las lineas de arriba. */}
-                {resultado.deduccionMaternidadEfectiva < resultado.totalDeduccionBruta && (
-                  <div className={styles.resultItem}>
-                    <span className={styles.resultLabel}>Limite por cotizaciones (art. 81.1)</span>
-                    <span className={styles.resultValue}>
-                      {formatCurrency(resultado.totalDeduccionBruta)} &rarr;{' '}
-                      {formatCurrency(resultado.limiteMaternidadCotizaciones)}
-                    </span>
-                  </div>
-                )}
                 <div className={styles.resultItem}>
                   <span className={styles.resultLabel}>Incremento guarderia</span>
                   <span className={styles.resultValue}>

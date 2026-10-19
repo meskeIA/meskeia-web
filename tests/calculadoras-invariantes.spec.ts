@@ -3835,10 +3835,26 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
     // ampliación de las VÍAS DE ACCESO, no su supresión.
     const r = calcularDeduccionMaternidadIRPF({
       hijos: [{ edadMesesInicioEjercicio: 12, mesesConDerechoEjercicio: 12 }],
-      cotizacionesSSTotalesAnio: 0,
       madreEnActivoOPrestacion: false,
     });
     expect(r.totalDeduccionEfectiva).toBe(0); // hoy: 1.200 € por hijo
+  });
+
+  test('ALTO: desde 2023 no hay tope por cotizaciones, ni en la deducción ni en la guardería', () => {
+    // REPARADO (cabo C0051, 19/10/2026). El motor recortaba la deducción y el incremento por
+    // guardería a las cotizaciones del año, que era la redacción anterior a 2023. El art. 81
+    // LIRPF vigente (Ley 31/2022, BOE-A-2022-22128, leído en el triaje fiscal del 19/10/2026 con
+    // OK del usuario) no tiene ese tope: el único límite del incremento es el gasto efectivo no
+    // subvencionado (apdo. 3, párrafo 3.º), además de los 1.000 € por hijo.
+    // Caso del cabo: alta con 30 días cotizados, 12 meses con derecho y 500 € cotizados en el
+    // año → 1.200 € de deducción (más los 150 € del art. 81.3 de esa vía), no 500 €.
+    const r = calcularDeduccionMaternidadIRPF({
+      hijos: [{ edadMesesInicioEjercicio: 0, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 1000 }],
+      situacion: 'alta-posterior',
+    });
+    expect(r.deduccionMaternidadEfectiva).toBe(BASE + EXTRA_ALTA_POSTERIOR);
+    expect(r.incrementoGuarderiaEfectivo).toBe(MAX_GUARDERIA);
+    expect(r.advertencias.join(' ')).not.toMatch(/LIMITE POR COTIZACIONES/);
   });
 
   test('ALTO: la vía «alta-posterior» del art. 81.3 y sus 150 € ya son alcanzables', () => {
@@ -3856,7 +3872,6 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
 
     const porVia = calcularDeduccionMaternidadIRPF({
       hijos: [{ edadMesesInicioEjercicio: 2, mesesConDerechoEjercicio: 12 }],
-      cotizacionesSSTotalesAnio: 5000,
       situacion: 'alta-posterior',
     });
     expect(porVia.totalDeduccionEfectiva).toBe(BASE + EXTRA_ALTA_POSTERIOR); // 1.350 €
@@ -3864,7 +3879,6 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
     // Y por la vía ordinaria siguen siendo 1.200 €: el incremento es de la tercera vía, no de todas.
     const ordinaria = calcularDeduccionMaternidadIRPF({
       hijos: [{ edadMesesInicioEjercicio: 2, mesesConDerechoEjercicio: 12 }],
-      cotizacionesSSTotalesAnio: 5000,
       situacion: 'alta',
     });
     expect(ordinaria.totalDeduccionEfectiva).toBe(BASE);
@@ -3875,31 +3889,32 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
     // EFECTIVA, ya recortada por el límite de cotizaciones, así que el desglose no cuadra
     // consigo mismo en cuanto el límite muerde. Es el defecto (b) de sucesiones, pero de
     // céntimos a MILES de euros: 223 descuadres de 432 combinaciones, hasta 4.800 €.
+    // (El tope por cotizaciones se retiró el 19/10/2026, cabo C0051; el cuadre se sigue
+    // vigilando con meses, gastos y las cuatro situaciones.)
     const fallos: string[] = [];
     let comprobados = 0;
     for (const numHijos of [1, 2, 3, 4]) {
       for (const meses of [1, 5, 12]) {
-        for (const gasto of [0, 250, 400, 1000, 1500, 3000]) {
-          for (const cotiz of [0, 500, 800, 1234.56, 5000, 20000]) {
+        for (const gasto of [0, 250, 333.33, 400, 1000, 1500, 3000]) {
+          for (const situacion of ['alta', 'desempleo', 'alta-posterior', 'ninguna'] as const) {
             const r = calcularDeduccionMaternidadIRPF({
               hijos: Array.from({ length: numHijos }, (_, i) => ({
                 edadMesesInicioEjercicio: i * 6,
                 mesesConDerechoEjercicio: meses,
                 gastosGuarderiaAnuales: gasto,
               })),
-              cotizacionesSSTotalesAnio: cotiz,
-              madreEnActivoOPrestacion: true,
+              situacion,
             });
             const suma = Math.round(r.detalleHijos.reduce((s, d) => s + d.totalDeduccionHijo, 0) * 100) / 100;
             comprobados++;
             if (suma !== r.totalDeduccionEfectiva) {
-              fallos.push(`${numHijos}h/${meses}m/gasto ${gasto}/cotiz ${cotiz}: Σ ${suma} ≠ ${r.totalDeduccionEfectiva}`);
+              fallos.push(`${numHijos}h/${meses}m/gasto ${gasto}/${situacion}: Σ ${suma} ≠ ${r.totalDeduccionEfectiva}`);
             }
           }
         }
       }
     }
-    expect(comprobados).toBeGreaterThan(400);
+    expect(comprobados).toBeGreaterThan(300);
     expect(fallos.length, fallos.slice(0, 3).join(' | ')).toBe(0); // hoy: 223 de 432
   });
 
@@ -3911,7 +3926,6 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
       hijos: [0, 6, 12].map((e) => ({
         edadMesesInicioEjercicio: e, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 1000,
       })),
-      cotizacionesSSTotalesAnio: 5000,
       madreEnActivoOPrestacion: true,
     });
     const suma = Math.round(r.detalleHijos.reduce((s, d) => s + d.incrementoGuarderia, 0) * 100) / 100;
@@ -3928,15 +3942,13 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
     //    y (b) el gasto efectivo no subvencionado satisfecho en relación con ESE hijo.
     // Gana la app: el motor cobraba 1.000 € de menos por cada hijo a partir del primero.
     //
-    // ⚠️ Lo que NO se pudo anclar y sigue tal cual: si el incremento está además limitado por
-    // las cotizaciones. El motor conserva ese tope sobre el agregado, con un comentario que
-    // apunta a /triaje-fiscal.
+    // Lo que entonces no se pudo anclar —si el incremento estaba además limitado por las
+    // cotizaciones— lo resolvió el triaje fiscal del 19/10/2026: no lo está (cabo C0051).
     const r = calcularDeduccionMaternidadIRPF({
       hijos: [
         { edadMesesInicioEjercicio: 6, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 1500 },
         { edadMesesInicioEjercicio: 20, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 1500 },
       ],
-      cotizacionesSSTotalesAnio: 5000,
       situacion: 'alta',
     });
     expect(r.incrementoGuarderiaEfectivo).toBe(2 * MAX_GUARDERIA);
@@ -3947,12 +3959,12 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
     // Candado permanente de los ejes sanos.
     for (let m = 0; m <= 12; m++) {
       const r = calcularDeduccionMaternidadIRPF({
-        hijos: [{ edadMesesInicioEjercicio: 4, mesesConDerechoEjercicio: m }], cotizacionesSSTotalesAnio: 99999,
+        hijos: [{ edadMesesInicioEjercicio: 4, mesesConDerechoEjercicio: m }],
       });
       expect(r.deduccionMaternidadEfectiva, `${m} meses`).toBe(m * MENSUAL);
     }
     const trece = calcularDeduccionMaternidadIRPF({
-      hijos: [{ edadMesesInicioEjercicio: 4, mesesConDerechoEjercicio: 13 }], cotizacionesSSTotalesAnio: 99999,
+      hijos: [{ edadMesesInicioEjercicio: 4, mesesConDerechoEjercicio: 13 }],
     });
     expect(trece.deduccionMaternidadEfectiva).toBe(BASE);
 
@@ -3961,7 +3973,6 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
         { edadMesesInicioEjercicio: 36, mesesConDerechoEjercicio: 12 },
         { edadMesesInicioEjercicio: 35, mesesConDerechoEjercicio: 12 },
       ],
-      cotizacionesSSTotalesAnio: 99999,
     });
     expect(corte.numHijosConDerecho).toBe(1);
     expect(corte.deduccionMaternidadEfectiva).toBe(BASE);
@@ -3972,12 +3983,11 @@ test.describe('Motores 09/09 — deducción por maternidad IRPF (tool del MCP de
     // CLAUDE.md. Hoy coinciden; esto fija que sigan coincidiendo si el módulo cambia — que es
     // por donde las dos implementaciones pudieron divergir en primer lugar.
     const anual = calcularDeduccionMaternidadIRPF({
-      hijos: [{ edadMesesInicioEjercicio: 0, mesesConDerechoEjercicio: 12 }], cotizacionesSSTotalesAnio: 99999,
+      hijos: [{ edadMesesInicioEjercicio: 0, mesesConDerechoEjercicio: 12 }],
     });
     expect(anual.deduccionMaternidadEfectiva).toBe(BASE);
     const guarderia = calcularDeduccionMaternidadIRPF({
       hijos: [{ edadMesesInicioEjercicio: 0, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 99999 }],
-      cotizacionesSSTotalesAnio: 99999,
     });
     expect(guarderia.incrementoGuarderiaEfectivo).toBe(MAX_GUARDERIA);
   });
@@ -4933,7 +4943,6 @@ test.describe('Unificación 10/09 — deducciones de IRPF por discapacidad y mat
     // aplicaba al agregado y perdía 1.000 € por cada hijo adicional; la app lo hacía bien.
     const tresHijos = calcularDeduccionMaternidadIRPF({
       situacion: 'alta',
-      cotizacionesSSTotalesAnio: 99999,
       hijos: [0, 0, 0].map(() => ({
         edadMesesInicioEjercicio: 0, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 2500,
       })),
@@ -4946,12 +4955,11 @@ test.describe('Unificación 10/09 — deducciones de IRPF por discapacidad y mat
     // en AUSENCIA de límite y se cobraba el máximo. Sin derecho no hay deducción ni guardería.
     const sinDerecho = calcularDeduccionMaternidadIRPF({
       situacion: 'ninguna',
-      cotizacionesSSTotalesAnio: 0,
       hijos: [{ edadMesesInicioEjercicio: 12, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: 3000 }],
     });
     expect(sinDerecho.tieneDerecho).toBe(false);
     expect(sinDerecho.totalDeduccionEfectiva).toBe(0);
-    expect(sinDerecho.limiteMaternidadCotizaciones).toBe(0);
+    expect(sinDerecho.incrementoGuarderiaEfectivo).toBe(0);
   });
 
   test('CUADRE: las líneas por hijo suman EXACTAMENTE el total publicado', () => {
@@ -4959,20 +4967,19 @@ test.describe('Unificación 10/09 — deducciones de IRPF por discapacidad y mat
     // total la efectiva. Se barre el reparto en céntimos, que es donde 1.000/3 producía 999,99.
     const fallos: string[] = [];
     for (const numHijos of [1, 2, 3, 4]) {
-      for (const cotizaciones of [0, 500, 1200, 2400, 99999]) {
+      for (const meses of [1, 7, 12]) {
         for (const gasto of [0, 333.33, 1000, 5000]) {
           const res = calcularDeduccionMaternidadIRPF({
             situacion: 'alta',
-            cotizacionesSSTotalesAnio: cotizaciones,
             hijos: Array.from({ length: numHijos }, () => ({
-              edadMesesInicioEjercicio: 0, mesesConDerechoEjercicio: 12, gastosGuarderiaAnuales: gasto,
+              edadMesesInicioEjercicio: 0, mesesConDerechoEjercicio: meses, gastosGuarderiaAnuales: gasto,
             })),
           });
           const suma = Math.round(
             res.detalleHijos.reduce((s, d) => s + d.totalDeduccionHijo, 0) * 100
           ) / 100;
           if (suma !== res.totalDeduccionEfectiva) {
-            fallos.push(`${numHijos}h/${cotizaciones}€/${gasto}€: ${suma} ≠ ${res.totalDeduccionEfectiva}`);
+            fallos.push(`${numHijos}h/${meses}m/${gasto}€: ${suma} ≠ ${res.totalDeduccionEfectiva}`);
           }
         }
       }

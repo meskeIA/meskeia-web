@@ -17,6 +17,7 @@
  * vez en rojo en lugar de en verde.
  */
 import { test, expect } from '@playwright/test';
+import { esperarHidratacion } from './_hidratacion';
 
 test.describe('estimador-legitimas — la web ya da la misma legítima que la API', () => {
   test('Baleares con 2 hijos: 1/3, no 1/2 (art. 42 Compilació)', async ({ page }) => {
@@ -164,49 +165,42 @@ test.describe('estimacion-deduccion-discapacidad — la regla del art. 60', () =
   });
 });
 
-test.describe('estimacion-deduccion-maternidad — el límite por cotizaciones ya se pregunta', () => {
-  test('un hijo, 12 meses y cotizaciones holgadas: 1.200 € sin recorte', async ({ page }) => {
+test.describe('estimacion-deduccion-maternidad — sin tope por cotizaciones desde 2023', () => {
+  // Del 10/09 al 19/10/2026 la página preguntaba las cotizaciones del año y recortaba la
+  // deducción a esa cifra, y estos tests lo consagraban. Ese tope era de la redacción del
+  // art. 81 anterior a 2023; la Ley 31/2022 lo suprimió (cabo C0051, triaje fiscal del
+  // 19/10/2026). REPARADO: el campo ya no existe y la cifra no se recorta.
+  // Sin el campo, el primer gesto de cada test es un clic: se espera a React antes, porque un
+  // clic previo a la hidratación se pierde (tests/apps/_hidratacion.ts).
+  test.beforeEach(async ({ page }) => {
     await page.goto('/estimacion-deduccion-maternidad/');
+    await esperarHidratacion(page, ['input[name="situacion"]']);
+  });
 
-    await page.getByLabel(/Cotizaciones a la Seguridad Social/i).fill('3000');
+  test('un hijo y 12 meses: 1.200 €, sin pedir cotizaciones', async ({ page }) => {
+
+    await expect(page.getByLabel(/Cotizaciones a la Seguridad Social/i)).toHaveCount(0);
     await page.getByRole('button', { name: /Estimar deduccion/i }).click();
 
-    // 12 meses × 100 € = 1.200 €, por debajo de las cotizaciones: no hay recorte que anunciar.
+    // 12 meses × 100 € = 1.200 €.
     // Se escribe «1200,00 €» sin punto: el español no agrupa los números de cuatro cifras, y
     // `Intl.NumberFormat('es-ES')` lo respeta. No es un fallo de formato.
+    await expect(page.getByText('Total deduccion anual')).toBeVisible();
     await expect(page.getByText('1200,00 €').first()).toBeVisible();
     await expect(page.getByText(/Limite por cotizaciones/i)).toHaveCount(0);
   });
 
-  test('con cotizaciones por debajo, el límite del art. 81.1 recorta Y SE DICE', async ({ page }) => {
-    await page.goto('/estimacion-deduccion-maternidad/');
-
-    // 500 € cotizados topan la deducción de 1.200 € en 500 €. La página sin este campo publicaba
-    // 1.200 € a cualquiera, que es el máximo legal y rara vez la cifra de nadie.
-    await page.getByLabel(/Cotizaciones a la Seguridad Social/i).fill('500');
+  test('alta posterior con 12 meses: 1.350 € (los 150 € del art. 81.3), no recortados', async ({ page }) => {
+    // El caso del cabo: alta tras el nacimiento con 30 días cotizados. Antes, con 500 €
+    // cotizados en el año, la página daba 500 €.
+    await page.getByRole('radio', { name: /Me di de alta despues del nacimiento/i }).check();
     await page.getByRole('button', { name: /Estimar deduccion/i }).click();
 
-    await expect(page.getByText(/Limite por cotizaciones/i).first()).toBeVisible();
-    await expect(page.getByText('500,00 €').first()).toBeVisible();
-  });
-
-  test('sin el dato de cotizaciones no se publica ninguna cifra', async ({ page }) => {
-    await page.goto('/estimacion-deduccion-maternidad/');
-    await page.getByRole('button', { name: /Estimar deduccion/i }).click();
-
-    // Se dice por qué y NO se enseña un número: un aviso debajo de una cifra falsa no vale.
-    await expect(page.getByRole('heading', { name: /No se puede estimar con estos datos/i })).toBeVisible();
-    // No se comprueba la ausencia del importe en TODA la página: la guía educativa cita 1.200 €
-    // como cuantía de la deducción, y eso es correcto. Lo que no debe existir es el panel de
-    // resultado, que es donde saldría la cifra atribuida a ESTE usuario.
-    await expect(page.getByText('Total deduccion anual')).toHaveCount(0);
+    await expect(page.getByText('1350,00 €').first()).toBeVisible();
   });
 
   test('los meses con derecho recortan la deducción: medio año son 600 €', async ({ page }) => {
-    await page.goto('/estimacion-deduccion-maternidad/');
-
     // 6 meses × 100 € = 600 €. Antes esta página daba 1.200 € naciera el bebé en enero o en julio.
-    await page.getByLabel(/Cotizaciones a la Seguridad Social/i).fill('3000');
     await page.getByLabel(/Meses del ano en que fue menor de 3 anos/i).selectOption('6');
     await page.getByRole('button', { name: /Estimar deduccion/i }).click();
 

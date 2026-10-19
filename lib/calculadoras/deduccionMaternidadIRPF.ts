@@ -30,7 +30,10 @@
  *   - 1.200 EUR por cada hijo menor de 3 anos (100 EUR/mes por mes completo)
  *   - Art. 81.3, parrafo 2: por la via 'alta-posterior', la deduccion del mes en que se
  *     completan los 30 dias cotizados se incrementa en 150 EUR.
- *   - Limite: no puede superar las cotizaciones y cuotas totales a la SS del ejercicio.
+ *   - SIN tope por cotizaciones: la redaccion anterior a 2023 limitaba la deduccion a las
+ *     cotizaciones y cuotas a la SS del periodo; la Ley 31/2022 lo suprimio, en la deduccion y
+ *     en el incremento por guarderia (cabo C0051, art. 81 LIRPF consolidado leido en el triaje
+ *     fiscal del 19/10/2026). Este motor lo aplico hasta esa fecha.
  *
  *   ABONO ANTICIPADO:
  *   - 100 EUR/mes/hijo, se solicita en el modelo 140 de la AEAT.
@@ -89,12 +92,6 @@ export interface HijoDeduccionMaternidad {
 export interface ParametrosDeduccionMaternidadIRPF {
   hijos: HijoDeduccionMaternidad[];
   /**
-   * Cotizaciones totales a la SS pagadas en el ejercicio por la madre (EUR)
-   * Incluye cuota obrera de RETA o de Regimen General
-   * Usado para verificar el limite de la deduccion
-   */
-  cotizacionesSSTotalesAnio: number;
-  /**
    * Via del art. 81.1 por la que se accede a la deduccion. Es el parametro preferente:
    * distingue las TRES vias con derecho de la ausencia de derecho ('ninguna').
    * Por defecto 'alta'.
@@ -134,17 +131,15 @@ export interface ResultadoDeduccionMaternidadIRPF {
   /** Numero de hijos con derecho a deduccion */
   numHijosConDerecho: number;
   detalleHijos: DetalleHijoMaternidad[];
-  /** Suma de deducciones brutas por maternidad, incluidos los 150 EUR del art. 81.3 (antes del limite) */
+  /** Suma de deducciones brutas por maternidad, incluidos los 150 EUR del art. 81.3 */
   totalDeduccionBruta: number;
   /** Suma de los 150 EUR del art. 81.3 por hijo (solo via 'alta-posterior') */
   totalIncrementoAltaPosterior: number;
   /** Incremento adicional por guarderia efectivo */
   totalIncrementoGuarderia: number;
-  /** Limite por cotizaciones SS. Sin derecho es 0: no hay deduccion que limitar */
-  limiteMaternidadCotizaciones: number;
-  /** Deduccion por maternidad efectiva (tras limite) */
+  /** Deduccion por maternidad efectiva. Sin derecho es 0 */
   deduccionMaternidadEfectiva: number;
-  /** Incremento guarderia efectivo (tras limite) */
+  /** Incremento guarderia efectivo (topes por hijo y alta en la SS) */
   incrementoGuarderiaEfectivo: number;
   /** Total deduccion efectiva (maternidad + guarderia) */
   totalDeduccionEfectiva: number;
@@ -196,7 +191,6 @@ export function calcularDeduccionMaternidadIRPF(
   p: ParametrosDeduccionMaternidadIRPF
 ): ResultadoDeduccionMaternidadIRPF {
   if (!p.hijos || p.hijos.length === 0) throw new Error('Debe indicar al menos un hijo.');
-  if (p.cotizacionesSSTotalesAnio < 0) throw new Error('Las cotizaciones no pueden ser negativas.');
 
   const advertencias: string[] = [];
 
@@ -259,31 +253,21 @@ export function calcularDeduccionMaternidadIRPF(
     detalleHijos.reduce((s, d) => s + d.incrementoAltaPosterior, 0)
   );
   // La bruta incluye los 150 EUR del art. 81.3, que la norma configura como incremento de
-  // «la deduccion correspondiente al mes» y por tanto viaja bajo su mismo limite.
+  // «la deduccion correspondiente al mes». Sin ninguna de las tres vias del art. 81.1 NO hay
+  // deduccion.
   const totalDeduccionBruta = tieneDerecho
     ? r(detalleHijos.reduce((s, d) => s + d.deduccionBruta + d.incrementoAltaPosterior, 0))
     : 0;
+  // Sin tope por cotizaciones desde 2023 (cabecera): la efectiva es la bruta.
+  const deduccionMaternidadEfectiva = totalDeduccionBruta;
 
-  // Limite de la deduccion de maternidad por cotizaciones. Sin ninguna de las tres vias del
-  // art. 81.1 NO hay deduccion: antes se ponia el limite a Infinity y se pagaba el maximo,
-  // convirtiendo la falta de derecho en ausencia de limite.
-  const limiteMaternidadCotizaciones = tieneDerecho ? r(p.cotizacionesSSTotalesAnio) : 0;
-  const deduccionMaternidadEfectiva = r(Math.min(totalDeduccionBruta, limiteMaternidadCotizaciones));
-
-  // Incremento por guarderia: los dos limites del art. 81.2 se aplican POR HIJO
-  // (Manual practico Renta 2025, «Limites de la deduccion»).
+  // Incremento por guarderia: sus dos unicos limites (art. 81.2 y 81.3, parrafo 3.º) se
+  // aplican POR HIJO: 1.000 EUR y el gasto efectivo no subvencionado.
   const incrementoPorHijo = detalleHijos.map((d) =>
     r(Math.min(INCREMENTO_MAX_GUARDERIA, d.gastosGuarderia))
   );
   const incrementoBruto = r(incrementoPorHijo.reduce((s, x) => s + x, 0));
-  // PENDIENTE DE CONFIRMAR EN /triaje-fiscal: si el incremento esta ademas limitado por las
-  // cotizaciones del ejercicio. La pagina de limites de la AEAT solo cita los dos anteriores
-  // (1.000 EUR y gasto efectivo no subvencionado, ambos por hijo), pero no se ha podido anclar
-  // con la rotundidad necesaria, asi que se CONSERVA el tope por cotizaciones tal como estaba:
-  // aplicado al agregado del incremento.
-  const incrementoGuarderiaEfectivo = estaDeAltaEnSS
-    ? r(Math.min(incrementoBruto, r(p.cotizacionesSSTotalesAnio)))
-    : 0;
+  const incrementoGuarderiaEfectivo = estaDeAltaEnSS ? incrementoBruto : 0;
 
   // Repartir entre hijos lo efectivamente deducible, para que las lineas publicadas sumen el
   // total publicado (antes las lineas daban la BRUTA y el total la EFECTIVA).
@@ -320,13 +304,6 @@ export function calcularDeduccionMaternidadIRPF(
       `ALTA POSTERIOR AL NACIMIENTO: se aplican ${INCREMENTO_ALTA_POSTERIOR} EUR adicionales por hijo ` +
       '(art. 81.3, parrafo 2) en el mes en que se completan los 30 dias cotizados. ' +
       `Total por este concepto: ${totalIncrementoAltaPosterior.toLocaleString('es-ES')} EUR.`
-    );
-  }
-  if (deduccionMaternidadEfectiva < totalDeduccionBruta) {
-    advertencias.push(
-      'LIMITE POR COTIZACIONES: la deduccion por maternidad (' + totalDeduccionBruta.toLocaleString('es-ES') + ' EUR) ' +
-      'supera las cotizaciones SS del ejercicio (' + p.cotizacionesSSTotalesAnio.toLocaleString('es-ES') + ' EUR). ' +
-      'La deduccion efectiva queda limitada a ' + deduccionMaternidadEfectiva.toLocaleString('es-ES') + ' EUR.'
     );
   }
   if (p.abonoAnticipado) {
@@ -369,7 +346,6 @@ export function calcularDeduccionMaternidadIRPF(
     totalDeduccionBruta,
     totalIncrementoAltaPosterior: tieneDerecho ? totalIncrementoAltaPosterior : 0,
     totalIncrementoGuarderia: incrementoGuarderiaEfectivo,
-    limiteMaternidadCotizaciones,
     deduccionMaternidadEfectiva,
     incrementoGuarderiaEfectivo,
     totalDeduccionEfectiva,

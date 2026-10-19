@@ -2877,21 +2877,20 @@ function crearServidorDelegum(): McpServer {
     'alternativas del art. 81.1: estar de alta en la Seguridad Social o mutualidad, percibir prestación o subsidio ' +
     'de desempleo al nacer el menor, o darse de alta después del nacimiento y alcanzar 30 días cotizados (esta ' +
     'última suma 150 € por hijo, art. 81.3). La reforma de 2023 (Ley 31/2022) amplió esas vías, no las suprimió: ' +
-    'sin ninguna de ellas la deducción es 0 €. Aplica el límite por cotizaciones a la Seguridad Social y descuenta ' +
-    'el abono anticipado ya cobrado.',
+    'sin ninguna de ellas la deducción es 0 €. Desde 2023 no hay tope por cotizaciones a la Seguridad Social. ' +
+    'Descuenta el abono anticipado ya cobrado.',
     {
       hijos: z.array(z.object({
         edad_meses_inicio_ejercicio: z.number().int().min(0).describe('Edad del hijo en MESES al inicio del ejercicio. 36 o más = sin derecho (se descarta).'),
         meses_con_derecho: z.number().int().min(0).max(12).describe('Meses del año con derecho a la deducción (1-12)'),
         gastos_guarderia_anuales: z.number().nonnegative().optional().describe('Gastos anuales de guardería o centro autorizado de este hijo (€). Por defecto 0. El tope de 1.000 € se aplica a cada hijo por separado.'),
       })).min(1).describe('Lista de hijos menores de 3 años'),
-      cotizaciones_ss_anuales: z.number().nonnegative().describe('Suma de las cotizaciones de la madre a la Seguridad Social en el año (€) — límite de la deducción base'),
       situacion: z.enum(['alta', 'desempleo', 'alta-posterior', 'ninguna']).optional().describe('Vía del art. 81.1 por la que se accede: "alta" (de alta en SS o mutualidad), "desempleo" (prestación o subsidio de desempleo al nacer el menor), "alta-posterior" (alta tras el nacimiento con 30 días cotizados; suma 150 €/hijo) o "ninguna" (ninguna de las tres → deducción 0 €). Por defecto "alta".'),
       madre_en_activo: z.boolean().optional().describe('OBSOLETO: usar "situacion". Solo se lee si no se indica "situacion": false equivale a "ninguna" y true a "alta".'),
       importe_abono_anticipado_cobrado: z.number().nonnegative().optional().describe('Importe ya cobrado por abono anticipado (modelo 140) en €. Por defecto 0.'),
     },
     { title: 'Calcula la deducción por maternidad en el IRPF', readOnlyHint: true },
-    async ({ hijos, cotizaciones_ss_anuales, situacion, madre_en_activo, importe_abono_anticipado_cobrado }, extra) => {
+    async ({ hijos, situacion, madre_en_activo, importe_abono_anticipado_cobrado }, extra) => {
       await registrarUsoDelegum('calcular_deduccion_maternidad_irpf', getCaller(extra));
       try {
         const r = calcularDeduccionMaternidadIRPF({
@@ -2900,7 +2899,6 @@ function crearServidorDelegum(): McpServer {
             mesesConDerechoEjercicio: h.meses_con_derecho,
             gastosGuarderiaAnuales: h.gastos_guarderia_anuales,
           })),
-          cotizacionesSSTotalesAnio: cotizaciones_ss_anuales,
           situacion: situacion as SituacionMaternidad | undefined,
           madreEnActivoOPrestacion: madre_en_activo,
           importeAbonoAnticipadoCobrado: importe_abono_anticipado_cobrado,
