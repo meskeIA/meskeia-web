@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from 'react';
 import styles from './TiradorDados.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 
 // Tipos de dados disponibles
 interface DiceType {
@@ -178,13 +178,16 @@ export default function TiradorDadosPage() {
                 >
                   −
                 </button>
-                <input
-                  type="number"
-                  value={quantity}
-                  onChange={e => setQuantity(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
+                {/* Con `type="number"` y `|| 1`, vaciar el campo escribía «1» bajo el cursor y
+                    teclear «5» daba «15»; el modificador no dejaba teclear «-» (cabo C0081) */}
+                <CampoNumerico
+                  valor={quantity}
+                  onCambio={setQuantity}
                   className={styles.quantityInput}
                   min={1}
                   max={20}
+                  decimales={0}
+                  ariaLabel="Cantidad de dados"
                 />
                 <button
                   className={styles.quantityBtn}
@@ -205,11 +208,12 @@ export default function TiradorDadosPage() {
                 >
                   −
                 </button>
-                <input
-                  type="number"
-                  value={modifier}
-                  onChange={e => setModifier(parseInt(e.target.value) || 0)}
+                <CampoNumerico
+                  valor={modifier}
+                  onCambio={setModifier}
                   className={styles.quantityInput}
+                  decimales={0}
+                  ariaLabel="Modificador"
                 />
                 <button
                   className={styles.quantityBtn}

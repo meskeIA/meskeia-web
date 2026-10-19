@@ -37,7 +37,8 @@ const APPS = [
       // Probar interacción básica
       await page.fill('input[type="number"]#monto', '50');
       await page.click('button:has-text("15%")');
-      await page.fill('input[type="number"]#personas', '2');
+      // Por id: desde el cabo C0081 (19/10/2026) es un CampoNumerico de texto, no un type="number"
+      await page.fill('#personas', '2');
     }
   },
   {

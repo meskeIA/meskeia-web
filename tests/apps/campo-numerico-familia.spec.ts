@@ -147,6 +147,45 @@ const CAMPOS: Campo[] = [
       await page.getByRole('button', { name: /Contador binario/ }).first().click();
     },
   },
+  // Lote 2 (19/10/2026): la misma forma, encontrada por el censo fuera de la lista del cabo
+  {
+    // Antes: value={personas || ''} con `|| 1`: vaciar escribía «1» y «4» daba «14»
+    slug: 'calculadora-propinas',
+    campo: '#personas',
+    teclear: '4',
+    valor: 4,
+    alSalir: '4',
+  },
+  {
+    slug: 'presupuesto-viaje',
+    campo: '#dias',
+    teclear: '12',
+    valor: 12,
+    alSalir: '12',
+  },
+  {
+    // Antes: `|| 10`: vaciar escribía «10» y «450» daba «10450»
+    slug: 'comparador-transporte-viaje',
+    campo: '#distancia',
+    teclear: '450',
+    valor: 450,
+    alSalir: '450',
+  },
+  {
+    // Antes: no dejaba teclear «-»: el navegador entregaba vacío y `|| 0` lo devolvía a 0
+    slug: 'tirador-dados',
+    campo: 'input[aria-label="Modificador"]',
+    teclear: '-3',
+    valor: -3,
+    alSalir: '-3',
+  },
+  {
+    slug: 'simulador-recursion',
+    campo: '#n-fact',
+    teclear: '9',
+    valor: 9,
+    alSalir: '9',
+  },
   {
     slug: 'simulador-programacion-dinamica',
     campo: 'input[aria-label="Peso del objeto 1"]',

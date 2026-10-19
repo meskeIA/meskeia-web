@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
@@ -210,15 +210,16 @@ export default function CalculadoraPropinas() {
             <label htmlFor="personas" className={styles.label}>
               Número de personas
             </label>
-            <input
-              type="number"
+            {/* Con `type="number"` y `|| 1`, vaciar el campo escribía «1» bajo el cursor y
+                teclear «4» daba «14» (cabo C0081) */}
+            <CampoNumerico
               id="personas"
               className={styles.input}
-              value={personas || ''}
-              onChange={(e) => setPersonas(parseInt(e.target.value) || 1)}
+              valor={personas}
+              onCambio={setPersonas}
               min={1}
               max={50}
-              step={1}
+              decimales={0}
             />
           </div>
 

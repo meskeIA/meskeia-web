@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard, CampoNumerico } from '@/components';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import styles from './PresupuestoViaje.module.css';
@@ -229,26 +229,26 @@ export default function PresupuestoViaje() {
             </div>
             <div className={styles.grupoCampo}>
               <label htmlFor="dias">Días de viaje</label>
-              <input
+              {/* Con `type="number"` y `|| 1`, vaciar el campo escribía «1» bajo el cursor y
+                  teclear «7» daba «17» (cabo C0081) */}
+              <CampoNumerico
                 id="dias"
-                type="number"
                 className={styles.inputNumero}
-                value={numeroDias}
-                onChange={e => setNumeroDias(Math.max(1, parseInt(e.target.value) || 1))}
-                min="1"
-                inputMode="numeric"
+                valor={numeroDias}
+                onCambio={setNumeroDias}
+                min={1}
+                decimales={0}
               />
             </div>
             <div className={styles.grupoCampo}>
               <label htmlFor="personas">Personas</label>
-              <input
+              <CampoNumerico
                 id="personas"
-                type="number"
                 className={styles.inputNumero}
-                value={personas}
-                onChange={e => setPersonas(Math.max(1, parseInt(e.target.value) || 1))}
-                min="1"
-                inputMode="numeric"
+                valor={personas}
+                onCambio={setPersonas}
+                min={1}
+                decimales={0}
               />
             </div>
             <div className={styles.grupoCampo}>

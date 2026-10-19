@@ -8,6 +8,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
+import CampoNumerico from '@/components/CampoNumerico';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import styles from './ComparadorTransporte.module.css';
 
@@ -292,19 +293,21 @@ export default function ComparadorTransporteViaje() {
               <label htmlFor="distancia" className={styles.campoLabel}>
                 Distancia (km)
               </label>
-              <input
+              {/* Con `type="number"` y `|| 10`, vaciar el campo escribía «10» bajo el cursor y
+                  teclear «450» daba «10450» (cabo C0081) */}
+              <CampoNumerico
                 id="distancia"
-                type="number"
                 className={styles.inputNumero}
-                value={distanciaKm}
+                valor={distanciaKm}
                 min={10}
                 max={3000}
-                onChange={(e) => {
-                  setDistanciaKm(Math.max(10, parseInt(e.target.value) || 10));
+                decimales={0}
+                paso={10}
+                onCambio={(v) => {
+                  setDistanciaKm(v);
                   setRutaLabel('');
                 }}
-                inputMode="numeric"
-                aria-describedby="distancia-hint"
+                ariaDescribedBy="distancia-hint"
               />
               <span id="distancia-hint" className={styles.campoHint}>Entre 10 y 3.000 km</span>
             </div>
@@ -313,15 +316,14 @@ export default function ComparadorTransporteViaje() {
               <label htmlFor="personas" className={styles.campoLabel}>
                 Número de personas
               </label>
-              <input
+              <CampoNumerico
                 id="personas"
-                type="number"
                 className={styles.inputNumero}
-                value={personas}
+                valor={personas}
                 min={1}
                 max={9}
-                onChange={(e) => setPersonas(Math.min(9, Math.max(1, parseInt(e.target.value) || 1)))}
-                inputMode="numeric"
+                decimales={0}
+                onCambio={setPersonas}
               />
             </div>
 

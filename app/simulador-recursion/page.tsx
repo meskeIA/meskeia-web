@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  CampoNumerico,
 } from '@/components';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorRecursion.module.css';
@@ -916,44 +917,23 @@ export default function Page() {
           {funcion === 'factorial' && (
             <div className={styles.inputGroup}>
               <label htmlFor="n-fact">n (1-12)</label>
-              <input
-                id="n-fact"
-                type="number"
-                min={1}
-                max={12}
-                value={nFactorial}
-                onChange={(e) => setNFactorial(Math.max(1, Math.min(12, parseInt(e.target.value, 10) || 1)))}
-              />
+              {/* Los siete campos: con `type="number"` y `|| 1`, vaciar escribía «1» bajo el
+                  cursor y teclear «5» daba «15» (cabo C0081) */}
+              <CampoNumerico id="n-fact" min={1} max={12} decimales={0} valor={nFactorial} onCambio={setNFactorial} />
             </div>
           )}
 
           {funcion === 'fibonacci' && (
             <div className={styles.inputGroup}>
               <label htmlFor="n-fib">n (1-{useMemo_ ? '20' : '10'})</label>
-              <input
-                id="n-fib"
-                type="number"
-                min={1}
-                max={useMemo_ ? 20 : 10}
-                value={nFib}
-                onChange={(e) =>
-                  setNFib(Math.max(1, Math.min(useMemo_ ? 20 : 10, parseInt(e.target.value, 10) || 1)))
-                }
-              />
+              <CampoNumerico id="n-fib" min={1} max={useMemo_ ? 20 : 10} decimales={0} valor={nFib} onCambio={setNFib} />
             </div>
           )}
 
           {funcion === 'hanoi' && (
             <div className={styles.inputGroup}>
               <label htmlFor="n-hanoi">Discos (1-7)</label>
-              <input
-                id="n-hanoi"
-                type="number"
-                min={1}
-                max={7}
-                value={nHanoi}
-                onChange={(e) => setNHanoi(Math.max(1, Math.min(7, parseInt(e.target.value, 10) || 1)))}
-              />
+              <CampoNumerico id="n-hanoi" min={1} max={7} decimales={0} valor={nHanoi} onCambio={setNHanoi} />
             </div>
           )}
 
@@ -961,23 +941,11 @@ export default function Page() {
             <>
               <div className={styles.inputGroup}>
                 <label htmlFor="a-mcd">a</label>
-                <input
-                  id="a-mcd"
-                  type="number"
-                  min={1}
-                  value={aMcd}
-                  onChange={(e) => setAMcd(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                />
+                <CampoNumerico id="a-mcd" min={1} decimales={0} valor={aMcd} onCambio={setAMcd} />
               </div>
               <div className={styles.inputGroup}>
                 <label htmlFor="b-mcd">b</label>
-                <input
-                  id="b-mcd"
-                  type="number"
-                  min={0}
-                  value={bMcd}
-                  onChange={(e) => setBMcd(Math.max(0, parseInt(e.target.value, 10) || 0))}
-                />
+                <CampoNumerico id="b-mcd" min={0} decimales={0} valor={bMcd} onCambio={setBMcd} />
               </div>
             </>
           )}
@@ -985,13 +953,7 @@ export default function Page() {
           {funcion === 'suma-digitos' && (
             <div className={styles.inputGroup}>
               <label htmlFor="n-suma">Número entero positivo</label>
-              <input
-                id="n-suma"
-                type="number"
-                min={0}
-                value={nSuma}
-                onChange={(e) => setNSuma(Math.max(0, parseInt(e.target.value, 10) || 0))}
-              />
+              <CampoNumerico id="n-suma" min={0} decimales={0} valor={nSuma} onCambio={setNSuma} />
             </div>
           )}
 
@@ -1009,12 +971,7 @@ export default function Page() {
               </div>
               <div className={styles.inputGroup}>
                 <label htmlFor="obj-bin">Buscar</label>
-                <input
-                  id="obj-bin"
-                  type="number"
-                  value={objetivoBusqueda}
-                  onChange={(e) => setObjetivoBusqueda(parseInt(e.target.value, 10) || 0)}
-                />
+                <CampoNumerico id="obj-bin" decimales={0} valor={objetivoBusqueda} onCambio={setObjetivoBusqueda} />
               </div>
             </>
           )}
