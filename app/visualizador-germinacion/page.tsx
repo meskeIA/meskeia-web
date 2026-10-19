@@ -594,9 +594,11 @@ export default function GerminacionPage() {
                 <div>
                   <strong>{germinaOK ? '¡La semilla germina!' : 'La semilla no germina'}</strong>
                   <p className={styles.resultadoDetalle}>
-                    {!aguaActiva && 'Sin agua, la testa no se ablanda y el metabolismo no se activa. '}
-                    {!tempOptima && `A ${temperatura}°C, las enzimas no funcionan correctamente. `}
-                    {germinaOK && 'Las condiciones son adecuadas: agua disponible, temperatura óptima y oxígeno presente.'}
+                    {/* Cada frase en su <span> (cabo C0312): como texto suelto con hermanos, al
+                        retirarla con la página traducida React no encontraba el nodo y la app caía. */}
+                    {!aguaActiva && <span>Sin agua, la testa no se ablanda y el metabolismo no se activa. </span>}
+                    {!tempOptima && <span>A {temperatura}°C, las enzimas no funcionan correctamente. </span>}
+                    {germinaOK && <span>Las condiciones son adecuadas: agua disponible, temperatura óptima y oxígeno presente.</span>}
                   </p>
                 </div>
               </div>

@@ -291,9 +291,9 @@ export default function AnalizadorTitulosSeoPage() {
                 <div className={`${styles.checkItem} ${analisis.longitudStatus === 'optimo' ? styles.passed : styles.failed}`}>
                   <span className={styles.checkIcon}>{analisis.longitudStatus === 'optimo' ? '✓' : '✗'}</span>
                   <span>Longitud: {analisis.longitud} caracteres
-                    {analisis.longitudStatus === 'corto' && ' (muy corto)'}
-                    {analisis.longitudStatus === 'largo' && ' (muy largo)'}
-                    {analisis.longitudStatus === 'optimo' && ' (óptimo)'}
+                    {analisis.longitudStatus === 'corto' && <span> (muy corto)</span>}
+                    {analisis.longitudStatus === 'largo' && <span> (muy largo)</span>}
+                    {analisis.longitudStatus === 'optimo' && <span> (óptimo)</span>}
                   </span>
                 </div>
                 <div className={`${styles.checkItem} ${analisis.empiezaMayuscula ? styles.passed : styles.failed}`}>
@@ -302,7 +302,10 @@ export default function AnalizadorTitulosSeoPage() {
                 </div>
                 <div className={`${styles.checkItem} ${analisis.tieneNumero ? styles.passed : styles.warning}`}>
                   <span className={styles.checkIcon}>{analisis.tieneNumero ? '✓' : '!'}</span>
-                  <span>Contiene números {!analisis.tieneNumero && '(recomendado)'}</span>
+                  {/* «(recomendado)», y los añadidos de la longitud y de las palabras débiles, en su
+                      propio <span> (cabo C0312): como texto suelto junto a otro, al retirarlo con
+                      la página traducida la app caía con NotFoundError. */}
+                  <span>Contiene números {!analisis.tieneNumero && <span>(recomendado)</span>}</span>
                 </div>
                 <div className={`${styles.checkItem} ${analisis.palabrasPoder.length > 0 ? styles.passed : styles.warning}`}>
                   <span className={styles.checkIcon}>{analisis.palabrasPoder.length > 0 ? '✓' : '!'}</span>
@@ -310,7 +313,7 @@ export default function AnalizadorTitulosSeoPage() {
                 </div>
                 <div className={`${styles.checkItem} ${analisis.palabrasDebiles.length === 0 ? styles.passed : styles.failed}`}>
                   <span className={styles.checkIcon}>{analisis.palabrasDebiles.length === 0 ? '✓' : '✗'}</span>
-                  <span>Sin palabras débiles {analisis.palabrasDebiles.length > 0 && `(${analisis.palabrasDebiles.join(', ')})`}</span>
+                  <span>Sin palabras débiles {analisis.palabrasDebiles.length > 0 && <span>({analisis.palabrasDebiles.join(', ')})</span>}</span>
                 </div>
                 <div className={`${styles.checkItem} ${analisis.tienePregunta ? styles.passed : styles.neutral}`}>
                   <span className={styles.checkIcon}>{analisis.tienePregunta ? '✓' : '○'}</span>
