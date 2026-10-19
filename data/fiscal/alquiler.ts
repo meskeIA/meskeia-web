@@ -12,8 +12,8 @@
  * - Publicado mensualmente
  * - Aplica a contratos firmados ANTES del 26 de mayo de 2023
  *
- * Versión: 1.1.3
- * Última verificación: 2026-10-11
+ * Versión: 1.1.4
+ * Última verificación: 2026-10-19
  * ⚠️ 2026-07-14: corregidos los valores de IPC de jun-2025 a feb-2026 (la serie
  *    anterior no coincidía con la oficial del INE, verificado mes a mes con varipc)
  *    y corregida la fuente del IRAV (la antigua tabla 25171 sirve hoy el IPV).
@@ -28,12 +28,15 @@
  *    El RDL 29/2026 (en vigor el 08/10/2026, PENDIENTE de convalidación) cambia el tope de
  *    la actualización (art. 18 LAU) y añade otro extraordinario del 2 % (DF 6.ª): NO está
  *    modelado a propósito hasta que se vote; lo decide el triaje de noviembre.
+ * ⚠️ 2026-10-19: incorporado el IPC interanual de septiembre (4,9 %, nota de prensa IPC0926
+ *    del INE, definitivo) y cerrado 2026-Q3 con los tres meses del IRAV de la API del INE
+ *    (tabla 72975). Sigue la media trimestral; el método lo revisa noviembre (cabo C0195).
  * ⚠️ Verificar valores con el INE antes de aplicar en un contrato real.
  */
 
 export const ALQUILER_META = {
   fuente: 'INE — Índice de Referencia de Actualización de Vivienda (IRAV) + IPC Interanual · Ley 12/2023 de Vivienda',
-  verificado: '2026-10-11',
+  verificado: '2026-10-19',
   vigencia: '2026',
   urlOficial: 'https://www.ine.es/jaxiT3/Tabla.htm?t=72975',
   nota: 'El IRAV se publica trimestralmente. Contratos anteriores al 26/05/2023 usan IPC interanual. Verificar índice vigente en el INE.',
@@ -61,6 +64,7 @@ export const IRAV_POR_TRIMESTRE: Record<string, number> = {
   '2025-Q4': 2.29, // oct-dic 2025 (media mensual INE: 2.25, 2.29, 2.32)
   '2026-Q1': 2.26, // ene-mar 2026 (media mensual INE: 2.14, 2.16, 2.47)
   '2026-Q2': 2.44, // abr-jun 2026 (media mensual INE: 2.40, 2.48, 2.44 — trimestre completo)
+  '2026-Q3': 2.50, // jul-sep 2026 (media mensual INE: 2.49, 2.47, 2.54 — trimestre completo)
 };
 
 /**
@@ -121,6 +125,7 @@ export const IPC_INTERANUAL_POR_MES: Record<string, number> = {
   '2026-06': 3.2,
   '2026-07': 3.6,
   '2026-08': 4.3,
+  '2026-09': 4.9,
 };
 
 /** Devuelve la clave del trimestre IRAV para un mes dado (1-12) */
