@@ -4709,27 +4709,40 @@ test.describe('Motores 09/09 — retención de dividendos: la escala del ahorro 
   });
 
   test('ALTO: un dividendo que el motor declara EXENTO no soporta retención española', () => {
-    test.fail(); // ABIERTO A PROPÓSITO — pendiente de fuente oficial, no de trabajo
-    // Incoherencia entre dos umbrales del mismo bloque: exime del IS desde el 5 % + 12 meses,
-    // pero solo suprime la retención desde el 25 %. Con 10 % y 24 meses publica
+    // REPARADO (cabo C0050, 19/10/2026). El motor eximía del IS desde el 5 % + 12 meses pero
+    // solo suprimía la retención desde un 25 % sin fuente: con 10 % y 24 meses publicaba
     // aplicaExencionIS: true junto a 19.000 € de retención practicada.
     //
-    // ⚠️ ESTE test.fail() NO se retira todavía, y no es un olvido. En la sesión de reparación
-    // del 09/09/2026 se buscó la fuente y NO se pudo anclar cuál de los dos umbrales es el
-    // correcto: `data/fiscal` no tiene módulo de excepciones a la obligación de retener y la
-    // consulta al art. 61 RIS no fue concluyente. Elegir uno «por coherencia» habría sido
-    // inventar normativa, y en la dirección equivocada haría daño: si el bueno fuera el 25 %,
-    // quitar la retención dejaría al usuario sin reclamar una devolución que le corresponde.
-    //
-    // Lo que SÍ se reparó es que la respuesta ya no deja las dos afirmaciones sin reconciliar:
-    // el motor explica que la retención es un pago a cuenta íntegramente recuperable y que la
-    // `cuotaDiferencial` negativa ES esa devolución. Queda para /triaje-fiscal.
+    // Art. 61.p RIS (BOE-A-2015-7771, leído en el triaje fiscal del 19/10/2026 con OK del
+    // usuario): «No existirá obligación de retener […] respecto de: p) Los dividendos o
+    // participaciones en beneficios a que se refiere el apartado 1 del artículo 21 de la Ley
+    // del Impuesto». El umbral de no retener es el mismo de la exención.
     const res = calcularRetencionDividendos({
       tipoReceptor: 'sociedad_residente', dividendoBruto: 100000,
       porcentajeParticipacion: 10, mesesTenencia: 24,
     });
     expect(res.aplicaExencionIS).toBe(true);
     expect(res.retencionPracticada).toBe(0);
+    expect(res.cuotaDiferencial).toBe(0);
+  });
+
+  test('ALTO: con el 5 % pero sin el año cumplido se retiene, y se dice que puede volver', () => {
+    // Art. 21.1.a LIS: el año puede completarse DESPUÉS de la fecha de exigibilidad. Ese día
+    // aún no hay exención acreditada, así que la pagadora retiene; si se completa, la
+    // retención se recupera en el modelo 200. El motor conserva la retención y lo explica.
+    const res = calcularRetencionDividendos({
+      tipoReceptor: 'sociedad_residente', dividendoBruto: 100000,
+      porcentajeParticipacion: 25, mesesTenencia: 6,
+    });
+    expect(res.aplicaExencionIS).toBe(false);
+    expect(res.retencionPracticada).toBe(100000 * RETENCIONES_IS_2025.dividendos / 100);
+    expect(res.advertencias.join(' ')).toMatch(/completar el ano/);
+    // Por debajo del 5 % ni hay exención ni excepción a retener, por mucho que dure.
+    const pequena = calcularRetencionDividendos({
+      tipoReceptor: 'sociedad_residente', dividendoBruto: 100000,
+      porcentajeParticipacion: 3, mesesTenencia: 24,
+    });
+    expect(pequena.retencionPracticada).toBe(100000 * RETENCIONES_IS_2025.dividendos / 100);
   });
 
   test('SANO — el caso corriente sale bien y tiene que seguir saliendo', () => {
@@ -4766,7 +4779,7 @@ test.describe('Motores 09/09 — retención de dividendos: la escala del ahorro 
   });
 
   test('DERIVA: el tipo de IS y la retención del 19 % coinciden HOY con data/fiscal', () => {
-    // Los otros dos valores hardcodeados del motor (19 % y 25 %) NO divergen todavía. Este
+    // Los valores que el motor usa (tipo del IS y retención del 19 %) NO divergen todavía. Este
     // candado existe para que se enteren el día que data/fiscal cambie, que es exactamente lo
     // que nadie vio pasar con el tramo del 28 %.
     const soc = calcularRetencionDividendos({

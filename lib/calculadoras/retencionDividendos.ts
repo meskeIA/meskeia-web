@@ -37,12 +37,15 @@
  *   desde 2015 (Ley 26/2014). TODOS los dividendos tributan.
  *
  * TRIBUTACION EN IS (persona juridica receptora):
- *   - EXENCION art. 21: si la participacion es >= 5% (o valor > 20 M EUR)
- *     mantenida durante >= 1 ano: los dividendos estan EXENTOS de IS
+ *   - EXENCION art. 21: si la participacion es >= 5% mantenida durante >= 1 ano:
+ *     los dividendos estan EXENTOS de IS
  *   - Si no se cumplen los requisitos: tributan al tipo general del IS
- *   - Retencion: la exencion del IS y la excepcion a la obligacion de retener NO
- *     comparten umbral en este motor (5% frente a 25%). Ver el comentario de
- *     PCT_PARTICIPACION_SIN_RETENCION: el 25% esta PENDIENTE DE VERIFICAR.
+ *   - Retencion: art. 61.p RIS, «No existira obligacion de retener [...] respecto de:
+ *     p) Los dividendos o participaciones en beneficios a que se refiere el apartado 1
+ *     del articulo 21 de la Ley del Impuesto». El umbral de no retener es el MISMO de la
+ *     exencion (5% y un ano cumplido a la fecha de exigibilidad). Decidido en el triaje
+ *     fiscal del 19/10/2026 (cabo C0050); antes este motor solo dejaba de retener desde
+ *     un 25% sin fuente.
  *
  * DIVIDENDOS DE NO RESIDENTES:
  *   - Tipo general LIRNR: el de data/fiscal (19%)
@@ -74,21 +77,6 @@ const PCT_IS_GENERAL = TIPOS_IS_2025.general;
 
 const PCT_PARTICIPACION_EXENCION_IS = 5;  // % participacion minima para exencion IS art. 21
 const MESES_TENENCIA_MINIMA_IS = 12;      // Meses de tenencia minima para exencion IS
-
-/**
- * % de participacion a partir del cual este motor deja de practicar retencion.
- *
- * ⚠️ PENDIENTE DE VERIFICAR EN /triaje-fiscal (anotado el 09/09/2026).
- * data/fiscal NO tiene modulo de excepciones a la obligacion de retener, y la consulta
- * al RIS art. 61 no fue concluyente. El valor 25 NO se ha tocado en la reparacion del
- * 09/09/2026 precisamente porque no se pudo anclar en fuente oficial: puede que el
- * umbral correcto sea el mismo 5% del art. 21 LIS, en cuyo caso este 25 sobra.
- *
- * Mientras no se ancle, lo que el motor SI garantiza es que el resultado no se
- * contradiga: cuando declara la exencion del IS y a la vez practica retencion, lo dice
- * y explica que esa retencion es un pago a cuenta integramente recuperable.
- */
-const PCT_PARTICIPACION_SIN_RETENCION = 25;
 
 /**
  * Escala base del ahorro — canonica de data/fiscal.
@@ -535,23 +523,35 @@ export function calcularRetencionDividendos(
         tipoEfectivo = r(cuotaImpuesto / dividendoBruto * 100);
       }
 
-      // Retencion: este motor deja de retener a partir de PCT_PARTICIPACION_SIN_RETENCION.
-      // ⚠️ Ese umbral esta PENDIENTE DE VERIFICAR (ver la constante).
-      if (!faltaParticipacion && (pctPart as number) >= PCT_PARTICIPACION_SIN_RETENCION) {
+      // Retencion: art. 61.p RIS exceptua de retener los dividendos del art. 21.1 LIS, asi
+      // que no se retiene exactamente cuando el dividendo esta exento.
+      if (aplicaExencionIS) {
         retencionPracticada = 0;
         advertencias.push(
-          'NO SE PRACTICA RETENCION: la participacion del ' + pctPart + '% alcanza el ' +
-          PCT_PARTICIPACION_SIN_RETENCION + '% a partir del cual la sociedad pagadora no ' +
-          'retiene. Confirma este extremo con la pagadora: el umbral exacto de la excepcion a ' +
-          'la obligacion de retener esta pendiente de verificacion en fuente oficial.'
+          'NO SE PRACTICA RETENCION (art. 61.p RIS): no hay obligacion de retener sobre los ' +
+          'dividendos que cumplen los requisitos de la exencion del art. 21.1 LIS, es decir, ' +
+          'participacion >= ' + PCT_PARTICIPACION_EXENCION_IS + '% poseida durante el ano ' +
+          'anterior al dia en que el dividendo es exigible.'
         );
       } else {
         retencionPracticada = r(dividendoBruto * PCT_RETENCION_DIVIDENDOS / 100);
-        if (faltaParticipacion) {
+        if (faltaParticipacion || faltaTenencia) {
           advertencias.push(
-            'RETENCION APLICADA POR DEFECTO: al no conocerse el porcentaje de participacion, se ' +
-            'calcula la retencion general del ' + PCT_RETENCION_DIVIDENDOS + '%. Con ' +
-            'participaciones altas la pagadora puede estar exceptuada de retener.'
+            'RETENCION APLICADA POR DEFECTO: sin el porcentaje de participacion y los meses de ' +
+            'tenencia no se puede comprobar la excepcion del art. 61.p RIS, asi que se calcula ' +
+            'la retencion general del ' + PCT_RETENCION_DIVIDENDOS + '%. Con participacion >= ' +
+            PCT_PARTICIPACION_EXENCION_IS + '% mantenida un ano, la pagadora no retiene.'
+          );
+        } else if ((pctPart as number) >= PCT_PARTICIPACION_EXENCION_IS) {
+          // >= 5% pero sin el ano cumplido a la fecha de exigibilidad.
+          advertencias.push(
+            'TENENCIA AUN NO CUMPLIDA: con ' + mesesTen + ' meses la pagadora retiene el ' +
+            PCT_RETENCION_DIVIDENDOS + '%, porque el ano de tenencia no se ha cumplido el dia en ' +
+            'que el dividendo es exigible. Si la participacion se mantiene despues hasta ' +
+            'completar el ano, el art. 21.1.a LIS tambien declara exento el dividendo: entonces ' +
+            'la cuota del IS sobre el es 0 EUR y esta retencion, un pago a cuenta, se recupera ' +
+            'en la autoliquidacion del IS (modelo 200). La cuota de abajo es el escenario en que ' +
+            'NO se completa el ano.'
           );
         }
       }
@@ -606,24 +606,6 @@ export function calcularRetencionDividendos(
   const cuotaFinal = aplicaExencionIS ? 0 : cuotaImpuesto;
   const cuotaDiferencial = r(cuotaFinal - retencionPracticada);
 
-  // Coherencia interna: si el dividendo esta EXENTO y aun asi soporta retencion, hay que
-  // decir por que y que esa retencion vuelve. Antes se publicaban las dos afirmaciones
-  // (exento / 19.000 EUR retenidos) sin nada que las reconciliara.
-  if (aplicaExencionIS && retencionPracticada > 0) {
-    advertencias.push(
-      'POR QUE HAY RETENCION SI EL DIVIDENDO ESTA EXENTO: son dos umbrales distintos. La ' +
-      'exencion del art. 21 LIS se gana con participacion >= ' + PCT_PARTICIPACION_EXENCION_IS +
-      '% y >= ' + MESES_TENENCIA_MINIMA_IS + ' meses; la dispensa de RETENER, en este calculo, ' +
-      'solo a partir del ' + PCT_PARTICIPACION_SIN_RETENCION + '%. Esa retencion de ' +
-      retencionPracticada + ' EUR NO es un impuesto: es un pago a cuenta integramente ' +
-      'recuperable. Como la cuota del IS sobre este dividendo es 0 EUR, se deduce en la ' +
-      'autoliquidacion del IS (modelo 200) y genera una DEVOLUCION de ' + retencionPracticada +
-      ' EUR, que es el importe negativo de cuotaDiferencial. ' +
-      'El umbral del ' + PCT_PARTICIPACION_SIN_RETENCION + '% esta pendiente de verificar en ' +
-      'fuente oficial: confirma con la pagadora si va a retener o no.'
-    );
-  }
-
   if (datosNoAportados.length > 0) {
     advertencias.push(
       'DATOS QUE NO SE HAN FACILITADO y que el calculo necesitaba: ' +
@@ -652,7 +634,7 @@ export function calcularRetencionDividendos(
     datosNoAportados,
     advertencias,
     fuenteDatos:
-      'LIRPF art. 25.1 + LIS art. 21 + LIRNR. ' +
+      'LIRPF art. 25.1 + LIS art. 21 + RIS art. 61.p + LIRNR. ' +
       `Escala del ahorro: ${FISCAL_INMUEBLES_META.fuente} — verificado ${FISCAL_INMUEBLES_META.verificado}. ` +
       `Tipos IS y retencion: ${FISCAL_SOCIEDADES_META.fuente} — verificado ${FISCAL_SOCIEDADES_META.verificado}.`,
   };
