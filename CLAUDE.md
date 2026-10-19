@@ -571,6 +571,18 @@ Escape: `footer-ok: <razón>`, razón obligatoria.
 > C0042. Crónica: cabecera de `scripts/check-footer-tracker.mjs` · pruebas:
 > `npm run footer-tracker:probar-candado`.
 
+### Candado del ternario que tumba la página traducida
+
+`npm run check:ternario-traducido` — en el build, y **rompe el build** si un ternario hijo de JSX
+alterna **texto suelto y JSX** (`{c ? '✓ Copiado' : <>…</>}`, también con plantilla o anidado):
+con la página traducida, al cambiar de rama React retira un nodo de texto que el traductor ya
+cambió por `<font>` y la app cae. Receta: cada rama en su `<span key>`. Barre `app/` y
+`components/`, **sin pasivo** · Escape: `traduccion-ok: <razón>`, razón obligatoria.
+⚠️ No ve `{x && 'texto'}` ni una hoja que sea variable: eso lo mide
+`tests/apps/ternario-traducido-familia.spec.ts`.
+> Salió del hallazgo 3314 (ShareCard) y el cabo C0262. Crónica: cabecera de
+> `scripts/check-ternario-traducido.mjs` · pruebas: `npm run ternario:probar-candado`.
+
 ### Candado del parser numérico
 
 `npm run check:parser` — en el build, y **rompe el build** si el commit escribe
