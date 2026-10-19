@@ -77,7 +77,7 @@ import {
   longitudUmbralNm,
   regionEspectro,
 } from './motor';
-import { corregirNumero, exigeRedondeo, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Holgura relativa con la que una inversión (φ o λ) tiene que reproducir el dato del enunciado. */
 const HOLGURA_INVERSION = 1e-9;
@@ -196,9 +196,9 @@ function phiTexto(phi: number): string {
   return `${formatNumber(phi, 2)} eV`;
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */

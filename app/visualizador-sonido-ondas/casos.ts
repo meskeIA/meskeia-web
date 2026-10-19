@@ -31,7 +31,7 @@
  * `resolverCaso` lo rechaza con un error legible en lugar de imprimir «∞» como resultado.
  */
 
-import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── Datos físicos de la app ─────────────────────────── */
 
@@ -203,9 +203,9 @@ function numero(n: number, decimales = 2): string {
   return n.toLocaleString('es-ES', { maximumFractionDigits: decimales });
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /**

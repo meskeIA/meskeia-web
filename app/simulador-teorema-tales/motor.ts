@@ -24,7 +24,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, dentroDeTolerancia, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, dentroDeTolerancia, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================
 // UTILIDADES BÁSICAS
@@ -47,8 +47,8 @@ function num(valor: number): string {
 /** Redondeo a `decimales` cifras, para que 0,1 + 0,2 no aparezca como 0,30000000000000004. */
 export function redondear(valor: number, decimales = 4): number {
   if (!Number.isFinite(valor)) return NaN;
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  // El del motor compartido: empates lejos de cero y sin ruido binario (C0126).
+  return redondearA(valor, decimales);
 }
 
 /** Resultado de un cálculo acompañado de su desarrollo. */

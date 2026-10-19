@@ -30,7 +30,7 @@
  */
 
 import { G_POR_DEFECTO, energiaCinetica, energiaPotencial, velocidadDesdeEnergiaCinetica } from './motor';
-import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 export { G_POR_DEFECTO } from './motor';
 
@@ -82,9 +82,9 @@ function numero(n: number, decimales = 2): string {
   return n.toLocaleString('es-ES', { maximumFractionDigits: decimales });
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** Falta un dato obligatorio: se responde con un error legible, nunca con una excepción. */

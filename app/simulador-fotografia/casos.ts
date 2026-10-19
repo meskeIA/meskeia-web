@@ -31,7 +31,7 @@
  * justamente ese redondeo comercial, y lo dicen en el enunciado.
  */
 
-import { corregirNumero, dentroDeTolerancia, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, dentroDeTolerancia, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────── Las escalas y la aritmética, compartidas con la vista ─────────────────── */
 
@@ -169,9 +169,9 @@ function numeroFijo(n: number, decimales: number): string {
   return n.toLocaleString('es-ES', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** Índice de un valor en su escala, o −1 si no pertenece a ella. */

@@ -63,7 +63,7 @@ import {
   cuerpoPorId,
   type CuerpoCentral,
 } from './motor';
-import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── Datos de un caso ─────────────────────────── */
 
@@ -178,9 +178,9 @@ export function cientifico(n: number, cifras = 4): string {
   return `${numero(mantisa, cifras)}·10${sup}`;
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */

@@ -59,7 +59,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -184,8 +184,8 @@ export function radianesAGrados(radianes: number): number {
  * JavaScript, que es lo único que distingue «−0,0000» de «0,0000».
  */
 export function redondear(n: number, decimales = 4): number {
-  const factor = Math.pow(10, decimales);
-  return Math.round(n * factor) / factor + 0;
+  // El del motor compartido (C0126): empates lejos de cero, sin ruido binario y también sin −0.
+  return redondearA(n, decimales);
 }
 
 /**

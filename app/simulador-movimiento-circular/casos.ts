@@ -28,7 +28,7 @@
  * `resolverCaso` lo rechaza con un error legible en lugar de imprimir «∞» como resultado.
  */
 
-import { corregirNumero, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, redondearA, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── La física, compartida con la vista ─────────────────────────── */
 
@@ -116,9 +116,9 @@ function numero(n: number, decimales = 2): string {
   return n.toLocaleString('es-ES', { maximumFractionDigits: decimales });
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 const NOMBRE_ENTRADA: Record<Entrada['via'], string> = {

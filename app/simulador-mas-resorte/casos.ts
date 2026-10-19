@@ -52,7 +52,7 @@
 
 import { formatNumber } from '@/lib';
 import { calcularEstado, describirOscilador, energiaInicial } from './motor';
-import { corregirNumero, exigeRedondeo, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Holgura relativa con la que una inversión (k o m) tiene que reproducir el T o la f dados. */
 const HOLGURA_INVERSION = 1e-9;
@@ -125,9 +125,9 @@ function numero(n: number, decimales = 4): string {
   return (n + 0).toLocaleString('es-ES', { maximumFractionDigits: decimales });
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */

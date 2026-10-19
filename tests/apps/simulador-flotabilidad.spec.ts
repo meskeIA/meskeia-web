@@ -9,6 +9,7 @@ import {
   type DatosCaso,
 } from '../../app/simulador-flotabilidad/casos';
 import { LIQUIDOS, MATERIALES } from '../../app/simulador-flotabilidad/materiales';
+import { redondearA } from '../../lib/calculadoras/correctorCasosAula';
 
 /**
  * Simulador de Flotabilidad (principio de Arquímedes) — PASO 4.bis de /nueva-app-meskeia
@@ -219,7 +220,8 @@ const A_MANO_AULA: Record<number, number> = {
   12: 400,
 };
 
-const redondeoAula = (v: number, d: number) => Math.round(v * 10 ** d) / 10 ** d;
+// El de la app, del motor compartido: con Math.round a secas este test consagraba el C0126.
+const redondeoAula = redondearA;
 
 function casoAula(id: number) {
   const caso = CASOS.find((c) => c.id === id);
@@ -302,10 +304,18 @@ test.describe('simulador-flotabilidad · casos para clase', () => {
     const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
     expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(muestras.map((m) => m.datos.magnitud)).size).toBeGreaterThanOrEqual(3);
-    for (const m of muestras) {
+    muestras.forEach((m, i) => {
       expect(Number.isFinite(m.respuesta)).toBe(true);
-      expect(redondeoAula(resolverCaso(m.datos).valor, m.datos.decimales ?? 2)).toBe(m.respuesta);
-    }
+      expect(redondeoAula(resolverCaso(m.datos).valor, m.datos.decimales ?? 2), `semilla ${i + 1}`).toBe(m.respuesta);
+    });
+
+    // Cabo C0126 (19/10/2026): la semilla 28 da P − E = 58,86 − 24,525 = 34,335 N EXACTOS, que en
+    // binario quedan en 34,334999…; con Math.round a secas el paso decía «34,335 N» y la línea
+    // siguiente «Redondeando a dos decimales: 34,33 N». El redondeo del motor limpia el ruido.
+    const s28 = generarEjercicioAleatorio(28);
+    expect(s28.pasos.join(' ')).toContain('= 34,335 N');
+    expect(s28.respuesta).toBe(34.34);
+    expect(s28.pasos[s28.pasos.length - 1]).toContain('34,34 N');
   });
 
   test('7 · el convenio queda fijado: las doce claves a mano y g = 9,81 declarada donde cuenta', async () => {

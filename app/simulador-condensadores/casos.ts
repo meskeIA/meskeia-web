@@ -69,7 +69,7 @@ import {
   type ModoBateria,
   type ModoRC,
 } from './motor';
-import { corregirNumero, exigeRedondeo, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Holgura relativa con la que una inversión (d o t) tiene que reproducir el dato del enunciado. */
 const HOLGURA_INVERSION = 1e-9;
@@ -190,9 +190,9 @@ function cientifico(x: number, decimales = 4): string {
   return `${mantisa}·10${potencia}`;
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */

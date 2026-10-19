@@ -26,7 +26,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -116,8 +116,8 @@ export interface Comprobacion {
 
 /** Redondea a `decimales` para no arrastrar el ruido binario del punto flotante. */
 export function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  // El del motor compartido: empates lejos de cero y sin ruido binario (C0126).
+  return redondearA(valor, decimales);
 }
 
 /**

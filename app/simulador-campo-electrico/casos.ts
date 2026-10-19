@@ -45,7 +45,7 @@ import {
   modulo,
   type CargaPuntual,
 } from './motor';
-import { corregirNumero, dentroDeTolerancia, exigeRedondeo, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, dentroDeTolerancia, exigeRedondeo, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── Datos de un caso ─────────────────────────── */
 
@@ -94,9 +94,9 @@ export interface Resolucion {
 /** 1 nano = 10⁻⁹: pasa N a nN y J a nJ. */
 const NANO = 1e-9;
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /**

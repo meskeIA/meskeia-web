@@ -814,6 +814,7 @@ import {
   generarEjercicioAleatorio,
 } from '../../app/simulador-campo-electrico/casos';
 import { calcularCampoEnPunto, modulo } from '../../app/simulador-campo-electrico/motor';
+import { redondearA } from '../../lib/calculadoras/correctorCasosAula';
 import {
   alCentimetro,
   leerCoordenada,
@@ -861,7 +862,7 @@ test.describe('simulador-campo-electrico · casos para clase', () => {
     for (const caso of CASOS_AULA) {
       const r = resolverCaso(caso.datos);
       expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
-      expect(Math.round(r.valor * 100) / 100, `caso ${caso.id}`).toBe(caso.respuesta);
+      expect(redondearA(r.valor, 2), `caso ${caso.id}`).toBe(caso.respuesta);
     }
   });
 
@@ -908,14 +909,18 @@ test.describe('simulador-campo-electrico · casos para clase', () => {
     const b = generarEjercicioAleatorio(12345);
     expect(b.enunciado).toBe(a.enunciado);
     expect(b.respuesta).toBe(a.respuesta);
-    expect(Math.round(resolverCaso(a.datos).valor * 100) / 100).toBe(a.respuesta);
+    expect(redondearA(resolverCaso(a.datos).valor, 2)).toBe(a.respuesta);
+
+    // Con el redondeo del motor, no con Math.round a secas: la semilla 1480853 da U = −4,495 nJ
+    // exactos, y Math.round la dejaba en −4,49 cuando +4,495 da 4,50 (cabo C0126, 19/10/2026).
+    expect(generarEjercicioAleatorio(1480853).respuesta).toBe(-4.5);
 
     const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
     expect(new Set(muestras.map((m) => m.respuesta)).size).toBeGreaterThanOrEqual(3);
     expect(new Set(muestras.map((m) => m.datos.magnitud)).size).toBeGreaterThanOrEqual(3);
     for (const m of muestras) {
       expect(Number.isFinite(m.respuesta), `semilla ${m.semilla}`).toBe(true);
-      expect(Math.round(resolverCaso(m.datos).valor * 100) / 100, `semilla ${m.semilla}`).toBe(m.respuesta);
+      expect(redondearA(resolverCaso(m.datos).valor, 2), `semilla ${m.semilla}`).toBe(m.respuesta);
     }
   });
 

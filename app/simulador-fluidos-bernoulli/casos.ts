@@ -63,7 +63,7 @@ import {
   type GeomId,
   type SeccionCalculada,
 } from './motor';
-import { corregirNumero, dentroDeTolerancia, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, dentroDeTolerancia, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 export { G, P_ATMOSFERICA } from './motor';
 
@@ -150,9 +150,9 @@ function numero(n: number, decimales = 4): string {
   return conMenos((n + 0).toLocaleString('es-ES', { maximumFractionDigits: decimales }));
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */

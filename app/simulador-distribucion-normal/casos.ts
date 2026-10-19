@@ -40,7 +40,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, dentroDeTolerancia, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, dentroDeTolerancia, redondearA, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── La matemática de la app ─────────────────────────── */
 
@@ -186,9 +186,9 @@ function fijo(n: number, decimales: number): string {
   );
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** Φ(z) como la da la tabla: z con dos decimales, Φ con cuatro. */

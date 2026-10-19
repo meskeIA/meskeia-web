@@ -37,6 +37,7 @@ import {
   dentroDeTolerancia,
   exigeRedondeo,
   fueraDeDominio,
+  redondearA,
   textoDesviacion,
   toleranciaDeRedondeo,
   toleranciaRelativa,
@@ -65,6 +66,7 @@ import * as condensadores from '../app/simulador-condensadores/casos';
 import * as circuitos from '../app/simulador-circuitos-electricos/casos';
 import * as volumenes from '../app/visualizador-volumenes/casos';
 import * as contabilidad from '../app/simulador-contabilidad-basica/casos';
+import * as campo from '../app/simulador-campo-electrico/casos';
 
 const CUADRANTE: Magnitud = { entero: true, minimo: 1, maximo: 4, que: 'el número de cuadrante' };
 
@@ -124,6 +126,26 @@ test.describe('el motor', () => {
     const nada = corregirNumero(Number.NaN, 100, { tolerancia: 1, magnitud: 'porcentaje' });
     expect(nada.estado).toBe('no-numerico');
     expect(Number.isNaN(nada.diferencia)).toBe(true);
+  });
+
+  test('C0126 — redondearA: empates lejos de cero y sin ruido binario, como formatNumber', () => {
+    // Lo que hacía la copia de las 24 apps: Math.round lleva el empate negativo hacia cero.
+    expect(Math.round(-4.495 * 100) / 100).toBe(-4.49);
+    // Un empate exacto se redondea igual a los dos lados del cero: 4,495 → 4,50 y −4,495 → −4,50.
+    expect(redondearA(4.495, 2)).toBe(4.5);
+    expect(redondearA(-4.495, 2)).toBe(-4.5);
+    expect(redondearA(-9.375, 2)).toBe(-9.38);
+    // El ruido binario no decide: 1/(1/2,5 − 1/4,5) es 5,625 y 2,675 · 100 da 267,49999999999997.
+    expect(1 / (1 / 2.5 - 1 / 4.5)).not.toBe(5.625);
+    expect(redondearA(1 / (1 / 2.5 - 1 / 4.5), 2)).toBe(5.63);
+    expect(redondearA(2.675, 2)).toBe(2.68);
+    // Lo que no es empate sigue igual, sin −0 y sin perder unidades en un valor grande.
+    expect(redondearA(-4.494, 2)).toBe(-4.49);
+    expect(Object.is(redondearA(-0.001, 2), 0)).toBe(true);
+    expect(redondearA(8987551792.3456, 2)).toBe(8987551792.35);
+    expect(Number.isNaN(redondearA(Number.NaN, 2))).toBe(true);
+    // Y lo usan las apps: el caso que cambió en simulador-campo-electrico, U = (−1 nC)·k·(1 nC)/2 m.
+    expect(campo.generarEjercicioAleatorio(1480853).respuesta).toBe(-4.5);
   });
 
   test('3369 — la desviación que se enseña al suspender no se redondea a 0', () => {

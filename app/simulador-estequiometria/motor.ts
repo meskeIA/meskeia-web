@@ -9,6 +9,8 @@
  * misma acaba de mostrar. Sin React ni DOM.
  */
 
+import { redondearA } from '@/lib/calculadoras/correctorCasosAula';
+
 // ============================================
 // TIPOS
 // ============================================
@@ -81,8 +83,8 @@ function mm(composicion: Partial<Record<Elemento, number>>): { masaMolar: number
     suma += PESO_ATOMICO[simbolo].valor * atomos;
     decimalesM = Math.min(decimalesM, PESO_ATOMICO[simbolo].decimales);
   }
-  const factor = 10 ** decimalesM;
-  return { masaMolar: Math.round(suma * factor) / factor, decimalesM };
+  // La suma arrastra ruido binario (2 · 35,45 + …): el redondeo del motor lo limpia (C0126).
+  return { masaMolar: redondearA(suma, decimalesM), decimalesM };
 }
 
 export const REACCIONES: Reaccion[] = [

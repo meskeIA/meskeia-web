@@ -45,7 +45,7 @@
 
 import { formatNumber } from '@/lib';
 import { ATM_TO_PA, L_TO_M3, calcularGasIdeal, calcularProceso } from './motor';
-import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Paso de °C a K: la app resta este mismo 273,15 para mostrar los °C. */
 const CERO_CELSIUS_K = 273.15;
@@ -130,9 +130,9 @@ function numero(n: number, decimales = 4): string {
   return (n + 0).toLocaleString('es-ES', { maximumFractionDigits: decimales });
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */

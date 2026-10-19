@@ -47,6 +47,7 @@ import {
   corregirNumero,
   dentroDeTolerancia,
   exigeRedondeo,
+  redondearA,
   type Magnitud as MagnitudCorrector,
 } from '@/lib/calculadoras/correctorCasosAula';
 
@@ -117,9 +118,9 @@ function numero(n: number, decimales = 4): string {
   return n < 0 ? `−${texto}` : texto;
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 function textoRedondeo(decimales: number): string {

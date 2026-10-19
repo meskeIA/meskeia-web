@@ -64,7 +64,7 @@
 import { formatNumber } from '@/lib';
 import { calcularFlotabilidad, CM3_POR_M3, G, type ResultadoFlotabilidad } from './motor';
 import { LIQUIDOS, MATERIALES } from './materiales';
-import { corregirNumero, exigeRedondeo, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, textoDesviacion, toleranciaDeRedondeo } from '@/lib/calculadoras/correctorCasosAula';
 
 /** Holgura relativa con la que una inversión tiene que reproducir el dato del enunciado. */
 const HOLGURA_INVERSION = 1e-9;
@@ -150,9 +150,9 @@ function porcentaje(fraccion: number, decimales = 2): string {
   return `${numero(fraccion * 100, decimales)}${NBSP}%`;
 }
 
+/** El redondeo del motor compartido: empates lejos de cero y sin ruido binario (C0126). */
 function redondear(valor: number, decimales: number): number {
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  return redondearA(valor, decimales);
 }
 
 /** «a unidades», «a una décima», «a dos decimales»: lo mismo que dice el enunciado. */

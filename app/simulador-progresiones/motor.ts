@@ -38,7 +38,7 @@
  */
 
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { corregirNumero, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -165,8 +165,8 @@ export const MAX_NUMEROS_IDENTIFICAR = 30;
 /** Redondea a `decimales` para no arrastrar el ruido binario del punto flotante. */
 export function redondear(valor: number, decimales: number): number {
   if (!Number.isFinite(valor)) return NaN;
-  const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  // El del motor compartido: empates lejos de cero y sin ruido binario (C0126).
+  return redondearA(valor, decimales);
 }
 
 /**

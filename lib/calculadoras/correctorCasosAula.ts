@@ -37,6 +37,7 @@
  * huella-de-copia: \bRUIDO_BINARIO\s*=
  * huella-de-copia: Math\.max\(\s*0\.01\s*,\s*Math\.abs\(
  * huella-de-copia: function\s+exigeRedondeo\s*\(
+ * huella-de-copia: Math\.round\(valor \* factor\) / factor
  */
 
 /**
@@ -63,10 +64,32 @@ export function toleranciaRelativa(esperado: number): number {
   return Math.max(0.01, Math.abs(esperado) * 0.01);
 }
 
-/** Redondeo al decimal pedido, el de `Math.round`. */
+/**
+ * Redondeo al decimal pedido: el de la clave, la solución y los pasos de los casos de aula.
+ *
+ * Dos decisiones, las dos sobre empates exactos (una cifra terminada en 5 justo después del
+ * último decimal pedido), tomadas de `redondearCifra` de simulador-lentes-opticas (hallazgo
+ * 2751, 03/10/2026):
+ *   · se redondea **alejándose de cero**, el redondeo escolar y el de `formatNumber`: −9,375 da
+ *     −9,38 igual que 9,375 da 9,38. `Math.round` a secas lleva los negativos hacia cero
+ *     (−9,375 → −9,37), así que la clave podía decir una cifra y el panel imprimir otra;
+ *   · antes de redondear se limpia el error de coma flotante con 12 cifras significativas:
+ *     1/(1/2,5 − 1/4,5) deja 5,624999999999999 donde el valor exacto es 5,625, y 2,675 · 100 da
+ *     267,49999999999997. La escala se limpia con 15, no con 12, para que un valor grande con
+ *     decimales (un campo de 10⁹ N/C a dos decimales) no pierda unidades.
+ *
+ * DE DÓNDE SALE (cabo C0126, 19/10/2026): este cuerpo estaba copiado con `Math.round` a secas en
+ * 24 `casos.ts` y `motor.ts` de apps con «Casos para clase». La huella de la copia está en la
+ * cabecera del fichero.
+ */
 export function redondearA(valor: number, decimales: number): number {
+  if (!Number.isFinite(valor)) return valor;
+  const limpio = Number(valor.toPrecision(12));
   const factor = 10 ** decimales;
-  return Math.round(valor * factor) / factor;
+  const escalado = Number((Math.abs(limpio) * factor).toPrecision(15));
+  const redondeado = Math.round(escalado) / factor;
+  // `+ 0` convierte el −0 de un valor que redondea a cero en 0: nunca «−0,00».
+  return (limpio < 0 ? -redondeado : redondeado) + 0;
 }
 
 /**
