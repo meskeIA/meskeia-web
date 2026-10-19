@@ -127,6 +127,15 @@ const CAMPOS: Campo[] = [
     },
   },
   {
+    // Antes: el manejador descartaba lo que caía fuera de 80-220 y React devolvía el campo al
+    // valor anterior en cada pulsación: no se podía vaciar ni teclear «160»
+    slug: 'calculadora-puntos-azucar',
+    campo: '#temp-input',
+    teclear: '160',
+    valor: 160,
+    alSalir: '160',
+  },
+  {
     // Antes: vaciar escribía «2» y teclear «12» daba «21», topado a 16
     slug: 'simulador-logica-secuencial',
     campo: '#modulo',

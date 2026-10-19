@@ -10,6 +10,7 @@ import {
   RelatedApps,
   LegalNotice,
   ShareCard,
+  CampoNumerico,
 } from '@/components';
 import {
   calcularPuntosAzucar,
@@ -53,13 +54,6 @@ export default function CalculadoraPuntosAzucarPage() {
     setCalculado(false);
   };
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = Number(e.target.value);
-    if (!isNaN(val) && val >= 80 && val <= 220) {
-      setTemperatura(val);
-      setCalculado(false);
-    }
-  };
 
   const fahrenheit = Math.round((temperatura * 9 / 5 + 32) * 10) / 10;
 
@@ -111,15 +105,20 @@ export default function CalculadoraPuntosAzucarPage() {
               O introduce la temperatura exacta:
             </label>
             <div className={styles.inputGroup}>
-              <input
+              {/* Con `type="number"` y un manejador que descartaba lo que caía fuera de
+                  80-220, React devolvía el campo al valor anterior en cada pulsación: vaciarlo
+                  o teclear «1» camino de «160» lo dejaba como estaba (cabo C0081) */}
+              <CampoNumerico
                 id="temp-input"
-                type="number"
-                min="80"
-                max="220"
-                value={temperatura}
-                onChange={handleInput}
+                min={80}
+                max={220}
+                valor={temperatura}
+                onCambio={(v) => {
+                  setTemperatura(v);
+                  setCalculado(false);
+                }}
                 className={styles.numericInput}
-                aria-describedby="temp-hint"
+                ariaDescribedBy="temp-hint"
               />
               <span className={styles.inputUnit}>°C</span>
             </div>
