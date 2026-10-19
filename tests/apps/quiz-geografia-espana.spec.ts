@@ -420,11 +420,11 @@ test.describe('Quiz Geografía de España · partida', () => {
 
 test.describe('Inspector 10/10/2026 · hallazgos de la partida', () => {
   test('hallazgo · «Difícil» saca sus 20 preguntas del nivel difícil', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). page.tsx:54 — Difícil baraja el banco ENTERO (25 fácil + 25
-    // medio + 25 difícil) aunque CONFIG_DIFICULTAD_GEO.dificil.pool = 'dificil'. Esperado a mano:
-    // 20 de 20 difíciles; con el banco entero, 20·25/75 = 6,7 por partida. Medido el 10/10/2026:
-    // 392 difíciles de 1.200 (60 partidas), media 6,5, máximo 11; ninguna partida con 20.
-    test.fail();
+    // REPARADO el 19/10/2026 (3213): cada nivel saca sus preguntas de BANCO_POR_NIVEL[cfg.pool].
+    // Antes Difícil barajaba el banco ENTERO (25 fácil + 25 medio + 25 difícil) aunque
+    // CONFIG_DIFICULTAD_GEO.dificil.pool = 'dificil'. Esperado a mano: 20 de 20 difíciles; con el
+    // banco entero, 20·25/75 = 6,7 por partida. Medido el 10/10/2026: 392 difíciles de 1.200
+    // (60 partidas), media 6,5, máximo 11; ninguna partida con 20.
     test.setTimeout(90_000);
     await abrir(page, { semilla: 13 });
     await arrancar(page, 'Difícil');
@@ -456,12 +456,10 @@ test.describe('Inspector 10/10/2026 · hallazgos de la partida', () => {
   });
 
   test('hallazgo · el foco no cae a <body> al empezar, al responder, al pasar de pregunta ni al volver', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). page.tsx:198/244/264/313/316 — «Comenzar quiz» se desmonta,
-    // la opción pulsada queda disabled, «Siguiente» se desmonta y «Jugar de nuevo»/«Cambiar
-    // dificultad» también: en los cinco casos el foco va a <body> (medido) y el teclado vuelve al
-    // principio de la página. La gemela quiz-historia-espana lo resolvió el 26/09 (enunciado h2
-    // con tabIndex −1, «Siguiente», título del resultado y «Comenzar quiz»).
-    test.fail();
+    // REPARADO el 19/10/2026 (3216) con la receta de la gemela: enunciado h2 con tabIndex −1,
+    // «Siguiente», título del resultado y «Comenzar quiz». Antes «Comenzar quiz» se desmontaba,
+    // la opción pulsada quedaba disabled, «Siguiente» se desmontaba y «Jugar de nuevo»/«Cambiar
+    // dificultad» también: en los cinco casos el foco iba a <body> (medido el 10/10/2026).
     test.setTimeout(90_000);
     const enBody = () => page.evaluate(() => document.activeElement === document.body || document.activeElement === null);
     await abrir(page, { semilla: 1 });
@@ -637,8 +635,7 @@ test.describe('Inspector 10/10/2026 · doble clic en escritorio 1280 × 800', ()
    * Esperado: un doble clic es una sola intención y el resultado queda a la vista.
    */
   test('hallazgo · un doble clic en «Ver resultado» no lleva a «Cambiar dificultad» antes de ver la nota', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026)
-    test.fail();
+    // REPARADO el 19/10/2026 (3214): guarda de ráfaga en captura sobre window.
     test.setTimeout(180_000);
     const mal: string[] = [];
     for (const frac of [0.35, 0.6]) mal.push(...(await segundosQueActuan(page, frac, dobleClic, clicar, Math.round(frac * 100) + 1280)));
@@ -663,8 +660,7 @@ test.describe('Inspector 10/10/2026 · móvil 360 × 740', () => {
   });
 
   test('hallazgo · tras «Comenzar», «Siguiente» y «Ver resultado» lo nuevo queda a la vista y no bajo la barra', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026)
-    test.fail();
+    // REPARADO el 19/10/2026 (3215): traerALaVista en cada transición, como la gemela.
     test.setTimeout(120_000);
     const tapadas = (): Promise<string[]> =>
       page.evaluate(() => {
@@ -712,8 +708,7 @@ test.describe('Inspector 10/10/2026 · móvil 360 × 740', () => {
    * relacionadas y sacó de la página a mitad de partida.
    */
   test('hallazgo · dos toques en «Comenzar» o «Ver resultado» no contestan solos ni se comen la nota', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026)
-    test.fail();
+    // REPARADO el 19/10/2026 (3214): guarda de ráfaga en captura sobre window.
     test.setTimeout(180_000);
     const mal: string[] = [];
     for (const frac of [0.35, 0.6]) mal.push(...(await segundosQueActuan(page, frac, dobleToque, tocar, Math.round(frac * 100) + 360)));
@@ -732,8 +727,7 @@ test.describe('Inspector 10/10/2026 · móvil 390 × 844', () => {
 
   /** Medido el 10/10/2026: «Comenzar» 2 de 3, «Ver resultado» 2 de 2, «Siguiente» 1 de 26 (sale a otra app). */
   test('hallazgo · dos toques en «Comenzar» o «Ver resultado» no contestan solos ni se comen la nota', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026)
-    test.fail();
+    // REPARADO el 19/10/2026 (3214): guarda de ráfaga en captura sobre window.
     test.setTimeout(180_000);
     const mal: string[] = [];
     for (const frac of [0.35, 0.6]) mal.push(...(await segundosQueActuan(page, frac, dobleToque, tocar, Math.round(frac * 100) + 390)));
@@ -746,13 +740,14 @@ test.describe('Inspector 10/10/2026 · móvil 390 × 844', () => {
 test.describe('Inspector 10/10/2026 · contraste', () => {
   for (const tema of ['light', 'dark'] as const) {
     test(`hallazgo · botones de acción y textos de estado con 4,5:1 (${tema === 'light' ? 'claro' : 'oscuro'})`, async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). Blanco sobre el degradado #2E86AB→#48A9A6 de «Comenzar»,
-      // «Siguiente», «Jugar de nuevo» y el número de paso: 2,80:1 en el extremo teal (existe
-      // --primary-boton, 5,47:1). Medido en claro: insignia de categoría 3,56 · letra blanca sobre
+      // REPARADO el 19/10/2026 (3217), con la receta de la gemela (2106/2107): el módulo ya no
+      // redeclara --primary/--secondary (los botones toman --primary-boton/--secondary-boton) y los
+      // textos de estado van con --texto-ok/-fail/-warn. Antes, blanco sobre el degradado
+      // #2E86AB→#48A9A6 de «Comenzar», «Siguiente», «Jugar de nuevo» y el número de paso: 2,80:1
+      // en el extremo teal. Medido en claro: insignia de categoría 3,56 · letra blanca sobre
       // verde 2,54 / rojo 3,76 · «Preguntas que has fallado» 3,61 · pregunta fallada 3,30 ·
       // respuesta buena 2,22 · h3 del FAQ 4,11 · h2 del aviso 1,88. En oscuro: insignia 3,06 ·
       // letra sobre verde 1,92 / rojo 2,77 · h3 del FAQ 3,50.
-      test.fail();
       test.setTimeout(90_000);
       await abrir(page, { semilla: 5, tema });
       const fallos: string[] = [];

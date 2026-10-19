@@ -2,9 +2,10 @@
    Quiz Geografía de España — meskeIA v2.0
    ============================================= */
 
+/* --primary y --secondary ya no se redeclaran aquí: fijaban el azul claro de marca también en
+   oscuro. Para TEXTO de marca, --primary-texto; para fondos con texto blanco, --primary-boton y
+   --secondary-boton. Hallazgo 3217, receta de la gemela quiz-historia-espana (2106 y 2107). */
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
@@ -18,6 +19,10 @@
   --color-ok: #10b981;
   --color-fail: #ef4444;
   --color-warn: #f59e0b;
+  /* Colores de estado para TEXTO: ≥ 4,5:1 sobre su fondo real en cada tema (hallazgo 3217). */
+  --texto-ok: #047857;
+  --texto-fail: #b91c1c;
+  --texto-warn: #92400e;
 
   max-width: 900px;
   margin: 0 auto;
@@ -37,6 +42,9 @@
   --color-ok: #34d399;
   --color-fail: #f87171;
   --color-warn: #fbbf24;
+  --texto-ok: #6ee7b7;
+  --texto-fail: #fca5a5;
+  --texto-warn: #fbbf24;
 }
 
 /* Hero */
@@ -164,6 +172,11 @@
 /* ── JUGANDO ── */
 .quizPanel { display: flex; flex-direction: column; gap: 1.25rem; }
 
+/* El enunciado y el título del resultado reciben el foco por programa (tabIndex −1, hallazgo
+   3216): no son controles, así que no se les pinta el anillo. */
+.preguntaTexto:focus,
+.finTitulo:focus { outline: none; }
+
 .progresoBarra { display: flex; flex-direction: column; gap: 0.5rem; }
 .progresoInfo { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); }
 .progresoTrack { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
@@ -187,6 +200,9 @@
   font-weight: 600;
   margin-bottom: 0.75rem;
 }
+/* En oscuro, --primary-texto sobre el velo azul de la insignia se queda en el límite;
+   un azul más claro da margen (≈ 6,4:1 sobre el fondo real). */
+[data-theme='dark'] .categoriaBadge { color: #7cc4e4; }
 
 .preguntaTexto {
   font-size: 1.2rem;
@@ -240,9 +256,9 @@
 
 /* Estados de opción */
 .opcion-correcta { border-color: var(--color-ok); background: rgba(16,185,129,0.1); }
-.opcion-correcta .opcionLetra { background: var(--color-ok); color: white; }
+.opcion-correcta .opcionLetra { background: #047857; color: white; }
 .opcion-seleccionada-mal { border-color: var(--color-fail); background: rgba(239,68,68,0.1); }
-.opcion-seleccionada-mal .opcionLetra { background: var(--color-fail); color: white; }
+.opcion-seleccionada-mal .opcionLetra { background: #b91c1c; color: white; }
 .opcion-neutral { }
 
 /* Feedback */
@@ -320,7 +336,7 @@
 .statLabel { font-size: 0.8rem; color: var(--text-secondary); }
 
 .erroresSection { width: 100%; text-align: left; }
-.erroresTitulo { font-size: 1rem; font-weight: 700; margin: 0 0 0.75rem; color: var(--color-fail); }
+.erroresTitulo { font-size: 1rem; font-weight: 700; margin: 0 0 0.75rem; color: var(--texto-fail); }
 
 .erroresGrid {
   display: grid;
@@ -338,8 +354,8 @@
   font-size: 0.85rem;
 }
 
-.errorPregunta { font-weight: 600; color: var(--color-fail); font-size: 0.8rem; margin-bottom: 0.2rem; }
-.errorCorrecta { color: var(--color-ok); font-size: 0.85rem; }
+.errorPregunta { font-weight: 600; color: var(--texto-fail); font-size: 0.8rem; margin-bottom: 0.2rem; }
+.errorCorrecta { color: var(--texto-ok); font-size: 0.85rem; }
 
 .finBotones { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; width: 100%; }
 
@@ -462,7 +478,7 @@
   padding: 1.5rem;
 }
 
-.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--color-warn); margin: 0 0 1rem; }
+.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--texto-warn); margin: 0 0 1rem; }
 
 .warningGrid { display: flex; flex-direction: column; gap: 0.75rem; }
 

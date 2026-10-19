@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import styles from './QuizGeografiaEspana.module.css';
 import {
   MeskeiaLogo,
@@ -11,6 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { margenBarraLogo } from '@/lib';
 import {
   PREGUNTAS_GEO_FACIL,
   PREGUNTAS_GEO_MEDIO,
@@ -37,6 +38,25 @@ const ETIQUETA_CATEGORIA: Record<string, string> = {
   'geografia-general': 'Geografía General',
 };
 
+const BANCO_POR_NIVEL: Record<DificultadGeografia, PreguntaGeografia[]> = {
+  facil: PREGUNTAS_GEO_FACIL,
+  medio: PREGUNTAS_GEO_MEDIO,
+  dificil: PREGUNTAS_GEO_DIFICIL,
+};
+
+/**
+ * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si su
+ * cabecera queda tapada por la barra del logo o por encima del borde, o si `clave` no cabe
+ * por abajo. Patrón de quiz-literatura-universal (hallazgo 1716), como en la gemela.
+ */
+function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
+  if (!bloque || !clave) return;
+  const arriba = bloque.getBoundingClientRect().top;
+  const abajo = clave.getBoundingClientRect().bottom;
+  if (arriba >= margenBarraLogo() && abajo <= window.innerHeight) return;
+  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
+
 function mezclar<T>(arr: T[]): T[] {
   const copia = [...arr];
   for (let i = copia.length - 1; i > 0; i--) {
@@ -46,13 +66,14 @@ function mezclar<T>(arr: T[]): T[] {
   return copia;
 }
 
+/**
+ * Cada nivel saca sus preguntas de SU banco (CONFIG_DIFICULTAD_GEO[n].pool). Antes «Difícil»
+ * barajaba el banco entero y de media solo 6,5 de sus 20 preguntas eran difíciles (hallazgo
+ * 3213; el 2103 de la gemela quiz-historia-espana).
+ */
 function seleccionarPreguntas(dificultad: DificultadGeografia): PreguntaGeografia[] {
   const cfg = CONFIG_DIFICULTAD_GEO[dificultad];
-  let pool: PreguntaGeografia[];
-  if (dificultad === 'facil') pool = PREGUNTAS_GEO_FACIL;
-  else if (dificultad === 'medio') pool = PREGUNTAS_GEO_MEDIO;
-  else pool = [...PREGUNTAS_GEO_FACIL, ...PREGUNTAS_GEO_MEDIO, ...PREGUNTAS_GEO_DIFICIL];
-  return mezclar(pool).slice(0, cfg.preguntas);
+  return mezclar(BANCO_POR_NIVEL[cfg.pool]).slice(0, cfg.preguntas);
 }
 
 function calcularMedalla(porcentaje: number): string {
@@ -83,7 +104,61 @@ export default function QuizGeografiaEspanaPage() {
 
   const preguntaActual = preguntas[indice];
 
+  /**
+   * Foco y vista (hallazgos 3215 y 3216, receta de la gemela, 2104 y 2105). En los pasos de la
+   * partida el control pulsado desaparece o queda disabled y el navegador soltaba el foco al
+   * <body>; en móvil, además, lo nuevo se pintaba bajo la barra fija del logo o fuera de la vista:
+   * · al empezar y al pasar de pregunta → al enunciado nuevo, y la vista sube si hace falta;
+   * · al responder → a «Siguiente pregunta», la única acción que queda;
+   * · al ver el resultado → al título; al volver a elegir dificultad → a «Comenzar quiz».
+   */
+  const quizPanelRef = useRef<HTMLDivElement>(null);
+  const enunciadoRef = useRef<HTMLHeadingElement>(null);
+  const botonSiguienteRef = useRef<HTMLButtonElement>(null);
+  const finPanelRef = useRef<HTMLDivElement>(null);
+  const finTituloRef = useRef<HTMLHeadingElement>(null);
+  const botonComenzarRef = useRef<HTMLButtonElement>(null);
+  const huboPartida = useRef(false);
+  useEffect(() => {
+    if (fase === 'jugando') {
+      huboPartida.current = true;
+      traerALaVista(quizPanelRef.current, enunciadoRef.current);
+      enunciadoRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'respondida') {
+      botonSiguienteRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'fin') {
+      traerALaVista(finPanelRef.current, finTituloRef.current);
+      finTituloRef.current?.focus({ preventScroll: true });
+    } else if (fase === 'inicio' && huboPartida.current) {
+      botonComenzarRef.current?.focus();
+    }
+  }, [fase, indice]);
+
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 3214, cabos C0082/C0140; receta de
+   * quiz-literatura-universal, ce0ad0bc, y de selector-alquiler-vs-compra, 7cc1064e). El primer
+   * clic cambia de pantalla y el segundo caía en el mismo punto sobre la nueva: contestaba la
+   * pregunta 1, pulsaba «Cambiar dificultad» antes de ver la nota o abría una app relacionada.
+   * Un clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el teclado no produce)
+   * Y el clic anterior de la app cambió de pantalla. Va en captura sobre window para alcanzar
+   * también los enlaces que no son de la app; un clic suelto cierra la ráfaga.
+   */
+  const ultimoCambioPantallaRef = useRef(false);
+  useEffect(() => {
+    function filtrar(e: MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantallaRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantallaRef.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+
   const iniciarQuiz = useCallback(() => {
+    ultimoCambioPantallaRef.current = true;
     const seleccionadas = seleccionarPreguntas(dificultad);
     setPreguntas(seleccionadas);
     setIndice(0);
@@ -107,6 +182,7 @@ export default function QuizGeografiaEspanaPage() {
   }, [fase, preguntaActual]);
 
   const siguiente = useCallback(() => {
+    ultimoCambioPantallaRef.current = true;
     const siguienteIndice = indice + 1;
     if (siguienteIndice >= preguntas.length) {
       setFase('fin');
@@ -119,6 +195,7 @@ export default function QuizGeografiaEspanaPage() {
   }, [indice, preguntas]);
 
   const reiniciar = useCallback(() => {
+    ultimoCambioPantallaRef.current = true;
     setFase('inicio');
     setPreguntas([]);
     setIndice(0);
@@ -195,7 +272,7 @@ export default function QuizGeografiaEspanaPage() {
               </div>
             </div>
 
-            <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
+            <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz} ref={botonComenzarRef}>
               Comenzar quiz ▶
             </button>
           </section>
@@ -204,7 +281,7 @@ export default function QuizGeografiaEspanaPage() {
 
       {/* FASE JUGANDO / RESPONDIDA */}
       {(fase === 'jugando' || fase === 'respondida') && preguntaActual && (
-        <div className={styles.quizPanel}>
+        <div className={styles.quizPanel} ref={quizPanelRef}>
           {/* Progreso */}
           <div className={styles.progresoBarra}>
             <div className={styles.progresoInfo}>
@@ -232,7 +309,8 @@ export default function QuizGeografiaEspanaPage() {
             <span className={styles.categoriaBadge}>
               {ETIQUETA_CATEGORIA[preguntaActual.categoria] ?? preguntaActual.categoria}
             </span>
-            <p className={styles.preguntaTexto}>{preguntaActual.pregunta}</p>
+            {/* Recibe el foco por programa al empezar y al pasar de pregunta (tabIndex=-1). */}
+            <h2 className={styles.preguntaTexto} ref={enunciadoRef} tabIndex={-1}>{preguntaActual.pregunta}</h2>
           </div>
 
           {/* Opciones */}
@@ -262,7 +340,7 @@ export default function QuizGeografiaEspanaPage() {
               {preguntaActual.explicacion && (
                 <p className={styles.explicacionTexto}>{preguntaActual.explicacion}</p>
               )}
-              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={siguiente} ref={botonSiguienteRef}>
                 {indice + 1 < preguntas.length ? 'Siguiente pregunta →' : 'Ver resultado'}
               </button>
             </div>
@@ -272,9 +350,9 @@ export default function QuizGeografiaEspanaPage() {
 
       {/* FASE FIN */}
       {fase === 'fin' && (
-        <div className={styles.finPanel}>
+        <div className={styles.finPanel} ref={finPanelRef}>
           <div className={styles.medallaIcon} aria-hidden="true">{calcularMedalla(porcentaje)}</div>
-          <h2 className={styles.finTitulo}>{calcularTextoMedalla(porcentaje)}</h2>
+          <h2 className={styles.finTitulo} ref={finTituloRef} tabIndex={-1}>{calcularTextoMedalla(porcentaje)}</h2>
           <p className={styles.finSubtitulo}>{aciertos} de {preguntas.length} preguntas correctas ({porcentaje}%)</p>
 
           <div className={styles.statsGrid}>
