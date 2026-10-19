@@ -300,7 +300,7 @@ function SeccionCriba() {
       </div>
 
       <div className={styles.contadorPrimos}>
-        Primos encontrados: <span className={styles.contadorDestacado}>{primosEncontrados}</span> de {formatNumber(limite)}
+        Primos encontrados: <span className={styles.contadorDestacado}>{primosEncontrados}</span> de {formatNumber(limite, 0)}
         {primoActual !== null && (
           <span className={styles.primoActualLabel}>Eliminando múltiplos de {primoActual}</span>
         )}
@@ -353,7 +353,7 @@ function SeccionCriba() {
 
       <div className={styles.insight}>
         <p>
-          Solo necesitas comprobar primos hasta <strong>√n</strong>. Para n = {formatNumber(limite)},
+          Solo necesitas comprobar primos hasta <strong>√n</strong>. Para n = {formatNumber(limite, 0)},
           basta con probar hasta {Math.floor(Math.sqrt(limite))}. Todo número compuesto ≤ n tiene
           al menos un factor primo ≤ √n.
         </p>
@@ -388,7 +388,7 @@ function SeccionPatrones() {
     { p: 3, valor: '7', digitos: 1 },
     { p: 5, valor: '31', digitos: 2 },
     { p: 7, valor: '127', digitos: 3 },
-    { p: 13, valor: '8.191', digitos: 4 },
+    { p: 13, valor: '8191', digitos: 4 },
     { p: 17, valor: '131.071', digitos: 6 },
     { p: 19, valor: '524.287', digitos: 6 },
     { p: 31, valor: '2.147.483.647', digitos: 10 },
@@ -404,6 +404,7 @@ function SeccionPatrones() {
       { rango: '401-500', primos: generarPrimosHasta(500).length - generarPrimosHasta(400).length },
       { rango: '501-600', primos: generarPrimosHasta(600).length - generarPrimosHasta(500).length },
       { rango: '601-700', primos: generarPrimosHasta(700).length - generarPrimosHasta(600).length },
+      { rango: '701-800', primos: generarPrimosHasta(800).length - generarPrimosHasta(700).length },
       { rango: '801-900', primos: generarPrimosHasta(900).length - generarPrimosHasta(800).length },
       { rango: '901-1000', primos: generarPrimosHasta(1000).length - generarPrimosHasta(900).length },
     ];
@@ -438,7 +439,7 @@ function SeccionPatrones() {
           ))}
         </div>
         <p className={styles.espiralNota}>
-          Grid {LADO}×{LADO} = {formatNumber(LADO * LADO)} números. Stanisław Ulam descubrió este patrón
+          Grid {LADO}×{LADO} = {formatNumber(LADO * LADO, 0)} números. Stanisław Ulam descubrió este patrón
           en 1963, aburrido en una conferencia. Las diagonales corresponden a polinomios cuadráticos.
         </p>
       </div>
@@ -490,8 +491,8 @@ function SeccionPatrones() {
       </div>
       <div className={styles.insight}>
         <p>
-          No todo 2ᵖ − 1 es primo (ej: p = 11 → 2.047 = 23 × 89). Solo se conocen <strong>51 primos
-          de Mersenne</strong>. El mayor tiene más de 24 millones de dígitos.
+          No todo 2ᵖ − 1 es primo (ej: p = 11 → 2047 = 23 × 89). Solo se conocen <strong>52 primos
+          de Mersenne</strong>. El mayor tiene más de 41 millones de dígitos.
         </p>
       </div>
     </div>
@@ -525,7 +526,7 @@ function SeccionCriptografia() {
       </div>
 
       <div className={styles.rsaPregunta}>
-        ¿Qué dos primos multiplicados dan {formatNumber(8051)}?
+        ¿Qué dos primos multiplicados dan {formatNumber(8051, 0)}?
       </div>
       <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
         <button
@@ -538,7 +539,7 @@ function SeccionCriptografia() {
       </div>
       {mostrarRespuesta && (
         <div className={styles.rsaRespuesta}>
-          <strong>83 × 97 = {formatNumber(8051)}</strong>. Con solo 4 dígitos ya cuesta.
+          <strong>83 × 97 = {formatNumber(8051, 0)}</strong>. Con solo 4 dígitos ya cuesta.
           RSA real usa primos de <strong>300+ dígitos</strong>. El producto resultante tiene 600+ dígitos.
           Ni todos los ordenadores del mundo juntos podrían factorizarlo en una vida humana.
         </div>
@@ -624,7 +625,7 @@ function SeccionDatos() {
     },
     {
       titulo: 'GIMPS: búsqueda distribuida',
-      texto: 'El Great Internet Mersenne Prime Search usa miles de ordenadores voluntarios desde 1996. Cualquiera puede participar. El mayor primo conocido fue descubierto por un ordenador de un ingeniero en Florida.',
+      texto: 'El Great Internet Mersenne Prime Search usa miles de ordenadores voluntarios desde 1996. Cualquiera puede participar. El mayor primo conocido lo encontró Luke Durant en 2024 con tarjetas gráficas alquiladas en la nube.',
     },
   ];
 
@@ -632,19 +633,19 @@ function SeccionDatos() {
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
         <p>Los primos son uno de los objetos más estudiados en matemáticas.
-        Llevan <strong>{formatNumber(2300)}+ años</strong> fascinando a los mejores matemáticos del mundo.</p>
+        Llevan <strong>{formatNumber(2300, 0)}+ años</strong> fascinando a los mejores matemáticos del mundo.</p>
       </div>
 
       <div className={styles.recordCard}>
-        <span className={styles.recordNumero}>{formatNumber(24862048)}</span>
+        <span className={styles.recordNumero}>{formatNumber(41024320, 0)}</span>
         <p className={styles.recordDescripcion}>
-          dígitos tiene el mayor primo conocido: <strong>2⁸²·⁵⁸⁹·⁹³³ − 1</strong> (descubierto en diciembre de 2018).
-          Si lo imprimieras con letra pequeña, ocuparía más de {formatNumber(9000)} páginas.
+          dígitos tiene el mayor primo conocido: <strong>2¹³⁶·²⁷⁹·⁸⁴¹ − 1</strong> (descubierto en octubre de 2024).
+          A {formatNumber(3000, 0)} cifras por página, ocuparía más de {formatNumber(13000, 0)} páginas.
         </p>
       </div>
 
       <div className={styles.recordCard}>
-        <span className={styles.recordNumero} style={{ fontSize: '1.5rem' }}>$1.000.000</span>
+        <span className={styles.recordNumero} style={{ fontSize: '1.5rem' }}>1.000.000 $</span>
         <p className={styles.recordDescripcion}>
           El <strong>Clay Mathematics Institute</strong> ofrece un millón de dólares a quien demuestre
           (o refute) la <strong>Hipótesis de Riemann</strong>. Formulada en 1859, conecta los ceros
@@ -664,7 +665,7 @@ function SeccionDatos() {
 
       <div className={styles.insight}>
         <p>
-          Los primos son infinitos (Euclides lo demostró hace {formatNumber(2300)} años con un
+          Los primos son infinitos (Euclides lo demostró hace {formatNumber(2300, 0)} años con un
           argumento elegantísimo), pero siguen guardando secretos. No sabemos si los primos gemelos
           son infinitos, ni si la Hipótesis de Riemann es verdadera.
           <strong> Lo que sabemos es que internet funciona gracias a ellos.</strong>
@@ -737,8 +738,8 @@ export default function VisualizadorNumerosPrimosPage() {
           <h3>El teorema de los números primos</h3>
           <p>
             Demostrado en 1896 por Hadamard y de la Vallée-Poussin: la cantidad de primos
-            menores que n se aproxima a n/ln(n). Entre 1 y {formatNumber(1000000)} hay
-            exactamente {formatNumber(78498)} primos. La fórmula predice {formatNumber(72382)}, un
+            menores que n se aproxima a n/ln(n). Entre 1 y {formatNumber(1000000, 0)} hay
+            exactamente {formatNumber(78498, 0)} primos. La fórmula predice {formatNumber(72382, 0)}, un
             error del 8% que disminuye a medida que n crece.
           </p>
           <h3>¿Y si se rompe RSA?</h3>
@@ -751,7 +752,8 @@ export default function VisualizadorNumerosPrimosPage() {
             <strong>Nota:</strong> La criba de Eratóstenes en esta app está limitada a 500 números
             por rendimiento del navegador. En la práctica, se usan versiones optimizadas (criba
             segmentada) para trabajar con millones de números. Los datos de primos de Mersenne y
-            récords se actualizaron por última vez en 2024.
+            récords se cotejaron con la lista de GIMPS (mersenne.org/primes) el 19/10/2026; el
+            puesto 52 es provisional hasta que GIMPS descarte todos los candidatos anteriores.
           </div>
         </EducationalSection>
 
