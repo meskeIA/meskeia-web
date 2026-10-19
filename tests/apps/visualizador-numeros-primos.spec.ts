@@ -102,7 +102,15 @@ test('CASO 7 · al imprimir solo sale la hoja', async ({ page }) => {
   await expect(hoja(page)).toBeVisible();
   await expect(page.getByRole('heading', { level: 1 })).toBeHidden();
   await expect(page.getByRole('button', { name: 'Paso a paso' })).toBeHidden();
+  // Sin esto, con «Gráficos de fondo» activado, la última página salía con un recuadro gris
+  // bajo la hoja: el fondo del body (19/10/2026, PDF de la criba del 1 al 1000).
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(
+    'rgb(255, 255, 255)',
+  );
   await page.emulateMedia({ media: 'screen' });
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe(
+    'rgb(255, 255, 255)',
+  );
   await expect(hoja(page)).toBeHidden();
 });
 

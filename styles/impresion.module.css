@@ -52,6 +52,15 @@
     display: none !important;
   }
 
+  /* El fondo del body (--bg-primary, #FAFAFA) también se imprime si el usuario activa
+     «Gráficos de fondo». La hoja blanca lo tapa mientras ocupa la página entera, pero en la
+     última, donde la hoja acaba antes, quedaba un recuadro gris debajo (19/10/2026, criba del
+     1 al 1000 de visualizador-numeros-primos, página 5). `.lienzo` dentro del selector es lo
+     que lo mantiene opt-in: solo afecta a las páginas que importan esta base. */
+  :global(body):has(.lienzo) {
+    background: #ffffff !important;
+  }
+
   /* El contenedor de la app deja de maquetar para pantalla */
   .lienzo {
     max-width: none !important;
