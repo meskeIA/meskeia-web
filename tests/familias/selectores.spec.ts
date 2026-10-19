@@ -126,13 +126,10 @@ const HERMANAS: Hermana[] = [
   {
     slug: 'selector-seguro-salud',
     empezar: true,
+    // Huecos 3122 (foco) y 3125/3126 (doble toque, guarda en captura sobre window) REPARADOS el
+    // 19/10/2026; queda el teclado.
     recetas: {
-      foco: { falla: 'hallazgo 3122: tras «Empezar», «Siguiente» y «Anterior» el foco cae a <body>' },
       teclado: { falla: 'hallazgo 3123: los radios no tienen tabindex itinerante ni flechas (APG)' },
-      // Hallazgos 3125 y 3126, abiertos: sin guarda. Medido el 17/10/2026, 1 de 4 en rojo (el
-      // segundo toque tras «Ver resultado» cae en la tarjeta de Delegum según dónde quede la
-      // página): no determinista, así que no lleva `falla`. Al repararla, quitar `omitido`.
-      dobleToque: { omitido: 'hallazgos 3125 y 3126 abiertos; el caso cae en rojo 1 de 4 veces' },
     },
   },
 ];

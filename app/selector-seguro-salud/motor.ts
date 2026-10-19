@@ -427,7 +427,12 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   if (contrataria) {
     // Sin marcas: el proyecto orienta por perfiles, no por aseguradoras.
     consejos.push({ icono: '🔍', texto: 'Compara siempre varias aseguradoras: los precios y los cuadros médicos varían mucho por zona.' });
-    consejos.push({ icono: '📋', texto: 'Revisa la red de médicos en tu ciudad antes de contratar: importa más la calidad de la red que el precio.' });
+    // A quien vive en zona rural, la red cercana es LO que decide: un seguro no acerca los centros,
+    // y la guía de esta misma app asocia el reembolso de gastos a las zonas rurales (hallazgo 3128,
+    // cabo C0011). El peso de la respuesta (PESOS[3].rural) no se ha tocado.
+    consejos.push(r[3] === 'rural'
+      ? { icono: '📋', texto: 'Has dicho que vives en zona rural o con poca oferta sanitaria: un seguro privado no acerca los centros. Antes de contratar, comprueba que su cuadro médico tiene consultas a una distancia razonable de tu casa, o pregunta por la modalidad de reembolso de gastos, que permite ir a médicos fuera de su red y te devuelve una parte.' }
+      : { icono: '📋', texto: 'Revisa la red de médicos en tu ciudad antes de contratar: importa más la calidad de la red que el precio.' });
     if (r[7] === 'necesito' || r[7] === 'critico') {
       consejos.push({ icono: '🦷', texto: 'El dental suele ser módulo aparte. Compara si compensa un seguro dental independiente frente al módulo dentro del seguro general.' });
     }

@@ -273,7 +273,9 @@ test.describe('Reparación 24/09/2026 — límites declarados, espera en tu zona
   const abrirGuia = async (page: Page): Promise<string> => {
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.getByText('MUFACE, ISFAS y MUGEJU: las mutualidades de funcionarios')).toBeVisible();
-    return (await page.locator('[class*="resultadosContainer"]').innerText()).replace(/\s+/g, ' ');
+    // La guía ya no vive dentro del resultado (hallazgo 3127): se lee su propio contenedor, el
+    // padre de sus h3.
+    return (await page.locator('h3', { hasText: 'MUFACE, ISFAS y MUGEJU' }).locator('..').innerText()).replace(/\s+/g, ' ');
   };
 
   // Ocasional (0) · Un especialista (+2) · Espera entre 2 y 4 meses (0) · 1 hijo (+2) · Cuenta ajena (0)
@@ -824,15 +826,16 @@ test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C01
   });
 
   test('C0011 (hallazgo) «zona rural» suma 2 puntos hacia el seguro y el resultado no le dice al usuario rural lo que su propia guía sabe', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). PESOS[3].rural = 2, sin fuente ni comentario en motor.ts, y la
+    // REPARADO el 19/10/2026 (3128): al usuario rural, el consejo de la red nombra la distancia y el
+    // reembolso de gastos. El PESO (PESOS[3].rural = 2) no se ha tocado: lo decide el usuario.
+    // Era: PESOS[3].rural = 2, sin fuente ni comentario en motor.ts, y la
     // descripción lo da como lo que más pesa («la lejanía de los centros de especialidades»). Un
     // seguro privado no acerca los centros: la guía de la misma app asocia la zona rural a los
     // cuadros médicos limitados («Reembolso de gastos: algunos seguros con cuadro médico limitado
     // permiten ir a cualquier médico […]. Útil en zonas rurales»), pero en el resultado el usuario
     // rural solo lee «Revisa la red de médicos en tu ciudad». Y decide el veredicto: con «Menos de
     // 2 meses» el mismo perfil sale pública (test «caso normal» de arriba).
-    // Obtenido: suma 2 y ningún aviso ni consejo nombra la zona rural, el reembolso ni la distancia.
-    test.fail();
+    // Obtenido el 10/10: suma 2 y ningún aviso ni consejo nombraba la zona rural, el reembolso ni la distancia.
     await abrirTest(page);
     await responder(page, RURAL);
     const sumaRural = (await textos(page, '[class*="razonItem"]')).some((r) => r.includes('Vivo en zona rural') && r.includes(' suma '));
@@ -847,18 +850,19 @@ test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C01
     await responder(page, LIMITE_8);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.getByText('MUFACE, ISFAS y MUGEJU: las mutualidades de funcionarios')).toBeVisible();
-    const todo = `${await page.locator('[class*="resultadosContainer"]').innerText()} ${(await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ')}`;
+    // La guía ya no está dentro del resultado (3127): se lee aparte, del padre de sus h3.
+    const guia = await page.locator('h3', { hasText: 'MUFACE, ISFAS y MUGEJU' }).locator('..').innerText();
+    const todo = `${await page.locator('[class*="resultadosContainer"]').innerText()} ${guia} ${(await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ')}`;
     expect(todo.match(/\b(Sanitas|Adeslas|Asisa|DKV|Mapfre|AXA|Caser|Cigna|Generali|ICEA)\b|ranking|cuota de mercado/g) ?? []).toEqual([]);
   });
 
   test('C0016 (hallazgo) tras «Empezar», «Siguiente» y «Anterior» el foco cae a <body>, no al enunciado de la pregunta', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Forma del 1680 de selector-smartphone: allí un efecto sobre
+    // REPARADO el 19/10/2026 (3122). Forma del 1680 de selector-smartphone: allí un efecto sobre
     // [pantalla, paso] lleva el foco al enunciado (h2 con tabIndex −1). Aquí solo lo recibe el
     // resultado. Medido con teclado: «Empezar» se desmonta y «Siguiente» se desactiva con el foco
     // dentro (la pregunta nueva está sin contestar), y el foco queda en <body>; el Tab siguiente a
     // «Siguiente» sale a la primera tarjeta de RelatedApps («Selector de Mascota»), DESPUÉS del
     // cuestionario. «Anterior» de la 2 a la 1 también lo pierde (en la 1 se desactiva).
-    test.fail();
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/selector-seguro-salud/');
     await esperarHidratacionBotones(page);
@@ -893,11 +897,11 @@ test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C01
   });
 
   test('C0104 (hallazgo) la guía educativa no está en el HTML servido: solo se monta en el resultado', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Forma del 2663 de selector-smartphone y del 3112 de alquiler:
-    // EducationalSection monta siempre su contenido «porque Googlebot no hace clic», pero aquí va
-    // dentro de `pantalla === 'resultado'`. Obtenido: el HTML servido sin «Guía completa: seguros de
-    // salud en España» y 0 botones «Ver guía educativa» en la intro.
-    test.fail();
+    // REPARADO el 19/10/2026 (3127): la guía va fuera de las pantallas. Forma del 2663 de
+    // selector-smartphone y del 3112 de alquiler: EducationalSection monta siempre su contenido
+    // «porque Googlebot no hace clic», pero iba dentro de `pantalla === 'resultado'`. Obtenido el
+    // 10/10: el HTML servido sin «Guía completa: seguros de salud en España» y 0 botones «Ver guía
+    // educativa» en la intro.
     const html = await (await page.request.get('/selector-seguro-salud/')).text();
     expect(html.includes('Guía completa: seguros de salud en España'), 'la guía en el HTML servido').toBe(true);
     await page.goto('/selector-seguro-salud/');
@@ -951,27 +955,25 @@ test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C01
     });
 
     test('C0104 (hallazgo) tras «Empezar» y «Siguiente» el enunciado de la pregunta nueva queda fuera de la vista o bajo la barra del logo', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). Forma del 2657 de selector-smartphone y del 3110 de alquiler:
+      // REPARADO el 19/10/2026 (3124): foco y vista al enunciado. Forma del 2657 de selector-smartphone y del 3110 de alquiler:
       // sin foco programático en las preguntas la página no se mueve, y la pregunta nueva se pinta
       // donde estaba la anterior. Medido tocando como un usuario (tap(), que desplaza lo justo): a
       // 360 px las preguntas 1-6 por ENCIMA del borde (y −152..−44) y la 7-10 bajo la barra (y
       // 25..79, barra hasta 52); a 390 px, las diez bajo la barra (y 5..59). Con «Siguiente» a media
       // pantalla, casi todas por encima del borde. Si se repara con el foco al enunciado (C0016),
       // hace falta además el scroll-margin-top de 80 px de la receta, o reaparece el 2657.
-      test.fail();
       test.setTimeout(60_000);
       expect(await enunciadosFuera(page, 10), 'enunciados bajo la barra o fuera de la vista').toEqual([]);
     });
 
     test('C0104 (hallazgo) un doble toque en «Siguiente» contesta la pregunta siguiente', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). Forma del 2659 de selector-smartphone (receta clicDeMas) y del
+      // REPARADO el 19/10/2026 (3125). Forma del 2659 de selector-smartphone (receta clicDeMas) y del
       // 3111 de alquiler. El primer toque avanza y el segundo (detail 2) cae en la pregunta nueva,
       // cuya botonera está en otro sitio. Barrido con «Siguiente» a 6 alturas (y 150..650): de la 5 a
       // la 6 (y 450-650) marca «Es crítico por mi trabajo o condición» (+3); de la 6 a la 7 (y
       // 150-450), «Voy a clínicas privadas de precio económico»; de la 9 a la 10 (y 450-650), «Tengo
       // mutualidad de funcionarios (MUFACE/ISFAS)», que FUERZA el veredicto «Tu mutualidad ya te da
       // cobertura» y habilita «Ver resultado». A 390 px, de la 6 a la 7 (test de abajo).
-      test.fail();
       test.setTimeout(60_000);
       const anomalias: string[] = [];
       for (const q of [5, 9]) { // pregunta en la que se pulsa «Siguiente»
@@ -988,12 +990,11 @@ test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C01
     });
 
     test('C0104 (hallazgo) un doble toque en «Ver resultado» saca de la app y se pierden las 10 respuestas', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). Forma del 3111 de alquiler (allí, guarda en captura sobre
+      // REPARADO el 19/10/2026 (3126), con la misma guarda. Forma del 3111 de alquiler (allí, guarda en captura sobre
       // window): el foco al <h1> del resultado sube la página arriba del todo y el segundo toque cae
       // en la cabecera común. Medido a 360 y 390 px con «Ver resultado» a 8 alturas: en y 350 →
       // /contacto/; en y 450 (y también 400 a 390 px) → https://delegum.com/soluciones/?from=meskeia,
       // la banda de <LegalNotice />. Delegum se sirve aquí sin red.
-      test.fail();
       test.setTimeout(60_000);
       await page.route(/^https:\/\/(www\.)?delegum\.com\//, (ruta) => ruta.fulfill({ status: 200, contentType: 'text/html', body: '<title>delegum</title>externo' }));
       const fuera: string[] = [];
@@ -1051,16 +1052,14 @@ test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C01
     });
 
     test('C0104 (hallazgo) a 390 px el enunciado de cada pregunta nueva queda bajo la barra del logo', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). Medido: las diez en y 5..59 (o más abajo) con la barra hasta 52.
-      test.fail();
+      // REPARADO el 19/10/2026 (3124). Medido el 10/10: las diez en y 5..59 (o más abajo) con la barra hasta 52.
       test.setTimeout(60_000);
       expect(await enunciadosFuera(page, 4), 'enunciados bajo la barra o fuera de la vista').toEqual([]);
     });
 
     test('C0104 (hallazgo) a 390 px un doble toque en «Siguiente» de la 6 contesta la 7', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). Medido con «Siguiente» en y 150-350: marca «Voy a clínicas
-      // privadas de precio económico» en la pregunta 7 sin que nadie la elija.
-      test.fail();
+      // REPARADO el 19/10/2026 (3125). Medido el 10/10 con «Siguiente» en y 150-350: marcaba «Voy a
+      // clínicas privadas de precio económico» en la pregunta 7 sin que nadie la eligiera.
       await hasta(page, 5);
       await page.locator('[role="radiogroup"] [role="radio"]').nth(0).click();
       await page.waitForTimeout(350);

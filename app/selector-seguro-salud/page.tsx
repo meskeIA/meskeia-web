@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorSeguroSalud.module.css';
+import { margenBarraLogo } from '@/lib';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { calcularResultado, PREGUNTAS, VEREDICTOS, TEXTO_CARENCIAS, TEXTO_COPAGO, TEXTO_ESPERA_SNS, type Resultado } from './motor';
 
@@ -19,24 +20,71 @@ export default function SelectorSeguroSalud() {
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLHeadingElement>(null);
 
-  // Al pulsar «Ver resultado» la sección del test se desmonta con el botón que tenía el foco, y
-  // el foco caía a <body>: se lleva al encabezado del resultado (familia de selectores, forma g).
+  // Al cambiar de pantalla o de pregunta se desmonta («Empezar», «Ver resultado») o se desactiva
+  // («Siguiente» sin respuesta aún, «Anterior» en la 1) el botón que tenía el foco, que caía a
+  // <body>: se lleva al enunciado de la pregunta nueva o al título del resultado (hallazgo 3122,
+  // forma del 1680 de selector-smartphone). Y en móvil la página no se movía: el enunciado nuevo
+  // quedaba bajo la barra fija del logo o por encima de la pantalla (hallazgo 3124). Si no está
+  // entero a la vista y por debajo de la barra, se sube a su sitio; el hueco lo da el
+  // scroll-padding del documento (globals.css). Como en selector-mascota.
   useEffect(() => {
-    if (pantalla === 'resultado') tituloResultado.current?.focus();
-  }, [pantalla]);
+    const destino = pantalla === 'resultado' ? tituloResultado.current
+      : pantalla === 'test' ? enunciado.current
+        : null;
+    if (!destino) return;
+    const caja = destino.getBoundingClientRect();
+    if (caja.top < margenBarraLogo() || caja.bottom > window.innerHeight) {
+      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+    destino.focus({ preventScroll: true });
+  }, [pantalla, paso]);
+
+  /**
+   * Doble clic y dos toques seguidos (hallazgos 3125 y 3126, cabo C0104; receta `clicDeMas` de la
+   * familia con la guarda en captura sobre window de selector-alquiler-vs-compra, 3111). El
+   * primer toque cambia la pantalla y el segundo caía en una opción de la pregunta nueva (en la
+   * 10, la mutualidad, que FUERZA el veredicto) o, tras «Ver resultado», en «Contacto» o la banda
+   * de Delegum de la cabecera común. Un clic se ignora cuando es el 2.º de una ráfaga (`detail`
+   * > 1, que el teclado no produce) Y el clic anterior de la app cambió de pantalla. Va en
+   * captura sobre window, antes de que React o el enlace lo vean; un clic suelto cierra la ráfaga.
+   */
+  const ultimoCambioPantalla = useRef(false);
+  useEffect(() => {
+    function filtrar(e: MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantalla.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantalla.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+  const cambiaPantalla = () => { ultimoCambioPantalla.current = true; };
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
   const progreso = (paso / totalPreguntas) * 100;
 
   function seleccionarOpcion(valor: string) { setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor })); }
+  // Avanza desde la pregunta DEL RENDER (`paso + 1`) y solo si está respondida: dos clics antes de
+  // repintar no saltan una pregunta.
   function avanzar() {
-    if (paso < totalPreguntas - 1) { setPaso(p => p + 1); }
+    if (!respuestas[preguntaActual.id]) return;
+    cambiaPantalla();
+    if (paso < totalPreguntas - 1) { setPaso(paso + 1); }
     else { setResultado(calcularResultado(respuestas)); setPantalla('resultado'); }
   }
-  function retroceder() { if (paso > 0) setPaso(p => p - 1); }
-  function reiniciar() { setPantalla('intro'); setPaso(0); setRespuestas({}); setResultado(null); }
+  function retroceder() {
+    if (paso === 0) return;
+    cambiaPantalla();
+    setPaso(paso - 1);
+  }
+  function empezar() { cambiaPantalla(); setPantalla('test'); }
+  function reiniciar() { cambiaPantalla(); setPantalla('intro'); setPaso(0); setRespuestas({}); setResultado(null); }
 
   return (
     <div className={styles.container}>
@@ -86,7 +134,7 @@ export default function SelectorSeguroSalud() {
               <li><span aria-hidden="true">✅</span> Consejos para comparar aseguradoras</li>
               <li><span aria-hidden="true">✅</span> Sin publicidad ni aseguradoras patrocinadas</li>
             </ul>
-            <button type="button" className={styles.btnStart} onClick={() => setPantalla('test')}>
+            <button type="button" className={styles.btnStart} onClick={empezar}>
               Empezar el test →
             </button>
           </div>
@@ -118,7 +166,7 @@ export default function SelectorSeguroSalud() {
           </div>
           <div className={styles.preguntaCard}>
             <span className={styles.preguntaIcon} aria-hidden="true">{preguntaActual.icon}</span>
-            <h2 className={styles.preguntaTexto}>{preguntaActual.pregunta}</h2>
+            <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{preguntaActual.pregunta}</h2>
             <div className={styles.opcionesGrid} role="radiogroup" aria-label={preguntaActual.pregunta}>
               {preguntaActual.opciones.map(op => (
                 <button key={op.valor} type="button"
@@ -190,7 +238,12 @@ export default function SelectorSeguroSalud() {
           </div>
 
           <button type="button" className={styles.btnRepetir} onClick={reiniciar} aria-label="Repetir el test">← Repetir el test</button>
+        </div>
+      )}
 
+      {/* Fuera de las pantallas: antes solo se montaba en el resultado, así que no estaba en el
+          HTML servido y quien no terminaba las 10 preguntas no la veía (hallazgo 3127; forma del
+          2663 de selector-smartphone y del 3112 de alquiler). */}
           <EducationalSection title="Guía completa: seguros de salud en España" subtitle="Sanidad pública, mutualidades, seguros privados y cómo comparar" defaultOpen={false}>
             <h3>El sistema sanitario público español</h3>
             {/* Antes: «en 2025» en presente y «uno de los mejores del mundo en ranking de la OMS», sin
@@ -223,8 +276,6 @@ export default function SelectorSeguroSalud() {
               <li><strong>Reembolso de gastos:</strong> algunos seguros con cuadro médico limitado permiten ir a cualquier médico y te reembolsan un porcentaje. Útil en zonas rurales.</li>
             </ul>
           </EducationalSection>
-        </div>
-      )}
 
       <RelatedApps />
       <ShareCard appName="selector-seguro-salud" />
