@@ -886,14 +886,16 @@ test.describe('Inspector 10/10/2026 · contenido', () => {
   });
 
   test('hallazgo · la app no enseña en un sitio la respuesta que en otro da por mala', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026).
-    // · Canarias: la guía (FAQ «¿Cuántas islas tiene España?») dice «7 islas habitadas
+    // REPARADO el 19/10/2026 (3222): la guía da 8 islas habitadas (las siete con administración
+    // propia y La Graciosa, art. 4.1 del Estatuto de Autonomía de Canarias, LO 1/2018,
+    // BOE-A-2018-15138, leído el 19/10/2026) y la explicación de la id 15 hace nacer el Tajo en
+    // la Sierra de Albarracín (Teruel). Antes:
+    // · Canarias: la guía (FAQ «¿Cuántas islas tiene España?») decía «7 islas habitadas
     //   principales»; la pregunta id 22 «¿Cuántas islas habitadas tiene el archipiélago canario?»
     //   da por buena 8 (con La Graciosa, «reconocida oficialmente en 2018») y por MALA el 7.
-    // · Tajo: la explicación de la id 15 dice «El Tajo nace en Cuenca»; la id 59 «¿En qué
+    // · Tajo: la explicación de la id 15 decía «El Tajo nace en Cuenca»; la id 59 «¿En qué
     //   provincia nace el río Tajo?» da por buena Teruel y por MALA Cuenca (y la explicación de la
     //   id 49, «Nace en la Sierra de Albarracín (Teruel)»).
-    test.fail();
     await abrir(page);
     const fallos: string[] = [];
     const islas = fichaDe(/islas habitadas tiene el archipiélago canario/);
@@ -909,15 +911,16 @@ test.describe('Inspector 10/10/2026 · contenido', () => {
   });
 
   test('hallazgo · la guía no hace de Zamora una comunidad ni lleva el Duero por Aragón', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). FAQ visible «¿Qué ríos atraviesan más comunidades autónomas?»
-    // (page.tsx:446): «El Duero atraviesa Castilla y León, Zamora y parte de Aragón antes de entrar
-    // en Portugal». La tabla de la misma guía pone Zamora entre las 9 provincias de Castilla y León
-    // y la de ríos dice del Duero «Atraviesa Castilla y León y Portugal»; la id 75 lo hace nacer en
-    // el Sistema Ibérico (Picos de Urbión, Soria).
-    test.fail();
+    // REPARADO el 19/10/2026 (3223): el Duero recorre una sola comunidad, con Zamora entre sus
+    // provincias. Antes, FAQ visible «¿Qué ríos atraviesan más comunidades autónomas?»: «El Duero
+    // atraviesa Castilla y León, Zamora y parte de Aragón antes de entrar en Portugal». La tabla
+    // de la misma guía pone Zamora entre las 9 provincias de Castilla y León y la de ríos dice del
+    // Duero «Atraviesa Castilla y León y Portugal»; la id 75 lo hace nacer en el Sistema Ibérico
+    // (Picos de Urbión, Soria).
     await abrir(page);
     const texto = (await faqVisible(page))['¿Qué ríos atraviesan más comunidades autónomas?'] ?? '';
     const duero = (texto.match(/El Duero[^.]*\./) ?? [''])[0];
+    expect(duero, 'el Duero recorre una sola comunidad').toMatch(/solo recorre una comunidad/);
     expect(duero, 'Zamora es provincia de Castilla y León, no una comunidad').not.toMatch(/Castilla y León, Zamora/);
     expect(duero, 'el Duero no pasa por Aragón').not.toMatch(/Arag[oó]n/);
   });

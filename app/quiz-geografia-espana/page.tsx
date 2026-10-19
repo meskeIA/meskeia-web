@@ -522,7 +522,7 @@ export default function QuizGeografiaEspanaPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué ríos atraviesan más comunidades autónomas?</h3>
-              <p>El Ebro atraviesa 7 CCAA (Cantabria, País Vasco, La Rioja, Navarra, Aragón, Cataluña y brevemente Castilla y León). El Duero atraviesa Castilla y León, Zamora y parte de Aragón antes de entrar en Portugal.</p>
+              <p>El Ebro atraviesa 7 CCAA (Cantabria, País Vasco, La Rioja, Navarra, Aragón, Cataluña y brevemente Castilla y León). El Duero, en cambio, solo recorre una comunidad: nace en los Picos de Urbión (Soria), cruza Castilla y León por Soria, Burgos, Valladolid y Zamora, y en los Arribes hace de frontera con Portugal antes de entrar en el país vecino.</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuál es la comunidad autónoma más grande?</h3>
@@ -534,7 +534,7 @@ export default function QuizGeografiaEspanaPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuántas islas tiene España?</h3>
-              <p>Los archipiélagos principales son las Islas Canarias (7 islas habitadas principales) y las Islas Baleares (5 islas habitadas principales: Mallorca, Menorca, Ibiza, Formentera y Cabrera). Hay además numerosos islotes.</p>
+              <p>Los archipiélagos principales son las Islas Canarias (8 islas habitadas: las siete con cabildo propio y La Graciosa, agregada a Lanzarote, según el art. 4.1 del Estatuto de Autonomía de Canarias de 2018) y las Islas Baleares (5 islas habitadas principales: Mallorca, Menorca, Ibiza, Formentera y Cabrera). Hay además numerosos islotes.</p>
             </div>
           </div>
         </section>

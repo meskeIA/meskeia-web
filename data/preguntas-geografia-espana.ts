@@ -160,7 +160,7 @@ export const PREGUNTAS_GEOGRAFIA: PreguntaGeografia[] = [
     pregunta: '¿Qué río atraviesa la ciudad de Madrid?',
     opciones: ['Tajo', 'Jarama', 'Manzanares', 'Henares'],
     correcta: 'Manzanares',
-    explicacion: 'El río Manzanares atraviesa Madrid. El Tajo nace en Cuenca y pasa por Toledo, no por Madrid.',
+    explicacion: 'El río Manzanares atraviesa Madrid. El Tajo nace en la Sierra de Albarracín (Teruel) y pasa por Toledo, no por Madrid.',
     categoria: 'rios',
     dificultad: 'facil',
   },
