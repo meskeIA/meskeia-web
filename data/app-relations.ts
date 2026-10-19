@@ -3567,7 +3567,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-automata-pila/', icon: '📚', name: 'Autómata a Pila', description: 'Lenguajes que un AFD no reconoce' },
     { url: '/simulador-maquina-turing/', icon: '📜', name: 'Máquina de Turing', description: 'Modelo computacional universal' },
     { url: '/simulador-grafos/', icon: '🕸️', name: 'Algoritmos de Grafos', description: 'BFS, DFS, Dijkstra, A*' },
-    { url: '/calculadora-algebra-booleana/', icon: '⚙️', name: 'Álgebra Booleana', description: 'Karnaugh, SOP/POS, tablas verdad' },
+    { url: '/simulador-logica-secuencial/', icon: '⏱️', name: 'Lógica Secuencial', description: 'Tu autómata hecho circuito: máquinas de Moore y Mealy' },
   ],
   'simulador-regresion': [
     { url: '/simulador-kmeans/', icon: '🎯', name: 'K-Means Clustering', description: 'Aprendizaje no supervisado' },
