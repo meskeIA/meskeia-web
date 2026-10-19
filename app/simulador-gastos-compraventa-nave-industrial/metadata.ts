@@ -208,10 +208,12 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
+      // Hallazgo 3265 (19/10/2026): daba por universales el IVA y el ITP, sin el IGIC/IPSI ni la
+      // renuncia que la propia calculadora aplica.
       name: '¿En qué se diferencia comprar una nave industrial de comprar un local comercial?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Fiscalmente, tanto nave industrial como local comercial tienen el mismo tratamiento: IVA ${IVA_INMUEBLES_2025.local}\u00A0% en primera transmisión e ITP al tipo general en segunda mano. La diferencia práctica está en el uso (industrial vs. comercial o de oficinas) y en la calificación urbanística, que determina qué actividades pueden realizarse. La superficie, la normativa de seguridad industrial y los servicios disponibles también difieren habitualmente.`,
+        text: `Fiscalmente, tanto nave industrial como local comercial tienen el mismo tratamiento: IVA ${IVA_INMUEBLES_2025.local}\u00A0% en primera transmisión (en Canarias rige el IGIC y en Ceuta y Melilla el IPSI) e ITP al tipo general en segunda mano, salvo que el vendedor renuncie a la exención del IVA porque el comprador es un empresario con derecho a deducirlo: entonces la segunda mano paga IVA, que autoliquida el comprador por inversión del sujeto pasivo, y no ITP. En Ceuta y Melilla el IPSI no admite esa renuncia y la cuota del ITP se paga a la mitad. La diferencia práctica está en el uso (industrial vs. comercial o de oficinas) y en la calificación urbanística, que determina qué actividades pueden realizarse. La superficie, la normativa de seguridad industrial y los servicios disponibles también difieren habitualmente.`,
       },
     },
     {

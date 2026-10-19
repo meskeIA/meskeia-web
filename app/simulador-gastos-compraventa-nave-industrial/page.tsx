@@ -441,16 +441,32 @@ export default function SimuladorNaveIndustrialPage() {
           <>
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
             {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
-            ({territorioActualSinIva.nombre}), que esta calculadora no cifra. El impuesto soportado
-            también puede ser <strong>deducible</strong>, pero con las reglas del{' '}
-            {territorioActualSinIva.impuesto}: consúltalas en la administración tributaria{' '}
-            {deNombreCcaa(ccaa)} y con tu asesor fiscal antes de tomar decisiones.
+            ({territorioActualSinIva.nombre}), que esta calculadora no cifra.{' '}
+            {/* Hallazgo 3263 (19/10/2026): en Ceuta y Melilla decía que el IPSI soportado «también
+                puede ser deducible», y la Ley 8/1991, art. 20.3 (BOE-A-1991-7645, leído el
+                19/10/2026) dice: «Las cuotas soportadas o satisfechas en relación con las entregas
+                de bienes inmuebles […] no podrán ser objeto de deducción». En Canarias el IGIC sí
+                se deduce y la frase se queda. */}
+            {territorioActualSinIva.impuesto === 'IPSI' ? (
+              <>
+                El IPSI soportado en la compra de un inmueble <strong>no se puede deducir</strong>{' '}
+                (Ley 8/1991, art. 20.3): consulta con tu asesor fiscal antes de tomar decisiones.
+              </>
+            ) : (
+              <>
+                El impuesto soportado también puede ser <strong>deducible</strong>, pero con las
+                reglas del {territorioActualSinIva.impuesto}: consúltalas en la administración
+                tributaria {deNombreCcaa(ccaa)} y con tu asesor fiscal antes de tomar decisiones.
+              </>
+            )}
           </>
         ) : (
           <>
+            {/* Hallazgo 3264 (cabo C0164): «sujeta y no exenta», art. 94.Uno.1.º.a LIVA. */}
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de una nave industrial
-            puede ser <strong>deducible</strong> si tu actividad está sujeta a IVA. Consulta con tu asesor fiscal
-            antes de tomar decisiones.
+            puede ser <strong>deducible</strong> si la destinas a una actividad sujeta y no exenta de IVA
+            (una actividad exenta, como la sanitaria o la educativa, no lo deduce). Consulta con tu asesor
+            fiscal antes de tomar decisiones.
           </>
         )}
       </div>
@@ -573,7 +589,7 @@ export default function SimuladorNaveIndustrialPage() {
                   <>
                     Con renuncia a la exención el IVA no se paga al vendedor: lo{' '}
                     <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
-                    deducible si tu actividad está sujeta a IVA. El AJD de la escritura va al{' '}
+                    deducible si tu actividad está sujeta y no exenta de IVA. El AJD de la escritura va al{' '}
                     <strong>tipo propio de la renuncia</strong> en {nombreEnFrase(ccaa)} (
                     {formatTipoNominal(ajdRotulo.tipo)}&nbsp;%), que es el que se aplica aquí.
                   </>
@@ -581,7 +597,7 @@ export default function SimuladorNaveIndustrialPage() {
                   <>
                     Con renuncia a la exención el IVA no se paga al vendedor: lo{' '}
                     <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
-                    deducible si tu actividad está sujeta a IVA. Ojo al AJD: varias comunidades le aplican
+                    deducible si tu actividad está sujeta y no exenta de IVA. Ojo al AJD: varias comunidades le aplican
                     un <strong>tipo incrementado</strong> cuando hay renuncia, y aquí se calcula con el
                     tipo general de la tabla — consúltalo en tu comunidad.
                   </>
@@ -762,7 +778,7 @@ export default function SimuladorNaveIndustrialPage() {
                     : resultadosComprador.tipoImpuesto.startsWith('IVA')
                       ? transmision === 'segunda-mano-renuncia'
                         ? 'Lo autoliquida el comprador por inversión del sujeto pasivo (no se paga al vendedor) y es deducible si tienes derecho'
-                        : 'Potencialmente deducible si eres empresa/autónomo sujeto a IVA'
+                        : 'Potencialmente deducible si la nave se destina a una actividad sujeta y no exenta de IVA'
                       : resultadosComprador.bonificado
                         ? `Tipo general con la bonificación del ${BONIFICACION_CIUDADES} de la cuota ya aplicada (art. 57 bis TRLITPAJD)`
                         : 'Tipo general — las naves no tienen los reducidos de vivienda, pero alguna comunidad sí tiene tipos ligados a la ACTIVIDAD'
@@ -982,7 +998,7 @@ export default function SimuladorNaveIndustrialPage() {
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>IVA deducible</td>
-                  <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>Sí (si actividad sujeta a IVA)</td>
+                  <td className={styles.celdaSi} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--border)', fontWeight: 700 }}>Sí (si actividad sujeta y no exenta de IVA)</td>
                   <td className={styles.celdaNo} style={{ padding: '8px 10px', textAlign: 'center', borderBottom: '1px solid var(--border)' }}>No</td>
                 </tr>
                 <tr>
@@ -1004,8 +1020,8 @@ export default function SimuladorNaveIndustrialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏭</span> Empresa compra nave nueva al promotor</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}&nbsp;% + AJD. Si la empresa está dada de alta en
-                actividades sujetas a IVA, puede deducir el IVA en la declaración trimestral (modelo 303).
+                Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}&nbsp;% + AJD. Si la empresa destina la nave a
+                actividades sujetas y no exentas de IVA, puede deducir el IVA en la declaración trimestral (modelo 303).
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
@@ -1021,7 +1037,8 @@ export default function SimuladorNaveIndustrialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">💡</span> IVA deducible: cuándo y cómo</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Solo si el comprador es sujeto pasivo de IVA y la nave se destina a la actividad económica.
+                Solo si el comprador es sujeto pasivo de IVA y la nave se destina a una actividad económica
+                sujeta y no exenta (una clínica o un colegio, exentos, no lo deducen).
                 El IVA se recupera en la declaración trimestral, reduciendo el coste real de adquisición.
               </p>
             </div>

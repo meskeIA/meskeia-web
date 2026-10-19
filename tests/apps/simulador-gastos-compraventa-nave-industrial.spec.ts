@@ -2197,7 +2197,8 @@ test.describe('Regresión — hallazgos del 07/09/2026, reparados', () => {
     expect(respuestas.filter((t) => t.startsWith('No por perfil del comprador'))).toHaveLength(1);
     expect(respuestas.filter((t) => t === 'No')).toHaveLength(1);
     expect(respuestas.some((t) => t.startsWith('Sí (jóvenes'))).toBe(true);
-    expect(respuestas.some((t) => t.startsWith('Sí (si actividad sujeta a IVA'))).toBe(true);
+    // Texto de la celda desde el hallazgo 3264 (19/10/2026): «sujeta y no exenta».
+    expect(respuestas.some((t) => t.startsWith('Sí (si actividad sujeta y no exenta de IVA'))).toBe(true);
   });
 
   /**
@@ -6649,7 +6650,8 @@ test.describe('Re-inspección 13/10/2026 — Extremadura en el tramo del 11 %, V
    * texto (page.tsx l. 1246), sin medir.
    */
   test('[13/10-a] en Ceuta y Melilla el aviso de cabecera no promete deducir el IPSI de la compra de la nave (Ley 8/1991, art. 20.3)', async ({ page }) => {
-    test.fail(!I13_VER_HUECOS, 'hallazgo abierto del 13/10/2026: el aviso de cabecera dice que el IPSI «también puede ser deducible»');
+    // REPARADO el 19/10/2026 (hallazgo 3263): en Ceuta y Melilla el aviso dice que el IPSI de la
+    // compra de un inmueble no se puede deducir (art. 20.3).
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
     await sembrar(page, PRECIO, '500000');
@@ -6686,7 +6688,7 @@ test.describe('Re-inspección 13/10/2026 — Extremadura en el tramo del 11 %, V
    * Es la forma del hallazgo 3089 de solar (reparado el 08/10/2026).
    */
   test('[13/10-b] ningún texto condiciona la deducción del IVA a una actividad «sujeta» sin «no exenta» (art. 94.Uno.1.º.a LIVA)', async ({ page }) => {
-    test.fail(!I13_VER_HUECOS, 'hallazgo abierto del 13/10/2026 (cabo C0164): cinco bocas dicen «sujeta» sin «no exenta»');
+    // REPARADO el 19/10/2026 (hallazgo 3264): las cinco bocas dicen «sujeta y no exenta».
     const limpio = (s: string | null) => (s ?? '').replace(/\s+/g, ' ').trim();
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
@@ -6729,7 +6731,7 @@ test.describe('Re-inspección 13/10/2026 — Extremadura en el tramo del 11 %, V
    * sino IVA. Tampoco dice que en Ceuta y Melilla la cuota del ITP se paga a la mitad.
    */
   test('[13/10-c] el FAQPage «¿En qué se diferencia… de un local comercial?» no da por universales el IVA del 21 % y el ITP', async ({ page }) => {
-    test.fail(!I13_VER_HUECOS, 'hallazgo abierto del 13/10/2026: la respuesta calla el IGIC/IPSI y la renuncia');
+    // REPARADO el 19/10/2026 (hallazgo 3265): la respuesta nombra el IGIC/IPSI y la renuncia.
     await page.goto(RUTA);
     const respuesta = (await faqPage(page)).find((f) => /local comercial/.test(f.q));
     expect(respuesta, 'el FAQPage tiene la pregunta').toBeDefined();
@@ -6751,7 +6753,8 @@ test.describe('Re-inspección 13/10/2026 — Extremadura en el tramo del 11 %, V
    * que alcanza a las siete apps.
    */
   test('[13/10-d] una fecha escrita con un año imposible (13/10/0026) no se pide como si faltara', async ({ page }) => {
-    test.fail(!I13_VER_HUECOS, 'hallazgo abierto del 13/10/2026: el bloque pide «Indica la fecha…» con la fecha escrita');
+    // REPARADO el 19/10/2026 (hallazgo 3266, components/ProrrateoIbiComunidad): dice que la fecha
+    // no es válida en vez de pedirla.
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS_REPARTO);
     const bloque = page.locator(BLOQUE_REPARTO);
@@ -6762,5 +6765,6 @@ test.describe('Re-inspección 13/10/2026 — Extremadura en el tramo del 11 %, V
     await expect(fecha).toHaveValue('0026-10-13');
     await expect(bloque).not.toContainText('abona');
     await expect(bloque.getByText('Indica la fecha de la escritura para repartir los días.')).toHaveCount(0);
+    await expect(bloque.getByRole('alert')).toContainText('La fecha de la escritura no es válida');
   });
 });
