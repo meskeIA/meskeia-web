@@ -51,6 +51,21 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['ecuación de Bernoulli', 'fluidos', 'efecto Venturi', 'presión', 'caudal', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'educación media', 'física'],
 });
 
+/**
+ * Hallazgo 3245 (19/10/2026): estas dos preguntas estaban también en la FAQ visible con OTRA
+ * respuesta. Sobre el avión se contradecían —aquí Bernoulli y Newton describían la misma fuerza,
+ * allí eran dos aportaciones que se suman— y el umbral de la compresibilidad cambiaba de una boca
+ * a otra. Ahora las dos bocas leen estas constantes (CLAUDE.md §1.ter). En el avión manda la
+ * versión de aquí: la diferencia de presión ES la sustentación, y la desviación del aire hacia
+ * abajo es la otra forma de contar la misma fuerza.
+ */
+export const PREGUNTA_AVION = '¿Por qué vuela un avión? ¿Es solo por Bernoulli?';
+export const RESPUESTA_AVION =
+  'Bernoulli es una parte de la explicación, no toda. El ala, por su forma y sobre todo por su ángulo de ataque, desvía el aire hacia abajo, y por la tercera ley de Newton el aire empuja el ala hacia arriba. Ese mismo flujo va más rápido sobre la cara superior que bajo la inferior, y Bernoulli relaciona esa mayor velocidad con una presión menor encima del ala: la diferencia de presión entre las dos caras es la sustentación, así que ambos enfoques describen la misma fuerza y se complementan. Por eso un avión puede volar invertido ajustando el ángulo de ataque, algo que una explicación basada solo en la curvatura del ala no justifica.';
+export const PREGUNTA_LIMITACIONES = '¿Cuáles son las limitaciones reales de la ecuación de Bernoulli?';
+export const RESPUESTA_LIMITACIONES =
+  'Bernoulli asume fluido ideal (sin viscosidad), flujo estacionario (la velocidad no cambia con el tiempo), incompresible (densidad constante) y a lo largo de una línea de corriente. No se aplica directamente a fluidos viscosos (miel, aceite muy frío), al flujo turbulento, a tubos con codos bruscos ni a fluidos que se calientan o enfrían: la viscosidad disipa energía (pérdidas de Darcy-Weisbach). En los gases, la densidad varía notablemente a velocidades próximas a la del sonido, y con más razón a velocidades supersónicas. Para agua y aire a velocidades moderadas es una aproximación muy precisa.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -68,12 +83,12 @@ export const faqJsonLd = {
       // Hallazgo 2369 (28/09/2026): la respuesta anterior atribuía la mayor velocidad sobre el
       // ala a que el aire «recorre más distancia» por la cara curvada, la teoría del tiempo de
       // tránsito igual que la NASA da por errónea (Glenn Research Center, «Incorrect Lift
-      // Theory #1»: el aire de arriba llega ANTES al borde de salida). Ahora dice lo mismo que
-      // la FAQ visible de la página: Bernoulli es una parte y Newton la otra cara de la fuerza.
-      name: '¿Por qué vuela un avión? ¿Es solo por Bernoulli?',
+      // Theory #1»: el aire de arriba llega ANTES al borde de salida). Desde el hallazgo 3245 la
+      // FAQ visible lee esta misma constante.
+      name: PREGUNTA_AVION,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Bernoulli es una parte de la explicación, no toda. El ala, por su forma y sobre todo por su ángulo de ataque, desvía el aire hacia abajo, y por la tercera ley de Newton el aire empuja el ala hacia arriba. Ese mismo flujo va más rápido sobre la cara superior que bajo la inferior, y Bernoulli relaciona esa mayor velocidad con una presión menor encima del ala: la diferencia de presión entre las dos caras es la sustentación, así que ambos enfoques describen la misma fuerza y se complementan. Por eso un avión puede volar invertido ajustando el ángulo de ataque, algo que una explicación basada solo en la curvatura del ala no justifica.',
+        text: RESPUESTA_AVION,
       },
     },
     {
@@ -86,10 +101,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cuáles son las limitaciones reales de la ecuación de Bernoulli?',
+      name: PREGUNTA_LIMITACIONES,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Bernoulli asume fluido ideal (sin viscosidad), flujo estacionario (la velocidad no cambia con el tiempo), incompresible (densidad constante) y a lo largo de una línea de corriente. En la realidad, la viscosidad disipa energía (pérdidas de Darcy-Weisbach), el flujo turbulento invalida el modelo, y a velocidades próximas a la del sonido la densidad varía notablemente. Para agua y aire a velocidades moderadas es una aproximación muy precisa.',
+        text: RESPUESTA_LIMITACIONES,
       },
     },
     {

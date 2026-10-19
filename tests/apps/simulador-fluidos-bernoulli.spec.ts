@@ -1584,7 +1584,9 @@ test.describe('Inspector 13/10/2026 — re-inspección con firma de rotura', () 
     expect(nueve!.rgb[0], 'con 9 m lo primero es el BORDE oscuro del tubo').toBeLessThan(150);
   });
 
-  // HALLAZGO NUEVO (operativa, bajo) · El tubo del desnivel se sale del lienzo en el tope del
+  // HALLAZGO 3242 REPARADO (19/10/2026): en el desnivel la base baja y la escala se calcula para
+  // que a 10 m el eje del tubo quede 10 px por debajo de los rótulos de los manómetros.
+  // Lo que había (operativa, bajo) · El tubo del desnivel se salía del lienzo en el tope del
   // deslizador. La reparación del 399 (26/08/2026) cambió la escala a una FIJA de 0,6·plotH para
   // los 10 m del recorrido, pero la base del tubo está en el 55 % de plotH y el medio tubo mide
   // 40 px: el borde superior de la meseta queda en 205 − 18·Δh − 40 px, negativo desde 9,5 m. Con
@@ -1594,8 +1596,7 @@ test.describe('Inspector 13/10/2026 — re-inspección con firma de rotura', () 
   // Caso: desnivel 10 m (lienzo de 380 px) → esperado el borde oscuro del tubo dentro del lienzo,
   // como con 9 m · obtenido el primer píxel de la columna x = 0,85 en y = 0 y es el RELLENO
   // (229, 241, 248): el borde está fuera, en y = −15 px.
-  test('HALLAZGO · con 10 m de desnivel el tubo entero cabe en el lienzo', async ({ page }) => {
-    test.fail(true, 'ABIERTO (13/10/2026): con Δh = 10 m el borde superior del tubo queda en y = −15 px');
+  test('HALLAZGO 3242 · con 10 m de desnivel el tubo entero cabe en el lienzo', async ({ page }) => {
     await page.getByRole('button', { name: /Tubería con desnivel/ }).click();
     await page.getByLabel(/Animación de partículas/).uncheck();
     expect(await poner(page, 'Desnivel', 10)).toBe('10');
@@ -1604,9 +1605,12 @@ test.describe('Inspector 13/10/2026 — re-inspección con firma de rotura', () 
     expect(diez, 'algo dibujado en la columna x = 0,85').not.toBeNull();
     // Lo correcto: el primer píxel opaco es el borde oscuro (#555), por debajo de y = 0.
     expect(diez!.rgb[0], 'lo primero que se ve es el borde del tubo, no su relleno cortado').toBeLessThan(150);
+    expect(diez!.y, 'el borde superior queda dentro del lienzo').toBeGreaterThan(0);
   });
 
-  // HALLAZGO NUEVO (operativa, bajo) · El bucle de requestAnimationFrame llama a dibujar() en
+  // HALLAZGO 3244 REPARADO (19/10/2026): sin animación se dibuja una vez por cambio (con ella el
+  // bucle sigue, también fuera de pantalla: es lo que el caso no pedía).
+  // Lo que había (operativa, bajo) · El bucle de requestAnimationFrame llamaba a dibujar() en
   // CADA fotograma aunque la casilla «Animación de partículas» esté desmarcada y aunque el lienzo
   // esté fuera de pantalla, y dibujar() reasigna canvas.width (borra y realoja el lienzo, 640×840
   // píxeles en un Pixel 7) y fuerza un getBoundingClientRect. Desmarcar la animación para el
@@ -1615,8 +1619,7 @@ test.describe('Inspector 13/10/2026 — re-inspección con firma de rotura', () 
   // largas, así que no bloquea: es batería y calor en el móvil.
   // Caso: animación desmarcada, sin tocar nada, 2 s → esperado ≤ 2 redibujos (no cambia nada) ·
   // obtenido ~120 asignaciones de canvas.width (181 en 3 s medidas en el móvil, una por fotograma).
-  test('HALLAZGO · con la animación apagada y nada que cambie, el lienzo no se redibuja en bucle', async ({ page }) => {
-    test.fail(true, 'ABIERTO (13/10/2026): dibujar() corre en cada fotograma con la animación desmarcada');
+  test('HALLAZGO 3244 · con la animación apagada y nada que cambie, el lienzo no se redibuja en bucle', async ({ page }) => {
     await page.getByLabel(/Animación de partículas/).uncheck();
     await page.waitForTimeout(300);
     const asignaciones = await page.evaluate(async () => {
@@ -1634,8 +1637,10 @@ test.describe('Inspector 13/10/2026 — re-inspección con firma de rotura', () 
     expect(asignaciones).toBeLessThanOrEqual(2);
   });
 
-  // HALLAZGO NUEVO (contenido, medio) · Dos preguntas del FAQPage (metadata.ts, lo que leen los
-  // buscadores y los asistentes de IA) están también en la FAQ visible con OTRA respuesta:
+  // HALLAZGO 3245 REPARADO (19/10/2026): PREGUNTA_/RESPUESTA_AVION y _LIMITACIONES en metadata.ts,
+  // que leen las dos bocas; en el avión manda la versión del FAQPage (la diferencia de presión ES
+  // la sustentación). Lo que había (contenido, medio) · Dos preguntas del FAQPage (metadata.ts, lo
+  // que leen los buscadores y los asistentes de IA) estaban también en la FAQ visible con OTRA respuesta:
   //   · «¿Por qué vuela un avión? ¿Es solo por Bernoulli?» (JSON-LD) dice que «la diferencia de
   //     presión entre las dos caras ES la sustentación, así que ambos enfoques describen la misma
   //     fuerza»; «¿De verdad los aviones vuelan por Bernoulli?» (visible) dice que «se debe sobre
@@ -1648,10 +1653,9 @@ test.describe('Inspector 13/10/2026 — re-inspección con firma de rotura', () 
   // La reparación es UNA constante en metadata.ts que importen las dos bocas (como
   // app/simulador-gastos-compraventa-garaje). Caso: HTML servido → esperado la misma pregunta y
   // la misma respuesta en el FAQPage y en la FAQ visible · obtenido dos textos distintos.
-  test('HALLAZGO · las preguntas del FAQPage que también salen en la FAQ visible dan la misma respuesta', async ({
+  test('HALLAZGO 3245 · las preguntas del FAQPage que también salen en la FAQ visible dan la misma respuesta', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO (13/10/2026): avión y limitaciones, dos respuestas distintas en cada boca');
     const faq = await page.evaluate(() =>
       Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
         .map((s) => s.textContent ?? '')
@@ -1675,14 +1679,14 @@ test.describe('Inspector 13/10/2026 — re-inspección con firma de rotura', () 
     }
   });
 
-  // HALLAZGO NUEVO (contenido, bajo) · «¿Qué es la ecuación de Bernoulli?» define los términos
+  // HALLAZGO 3246 REPARADO (19/10/2026): «P: presión estática (Pa)».
+  // Lo que había (contenido, bajo) · «¿Qué es la ecuación de Bernoulli?» definía los términos
   // con «P: presión hidrostática (Pa)» y, una línea más abajo, «ρgh: presión hidrostática debida
   // a la altura»: dos términos distintos de la misma ecuación con el mismo nombre. P es la presión
   // ESTÁTICA, como dice la propia página en el escenario del tubo de Pitot («presión total
   // (P + ½ρv²) y estática (P)») y el FAQPage («la presión estática P»).
   // Caso: bloque educativo → esperado «P: presión estática» · obtenido «P: presión hidrostática».
-  test('HALLAZGO · el bloque educativo llama «estática» a P, no «hidrostática» como a ρgh', async ({ page }) => {
-    test.fail(true, 'ABIERTO (13/10/2026): «P: presión hidrostática (Pa)»');
+  test('HALLAZGO 3246 · el bloque educativo llama «estática» a P, no «hidrostática» como a ρgh', async ({ page }) => {
     const definicionP = await page.evaluate(
       () =>
         Array.from(document.querySelectorAll('ul[class*="bulletList"] li'))
@@ -1754,7 +1758,8 @@ test.describe('Inspector 13/10/2026 — operativa en móvil táctil de 390 px', 
     await expect(aviso).toContainText('−105,37 kPa');
   });
 
-  // HALLAZGO NUEVO (operativa, bajo) · En el móvil, «Cargar en el simulador» lleva la vista a
+  // HALLAZGO 3243 REPARADO (19/10/2026): la carga lleva la vista al lienzo, centrado.
+  // Lo que había (operativa, bajo) · En el móvil, «Cargar en el simulador» llevaba la vista a
   // los tres botones de geometría (scrollY ≈ 671), que en una columna ocupan 360 px; la tubería
   // empieza en y ≈ 1.807 y la tabla en y ≈ 2.265, así que tras cargar no se ve ni una cifra ni el
   // dibujo, y el aviso «El caso 5 está cargado en el simulador…» se queda en la sección de casos,
@@ -1764,10 +1769,9 @@ test.describe('Inspector 13/10/2026 — operativa en móvil táctil de 390 px', 
   // Caso: 390×844, caso 5 → «Cargar en el simulador» → esperado la tubería o la tabla cargada
   // en pantalla · obtenido solo los botones de geometría y la tarjeta de descripción (lienzo a
   // 1.136 px y tabla a 1.594 px por debajo del borde superior de la vista).
-  test('HALLAZGO · tras «Cargar en el simulador» en el móvil se ve la tubería o la tabla cargada', async ({
+  test('HALLAZGO 3243 · tras «Cargar en el simulador» en el móvil se ve la tubería o la tabla cargada', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO (13/10/2026): la vista acaba en los botones de geometría, sin lienzo ni tabla');
     const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
     await seccion.getByRole('button', { name: /^Caso 5:/ }).click();
     await seccion.getByRole('button', { name: /Cargar en el simulador/ }).click();

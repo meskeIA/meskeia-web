@@ -22,6 +22,7 @@ import {
   type FluidoId,
 } from './motor';
 import CasosAula from './CasosAula';
+import { PREGUNTA_AVION, RESPUESTA_AVION, PREGUNTA_LIMITACIONES, RESPUESTA_LIMITACIONES } from './metadata';
 import type { ConfiguracionSimulador } from './casos';
 
 // ============================================
@@ -201,7 +202,14 @@ export default function SimuladorFluidosBernoulliPage() {
     if (c.desnivel !== undefined) setAlturaDesnivel(c.desnivel);
     setP0(c.presionEntrada);
     const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    simuladorRef.current?.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'start' });
+    // Hallazgo 3243 (19/10/2026): la vista iba a los botones de geometría (block: 'start'), que
+    // en el móvil ocupan 360 px en columna: la tubería quedaba 1.136 px más abajo y la tabla
+    // 1.594, y tras cargar no se veía ni una cifra. Ahora va al lienzo, centrado, que es lo que
+    // el caso pide mirar (y en escritorio deja también la tabla a la vista).
+    (canvasRef.current ?? simuladorRef.current)?.scrollIntoView({
+      behavior: reducido ? 'auto' : 'smooth',
+      block: 'center',
+    });
   }, []);
 
   // ============================================
@@ -293,11 +301,21 @@ export default function SimuladorFluidosBernoulliPage() {
     // —(plotH·0,5)/max(1, dh)— la subida ocupaba siempre la misma mitad del canvas para
     // cualquier dh ≥ 1 m: el tubo salía idéntico píxel a píxel con 1 m y con 10, mientras la
     // tabla sí cambiaba. Ahora arrastrar el control mueve el dibujo.
-    const escalaY = (plotH * 0.6) / DESNIVEL_MAX;
+    //
+    // ⚠️ 19/10/2026 (hallazgo 3242) — con la base en el 55 % de plotH y 0,6·plotH para los 10 m,
+    // el borde superior de la meseta quedaba en 205 − 18·Δh − 40 px: negativo desde 9,5 m, y con
+    // 10 m el tubo salía cortado por arriba y la flecha de «Superior» tapaba su rótulo de presión.
+    // En el desnivel la base baja hasta dejar sitio a la etiqueta de velocidad y al nombre de la
+    // sección, y la escala se calcula para que a 10 m el eje del tubo quede 10 px por debajo de
+    // los rótulos de los manómetros (pad.top). Sigue siendo FIJA: 1 m y 10 m se dibujan distintos.
+    const MEDIO_TUBO_PX = 40; // anchoToPx(0,10) / 2
+    const yBase =
+      geom === 'desnivel' ? pad.top + plotH - MEDIO_TUBO_PX - 20 : pad.top + plotH * 0.55;
+    const escalaY =
+      geom === 'desnivel' ? Math.max(0, yBase - (pad.top + 10)) / DESNIVEL_MAX : (plotH * 0.6) / DESNIVEL_MAX;
     const yCentral = (xn: number) => {
       const h = alturaEnX(xn, geom, alturaDesnivel);
       // Para desnivel: alto h → arriba (menor py)
-      const yBase = pad.top + plotH * 0.55;
       return yBase - h * escalaY;
     };
 
@@ -437,16 +455,26 @@ export default function SimuladorFluidosBernoulliPage() {
   // ============================================
   // ANIMACIÓN LOOP
   // ============================================
+  //
+  // ⚠️ 19/10/2026 (hallazgo 3244) — el bucle llamaba a dibujar() en cada fotograma aunque la
+  // animación estuviera desmarcada o el lienzo fuera de pantalla, y cada llamada reasigna
+  // canvas.width (borra y realoja el lienzo): 60 redibujos por segundo de una imagen quieta, que
+  // en el móvil es batería y calor. Sin animación se dibuja UNA vez por cambio (este efecto se
+  // repite cuando cambia `dibujar`, es decir, los datos; el tamaño y el tema tienen sus propios
+  // oyentes abajo). Con la animación en marcha sigue dibujando aunque el lienzo no se vea: pararlo
+  // ahí dejaría el lienzo sin el último cambio hasta volver a verlo.
   useEffect(() => {
+    if (!animando) {
+      dibujar();
+      return;
+    }
     let lastTime = 0;
     const tick = (tNow: number) => {
       if (lastTime === 0) lastTime = tNow;
       const dt = Math.min(0.05, (tNow - lastTime) / 1000);
       lastTime = tNow;
 
-      if (animando) {
-        updateParticulas(dt);
-      }
+      updateParticulas(dt);
       dibujar();
       animFrameRef.current = requestAnimationFrame(tick);
     };
@@ -804,7 +832,7 @@ export default function SimuladorFluidosBernoulliPage() {
             P + ½ρv² + ρgh = constante
           </div>
           <ul className={styles.bulletList}>
-            <li><strong>P</strong>: presión hidrostática (Pa).</li>
+            <li><strong>P</strong>: presión estática (Pa).</li>
             <li><strong>½ρv²</strong>: presión dinámica (energía cinética por unidad de volumen).</li>
             <li><strong>ρgh</strong>: presión hidrostática debida a la altura (energía potencial por unidad de volumen).</li>
           </ul>
@@ -913,15 +941,16 @@ export default function SimuladorFluidosBernoulliPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Cuándo NO se cumple Bernoulli?</h4>
-              <p>La ecuación clásica asume <strong>fluido ideal</strong> (sin viscosidad, incompresible) en régimen estacionario y a lo largo de una <em>línea de corriente</em>. NO se aplica directamente a: fluidos viscosos (miel, aceite muy frío), turbulencia, tubos con codos bruscos, gases a velocidades supersónicas, fluidos que se calientan o enfrían.</p>
+              {/* Hallazgo 3245: la misma pregunta y respuesta que el FAQPage, de metadata.ts */}
+              <h4>{PREGUNTA_LIMITACIONES}</h4>
+              <p>{RESPUESTA_LIMITACIONES}</p>
               <p className={styles.faqTip}><span aria-hidden="true">💡</span> En la práctica industrial se añaden términos de pérdidas por fricción (ecuación de Bernoulli generalizada o ecuación de energía).</p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿De verdad los aviones vuelan por Bernoulli?</h4>
-              <p>Es una <strong>parte</strong> de la explicación, pero no toda. La sustentación se debe sobre todo a la <em>desviación del aire hacia abajo</em> (3.ª ley de Newton: el ala empuja el aire abajo, el aire empuja al ala arriba). Bernoulli explica por qué la presión arriba del ala es menor, lo que contribuye a la fuerza neta. Ambos enfoques son correctos y complementarios.</p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Una explicación &quot;sólo Bernoulli&quot; tiene problemas: no explica por qué un avión puede volar invertido. La realidad combina forma, ángulo de ataque y dinámica del aire.</p>
+              <h4>{PREGUNTA_AVION}</h4>
+              <p>{RESPUESTA_AVION}</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> La explicación de que el aire de arriba va más rápido porque «recorre más camino» y tiene que llegar a la vez al borde de salida es errónea: el aire de la cara superior llega ANTES (NASA Glenn Research Center, «Incorrect Lift Theory #1»).</p>
             </div>
 
             <div className={styles.faqItem}>
