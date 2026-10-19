@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import styles from './Combinatoria.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 
 // ======== TIPOS ========
 type TabId = 'permcomb' | 'pascal' | 'principio';
@@ -552,14 +552,16 @@ export default function VisualizadorCombinatoriaPage() {
                 {multiplySteps.map((step, idx) => (
                   <div key={idx} className={styles.multiplyStep}>
                     <label className={styles.stepLabel}>{step.label}</label>
-                    <input
-                      type="number"
+                    {/* Con `type="number"` y Number(v), vaciar el campo escribía «1» bajo el
+                        cursor y teclear «5» daba «15» (cabo C0081) */}
+                    <CampoNumerico
                       min={1}
                       max={20}
-                      value={step.options}
-                      onChange={e => updateStep(idx, Math.max(1, Math.min(20, Number(e.target.value))))}
+                      decimales={0}
+                      valor={step.options}
+                      onCambio={(v) => updateStep(idx, v)}
                       className={styles.stepInput}
-                      aria-label={`Opciones en ${step.label}`}
+                      ariaLabel={`Opciones en ${step.label}`}
                     />
                     <span className={styles.stepUnit}>opciones</span>
                     {idx < multiplySteps.length - 1 && <span className={styles.stepOp}>×</span>}

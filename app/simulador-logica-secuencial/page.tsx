@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import styles from './SimuladorLogicaSecuencial.module.css';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 
 // ============================================
 // TIPOS
@@ -524,16 +524,15 @@ export default function SimuladorLogicaSecuencial() {
             <div className={styles.configRow}>
               <label className={styles.configLabel} htmlFor="modulo">
                 Módulo de cuenta
-                <input
+                {/* Con `type="number"`, vaciar el campo escribía «2» bajo el cursor y teclear
+                    «12» daba «21», topado a 16 (cabo C0081) */}
+                <CampoNumerico
                   id="modulo"
-                  type="number"
                   min={2}
                   max={16}
-                  value={modulo}
-                  onChange={e => {
-                    const v = Number(e.target.value);
-                    if (!Number.isNaN(v)) setModulo(Math.min(16, Math.max(2, Math.trunc(v))));
-                  }}
+                  decimales={0}
+                  valor={modulo}
+                  onCambio={setModulo}
                   className={styles.inputNumero}
                 />
               </label>

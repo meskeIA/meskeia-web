@@ -6,7 +6,7 @@ import styles from './ConversorColores.module.css';
 import CampoCanal from './CampoCanal';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, EducationalSection, ShareCard } from '@/components';
+import { RelatedApps, LegalNotice, EducationalSection, ShareCard, CampoNumerico } from '@/components';
 import {
   buscarColores,
   colorPorHex,
@@ -824,24 +824,26 @@ export default function ConvertidorColoresPage() {
             {tamano === 'personalizado' && (
               <div className={styles.descargaMedida}>
                 <label htmlFor="ancho-libre">Ancho</label>
-                <input
+                {/* Con `type="number"` y Number(v), vaciar el campo dejaba «0» bajo el cursor
+                    y teclear «800» daba «0800» (cabo C0081) */}
+                <CampoNumerico
                   id="ancho-libre"
-                  type="number"
                   min={LADO_MINIMO}
                   max={LADO_MAXIMO}
-                  value={anchoLibre}
-                  onChange={(e) => setAnchoLibre(Number(e.target.value))}
+                  decimales={0}
+                  valor={anchoLibre}
+                  onCambio={setAnchoLibre}
                   className={styles.valueInput}
                 />
                 <span aria-hidden="true">×</span>
                 <label htmlFor="alto-libre">Alto</label>
-                <input
+                <CampoNumerico
                   id="alto-libre"
-                  type="number"
                   min={LADO_MINIMO}
                   max={LADO_MAXIMO}
-                  value={altoLibre}
-                  onChange={(e) => setAltoLibre(Number(e.target.value))}
+                  decimales={0}
+                  valor={altoLibre}
+                  onCambio={setAltoLibre}
                   className={styles.valueInput}
                 />
                 <span className={styles.descargaMedidaNota}>

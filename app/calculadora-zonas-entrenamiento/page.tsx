@@ -9,6 +9,7 @@ import {
   ShareCard,
   EducationalSection,
   DisclaimerCard,
+  CampoNumerico,
 } from '@/components';
 import styles from './CalculadoraZonasEntrenamiento.module.css';
 
@@ -144,13 +145,14 @@ export default function CalculadoraZonasEntrenamientoPage() {
                 Edad
               </label>
               <div className={styles.inputRow}>
-                <input
+                {/* Con `type="number"` y Number(v), vaciar el campo dejaba «0» bajo el cursor
+                    y teclear «35» daba «035» (cabo C0081) */}
+                <CampoNumerico
                   id="edad"
-                  type="number"
-                  min={15} max={80} value={edad}
-                  onChange={e => { setEdad(Number(e.target.value)); setCalculado(false); }}
+                  min={15} max={80} decimales={0} valor={edad}
+                  onCambio={(v) => { setEdad(v); setCalculado(false); }}
                   className={styles.inputNumber}
-                  aria-label="Tu edad en años"
+                  ariaLabel="Tu edad en años"
                 />
                 <span className={styles.inputUnidad}>años</span>
               </div>
@@ -165,13 +167,12 @@ export default function CalculadoraZonasEntrenamientoPage() {
                 <span className={styles.inputHint}>(opcional, para Karvonen)</span>
               </label>
               <div className={styles.inputRow}>
-                <input
+                <CampoNumerico
                   id="fcrep"
-                  type="number"
-                  min={40} max={100} value={fcRep}
-                  onChange={e => { setFcRep(Number(e.target.value)); setCalculado(false); }}
+                  min={40} max={100} decimales={0} valor={fcRep}
+                  onCambio={(v) => { setFcRep(v); setCalculado(false); }}
                   className={styles.inputNumber}
-                  aria-label="Frecuencia cardíaca en reposo"
+                  ariaLabel="Frecuencia cardíaca en reposo"
                 />
                 <span className={styles.inputUnidad}>ppm</span>
               </div>

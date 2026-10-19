@@ -14,11 +14,14 @@ import { esperarHidratacion } from './_hidratacion';
  * Para cada campo migrado:
  *   1. se vacía con Ctrl+A y Retroceso → el campo queda VACÍO (antes: el respaldo);
  *   2. se teclea la cifra tecla a tecla → el campo enseña exactamente lo tecleado;
- *   3. la app la usa: la lectura de la página enseña el valor en formato español;
+ *   3. la app la usa: el valor aplicado (`aria-valuenow`) es esa cifra y, si la página la
+ *      enseña en algún sitio, lo enseña en formato español;
  *   4. al salir del campo, enseña el valor aplicado en formato español.
  *
- * Reinyección: con el `type="number"` y el `||` de antes, el paso 1 falla en todos (el campo
- * se rellena con el respaldo) y el 2 da «12400» o «0.15».
+ * Reinyección: con el `type="number"` de antes, el paso 1 falla (el campo se rellena con el
+ * respaldo: medido el 19/10/2026 en simulador-disoluciones, «1» donde debía quedar vacío).
+ *
+ * Una app migrada a CampoNumerico se añade a CAMPOS.
  */
 
 interface Campo {
@@ -27,13 +30,15 @@ interface Campo {
   campo: string;
   /** Lo que se teclea, tecla a tecla. */
   teclear: string;
-  /** Lo que tiene que decir la página con ese valor (selector y texto). */
-  lectura: { selector: string; texto: string };
+  /** El valor que la app tiene que aplicar. */
+  valor: number;
+  /** Lo que tiene que decir la página con ese valor (selector y texto), si lo enseña. */
+  lectura?: { selector: string; texto: string };
   /** Lo que enseña el campo al salir. */
   alSalir: string;
   /** Antes de tocar el campo (pestañas, modos). */
   preparar?: (page: Page) => Promise<void>;
-  /** Un `<input>` presente al cargar, si el campo solo aparece tras `preparar`. */
+  /** Selector CSS de un `<input>` presente al cargar, si el campo solo aparece tras `preparar`. */
   hidratado?: string;
 }
 
@@ -42,6 +47,7 @@ const CAMPOS: Campo[] = [
     slug: 'calculadora-seccion-cable',
     campo: '#tension',
     teclear: '400',
+    valor: 400,
     lectura: { selector: 'label[for="tension"]', texto: '400 V' },
     alSalir: '400',
   },
@@ -49,6 +55,7 @@ const CAMPOS: Campo[] = [
     slug: 'calculadora-seccion-cable',
     campo: '#longitud',
     teclear: '12.5',
+    valor: 12.5,
     lectura: { selector: 'label[for="longitud"]', texto: '12,5 m' },
     alSalir: '12,5',
   },
@@ -56,6 +63,7 @@ const CAMPOS: Campo[] = [
     slug: 'calculadora-seccion-cable',
     campo: '#potencia',
     teclear: '2300',
+    valor: 2300,
     lectura: { selector: 'label[for="potencia"]', texto: '2300 W' },
     alSalir: '2300',
   },
@@ -63,6 +71,7 @@ const CAMPOS: Campo[] = [
     slug: 'calculadora-seccion-cable',
     campo: '#corriente',
     teclear: '16,5',
+    valor: 16.5,
     lectura: { selector: 'label[for="corriente"]', texto: '16,5 A' },
     alSalir: '16,5',
     hidratado: '#tension',
@@ -75,11 +84,76 @@ const CAMPOS: Campo[] = [
     slug: 'simulador-disoluciones',
     campo: 'input[aria-label="Masa molar personalizada en g/mol"]',
     teclear: '58.44',
+    valor: 58.44,
     lectura: { selector: 'p:has(input[aria-label="Masa molar personalizada en g/mol"]) strong', texto: '58,44 g/mol' },
     alSalir: '58,44',
     hidratado: '#masa-input',
     preparar: async (page) => {
       await page.locator('button:has-text("Personalizado")').first().click();
+    },
+  },
+  {
+    // Antes: Number(v) sin respaldo: vaciar dejaba «0» y «120» se leía «0120»
+    slug: 'calculadora-tiempo-lectura',
+    campo: '#velocidad-personalizada',
+    teclear: '120',
+    valor: 120,
+    alSalir: '120',
+  },
+  {
+    slug: 'calculadora-zonas-entrenamiento',
+    campo: '#edad',
+    teclear: '35',
+    valor: 35,
+    alSalir: '35',
+  },
+  {
+    slug: 'calculadora-zonas-entrenamiento',
+    campo: '#fcrep',
+    teclear: '55',
+    valor: 55,
+    alSalir: '55',
+  },
+  {
+    slug: 'conversor-colores',
+    campo: '#ancho-libre',
+    teclear: '800',
+    valor: 800,
+    lectura: { selector: 'button:has-text("Descargar")', texto: '800 × 1080' },
+    alSalir: '800',
+    hidratado: 'input[placeholder="#000000"]',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /A medida/ }).click();
+    },
+  },
+  {
+    // Antes: vaciar escribía «2» y teclear «12» daba «21», topado a 16
+    slug: 'simulador-logica-secuencial',
+    campo: '#modulo',
+    teclear: '12',
+    valor: 12,
+    alSalir: '12',
+    hidratado: 'input',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /Contador binario/ }).first().click();
+    },
+  },
+  {
+    slug: 'simulador-programacion-dinamica',
+    campo: 'input[aria-label="Peso del objeto 1"]',
+    teclear: '5',
+    valor: 5,
+    alSalir: '5',
+  },
+  {
+    slug: 'visualizador-combinatoria',
+    campo: 'input[aria-label^="Opciones en"] >> nth=0',
+    teclear: '7',
+    valor: 7,
+    alSalir: '7',
+    hidratado: 'input',
+    preparar: async (page) => {
+      await page.getByRole('tab', { name: 'Multiplicación y Newton' }).click();
     },
   },
 ];
@@ -98,7 +172,8 @@ for (const c of CAMPOS) {
 
     await campo.pressSequentially(c.teclear, { delay: 40 });
     await expect(campo, 'el campo enseña lo tecleado, tal cual').toHaveValue(c.teclear);
-    await expect(page.locator(c.lectura.selector)).toContainText(c.lectura.texto);
+    await expect(campo, 'la app aplica la cifra tecleada').toHaveAttribute('aria-valuenow', String(c.valor));
+    if (c.lectura) await expect(page.locator(c.lectura.selector)).toContainText(c.lectura.texto);
 
     await campo.press('Tab');
     await expect(campo, 'al salir enseña el valor aplicado').toHaveValue(c.alSalir);

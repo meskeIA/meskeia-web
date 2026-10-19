@@ -9,6 +9,7 @@ import {
   RelatedApps,
   EducationalSection,
   ShareCard,
+  CampoNumerico,
 } from '@/components';
 import styles from './SimuladorProgramacionDinamica.module.css';
 
@@ -365,26 +366,28 @@ export default function SimuladorProgramacionDinamica() {
                     <span className={styles.itemEtiq}>#{idx + 1}</span>
                     <label className={styles.itemCampo}>
                       Peso
-                      <input
-                        type="number"
+                      {/* Con `type="number"` y Number(v), vaciar el campo escribía «1» bajo el
+                          cursor y teclear «5» daba «15», topado a 12 (cabo C0081) */}
+                      <CampoNumerico
                         min={1}
                         max={12}
-                        value={o.peso}
-                        onChange={(e) => handleItemChange(idx, 'peso', Number(e.target.value))}
+                        decimales={0}
+                        valor={o.peso}
+                        onCambio={(v) => handleItemChange(idx, 'peso', v)}
                         className={styles.itemInput}
-                        inputMode="numeric"
+                        ariaLabel={`Peso del objeto ${idx + 1}`}
                       />
                     </label>
                     <label className={styles.itemCampo}>
                       Valor
-                      <input
-                        type="number"
+                      <CampoNumerico
                         min={1}
                         max={12}
-                        value={o.valor}
-                        onChange={(e) => handleItemChange(idx, 'valor', Number(e.target.value))}
+                        decimales={0}
+                        valor={o.valor}
+                        onCambio={(v) => handleItemChange(idx, 'valor', v)}
                         className={styles.itemInput}
-                        inputMode="numeric"
+                        ariaLabel={`Valor del objeto ${idx + 1}`}
                       />
                     </label>
                     <button

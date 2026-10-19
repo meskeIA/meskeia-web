@@ -6,6 +6,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
+  CampoNumerico,
 } from '@/components';
 import { formatNumber } from '@/lib';
 
@@ -196,13 +197,17 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
               ))}
             </div>
             <div className={styles.customVelocidad}>
-              <label>Personalizar:</label>
-              <input
-                type="number"
-                min="50"
-                max="500"
-                value={velocidad}
-                onChange={(e) => setVelocidad(Number(e.target.value))}
+              <label htmlFor="velocidad-personalizada">Personalizar:</label>
+              {/* Con `type="number"` y Number(v), vaciar el campo dejaba «0» bajo el cursor y
+                  teclear «120» daba «0120» (cabo C0081) */}
+              <CampoNumerico
+                id="velocidad-personalizada"
+                min={50}
+                max={500}
+                decimales={0}
+                paso={10}
+                valor={velocidad}
+                onCambio={setVelocidad}
                 className={styles.velocidadInput}
               />
               <span>palabras/min</span>
