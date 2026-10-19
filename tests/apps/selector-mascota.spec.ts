@@ -1896,13 +1896,13 @@ for (const movil of MOVILES_1010) {
     });
 
     test(`HALLAZGO: el 2.º toque de un doble toque en «Ver resultado» (botón en y ${movil.yVer}) no saca de la app`, async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). El primer toque pinta el resultado y lo sube a su sitio; en
+      // REPARADO el 19/10/2026 (3211): la guarda de ráfaga va también en captura sobre window,
+      // que alcanza los enlaces de los componentes compartidos. Antes: el primer toque pinta el resultado y lo sube a su sitio; en
       // ese punto queda la fila del aviso legal (LegalNotice) y el 2.º toque, que el navegador
       // ajusta al enlace más cercano, abre «Contacto» (/contacto/). Se pierden el resultado y las
       // diez respuestas: «atrás» vuelve a la intro. El guard de ráfaga del 2671 (`clicDeMas`) solo
       // está en los botones de la app; un enlace de un componente compartido no pasa por él.
-      // Esperado: el resultado sigue en /selector-mascota/. Obtenido hoy: /contacto/.
-      test.fail();
+      // Esperado: el resultado sigue en /selector-mascota/. Obtenido el 10/10: /contacto/.
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await abrirTest(page);
       await contestarLasDiez(page);
@@ -1917,11 +1917,10 @@ for (const movil of MOVILES_1010) {
     });
 
     test(`HALLAZGO: el 2.º toque de un doble toque en «Repetir el test» (botón en y ${movil.yRepetir}) no saca de la app`, async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). Mismo defecto que el anterior: al volver a la intro la página
+      // REPARADO el 19/10/2026 (3211), con la misma guarda en captura. Antes, mismo defecto que el anterior: al volver a la intro la página
       // encoge y bajo el dedo queda el pie (enlace a «/»); con el aviso de transparencia sin cerrar,
       // su «Más información →» (/privacidad/), en una franja más baja. Se cierra con su botón, como
-      // quien ya lo ha visto. Esperado: la intro del test en /selector-mascota/. Obtenido hoy: «/».
-      test.fail();
+      // quien ya lo ha visto. Esperado: la intro del test en /selector-mascota/. Obtenido el 10/10: «/».
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await page.goto('/selector-mascota/');
       await esperarHidratacionBotones(page);

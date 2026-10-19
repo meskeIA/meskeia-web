@@ -210,6 +210,25 @@ export default function SelectorMascota() {
     ultimoCambioPantallaRef.current = cambiaPantalla;
   };
 
+  // Lo que el segundo toque pisa tras «Ver resultado» o «Repetir el test» no es de esta app: la
+  // página sube o encoge y el toque cae en un enlace de la cabecera común («Contacto» de
+  // <LegalNotice />, el aviso de transparencia) o del pie, que `clicDeMas` no alcanza (hallazgo
+  // 3211). La misma regla, en fase de captura sobre window, antes de que el enlace o React lo
+  // vean, como en selector-alquiler-vs-compra (3111). Un clic suelto (detail 1) no se toca y
+  // cierra la ráfaga: la app vuelve a marcar el cambio de pantalla en su propio manejador.
+  useEffect(() => {
+    function filtrar(e: globalThis.MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantallaRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantallaRef.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+
   function seleccionarOpcion(valor: string) { setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor })); }
 
   /** Casilla de una pregunta de varias respuestas: «Sin restricciones» excluye a las demás. */
