@@ -9121,7 +9121,8 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
 
   /**
-   * HALLAZGO [medio, calculo] — ABIERTO (12/10/2026). La casilla «Es mi vivienda habitual» viene
+   * HALLAZGO [medio, calculo] — REPARADO el 19/10/2026 (3238): `irpfForal` exige ahora que el
+   * inmueble sea una vivienda, como `pideExencion`. La casilla «Es mi vivienda habitual» viene
    * marcada de fábrica y solo se pinta con «Vivienda»; al pasar a un LOCAL, una nave, un terreno,
    * un garaje o un trastero en el País Vasco o en Navarra, su estado sobrevive y `irpfForal`
    * (`esViviendaHabitual && TERRITORIOS_IIVTNU_FORAL.includes(ccaa)`, page.tsx) no mira el tipo
@@ -9134,7 +9135,7 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
    * 19.810,00 € y neto 271.190,00 € · obtenido «Sin calcular · Vendes tu vivienda habitual…» y neto
    * 291.000,00 €. Igual en Navarra con un garaje.
    */
-  test.fail('HALLAZGO IRPF foral — un local en el País Vasco no es la vivienda habitual del vendedor', async ({ page }) => {
+  test('HALLAZGO IRPF foral — un local en el País Vasco no es la vivienda habitual del vendedor', async ({ page }) => {
     test.setTimeout(60_000);
     await abrir(page, 'pais-vasco');
     await page.getByRole('button', { name: /Local comercial/ }).click();
@@ -9144,7 +9145,7 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
     await sembrar(page, 'Precio de compra original', '200000');
     await sembrar(page, 'Años de propiedad', '10');
     await sembrar(page, 'Valor catastral del suelo', '60000');
-    // Hoy: «Sin calcular» y «Vendes tu vivienda habitual en el País Vasco…» (ver el CONTROL)
+    // Antes de 3238: «Sin calcular» y «Vendes tu vivienda habitual en el País Vasco…»
     expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).not.toContain('Vendes tu vivienda habitual');
     expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('19.810,00 €');
     expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('271.190,00 €');

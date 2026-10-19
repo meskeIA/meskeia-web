@@ -996,7 +996,10 @@ export default function SimuladorCompraventaPage() {
           }
         : undefined,
       ccaa,
-      irpfForal: esViviendaHabitual && TERRITORIOS_IIVTNU_FORAL.includes(ccaa),
+      // Solo una VIVIENDA puede ser la habitual (hallazgo 3238): la casilla viene marcada de
+      // fábrica y su estado sobrevivía al pasar a local o garaje, que en el País Vasco y Navarra
+      // dejaban el IRPF «Sin calcular» como si el vendedor residiera allí. Como en pideExencion.
+      irpfForal: puedeSerViviendaHabitual && esViviendaHabitual && TERRITORIOS_IIVTNU_FORAL.includes(ccaa),
     };
     const r = calcularVendedor(entrada);
     const rp = r.resultadoPlusvalia;
