@@ -163,7 +163,7 @@ export default function GeneradorGradientesPage() {
                 className={`${styles.copyBtn} ${copied ? styles.copied : ''}`}
                 aria-label="Copiar código CSS al portapapeles"
               >
-                <span role="status" aria-live="polite">{copied ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}</span>
+                <span role="status" aria-live="polite">{copied ? <span key="si"><span aria-hidden="true">✓</span> Copiado</span> : <span key="no"><span aria-hidden="true">📋</span> Copiar</span>}</span>
               </button>
             </div>
             <pre className={styles.codeBlock}>

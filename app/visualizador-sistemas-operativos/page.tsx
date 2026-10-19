@@ -766,7 +766,7 @@ export default function VisualizadorSistemasOperativos() {
                       <td><code>{fila.marco}</code></td>
                       <td>{fila.presente ? <><span aria-hidden="true">✅</span> Sí</> : <><span aria-hidden="true">❌</span> Page Fault</>}</td>
                       <td><code>{fila.acceso}</code></td>
-                      <td>{fila.mod ? <><span aria-hidden="true">✏️</span> Sí</> : 'No'}</td>
+                      <td>{fila.mod ? <span key="si"><span aria-hidden="true">✏️</span> Sí</span> : <span key="no">No</span>}</td>
                     </tr>
                   ))}
                 </tbody>

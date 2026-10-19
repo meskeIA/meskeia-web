@@ -724,15 +724,17 @@ export default function SimuladorFluidosBernoulliPage() {
                 desnivel TOTAL, y la tarjeta compara con la sección intermedia, a Δh/2. Con
                 Δh = 1 m la fórmula de la nota daba 9.810 Pa junto a una cifra de 4.905. */}
             <span className={styles.resultRange}>
+              {/* Cada rama en su <span> con key: con la página traducida, pasar de un texto suelto
+                  a un fragmento tumbaba la app (cabo C0262) */}
               {dP === 0
                 ? geom === 'desnivel'
-                  ? 'Sin desnivel no hay caída: el tubo es horizontal y de sección constante'
-                  : 'Sin estrechamiento no hay caída: la sección es constante'
+                  ? <span key="sin-desnivel">Sin desnivel no hay caída: el tubo es horizontal y de sección constante</span>
+                  : <span key="sin-estrechamiento">Sin estrechamiento no hay caída: la sección es constante</span>
                 : dP < 0
                   ? geom === 'desnivel'
-                    ? <><span aria-hidden="true">⚠️</span> Subir cuesta presión: se convierte en energía potencial (ρ·g·(h₂ − h₁))</>
-                    : <><span aria-hidden="true">⚠️</span> La presión CAE en el estrechamiento (paradoja Bernoulli)</>
-                  : 'La presión sube'}
+                    ? <span key="sube-cuesta"><span aria-hidden="true">⚠️</span> Subir cuesta presión: se convierte en energía potencial (ρ·g·(h₂ − h₁))</span>
+                    : <span key="cae"><span aria-hidden="true">⚠️</span> La presión CAE en el estrechamiento (paradoja Bernoulli)</span>
+                  : <span key="sube">La presión sube</span>}
             </span>
           </div>
 

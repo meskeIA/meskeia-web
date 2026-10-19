@@ -429,7 +429,7 @@ export default function QuizPaisesCapitalesPage() {
                 )}
               </div>
               <button type="button" ref={botonSiguienteRef} className={styles.btnSiguiente} onClick={siguiente}>
-                {esUltima ? 'Ver resultados' : <>Siguiente pregunta <span aria-hidden="true">→</span></>}
+                {esUltima ? <span key="si">Ver resultados</span> : <span key="no">Siguiente pregunta <span aria-hidden="true">→</span></span>}
               </button>
             </>
           )}

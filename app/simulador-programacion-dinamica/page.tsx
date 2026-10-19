@@ -552,7 +552,7 @@ export default function SimuladorProgramacionDinamica() {
               aria-pressed={auto}
               disabled={completado}
             >
-              {auto ? 'Pausar' : <>Auto <span aria-hidden="true">▶▶</span></>}
+              {auto ? <span key="si">Pausar</span> : <span key="no">Auto <span aria-hidden="true">▶▶</span></span>}
             </button>
             <button
               type="button"

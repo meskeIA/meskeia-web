@@ -274,7 +274,7 @@ export default function TokenizadorIa() {
           </p>
 
           <button type="button" className={styles.editarBtn} onClick={() => setEditandoPrecios((p) => !p)} aria-expanded={editandoPrecios}>
-            {editandoPrecios ? '▲ Ocultar editor de precios' : <><span aria-hidden="true">✏️</span>{' Editar precios'}</>}
+            {editandoPrecios ? <span key="si"><span aria-hidden="true">▲</span> Ocultar editor de precios</span> : <span key="no"><span aria-hidden="true">✏️</span>{' Editar precios'}</span>}
           </button>
 
           {editandoPrecios && (

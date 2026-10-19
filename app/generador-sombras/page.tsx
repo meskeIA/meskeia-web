@@ -251,7 +251,7 @@ export default function GeneradorSombrasPage() {
                 onClick={copyToClipboard}
                 className={`${styles.copyBtn} ${copied ? styles.copied : ''}`}
               >
-                {copied ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
+                {copied ? <span key="si"><span aria-hidden="true">✓</span> Copiado</span> : <span key="no"><span aria-hidden="true">📋</span> Copiar</span>}
               </button>
             </div>
             <pre className={styles.codeBlock}>

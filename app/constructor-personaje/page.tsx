@@ -484,7 +484,7 @@ export default function ConstructorPersonajePage() {
                     className={`${styles.copyBtn} ${copiado ? styles.copyBtnOk : ''}`}
                     onClick={copiar}
                   >
-                    {copiado ? '✓ Copiada' : <><span aria-hidden="true">📋</span> Copiar ficha</>}
+                    {copiado ? <span key="si"><span aria-hidden="true">✓</span> Copiada</span> : <span key="no"><span aria-hidden="true">📋</span> Copiar ficha</span>}
                   </button>
                 </div>
                 {seccionesFicha.map((seccion) => {

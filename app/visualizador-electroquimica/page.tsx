@@ -205,7 +205,7 @@ const SeccionPila = () => {
             />
             <span className={styles.toggleSlider} />
           </label>
-          <span className={styles.toggleLabel}>{cargaConectada ? <><span aria-hidden="true">💡</span> Encendido</> : '○ Abierto'}</span>
+          <span className={styles.toggleLabel}>{cargaConectada ? <span key="si"><span aria-hidden="true">💡</span> Encendido</span> : <span key="no"><span aria-hidden="true">○</span> Abierto</span>}</span>
         </div>
 
         <div className={styles.pilaSvgWrapper}>

@@ -586,7 +586,7 @@ export default function RecordatorioMedicacionPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>{editando ? <><span aria-hidden="true">✏️</span> Editar medicamento</> : '+ Nuevo medicamento'}</h1>
+        <h1 className={styles.title}>{editando ? <span key="si"><span aria-hidden="true">✏️</span> Editar medicamento</span> : <span key="no">+ Nuevo medicamento</span>}</h1>
         <p className={styles.subtitle}>Configura el nombre, pictograma y horarios</p>
       </header>
 

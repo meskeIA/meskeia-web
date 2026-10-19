@@ -542,8 +542,10 @@ export default function CalculadoraAlgebraBooleanaPage() {
               <div className={styles.step}>
                 <strong>Paso 3:</strong> Elegir la cobertura mínima
                 <br />
+                {/* Cada rama en su <span> con key: con la página traducida, retirar el texto suelto
+                    de la otra rama tumbaba la app (cabo C0262) */}
                 {karnaughGroups.length > 0 ? (
-                  <>
+                  <span key="grupos">
                     {karnaughGroups.filter(g => g.esencial).length > 0
                       ? `Esenciales (obligatorios): ${karnaughGroups.filter(g => g.esencial).map(g => g.term).join(', ')}`
                       : 'No hay implicantes esenciales: la elección se resuelve por búsqueda exacta'}
@@ -554,8 +556,8 @@ export default function CalculadoraAlgebraBooleanaPage() {
                     {primosDescartados.length > 0 && (
                       <>Descartados por redundantes: {primosDescartados.join(', ')}</>
                     )}
-                  </>
-                ) : 'No hay grupos que formar'}
+                  </span>
+                ) : <span key="sin-grupos">No hay grupos que formar</span>}
               </div>
 
               <div className={styles.step}>

@@ -391,7 +391,7 @@ export default function GeneradorGitignorePage() {
             <h2>.gitignore generado</h2>
             <div className={styles.previewActions}>
               <button type="button" onClick={handleCopy} className={styles.btnSecondary} aria-label="Copiar contenido al portapapeles">
-                {copied ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
+                {copied ? <span key="si"><span aria-hidden="true">✓</span> Copiado</span> : <span key="no"><span aria-hidden="true">📋</span> Copiar</span>}
               </button>
               <button type="button" onClick={handleDownload} className={styles.btnPrimary} aria-label="Descargar archivo .gitignore">
                 <span aria-hidden="true">⬇️</span> Descargar

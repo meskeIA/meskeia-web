@@ -339,7 +339,7 @@ function TabCampo() {
           disabled={animando}
           aria-label="Animar solución desde la condición inicial"
         >
-          {animando ? 'Animando…' : <><span aria-hidden="true">▶</span> Animar solución</>}
+          {animando ? <span key="si">Animando…</span> : <span key="no"><span aria-hidden="true">▶</span> Animar solución</span>}
         </button>
         <button
           type="button"
@@ -476,7 +476,7 @@ function TabLotkaVolterra() {
           <div className={styles.botonRow}>
             <button type="button" className={styles.btnPrimario} onClick={animar} disabled={animando}
               aria-label="Animar simulación Lotka-Volterra">
-              {animando ? 'Simulando…' : <><span aria-hidden="true">▶</span> Animar</>}
+              {animando ? <span key="si">Simulando…</span> : <span key="no"><span aria-hidden="true">▶</span> Animar</span>}
             </button>
             <button type="button" className={styles.btnSecundario} onClick={() => setVisibles(300)}
               aria-label="Ver resultado completo">

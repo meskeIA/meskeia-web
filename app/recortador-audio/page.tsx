@@ -712,7 +712,7 @@ export default function RecortadorAudioPage() {
                 className={styles.btnPrimary}
                 disabled={isProcessing}
               >
-                {isProcessing ? 'Procesando...' : <><span aria-hidden="true">✂️</span> Recortar y Procesar</>}
+                {isProcessing ? <span key="si">Procesando...</span> : <span key="no"><span aria-hidden="true">✂️</span> Recortar y Procesar</span>}
               </button>
             </div>
 

@@ -504,7 +504,7 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
               disabled={!content.trim() || isAnalyzing}
               className={styles.btnPrimary}
             >
-              {isAnalyzing ? 'Analizando...' : <><span aria-hidden="true">🔍</span> Analizar Contenido</>}
+              {isAnalyzing ? <span key="si">Analizando...</span> : <span key="no"><span aria-hidden="true">🔍</span> Analizar Contenido</span>}
             </button>
             <button type="button" onClick={handleClear} className={styles.btnSecondary}>
               Limpiar

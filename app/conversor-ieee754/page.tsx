@@ -525,7 +525,7 @@ export default function ConversorIEEE754Page() {
                 className={styles.copyBtn}
                 onClick={() => handleCopy(result.fullBinary, 'binary')}
               >
-                {copied === 'binary' ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
+                {copied === 'binary' ? <span key="si"><span aria-hidden="true">✓</span> Copiado</span> : <span key="no"><span aria-hidden="true">📋</span> Copiar</span>}
               </button>
             </div>
             <code className={styles.fullBinaryValue}>
