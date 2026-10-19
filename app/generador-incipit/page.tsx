@@ -250,7 +250,7 @@ export default function GeneradorIncipitPage() {
         </div>
         <div className={styles.generarRow}>
           <button type="button" className={styles.generarBtn} onClick={generar} aria-label="Generar nuevos íncipit">
-            🎲 Generar
+            <span aria-hidden="true">🎲</span> Generar
           </button>
           <span className={styles.contadorInfo}>
             {totalFiltrados} íncipit{totalFiltrados !== 1 ? 's' : ''} en esta combinación
@@ -293,7 +293,7 @@ export default function GeneradorIncipitPage() {
                   onClick={() => copiar(inc.texto, inc.id)}
                   aria-label="Copiar al portapapeles"
                 >
-                  {copiado === inc.id ? '✓ Copiado' : '📋 Copiar'}
+                  {copiado === inc.id ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
                 </button>
               </article>
             );
@@ -377,19 +377,19 @@ export default function GeneradorIncipitPage() {
         <h3>Para qué tipo de escritor es este generador</h3>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🔓 Escritor bloqueado</strong>
+            <strong><span aria-hidden="true">🔓</span> Escritor bloqueado</strong>
             <p>Usa el generador para romper el bloqueo. No tienes que usar el incipit tal cual: basta con que te dé impulso para escribir la primera frase propia.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>📖 Estudiante de técnica</strong>
+            <strong><span aria-hidden="true">📖</span> Estudiante de técnica</strong>
             <p>Analiza los incipits reales: ¿qué prometen? ¿qué tono establecen? ¿cómo relacionan género y apertura? La respuesta a esas preguntas vale más que el incipit.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>✍️ Escritor de taller</strong>
+            <strong><span aria-hidden="true">✍️</span> Escritor de taller</strong>
             <p>Usa los incipits como ejercicio de continuación: elige uno que no has escrito tú y escribe las 10 frases siguientes. El incipit ajeno libera el control y la autocrítica.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🎯 Escritor en revisión</strong>
+            <strong><span aria-hidden="true">🎯</span> Escritor en revisión</strong>
             <p>Compara tu incipit actual con los de tu género. ¿Cumple alguna de las funciones de la tabla? ¿Hace una promesa? ¿Tiene tensión o voz? Si no, es candidato a reescritura.</p>
           </div>
         </div>

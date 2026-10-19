@@ -315,6 +315,7 @@ export default function ArbolDecisionIa() {
         <div className={styles.dsRow} role="group" aria-label="Seleccionar dataset">
           {Object.entries(DATASETS).map(([key, d]) => (
             <button
+              type="button"
               key={key}
               className={`${styles.dsPill} ${dsKey === key ? styles.dsPillActivo : ''}`}
               onClick={() => cambiarDs(key)}

@@ -248,7 +248,7 @@ export default function EvaluadorFortalezaContrasenaPage() {
             aria-pressed={mostrar}
             aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
           >
-            {mostrar ? '🙈 Ocultar' : '👁️ Mostrar'}
+            {mostrar ? <><span aria-hidden="true">🙈</span> Ocultar</> : <><span aria-hidden="true">👁️</span> Mostrar</>}
           </button>
         </div>
 

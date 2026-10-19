@@ -314,6 +314,7 @@ export default function InformacionTiempoPage() {
           <div className={styles.ciudadesRapidas}>
             {CIUDADES_POPULARES.map((c) => (
               <button
+                type="button"
                 key={c.nombre}
                 onClick={() => buscarCiudad(c.nombre)}
                 className={styles.ciudadBtn}
@@ -330,6 +331,7 @@ export default function InformacionTiempoPage() {
               <span className={styles.historialLabel}>Recientes:</span>
               {historial.map((c) => (
                 <button
+                  type="button"
                   key={c}
                   onClick={() => buscarCiudad(c)}
                   className={styles.historialBtn}
@@ -343,6 +345,7 @@ export default function InformacionTiempoPage() {
 
           {/* Botón ubicación */}
           <button
+            type="button"
             onClick={() => {
               if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -354,7 +357,7 @@ export default function InformacionTiempoPage() {
             className={styles.ubicacionBtn}
             disabled={loading}
           >
-            📍 Usar mi ubicación
+            <span aria-hidden="true">📍</span> Usar mi ubicación
           </button>
         </div>
 
@@ -528,7 +531,7 @@ export default function InformacionTiempoPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>☀️ Sol despejado</td>
+                  <td><span aria-hidden="true">☀️</span> Sol despejado</td>
                   <td>20 – 40 °C</td>
                   <td>20 – 50 %</td>
                   <td>&gt; 10 km</td>
@@ -537,7 +540,7 @@ export default function InformacionTiempoPage() {
                   <td>Senderismo, playa, deportes al aire libre</td>
                 </tr>
                 <tr>
-                  <td>🌧️ Lluvia moderada</td>
+                  <td><span aria-hidden="true">🌧️</span> Lluvia moderada</td>
                   <td>8 – 18 °C</td>
                   <td>75 – 90 %</td>
                   <td>2 – 8 km</td>
@@ -546,7 +549,7 @@ export default function InformacionTiempoPage() {
                   <td>Museos, cine, actividades interiores</td>
                 </tr>
                 <tr>
-                  <td>❄️ Nieve</td>
+                  <td><span aria-hidden="true">❄️</span> Nieve</td>
                   <td>-5 – 2 °C</td>
                   <td>70 – 95 %</td>
                   <td>0,5 – 5 km</td>
@@ -555,7 +558,7 @@ export default function InformacionTiempoPage() {
                   <td>Esquí, excursiones con equipamiento adecuado</td>
                 </tr>
                 <tr>
-                  <td>⛈️ Tormenta eléctrica</td>
+                  <td><span aria-hidden="true">⛈️</span> Tormenta eléctrica</td>
                   <td>15 – 30 °C</td>
                   <td>60 – 95 %</td>
                   <td>0,5 – 5 km</td>
@@ -564,7 +567,7 @@ export default function InformacionTiempoPage() {
                   <td>Permanecer en interior, alejarse de árboles</td>
                 </tr>
                 <tr>
-                  <td>🌫️ Niebla</td>
+                  <td><span aria-hidden="true">🌫️</span> Niebla</td>
                   <td>0 – 15 °C</td>
                   <td>90 – 100 %</td>
                   <td>&lt; 1 km</td>
@@ -573,7 +576,7 @@ export default function InformacionTiempoPage() {
                   <td>Actividades sedentarias, evitar montaña</td>
                 </tr>
                 <tr>
-                  <td>🌨️ Granizo</td>
+                  <td><span aria-hidden="true">🌨️</span> Granizo</td>
                   <td>2 – 20 °C</td>
                   <td>60 – 90 %</td>
                   <td>1 – 5 km</td>

@@ -257,10 +257,10 @@ function VisualElasticidad() {
     <div className={styles.visualWrap}>
       <div className={styles.toggleRow} role="group" aria-label="Tipo de bien">
         <button type="button" className={`${styles.toggleBtn} ${inelastico ? styles.toggleActivo : ''}`} aria-pressed={inelastico} onClick={() => setModo('inelastico')}>
-          ⛽ Inelástico (gasolina)
+          <span aria-hidden="true">⛽</span> Inelástico (gasolina)
         </button>
         <button type="button" className={`${styles.toggleBtn} ${!inelastico ? styles.toggleActivo : ''}`} aria-pressed={!inelastico} onClick={() => setModo('elastico')}>
-          🥤 Elástico (refresco)
+          <span aria-hidden="true">🥤</span> Elástico (refresco)
         </button>
       </div>
       <svg viewBox="0 0 100 100" className={styles.visualSvg} role="img" aria-label={`Demanda ${modo}: al subir el precio, la cantidad cae un ${caidaCantidad}%`}>

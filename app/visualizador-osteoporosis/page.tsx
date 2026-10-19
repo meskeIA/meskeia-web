@@ -688,7 +688,7 @@ function SeccionCurva() {
         <h3 className={styles.sexoComparativaTitulo}>¿Por qué las mujeres son más vulnerables?</h3>
         <div className={styles.sexoComparativaGrid}>
           <div className={styles.sexoComparativaCol}>
-            <span className={styles.sexoComparativaColTitulo}>♀ Mujer</span>
+            <span className={styles.sexoComparativaColTitulo}><span aria-hidden="true">♀</span> Mujer</span>
             <div className={styles.sexoComparativaFila}>
               <span className={styles.sexoComparativaLabel}>Pico de masa ósea</span>
               <span className={styles.sexoComparativaValor}>~85% del hombre</span>
@@ -707,7 +707,7 @@ function SeccionCurva() {
             </div>
           </div>
           <div className={styles.sexoComparativaCol}>
-            <span className={styles.sexoComparativaColTitulo}>♂ Hombre</span>
+            <span className={styles.sexoComparativaColTitulo}><span aria-hidden="true">♂</span> Hombre</span>
             <div className={styles.sexoComparativaFila}>
               <span className={styles.sexoComparativaLabel}>Pico de masa ósea</span>
               <span className={styles.sexoComparativaValor}>Base de referencia</span>
@@ -801,7 +801,7 @@ export default function VisualizadorOsteoporosisPage() {
 
         {/* warningBox standalone */}
         <div className={styles.warningBox}>
-          <strong>🦴 Prevención antes de los 30:</strong> el 90% de la masa ósea máxima se alcanza a los 18 años.
+          <strong><span aria-hidden="true">🦴</span> Prevención antes de los 30:</strong> el 90% de la masa ósea máxima se alcanza a los 18 años.
           La infancia y adolescencia son la ventana más importante para la prevención: ejercicio de impacto, calcio
           y vitamina D forman la reserva que protegerá el hueso durante toda la vida adulta.
         </div>

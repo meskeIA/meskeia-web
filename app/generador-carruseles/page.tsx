@@ -418,7 +418,7 @@ export default function GeneradorCarruselesPage() {
             disabled={exportando}
             className={styles.exportBtn}
           >
-            {exportando ? '⏳ Generando imágenes...' : '📥 Descargar imágenes PNG'}
+            {exportando ? <><span aria-hidden="true">⏳</span> Generando imágenes...</> : <><span aria-hidden="true">📥</span> Descargar imágenes PNG</>}
           </button>
 
           {mensajeExito && (
@@ -495,7 +495,7 @@ export default function GeneradorCarruselesPage() {
 
         {/* TABLA COMPARATIVA: Plataformas */}
         <section className={styles.eduComparativa}>
-          <h2>⚖️ Instagram vs LinkedIn vs TikTok: ¿dónde triunfan los carruseles?</h2>
+          <h2><span aria-hidden="true">⚖️</span> Instagram vs LinkedIn vs TikTok: ¿dónde triunfan los carruseles?</h2>
           <p className={styles.eduIntro}>
             Cada plataforma tiene sus propias reglas de engagement. Los carruseles funcionan diferente según donde los publiques.
           </p>
@@ -504,9 +504,9 @@ export default function GeneradorCarruselesPage() {
               <thead>
                 <tr>
                   <th>Criterio</th>
-                  <th>📸 Instagram</th>
-                  <th>💼 LinkedIn</th>
-                  <th>🎵 TikTok</th>
+                  <th><span aria-hidden="true">📸</span> Instagram</th>
+                  <th><span aria-hidden="true">💼</span> LinkedIn</th>
+                  <th><span aria-hidden="true">🎵</span> TikTok</th>
                 </tr>
               </thead>
               <tbody>
@@ -536,9 +536,9 @@ export default function GeneradorCarruselesPage() {
                 </tr>
                 <tr>
                   <td><strong>Engagement</strong></td>
-                  <td>⭐⭐⭐⭐⭐ Muy alto (guardados + likes)</td>
-                  <td>⭐⭐⭐⭐ Alto (comentarios + shares)</td>
-                  <td>⭐⭐⭐ Medio (vistas + follows)</td>
+                  <td><span aria-hidden="true">⭐⭐⭐⭐⭐</span> Muy alto (guardados + likes)</td>
+                  <td><span aria-hidden="true">⭐⭐⭐⭐</span> Alto (comentarios + shares)</td>
+                  <td><span aria-hidden="true">⭐⭐⭐</span> Medio (vistas + follows)</td>
                 </tr>
                 <tr>
                   <td><strong>Mejor hora</strong></td>
@@ -559,7 +559,7 @@ export default function GeneradorCarruselesPage() {
 
         {/* CASOS DE USO */}
         <section className={styles.eduEscenarios}>
-          <h2>💼 Casos de uso reales: quién usa carruseles y cómo</h2>
+          <h2><span aria-hidden="true">💼</span> Casos de uso reales: quién usa carruseles y cómo</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -661,10 +661,10 @@ export default function GeneradorCarruselesPage() {
 
         {/* FAQ */}
         <section className={styles.eduFaq}>
-          <h2>❓ Preguntas frecuentes sobre carruseles</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre carruseles</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuántos slides debe tener un carrusel para maximizar el alcance?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuántos slides debe tener un carrusel para maximizar el alcance?</h4>
               <p>
                 Para Instagram, el rango óptimo es <strong>6-10 slides</strong>. El algoritmo detecta cuántos usuarios llegan al último slide y lo usa como señal de calidad. Con menos de 5 slides no hay suficiente recorrido; con más de 10 el abandono aumenta. Los carruseles de 7-8 slides suelen tener el mejor equilibrio entre retención y tiempo de lectura.
               </p>
@@ -674,7 +674,7 @@ export default function GeneradorCarruselesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué tipo de primer slide genera más clics en &quot;Ver más&quot;?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué tipo de primer slide genera más clics en &quot;Ver más&quot;?</h4>
               <p>
                 Los primeros slides con mayor retención son: <strong>preguntas directas</strong> (&quot;¿Cometes este error?&quot;), <strong>afirmaciones contraintuitivas</strong> (&quot;Lo que te enseñaron sobre marketing está mal&quot;), <strong>listas numéricas</strong> (&quot;5 herramientas que uso cada día&quot;) y <strong>resultados sorprendentes</strong> (&quot;Cómo conseguí 10.000 seguidores en 30 días&quot;). Evita empezar con tu nombre o logo, es el formato menos efectivo.
               </p>
@@ -684,7 +684,7 @@ export default function GeneradorCarruselesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Es mejor texto grande o imágenes en los slides?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Es mejor texto grande o imágenes en los slides?</h4>
               <p>
                 Depende de la plataforma. En Instagram, el equilibrio entre diseño visual y texto breve (<strong>3-7 palabras por frase</strong>) funciona mejor. En LinkedIn, el texto más extenso (2-3 frases por slide) genera más credibilidad y comentarios. En ambas plataformas, las fuentes grandes (≥28pt) y el alto contraste son fundamentales porque muchos usuarios leen desde el feed sin ampliar.
               </p>
@@ -694,7 +694,7 @@ export default function GeneradorCarruselesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuál es el mejor horario para publicar carruseles?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuál es el mejor horario para publicar carruseles?</h4>
               <p>
                 En Instagram: <strong>martes y miércoles de 9-11h o 18-21h</strong>. En LinkedIn: <strong>martes a jueves de 8-10h o 12-14h</strong>. Estos horarios coinciden con momentos de navegación pasiva (camino al trabajo, pausa de comida). Sin embargo, la hora óptima varía según tu audiencia específica. Analiza tus propias estadísticas después de 20+ publicaciones para encontrar tu ventana horaria.
               </p>
@@ -704,7 +704,7 @@ export default function GeneradorCarruselesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Debo usar la misma plantilla siempre o variar el diseño?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Debo usar la misma plantilla siempre o variar el diseño?</h4>
               <p>
                 Usa la <strong>misma plantilla de forma consistente</strong> durante al menos 3-6 meses. El reconocimiento visual de marca (colores, tipografía, estilo) hace que tus seguidores identifiquen tu contenido antes de leer el texto. Las cuentas que varían constantemente de diseño generan una percepción de falta de profesionalidad y reducen la fidelización. Puedes tener 2-3 plantillas predefinidas para distintos tipos de contenido (tips, casos de éxito, anuncios).
               </p>
@@ -714,7 +714,7 @@ export default function GeneradorCarruselesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo mido si mis carruseles están funcionando bien?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo mido si mis carruseles están funcionando bien?</h4>
               <p>
                 Las métricas clave para carruseles son: <strong>Tasa de alcance</strong> (impresiones/seguidores, debería superar el 20%), <strong>Slides promedio vistos</strong> (cuántos slides ven de media, objetivo: más del 60% del total), <strong>Guardados</strong> (la métrica más valiosa, indica contenido de referencia) y <strong>Comentarios</strong> (señal de engagement profundo). Evita obsesionarte con los likes, que son la métrica menos valiosa algorítmicamente.
               </p>
@@ -724,7 +724,7 @@ export default function GeneradorCarruselesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué resolución debo usar para que las imágenes no se vean pixeladas?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué resolución debo usar para que las imágenes no se vean pixeladas?</h4>
               <p>
                 El estándar para carruseles de Instagram y LinkedIn es <strong>1080×1080px a 72 DPI</strong> (lo que genera esta herramienta). Si publicas desde desktop, puedes usar hasta 2160×2160px. Nunca bajes de 1080px porque Instagram comprime las imágenes al subirlas y la pérdida de calidad es visible. Para formato vertical (Stories-style), usa <strong>1080×1350px</strong> (4:5 ratio).
               </p>
@@ -734,7 +734,7 @@ export default function GeneradorCarruselesPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuántos carruseles debo publicar por semana para crecer?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuántos carruseles debo publicar por semana para crecer?</h4>
               <p>
                 La consistencia supera la frecuencia. <strong>1-2 carruseles por semana</strong> publicados de forma consistente durante 6 meses generan más crecimiento que 5 posts por semana durante 1 mes. El algoritmo favorece a las cuentas activas y predecibles. Empieza con una frecuencia que puedas mantener: es mejor comprometerte con 1 carrusel semanal durante un año que quemarte con publicaciones diarias.
               </p>
@@ -747,7 +747,7 @@ export default function GeneradorCarruselesPage() {
 
         {/* GUÍA PASO A PASO */}
         <section className={styles.eduGuia}>
-          <h2>📋 Cómo crear un carrusel viral en 7 pasos</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo crear un carrusel viral en 7 pasos</h2>
           <div className={styles.stepGuide}>
             <div className={styles.step}>
               <div className={styles.stepNumber}>1</div>
@@ -817,7 +817,7 @@ export default function GeneradorCarruselesPage() {
 
         {/* MEJORES PRÁCTICAS */}
         <section className={styles.eduTips}>
-          <h2>✅ 6 mejores prácticas para carruseles de alto rendimiento</h2>
+          <h2><span aria-hidden="true">✅</span> 6 mejores prácticas para carruseles de alto rendimiento</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">✅</span>
@@ -861,22 +861,22 @@ export default function GeneradorCarruselesPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Primer slide con tu logo grande:</strong> El mayor error de branding. Tu audiencia no se detiene por tu logo, se detiene por el valor que prometes. Pon el logo pequeño (inferior derecha) y el titular grande. Las cuentas que pusieron el titular primero vieron +40% de retención en el primer slide.
+                <strong><span aria-hidden="true">❌</span> Primer slide con tu logo grande:</strong> El mayor error de branding. Tu audiencia no se detiene por tu logo, se detiene por el valor que prometes. Pon el logo pequeño (inferior derecha) y el titular grande. Las cuentas que pusieron el titular primero vieron +40% de retención en el primer slide.
               </li>
               <li>
-                <strong>❌ Texto demasiado pequeño o bajo contraste:</strong> El 50% de los usuarios no ampliará tu carrusel para leerlo. Si el texto no se ve a 30cm de distancia en pantalla de móvil, pierde el 50% de tu audiencia potencial. Usa fuentes de ≥40px en el archivo exportado.
+                <strong><span aria-hidden="true">❌</span> Texto demasiado pequeño o bajo contraste:</strong> El 50% de los usuarios no ampliará tu carrusel para leerlo. Si el texto no se ve a 30cm de distancia en pantalla de móvil, pierde el 50% de tu audiencia potencial. Usa fuentes de ≥40px en el archivo exportado.
               </li>
               <li>
-                <strong>❌ Último slide con solo el logo:</strong> El slide final es el más valioso y el más desperdiciado. El algoritmo mide cuántos usuarios llegan hasta el final; si el último slide no tiene CTA, hay 0% de conversión después de todo el trabajo previo.
+                <strong><span aria-hidden="true">❌</span> Último slide con solo el logo:</strong> El slide final es el más valioso y el más desperdiciado. El algoritmo mide cuántos usuarios llegan hasta el final; si el último slide no tiene CTA, hay 0% de conversión después de todo el trabajo previo.
               </li>
               <li>
-                <strong>❌ Demasiado texto por slide:</strong> Un párrafo en cada slide convierte el carrusel en un PDF. La regla: si tardas más de 3 segundos en leer el slide, tiene demasiado texto. Divide en dos slides o elimina lo menos relevante.
+                <strong><span aria-hidden="true">❌</span> Demasiado texto por slide:</strong> Un párrafo en cada slide convierte el carrusel en un PDF. La regla: si tardas más de 3 segundos en leer el slide, tiene demasiado texto. Divide en dos slides o elimina lo menos relevante.
               </li>
               <li>
-                <strong>❌ Publicar sin testear en móvil:</strong> El 94% del consumo en redes es en móvil. Previsualiza siempre en el teléfono antes de publicar. Errores de texto cortado, botones muy pequeños o colores que no se ven bien en pantallas OLED son frecuentes y evitables.
+                <strong><span aria-hidden="true">❌</span> Publicar sin testear en móvil:</strong> El 94% del consumo en redes es en móvil. Previsualiza siempre en el teléfono antes de publicar. Errores de texto cortado, botones muy pequeños o colores que no se ven bien en pantallas OLED son frecuentes y evitables.
               </li>
               <li>
-                <strong>❌ Inconsistencia de diseño entre posts:</strong> Cambiar de plantilla cada semana destruye el reconocimiento de marca. Los seguidores fieles reconocen tu contenido en el feed por el diseño antes de leer. La consistencia durante 3+ meses multiplica la tasa de retención de seguidores.
+                <strong><span aria-hidden="true">❌</span> Inconsistencia de diseño entre posts:</strong> Cambiar de plantilla cada semana destruye el reconocimiento de marca. Los seguidores fieles reconocen tu contenido en el feed por el diseño antes de leer. La consistencia durante 3+ meses multiplica la tasa de retención de seguidores.
               </li>
             </ul>
           </div>

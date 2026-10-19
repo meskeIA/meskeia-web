@@ -322,7 +322,7 @@ export default function VisualizadorBlockchainPage() {
       {seccion === 'bloques' && (
         <section className={styles.seccion} aria-label="Visualización de bloques">
           <div className={styles.seccionHeader}>
-            <h2 className={styles.seccionTitulo}>🧱 Anatomía de una cadena de bloques</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">🧱</span> Anatomía de una cadena de bloques</h2>
             <p className={styles.seccionDesc}>
               Cada bloque contiene el hash del bloque anterior, creando un enlace criptográfico. Modifica los datos de un bloque y observa cómo se rompe la cadena.
             </p>
@@ -330,7 +330,7 @@ export default function VisualizadorBlockchainPage() {
 
           {cadenaRota && (
             <div className={styles.alertaRota} role="alert">
-              ⚠️ La cadena está <strong>rota</strong>: los hashes ya no coinciden. Un atacante necesitaría recalcular toda la cadena (con más poder de cómputo que el 51% de la red) para falsificarla.
+              <span aria-hidden="true">⚠️</span> La cadena está <strong>rota</strong>: los hashes ya no coinciden. Un atacante necesitaría recalcular toda la cadena (con más poder de cómputo que el 51% de la red) para falsificarla.
             </div>
           )}
 
@@ -438,7 +438,7 @@ export default function VisualizadorBlockchainPage() {
 
           <div className={styles.botonesBloque}>
             <button type="button" className={styles.btnPrimario} onClick={restaurarCadena}>
-              🔄 Restaurar cadena
+              <span aria-hidden="true">🔄</span> Restaurar cadena
             </button>
           </div>
 
@@ -452,7 +452,7 @@ export default function VisualizadorBlockchainPage() {
       {seccion === 'consenso' && (
         <section className={styles.seccion} aria-label="Mecanismos de consenso">
           <div className={styles.seccionHeader}>
-            <h2 className={styles.seccionTitulo}>⚡ Mecanismos de consenso</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">⚡</span> Mecanismos de consenso</h2>
             <p className={styles.seccionDesc}>
               ¿Cómo se ponen de acuerdo miles de nodos sin autoridad central? Dos enfoques dominantes: Proof of Work y Proof of Stake.
             </p>
@@ -465,7 +465,7 @@ export default function VisualizadorBlockchainPage() {
               onClick={() => { setConsensoTipo('pow'); setHashEncontrado(false); setNonceActual(0); setAnimandoPow(false); }}
               aria-pressed={consensoTipo === 'pow'}
             >
-              ⛏️ Proof of Work
+              <span aria-hidden="true">⛏️</span> Proof of Work
             </button>
             <button
               type="button"
@@ -473,13 +473,13 @@ export default function VisualizadorBlockchainPage() {
               onClick={() => { setConsensoTipo('pos'); setValidadorSeleccionado(null); }}
               aria-pressed={consensoTipo === 'pos'}
             >
-              🥩 Proof of Stake
+              <span aria-hidden="true">🥩</span> Proof of Stake
             </button>
           </div>
 
           {consensoTipo === 'pow' && (
             <div className={styles.consensoPanel}>
-              <h3 className={styles.consensoPanelTitulo}>⛏️ Proof of Work — Minería</h3>
+              <h3 className={styles.consensoPanelTitulo}><span aria-hidden="true">⛏️</span> Proof of Work — Minería</h3>
               <p className={styles.consensoPanelDesc}>
                 Los mineros compiten para encontrar un nonce que haga que el hash del bloque empiece por N ceros. El primero en encontrarlo gana la recompensa de bloque (actualmente 3,125 BTC) y propaga el bloque a la red.
               </p>
@@ -522,7 +522,7 @@ export default function VisualizadorBlockchainPage() {
                     )}
                     {hashEncontrado && (
                       <div className={styles.powSolucion} role="alert">
-                        ✅ ¡Nonce encontrado! Hash válido (empieza por 0000…)
+                        <span aria-hidden="true">✅</span> ¡Nonce encontrado! Hash válido (empieza por 0000…)
                       </div>
                     )}
                   </div>
@@ -533,7 +533,7 @@ export default function VisualizadorBlockchainPage() {
                     disabled={animandoPow}
                     aria-busy={animandoPow}
                   >
-                    {animandoPow ? '⛏️ Minando…' : '⛏️ Simular minado'}
+                    {animandoPow ? <><span aria-hidden="true">⛏️</span> Minando…</> : <><span aria-hidden="true">⛏️</span> Simular minado</>}
                   </button>
                 </div>
               </div>
@@ -561,7 +561,7 @@ export default function VisualizadorBlockchainPage() {
 
           {consensoTipo === 'pos' && (
             <div className={styles.consensoPanel}>
-              <h3 className={styles.consensoPanelTitulo}>🥩 Proof of Stake — Validación</h3>
+              <h3 className={styles.consensoPanelTitulo}><span aria-hidden="true">🥩</span> Proof of Stake — Validación</h3>
               <p className={styles.consensoPanelDesc}>
                 Los validadores depositan ("apuestan") ETH como garantía. Se selecciona aleatoriamente un validador para proponer el siguiente bloque, ponderado por su stake. Si valida deshonestamente, pierde su depósito (slashing).
               </p>
@@ -592,7 +592,7 @@ export default function VisualizadorBlockchainPage() {
                         />
                       </div>
                       {validadorSeleccionado === i && (
-                        <div className={styles.posElegidoBadge} role="status">🏆 Seleccionado para proponer bloque</div>
+                        <div className={styles.posElegidoBadge} role="status"><span aria-hidden="true">🏆</span> Seleccionado para proponer bloque</div>
                       )}
                     </div>
                   ))}
@@ -604,7 +604,7 @@ export default function VisualizadorBlockchainPage() {
                   onClick={seleccionarValidadorPos}
                   aria-label="Seleccionar validador aleatoriamente ponderado por stake"
                 >
-                  🎲 Seleccionar validador
+                  <span aria-hidden="true">🎲</span> Seleccionar validador
                 </button>
               </div>
 
@@ -636,8 +636,8 @@ export default function VisualizadorBlockchainPage() {
                 <thead>
                   <tr>
                     <th>Dimensión</th>
-                    <th>⛏️ Proof of Work</th>
-                    <th>🥩 Proof of Stake</th>
+                    <th><span aria-hidden="true">⛏️</span> Proof of Work</th>
+                    <th><span aria-hidden="true">🥩</span> Proof of Stake</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -658,7 +658,7 @@ export default function VisualizadorBlockchainPage() {
       {seccion === 'contratos' && (
         <section className={styles.seccion} aria-label="Contratos inteligentes">
           <div className={styles.seccionHeader}>
-            <h2 className={styles.seccionTitulo}>📜 Contratos inteligentes</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">📜</span> Contratos inteligentes</h2>
             <p className={styles.seccionDesc}>
               Código que se ejecuta automáticamente cuando se cumplen condiciones. Sin intermediarios, sin confianza: la lógica está en la blockchain y todos pueden verificarla.
             </p>
@@ -702,17 +702,17 @@ export default function VisualizadorBlockchainPage() {
                     <div className={styles.pasoContenido}>
                       <div className={styles.pasoFila}>
                         <div className={styles.pasoBloque}>
-                          <span className={styles.pasoEtiqueta}>📋 Condición</span>
+                          <span className={styles.pasoEtiqueta}><span aria-hidden="true">📋</span> Condición</span>
                           <span className={styles.pasoTexto}>{paso.condicion}</span>
                         </div>
                         <div className={styles.pasoFlecha} aria-hidden="true">→</div>
                         <div className={styles.pasoBloque}>
-                          <span className={styles.pasoEtiqueta}>🔍 Verificación</span>
+                          <span className={styles.pasoEtiqueta}><span aria-hidden="true">🔍</span> Verificación</span>
                           <span className={styles.pasoTexto}>{paso.verificacion}</span>
                         </div>
                         <div className={styles.pasoFlecha} aria-hidden="true">→</div>
                         <div className={`${styles.pasoBloque} ${styles.pasoAccion}`}>
-                          <span className={styles.pasoEtiqueta}>⚡ Ejecución automática</span>
+                          <span className={styles.pasoEtiqueta}><span aria-hidden="true">⚡</span> Ejecución automática</span>
                           <span className={styles.pasoTexto}>{paso.accion}</span>
                         </div>
                       </div>
@@ -735,11 +735,11 @@ export default function VisualizadorBlockchainPage() {
 
             <div className={styles.contratoBtns}>
               <button type="button" className={styles.btnSecundario} onClick={reiniciarContrato}>
-                🔄 Reiniciar
+                <span aria-hidden="true">🔄</span> Reiniciar
               </button>
               {pasosEjecutados.size === contrato.pasos.length && (
                 <div className={styles.contratoCompletado} role="status">
-                  ✅ Contrato ejecutado completamente. Sin intermediarios, sin confianza, sin posibilidad de manipulación.
+                  <span aria-hidden="true">✅</span> Contrato ejecutado completamente. Sin intermediarios, sin confianza, sin posibilidad de manipulación.
                 </div>
               )}
             </div>
@@ -751,7 +751,7 @@ export default function VisualizadorBlockchainPage() {
       {seccion === 'comparativa' && (
         <section className={styles.seccion} aria-label="Comparativa Bitcoin vs Ethereum">
           <div className={styles.seccionHeader}>
-            <h2 className={styles.seccionTitulo}>⚖️ Bitcoin vs Ethereum</h2>
+            <h2 className={styles.seccionTitulo}><span aria-hidden="true">⚖️</span> Bitcoin vs Ethereum</h2>
             <p className={styles.seccionDesc}>
               Las dos blockchains más grandes del mundo tienen filosofías y propósitos muy distintos. Ninguna es "mejor": cada una está optimizada para objetivos diferentes.
             </p>

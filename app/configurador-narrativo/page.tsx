@@ -604,11 +604,11 @@ export default function ConfiguradorNarrativoPage() {
                 <div className={styles.resultadoBloque}>
                   <div className={styles.fortalezaDebilidad}>
                     <div className={styles.fortaleza}>
-                      <span className={styles.fortalezaLabel}>✅ Fortaleza principal</span>
+                      <span className={styles.fortalezaLabel}><span aria-hidden="true">✅</span> Fortaleza principal</span>
                       <p>{combinacion.fortaleza}</p>
                     </div>
                     <div className={styles.debilidad}>
-                      <span className={styles.debilidadLabel}>⚠️ Debilidad principal</span>
+                      <span className={styles.debilidadLabel}><span aria-hidden="true">⚠️</span> Debilidad principal</span>
                       <p>{combinacion.debilidad}</p>
                     </div>
                   </div>

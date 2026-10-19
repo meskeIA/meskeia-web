@@ -151,11 +151,11 @@ function SeccionEvolucion() {
           <p className={styles.techDesc}>{seleccionada.descripcion}</p>
           <div className={styles.techProsContras}>
             <div className={styles.techPros}>
-              <span className={styles.techLabel}>✅ Ventajas</span>
+              <span className={styles.techLabel}><span aria-hidden="true">✅</span> Ventajas</span>
               <p>{seleccionada.ventajas}</p>
             </div>
             <div className={styles.techContras}>
-              <span className={styles.techLabel}>❌ Desventajas</span>
+              <span className={styles.techLabel}><span aria-hidden="true">❌</span> Desventajas</span>
               <p>{seleccionada.desventajas}</p>
             </div>
           </div>
@@ -283,13 +283,13 @@ function SeccionPixel() {
             <strong className={styles.comparativaNombre}>LCD</strong>
             <div className={styles.pixelDiagrama}>
               <div className={styles.diagramaCapa} style={{ backgroundColor: '#FDE68A' }}>
-                <span>💡 Retroiluminación</span>
+                <span><span aria-hidden="true">💡</span> Retroiluminación</span>
               </div>
               <div className={styles.diagramaCapa} style={{ backgroundColor: '#DBEAFE' }}>
-                <span>🔄 Cristal líquido</span>
+                <span><span aria-hidden="true">🔄</span> Cristal líquido</span>
               </div>
               <div className={styles.diagramaCapa} style={{ backgroundColor: '#F3E8FF' }}>
-                <span>🎨 Filtro de color</span>
+                <span><span aria-hidden="true">🎨</span> Filtro de color</span>
               </div>
             </div>
             <p className={styles.comparativaDesc}>La retroiluminación siempre está encendida. Los cristales líquidos bloquean la luz para crear negro — pero nunca al 100%.</p>
@@ -298,10 +298,10 @@ function SeccionPixel() {
             <strong className={styles.comparativaNombre}>OLED</strong>
             <div className={styles.pixelDiagrama}>
               <div className={styles.diagramaCapa} style={{ backgroundColor: '#D1FAE5' }}>
-                <span>💡 Emisión propia</span>
+                <span><span aria-hidden="true">💡</span> Emisión propia</span>
               </div>
               <div className={styles.diagramaCapa} style={{ backgroundColor: '#FEE2E2' }}>
-                <span>🔴🟢🔵 Subpíxel orgánico</span>
+                <span><span aria-hidden="true">🔴🟢🔵</span> Subpíxel orgánico</span>
               </div>
             </div>
             <p className={styles.comparativaDesc}>Cada subpíxel genera su propia luz. Para mostrar negro, simplemente se apaga. Por eso el contraste es &quot;infinito&quot;.</p>

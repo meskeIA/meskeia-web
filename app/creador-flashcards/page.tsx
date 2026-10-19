@@ -815,7 +815,7 @@ export default function CreadorFlashcardsPage() {
               <tbody>
                 <tr>
                   <td><strong>Flashcards + repetición espaciada</strong></td>
-                  <td>⭐⭐⭐⭐⭐ Muy alta</td>
+                  <td><span aria-hidden="true">⭐⭐⭐⭐⭐</span> Muy alta</td>
                   <td>Media (30-60 min)</td>
                   <td>Baja (15-20 min/día)</td>
                   <td>Vocabulario, conceptos, datos</td>
@@ -823,7 +823,7 @@ export default function CreadorFlashcardsPage() {
                 </tr>
                 <tr>
                   <td>Mapas mentales</td>
-                  <td>⭐⭐⭐⭐ Alta</td>
+                  <td><span aria-hidden="true">⭐⭐⭐⭐</span> Alta</td>
                   <td>Alta (60-90 min)</td>
                   <td>Media (30 min)</td>
                   <td>Conceptos interconectados</td>
@@ -831,7 +831,7 @@ export default function CreadorFlashcardsPage() {
                 </tr>
                 <tr>
                   <td>Resúmenes propios</td>
-                  <td>⭐⭐⭐ Media</td>
+                  <td><span aria-hidden="true">⭐⭐⭐</span> Media</td>
                   <td>Alta (45-90 min)</td>
                   <td>Alta (releer todo)</td>
                   <td>Comprensión global</td>
@@ -839,7 +839,7 @@ export default function CreadorFlashcardsPage() {
                 </tr>
                 <tr>
                   <td>Subrayado</td>
-                  <td>⭐⭐ Baja</td>
+                  <td><span aria-hidden="true">⭐⭐</span> Baja</td>
                   <td>Baja (10-15 min)</td>
                   <td>Alta (releer)</td>
                   <td>Primera lectura</td>
@@ -847,7 +847,7 @@ export default function CreadorFlashcardsPage() {
                 </tr>
                 <tr>
                   <td>Relectura</td>
-                  <td>⭐ Muy baja</td>
+                  <td><span aria-hidden="true">⭐</span> Muy baja</td>
                   <td>Ninguna</td>
                   <td>Muy alta</td>
                   <td>Familiarización inicial</td>
@@ -855,7 +855,7 @@ export default function CreadorFlashcardsPage() {
                 </tr>
                 <tr>
                   <td>Método Pomodoro</td>
-                  <td>⭐⭐⭐ Media</td>
+                  <td><span aria-hidden="true">⭐⭐⭐</span> Media</td>
                   <td>Ninguna</td>
                   <td>Variable</td>
                   <td>Gestión del tiempo</td>

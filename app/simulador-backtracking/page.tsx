@@ -229,7 +229,7 @@ export default function SimuladorBacktracking() {
             aria-live="polite"
           >
             <strong>
-              {snap.estado === 'probar' && '🔍 Probando: '}
+              {snap.estado === 'probar' && <><span aria-hidden="true">🔍</span> Probando: </>}
               {snap.estado === 'conflicto' && '✗ Conflicto: '}
               {snap.estado === 'colocar' && '♛ Colocada: '}
               {snap.estado === 'retroceder' && '↩ Retroceso: '}
@@ -286,7 +286,7 @@ export default function SimuladorBacktracking() {
               aria-pressed={auto}
               disabled={pasoIdx >= total - 1}
             >
-              {auto ? 'Pausar' : 'Auto ▶▶'}
+              {auto ? 'Pausar' : <>Auto <span aria-hidden="true">▶▶</span></>}
             </button>
             <button
               type="button"

@@ -336,7 +336,7 @@ export default function ComparadorIdesIa() {
         {tab === 'comparativa' && (
           <div className={styles.tabContent} role="tabpanel">
             <div className={styles.dataNotice} role="note">
-              📅 Datos verificados en junio 2026. Precios y funcionalidades pueden cambiar — verifica en las webs oficiales.
+              <span aria-hidden="true">📅</span> Datos verificados en junio 2026. Precios y funcionalidades pueden cambiar — verifica en las webs oficiales.
             </div>
             <div className={styles.tablaWrapper}>
               <table className={styles.tabla} aria-label="Comparativa de IDEs con IA">
@@ -608,13 +608,13 @@ export default function ComparadorIdesIa() {
               <tr><th>Dimensión</th><th>IDE IA-nativo (Cursor, Windsurf)</th><th>IDE clásico + extensión (VS Code)</th></tr>
             </thead>
             <tbody>
-              <tr><td>IA integrada</td><td>✅ De base, sin instalación extra</td><td>🟡 Requiere instalar extensión</td></tr>
-              <tr><td>Modelo elegible</td><td>✅ Claude, GPT-4o, Gemini, local</td><td>Depende de la extensión</td></tr>
-              <tr><td>Agente autónomo</td><td>✅ Nativo (Composer / Flows)</td><td>🟡 Vía extensión o CLI</td></tr>
-              <tr><td>Ecosistema extensiones</td><td>✅ Compatible con VS Code</td><td>✅ El más grande del mercado</td></tr>
-              <tr><td>Coste base IDE</td><td>Gratis con límites / $15-20/mes</td><td>✅ Gratuito (+ coste asistente)</td></tr>
-              <tr><td>Estabilidad</td><td>🟡 Productos jóvenes, evolución rápida</td><td>✅ Muy estable, actualizado por Microsoft</td></tr>
-              <tr><td>Open source</td><td>❌ Propietarios</td><td>✅ VS Code es MIT</td></tr>
+              <tr><td>IA integrada</td><td><span aria-hidden="true">✅</span> De base, sin instalación extra</td><td><span aria-hidden="true">🟡</span> Requiere instalar extensión</td></tr>
+              <tr><td>Modelo elegible</td><td><span aria-hidden="true">✅</span> Claude, GPT-4o, Gemini, local</td><td>Depende de la extensión</td></tr>
+              <tr><td>Agente autónomo</td><td><span aria-hidden="true">✅</span> Nativo (Composer / Flows)</td><td><span aria-hidden="true">🟡</span> Vía extensión o CLI</td></tr>
+              <tr><td>Ecosistema extensiones</td><td><span aria-hidden="true">✅</span> Compatible con VS Code</td><td><span aria-hidden="true">✅</span> El más grande del mercado</td></tr>
+              <tr><td>Coste base IDE</td><td>Gratis con límites / $15-20/mes</td><td><span aria-hidden="true">✅</span> Gratuito (+ coste asistente)</td></tr>
+              <tr><td>Estabilidad</td><td><span aria-hidden="true">🟡</span> Productos jóvenes, evolución rápida</td><td><span aria-hidden="true">✅</span> Muy estable, actualizado por Microsoft</td></tr>
+              <tr><td>Open source</td><td><span aria-hidden="true">❌</span> Propietarios</td><td><span aria-hidden="true">✅</span> VS Code es MIT</td></tr>
             </tbody>
           </table>
         </div>

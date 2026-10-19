@@ -424,27 +424,27 @@ export default function CalculadoraSubredesPage() {
         {/* Sección 2: Casos de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🏠 Red doméstica con router</h3>
+            <h3><span aria-hidden="true">🏠</span> Red doméstica con router</h3>
             <p>Un router doméstico usa típicamente 192.168.1.0/24, proporcionando 254 IPs. Calcula las IPs disponibles y verifica que tu dispositivo está en la subred correcta.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🏢 Segmentación de VLANs empresariales</h3>
+            <h3><span aria-hidden="true">🏢</span> Segmentación de VLANs empresariales</h3>
             <p>Divide una red corporativa en VLANs por departamento: Ventas /26 (62 hosts), IT /27 (30 hosts), Dirección /28 (14 hosts). Optimiza el espacio de IPs disponible.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🔧 Configuración de ACLs en Cisco</h3>
+            <h3><span aria-hidden="true">🔧</span> Configuración de ACLs en Cisco</h3>
             <p>Las ACLs de IOS usan máscara wildcard (inversa de la subred). Calcula automáticamente la wildcard mask para configurar reglas de firewall en routers Cisco.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>☁️ Planificación de VPCs en cloud</h3>
+            <h3><span aria-hidden="true">☁️</span> Planificación de VPCs en cloud</h3>
             <p>AWS VPC, Azure VNet y GCP VPC requieren definir rangos CIDR. Usa /16 para el VPC raíz y divide en /24 por zona de disponibilidad y servicio.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🔍 Diagnóstico de conflictos de IP</h3>
+            <h3><span aria-hidden="true">🔍</span> Diagnóstico de conflictos de IP</h3>
             <p>Verifica si dos IPs están en la misma subred comparando sus direcciones de red. Si comparten red y máscara, deben comunicarse sin router.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📚 Preparación para CCNA / Network+</h3>
+            <h3><span aria-hidden="true">📚</span> Preparación para CCNA / Network+</h3>
             <p>Las certificaciones de red (CCNA, CompTIA Network+) exigen dominar el subnetting. Practica calculando máscaras y rangos hasta automatizarlo mentalmente.</p>
           </div>
         </div>
@@ -541,34 +541,34 @@ export default function CalculadoraSubredesPage() {
         {/* Sección 5: Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>📏 Deja margen de hosts</h3>
+            <h3><span aria-hidden="true">📏</span> Deja margen de hosts</h3>
             <p>No uses el prefijo justo. Si necesitas 50 hosts, elige /26 (62) en lugar de /27 (30). Prever crecimiento evita reconfigurar la red en el futuro.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📄 Documenta siempre</h3>
+            <h3><span aria-hidden="true">📄</span> Documenta siempre</h3>
             <p>Registra el propósito de cada subred: &quot;192.168.10.0/24 - Planta 1 - WiFi empleados&quot;. La documentación es esencial para el mantenimiento.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔒 Usa rangos privados internamente</h3>
+            <h3><span aria-hidden="true">🔒</span> Usa rangos privados internamente</h3>
             <p>Utiliza siempre rangos RFC 1918 (10.x, 172.16-31.x, 192.168.x) en redes internas. Las IPs públicas son para interfaces externas de routers.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🌐 Reserva IPs para infraestructura</h3>
+            <h3><span aria-hidden="true">🌐</span> Reserva IPs para infraestructura</h3>
             <p>Asigna las primeras IPs de cada subred a routers, switches y servidores. Usa DHCP solo para el rango restante para facilitar la gestión.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔗 Usa /30 para enlaces entre routers</h3>
+            <h3><span aria-hidden="true">🔗</span> Usa /30 para enlaces entre routers</h3>
             <p>Los enlaces WAN entre routers solo necesitan 2 IPs. Un /30 es suficiente y no desperdicia espacio. Considera /31 (RFC 3021) para ahorrar aún más.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🚀 Planifica pensando en el futuro</h3>
+            <h3><span aria-hidden="true">🚀</span> Planifica pensando en el futuro</h3>
             <p>Diseña el esquema de subredes con espacio para crecer. Usa un bloque padre grande (ej: 10.0.0.0/8) y subdivídelo en subredes más pequeñas según necesidad.</p>
           </div>
         </div>
 
         {/* Sección 6: Warning Box */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Importante para entornos de producción</h3>
+          <h3><span aria-hidden="true">⚠️</span> Importante para entornos de producción</h3>
           <ul className={styles.warningList}>
             <li>Esta calculadora trabaja exclusivamente con IPv4 (32 bits). IPv6 usa un esquema diferente con 128 bits.</li>
             <li>Para entornos de producción, valida siempre la configuración de red con un administrador de sistemas.</li>
@@ -581,7 +581,7 @@ export default function CalculadoraSubredesPage() {
         <section className={styles.infoSection}>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>🌐 ¿Qué es una Subred?</h3>
+              <h3><span aria-hidden="true">🌐</span> ¿Qué es una Subred?</h3>
               <p>
                 Una subred es una división lógica de una red IP. Permite segmentar
                 una red grande en redes más pequeñas y manejables, mejorando la
@@ -591,7 +591,7 @@ export default function CalculadoraSubredesPage() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>📐 Notación CIDR</h3>
+              <h3><span aria-hidden="true">📐</span> Notación CIDR</h3>
               <p>
                 CIDR (Classless Inter-Domain Routing) indica cuántos bits de la
                 dirección IP pertenecen a la red. Por ejemplo, /24 significa que
@@ -601,7 +601,7 @@ export default function CalculadoraSubredesPage() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>🏠 Direcciones Privadas (RFC 1918)</h3>
+              <h3><span aria-hidden="true">🏠</span> Direcciones Privadas (RFC 1918)</h3>
               <p>
                 Rangos reservados para redes internas que no se enrutan en Internet:
               </p>
@@ -613,7 +613,7 @@ export default function CalculadoraSubredesPage() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>📡 Broadcast vs Gateway</h3>
+              <h3><span aria-hidden="true">📡</span> Broadcast vs Gateway</h3>
               <p>
                 <strong>Broadcast:</strong> Última IP de la subred, envía a todos los hosts.<br />
                 <strong>Gateway:</strong> Típicamente la primera IP usable, conecta con otras redes.
@@ -626,7 +626,7 @@ export default function CalculadoraSubredesPage() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>🔢 Cálculo de Hosts</h3>
+              <h3><span aria-hidden="true">🔢</span> Cálculo de Hosts</h3>
               <p>
                 Fórmula: 2^(32-CIDR) - 2<br />
                 Se restan 2 porque la dirección de red y broadcast no son asignables a hosts.
@@ -639,7 +639,7 @@ export default function CalculadoraSubredesPage() {
             </div>
 
             <div className={styles.infoCard}>
-              <h3>🎭 Máscara Wildcard</h3>
+              <h3><span aria-hidden="true">🎭</span> Máscara Wildcard</h3>
               <p>
                 Es el inverso de la máscara de subred. Se usa en ACLs de routers
                 Cisco y otros dispositivos de red.

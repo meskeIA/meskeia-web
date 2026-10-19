@@ -199,7 +199,7 @@ export default function ChecklistDocumentosViajePage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>📋 Documentos de Viaje</h1>
+        <h1 className={styles.title}><span aria-hidden="true">📋</span> Documentos de Viaje</h1>
         <p className={styles.subtitle}>Checklist personalizada para no olvidar nada antes de salir</p>
       </header>
 
@@ -216,6 +216,7 @@ export default function ChecklistDocumentosViajePage() {
       <div className={styles.tipoBar}>
         {(Object.entries(TIPO_CONFIG) as [TipoViaje, typeof TIPO_CONFIG[TipoViaje]][]).map(([tipo, cfg]) => (
           <button
+            type="button"
             key={tipo}
             onClick={() => cambiarTipo(tipo)}
             className={`${styles.tipoBtn} ${tipoViaje === tipo ? styles.active : ''}`}
@@ -232,7 +233,7 @@ export default function ChecklistDocumentosViajePage() {
       <div className={`${styles.progresoWrapper} ${todoCompleto ? styles.progresoCompleto : ''}`}>
         <div className={styles.progresoHeader}>
           <span className={styles.progresoTexto}>
-            {todoCompleto ? '✅ ¡Todo listo para el viaje!' : `${itemsCompletados} de ${totalItems} documentos verificados`}
+            {todoCompleto ? <><span aria-hidden="true">✅</span> ¡Todo listo para el viaje!</> : `${itemsCompletados} de ${totalItems} documentos verificados`}
           </span>
           <span className={styles.progresoPorcentaje}>{porcentaje}%</span>
         </div>
@@ -243,21 +244,21 @@ export default function ChecklistDocumentosViajePage() {
 
       {/* Acciones rápidas */}
       <div className={styles.acciones}>
-        <button onClick={() => marcarTodos(true)} className={styles.btnAccion}>
+        <button type="button" onClick={() => marcarTodos(true)} className={styles.btnAccion}>
           ✓ Marcar todo
         </button>
-        <button onClick={() => marcarTodos(false)} className={styles.btnAccion}>
+        <button type="button" onClick={() => marcarTodos(false)} className={styles.btnAccion}>
           ✗ Desmarcar todo
         </button>
-        <button onClick={descargarChecklist} className={styles.btnDescargar}>
-          ⬇️ Descargar lista
+        <button type="button" onClick={descargarChecklist} className={styles.btnDescargar}>
+          <span aria-hidden="true">⬇️</span> Descargar lista
         </button>
       </div>
 
       {/* Mensaje completo */}
       {todoCompleto && (
         <div className={styles.mensajeCompleto} role="alert">
-          <h2>🎒 ¡Todo en orden!</h2>
+          <h2><span aria-hidden="true">🎒</span> ¡Todo en orden!</h2>
           <p>Tienes todos los documentos preparados para tu viaje a {TIPO_CONFIG[tipoViaje].label}. ¡Buen viaje!</p>
         </div>
       )}
@@ -313,11 +314,11 @@ export default function ChecklistDocumentosViajePage() {
               <thead>
                 <tr>
                   <th>Documento</th>
-                  <th>España 🇪🇸</th>
-                  <th>Schengen 🇪🇺</th>
-                  <th>UK 🇬🇧</th>
-                  <th>EEUU/Canadá 🌎</th>
-                  <th>País con visado 🌍</th>
+                  <th>España <span aria-hidden="true">🇪🇸</span></th>
+                  <th>Schengen <span aria-hidden="true">🇪🇺</span></th>
+                  <th>UK <span aria-hidden="true">🇬🇧</span></th>
+                  <th>EEUU/Canadá <span aria-hidden="true">🌎</span></th>
+                  <th>País con visado <span aria-hidden="true">🌍</span></th>
                 </tr>
               </thead>
               <tbody>
