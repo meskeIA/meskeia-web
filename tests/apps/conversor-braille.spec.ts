@@ -823,17 +823,16 @@ test.describe('re-inspección 13/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ⚠️ HALLAZGO ABIERTO (13/10/2026) — el resultado no se invalida al cambiar la entrada
+  // ✅ HALLAZGO 3278 REPARADO (19/10/2026) — el resultado no se invalidaba al cambiar la entrada
   // ─────────────────────────────────────────────────────────────────────────
   //
   // La conversión solo corre al pulsar «Convertir», pero el aviso de caracteres omitidos se
-  // recalcula con el texto ACTUAL de la caja (`sinCelda` depende de `input`). Si se corrige el
-  // texto después de convertir y no se vuelve a pulsar, el resultado —y la hoja imprimible,
-  // que se dibuja con él— siguen siendo los del texto anterior, mientras el aviso habla del
-  // nuevo y asegura que «el resto del texto sí está completo». Quien usa la hoja no lee
-  // braille: no tiene forma de ver que lo que va a punzar es otra cosa. El FAQPage de
-  // metadata.ts promete además que «la conversión se realiza en tiempo real».
-  test.fail('NUEVO — tras corregir el texto sin pulsar Convertir, el resultado y la hoja siguen con el texto anterior', async ({
+  // recalcula con el texto ACTUAL de la caja (`sinCelda` depende de `input`). Si se corregía el
+  // texto después de convertir y no se volvía a pulsar, el resultado —y la hoja imprimible,
+  // que se dibuja con él— seguían siendo los del texto anterior, mientras el aviso hablaba del
+  // nuevo y aseguraba que «el resto del texto sí está completo». Ahora cambiar la entrada o el
+  // sentido retira el resultado, y el FAQPage ya no promete una conversión «en tiempo real».
+  test('3278 — tras corregir el texto sin pulsar Convertir, no queda el resultado del texto anterior', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -856,6 +855,16 @@ test.describe('re-inspección 13/10/2026', () => {
           : await cajaResultado(page).innerText(),
       )
       .toMatch(/^(\(sin resultado\)|⠨⠁⠙⠊⠬⠎⠀)$/);
+
+    // Segunda forma, misma raíz: convertir «Hola» y cambiar el sentido a «Braille → Texto»
+    // dejaba el braille de «Hola» como Resultado, con el aviso falso de que lo pegado no
+    // contiene ninguna celda braille.
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'Hola');
+    await expect(cajaResultado(page)).toHaveText('⠨⠓⠕⠇⠁');
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    await expect(cajaResultado(page)).toHaveCount(0);
+    await expect(page.getByText('no contiene ninguna celda braille')).toHaveCount(0);
   });
 
   // ─────────────────────────────────────────────────────────────────────────

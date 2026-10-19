@@ -74,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Puedo convertir Braille a texto normal o solo texto a Braille?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El conversor funciona en ambas direcciones. Puedes escribir texto en español y obtener los símbolos Braille correspondientes, o pegar caracteres Braille Unicode para obtener el texto en español. La conversión se realiza en tiempo real directamente en el navegador, sin enviar datos a ningún servidor.',
+        text: 'El conversor funciona en ambas direcciones. Puedes escribir texto en español y obtener los símbolos Braille correspondientes, o pegar caracteres Braille Unicode para obtener el texto en español. La conversión se hace al pulsar «Convertir», directamente en el navegador, sin enviar datos a ningún servidor.',
       },
     },
     {

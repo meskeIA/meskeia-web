@@ -603,6 +603,25 @@ export default function ConversorBraillePage() {
     }
   };
 
+  /**
+   * ⚠️ 19/10/2026 (hallazgo 3278) — la conversión solo corre al pulsar «Convertir», pero los
+   * avisos se recalculan con la entrada ACTUAL. Al corregir el texto o cambiar de sentido sin
+   * volver a convertir, el resultado y la hoja imprimible seguían siendo los del texto anterior
+   * mientras el aviso hablaba del nuevo («El resto del texto sí está completo»). Quien punza la
+   * hoja no lee braille y no podía verlo. Cualquier cambio de entrada o de sentido retira el
+   * resultado: lo que queda en pantalla corresponde siempre a lo que hay en la caja.
+   */
+  const cambiarEntrada = (texto: string) => {
+    setInput(texto);
+    setResult('');
+  };
+
+  const cambiarModo = (nuevo: 'textToBraille' | 'brailleToText') => {
+    if (nuevo === mode) return;
+    setMode(nuevo);
+    setResult('');
+  };
+
   const handleSwap = () => {
     setMode(mode === 'textToBraille' ? 'brailleToText' : 'textToBraille');
     setInput(result);
@@ -701,7 +720,7 @@ export default function ConversorBraillePage() {
             type="button"
             className={`${styles.modeBtn} ${mode === 'textToBraille' ? styles.active : ''}`}
             aria-pressed={mode === 'textToBraille'}
-            onClick={() => setMode('textToBraille')}
+            onClick={() => cambiarModo('textToBraille')}
           >
             Texto → Braille
           </button>
@@ -709,7 +728,7 @@ export default function ConversorBraillePage() {
             type="button"
             className={`${styles.modeBtn} ${mode === 'brailleToText' ? styles.active : ''}`}
             aria-pressed={mode === 'brailleToText'}
-            onClick={() => setMode('brailleToText')}
+            onClick={() => cambiarModo('brailleToText')}
           >
             Braille → Texto
           </button>
@@ -722,7 +741,7 @@ export default function ConversorBraillePage() {
           <textarea
             className={styles.textarea}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => cambiarEntrada(e.target.value)}
             placeholder={mode === 'textToBraille'
               ? 'Escribe el texto aquí...'
               : 'Pega el código Braille aquí (⠁⠃⠉...)'}
@@ -735,7 +754,7 @@ export default function ConversorBraillePage() {
                 key={ex.text}
                 type="button"
                 className={styles.exampleBtn}
-                onClick={() => setInput(ex.text)}
+                onClick={() => cambiarEntrada(ex.text)}
               >
                 {ex.label}
               </button>
