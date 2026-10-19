@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import styles from './SelectorSeguroCoche.module.css';
+import { margenBarraLogo } from '@/lib';
 import {
   MeskeiaLogo,
   Footer,
@@ -65,6 +66,13 @@ function textoNota(nota: Nota, respuestas: readonly number[]): string {
         `compara también ${alternativa}, el todo riesgo que mejor encaja con tus respuestas.`
       );
     }
+    case 'sin-colchon':
+      return (
+        '¿Podrías asumir una reparación importante de tu bolsillo? Has respondido ' +
+        `«${respuestaLiteral(RESPUESTA.reparacionNoAsumible)}». Con un seguro a terceros, si tienes ` +
+        'un accidente del que eres responsable, la reparación de tu coche la pagas tú. Compara ' +
+        `también ${alternativa}, el todo riesgo que mejor encaja con tus respuestas.`
+      );
     case 'uso-profesional':
       return (
         `Has elegido «${respuestaLiteral(RESPUESTA.usoProfesional)}»: declara ese uso al contratar. ` +
@@ -102,11 +110,55 @@ export default function SelectorSeguroCochePage() {
   const resultado = calculo ? calculo.modalidad : null;
 
   // Al pulsar «Ver resultado» el test se desmonta con el botón que tenía el foco, que caía a
-  // <body>: se lleva al título del resultado (familia de selectores, punto g).
+  // <body>: se lleva al título del resultado (familia de selectores, punto g). Tras «Siguiente» y
+  // «Anterior» el botón se DESACTIVA (la pregunta nueva aún no tiene respuesta) y Chrome retiraba
+  // el foco: se lleva al enunciado de la pregunta nueva (hallazgo 3133, receta b0f31109 de
+  // selector-smartphone). Y en móvil la página no se movía: el enunciado o el título quedaban
+  // bajo la barra fija del logo o por encima de la pantalla (hallazgo 3135); si no están enteros a
+  // la vista y por debajo de la barra, se suben a su sitio (el hueco lo da el scroll-padding del
+  // documento). Solo tras una navegación: al cargar, el foco no se mueve.
   const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const enunciado = useRef<HTMLHeadingElement>(null);
+  const navegado = useRef(false);
   useEffect(() => {
-    if (calculo) tituloResultado.current?.focus();
-  }, [calculo]);
+    if (!navegado.current) return;
+    const destino = calculo ? tituloResultado.current : enunciado.current;
+    if (!destino) return;
+    const caja = destino.getBoundingClientRect();
+    if (caja.top < margenBarraLogo() || caja.bottom > window.innerHeight) {
+      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+    destino.focus({ preventScroll: true });
+  }, [calculo, preguntaActual]);
+
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 3134, cabo C0104; receta `clicDeMas` de
+   * selector-smartphone, b0f31109, con la guarda en captura sobre window de
+   * selector-alquiler-vs-compra, 7cc1064e). Al cambiar el número de opciones la botonera se mueve
+   * bajo el dedo y el segundo toque marcaba una opción de la pregunta nueva, caía en «Anterior»
+   * (en móvil va justo debajo de «Siguiente») o, tras «Ver resultado», en el enlace de Delegum de
+   * <LegalNotice />. Un clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el
+   * teclado no produce) Y el clic anterior de la app cambió de pantalla. Va en captura sobre
+   * window, antes de que React o el enlace lo vean; un clic suelto cierra la ráfaga.
+   */
+  const ultimoCambioPantalla = useRef(false);
+  useEffect(() => {
+    function filtrar(e: globalThis.MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantalla.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantalla.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+  /** Marca que el clic en curso cambia de pantalla (y que el efecto de foco debe actuar). */
+  const cambiaPantalla = () => {
+    ultimoCambioPantalla.current = true;
+    navegado.current = true;
+  };
 
   const totalPreguntas = PREGUNTAS.length;
   const progresoPct = resultado
@@ -117,8 +169,29 @@ export default function SelectorSeguroCochePage() {
     setOpcionSeleccionada(idx);
   };
 
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG): las flechas mueven el foco a la opción vecina y
+   * la marcan, con vuelta al principio, e Inicio/Fin van a los extremos. El grupo es UNA parada de
+   * Tab (tabindex itinerante). Antes cada opción era una parada y las flechas no hacían nada
+   * (hallazgo 3132; selector-smartphone, 1681).
+   */
+  const teclaEnOpcion = (e: KeyboardEvent<HTMLButtonElement>, indice: number) => {
+    const total = PREGUNTAS[preguntaActual].opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    setOpcionSeleccionada(destino);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  };
+
   const handleSiguiente = () => {
     if (opcionSeleccionada === null) return;
+    cambiaPantalla();
 
     const nuevasRespuestas = [...respuestas];
     nuevasRespuestas[preguntaActual] = opcionSeleccionada;
@@ -138,12 +211,14 @@ export default function SelectorSeguroCochePage() {
 
   const handleAnterior = () => {
     if (preguntaActual === 0) return;
+    cambiaPantalla();
     const anterior = preguntaActual - 1;
     setPreguntaActual(anterior);
     setOpcionSeleccionada(respuestas[anterior] !== undefined ? respuestas[anterior] : null);
   };
 
   const handleReiniciar = () => {
+    cambiaPantalla();
     setPreguntaActual(0);
     setRespuestas([]);
     setOpcionSeleccionada(null);
@@ -192,9 +267,10 @@ export default function SelectorSeguroCochePage() {
 
           {/* Pregunta */}
           <div className={styles.pregunta}>
-            <p className={styles.preguntaTexto}>
+            {/* Recibe el foco por programa tras «Siguiente» y «Anterior» (tabIndex=-1, 3133). */}
+            <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>
               <span aria-hidden="true">{pregunta.icono}</span> {pregunta.texto}
-            </p>
+            </h2>
 
             <div className={styles.opciones} role="radiogroup" aria-label={pregunta.texto}>
               {pregunta.opciones.map((opcion, idx) => (
@@ -208,6 +284,9 @@ export default function SelectorSeguroCochePage() {
                   // radio dentro (selector-smartphone, hallazgo 950).
                   role="radio"
                   aria-checked={opcionSeleccionada === idx}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (3132).
+                  tabIndex={opcionSeleccionada === null ? (idx === 0 ? 0 : -1) : (opcionSeleccionada === idx ? 0 : -1)}
+                  onKeyDown={(e) => teclaEnOpcion(e, idx)}
                 >
                   <span className={styles.opcionIcono} aria-hidden="true">
                     {opcion.icono}

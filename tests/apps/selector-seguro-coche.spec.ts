@@ -779,10 +779,9 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
   // ── Hallazgos ABIERTOS (inspector 10/10/2026) ───────────────────────────────
 
   test('teclado de radios (APG): las flechas mueven y marcan, y el grupo es UNA parada de Tab', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). C0016. Forma del 1681 de selector-smartphone (b0f31109:
+    // REPARADO el 19/10/2026 (3132). C0016. Forma del 1681 de selector-smartphone (b0f31109:
     // tabindex itinerante y teclaEnOpcion). Medido el 10/10/2026: tabIndex [0, 0, 0, 0], ArrowDown y
-    // End sobre «Menos de 2 años» no mueven el foco ni marcan nada, y Tab recorre las cuatro opciones.
-    test.fail();
+    // End sobre «Menos de 2 años» no movían el foco ni marcaban nada, y Tab recorría las cuatro opciones.
     await abrirTest(page);
     expect(await radios(page).evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1]);
     await radios(page).nth(0).focus();
@@ -795,11 +794,11 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
   });
 
   test('foco: tras «Siguiente» y «Anterior» va al enunciado de la pregunta nueva, no a <body>', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). C0016. Forma del 1679/1680 de selector-smartphone. «Siguiente»
-    // sigue montado pero se DESACTIVA (la pregunta nueva no tiene respuesta) y el foco cae a <body>;
-    // el Tab siguiente sale del cuestionario a «Ver guía educativa». Igual con «Anterior» al volver a
-    // la 1. Obtenido el 10/10/2026: ['body', 'button Ver guía educativa', 'body'].
-    test.fail();
+    // REPARADO el 19/10/2026 (3133): el foco va al enunciado (h2 con tabIndex −1). C0016. Forma del
+    // 1679/1680 de selector-smartphone. «Siguiente» sigue montado pero se DESACTIVA (la pregunta
+    // nueva no tiene respuesta) y el foco caía a <body>; el Tab siguiente salía del cuestionario a
+    // «Ver guía educativa». Igual con «Anterior» al volver a la 1. Obtenido el 10/10/2026:
+    // ['body', 'button Ver guía educativa', 'body'].
     await abrirTest(page);
     const vistos: string[] = [];
     await radios(page).nth(1).click();
@@ -819,14 +818,13 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
   });
 
   test('quien declara que no podría pagar una reparación y recibe terceros lo lee en el resultado, con el todo riesgo que mejor encaja', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). El motor llama a la pregunta 9 «el centro de la decisión entre
+    // REPARADO el 19/10/2026 (3136): nota «sin-colchon». El motor llama a la pregunta 9 «el centro de la decisión entre
     // terceros y todo riesgo», y la nota «valor-alto» ya dice «Si no podrías asumirla, compara
     // también…». Pero quien contesta «No, sería un problema económico serio» y acaba en terceros no
     // lee nada que lo recoja. NO_PUEDE_PAGAR: Terceros Ampliado 8, sin ninguna nota.
     // Enumerado: de 31.104 perfiles con esa respuesta, 5.384 acaban en terceros (1.545 en el básico,
     // 76 de ellos por el desempate de la prima, como EMPATE_PRIMA); 3.159 sin nota de financiación
     // ni de valor alto (las dos que nombran un todo riesgo), 1.209 sin ninguna nota.
-    test.fail();
     await abrirTest(page);
     await responder(page, NO_PUEDE_PAGAR);
     await expect(titulo(page)).toHaveText('Seguro a Terceros Ampliado');
@@ -896,10 +894,9 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
   });
 
   test('doble clic (escritorio) en «Siguiente» de la pregunta 3 no contesta la 4', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). C0104 (2). La 3 tiene 2 opciones y la 4, 3: la botonera baja
-    // y el segundo clic (detail 2) cae en «Más de 5 años con experiencia sólida» (+1 básico, +1
-    // ampliado). Igual de la 5 (3 opciones) a la 6 (4): «Lo comparten varias personas…».
-    test.fail();
+    // REPARADO el 19/10/2026 (3134): guarda de ráfaga en captura sobre window. C0104 (2). La 3
+    // tiene 2 opciones y la 4, 3: la botonera baja y el segundo clic (detail 2) caía en «Más de 5
+    // años con experiencia sólida» (+1 básico, +1 ampliado). Igual de la 5 (3 opciones) a la 6 (4).
     await abrirTest(page);
     for (const i of [0, 0]) {
       await radios(page).nth(i).click();
@@ -977,12 +974,11 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
     });
 
     test('con «Siguiente» a media pantalla, el enunciado de cada pregunta nueva queda a la vista y bajo la barra', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). C0104 (1), forma del 3110 de alquiler-vs-compra y del 2657 de
-      // selector-smartphone. Sin foco programático la página no se mueve y la pregunta nueva se pinta
-      // donde estaba la anterior. Medido el 10/10/2026 a 360 y 390 px con el botón en y 360 (barra
-      // hasta 52): P2 en y −60..−9, P3 −44..7, P5 −4..47, P6 11..62, P7 −112..−61, P8 −4..47,
-      // P9 −20..57, P10 −46..31; solo la 4 (82..133) queda bien. Tocando donde lo deja tap(), bien.
-      test.fail();
+      // REPARADO el 19/10/2026 (3135, con el foco de 3133). C0104 (1), forma del 3110 de
+      // alquiler-vs-compra y del 2657 de selector-smartphone. Sin foco programático la página no se
+      // movía y la pregunta nueva se pintaba donde estaba la anterior. Medido el 10/10/2026 a 360 y
+      // 390 px con el botón en y 360 (barra hasta 52): P2 en y −60..−9, P3 −44..7, P5 −4..47, P6
+      // 11..62, P7 −112..−61, P8 −4..47, P9 −20..57, P10 −46..31; solo la 4 (82..133) quedaba bien.
       await abrirTest(page);
       const fuera: string[] = [];
       for (let i = 1; i <= 10; i++) {
@@ -1000,10 +996,9 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
     });
 
     test('con «Ver resultado» a media pantalla, el título del resultado tiene el foco y queda por debajo de la barra', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). C0104 (1). El h2 ya está a la vista y el foco no desplaza:
-      // queda en y 49..111 con la barra hasta 52 (medido a 360 y 390 px). Falta el scroll-margin-top
-      // de la receta (80 px).
-      test.fail();
+      // REPARADO el 19/10/2026 (3135). C0104 (1). El h2 ya estaba a la vista y el foco no desplazaba:
+      // quedaba en y 49..111 con la barra hasta 52 (medido a 360 y 390 px). Ahora, si no está entero
+      // por debajo de la barra, se sube con scrollIntoView (el scroll-padding da el hueco).
       await abrirTest(page);
       await contestarTocando(page, [0, 0, 0, 0, 0, 0, 0, 0, 0]);
       await page.waitForTimeout(500);
@@ -1017,11 +1012,10 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
     });
 
     test('un doble toque en «Siguiente» de la pregunta 3 no contesta la 4', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). C0104 (2), forma del 2659/3111. Medido el 10/10/2026 a 360 y
-      // 390 px con el botón entre y 150 y 650: el segundo toque (detail 2) marca «Más de 5 años con
+      // REPARADO el 19/10/2026 (3134). C0104 (2), forma del 2659/3111. Medido el 10/10/2026 a 360 y
+      // 390 px con el botón entre y 150 y 650: el segundo toque (detail 2) marcaba «Más de 5 años con
       // experiencia sólida» en la 4, y en la 6 «Lo comparten varias personas (coche de empresa o
       // familiar)» tras el doble toque en la 5.
-      test.fail();
       await abrirTest(page);
       await contestarTocando(page, [0, 0]);
       await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
@@ -1036,11 +1030,11 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
     });
 
     test('un doble toque en «Ver resultado» no saca de la app', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). C0104 (2), forma del 3111 de alquiler-vs-compra. Con el botón
-      // en la parte alta (y 100-150 a 360 px; 150-200 a 390), el h2 del resultado queda por encima de
-      // la vista, el foco lo centra (y 339) y el enlace de Delegum de <LegalNotice /> baja a y 66..165:
-      // el segundo toque lo abre y se pierden las 10 respuestas. Delegum se sirve aquí sin red.
-      test.fail();
+      // REPARADO el 19/10/2026 (3134): guarda en captura sobre window. C0104 (2), forma del 3111 de
+      // alquiler-vs-compra. Con el botón en la parte alta (y 100-150 a 360 px; 150-200 a 390), el h2
+      // del resultado quedaba por encima de la vista, el foco lo centraba (y 339) y el enlace de
+      // Delegum de <LegalNotice /> bajaba a y 66..165: el segundo toque lo abría y se perdían las 10
+      // respuestas. Delegum se sirve aquí sin red.
       await page.route(/^https:\/\/(www\.)?delegum\.com\//, (ruta) => ruta.fulfill({ status: 200, contentType: 'text/html', body: '<title>delegum</title>externo' }));
       await abrirTest(page);
       const origen = new URL(page.url()).origin;
@@ -1066,11 +1060,10 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
     });
 
     test('un doble toque en «Siguiente» de la pregunta 6 no devuelve a la 6 por «Anterior»', async ({ page }) => {
-      // ABIERTO (inspector 10/10/2026). C0104 (2). Forma propia de esta hermana: en móvil la botonera
+      // REPARADO el 19/10/2026 (3134). C0104 (2). Forma propia de esta hermana: en móvil la botonera
       // va en columna inversa («Anterior» justo DEBAJO de «Siguiente»), y de la 6 (4 opciones) a la 7
-      // (3) sube: el segundo toque cae en «Volver a la pregunta anterior». Medido a 390 px con el
-      // botón entre y 150 y 650; a 360 px no pasa.
-      test.fail();
+      // (3) sube: el segundo toque caía en «Volver a la pregunta anterior». Medido a 390 px con el
+      // botón entre y 150 y 650; a 360 px no pasaba.
       await abrirTest(page);
       await contestarTocando(page, [0, 0, 0, 0, 0]);
       await expect(page.getByText('Pregunta 6 de 10')).toBeVisible();

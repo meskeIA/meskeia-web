@@ -400,8 +400,11 @@ const DESEMPATE: { indice: number; motivo: string }[] = [
  *  · Uso profesional y conductores menores de 25 años. No cambian la modalidad, cambian lo que
  *    hay que DECLARAR: si el riesgo se declaró inexacto, la prestación se reduce en proporción
  *    a la prima (Ley 50/1980, art. 10; art. 11 si cambia después de contratar) (1476, 1477).
+ *  · Reparación de tu bolsillo. La pregunta 9 es el centro de la decisión, pero puntúa: quien
+ *    contesta que no podría asumirla y aun así acaba en terceros lo lee, con el todo riesgo que
+ *    mejor encaja (hallazgo 3136; antes 5.384 perfiles así, 1.209 sin ninguna nota).
  */
-export type TipoNota = 'financiacion' | 'valor-bajo' | 'valor-alto' | 'uso-profesional' | 'conductor-joven';
+export type TipoNota = 'financiacion' | 'valor-bajo' | 'valor-alto' | 'sin-colchon' | 'uso-profesional' | 'conductor-joven';
 
 export interface Nota {
   tipo: TipoNota;
@@ -426,6 +429,7 @@ export const RESPUESTA = {
   valorMas25000: [1, 0],
   valorMenos3000: [1, 3],
   financiado: [2, 0],
+  reparacionNoAsumible: [8, 2],
   usoProfesional: [5, 2],
   jovenFrecuente: [9, 0],
   jovenEsporadico: [9, 1],
@@ -526,6 +530,7 @@ export function calcularResultado(respuestas: readonly number[]): Resultado {
   if ((eligio(RESPUESTA.valorMas25000) || eligio(RESPUESTA.antiguedadMenos2)) && !recomiendaTR) {
     notas.push({ tipo: 'valor-alto', alternativa: mejor(true) });
   }
+  if (eligio(RESPUESTA.reparacionNoAsumible) && !recomiendaTR) notas.push({ tipo: 'sin-colchon', alternativa: mejor(true) });
   if (eligio(RESPUESTA.usoProfesional)) notas.push({ tipo: 'uso-profesional' });
   if (eligio(RESPUESTA.jovenFrecuente) || eligio(RESPUESTA.jovenEsporadico)) notas.push({ tipo: 'conductor-joven' });
 

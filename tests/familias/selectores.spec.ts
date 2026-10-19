@@ -116,11 +116,8 @@ const HERMANAS: Hermana[] = [
   {
     slug: 'selector-seguro-coche',
     empezar: false,
-    recetas: {
-      foco: { falla: 'hallazgo 3133: tras «Siguiente» y «Anterior» el foco cae a <body>' },
-      teclado: { falla: 'hallazgo 3132: los radios no tienen tabindex itinerante ni flechas (APG)' },
-      dobleToque: { falla: 'hallazgo 3134: sin guarda, el segundo clic contesta la pregunta nueva' },
-    },
+    // Huecos 3132, 3133 y 3134 REPARADOS el 19/10/2026: tabindex itinerante y flechas, foco al
+    // enunciado y guarda en captura sobre window.
   },
   {
     slug: 'selector-seguro-hogar',

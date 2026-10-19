@@ -109,6 +109,11 @@
   line-height: 1.4;
 }
 
+/* Recibe el foco tras «Siguiente» y «Anterior» (tabIndex=-1): sin anillo, no es un control. */
+.preguntaTexto:focus {
+  outline: none;
+}
+
 /* ---- Opciones ---- */
 .opciones {
   display: flex;
