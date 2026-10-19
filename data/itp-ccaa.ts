@@ -43,7 +43,7 @@
 
 // ===== TIPOS =====
 
-import { coeficienteIIVTNU, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025, BONIFICACION_IIVTNU_CEUTA_MELILLA } from '@/data/fiscal';
+import { coeficienteIIVTNU, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025, BONIFICACION_IIVTNU_CEUTA_MELILLA, PORCENTAJES_IVA } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
 /**
@@ -1512,8 +1512,12 @@ export function avisoIrpfForalResidente(ccaa: ComunidadAutonoma, viviendaHabitua
   return `Vendes tu vivienda habitual en ${nombreEnFrase(ccaa)}, así que resides allí: tu IRPF es foral y se liquida con su propia escala, que esta herramienta no aplica`;
 }
 
-/** IVA general que se repercute en las facturas de notaría y registro (art. 90.Uno Ley 37/1992). */
-const IVA_HONORARIOS = 0.21;
+/**
+ * IVA general que se repercute en las facturas de notaría y registro (art. 90.Uno Ley 37/1992).
+ * Hallazgo 3272 (19/10/2026): estaba tecleado (0,21) mientras el IVA de la renuncia de la misma
+ * pantalla salía de data/fiscal; ahora tiene un solo dueño, como el tipo general del ITP.
+ */
+const IVA_HONORARIOS = PORCENTAJES_IVA.general / 100;
 
 /**
  * Si la factura de notaría y registro lleva IVA: no en Canarias, Ceuta y Melilla.
