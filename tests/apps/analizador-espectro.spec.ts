@@ -742,7 +742,11 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       await esperarHidratacion(page, ['#sensitivity-slider']);
       await botonIniciar(page).click();
       await botonIniciar(page).click();
-      await expect(page.getByRole('button', { name: /Detener/ })).toBeVisible();
+      // 15 s y no 5 (cabo C0280, 19/10/2026): el botón no cambia hasta que getUserMedia resuelve,
+      // y bajo la suite de 4 workers el micrófono emulado, más los 400 ms del espía, pasó dos
+      // veces de 5 s. La captura de los dos rojos («Iniciar análisis», sin error) es la de una
+      // apertura aún pendiente; aislado pasa siempre (5 de 5).
+      await expect(page.getByRole('button', { name: /Detener/ })).toBeVisible({ timeout: 15_000 });
       await page.waitForTimeout(1000);
       await page.getByRole('button', { name: /Detener/ }).click();
       await expect(botonIniciar(page)).toBeVisible();
