@@ -1172,14 +1172,18 @@ test('REGRESIÓN 3.ª pasada — al llegar a 60, la app avisa de que descarta la
 
   // Sigue habiendo 60 filas: la nueva ha entrado y otra ha salido
   await expect(filasRegistro(page)).toHaveCount(60);
-  const idsGuardados: string[] = (
-    JSON.parse(
-      (await page.evaluate((k) => window.localStorage.getItem(k), CLAVE_SESIONES)) ?? '[]',
-    ) as SesionSembrada[]
-  ).map((s) => s.id);
-  expect(idsGuardados, 'la más antigua ha desaparecido del almacenamiento').not.toContain(
-    laMasAntigua.id,
-  );
+  // Con sondeo, no con una lectura: antes y después de guardar hay 60 filas, así que la cuenta de
+  // arriba pasa ANTES de que la app escriba el almacenamiento, y una lectura única podía ver aún la
+  // noche 1 (cabo C0298: inestable con 1 worker el 18/10/2026, nunca aislado).
+  const idsGuardados = async (): Promise<string[]> =>
+    (
+      JSON.parse(
+        (await page.evaluate((k) => window.localStorage.getItem(k), CLAVE_SESIONES)) ?? '[]',
+      ) as SesionSembrada[]
+    ).map((s) => s.id);
+  await expect
+    .poll(idsGuardados, { message: 'la más antigua ha desaparecido del almacenamiento' })
+    .not.toContain(laMasAntigua.id);
 
   // ESTO es lo que falla: el usuario acaba de perder la primera noche de su diario y lo único
   // que se le dice es «Medición guardada en el registro de este navegador.».
