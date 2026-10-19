@@ -305,7 +305,7 @@ export default function InformacionTiempoPage() {
               placeholder="Buscar ciudad..."
               className={styles.searchInput}
             />
-            <button type="submit" className={styles.searchBtn} disabled={loading}>
+            <button type="submit" className={styles.searchBtn} disabled={loading} aria-label={loading ? 'Buscando' : 'Buscar'}>
               {loading ? '...' : '🔍'}
             </button>
           </form>

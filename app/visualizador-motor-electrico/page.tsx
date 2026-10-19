@@ -185,13 +185,13 @@ function SvgRegeneracion(): React.ReactNode {
       {/* Flecha tracción → */}
       <path d="M 100 48 Q 150 30 200 48" fill="none" stroke="#2ECC71" strokeWidth="2.5" strokeDasharray="0" />
       <polygon points="200,44 208,48 200,52" fill="#2ECC71" />
-      <text x="150" y="28" textAnchor="middle" fontSize="7.5" fill="#2ECC71" fontWeight="bold">⚡ Tracción</text>
+      <text x="150" y="28" textAnchor="middle" fontSize="7.5" fill="#2ECC71" fontWeight="bold"><tspan aria-hidden="true">⚡</tspan> Tracción</text>
       <text x="150" y="37" textAnchor="middle" fontSize="6.5" fill="#2ECC71">Batería → Motor → Ruedas</text>
 
       {/* Flecha regeneración ← */}
       <path d="M 200 72 Q 150 90 100 72" fill="none" stroke="#E84855" strokeWidth="2.5" strokeDasharray="5 3" />
       <polygon points="100,68 92,72 100,76" fill="#E84855" />
-      <text x="150" y="100" textAnchor="middle" fontSize="7.5" fill="#E84855" fontWeight="bold">🔄 Regeneración</text>
+      <text x="150" y="100" textAnchor="middle" fontSize="7.5" fill="#E84855" fontWeight="bold"><tspan aria-hidden="true">🔄</tspan> Regeneración</text>
       <text x="150" y="110" textAnchor="middle" fontSize="6.5" fill="#E84855">Ruedas → Generador → Batería</text>
 
       {/* Caja batería */}

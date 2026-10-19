@@ -530,7 +530,7 @@ function SeccionFuturo() {
 
       <div className={styles.preguntaCard}>
         <span className={styles.preguntaIcono} aria-hidden="true">🤔</span>
-        <p>En {formatNumber(40000, 0)} años hemos pasado de dibujar bisontes en cuevas a enviar 😂 por WhatsApp. En ambos casos, el impulso es el mismo: <strong>dejar una marca que sobreviva al momento</strong>. ¿Qué sobrevivirá de lo que escribimos hoy?</p>
+        <p>En {formatNumber(40000, 0)} años hemos pasado de dibujar bisontes en cuevas a enviar <span role="img" aria-label="un emoji de risa">😂</span> por WhatsApp. En ambos casos, el impulso es el mismo: <strong>dejar una marca que sobreviva al momento</strong>. ¿Qué sobrevivirá de lo que escribimos hoy?</p>
       </div>
     </div>
   );

@@ -628,6 +628,8 @@ export default function CreadorFlashcardsPage() {
                     key={color}
                     type="button"
                     className={`${styles.colorOption} ${formMazo.color === color ? styles.selected : ''}`}
+                    aria-pressed={formMazo.color === color}
+                    aria-label={`Color ${color}`}
                     style={{ background: color }}
                     onClick={() => setFormMazo({ ...formMazo, color })}
                   />

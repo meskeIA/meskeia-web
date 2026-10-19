@@ -375,7 +375,7 @@ export default function ComparadorIdesIa() {
                           </div>
                         </td>
                         <td className={styles.td}><span className={styles.basadoLabel}>{ide.basado}</span></td>
-                        <td className={styles.td}>{ide.planGratuito ? <span className={styles.siTag}><span aria-hidden="true">✅</span> Sí</span> : <span className={styles.noTag}><span aria-hidden="true">❌</span> No</span>}</td>
+                        <td className={styles.td}>{ide.planGratuito ? <span className={styles.siTag}><span role="img" aria-label="A favor:">✅</span> Sí</span> : <span className={styles.noTag}><span role="img" aria-label="En contra:">❌</span> No</span>}</td>
                         <td className={styles.td}><span className={styles.precioTag} style={{ borderColor: ide.color, color: ide.color }}>{ide.precioDesde}</span></td>
                         <td className={styles.td}>{dispIcon(ide.iaNativa)}</td>
                         <td className={styles.td}><span aria-hidden="true">{dispIcon(ide.agenteAutonomo)}</span> <span className={styles.dispLabel}>{dispLabel(ide.agenteAutonomo)}</span></td>
@@ -473,9 +473,9 @@ export default function ComparadorIdesIa() {
               ))}
             </div>
             <div className={styles.leyendaDisp}>
-              <span><span aria-hidden="true">✅</span> Disponible</span>
-              <span><span aria-hidden="true">🟡</span> Disponible con limitaciones</span>
-              <span><span aria-hidden="true">❌</span> No disponible</span>
+              <span><span role="img" aria-label="A favor:">✅</span> Disponible</span>
+              <span><span role="img" aria-label="A medias:">🟡</span> Disponible con limitaciones</span>
+              <span><span role="img" aria-label="En contra:">❌</span> No disponible</span>
             </div>
           </div>
         )}
@@ -608,13 +608,13 @@ export default function ComparadorIdesIa() {
               <tr><th>Dimensión</th><th>IDE IA-nativo (Cursor, Windsurf)</th><th>IDE clásico + extensión (VS Code)</th></tr>
             </thead>
             <tbody>
-              <tr><td>IA integrada</td><td><span aria-hidden="true">✅</span> De base, sin instalación extra</td><td><span aria-hidden="true">🟡</span> Requiere instalar extensión</td></tr>
-              <tr><td>Modelo elegible</td><td><span aria-hidden="true">✅</span> Claude, GPT-4o, Gemini, local</td><td>Depende de la extensión</td></tr>
-              <tr><td>Agente autónomo</td><td><span aria-hidden="true">✅</span> Nativo (Composer / Flows)</td><td><span aria-hidden="true">🟡</span> Vía extensión o CLI</td></tr>
-              <tr><td>Ecosistema extensiones</td><td><span aria-hidden="true">✅</span> Compatible con VS Code</td><td><span aria-hidden="true">✅</span> El más grande del mercado</td></tr>
-              <tr><td>Coste base IDE</td><td>Gratis con límites / $15-20/mes</td><td><span aria-hidden="true">✅</span> Gratuito (+ coste asistente)</td></tr>
-              <tr><td>Estabilidad</td><td><span aria-hidden="true">🟡</span> Productos jóvenes, evolución rápida</td><td><span aria-hidden="true">✅</span> Muy estable, actualizado por Microsoft</td></tr>
-              <tr><td>Open source</td><td><span aria-hidden="true">❌</span> Propietarios</td><td><span aria-hidden="true">✅</span> VS Code es MIT</td></tr>
+              <tr><td>IA integrada</td><td><span role="img" aria-label="A favor:">✅</span> De base, sin instalación extra</td><td><span role="img" aria-label="A medias:">🟡</span> Requiere instalar extensión</td></tr>
+              <tr><td>Modelo elegible</td><td><span role="img" aria-label="A favor:">✅</span> Claude, GPT-4o, Gemini, local</td><td>Depende de la extensión</td></tr>
+              <tr><td>Agente autónomo</td><td><span role="img" aria-label="A favor:">✅</span> Nativo (Composer / Flows)</td><td><span role="img" aria-label="A medias:">🟡</span> Vía extensión o CLI</td></tr>
+              <tr><td>Ecosistema extensiones</td><td><span role="img" aria-label="A favor:">✅</span> Compatible con VS Code</td><td><span role="img" aria-label="A favor:">✅</span> El más grande del mercado</td></tr>
+              <tr><td>Coste base IDE</td><td>Gratis con límites / $15-20/mes</td><td><span role="img" aria-label="A favor:">✅</span> Gratuito (+ coste asistente)</td></tr>
+              <tr><td>Estabilidad</td><td><span role="img" aria-label="A medias:">🟡</span> Productos jóvenes, evolución rápida</td><td><span role="img" aria-label="A favor:">✅</span> Muy estable, actualizado por Microsoft</td></tr>
+              <tr><td>Open source</td><td><span role="img" aria-label="En contra:">❌</span> Propietarios</td><td><span role="img" aria-label="A favor:">✅</span> VS Code es MIT</td></tr>
             </tbody>
           </table>
         </div>

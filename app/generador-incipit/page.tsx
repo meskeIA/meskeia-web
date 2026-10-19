@@ -291,7 +291,7 @@ export default function GeneradorIncipitPage() {
                   type="button"
                   className={`${styles.copyBtn} ${copiado === inc.id ? styles.copyBtnOk : ''}`}
                   onClick={() => copiar(inc.texto, inc.id)}
-                  aria-label="Copiar al portapapeles"
+                  aria-label={copiado === inc.id ? 'Copiado al portapapeles' : 'Copiar al portapapeles'}
                 >
                   {copiado === inc.id ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
                 </button>

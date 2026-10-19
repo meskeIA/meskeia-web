@@ -247,6 +247,7 @@ export default function CalculadoraSubredesPage() {
                     className={styles.copyBtn}
                     onClick={() => handleCopy(subnetInfo.subnetMask, 'mask')}
                     title="Copiar"
+                    aria-label={copied === 'mask' ? 'Máscara de red copiada' : 'Copiar máscara de red'}
                   >
                     {copied === 'mask' ? '✓' : '📋'}
                   </button>
@@ -265,6 +266,7 @@ export default function CalculadoraSubredesPage() {
                     className={styles.copyBtn}
                     onClick={() => handleCopy(subnetInfo.networkAddress, 'network')}
                     title="Copiar"
+                    aria-label={copied === 'network' ? 'Dirección de red copiada' : 'Copiar dirección de red'}
                   >
                     {copied === 'network' ? '✓' : '📋'}
                   </button>
@@ -283,6 +285,7 @@ export default function CalculadoraSubredesPage() {
                     className={styles.copyBtn}
                     onClick={() => handleCopy(subnetInfo.broadcastAddress, 'broadcast')}
                     title="Copiar"
+                    aria-label={copied === 'broadcast' ? 'Dirección broadcast copiada' : 'Copiar dirección broadcast'}
                   >
                     {copied === 'broadcast' ? '✓' : '📋'}
                   </button>
@@ -301,6 +304,7 @@ export default function CalculadoraSubredesPage() {
                     className={styles.copyBtn}
                     onClick={() => handleCopy(subnetInfo.wildcardMask, 'wildcard')}
                     title="Copiar"
+                    aria-label={copied === 'wildcard' ? 'Máscara wildcard copiada' : 'Copiar máscara wildcard'}
                   >
                     {copied === 'wildcard' ? '✓' : '📋'}
                   </button>
@@ -526,7 +530,7 @@ export default function CalculadoraSubredesPage() {
             <div className={styles.stepNumber}>6</div>
             <div className={styles.stepContent}>
               <h3>Anota dirección de red y broadcast</h3>
-              <p>Copia estos valores con el botón 📋. Los necesitarás para configurar el router, el servidor DHCP y las reglas de firewall.</p>
+              <p>Copia estos valores con el botón de copiar (<span aria-hidden="true">📋</span>). Los necesitarás para configurar el router, el servidor DHCP y las reglas de firewall.</p>
             </div>
           </div>
           <div className={styles.step}>

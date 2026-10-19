@@ -619,7 +619,7 @@ export default function VisualizadorRedesComputadoras() {
                       {r.id}
                     </text>
                     <text x={r.x} y={r.y + 38} fontSize="10" textAnchor="middle" fill="#555">
-                      {esOrigen ? '🟢 Origen' : esDestino ? '🔴 Destino' : ''}
+                      {esOrigen ? <><tspan aria-hidden="true">🟢</tspan> Origen</> : esDestino ? <><tspan aria-hidden="true">🔴</tspan> Destino</> : ''}
                     </text>
                   </g>
                 );
@@ -801,7 +801,7 @@ export default function VisualizadorRedesComputadoras() {
                   rx={8} fill="#2E86AB" stroke="#fff" strokeWidth={2}
                 />
                 <text x={ORIGEN_SERVIDOR.x} y={ORIGEN_SERVIDOR.y - 2} fontSize="9" textAnchor="middle" fill="#fff" fontWeight="bold">
-                  🖥️ Origen
+                  <tspan aria-hidden="true">🖥️</tspan> Origen
                 </text>
                 <text x={ORIGEN_SERVIDOR.x} y={ORIGEN_SERVIDOR.y + 11} fontSize="8" textAnchor="middle" fill="#ddd">
                   España

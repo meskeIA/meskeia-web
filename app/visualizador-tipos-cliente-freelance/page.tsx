@@ -214,7 +214,7 @@ const ESPECTRO = [
 
 function Estrellas({ nivel, esIlegal }: { nivel: number; esIlegal?: boolean }) {
   if (esIlegal) {
-    return <span className={styles.estrellaIlegal} aria-label="Ilegal"><span aria-hidden="true">❌</span> ILEGAL</span>;
+    return <span className={styles.estrellaIlegal}><span aria-hidden="true">❌</span> ILEGAL</span>;
   }
   const estrellas = [];
   for (let i = 1; i <= 5; i++) {

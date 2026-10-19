@@ -230,10 +230,10 @@ export default function SimuladorBacktracking() {
           >
             <strong>
               {snap.estado === 'probar' && <><span aria-hidden="true">🔍</span> Probando: </>}
-              {snap.estado === 'conflicto' && '✗ Conflicto: '}
-              {snap.estado === 'colocar' && '♛ Colocada: '}
-              {snap.estado === 'retroceder' && '↩ Retroceso: '}
-              {snap.estado === 'solucion' && '✅ '}
+              {snap.estado === 'conflicto' && <><span aria-hidden="true">✗</span> Conflicto: </>}
+              {snap.estado === 'colocar' && <><span aria-hidden="true">♛</span> Colocada: </>}
+              {snap.estado === 'retroceder' && <><span aria-hidden="true">↩</span> Retroceso: </>}
+              {snap.estado === 'solucion' && <><span aria-hidden="true">✅</span> </>}
             </strong>
             {snap.texto}
           </div>
