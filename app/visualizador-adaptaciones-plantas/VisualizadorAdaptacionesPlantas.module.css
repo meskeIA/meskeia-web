@@ -581,15 +581,24 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
+/* Con el tinte al 12 % el texto de marca daba 4,36:1 en claro y 3,73:1 en oscuro (cabo C0278):
+   ningún token de texto llega sobre ese fondo. Con el tinte más suave, cumple en los dos temas
+   (tests/contraste-tinte-marca.spec.ts). */
 .valorBadge {
   display: inline-block;
-  background: rgba(46, 134, 171, 0.12);
+  background: rgba(46, 134, 171, 0.06);
   color: var(--primary-texto);
   padding: 0.2rem 0.6rem;
   border-radius: 10px;
   font-weight: 700;
   font-size: 0.82rem;
   white-space: nowrap;
+}
+
+/* En oscuro el badge va sobre las filas pares (blanco al 4 %), y ahí el azul de marca no llega ni
+   sin tinte (3,95:1 sobre rgb(56,61,63)): se oscurece el fondo del badge en vez de teñirlo. */
+[data-theme='dark'] .valorBadge {
+  background: rgba(0, 0, 0, 0.25);
 }
 
 /* Escenarios */

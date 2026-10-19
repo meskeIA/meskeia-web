@@ -104,8 +104,10 @@
   background: #2a2a2a;
 }
 
+/* Al 20 % el texto de marca del preset activo daba 3,94:1 sobre rgb(45,63,70) (cabo C0278); al
+   8 %, 4,7:1. Lo que dice cuál está activo es el borde de marca, que no cambia. */
 [data-theme='dark'] .presetActivo {
-  background: rgba(46, 134, 171, 0.2) !important;
+  background: rgba(46, 134, 171, 0.08) !important;
 }
 
 .presetKm {

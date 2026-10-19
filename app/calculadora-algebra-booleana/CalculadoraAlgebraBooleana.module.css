@@ -983,8 +983,11 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* Con un blanco al 10 % encima el código quedaba en rgb(75,75,75) bajo stemum.com y el violeta
+   daba 3,91:1; en meskeia.com, 3,63:1 con #3FA5D1 (cabo C0278). Oscurecer en vez de aclarar:
+   medido por píxel en los dos dominios (tests/apps/contraste-marca-oscuro.spec.ts). */
 [data-theme='dark'] .referenceCard code {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive */

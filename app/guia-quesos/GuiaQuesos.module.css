@@ -226,6 +226,12 @@
   font-weight: 500;
 }
 
+/* En oscuro, con el tinte al 10 % el texto de marca daba 4,42:1 sobre rgb(45,54,58) (cabo
+   C0278); al 5 %, 4,7:1. En claro el 10 % da 4,85:1 y se queda. */
+[data-theme='dark'] .maduracionPill {
+  background: rgba(46, 134, 171, 0.05);
+}
+
 .descripcion {
   font-size: 0.88rem;
   color: var(--text-secondary);

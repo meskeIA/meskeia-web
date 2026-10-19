@@ -111,6 +111,33 @@ for (const slug of DEGRADADO) {
   });
 }
 
+/**
+ * Cabo C0278 (19/10/2026): la misma medida sobre FONDOS PLANOS semitransparentes de marca, lo que
+ * el censo de C0112 dejó fuera del degradado. Medido el 17/10: algebra-booleana bajo stemum.com
+ * 3,91:1 (A', AB, SOP…), tabla-valencias bajo stemum.com 4,25:1 (chips +1), comparador-transporte-
+ * viaje 3,94:1 (Madrid – Barcelona 621 km), guia-quesos y guia-cafe 4,42:1 (las píldoras).
+ */
+const FONDOS_PLANOS: { slug: string; dominio: 'meskeia' | 'stemum' }[] = [
+  { slug: 'calculadora-algebra-booleana', dominio: 'stemum' },
+  { slug: 'tabla-valencias', dominio: 'stemum' },
+  { slug: 'comparador-transporte-viaje', dominio: 'meskeia' },
+  { slug: 'guia-quesos', dominio: 'meskeia' },
+  { slug: 'guia-cafe', dominio: 'meskeia' },
+];
+
+for (const { slug, dominio } of FONDOS_PLANOS) {
+  test(`${slug}: en oscuro el texto de marca se lee sobre su fondo plano (${dominio}.com, C0278)`, async ({ page }) => {
+    // El fondo se cambia para las dos marcas: se mide siempre meskeia.com, y Stemum donde se vio
+    await abrirOscuro(page, `${ORIGEN}/${slug}/`);
+    expect(await textosBajoUmbral(page, MESKEIA_OSCURO), 'meskeia.com').toEqual([]);
+    if (dominio === 'stemum') {
+      await abrirOscuro(page, `http://stemum.com/${slug}/`);
+      await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+      expect(await textosBajoUmbral(page, STEMUM_OSCURO), 'stemum.com').toEqual([]);
+    }
+  });
+}
+
 test('la píldora de Stemum y la de Coquinum se leen en oscuro (son blancas en los dos temas)', async ({ page }) => {
   for (const [url, pildora] of [
     ['http://stemum.com/simulador-pendulo/', 'stemumPill'],

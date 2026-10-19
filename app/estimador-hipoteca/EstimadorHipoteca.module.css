@@ -1222,8 +1222,10 @@
   font-weight: 600;
 }
 
+/* Con el tinte al 10 % el «Perspectiva:» de marca daba 4,48:1 en claro y 4,06:1 en oscuro (cabo
+   C0278). Con el tinte más suave cumple en los dos temas; el borde izquierdo lo sigue marcando. */
 .faqTip {
-  background: rgba(46, 134, 171, 0.1);
+  background: rgba(46, 134, 171, 0.06);
   padding: var(--spacing-md);
   border-radius: var(--radius);
   border-left: 3px solid var(--primary);
@@ -1465,9 +1467,21 @@
   font-weight: 600;
   color: var(--primary-texto);
   padding: var(--spacing-xs) var(--spacing-sm);
-  background: rgba(46, 134, 171, 0.1);
+  /* Al 10 %, 4,48:1 en claro (cabo C0278); al 6 % cumple. En oscuro va sobre una tarjeta más
+     clara y ni el 6 % llega (4,25:1): ahí se oscurece, abajo. */
+  background: rgba(46, 134, 171, 0.06);
   border-radius: 20px;
   margin-top: var(--spacing-xs);
+}
+
+/* En oscuro las tarjetas de esta app son más claras y cualquier tinte de marca deja su texto de
+   marca por debajo de 4,5:1 (4,25:1 con el 6 %, cabo C0278): los contenedores con texto de marca
+   se oscurecen en vez de teñirse. */
+[data-theme='dark'] .comparadorTag,
+[data-theme='dark'] .faqTip,
+[data-theme='dark'] .comparativaConsejo,
+[data-theme='dark'] .escenarioResultado {
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .comparadorNota {

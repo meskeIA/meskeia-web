@@ -328,8 +328,10 @@
   border: 1px solid var(--primary-boton);
 }
 
+/* Con el tinte al 20 % el violeta de Stemum daba 4,25:1 sobre rgb(61,72,78) (cabo C0278); al
+   10 %, 5,2:1, y el --accent de meskeia.com 5,0:1. El borde marca el chip igual. */
 [data-theme='dark'] .chipHabitual {
-  background: rgba(127, 179, 211, 0.2);
+  background: rgba(127, 179, 211, 0.1);
   color: var(--accent);
   border-color: rgba(127, 179, 211, 0.45);
 }
@@ -615,8 +617,10 @@
   padding: 1.1rem 1.25rem;
 }
 
+/* Sobre --hover (#383838) el título de marca daba 4,20:1 en meskeia.com (cabo C0278); sobre la
+   tarjeta, 4,9:1 (6,2:1 con el violeta de Stemum). El borde la sigue separando. */
 [data-theme='dark'] .sufijoCard {
-  background: var(--hover);
+  background: var(--bg-card);
 }
 
 .sufijoCard h3 {
