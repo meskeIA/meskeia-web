@@ -45,7 +45,7 @@ import { formatNumber, parseSpanishNumber } from '../../lib/formatters';
  * (A-E), escritos con `test.fail()` (los cabos C0056 y C0058 entre ellos). B (3362, el
  * wolframio) y C (3363, el margen de la masa) se REPARARON el 17/10/2026 y ya son regresión;
  * D (3364, las excepciones de período y grupo) y E (3365, la letra a 360 px), el 18/10/2026.
- * A (3361) sigue ABIERTO: decidir las cifras de Pm, Eu y Tb exige la fuente.
+ * A (3361) se REPARÓ el 19/10/2026 con el módulo común data/electronegatividad.ts.
  *
  * RE-INSPECCIÓN 18/10/2026: al final del fichero. Verifica las dos reparaciones del 17/10
  * (26e2e846 y f6314c1f) con tres casos nuevos (23-25) y uno en un móvil de 390 px (26), y deja
@@ -2655,12 +2655,17 @@ test.describe('verificación 16/10/2026 · los commits posteriores a la inspecci
 // HALLAZGOS de la re-inspección del 16/10/2026 — con `test.fail()` los ABIERTOS
 // Cada uno afirma lo que DEBERÍA pasar; al repararlos se retira la marca y quedan como
 // regresión. El E, que necesita el viewport de 360 px, vive dentro del CASO 22.
-// Estado a 18/10/2026: A (3361) ABIERTO; B (3362) y C (3363) REPARADOS el 17/10/2026
-// (26e2e846 y f6314c1f), y D (3364) y E (3365) el 18/10/2026, sin marca: hoy son regresión.
+// Estado a 19/10/2026: los cinco REPARADOS y sin marca, hoy son regresión. B (3362) y C (3363)
+// el 17/10/2026 (26e2e846 y f6314c1f), D (3364) y E (3365) el 18/10/2026, y A (3361) el
+// 19/10/2026 con el módulo común data/electronegatividad.ts.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('hallazgos · 16/10/2026 (A abierto; B, C, D y E reparados)', () => {
-  test('A · C0056 · el radón y el lawrencio llevan una electronegatividad que las fuentes de tendencias no dan', async ({ page }) => {
-    test.fail(true, 'ABIERTO (inspector 16/10/2026): Rn 2,20 y Lr 1,30; tendencias los deja sin dato');
+test.describe('hallazgos · 16/10/2026 (A, B, C, D y E reparados)', () => {
+  // REPARADO (hallazgo 3361, 19/10/2026): las dos apps leen data/electronegatividad.ts.
+  test('A · C0056 (3361) · el radón y el lawrencio sin la electronegatividad que las fuentes no dan, y las dos apps con la misma serie', async ({ page }) => {
+    // Fuente consultada el 19/10/2026 en «Electronegativities of the elements (data page)»
+    // (columnas WebElements, CRC y Lange): Rn sin dato en las tres; Lr fuera de la tabla
+    // (solo una figura con 1,3 de Brown 2012); Tb 1,1; Pm y Eu, intervalo 1,1–1,2, y la serie
+    // toma el 1,1. Antes del 19/10: Rn 2,20, Lr 1,30, Pm 1,13, Eu 1,20 y Tb 1,20.
     // Fuente que el repositorio cita y ancla: cabecera de app/simulador-tabla-periodica-
     // tendencias/datos.ts, cotejada el 26/09/2026: Pauling (Allred 1961) «según la tabulan el
     // CRC Handbook, WebElements y el Lange. Sin dato donde ninguna de las tres da valor (gases
@@ -2675,18 +2680,23 @@ test.describe('hallazgos · 16/10/2026 (A abierto; B, C, D y E reparados)', () =
     expect(await fichaDe(page, 'Fermio (Fm)')).toContain('Electronegatividad: 1,30');
     await cerrarFicha(page);
     for (const titulo of ['Radón (Rn)', 'Lawrencio (Lr)']) {
-      expect(await fichaDe(page, titulo), titulo).toContain('Electronegatividad: N/D'); // hoy: 2,20 y 1,30
+      expect(await fichaDe(page, titulo), titulo).toContain('Electronegatividad: N/D'); // antes: 2,20 y 1,30
+      await cerrarFicha(page);
+    }
+    for (const titulo of ['Prometio (Pm)', 'Europio (Eu)', 'Terbio (Tb)']) {
+      expect(await fichaDe(page, titulo), titulo).toContain('Electronegatividad: 1,10'); // antes: 1,13 · 1,20 · 1,20
       await cerrarFicha(page);
     }
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.locator('[class*="__comparativaSection"]')).not.toContainText('en Kr, Xe y Rn');
+    await expect(page.locator('[class*="__comparativaSection"]')).toContainText('Sin valor salvo en Kr (3,00) y Xe (2,60)');
     const enTendencias = new Map<number, number | null>(
       ELEMENTOS_TENDENCIAS.map((t) => [t.Z, t.electronegatividad]),
     );
     const distintos = elementos
       .filter((e) => e.electronegatividad !== enTendencias.get(e.numero))
       .map((e) => e.simbolo);
-    expect(distintos).toEqual([]); // hoy: ['Pm', 'Eu', 'Tb', 'Rn', 'Lr']
+    expect(distintos).toEqual([]); // antes del 19/10: ['Pm', 'Eu', 'Tb', 'Rn', 'Lr']
   });
 
   // REPARADO (hallazgo 3362, 17/10/2026): «Wolframio» de nombre y «Tungsteno» en otrosNombres.

@@ -898,9 +898,10 @@ export default function TablaPerodicaPage() {
                 <tr>
                   <td><strong>Gases nobles (Gp18)</strong></td>
                   <td>Capa completa, monoatómicos, inertes</td>
-                  {/* «No aplicable» era cierto de los tres primeros, no del grupo: kriptón,
-                      xenón y radón tienen electronegatividad en sus propias fichas (hallazgo 775). */}
-                  <td>Sin valor en He, Ne y Ar · 2,2–3,0 en Kr, Xe y Rn</td>
+                  {/* «No aplicable» era cierto de los tres primeros, no del grupo: kriptón y
+                      xenón tienen electronegatividad en sus propias fichas (hallazgo 775). El
+                      radón no: la serie de Pauling no le da valor (hallazgo 3361). */}
+                  <td>Sin valor salvo en Kr (3,00) y Xe (2,60)</td>
                   <td>Gas</td>
                   <td>Prácticamente nula</td>
                   <td>Iluminación (Ne, Ar), globos/dirigibles (He), láseres (Kr, Xe)</td>
