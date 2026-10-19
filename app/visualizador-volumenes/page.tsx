@@ -13,11 +13,15 @@ import {
 } from '@/components';
 import ZonaHerramienta from '@/components/ZonaHerramienta';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+// El volumen se calcula en ./casos.ts, el mismo módulo con que se corrigen los casos para clase:
+// si la tarjeta y el corrector calcularan por separado, la app suspendería una respuesta que ella
+// misma enseña (skill /casos-aula-meskeia, 19/10/2026).
+import { calcVolumen, type Figura } from './casos';
+import CasosAula from './CasosAula';
 
 // =========================================================
 // TIPOS
 // =========================================================
-type Figura = 'esfera' | 'cubo' | 'cilindro' | 'cono' | 'piramide';
 
 interface FiguraInfo {
   id: Figura;
@@ -343,22 +347,8 @@ function SvgPiramide({ lado, altura, escala }: { lado: number; altura: number; e
 }
 
 // =========================================================
-// HELPERS DE CÁLCULO
+// HELPERS DE CÁLCULO (el volumen, `calcVolumen`, vive en ./casos.ts)
 // =========================================================
-function calcVolumen(figura: Figura, p: {
-  radio: number; ancho: number; largo: number; alto: number;
-  radioCil: number; alturaCil: number; radioCon: number; alturaCon: number;
-  lado: number; alturaPir: number;
-}): number {
-  switch (figura) {
-    case 'esfera': return (4 / 3) * Math.PI * Math.pow(p.radio, 3);
-    case 'cubo': return p.ancho * p.largo * p.alto;
-    case 'cilindro': return Math.PI * Math.pow(p.radioCil, 2) * p.alturaCil;
-    case 'cono': return (1 / 3) * Math.PI * Math.pow(p.radioCon, 2) * p.alturaCon;
-    case 'piramide': return (1 / 3) * Math.pow(p.lado, 2) * p.alturaPir;
-  }
-}
-
 function getFormula(figura: Figura, p: {
   radio: number; ancho: number; largo: number; alto: number;
   radioCil: number; alturaCil: number; radioCon: number; alturaCon: number;
@@ -802,6 +792,11 @@ export default function VisualizadorVolumenesPage() {
       </div>
 
       </ZonaHerramienta>
+
+      {/* Tarea de aula (skill /casos-aula-meskeia): FUERA de EducationalSection, que nace
+          colapsada, y después de la herramienta, para que la fórmula siga siendo el primer
+          <code> de la página (el acta lo localiza así). */}
+      <CasosAula />
 
       {/* ========================================================= */}
       {/* CONTENIDO EDUCATIVO v2.0 */}

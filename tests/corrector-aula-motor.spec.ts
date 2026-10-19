@@ -63,6 +63,7 @@ import * as lentes from '../app/simulador-lentes-opticas/casos';
 import * as flotabilidad from '../app/simulador-flotabilidad/casos';
 import * as condensadores from '../app/simulador-condensadores/casos';
 import * as circuitos from '../app/simulador-circuitos-electricos/casos';
+import * as volumenes from '../app/visualizador-volumenes/casos';
 
 const CUADRANTE: Magnitud = { entero: true, minimo: 1, maximo: 4, que: 'el número de cuadrante' };
 
@@ -176,6 +177,8 @@ const FAMILIA_REDONDEO: Record<string, Probar> = {
     conCasos(condensadores.CASOS, condensadores.generarEjercicioAleatorio, (c) => condensadores.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => condensadores.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
   'simulador-circuitos-electricos': () =>
     conCasos(circuitos.CASOS, circuitos.generarEjercicioAleatorio, (c) => circuitos.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => circuitos.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
+  'visualizador-volumenes': () =>
+    conCasos(volumenes.CASOS, volumenes.generarEjercicioAleatorio, (c) => volumenes.comprobarRespuesta(c.respuesta + DESVIO, c.respuesta, c.datos), (e) => volumenes.comprobarRespuesta(e.respuesta + DESVIO, e.respuesta, e.datos)),
 };
 
 for (const [slug, probar] of Object.entries(FAMILIA_REDONDEO)) {

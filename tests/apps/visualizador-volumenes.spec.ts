@@ -44,6 +44,19 @@ import {
   esperarValorEnReact,
   sembrarValor,
 } from './_hidratacion';
+import { readFileSync } from 'node:fs';
+import {
+  CASOS as CASOS_AULA,
+  MEDIDAS_DE,
+  TOTAL_CASOS,
+  comprobarRespuesta,
+  dependeDePi,
+  generarEjercicioAleatorio,
+  resolverCaso,
+  type DatosCaso,
+  type Figura,
+  type Medidas,
+} from '../../app/visualizador-volumenes/casos';
 
 /**
  * stemum.com → el servidor local, para ver la app como la sirve el portal (data-brand="stemum"
@@ -1561,4 +1574,272 @@ test('teclear «0,5» no anuncia un error a mitad de escritura', async ({ page }
   );
   await expect(radio).toHaveAttribute('aria-invalid', 'true');
   await expect(valorVolumen(page)).toHaveText('0,5236');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASOS PARA CLASE (19/10/2026) — app/visualizador-volumenes/casos.ts
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * La tarea asignable que añadió la skill /casos-aula-meskeia: doce casos fijos y un modo
+ * práctica. La lógica se prueba sin navegador (aunque el `beforeEach` del fichero abra la
+ * página) y un último bloque comprueba que la sección corrige en la página y que el visualizador
+ * da la misma cifra que el caso.
+ *
+ * LAS DOCE RESPUESTAS, resueltas a mano antes de ejecutar nada (π = 3,14159265…):
+ *    1  esfera r=6           (4/3)·π·216 = 288π = 904,7787        → 904,78 cm³
+ *    2  ortoedro 7×4×2,5     70                                    → 70 cm³ (exacta)
+ *    3  cilindro r=3 h=10    π·9·10 = 90π = 282,7433               → 282,74 cm³
+ *    4  cono r=6 h=7         (1/3)·π·36·7 = 84π = 263,8938         → 263,89 cm³
+ *    5  pirámide l=9 h=10    (1/3)·81·10 = 270                     → 270 cm³ (exacta)
+ *    6  lata Ø7 h=12         r=3,5 · π·12,25·12 = 147π = 461,8141 cm³ = 461,8141 mL → 461,81 mL
+ *    7  piscina 8×4×1,5 m    48 m³ × 1.000                         → 48.000 L (exacta)
+ *    8  depósito Ø2 m        r=1 · (4/3)·π = 4,188790 m³ × 1.000   → 4188,79 L
+ *    9  cucurucho r=2,5 h=12 (1/3)·π·6,25·12 = 25π = 78,5398       → 78,54 cm³
+ *   10  vaso r=4, 1000 cm³   h = 1000 ÷ (16π) = 1000 ÷ 50,2655 = 19,8944 → 19,89 cm
+ *   11  cilindro ÷ cono, misma base y altura: π·25·9 ÷ (π·25·9/3) → 3 (π se cancela)
+ *   12  esfera r=6 ÷ esfera r=3: (6/3)³                            → 8 (π se cancela)
+ *
+ * EL CONVENIO, π: en clase se usa 3,14 (o 22/7). Con 3,14 el caso 1 da 288 · 3,14 = 904,32, a
+ * 0,46 de 904,78 (un 0,05 %): dentro del 1 % de la tolerancia relativa. Con π = 3 da 864, un
+ * 4,5 % por debajo, y se suspende. Las exactas (2, 5, 7, 11, 12) no dependen de π y no admiten
+ * margen: 69,5 no es 70. El test lo comprueba con un volumen PROPIO escrito aquí, no con el de
+ * la app, en los doce casos y en 40 semillas del modo práctica.
+ *
+ * ERRORES CON NOMBRE (7.bis), a mano:
+ *    6 con el diámetro como radio: π·49·12 = 588π = 1.847,26
+ *    9 sin el 1/3: 75π = 235,62
+ *    7 en m³ sin pasar a litros: 48
+ *    8 dividiendo entre 1.000 en vez de multiplicar: 4,18879 ÷ 1.000 = 0,0042
+ *   12 al revés: 1/8 = 0,125
+ */
+
+const RESUELTAS_A_MANO = [904.78, 70, 282.74, 263.89, 270, 461.81, 48000, 4188.79, 78.54, 19.89, 3, 8];
+
+/** El volumen con las fórmulas de un libro, escritas aquí y no tomadas de la app. */
+function volumenPropio(figura: Figura, m: Medidas, pi: number): number {
+  const r = m.r ?? NaN;
+  const h = m.h ?? NaN;
+  switch (figura) {
+    case 'esfera': return (4 * pi * r * r * r) / 3;
+    case 'cubo': return (m.a ?? NaN) * (m.b ?? NaN) * h;
+    case 'cilindro': return pi * r * r * h;
+    case 'cono': return (pi * r * r * h) / 3;
+    case 'piramide': return ((m.l ?? NaN) * (m.l ?? NaN) * h) / 3;
+  }
+}
+
+/** La respuesta de un caso con las fórmulas del test y el π que se pida. */
+function respuestaPropia(d: DatosCaso, pi: number): number {
+  const litros = { cm: 0.001, dm: 1, m: 1000 }[d.unidad];
+  switch (d.pregunta) {
+    case 'volumen':
+      return volumenPropio(d.figura, d.medidas, pi);
+    case 'capacidad':
+      return volumenPropio(d.figura, d.medidas, pi) * litros * (d.capacidad === 'mL' ? 1000 : 1);
+    case 'altura': {
+      const r = d.medidas.r ?? NaN;
+      const base = {
+        esfera: NaN,
+        cubo: (d.medidas.a ?? NaN) * (d.medidas.b ?? NaN),
+        cilindro: pi * r * r,
+        cono: (pi * r * r) / 3,
+        piramide: ((d.medidas.l ?? NaN) * (d.medidas.l ?? NaN)) / 3,
+      }[d.figura];
+      return (d.volumenDado ?? NaN) / base;
+    }
+    case 'razon':
+      return d.otra ? volumenPropio(d.figura, d.medidas, pi) / volumenPropio(d.otra.figura, d.otra.medidas, pi) : NaN;
+  }
+}
+
+const red2 = (v: number): number => Math.round(v * 100) / 100;
+/** «4188,79», «48.000», «2,5»: como escribe las cifras la app (es-ES). */
+const comoTexto = (v: number): string => v.toLocaleString('es-ES', { maximumFractionDigits: 4 });
+const sinEspacioDuro = (t: string): string => t.replace(/ /g, ' ');
+const PRACTICAS = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+const TODOS = [
+  ...CASOS_AULA.map((c) => ({ origen: `caso ${c.id}`, datos: c.datos, respuesta: c.respuesta, enunciado: c.enunciado })),
+  ...PRACTICAS.map((e) => ({ origen: `semilla ${e.semilla}`, datos: e.datos, respuesta: e.respuesta, enunciado: e.enunciado })),
+];
+
+test.describe('casos para clase · lógica', () => {
+  test('1 · doce casos con ids 1..12 sin huecos', () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS_AULA.map((c) => c.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+
+  test('2 · deterministas: dos resoluciones dan lo mismo', () => {
+    for (const caso of CASOS_AULA) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(a.ok, `caso ${caso.id}: ${a.error ?? ''}`).toBe(true);
+      expect(b.valor).toBe(a.valor);
+      expect(b.pasos).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta coincide con la resuelta a mano y con el volumen del test', () => {
+    CASOS_AULA.forEach((caso, i) => {
+      expect(caso.respuesta, `caso ${caso.id} frente a la cuenta a mano`).toBe(RESUELTAS_A_MANO[i]);
+      expect(caso.respuesta, `caso ${caso.id} frente al volumen del test`).toBe(red2(respuestaPropia(caso.datos, Math.PI)));
+    });
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta finita, desarrollo y pista', () => {
+    for (const caso of CASOS_AULA) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(40);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(Number.isFinite(caso.respuesta) && caso.respuesta > 0, `caso ${caso.id}`).toBe(true);
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      if (caso.unidad) expect(caso.respuestaTexto, `caso ${caso.id}`).toContain(caso.unidad);
+    }
+    expect(new Set(CASOS_AULA.map((c) => c.categoria))).toEqual(new Set(['abstracto', 'aplicado']));
+    expect(new Set(CASOS_AULA.map((c) => c.datos.figura)).size, 'las cinco figuras').toBe(5);
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad ni una moneda', () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Madrid|Barcelona|Bogotá|Lima|euros?|dólares?|pesos (mexicanos|colombianos|argentinos|chilenos))\b/i;
+    for (const t of TODOS) {
+      expect(PROHIBIDO.test(t.enunciado), t.origen).toBe(false);
+      expect(/\bESO\b/.test(t.enunciado), t.origen).toBe(false);
+    }
+  });
+
+  test('5.bis · lo que el enunciado PIDE coincide con lo que la solución MUESTRA', () => {
+    for (const caso of CASOS_AULA) {
+      const ultimo = sinEspacioDuro(caso.pasos[caso.pasos.length - 1]);
+      expect(ultimo, `caso ${caso.id}: el último paso enseña la cifra de la casilla`).toContain(sinEspacioDuro(caso.respuestaTexto));
+      expect(/dos decimales/.test(caso.enunciado), `caso ${caso.id}: pide redondear si y solo si hace falta`).toBe(caso.requiereRedondeo);
+      for (const texto of [caso.enunciado, caso.pista, ...caso.pasos]) {
+        expect(texto, `caso ${caso.id}`).not.toMatch(/\d ?%/);
+      }
+    }
+    // «Volumen de el cilindro» salió en la primera versión: la contracción va escrita.
+    for (const texto of [...CASOS_AULA.flatMap((c) => [c.enunciado, ...c.pasos]), ...PRACTICAS.flatMap((e) => [e.enunciado, ...e.pasos])]) {
+      expect(texto).not.toMatch(/\b[Dd]e el\b/);
+    }
+  });
+
+  test('5.ter · cada medida cabe en los deslizadores y está escrita en el enunciado', () => {
+    for (const t of TODOS) {
+      const figuras = [{ figura: t.datos.figura, medidas: t.datos.medidas }, ...(t.datos.otra ? [t.datos.otra] : [])];
+      for (const { figura, medidas } of figuras) {
+        for (const k of MEDIDAS_DE[figura]) {
+          const v = medidas[k];
+          if (k === 'h' && t.datos.pregunta === 'altura') {
+            expect(v, `${t.origen}: la altura es la incógnita`).toBeUndefined();
+            continue;
+          }
+          expect(v !== undefined && v >= 1 && v <= 50 && Number.isInteger(v * 2), `${t.origen}: ${k} = ${v}`).toBe(true);
+        }
+      }
+      // Lo que lee el alumno coincide con lo que calcula el motor. En una razón se escriben las
+      // medidas de la SEGUNDA figura (la de partida, o la de la misma base y altura).
+      const escritas = t.datos.otra ? t.datos.otra : { figura: t.datos.figura, medidas: t.datos.medidas };
+      for (const k of MEDIDAS_DE[escritas.figura]) {
+        const v = escritas.medidas[k];
+        if (v === undefined) continue;
+        const texto = k === 'r' && t.datos.diametroEnEnunciado ? comoTexto(2 * v) : comoTexto(v);
+        expect(t.enunciado, `${t.origen}: ${k}`).toContain(`${texto} ${t.datos.unidad}`);
+      }
+      if (t.datos.diametroEnEnunciado) expect(t.enunciado, t.origen).toMatch(/diámetro/);
+      if (t.datos.volumenDado !== undefined) expect(t.enunciado, t.origen).toContain(comoTexto(t.datos.volumenDado));
+    }
+  });
+
+  test('6 · el generador aleatorio es reproducible, variado y usa la misma aritmética', () => {
+    expect(generarEjercicioAleatorio(12345)).toEqual(generarEjercicioAleatorio(12345));
+    expect(new Set(PRACTICAS.map((e) => e.respuesta)).size, 'respuestas distintas').toBeGreaterThanOrEqual(15);
+    expect(new Set(PRACTICAS.map((e) => e.datos.pregunta)).size, 'tipos de pregunta').toBe(4);
+    expect(new Set(PRACTICAS.map((e) => e.datos.figura)).size, 'figuras').toBeGreaterThanOrEqual(4);
+    for (const e of PRACTICAS) {
+      expect(e.respuesta, `semilla ${e.semilla}`).toBe(red2(respuestaPropia(e.datos, Math.PI)));
+      expect(comprobarRespuesta(e.respuesta, e.respuesta, e.datos).correcto, `semilla ${e.semilla}`).toBe(true);
+      expect(/dos decimales/.test(e.enunciado), `semilla ${e.semilla}`).toBe(e.requiereRedondeo);
+    }
+  });
+
+  test('7 · convenio: con π = 3,14 o 22/7 se acierta; con π = 3, no; y lo exacto no admite margen', () => {
+    for (const t of TODOS) {
+      for (const pi of [3.14, 22 / 7]) {
+        const delLibro = red2(respuestaPropia(t.datos, pi));
+        expect(comprobarRespuesta(delLibro, t.respuesta, t.datos).correcto, `${t.origen}: suspende ${delLibro} (π = ${pi})`).toBe(true);
+      }
+      // dependeDePi se decide ejecutando el motor: aquí se contrasta con el volumen del test
+      const cambia = Math.abs(respuestaPropia(t.datos, 3.14) - respuestaPropia(t.datos, Math.PI)) > 1e-9;
+      expect(dependeDePi(t.datos), t.origen).toBe(cambia);
+      if (cambia) {
+        const conTres = red2(respuestaPropia(t.datos, 3));
+        expect(comprobarRespuesta(conTres, t.respuesta, t.datos).correcto, `${t.origen}: acepta π = 3 (${conTres})`).toBe(false);
+      }
+    }
+    const caso = (id: number) => CASOS_AULA[id - 1];
+    expect(comprobarRespuesta(904.32, caso(1).respuesta, caso(1).datos).correcto).toBe(true);
+    expect(comprobarRespuesta(864, caso(1).respuesta, caso(1).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(69.5, caso(2).respuesta, caso(2).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(269.99, caso(5).respuesta, caso(5).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(3.01, caso(11).respuesta, caso(11).datos).correcto).toBe(false);
+    expect(comprobarRespuesta(3, caso(11).respuesta, caso(11).datos).correcto).toBe(true);
+  });
+
+  test('7.bis · el corrector: errores típicos con nombre, lo imposible y lo que no es número', () => {
+    const caso = (id: number) => CASOS_AULA[id - 1];
+    const motivo = (v: number, id: number) => comprobarRespuesta(v, caso(id).respuesta, caso(id).datos).motivo;
+    expect(motivo(1847.26, 6)).toMatch(/diámetro como si fuera el radio/);
+    expect(motivo(235.62, 9)).toMatch(/factor 1\/3/);
+    expect(motivo(48, 7)).toMatch(/volumen en m³/);
+    expect(motivo(0.0042, 8)).toMatch(/dividido en vez de multiplicar/);
+    expect(motivo(0.125, 12)).toMatch(/al revés/);
+    expect(motivo(NaN, 3)).not.toContain('NaN');
+    expect(comprobarRespuesta(-282.74, caso(3).respuesta, caso(3).datos).correcto).toBe(false);
+    // un fallo cualquiera dice cuánto se ha desviado, con espacio duro antes de la unidad
+    expect(motivo(271, 5)).toBe('No es correcto. Te has desviado 1,00 cm³ de la respuesta.');
+  });
+
+  test('7.ter · una sola implementación: la página toma el volumen de casos.ts', () => {
+    const pagina = readFileSync('app/visualizador-volumenes/page.tsx', 'utf8');
+    expect(pagina).toMatch(/import \{[^}]*\bcalcVolumen\b[^}]*\} from '\.\/casos'/);
+    expect(pagina).not.toMatch(/function calcVolumen/);
+  });
+});
+
+test.describe('casos para clase · en la página', () => {
+  test('corrige el caso 6, avisa del diámetro, y el visualizador da la misma cifra', async ({ page }) => {
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: /^Caso 6:/ }).click();
+    await expect(seccion.getByRole('button', { name: /^Caso 6:/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(seccion).toContainText('7 cm de diámetro');
+
+    const casilla = seccion.locator('#casos-respuesta');
+    await casilla.fill('1847,26');
+    await seccion.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion.getByRole('alert')).toContainText('diámetro como si fuera el radio');
+
+    await casilla.fill('461,81');
+    await seccion.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion.getByRole('alert')).toContainText('¡Correcto!');
+
+    await seccion.getByRole('button', { name: 'Ver solución' }).click();
+    await expect(seccion).toContainText('r = 7 ÷ 2 = 3,5 cm');
+    await expect(seccion).toContainText('461,81 mL');
+
+    // El mismo cilindro en el visualizador: 147π = 461,81 → tramo [100, 100.000) → «461,8»
+    await elegirFigura(page, /^Cilindro$/);
+    await escribir(campo(page, 'Radio (r)'), '3,5');
+    await escribir(campo(page, 'Altura (h)'), '12');
+    await expect(valorVolumen(page)).toHaveText('461,8');
+  });
+
+  test('«Practicar» da un ejercicio y se corrige con su propia respuesta', async ({ page }) => {
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    const practicar = seccion.getByRole('button', { name: 'Practicar' });
+    await practicar.click();
+    await expect(practicar).toHaveAttribute('aria-pressed', 'true');
+    await expect(seccion.getByRole('heading', { name: 'Ejercicio de práctica' })).toBeVisible();
+    await seccion.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion.getByRole('alert')).toContainText('Escribe un número');
+    await expect(seccion.getByRole('alert')).not.toContainText('NaN');
+  });
 });
