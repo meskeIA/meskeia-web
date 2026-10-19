@@ -10,6 +10,7 @@ import {
   FISCAL_DEPENDENCIA_META,
   FISCAL_EMPLEADOS_HOGAR_META,
   PRESTACIONES_DEPENDENCIA_2025,
+  cuantiaMaximaPEVS,
   COTIZACION_EMPLEADOS_HOGAR_2026,
   HORAS_JORNADA_COMPLETA_MES,
   costeMinimoEmpleadorHogar,
@@ -100,9 +101,16 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
   const tienePrestacion = gradoDependencia !== 'no_valorado';
   const pevs = cuantiaPrestacion(gradoDependencia, 'PEVS');
   const pecef = cuantiaPrestacion(gradoDependencia, 'PECEF');
+  const sinValoracion = 'Sin valoración de dependencia, los costes son íntegramente privados. Solicitar la valoración es lo que abre el acceso a las prestaciones y a los servicios del SAAD.';
   const notaPublica = tienePrestacion
     ? `Con ${GRADO_ROMANO[gradoDependencia]} reconocido puedes solicitar la prestación vinculada a servicio (hasta ${formatCurrency(pevs)}/mes) o, si cuida un familiar, la de cuidados en el entorno familiar (hasta ${formatCurrency(pecef)}/mes). Son cuantías MÁXIMAS estatales y el copago las reduce según tu capacidad económica.`
-    : 'Sin valoración de dependencia, los costes son íntegramente privados. Solicitar la valoración es lo que abre el acceso a las prestaciones y a los servicios del SAAD.';
+    : sinValoracion;
+  // Cabo C0313: la vinculada al servicio de ATENCIÓN RESIDENCIAL tiene en Grado II la cuantía del
+  // Grado III (anexo IV del RD 1051/2013). Con Grado II la tarjeta decía 445,30 € donde son 747,25 €.
+  const pevsResidencial = tienePrestacion ? cuantiaMaximaPEVS(Number(gradoDependencia.slice(-1)), 'residencial') : 0;
+  const notaResidencia = tienePrestacion
+    ? `Con ${GRADO_ROMANO[gradoDependencia]} reconocido puedes solicitar la prestación vinculada al servicio de atención residencial (hasta ${formatCurrency(pevsResidencial)}/mes)${gradoDependencia === 'grado2' ? ', que en Grado II tiene la cuantía del Grado III' : ''}. Es una cuantía MÁXIMA estatal y el copago la reduce según tu capacidad económica.`
+    : sinValoracion;
 
   // ⚠️ 2026-10-04 (hallazgo 2878): «Coste mensual más alto en términos absolutos» era fijo, y
   //    desde unas 4,5 h/día la misma tarjeta llevaba la insignia «Menor coste mensual».
@@ -136,7 +144,8 @@ function calcularOpciones(horasDia: number, gradoDependencia: GradoDependencia):
       ],
       // Hallazgo 1124: la nota de ayudas se imprimía en SAD y cuidador y nunca aquí, pese
       // a que la PEVS está pensada precisamente para pagar una plaza residencial privada.
-      notaPublica,
+      // La de cuidados en el entorno familiar no se nombra aquí: no paga una residencia.
+      notaPublica: notaResidencia,
     },
     {
       id: 'sad',

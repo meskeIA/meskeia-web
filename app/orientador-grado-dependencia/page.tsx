@@ -11,6 +11,7 @@ import {
   GRADOS_DEPENDENCIA,
   GRADO_III_PLUS,
   PRESTACIONES_DEPENDENCIA_2025,
+  cuantiaMaximaPEVS,
 } from '@/data/fiscal';
 import { estimarBVD, type EstimacionBVD, type GradoBVD, type TipoApoyo } from './motor';
 
@@ -446,7 +447,7 @@ export default function OrientadorGradoDependencia() {
           </tbody>
         </table>
         <p className={styles.notaTabla}>
-          Cuantías máximas estatales: cada comunidad autónoma puede complementarlas y el copago las reduce según la capacidad económica. El {GRADO_III_PLUS.nombre} no tiene baremo propio: se reconoce a personas con Grado III y un diagnóstico de ELA avanzada u otra enfermedad de alta complejidad y curso irreversible, y da acceso a la prestación vinculada al servicio de ayuda a domicilio o a la de asistencia personal, con cuantías máximas propias que esta tabla no recoge (disposición adicional 17.ª de la Ley 39/2006, añadida por el RDL 11/2025).
+          Cuantías máximas estatales: cada comunidad autónoma puede complementarlas y el copago las reduce según la capacidad económica. La vinculada al servicio es la cuantía general, con dos excepciones del anexo IV del RD 1051/2013: vinculada a una plaza residencial, el Grado II llega a {formatCurrency(cuantiaMaximaPEVS(2, 'residencial'))}/mes (la del Grado III), y vinculada a un centro de día, el Grado I llega a {formatCurrency(cuantiaMaximaPEVS(1, 'centroDia'))}/mes (la del Grado II). El {GRADO_III_PLUS.nombre} no tiene baremo propio: se reconoce a personas con Grado III y un diagnóstico de ELA avanzada u otra enfermedad de alta complejidad y curso irreversible, y da acceso a la prestación vinculada al servicio de ayuda a domicilio o a la de asistencia personal, con cuantías máximas propias que esta tabla no recoge (disposición adicional 17.ª de la Ley 39/2006, añadida por el RDL 11/2025).
         </p>
       </div>
 

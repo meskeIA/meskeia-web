@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { PRESTACIONES_DEPENDENCIA_2025 } from '@/data/fiscal';
+import { PRESTACIONES_DEPENDENCIA_2025, cuantiaMaximaPEVS } from '@/data/fiscal';
 import { COSTES_MERCADO } from './costes';
 
 /** Las horquillas de mercado del FAQPage salen de COSTES_MERCADO, como las de la comparativa (hallazgo 2880). */
@@ -100,7 +100,7 @@ export const faqJsonLd = {
       name: '¿Las ayudas por dependencia cubren el coste de la residencia o del cuidador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Sí, parcialmente. El Sistema para la Autonomía y Atención a la Dependencia (SAAD) reconoce prestaciones según el grado (I, II o III). La prestación vinculada a servicio, que sirve para pagar una plaza residencial privada o un servicio acreditado, llega hasta ${pecef('PEVS', 1)} €/mes en Grado I, ${pecef('PEVS', 2)} € en Grado II y ${pecef('PEVS', 3)} € en Grado III. La prestación económica para cuidados en el entorno familiar va de ${pecef('PECEF', 1)} a ${pecef('PECEF', 3)} €/mes según el grado, y se cobra por cuidar en casa. Todas son cuantías máximas estatales: el copago las reduce según la capacidad económica.`,
+        text: `Sí, parcialmente. El Sistema para la Autonomía y Atención a la Dependencia (SAAD) reconoce prestaciones según el grado (I, II o III). La prestación vinculada a servicio, que sirve para pagar una plaza residencial privada o un servicio acreditado, llega hasta ${pecef('PEVS', 1)} €/mes en Grado I, ${pecef('PEVS', 2)} € en Grado II y ${pecef('PEVS', 3)} € en Grado III; para una plaza residencial, el Grado II tiene la cuantía del Grado III (${cuantiaMaximaPEVS(2, 'residencial').toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €). La prestación económica para cuidados en el entorno familiar va de ${pecef('PECEF', 1)} a ${pecef('PECEF', 3)} €/mes según el grado, y se cobra por cuidar en casa. Todas son cuantías máximas estatales: el copago las reduce según la capacidad económica.`,
       },
     },
     {

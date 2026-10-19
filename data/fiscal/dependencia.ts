@@ -300,6 +300,27 @@ export const PRESTACIONES_DEPENDENCIA_2025: PrestacionDependencia[] = [
   { grado: 3, tipo: 'PAP',   nombre: 'Asistencia personal (Grado III)',            descripcion: 'Para contratar asistente personal (vida activa)',  cuantiaMaximaMensual: 747.25 },
 ];
 
+/** Servicio al que se vincula la PEVS: el anexo IV fija dos excepciones a la cuantía general. */
+export type ServicioVinculadoPEVS = 'general' | 'residencial' | 'centroDia';
+
+/**
+ * Cuantía máxima mensual de la prestación vinculada al servicio según el servicio que paga.
+ * Anexo IV del RD 1051/2013 (BOE-A-2013-13811, consolidado leído el 19/10/2026, cabo C0313):
+ *   «En el supuesto de la prestación económica vinculada al servicio de atención residencial, la
+ *    cuantía máxima para el grado II será igual a la establecida para el grado III» y «En el
+ *    supuesto de la prestación económica vinculada al servicio de centro de día, la cuantía
+ *    máxima para el grado I será igual a la establecida para el grado II».
+ * Grado fuera de 1-3 → 0.
+ */
+export function cuantiaMaximaPEVS(grado: number, servicio: ServicioVinculadoPEVS = 'general'): number {
+  const gradoCuantia =
+    servicio === 'residencial' && grado === 2 ? 3
+      : servicio === 'centroDia' && grado === 1 ? 2
+        : grado;
+  return PRESTACIONES_DEPENDENCIA_2025.find(p => p.grado === gradoCuantia && p.tipo === 'PEVS')
+    ?.cuantiaMaximaMensual ?? 0;
+}
+
 // ─── Servicios del catálogo SAAD ─────────────────────────────────────────────
 
 export interface ServicioSAAD {

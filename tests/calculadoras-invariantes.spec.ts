@@ -106,7 +106,7 @@ import {
 } from '../lib/calculadoras/legitimas';
 import { calcularRetencionDividendos } from '../lib/calculadoras/retencionDividendos';
 import { TRAMOS_IRPF_2025, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, REDUCCION_TRIBUTACION_CONJUNTA_2025, cuotaEscalaGeneral, desglosarEscalaGeneral, calcularCuotaIntegraGeneral } from '../data/fiscal/irpf';
-import { DEDUCCIONES_IRPF_DISCAPACIDAD_2025 } from '../data/fiscal/dependencia';
+import { DEDUCCIONES_IRPF_DISCAPACIDAD_2025, cuantiaMaximaPEVS } from '../data/fiscal/dependencia';
 import { DEDUCCION_MATERNIDAD_IRPF } from '../data/fiscal/maternidad';
 import { COEFICIENTES_IIVTNU_2025 } from '../data/fiscal/inmuebles';
 import { TRAMOS_GANANCIAS_PATRIMONIALES_2025, RETENCIONES_IS_2025, TIPOS_IS_2025 } from '../data/fiscal';
@@ -4985,6 +4985,19 @@ test.describe('Unificación 10/09 — deducciones de IRPF por discapacidad y mat
       }
     }
     expect(fallos, `${fallos.length} descuadres`).toEqual([]);
+  });
+});
+
+test.describe('Dependencia — cuantía de la PEVS según el servicio (cabo C0313)', () => {
+  test('anexo IV RD 1051/2013: residencial en grado II = grado III; centro de día en grado I = grado II', () => {
+    // BOE-A-2013-13811, consolidado leído el 19/10/2026: «En el supuesto de la prestación
+    // económica vinculada al servicio de atención residencial, la cuantía máxima para el grado II
+    // será igual a la establecida para el grado III» y lo mismo del centro de día en grado I con
+    // el II. Cuantías generales: 313,50 · 445,30 · 747,25.
+    expect([1, 2, 3].map(g => cuantiaMaximaPEVS(g))).toEqual([313.5, 445.3, 747.25]);
+    expect([1, 2, 3].map(g => cuantiaMaximaPEVS(g, 'residencial'))).toEqual([313.5, 747.25, 747.25]);
+    expect([1, 2, 3].map(g => cuantiaMaximaPEVS(g, 'centroDia'))).toEqual([445.3, 445.3, 747.25]);
+    expect(cuantiaMaximaPEVS(0, 'residencial')).toBe(0);
   });
 });
 

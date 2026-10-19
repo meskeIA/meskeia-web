@@ -175,10 +175,17 @@ test.describe('Residencia vs Cuidado en Casa', () => {
     // Hallazgo 1124 · la nota de ayudas también en la residencia: la PEVS está pensada
     // precisamente para pagar una plaza residencial privada.
     await expect(tarjeta(page, 'Residencia privada').locator('[class*="notaPublica"]')).toHaveCount(1);
-    // Hallazgo 1116 · las cuantías salen de PRESTACIONES_DEPENDENCIA_2025, no escritas a mano.
-    // Grado II → PEVS 445,30 € · PECEF 315,90 €.
-    await expect(tarjeta(page, 'Residencia privada')).toContainText('445,30');
-    await expect(tarjeta(page, 'Residencia privada')).toContainText('315,90');
+    // Hallazgo 1116 · las cuantías salen de data/fiscal, no escritas a mano.
+    // REPARADO (cabo C0313, 19/10/2026): este test pedía aquí 445,30 € y 315,90 €, la PEVS
+    // general y la de cuidados en el entorno familiar. El anexo IV del RD 1051/2013 dice que la
+    // vinculada al servicio de ATENCIÓN RESIDENCIAL tiene en grado II la cuantía del grado III:
+    // 747,25 €. Y la de cuidados en el entorno familiar no paga una residencia.
+    await expect(tarjeta(page, 'Residencia privada')).toContainText('747,25');
+    await expect(tarjeta(page, 'Residencia privada')).toContainText('atención residencial');
+    await expect(tarjeta(page, 'Residencia privada')).not.toContainText('445,30');
+    // En el domicilio sigue la vinculada general y la de cuidados en el entorno familiar.
+    await expect(tarjeta(page, /SAD en domicilio/)).toContainText('445,30');
+    await expect(tarjeta(page, /SAD en domicilio/)).toContainText('315,90');
   });
 
   test('CASO 2 — 24 h/día: el suelo sale del SMI y hacen falta cinco contratos', async ({ page }) => {
@@ -366,9 +373,11 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     // 75 h/mes × 9,55 × 1,236 = 885,285 → 885 · 885 × 1,35 = 1.194,75 → 1.195
     expect(await coste(page, /Cuidado en casa/)).toBe(norm('885,00 € – 1195,00 €/mes'));
     await expect(tarjeta(page, /Cuidado en casa/).locator('[class*="opcionBadge"]')).toHaveText('Menor coste mensual');
-    // Grado I → PEVS 313,50 € · PECEF 180 € (PRESTACIONES_DEPENDENCIA_2025)
+    // Grado I → PEVS 313,50 € · PECEF 180 € (PRESTACIONES_DEPENDENCIA_2025). En grado I la
+    // residencial no tiene excepción en el anexo IV: 313,50 también en la residencia; la de
+    // cuidados en el entorno familiar ya no se nombra en ella (cabo C0313).
     await expect(tarjeta(page, 'Residencia privada')).toContainText('313,50');
-    await expect(tarjeta(page, 'Residencia privada')).toContainText('180,00');
+    await expect(tarjeta(page, /Cuidado en casa/)).toContainText('180,00');
   });
 
   test('CASO 7 — 5 h/día: la residencia pasa a ser la de menor coste mensual', async ({ page }) => {

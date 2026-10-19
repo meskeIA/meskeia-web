@@ -19,6 +19,7 @@ import {
   PRESTACIONES_DEPENDENCIA_2025,
   SERVICIOS_SAAD,
   COPAGO_DEPENDENCIA_2025,
+  cuantiaMaximaPEVS,
 } from '@/data/fiscal';
 
 // ===== TIPOS =====
@@ -49,6 +50,21 @@ const ICONOS_SERVICIO: Record<string, string> = {
 /** Cuantía máxima mensual del módulo (anexo IV del RD 1051/2013). Nunca teclearla aquí. */
 function cuantia(grado: number, tipo: 'PEVS' | 'PECEF' | 'PAP'): number {
   return PRESTACIONES_DEPENDENCIA_2025.find((p) => p.grado === grado && p.tipo === tipo)?.cuantiaMaximaMensual ?? 0;
+}
+
+/**
+ * Las dos excepciones del anexo IV a la PEVS general (cabo C0313): vinculada a una plaza
+ * residencial, el grado II cobra como el III; a un centro de día, el grado I como el II.
+ * Devuelve la frase del grado que tiene excepción, o null.
+ */
+function excepcionPEVS(grado: number): string | null {
+  if (grado === 2) {
+    return `Vinculada a una plaza residencial: hasta ${formatCurrency(cuantiaMaximaPEVS(2, 'residencial'))}/mes, la cuantía del Grado III.`;
+  }
+  if (grado === 1) {
+    return `Vinculada a un centro de día: hasta ${formatCurrency(cuantiaMaximaPEVS(1, 'centroDia'))}/mes, la cuantía del Grado II.`;
+  }
+  return null;
 }
 
 export default function EstimacionPrestacionesDependencia() {
@@ -166,6 +182,9 @@ export default function EstimacionPrestacionesDependencia() {
                   <span className={styles.prestacionTipo}>{p.tipo}</span>
                   <p className={styles.prestacionNombre}>{p.nombre}</p>
                   <p className={styles.prestacionDesc}>{p.descripcion}</p>
+                  {p.tipo === 'PEVS' && excepcionPEVS(p.grado) && (
+                    <p className={styles.prestacionDesc}>{excepcionPEVS(p.grado)}</p>
+                  )}
                 </div>
                 <div className={styles.prestacionCuantia}>
                   {formatCurrency(p.cuantiaMaximaMensual)}
@@ -287,6 +306,13 @@ export default function EstimacionPrestacionesDependencia() {
               </tbody>
             </table>
           </div>
+          <p>
+            La fila PEVS es la cuantía general. El anexo IV del RD 1051/2013 fija dos excepciones: en
+            Grado II, la vinculada a una plaza residencial llega a{' '}
+            {formatCurrency(cuantiaMaximaPEVS(2, 'residencial'))}/mes, la del Grado III; y en Grado I,
+            la vinculada a un centro de día llega a {formatCurrency(cuantiaMaximaPEVS(1, 'centroDia'))}/mes,
+            la del Grado II.
+          </p>
         </section>
 
         {/* Escenarios */}
