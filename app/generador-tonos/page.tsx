@@ -1653,12 +1653,12 @@ export default function GeneradorTonosPage() {
             disabled={midiendo !== null || medidorActivo}
           >
             {midiendo === 'A' ? (
-              'Midiendo A…'
+              <span key="midiendo">Midiendo A…</span>
             ) : (
-              <>
+              <span key="medir">
                 <span aria-hidden="true">{curvaA ? '🔁' : '🎙️'}</span>{' '}
                 {curvaA ? 'Repetir medida A' : 'Medir A'}
-              </>
+              </span>
             )}
           </button>
           <button
@@ -1668,12 +1668,12 @@ export default function GeneradorTonosPage() {
             disabled={midiendo !== null || medidorActivo}
           >
             {midiendo === 'B' ? (
-              'Midiendo B…'
+              <span key="midiendo">Midiendo B…</span>
             ) : (
-              <>
+              <span key="medir">
                 <span aria-hidden="true">{curvaB ? '🔁' : '🎙️'}</span>{' '}
                 {curvaB ? 'Repetir medida B' : 'Medir B'}
-              </>
+              </span>
             )}
           </button>
           {(curvaA || curvaB) && (

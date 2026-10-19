@@ -592,13 +592,13 @@ export default function SimuladorModulosVsDirectaPage() {
               <>
                 <span className={styles.diferenciaTitulo}>
                   {diferencia === 0 ? (
-                    'Con estos datos, el coste anual es el mismo en los dos regímenes.'
+                    <span key="igual">Con estos datos, el coste anual es el mismo en los dos regímenes.</span>
                   ) : (
-                    <>
+                    <span key="distinto">
                       Con estos datos, el coste anual en Estimación Directa es{' '}
                       <strong>{formatCurrency(Math.abs(diferencia))}</strong>{' '}
                       {diferencia > 0 ? 'mayor' : 'menor'} que en módulos.
-                    </>
+                    </span>
                   )}
                 </span>
                 <span className={styles.diferenciaDetalle}>

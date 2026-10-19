@@ -51,6 +51,8 @@ const CASOS: Caso[] = [
   { slug: 'generador-tipografias', boton: /^📋 Copiar$/, despues: /Copiado/ },
   { slug: 'generador-gradientes', boton: /^📋 Copiar$/, despues: /Copiado/ },
   { slug: 'cara-o-cruz', boton: /Lanzar Moneda/, despues: /Lanzando/ },
+  // La encontró el candado check:ternario-traducido al nacer (19/10/2026): el censo de la tanda no la vio
+  { slug: 'generador-incipit', boton: /^📋 Copiar$/, despues: /Copiado/ },
 ];
 
 test.describe('ternario de texto y fragmento con la página traducida (C0262)', () => {

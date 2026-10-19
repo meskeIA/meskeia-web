@@ -293,7 +293,7 @@ export default function GeneradorIncipitPage() {
                   onClick={() => copiar(inc.texto, inc.id)}
                   aria-label={copiado === inc.id ? 'Copiado al portapapeles' : 'Copiar al portapapeles'}
                 >
-                  {copiado === inc.id ? '✓ Copiado' : <><span aria-hidden="true">📋</span> Copiar</>}
+                  {copiado === inc.id ? <span key="copiado">✓ Copiado</span> : <span key="copiar"><span aria-hidden="true">📋</span> Copiar</span>}
                 </button>
               </article>
             );

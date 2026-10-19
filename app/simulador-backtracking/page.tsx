@@ -286,7 +286,7 @@ export default function SimuladorBacktracking() {
               aria-pressed={auto}
               disabled={pasoIdx >= total - 1}
             >
-              {auto ? 'Pausar' : <>Auto <span aria-hidden="true">▶▶</span></>}
+              {auto ? <span key="pausar">Pausar</span> : <span key="auto">Auto <span aria-hidden="true">▶▶</span></span>}
             </button>
             <button
               type="button"

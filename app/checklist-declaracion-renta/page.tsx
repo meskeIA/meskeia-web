@@ -298,8 +298,8 @@ export default function ChecklistDeclaracionRentaPage() {
         <div className={styles.progresoHeader}>
           <span className={styles.progresoTexto}>
             {todoCompleto
-              ? <><span aria-hidden="true">✅</span> ¡Tienes todo preparado para hacer la renta!</>
-              : `${itemsCompletados} de ${totalItems} documentos verificados`}
+              ? <span key="completo"><span aria-hidden="true">✅</span> ¡Tienes todo preparado para hacer la renta!</span>
+              : <span key="progreso">{`${itemsCompletados} de ${totalItems} documentos verificados`}</span>}
           </span>
           <span className={styles.progresoPorcentaje}>{porcentaje}%</span>
         </div>

@@ -381,8 +381,8 @@ export default function EstimadorPlusvalidasIRPFPage() {
                 </span>
                 <p className={styles.cuotaTipoEfectivo}>
                   {resultado.esGanancia
-                    ? `Tipo efectivo orientativo: ${formatNumber(resultado.tipoEfectivo, 2)}%`
-                    : <><span aria-hidden="true">⬇️</span>{' No hay ganancia patrimonial — posible pérdida compensable'}</>}
+                    ? <span key="ganancia">{`Tipo efectivo orientativo: ${formatNumber(resultado.tipoEfectivo, 2)}%`}</span>
+                    : <span key="perdida"><span aria-hidden="true">⬇️</span>{' No hay ganancia patrimonial — posible pérdida compensable'}</span>}
                 </p>
               </div>
 

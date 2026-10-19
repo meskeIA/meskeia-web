@@ -233,7 +233,7 @@ export default function ChecklistDocumentosViajePage() {
       <div className={`${styles.progresoWrapper} ${todoCompleto ? styles.progresoCompleto : ''}`}>
         <div className={styles.progresoHeader}>
           <span className={styles.progresoTexto}>
-            {todoCompleto ? <><span aria-hidden="true">✅</span> ¡Todo listo para el viaje!</> : `${itemsCompletados} de ${totalItems} documentos verificados`}
+            {todoCompleto ? <span key="completo"><span aria-hidden="true">✅</span> ¡Todo listo para el viaje!</span> : <span key="progreso">{`${itemsCompletados} de ${totalItems} documentos verificados`}</span>}
           </span>
           <span className={styles.progresoPorcentaje}>{porcentaje}%</span>
         </div>

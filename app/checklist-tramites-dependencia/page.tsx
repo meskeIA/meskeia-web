@@ -229,8 +229,8 @@ export default function ChecklistTramitesDependenciaPage() {
           <div className={styles.progresoHeader}>
             <span className={styles.progresoTexto}>
               {todoCompleto
-                ? <><span aria-hidden="true">🎉</span> ¡Has completado todos los pasos!</>
-                : `${itemsCompletados} de ${totalItems} pasos completados`}
+                ? <span key="completo"><span aria-hidden="true">🎉</span> ¡Has completado todos los pasos!</span>
+                : <span key="progreso">{`${itemsCompletados} de ${totalItems} pasos completados`}</span>}
             </span>
             <span className={styles.progresoPorcentaje}>{porcentaje}%</span>
           </div>
