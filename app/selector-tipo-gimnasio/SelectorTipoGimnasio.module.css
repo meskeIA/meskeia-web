@@ -87,6 +87,12 @@
   line-height: 1.4;
 }
 
+/* El enunciado y el nombre del resultado reciben el foco por programa (tabIndex −1, hallazgos
+   3184 y 3185): no son controles, así que no se les pinta el anillo. */
+.recibeFoco:focus {
+  outline: none;
+}
+
 /* Opciones */
 .opciones {
   display: flex;

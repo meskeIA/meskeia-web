@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { margenBarraLogo } from '@/lib';
 import {
   MeskeiaLogo,
   Footer,
@@ -210,6 +211,53 @@ export default function SelectorTipoGimnasio() {
   const [respuestas, setRespuestas] = useState<number[]>(Array(PREGUNTAS.length).fill(-1));
   const [mostrarResultado, setMostrarResultado] = useState(false);
 
+  // «Siguiente» se desactiva al llegar la pregunta nueva (sin respuesta), y «Ver mi resultado» y
+  // «Repetir el test» sustituyen la pantalla entera: el foco caía a <body> y la vista se quedaba
+  // donde estaba, con el enunciado o el nombre del resultado por encima del borde o bajo la barra
+  // fija del logo (hallazgos 3184 y 3185; receta 1680/2657 de selector-smartphone). Se lleva el
+  // foco al enunciado nuevo o al nombre del resultado y, si no están enteros a la vista y por
+  // debajo de la barra, se suben a su sitio (el hueco lo da el scroll-padding del documento).
+  // Solo tras una navegación: al cargar, el foco no se mueve.
+  const enunciado = useRef<HTMLHeadingElement>(null);
+  const nombreResultado = useRef<HTMLHeadingElement>(null);
+  const navegado = useRef(false);
+  useEffect(() => {
+    if (!navegado.current) return;
+    const destino = mostrarResultado ? nombreResultado.current : enunciado.current;
+    if (!destino) return;
+    const caja = destino.getBoundingClientRect();
+    if (caja.top < margenBarraLogo() || caja.bottom > window.innerHeight) {
+      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
+    destino.focus({ preventScroll: true });
+  }, [mostrarResultado, preguntaActual]);
+
+  /**
+   * Doble clic y dos toques seguidos (hallazgo 3183; receta `clicDeMas` de selector-smartphone,
+   * 2659, con la guarda en captura sobre window de selector-alquiler-vs-compra, 3111). Las
+   * preguntas tienen alturas distintas, la botonera se mueve bajo el dedo y el segundo toque
+   * marcaba una opción de la pregunta nueva o caía en «Anterior». Un clic se ignora cuando es el
+   * 2.º de una ráfaga (`detail` > 1, que el teclado no produce) Y el clic anterior de la app
+   * cambió de pantalla. En captura sobre window, también alcanza los enlaces ajenos.
+   */
+  const ultimoCambioPantalla = useRef(false);
+  useEffect(() => {
+    function filtrar(e: MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantalla.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantalla.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+  const cambiaPantalla = () => {
+    ultimoCambioPantalla.current = true;
+    navegado.current = true;
+  };
+
   const totalPreguntas = PREGUNTAS.length;
   const seleccionActual = respuestas[preguntaActual];
 
@@ -295,6 +343,8 @@ export default function SelectorTipoGimnasio() {
   }
 
   function siguientePregunta() {
+    if (seleccionActual < 0) return;
+    cambiaPantalla();
     if (preguntaActual < totalPreguntas - 1) {
       setPreguntaActual(preguntaActual + 1);
     } else {
@@ -304,11 +354,13 @@ export default function SelectorTipoGimnasio() {
 
   function anteriorPregunta() {
     if (preguntaActual > 0) {
+      cambiaPantalla();
       setPreguntaActual(preguntaActual - 1);
     }
   }
 
   function reiniciar() {
+    cambiaPantalla();
     setPreguntaActual(0);
     setRespuestas(Array(PREGUNTAS.length).fill(-1));
     setMostrarResultado(false);
@@ -338,7 +390,8 @@ export default function SelectorTipoGimnasio() {
         <div className={styles.resultado}>
           <div className={styles.resultadoCard}>
             <div className={styles.resultadoIcono} aria-hidden="true">{resultado.icono}</div>
-            <h2>{resultado.nombre}</h2>
+            {/* Recibe el foco al llegar al resultado (tabIndex=-1, hallazgo 3185). */}
+            <h2 ref={nombreResultado} tabIndex={-1} className={styles.recibeFoco}>{resultado.nombre}</h2>
             <p>{resultado.descripcion}</p>
 
             {/* Lo declarado que descarta o que choca con la recomendación, y el empate (3179-3182). */}
@@ -497,7 +550,8 @@ export default function SelectorTipoGimnasio() {
 
         {/* Pregunta */}
         <div className={styles.pregunta}>
-          <h2>{pregunta.texto}</h2>
+          {/* Recibe el foco al cambiar de pregunta (tabIndex=-1, hallazgo 3184). */}
+          <h2 ref={enunciado} tabIndex={-1} className={styles.recibeFoco}>{pregunta.texto}</h2>
           <div className={styles.opciones} role="radiogroup" aria-label={pregunta.texto}>
             {pregunta.opciones.map((opcion, idx) => (
               <button

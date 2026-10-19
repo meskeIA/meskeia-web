@@ -345,7 +345,7 @@ test.describe('invariante de familia y accesibilidad', () => {
     // ABIERTO (inspector 10/10/2026). «Siguiente» se desactiva al llegar la pregunta nueva sin
     // responder y el foco, que estaba en él, cae a <body>: medidos 17 Tab (Apps relacionadas,
     // catálogo, Delegum…) hasta la primera opción de la pregunta 2. Igual con «Anterior» en la 1.
-    test.fail();
+    // REPARADO el 19/10/2026 (3184): el foco va al enunciado (h2 con tabIndex −1).
     await abrir(page);
     await radios(page).first().click();
     await page.getByRole('button', { name: 'Siguiente pregunta' }).focus();
@@ -358,8 +358,9 @@ test.describe('invariante de familia y accesibilidad', () => {
   test('ABIERTO: «Repetir el test» deja a la vista la pregunta 1', async ({ page }) => {
     // ABIERTO (inspector 10/10/2026). A 1.280 × 720, pulsando «Repetir el test» con la página en
     // scrollY 623, la pregunta 1 aparece con el enunciado en y −189 (por encima del borde) y el
-    // foco en <body>.
-    test.fail();
+    // foco en <body>. REPARADO (3185): el test.fail ya pasaba en la suite del 14/10 (cabo C0248,
+    // probablemente por el scroll-padding de cd462414); desde el 19/10/2026 la app lleva además el
+    // foco y la vista al enunciado.
     test.setTimeout(60_000);
     await abrir(page);
     await responder(page, NORMAL_YOGA);
@@ -453,7 +454,7 @@ test.describe('móvil 360 px', () => {
     // referencia). La pregunta 3 es más alta que la 2 (sus opciones ocupan dos líneas a 360 px)
     // y la botonera baja: el segundo toque, en el mismo punto, cae en «Me da igual, me adapto a
     // cualquier situación». Medido igual con el botón a media pantalla y abajo del todo.
-    test.fail();
+    // REPARADO el 19/10/2026 (3183): guarda en captura sobre window.
     test.setTimeout(60_000);
     await abrir(page);
     await prepararTransicion(page, 1);
@@ -468,8 +469,7 @@ test.describe('móvil 360 px', () => {
     // ABIERTO (inspector 10/10/2026). La pregunta 4 es más baja que la 3 y la botonera sube: el
     // segundo toque cae en «← Anterior» (a ≤ 480 px va debajo de «Siguiente») y deshace el avance.
     // A 390 px pasa también en las transiciones 6→7 y 7→8; la 8→9 marca «La comodidad y poder
-    // entrenar sin desplazarme» (casa +3) a 360 y 390 px.
-    test.fail();
+    // entrenar sin desplazarme» (casa +3) a 360 y 390 px. REPARADO el 19/10/2026 (3183).
     test.setTimeout(60_000);
     await abrir(page);
     await prepararTransicion(page, 2);
@@ -483,7 +483,7 @@ test.describe('móvil 360 px', () => {
     // ABIERTO (inspector 10/10/2026). La app no mueve ni el foco ni la vista: con el botón a
     // media pantalla, el enunciado de las preguntas 2 a 10 queda POR ENCIMA del borde en 9 de 9
     // transiciones (P2 en y −242..−191). A 390 px, P3 y P9 quedan bajo la barra del logo.
-    test.fail();
+    // REPARADO el 19/10/2026 (3184).
     test.setTimeout(60_000);
     await abrir(page);
     await radios(page).last().tap();
@@ -498,8 +498,7 @@ test.describe('móvil 360 px', () => {
   test('ABIERTO: al tocar «Ver mi resultado» se ve el nombre del resultado y tiene (o lleva) el foco', async ({ page }) => {
     // ABIERTO (inspector 10/10/2026). El resultado sustituye al cuestionario en el sitio: con el
     // botón a media pantalla se aterriza en scrollY 595, con el <h1> «Tu resultado» en y −515 y
-    // el nombre (h2) en y −151, y el foco en <body>.
-    test.fail();
+    // el nombre (h2) en y −151, y el foco en <body>. REPARADO el 19/10/2026 (3185).
     test.setTimeout(60_000);
     await abrir(page);
     await prepararTransicion(page, 9);
@@ -577,7 +576,8 @@ test('ABIERTO: «Siguiente», la opción marcada y «Anterior» llegan a 4,5:1',
   // 2,45:1 en oscuro · opción marcada (--primary sobre su tinte) 3,56:1 · «← Anterior» (--primary)
   // 3,93:1 en claro. «Repetir el test», con el mismo color, también da 3,93:1 (medido aparte; aquí
   // no se recorre el test entero). La referencia lo resolvió con --primary-boton / --primary-texto (1682).
-  test.fail();
+  // REPARADO (3186) por la campaña de contraste de marca C0070 (dfaf84a2 y 4488bd1d): el test.fail
+  // ya pasaba en la suite del 18/10/2026 (cabo C0248).
   test.setTimeout(60_000);
   await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
   await page.goto('/selector-tipo-gimnasio/');
@@ -585,6 +585,10 @@ test('ABIERTO: «Siguiente», la opción marcada y «Anterior» llegan a 4,5:1',
   const medidas: Record<string, number> = {};
   await radios(page).first().click();
   await page.mouse.move(0, 0);
+  // «Siguiente» pasa de disabled (opacity 0,5) a activo con una transición: medido sin esperar,
+  // daba la mitad de camino (2,54:1, 19/10/2026), no el color asentado.
+  await expect(page.getByRole('button', { name: 'Siguiente pregunta' })).toBeEnabled();
+  await page.waitForFunction(() => document.getAnimations().every((a) => !(a instanceof CSSTransition) || a.playState !== 'running'));
   medidas['opción marcada'] = await contrasteMinimo(page, '[class*="seleccionada"]');
   medidas['Siguiente, claro'] = await contrasteMinimo(page, '[class*="btnPrimary"]');
   await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
