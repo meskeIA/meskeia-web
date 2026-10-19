@@ -33,7 +33,7 @@ import { calcularPensionPublica } from '@/lib/calculadoras/pensionPublica';
 import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
 import { calcularComplementoBrechaGenero, FECHA_MINIMA_HECHO_CAUSANTE, type SexoBeneficiario as SexoBeneficiarioBG, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
 // Pagas y doctrina del complemento, citadas desde el módulo y no tecleadas (residuo de 2245/2246)
-import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META, PLAZO_AUTOLIQUIDACION_DONACIONES, REDUCCION_SEGURO_VIDA_MAX_IS } from '@/data/fiscal';
+import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META, PLAZO_AUTOLIQUIDACION_DONACIONES, REDUCCION_SEGURO_VIDA_MAX_IS, cuantiaMaximaPEVS } from '@/data/fiscal';
 const PAGAS_BG = COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales;
 const DOCTRINA_BG = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 // Concurrencia entre progenitores y cómo se comparan las sumas (art. 60.7 LGSS, hallazgo 2538)
@@ -2955,6 +2955,9 @@ function crearServidorDelegum(): McpServer {
           '',
           `💶 **Prestaciones económicas (máximo mensual, antes de copago):**`,
           ...r.prestaciones.map(p => `  • ${p.nombre}: hasta ${fmt(p.cuantiaMaximaMensual)} €/mes — ${p.descripcion}`),
+          // Anexo IV del RD 1051/2013 (cabo C0313): la vinculada tiene dos excepciones por servicio.
+          grado === 2 ? `  • Vinculada al servicio de atención residencial: hasta ${fmt(cuantiaMaximaPEVS(2, 'residencial'))} €/mes, la cuantía del Grado III (anexo IV RD 1051/2013)` : '',
+          grado === 1 ? `  • Vinculada al servicio de centro de día: hasta ${fmt(cuantiaMaximaPEVS(1, 'centroDia'))} €/mes, la cuantía del Grado II (anexo IV RD 1051/2013)` : '',
           '',
           `🛠️ **Servicios disponibles:** ${r.serviciosDisponibles.map(s => s.nombre).join(', ')}`,
           r.serviciosNoDisponibles.length > 0 ? `🚫 No disponibles en este grado: ${r.serviciosNoDisponibles.map(s => s.nombre).join(', ')}` : '',
