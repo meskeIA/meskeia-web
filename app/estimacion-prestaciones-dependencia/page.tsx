@@ -46,6 +46,11 @@ const ICONOS_SERVICIO: Record<string, string> = {
   prevencion: '💪',
 };
 
+/** Cuantía máxima mensual del módulo (anexo IV del RD 1051/2013). Nunca teclearla aquí. */
+function cuantia(grado: number, tipo: 'PEVS' | 'PECEF' | 'PAP'): number {
+  return PRESTACIONES_DEPENDENCIA_2025.find((p) => p.grado === grado && p.tipo === tipo)?.cuantiaMaximaMensual ?? 0;
+}
+
 export default function EstimacionPrestacionesDependencia() {
   const [gradoSeleccionado, setGradoSeleccionado] = useState<number | null>(null);
 
@@ -233,21 +238,21 @@ export default function EstimacionPrestacionesDependencia() {
               <tbody>
                 <tr>
                   <td><strong>PEVS</strong> — Vinculada a servicio</td>
-                  <td>{formatCurrency(300)}/mes</td>
-                  <td>{formatCurrency(426.12)}/mes</td>
-                  <td>{formatCurrency(833.96)}/mes</td>
+                  <td>{formatCurrency(cuantia(1, 'PEVS'))}/mes</td>
+                  <td>{formatCurrency(cuantia(2, 'PEVS'))}/mes</td>
+                  <td>{formatCurrency(cuantia(3, 'PEVS'))}/mes</td>
                 </tr>
                 <tr>
                   <td><strong>PECEF</strong> — Cuidados entorno familiar</td>
-                  <td>{formatCurrency(153)}/mes</td>
-                  <td>{formatCurrency(286.66)}/mes</td>
-                  <td>{formatCurrency(449.77)}/mes</td>
+                  <td>{formatCurrency(cuantia(1, 'PECEF'))}/mes</td>
+                  <td>{formatCurrency(cuantia(2, 'PECEF'))}/mes</td>
+                  <td>{formatCurrency(cuantia(3, 'PECEF'))}/mes</td>
                 </tr>
                 <tr>
                   <td><strong>PAP</strong> — Asistencia personal</td>
-                  <td>No disponible</td>
-                  <td>No disponible</td>
-                  <td>{formatCurrency(833.96)}/mes</td>
+                  <td>{formatCurrency(cuantia(1, 'PAP'))}/mes</td>
+                  <td>{formatCurrency(cuantia(2, 'PAP'))}/mes</td>
+                  <td>{formatCurrency(cuantia(3, 'PAP'))}/mes</td>
                 </tr>
                 <tr>
                   <td><strong>Teleasistencia</strong></td>
@@ -295,7 +300,7 @@ export default function EstimacionPrestacionesDependencia() {
               </div>
               <p>
                 María, 72 años, con Grado II. Su hija la cuida en casa. Solicita la PECEF
-                (hasta {formatCurrency(286.66)}/mes). Además, la hija queda dada de alta
+                (hasta {formatCurrency(cuantia(2, 'PECEF'))}/mes). Además, la hija queda dada de alta
                 en la Seguridad Social como cuidadora no profesional con cuota 100% bonificada
                 por el Estado.
               </p>
@@ -311,7 +316,7 @@ export default function EstimacionPrestacionesDependencia() {
               <p>
                 Antonio, 85 años, con Grado III y gran dependencia. No puede ser atendido en casa.
                 Solicita plaza en residencia pública concertada. Si no hay plaza disponible, puede
-                solicitar la PEVS (hasta {formatCurrency(833.96)}/mes) para contratar una residencia
+                solicitar la PEVS (hasta {formatCurrency(cuantia(3, 'PEVS'))}/mes) para contratar una residencia
                 privada acreditada.
               </p>
               <div className={styles.escenarioResultado}>
@@ -339,7 +344,7 @@ export default function EstimacionPrestacionesDependencia() {
               </div>
               <p>
                 Luis, 45 años, con Grado III por lesión medular. Quiere mantener una vida activa
-                y trabajar. Solicita la PAP (hasta {formatCurrency(833.96)}/mes) para contratar un
+                y trabajar. Solicita la PAP (hasta {formatCurrency(cuantia(3, 'PAP'))}/mes) para contratar un
                 asistente personal que le ayude en las actividades diarias y el desplazamiento al trabajo.
               </p>
               <div className={styles.escenarioResultado}>
@@ -366,7 +371,7 @@ export default function EstimacionPrestacionesDependencia() {
             <div className={styles.faqItem}>
               <h4>¿Quién puede solicitar la PAP (Asistencia Personal)?</h4>
               <p>
-                La PAP solo está disponible para personas con Grado III (Gran Dependencia). Su finalidad
+                La PAP se reconoce en cualquiera de los tres grados (art. 19 de la Ley 39/2006). Su finalidad
                 es contratar un asistente personal que facilite la vida autónoma del beneficiario:
                 trabajo, estudios, ocio. A diferencia de las demás prestaciones, la PAP está especialmente
                 orientada a personas más jóvenes que quieren mantener una vida activa.

@@ -157,7 +157,7 @@ export default function PrestacionesDependenciaPage() {
             <p className={styles.tableFoot}>
               PEVS = prestación vinculada a servicio (pago de servicio privado acreditado). PECEF =
               cuidados en el entorno familiar (retribuye al cuidador no profesional). PAP = asistencia
-              personal (solo Grado III).
+              personal (en cualquiera de los tres grados, art. 19 de la Ley 39/2006).
             </p>
           </section>
 

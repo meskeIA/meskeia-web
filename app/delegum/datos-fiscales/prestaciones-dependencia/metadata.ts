@@ -1,5 +1,10 @@
 import { Metadata } from 'next';
-import { FISCAL_DEPENDENCIA_META } from '@/data/fiscal';
+import { FISCAL_DEPENDENCIA_META, PRESTACIONES_DEPENDENCIA_2025 } from '@/data/fiscal';
+import { formatCurrency } from '@/lib';
+
+/** Cuantía máxima de la PECEF por grado, leída del módulo (anexo IV del RD 1051/2013). */
+const pecef = (grado: number): string =>
+  formatCurrency(PRESTACIONES_DEPENDENCIA_2025.find((p) => p.grado === grado && p.tipo === 'PECEF')?.cuantiaMaximaMensual ?? 0);
 
 const URL_CANONICA = 'https://delegum.com/datos-fiscales/prestaciones-dependencia/';
 
@@ -99,7 +104,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se cobra por cuidar a un familiar dependiente?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La prestación económica para cuidados en el entorno familiar (PECEF) tiene una cuantía máxima estatal de 153 €/mes en Grado I, 286,66 €/mes en Grado II y 449,77 €/mes en Grado III. Son importes máximos: el copago según la capacidad económica del beneficiario puede reducirlos, y algunas comunidades los complementan.',
+        text: `La prestación económica para cuidados en el entorno familiar (PECEF) tiene una cuantía máxima estatal de ${pecef(1)}/mes en Grado I, ${pecef(2)}/mes en Grado II y ${pecef(3)}/mes en Grado III. Son importes máximos: el copago según la capacidad económica del beneficiario puede reducirlos, y algunas comunidades los complementan.`,
       },
     },
     {
@@ -107,7 +112,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre PEVS, PECEF y asistencia personal?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La PEVS (prestación vinculada a servicio) sirve para pagar un servicio privado acreditado cuando no hay plaza pública; la PECEF retribuye al cuidador familiar no profesional; y la prestación de asistencia personal (solo Grado III) financia un asistente que facilite la vida autónoma. Todas son económicas pero con finalidad y cuantía distintas.',
+        text: 'La PEVS (prestación vinculada a servicio) sirve para pagar un servicio privado acreditado cuando no hay plaza pública; la PECEF retribuye al cuidador familiar no profesional; y la prestación de asistencia personal (en cualquiera de los tres grados) financia un asistente que facilite la vida autónoma. Todas son económicas pero con finalidad y cuantía distintas.',
       },
     },
     {

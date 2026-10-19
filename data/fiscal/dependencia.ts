@@ -18,7 +18,9 @@
 // ─── Metadatos del módulo ────────────────────────────────────────────────────
 
 export const FISCAL_DEPENDENCIA_META = {
-  fuente: 'Ley 39/2006 LAPAD + LPGE 2025 + RD 1051/2013 + Orden ISM/835/2023 + RDL 17/2026',
+  // `verificado` NO se movió el 19/10/2026: ese día solo se cotejaron las prestaciones
+  // económicas (anexo IV), y el sello ampara también el copago y la cotización del cuidador.
+  fuente: 'Ley 39/2006 LAPAD + LPGE 2025 + RD 1051/2013 (anexo IV en la redacción del RD 675/2023) + Orden ISM/835/2023 + RDL 17/2026',
   verificado: '2026-07-14',
   vigencia: '2025-2026',
   urlOficial: 'https://imserso.es/el-saad/prestaciones',
@@ -68,7 +70,7 @@ export const GRADOS_DEPENDENCIA: GradoDependencia[] = [
 // ⚠️ 26/09/2026: el origen estaba mal. Lo crea el RDL 11/2025, de 21 de octubre, que añade la
 // disposición adicional 17.ª a la Ley 39/2006 (BOE-A-2025-21205, leído en sesión); el RDL
 // 17/2026 solo le fijó después el nivel mínimo de protección. Las cuantías de
-// PRESTACIONES_DEPENDENCIA_2025 están pendientes de cotejo con el anexo IV vigente (Inspector).
+// PRESTACIONES_DEPENDENCIA_2025 se cotejaron con el anexo IV vigente el 19/10/2026 (C0033).
 export const GRADO_III_PLUS = {
   nombre: 'Grado III+ — Dependencia Extrema',
   baseNormativa: 'RDL 11/2025, de 21 de octubre (BOE-A-2025-21205), que añade la disposición adicional 17.ª a la Ley 39/2006',
@@ -257,9 +259,19 @@ export const NIVEL_MINIMO_PROTECCION_2026 = {
   },
 };
 
-// ─── Prestaciones económicas SAAD 2025 (cuantías máximas €/mes) ──────────────
-// Cuantías máximas estatales. El copago reduce según capacidad económica.
-// Actualizadas con RD de revalorización enero 2025.
+// ─── Prestaciones económicas SAAD (cuantías máximas €/mes) ───────────────────
+// Cuantías máximas estatales del anexo IV del RD 1051/2013, en la redacción del RD 675/2023
+// (BOE-A-2023-16651), efectivas desde el 01/08/2023 (su disposición transitoria 1.ª). El RDL
+// 11/2025 solo añadió al anexo el párrafo del Grado III+ (GRADO_III_PLUS). El copago reduce la
+// cuantía según la capacidad económica.
+//
+// ⚠️ 19/10/2026 (triaje fiscal, cabo C0033): estas cifras NO eran las del anexo IV vigente
+// (eran 300/426,12/833,96 la vinculada, 153/286,66/449,77 la de cuidados en el entorno, y la
+// asistencia personal solo existía en grado III, con 833,96). Cotejadas con el texto
+// consolidado BOE-A-2013-13811, bloque del anexo IV. El mismo anexo dice además que la
+// vinculada al servicio de ATENCIÓN RESIDENCIAL tiene en grado II la cuantía del grado III, y
+// la de CENTRO DE DÍA en grado I la del grado II: estas filas son la vinculada en general.
+// Las cuantías no se revalorizan cada año: cambian cuando se modifica el anexo.
 
 export interface PrestacionDependencia {
   grado: number;
@@ -275,15 +287,17 @@ export interface PrestacionDependencia {
 
 export const PRESTACIONES_DEPENDENCIA_2025: PrestacionDependencia[] = [
   // Grado I
-  { grado: 1, tipo: 'PEVS',  nombre: 'Vinculada a servicio (Grado I)',             descripcion: 'Para contratar servicios privados acreditados',   cuantiaMaximaMensual: 300 },
-  { grado: 1, tipo: 'PECEF', nombre: 'Cuidados entorno familiar (Grado I)',        descripcion: 'Para cuidador familiar no profesional',             cuantiaMaximaMensual: 153 },
+  { grado: 1, tipo: 'PEVS',  nombre: 'Vinculada a servicio (Grado I)',             descripcion: 'Para contratar servicios privados acreditados',   cuantiaMaximaMensual: 313.50 },
+  { grado: 1, tipo: 'PECEF', nombre: 'Cuidados entorno familiar (Grado I)',        descripcion: 'Para cuidador familiar no profesional',             cuantiaMaximaMensual: 180.00 },
+  { grado: 1, tipo: 'PAP',   nombre: 'Asistencia personal (Grado I)',              descripcion: 'Para contratar asistente personal (vida activa)',  cuantiaMaximaMensual: 313.50 },
   // Grado II
-  { grado: 2, tipo: 'PEVS',  nombre: 'Vinculada a servicio (Grado II)',            descripcion: 'Para contratar servicios privados acreditados',   cuantiaMaximaMensual: 426.12 },
-  { grado: 2, tipo: 'PECEF', nombre: 'Cuidados entorno familiar (Grado II)',       descripcion: 'Para cuidador familiar no profesional',             cuantiaMaximaMensual: 286.66 },
+  { grado: 2, tipo: 'PEVS',  nombre: 'Vinculada a servicio (Grado II)',            descripcion: 'Para contratar servicios privados acreditados',   cuantiaMaximaMensual: 445.30 },
+  { grado: 2, tipo: 'PECEF', nombre: 'Cuidados entorno familiar (Grado II)',       descripcion: 'Para cuidador familiar no profesional',             cuantiaMaximaMensual: 315.90 },
+  { grado: 2, tipo: 'PAP',   nombre: 'Asistencia personal (Grado II)',             descripcion: 'Para contratar asistente personal (vida activa)',  cuantiaMaximaMensual: 747.25 },
   // Grado III
-  { grado: 3, tipo: 'PEVS',  nombre: 'Vinculada a servicio (Grado III)',           descripcion: 'Para contratar servicios privados acreditados',   cuantiaMaximaMensual: 833.96 },
-  { grado: 3, tipo: 'PECEF', nombre: 'Cuidados entorno familiar (Grado III)',      descripcion: 'Para cuidador familiar no profesional',             cuantiaMaximaMensual: 449.77 },
-  { grado: 3, tipo: 'PAP',   nombre: 'Asistencia personal (Grado III)',            descripcion: 'Para contratar asistente personal (vida activa)',  cuantiaMaximaMensual: 833.96 },
+  { grado: 3, tipo: 'PEVS',  nombre: 'Vinculada a servicio (Grado III)',           descripcion: 'Para contratar servicios privados acreditados',   cuantiaMaximaMensual: 747.25 },
+  { grado: 3, tipo: 'PECEF', nombre: 'Cuidados entorno familiar (Grado III)',      descripcion: 'Para cuidador familiar no profesional',             cuantiaMaximaMensual: 455.40 },
+  { grado: 3, tipo: 'PAP',   nombre: 'Asistencia personal (Grado III)',            descripcion: 'Para contratar asistente personal (vida activa)',  cuantiaMaximaMensual: 747.25 },
 ];
 
 // ─── Servicios del catálogo SAAD ─────────────────────────────────────────────

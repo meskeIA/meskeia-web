@@ -1,5 +1,12 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { PRESTACIONES_DEPENDENCIA_2025 } from '@/data/fiscal';
+import { formatCurrency } from '@/lib';
+
+/** Horquilla de las cuantías máximas del módulo (anexo IV del RD 1051/2013), sin teclearla. */
+const CUANTIAS = PRESTACIONES_DEPENDENCIA_2025.map((p) => p.cuantiaMaximaMensual);
+const CUANTIA_MIN = formatCurrency(Math.min(...CUANTIAS));
+const CUANTIA_MAX = formatCurrency(Math.max(...CUANTIAS));
 
 export const metadata: Metadata = {
   title: 'Estimación de Prestaciones por Dependencia - SAAD España | meskeIA',
@@ -53,7 +60,7 @@ export const faqJsonLd = {
       name: '¿Qué prestaciones económicas existen para personas con dependencia en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El SAAD reconoce varias prestaciones económicas según el grado: la Prestación Económica para Cuidados en el Entorno Familiar (PECEF) para quienes son atendidos por un familiar, la Prestación Económica de Asistencia Personal (PEAP) para contratar un asistente, y la Prestación Económica Vinculada al Servicio (PEVS) cuando no es posible acceder a un servicio público. Las cuantías máximas en 2025 oscilan entre 153 € y 747 € mensuales según grado y prestación.',
+        text: `El SAAD reconoce varias prestaciones económicas según el grado: la Prestación Económica para Cuidados en el Entorno Familiar (PECEF) para quienes son atendidos por un familiar, la Prestación Económica de Asistencia Personal (PEAP) para contratar un asistente, y la Prestación Económica Vinculada al Servicio (PEVS) cuando no es posible acceder a un servicio público. Las cuantías máximas estatales van de ${CUANTIA_MIN} a ${CUANTIA_MAX} mensuales según grado y prestación.`,
       },
     },
     {

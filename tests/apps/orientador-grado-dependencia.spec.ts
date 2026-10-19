@@ -229,17 +229,18 @@ test.describe('orientador-grado-dependencia', () => {
   /*
    * HALLAZGO 1321 — la tabla toma cortes y cuantías de data/fiscal/dependencia.ts:
    * GRADOS_DEPENDENCIA (25-49 / 50-74 / 75-100) y PRESTACIONES_DEPENDENCIA_2025, PEVS
-   * 300 / 426,12 / 833,96 €/mes (antes 291 / 426 / 833 escritos a mano).
+   * 300 / 426,12 / 833,96 €/mes (antes 291 / 426 / 833 escritos a mano). Desde el 19/10/2026,
+   * las del anexo IV vigente: 313,50 / 445,30 / 747,25 (triaje fiscal, cabo C0033).
    */
   test('la tabla toma cortes y cuantías de data/fiscal', async ({ page }) => {
     await abrir(page);
     const fila = (grado: string) => page.locator('table tr').filter({ hasText: grado });
     await expect(fila('Grado I — Dependencia Moderada')).toContainText('25-49');
-    await expect(fila('Grado I — Dependencia Moderada')).toContainText('300,00 €/mes');
+    await expect(fila('Grado I — Dependencia Moderada')).toContainText('313,50 €/mes');
     await expect(fila('Grado II — Dependencia Severa')).toContainText('50-74');
-    await expect(fila('Grado II — Dependencia Severa')).toContainText('426,12 €/mes');
+    await expect(fila('Grado II — Dependencia Severa')).toContainText('445,30 €/mes');
     await expect(fila('Grado III — Gran Dependencia')).toContainText('75-100');
-    await expect(fila('Grado III — Gran Dependencia')).toContainText('833,96 €/mes');
+    await expect(fila('Grado III — Gran Dependencia')).toContainText('747,25 €/mes');
   });
 
   /* HALLAZGO 1324 — ningún 💡 del bloque educativo queda fuera de un aria-hidden. */

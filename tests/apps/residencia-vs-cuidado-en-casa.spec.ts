@@ -176,9 +176,9 @@ test.describe('Residencia vs Cuidado en Casa', () => {
     // precisamente para pagar una plaza residencial privada.
     await expect(tarjeta(page, 'Residencia privada').locator('[class*="notaPublica"]')).toHaveCount(1);
     // Hallazgo 1116 · las cuantías salen de PRESTACIONES_DEPENDENCIA_2025, no escritas a mano.
-    // Grado II → PEVS 426,12 € · PECEF 286,66 €.
-    await expect(tarjeta(page, 'Residencia privada')).toContainText('426,12');
-    await expect(tarjeta(page, 'Residencia privada')).toContainText('286,66');
+    // Grado II → PEVS 445,30 € · PECEF 315,90 €.
+    await expect(tarjeta(page, 'Residencia privada')).toContainText('445,30');
+    await expect(tarjeta(page, 'Residencia privada')).toContainText('315,90');
   });
 
   test('CASO 2 — 24 h/día: el suelo sale del SMI y hacen falta cinco contratos', async ({ page }) => {
@@ -275,9 +275,9 @@ test.describe('Residencia vs Cuidado en Casa', () => {
     const sad = tarjeta(page, /SAD en domicilio/);
     await expect(sad).toContainText('SAD público disponible con tu grado');
     await expect(sad).not.toContainText('posible si se valora dependencia');
-    // Grado I → PEVS 300 € · PECEF 153 €, de PRESTACIONES_DEPENDENCIA_2025.
-    await expect(sad).toContainText('300,00');
-    await expect(sad).toContainText('153,00');
+    // Grado I → PEVS 313,50 € · PECEF 180 €, de PRESTACIONES_DEPENDENCIA_2025.
+    await expect(sad).toContainText('313,50');
+    await expect(sad).toContainText('180,00');
   });
 
   test('las piezas obligatorias de una app de riesgo 1', async ({ page }) => {
@@ -366,9 +366,9 @@ test.describe('Re-inspección 04/10/2026 — escritorio', () => {
     // 75 h/mes × 9,55 × 1,236 = 885,285 → 885 · 885 × 1,35 = 1.194,75 → 1.195
     expect(await coste(page, /Cuidado en casa/)).toBe(norm('885,00 € – 1195,00 €/mes'));
     await expect(tarjeta(page, /Cuidado en casa/).locator('[class*="opcionBadge"]')).toHaveText('Menor coste mensual');
-    // Grado I → PEVS 300 € · PECEF 153 € (PRESTACIONES_DEPENDENCIA_2025)
-    await expect(tarjeta(page, 'Residencia privada')).toContainText('300,00');
-    await expect(tarjeta(page, 'Residencia privada')).toContainText('153,00');
+    // Grado I → PEVS 313,50 € · PECEF 180 € (PRESTACIONES_DEPENDENCIA_2025)
+    await expect(tarjeta(page, 'Residencia privada')).toContainText('313,50');
+    await expect(tarjeta(page, 'Residencia privada')).toContainText('180,00');
   });
 
   test('CASO 7 — 5 h/día: la residencia pasa a ser la de menor coste mensual', async ({ page }) => {
@@ -519,9 +519,9 @@ test.describe('Re-inspección 04/10/2026 — móvil 375 px, tecleando', () => {
     // 105 h/mes × 9,55 × 1,236 = 1.239,40 → 1.239 · × 1,35 = 1.672,65 → 1.673
     expect(await coste(page, /Cuidado en casa/)).toBe(norm('1239,00 € – 1673,00 €/mes'));
     await expect(tarjeta(page, /Cuidado en casa/).locator('[class*="opcionBadge"]')).toHaveText('Menor coste mensual');
-    // Grado II → PEVS 426,12 € · PECEF 286,66 €
-    await expect(tarjeta(page, /Cuidado en casa/)).toContainText('426,12');
-    await expect(tarjeta(page, /Cuidado en casa/)).toContainText('286,66');
+    // Grado II → PEVS 445,30 € · PECEF 315,90 €
+    await expect(tarjeta(page, /Cuidado en casa/)).toContainText('445,30');
+    await expect(tarjeta(page, /Cuidado en casa/)).toContainText('315,90');
 
     const { ancho, visible } = await page.evaluate(() => ({
       ancho: document.documentElement.scrollWidth,

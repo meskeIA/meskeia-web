@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-10-19',
+    fichaSlug: 'prestaciones-dependencia',
+    texto:
+      'Cuantías máximas corregidas a las del anexo IV vigente, efectivas desde el 01/08/2023: vinculada al servicio 313,50 / 445,30 / 747,25 €, cuidados en el entorno familiar 180,00 / 315,90 / 455,40 € y asistencia personal 313,50 / 747,25 / 747,25 € (grados I / II / III). La asistencia personal se reconoce en cualquier grado, y no solo en el III. La tabla traía cifras anteriores a esa redacción (anexo IV del RD 1051/2013, en la redacción del RD 675/2023, BOE-A-2023-16651; art. 19 de la Ley 39/2006).',
+  },
+  {
     fecha: '2026-10-11',
     fichaSlug: 'impuesto-patrimonio',
     texto:
