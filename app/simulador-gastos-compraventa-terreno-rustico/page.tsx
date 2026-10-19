@@ -527,8 +527,11 @@ export default function SimuladorTerrenoRusticoPage() {
               ) : (
                 <>
                   <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
-                  comprador y vendedor son empresarios o profesionales con derecho a deducción (por ejemplo, un
-                  agricultor en régimen general que afecta la finca a su explotación). El IVA se autoliquida por
+                  el vendedor es empresario o profesional y el <strong>comprador</strong> es un empresario o
+                  profesional que compra para su actividad y tiene derecho a deducir, total o parcialmente, el IVA
+                  de la compra (por ejemplo, un agricultor en régimen general que afecta la finca a su
+                  explotación).{/* Hallazgo 3270 (19/10/2026): el art. 20.Dos LIVA (BOE-A-1992-28740, leído
+                  el 19/10/2026) pone el requisito del derecho a deducir en el ADQUIRENTE, no en los dos. */} El IVA se autoliquida por
                   <strong> inversión del sujeto pasivo</strong> y es deducible si tienes derecho. A cambio, la
                   escritura tributa por AJD
                   {ajdRenunciaRotulo.motivo === 'renuncia' ? (
@@ -700,7 +703,7 @@ export default function SimuladorTerrenoRusticoPage() {
                   resultadosComprador.impuestoNoCalculado
                     ? `En ${nombreEnFrase(ccaa)} no rige el IVA: la operación tributa por el ${resultadosComprador.tipoImpuesto}, que este simulador no calcula`
                     : esRenuncia
-                      ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si eres sujeto pasivo de IVA'
+                      ? 'Autorrepercutido por inversión del sujeto pasivo — deducible si destinas la finca a una actividad sujeta y no exenta de IVA'
                       : ciudadBonificada
                         ? `Tipo general del ${formatTipoNominal(itpGeneralRotulo)}\u00A0% con la bonificación del ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}\u00A0% de la cuota ya aplicada (art. 57 bis TRLITPAJD). No incluye posibles reducciones agrarias`
                         : 'Tipo general de la CCAA (posibles reducciones agrarias no incluidas)'
@@ -954,7 +957,7 @@ export default function SimuladorTerrenoRusticoPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🤝</span> Empresa compra finca a otra empresa</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Si ambas tienen derecho a deducción, el vendedor puede renunciar a la exención de IVA. La compra
+                Si la compradora tiene derecho a deducir el IVA de la compra, el vendedor puede renunciar a la exención de IVA. La compra
                 pasa a IVA {formatNumber(IVA_RENUNCIA, 0)}&nbsp;% con inversión del sujeto pasivo, que el comprador
                 autoliquida y deduce. En Canarias no rige el IVA, pero la renuncia existe igual sobre la
                 exención del IGIC, que esta calculadora no cifra; en Ceuta y Melilla el IPSI no la admite y la

@@ -3850,7 +3850,7 @@ test.describe('Inspector 13/10/2026 — País Vasco, Cataluña en su tramo del 1
    *   derecho al vendedor · obtenido: los tres textos citados.
    */
   test('[13/10-a] la renuncia y la deducción del IVA se condicionan a lo que dice la ley (arts. 20.Dos y 94.Uno LIVA)', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo 13/10-a: requisitos de la renuncia y de la deducción distintos de los de la LIVA');
+    // REPARADO el 19/10/2026 (hallazgo 3270; art. 20.Dos LIVA leído en el BOE ese día).
     await abrirHidratada(page);
     await page.selectOption('#select-ccaa', 'pais-vasco');
     await page.getByRole('button', { name: /renuncia a la exención/i }).click();
@@ -3880,7 +3880,7 @@ test.describe('Inspector 13/10/2026 — País Vasco, Cataluña en su tramo del 1
    *   «…está exento de IVA, tributa por ITP y no genera plusvalía municipal…».
    */
   test('[13/10-b] el FAQPage no da la finca por «tributa por ITP» sin la renuncia que la app calcula', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo 13/10-b: la 6.ª respuesta del FAQPage calla la renuncia');
+    // REPARADO el 19/10/2026 (hallazgo 3271).
     expect(ITP_CCAA.madrid.ajd).toBe(0.75);
     await abrirHidratada(page);
     await page.getByRole('button', { name: /renuncia a la exención/i }).click();
@@ -3905,7 +3905,7 @@ test.describe('Inspector 13/10/2026 — País Vasco, Cataluña en su tramo del 1
    * nada lo avise. Alcanza a las siete hermanas.
    */
   test('[13/10-c] el IVA de notaría y registro se lee de data/fiscal, no se teclea en data/itp-ccaa.ts', async () => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo 13/10-c: IVA_HONORARIOS = 0.21 tecleado en el motor');
+    // REPARADO el 19/10/2026 (hallazgo 3272): IVA_HONORARIOS sale de PORCENTAJES_IVA.general.
     // Preparación (pasa): hoy el factor del motor coincide con el tipo general de data/fiscal. La
     // precisión vigila una divergencia de un punto de IVA (0,01), no el redondeo.
     expect(calcularRegistro(65000, 'pais-vasco') / calcularRegistro(65000, 'canarias')).toBeCloseTo(
