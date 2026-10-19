@@ -193,7 +193,7 @@ export default function SimuladorContabilidadBasicaPage() {
 
     if (Math.abs(totalDebe - totalHaber) > 0.001) {
       setErrorValidacion(
-        `El asiento no cuadra: Debe ${formatNumber(totalDebe, 2)} ≠ Haber ${formatNumber(totalHaber, 2)}. La diferencia es ${formatNumber(Math.abs(totalDebe - totalHaber), 2)} €.`
+        `El asiento no cuadra: Debe ${formatNumber(totalDebe, 2)} ≠ Haber ${formatNumber(totalHaber, 2)}. La diferencia es ${formatNumber(Math.abs(totalDebe - totalHaber), 2)}.`
       );
       return;
     }
@@ -293,8 +293,8 @@ export default function SimuladorContabilidadBasicaPage() {
                       <tr>
                         <th>Cuenta</th>
                         <th>Descripción</th>
-                        <th className={styles.colImporte}>Debe (€)</th>
-                        <th className={styles.colImporte}>Haber (€)</th>
+                        <th className={styles.colImporte}>Debe</th>
+                        <th className={styles.colImporte}>Haber</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -322,7 +322,7 @@ export default function SimuladorContabilidadBasicaPage() {
 
                   {!equilibrado && (
                     <p className={styles.alertaDesequilibrio} role="alert">
-                      <span aria-hidden="true">⚠️</span> Este asiento no cuadra ({formatNumber(Math.abs(totDebe - totHaber), 2)} € de diferencia)
+                      <span aria-hidden="true">⚠️</span> Este asiento no cuadra ({formatNumber(Math.abs(totDebe - totHaber), 2)} de diferencia)
                     </p>
                   )}
                 </article>
@@ -364,10 +364,10 @@ export default function SimuladorContabilidadBasicaPage() {
                 <span className={styles.label}>Líneas del asiento</span>
                 <div className={styles.totalesFormulario}>
                   <span>
-                    Debe: <strong>{formatNumber(totalLineas(nuevoAsiento.lineas, 'debe'), 2)} €</strong>
+                    Debe: <strong>{formatNumber(totalLineas(nuevoAsiento.lineas, 'debe'), 2)}</strong>
                   </span>
                   <span>
-                    Haber: <strong>{formatNumber(totalLineas(nuevoAsiento.lineas, 'haber'), 2)} €</strong>
+                    Haber: <strong>{formatNumber(totalLineas(nuevoAsiento.lineas, 'haber'), 2)}</strong>
                   </span>
                   {Math.abs(totalLineas(nuevoAsiento.lineas, 'debe') - totalLineas(nuevoAsiento.lineas, 'haber')) < 0.001 &&
                     totalLineas(nuevoAsiento.lineas, 'debe') > 0 && (
@@ -380,8 +380,8 @@ export default function SimuladorContabilidadBasicaPage() {
                 <div className={styles.lineasGridHeader} aria-hidden="true">
                   <span>Cuenta</span>
                   <span>Descripción</span>
-                  <span>Debe (€)</span>
-                  <span>Haber (€)</span>
+                  <span>Debe</span>
+                  <span>Haber</span>
                   <span></span>
                 </div>
                 {nuevoAsiento.lineas.map((linea, idx) => (
@@ -538,7 +538,7 @@ export default function SimuladorContabilidadBasicaPage() {
 
                   {/* Saldo */}
                   <div className={`${styles.cuentaTSaldo} ${cuenta.naturaleza === 'deudora' ? styles.saldoDeudor : styles.saldoAcreedor}`}>
-                    Saldo {cuenta.naturaleza}: <strong>{formatNumber(cuenta.saldo, 2)} €</strong>
+                    Saldo {cuenta.naturaleza}: <strong>{formatNumber(cuenta.saldo, 2)}</strong>
                   </div>
                 </div>
               ))}
@@ -649,7 +649,7 @@ export default function SimuladorContabilidadBasicaPage() {
             <div className={styles.faqItem}>
               <dt>¿Este simulador sirve para llevar la contabilidad real de una empresa?</dt>
               <dd>
-                No: es una herramienta educativa para comprender los principios. La contabilidad oficial de una empresa requiere software homologado, el cumplimiento del Plan General de Contabilidad (PGC) y la supervisión de un profesional (graduado en contabilidad o asesor fiscal).
+                No: es una herramienta educativa para comprender los principios. La contabilidad oficial de una empresa requiere software homologado, el cumplimiento del plan de cuentas oficial de cada país y la supervisión de un profesional (graduado en contabilidad o asesor fiscal).
               </dd>
             </div>
           </dl>
@@ -663,7 +663,7 @@ export default function SimuladorContabilidadBasicaPage() {
               <span className={styles.stepNumber}>1</span>
               <div className={styles.stepContent}>
                 <strong>Identifica la operación</strong>
-                <p>¿Qué ha ocurrido? Por ejemplo: "He comprado material de oficina por 200 € pagando con tarjeta."</p>
+                <p>¿Qué ha ocurrido? Por ejemplo: "He comprado material de oficina por 200 unidades monetarias pagando con tarjeta."</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -684,7 +684,7 @@ export default function SimuladorContabilidadBasicaPage() {
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
                 <strong>Escribe el asiento y verifica el equilibrio</strong>
-                <p>Debe: Material de Oficina 200 €. Haber: Banco 200 €. La suma es igual a ambos lados → asiento correcto.</p>
+                <p>Debe: Material de Oficina 200. Haber: Banco 200. La suma es igual a ambos lados → asiento correcto.</p>
               </div>
             </li>
             <li className={styles.step}>

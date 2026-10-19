@@ -69,7 +69,7 @@ export const faqJsonLd = {
       name: '¿Cómo se registra un asiento contable en el libro diario?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un asiento contable se registra indicando la fecha, las cuentas afectadas, el importe en el Debe o en el Haber, y una descripción del concepto. La suma de los importes del Debe debe ser igual a la suma de los importes del Haber. Por ejemplo, si compras material de oficina por 500 € al contado: cargo (Debe) la cuenta "Material de Oficina" por 500 € y abona (Haber) la cuenta "Banco" por 500 €.',
+        text: 'Un asiento contable se registra indicando la fecha, las cuentas afectadas, el importe en el Debe o en el Haber, y una descripción del concepto. La suma de los importes del Debe debe ser igual a la suma de los importes del Haber. Por ejemplo, si compras material de oficina por 500 unidades monetarias al contado: cargo (Debe) la cuenta "Material de Oficina" por 500 y abona (Haber) la cuenta "Banco" por 500.',
       },
     },
     {
