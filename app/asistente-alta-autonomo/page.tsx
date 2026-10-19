@@ -1297,8 +1297,13 @@ export default function AsistenteAltaAutonomoPage() {
               </div>
 
               <div className={styles.recomendacion}>
-                <strong><span aria-hidden="true">💡</span> Recomendación general:</strong> Empieza como autónomo si facturas menos de 40.000-50.000 €/año.
-                Cuando superes esa cifra o necesites limitar responsabilidad, valora constituir una SL.
+                {/* Hasta el 19/10/2026 daba un umbral de «40.000-50.000 €/año» sin fuente (cabo C0036):
+                    el punto en que compensa una SL depende del beneficio, no de la facturación, y de
+                    cuánto se retira; lo calcula comparador-autonomo-vs-sl con tus cifras. */}
+                <strong><span aria-hidden="true">💡</span> Recomendación general:</strong> Empezar como autónomo es lo más
+                sencillo. Cuando el beneficio crezca, o necesites limitar la responsabilidad o entren socios,
+                valora constituir una SL: el punto en que compensa depende de tu beneficio y de cuánto retires,
+                y conviene calcularlo con tus cifras.
               </div>
             </div>
           </div>

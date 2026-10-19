@@ -608,8 +608,9 @@ export default function ComparadorAutonomoVsSLPage() {
             <div className={styles.faqItem}>
               <dt>¿Puedo ser administrador de mi SL sin cobrar salario?</dt>
               <dd>
-                Sí, pero debes estar dado de alta como autónomo societario igualmente si controlas más del 25%
-                del capital social y trabajas en la empresa. La cotización mínima es ~515 €/mes (2026)
+                Sí, pero debes estar dado de alta como autónomo societario igualmente si trabajas en la
+                empresa y tienes su control efectivo (art. 305.2.b LGSS: siempre con la mitad del capital o
+                más; se presume con un tercio, o con una cuarta parte si dirige y gestiona). La cotización mínima es ~515 €/mes (2026)
                 independientemente de si te pagas salario. No cobrar salario puede generar problemas con la AEAT
                 por operaciones vinculadas si la SL tiene actividad real.
               </dd>

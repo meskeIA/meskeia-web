@@ -45,7 +45,7 @@ const SECCIONES: Seccion[] = [
       {
         id: 'fecha-limite',
         titulo: 'Conozco la fecha límite de entrada en vigor',
-        info: '1 de enero de 2027 (aplazado desde julio 2025). Aplica a todos los empresarios y profesionales obligados a emitir factura.',
+        info: 'Sociedades (contribuyentes del Impuesto sobre Sociedades): antes del 1 de enero de 2027. Resto de obligados, autónomos incluidos: antes del 1 de julio de 2027 (disposición final 4.ª del RD 1007/2023, en la redacción del RDL 15/2025; la fecha original era julio de 2025).',
       },
       {
         id: 'obligado',
@@ -61,8 +61,8 @@ const SECCIONES: Seccion[] = [
     items: [
       {
         id: 'software-certificado',
-        titulo: 'Mi software de facturación actual está certificado VeriFactu (o tiene plan de serlo)',
-        info: 'El software debe estar homologado y enviar registros con firma electrónica. Consulta con tu proveedor si ya tiene certificación o fecha prevista. Programas populares: Holded, Billin, Quipu, Contasol, A3.',
+        titulo: 'Mi software de facturación cumple VeriFactu (o tiene fecha para hacerlo)',
+        info: 'No hay homologación de la AEAT: es el fabricante quien declara, en una declaración responsable que debe verse en el propio programa, que cumple el reglamento (art. 13 del RD 1007/2023). Pide a tu proveedor esa declaración o la fecha en que la tendrá. Programas populares: Holded, Billin, Quipu, Contasol, A3.',
       },
       {
         id: 'certificado-digital',
@@ -121,7 +121,7 @@ const SECCIONES: Seccion[] = [
       {
         id: 'fechas-calendario',
         titulo: 'He marcado en mi calendario las fechas clave',
-        info: 'Fecha entrada en vigor: 1 enero 2027. Recomendación: tener software listo 3 meses antes (octubre 2026) para pruebas.',
+        info: 'Sociedades: antes del 1 de enero de 2027. Autónomos y demás obligados: antes del 1 de julio de 2027. Recomendación: tener el software listo unos meses antes de tu fecha para probarlo.',
       },
       {
         id: 'asesor-fiscal',
@@ -204,7 +204,7 @@ export default function ChecklistPrepararVerifactuPage() {
         <header className={styles.hero}>
           <h1 className={styles.title}><span aria-hidden="true">📋</span> Checklist VeriFactu</h1>
           <p className={styles.subtitle}>
-            Prepara tu negocio para la facturación electrónica obligatoria (enero 2027)
+            Prepara tu negocio para VeriFactu: sociedades antes de enero de 2027, autónomos antes de julio de 2027
           </p>
         </header>
 
@@ -333,8 +333,9 @@ export default function ChecklistPrepararVerifactuPage() {
               (AEAT) de forma automática, prácticamente en tiempo real.
             </p>
             <p>
-              El objetivo es combatir el fraude fiscal mediante el uso de <strong>software de facturación certificado</strong> que
-              garantice la integridad, trazabilidad e inalterabilidad de los registros de facturación.
+              El objetivo es combatir el fraude fiscal mediante <strong>software de facturación que cumpla el reglamento</strong> y
+              garantice la integridad, trazabilidad e inalterabilidad de los registros de facturación. No lo
+              homologa la AEAT: lo acredita su fabricante con una declaración responsable (art. 13).
             </p>
           </section>
 
@@ -361,8 +362,9 @@ export default function ChecklistPrepararVerifactuPage() {
               <li><strong>2021</strong>: Ley 11/2021 Antifraude — establece la base legal para prohibir software de doble contabilidad.</li>
               <li><strong>2022</strong>: Borrador del reglamento técnico de facturación electrónica.</li>
               <li><strong>Dic 2023</strong>: Publicación del RD 1007/2023 con los requisitos técnicos.</li>
-              <li><strong>Jul 2025</strong>: Fecha original de entrada en vigor (aplazada).</li>
-              <li><strong>Ene 2027</strong>: Nueva fecha de entrada en vigor obligatoria.</li>
+              <li><strong>Jul 2025</strong>: Fecha original de adaptación, aplazada después por el RD 254/2025 y el RDL 15/2025.</li>
+              <li><strong>Ene 2027</strong>: Fecha límite para las sociedades (contribuyentes del Impuesto sobre Sociedades).</li>
+              <li><strong>Jul 2027</strong>: Fecha límite para el resto de obligados, autónomos incluidos.</li>
             </ul>
           </section>
 
@@ -384,7 +386,8 @@ export default function ChecklistPrepararVerifactuPage() {
 
             <h3>¿Puedo seguir usando Excel para mis facturas?</h3>
             <p>
-              No. VeriFactu exige que el software esté <strong>certificado y homologado</strong>. Excel, Word
+              No. VeriFactu exige un programa que cumpla el reglamento, y lo acredita la <strong>declaración
+              responsable de su fabricante</strong> (no hay homologación de la AEAT). Excel, Word
               o cualquier herramienta genérica no cumple los requisitos técnicos (firma electrónica, envío
               automático a la AEAT, código QR).
             </p>
@@ -401,10 +404,10 @@ export default function ChecklistPrepararVerifactuPage() {
             <ul>
               <li>
                 <strong>No esperes al último mes</strong>: contacta con tu proveedor de software ahora para
-                conocer su plan de certificación.
+                conocer su plan de adaptación y cuándo tendrá su declaración responsable.
               </li>
               <li>
-                <strong>Renueva tu certificado digital</strong>: si caduca antes de enero 2027, renuévalo
+                <strong>Renueva tu certificado digital</strong>: si caduca antes de tu fecha límite, renuévalo
                 con antelación (FNMT puede tardar semanas).
               </li>
               <li>

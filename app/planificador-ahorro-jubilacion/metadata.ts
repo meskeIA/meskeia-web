@@ -1,10 +1,21 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FISCAL_PLAN_PENSIONES_META } from '@/data/fiscal';
+import { FISCAL_PLAN_PENSIONES_META, TRAMOS_IRPF_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import { formatNumber } from '@/lib/formatters';
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
 // y no se escribe a mano (lo exige check:anio-titulo).
 const anio = FISCAL_PLAN_PENSIONES_META.vigencia;
+
+/**
+ * Los extremos de las dos escalas del FAQPage, de data/fiscal. Hasta el 19/10/2026 iban
+ * tecleados, y el del ahorro decía «entre 19% y 28%», el máximo de 2023-2024: desde el
+ * 1/1/2025 acaba en el 30 % (Ley 7/2024). Cabo C0036, la misma forma que el C0092 de
+ * comparador-autonomo-vs-sl.
+ */
+const pct = (n: number) => `${formatNumber(n, 0)} %`;
+const extremos = (escala: { tipo: number }[]) =>
+  `entre el ${pct(escala[0].tipo)} y el ${pct(escala[escala.length - 1].tipo)}`;
 
 export const metadata: Metadata = {
   title: `Planificador de Ahorro para la Jubilación ${anio} — Brecha, ahorro y plan de pensiones | meskeIA`,
@@ -93,7 +104,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre un plan de pensiones y un fondo de inversión para la jubilación?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El plan de pensiones ofrece deducción fiscal en la aportación pero tributa como rendimiento del trabajo en el rescate (tipo entre 19% y 47%) y es ilíquido hasta la jubilación salvo supuestos excepcionales. El fondo de inversión no da deducción en la aportación pero tributa como ganancia patrimonial en el rescate (tipo entre 19% y 28%) y es líquido en cualquier momento. Para rentas altas en activo con tramo marginal alto, el plan de pensiones suele ser más eficiente fiscalmente.',
+        text: `El plan de pensiones ofrece deducción fiscal en la aportación pero tributa como rendimiento del trabajo en el rescate (tipo ${extremos(TRAMOS_IRPF_2025)}) y es ilíquido hasta la jubilación salvo supuestos excepcionales. El fondo de inversión no da deducción en la aportación pero tributa como ganancia patrimonial en el rescate (tipo ${extremos(TRAMOS_GANANCIAS_PATRIMONIALES_2025)}) y es líquido en cualquier momento. Para rentas altas en activo con tramo marginal alto, el plan de pensiones suele ser más eficiente fiscalmente.`,
       },
     },
   ],

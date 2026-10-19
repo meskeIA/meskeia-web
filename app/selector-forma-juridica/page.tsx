@@ -9,6 +9,13 @@ import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
 import styles from './SelectorFormaJuridica.module.css';
+import { TRAMOS_IRPF_2025 } from '@/data/fiscal';
+
+/**
+ * Extremos de la escala del IRPF, de data/fiscal: hasta el 19/10/2026 la tabla los llevaba
+ * tecleados («19-47 %», cabo C0036), la forma que el hallazgo 2143 dejó desfasada en otra app.
+ */
+const ESCALA_IRPF_TEXTO = `${TRAMOS_IRPF_2025[0].tipo}-${TRAMOS_IRPF_2025[TRAMOS_IRPF_2025.length - 1].tipo} %`;
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -431,7 +438,7 @@ export default function SelectorFormaJuridica() {
             </tr>
             <tr>
               <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid #e0e0e0', fontWeight: 600 }}>Fiscalidad</td>
-              <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid #e0e0e0' }}>IRPF progresivo (19-47 %)</td>
+              <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid #e0e0e0' }}>IRPF progresivo ({ESCALA_IRPF_TEXTO})</td>
               <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid #e0e0e0' }}>Impuesto sobre Sociedades (23-25 %)</td>
             </tr>
             <tr>

@@ -111,7 +111,7 @@ const CHECKLIST_ITEMS: ChecklistItem[] = [
   { id: 'libros', fase: 3, texto: 'Legalizar libros obligatorios', descripcion: 'Libro de actas, libro de socios/acciones. Se legalizan en el Registro Mercantil.', obligatorio: true },
   { id: 'iae', fase: 3, texto: 'Alta en IAE (si facturación prevista > 1 M€)', descripcion: 'Impuesto de Actividades Económicas. Exento si cifra de negocios < 1 millón €/año.', obligatorio: false },
   // Fase 4: Operatividad
-  { id: 'alta-admin', fase: 4, texto: 'Alta del administrador en Seguridad Social', descripcion: 'Si el administrador es socio con >25% (SL) o >50% de capital, alta en RETA.', obligatorio: false },
+  { id: 'alta-admin', fase: 4, texto: 'Alta del administrador en Seguridad Social', descripcion: 'Si el administrador trabaja para la sociedad y tiene su control efectivo, alta en RETA (art. 305.2.b LGSS): siempre con la mitad del capital o más; se presume con un tercio, o con una cuarta parte si además dirige y gestiona.', obligatorio: false },
   { id: 'apertura-centro', fase: 4, texto: 'Comunicar apertura de centro de trabajo', descripcion: 'Obligatorio si tienes local o empleados. Se presenta en la autoridad laboral.', obligatorio: false },
   { id: 'licencias', fase: 4, texto: 'Solicitar licencias y permisos específicos', descripcion: 'Según actividad: licencia de apertura, sanitaria, ambiental, etc.', obligatorio: false },
 ];
@@ -639,7 +639,7 @@ export default function AsistenteConstitucionSociedadPage() {
             </div>
             <div className={styles.ventajaCard}>
               <h4><span aria-hidden="true">💸</span> Ventaja fiscal (a partir de ciertos ingresos)</h4>
-              <p>El Impuesto de Sociedades (IS) tiene tipo general del 25% (15% para nuevas empresas los 2 primeros años con base positiva). Puede ser más ventajoso que IRPF si facturas más de 40.000–50.000 €/año.</p>
+              <p>El Impuesto de Sociedades (IS) tiene tipo general del 25% (15% para nuevas empresas los 2 primeros años con base positiva). Puede ser más ventajoso que el IRPF cuando el beneficio es alto y no se retira todo: el punto en que compensa depende de tus cifras.</p>
             </div>
             <div className={styles.ventajaCard}>
               <h4><span aria-hidden="true">🤝</span> Imagen profesional</h4>
@@ -676,7 +676,7 @@ export default function AsistenteConstitucionSociedadPage() {
             {[
               { p: '¿Cuánto tarda constituir una SL?', r: 'Entre 1 y 3 semanas si todo va bien. Con PAE/CIRCE puede hacerse en 24-48 horas en algunos casos. El cuello de botella suele ser el Registro Mercantil (5-15 días hábiles).' },
               { p: '¿Puedo constituir una SL con 1 € de capital?', r: 'Desde 2023 existe la SL con capital inferior a 3.000 € (mínimo 1 €), pero con restricciones: debes destinar el 20% de beneficios a reservas hasta llegar a 3.000 €, y tienes responsabilidad personal mientras no alcances ese mínimo.' },
-              { p: '¿Tiene que darse de alta el administrador en autónomos?', r: 'Depende. Si eres socio con >25% de participación en una SL (o >50% en SA) y trabajas para la empresa, debes darte de alta en RETA (autónomos). Si eres administrador sin sueldo y sin participación significativa, puede que no.' },
+              { p: '¿Tiene que darse de alta el administrador en autónomos?', r: 'Depende de si tienes el control efectivo de la sociedad (art. 305.2.b LGSS), igual en una SL que en una SA. Si trabajas para ella de forma habitual y tienes al menos la mitad del capital, debes darte de alta en RETA (autónomos) en todo caso. Se presume ese control, salvo prueba en contrario, con un tercio del capital, con una cuarta parte si además ejerces funciones de dirección y gerencia, o si la mitad del capital está en manos de familiares con los que convives hasta el segundo grado. Sin control efectivo, puede que no.' },
               { p: '¿Puedo poner mi domicilio particular como domicilio social?', r: 'Sí, es perfectamente legal. Muchas startups lo hacen al inicio. Recuerda que es información pública en el Registro Mercantil.' },
             ].map(({ p, r }, i) => (
               <details key={i} className={styles.faqItem}>
@@ -846,7 +846,7 @@ export default function AsistenteConstitucionSociedadPage() {
               },
               {
                 p: '¿Puedo ser administrador y cobrar si soy el único socio?',
-                r: 'Sí. El administrador único puede percibir retribución si así lo establecen los estatutos o lo aprueba la junta. En la práctica, la forma más habitual es la "nómina de administrador" o el contrato mercantil. Si además trabajas para la empresa de forma habitual y eres socio con más del 25% del capital, debes darte de alta en el RETA (autónomos) independientemente de si cobras nómina.',
+                r: 'Sí. El administrador único puede percibir retribución si así lo establecen los estatutos o lo aprueba la junta. En la práctica, la forma más habitual es la "nómina de administrador" o el contrato mercantil. Si además trabajas para la empresa de forma habitual y tienes su control efectivo (art. 305.2.b LGSS: siempre con la mitad del capital o más; se presume con un tercio, o con una cuarta parte si dirige y gestiona), debes darte de alta en el RETA (autónomos) independientemente de si cobras nómina.',
               },
               {
                 p: '¿Qué pasa si la empresa no genera beneficios el primer año?',
@@ -915,7 +915,7 @@ export default function AsistenteConstitucionSociedadPage() {
               <span className={styles.stepNumber}>7</span>
               <div className={styles.stepContent}>
                 <strong>NIF definitivo + alta en Hacienda + RETA (si procede)</strong>
-                <span>Una vez inscrita, solicitar el NIF definitivo en la AEAT presentando la escritura y el modelo 036. Si el administrador es socio con &gt;25% y trabaja para la sociedad, debe darse de alta en el <strong>RETA</strong> (autónomos) en Seguridad Social. También debes darte de alta en el epígrafe del IAE correspondiente si la facturación prevista supera 1 M€.</span>
+                <span>Una vez inscrita, solicitar el NIF definitivo en la AEAT presentando la escritura y el modelo 036. Si el administrador trabaja para la sociedad y tiene su control efectivo (siempre con la mitad del capital o más; se presume con un tercio, o con una cuarta parte si dirige y gestiona, art. 305.2.b LGSS), debe darse de alta en el <strong>RETA</strong> (autónomos) en Seguridad Social. También debes darte de alta en el epígrafe del IAE correspondiente si la facturación prevista supera 1 M€.</span>
               </div>
             </li>
           </ol>
@@ -978,8 +978,9 @@ export default function AsistenteConstitucionSociedadPage() {
               </li>
               <li>
                 <strong>Nombrar administrador sin revisar el alta en RETA:</strong> si el administrador
-                posee más del 25% de las participaciones y trabaja habitualmente para la sociedad, está
-                obligado a darse de alta en el RETA. No hacerlo genera deudas con la Seguridad Social
+                trabaja habitualmente para la sociedad y tiene su control efectivo (siempre con la mitad
+                del capital o más; se presume con un tercio, o con una cuarta parte si dirige y gestiona,
+                art. 305.2.b LGSS), está obligado a darse de alta en el RETA. No hacerlo genera deudas con la Seguridad Social
                 con recargo e intereses.
               </li>
             </ul>
