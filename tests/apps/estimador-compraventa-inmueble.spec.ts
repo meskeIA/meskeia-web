@@ -9459,7 +9459,10 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
    * Esperado: que diga que ESTA herramienta no las compensa · obtenido «… la cuota será la que esta
    * venta añade. No se compensan pérdidas de otras operaciones.»
    */
-  test.fail('HALLAZGO pérdidas — la caja de errores comunes no niega la compensación de pérdidas', async ({ page }) => {
+  // REPARADO el 20/10/2026 (hallazgo 3378): dice que es la calculadora la que no compensa, y que en
+  // la declaración sí se compensan (art. 49.1.b LIRPF, leído en el BOE ese día). En garaje, trastero
+  // y local-comercial, la misma frase de limitaciones con la misma salvedad.
+  test('HALLAZGO pérdidas — la caja de errores comunes no niega la compensación de pérdidas', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, [CAMPO_PRECIO]);
     const linea = (
@@ -9470,5 +9473,6 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
     ).replace(/\s+/g, ' ');
     expect(linea).toContain('la cuota será la que esta venta añade');
     expect(linea).not.toContain('No se compensan pérdidas de otras operaciones');
+    expect(linea).toContain('Lo que esta calculadora no hace es compensar pérdidas de otras operaciones');
   });
 });
