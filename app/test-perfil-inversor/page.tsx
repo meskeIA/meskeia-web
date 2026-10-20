@@ -6,6 +6,7 @@ import styles from './TestPerfilInversor.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, RegionBadge } from '@/components';
 import { formatNumber, formatPercentage } from '@/lib';
 import { PREGUNTA_REVISAR_PERFIL, RESPUESTA_REVISAR_PERFIL } from './metadata';
+import { CARTERAS_PERFIL, calcularParametrosCartera, type PerfilInversor } from '@/lib/calculadoras/carteraPerfiles';
 
 // Definición de preguntas con puntuaciones
 interface Option {
@@ -53,11 +54,15 @@ const QUESTIONS: Question[] = [
   {
     id: 4,
     text: '¿Qué porcentaje de tus ahorros totales vas a destinar a inversiones?',
+    // Hallazgo 3376 (20/10/2026; decidido por el usuario): puntuaba al revés que la 8 la misma
+    // situación, y poner en juego la mayor parte del ahorro SUBÍA el perfil, contra la propia guía
+    // («si dependes de esta inversión, sé más conservador»). Ahora cuanto más ahorro en juego,
+    // menos puntos; el orden de las opciones sigue la convención de las demás (A = 1 punto).
     options: [
-      { text: 'Menos del 20\u00A0% - Solo una pequeña parte', points: 1 },
-      { text: '20\u00A0% a 40\u00A0% - Una parte moderada', points: 2 },
-      { text: '40\u00A0% a 60\u00A0% - Una parte significativa', points: 3 },
-      { text: 'Más del 60\u00A0% - La mayor parte de mis ahorros', points: 4 },
+      { text: 'Más del 60\u00A0% - La mayor parte de mis ahorros', points: 1 },
+      { text: '40\u00A0% a 60\u00A0% - Una parte significativa', points: 2 },
+      { text: '20\u00A0% a 40\u00A0% - Una parte moderada', points: 3 },
+      { text: 'Menos del 20\u00A0% - Solo una pequeña parte', points: 4 },
     ],
   },
   {
@@ -145,6 +150,16 @@ interface Profile {
   recommendations: string[];
 }
 
+/**
+ * Hallazgo 3227 (cabo C0158, 20/10/2026; decidido por el usuario): la volatilidad de cada perfil
+ * estaba tecleada sin fuente (5–8 … 20–25 %) y el estimador al que lleva «Simular esta Cartera»
+ * calculaba otra para la misma cartera (4,53 … 14,72 %). Ahora la cartera, la volatilidad y la
+ * rentabilidad salen del motor del estimador, con sus hipótesis.
+ */
+const parametrosDe = (perfil: PerfilInversor) => calcularParametrosCartera(CARTERAS_PERFIL[perfil]);
+// Con dos decimales, como el estimador: con uno, su 11,75 % salía aquí 11,7 % (11,748 redondeado).
+const volatilidadDe = (perfil: PerfilInversor) => formatPercentage(parametrosDe(perfil).volatilidad, 2);
+
 const PROFILES: Record<ProfileType, Profile> = {
   conservador: {
     name: 'Conservador',
@@ -156,10 +171,10 @@ const PROFILES: Record<ProfileType, Profile> = {
     traits: {
       riesgo: 'Muy bajo',
       horizonte: '< 3 años',
-      volatilidad: '5-8\u00A0%',
+      volatilidad: volatilidadDe('conservador'),
       objetivo: 'Preservar capital',
     },
-    allocation: { rv: 15, rf: 60, liq: 20, alt: 5 },
+    allocation: CARTERAS_PERFIL.conservador,
     recommendations: [
       'Fondos monetarios y depósitos a plazo',
       'Bonos gubernamentales de corto plazo',
@@ -175,10 +190,10 @@ const PROFILES: Record<ProfileType, Profile> = {
     traits: {
       riesgo: 'Bajo',
       horizonte: '3-5 años',
-      volatilidad: '8-12\u00A0%',
+      volatilidad: volatilidadDe('moderado'),
       objetivo: 'Batir inflación',
     },
-    allocation: { rv: 30, rf: 50, liq: 15, alt: 5 },
+    allocation: CARTERAS_PERFIL.moderado,
     recommendations: [
       'Fondos mixtos conservadores',
       'Combinación de ETFs de renta fija y variable',
@@ -194,10 +209,10 @@ const PROFILES: Record<ProfileType, Profile> = {
     traits: {
       riesgo: 'Medio',
       horizonte: '5-10 años',
-      volatilidad: '12-15\u00A0%',
+      volatilidad: volatilidadDe('equilibrado'),
       objetivo: 'Crecimiento sostenido',
     },
-    allocation: { rv: 50, rf: 35, liq: 10, alt: 5 },
+    allocation: CARTERAS_PERFIL.equilibrado,
     recommendations: [
       'Fondos indexados de renta variable global, ampliamente diversificados',
       'Vehículos de acumulación, que reinvierten los dividendos',
@@ -213,10 +228,10 @@ const PROFILES: Record<ProfileType, Profile> = {
     traits: {
       riesgo: 'Alto',
       horizonte: '10-15 años',
-      volatilidad: '15-20\u00A0%',
+      volatilidad: volatilidadDe('dinamico'),
       objetivo: 'Maximizar crecimiento',
     },
-    allocation: { rv: 70, rf: 20, liq: 5, alt: 5 },
+    allocation: CARTERAS_PERFIL.dinamico,
     recommendations: [
       'ETFs de renta variable global',
       'Fondos indexados de mercados desarrollados',
@@ -232,10 +247,10 @@ const PROFILES: Record<ProfileType, Profile> = {
     traits: {
       riesgo: 'Muy alto',
       horizonte: '> 15 años',
-      volatilidad: '20-25\u00A0%',
+      volatilidad: volatilidadDe('agresivo'),
       objetivo: 'Máxima rentabilidad',
     },
-    allocation: { rv: 90, rf: 5, liq: 0, alt: 5 },
+    allocation: CARTERAS_PERFIL.agresivo,
     recommendations: [
       'ETFs 100\u00A0% renta variable global',
       'Exposición significativa a mercados emergentes',
@@ -1421,16 +1436,18 @@ function GuiaPerfilInversor() {
             </thead>
             <tbody>
               <tr>
-                <td><strong>Rentabilidad histórica orientativa</strong></td>
-                <td>1–3&nbsp;%</td>
-                <td>2–4&nbsp;%</td>
-                <td>3–6&nbsp;%</td>
-                <td>4–7&nbsp;%</td>
-                <td>5–9&nbsp;%</td>
+                {/* Hallazgo 3227 (20/10/2026): eran tramos «históricos» tecleados sin fuente que no
+                    cuadraban con el estimador; ahora es lo que calcula su motor para la cartera. */}
+                <td><strong>Rentabilidad esperada</strong></td>
+                {(Object.keys(PROFILES) as ProfileType[]).map((tipo) => (
+                  <td key={tipo}>{formatPercentage(parametrosDe(tipo).rentabilidad, 2)}</td>
+                ))}
               </tr>
               <tr>
                 <td colSpan={6} style={{ fontSize: '0.85em', fontStyle: 'italic', color: 'var(--text-secondary)' }}>
-                  Rentabilidades históricas nominales medias antes de inflación, comisiones e impuestos. Pasadas, no futuras.
+                  Rentabilidad nominal media anual (antes de inflación, comisiones e impuestos) y volatilidad anual que
+                  calcula el simulador de cartera al que lleva «Simular esta Cartera», con sus hipótesis para cada clase
+                  de activo. Son supuestos del modelo, no datos medidos ni una promesa.
                 </td>
               </tr>
               {/* Hallazgo 3232 (20/10/2026): la tabla llamaba «Volatilidad máxima» y «Horizonte
@@ -1623,10 +1640,11 @@ function GuiaPerfilInversor() {
                   general, ante un público que es hispanohablante, no solo europeo. */}
               En la Unión Europea, los bancos y las gestoras tienen que hacer un test de idoneidad
               (MiFID II) por obligación legal, y en otros países existen exigencias equivalentes con
-              otro nombre. Ese test a veces está sesgado hacia productos propios o hacia perfiles más
-              conservadores para reducir reclamaciones.{' '}
-              <strong>El perfil del banco es orientativo</strong>; el de este test busca darte una imagen más
-              objetiva de tu situación real.
+              otro nombre. {/* Hallazgo 3229 (20/10/2026; decidido por el usuario): atribuía al test
+              del banco un sesgo sin fuente y presentaba este, sin validar, como «más objetivo». */}
+              Esa evaluación la exige la norma y tiene en cuenta datos que este test no pide;{' '}
+              <strong>este test es orientativo</strong>. Si los dos resultados difieren, pregunta al
+              banco en qué se basa el suyo.
             </p>
           </div>
 

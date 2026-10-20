@@ -125,7 +125,7 @@ test.describe('Caso normal: un recorrido de 26 puntos', () => {
     // expectativas antiguas («12-15%», «Renta Variable (50%)») consagraban el defecto.
     await expect(rasgo(page, 0)).toHaveText('Medio');
     await expect(rasgo(page, 1)).toHaveText('5-10 años');
-    await expect(rasgo(page, 2)).toHaveText('12-15\u00A0%');
+    await expect(rasgo(page, 2)).toHaveText('8,87\u00A0%');
     await expect(rasgo(page, 3)).toHaveText('Crecimiento sostenido');
     // PROFILES.equilibrado.allocation = { rv: 50, rf: 35, liq: 10, alt: 5 }
     expect(await reparto(page)).toEqual([
@@ -455,7 +455,7 @@ test.describe('re-inspección 22/09/2026', () => {
     // PROFILES.dinamico.traits
     await expect(rasgo(page, 0)).toHaveText('Alto');
     await expect(rasgo(page, 1)).toHaveText('10-15 años');
-    await expect(rasgo(page, 2)).toHaveText('15-20\u00A0%');
+    await expect(rasgo(page, 2)).toHaveText('11,75\u00A0%');
     await expect(rasgo(page, 3)).toHaveText('Maximizar crecimiento');
     // PROFILES.dinamico.allocation = { rv: 70, rf: 20, liq: 5, alt: 5 }
     expect(await reparto(page)).toEqual([
@@ -1254,13 +1254,6 @@ function cifraEspanola(texto: string): number {
   return Number(entera) + (decimales ? Number(decimales) / 10 ** decimales.length : 0);
 }
 
-/** Tramo «a–b %» → [a, b]; un «+» final («20–25 %+») deja el techo abierto. */
-function tramoPorcentual(texto: string): [number, number] {
-  const m = texto.match(/(\d+(?:,\d+)?)\s*[-–]\s*(\d+(?:,\d+)?)/);
-  if (!m) throw new Error(`«${texto}» no es un tramo a–b`);
-  return [cifraEspanola(m[1]), texto.includes('+') ? Infinity : cifraEspanola(m[2])];
-}
-
 /** El FAQPage que se sirve en el <head>: pregunta → respuesta. */
 async function faqPage(page: Page): Promise<Map<string, string>> {
   const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -1293,7 +1286,7 @@ test.describe('re-inspección 12/10/2026', () => {
     // PROFILES.agresivo.traits
     await expect(rasgo(page, 0)).toHaveText('Muy alto');
     await expect(rasgo(page, 1)).toHaveText('> 15 años');
-    await expect(rasgo(page, 2)).toHaveText('20-25 %');
+    await expect(rasgo(page, 2)).toHaveText('14,72 %');
     await expect(rasgo(page, 3)).toHaveText('Máxima rentabilidad');
     expect(await reparto(page)).toEqual([
       'Renta Variable (90 %)',
@@ -1319,21 +1312,25 @@ test.describe('re-inspección 12/10/2026', () => {
   });
 
   // ---------- Hallazgo C0158 ----------
-  test.fail('C0158 — la volatilidad que el test anuncia para cada cartera no contradice la que da el estimador al que enlaza', async ({
+  // REPARADO 20/10/2026 (hallazgo 3227; decidido por el usuario): el test lee la volatilidad del
+  // motor del estimador (lib/calculadoras/carteraPerfiles.ts) y la pinta con dos decimales, como
+  // él: cada celda es la misma cifra que su tabla, 4,53 · 6,21 · 8,87 · 11,75 · 14,72 %.
+  test('C0158 — la volatilidad que el test anuncia para cada cartera no contradice la que da el estimador al que enlaza', async ({
     page,
   }) => {
-    // Esperado: el σ que calcula el estimador para cada cartera cae dentro del tramo que el test
-    // anuncia para ella. No se juzga cuál de las dos cifras es la buena: basta con que las dos
-    // páginas, enlazadas por «Simular esta Cartera», no se contradigan.
+    // Esperado: el σ que calcula el estimador para cada cartera es el que el test anuncia para
+    // ella. No se juzga cuál de las dos cifras es la buena: basta con que las dos páginas,
+    // enlazadas por «Simular esta Cartera», no se contradigan.
     // Obtenido (12/10/2026): 4,53 ∉ 5–8 · 6,21 ∉ 8–12 · 8,87 ∉ 12–15 · 11,75 ∉ 15–20 · 14,72 ∉ 20–25.
     await page.goto(RUTA);
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    // La fila por su rótulo: la nota de debajo de la tabla también dice «volatilidad».
     const celdas = await page
-      .locator('[class*="comparativaTable"] tr', { hasText: 'Volatilidad' })
+      .locator('[class*="comparativaTable"] tr', { has: page.locator('td strong', { hasText: /^Volatilidad esperada$/ }) })
       .locator('td')
       .allTextContents();
-    const tramos = celdas.slice(1).map(tramoPorcentual);
-    expect(tramos).toHaveLength(5);
+    const anunciadas = celdas.slice(1).map((c) => cifraEspanola(c.replace(/[^\d,]/g, '')));
+    expect(anunciadas).toEqual([4.53, 6.21, 8.87, 11.75, 14.72]);
 
     await page.goto('/estimador-cartera-inversion/');
     await esperarPaginaAsentada(page);
@@ -1351,9 +1348,9 @@ test.describe('re-inspección 12/10/2026', () => {
     expect(volatilidades.every((v) => v.length > 0)).toBe(true);
 
     const contradicciones = perfiles
-      .map((p, i) => ({ p, sigma: cifraEspanola(volatilidades[i]), tramo: tramos[i] }))
-      .filter(({ sigma, tramo }) => sigma < tramo[0] || sigma > tramo[1])
-      .map(({ p, sigma, tramo }) => `${p}: estimador ${sigma} % fuera de ${tramo[0]}–${tramo[1]} %`);
+      .map((p, i) => ({ p, sigma: cifraEspanola(volatilidades[i]), anunciada: anunciadas[i] }))
+      .filter(({ sigma, anunciada }) => sigma !== anunciada)
+      .map(({ p, sigma, anunciada }) => `${p}: estimador ${sigma} % y test ${anunciada} %`);
     expect(contradicciones).toEqual([]);
   });
 
@@ -1394,7 +1391,9 @@ test.describe('re-inspección 12/10/2026', () => {
   });
 
   // ---------- Hallazgos de contenido ----------
-  test.fail('HALLAZGO — la guía no presenta este test como «más objetivo» que el de idoneidad del banco', async ({
+  // REPARADO 20/10/2026 (hallazgo 3229; decidido por el usuario): la FAQ ya no atribuye un sesgo al
+  // test del banco y presenta este como orientativo.
+  test('HALLAZGO — la guía no presenta este test como «más objetivo» que el de idoneidad del banco', async ({
     page,
   }) => {
     // La FAQ avanzada dice del test MiFID II del banco que «a veces está sesgado […] para reducir
@@ -1408,6 +1407,8 @@ test.describe('re-inspección 12/10/2026', () => {
       .filter({ hasText: '¿Qué pasa si el banco me asigna un perfil diferente?' });
     await expect(respuesta).toHaveCount(1);
     await expect(respuesta).not.toContainText('más objetiva');
+    await expect(respuesta).not.toContainText('sesgado');
+    await expect(respuesta).toContainText('este test es orientativo');
   });
 
   // REPARADO el 20/10/2026 (hallazgo 3230): una sola constante, y la visible usa la pregunta del FAQPage.
@@ -1498,7 +1499,7 @@ test.describe('re-inspección 12/10/2026 · móvil 390×844', () => {
     // PROFILES.moderado
     await expect(rasgo(page, 0)).toHaveText('Bajo');
     await expect(rasgo(page, 1)).toHaveText('3-5 años');
-    await expect(rasgo(page, 2)).toHaveText('8-12 %');
+    await expect(rasgo(page, 2)).toHaveText('6,21 %');
     await expect(rasgo(page, 3)).toHaveText('Batir inflación');
     expect(await reparto(page)).toEqual([
       'Renta Variable (30 %)',
@@ -1721,7 +1722,7 @@ test.describe('re-inspección 14/10/2026 · móvil 390×844', () => {
     // PROFILES.conservador
     await expect(rasgo(page, 0)).toHaveText('Muy bajo');
     await expect(rasgo(page, 1)).toHaveText('< 3 años');
-    await expect(rasgo(page, 2)).toHaveText('5-8 %');
+    await expect(rasgo(page, 2)).toHaveText('4,53 %');
     await expect(rasgo(page, 3)).toHaveText('Preservar capital');
     expect(await reparto(page)).toEqual([
       'Renta Variable (15 %)',
@@ -2137,7 +2138,7 @@ test.describe('re-inspección 14/10/2026 (tarde) · escritorio', () => {
     // PROFILES.equilibrado
     await expect(rasgo(page, 0)).toHaveText('Medio');
     await expect(rasgo(page, 1)).toHaveText('5-10 años');
-    await expect(rasgo(page, 2)).toHaveText('12-15 %');
+    await expect(rasgo(page, 2)).toHaveText('8,87 %');
     await expect(rasgo(page, 3)).toHaveText('Crecimiento sostenido');
     // El % va con espacio duro (U+00A0), como manda la norma del 25/09/2026 (hallazgo 2180)
     expect(await reparto(page)).toEqual([
@@ -2366,7 +2367,7 @@ test.describe('re-inspección 14/10/2026 (tarde) · móvil 375×667', () => {
     // PROFILES.agresivo
     await expect(rasgo(page, 0)).toHaveText('Muy alto');
     await expect(rasgo(page, 1)).toHaveText('> 15 años');
-    await expect(rasgo(page, 2)).toHaveText('20-25 %');
+    await expect(rasgo(page, 2)).toHaveText('14,72 %');
     await expect(rasgo(page, 3)).toHaveText('Máxima rentabilidad');
     expect(await reparto(page)).toEqual([
       'Renta Variable (90 %)',
@@ -2526,7 +2527,7 @@ test.describe('re-inspección 15/10/2026 · escritorio', () => {
     // PROFILES.dinamico
     await expect(rasgo(page, 0)).toHaveText('Alto');
     await expect(rasgo(page, 1)).toHaveText('10-15 años');
-    await expect(rasgo(page, 2)).toHaveText('15-20 %');
+    await expect(rasgo(page, 2)).toHaveText('11,75 %');
     await expect(rasgo(page, 3)).toHaveText('Maximizar crecimiento');
     // PROFILES.dinamico.allocation = 70/20/5/5, con espacio duro antes del % (2180)
     expect(await reparto(page)).toEqual([
@@ -3018,7 +3019,7 @@ test.describe('Inspector 16/10/2026 · escritorio', () => {
     // PROFILES.equilibrado
     await expect(rasgo(page, 0)).toHaveText('Medio');
     await expect(rasgo(page, 1)).toHaveText('5-10 años');
-    await expect(rasgo(page, 2)).toHaveText('12-15 %');
+    await expect(rasgo(page, 2)).toHaveText('8,87 %');
     await expect(rasgo(page, 3)).toHaveText('Crecimiento sostenido');
     expect(await reparto1610(page)).toEqual([
       'Renta Variable (50 %)',
@@ -3052,7 +3053,7 @@ test.describe('Inspector 16/10/2026 · escritorio', () => {
     // PROFILES.moderado
     await expect(rasgo(page, 0)).toHaveText('Bajo');
     await expect(rasgo(page, 1)).toHaveText('3-5 años');
-    await expect(rasgo(page, 2)).toHaveText('8-12 %');
+    await expect(rasgo(page, 2)).toHaveText('6,21 %');
     await expect(rasgo(page, 3)).toHaveText('Batir inflación');
     expect(await reparto1610(page)).toEqual([
       'Renta Variable (30 %)',
@@ -3588,7 +3589,7 @@ test.describe('Inspector 18/10/2026 · escritorio', () => {
       // PROFILES.dinamico
       await expect(rasgo(page, 0)).toHaveText('Alto');
       await expect(rasgo(page, 1)).toHaveText('10-15 años');
-      await expect(rasgo(page, 2)).toHaveText('15-20 %');
+      await expect(rasgo(page, 2)).toHaveText('11,75 %');
       await expect(rasgo(page, 3)).toHaveText('Maximizar crecimiento');
       expect(await reparto1810(page)).toEqual([
         'Renta Variable (70 %)',
@@ -4004,8 +4005,13 @@ test.describe('Inspector 19/10/2026 · escritorio', () => {
     expect(faqLimite).toContain('La excepción es el horizonte: tu respuesta a la pregunta 1 fija el perfil más alto al que llega el test');
   });
 
-  // HALLAZGO (19/10/2026): ABIERTO.
-  test.fail('HALLAZGO — poner en juego la mayor parte del ahorro (pregunta 4) no sube el perfil, igual que en la 8', async ({
+  // HALLAZGO (19/10/2026): REPARADO 20/10/2026 (hallazgo 3376; decidido por el usuario). La 4 puntúa
+  // ahora como la 8: «Más del 60 %» da 1 punto y es la opción A; «Menos del 20 %» da 4 y es la D, así
+  // que los índices de abajo se leen al revés que el 19/10. Con D,C,C,·,C,C,C,B,C,C (27 sin la 4):
+  // «Menos del 20 %» → 31, Dinámico · «Más del 60 %» → 28, Equilibrado. Y «más del 60 %» con «todo
+  // mi ahorro» suma 1 + 1 + 25 = 27, por debajo de «una pequeña parte» de un «patrimonio
+  // diversificado», 4 + 4 + 25 = 33.
+  test('HALLAZGO — poner en juego la mayor parte del ahorro (pregunta 4) no sube el perfil, igual que en la 8', async ({
     page,
   }) => {
     // La 4 («¿Qué porcentaje de tus ahorros totales vas a destinar a inversiones?») da 4 puntos a «Más
@@ -4025,10 +4031,12 @@ test.describe('Inspector 19/10/2026 · escritorio', () => {
       await expect(perfilMostrado(page)).toBeVisible();
       return { perfil: (await perfilMostrado(page).textContent()) ?? '', puntos: await puntos1910(page) };
     };
-    const pocoAhorro = await recorrer([3, 2, 2, 0, 2, 2, 2, 1, 2, 2]); // la 4 en A: 28 → Equilibrado
-    const casiTodo = await recorrer([3, 2, 2, 3, 2, 2, 2, 1, 2, 2]); // la 4 en D: 31 → Dinámico
-    const todoMiAhorro = await recorrer([3, 2, 2, 3, 2, 2, 2, 0, 2, 2]); // la 4 en D y la 8 en A: 30
-    const unaParte = await recorrer([3, 2, 2, 0, 2, 2, 2, 3, 2, 2]); // la 4 en A y la 8 en D: 30
+    const pocoAhorro = await recorrer([3, 2, 2, 3, 2, 2, 2, 1, 2, 2]); // la 4 en D («Menos del 20 %»): 31 → Dinámico
+    const casiTodo = await recorrer([3, 2, 2, 0, 2, 2, 2, 1, 2, 2]); // la 4 en A («Más del 60 %»): 28 → Equilibrado
+    const todoMiAhorro = await recorrer([3, 2, 2, 0, 2, 2, 2, 0, 2, 2]); // la 4 en A y la 8 en A: 27
+    const unaParte = await recorrer([3, 2, 2, 3, 2, 2, 2, 3, 2, 2]); // la 4 en D y la 8 en D: 33
+    expect(casiTodo).toEqual({ perfil: 'Equilibrado', puntos: 28 });
+    expect(pocoAhorro).toEqual({ perfil: 'Dinámico', puntos: 31 });
     // Lo que se espera: más ahorro en juego no suma puntos ni sube el perfil
     expect
       .soft(casiTodo.puntos, 'la 4 en «Más del 60 %» frente a «Menos del 20 %»')
@@ -4077,7 +4085,7 @@ test.describe('Inspector 19/10/2026 · móvil 390×844', () => {
     // PROFILES.moderado
     await expect(rasgo(page, 0)).toHaveText('Bajo');
     await expect(rasgo(page, 1)).toHaveText('3-5 años');
-    await expect(rasgo(page, 2)).toHaveText('8-12 %');
+    await expect(rasgo(page, 2)).toHaveText('6,21 %');
     await expect(rasgo(page, 3)).toHaveText('Batir inflación');
     expect(await reparto1910(page)).toEqual([
       'Renta Variable (30 %)',

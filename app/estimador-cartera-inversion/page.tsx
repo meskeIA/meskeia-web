@@ -6,6 +6,8 @@ import Link from 'next/link';
 import styles from './EstimadorCartera.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+// Carteras, hipótesis y volatilidad, compartidas con test-perfil-inversor (hallazgo 3227).
+import { PARAMETROS_CLASES, CARTERAS_PERFIL, calcularParametrosCartera, type CarteraPerfil } from '@/lib/calculadoras/carteraPerfiles';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -41,12 +43,7 @@ interface AssetClass {
   descripcion: string;
 }
 
-interface CarteraConfig {
-  rv: number; // Renta Variable %
-  rf: number; // Renta Fija %
-  liq: number; // Liquidez %
-  alt: number; // Alternativos %
-}
+type CarteraConfig = CarteraPerfil;
 
 interface SimulacionResultado {
   años: number[];
@@ -87,43 +84,39 @@ const ASSET_CLASSES: AssetClass[] = [
   {
     id: 'rv',
     nombre: 'Renta Variable',
-    rentabilidadMedia: 0.07, // 7% anual
-    volatilidad: 0.16, // 16% desviación
+    ...PARAMETROS_CLASES.rv,
     color: '#2E86AB',
     descripcion: 'Acciones globales (MSCI World)',
   },
   {
     id: 'rf',
     nombre: 'Renta Fija',
-    rentabilidadMedia: 0.03, // 3% anual
-    volatilidad: 0.05, // 5% desviación
+    ...PARAMETROS_CLASES.rf,
     color: '#48A9A6',
     descripcion: 'Bonos gubernamentales y corporativos',
   },
   {
     id: 'liq',
     nombre: 'Liquidez',
-    rentabilidadMedia: 0.015, // 1.5% anual
-    volatilidad: 0.005, // 0.5% desviación
+    ...PARAMETROS_CLASES.liq,
     color: '#10B981',
     descripcion: 'Fondos monetarios y depósitos',
   },
   {
     id: 'alt',
     nombre: 'Alternativos',
-    rentabilidadMedia: 0.05, // 5% anual
-    volatilidad: 0.12, // 12% desviación
+    ...PARAMETROS_CLASES.alt,
     color: '#F59E0B',
     descripcion: 'REITs, materias primas, oro',
   },
 ];
 
 const PERFILES_PREDEFINIDOS: Record<string, { nombre: string; cartera: CarteraConfig }> = {
-  conservador: { nombre: 'Conservador', cartera: { rv: 15, rf: 60, liq: 20, alt: 5 } },
-  moderado: { nombre: 'Moderado', cartera: { rv: 30, rf: 50, liq: 15, alt: 5 } },
-  equilibrado: { nombre: 'Equilibrado', cartera: { rv: 50, rf: 35, liq: 10, alt: 5 } },
-  dinamico: { nombre: 'Dinámico', cartera: { rv: 70, rf: 20, liq: 5, alt: 5 } },
-  agresivo: { nombre: 'Agresivo', cartera: { rv: 90, rf: 5, liq: 0, alt: 5 } },
+  conservador: { nombre: 'Conservador', cartera: CARTERAS_PERFIL.conservador },
+  moderado: { nombre: 'Moderado', cartera: CARTERAS_PERFIL.moderado },
+  equilibrado: { nombre: 'Equilibrado', cartera: CARTERAS_PERFIL.equilibrado },
+  dinamico: { nombre: 'Dinámico', cartera: CARTERAS_PERFIL.dinamico },
+  agresivo: { nombre: 'Agresivo', cartera: CARTERAS_PERFIL.agresivo },
 };
 
 /** Horizonte y encaje orientativos de cada perfil, para la tabla del bloque educativo. */
@@ -175,37 +168,8 @@ function randomNormal(): number {
   return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 }
 
-// Calcular rentabilidad y volatilidad de la cartera
-function calcularParametrosCartera(cartera: CarteraConfig): { rentabilidad: number; volatilidad: number } {
-  const pesos = [cartera.rv / 100, cartera.rf / 100, cartera.liq / 100, cartera.alt / 100];
-
-  // Rentabilidad ponderada
-  let rentabilidad = 0;
-  ASSET_CLASSES.forEach((asset, i) => {
-    rentabilidad += pesos[i] * asset.rentabilidadMedia;
-  });
-
-  // Volatilidad con matriz de correlaciones simplificada (Markowitz)
-  // σ_p² = Σ w_i²·σ_i² + 2·Σ_{i<j} w_i·w_j·σ_i·σ_j·ρ_ij
-  // Correlaciones aproximadas: RV-RF=0.25, RV-LIQ=0.1, RV-ALT=0.4, RF-LIQ=0.05, RF-ALT=0.15, LIQ-ALT=0.05
-  const correlaciones = [
-    [1.00, 0.25, 0.10, 0.40],
-    [0.25, 1.00, 0.05, 0.15],
-    [0.10, 0.05, 1.00, 0.05],
-    [0.40, 0.15, 0.05, 1.00],
-  ];
-  let varianza = 0;
-  for (let i = 0; i < 4; i++) {
-    for (let j = 0; j < 4; j++) {
-      varianza += pesos[i] * pesos[j] * ASSET_CLASSES[i].volatilidad * ASSET_CLASSES[j].volatilidad * correlaciones[i][j];
-    }
-  }
-
-  return {
-    rentabilidad,
-    volatilidad: Math.sqrt(varianza),
-  };
-}
+// La rentabilidad y la volatilidad de la cartera las calcula el motor compartido
+// (calcularParametrosCartera, lib/calculadoras/carteraPerfiles.ts).
 
 // Simulación Monte Carlo
 /**
