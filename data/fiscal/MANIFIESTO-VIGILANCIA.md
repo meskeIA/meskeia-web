@@ -454,7 +454,7 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   30/08/2026 no lo hizo y el mismo catálogo acabó publicando dos fechas distintas según la página
   (hallazgo 588 del Inspector). Desde entonces la app lee `FISCAL_CNAE_IAE_META.verificado`, no el
   `generado` del JSON, así que las dos páginas dicen lo mismo por construcción.
-- **Verificado**: 2026-09-14 (el sello `verificado` del módulo; aquí seguía el 2026-08-30).
+- **Verificado**: 2026-10-20 (el sello `verificado` del módulo; resellado al regenerar por el sinónimo de la distribuidora de bebidas, hallazgo 2950).
 
 ### 3.7 Módulos EXENTOS de vigilancia normativa
 

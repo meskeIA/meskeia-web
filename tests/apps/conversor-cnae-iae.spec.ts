@@ -155,9 +155,9 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * CÓMO SE LEEN LOS BLOQUES DE HALLAZGOS: mientras un hallazgo está ABIERTO su test lleva
  * `test.fail()` y falla a propósito; el día que se repare pasará a ROJO («expected to fail,
  * but passed»), y entonces se le quita la marca y se queda como regresión, sin reescribir el
- * valor esperado. Hoy (16/10/2026) los ABIERTOS son seis de los siete del bloque del 07/10/2026
- * (2945, 2946, 2948, 2949, 2950 y 2951; el 2947 está REPARADO) y los dos del bloque «Inspector
- * 16/10/2026», al final. Los cuatro del bloque del 06/10/2026 (2923-2926) están REPARADOS.
+ * valor esperado. Los siete del bloque del 07/10/2026 (2945-2951) están REPARADOS: el último,
+ * el 2950, el 20/10/2026. También los dos del bloque «Inspector 16/10/2026» (3336 y 3337) y los
+ * cuatro del 06/10/2026 (2923-2926): hoy no queda ningún `test.fail()` abierto.
  */
 
 const RUTA = '/conversor-cnae-iae/';
@@ -427,9 +427,10 @@ test('REGRESIÓN — la app niega la conversión CNAE→IAE en la página, en el
   // fechas del mismo catálogo). Se reselló el 14/09/2026 al mover el alquiler de vivienda
   // de hostelería a 68.20 y el comercio electrónico fuera de la intermediación (hallazgos
   // 838-842); antes, el 08/09/2026, por lavandería y motos (631-632): regenerar ES verificar.
+  // El 20/10/2026, por la distribuidora de bebidas, que pasa al por mayor (2950).
   await expect(page.getByText('RD 10/2025', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('RD Legislativo 1175/1990', { exact: false }).first()).toBeVisible();
-  await expect(page.getByText('14/09/2026', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('20/10/2026', { exact: false }).first()).toBeVisible();
 
   // El FAQPage del JSON-LD dice lo mismo que la página: sin él, las IAs citarían la
   // app como si fuese un conversor.
@@ -3988,10 +3989,11 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
     }
   });
 
-  test('ABIERTO · BAJO (dato) — «distribuidora de bebidas» lleva al comercio al POR MENOR y no al por mayor', async ({
+  test('REPARADO 20/10/2026 · BAJO (dato) — «distribuidora de bebidas» lleva al comercio al POR MENOR y no al por mayor', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO (hallazgo 2950): el sinónimo pasa de 47.25 a una entrada propia de 46.34 y el
+    // catálogo servido se regenera. Era el único «distribuidor/a» del diccionario.
     // Mecanismo del 423: el diccionario (data/cnae-sinonimos.json) pone «distribuidora de
     // bebidas» en 47.25 «Comercio al por menor de bebidas», junto a «bodega», «licorería» y
     // «vinoteca», cuando la CNAE-2025 tiene 46.34 «Comercio al por mayor de bebidas», sin
@@ -3999,10 +4001,14 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
     // comercio al por mayor. El CANDADO de sinónimos no lo ve: 46.34 no es hermana de 47.25 en
     // la correspondencia (`correspondencia['4725'] = ['47.25', '47.92']`).
     await abrirHidratado(page);
-    await buscarCnaeVerificado(page, 'distribuidora de bebidas');
-    await expect(fichas(page).filter({ hasText: 'Comercio al por mayor de bebidas' }).first()).toBeVisible({
-      timeout: 2000,
-    });
+    // El masculino lo deriva el índice desde el 2926: lleva al mismo sitio.
+    for (const consulta of ['distribuidora de bebidas', 'distribuidor de bebidas']) {
+      await buscarCnaeVerificado(page, consulta);
+      const mayor = fichas(page).filter({ hasText: 'Comercio al por mayor de bebidas' }).first();
+      await expect(mayor).toBeVisible({ timeout: 2000 });
+      await expect(mayor.locator('[class*="codigoCnae"]')).toHaveText('46.34');
+      await expect(fichas(page).filter({ hasText: 'Comercio al por menor de bebidas' })).toHaveCount(0);
+    }
   });
 
   test('REPARADO 20/10/2026 · BAJO (contenido) — la misma pregunta tiene una respuesta en la FAQ visible y otra en el FAQPage', async ({
@@ -4291,11 +4297,12 @@ test.describe('Inspector 16/10/2026 — la fecha de la CNAE-2025 vista desde Am�
     // «Vigente. Operativa desde el 15/01/2025.» y «Verificado el 13/09/2026» (en Madrid, 16/01 y
     // 14/09). Las fechas de «Novedades» de la ficha se deslizan igual (11/10/2026 → 10/10/2026).
     expect(CNAE_VIGENCIA.desde).toBe('2025-01-16');
-    expect(FISCAL_CNAE_IAE_META.verificado).toBe('2026-09-14');
+    // Resellado el 20/10/2026 (hallazgo 2950): el caso es el mismo con cualquier fecha ISO.
+    expect(FISCAL_CNAE_IAE_META.verificado).toBe('2026-10-20');
     await abrirFichaDelegumHidratada(page);
     const celda = page.locator('td', { hasText: 'Operativa desde' }).first();
     await expect(celda).toContainText('16/01/2025', { timeout: 2000 });
-    await expect(page.getByText('Verificado el 14/09/2026').first()).toBeVisible({ timeout: 2000 });
+    await expect(page.getByText('Verificado el 20/10/2026').first()).toBeVisible({ timeout: 2000 });
     // Y las novedades de la ficha, que comparten las 20 fichas: la del 11/10/2026 no baja al 10/10.
     // (novedades.ts trae una de cnae-iae fechada '2026-10-11')
     const fechas = await page

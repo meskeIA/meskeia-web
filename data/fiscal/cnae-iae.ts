@@ -45,7 +45,7 @@ export const FISCAL_CNAE_IAE_META = {
    * `meta.generado` en silencio, dejando este sello otra vez por detrás. El generador lo
    * recuerda ya en las dos salidas.
    */
-  verificado: '2026-09-14',
+  verificado: '2026-10-20',
   vigencia: '2026',
 
   iae: {
