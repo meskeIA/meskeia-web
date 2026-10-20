@@ -1393,8 +1393,8 @@ export default function SimuladorLocalComercialPage() {
                 <>
                   <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención del {territorioActualSinIva.impuesto}:</strong> en{' '}
                   {nombreEnFrase(ccaa)} no se devenga IVA, sino el <strong>{territorioActualSinIva.impuesto}</strong>, y la
-                  renuncia es a su exención (art. 50.Cinco Ley canaria 4/2012), entre empresarios con derecho a
-                  deducción. Ese {territorioActualSinIva.impuesto} lo <strong>autoliquida el comprador</strong> por inversión
+                  renuncia es a su exención (art. 50.Cinco Ley canaria 4/2012), que hace el vendedor si se cumplen
+                  los requisitos de la ley. Ese {territorioActualSinIva.impuesto} lo <strong>autoliquida el comprador</strong> por inversión
                   del sujeto pasivo, la operación deja de pagar ITP y la escritura paga AJD. Esta calculadora no
                   cifra el {territorioActualSinIva.impuesto}; el AJD sí, con el tipo general de la comunidad.
                 </>

@@ -640,7 +640,7 @@ const DERIVACIONES: Partial<Record<TipoInmueble, { url: string; nombre: string; 
   local: [{
     url: '/simulador-gastos-compraventa-local-comercial/',
     nombre: 'Simulador de gastos de compra de local comercial',
-    matiz: 'contempla la renuncia a la exención de IVA con inversión del sujeto pasivo (art. 20.Dos LIVA) cuando comprador y vendedor son empresarios con derecho a deducción. Aquí la segunda mano se calcula siempre por ITP.',
+    matiz: 'contempla la renuncia a la exención de IVA con inversión del sujeto pasivo (art. 20.Dos LIVA) cuando el vendedor es empresario y renuncia porque el comprador es un empresario con derecho a deducir el IVA. Aquí la segunda mano se calcula siempre por ITP.',
   }],
   nave: [{
     url: '/simulador-gastos-compraventa-nave-industrial/',
