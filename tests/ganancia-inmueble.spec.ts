@@ -112,6 +112,25 @@ test.describe('Ganancia patrimonial (arts. 34-36 LIRPF)', () => {
     expect(r2(g.ganancia)).toBe(80000);
   });
 
+  // Hallazgo 2966: amortizaciones sobre el valor catastral de la construcción que superan el
+  // coste (art. 14.2.a RIRPF). La minoración del art. 35.2 LIRPF es literal, sin suelo en 0:
+  //   adquisición 40.000 + 4.000 − 48.000 = −4.000 · ganancia 189.500 + 4.000 = 193.500
+  //   cuota 6.000 × 19 % + 44.000 × 21 % + 143.500 × 23 % = 1.140 + 9.240 + 33.005 = 43.385
+  // (con el suelo en 0 de antes: ganancia 189.500 y cuota 42.465).
+  test('unas amortizaciones mayores que el coste dejan el valor de adquisición negativo, sin perder el exceso', () => {
+    const g = calcularGananciaInmueble({
+      precioVenta: 200000,
+      precioCompra: 40000,
+      gastosAdquisicion: 4000,
+      amortizacionesDeducidas: 48000,
+      gastosTransmision: 6500,
+      plusvaliaMunicipal: 4000,
+    });
+    expect(r2(g.valorAdquisicion)).toBe(-4000);
+    expect(r2(g.ganancia)).toBe(193500);
+    expect(r2(g.cuotaIRPF)).toBe(43385);
+  });
+
   test('vender por debajo del valor de adquisición es pérdida y no genera cuota', () => {
     const g = calcularGananciaInmueble({
       precioVenta: 160000, precioCompra: 150000, gastosAdquisicion: 20000, gastosTransmision: 5000,

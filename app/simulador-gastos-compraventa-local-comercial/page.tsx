@@ -172,6 +172,11 @@ interface ResultadosVendedor {
   /** Coste de adquisición (precio + gastos de aquella compra) con el que se compara */
   costeAdquisicion: number;
   /**
+   * Valor catastral de la construcción (total − suelo), la otra base de la amortización del
+   * art. 14.2.a RIRPF (hallazgo 2966). 0 si los dos valores del recibo no se conocen.
+   */
+  construccionCatastral: number;
+  /**
    * false mientras falte el precio de compra original: entonces el 0 del IRPF no es una
    * exención, es un impuesto que no se ha podido calcular (hallazgo 1159, ALTO). Es el mismo
    * campo con el que garaje, trastero y estimador-compraventa-inmueble cierran el «efecto
@@ -733,11 +738,11 @@ export default function SimuladorLocalComercialPage() {
               : null;
 
     /**
-     * CASO 28 (hallazgo 1261): unas amortizaciones MAYORES que todo el coste de adquisición no
-     * pueden existir —la del art. 40 RIRPF recae sobre la construcción, que es parte de ese
-     * coste— y el motor las acotaba en silencio a un valor de adquisición 0: descartaba el
-     * exceso y liquidaba un IRPF enorme como definitivo. Se rechaza como el par catastral
-     * imposible (hallazgo 900): la app nombra el dato y no liquida el IRPF con él.
+     * CASO 28 (hallazgo 1261): unas amortizaciones MAYORES que todo el coste de adquisición y
+     * que la construcción catastral no pueden existir —ver el 2966, abajo— y el motor las
+     * acotaba en silencio a un valor de adquisición 0: descartaba el exceso y liquidaba un IRPF
+     * enorme como definitivo. Se rechaza como el par catastral imposible (hallazgo 900): la app
+     * nombra el dato y no liquida el IRPF con él.
      */
     /**
      * ⚠️ 24/09/2026 (hallazgo 1573): con los gastos de aquella compra ILEGIBLES el coste de
@@ -747,11 +752,25 @@ export default function SimuladorLocalComercialPage() {
      * y el sondeo de los gastos dice hacia dónde queda, como con cualquier otro ilegible.
      */
     const costeAdquisicion = precioC > 0 ? precioC + entrada.gastosAdquisicion : 0;
+    /**
+     * ⚠️ 20/10/2026 (hallazgo 2966): la amortización no recae solo sobre el coste. El art. 14.2.a
+     * RIRPF la admite cada año sobre «el mayor de los siguientes valores: el coste de adquisición
+     * satisfecho o el valor catastral, sin incluir en el cómputo el del suelo», y ni él ni el
+     * art. 40 ponen tope acumulado: un local alquilado con la construcción catastral por encima
+     * del coste puede haber amortizado más que el coste. La regla del 1261 lo declaraba imposible.
+     * El tope es el mayor de los dos; el catastral solo cuenta con los dos valores del recibo
+     * leídos y el total por encima del suelo (0 si no se conoce).
+     */
+    const construccionCatastral =
+      Number.isFinite(valorSuelo) && valorSuelo > 0 && Number.isFinite(valorTotal) && valorTotal > valorSuelo
+        ? valorTotal - valorSuelo
+        : 0;
+    const topeAmortizaciones = Math.max(costeAdquisicion, construccionCatastral);
     const amortizacionesImposibles =
-      precioC > 0 && gastosAdquisicionLegible && entrada.amortizaciones > costeAdquisicion;
+      precioC > 0 && gastosAdquisicionLegible && entrada.amortizaciones > topeAmortizaciones;
     /** Lo que tendrían que sumar los gastos ilegibles para que las amortizaciones cuadren. */
     const excesoSobrePrecio =
-      precioC > 0 && !gastosAdquisicionLegible && entrada.amortizaciones > precioC
+      precioC > 0 && !gastosAdquisicionLegible && entrada.amortizaciones > Math.max(precioC, construccionCatastral)
         ? entrada.amortizaciones - precioC
         : 0;
     const r = calcularVendedor(entrada);
@@ -860,11 +879,12 @@ export default function SimuladorLocalComercialPage() {
       });
     }
     if (!amortizacionesLegible) {
-      // Hasta el coste de adquisición: más allá sería el dato imposible del CASO 28.
+      // Hasta el mayor entre el coste y la construcción catastral: más allá sería el dato
+      // imposible del CASO 28 (hallazgo 2966).
       sondas.push({
         nombre: 'las amortizaciones deducidas',
         pequeno: { ...entrada, amortizaciones: 1 },
-        grande: { ...entrada, amortizaciones: Math.max(1, costeAdquisicion) },
+        grande: { ...entrada, amortizaciones: Math.max(1, topeAmortizaciones) },
       });
     }
     if (!valorTotalLegible && valorSuelo > 0) {
@@ -937,6 +957,7 @@ export default function SimuladorLocalComercialPage() {
       irpfGanancia: irpf,
       amortizacionesImposibles,
       costeAdquisicion,
+      construccionCatastral,
       irpfCalculado: irpfPublicable,
       comisionLegible,
       gestoriaLegible,
@@ -1159,6 +1180,17 @@ export default function SimuladorLocalComercialPage() {
     resultadosVendedor && resultadosVendedor.gastosVentaImposibles.length > 0
       ? mayuscula(enumerar(resultadosVendedor.gastosVentaImposibles))
       : null;
+
+  /**
+   * Por qué unas amortizaciones no pueden ser, con las dos bases del art. 14.2.a RIRPF (hallazgo
+   * 2966). Sin la construcción catastral no se puede afirmar del todo: se pide el dato que lo
+   * decide. Lo usan la tarjeta del valor de adquisición y la del IRPF.
+   */
+  const motivoAmortizaciones = !resultadosVendedor?.amortizacionesImposibles
+    ? null
+    : resultadosVendedor.construccionCatastral > 0
+      ? `las amortizaciones deducidas superan todo el coste de adquisición (${formatCurrency(resultadosVendedor.costeAdquisicion)}) y el valor catastral de la construcción (${formatCurrency(resultadosVendedor.construccionCatastral)}), que son las dos bases sobre las que se amortiza, y eso no puede ser. Revisa el dato`
+      : `las amortizaciones deducidas superan todo el coste de adquisición (${formatCurrency(resultadosVendedor.costeAdquisicion)}), y solo puede ser si se amortizó sobre un valor catastral de la construcción mayor. Revisa el dato o escribe el valor catastral total y el del suelo para comprobarlo`;
 
   /**
    * ¿La plusvalía FALTA mientras la ganancia sí se calcula? Al calcularse restará del valor de
@@ -1987,9 +2019,11 @@ export default function SimuladorLocalComercialPage() {
                           (resultadosVendedor.amortizacionesLegible
                             ? ''
                             : '. Las amortizaciones deducidas no se han podido leer y no están restadas') +
-                          (resultadosVendedor.amortizacionesImposibles
-                            ? `. Atención: las amortizaciones superan todo el coste de adquisición (${formatCurrency(resultadosVendedor.costeAdquisicion)}): no puede ser, porque se amortiza solo la construcción. Revisa el dato`
-                            : '') +
+                          (motivoAmortizaciones
+                            ? `. Atención: ${motivoAmortizaciones}`
+                            : resultadosVendedor.valorAdquisicionCorregido < 0
+                              ? '. Es negativo porque las amortizaciones, calculadas sobre el valor catastral de la construcción, superan el coste: la ganancia las recoge todas (art. 35.2 LIRPF y art. 14.2.a RIRPF)'
+                              : '') +
                           // Con los gastos ilegibles no se puede afirmar que sean imposibles
                           // (hallazgo 1573): se dice qué tendrían que sumar para cuadrar.
                           (resultadosVendedor.excesoSobrePrecio > 0
@@ -2108,8 +2142,8 @@ export default function SimuladorLocalComercialPage() {
                     }
                     icon="🧾"
                     description={
-                      resultadosVendedor.amortizacionesImposibles
-                        ? `Sin calcular: las amortizaciones deducidas superan todo el coste de adquisición (${formatCurrency(resultadosVendedor.costeAdquisicion)}), y eso no puede ser porque solo se amortiza la construcción. Revisa el dato. Este impuesto NO está incluido en el neto de abajo.`
+                      motivoAmortizaciones
+                        ? `Sin calcular: ${motivoAmortizaciones}. Este impuesto NO está incluido en el neto de abajo.`
                         : motivoGastosVenta
                           ? `Sin calcular: ${motivoGastosVenta.charAt(0).toLowerCase()}${motivoGastosVenta.slice(1)}, y con ese dato el valor de transmisión saldría negativo. ${mayuscula(resultadosVendedor.corregirGastosVenta ?? '')}. Este impuesto NO está incluido en el neto de abajo.`
                         : !resultadosVendedor.irpfCalculado

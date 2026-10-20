@@ -2740,7 +2740,11 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
     expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toMatch(/superan todo el coste de adquisición \(129\.000,00 €\)/);
     expect(await page.locator('h3', { hasText: /^NETO QUE RECIBES/ }).first().innerText()).toContain('(PARCIAL)');
     expect(await avisoNeto2309(page)).toMatch(/revisa las amortizaciones deducidas/i);
-    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('0,00 €');
+    // ⚠️ 20/10/2026 (hallazgo 2966): el motor ya no acota la adquisición en 0, así que la tarjeta
+    // da la cifra que sale del dato (129.000 − 150.000) junto al aviso de que no puede ser. Sigue
+    // siendo imposible: la construcción catastral (80.000 − 30.000 = 50.000) tampoco llega.
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('-21.000,00 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain('el valor catastral de la construcción (50.000,00 €)');
     await expect(page.locator('h3', { hasText: 'Valor de transmisión' })).toHaveCount(1);
     // Con las amortizaciones iguales al coste (129.000) el dato ya es posible y se liquida.
     await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '129000');
@@ -4847,7 +4851,10 @@ test.describe('RE-INSPECCIÓN 07/10/2026 — La Rioja, el euro 50.001 de la base
   // reintento. [07/10-b] y [07/10-c] (2967 y 2968) se repararon el 07/10 (e8c8d2ca) y la
   // re-inspección del 08/10/2026 los verificó en navegador: ya van sin la marca.
 
-  // HALLAZGO [07/10-a] (medio, cálculo) — ❌ ABIERTO. La SOSPECHA de la inversa del 1261, con caso:
+  // HALLAZGO [07/10-a] (2966, medio, cálculo) — ✅ REPARADO el 20/10/2026, con la decisión del
+  // usuario: el tope es el mayor entre el coste y la construcción catastral (art. 14.2.a RIRPF), y el
+  // motor minora al pie de la letra, sin suelo en 0 (art. 35.2 LIRPF): 43.385,00 €. Era así: la
+  // SOSPECHA de la inversa del 1261, con caso:
   // la regla «amortizaciones mayores que todo el coste de adquisición = no puede ser» rechaza la
   // amortización legítima de un local ALQUILADO cuyo valor catastral de la construcción supera el
   // coste. El art. 14.2.a RIRPF admite cada año el 3 % del MAYOR entre el coste y el valor catastral
@@ -4864,16 +4871,32 @@ test.describe('RE-INSPECCIÓN 07/10/2026 — La Rioja, el euro 50.001 de la base
   //   obtenido: «IRPF Sin calcular: … superan todo el coste de adquisición (44.000,00 €), y eso no
   //   puede ser porque solo se amortiza la construcción. Revisa el dato» y el neto «(PARCIAL)».
   test('[07/10-a] la amortización del alquiler sobre el valor catastral de la construcción no se declara imposible aunque supere el coste', async ({ page }) => {
-    test.fail();
     await prepararVendedor2609(page, {
       compra: '40000', gastos: '4000', anios: '25', suelo: '40000', total: '120000',
     });
     await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '48000');
     expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('4000,00 €');
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('189.500,00 €');
-    // El defecto (lee y compara, sin reintento).
     expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).not.toContain('no puede ser');
-    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).not.toBe('Sin calcular');
+    // Minoración literal: adquisición 44.000 − 48.000 = −4.000 · ganancia 193.500 ·
+    // IRPF 1.140 + 9.240 + 143.500 × 23 % = 43.385,00 (con el suelo en 0 salían 42.465,00).
+    // Cuatro cifras enteras no se agrupan (RAE 2010, como `Intl` en es-ES).
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('-4000,00 €');
+    expect(await descripcionTarjeta(page, 'Valor de adquisición')).toContain('Es negativo porque las amortizaciones');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('193.500,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('43.385,00 €');
+    expect(await page.locator('h3', { hasText: /^NETO QUE RECIBES/ }).first().innerText()).not.toContain('(PARCIAL)');
+
+    // Sin los dos valores del recibo la construcción no se conoce: no se liquida, pero el aviso
+    // ya no dice que no puede ser, sino qué dato lo decide.
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain('escribe el valor catastral total y el del suelo');
+    // Y por encima de la construcción catastral (80.000) vuelve a ser imposible.
+    await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '120000');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '80001');
+    expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain('el valor catastral de la construcción (80.000,00 €)');
   });
 
   // HALLAZGO [07/10-b] (medio, dato) — ✅ REPARADO el 07/10/2026 (RESPUESTA_IMPUESTO_COMPRA, e8c8d2ca),

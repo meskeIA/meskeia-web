@@ -201,10 +201,16 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
   // Un NaN (importe ilegible) entra como 0, como cualquier otro importe: lo avisa cada app.
   const otrasRentasAhorro = Number.isFinite(e.otrasRentasAhorro) ? positivo(e.otrasRentasAhorro) : 0;
 
-  const valorAdquisicion = Math.max(
-    0,
-    positivo(e.precioCompra) + positivo(e.gastosAdquisicion) + positivo(e.mejoras) - positivo(e.amortizacionesDeducidas),
-  );
+  /**
+   * Sin suelo en 0 (hallazgo 2966, 20/10/2026, decisión del usuario con la cita a la vista): el
+   * art. 35.2 LIRPF y el art. 40.1 RIRPF minoran el valor de adquisición en las amortizaciones
+   * sin tope acumulado, y el art. 14.2.a RIRPF las admite sobre el MAYOR entre el coste y el valor
+   * catastral de la construcción, así que pueden superar el coste. Con `Math.max(0, …)` el exceso
+   * desaparecía en silencio (adquisición −4.000 → 0, 920 € menos de IRPF en el caso del Inspector).
+   * Solo puede salir negativo con amortizaciones: los demás sumandos están acotados en 0.
+   */
+  const valorAdquisicion =
+    positivo(e.precioCompra) + positivo(e.gastosAdquisicion) + positivo(e.mejoras) - positivo(e.amortizacionesDeducidas);
 
   const valorTransmision = Math.max(
     0,
