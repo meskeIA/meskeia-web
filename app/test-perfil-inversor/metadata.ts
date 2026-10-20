@@ -34,6 +34,15 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Hallazgo 3230 (20/10/2026): la FAQ visible y el FAQPage hacían la misma pregunta con dos listas
+ * de cambios vitales, y solo la visible hablaba de la deriva de la cartera. UNA constante que
+ * importan las dos bocas (como app/simulador-gastos-compraventa-garaje), con la unión de las dos.
+ */
+export const PREGUNTA_REVISAR_PERFIL = '¿Cada cuánto tiempo se debe revisar el perfil inversor?';
+export const RESPUESTA_REVISAR_PERFIL =
+  'Se recomienda revisar el perfil al menos una vez al año y siempre que ocurra un cambio significativo en tu situación: nuevo trabajo o pérdida de empleo, matrimonio o divorcio, nacimiento de hijos, herencia, compra de vivienda, proximidad a la jubilación o un cambio en tus objetivos financieros. Los mercados también cambian tu exposición real: si la bolsa sube mucho, tu porcentaje en renta variable aumenta sin que hagas nada.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -71,17 +80,20 @@ export const faqJsonLd = {
       name: '¿En qué invierte un perfil agresivo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un perfil agresivo invierte principalmente en renta variable: acciones individuales, fondos de bolsa, ETFs sectoriales y mercados emergentes. Acepta fluctuaciones elevadas —incluyendo pérdidas temporales del 30-50\u00A0%— a cambio de mayor potencial de rentabilidad a largo plazo.',
+        // 3231 (20/10/2026): nombraba acciones individuales y ETFs sectoriales, que son
+        // concentración, cuando la página le asocia renta variable global diversificada, y lo
+        // afirmaba como un hecho cuando la página da ejemplos ilustrativos.
+        text: 'Este test asocia al perfil agresivo, como ejemplos ilustrativos y no como recomendación, una cartera casi toda en renta variable global diversificada (por ejemplo, fondos o ETFs de renta variable global), con exposición a mercados emergentes y, a veces, estrategias que sobreponderan algún factor como el tamaño o el valor. Acepta fluctuaciones elevadas —incluyendo pérdidas temporales del 30-50\u00A0%— a cambio de mayor potencial de rentabilidad a largo plazo.',
       },
     },
     {
       '@type': 'Question',
-      name: '¿Cada cuánto tiempo se debe revisar el perfil inversor?',
+      name: PREGUNTA_REVISAR_PERFIL,
       acceptedAnswer: {
         '@type': 'Answer',
         // 1216: decía «cada 1-2 años» mientras la página dice dos veces «al menos una vez al
-        // año» y «anualmente». Se unifica con lo que la página afirma.
-        text: 'Se recomienda revisar el perfil inversor al menos una vez al año, y además ante cambios significativos en la situación personal: proximidad a la jubilación, cambio de empleo, herencia, matrimonio, divorcio o cambio en los objetivos financieros. El perfil puede evolucionar a lo largo de la vida.',
+        // año» y «anualmente». Se unifica con lo que la página afirma. 3230: una sola constante.
+        text: RESPUESTA_REVISAR_PERFIL,
       },
     },
   ],

@@ -440,12 +440,30 @@
   transition: left 0.5s ease;
 }
 
+/* Hallazgo 3228 (20/10/2026): con flex y space-between las etiquetas no iban alineadas con los
+   segmentos de la barra (la flecha se coloca por segmento del 20 %) y a 360-390 px se pegaban y se
+   salían. Ahora son cinco columnas iguales, centradas bajo su segmento; los nombres llevan guion
+   blando (U+00AD) para partirse con guion si la columna no les cabe. */
 .profileLabels {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  text-align: center;
   color: var(--text-muted);
   font-size: 0.8rem;
+  line-height: 1.2;
   margin-bottom: var(--spacing-xl);
+}
+
+.profileLabels span {
+  min-width: 0;
+  hyphens: manual;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 480px) {
+  .profileLabels {
+    font-size: 0.7rem;
+  }
 }
 
 /* Descripción del Perfil */

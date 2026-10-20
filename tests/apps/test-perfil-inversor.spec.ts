@@ -1410,7 +1410,8 @@ test.describe('re-inspección 12/10/2026', () => {
     await expect(respuesta).not.toContainText('más objetiva');
   });
 
-  test.fail('HALLAZGO — «cada cuánto revisar el perfil» tiene UNA respuesta en el FAQPage y en la FAQ visible', async ({
+  // REPARADO el 20/10/2026 (hallazgo 3230): una sola constante, y la visible usa la pregunta del FAQPage.
+  test('HALLAZGO — «cada cuánto revisar el perfil» tiene UNA respuesta en el FAQPage y en la FAQ visible', async ({
     page,
   }) => {
     // FAQPage: «…al menos una vez al año, y además ante cambios significativos en la situación
@@ -1426,14 +1427,15 @@ test.describe('re-inspección 12/10/2026', () => {
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const visible = await page
       .locator('[class*="faqSectionItem"]')
-      .filter({ hasText: '¿Con qué frecuencia debo revisar mi perfil?' })
+      .filter({ hasText: '¿Cada cuánto tiempo se debe revisar el perfil inversor?' })
       .locator('p')
       .first()
       .textContent();
     expect(sinEspacios(visible ?? '')).toBe(sinEspacios(enFaqPage ?? ''));
   });
 
-  test.fail('HALLAZGO — el FAQPage describe al perfil agresivo con lo que la página le asocia', async ({ page }) => {
+  // REPARADO el 20/10/2026 (hallazgo 3231).
+  test('HALLAZGO — el FAQPage describe al perfil agresivo con lo que la página le asocia', async ({ page }) => {
     // FAQPage: «invierte principalmente en renta variable: acciones individuales, fondos de bolsa,
     // ETFs sectoriales y mercados emergentes». La página, para Agresivo: «ETFs 100 % renta
     // variable global», «Exposición significativa a mercados emergentes», factores; su tabla,
@@ -1444,9 +1446,11 @@ test.describe('re-inspección 12/10/2026', () => {
     const agresivo = faq.get('¿En qué invierte un perfil agresivo?') ?? '';
     expect(agresivo.length).toBeGreaterThan(0);
     expect(agresivo).not.toMatch(/acciones individuales|ETFs sectoriales/);
+    expect(agresivo).toMatch(/ejemplos ilustrativos/);
   });
 
-  test.fail('HALLAZGO — la tabla comparativa nombra los rasgos como el resultado y no da al Equilibrado otro reparto', async ({
+  // REPARADO el 20/10/2026 (hallazgo 3232): la tabla lee los rasgos de PROFILES.
+  test('HALLAZGO — la tabla comparativa nombra los rasgos como el resultado y no da al Equilibrado otro reparto', async ({
     page,
   }) => {
     // El resultado pinta «Volatilidad esperada» y «Horizonte ideal»; la tabla de la guía da los
@@ -1466,6 +1470,7 @@ test.describe('re-inspección 12/10/2026', () => {
     expect(cabecerasDeFila).toEqual(expect.arrayContaining(rotulos));
     const activos = await tabla.locator('tr', { hasText: 'Activos típicos' }).locator('td').allTextContents();
     expect(activos[3]).not.toContain('60/40'); // columna Equilibrado
+    expect(activos[3]).toContain('50/35/10/5');
   });
 });
 
@@ -1552,7 +1557,9 @@ test.describe('re-inspección 12/10/2026 · móvil 360×740', () => {
   });
 
   // ---------- Hallazgos de operativa en móvil ----------
-  test.fail('HALLAZGO — la flecha de la barra señala la etiqueta del perfil que se nombra (31 y 37 puntos)', async ({
+  // REPARADO el 20/10/2026 (hallazgo 3228): una columna por segmento; los nombres llevan guion
+  // blando (U+00AD), que aquí se retira antes de comparar.
+  test('HALLAZGO — la flecha de la barra señala la etiqueta del perfil que se nombra (31 y 37 puntos)', async ({
     page,
   }) => {
     // Las cinco etiquetas van con `justify-content: space-between` y sin hueco: a 360 px suman
@@ -1578,7 +1585,7 @@ test.describe('re-inspección 12/10/2026 · móvil 360×740', () => {
         const barra = document.querySelector('[class*="profileBar"]')!.getBoundingClientRect();
         const etiquetas = Array.from(document.querySelectorAll('[class*="profileLabels"] span')).map((e) => {
           const r = e.getBoundingClientRect();
-          return { texto: e.textContent ?? '', izq: r.left, der: r.right };
+          return { texto: (e.textContent ?? '').replace(/­/g, ''), izq: r.left, der: r.right };
         });
         return { cx: f.left + f.width / 2, derBarra: barra.right, etiquetas };
       });

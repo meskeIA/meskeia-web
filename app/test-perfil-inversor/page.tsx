@@ -5,6 +5,7 @@ import Link from 'next/link';
 import styles from './TestPerfilInversor.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, RegionBadge } from '@/components';
 import { formatNumber, formatPercentage } from '@/lib';
+import { PREGUNTA_REVISAR_PERFIL, RESPUESTA_REVISAR_PERFIL } from './metadata';
 
 // Definición de preguntas con puntuaciones
 interface Option {
@@ -1158,12 +1159,13 @@ export default function TestPerfilInversorPage() {
               ▼
             </span>
           </div>
+          {/* Hallazgo 3228: una columna por segmento, con guion blando para el móvil. */}
           <div className={styles.profileLabels}>
-            <span>Conservador</span>
-            <span>Moderado</span>
-            <span>Equilibrado</span>
-            <span>Dinámico</span>
-            <span>Agresivo</span>
+            <span>Conser{'­'}vador</span>
+            <span>Mode{'­'}rado</span>
+            <span>Equili{'­'}brado</span>
+            <span>Diná{'­'}mico</span>
+            <span>Agre{'­'}sivo</span>
           </div>
 
           {/* Descripción */}
@@ -1431,35 +1433,32 @@ function GuiaPerfilInversor() {
                   Rentabilidades históricas nominales medias antes de inflación, comisiones e impuestos. Pasadas, no futuras.
                 </td>
               </tr>
+              {/* Hallazgo 3232 (20/10/2026): la tabla llamaba «Volatilidad máxima» y «Horizonte
+                  mínimo» a las mismas cifras que el resultado rotula «esperada» e «ideal», y las
+                  tecleaba aparte. Ahora las lee de PROFILES, con el rótulo del resultado. */}
               <tr>
-                <td><strong>Volatilidad máxima</strong></td>
-                <td>5–8&nbsp;%</td>
-                <td>8–12&nbsp;%</td>
-                <td>12–15&nbsp;%</td>
-                <td>15–20&nbsp;%</td>
-                <td>20–25&nbsp;%+</td>
+                <td><strong>Volatilidad esperada</strong></td>
+                {Object.values(PROFILES).map((p) => (
+                  <td key={p.name}>{p.traits.volatilidad.replace('-', '–')}</td>
+                ))}
               </tr>
               <tr>
                 <td><strong>Renta variable (%)</strong></td>
-                <td>15&nbsp;%</td>
-                <td>30&nbsp;%</td>
-                <td>50&nbsp;%</td>
-                <td>70&nbsp;%</td>
-                <td>90&nbsp;%</td>
+                {Object.values(PROFILES).map((p) => (
+                  <td key={p.name}>{p.allocation.rv}&nbsp;%</td>
+                ))}
               </tr>
               <tr>
-                <td><strong>Horizonte mínimo</strong></td>
-                <td>1–3 años</td>
-                <td>3–5 años</td>
-                <td>5–10 años</td>
-                <td>10–15 años</td>
-                <td>+15 años</td>
+                <td><strong>Horizonte ideal</strong></td>
+                {Object.values(PROFILES).map((p) => (
+                  <td key={p.name}>{p.traits.horizonte.replace('-', '–')}</td>
+                ))}
               </tr>
               <tr>
                 <td><strong>Activos típicos</strong></td>
                 <td>Depósitos, bonos corto</td>
                 <td>Mixtos conservadores</td>
-                <td>ETFs globales 60/40</td>
+                <td>Mixto global {PROFILES.equilibrado.allocation.rv}/{PROFILES.equilibrado.allocation.rf}/{PROFILES.equilibrado.allocation.liq}/{PROFILES.equilibrado.allocation.alt}</td>
                 <td>ETFs renta variable</td>
                 <td>100&nbsp;% acciones globales</td>
               </tr>
@@ -1632,13 +1631,9 @@ function GuiaPerfilInversor() {
           </div>
 
           <div className={styles.faqSectionItem}>
-            <h3>¿Con qué frecuencia debo revisar mi perfil?</h3>
-            <p>
-              Se recomienda revisar el perfil <strong>al menos una vez al año</strong> y siempre que ocurra
-              un cambio vital significativo: nuevo trabajo, matrimonio, nacimiento de hijos, herencia,
-              compra de vivienda o jubilación próxima. Los mercados también cambian tu exposición real:
-              si la bolsa sube mucho, tu porcentaje en renta variable aumenta automáticamente.
-            </p>
+            {/* Hallazgo 3230: la misma constante que el FAQPage de metadata.ts. */}
+            <h3>{PREGUNTA_REVISAR_PERFIL}</h3>
+            <p>{RESPUESTA_REVISAR_PERFIL}</p>
           </div>
 
           <div className={styles.faqSectionItem}>
