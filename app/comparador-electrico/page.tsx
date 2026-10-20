@@ -252,21 +252,36 @@ function Veredicto({ r }: { r: ResultadoComparador }) {
             : ` y se agotaría en el año ${r.anioCruce}.`}
         </p>
         <p className={styles.breakEvenSubLabel}>
-          Cuantos más kilómetros recorras, antes se agota. Si cargas fuera de casa, el precio del
-          kWh es lo que más pesa.
+          {/* Con el mantenimiento editable, el sobrecoste de uso puede venir del mantenimiento y
+              no de la energía: entonces más kilómetros NO lo agotan antes (hallazgo 2833). */}
+          {r.energiaMasBarataEV
+            ? 'Su energía por kilómetro es más barata que la gasolina: lo que encarece su uso es el mantenimiento, así que con más kilómetros al año la ventaja se agota más tarde, o deja de agotarse.'
+            : 'Cuantos más kilómetros recorras, antes se agota. Si cargas fuera de casa, el precio del kWh es lo que más pesa.'}
         </p>
       </>
     );
   }
 
+  // `nunca`: no es más barato de comprar y su uso no es más barato. Con el mismo precio de compra
+  // no «cuesta más de comprar» (hallazgo 2834), y si su energía por kilómetro sí es más barata, el
+  // sobrecoste es del mantenimiento y con más kilómetros puede recuperarse (hallazgo 2833).
+  const mismaCompra = r.inversionInicialExtra === 0;
   return (
     <>
       <div className={styles.breakEvenNunca}>El eléctrico no compensa con estos datos</div>
       <p className={styles.breakEvenLabel}>
-        Cuesta más de comprar y su uso no es más barato que el de la gasolina: la diferencia no se
-        recupera con ningún kilometraje.
+        {mismaCompra
+          ? 'Los dos cuestan lo mismo al comprarlos, pero el uso del eléctrico es más caro: va por detrás desde el primer año.'
+          : 'Cuesta más de comprar y su uso no es más barato que el de la gasolina.'}
+        {r.energiaMasBarataEV
+          ? ' Su energía por kilómetro sí es más barata: lo que encarece su uso es el mantenimiento, y con más kilómetros al año la diferencia podría recuperarse.'
+          : ' Su energía por kilómetro tampoco es más barata, así que la diferencia no se recupera con ningún kilometraje.'}
       </p>
-      <p className={styles.breakEvenSubLabel}>Revisa los precios de compra y de la energía.</p>
+      <p className={styles.breakEvenSubLabel}>
+        {r.energiaMasBarataEV
+          ? 'Revisa los kilómetros anuales y el mantenimiento de cada coche.'
+          : 'Revisa los precios de compra y de la energía.'}
+      </p>
     </>
   );
 }
@@ -506,7 +521,12 @@ export default function ComparadorElectrico() {
                 </span>
                 <span className={styles.statLabel}>
                   Diferencia al comprar: eléctrico con cargador y tras la ayuda, menos gasolina
-                  {resultado.inversionInicialExtra <= 0 ? ' (el eléctrico ya es más barato)' : ''}
+                  {/* Con diferencia 0 cuestan lo mismo: no «ya es más barato» (hallazgo 2834) */}
+                  {resultado.inversionInicialExtra < 0
+                    ? ' (el eléctrico ya es más barato)'
+                    : resultado.inversionInicialExtra === 0
+                      ? ' (cuestan lo mismo)'
+                      : ''}
                 </span>
               </div>
               <div className={styles.statCard}>
@@ -604,8 +624,13 @@ export default function ComparadorElectrico() {
 
           <h3>La ayuda a la compra</h3>
           <p>
-            En España, el {MOVES_III_HISTORICO.nombre} estuvo vigente entre {MOVES_III_HISTORICO.vigencia.replace('-', ' y ')} y
-            terminó el {fechaISO(MOVES_III_HISTORICO.finalizado)}. Hoy rige el {AUTO_PLUS.nombre}{' '}
+            {/* Los años 2019-2025 son los del Programa MOVES con todas sus convocatorias, no los
+                del MOVES III, que nace con el RD 266/2021 (preámbulo del RD 609/2026, hallazgo
+                2835). */}
+            En España, el Programa MOVES tuvo convocatorias entre{' '}
+            {MOVES_III_HISTORICO.vigencia.replace('-', ' y ')} (la última, el{' '}
+            {MOVES_III_HISTORICO.nombre}, del {MOVES_III_HISTORICO.norma}) y terminó el{' '}
+            {fechaISO(MOVES_III_HISTORICO.finalizado)}. Hoy rige el {AUTO_PLUS.nombre}{' '}
             (RD 609/2026), con un máximo de {euros(AUTO_PLUS.maximo.turismo)} por turismo
             que se alcanza sumando criterios: tipo de vehículo, precio sin impuestos y fabricación
             europea. La app no calcula la ayuda, porque algunas condiciones —como el origen de la

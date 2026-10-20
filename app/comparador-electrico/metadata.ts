@@ -89,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Cuándo es más barato un coche (carro o auto) eléctrico que uno de gasolina en total?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El punto de equilibrio entre un eléctrico y un equivalente de gasolina depende de la diferencia al comprar (con el cargador doméstico y tras la ayuda que corresponda), de los kilómetros anuales y de lo que cuesta cada kilómetro en energía y mantenimiento. Con los datos de ejemplo de la calculadora (35.000 € frente a 25.000 €, 15.000 km al año, 16 kWh/100 km a 0,18 €/kWh, 7 l/100 km a 1,65 €/l, cargador de 800 €, mantenimiento de 800 € y 1.000 € al año, y sin ayuda), el eléctrico ahorra 1.500,50 € al año y recupera los 10.800 € de diferencia en el año 8. Con más kilómetros o una ayuda a la compra, el plazo se acorta; con electricidad cara, se alarga o no llega.',
+        text: 'El punto de equilibrio entre un eléctrico y un equivalente de gasolina depende de la diferencia al comprar (con el cargador doméstico y tras la ayuda que corresponda), de los kilómetros anuales y de lo que cuesta cada kilómetro en energía y mantenimiento. Con los datos de ejemplo de la calculadora (35.000 € frente a 25.000 €, 15.000 km al año, 16 kWh/100 km a 0,18 €/kWh, 7 l/100 km a 1,65 €/l, cargador de 800 €, mantenimiento de 800 € y 1000 € al año, y sin ayuda), el eléctrico ahorra 1500,50 € al año y recupera los 10.800 € de diferencia en el año 8. Con más kilómetros o una ayuda a la compra, el plazo se acorta; con electricidad cara, se alarga o no llega.',
       },
     },
     {
@@ -105,7 +105,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta recargar un coche eléctrico en casa comparado con repostar gasolina?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende sobre todo del precio del kWh que pagues. Un coche eléctrico que consume 15 kWh/100 km, cargado a 0,18 €/kWh, gasta 2,70 € cada 100 km. Un gasolina que consume 6 l/100 km a 1,60 €/l gasta 9,60 €. La diferencia, 6,90 € cada 100 km, supone unos 1.035 € al año para 15.000 km, solo en energía. En un punto de carga rápida el kWh puede costar varias veces más que en casa, y esa ventaja se reduce o desaparece: conviene hacer la cuenta con tu precio real.',
+        text: 'Depende sobre todo del precio del kWh que pagues. Un coche eléctrico que consume 15 kWh/100 km, cargado a 0,18 €/kWh, gasta 2,70 € cada 100 km. Un gasolina que consume 6 l/100 km a 1,60 €/l gasta 9,60 €. La diferencia, 6,90 € cada 100 km, supone unos 1035 € al año para 15.000 km, solo en energía. En un punto de carga rápida el kWh puede costar varias veces más que en casa, y esa ventaja se reduce o desaparece: conviene hacer la cuenta con tu precio real.',
       },
     },
     {

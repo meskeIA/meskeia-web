@@ -68,7 +68,7 @@ import {
  * La sospecha del 28-30/09 sobre el tecleo se DESCARTA: los campos guardan el texto tal cual
  * («1.», «1,», «-», vacío) sin que React escriba «0» bajo el cursor, y el `Number(...)` de la
  * línea 433 es el del horizonte, un <select> de opciones fijas (5/8/10/15), que no se teclea.
- * Hallazgos ABIERTOS de esta vuelta, cada uno con su test.fail():
+ * Hallazgos de esta vuelta, REPARADOS el 20/10/2026 (2833-2836) y ya sin test.fail():
  *   K · los veredictos «nunca» y «se agota» dan por hecho que el sobrecoste de uso viene de la
  *       energía; con el mantenimiento editable, la propia app los desmiente cambiando los km
  *   L · mismo precio de compra y uso más caro: «Cuesta más de comprar» y «ya es más barato»
@@ -646,11 +646,11 @@ test.describe('Re-inspección 04/10/2026 · cálculo', () => {
     await expect(page.locator('#precioGasolina')).toHaveAttribute('aria-invalid', 'true');
   });
 
-  // HALLAZGO K (ABIERTO) — el veredicto «nunca» afirma que ningún kilometraje recupera la
-  // diferencia, pero con el mantenimiento del eléctrico por encima del de gasolina el sobrecoste
-  // de uso viene del mantenimiento, y MÁS kilómetros sí la recuperan.
+  // HALLAZGO K (2833, REPARADO el 20/10/2026) — el veredicto «nunca» afirmaba que ningún
+  // kilometraje recupera la diferencia, pero con el mantenimiento del eléctrico por encima del de
+  // gasolina el sobrecoste de uso viene del mantenimiento, y MÁS kilómetros sí la recuperan. Ahora
+  // el texto mira si la energía por km del eléctrico es más barata.
   test('«nunca»: no afirma que ningún kilometraje recupere la diferencia cuando más km la recuperan', async ({ page }) => {
-    test.fail(true, 'Hallazgo K abierto: el veredicto «nunca» da por hecho que el sobrecoste es de energía');
     // A mano, por defecto salvo mantenimiento del eléctrico 1.500 €/año y 15 años:
     // · 15.000 km: uso EV 432 + 1.500 = 1.932 €; gasolina 1.732,50 + 1.000 = 2.732,50 € →
     //   ahorro 800,50 €; 10.800/800,50 = 13,49 ⇒ «Año 14».
@@ -665,12 +665,16 @@ test.describe('Re-inspección 04/10/2026 · cálculo', () => {
     await expect(page.locator(TARJETA)).toContainText('El eléctrico no compensa con estos datos');
     await expect(estadistica(page, 0)).toContainText(/66,50\s€/);
     await expect(page.locator(TARJETA)).not.toContainText('ningún kilometraje');
+    await expect(page.locator(TARJETA)).toContainText('lo que encarece su uso es el mantenimiento');
+    // Control: con la luz cara la energía del eléctrico deja de ser más barata, y entonces sí.
+    // 5.000 km a 1 €/kWh: energía EV 50·16·1 = 800 € frente a 577,50 € de gasolina.
+    await fijar(page, { precioLuz: '1' });
+    await expect(page.locator(TARJETA)).toContainText('no se recupera con ningún kilometraje');
   });
 
-  // HALLAZGO K (ABIERTO) — mismo defecto en «se agota»: «Cuantos más kilómetros recorras, antes
-  // se agota» es falso cuando el sobrecoste viene del mantenimiento.
+  // HALLAZGO K (2833, REPARADO el 20/10/2026) — mismo defecto en «se agota»: «Cuantos más
+  // kilómetros recorras, antes se agota» era falso cuando el sobrecoste viene del mantenimiento.
   test('«se agota»: no dice que más km la agotan antes cuando más km la hacen crecer', async ({ page }) => {
-    test.fail(true, 'Hallazgo K abierto: el veredicto «se agota» da por hecho que el sobrecoste es de energía');
     // A mano: EV 22.000 €, gasolina 24.000 €, sin cargador, mantenimiento 1.500 € (EV) y
     // 900 € (gasolina), resto por defecto, 15 años. Diferencia al comprar −2.000 €.
     // · 15.000 km: uso EV 432 + 1.500 = 1.932 €; gasolina 1.732,50 + 900 = 2.632,50 € →
@@ -692,12 +696,13 @@ test.describe('Re-inspección 04/10/2026 · cálculo', () => {
     await fijar(page, { kmAnuales: '5.000' });
     await expect(page.locator(TARJETA)).toContainText('Más caro desde el año 13');
     await expect(page.locator(TARJETA)).not.toContainText('Cuantos más kilómetros recorras, antes se agota');
+    await expect(page.locator(TARJETA)).toContainText('la ventaja se agota más tarde');
   });
 
-  // HALLAZGO L (ABIERTO) — con el mismo precio de compra (diferencia 0) y el uso más caro, el
-  // veredicto «nunca» dice «Cuesta más de comprar» y la métrica «(el eléctrico ya es más barato)».
+  // HALLAZGO L (2834, REPARADO el 20/10/2026) — con el mismo precio de compra (diferencia 0) y el
+  // uso más caro, el veredicto «nunca» decía «Cuesta más de comprar» y la métrica «(el eléctrico
+  // ya es más barato)».
   test('mismo precio de compra y uso más caro: no dice que cueste más ni que ya sea más barato', async ({ page }) => {
-    test.fail(true, 'Hallazgo L abierto: con diferencia al comprar 0 el texto afirma lo contrario');
     // A mano: EV 25.000 € = gasolina 25.000 €, sin cargador, luz 1 €/kWh, resto por defecto.
     // Energía EV 150·16·1 = 2.400 € → uso 3.200 €; gasolina 2.732,50 € → sobrecoste 467,50 €.
     // Diferencia al comprar 0,00 €: ni «cuesta más de comprar» ni «ya es más barato».
@@ -708,25 +713,29 @@ test.describe('Re-inspección 04/10/2026 · cálculo', () => {
     await expect(celda(page, 1, 3)).toHaveText(/^-467,50\s€$/);
     await expect(page.locator(TARJETA)).not.toContainText('Cuesta más de comprar');
     await expect(estadistica(page, 1)).not.toContainText('ya es más barato');
+    await expect(estadistica(page, 1)).toContainText('cuestan lo mismo');
+    await expect(page.locator(TARJETA)).toContainText('Los dos cuestan lo mismo al comprarlos');
+    await expect(page.locator(TARJETA)).toContainText('va por detrás desde el primer año');
   });
 });
 
 test.describe('Re-inspección 04/10/2026 · contenido', () => {
-  // HALLAZGO M (ABIERTO) — RD 609/2026 (BOE-A-2026-16010), preámbulo: «el Programa MOVES, que,
+  // HALLAZGO M (2835, REPARADO el 20/10/2026 en la app, sin tocar data/fiscal) — RD 609/2026 (BOE-A-2026-16010), preámbulo: «el Programa MOVES, que,
   // mediante sus diversas convocatorias, ha estado vigente entre los años 2019 y 2025», y en el
   // párrafo siguiente MOVES III es el «Real Decreto 266/2021, de 13 de abril». La app atribuye a
   // MOVES III los años de todo el programa (MOVES_III_HISTORICO.vigencia = '2019-2025').
   test('no atribuye a MOVES III la vigencia 2019-2025 de todo el Programa MOVES', async ({ page }) => {
-    test.fail(true, 'Hallazgo M abierto: MOVES III (RD 266/2021) no pudo estar vigente en 2019');
     await abrir(page);
     await expect(page.locator('main')).toContainText('Hoy rige el Programa Auto+');
     await expect(page.locator('main')).not.toContainText('MOVES III estuvo vigente entre 2019');
+    await expect(page.locator('main')).toContainText(
+      'el Programa MOVES tuvo convocatorias entre 2019 y 2025 (la última, el Programa MOVES III, del Real Decreto 266/2021)',
+    );
   });
 
-  // HALLAZGO N (ABIERTO) — CLAUDE.md §2 (RAE 2010): con cuatro cifras enteras no se agrupa. El
-  // FAQ, escrito a mano, pone «1.000 €», «1.500,50 €» y «1.035 €»; la app escribe «1500,50 €».
+  // HALLAZGO N (2836, REPARADO el 20/10/2026) — CLAUDE.md §2 (RAE 2010): con cuatro cifras
+  // enteras no se agrupa. El FAQ, escrito a mano, ponía «1.000 €», «1.500,50 €» y «1.035 €».
   test('el FAQ no agrupa las cifras de cuatro dígitos', async ({ page }) => {
-    test.fail(true, 'Hallazgo N abierto: «1.500,50 €», «1.000 €» y «1.035 €» en el FAQPage');
     await abrir(page);
     const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = scripts.find((t) => t.includes('FAQPage')) ?? '';
