@@ -219,6 +219,31 @@ test.describe('Calculadora de Fracciones — en el navegador', () => {
     await expect(page.locator('#panel-operar dd').first()).toHaveText('5/6');
   });
 
+  test('C.bis · con los fotogramas lentos (carga), el cursor ya está en su sitio al teclear tras el botón', async ({ page }) => {
+    // Cabo C0336: «C» falló en la suite entera con 4 workers y pasaba aislado. insertar()
+    // colocaba el cursor en un requestAnimationFrame; si el fotograma llegaba después de que se
+    // tecleara, el cursor volvía atrás y lo tecleado quedaba detrás. Aquí cada fotograma se
+    // retrasa 300 ms, que es la carga hecha determinista: con la versión vieja daba «1/ + 21/3».
+    await page.evaluate(() => {
+      const original = window.requestAnimationFrame.bind(window);
+      window.requestAnimationFrame = (cb: FrameRequestCallback) => {
+        setTimeout(() => original(cb), 300);
+        return 0;
+      };
+    });
+    const caja = page.locator('#fr-expresion');
+    await caja.fill('1');
+    await esperarValorEnReact(page, caja, '1');
+    await page.getByRole('button', { name: 'Insertar barra de fracción' }).click();
+    await caja.pressSequentially('2');
+    await page.getByRole('button', { name: 'Insertar suma' }).click();
+    await caja.pressSequentially('1/3');
+    await expect(caja).toHaveValue('1/2 + 1/3');
+    await page.waitForTimeout(400); // ningún fotograma atrasado mueve ya nada
+    await expect(caja).toHaveValue('1/2 + 1/3');
+    await expect(page.locator('#panel-operar dd').first()).toHaveText('5/6');
+  });
+
   test('D · simplificar 84/126 explica el m.c.d. 42 y da 2/3', async ({ page }) => {
     await page.getByRole('tab', { name: 'Simplificar' }).click();
     const panel = page.locator('#panel-simplificar');

@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import styles from './NormalizacionBasesDatos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import {
@@ -132,6 +132,19 @@ export default function NormalizacionBasesDatosPage() {
     ejecutarAnalisis(ejemplo.atributos, ejemplo.dependencias);
   };
 
+  // El cursor tras la flecha se coloca justo después de pintar el texto nuevo, en el mismo
+  // evento del clic. Con requestAnimationFrame llegaba un fotograma tarde y lo tecleado en ese
+  // intervalo quedaba detrás del cursor (cabo C0336, en calculadora-fracciones).
+  const cursorPendiente = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const posicion = cursorPendiente.current;
+    if (posicion === null) return;
+    cursorPendiente.current = null;
+    const campo = refDependencias.current;
+    campo?.focus();
+    campo?.setSelectionRange(posicion, posicion);
+  }, [textoDependencias]);
+
   const insertarFlecha = () => {
     const campo = refDependencias.current;
     setEjemploActivo(null);
@@ -142,12 +155,8 @@ export default function NormalizacionBasesDatosPage() {
     const inicio = campo.selectionStart;
     const fin = campo.selectionEnd;
     const nuevo = `${textoDependencias.slice(0, inicio)} → ${textoDependencias.slice(fin)}`;
+    cursorPendiente.current = inicio + 3;
     setTextoDependencias(nuevo);
-    const posicion = inicio + 3;
-    requestAnimationFrame(() => {
-      campo.focus();
-      campo.setSelectionRange(posicion, posicion);
-    });
   };
 
   const limpiar = () => {

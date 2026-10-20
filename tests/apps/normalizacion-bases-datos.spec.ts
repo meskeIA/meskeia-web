@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * normalizacion-bases-datos — 05/09/2026
@@ -80,6 +81,30 @@ test.describe('normalizacion-bases-datos', () => {
 
     await expect(page.getByText(/Zzz/).first()).toBeVisible();
     await expect(page.getByRole('heading', { name: /Clave candidata/ })).toHaveCount(0);
+  });
+
+  test('«Insertar →» deja el cursor tras la flecha aunque los fotogramas vayan lentos', async ({ page }) => {
+    // Cabo C0336 (visto en calculadora-fracciones): el cursor se colocaba en un
+    // requestAnimationFrame y, si el fotograma llegaba después de teclear, volvía atrás y lo
+    // tecleado quedaba detrás. Cada fotograma se retrasa 300 ms: la carga hecha determinista.
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['#campo-dependencias']);
+    await page.evaluate(() => {
+      const original = window.requestAnimationFrame.bind(window);
+      window.requestAnimationFrame = (cb: FrameRequestCallback) => {
+        setTimeout(() => original(cb), 300);
+        return 0;
+      };
+    });
+    const campo = page.locator('#campo-dependencias');
+    await campo.fill('A');
+    await esperarValorEnReact(page, campo, 'A');
+    await page.getByRole('button', { name: 'Insertar →' }).click();
+    await campo.pressSequentially('B');
+    await expect(campo).toHaveValue('A → B');
+    await page.waitForTimeout(400); // ningún fotograma atrasado mueve ya nada
+    await campo.pressSequentially('C');
+    await expect(campo).toHaveValue('A → BC');
   });
 
   test('la guía educativa está en el HTML servido, no solo tras hidratar', async ({ page }) => {

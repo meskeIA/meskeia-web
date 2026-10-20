@@ -6,7 +6,7 @@
  * `@/lib/calculadoras/fracciones` (probado en tests/fracciones-motor.spec.ts) y los casos de aula en `./casos.ts`.
  */
 
-import { useMemo, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styles from './CalculadoraFracciones.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { PREGUNTAS_FRECUENTES } from './metadata';
@@ -185,17 +185,33 @@ export default function CalculadoraFraccionesPage() {
   const lecturaA = useMemo(() => leerFraccion(textoA), [textoA]);
   const lecturaB = useMemo(() => leerFraccion(textoB), [textoB]);
 
+  // El cursor tras un botón de símbolo se coloca justo después de pintar el valor nuevo, en el
+  // mismo evento del clic. Con requestAnimationFrame llegaba un fotograma tarde: lo que se
+  // tecleaba en ese intervalo quedaba detrás del cursor, que volvía atrás (cabo C0336).
+  const cursorPendiente = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const cursor = cursorPendiente.current;
+    if (cursor === null) return;
+    cursorPendiente.current = null;
+    const el = entradaRef.current;
+    el?.focus();
+    el?.setSelectionRange(cursor, cursor);
+  }, [expresion]);
+
   function insertar(texto: string) {
     const el = entradaRef.current;
     const inicio = el?.selectionStart ?? expresion.length;
     const fin = el?.selectionEnd ?? expresion.length;
     const nuevo = (expresion.slice(0, inicio) + texto + expresion.slice(fin)).slice(0, MAX_LONGITUD);
-    setExpresion(nuevo);
     const cursor = Math.min(inicio + texto.length, nuevo.length);
-    requestAnimationFrame(() => {
+    if (nuevo === expresion) {
+      // Sin cambio de valor (tope de longitud) no hay render que aplique el cursor.
       el?.focus();
       el?.setSelectionRange(cursor, cursor);
-    });
+      return;
+    }
+    cursorPendiente.current = cursor;
+    setExpresion(nuevo);
   }
 
   return (
