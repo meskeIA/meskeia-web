@@ -360,6 +360,9 @@ const sujetoPlural = (partes: readonly string[]): boolean =>
 const escribelo = (partes: readonly string[]): string => (partes.length > 1 ? 'Escríbelos' : 'Escríbelo');
 /** Cómo se nombra en los avisos el campo de las otras rentas del ahorro (hallazgo 3368). */
 const OTRAS_RENTAS = NOMBRE_OTRAS_RENTAS_AHORRO;
+/** Si el aviso de una cifra ya nombra las otras rentas como ilegibles (hallazgo 3386). */
+const nombraOtrasRentas = (v: Veredicto): boolean =>
+  v.tipo === 'mixto' ? [...v.mayor, ...v.menor].includes(OTRAS_RENTAS) : v.tipo !== 'ninguno' && v.campos.includes(OTRAS_RENTAS);
 
 /** Los meses completos del periodo inferior a un año, para el prorrateo del art. 107.4 TRLRHL. */
 const MESES_COMPLETOS = Array.from({ length: 12 }, (_, m) => m);
@@ -1298,7 +1301,7 @@ export default function SimuladorLocalComercialPage() {
             {renunciaImposible ? (
               <>La <strong>renuncia a la exención</strong> no existe en el {territorioActualSinIva.impuesto}: la segunda mano paga siempre ITP.</>
             ) : (
-              <>En segunda mano entre empresarios con derecho a deducción se puede <strong>renunciar a la exención del {territorioActualSinIva.impuesto}</strong> (art. 50.Cinco Ley canaria 4/2012).</>
+              <>En segunda mano, si se cumplen los requisitos de la ley, el vendedor empresario puede <strong>renunciar a la exención del {territorioActualSinIva.impuesto}</strong> (art. 50.Cinco Ley canaria 4/2012).</>
             )}{' '}
             Consúltalo con tu asesor fiscal antes de decidir.
           </>
@@ -1306,9 +1309,9 @@ export default function SimuladorLocalComercialPage() {
           <>
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de un local comercial
             puede ser <strong>deducible</strong> si lo destinas a una actividad sujeta y no exenta de IVA (una
-            consulta médica o una academia, exentas, no lo deducen). Por eso, en segunda mano entre
-            profesionales con derecho a deducir, muchas veces conviene <strong>renunciar a la exención de IVA</strong> para no pagar un ITP
-            que no se recupera. Consulta con tu asesor fiscal antes de decidir.
+            consulta médica o una academia, exentas, no lo deducen). Por eso, en segunda mano, si
+            quien vende es empresario y tú tienes derecho a deducir, muchas veces conviene que <strong>renuncie a la exención de IVA</strong> (art. 20.Dos LIVA)
+            para que no pagues un ITP que no se recupera. Consulta con tu asesor fiscal antes de decidir.
           </>
         )}
       </div>
@@ -1397,8 +1400,9 @@ export default function SimuladorLocalComercialPage() {
                 </>
               ) : (
                 <>
-                  <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
-                  comprador y vendedor son empresarios o profesionales con derecho a deducción. El IVA se autoliquida
+                  <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> la hace el vendedor
+                  empresario, y solo es posible cuando el comprador es empresario o profesional con derecho a
+                  deducir el IVA. El IVA se autoliquida
                   por <strong>inversión del sujeto pasivo</strong> (no se paga al vendedor) y es deducible si tienes
                   derecho. A cambio, la escritura tributa por AJD, que <strong>algunas comunidades aplican a un tipo
                   incrementado</strong> en caso de renuncia.{' '}
@@ -2100,7 +2104,17 @@ export default function SimuladorLocalComercialPage() {
                                   ? ` Lleva la deducción del ${conPct(formatNumber(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje, 0))} por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos.`
                                   : '';
                               const aviso = avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0);
-                              if (aviso) return `${aviso}${fraseCeutaMelilla}`;
+                              // Hallazgo 3386 (20/10/2026): la frase de las otras rentas del ahorro, la
+                              // misma forma que la de Ceuta y Melilla, también detrás del aviso cuando
+                              // hay cuota publicada.
+                              if (aviso) {
+                                const fraseOtrasRentas =
+                                  // Con las otras rentas ilegibles, el aviso ya lo dice (no «única renta»).
+                                  resultadosVendedor.irpfGanancia > 0 && !nombraOtrasRentas(resultadosVendedor.veredictoIrpf)
+                                    ? ` ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`
+                                    : '';
+                                return `${aviso}${fraseCeutaMelilla}${fraseOtrasRentas}`;
+                              }
                               return resultadosVendedor.gananciaPatrimonial < 0
                                 ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
                                 : resultadosVendedor.gananciaPatrimonial === 0
@@ -2303,7 +2317,7 @@ export default function SimuladorLocalComercialPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid #e0e0e0', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🤝</span> Empresa compra local usado a otra empresa</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Si ambas partes tienen derecho a deducción, el vendedor puede renunciar a la exención de IVA.
+                Si la empresa compradora tiene derecho a deducir el IVA, el vendedor puede renunciar a la exención de IVA.
                 La operación pasa a IVA {conPct(formatNumber(IVA_LOCAL_COMERCIAL, 0))} con inversión del sujeto pasivo: el comprador lo autoliquida y
                 deduce, evitando un ITP que no recuperaría.
               </p>
@@ -2425,7 +2439,7 @@ export default function SimuladorLocalComercialPage() {
             <strong>Limitaciones de este simulador</strong>
           </div>
           <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
-            <li>La renuncia a la exención de IVA solo es válida entre empresarios o profesionales con derecho a deducción; no todos los compradores pueden acogerse.</li>
+            <li>La renuncia a la exención de IVA la hace un vendedor empresario y solo es válida si el comprador es empresario o profesional con derecho a deducir el IVA (art. 20.Dos LIVA); no todos los compradores pueden acogerse.</li>
             <li>En la renuncia, algunas comunidades aplican un tipo de AJD incrementado; este simulador solo lo aplica donde está verificado (Comunitat Valenciana) y en el resto usa el AJD general, así que el coste real de AJD puede ser mayor.</li>
             <li>El IVA solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta.</li>
             <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado, y también la del AJD de la obra nueva o de la renuncia: aunque el IVA se calcula sobre la contraprestación pactada, la base del AJD no puede ser inferior a ese valor (art. 30.1 TRLITPAJD, redacción de la Ley 11/2021). Aquí el AJD se calcula sobre el precio escrito.</li>

@@ -5183,8 +5183,9 @@ test.describe('HALLAZGOS 24/09/2026 — reparados', () => {
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('3050,00 €');
     expect(await tituloTarjeta24(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('579,50 €');
+    // Desde el hallazgo 3386 (20/10/2026) el aviso va seguido de la base del ahorro de la cuota.
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
-      'No resta la plusvalía municipal, que falta, así que la cuota real puede ser menor.',
+      'No resta la plusvalía municipal, que falta, así que la cuota real puede ser menor. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
 
     await sembrar(page, 'Años de propiedad', '5');
@@ -5566,7 +5567,7 @@ test.describe('RE-INSPECCIÓN 26/09/2026 — Valencia en obra nueva, la raya del
     );
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1260,75 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
-      'La gestoría de la venta no se ha podido leer, así que la cuota real es menor. Escríbelo con coma decimal (1.234,56).',
+      'La gestoría de la venta no se ha podido leer, así que la cuota real es menor. Escríbelo con coma decimal (1.234,56). Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     expect(await tituloTarjeta24(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('2685,75 €');
@@ -5607,7 +5608,7 @@ test.describe('RE-INSPECCIÓN 26/09/2026 — Valencia en obra nueva, la raya del
     expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('el valor catastral total no se ha podido leer');
     expect(euros24(await valorTarjeta(page, 'IRPF sobre ganancia'))).toBeCloseTo(226.81, 2);
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
-      'El valor catastral total no se ha podido leer, así que la cuota real puede ser mayor. Escríbelo con coma decimal (1.234,56).',
+      'El valor catastral total no se ha podido leer, así que la cuota real puede ser mayor. Escríbelo con coma decimal (1.234,56). Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     expect(await tituloTarjeta24(page, /IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('18.966,94 €');
@@ -6057,7 +6058,7 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Baleares, Navarra en obra nueva, la
     );
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('755,25 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
-      'No se han podido leer los impuestos y gastos de aquella compra, así que la cuota real es menor. Escríbelo con coma decimal (1.234,56).',
+      'No se han podido leer los impuestos y gastos de aquella compra, así que la cuota real es menor. Escríbelo con coma decimal (1.234,56). Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('13.219,75 €');

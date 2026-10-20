@@ -5932,8 +5932,9 @@ test.describe('Hallazgos de la inspección del 24/09/2026 — REPARADOS el mismo
     expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('3950,00 €');
     expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
     expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('750,50 €');
+    // Desde el hallazgo 3386 (20/10/2026) el aviso va seguido de la base del ahorro de la cuota.
     expect(await i24Desc(page, /^IRPF sobre ganancia/)).toBe(
-      'No resta la plusvalía municipal, que falta, así que la cuota real puede ser menor.',
+      'No resta la plusvalía municipal, que falta, así que la cuota real puede ser menor. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     // Con el suelo la cuota baja, que es lo que el «máximo» anunciaba.
     await sembrarImporte(page, 'Valor catastral del suelo (€)', '5000');

@@ -119,6 +119,9 @@ const sujetoPlural = (partes: readonly string[]): boolean =>
 const escribelo = (partes: readonly string[]): string => (partes.length > 1 ? 'Escríbelos' : 'Escríbelo');
 /** Cómo se nombra en los avisos el campo de las otras rentas del ahorro (hallazgo 3368). */
 const OTRAS_RENTAS = NOMBRE_OTRAS_RENTAS_AHORRO;
+/** Si el aviso de una cifra ya nombra las otras rentas como ilegibles (hallazgo 3386). */
+const nombraOtrasRentas = (v: Veredicto): boolean =>
+  v.tipo === 'mixto' ? [...v.mayor, ...v.menor].includes(OTRAS_RENTAS) : v.tipo !== 'ninguno' && v.campos.includes(OTRAS_RENTAS);
 
 /** Los meses completos del periodo inferior a un año, para el prorrateo del art. 107.4 TRLRHL. */
 const MESES_COMPLETOS = Array.from({ length: 12 }, (_, m) => m);
@@ -1827,7 +1830,17 @@ export default function SimuladorTrasteroCompraventaPage() {
                                 `${AVISO_COMISION_IMPOSIBLE} Este impuesto NO está incluido en el neto de abajo.`
                         : // Sin ganancia no hay nada que tribute: «SIN CUOTA · Tributación en base
                           // del ahorro» era la forma del hallazgo 1554 de la referencia.
-                          (avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0) ??
+                          // Hallazgo 3386 (20/10/2026, medido en local-comercial): detrás del aviso
+                          // también se dice sobre qué base del ahorro está la cuota publicada.
+                          ((() => {
+                            const aviso = avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0);
+                            if (!aviso) return null;
+                            // Con las otras rentas ilegibles, el aviso ya lo dice: no se añade
+                            // «como si esta venta fuera tu única renta», que lo contradiría.
+                            return resultadosVendedor.irpfGanancia > 0 && !nombraOtrasRentas(resultadosVendedor.veredictoIrpf)
+                              ? `${aviso} ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`
+                              : aviso;
+                          })() ??
                           (resultadosVendedor.gananciaPatrimonial < 0
                             ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
                             : resultadosVendedor.gananciaPatrimonial === 0

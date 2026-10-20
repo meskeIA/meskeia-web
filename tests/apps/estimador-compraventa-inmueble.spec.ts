@@ -5792,7 +5792,8 @@ test.describe('Inspección 24/09/2026 — el tipo de inmueble en el vendedor y l
     // La cuota: los dos ilegibles la bajarían (la comisión es gasto de transmisión y las mejoras
     // suman al valor de adquisición), así que la dirección es segura y el remate va en plural.
     expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
-      'No se han podido leer la comisión inmobiliaria y las mejoras, así que la cuota real es menor. Escríbelos con coma decimal (1.234,56).',
+      // Desde el hallazgo 3386 (20/10/2026) el aviso va seguido de la base del ahorro de la cuota.
+      'No se han podido leer la comisión inmobiliaria y las mejoras, así que la cuota real es menor. Escríbelos con coma decimal (1.234,56). Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
   });
 
@@ -5866,8 +5867,9 @@ test.describe('Inspección 24/09/2026 — el tipo de inmueble en el vendedor y l
     expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('44.000,00 €');
     expect(await textoH3(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
     expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('9120,00 €');
+    // Desde el hallazgo 3386 (20/10/2026) el aviso va seguido de la base del ahorro de la cuota.
     expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
-      'No resta la plusvalía municipal, que falta, así que la cuota real puede ser menor.',
+      'No resta la plusvalía municipal, que falta, así que la cuota real puede ser menor. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     // Con el suelo la cuota baja, que es lo que el «máximo» anunciaba
     await sembrar24(page, 'Valor catastral del suelo', '50000');

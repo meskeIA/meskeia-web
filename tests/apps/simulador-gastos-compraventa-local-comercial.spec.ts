@@ -3287,8 +3287,9 @@ test.describe('Inspección 24/09/2026 — Castilla y León, amortizaciones frent
     expect(await tituloTarjeta24(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial (máximo)');
     expect(await tituloTarjeta24(page, /^IRPF sobre la ganancia/)).toBe('IRPF sobre la ganancia (máximo)');
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('37.106,00 €');
+    // Desde el hallazgo 3386 (20/10/2026) el aviso va seguido de la base del ahorro de la cuota.
     expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toBe(
-      'No resta la plusvalía municipal, que falta, así que la cuota real puede ser menor.',
+      'No resta la plusvalía municipal, que falta, así que la cuota real puede ser menor. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
 
     await sembrarImporte12(page, 'Valor catastral del suelo (€)', '50000');
@@ -6132,8 +6133,8 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
   // la deducción total o parcial del Impuesto soportado al realizar la adquisición» (o, si no, por el
   // destino previsible de los bienes). El requisito de deducir es del ADQUIRENTE: una clínica o una
   // academia (exentas) que venden su local a un comercio sí pueden renunciar.
+  // REPARADO el 20/10/2026 (hallazgo 3385): las cuatro bocas, la limitación y la nota de Canarias.
   test('[19/10-b] ninguna boca exige al vendedor derecho a deducir para renunciar a la exención (art. 20.Dos LIVA)', async ({ page }) => {
-    test.fail();
     await abrir0810(page);
     await page.getByRole('button', { name: /2ª mano con renuncia/ }).click();
     await sembrarImporte12(page, 'Precio del local comercial', '200000');
@@ -6168,8 +6169,8 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
   //   ganancia 33.300 → cuota(213.300) − cuota(180.000) = 8191,00 (la venta sola daría 1.140 + 27.300 ×
   //   21 % = 6873,00), y la tarjeta solo dice «La comisión inmobiliaria no se ha podido leer, así que la
   //   cuota real es menor».
+  // REPARADO el 20/10/2026 (hallazgo 3386), también en garaje, trastero y el estimador.
   test('[19/10-c] con otras rentas y un importe ilegible, la tarjeta del IRPF sigue diciendo sobre qué base está la cuota', async ({ page }) => {
-    test.fail();
     await abrir0810(page);
     await vendedorSinAmortizar0810(page, 'madrid');
     await sembrarImporte12(page, 'Otras rentas del ahorro de este año (€)', '180000');

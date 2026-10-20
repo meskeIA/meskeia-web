@@ -238,6 +238,9 @@ const sinRepetir = (partes: readonly string[]): string[] => Array.from(new Set(p
 const escribelo = (partes: readonly string[]): string => (partes.length > 1 ? 'Escríbelos' : 'Escríbelo');
 /** Cómo se nombra en los avisos el campo de las otras rentas del ahorro (hallazgo 3368). */
 const OTRAS_RENTAS = NOMBRE_OTRAS_RENTAS_AHORRO;
+/** Si el aviso de una cifra ya nombra las otras rentas como ilegibles (hallazgo 3386). */
+const nombraOtrasRentas = (v: Veredicto): boolean =>
+  v.tipo === 'mixto' ? [...v.mayor, ...v.menor].includes(OTRAS_RENTAS) : v.tipo !== 'ninguno' && v.campos.includes(OTRAS_RENTAS);
 
 /** Cada inmueble con su artículo, para las frases que lo nombran. */
 const CON_ARTICULO: Record<TipoInmueble, string> = {
@@ -2662,10 +2665,11 @@ export default function SimuladorCompraventaPage() {
                             resultadosVendedor.deduccionCeutaMelilla > 0
                               ? `Lleva la deducción del ${DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje}\u00A0% por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos`
                               : null,
-                            // Sobre qué base del ahorro está calculada la cuota (hallazgo 3368), junto a
-                            // la descripción de la cuota y no detrás de un aviso, como en las hermanas.
-                            resultadosVendedor.irpfGanancia > 0 &&
-                            avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', true) === null
+                            // Sobre qué base del ahorro está calculada la cuota (hallazgo 3368). Desde el
+                            // hallazgo 3386 (20/10/2026) también detrás de un aviso de ilegibles: la
+                            // cuota se sigue publicando y sigue llevando las otras rentas.
+                            // Con las otras rentas ilegibles, el aviso ya lo dice (no «única renta»).
+                            resultadosVendedor.irpfGanancia > 0 && !nombraOtrasRentas(resultadosVendedor.veredictoIrpf)
                               ? textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)
                               : null,
                           ]
