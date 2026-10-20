@@ -202,6 +202,13 @@ test.describe('simulador-fisica · reparaciones del 21/09/2026', () => {
     await expect
       .poll(async () => leerMarcador(page, 'Tiempo'), { timeout: 30_000 })
       .toBeCloseTo(2.02, 2);
+    // «2,02 s» sale ya desde t = 2,015 s, ANTES del impacto (2,0193 s), y ese fotograma lleva
+    // v = 9,81 × 2,016 ≈ 19,78: con los fotogramas largos de la suite con 4 workers el poll se
+    // quedó con él (19,78 frente a 19,81, cabo C0330). El marcador no anuncia el impacto, así que
+    // se deja correr medio segundo (el impacto llega como mucho 5 ms después) y se leen los
+    // valores ya fijos, que es lo que el hallazgo mide: con el defecto, 2,03 s y 19,95 m/s.
+    await page.waitForTimeout(500);
+    expect(await leerMarcador(page, 'Tiempo')).toBeCloseTo(2.02, 2);
     expect(await leerMarcador(page, 'Velocidad')).toBeCloseTo(19.81, 2);
     // La energía final no puede pasar de la inicial: es el testigo de la conservación.
     expect(await leerMarcador(page, 'Energía')).toBeLessThanOrEqual(energiaInicial);
