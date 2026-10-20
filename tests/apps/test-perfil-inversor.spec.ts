@@ -3,6 +3,17 @@ import { esperarPaginaAsentada } from './_hidratacion';
 import { ORIGEN } from './_puerto';
 
 /**
+ * Los tests de este fichero se reparten entre los workers (20/10/2026). Es el spec más largo del
+ * catálogo (~9 min: cada caso contesta las diez preguntas, con pausas de lectura a propósito), y con
+ * `fullyParallel: false` ocupaba un solo worker mientras los demás acababan: marcaba él solo el tiempo
+ * de `suite --specs` y de la suite entera. Son independientes —ni `beforeAll`, ni `describe.serial`,
+ * ni estado a nivel de fichero, y cada test tiene su propio contexto de navegador y su sessionStorage—,
+ * así que el reparto no cambia lo que mide ninguno. Con 1 worker (`next dev`, el día a día) no cambia
+ * nada. Un caso que dependa de otro, si se añade, va en su propio `test.describe.serial`.
+ */
+test.describe.configure({ mode: 'parallel' });
+
+/**
  * Inspector — test-perfil-inversor (segmento interactiva, riesgo 2, 524 usos reales)
  *
  * Primera inspección: 20/08/2026. Aunque el segmento sea «interactiva», la app SÍ tiene
