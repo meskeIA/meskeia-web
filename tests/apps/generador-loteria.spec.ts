@@ -3769,3 +3769,50 @@ test.describe('re-inspección 15/10/2026', () => {
     });
   });
 });
+
+// ============================================================
+// COTEJO 20/10/2026 — cabo C0230: el bote de La Primitiva frente a las normas de SELAE
+//
+// Fuente: «Normas que regulan los concursos de pronósticos de Lotería Primitiva en la modalidad
+// de La Primitiva», SELAE, junio de 2015 (las que cita comprobar.ts), leídas en
+// hacienda.gob.es/DocLeyes/REPOSITORIO NORMATIVA/58014anexo.pdf (loteriasyapuestas.es da 403).
+//   · Norma 8.ª.1: categoría especial = «los seis primeros números extraídos … y además el número
+//     extraído para el reintegro»; primera = los seis, sin reintegro.
+//   · Norma 8.ª.1.1 y 1.2: sin acertantes de la especial, su fondo pasa a la especial del sorteo
+//     siguiente; sin acertantes de primera, su fondo TAMBIÉN pasa a la especial del siguiente.
+//     El bote acumulado, por tanto, solo lo cobra quien acierta 6 + reintegro.
+//   · Norma 9.ª y extracción del reintegro: un número asignado en el resguardo frente a UNA bola
+//     de diez (0-9).
+// Resuelto a mano: C(49,6) = 13.983.816 combinaciones; con el reintegro, × 10 = 139.838.160.
+// La ficha «Probabilidad de acertar los 6 números» (1 entre 13.983.816) es correcta tal cual: es
+// la primera categoría, y no habla del bote. Lo que falla es lo que se rotula como bote.
+// ============================================================
+
+test.describe('cotejo 20/10/2026 · bote de La Primitiva (normas de SELAE de 2015)', () => {
+  const filaPrimitiva = (page: Page) =>
+    page.locator('[class*="comparativaTable"] tbody tr').filter({ hasText: 'La Primitiva' });
+  const faqBote = (page: Page) =>
+    page.locator('details').filter({ hasText: '¿Qué probabilidad tengo de acertar el bote de La Primitiva?' });
+
+  test('la ficha de La Primitiva da la probabilidad de acertar los 6 (primera categoría): 1 entre 13.983.816', async ({ page }) => {
+    // C(49,6) = 49·48·47·46·45·44 / 720 = 13.983.816. No es el bote y no lo dice.
+    const ficha = page.locator('section#generador-primitiva dl');
+    await expect(ficha).toContainText('Probabilidad de acertar los 6 números');
+    await expect(ficha).toContainText('1 entre 13.983.816');
+  });
+
+  test('HALLAZGO (19/10 C0230 → 20/10) · la tabla rotula «Probabilidad bote» de La Primitiva con 1 entre 139.838.160', async ({ page }) => {
+    test.fail(); // ABIERTO: la celda dice 1 entre 13.983.816, que es la primera categoría
+    // Columnas: Lotería · Combinación · Probabilidad bote. Norma 8.ª.1.1-1.2: el bote es de la
+    // categoría especial (6 + reintegro) → 13.983.816 × 10 = 139.838.160.
+    await expect(filaPrimitiva(page).locator('td').nth(2)).toHaveText('1 entre 139.838.160');
+  });
+
+  test('HALLAZGO (19/10 C0230 → 20/10) · la FAQ «¿…acertar el bote de La Primitiva?» da 1 entre 139.838.160', async ({ page }) => {
+    test.fail(); // ABIERTO: responde con los 6 números (1 entre 13.983.816), 9,6 millones y 269.000 años
+    // Con 139.838.160: el 50 % exige ln 2 · 139.838.160 ≈ 96,9 millones de apuestas, y a una por
+    // semana la espera media es 139.838.160 / 52 ≈ 2,69 millones de años.
+    await expect(faqBote(page)).toContainText('139.838.160');
+    await expect(faqBote(page)).not.toContainText('13.983.816');
+  });
+});
