@@ -61,6 +61,15 @@ export function calcularCuotaISMicropyme(baseImponible: number): number {
   return cuota;
 }
 
+// ─── Tipo IS 2026 de las entidades de reducida dimensión (DT 44ª LIS) ─────────
+// Entidades del art. 101 LIS (cifra de negocios < 10 M €) que no son microempresas.
+// Cita literal, DT 44ª.2.b) de la Ley 27/2014 consolidada (BOE-A-2014-12328), añadida por la
+// DF 8.8 de la Ley 7/2024, consultada el 20/10/2026: «Las entidades que cumplan las previsiones
+// previstas en el artículo 101 de esta ley tributarán al 23 %, salvo que deban tributar a un
+// tipo diferente del general.» Calendario: 2025 → 24 · 2026 → 23 · 2027 → 22 · 2028 → 21.
+
+export const TIPO_IS_REDUCIDA_DIMENSION_2026 = 23; // %
+
 // ─── Retenciones sobre dividendos y beneficios ───────────────────────────────
 
 export const RETENCIONES_IS_2025 = {

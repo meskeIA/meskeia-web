@@ -111,3 +111,14 @@ test('C0015 · la fecha de verificación de los datos sale en formato español',
   expect(texto).toMatch(/Datos verificados: \d{2}\/\d{2}\/\d{4}/);
   expect(texto).not.toMatch(/verificad[oa]s?:? (a )?\d{4}-\d{2}-\d{2}/);
 });
+
+// Cabo C0339 (20/10/2026): el IS se daba como «23-25 %», con el 23 % plano de micropymes que la
+// Ley 7/2024 sustituyó en 2025 por una escala. Cifras de la norma, no de data/fiscal: art. 29.1
+// LIS (25 % general, 15 % nueva creación) y DT 44.ª.2.a) (19 % y 21 % en 2026 con cifra de
+// negocios inferior a 1 millón), BOE-A-2014-12328 consolidado, consultado el 20/10/2026.
+test('C0339 · los tipos del IS son los de 2026, no el «23-25 %»', async ({ page }) => {
+  const texto = limpiar((await page.locator('body').textContent()) ?? '');
+  expect(texto).not.toMatch(/23-25 ?%/);
+  expect(texto).toContain('al 25 % general, o al 19-21 % en 2026 si la cifra de negocios es inferior a 1 M €');
+  expect(texto).toContain('ahorro de hasta 10 puntos porcentuales frente al tipo general del 25 %');
+});

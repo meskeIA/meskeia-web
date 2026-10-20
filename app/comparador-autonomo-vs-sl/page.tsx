@@ -19,6 +19,8 @@ import {
   AUTONOMO_SOCIETARIO_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   calcularCuotaISMicropyme,
+  TIPOS_IS_2025,
+  TRAMOS_IS_MICROPYMES_2026,
 } from '@/data/fiscal';
 
 export type TipoISComparador = '25' | 'micropyme' | '15';
@@ -26,6 +28,11 @@ export type TipoISComparador = '25' | 'micropyme' | '15';
 function labelTipoIS(tipoIS: TipoISComparador): string {
   return tipoIS === 'micropyme' ? '19-21' : tipoIS;
 }
+
+// Tipos del IS para los textos, de data/fiscal: hasta el 20/10/2026 decían «23-25 %», con el
+// 23 % plano de micropymes que la Ley 7/2024 sustituyó en 2025 por una escala (cabo C0339).
+const IS_GENERAL = TIPOS_IS_2025.general;
+const IS_MICRO_2026_TEXTO = `${TRAMOS_IS_MICROPYMES_2026[0].tipo}-${TRAMOS_IS_MICROPYMES_2026[TRAMOS_IS_MICROPYMES_2026.length - 1].tipo} %`;
 
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
 
@@ -563,7 +570,8 @@ export default function ComparadorAutonomoVsSLPage() {
               <div className={styles.escenarioExample}>
                 <p>
                   Si tienes 80.000 € de beneficio y reinviertes 50.000 € en la empresa (equipos, contrataciones,
-                  marketing), la SL solo tributa al <strong>23-25% IS</strong> por esos 50.000 € que no retiras.
+                  marketing), la SL solo tributa en el IS por esos 50.000 € que no retiras: al <strong>{IS_GENERAL}{' '}%
+                  general</strong>, o al {IS_MICRO_2026_TEXTO} en 2026 si la cifra de negocios es inferior a 1{' '}M{' '}€.
                   Como autónomo, tributarías hasta al 45% de IRPF por <em>todos</em> los beneficios, reinviertas o no.
                 </p>
               </div>
@@ -792,7 +800,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <p>
                 Las SL de nueva creación tributan al <strong>15%</strong> en el primer ejercicio con base
                 imponible positiva y en el siguiente (art. 29.1 LIS). Este tipo reducido puede suponer un
-                ahorro de hasta <strong>8-10 puntos porcentuales</strong> frente al tipo general del 23-25%.
+                ahorro de hasta <strong>{IS_GENERAL - TIPOS_IS_2025.nuevaCreacion} puntos porcentuales</strong> frente al tipo general del {IS_GENERAL}{' '}%.
                 Para aprovecharlo al máximo, planifica los ingresos del año de constitución.
               </p>
             </div>

@@ -9,13 +9,20 @@ import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 import EducationalSection from '@/components/EducationalSection';
 import styles from './SelectorFormaJuridica.module.css';
-import { TRAMOS_IRPF_2025 } from '@/data/fiscal';
+import { TRAMOS_IRPF_2025, TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026 } from '@/data/fiscal';
 
 /**
  * Extremos de la escala del IRPF, de data/fiscal: hasta el 19/10/2026 la tabla los llevaba
  * tecleados («19-47 %», cabo C0036), la forma que el hallazgo 2143 dejó desfasada en otra app.
  */
 const ESCALA_IRPF_TEXTO = `${TRAMOS_IRPF_2025[0].tipo}-${TRAMOS_IRPF_2025[TRAMOS_IRPF_2025.length - 1].tipo} %`;
+
+/**
+ * Tipos del IS, también de data/fiscal: hasta el 20/10/2026 se leía «23-25 %», con el 23 % plano
+ * de micropymes que la Ley 7/2024 sustituyó en 2025 por una escala (cabo C0339).
+ */
+const IS_GENERAL_MICRO_TEXTO = `${TIPOS_IS_2025.general}\u00A0% general, o ${TRAMOS_IS_MICROPYMES_2026[0].tipo}-${TRAMOS_IS_MICROPYMES_2026[TRAMOS_IS_MICROPYMES_2026.length - 1].tipo}\u00A0% en 2026 con cifra de negocios inferior a 1\u00A0M\u00A0€`;
+const IS_TIPOS_TEXTO = `${IS_GENERAL_MICRO_TEXTO}; ${TIPOS_IS_2025.nuevaCreacion}\u00A0% los dos primeros ejercicios con beneficio`;
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -176,7 +183,7 @@ const VEREDICTOS: Record<VeredictoKey, Veredicto> = {
       'Tus respuestas sugieren que la Sociedad Limitada puede ofrecerte ventajas importantes: separación patrimonial, posible ahorro fiscal según el beneficio y cuánto retires de la sociedad, e imagen más profesional frente a clientes y entidades financieras. Requiere escritura ante notario, inscripción en el Registro Mercantil y llevar contabilidad formal.',
     ventajas: [
       'Responsabilidad limitada al capital aportado',
-      'Tipo IS del 23-25 % (puede ser menor que el IRPF)',
+      `Impuesto sobre Sociedades al ${IS_TIPOS_TEXTO} (puede ser menor que el IRPF)`,
       'Capital mínimo desde 1 € (reforma 2023)',
       'Facilita captar socios, inversores y financiación',
       'Mayor credibilidad ante grandes clientes y proveedores',
@@ -439,7 +446,7 @@ export default function SelectorFormaJuridica() {
             <tr>
               <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid #e0e0e0', fontWeight: 600 }}>Fiscalidad</td>
               <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid #e0e0e0' }}>IRPF progresivo ({ESCALA_IRPF_TEXTO})</td>
-              <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid #e0e0e0' }}>Impuesto sobre Sociedades (23-25 %)</td>
+              <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid #e0e0e0' }}>Impuesto sobre Sociedades ({IS_TIPOS_TEXTO})</td>
             </tr>
             <tr>
               <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid #e0e0e0', fontWeight: 600 }}>Coste de alta</td>
@@ -458,7 +465,7 @@ export default function SelectorFormaJuridica() {
           ¿Cuándo puede el IS ser más favorable que el IRPF?
         </h3>
         <p>
-          En términos generales, el Impuesto sobre Sociedades (IS) al tipo del 23-25 % puede
+          En términos generales, el Impuesto sobre Sociedades (IS), al {IS_GENERAL_MICRO_TEXTO}, puede
           resultar más ventajoso que el IRPF sobre la parte del beneficio que se queda en la
           sociedad: el tipo marginal del IRPF escala (37-47 %), mientras que el IS no sube con el
           beneficio de la misma forma. No hay una cifra de beneficio que valga para todos: depende
