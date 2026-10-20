@@ -8372,7 +8372,10 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
   });
 
   /**
-   * HALLAZGO [bajo, operativa] — ABIERTO (07/10/2026). El residuo del 2916 que e0979382 dejó a
+   * HALLAZGO 2965 [bajo, operativa] — ✅ REPARADO el 20/10/2026 (components/NumberInput), con la
+   * decisión del usuario: el texto pegado se queda tal cual y la app lo nombra como ilegible, sin
+   * adivinar la cifra. Una tecla suelta que haría ilegible un valor legible se sigue rechazando, y
+   * las letras pegadas se pueden borrar una a una. Era así: el residuo del 2916 que e0979382 dejó a
    * propósito («las letras se siguen rechazando, como al teclear»): un importe pegado con la
    * palabra «euros» o «EUR» se descarta ENTERO y en silencio, y la app sigue publicando el desglose
    * del precio anterior. Al teclear, cada letra rechazada es una tecla y se ve; al pegar se pierde
@@ -8382,16 +8385,39 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
    * o lo nombra como ilegible) · obtenido: el campo sigue en «85000» y «Precio del inmueble
    * 85.000,00 €». Lo mismo con «EUR 120.000».
    */
-  test.fail('HALLAZGO pegado — «120.000 euros» pegado no se descarta en silencio', async ({ page }) => {
+  test('HALLAZGO 2965 — «120.000 euros» pegado no se descarta en silencio: se queda y se nombra', async ({ page }) => {
     await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
     await abrir(page, 'madrid');
     const campo = page.locator(CAMPO_PRECIO);
+    const pegar = async (texto: string) => {
+      await campo.click();
+      await page.keyboard.press('Control+A');
+      await page.evaluate((t) => navigator.clipboard.writeText(t), texto);
+      await page.keyboard.press('Control+V');
+    };
     await sembrar(page, 'Precio de la vivienda', '85000');
-    await campo.click();
-    await page.keyboard.press('Control+A');
-    await page.evaluate((t) => navigator.clipboard.writeText(t), '120.000 euros');
-    await page.keyboard.press('Control+V');
-    await expect(campo).not.toHaveValue('85000', { timeout: 3000 });
+    await pegar('120.000 euros');
+    await expect(campo).toHaveValue('120.000 euros', { timeout: 3000 });
+    // El desglose de 85.000 ya no se publica: la app dice que no ha podido leer lo pegado.
+    await expect(page.getByText('No se ha podido leer el precio «120.000 euros»').first()).toBeVisible();
+    await expect(page.locator('h3', { hasText: 'Precio del inmueble' })).toHaveCount(0);
+
+    await pegar('EUR 120.000');
+    await expect(campo).toHaveValue('EUR 120.000', { timeout: 3000 });
+
+    // Las letras pegadas se borran una a una, y al quedar solo la cifra vuelve a leerse.
+    await campo.press('End');
+    await pegar('120.000 euros');
+    await campo.press('End');
+    // Cinco, no seis: con «120.000 » el texto ya casa y el espacio se limpia solo.
+    for (let i = 0; i < 'euros'.length; i++) await campo.press('Backspace');
+    await expect(campo).toHaveValue('120.000');
+    await expect(page.getByText('No se ha podido leer el precio').first()).toHaveCount(0);
+
+    // Una tecla suelta que haría ilegible un valor legible se sigue rechazando, como siempre.
+    await campo.press('End');
+    await page.keyboard.type('x');
+    await expect(campo).toHaveValue('120.000');
   });
 });
 

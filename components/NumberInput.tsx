@@ -75,17 +75,28 @@ export default function NumberInput({
      * Un importe PEGADO tal como viene de un anuncio («120.000 €», «1 250») no casaba con la
      * expresión y se descartaba ENTERO: el campo conservaba el valor anterior y la app seguía
      * publicando el cálculo viejo sin una palabra. Teclearlo carácter a carácter funcionaba,
-     * porque cada tecla rechazada era solo esa tecla; el pegado perdía todo. Lo que aún no
-     * casa tras limpiar (letras) se sigue rechazando, como al teclear.
+     * porque cada tecla rechazada era solo esa tecla; el pegado perdía todo.
+     *
+     * ── Lo que aún no casa tras limpiar (20/10/2026, hallazgo 2965, decisión del usuario) ──
+     * «120.000 euros» o «EUR 120.000» pegados se seguían descartando ENTEROS y en silencio. No se
+     * adivina la cifra quitando la palabra: el texto se queda tal cual, y la app lo nombra como
+     * ilegible («No se ha podido leer el precio…»), como cualquier «2.000.50». Solo una TECLA
+     * que haría ilegible un valor legible se rechaza, como siempre; borrar y editar un texto que
+     * ya era ilegible se acepta, o las letras pegadas no se podrían quitar una a una.
      */
-    const val = e.target.value
-      .replace(/[\s\u00A0\u202F\u20AC$\u00A3%]/g, '')
-      .replace(/\u2212/g, '-');
+    const limpiar = (texto: string) =>
+      texto.replace(/[\s\u00A0\u202F\u20AC$\u00A3%]/g, '').replace(/\u2212/g, '-');
+    const esValido = (texto: string) => texto === '' || /^-?[\d.,]*$/.test(texto);
 
-    const regex = /^-?[\d.,]*$/;
-    if (regex.test(val) || val === '') {
+    const val = limpiar(e.target.value);
+    if (esValido(val)) {
       onChange(val);
+      return;
     }
+    const tipo = (e.nativeEvent as InputEvent).inputType ?? '';
+    const esTecla = tipo === 'insertText' || tipo === 'insertCompositionText';
+    if (esTecla && esValido(limpiar(value))) return;
+    onChange(e.target.value);
   };
 
   const handleBlur = () => {
