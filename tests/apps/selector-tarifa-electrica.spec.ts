@@ -34,6 +34,10 @@ import { test, expect, Page, devices } from '@playwright/test';
  * midiendo puntos y la pantalla dice que no compara precios. La tabla de coste se deja arriba
  * como registro de lo que la app hacía.
  *
+ * REPARADOS el 20/10/2026 los diez restantes de la inspección del 10/10 (3168-3173, 3175-3178):
+ * foco al resultado, contraste, nombre y teclado de los radios, tildes, FAQ única del cambio de
+ * tarifa, Bono Social desde data/fiscal, singular del botón, «%» con espacio duro y RegionBadge.
+ *
  * Los casos que demuestran un hallazgo ABIERTO van con test.fail().
  */
 
@@ -137,11 +141,11 @@ test('caso normal: «amante del valle» → PVPC, sin importes, y sus tres facto
   expect(r.texto).not.toMatch(IMPORTE);
   expect(r.texto).not.toMatch(MAS_BARATA);
   expect(r.texto).toMatch(NO_COMPARA);
-  expect(r.barras).toEqual(['Puntuacion PVPC: 15', 'Puntuacion mercado libre: 0']);
+  expect(r.barras).toEqual(['Puntuación PVPC: 15', 'Puntuación mercado libre: 0']);
   // P6 Sí → coche · P4 siempre → electrodomésticos · P9 <200 → consumo bajo (en ese orden)
   expect(r.factores).toEqual([
-    'Cargar el coche electrico en valle (00-08h) reduce mucho el coste con PVPC',
-    'Usar electrodomesticos siempre en valle te da una gran ventaja en PVPC',
+    'Cargar el coche eléctrico en valle (00-08 h) reduce mucho el coste con PVPC',
+    'Usar electrodomésticos siempre en valle te da una gran ventaja en PVPC',
     'Con consumo bajo, el ahorro del PVPC en valle es muy significativo proporcionalmente',
   ]);
 });
@@ -175,7 +179,7 @@ test('caso límite: 4 puntos es PVPC y 3 es «Ambas»; el mínimo (−15) es lib
   expect(r.recomendacion).toBe('Mercado libre (precio fijo)');
   expect(r.texto).not.toMatch(IMPORTE);
   expect(r.texto).not.toMatch(MAS_BARATA);
-  expect(r.barras).toEqual(['Puntuacion PVPC: 0', 'Puntuacion mercado libre: 15']);
+  expect(r.barras).toEqual(['Puntuación PVPC: 0', 'Puntuación mercado libre: 15']);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -272,51 +276,73 @@ test('hallazgo 3167: no se muestra un coste anual con la potencia en 51,10 € f
   expect(html).not.toMatch(/Estimaci[oó]n de coste anual/i);
 });
 
-test('ortografía: «€/año», «España» y «Eléctrica» con sus tildes y eñes', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Toda la pantalla y el metadata están escritos sin tildes
-  // ni eñes; en el resultado el coste sale como «~287,26 €/ano», y el <title> que muestra el
-  // buscador dice «Mercado Libre Espana». El FAQPage de metadata.ts sí lleva tildes.
-  test.fail();
+test('ortografía: «España», «Eléctrica» y «recomendación» con sus tildes y eñes (hallazgo 3172)', async ({ page }) => {
+  // REPARADO (20/10/2026). Toda la pantalla y el metadata estaban escritos sin tildes ni eñes, y
+  // el <title> que muestra el buscador decía «Mercado Libre Espana». El «~287,26 €/ano» del caso
+  // ya no existe: la estimación de coste se retiró el 12/10/2026.
   await abrir(page);
   expect(await page.title()).toContain('España');
   await expect(page.locator('h1')).toContainText('Eléctrica');
+  await expect(page.getByRole('radiogroup', { name: /Cuántas personas/ })).toHaveCount(1);
+  await expect(page.locator('[role="radio"]', { hasText: 'No sé' })).toHaveCount(1);
   await responder(page, AMANTE_VALLE);
   await verResultado(page);
-  // Desde el 12/10/2026 el resultado ya no lleva «€/año»: el encabezado tiene la tilde de antes.
   await expect(page.locator('[class*="resultTitle"]')).toContainText('recomendación');
+  // El texto de la página entera, guía plegada incluida, sin scripts (los nombres de clase del
+  // módulo CSS llevan «Electrica» y no son texto).
+  const texto = await page.evaluate(() => {
+    const copia = document.body.cloneNode(true) as HTMLElement;
+    copia.querySelectorAll('script, style').forEach((n) => n.remove());
+    return copia.textContent ?? '';
+  });
+  expect(texto).not.toMatch(/Espana|Electrica|recomendacion|Cuantas|Mas barata|Que es|\bano\b/);
 });
 
-test('con una sola pregunta pendiente el botón no dice «las 1 preguntas restantes»', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). page.tsx:526/531 interpola el número en un texto en plural.
-  test.fail();
+test('con una sola pregunta pendiente el botón no dice «las 1 preguntas restantes» (hallazgo 3176)', async ({ page }) => {
+  // REPARADO (20/10/2026). page.tsx interpolaba el número en un texto siempre en plural.
   await abrir(page);
   await responder(page, [0, 0, 2, 0, 2, 0, 2, 0, 0, null]);
-  await expect(botonVer(page)).not.toHaveText('Responde las 1 preguntas restantes');
+  await expect(botonVer(page)).toHaveText('Responde la pregunta que falta');
+  await expect(botonVer(page)).toHaveAccessibleName('Responde la pregunta que falta');
 });
 
-test('el nombre de cada grupo de radios es su pregunta, no «Pregunta N»', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). aria-label={`Pregunta ${id}`} en el radiogroup y el
-  // enunciado en un <p> sin asociar: con lector de pantalla, al entrar en el grupo se oye
-  // «Pregunta 2, grupo» y luego «Si / No / No se», sin la pregunta.
-  test.fail();
+test('el nombre de cada grupo de radios es su pregunta, no «Pregunta N» (hallazgo 3170)', async ({ page }) => {
+  // REPARADO (20/10/2026). aria-label={`Pregunta ${id}`} en el radiogroup y el enunciado en un
+  // <p> sin asociar: con lector de pantalla, al entrar en el grupo se oía «Pregunta 2, grupo» y
+  // luego «Sí / No / No sé», sin la pregunta. Ahora aria-labelledby apunta al enunciado.
   await abrir(page);
   await expect(page.getByRole('radiogroup', { name: /Cu[aá]ntas personas viven en tu hogar/ })).toHaveCount(1);
   await expect(page.getByRole('radiogroup', { name: /discriminaci[oó]n horaria/ })).toHaveCount(1);
+  await expect(page.getByRole('radiogroup', { name: /^Pregunta \d+$/ })).toHaveCount(0);
 });
 
-test('teclado del patrón de radios: la flecha mueve y marca, y el grupo es una sola parada de Tab', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026), cabo C0016. Un role="radio" promete el teclado del patrón
-  // APG (referencia: selector-smartphone, b0f31109). Medido: ArrowDown y ArrowRight sobre
-  // «1 persona» no mueven el foco ni marcan nada; los cuatro radios tienen tabindex 0 y el
-  // cuestionario son 29 paradas de Tab.
-  test.fail();
+test('teclado del patrón de radios: la flecha mueve y marca, y el grupo es una sola parada de Tab (hallazgo 3171)', async ({ page }) => {
+  // REPARADO (20/10/2026), cabo C0016. Un role="radio" promete el teclado del patrón APG
+  // (referencia: selector-smartphone, b0f31109). Medido el 10/10: ArrowDown y ArrowRight sobre
+  // «1 persona» no movían el foco ni marcaban nada; los cuatro radios tenían tabindex 0 y el
+  // cuestionario eran 29 paradas de Tab.
   await abrir(page);
   const radios = page.locator('[role="radiogroup"]').first().locator('[role="radio"]');
+  // Sin respuesta, la primera es la única parada.
+  expect(await radios.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1]);
   await radios.nth(0).focus();
   await page.keyboard.press('ArrowDown');
   await expect(radios.nth(1)).toBeFocused({ timeout: 1_000 });
   await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
   expect(await radios.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([-1, 0, -1, -1]);
+  await page.keyboard.press('ArrowRight');
+  await expect(radios.nth(2)).toBeFocused();
+  await expect(radios.nth(2)).toHaveAttribute('aria-checked', 'true');
+  await page.keyboard.press('End');
+  await expect(radios.nth(3)).toBeFocused();
+  // Vuelta al principio desde la última.
+  await page.keyboard.press('ArrowDown');
+  await expect(radios.nth(0)).toBeFocused();
+  await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'true');
+  await expect(page.locator('[role="radiogroup"]').first().locator('[aria-checked="true"]')).toHaveCount(1);
+  // Tab sale del grupo al siguiente: la 1.ª opción de la pregunta 2.
+  await page.keyboard.press('Tab');
+  await expect(page.locator('[role="radiogroup"]').nth(1).locator('[role="radio"]').first()).toBeFocused();
 });
 
 /**
@@ -379,15 +405,16 @@ async function contrasteMinimo(page: Page, selector: string): Promise<number> {
   });
 }
 
-test('textos pequeños de marca llegan a 4,5:1 en los dos temas', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Medido el 10/10/2026 (ninguno es texto grande):
+test('textos pequeños de marca llegan a 4,5:1 en los dos temas (hallazgo 3169)', async ({ page }) => {
+  // REPARADO (20/10/2026). Medido el 10/10/2026 (ninguno es texto grande):
   //   «Pregunta N de 10» (13,6 px/600, blanco sobre #2E86AB)      4,11:1 claro y oscuro
   //   opción marcada (14,4 px/600, --primary sobre su tinte)      3,56 claro · 3,06 oscuro
   //   «Ver recomendacion» (17,6 px/600, blanco sobre degradado)   3,24 claro y oscuro
-  //   «Mas barata» (12 px/700, #16a34a sobre tinte verde)          2,90 claro
+  //   «Mas barata» (12 px/700, #16a34a sobre tinte verde)          2,90 claro (ya no existe: 12/10)
   //   «Consejos para tu perfil» (16,8 px/600, --primary)          3,74 claro · 3,21 oscuro
-  // El módulo redeclara --primary: #2E86AB en .container para los dos temas.
-  test.fail();
+  // El módulo redeclaraba --primary: #2E86AB en .container para los dos temas. Ahora usa la
+  // marca de globals con -texto y -boton, y la opción marcada en oscuro lleva un tinte más
+  // tenue (al 12 % quedaba en 4,47:1).
   await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
   await page.goto('/selector-tarifa-electrica/');
   await esperarHidratacionBotones(page);
@@ -415,13 +442,17 @@ test('textos pequeños de marca llegan a 4,5:1 en los dos temas', async ({ page 
   expect(bajos, 'textos por debajo de 4,5:1').toEqual([]);
 });
 
-test('el FAQPage y la FAQ visible dicen lo mismo sobre el cambio de tarifa, con la permanencia', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Visible: «Si, puedes cambiar en cualquier momento y sin
-  // coste. El cambio de mercado libre a PVPC es inmediato (salvo permanencia contractual). El
-  // cambio de PVPC a libre [...] suele tardar 2-3 semanas». FAQPage (metadata.ts): «El cambio no
-  // tiene coste y suele hacerse efectivo en el siguiente ciclo de facturación», sin la
-  // permanencia. Y el recuadro de errores comunes: «tarda entre 1 y 3 semanas».
-  test.fail();
+test('el FAQPage y la FAQ visible dicen lo mismo sobre el cambio de tarifa, con la permanencia (hallazgo 3173)', async ({ page }) => {
+  // REPARADO (20/10/2026): una constante en metadata.ts que importan las dos bocas, sin plazo
+  // fijo (depende de la gestión con la distribuidora) y con la permanencia. Antes: visible «Si,
+  // puedes cambiar en cualquier momento y sin coste. El cambio de mercado libre a PVPC es
+  // inmediato (salvo permanencia contractual). El cambio de PVPC a libre [...] suele tardar 2-3
+  // semanas». FAQPage (metadata.ts): «El cambio no tiene coste y suele hacerse efectivo en el
+  // siguiente ciclo de facturación», sin la permanencia. Y errores comunes: «entre 1 y 3 semanas».
+  await page.goto('/selector-tarifa-electrica/');
+  const visible = page.locator('[class*="faqItem"]', { hasText: 'cambiar de tarifa' });
+  await expect(visible).toHaveCount(1);
+  const textoVisible = ((await visible.locator('p').textContent()) ?? '').trim();
   const html = await (await page.request.get('/selector-tarifa-electrica/')).text();
   const bloques = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(
     (m) => JSON.parse(m[1]) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] },
@@ -433,12 +464,14 @@ test('el FAQPage y la FAQ visible dicen lo mismo sobre el cambio de tarifa, con 
   const visibleInmediato = html.includes('es inmediato');
   const faqCiclo = (cambio?.acceptedAnswer.text ?? '').includes('siguiente ciclo de facturación');
   expect(visibleInmediato && faqCiclo, 'dos plazos distintos para el mismo cambio').toBe(false);
+  // La misma respuesta, letra por letra, en las dos bocas, y ningún plazo en «Errores comunes».
+  expect(textoVisible).toBe(cambio?.acceptedAnswer.text);
+  expect(html).not.toMatch(/semanas|es inmediato|siguiente ciclo de facturaci/);
 });
 
-test('los porcentajes del texto llevan espacio duro antes de «%»', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). «entre un 20% y un 35%», «100% renovable», «entre el 30% y
-  // el 40%», «un 7% mas», «un 80%», «25% (o 40%», «40-50%» (CLAUDE.md global §2, 25/09/2026).
-  test.fail();
+test('los porcentajes del texto llevan espacio duro antes de «%» (hallazgo 3177)', async ({ page }) => {
+  // REPARADO (20/10/2026). «entre un 20% y un 35%», «100% renovable», «entre el 30% y el 40%»,
+  // «un 7% mas», «un 80%», «25% (o 40%», «40-50%» (CLAUDE.md global §2, 25/09/2026).
   await abrir(page);
   const texto = (
     await page
@@ -448,12 +481,15 @@ test('los porcentajes del texto llevan espacio duro antes de «%»', async ({ pa
   expect(texto.match(/\d%/g) ?? []).toEqual([]);
 });
 
-test('una app solo de España (PVPC, 2.0TD, CNMC) lo declara con RegionBadge', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). Sin RegionBadge: el <h1> no dice España y PVPC no existe
-  // fuera de ella (CLAUDE.md del proyecto, §1.bis; precedente: hallazgo 949 de selector-smartphone).
-  test.fail();
+test('una app solo de España (PVPC, 2.0TD, CNMC) lo declara con RegionBadge (hallazgo 3178)', async ({ page }) => {
+  // REPARADO (20/10/2026). Sin RegionBadge, el <h1> no decía España y PVPC no existe fuera de
+  // ella (CLAUDE.md del proyecto, §1.bis; precedente: hallazgo 949 de selector-smartphone). La
+  // regulación es eléctrica, no fiscal: sin el enlace a los datos fiscales de Delegum.
   await abrir(page);
-  await expect(page.locator('[role="note"][aria-label*="España"]')).toHaveCount(1);
+  const aviso = page.locator('[role="note"][aria-label*="España"]');
+  await expect(aviso).toHaveCount(1);
+  await expect(aviso).toContainText('Solo España');
+  await expect(aviso.locator('a[href*="delegum"]')).toHaveCount(0);
 });
 
 test('hallazgo 3174: no quedan precios de la luz sin fecha ni fuente', async ({ page }) => {
@@ -465,17 +501,19 @@ test('hallazgo 3174: no quedan precios de la luz sin fecha ni fuente', async ({ 
   expect(html).not.toMatch(/0,\d{2} euros|€\/kWh|euros\/kWh/);
 });
 
-test('el Bono Social se describe como en data/fiscal y con su fuente oficial', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). FAQ visible: «un descuento del 25% (o 40% para consumidores
-  // vulnerables severos) sobre la factura PVPC», sin fuente ni fecha. data/fiscal/
-  // ayudas-personas.ts (bono-social-electrico, verificado 2026-06-11) lo describe como
-  // «Descuento sobre el precio de la energía» y remite a bonosocial.gob.es; no da porcentajes.
-  test.fail();
+test('el Bono Social se describe como en data/fiscal y con su fuente oficial (hallazgo 3175)', async ({ page }) => {
+  // REPARADO (20/10/2026): la respuesta sale de data/fiscal/ayudas-personas.ts y enlaza la web
+  // oficial. Antes, FAQ visible: «un descuento del 25% (o 40% para consumidores vulnerables
+  // severos) sobre la factura PVPC», sin fuente ni fecha. data/fiscal (bono-social-electrico,
+  // verificado 2026-06-11) lo describe como «Descuento sobre el precio de la energía» y remite a
+  // bonosocial.gob.es; no da porcentajes.
   await abrir(page);
   const respuesta = page.locator('[class*="faqItem"]', { hasText: 'Bono Social' }).locator('p');
   const texto = (await respuesta.textContent()) ?? '';
   expect(texto).toMatch(/precio de la energ[ií]a/i);
   expect(texto).toContain('bonosocial.gob.es');
+  expect(texto).not.toMatch(/\d\s*%/);
+  await expect(respuesta.locator('a[href="https://www.bonosocial.gob.es"]')).toHaveCount(1);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -491,11 +529,11 @@ test.describe('móvil (390 px)', () => {
     hasTouch: true,
   });
 
-  test('al tocar «Ver recomendación» se ve el encabezado del resultado y tiene el foco', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). handleVerResultado hace scrollTo({ top: 0 }) y desmonta el
-    // botón que tenía el foco: se aterriza en el hero, con el encabezado del resultado a 872 px
-    // (pantalla de 844) y el foco en <body>. A 360 × 780 queda a 949 px.
-    test.fail();
+  test('al tocar «Ver recomendación» se ve el encabezado del resultado y tiene el foco (hallazgo 3168)', async ({ page }) => {
+    // REPARADO (20/10/2026): el foco va al encabezado del resultado, que lo desplaza a la vista,
+    // y «Repetir test» lo lleva a la primera pregunta. Antes, handleVerResultado hacía
+    // scrollTo({ top: 0 }) y desmontaba el botón que tenía el foco: se aterrizaba en el hero,
+    // con el encabezado del resultado a 872 px (pantalla de 844) y el foco en <body>.
     await abrir(page);
     for (let i = 0; i < AMANTE_VALLE.length; i++) {
       await page.locator('[role="radiogroup"]').nth(i).locator('[role="radio"]').nth(AMANTE_VALLE[i] as number).tap();
@@ -517,5 +555,11 @@ test.describe('móvil (390 px)', () => {
       .toBe(true);
     await expect(titulo).toBeInViewport({ timeout: 1_000 });
     await expect(titulo).toBeFocused();
+
+    // «Repetir test»: el foco no cae a <body>, va a la primera pregunta, que está a la vista.
+    await page.getByRole('button', { name: 'Repetir test' }).tap();
+    const primera = page.locator('#pregunta-1-texto');
+    await expect(primera).toBeFocused();
+    await expect(primera).toBeInViewport();
   });
 });

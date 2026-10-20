@@ -1,21 +1,35 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
+/**
+ * «¿Cómo se cambia de tarifa?», en UN solo sitio (hallazgo 3173, 20/10/2026).
+ *
+ * La importan las dos bocas que la publican: el FAQPage de abajo y la FAQ VISIBLE de
+ * `page.tsx`. Estaban escritas aparte y daban tres plazos para el mismo cambio («inmediato»,
+ * «2-3 semanas» y «el siguiente ciclo de facturación», más «entre 1 y 3 semanas» en «Errores
+ * comunes»), y el FAQPage, que es lo que citan los asistentes de IA, callaba la permanencia que
+ * la tabla de la misma página sí da. El plazo depende de la gestión entre comercializadora y
+ * distribuidora, así que la respuesta no fija ninguno.
+ */
+export const PREGUNTA_CAMBIO_TARIFA = '¿Cómo puedo cambiar de tarifa eléctrica, del PVPC al mercado libre o al revés?';
+
+export const RESPUESTA_CAMBIO_TARIFA = 'Se puede cambiar en cualquier momento y en los dos sentidos. Para pasar al PVPC se contrata con una comercializadora de referencia (la lista oficial está en la web de la CNMC); para pasar al mercado libre, con la comercializadora elegida, tras comparar ofertas en el comparador de la CNMC (comparador.cnmc.gob.es). Solo hace falta el CUPS, que aparece en la factura. El cambio no tiene coste, no corta el suministro ni exige cambiar el contador: lo tramita la nueva comercializadora con la distribuidora, y el plazo depende de esa gestión. Antes, mira si tu contrato del mercado libre tiene permanencia: salir antes de que acabe puede suponer una penalización.';
+
 export const metadata: Metadata = {
-  title: 'Selector de Tarifa Electrica - PVPC o Mercado Libre Espana | meskeIA',
+  title: 'Selector de Tarifa Eléctrica - PVPC o Mercado Libre España | meskeIA',
   description:
-    'Test de 10 preguntas para descubrir si te conviene mas la tarifa PVPC regulada o el mercado libre de electricidad en Espana. Analiza tu patron de consumo.',
+    'Test de 10 preguntas para descubrir si te conviene más la tarifa PVPC regulada o el mercado libre de electricidad en España. Analiza tu patrón de consumo.',
   keywords:
-    'PVPC o mercado libre, tarifa electrica Espana, discriminacion horaria, 2.0TD, mejor tarifa luz, comparar tarifas electricidad',
+    'PVPC o mercado libre, tarifa eléctrica España, discriminación horaria, 2.0TD, mejor tarifa luz, comparar tarifas electricidad',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Selector de Tarifa Electrica - PVPC o Mercado Libre | meskeIA',
+    title: 'Selector de Tarifa Eléctrica - PVPC o Mercado Libre | meskeIA',
     description:
-      'Responde 10 preguntas sobre tus habitos de consumo y descubre que tarifa electrica te conviene mas: PVPC regulada o mercado libre.',
+      'Responde 10 preguntas sobre tus hábitos de consumo y descubre qué tarifa eléctrica te conviene más: PVPC regulada o mercado libre.',
     url: 'https://meskeia.com/selector-tarifa-electrica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -28,28 +42,28 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Selector de Tarifa Electrica | meskeIA',
+    title: 'Selector de Tarifa Eléctrica | meskeIA',
     description:
-      'Test rapido para saber si te conviene PVPC o mercado libre de electricidad en Espana.',
+      'Test rápido para saber si te conviene PVPC o mercado libre de electricidad en España.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
-    'application-name': 'Selector de Tarifa Electrica meskeIA',
+    'application-name': 'Selector de Tarifa Eléctrica meskeIA',
   },
 };
 
-// Schema.org JSON-LD para indexacion por buscadores e IAs
+// Schema.org JSON-LD para indexación por buscadores e IAs
 export const jsonLd = generateWebAppSchema({
-  name: 'Selector de Tarifa Electrica',
+  name: 'Selector de Tarifa Eléctrica',
   description:
-    'Herramienta interactiva con 10 preguntas para analizar tu patron de consumo electrico y recomendarte la mejor tarifa: PVPC regulada (2.0TD con discriminacion horaria) o mercado libre con precio fijo. Incluye los factores de tu perfil y consejos personalizados.',
+    'Herramienta interactiva con 10 preguntas para analizar tu patrón de consumo eléctrico y recomendarte la mejor tarifa: PVPC regulada (2.0TD con discriminación horaria) o mercado libre con precio fijo. Incluye los factores de tu perfil y consejos personalizados.',
   url: 'https://meskeia.com/selector-tarifa-electrica/',
   features: [
-    'Test de 10 preguntas sobre habitos de consumo electrico',
-    'Recomendacion personalizada entre PVPC y mercado libre',
+    'Test de 10 preguntas sobre hábitos de consumo eléctrico',
+    'Recomendación personalizada entre PVPC y mercado libre',
     'Factores clave de tu perfil y consejos personalizados',
-    'Explicacion de franjas horarias 2.0TD (punta, llano, valle)',
-    'Disponible en espanol',
+    'Explicación de franjas horarias 2.0TD (punta, llano, valle)',
+    'Disponible en español',
   ],
 });
 
@@ -83,10 +97,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cómo puedo cambiar de tarifa eléctrica en España?',
+      name: PREGUNTA_CAMBIO_TARIFA,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para pasar del mercado libre al PVPC puedes contactar con cualquier comercializadora de referencia (Endesa, Iberdrola, Naturgy, EDP o CHC). Para pasarte al mercado libre, compara ofertas en el comparador de la CNMC (comparador.cnmc.gob.es) y contacta con la comercializadora elegida. El cambio no tiene coste y suele hacerse efectivo en el siguiente ciclo de facturación. Solo necesitas tu número de CUPS (que aparece en tu factura actual).',
+        text: RESPUESTA_CAMBIO_TARIFA,
       },
     },
     {

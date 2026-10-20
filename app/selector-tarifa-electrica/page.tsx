@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorTarifaElectrica.module.css';
 import {
   MeskeiaLogo,
@@ -10,7 +10,10 @@ import {
   DisclaimerCard,
   LegalNotice,
   ShareCard,
+  RegionBadge,
 } from '@/components';
+import { CATEGORIAS_AYUDAS_PERSONAS } from '@/data/fiscal/ayudas-personas';
+import { PREGUNTA_CAMBIO_TARIFA, RESPUESTA_CAMBIO_TARIFA } from './metadata';
 
 // ─── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -40,34 +43,39 @@ interface Resultado {
 // precios en un módulo de data/ con fuente, fecha y <DataReference>; la recomendación es por
 // perfil de consumo y la pantalla dice que no compara precios.
 
+// El Bono Social se describe con lo que dice data/fiscal, que no da cuantías y remite a la web
+// oficial: la FAQ daba «un descuento del 25 % (o 40 %…)» escrito a mano, sin fuente ni fecha
+// (hallazgo 3175).
+const BONO_SOCIAL = CATEGORIAS_AYUDAS_PERSONAS.find((a) => a.id === 'bono-social-electrico');
+
 // ─── Preguntas del test ────────────────────────────────────────────────────────
 
 const PREGUNTAS: Pregunta[] = [
   {
     id: 1,
-    texto: '¿Cuantas personas viven en tu hogar?',
+    texto: '¿Cuántas personas viven en tu hogar?',
     opciones: [
       { texto: '1 persona', pvpcPuntos: 1 },
       { texto: '2 personas', pvpcPuntos: 0 },
       { texto: '3-4 personas', pvpcPuntos: -1 },
-      { texto: '5 o mas', pvpcPuntos: -2 },
+      { texto: '5 o más', pvpcPuntos: -2 },
     ],
   },
   {
     id: 2,
-    texto: '¿Tienes tarifa con discriminacion horaria (2.0TD)?',
+    texto: '¿Tienes tarifa con discriminación horaria (2.0TD)?',
     opciones: [
-      { texto: 'Si', pvpcPuntos: 2 },
+      { texto: 'Sí', pvpcPuntos: 2 },
       { texto: 'No', pvpcPuntos: -1 },
-      { texto: 'No se', pvpcPuntos: 0 },
+      { texto: 'No sé', pvpcPuntos: 0 },
     ],
   },
   {
     id: 3,
-    texto: '¿A que hora sueles cocinar?',
+    texto: '¿A qué hora sueles cocinar?',
     opciones: [
-      { texto: 'Mediodia (12-15h)', pvpcPuntos: -2 },
-      { texto: 'Noche (20-22h)', pvpcPuntos: -1 },
+      { texto: 'Mediodía (12-15 h)', pvpcPuntos: -2 },
+      { texto: 'Noche (20-22 h)', pvpcPuntos: -1 },
       { texto: 'Variable', pvpcPuntos: 0 },
     ],
   },
@@ -84,16 +92,16 @@ const PREGUNTAS: Pregunta[] = [
     id: 5,
     texto: '¿Tienes aire acondicionado? ¿Lo usas mucho en verano?',
     opciones: [
-      { texto: 'Si, mucho', pvpcPuntos: -2 },
-      { texto: 'Si, poco', pvpcPuntos: 0 },
+      { texto: 'Sí, mucho', pvpcPuntos: -2 },
+      { texto: 'Sí, poco', pvpcPuntos: 0 },
       { texto: 'No tengo', pvpcPuntos: 1 },
     ],
   },
   {
     id: 6,
-    texto: '¿Tienes coche electrico que cargues en casa?',
+    texto: '¿Tienes coche eléctrico que cargues en casa?',
     opciones: [
-      { texto: 'Si', pvpcPuntos: 3 },
+      { texto: 'Sí', pvpcPuntos: 3 },
       { texto: 'No', pvpcPuntos: 0 },
     ],
   },
@@ -101,14 +109,14 @@ const PREGUNTAS: Pregunta[] = [
     id: 7,
     texto: '¿Trabajas desde casa?',
     opciones: [
-      { texto: 'Si, siempre', pvpcPuntos: -2 },
-      { texto: 'Hibrido', pvpcPuntos: -1 },
+      { texto: 'Sí, siempre', pvpcPuntos: -2 },
+      { texto: 'Híbrido', pvpcPuntos: -1 },
       { texto: 'No', pvpcPuntos: 1 },
     ],
   },
   {
     id: 8,
-    texto: '¿Te importa que el precio varie cada hora?',
+    texto: '¿Te importa que el precio varíe cada hora?',
     opciones: [
       { texto: 'Me da igual', pvpcPuntos: 2 },
       { texto: 'Prefiero precio fijo', pvpcPuntos: -3 },
@@ -121,20 +129,20 @@ const PREGUNTAS: Pregunta[] = [
     opciones: [
       { texto: 'Menos de 200 kWh', pvpcPuntos: 2 },
       { texto: '200-400 kWh', pvpcPuntos: 0 },
-      { texto: 'Mas de 400 kWh', pvpcPuntos: -1 },
+      { texto: 'Más de 400 kWh', pvpcPuntos: -1 },
     ],
   },
   {
     id: 10,
     texto: '¿Tienes placas solares con excedentes?',
     opciones: [
-      { texto: 'Si', pvpcPuntos: 3 },
+      { texto: 'Sí', pvpcPuntos: 3 },
       { texto: 'No', pvpcPuntos: 0 },
     ],
   },
 ];
 
-// ─── Funcion de calculo ────────────────────────────────────────────────────────
+// ─── Función de cálculo ────────────────────────────────────────────────────────
 
 function calcularResultado(respuestas: Record<number, number>): Resultado {
   let puntosPvpc = 0;
@@ -150,39 +158,39 @@ function calcularResultado(respuestas: Record<number, number>): Resultado {
     }
   }
 
-  // Factores segun respuestas
+  // Factores según respuestas
   const r = respuestas;
 
-  // Coche electrico
+  // Coche eléctrico
   if (r[6] === 0) {
-    factores.push('Cargar el coche electrico en valle (00-08h) reduce mucho el coste con PVPC');
+    factores.push('Cargar el coche eléctrico en valle (00-08 h) reduce mucho el coste con PVPC');
     consejos.push('Programa la carga del coche entre las 00:00 y las 08:00 para aprovechar el valle');
   }
 
   // Placas solares
   if (r[10] === 0) {
-    factores.push('Con placas solares, la compensacion de excedentes funciona mejor en PVPC');
-    consejos.push('Maximiza el autoconsumo y vierte excedentes en horas punta para mayor compensacion');
+    factores.push('Con placas solares, la compensación de excedentes funciona mejor en PVPC');
+    consejos.push('Maximiza el autoconsumo y vierte excedentes en horas punta para mayor compensación');
   }
 
-  // Electrodomesticos en valle
+  // Electrodomésticos en valle
   if (r[4] === 0) {
-    factores.push('Usar electrodomesticos siempre en valle te da una gran ventaja en PVPC');
+    factores.push('Usar electrodomésticos siempre en valle te da una gran ventaja en PVPC');
     consejos.push('Mantener la lavadora y el lavavajillas en horario nocturno o de fin de semana');
   } else if (r[4] === 2) {
-    factores.push('No usar electrodomesticos en valle reduce la ventaja del PVPC');
+    factores.push('No usar electrodomésticos en valle reduce la ventaja del PVPC');
     consejos.push('Intenta programar lavadora y lavavajillas para la noche o fines de semana');
   }
 
   // Teletrabajo
   if (r[7] === 0) {
     factores.push('Trabajar desde casa aumenta el consumo en horas punta (mayor coste PVPC)');
-    consejos.push('Si teletrabajas, valora un precio fijo que te de tranquilidad');
+    consejos.push('Si teletrabajas, valora un precio fijo que te dé tranquilidad');
   }
 
   // Cocinar en horas punta
   if (r[3] === 0) {
-    factores.push('Cocinar al mediodia cae en franja punta (la mas cara en PVPC)');
+    factores.push('Cocinar al mediodía cae en franja punta (la más cara en PVPC)');
     consejos.push('Si puedes, prepara comidas la noche anterior o en fin de semana');
   }
 
@@ -195,7 +203,7 @@ function calcularResultado(respuestas: Record<number, number>): Resultado {
   // Aire acondicionado
   if (r[5] === 0) {
     factores.push('Uso intensivo de aire acondicionado en verano (muchas horas punta)');
-    consejos.push('Programa el AC para que enfrie antes de las 18h y mantener temperatura a 25-26 grados');
+    consejos.push('Programa el aire acondicionado para que enfríe antes de las 18:00 y mantén la temperatura a 25-26 grados');
   }
 
   // Consumo bajo
@@ -203,16 +211,16 @@ function calcularResultado(respuestas: Record<number, number>): Resultado {
     factores.push('Con consumo bajo, el ahorro del PVPC en valle es muy significativo proporcionalmente');
   }
 
-  // Si no hay factores especificos, añadir generico
+  // Si no hay factores específicos, añadir genérico
   if (factores.length === 0) {
     factores.push('Tu perfil de consumo es equilibrado entre ambas opciones');
   }
 
-  // Consejos genericos siempre
+  // Consejos genéricos siempre
   consejos.push('Revisa tu factura actual para conocer tu consumo real por franjas horarias');
   consejos.push('Consulta el comparador de la CNMC (comparador.cnmc.gob.es) para ofertas actualizadas');
 
-  // Determinar recomendacion
+  // Determinar recomendación
   let recomendacion: 'pvpc' | 'libre' | 'ambas';
   if (puntosPvpc >= 4) {
     recomendacion = 'pvpc';
@@ -233,11 +241,34 @@ function calcularResultado(respuestas: Record<number, number>): Resultado {
   };
 }
 
+/** «Responde las N preguntas restantes», con su singular (hallazgo 3176: «las 1 preguntas»). */
+function textoPendientes(pendientes: number): string {
+  return pendientes === 1
+    ? 'Responde la pregunta que falta'
+    : `Responde las ${pendientes} preguntas restantes`;
+}
+
 // ─── Componente principal ──────────────────────────────────────────────────────
 
 export default function SelectorTarifaElectricaPage() {
   const [respuestas, setRespuestas] = useState<Record<number, number>>({});
   const [mostrarResultado, setMostrarResultado] = useState(false);
+
+  // «Ver recomendación» y «Repetir test» desmontan el botón que tenía el foco, que caía a <body>,
+  // y el scrollTo({ top: 0 }) dejaba el resultado bajo el pliegue en móvil (hallazgo 3168). Como
+  // en la referencia de la familia (selector-smartphone, 1679), el foco va al encabezado del
+  // resultado o a la primera pregunta, y eso los desplaza a la vista. Solo tras un clic: al
+  // cargar la página no se mueve nada.
+  const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const primeraPregunta = useRef<HTMLParagraphElement>(null);
+  const enfocarTras = useRef(false);
+
+  useEffect(() => {
+    if (!enfocarTras.current) return;
+    enfocarTras.current = false;
+    if (mostrarResultado) tituloResultado.current?.focus();
+    else primeraPregunta.current?.focus();
+  }, [mostrarResultado]);
 
   const totalRespondidas = Object.keys(respuestas).length;
   const todasRespondidas = totalRespondidas === PREGUNTAS.length;
@@ -246,17 +277,41 @@ export default function SelectorTarifaElectricaPage() {
     setRespuestas((prev) => ({ ...prev, [preguntaId]: opcionIdx }));
   };
 
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG, cabo C0016, hallazgo 3171): las flechas mueven
+   * el foco a la opción vecina y la marcan, con vuelta al principio, e Inicio/Fin van a los
+   * extremos. Cada grupo es UNA parada de Tab (tabindex itinerante). Receta de selector-smartphone
+   * (hallazgo 1681).
+   */
+  const teclaEnOpcion = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    pregunta: Pregunta,
+    indice: number,
+  ) => {
+    const total = pregunta.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    handleRespuesta(pregunta.id, destino);
+    const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    radios?.[destino]?.focus();
+  };
+
   const handleVerResultado = () => {
     if (todasRespondidas) {
+      enfocarTras.current = true;
       setMostrarResultado(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handleRepetir = () => {
+    enfocarTras.current = true;
     setRespuestas({});
     setMostrarResultado(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const resultado = todasRespondidas ? calcularResultado(respuestas) : null;
@@ -284,12 +339,21 @@ export default function SelectorTarifaElectricaPage() {
 
         <header className={styles.hero}>
           <h1 className={styles.title}>
-            <span aria-hidden="true">⚡</span> Selector de Tarifa Electrica
+            <span aria-hidden="true">⚡</span> Selector de Tarifa Eléctrica
           </h1>
           <p className={styles.subtitle}>
-            Responde 10 preguntas y descubre si te conviene mas PVPC o mercado libre
+            Responde 10 preguntas y descubre si te conviene más PVPC o mercado libre
           </p>
         </header>
+
+        {/* PVPC, peajes 2.0TD, comercializadoras de referencia y CNMC solo existen en España, y
+            la mitad del público es latinoamericano (hallazgo 3178). La regulación es eléctrica,
+            no fiscal: Delegum no es la fuente de nada de lo que dice la app. */}
+        <RegionBadge
+          variant="es-only"
+          text="Solo España: PVPC, peajes 2.0TD y comparador de la CNMC son de la regulación eléctrica española"
+          fuenteDelegum={false}
+        />
 
         <LegalNotice />
 
@@ -298,8 +362,8 @@ export default function SelectorTarifaElectricaPage() {
           severity="high"
           context="selector-tarifa-electrica"
         >
-          Esta herramienta ofrece una orientacion basada en patrones de consumo tipicos.
-          Los precios PVPC varian diariamente y los del mercado libre dependen de cada
+          Esta herramienta ofrece una orientación basada en patrones de consumo típicos.
+          Los precios PVPC varían diariamente y los del mercado libre dependen de cada
           comercializadora. Para una comparativa exacta, consulta tu factura actual y las
           ofertas disponibles en el <strong>comparador de la CNMC</strong>.
         </DisclaimerCard>
@@ -308,10 +372,12 @@ export default function SelectorTarifaElectricaPage() {
         {mostrarResultado && resultado && (
           <div className={styles.resultScreen}>
             <div className={styles.resultHeader}>
-              <div className={styles.resultIcon}>
+              <div className={styles.resultIcon} aria-hidden="true">
                 {iconoRecomendacion[resultado.recomendacion]}
               </div>
-              <h2 className={styles.resultTitle}>Nuestra recomendacion</h2>
+              <h2 className={styles.resultTitle} ref={tituloResultado} tabIndex={-1}>
+                Nuestra recomendación
+              </h2>
               <p className={styles.resultProfile}>
                 {etiquetaRecomendacion[resultado.recomendacion]}
               </p>
@@ -337,7 +403,7 @@ export default function SelectorTarifaElectricaPage() {
                       width: `${Math.max(15, (resultado.puntosPvpc / maxPuntos) * 100)}%`,
                     }}
                     role="img"
-                    aria-label={`Puntuacion PVPC: ${resultado.puntosPvpc}`}
+                    aria-label={`Puntuación PVPC: ${resultado.puntosPvpc}`}
                   />
                 </div>
               </div>
@@ -355,7 +421,7 @@ export default function SelectorTarifaElectricaPage() {
                       width: `${Math.max(15, (resultado.puntosLibre / maxPuntos) * 100)}%`,
                     }}
                     role="img"
-                    aria-label={`Puntuacion mercado libre: ${resultado.puntosLibre}`}
+                    aria-label={`Puntuación mercado libre: ${resultado.puntosLibre}`}
                   />
                 </div>
               </div>
@@ -398,8 +464,8 @@ export default function SelectorTarifaElectricaPage() {
         {!mostrarResultado && (
           <>
             <p className={styles.introText}>
-              Responde segun tus habitos reales de consumo electrico. No hay respuestas
-              correctas ni incorrectas — cada hogar tiene un perfil diferente.
+              Responde según tus hábitos reales de consumo eléctrico. No hay respuestas
+              correctas ni incorrectas: cada hogar tiene un perfil diferente.
             </p>
 
             {/* Progreso */}
@@ -414,87 +480,97 @@ export default function SelectorTarifaElectricaPage() {
             </p>
 
             {/* Preguntas */}
-            {PREGUNTAS.map((pregunta) => (
-              <div key={pregunta.id} className={styles.questionCard}>
-                <span className={styles.questionNumber}>
-                  Pregunta {pregunta.id} de {PREGUNTAS.length}
-                </span>
-                <p className={styles.questionText}>{pregunta.texto}</p>
-                <div
-                  className={styles.optionsGroup}
-                  role="radiogroup"
-                  aria-label={`Pregunta ${pregunta.id}`}
-                >
-                  {pregunta.opciones.map((opcion, idx) => (
-                    <button
-                      type="button"
-                      key={idx}
-                      className={`${styles.optionBtn} ${
-                        respuestas[pregunta.id] === idx ? styles.optionBtnSelected : ''
-                      }`}
-                      onClick={() => handleRespuesta(pregunta.id, idx)}
-                      role="radio"
-                      aria-checked={respuestas[pregunta.id] === idx ? 'true' : 'false'}
-                      aria-label={opcion.texto}
-                    >
-                      {opcion.texto}
-                    </button>
-                  ))}
+            {PREGUNTAS.map((pregunta, posicion) => {
+              const marcada = respuestas[pregunta.id];
+              return (
+                <div key={pregunta.id} className={styles.questionCard}>
+                  <span className={styles.questionNumber}>
+                    Pregunta {pregunta.id} de {PREGUNTAS.length}
+                  </span>
+                  {/* El grupo se llama como su enunciado: con aria-label «Pregunta N» el lector
+                      anunciaba «Pregunta 2, grupo» y luego «Sí / No / No sé» (hallazgo 3170). */}
+                  <p
+                    id={`pregunta-${pregunta.id}-texto`}
+                    className={styles.questionText}
+                    ref={posicion === 0 ? primeraPregunta : undefined}
+                    tabIndex={posicion === 0 ? -1 : undefined}
+                  >
+                    {pregunta.texto}
+                  </p>
+                  <div
+                    className={styles.optionsGroup}
+                    role="radiogroup"
+                    aria-labelledby={`pregunta-${pregunta.id}-texto`}
+                  >
+                    {pregunta.opciones.map((opcion, idx) => (
+                      <button
+                        type="button"
+                        key={idx}
+                        className={`${styles.optionBtn} ${
+                          marcada === idx ? styles.optionBtnSelected : ''
+                        }`}
+                        onClick={() => handleRespuesta(pregunta.id, idx)}
+                        onKeyDown={(e) => teclaEnOpcion(e, pregunta, idx)}
+                        role="radio"
+                        aria-checked={marcada === idx ? 'true' : 'false'}
+                        // Tabindex itinerante: la marcada, o la primera si no hay ninguna (3171).
+                        tabIndex={marcada === undefined ? (idx === 0 ? 0 : -1) : marcada === idx ? 0 : -1}
+                      >
+                        {opcion.texto}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
-            {/* Boton ver resultado */}
+            {/* Botón ver resultado */}
             <button
               type="button"
               className={styles.btnPrimary}
               onClick={handleVerResultado}
               disabled={!todasRespondidas}
-              aria-label={
-                todasRespondidas
-                  ? 'Ver recomendacion'
-                  : `Responde las ${PREGUNTAS.length - totalRespondidas} preguntas restantes`
-              }
             >
               {todasRespondidas
-                ? 'Ver recomendacion'
-                : `Responde las ${PREGUNTAS.length - totalRespondidas} preguntas restantes`}
+                ? 'Ver recomendación'
+                : textoPendientes(PREGUNTAS.length - totalRespondidas)}
             </button>
           </>
         )}
 
         {/* ─── CONTENIDO EDUCATIVO v2.0 ─── */}
         <EducationalSection
-          title="Tarifas electricas en Espana: guia completa"
-          subtitle="PVPC, mercado libre y como elegir la mejor opcion"
+          title="Tarifas eléctricas en España: guía completa"
+          subtitle="PVPC, mercado libre y cómo elegir la mejor opción"
         >
           {/* PVPC explicado */}
           <section className={styles.guideSection}>
-            <h2>¿Que es la PVPC (tarifa regulada)?</h2>
+            <h2>¿Qué es el PVPC (tarifa regulada)?</h2>
             <div className={styles.contentGrid}>
               <div className={styles.contentCard}>
                 <h4>Precio variable por horas</h4>
                 <p>
-                  La PVPC (Precio Voluntario para el Pequeno Consumidor) es la tarifa regulada
-                  por el Gobierno. El precio del kWh cambia cada hora segun el mercado mayorista
-                  de electricidad. Puedes consultarlo en la web de Red Electrica (ESIOS).
+                  El PVPC (Precio Voluntario para el Pequeño Consumidor) es la tarifa regulada
+                  por el Gobierno. El precio del kWh cambia cada hora según el mercado mayorista
+                  de electricidad. Puedes consultarlo en la web de Red Eléctrica (ESIOS).
                 </p>
               </div>
               <div className={styles.contentCard}>
                 <h4>Tres franjas horarias (2.0TD)</h4>
                 <p>
-                  <strong>Punta</strong> (la mas cara): 10-14h y 18-22h entre semana.{' '}
-                  <strong>Llano</strong>: 8-10h, 14-18h y 22-00h entre semana.{' '}
-                  <strong>Valle</strong> (la mas barata): 00-08h entre semana y todo el
+                  <strong>Punta</strong> (la más cara): 10-14 h y 18-22 h entre semana.{' '}
+                  <strong>Llano</strong>: 8-10 h, 14-18 h y 22-24 h entre semana.{' '}
+                  <strong>Valle</strong> (la más barata): 0-8 h entre semana y todo el
                   fin de semana y festivos nacionales.
                 </p>
               </div>
               <div className={styles.contentCard}>
-                <h4>Para quien es ideal</h4>
+                <h4>Para quién es ideal</h4>
                 <p>
-                  Hogares que pueden concentrar su consumo en horas valle: cargar coche electrico
-                  de noche, poner lavadora en fin de semana, o que tienen placas solares con
-                  compensacion de excedentes. Tambien para consumos bajos (&lt;200 kWh/mes).
+                  Hogares que pueden concentrar su consumo en horas valle: cargar el coche
+                  eléctrico de noche, poner la lavadora en fin de semana, o que tienen placas
+                  solares con compensación de excedentes. También para consumos bajos
+                  (&lt;200 kWh/mes).
                 </p>
               </div>
             </div>
@@ -502,30 +578,30 @@ export default function SelectorTarifaElectricaPage() {
 
           {/* Mercado libre explicado */}
           <section className={styles.guideSection}>
-            <h2>¿Que es el mercado libre?</h2>
+            <h2>¿Qué es el mercado libre?</h2>
             <div className={styles.contentGrid}>
               <div className={styles.contentCard}>
                 <h4>Precio fijo pactado</h4>
                 <p>
                   En el mercado libre, la comercializadora te ofrece un precio fijo por kWh
-                  que no varia con el mercado mayorista.
-                  Sabes exactamente cuanto pagaras cada mes por tu consumo.
+                  que no varía con el mercado mayorista.
+                  Sabes exactamente cuánto pagarás cada mes por tu consumo.
                 </p>
               </div>
               <div className={styles.contentCard}>
                 <h4>Servicios adicionales</h4>
                 <p>
                   Muchas comercializadoras incluyen servicios extra: mantenimiento de caldera,
-                  seguro del hogar, energia 100% renovable certificada, app de seguimiento
+                  seguro del hogar, energía 100&nbsp;% renovable certificada, app de seguimiento
                   de consumo, o descuentos por permanencia.
                 </p>
               </div>
               <div className={styles.contentCard}>
-                <h4>Para quien es ideal</h4>
+                <h4>Para quién es ideal</h4>
                 <p>
-                  Hogares con consumo repartido a lo largo del dia (teletrabajo, familias
+                  Hogares con consumo repartido a lo largo del día (teletrabajo, familias
                   numerosas), quienes valoran la previsibilidad en la factura, o quienes
-                  no quieren preocuparse de en que hora ponen la lavadora.
+                  no quieren preocuparse de a qué hora ponen la lavadora.
                 </p>
               </div>
             </div>
@@ -533,7 +609,7 @@ export default function SelectorTarifaElectricaPage() {
 
           {/* Tabla comparativa */}
           <section className={styles.comparativaSection}>
-            <h2>Comparativa: PVPC vs Mercado libre</h2>
+            <h2>Comparativa: PVPC vs. mercado libre</h2>
             <p className={styles.comparativaSubtitle}>
               Diferencias clave entre ambas opciones
             </p>
@@ -553,7 +629,7 @@ export default function SelectorTarifaElectricaPage() {
                     <td>Fijo (pactado)</td>
                   </tr>
                   <tr>
-                    <td><strong>Regulacion</strong></td>
+                    <td><strong>Regulación</strong></td>
                     <td>Gobierno (BOE)</td>
                     <td>Comercializadora privada</td>
                   </tr>
@@ -574,12 +650,12 @@ export default function SelectorTarifaElectricaPage() {
                   </tr>
                   <tr>
                     <td><strong>Excedentes solares</strong></td>
-                    <td>Compensacion a precio horario</td>
-                    <td>Segun la oferta contratada</td>
+                    <td>Compensación a precio horario</td>
+                    <td>Según la oferta contratada</td>
                   </tr>
                   <tr>
                     <td><strong>Bono Social</strong></td>
-                    <td>Si, disponible</td>
+                    <td>Sí, disponible</td>
                     <td>No disponible</td>
                   </tr>
                   <tr>
@@ -596,7 +672,7 @@ export default function SelectorTarifaElectricaPage() {
           <section className={styles.profilesSection}>
             <h2>4 perfiles de consumidor</h2>
             <p className={styles.profilesSubtitle}>
-              Descubre cual se parece mas a tu hogar
+              Descubre cuál se parece más a tu hogar
             </p>
             <div className={styles.profilesGrid}>
               <div className={styles.profileCard}>
@@ -606,10 +682,10 @@ export default function SelectorTarifaElectricaPage() {
                 </div>
                 <div className={styles.profileExample}>
                   <p>Perfil:</p>
-                  <code>Carga coche electrico de noche. Pone lavadora y lavavajillas en fin de semana. Consume poco entre semana de dia.</code>
+                  <code>Carga el coche eléctrico de noche. Pone lavadora y lavavajillas en fin de semana. Consume poco entre semana de día.</code>
                 </div>
                 <p className={styles.profileRecommendation}>
-                  <strong>Recomendacion:</strong> PVPC. Concentrar el consumo en las horas mas
+                  <strong>Recomendación:</strong> PVPC. Concentrar el consumo en las horas más
                   baratas es justo lo que el precio por franjas premia.
                 </p>
               </div>
@@ -621,11 +697,11 @@ export default function SelectorTarifaElectricaPage() {
                 </div>
                 <div className={styles.profileExample}>
                   <p>Perfil:</p>
-                  <code>Familia con ninos. Consumo repartido durante todo el dia. Cocina, calefaccion, TV, trabajo desde casa.</code>
+                  <code>Familia con niños. Consumo repartido durante todo el día. Cocina, calefacción, TV, trabajo desde casa.</code>
                 </div>
                 <p className={styles.profileRecommendation}>
-                  <strong>Recomendacion:</strong> Mercado libre. Al tener consumo en todas las
-                  franjas, el precio fijo suele ser mas ventajoso que pagar la franja punta, la mas cara.
+                  <strong>Recomendación:</strong> Mercado libre. Al tener consumo en todas las
+                  franjas, el precio fijo suele ser más ventajoso que pagar la franja punta, la más cara.
                 </p>
               </div>
 
@@ -636,11 +712,11 @@ export default function SelectorTarifaElectricaPage() {
                 </div>
                 <div className={styles.profileExample}>
                   <p>Perfil:</p>
-                  <code>Cocina al mediodia. Aire acondicionado por la tarde. Teletrabajo. Consumo alto entre 10h y 22h.</code>
+                  <code>Cocina al mediodía. Aire acondicionado por la tarde. Teletrabajo. Consumo alto entre las 10 y las 22 h.</code>
                 </div>
                 <p className={styles.profileRecommendation}>
-                  <strong>Recomendacion:</strong> Mercado libre. El consumo concentrado en horas punta
-                  hace que el PVPC sea significativamente mas caro que un precio fijo plano.
+                  <strong>Recomendación:</strong> Mercado libre. El consumo concentrado en horas punta
+                  hace que el PVPC sea significativamente más caro que un precio fijo plano.
                 </p>
               </div>
 
@@ -651,11 +727,11 @@ export default function SelectorTarifaElectricaPage() {
                 </div>
                 <div className={styles.profileExample}>
                   <p>Perfil:</p>
-                  <code>Placas solares con excedentes. Autoconsumo de dia. Vierte excedentes a la red en horas de sol.</code>
+                  <code>Placas solares con excedentes. Autoconsumo de día. Vierte excedentes a la red en horas de sol.</code>
                 </div>
                 <p className={styles.profileRecommendation}>
-                  <strong>Recomendacion:</strong> PVPC. La compensacion de excedentes se paga a precio
-                  horario del mercado, que en horas de sol (punta/llano) suele ser mas favorable.
+                  <strong>Recomendación:</strong> PVPC. La compensación de excedentes se paga a precio
+                  horario del mercado, que en horas de sol (punta/llano) suele ser más favorable.
                 </p>
               </div>
             </div>
@@ -666,55 +742,56 @@ export default function SelectorTarifaElectricaPage() {
             <h2>Preguntas frecuentes</h2>
             <div className={styles.faqGrid}>
               <details className={styles.faqItem}>
-                <summary>¿Puedo cambiar de PVPC a mercado libre y viceversa?</summary>
-                <p>
-                  Si, puedes cambiar en cualquier momento y sin coste. El cambio de mercado libre
-                  a PVPC es inmediato (salvo permanencia contractual). El cambio de PVPC a libre
-                  se tramita con la nueva comercializadora y suele tardar 2-3 semanas. No hay
-                  corte de suministro durante el proceso.
-                </p>
+                {/* La misma constante que el FAQPage de metadata.ts (hallazgo 3173) */}
+                <summary>{PREGUNTA_CAMBIO_TARIFA}</summary>
+                <p>{RESPUESTA_CAMBIO_TARIFA}</p>
               </details>
               <details className={styles.faqItem}>
-                <summary>¿Que es el Bono Social y como puedo solicitarlo?</summary>
+                <summary>¿Qué es el Bono Social y cómo puedo solicitarlo?</summary>
                 <p>
-                  El Bono Social es un descuento del 25% (o 40% para consumidores vulnerables
-                  severos) sobre la factura PVPC. Solo esta disponible en la tarifa regulada.
-                  Para solicitarlo, debes cumplir requisitos de renta y solicitarlo a tu
-                  comercializadora de referencia (la que aparece en tu zona).
+                  {BONO_SOCIAL
+                    ? `${BONO_SOCIAL.descripcion} ${BONO_SOCIAL.comoFunciona} Solo existe en la tarifa regulada. `
+                    : 'Es un descuento en la factura de la luz para hogares vulnerables, solo en la tarifa regulada. '}
+                  Requisitos y cuantías vigentes en{' '}
+                  <a href="https://www.bonosocial.gob.es" target="_blank" rel="noopener noreferrer">
+                    bonosocial.gob.es
+                  </a>
+                  .
                 </p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Las franjas horarias cambian en verano?</summary>
                 <p>
-                  No. Las franjas horarias de la 2.0TD son fijas todo el ano: punta (10-14h y
-                  18-22h L-V), llano (8-10h, 14-18h y 22-00h L-V) y valle (00-08h L-V y todo
-                  sabado, domingo y festivo nacional). No hay cambio estacional.
+                  No. Las franjas horarias de la 2.0TD son fijas todo el año: punta (10-14 h y
+                  18-22 h de lunes a viernes), llano (8-10 h, 14-18 h y 22-24 h de lunes a
+                  viernes) y valle (0-8 h de lunes a viernes y todo el sábado, domingo y festivo
+                  nacional). No hay cambio estacional.
                 </p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Los festivos locales cuentan como valle?</summary>
                 <p>
-                  No. Solo los festivos nacionales (14 al ano) tienen tarifa valle las 24 horas.
-                  Los festivos autonomicos y locales se tarifica como dia laborable normal.
-                  Consulta el calendario oficial de Red Electrica para las fechas exactas.
+                  No. Solo los festivos nacionales tienen tarifa valle las 24 horas. Los festivos
+                  autonómicos y locales se tarifican como día laborable normal. Consulta el
+                  calendario oficial de Red Eléctrica para las fechas exactas.
                 </p>
               </details>
               <details className={styles.faqItem}>
-                <summary>¿La potencia contratada afecta a la eleccion?</summary>
+                <summary>¿La potencia contratada afecta a la elección?</summary>
                 <p>
                   La potencia tiene el mismo coste tanto en PVPC como en mercado libre (salvo
-                  ofertas especificas). Lo que si influye es el numero de periodos: la 2.0TD
+                  ofertas específicas). Lo que sí influye es el número de periodos: la 2.0TD
                   tiene 2 periodos de potencia (P1 diurno y P2 nocturno). Si tu potencia P2
-                  es baja, asegurate de que los electrodomesticos de noche no salten el ICP.
+                  es baja, asegúrate de que los electrodomésticos de noche no salten el ICP.
                 </p>
               </details>
               <details className={styles.faqItem}>
-                <summary>¿Merece la pena contratar tarifa nocturna si no tengo coche electrico?</summary>
+                <summary>¿Merece la pena contratar tarifa nocturna si no tengo coche eléctrico?</summary>
                 <p>
-                  No necesitas coche electrico para beneficiarte del valle. Si puedes programar
+                  No necesitas coche eléctrico para beneficiarte del valle. Si puedes programar
                   lavadora, lavavajillas, secadora y acumulador de agua caliente para las horas
                   nocturnas o fines de semana, el ahorro con PVPC puede ser notable incluso sin
-                  vehiculo electrico. La clave es que al menos el 40-50% de tu consumo sea en valle.
+                  vehículo eléctrico. La clave es que al menos el 40-50&nbsp;% de tu consumo sea en valle.
                 </p>
               </details>
             </div>
@@ -726,7 +803,7 @@ export default function SelectorTarifaElectricaPage() {
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
                 <span className={styles.tipIconEdu} aria-hidden="true">⏰</span>
-                <h3>Programa electrodomesticos</h3>
+                <h3>Programa los electrodomésticos</h3>
                 <p>
                   Usa los temporizadores de lavadora y lavavajillas para que funcionen
                   entre las 00:00 y las 08:00 o en fin de semana.
@@ -736,23 +813,23 @@ export default function SelectorTarifaElectricaPage() {
                 <span className={styles.tipIconEdu} aria-hidden="true">🌡️</span>
                 <h3>Temperatura inteligente</h3>
                 <p>
-                  Calefaccion a 20-21 grados y aire acondicionado a 25-26 grados. Cada grado
-                  de diferencia supone un 7% mas de consumo.
+                  Calefacción a 20-21 grados y aire acondicionado a 25-26 grados. Cada grado
+                  de diferencia supone un 7&nbsp;% más de consumo.
                 </p>
               </div>
               <div className={styles.tipCard}>
                 <span className={styles.tipIconEdu} aria-hidden="true">💡</span>
-                <h3>Iluminacion LED</h3>
+                <h3>Iluminación LED</h3>
                 <p>
-                  Cambiar a LED reduce el consumo en iluminacion un 80%. Una bombilla LED
-                  de 10W equivale a una incandescente de 60W.
+                  Cambiar a LED reduce el consumo en iluminación un 80&nbsp;%. Una bombilla LED
+                  de 10 W equivale a una incandescente de 60 W.
                 </p>
               </div>
               <div className={styles.tipCard}>
                 <span className={styles.tipIconEdu} aria-hidden="true">🔌</span>
                 <h3>Elimina el stand-by</h3>
                 <p>
-                  Los aparatos en stand-by consumen entre 50 y 100 euros al ano. Usa
+                  Los aparatos en stand-by consumen entre 50 y 100 euros al año. Usa
                   regletas con interruptor para apagarlos de verdad.
                 </p>
               </div>
@@ -760,7 +837,7 @@ export default function SelectorTarifaElectricaPage() {
                 <span className={styles.tipIconEdu} aria-hidden="true">📱</span>
                 <h3>Monitoriza tu consumo</h3>
                 <p>
-                  Instala la app i-DE o e-distribucion (segun tu distribuidora) para ver
+                  Instala la app i-DE o e-distribución (según tu distribuidora) para ver
                   tu consumo real por horas y detectar picos innecesarios.
                 </p>
               </div>
@@ -768,8 +845,8 @@ export default function SelectorTarifaElectricaPage() {
                 <span className={styles.tipIconEdu} aria-hidden="true">📋</span>
                 <h3>Revisa tu potencia</h3>
                 <p>
-                  Muchos hogares tienen mas potencia contratada de la que necesitan.
-                  Ajustarla a lo que de verdad usas baja el termino fijo de todas las facturas.
+                  Muchos hogares tienen más potencia contratada de la que necesitan.
+                  Ajustarla a lo que de verdad usas baja el término fijo de todas las facturas.
                 </p>
               </div>
             </div>
@@ -779,13 +856,13 @@ export default function SelectorTarifaElectricaPage() {
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
-              <h3>Errores comunes al elegir tarifa electrica</h3>
+              <h3>Errores comunes al elegir tarifa eléctrica</h3>
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>&quot;La PVPC siempre es mas barata&quot;.</strong> Depende de tu patron
+                <strong>&quot;El PVPC siempre es más barato&quot;.</strong> Depende de tu patrón
                 de consumo. Si la mayor parte de tu gasto es en horas punta, el mercado libre
-                con precio plano puede ser mas economico. La PVPC solo es claramente ventajosa
+                con precio plano puede ser más económico. El PVPC solo es claramente ventajoso
                 si concentras consumo en valle.
               </li>
               <li>
@@ -795,22 +872,22 @@ export default function SelectorTarifaElectricaPage() {
                 incluidos y precio real por kWh.
               </li>
               <li>
-                <strong>&quot;Las franjas horarias son iguales todo el ano&quot;.</strong> Las
-                franjas de la 2.0TD no cambian, pero el precio PVPC si varia mucho segun la
-                epoca: en invierno y verano (alta demanda) suele ser mas caro, mientras que
-                primavera y otono suelen tener precios mas bajos.
+                <strong>&quot;Las franjas horarias son iguales todo el año&quot;.</strong> Las
+                franjas de la 2.0TD no cambian, pero el precio PVPC sí varía mucho según la
+                época: en invierno y verano (alta demanda) suele ser más caro, mientras que
+                primavera y otoño suelen tener precios más bajos.
               </li>
               <li>
-                <strong>&quot;Solo importa el precio del kWh&quot;.</strong> El termino de
-                potencia es una parte fija de la factura que pagas aunque no consumas. Optimizar la potencia
-                contratada puede ahorrar mas que cambiar de tarifa. Revisa si tu potencia
-                P1 y P2 estan bien ajustadas.
+                <strong>&quot;Solo importa el precio del kWh&quot;.</strong> El término de
+                potencia es una parte fija de la factura que pagas aunque no consumas. Ajustar la potencia
+                contratada puede ahorrar más que cambiar de tarifa. Revisa si tu potencia
+                P1 y P2 están bien ajustadas.
               </li>
               <li>
                 <strong>&quot;Cambiar de tarifa es complicado&quot;.</strong> En realidad
-                es gratuito, no hay corte de suministro y se puede hacer online. El proceso
-                tarda entre 1 y 3 semanas. No necesitas cambiar el contador ni hacer ninguna
-                instalacion.
+                es gratuito, no hay corte de suministro y se puede hacer en línea. No necesitas
+                cambiar el contador ni hacer ninguna instalación; solo conviene mirar antes si
+                tu contrato actual tiene permanencia.
               </li>
             </ul>
           </div>

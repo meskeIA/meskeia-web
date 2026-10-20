@@ -1,8 +1,6 @@
-/* Variables CSS - Paleta meskeIA */
+/* Variables CSS - Paleta meskeIA. La marca (--primary, --secondary, --accent) NO se redeclara:
+   la de globals.css trae ya sus variantes -texto y -boton para cada tema (hallazgo 3169). */
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
-  --accent: #7FB3D3;
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;
@@ -159,6 +157,12 @@
   background: rgba(46, 134, 171, 0.12);
   color: var(--primary-texto);
   font-weight: 600;
+}
+
+/* En oscuro, el tinte al 12 % sobre la tarjeta dejaba --primary-texto en 4,47:1; al 8 %, 4,7:1
+   (hallazgo 3169) */
+[data-theme='dark'] .optionBtnSelected {
+  background: rgba(46, 134, 171, 0.08);
 }
 
 .optionBtn:focus-visible {
