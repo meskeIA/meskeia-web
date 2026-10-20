@@ -34,6 +34,12 @@ import { calcularBrechaJubilacion } from '@/lib/calculadoras/brechaJubilacion';
 import { calcularComplementoBrechaGenero, FECHA_MINIMA_HECHO_CAUSANTE, type SexoBeneficiario as SexoBeneficiarioBG, type TipoPensionBG } from '@/lib/calculadoras/complementoBrechaGenero';
 // Pagas y doctrina del complemento, citadas desde el módulo y no tecleadas (residuo de 2245/2246)
 import { COMPLEMENTO_BRECHA_GENERO_2026, COMPLEMENTO_BRECHA_GENERO_META, PLAZO_AUTOLIQUIDACION_DONACIONES, REDUCCION_SEGURO_VIDA_MAX_IS, cuantiaMaximaPEVS } from '@/data/fiscal';
+import {
+  NOMBRE_REGIMEN_DIRECTA,
+  REGIMEN_DIRECTA_POR_DEFECTO,
+  GASTOS_DIFICIL_JUSTIFICACION_EDS,
+  reduccionGastosDificilJustificacion,
+} from '@/data/fiscal';
 const PAGAS_BG = COMPLEMENTO_BRECHA_GENERO_2026.pagasAnuales;
 const DOCTRINA_BG = COMPLEMENTO_BRECHA_GENERO_META.doctrina;
 // Concurrencia entre progenitores y cómo se comparan las sumas (art. 60.7 LGSS, hallazgo 2538)
@@ -311,6 +317,21 @@ const ENUM_CCAA = [
 const ENUM_CCAA_INMUEBLE_VENTA = [...ENUM_CCAA, 'ceuta', 'melilla'] as const;
 const ENUM_SITUACION =['soltero', 'casado_sin_ingresos', 'casado_con_ingresos'] as const;
 
+// Modalidad de la estimación directa del autónomo (cabo C0294, 20/10/2026): en la simplificada el
+// rendimiento computable del RETA y la base del IRPF restan además el 5 % de difícil justificación.
+const PARAM_REGIMEN = z.enum(['normal', 'simplificada']).optional()
+  .describe(
+    'Modalidad de estimación directa del IRPF del autónomo: "simplificada" (la de casi todos; resta ' +
+    `un ${GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje} % de gastos de difícil justificación, máximo ` +
+    `${GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual} € al año) o "normal". Por defecto "simplificada".`,
+  );
+
+const lineaRegimen = (regimen: 'normal' | 'simplificada') =>
+  `📐 Régimen supuesto: ${NOMBRE_REGIMEN_DIRECTA[regimen].toLowerCase()}` +
+  (regimen === 'simplificada'
+    ? ` (−${GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje} % de difícil justificación, máx. ${GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual} €/año)`
+    : '');
+
 // ---------------------------------------------------------------------------
 // Creación del servidor Delegum con su personalidad de «gestoría».
 // ---------------------------------------------------------------------------
@@ -352,18 +373,25 @@ function crearServidorDelegum(): McpServer {
         .describe('Situación familiar para el IRPF. Por defecto "soltero".'),
       num_hijos: z.number().int().min(0).max(15).optional()
         .describe('Número de hijos a cargo (para el mínimo familiar del IRPF). Por defecto 0.'),
+      regimen: PARAM_REGIMEN,
     },
     { title: 'Consulta integral de autónomo (cuota + IRPF + neto + autónomo vs SL)', readOnlyHint: true },
-    async ({ facturacion_anual, gastos_anuales, es_nuevo_autonomo, situacion_familiar, num_hijos }, extra) => {
+    async ({ facturacion_anual, gastos_anuales, es_nuevo_autonomo, situacion_familiar, num_hijos, regimen: regimenParam }, extra) => {
       await registrarUsoDelegum('consulta_autonomo', getCaller(extra));
       try {
         const gastos = gastos_anuales ?? 0;
+        const regimen = regimenParam ?? REGIMEN_DIRECTA_POR_DEFECTO;
         const rendimientoNetoAnual = Math.max(0, facturacion_anual - gastos);
         const cuota = calcularCuotaAutonomo({
           rendimientoNetoMensual: rendimientoNetoAnual / 12,
           esNuevoAutonomo: es_nuevo_autonomo,
+          regimen,
         });
-        const baseIRPF = Math.max(0, rendimientoNetoAnual - cuota.cuotaAnual);
+        // En la simplificada, el 5 % se calcula sobre el neto ya descontada la cuota que se paga.
+        const reduccionDJ = regimen === 'simplificada'
+          ? reduccionGastosDificilJustificacion(rendimientoNetoAnual - cuota.cuotaAnual)
+          : 0;
+        const baseIRPF = Math.max(0, rendimientoNetoAnual - cuota.cuotaAnual - reduccionDJ);
         const irpf = calcularIRPF({
           rendimientosTrabajo: baseIRPF,
           situacion: situacion_familiar,
@@ -375,6 +403,7 @@ function crearServidorDelegum(): McpServer {
           gastosDeducibles: gastos,
           tipoIS: 'general',
           repartirDividendos: true,
+          regimen,
         });
         const netoAnual = rendimientoNetoAnual - cuota.cuotaAnual - irpf.cuotaIntegra;
 
@@ -386,9 +415,11 @@ function crearServidorDelegum(): McpServer {
           '',
           `🏛️ **Seguridad Social (RETA)**`,
           `  • Cuota mensual: **${fmt(cuota.cuotaEfectiva)} €/mes**${cuota.aplicaTarifaPlana ? ' (tarifa plana)' : ''}`,
-          `  • Cuota anual: ${fmt(cuota.cuotaAnual)} €`,
+          `  • Cuota anual: ${fmt(cuota.cuotaAnual)} € · tramo ${cuota.tramo}`,
+          `  • ${lineaRegimen(regimen)}`,
           '',
           `🧾 **IRPF estimado**`,
+          ...(reduccionDJ > 0 ? [`  • Gastos de difícil justificación: −${fmt(reduccionDJ)} € en la base`] : []),
           `  • Cuota anual: **${fmt(irpf.cuotaIntegra)} €**`,
           `  • Tipo efectivo: ${pct(irpf.tipoEfectivoGeneral)}%`,
           '',
@@ -1111,14 +1142,18 @@ function crearServidorDelegum(): McpServer {
     {
       rendimiento_neto_mensual: z.number().nonnegative().describe('Rendimiento neto mensual (ingresos - gastos, antes de cuota) en euros'),
       es_nuevo_autonomo: z.boolean().optional().describe('Si está en los primeros 12 meses (tarifa plana). Por defecto false.'),
+      regimen: PARAM_REGIMEN,
     },
     { title: 'Calcula la cuota mensual de autónomo (RETA) por ingresos reales', readOnlyHint: true },
-    async ({ rendimiento_neto_mensual, es_nuevo_autonomo }, extra) => {
+    async ({ rendimiento_neto_mensual, es_nuevo_autonomo, regimen: regimenParam }, extra) => {
       await registrarUsoDelegum('calcular_cuota_autonomo', getCaller(extra));
       try {
-        const r = calcularCuotaAutonomo({ rendimientoNetoMensual: rendimiento_neto_mensual, esNuevoAutonomo: es_nuevo_autonomo });
+        const regimen = regimenParam ?? REGIMEN_DIRECTA_POR_DEFECTO;
+        const r = calcularCuotaAutonomo({ rendimientoNetoMensual: rendimiento_neto_mensual, esNuevoAutonomo: es_nuevo_autonomo, regimen });
         const texto = [
           `🏛️ **Cuota de Autónomo (RETA) — Tramo ${r.tramo}**`,
+          `📊 Rendimiento computable: ${fmt(r.rendimientoComputableMensual)} €/mes`,
+          lineaRegimen(regimen),
           `📦 Base de cotización: ${fmt(r.baseCotizacion)} €`,
           `💳 **Cuota mensual: ${fmt(r.cuotaEfectiva)} €**${r.aplicaTarifaPlana ? ' (tarifa plana)' : ''}`,
           `📅 Cuota anual: ${fmt(r.cuotaAnual)} €`,
@@ -1141,9 +1176,10 @@ function crearServidorDelegum(): McpServer {
       gastos_deducibles: z.number().nonnegative().optional().describe('Gastos deducibles anuales. Por defecto 0.'),
       tipo_is: z.enum(['general', 'micropyme', 'nueva_creacion']).optional().describe('Tipo de IS para la SL. Por defecto "general".'),
       repartir_dividendos: z.boolean().optional().describe('Si la SL reparte dividendos al socio. Por defecto true.'),
+      regimen: PARAM_REGIMEN,
     },
     { title: 'Compara la carga fiscal de autónomo frente a Sociedad Limitada', readOnlyHint: true },
-    async ({ beneficio_anual, gastos_deducibles, tipo_is, repartir_dividendos }, extra) => {
+    async ({ beneficio_anual, gastos_deducibles, tipo_is, repartir_dividendos, regimen }, extra) => {
       await registrarUsoDelegum('comparar_autonomo_vs_sl', getCaller(extra));
       try {
         const r = compararAutonomoVsSL({
@@ -1151,11 +1187,13 @@ function crearServidorDelegum(): McpServer {
           gastosDeducibles: gastos_deducibles,
           tipoIS: (tipo_is ?? 'general') as TipoISSL,
           repartirDividendos: repartir_dividendos ?? true,
+          regimen,
         });
         const texto = [
           `⚖️ **Autónomo vs Sociedad Limitada**`,
           '',
-          `👤 **Autónomo**: neto ${fmt(r.autonomo.netoAnual)} € · carga total ${pct(r.autonomo.tipoEfectivoTotal)}%`,
+          `👤 **Autónomo**: neto ${fmt(r.autonomo.netoAnual)} € · carga total ${pct(r.autonomo.tipoEfectivoTotal)}% · RETA tramo ${r.tramoRETAAutonomo}`,
+          `   ${lineaRegimen(r.regimenAutonomo)}`,
           `🏢 **SL** (IS ${r.tipoISAplicado}%): neto ${fmt(r.sl.netoAnual)} € · carga total ${pct(r.sl.tipoEfectivoTotal)}%`,
           '',
           r.convieneSL

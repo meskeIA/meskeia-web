@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, APIRequestContext } from '@playwright/test';
 
 /**
  * comparador-autonomo-vs-sl — regresión del mínimo personal (art. 63.1.2.º LIRPF)
@@ -193,4 +193,46 @@ test('C0294 · frontera: 24.516,13 € sin gastos cotiza en simplificada un tram
   expect(await fila(page, 'Cuota RETA (SS), general, tramo 5')).toBe('- 4570,59 €');
   await comparar(page, '24516,13', '0', 'simplificada');
   expect(await fila(page, 'Cuota RETA (SS), general, tramo 4')).toBe('- 4323,53 €');
+});
+
+/** Llama a una herramienta del MCP de Delegum y devuelve el texto de la respuesta, normalizado. */
+async function porMcp(request: APIRequestContext, herramienta: string, argumentos: Record<string, unknown>): Promise<string> {
+  const respuesta = await request.post('/api/mcp/delegum/', {
+    headers: { Accept: 'application/json, text/event-stream' },
+    data: { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: herramienta, arguments: argumentos } },
+  });
+  expect(respuesta.ok()).toBeTruthy();
+  return limpiar((await respuesta.json()).result.content[0].text);
+}
+
+// El motor del MCP (lib/calculadoras/autonomoVsSL.ts) redondea la cuota y el 5 % a céntimos antes
+// de sumar, y la app no: el neto puede diferir en un céntimo. 30.000 y 4.500, tramo 8:
+//   simplificada: base 25.500 − 4.570,59 − 1.046,47 = 19.882,94 → IRPF 4.149,4056 − 1.054,50 =
+//   3.094,91 → total 7.665,50 → neto 17.834,50 · normal: base 20.929,41 → IRPF 2.365,50 + 1.860,00
+//   + 218,823 − 1.054,50 = 3.389,82 → total 7.960,41 → neto 17.539,59
+test('C0294 · MCP comparar_autonomo_vs_sl: régimen opcional, simplificada por defecto', async ({ request }) => {
+  const args = { beneficio_anual: 30000, gastos_deducibles: 4500 };
+  const porDefecto = await porMcp(request, 'comparar_autonomo_vs_sl', args);
+  expect(porDefecto).toContain('neto 17.834,50 €');
+  expect(porDefecto).toContain('RETA tramo 8');
+  expect(porDefecto).toContain('Régimen supuesto: estimación directa simplificada');
+
+  const normal = await porMcp(request, 'comparar_autonomo_vs_sl', { ...args, regimen: 'normal' });
+  expect(normal).toContain('neto 17.539,59 €');
+  expect(normal).toContain('Régimen supuesto: estimación directa normal');
+});
+
+// consulta_autonomo resta el 5 % sobre el neto menos la cuota que de verdad se paga (380,88 × 12 =
+// 4.570,56): 5 % de 20.929,44 = 1.046,472 → 1.046,47 €.
+test('C0294 · MCP consulta_autonomo: régimen opcional, simplificada por defecto', async ({ request }) => {
+  const args = { facturacion_anual: 30000, gastos_anuales: 4500 };
+  const porDefecto = await porMcp(request, 'consulta_autonomo', args);
+  expect(porDefecto).toContain('Cuota mensual: **380,88 €/mes**');
+  expect(porDefecto).toContain('tramo 8');
+  expect(porDefecto).toContain('Régimen supuesto: estimación directa simplificada');
+  expect(porDefecto).toContain('Gastos de difícil justificación: −1046,47 € en la base');
+
+  const normal = await porMcp(request, 'consulta_autonomo', { ...args, regimen: 'normal' });
+  expect(normal).toContain('Régimen supuesto: estimación directa normal');
+  expect(normal).not.toContain('difícil justificación');
 });

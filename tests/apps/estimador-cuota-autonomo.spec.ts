@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, APIRequestContext } from '@playwright/test';
 
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
@@ -114,4 +114,31 @@ test('C0294 · frontera: 1.900 €/mes de computable normal bajan en simplificad
   expect(await fila(page, /^Rendimiento computable mensual/)).toBe('1821,75 €');
   expect(await fila(page, /^Base de cotización$/)).toBe('1143,79 €');
   expect(await fila(page, /^Cuota mensual \(sin bonificación\)$/)).toBe('360,29 €');
+});
+
+/** Llama a una herramienta del MCP de Delegum y devuelve el texto de la respuesta, normalizado. */
+async function porMcp(request: APIRequestContext, herramienta: string, argumentos: Record<string, unknown>): Promise<string> {
+  const respuesta = await request.post('/api/mcp/delegum/', {
+    headers: { Accept: 'application/json, text/event-stream' },
+    data: { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: herramienta, arguments: argumentos } },
+  });
+  expect(respuesta.ok()).toBeTruthy();
+  return limpiar((await respuesta.json()).result.content[0].text);
+}
+
+// La herramienta del MCP usa la misma fórmula (`cotizacionRETADesdeActividad` de data/fiscal) con el
+// mismo régimen por defecto: mismas cifras que la frontera de arriba.
+test('C0294 · MCP calcular_cuota_autonomo: régimen opcional, simplificada por defecto', async ({ request }) => {
+  const neto = 24516.13 / 12;
+  const porDefecto = await porMcp(request, 'calcular_cuota_autonomo', { rendimiento_neto_mensual: neto });
+  expect(porDefecto).toContain('Tramo 7');
+  expect(porDefecto).toContain('Rendimiento computable: 1821,75 €/mes');
+  expect(porDefecto).toContain('Cuota mensual: 360,29 €');
+  expect(porDefecto).toContain('Régimen supuesto: estimación directa simplificada (−5 % de difícil justificación, máx. 2000 €/año)');
+
+  const normal = await porMcp(request, 'calcular_cuota_autonomo', { rendimiento_neto_mensual: neto, regimen: 'normal' });
+  expect(normal).toContain('Tramo 8');
+  expect(normal).toContain('Rendimiento computable: 1900,00 €/mes');
+  expect(normal).toContain('Cuota mensual: 380,88 €');
+  expect(normal).toContain('Régimen supuesto: estimación directa normal');
 });
