@@ -248,6 +248,7 @@ function PilaCombustibleSVG() {
       {/* Motor */}
       <circle cx="150" cy="10" r="8" fill="white" stroke="#EF4444" strokeWidth="2" />
       <text x="150" y="14" textAnchor="middle" fontSize="8" fill="#EF4444" fontWeight="bold">M</text>
+      {/* a11y-ok: <text> de un <svg role="img"> con su aria-label: el lector no entra en el dibujo */}
       <text x="150" y="0" textAnchor="middle" fontSize="9" fill="#EF4444">⚡ e⁻</text>
 
       {/* Flechas H⁺ en membrana */}

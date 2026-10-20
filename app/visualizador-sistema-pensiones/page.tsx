@@ -265,6 +265,7 @@ export default function VisualizadorSistemaPensiones() {
               <text x="260" y="42" textAnchor="middle" fontSize="11" fontWeight="600" fill="#48A9A6">Fondo Individual</text>
               <text x="260" y="60" textAnchor="middle" fontSize="10" fill="#555">Acumula con intereses</text>
               <text x="260" y="76" textAnchor="middle" fontSize="10" fill="#555">durante 40 años</text>
+              {/* a11y-ok: <text> de un <svg role="img"> con su aria-label: el lector no entra en el dibujo */}
               <text x="260" y="92" textAnchor="middle" fontSize="9" fill="#888">📈 invertido en mercados</text>
 
               {/* Flecha → Jubilado */}

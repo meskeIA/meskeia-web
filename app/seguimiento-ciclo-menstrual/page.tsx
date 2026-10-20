@@ -300,8 +300,8 @@ export default function SeguimientoCicloMenstrualPage() {
                       <span aria-hidden="true">✨</span> Ovulación probable: {formatFecha(ciclo.ovulacion)}
                     </div>
                   </div>
-                  <div className={styles.cicloFertil} aria-label={`Ventana fértil: ${formatFechaCorta(ciclo.inicioVentanaFertil)} al ${formatFechaCorta(ciclo.finVentanaFertil)}`}>
-                    💚 {formatFechaCorta(ciclo.inicioVentanaFertil)} – {formatFechaCorta(ciclo.finVentanaFertil)}
+                  <div className={styles.cicloFertil}>
+                    <span aria-hidden="true">💚</span> <span className="sr-only">Ventana fértil:</span> {formatFechaCorta(ciclo.inicioVentanaFertil)} – {formatFechaCorta(ciclo.finVentanaFertil)}
                   </div>
                 </div>
               ))}
