@@ -34,6 +34,20 @@ function labelTipoIS(tipoIS: TipoISComparador): string {
 const IS_GENERAL = TIPOS_IS_2025.general;
 const IS_MICRO_2026_TEXTO = `${TRAMOS_IS_MICROPYMES_2026[0].tipo}-${TRAMOS_IS_MICROPYMES_2026[TRAMOS_IS_MICROPYMES_2026.length - 1].tipo} %`;
 
+// Cuota mínima del autónomo societario, de data/fiscal: hasta el 20/10/2026 los textos decían
+// «~512 €/mes», «~515 €/mes», «~6.180 €» al año y una base de «~1.634 €», a mano y sin fuente
+// (cabo C0339).
+const CUOTA_SOCIETARIO_ANUAL = AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual * 12;
+const CUOTA_SOCIETARIO_MES_TEXTO = `~${formatNumber(AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual, 0)} €/mes`;
+const CUOTA_SOCIETARIO_ANUAL_TEXTO = `~${formatNumber(CUOTA_SOCIETARIO_ANUAL, 0)} €`;
+
+// Escenarios orientativos: el IS y el IRPF de cada uno van en su texto; lo que depende de la
+// cuota del societario se suma aquí para que no vuelva a quedarse desfasado.
+const ESC_FREELANCE_SL = 7500 + 4605 + CUOTA_SOCIETARIO_ANUAL;
+const ESC_CONSULTOR_SL = 7500 + 5500 + CUOTA_SOCIETARIO_ANUAL;
+const ESC_CONSULTOR_AHORRO_BRUTO = 19973 - ESC_CONSULTOR_SL;
+const ESC_CONSULTOR_SOBRECOSTE = 5500 - ESC_CONSULTOR_AHORRO_BRUTO;
+
 // ─── Lógica de cálculo ────────────────────────────────────────────────────────
 
 /**
@@ -428,7 +442,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <ul>
                 <li>Constitución: ~1.500-3.000 € (notaría + registro)</li>
                 <li>Gestoría mensual: ~150-400 €/mes</li>
-                <li>Autónomo societario obligatorio: ~512 €/mes</li>
+                <li>Autónomo societario obligatorio: {CUOTA_SOCIETARIO_MES_TEXTO}</li>
                 <li>Legalización libros, cuentas anuales...</li>
               </ul>
             </div>
@@ -483,7 +497,7 @@ export default function ComparadorAutonomoVsSLPage() {
                 <tr>
                   <td>Cotización mínima mensual SS</td>
                   <td>~206 €/mes (rendimiento bajo, tramo mínimo 2026)</td>
-                  <td>~515 €/mes (autónomo societario obligatorio)</td>
+                  <td>{CUOTA_SOCIETARIO_MES_TEXTO} (autónomo societario obligatorio)</td>
                 </tr>
                 <tr>
                   <td>Costes de constitución</td>
@@ -529,13 +543,13 @@ export default function ComparadorAutonomoVsSLPage() {
                 </p>
                 <p>
                   Como <strong>SL</strong> (IS 25%, repartiendo todo como dividendos): ~7.500 € IS + ~4.605 € IRPF
-                  sobre dividendos + ~6.180 € autónomo societario = <strong>~18.285 € en cargas</strong>, más los
+                  sobre dividendos + {CUOTA_SOCIETARIO_ANUAL_TEXTO} autónomo societario = <strong>~{formatNumber(ESC_FREELANCE_SL, 0)}{' '}€ en cargas</strong>, más los
                   costes fijos de la SL (~5.000-6.000 €/año de gestoría, cuentas anuales, etc.).
                 </p>
               </div>
               <p className={styles.escenarioTip}>
                 Veredicto: La SL no compensa a este nivel: ya supone casi el doble de carga que el autónomo
-                (18.285 € vs 9.142 €) antes incluso de sumar los costes fijos de gestoría. Continúa como autónomo.
+                ({formatNumber(ESC_FREELANCE_SL, 0)}{' '}€ vs 9.142 €) antes incluso de sumar los costes fijos de gestoría. Continúa como autónomo.
               </p>
             </div>
 
@@ -549,9 +563,9 @@ export default function ComparadorAutonomoVsSLPage() {
                   Como <strong>autónomo</strong>: ~13.426 € IRPF + ~6.547 € RETA = <strong>19.973 € en cargas</strong>.
                 </p>
                 <p>
-                  Como <strong>SL</strong> con salario 30.000 €: IS ~7.500 € + IRPF salario ~5.500 € + autónomo societario ~6.180 €
-                  = ~19.180 €. El ahorro bruto es de solo ~790 €, que los costes fijos de la SL (~5.500 €/año)
-                  convierten en un <strong>sobrecoste neto de ~4.700 €/año</strong>.
+                  Como <strong>SL</strong> con salario 30.000 €: IS ~7.500 € + IRPF salario ~5.500 € + autónomo societario {CUOTA_SOCIETARIO_ANUAL_TEXTO}
+                  = ~{formatNumber(ESC_CONSULTOR_SL, 0)}{' '}€. El ahorro bruto es de solo ~{formatNumber(ESC_CONSULTOR_AHORRO_BRUTO, 0)}{' '}€, que los costes fijos de la SL (~5.500 €/año)
+                  convierten en un <strong>sobrecoste neto de ~{formatNumber(ESC_CONSULTOR_SOBRECOSTE, 0)}{' '}€/año</strong>.
                 </p>
               </div>
               <p className={styles.escenarioTip}>
@@ -618,7 +632,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <dd>
                 Sí, pero debes estar dado de alta como autónomo societario igualmente si trabajas en la
                 empresa y tienes su control efectivo (art. 305.2.b LGSS: siempre con la mitad del capital o
-                más; se presume con un tercio, o con una cuarta parte si dirige y gestiona). La cotización mínima es ~515 €/mes (2026)
+                más; se presume con un tercio, o con una cuarta parte si dirige y gestiona). La cotización mínima es {CUOTA_SOCIETARIO_MES_TEXTO} (2026)
                 independientemente de si te pagas salario. No cobrar salario puede generar problemas con la AEAT
                 por operaciones vinculadas si la SL tiene actividad real.
               </dd>
@@ -667,7 +681,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <dd>
                 Sí, en general. El autónomo societario cotiza en el RETA y tiene acceso a las mismas prestaciones:
                 cese de actividad (paro del autónomo), incapacidad temporal, jubilación, maternidad/paternidad.
-                La diferencia es que la base de cotización suele ser más alta (mínimo ~1.634 €/mes en 2026),
+                La diferencia es que la base de cotización suele ser más alta (mínimo {formatNumber(AUTONOMO_SOCIETARIO_2025.baseMinimaMensual, 2)}{' '}€/mes en 2026),
                 lo que implica mayor cuota pero también mejores prestaciones futuras.
               </dd>
             </div>
@@ -779,7 +793,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <h4>Evalúa el umbral real de rentabilidad</h4>
               <p>
                 No crees una SL solo por el ahorro fiscal sin comprobar que cubre lo que cuesta la estructura.
-                Los costes fijos anuales (gestoría ~3.000 €, cuentas anuales, autónomo societario ~6.180 €)
+                Los costes fijos anuales (gestoría ~3.000 €, cuentas anuales, autónomo societario {CUOTA_SOCIETARIO_ANUAL_TEXTO})
                 suman fácilmente <strong>5.000-7.000 €/año</strong> en obligaciones que el autónomo no tiene.
                 Haz el cálculo neto real antes de decidir.
               </p>

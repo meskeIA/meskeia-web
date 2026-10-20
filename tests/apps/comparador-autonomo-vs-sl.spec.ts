@@ -122,3 +122,28 @@ test('C0339 · los tipos del IS son los de 2026, no el «23-25 %»', async ({ pa
   expect(texto).toContain('al 25 % general, o al 19-21 % en 2026 si la cifra de negocios es inferior a 1 M €');
   expect(texto).toContain('ahorro de hasta 10 puntos porcentuales frente al tipo general del 25 %');
 });
+
+// Cabo C0339 (20/10/2026): la cuota mínima del autónomo societario salía a mano con tres valores
+// («~512 €/mes», «~515 €/mes», «~6.180 €» al año) de una base de 1.634,88 € sin fuente. Cifras de
+// la norma: art. 308.1.a) regla 4.ª LGSS (base mínima del grupo 7 del Régimen General) y Orden
+// PJC/297/2026, art. 3 (grupo 7: 1.424,40 €/mes), arts. 18.2 y 37.5-6 (28,30 + 1,30 + 0,90 MEI +
+// 0,90 cese + 0,10 FP = 31,50 %):
+//   1.424,40 × 31,50 % = 448,686 → 448,69 €/mes · × 12 = 5.384,28 €/año
+//   escenario freelance: 7.500 + 4.605 + 5.384,28 = 17.489,28 · consultor: 7.500 + 5.500 + 5.384,28
+//   = 18.384,28; ahorro bruto 19.973 − 18.384,28 = 1.588,72; sobrecoste 5.500 − 1.588,72 = 3.911,28
+test('C0339 · la cuota del autónomo societario es la de la orden de cotización de 2026', async ({ page }) => {
+  const texto = limpiar((await page.locator('body').textContent()) ?? '');
+  expect(texto).not.toMatch(/51[25] €\/mes|6\.180 €|1\.634/);
+  expect(texto).toContain('Autónomo societario obligatorio: ~449 €/mes');
+  expect(texto).toContain('~449 €/mes (autónomo societario obligatorio)');
+  expect(texto).toContain('La cotización mínima es ~449 €/mes (2026)');
+  expect(texto).toContain('mínimo 1424,40 €/mes en 2026');
+  expect(texto).toContain('autónomo societario ~5384 €)');
+  expect(texto).toContain('~17.489 € en cargas');
+  expect(texto).toContain('= ~18.384 €. El ahorro bruto es de solo ~1589 €');
+  expect(texto).toContain('sobrecoste neto de ~3911 €/año');
+
+  // Y el cálculo: la fila de la SL resta la cuota anual entera
+  await comparar(page, '60000', '10000');
+  expect(await fila(page, 'Autónomo societario (SS)')).toBe('- 5384,28 €');
+});

@@ -81,11 +81,23 @@ export const RETENCIONES_IS_2025 = {
 // Base mínima para quien tiene el control efectivo de la sociedad. El art. 305.2.b LGSS lo
 // presume con una participación IGUAL O SUPERIOR a la cuarta parte si se ejercen funciones de
 // dirección y gerencia, a la tercera parte sin ellas, y siempre con la mitad (hallazgo 2144).
+//
+// Verificado el 20/10/2026 (cabo C0339). Hasta entonces la base era 1.634,88 € (cuota 514,99 €),
+// sin fuente: entró el 15/03/2026, antes de publicarse la orden de cotización de 2026.
+//   · Art. 308.1.a), regla 4.ª LGSS (BOE-A-2015-11724): «no podrán elegir una base de cotización
+//     mensual inferior a aquella que determine la correspondiente Ley de Presupuestos Generales
+//     del Estado como base de cotización mínima para contingencias comunes para los trabajadores
+//     incluidos en el Régimen General de la Seguridad Social del grupo de cotización 7».
+//   · Orden PJC/297/2026 (BOE-A-2026-7296), art. 3: grupo 7, «Auxiliares Administrativos.
+//     1.424,40» €/mes. Tipo: 28,30 contingencias comunes + 1,30 profesionales + 0,90 MEI (art. 18.2)
+//     + 0,90 cese de actividad + 0,10 formación profesional (art. 37.5 y 6) = 31,50 %.
+//   · Art. 18.4 de la orden: en 2026 se puede mantener la base provisional de 2025 (1.000 €), pero
+//     en la regularización «la base de cotización definitiva no podrá ser inferior» a la del grupo 7.
 
 export const AUTONOMO_SOCIETARIO_2025 = {
-  baseMinimaMensual:    1634.88, // € — Base mínima obligatoria para adm. con control
-  cuotaMinimaMensual:   514.99,  // € — Cuota mínima mensual (31,5% de la base desde 2026 por subida MEI)
-  nota: 'Quien tiene el control efectivo de la sociedad (art. 305.2.b LGSS: participación igual o superior al 25 % con funciones de dirección y gerencia, al 33 % sin ellas, o al 50 % en todo caso) cotiza por base mínima obligatoria, no por ingresos reales. Tipo 31,5% (RDL 16/2025). Verificar en SS.',
+  baseMinimaMensual:    1424.40, // € — Base mínima del grupo 7 del Régimen General (Orden PJC/297/2026)
+  cuotaMinimaMensual:   448.69,  // € — 1.424,40 × 31,50 %
+  nota: 'Quien tiene el control efectivo de la sociedad (art. 305.2.b LGSS: participación igual o superior al 25 % con funciones de dirección y gerencia, al 33 % sin ellas, o al 50 % en todo caso) no puede cotizar por una base inferior a la mínima del grupo 7 del Régimen General (1.424,40 € en 2026, Orden PJC/297/2026), sean cuales sean sus ingresos. Tipo 31,50 %. En 2026 puede mantener la base provisional de 2025 (1.000 €) y regularizar la diferencia después. Verificar en la Seguridad Social.',
 };
 
 // ─── Gastos deducibles relevantes en SL ──────────────────────────────────────

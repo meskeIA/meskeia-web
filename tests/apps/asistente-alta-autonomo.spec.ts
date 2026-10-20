@@ -432,17 +432,19 @@ test('REGRESIÓN 1376 · type="button", pestañas con aria-pressed, fases con ar
 test('REGRESIÓN 1377 · las cifras normativas de la prosa son las de data/fiscal', async ({ page }) => {
   // Valores literales, cotejados con el módulo: si data/fiscal cambia, este test obliga a
   // mirar que la página lo haya seguido (antes eran literales escritos a mano en page.tsx).
-  //   TARIFA_PLANA_2025.cuota = 80 · SMI_2026.anual = 17.094 · societario 514,99 → «~515 €»
+  //   TARIFA_PLANA_2025.cuota = 80 · SMI_2026.anual = 17.094 · societario 448,69 → «~449 €»
+  //   (1.424,40 de base mínima del grupo 7, Orden PJC/297/2026 art. 3, × 31,50 %; hasta el
+  //   20/10/2026 era 514,99, de una base de 1.634,88 sin fuente, cabo C0339)
   expect(TARIFA_PLANA_2025.cuota).toBe(80);
   expect(SMI_2026.anual).toBe(17094);
-  expect(Math.round(AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual)).toBe(515);
+  expect(Math.round(AUTONOMO_SOCIETARIO_2025.cuotaMinimaMensual)).toBe(449);
 
   expect(await texto(page.locator('[class*="infoCard"]').filter({ hasText: 'Tarifa plana' }))).toContain('80,00 €/mes');
   const cuerpo = limpiar((await page.locator('body').textContent()) ?? '');
   expect(cuerpo).toContain('(17.094 € en 2026)');
   expect(cuerpo).toContain('del SMI, 17.094 € anuales en 2026');
   await abrirCostes(page);
-  expect(await texto(page.locator('table tr').filter({ hasText: 'Cuota Seg. Social' }))).toContain('~515 €/mes');
+  expect(await texto(page.locator('table tr').filter({ hasText: 'Cuota Seg. Social' }))).toContain('~449 €/mes');
 });
 
 test('25/09 · tramo intermedio de 2026: 2.500 €/mes cae en el tramo 10', async ({ page }) => {

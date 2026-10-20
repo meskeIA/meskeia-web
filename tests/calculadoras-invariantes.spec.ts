@@ -342,8 +342,10 @@ test.describe('Golden — compararAutonomoVsSL (Capa 1 · IS micropymes 2026 ✓
     expect(cmp.sl.cuotaImpuesto).toBeCloseTo(7600, 2);
     expect(cmp.tipoISAplicado).toBeCloseTo(19, 2);
     expect(cmp.sl.irpfDividendos).toBeCloseTo(6684, 2);
-    expect(cmp.sl.totalCargas).toBeCloseTo(20463.88, 2);
-    expect(cmp.sl.netoAnual).toBeCloseTo(19536.12, 2);
+    // 7.600 IS + 6.684 dividendos + 5.384,28 societario (1.424,40 × 31,50 % = 448,69 × 12, Orden
+    // PJC/297/2026; hasta el 20/10/2026 eran 6.179,88 de una base sin fuente, cabo C0339)
+    expect(cmp.sl.totalCargas).toBeCloseTo(19668.28, 2);
+    expect(cmp.sl.netoAnual).toBeCloseTo(20331.72, 2);
   });
 
   test('GOLDEN-MICROPYME-B: BI 80.000 € (> 50.000 €) → escala 19%/21% = 15.800 € (tipo medio 19,75%)', () => {
@@ -352,8 +354,9 @@ test.describe('Golden — compararAutonomoVsSL (Capa 1 · IS micropymes 2026 ✓
     expect(cmp.sl.cuotaImpuesto).toBeCloseTo(15800, 2);
     expect(cmp.tipoISAplicado).toBeCloseTo(19.75, 2);
     expect(cmp.sl.irpfDividendos).toBeCloseTo(13646, 2);
-    expect(cmp.sl.totalCargas).toBeCloseTo(35625.88, 2);
-    expect(cmp.sl.netoAnual).toBeCloseTo(44374.12, 2);
+    // 15.800 IS + 13.646 dividendos + 5.384,28 societario (cabo C0339, ver el caso A)
+    expect(cmp.sl.totalCargas).toBeCloseTo(34830.28, 2);
+    expect(cmp.sl.netoAnual).toBeCloseTo(45169.72, 2);
   });
 
   test('REGRESIÓN: tipoIS "general" sigue aplicando el 25% plano (no afectado por la escala micropyme)', () => {
