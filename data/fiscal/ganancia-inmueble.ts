@@ -66,6 +66,19 @@ export const AYUDA_OTRAS_RENTAS_AHORRO =
  * sin ellas, que se ha calculado como si fuera la única renta del ahorro y la real puede ser
  * mayor. Es la cifra la que cambia con el dato; la frase solo dice sobre qué supuesto está.
  */
+/**
+ * La venta de obra nueva en las cuatro apps con pestaña Vendedor (hallazgos 3377, 3379, 3380 y
+ * 3384, cabo C0284; decidido por el usuario el 20/10/2026: avisar y no publicar cuota). Una
+ * primera entrega la hace el promotor (art. 20.Uno.22.º A LIVA), que es empresario aunque
+ * promueva una sola vez (art. 5.Uno.d), y su renta es de actividad económica (art. 27.1 LIRPF)
+ * o del Impuesto sobre Sociedades, no una ganancia patrimonial (art. 33.1: «salvo que por esta
+ * Ley se califiquen como rendimientos»). BOE-A-1992-28740 y BOE-A-2006-20764, leídos el 19/10/2026.
+ */
+export const NOMBRE_RENTA_PROMOTOR = 'el impuesto sobre la renta del promotor';
+
+export const AVISO_VENTA_PROMOTOR =
+  'En una primera entrega (obra nueva) vende el promotor, que es empresario aunque promueva una sola vez: su renta no es una ganancia patrimonial de la base del ahorro, sino un rendimiento de actividad económica en el IRPF (art. 27.1 LIRPF) o, si es una sociedad, renta del Impuesto sobre Sociedades. Esta pestaña no la calcula, y el neto de abajo no la descuenta.';
+
 export function textoOtrasRentasAhorro(otrasRentasAhorro: number): string {
   return otrasRentasAhorro > 0
     ? `Es lo que esta venta añade a tu cuota, sumada a ${formatCurrency(otrasRentasAhorro)} de otras rentas del ahorro del año.`

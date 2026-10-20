@@ -7973,6 +7973,9 @@ test.describe('Inspector 18/10/2026 — obra nueva vinculada, el tope de los dos
     expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('40.844,38 €');
     expect(await i18DescCruda(page, /^COSTE TOTAL/)).toBe(`Precio + todos los gastos. ${AVISO_BASE_AJD}`);
 
+    // Desde el 20/10/2026 (hallazgos 3379/3384) la pestaña Vendedor no liquida IRPF en obra nueva: vende
+    // el promotor. Este caso mide a un particular que vende, así que vuelve a «Segunda mano» antes.
+    await page.getByRole('button', { name: /^Segunda mano/ }).first().click();
     await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
     for (const [etiqueta, valor] of I18_VENDEDOR) await sembrarImporte(page, etiqueta, valor);
     expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('245,00 €');
@@ -8074,6 +8077,9 @@ test.describe('Inspector 18/10/2026 — obra nueva vinculada, el tope de los dos
       `No incluye la gestoría, que no se ha podido leer: el coste real será mayor. ${AVISO_BASE_AJD}`,
     );
 
+    // Desde el 20/10/2026 (hallazgos 3379/3384) la pestaña Vendedor no liquida IRPF en obra nueva: vende
+    // el promotor. Este caso mide a un particular que vende, así que vuelve a «Segunda mano» antes.
+    await page.getByRole('button', { name: /^Segunda mano/ }).first().click();
     await page.getByRole('tab', { name: 'Vendedor', exact: true }).click();
     for (const [etiqueta, valor] of I18_VENDEDOR) {
       await sembrarImporte(page, etiqueta, etiqueta === 'Años de propiedad' ? '1.0.5' : valor);
@@ -8437,7 +8443,7 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
   });
 
   /**
-   * ❌ ABIERTO 19/10/2026 (cabo C0284; cálculo, medio) — [19/10-a] Con «Primera mano (obra nueva)» la
+   * ✅ REPARADO 20/10/2026 (hallazgo 3379, cabo C0284; cálculo, medio) — [19/10-a] Con «Primera mano (obra nueva)» la
    * pestaña Vendedor liquida la venta como si quien vende fuera un particular: «IRPF sobre ganancia» en
    * la base del ahorro (del 19 % al 30 %) y un neto con esa cuota. Pero esa operación paga IVA porque es
    * una PRIMERA ENTREGA, y la primera entrega «es la realizada por el promotor» (LIVA, art. 20.Uno.22.º
@@ -8451,11 +8457,13 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
    *   ganancia de 9.850) · «Tributación en base del ahorro (del 19 % al 30 %)…» · neto 27.901,50 €, y el
    *   panel no nombra al promotor. Lo que DEBERÍA: avisar en esa rama de que el vendedor es el
    *   promotor y su renta no es esa (o no liquidarla); decidir cuál es del usuario.
+   *   El usuario decidió el 20/10/2026: avisar y NO publicar cuota. La tarjeta del IRPF (y las de la
+   *   ganancia) dejan paso a «Impuesto sobre la renta de la venta · Sin calcular» con el aviso común
+   *   (AVISO_VENTA_PROMOTOR), y el neto sale sin IRPF y «(PARCIAL)»: 30.000 − 150 de plusvalía.
    */
   test('[19/10-a] con «Primera mano (obra nueva)», la pestaña Vendedor no liquida al promotor como a un particular', async ({
     page,
   }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await page.getByRole('button', { name: /Primera mano/ }).first().click();
@@ -8470,6 +8478,11 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
       ['Comisión inmobiliaria del vendedor (%)', '0'],
     ]);
     const panel = i24Normaliza(await page.locator('#panel-vendedor').innerText());
-    expect(panel).toMatch(/promotor|actividad económica|Impuesto sobre Sociedades/i);
+    expect(panel).toMatch(/vende el promotor/);
+    expect(panel).toMatch(/actividad económica/);
+    expect(panel).not.toMatch(/IRPF sobre ganancia|Ganancia patrimonial|base del ahorro \(del/);
+    expect(await i24Valor(page, /^Impuesto sobre la renta de la venta/)).toBe('Sin calcular');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('29.850,00 €');
   });
 });

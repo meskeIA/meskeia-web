@@ -7151,7 +7151,11 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
   // 3.000 de 9.000 · comisión 0: plusvalía 3.000 × 0,14 × 25 % = 105,00 · ganancia 25.000 − 105 −
   // 18.000 = 6.895,00 · IRPF 1.140 + 895 × 21 % = 1.327,95 · neto 23.567,05, y nada en el panel
   // nombra al promotor.
-  test.fail('[19/10-a] con «Primera mano», el vendedor no se liquida como un particular en la base del ahorro', async ({ page }) => {
+  // ✅ REPARADO el 20/10/2026 (hallazgo 3380): el usuario decidió avisar y NO publicar cuota. En
+  // primera mano la tarjeta del IRPF y las de la ganancia dejan paso a «Impuesto sobre la renta de
+  // la venta · Sin calcular» con el aviso común (AVISO_VENTA_PROMOTOR), y el neto sale sin IRPF y
+  // «(PARCIAL)»: 25.000 − 105 de plusvalía = 24.895,00.
+  test('[19/10-a] con «Primera mano», el vendedor no se liquida como un particular en la base del ahorro', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await page.locator('#select-ccaa').selectOption('valencia');
@@ -7165,9 +7169,12 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
     await sembrar(page, 'Valor catastral total (suelo + construcción)', '9000');
     await sembrar(page, 'Comisión inmobiliaria (%)', '0');
     const panel = await texto(page.locator('[class*="resultsPanel"]'));
-    // El defecto.
-    expect(panel).toMatch(/promotor|actividad económica|Impuesto sobre Sociedades/i);
-    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1327,95 €');
+    expect(panel).toMatch(/vende el promotor/);
+    expect(panel).toMatch(/actividad económica/);
+    expect(panel).not.toMatch(/IRPF sobre ganancia|Ganancia patrimonial|base del ahorro \(del/);
+    expect(await valorTarjeta(page, 'Impuesto sobre la renta de la venta')).toBe('Sin calcular');
+    expect(panel).toContain('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('24.895,00 €');
   });
 
   // HALLAZGO [19/10-b] (bajo, contenido) — el ejemplo «Vender un trastero» del bloque educativo

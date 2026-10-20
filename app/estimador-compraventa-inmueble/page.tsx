@@ -8,7 +8,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, Resu
 import ProrrateoIbiComunidad from '@/components/ProrrateoIbiComunidad';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -326,6 +326,8 @@ interface ResultadosVendedor {
   irpfCalculado: boolean;
   /** Vende su vivienda habitual en territorio foral: el IRPF no se calcula (3072). */
   irpfForal: boolean;
+  /** Obra nueva: vende el promotor y no se liquida IRPF (hallazgo 3377). */
+  ventaDelPromotor: boolean;
   /** Deducción del 60 % del art. 68.4 LIRPF ya restada del IRPF (Ceuta y Melilla). */
   deduccionCeutaMelilla: number;
   /** Las otras rentas del ahorro con las que se ha calculado la cuota (0 si no se dieron, 3368). */
@@ -461,6 +463,11 @@ interface EntradaVendedor {
    * foral: la cuota de la escala estatal no es la suya y no se publica (3072, 10/10/2026).
    */
   irpfForal: boolean;
+  /**
+   * true en primera mano (obra nueva): vende el promotor, cuya renta no es una ganancia
+   * patrimonial del ahorro, y no se liquida IRPF (hallazgo 3377, AVISO_VENTA_PROMOTOR).
+   */
+  ventaDelPromotor?: boolean;
 }
 
 /**
@@ -522,7 +529,8 @@ function calcularVendedor(e: EntradaVendedor) {
   // una exención, es un dato que falta (hallazgo 428).
   const hayDatosGanancia = e.precioC > 0;
   // Con el IRPF foral no se publica la cuota de la escala estatal (3072).
-  const irpf = hayDatosGanancia && !e.irpfForal ? g.cuotaIRPF : 0;
+  // Ni la de un promotor, cuya renta no es esta (3377).
+  const irpf = hayDatosGanancia && !e.irpfForal && !e.ventaDelPromotor ? g.cuotaIRPF : 0;
   const totalGastos = sumarLineasVisibles(plusvalia, comision, e.otrosVenta, irpf);
   /** El valor de transmisión SIN restar la plusvalía, contra el de adquisición (receta 6). */
   const gananciaSinPlusvalia = hayDatosGanancia
@@ -956,8 +964,12 @@ export default function SimuladorCompraventaPage() {
      * (hallazgo 1553, ALTO). Es lo que el comprador ya resolvía (`puedeSerViviendaHabitual`,
      * hallazgo 833), lo que las hermanas garaje, trastero y local no aplican nunca y lo que el
      * JSON-LD de esta página afirma. Las casillas ya solo se pintan con «Vivienda».
+     *
+     * Y no en obra nueva: allí vende el promotor, que no vende su vivienda habitual ni liquida
+     * una ganancia patrimonial (hallazgo 3377; las casillas tampoco se pintan).
      */
-    const puedeSerViviendaHabitual = tipoInmueble === 'vivienda';
+    const ventaDelPromotor = tipoTransmision === 'primera-mano';
+    const puedeSerViviendaHabitual = tipoInmueble === 'vivienda' && !ventaDelPromotor;
     /** Art. 33.4.b LIRPF: «por mayores de 65 años o por personas en situación de dependencia
      *  severa o de gran dependencia» (BOE-A-2006-20764, hallazgo 2183). */
     const exencionPersonal = vendedorMayor65 || vendedorDependencia;
@@ -1005,6 +1017,7 @@ export default function SimuladorCompraventaPage() {
       // fábrica y su estado sobrevivía al pasar a local o garaje, que en el País Vasco y Navarra
       // dejaban el IRPF «Sin calcular» como si el vendedor residiera allí. Como en pideExencion.
       irpfForal: puedeSerViviendaHabitual && esViviendaHabitual && TERRITORIOS_IIVTNU_FORAL.includes(ccaa),
+      ventaDelPromotor,
     };
     const r = calcularVendedor(entrada);
     const rp = r.resultadoPlusvalia;
@@ -1147,6 +1160,7 @@ export default function SimuladorCompraventaPage() {
       irpfGanancia: r.irpf,
       irpfCalculado: hayDatosGanancia && !entrada.irpfForal,
       irpfForal: hayDatosGanancia && entrada.irpfForal,
+      ventaDelPromotor,
       deduccionCeutaMelilla: hayDatosGanancia && !entrada.irpfForal ? r.g.deduccionCeutaMelilla : 0,
       otrasRentasAhorro: r.g.otrasRentasAhorro,
       exentoIRPF,
@@ -1189,7 +1203,7 @@ export default function SimuladorCompraventaPage() {
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioVenta, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble, otrasRentasAhorro]);
+  }, [precioVenta, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble, otrasRentasAhorro, tipoTransmision]);
 
   /**
    * En Canarias, Ceuta y Melilla la obra nueva no pagó IVA sino IGIC o IPSI, que esta app no
@@ -1304,7 +1318,9 @@ export default function SimuladorCompraventaPage() {
   const faltanEnElNeto = resultadosVendedor
     ? [
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
-        resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+        resultadosVendedor.ventaDelPromotor
+          ? NOMBRE_RENTA_PROMOTOR
+          : resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
         // Escrita por encima del 100 %: fuera del cálculo, así que el neto no la descuenta
         // (patrón 5 de la familia, hallazgo 2186).
         resultadosVendedor.comisionImposible ? 'la comisión inmobiliaria' : null,
@@ -2364,8 +2380,9 @@ export default function SimuladorCompraventaPage() {
 
                 {/* Las dos exenciones de la ganancia son de la VIVIENDA habitual (arts. 33.4.b y
                     38 LIRPF): con otro inmueble las casillas no se ofrecen, en vez de venir
-                    marcadas y eximir a un local, una nave o un terreno (hallazgo 1553, ALTO). */}
-                {tipoInmueble === 'vivienda' ? (
+                    marcadas y eximir a un local, una nave o un terreno (hallazgo 1553, ALTO).
+                    En obra nueva vende el promotor: ni vivienda habitual ni exención (3377). */}
+                {tipoTransmision === 'primera-mano' ? null : tipoInmueble === 'vivienda' ? (
                   <div className={styles.checkboxGroup}>
                     <label className={styles.checkbox}>
                       <input
@@ -2441,7 +2458,7 @@ export default function SimuladorCompraventaPage() {
                   </p>
                 )}
 
-                {tipoInmueble === 'vivienda' && esViviendaHabitual && reinvierte && !vendedorMayor65 && !vendedorDependencia && (
+                {tipoTransmision !== 'primera-mano' && tipoInmueble === 'vivienda' && esViviendaHabitual && reinvierte && !vendedorMayor65 && !vendedorDependencia && (
                   <>
                     <NumberInput
                       value={importeReinversion}
@@ -2516,6 +2533,18 @@ export default function SimuladorCompraventaPage() {
                     }
                   />
 
+                  {/* Obra nueva: vende el promotor, y ni la ganancia patrimonial ni su IRPF son los
+                      suyos (hallazgo 3377, cabo C0284; decidido el 20/10/2026: avisar sin cuota). */}
+                  {resultadosVendedor.ventaDelPromotor ? (
+                    <ResultCard
+                      title="Impuesto sobre la renta de la venta"
+                      value="Sin calcular"
+                      variant="default"
+                      icon="💸"
+                      description={AVISO_VENTA_PROMOTOR}
+                    />
+                  ) : (
+                  <>
                   {resultadosVendedor.valorAdquisicion > 0 && (
                     <ResultCard
                       title="Valor de adquisición"
@@ -2690,6 +2719,8 @@ export default function SimuladorCompraventaPage() {
                             .reduce((texto, frase) => (texto ? `${texto}${texto.endsWith('.') ? '' : '.'} ${frase}` : frase), '')
                     }
                   />
+                  </>
+                  )}
 
                   {/* Un porcentaje ilegible no hace desaparecer su línea (hallazgo 1230, el 1191 de
                       la gestoría del comprador de esta misma app). */}
@@ -2814,7 +2845,9 @@ export default function SimuladorCompraventaPage() {
                         ].filter((x): x is string => x !== null);
                         const texto = pedir.join(' y ');
                         // En territorio foral puede no haber nada que pedir: entonces no hay «para obtenerlo».
-                        return texto ? `${avisos.join('. ')}. ${mayuscula(texto)} para obtenerlo.` : `${avisos.join('. ')}.`;
+                        // Del promotor no hay dato que lo complete: rellenar solo cierra lo demás (3377).
+                        const para = resultadosVendedor.ventaDelPromotor ? 'para calcular lo demás' : 'para obtenerlo';
+                        return texto ? `${avisos.join('. ')}. ${mayuscula(texto)} ${para}.` : `${avisos.join('. ')}.`;
                       })()
                     }
                   />

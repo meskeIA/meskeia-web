@@ -34,6 +34,8 @@ import {
   NOMBRE_OTRAS_RENTAS_AHORRO,
   AYUDA_OTRAS_RENTAS_AHORRO,
   textoOtrasRentasAhorro,
+  NOMBRE_RENTA_PROMOTOR,
+  AVISO_VENTA_PROMOTOR,
 } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -136,6 +138,8 @@ interface ResultadosVendedor {
   plusvaliaPendiente: boolean;
   /** País Vasco o Navarra: la plusvalía es foral y no se calcula (3071). */
   plusvaliaForal: boolean;
+  /** «Obra nueva / Promotor»: vende el promotor y no se liquida IRPF (hallazgo 3384). */
+  ventaDelPromotor: boolean;
   /** Deducción del 60 % del art. 68.4 LIRPF ya restada del IRPF (Ceuta y Melilla). */
   deduccionCeutaMelilla: number;
   /** Las otras rentas del ahorro con las que se ha calculado la cuota (0 si no se dieron, 3368). */
@@ -250,6 +254,11 @@ interface EntradaVendedor {
    * habría ganancia en el mejor caso del total catastral ilegible (hallazgo 2201).
    */
   plusvaliaForzada?: number;
+  /**
+   * true con «Obra nueva / Promotor»: vende el promotor, cuya renta no es una ganancia
+   * patrimonial del ahorro, y no se liquida IRPF (hallazgo 3384, AVISO_VENTA_PROMOTOR).
+   */
+  ventaDelPromotor?: boolean;
   /** Dónde está el local: Ceuta y Melilla bonifican la plusvalía y deducen el IRPF; en
    *  territorio foral la plusvalía no es la del TRLRHL (hallazgos 3059, 3060 y 3071, 10/10/2026). */
   ccaa: ComunidadAutonoma;
@@ -307,7 +316,7 @@ function calcularVendedor(e: EntradaVendedor) {
     otrasRentasAhorro: e.otrasRentas,
   });
   const hayDatosGanancia = e.precioC > 0;
-  const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
+  const irpf = hayDatosGanancia && !e.ventaDelPromotor ? g.cuotaIRPF : 0;
   const totalGastos = sumarLineasVisibles(plusvalia, comision, e.gestoria, irpf);
   return {
     comision,
@@ -691,6 +700,7 @@ export default function SimuladorLocalComercialPage() {
       gastosAdquisicion: Math.max(0, parseSpanishNumberOr(gastosAdquisicion)),
       amortizaciones: Math.max(0, parseSpanishNumberOr(amortizacionesAcumuladas)),
       otrasRentas: Math.max(0, parseSpanishNumberOr(otrasRentasAhorro)),
+      ventaDelPromotor: transmision === 'primera-mano',
       ccaa,
     };
 
@@ -910,6 +920,7 @@ export default function SimuladorLocalComercialPage() {
       parCatastralImposible: rp !== null && !rp.exento && rp.parCatastralImposible,
       plusvaliaPendiente: rp === null && irpfPublicable,
       plusvaliaForal: r.plusvaliaForal,
+      ventaDelPromotor: entrada.ventaDelPromotor === true,
       deduccionCeutaMelilla: irpfPublicable ? r.g.deduccionCeutaMelilla : 0,
       otrasRentasAhorro: r.g.otrasRentasAhorro,
       excesoSobrePrecio,
@@ -957,6 +968,8 @@ export default function SimuladorLocalComercialPage() {
     comisionInmobiliaria, gastosGestoriaVenta, amortizacionesAcumuladas, otrasRentasAhorro,
     // La comunidad mueve la plusvalía (Ceuta, Melilla y territorio foral) y el IRPF (3059-3071).
     ccaa,
+    // En obra nueva vende el promotor, y no se liquida IRPF (hallazgo 3384).
+    transmision,
   ]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
@@ -1048,9 +1061,11 @@ export default function SimuladorLocalComercialPage() {
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
         // Con unos gastos de la venta imposibles el IRPF no «falta»: no se liquida con un dato
         // que no vale, y el aviso lo dice aparte (hallazgo 2198).
-        resultadosVendedor.irpfCalculado || resultadosVendedor.gastosVentaImposibles.length > 0
-          ? null
-          : 'el IRPF de la ganancia',
+        resultadosVendedor.ventaDelPromotor
+          ? NOMBRE_RENTA_PROMOTOR
+          : resultadosVendedor.irpfCalculado || resultadosVendedor.gastosVentaImposibles.length > 0
+            ? null
+            : 'el IRPF de la ganancia',
       ].filter((x): x is string => x !== null)
     : [];
 
@@ -1933,6 +1948,19 @@ export default function SimuladorLocalComercialPage() {
                     description={resultadosVendedor.metodoPlusvalia}
                   />
 
+                  {/* «Obra nueva / Promotor»: vende el promotor, y ni la ganancia patrimonial ni su
+                      IRPF son los suyos (hallazgo 3384, cabo C0284; decidido el 20/10/2026: avisar
+                      sin cuota). */}
+                  {resultadosVendedor.ventaDelPromotor ? (
+                    <ResultCard
+                      title="Impuesto sobre la renta de la venta"
+                      value="Sin calcular"
+                      variant="default"
+                      icon="🧾"
+                      description={AVISO_VENTA_PROMOTOR}
+                    />
+                  ) : (
+                  <>
                   {/* Con precio de compra, aunque las amortizaciones dejen el valor corregido en 0:
                       la guarda `> 0` era para «falta el precio de compra» y escondía las dos
                       tarjetas justo en el caso que hay que explicar (hallazgo 1261). */}
@@ -2129,6 +2157,8 @@ export default function SimuladorLocalComercialPage() {
                             })()
                     }
                   />
+                  </>
+                  )}
 
                   {/* Un porcentaje ilegible valía 0 y la tarjeta publicaba «0,00 €», un cero
                       falso al lado de un neto que ya avisaba de lo contrario (hueco A3). Se
@@ -2222,8 +2252,10 @@ export default function SimuladorLocalComercialPage() {
                         ].filter((x): x is string => x !== null);
                         const texto = pedir.join(' y ');
                         // En territorio foral puede no haber nada que pedir: entonces no hay «para obtenerlo».
+                        // Del promotor no hay dato que lo complete: rellenar solo cierra lo demás (3384).
+                        const para = resultadosVendedor.ventaDelPromotor ? 'para calcular lo demás' : 'para obtenerlo';
                         return texto
-                          ? `${avisos.join('. ')}. ${texto.charAt(0).toUpperCase()}${texto.slice(1)} para obtenerlo.`
+                          ? `${avisos.join('. ')}. ${texto.charAt(0).toUpperCase()}${texto.slice(1)} ${para}.`
                           : `${avisos.join('. ')}.`;
                       })()
                     }

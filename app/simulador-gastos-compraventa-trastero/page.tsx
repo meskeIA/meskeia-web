@@ -51,7 +51,7 @@ const AVISO_BASE_AJD =
 /** La salvedad del AJD detrás de un texto, con o sin punto final, solo si hay AJD. */
 const conAvisoBaseAjd = (texto: string, ajd: number): string =>
   ajd > 0 ? `${texto}${texto.endsWith('.') ? '' : '.'} ${AVISO_BASE_AJD}` : texto;
-import { PLAZO_ITP, IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro } from '@/data/fiscal';
+import { PLAZO_ITP, IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -227,6 +227,8 @@ interface ResultadosVendedor {
   plusvaliaPendiente: boolean;
   /** País Vasco o Navarra: la plusvalía es foral y no se calcula (3071). */
   plusvaliaForal: boolean;
+  /** Primera mano: vende el promotor y no se liquida IRPF (hallazgo 3380). */
+  ventaDelPromotor: boolean;
   /** Deducción del 60 % del art. 68.4 LIRPF ya restada del IRPF (Ceuta y Melilla). */
   deduccionCeutaMelilla: number;
   /** Las otras rentas del ahorro con las que se ha calculado la cuota (0 si no se dieron, 3368). */
@@ -371,6 +373,11 @@ interface EntradaVendedor {
    * dato imposible (patrón 5 de la familia). Se nombran como pendientes.
    */
   sinGanancia?: boolean;
+  /**
+   * true en primera mano: vende el promotor, cuya renta no es una ganancia patrimonial del
+   * ahorro, y no se liquida IRPF (hallazgo 3380, AVISO_VENTA_PROMOTOR).
+   */
+  ventaDelPromotor?: boolean;
   /** Dónde está el inmueble: Ceuta y Melilla bonifican la plusvalía y deducen el IRPF; en
    *  territorio foral la plusvalía no es la del TRLRHL (hallazgos 3059-3071, 10/10/2026). */
   ccaa: ComunidadAutonoma;
@@ -426,7 +433,7 @@ function calcularVendedor(e: EntradaVendedor) {
     otrasRentasAhorro: e.otrasRentas,
   });
   const hayDatosGanancia = e.precioC > 0 && !e.sinGanancia;
-  const irpf = hayDatosGanancia ? g.cuotaIRPF : 0;
+  const irpf = hayDatosGanancia && !e.ventaDelPromotor ? g.cuotaIRPF : 0;
   const totalGastos = sumarLineasVisibles(plusvalia, comision, e.gestoria, irpf);
   return {
     comision,
@@ -665,6 +672,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       gastosAdquisicion: Math.max(0, parseSpanishNumberOr(gastosAdquisicion)),
       otrasRentas: Math.max(0, parseSpanishNumberOr(otrasRentasAhorro)),
       sinGanancia: comisionImposible,
+      ventaDelPromotor: tipoTransmision === 'primera-mano',
       ccaa,
     };
     const r = calcularVendedor(entrada);
@@ -828,6 +836,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       parCatastralImposible: rp !== null && !rp.exento && rp.parCatastralImposible,
       plusvaliaPendiente: rp === null && r.hayDatosGanancia,
       plusvaliaForal: r.plusvaliaForal,
+      ventaDelPromotor: entrada.ventaDelPromotor === true,
       deduccionCeutaMelilla: r.hayDatosGanancia ? r.g.deduccionCeutaMelilla : 0,
       otrasRentasAhorro: r.g.otrasRentasAhorro,
       exentoPlusvalia,
@@ -852,7 +861,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioVenta, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion, otrasRentasAhorro]);
+  }, [precioVenta, ccaa, tipoTransmision, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion, otrasRentasAhorro]);
 
   /**
    * Lo que el neto NO incluye por falta de datos, para que «IMPORTE NETO VENDEDOR» no se
@@ -864,7 +873,9 @@ export default function SimuladorTrasteroCompraventaPage() {
         // Una comisión por encima del 100 % no se descuenta: no es un dato que valga (patrón 5).
         resultadosVendedor.comisionImposible ? 'la comisión inmobiliaria' : null,
         resultadosVendedor.plusvaliaCalculada ? null : 'la plusvalía municipal',
-        resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
+        resultadosVendedor.ventaDelPromotor
+          ? NOMBRE_RENTA_PROMOTOR
+          : resultadosVendedor.irpfCalculado ? null : 'el IRPF de la ganancia',
       ].filter((x): x is string => x !== null)
     : [];
 
@@ -1713,6 +1724,18 @@ export default function SimuladorTrasteroCompraventaPage() {
                     description={resultadosVendedor.metodoPlusvalia}
                   />
 
+                  {/* Primera mano: vende el promotor, y ni la ganancia patrimonial ni su IRPF son los
+                      suyos (hallazgo 3380, cabo C0284; decidido el 20/10/2026: avisar sin cuota). */}
+                  {resultadosVendedor.ventaDelPromotor ? (
+                    <ResultCard
+                      title="Impuesto sobre la renta de la venta"
+                      value="Sin calcular"
+                      variant="default"
+                      icon="💸"
+                      description={AVISO_VENTA_PROMOTOR}
+                    />
+                  ) : (
+                  <>
                   {resultadosVendedor.valorAdquisicion > 0 && (
                     <>
                       <ResultCard
@@ -1872,6 +1895,8 @@ export default function SimuladorTrasteroCompraventaPage() {
                                 }. ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`))
                     }
                   />
+                  </>
+                  )}
 
                   {/* Un importe ilegible no hace desaparecer su línea: se ve «Sin leer» (la forma
                       del A3 de local-comercial y del 1191 del estimador). */}
@@ -1986,7 +2011,9 @@ export default function SimuladorTrasteroCompraventaPage() {
                           .filter(Boolean)
                           .join(' y ');
                         // En territorio foral puede no haber nada que pedir: entonces no hay «para obtenerlo».
-                        return pedir ? `${frases.join('. ')}. ${mayuscula(pedir)} para obtenerlo.` : `${frases.join('. ')}.`;
+                        // Del promotor no hay dato que lo complete: rellenar solo cierra lo demás (3380).
+                        const para = resultadosVendedor.ventaDelPromotor ? 'para calcular lo demás' : 'para obtenerlo';
+                        return pedir ? `${frases.join('. ')}. ${mayuscula(pedir)} ${para}.` : `${frases.join('. ')}.`;
                       })()
                     }
                   />

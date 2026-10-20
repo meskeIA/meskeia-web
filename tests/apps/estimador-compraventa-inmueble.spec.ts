@@ -9406,21 +9406,23 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
 
   /**
    * CONTROL de montaje del hallazgo de obra nueva: va en VERDE antes y después de repararlo. Con
-   * «Primera mano» pulsado, la plusvalía municipal (que también paga la promotora) y el valor de
-   * transmisión son los de la BASE O: 1800,00 € y 289.200,00 €.
+   * «Primera mano» pulsado, la plusvalía municipal (que también paga la promotora) es la de la
+   * BASE O: 1800,00 €. Hasta la reparación (3377, 20/10/2026) medía también el valor de
+   * transmisión, 289.200,00 €; desde entonces esa tarjeta no se pinta en obra nueva, y la cifra
+   * es el neto sin IRPF: 300.000 − 9.000 de comisión − 1.800 de plusvalía.
    */
   test('CONTROL de montaje — BASE O con «Primera mano»: la plusvalía y la transmisión no cambian', async ({ page }) => {
     test.setTimeout(90_000);
     await baseO(page, 'madrid', true);
     await expect(page.getByRole('button', { name: /Primera mano/ })).toHaveAttribute('aria-pressed', 'true');
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1800,00 €');
-    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('289.200,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
   });
 
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
 
   /**
-   * HALLAZGO [medio, calculo] — ABIERTO (19/10/2026; cabo C0284, visto primero en garaje). Con
+   * HALLAZGO [medio, calculo] — REPARADO 20/10/2026 (hallazgo 3377; cabo C0284, visto primero en garaje). Con
    * «Primera mano» —obra nueva, que esta misma página define como «primera transmisión del
    * promotor» y que el selector del vendedor rotula «Obra nueva, a la promotora»— la pestaña
    * Vendedor liquida la venta como ganancia patrimonial de un particular en la base del ahorro,
@@ -9435,17 +9437,23 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
    * Tributación en base del ahorro…» y neto 269.804,00 € «Lo que realmente recibes»; con «Soy
    * mayor de 65 años», «EXENTO · Mayor de 65 años + vivienda habitual» y 289.200,00 €.
    * Si avisa o se apaga lo decide el usuario: el caso acepta las dos reparaciones.
+   * El usuario decidió el 20/10/2026 avisar y NO publicar cuota: la tarjeta del IRPF y las de la
+   * ganancia dejan paso a «Impuesto sobre la renta de la venta · Sin calcular» con el aviso común
+   * (AVISO_VENTA_PROMOTOR), las casillas de vivienda habitual y edad no se ofrecen, y el neto sale
+   * sin IRPF y «(PARCIAL)»: 300.000 − 9.000 − 1.800 = 289.200,00 €.
    */
-  test.fail('HALLAZGO obra nueva — la pestaña Vendedor no liquida a la promotora como a un particular', async ({ page }) => {
+  test('HALLAZGO obra nueva — la pestaña Vendedor no liquida a la promotora como a un particular', async ({ page }) => {
     test.setTimeout(90_000);
     await baseO(page, 'madrid', true);
-    const irpf = page.locator('h3', { hasText: /^IRPF sobre ganancia/ });
-    const textoIrpf =
-      (await irpf.count()) === 0
-        ? ''
-        : `${await valorTarjeta(page, /^IRPF sobre ganancia/)} ${await descripcionTarjeta(page, /^IRPF sobre ganancia/)}`;
-    const textoNeto = await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/);
-    expect(`${textoIrpf} ${textoNeto}`).toMatch(/promotor|actividad econ[oó]mica|Impuesto sobre Sociedades/i);
+    await expect(page.locator('h3', { hasText: /^IRPF sobre ganancia/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: /^Ganancia patrimonial/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Impuesto sobre la renta de la venta')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Impuesto sobre la renta de la venta')).toMatch(/vende el promotor.*actividad económica/);
+    await expect(page.getByText('Soy mayor de 65 años')).toHaveCount(0);
+    await expect(page.getByText('Es mi vivienda habitual')).toHaveCount(0);
+    expect(await rotulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toContain('No descuenta el impuesto sobre la renta del promotor');
   });
 
   /**

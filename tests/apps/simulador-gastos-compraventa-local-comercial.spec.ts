@@ -1523,6 +1523,9 @@ test.describe('RE-INSPECCIÓN 12/09/2026 — Galicia, Melilla y la comisión del
     expect(await valorTarjeta(page, /COSTE TOTAL/)).toBe('307.763,53 €');
 
     // ── Vendedor: pérdida patrimonial y plusvalía no sujeta
+    // Desde el 20/10/2026 (hallazgos 3379/3384) la pestaña Vendedor no liquida IRPF en obra nueva: vende
+    // el promotor. Este caso mide a un particular que vende, así que vuelve a «Segunda mano» antes.
+    await page.getByRole('button', { name: /^Segunda mano/ }).first().click();
     await page.getByRole('button', { name: /Vendedor/ }).click();
     await sembrarImporte12(page, 'Precio de compra original', '300000');
     await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '25000');
@@ -2542,6 +2545,9 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Asturias, Extremadura y Navarra, y 
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('22,62 % sobre el precio de compra');
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('514.983,15 €');
 
+    // Desde el 20/10/2026 (hallazgos 3379/3384) la pestaña Vendedor no liquida IRPF en obra nueva: vende
+    // el promotor. Este caso mide a un particular que vende, así que vuelve a «Segunda mano» antes.
+    await page.getByRole('button', { name: /^Segunda mano/ }).first().click();
     await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
     await page.getByRole('button', { name: /Local afecto a actividad/ }).click();
     await sembrarImporte12(page, 'Precio de compra original', '200000');
@@ -6093,7 +6099,7 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
   // Con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la del defecto son
   // cifras o textos que la reparación no debe mover; la del defecto lee y compara, sin reintento.
 
-  // HALLAZGO [19/10-a] (medio, cálculo) — ❌ ABIERTO. Cabo C0284, la forma de los hallazgos 3379
+  // HALLAZGO [19/10-a] (medio, cálculo) — ✅ REPARADO 20/10/2026 (hallazgo 3384). Cabo C0284, la forma de los hallazgos 3379
   // (garaje) y 3377 (estimador), medida aquí. Con «Obra nueva / Promotor» la pestaña Vendedor sigue
   // liquidando la venta como la ganancia patrimonial de un particular en la base del ahorro (19-30 %) y
   // publica un neto con esa cuota: el cálculo del vendedor (`calcularVendedor`) no recibe el tipo de
@@ -6103,8 +6109,10 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
   // panel solo habla de la SOCIEDAD vendedora y no nombra al promotor.
   //   Madrid · Obra nueva / Promotor · 200.000 → comprador IVA 200.000 × 21 % = 42.000,00 ; vendedor
   //   de la base → «IRPF sobre la ganancia 5613,00 €» (1.140 + 21.300 × 21 %) y neto 186.687,00.
+  //   El usuario decidió el 20/10/2026 avisar y NO publicar cuota: la tarjeta del IRPF y las de la
+  //   ganancia dejan paso a «Impuesto sobre la renta de la venta · Sin calcular» con el aviso común
+  //   (AVISO_VENTA_PROMOTOR), y el neto sale sin IRPF y «(PARCIAL)»: 186.687 + 5.613 = 192.300,00.
   test('[19/10-a] con «Obra nueva / Promotor», la pestaña Vendedor no liquida al promotor como a un particular', async ({ page }) => {
-    test.fail();
     expect(IVA_INMUEBLES_2025.local).toBe(21);
     await abrir0810(page);
     await page.getByRole('button', { name: /Obra nueva/ }).click();
@@ -6112,13 +6120,15 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
     await sembrarImporte12(page, 'Precio del local comercial', '200000');
     await esperarTarjeta2609(page, /^IVA \(21/, '42.000,00 €');
     await vendedorSinAmortizar0810(page, 'madrid');
-    await esperarTarjeta2609(page, 'IRPF sobre la ganancia', '5613,00 €');
-    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('186.687,00 €');
-    // El defecto (lee una vez, sin reintento): el panel del vendedor no nombra al promotor ni la
-    // actividad económica. «Impuesto sobre Sociedades» no cuenta: la nota fija lo dice de cualquier
-    // venta, con cualquier tipo de transmisión.
+    await esperarTarjeta2609(page, 'Impuesto sobre la renta de la venta', 'Sin calcular');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('192.300,00 €');
+    // «Impuesto sobre Sociedades» no cuenta: la nota fija lo dice de cualquier venta, con cualquier
+    // tipo de transmisión. Lo que se mide es que el panel nombra al promotor y no liquida su IRPF.
     const panel = ((await page.locator('div[class*="resultsInner"]').first().textContent()) ?? '').replace(/\s+/g, ' ');
-    expect(panel).toMatch(/promotor|actividad económica/i);
+    expect(panel).toMatch(/vende el promotor/);
+    expect(panel).toMatch(/actividad económica/);
+    expect(panel).not.toMatch(/IRPF sobre la ganancia|Ganancia patrimonial|Base del ahorro \(/);
+    expect(panel).toContain('NETO QUE RECIBES (PARCIAL)');
   });
 
   // HALLAZGO [19/10-b] (medio, dato) — ❌ ABIERTO. Cabo C0314, medido aquí. Cuatro bocas exigen que
