@@ -180,6 +180,19 @@ export interface ResultadoGananciaInmueble {
 }
 
 /**
+ * El porcentaje exento de una reinversión PARCIAL (0 < p < 1), con una décima, sin que el
+ * redondeo llegue a los extremos: «exento el 100,0 %» junto a una cuota por pagar, o «el 0,0 %»
+ * con una parte exenta, se contradecían con la cifra de al lado (hallazgo 2962, 20/10/2026).
+ * Solo cambia el texto; los importes nunca han usado este redondeo.
+ */
+function porcentajeExentoParcial(p: number): string {
+  const pct = p * 100;
+  if (pct >= 99.95) return `más del ${formatNumber(99.9, 1)} %`;
+  if (pct < 0.05) return `menos del ${formatNumber(0.1, 1)} %`;
+  return `el ${formatNumber(pct, 1)} %`;
+}
+
+/**
  * Calcula la ganancia patrimonial de un inmueble y su cuota en el IRPF.
  * No redondea: cada consumidor decide cómo presentar los importes.
  */
@@ -297,7 +310,7 @@ export function calcularGananciaInmueble(e: EntradaGananciaInmueble): ResultadoG
     : proporcionReinvertida >= 1
       ? 'Reinversión total del importe obtenido en una nueva vivienda habitual (art. 38 LIRPF)'
       : proporcionReinvertida > 0
-        ? `Reinversión parcial: exento el ${formatNumber(proporcionReinvertida * 100, 1)} % de la ganancia (art. 41 RIRPF)`
+        ? `Reinversión parcial: exento ${porcentajeExentoParcial(proporcionReinvertida)} de la ganancia (art. 41 RIRPF)`
         : null;
 
   return {
