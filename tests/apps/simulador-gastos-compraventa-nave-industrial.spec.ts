@@ -7039,7 +7039,9 @@ test.describe('Inspección 19/10/2026 — La Rioja con decimales, Aragón en el 
    * deducirlo». El cálculo no exige nada a ninguno de los dos: la tercera opción es un botón.
    */
   test('[19/10-a] el derecho a deducir que exige la renuncia es del ADQUIRENTE, y renuncia quien vende (art. 20.Dos LIVA)', async ({ page }) => {
-    test.fail(!I19_VER_HUECOS, 'ABIERTO (inspector 19/10/2026): cuatro textos piden el derecho a deducir a comprador y vendedor, y uno hace renunciar a los dos');
+    // REPARADO el 20/10/2026 (hallazgo 3387). En Canarias el aviso ya no pone requisito a ninguna de
+    // las partes («si se cumplen los requisitos de la ley»): el art. 50.Cinco de la Ley canaria 4/2012
+    // no se pudo leer en el BOE consolidado en la sesión, y no se escribe un requisito sin cotejar.
     const limpio = (s: string | null) => (s ?? '').replace(/\s+/g, ' ').trim();
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
@@ -7080,7 +7082,7 @@ test.describe('Inspección 19/10/2026 — La Rioja con decimales, Aragón en el 
    * de las mismas comunidades, con la expresión en la misma línea, sí dice «tributaria de Canarias».
    */
   test('[19/10-b] la nota del recuadro en Canarias, Ceuta y Melilla dice «administración tributaria de …», con su espacio', async ({ page }) => {
-    test.fail(!I19_VER_HUECOS, 'ABIERTO (inspector 19/10/2026): «administración tributariade Canarias», desde bd3f3e2a');
+    // REPARADO el 20/10/2026 (hallazgo 3388): «tributaria» y la expresión, en la misma línea.
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
     const vistos: string[] = [];
@@ -7111,12 +7113,13 @@ test.describe('Inspección 19/10/2026 — La Rioja con decimales, Aragón en el 
    * la que no se paga ITP sino IVA autoliquidado y deducible.
    */
   test('[19/10-c] el caso de uso «Autónomo compra nave de segunda mano» nombra la renuncia a la exención', async ({ page }) => {
-    test.fail(!I19_VER_HUECOS, 'ABIERTO (inspector 19/10/2026): la tarjeta da el ITP por seguro sin la salvedad de la renuncia');
+    // REPARADO el 20/10/2026 (hallazgo 3389), con el requisito del 3387: el derecho a deducir es del autónomo.
     await page.goto(RUTA);
     const tarjeta = (
       (await page.locator('strong', { hasText: 'Autónomo compra nave de segunda mano' }).first().locator('xpath=following-sibling::p[1]').textContent()) ?? ''
     ).replace(/\s+/g, ' ');
     expect(tarjeta).toContain('Paga ITP al tipo general de su CCAA');
     expect(tarjeta).toMatch(/renuncia/);
+    expect(tarjeta).toContain('el autónomo tiene derecho a deducir el IVA (art. 20.Dos LIVA');
   });
 });

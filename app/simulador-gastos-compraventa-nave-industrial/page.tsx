@@ -555,7 +555,7 @@ export default function SimuladorNaveIndustrialPage() {
                   <>
                     En {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
                     ({territorioActualSinIva.nombre}). También en él la segunda entrega de una nave está
-                    exenta y, entre empresarios con derecho a deducción, se puede{' '}
+                    exenta y, si se cumplen los requisitos de la ley, quien vende puede{' '}
                     <strong>renunciar a esa exención</strong> (art. 50.Cinco Ley canaria 4/2012): la
                     operación pasa al {territorioActualSinIva.impuesto}, que autoliquida el comprador
                     (inversión del sujeto pasivo), y no se paga ITP. Si es tu caso, usa la tercera opción;
@@ -563,10 +563,10 @@ export default function SimuladorNaveIndustrialPage() {
                   </>
                 ) : (
                   <>
-                    Entre empresarios con derecho a deducción es habitual{' '}
-                    <strong>renunciar a la exención de IVA</strong> en la segunda transmisión: la operación
-                    vuelve al IVA, lo autoliquida el comprador (inversión del sujeto pasivo) y no se paga
-                    ITP. Si es tu caso, usa la tercera opción.
+                    Cuando el comprador es un empresario o profesional con derecho a deducir el IVA, es
+                    habitual que quien vende <strong>renuncie a la exención de IVA</strong> en la segunda
+                    transmisión (art. 20.Dos LIVA): la operación vuelve al IVA, lo autoliquida el comprador
+                    (inversión del sujeto pasivo) y no se paga ITP. Si es tu caso, usa la tercera opción.
                   </>
                 )}
               </p>
@@ -711,8 +711,8 @@ export default function SimuladorNaveIndustrialPage() {
               <p className={styles.infoCcaaNote}>
                 <span aria-hidden="true">⚠️</span> En {nombreEnFrase(ccaa)} <strong>no se aplica el IVA</strong>:
                 la obra nueva tributa por el {territorioActualSinIva.impuesto} ({territorioActualSinIva.nombre}),
-                con sus propios tipos. Este simulador no lo calcula — consúltalo en la administración tributaria
-                {deNombreCcaa(ccaa)}.
+                con sus propios tipos. Este simulador no lo calcula — consúltalo en la administración
+                tributaria {deNombreCcaa(ccaa)}.
               </p>
             )}
           </div>
@@ -1030,8 +1030,11 @@ export default function SimuladorNaveIndustrialPage() {
                 Paga ITP al tipo general de su CCAA — salvo en Ceuta y Melilla, donde la cuota se bonifica
                 un {BONIFICACION_CIUDADES} (art. 57 bis TRLITPAJD) para cualquier inmueble, también una
                 nave, y en las comunidades con un tipo reducido para el inmueble con el que se inicia una
-                actividad, como Aragón (lo indica el recuadro de la comunidad). El ITP no es
-                deducible como IVA, pero sí se añade al valor de adquisición del activo.
+                actividad, como Aragón (lo indica el recuadro de la comunidad). Y salvo la renuncia a
+                la exención, que puede hacer quien vende si es empresario y el autónomo tiene derecho a
+                deducir el IVA (art. 20.Dos LIVA, tercera opción del selector): entonces no paga ITP sino
+                IVA, que autoliquida él mismo y se deduce. El ITP no es deducible como IVA, pero sí se añade al
+                valor de adquisición del activo.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
@@ -1092,8 +1095,9 @@ export default function SimuladorNaveIndustrialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
                 El AJD aplica en la compra de nave nueva (primera transmisión) junto con el IVA, igual que en
                 cualquier otro inmueble. En segunda mano sin renunciar a la exención se paga ITP y no AJD —ahí
-                el AJD solo se pagaría sobre la escritura de hipoteca, si la hay—. Pero si el comprador y el
-                vendedor renuncian a la exención (tercera opción de «Tipo de transmisión»), la operación
+                el AJD solo se pagaría sobre la escritura de hipoteca, si la hay—. Pero si el vendedor renuncia
+                a la exención porque el comprador es un empresario con derecho a deducir el IVA (art. 20.Dos
+                LIVA; tercera opción de «Tipo de transmisión»), la operación
                 vuelve al IVA y sí devenga AJD sobre la propia compraventa, con varias comunidades aplicándole
                 un tipo incrementado. El País Vasco, que exime del AJD la primera transmisión de una
                 vivienda, sí lo cobra a una nave, y en Ceuta y Melilla se paga la mitad (bonificación del{' '}
@@ -1133,8 +1137,9 @@ export default function SimuladorNaveIndustrialPage() {
                     exención, que la app calcula en su tercera opción (hallazgo 1268; forma del
                     hallazgo B del 27/08/2026). */}
                 Si tu actividad está sujeta a IVA y no exenta, el IVA de la primera mano ({formatNumber(IVA_NAVE_INDUSTRIAL, 0)}&nbsp;%)
-                es deducible, y en segunda mano entre empresarios con derecho a deducción cabe la{' '}
-                <strong>renuncia a la exención</strong>: la operación vuelve al IVA, que autoliquida el comprador
+                es deducible, y en segunda mano, si quien vende es empresario, cabe que{' '}
+                <strong>renuncie a la exención</strong> (el derecho a deducir que exige el art. 20.Dos LIVA
+                es el tuyo, el del comprador): la operación vuelve al IVA, que autoliquida el comprador
                 (inversión del sujeto pasivo) y también es deducible. Sin renuncia, la segunda mano paga ITP, que no es
                 deducible: una diferencia que pesa más en naves de alto valor. La renuncia es la
                 tercera opción del selector.
