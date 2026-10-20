@@ -39,14 +39,27 @@ const PERIODOS: { valor: Periodicidad; texto: string }[] = [
 const fmtEuro = (n: number) => `${formatNumber(n, 2)} €`;
 const fmtFecha = (f: Fecha) => `${String(f.dia).padStart(2, '0')}/${String(f.mes).padStart(2, '0')}/${f.anio}`;
 
-type Lectura = { estado: 'vacio' } | { estado: 'ilegible' } | { estado: 'ok'; valor: number };
+type Lectura =
+  | { estado: 'vacio' }
+  | { estado: 'ilegible' }
+  | { estado: 'negativo' }
+  | { estado: 'ok'; valor: number };
 
+/**
+ * Una cuota negativa SE LEE y es imposible: no es ilegible, y decirle «No se entiende el
+ * importe… escríbelo como 450» a quien escribió «-450» no le dice qué falla (patrón 5 de la
+ * familia, «no falta, no vale»; hallazgo 3240, 20/10/2026).
+ */
 function leerImporte(texto: string): Lectura {
   if (texto.trim() === '') return { estado: 'vacio' };
   const n = parseSpanishNumber(texto);
-  if (!Number.isFinite(n) || n < 0) return { estado: 'ilegible' };
+  if (!Number.isFinite(n)) return { estado: 'ilegible' };
+  if (n < 0) return { estado: 'negativo' };
   return { estado: 'ok', valor: n };
 }
+
+/** Al céntimo, como lo pinta `fmtEuro`: el total suma las líneas que se ven (hallazgo 3239). */
+const alCentimo = (n: number) => Math.round(n * 100) / 100;
 
 export default function ProrrateoIbiComunidad({ conComunidad = true }: Props) {
   const [fecha, setFecha] = useState('');
@@ -61,10 +74,22 @@ export default function ProrrateoIbiComunidad({ conComunidad = true }: Props) {
       lecturaIbi.estado === 'ilegible' ? '«Cuota anual del IBI»' : null,
       lecturaCom.estado === 'ilegible' ? '«Cuota de comunidad»' : null,
     ].filter((x): x is string => x !== null);
-    if (ilegibles.length > 0) {
+    const negativos = [
+      lecturaIbi.estado === 'negativo' ? '«Cuota anual del IBI»' : null,
+      lecturaCom.estado === 'negativo' ? '«Cuota de comunidad»' : null,
+    ].filter((x): x is string => x !== null);
+    if (ilegibles.length > 0 || negativos.length > 0) {
+      const frases = [
+        ilegibles.length > 0
+          ? `No se entiende el importe de ${ilegibles.join(' y ')}: escríbelo como 450 o 450,80.`
+          : null,
+        negativos.length > 0
+          ? `${negativos.length > 1 ? `${negativos.join(' y ')} no pueden ser negativas` : `${negativos[0]} no puede ser negativa`}: escribe el importe sin signo menos.`
+          : null,
+      ].filter((x): x is string => x !== null);
       return {
         tipo: 'error' as const,
-        texto: `No se entiende el importe de ${ilegibles.join(' y ')}: escríbelo como 450 o 450,80. Hasta corregirlo no se reparte nada, para no publicar una cifra calculada con un importe equivocado.`,
+        texto: `${frases.join(' ')} Hasta corregirlo no se reparte nada, para no publicar una cifra calculada con un importe equivocado.`,
       };
     }
     if (lecturaIbi.estado === 'vacio' && lecturaCom.estado === 'vacio') return { tipo: 'nada' as const };
@@ -77,7 +102,9 @@ export default function ProrrateoIbiComunidad({ conComunidad = true }: Props) {
     if (lecturaIbi.estado === 'ok') filas.push({ concepto: 'IBI del año', r: repartoIbi(lecturaIbi.valor, f) });
     if (lecturaCom.estado === 'ok')
       filas.push({ concepto: `Comunidad (cuota ${periodicidad})`, r: repartoComunidad(lecturaCom.valor, periodicidad, f) });
-    const totalComprador = filas.reduce((s, x) => s + x.r.importeComprador, 0);
+    // Suma las líneas AL CÉNTIMO, como se pintan: sin redondear, 297,2055 + 41,5385 daba 338,74 €
+    // bajo dos líneas de 297,21 y 41,54 (hallazgo 3239, la familia del 594).
+    const totalComprador = alCentimo(filas.reduce((s, x) => s + alCentimo(x.r.importeComprador), 0));
     return { tipo: 'ok' as const, filas, totalComprador, fecha: f };
   }, [fecha, ibi, comunidad, periodicidad, conComunidad]);
 
