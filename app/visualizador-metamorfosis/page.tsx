@@ -441,14 +441,14 @@ export default function MetamorfosisPage() {
           <h4 className={styles.comparativaTitulo}>Completa vs Incompleta</h4>
           <div className={styles.comparativaGrid}>
             <div className={styles.comparativaCol}>
-              <span className={styles.comparativaColTitulo}>🦋 Completa</span>
+              <span className={styles.comparativaColTitulo}><span aria-hidden="true">🦋</span> Completa</span>
               <div className={styles.comparativaFila}><span className={styles.comparativaLabel}>Fases</span><span className={styles.comparativaValor}>4 (huevo→larva→pupa→adulto)</span></div>
               <div className={styles.comparativaFila}><span className={styles.comparativaLabel}>Cambio</span><span className={styles.comparativaValor}>Radical (disolución total)</span></div>
               <div className={styles.comparativaFila}><span className={styles.comparativaLabel}>Pupa</span><span className={styles.comparativaValor}>Sí (inmovilidad)</span></div>
               <div className={styles.comparativaFila}><span className={styles.comparativaLabel}>Larva vs adulto</span><span className={styles.comparativaValor}>Muy diferentes</span></div>
             </div>
             <div className={styles.comparativaCol}>
-              <span className={styles.comparativaColTitulo}>🦗 Incompleta</span>
+              <span className={styles.comparativaColTitulo}><span aria-hidden="true">🦗</span> Incompleta</span>
               <div className={styles.comparativaFila}><span className={styles.comparativaLabel}>Fases</span><span className={styles.comparativaValor}>3 (huevo→ninfa→adulto)</span></div>
               <div className={styles.comparativaFila}><span className={styles.comparativaLabel}>Cambio</span><span className={styles.comparativaValor}>Gradual (mudas sucesivas)</span></div>
               <div className={styles.comparativaFila}><span className={styles.comparativaLabel}>Pupa</span><span className={styles.comparativaValor}>No</span></div>
@@ -627,7 +627,7 @@ export default function MetamorfosisPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>🦋 Metamorfosis Animal</h1>
+          <h1 className={styles.title}><span aria-hidden="true">🦋</span> Metamorfosis Animal</h1>
           <p className={styles.subtitle}>La transformación más radical de la naturaleza, paso a paso</p>
         </header>
 

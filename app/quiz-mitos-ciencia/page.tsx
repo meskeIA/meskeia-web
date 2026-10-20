@@ -473,37 +473,37 @@ export default function QuizMitosCiencia() {
             </thead>
             <tbody>
               <tr>
-                <td>🧠 Cuerpo humano</td>
+                <td><span aria-hidden="true">🧠</span> Cuerpo humano</td>
                 <td>Usamos solo el 10% del cerebro</td>
                 <td>Malinterpretación de estudios de neurología del siglo XIX</td>
                 <td>Usamos prácticamente todo el cerebro; consume el 20% de la energía corporal</td>
               </tr>
               <tr>
-                <td>🦁 Animales</td>
+                <td><span aria-hidden="true">🦁</span> Animales</td>
                 <td>Los peces tienen 3 segundos de memoria</td>
                 <td>Justificación popular para mantener peces en espacios pequeños</td>
                 <td>Su memoria puede durar semanas, meses o años según la especie</td>
               </tr>
               <tr>
-                <td>⚛️ Física</td>
+                <td><span aria-hidden="true">⚛️</span> Física</td>
                 <td>Los rayos no caen dos veces en el mismo sitio</td>
                 <td>Generalización intuitiva pero incorrecta de la física de los rayos</td>
                 <td>Los pararrayos los atraen repetidamente; el Empire State recibe ~23 al año</td>
               </tr>
               <tr>
-                <td>🏛️ Historia</td>
+                <td><span aria-hidden="true">🏛️</span> Historia</td>
                 <td>Napoleón era excepcionalmente bajo</td>
                 <td>Confusión de medidas + propaganda caricaturesca británica</td>
                 <td>Medía ~1,69 m: altura media o superior en la Francia de su época</td>
               </tr>
               <tr>
-                <td>🧬 Biología</td>
+                <td><span aria-hidden="true">🧬</span> Biología</td>
                 <td>El azúcar causa hiperactividad en niños</td>
                 <td>Efecto nocebo: los padres perciben lo que esperan percibir</td>
                 <td>Más de 12 estudios con doble ciego en JAMA lo desmienten consistentemente</td>
               </tr>
               <tr>
-                <td>🐙 Sorpresas</td>
+                <td><span aria-hidden="true">🐙</span> Sorpresas</td>
                 <td>Los pulpos tienen solo un corazón</td>
                 <td>Generalización de la anatomía humana a todos los animales</td>
                 <td>Tienen tres corazones y sangre azul (hemocianina con cobre, no hierro)</td>

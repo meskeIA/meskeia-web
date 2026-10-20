@@ -705,7 +705,7 @@ export default function JuegoAsteroidsPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🚀 ASTEROIDS</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🚀</span> ASTEROIDS</h1>
         <p className={styles.subtitle}>El clásico arcade de destrucción espacial</p>
       </header>
 
@@ -728,13 +728,13 @@ export default function JuegoAsteroidsPage() {
                 <h2>ASTEROIDS</h2>
                 <p className={styles.instructions}>Destruye los asteroides y esquiva los OVNIs</p>
                 <div className={styles.gameRules}>
-                  <p>🚀 La nave tiene inercia - controla tu velocidad</p>
-                  <p>🪨 Los asteroides grandes se dividen en medianos</p>
-                  <p>🪨 Los medianos se dividen en pequeños</p>
-                  <p>🛸 Los OVNIs aparecen aleatoriamente y disparan</p>
-                  <p>⚠️ Los bordes te teletransportan al lado opuesto</p>
+                  <p><span aria-hidden="true">🚀</span> La nave tiene inercia - controla tu velocidad</p>
+                  <p><span aria-hidden="true">🪨</span> Los asteroides grandes se dividen en medianos</p>
+                  <p><span aria-hidden="true">🪨</span> Los medianos se dividen en pequeños</p>
+                  <p><span aria-hidden="true">🛸</span> Los OVNIs aparecen aleatoriamente y disparan</p>
+                  <p><span aria-hidden="true">⚠️</span> Los bordes te teletransportan al lado opuesto</p>
                 </div>
-                <button onClick={startGame} className={styles.gameBtn}>
+                <button type="button" onClick={startGame} className={styles.gameBtn}>
                   INICIAR JUEGO
                 </button>
               </div>
@@ -758,7 +758,7 @@ export default function JuegoAsteroidsPage() {
                 <h2>GAME OVER</h2>
                 <p>Puntuación final: {formatNumber(score, 0)}</p>
                 <p>Mejor puntuación: {formatNumber(highScore, 0)}</p>
-                <button onClick={restartGame} className={styles.gameBtn}>
+                <button type="button" onClick={restartGame} className={styles.gameBtn}>
                   JUGAR DE NUEVO
                 </button>
               </div>
@@ -892,19 +892,19 @@ export default function JuegoAsteroidsPage() {
           <div className={styles.panel}>
             <h3 className={styles.panelTitle}>Puntuación</h3>
             <div className={styles.enemyRow}>
-              <span className={styles.asteroidLabel}>Grande 🪨</span>
+              <span className={styles.asteroidLabel}>Grande <span aria-hidden="true">🪨</span></span>
               <span className={styles.enemyPoints}>20 pts</span>
             </div>
             <div className={styles.enemyRow}>
-              <span className={styles.asteroidLabel}>Medio 🪨</span>
+              <span className={styles.asteroidLabel}>Medio <span aria-hidden="true">🪨</span></span>
               <span className={styles.enemyPoints}>50 pts</span>
             </div>
             <div className={styles.enemyRow}>
-              <span className={styles.asteroidLabel}>Pequeño 🪨</span>
+              <span className={styles.asteroidLabel}>Pequeño <span aria-hidden="true">🪨</span></span>
               <span className={styles.enemyPoints}>100 pts</span>
             </div>
             <div className={styles.enemyRow}>
-              <span className={styles.asteroidLabel}>OVNI 🛸</span>
+              <span className={styles.asteroidLabel}>OVNI <span aria-hidden="true">🛸</span></span>
               <span className={styles.enemyPoints}>200 pts</span>
             </div>
           </div>
@@ -937,7 +937,7 @@ export default function JuegoAsteroidsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🚀 Asteroids</td>
+                  <td><span aria-hidden="true">🚀</span> Asteroids</td>
                   <td>1979</td>
                   <td>Destruir rocas espaciales con inercia newtoniana</td>
                   <td>Control de inercia y precisión de disparo</td>
@@ -945,7 +945,7 @@ export default function JuegoAsteroidsPage() {
                   <td>Primer juego con puntuación de más de 1 millón de pts</td>
                 </tr>
                 <tr>
-                  <td>👾 Space Invaders</td>
+                  <td><span aria-hidden="true">👾</span> Space Invaders</td>
                   <td>1978</td>
                   <td>Disparar oleadas de alienígenas en formación</td>
                   <td>Velocidad de reacción y gestión del tiempo</td>
@@ -953,7 +953,7 @@ export default function JuegoAsteroidsPage() {
                   <td>Primer fenómeno cultural masivo del videojuego</td>
                 </tr>
                 <tr>
-                  <td>👻 Pac-Man</td>
+                  <td><span aria-hidden="true">👻</span> Pac-Man</td>
                   <td>1980</td>
                   <td>Recorrer laberintos comiendo puntos y huyendo</td>
                   <td>Memoria espacial y anticipación de patrones</td>
@@ -961,7 +961,7 @@ export default function JuegoAsteroidsPage() {
                   <td>Primer personaje de videojuego reconocible mundialmente</td>
                 </tr>
                 <tr>
-                  <td>🐝 Galaga</td>
+                  <td><span aria-hidden="true">🐝</span> Galaga</td>
                   <td>1981</td>
                   <td>Disparar oleadas de insectos espaciales en formación</td>
                   <td>Precisión de puntería y multitarea</td>

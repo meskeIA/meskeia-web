@@ -618,7 +618,7 @@ export default function GuiaProductosLimpiezaPage() {
                 <div key={i} className={`${styles.mezclaCard} ${m.gravedad === 'critica' ? styles.mezclaCritica : styles.mezclaAlta}`}>
                   <div className={styles.mezclaCabecera}>
                     <span className={styles.mezclaGravedadBadge}>
-                      {m.gravedad === 'critica' ? '🚨 PELIGRO CRÍTICO' : '⚠️ RIESGO ALTO'}
+                      {m.gravedad === 'critica' ? <><span aria-hidden="true">🚨</span> PELIGRO CRÍTICO</> : <><span aria-hidden="true">⚠️</span> RIESGO ALTO</>}
                     </span>
                     <strong className={styles.mezclaProducto}>{m.con}</strong>
                   </div>

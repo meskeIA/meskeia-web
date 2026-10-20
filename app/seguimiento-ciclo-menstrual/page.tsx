@@ -156,7 +156,7 @@ export default function SeguimientoCicloMenstrualPage() {
 
       {/* HERO */}
       <header className={styles.hero}>
-        <h1 className={styles.heroTitle}>🌸 Seguimiento Ciclo Menstrual</h1>
+        <h1 className={styles.heroTitle}><span aria-hidden="true">🌸</span> Seguimiento Ciclo Menstrual</h1>
         <p className={styles.heroSubtitle}>
           Calcula tu ventana fértil, predicción de ovulación y próximas fechas. Cálculo 100% local: ningún dato sale de tu navegador.
         </p>
@@ -287,17 +287,17 @@ export default function SeguimientoCicloMenstrualPage() {
 
           {/* PRÓXIMOS CICLOS */}
           <div className={styles.ciclosCard}>
-            <h3 className={styles.ciclosTitle}>📅 Próximas predicciones (4 ciclos)</h3>
+            <h3 className={styles.ciclosTitle}><span aria-hidden="true">📅</span> Próximas predicciones (4 ciclos)</h3>
             <div role="list" aria-label="Próximos ciclos menstruales">
               {ciclos.map(ciclo => (
                 <div key={ciclo.numero} className={styles.cicloRow} role="listitem">
                   <div className={styles.cicloNum} aria-label={`Ciclo ${ciclo.numero}`}>{ciclo.numero}</div>
                   <div className={styles.cicloFechas}>
                     <div className={styles.cicloFechaPeriodo}>
-                      🔴 Período: {formatFecha(ciclo.inicioPeriodo)} – {formatFechaCorta(ciclo.finPeriodo)}
+                      <span aria-hidden="true">🔴</span> Período: {formatFecha(ciclo.inicioPeriodo)} – {formatFechaCorta(ciclo.finPeriodo)}
                     </div>
                     <div className={styles.cicloFechaOvulacion}>
-                      ✨ Ovulación probable: {formatFecha(ciclo.ovulacion)}
+                      <span aria-hidden="true">✨</span> Ovulación probable: {formatFecha(ciclo.ovulacion)}
                     </div>
                   </div>
                   <div className={styles.cicloFertil} aria-label={`Ventana fértil: ${formatFechaCorta(ciclo.inicioVentanaFertil)} al ${formatFechaCorta(ciclo.finVentanaFertil)}`}>
@@ -338,28 +338,28 @@ export default function SeguimientoCicloMenstrualPage() {
             </thead>
             <tbody>
               <tr>
-                <td>🔴 Menstrual</td>
+                <td><span aria-hidden="true">🔴</span> Menstrual</td>
                 <td>1-5</td>
                 <td>Estrógeno y progesterona bajos</td>
                 <td>Cansancio, calambres, introspección</td>
                 <td>Muy baja</td>
               </tr>
               <tr>
-                <td>🌱 Folicular</td>
+                <td><span aria-hidden="true">🌱</span> Folicular</td>
                 <td>1-13</td>
                 <td>Estrógeno en ascenso (FSH)</td>
                 <td>Energía y optimismo crecientes</td>
                 <td>Baja → moderada</td>
               </tr>
               <tr>
-                <td>✨ Ovulatoria</td>
+                <td><span aria-hidden="true">✨</span> Ovulatoria</td>
                 <td>14 (±2)</td>
                 <td>Pico de LH, estrógeno máximo</td>
                 <td>Vitalidad, sociabilidad, libido alta</td>
                 <td>Alta (ventana fértil)</td>
               </tr>
               <tr>
-                <td>🌙 Lútea</td>
+                <td><span aria-hidden="true">🌙</span> Lútea</td>
                 <td>15-28</td>
                 <td>Progesterona dominante</td>
                 <td>Calma, posible SPM en últimos días</td>
@@ -379,7 +379,7 @@ export default function SeguimientoCicloMenstrualPage() {
               <span className={styles.casoTag}>Fertilidad</span>
             </div>
             <p>Ana, 30 años, lleva 3 meses intentando concebir. Con el seguimiento identifica su ventana fértil real (días 11-16 de su ciclo de 30 días) y ajusta el momento de relaciones.</p>
-            <p className={styles.casoResultado}>✅ Identifica los días óptimos con precisión</p>
+            <p className={styles.casoResultado}><span aria-hidden="true">✅</span> Identifica los días óptimos con precisión</p>
           </div>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
@@ -388,7 +388,7 @@ export default function SeguimientoCicloMenstrualPage() {
               <span className={styles.casoTag}>Deporte</span>
             </div>
             <p>Laura, deportista amateur, adapta su entrenamiento al ciclo: entrenamientos de fuerza en fase folicular, HIIT en ovulación y yoga/recuperación en fase lútea tardía.</p>
-            <p className={styles.casoResultado}>✅ Mejor rendimiento sin sobreentrenamiento</p>
+            <p className={styles.casoResultado}><span aria-hidden="true">✅</span> Mejor rendimiento sin sobreentrenamiento</p>
           </div>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
@@ -397,7 +397,7 @@ export default function SeguimientoCicloMenstrualPage() {
               <span className={styles.casoTag}>Productividad</span>
             </div>
             <p>Marta programa presentaciones laborales y entrevistas en su fase folicular/ovulatoria, cuando se siente más segura y comunicativa, evitando los días de mayor fatiga.</p>
-            <p className={styles.casoResultado}>✅ Mayor rendimiento en momentos clave</p>
+            <p className={styles.casoResultado}><span aria-hidden="true">✅</span> Mayor rendimiento en momentos clave</p>
           </div>
           <div className={styles.casoCard}>
             <div className={styles.casoHeader}>
@@ -406,7 +406,7 @@ export default function SeguimientoCicloMenstrualPage() {
               <span className={styles.casoTag}>Salud</span>
             </div>
             <p>Sofía nota que sus ciclos varían entre 22 y 40 días. El seguimiento durante 3 meses le permite mostrar datos objetivos a su ginecóloga, que diagnostica SOP.</p>
-            <p className={styles.casoResultado}>✅ Diagnóstico más rápido con datos reales</p>
+            <p className={styles.casoResultado}><span aria-hidden="true">✅</span> Diagnóstico más rápido con datos reales</p>
           </div>
         </div>
 

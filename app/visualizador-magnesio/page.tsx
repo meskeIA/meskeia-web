@@ -427,7 +427,7 @@ export default function VisualizadorMagnesio() {
               )}
               {estadoMuscular === 'deficit' && (
                 <div className={styles.muscleVisualDeficit}>
-                  <span className={styles.deficitLabel}>⚠ Mg²⁺ insuficiente</span>
+                  <span className={styles.deficitLabel}><span aria-hidden="true">⚠</span> Mg²⁺ insuficiente</span>
                   <span className={styles.ionCa} style={{ color: '#FF3355' }}>Ca²⁺ sin control</span>
                   <span className={styles.espasmoLabel}>ESPASMO / CALAMBRE</span>
                 </div>

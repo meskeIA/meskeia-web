@@ -140,6 +140,7 @@ export default function VisualizadorSistemaPensiones() {
 
         <div className={styles.tabsBotones} role="tablist" aria-label="Modelos de pensiones">
           <button
+            type="button"
             className={`${styles.tabBoton} ${sistemaActivo === 'reparto' ? styles.tabActivo : ''}`}
             onClick={() => setSistemaActivo('reparto')}
             role="tab"
@@ -149,6 +150,7 @@ export default function VisualizadorSistemaPensiones() {
             Reparto (España)
           </button>
           <button
+            type="button"
             className={`${styles.tabBoton} ${sistemaActivo === 'capitalizacion' ? styles.tabActivo : ''}`}
             onClick={() => setSistemaActivo('capitalizacion')}
             role="tab"

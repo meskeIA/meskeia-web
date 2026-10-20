@@ -352,7 +352,7 @@ export default function OrientadorContratoMercantilPage() {
         <MeskeiaLogo />
 
         <header className={styles.hero}>
-          <h1 className={styles.title}>⚖️ Orientador de Contrato Mercantil</h1>
+          <h1 className={styles.title}><span aria-hidden="true">⚖️</span> Orientador de Contrato Mercantil</h1>
           <p className={styles.subtitle}>
             Descubre qué tipo de contrato necesitas y qué cláusulas no pueden faltar
           </p>

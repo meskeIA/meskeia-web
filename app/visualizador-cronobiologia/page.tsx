@@ -606,10 +606,10 @@ function TabSincronizadores() {
           </div>
           <div className={styles.diagramaFlecha} aria-hidden="true">→</div>
           <div className={styles.diagramaRelojes}>
-            <div className={styles.diagramaBox} style={{ background: '#27AE60', fontSize: '0.8rem' }}>🫀 Corazón</div>
-            <div className={styles.diagramaBox} style={{ background: '#8E44AD', fontSize: '0.8rem' }}>🫁 Pulmón</div>
-            <div className={styles.diagramaBox} style={{ background: '#E74C3C', fontSize: '0.8rem' }}>🫀 Hígado</div>
-            <div className={styles.diagramaBox} style={{ background: '#E67E22', fontSize: '0.8rem' }}>🧫 Páncreas</div>
+            <div className={styles.diagramaBox} style={{ background: '#27AE60', fontSize: '0.8rem' }}><span aria-hidden="true">🫀</span> Corazón</div>
+            <div className={styles.diagramaBox} style={{ background: '#8E44AD', fontSize: '0.8rem' }}><span aria-hidden="true">🫁</span> Pulmón</div>
+            <div className={styles.diagramaBox} style={{ background: '#E74C3C', fontSize: '0.8rem' }}><span aria-hidden="true">🫀</span> Hígado</div>
+            <div className={styles.diagramaBox} style={{ background: '#E67E22', fontSize: '0.8rem' }}><span aria-hidden="true">🧫</span> Páncreas</div>
           </div>
         </div>
         <p className={styles.diagramaNsqNota}>Los relojes periféricos también responden directamente a la alimentación y el ejercicio, pudiendo desincronizarse del NSQ.</p>
@@ -777,7 +777,7 @@ function TabCronofarmacologia() {
                   <span className={styles.farmaRowEjemplos}>{f.ejemplos}</span>
                 </div>
                 <span className={`${styles.farmaBadge} ${f.mejorMomento === 'mañana' ? styles.farmaBadgeManana : styles.farmaBadgeNoche}`}>
-                  {f.mejorMomento === 'mañana' ? '🌅 Mañana' : f.mejorMomento === 'noche' ? '🌙 Noche' : '🔄 Flexible'}
+                  {f.mejorMomento === 'mañana' ? <><span aria-hidden="true">🌅</span> Mañana</> : f.mejorMomento === 'noche' ? <><span aria-hidden="true">🌙</span> Noche</> : <><span aria-hidden="true">🔄</span> Flexible</>}
                 </span>
                 <span className={styles.farmaHoraIdeal}>{f.horaIdeal}</span>
               </button>
@@ -905,7 +905,7 @@ export default function VisualizadorCronobiologiaPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>🐦 Alondra</strong></td>
+                  <td><strong><span aria-hidden="true">🐦</span> Alondra</strong></td>
                   <td>5:30–6:00h</td>
                   <td>9–12h</td>
                   <td>PER3⁴ / CRY1</td>
@@ -913,7 +913,7 @@ export default function VisualizadorCronobiologiaPage() {
                   <td>Trabajo cognitivo matutino</td>
                 </tr>
                 <tr>
-                  <td><strong>🐦‍⬛ Colibrí</strong></td>
+                  <td><strong><span aria-hidden="true">🐦‍⬛</span> Colibrí</strong></td>
                   <td>7:00–7:30h</td>
                   <td>11–15h</td>
                   <td>PER3 heterocigoto</td>
@@ -921,7 +921,7 @@ export default function VisualizadorCronobiologiaPage() {
                   <td>Flexible; mañana y tarde</td>
                 </tr>
                 <tr>
-                  <td><strong>🦉 Búho</strong></td>
+                  <td><strong><span aria-hidden="true">🦉</span> Búho</strong></td>
                   <td>9:00–10:00h</td>
                   <td>15–20h</td>
                   <td>PER3⁵ / CRY1-ext</td>

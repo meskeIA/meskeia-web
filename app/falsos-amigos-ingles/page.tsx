@@ -237,7 +237,7 @@ export default function FalsosAmigosIngles() {
             aria-pressed={tab === 'catalogo'}
             onClick={() => setTab('catalogo')}
           >
-            📖 Catálogo
+            <span aria-hidden="true">📖</span> Catálogo
           </button>
           <button
             type="button"
@@ -245,7 +245,7 @@ export default function FalsosAmigosIngles() {
             aria-pressed={tab === 'practica'}
             onClick={() => setTab('practica')}
           >
-            🎯 Práctica
+            <span aria-hidden="true">🎯</span> Práctica
           </button>
         </div>
 
@@ -457,12 +457,12 @@ export default function FalsosAmigosIngles() {
               </tr>
             </thead>
             <tbody>
-              <tr><td><strong>embarrassed</strong></td><td>avergonzado/a</td><td>embarazada</td><td>"I was so embarrassed" → "Estaba tan embarazada" ❌</td></tr>
-              <tr><td><strong>actually</strong></td><td>en realidad / de hecho</td><td>actualmente</td><td>"Actually I work here" → "Actualmente trabajo aquí" ❌</td></tr>
-              <tr><td><strong>sensible</strong></td><td>razonable / sensato</td><td>sensible (sensitive)</td><td>"Be sensible!" → "¡Sé sensible!" ❌</td></tr>
-              <tr><td><strong>realize</strong></td><td>darse cuenta de</td><td>realizar (to do/accomplish)</td><td>"I realized the mistake" → "Realicé el error" ❌</td></tr>
-              <tr><td><strong>fabric</strong></td><td>tela / tejido</td><td>fábrica (factory)</td><td>"Beautiful fabric" → "Hermosa fábrica" ❌</td></tr>
-              <tr><td><strong>eventually</strong></td><td>finalmente / al final</td><td>eventualmente (possibly)</td><td>"He eventually came" → "Eventualmente vino" ❌</td></tr>
+              <tr><td><strong>embarrassed</strong></td><td>avergonzado/a</td><td>embarazada</td><td>"I was so embarrassed" → "Estaba tan embarazada" <span aria-hidden="true">❌</span></td></tr>
+              <tr><td><strong>actually</strong></td><td>en realidad / de hecho</td><td>actualmente</td><td>"Actually I work here" → "Actualmente trabajo aquí" <span aria-hidden="true">❌</span></td></tr>
+              <tr><td><strong>sensible</strong></td><td>razonable / sensato</td><td>sensible (sensitive)</td><td>"Be sensible!" → "¡Sé sensible!" <span aria-hidden="true">❌</span></td></tr>
+              <tr><td><strong>realize</strong></td><td>darse cuenta de</td><td>realizar (to do/accomplish)</td><td>"I realized the mistake" → "Realicé el error" <span aria-hidden="true">❌</span></td></tr>
+              <tr><td><strong>fabric</strong></td><td>tela / tejido</td><td>fábrica (factory)</td><td>"Beautiful fabric" → "Hermosa fábrica" <span aria-hidden="true">❌</span></td></tr>
+              <tr><td><strong>eventually</strong></td><td>finalmente / al final</td><td>eventualmente (possibly)</td><td>"He eventually came" → "Eventualmente vino" <span aria-hidden="true">❌</span></td></tr>
             </tbody>
           </table>
         </div>

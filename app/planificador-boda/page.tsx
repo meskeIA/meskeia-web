@@ -733,7 +733,7 @@ export default function PlanificadorBodaPage() {
 
           <div className={styles.tipGrid}>
             <div className={styles.tipCard}>
-              <h4>📅 Elige bien la fecha</h4>
+              <h4><span aria-hidden="true">📅</span> Elige bien la fecha</h4>
               <p>
                 <strong>Temporada alta</strong>: mayo-octubre (precios más altos).
                 <strong>Temporada baja</strong>: noviembre-abril (hasta 30% más económico).
@@ -742,7 +742,7 @@ export default function PlanificadorBodaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <h4>💰 El 10% extra</h4>
+              <h4><span aria-hidden="true">💰</span> El 10% extra</h4>
               <p>
                 Siempre reserva un 10-15% del presupuesto para imprevistos.
                 Surgirán gastos que no habías contemplado: extras del menú,
@@ -751,7 +751,7 @@ export default function PlanificadorBodaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <h4>👥 Confirma pronto</h4>
+              <h4><span aria-hidden="true">👥</span> Confirma pronto</h4>
               <p>
                 Pide confirmación de asistencia al menos 3 semanas antes.
                 Calcula un 10-15% de ausencias sobre los confirmados.
@@ -760,7 +760,7 @@ export default function PlanificadorBodaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <h4>📸 Reserva con tiempo</h4>
+              <h4><span aria-hidden="true">📸</span> Reserva con tiempo</h4>
               <p>
                 Los buenos fotógrafos y lugares se reservan con 12-18 meses de
                 antelación. Si tienes una fecha fija, empieza a buscar
@@ -769,7 +769,7 @@ export default function PlanificadorBodaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <h4>🍽️ El banquete es clave</h4>
+              <h4><span aria-hidden="true">🍽️</span> El banquete es clave</h4>
               <p>
                 El catering representa el 40-50% del presupuesto. Pide degustación
                 antes de contratar. Negocia el precio del menú infantil y las
@@ -778,7 +778,7 @@ export default function PlanificadorBodaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <h4>📝 Todo por escrito</h4>
+              <h4><span aria-hidden="true">📝</span> Todo por escrito</h4>
               <p>
                 Firma contratos con todos los proveedores. Incluye fecha, hora,
                 servicios detallados, precio total, forma de pago y política
@@ -800,13 +800,13 @@ export default function PlanificadorBodaPage() {
 
           <h3>Errores comunes a evitar</h3>
           <ul className={styles.errorList}>
-            <li>❌ No tener un presupuesto claro desde el principio</li>
-            <li>❌ Invitar a más personas de las que puedes permitirte</li>
-            <li>❌ No leer la letra pequeña de los contratos</li>
-            <li>❌ Dejar todo para última hora</li>
-            <li>❌ No designar un coordinador para el día de la boda</li>
-            <li>❌ Olvidar propinas para proveedores</li>
-            <li>❌ No tener plan B para bodas al aire libre</li>
+            <li><span aria-hidden="true">❌</span> No tener un presupuesto claro desde el principio</li>
+            <li><span aria-hidden="true">❌</span> Invitar a más personas de las que puedes permitirte</li>
+            <li><span aria-hidden="true">❌</span> No leer la letra pequeña de los contratos</li>
+            <li><span aria-hidden="true">❌</span> Dejar todo para última hora</li>
+            <li><span aria-hidden="true">❌</span> No designar un coordinador para el día de la boda</li>
+            <li><span aria-hidden="true">❌</span> Olvidar propinas para proveedores</li>
+            <li><span aria-hidden="true">❌</span> No tener plan B para bodas al aire libre</li>
           </ul>
         </section>
 

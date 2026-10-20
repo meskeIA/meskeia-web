@@ -704,7 +704,7 @@ function PanelDetalle({ grupoId, grupos }: PanelDetalleProps) {
 
       <div className={styles.detalleBadges}>
         <span className={`${styles.badge} ${grupo.vasculatura ? styles.badgeSi : styles.badgeNo}`}>
-          {grupo.vasculatura ? '✅ Con vasculatura' : '❌ Sin vasculatura'}
+          {grupo.vasculatura ? <><span aria-hidden="true">✅</span> Con vasculatura</> : <><span aria-hidden="true">❌</span> Sin vasculatura</>}
         </span>
         <span className={`${styles.badge} ${grupo.semilla ? styles.badgeSi : styles.badgeNo}`}>
           Semilla: {formatSemilla()}
@@ -713,7 +713,7 @@ function PanelDetalle({ grupoId, grupos }: PanelDetalleProps) {
           Flor: {formatFlor()}
         </span>
         <span className={`${styles.badge} ${grupo.fruto ? styles.badgeSi : styles.badgeNo}`}>
-          {grupo.fruto ? '✅ Con fruto' : '❌ Sin fruto'}
+          {grupo.fruto ? <><span aria-hidden="true">✅</span> Con fruto</> : <><span aria-hidden="true">❌</span> Sin fruto</>}
         </span>
       </div>
 

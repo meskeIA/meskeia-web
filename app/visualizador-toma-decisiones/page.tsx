@@ -435,8 +435,8 @@ export default function TomaDecisionesPage() {
                       <div className={`${styles.respuestaBox} ${respuesta === 'intuitiva' ? styles.respuestaSistema1 : styles.respuestaRacional}`}>
                         <p className={styles.respuestaElegida}>
                           {respuesta === 'intuitiva'
-                            ? '🎯 Respuesta intuitiva — el Sistema 1 tomó el control'
-                            : '✅ Respuesta analítica — el Sistema 2 intervino'}
+                            ? <><span aria-hidden="true">🎯</span> Respuesta intuitiva — el Sistema 1 tomó el control</>
+                            : <><span aria-hidden="true">✅</span> Respuesta analítica — el Sistema 2 intervino</>}
                         </p>
                         <p className={styles.respuestaExplicacion}>{ej.explicacion}</p>
                         <button

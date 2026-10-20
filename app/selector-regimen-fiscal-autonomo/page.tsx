@@ -536,7 +536,7 @@ export default function SelectorRegimenFiscalAutonomo() {
 
             <div className={styles.ventajasGrid}>
               <div className={styles.ventajasBloque}>
-                <p className={`${styles.ventajasTitulo} ${styles.verde}`}>✅ Ventajas</p>
+                <p className={`${styles.ventajasTitulo} ${styles.verde}`}><span aria-hidden="true">✅</span> Ventajas</p>
                 <ul className={styles.ventajasList}>
                   {rec.ventajas.map((v, i) => (
                     <li key={i}>• {v}</li>
@@ -544,7 +544,7 @@ export default function SelectorRegimenFiscalAutonomo() {
                 </ul>
               </div>
               <div className={styles.ventajasBloque}>
-                <p className={`${styles.ventajasTitulo} ${styles.naranja}`}>⚠️ A tener en cuenta</p>
+                <p className={`${styles.ventajasTitulo} ${styles.naranja}`}><span aria-hidden="true">⚠️</span> A tener en cuenta</p>
                 <ul className={styles.ventajasList}>
                   {rec.consideraciones.map((c, i) => (
                     <li key={i}>• {c}</li>
@@ -561,7 +561,7 @@ export default function SelectorRegimenFiscalAutonomo() {
               onClick={reiniciarTest}
               aria-label="Repetir el test desde el inicio"
             >
-              🔄 Repetir test
+              <span aria-hidden="true">🔄</span> Repetir test
             </button>
           </div>
         </section>

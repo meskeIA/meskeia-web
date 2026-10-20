@@ -799,7 +799,7 @@ export default function VisualizadorArteMovimientos() {
 
         {/* Sección 6 — Warning Box */}
         <div className={styles.warningBox}>
-          <strong>⚠️ Errores frecuentes al estudiar movimientos artísticos</strong>
+          <strong><span aria-hidden="true">⚠️</span> Errores frecuentes al estudiar movimientos artísticos</strong>
           <ul>
             <li>Confundir <strong>Expresionismo Abstracto</strong> (Pollock, Rothko, EE.UU. años 40-60) con <strong>Expresionismo Alemán</strong> (Kirchner, Munch, 1905-1925): son movimientos distintos separados por 40 años.</li>
             <li>Llamar «impresionistas» a Gauguin, Van Gogh o Cézanne: son <strong>postimpresionistas</strong> que reaccionaron contra el Impresionismo, no que lo practicaron.</li>

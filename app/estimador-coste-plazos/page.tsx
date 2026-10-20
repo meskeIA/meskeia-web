@@ -351,25 +351,25 @@ export default function CalculadoraCostePlazosPage() {
                 <td><strong>TIN</strong> (Tipo Interés Nominal)</td>
                 <td>Solo el interés puro del préstamo</td>
                 <td>Las tiendas en su publicidad</td>
-                <td>❌ No (oculta comisiones)</td>
+                <td><span aria-hidden="true">❌</span> No (oculta comisiones)</td>
               </tr>
               <tr>
                 <td><strong>TAE</strong> (Tasa Anual Equivalente)</td>
                 <td>TIN + comisiones + gastos</td>
                 <td>Contratos legales (obligatorio)</td>
-                <td>✅ Sí (coste real)</td>
+                <td><span aria-hidden="true">✅</span> Sí (coste real)</td>
               </tr>
               <tr>
                 <td><strong>Coste total</strong></td>
                 <td>Todo lo que pagas al final</td>
                 <td>Esta calculadora</td>
-                <td>✅ Sí (importe exacto)</td>
+                <td><span aria-hidden="true">✅</span> Sí (importe exacto)</td>
               </tr>
               <tr>
                 <td><strong>Cuota mensual</strong></td>
                 <td>Solo el pago periódico</td>
                 <td>La mayoría de ofertas</td>
-                <td>❌ No (no muestra el total)</td>
+                <td><span aria-hidden="true">❌</span> No (no muestra el total)</td>
               </tr>
             </tbody>
           </table>

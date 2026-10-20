@@ -224,6 +224,7 @@ function TarjetaActividad({ actividad, onEditar, onEliminar, onMoverArriba, onMo
         </div>
         <div className={styles.actividadAcciones}>
           <button
+            type="button"
             className={styles.btnIcono}
             onClick={onMoverArriba}
             disabled={esPrimera}
@@ -231,14 +232,15 @@ function TarjetaActividad({ actividad, onEditar, onEliminar, onMoverArriba, onMo
             title="Subir"
           >▲</button>
           <button
+            type="button"
             className={styles.btnIcono}
             onClick={onMoverAbajo}
             disabled={esUltima}
             aria-label="Mover actividad abajo"
             title="Bajar"
           >▼</button>
-          <button className={styles.btnIcono} onClick={onEditar} aria-label="Editar actividad" title="Editar">✏️</button>
-          <button className={`${styles.btnIcono} ${styles.btnEliminar}`} onClick={onEliminar} aria-label="Eliminar actividad" title="Eliminar">✕</button>
+          <button type="button" className={styles.btnIcono} onClick={onEditar} aria-label="Editar actividad" title="Editar">✏️</button>
+          <button type="button" className={`${styles.btnIcono} ${styles.btnEliminar}`} onClick={onEliminar} aria-label="Eliminar actividad" title="Eliminar">✕</button>
         </div>
       </div>
       {actividad.lugar && <div className={styles.actividadLugar}>📍 {actividad.lugar}</div>}
@@ -319,9 +321,9 @@ function PanelDia({ dia, indiceDia, totalDias, onActualizar, onEliminar, onMover
           />
         </div>
         <div className={styles.diaAcciones}>
-          <button className={styles.btnIcono} onClick={onMoverArriba} disabled={indiceDia === 0} aria-label="Mover día arriba" title="Subir día">▲</button>
-          <button className={styles.btnIcono} onClick={onMoverAbajo} disabled={indiceDia === totalDias - 1} aria-label="Mover día abajo" title="Bajar día">▼</button>
-          <button className={`${styles.btnIcono} ${styles.btnEliminar}`} onClick={onEliminar} aria-label="Eliminar día" title="Eliminar día">✕</button>
+          <button type="button" className={styles.btnIcono} onClick={onMoverArriba} disabled={indiceDia === 0} aria-label="Mover día arriba" title="Subir día">▲</button>
+          <button type="button" className={styles.btnIcono} onClick={onMoverAbajo} disabled={indiceDia === totalDias - 1} aria-label="Mover día abajo" title="Bajar día">▼</button>
+          <button type="button" className={`${styles.btnIcono} ${styles.btnEliminar}`} onClick={onEliminar} aria-label="Eliminar día" title="Eliminar día">✕</button>
         </div>
       </div>
 
@@ -359,7 +361,7 @@ function PanelDia({ dia, indiceDia, totalDias, onActualizar, onEliminar, onMover
             onCancelar={() => { setAgregando(false); setNuevaActividad(crearActividad()); }}
           />
         ) : (
-          <button className={styles.btnAgregarActividad} onClick={() => setAgregando(true)}>
+          <button type="button" className={styles.btnAgregarActividad} onClick={() => setAgregando(true)}>
             + Añadir actividad
           </button>
         )}
@@ -476,16 +478,16 @@ export default function PlanificadorItinerario() {
           />
         ))}
 
-        <button className={styles.btnAgregarDia} onClick={agregarDia}>
+        <button type="button" className={styles.btnAgregarDia} onClick={agregarDia}>
           + Añadir día
         </button>
       </div>
 
       {/* Acciones globales */}
       <div className={styles.accionesGlobales}>
-        <button className={styles.btnSecundario} onClick={reiniciar}>Limpiar todo</button>
-        <button className={styles.btnPrimario} onClick={descargarTxt} disabled={totalActividades === 0}>
-          ⬇ Descargar itinerario (.txt)
+        <button type="button" className={styles.btnSecundario} onClick={reiniciar}>Limpiar todo</button>
+        <button type="button" className={styles.btnPrimario} onClick={descargarTxt} disabled={totalActividades === 0}>
+          <span aria-hidden="true">⬇</span> Descargar itinerario (.txt)
         </button>
       </div>
 

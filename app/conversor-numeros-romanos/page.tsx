@@ -419,10 +419,10 @@ export default function ConversorNumerosRomanosPage() {
               <h3>Limitaciones del Sistema Romano y de este Conversor</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ El sistema romano no tiene cero:</strong> Los romanos no tenían concepto de cero como número. &quot;Nulla&quot; significaba &quot;nada&quot; pero no era un símbolo matemático operable. Esto hacía imposible la notación posicional y limitaba gravemente las matemáticas avanzadas.</li>
-              <li><strong>❌ Solo funciona entre 1 y 3.999:</strong> El sistema estándar no representa el 0 ni números negativos ni fracciones. Los romanos tenían fracciones propias (basadas en el as de 12 partes: semis=½, triens=⅓...) pero no forman parte del sistema romano convencional moderno.</li>
-              <li><strong>❌ El sistema romano no es universal ni totalmente estandarizado:</strong> Antes del siglo XVI coexistían muchas variantes: IIII y IV ambos válidos para el 4, algunas reglas sustractivas que no todos seguían. El &quot;sistema romano estándar&quot; que usamos hoy es una codificación medieval y renacentista, no el sistema original romano clásico.</li>
-              <li><strong>❌ No apto para cálculos:</strong> Nunca uses números romanos para operaciones matemáticas reales. Son representaciones de escritura/display, no un sistema de cálculo. Si ves MCMXCIX + I = MM, estás haciendo la conversión mentalmente a números arábigos, no operando en romano.</li>
+              <li><strong><span aria-hidden="true">❌</span> El sistema romano no tiene cero:</strong> Los romanos no tenían concepto de cero como número. &quot;Nulla&quot; significaba &quot;nada&quot; pero no era un símbolo matemático operable. Esto hacía imposible la notación posicional y limitaba gravemente las matemáticas avanzadas.</li>
+              <li><strong><span aria-hidden="true">❌</span> Solo funciona entre 1 y 3.999:</strong> El sistema estándar no representa el 0 ni números negativos ni fracciones. Los romanos tenían fracciones propias (basadas en el as de 12 partes: semis=½, triens=⅓...) pero no forman parte del sistema romano convencional moderno.</li>
+              <li><strong><span aria-hidden="true">❌</span> El sistema romano no es universal ni totalmente estandarizado:</strong> Antes del siglo XVI coexistían muchas variantes: IIII y IV ambos válidos para el 4, algunas reglas sustractivas que no todos seguían. El &quot;sistema romano estándar&quot; que usamos hoy es una codificación medieval y renacentista, no el sistema original romano clásico.</li>
+              <li><strong><span aria-hidden="true">❌</span> No apto para cálculos:</strong> Nunca uses números romanos para operaciones matemáticas reales. Son representaciones de escritura/display, no un sistema de cálculo. Si ves MCMXCIX + I = MM, estás haciendo la conversión mentalmente a números arábigos, no operando en romano.</li>
             </ul>
           </div>
 

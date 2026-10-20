@@ -358,7 +358,7 @@ function BloqueSSRI() {
           <span style={{ background: '#48A9A6' }} className={styles.sinapsisMolPeq}>5-HT</span>
           <span style={{ background: '#48A9A6' }} className={styles.sinapsisMolPeq}>5-HT</span>
         </div>
-        <div className={styles.ssriTag} aria-label="SSRI bloquea SERT">SSRI bloquea SERT 🚫</div>
+        <div className={styles.ssriTag} aria-label="SSRI bloquea SERT">SSRI bloquea SERT <span aria-hidden="true">🚫</span></div>
       </div>
       <div className={styles.sinapsisNeurona} aria-label="Neurona postsináptica con SSRI">
         <div className={styles.sinapsisNeuronaTitulo}>Neurona postsináptica</div>
