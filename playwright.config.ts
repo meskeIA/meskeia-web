@@ -18,6 +18,10 @@ export default defineConfig({
   // Directorio de tests
   testDir: './tests',
 
+  // Una sola tanda a la vez con el servidor que arranca Playwright: la segunda reutilizaría el de
+  // la primera, y esta lo apagaría al terminar (20/10/2026, cabecera del fichero)
+  globalSetup: './tests/_cerrojo-playwright.ts',
+
   // Tiempo máximo por test
   timeout: 30 * 1000,
 
