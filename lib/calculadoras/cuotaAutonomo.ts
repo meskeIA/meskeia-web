@@ -10,14 +10,18 @@
  * El tramo se busca con el rendimiento COMPUTABLE del art. 308.1.c LGSS. Hasta el 18/10/2026
  * (cabo C0105) se buscaba con `rendimientoNetoMensual` tal cual, sin la deducción del 7 % por
  * gastos genéricos: 2.125 €/mes caían en el tramo 9 (401,47 €) en vez del 8 (380,88 €).
+ * Desde el 20/10/2026 (cabo C0294) recibe el régimen de la directa: en la simplificada, la de por
+ * defecto, el computable resta además el 5 % de difícil justificación (art. 30, regla 2.ª, RIRPF).
  */
 
 import {
   tramoRETA,
-  rendimientoComputableDesdeActividad,
+  cotizacionRETADesdeActividad,
+  REGIMEN_DIRECTA_POR_DEFECTO,
   TIPO_COTIZACION_RETA,
   TARIFA_PLANA_2025,
   FISCAL_AUTONOMOS_META,
+  type RegimenEstimacionDirecta,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -25,9 +29,12 @@ import {
 export interface ParametrosCuotaAutonomo {
   /**
    * Rendimiento neto mensual estimado (ingresos - gastos, SIN descontar cuota SS). El tramo se
-   * busca con él menos el 7 % de gastos genéricos (`rendimientoComputableDesdeActividad`).
+   * busca con él menos el 7 % de gastos genéricos, y en la simplificada menos además el 5 % de
+   * difícil justificación (`cotizacionRETADesdeActividad`).
    */
   rendimientoNetoMensual?: number;
+  /** Modalidad de la directa con que se calcula el computable desde el neto. Por defecto, simplificada. */
+  regimen?: RegimenEstimacionDirecta;
   /**
    * Rendimiento computable mensual ya calculado (art. 308.1.c LGSS, con su deducción): si se da,
    * manda sobre `rendimientoNetoMensual` y se usa tal cual. Lo pasa simulador-modulos-vs-directa,
@@ -45,6 +52,8 @@ export interface ResultadoCuotaAutonomo {
   rendimientoNetoMensual: number | null;
   /** Rendimiento computable mensual, el que decide el tramo */
   rendimientoComputableMensual: number;
+  /** Régimen supuesto para el computable (null si se dio el computable ya calculado) */
+  regimen: RegimenEstimacionDirecta | null;
   /** Tramo correspondiente (1-15) */
   tramo: number;
   /** Base de cotización mínima del tramo */
@@ -81,7 +90,9 @@ export function calcularCuotaAutonomo(p: ParametrosCuotaAutonomo): ResultadoCuot
   const r = (n: number) => Math.round(n * 100) / 100;
 
   // Buscar tramo con el rendimiento computable (art. 308.1.c LGSS)
-  const computable = p.rendimientoComputableMensual ?? rendimientoComputableDesdeActividad((neto ?? 0) * 12);
+  const regimen = p.rendimientoComputableMensual === undefined ? (p.regimen ?? REGIMEN_DIRECTA_POR_DEFECTO) : null;
+  const computable = p.rendimientoComputableMensual
+    ?? cotizacionRETADesdeActividad((neto ?? 0) * 12, p.regimen ?? REGIMEN_DIRECTA_POR_DEFECTO).computableMensual;
   const tramo = tramoRETA(computable);
 
   // Base de cotización
@@ -102,6 +113,7 @@ export function calcularCuotaAutonomo(p: ParametrosCuotaAutonomo): ResultadoCuot
   return {
     rendimientoNetoMensual: neto === null ? null : r(neto),
     rendimientoComputableMensual: r(computable),
+    regimen,
     tramo: tramo.id,
     baseMinima: tramo.baseMinima,
     baseMaxima: tramo.baseMaxima,

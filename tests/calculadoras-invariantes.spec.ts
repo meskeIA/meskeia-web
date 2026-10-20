@@ -49,6 +49,7 @@ import { calcularIndemnizacionDespido } from '../lib/calculadoras/indemnizacionD
 import { calcularSueldoNeto } from '../lib/calculadoras/sueldoNeto';
 import { calcularDeduccionRentasBajas, limitarDeduccionRendimientosTrabajo } from '../data/fiscal/irpf';
 import { calcularCuotaAutonomo } from '../lib/calculadoras/cuotaAutonomo';
+import { cotizacionRETADesdeActividad } from '../data/fiscal/autonomos';
 import { compararModulosVsDirecta, superaLimitesModulos } from '../lib/calculadoras/modulosVsDirecta';
 import {
   GASTOS_DIFICIL_JUSTIFICACION_EDS,
@@ -301,7 +302,8 @@ test.describe('Invariantes de composición — consulta_autonomo', () => {
   const gastos = 5000;
   const rendimientoNeto = facturacion - gastos;
   const cuota = calcularCuotaAutonomo({ rendimientoNetoMensual: rendimientoNeto / 12, esNuevoAutonomo: false });
-  const baseIRPF = Math.max(0, rendimientoNeto - cuota.cuotaAnual);
+  // Simplificada por defecto (cabo C0294): el 5 % de difícil justificación, sobre el neto sin la cuota
+  const baseIRPF = Math.max(0, rendimientoNeto - cuota.cuotaAnual - reduccionGastosDificilJustificacion(rendimientoNeto - cuota.cuotaAnual));
   const irpf = calcularIRPF({ rendimientosTrabajo: baseIRPF, situacion: 'soltero', esTrabajador: false });
 
   test('COHERENCIA: cuota RETA e IRPF no negativos', () => {
@@ -1094,8 +1096,11 @@ test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => 
   // 2.125 €/mes → computable 2.125 × 0,93 = 1.976,25 €/mes (art. 308.1.c LGSS, regla 2.ª)
   // → tramo 8 (> 1.850 y ≤ 2.030), base mínima 1.209,15 €, cuota 1.209,15 × 31,50 % = 380,88 €.
   // Antes: 2.125 €/mes → tramo 9, base 1.274,51 €, cuota 401,47 €.
+  // Desde el 20/10/2026 (cabo C0294) el neto pasa por el régimen de la directa, simplificada por
+  // defecto: estos dos casos son de la NORMAL y lo dicen.
   test('C0105: neto 2.125 €/mes → computable 1.976,25 €, tramo 8, cuota 380,88 € (no la 401,47 del tramo 9)', () => {
-    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 25500 / 12 });
+    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 25500 / 12, regimen: 'normal' });
+    expect(res.regimen).toBe('normal');
     expect(res.rendimientoComputableMensual).toBeCloseTo(1976.25, 2);
     expect(res.tramo).toBe(8);
     expect(res.baseMinima).toBeCloseTo(1209.15, 2);
@@ -1105,7 +1110,8 @@ test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => 
   test('C0105: el computable dado se usa tal cual, sin restarle otra vez el 7 % (simulador-modulos-vs-directa)', () => {
     // 1.850,01 es tramo 8; con el 7 % restado dos veces (1.720,51) caería en el 7
     expect(calcularCuotaAutonomo({ rendimientoComputableMensual: 1850.01 }).tramo).toBe(8);
-    expect(calcularCuotaAutonomo({ rendimientoNetoMensual: 1850.01 }).tramo).toBe(7);
+    expect(calcularCuotaAutonomo({ rendimientoNetoMensual: 1850.01, regimen: 'normal' }).tramo).toBe(7);
+    expect(calcularCuotaAutonomo({ rendimientoComputableMensual: 1850.01 }).regimen).toBeNull();
   });
 
   test('C0105: sin ningún rendimiento lanza error', () => {
@@ -1114,8 +1120,73 @@ test.describe('Golden — calcularCuotaAutonomo (Capa 1 · SS 2026 ✓)', () => 
 
   test('C0105: el comparador autónomo vs SL busca el mismo tramo — 30.000 y 4.500 → RETA 4.570,59 €/año', () => {
     // 1.209,15 × 0,315 × 12 = 4.570,587 → 4.570,59 (antes 1.274,51 × 0,315 × 12 = 4.817,65)
-    const cmp = compararAutonomoVsSL({ beneficioAnual: 30000, gastosDeducibles: 4500, tipoIS: 'general', repartirDividendos: true });
+    const cmp = compararAutonomoVsSL({ beneficioAnual: 30000, gastosDeducibles: 4500, tipoIS: 'general', repartirDividendos: true, regimen: 'normal' });
     expect(cmp.autonomo.cuotaSSAnual).toBeCloseTo(4570.59, 2);
+  });
+
+  // Cabo C0294 (20/10/2026): en la directa SIMPLIFICADA el rendimiento neto del IRPF lleva restado
+  // además el 5 % de difícil justificación (art. 30, regla 2.ª, RIRPF; tope 2.000 €/año), sobre el
+  // neto ya descontada la cuota, y la regla 1.ª del art. 308.1.c LGSS no lo devuelve. A mano:
+  test('C0294: 30.000 y 4.500 en simplificada → computable 1.895,15 €, sigue en el tramo 8 (normal 1.976,25)', () => {
+    // Tramo 8: cuota 1.209,15 × 0,315 = 380,88225 → 4.570,587 €/año; neto IRPF previo
+    // 25.500 − 4.570,587 = 20.929,413; 5 % = 1.046,47065 (< 2.000); computable
+    // (25.500 − 1.046,47065) × 0,93 / 12 = 1.895,1485 → tramo 8 (> 1.850 y ≤ 2.030): estable.
+    const res = calcularCuotaAutonomo({ rendimientoNetoMensual: 25500 / 12 });
+    expect(res.regimen).toBe('simplificada');
+    expect(res.rendimientoComputableMensual).toBeCloseTo(1895.15, 2);
+    expect(res.tramo).toBe(8);
+    expect(res.cuotaMensualGeneral).toBeCloseTo(380.88, 2);
+    const explicito = calcularCuotaAutonomo({ rendimientoNetoMensual: 25500 / 12, regimen: 'simplificada' });
+    expect(explicito.rendimientoComputableMensual).toBeCloseTo(1895.15, 2);
+  });
+
+  test('C0294: 1.900 €/mes de computable normal baja en simplificada del tramo 8 (380,88 €) al 7 (360,29 €)', () => {
+    // 1.900 × 12 / 0,93 = 24.516,13 de ingresos − gastos. Normal: 24.516,13 × 0,93 / 12 = 1.900,00.
+    // Simplificada, partiendo del tramo 8 (cuota 4.570,587/año): 5 % de 19.945,543 = 997,277 →
+    // (24.516,13 − 997,277) × 0,0775 = 1.822,71 → tramo 7. Con la cuota del 7 (1.143,79 × 0,315
+    // = 360,29385 → 4.323,526/año): 5 % de 20.192,604 = 1.009,630 → 1.821,75 → tramo 7, estable.
+    const normal = calcularCuotaAutonomo({ rendimientoNetoMensual: 24516.13 / 12, regimen: 'normal' });
+    expect(normal.rendimientoComputableMensual).toBeCloseTo(1900, 2);
+    expect(normal.tramo).toBe(8);
+    expect(normal.cuotaMensualGeneral).toBeCloseTo(380.88, 2);
+    const simplificada = calcularCuotaAutonomo({ rendimientoNetoMensual: 24516.13 / 12, regimen: 'simplificada' });
+    expect(simplificada.rendimientoComputableMensual).toBeCloseTo(1821.75, 2);
+    expect(simplificada.tramo).toBe(7);
+    expect(simplificada.cuotaMensualGeneral).toBeCloseTo(360.29, 2);
+    // La fórmula es una sola: la de data/fiscal da lo mismo que el motor
+    const c = cotizacionRETADesdeActividad(24516.13, 'simplificada');
+    expect(c.computableMensual).toBeCloseTo(1821.75, 2);
+    expect(c.reduccionDificilJustificacion).toBeCloseTo(1009.63, 2);
+    expect(c.tramo.id).toBe(7);
+  });
+
+  test('C0294: el 5 % se capa en 2.000 €/año — 60.000 € de ingresos − gastos → computable 4.495 €', () => {
+    // Normal: 60.000 × 0,0775 = 4.650 → tramo 14. Cuota del 14: 1.732,03 × 0,315 × 12 = 6.547,07;
+    // 5 % de 53.452,93 = 2.672,65 > 2.000 → 2.000. Computable (60.000 − 2.000) × 0,0775 = 4.495.
+    const c = cotizacionRETADesdeActividad(60000, 'simplificada');
+    expect(c.reduccionDificilJustificacion).toBe(2000);
+    expect(c.computableMensual).toBeCloseTo(4495, 2);
+    expect(c.tramo.id).toBe(14);
+    expect(cotizacionRETADesdeActividad(60000, 'normal').computableMensual).toBeCloseTo(4650, 2);
+  });
+
+  test('C0294: el comparador autónomo vs SL resta el 5 % también en la base del IRPF', () => {
+    // 30.000 y 4.500, tramo 8 en los dos: RETA 4.570,59. Normal: base 25.500 − 4.570,59 = 20.929,41.
+    // Simplificada: 5 % = 1.046,47 → base 20.929,41 − 1.046,47 = 19.882,94.
+    const normal = compararAutonomoVsSL({ beneficioAnual: 30000, gastosDeducibles: 4500, tipoIS: 'general', repartirDividendos: true, regimen: 'normal' });
+    expect(normal.autonomo.baseImponible).toBeCloseTo(20929.41, 2);
+    expect(normal.reduccionDificilJustificacion).toBe(0);
+    const simpl = compararAutonomoVsSL({ beneficioAnual: 30000, gastosDeducibles: 4500, tipoIS: 'general', repartirDividendos: true });
+    expect(simpl.regimenAutonomo).toBe('simplificada');
+    expect(simpl.tramoRETAAutonomo).toBe(8);
+    expect(simpl.autonomo.cuotaSSAnual).toBeCloseTo(4570.59, 2);
+    expect(simpl.reduccionDificilJustificacion).toBeCloseTo(1046.47, 2);
+    expect(simpl.autonomo.baseImponible).toBeCloseTo(19882.94, 2);
+    // Frontera: 24.516,13 → la simplificada cotiza en el 7 (360,29385 × 12 = 4.323,53)
+    const frontera = compararAutonomoVsSL({ beneficioAnual: 24516.13, tipoIS: 'general', regimen: 'simplificada' });
+    expect(frontera.tramoRETAAutonomo).toBe(7);
+    expect(frontera.autonomo.cuotaSSAnual).toBeCloseTo(4323.53, 2);
+    expect(compararAutonomoVsSL({ beneficioAnual: 24516.13, tipoIS: 'general', regimen: 'normal' }).autonomo.cuotaSSAnual).toBeCloseTo(4570.59, 2);
   });
 });
 

@@ -7,7 +7,9 @@ import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, Shar
 } from '@/components';
 import { formatCurrency, formatDate, formatNumber, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import {
-  FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA, tramoRETA, rendimientoComputableDesdeActividad,
+  FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA, cotizacionRETADesdeActividad,
+  NOMBRE_REGIMEN_DIRECTA, REGIMEN_DIRECTA_POR_DEFECTO, GASTOS_DIFICIL_JUSTIFICACION_EDS,
+  type RegimenEstimacionDirecta,
 } from '@/data/fiscal';
 
 // Datos fiscales centralizados en data/fiscal/autonomos.ts
@@ -87,6 +89,7 @@ export default function EstimadorCuotaAutonomoPage() {
   // Estados de entrada
   const [ingresosAnuales, setIngresosAnuales] = useState('');
   const [gastosAnuales, setGastosAnuales] = useState('');
+  const [regimen, setRegimen] = useState<RegimenEstimacionDirecta>(REGIMEN_DIRECTA_POR_DEFECTO);
   const [tieneBonicacion, setTieneBonificacion] = useState(false);
   const [bonificacionSeleccionada, setBonificacionSeleccionada] = useState<string>('tarifa-plana');
 
@@ -107,8 +110,11 @@ export default function EstimadorCuotaAutonomoPage() {
     // El tramo lo decide el rendimiento COMPUTABLE (art. 308.1.c LGSS): el neto, sin la cuota,
     // menos el 7 % de gastos genéricos. Hasta el 18/10/2026 (cabo C0105) se buscaba con el neto:
     // 30.000 € de ingresos y 4.500 € de gastos caían en el tramo 9 (401,47 €) y no en el 8 (380,88 €).
-    const rendimientoComputableMensual = rendimientoComputableDesdeActividad(rendimientoNetoAnual);
-    const tramo = tramoRETA(rendimientoComputableMensual);
+    // Desde el 20/10/2026 (cabo C0294) pregunta el régimen: en la simplificada, la de por defecto,
+    // el computable resta además el 5 % de difícil justificación (art. 30, regla 2.ª, RIRPF).
+    const cotizacion = cotizacionRETADesdeActividad(rendimientoNetoAnual, regimen);
+    const rendimientoComputableMensual = cotizacion.computableMensual;
+    const tramo = cotizacion.tramo;
 
     // La base puede elegirse entre la mínima y la máxima del tramo: se estima con la mínima
     // (cuota más baja), como calcularCuotaAutonomo y comparador-autonomo-vs-sl. Hasta el 18/10/2026
@@ -141,7 +147,7 @@ export default function EstimadorCuotaAutonomoPage() {
       bonificacion: tieneBonicacion ? bonificacion : null,
       tipoCotizacion: TIPO_COTIZACION_RETA * 100,
     };
-  }, [ingresosAnuales, gastosAnuales, tieneBonicacion, bonificacionSeleccionada]);
+  }, [ingresosAnuales, gastosAnuales, regimen, tieneBonicacion, bonificacionSeleccionada]);
 
   // Renderizar tabla de tramos
   const renderTablaTramos = () => (
@@ -333,6 +339,21 @@ export default function EstimadorCuotaAutonomoPage() {
                 </div>
                 <span className={styles.inputHint}>Gastos de actividad (material, suministros, etc.)</span>
               </div>
+
+              <div className={styles.inputGroup}>
+                <label htmlFor="regimen">Régimen en el IRPF</label>
+                <select
+                  id="regimen"
+                  className={styles.selectRegimen}
+                  aria-label="Régimen en el IRPF: estimación directa normal o simplificada"
+                  value={regimen}
+                  onChange={(e) => setRegimen(e.target.value as RegimenEstimacionDirecta)}
+                >
+                  <option value="simplificada">{NOMBRE_REGIMEN_DIRECTA.simplificada}</option>
+                  <option value="normal">{NOMBRE_REGIMEN_DIRECTA.normal}</option>
+                </select>
+                <span className={styles.inputHint}>La simplificada es la habitual si no has renunciado a ella</span>
+              </div>
             </div>
 
             {/* Bonificación */}
@@ -392,7 +413,11 @@ export default function EstimadorCuotaAutonomoPage() {
                   <span className={styles.desgloseValor}>{formatCurrency(resultados.rendimientoNetoMensual)}</span>
                 </div>
                 <div className={styles.desgloseItem}>
-                  <span className={styles.desgloseLabel}>Rendimiento computable mensual (−7&nbsp;% de gastos genéricos)</span>
+                  <span className={styles.desgloseLabel}>
+                    Rendimiento computable mensual ({regimen === 'simplificada'
+                      ? `−${GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje} % de difícil justificación y −7 % de gastos genéricos`
+                      : '−7 % de gastos genéricos'})
+                  </span>
                   <span className={styles.desgloseValor}>{formatCurrency(resultados.rendimientoComputableMensual)}</span>
                 </div>
                 <div className={styles.desgloseSeparador} />
@@ -400,6 +425,12 @@ export default function EstimadorCuotaAutonomoPage() {
                   <span className={styles.desgloseLabel}>Tramo aplicable</span>
                   <span className={styles.desgloseValor}>Tramo {resultados.tramo?.id}</span>
                 </div>
+                <p className={styles.notaRegimen}>
+                  Régimen supuesto: {NOMBRE_REGIMEN_DIRECTA[regimen].toLowerCase()}
+                  {regimen === 'simplificada'
+                    ? ` (resta un ${GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje} % de gastos de difícil justificación, máximo ${formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)} al año, sobre el rendimiento ya descontada la cuota)`
+                    : ''}
+                </p>
                 <div className={styles.desgloseItem}>
                   <span className={styles.desgloseLabel}>Base de cotización</span>
                   <span className={styles.desgloseValor}>{formatCurrency(resultados.baseCotizacion)}</span>

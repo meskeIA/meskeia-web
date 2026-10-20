@@ -142,6 +142,14 @@
 .filaResultado:last-child { border-bottom: none; }
 
 .filaLabel { color: var(--text-secondary); }
+
+/* Régimen supuesto, bajo la cuota RETA: tokens que cambian con el tema */
+.notaRegimen {
+  margin: 0;
+  padding: 0.25rem 0 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
 .filaValor { font-weight: 600; }
 .filaTotal { font-weight: 700; font-size: 1rem; color: var(--text-primary); }
 .filaNetoPositivo { font-weight: 700; color: #38a169; }

@@ -12,9 +12,12 @@ import {
   FISCAL_SOCIEDADES_META,
   calcularCuotaIntegraGeneral,
   MINIMOS_IRPF_2025,
-  tramoRETA,
-  rendimientoComputableDesdeActividad,
-  TIPO_COTIZACION_RETA,
+  cotizacionRETADesdeActividad,
+  nombreTramoRETA,
+  NOMBRE_REGIMEN_DIRECTA,
+  REGIMEN_DIRECTA_POR_DEFECTO,
+  GASTOS_DIFICIL_JUSTIFICACION_EDS,
+  type RegimenEstimacionDirecta,
   RETENCIONES_IS_2025,
   AUTONOMO_SOCIETARIO_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
@@ -77,15 +80,6 @@ function calcularCuotaBaseAhorro(base: number): number {
   return cuota;
 }
 
-/**
- * Cuota anual a la base mínima del tramo. El tramo se busca con el rendimiento computable del
- * art. 308.1.c LGSS: (beneficio − gastos, sin la cuota) menos el 7 % de gastos genéricos. Hasta
- * el 18/10/2026 (cabo C0105) se buscaba con (beneficio − gastos) / 12 sin el 7 %.
- */
-function calcularCuotaReta(beneficioMenosGastosAnual: number): number {
-  const tramo = tramoRETA(rendimientoComputableDesdeActividad(beneficioMenosGastosAnual));
-  return tramo.baseMinima * TIPO_COTIZACION_RETA * 12;
-}
 
 interface ResultadoFiscal {
   ingresosBrutos: number;
@@ -99,11 +93,29 @@ interface ResultadoFiscal {
   tipoEfectivoTotal: number;
 }
 
-function calcularAutonomo(beneficio: number, gastosDeducibles: number): ResultadoFiscal {
-  const cuotaRetaAnual = calcularCuotaReta(Math.max(0, beneficio - gastosDeducibles));
+interface ResultadoAutonomo extends ResultadoFiscal {
+  /** Nombre del tramo del RETA según la Orden («general, tramo 5») */
+  tramoTexto: string;
+  regimen: RegimenEstimacionDirecta;
+  /** Gastos de difícil justificación restados en la simplificada (0 en la normal) */
+  reduccionDificilJustificacion: number;
+}
 
-  // Rendimiento neto = beneficio - gastos deducibles - cuota SS
-  const rendimientoNeto = Math.max(0, beneficio - gastosDeducibles - cuotaRetaAnual);
+/**
+ * La cuota es la de la base mínima del tramo, y el tramo se busca con el rendimiento computable
+ * del art. 308.1.c LGSS (`cotizacionRETADesdeActividad`, la misma fórmula que el MCP). Hasta el
+ * 18/10/2026 (cabo C0105) se buscaba con (beneficio − gastos) / 12 sin el 7 %, y hasta el
+ * 20/10/2026 (cabo C0294) se suponía siempre la directa normal: en la simplificada, el
+ * computable y la base del IRPF restan además el 5 % de difícil justificación.
+ */
+function calcularAutonomo(beneficio: number, gastosDeducibles: number, regimen: RegimenEstimacionDirecta): ResultadoAutonomo {
+  const cotizacion = cotizacionRETADesdeActividad(Math.max(0, beneficio - gastosDeducibles), regimen);
+  const cuotaRetaAnual = cotizacion.cuotaMensual * 12;
+  const reduccion = cotizacion.reduccionDificilJustificacion;
+  const { tabla, numero } = nombreTramoRETA(cotizacion.tramo);
+
+  // Rendimiento neto = beneficio - gastos deducibles - cuota SS (- 5 % en la simplificada)
+  const rendimientoNeto = Math.max(0, beneficio - gastosDeducibles - cuotaRetaAnual - reduccion);
 
   // IRPF: el minimo personal NO se resta de la base. Entra en calcularCuotaIRPF, que lo
   // grava a tipo cero aplicando la escala dos veces (art. 63.1.2 LIRPF).
@@ -122,6 +134,9 @@ function calcularAutonomo(beneficio: number, gastosDeducibles: number): Resultad
     totalCargas,
     netoAnual: Math.max(0, netoAnual),
     tipoEfectivoTotal: beneficio > 0 ? (totalCargas / beneficio) * 100 : 0,
+    tramoTexto: `${tabla}, tramo ${numero}`,
+    regimen,
+    reduccionDificilJustificacion: reduccion,
   };
 }
 
@@ -167,9 +182,10 @@ export default function ComparadorAutonomoVsSLPage() {
   const [gastosDeducibles, setGastosDeducibles] = useState('');
   const [tipoIS, setTipoIS] = useState<TipoISComparador>('25');
   const [repartirDividendos, setRepartirDividendos] = useState(true);
+  const [regimen, setRegimen] = useState<RegimenEstimacionDirecta>(REGIMEN_DIRECTA_POR_DEFECTO);
 
   const [resultados, setResultados] = useState<{
-    autonomo: ResultadoFiscal;
+    autonomo: ResultadoAutonomo;
     sl: ResultadoFiscal;
     ahorroSL: number;
     convieneSL: boolean;
@@ -180,12 +196,12 @@ export default function ComparadorAutonomoVsSLPage() {
     const g = parseSpanishNumber(gastosDeducibles) || 0;
     if (b <= 0) return;
 
-    const resAutonomo = calcularAutonomo(b, g);
+    const resAutonomo = calcularAutonomo(b, g, regimen);
     const resSL = calcularSL(b, g, tipoIS, repartirDividendos);
     const ahorroSL = resAutonomo.totalCargas - resSL.totalCargas;
 
     setResultados({ autonomo: resAutonomo, sl: resSL, ahorroSL, convieneSL: ahorroSL > 0 });
-  }, [beneficio, gastosDeducibles, tipoIS, repartirDividendos]);
+  }, [beneficio, gastosDeducibles, tipoIS, repartirDividendos, regimen]);
 
   return (
     <div className={styles.container}>
@@ -233,6 +249,19 @@ export default function ComparadorAutonomoVsSLPage() {
             helperText="Gastos de la actividad (material, servicios, etc.)"
             min={0}
           />
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="regimen">Régimen del autónomo en el IRPF</label>
+            <select
+              id="regimen"
+              aria-label="Régimen del autónomo en el IRPF: estimación directa normal o simplificada"
+              value={regimen}
+              onChange={e => setRegimen(e.target.value as RegimenEstimacionDirecta)}
+              className={styles.select}
+            >
+              <option value="simplificada">{NOMBRE_REGIMEN_DIRECTA.simplificada}</option>
+              <option value="normal">{NOMBRE_REGIMEN_DIRECTA.normal}</option>
+            </select>
+          </div>
           <div className={styles.formGroup}>
             <label className={styles.label} htmlFor="tipoIS">Tipo IS para la SL</label>
             <select
@@ -306,9 +335,21 @@ export default function ComparadorAutonomoVsSLPage() {
                   <span className={styles.filaValor}>- {formatCurrency(resultados.autonomo.gastosDeducibles)}</span>
                 </div>
                 <div className={styles.filaResultado}>
-                  <span className={styles.filaLabel}>Cuota RETA (SS)</span>
+                  <span className={styles.filaLabel}>Cuota RETA (SS), {resultados.autonomo.tramoTexto}</span>
                   <span className={styles.filaValor}>- {formatCurrency(resultados.autonomo.cuotaSS)}</span>
                 </div>
+                <p className={styles.notaRegimen}>
+                  Régimen supuesto: {NOMBRE_REGIMEN_DIRECTA[resultados.autonomo.regimen].toLowerCase()}
+                  {resultados.autonomo.regimen === 'simplificada'
+                    ? ` (resta un ${GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje} % de gastos de difícil justificación, máximo ${formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)} al año)`
+                    : ''}
+                </p>
+                {resultados.autonomo.reduccionDificilJustificacion > 0 && (
+                  <div className={styles.filaResultado}>
+                    <span className={styles.filaLabel}>Gastos de difícil justificación</span>
+                    <span className={styles.filaValor}>- {formatCurrency(resultados.autonomo.reduccionDificilJustificacion)}</span>
+                  </div>
+                )}
                 <div className={styles.filaResultado}>
                   <span className={styles.filaLabel}>Rendimiento neto</span>
                   <span className={styles.filaValor}>{formatCurrency(resultados.autonomo.rendimientoNeto)}</span>

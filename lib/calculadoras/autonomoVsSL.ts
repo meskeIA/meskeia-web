@@ -6,13 +6,17 @@
  * como autónomo persona física frente a constituir una SL.
  *
  * Fuente: IRPF 2025 + RETA 2026 + IS 2026 (Ley 27/2014, escala micropymes Ley 7/2024)
+ *
+ * El autónomo tributa en estimación directa, simplificada por defecto: desde el 20/10/2026 (cabo
+ * C0294) el régimen decide el tramo del RETA y la base del IRPF, que en la simplificada lleva
+ * restado el 5 % de difícil justificación (art. 30, regla 2.ª, RIRPF). Hasta entonces se suponía
+ * la normal.
  */
 
 import {
   calcularCuotaIntegraGeneral,
-  tramoRETA,
-  rendimientoComputableDesdeActividad,
-  TIPO_COTIZACION_RETA,
+  cotizacionRETADesdeActividad,
+  REGIMEN_DIRECTA_POR_DEFECTO,
   MINIMOS_IRPF_2025,
   TIPOS_IS_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
@@ -20,6 +24,7 @@ import {
   FISCAL_AUTONOMOS_META,
   FISCAL_SOCIEDADES_META,
   calcularCuotaISMicropyme,
+  type RegimenEstimacionDirecta,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -35,6 +40,8 @@ export interface ParametrosAutonomoVsSL {
   tipoIS?: TipoIS;
   /** ¿La SL repartirá dividendos al socio? */
   repartirDividendos?: boolean;
+  /** Modalidad de la estimación directa del autónomo. Por defecto, simplificada. */
+  regimen?: RegimenEstimacionDirecta;
 }
 
 export interface ResultadoFiscal {
@@ -61,6 +68,12 @@ export interface ResultadoComparacion {
   umbralSL: number;
   /** Tipo IS aplicado (%) */
   tipoISAplicado: number;
+  /** Régimen de estimación directa supuesto para el autónomo */
+  regimenAutonomo: RegimenEstimacionDirecta;
+  /** Tramo del RETA del autónomo (numeración interna 1-15) */
+  tramoRETAAutonomo: number;
+  /** Gastos de difícil justificación restados en la base del IRPF del autónomo (0 en la normal) */
+  reduccionDificilJustificacion: number;
   /** Fuente normativa */
   fuenteDatos: string;
 }
@@ -80,13 +93,22 @@ function calcularCuotaAhorro(base: number): number {
 }
 
 /**
- * Cuota anual a la base mínima del tramo. El tramo se busca con el rendimiento computable del
- * art. 308.1.c LGSS: (ingresos − gastos, sin la cuota) menos el 7 % de gastos genéricos. Hasta
- * el 18/10/2026 (cabo C0105) se buscaba con (ingresos − gastos) / 12 sin el 7 %.
+ * Cuota anual a la base mínima del tramo y base del IRPF del autónomo. El tramo se busca con el
+ * rendimiento computable del art. 308.1.c LGSS (`cotizacionRETADesdeActividad`). Hasta el
+ * 18/10/2026 (cabo C0105) se buscaba con (ingresos − gastos) / 12 sin el 7 %, y hasta el
+ * 20/10/2026 (cabo C0294) sin el 5 % de difícil justificación de la simplificada.
  */
-function calcularCuotaRetaAnual(ingresosMenosGastosAnual: number): number {
-  const tramo = tramoRETA(rendimientoComputableDesdeActividad(ingresosMenosGastosAnual));
-  return tramo.baseMinima * TIPO_COTIZACION_RETA * 12;
+function calcularAutonomoRetaIRPF(ingresosMenosGastosAnual: number, regimen: RegimenEstimacionDirecta) {
+  const r = (n: number) => Math.round(n * 100) / 100;
+  const c = cotizacionRETADesdeActividad(ingresosMenosGastosAnual, regimen);
+  const cuotaRetaAnual = r(c.cuotaMensual * 12);
+  const reduccion = r(c.reduccionDificilJustificacion);
+  return {
+    tramo: c.tramo.id,
+    cuotaRetaAnual,
+    reduccion,
+    baseIRPF: Math.max(0, ingresosMenosGastosAnual - cuotaRetaAnual - reduccion),
+  };
 }
 
 // Cuota de IS según el tipo de SL: las micropymes tributan por la escala
@@ -106,14 +128,16 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
 
   const gastosDeducibles = p.gastosDeducibles ?? 0;
   const repartirDividendos = p.repartirDividendos !== false; // por defecto sí
+  const regimen = p.regimen ?? REGIMEN_DIRECTA_POR_DEFECTO;
 
   // ─── AUTÓNOMO ───────────────────────────────────────────────────────────────
 
   const rendimientoNetoAutonomo = Math.max(0, p.beneficioAnual - gastosDeducibles);
-  const cuotaRetaAnual = r(calcularCuotaRetaAnual(rendimientoNetoAutonomo));
+  const retaIRPF = calcularAutonomoRetaIRPF(rendimientoNetoAutonomo, regimen);
+  const cuotaRetaAnual = retaIRPF.cuotaRetaAnual;
 
-  // Rendimiento neto tras SS (base IRPF autónomo)
-  const baseIRPFAutonomo = Math.max(0, rendimientoNetoAutonomo - cuotaRetaAnual);
+  // Rendimiento neto tras SS, y en la simplificada tras el 5 % (base IRPF autónomo)
+  const baseIRPFAutonomo = retaIRPF.baseIRPF;
 
   // IRPF: art. 63.1.2 LIRPF. Reparado a mano el 09/09/2026; desde el 12/09/2026 la formula
   // ya no se reescribe aqui, la pone data/fiscal/irpf.ts.
@@ -186,8 +210,7 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
   for (let b = 30000; b <= 200000; b += 1000) {
     const gd = gastosDeducibles;
     const rnA = Math.max(0, b - gd);
-    const cuotaR = calcularCuotaRetaAnual(rnA);
-    const baseA = Math.max(0, rnA - cuotaR);
+    const { cuotaRetaAnual: cuotaR, baseIRPF: baseA } = calcularAutonomoRetaIRPF(rnA, regimen);
     const cargaA = cuotaR + calcularCuotaIntegraGeneral(baseA, MINIMOS_IRPF_2025.personal);
     const benefS = Math.max(0, b - gd);
     const cuotaISU = calcularCuotaIS(benefS, p.tipoIS);
@@ -207,6 +230,9 @@ export function compararAutonomoVsSL(p: ParametrosAutonomoVsSL): ResultadoCompar
     convieneSL,
     umbralSL,
     tipoISAplicado: tipoISEfectivo,
+    regimenAutonomo: regimen,
+    tramoRETAAutonomo: retaIRPF.tramo,
+    reduccionDificilJustificacion: retaIRPF.reduccion,
     fuenteDatos: `${FISCAL_AUTONOMOS_META.fuente} | ${FISCAL_SOCIEDADES_META.fuente}`,
   };
 }

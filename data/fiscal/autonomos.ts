@@ -18,6 +18,8 @@
  *    precisamente la que no venía de la fuente primaria.
  */
 
+import { reduccionGastosDificilJustificacion } from './estimacion-directa';
+
 export const FISCAL_AUTONOMOS_META = {
   fuente: 'Real Decreto-ley 13/2022 + Orden PJC/297/2026 (cotización 2026, art. 18)',
   descripcion: 'Sistema de cotización por ingresos reales para autónomos',
@@ -160,29 +162,107 @@ export function rendimientoComputableMensualRETA(p: {
   return (base * (1 - deduccion)) / 12;
 }
 
+/** Modalidad de la estimación directa del IRPF (arts. 28-30 RIRPF). */
+export type RegimenEstimacionDirecta = 'normal' | 'simplificada';
+
 /**
- * Rendimiento computable MENSUAL para quien da los ingresos y los gastos de la actividad SIN la
- * cuota del RETA, que es lo que piden estimador-cuota-autonomo, comparador-autonomo-vs-sl y las
- * herramientas del MCP («ingresos − gastos, antes de cuota»). En estimación directa esa resta
- * YA es «el rendimiento neto, incrementado en el importe de las cuotas» de la regla 1.ª: la
- * cuota se descuenta para el IRPF y se vuelve a sumar para el tramo, así que no hay punto fijo
- * cuota → tramo → cuota. Solo falta la regla 2.ª, el 7 % (3 % societarios).
- *
- * ⚠️ 18/10/2026 — cabo C0105: hasta hoy esos cuatro consumidores buscaban el tramo con
- * (ingresos − gastos) / 12, sin el 7 %. Con 30.000 € de ingresos y 4.500 € de gastos buscaban
- * con 2.125 €/mes (general, tramo 6, cuota mínima 401,47 €); con la regla 2.ª son
- * 25.500 × 0,93 / 12 = 1.976,25 €/mes (general, tramo 5, 380,88 €).
- * NO aplica el 5 % de gastos de difícil justificación de la directa SIMPLIFICADA (art. 30.2.4.ª
- * RIRPF), que rebajaría algo más el rendimiento: supone la directa normal, como el IRPF que
- * calculan esos mismos consumidores.
+ * La simplificada es la de casi todos los autónomos: se aplica salvo renuncia o cifra de negocios
+ * del año anterior por encima de 600.000 € (art. 28 RIRPF). Las apps de cuota y el MCP la marcan
+ * por defecto y preguntan (decisión del usuario del 18/10/2026, cabo C0294).
  */
-export function rendimientoComputableDesdeActividad(ingresosMenosGastosAnual: number, societario = false): number {
-  return rendimientoComputableMensualRETA({
+export const REGIMEN_DIRECTA_POR_DEFECTO: RegimenEstimacionDirecta = 'simplificada';
+
+export const NOMBRE_REGIMEN_DIRECTA: Record<RegimenEstimacionDirecta, string> = {
+  normal: 'Estimación directa normal',
+  simplificada: 'Estimación directa simplificada',
+};
+
+export interface CotizacionDesdeActividad {
+  /** Rendimiento computable MENSUAL del art. 308.1.c LGSS, el que decide el tramo. */
+  computableMensual: number;
+  tramo: TramoCotizacion;
+  /** Cuota mensual a la base mínima del tramo, sin redondear. */
+  cuotaMensual: number;
+  /** Gastos de difícil justificación del año (art. 30, regla 2.ª, RIRPF); 0 en la normal. */
+  reduccionDificilJustificacion: number;
+  /** Rendimiento neto anual del IRPF: ingresos − gastos − cuota − difícil justificación. */
+  rendimientoNetoIRPF: number;
+}
+
+/**
+ * Tramo, cuota y rendimiento computable para quien da los ingresos y los gastos de la actividad
+ * SIN la cuota del RETA, que es lo que piden estimador-cuota-autonomo, comparador-autonomo-vs-sl
+ * y las herramientas del MCP («ingresos − gastos, antes de cuota»).
+ *
+ * Regla 1.ª del art. 308.1.c LGSS: el rendimiento neto del IRPF más la cuota. En la directa
+ * NORMAL, el neto es ingresos − gastos − cuota, así que la cuota se descuenta y se vuelve a sumar:
+ * el computable es (ingresos − gastos) × 0,93 / 12. En la SIMPLIFICADA, el neto lleva además
+ * restado el 5 % de difícil justificación (art. 30, regla 2.ª, RIRPF, tope 2.000 €/año), que se
+ * calcula sobre el neto YA descontada la cuota, y la regla 1.ª no lo devuelve: el computable es
+ * (ingresos − gastos − 5 % de (ingresos − gastos − cuota)) × 0,93 / 12.
+ *
+ * Como la cuota depende del tramo, en la simplificada hay punto fijo cuota → tramo → cuota. Se
+ * parte del tramo de la normal (el computable de la simplificada nunca es mayor) y se baja hasta
+ * que el tramo no cambia: con más cuota la reducción es menor y el computable mayor, así que la
+ * serie solo puede bajar y termina. La cuota es la de la base mínima del tramo, la que suponen
+ * las apps; con tarifa plana o una base mayor la cuota deducida real es otra.
+ *
+ * ⚠️ 18/10/2026 — cabo C0105: hasta entonces se buscaba el tramo con (ingresos − gastos) / 12,
+ * sin el 7 %. Con 30.000 € de ingresos y 4.500 € de gastos buscaban con 2.125 €/mes (general,
+ * tramo 6, cuota mínima 401,47 €); con la regla 2.ª son 25.500 × 0,93 / 12 = 1.976,25 €/mes.
+ * ⚠️ 20/10/2026 — cabo C0294: hasta hoy suponía siempre la NORMAL. Con 24.516,13 € de ingresos
+ * menos gastos, la normal da 1.900 €/mes (general, tramo 5, 380,88 €) y la simplificada
+ * 1.821,75 €/mes (general, tramo 4, 360,29 €): un tramo menos.
+ */
+export function cotizacionRETADesdeActividad(
+  ingresosMenosGastosAnual: number,
+  regimen: RegimenEstimacionDirecta,
+  societario = false,
+): CotizacionDesdeActividad {
+  const calcular = (tramo: TramoCotizacion): CotizacionDesdeActividad => {
+    const cuotaMensual = tramo.baseMinima * TIPO_COTIZACION_RETA;
+    const cuotaAnual = cuotaMensual * 12;
+    const reduccion = regimen === 'simplificada'
+      ? reduccionGastosDificilJustificacion(ingresosMenosGastosAnual - cuotaAnual)
+      : 0;
+    return {
+      // (neto + cuota) con neto = x − cuota − reducción: se suma sin pasar por la cuota para que
+      // en la normal salga exactamente x × 0,93 / 12 y las fronteras no dependan del redondeo.
+      computableMensual: rendimientoComputableMensualRETA({
+        rendimientoNetoAnual: ingresosMenosGastosAnual - reduccion,
+        cuotasAnuales: 0,
+        metodo: 'directa',
+        societario,
+      }),
+      tramo,
+      cuotaMensual,
+      reduccionDificilJustificacion: reduccion,
+      rendimientoNetoIRPF: ingresosMenosGastosAnual - cuotaAnual - reduccion,
+    };
+  };
+
+  // Se parte del tramo de la normal, que acota por arriba.
+  let actual = calcular(tramoRETA(rendimientoComputableMensualRETA({
     rendimientoNetoAnual: ingresosMenosGastosAnual,
-    cuotasAnuales: 0, // ya están dentro: la resta no las descontó
+    cuotasAnuales: 0,
     metodo: 'directa',
     societario,
-  });
+  })));
+  for (let i = 0; i < TRAMOS_RETA_2025.length; i++) {
+    const siguiente = tramoRETA(actual.computableMensual);
+    if (siguiente.id === actual.tramo.id) return actual;
+    actual = calcular(siguiente);
+  }
+  return actual;
+}
+
+/** Rendimiento computable MENSUAL de `cotizacionRETADesdeActividad`, para quien solo quiere el tramo. */
+export function rendimientoComputableDesdeActividad(
+  ingresosMenosGastosAnual: number,
+  regimen: RegimenEstimacionDirecta,
+  societario = false,
+): number {
+  return cotizacionRETADesdeActividad(ingresosMenosGastosAnual, regimen, societario).computableMensual;
 }
 
 // Bases de referencia 2026

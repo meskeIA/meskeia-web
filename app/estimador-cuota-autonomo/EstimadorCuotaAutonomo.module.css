@@ -179,6 +179,29 @@
   color: var(--text-muted);
 }
 
+/* Selector del régimen de la directa (cabo C0294) */
+.selectRegimen {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  cursor: pointer;
+}
+
+.selectRegimen:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.notaRegimen {
+  margin: 0 0 var(--spacing-sm);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
 /* Selector de bonificación */
 .bonificacionSelector {
   padding-top: var(--spacing-lg);
@@ -628,6 +651,7 @@
 
 /* Dark Mode */
 [data-theme='dark'] .inputWrapper input,
+[data-theme='dark'] .selectRegimen,
 [data-theme='dark'] .selectBonificacion select {
   background: var(--bg-card);
   border-color: var(--border);

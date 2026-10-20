@@ -45,7 +45,8 @@ async function fila(page: Page, etiqueta: string): Promise<string> {
  * no valores. Sin rellenarlos, el beneficio es 0 y la app ni siquiera calcula; y rellenar solo
  * el beneficio deja los gastos en 0, que da otra base y otra cuota. Los dos, siempre.
  */
-async function comparar(page: Page, beneficio: string, gastos: string): Promise<void> {
+async function comparar(page: Page, beneficio: string, gastos: string, regimen?: 'normal' | 'simplificada'): Promise<void> {
+  if (regimen) await page.locator('#regimen').selectOption(regimen);
   await page.getByLabel('Beneficio bruto anual previsto').fill(beneficio);
   await page.getByLabel('Gastos deducibles anuales').fill(gastos);
   await page.getByRole('button', { name: 'Comparar', exact: true }).click();
@@ -76,7 +77,9 @@ test('CASO 1 · 60.000 € de beneficio y 10.000 € de gastos', async ({ page }
   //
   // El defecto del mínimo (12/09/2026) daba escala(43.947,05 − 5.550): el mínimo valorado al
   // 37 % marginal y no al 19 %, 999,00 € menos de IRPF.
-  await comparar(page, '60000', '10000');
+  // Cuentas de la directa NORMAL: desde el 20/10/2026 (cabo C0294) la simplificada es la de por
+  // defecto y resta además el 5 % de difícil justificación (casos C0294, al final).
+  await comparar(page, '60000', '10000', 'normal');
 
   expect(await fila(page, 'IRPF estimado')).toBe('- 10.907,41 €');
   expect(await fila(page, 'Total cargas (SS + IRPF)')).toBe('16.960,36 €');
@@ -97,8 +100,8 @@ test('CASO 2 · 120.000 € de beneficio: el mínimo cae entero en el tramo del 
   //   escala(5.550)      = 1.054,50 €
   //   cuota íntegra      = 36.067,3019 → 36.067,30 €
   // Total cargas = 7.288,22 + 36.067,30 = 43.355,52 €
-  // Neto anual = 110.000 − 43.355,52 = 66.644,48 €
-  await comparar(page, '120000', '10000');
+  // Neto anual = 110.000 − 43.355,52 = 66.644,48 €  (directa NORMAL, como el CASO 1)
+  await comparar(page, '120000', '10000', 'normal');
 
   expect(await fila(page, 'IRPF estimado')).toBe('- 36.067,30 €');
   expect(await fila(page, 'Total cargas (SS + IRPF)')).toBe('43.355,52 €');
@@ -146,4 +149,48 @@ test('C0339 · la cuota del autónomo societario es la de la orden de cotizació
   // Y el cálculo: la fila de la SL resta la cuota anual entera
   await comparar(page, '60000', '10000');
   expect(await fila(page, 'Autónomo societario (SS)')).toBe('- 5384,28 €');
+});
+
+// Cabo C0294 (20/10/2026): la app suponía siempre la directa NORMAL. Pregunta el régimen, con la
+// simplificada por defecto, que resta un 5 % de difícil justificación (art. 30, regla 2.ª, RIRPF,
+// tope 2.000 €/año, BOE-A-2007-6820 consultado el 20/10/2026) sobre el neto ya descontada la
+// cuota, en el tramo del RETA (el art. 308.1.c LGSS no lo devuelve) y en la base del IRPF.
+test('C0294 · 30.000 y 4.500 en simplificada (por defecto): mismo tramo, 5 % menos en la base del IRPF', async ({ page }) => {
+  // Tramo 8 (general, tramo 5): cuota 1.209,15 × 31,50 % × 12 = 4.570,587. Computable
+  // (25.500 − 5 % de 20.929,413) × 0,93 / 12 = 1.895,15 → sigue en el tramo 8.
+  // 5 % = 1.046,47065 → rendimiento neto 25.500 − 4.570,587 − 1.046,47065 = 19.882,94235
+  //   escala(19.882,94) = 2.365,50 + 7.432,94235 × 24 % = 2.365,50 + 1.783,90616 = 4.149,40616
+  //   cuota = 4.149,40616 − 1.054,50 = 3.094,90616 → 3.094,91 €
+  // Total = 4.570,587 + 3.094,90616 = 7.665,49316 → 7.665,49 · neto 25.500 − 7.665,49316 = 17.834,51
+  // En la normal: base 20.929,413 → escala = 2.365,50 + 7.750 × 24 % (1.860,00) + 729,413 × 30 %
+  // (218,8239) = 4.444,3239 → cuota 3.389,8239 → 3.389,82 €; total 4.570,587 + 3.389,8239 = 7.960,41.
+  await expect(page.locator('#regimen')).toHaveValue('simplificada');
+  await expect(page.getByRole('combobox', { name: /Régimen del autónomo en el IRPF/ })).toBeVisible();
+  await comparar(page, '30000', '4500');
+
+  expect(await fila(page, 'Cuota RETA (SS), general, tramo 5')).toBe('- 4570,59 €');
+  expect(await fila(page, 'Gastos de difícil justificación')).toBe('- 1046,47 €');
+  expect(await fila(page, 'Rendimiento neto')).toBe('19.882,94 €');
+  expect(await fila(page, 'IRPF estimado')).toBe('- 3094,91 €');
+  expect(await fila(page, 'Total cargas (SS + IRPF)')).toBe('7665,49 €');
+  expect(await fila(page, 'Neto anual estimado')).toBe('17.834,51 €');
+  const texto = limpiar((await page.locator('body').textContent()) ?? '');
+  expect(texto).toContain('Régimen supuesto: estimación directa simplificada (resta un 5 % de gastos de difícil justificación, máximo 2000,00 € al año)');
+
+  await comparar(page, '30000', '4500', 'normal');
+  expect(await fila(page, 'IRPF estimado')).toBe('- 3389,82 €');
+  expect(await fila(page, 'Total cargas (SS + IRPF)')).toBe('7960,41 €');
+  expect(await page.getByText('Gastos de difícil justificación', { exact: true }).count()).toBe(0);
+  expect(limpiar((await page.locator('body').textContent()) ?? '')).toContain('Régimen supuesto: estimación directa normal');
+});
+
+test('C0294 · frontera: 24.516,13 € sin gastos cotiza en simplificada un tramo menos que en normal', async ({ page }) => {
+  // Normal: 24.516,13 × 0,93 / 12 = 1.900,00 → tramo 8 (general, tramo 5), 4.570,587 → 4.570,59 €.
+  // Simplificada: con la cuota del 8, 1.822,71 → tramo 7; con la del 7 (1.143,79 × 31,50 % × 12 =
+  // 4.323,5262), 5 % de 20.192,6038 = 1.009,63 → (24.516,13 − 1.009,63) × 0,0775 = 1.821,75 → tramo
+  // 7 (general, tramo 4), estable: 4.323,53 €.
+  await comparar(page, '24516,13', '0', 'normal');
+  expect(await fila(page, 'Cuota RETA (SS), general, tramo 5')).toBe('- 4570,59 €');
+  await comparar(page, '24516,13', '0', 'simplificada');
+  expect(await fila(page, 'Cuota RETA (SS), general, tramo 4')).toBe('- 4323,53 €');
 });
