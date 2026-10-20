@@ -67,7 +67,7 @@ export const faqJsonLd = {
       name: '¿Cuándo conviene más una Sociedad Limitada que ser autónomo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En términos generales, una SL suele ser más ventajosa fiscalmente a partir de beneficios netos de unos 40.000–50.000 € anuales, momento en que el IRPF del autónomo supera el Impuesto sobre Sociedades del 25%. Por debajo de esa cifra, los costes de constitución y gestión de la SL suelen superar el ahorro fiscal. El punto de equilibrio exacto depende de los gastos deducibles, la comunidad autónoma y si se reinvierte el beneficio o se reparte como dividendos.',
+        text: 'No hay una cifra de beneficio a partir de la cual la SL compense siempre. El ahorro posible está en la parte del beneficio que se queda en la sociedad, que tributa por el Impuesto sobre Sociedades en lugar de por el tipo marginal del IRPF; lo que se retira como sueldo o dividendos vuelve a tributar en el IRPF, y la SL añade costes de constitución, gestión y la cotización del administrador. Por eso el punto de equilibrio depende del beneficio, de cuánto se retira, de los gastos deducibles y de la comunidad autónoma: esta herramienta lo estima con el beneficio, los gastos, el tipo del IS y si se reparte o no el beneficio.',
       },
     },
     {

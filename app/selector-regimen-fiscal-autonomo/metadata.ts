@@ -65,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Cuándo conviene constituir una Sociedad Limitada en lugar de seguir como autónomo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Crear una SL suele ser ventajoso cuando el beneficio neto supera aproximadamente 40.000-50.000 € anuales, ya que el Impuesto de Sociedades (25%) puede resultar inferior al IRPF marginal que pagaría un autónomo persona física. También es recomendable cuando hay varios socios, se quiere limitar la responsabilidad patrimonial personal o se necesita atraer inversores. La SL implica más costes de gestión (asesoría, auditoría en ciertos casos, depósito de cuentas).',
+        text: 'No hay una cifra de beneficio a partir de la cual la SL compense siempre: el Impuesto de Sociedades (25 % general) puede resultar inferior al IRPF marginal que pagaría un autónomo persona física sobre la parte del beneficio que se deja en la sociedad, pero lo que se retira como sueldo o dividendos vuelve a tributar en el IRPF. Depende del beneficio, de cuánto se retira y de los costes de la SL, y el comparador autónomo vs SL lo calcula con las cifras de cada caso. También es recomendable cuando hay varios socios, se quiere limitar la responsabilidad patrimonial personal o se necesita atraer inversores. La SL implica más costes de gestión (asesoría, auditoría en ciertos casos, depósito de cuentas).',
       },
     },
     {

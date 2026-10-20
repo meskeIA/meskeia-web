@@ -116,7 +116,7 @@ const faqData = [
   },
   {
     question: '¿Cuándo me conviene pasar de autónomo a SL?',
-    answer: 'Como regla general, a partir de 40.000-50.000€ de beneficio anual puede empezar a compensar una SL. Pero depende de muchos factores: si reinviertes beneficios, si quieres protección patrimonial, si tienes empleados, etc.',
+    answer: 'No hay una cifra de beneficio que valga para todos: depende de cuánto beneficio dejas en la sociedad y cuánto retiras (lo retirado vuelve a tributar en el IRPF), de los costes de la SL y de otros factores, como si quieres protección patrimonial o tienes empleados. El comparador autónomo vs SL lo calcula con tus cifras.',
   },
   {
     question: '¿Cuánto debería cobrar por hora como freelance?',

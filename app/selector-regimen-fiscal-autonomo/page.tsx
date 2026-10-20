@@ -339,7 +339,7 @@ const RECOMENDACIONES: Record<RegimenId, Recomendacion> = {
     titulo: 'Constituir una Sociedad Limitada (SL)',
     subtitulo: 'Tributación por Impuesto de Sociedades (IS) al 25%',
     descripcion:
-      'Tu perfil indica que podrías beneficiarte de constituir una Sociedad Limitada. A partir de ciertos niveles de beneficio (generalmente a partir de 40.000–60.000 € netos anuales), tributar al tipo del Impuesto de Sociedades (25%, o 15% los dos primeros años para nuevas entidades) puede ser más eficiente que el IRPF como autónomo, que puede llegar al 47%. Además, la SL separa el patrimonio personal del empresarial, facilita la captación de socios e inversores y da una imagen más profesional ante clientes empresariales.',
+      'Tu perfil indica que podrías beneficiarte de constituir una Sociedad Limitada. Con un beneficio alto, y sobre la parte que se deja en la sociedad, tributar al tipo del Impuesto de Sociedades (25%, o 15% los dos primeros años para nuevas entidades) puede ser más eficiente que el IRPF como autónomo, que puede llegar al 47%. Además, la SL separa el patrimonio personal del empresarial, facilita la captación de socios e inversores y da una imagen más profesional ante clientes empresariales.',
     ventajas: [
       'Tipo IS 25% (o 15% nuevas empresas los 2 primeros años)',
       'Separación patrimonio personal del empresarial',
@@ -604,10 +604,13 @@ export default function SelectorRegimenFiscalAutonomo() {
 
         <h3>¿Cuándo plantearse constituir una SL?</h3>
         <p>
-          Cuando el beneficio neto supera de forma sostenida los 40.000–60.000 € anuales, el Impuesto de
-          Sociedades (tipo general 25%, o 15% los dos primeros ejercicios para nuevas entidades) puede resultar
-          más eficiente que el IRPF como autónomo, cuyo tipo marginal puede llegar al 47% en los tramos más
-          altos. Además, la SL ofrece separación del patrimonio personal, mayor credibilidad ante terceros y
+          Cuando el beneficio es alto de forma sostenida, el Impuesto de Sociedades (tipo general 25%, o 15%
+          los dos primeros ejercicios para nuevas entidades) puede resultar más eficiente que el IRPF como
+          autónomo, cuyo tipo marginal puede llegar al 47% en los tramos más altos, sobre la parte del
+          beneficio que se queda en la sociedad: lo que se retira como sueldo o dividendos vuelve a tributar
+          en el IRPF. No hay una cifra de beneficio que valga para todos; el{' '}
+          <a href="/comparador-autonomo-vs-sl/">comparador autónomo vs SL</a> lo calcula con tus cifras.
+          Además, la SL ofrece separación del patrimonio personal, mayor credibilidad ante terceros y
           facilita la incorporación de socios e inversores. Sin embargo, implica mayores costes de constitución
           y administrativos.
         </p>

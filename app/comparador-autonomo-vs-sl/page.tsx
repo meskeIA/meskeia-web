@@ -410,7 +410,7 @@ export default function ComparadorAutonomoVsSLPage() {
             <div className={styles.guideCard}>
               <h4><span aria-hidden="true">📊</span> Fiscalidad (cuándo suele convenir SL)</h4>
               <ul>
-                <li>Beneficios netos anuales superiores a <strong>40.000-60.000 €</strong> aprox.</li>
+                <li>Beneficios lo bastante altos como para que el tipo marginal del IRPF supere al del IS (la calculadora de arriba lo mide con tus cifras)</li>
                 <li>Cuando no necesitas retirar todo el beneficio como salario</li>
                 <li>Si vas a reinvertir beneficios en el negocio</li>
                 <li>Primeros 2 años: tipo IS 15% vs IRPF progresivo</li>
@@ -599,10 +599,10 @@ export default function ComparadorAutonomoVsSLPage() {
             <div className={styles.faqItem}>
               <dt>¿A partir de cuántos ingresos compensa crear una SL?</dt>
               <dd>
-                No hay una cifra exacta porque depende de cuánto retiras, cuánto reinviertes y los costes fijos de
-                tu SL. Como referencia orientativa: con beneficios netos entre <strong>40.000-50.000 €</strong> y
-                costes SL de ~5.000 €/año, el ahorro fiscal empieza a cubrir los gastos de estructura. Con más de
-                60.000 € el ahorro suele ser claro. Por debajo de 35.000 €, la SL raramente compensa.
+                No hay una cifra que valga para todos, porque depende de cuánto retiras, cuánto reinviertes y los
+                costes fijos de tu SL: el ahorro fiscal de lo que se queda en la sociedad tiene que cubrir los gastos
+                de estructura. La calculadora de arriba hace esa cuenta con tus ingresos, tus gastos, el tipo del IS
+                que te corresponda y si repartes o no el beneficio.
               </dd>
             </div>
             <div className={styles.faqItem}>
@@ -770,7 +770,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Evalúa el umbral real de rentabilidad</h4>
               <p>
-                No crees una SL solo por el ahorro fiscal si los beneficios son inferiores a <strong>50.000 €</strong>.
+                No crees una SL solo por el ahorro fiscal sin comprobar que cubre lo que cuesta la estructura.
                 Los costes fijos anuales (gestoría ~3.000 €, cuentas anuales, autónomo societario ~6.180 €)
                 suman fácilmente <strong>5.000-7.000 €/año</strong> en obligaciones que el autónomo no tiene.
                 Haz el cálculo neto real antes de decidir.

@@ -163,7 +163,7 @@ const VEREDICTOS: Record<VeredictoKey, Veredicto> = {
     ],
     inconvenientes: [
       'Responsabilidad ilimitada con tu patrimonio personal',
-      'IRPF puede ser más alto que el IS a partir de ~40.000 € de beneficio',
+      'Con beneficios altos, el IRPF puede superar al IS sobre lo que se dejaría en una sociedad',
       'Imagen menos corporativa frente a grandes clientes',
       'Dificulta captar socios o inversores',
     ],
@@ -173,7 +173,7 @@ const VEREDICTOS: Record<VeredictoKey, Veredicto> = {
     titulo: 'Constituir una Sociedad Limitada',
     subtitulo: 'Tu perfil apunta hacia una Sociedad Limitada (SL)',
     descripcion:
-      'Tus respuestas sugieren que la Sociedad Limitada puede ofrecerte ventajas importantes: separación patrimonial, posible ahorro fiscal cuando los beneficios superan los 40.000-50.000 €, e imagen más profesional frente a clientes y entidades financieras. Requiere escritura ante notario, inscripción en el Registro Mercantil y llevar contabilidad formal.',
+      'Tus respuestas sugieren que la Sociedad Limitada puede ofrecerte ventajas importantes: separación patrimonial, posible ahorro fiscal según el beneficio y cuánto retires de la sociedad, e imagen más profesional frente a clientes y entidades financieras. Requiere escritura ante notario, inscripción en el Registro Mercantil y llevar contabilidad formal.',
     ventajas: [
       'Responsabilidad limitada al capital aportado',
       'Tipo IS del 23-25 % (puede ser menor que el IRPF)',
@@ -459,11 +459,14 @@ export default function SelectorFormaJuridica() {
         </h3>
         <p>
           En términos generales, el Impuesto sobre Sociedades (IS) al tipo del 23-25 % puede
-          resultar más ventajoso que el IRPF cuando el beneficio de la actividad supera los{' '}
-          <strong>40.000-50.000 € anuales</strong>. A partir de ese umbral, el tipo marginal del
-          IRPF escala rápidamente (37-47 %), mientras que el IS se mantiene estable. No obstante,
-          el análisis debe incluir también la retribución del socio-administrador, las
-          cotizaciones a la Seguridad Social y los gastos de gestión de la SL.
+          resultar más ventajoso que el IRPF sobre la parte del beneficio que se queda en la
+          sociedad: el tipo marginal del IRPF escala (37-47 %), mientras que el IS no sube con el
+          beneficio de la misma forma. No hay una cifra de beneficio que valga para todos: depende
+          de cuánto se retira como sueldo o dividendos (que vuelven a tributar en el IRPF), de la
+          retribución del socio-administrador, las cotizaciones a la Seguridad Social y los gastos
+          de gestión de la SL. El{' '}
+          <a href="/comparador-autonomo-vs-sl/">comparador autónomo vs SL</a> lo calcula con tus
+          cifras.
         </p>
 
         <h3 style={{ marginTop: '1.25rem', color: 'var(--primary-texto)', fontSize: '1rem' }}>

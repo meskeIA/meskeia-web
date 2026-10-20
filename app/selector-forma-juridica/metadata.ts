@@ -81,7 +81,7 @@ export const faqJsonLd = {
       name: '¿Cuándo conviene constituir una Sociedad Limitada en lugar de ser autónomo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Generalmente conviene plantearse la SL cuando los beneficios netos superan los 40.000-50.000 € anuales, ya que el tipo del Impuesto sobre Sociedades (25 % general, o 19-21 % en escala progresiva para empresas con cifra de negocio inferior a 1 millón de euros) puede ser inferior al IRPF marginal. También es recomendable si el proyecto implica varios socios, necesita financiación externa o presenta un riesgo patrimonial elevado, dado que la SL limita la responsabilidad al capital aportado.',
+        text: 'No hay una cifra de beneficio a partir de la cual la SL compense siempre: depende del beneficio, de cuánto se retira de la sociedad como sueldo o dividendos (que vuelven a tributar en el IRPF) y de lo que cuestan su gestión y la cotización del administrador. Lo que la SL puede ahorrar es la diferencia entre el tipo del Impuesto sobre Sociedades (25 % general, o 19-21 % en escala progresiva para empresas con cifra de negocio inferior a 1 millón de euros) y el IRPF marginal sobre lo que se deja en la sociedad; el comparador autónomo vs SL lo calcula con las cifras de cada caso. También es recomendable si el proyecto implica varios socios, necesita financiación externa o presenta un riesgo patrimonial elevado, dado que la SL limita la responsabilidad al capital aportado.',
       },
     },
     {
@@ -113,7 +113,7 @@ export const faqJsonLd = {
       name: '¿Qué forma jurídica es mejor para un freelance que empieza?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para quien empieza con ingresos inciertos, el alta como autónomo es la opción más sencilla y económica: sin capital mínimo, sin gestión mercantil y con la tarifa plana de cuota reducida durante el primer año. La SL tiene sentido cuando el negocio ya genera beneficios regulares superiores a 40.000-50.000 € anuales o cuando sea necesario separar legalmente el patrimonio personal del profesional.',
+        text: 'Para quien empieza con ingresos inciertos, el alta como autónomo es la opción más sencilla y económica: sin capital mínimo, sin gestión mercantil y con la tarifa plana de cuota reducida durante el primer año. La SL tiene sentido cuando el negocio ya genera beneficios regulares —a partir de cuánto depende de lo que se retire de la sociedad y de sus costes, y lo calcula el comparador autónomo vs SL— o cuando sea necesario separar legalmente el patrimonio personal del profesional.',
       },
     },
   ],
