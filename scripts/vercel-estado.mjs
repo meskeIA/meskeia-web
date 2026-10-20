@@ -22,6 +22,7 @@
  * consumo NO se consultan desde aquí, solo desde el panel de Usage.
  */
 
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -97,15 +98,35 @@ async function listarDespliegues(limite = 10) {
   const { deployments = [] } = await api(`/v6/deployments?projectId=${projectId}&limit=${limite}`);
   if (!deployments.length) return console.log('No hay despliegues.');
 
+  // El commit de cierre de /push lleva SIEMPRE el mismo mensaje («refresca app-dates
+  // del lote»): por el título no se distingue el push recién hecho del anterior, y
+  // el 20/10/2026 se dio por verde el despliegue de 3 h antes mientras el nuevo, que
+  // aún no salía en la lista, acabó en error. Lo que identifica el push es el SHA.
+  let head = '';
+  try {
+    head = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: RAIZ, encoding: 'utf8' }).trim();
+  } catch { /* sin git: se lista sin la marca */ }
+
   console.log(`\nÚltimos ${deployments.length} despliegues de meskeia-web:\n`);
   for (const d of deployments) {
     const titulo = (d.meta?.githubCommitMessage || '(sin mensaje)').split('\n')[0];
     const duracion = d.ready && d.buildingAt ? `${Math.round((d.ready - d.buildingAt) / 1000)} s` : '—';
-    console.log(`${SEMAFORO[d.state] || '·'} ${fecha(d.created)}  ${String(duracion).padStart(6)}  ${titulo.slice(0, 62)}`);
+    const sha = d.meta?.githubCommitSha || '';
+    const marca = head && sha === head ? '  ← HEAD local' : '';
+    console.log(`${SEMAFORO[d.state] || '·'} ${fecha(d.created)}  ${String(duracion).padStart(6)}  ${sha.slice(0, 7) || '·······'}  ${titulo.slice(0, 54)}${marca}`);
     console.log(`   ${d.uid}`);
   }
   const fallidos = deployments.filter((d) => d.state === 'ERROR').length;
-  console.log(fallidos ? `\n⚠️  ${fallidos} con error en esta ventana.\n` : '\nSin errores en esta ventana.\n');
+  console.log(fallidos ? `\n⚠️  ${fallidos} con error en esta ventana.` : '\nSin errores en esta ventana.');
+
+  if (head) {
+    // Manda el más reciente del commit local: un redespliegue en verde tapa el error anterior
+    const delHead = deployments.find((d) => d.meta?.githubCommitSha === head);
+    if (!delHead) console.log(`⏳ Ningún despliegue de HEAD (${head.slice(0, 7)}) todavía: el push aún no ha llegado a Vercel. No darlo por bueno.`);
+    else if (delHead.state === 'READY') console.log(`✅ HEAD (${head.slice(0, 7)}) desplegado.`);
+    else console.log(`${SEMAFORO[delHead.state] || '·'} HEAD (${head.slice(0, 7)}) en estado ${delHead.state}.`);
+  }
+  console.log('');
 }
 
 async function verLogs(idDado) {
