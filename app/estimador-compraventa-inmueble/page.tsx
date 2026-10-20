@@ -428,6 +428,8 @@ interface ResultadosVendedor {
   veredictoNeto: Veredicto;
   veredictoIrpf: Veredicto;
   veredictoGanancia: Veredicto;
+  /** Sondeo de la base del IRPF tras la exención por reinversión (hallazgo 2904). */
+  veredictoBase: Veredicto;
 }
 
 // ===== CÁLCULO DEL VENDEDOR =====
@@ -1202,6 +1204,9 @@ export default function SimuladorCompraventaPage() {
       veredictoNeto: veredictoDe((x) => x.neto),
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
+      // La base que la tarjeta de la ganancia publica tras la exención por reinversión: la
+      // reinversión y la hipoteca no mueven la ganancia, pero sí esta base (hallazgo 2904).
+      veredictoBase: veredictoDe((x) => (x.hayDatosGanancia ? x.g.baseImponible : 0)),
     };
   }, [precioVenta, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble, otrasRentasAhorro, tipoTransmision]);
 
@@ -2559,7 +2564,11 @@ export default function SimuladorCompraventaPage() {
                           : `Precio de compra y lo que se lee: ${noSePudoLeer([
                               ...(resultadosVendedor.gastosAdquisicionLegible ? [] : ['los impuestos y gastos de aquella compra']),
                               ...(resultadosVendedor.mejorasLegible ? [] : ['las mejoras']),
-                            ])}, y no están sumados`
+                            ])}, y no están ${
+                              // Concuerda con lo que no se suma: «las mejoras» solas, en femenino;
+                              // con los gastos, masculino (hallazgo 2961).
+                              resultadosVendedor.gastosAdquisicionLegible ? 'sumadas' : 'sumados'
+                            }`
                       }
                     />
                   )}
@@ -2640,7 +2649,14 @@ export default function SimuladorCompraventaPage() {
                         description={
                           avisoTarjeta(resultadosVendedor.veredictoGanancia, 'la ganancia') ??
                           (resultadosVendedor.baseImponibleIRPF < resultadosVendedor.gananciaPatrimonial
-                            ? `Tributa ${formatCurrency(resultadosVendedor.baseImponibleIRPF)} tras aplicar la exención`
+                            ? // La base publicada se mueve con la reinversión y la hipoteca, que la
+                              // ganancia no ve: su aviso sale del sondeo de la BASE (hallazgo 2904).
+                              [
+                                `Tributa ${formatCurrency(resultadosVendedor.baseImponibleIRPF)} tras aplicar la exención`,
+                                avisoTarjeta(resultadosVendedor.veredictoBase, 'la base', false),
+                              ]
+                                .filter((t): t is string => t !== null)
+                                .join('. ')
                             : 'Base para IRPF')
                         }
                       />
@@ -2968,8 +2984,13 @@ export default function SimuladorCompraventaPage() {
                 catastral total. Por eso hacen falta las dos cifras del recibo del IBI, no solo la del suelo.
               </p>
               <p>
-                <strong>Si no hay incremento de valor, no se paga</strong> (sentencia del Tribunal Constitucional
-                de 26 de octubre de 2021).
+                {/* La no sujeción sin incremento es el art. 104.5 TRLRHL (RDL 26/2021), como dice la
+                    FAQ de esta página; la STC 182/2021 anuló el método de cálculo, y la vía de la
+                    pérdida la abrió la STC 59/2017 (cabecera de PRESCRIPCION_DEVOLUCION_IIVTNU en
+                    data/fiscal/inmuebles.ts, hallazgo 3241). */}
+                <strong>Si no hay incremento de valor, no se paga</strong>: es un supuesto de no sujeción
+                (art. 104.5 TRLRHL, redacción del RDL 26/2021), y hay que acreditar la pérdida con las
+                escrituras de compra y venta.
               </p>
               <p>
                 Esta calculadora aplica un <strong>tipo del {formatNumber(PLUSVALIA_MUNICIPAL_META.tipoOrientativo, 0)}&nbsp;%</strong> como referencia orientativa habitual;

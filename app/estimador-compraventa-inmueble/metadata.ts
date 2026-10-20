@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -278,9 +278,19 @@ export const RESPUESTA_QUIEN_PAGA =
 export const PREGUNTA_TIPOS_REDUCIDOS = '¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?';
 export const RESPUESTA_TIPOS_REDUCIDOS = `Muchas comunidades aplican tipos reducidos para jóvenes, familias numerosas, personas con discapacidad (≥33\u00A0%), VPO o municipios en riesgo de despoblación. Los requisitos (edad, ingresos, valor máximo del inmueble) varían por comunidad: la edad tope del tipo joven va de los ${EDAD_JOVEN.min} a los ${EDAD_JOVEN.max} años según dónde compres, y el panel de beneficios fiscales de la calculadora muestra la que aplica en cada caso. Consulta la normativa de tu CC.AA.`;
 
-const faqSchema = generateFAQSchema({
-  url: 'https://meskeia.com/estimador-compraventa-inmueble/',
-  mainEntity: [
+/**
+ * UN solo FAQPage por URL (hallazgo 2963, 20/10/2026; el 846 de garaje). La página servía DOS:
+ * `jsonLd` combinaba el WebApplication con un FAQPage de estas nueve preguntas y el layout
+ * inyectaba además `faqJsonLd`, con otras cinco. Las seis hermanas ya servían uno. Aquí no se
+ * tiran, como en garaje, porque tres salen de constantes compartidas con la FAQ visible: pasan a
+ * `faqJsonLd`, salvo la que repetía con otras palabras una pregunta que ya está allí («¿Qué paga
+ * el vendedor de una vivienda?» frente a «¿Qué impuestos paga el vendedor al vender un
+ * inmueble?»). «¿Cuánto hay que sumar al precio…?» se queda: es la que publica la horquilla del
+ * motor en porcentaje, y su test (REPARADO 11/09) la sujeta.
+ */
+const REPETIDAS_EN_FAQ_JSON_LD = new Set(['¿Qué paga el vendedor de una vivienda?']);
+
+const PREGUNTAS_GUIA: { question: string; answer: string }[] = [
     {
       question: '¿Qué diferencia hay entre ITP e IVA en la compra de una vivienda?',
       answer: `El ITP se aplica a viviendas de segunda mano (transmisiones entre particulares), mientras que el IVA al ${IVA_INMUEBLES_2025.obraNueva}\u00A0% se paga en viviendas nuevas (primera entrega del promotor). No pueden coexistir en la misma operación: o se paga uno u otro, nunca ambos.`,
@@ -317,10 +327,17 @@ const faqSchema = generateFAQSchema({
       question: '¿La gestoría es obligatoria en la compraventa?',
       answer: `No es obligatoria por ley, pero los bancos suelen exigirla cuando hay hipoteca para asegurarse de que la documentación se tramita correctamente. Su coste oscila entre ${gestoriaEnTexto()}. Sin hipoteca, puedes presentar los impuestos directamente o contratar una gestoría por comodidad.`,
     },
-  ],
-});
+];
 
-export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+export const jsonLd = webAppSchema;
+
+const preguntasGuiaJsonLd = PREGUNTAS_GUIA.filter((q) => !REPETIDAS_EN_FAQ_JSON_LD.has(q.question)).map(
+  (q) => ({
+    '@type': 'Question',
+    name: q.question,
+    acceptedAnswer: { '@type': 'Answer', text: q.answer },
+  }),
+);
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -366,5 +383,6 @@ export const faqJsonLd = {
         text: 'La plusvalía municipal (IIVTNU, Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) grava el aumento de valor del suelo desde la última transmisión. La paga el vendedor, salvo en herencias y donaciones (donde la paga el heredero o donatario). Si no hay incremento de valor del terreno, la transmisión no está sujeta (art. 104.5 del texto refundido de la Ley de Haciendas Locales, redacción del RDL 26/2021): el impuesto no llega a devengarse, aunque hay que declarar la transmisión y aportar las escrituras de compra y venta. Si lo hay, el vendedor elige el método de cálculo más favorable, el objetivo o el real.',
       },
     },
+    ...preguntasGuiaJsonLd,
   ],
 };

@@ -7733,7 +7733,8 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
   });
 
   /**
-   * HALLAZGO 2904 [bajo, contenido] — ABIERTO (06/10/2026; sigue abierto el 07/10). La tarjeta de la GANANCIA publica la base
+   * HALLAZGO 2904 [bajo, contenido] — ✅ REPARADO el 20/10/2026 (`veredictoBase`, el sondeo de la
+   * BASE junto al «Tributa»). Era así (06/10/2026; seguía abierto el 07/10). La tarjeta de la GANANCIA publica la base
    * imponible («Tributa X € tras aplicar la exención», o «Base para IRPF» cuando no hay exención)
    * y su aviso sale del sondeo de la GANANCIA, que la reinversión y la hipoteca no mueven: con
    * cualquiera de las dos ilegible, la base publicada se mueve y la tarjeta calla (la del IRPF y la
@@ -7744,7 +7745,7 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
    *   hipoteca «2.000.50» → se lee 0 → base 42.934,44 → «Tributa 42.934,44 € tras aplicar la
    *     exención», sin nombrar la hipoteca ni decir que la base real es menor.
    */
-  test.fail('HALLAZGO base imponible — la tarjeta de la ganancia nombra la hipoteca ilegible que mueve su «Tributa»', async ({
+  test('HALLAZGO base imponible — la tarjeta de la ganancia nombra la hipoteca ilegible que mueve su «Tributa»', async ({
     page,
   }) => {
     test.setTimeout(60_000);
@@ -7752,8 +7753,13 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
     await marcarReinversion(page);
     await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
     await sembrar(page, 'Hipoteca pendiente de la vivienda que vendes', ILEGIBLE_0610);
-    // Hoy: «Tributa 42.934,44 € tras aplicar la exención», sin nombrar nada (ver el CONTROL)
-    expect(await descripcionTarjeta(page, /^Ganancia patrimonial/)).toMatch(/no se ha podido leer/);
+    // Antes: «Tributa 42.934,44 € tras aplicar la exención», sin nombrar nada (ver el CONTROL)
+    const d = await descripcionTarjeta(page, /^Ganancia patrimonial/);
+    expect(d).toContain('Tributa 42.934,44 € tras aplicar la exención');
+    expect(d).toMatch(/no se ha podido leer/);
+    expect(d).toContain('hipoteca');
+    // La hipoteca leída como 0 deja más importe obtenido sin reinvertir: la base real es MENOR.
+    expect(d).toMatch(/la base real (es|puede ser) menor/);
   });
 });
 
@@ -8271,14 +8277,14 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026). Concordancia de género en un campo que SOLO
+   * HALLAZGO [bajo, contenido] — ✅ REPARADO el 20/10/2026 (2961). Concordancia de género en un campo que SOLO
    * tiene esta app de la familia (las mejoras): la descripción del valor de adquisición cierra
    * siempre con «y no están sumados», también cuando lo ilegible son «las mejoras».
    * BASE V + mejoras «2.000.50» → esperado «… no se han podido leer las mejoras, y no están
    * sumadas» · obtenido «Precio de compra y lo que se lee: no se han podido leer las mejoras, y no
    * están sumados». Con «los impuestos y gastos de aquella compra», o con los dos, está bien.
    */
-  test.fail('HALLAZGO concordancia — «las mejoras … no están sumadas»', async ({ page }) => {
+  test('HALLAZGO concordancia — «las mejoras … no están sumadas»', async ({ page }) => {
     test.setTimeout(60_000);
     await montarBaseV(page);
     await sembrar(page, 'Inversiones y mejoras (opcional)', ILEGIBLE_0710);
@@ -8286,10 +8292,12 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
     const d = await descripcionTarjeta(page, 'Valor de adquisición');
     expect(d).toContain('las mejoras');
     expect(d).not.toContain('las mejoras, y no están sumados');
+    expect(d).toContain('las mejoras, y no están sumadas');
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026). El motivo de la reinversión PARCIAL redondea
+   * HALLAZGO [bajo, contenido] — ✅ REPARADO el 20/10/2026 (2962, `porcentajeExentoParcial`: «más del
+   * 99,9 %» y «menos del 0,1 %» en los cantos). El motivo de la reinversión PARCIAL redondeaba
    * la proporción exenta a una décima (`formatNumber(proporcionReinvertida * 100, 1)`,
    * data/fiscal/ganancia-inmueble.ts), así que en los dos cantos se contradice con la cuota de al
    * lado: «Reinversión parcial: exento el 100,0 %» con 5,86 € de IRPF, y «exento el 0,0 %» con una
@@ -8300,7 +8308,7 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
    *   reinversión 100 → exento el 0,035 % → obtenido «exento el 0,0 % de la ganancia» con «Tributa
    *     89.169,16 €» (30,84 € exentos)
    */
-  test.fail('HALLAZGO redondeo — la reinversión parcial no puede decir «exento el 100,0 %» con cuota, ni «el 0,0 %» con parte exenta', async ({
+  test('HALLAZGO redondeo — la reinversión parcial no puede decir «exento el 100,0 %» con cuota, ni «el 0,0 %» con parte exenta', async ({
     page,
   }) => {
     test.setTimeout(60_000);
@@ -8310,23 +8318,35 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
     let d = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
     expect(d).toContain('Reinversión parcial');
     expect(d).not.toContain('exento el 100,0 %');
+    expect(d).toContain('exento más del 99,9 % de la ganancia');
     await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '100');
     d = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
     expect(d).toContain('Reinversión parcial');
     expect(d).not.toContain('exento el 0,0 %');
+    expect(d).toContain('exento menos del 0,1 % de la ganancia');
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (07/10/2026). La página sirve DOS FAQPage: `jsonLd`
+   * HALLAZGO [bajo, contenido] — ✅ REPARADO el 20/10/2026 (2963): `jsonLd` es solo el
+   * WebApplication y las preguntas de la guía pasan a `faqJsonLd`, salvo dos que repetían otra. Era
+   * así (07/10/2026). La página sirve DOS FAQPage: `jsonLd`
    * combina el WebApplication con uno de 9 preguntas (generateFAQSchema) y el layout inyecta además
    * `faqJsonLd`, con 5. Es el hallazgo 846 de garaje («UN solo FAQPage por URL»), reparado allí y
    * presente ya en las seis hermanas, que sirven uno: no llegó a la referencia.
    * curl /estimador-compraventa-inmueble/ → esperado 1 bloque FAQPage · obtenido 2 (9 + 5).
    */
-  test.fail('HALLAZGO — la página sirve un solo FAQPage, como sus seis hermanas', async ({ page }) => {
+  test('HALLAZGO — la página sirve un solo FAQPage, como sus seis hermanas', async ({ page }) => {
     await page.goto(RUTA);
     const bloques = await bloquesFaqPage(page);
     expect(bloques.length).toBe(1);
+    // Las 5 de faqJsonLd + 8 de la guía (9 menos la que repetía otra con otras palabras), sin
+    // ninguna pregunta dos veces.
+    const preguntas = bloques[0].map((q) => q.pregunta);
+    expect(preguntas).toHaveLength(13);
+    expect(new Set(preguntas).size).toBe(13);
+    expect(preguntas).not.toContain('¿Qué paga el vendedor de una vivienda?');
+    expect(preguntas).toContain('¿Cuándo no se paga plusvalía municipal?');
+    expect(preguntas).toContain('¿Qué son los tipos reducidos de ITP y cómo acceder a ellos?');
   });
 
   /**
@@ -9154,7 +9174,8 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
   });
 
   /**
-   * HALLAZGO [bajo, calculo] — ABIERTO (12/10/2026). El total del reparto («el comprador le abona en
+   * HALLAZGO [bajo, calculo] — ✅ REPARADO el 20/10/2026 (3239, `alCentimo` en el componente, para
+   * las siete apps). Era así (12/10/2026). El total del reparto («el comprador le abona en
    * la firma») suma los importes SIN redondear y redondea al final, mientras cada línea de la tabla
    * se pinta redondeada al céntimo: el total no cuadra con las dos líneas que tiene encima. Es la
    * familia del hallazgo 594, que el resto de la app evita con `sumarLineasVisibles`
@@ -9163,17 +9184,21 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
    * IBI 480 € · comunidad 90 € trimestral · 20/05/2026 → líneas del comprador 297,21 € + 41,54 € =
    * esperado 338,75 € · obtenido «le abona en la firma 338,74 €» (297,2055 + 41,5385 = 338,7439).
    */
-  test.fail('HALLAZGO reparto — el total que abona el comprador suma las líneas que enseña', async ({ page }) => {
+  test('HALLAZGO reparto — el total que abona el comprador suma las líneas que enseña', async ({ page }) => {
     test.setTimeout(60_000);
     await abrir(page);
     await repartir(page, '2026-05-20', '480', '90', 'trimestral');
     const ibi = importeCelda((await filaReparto(page, /^IBI/))[3]);
     const comunidad = importeCelda((await filaReparto(page, /^Comunidad/))[3]);
+    expect(ibi).toBeCloseTo(297.21, 2);
+    expect(comunidad).toBeCloseTo(41.54, 2);
     expect(parseSpanishNumber((await totalReparto(page)).replace(/\s*€$/, ''))).toBeCloseTo(ibi + comunidad, 2);
+    expect(await totalReparto(page)).toMatch(/^338,75\s€$/);
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (12/10/2026). Patrón 5 de la familia («no falta, no vale»):
+   * HALLAZGO [bajo, contenido] — ✅ REPARADO el 20/10/2026 (3240, estado «negativo» en
+   * `leerImporte`). Era así (12/10/2026). Patrón 5 de la familia («no falta, no vale»):
    * una cuota NEGATIVA se lee bien —«-450» es un número— y es imposible, pero el aviso del reparto
    * dice «No se entiende el importe de «Cuota anual del IBI»: escríbelo como 450 o 450,80», la
    * frase del importe ILEGIBLE. `leerImporte` (components/ProrrateoIbiComunidad.tsx) mete `n < 0`
@@ -9183,17 +9208,19 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
    * obtenido «No se entiende el importe de «Cuota anual del IBI»: escríbelo como 450 o 450,80…».
    * (Que no reparta nada es correcto: lo sujeta el CASO 75.)
    */
-  test.fail('HALLAZGO reparto — un IBI negativo se entiende: no vale, y el aviso tiene que decirlo', async ({ page }) => {
+  test('HALLAZGO reparto — un IBI negativo se entiende: no vale, y el aviso tiene que decirlo', async ({ page }) => {
     await abrir(page);
     await repartir(page, '2026-05-20', '-450');
     const aviso = bloqueReparto(page).getByRole('alert');
     await expect(aviso).toBeVisible();
     await expect(aviso).not.toContainText('No se entiende');
     await expect(aviso).toContainText(/negativ/i);
+    await expect(aviso).toContainText('«Cuota anual del IBI» no puede ser negativa');
   });
 
   /**
-   * HALLAZGO [bajo, dato] — ABIERTO (12/10/2026). La tarjeta «Plusvalía municipal» del bloque
+   * HALLAZGO [bajo, dato] — ✅ REPARADO el 20/10/2026 (3241: cita el art. 104.5 TRLRHL, como la
+   * FAQ). Era así (12/10/2026). La tarjeta «Plusvalía municipal» del bloque
    * educativo atribuye la no sujeción sin incremento a la sentencia del TC de 26/10/2021 (STC
    * 182/2021): «Si no hay incremento de valor, no se paga (sentencia del Tribunal Constitucional de
    * 26 de octubre de 2021)». data/fiscal/inmuebles.ts (cabecera de PRESCRIPCION_DEVOLUCION_IIVTNU,
@@ -9204,7 +9231,7 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
    * Esperado: que la tarjeta cite el art. 104.5 TRLRHL o la STC 59/2017 · obtenido «(sentencia del
    * Tribunal Constitucional de 26 de octubre de 2021)».
    */
-  test.fail('HALLAZGO (dato) — la no sujeción sin incremento no viene de la STC de 26/10/2021', async ({ page }) => {
+  test('HALLAZGO (dato) — la no sujeción sin incremento no viene de la STC de 26/10/2021', async ({ page }) => {
     await abrir(page);
     const tarjeta = page
       .locator('div[class*="contentCard"]')
@@ -9213,6 +9240,7 @@ test.describe('Inspector 12/10/2026 — reparto del IBI, Ceuta y Melilla, el IRP
     const texto = (await tarjeta.evaluate((e) => e.textContent ?? '')).replace(/\s+/g, ' ');
     expect(texto).toContain('Si no hay incremento de valor, no se paga');
     expect(texto).not.toMatch(/no se paga \(sentencia del Tribunal Constitucional de 26 de octubre de 2021\)/);
+    expect(texto).toContain('art. 104.5 TRLRHL');
   });
 });
 
