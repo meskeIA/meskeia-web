@@ -434,8 +434,7 @@ test.describe('Inspector 10/10/2026 · hallazgos de la partida', () => {
   });
 
   test('hallazgo · el marcador dice «1 correcta», no «1 correctas»', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). page.tsx:212 — `{aciertos} correctas` sin singular.
-    test.fail();
+    // REPARADO el 20/10/2026 (3225), como la gemela quiz-historia-espana.
     await abrir(page, { semilla: 3 });
     await arrancar(page, 'Fácil');
     await responder(page, 'bien');
@@ -445,7 +444,7 @@ test.describe('Inspector 10/10/2026 · hallazgos de la partida', () => {
   test('hallazgo · el porcentaje va separado con espacio duro («70 %»)', async ({ page }) => {
     // ABIERTO (inspector 10/10/2026). Regla de formato del 25/09/2026 (Ortografía RAE 2010):
     // page.tsx:277 y :289 pegan el «%». 7/10 → «7 de 10 preguntas correctas (70 %)» y «70 %».
-    test.fail();
+    // REPARADO el 20/10/2026 (3226) con formatPercentage, como la gemela.
     test.setTimeout(90_000);
     await abrir(page, { semilla: 2 });
     await arrancar(page, 'Fácil');
@@ -490,7 +489,7 @@ test.describe('Inspector 10/10/2026 · hallazgos de la partida', () => {
     // ABIERTO (inspector 10/10/2026). page.tsx:255 — role="alert" (con aria-live="polite", que
     // se contradicen) envuelve el panel entero, botón «Siguiente pregunta →» incluido, y nace ya
     // con contenido. Medido: región role=alert con 1 botón y texto «¡Correcto!…Siguiente pregunta →».
-    test.fail();
+    // REPARADO el 20/10/2026 (3218) con la receta del 2108 de la gemela.
     await abrir(page, { semilla: 3 });
     await arrancar(page, 'Fácil');
     await responder(page, 'bien');
@@ -501,12 +500,12 @@ test.describe('Inspector 10/10/2026 · hallazgos de la partida', () => {
     );
     expect(regiones.length, 'no hay región viva en el panel').toBeGreaterThan(0);
     expect(regiones.filter((r) => r.botones > 0), `regiones con botón dentro: ${JSON.stringify(regiones)}`).toEqual([]);
+    expect(regiones.filter((r) => r.role === 'alert'), 'role="alert" con aria-live="polite" se contradicen').toEqual([]);
   });
 
   test('hallazgo · «Comenzar quiz» no lleva el ▶ en su nombre accesible', async ({ page }) => {
     // ABIERTO (inspector 10/10/2026). page.tsx:199 — «Comenzar quiz ▶» sin aria-hidden; medido el
-    // nombre accesible «Comenzar quiz ▶».
-    test.fail();
+    // nombre accesible «Comenzar quiz ▶». REPARADO el 20/10/2026 (3219).
     await abrir(page);
     await expect(page.getByRole('button', { name: 'Comenzar quiz', exact: true })).toHaveCount(1, { timeout: 2000 });
   });
@@ -877,8 +876,7 @@ test.describe('Inspector 10/10/2026 · contenido', () => {
   test('hallazgo · «¿Cuántas provincias tiene España?» se contesta con el mismo texto en las dos FAQ', async ({ page }) => {
     // ABIERTO (inspector 10/10/2026). Mismas cifras (50 · 17 · Ceuta y Melilla) con dos redacciones;
     // la del FAQPage («distribuidas en 17 comunidades autónomas y 2 ciudades autónomas») se lee como
-    // si Ceuta y Melilla tuvieran provincias. Reparación: una constante en metadata.ts.
-    test.fail();
+    // si Ceuta y Melilla tuvieran provincias. REPARADO el 20/10/2026 (3221): una constante en metadata.ts.
     await abrir(page);
     const pregunta = '¿Cuántas provincias tiene España?';
     expect((await faqServida(page))[pregunta]).toBe((await faqVisible(page))[pregunta]);
@@ -931,7 +929,9 @@ test.describe('Inspector 10/10/2026 · contenido', () => {
     // · «Le siguen Castilla-La Mancha (79.463 km²) y Andalucía (87.268 km²)»: con sus propias cifras
     //   la segunda es Andalucía.
     // · La curiosidad «Tres zonas horarias» explica que «España tiene técnicamente dos husos horarios».
-    test.fail();
+    // REPARADO el 20/10/2026 (3224): «más de 94.000 km²» y «la más extensa de España» en las dos
+    // bocas (sin fuente consultada para el dígito ni para el puesto en la UE), Andalucía antes que
+    // Castilla-La Mancha, y la curiosidad titulada «Dos husos horarios».
     await abrir(page);
     const fallos: string[] = [];
     const faq = (await faqVisible(page))['¿Cuál es la comunidad autónoma más grande?'] ?? '';

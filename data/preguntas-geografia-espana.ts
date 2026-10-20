@@ -115,7 +115,10 @@ export const PREGUNTAS_GEOGRAFIA: PreguntaGeografia[] = [
     pregunta: '¿Cuál es la comunidad autónoma más extensa de España?',
     opciones: ['Andalucía', 'Extremadura', 'Castilla-La Mancha', 'Castilla y León'],
     correcta: 'Castilla y León',
-    explicacion: 'Castilla y León es la comunidad autónoma más extensa de España y de la Unión Europea, con 94.226 km².',
+    // Hallazgo 3224 (20/10/2026): la FAQ de la guía decía 94.225 km² y «segunda de la UE», y aquí
+    // 94.226 y «la más extensa de la UE». Sin fuente consultada para el dígito ni para el puesto
+    // europeo, las dos bocas dicen lo que comparten: más de 94.000 km², la más extensa de España.
+    explicacion: 'Castilla y León es la comunidad autónoma más extensa de España, con más de 94.000 km².',
     categoria: 'comunidades-autonomas',
     dificultad: 'facil',
   },

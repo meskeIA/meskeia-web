@@ -264,6 +264,10 @@
 /* Feedback */
 .feedbackPanel { display: flex; flex-direction: column; gap: 0.75rem; }
 
+/* La región viva del veredicto (hallazgo 3218): existe siempre; vacía no ocupa ni deja hueco. */
+.feedbackRegion { display: flex; flex-direction: column; gap: 0.75rem; }
+.feedbackRegion:empty { display: none; }
+
 .feedbackMensaje {
   padding: 1rem 1.25rem;
   border-radius: var(--radius);

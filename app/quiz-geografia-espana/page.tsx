@@ -11,7 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { margenBarraLogo } from '@/lib';
+import { formatPercentage, margenBarraLogo } from '@/lib';
 import {
   PREGUNTAS_GEO_FACIL,
   PREGUNTAS_GEO_MEDIO,
@@ -20,7 +20,7 @@ import {
   type DificultadGeografia,
   type PreguntaGeografia,
 } from '@/data/preguntas-geografia-espana';
-import { PREGUNTA_PICO_MAS_ALTO, RESPUESTA_PICO_MAS_ALTO } from './metadata';
+import { PREGUNTA_PICO_MAS_ALTO, RESPUESTA_PICO_MAS_ALTO, PREGUNTA_PROVINCIAS, RESPUESTA_PROVINCIAS } from './metadata';
 
 type Fase = 'inicio' | 'jugando' | 'respondida' | 'fin';
 
@@ -209,6 +209,8 @@ export default function QuizGeografiaEspanaPage() {
     if (preguntas.length === 0) return 0;
     return Math.round((aciertos / preguntas.length) * 100);
   }, [aciertos, preguntas.length]);
+  /** «70 %» con espacio duro (regla del 25/09/2026, hallazgo 3226; como en quiz-historia-espana). */
+  const porcentajeTexto = formatPercentage(porcentaje / 100, 0);
 
   const claseOpcion = (opcion: string) => {
     if (fase !== 'respondida') return '';
@@ -274,7 +276,7 @@ export default function QuizGeografiaEspanaPage() {
             </div>
 
             <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz} ref={botonComenzarRef}>
-              Comenzar quiz ▶
+              Comenzar quiz <span aria-hidden="true">▶</span>
             </button>
           </section>
         </div>
@@ -287,7 +289,7 @@ export default function QuizGeografiaEspanaPage() {
           <div className={styles.progresoBarra}>
             <div className={styles.progresoInfo}>
               <span>Pregunta {indice + 1} de {preguntas.length}</span>
-              <span>{aciertos} correctas</span>
+              <span>{aciertos} {aciertos === 1 ? 'correcta' : 'correctas'}</span>
             </div>
             <div
               className={styles.progresoTrack}
@@ -331,21 +333,31 @@ export default function QuizGeografiaEspanaPage() {
           </div>
 
           {/* Feedback */}
-          {fase === 'respondida' && (
-            <div className={styles.feedbackPanel} role="alert" aria-live="polite">
-              <div className={`${styles.feedbackMensaje} ${seleccionada === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
-                {seleccionada === preguntaActual.correcta
-                  ? <><span aria-hidden="true">✅</span>{' ¡Correcto!'}</>
-                  : <><span aria-hidden="true">❌</span>{` Incorrecto. La respuesta correcta es: "${preguntaActual.correcta}"`}</>}
-              </div>
-              {preguntaActual.explicacion && (
-                <p className={styles.explicacionTexto}>{preguntaActual.explicacion}</p>
+          {/* Hallazgo 3218 (20/10/2026), receta del 2108 de quiz-historia-espana: era role="alert"
+              con aria-live="polite" (se contradicen), nacía ya llena (no siempre se anuncia) y
+              envolvía el botón. Ahora la región existe desde el principio, es role="status" y
+              abarca solo el veredicto y la explicación. */}
+          <div className={styles.feedbackPanel}>
+            <div className={styles.feedbackRegion} role="status" aria-live="polite" aria-atomic="true">
+              {fase === 'respondida' && (
+                <>
+                  <div className={`${styles.feedbackMensaje} ${seleccionada === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
+                    {seleccionada === preguntaActual.correcta
+                      ? <><span aria-hidden="true">✅</span>{' ¡Correcto!'}</>
+                      : <><span aria-hidden="true">❌</span>{` Incorrecto. La respuesta correcta es: "${preguntaActual.correcta}"`}</>}
+                  </div>
+                  {preguntaActual.explicacion && (
+                    <p className={styles.explicacionTexto}>{preguntaActual.explicacion}</p>
+                  )}
+                </>
               )}
+            </div>
+            {fase === 'respondida' && (
               <button type="button" className={styles.btnSiguiente} onClick={siguiente} ref={botonSiguienteRef}>
                 {indice + 1 < preguntas.length ? 'Siguiente pregunta →' : 'Ver resultado'}
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
@@ -354,7 +366,7 @@ export default function QuizGeografiaEspanaPage() {
         <div className={styles.finPanel} ref={finPanelRef}>
           <div className={styles.medallaIcon} aria-hidden="true">{calcularMedalla(porcentaje)}</div>
           <h2 className={styles.finTitulo} ref={finTituloRef} tabIndex={-1}>{calcularTextoMedalla(porcentaje)}</h2>
-          <p className={styles.finSubtitulo}>{aciertos} de {preguntas.length} preguntas correctas ({porcentaje}%)</p>
+          <p className={styles.finSubtitulo}>{aciertos} de {preguntas.length} preguntas correctas ({porcentajeTexto})</p>
 
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
@@ -366,7 +378,7 @@ export default function QuizGeografiaEspanaPage() {
               <span className={styles.statLabel}>Errores</span>
             </div>
             <div className={styles.statCard}>
-              <span className={styles.statValor}>{porcentaje}%</span>
+              <span className={styles.statValor}>{porcentajeTexto}</span>
               <span className={styles.statLabel}>Puntuación</span>
             </div>
             <div className={styles.statCard}>
@@ -518,8 +530,8 @@ export default function QuizGeografiaEspanaPage() {
               <p>{RESPUESTA_PICO_MAS_ALTO}</p>
             </div>
             <div className={styles.faqItem}>
-              <h3>¿Cuántas provincias tiene España?</h3>
-              <p>España tiene 50 provincias, organizadas en 17 comunidades autónomas. Además hay 2 ciudades autónomas: Ceuta y Melilla.</p>
+              <h3>{PREGUNTA_PROVINCIAS}</h3>
+              <p>{RESPUESTA_PROVINCIAS}</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué ríos atraviesan más comunidades autónomas?</h3>
@@ -527,7 +539,9 @@ export default function QuizGeografiaEspanaPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuál es la comunidad autónoma más grande?</h3>
-              <p>Castilla y León, con 94.225 km², es la región más extensa de España y la segunda de la Unión Europea. Le siguen Castilla-La Mancha (79.463 km²) y Andalucía (87.268 km²).</p>
+              {/* Hallazgo 3224: la misma cifra y el mismo puesto que la explicación de la pregunta, y
+                  las dos siguientes en el orden de sus propias cifras. */}
+              <p>Castilla y León, con más de 94.000 km², es la región más extensa de España. Le siguen Andalucía (87.268 km²) y Castilla-La Mancha (79.463 km²).</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué mares y océanos bañan España?</h3>
@@ -570,7 +584,7 @@ export default function QuizGeografiaEspanaPage() {
               { icon: '🌊', titulo: 'El río más caudaloso', desc: 'El Ebro es el río más caudaloso de España con 426 m³/s de media, aunque el Tajo es más largo. El Ebro es el único gran río que desemboca en el Mediterráneo.' },
               { icon: '🏝️', titulo: 'Canarias, a la misma latitud que el Sáhara', desc: 'El archipiélago canario está a 100 km de la costa africana y en la misma latitud que el norte de Marruecos. Tiene clima subtropical, no mediterráneo.' },
               { icon: '📐', titulo: 'España, el segundo país más montañoso de Europa', desc: 'Con una altitud media de 660 m, España es el segundo país más montañoso de Europa tras Suiza. Solo un 11% de su territorio está por debajo de los 200 m.' },
-              { icon: '🌐', titulo: 'Tres zonas horarias', desc: 'España tiene técnicamente dos husos horarios: la Península y Baleares (UTC+1) y Canarias (UTC). Ceuta y Melilla siguen el horario peninsular aunque estén en África.' },
+              { icon: '🌐', titulo: 'Dos husos horarios', desc: 'España tiene técnicamente dos husos horarios: la Península y Baleares (UTC+1) y Canarias (UTC). Ceuta y Melilla siguen el horario peninsular aunque estén en África.' },
               { icon: '💧', titulo: 'La laguna más grande de España', desc: 'La Albufera de Valencia es la laguna más grande de España con 2.800 ha de agua dulce. El Mar Menor (Murcia) es la laguna salada más grande de Europa occidental.' },
             ].map(t => (
               <div key={t.icon} className={styles.tipCard}>

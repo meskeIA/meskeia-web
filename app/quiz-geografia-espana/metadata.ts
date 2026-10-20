@@ -49,16 +49,23 @@ export const PREGUNTA_PICO_MAS_ALTO = '¿Cuál es el pico más alto de España?'
 export const RESPUESTA_PICO_MAS_ALTO =
   'El Teide (Tenerife, Canarias) es el punto más alto de España con 3.715 metros sobre el nivel del mar. En la Península Ibérica, el pico más elevado es el Mulhacén (Sierra Nevada, Granada) con 3.479 metros.';
 
+// Hallazgo 3221 (20/10/2026): la FAQ visible y el FAQPage daban dos redacciones, y la del FAQPage
+// («en 17 comunidades autónomas y 2 ciudades autónomas») se leía como si Ceuta y Melilla tuvieran
+// provincias. Una sola constante para las dos bocas.
+export const PREGUNTA_PROVINCIAS = '¿Cuántas provincias tiene España?';
+export const RESPUESTA_PROVINCIAS =
+  'España tiene 50 provincias, organizadas en 17 comunidades autónomas. Además hay 2 ciudades autónomas, Ceuta y Melilla, que no forman parte de ninguna provincia. Las provincias son la división administrativa de segundo nivel, por debajo de las comunidades autónomas y por encima de los municipios.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
     {
       '@type': 'Question',
-      name: '¿Cuántas provincias tiene España?',
+      name: PREGUNTA_PROVINCIAS,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'España tiene 50 provincias distribuidas en 17 comunidades autónomas y 2 ciudades autónomas (Ceuta y Melilla). Las provincias son la división administrativa de segundo nivel, por debajo de las comunidades autónomas y por encima de los municipios.',
+        text: RESPUESTA_PROVINCIAS,
       },
     },
     {
