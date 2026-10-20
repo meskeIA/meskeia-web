@@ -72,6 +72,25 @@ const ARTICULO_EXENCION: string = (() => {
   return norma.charAt(0).toLowerCase() + norma.slice(1);
 })();
 
+/**
+ * Las cuatro respuestas que están a la vez en el FAQPage y en la FAQ VISIBLE, en UN solo sitio
+ * (hallazgo 2951, 20/10/2026). Estaban redactadas aparte en cada boca: no se contradecían
+ * —cifras y fechas ya salían de data/fiscal—, pero nada las ataba, y ya diferían (el JSON-LD
+ * citaba el art. 82.1.c) y la pantalla no; la pantalla daba el «Dato útil» de la sección y el
+ * JSON-LD lo callaba). Van en texto plano: el énfasis tipográfico se pierde, pero no pueden
+ * volver a divergir. Mismo patrón que app/simulador-gastos-compraventa-garaje.
+ */
+export const RESPUESTA_VIGENCIA_CNAE = `${VIGENCIA_CNAE} Los códigos antiguos de cuatro dígitos siguen apareciendo en documentos anteriores; para saber a qué clase o clases de la ${CNAE_VIGENCIA.vigente} equivalen según la tabla de correspondencia del INE, basta con escribirlos en el buscador de esta página. En muchos casos la equivalencia es uno a uno, pero algunas clases antiguas se han dividido entre varias nuevas y hay que leer los literales para elegir.`;
+
+export const RESPUESTA_SECCIONES_IAE = `La Sección 1ª agrupa las actividades empresariales (organizadas con local, medios materiales o personal) y la Sección 2ª el ejercicio individual de una profesión. La consecuencia práctica está en la factura: las facturas de un profesional de la Sección 2ª a empresas y a otros profesionales llevan retención de IRPF (${RETENCION} con carácter general y ${RETENCION_INICIO} el año de inicio de la actividad y los dos siguientes), mientras que las de una actividad empresarial de la Sección 1ª, con carácter general, no la llevan. La Sección 3ª recoge las actividades artísticas, con tratamiento análogo al profesional.`;
+
+/** Va en la FAQ visible como «Dato útil:» aparte, y en el FAQPage detrás de la respuesta. */
+export const DATO_UTIL_SECCIONES_IAE = 'una misma actividad puede encajar en una sección o en otra según cómo se ejerza; lo determinante es si hay organización empresarial de medios o ejercicio personal de la profesión.';
+
+export const RESPUESTA_IAE_AUTONOMO = `Con carácter general, no: están exentas del pago las personas físicas y quienes tengan un importe neto de la cifra de negocios inferior a ${UMBRAL_EXENCION} €, según el ${ARTICULO_EXENCION}. Eso deja fuera del pago a la mayoría de autónomos y pequeñas empresas. Declarar el epígrafe es otra cosa distinta: el alta censal en el epígrafe es obligatoria aunque exista exención, porque es la forma en que la AEAT registra qué actividad se ejerce.`;
+
+export const RESPUESTA_VARIOS_EPIGRAFES = 'Sí. Cada actividad que se ejerce efectivamente debe tener su alta en el epígrafe que le corresponda, y todas se declaran en el mismo modelo 036 o 037. Es lo habitual cuando el negocio tiene varias patas: dar clases y vender material, ejecutar obra y redactar proyectos, prestar servicios y revender producto. Estar en varios epígrafes no multiplica las obligaciones formales, pero obliga a aplicar a cada factura el régimen propio de su actividad.';
+
 // App estructuralmente española (CNAE-2025 del INE y Tarifas del IAE de la AEAT):
 // no procede lenguaje dual ES/Latam. Ver <RegionBadge variant="es-only" />.
 //
@@ -162,7 +181,7 @@ export const faqJsonLd = {
         // jsonLd.description: aquí iban tecleadas y coincidían con el módulo por casualidad,
         // no por construcción (hallazgo 843, residuo simétrico del 681).
         // Y la diferencia entre entrada en vigor y aplicación, de VIGENCIA_CNAE (hallazgo 3336).
-        text: `${VIGENCIA_CNAE} Los códigos antiguos de cuatro dígitos siguen apareciendo en documentos anteriores; la tabla de correspondencia del INE permite saber a qué clase o clases de la ${CNAE_VIGENCIA.vigente} equivalen. En muchos casos la equivalencia es uno a uno, pero algunas clases antiguas se han dividido entre varias nuevas y hay que leer los literales para elegir.`,
+        text: RESPUESTA_VIGENCIA_CNAE,
       },
     },
     {
@@ -170,7 +189,7 @@ export const faqJsonLd = {
       name: '¿Qué significa que un epígrafe del IAE sea de la Sección 1ª o de la Sección 2ª?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La Sección 1ª agrupa las actividades empresariales (organizadas con local, medios materiales o personal) y la Sección 2ª el ejercicio individual de una profesión. La consecuencia práctica está en la factura: las facturas de un profesional de la Sección 2ª a empresas y a otros profesionales llevan retención de IRPF (${RETENCION} con carácter general y ${RETENCION_INICIO} el año de inicio de la actividad y los dos siguientes), mientras que las de una actividad empresarial de la Sección 1ª, con carácter general, no la llevan. La Sección 3ª recoge las actividades artísticas, con tratamiento análogo al profesional.`,
+        text: `${RESPUESTA_SECCIONES_IAE} Dato útil: ${DATO_UTIL_SECCIONES_IAE}`,
       },
     },
     {
@@ -178,7 +197,7 @@ export const faqJsonLd = {
       name: '¿Se paga el IAE siendo autónomo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Con carácter general, no: están exentas del pago las personas físicas y quienes tengan un importe neto de la cifra de negocios inferior a ${UMBRAL_EXENCION} €, según el ${ARTICULO_EXENCION}. Eso deja fuera del pago a la mayoría de autónomos y pequeñas empresas. Declarar el epígrafe es otra cosa distinta: el alta censal en el epígrafe es obligatoria aunque exista exención, porque es la forma en que la AEAT registra qué actividad se ejerce.`,
+        text: RESPUESTA_IAE_AUTONOMO,
       },
     },
     {
@@ -186,7 +205,7 @@ export const faqJsonLd = {
       name: '¿Puedo darme de alta en varios epígrafes del IAE a la vez?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Cada actividad que se ejerce efectivamente debe tener su alta en el epígrafe que le corresponda, y todas se declaran en el mismo modelo 036 o 037. Es lo habitual cuando el negocio tiene varias patas: dar clases y vender material, ejecutar obra y redactar proyectos, prestar servicios y revender producto. Estar en varios epígrafes no multiplica las obligaciones formales, pero obliga a aplicar a cada factura el régimen propio de su actividad.',
+        text: RESPUESTA_VARIOS_EPIGRAFES,
       },
     },
   ],

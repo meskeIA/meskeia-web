@@ -17,7 +17,6 @@ import {
   formatDate,
   formatFechaLarga,
   formatNumber,
-  formatPercentage,
   parseISODateLocal,
 } from '@/lib';
 import {
@@ -112,20 +111,24 @@ const LIMITE_RESULTADOS = 10;
 const RUTA_CATALOGO = CNAE_IAE_RUTA_CATALOGO;
 
 /**
- * La Sección 2ª del IAE, leída del módulo. Los porcentajes de retención son dato normativo
- * y el comentario de `data/fiscal/cnae-iae.ts` lo dice sin rodeos: «Fuente única de estos
- * textos: las apps NO deben redactar los suyos, porque el dato que contienen (los
- * porcentajes de retención) es normativo y divergiría» (hallazgo 425).
- */
-const SECCION_PROFESIONAL = SECCIONES_IAE.find((s) => s.seccion === '2ª')!;
-
-/**
  * La norma que aprueba las Tarifas del IAE. Se deriva de `FISCAL_CNAE_IAE_META.iae.fuente`
  * (hallazgo 636), y la derivación vive en `./metadata` desde el hallazgo 681, porque aquel
  * fichero la seguía tecleando a mano en el JSON-LD que citan los asistentes de IA. Una sola
  * derivación para las dos bocas de la app.
+ *
+ * Los porcentajes de retención de la Sección 2ª (hallazgo 425: dato normativo, nunca a mano) los
+ * lee ahora `RESPUESTA_SECCIONES_IAE` de SECCIONES_IAE, la misma respuesta que el FAQPage
+ * (hallazgo 2951).
  */
-import { NORMA_IAE, APLICACION_CNAE, VIGENCIA_CNAE } from './metadata';
+import {
+  NORMA_IAE,
+  APLICACION_CNAE,
+  RESPUESTA_VIGENCIA_CNAE,
+  RESPUESTA_SECCIONES_IAE,
+  DATO_UTIL_SECCIONES_IAE,
+  RESPUESTA_IAE_AUTONOMO,
+  RESPUESTA_VARIOS_EPIGRAFES,
+} from './metadata';
 
 const EJEMPLOS_CNAE: string[] = [
   'hago páginas web',
@@ -314,6 +317,20 @@ const PERSONAS_IAE = new Set([
   'tecnicos', 'topografos', 'traductores', 'veterinarios',
 ]);
 
+/**
+ * Erratas del literal de las Tarifas del IAE que dejan una profesión inalcanzable, normalizadas,
+ * con lo que se añade al índice para encontrarla (hallazgo 2949, 20/10/2026).
+ *
+ * El grupo 836 de la Sección 2.ª figura en el catálogo sellado como «Ayudantes Técnicos
+ * Sanitarios y Fisoterapéutas», sin la segunda «i». Como la búsqueda es por subcadena, ni
+ * «fisioterapeuta», ni «fisioterapia», ni «fisio» daban nada: solo «terapeuta». No se ha
+ * contrastado si la errata es del BOE o del parseo, y no importa para esto: el título se sigue
+ * pintando tal cual y solo el índice lleva la forma correcta.
+ */
+const ERRATAS_IAE: Record<string, string> = {
+  fisoterapeutas: 'fisioterapeutas fisioterapia',
+};
+
 /** Femeninos que no se forman por terminación. */
 const FEMENINOS_IRREGULARES: Record<string, string> = { actriz: 'actor', actrices: 'actores' };
 
@@ -404,11 +421,31 @@ function soloDigitos(texto: string): string {
  * pista para afinar.
  */
 function digitosSiEsCodigo(texto: string): string {
-  const sinPresentacion = normalizarTexto(texto).replace(
-    /^(cnae|iae|epigrafe|codigo|clase|grupo|seccion)\b/,
-    '',
-  );
-  return /^[\d.,\s-]*$/.test(sinPresentacion) ? soloDigitos(texto) : '';
+  const codigo = codigoSinPresentacion(texto);
+  return codigo === null ? '' : soloDigitos(codigo);
+}
+
+/** Palabras que presentan un código y no son parte de él («código CNAE: 47.11»). */
+const PRESENTACION_CODIGO = new Set(['cnae', 'iae', 'epigrafe', 'codigo', 'clase', 'grupo', 'seccion']);
+
+/**
+ * El código tal como se escribió, sin las palabras que lo presentan ni los dos puntos, o null si
+ * la consulta tiene más texto que eso.
+ *
+ * ⚠️ 20/10/2026 (hallazgos 2945 y 2946) — se quitaba UNA sola palabra al principio, así que
+ * «CNAE: 4711», «código CNAE 4711» y «epígrafe 673.2 IAE» —las formas en que el código llega
+ * copiado de una escritura o de un 036— caían a búsqueda por texto y daban cero, una regresión
+ * frente a 2f3e4c2b. Ahora valen las palabras de presentación en cualquier sitio y los dos
+ * puntos. Y el formato vigente «dd.dd» se comprueba sobre ESTO y no sobre la consulta en bruto:
+ * con «cnae 47.11» la página anunciaba como código antiguo una clase de la CNAE-2025 escrita
+ * con su punto.
+ */
+function codigoSinPresentacion(texto: string): string | null {
+  const resto = normalizarTexto(texto.replace(/:/g, ' '))
+    .split(' ')
+    .filter((palabra) => !PRESENTACION_CODIGO.has(palabra))
+    .join(' ');
+  return /^[\d.,\s-]*$/.test(resto) ? resto : null;
 }
 
 /**
@@ -669,13 +706,21 @@ export default function ConversorCnaeIaePage() {
       return tituloPorCodigo[`${entrada.seccion}|${raiz}`] ?? '';
     };
 
-    return catalogo.iae.map((entrada) => ({
-      ...entrada,
-      codigoDigitos: soloDigitos(entrada.codigo),
-      textoBusqueda: normalizarTexto(
+    return catalogo.iae.map((entrada) => {
+      const texto = normalizarTexto(
         `${entrada.codigo} ${entrada.titulo} ${titulosDeLosPadres(entrada)}`,
-      ),
-    }));
+      );
+      // Formas correctas de las erratas del literal, solo en el ÍNDICE: en pantalla se pinta el
+      // título tal como está en el catálogo sellado (hallazgo 2949).
+      const correcciones = Object.entries(ERRATAS_IAE)
+        .filter(([errata]) => texto.includes(errata))
+        .map(([, correcta]) => correcta);
+      return {
+        ...entrada,
+        codigoDigitos: soloDigitos(entrada.codigo),
+        textoBusqueda: correcciones.length > 0 ? `${texto} ${correcciones.join(' ')}` : texto,
+      };
+    });
   }, [catalogo]);
 
   const mapaIae = useMemo<Record<string, EntradaIae>>(() => {
@@ -737,7 +782,7 @@ export default function ConversorCnaeIaePage() {
   }, [catalogo, digitosConsultaCnae]);
 
   const consultaConFormatoVigente =
-    /^\s*\d{2}\.\d{2}\s*$/.test(consultaCnae) &&
+    /^\s*\d{2}\.\d{2}\s*$/.test(codigoSinPresentacion(consultaCnae) ?? '') &&
     vigenteHomonima !== null &&
     // El código no era también uno antiguo, o lo era y su homónima SÍ es una de sus
     // equivalencias: en ambos casos, lo tecleado significa hoy lo que la ficha enseña.
@@ -774,11 +819,23 @@ export default function ConversorCnaeIaePage() {
       }
       const titulo = normalizarTexto(entrada.titulo);
       if (titulo.startsWith(consultaCnaeNormalizada)) return 2;
+      // Un sinónimo IGUAL a la consulta (o su otro género) antes que una palabra completa
+      // dentro de un sinónimo más largo: «arquitecto» es sinónimo exacto de 71.11 y solo una
+      // palabra de «arquitecto de software» en 62.20, y empataban; el código ponía delante la
+      // consultoría informática (hallazgo 2948, la forma del 479 un escalón más arriba).
+      if (
+        entrada.sinonimos.some((s) => {
+          const n = normalizarTexto(s);
+          return n === consultaCnaeNormalizada || otroGenero(n) === consultaCnaeNormalizada;
+        })
+      ) {
+        return 3;
+      }
       // Palabra completa (en el título o en un sinónimo) antes que subcadena accidental:
       // «bar» tiene que encontrar el sinónimo exacto de 56.30 antes que «barnices».
-      if (coincidePalabraCompleta(entrada.textoBusqueda, consultaCnaeNormalizada)) return 3;
-      if (titulo.includes(consultaCnaeNormalizada)) return 4;
-      return 5;
+      if (coincidePalabraCompleta(entrada.textoBusqueda, consultaCnaeNormalizada)) return 4;
+      if (titulo.includes(consultaCnaeNormalizada)) return 5;
+      return 6;
     };
 
     let base: CnaeIndexada[];
@@ -1662,54 +1719,23 @@ export default function ConversorCnaeIaePage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Desde cuándo rige la CNAE-2025 y qué pasa con mi código antiguo?</h4>
-              <p>
-                {VIGENCIA_CNAE} Los códigos antiguos siguen apareciendo en documentos
-                previos; para saber a qué corresponden hoy basta con escribir los cuatro dígitos en
-                el buscador de esta página. En muchos casos la equivalencia es uno a uno, pero
-                algunas clases se han dividido o fusionado.
-              </p>
+              {/* Las cuatro respuestas compartidas con el FAQPage salen de metadata.ts (2951) */}
+              <p>{RESPUESTA_VIGENCIA_CNAE}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué cambia según la sección del IAE en la que me dé de alta?</h4>
-              <p>
-                La Sección 1ª recoge las actividades empresariales y la 2ª el ejercicio individual
-                de una profesión. La diferencia práctica está en la factura: un profesional de la
-                Sección 2ª aplica retención de IRPF en sus facturas a empresas y a otros
-                profesionales (
-                {formatPercentage((SECCION_PROFESIONAL.tipoRetencion ?? 0) / 100, 0)} con carácter
-                general y {formatPercentage((SECCION_PROFESIONAL.tipoRetencionInicio ?? 0) / 100, 0)}{' '}
-                el año de inicio de la actividad y los dos siguientes), mientras que una actividad empresarial de la Sección 1ª, con
-                carácter general, no la aplica. La Sección 3ª, artística, tiene tratamiento
-                análogo al profesional.
-              </p>
+              <p>{RESPUESTA_SECCIONES_IAE}</p>
               <p className={styles.faqTip}>
-                <strong>Dato útil:</strong> una misma actividad puede encajar en una sección o en
-                otra según cómo se ejerza; lo determinante es si hay organización empresarial de
-                medios o ejercicio personal de la profesión.
+                <strong>Dato útil:</strong> {DATO_UTIL_SECCIONES_IAE}
               </p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Tengo que pagar el IAE siendo autónomo?</h4>
-              <p>
-                Con carácter general, no. Están exentas del pago las personas físicas y quienes
-                tengan un importe neto de la cifra de negocios inferior a{' '}
-                {formatNumber(IAE_EXENCION.umbralCifraNegocio, 0)} €, lo
-                que deja fuera del pago a la inmensa mayoría de autónomos y de pequeñas empresas.
-                Otra cosa distinta es <strong>declarar</strong> el epígrafe: el alta censal es
-                obligatoria aunque no se pague cuota, porque es la forma en que la AEAT registra
-                qué actividad ejerces.
-              </p>
+              <p>{RESPUESTA_IAE_AUTONOMO}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Puedo estar dado de alta en varios epígrafes a la vez?</h4>
-              <p>
-                Sí, y es lo habitual en cuanto una actividad tiene varias patas: quien da clases y
-                además vende material, o quien ejecuta obra y también redacta proyectos. Cada
-                actividad efectivamente ejercida debe tener su alta en el epígrafe que le
-                corresponda, y todas se declaran en el mismo modelo 036 o 037. Estar en varios
-                epígrafes no multiplica las obligaciones formales, pero sí obliga a aplicar a cada
-                factura el régimen propio de su actividad.
-              </p>
+              <p>{RESPUESTA_VARIOS_EPIGRAFES}</p>
             </div>
           </div>
 

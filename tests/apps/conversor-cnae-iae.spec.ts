@@ -1053,10 +1053,12 @@ test.describe('Buscador CNAE-IAE — re-verificación del 30/08/2026', () => {
     await buscarCnae(page, 'bar');
     await expect(contador(page)).toContainText('13 resultados');
     await expect(fichas(page)).toHaveCount(10);
-    await expect(fichas(page).nth(0)).toContainText('56.11');
-    await expect(fichas(page).nth(0)).toContainText('Restaurantes');
-    await expect(fichas(page).nth(1)).toContainText('56.30');
-    await expect(fichas(page).nth(1)).toContainText('Servicios de bebidas');
+    // ⚠️ 20/10/2026 (hallazgo 2948): el sinónimo IGUAL a la consulta sube un nivel, así que 56.30
+    // (sinónimo «bar») ya no empata con 56.11 («bar restaurante») y va primero. El resto, igual.
+    await expect(fichas(page).nth(0)).toContainText('56.30');
+    await expect(fichas(page).nth(0)).toContainText('Servicios de bebidas');
+    await expect(fichas(page).nth(1)).toContainText('56.11');
+    await expect(fichas(page).nth(1)).toContainText('Restaurantes');
     // Y «barnices» detrás, no delante: 20.30, en cuarta posición.
     await expect(fichas(page).nth(3)).toContainText('20.30');
     await expect(fichas(page).nth(3)).toContainText(
@@ -3380,10 +3382,14 @@ test.describe('Buscador CNAE-IAE — re-inspección del 06/10/2026', () => {
     await expect(contador(page)).toHaveText(/^2 resultados/);
     await expect(fichas(page).filter({ hasText: '74.12' }).first()).toBeVisible();
     await expect(fichas(page).filter({ hasText: '74.11' }).first()).toBeVisible();
+    // Orden: hasta el 20/10/2026 el empate lo rompía el código (74.11 delante). Desde el hallazgo
+    // 2948, un sinónimo IGUAL a la consulta —o su otro género, como en el índice— va antes que la
+    // palabra dentro de un sinónimo más largo: «diseñador» ES el masculino de «diseñadora»
+    // (74.12) y solo una palabra de «diseñador de producto» (74.11).
     await buscarCnaeVerificado(page, 'diseñador');
     await expect(contador(page)).toHaveText(/^2 resultados/);
-    await expect(fichas(page).nth(0)).toContainText('74.11');
-    await expect(fichas(page).nth(1)).toContainText('74.12');
+    await expect(fichas(page).nth(0)).toContainText('74.12');
+    await expect(fichas(page).nth(1)).toContainText('74.11');
 
     // En el IAE, «diseñadora» no está en ningún título; «diseñadores» sí está en PERSONAS_IAE y
     // el único título que contiene «diseñador» es el grupo 432 «Decoradores-Diseñadores de
@@ -3855,10 +3861,11 @@ test.describe('Buscador CNAE-IAE — re-verificación del 07/10/2026', () => {
 // les quita la marca y quedan como regresión, SIN tocar el valor esperado.
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
-  test('ABIERTO · BAJO (operativa) — la reparación del 2925 deja en cero un código presentado con dos palabras o con dos puntos', async ({
+  test('REPARADO 20/10/2026 · BAJO (operativa) — la reparación del 2925 deja en cero un código presentado con dos palabras o con dos puntos', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO (hallazgo 2945): codigoSinPresentacion quita las palabras de presentación en
+    // cualquier sitio y los dos puntos.
     // `digitosSiEsCodigo` (2f3e4c2b) solo acepta como código lo que, tras quitar UNA palabra
     // de presentación al principio, sean cifras, puntos, comas, guiones y espacios. «CNAE:
     // 4711» deja «: 4711» (los dos puntos no están admitidos), «código CNAE 4711» deja «cnae
@@ -3868,11 +3875,18 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
     // «4711» → 2 resultados (47.11 y 47.91, `correspondencia['4711']`); «673.2» → el epígrafe
     // 673.2 de la Sección 1ª. Medido el 07/10/2026: 0 resultados en los seis, a 1280 y a 390.
     await abrirHidratado(page);
-    for (const consulta of ['CNAE: 4711', 'código CNAE 4711', 'Código CNAE: 47.11']) {
+    for (const consulta of ['CNAE: 4711', 'código CNAE 4711']) {
       await buscarCnaeVerificado(page, consulta);
       await expect(contador(page)).toHaveText(/^2 resultados/, { timeout: 2000 });
       await expect(fichas(page).first().locator('[class*="codigoCnae"]')).toHaveText('47.11');
     }
+    // «Código CNAE: 47.11» lleva el formato VIGENTE (con su punto): el caso del Inspector lo
+    // esperaba como «4711» (2 resultados), pero eso contradice el 2946 de abajo, que pide lo
+    // mismo que «47.11» a secas: 1 resultado, sin aviso de código antiguo. Manda el 2946.
+    await buscarCnaeVerificado(page, 'Código CNAE: 47.11');
+    await expect(contador(page)).toHaveText(/^1 resultado/, { timeout: 2000 });
+    await expect(fichas(page).first().locator('[class*="codigoCnae"]')).toHaveText('47.11');
+    await expect(avisoAntiguo(page)).toHaveCount(0);
     for (const consulta of ['Epígrafe IAE 673.2', 'Epígrafe: 673.2', 'epígrafe 673.2 IAE']) {
       await buscarIaeVerificado(page, consulta);
       await expect(contador(page)).toHaveText(/^1 resultado/, { timeout: 2000 });
@@ -3880,10 +3894,11 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
     }
   });
 
-  test('ABIERTO · BAJO (operativa) — «cnae 47.11» y «clase 47.11» se anuncian como código de la CNAE-2009, y «47.11» no (residuo del 424)', async ({
+  test('REPARADO 20/10/2026 · BAJO (operativa) — «cnae 47.11» y «clase 47.11» se anuncian como código de la CNAE-2009, y «47.11» no (residuo del 424)', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO (hallazgo 2946): el formato vigente «dd.dd» se mira sobre el código sin las
+    // palabras que lo presentan.
     // La reparación del 424 dejó de anunciar como antiguo un código VIGENTE tecleado con su
     // punto («47.11» → 1 resultado, sin aviso), pero `consultaConFormatoVigente` mira la
     // consulta EN BRUTO (/^\s*\d{2}\.\d{2}\s*$/), mientras que la reparación del 2925 admite
@@ -3926,10 +3941,11 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
     }
   });
 
-  test('ABIERTO · BAJO (operativa) — «arquitecto» encabeza con la consultoría informática, por delante de la clase de arquitectura', async ({
+  test('REPARADO 20/10/2026 · BAJO (operativa) — «arquitecto» encabeza con la consultoría informática, por delante de la clase de arquitectura', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO (hallazgo 2948): un sinónimo IGUAL a la consulta sube un nivel por encima de la
+    // palabra completa dentro de un sinónimo más largo.
     // «arquitecto» es sinónimo EXACTO de 71.11 «Servicios técnicos de arquitectura», y 62.20
     // «Actividades de consultoría informática…» solo lo contiene dentro de «arquitecto de
     // software». La relevancia les da el mismo nivel (palabra completa en el texto de
@@ -3940,12 +3956,20 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
     await expect(fichas(page).first().locator('[class*="codigoCnae"]')).toHaveText('71.11', {
       timeout: 2000,
     });
+    // La consultoría informática sigue saliendo (su «arquitecto de software»), detrás.
+    await expect(fichas(page).filter({ hasText: '62.20' })).toHaveCount(1);
+    // El femenino, igual que antes: solo 71.11.
+    await buscarCnaeVerificado(page, 'arquitecta');
+    await expect(fichas(page).first().locator('[class*="codigoCnae"]')).toHaveText('71.11', {
+      timeout: 2000,
+    });
   });
 
-  test('ABIERTO · BAJO (operativa) — «fisioterapeuta» no encuentra en el IAE el grupo 836, cuyo literal escribe «Fisoterapéutas»', async ({
+  test('REPARADO 20/10/2026 · BAJO (operativa) — «fisioterapeuta» no encuentra en el IAE el grupo 836, cuyo literal escribe «Fisoterapéutas»', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO (hallazgo 2949): ERRATAS_IAE añade al ÍNDICE la forma correcta; en pantalla el
+    // título sigue tal como está en el catálogo sellado.
     // El literal del catálogo sellado (bajado de la API del BOE) es 2ª 836 «Ayudantes Técnicos
     // Sanitarios y Fisoterapéutas»: sin la segunda «i», «fisioterapeuta» no es subcadena de
     // nada y da «0 resultados — Ningún epígrafe coincide» (igual «fisioterapia»). En la CNAE
@@ -3956,6 +3980,12 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
     await expect(grupo).toBeVisible({ timeout: 2000 });
     await expect(grupo).toContainText('836');
     await expect(grupo).toContainText(SECCION_2.retencion);
+    for (const consulta of ['fisioterapia', 'fisio']) {
+      await buscarIaeVerificado(page, consulta);
+      await expect(fichas(page).filter({ hasText: 'Ayudantes Técnicos Sanitarios' }).first()).toBeVisible({
+        timeout: 2000,
+      });
+    }
   });
 
   test('ABIERTO · BAJO (dato) — «distribuidora de bebidas» lleva al comercio al POR MENOR y no al por mayor', async ({
@@ -3975,10 +4005,10 @@ test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
     });
   });
 
-  test('ABIERTO · BAJO (contenido) — la misma pregunta tiene una respuesta en la FAQ visible y otra en el FAQPage', async ({
+  test('REPARADO 20/10/2026 · BAJO (contenido) — la misma pregunta tiene una respuesta en la FAQ visible y otra en el FAQPage', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO (hallazgo 2951): cuatro constantes en metadata.ts que importan las dos bocas.
     // Cuatro de las cinco preguntas del FAQPage (metadata.ts) están también en la FAQ visible
     // (page.tsx), con otra redacción y respuestas escritas aparte. No se contradicen hoy, pero
     // nada las ata: la del IAE cita el art. 82.1.c) en el JSON-LD y no en pantalla; la de varios
