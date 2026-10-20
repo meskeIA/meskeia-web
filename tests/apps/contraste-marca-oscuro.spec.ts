@@ -1,6 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
 import { PUERTO, ORIGEN } from './_puerto';
+import { prepararParaMedir } from '../_contraste';
 
 /**
  * Testigo — el color de marca como texto se lee en tema oscuro (cabo C0112, 17/10/2026).
@@ -74,12 +75,17 @@ async function textosBajoUmbral(page: Page, objetivo: number[]): Promise<string[
 async function abrirOscuro(page: Page, url: string): Promise<void> {
   await page.goto(url);
   await esperarPaginaAsentada(page);
+  // Sin transiciones, como el instrumento compartido. Antes había una espera fija de 300 ms tras
+  // el clic, y bajo carga las transiciones del cambio de tema duran más: con la CPU frenada ×6 se
+  // midió un fondo a medio camino (rgb(115,115,115) a los 100 ms) y transiciones vivas hasta los
+  // 600 ms. Era el rojo de la suite que aislado no salía (cabo C0337, simulador-gas-ideal y
+  // simulador-orbitas-kepler, 20/10/2026).
+  await prepararParaMedir(page);
   // Con el botón del logo, como lo haría la persona: sembrar data-theme o localStorage pasa en falso
   if ((await page.locator('html').getAttribute('data-theme')) !== 'dark') {
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).first().click();
   }
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await page.waitForTimeout(300); // transiciones de color
 }
 
 const DEGRADADO = [
