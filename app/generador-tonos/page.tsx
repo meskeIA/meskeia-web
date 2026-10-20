@@ -167,6 +167,17 @@ const LECTURAS_POR_PUNTO = 3;
 const MS_ENTRE_LECTURAS = 35;
 /** Rampa de entrada del oscilador de medida: el primer tercio no se lee hasta que ha terminado. */
 const RAMPA_MEDIDA_S = 0.05;
+/**
+ * El primer tercio, además, se relee hasta que su nivel deja de subir (cabo C0173). MS_ESTABILIZACION
+ * cubre la latencia de entrada en régimen, pero el PRIMER audio de un micrófono puede llegar más
+ * tarde: bajo carga se midieron 70-229 ms, y un micrófono que tarda 400 ms hundía el tercio de 50 Hz
+ * 5,6 dB mientras los otros 25 salían bien. Su ventana arrastraba silencio, y solo la suya: después
+ * la latencia es constante y se cancela al normalizar. Con un tono fijo dos lecturas seguidas dan lo
+ * mismo en cuanto la ventana lo contiene entero; mientras arrastre silencio, el nivel sube.
+ */
+const DB_PRIMER_TERCIO_ASENTADO = 0.5;
+const MS_ENTRE_RELECTURAS = 100;
+const RELECTURAS_MAX = 10;
 
 /** Volumen de la medida: fijo y moderado, para no saturar el micrófono del propio aparato. */
 const VOLUMEN_MEDIDA = 0.35;
@@ -826,6 +837,23 @@ export default function GeneradorTonosPage() {
         return leidas > 0 ? acumulado / leidas : -Infinity;
       };
 
+      // Solo para el primer tercio: relee hasta que dos lecturas seguidas difieran menos de
+      // DB_PRIMER_TERCIO_ASENTADO y despeguen del ruido de fondo (dos lecturas iguales de puro
+      // ruido son un micrófono que aún no ha entregado nada), con un tope. Si el nivel no se
+      // asienta, se queda la última lectura, que es la de la ventana más llena de tono.
+      const leerNivelAsentado = async (f: number, ruidoF: number) => {
+        let anterior = await leerNivel(f);
+        for (let i = 0; i < RELECTURAS_MAX; i++) {
+          await esperar(MS_ENTRE_RELECTURAS);
+          const actual = await leerNivel(f);
+          const asentado = Number.isFinite(anterior) && Number.isFinite(actual) &&
+            Math.abs(actual - anterior) < DB_PRIMER_TERCIO_ASENTADO;
+          if (asentado && restarRuido(actual, ruidoF) !== null) return actual;
+          anterior = actual;
+        }
+        return anterior;
+      };
+
       // 1) Suelo de ruido, en silencio. La ventana tiene que llenarse de audio posterior a abrir
       // el micrófono (antes, el analizador solo tiene ceros) y posterior al final del tono manual
       // si sonaba: con un micrófono que entrega audio en cuanto se abre, o un altavoz con
@@ -852,14 +880,14 @@ export default function GeneradorTonosPage() {
       medidaNodosRef.current = { oscilador, ganancia };
 
       const puntos: PuntoMedida[] = [];
-      for (const f of frecuencias) {
+      for (const [i, f] of frecuencias.entries()) {
         const cambio = ctx.currentTime;
         oscilador.frequency.setValueAtTime(f, cambio);
         setFrecuenciaEnCurso(f);
         // La ventana se cuenta desde que el tono suena ENTERO: en el primer tercio, desde el
         // final de la rampa de arranque, que antes caía dentro y lo hundía 4-6 dB (2306).
         await esperarRelojAudio(ctx, Math.max(cambio, arranque + RAMPA_MEDIDA_S) + esperaS);
-        const senal = await leerNivel(f);
+        const senal = i === 0 ? await leerNivelAsentado(f, ruido.get(f) ?? -Infinity) : await leerNivel(f);
         puntos.push({ frecuencia: f, db: restarRuido(senal, ruido.get(f) ?? -Infinity) });
       }
 

@@ -2204,11 +2204,15 @@ function INSTRUMENTAR_MICRO(): void {
     __pedidoMicro: MediaStreamConstraints | null;
     __pistasMicro: MediaStreamTrack[];
     __bucle: Bucle | null;
+    __retrasoPrimerAudioMs: number;
   };
   w.__modoMicro = 'bucle';
   w.__pedidoMicro = null;
   w.__pistasMicro = [];
   w.__bucle = null;
+  // Un micrófono que tarda en entregar su primer audio (cabo C0173): el bucle de un contexto queda
+  // mudo esos milisegundos desde que la app conecta algo a sus altavoces por primera vez.
+  w.__retrasoPrimerAudioMs = 0;
 
   // Los nodos del bucle se crean con CONSTRUCTORES, no con `ctx.createGain()` y compañía: esos
   // métodos los envuelve `INSTRUMENTAR`, y un nodo del test en `__ganancias` taparía la ganancia
@@ -2240,7 +2244,14 @@ function INSTRUMENTAR_MICRO(): void {
         copia = new MediaStreamAudioDestinationNode(this.context as AudioContext);
         copias.set(this.context, copia);
         const b = prepararBucle();
-        new MediaStreamAudioSourceNode(b.ctx, { mediaStream: copia.stream }).connect(b.entrada);
+        const fuente = new MediaStreamAudioSourceNode(b.ctx, { mediaStream: copia.stream });
+        if (w.__retrasoPrimerAudioMs > 0) {
+          const mudo = new GainNode(b.ctx, { gain: 0 });
+          mudo.gain.setValueAtTime(1, b.ctx.currentTime + w.__retrasoPrimerAudioMs / 1000);
+          fuente.connect(mudo).connect(b.entrada);
+        } else {
+          fuente.connect(b.entrada);
+        }
       }
       conectar.call(this, copia);
     }
@@ -2440,6 +2451,34 @@ test('HALLAZGO I1 — la misma cadena medida dos veces da la misma curva, y plan
   expect(peor, `B − A por tercio: ${diferencias.join(' · ')} — tabla entera: ${tablaEntera}`).toBeLessThanOrEqual(1);
   const a50 = tabla.get(50)?.[0] ?? null;
   expect(Math.abs(a50 ?? Infinity), `el tercio de 50 Hz de una cadena plana, en dB rel. (${tablaEntera})`).toBeLessThanOrEqual(1.5);
+});
+
+/**
+ * Cabo C0173: el I1 falló a veces en la suite con 4 workers, siempre igual: A, la PRIMERA medida,
+ * bajaba solo en el tercio de 50 Hz (−2,7 · −3,0 · −1,5 dB frente a B +0,5), los otros 25 A = B.
+ * Medido el 20/10/2026 (.reparar-trabajo/c0173-diag.mjs de la copia): con la CPU frenada ×6 el
+ * primer audio del micrófono en bucle llega 70-229 ms después del tono, y varía de una medida a
+ * otra. MS_ESTABILIZACION (100 ms) cubre la latencia de entrada en régimen, pero no un arranque
+ * más lento: la ventana del primer tercio recoge silencio. Después la latencia es constante y se
+ * cancela al normalizar; por eso solo cae el 50 Hz. Un móvil con la entrada lenta en arrancar haría
+ * lo mismo en cada medida. Aquí, determinista: el micrófono entrega su primer audio 400 ms tarde
+ * (con 250 ms el margen de la espera aún lo absorbía). Sin la relectura del primer tercio: 50 Hz a
+ * −5,6 dB y los otros 25 a 0 ± 0,7, la firma de los rojos de la suite.
+ * Esperado, a mano: lo mismo que en el I1 — la cadena es plana, 50 Hz incluido, a ±1,5 dB.
+ */
+test('C0173 — un micrófono que tarda 400 ms en entregar el primer audio no hunde el tercio de 50 Hz', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  await abrirConMicro(page);
+  await page.evaluate(() => {
+    (window as unknown as { __retrasoPrimerAudioMs: number }).__retrasoPrimerAudioMs = 400;
+  });
+  await medir(page, 'A');
+  const tabla = await tablaMedida(page);
+  const tablaA = TERCIOS_50_16K.map((f) => `${f}: ${tabla.get(f)?.[0] ?? '—'}`).join(' · ');
+  const a50 = tabla.get(50)?.[0] ?? null;
+  expect(Math.abs(a50 ?? Infinity), `tercio de 50 Hz de una cadena plana, en dB rel. (A: ${tablaA})`).toBeLessThanOrEqual(1.5);
 });
 
 // ------------------------------------------------------------
