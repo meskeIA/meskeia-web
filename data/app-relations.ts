@@ -313,6 +313,7 @@ const matematicasBasicasApps: RelatedApp[] = [
   { url: '/calculadora-porcentajes/', icon: '📊', name: 'Porcentajes', description: 'Cálculos de %' },
   { url: '/calculadora-regla-de-tres/', icon: '⚖️', name: 'Regla de Tres', description: 'Proporciones' },
   { url: '/calculadora-mcd-mcm/', icon: '🔗', name: 'MCD y MCM', description: 'Divisores y múltiplos' },
+  { url: '/calculadora-fracciones/', icon: '➗', name: 'Calculadora de Fracciones', description: 'Operaciones combinadas paso a paso' },
 ];
 
 const matematicasAvanzadasApps: RelatedApp[] = [
@@ -2540,6 +2541,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'calculadora-porcentajes': matematicasBasicasApps.filter(a => a.url !== '/calculadora-porcentajes/'),
   'calculadora-regla-de-tres': matematicasBasicasApps.filter(a => a.url !== '/calculadora-regla-de-tres/'),
   'calculadora-mcd-mcm': matematicasBasicasApps.filter(a => a.url !== '/calculadora-mcd-mcm/'),
+  'calculadora-fracciones': [
+    { url: '/calculadora-mcd-mcm/', icon: '🔗', name: 'MCD y MCM', description: 'Para simplificar y sumar fracciones' },
+    fichasCalculoApp,
+    { url: '/calculadora-matematica/', icon: '🔢', name: 'Calculadora Matemática', description: 'Matrices, potencias y logaritmos' },
+    { url: '/calculadora-porcentajes/', icon: '📊', name: 'Porcentajes', description: 'Cálculos de %' },
+  ],
   'algebra-ecuaciones': matematicasAvanzadasApps.filter(a => a.url !== '/algebra-ecuaciones/'),
   'simulador-progresiones': [
     { url: '/visualizador-funciones-mundo/', icon: '📈', name: 'Funciones que Gobiernan el Mundo', description: 'La aritmética crece como una recta; la geométrica, como una exponencial' },
@@ -2885,9 +2892,9 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'generador-fichas-calculo': [
     { url: '/tablas-multiplicar/', icon: '✖️', name: 'Tablas de Multiplicar', description: 'Practica las tablas' },
+    { url: '/calculadora-fracciones/', icon: '➗', name: 'Calculadora de Fracciones', description: 'Comprueba las fichas paso a paso' },
     sudokusApp,
     { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos' },
-    laberintosApp,
   ],
   'generador-sudokus': [
     { url: '/juego-sudoku/', icon: '🔢', name: 'Sudoku', description: 'Juega en pantalla, sin imprimir' },

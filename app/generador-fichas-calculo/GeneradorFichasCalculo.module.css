@@ -410,6 +410,63 @@
   color: var(--text-secondary);
 }
 
+/* Ejercicio de fracciones: siempre en línea, con las fracciones apiladas */
+.operacionFraccion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.enunciadoFraccion {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.fraccionHoja {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+}
+
+.fraccionNum {
+  padding: 0 0.2em 0.05em;
+  border-bottom: 2px solid currentColor;
+}
+
+.fraccionDen {
+  padding: 0.05em 0.2em 0;
+}
+
+.fraccionEntera {
+  line-height: 1.15;
+}
+
+/* Hueco para escribir a mano una fracción: alto de dos casillas, ancho de tres */
+.huecoFraccion {
+  display: inline-block;
+  width: calc(var(--casilla) * 3);
+  height: calc(var(--casilla) * 2);
+  border-bottom: 1px dashed var(--border);
+}
+
+.mixtoSolucion {
+  margin-left: 0.4rem;
+  font-size: 0.85em;
+}
+
+.notaCampo {
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
 .pieHoja {
   margin-top: var(--spacing-xl);
   text-align: center;
@@ -650,8 +707,18 @@
   }
 
   .operacionColumna,
-  .operacionHorizontal {
+  .operacionHorizontal,
+  .operacionFraccion {
     font-size: 4.2mm;
+  }
+
+  .enunciadoFraccion {
+    font-size: 3mm;
+    color: #000000;
+  }
+
+  .huecoFraccion {
+    border-bottom-color: #000000;
   }
 
   .pieHoja {

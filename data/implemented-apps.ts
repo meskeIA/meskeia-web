@@ -172,6 +172,7 @@ export const implementedAppsUrls = [
   "/calculadora-distribuciones/",    // Distribuciones: Normal, Poisson, Exponencial, etc.
   "/inferencia-bayesiana/",          // Teorema de Bayes, tests diagnósticos
   "/calculadora-matematica/",
+  "/calculadora-fracciones/",         // Operaciones combinadas con fracciones paso a paso, simplificar, equivalentes y 12 casos de aula (S0215)
   "/calculadora-geometria/",
   "/calculadora-calculo/",
   "/calculadora-trigonometria/",

@@ -2,11 +2,11 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Generador de Fichas de Cálculo para Imprimir | meskeIA',
+  title: 'Generador de Fichas de Cálculo y Fracciones para Imprimir | meskeIA',
   description:
-    'Crea fichas de sumas, restas, multiplicaciones y divisiones para imprimir. Cinco niveles, con o sin llevadas, en columna u horizontal y hoja de soluciones incluida.',
+    'Crea fichas de sumas, restas, multiplicaciones, divisiones y fracciones para imprimir. Cinco niveles, con o sin llevadas, en columna u horizontal y hoja de soluciones incluida.',
   keywords:
-    'generador fichas de calculo, ejercicios de matematicas para imprimir, fichas de sumas y restas, operaciones para imprimir, multiplicaciones para imprimir, divisiones para imprimir, cuentas para niños, hojas de calculo mental',
+    'generador fichas de calculo, ejercicios de matematicas para imprimir, fichas de sumas y restas, operaciones para imprimir, multiplicaciones para imprimir, divisiones para imprimir, cuentas para niños, hojas de calculo mental, fichas de fracciones para imprimir, ejercicios de fracciones, suma y resta de fracciones, simplificar fracciones',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -43,11 +43,12 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Generador de Fichas de Cálculo',
   description:
-    'Generador de fichas imprimibles de sumas, restas, multiplicaciones y divisiones con cinco niveles de dificultad, control de llevadas, división exacta o con resto, y presentación horizontal o en columna. Incluye hoja de soluciones.',
+    'Generador de fichas imprimibles de sumas, restas, multiplicaciones, divisiones y fracciones con cinco niveles de dificultad, control de llevadas, división exacta o con resto, y presentación horizontal o en columna. Incluye hoja de soluciones.',
   url: 'https://meskeia.com/generador-fichas-calculo/',
   category: 'EducationalApplication',
   features: [
     'Cuatro operaciones combinables en la misma ficha',
+    'Fichas de fracciones: mismo y distinto denominador, multiplicar y dividir, simplificar',
     'Cinco niveles, desde números hasta 10 hasta cuatro cifras',
     'Control de llevadas en sumas y restas',
     'División exacta o con resto',
@@ -93,6 +94,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Sí. Cada ficha lleva un número que actúa como semilla del generador: introduciéndolo de nuevo con los mismos ajustes se obtienen exactamente las mismas operaciones. Es lo que permite repartir una hoja idéntica a todo un grupo y corregir después con una única plantilla de soluciones.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Qué ejercicios de fracciones genera?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Cinco tipos: sumas y restas con el mismo denominador, sumas y restas con distinto denominador (el mínimo común múltiplo nunca pasa de 60), multiplicaciones y divisiones, simplificar hasta la fracción irreducible, y una mezcla de todos. El nivel fija el denominador máximo, de 6 en Iniciación a 15 en Experto. Las soluciones salen simplificadas y, si pasan de la unidad, también como número mixto.',
       },
     },
     {

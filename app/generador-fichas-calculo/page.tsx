@@ -13,21 +13,33 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { aMixto, normalizar, textoMixto, type Fraccion } from '@/lib/calculadoras/fracciones';
+import {
+  DENOMINADOR_MAXIMO,
+  TIPOS_FRACCION,
+  generarFraccion,
+  type CuentaFraccion,
+  type TipoFraccion,
+} from './fichasFracciones';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
 // ─────────────────────────────────────────────────────────────
 
-type Operacion = 'suma' | 'resta' | 'multiplicacion' | 'division';
+type Operacion = 'suma' | 'resta' | 'multiplicacion' | 'division' | 'fraccion';
 type Presentacion = 'horizontal' | 'columna';
 
-interface Cuenta {
+interface CuentaEntera {
+  tipo: 'entera';
   a: number;
   b: number;
   simbolo: string;
   resultado: number;
   resto: number | null;
 }
+
+/** Unión declarada a mano con literales: inferida, `tipo` se ensancharía a string (types/CLAUDE.md). */
+type Cuenta = CuentaEntera | CuentaFraccion;
 
 interface Nivel {
   id: string;
@@ -101,6 +113,7 @@ const ETIQUETAS_OPERACION: Record<Operacion, { nombre: string; simbolo: string }
   resta: { nombre: 'Restas', simbolo: '−' },
   multiplicacion: { nombre: 'Multiplicaciones', simbolo: '×' },
   division: { nombre: 'Divisiones', simbolo: ':' },
+  fraccion: { nombre: 'Fracciones', simbolo: '½' },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -138,7 +151,7 @@ function sumaSinLlevadas(aleatorio: () => number, maximo: number): Cuenta {
     potencia *= 10;
   }
 
-  return { a, b, simbolo: '+', resultado: a + b, resto: null };
+  return { tipo: 'entera', a, b, simbolo: '+', resultado: a + b, resto: null };
 }
 
 /** Resta sin llevadas: cada dígito del minuendo es mayor o igual que el del sustraendo */
@@ -156,7 +169,7 @@ function restaSinLlevadas(aleatorio: () => number, maximo: number): Cuenta {
     potencia *= 10;
   }
 
-  return { a, b, simbolo: '−', resultado: a - b, resto: null };
+  return { tipo: 'entera', a, b, simbolo: '−', resultado: a - b, resto: null };
 }
 
 function generarCuenta(
@@ -164,26 +177,29 @@ function generarCuenta(
   nivel: Nivel,
   conLlevadas: boolean,
   divisionConResto: boolean,
+  tipoFraccion: TipoFraccion,
   aleatorio: () => number,
 ): Cuenta {
   switch (operacion) {
+    case 'fraccion':
+      return generarFraccion(tipoFraccion, nivel.id, aleatorio);
     case 'suma': {
       if (!conLlevadas) return sumaSinLlevadas(aleatorio, nivel.maxAditivo);
       const a = entero(aleatorio, 2, nivel.maxAditivo);
       const b = entero(aleatorio, 2, nivel.maxAditivo);
-      return { a, b, simbolo: '+', resultado: a + b, resto: null };
+      return { tipo: 'entera', a, b, simbolo: '+', resultado: a + b, resto: null };
     }
     case 'resta': {
       if (!conLlevadas) return restaSinLlevadas(aleatorio, nivel.maxAditivo);
       // El minuendo siempre es mayor: el resultado nunca es negativo
       const mayor = entero(aleatorio, 3, nivel.maxAditivo);
       const menor = entero(aleatorio, 1, mayor);
-      return { a: mayor, b: menor, simbolo: '−', resultado: mayor - menor, resto: null };
+      return { tipo: 'entera', a: mayor, b: menor, simbolo: '−', resultado: mayor - menor, resto: null };
     }
     case 'multiplicacion': {
       const a = entero(aleatorio, 2, nivel.maxFactorA);
       const b = entero(aleatorio, 2, nivel.maxFactorB);
-      return { a, b, simbolo: '×', resultado: a * b, resto: null };
+      return { tipo: 'entera', a, b, simbolo: '×', resultado: a * b, resto: null };
     }
     case 'division':
     default: {
@@ -191,6 +207,7 @@ function generarCuenta(
       const cociente = entero(aleatorio, 2, nivel.maxCociente);
       const resto = divisionConResto ? entero(aleatorio, 0, divisor - 1) : 0;
       return {
+        tipo: 'entera',
         a: divisor * cociente + resto,
         b: divisor,
         simbolo: ':',
@@ -207,6 +224,7 @@ function generarFicha(
   cantidad: number,
   conLlevadas: boolean,
   divisionConResto: boolean,
+  tipoFraccion: TipoFraccion,
   semilla: number,
 ): Cuenta[] {
   const aleatorio = crearAleatorio(semilla);
@@ -215,10 +233,38 @@ function generarFicha(
   for (let i = 0; i < cantidad; i++) {
     // Las operaciones se alternan en orden para que la ficha quede repartida
     const operacion = operaciones[i % operaciones.length];
-    cuentas.push(generarCuenta(operacion, nivel, conLlevadas, divisionConResto, aleatorio));
+    cuentas.push(generarCuenta(operacion, nivel, conLlevadas, divisionConResto, tipoFraccion, aleatorio));
   }
 
   return cuentas;
+}
+
+/** Fracción apilada (numerador, raya y denominador), igual en pantalla que en papel. */
+function FraccionHoja({ f }: { f: Fraccion }) {
+  const n = normalizar(f);
+  if (n.den === 1) return <span className={styles.fraccionEntera}>{formatNumber(n.num, 0)}</span>;
+  return (
+    <span className={styles.fraccionHoja} role="img" aria-label={`${formatNumber(n.num, 0)} entre ${formatNumber(n.den, 0)}`}>
+      <span className={styles.fraccionNum} aria-hidden="true">
+        {formatNumber(n.num, 0)}
+      </span>
+      <span className={styles.fraccionDen} aria-hidden="true">
+        {formatNumber(n.den, 0)}
+      </span>
+    </span>
+  );
+}
+
+/** La solución de un ejercicio de fracciones: irreducible y, si pasa de 1, también en mixto. */
+function SolucionFraccion({ f }: { f: Fraccion }) {
+  const m = aMixto(f);
+  const hayMixto = m.entero !== 0 && m.parte.num !== 0;
+  return (
+    <span className={styles.solucion}>
+      <FraccionHoja f={f} />
+      {hayMixto && <span className={styles.mixtoSolucion}>= {textoMixto(m)}</span>}
+    </span>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -232,6 +278,7 @@ export default function GeneradorFichasCalculoPage() {
   const [cantidad, setCantidad] = useState(24);
   const [conLlevadas, setConLlevadas] = useState(true);
   const [divisionConResto, setDivisionConResto] = useState(false);
+  const [tipoFraccion, setTipoFraccion] = useState<TipoFraccion>('distinto');
   const [presentacion, setPresentacion] = useState<Presentacion>('columna');
   const [semillaManual, setSemillaManual] = useState('');
   const [ficha, setFicha] = useState<Cuenta[]>([]);
@@ -259,11 +306,11 @@ export default function GeneradorFichasCalculoPage() {
     const base = Number(semillaManual.replace(/\D/g, ''));
     const nuevaSemilla = base > 0 ? base : Math.floor(Math.random() * 900000) + 100000;
 
-    setFicha(generarFicha(operaciones, nivel, cantidad, conLlevadas, divisionConResto, nuevaSemilla));
+    setFicha(generarFicha(operaciones, nivel, cantidad, conLlevadas, divisionConResto, tipoFraccion, nuevaSemilla));
     setSemilla(nuevaSemilla);
     setMostrarSoluciones(false);
     setAviso('');
-  }, [operaciones, nivel, cantidad, conLlevadas, divisionConResto, semillaManual]);
+  }, [operaciones, nivel, cantidad, conLlevadas, divisionConResto, tipoFraccion, semillaManual]);
 
   return (
     <div className={`${styles.container} ${impresion.lienzo}`}>
@@ -275,8 +322,8 @@ export default function GeneradorFichasCalculoPage() {
             <span aria-hidden="true">➗</span> Generador de Fichas de Cálculo
           </h1>
           <p className={styles.subtitle}>
-            Sumas, restas, multiplicaciones y divisiones a la medida del nivel, listas para imprimir y
-            con su hoja de soluciones.
+            Sumas, restas, multiplicaciones, divisiones y fracciones a la medida del nivel, listas para
+            imprimir y con su hoja de soluciones.
           </p>
         </header>
 
@@ -317,6 +364,30 @@ export default function GeneradorFichasCalculoPage() {
                 ))}
               </div>
             </div>
+
+            {operaciones.includes('fraccion') && (
+              <div className={styles.campo}>
+                <span className={styles.etiqueta}>Ejercicios de fracciones</span>
+                <div className={styles.grupoBotones} role="group" aria-label="Tipo de ejercicios de fracciones">
+                  {TIPOS_FRACCION.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      className={`${styles.btnOpcion} ${tipoFraccion === t.id ? styles.btnOpcionActivo : ''}`}
+                      aria-pressed={tipoFraccion === t.id}
+                      onClick={() => setTipoFraccion(t.id)}
+                    >
+                      <strong>{t.nombre}</strong>
+                      <small>{t.detalle}</small>
+                    </button>
+                  ))}
+                </div>
+                <p className={styles.notaCampo}>
+                  El nivel fija el denominador máximo: {DENOMINADOR_MAXIMO[nivel.id] ?? 10} en el nivel {nivel.nombre}. Las
+                  soluciones salen simplificadas y, si pasan de la unidad, también como número mixto.
+                </p>
+              </div>
+            )}
 
             <div className={styles.campo}>
               <span className={styles.etiqueta}>Nivel</span>
@@ -465,12 +536,35 @@ export default function GeneradorFichasCalculoPage() {
             </div>
           </div>
 
-          <ol className={presentacion === 'columna' ? styles.rejillaColumna : styles.rejillaHorizontal}>
+          {/* Una fracción apilada no cabe en la celda estrecha de la rejilla en columna */}
+          <ol
+            className={
+              presentacion === 'columna' && !ficha.some((c) => c.tipo === 'fraccion')
+                ? styles.rejillaColumna
+                : styles.rejillaHorizontal
+            }
+          >
             {ficha.map((cuenta, i) => (
               <li key={i} className={`${styles.cuenta} ${impresion.bloque}`}>
                 <span className={styles.numeroCuenta}>{i + 1}.</span>
 
-                {presentacion === 'columna' ? (
+                {cuenta.tipo === 'fraccion' ? (
+                  // Las fracciones no se colocan en columna: siempre en línea, apiladas
+                  <div className={styles.operacionFraccion}>
+                    {cuenta.b === null ? (
+                      <span className={styles.enunciadoFraccion}>Simplifica</span>
+                    ) : null}
+                    <FraccionHoja f={cuenta.a} />
+                    {cuenta.b !== null && <span className={styles.simbolo}>{cuenta.simbolo}</span>}
+                    {cuenta.b !== null && <FraccionHoja f={cuenta.b} />}
+                    <span className={styles.simbolo}>=</span>
+                    {mostrarSoluciones ? (
+                      <SolucionFraccion f={cuenta.resultado} />
+                    ) : (
+                      <span className={styles.huecoFraccion} />
+                    )}
+                  </div>
+                ) : presentacion === 'columna' ? (
                   <div className={styles.operacionColumna}>
                     <span className={styles.operandoA}>{formatNumber(cuenta.a, 0)}</span>
                     <span className={styles.operandoB}>
@@ -590,6 +684,19 @@ export default function GeneradorFichasCalculoPage() {
               soltura y menos de dos fallos, toca subir de nivel o activar las llevadas.
             </p>
 
+            <h2>Fichas de fracciones: en qué orden</h2>
+            <p>
+              El orden habitual es el de la dificultad del procedimiento, no el de las operaciones: primero
+              sumas y restas con el <strong>mismo denominador</strong>, después <strong>simplificar</strong>{' '}
+              (hace falta para dar bien cualquier resultado), luego sumas y restas con{' '}
+              <strong>distinto denominador</strong>, que exigen el mínimo común múltiplo, y al final
+              multiplicar y dividir. Curiosamente, multiplicar fracciones es más fácil que sumarlas, pero
+              conviene dejarlo para después para que no se confundan las dos reglas. Para comprobar un
+              resultado concreto paso a paso, la{' '}
+              <a href="/calculadora-fracciones/">calculadora de fracciones</a> usa exactamente el mismo
+              cálculo que la hoja de soluciones.
+            </p>
+
             <h2>Tres formas de usar las fichas</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
@@ -666,6 +773,18 @@ export default function GeneradorFichasCalculoPage() {
                   tipos elegidos y no se agrupan todas las divisiones al final. Mezclar operaciones tiene
                   una ventaja pedagógica: obliga a leer el signo antes de calcular, algo que se pierde
                   cuando toda la hoja es del mismo tipo y se entra en piloto automático.
+                </p>
+              </div>
+              <div className={styles.faqItem}>
+                <h4>
+                  <span aria-hidden="true">❓</span> ¿Qué ejercicios de fracciones genera?
+                </h4>
+                <p>
+                  Cinco tipos: sumas y restas con el mismo denominador, sumas y restas con distinto
+                  denominador (el mínimo común múltiplo nunca pasa de 60), multiplicaciones y divisiones,
+                  simplificar hasta la fracción irreducible, y una mezcla de todos. El nivel fija el
+                  denominador máximo, de 6 en Iniciación a 15 en Experto. Las soluciones salen simplificadas
+                  y, si pasan de la unidad, también como número mixto.
                 </p>
               </div>
               <div className={styles.faqItem}>
