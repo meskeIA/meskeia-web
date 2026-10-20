@@ -786,7 +786,11 @@ export default function GeneradorLoteriaPage() {
                 <tr>
                   <td><span aria-hidden="true">🎱</span> La Primitiva</td>
                   <td>6 de 49 + Reintegro</td>
-                  <td>1 entre 13.983.816</td>
+                  {/* Hallazgo 3390 (cabo C0230, 20/10/2026): el bote de La Primitiva es la categoría
+                      especial, los 6 números Y el reintegro (norma 8.ª.1, 1.1 y 1.2 de las normas de
+                      SELAE de junio de 2015; el reintegro sale de diez bolas, norma 37.ª):
+                      13.983.816 × 10. Acertar solo los 6 es la primera categoría. */}
+                  <td>1 entre 139.838.160</td>
                   <td>1,00 €</td>
                   <td>3.000.000 €</td>
                   <td>Lunes, jueves y sábados</td>
@@ -931,10 +935,14 @@ export default function GeneradorLoteriaPage() {
               <details>
                 <summary>¿Qué probabilidad tengo de acertar el bote de La Primitiva?</summary>
                 <p>
-                  La probabilidad de acertar los 6 números principales es de 1 entre 13.983.816.
-                  Para tener una probabilidad del 50 % de acertar al menos una vez necesitarías
-                  comprar más de 9,6 millones de boletos. Si compras uno por semana, estadísticamente
-                  tardarías unos 269.000 años en acertar.
+                  {/* Hallazgo 3390: el bote es la categoría especial (6 números + reintegro), no la
+                      primera. ln 2 × 139.838.160 ≈ 96,9 millones; 139.838.160 / 52 ≈ 2,69 millones. */}
+                  El bote de La Primitiva es el premio de la categoría especial: acertar los 6
+                  números y además el reintegro. La probabilidad es de 1 entre 139.838.160 (los 6
+                  números, 1 entre 13.983.816, por 1 entre 10 del reintegro). Para tener una
+                  probabilidad del 50 % de acertarlo al menos una vez necesitarías unos 97 millones
+                  de apuestas distintas. Con una por semana, de media tardarías unos 2,7 millones de
+                  años en acertarlo.
                 </p>
               </details>
             </li>

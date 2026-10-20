@@ -3802,17 +3802,22 @@ test.describe('cotejo 20/10/2026 · bote de La Primitiva (normas de SELAE de 201
   });
 
   test('HALLAZGO (19/10 C0230 → 20/10) · la tabla rotula «Probabilidad bote» de La Primitiva con 1 entre 139.838.160', async ({ page }) => {
-    test.fail(); // ABIERTO: la celda dice 1 entre 13.983.816, que es la primera categoría
+    // REPARADO 20/10/2026 (hallazgo 3390): la celda decía 1 entre 13.983.816, que es la primera categoría.
     // Columnas: Lotería · Combinación · Probabilidad bote. Norma 8.ª.1.1-1.2: el bote es de la
     // categoría especial (6 + reintegro) → 13.983.816 × 10 = 139.838.160.
     await expect(filaPrimitiva(page).locator('td').nth(2)).toHaveText('1 entre 139.838.160');
   });
 
   test('HALLAZGO (19/10 C0230 → 20/10) · la FAQ «¿…acertar el bote de La Primitiva?» da 1 entre 139.838.160', async ({ page }) => {
-    test.fail(); // ABIERTO: responde con los 6 números (1 entre 13.983.816), 9,6 millones y 269.000 años
-    // Con 139.838.160: el 50 % exige ln 2 · 139.838.160 ≈ 96,9 millones de apuestas, y a una por
-    // semana la espera media es 139.838.160 / 52 ≈ 2,69 millones de años.
-    await expect(faqBote(page)).toContainText('139.838.160');
-    await expect(faqBote(page)).not.toContainText('13.983.816');
+    // REPARADO 20/10/2026 (hallazgo 3390): respondía con los 6 números (1 entre 13.983.816), 9,6
+    // millones y 269.000 años. Con 139.838.160: el 50 % exige ln 2 · 139.838.160 ≈ 96,9 millones de
+    // apuestas, y a una por semana la espera media es 139.838.160 / 52 ≈ 2,69 millones de años.
+    // La respuesta nombra el 13.983.816 de los 6 números, pero como un FACTOR del bote, no como el bote.
+    await expect(faqBote(page)).toContainText('La probabilidad es de 1 entre 139.838.160');
+    await expect(faqBote(page)).toContainText('unos 97 millones');
+    await expect(faqBote(page)).toContainText('unos 2,7 millones de');
+    await expect(faqBote(page)).not.toContainText('9,6 millones');
+    await expect(faqBote(page)).not.toContainText('269.000');
+    await expect(faqBote(page)).not.toContainText('principales es de 1 entre 13.983.816');
   });
 });
