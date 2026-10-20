@@ -1989,6 +1989,12 @@ export default function SimuladorLocalComercialPage() {
                               ])}`) +
                           (motivoGastosVenta
                             ? `. ${motivoGastosVenta}: con ese dato saldría negativo, y no se usa para calcular la ganancia`
+                            : '') +
+                          // Hallazgo 2911 (20/10/2026): con el valor catastral total ilegible la
+                          // plusvalía restada es la del método objetivo, y con el real (más barato)
+                          // el valor de transmisión sería MAYOR; las tarjetas de abajo ya lo decían.
+                          (resultadosVendedor.plusvaliaCalculada && !resultadosVendedor.valorTotalLegible
+                            ? '. El valor catastral total no se ha podido leer, así que la plusvalía restada es la del método objetivo y el valor real puede ser MAYOR'
                             : '')
                         }
                       />

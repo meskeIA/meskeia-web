@@ -4445,8 +4445,8 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Cantabria, la renuncia que Ceuta no
   //   BASE R: plusvalía real = (200.000 − 195.000) × 0,4 × 25 % = 500 < objetivo 40.000 × 0,12 × 25 %
   //   = 1.200 → transmisión = 200.000 − 6.000 − 500 − 500 = 193.000,00
   //   total «100.000.00» → plusvalía 1.200 → transmisión 192.300,00 (la real, MAYOR)
+  // REPARADO el 20/10/2026 (hallazgo 2911), también en garaje, trastero (3252) y el estimador.
   test('[06/10-a] con el valor catastral total ilegible, «Valor de transmisión» nombra el dato y dice que el real puede ser mayor', async ({ page }) => {
-    test.fail();
     await prepararVendedor2609(page, { afecto: true, amort: '20000', compra: '195000' });
     expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('500,00 €');
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('193.000,00 €');
@@ -4458,8 +4458,8 @@ test.describe('RE-INSPECCIÓN 06/10/2026 — Cantabria, la renuncia que Ceuta no
       'El valor catastral total no se ha podido leer, así que la ganancia real puede ser mayor',
     );
     expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toContain('El valor catastral total no se ha podido leer');
-    // El defecto.
     expect(await descripcionTarjeta(page, 'Valor de transmisión')).toMatch(/valor catastral total/i);
+    expect(await descripcionTarjeta(page, 'Valor de transmisión')).toMatch(/puede ser MAYOR/);
   });
 
   // HALLAZGO [06/10-b] (bajo, accesibilidad) — ✅ REPARADO el 06/10/2026 (hallazgo 2912): `.errorText`

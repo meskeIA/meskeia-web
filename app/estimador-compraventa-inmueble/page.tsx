@@ -2544,7 +2544,7 @@ export default function SimuladorCompraventaPage() {
                       // Sin la plusvalía calculada no puede decir que la resta: el motor la tomó
                       // como 0 y la ganancia y el IRPF de abajo son un máximo (patrón 2).
                       description={
-                        resultadosVendedor.comisionImposible
+                        (resultadosVendedor.comisionImposible
                           ? // La comisión por encima del 100 % no entra (hallazgo 2186): no se resta.
                             `Precio de venta − otros gastos de la venta${resultadosVendedor.plusvaliaCalculada ? ' y plusvalía municipal' : ` (sin la plusvalía municipal, ${faltaPlusvalia})`}, sin la comisión, que no es válida${resultadosVendedor.otrosVentaLegible ? '' : `: ${noSePudoLeer(['los otros gastos de la venta'])}`}`
                           : resultadosVendedor.comisionLegible && resultadosVendedor.otrosVentaLegible
@@ -2554,7 +2554,13 @@ export default function SimuladorCompraventaPage() {
                           : `Precio de venta − ${resultadosVendedor.plusvaliaCalculada ? 'plusvalía municipal y ' : ''}los gastos que se leen${resultadosVendedor.plusvaliaCalculada ? '' : ` (sin la plusvalía municipal, ${faltaPlusvalia})`}: ${noSePudoLeer([
                               ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
                               ...(resultadosVendedor.otrosVentaLegible ? [] : ['los otros gastos de la venta']),
-                            ])}`
+                            ])}`) +
+                        // Efecto familia del 2911 (20/10/2026): con el valor catastral total ilegible
+                        // la plusvalía restada es la del método objetivo, y con el real (más barato)
+                        // el valor de transmisión sería MAYOR.
+                        (resultadosVendedor.plusvaliaCalculada && !resultadosVendedor.valorTotalLegible
+                          ? '. El valor catastral total no se ha podido leer, así que la plusvalía restada es la del método objetivo y el valor real puede ser MAYOR'
+                          : '')
                       }
                     />
                   )}

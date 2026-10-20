@@ -1735,7 +1735,10 @@ export default function SimuladorGarajeCompraventaPage() {
                         icon="📤"
                         // Sin la plusvalía calculada no puede decir que la resta: el motor la tomó
                         // como 0, y la ganancia y el IRPF de abajo son un máximo (patrón 2, 1546).
-                        description={
+                        // Efecto familia del 2911 (20/10/2026): con el valor catastral total
+                        // ilegible la plusvalía restada es la del método objetivo, y con el real
+                        // (más barato) el valor de transmisión sería MAYOR.
+                        description={`${
                           resultadosVendedor.comisionLegible && resultadosVendedor.gestoriaLegible
                             ? resultadosVendedor.plusvaliaCalculada
                               ? 'Precio de venta − comisión, gestoría y plusvalía municipal'
@@ -1744,7 +1747,11 @@ export default function SimuladorGarajeCompraventaPage() {
                                 ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
                                 ...(resultadosVendedor.gestoriaLegible ? [] : ['la gestoría de la venta']),
                               ])}`
-                        }
+                        }${
+                          resultadosVendedor.plusvaliaCalculada && !resultadosVendedor.valorTotalLegible
+                            ? '. El valor catastral total no se ha podido leer, así que la plusvalía restada es la del método objetivo y el valor real puede ser MAYOR'
+                            : ''
+                        }`}
                       />
                     </>
                   )}
