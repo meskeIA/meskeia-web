@@ -663,7 +663,9 @@ const DERIVACIONES: Partial<Record<TipoInmueble, { url: string; nombre: string; 
 
 const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'general', label: 'General (sin bonificaciones)' },
-  { value: 'joven', label: 'Joven (< 35 años)' },
+  // Efecto familia del 3255 de trastero (20/10/2026): «< 35 años» contradecía a ITP_CCAA en ocho
+  // comunidades; la edad la dice el aviso del reducido de cada comunidad.
+  { value: 'joven', label: 'Joven (la edad límite depende de la comunidad)' },
   { value: 'familia-numerosa', label: 'Familia numerosa' },
   { value: 'discapacidad', label: 'Persona con discapacidad' },
   { value: 'vpo', label: 'Vivienda de Protección Oficial' },
@@ -1024,7 +1026,12 @@ export default function SimuladorCompraventaPage() {
               ? 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
       if (!rp.exento && rp.bonificadaCiudad) {
-        metodoPlusvalia += `, con la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+        const bonificacion = `la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+        // Receta del 3259 de local-comercial (20/10/2026, efecto familia del 3254 de trastero):
+        // detrás de una descripción que ya acaba en punto salía «(1.234,56)., con la bonificación».
+        metodoPlusvalia = metodoPlusvalia.endsWith('.')
+          ? `${metodoPlusvalia} Lleva ${bonificacion}.`
+          : `${metodoPlusvalia}, con ${bonificacion}`;
       }
     }
 

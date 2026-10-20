@@ -719,7 +719,9 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 0.75,
-    notas: 'ITP más bajo de España peninsular (6 %). Bonificación 100 % para jóvenes en pueblos pequeños desde nov/2024.',
+    // Hallazgo 3251 (20/10/2026): decía «ITP más bajo de España peninsular», y Navarra, peninsular,
+    // tiene el mismo 6 %. Se dice el dato, sin ranking (la forma de los 2915/2917/2921 de Canarias).
+    notas: 'ITP general del 6 %. Bonificación 100 % para jóvenes en pueblos pequeños desde nov/2024.',
   },
 
   'murcia': {

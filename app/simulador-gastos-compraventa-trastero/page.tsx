@@ -337,7 +337,9 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
 
 const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'general', label: 'General (sin bonificaciones)' },
-  { value: 'joven', label: 'Joven (< 35 años)' },
+  // Hallazgo 3255 (20/10/2026): «< 35 años» contradecía a ITP_CCAA en ocho comunidades (de menores
+  // de 30 a hasta 40); la edad la dice el aviso del reducido de cada comunidad.
+  { value: 'joven', label: 'Joven (la edad límite depende de la comunidad)' },
   { value: 'familia-numerosa', label: 'Familia numerosa' },
   { value: 'discapacidad', label: 'Persona con discapacidad' },
 ];
@@ -447,7 +449,7 @@ function calcularVendedor(e: EntradaVendedor) {
  * el País Vasco cobra el 7 % (hallazgo 1582); la bonificación de Ceuta y Melilla sale del motor.
  * Decisión común de la familia con nave, solar y terreno (24/09/2026).
  */
-const NOTA_DATOS = `El ITP de un trastero comprado por separado va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}\u00A0% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}\u00A0% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}\u00A0% (art. 57 bis.1 TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
+const NOTA_DATOS = `El ITP de un trastero comprado por separado va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}\u00A0% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}\u00A0% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}\u00A0% (art. 57 bis.3.a y 57 bis.1 TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
 
 /**
  * Lo que de verdad aplica el sello de ITP/AJD/IVA. `FISCAL_INMUEBLES_META.fuente` nombra además
@@ -739,7 +741,12 @@ export default function SimuladorTrasteroCompraventaPage() {
               : 'Método objetivo (más favorable)';
     }
     if (rp && !rp.exento && rp.bonificadaCiudad) {
-      metodoPlusvalia += `, con la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+      const bonificacion = `la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+      // Hallazgo 3254 (20/10/2026), receta del 3259 de local-comercial: detrás de una descripción
+      // que ya acaba en punto (la del total catastral ilegible) salía «(1.234,56)., con la bonificación».
+      metodoPlusvalia = metodoPlusvalia.endsWith('.')
+        ? `${metodoPlusvalia} Lleva ${bonificacion}.`
+        : `${metodoPlusvalia}, con ${bonificacion}`;
     }
 
     /**
@@ -1731,7 +1738,10 @@ export default function SimuladorTrasteroCompraventaPage() {
                         // como 0 por ilegibles (hallazgo 1284, la gemela del 1157).
                         // Sin la plusvalía calculada no puede decir que la resta: el motor la tomó
                         // como 0, y la ganancia y el IRPF de abajo son un máximo (patrón 2, 1562).
-                        description={
+                        // Hallazgo 3252 (20/10/2026): con el valor catastral total ilegible la
+                        // plusvalía restada es la del método objetivo, y con el real (más barato)
+                        // el valor de transmisión sería MAYOR; las tarjetas de abajo ya lo decían.
+                        description={`${
                           resultadosVendedor.comisionLegible && resultadosVendedor.gestoriaLegible
                             ? resultadosVendedor.plusvaliaCalculada
                               ? 'Precio de venta − comisión, gestoría y plusvalía municipal'
@@ -1740,7 +1750,11 @@ export default function SimuladorTrasteroCompraventaPage() {
                                 ...(resultadosVendedor.comisionLegible ? [] : ['la comisión']),
                                 ...(resultadosVendedor.gestoriaLegible ? [] : ['la gestoría de la venta']),
                               ])}`
-                        }
+                        }${
+                          resultadosVendedor.plusvaliaCalculada && !resultadosVendedor.valorTotalLegible
+                            ? '. El valor catastral total no se ha podido leer, así que la plusvalía restada es la del método objetivo y el valor real puede ser MAYOR'
+                            : ''
+                        }`}
                       />
                     </>
                   )}
@@ -1837,9 +1851,15 @@ export default function SimuladorTrasteroCompraventaPage() {
                             if (!aviso) return null;
                             // Con las otras rentas ilegibles, el aviso ya lo dice: no se añade
                             // «como si esta venta fuera tu única renta», que lo contradiría.
+                            // Hallazgo 3253 (20/10/2026): la deducción de Ceuta y Melilla, también
+                            // detrás del aviso (la forma del 3258 de local-comercial).
+                            const deduccion =
+                              resultadosVendedor.deduccionCeutaMelilla > 0
+                                ? ` Lleva la deducción del ${DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje} % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos.`
+                                : '';
                             return resultadosVendedor.irpfGanancia > 0 && !nombraOtrasRentas(resultadosVendedor.veredictoIrpf)
-                              ? `${aviso} ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`
-                              : aviso;
+                              ? `${aviso}${deduccion} ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`
+                              : `${aviso}${deduccion}`;
                           })() ??
                           (resultadosVendedor.gananciaPatrimonial < 0
                             ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
@@ -2110,8 +2130,13 @@ export default function SimuladorTrasteroCompraventaPage() {
               pero el art. 35 LIRPF descuenta antes los gastos de la venta: con la comisión del 3&nbsp;% que trae el
               simulador ({formatCurrency(EJEMPLOS.ventaComision)}), y antes de restar la plusvalía municipal, la ganancia queda como máximo en {formatCurrency(EJEMPLOS.ventaGanancia)} y
               el IRPF en {formatCurrency(EJEMPLOS.ventaIrpf)}, porque la base del ahorro no es plana: {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}&nbsp;% hasta {eurosEnteros(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].hasta)} y {formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[1].tipo, 0)}&nbsp;% sobre el resto.
-              La plusvalía que se pague se resta del valor de transmisión, así que las dos cifras bajan un poco más.</p>
-              <div className={styles.casoResultado}>Como máximo: ganancia de {formatCurrency(EJEMPLOS.ventaGanancia)} → {formatCurrency(EJEMPLOS.ventaIrpf)} de IRPF, antes de restar la plusvalía</div>
+              La plusvalía que se pague se resta del valor de transmisión, así que las dos cifras bajan un poco más.
+              {/* Hallazgo 3381 (20/10/2026): desde 5f1b199a la calculadora cobra lo que la venta AÑADE a
+                  las otras rentas del ahorro; el «como máximo» del IRPF solo lo es si no las hay. */}
+              {' '}Ese IRPF supone que la venta es tu única renta del ahorro del año: con intereses, dividendos u
+              otras ganancias, la venta cae en tramos más altos y la cuota que añade sube (la calculadora lo
+              tiene en cuenta si las escribes en la pestaña Vendedor).</p>
+              <div className={styles.casoResultado}>Como máximo: ganancia de {formatCurrency(EJEMPLOS.ventaGanancia)} → {formatCurrency(EJEMPLOS.ventaIrpf)} de IRPF, antes de restar la plusvalía y si es tu única renta del ahorro del año</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>

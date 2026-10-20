@@ -6931,10 +6931,11 @@ test.describe('Inspector 13/10/2026 — Cantabria con perfil joven, Melilla a 20
   // gestoría). La plusvalía, la ganancia, el IRPF y el neto sí lo nombran.
   //   Melilla (CASO 56) con el total «30.000.00» → obtenido 37.962,50 € y la descripción fija;
   //   con el total legible 30.000 es 38.000,00 € (real ≥ publicado: puede ser MAYOR).
-  test.fail('[13/10-a] «Valor de transmisión» nombra el valor catastral total ilegible', async ({ page }) => {
+  // REPARADO el 20/10/2026 (hallazgo 3252).
+  test('[13/10-a] «Valor de transmisión» nombra el valor catastral total ilegible', async ({ page }) => {
     await vendedor0810(page, { ...BASE_1310_MELILLA, total: '30.000.00' });
-    // El defecto.
     expect(await descripcionTarjeta(page, 'Valor de transmisión')).toMatch(/valor catastral total/i);
+    expect(await descripcionTarjeta(page, 'Valor de transmisión')).toMatch(/puede ser MAYOR/);
     expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('37.962,50 €');
   });
 
@@ -6946,9 +6947,9 @@ test.describe('Inspector 13/10/2026 — Cantabria con perfil joven, Melilla a 20
   //   Melilla (CASO 56) con los años VACÍOS → «IRPF sobre ganancia (máximo) 616,65 €» =
   //   (1.140 + 1.912,50 × 21 %) × 40 %, descrito solo «No resta la plusvalía municipal, que falta,
   //   así que la cuota real puede ser menor.» (con el total «30.000.00», 578,85 € e igual).
-  test.fail('[13/10-b] la tarjeta del IRPF dice la deducción de Ceuta y Melilla también cuando hay otro aviso', async ({ page }) => {
+  // REPARADO el 20/10/2026 (hallazgo 3253).
+  test('[13/10-b] la tarjeta del IRPF dice la deducción de Ceuta y Melilla también cuando hay otro aviso', async ({ page }) => {
     await vendedor0810(page, { ...BASE_1310_MELILLA, anios: '' });
-    // El defecto.
     expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toMatch(
       /deducción del 60\s?% por rentas obtenidas en Ceuta o Melilla/,
     );
@@ -6960,10 +6961,10 @@ test.describe('Inspector 13/10/2026 — Cantabria con perfil joven, Melilla a 20
   // termina en frase completa con punto: sale «…Escríbelo con coma decimal (1.234,56)., con la
   // bonificación del 50 % de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)». La referencia
   // (~l. 1002-1007), garaje (~l. 700) y local-comercial (~l. 796) componen igual.
-  test.fail('[13/10-c] la bonificación de Ceuta y Melilla no se pega tras un punto final', async ({ page }) => {
+  // REPARADO el 20/10/2026 (hallazgo 3254), con la receta del 3259 de local-comercial.
+  test('[13/10-c] la bonificación de Ceuta y Melilla no se pega tras un punto final', async ({ page }) => {
     await vendedor0810(page, { ...BASE_1310_MELILLA, total: '30.000.00' });
     const desc = await descripcionTarjeta(page, 'Plusvalía municipal');
-    // El defecto.
     expect(desc).not.toContain('.,');
     expect(desc).toContain('bonificación del 50 % de la cuota de Ceuta y Melilla');
   });
@@ -6976,7 +6977,8 @@ test.describe('Inspector 13/10/2026 — Cantabria con perfil joven, Melilla a 20
   //   Cantabria · segunda mano · perfil «Joven (< 35 años)» · 18.500 € → el aviso ofrece
   //   «4,00 % — Jóvenes < 36 años · Requisitos: Menor de 36 años…»: quien tiene 35 años lee
   //   que no es «joven» y elige General, con lo que la oportunidad no se le enseña.
-  test.fail('[13/10-d] la etiqueta del perfil joven no contradice la edad del reducido que ofrece', async ({ page }) => {
+  // REPARADO el 20/10/2026 (hallazgo 3255), también en garaje y el estimador.
+  test('[13/10-d] la etiqueta del perfil joven no contradice la edad del reducido que ofrece', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await page.locator('#select-ccaa').selectOption('cantabria');
@@ -7121,9 +7123,13 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
     expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('13.700,00 €');
     expect(await descripcionTarjeta(page, 'Ganancia patrimonial')).toBe('Base para IRPF (base del ahorro)');
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1102,80 €');
-    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toBe(
-      'El importe de otras rentas del ahorro no se ha podido leer, así que la cuota real es mayor. Escríbelo con coma decimal (1.234,56).',
-    );
+    // Desde el hallazgo 3253 (20/10/2026) la deducción de Melilla va también detrás del aviso;
+    // la frase de «única renta» no, porque el ilegible son las propias otras rentas (3386).
+    const descIrpf = await descripcionTarjeta(page, 'IRPF sobre ganancia');
+    expect(descIrpf.startsWith(
+      'El importe de otras rentas del ahorro no se ha podido leer, así que la cuota real es mayor. Escríbelo con coma decimal (1.234,56). Lleva la deducción del 60',
+    )).toBe(true);
+    expect(descIrpf).toMatch(/por rentas obtenidas en Ceuta o Melilla \(art\. 68\.4 LIRPF\): 1654,20\s€ menos\.$/);
     expect(await tituloTarjeta24(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
     expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1402,80 €');
     expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
@@ -7170,7 +7176,8 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
   // ahorro del año. Desde 5f1b199a la calculadora cobra lo que la venta AÑADE: con esos mismos datos
   // y 6.000 € de otras rentas publica 6.550 × 21 % = 1.375,50 € (máximo), por encima del «como
   // máximo» del ejemplo.
-  test.fail('[19/10-b] el ejemplo de la venta dice sobre qué base del ahorro está su «como máximo» de IRPF', async ({ page }) => {
+  // REPARADO el 20/10/2026 (hallazgo 3381).
+  test('[19/10-b] el ejemplo de la venta dice sobre qué base del ahorro está su «como máximo» de IRPF', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     const ejemplo = await page.evaluate(() => {
@@ -7193,7 +7200,8 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
   // TRLITPAJD la bonificación del ITP y la del AJD; en el BOE (BOE-A-1993-25359, leído hoy) el
   // apartado 1 es la cuota gradual de AJD y la transmisión de inmuebles es el apartado 3.a). La
   // fila «AJD en primera mano» de la tabla educativa cita bien el 57 bis.1 (es AJD).
-  test.fail('[19/10-c] el sello no atribuye al art. 57 bis.1 la bonificación del ITP', async ({ page }) => {
+  // REPARADO el 20/10/2026 (hallazgo 3382): «art. 57 bis.3.a y 57 bis.1», ITP y AJD, leído en el BOE.
+  test('[19/10-c] el sello no atribuye al art. 57 bis.1 la bonificación del ITP', async ({ page }) => {
     await page.goto(RUTA);
     const sello = (await page.locator('body').innerText()).replace(ESPACIO_DURO, ' ');
     const i = sello.indexOf('El ITP de un trastero comprado por separado');
@@ -7209,7 +7217,8 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
   // calculadora bonifica la cuota al 50 % (art. 159.2 TRLRHL, `BONIFICACION_IIVTNU_CEUTA_MELILLA`)
   // y en Navarra y el País Vasco no la calcula. Melilla, base del CASO 59: quien rehaga la cuenta
   // con el tipo escrito obtiene 6.000 × 0,40 × 25 % = 600,00 €; la tarjeta publica 300,00 €.
-  test.fail('[19/10-d] la FAQ de la plusvalía nombra la bonificación de Ceuta y Melilla y el régimen foral', async ({ page }) => {
+  // REPARADO el 20/10/2026 (hallazgo 3383), con garaje (3249).
+  test('[19/10-d] la FAQ de la plusvalía nombra la bonificación de Ceuta y Melilla y el régimen foral', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     const respuestas = await page.evaluate(() => {
@@ -7223,6 +7232,7 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
     expect(respuestas.visible).toMatch(/Ceuta|Melilla/);
     expect(respuestas.visible).toMatch(/foral|Navarra|País Vasco/);
     expect(respuestas.ld).toMatch(/Ceuta|Melilla/);
+    expect(respuestas.ld).toMatch(/foral/);
     await vendedor0810(page, BASE_1910_MELILLA);
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('300,00 €');
   });

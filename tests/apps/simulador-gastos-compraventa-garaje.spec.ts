@@ -7749,8 +7749,8 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
    *     la escala da 1.397,91 € y la deducción, 838,74 € que no se nombran.
    * Esperado: la deducción nombrada también junto a esos avisos, como en el CASO EB.
    */
+  // REPARADO el 20/10/2026 (hallazgo 3247): la deducción va también detrás del aviso.
   test('[13/10-a] Melilla: la tarjeta del IRPF nombra la deducción del 60 % también cuando lleva otro aviso', async ({ page }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await i13VendedorMelilla(page);
     await sembrarImporte(page, 'Años de propiedad', '-2');
     expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('493,80 €');
@@ -7770,8 +7770,8 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
    * sí lo dice («la mitad en Ceuta y Melilla»).
    *   Ceuta · segunda mano · 25.000 € → tarjeta «ITP (3,00 %)» 750,00 € · FAQ «del 6 % al 13 %».
    */
+  // REPARADO el 20/10/2026 (hallazgo 3248): RESPUESTA_ITP_GARAJE_SEGUNDA_MANO cita el 57 bis.3.a.
   test('[13/10-b] la FAQ del ITP de segunda mano dice que en Ceuta y Melilla se paga la mitad', async ({ page, request }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await page.selectOption('#select-ccaa', 'ceuta');
@@ -7798,8 +7798,9 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
    *   Navarra · venta 25.000 · compra 18.000 · 8 años · suelo 5.000 · total 12.000 → tarjeta «Sin
    *   calcular — …Ley Foral 2/1995…» · FAQ «…máximo legal del 30 %», sin ninguna mención foral.
    */
+  // REPARADO el 20/10/2026 (hallazgo 3249): régimen foral y bonificación de Ceuta y Melilla. El 25 %
+  // máximo navarro no se escribe: no se leyó la Ley Foral 2/1995 en la sesión.
   test('[13/10-c] la FAQ de la plusvalía nombra el régimen foral que la tarjeta ya aplica', async ({ page, request }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     await page.selectOption('#select-ccaa', 'navarra');
@@ -7827,8 +7828,8 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
    * 13/10/2026; así lo citan ya data/itp-ccaa.ts, local-comercial, solar y nave). Mismo texto en
    * trastero. Esperado: que la bonificación del ITP no se atribuya al apartado 1.
    */
+  // REPARADO el 20/10/2026 (hallazgo 3250): «art. 57 bis.3.a y 57 bis.1», leído en el BOE.
   test('[13/10-d] el sello no atribuye la bonificación del ITP al art. 57 bis.1 TRLITPAJD', async ({ page }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await page.goto(RUTA);
     const sello = page.locator('[role="note"][aria-label="Datos de referencia normativos"]').filter({ hasText: 'ITP/AJD/IVA' });
     const nota = i24Normaliza((await sello.textContent()) ?? '');
@@ -7844,8 +7845,8 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
    * data/itp-ccaa.ts y la pintan las siete apps. Esperado: una nota que no declare a Madrid el ITP
    * más bajo de la España peninsular.
    */
+  // REPARADO el 20/10/2026 (hallazgo 3251, data/itp-ccaa.ts): la nota dice el dato sin ranking.
   test('[13/10-e] la nota de Madrid no le atribuye el ITP más bajo de la España peninsular', async ({ page }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     expect(await valorPanelCcaa(page, 'ITP General')).toBe('6,00 %');

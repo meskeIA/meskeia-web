@@ -314,7 +314,9 @@ const COMUNIDADES: { value: ComunidadAutonoma; label: string }[] = [
 
 const PERFILES_COMPRADOR: { value: PerfilComprador; label: string }[] = [
   { value: 'general', label: 'General (sin bonificaciones)' },
-  { value: 'joven', label: 'Joven (< 35 años)' },
+  // Efecto familia del 3255 de trastero (20/10/2026): «< 35 años» contradecía a ITP_CCAA en ocho
+  // comunidades; la edad la dice el aviso del reducido de cada comunidad.
+  { value: 'joven', label: 'Joven (la edad límite depende de la comunidad)' },
   { value: 'familia-numerosa', label: 'Familia numerosa' },
   { value: 'discapacidad', label: 'Persona con discapacidad' },
 ];
@@ -425,7 +427,7 @@ function calcularVendedor(e: EntradaVendedor) {
  * el País Vasco cobra el 7 % (hallazgo 1582); la bonificación de Ceuta y Melilla sale del motor.
  * Decisión común de la familia con nave, solar y terreno (24/09/2026).
  */
-const NOTA_DATOS = `El ITP de un garaje comprado por separado va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}\u00A0% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}\u00A0% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}\u00A0% (art. 57 bis.1 TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
+const NOTA_DATOS = `El ITP de un garaje comprado por separado va del ${formatTipoNominal(RANGO_ITP_OTROS.min)}\u00A0% al ${formatTipoNominal(RANGO_ITP_OTROS.max)}\u00A0% según la comunidad autónoma, contando el tramo más alto de las que aplican escala progresiva; en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un ${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}\u00A0% (art. 57 bis.3.a y 57 bis.1 TRLITPAJD). Los tipos indicados son orientativos: consulta el de tu comunidad antes de firmar.`;
 
 /**
  * Lo que de verdad aplica el sello de ITP/AJD/IVA. `FISCAL_INMUEBLES_META.fuente` nombra además
@@ -712,7 +714,12 @@ export default function SimuladorGarajeCompraventaPage() {
               : 'Método objetivo (más favorable)';
     }
     if (rp && !rp.exento && rp.bonificadaCiudad) {
-      metodoPlusvalia += `, con la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+      const bonificacion = `la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
+      // Receta del 3259 de local-comercial (20/10/2026, efecto familia del 3254 de trastero): detrás
+      // de una descripción que ya acaba en punto salía «(1.234,56)., con la bonificación».
+      metodoPlusvalia = metodoPlusvalia.endsWith('.')
+        ? `${metodoPlusvalia} Lleva ${bonificacion}.`
+        : `${metodoPlusvalia}, con ${bonificacion}`;
     }
 
     /**
@@ -1831,9 +1838,15 @@ export default function SimuladorGarajeCompraventaPage() {
                             if (!aviso) return null;
                             // Con las otras rentas ilegibles, el aviso ya lo dice: no se añade
                             // «como si esta venta fuera tu única renta», que lo contradiría.
+                            // Hallazgo 3247 (20/10/2026): la deducción de Ceuta y Melilla, también
+                            // detrás del aviso (la forma del 3258 de local-comercial).
+                            const deduccion =
+                              resultadosVendedor.deduccionCeutaMelilla > 0
+                                ? ` Lleva la deducción del ${DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje} % por rentas obtenidas en Ceuta o Melilla (art. 68.4 LIRPF): ${formatCurrency(resultadosVendedor.deduccionCeutaMelilla)} menos.`
+                                : '';
                             return resultadosVendedor.irpfGanancia > 0 && !nombraOtrasRentas(resultadosVendedor.veredictoIrpf)
-                              ? `${aviso} ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`
-                              : aviso;
+                              ? `${aviso}${deduccion} ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`
+                              : `${aviso}${deduccion}`;
                           })() ??
                           (resultadosVendedor.gananciaPatrimonial < 0
                             ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
