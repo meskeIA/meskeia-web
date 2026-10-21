@@ -515,6 +515,12 @@ export default function GeneradorTonosPage() {
   /** La última lectura estable: se queda a la vista cuando el sonido ya ha parado. */
   const [ultimaEstableHz, setUltimaEstableHz] = useState<number | null>(null);
   /**
+   * La misma retenida, sin esperar al render (cabo C0355, 21/10/2026). El intervalo del medidor
+   * la escribe cada 100 ms; si «Llevar» llegaba entre ese setState y su render, se llevaba la del
+   * cierre anterior (435,4 Hz) y la pantalla acababa en la nueva (437 Hz). «Llevar» lee esta.
+   */
+  const ultimaEstableRef = useRef<number | null>(null);
+  /**
    * Lo que se ANUNCIA de esa lectura en la región aria-live: solo cambia cuando el tono se mueve
    * 10 cents o más, para que un lector de pantalla no la repita con cada décima de hercio. Hasta
    * el 14/10/2026 esa histéresis la llevaba también la cifra que se ve y la que se lleva al
@@ -1115,6 +1121,7 @@ export default function GeneradorTonosPage() {
         return;
       }
       lecturasSinEstableRef.current = 0;
+      ultimaEstableRef.current = estable;
       setUltimaEstableHz(estable);
       pendienteAnuncioRef.current = estable;
       if (faseAnuncioRef.current !== 'libre') return; // decide el temporizador en curso
@@ -1135,10 +1142,13 @@ export default function GeneradorTonosPage() {
 
   /** Lleva la última lectura estable al generador, para oír (o comparar) el tono medido. */
   const usarFrecuenciaMedida = () => {
-    if (ultimaEstableHz === null) return;
+    // La del ref, no la del render: puede haber una más nueva escrita y aún sin pintar (C0355).
+    // Al parar el medidor ya no cambia, así que lo llevado es lo que se queda a la vista.
+    const retenidaHz = ultimaEstableRef.current;
+    if (retenidaHz === null) return;
     detenerMedidor();
     // Un decimal: más finura que esa no la da la medida, y el campo la escribe tal cual.
-    const v = Math.round(ultimaEstableHz * 10) / 10;
+    const v = Math.round(retenidaHz * 10) / 10;
     aplicarFrecuencia(v);
     frecuenciaLlevadaRef.current = acotarFrecuencia(v);
     setAnuncioMedidor(`Frecuencia puesta en el generador: ${cifraExacta(acotarFrecuencia(v))} Hz. Pulsa Reproducir para oírla.`);
