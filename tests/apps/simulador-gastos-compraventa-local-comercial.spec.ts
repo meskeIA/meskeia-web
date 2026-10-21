@@ -6619,7 +6619,8 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
     expect(texto).toContain('para esas compras, el IRPF que se muestra es un máximo');
   });
 
-  // HALLAZGO [21/10-c] (bajo, contenido) — ❌ ABIERTO. Lo que 616e5fc8 (hallazgo 3384) no llevó a
+  // HALLAZGO [21/10-c] 3402 (bajo, contenido) — ✅ REPARADO 21/10/2026: el FAQPage, el caso de uso y la
+  // lista del bloque educativo nombran al promotor. Lo que 616e5fc8 (hallazgo 3384) no llevó a
   // las otras bocas. Desde el 20/10/2026 la pestaña Vendedor dice, en obra nueva, que «vende el
   // promotor […]: su renta no es una ganancia patrimonial de la base del ahorro, sino un rendimiento
   // de actividad económica […] o, si es una sociedad, renta del Impuesto sobre Sociedades». El
@@ -6630,7 +6631,7 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
   // dice «Si vendes como persona física, la ganancia tributa en el IRPF del ahorro», que no vale para
   // el promotor persona física. La reparación es la frase del promotor (o AVISO_VENTA_PROMOTOR) en las
   // dos bocas.
-  test.fail('[21/10-c] el FAQPage y el caso de uso del vendedor dicen que la venta del promotor no es renta del ahorro', async ({ page }) => {
+  test('[21/10-c] el FAQPage y el caso de uso del vendedor dicen que la venta del promotor no es renta del ahorro', async ({ page }) => {
     await abrir0810(page);
     await page.getByRole('button', { name: /Obra nueva/ }).click();
     await sembrarImporte12(page, 'Precio del local comercial', '200000');

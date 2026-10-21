@@ -2423,7 +2423,9 @@ export default function SimuladorLocalComercialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si vendes como persona física, la ganancia tributa en el IRPF del ahorro
                 ({conPct(formatNumber(TIPO_AHORRO_MIN, 0))}-{conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). Si vendes
-                como empresa, tributa en el Impuesto de Sociedades. En ambos casos hay plusvalía municipal.
+                como empresa, tributa en el Impuesto sobre Sociedades. Si eres el promotor y es una primera
+                entrega (obra nueva), tu renta no es una ganancia del ahorro sino un rendimiento de actividad
+                económica, o renta de tu sociedad. En todos los casos hay plusvalía municipal.
               </p>
             </div>
           </div>
@@ -2519,6 +2521,13 @@ export default function SimuladorLocalComercialPage() {
             <li>
               <strong>Si el vendedor es una sociedad</strong>, la ganancia no va al IRPF sino al
               Impuesto sobre Sociedades, integrada en la base imponible del ejercicio.
+            </li>
+            {/* La salvedad del promotor también aquí, como en el FAQPage y el caso de uso (3402). */}
+            <li>
+              <strong>Si es una primera entrega (obra nueva)</strong>, vende el promotor, que es empresario
+              aunque promueva una sola vez: su renta no es una ganancia patrimonial del ahorro, sino un
+              rendimiento de actividad económica en el IRPF (art. 27.1 LIRPF) o, si es una sociedad, renta
+              del Impuesto sobre Sociedades. El simulador no la calcula.
             </li>
           </ul>
           <p>
