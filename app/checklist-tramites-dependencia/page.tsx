@@ -102,7 +102,7 @@ const FASES: FaseConfig[] = [
     plazo: 'Variable',
     items: [
       { id: 'f6-confirmar', texto: 'Confirmar inicio del servicio o cobro de la prestación' },
-      { id: 'f6-importe', texto: 'Verificar el importe', nota: 'Incluye retroactivo desde la fecha de solicitud (por eso guardar la copia sellada es crítico)' },
+      { id: 'f6-importe', texto: 'Verificar el importe', nota: 'Si la resolución llegó más de 6 meses después de la solicitud, el derecho nace a los 6 meses: comprueba que se incluyan esos atrasos (la copia sellada prueba la fecha)' },
       { id: 'f6-documentacion', texto: 'Guardar toda la documentación para futuras revisiones' },
       { id: 'f6-cambios', texto: 'Comunicar cualquier cambio de situación', nota: 'Mudanza, mejora, empeoramiento, cambio de cuidador, fallecimiento...' },
     ],
@@ -487,10 +487,13 @@ export default function ChecklistTramitesDependenciaPage() {
                 </div>
                 <p>
                   Una vez aprobado el PIA, se activa el servicio o prestación económica.
-                  <strong> Los derechos económicos son retroactivos</strong> desde la fecha
-                  de solicitud (fase 2), por lo que el primer pago puede incluir los meses
-                  de espera acumulados. Ante cualquier cambio relevante (mudanza, cambio de
-                  cuidador, empeoramiento), hay que comunicarlo a los Servicios Sociales.
+                  Por la norma estatal, <strong>el derecho a las prestaciones se genera desde
+                  la resolución</strong> que las reconoce o, si pasan seis meses desde la
+                  solicitud (fase 2) sin resolución, desde ese momento (Ley 39/2006,
+                  disposición final primera, apartado 3): en ese caso el primer pago puede
+                  incluir los meses de espera posteriores a esos seis. Ante cualquier cambio
+                  relevante (mudanza, cambio de cuidador, empeoramiento), hay que comunicarlo a
+                  los Servicios Sociales.
                 </p>
               </div>
             </div>
@@ -542,7 +545,7 @@ export default function ChecklistTramitesDependenciaPage() {
                 <span className={styles.tipIcon} aria-hidden="true">💰</span>
                 <div>
                   <strong>Problemas con la prestación económica</strong>
-                  <p>Si no recibes el retroactivo desde la fecha de solicitud o el importe no es correcto, busca asesoría especializada.</p>
+                  <p>Si no recibes los atrasos que te correspondan o el importe no es correcto, busca asesoría especializada.</p>
                 </div>
               </div>
             </div>
@@ -567,9 +570,10 @@ export default function ChecklistTramitesDependenciaPage() {
                 <dd>
                   El plazo legal máximo para la resolución es de <strong>6 meses</strong> desde
                   la solicitud. En la práctica, muchas CCAA tardan entre 6 y 18 meses. Tras la
-                  resolución, el PIA se elabora en semanas o meses adicionales. Los derechos
-                  económicos son retroactivos desde la fecha de solicitud, lo que compensa parte
-                  de la espera.
+                  resolución, el PIA se elabora en semanas o meses adicionales. Por la norma
+                  estatal, el derecho a las prestaciones se genera desde la resolución que las
+                  reconoce o, si pasan seis meses desde la solicitud sin resolución, desde ese
+                  momento (Ley 39/2006, disposición final primera, apartado 3).
                 </dd>
               </div>
               <div className={styles.faqItem}>
@@ -629,7 +633,7 @@ export default function ChecklistTramitesDependenciaPage() {
                 <span className={styles.tipIcon} aria-hidden="true">📝</span>
                 <div>
                   <strong>Fase 2: Fecha de registro</strong>
-                  <p>La fecha de la solicitud sellada es el inicio de tus derechos económicos. Presenta cuanto antes, incluso si te falta algún documento menor que puedas aportar después.</p>
+                  <p>Con la fecha de la solicitud sellada empieza a contar el plazo de seis meses para resolver; si se agota sin resolución, el derecho a las prestaciones nace en ese momento. Presenta cuanto antes, incluso si te falta algún documento menor que puedas aportar después.</p>
                 </div>
               </div>
               <div className={styles.tipCard}>
@@ -656,8 +660,8 @@ export default function ChecklistTramitesDependenciaPage() {
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">✅</span>
                 <div>
-                  <strong>Fase 6: Verificar el retroactivo</strong>
-                  <p>La prestación económica debe incluir los meses desde la solicitud. Si el importe no cuadra, reclama por escrito ante los Servicios Sociales.</p>
+                  <strong>Fase 6: Verificar los atrasos</strong>
+                  <p>Si la resolución tardó más de seis meses, la prestación económica debe incluir los meses desde que se cumplieron esos seis, no desde la solicitud. Si el importe no cuadra, reclama por escrito ante los Servicios Sociales.</p>
                 </div>
               </div>
             </div>
@@ -673,7 +677,8 @@ export default function ChecklistTramitesDependenciaPage() {
               <ul className={styles.warningList}>
                 <li>
                   <strong>No guardar la copia sellada de la solicitud.</strong> Sin
-                  fecha de registro no podrás reclamar los derechos económicos retroactivos.
+                  fecha de registro no podrás probar cuándo se cumplieron los seis meses del
+                  plazo para resolver, ni reclamar los atrasos desde entonces.
                   Es el documento más importante del proceso.
                 </li>
                 <li>

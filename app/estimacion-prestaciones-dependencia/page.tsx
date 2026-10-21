@@ -419,8 +419,11 @@ export default function EstimacionPrestacionesDependencia() {
                 La ley establece un plazo máximo de 6 meses desde la solicitud hasta la resolución
                 del grado y la aprobación del PIA (Programa Individual de Atención). En la práctica,
                 los plazos varían mucho por comunidad autónoma y pueden extenderse entre 6 y 18 meses.
-                Es recomendable solicitar cuanto antes, ya que las prestaciones se devengan desde la
-                fecha de solicitud (con retroactividad).
+                Por la norma estatal, el derecho a las prestaciones se genera desde la resolución que
+                las reconoce o, si pasan seis meses desde la solicitud sin resolución, desde ese
+                momento (Ley 39/2006, disposición final primera, apartado 3). Es recomendable
+                solicitar cuanto antes, porque ese plazo de seis meses empieza a contar con la
+                solicitud.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -510,9 +513,9 @@ export default function EstimacionPrestacionesDependencia() {
                 <strong>Inicio de la prestación y revisiones periódicas</strong>
                 <p>
                   Una vez aprobado el PIA, se inicia el servicio o el cobro de la prestación
-                  económica. Las prestaciones se devengan desde la fecha de solicitud (con
-                  retroactividad). El grado se revisa periódicamente o cuando cambien las
-                  circunstancias.
+                  económica. Si se reconocen importes con efectos anteriores al primer pago,
+                  pregunta en Servicios Sociales cómo y cuándo los abona tu comunidad autónoma. El
+                  grado se revisa periódicamente o cuando cambien las circunstancias.
                 </p>
               </div>
             </li>
@@ -527,8 +530,9 @@ export default function EstimacionPrestacionesDependencia() {
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Solicita cuanto antes</strong>
               <p>
-                Las prestaciones se devengan desde la fecha de solicitud. Cada mes de retraso
-                en presentarla es un mes de prestación que se pierde.
+                El plazo máximo de seis meses para resolver empieza a contar con la solicitud, y
+                si se agota sin resolución el derecho a las prestaciones se genera desde ese
+                momento. Cada mes de retraso en presentarla retrasa también esa fecha.
               </p>
             </div>
             <div className={styles.tipCard}>
@@ -587,9 +591,12 @@ export default function EstimacionPrestacionesDependencia() {
               económica del beneficiario.
             </li>
             <li>
-              <strong>No solicitar la retroactividad:</strong> Las prestaciones se devengan desde la
-              fecha de solicitud, pero hay que reclamarla. Si la resolución tarda 12 meses, tienes
-              derecho a los atrasos.
+              <strong>Contar con atrasos desde el día de la solicitud:</strong> Por la norma
+              estatal, el derecho a las prestaciones se genera desde la resolución que las reconoce
+              o, si pasan seis meses desde la solicitud sin resolución, desde ese momento (Ley
+              39/2006, disposición final primera, apartado 3). Si la resolución tarda 12 meses, los
+              atrasos se cuentan desde que se cumplieron los seis meses, no desde la solicitud; comprueba que el importe
+              los incluya y consulta qué aplica tu comunidad autónoma.
             </li>
             <li>
               <strong>Olvidar dar de alta al cuidador en SS:</strong> El convenio especial con cuota
