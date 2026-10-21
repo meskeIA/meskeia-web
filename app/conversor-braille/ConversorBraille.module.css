@@ -934,3 +934,129 @@
 [data-theme='dark'] .container .avisoConversion {
   background: rgba(46, 134, 171, 0.18);
 }
+
+/* Teclado braille de seis puntos (S0219) */
+.teclado {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+}
+
+.tecladoTitulo {
+  margin: 0 0 var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tecladoZona {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  cursor: text;
+}
+
+.tecladoZona:focus-visible,
+.tecladoZona:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-style: solid;
+}
+
+.tecladoTeclas {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tecladoTeclas kbd {
+  min-width: 1.9rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--border);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.tecladoSeparador {
+  display: inline-block;
+  width: 1rem;
+}
+
+.tecladoAyuda {
+  flex: 1 1 14rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.tecladoTactil {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-md);
+}
+
+.tecladoPuntos {
+  display: grid;
+  grid-template-columns: repeat(2, 48px);
+  grid-template-rows: repeat(3, 48px);
+  gap: 8px;
+}
+
+.tecladoPunto {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.tecladoPunto:hover {
+  border-color: var(--primary);
+}
+
+.tecladoPunto:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tecladoPuntoActivo,
+.tecladoPuntoActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #FFFFFF;
+}
+
+.tecladoAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.tecladoAcciones button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tecladoAnuncio {
+  min-height: 1.2em;
+  margin: var(--spacing-sm) 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}

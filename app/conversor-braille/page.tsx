@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import styles from './ConversorBraille.module.css';
 import impresion from '@/styles/impresion.module.css';
+import TecladoBraille from './TecladoBraille';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
@@ -675,6 +676,24 @@ export default function ConversorBraillePage() {
     setResult('');
   };
 
+  /**
+   * Celdas que llegan del teclado de seis puntos (S0219). Al contrario que al teclear en la caja,
+   * aquí el resultado se recalcula en el acto: quien copia un cartel celda a celda quiere ver la
+   * lectura crecer. Sigue valiendo la regla del hallazgo 3278 —el resultado corresponde siempre a
+   * lo que hay en la caja—, porque se calcula con la entrada NUEVA.
+   */
+  const anadirCelda = (celda: string) => {
+    const nuevo = input + celda;
+    setInput(nuevo);
+    setResult(convertBrailleToText(nuevo));
+  };
+
+  const borrarCelda = () => {
+    const nuevo = Array.from(input).slice(0, -1).join('');
+    setInput(nuevo);
+    setResult(nuevo ? convertBrailleToText(nuevo) : '');
+  };
+
   const cambiarModo = (nuevo: 'textToBraille' | 'brailleToText') => {
     if (nuevo === mode) return;
     setMode(nuevo);
@@ -803,7 +822,7 @@ export default function ConversorBraillePage() {
             onChange={(e) => cambiarEntrada(e.target.value)}
             placeholder={mode === 'textToBraille'
               ? 'Escribe el texto aquí...'
-              : 'Pega el código Braille aquí (⠁⠃⠉...)'}
+              : 'Pega el código Braille aquí (⠁⠃⠉...) o escríbelo con el teclado de seis puntos'}
             rows={4}
           />
           <div className={styles.examples}>
@@ -819,6 +838,9 @@ export default function ConversorBraillePage() {
               </button>
             ))}
           </div>
+          {mode === 'brailleToText' && (
+            <TecladoBraille onCelda={anadirCelda} onBorrar={borrarCelda} />
+          )}
         </div>
 
         <div className={styles.buttonRow}>

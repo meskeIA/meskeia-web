@@ -909,3 +909,86 @@ test.describe('re-inspección 13/10/2026', () => {
     expect(emojis).toEqual([]);
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// S0219 (21/10/2026) — teclado de seis puntos para el sentido Braille → Texto
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Ese sentido solo admitía PEGAR celdas Unicode. Ahora se escriben como en una máquina Perkins
+// (F D S = puntos 1 2 3, J K L = puntos 4 5 6, a la vez, y la celda sale al soltar) o marcando
+// los puntos en pantalla. Celdas esperadas, del B 2 y con la regla de la cabecera (U+2800 + bits):
+//   h = 1-2-5 → ⠓ · o = 1-3-5 → ⠕ · l = 1-2-3 → ⠇ · a = 1 → ⠁ · ñ = 1-2-4-5-6 → ⠻
+test.describe('S0219 — teclado braille de seis puntos', () => {
+  const TECLA: Record<number, string> = { 1: 'KeyF', 2: 'KeyD', 3: 'KeyS', 4: 'KeyJ', 5: 'KeyK', 6: 'KeyL' };
+
+  /** Pulsa a la vez las teclas de esos puntos y las suelta en el mismo orden. */
+  async function acorde(page: Page, puntos: number[]) {
+    for (const p of puntos) await page.keyboard.down(TECLA[p]);
+    for (const p of puntos) await page.keyboard.up(TECLA[p]);
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+  });
+
+  test('solo aparece en el sentido Braille → Texto', async ({ page }) => {
+    await expect(page.getByTestId('zona-perkins')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    await expect(page.getByTestId('zona-perkins')).toBeVisible();
+  });
+
+  test('CASO 1 (normal) — «hola mañana» a acordes; la celda sale al soltar la ÚLTIMA tecla', async ({ page }) => {
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    await page.getByTestId('zona-perkins').focus();
+    const textarea = page.locator('textarea').first();
+
+    // Acorde a medias: con F y D pulsadas y K sin soltar, todavía no se ha escrito nada
+    await page.keyboard.down('KeyF');
+    await page.keyboard.down('KeyD');
+    await page.keyboard.down('KeyK');
+    await page.keyboard.up('KeyF');
+    await page.keyboard.up('KeyD');
+    await expect(textarea).toHaveValue('');
+    await page.keyboard.up('KeyK');
+    await expect(textarea).toHaveValue('⠓');
+
+    await acorde(page, [1, 3, 5]);
+    await acorde(page, [1, 2, 3]);
+    await acorde(page, [1]);
+    await page.keyboard.press('Space');
+    // m = 1-3-4 → ⠍ · a · ñ · a · n = 1-3-4-5 → ⠝ · a
+    for (const c of [[1, 3, 4], [1], [1, 2, 4, 5, 6], [1], [1, 3, 4, 5], [1]]) await acorde(page, c);
+
+    await expect(textarea).toHaveValue('⠓⠕⠇⠁⠀⠍⠁⠻⠁⠝⠁');
+    // El resultado se recalcula solo, sin pulsar Convertir
+    await expect(cajaResultado(page)).toHaveText('hola mañana');
+
+    // Retroceso borra la última celda y el resultado la sigue
+    await page.keyboard.press('Backspace');
+    await expect(textarea).toHaveValue('⠓⠕⠇⠁⠀⠍⠁⠻⠁⠝');
+    await expect(cajaResultado(page)).toHaveText('hola mañan');
+  });
+
+  test('CASO 2 (táctil) — marcar los puntos de la ñ y escribir la celda', async ({ page }) => {
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    const escribir = page.getByRole('button', { name: /^Escribir celda/ });
+    await expect(escribir).toBeDisabled();
+    for (const p of [1, 2, 4, 5, 6]) {
+      await page.getByRole('button', { name: `Punto ${p}`, exact: true }).click();
+    }
+    await expect(page.getByRole('button', { name: 'Punto 3', exact: true })).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByRole('button', { name: 'Punto 6', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(escribir).toHaveText('Escribir celda ⠻');
+    await escribir.click();
+
+    await expect(page.locator('textarea').first()).toHaveValue('⠻');
+    await expect(cajaResultado(page)).toHaveText('ñ');
+    // Los puntos se apagan para la celda siguiente
+    await expect(page.getByRole('button', { name: 'Punto 1', exact: true })).toHaveAttribute('aria-pressed', 'false');
+
+    await page.getByRole('button', { name: 'Borrar última' }).click();
+    await expect(page.locator('textarea').first()).toHaveValue('');
+    await expect(page.locator('[class*="resultBox"]')).toHaveCount(0);
+  });
+});

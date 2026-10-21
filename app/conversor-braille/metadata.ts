@@ -44,6 +44,7 @@ export const jsonLd = generateWebAppSchema({
     'Alfabeto Braille español completo (ñ, vocales acentuadas)',
     'Visualización con celdas Braille Unicode',
     'Soporte para números y signos de puntuación',
+    'Teclado braille de seis puntos (F D S J K L, como una máquina Perkins) o puntos táctiles para escribir celdas y traducirlas',
     'En español',
   ],
   keywords: ['Braille', 'accesibilidad', 'discapacidad visual', 'conversor texto Braille'],
