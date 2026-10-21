@@ -57,6 +57,7 @@ import {
   RESPUESTA_IVA_DEDUCIBLE,
   PREGUNTA_PLUSVALIA,
   RESPUESTA_PLUSVALIA,
+  SALVEDAD_PLUSVALIA_NO_RESIDENTE,
 } from './metadata';
 
 // ===== TIPOS =====
@@ -781,7 +782,8 @@ export default function SimuladorSolarPage() {
                 <strong>Recuerda:</strong> el solar es suelo urbano, así que el <strong>vendedor</strong> pagará
                 además la <strong>plusvalía municipal</strong> (IIVTNU) si hubo incremento real del valor del
                 terreno; sin incremento, la transmisión no está sujeta (art. 104.5 TRLRHL). No es un coste del
-                comprador, pero puede influir en la negociación del precio.
+                comprador, con una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}. En cualquier caso, puede
+                influir en la negociación del precio.
               </div>
             </>
           ) : (
@@ -876,8 +878,13 @@ export default function SimuladorSolarPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🏢</span> Promotora compra suelo para construir</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Si compra a otro empresario, paga IVA {formatNumber(IVA_SOLAR, 0)}&nbsp;% deducible en el modelo 303 (en
-                Canarias, Ceuta y Melilla, IGIC o IPSI, con sus propias reglas, que esta calculadora no cifra). Si
+                {/* Afirmaba el IVA deducible sin condición, la quinta boca que el 3089 no listaba
+                    (hallazgo 3267): la FAQ de la página excluye justo a la promotora que alquila. */}
+                Si compra a otro empresario, paga IVA {formatNumber(IVA_SOLAR, 0)}&nbsp;%, deducible en el modelo 303 si
+                destina el solar a una actividad sujeta y no exenta, como vender lo que construya; si levanta
+                viviendas para alquilarlas no lo deduce, porque ese arrendamiento está exento (art. 20.Uno.23.º de
+                la Ley del IVA). En Canarias, Ceuta y Melilla, IGIC o IPSI, con sus propias reglas, que esta
+                calculadora no cifra. Si
                 compra a un particular, paga ITP, que no se recupera pero se incorpora al coste de la promoción.
               </p>
             </div>
@@ -886,7 +893,8 @@ export default function SimuladorSolarPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Al ser suelo urbano, el vendedor paga plusvalía municipal si hubo incremento real del valor
                 del terreno; sin incremento, la transmisión no está sujeta (art. 104.5 TRLRHL). No es coste
-                del comprador, pero conviene tenerlo en cuenta al negociar el precio.
+                del comprador, con una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}. En cualquier caso,
+                conviene tenerlo en cuenta al negociar el precio.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
@@ -948,9 +956,9 @@ export default function SimuladorSolarPage() {
             <strong>Limitaciones de este simulador</strong>
           </div>
           <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
-            <li>Válido para solar o terreno edificable (suelo urbano). Si el terreno es rústico no edificable, la fiscalidad es distinta (exento de IVA, sin plusvalía municipal).</li>
+            <li>Válido para solar o terreno edificable (suelo urbano). Si el terreno es rústico no edificable, la fiscalidad es distinta (exento de IVA salvo renuncia a la exención, sin plusvalía municipal).</li>
             <li>El IVA solo es deducible si el comprador es sujeto pasivo de IVA con actividad sujeta y no exenta; el autopromotor particular no lo deduce.</li>
-            <li>No calcula la plusvalía municipal, que corresponde al vendedor; se muestra solo como recordatorio.</li>
+            <li>No calcula la plusvalía municipal, que corresponde al vendedor (con una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}); se muestra solo como recordatorio.</li>
             <li>El valor de referencia catastral puede ser la base imponible del ITP si supera el precio escriturado, y también la del AJD cuando vende un promotor: aunque el IVA se calcula sobre el precio pactado, la base del AJD no puede ser inferior a ese valor (art. 30.1 TRLITPAJD, redacción de la Ley 11/2021). Aquí el AJD se calcula sobre el precio escrito.</li>
             <li>Los tipos de ITP y AJD pueden variar; verifica la normativa vigente de tu comunidad autónoma y consulta con tu asesor antes de firmar.</li>
           </ul>

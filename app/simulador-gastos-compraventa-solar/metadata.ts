@@ -32,8 +32,16 @@ export const PREGUNTA_SOLAR_NO_EXENTO = '¿Por qué el solar no está exento de 
 export const RESPUESTA_SOLAR_NO_EXENTO = `Porque la exención de IVA alcanza al terreno rústico y no edificable, y los solares y terrenos edificables quedan expresamente excluidos de ella. Cuando un empresario o promotor entrega un solar en el ejercicio de su actividad, la operación está sujeta y no exenta de IVA al ${IVA_SOLAR} —o de IGIC o IPSI en Canarias, Ceuta y Melilla, donde no rige el IVA—, y la escritura tributa además por Actos Jurídicos Documentados (AJD).`;
 export const PREGUNTA_IVA_DEDUCIBLE = '¿Puedo deducir el IVA de la compra de un solar?';
 export const RESPUESTA_IVA_DEDUCIBLE = 'Si eres promotor, empresario o autónomo y afectas el solar a una actividad económica sujeta y no exenta de IVA, puedes deducir el IVA soportado en el modelo 303. Si la actividad está exenta, no: es el caso de quien levanta en él viviendas para alquilarlas, porque ese arrendamiento está exento (art. 20.Uno.23.º de la Ley del IVA). Y un particular que compra un solar para autopromover su vivienda no actúa como empresario, así que tampoco lo deduce: el IVA soportado se convierte en un mayor coste de la parcela.';
+/**
+ * La excepción a «la paga el vendedor» (hallazgo 3269): en una transmisión onerosa, si el
+ * contribuyente es una persona física no residente en España, el adquirente es sujeto pasivo
+ * sustituto (TRLRHL, art. 106.2, BOE-A-2004-4214, leído el 21/10/2026). La pintan la FAQ (las dos
+ * bocas), la nota «Recuerda», la tarjeta de casos de uso y Limitaciones. «En territorio común»:
+ * el País Vasco y Navarra tienen sus normas forales del impuesto, que no se han consultado.
+ */
+export const SALVEDAD_PLUSVALIA_NO_RESIDENTE = 'si vende una persona física no residente en España, el comprador es sujeto pasivo sustituto y es él quien la ingresa (art. 106.2 TRLRHL, en territorio común)';
 export const PREGUNTA_PLUSVALIA = '¿Hay plusvalía municipal al comprar o vender un solar?';
-export const RESPUESTA_PLUSVALIA = 'Sí, pero la paga el vendedor, no el comprador. El solar es suelo de naturaleza urbana, así que su transmisión genera plusvalía municipal (IIVTNU) sobre el incremento de valor del terreno durante el tiempo de tenencia. Si no ha habido incremento real de valor, la transmisión no está sujeta al impuesto (art. 104.5 TRLRHL, redacción del RDL 26/2021): hay que declararlo y acreditarlo con las escrituras de compra y venta.';
+export const RESPUESTA_PLUSVALIA = `Sí, pero la paga el vendedor, no el comprador, salvo en un caso: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}. El solar es suelo de naturaleza urbana, así que su transmisión genera plusvalía municipal (IIVTNU) sobre el incremento de valor del terreno durante el tiempo de tenencia. Si no ha habido incremento real de valor, la transmisión no está sujeta al impuesto (art. 104.5 TRLRHL, redacción del RDL 26/2021): hay que declararlo y acreditarlo con las escrituras de compra y venta.`;
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Solar / Terreno Edificable - IVA o ITP | meskeIA',
@@ -131,7 +139,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre comprar un solar y una finca rústica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La fiscalidad es distinta. El solar edificable tributa por IVA ${IVA_SOLAR} más AJD si vende un empresario (IGIC o IPSI en Canarias, Ceuta y Melilla), o por ITP si vende un particular, y al ser suelo urbano está sujeto a la plusvalía municipal cuando hay incremento real del valor del terreno (sin incremento, la transmisión no está sujeta: art. 104.5 TRLRHL). La finca rústica no edificable está exenta de IVA (tributa por ITP incluso vendiéndola un empresario) y no genera plusvalía municipal. Por eso conviene identificar bien el tipo de suelo antes de comprar.`,
+        text: `La fiscalidad es distinta. El solar edificable tributa por IVA ${IVA_SOLAR} más AJD si vende un empresario (IGIC o IPSI en Canarias, Ceuta y Melilla), o por ITP si vende un particular, y al ser suelo urbano está sujeto a la plusvalía municipal cuando hay incremento real del valor del terreno (sin incremento, la transmisión no está sujeta: art. 104.5 TRLRHL). La finca rústica no edificable está exenta de IVA y tributa por ITP aunque la venda un empresario, salvo renuncia a la exención: el vendedor puede renunciar a ella cuando el comprador es un empresario con derecho a deducir el IVA, y entonces la venta va por IVA más AJD (art. 20.Dos de la Ley del IVA). No genera plusvalía municipal. Por eso conviene identificar bien el tipo de suelo antes de comprar.`,
       },
     },
   ],

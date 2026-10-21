@@ -45,10 +45,10 @@
  * y registral recalculados tramo a tramo por un script propio que NO llama al código de la
  * app; el desarrollo va comentado junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS: a 21/10/2026 se suma uno ABIERTO, [21/10-a] (las notas de comunidad con ranking o
- * calificativo), con `test.fail()` en el último describe; los tres del 13/10 siguen igual.
- * A 13/10/2026 hay tres ABIERTOS, del Inspector de ese día ([13/10-a] a [13/10-c], con
- * `test.fail()` en el último describe: la tarjeta «Promotora compra suelo para construir» da el
+ * HALLAZGOS: a 21/10/2026 se sumó uno, [21/10-a] (las notas de comunidad con ranking o
+ * calificativo), reparado en b8d8bff5 y ya sin `test.fail()`. Los tres del 13/10 ([13/10-a] a
+ * [13/10-c], hallazgos 3267-3269) se REPARARON el 21/10/2026 y quedan como regresión, sin marca:
+ * la tarjeta «Promotora compra suelo para construir» da el
  * IVA por deducible sin condición —residuo del 3089—, el FAQPage de la finca rústica sin la
  * renuncia del art. 20.Dos LIVA y la plusvalía «no es un coste del comprador» sin el sustituto del
  * art. 106.2 TRLRHL). Los cuatro del Inspector del 08/10/2026 ([08/10-a] a [08/10-d], hallazgos
@@ -3908,7 +3908,9 @@ test.describe('Inspector 13/10/2026 — aranceles con la rebaja del 5 %, el repa
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-a] Residuo del hallazgo 3089 (cabo C0164), que
+   * ✅ REPARADO 21/10/2026 (abierto el 13/10/2026; hallazgo 3267; contenido, bajo): la tarjeta
+   * condiciona la deducción a una actividad sujeta y no exenta y nombra la promotora que alquila.
+   * Lo que había — [13/10-a] Residuo del hallazgo 3089 (cabo C0164), que
    * se reparó en sus cuatro bocas (aviso del promotor, tarjeta del IVA, fila de la tabla y FAQ, todas
    * ya con «sujeta y no exenta»). La quinta no estaba en aquella lista: la tarjeta de casos de uso
    * «Promotora compra suelo para construir» dice «Si compra a otro empresario, paga IVA 21 %
@@ -3919,7 +3921,6 @@ test.describe('Inspector 13/10/2026 — aranceles con la rebaja del 5 %, el repa
    *   obtenido «…paga IVA 21 % deducible en el modelo 303 (en Canarias, Ceuta y Melilla…)».
    */
   test('[13/10-a] la tarjeta «Promotora compra suelo para construir» condiciona el IVA deducible a una actividad sujeta y no exenta', async ({ page }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -3936,7 +3937,10 @@ test.describe('Inspector 13/10/2026 — aranceles con la rebaja del 5 %, el repa
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-b] El FAQPage («¿Qué diferencia hay entre
+   * ✅ REPARADO 21/10/2026 (abierto el 13/10/2026; hallazgo 3268; contenido, bajo): el FAQPage
+   * nombra la renuncia del art. 20.Dos LIVA (leído el 21/10/2026) y la tarjeta relacionada dice
+   * «Terreno rústico: ITP, o IVA con renuncia», en solar y en la otra entrada de app-relations que
+   * la repetía. Lo que había — [13/10-b] El FAQPage («¿Qué diferencia hay entre
    * comprar un solar y una finca rústica?», solo en el JSON-LD, lo que leen los asistentes de IA)
    * dice que la finca rústica «está exenta de IVA (tributa por ITP incluso vendiéndola un
    * empresario)». Falta la renuncia: el art. 20.Dos de la Ley 37/1992 permite renunciar a la exención
@@ -3947,7 +3951,6 @@ test.describe('Inspector 13/10/2026 — aranceles con la rebaja del 5 %, el repa
    *   Esperado: la renuncia nombrada (o al menos «salvo renuncia») · obtenido la regla sin excepción.
    */
   test('[13/10-b] el FAQPage de la finca rústica no la da por «ITP incluso vendiéndola un empresario» sin la renuncia del art. 20.Dos LIVA', async ({ page }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
     const ld = await faqLd(page);
@@ -3961,7 +3964,10 @@ test.describe('Inspector 13/10/2026 — aranceles con la rebaja del 5 %, el repa
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (contenido, bajo) — [13/10-c] La plusvalía municipal se presenta como
+   * ✅ REPARADO 21/10/2026 (abierto el 13/10/2026; hallazgo 3269; contenido, bajo): la salvedad del
+   * comprador sustituto (SALVEDAD_PLUSVALIA_NO_RESIDENTE, metadata.ts; art. 106.2 releído el
+   * 21/10/2026) va en la FAQ de las dos bocas, la nota «Recuerda», la tarjeta y Limitaciones.
+   * Lo que había — [13/10-c] La plusvalía municipal se presenta como
    * ajena al comprador sin excepción: FAQ visible y FAQPage («Sí, pero la paga el vendedor, no el
    * comprador»), la nota «Recuerda» bajo el resultado y la tarjeta de casos de uso («No es (un) coste
    * del comprador»). El TRLRHL, art. 106.2 (BOE-A-2004-4214, consolidado, leído el 13/10/2026),
@@ -3971,7 +3977,6 @@ test.describe('Inspector 13/10/2026 — aranceles con la rebaja del 5 %, el repa
    *   Esperado: la salvedad del no residente en la respuesta (las dos bocas) · obtenido la regla sola.
    */
   test('[13/10-c] la plusvalía «la paga el vendedor» nombra al comprador sustituto cuando vende un no residente (art. 106.2 TRLRHL)', async ({ page }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA]);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -3995,7 +4000,7 @@ test.describe('Inspector 13/10/2026 — aranceles con la rebaja del 5 %, el repa
 //   · f6de548d (20/10, hallazgo 3251): la nota de Madrid ya no la declara el ITP más bajo de la
 //     península. Se sostiene aquí (test «f6de548d»). Lo que dejó: la misma forma en otras notas
 //     de la tabla → HALLAZGO [21/10-a].
-// Siguen ABIERTOS, sin cambios, 3267-3269 ([13/10-a] a [13/10-c], bloque anterior).
+// 3267-3269 ([13/10-a] a [13/10-c], bloque anterior) seguían ABIERTOS; se repararon el 21/10/2026.
 //
 // De dónde sale cada cifra esperada (ninguna de memoria; aritmética en un script propio que no
 // llama al código de la app):
