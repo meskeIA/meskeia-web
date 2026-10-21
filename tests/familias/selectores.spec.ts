@@ -132,6 +132,38 @@ const HERMANAS: Hermana[] = [
       teclado: { falla: 'hallazgo 3123: los radios no tienen tabindex itinerante ni flechas (APG)' },
     },
   },
+  // Cinco que tenían el armazón sin estar declaradas (cabo C0005, medidas por el Inspector del
+  // 25/09 y el 10/10 y reparadas en la tanda del 19/10). selector-tarifa-electrica no entra: sus
+  // radios no van con barra ni con Siguiente/Anterior, es otro armazón.
+  {
+    slug: 'selector-dieta',
+    empezar: true,
+  },
+  {
+    slug: 'selector-tablet',
+    empezar: false,
+    recetas: {
+      teclado: { falla: 'hallazgo 3206: cada opción es una parada de Tab y las flechas no hacen nada (APG)' },
+    },
+  },
+  {
+    slug: 'selector-tipo-gimnasio',
+    empezar: false,
+    recetas: {
+      teclado: { falla: 'hallazgo 3187: los radios no tienen tabindex itinerante ni flechas (APG)' },
+    },
+  },
+  {
+    // Doble toque REPARADO al declararla (21/10/2026, C0005): no tenía guarda y el 2.º toque
+    // marcaba una opción de la pregunta nueva desde el paso 1.
+    slug: 'selector-tipo-vivienda',
+    empezar: false,
+  },
+  {
+    // Doble toque REPARADO al declararla (21/10/2026, C0005), la misma forma que tipo-vivienda.
+    slug: 'selector-vehiculo-electrico',
+    empezar: false,
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -148,7 +180,8 @@ const HERMANAS: Hermana[] = [
 async function esperarHidratacionBotones(page: Page, selector: string, texto = ''): Promise<void> {
   await page.waitForFunction(
     ({ sel, txt }) => {
-      const boton = Array.from(document.querySelectorAll(sel)).find((b) => (b.textContent ?? '').includes(txt));
+      const patron = new RegExp(txt);
+      const boton = Array.from(document.querySelectorAll(sel)).find((b) => patron.test(b.textContent ?? ''));
       if (!boton) return false;
       return Object.keys(boton).some((k) => k.startsWith('__reactProps$') || k.startsWith('__reactFiber$'));
     },
@@ -157,13 +190,16 @@ async function esperarHidratacionBotones(page: Page, selector: string, texto = '
   );
 }
 
+/** El botón de la pantalla de presentación: «Empezar el test» en casi todas, «Comenzar» en selector-dieta. */
+const EMPEZAR = 'Empezar|Comenzar';
+
 async function abrirTest(page: Page, h: Hermana): Promise<Locator> {
   // Sin animaciones: el relleno cambia de ancho con una transición, y se mide el ancho real.
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(`/${h.slug}/`);
   if (h.empezar) {
-    await esperarHidratacionBotones(page, 'button', 'Empezar');
-    await page.getByRole('button', { name: /Empezar/ }).first().click();
+    await esperarHidratacionBotones(page, 'button', EMPEZAR);
+    await page.getByRole('button', { name: new RegExp(EMPEZAR) }).first().click();
   }
   const grupo = page.locator('[role="radiogroup"]').first();
   await grupo.waitFor();
@@ -179,12 +215,18 @@ async function fraccionAnunciada(barra: Locator): Promise<number> {
   return (ahora - minimo) / (maximo - minimo);
 }
 
-/** La fracción que se VE: el ancho real del relleno sobre el ancho interior de la barra. */
+/**
+ * La fracción que se VE: el ancho real del relleno sobre el ancho interior de su pista.
+ * El relleno se localiza por el ancho que pide en `style` y se MIDE por su caja: en
+ * selector-tablet el `role="progressbar"` envuelve el texto «3 / 7» y la pista, así que su
+ * primer hijo no es el relleno ni la barra es la pista.
+ */
 async function fraccionPintada(barra: Locator): Promise<number> {
   return barra.evaluate((el) => {
-    const relleno = el.firstElementChild as HTMLElement | null;
+    const relleno = (el.querySelector('[style*="width"]') ?? el.firstElementChild) as HTMLElement | null;
     if (!relleno) return Number.NaN;
-    return relleno.getBoundingClientRect().width / el.clientWidth;
+    const pista = relleno.parentElement ?? el;
+    return relleno.getBoundingClientRect().width / pista.clientWidth;
   });
 }
 

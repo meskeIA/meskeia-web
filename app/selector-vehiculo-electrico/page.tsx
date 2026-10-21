@@ -193,6 +193,30 @@ export default function SelectorVehiculoElectrico() {
     }
   }, [preguntaActual, resultado]);
 
+  /**
+   * Doble clic y dos toques seguidos (cabo C0005, receta de selector-tablet y
+   * selector-alquiler-vs-compra, 3111): tras «Siguiente →» la botonera se mueve bajo el dedo y el
+   * segundo toque marcaba una opción de la pregunta nueva. Un clic se ignora cuando es el 2.º de
+   * una ráfaga (`detail` > 1, que el teclado no produce) Y el clic anterior cambió de pantalla.
+   */
+  const ultimoCambioPantalla = useRef(false);
+  useEffect(() => {
+    function filtrar(e: MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantalla.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantalla.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+  function cambiaPantalla() {
+    ultimoCambioPantalla.current = true;
+    navegado.current = true;
+  }
+
   function seleccionarOpcion(idx: number) {
     const nuevas = [...respuestas];
     nuevas[preguntaActual] = idx;
@@ -220,7 +244,7 @@ export default function SelectorVehiculoElectrico() {
 
   function avanzar() {
     if (seleccionActual === -1) return;
-    navegado.current = true;
+    cambiaPantalla();
     if (preguntaActual < totalPreguntas - 1) {
       setPreguntaActual(preguntaActual + 1);
     } else {
@@ -230,13 +254,13 @@ export default function SelectorVehiculoElectrico() {
 
   function retroceder() {
     if (preguntaActual > 0) {
-      navegado.current = true;
+      cambiaPantalla();
       setPreguntaActual(preguntaActual - 1);
     }
   }
 
   function reiniciar() {
-    navegado.current = true;
+    cambiaPantalla();
     setPreguntaActual(0);
     setRespuestas(Array(PREGUNTAS.length).fill(-1));
     setResultado(null);

@@ -214,6 +214,30 @@ export default function SelectorTipoVivienda() {
     else enunciado.current?.focus();
   }, [preguntaActual, mostrarResultado]);
 
+  /**
+   * Doble clic y dos toques seguidos (cabo C0005, receta de selector-tablet y
+   * selector-alquiler-vs-compra, 3111): tras «Siguiente» la botonera se mueve bajo el dedo y el
+   * segundo toque marcaba una opción de la pregunta nueva. Un clic se ignora cuando es el 2.º de
+   * una ráfaga (`detail` > 1, que el teclado no produce) Y el clic anterior cambió de pantalla.
+   */
+  const ultimoCambioPantalla = useRef(false);
+  useEffect(() => {
+    function filtrar(e: MouseEvent) {
+      if (e.detail > 1 && ultimoCambioPantalla.current) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else if (e.detail <= 1) {
+        ultimoCambioPantalla.current = false;
+      }
+    }
+    window.addEventListener('click', filtrar, true);
+    return () => window.removeEventListener('click', filtrar, true);
+  }, []);
+  const cambiaPantalla = () => {
+    ultimoCambioPantalla.current = true;
+    moverFoco.current = true;
+  };
+
   /* ── Handlers ── */
   const handleSeleccionarOpcion = (idx: number) => {
     setRespuestas((prev) => ({ ...prev, [preguntaActual]: idx }));
@@ -239,25 +263,25 @@ export default function SelectorTipoVivienda() {
 
   const handleSiguiente = () => {
     if (preguntaActual < total - 1) {
-      moverFoco.current = true;
+      cambiaPantalla();
       setPreguntaActual((p) => p + 1);
     }
   };
 
   const handleAnterior = () => {
     if (preguntaActual > 0) {
-      moverFoco.current = true;
+      cambiaPantalla();
       setPreguntaActual((p) => p - 1);
     }
   };
 
   const handleVerResultado = () => {
-    moverFoco.current = true;
+    cambiaPantalla();
     setMostrarResultado(true);
   };
 
   const handleReiniciar = () => {
-    moverFoco.current = true;
+    cambiaPantalla();
     setPreguntaActual(0);
     setRespuestas({});
     setMostrarResultado(false);

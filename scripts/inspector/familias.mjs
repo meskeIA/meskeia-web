@@ -85,6 +85,13 @@ export const FAMILIAS = [
       'selector-seguro-coche',
       'selector-seguro-hogar',
       'selector-seguro-salud',
+      // Cabo C0005 (21/10/2026): cinco con el mismo armazón que no estaban declaradas.
+      // selector-tarifa-electrica queda fuera: radios sin barra ni Siguiente/Anterior.
+      'selector-dieta',
+      'selector-tablet',
+      'selector-tipo-gimnasio',
+      'selector-tipo-vivienda',
+      'selector-vehiculo-electrico',
     ],
   },
 ];
