@@ -3,7 +3,10 @@
 // de descubrimiento de Delegum en apps ES que NO están en la curaduría de
 // Soluciones (enlace a soluciones home). Ver _private/archivo/DELEGUM-SOLUCIONES.md.
 
-/** Apps fiscal-España: <RegionBadge variant="es-only">. */
+/**
+ * Apps fiscal-España (<RegionBadge variant="es-only">) en una suite de Delegum
+ * (finanzas, freelance, legal-fiscal).
+ */
 export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'asistente-alta-autonomo',
   'calendario-fiscal-emprendedor',
@@ -15,7 +18,6 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'conversor-pesetas-euros',
   'curso-decisiones-inversion',
   'declaracion-renta-fallecidos',
-  'estimacion-baja-maternal',
   'estimacion-deduccion-discapacidad',
   'estimacion-deduccion-maternidad',
   'estimacion-prestacion-nacimiento',
@@ -55,7 +57,6 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'orientador-tramites-jubilacion',
   'planificador-ahorro-jubilacion',
   'planificador-trimestres-freelance',
-  'planificador-turnos-cuidadores',
   'planificador-vacaciones-autonomo',
   'requisitos-nomada-digital',
   'residencia-vs-cuidado-en-casa',
@@ -63,7 +64,6 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'selector-regimen-fiscal-autonomo',
   'selector-seguro-hogar',
   'selector-seguro-salud',
-  'selector-tarifa-electrica',
   'simulador-bono-joven-alquiler',
   'simulador-colchon-emergencia-freelance',
   'simulador-desglose-nomina',
@@ -81,10 +81,8 @@ export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'simulador-renta-plan-pensiones',
   'simulador-subvenciones-rehabilitacion',
   'test-obligado-declarar-renta',
-  'validador-dni-nif-cif',
   'verificador-complemento-brecha-genero',
   'visualizador-anatomia-nomina',
-  'visualizador-coste-sanidad',
   'visualizador-estructura-costes-autonomo',
   'visualizador-jubilacion-perspectiva',
   'visualizador-sueldo-neto',

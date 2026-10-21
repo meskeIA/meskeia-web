@@ -563,3 +563,18 @@ test.describe('móvil (390 px)', () => {
     await expect(primera).toBeInViewport();
   });
 });
+
+test('sin banda de Delegum: es-only fuera de las suites de Delegum no la lleva', async ({ page }) => {
+  // 21/10/2026, decisión del usuario: la banda «Delegum reúne más herramientas de fiscalidad,
+  // derecho laboral y finanzas» solo va en apps de las suites finanzas, freelance o legal-fiscal.
+  // Al ponerle es-only (hallazgo 3178) esta app entró en APPS_REGION_ES y la pintaba, aunque su
+  // propio badge dice que la regulación es eléctrica y Delegum no es la fuente de nada.
+  // Contraste: selector-seguro-hogar, también es-only y sin fuente Delegum, pero de finanzas.
+  await page.goto('/selector-tarifa-electrica/');
+  await expect(page.getByText('Solo España: PVPC').first()).toBeVisible();
+  const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+  expect(cuerpo).not.toContain('fiscalidad, derecho laboral y finanzas');
+
+  await page.goto('/selector-seguro-hogar/');
+  await expect(page.getByText('fiscalidad, derecho laboral y finanzas').first()).toBeVisible();
+});

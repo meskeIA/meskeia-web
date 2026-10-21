@@ -5,13 +5,16 @@
  * variant="es-only"|"es-data" /> y genera data/delegum/apps-region-es.ts con
  * los dos conjuntos que decide la banda de descubrimiento de Delegum:
  *
- *  - APPS_REGION_ES: `es-only`, la autodeclaración de "herramienta
- *    fiscal-España" (universo Delegum). La banda dice que la herramienta
- *    aplica a España, que es lo mismo que dice su badge.
- *  - APPS_REGION_ES_DATOS: `es-data` en una app de las suites de Delegum
- *    (finanzas, freelance, legal-fiscal). La banda invita a Delegum SIN
- *    declarar ámbito: el badge de encima ya dice «Datos de referencia:
- *    España. La metodología es universal».
+ *  - APPS_REGION_ES: `es-only` en una app de las suites de Delegum (finanzas,
+ *    freelance, legal-fiscal). La banda dice que la herramienta aplica a
+ *    España, que es lo mismo que dice su badge.
+ *  - APPS_REGION_ES_DATOS: `es-data` en una app de las mismas suites. La banda
+ *    invita a Delegum SIN declarar ámbito: el badge de encima ya dice «Datos de
+ *    referencia: España. La metodología es universal».
+ *
+ * Una app es-only o es-data FUERA de esas suites no lleva banda: el badge dice
+ * dónde aplica, pero la app no es de fiscalidad, derecho laboral ni finanzas, y
+ * la banda anuncia justo eso.
  *
  * Lo consume el componente DescubreVertical para mostrar la banda de
  * descubrimiento de Delegum en apps de España que NO están en la curaduría de
@@ -25,6 +28,14 @@
  * metodología es universal», una banda que decía «Esta herramienta aplica a
  * España». Dos declaraciones de ámbito contradictorias en la misma pantalla, y
  * Delegum anunciado en un test de mascota o de ejercicio.
+ *
+ * Por qué `es-only` tampoco basta sola (21/10/2026, decisión del usuario): al
+ * ponerle es-only a selector-tarifa-electrica (hallazgo 3178, «la regulación es
+ * eléctrica, no fiscal: Delegum no es la fuente de nada») entró en la banda
+ * «Delegum reúne más herramientas de fiscalidad, derecho laboral y finanzas»,
+ * como ya lo estaban validador-dni-nif-cif, planificador-turnos-cuidadores,
+ * estimacion-baja-maternal y visualizador-coste-sanidad. Desde ese día las dos
+ * variantes pasan el mismo filtro de suites.
  *
  * Las suites salen de data/applications.ts leído como TEXTO (scripts/CLAUDE.md):
  * si el formato cambia, el regex se queda mudo sin error. Por eso el script se
@@ -79,10 +90,11 @@ for (const entry of readdirSync(appDir, { withFileTypes: true })) {
   const src = readFileSync(page, 'utf-8');
   const m = src.match(RE_ES);
   if (!m || !src.includes('RegionBadge')) continue;
+  if (!(suitesPorSlug.get(entry.name) ?? []).some((s) => SUITES_DELEGUM.has(s))) continue;
   // Una página que declare las dos variantes es fiscal-España: manda es-only.
   if (m[1] === 'es-only' || /variant=["']es-only["']/.test(src)) {
     soloEspana.push(entry.name);
-  } else if ((suitesPorSlug.get(entry.name) ?? []).some((s) => SUITES_DELEGUM.has(s))) {
+  } else {
     datosEspana.push(entry.name);
   }
 }
@@ -95,7 +107,10 @@ const out = `// AUTO-GENERADO por scripts/generate-delegum-es.mjs — NO editar 
 // de descubrimiento de Delegum en apps ES que NO están en la curaduría de
 // Soluciones (enlace a soluciones home). Ver _private/archivo/DELEGUM-SOLUCIONES.md.
 
-/** Apps fiscal-España: <RegionBadge variant="es-only">. */
+/**
+ * Apps fiscal-España (<RegionBadge variant="es-only">) en una suite de Delegum
+ * (finanzas, freelance, legal-fiscal).
+ */
 export const APPS_REGION_ES: ReadonlySet<string> = new Set([
 ${cuerpo(soloEspana)}
 ]);
