@@ -1395,7 +1395,12 @@ export default function SimuladorCompraventaPage() {
       // Un ilegible que SUBIRÍA el neto no permite afirmar «el neto real es MAYOR» si a la vez
       // FALTA un impuesto que lo bajaría: el sondeo solo mide los ilegibles, y la dirección
       // segura era falsa en cuanto se rellenaba el dato vacío (hallazgo 1561).
-      return `Sin cerrar: ${noSePudoLeer(v.campos)} y ${sujetoPlural(v.campos) ? 'lo subirían' : 'lo subiría'}, pero ${faltaOFaltan(faltanEnElNeto)}, que ${sujetoPlural(faltanEnElNeto) ? 'lo bajarían' : 'lo bajaría'}: no se puede saber si el neto real es mayor o menor que este`;
+      // En territorio foral la plusvalía no «falta»: no se calcula nunca (3071), y escribir el
+      // importe ilegible no la trae (hallazgo 3403 de local-comercial, la misma línea).
+      const queLoBaja = resultadosVendedor?.plusvaliaForal
+        ? `no descuenta ${enumerarNi(faltanEnElNeto)}`
+        : faltaOFaltan(faltanEnElNeto);
+      return `Sin cerrar: ${noSePudoLeer(v.campos)} y ${sujetoPlural(v.campos) ? 'lo subirían' : 'lo subiría'}, pero ${queLoBaja}, que ${sujetoPlural(faltanEnElNeto) ? 'lo bajarían' : 'lo bajaría'}: no se puede saber si el neto real es mayor o menor que este`;
     }
     if (v.tipo === 'menor') {
       const deducibles = v.campos.filter(
@@ -2862,7 +2867,8 @@ export default function SimuladorCompraventaPage() {
                         const texto = pedir.join(' y ');
                         // En territorio foral puede no haber nada que pedir: entonces no hay «para obtenerlo».
                         // Del promotor no hay dato que lo complete: rellenar solo cierra lo demás (3377).
-                        const para = resultadosVendedor.ventaDelPromotor ? 'para calcular lo demás' : 'para obtenerlo';
+                        // Ni de la plusvalía foral: el neto sigue PARCIAL aunque se rellene todo (3399).
+                        const para = resultadosVendedor.ventaDelPromotor || resultadosVendedor.plusvaliaForal ? 'para calcular lo demás' : 'para obtenerlo';
                         return texto ? `${avisos.join('. ')}. ${mayuscula(texto)} ${para}.` : `${avisos.join('. ')}.`;
                       })()
                     }

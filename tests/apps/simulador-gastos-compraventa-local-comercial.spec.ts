@@ -6637,7 +6637,9 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
     expect(callan).toEqual([]);
   });
 
-  // HALLAZGO [21/10-d] (bajo, contenido) — ❌ ABIERTO. La forma de la reparación del 3071 que no llegó
+  // HALLAZGO [21/10-d] 3403 (bajo, contenido) — ✅ REPARADO 21/10/2026: en foral el aviso dice que «no
+  // descuenta» la plusvalía (no que «falta») y cierra con «para calcular lo demás»; la misma rama en
+  // las cuatro apps con pestaña Vendedor. La forma de la reparación del 3071 que no llegó
   // al aviso del neto. En Navarra y el País Vasco la plusvalía no se calcula nunca, y las tarjetas lo
   // dicen («sin la plusvalía municipal, que aquí no se calcula», `faltaPlusvalia`). Con un importe
   // ilegible, el aviso del neto vuelve a la frase de un dato que falta: «Sin cerrar: no se han podido
@@ -6650,7 +6652,7 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
   //   ganancia 98.400 → IRPF 10.380 + 48.400 × 23 % = 21.512,00 · neto 268.888,00 (PARCIAL);
   //   gastos «12.000.50» (valen 0) → ganancia 110.400 → IRPF 10.380 + 60.400 × 23 % = 24.272,00 ·
   //   neto 266.128,00 (PARCIAL).
-  test.fail('[21/10-d] en territorio foral, con un importe ilegible, el neto no dice que «falta» la plusvalía ni promete obtenerse', async ({ page }) => {
+  test('[21/10-d] en territorio foral, con un importe ilegible, el neto no dice que «falta» la plusvalía ni promete obtenerse', async ({ page }) => {
     await abrir0810(page);
     await promotorNavarra2110(page);
     await page.getByRole('button', { name: /Segunda mano/ }).first().click();
@@ -6670,6 +6672,8 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
     expect(aviso).toContain('no se puede saber si el neto real es mayor o menor que este');
     // El defecto.
     expect(aviso).not.toMatch(/falta la plusvalía municipal|para obtenerlo/);
+    expect(aviso).toContain('pero no descuenta la plusvalía municipal, que lo bajaría: no se puede saber');
+    expect(aviso).toContain('para calcular lo demás.');
   });
 
   // HALLAZGO [21/10-e] 3404 (bajo, contenido) — ✅ REPARADO (21/10/2026): la frase pide ya el derecho

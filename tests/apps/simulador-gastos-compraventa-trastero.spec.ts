@@ -7595,7 +7595,8 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
     expect(textoPagina).toContain('para esas compras, el IRPF que se muestra es un máximo');
   });
 
-  // HALLAZGO [21/10-c] (bajo, contenido) — en territorio foral el neto promete «obtenerlo». Con la
+  // HALLAZGO [21/10-c] 3399 (bajo, contenido) — ✅ REPARADO 21/10/2026: en foral dice «para calcular lo
+  // demás», como el promotor, en las cuatro apps con pestaña Vendedor. Lo que se vio: en territorio foral el neto promete «obtenerlo». Con la
   // plusvalía foral (País Vasco y Navarra, que la app no calcula nunca) y un importe que corregir, la
   // descripción del neto termina «Escribe con coma decimal (1.234,56) lo que no se ha podido leer para
   // obtenerlo.»; escrita la comisión legible (3,5 %), el neto sigue «(PARCIAL)» —30.000 − 1.050 − 200
@@ -7603,10 +7604,12 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
   // para el promotor con «para calcular lo demás» (page.tsx ~l. 2015), y el comentario de esa misma
   // línea solo prevé el foral SIN nada que pedir. La misma línea está en la referencia (~l. 2865),
   // garaje (~l. 2003) y local-comercial (~l. 2290); medido solo aquí.
-  test.fail('[21/10-c] en territorio foral el neto no promete «obtenerlo» al corregir un importe', async ({ page }) => {
+  test('[21/10-c] en territorio foral el neto no promete «obtenerlo» al corregir un importe', async ({ page }) => {
     await vendedor0810(page, BASE_2110_PV);
     // El defecto.
-    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toContain('para obtenerlo');
+    const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(neto).not.toContain('para obtenerlo');
+    expect(neto).toContain('lo que no se ha podido leer para calcular lo demás.');
     // Lo que lo demuestra: corregida la comisión, el neto sigue sin la plusvalía foral.
     await sembrar(page, 'Comisión inmobiliaria (%)', '3,5');
     expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
