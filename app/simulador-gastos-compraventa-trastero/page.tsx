@@ -1583,7 +1583,9 @@ export default function SimuladorTrasteroCompraventaPage() {
           {pestanaActiva === 'vendedor' && (
             <div className={styles.resultados}>
               <div className={styles.formVendedor}>
-                <h3 className={styles.formVendedorTitle}>Datos para calcular plusvalía e IRPF</h3>
+                <h3 className={styles.formVendedorTitle}>
+                  {tipoTransmision === 'primera-mano' ? 'Datos para calcular la plusvalía' : 'Datos para calcular plusvalía e IRPF'}
+                </h3>
 
                 <NumberInput
                   value={precioCompraOriginal}
@@ -1594,14 +1596,19 @@ export default function SimuladorTrasteroCompraventaPage() {
                   min={0}
                 />
 
-                <NumberInput
-                  value={gastosAdquisicion}
-                  onChange={setGastosAdquisicion}
-                  label="Impuestos y gastos que pagaste al comprarlo"
-                  placeholder="1000"
-                  helperText="ITP o IVA, notaría, registro y gestoría de aquella compra: suman al valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF)"
-                  min={0}
-                />
+                {/* En obra nueva vende el promotor y su renta no se calcula (3380): los campos que solo
+                    alimentan la ganancia y su cuota no se piden, en vez de prometer un efecto que no
+                    producen (hallazgo 3397, efecto familia del 3394). */}
+                {tipoTransmision !== 'primera-mano' && (
+                  <NumberInput
+                    value={gastosAdquisicion}
+                    onChange={setGastosAdquisicion}
+                    label="Impuestos y gastos que pagaste al comprarlo"
+                    placeholder="1000"
+                    helperText="ITP o IVA, notaría, registro y gestoría de aquella compra: suman al valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF)"
+                    min={0}
+                  />
+                )}
 
                 <NumberInput
                   value={aniosPropiedad}
@@ -1693,15 +1700,18 @@ export default function SimuladorTrasteroCompraventaPage() {
                   min={0}
                 />
                 {/* La escala del ahorro grava todas las rentas del ahorro del año juntas: sin este
-                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368). */}
-                <NumberInput
-                  value={otrasRentasAhorro}
-                  onChange={setOtrasRentasAhorro}
-                  label="Otras rentas del ahorro de este año (€)"
-                  placeholder="0"
-                  helperText={AYUDA_OTRAS_RENTAS_AHORRO}
-                  min={0}
-                />
+                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368).
+                    En obra nueva no hay cuota del ahorro que calcular (3397). */}
+                {tipoTransmision !== 'primera-mano' && (
+                  <NumberInput
+                    value={otrasRentasAhorro}
+                    onChange={setOtrasRentasAhorro}
+                    label="Otras rentas del ahorro de este año (€)"
+                    placeholder="0"
+                    helperText={AYUDA_OTRAS_RENTAS_AHORRO}
+                    min={0}
+                  />
+                )}
               </div>
 
               {resultadosVendedor ? (

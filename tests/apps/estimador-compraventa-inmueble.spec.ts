@@ -9771,7 +9771,8 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
     );
 
     await sembrar(page, 'Comisión inmobiliaria (%)', '3');
-    await sembrar(page, OTRAS, '45.000.50');
+    // Desde el 3394 (21/10/2026) las otras rentas no se piden en obra nueva: no hay cuota del ahorro.
+    await expect(page.locator(`input[aria-label="${OTRAS}"]`)).toHaveCount(0);
     expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
     expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe(
       'No descuenta el impuesto sobre la renta del promotor: el neto real puede ser menor que este.',
@@ -9809,12 +9810,16 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
       'Reinversión parcial: exento el 51,9 % de la ganancia (art. 41 RIRPF)',
     );
 
-    await baseO(page, 'madrid', true);
-    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
+    // Obra nueva: antes del 3394 se escribían aquí otras rentas 45.000, gastos 20.000 y mejoras
+    // 10.000 y el neto no se movía; desde el 21/10/2026 esos campos ya no se ofrecen. Lo que se
+    // escribió en segunda mano tampoco mueve nada al pasar a obra nueva.
+    await baseO(page, 'madrid');
     await sembrar(page, OTRAS, '45000');
     await sembrar(page, 'Impuestos y gastos que pagaste al comprar', '20000');
     await sembrar(page, 'Inversiones y mejoras (opcional)', '10000');
+    await page.getByRole('button', { name: /Primera mano/ }).click();
     expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
+    await expect(page.locator(`input[aria-label="${OTRAS}"]`)).toHaveCount(0);
   });
 
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
@@ -9847,7 +9852,10 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (21/10/2026). Con «Primera mano» la pestaña Vendedor ya no
+   * HALLAZGO 3394 [bajo, contenido] — REPARADO (21/10/2026): en obra nueva la pestaña ya no pide los
+   * gastos de aquella compra (ni «Estimar por mí»), las mejoras ni las otras rentas del ahorro, y el
+   * rótulo dice «Datos para calcular la plusvalía». La misma reparación en garaje, trastero y local.
+   * Lo que se vio: con «Primera mano» la pestaña Vendedor ya no
    * liquida la renta del promotor (616e5fc8, hallazgo 3377) y retiró las casillas de vivienda
    * habitual, edad y reinversión, pero sigue pidiendo los campos que solo alimentan esa cuota, con
    * ayudas que prometen un efecto que la misma pestaña niega: «Impuestos y gastos que pagaste al
@@ -9858,13 +9866,21 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
    * mejoras 10.000 → esperado: esos campos no se ofrecen en obra nueva, o su ayuda no promete efecto
    * · obtenido: neto 289.200,00 € idéntico, con las dos ayudas tal cual.
    */
-  test.fail('HALLAZGO obra nueva — no se piden campos del IRPF que esta rama no calcula', async ({ page }) => {
+  test('REPARADO 3394 obra nueva — no se piden campos del IRPF que esta rama no calcula', async ({ page }) => {
     test.setTimeout(90_000);
     await baseO(page, 'madrid', true);
     const otras = await ayudaDe(page, OTRAS);
     if (otras !== null) expect(otras).not.toContain('la venta puede tributar a un tipo mayor');
     const gastos = await ayudaDe(page, 'Impuestos y gastos que pagaste al comprar');
     if (gastos !== null) expect(gastos).not.toContain('REDUCEN la ganancia');
+    expect(otras).toBeNull();
+    expect(gastos).toBeNull();
+    expect(await ayudaDe(page, 'Inversiones y mejoras (opcional)')).toBeNull();
+    await expect(page.getByRole('button', { name: /Estimar por mí/ })).toHaveCount(0);
+    await expect(page.locator('h3', { hasText: 'Datos para calcular la plusvalía' })).toHaveCount(1);
+    // Lo que sí alimenta la plusvalía sigue ahí.
+    expect(await ayudaDe(page, 'Valor catastral del suelo')).not.toBeNull();
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1800,00 €');
   });
 
   /**

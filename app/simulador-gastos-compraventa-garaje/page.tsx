@@ -1589,14 +1589,19 @@ export default function SimuladorGarajeCompraventaPage() {
                   helperText="Lo que pagaste cuando lo compraste"
                   min={0}
                 />
-                <NumberInput
-                  value={gastosAdquisicion}
-                  onChange={setGastosAdquisicion}
-                  label="Impuestos y gastos que pagaste al comprarlo (€)"
-                  placeholder="1800"
-                  helperText="ITP o IVA, notaría, registro y gestoría de aquella compra: suman al valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF)"
-                  min={0}
-                />
+                {/* En obra nueva vende el promotor y su renta no se calcula (3379): los campos que solo
+                    alimentan la ganancia y su cuota no se piden, en vez de prometer un efecto que no
+                    producen (efecto familia del 3394, medido en trastero y local: 3397 y 3400). */}
+                {tipoTransmision !== 'primera-mano' && (
+                  <NumberInput
+                    value={gastosAdquisicion}
+                    onChange={setGastosAdquisicion}
+                    label="Impuestos y gastos que pagaste al comprarlo (€)"
+                    placeholder="1800"
+                    helperText="ITP o IVA, notaría, registro y gestoría de aquella compra: suman al valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF)"
+                    min={0}
+                  />
+                )}
                 <NumberInput
                   value={aniosPropiedad}
                   onChange={setAniosPropiedad}
@@ -1682,15 +1687,18 @@ export default function SimuladorGarajeCompraventaPage() {
                   min={0}
                 />
                 {/* La escala del ahorro grava todas las rentas del ahorro del año juntas: sin este
-                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368). */}
-                <NumberInput
-                  value={otrasRentasAhorro}
-                  onChange={setOtrasRentasAhorro}
-                  label="Otras rentas del ahorro de este año (€)"
-                  placeholder="0"
-                  helperText={AYUDA_OTRAS_RENTAS_AHORRO}
-                  min={0}
-                />
+                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368).
+                    En obra nueva no hay cuota del ahorro que calcular. */}
+                {tipoTransmision !== 'primera-mano' && (
+                  <NumberInput
+                    value={otrasRentasAhorro}
+                    onChange={setOtrasRentasAhorro}
+                    label="Otras rentas del ahorro de este año (€)"
+                    placeholder="0"
+                    helperText={AYUDA_OTRAS_RENTAS_AHORRO}
+                    min={0}
+                  />
+                )}
               </div>
 
               {resultadosVendedor ? (

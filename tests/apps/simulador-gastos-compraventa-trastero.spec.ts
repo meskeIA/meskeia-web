@@ -7549,7 +7549,9 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
   // Cada uno con `test.fail()` y la aserción de FONDO primero; las cifras de sus escenarios las
   // sujetan en verde los CASOS 61-63.
 
-  // HALLAZGO [21/10-a] (bajo, contenido) — EFECTO FAMILIA del 3394 (estimador-compraventa-inmueble),
+  // HALLAZGO [21/10-a] 3397 (bajo, contenido) — ✅ REPARADO 21/10/2026: en obra nueva los dos campos ya
+  // no se ofrecen y el rótulo dice «Datos para calcular la plusvalía».
+  // EFECTO FAMILIA del 3394 (estimador-compraventa-inmueble),
   // medido aquí. Con «Primera mano» la pestaña Vendedor ya no liquida la renta del promotor (616e5fc8,
   // hallazgo 3380), pero sigue pidiendo bajo el rótulo «Datos para calcular plusvalía e IRPF» los dos
   // campos que solo alimentaban esa cuota, con ayudas que prometen un efecto: «Impuestos y gastos que
@@ -7557,11 +7559,16 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
   // «Otras rentas del ahorro de este año (€)» («…así que con ellas la venta puede tributar a un tipo
   // mayor»). Escribir en ellos no mueve ninguna cifra: el neto sigue en 21.120,00 € y el total en
   // 880,00 €.
-  test.fail('[21/10-a] en obra nueva la pestaña Vendedor no promete el efecto de campos que ya no alimentan nada', async ({ page }) => {
+  test('[21/10-a] en obra nueva la pestaña Vendedor no promete el efecto de campos que ya no alimentan nada', async ({ page }) => {
     await promotorAndalucia2110(page);
     // El defecto.
-    const formulario = await texto(page.locator('[class*="formVendedor"]'));
+    // `div`: desde la reparación el rótulo cambia en obra nueva, y su clase (formVendedorTitle)
+    // también contiene «formVendedor».
+    const formulario = await texto(page.locator('div[class*="formVendedor"]'));
     expect(formulario).not.toMatch(/REDUCEN la ganancia|puede tributar a un tipo mayor/);
+    expect(formulario).toContain('Datos para calcular la plusvalía');
+    await expect(page.locator('input[aria-label="Impuestos y gastos que pagaste al comprarlo"]')).toHaveCount(0);
+    await expect(page.locator('input[aria-label="Otras rentas del ahorro de este año (€)"]')).toHaveCount(0);
     // Lo que lo demuestra, si los campos siguen ahí: con 1.500 € y 40.000 € escritos nada se mueve.
     for (const [etiqueta, valor] of [
       ['Impuestos y gastos que pagaste al comprarlo', '1500'],

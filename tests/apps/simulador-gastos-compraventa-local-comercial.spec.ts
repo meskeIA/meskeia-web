@@ -6142,11 +6142,12 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
   test('[19/10-a] con «Obra nueva / Promotor», la pestaña Vendedor no liquida al promotor como a un particular', async ({ page }) => {
     expect(IVA_INMUEBLES_2025.local).toBe(21);
     await abrir0810(page);
+    // Desde el 3400 (21/10/2026) los gastos de aquella compra no se piden en obra nueva: el
+    // vendedor se rellena en segunda mano y después se pasa a «Obra nueva / Promotor» (el IVA del
+    // comprador, 42.000,00 €, lo sujeta el CASO 1).
+    await vendedorSinAmortizar0810(page, 'madrid');
     await page.getByRole('button', { name: /Obra nueva/ }).click();
     await expect(page.getByRole('button', { name: /Obra nueva/ })).toHaveAttribute('aria-pressed', 'true');
-    await sembrarImporte12(page, 'Precio del local comercial', '200000');
-    await esperarTarjeta2609(page, /^IVA \(21/, '42.000,00 €');
-    await vendedorSinAmortizar0810(page, 'madrid');
     await esperarTarjeta2609(page, 'Impuesto sobre la renta de la venta', 'Sin calcular');
     expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('192.300,00 €');
     // «Impuesto sobre Sociedades» no cuenta: la nota fija lo dice de cualquier venta, con cualquier
@@ -6529,7 +6530,9 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
   // Con `test.fail()`, afirmando lo que DEBERÍA ocurrir. Las aserciones previas a la del defecto son
   // cifras o textos que la reparación no debe mover; la del defecto lee y compara, sin reintento.
 
-  // HALLAZGO [21/10-a] (bajo, contenido) — ❌ ABIERTO. Efecto familia del 3394 (estimador), medido
+  // HALLAZGO [21/10-a] 3400 (bajo, contenido) — ✅ REPARADO 21/10/2026: en obra nueva el perfil y los
+  // tres campos ya no se ofrecen, el rótulo dice «Datos para calcular la plusvalía» y unas
+  // amortizaciones escritas antes en segunda mano no piden revisar nada. Efecto familia del 3394 (estimador), medido
   // aquí. Con «Obra nueva / Promotor» la pestaña Vendedor ya no liquida la renta del promotor
   // (616e5fc8, hallazgo 3384), pero sigue pidiendo, bajo «Datos para calcular plusvalía e IRPF», los
   // campos que solo alimentaban esa cuota, con ayudas que prometen un efecto: «Impuestos y gastos que
@@ -6541,19 +6544,31 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
   //   Navarra · promotor de `promotorNavarra2110` → NETO (PARCIAL) 290.400,00 · gastos 40.000,
   //   amortizaciones 25.000 y otras rentas 100.000 → 290.400,00 igual; amortizaciones 999.999 → igual,
   //   con «Revisa las amortizaciones deducidas para calcular lo demás».
-  test.fail('[21/10-a] con «Obra nueva / Promotor», el formulario del vendedor no promete efectos que no produce', async ({ page }) => {
+  test('[21/10-a] con «Obra nueva / Promotor», el formulario del vendedor no promete efectos que no produce', async ({ page }) => {
     await abrir0810(page);
     await promotorNavarra2110(page);
     await esperarTarjeta2609(page, /^NETO QUE RECIBES/, '290.400,00 €');
     await expect(page.locator('h3', { hasText: 'Impuesto sobre la renta de la venta' })).toHaveCount(1);
-    // Lo que escribir en esos campos NO produce: ni una cifra se mueve.
+    // Los campos que solo alimentaban la renta del vendedor no se ofrecen.
+    for (const etiqueta of [
+      'Impuestos y gastos que pagaste al comprarlo (€)',
+      'Amortizaciones acumuladas deducidas (€)',
+      'Otras rentas del ahorro de este año (€)',
+    ]) {
+      await expect(page.locator(`input[aria-label="${etiqueta}"]`), etiqueta).toHaveCount(0);
+    }
+    await expect(page.getByRole('button', { name: /Local no afecto/ })).toHaveCount(0);
+    expect(await formVendedor2110(page)).toContain('Datos para calcular la plusvalía');
+    // Lo escrito en segunda mano (amortizaciones imposibles incluidas) no mueve nada al pasar a obra nueva.
+    await page.getByRole('button', { name: /Segunda mano/ }).first().click();
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
     await sembrarImporte12(page, 'Impuestos y gastos que pagaste al comprarlo (€)', '40000');
-    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '25000');
     await sembrarImporte12(page, 'Otras rentas del ahorro de este año (€)', '100000');
+    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '999999');
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
     await esperarTarjeta2609(page, /^NETO QUE RECIBES/, '290.400,00 €');
     expect(await valorTarjeta(page, /^Total gastos de la venta/)).toBe('9600,00 €');
-    await sembrarImporte12(page, 'Amortizaciones acumuladas deducidas (€)', '999999');
-    await esperarTarjeta2609(page, /^NETO QUE RECIBES/, '290.400,00 €');
     // El defecto: el formulario promete efectos y el neto pide revisar un dato que no se usa.
     const form = await formVendedor2110(page);
     const neto = await avisoNeto2309(page);

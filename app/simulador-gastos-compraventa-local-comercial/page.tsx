@@ -767,11 +767,13 @@ export default function SimuladorLocalComercialPage() {
         ? valorTotal - valorSuelo
         : 0;
     const topeAmortizaciones = Math.max(costeAdquisicion, construccionCatastral);
+    // En obra nueva (vende el promotor) las amortizaciones no entran en nada y el campo no se
+    // pinta: el neto pedía «Revisa las amortizaciones deducidas» por un dato sin uso (3400).
     const amortizacionesImposibles =
-      precioC > 0 && gastosAdquisicionLegible && entrada.amortizaciones > topeAmortizaciones;
+      !entrada.ventaDelPromotor && precioC > 0 && gastosAdquisicionLegible && entrada.amortizaciones > topeAmortizaciones;
     /** Lo que tendrían que sumar los gastos ilegibles para que las amortizaciones cuadren. */
     const excesoSobrePrecio =
-      precioC > 0 && !gastosAdquisicionLegible && entrada.amortizaciones > Math.max(precioC, construccionCatastral)
+      !entrada.ventaDelPromotor && precioC > 0 && !gastosAdquisicionLegible && entrada.amortizaciones > Math.max(precioC, construccionCatastral)
         ? entrada.amortizaciones - precioC
         : 0;
     const r = calcularVendedor(entrada);
@@ -1788,8 +1790,15 @@ export default function SimuladorLocalComercialPage() {
           {pestanaActiva === 'vendedor' && (
             <div className={styles.resultsInner}>
               <div className={styles.formVendedor}>
-                <h3 className={styles.formVendedorTitle}>Datos para calcular plusvalía e IRPF</h3>
+                <h3 className={styles.formVendedorTitle}>
+                  {transmision === 'primera-mano' ? 'Datos para calcular la plusvalía' : 'Datos para calcular plusvalía e IRPF'}
+                </h3>
 
+                {/* En obra nueva vende el promotor y su renta no se calcula (3384): el perfil y los
+                    campos que solo alimentan la ganancia y su cuota —gastos de aquella compra,
+                    amortizaciones y otras rentas del ahorro— no se piden, en vez de prometer un
+                    efecto que no producen (hallazgo 3400, efecto familia del 3394). */}
+                {transmision !== 'primera-mano' && (
                 <div className={styles.perfilGrid}>
                   <button
                     type="button"
@@ -1812,6 +1821,7 @@ export default function SimuladorLocalComercialPage() {
                     <span className={styles.transmisionSub}>Usado en tu negocio</span>
                   </button>
                 </div>
+                )}
 
                 <NumberInput
                   value={precioCompraOriginal}
@@ -1822,6 +1832,8 @@ export default function SimuladorLocalComercialPage() {
                   min={0}
                 />
 
+                {transmision !== 'primera-mano' && (
+                <>
                 <NumberInput
                   value={gastosAdquisicion}
                   onChange={setGastosAdquisicion}
@@ -1848,6 +1860,8 @@ export default function SimuladorLocalComercialPage() {
                   }
                   min={0}
                 />
+                </>
+                )}
 
                 <NumberInput
                   value={aniosPropiedad}
@@ -1939,15 +1953,18 @@ export default function SimuladorLocalComercialPage() {
                 />
 
                 {/* La escala del ahorro grava todas las rentas del ahorro del año juntas: sin este
-                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368). */}
-                <NumberInput
-                  value={otrasRentasAhorro}
-                  onChange={setOtrasRentasAhorro}
-                  label="Otras rentas del ahorro de este año (€)"
-                  placeholder="0"
-                  helperText={AYUDA_OTRAS_RENTAS_AHORRO}
-                  min={0}
-                />
+                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368).
+                    En obra nueva no hay cuota del ahorro que calcular (3400). */}
+                {transmision !== 'primera-mano' && (
+                  <NumberInput
+                    value={otrasRentasAhorro}
+                    onChange={setOtrasRentasAhorro}
+                    label="Otras rentas del ahorro de este año (€)"
+                    placeholder="0"
+                    helperText={AYUDA_OTRAS_RENTAS_AHORRO}
+                    min={0}
+                  />
+                )}
 
                 <div className={styles.enlaceCatastro}>
                   <a href={ENLACE_CATASTRO} target="_blank" rel="noopener noreferrer" className={styles.catastroLink}>

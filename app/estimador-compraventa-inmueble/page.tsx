@@ -2202,7 +2202,9 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.resultados}>
               {/* Formulario adicional vendedor */}
               <div className={styles.formVendedor}>
-                <h3 className={styles.formVendedorTitle}>Datos para calcular plusvalía e IRPF</h3>
+                <h3 className={styles.formVendedorTitle}>
+                  {tipoTransmision === 'primera-mano' ? 'Datos para calcular la plusvalía' : 'Datos para calcular plusvalía e IRPF'}
+                </h3>
 
                 {/* La plusvalía municipal (IIVTNU) solo grava el suelo urbano */}
                 {tipoInmueble === 'terreno' && (
@@ -2271,6 +2273,11 @@ export default function SimuladorCompraventaPage() {
                   </div>
                 )}
 
+                {/* En obra nueva vende el promotor y su renta no se calcula (3377): los campos que solo
+                    alimentan la ganancia y su cuota —gastos de aquella compra, mejoras y otras rentas
+                    del ahorro— no se piden, en vez de prometer un efecto que no producen (3394). */}
+                {tipoTransmision !== 'primera-mano' && (
+                <>
                 <div className={styles.campoConAccion}>
                   <NumberInput
                     value={gastosAdquisicion}
@@ -2327,6 +2334,8 @@ export default function SimuladorCompraventaPage() {
                   helperText="Ampliaciones o instalaciones nuevas con factura. No cuentan pintura, sustituciones ni reparaciones de conservación"
                   min={0}
                 />
+                </>
+                )}
 
                 <NumberInput
                   value={valorCatastralSuelo}
@@ -2378,15 +2387,18 @@ export default function SimuladorCompraventaPage() {
                 />
 
                 {/* La escala del ahorro grava todas las rentas del ahorro del año juntas: sin este
-                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368). */}
-                <NumberInput
-                  value={otrasRentasAhorro}
-                  onChange={setOtrasRentasAhorro}
-                  label="Otras rentas del ahorro de este año (€)"
-                  placeholder="0"
-                  helperText={AYUDA_OTRAS_RENTAS_AHORRO}
-                  min={0}
-                />
+                    dato la cuota se calculaba como si la venta fuera la única (hallazgo 3368).
+                    En obra nueva no hay cuota del ahorro que calcular (3394). */}
+                {tipoTransmision !== 'primera-mano' && (
+                  <NumberInput
+                    value={otrasRentasAhorro}
+                    onChange={setOtrasRentasAhorro}
+                    label="Otras rentas del ahorro de este año (€)"
+                    placeholder="0"
+                    helperText={AYUDA_OTRAS_RENTAS_AHORRO}
+                    min={0}
+                  />
+                )}
 
                 {/* Las dos exenciones de la ganancia son de la VIVIENDA habitual (arts. 33.4.b y
                     38 LIRPF): con otro inmueble las casillas no se ofrecen, en vez de venir
