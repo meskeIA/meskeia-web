@@ -132,6 +132,8 @@ export default function RuletaAleatoriaPage() {
       oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
       oscillator.stop(audioContext.currentTime + 0.4);
     }
+    // Un contexto por sonido: se cierra al acabar, o se acumulan uno por giro (cabo C0038).
+    oscillator.onended = () => { audioContext.close().catch(() => {}); };
   }, [soundEnabled]);
 
   // Girar ruleta

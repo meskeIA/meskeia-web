@@ -76,6 +76,23 @@ export default function RecortadorAudioPage() {
     return audioContextRef.current;
   }, []);
 
+  // Al salir de la app, el contexto se cierra: si no, sigue vivo con su hilo de audio (y su
+  // fuente sonando, si se sale reproduciendo) hasta que se cierra la pestaña (cabo C0038, la
+  // forma del 1978 de conversor-morse).
+  useEffect(() => {
+    return () => {
+      const ctx = audioContextRef.current;
+      audioContextRef.current = null;
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      try {
+        sourceNodeRef.current?.stop();
+      } catch {
+        // Ya estaba parada
+      }
+      if (ctx && ctx.state !== 'closed') ctx.close().catch(() => {});
+    };
+  }, []);
+
   // Cargar archivo de audio
   const handleFileSelect = useCallback(async (file: File) => {
     if (!file.type.startsWith('audio/')) {

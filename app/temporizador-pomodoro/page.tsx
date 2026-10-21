@@ -161,6 +161,9 @@ export default function TemporizadorPomodoroPage() {
         gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
         osc2.start(audioContext.currentTime);
         osc2.stop(audioContext.currentTime + 1);
+        // Un contexto por aviso: se cierra tras la segunda campana, o se acumula uno por
+        // pomodoro (cabo C0038).
+        osc2.onended = () => { audioContext.close().catch(() => {}); };
       }, 300);
     }
   }, [config.soundEnabled, config.soundVolume]);

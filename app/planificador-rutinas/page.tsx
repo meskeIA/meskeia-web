@@ -209,6 +209,8 @@ export default function PlanificadorRutinasPage() {
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
       osc.start();
       osc.stop(ctx.currentTime + 0.4);
+      // Un contexto por tono: se cierra al acabar, o se acumulan uno por tarea completada (C0038).
+      osc.onended = () => { ctx.close().catch(() => {}); };
     } catch { /* ignorar */ }
 
     setRutinaActiva(prev => {
