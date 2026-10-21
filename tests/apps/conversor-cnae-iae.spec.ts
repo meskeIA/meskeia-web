@@ -761,6 +761,43 @@ test('CANDADO — ningún sinónimo está en una clase que un hermano de su corr
 });
 
 /**
+ * CANDADO del hallazgo 2950 (cabo C0344, 21/10/2026) — el eje mayorista/minorista.
+ *
+ * El candado de arriba no lo veía por dos razones: solo compara con las clases HERMANAS de la
+ * correspondencia (46.34 no lo es de 47.25) y tiene «mayor» y «menor» en GENERICAS, así que
+ * «distribuidora de bebidas» casaba con 47.25 por «bebidas» y pasaba. Este mira solo la marca:
+ * un sinónimo que dice distribuidor/a o mayorista es comercio al por mayor (CNAE 46.xx), y uno
+ * que dice tienda o minorista no lo es. Reinyecta el 2950 antes de mirar el catálogo servido.
+ */
+test('CANDADO — un sinónimo mayorista está en una clase 46 y uno minorista no', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const MAYORISTA = /\b(distribuid\w*|mayoristas?)\b/i;
+  const MINORISTA = /\b(tiendas?|minoristas?)\b/i;
+  const infracciones = (sinonimos: Record<string, string[]>): string[] => {
+    const fuera: string[] = [];
+    for (const [codigo, terminos] of Object.entries(sinonimos)) {
+      const alPorMayor = codigo.startsWith('46');
+      for (const t of terminos) {
+        if (MAYORISTA.test(t) && !alPorMayor) fuera.push(`«${t}» dice al por mayor y está en ${codigo}`);
+        if (MINORISTA.test(t) && alPorMayor) fuera.push(`«${t}» dice al por menor y está en ${codigo}`);
+      }
+    }
+    return fuera;
+  };
+
+  // El caso de origen: así estaba el diccionario antes del 2950. Si esto pasa, el candado no ve nada.
+  expect(infracciones({ '47.25': ['bebidas', 'distribuidora de bebidas'] })).toHaveLength(1);
+  expect(infracciones({ '46.34': ['tienda de vinos'] })).toHaveLength(1);
+
+  const catalogo = JSON.parse(
+    readFileSync(join(process.cwd(), 'public', 'datos', 'cnae-iae-catalogo.json'), 'utf8'),
+  ) as { sinonimos: Record<string, string[]> };
+  const fuera = infracciones(catalogo.sinonimos);
+  expect(fuera, fuera.join('\n')).toEqual([]);
+});
+
+/**
  * CANDADO del hallazgo 426 — la ruta del catálogo se importa del módulo de datos.
  *
  * `data/fiscal/cnae-iae.ts` la exporta con ese fin explícito y la app la redeclaraba: si el
