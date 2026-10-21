@@ -360,7 +360,7 @@ export default function GeneradorHashesPage() {
             </div>
             {procesando && (
               <div className={styles.procesando}>
-                ⏳ Procesando archivo...
+                <span aria-hidden="true">⏳</span> Procesando archivo...
               </div>
             )}
             <button type="button" onClick={limpiar} className={styles.btnSecondary}>
@@ -469,7 +469,7 @@ export default function GeneradorHashesPage() {
       >
         {/* ========== SECCIÓN 1: TABLA COMPARATIVA ========== */}
         <section className={styles.comparativaSection}>
-          <h2>📊 Comparativa de algoritmos de hash</h2>
+          <h2><span aria-hidden="true">📊</span> Comparativa de algoritmos de hash</h2>
           <p className={styles.comparativaSubtitle}>
             MD5, SHA-1, SHA-256, SHA-384 y SHA-512: bits, longitud, velocidad y estado de seguridad actual
           </p>
@@ -507,7 +507,7 @@ export default function GeneradorHashesPage() {
                   <td>256</td>
                   <td>64 chars</td>
                   <td>2001</td>
-                  <td className={styles.tdPositive}>Seguro ✅</td>
+                  <td className={styles.tdPositive}>Seguro <span aria-hidden="true">✅</span></td>
                   <td>Uso general, contraseñas, TLS</td>
                 </tr>
                 <tr>
@@ -515,7 +515,7 @@ export default function GeneradorHashesPage() {
                   <td>384</td>
                   <td>96 chars</td>
                   <td>2001</td>
-                  <td className={styles.tdPositive}>Muy seguro ✅</td>
+                  <td className={styles.tdPositive}>Muy seguro <span aria-hidden="true">✅</span></td>
                   <td>Seguridad alta, certificados</td>
                 </tr>
                 <tr>
@@ -523,7 +523,7 @@ export default function GeneradorHashesPage() {
                   <td>512</td>
                   <td>128 chars</td>
                   <td>2001</td>
-                  <td className={styles.tdPositive}>Máxima seguridad ✅</td>
+                  <td className={styles.tdPositive}>Máxima seguridad <span aria-hidden="true">✅</span></td>
                   <td>Datos críticos, firmas digitales</td>
                 </tr>
               </tbody>
@@ -533,10 +533,10 @@ export default function GeneradorHashesPage() {
 
         {/* ========== SECCIÓN 2: QUÉ ES UN HASH ========== */}
         <section className={styles.infoSection}>
-          <h2>🔐 ¿Qué son las funciones hash criptográficas?</h2>
+          <h2><span aria-hidden="true">🔐</span> ¿Qué son las funciones hash criptográficas?</h2>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>📖 Definición</h3>
+              <h3><span aria-hidden="true">📖</span> Definición</h3>
               <p>
                 Una función hash convierte cualquier cantidad de datos (texto, archivo, imagen)
                 en una cadena de longitud fija llamada «digest» o «hash». El mismo input
@@ -545,7 +545,7 @@ export default function GeneradorHashesPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>🎯 Tres propiedades fundamentales</h3>
+              <h3><span aria-hidden="true">🎯</span> Tres propiedades fundamentales</h3>
               <p>
                 <strong>Determinista:</strong> mismo input → mismo output siempre<br />
                 <strong>Unidireccional:</strong> imposible calcular el input desde el hash<br />
@@ -553,7 +553,7 @@ export default function GeneradorHashesPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>💡 Usos en el mundo real</h3>
+              <h3><span aria-hidden="true">💡</span> Usos en el mundo real</h3>
               <p>
                 • Verificar descargas con checksums<br />
                 • Almacenar contraseñas (con salt)<br />
@@ -564,7 +564,7 @@ export default function GeneradorHashesPage() {
               </p>
             </div>
             <div className={styles.infoCard}>
-              <h3>📅 Historia del SHA</h3>
+              <h3><span aria-hidden="true">📅</span> Historia del SHA</h3>
               <p>
                 SHA (Secure Hash Algorithm) fue diseñado por la NSA y estandarizado
                 por el NIST. SHA-1 (1995) → SHA-2 (2001, incluye SHA-256/512) →
@@ -577,7 +577,7 @@ export default function GeneradorHashesPage() {
 
         {/* ========== SECCIÓN 3: FAQ ========== */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas frecuentes sobre hashes</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre hashes</h2>
           <div className={styles.faqList}>
             <details className={styles.faqItem}>
               <summary className={styles.faqQuestion}>
@@ -642,7 +642,7 @@ export default function GeneradorHashesPage() {
 
         {/* ========== SECCIÓN 4: EFECTO AVALANCHA ========== */}
         <section className={styles.ejemplosSection}>
-          <h2>⚡ El efecto avalancha en acción</h2>
+          <h2><span aria-hidden="true">⚡</span> El efecto avalancha en acción</h2>
           <div className={styles.ejemploGrid}>
             <div className={styles.ejemploCard}>
               <p className={styles.ejemploLabel}>Input: <code>&quot;Hola&quot;</code></p>
@@ -667,7 +667,7 @@ export default function GeneradorHashesPage() {
 
         {/* ========== SECCIÓN 5: USOS PRÁCTICOS ========== */}
         <section className={styles.tipsSection}>
-          <h2>💡 Cuándo usar cada algoritmo</h2>
+          <h2><span aria-hidden="true">💡</span> Cuándo usar cada algoritmo</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>📦</span>
@@ -702,7 +702,7 @@ export default function GeneradorHashesPage() {
 
         {/* ========== SECCIÓN 6: WARNING BOX ========== */}
         <div className={styles.warningBox}>
-          <h2>⚠️ Errores frecuentes con funciones hash</h2>
+          <h2><span aria-hidden="true">⚠️</span> Errores frecuentes con funciones hash</h2>
           <ul className={styles.warningList}>
             <li className={styles.warningItem}>
               <span className={styles.warningIcon}>🚫</span>

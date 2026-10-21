@@ -391,7 +391,7 @@ export default function ListaEquipajePage() {
           </div>
 
           <button type="button" onClick={generarLista} className={styles.btnGenerar}>
-            {listaGenerada ? '🔄 Regenerar lista' : '✨ Generar lista'}
+            {listaGenerada ? <><span aria-hidden="true">🔄</span> Regenerar lista</> : <><span aria-hidden="true">✨</span> Generar lista</>}
           </button>
           {listaGenerada && (
             <p className={styles.avisoRegenerar}>
@@ -427,7 +427,7 @@ export default function ListaEquipajePage() {
                   ✗ Desmarcar todo
                 </button>
                 <button type="button" onClick={resetearLista} className={styles.btnReset}>
-                  🗑 Vaciar lista
+                  <span aria-hidden="true">🗑</span> Vaciar lista
                 </button>
               </div>
 
@@ -459,6 +459,7 @@ export default function ListaEquipajePage() {
                             {item.nombre}
                           </span>
                           <button
+                            type="button"
                             className={styles.itemBorrar}
                             onClick={() => eliminarItem(item.id)}
                             aria-label={`Eliminar ${item.nombre}`}
@@ -482,6 +483,7 @@ export default function ListaEquipajePage() {
                         aria-label={`Añadir item a ${categoria}`}
                       />
                       <button
+                        type="button"
                         onClick={() => añadirItemACategoria(categoria)}
                         className={styles.btnAdd}
                         aria-label={`Añadir a ${categoria}`}
@@ -515,6 +517,7 @@ export default function ListaEquipajePage() {
                       aria-label="Primer item de la nueva categoría"
                     />
                     <button
+                      type="button"
                       onClick={añadirCategoria}
                       className={styles.btnAdd}
                       disabled={!nuevaCategoriaInput.trim() || !nuevaCategoriaItemInput.trim()}

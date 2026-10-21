@@ -562,7 +562,7 @@ export default function GeneradorIconosPage() {
                   </div>
                 </div>
                 <button type="button" onClick={downloadIco} className={styles.btnIcoDownload}>
-                  📥 Descargar favicon.ico
+                  <span aria-hidden="true">📥</span> Descargar favicon.ico
                 </button>
               </div>
               <p className={styles.icoHint}>

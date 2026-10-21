@@ -402,7 +402,7 @@ export default function RecortadorVideoPage() {
           <section className={styles.card}>
             <h2 className={styles.stepTitle}><span aria-hidden="true">4</span> Exportar</h2>
             <button type="button" className={styles.btnExportar} onClick={exportar} disabled={procesando || !soportado}>
-              {procesando ? 'Procesando…' : '✂ Recortar y descargar'}
+              {procesando ? <span key="procesando">Procesando…</span> : <span key="recortar"><span aria-hidden="true">✂</span> Recortar y descargar</span>}
             </button>
 
             {procesando && (

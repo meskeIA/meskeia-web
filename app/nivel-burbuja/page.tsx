@@ -327,11 +327,11 @@ export default function NivelBurbujaPage() {
           {/* Estado */}
           <div className={`${styles.statusIndicator} ${isPerfectlyLevel && isActive ? styles.levelOk : ''}`}>
             {!isActive ? (
-              <span>🎯 Pulsa &quot;Iniciar&quot; para comenzar</span>
+              <span><span aria-hidden="true">🎯</span> Pulsa &quot;Iniciar&quot; para comenzar</span>
             ) : isPerfectlyLevel ? (
-              <span>✅ ¡Nivelado!</span>
+              <span><span aria-hidden="true">✅</span> ¡Nivelado!</span>
             ) : (
-              <span>📐 Ajustando...</span>
+              <span><span aria-hidden="true">📐</span> Ajustando...</span>
             )}
           </div>
 
@@ -410,7 +410,7 @@ export default function NivelBurbujaPage() {
           {/* Aviso de PC */}
           {!isSupported && (
             <div className={styles.warningMessage}>
-              💻 Esta herramienta requiere un dispositivo con sensores de orientación (móvil o tablet).
+              <span aria-hidden="true">💻</span> Esta herramienta requiere un dispositivo con sensores de orientación (móvil o tablet).
               En ordenadores de escritorio los sensores no están disponibles.
             </div>
           )}
@@ -418,7 +418,7 @@ export default function NivelBurbujaPage() {
           {/* Mensaje para iOS */}
           {needsPermission && !isActive && !error && (
             <div className={styles.infoMessage}>
-              📱 En iOS, se solicitará permiso para acceder a los sensores de movimiento
+              <span aria-hidden="true">📱</span> En iOS, se solicitará permiso para acceder a los sensores de movimiento
             </div>
           )}
         </div>
@@ -463,7 +463,7 @@ export default function NivelBurbujaPage() {
 
       {/* Disclaimer */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso Importante</h3>
         <p>
           Este nivel digital proporciona <strong>mediciones aproximadas</strong> con fines orientativos.
           Los sensores de los dispositivos móviles no están calibrados profesionalmente.
@@ -488,14 +488,14 @@ export default function NivelBurbujaPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🔬 Principio físico</h4>
+              <h4><span aria-hidden="true">🔬</span> Principio físico</h4>
               <p>
                 La burbuja de aire, al ser menos densa que el líquido, siempre flota hacia arriba
                 por efecto de la gravedad. Esto permite detectar inclinaciones mínimas con gran precisión.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📱 Versión digital</h4>
+              <h4><span aria-hidden="true">📱</span> Versión digital</h4>
               <p>
                 Los dispositivos móviles (en Latinoamérica, el celular) usan acelerómetros MEMS
                 (Sistemas Microelectromecánicos) que detectan la aceleración gravitatoria en 3 ejes
@@ -509,7 +509,7 @@ export default function NivelBurbujaPage() {
           <h2>Aplicaciones prácticas</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🏠 Bricolaje en casa</h4>
+              <h4><span aria-hidden="true">🏠</span> Bricolaje en casa</h4>
               <ul>
                 <li>Colgar cuadros y estanterías</li>
                 <li>Instalar electrodomésticos</li>
@@ -518,7 +518,7 @@ export default function NivelBurbujaPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>🏗️ Construcción</h4>
+              <h4><span aria-hidden="true">🏗️</span> Construcción</h4>
               <ul>
                 <li>Nivelar cimientos</li>
                 <li>Instalar ventanas y puertas</li>
@@ -527,7 +527,7 @@ export default function NivelBurbujaPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>📐 Medir pendientes</h4>
+              <h4><span aria-hidden="true">📐</span> Medir pendientes</h4>
               <ul>
                 <li>Pendiente de tejados</li>
                 <li>Rampas de accesibilidad</li>
@@ -536,7 +536,7 @@ export default function NivelBurbujaPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>🚗 Automoción</h4>
+              <h4><span aria-hidden="true">🚗</span> Automoción</h4>
               <ul>
                 <li>Nivelar caravanas</li>
                 <li>Ajustar suspensiones</li>
@@ -551,7 +551,7 @@ export default function NivelBurbujaPage() {
           <h2>Entender las pendientes</h2>
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>📊 Formas de expresar pendiente</h4>
+              <h4><span aria-hidden="true">📊</span> Formas de expresar pendiente</h4>
               <ul>
                 <li><strong>Grados (°)</strong>: Ángulo respecto a la horizontal (0-90°)</li>
                 <li><strong>Porcentaje (%)</strong>: Subida por cada 100 de avance horizontal</li>
@@ -559,7 +559,7 @@ export default function NivelBurbujaPage() {
               </ul>
             </div>
             <div className={styles.contentCard}>
-              <h4>📏 Pendientes comunes</h4>
+              <h4><span aria-hidden="true">📏</span> Pendientes comunes</h4>
               <ul>
                 <li>Rampa accesible: 6-8% (3-5°)</li>
                 <li>Carretera de montaña: 8-12% (5-7°)</li>
@@ -696,7 +696,7 @@ export default function NivelBurbujaPage() {
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
                 <h4>Ajustar hasta que la burbuja quede centrada</h4>
-                <p>Mueve o ajusta el objeto (por ejemplo, girando las patas regulables de un mueble) hasta que la burbuja quede en el centro y el indicador muestre ✅ Nivelado.</p>
+                <p>Mueve o ajusta el objeto (por ejemplo, girando las patas regulables de un mueble) hasta que la burbuja quede en el centro y el indicador muestre <span aria-hidden="true">✅</span> Nivelado.</p>
               </div>
             </li>
             <li className={styles.step}>

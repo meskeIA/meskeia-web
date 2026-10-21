@@ -193,6 +193,7 @@ export default function TestVelocidadEscrituraPage() {
             <div className={styles.durationButtons}>
               {[30, 60, 120].map((d) => (
                 <button
+                  type="button"
                   key={d}
                   className={`${styles.durationBtn} ${duracion === d ? styles.active : ''}`}
                   onClick={() => setDuracion(d)}
@@ -202,7 +203,7 @@ export default function TestVelocidadEscrituraPage() {
               ))}
             </div>
           </div>
-          <button onClick={iniciar} className={styles.btnStart}>
+          <button type="button" onClick={iniciar} className={styles.btnStart}>
             Comenzar Test
           </button>
         </div>
@@ -238,7 +239,7 @@ export default function TestVelocidadEscrituraPage() {
             spellCheck="false"
           />
 
-          <button onClick={finalizar} className={styles.btnStop}>
+          <button type="button" onClick={finalizar} className={styles.btnStop}>
             Terminar
           </button>
         </div>
@@ -308,7 +309,7 @@ export default function TestVelocidadEscrituraPage() {
             </div>
           </div>
 
-          <button onClick={iniciar} className={styles.btnStart}>
+          <button type="button" onClick={iniciar} className={styles.btnStart}>
             Intentar de nuevo
           </button>
         </div>
@@ -320,7 +321,7 @@ export default function TestVelocidadEscrituraPage() {
         icon="⌨️"
       >
         <section>
-          <h3>📊 Velocidades de Escritura por Nivel y Profesión</h3>
+          <h3><span aria-hidden="true">📊</span> Velocidades de Escritura por Nivel y Profesión</h3>
           <div className={styles.eduTablaWrapper}>
             <table className={styles.eduTabla}>
               <thead>
@@ -381,7 +382,7 @@ export default function TestVelocidadEscrituraPage() {
         </section>
 
         <section>
-          <h3>🎯 ¿Para Qué Importa la Velocidad de Escritura?</h3>
+          <h3><span aria-hidden="true">🎯</span> ¿Para Qué Importa la Velocidad de Escritura?</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon}>💼</span>
@@ -407,7 +408,7 @@ export default function TestVelocidadEscrituraPage() {
         </section>
 
         <section>
-          <h3>❓ Preguntas Frecuentes sobre Velocidad de Escritura</h3>
+          <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Velocidad de Escritura</h3>
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué diferencia hay entre PPM y CPM?</summary>
@@ -445,7 +446,7 @@ export default function TestVelocidadEscrituraPage() {
         </section>
 
         <section>
-          <h3>📋 Cómo Mejorar tu Velocidad de Escritura: Plan de 6 Semanas</h3>
+          <h3><span aria-hidden="true">📋</span> Cómo Mejorar tu Velocidad de Escritura: Plan de 6 Semanas</h3>
           <ol className={styles.eduPasosList}>
             <li className={styles.eduPaso}>
               <span className={styles.eduPasoNum}>1</span>
@@ -493,7 +494,7 @@ export default function TestVelocidadEscrituraPage() {
         </section>
 
         <section>
-          <h3>💡 Consejos para Mejorar Más Rápido</h3>
+          <h3><span aria-hidden="true">💡</span> Consejos para Mejorar Más Rápido</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono}>🎯</span>

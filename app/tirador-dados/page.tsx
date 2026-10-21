@@ -150,11 +150,12 @@ export default function TiradorDadosPage() {
       <div className={styles.mainContent}>
         {/* Panel de selección */}
         <div className={styles.controlPanel}>
-          <h2 className={styles.sectionTitle}>🎲 Selecciona el dado</h2>
+          <h2 className={styles.sectionTitle}><span aria-hidden="true">🎲</span> Selecciona el dado</h2>
 
           <div className={styles.diceGrid}>
             {DICE_TYPES.map(dice => (
               <button
+                type="button"
                 key={dice.id}
                 className={`${styles.diceCard} ${selectedDice.id === dice.id ? styles.diceCardActive : ''}`}
                 onClick={() => setSelectedDice(dice)}
@@ -172,6 +173,7 @@ export default function TiradorDadosPage() {
               <label className={styles.optionLabel}>Cantidad de dados</label>
               <div className={styles.quantityControl}>
                 <button
+                  type="button"
                   className={styles.quantityBtn}
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   disabled={quantity <= 1}
@@ -190,6 +192,7 @@ export default function TiradorDadosPage() {
                   ariaLabel="Cantidad de dados"
                 />
                 <button
+                  type="button"
                   className={styles.quantityBtn}
                   onClick={() => setQuantity(Math.min(20, quantity + 1))}
                   disabled={quantity >= 20}
@@ -203,6 +206,7 @@ export default function TiradorDadosPage() {
               <label className={styles.optionLabel}>Modificador</label>
               <div className={styles.quantityControl}>
                 <button
+                  type="button"
                   className={styles.quantityBtn}
                   onClick={() => setModifier(modifier - 1)}
                 >
@@ -216,6 +220,7 @@ export default function TiradorDadosPage() {
                   ariaLabel="Modificador"
                 />
                 <button
+                  type="button"
                   className={styles.quantityBtn}
                   onClick={() => setModifier(modifier + 1)}
                 >
@@ -236,13 +241,15 @@ export default function TiradorDadosPage() {
 
           <div className={styles.rollButtons}>
             <button
+              type="button"
               className={styles.rollBtn}
               onClick={rollDice}
               disabled={isRolling}
             >
-              {isRolling ? '🎲 Lanzando...' : '🎲 Lanzar dados'}
+              {isRolling ? <><span aria-hidden="true">🎲</span> Lanzando...</> : <><span aria-hidden="true">🎲</span> Lanzar dados</>}
             </button>
             <button
+              type="button"
               className={styles.quickRollBtn}
               onClick={quickRoll}
               disabled={isRolling}
@@ -257,6 +264,7 @@ export default function TiradorDadosPage() {
             <h3 className={styles.presetsTitle}>Lanzamientos rápidos</h3>
             <div className={styles.presetsGrid}>
               <button
+                type="button"
                 className={styles.presetBtn}
                 onClick={() => {
                   setSelectedDice(DICE_TYPES[5]); // D20
@@ -267,6 +275,7 @@ export default function TiradorDadosPage() {
                 1D20
               </button>
               <button
+                type="button"
                 className={styles.presetBtn}
                 onClick={() => {
                   setSelectedDice(DICE_TYPES[1]); // D6
@@ -277,6 +286,7 @@ export default function TiradorDadosPage() {
                 2D6
               </button>
               <button
+                type="button"
                 className={styles.presetBtn}
                 onClick={() => {
                   setSelectedDice(DICE_TYPES[1]); // D6
@@ -287,6 +297,7 @@ export default function TiradorDadosPage() {
                 4D6
               </button>
               <button
+                type="button"
                 className={styles.presetBtn}
                 onClick={() => {
                   setSelectedDice(DICE_TYPES[2]); // D8
@@ -297,6 +308,7 @@ export default function TiradorDadosPage() {
                 1D8+3
               </button>
               <button
+                type="button"
                 className={styles.presetBtn}
                 onClick={() => {
                   setSelectedDice(DICE_TYPES[6]); // D100
@@ -307,6 +319,7 @@ export default function TiradorDadosPage() {
                 1D100
               </button>
               <button
+                type="button"
                 className={styles.presetBtn}
                 onClick={() => {
                   setSelectedDice(DICE_TYPES[3]); // D10
@@ -324,7 +337,7 @@ export default function TiradorDadosPage() {
         <div className={styles.resultsPanel}>
           {/* Resultado actual */}
           <div className={styles.currentResult}>
-            <h2 className={styles.sectionTitle}>🎯 Resultado</h2>
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🎯</span> Resultado</h2>
 
             {(currentResults.length > 0 || isRolling) ? (
               <div className={styles.resultDisplay}>
@@ -364,10 +377,10 @@ export default function TiradorDadosPage() {
                     {selectedDice.sides === 20 && currentResults.length === 1 && (
                       <>
                         {isCritical(currentResults[0], 20) && (
-                          <div className={styles.criticalBadge}>🎉 ¡CRÍTICO!</div>
+                          <div className={styles.criticalBadge}><span aria-hidden="true">🎉</span> ¡CRÍTICO!</div>
                         )}
                         {isFumble(currentResults[0], 20) && (
-                          <div className={styles.fumbleBadge}>💀 ¡PIFIA!</div>
+                          <div className={styles.fumbleBadge}><span aria-hidden="true">💀</span> ¡PIFIA!</div>
                         )}
                       </>
                     )}
@@ -385,9 +398,10 @@ export default function TiradorDadosPage() {
           {/* Historial */}
           <div className={styles.historySection}>
             <div className={styles.historyHeader}>
-              <h2 className={styles.sectionTitle}>📜 Historial</h2>
+              <h2 className={styles.sectionTitle}><span aria-hidden="true">📜</span> Historial</h2>
               {history.length > 0 && (
                 <button
+                  type="button"
                   className={styles.clearHistoryBtn}
                   onClick={clearHistory}
                 >
@@ -435,7 +449,7 @@ export default function TiradorDadosPage() {
       {/* Estadísticas rápidas */}
       {history.length >= 3 && (
         <div className={styles.statsSection}>
-          <h3 className={styles.statsTitle}>📊 Estadísticas de la sesión</h3>
+          <h3 className={styles.statsTitle}><span aria-hidden="true">📊</span> Estadísticas de la sesión</h3>
           <div className={styles.statsGrid}>
             <div className={styles.statCard}>
               <span className={styles.statValue}>{history.length}</span>
@@ -469,7 +483,7 @@ export default function TiradorDadosPage() {
       >
         <div className={styles.eduContent}>
           <section className={styles.eduSection}>
-            <h3>🎲 Tipos de dados poliédricos</h3>
+            <h3><span aria-hidden="true">🎲</span> Tipos de dados poliédricos</h3>
             <div className={styles.diceExplanation}>
               <div className={styles.diceInfo}>
                 <strong>D4 (Tetraedro)</strong>
@@ -503,7 +517,7 @@ export default function TiradorDadosPage() {
           </section>
 
           <section className={styles.eduSection}>
-            <h3>🎯 Críticos y pifias en D20</h3>
+            <h3><span aria-hidden="true">🎯</span> Críticos y pifias en D20</h3>
             <p>
               En muchos sistemas de rol, sacar un <strong>20 natural</strong> en un D20 es un
               <strong> golpe crítico</strong> (éxito automático con bonificación), mientras que
@@ -513,7 +527,7 @@ export default function TiradorDadosPage() {
           </section>
 
           <section className={styles.eduSection}>
-            <h3>📐 Notación de dados</h3>
+            <h3><span aria-hidden="true">📐</span> Notación de dados</h3>
             <p>La notación estándar es <strong>XdY+Z</strong> donde:</p>
             <ul>
               <li><strong>X</strong> = número de dados a lanzar</li>
@@ -526,7 +540,7 @@ export default function TiradorDadosPage() {
 
           {/* Tabla Comparativa */}
           <section className={styles.eduSection}>
-            <h3>📊 Comparativa de tipos de dado</h3>
+            <h3><span aria-hidden="true">📊</span> Comparativa de tipos de dado</h3>
             <div className={styles.tableWrapper}>
               <table className={styles.comparativaTable}>
                 <thead>
@@ -587,7 +601,7 @@ export default function TiradorDadosPage() {
 
           {/* Casos de Uso */}
           <section className={styles.eduSection}>
-            <h3>🎯 Casos de uso frecuentes</h3>
+            <h3><span aria-hidden="true">🎯</span> Casos de uso frecuentes</h3>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
@@ -636,7 +650,7 @@ export default function TiradorDadosPage() {
 
           {/* FAQ */}
           <section className={styles.eduSection}>
-            <h3>❓ Preguntas frecuentes</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas frecuentes</h3>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <strong>¿Son realmente aleatorios los dados digitales?</strong>
@@ -684,7 +698,7 @@ export default function TiradorDadosPage() {
 
           {/* Guía Paso a Paso */}
           <section className={styles.eduSection}>
-            <h3>🗺️ Cómo usar el tirador en tu partida</h3>
+            <h3><span aria-hidden="true">🗺️</span> Cómo usar el tirador en tu partida</h3>
             <div className={styles.stepGuide}>
               <div className={styles.step}>
                 <span className={styles.stepNumber}>1</span>
@@ -731,7 +745,7 @@ export default function TiradorDadosPage() {
 
           {/* Mejores Prácticas */}
           <section className={styles.eduSection}>
-            <h3>💡 Mejores prácticas con dados</h3>
+            <h3><span aria-hidden="true">💡</span> Mejores prácticas con dados</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon}>🎯</span>

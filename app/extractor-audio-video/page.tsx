@@ -205,7 +205,7 @@ export default function ExtractorAudioVideoPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.titulo}>🎬 Extractor de Audio de Vídeo</h1>
+        <h1 className={styles.titulo}><span aria-hidden="true">🎬</span> Extractor de Audio de Vídeo</h1>
         <p className={styles.subtitulo}>
           Extrae fragmentos de audio de tus vídeos directamente en el navegador.<br />
           Sin subir nada a internet — todo ocurre en tu dispositivo.
@@ -303,7 +303,7 @@ export default function ExtractorAudioVideoPage() {
             </div>
             {duracion === 0 && (
               <p className={styles.avisoFormato}>
-                ⚠️ El navegador no puede previsualizar este formato, pero puedes extraer el audio igualmente.
+                <span aria-hidden="true">⚠️</span> El navegador no puede previsualizar este formato, pero puedes extraer el audio igualmente.
                 Introduce los tiempos manualmente en segundos.
               </p>
             )}
@@ -465,7 +465,7 @@ export default function ExtractorAudioVideoPage() {
                 className={styles.btnExtraer}
                 aria-label={estado === 'completado' ? 'Extraer audio de nuevo' : 'Extraer audio del vídeo'}
               >
-                {estado === 'completado' ? '🔄 Extraer de nuevo' : '🎵 Extraer Audio'}
+                {estado === 'completado' ? <><span aria-hidden="true">🔄</span> Extraer de nuevo</> : <><span aria-hidden="true">🎵</span> Extraer Audio</>}
               </button>
             )}
 
@@ -473,8 +473,8 @@ export default function ExtractorAudioVideoPage() {
               <div className={styles.progresoContainer}>
                 <p className={styles.mensajeProcesando}>
                   {estado === 'cargando-ffmpeg'
-                    ? '⬇️ Cargando motor de procesamiento (~30 MB, solo la primera vez)...'
-                    : '⚙️ Procesando audio...'}
+                    ? <><span aria-hidden="true">⬇️</span> Cargando motor de procesamiento (~30 MB, solo la primera vez)...</>
+                    : <><span aria-hidden="true">⚙️</span> Procesando audio...</>}
                 </p>
                 <div
                   className={styles.barraProgreso}
@@ -562,27 +562,27 @@ export default function ExtractorAudioVideoPage() {
         {/* Sección 2: Casos de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <h3>🎵 Extraer banda sonora de vídeo</h3>
+            <h3><span aria-hidden="true">🎵</span> Extraer banda sonora de vídeo</h3>
             <p>Obtén el audio de grabaciones de conciertos, películas descargadas o vídeos de YouTube (previamente descargados) en formato MP3 o WAV de alta calidad.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎙️ Preparar fragmentos para podcast</h3>
+            <h3><span aria-hidden="true">🎙️</span> Preparar fragmentos para podcast</h3>
             <p>Extrae exactamente los segundos que necesitas de una entrevista o grabación para usar como clip en tu episodio de podcast sin herramientas adicionales.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🌍 Aprendizaje de idiomas</h3>
+            <h3><span aria-hidden="true">🌍</span> Aprendizaje de idiomas</h3>
             <p>Aísla diálogos de películas o series para practicar pronunciación. Extrae fragmentos específicos y escúchalos fuera de contexto para mayor retención.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎬 Audio para presentaciones y vídeos</h3>
+            <h3><span aria-hidden="true">🎬</span> Audio para presentaciones y vídeos</h3>
             <p>Extrae efectos de sonido o músicas de tus grabaciones de vídeo para reutilizarlos en proyectos de edición, sin necesidad de software especializado.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>🎛️ Samples para producción musical</h3>
+            <h3><span aria-hidden="true">🎛️</span> Samples para producción musical</h3>
             <p>Obtén fragmentos precisos de grabaciones para usarlos como samples o loops en tu DAW. Usa WAV para mantener la máxima calidad en la edición posterior.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <h3>📁 Convertir colección de vídeos a audio</h3>
+            <h3><span aria-hidden="true">📁</span> Convertir colección de vídeos a audio</h3>
             <p>Procesa grabaciones de eventos, clases o conferencias y conviértelas a audio para escucharlas después como si fueran podcasts, sin consumir espacio con el vídeo.</p>
           </div>
         </div>
@@ -679,34 +679,34 @@ export default function ExtractorAudioVideoPage() {
         {/* Sección 5: Mejores prácticas */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <h3>🎯 192k es el punto dulce del MP3</h3>
+            <h3><span aria-hidden="true">🎯</span> 192k es el punto dulce del MP3</h3>
             <p>Para música, 192k ofrece calidad casi indistinguible del original a un tamaño razonable. Usa 320k solo si el vídeo tiene audio de estudio o necesitas la máxima fidelidad posible.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🎛️ WAV para edición posterior</h3>
+            <h3><span aria-hidden="true">🎛️</span> WAV para edición posterior</h3>
             <p>Si vas a importar el audio a un editor (Audacity, Adobe Premiere, DaVinci), usa siempre WAV. Cada re-codificación a MP3 reduce la calidad irreversiblemente.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>📻 128k suficiente para voz</h3>
+            <h3><span aria-hidden="true">📻</span> 128k suficiente para voz</h3>
             <p>Para podcasts, entrevistas o grabaciones de voz, 128k es perfectamente válido. El oído humano no aprecia la diferencia en contenido hablado por encima de 96k.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔢 Usa los campos numéricos para precisión</h3>
+            <h3><span aria-hidden="true">🔢</span> Usa los campos numéricos para precisión</h3>
             <p>Los sliders son cómodos para aproximaciones, pero los campos de &quot;Inicio (segundos)&quot; y &quot;Fin (segundos)&quot; te dan precisión de décimas de segundo para cortes exactos.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>⚡ La caché hace las extracciones rápidas</h3>
+            <h3><span aria-hidden="true">⚡</span> La caché hace las extracciones rápidas</h3>
             <p>El motor ffmpeg.wasm (~30 MB) se descarga solo la primera vez. En sesiones siguientes ya está en caché del navegador y el procesamiento comienza inmediatamente.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3>🔄 Extrae múltiples fragmentos sin recargar</h3>
+            <h3><span aria-hidden="true">🔄</span> Extrae múltiples fragmentos sin recargar</h3>
             <p>Usa el botón &quot;Extraer de nuevo&quot; para cambiar los tiempos y sacar otro fragmento del mismo vídeo. No necesitas volver a seleccionar el archivo cada vez.</p>
           </div>
         </div>
 
         {/* Sección 6: Warning Box */}
         <div className={styles.warningBox}>
-          <h3>⚠️ Importante antes de usar</h3>
+          <h3><span aria-hidden="true">⚠️</span> Importante antes de usar</h3>
           <ul className={styles.warningList}>
             <li>Esta herramienta solo procesa archivos que ya están en tu dispositivo. No descarga vídeos de internet.</li>
             <li>Respeta los derechos de autor: extrae audio solo de contenido del que seas titular o tengas licencia para usar.</li>

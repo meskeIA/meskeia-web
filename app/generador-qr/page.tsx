@@ -962,7 +962,7 @@ export default function GeneradorQRPage() {
               )}
 
               <div className={styles.infoCard}>
-                <h4>💡 Consejos para logos</h4>
+                <h4><span aria-hidden="true">💡</span> Consejos para logos</h4>
                 <ul>
                   <li>Usa imágenes con <strong>fondo transparente</strong> (PNG)</li>
                   <li>Los logos cuadrados funcionan mejor</li>
@@ -1038,7 +1038,7 @@ export default function GeneradorQRPage() {
         <div className={styles.htmlSection}>
           <div className={styles.htmlHeader}>
             <div>
-              <h2>💻 Código de implementación</h2>
+              <h2><span aria-hidden="true">💻</span> Código de implementación</h2>
               <p className={styles.htmlSubtitle}>
                 Copia este código HTML para usar tu QR en tu sitio web o aplicación
               </p>
@@ -1050,7 +1050,7 @@ export default function GeneradorQRPage() {
               aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
               aria-pressed={htmlExpanded}
             >
-              {htmlExpanded ? '▼ Ocultar código' : '▶ Ver código HTML'}
+              {htmlExpanded ? <><span aria-hidden="true">▼</span> Ocultar código</> : <><span aria-hidden="true">▶</span> Ver código HTML</>}
             </button>
           </div>
 
@@ -1074,7 +1074,7 @@ export default function GeneradorQRPage() {
       >
         {/* Tabla de casos de uso */}
         <div className={styles.useCasesSection}>
-          <h2>📋 Casos de uso y compatibilidad</h2>
+          <h2><span aria-hidden="true">📋</span> Casos de uso y compatibilidad</h2>
         <p className={styles.useCasesSubtitle}>
           Descubre cómo aprovechar cada tipo de código QR
         </p>
@@ -1147,7 +1147,7 @@ export default function GeneradorQRPage() {
           <h2>Conceptos clave</h2>
           <div className={styles.conceptGrid}>
             <div className={styles.conceptCard}>
-              <h4>🔗 QR para URLs</h4>
+              <h4><span aria-hidden="true">🔗</span> QR para URLs</h4>
               <p>
                 Perfecto para compartir enlaces a sitios web, redes sociales,
                 landing pages o cualquier recurso online. Los usuarios acceden
@@ -1155,7 +1155,7 @@ export default function GeneradorQRPage() {
               </p>
             </div>
             <div className={styles.conceptCard}>
-              <h4>📶 QR para WiFi</h4>
+              <h4><span aria-hidden="true">📶</span> QR para WiFi</h4>
               <p>
                 Tus invitados pueden conectarse a tu red WiFi simplemente
                 escaneando el código, sin necesidad de escribir la contraseña.
@@ -1163,7 +1163,7 @@ export default function GeneradorQRPage() {
               </p>
             </div>
             <div className={styles.conceptCard}>
-              <h4>👤 QR para Contactos</h4>
+              <h4><span aria-hidden="true">👤</span> QR para Contactos</h4>
               <p>
                 Crea tarjetas de visita digitales en formato vCard que se
                 guardan directamente en el teléfono del receptor. Incluye
@@ -1171,7 +1171,7 @@ export default function GeneradorQRPage() {
               </p>
             </div>
             <div className={styles.conceptCard}>
-              <h4>🎨 Personalización</h4>
+              <h4><span aria-hidden="true">🎨</span> Personalización</h4>
               <p>
                 Los QR con logo y colores personalizados refuerzan tu marca
                 sin perder funcionalidad gracias a la corrección de errores.
@@ -1280,7 +1280,7 @@ export default function GeneradorQRPage() {
           <h2>Preguntas frecuentes</h2>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Qué tamaño debe tener mi código QR para imprimirlo?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Qué tamaño debe tener mi código QR para imprimirlo?</h3>
             <p>
               El tamaño mínimo recomendado es <strong>3x3 cm</strong> para garantizar legibilidad en smartphones.
               Para distancias mayores, usa la regla: 1cm de QR por cada 10cm de distancia de escaneo.
@@ -1296,7 +1296,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Los códigos QR personalizados (con logo) funcionan igual que los estándar?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Los códigos QR personalizados (con logo) funcionan igual que los estándar?</h3>
             <p>
               Sí, siempre que uses el <strong>nivel de corrección &quot;Máximo&quot; (H - 30%)</strong>.
               Este nivel permite que hasta el 30% del QR esté cubierto u dañado y siga siendo legible.
@@ -1309,7 +1309,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Puedo editar el contenido de un QR después de imprimirlo?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Puedo editar el contenido de un QR después de imprimirlo?</h3>
             <p>
               No directamente. Los QR estáticos (como los de esta herramienta) codifican el contenido permanentemente.
               <strong>Solución:</strong> Para QR que puedan cambiar, codifica una URL corta que redirija
@@ -1323,7 +1323,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Qué diferencia hay entre los formatos PNG, SVG y PDF?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre los formatos PNG, SVG y PDF?</h3>
             <p>
               <strong>PNG/JPEG:</strong> Imágenes de píxeles. Ideales para redes sociales, web y impresión en tamaños fijos.
               Si amplías mucho, pueden pixelarse.<br />
@@ -1335,7 +1335,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Los códigos QR para WiFi funcionan en todos los dispositivos?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Los códigos QR para WiFi funcionan en todos los dispositivos?</h3>
             <p>
               La mayoría sí, pero depende del sistema operativo:<br />
               <strong>iOS 11+:</strong> Soporta WiFi QR de forma nativa con la cámara.<br />
@@ -1349,7 +1349,7 @@ export default function GeneradorQRPage() {
           </div>
 
           <div className={styles.faqItem}>
-            <h3>❓ ¿Cuántos caracteres puedo incluir en un código QR de texto?</h3>
+            <h3><span aria-hidden="true">❓</span> ¿Cuántos caracteres puedo incluir en un código QR de texto?</h3>
             <p>
               Técnicamente, hasta <strong>4.296 caracteres alfanuméricos</strong>, pero no es práctico.
               A más contenido, el QR se vuelve más complejo y difícil de escanear.
@@ -1357,9 +1357,9 @@ export default function GeneradorQRPage() {
             </p>
             <p className={styles.faqExample}>
               <strong>Uso práctico:</strong><br />
-              • Códigos promocionales: 10-20 caracteres ✅<br />
-              • Instrucciones breves: 100-150 caracteres ✅<br />
-              • Texto largo / manual: Usa URL a documento completo ⚠️
+              • Códigos promocionales: 10-20 caracteres <span aria-hidden="true">✅</span><br />
+              • Instrucciones breves: 100-150 caracteres <span aria-hidden="true">✅</span><br />
+              • Texto largo / manual: Usa URL a documento completo <span aria-hidden="true">⚠️</span>
             </p>
           </div>
 
@@ -1400,7 +1400,7 @@ export default function GeneradorQRPage() {
 
           {/* Advertencias */}
           <div className={styles.warningBox}>
-            <h3>⚠️ Errores comunes que debes evitar</h3>
+            <h3><span aria-hidden="true">⚠️</span> Errores comunes que debes evitar</h3>
             <ul>
               <li><strong>QR demasiado pequeño:</strong> Mínimo 3x3cm. En carteles grandes, escala proporcionalmente.</li>
               <li><strong>Colores de bajo contraste:</strong> Evita amarillo sobre blanco, gris claro sobre blanco, etc.</li>

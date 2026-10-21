@@ -432,7 +432,7 @@ function TabPool(): React.ReactNode {
 
       <div className={styles.variabilidadBadge} style={{ borderColor: colorCurva, color: colorCurva }}>
         Variabilidad por asegurado: <strong>{formatEur(variabilidad)}</strong>
-        {asegurados < 500 && <span className={styles.badgeAlerta}> ⚠ Pool inestable</span>}
+        {asegurados < 500 && <span className={styles.badgeAlerta}> <span aria-hidden="true">⚠</span> Pool inestable</span>}
         {asegurados >= 500 && asegurados < 3000 && <span className={styles.badgeOk}> Pool aceptable</span>}
         {asegurados >= 3000 && <span className={styles.badgeExcelente}> Pool estable</span>}
       </div>

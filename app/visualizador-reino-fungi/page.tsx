@@ -503,28 +503,28 @@ export default function VisualizadorReinoFungi() {
                     <td>Ascosporas (sacos)</td>
                     <td>75.000</td>
                     <td>Levaduras, trufas, Penicillium</td>
-                    <td>✅ Antibióticos, fermentación</td>
+                    <td><span aria-hidden="true">✅</span> Antibióticos, fermentación</td>
                   </tr>
                   <tr>
                     <td>Basidiomycota</td>
                     <td>Basidiosporas (pedúnculos)</td>
                     <td>30.000</td>
                     <td>Setas, champiñones, roya</td>
-                    <td>✅ Alimentación, ectomicorrizas</td>
+                    <td><span aria-hidden="true">✅</span> Alimentación, ectomicorrizas</td>
                   </tr>
                   <tr>
                     <td>Zygomycota</td>
                     <td>Zigosporas (fusión)</td>
                     <td>1.000</td>
                     <td>Rhizopus (moho pan), Mucor</td>
-                    <td>⚠️ Patógenos en fruta</td>
+                    <td><span aria-hidden="true">⚠️</span> Patógenos en fruta</td>
                   </tr>
                   <tr>
                     <td>Deuteromycota</td>
                     <td>Sin fase sexual conocida</td>
                     <td>~17.000</td>
                     <td>Aspergillus, Candida, Tinea</td>
-                    <td>⚠️ Patógenos humanos</td>
+                    <td><span aria-hidden="true">⚠️</span> Patógenos humanos</td>
                   </tr>
                 </tbody>
               </table>

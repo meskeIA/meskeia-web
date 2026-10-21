@@ -298,7 +298,7 @@ export default function CodificadorBase64Page() {
       >
         {/* Tabla Comparativa */}
         <div className="edu-table-wrapper">
-          <h3 className="edu-section-title">📊 Comparativa de Formatos de Codificación</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">📊</span> Comparativa de Formatos de Codificación</h3>
           <div className="edu-table-scroll">
             <table className="edu-table">
               <thead>
@@ -353,7 +353,7 @@ export default function CodificadorBase64Page() {
 
         {/* Casos de Uso */}
         <div className="edu-escenarios-section">
-          <h3 className="edu-section-title">🎯 ¿Cuándo usarás cada formato?</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">🎯</span> ¿Cuándo usarás cada formato?</h3>
           <div className="edu-escenarios-grid">
             <div className="edu-escenario-card">
               <span className="edu-escenario-icon">🌐</span>
@@ -380,7 +380,7 @@ export default function CodificadorBase64Page() {
 
         {/* FAQ */}
         <div className="edu-faq-section">
-          <h3 className="edu-section-title">❓ Preguntas Frecuentes</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">❓</span> Preguntas Frecuentes</h3>
           <div className="edu-faq-list">
             <details className="edu-faq-item">
               <summary className="edu-faq-question">¿Base64 es lo mismo que cifrar datos?</summary>
@@ -435,7 +435,7 @@ export default function CodificadorBase64Page() {
 
         {/* Guía Paso a Paso */}
         <div className="edu-guide-section">
-          <h3 className="edu-section-title">📋 Guía: Elige el formato correcto para tu caso</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">📋</span> Guía: Elige el formato correcto para tu caso</h3>
           <ol className="edu-steps-list">
             <li className="edu-step-item">
               <div className="edu-step-number">1</div>
@@ -484,7 +484,7 @@ export default function CodificadorBase64Page() {
 
         {/* Tips Grid */}
         <div className="edu-tips-section">
-          <h3 className="edu-section-title">💡 Consejos para Usar Codificaciones Correctamente</h3>
+          <h3 className="edu-section-title"><span aria-hidden="true">💡</span> Consejos para Usar Codificaciones Correctamente</h3>
           <div className="edu-tips-grid">
             <div className="edu-tip-card">
               <span className="edu-tip-icon">🔗</span>
@@ -521,7 +521,7 @@ export default function CodificadorBase64Page() {
 
         {/* Warning Box */}
         <div className="edu-warning-box">
-          <h4 className="edu-warning-title">⚠️ Advertencias importantes sobre codificación</h4>
+          <h4 className="edu-warning-title"><span aria-hidden="true">⚠️</span> Advertencias importantes sobre codificación</h4>
           <ul className="edu-warning-list">
             <li><strong>Ninguno de estos formatos es cifrado</strong>: Base64, URL Encoding y Hex son completamente reversibles sin clave. No protegen la confidencialidad de los datos.</li>
             <li><strong>No uses Base64 para contraseñas</strong>: Es un error de seguridad muy común. Las contraseñas deben hashearse con bcrypt, Argon2 o PBKDF2. Nunca codificarse.</li>

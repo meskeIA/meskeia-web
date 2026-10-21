@@ -328,16 +328,16 @@ export default function DiagnosticoMultitareaPage() {
               </div>
               <div className={styles.map}>
                 <div className={`${styles.quadrant} ${styles.quadrantTL}`}>
-                  <span>🎯 Concentración Profunda</span>
+                  <span><span aria-hidden="true">🎯</span> Concentración Profunda</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}>
-                  <span>🎛️ Multitarea Gestionada</span>
+                  <span><span aria-hidden="true">🎛️</span> Multitarea Gestionada</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}>
-                  <span>😶 Baja Activación</span>
+                  <span><span aria-hidden="true">😶</span> Baja Activación</span>
                 </div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
-                  <span>💥 Alta Fragmentación</span>
+                  <span><span aria-hidden="true">💥</span> Alta Fragmentación</span>
                 </div>
                 <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
                 <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />

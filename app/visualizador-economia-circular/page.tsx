@@ -221,7 +221,7 @@ export default function VisualizadorEconomiaCircular() {
             onClick={() => setModoLineal(true)}
             aria-pressed={modoLineal}
           >
-            📉 Modelo Lineal
+            <span aria-hidden="true">📉</span> Modelo Lineal
           </button>
           <button
             type="button"
@@ -229,7 +229,7 @@ export default function VisualizadorEconomiaCircular() {
             onClick={() => setModoLineal(false)}
             aria-pressed={!modoLineal}
           >
-            🔄 Modelo Circular
+            <span aria-hidden="true">🔄</span> Modelo Circular
           </button>
         </div>
 

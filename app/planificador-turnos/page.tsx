@@ -892,7 +892,7 @@ export default function PlanificadorTurnosPage() {
               {/* Alertas */}
               {alertas.length > 0 && (
                 <div className={styles.alertasPanel}>
-                  <h4>⚠️ Alertas</h4>
+                  <h4><span aria-hidden="true">⚠️</span> Alertas</h4>
                   <ul>
                     {alertas.map((alerta, idx) => (
                       <li key={idx}>{alerta}</li>
@@ -908,7 +908,7 @@ export default function PlanificadorTurnosPage() {
       {/* Estadísticas (siempre visible) */}
       {empleados.length > 0 && (
         <div className={styles.estadisticasPanel}>
-          <h3>📊 Estadísticas de la semana</h3>
+          <h3><span aria-hidden="true">📊</span> Estadísticas de la semana</h3>
           <div className={styles.estadisticasGrid}>
             {empleados.map(emp => {
               const horas = horasPorEmpleado[emp.id] || 0;
@@ -945,7 +945,7 @@ export default function PlanificadorTurnosPage() {
 
       {/* Disclaimer */}
       <div className={styles.disclaimer}>
-        <h3>⚠️ Aviso Importante</h3>
+        <h3><span aria-hidden="true">⚠️</span> Aviso Importante</h3>
         <p>
           Este planificador es una herramienta de apoyo. Verifica siempre que los horarios
           cumplan con la legislación laboral vigente en tu país (horas máximas, descansos
@@ -964,7 +964,7 @@ export default function PlanificadorTurnosPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>⏰ Descanso entre turnos</h4>
+              <h4><span aria-hidden="true">⏰</span> Descanso entre turnos</h4>
               <p>
                 La legislación española establece un mínimo de 12 horas entre el fin de una
                 jornada y el inicio de la siguiente. Planifica con margen suficiente.
@@ -972,7 +972,7 @@ export default function PlanificadorTurnosPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>📅 Distribución equitativa</h4>
+              <h4><span aria-hidden="true">📅</span> Distribución equitativa</h4>
               <p>
                 Intenta repartir los turnos menos deseados (noches, fines de semana) de forma
                 rotativa entre todos los empleados para mantener la motivación.
@@ -980,7 +980,7 @@ export default function PlanificadorTurnosPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🔄 Rotación predecible</h4>
+              <h4><span aria-hidden="true">🔄</span> Rotación predecible</h4>
               <p>
                 Los horarios rotativos predecibles ayudan a los empleados a planificar su
                 vida personal. Evita cambios de última hora siempre que sea posible.
@@ -988,7 +988,7 @@ export default function PlanificadorTurnosPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>💬 Comunicación</h4>
+              <h4><span aria-hidden="true">💬</span> Comunicación</h4>
               <p>
                 Publica los horarios con al menos 2 semanas de antelación. Esto da tiempo
                 a los empleados para organizarse y solicitar cambios si es necesario.

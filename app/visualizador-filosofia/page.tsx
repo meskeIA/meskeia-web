@@ -490,6 +490,7 @@ function TabDetalle() {
 
       <div className={styles.navBtns}>
         <button
+          type="button"
           className={styles.btnAnterior}
           onClick={() => setIndice((i) => Math.max(0, i - 1))}
           disabled={indice === 0}
@@ -499,6 +500,7 @@ function TabDetalle() {
         </button>
         <span className={styles.navCounter}>{indice + 1} / {CORRIENTES.length}</span>
         <button
+          type="button"
           className={styles.btnSiguiente}
           onClick={() => setIndice((i) => Math.min(CORRIENTES.length - 1, i + 1))}
           disabled={indice === CORRIENTES.length - 1}

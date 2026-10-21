@@ -763,19 +763,19 @@ export default function GeneradorAvataresPage() {
             <h2>Ventajas de usar avatares generados</h2>
             <div className={styles.contentGrid}>
               <div className={styles.contentCard}>
-                <h4>🔒 Privacidad</h4>
+                <h4><span aria-hidden="true">🔒</span> Privacidad</h4>
                 <p>No necesitas subir fotos personales ni compartir tu imagen real.</p>
               </div>
               <div className={styles.contentCard}>
-                <h4>🎯 Consistencia</h4>
+                <h4><span aria-hidden="true">🎯</span> Consistencia</h4>
                 <p>El mismo texto siempre genera exactamente el mismo avatar.</p>
               </div>
               <div className={styles.contentCard}>
-                <h4>⚡ Instantáneo</h4>
+                <h4><span aria-hidden="true">⚡</span> Instantáneo</h4>
                 <p>Se genera al momento, sin esperas ni procesamientos externos.</p>
               </div>
               <div className={styles.contentCard}>
-                <h4>🌐 Universal</h4>
+                <h4><span aria-hidden="true">🌐</span> Universal</h4>
                 <p>Funciona offline, sin servidores, todo se procesa en tu navegador.</p>
               </div>
             </div>

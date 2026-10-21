@@ -174,7 +174,7 @@ export default function VisualizadorOro() {
 
             {/* Subcapa 6s — la clave */}
             <div className={`${styles.subcapa6s} ${styles.subcapaOro}`} aria-label="Subcapa 6s: 1 electrón (clave relativista)">
-              <span className={styles.subcapaLabel}>6s¹ ⚡</span>
+              <span className={styles.subcapaLabel}>6s¹ <span aria-hidden="true">⚡</span></span>
               <div className={styles.electronRow}>
                 <span className={styles.electronOro} aria-hidden="true">e⁻</span>
               </div>

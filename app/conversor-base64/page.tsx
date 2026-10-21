@@ -379,7 +379,7 @@ export default function ConversorBase64Page() {
       >
         {/* 1. Tabla Comparativa */}
         <div className={styles.tableWrapper}>
-          <h3 className={styles.eduSectionTitle}>📊 Comparativa de Variantes de Base64 y Esquemas Relacionados</h3>
+          <h3 className={styles.eduSectionTitle}><span aria-hidden="true">📊</span> Comparativa de Variantes de Base64 y Esquemas Relacionados</h3>
           <div className={styles.comparativaTable}>
             <table>
               <thead>
@@ -440,7 +440,7 @@ export default function ConversorBase64Page() {
 
         {/* 2. Casos de Uso — 4 perfiles */}
         <div className={styles.escenariosGrid}>
-          <h3 className={styles.eduSectionTitle}>🎯 ¿Quién usa Base64 y para qué?</h3>
+          <h3 className={styles.eduSectionTitle}><span aria-hidden="true">🎯</span> ¿Quién usa Base64 y para qué?</h3>
           <div className={styles.escenariosGridInner}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -483,7 +483,7 @@ export default function ConversorBase64Page() {
 
         {/* 3. FAQ — 8 preguntas */}
         <div className={styles.faqList}>
-          <h3 className={styles.eduSectionTitle}>❓ Preguntas Frecuentes sobre Base64</h3>
+          <h3 className={styles.eduSectionTitle}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Base64</h3>
           <div className={styles.faqListInner}>
             <details className={styles.faqItem}>
               <summary>¿Qué es Base64 y para qué sirve exactamente?</summary>
@@ -541,7 +541,7 @@ export default function ConversorBase64Page() {
 
         {/* 4. Guía Paso a Paso — 7 pasos */}
         <div className={styles.stepGuide}>
-          <h3 className={styles.eduSectionTitle}>📋 Guía: Cómo usar Base64 correctamente en una aplicación web</h3>
+          <h3 className={styles.eduSectionTitle}><span aria-hidden="true">📋</span> Guía: Cómo usar Base64 correctamente en una aplicación web</h3>
           <ol>
             <li className={styles.step}>
               <div className={styles.stepNumber} aria-hidden="true">1</div>
@@ -597,7 +597,7 @@ export default function ConversorBase64Page() {
 
         {/* 5. Mejores Prácticas — 6 tips */}
         <div className={styles.tipsGrid}>
-          <h3 className={styles.eduSectionTitle}>💡 Mejores Prácticas para Usar Base64</h3>
+          <h3 className={styles.eduSectionTitle}><span aria-hidden="true">💡</span> Mejores Prácticas para Usar Base64</h3>
           <div className={styles.tipsGridInner}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🔗</span>
