@@ -997,3 +997,152 @@
     text-align: center;
   }
 }
+
+/* Comparación entre dos versiones (S0218) */
+.comparacion {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparacion h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.comparacionTexto {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.tablaComparacionWrap {
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.tablaComparacion {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.tablaComparacion th,
+.tablaComparacion td {
+  padding: 0.4rem 0.5rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.tablaComparacion thead th {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.tablaComparacion th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+.comparacionAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Dónde está la dificultad (S0218) */
+.dificultadSection {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.dificultadVacia {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.frasesLargas h3 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.frasesLargas ol {
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.frasesLargas li {
+  margin-bottom: 0.6rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.fraseCita {
+  color: var(--text-primary);
+  font-style: italic;
+}
+
+.fraseDato {
+  color: var(--text-secondary);
+}
+
+.palabrasMuyLargasResumen {
+  margin: 0 0 1.25rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.textoMarcado {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.marcaFrase {
+  background: rgba(245, 158, 11, 0.2);
+  border-radius: 3px;
+}
+
+.marcaPalabra {
+  text-decoration: underline wavy #C2410C;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .marcaFrase {
+  background: rgba(245, 158, 11, 0.24);
+}
+
+[data-theme='dark'] .marcaPalabra {
+  text-decoration-color: #FDBA74;
+}

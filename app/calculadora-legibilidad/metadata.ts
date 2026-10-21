@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Legibilidad INFLESZ y Flesch-Szigriszt | meskeIA',
-  description: 'Analiza la legibilidad de tus textos en español con índices Flesch-Szigriszt, Fernández Huerta e INFLESZ. Descubre el nivel educativo de tu contenido.',
+  description: 'Analiza la legibilidad de tus textos en español con Flesch-Szigriszt, Fernández Huerta y la escala INFLESZ. Señala las frases largas y compara dos versiones.',
   keywords: 'legibilidad, flesch, szigriszt, fernandez huerta, inflesz, readability, texto, español, nivel lectura, seo',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -33,10 +33,17 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Calculadora de Legibilidad",
-  description: "Analiza la legibilidad de tus textos en español con índices Flesch-Szigriszt, Fernández Huerta e INFLESZ. Descubre el nivel educativo de tu contenido.",
+  description: "Analiza la legibilidad de tus textos en español con Flesch-Szigriszt, Fernández Huerta y la escala INFLESZ. Señala las frases largas y compara dos versiones.",
   url: "https://meskeia.com/calculadora-legibilidad/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Puntuación Flesch-Szigriszt y Fernández Huerta calculadas en el navegador',
+    'Grado de lectura con la escala INFLESZ de cinco tramos y el umbral de 55 para textos de salud',
+    'Frases de más de 25 palabras resaltadas en el texto y ordenadas por cuánto subiría la puntuación al partirlas',
+    'Palabras de cuatro sílabas o más señaladas en el propio texto',
+    'Comparación de dos versiones del texto, guardada y actual, con el cambio de cada medida',
+    'Recuento de palabras, frases, sílabas y palabras largas',
+  ],
 });
 
 export const faqJsonLd = {

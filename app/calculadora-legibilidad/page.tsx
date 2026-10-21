@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './CalculadoraLegibilidad.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -8,137 +8,62 @@ import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import {
+  analizarTexto,
+  marcarTexto,
+  PALABRAS_FRASE_LARGA,
+  PALABRAS_TROZO,
+  SILABAS_PALABRA_MUY_LARGA,
+  type Analisis,
+} from './motor';
 
-// Función para contar sílabas en español
-function contarSilabas(palabra: string): number {
-  palabra = palabra.toLowerCase().trim();
-  if (!palabra) return 0;
+/**
+ * Lo que se guarda de una versión del texto para compararla con la siguiente (S0218). El
+ * ejercicio típico de legibilidad es reescribir y volver a medir: sin esto había que apuntar
+ * la cifra anterior a mano.
+ */
+type VersionGuardada = Pick<
+  Analisis,
+  'fleschSzigriszt' | 'fernandezHuerta' | 'dificultad' | 'promedioPalabrasOracion' | 'promedioSilabasPalabra' | 'palabras'
+> & { frasesLargas: number };
 
-  // Vocales
-  const vocales = 'aeiouáéíóúü';
-
-  // Diptongos (no se separan)
-  const diptongos = [
-    'ai', 'au', 'ei', 'eu', 'oi', 'ou', 'ui', 'iu',
-    'ia', 'ie', 'io', 'ua', 'ue', 'uo',
-    'ái', 'áu', 'éi', 'éu', 'ói', 'óu',
-    'iá', 'ié', 'ió', 'uá', 'ué', 'uó'
-  ];
-
-  let silabas = 0;
-  let i = 0;
-
-  while (i < palabra.length) {
-    if (vocales.includes(palabra[i])) {
-      silabas++;
-      // Verificar si es diptongo
-      if (i + 1 < palabra.length) {
-        const par = palabra.substring(i, i + 2);
-        if (diptongos.includes(par)) {
-          i++; // Saltar la segunda vocal del diptongo
-        }
-      }
-    }
-    i++;
-  }
-
-  return Math.max(silabas, 1);
+/** Diferencia con signo, para la columna de la comparación: «+5,8», «−2,0», «0,0». */
+function conSigno(valor: number, decimales: number): string {
+  const redondeado = Number(valor.toFixed(decimales));
+  if (redondeado === 0) return formatNumber(0, decimales);
+  return `${redondeado > 0 ? '+' : '−'}${formatNumber(Math.abs(redondeado), decimales)}`;
 }
 
-// Escala INFLESZ (Barrio-Cantalejo y otros, An. Sist. Sanit. Navar. 2008;31(2):135-152):
-// cinco tramos sobre la puntuación Flesch-Szigriszt
-function getGradoInflesz(ifsz: number): string {
-  if (ifsz >= 80) return 'Muy fácil';
-  if (ifsz >= 65) return 'Bastante fácil';
-  if (ifsz >= 55) return 'Normal';
-  if (ifsz >= 40) return 'Algo difícil';
-  return 'Muy difícil';
-}
-
-// Función para contar palabras
-function contarPalabras(texto: string): number {
-  const palabras = texto.trim().split(/\s+/).filter(p => p.length > 0);
-  return palabras.length;
-}
-
-// Función para contar oraciones
-function contarOraciones(texto: string): number {
-  const oraciones = texto.split(/[.!?]+/).filter(o => o.trim().length > 0);
-  return Math.max(oraciones.length, 1);
-}
-
-// Función para obtener todas las palabras
-function obtenerPalabras(texto: string): string[] {
-  return texto.toLowerCase()
-    .replace(/[^a-záéíóúüñ\s]/gi, ' ')
-    .split(/\s+/)
-    .filter(p => p.length > 0);
+/** Las primeras palabras de una frase, para nombrarla en la lista. */
+function arranque(frase: string, palabras = 8): string {
+  const trozos = frase.trim().split(/\s+/);
+  return trozos.length <= palabras ? frase.trim() : `${trozos.slice(0, palabras).join(' ')}…`;
 }
 
 export default function CalculadoraLegibilidadPage() {
   const [texto, setTexto] = useState('');
-  const [analisis, setAnalisis] = useState<{
-    palabras: number;
-    oraciones: number;
-    silabas: number;
-    promedioSilabasPalabra: number;
-    promedioPalabrasOracion: number;
-    fleschSzigriszt: number;
-    fernandezHuerta: number;
-    dificultad: string;
-    palabrasLargas: number;
-    porcentajeLargas: number;
-  } | null>(null);
+  const [guardada, setGuardada] = useState<VersionGuardada | null>(null);
 
-  useEffect(() => {
-    if (texto.trim().length > 20) {
-      analizarTexto();
-    } else {
-      setAnalisis(null);
-    }
-  }, [texto]);
+  // Se analiza a partir de 20 caracteres, como siempre
+  const analisis = useMemo(
+    () => (texto.trim().length > 20 ? analizarTexto(texto) : null),
+    [texto],
+  );
+  const tramos = useMemo(
+    () => (analisis ? marcarTexto(texto, analisis) : []),
+    [texto, analisis],
+  );
 
-  const analizarTexto = () => {
-    const palabras = contarPalabras(texto);
-    const oraciones = contarOraciones(texto);
-    const listaPalabras = obtenerPalabras(texto);
-
-    let totalSilabas = 0;
-    let palabrasLargas = 0;
-
-    listaPalabras.forEach(palabra => {
-      const silabas = contarSilabas(palabra);
-      totalSilabas += silabas;
-      if (silabas >= 3) palabrasLargas++;
-    });
-
-    const promedioSilabasPalabra = palabras > 0 ? totalSilabas / palabras : 0;
-    const promedioPalabrasOracion = oraciones > 0 ? palabras / oraciones : 0;
-
-    // Fórmula Flesch-Szigriszt (adaptada al español), tal como la recoge
-    // Barrio-Cantalejo y otros (2008): IFSZ = 206,835 − 62,3 × (sílabas/palabras) − (palabras/frases)
-    const fleschSzigriszt = 206.835 - (62.3 * promedioSilabasPalabra) - promedioPalabrasOracion;
-
-    // Fórmula Fernández Huerta (español)
-    // P = 206.84 - 60 * (sílabas/palabras) - 1.02 * (palabras/oraciones)
-    const fernandezHuerta = 206.84 - (60 * promedioSilabasPalabra) - (1.02 * promedioPalabrasOracion);
-
-    // INFLESZ no es otra fórmula: es la escala con la que se lee el IFSZ
-    const dificultad = getGradoInflesz(fleschSzigriszt);
-
-    const porcentajeLargas = palabras > 0 ? (palabrasLargas / palabras) * 100 : 0;
-
-    setAnalisis({
-      palabras,
-      oraciones,
-      silabas: totalSilabas,
-      promedioSilabasPalabra,
-      promedioPalabrasOracion,
-      fleschSzigriszt: Math.max(0, Math.min(100, fleschSzigriszt)),
-      fernandezHuerta: Math.max(0, Math.min(100, fernandezHuerta)),
-      dificultad,
-      palabrasLargas,
-      porcentajeLargas
+  const guardarVersion = () => {
+    if (!analisis) return;
+    setGuardada({
+      fleschSzigriszt: analisis.fleschSzigriszt,
+      fernandezHuerta: analisis.fernandezHuerta,
+      dificultad: analisis.dificultad,
+      promedioPalabrasOracion: analisis.promedioPalabrasOracion,
+      promedioSilabasPalabra: analisis.promedioSilabasPalabra,
+      palabras: analisis.palabras,
+      frasesLargas: analisis.frasesLargas.length,
     });
   };
 
@@ -322,6 +247,90 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                   )}
                 </ul>
               </div>
+
+              {/* Comparación entre dos versiones (S0218) */}
+              <div className={styles.comparacion}>
+                <h4>Comparar con otra versión</h4>
+                {guardada ? (
+                  <>
+                    <div className={styles.tablaComparacionWrap}>
+                      <table className={styles.tablaComparacion}>
+                        <thead>
+                          <tr>
+                            <th scope="col">Medida</th>
+                            <th scope="col">Guardada</th>
+                            <th scope="col">Ahora</th>
+                            <th scope="col">Cambio</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row">Flesch-Szigriszt</th>
+                            <td>{formatNumber(guardada.fleschSzigriszt, 1)}</td>
+                            <td>{formatNumber(analisis.fleschSzigriszt, 1)}</td>
+                            <td>{conSigno(analisis.fleschSzigriszt - guardada.fleschSzigriszt, 1)}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Grado INFLESZ</th>
+                            <td>{guardada.dificultad}</td>
+                            <td>{analisis.dificultad}</td>
+                            <td>{guardada.dificultad === analisis.dificultad ? 'igual' : 'cambia'}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Fernández Huerta</th>
+                            <td>{formatNumber(guardada.fernandezHuerta, 1)}</td>
+                            <td>{formatNumber(analisis.fernandezHuerta, 1)}</td>
+                            <td>{conSigno(analisis.fernandezHuerta - guardada.fernandezHuerta, 1)}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Palabras por frase</th>
+                            <td>{formatNumber(guardada.promedioPalabrasOracion, 1)}</td>
+                            <td>{formatNumber(analisis.promedioPalabrasOracion, 1)}</td>
+                            <td>{conSigno(analisis.promedioPalabrasOracion - guardada.promedioPalabrasOracion, 1)}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Sílabas por palabra</th>
+                            <td>{formatNumber(guardada.promedioSilabasPalabra, 2)}</td>
+                            <td>{formatNumber(analisis.promedioSilabasPalabra, 2)}</td>
+                            <td>{conSigno(analisis.promedioSilabasPalabra - guardada.promedioSilabasPalabra, 2)}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Frases de más de {PALABRAS_FRASE_LARGA} palabras</th>
+                            <td>{guardada.frasesLargas}</td>
+                            <td>{analisis.frasesLargas.length}</td>
+                            <td>{conSigno(analisis.frasesLargas.length - guardada.frasesLargas, 0)}</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">Palabras</th>
+                            <td>{guardada.palabras}</td>
+                            <td>{analisis.palabras}</td>
+                            <td>{conSigno(analisis.palabras - guardada.palabras, 0)}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className={styles.comparacionAcciones}>
+                      <button type="button" className={styles.ejemploBtn} onClick={guardarVersion}>
+                        Guardar esta versión en su lugar
+                      </button>
+                      <button type="button" className={styles.ejemploBtn} onClick={() => setGuardada(null)}>
+                        Olvidar la guardada
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className={styles.comparacionTexto}>
+                      Guarda esta versión, reescribe el texto en la caja y verás aquí las dos
+                      puntuaciones lado a lado. La versión guardada no sale de tu navegador y se
+                      pierde al recargar la página.
+                    </p>
+                    <button type="button" className={styles.ejemploBtn} onClick={guardarVersion}>
+                      Guardar esta versión para comparar
+                    </button>
+                  </>
+                )}
+              </div>
             </>
           ) : (
             <div className={styles.placeholder}>
@@ -331,6 +340,75 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
           )}
         </div>
       </div>
+
+      {/* Dónde está la dificultad (S0218): la app señala, ya no solo cuenta */}
+      {analisis && (
+        <section className={styles.dificultadSection} aria-labelledby="titulo-dificultad">
+          <h2 id="titulo-dificultad" className={styles.panelTitle}>Dónde está la dificultad</h2>
+
+          {analisis.frasesLargas.length === 0 && analisis.palabrasMuyLargas.length === 0 ? (
+            <p className={styles.dificultadVacia}>
+              Ninguna frase pasa de {PALABRAS_FRASE_LARGA} palabras y no hay palabras de{' '}
+              {SILABAS_PALABRA_MUY_LARGA} sílabas o más.
+            </p>
+          ) : (
+            <>
+              {analisis.frasesLargas.length > 0 && (
+                <div className={styles.frasesLargas}>
+                  <h3>
+                    {analisis.frasesLargas.length === 1
+                      ? `1 frase de más de ${PALABRAS_FRASE_LARGA} palabras`
+                      : `${analisis.frasesLargas.length} frases de más de ${PALABRAS_FRASE_LARGA} palabras`}
+                    , de la que más sube la puntuación al partirla a la que menos
+                  </h3>
+                  <ol>
+                    {analisis.frasesLargas.map((f) => (
+                      <li key={f.inicio}>
+                        <span className={styles.fraseCita}>«{arranque(texto.slice(f.inicio, f.fin))}»</span>{' '}
+                        <span className={styles.fraseDato}>
+                          {f.palabras} palabras. Partida en {f.trozos} frases de {PALABRAS_TROZO} palabras
+                          como mucho, la puntuación Flesch-Szigriszt del texto pasaría de{' '}
+                          {formatNumber(analisis.fleschSzigriszt, 1)} a{' '}
+                          {formatNumber(analisis.fleschSzigriszt + f.ganancia, 1)} ({conSigno(f.ganancia, 1)}).
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {analisis.palabrasMuyLargas.length > 0 && (
+                <p className={styles.palabrasMuyLargasResumen}>
+                  {analisis.palabrasMuyLargas.length === 1
+                    ? `1 palabra de ${SILABAS_PALABRA_MUY_LARGA} sílabas o más`
+                    : `${analisis.palabrasMuyLargas.length} palabras de ${SILABAS_PALABRA_MUY_LARGA} sílabas o más`}
+                  : {[...new Set(analisis.palabrasMuyLargas.map((p) => texto.slice(p.inicio, p.fin).toLowerCase()))].join(', ')}.
+                  Son las que más suben la media de sílabas por palabra; cambiarlas por una más corta,
+                  si la hay, mejora la puntuación.
+                </p>
+              )}
+
+              <div className={styles.leyenda} aria-hidden="true">
+                <span><span className={styles.marcaFrase}>Frase larga</span></span>
+                <span><span className={styles.marcaPalabra}>palabra muy larga</span></span>
+              </div>
+              <div className={styles.textoMarcado} data-testid="texto-marcado">
+                {tramos.map((t, i) => (
+                  <span
+                    key={i}
+                    className={[
+                      t.enFraseLarga ? styles.marcaFrase : '',
+                      t.palabraMuyLarga ? styles.marcaPalabra : '',
+                    ].filter(Boolean).join(' ') || undefined}
+                  >
+                    {t.texto}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+      )}
 
       {/* Guía de interpretación */}
       <div className={styles.guideSection}>
@@ -654,7 +732,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 <span className={styles.stepNumber}>1</span>
                 <div className={styles.stepContent}>
                   <strong>Análisis inicial: obtén tu línea base</strong>
-                  <p>Pega el texto completo en esta calculadora y anota la puntuación Flesch-Szigriszt, el promedio de palabras por oración y el porcentaje de palabras largas. Esta es tu línea base.</p>
+                  <p>Pega el texto completo en esta calculadora y pulsa «Guardar esta versión para comparar»: la puntuación Flesch-Szigriszt, las palabras por frase y las sílabas por palabra de ese momento quedan como línea base, y al reescribir verás el cambio de cada una.</p>
                 </div>
               </li>
 
@@ -662,7 +740,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 <span className={styles.stepNumber}>2</span>
                 <div className={styles.stepContent}>
                   <strong>Identifica las frases más largas</strong>
-                  <p>Busca manualmente las frases de más de 30 palabras. Son las candidatas prioritarias a dividirse. Una frase larga puede reescribirse en dos frases sin perder significado.</p>
+                  <p>El bloque «Dónde está la dificultad» las resalta en el texto y las ordena por cuánto subiría la puntuación al partir cada una. Son las candidatas prioritarias a dividirse: una frase larga puede reescribirse en dos sin perder significado.</p>
                 </div>
               </li>
 
