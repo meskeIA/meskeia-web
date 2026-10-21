@@ -108,7 +108,7 @@ export const faqJsonLd = {
       name: '¿Cómo se genera una combinación de Euromillones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una combinación de Euromillones son 5 números del 1 al 50 más 2 estrellas del 1 al 12, y los dos bloques se sortean por separado. El generador produce ambos a la vez sin repetir números dentro de cada bloque. Acertar los 5 números y las 2 estrellas tiene una probabilidad de 1 entre 139.838.160, la más baja de las cinco loterías disponibles.',
+        text: 'Una combinación de Euromillones son 5 números del 1 al 50 más 2 estrellas del 1 al 12, y los dos bloques se sortean por separado. El generador produce ambos a la vez sin repetir números dentro de cada bloque. Acertar los 5 números y las 2 estrellas tiene una probabilidad de 1 entre 139.838.160, la misma que el bote de La Primitiva (los 6 números y el reintegro): son los dos botes más difíciles de las cinco loterías disponibles.',
       },
     },
     {
@@ -116,7 +116,7 @@ export const faqJsonLd = {
       name: '¿En qué se diferencian Bonoloto y La Primitiva al generar números?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En nada desde el punto de vista de la combinación: ambas son 6 números del 1 al 49 más el Reintegro, con la misma probabilidad de acertar los 6 (1 entre 13.983.816). Las diferencias están fuera del bombo: la Bonoloto se sortea todos los días, de lunes a domingo, y la apuesta cuesta 0,50 €, mientras que La Primitiva se sortea los lunes, jueves y sábados a 1,00 € la apuesta.',
+        text: 'En nada desde el punto de vista de la combinación: ambas son 6 números del 1 al 49 más el Reintegro, con la misma probabilidad de acertar los 6 (1 entre 13.983.816). Solo cambia el bote: el de La Primitiva exige además el reintegro (1 entre 139.838.160), y el de la Bonoloto, los 6 números. El resto de diferencias está fuera del bombo: la Bonoloto se sortea todos los días, de lunes a domingo, y la apuesta cuesta 0,50 €, mientras que La Primitiva se sortea los lunes, jueves y sábados a 1,00 € la apuesta.',
       },
     },
     {

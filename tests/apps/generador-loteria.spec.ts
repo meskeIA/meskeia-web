@@ -4082,26 +4082,36 @@ test.describe('re-inspección 21/10/2026', () => {
   });
 
   test.describe('hallazgos NUEVOS (re-inspección 21/10/2026)', () => {
-    test('NUEVO (contenido, bajo) · el FAQPage no llama «la más baja de las cinco» a una probabilidad que empata con el bote de La Primitiva', async ({ page }) => {
-      // FAQPage «¿Cómo se genera una combinación de Euromillones?»: «Acertar los 5 números y las 2
-      // estrellas tiene una probabilidad de 1 entre 139.838.160, la más baja de las cinco loterías
+    test('REPARADO 3391 (contenido, bajo) · el FAQPage no llama «la más baja de las cinco» a una probabilidad que empata con el bote de La Primitiva', async ({ page }) => {
+      // REPARADO 21/10/2026: decía «1 entre 139.838.160, la más baja de las cinco loterías
       // disponibles». Desde 3390 la tabla da al bote de La Primitiva (6 + reintegro) la MISMA cifra:
       // C(50,5) × C(12,2) = 2.118.760 × 66 = 139.838.160 = C(49,6) × 10. Empatan; ninguna es «la más baja».
-      test.fail();
+      // La ficha de Euromillones decía «la modalidad con más combinaciones posibles de las cinco»:
+      // la misma forma, reparada a la vez.
       const primitiva = (await celdaBote(page, 'La Primitiva').textContent())?.trim();
       const euromillones = (await celdaBote(page, 'Euromillones').textContent())?.trim();
-      const respuesta = (await faqPageR(page))
+      expect(primitiva).toBe(euromillones);
+      const preguntas = await faqPageR(page);
+      const respuesta = preguntas
         .find((q) => q.name === '¿Cómo se genera una combinación de Euromillones?')?.acceptedAnswer.text ?? '';
-      expect(primitiva === euromillones && /la más baja de las cinco/.test(respuesta)).toBe(false);
+      expect(respuesta).not.toMatch(/la más baja de las cinco/);
+      expect(respuesta).toContain('la misma que el bote de La Primitiva');
+      // La de Bonoloto y La Primitiva ya no calla que solo el bote de La Primitiva exige el reintegro
+      const bonoloto = preguntas
+        .find((q) => q.name === '¿En qué se diferencian Bonoloto y La Primitiva al generar números?')?.acceptedAnswer.text ?? '';
+      expect(bonoloto).toContain('exige además el reintegro (1 entre 139.838.160)');
+      await expect(page.locator('section#generador-euromillones p')).not.toContainText('más combinaciones posibles de las cinco');
     });
 
-    test('NUEVO (contenido, bajo) · la ficha de El Gordo no dice «menos combinaciones que La Primitiva» junto a una cifra mayor', async ({ page }) => {
-      // Ficha de El Gordo: «tiene menos combinaciones posibles que La Primitiva», con «1 entre
-      // 31.625.100» (C(54,5) × 10 de la clave) al lado; la de La Primitiva da «1 entre 13.983.816»
+    test('REPARADO 3392 (contenido, bajo) · la ficha de El Gordo no dice «menos combinaciones que La Primitiva» junto a una cifra mayor', async ({ page }) => {
+      // REPARADO 21/10/2026. Ficha de El Gordo: «tiene menos combinaciones posibles que La Primitiva», con «1 entre
+      // 31.625.100» (C(54,5) × 10 de la clave) al lado; la de La Primitiva daba solo «1 entre 13.983.816»
       // (C(49,6), SIN el reintegro). La frase es cierta comparando igual con igual (3.162.510 frente a
-      // 13.983.816, o 31.625.100 frente a 139.838.160), pero las dos cifras que la acompañan dicen lo
-      // contrario: 31.625.100 > 13.983.816.
-      test.fail();
+      // 13.983.816, o 31.625.100 frente a 139.838.160), pero las dos cifras que la acompañaban decían lo
+      // contrario. Ahora la ficha de La Primitiva añade, al final, la del bote (6 + reintegro), en el
+      // mismo marco que la de El Gordo, y la frase de El Gordo da las dos parejas de cifras.
+      await expect(page.locator('section#generador-gordo-primitiva p'))
+        .toContainText('3.162.510 frente a 13.983.816 sin la bola extra, y 31.625.100 frente a 139.838.160');
       // «1 entre 31.625.100» → 31625100 (el número que sigue a «entre», sin puntos de millar)
       const cifra = async (id: string) => Number(
         (/entre\s+([\d.]+)/.exec((await page.locator(`section#${id} dl > div`).last().locator('dd').textContent()) ?? '')?.[1] ?? '')

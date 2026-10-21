@@ -33,6 +33,11 @@ interface LotteryConfig {
   odds: string;
   /** Qué combinación hay que acertar para esa probabilidad. */
   oddsLabel: string;
+  /** Solo si el bote exige más que el primer premio (La Primitiva: 6 + reintegro, categoría
+   *  especial). Así la ficha da la cifra del bote en el mismo marco que las de Euromillones,
+   *  El Gordo y Lototurf, que ya incluyen su bola extra (hallazgo 3392). */
+  oddsBote?: string;
+  oddsBoteLabel?: string;
   /** Párrafo funcional de la sección propia: reglas y uso, sin hablar de botes. */
   blurb: string;
 }
@@ -170,6 +175,9 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     anchor: 'generador-primitiva',
     odds: '1 entre 13.983.816',
     oddsLabel: 'acertar los 6 números',
+    // 13.983.816 × 10 bolas del reintegro (norma 8.ª.1 de SELAE, hallazgo 3390)
+    oddsBote: '1 entre 139.838.160',
+    oddsBoteLabel: 'acertar los 6 números y el reintegro (bote)',
     blurb: 'Genera combinaciones de 6 números del 1 al 49 para La Primitiva, más el Reintegro (un dígito del 0 al 9). Puedes producir varias apuestas de golpe si juegas boleto múltiple y guardar las que quieras conservar. Hay sorteo los lunes, jueves y sábados.'
   },
   euromillones: {
@@ -186,7 +194,7 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     anchor: 'generador-euromillones',
     odds: '1 entre 139.838.160',
     oddsLabel: 'acertar los 5 números y las 2 estrellas',
-    blurb: 'Genera combinaciones de Euromillones: 5 números del 1 al 50 y 2 estrellas del 1 al 12, los dos bloques a la vez y sin repetir números dentro de cada uno. Es la modalidad con más combinaciones posibles de las cinco, porque hay que acertar dos sorteos independientes. Se juega martes y viernes.'
+    blurb: 'Genera combinaciones de Euromillones: 5 números del 1 al 50 y 2 estrellas del 1 al 12, los dos bloques a la vez y sin repetir números dentro de cada uno. Su bote es, empatado con el de La Primitiva (los 6 números y el reintegro), el más difícil de las cinco, porque hay que acertar dos sorteos independientes. Se juega martes y viernes.'
   },
   bonoloto: {
     name: 'Bonoloto',
@@ -218,7 +226,7 @@ const LOTTERY_CONFIG: Record<LotteryType, LotteryConfig> = {
     anchor: 'generador-gordo-primitiva',
     odds: '1 entre 31.625.100',
     oddsLabel: 'acertar los 5 números y la clave',
-    blurb: 'Genera combinaciones de El Gordo de la Primitiva: 5 números del 1 al 54 más la Clave (un dígito del 0 al 9). Al pedir solo 5 aciertos sobre 54 bolas, tiene menos combinaciones posibles que La Primitiva pese a usar más números. Sorteo los domingos.'
+    blurb: 'Genera combinaciones de El Gordo de la Primitiva: 5 números del 1 al 54 más la Clave (un dígito del 0 al 9). Al pedir solo 5 aciertos sobre 54 bolas, tiene menos combinaciones posibles que La Primitiva pese a usar más números: 3.162.510 frente a 13.983.816 sin la bola extra, y 31.625.100 frente a 139.838.160 con la clave y el reintegro. Sorteo los domingos.'
   },
   lototurf: {
     name: 'Lototurf',
@@ -744,6 +752,12 @@ export default function GeneradorLoteriaPage() {
                     <dt>Probabilidad de {c.oddsLabel}</dt>
                     <dd>{c.odds}</dd>
                   </div>
+                  {c.oddsBote && (
+                    <div>
+                      <dt>Probabilidad de {c.oddsBoteLabel}</dt>
+                      <dd>{c.oddsBote}</dd>
+                    </div>
+                  )}
                 </dl>
                 <button
                   type="button"
