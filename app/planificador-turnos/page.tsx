@@ -921,7 +921,7 @@ export default function PlanificadorTurnosPage() {
                     <div className={styles.empleadoColor} style={{ backgroundColor: emp.color }} />
                     <span className={styles.estadisticaNombre}>{emp.nombre}</span>
                     <span className={`${styles.estadisticaHoras} ${excedido ? styles.horasExcedidas : ''}`}>
-                      {horas}/{emp.horasMaxSemana}h {excedido && '⚠️'}
+                      {horas}/{emp.horasMaxSemana}h {excedido && <span role="img" aria-label="Supera el máximo de horas">⚠️</span>}
                     </span>
                   </div>
                   <div className={styles.barraProgreso}>

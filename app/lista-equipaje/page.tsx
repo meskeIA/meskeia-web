@@ -352,11 +352,11 @@ export default function ListaEquipajePage() {
               onChange={(e) => setTipoViaje(e.target.value as TipoViaje)}
               className={styles.select}
             >
-              <option value="playa">🏖️ Playa</option>
-              <option value="montana">🏔️ Montaña</option>
-              <option value="ciudad">🏙️ Ciudad / Turismo</option>
-              <option value="negocios">💼 Negocios</option>
-              <option value="aventura">🎒 Aventura / Camping</option>
+              <option value="playa">Playa</option>
+              <option value="montana">Montaña</option>
+              <option value="ciudad">Ciudad / Turismo</option>
+              <option value="negocios">Negocios</option>
+              <option value="aventura">Aventura / Camping</option>
             </select>
           </div>
 
@@ -369,9 +369,9 @@ export default function ListaEquipajePage() {
               onChange={(e) => setClima(e.target.value as Clima)}
               className={styles.select}
             >
-              <option value="calido">☀️ Cálido (25°C+)</option>
-              <option value="templado">🌤️ Templado (15-25°C)</option>
-              <option value="frio">❄️ Frío (menos de 15°C)</option>
+              <option value="calido">Cálido (25°C+)</option>
+              <option value="templado">Templado (15-25°C)</option>
+              <option value="frio">Frío (menos de 15°C)</option>
             </select>
           </div>
 
@@ -384,9 +384,9 @@ export default function ListaEquipajePage() {
               onChange={(e) => setDuracion(e.target.value as Duracion)}
               className={styles.select}
             >
-              <option value="corto">📅 Corto (1-3 días)</option>
-              <option value="medio">📆 Medio (4-7 días)</option>
-              <option value="largo">🗓️ Largo (más de 7 días)</option>
+              <option value="corto">Corto (1-3 días)</option>
+              <option value="medio">Medio (4-7 días)</option>
+              <option value="largo">Largo (más de 7 días)</option>
             </select>
           </div>
 

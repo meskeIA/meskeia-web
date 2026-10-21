@@ -261,7 +261,7 @@ export default function ExtractorAudioVideoPage() {
           />
           {videoFile && infoVideo ? (
             <div className={styles.archivoSeleccionado}>
-              <span className={styles.iconoArchivo}>🎬</span>
+              <span className={styles.iconoArchivo} aria-hidden="true">🎬</span>
               <div>
                 <p className={styles.nombreArchivo}>{infoVideo.nombre}</p>
                 <p className={styles.infoArchivo}>
@@ -273,7 +273,7 @@ export default function ExtractorAudioVideoPage() {
             </div>
           ) : (
             <div className={styles.placeholderUpload}>
-              <span className={styles.iconoUpload}>📁</span>
+              <span className={styles.iconoUpload} aria-hidden="true">📁</span>
               <p className={styles.textoUpload}>Arrastra tu vídeo aquí o haz clic para seleccionar</p>
               <p className={styles.formatosAceptados}>AVI · MP4 · MOV · MKV · WebM · WMV · MPEG</p>
             </div>

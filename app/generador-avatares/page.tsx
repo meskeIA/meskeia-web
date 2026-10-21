@@ -822,51 +822,51 @@ export default function GeneradorAvataresPage() {
                 <tbody>
                   <tr>
                     <td><strong>Foto real</strong></td>
-                    <td>⭐⭐⭐⭐⭐</td>
+                    <td><span role="img" aria-label="5 de 5">⭐⭐⭐⭐⭐</span></td>
                     <td>LinkedIn, email profesional</td>
                     <td>Media (requiere buena foto)</td>
-                    <td>⭐⭐⭐⭐</td>
-                    <td>⭐⭐⭐</td>
+                    <td><span role="img" aria-label="4 de 5">⭐⭐⭐⭐</span></td>
+                    <td><span role="img" aria-label="3 de 5">⭐⭐⭐</span></td>
                   </tr>
                   <tr>
                     <td><strong>Ilustración / Cartoon</strong></td>
-                    <td>⭐⭐⭐⭐</td>
+                    <td><span role="img" aria-label="4 de 5">⭐⭐⭐⭐</span></td>
                     <td>Twitter, YouTube, blogs</td>
                     <td>Baja (requiere diseñador)</td>
-                    <td>⭐⭐⭐⭐⭐</td>
-                    <td>⭐⭐⭐⭐⭐</td>
+                    <td><span role="img" aria-label="5 de 5">⭐⭐⭐⭐⭐</span></td>
+                    <td><span role="img" aria-label="5 de 5">⭐⭐⭐⭐⭐</span></td>
                   </tr>
                   <tr>
                     <td><strong>Minimalista geométrico</strong></td>
-                    <td>⭐⭐⭐⭐</td>
+                    <td><span role="img" aria-label="4 de 5">⭐⭐⭐⭐</span></td>
                     <td>GitHub, apps técnicas, portfolios</td>
                     <td>Alta (generadores automáticos)</td>
-                    <td>⭐⭐⭐⭐</td>
-                    <td>⭐⭐⭐⭐</td>
+                    <td><span role="img" aria-label="4 de 5">⭐⭐⭐⭐</span></td>
+                    <td><span role="img" aria-label="4 de 5">⭐⭐⭐⭐</span></td>
                   </tr>
                   <tr>
                     <td><strong>Pixel Art</strong></td>
-                    <td>⭐⭐</td>
+                    <td><span role="img" aria-label="2 de 5">⭐⭐</span></td>
                     <td>Discord, Twitch, gaming, foros</td>
                     <td>Media (editores de pixel)</td>
-                    <td>⭐⭐⭐</td>
-                    <td>⭐⭐⭐</td>
+                    <td><span role="img" aria-label="3 de 5">⭐⭐⭐</span></td>
+                    <td><span role="img" aria-label="3 de 5">⭐⭐⭐</span></td>
                   </tr>
                   <tr>
                     <td><strong>3D Render</strong></td>
-                    <td>⭐⭐⭐⭐</td>
+                    <td><span role="img" aria-label="4 de 5">⭐⭐⭐⭐</span></td>
                     <td>Metaverso, apps 3D, presentaciones</td>
                     <td>Baja (software especializado)</td>
-                    <td>⭐⭐⭐</td>
-                    <td>⭐⭐⭐⭐</td>
+                    <td><span role="img" aria-label="3 de 5">⭐⭐⭐</span></td>
+                    <td><span role="img" aria-label="4 de 5">⭐⭐⭐⭐</span></td>
                   </tr>
                   <tr>
                     <td><strong>Abstracto / Inicial</strong></td>
-                    <td>⭐⭐⭐</td>
+                    <td><span role="img" aria-label="3 de 5">⭐⭐⭐</span></td>
                     <td>Apps empresariales, Slack, Jira</td>
                     <td>Muy alta (automático)</td>
-                    <td>⭐⭐⭐⭐⭐</td>
-                    <td>⭐⭐⭐⭐</td>
+                    <td><span role="img" aria-label="5 de 5">⭐⭐⭐⭐⭐</span></td>
+                    <td><span role="img" aria-label="4 de 5">⭐⭐⭐⭐</span></td>
                   </tr>
                 </tbody>
               </table>

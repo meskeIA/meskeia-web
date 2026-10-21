@@ -396,12 +396,12 @@ export default function GeneradorHashesPage() {
               <div className={`${styles.comparacionResultado} ${resultadoComparacion ? styles.exito : styles.error}`}>
                 {resultadoComparacion ? (
                   <>
-                    <span className={styles.resultadoIcon}>✅</span>
+                    <span className={styles.resultadoIcon} aria-hidden="true">✅</span>
                     <span>Los hashes coinciden - El contenido es idéntico</span>
                   </>
                 ) : (
                   <>
-                    <span className={styles.resultadoIcon}>❌</span>
+                    <span className={styles.resultadoIcon} aria-hidden="true">❌</span>
                     <span>Los hashes NO coinciden - El contenido es diferente</span>
                   </>
                 )}

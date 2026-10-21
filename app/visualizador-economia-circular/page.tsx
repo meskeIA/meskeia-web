@@ -207,7 +207,7 @@ export default function VisualizadorEconomiaCircular() {
       {/* SECCIÓN 1: Lineal vs Circular */}
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <span className={styles.sectionIcon}>⚡</span>
+          <span className={styles.sectionIcon} aria-hidden="true">⚡</span>
           <h2 className={styles.sectionTitle}>Lineal vs Circular</h2>
           <p className={styles.sectionSubtitle}>
             Dos modelos económicos: uno que agota, otro que regenera
@@ -309,7 +309,7 @@ export default function VisualizadorEconomiaCircular() {
       {/* SECCIÓN 2: Las 7 estrategias */}
       <section className={styles.sectionAlt}>
         <div className={styles.sectionHeader}>
-          <span className={styles.sectionIcon}>🏆</span>
+          <span className={styles.sectionIcon} aria-hidden="true">🏆</span>
           <h2 className={styles.sectionTitle}>Las 7 Estrategias</h2>
           <p className={styles.sectionSubtitle}>
             Ordenadas de más a menos eficiente — las primeras conservan más valor
@@ -364,7 +364,7 @@ export default function VisualizadorEconomiaCircular() {
       {/* SECCIÓN 3: Flujos de residuos en España */}
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <span className={styles.sectionIcon}>🇪🇸</span>
+          <span className={styles.sectionIcon} aria-hidden="true">🇪🇸</span>
           <h2 className={styles.sectionTitle}>Residuos en España</h2>
           <p className={styles.sectionSubtitle}>
             Datos 2022 — España recicla el 36%, la UE hace el 47% de media
@@ -468,7 +468,7 @@ export default function VisualizadorEconomiaCircular() {
       {/* SECCIÓN 4: Casos de éxito */}
       <section className={styles.sectionAlt}>
         <div className={styles.sectionHeader}>
-          <span className={styles.sectionIcon}>🌟</span>
+          <span className={styles.sectionIcon} aria-hidden="true">🌟</span>
           <h2 className={styles.sectionTitle}>Casos de Éxito Reales</h2>
           <p className={styles.sectionSubtitle}>
             Empresas que demuestran que la economía circular es rentable
