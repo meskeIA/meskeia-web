@@ -1413,3 +1413,31 @@ test.describe('re-inspección 02/10/2026 · móvil 390 px', () => {
     expect(new URL(page.url()).pathname).toBe('/selector-smartphone/');
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cabo C0029 (reparar 21/10/2026): el emoji de cada característica y consejo vive en una cadena
+// de motor.ts, que check:a11y-jsx no ve, y el lector lo anunciaba antes de cada línea.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test('REPARADO (C0029): el emoji de las características y los consejos no llega al lector', async ({ page }) => {
+  await abrirTest(page);
+  await responder(page, SOLO_LLAMAR);
+  await leerResultado(page);
+  const lineas = page.locator('[class*="caracteristicaItem"], [class*="consejoItem"]');
+  const n = await lineas.count();
+  expect(n, 'hay características y consejos').toBeGreaterThan(3);
+  // Lo que oye el lector: el texto sin lo que cuelga de aria-hidden.
+  const audibles = await lineas.evaluateAll((els) =>
+    els.map((el) => {
+      const copia = el.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('[aria-hidden="true"]').forEach((x) => x.remove());
+      return { audible: copia.textContent ?? '', visible: el.textContent ?? '' };
+    }),
+  );
+  for (const { audible, visible } of audibles) {
+    expect(audible, `«${visible}»`).not.toMatch(/\p{Extended_Pictographic}/u);
+    expect(audible.trim().length, `«${visible}» conserva su texto`).toBeGreaterThan(10);
+  }
+  // Y en pantalla siguen viéndose: el emoji solo se oculta al lector.
+  expect(audibles.some(({ visible }) => /🔋/u.test(visible))).toBe(true);
+});

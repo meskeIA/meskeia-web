@@ -45,6 +45,23 @@ interface GamaInfo {
   descripcion: string;
 }
 
+/**
+ * Las características y los consejos llegan del motor con su emoji delante («💧 Verifica…»), y
+ * pintados tal cual el lector de pantalla anunciaba «gota de agua» antes de cada línea (cabo
+ * C0029, la forma del 1838). check:a11y-jsx no lo ve porque la cadena vive en motor.ts. Se
+ * separa al pintar: el emoji, oculto; el texto, igual que antes.
+ */
+const ICONO_INICIAL = /^(\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic})*)\s*/u;
+function conIconoOculto(texto: string): React.ReactNode {
+  const m = texto.match(ICONO_INICIAL);
+  if (!m) return texto;
+  return (
+    <>
+      <span aria-hidden="true">{m[1]}</span> {texto.slice(m[0].length)}
+    </>
+  );
+}
+
 
 // ─────────────────────────────────────────────
 // Datos de gamas
@@ -550,7 +567,7 @@ export default function SelectorSmartphone() {
             </p>
             <div className={styles.caracteristicasGrid}>
               {resultado.caracteristicas.map((c, i) => (
-                <div key={i} className={styles.caracteristicaItem}>{c}</div>
+                <div key={i} className={styles.caracteristicaItem}>{conIconoOculto(c)}</div>
               ))}
             </div>
           </div>
@@ -560,7 +577,7 @@ export default function SelectorSmartphone() {
             <div className={styles.consejosSection}>
               <p className={styles.consejosTitulo}>Consejos antes de comprar</p>
               {resultado.consejos.map((c, i) => (
-                <p key={i} className={styles.consejoItem}>{c}</p>
+                <p key={i} className={styles.consejoItem}>{conIconoOculto(c)}</p>
               ))}
             </div>
           )}
