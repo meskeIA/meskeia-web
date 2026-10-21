@@ -4329,7 +4329,9 @@ test.describe('Inspector 21/10/2026 — re-inspección tras 011fc97f y f6de548d'
   });
 
   /**
-   * ❌ ABIERTO 21/10/2026 (contenido, bajo) — [21/10-a] La forma de los 2915/2917/2921 (Canarias) y del
+   * ✅ REPARADO 21/10/2026 (hallazgo 3405): las seis notas de data/itp-ccaa.ts dicen el dato, sin
+   * ranking ni calificativo (Castilla y León, con la cifra de su propio reducido: 0,01 %).
+   * Lo que se vio (contenido, bajo) — [21/10-a] La forma de los 2915/2917/2921 (Canarias) y del
    * 3251 (Madrid), en las notas que quedan de data/itp-ccaa.ts. El recuadro de esta app pinta la
    * ficha de cada comunidad (desde 2208), y la reparación de esas dos dijo «el dato, sin ranking».
    * Quedan:
@@ -4347,7 +4349,6 @@ test.describe('Inspector 21/10/2026 — re-inspección tras 011fc97f y f6de548d'
    *   Esperado: cada nota dice su dato sin ranking ni calificativo · obtenido: las seis frases.
    */
   test('[21/10-a] las notas de comunidad que pinta el recuadro dicen el dato, sin ranking ni calificativo', async ({ page }) => {
-    if (!I08_VER_HUECOS) test.fail();
     await abrir(page, 'ceuta', 'particular');
     await sembrarValor(page, SEL_PRECIO, '200000');
     // La cifra que desmiente el «más bajo de España»: 200.000 × 6 % × 50 % = 6000,00 → 3,00 %.

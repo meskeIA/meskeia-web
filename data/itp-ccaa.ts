@@ -365,7 +365,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Una de las escalas más altas de España (hasta 13 %). Bonificación 100 % (tipo 0 %) para menores de 30 años o discapacidad ≥33 % en primera vivienda habitual (valor ≤270.151 €).',
+    notas: 'Escala progresiva hasta el 13 %. Bonificación 100 % (tipo 0 %) para menores de 30 años o discapacidad ≥33 % en primera vivienda habitual (valor ≤270.151 €).',
   },
 
   'canarias': {
@@ -493,7 +493,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'Tipo casi 0 % para jóvenes en municipios rurales. Gran incentivo contra despoblación.',
+    notas: 'Tipo del 0,01 % para menores de 36 años en municipios de menos de 10.000 habitantes, con un valor de hasta 150.000 €.',
   },
 
   'castilla-mancha': {
@@ -564,7 +564,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1.5,
-    notas: 'ITP elevado (10-13 % en escala progresiva desde el 27/06/2025, Decreto-ley 5/2025). Tipo reducido del 5 % en la vivienda habitual para colectivos específicos, con el límite de edad de los jóvenes en 35 años desde esa misma fecha (antes 32). La ATC reconoce además un 5 % para víctimas de violencia machista, un 4 % en municipios rurales (3 % en los de especial atención) y un 20 % para grandes tenedores, que esta app no distingue.',
+    notas: 'ITP en escala progresiva del 10 al 13 % desde el 27/06/2025 (Decreto-ley 5/2025). Tipo reducido del 5 % en la vivienda habitual para colectivos específicos, con el límite de edad de los jóvenes en 35 años desde esa misma fecha (antes 32). La ATC reconoce además un 5 % para víctimas de violencia machista, un 4 % en municipios rurales (3 % en los de especial atención) y un 20 % para grandes tenedores, que esta app no distingue.',
   },
 
   'valencia': {
@@ -772,7 +772,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 0.5,
-    notas: 'Régimen foral propio. ITP bajo (6 %). AJD muy reducido (0,5 %).',
+    notas: 'Régimen foral propio. ITP del 6 %. AJD del 0,5 %.',
   },
 
   'pais-vasco': {
@@ -803,7 +803,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     // AJD (hallazgos 1583 y 1592).
     ajd: 0.5,
     ajdVivienda: 0,
-    notas: 'Régimen foral propio. ITP del 4 % en vivienda (el más bajo de España) y del 7 % en el resto de inmuebles. AJD del 0,5 %, del que está exenta la primera transmisión de vivienda.',
+    notas: 'Régimen foral propio. ITP del 4 % en vivienda y del 7 % en el resto de inmuebles. AJD del 0,5 %, del que está exenta la primera transmisión de vivienda.',
   },
 
   'rioja': {
@@ -837,7 +837,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
       },
     ],
     ajd: 1,
-    notas: 'ITP moderado (7 %). Jóvenes menores de 40 años en primera vivienda habitual: 4 % (3 % en los municipios del anexo I de la Ley 10/2017), por la Ley 1/2025 de medidas urgentes para el acceso a la vivienda, con efectos desde el 03/03/2025. Dato orientativo: la familia numerosa baja del 5 % al 3 % con requisitos adicionales de renta (≤30.600 €) que esta app no pregunta — verifica la tarifa vigente en larioja.org',
+    notas: 'ITP general del 7 %. Jóvenes menores de 40 años en primera vivienda habitual: 4 % (3 % en los municipios del anexo I de la Ley 10/2017), por la Ley 1/2025 de medidas urgentes para el acceso a la vivienda, con efectos desde el 03/03/2025. Dato orientativo: la familia numerosa baja del 5 % al 3 % con requisitos adicionales de renta (≤30.600 €) que esta app no pregunta — verifica la tarifa vigente en larioja.org',
   },
 
   'ceuta': {
