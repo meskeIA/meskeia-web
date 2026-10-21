@@ -285,10 +285,10 @@ export const RESPUESTA_TIPOS_REDUCIDOS = `Muchas comunidades aplican tipos reduc
  * tiran, como en garaje, porque tres salen de constantes compartidas con la FAQ visible: pasan a
  * `faqJsonLd`, salvo la que repetía con otras palabras una pregunta que ya está allí («¿Qué paga
  * el vendedor de una vivienda?» frente a «¿Qué impuestos paga el vendedor al vender un
- * inmueble?»). «¿Cuánto hay que sumar al precio…?» se queda: es la que publica la horquilla del
- * motor en porcentaje, y su test (REPARADO 11/09) la sujeta.
+ * inmueble?»). Esa se quedó aquí filtrada y sin lector, ni en el FAQPage ni en la FAQ visible, y
+ * se retiró el 21/10/2026 (cabo C0350). «¿Cuánto hay que sumar al precio…?» se queda: es la que
+ * publica la horquilla del motor en porcentaje, y su test (REPARADO 11/09) la sujeta.
  */
-const REPETIDAS_EN_FAQ_JSON_LD = new Set(['¿Qué paga el vendedor de una vivienda?']);
 
 const PREGUNTAS_GUIA: { question: string; answer: string }[] = [
     {
@@ -298,10 +298,6 @@ const PREGUNTAS_GUIA: { question: string; answer: string }[] = [
     {
       question: '¿Cuánto hay que sumar al precio de una vivienda por gastos e impuestos?',
       answer: `Los gastos e impuestos van del ${pct(HORQUILLA_GASTOS_COMPRAVENTA.min)} al ${pct(HORQUILLA_GASTOS_COMPRAVENTA.max)} del precio, según la comunidad autónoma, el importe de la operación y si la vivienda es de segunda mano o de obra nueva. El grueso es el impuesto: ITP entre el ${RANGO_ITP_VIVIENDA.min}\u00A0% y el ${RANGO_ITP_VIVIENDA.max}\u00A0% según la comunidad autónoma en segunda mano (la mitad en Ceuta y Melilla, por la bonificación de la cuota del art. 57 bis TRLITPAJD), o IVA al ${IVA_INMUEBLES_2025.obraNueva}\u00A0% más AJD en obra nueva. A eso se suman notaría, registro de la propiedad y gestoría, que en conjunto rondan el ${pct(HORQUILLA_FEDATARIOS_PCT.min)} al ${pct(HORQUILLA_FEDATARIOS_PCT.max)} del precio. Conviene tener ese dinero ahorrado aparte, porque no se financia con la hipoteca.`,
-    },
-    {
-      question: '¿Qué paga el vendedor de una vivienda?',
-      answer: `El vendedor asume la plusvalía municipal (IIVTNU), el IRPF sobre la ganancia patrimonial (del ${TIPO_AHORRO_MIN}\u00A0% al ${TIPO_AHORRO_MAX}\u00A0% en la base del ahorro) y, si la hubo, la comisión de la inmobiliaria. Existen dos exenciones importantes en el IRPF que no se aplican a otros inmuebles: la reinversión del importe en otra vivienda habitual y la de los mayores de 65 años o personas en situación de dependencia severa o gran dependencia que venden su vivienda habitual. Las dos exigen que haya sido su residencia al menos 3 años seguidos, salvo fallecimiento o una causa que obligue a cambiar de domicilio (art. 41 bis.1 RIRPF).`,
     },
     {
       question: PREGUNTA_QUIEN_PAGA,
@@ -331,7 +327,7 @@ const PREGUNTAS_GUIA: { question: string; answer: string }[] = [
 
 export const jsonLd = webAppSchema;
 
-const preguntasGuiaJsonLd = PREGUNTAS_GUIA.filter((q) => !REPETIDAS_EN_FAQ_JSON_LD.has(q.question)).map(
+const preguntasGuiaJsonLd = PREGUNTAS_GUIA.map(
   (q) => ({
     '@type': 'Question',
     name: q.question,
@@ -364,7 +360,7 @@ export const faqJsonLd = {
       name: '¿Qué impuestos paga el vendedor al vender un inmueble?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el ${TIPO_AHORRO_MIN}\u00A0% y el ${TIPO_AHORRO_MAX}\u00A0% según el importe. Existen dos exenciones en el IRPF, y las dos exigen que lo vendido sea la vivienda habitual, es decir, la residencia durante al menos 3 años seguidos salvo fallecimiento o una causa que obligue a cambiar de domicilio (art. 41 bis.1 RIRPF): la reinversión del importe obtenido en otra vivienda habitual (art. 38.1 LIRPF) y la de los mayores de 65 años o personas en situación de dependencia severa o gran dependencia (art. 33.4.b LIRPF). Los mayores de 65 años pueden además excluir la ganancia de cualquier elemento patrimonial si destinan lo obtenido, en seis meses, a una renta vitalicia asegurada a su favor, hasta 240.000 € (art. 38.3 LIRPF). Tener hipoteca pendiente no exime de nada: el principal que se cancela solo minora el importe obtenido a efectos de la reinversión (art. 41 RIRPF).`,
+        text: `El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el ${TIPO_AHORRO_MIN}\u00A0% y el ${TIPO_AHORRO_MAX}\u00A0% según el importe. Si es una primera entrega (obra nueva), vende el promotor, que es empresario aunque promueva una sola vez: su renta no es una ganancia patrimonial del ahorro, sino un rendimiento de actividad económica en el IRPF (art. 27.1 LIRPF) o, si es una sociedad, renta del Impuesto sobre Sociedades. Existen dos exenciones en el IRPF, y las dos exigen que lo vendido sea la vivienda habitual, es decir, la residencia durante al menos 3 años seguidos salvo fallecimiento o una causa que obligue a cambiar de domicilio (art. 41 bis.1 RIRPF): la reinversión del importe obtenido en otra vivienda habitual (art. 38.1 LIRPF) y la de los mayores de 65 años o personas en situación de dependencia severa o gran dependencia (art. 33.4.b LIRPF). Los mayores de 65 años pueden además excluir la ganancia de cualquier elemento patrimonial si destinan lo obtenido, en seis meses, a una renta vitalicia asegurada a su favor, hasta 240.000 € (art. 38.3 LIRPF). Tener hipoteca pendiente no exime de nada: el principal que se cancela solo minora el importe obtenido a efectos de la reinversión (art. 41 RIRPF).`,
       },
     },
     {

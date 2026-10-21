@@ -3030,6 +3030,11 @@ export default function SimuladorCompraventaPage() {
               <p>
                 La ganancia patrimonial tributa en la <strong>base del ahorro</strong> con tipos del {formatNumber(TIPO_AHORRO_MIN, 0)}&nbsp;% al {formatNumber(TIPO_AHORRO_MAX, 0)}&nbsp;%
                 según el importe.
+                {/* La salvedad del promotor, como en el FAQPage y la pestaña Vendedor (cabo C0349,
+                    la forma del 3402 de local-comercial). */}
+                {' '}En una primera entrega (obra nueva) vende el promotor: su renta no es una ganancia
+                del ahorro, sino un rendimiento de actividad económica en el IRPF (art. 27.1 LIRPF) o,
+                si es una sociedad, renta del Impuesto sobre Sociedades.
               </p>
               <p>
                 No es la simple diferencia entre lo que pagaste y lo que cobras: al precio de compra se le suman

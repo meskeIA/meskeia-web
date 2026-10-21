@@ -8351,6 +8351,25 @@ test.describe('Inspector 07/10/2026 — las reparaciones del 06/10 y dónde no l
   });
 
   /**
+   * REPARADO (21/10/2026, cabo C0349, la forma del 3402 de local-comercial). El FAQPage «¿Qué
+   * impuestos paga el vendedor al vender un inmueble?» y la tarjeta «IRPF del vendedor» de la guía
+   * daban la ganancia patrimonial del ahorro como la renta de todo vendedor, mientras la pestaña
+   * Vendedor dice desde 616e5fc8 (AVISO_VENTA_PROMOTOR) que en obra nueva vende el promotor, cuya
+   * renta es de actividad económica (art. 27.1 LIRPF) o del Impuesto sobre Sociedades.
+   */
+  test('REPARADO (C0349): el FAQPage y la guía del vendedor llevan la salvedad del promotor', async ({ page }) => {
+    await page.goto(RUTA);
+    const [faq] = await bloquesFaqPage(page);
+    const vendedor = faq.find((q) => q.pregunta === '¿Qué impuestos paga el vendedor al vender un inmueble?');
+    expect(vendedor, 'la pregunta del vendedor sigue en el FAQPage').toBeTruthy();
+    expect(vendedor!.respuesta).toContain('vende el promotor');
+    expect(vendedor!.respuesta).toContain('art. 27.1 LIRPF');
+    const tarjeta = page.locator('h4', { hasText: 'IRPF del vendedor' }).locator('..');
+    await expect(tarjeta).toContainText('vende el promotor', { useInnerText: false });
+    await expect(tarjeta).toContainText('art. 27.1 LIRPF', { useInnerText: false });
+  });
+
+  /**
    * HALLAZGO [bajo, contenido] — REPARADO el 08/10/2026 (2964). Era así (07/10/2026): «¿Qué son los tipos reducidos de ITP y cómo
    * acceder a ellos?» estaba en la FAQ visible y en el FAQPage de `jsonLd` con dos redacciones (la del
    * FAQPage resume la visible: mete la edad entre paréntesis y omite el panel de la calculadora). Es
