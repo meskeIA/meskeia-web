@@ -25,6 +25,7 @@ import {
 } from '@/lib/calculadoras/frecuenciaDominante';
 import { notaMasCercana, nombreNota } from '@/lib/calculadoras/afinacionInstrumentos';
 import { lecturaSostenida, LECTURAS_ESTABLES, type LecturaMedidor } from './motor-medidor';
+import { FAQ_MEDIR_HERCIOS, FAQ_TIPOS_ONDA } from './metadata';
 
 interface FrecuenciaPreset {
   nombre: string;
@@ -645,7 +646,12 @@ export default function GeneradorTonosPage() {
     };
   }, []);
 
-  const iniciarAudio = useCallback(() => {
+  /**
+   * `frecuenciaInicial`: con la que arranca el oscilador si no es la del campo. La pasa el barrido,
+   * que tiene que sonar desde «Desde» (hallazgo 3281): `frecuencia` es la del cierre de este
+   * render, y fijarla con `aplicarFrecuencia` justo antes no llega a tiempo.
+   */
+  const iniciarAudio = useCallback((frecuenciaInicial?: number) => {
     // El tono entraría por el micrófono y el medidor leería la salida de la propia app. Pasa
     // también por aquí el barrido, que arranca el tono con esta misma función.
     if (medidorRef.current) detenerMedidor();
@@ -668,7 +674,7 @@ export default function GeneradorTonosPage() {
       const gainNode = ctx.createGain();
 
       oscillator.type = tipoOnda;
-      oscillator.frequency.setValueAtTime(frecuencia, ctx.currentTime);
+      oscillator.frequency.setValueAtTime(frecuenciaInicial ?? frecuencia, ctx.currentTime);
 
       // Rampa de entrada 0 → volumen. Ya no la pisa el efecto de volumen (hallazgo 1637).
       gainNode.gain.setValueAtTime(0, ctx.currentTime);
@@ -1199,14 +1205,20 @@ export default function GeneradorTonosPage() {
 
   // Función de barrido (sweep)
   const iniciarSweep = () => {
-    if (!reproduciendo) {
-      iniciarAudio();
-    }
-
     // Los límites se ordenan aquí: con «Desde» mayor que «Hasta» el incremento salía
     // negativo y el barrido se quedaba clavado en el mínimo sin avisar de nada.
     const desde = acotarFrecuencia(Math.min(sweepMin, sweepMax));
     const hasta = acotarFrecuencia(Math.max(sweepMin, sweepMax));
+
+    // El barrido SUENA desde «Desde» (hallazgo 3281). Arrancaba el oscilador con la frecuencia que
+    // hubiera en el campo y el primer paso, a los 50 ms, ya sumaba el incremento: con el último
+    // tono en 20 kHz, el barrido de graves empezaba con 50 ms de ese pitido y su primer peldaño
+    // era Desde + incremento. Ahora el tono arranca (o salta, si ya sonaba) en «Desde», y el
+    // campo lo dice.
+    if (!reproduciendo) {
+      iniciarAudio(desde);
+    }
+    aplicarFrecuencia(desde);
 
     setSweep(true);
     let frecActual = desde;
@@ -2012,7 +2024,9 @@ export default function GeneradorTonosPage() {
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon} aria-hidden="true">🔊</span>
               <h4>Calibración de Sistemas de Audio</h4>
-              <p>Usa el barrido (sweep) de 20 Hz a 20 kHz para detectar resonancias o "huecos" en la respuesta de frecuencia de altavoces, auriculares o una sala. Si un rango se escucha mucho más fuerte o más débil que el resto, tu sistema tiene una coloración no lineal. Los tonos de prueba individuales identifican la frecuencia exacta del problema.</p>
+              {/* Proponía el barrido para las resonancias de una sala, que están en los graves, y el
+                  barrido es lineal: los cruza de un salto (hallazgo 3282). */}
+              <p>Usa el barrido (sweep) para recorrer de oído los medios y los agudos de altavoces o auriculares: si un rango se escucha mucho más fuerte o más débil que el resto, tu sistema tiene una coloración no lineal. El barrido avanza en pasos iguales de hercios, así que los graves los cruza casi de golpe; para ellos, y para las resonancias de una sala, que están por debajo de 100 Hz, ve tono a tono (50, 63, 80, 100 Hz…) o usa «Medir la respuesta con el micrófono», que emite un tono fijo por cada tercio de octava desde 50 Hz. Los tonos de prueba individuales identifican la frecuencia exacta del problema.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon} aria-hidden="true">🏫</span>
@@ -2030,16 +2044,17 @@ export default function GeneradorTonosPage() {
               <p className={styles.eduFaqRespuesta}>La frecuencia es el número de oscilaciones completas por segundo de una onda sonora. El hercio (Hz), llamado así en honor al físico Heinrich Hertz, equivale a 1 ciclo por segundo. 440 Hz significa que el aire oscila 440 veces por segundo. A mayor frecuencia, más agudo es el sonido; a menor frecuencia, más grave. La velocidad del sonido en el aire (~343 m/s a 20&nbsp;°C) divide entre la frecuencia da la longitud de onda: a 440 Hz, λ ≈ 78 cm; a 20 Hz, λ ≈ 17 metros.</p>
             </details>
             <details className={styles.eduFaqItem}>
-              <summary className={styles.eduFaqPregunta}>¿Cómo mido cuántos hercios tiene un sonido?</summary>
-              <p className={styles.eduFaqRespuesta}>Con el medidor de esta misma página: pulsa «Medir la frecuencia», da permiso al micrófono y acerca el aparato al sonido. La app analiza el audio con una transformada de Fourier, busca el pico que más destaca y lo afina entre los puntos del análisis, así que con un tono limpio y sostenido la cifra queda a menos de un hercio. Además dice a qué nota musical corresponde. Ojo con las voces y los instrumentos: el pico más fuerte puede ser un armónico (el doble o el triple de la nota que oyes); para afinar, un afinador busca la fundamental.</p>
+              {/* La misma pregunta y respuesta que el FAQPage: salen de metadata.ts (hallazgo 3283) */}
+              <summary className={styles.eduFaqPregunta}>{FAQ_MEDIR_HERCIOS.pregunta}</summary>
+              <p className={styles.eduFaqRespuesta}>{FAQ_MEDIR_HERCIOS.respuesta}</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Por qué el oído humano oye exactamente de 20 Hz a 20 kHz?</summary>
               <p className={styles.eduFaqRespuesta}>El rango audible humano está determinado por la anatomía del oído interno. La cóclea contiene ~16.000 células ciliares dispuestas como un piano: las de la base detectan agudos y las del ápice detectan graves. Las frecuencias muy bajas (&lt;20 Hz) no son suficientemente energéticas para mover los cilios con eficacia; y las muy altas (&gt;20 kHz) dejan de mover la membrana basilar de forma eficaz — el límite lo pone la mecánica de la onda viajera en la cóclea, no el tamaño de los cilios: a 20 kHz la longitud de onda en aire es de 1,7 cm, unas diez mil veces mayor que un estereocilio. Con la edad, las células de los agudos mueren primero por ser las más expuestas, lo que explica la presbiacusia (pérdida auditiva de agudos por envejecimiento).</p>
             </details>
             <details className={styles.eduFaqItem}>
-              <summary className={styles.eduFaqPregunta}>¿Qué diferencia hay entre onda senoidal, cuadrada, triangular y sierra?</summary>
-              <p className={styles.eduFaqRespuesta}>La <strong>onda senoidal</strong> es el tono más puro: un solo armónico, la frecuencia fundamental. Es la más suave y menos agresiva al oído. La <strong>onda cuadrada</strong> contiene la fundamental más todos los armónicos impares (3ª, 5ª, 7ª...) con amplitud 1/n. Suena más "metálica" y brillante; es la base de los sintetizadores clásicos (Moog). La <strong>onda sierra</strong> contiene todos los armónicos (pares e impares), dando el timbre más rico y "rasgado". La <strong>onda triangular</strong> tiene solo armónicos impares pero con caída mucho más rápida (1/n²), sonando más suave que la cuadrada pero más brillante que la senoidal.</p>
+              <summary className={styles.eduFaqPregunta}>{FAQ_TIPOS_ONDA.pregunta}</summary>
+              <p className={styles.eduFaqRespuesta}>{FAQ_TIPOS_ONDA.respuesta}</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué son los tonos binaurales y sirven para algo?</summary>
@@ -2127,8 +2142,8 @@ export default function GeneradorTonosPage() {
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono} aria-hidden="true">🔁</span>
-              <h4>El sweep revela la respuesta de frecuencia</h4>
-              <p>Un barrido lento de 20 Hz a 20 kHz con volumen constante te muestra qué frecuencias suenan más alto o más bajo en tu sistema. Las "montañas" son resonancias del altavoz o la sala; los "valles" son cancelaciones de fase o deficiencias del driver.</p>
+              <h4>El sweep da una idea de la respuesta de frecuencia</h4>
+              <p>Un barrido con volumen constante te deja oír qué frecuencias suenan más alto o más bajo en tu sistema: las "montañas" son resonancias del altavoz y los "valles", cancelaciones de fase o deficiencias del driver. Es lineal, en pasos iguales de hercios: de 20 Hz a 20 kHz, incluso en 60 s, pasa de 20 a 200 Hz en poco más de medio segundo y dedica la mitad del tiempo a la última octava. Las resonancias de la sala, que están en esos graves, se buscan tono a tono.</p>
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono} aria-hidden="true">🎼</span>

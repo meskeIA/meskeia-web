@@ -52,6 +52,35 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['generador tonos', 'frecuencias audio', 'medidor de frecuencia', 'test audio', 'calibración altavoces', 'tinnitus'],
 });
 
+interface PreguntaFrecuente {
+  pregunta: string;
+  respuesta: string;
+}
+
+/*
+ * Las dos preguntas que están en las DOS bocas: la FAQ visible de la guía (page.tsx) y el FAQPage
+ * de abajo, que leen buscadores e IAs. Salen de aquí las dos, para que no vuelvan a divergir
+ * (hallazgo 3283: cada boca tenía su texto, y el FAQPage resumía, añadía y quitaba frases). Texto
+ * plano: el JSON-LD no admite marcado.
+ */
+export const FAQ_MEDIR_HERCIOS: PreguntaFrecuente = {
+  pregunta: '¿Cómo mido cuántos hercios tiene un sonido?',
+  respuesta:
+    'Con el medidor de esta misma página: pulsa «Medir la frecuencia», da permiso al micrófono y acerca el aparato al sonido. La app analiza el audio con una transformada de Fourier, busca el pico que más destaca y lo afina entre los puntos del análisis, así que con un tono limpio y sostenido la cifra queda a menos de un hercio. Además dice a qué nota musical corresponde y cuántos cents se desvía de ella. Ojo con las voces y los instrumentos: el pico más fuerte puede ser un armónico (el doble o el triple de la nota que oyes); para afinar, un afinador busca la fundamental. El audio se analiza en el propio navegador y no se envía a ningún sitio.',
+};
+
+export const FAQ_TIPOS_ONDA: PreguntaFrecuente = {
+  pregunta: '¿Qué diferencia hay entre onda senoidal, cuadrada, triangular y sierra?',
+  respuesta:
+    'La onda senoidal es el tono más puro: un solo armónico, la frecuencia fundamental. Es la más suave y menos agresiva al oído. La onda cuadrada contiene la fundamental más todos los armónicos impares (3.º, 5.º, 7.º...) con amplitud 1/n. Suena más "metálica" y brillante; es la base de los sintetizadores clásicos (Moog). La onda sierra contiene todos los armónicos (pares e impares), dando el timbre más rico y "rasgado". La onda triangular tiene solo armónicos impares pero con caída mucho más rápida (1/n²), sonando más suave que la cuadrada pero más brillante que la senoidal. Para tests de oído y calibración conviene la senoidal.',
+};
+
+const preguntaLd = (f: PreguntaFrecuente) => ({
+  '@type': 'Question',
+  name: f.pregunta,
+  acceptedAnswer: { '@type': 'Answer', text: f.respuesta },
+});
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -64,14 +93,7 @@ export const faqJsonLd = {
         text: 'Un generador de tonos produce frecuencias de audio puras, con la misma señal en los dos oídos, que puedes usar para varias pruebas: comprobar de forma orientativa hasta qué frecuencia escuchas, calibrar altavoces y auriculares con tonos sueltos o con un barrido, afinar un instrumento con una nota de referencia o enseñar en clase cómo suenan las ondas senoidal, cuadrada, triangular y sierra. También permite medir, con el micrófono del propio aparato, cómo cambia la respuesta de un altavoz entre dos posiciones.',
       },
     },
-    {
-      '@type': 'Question',
-      name: '¿Cómo puedo medir la frecuencia de un sonido en hercios?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Con el micrófono del móvil o del ordenador: el medidor de esta página analiza el audio con una transformada de Fourier, busca el pico que más destaca y lo afina entre los puntos del análisis, de modo que con un tono limpio y sostenido la cifra queda a menos de un hercio. También indica la nota musical más cercana y sus cents de desviación. En una voz o un instrumento el pico más fuerte puede ser un armónico, el doble o el triple de la nota que se oye, así que para afinar conviene un afinador, que busca la fundamental. El audio se analiza en el propio navegador y no se envía a ningún sitio.',
-      },
-    },
+    preguntaLd(FAQ_MEDIR_HERCIOS),
     {
       '@type': 'Question',
       name: '¿Qué rango de frecuencias puede oír el ser humano?',
@@ -80,14 +102,7 @@ export const faqJsonLd = {
         text: 'El oído humano adulto percibe sonidos en el rango de aproximadamente 20 Hz a 20.000 Hz (20 kHz). Con la edad, la capacidad de escuchar frecuencias altas disminuye: la mayoría de adultos mayores de 40 años ya no perciben con claridad por encima de 15.000-16.000 Hz. Los niños y adolescentes pueden escuchar con más facilidad frecuencias cerca de los 20.000 Hz.',
       },
     },
-    {
-      '@type': 'Question',
-      name: '¿Cuál es la diferencia entre una onda senoidal, cuadrada, triangular y sierra?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'La onda senoidal es el tono más puro, sin armónicos, y suena suave. La onda cuadrada tiene un timbre metálico y brillante por sus múltiples armónicos impares. La onda triangular es similar a la senoidal pero con más brillo. La onda de sierra (diente de sierra) es la más rica en armónicos y suena más agresiva. Para tests de oído y calibración, se recomienda la senoidal.',
-      },
-    },
+    preguntaLd(FAQ_TIPOS_ONDA),
     {
       '@type': 'Question',
       name: '¿Cómo uso el generador de tonos para hacer un test de audición básico?',

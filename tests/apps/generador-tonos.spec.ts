@@ -699,9 +699,10 @@ test('CASO 5 — el barrido con «Desde» mayor que «Hasta» ordena los límite
   await page.waitForTimeout(1300); // ~26 pasos de 50 ms
   await page.getByRole('button', { name: /Detener barrido/ }).click();
 
-  // El primer valor aplicado es el 440 con el que arranca el oscilador; el resto es el barrido.
+  // El oscilador arranca en «Desde» (500), no en el 440 que había en el campo: lo fijaba este caso
+  // hasta que se reparó el hallazgo 3281 (J1). El resto es el barrido.
   const aplicadas = await frecuenciasAplicadas(page);
-  expect(aplicadas[0]).toBe(440);
+  expect(aplicadas[0]).toBe(500);
   const barrido = aplicadas.slice(1);
 
   // Que se MUEVE es lo que prueba que los límites se ordenaron: con incremento negativo se
@@ -1728,7 +1729,9 @@ test.describe('Inspector 25/09/2026 (tarde) — en móvil (Pixel 7)', () => {
    *   incremento = (1100 − 100) / (1 · 20) = 50 Hz (exacto en coma flotante)
    *   escalera aplicada: 150, 200, … 1.050 y, en el paso 20, frecActual = 1.100 ≥ hasta → vuelve a
    *   100 y aplica 100. El techo (1.100) no llega a emitirse nunca; el suelo solo en la vuelta.
-   * Medido el 25/09/2026: [440, 150, 200, … 1050, 100, 150, …].
+   * Medido el 25/09/2026: [440, 150, 200, … 1050, 100, 150, …]. Desde el hallazgo 3281 (J1) el
+   * tono arranca en el suelo, 100, y no en el 440 del campo: el «suelo solo en la vuelta» es ahora
+   * el arranque Y la vuelta, y la vuelta es el 100 que llega DESPUÉS de haber subido.
    * Se espera a que la vuelta a 100 aparezca en el registro, no un plazo de reloj. Con la máquina
    * cargada React puede agrupar dos pasos en un render, así que no se exige cada peldaño: se exige
    * que todo lo emitido esté EN la escalera.
@@ -1755,9 +1758,13 @@ test.describe('Inspector 25/09/2026 (tarde) — en móvil (Pixel 7)', () => {
     await iniciar.tap();
     await expect(page.getByRole('button', { name: /Detener barrido/ })).toHaveAttribute('aria-pressed', 'true');
 
-    const barrido = async (): Promise<number[]> => (await frecuenciasAplicadas(page)).slice(1);
+    // La vuelta: un 100 después del primer peldaño que ya no es el suelo del arranque.
+    const volvioAlSuelo = (fs: number[]) => {
+      const subida = fs.findIndex((f) => f !== 100);
+      return subida >= 0 && fs.slice(subida).includes(100);
+    };
     await expect
-      .poll(async () => (await barrido()).includes(100), {
+      .poll(async () => volvioAlSuelo(await frecuenciasAplicadas(page)), {
         timeout: 10000,
         message: 'el barrido nunca volvió al suelo de 100 Hz',
       })
@@ -1765,7 +1772,7 @@ test.describe('Inspector 25/09/2026 (tarde) — en móvil (Pixel 7)', () => {
     await page.getByRole('button', { name: /Detener barrido/ }).tap();
 
     const aplicadas = await frecuenciasAplicadas(page);
-    expect(aplicadas[0]).toBe(440); // el tono arranca en la frecuencia del campo
+    expect(aplicadas[0]).toBe(100); // el tono arranca en «Desde», no en el 440 del campo (J1)
     const pasos = aplicadas.slice(1);
     for (const f of pasos) {
       expect((f - 100) % 50, `fuera de la escalera de 50 Hz: ${f}`).toBe(0);
@@ -2835,7 +2842,9 @@ test.describe('Inspector 13/10/2026', () => {
   });
 
   /**
-   * HALLAZGO J1 [bajo · operativa] — ABIERTO (13/10/2026). El barrido no empieza en «Desde»:
+   * HALLAZGO J1 [bajo · operativa, 3281] — REPARADO (21/10/2026): `iniciarSweep` arranca el
+   * oscilador en «Desde» (`iniciarAudio(desde)`) y lo escribe en el campo. Lo que había:
+   * El barrido no empezaba en «Desde»:
    * `iniciarSweep` arranca el oscilador con la frecuencia que hubiera en el campo (`iniciarAudio`
    * usa `frecuencia`) y el primer paso del intervalo, a los 50 ms, ya suma el incremento: la primera
    * vuelta va de «Desde» + incremento a «Hasta» − incremento, y «Desde» solo suena al dar la vuelta.
@@ -2845,12 +2854,9 @@ test.describe('Inspector 13/10/2026', () => {
    *   obtenido  [5000, 40, 60, 79, 99, …]: 50 ms a 5.000 Hz (con la rampa de entrada subiendo) y
    *             el primer peldaño en 40 Hz. Con el último tono en 20.000 Hz, como tras un test de
    *             agudos, el barrido de graves empieza con un pitido de 20 kHz.
-   * El CASO 5 fija hoy ese primer valor («aplicadas[0] = 440»): al reparar, ese caso cambia.
+   * El CASO 5 fijaba ese primer valor («aplicadas[0] = 440»); al reparar pasó a 500, su «Desde».
    */
   test('HALLAZGO J1 — el barrido empieza en «Desde», sin sonar antes la frecuencia que había', async ({ page }) => {
-    // ABIERTO: afirma lo que DEBERÍA pasar. Comprobado el 13/10/2026 que cae en la aserción de la
-    // primera frecuencia (5000 en vez de 20), no en la precondición de que el barrido se mueva.
-    test.fail();
     await abrir(page);
     await page.getByRole('button', { name: 'Ir a 5.000 Hz' }).click();
     await expect(campoFrecuencia(page)).toHaveValue('5000');
@@ -2868,7 +2874,11 @@ test.describe('Inspector 13/10/2026', () => {
   });
 
   /**
-   * HALLAZGO J2 [bajo · contenido] — ABIERTO (13/10/2026). La guía propone el barrido para algo
+   * HALLAZGO J2 [bajo · contenido, 3282] — REPARADO (21/10/2026) por la segunda vía, la guía (N2,
+   * promesa): la tarjeta «Calibración» y el consejo del sweep dicen que el barrido es lineal y cruza
+   * los graves casi de golpe, y mandan las resonancias de sala a los tonos sueltos y a la medida por
+   * tercios. El barrido logarítmico es ampliar la app (N3): no se ha hecho. Lo que había:
+   * La guía propone el barrido para algo
    * que su barrido no puede hacer en los graves. «Calibración de Sistemas de Audio»: «Usa el barrido
    * (sweep) de 20 Hz a 20 kHz para detectar resonancias o "huecos" en la respuesta de frecuencia de
    * altavoces, auriculares o una sala»; consejo: «Un barrido lento de 20 Hz a 20 kHz […] Las
@@ -2887,9 +2897,6 @@ test.describe('Inspector 13/10/2026', () => {
   test('HALLAZGO J2 — el barrido más lento de 20 Hz a 20 kHz no cruza los graves de un salto, o la guía no lo propone para ellos', async ({
     page,
   }) => {
-    // ABIERTO: comprobado el 13/10/2026 que cae en la última aserción (519 Hz a los 1,5 s, con la
-    // guía proponiéndolo), no en la precondición de que el barrido se mueva.
-    test.fail();
     await abrir(page);
     await teclear(page, '#sweep-min', '20');
     await teclear(page, '#sweep-max', '20.000');
@@ -2899,7 +2906,7 @@ test.describe('Inspector 13/10/2026', () => {
     await page.getByRole('button', { name: /Iniciar barrido/ }).click();
     await page.waitForTimeout(1500);
     await page.getByRole('button', { name: /Detener barrido/ }).click();
-    // Sin la primera: es la que hubiera en el campo al arrancar (HALLAZGO J1).
+    // Sin la primera, la del arranque (desde el J1, «Desde»).
     const barrido = (await frecuenciasAplicadas(page)).slice(1);
     expect(barrido.length, 'el barrido tenía que moverse (pasos de 50 ms)').toBeGreaterThanOrEqual(15);
     const texto = (await page.locator('body').textContent()) ?? '';
@@ -2914,7 +2921,9 @@ test.describe('Inspector 13/10/2026', () => {
   });
 
   /**
-   * HALLAZGO J3 [bajo · contenido] — ABIERTO (13/10/2026). Dos preguntas están en las dos FAQ (la
+   * HALLAZGO J3 [bajo · contenido, 3283] — REPARADO (21/10/2026): las dos preguntas salen de
+   * FAQ_MEDIR_HERCIOS y FAQ_TIPOS_ONDA de metadata.ts, que pintan la FAQ visible y el FAQPage. Lo que
+   * había: dos preguntas estaban en las dos FAQ (la
    * visible de la guía y el FAQPage de metadata.ts, que leen buscadores e IAs) con respuestas
    * distintas. No se contradicen: el FAQPage resume, y añade o quita frases sueltas.
    *   «¿Cómo mido cuántos hercios tiene un sonido?» (visible) / «¿Cómo puedo medir la frecuencia de
@@ -2926,9 +2935,6 @@ test.describe('Inspector 13/10/2026', () => {
    * respuesta sea la misma.
    */
   test('HALLAZGO J3 — una pregunta que está en las dos FAQ tiene la misma respuesta en las dos', async ({ page }) => {
-    // ABIERTO: comprobado el 13/10/2026 que cae en la comparación de respuestas (la de los hercios),
-    // no en las precondiciones de que la pregunta exista en las dos FAQ.
-    test.fail();
     await abrir(page);
     const delFaqPage = await page.evaluate(() => {
       for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
