@@ -7573,7 +7573,9 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('21.120,00 €');
   });
 
-  // HALLAZGO [21/10-b] (bajo, contenido) — EFECTO FAMILIA del 3396 (simulador-gastos-compraventa-
+  // HALLAZGO [21/10-b] 3398 (bajo, contenido) — ✅ REPARADO 21/10/2026: las limitaciones lo dicen con
+  // LIMITACION_ABATIMIENTO (data/fiscal/ganancia-inmueble.ts), la misma frase que garaje y local.
+  // EFECTO FAMILIA del 3396 (simulador-gastos-compraventa-
   // garaje), medido aquí. El campo admite hasta 50 años de propiedad, y con 32 o más la compra es
   // anterior al 31/12/1994 (con 31, puede serlo): su ganancia puede reducirse con los coeficientes de abatimiento de la
   // disposición transitoria 9.ª LIRPF, que la app no aplica. data/fiscal/ganancia-inmueble.ts, el
@@ -7581,15 +7583,16 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
   // aproximarlo)», y la referencia lo nombra en su bloque educativo («…y los coeficientes de
   // abatimiento de las compras anteriores a 1995»). Aquí no lo dice ni la tarjeta del IRPF, ni el
   // sello, ni las «Limitaciones de esta calculadora», y el neto del CASO 62 sale como definitivo.
-  test.fail('[21/10-b] con una compra anterior a 1995 la página dice que no aplica los coeficientes de abatimiento', async ({ page }) => {
+  test('[21/10-b] con una compra anterior a 1995 la página dice que no aplica los coeficientes de abatimiento', async ({ page }) => {
     await vendedor0810(page, BASE_2110_MURCIA);
     // El defecto: el texto de la página, bloque educativo plegado incluido y sin los <script>.
     const textoPagina = await page.evaluate(() => {
       const copia = document.body.cloneNode(true) as HTMLElement;
       copia.querySelectorAll('script, style').forEach((s) => s.remove());
-      return copia.textContent ?? '';
+      return (copia.textContent ?? '').replace(/\s+/g, ' ');
     });
     expect(textoPagina).toMatch(/abatimiento|anteriores a 1995|31\/12\/1994/i);
+    expect(textoPagina).toContain('para esas compras, el IRPF que se muestra es un máximo');
   });
 
   // HALLAZGO [21/10-c] (bajo, contenido) — en territorio foral el neto promete «obtenerlo». Con la

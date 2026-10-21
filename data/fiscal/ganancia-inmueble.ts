@@ -62,6 +62,15 @@ export const AYUDA_OTRAS_RENTAS_AHORRO =
   'Opcional. Intereses, dividendos y otras ganancias que declararás el mismo año: la escala del ahorro se aplica a todas juntas, así que con ellas la venta puede tributar a un tipo mayor';
 
 /**
+ * Lo primero de «LO QUE ESTE MÓDULO NO HACE», dicho en las limitaciones de las tres apps con
+ * pestaña Vendedor que no lo decían (garaje, trastero y local; hallazgos 3396, 3398 y 3401). La
+ * referencia de la familia lo dice en su bloque educativo. Los coeficientes solo REDUCEN la
+ * ganancia, así que sin ellos la cuota publicada es un máximo para esas compras.
+ */
+export const LIMITACION_ABATIMIENTO =
+  'No aplica los coeficientes de abatimiento de la disposición transitoria 9.ª LIRPF, que pueden reducir la ganancia de los inmuebles comprados antes del 31/12/1994 y dependen también de las demás ventas del contribuyente: para esas compras, el IRPF que se muestra es un máximo, y ahí un asesor fiscal sí marca la diferencia.';
+
+/**
  * La frase que acompaña a la cuota publicada: con otras rentas, que es lo que la venta AÑADE;
  * sin ellas, que se ha calculado como si fuera la única renta del ahorro y la real puede ser
  * mayor. Es la cifra la que cambia con el dato; la frase solo dice sobre qué supuesto está.

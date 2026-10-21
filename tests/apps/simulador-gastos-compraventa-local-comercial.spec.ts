@@ -6566,7 +6566,9 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
     expect(promesas).toEqual([]);
   });
 
-  // HALLAZGO [21/10-b] (bajo, contenido) — ❌ ABIERTO. Efecto familia del 3396 (garaje), medido aquí.
+  // HALLAZGO [21/10-b] 3401 (bajo, contenido) — ✅ REPARADO (21/10/2026): las limitaciones lo dicen con
+  // LIMITACION_ABATIMIENTO (data/fiscal/ganancia-inmueble.ts), la misma frase que garaje y trastero.
+  // Efecto familia del 3396 (garaje), medido aquí.
   // La app acepta cualquier número de años de propiedad (la ayuda solo dice que la plusvalía cuenta
   // 20 como máximo) y con 32 o más la compra es anterior al 31/12/1994, cuya ganancia puede reducirse
   // con los coeficientes de abatimiento de la disposición transitoria 9.ª LIRPF, que la app no
@@ -6576,7 +6578,7 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
   // familia lo nombra en su bloque educativo («…y los coeficientes de abatimiento de las compras
   // anteriores a 1995»). Es el vendedor del CASO 52: 35 años, IRPF 152.130,00 € publicado como
   // definitivo, que para esa compra es un techo.
-  test.fail('[21/10-b] con 35 años de propiedad, la página dice que no aplica los coeficientes de abatimiento de las compras anteriores a 1995', async ({ page }) => {
+  test('[21/10-b] con 35 años de propiedad, la página dice que no aplica los coeficientes de abatimiento de las compras anteriores a 1995', async ({ page }) => {
     await abrir0810(page);
     await page.selectOption('#select-ccaa', 'extremadura');
     await sembrarImporte12(page, 'Precio del local comercial', '650000');
@@ -6599,6 +6601,7 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
     });
     expect(texto).toContain('Limitaciones de este simulador');
     expect(texto).toMatch(/abatimiento|anteriores a 1995|transitoria (9\.ª|novena)/i);
+    expect(texto).toContain('para esas compras, el IRPF que se muestra es un máximo');
   });
 
   // HALLAZGO [21/10-c] (bajo, contenido) — ❌ ABIERTO. Lo que 616e5fc8 (hallazgo 3384) no llevó a

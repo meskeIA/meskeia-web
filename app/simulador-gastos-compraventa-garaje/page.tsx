@@ -44,7 +44,7 @@ const AVISO_BASE_AJD =
 /** La salvedad del AJD detrás de un texto, con o sin punto final, solo si hay AJD. */
 const conAvisoBaseAjd = (texto: string, ajd: number): string =>
   ajd > 0 ? `${texto}${texto.endsWith('.') ? '' : '.'} ${AVISO_BASE_AJD}` : texto;
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, PLAZO_ITP, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR, LIMITACION_ABATIMIENTO } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -2233,6 +2233,7 @@ export default function SimuladorGarajeCompraventaPage() {
             <li><strong>Estimaciones orientativas:</strong> Los importes reales pueden diferir según el valor de referencia catastral del inmueble (base mínima del ITP y, en la compra al promotor, también del AJD: art. 30.1 TRLITPAJD; aquí el AJD se calcula sobre el precio escrito), los coeficientes de plusvalía de cada municipio y los aranceles notariales concretos aplicados.</li>
             <li><strong>IRPF de la venta junto a tus otras rentas del ahorro:</strong> La escala del ahorro (del {TIPO_AHORRO_MIN}&nbsp;% al {TIPO_AHORRO_MAX}&nbsp;%) se aplica a todas las rentas del ahorro del año juntas. Si no escribes las otras (intereses, dividendos, otras ganancias), la cuota es la de una venta que fuera tu única renta del ahorro, y la real puede ser mayor. Esta calculadora no compensa pérdidas de otras operaciones, que en la declaración sí se compensan con las ganancias patrimoniales del año (art. 49.1.b LIRPF).</li>
             <li><strong>Sin exención IRPF por vivienda habitual:</strong> Esta calculadora no aplica la exención por reinversión en vivienda habitual ni la exención para mayores de 65 años, ya que estas exenciones aplican a vivienda, no a garajes independientes.</li>
+            <li><strong>Compras anteriores a 1995:</strong> {LIMITACION_ABATIMIENTO}</li>
             <li><strong>Tipos fiscales pueden cambiar:</strong> Los tipos de ITP, AJD e IVA corresponden a la normativa vigente indicada en el aviso de fuentes al inicio de la página. Verifica con tu comunidad autónoma antes de tomar decisiones.</li>
           </ul>
         </div>

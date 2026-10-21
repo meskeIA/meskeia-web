@@ -36,6 +36,7 @@ import {
   textoOtrasRentasAhorro,
   NOMBRE_RENTA_PROMOTOR,
   AVISO_VENTA_PROMOTOR,
+  LIMITACION_ABATIMIENTO,
 } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -2517,6 +2518,7 @@ export default function SimuladorLocalComercialPage() {
             <li>El valor de referencia catastral puede ser la base imponible real del ITP si supera el precio escriturado, y también la del AJD de la obra nueva o de la renuncia: aunque el IVA se calcula sobre la contraprestación pactada, la base del AJD no puede ser inferior a ese valor (art. 30.1 TRLITPAJD, redacción de la Ley 11/2021). Aquí el AJD se calcula sobre el precio escrito.</li>
             <li>En la pestaña de vendedor, el tipo municipal del IIVTNU se estima con un valor orientativo: cada ayuntamiento fija el suyo, así que confirma el de tu municipio.</li>
             <li>En la pestaña de vendedor, la escala del ahorro ({formatNumber(TIPO_AHORRO_MIN, 0)}–{conPct(formatNumber(TIPO_AHORRO_MAX, 0))}) se aplica a todas las rentas del ahorro del año juntas. Si no escribes las otras (intereses, dividendos, otras ganancias), la cuota es la de una venta que fuera tu única renta del ahorro, y la real puede ser mayor. Esta calculadora no compensa pérdidas de otras operaciones, que en la declaración sí se compensan con las ganancias patrimoniales del año (art. 49.1.b LIRPF).</li>
+            <li>En la pestaña de vendedor, compras anteriores a 1995: {LIMITACION_ABATIMIENTO}</li>
             <li>Si el local estuvo afecto a una actividad o alquilado, la amortización que debe restarse es la deducida o la mínima, aunque no se hubiera deducido; el simulador usa la cifra que introduzcas.</li>
             <li>Los tipos de ITP y AJD pueden variar; verifica la normativa vigente de tu comunidad autónoma y consulta con tu asesor fiscal antes de cerrar la operación.</li>
           </ul>

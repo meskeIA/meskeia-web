@@ -77,7 +77,7 @@
  *    3247-3251); el [18/10-a] de la sección 26 (hallazgo 3368) se reparó ese mismo día.
  * ✅ 19/10/2026 — a los cinco de la sección 25 se sumó el [19/10-a] de la sección 27. Los seis se
  *    REPARARON el 20/10/2026 (f6de548d y 616e5fc8): a 21/10/2026 la base no tiene ninguno abierto, y
- *    el único `test.fail()` vivo es el [21/10-a] de la sección 28.
+ *    el único `test.fail()` vivo es el [21/10-a] de la sección 28, reparado ese mismo día (3396).
  * ⚠️ 13/10/2026 — las secciones que fijan la notaría y el registro de ANTES del 11/10/2026
  * (371,84 €, 80,21 €…) fallan desde a3c3ecb0: su puesta al día es el cabo C0209.
  * ✅ 17/10/2026 (cabo C0209) — puestas al día: cada cifra se recalculó a mano con la base del BOE
@@ -8783,7 +8783,10 @@ test.describe('Inspector 21/10/2026 — Castilla y León, el tramo del 27 % al e
   });
 
   /**
-   * ❌ ABIERTO 21/10/2026 (contenido, bajo) — [21/10-a] Con 32 años o más de propiedad la compra es
+   * ✅ REPARADO 21/10/2026 (hallazgo 3396): «Limitaciones de esta calculadora» dice que no aplica los
+   * coeficientes y que para esas compras el IRPF mostrado es un máximo (LIMITACION_ABATIMIENTO de
+   * data/fiscal/ganancia-inmueble.ts, la misma frase en trastero y local).
+   * Lo que se vio (contenido, bajo) — [21/10-a] Con 32 años o más de propiedad la compra es
    * anterior al 31/12/1994 (32 años completos a 21/10/2026 = comprado antes del 22/10/1994), y la
    * ganancia de esas compras puede reducirse con los coeficientes de abatimiento de la disposición
    * transitoria 9.ª LIRPF, que la app no aplica. data/fiscal/ganancia-inmueble.ts, el motor que usa la
@@ -8798,7 +8801,7 @@ test.describe('Inspector 21/10/2026 — Castilla y León, el tramo del 27 % al e
    *   texto de la página (sin <script>) no contiene «abatimiento», «1994», «1995» ni «transitoria».
    *   Esperado: que lo diga, como la referencia (la cifra es un techo para esas compras).
    */
-  test.fail('[21/10-a] con 35 años de propiedad, la página dice que no aplica los coeficientes de abatimiento de las compras anteriores a 1995', async ({
+  test('[21/10-a] con 35 años de propiedad, la página dice que no aplica los coeficientes de abatimiento de las compras anteriores a 1995', async ({
     page,
   }) => {
     await i19Abrir(page, 'madrid', '30000');
@@ -8819,5 +8822,6 @@ test.describe('Inspector 21/10/2026 — Castilla y León, el tramo del 27 % al e
       return (copia.textContent ?? '').replace(/\s+/g, ' ');
     });
     expect(texto).toMatch(/abatimiento|anteriores a 1995|31\/12\/1994|transitoria novena/i);
+    expect(texto).toContain('para esas compras, el IRPF que se muestra es un máximo');
   });
 });
