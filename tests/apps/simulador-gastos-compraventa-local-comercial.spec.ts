@@ -6669,7 +6669,8 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
     expect(aviso).not.toMatch(/falta la plusvalía municipal|para obtenerlo/);
   });
 
-  // HALLAZGO [21/10-e] (bajo, contenido) — ❌ ABIERTO. Efecto familia del 3395 (estimador, residuo de
+  // HALLAZGO [21/10-e] 3404 (bajo, contenido) — ✅ REPARADO (21/10/2026): la frase pide ya el derecho
+  // a deducir del comprador, como RESPUESTA_RENUNCIA. Efecto familia del 3395 (estimador, residuo de
   // ef34f391), aquí en la constante RESPUESTA_IMPUESTO_COMPRA de metadata.ts, que leen la FAQ visible
   // y el FAQPage: «La excepción es la renuncia a la exención entre empresarios, que no existe en Ceuta
   // y Melilla». La reparación del 3385 (79ed543c) corrigió RESPUESTA_RENUNCIA, el aviso, el caso de uso
@@ -6679,12 +6680,13 @@ test.describe('Inspector 21/10/2026 — Navarra en obra nueva, Extremadura con r
   // total o parcialmente el impuesto soportado o, si no, cuando por su destino previsible los bienes
   // vayan a utilizarse en operaciones que originen ese derecho. La consulta médica o la academia del
   // aviso de cabecera de esta misma página son empresarios y no pueden pedirla.
-  test.fail('[21/10-e] la respuesta del impuesto de la compra pide el derecho a deducir del comprador para la renuncia', async ({ page }) => {
+  test('[21/10-e] la respuesta del impuesto de la compra pide el derecho a deducir del comprador para la renuncia', async ({ page }) => {
     await abrir0810(page);
     const visible = await faqVisible0710(page, '¿Se paga IVA o ITP al comprar un local comercial?');
     const faqPage = (await faqPage0710(page)).get('¿Qué impuesto se paga al comprar un local comercial?') ?? '';
     expect(visible).toBe(faqPage);
-    expect(visible).toContain('La excepción es la renuncia a la exención entre empresarios');
+    expect(visible).not.toContain('entre empresarios');
+    expect(visible).toContain('que no existe en Ceuta y Melilla');
     // La respuesta de la renuncia, en la misma FAQ, sí lo pide (3385).
     expect(await faqVisible0710(page, '¿Qué es la renuncia a la exención de IVA y a quién le interesa?')).toContain(
       'el derecho a deducir solo se lo exige al comprador',

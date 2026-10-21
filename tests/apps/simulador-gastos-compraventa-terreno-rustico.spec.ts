@@ -2692,7 +2692,8 @@ test.describe('Reparación 26/09/2026 — hallazgos 2214-2220 y la receta de la 
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const celda = (fila: string) => page.locator('tr', { hasText: fila }).locator('td').nth(1);
     await expect(celda('¿Sujeto a IVA por empresario?')).toHaveText('Sí, pero exenta (art. 20.Uno.20.º LIVA)');
-    await expect(celda('Renuncia a la exención de IVA')).toContainText('Posible entre profesionales');
+    // Desde el 3406 (21/10/2026) con el requisito del comprador del art. 20.Dos LIVA
+    await expect(celda('Renuncia a la exención de IVA')).toContainText('Posible si compra un empresario con derecho a deducir');
   });
 
   /**
@@ -4213,7 +4214,9 @@ test.describe('Inspector 21/10/2026 — Cantabria, el límite del arancel notari
   });
 
   /**
-   * [21/10-a] (contenido, medio) — lo que la reparación del 3270 (edadd9d8, 19/10/2026) no llevó a
+   * [21/10-a] 3406 (contenido, medio) — REPARADO 21/10/2026: las ocho bocas ponen el derecho a
+   * deducir en el comprador, o no nombran requisitos «entre» las partes.
+   * Era lo que la reparación del 3270 (edadd9d8, 19/10/2026) no llevó a
    * las demás bocas de la página. Forma de los hallazgos 3395 (estimador, «entre empresarios» en
    * DERIVACIONES) y 3404 (local-comercial, RESPUESTA_IMPUESTO_COMPRA) de esta misma tanda.
    * Ley 37/1992, art. 20.Dos (BOE-A-1992-28740, leído el 21/10/2026): las exenciones de los
@@ -4234,7 +4237,6 @@ test.describe('Inspector 21/10/2026 — Cantabria, el límite del arancel notari
    *   derecho a deducir es del comprador · obtenido: las ocho bocas citadas.
    */
   test('[21/10-a] la renuncia no se describe «entre profesionales» sin el derecho a deducir del comprador (art. 20.Dos LIVA)', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'Hallazgo 21/10-a: la renuncia descrita «entre profesionales» en ocho bocas');
     await abrirHidratada(page);
     await page.selectOption('#select-ccaa', 'cantabria');
     await page.getByRole('button', { name: /renuncia a la exención/i }).click();
@@ -4253,6 +4255,10 @@ test.describe('Inspector 21/10/2026 — Cantabria, el límite del arancel notari
     // El defecto, boca a boca.
     for (const [boca, texto] of Object.entries(bocas)) {
       expect.soft(texto, boca).not.toMatch(/entre (?:empresarios o )?(?:empresarios|profesionales)/);
+    }
+    // Y donde se nombra un requisito, es el derecho a deducir del comprador.
+    for (const boca of ['FAQ visible «¿Se paga IVA o ITP…?»', 'Limitaciones de este simulador', 'Tabla, fila de la renuncia (finca rústica)']) {
+      expect.soft(bocas[boca], boca).toMatch(/compra(?:dor es)? un empresario[^.]*derecho a deducir/);
     }
   });
 });

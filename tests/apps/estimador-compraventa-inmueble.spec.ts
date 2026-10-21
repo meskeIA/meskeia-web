@@ -9868,7 +9868,8 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (21/10/2026). Residuo de ef34f391 (efecto familia del 3387)
+   * HALLAZGO 3395 [bajo, contenido] — REPARADO (21/10/2026): la línea de la nave dice ya lo mismo
+   * que la del local. Residuo de ef34f391 (efecto familia del 3387)
    * en la MISMA constante DERIVACIONES de page.tsx: la línea del local se corrigió al art. 20.Dos
    * LIVA («cuando el vendedor es empresario y renuncia porque el comprador es un empresario con
    * derecho a deducir el IVA») y la de la nave se quedó en «la renuncia a la exención de IVA … entre
@@ -9879,7 +9880,7 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
    * Tipo de inmueble «Nave industrial» → esperado: el requisito del derecho a deducir, como en el
    * local · obtenido «…(art. 20.Dos LIVA) entre empresarios.»
    */
-  test.fail('HALLAZGO renuncia — la derivación de la nave nombra el derecho a deducir del comprador', async ({ page }) => {
+  test('REPARADO 3395 renuncia — la derivación de la nave nombra el derecho a deducir del comprador', async ({ page }) => {
     await abrir(page, 'madrid');
     await page.getByRole('button', { name: /Nave industrial/ }).click();
     const linea = (

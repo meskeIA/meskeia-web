@@ -67,7 +67,8 @@ import {
 
 // ===== TIPOS =====
 // Terreno rústico no edificable: exento de IVA → ITP (regla general).
-// Excepción: renuncia a la exención de IVA entre profesionales → IVA 21% (ISP) + AJD.
+// Excepción: renuncia a la exención de IVA (comprador empresario con derecho a deducir, art. 20.Dos
+// LIVA) → IVA 21% (ISP) + AJD.
 type TipoOperacion = 'itp' | 'renuncia';
 
 interface ResultadosComprador {
@@ -378,7 +379,8 @@ export default function SimuladorTerrenoRusticoPage() {
         <h1 className={styles.title}>Simulador de Gastos de Compra de Finca Rústica</h1>
         <p className={styles.subtitle}>
           Calcula el ITP, la notaría y el registro al comprar una finca o terreno rústico en España — sin
-          plusvalía municipal, con la excepción de la renuncia a la exención de IVA entre profesionales
+          plusvalía municipal, con la excepción de la renuncia a la exención de IVA cuando compra un
+          empresario con derecho a deducir
         </p>
       </header>
 
@@ -927,8 +929,9 @@ export default function SimuladorTerrenoRusticoPage() {
                 </tr>
                 <tr style={{ background: 'var(--bg-primary)' }}>
                   <td style={{ padding: '8px 10px' }}>Renuncia a la exención de IVA</td>
-                  {/* Canarias sí la tiene (del IGIC) y Ceuta y Melilla no (IPSI): hallazgo 1605. */}
-                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Posible entre profesionales (en Canarias, la del IGIC; el IPSI de Ceuta y Melilla no la admite)</td>
+                  {/* Canarias sí la tiene (del IGIC) y Ceuta y Melilla no (IPSI): hallazgo 1605.
+                      El derecho a deducir se pide al comprador, no al vendedor (art. 20.Dos LIVA, 3406). */}
+                  <td style={{ padding: '8px 10px', textAlign: 'center' }}>Posible si compra un empresario con derecho a deducir (en Canarias, la del IGIC; el IPSI de Ceuta y Melilla no la admite)</td>
                   <td style={{ padding: '8px 10px', textAlign: 'center' }}>No procede (ya es IVA)</td>
                 </tr>
               </tbody>
@@ -1029,7 +1032,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 la exención solo se pierde en los urbanizados o en curso de urbanización. Para la
                 plusvalía municipal, en cambio, sí cuenta como urbano. */}
             <li>Válido para terreno rústico no edificable. Si el terreno es edificable (un solar, o un terreno con licencia de edificación) o está urbanizado o en curso de urbanización, su entrega por un empresario ya no está exenta de IVA y la fiscalidad es la de un solar (IVA si vende un empresario, ITP si vende un particular, más la plusvalía municipal). El suelo urbanizable que aún no está urbanizado ni en curso de urbanización sigue exento de IVA como el rústico (art. 20.Uno.20.º LIVA): el ITP y la renuncia de este simulador le valen. Para la plusvalía municipal, en cambio, cuenta como suelo urbano, y su vendedor la paga si hubo incremento real del valor.</li>
-            <li>La renuncia a la exención de IVA solo es válida entre empresarios o profesionales con derecho a deducción, y muchas CCAA aplican un AJD incrementado: aquí se usa el tipo propio de la renuncia donde está verificado en su norma ({CCAA_CON_AJD_DE_RENUNCIA.join(', ')}) y el general en las demás. En Ceuta y Melilla el IPSI no admite la renuncia.</li>
+            <li>La renuncia a la exención de IVA solo cabe cuando vende un empresario y compra un empresario o profesional con derecho a deducir el IVA (art. 20.Dos LIVA), y muchas CCAA aplican un AJD incrementado: aquí se usa el tipo propio de la renuncia donde está verificado en su norma ({CCAA_CON_AJD_DE_RENUNCIA.join(', ')}) y el general en las demás. En Ceuta y Melilla el IPSI no admite la renuncia.</li>
             <li>El valor de referencia catastral puede ser la base imponible del ITP si supera el precio escriturado, y también la del AJD de la renuncia: aunque el IVA se calcula sobre el precio pactado, la base del AJD no puede ser inferior a ese valor (art. 30.1 TRLITPAJD, redacción de la Ley 11/2021). Aquí el AJD se calcula sobre el precio escrito.</li>
             <li>Los tipos pueden variar; verifica la normativa vigente de tu comunidad autónoma y consulta con tu asesor antes de firmar.</li>
           </ul>
