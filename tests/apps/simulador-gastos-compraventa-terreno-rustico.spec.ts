@@ -44,8 +44,10 @@
  * llevan `test.fail()`. A 08/10/2026 la base no tenía ninguno abierto antes de la inspección de
  * ese día, cuyos seis hallazgos ([08/10-a…f], 3093-3098) se REPARARON el mismo 08/10 y ya no llevan
  * `test.fail()`. A 13/10/2026 la base no tenía ninguno abierto (los 40 anteriores, ARREGLADOS); los
- * tres de esa re-inspección van con `test.fail()` y etiqueta [13/10-a…c] en el ÚLTIMO describe del
- * fichero. Lo anterior también está REPARADO: los de la
+ * tres de esa re-inspección ([13/10-a…c], 3270-3272) se REPARARON el 19/10/2026 y ya no llevan
+ * `test.fail()`. A 21/10/2026 la base tampoco tenía ninguno abierto (43, ARREGLADOS); el de esa
+ * re-inspección va con `test.fail()` y etiqueta [21/10-a] en el ÚLTIMO describe del fichero.
+ * Lo anterior también está REPARADO: los de la
  * re-inspección del 26/09/2026 (2214-2220) están sin marca en su describe, con la receta de la
  * familia (base mínima del AJD, 2209; notas de la comunidad, 2208). Los casos anteriores con Canarias,
  * Ceuta y Melilla se recalcularon a mano (notaría y registro ÷ 1,21), y los lectores de tarjeta
@@ -2773,9 +2775,10 @@ test.describe('Reparación 26/09/2026 — hallazgos 2214-2220 y la receta de la 
 //    600.000, 11 % después); Ceuta 6 con la bonificación del 50 % (art. 57 bis TRLITPAJD).
 //  - AJD de la renuncia: `ITP_CCAA[x].ajd` (Extremadura 1,5 · País Vasco 0,5 · Madrid 0,75), sin
 //    `ajdRenuncia` propio en ninguna de las tres. IVA: `PORCENTAJES_IVA.general` = 21.
-//  ⚠️ La notaría y el registro NO se fijan en estos casos: los hallazgos 2901 y 2902 (rebaja del
-//  5 % de los dos aranceles, registrados en la referencia) los moverán al repararse. Los totales
-//  se comprueban como suma de lo que se ve y restando esas dos líneas de la pantalla.
+//  ⚠️ La notaría y el registro NO se fijaron en estos casos porque los hallazgos 2901 y 2902 (rebaja
+//  del 5 % de los dos aranceles, registrados en la referencia) estaban entonces abiertos; se
+//  REPARARON el 11/10/2026. Los totales se comprueban como suma de lo que se ve y restando esas dos
+//  líneas de la pantalla, así que valen antes y después de la rebaja.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /** Importe de una tarjeta, como número (con `euros`, que ya entiende el formato español). */
@@ -3175,9 +3178,10 @@ test.describe('Re-inspección 06/10/2026 — Extremadura, País Vasco, los selec
 //  - Notaría y registro: calculados a mano y coincidentes (CLM 125.000 €: arancel 308,306895 ×
 //    1,21 × 1,75 = 652,84 · registro 161,363382 × 1,21 = 195,25; Valencia 7.000.000 €: 2.181,672142
 //    × 1,21 × 1,75 = 4619,69 · 1.595,3284555 × 1,21 = 1930,35; Ceuta 45.000 €, sin IVA: 220,75629
-//    × 1,75 = 386,32 · 93,81), pero NO se fijan: los hallazgos 2901 y 2902 (rebaja del 5 % de los
-//    dos aranceles, abiertos en la referencia) los moverán. Los totales se comprueban como suma de
-//    lo que se ve y restando esas dos líneas de la pantalla.
+//    × 1,75 = 386,32 · 93,81), pero NO se fijaron: los hallazgos 2901 y 2902 (rebaja del 5 % de los
+//    dos aranceles, entonces abiertos en la referencia) iban a moverlos, y se REPARARON el
+//    11/10/2026. Los totales se comprueban como suma de lo que se ve y restando esas dos líneas de
+//    la pantalla, así que valen antes y después de la rebaja.
 //
 // Con `VER_HUECOS=1 npx playwright test <este fichero>` los seis hallazgos de esta sección dejan de
 // estar marcados y la salida enseña lo que la app publica frente a lo esperado.
@@ -3608,9 +3612,10 @@ test.describe('Inspector 08/10/2026 — Castilla-La Mancha, la renuncia valencia
 //    lib/calculadoras/prorrateoCompraventa.ts).
 // Medido después en la app: todo coincide al céntimo, así que las cifras se comparan como texto.
 //
-// Hallazgos de esta sección, con `test.fail()` y etiqueta [13/10-a…c] (con `VER_HUECOS=1` dejan de
-// estar marcados, como los de la sección del 08/10):
-//  a) la condición para renunciar y para deducir, escrita con requisitos que no son los de la LIVA;
+// Hallazgos de esta sección, etiqueta [13/10-a…c] (3270-3272), REPARADOS el 19/10/2026 (edadd9d8 y
+// 011fc97f): sus casos ya no llevan `test.fail()` y vigilan que no vuelvan.
+//  a) la condición para renunciar y para deducir, escrita con requisitos que no son los de la LIVA
+//     (lo que el 19/10 no llegó a otras bocas de la página es el [21/10-a], al final del fichero);
 //  b) el FAQPage da la finca por «tributa por ITP» sin la renuncia que la propia app calcula;
 //  c) el 21 % de IVA de notaría y registro, tecleado en data/itp-ccaa.ts.
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -3917,5 +3922,337 @@ test.describe('Inspector 13/10/2026 — País Vasco, Cataluña en su tramo del 1
     const fuente = readFileSync(join(process.cwd(), 'data', 'itp-ccaa.ts'), 'utf8');
     // El defecto.
     expect(fuente).not.toMatch(/const\s+IVA_HONORARIOS\s*=\s*0?[.,]\d+/);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inspector 21/10/2026 — RE-INSPECCIÓN (INVALIDADA por edadd9d8, 011fc97f, ef34f391 y f6de548d,
+// 19-20/10/2026; la base no tenía ningún hallazgo abierto: los 43, ARREGLADOS). Tanda de la familia
+// «Compraventa inmobiliaria»; el testigo tests/familias/compraventa.spec.ts dio 93/93 al empezar.
+// Lo reparado se sostiene: [13/10-a…c] pasan sin marca, el aviso de Canarias de ef34f391 ya no
+// exige nada a las partes y la tarjeta del IVA condiciona la deducción a una actividad sujeta y no
+// exenta (art. 94.Uno LIVA).
+//
+// Cifras a mano ANTES de abrir la app, con una aritmética que no importa nada de la app:
+//  - ITP: `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts) — Cantabria 9 (sin escala ni umbral en
+//    `ITP_CCAA`), Navarra 6, Melilla 6 (excepción declarada en data/itp-ccaa.ts) con la
+//    bonificación del 50 % de la cuota (art. 57 bis TRLITPAJD).
+//  - AJD de la renuncia: `ITP_CCAA[x].ajd`, sin `ajdRenuncia` propio — Cantabria 1,5 y Navarra 0,5.
+//    IVA: `PORCENTAJES_IVA.general` = 21. En Melilla no hay renuncia (Ley 8/1991, arts. 7 y 20.3).
+//  - Notaría: nº 2.1 del RD 1426/1989 × 0,95 (RDL 8/2010, DA 8.ª) × 1,21 (sin el 1,21 en Melilla),
+//    factura ×1,5 / ×1,75 / ×2; lo que excede de 6.010.121,04 € es de libre acuerdo, sin arancel.
+//      210.000 €: 90,151816 + 108,182205 + 45,0759 + 90,15182 + 29,873485 = 363,435226 → ×0,95 =
+//        345,263465 → ×1,21 = 417,768792 → 626,65 / 731,10 / 835,54.
+//      6.010.121,04 € (y cualquier valor mayor): 558,941276 + 1.622,732682 = 2.181,673958 → ×0,95 =
+//        2.072,59026 → ×1,21 = 2.507,834215 → 3761,75 / 4388,71 / 5015,67.
+//      80.000 €, sin IPSI: 90,151816 + 108,182205 + 45,0759 + 19,89879 = 263,308711 → ×0,95 =
+//        250,143275 → 375,21 / 437,75 / 500,29.
+//  - Registro: nº 2.1 del RD 1427/1989 × 0,95 + 6,010121 + 3,005061, × 1,21 donde rige el IVA.
+//      210.000 €: 189,212548 × 0,95 + 9,015182 = 188,767102 → ×1,21 = 228,41.
+//      6.010.121,04 €: 1.388,337966 × 0,95 + 9,015182 = 1.327,936249 → ×1,21 = 1606,80.
+//      80.000 €, sin IPSI: 118,598684 × 0,95 + 9,015182 = 121,68.
+//  - Reparto del IBI por días naturales (STS 409/2016): 2028 es bisiesto; con escritura el
+//    01/03/2028 el vendedor cuenta del 01/01 al 29/02 (31 + 29 = 60 días) y el comprador 306;
+//    183 € → 183 × 60 / 366 = 30,00 € y 183 × 306 / 366 = 153,00 €.
+// Medido después en la app: todo coincide al céntimo, así que las cifras se comparan como texto.
+//
+// Hallazgo de esta sección, con `test.fail()` y etiqueta [21/10-a] (con `VER_HUECOS=1` deja de
+// estar marcado):
+//  a) la renuncia sigue descrita «entre (empresarios o) profesionales» —y en dos bocas, «con derecho
+//     a deducción» de los dos— en el FAQ del impuesto, las limitaciones, la tabla, el hero, la
+//     description y el JSON-LD: la forma de los 3395 (estimador) y 3404 (local) de esta tanda.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+import {
+  LIMITE_ARANCEL_NOTARIAL,
+  BONIFICACION_CUOTA_CEUTA_MELILLA,
+  TERRITORIOS_SIN_RENUNCIA,
+} from '../../data/itp-ccaa';
+
+/** Pregunta del FAQ que la app escribe con una sola constante para las dos bocas (hallazgo 3095). */
+const I21_PREGUNTA_IMPUESTO = '¿Se paga IVA o ITP al comprar una finca rústica?';
+
+/**
+ * Las bocas que describen la renuncia sin ser su aviso ni su FAQ propia: leídas por `textContent`
+ * porque la FAQ, la tabla y las limitaciones viven dentro de la guía, que nace plegada.
+ */
+async function i21BocasRenuncia(page: Page): Promise<Record<string, string>> {
+  return page.evaluate((pregunta) => {
+    const limpio = (s: string | null | undefined): string => (s ?? '').replace(/\s+/g, ' ').trim();
+    const faqVisible = [...document.querySelectorAll('strong')].find((s) => limpio(s.textContent) === pregunta);
+    const limitacion = [...document.querySelectorAll('li')].find((li) =>
+      limpio(li.textContent).startsWith('La renuncia a la exención de IVA'),
+    );
+    const fila = [...document.querySelectorAll('tr')].find(
+      (tr) => limpio(tr.querySelector('td')?.textContent) === 'Renuncia a la exención de IVA',
+    );
+    const ld = [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => JSON.parse(s.textContent ?? '{}'));
+    const app = ld.find((j) => j['@type'] === 'WebApplication');
+    const faq = ld.find((j) => j['@type'] === 'FAQPage');
+    const faqLd = ((faq?.mainEntity ?? []) as { name: string; acceptedAnswer: { text: string } }[]).find(
+      (q) => q.name === pregunta,
+    );
+    return {
+      'FAQ visible «¿Se paga IVA o ITP…?»': limpio(faqVisible?.parentElement?.querySelector('p')?.textContent),
+      'FAQPage «¿Se paga IVA o ITP…?»': limpio(faqLd?.acceptedAnswer.text),
+      'Limitaciones de este simulador': limpio(limitacion?.textContent),
+      'Tabla, fila de la renuncia (finca rústica)': limpio(fila?.querySelectorAll('td')[1]?.textContent),
+      'Subtítulo del hero': limpio(document.querySelector('h1')?.parentElement?.querySelector('p')?.textContent),
+      'meta description': limpio(document.querySelector('meta[name="description"]')?.getAttribute('content')),
+      'JSON-LD description': limpio(app?.description),
+      'JSON-LD featureList': limpio(((app?.featureList ?? []) as string[]).find((f) => /renuncia/i.test(f))),
+    };
+  }, I21_PREGUNTA_IMPUESTO);
+}
+
+test.describe('Inspector 21/10/2026 — Cantabria, el límite del arancel notarial en Navarra, Melilla y la renuncia en las bocas que quedaban', () => {
+  test.describe.configure({ timeout: 60_000 });
+
+  /**
+   * CASO 1 (NORMAL) — Cantabria, 210.000 €, gestoría 520 €. Ninguna ronda anterior había pisado
+   * Cantabria en esta app.
+   *   a) Compra habitual: ITP = 210.000 × 9 % = 18.900,00 € (9,00 %). Notaría 731,10 (626,65-835,54),
+   *      registro 228,41. Total = 18.900 + 731,10 + 228,41 + 520 = 20.379,51 € (9,70 %); coste
+   *      230.379,51 €.
+   *   b) Renuncia: IVA 210.000 × 21 % = 44.100,00 · AJD 210.000 × 1,5 % = 3.150,00 · ningún ITP.
+   *      Total = 44.100 + 3.150 + 731,10 + 228,41 + 520 = 48.729,51 € (23,20 %); coste 258.729,51 €.
+   */
+  test('CASO 1 (normal) — Cantabria, 210.000 €: ITP del 9 % y, con renuncia, IVA 21 % + AJD 1,5 %', async ({ page }) => {
+    expect(TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === 'Cantabria')?.tipo).toBe(9);
+    expect(ITP_CCAA.cantabria.tramosProgresivos).toBeUndefined();
+    expect(ITP_CCAA.cantabria.umbralTipoUnico).toBeUndefined();
+    expect(ITP_CCAA.cantabria.ajd).toBe(1.5);
+    expect(ITP_CCAA.cantabria.ajdRenuncia).toBeUndefined();
+    expect(PORCENTAJES_IVA.general).toBe(21);
+
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'cantabria');
+    await sembrarValor(page, CAMPO_PRECIO, '210.000');
+    await sembrarValor(page, CAMPO_GESTORIA, '520');
+
+    // a) Compra habitual.
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (9,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('18.900,00 €');
+    await expect(page.locator('h3', { hasText: /^(AJD|IVA)/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría (IVA incluido)')).toBe('731,10 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 626,65 € y 835,54 €.');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (IVA incluido)')).toBe('228,41 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('520,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('20.379,51 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('9,70% sobre el precio de compra');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('230.379,51 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos de la operación');
+    expect((await lineasPanelCcaa(page)).map(sinEspacioPct)).toEqual(['ITP General 9%', 'AJD (renuncia) 1,5%', 'IVA (renuncia) 21%']);
+
+    // b) Renuncia.
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^IVA \(/))).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('44.100,00 €');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD \(/))).toBe('AJD (1,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('3150,00 €');
+    expect(await descripcionTarjeta(page, 'AJD (')).toBe(
+      'Tipo general de la comunidad: algunas CCAA aplican un tipo de AJD incrementado en la renuncia',
+    );
+    expect(await valorTarjeta(page, 'Gastos de notaría (IVA incluido)')).toBe('731,10 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (IVA incluido)')).toBe('228,41 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('48.729,51 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('23,20% sobre el precio de compra');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('258.729,51 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos (antes de deducir el IVA si tienes derecho)');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Navarra (territorio foral), gestoría 750 €, en el límite del arancel notarial
+   * (RD 1426/1989, nº 2.1: lo que excede de 6.010.121,04 € es de libre acuerdo).
+   *   a) Renuncia a 6.010.121,04 € (el límite exacto, todavía reglado): IVA × 21 % = 1.262.125,4184 →
+   *      1.262.125,42 · AJD × 0,5 % = 30.050,6052 → 30.050,61 · notaría 4388,71 (3761,75-5015,67) ·
+   *      registro 1606,80. Total = 1.298.921,54 € (21,61 %); coste 7.309.042,58 €, DEFINITIVO.
+   *   b) Compra habitual a 6.010.121,05 € (un céntimo más): ITP × 6 % = 360.607,263 → 360.607,26;
+   *      notaría y registro iguales (el arancel no sube). Total = 360.607,26 + 4388,71 + 1606,80 +
+   *      750 = 367.352,77 € (6,11 %), PARCIAL por la notaría de libre acuerdo; coste 6.377.473,82 €.
+   *   c) Invariante en la rama foral: gestoría «7.50.0» → el total baja 750,00 (366.602,77 €, 6,10 %)
+   *      y el cierre lo nombra con la dirección correcta: «será mayor».
+   */
+  test('CASO 2 (límite) — Navarra, 6.010.121,04 € y un céntimo más: la notaría pasa a libre acuerdo y el cierre a parcial; la gestoría ilegible con su dirección', async ({ page }) => {
+    expect(TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === 'Navarra')?.tipo).toBe(6);
+    expect(ITP_CCAA.navarra.ajd).toBe(0.5);
+    expect(ITP_CCAA.navarra.ajdRenuncia).toBeUndefined();
+    expect(LIMITE_ARANCEL_NOTARIAL).toBe(6010121.04);
+
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'navarra');
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await sembrarValor(page, CAMPO_PRECIO, '6.010.121,04');
+    await sembrarValor(page, CAMPO_GESTORIA, '750');
+
+    // a) Renuncia en el límite exacto: todo reglado, cierre definitivo.
+    expect(await valorTarjeta(page, 'IVA (')).toBe('1.262.125,42 €');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD \(/))).toBe('AJD (0,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('30.050,61 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría (IVA incluido)')).toBe('4388,71 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 3761,75 € y 5015,67 €.');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (IVA incluido)')).toBe('1606,80 €');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1.298.921,54 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('21,61% sobre el precio de compra');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('7.309.042,58 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos (antes de deducir el IVA si tienes derecho)');
+    expect((await lineasPanelCcaa(page)).map(sinEspacioPct)).toEqual(['ITP General 6%', 'AJD (renuncia) 0,5%', 'IVA (renuncia) 21%']);
+
+    // b) Compra habitual, un céntimo por encima del límite.
+    await page.getByRole('button', { name: /Compra habitual/ }).click();
+    await sembrarValor(page, CAMPO_PRECIO, '6.010.121,05');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (6,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('360.607,26 €');
+    await expect(page.locator('h3', { hasText: /^(AJD|IVA)/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría (IVA incluido)')).toBe('4388,71 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toBe(
+      'Arancel hasta 6.010.121,04 €: factura estimada entre 3761,75 € y 5015,67 €. Lo que excede de ese valor no tiene arancel: sus honorarios son de libre acuerdo con el notario (RD 1426/1989, número 2), así que la factura real puede ser mayor.',
+    );
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (IVA incluido)')).toBe('1606,80 €');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('367.352,77 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '6,11% sobre el precio de compra — SIN la parte de la notaría de libre acuerdo (el valor que excede de 6.010.121,04 €)',
+    );
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('6.377.473,82 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('No incluye la parte de la notaría de libre acuerdo: el coste real puede ser mayor');
+
+    // c) La gestoría ilegible en la rama foral: baja exactamente 750,00 y dice «será mayor».
+    await sembrarValor(page, CAMPO_GESTORIA, '7.50.0');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('366.602,77 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '6,10% sobre el precio de compra — SIN la gestoría, que no se ha podido leer — SIN la parte de la notaría de libre acuerdo (el valor que excede de 6.010.121,04 €)',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('6.376.723,82 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(
+      'No incluye la gestoría, que no se ha podido leer, ni la parte de la notaría de libre acuerdo: el coste real será mayor',
+    );
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — Melilla, donde la renuncia no existe (botón desactivado).
+   *   Precio «1e5» y «12abc» → ilegibles (`parseSpanishNumber` ya no admite exponentes ni prefijos):
+   *   ninguna tarjeta y el marcador los nombra. «   » → el control lo limpia a vacío y pide el
+   *   precio. «80 000 €» pegado → el control quita espacio y símbolo y lee 80.000.
+   *   80.000 €: ITP 80.000 × 6 % × 50 % = 2400,00 (3,00 %); notaría 437,75 (375,21-500,29) y
+   *   registro 121,68 sin IPSI. Gestoría 300 → total 3259,43 (4,07 %) parcial por el IPSI de los
+   *   honorarios, coste 83.259,43. Gestoría «300 euros» (pegada con la palabra) → «Sin leer», total
+   *   2959,43 (3,70 %), coste 82.959,43 y «será mayor»: 300,00 menos, en la dirección que se dice.
+   *   Reparto del IBI de 2028 (bisiesto), escritura 01/03/2028, 183 € → 30,00 € · 60 días y
+   *   153,00 € · 306 días; «-183» se nombra como negativa, no reparte y el coste no se mueve.
+   */
+  test('CASO 3 (rechazo) — Melilla: «1e5», «12abc» y «   » no publican cifra; «80 000 €» pegado se lee; la gestoría «300 euros» falta en la dirección que se dice; el IBI bisiesto y el negativo', async ({ page }) => {
+    expect(ITP_CCAA.melilla.tipoGeneral).toBe(6);
+    expect(BONIFICACION_CUOTA_CEUTA_MELILLA).toBe(0.5);
+    expect(TERRITORIOS_SIN_RENUNCIA).toContain('melilla');
+    expect(TERRITORIOS_SIN_IVA.melilla?.impuesto).toBe('IPSI');
+
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'melilla');
+    await expect(page.getByRole('button', { name: /renuncia a la exención/i })).toBeDisabled();
+    const marcador = page.locator('[class*="placeholder"] p');
+    const tarjetas = page.locator('[class*="resultados"] h3');
+
+    for (const v of ['1e5', '12abc']) {
+      await sembrarValor(page, CAMPO_PRECIO, v);
+      await expect(tarjetas, v).toHaveCount(0);
+      await expect(marcador, v).toHaveText(
+        `No se ha podido leer el precio «${v}». Introduce el precio de la finca rústica para ver el desglose de gastos, con coma decimal (80.000 o 80000,50)`,
+      );
+    }
+    await sembrarValor(page, CAMPO_PRECIO, '   ', { esperado: '' });
+    await expect(tarjetas).toHaveCount(0);
+    await expect(marcador).toHaveText('Introduce el precio de la finca rústica para ver el desglose de gastos');
+    expect(await page.locator('body').innerText()).not.toMatch(/NaN|undefined|Infinity/);
+
+    await sembrarValor(page, CAMPO_PRECIO, '80 000 €', { esperado: '80000' });
+    await sembrarValor(page, CAMPO_GESTORIA, '300');
+    expect(await valorTarjeta(page, 'Precio de la finca rústica')).toBe('80.000,00 €');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (3,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('2400,00 €');
+    expect(await descripcionTarjeta(page, 'ITP (')).toBe(
+      'Tipo general del 6% con la bonificación del 50% de la cuota ya aplicada (art. 57 bis TRLITPAJD). No incluye posibles reducciones agrarias',
+    );
+    expect(await valorTarjeta(page, 'Gastos de notaría (sin IPSI)')).toBe('437,75 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 375,21 € y 500,29 €.');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (sin IPSI)')).toBe('121,68 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('3259,43 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(`4,07% sobre el precio de compra${sinHonorarios('IPSI')}`);
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('83.259,43 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IPSI'));
+
+    await sembrarValor(page, CAMPO_GESTORIA, '300 euros');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2959,43 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      `3,70% sobre el precio de compra — SIN la gestoría, que no se ha podido leer${sinHonorarios('IPSI')}`,
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('82.959,43 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('No incluye la gestoría, que no se ha podido leer: el coste real será mayor');
+
+    const bloque = page.locator('section[aria-labelledby="titulo-prorrateo"]');
+    await sembrarValor(page, bloque.locator('input[type="date"]'), '2028-03-01');
+    await sembrarValor(page, I13_IBI, '183');
+    const filas = bloque.locator('tbody tr');
+    await expect(filas).toHaveCount(1);
+    await expect(filas).toContainText('30,00 € · 60 días');
+    await expect(filas).toContainText('153,00 € · 306 días');
+    await expect(bloque).toContainText('el comprador le abona en la firma 153,00 €');
+
+    await sembrarValor(page, I13_IBI, '-183');
+    await expect(bloque.getByRole('alert')).toContainText('«Cuota anual del IBI» no puede ser negativa: escribe el importe sin signo menos.');
+    await expect(bloque.locator('table')).toHaveCount(0);
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('82.959,43 €');
+  });
+
+  /**
+   * [21/10-a] (contenido, medio) — lo que la reparación del 3270 (edadd9d8, 19/10/2026) no llevó a
+   * las demás bocas de la página. Forma de los hallazgos 3395 (estimador, «entre empresarios» en
+   * DERIVACIONES) y 3404 (local-comercial, RESPUESTA_IMPUESTO_COMPRA) de esta misma tanda.
+   * Ley 37/1992, art. 20.Dos (BOE-A-1992-28740, leído el 21/10/2026): las exenciones de los
+   * números 20.º y 22.º «podrán ser objeto de renuncia por el sujeto pasivo […] cuando el adquirente
+   * sea un sujeto pasivo que actúe en el ejercicio de sus actividades empresariales o profesionales y
+   * se le atribuya el derecho a efectuar la deducción total o parcial del Impuesto soportado al
+   * realizar la adquisición» (o, si no, por el destino previsible de los bienes). El derecho a
+   * deducir se le pide al ADQUIRENTE; al vendedor, solo ser sujeto pasivo.
+   * El aviso de la renuncia y la FAQ «¿Qué es la renuncia…?» ya lo dicen así. Siguen sin decirlo:
+   *  · la FAQ «¿Se paga IVA o ITP…?» (visible y FAQPage, la misma constante) y las limitaciones,
+   *    que exigen «derecho a deducción» a las dos partes: «entre profesionales con derecho a
+   *    deducción» / «solo es válida entre empresarios o profesionales con derecho a deducción»;
+   *  · la tabla («Posible entre profesionales»), el subtítulo del hero, la meta description, la
+   *    description del JSON-LD y su featureList («… entre profesionales»), sin el requisito del
+   *    comprador.
+   *   Cantabria · renuncia · 210.000 € → IVA 44.100,00 € y AJD 3150,00 € (correctos) · esperado:
+   *   ninguna boca describe la renuncia «entre empresarios/profesionales»; si nombra requisitos, el
+   *   derecho a deducir es del comprador · obtenido: las ocho bocas citadas.
+   */
+  test('[21/10-a] la renuncia no se describe «entre profesionales» sin el derecho a deducir del comprador (art. 20.Dos LIVA)', async ({ page }) => {
+    test.fail(!I08_VER_HUECOS, 'Hallazgo 21/10-a: la renuncia descrita «entre profesionales» en ocho bocas');
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'cantabria');
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await sembrarValor(page, CAMPO_PRECIO, '210000');
+    // Preparación (pasa): la renuncia está calculada y las dos bocas reparadas el 19/10 ya ponen el
+    // requisito en el comprador, así que la página se contradice consigo misma.
+    expect(await valorTarjeta(page, 'IVA (')).toBe('44.100,00 €');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('3150,00 €');
+    expect((await i08AvisosRenuncia(page)).join(' ')).toContain(
+      'el comprador es un empresario o profesional que compra para su actividad y tiene derecho a deducir',
+    );
+    const faqRenuncia = (await i13FaqPage(page)).find((x) => /Qué es la renuncia a la exención/.test(x.q));
+    expect(faqRenuncia?.a).toContain('el comprador es un empresario o profesional que compra para su actividad con derecho a deducir');
+    const bocas = await i21BocasRenuncia(page);
+    for (const [boca, texto] of Object.entries(bocas)) expect(texto, boca).toMatch(/renuncia|Posible/i);
+    // El defecto, boca a boca.
+    for (const [boca, texto] of Object.entries(bocas)) {
+      expect.soft(texto, boca).not.toMatch(/entre (?:empresarios o )?(?:empresarios|profesionales)/);
+    }
   });
 });

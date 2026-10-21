@@ -65,13 +65,19 @@
  *      ca9ab312: la venta cruzando tramo con otras rentas (La Rioja, del 21 % al 23 %), Ceuta en el
  *      30 % con la deducción proporcional del art. 68.4 LIRPF, las otras rentas ilegibles en Ceuta y
  *      un hallazgo con `test.fail()` (cabo C0284: el vendedor de la obra nueva es el promotor).
+ *  28. INSPECTOR 21/10/2026 — re-inspección tras f6de548d, 1084f12f, e2c8819a y 616e5fc8 (la familia
+ *      del 20/10/2026): Castilla y León con cifra de comprador y un vendedor de 15 años, el TRAMO DEL
+ *      27 % de la escala del ahorro cruzado al euro con otras rentas (Galicia), un valor catastral
+ *      total «0» con el método real ganando (Asturias) y un hallazgo con `test.fail()`: la DT 9.ª.
  *
  * ⚠️ 06/10/2026 — los bloques «✅ REPARADO» (antes «❌ ABIERTO») describen el defecto TAL
  * COMO SE VIO el día de su inspección, con los verbos de entonces. A 13/10/2026 la base no
  * tenía ninguno abierto en esta app: los únicos `test.fail()` vivos son los de la sección 25.
- * ⚠️ 18/10/2026 — siguen ABIERTOS en la base los cinco de la sección 25 (hallazgos 3247-3251). El
- *    [18/10-a] de la sección 26 (hallazgo 3368) se reparó ese mismo día.
- * ⚠️ 19/10/2026 — los cinco de la sección 25 siguen abiertos; se suma el [19/10-a] de la sección 27.
+ * ✅ 18/10/2026 — entonces seguían abiertos en la base los cinco de la sección 25 (hallazgos
+ *    3247-3251); el [18/10-a] de la sección 26 (hallazgo 3368) se reparó ese mismo día.
+ * ✅ 19/10/2026 — a los cinco de la sección 25 se sumó el [19/10-a] de la sección 27. Los seis se
+ *    REPARARON el 20/10/2026 (f6de548d y 616e5fc8): a 21/10/2026 la base no tiene ninguno abierto, y
+ *    el único `test.fail()` vivo es el [21/10-a] de la sección 28.
  * ⚠️ 13/10/2026 — las secciones que fijan la notaría y el registro de ANTES del 11/10/2026
  * (371,84 €, 80,21 €…) fallan desde a3c3ecb0: su puesta al día es el cabo C0209.
  * ✅ 17/10/2026 (cabo C0209) — puestas al día: cada cifra se recalculó a mano con la base del BOE
@@ -7737,7 +7743,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (hallazgo 3247; contenido, bajo; sigue abierto el 18/10) — [13/10-a] En Ceuta y Melilla la cuota del IRPF ya
+   * ✅ REPARADO 20/10/2026 (abierto el 13/10/2026; hallazgo 3247; contenido, bajo) — [13/10-a] En Ceuta y Melilla la cuota del IRPF ya
    * lleva restada la deducción del 60 % del art. 68.4 LIRPF, pero la tarjeta solo lo dice cuando no
    * tiene otro aviso: `avisoTarjeta(...)` SUSTITUYE la descripción entera («No resta la plusvalía
    * municipal…», «No se han podido leer…»), y la frase de la deducción va en la rama de reserva.
@@ -7762,7 +7768,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (hallazgo 3248; contenido, bajo; sigue abierto el 18/10) — [13/10-b] La forma del 1593 de solar, aquí en la
+   * ✅ REPARADO 20/10/2026 (abierto el 13/10/2026; hallazgo 3248; contenido, bajo) — [13/10-b] La forma del 1593 de solar, aquí en la
    * pregunta que más la necesita. RESPUESTA_ITP_GARAJE_SEGUNDA_MANO (metadata.ts, la FAQ visible y
    * el FAQPage) dice que el garaje suelto paga el ITP «al tipo general de su comunidad autónoma,
    * que va del 6 % al 13 %», sin la salvedad de Ceuta y Melilla, donde la app cobra el 3 %: el 6 %
@@ -7787,7 +7793,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (hallazgo 3249; contenido, bajo; sigue abierto el 18/10) — [13/10-c] Residuo del 3071 (10/10/2026), que llegó al
+   * ✅ REPARADO 20/10/2026 (abierto el 13/10/2026; hallazgo 3249; contenido, bajo) — [13/10-c] Residuo del 3071 (10/10/2026), que llegó al
    * motor y a la tarjeta pero no a RESPUESTA_PLUSVALIA_GARAJE (la FAQ visible y el FAQPage). La
    * respuesta da por universales las reglas del TRLRHL —«Desde 2021, puede elegir entre el método
    * objetivo y el real», el art. 104.5 y «Esta calculadora aplica un tipo del 25 %…, con un máximo
@@ -7821,7 +7827,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (hallazgo 3250; dato, bajo; sigue abierto el 18/10) — [13/10-d] El sello de ITP/AJD/IVA (NOTA_DATOS de page.tsx)
+   * ✅ REPARADO 20/10/2026 (abierto el 13/10/2026; hallazgo 3250; dato, bajo) — [13/10-d] El sello de ITP/AJD/IVA (NOTA_DATOS de page.tsx)
    * dice «en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un 50 % (art. 57 bis.1
    * TRLITPAJD)». El art. 57 bis.1 es el de la cuota gradual de AJD de los documentos notariales; la
    * de las transmisiones de inmuebles es el 57 bis.3.a (TRLITPAJD, BOE-A-1993-25359, leído el
@@ -7838,7 +7844,7 @@ test.describe('Inspector 13/10/2026 — la rebaja del arancel, Melilla en las do
   });
 
   /**
-   * ❌ ABIERTO 13/10/2026 (hallazgo 3251; contenido, bajo; sigue abierto el 18/10) — [13/10-e] La forma del 2915/2917/2921 (la nota de
+   * ✅ REPARADO 20/10/2026 (abierto el 13/10/2026; hallazgo 3251; contenido, bajo) — [13/10-e] La forma del 2915/2917/2921 (la nota de
    * Canarias, corregida el 06/10) en la nota de MADRID, que se pinta por defecto: «ITP más bajo de
    * España peninsular (6 %)». Navarra, peninsular, tiene el mismo 6 % (TIPOS_ITP_CCAA_2025, y el
    * recuadro de esta app lo rotula así), y en la vivienda el País Vasco cobra el 4 %: la nota vive en
@@ -8215,12 +8221,14 @@ test.describe('Inspector 18/10/2026 — obra nueva vinculada, el tope de los dos
 //                  silencio, se nombran y la dirección (cuota mayor, neto menor) sale del sondeo. Y un
 //                  negativo se acota a 0, como cualquier importe de la familia.
 //
-// Hallazgo NUEVO, con `test.fail()` (afirma lo que DEBERÍA pasar), al final del bloque:
-//   [19/10-a] (cabo C0284) con «Primera mano (obra nueva)» la pestaña Vendedor liquida la venta como
+// Hallazgo nuevo de aquel día, escrito con `test.fail()` y REPARADO el 20/10/2026 (616e5fc8, hallazgo
+// 3379; ya va sin la marca), al final del bloque:
+//   [19/10-a] (cabo C0284) con «Primera mano (obra nueva)» la pestaña Vendedor liquidaba la venta como
 //             la ganancia patrimonial de un particular en la base del ahorro, y quien vende en una
 //             primera entrega es el promotor.
-// Siguen abiertos los cinco de la sección 25 (3247-3251). El GC vuelve a mostrar el 3247: con las
-// otras rentas ilegibles en Ceuta la tarjeta del IRPF pierde la frase de la deducción.
+// Seguían abiertos entonces los cinco de la sección 25 (3247-3251), REPARADOS el 20/10/2026
+// (f6de548d). El GC volvió a mostrar el 3247: con las otras rentas ilegibles en Ceuta la tarjeta del
+// IRPF perdía la frase de la deducción.
 //
 // De dónde sale cada cifra esperada (ninguna de memoria):
 //   · ITP → `ITP_CCAA.rioja.tipoGeneral` (TIPOS_ITP_CCAA_2025: La Rioja 7) y, en Ceuta, su
@@ -8484,5 +8492,332 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
     expect(await i24Valor(page, /^Impuesto sobre la renta de la venta/)).toBe('Sin calcular');
     expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
     expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('29.850,00 €');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 28. INSPECTOR 21/10/2026 — RE-INSPECCIÓN tras la familia del 20/10/2026: f6de548d (3247-3251: la
+//     deducción de Melilla tras un aviso, la FAQ del ITP y la de la plusvalía, el sello del 57 bis y la
+//     nota de Madrid), 1084f12f (3378), e2c8819a (2911: el total catastral ilegible en «Valor de
+//     transmisión») y 616e5fc8 (3379: el vendedor de la obra nueva es el promotor). Las secciones 25 y
+//     27 los vigilan ya sin `test.fail()`, y pasan.
+//
+// Tres casos en sitios que ninguna sección había medido con cifra, resueltos a mano ANTES de abrir la
+// app; cuadraron al céntimo a la primera:
+//   HA (normal)  — CASTILLA Y LEÓN · segunda mano · 40.000 €: el comprador entero (la sección de
+//                  27/08 solo medía la escala a 300.000 €) y un vendedor de 15 AÑOS (coeficiente 0,09,
+//                  sin estrenar) cuya ganancia cruza por 65 € los 6.000 € del primer tramo.
+//   HB (límite)  — GALICIA · 30.000 €: el TRAMO DEL 27 % de la escala del ahorro (de 200.000 a 300.000
+//                  €), que ninguna sección pisaba (sí el 21, el 23 y el 30 %), cruzado AL EURO con las
+//                  otras rentas del ahorro: 190.180 € (la venta acaba justo en 200.000), 190.181 € (el
+//                  último euro ya al 27 %) y 195.000 €.
+//   HC (rechazo) — ASTURIAS · 30.000 €: un valor catastral total «0» escrito, con un par en el que el
+//                  método REAL ganaría. El 0 no es un total: no se divide por él ni se compara, se
+//                  liquida el objetivo y se pide corregirlo, distinto del campo vacío.
+// Y la regresión de e2c8819a (2911), que llegó a page.tsx sin testigo en este fichero: «Valor de
+// transmisión» con el total catastral ilegible (base R del testigo de familia).
+//
+// Hallazgo NUEVO, con `test.fail()` (afirma lo que DEBERÍA pasar), al final del bloque:
+//   [21/10-a] con 32 años o más de propiedad la compra es anterior a 1995, y la página no dice en
+//             ningún sitio que no aplica los coeficientes de abatimiento de la DT 9.ª LIRPF, que la
+//             referencia (estimador-compraventa-inmueble) sí nombra y que data/fiscal/ganancia-inmueble.ts
+//             manda decir «en vez de aproximarlo».
+//
+// De dónde sale cada cifra esperada (ninguna de memoria):
+//   · ITP → `TIPOS_ITP_CCAA_2025` vía `ITP_CCAA` (Castilla y León 8 % con escala 8/10 % y corte en
+//     250.000 €; Galicia 8 % plano; Asturias 8 % hasta 300.000 €).
+//   · Notaría → `ARANCELES_NOTARIO` (RD 1426/1989, nº 2.1) × (1 − `REBAJA_ARANCEL_CUANTIA`) × 1,21 y
+//     la horquilla ×1,5 / ×2 de `FACTURA_NOTARIAL` (la tarjeta, ×1,75) · Registro → `ARANCELES_REGISTRO`
+//     × 0,95 + `REGISTRO_CONCEPTOS` (6,010121 + 3,005061), × 1,21.
+//   · Plusvalía → `COEFICIENTES_IIVTNU_2025` (5 años 0,18 · 6 años 0,19 · 15 años 0,09 · 20 o más 0,40)
+//     × 25 % (`PLUSVALIA_MUNICIPAL_META.tipoOrientativo`); el real, (venta − compra) × suelo / total × 25 %.
+//   · IRPF → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` sobre la base del ahorro ENTERA (art. 66 LIRPF):
+//     lo que la venta añade es cuota(otras + ganancia) − cuota(otras).
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** El vendedor de HA (Castilla y León, 15 años), sobre la pestaña Vendedor ya abierta. */
+const I21_VENDEDOR_CYL: readonly [string, string][] = [
+  ['Precio de compra original del garaje', '30000'],
+  ['Impuestos y gastos que pagaste al comprarlo (€)', '2400'],
+  ['Años de propiedad', '15'],
+  ['Valor catastral del suelo (€)', '6000'],
+  ['Valor catastral total (suelo + construcción) (€)', '15000'],
+  ['Comisión inmobiliaria del vendedor (%)', '3'],
+  ['Gestoría y certificados del vendedor (€)', '200'],
+];
+
+/** El vendedor de HB (Galicia): sin gastos de aquella compra, sin comisión y sin gestoría de la venta. */
+const I21_VENDEDOR_GALICIA: readonly [string, string][] = [
+  ['Precio de compra original del garaje', '20000'],
+  ['Años de propiedad', '5'],
+  ['Valor catastral del suelo (€)', '4000'],
+  ['Valor catastral total (suelo + construcción) (€)', '10000'],
+  ['Comisión inmobiliaria del vendedor (%)', '0'],
+];
+
+const I21_TOTAL_CATASTRAL = 'Valor catastral total (suelo + construcción) (€)';
+
+test.describe('Inspector 21/10/2026 — Castilla y León, el tramo del 27 % al euro y un total catastral «0»', () => {
+  /**
+   * CASO HA (NORMAL) — CASTILLA Y LEÓN · segunda mano · 40.000 € · General · gestoría 300 (la de serie).
+   *   ITP: el primer tramo de la escala llega a 250.000 €, así que 40.000 × 8 % = 3.200,00 € (8,00 %).
+   *   Notaría: 90,151816 + 24.040,49 × 0,45 % (108,182205) + 9.949,39 × 0,15 % (14,924085) = 213,258106
+   *     × 0,95 = 202,595201 × 1,21 = 245,140193 → ×1,5 = 367,71 · ×2 = 490,28 · ×1,75 = 428,995 → 429,00 €.
+   *   Registro: 24,040484 + 24.040,49 × 0,175 % (42,0708575) + 9.949,39 × 0,125 % (12,4367375) =
+   *     78,548079 × 0,95 = 74,620675 + 9,015182 = 83,635857 × 1,21 = 101,199387 → 101,20 €.
+   *   Total: 3.200 + 429,00 + 101,20 + 300 = 4.030,20 € (10,0755 % → 10,08 %) · coste 44.030,20 €.
+   *   Recuadro: «ITP General 8,00 %» y el AJD nominal de la ficha (1,5 %).
+   * Vendedor: compra 30.000 · gastos de aquella compra 2.400 · 15 años · suelo 6.000 · total 15.000 ·
+   *   comisión 3 % · gestoría 200.
+   *   Comisión 40.000 × 3 % = 1.200,00.
+   *   Plusvalía: objetivo 6.000 × 0,09 × 25 % = 135,00 · real 10.000 × (6.000 / 15.000) × 25 % = 1.000,00
+   *     → el objetivo, 135,00 €.
+   *   Adquisición 30.000 + 2.400 = 32.400 · transmisión 40.000 − 1.200 − 200 − 135 = 38.465 ·
+   *     ganancia 6.065,00 € → IRPF 6.000 × 19 % + 65 × 21 % = 1.140 + 13,65 = 1.153,65 €.
+   *   Total gastos 135 + 1.200 + 200 + 1.153,65 = 2.688,65 € · neto 40.000 − 2.688,65 = 37.311,35 €.
+   *   Lo que vigila: con el coeficiente de 2022 (0,09 ya era el de 15 años, pero el de 14 o 16 no) o con
+   *   un 19 % plano saldría 1.152,35 € (−1,30); con el método real, 1.000 € de plusvalía. Al céntimo.
+   */
+  test('CASO HA (normal) — Castilla y León 40.000 €: ITP del 8 % del primer tramo, y un vendedor de 15 años que cruza los 6.000 €', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA['castilla-leon'].tipoGeneral).toBe(8);
+    expect(ITP_CCAA['castilla-leon'].tramosProgresivos).toEqual([
+      { hasta: 250000, tipo: 8 },
+      { hasta: Infinity, tipo: 10 },
+    ]);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 15)?.coeficiente).toBe(0.09);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(REBAJA_ARANCEL_CUANTIA).toBe(0.05);
+
+    await i19Abrir(page, 'castilla-leon', '40000');
+    expect(await valorPanelCcaa(page, 'ITP General')).toBe('8,00 %');
+    expect(await valorPanelCcaa(page, 'AJD')).toBe(`${formatTipoNominal(ITP_CCAA['castilla-leon'].ajd)} %`);
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (8,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('3200,00 €');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('429,00 €');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('Factura estimada entre 367,71 € y 490,28 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('101,20 €');
+    expect(await i24Valor(page, /^Gastos de gestoría/)).toBe('300,00 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('4030,20 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe('10,08 % sobre el precio');
+    expect(await i24Titulo(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('44.030,20 €');
+
+    await i19Vendedor(page, I21_VENDEDOR_CYL);
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('135,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método objetivo (más favorable)');
+    expect(await i24Valor(page, /^Valor de adquisición/)).toBe('32.400,00 €');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('38.465,00 €');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('6065,00 €');
+    expect(await i24Titulo(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('1153,65 €');
+    expect(await i24Titulo(page, /^Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (3 %)');
+    expect(await i24Valor(page, /^Comisión inmobiliaria/)).toBe('1200,00 €');
+    expect(await i24Valor(page, /^Gestoría y certificados/)).toBe('200,00 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('2688,65 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('37.311,35 €');
+    expect(await i24Desc(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes tras gastos e impuestos');
+  });
+
+  /**
+   * CASO HB (LÍMITE) — GALICIA · segunda mano · 30.000 € · General · gestoría 300 (la de serie).
+   *   ITP: 30.000 × 8 % = 2.400,00 € (sin escala).
+   *   Notaría: 90,151816 + 23.989,88 × 0,45 % (107,95446) = 198,106276 × 0,95 = 188,200962 × 1,21 =
+   *     227,723164 → ×1,5 = 341,58 · ×2 = 455,45 · ×1,75 = 398,515537 → 398,52 €.
+   *   Registro: 24,040484 + 23.989,88 × 0,175 % (41,98229) = 66,022774 × 0,95 = 62,721635 + 9,015182 =
+   *     71,736817 × 1,21 = 86,801549 → 86,80 €.
+   *   Total: 2.400 + 398,52 + 86,80 + 300 = 3.185,32 € (10,62 %) · coste 33.185,32 €.
+   * Vendedor: compra 20.000 · 5 años · suelo 4.000 · total 10.000 · comisión 0 (sin tarjeta) · sin
+   *   gastos de aquella compra ni gestoría de la venta.
+   *   Plusvalía: objetivo 4.000 × 0,18 × 25 % = 180,00 · real 10.000 × 0,4 × 25 % = 1.000 → 180,00 €.
+   *   Adquisición 20.000 · transmisión 30.000 − 180 = 29.820 · ganancia 9.820,00 €.
+   *   · Sin otras rentas: 1.140 + 3.820 × 21 % = 1.942,20 € · total 2.122,20 · neto 27.877,80 €.
+   *   · Con 190.180 €: la venta ocupa [190.180, 200.000], todo al 23 %: 9.820 × 23 % = 2.258,60 €
+   *     (= cuota(200.000) 44.880,00 − cuota(190.180) 42.621,40) · total 2.438,60 · neto 27.561,40 €.
+   *   · Con 190.181 €: el último euro ya cae en el 27 %: 9.819 × 23 % + 1 × 27 % = 2.258,37 + 0,27 =
+   *     2.258,64 € · total 2.438,64 · neto 27.561,36 €.
+   *   · Con 195.000 €: 5.000 × 23 % + 4.820 × 27 % = 1.150 + 1.301,40 = 2.451,40 € (= cuota(204.820)
+   *     46.181,40 − cuota(195.000) 43.730,00) · total 2.631,40 · neto 27.368,60 €.
+   *   Lo que vigila: el corte de los 200.000 € al euro. Un 23 % plano sobre toda la venta con 195.000 €
+   *   saldría 2.258,60 (192,80 menos), y un 27 % plano, 2.651,40. Los cuatro céntimos del segundo paso son
+   *   el defecto que se mide: van al céntimo.
+   */
+  test('CASO HB (límite) — Galicia 30.000 €: la venta cruza al euro los 200.000 € de la base del ahorro y entra en el 27 %', async ({
+    page,
+  }) => {
+    expect(ITP_CCAA.galicia.tipoGeneral).toBe(8);
+    expect(ITP_CCAA.galicia.tramosProgresivos).toBeUndefined();
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 5)?.coeficiente).toBe(0.18);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.slice(2, 4)).toEqual([
+      { hasta: 200000, tipo: 23 },
+      { hasta: 300000, tipo: 27 },
+    ]);
+
+    await i19Abrir(page, 'galicia', '30000');
+    expect(await i24Titulo(page, /^ITP/)).toBe('ITP (8,00 %)');
+    expect(await i24Valor(page, /^ITP/)).toBe('2400,00 €');
+    expect(await i24Valor(page, /^Gastos de notaría/)).toBe('398,52 €');
+    expect(await i24Desc(page, /^Gastos de notaría/)).toContain('Factura estimada entre 341,58 € y 455,45 €');
+    expect(await i24Valor(page, /^Registro de la Propiedad/)).toBe('86,80 €');
+    expect(await i24Valor(page, /^Total gastos adicionales/)).toBe('3185,32 €');
+    expect(await i24Desc(page, /^Total gastos adicionales/)).toBe('10,62 % sobre el precio');
+    expect(await i24Valor(page, /^COSTE TOTAL/)).toBe('33.185,32 €');
+
+    await i19Vendedor(page, I21_VENDEDOR_GALICIA);
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('180,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método objetivo (más favorable)');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('29.820,00 €');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('9820,00 €');
+    // Comisión 0: su tarjeta no se pinta (no hay importe que descontar).
+    await expect(page.locator('[role="tabpanel"] h3').filter({ hasText: /^Comisión inmobiliaria/ })).toHaveCount(0);
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('1942,20 €');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('27.877,80 €');
+
+    const pasos: readonly [string, string, string, string][] = [
+      ['190180', '2258,60 €', '2438,60 €', '27.561,40 €'],
+      ['190181', '2258,64 €', '2438,64 €', '27.561,36 €'],
+      ['195000', '2451,40 €', '2631,40 €', '27.368,60 €'],
+    ];
+    for (const [otras, irpf, total, neto] of pasos) {
+      await sembrarImporte(page, I19_OTRAS_RENTAS, otras);
+      expect(await i24Valor(page, /^IRPF sobre ganancia/), `IRPF con ${otras} € de otras rentas`).toBe(irpf);
+      expect(await i24Valor(page, /^Total gastos vendedor/), `total con ${otras} €`).toBe(total);
+      expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/), `neto con ${otras} €`).toBe(neto);
+    }
+    expect(await i18DescCruda(page, /^IRPF sobre ganancia/)).toBe(
+      'Tributación en base del ahorro (del 19 % al 30 %). Es lo que esta venta añade a tu cuota, sumada a 195.000,00 € de otras rentas del ahorro del año.',
+    );
+    // La ganancia no se mueve con las otras rentas, y el neto sigue completo: no falta nada.
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('9820,00 €');
+    expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+  });
+
+  /**
+   * CASO HC (RECHAZO) — ASTURIAS · 30.000 € · vendedor: compra 28.000 · 6 años · suelo 6.000 · total
+   *   catastral «0» · comisión 3 %.
+   *   El 0 no es un total: no se puede repartir el incremento con él (suelo / 0) ni compararlo. La
+   *   plusvalía se liquida por el objetivo, 6.000 × 0,19 × 25 % = 285,00 €, y la tarjeta pide corregir el
+   *   0 (no dice que «falta»: está escrito, y el blur lo conserva).
+   *   Comisión 900 · transmisión 30.000 − 900 − 285 = 28.815 · ganancia 815,00 € · IRPF 815 × 19 % =
+   *   154,85 € · total 285 + 900 + 154,85 = 1.339,85 € · neto 28.660,15 €.
+   *   CONTROL con un total legible de 12.000: real 2.000 × 0,5 × 25 % = 250,00 < 285 → «Método real» ·
+   *   transmisión 28.850 · ganancia 850 · IRPF 161,50 · total 1.311,50 · neto 28.688,50 €. Es la prueba de
+   *   que, con el «0», la app NO estaba usando ningún total: el real habría ganado.
+   *   Y vacío: el mismo objetivo con «falta el valor catastral total para comparar».
+   */
+  test('CASO HC (rechazo) — un valor catastral total «0» no se usa como total: objetivo, y se pide corregirlo', async ({
+    page,
+  }) => {
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 6)?.coeficiente).toBe(0.19);
+
+    await i19Abrir(page, 'asturias', '30000');
+    await i19Vendedor(page, [
+      ['Precio de compra original del garaje', '28000'],
+      ['Años de propiedad', '6'],
+      ['Valor catastral del suelo (€)', '6000'],
+      [I21_TOTAL_CATASTRAL, '0'],
+      ['Comisión inmobiliaria del vendedor (%)', '3'],
+    ]);
+    await expect(page.locator(`input[aria-label="${I21_TOTAL_CATASTRAL}"]`)).toHaveValue('0');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('285,00 €');
+    const motivo = await i24Desc(page, /^Plusvalía municipal/);
+    expect(motivo).toBe(
+      'Método objetivo (el valor catastral total escrito tiene que ser mayor que 0: corrígelo para comparar con el método real)',
+    );
+    expect(motivo).not.toContain('falta el valor catastral total');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('28.815,00 €');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('815,00 €');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('154,85 €');
+    expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('1339,85 €');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('28.660,15 €');
+    // Ningún NaN ni «Infinity» de dividir el suelo entre el 0.
+    expect(i24Normaliza(await page.locator('#panel-vendedor').innerText())).not.toMatch(/NaN|Infinity/);
+
+    // CONTROL: con un total legible el real gana, así que el «0» no se estaba usando.
+    await sembrarImporte(page, I21_TOTAL_CATASTRAL, '12000');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('250,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método real (más favorable)');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('28.688,50 €');
+
+    // Y vacío no es lo mismo que «0»: falta, no se corrige.
+    await sembrarImporte(page, I21_TOTAL_CATASTRAL, '');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('285,00 €');
+    expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('Método objetivo (falta el valor catastral total para comparar)');
+  });
+
+  /**
+   * REPARADO 20/10/2026 (e2c8819a, hallazgo 2911 de local-comercial llevado a la familia) — sin testigo
+   * en este fichero hasta hoy. Con el valor catastral total ilegible, la plusvalía restada en «Valor de
+   * transmisión» es la del método objetivo, y la tarjeta tiene que decirlo y que el valor real puede
+   * ser MAYOR. Base R del testigo de familia: venta 25.000 · compra 24.000 · gastos 1.800 · 8 años ·
+   * suelo 5.000 · comisión 3 % · gestoría 500.
+   *   Total legible 12.000: real 1.000 × 5.000 / 12.000 × 25 % = 104,1667 < objetivo 5.000 × 0,19 × 25 %
+   *     = 237,50 → transmisión 25.000 − 750 − 500 − 104,17 = 23.645,83 €.
+   *   Total «12.000.00»: objetivo 237,50 → transmisión 23.512,50 € (133,33 € menos), con el aviso.
+   */
+  test('REPARADO 2911 (e2c8819a) — con el total catastral ilegible, «Valor de transmisión» dice que el real puede ser MAYOR', async ({
+    page,
+  }) => {
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 8)?.coeficiente).toBe(0.19);
+    await i19Abrir(page, 'madrid', '25000');
+    await i19Vendedor(page, [
+      ['Precio de compra original del garaje', '24000'],
+      ['Impuestos y gastos que pagaste al comprarlo (€)', '1800'],
+      ['Años de propiedad', '8'],
+      ['Valor catastral del suelo (€)', '5000'],
+      [I21_TOTAL_CATASTRAL, '12000'],
+      ['Comisión inmobiliaria del vendedor (%)', '3'],
+      ['Gestoría y certificados del vendedor (€)', '500'],
+    ]);
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('23.645,83 €');
+    expect(await i24Desc(page, /^Valor de transmisión/)).toBe('Precio de venta − comisión, gestoría y plusvalía municipal');
+
+    await sembrarImporte(page, I21_TOTAL_CATASTRAL, '12.000.00');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('237,50 €');
+    expect(await i24Valor(page, /^Valor de transmisión/)).toBe('23.512,50 €');
+    expect(await i24Desc(page, /^Valor de transmisión/)).toBe(
+      'Precio de venta − comisión, gestoría y plusvalía municipal. El valor catastral total no se ha podido leer, así que la plusvalía restada es la del método objetivo y el valor real puede ser MAYOR',
+    );
+  });
+
+  /**
+   * ❌ ABIERTO 21/10/2026 (contenido, bajo) — [21/10-a] Con 32 años o más de propiedad la compra es
+   * anterior al 31/12/1994 (32 años completos a 21/10/2026 = comprado antes del 22/10/1994), y la
+   * ganancia de esas compras puede reducirse con los coeficientes de abatimiento de la disposición
+   * transitoria 9.ª LIRPF, que la app no aplica. data/fiscal/ganancia-inmueble.ts, el motor que usa la
+   * tarjeta, lo pone en «LO QUE ESTE MÓDULO NO HACE (y por qué se dice en vez de aproximarlo)», y la
+   * referencia de la familia lo dice en su bloque educativo («…y los coeficientes de abatimiento de las
+   * compras anteriores a 1995. Ahí un asesor fiscal sí marca la diferencia.»). Esta app acepta hasta 50
+   * años y no lo dice en ningún sitio: ni la tarjeta del IRPF, ni el sello, ni «Limitaciones de esta
+   * calculadora». Tampoco trastero ni local-comercial (grep de «abatimiento|anteriores a 1995»).
+   *   Madrid · venta 30.000 · compra 6.000 · 35 años · suelo 3.000 · total 10.000 · comisión 3 % →
+   *   plusvalía 3.000 × 0,40 × 25 % = 300,00 (real 24.000 × 0,3 × 25 % = 1.800) · ganancia 30.000 − 900 −
+   *   300 − 6.000 = 22.800,00 · IRPF 1.140 + 16.800 × 21 % = 4.668,00 € publicado como definitivo, y el
+   *   texto de la página (sin <script>) no contiene «abatimiento», «1994», «1995» ni «transitoria».
+   *   Esperado: que lo diga, como la referencia (la cifra es un techo para esas compras).
+   */
+  test.fail('[21/10-a] con 35 años de propiedad, la página dice que no aplica los coeficientes de abatimiento de las compras anteriores a 1995', async ({
+    page,
+  }) => {
+    await i19Abrir(page, 'madrid', '30000');
+    await i19Vendedor(page, [
+      ['Precio de compra original del garaje', '6000'],
+      ['Años de propiedad', '35'],
+      ['Valor catastral del suelo (€)', '3000'],
+      [I21_TOTAL_CATASTRAL, '10000'],
+      ['Comisión inmobiliaria del vendedor (%)', '3'],
+    ]);
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('300,00 €');
+    expect(await i24Valor(page, /^Ganancia patrimonial/)).toBe('22.800,00 €');
+    expect(await i24Valor(page, /^IRPF sobre ganancia/)).toBe('4668,00 €');
+    // El texto de la página entera, también lo plegado del bloque educativo, sin <script> ni <style>.
+    const texto = await page.locator('body').evaluate((b) => {
+      const copia = b.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('script, style').forEach((s) => s.remove());
+      return (copia.textContent ?? '').replace(/\s+/g, ' ');
+    });
+    expect(texto).toMatch(/abatimiento|anteriores a 1995|31\/12\/1994|transitoria novena/i);
   });
 });

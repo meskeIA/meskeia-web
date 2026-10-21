@@ -7653,8 +7653,8 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
   /**
    * HALLAZGO 2901 [medio, dato] — el MOTOR quedó REPARADO por el triaje del 11/10/2026 (a3c3ecb0:
    * REBAJA_ARANCEL_CUANTIA en data/itp-ccaa.ts, DA 8.ª RDL 8/2010), verificado aquí el 12/10/2026:
-   * Madrid 200.000 → 721,04 € y 10.000.000 → 4.388,71 €, las cifras de abajo. El hallazgo sigue
-   * abierto en la base por el cabo C0209 (casos de las specs y textos de las hermanas); en esta app
+   * Madrid 200.000 → 721,04 € y 10.000.000 → 4.388,71 €, las cifras de abajo. El hallazgo siguió
+   * abierto en la base por el cabo C0209 hasta el 17/10/2026, cuando se dio por REPARADO; en esta app
    * el bloque educativo y el FAQPage derivan sus rangos del motor y ya publican los de la rebaja
    * (ver el caso 584). Por eso el `test.fail` pasó a `test`: hoy es la regresión del motor.
    * Era así: la notaría no aplicaba la rebaja del 5 % del
@@ -7687,8 +7687,8 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
 
   /**
    * HALLAZGO 2902 [medio, dato] — el MOTOR quedó REPARADO por el triaje del 11/10/2026 (a3c3ecb0),
-   * verificado aquí el 12/10/2026: Madrid 200.000 → 224,96 € y 10.000.000 → 2.518,74 €. Sigue
-   * abierto en la base por el cabo C0209, como el 2901; por eso el `test.fail` pasó a `test`.
+   * verificado aquí el 12/10/2026: Madrid 200.000 → 224,96 € y 10.000.000 → 2.518,74 €. Siguió
+   * abierto por el cabo C0209 hasta el 17/10/2026 (REPARADO), como el 2901; el `test.fail` ya era `test`.
    * Era así: el registro no aplicaba la rebaja del 5 % del
    * nº 2.1 del Arancel de los Registradores, que alcanza también al tope. Vive en
    * `calcularRegistro` de data/itp-ccaa.ts y llega a las siete apps de la familia.
@@ -7772,8 +7772,9 @@ test.describe('Inspector 06/10/2026 — la rebaja de los aranceles y el invarian
 // (components/NumberInput: el pegado con «€» o espacios se descartaba entero, y el aviso de error
 // no llegaba a 4,5:1). Las cuatro, VERIFICADAS aquí con su caso original y medidas en navegador.
 //
-// Siguen abiertos (no se registran de nuevo): 2901 y 2902 (la rebaja del 5 % de los aranceles) y
-// 2904 (la «Tributa» de la ganancia y la hipoteca ilegible). Los casos que miden el cálculo no
+// Seguían abiertos entonces (no se registraron de nuevo): 2901 y 2902 (la rebaja del 5 % de los
+// aranceles, REPARADOS el 17/10/2026) y 2904 (la «Tributa» de la ganancia y la hipoteca ilegible,
+// REPARADO el 20/10/2026). Los casos que miden el cálculo no
 // fijan la cifra de la notaría ni la del registro, por lo mismo que el describe del 06/10.
 //
 // Tres sospechas de SOSPECHAS.md (06/10): (a) la coma que falta antes de «ni» → hallazgo; (b) el
@@ -8505,10 +8506,9 @@ test.describe('Inspector 07/10/2026 — 390 px', () => {
 //    coeficiente máximo de 10 años = 0,58 (el art. 107.4 TRLRHL da 0,12); art. 176.2: tipo máximo
 //    del 25 %, que es también el tipo orientativo de la app (PLUSVALIA_MUNICIPAL_META).
 //
-// Siguen abiertos y NO se registran de nuevo: 2901, 2902, 2904 y 2958 a 2965 (sus test.fail siguen
-// en los describes del 06/10 y del 07/10). [Al 12/10/2026 la base ya no tiene abiertos 2958, 2959,
-// 2960 ni 2964 (REPARADOS el 08/10); de 2901 y 2902 el motor está reparado y su test.fail pasó a
-// test (describe del 06/10); siguen abiertos 2901, 2902, 2904, 2961, 2962, 2963 y 2965.]
+// Seguían abiertos entonces y NO se registraron de nuevo: 2901, 2902, 2904 y 2958 a 2965. [Todos
+// REPARADOS: 2958, 2959, 2960 y 2964 el 08/10; 2901 y 2902 el 17/10; 2904, 2961, 2962, 2963 y 2965
+// el 20/10/2026. Al 21/10/2026 la base no tiene ninguno abierto y sus casos ya no son test.fail.]
 test.describe('Inspector 08/10/2026 — Ceuta, Melilla y los territorios forales en la pestaña Vendedor', () => {
   const CAMPO_PRECIO = 'input[aria-label="Precio de la vivienda"]';
 
@@ -9511,7 +9511,7 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
   });
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (19/10/2026). La línea que 5f1b199a (3368) añadió a la caja
+   * HALLAZGO [bajo, contenido] — REPARADO el 20/10/2026 (3378); era así el 19/10/2026. La línea que 5f1b199a (3368) añadió a la caja
    * «Errores comunes al calcular los gastos de compraventa» termina en «No se compensan pérdidas de
    * otras operaciones.» En garaje la misma frase va en la lista de limitaciones y se lee como un
    * límite de la herramienta; aquí, entre errores fiscales, se lee como regla, y es falsa: el art.
@@ -9536,5 +9536,356 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
     expect(linea).toContain('la cuota será la que esta venta añade');
     expect(linea).not.toContain('No se compensan pérdidas de otras operaciones');
     expect(linea).toContain('Lo que esta calculadora no hace es compensar pérdidas de otras operaciones');
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Inspector 21/10/2026 — re-inspección tras las reparaciones del 19-20/10/2026 (58ca4c50,
+// 79ed543c, ef34f391, 1084f12f, e2c8819a, 616e5fc8 y 0dc46e32)
+//
+// Verificadas con su caso, en verde el 21/10/2026: 2904 (la «Tributa» de la ganancia nombra la
+// hipoteca ilegible), 2961, 2962, 2963 (un solo FAQPage, 13 preguntas; las siete de la FAQ visible,
+// idénticas), 2965 (pegado con «euros»), 3238, 3239, 3240, 3241, 3377 (obra nueva: vende el
+// promotor) y 3378. La base no tiene ninguno abierto.
+//
+// Tres casos nuevos, resueltos a mano ANTES de abrir la app, por caminos que el spec no pisaba:
+//   79 · Valencia: reinversión PARCIAL con hipoteca, gastos de aquella compra, mejoras y otras
+//        rentas del ahorro a la vez (ningún caso las juntaba).
+//   80 · el plazo del art. 41 bis.1 RIRPF justo en 3 años, y en 2 con la ganancia en el tramo del
+//        30 % de la escala del ahorro.
+//   81 · obra nueva (vende el promotor) con importes ilegibles: el invariante de la familia en la
+//        rama de 616e5fc8, que el testigo no mide (sus filas van sobre la BASE B, segunda mano), y
+//        la «Cuota de comunidad» del reparto (el testigo solo mide el IBI).
+//
+// Fuentes: ITP_CCAA (data/itp-ccaa.ts: Valencia 9 % hasta 1.000.000 €, Madrid 6 %),
+// COEFICIENTES_IIVTNU_2025 y PLUSVALIA_MUNICIPAL_META.tipoOrientativo (data/fiscal/inmuebles.ts),
+// TRAMOS_GANANCIAS_PATRIMONIALES_2025 (19/21/23/27/30 %) con calcularGananciaInmueble
+// (data/fiscal/ganancia-inmueble.ts: arts. 35 y 38 LIRPF, 41 RIRPF) y el art. 41 bis.1 RIRPF que
+// aplica page.tsx.
+// ══════════════════════════════════════════════════════════════════════════════
+test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo de 3 años y la obra nueva con ilegibles', () => {
+  const CAMPO_PRECIO = 'input[aria-label="Precio de la vivienda"]';
+  const OTRAS = 'Otras rentas del ahorro de este año (€)';
+
+  /** Escribe como el usuario, comprueba que el ESTADO de React lo recogió y sale del campo. */
+  async function sembrar(page: Page, etiqueta: string, valor: string): Promise<void> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+    await campo.blur();
+  }
+
+  async function abrir(page: Page, ccaa: string, primeraMano = false): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO_PRECIO]);
+    await page.locator('#ccaa-inmueble').selectOption(ccaa);
+    if (primeraMano) await page.getByRole('button', { name: /Primera mano/ }).click();
+  }
+
+  async function irAVendedor(page: Page): Promise<void> {
+    await page.getByRole('button', { name: 'Vendedor' }).click();
+    await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+  }
+
+  /**
+   * La BASE O del describe del 19/10 (300.000 · compra 200.000 · 10 años · suelo 60.000 · total
+   * 150.000 · comisión 3 %, la de fábrica), en la comunidad y la transmisión dadas. A mano:
+   * plusvalía objetivo 60.000 × 0,12 × 25 % = 1.800 (el real, 100.000 × 60/150 × 25 % = 10.000,
+   * pierde) · comisión 9.000 · transmisión 289.200 · ganancia 89.200.
+   */
+  async function baseO(page: Page, ccaa: string, primeraMano = false): Promise<void> {
+    await abrir(page, ccaa, primeraMano);
+    await sembrar(page, 'Precio de la vivienda', '300000');
+    await irAVendedor(page);
+    await sembrar(page, 'Precio de compra original', '200000');
+    await sembrar(page, 'Años de propiedad', '10');
+    await sembrar(page, 'Valor catastral del suelo', '60000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '150000');
+  }
+
+  const rotulo = async (page: Page, titulo: RegExp): Promise<string> =>
+    (await page.locator('h3', { hasText: titulo }).first().innerText()).replace(ESPACIO_DURO, ' ');
+
+  /** El texto de ayuda de un NumberInput, por su aria-describedby; null si el campo no está. */
+  async function ayudaDe(page: Page, etiqueta: string): Promise<string | null> {
+    const campo = page.locator(`input[aria-label="${etiqueta}"]`);
+    if ((await campo.count()) === 0) return null;
+    const id = await campo.getAttribute('aria-describedby');
+    if (!id) return '';
+    return (await page.locator(`[id="${id}"]`).innerText()).replace(ESPACIO_DURO, ' ');
+  }
+
+  /**
+   * CASO 79 (normal) — Valencia, segunda mano, vivienda de 260.000 €, perfil General.
+   *  Comprador: ITP_CCAA.valencia, 9 % hasta 1.000.000 € → 260.000 × 9 % = 23.400,00 € «ITP (9,00 %)».
+   *  Vendedor: compra 180.000 · 7 años · gastos de aquella compra 15.000 · mejoras 5.000 · suelo
+   *  50.000 · total 140.000 · comisión 3 % (la de fábrica) · otras rentas 20.000 · reinvierte
+   *  150.000 · hipoteca pendiente 60.000:
+   *   Plusvalía: objetivo 50.000 × 0,20 (7 años) × 25 % = 2.500 · real 80.000 × 50/140 × 25 % =
+   *     7.142,86 → el objetivo, «2500,00 €»
+   *   Comisión 7.800 · transmisión 260.000 − 7.800 − 2.500 = 249.700 · adquisición 180.000 + 15.000
+   *     + 5.000 = 200.000 · ganancia 49.700
+   *   Importe obtenido (art. 41.1 RIRPF) 249.700 − 60.000 = 189.700 · exento 150.000 / 189.700 =
+   *     79,07 % → «exento el 79,1 %» · base 49.700 × 39.700 / 189.700 = 10.401,107 → «10.401,11 €»
+   *   Cuota con 20.000 de otras rentas: toda la base cae en el 21 % → 10.401,107 × 21 % = 2.184,23
+   *   Total 2.500 + 7.800 + 2.184,23 = 12.484,23 · neto 260.000 − 12.484,23 = 247.515,77 €
+   */
+  test('CASO 79 (normal) — Valencia, 260.000: reinversión parcial con hipoteca, gastos, mejoras y otras rentas', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    expect(ITP_CCAA.valencia.tipoGeneral).toBe(9);
+    expect(ITP_CCAA.valencia.umbralTipoUnico?.superiorA).toBe(1_000_000);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 7)?.coeficiente).toBe(0.2);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.slice(0, 2).map((t) => [t.hasta, t.tipo])).toEqual([
+      [6000, 19],
+      [50000, 21],
+    ]);
+
+    await abrir(page, 'valencia');
+    await sembrar(page, 'Precio de la vivienda', '260000');
+    expect(await rotulo(page, /^ITP \(/)).toBe('ITP (9,00 %)');
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('23.400,00 €');
+
+    await irAVendedor(page);
+    await sembrar(page, 'Precio de compra original', '180000');
+    await sembrar(page, 'Años de propiedad', '7');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprar', '15000');
+    await sembrar(page, 'Inversiones y mejoras (opcional)', '5000');
+    await sembrar(page, 'Valor catastral del suelo', '50000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '140000');
+    await sembrar(page, OTRAS, '20000');
+    await page.getByRole('checkbox', { name: /Voy a reinvertir en otra vivienda habitual/ }).check();
+    await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
+    await sembrar(page, 'Hipoteca pendiente de la vivienda que vendes', '60000');
+
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2500,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('200.000,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('249.700,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('49.700,00 €');
+    expect(await descripcionTarjeta(page, /^Ganancia patrimonial/)).toBe('Tributa 10.401,11 € tras aplicar la exención');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('2184,23 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'Reinversión parcial: exento el 79,1 % de la ganancia (art. 41 RIRPF). Es lo que esta venta añade a tu cuota, sumada a 20.000,00 € de otras rentas del ahorro del año.',
+    );
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('7800,00 €');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('12.484,23 €');
+    expect(await rotulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('247.515,77 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('Lo que realmente recibes');
+  });
+
+  /**
+   * CASO 80 (límite) — Madrid, vivienda de 700.000 €, vendedor mayor de 65 en su vivienda habitual:
+   * el plazo de 3 años del art. 41 bis.1 RIRPF en su canto, y la ganancia en el tramo del 30 %.
+   *  Comprador: 700.000 × 6 % = 42.000,00 € «ITP (6,00 %)» (el 5,4 % de vivienda habitual se queda
+   *  en su tope de 250.000 €).
+   *  Vendedor: compra 300.000 · suelo 150.000 · total 400.000 · comisión 4 %:
+   *   Plusvalía: objetivo 150.000 × 0,14 (3 años, y también 2) × 25 % = 5.250 · real 400.000 ×
+   *     150/400 × 25 % = 37.500 → «5250,00 €» · comisión 28.000 · transmisión 666.750 · ganancia 366.750
+   *  · 3 años: el plazo se cumple → EXENTO (art. 33.4.b LIRPF), sin la casilla de la excepción ·
+   *    neto 700.000 − 5.250 − 28.000 = 666.750,00 €
+   *  · 2 años: no llega a 3 de residencia → sin exención: 6.000 × 19 % (1.140) + 44.000 × 21 %
+   *    (9.240) + 150.000 × 23 % (34.500) + 100.000 × 27 % (27.000) + 66.750 × 30 % (20.025) =
+   *    91.905,00 € · total 125.155,00 · neto 574.845,00 €
+   *  · 2 años y la excepción marcada (traslado, matrimonio…): EXENTO otra vez, y lo dice.
+   */
+  test('CASO 80 (límite) — 41 bis justo en 3 años y en 2, con la ganancia en el tramo del 30 %', async ({ page }) => {
+    test.setTimeout(90_000);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 3)?.coeficiente).toBe(0.14);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 2)?.coeficiente).toBe(0.14);
+    expect(ITP_CCAA.madrid.tipoGeneral).toBe(6);
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo).toBe(30);
+
+    await abrir(page, 'madrid');
+    await sembrar(page, 'Precio de la vivienda', '700000');
+    expect(await rotulo(page, /^ITP \(/)).toBe('ITP (6,00 %)');
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('42.000,00 €');
+
+    await irAVendedor(page);
+    await sembrar(page, 'Precio de compra original', '300000');
+    await sembrar(page, 'Años de propiedad', '3');
+    await sembrar(page, 'Valor catastral del suelo', '150000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '400000');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '4');
+    await page.getByRole('checkbox', { name: /Soy mayor de 65 años/ }).check();
+    const excepcion = page.getByRole('checkbox', { name: /menos de 3 años por una causa/ });
+
+    // 3 años: el plazo se cumple
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('5250,00 €');
+    expect(await valorTarjeta(page, /^Ganancia patrimonial/)).toBe('366.750,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe('Mayor de 65 años + vivienda habitual');
+    await expect(excepcion).toHaveCount(0);
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('666.750,00 €');
+
+    // 2 años: no llega
+    await sembrar(page, 'Años de propiedad', '2');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('5250,00 €');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('91.905,00 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toContain(
+      'con 2 años de propiedad no llega a los 3 años seguidos de residencia que exige el art. 41 bis.1 RIRPF',
+    );
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('125.155,00 €');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('574.845,00 €');
+    await expect(excepcion).toHaveCount(1);
+
+    // 2 años con la causa que obligó a cambiar de domicilio
+    await excepcion.check();
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('EXENTO');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toBe(
+      'Mayor de 65 años + vivienda habitual (con menos de 3 años de residencia, por la causa que declaras: art. 41 bis.1 RIRPF)',
+    );
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('666.750,00 €');
+  });
+
+  /**
+   * CASO 81 (debe rechazarse) — Madrid, OBRA NUEVA, BASE O: vende el promotor (616e5fc8), así que
+   * no hay IRPF que publicar y el neto sin él es 300.000 − 9.000 − 1.800 = 289.200,00 € (PARCIAL).
+   *  · Comisión «3.5.0» (NaN por diseño): no es un 0. Se publica sin ella, 300.000 − 1.800 =
+   *    298.200,00 €, y el aviso tiene que nombrarla y decir que el neto real es MENOR.
+   *  · Otras rentas «45.000.50»: en esta rama no mueven ninguna cifra (no hay cuota del ahorro), así
+   *    que el neto sigue en 289.200,00 € y la app no puede atribuirles una dirección.
+   *  · Reparto, IBI 600 legible y «Cuota de comunidad» «90.5.0»: no se reparte nada y se nombra el campo.
+   */
+  test('CASO 81 (debe rechazarse) — obra nueva: la comisión ilegible se nombra y las otras rentas no inventan dirección', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await baseO(page, 'madrid', true);
+    expect(await valorTarjeta(page, 'Impuesto sobre la renta de la venta')).toBe('Sin calcular');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
+
+    await sembrar(page, 'Comisión inmobiliaria (%)', '3.5.0');
+    await expect(page.locator('input[aria-label="Comisión inmobiliaria (%)"]')).toHaveValue('3.5.0');
+    expect(await valorTarjeta(page, /^Comisión inmobiliaria/)).toBe('Sin leer');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1800,00 €');
+    expect(await rotulo(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await valorTarjeta(page, /^Total gastos vendedor/)).toBe('1800,00 €');
+    expect(await rotulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('298.200,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe(
+      'No descuenta el impuesto sobre la renta del promotor: el neto real puede ser menor que este. No descuenta la comisión inmobiliaria, que no se ha podido leer: el neto real es menor que este. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para calcular lo demás.',
+    );
+
+    await sembrar(page, 'Comisión inmobiliaria (%)', '3');
+    await sembrar(page, OTRAS, '45.000.50');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
+    expect(await descripcionTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe(
+      'No descuenta el impuesto sobre la renta del promotor: el neto real puede ser menor que este.',
+    );
+
+    // El reparto del IBI y la comunidad: un importe ilegible tampoco es un cero allí.
+    const bloque = page.locator('section[aria-labelledby="titulo-prorrateo"]');
+    const fecha = bloque.locator('input[type="date"]');
+    await fecha.fill('2026-07-01');
+    await esperarValorEnReact(page, fecha, '2026-07-01');
+    await sembrar(page, 'Cuota anual del IBI', '600');
+    await sembrar(page, 'Cuota de comunidad', '90');
+    await expect(bloque).toContainText('abona');
+    await sembrar(page, 'Cuota de comunidad', '90.5.0');
+    await expect(bloque.getByRole('alert')).toHaveText(
+      'No se entiende el importe de «Cuota de comunidad»: escríbelo como 450 o 450,80. Hasta corregirlo no se reparte nada, para no publicar una cifra calculada con un importe equivocado.',
+    );
+    await expect(bloque).not.toContainText('abona');
+  });
+
+  /**
+   * CONTROL de montaje de los hallazgos de abajo: va en VERDE antes y después de repararlos.
+   *  · Madrid, BASE O + reinvierte 150.000 (sin hipoteca): obtenido 289.200 → exento 150.000 /
+   *    289.200 = 51,87 % → «exento el 51,9 %» · base 89.200 × 139.200 / 289.200 = 42.934,44 →
+   *    1.140 + 36.934,44 × 21 % = 8.896,23 € (las cifras del hallazgo 2904).
+   *  · Madrid, OBRA NUEVA, BASE O: neto 289.200,00 € con o sin otras rentas, gastos y mejoras.
+   */
+  test('CONTROL de montaje — la reinversión parcial con su motivo, y la obra nueva que no se mueve', async ({ page }) => {
+    test.setTimeout(90_000);
+    await baseO(page, 'madrid');
+    await page.getByRole('checkbox', { name: /Voy a reinvertir en otra vivienda habitual/ }).check();
+    await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8896,23 €');
+    expect(await descripcionTarjeta(page, /^IRPF sobre ganancia/)).toContain(
+      'Reinversión parcial: exento el 51,9 % de la ganancia (art. 41 RIRPF)',
+    );
+
+    await baseO(page, 'madrid', true);
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
+    await sembrar(page, OTRAS, '45000');
+    await sembrar(page, 'Impuestos y gastos que pagaste al comprar', '20000');
+    await sembrar(page, 'Inversiones y mejoras (opcional)', '10000');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
+  });
+
+  // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (21/10/2026). Con una reinversión PARCIAL, la tarjeta del
+   * IRPF publica una cuota que ya lleva la exención del art. 38 LIRPF y lo dice con su motivo
+   * («Reinversión parcial: exento el 51,9 % de la ganancia (art. 41 RIRPF)»). En cuanto otro importe
+   * es ilegible, el aviso SUSTITUYE al motivo (page.tsx: `avisoTarjeta(...) ?? motivo`) y la cuota,
+   * que sigue llevando la exención, deja de decirlo; la deducción de Ceuta y Melilla y la frase de
+   * las otras rentas sí se mantienen detrás del aviso desde el hallazgo 3386. Es esa forma, en el
+   * motivo de la exención.
+   * Madrid · BASE O + reinvierte 150.000 → «8896,23 € · Reinversión parcial: exento el 51,9 %…» ·
+   * + otras rentas «45.000.50» → esperado: el aviso y el motivo · obtenido «8896,23 € · El importe de
+   * otras rentas del ahorro no se ha podido leer, así que la cuota real es mayor. Escríbelo con
+   * coma decimal (1.234,56).», sin el motivo. Igual con la comisión «3.5.0» (10.128,76 €).
+   */
+  test.fail('HALLAZGO motivo — la cuota con reinversión parcial no pierde su motivo detrás de un aviso', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await baseO(page, 'madrid');
+    await page.getByRole('checkbox', { name: /Voy a reinvertir en otra vivienda habitual/ }).check();
+    await sembrar(page, 'Importe que reinviertes en la nueva vivienda', '150000');
+    await sembrar(page, OTRAS, '45.000.50');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('8896,23 €');
+    const d = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
+    expect(d).toContain('no se ha podido leer');
+    expect(d).toContain('Reinversión parcial: exento el 51,9 % de la ganancia (art. 41 RIRPF)');
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (21/10/2026). Con «Primera mano» la pestaña Vendedor ya no
+   * liquida la renta del promotor (616e5fc8, hallazgo 3377) y retiró las casillas de vivienda
+   * habitual, edad y reinversión, pero sigue pidiendo los campos que solo alimentan esa cuota, con
+   * ayudas que prometen un efecto que la misma pestaña niega: «Impuestos y gastos que pagaste al
+   * comprar» (con «Estimar por mí» y su desplegable) «Suman al valor de adquisición y REDUCEN la
+   * ganancia (art. 35.1 LIRPF)», y «Otras rentas del ahorro de este año» «…así que con ellas la
+   * venta puede tributar a un tipo mayor». Escribir en ellos no mueve ninguna cifra.
+   * Madrid · Primera mano · BASE O → neto 289.200,00 € · + otras rentas 45.000, gastos 20.000 y
+   * mejoras 10.000 → esperado: esos campos no se ofrecen en obra nueva, o su ayuda no promete efecto
+   * · obtenido: neto 289.200,00 € idéntico, con las dos ayudas tal cual.
+   */
+  test.fail('HALLAZGO obra nueva — no se piden campos del IRPF que esta rama no calcula', async ({ page }) => {
+    test.setTimeout(90_000);
+    await baseO(page, 'madrid', true);
+    const otras = await ayudaDe(page, OTRAS);
+    if (otras !== null) expect(otras).not.toContain('la venta puede tributar a un tipo mayor');
+    const gastos = await ayudaDe(page, 'Impuestos y gastos que pagaste al comprar');
+    if (gastos !== null) expect(gastos).not.toContain('REDUCEN la ganancia');
+  });
+
+  /**
+   * HALLAZGO [bajo, contenido] — ABIERTO (21/10/2026). Residuo de ef34f391 (efecto familia del 3387)
+   * en la MISMA constante DERIVACIONES de page.tsx: la línea del local se corrigió al art. 20.Dos
+   * LIVA («cuando el vendedor es empresario y renuncia porque el comprador es un empresario con
+   * derecho a deducir el IVA») y la de la nave se quedó en «la renuncia a la exención de IVA … entre
+   * empresarios», sin el requisito del adquirente. El art. 20.Dos (BOE-A-1992-28740, leído el
+   * 21/10/2026) la limita al adquirente empresario «y se le atribuya el derecho a efectuar la
+   * deducción total o parcial del Impuesto soportado» (o, si no, por el destino previsible de los
+   * bienes): un empresario con actividad exenta no puede pedirla. La app de la nave lo dice bien.
+   * Tipo de inmueble «Nave industrial» → esperado: el requisito del derecho a deducir, como en el
+   * local · obtenido «…(art. 20.Dos LIVA) entre empresarios.»
+   */
+  test.fail('HALLAZGO renuncia — la derivación de la nave nombra el derecho a deducir del comprador', async ({ page }) => {
+    await abrir(page, 'madrid');
+    await page.getByRole('button', { name: /Nave industrial/ }).click();
+    const linea = (
+      await page.locator('li', { hasText: 'Simulador de gastos de compra de nave industrial' }).innerText()
+    ).replace(ESPACIO_DURO, ' ');
+    expect(linea).toContain('art. 20.Dos LIVA');
+    expect(linea).toMatch(/derecho a deducir/);
   });
 });

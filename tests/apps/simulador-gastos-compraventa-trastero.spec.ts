@@ -136,14 +136,22 @@
  *      más alto del IIVTNU (≥ 20 años), el método real, la bonificación del 50 % y la
  *      deducción del 60 % del IRPF, y una comisión del 150 % en Ceuta. Las cifras de notaría y
  *      registro ya llevan la rebaja del 5 % que el motor aplica desde el 11/10/2026. Y cuatro
- *      hallazgos ABIERTOS con `test.fail()` y etiqueta [13/10-a] … [13/10-d].
+ *      hallazgos que nacieron con `test.fail()` y etiqueta [13/10-a] … [13/10-d] (3252-3255),
+ *      REPARADOS el 20/10/2026 (f6de548d) y hoy regresión.
  *
  *  22. INSPECTOR 19/10/2026 (re-inspección, app INVALIDADA por 5f1b199a, hallazgo 3368: el IRPF
  *      de la venta con las otras rentas del ahorro del año) — CASOS 58-60 al final del fichero:
  *      Castilla-La Mancha con otras rentas que hacen CRUZAR a la venta el tramo de 50.000 €,
  *      Melilla en el tramo MÁS ALTO de la escala (30 %) con la deducción del art. 68.4 LIRPF
  *      sobre la parte PROPORCIONAL de la cuota, y esas otras rentas ilegibles en Melilla. Y
- *      cuatro hallazgos ABIERTOS con `test.fail()` y etiqueta [19/10-a] … [19/10-d].
+ *      cuatro hallazgos que nacieron con `test.fail()` y etiqueta [19/10-a] … [19/10-d]
+ *      (3380-3383), REPARADOS el 20/10/2026 (616e5fc8 y f6de548d) y hoy regresión.
+ *
+ *  23. INSPECTOR 21/10/2026 (re-inspección, app INVALIDADA por f6de548d, 1084f12f y 616e5fc8) —
+ *      CASOS 61-63 al final del fichero: Andalucía en obra nueva con el trastero independiente y el
+ *      vendedor-promotor, Murcia a 50 años de propiedad (el máximo del campo) y el País Vasco con la
+ *      gestoría del comprador y la comisión ilegibles, más la cuota de comunidad del reparto. Y tres
+ *      hallazgos ABIERTOS con `test.fail()` y etiqueta [21/10-a] … [21/10-c].
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -1036,7 +1044,7 @@ test.describe('REGRESIÓN — hallazgos del 27/08/2026, reparados', () => {
   // —`Comisión inmobiliaria (${comisionInmobiliaria}%)`— en vez de pasarlo por `formatNumber`,
   // así que un porcentaje tecleado con punto decimal se publica en formato estadounidense,
   // contra la regla de formato español obligatoria. El importe sí es correcto. Es el mismo
-  // resto que el garaje tiene abierto (hallazgo 438).
+  // resto que el garaje tenía abierto entonces (hallazgo 438, ya cerrado en la base).
   // Caso: pestaña Vendedor · precio de venta 15.000 € · compra 8.000 € · «Comisión
   //       inmobiliaria (%)» = 3.5 → esperado el título «Comisión inmobiliaria (3,5%)» ·
   //       obtenido «Comisión inmobiliaria (3.5%)», con el importe 525,00 €, que sí es
@@ -6715,7 +6723,8 @@ test.describe('Reparación 10/10/2026 — Ceuta, Melilla y la plusvalía foral',
 //  estrenó y ningún caso había combinado: Cantabria con perfil joven, Melilla con el tramo MÁS
 //  ALTO del coeficiente del IIVTNU (≥ 20 años), el método REAL, la bonificación del 50 % de la
 //  cuota y la deducción del 60 % del IRPF, y una comisión imposible en Ceuta. Después, cuatro
-//  hallazgos ABIERTOS con `test.fail()` y la aserción de FONDO primero.
+//  hallazgos que nacieron con `test.fail()` y la aserción de FONDO primero, REPARADOS el
+//  20/10/2026 (hallazgos 3252-3255): se les quitó la marca y quedan como regresión.
 //
 //  De dónde sale cada cifra (ninguna de memoria):
 //   · ITP de Cantabria 9 %, sin escala → `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts), leído
@@ -6918,10 +6927,10 @@ test.describe('Inspector 13/10/2026 — Cantabria con perfil joven, Melilla a 20
     );
   });
 
-  // ─── HALLAZGOS del 13/10/2026, ABIERTOS ──────────────────────────────────────────────
-  // Cada uno con `test.fail()` y la aserción de FONDO primero (dentro de un test.fail() basta
-  // con que falle cualquiera, así que la primera es la que de verdad se comprueba). Las cifras
-  // de sus escenarios las sujeta en verde el CASO 56.
+  // ─── HALLAZGOS del 13/10/2026, REPARADOS el 20/10/2026 ───────────────────────────────
+  // Nacieron con `test.fail()` y la aserción de FONDO primero; al repararlos (f6de548d) se les
+  // quitó la marca y hoy sujetan la reparación. Las cifras de sus escenarios las sujeta en verde
+  // el CASO 56.
 
   // HALLAZGO [13/10-a] (bajo, operativa) — EFECTO FAMILIA del 2911 de local-comercial, que ya
   // nombraba esta app. Con el valor catastral total ilegible y el método REAL más barato, la
@@ -7114,7 +7123,8 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
    *   total 300 + 1.102,80 = 1.402,80 · neto 38.597,20 (PARCIAL)
    *   Cualquier valor que quisiera escribir SUBE la cuota (con 1 €, 1.102,81), así que la cuota real
    *   ES mayor y el neto real ES menor: lo dice el sondeo y lo nombra con el campo.
-   *   (Que la tarjeta pierda la frase de la deducción con este aviso es el hallazgo 3253, abierto.)
+   *   (Que la tarjeta perdía la frase de la deducción con este aviso era el hallazgo 3253, REPARADO
+   *   el 20/10/2026: hoy la lleva detrás del aviso.)
    */
   test('CASO 60 — Melilla, otras rentas «295.000.50»: no se leen como cero y se dice hacia dónde queda la cuota', async ({ page }) => {
     await vendedor0810(page, BASE_1910_MELILLA);
@@ -7139,8 +7149,9 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
     );
   });
 
-  // ─── HALLAZGOS del 19/10/2026, ABIERTOS ──────────────────────────────────────────────
-  // Cada uno con `test.fail()` y la aserción de FONDO primero.
+  // ─── HALLAZGOS del 19/10/2026, REPARADOS el 20/10/2026 ───────────────────────────────
+  // Nacieron con `test.fail()` y la aserción de FONDO primero; al repararlos (616e5fc8 y
+  // f6de548d) se les quitó la marca y hoy sujetan la reparación.
 
   // HALLAZGO [19/10-a] (medio, calculo) — la forma del 3379 (garaje) y el 3377 (estimador), cabo
   // C0284. Con «Primera mano» la pestaña Vendedor liquida la venta como la ganancia patrimonial de
@@ -7202,7 +7213,8 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
     expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1375,50 €');
   });
 
-  // HALLAZGO [19/10-c] (bajo, dato) — EFECTO FAMILIA del 3250, abierto en garaje, que ya nombraba
+  // HALLAZGO [19/10-c] (bajo, dato) — EFECTO FAMILIA del 3250 (garaje; abierto aquel día y
+  // REPARADO el 20/10/2026 con este), que ya nombraba
   // esta app. El sello ITP/AJD/IVA (NOTA_DATOS, page.tsx l. 447) atribuye al art. 57 bis.1
   // TRLITPAJD la bonificación del ITP y la del AJD; en el BOE (BOE-A-1993-25359, leído hoy) el
   // apartado 1 es la cuota gradual de AJD y la transmisión de inmuebles es el apartado 3.a). La
@@ -7218,7 +7230,8 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
     expect(nota).toContain('en Ceuta y Melilla la cuota del ITP y la del AJD se bonifican un 50 %');
   });
 
-  // HALLAZGO [19/10-d] (bajo, contenido) — EFECTO FAMILIA del 3249, abierto en garaje, que ya
+  // HALLAZGO [19/10-d] (bajo, contenido) — EFECTO FAMILIA del 3249 (garaje; abierto aquel día y
+  // REPARADO el 20/10/2026 con este), que ya
   // nombraba RESPUESTA_PLUSVALIA_TRASTERO. La respuesta (FAQ visible y FAQPage, una sola constante)
   // dice sin salvedad «Esta calculadora aplica un tipo del 25 %…», pero en Ceuta y Melilla la
   // calculadora bonifica la cuota al 50 % (art. 159.2 TRLRHL, `BONIFICACION_IIVTNU_CEUTA_MELILLA`)
@@ -7242,5 +7255,358 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
     expect(respuestas.ld).toMatch(/foral/);
     await vendedor0810(page, BASE_1910_MELILLA);
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('300,00 €');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  INSPECTOR 21/10/2026 — re-inspección (la app estaba INVALIDADA por las reparaciones del
+//  20/10/2026: f6de548d, 1084f12f y 616e5fc8; e2c8819a no la tocó, ya lo llevaba desde 9b58029b).
+//  Los hallazgos de esas reparaciones (3252-3255 y 3380-3383) siguen cerrados: los sujetan arriba
+//  [13/10-a…d] y [19/10-a…d], hoy sin marca.
+//
+//  Tres casos resueltos a mano ANTES de abrir el navegador, en ramas que el testigo de familia no
+//  mide (tests/familias/compraventa.spec.ts pasa esta app por Madrid y segunda mano):
+//   · CASO 61 — Andalucía en OBRA NUEVA con el trastero INDEPENDIENTE (IVA del 21 % y el AJD del
+//     objeto «otro») y el vendedor-promotor de 616e5fc8, sin cuota y con el neto «(PARCIAL)».
+//   · CASO 62 — Murcia (un tipo general que no es entero, 7,75 %) y 50 años de propiedad, el máximo
+//     que admite el campo: el coeficiente del IIVTNU se topa en el de «20 o más años».
+//   · CASO 63 — el País Vasco: obra nueva independiente (AJD del 0,5 %, no la exención foral de la
+//     vivienda) con la gestoría del comprador «2.000.50»; la venta de un particular con la comisión
+//     «3.5.0» y la plusvalía FORAL; y la cuota de comunidad «2.000.50» del reparto del IBI.
+//  Después, tres hallazgos ABIERTOS con `test.fail()` y la aserción de FONDO primero.
+//
+//  De dónde sale cada cifra (ninguna de memoria):
+//   · ITP general → `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts): Andalucía 7 %, Murcia 7,75 %,
+//     País Vasco 7 % para lo que no es vivienda (`tipoNoVivienda`, NF 1/2011 de Bizkaia art. 13.a).
+//   · IVA → `IVA_INMUEBLES_2025.garaje` = 21 % para el trastero independiente. AJD → `ITP_CCAA`
+//     (data/itp-ccaa.ts): Andalucía `ajd` 1,2 % · País Vasco `ajd` 0,5 % (su `ajdVivienda` 0 es solo
+//     de la vivienda y sus anejos) · Murcia `ajd` 1,5 % en el recuadro.
+//   · Notaría → `ARANCELES_NOTARIO` × (1 − `REBAJA_ARANCEL_CUANTIA`) × 1,21 y `FACTURA_NOTARIAL`
+//     (×1,5 a ×2; se publica ×1,75). Registro → `ARANCELES_REGISTRO` × 0,95 + `REGISTRO_CONCEPTOS`
+//     (6,010121 + 3,005061), × 1,21. RD 1426/1989 y RD 1427/1989.
+//   · Plusvalía → `COEFICIENTES_IIVTNU_2025` (3 años 0,14 · 20 o más años 0,40) ×
+//     `PLUSVALIA_MUNICIPAL_META.tipoOrientativo` (25 %); foral en el País Vasco y Navarra
+//     (`TERRITORIOS_IIVTNU_FORAL`). IRPF → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19 % hasta 6.000,
+//     21 % hasta 50.000). Obra nueva → `AVISO_VENTA_PROMOTOR` (data/fiscal/ganancia-inmueble.ts).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** Obra nueva con el trastero INDEPENDIENTE, con el precio y la gestoría del comprador escritos. */
+async function obraNuevaIndependiente2110(page: Page, ccaa: string, precio: string, gestoria: string): Promise<void> {
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+  await page.locator('#select-ccaa').selectOption(ccaa);
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await page.getByRole('button', { name: /Independiente/ }).click();
+  await expect(page.getByRole('button', { name: /Independiente/ })).toHaveAttribute('aria-pressed', 'true');
+  await sembrar(page, 'Precio del trastero', precio);
+  await sembrar(page, 'Gastos de gestoría del comprador (€)', gestoria);
+}
+
+/** Las dos casillas del recuadro de la comunidad («ITP General» y «AJD»). */
+const recuadro2110 = (page: Page) => texto(page.locator('[class*="infoCcaaGrid"]'));
+
+/** El vendedor-promotor del CASO 61 y del hallazgo [21/10-a] (la comisión, la del 3 % por defecto). */
+async function promotorAndalucia2110(page: Page): Promise<void> {
+  await obraNuevaIndependiente2110(page, 'andalucia', '22000', '280');
+  await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+  await sembrar(page, 'Precio de compra original', '14000');
+  await sembrar(page, 'Años de propiedad', '3');
+  await sembrar(page, 'Valor catastral del suelo', '2000');
+  await sembrar(page, 'Valor catastral total (suelo + construcción)', '6000');
+  await sembrar(page, 'Gestoría y certificados del vendedor (€)', '150');
+}
+
+/** Murcia, 50 años de propiedad: la base del CASO 62 y del hallazgo [21/10-b]. */
+const BASE_2110_MURCIA = {
+  ccaa: 'murcia',
+  venta: '48000',
+  compra: '9000',
+  gastos: '600',
+  anios: '50',
+  suelo: '4000',
+  total: '12000',
+  comision: '3',
+  gestoria: '',
+};
+
+/** País Vasco, un particular con la comisión ilegible: la base del CASO 63 y del hallazgo [21/10-c]. */
+const BASE_2110_PV = {
+  ccaa: 'pais-vasco',
+  venta: '30000',
+  compra: '21000',
+  gastos: '1200',
+  anios: '9',
+  suelo: '3000',
+  total: '10000',
+  comision: '3.5.0',
+  gestoria: '200',
+};
+
+test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor, Murcia a 50 años y el País Vasco con tres importes ilegibles', () => {
+  /**
+   * CASO 61 (normal) — Andalucía · Primera mano · Independiente · 22.000 € · gestoría 280.
+   *   IVA 22.000 × 21 % = 4.620,00 · AJD 22.000 × 1,2 % = 264,00
+   *   Notaría: 90,151816 + (22.000 − 6.010,12) × 0,45 % = 162,106276 × 0,95 = 154,000962 × 1,21 =
+   *     186,341164 → ×1,5 = 279,51 · ×2 = 372,68 · ×1,75 = 326,10
+   *   Registro: 24,040484 + 15.989,88 × 0,175 % = 52,022774 × 0,95 = 49,421635 + 9,015182 =
+   *     58,436817 × 1,21 = 70,71
+   *   Total 4.620,00 + 264,00 + 326,10 + 70,71 + 280,00 = 5.560,81 (25,28 %) · coste 27.560,81
+   *   Recuadro: «ITP General 7 %» y «AJD 1,2 %», el del trastero suelto que se liquida.
+   * VENDEDOR (el promotor, 616e5fc8) — compra 14.000 · 3 años · suelo 2.000 de 6.000 · comisión del 3 %
+   * por defecto · gestoría 150:
+   *   plusvalía: objetivo 2.000 × 0,14 × 25 % = 70,00 · real 8.000 × 1/3 × 25 % = 666,67 → 70,00
+   *   «Impuesto sobre la renta de la venta · Sin calcular» y ninguna tarjeta de ganancia
+   *   comisión 660,00 · total 70 + 660 + 150 = 880,00 (parcial) · neto 21.120,00 (PARCIAL)
+   *   Con la comisión «3.5.0» (el invariante en la rama del promotor): leída como 0, total 220,00 y
+   *   neto 21.780,00; cualquier comisión real lo BAJA, y se dice con su nombre.
+   */
+  test('CASO 61 — Andalucía, obra nueva independiente de 22.000 €: IVA del 21 %, AJD del 1,2 % y el promotor sin cuota', async ({ page }) => {
+    await obraNuevaIndependiente2110(page, 'andalucia', '22000', '280');
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (21,00 %)');
+    expect(await valorTarjeta(page, /^IVA \(/)).toBe('4620,00 €');
+    expect(await descripcionTarjeta(page, /^IVA \(/)).toBe('IVA 21 % — trastero independiente (obra nueva)');
+    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (1,20 %)');
+    expect(await valorTarjeta(page, /^AJD \(/)).toBe('264,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('326,10 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 279,51 € y 372,68 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('70,71 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('280,00 €');
+    expect(await tituloTarjeta24(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('5560,81 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('25,28 % sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('27.560,81 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio del trastero + todos los gastos');
+    const recuadro = await recuadro2110(page);
+    expect(recuadro).toContain('ITP General 7 %');
+    expect(recuadro).toContain('AJD 1,2 %');
+    await expect(avisoReducidos0810(page)).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    await sembrar(page, 'Precio de compra original', '14000');
+    await sembrar(page, 'Años de propiedad', '3');
+    await sembrar(page, 'Valor catastral del suelo', '2000');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '6000');
+    await sembrar(page, 'Gestoría y certificados del vendedor (€)', '150');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('70,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Impuesto sobre la renta de la venta')).toBe('Sin calcular');
+    expect(await descripcionTarjeta(page, 'Impuesto sobre la renta de la venta')).toContain('vende el promotor');
+    await expect(page.locator('h3', { hasText: /Ganancia patrimonial|IRPF sobre ganancia|Valor de adquisición/ })).toHaveCount(0);
+    expect(await tituloTarjeta24(page, /^Comisión inmobiliaria/)).toBe('Comisión inmobiliaria (3 %)');
+    expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('660,00 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('150,00 €');
+    expect(await tituloTarjeta24(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('880,00 €');
+    expect(await descripcionTarjeta(page, 'Total gastos vendedor')).toBe('SIN el impuesto sobre la renta del promotor, que no se incluye');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('21.120,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'No descuenta el impuesto sobre la renta del promotor: el neto real puede ser menor que este.',
+    );
+
+    await sembrar(page, 'Comisión inmobiliaria (%)', '3.5.0');
+    expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('Sin leer');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('220,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('21.780,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
+      'No descuenta la comisión inmobiliaria, que no se ha podido leer: el neto real es menor que este.',
+    );
+  });
+
+  /**
+   * CASO 62 (límite) — Murcia · segunda mano · 48.000 € · gestoría 300 por defecto, y un vendedor con
+   * 50 años de propiedad, el MÁXIMO que admite el campo (max={50}).
+   *   ITP 48.000 × 7,75 % = 3.720,00 → «ITP (7,75 %)», un tipo general con decimales
+   *   Notaría: 90,151816 + 24.040,49 × 0,45 % + 17.949,39 × 0,15 % = 225,258106 × 0,95 × 1,21 =
+   *     258,934193 → ×1,5 = 388,40 · ×2 = 517,87 · ×1,75 = 453,13
+   *   Registro: 24,040484 + 24.040,49 × 0,175 % + 17.949,39 × 0,125 % = 88,548079 × 0,95 =
+   *     84,120675 + 9,015182 = 93,135857 × 1,21 = 112,69
+   *   Total 3.720,00 + 453,13 + 112,69 + 300,00 = 4.585,82 (9,55 %) · coste 52.585,82
+   *   Los cuatro reducidos de Murcia son de colectivo: a un perfil General no se le ofrece ninguno.
+   * VENDEDOR — compra 9.000 · gastos 600 · 50 años · suelo 4.000 de 12.000 · comisión 3 % · sin gestoría:
+   *   plusvalía: objetivo 4.000 × 0,40 × 25 % = 400,00 · real 39.000 × 1/3 × 25 % = 3.250 → 400,00
+   *   comisión 1.440,00 · transmisión 48.000 − 1.440 − 400 = 46.160,00 · adquisición 9.600,00
+   *   ganancia 36.560,00 (cruza el tramo de 6.000) · IRPF 1.140 + 30.560 × 21 % = 7.557,60
+   *   total 400 + 1.440 + 7.557,60 = 9.397,60 · neto 38.602,40, que la app da por definitivo.
+   *   (Que con 50 años la compra es de 1976, anterior al 31/12/1994, es el hallazgo [21/10-b].)
+   */
+  test('CASO 62 — Murcia, 48.000 € al 7,75 % y un vendedor con 50 años de propiedad', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.locator('#select-ccaa').selectOption('murcia');
+    await sembrar(page, 'Precio del trastero', '48000');
+    expect(await tituloTarjeta24(page, /^ITP \(/)).toBe('ITP (7,75 %)');
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('3720,00 €');
+    expect(await descripcionTarjeta(page, /^ITP \(/)).toBe('ITP Región de Murcia');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('453,13 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 388,40 € y 517,87 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('112,69 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('4585,82 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('9,55 % sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('52.585,82 €');
+    const recuadro = await recuadro2110(page);
+    expect(recuadro).toContain('ITP General 7,75 %');
+    expect(recuadro).toContain('AJD 1,5 %');
+    await expect(avisoReducidos0810(page)).toHaveCount(0);
+
+    await vendedor0810(page, BASE_2110_MURCIA);
+    await expect(page.locator('input[aria-label="Años de propiedad"]')).toHaveValue('50');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('400,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('9600,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('46.160,00 €');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('36.560,00 €');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('7557,60 €');
+    expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('1440,00 €');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('9397,60 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('38.602,40 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('Lo que realmente recibes tras los gastos');
+  });
+
+  /**
+   * CASO 63 (debe rechazarse) — el País Vasco con tres importes ilegibles, en ramas que el testigo no mide.
+   * COMPRADOR — Primera mano · Independiente · 30.000 € · gestoría «2.000.50»:
+   *   IVA 30.000 × 21 % = 6.300,00 · AJD 30.000 × 0,5 % = 150,00 (el trastero suelto no comparte la
+   *   exención foral de la primera transmisión de vivienda)
+   *   Notaría: 90,151816 + 23.989,88 × 0,45 % = 198,106276 × 0,95 × 1,21 = 227,723164 → ×1,5 =
+   *     341,58 · ×2 = 455,45 · ×1,75 = 398,52
+   *   Registro: 24,040484 + 23.989,88 × 0,175 % = 66,022774 × 0,95 = 62,721635 + 9,015182 =
+   *     71,736817 × 1,21 = 86,80
+   *   La gestoría no se lee: «Sin leer», total 6.300 + 150 + 398,52 + 86,80 = 6.935,32 (parcial,
+   *   23,12 %) y coste 36.935,32 «(PARCIAL)», «el coste real será mayor».
+   * VENDEDOR — segunda mano (un particular) · compra 21.000 · gastos 1.200 · 9 años · suelo 3.000 de
+   * 10.000 · comisión «3.5.0» · gestoría 200:
+   *   plusvalía FORAL «SIN CALCULAR» · la comisión entra como 0
+   *   transmisión 30.000 − 200 = 29.800,00 · adquisición 22.200,00 · ganancia 7.600,00 (máximo)
+   *   IRPF 1.140 + 1.600 × 21 % = 1.476,00 (máximo) · total 200 + 1.476 = 1.676,00 · neto 28.324,00
+   *   La comisión real BAJA la ganancia, la cuota y el neto: «es menor» en las tres, con su nombre.
+   * REPARTO — escritura 01/07/2026 · IBI 180 · cuota de comunidad «2.000.50» → no reparte nada y nombra
+   *   el campo.
+   */
+  test('CASO 63 — País Vasco: gestoría, comisión y cuota de comunidad ilegibles se nombran con su dirección', async ({ page }) => {
+    await obraNuevaIndependiente2110(page, 'pais-vasco', '30000', '2.000.50');
+    await expect(page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]')).toHaveValue('2.000.50');
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (21,00 %)');
+    expect(await valorTarjeta(page, /^IVA \(/)).toBe('6300,00 €');
+    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (0,50 %)');
+    expect(await valorTarjeta(page, /^AJD \(/)).toBe('150,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('398,52 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 341,58 € y 455,45 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('86,80 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await tituloTarjeta24(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('6935,32 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('23,12 % sobre el precio — SIN la gestoría, que no se ha podido leer');
+    expect(await tituloTarjeta24(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, /^COSTE TOTAL/)).toBe('36.935,32 €');
+    expect(await descripcionTarjeta(page, /^COSTE TOTAL/)).toBe('No incluye la gestoría, que no se ha podido leer: el coste real será mayor');
+    const recuadro = await recuadro2110(page);
+    expect(recuadro).toContain('ITP General 7 %');
+    expect(recuadro).toContain('AJD 0,5 %');
+
+    await vendedor0810(page, BASE_2110_PV);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('SIN CALCULAR');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('norma foral de cada territorio histórico');
+    expect(await valorTarjeta(page, 'Valor de adquisición')).toBe('22.200,00 €');
+    expect(await valorTarjeta(page, 'Valor de transmisión')).toBe('29.800,00 €');
+    expect(await descripcionTarjeta(page, 'Valor de transmisión')).toContain('la comisión no se ha podido leer');
+    expect(await tituloTarjeta24(page, /^Ganancia patrimonial/)).toBe('Ganancia patrimonial (máximo)');
+    expect(await valorTarjeta(page, 'Ganancia patrimonial')).toBe('7600,00 €');
+    expect(await descripcionTarjeta(page, 'Ganancia patrimonial')).toContain(
+      'La comisión inmobiliaria no se ha podido leer, así que la ganancia real es menor',
+    );
+    expect(await tituloTarjeta24(page, /^IRPF sobre ganancia/)).toBe('IRPF sobre ganancia (máximo)');
+    expect(await valorTarjeta(page, 'IRPF sobre ganancia')).toBe('1476,00 €');
+    expect(await descripcionTarjeta(page, 'IRPF sobre ganancia')).toContain(
+      'La comisión inmobiliaria no se ha podido leer, así que la cuota real es menor',
+    );
+    expect(await valorTarjeta(page, /Comisión inmobiliaria/)).toBe('Sin leer');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('200,00 €');
+    expect(await tituloTarjeta24(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1676,00 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('28.324,00 €');
+    const neto = await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR');
+    expect(
+      neto.startsWith(
+        'No descuenta la plusvalía municipal: el neto real puede ser menor que este. No descuenta la comisión inmobiliaria, que no se ha podido leer (la comisión inmobiliaria rebaja también el IRPF al descontarla, hasta un 21 % de su importe): el neto real es menor que este. En el País Vasco la plusvalía municipal se rige por la norma foral',
+      ),
+    ).toBe(true);
+
+    await page.locator('input[type="date"]').fill('2026-07-01');
+    await sembrar(page, 'Cuota anual del IBI', '180');
+    await sembrar(page, 'Cuota de comunidad', '2.000.50');
+    const reparto = page.locator('section[aria-labelledby="titulo-prorrateo"]');
+    await expect(reparto.locator('[role="alert"]')).toHaveText(
+      /No se entiende el importe de «Cuota de comunidad»: escríbelo como 450 o 450,80\. Hasta corregirlo no se reparte nada/,
+    );
+    await expect(reparto.locator('table')).toHaveCount(0);
+  });
+
+  // ─── HALLAZGOS del 21/10/2026, ABIERTOS ──────────────────────────────────────────────
+  // Cada uno con `test.fail()` y la aserción de FONDO primero; las cifras de sus escenarios las
+  // sujetan en verde los CASOS 61-63.
+
+  // HALLAZGO [21/10-a] (bajo, contenido) — EFECTO FAMILIA del 3394 (estimador-compraventa-inmueble),
+  // medido aquí. Con «Primera mano» la pestaña Vendedor ya no liquida la renta del promotor (616e5fc8,
+  // hallazgo 3380), pero sigue pidiendo bajo el rótulo «Datos para calcular plusvalía e IRPF» los dos
+  // campos que solo alimentaban esa cuota, con ayudas que prometen un efecto: «Impuestos y gastos que
+  // pagaste al comprarlo» («…suman al valor de adquisición y REDUCEN la ganancia (art. 35.1 LIRPF)») y
+  // «Otras rentas del ahorro de este año (€)» («…así que con ellas la venta puede tributar a un tipo
+  // mayor»). Escribir en ellos no mueve ninguna cifra: el neto sigue en 21.120,00 € y el total en
+  // 880,00 €.
+  test.fail('[21/10-a] en obra nueva la pestaña Vendedor no promete el efecto de campos que ya no alimentan nada', async ({ page }) => {
+    await promotorAndalucia2110(page);
+    // El defecto.
+    const formulario = await texto(page.locator('[class*="formVendedor"]'));
+    expect(formulario).not.toMatch(/REDUCEN la ganancia|puede tributar a un tipo mayor/);
+    // Lo que lo demuestra, si los campos siguen ahí: con 1.500 € y 40.000 € escritos nada se mueve.
+    for (const [etiqueta, valor] of [
+      ['Impuestos y gastos que pagaste al comprarlo', '1500'],
+      ['Otras rentas del ahorro de este año (€)', '40000'],
+    ] as const) {
+      if (await page.locator(`input[aria-label="${etiqueta}"]`).count()) await sembrar(page, etiqueta, valor);
+    }
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('880,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('21.120,00 €');
+  });
+
+  // HALLAZGO [21/10-b] (bajo, contenido) — EFECTO FAMILIA del 3396 (simulador-gastos-compraventa-
+  // garaje), medido aquí. El campo admite hasta 50 años de propiedad, y con 32 o más la compra es
+  // anterior al 31/12/1994 (con 31, puede serlo): su ganancia puede reducirse con los coeficientes de abatimiento de la
+  // disposición transitoria 9.ª LIRPF, que la app no aplica. data/fiscal/ganancia-inmueble.ts, el
+  // motor de la tarjeta, lo pone en «LO QUE ESTE MÓDULO NO HACE (y por qué se dice en vez de
+  // aproximarlo)», y la referencia lo nombra en su bloque educativo («…y los coeficientes de
+  // abatimiento de las compras anteriores a 1995»). Aquí no lo dice ni la tarjeta del IRPF, ni el
+  // sello, ni las «Limitaciones de esta calculadora», y el neto del CASO 62 sale como definitivo.
+  test.fail('[21/10-b] con una compra anterior a 1995 la página dice que no aplica los coeficientes de abatimiento', async ({ page }) => {
+    await vendedor0810(page, BASE_2110_MURCIA);
+    // El defecto: el texto de la página, bloque educativo plegado incluido y sin los <script>.
+    const textoPagina = await page.evaluate(() => {
+      const copia = document.body.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('script, style').forEach((s) => s.remove());
+      return copia.textContent ?? '';
+    });
+    expect(textoPagina).toMatch(/abatimiento|anteriores a 1995|31\/12\/1994/i);
+  });
+
+  // HALLAZGO [21/10-c] (bajo, contenido) — en territorio foral el neto promete «obtenerlo». Con la
+  // plusvalía foral (País Vasco y Navarra, que la app no calcula nunca) y un importe que corregir, la
+  // descripción del neto termina «Escribe con coma decimal (1.234,56) lo que no se ha podido leer para
+  // obtenerlo.»; escrita la comisión legible (3,5 %), el neto sigue «(PARCIAL)» —30.000 − 1.050 − 200
+  // − 1.255,50 de IRPF = 27.494,50 €— porque la plusvalía no llega nunca. Es lo que 616e5fc8 resolvió
+  // para el promotor con «para calcular lo demás» (page.tsx ~l. 2015), y el comentario de esa misma
+  // línea solo prevé el foral SIN nada que pedir. La misma línea está en la referencia (~l. 2865),
+  // garaje (~l. 2003) y local-comercial (~l. 2290); medido solo aquí.
+  test.fail('[21/10-c] en territorio foral el neto no promete «obtenerlo» al corregir un importe', async ({ page }) => {
+    await vendedor0810(page, BASE_2110_PV);
+    // El defecto.
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toContain('para obtenerlo');
+    // Lo que lo demuestra: corregida la comisión, el neto sigue sin la plusvalía foral.
+    await sembrar(page, 'Comisión inmobiliaria (%)', '3,5');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('27.494,50 €');
   });
 });

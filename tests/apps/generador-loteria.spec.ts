@@ -2081,8 +2081,8 @@ test.describe('Inspector 12/10/2026', () => {
 
   test.describe('hallazgos ABIERTOS (inspector 12/10/2026)', () => {
     // En la base, por orden: 3234 (desglose), 3235 (botones 1/3/5/10), 3236 (gravamen español) y
-    // 3237 (FAQ duplicada). Siguen abiertos en las re-inspecciones del 14/10/2026 y del 15/10/2026:
-    // los cuatro `test.fail()` fallan como se espera. 1e288cc3 (15/10) numeró bien los RÓTULOS de
+    // 3237 (FAQ duplicada). Siguen abiertos en las re-inspecciones del 14/10/2026, del 15/10/2026 y
+    // del 21/10/2026: los cuatro `test.fail()` fallan como se espera. 1e288cc3 (15/10) numeró bien los RÓTULOS de
     // los campos, pero el desglose de 3234 sigue contando solo los premios escritos.
     test('ABIERTO (contenido, bajo) · el desglose por décimo numera los décimos como el formulario', async ({ page }) => {
       // Con el campo 1 vacío y premios en los campos 2 y 3 («Premio del décimo o apuesta 2/3 (€)»),
@@ -3170,8 +3170,8 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
  * adivinar dónde mirar. Su control positivo en la exploración fue el botón de la guía educativa
  * (cabo C0250, componente compartido, ya anotado); aquí, uno sintético. En la app: 3288, 3289 y
  * 3303 SE SOSTIENEN, y ni texto viejo ni caída en el generador, el comprobador ni el reparto. SÍ
- * cae la tarjeta de compartir del pie (components/ShareCard.tsx, la monta todo el catálogo):
- * HALLAZGO 3314, al final con test.fail().
+ * caía la tarjeta de compartir del pie (components/ShareCard.tsx, la monta todo el catálogo):
+ * HALLAZGO 3314, REPARADO el 15/10/2026; su test, al final del bloque, ya va sin test.fail().
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 test.describe('re-inspección 15/10/2026', () => {
@@ -3801,14 +3801,14 @@ test.describe('cotejo 20/10/2026 · bote de La Primitiva (normas de SELAE de 201
     await expect(ficha).toContainText('1 entre 13.983.816');
   });
 
-  test('HALLAZGO (19/10 C0230 → 20/10) · la tabla rotula «Probabilidad bote» de La Primitiva con 1 entre 139.838.160', async ({ page }) => {
+  test('REPARADO 3390 (dato, medio; cabo C0230) · la tabla rotula «Probabilidad bote» de La Primitiva con 1 entre 139.838.160', async ({ page }) => {
     // REPARADO 20/10/2026 (hallazgo 3390): la celda decía 1 entre 13.983.816, que es la primera categoría.
     // Columnas: Lotería · Combinación · Probabilidad bote. Norma 8.ª.1.1-1.2: el bote es de la
     // categoría especial (6 + reintegro) → 13.983.816 × 10 = 139.838.160.
     await expect(filaPrimitiva(page).locator('td').nth(2)).toHaveText('1 entre 139.838.160');
   });
 
-  test('HALLAZGO (19/10 C0230 → 20/10) · la FAQ «¿…acertar el bote de La Primitiva?» da 1 entre 139.838.160', async ({ page }) => {
+  test('REPARADO 3390 (dato, medio; cabo C0230) · la FAQ «¿…acertar el bote de La Primitiva?» da 1 entre 139.838.160', async ({ page }) => {
     // REPARADO 20/10/2026 (hallazgo 3390): respondía con los 6 números (1 entre 13.983.816), 9,6
     // millones y 269.000 años. Con 139.838.160: el 50 % exige ln 2 · 139.838.160 ≈ 96,9 millones de
     // apuestas, y a una por semana la espera media es 139.838.160 / 52 ≈ 2,69 millones de años.
@@ -3819,5 +3819,297 @@ test.describe('cotejo 20/10/2026 · bote de La Primitiva (normas de SELAE de 201
     await expect(faqBote(page)).not.toContainText('9,6 millones');
     await expect(faqBote(page)).not.toContainText('269.000');
     await expect(faqBote(page)).not.toContainText('principales es de 1 entre 13.983.816');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Re-inspección 21/10/2026 — vuelve INVALIDADA por 328d72c6 (hallazgo 3390, cabo C0230: el bote
+ * de La Primitiva es la categoría especial, 6 números + reintegro). Segmento fiscal, riesgo 1.
+ *
+ * NORMA — gravamen: data/fiscal/premios-loterias.ts (DA 33.ª LIRPF, BOE-A-2006-20764):
+ * EXENCION_PREMIO_LOTERIA = 40.000 € por décimo o apuesta (ap. 1 y 2), reducida en proporción si
+ * cuesta menos de 0,50 € (40.000 × precio / 0,50); TIPO_GRAVAMEN_PREMIO_LOTERIA = 20 % sobre el
+ * exceso (ap. 4 y 6); prorrateo por cuotas (ap. 2 y 3). Céntimos por el mayor resto (reparto.ts:
+ * cada parte truncada, los céntimos sobrantes al mayor decimal y, en empate, al primero).
+ * Categorías de La Primitiva: normas de SELAE de junio de 2015 que cita comprobar.ts (norma 8.ª:
+ * especial = 6 + reintegro, 1.ª = 6); el reintegro sale de diez bolas (0-9).
+ *
+ * COMBINATORIA resuelta a mano: C(49,6) = 49·48·47·46·45·44 / 720 = 13.983.816; × 10 del reintegro
+ * = 139.838.160. Euromillones C(50,5) × C(12,2) = 2.118.760 × 66 = 139.838.160 (LA MISMA cifra). El
+ * Gordo C(54,5) × 10 = 3.162.510 × 10 = 31.625.100. Lototurf C(31,6) × 12 = 736.281 × 12 = 8.835.372.
+ * 50 % de acertar el bote al menos una vez, con apuestas en sorteos independientes:
+ * n = ln 0,5 / ln(1 − 1/139.838.160) ≈ ln 2 · 139.838.160 ≈ 96.928.426 → «unos 97 millones».
+ * Espera media a una apuesta por semana: 139.838.160 semanas / 52 ≈ 2.689.195 años → «unos 2,7
+ * millones de años».
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR:
+ *   1. Normal — tres personas ponen 1 € cada una (cuotas 1/3), precio 3 €, décimo de 100.000 €:
+ *      exento 40.000, base 60.000, retención 12.000, se cobran 88.000. Bruto 10.000.000 c / 3 =
+ *      3.333.333,33 c → el céntimo sobrante, en empate, a Persona 1: 33.333,34 / 33.333,33 /
+ *      33.333,33; retención 4000,00 cada una; le llega 29.333,34 / 29.333,33 / 29.333,33.
+ *      Se añade un décimo de 50.000 €: exento 40.000, retención 2000. Totales 150.000 / 80.000 /
+ *      14.000 / 136.000. Bruto 50.000,00 cada una; retención 1.400.000 c / 3 = 466.666,67 c → los
+ *      DOS céntimos sobrantes a Persona 1 y 2: 4666,67 / 4666,67 / 4666,66; le llega 45.333,33 /
+ *      45.333,33 / 45.333,34 (suman 136.000,00). Desglose «Décimo 1: 100.000,00 €, retención
+ *      12.000,00 € · Décimo 2: 50.000,00 €, retención 2000,00 €».
+ *   2. Límite — precio 0,25 € (apuesta por debajo de 0,50): exención 40.000 × 0,25 / 0,50 =
+ *      20.000. Premio 30.000 → base 10.000, retención 2000, se cobran 28.000; peña de partida
+ *      10/5/5: le llega 14.000 / 7000 / 7000, premio 15.000 / 7500 / 7500, retención 1000 / 500 /
+ *      500. Premio 20.000 justo: retención 0,00 €. Y el tramo más alto del comprobador: La
+ *      Primitiva 4 9 16 23 37 45 · complementario 12 · reintegro 3 contra la misma combinación
+ *      con reintegro 3 (categoría especial = el bote) y con reintegro 8 (1.ª).
+ *   3. Rechazo — premio −100 (aviso de premio, su campo marcado, sin tabla); las tres
+ *      aportaciones a 0 («la peña suma 0 €», sin campo marcado: no falla ninguno en concreto);
+ *      Persona 1 con −3 (aviso que la nombra, su campo marcado). Comprobador con el complementario
+ *      igual a uno de los seis (16): aviso y ningún veredicto.
+ * Los tres casos dieron en el navegador exactamente lo calculado.
+ *
+ * BOCAS DE 3390: la tabla (La Primitiva 1 entre 139.838.160; Bonoloto, sin categoría especial,
+ * 1 entre 13.983.816), la FAQ visible (139.838.160, unos 97 millones, unos 2,7 millones de años)
+ * y el comprobador (categoría especial = 6 + reintegro) SE SOSTIENEN. La ficha «Probabilidad de
+ * acertar los 6 números» (1 entre 13.983.816) es correcta tal cual. Ni «9,6 millones» ni
+ * «269.000» en la página ni en el FAQPage.
+ *
+ * HALLAZGOS NUEVOS, con `test.fail()` al final del bloque: dos frases que comparan modalidades
+ * contradicen las cifras que la propia página da junto a ellas.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('re-inspección 21/10/2026', () => {
+  const SEL_R = 'section[aria-labelledby="pena-titulo"]';
+  const penaR = (page: Page) => page.locator(SEL_R);
+  const poneR = (page: Page, n: number) => penaR(page).getByLabel('Pone (€)').nth(n);
+  const premioR = (page: Page, n = 0) => penaR(page).getByLabel(/Premio del décimo o apuesta/).nth(n);
+  const precioR = (page: Page) => penaR(page).getByLabel('Precio de cada décimo o apuesta (€)');
+  const avisoR = (page: Page) => penaR(page).locator('[class*="comprobadorError"]');
+  // formatCurrency y formatPercentage ponen espacio duro (U+00A0) delante del símbolo
+  const eurR = (s: string) => `${s} €`;
+  const pctR = (s: string) => `${s} %`;
+
+  async function escribirR(page: Page, campo: Locator, valor: string) {
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+  const totalesR = (page: Page) => penaR(page).locator('[class*="penaTotales"] > div').evaluateAll((divs) =>
+    divs.map((d) => [d.querySelector('dt')?.textContent ?? '', d.querySelector('dd')?.textContent ?? '']));
+  const filasR = (page: Page) => penaR(page).locator('tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => [
+      tr.querySelector('th')?.textContent ?? '',
+      ...Array.from(tr.querySelectorAll('td')).map((td) => td.textContent ?? ''),
+    ]));
+  const celdaBote = (page: Page, loteria: string) =>
+    page.locator('[class*="comparativaTable"] tbody tr').filter({ hasText: loteria }).locator('td').nth(2);
+
+  interface PreguntaLd { name: string; acceptedAnswer: { text: string } }
+  async function faqPageR(page: Page): Promise<PreguntaLd[]> {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques.map((b) => JSON.parse(b) as { '@type'?: string; mainEntity?: PreguntaLd[] })
+      .find((j) => j['@type'] === 'FAQPage');
+    return faq?.mainEntity ?? [];
+  }
+
+  async function prepararPena(page: Page) {
+    await esperarInteractiva(page);
+    await esperarHidratacion(page, [`${SEL_R} input`]);
+  }
+
+  test.describe('caso 1 (normal)', () => {
+    test('peña 1/1/1 € con décimos de 100.000 y 50.000 €: los céntimos sobrantes por el mayor resto', async ({ page }) => {
+      await prepararPena(page);
+      await escribirR(page, poneR(page, 0), '1');
+      await escribirR(page, poneR(page, 1), '1');
+      await escribirR(page, poneR(page, 2), '1');
+      await escribirR(page, precioR(page), '3');
+      await escribirR(page, premioR(page), '100.000');
+
+      // DA 33.ª: 40.000 exentos; 20 % de 60.000 = 12.000
+      await expect.poll(() => totalesR(page)).toEqual([
+        ['Premio íntegro', eurR('100.000,00')],
+        ['Exento', eurR('40.000,00')],
+        [`Retención del ${pctR('20')}`, eurR('12.000,00')],
+        ['Lo que se cobra', eurR('88.000,00')],
+      ]);
+      // 10.000.000 c / 3: el céntimo sobrante, en empate de restos, a la primera de la lista
+      expect(await filasR(page)).toEqual([
+        ['Persona 1', eurR('1,00'), eurR('29.333,34'), pctR('33,33'), eurR('33.333,34'), eurR('4000,00')],
+        ['Persona 2', eurR('1,00'), eurR('29.333,33'), pctR('33,33'), eurR('33.333,33'), eurR('4000,00')],
+        ['Persona 3', eurR('1,00'), eurR('29.333,33'), pctR('33,33'), eurR('33.333,33'), eurR('4000,00')],
+      ]);
+
+      await penaR(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+      await escribirR(page, premioR(page, 1), '50.000');
+      // La exención va por décimo: 2 × 40.000; retención 12.000 + 20 % de 10.000 = 14.000
+      await expect.poll(() => totalesR(page)).toEqual([
+        ['Premio íntegro', eurR('150.000,00')],
+        ['Exento', eurR('80.000,00')],
+        [`Retención del ${pctR('20')}`, eurR('14.000,00')],
+        ['Lo que se cobra', eurR('136.000,00')],
+      ]);
+      // Retención 1.400.000 c / 3 = 466.666,67 c: los dos céntimos sobrantes a Persona 1 y 2
+      expect(await filasR(page)).toEqual([
+        ['Persona 1', eurR('1,00'), eurR('45.333,33'), pctR('33,33'), eurR('50.000,00'), eurR('4666,67')],
+        ['Persona 2', eurR('1,00'), eurR('45.333,33'), pctR('33,33'), eurR('50.000,00'), eurR('4666,67')],
+        ['Persona 3', eurR('1,00'), eurR('45.333,34'), pctR('33,33'), eurR('50.000,00'), eurR('4666,66')],
+      ]);
+      await expect(penaR(page).locator('[class*="penaResultado"] > p')).toHaveText(
+        `Décimo 1: ${eurR('100.000,00')}, retención ${eurR('12.000,00')} · Décimo 2: ${eurR('50.000,00')}, retención ${eurR('2000,00')}`);
+    });
+  });
+
+  test.describe('caso 2 (límite)', () => {
+    test('apuesta de 0,25 €: exención reducida a 20.000 € (DA 33.ª.2); 30.000 € dejan 2000 de retención y 20.000 €, nada', async ({ page }) => {
+      await prepararPena(page);
+      await escribirR(page, precioR(page), '0,25');
+      // 40.000 × 0,25 / 0,50 = 20.000
+      await expect(penaR(page).locator('#pena-precio-ayuda')).toContainText(
+        `Con este precio, cada décimo o apuesta tiene ${eurR('20.000,00')} exentos.`);
+      await escribirR(page, premioR(page), '30.000');
+      await expect.poll(() => totalesR(page)).toEqual([
+        ['Premio íntegro', eurR('30.000,00')],
+        ['Exento', eurR('20.000,00')],
+        [`Retención del ${pctR('20')}`, eurR('2000,00')],
+        ['Lo que se cobra', eurR('28.000,00')],
+      ]);
+      expect(await filasR(page)).toEqual([
+        ['Persona 1', eurR('10,00'), eurR('14.000,00'), pctR('50,00'), eurR('15.000,00'), eurR('1000,00')],
+        ['Persona 2', eurR('5,00'), eurR('7000,00'), pctR('25,00'), eurR('7500,00'), eurR('500,00')],
+        ['Persona 3', eurR('5,00'), eurR('7000,00'), pctR('25,00'), eurR('7500,00'), eurR('500,00')],
+      ]);
+      // Justo en la exención reducida: nada que retener
+      await escribirR(page, premioR(page), '20.000');
+      await expect.poll(() => totalesR(page)).toEqual([
+        ['Premio íntegro', eurR('20.000,00')],
+        ['Exento', eurR('20.000,00')],
+        [`Retención del ${pctR('20')}`, eurR('0,00')],
+        ['Lo que se cobra', eurR('20.000,00')],
+      ]);
+    });
+
+    test('comprobador, tramo más alto de La Primitiva: 6 + reintegro es la categoría especial (el bote); 6 sin él, la 1.ª', async ({ page }) => {
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([
+          { id: 'p1', type: 'primitiva', mainNumbers: [4, 9, 16, 23, 37, 45], extraNumbers: [3], timestamp: '2026-10-20T10:00:00.000Z' },
+          { id: 'p2', type: 'primitiva', mainNumbers: [4, 9, 16, 23, 37, 45], extraNumbers: [8], timestamp: '2026-10-20T10:00:00.000Z' },
+        ]),
+      });
+      const zona = zonaComprobador(page);
+      const numeros = ['4', '9', '16', '23', '37', '45'];
+      for (let i = 0; i < numeros.length; i++) {
+        await escribirCasilla(page, zona.getByLabel(`Número ${i + 1} de la combinación ganadora`), numeros[i]);
+      }
+      await escribirCasilla(page, zona.getByLabel('Complementario', { exact: true }), '12');
+      await escribirCasilla(page, zona.getByLabel('Reintegro', { exact: true }), '3');
+      await zona.getByRole('button', { name: 'Comprobar mis combinaciones de La Primitiva' }).click();
+      // Norma 8.ª (SELAE, 2015): especial = 6 + reintegro; 1.ª = 6
+      await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveText([
+        'Categoría especial (6 aciertos + reintegro)',
+        '1.ª categoría (6 aciertos)',
+      ]);
+      await expect(zona.locator('[class*="comprobadorResumen"]')).toHaveText(
+        '2 de tus 2 combinaciones de La Primitiva tienen premio de categoría; 1 acierta el reintegro.');
+    });
+  });
+
+  test.describe('caso 3 (rechazo)', () => {
+    test('premio −100, una peña que suma 0 € y una aportación de −3 € avisan y no reparten', async ({ page }) => {
+      await prepararPena(page);
+      await escribirR(page, premioR(page), '-100');
+      await expect(avisoR(page)).toHaveText('Indica el premio de cada décimo o apuesta premiados, mayor que 0 €.');
+      await expect(premioR(page)).toHaveAttribute('aria-invalid', 'true');
+      await expect(penaR(page).locator('tbody tr')).toHaveCount(0);
+
+      await escribirR(page, premioR(page), '100.000');
+      for (let i = 0; i < 3; i++) await escribirR(page, poneR(page, i), '0');
+      await expect(avisoR(page)).toHaveText('Indica lo que puso cada persona: ahora la peña suma 0 €.');
+      await expect(penaR(page).locator('tbody tr')).toHaveCount(0);
+
+      await escribirR(page, poneR(page, 0), '-3');
+      await expect(avisoR(page)).toHaveText(
+        'Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Persona 1.');
+      await expect(poneR(page, 0)).toHaveAttribute('aria-invalid', 'true');
+      await expect(penaR(page).locator('input[aria-invalid="true"]')).toHaveCount(1);
+    });
+
+    test('comprobador: un complementario que es uno de los seis no da veredicto', async ({ page }) => {
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([
+          { id: 'p1', type: 'primitiva', mainNumbers: [4, 9, 16, 23, 37, 45], extraNumbers: [3], timestamp: '2026-10-20T10:00:00.000Z' },
+        ]),
+      });
+      const zona = zonaComprobador(page);
+      const numeros = ['4', '9', '16', '23', '37', '45'];
+      for (let i = 0; i < numeros.length; i++) {
+        await escribirCasilla(page, zona.getByLabel(`Número ${i + 1} de la combinación ganadora`), numeros[i]);
+      }
+      await escribirCasilla(page, zona.getByLabel('Complementario', { exact: true }), '16');
+      await escribirCasilla(page, zona.getByLabel('Reintegro', { exact: true }), '3');
+      await zona.getByRole('button', { name: 'Comprobar mis combinaciones de La Primitiva' }).click();
+      await expect(zona.getByRole('alert')).toHaveText(
+        'El complementario (16) no puede ser uno de los seis de la combinación ganadora: sale del mismo bombo, después.');
+      await expect(zona.locator('[class*="comprobadaVeredicto"]')).toHaveCount(0);
+    });
+  });
+
+  test('3390 se sostiene en todas sus bocas: tabla, FAQ visible con sus cifras derivadas y FAQPage', async ({ page }) => {
+    // Combinatoria a mano (cabecera del bloque). Se recalcula aquí para que el literal no se
+    // copie de la app: el defecto que vigila es un factor 10 (9,6 millones frente a 97; 269.000
+    // años frente a 2,7 millones), así que basta redondear al millón y a la décima de millón.
+    const C49_6 = (49 * 48 * 47 * 46 * 45 * 44) / 720;
+    expect(C49_6).toBe(13_983_816);
+    const BOTE = C49_6 * 10; // norma 8.ª: especial = 6 + reintegro (diez bolas)
+    expect(BOTE).toBe(139_838_160);
+    expect(Math.round(Math.log(0.5) / Math.log(1 - 1 / BOTE) / 1e6)).toBe(97);
+    expect(Math.round(BOTE / 52 / 1e5) / 10).toBe(2.7);
+
+    await expect(celdaBote(page, 'La Primitiva')).toHaveText('1 entre 139.838.160');
+    // Bonoloto no tiene categoría especial (comprobar.ts): su bote es la 1.ª, los 6
+    await expect(celdaBote(page, 'Bonoloto')).toHaveText('1 entre 13.983.816');
+
+    const faqBote = page.locator('[class*="faqList"] details')
+      .filter({ has: page.locator('summary', { hasText: '¿Qué probabilidad tengo de acertar el bote de La Primitiva?' }) });
+    await expect(faqBote).toContainText('acertar los 6 números y además el reintegro');
+    await expect(faqBote).toContainText('La probabilidad es de 1 entre 139.838.160');
+    await expect(faqBote).toContainText('unos 97 millones de apuestas');
+    await expect(faqBote).toContainText('unos 2,7 millones de años');
+
+    // Ni rastro de las cifras viejas en la página ni en el FAQPage
+    const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
+    expect(cuerpo).not.toContain('9,6 millones');
+    expect(cuerpo).not.toContain('269.000');
+    const faqLd = JSON.stringify(await faqPageR(page));
+    expect(faqLd).not.toContain('9,6 millones');
+    expect(faqLd).not.toContain('269.000');
+    expect(faqLd).not.toMatch(/bote[^.]*13\.983\.816/);
+  });
+
+  test.describe('hallazgos NUEVOS (re-inspección 21/10/2026)', () => {
+    test('NUEVO (contenido, bajo) · el FAQPage no llama «la más baja de las cinco» a una probabilidad que empata con el bote de La Primitiva', async ({ page }) => {
+      // FAQPage «¿Cómo se genera una combinación de Euromillones?»: «Acertar los 5 números y las 2
+      // estrellas tiene una probabilidad de 1 entre 139.838.160, la más baja de las cinco loterías
+      // disponibles». Desde 3390 la tabla da al bote de La Primitiva (6 + reintegro) la MISMA cifra:
+      // C(50,5) × C(12,2) = 2.118.760 × 66 = 139.838.160 = C(49,6) × 10. Empatan; ninguna es «la más baja».
+      test.fail();
+      const primitiva = (await celdaBote(page, 'La Primitiva').textContent())?.trim();
+      const euromillones = (await celdaBote(page, 'Euromillones').textContent())?.trim();
+      const respuesta = (await faqPageR(page))
+        .find((q) => q.name === '¿Cómo se genera una combinación de Euromillones?')?.acceptedAnswer.text ?? '';
+      expect(primitiva === euromillones && /la más baja de las cinco/.test(respuesta)).toBe(false);
+    });
+
+    test('NUEVO (contenido, bajo) · la ficha de El Gordo no dice «menos combinaciones que La Primitiva» junto a una cifra mayor', async ({ page }) => {
+      // Ficha de El Gordo: «tiene menos combinaciones posibles que La Primitiva», con «1 entre
+      // 31.625.100» (C(54,5) × 10 de la clave) al lado; la de La Primitiva da «1 entre 13.983.816»
+      // (C(49,6), SIN el reintegro). La frase es cierta comparando igual con igual (3.162.510 frente a
+      // 13.983.816, o 31.625.100 frente a 139.838.160), pero las dos cifras que la acompañan dicen lo
+      // contrario: 31.625.100 > 13.983.816.
+      test.fail();
+      // «1 entre 31.625.100» → 31625100 (el número que sigue a «entre», sin puntos de millar)
+      const cifra = async (id: string) => Number(
+        (/entre\s+([\d.]+)/.exec((await page.locator(`section#${id} dl > div`).last().locator('dd').textContent()) ?? '')?.[1] ?? '')
+          .replace(/\./g, ''));
+      const gordo = await cifra('generador-gordo-primitiva');
+      const primitiva = await cifra('generador-primitiva');
+      const texto = (await page.locator('section#generador-gordo-primitiva p').textContent()) ?? '';
+      expect(/menos combinaciones posibles que La Primitiva/.test(texto) && gordo > primitiva).toBe(false);
+    });
   });
 });

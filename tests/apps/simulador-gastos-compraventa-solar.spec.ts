@@ -45,7 +45,9 @@
  * y registral recalculados tramo a tramo por un script propio que NO llama al código de la
  * app; el desarrollo va comentado junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS: a 13/10/2026 hay tres ABIERTOS, del Inspector de ese día ([13/10-a] a [13/10-c], con
+ * HALLAZGOS: a 21/10/2026 se suma uno ABIERTO, [21/10-a] (las notas de comunidad con ranking o
+ * calificativo), con `test.fail()` en el último describe; los tres del 13/10 siguen igual.
+ * A 13/10/2026 hay tres ABIERTOS, del Inspector de ese día ([13/10-a] a [13/10-c], con
  * `test.fail()` en el último describe: la tarjeta «Promotora compra suelo para construir» da el
  * IVA por deducible sin condición —residuo del 3089—, el FAQPage de la finca rústica sin la
  * renuncia del art. 20.Dos LIVA y la plusvalía «no es un coste del comprador» sin el sustituto del
@@ -3979,5 +3981,386 @@ test.describe('Inspector 13/10/2026 — aranceles con la rebaja del 5 %, el repa
     expect(visible).toContain('la paga el vendedor, no el comprador');
     expect(visible, `FAQ visible: «${visible}»`).toMatch(/no residente|sustitut/i);
     expect(servida, `FAQPage: «${servida}»`).toMatch(/no residente|sustitut/i);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 21/10/2026 — RE-INSPECCIÓN (familia «Compraventa inmobiliaria»; referencia
+// estimador-compraventa-inmueble; testigo tests/familias/compraventa.spec.ts, 93/93 en verde al
+// empezar la tanda). La app volvió a la cola INVALIDADA por dos commits de data/itp-ccaa.ts; su
+// page.tsx y su metadata.ts no se tocaron entre el 19 y el 20/10/2026:
+//   · 011fc97f (19/10, hallazgo 3272): el IVA de las facturas de notaría y registro sale de
+//     PORCENTAJES_IVA.general en vez de un 0,21 tecleado, «sin que cambie ninguna cifra». Se
+//     sostiene: los aranceles de los tres casos de abajo, resueltos a mano con el 21 %, coinciden.
+//   · f6de548d (20/10, hallazgo 3251): la nota de Madrid ya no la declara el ITP más bajo de la
+//     península. Se sostiene aquí (test «f6de548d»). Lo que dejó: la misma forma en otras notas
+//     de la tabla → HALLAZGO [21/10-a].
+// Siguen ABIERTOS, sin cambios, 3267-3269 ([13/10-a] a [13/10-c], bloque anterior).
+//
+// De dónde sale cada cifra esperada (ninguna de memoria; aritmética en un script propio que no
+// llama al código de la app):
+//   · ITP → TIPOS_ITP_CCAA_2025 (data/fiscal/inmuebles.ts): Castilla y León 8 %, con la escala de
+//     ITP_CCAA['castilla-leon'] (8 % hasta 250.000 €); Navarra 6 %; País Vasco 7 % (tipoNoVivienda,
+//     NF 1/2011 de Bizkaia, art. 13.a); Melilla 6 % (excepción declarada en data/itp-ccaa.ts) con
+//     BONIFICACION_CUOTA_CEUTA_MELILLA = 0,5 (art. 57 bis.3.a TRLITPAJD).
+//   · AJD → ITP_CCAA[x].ajd: Castilla y León 1,5 %, Navarra 0,5 %, Melilla 0,5 % × 50 % (57 bis.1).
+//   · IVA → PORCENTAJES_IVA.general = 21 (data/fiscal/iva.ts).
+//   · Notaría → ARANCELES_NOTARIO (RD 1426/1989, nº 2.1) × (1 − REBAJA_ARANCEL_CUANTIA, 5 %) ×
+//     1,21 salvo en Canarias, Ceuta y Melilla, × FACTURA_NOTARIAL 1,5 / 1,75 (la tarjeta) / 2.
+//   · Registro → ARANCELES_REGISTRO (RD 1427/1989, nº 2.1) × 0,95 + presentación 6,010121 + nota
+//     simple 3,005061 (REGISTRO_CONCEPTOS), × 1,21 salvo en Canarias, Ceuta y Melilla.
+//   · Reparto del IBI → components/ProrrateoIbiComunidad: el vendedor hasta el día anterior a la
+//     escritura, el comprador desde ese día, por días del año natural.
+//
+// INVARIANTE de la familia, campo a campo. La app tiene tres NumberInput: el precio y la gestoría
+// (los dos que declara el testigo) y la cuota del IBI (bloque común, también en el testigo). Aquí se
+// mide lo que el testigo no recorre: lo PEGADO con palabras, que desde el 20/10/2026 (hallazgo 2965,
+// components/NumberInput.tsx) se queda escrito tal cual, en el régimen foral (País Vasco) y en
+// Melilla con los dos vendedores. Ninguna pantalla ni campo exclusivo de esta hermana: la app no
+// tiene pestaña de vendedor, ni perfil de comprador, ni caja «Podrías pagar menos».
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Inspector 21/10/2026 — re-inspección tras 011fc97f y f6de548d', () => {
+  test.describe.configure({ timeout: 90_000 });
+  const SEL_PRECIO = `input[aria-label="${PRECIO}"]`;
+  const SEL_GESTORIA = `input[aria-label="${GESTORIA}"]`;
+  const SEL_IBI = 'input[aria-label="Cuota anual del IBI"]';
+  const n = (s: string | null | undefined): string => (s ?? '').replace(/\s+/g, ' ').trim();
+  /** El marcador del panel sin cifra (no el anunciador de rutas de Next). */
+  const marcador = (page: Page) => page.locator('[class*="placeholder"] p');
+
+  interface I21Tarjeta {
+    titulo: string;
+    valor: string;
+    desc: string;
+  }
+
+  /** Las tarjetas del panel de resultados, en orden, con el texto normalizado (U+00A0 → espacio). */
+  const leer = (page: Page): Promise<I21Tarjeta[]> =>
+    page.evaluate(() => {
+      const cont = document.querySelector('[class*="resultados"]');
+      const norm = (s: string | undefined) => (s ?? '').replace(/\s+/g, ' ').trim();
+      return [...(cont?.querySelectorAll('h3') ?? [])].map((h) => {
+        const card = h.parentElement!.parentElement!;
+        const valor = card.querySelector(':scope > div:nth-of-type(2) > p') as HTMLElement | null;
+        const ps = card.querySelectorAll(':scope > p');
+        return {
+          titulo: norm(h.innerText),
+          valor: norm(valor?.innerText),
+          desc: ps.length ? norm((ps[ps.length - 1] as HTMLElement).innerText) : '',
+        };
+      });
+    });
+
+  const tarjeta = (ts: I21Tarjeta[], re: RegExp): I21Tarjeta => {
+    const x = ts.find((c) => re.test(c.titulo));
+    if (!x) throw new Error(`No hay tarjeta ${re} entre: ${ts.map((c) => c.titulo).join(' | ')}`);
+    return x;
+  };
+
+  async function elegir(page: Page, vende: 'particular' | 'promotor'): Promise<void> {
+    const boton = page.getByRole('button', { name: vende === 'particular' ? /Un particular/ : /Promotor \/ Empresa/ });
+    await boton.click();
+    await expect(boton).toHaveAttribute('aria-pressed', 'true');
+  }
+
+  async function comunidad(page: Page, ccaa: string): Promise<void> {
+    await page.selectOption('#select-ccaa', ccaa);
+    await expect(page.locator('#select-ccaa')).toHaveValue(ccaa);
+  }
+
+  async function abrir(page: Page, ccaa: string, vende: 'particular' | 'promotor'): Promise<void> {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [SEL_PRECIO, SEL_GESTORIA, SEL_IBI]);
+    await comunidad(page, ccaa);
+    await elegir(page, vende);
+  }
+
+  /** Pega como un usuario (Ctrl+A, Ctrl+V): es la puerta por la que entran las palabras. */
+  async function pegar(page: Page, selector: string, texto: string): Promise<void> {
+    await page.evaluate((t) => navigator.clipboard.writeText(t), texto);
+    await page.locator(selector).click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Control+V');
+    await expect(page.locator(selector)).toHaveValue(texto, { timeout: 3000 });
+  }
+
+  /** La ficha de la comunidad (ITP_CCAA[x].notas) que pinta el recuadro, tras elegirla. */
+  async function fichaComunidad(page: Page, ccaa: keyof typeof ITP_CCAA): Promise<string> {
+    await comunidad(page, ccaa);
+    const nombre = ITP_CCAA[ccaa].nombre;
+    return n(await page.locator('[class*="infoCcaaNote"]', { hasText: `${nombre}:` }).innerText());
+  }
+
+  /**
+   * CASO 1 (NORMAL) — Castilla y León, 180.000 €, gestoría 650 €. Dentro del primer tramo de su
+   * escala (8 % hasta 250.000 €), con los dos vendedores.
+   *   a) PARTICULAR: ITP = 180.000 × 8 % = 14.400,00 → «ITP (8,00 %)»; sin AJD ni IVA.
+   *      Notaría: 90,151816 + 108,182205 + 45,0759 + 90,15182 + 29.746,97 × 0,05 % (14,873485)
+   *      = 348,435226 × 0,95 = 331,013465 × 1,21 = 400,526292 → ×1,5 = 600,79 · ×2 = 801,05 ·
+   *      ×1,75 = 700,92. Registro: 24,040484 + 42,0708575 + 37,56325 + 67,613865 + 29.746,97 ×
+   *      0,03 % (8,924091) = 180,212548 × 0,95 = 171,201920 + 9,015182 = 180,217102 × 1,21 = 218,06.
+   *      Total = 14.400 + 700,92 + 218,06 + 650 = 15.968,98 (8,87 %) · coste 195.968,98, completo.
+   *   b) PROMOTOR: IVA = 180.000 × 21 % = 37.800,00 · AJD = 180.000 × 1,5 % = 2700,00; los mismos
+   *      aranceles. Total = 37.800 + 2700 + 700,92 + 218,06 + 650 = 42.068,98 (23,37 %) · coste
+   *      222.068,98, con la salvedad del IVA deducible y la del art. 30.1.
+   * Y lo que la sospecha del agente de garaje miraba en su app: aquí no se ofrece ningún tipo
+   * reducido (ni el 0,01 % de «Municipios poco poblados»), porque la app no tiene esa caja.
+   */
+  test('CASO 1 (normal) — Castilla y León, 180.000 €: ITP 8 % = 14.400 € y, con promotor, IVA 37.800 € + AJD 2700 €; aranceles con el IVA de data/fiscal', async ({ page }) => {
+    expect(PORCENTAJES_IVA.general).toBe(21);
+    await abrir(page, 'castilla-leon', 'particular');
+    await sembrarValor(page, SEL_GESTORIA, '650');
+    await sembrarValor(page, SEL_PRECIO, '180000');
+    const a = await leer(page);
+    expect(tarjeta(a, /^Precio del solar/).valor).toBe('180.000,00 €');
+    expect(tarjeta(a, /^ITP \(/).titulo).toBe('ITP (8,00 %)');
+    expect(tarjeta(a, /^ITP \(/).valor).toBe('14.400,00 €');
+    expect(a.some((c) => /^(AJD|IVA|IGIC|IPSI)/.test(c.titulo))).toBe(false);
+    expect(tarjeta(a, /^Gastos de notaría/).titulo).toBe('Gastos de notaría (IVA incluido)');
+    expect(tarjeta(a, /^Gastos de notaría/).valor).toBe('700,92 €');
+    expect(tarjeta(a, /^Gastos de notaría/).desc).toMatch(/^Factura estimada entre 600,79 € y 801,05 €\./);
+    expect(tarjeta(a, /^Registro de la Propiedad/).titulo).toBe('Registro de la Propiedad (IVA incluido)');
+    expect(tarjeta(a, /^Registro de la Propiedad/).valor).toBe('218,06 €');
+    expect(tarjeta(a, /^Gastos de gestoría/).valor).toBe('650,00 €');
+    expect(tarjeta(a, /^Total gastos/).titulo).toBe('Total gastos adicionales');
+    expect(tarjeta(a, /^Total gastos/).valor).toBe('15.968,98 €');
+    expect(tarjeta(a, /^Total gastos/).desc).toBe('8,87 % sobre el precio de compra');
+    expect(tarjeta(a, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(tarjeta(a, /^COSTE TOTAL/).valor).toBe('195.968,98 €');
+    expect(tarjeta(a, /^COSTE TOTAL/).desc).toBe('Precio + todos los gastos de la operación');
+    const recuadro = n(await page.locator('[class*="infoCcaa"]').first().innerText());
+    expect(recuadro).toContain('ITP General 8 %');
+    expect(recuadro).toContain('AJD 1,5 %');
+    expect(recuadro).toContain('aplica escala progresiva (8 % → 10 %): cada tramo del valor tributa a su tipo');
+    await expect(page.locator('body')).not.toContainText('Podrías pagar menos');
+    expect(n(await page.locator('[class*="resultados"]').innerText())).not.toContain('0,01');
+
+    await elegir(page, 'promotor');
+    const b = await leer(page);
+    expect(b.some((c) => /^ITP/.test(c.titulo))).toBe(false);
+    expect(tarjeta(b, /^IVA \(/).titulo).toBe('IVA (21,00 %)');
+    expect(tarjeta(b, /^IVA \(/).valor).toBe('37.800,00 €');
+    expect(tarjeta(b, /^AJD \(/).titulo).toBe('AJD (1,50 %)');
+    expect(tarjeta(b, /^AJD \(/).valor).toBe('2700,00 €');
+    expect(tarjeta(b, /^Gastos de notaría/).valor).toBe('700,92 €');
+    expect(tarjeta(b, /^Registro de la Propiedad/).valor).toBe('218,06 €');
+    expect(tarjeta(b, /^Total gastos/).titulo).toBe('Total gastos adicionales');
+    expect(tarjeta(b, /^Total gastos/).valor).toBe('42.068,98 €');
+    expect(tarjeta(b, /^Total gastos/).desc).toBe('23,37 % sobre el precio de compra');
+    expect(tarjeta(b, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(tarjeta(b, /^COSTE TOTAL/).valor).toBe('222.068,98 €');
+    expect(tarjeta(b, /^COSTE TOTAL/).desc).toBe(
+      `Precio + todos los gastos (antes de deducir el IVA si tienes derecho). ${AVISO_BASE_AJD}`,
+    );
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Comunidad Foral de Navarra, «150.253,03» € (el corte EXACTO entre el 4.º y el
+   * 5.º tramo de los dos aranceles: el 5.º no debe sumar nada) y gestoría «0» (un cero escrito, que
+   * sí vale: sin tarjeta de gestoría y con el cierre completo, no parcial).
+   *   a) PARTICULAR: ITP = 150.253,03 × 6 % = 9015,1818 → 9015,18 «ITP (6,00 %)».
+   *      Notaría: 90,151816 + 108,182205 + 45,0759 + 90,15182 = 333,561741 × 0,95 × 1,21 =
+   *      383,429221 → ×1,5 = 575,14 · ×2 = 766,86 · ×1,75 = 671,00. Registro: 24,040484 +
+   *      42,0708575 + 37,56325 + 67,613865 = 171,288457 × 0,95 + 9,015182 = 171,739216 × 1,21 =
+   *      207,80. Total = 9015,18 + 671,00 + 207,80 = 9893,98 (6,58 %) · coste 160.147,01.
+   *   b) PROMOTOR: IVA = 150.253,03 × 21 % = 31.553,1363 → 31.553,14 · AJD = 150.253,03 × 0,5 % =
+   *      751,26515 → 751,27 «AJD (0,50 %)». Total = 31.553,14 + 751,27 + 671,00 + 207,80 =
+   *      33.183,21 (22,08 %) · coste 183.436,24.
+   */
+  test('CASO 2 (límite) — Navarra, 150.253,03 € (corte del 4.º tramo de los aranceles) con gestoría «0»: cierre completo, sin tarjeta de gestoría', async ({ page }) => {
+    await abrir(page, 'navarra', 'particular');
+    await sembrarValor(page, SEL_GESTORIA, '0');
+    await sembrarValor(page, SEL_PRECIO, '150.253,03');
+    const a = await leer(page);
+    expect(tarjeta(a, /^Precio del solar/).valor).toBe('150.253,03 €');
+    expect(tarjeta(a, /^ITP \(/).titulo).toBe('ITP (6,00 %)');
+    expect(tarjeta(a, /^ITP \(/).valor).toBe('9015,18 €');
+    expect(tarjeta(a, /^Gastos de notaría/).valor).toBe('671,00 €');
+    expect(tarjeta(a, /^Gastos de notaría/).desc).toMatch(/^Factura estimada entre 575,14 € y 766,86 €\./);
+    expect(tarjeta(a, /^Registro de la Propiedad/).valor).toBe('207,80 €');
+    expect(a.some((c) => /^Gastos de gestoría/.test(c.titulo))).toBe(false);
+    expect(tarjeta(a, /^Total gastos/).titulo).toBe('Total gastos adicionales');
+    expect(tarjeta(a, /^Total gastos/).valor).toBe('9893,98 €');
+    expect(tarjeta(a, /^Total gastos/).desc).toBe('6,58 % sobre el precio de compra');
+    expect(tarjeta(a, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(tarjeta(a, /^COSTE TOTAL/).valor).toBe('160.147,01 €');
+    expect(tarjeta(a, /^COSTE TOTAL/).desc).toBe('Precio + todos los gastos de la operación');
+    const recuadro = n(await page.locator('[class*="infoCcaa"]').first().innerText());
+    expect(recuadro).toContain('ITP General 6 %');
+    expect(recuadro).toContain('AJD 0,5 %');
+    expect(recuadro).not.toContain('Tipo según el valor');
+
+    await elegir(page, 'promotor');
+    const b = await leer(page);
+    expect(tarjeta(b, /^IVA \(/).titulo).toBe('IVA (21,00 %)');
+    expect(tarjeta(b, /^IVA \(/).valor).toBe('31.553,14 €');
+    expect(tarjeta(b, /^AJD \(/).titulo).toBe('AJD (0,50 %)');
+    expect(tarjeta(b, /^AJD \(/).valor).toBe('751,27 €');
+    expect(tarjeta(b, /^Gastos de notaría/).valor).toBe('671,00 €');
+    expect(tarjeta(b, /^Registro de la Propiedad/).valor).toBe('207,80 €');
+    expect(b.some((c) => /^Gastos de gestoría/.test(c.titulo))).toBe(false);
+    expect(tarjeta(b, /^Total gastos/).titulo).toBe('Total gastos adicionales');
+    expect(tarjeta(b, /^Total gastos/).valor).toBe('33.183,21 €');
+    expect(tarjeta(b, /^Total gastos/).desc).toBe('22,08 % sobre el precio de compra');
+    expect(tarjeta(b, /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(tarjeta(b, /^COSTE TOTAL/).valor).toBe('183.436,24 €');
+
+    // El «0» de la gestoría sobrevive al blur (min={0} no lo reescribe) y no se trata como un dato que falta.
+    await page.locator(SEL_GESTORIA).focus();
+    await page.locator(SEL_GESTORIA).blur();
+    await expect(page.locator(SEL_GESTORIA)).toHaveValue('0');
+    expect(tarjeta(await leer(page), /^COSTE TOTAL/).titulo).toBe('COSTE TOTAL DE ADQUISICIÓN');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — lo PEGADO con palabras, que desde el 20/10/2026 se queda escrito (2965).
+   *   a) Madrid, particular, 85.000 € con la gestoría de 500 € que trae el campo: coste 91.291,29
+   *      (5100,00 + 539,74 + 151,55 + 500). Se pega «120.000 euros» en el precio → ninguna cifra (ni
+   *      la vieja de 85.000) y el marcador nombra lo escrito.
+   *   b) El invariante en tres ramas que el testigo no recorre, a 90.000 € con la gestoría en 450 €
+   *      y luego pegada como «EUR 450»: el total y el coste BAJAN 450,00 €, la gestoría sale «Sin
+   *      leer», los dos cierres se rotulan parciales y el coste dice «será mayor».
+   *        · País Vasco (foral), particular: ITP 90.000 × 7 % = 6300,00 · notaría 549,79 · registro
+   *          155,86 → total 7455,65, coste 97.455,65 → con «EUR 450»: 7005,65 y 97.005,65.
+   *        · Melilla, particular: ITP 90.000 × 6 % × 50 % = 2700,00 · notaría sin IPSI 454,38 ·
+   *          registro sin IPSI 128,81 → 3733,19 y 93.733,19 → 3283,19 y 93.283,19.
+   *        · Melilla, promotor: IPSI sin calcular · AJD 90.000 × 0,5 % × 50 % = 225,00 → 1258,19 y
+   *          91.258,19 → 808,19 y 90.808,19, con «el IPSI ni la gestoría».
+   *   c) Una TECLA que haría ilegible un valor legible se rechaza: «450» + «x» sigue en «450».
+   *   d) El IBI: 480 € con escritura el 10/05/2027 → vendedor 31+28+31+30+9 = 129 días, 480 × 129 /
+   *      365 = 169,64; comprador 236 días, 480 − 169,6438 = 310,36. Pegado «480 euros» → se nombra
+   *      el campo y no se reparte nada.
+   */
+  test('CASO 3 (rechazo) — lo pegado con palabras no se lee: el precio se nombra sin cifra vieja; la gestoría baja 450 € y se nombra en el foral y en Melilla; el IBI no se reparte', async ({ page }) => {
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    await abrir(page, 'madrid', 'particular');
+    await sembrarValor(page, SEL_PRECIO, '85000');
+    expect(tarjeta(await leer(page), /^COSTE TOTAL/).valor).toBe('91.291,29 €');
+    await pegar(page, SEL_PRECIO, '120.000 euros');
+    await expect(page.locator('[class*="resultados"] h3')).toHaveCount(0);
+    await expect(marcador(page)).toHaveText(
+      'No se ha podido leer el precio «120.000 euros». Introduce el precio del solar para ver el desglose de gastos, con coma decimal (120.000 o 120000,50)',
+    );
+
+    const ramas: Array<{
+      ccaa: string;
+      vende: 'particular' | 'promotor';
+      antes: [string, string];
+      despues: [string, string];
+      coste: string;
+    }> = [
+      {
+        ccaa: 'pais-vasco',
+        vende: 'particular',
+        antes: ['7455,65 €', '97.455,65 €'],
+        despues: ['7005,65 €', '97.005,65 €'],
+        coste: 'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
+      },
+      {
+        ccaa: 'melilla',
+        vende: 'particular',
+        antes: ['3733,19 €', '93.733,19 €'],
+        despues: ['3283,19 €', '93.283,19 €'],
+        coste: 'No incluye la gestoría, que no se ha podido leer: el coste real será mayor',
+      },
+      {
+        ccaa: 'melilla',
+        vende: 'promotor',
+        antes: ['1258,19 €', '91.258,19 €'],
+        despues: ['808,19 €', '90.808,19 €'],
+        coste: `No incluye el IPSI ni la gestoría, que no se ha podido leer: el coste real será mayor. ${AVISO_BASE_AJD}`,
+      },
+    ];
+    for (const r of ramas) {
+      const etiqueta = `${r.ccaa}/${r.vende}`;
+      await comunidad(page, r.ccaa);
+      await elegir(page, r.vende);
+      await sembrarValor(page, SEL_PRECIO, '90000');
+      await sembrarValor(page, SEL_GESTORIA, '450');
+      const a = await leer(page);
+      expect(tarjeta(a, /^Gastos de gestoría/).valor, etiqueta).toBe('450,00 €');
+      expect(tarjeta(a, /^Total gastos/).valor, etiqueta).toBe(r.antes[0]);
+      expect(tarjeta(a, /^COSTE TOTAL/).valor, etiqueta).toBe(r.antes[1]);
+      await pegar(page, SEL_GESTORIA, 'EUR 450');
+      const b = await leer(page);
+      expect(tarjeta(b, /^Gastos de gestoría/).valor, etiqueta).toBe('Sin leer');
+      expect(tarjeta(b, /^Total gastos/).titulo, etiqueta).toBe('Total gastos adicionales (parcial)');
+      expect(tarjeta(b, /^Total gastos/).valor, etiqueta).toBe(r.despues[0]);
+      expect(tarjeta(b, /^Total gastos/).desc, etiqueta).toContain('SIN la gestoría, que no se ha podido leer');
+      expect(tarjeta(b, /^COSTE TOTAL/).titulo, etiqueta).toBe('COSTE TOTAL (PARCIAL)');
+      expect(tarjeta(b, /^COSTE TOTAL/).valor, etiqueta).toBe(r.despues[1]);
+      expect(tarjeta(b, /^COSTE TOTAL/).desc, etiqueta).toBe(r.coste);
+    }
+
+    await sembrarValor(page, SEL_GESTORIA, '450');
+    await page.locator(SEL_GESTORIA).click();
+    await page.keyboard.press('End');
+    await page.keyboard.type('x');
+    await expect(page.locator(SEL_GESTORIA)).toHaveValue('450');
+    expect(tarjeta(await leer(page), /^Gastos de gestoría/).valor).toBe('450,00 €');
+
+    const bloque = page.locator('section[aria-labelledby="titulo-prorrateo"]');
+    const fecha = bloque.locator('input[type="date"]');
+    await fecha.fill('2027-05-10');
+    await esperarValorEnReact(page, fecha, '2027-05-10');
+    await sembrarValor(page, SEL_IBI, '480');
+    expect(n(await bloque.locator('tbody tr').first().innerText())).toBe(
+      'IBI del año 01/01/2027 – 31/12/2027 169,64 € · 129 días 310,36 € · 236 días',
+    );
+    await expect(bloque).toContainText('el comprador le abona en la firma 310,36 €.');
+    await pegar(page, SEL_IBI, '480 euros');
+    await expect(bloque.locator('[role="alert"]')).toContainText('No se entiende el importe de «Cuota anual del IBI»');
+    await expect(bloque).not.toContainText('abona');
+    await expect(bloque.locator('table')).toHaveCount(0);
+  });
+
+  /**
+   * f6de548d (hallazgo 3251, 20/10/2026), en esta app: la nota de Madrid de data/itp-ccaa.ts, que el
+   * recuadro pinta por defecto, dice el dato («ITP general del 6 %») y ya no declara a Madrid el ITP
+   * más bajo de la península, con Navarra al mismo 6 % en el recuadro de esta misma página.
+   */
+  test('f6de548d (3251) — la nota de Madrid del recuadro dice el dato, sin declararla el ITP más bajo', async ({ page }) => {
+    await abrir(page, 'navarra', 'particular');
+    expect(n(await page.locator('[class*="infoCcaa"]').first().innerText())).toContain('ITP General 6 %');
+    const madrid = await fichaComunidad(page, 'madrid');
+    expect(madrid).toContain('ITP general del 6 %');
+    expect(madrid).not.toMatch(/más bajo/);
+  });
+
+  /**
+   * ❌ ABIERTO 21/10/2026 (contenido, bajo) — [21/10-a] La forma de los 2915/2917/2921 (Canarias) y del
+   * 3251 (Madrid), en las notas que quedan de data/itp-ccaa.ts. El recuadro de esta app pinta la
+   * ficha de cada comunidad (desde 2208), y la reparación de esas dos dijo «el dato, sin ranking».
+   * Quedan:
+   *   · País Vasco: «ITP del 4 % en vivienda (el más bajo de España)». En esta misma app Ceuta y
+   *     Melilla cobran el 3 % efectivo (6 % con la bonificación del 50 % del art. 57 bis.3.a
+   *     TRLITPAJD, que alcanza a cualquier inmueble de la ciudad, también la vivienda): el ranking
+   *     es falso con la tabla del propio motor (la misma lectura del 2915: «Ceuta y Melilla, 3 %
+   *     efectivo, son más baratas»).
+   *   · Y calificativos territoriales, el antipatrón 6 del §1.quinquies del CLAUDE.md («las
+   *     diferencias geográficas son hechos, no notas»; precedente, el 1878 de donaciones): Navarra
+   *     «ITP bajo (6 %). AJD muy reducido (0,5 %)» (el País Vasco cobra al solar el mismo 0,5 %),
+   *     Cataluña «ITP elevado», La Rioja «ITP moderado (7 %)», Baleares «Una de las escalas más
+   *     altas de España» (Cataluña llega al mismo 13 %) y Castilla y León «Gran incentivo contra
+   *     despoblación».
+   *   Esperado: cada nota dice su dato sin ranking ni calificativo · obtenido: las seis frases.
+   */
+  test('[21/10-a] las notas de comunidad que pinta el recuadro dicen el dato, sin ranking ni calificativo', async ({ page }) => {
+    if (!I08_VER_HUECOS) test.fail();
+    await abrir(page, 'ceuta', 'particular');
+    await sembrarValor(page, SEL_PRECIO, '200000');
+    // La cifra que desmiente el «más bajo de España»: 200.000 × 6 % × 50 % = 6000,00 → 3,00 %.
+    expect(tarjeta(await leer(page), /^ITP \(/).titulo).toBe('ITP (3,00 %)');
+    expect(ITP_CCAA['pais-vasco'].tipoGeneral).toBe(4);
+    const calificativo = /más baj[oa]s? de España|más altas? de España|ITP (bajo|elevado|moderado)|muy reducido|Gran incentivo/i;
+    const malas: string[] = [];
+    for (const c of ['pais-vasco', 'navarra', 'cataluna', 'rioja', 'baleares', 'castilla-leon'] as const) {
+      const ficha = await fichaComunidad(page, c);
+      expect(ficha, c).toMatch(new RegExp(`^${ITP_CCAA[c].nombre}:`));
+      const m = ficha.match(calificativo);
+      if (m) malas.push(`${c}: «${m[0]}»`);
+    }
+    expect(malas).toEqual([]);
   });
 });
