@@ -9825,7 +9825,9 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
 
   /**
-   * HALLAZGO [bajo, contenido] — ABIERTO (21/10/2026). Con una reinversión PARCIAL, la tarjeta del
+   * HALLAZGO 3393 [bajo, contenido] — REPARADO (21/10/2026): el motivo va detrás del aviso, como la
+   * deducción de Ceuta y Melilla y las otras rentas desde el 3386.
+   * Lo que se vio: con una reinversión PARCIAL, la tarjeta del
    * IRPF publica una cuota que ya lleva la exención del art. 38 LIRPF y lo dice con su motivo
    * («Reinversión parcial: exento el 51,9 % de la ganancia (art. 41 RIRPF)»). En cuanto otro importe
    * es ilegible, el aviso SUSTITUYE al motivo (page.tsx: `avisoTarjeta(...) ?? motivo`) y la cuota,
@@ -9837,7 +9839,7 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
    * otras rentas del ahorro no se ha podido leer, así que la cuota real es mayor. Escríbelo con
    * coma decimal (1.234,56).», sin el motivo. Igual con la comisión «3.5.0» (10.128,76 €).
    */
-  test.fail('HALLAZGO motivo — la cuota con reinversión parcial no pierde su motivo detrás de un aviso', async ({
+  test('REPARADO 3393 motivo — la cuota con reinversión parcial no pierde su motivo detrás de un aviso', async ({
     page,
   }) => {
     test.setTimeout(90_000);
@@ -9849,6 +9851,15 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
     const d = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
     expect(d).toContain('no se ha podido leer');
     expect(d).toContain('Reinversión parcial: exento el 51,9 % de la ganancia (art. 41 RIRPF)');
+    // El aviso primero, después el motivo
+    expect(d.indexOf('no se ha podido leer')).toBeLessThan(d.indexOf('Reinversión parcial'));
+    // Y con la comisión «3.5.0» (la otra forma del hallazgo): 10.128,76 €, con el motivo
+    await sembrar(page, OTRAS, '');
+    await sembrar(page, 'Comisión inmobiliaria (%)', '3.5.0');
+    expect(await valorTarjeta(page, /^IRPF sobre ganancia/)).toBe('10.128,76 €');
+    const c = await descripcionTarjeta(page, /^IRPF sobre ganancia/);
+    expect(c).toContain('La comisión inmobiliaria no se ha podido leer');
+    expect(c).toContain('Reinversión parcial: exento el');
   });
 
   /**

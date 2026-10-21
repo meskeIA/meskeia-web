@@ -2734,6 +2734,15 @@ export default function SimuladorCompraventaPage() {
                                     : resultadosVendedor.motivoExencion
                                       ? `${separarPorcentajes(resultadosVendedor.motivoExencion)}${sufijo41bis}`
                                       : 'Tributación en base del ahorro'),
+                            // La reinversión PARCIAL, también detrás de un aviso de ilegibles: la cuota
+                            // publicada sigue llevando la exención y tiene que decirlo (hallazgo 3393, la
+                            // forma del 3386 en el motivo).
+                            avisoTarjeta(resultadosVendedor.veredictoIrpf, 'la cuota', resultadosVendedor.irpfGanancia > 0) &&
+                            !irpfExento &&
+                            resultadosVendedor.gananciaPatrimonial > 0 &&
+                            resultadosVendedor.motivoExencion
+                              ? `${separarPorcentajes(resultadosVendedor.motivoExencion)}${sufijo41bis}`
+                              : null,
                             // El plazo del art. 41 bis.1 RIRPF, dicho junto a la cuota que lo aplica (2182).
                             resultadosVendedor.gananciaPatrimonial > 0 ? aviso41bis : null,
                             // Ceuta y Melilla: la deducción del art. 68.4 LIRPF, dicha junto a la cuota (3070).
