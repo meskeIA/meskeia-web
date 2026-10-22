@@ -1291,9 +1291,14 @@ test.describe('re-inspección 22/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — C0238 (a), catalán
+  // REPARADO (22/10/2026, hallazgo 3415) — C0238 (a), catalán
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // La reparación no inventa celdas (salen del B 2, no de memoria): à, è, ò, ï, ç y · llevan su
+  // propio aviso —el B 2 recoge las lenguas cooficiales y esta app solo escribe por ahora las
+  // letras del castellano— y la FAQ lo dice igual.
+  //
+  // Era:
   // La FAQ visible dice que la app sigue el B 2, «que cubre castellano, catalán, gallego, euskera y
   // valenciano», y el título del documento es «Signografía básica de las lenguas cooficiales». Pero
   // «València», «Plaça» y «col·legi» pierden è, ç y ·, y el aviso lo justifica con que «puede que el
@@ -1303,9 +1308,11 @@ test.describe('re-inspección 22/10/2026', () => {
   test('C0238 (a) — la FAQ promete catalán y valenciano y el aviso de «València» lo contradice', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
-    const prometeCatalan = /Esta app sigue[^.]*catalán[^.]*valenciano/.test(await textoGuia(page));
+    const guia = await textoGuia(page);
+    const prometeCatalan = /Esta app sigue[^.]*catalán[^.]*valenciano/.test(guia);
+    // La FAQ dice también lo que aún no escribe
+    expect(guia).toContain('las propias del catalán y el valenciano (à, è, ò, ï, ç y el punto volado de «l·l») todavía no');
     // V ⠨⠧ (4-6 | 1-2-3-6) · a ⠁ · l ⠇ · (è) · n ⠝ · c ⠉ · i ⠊ · a ⠁
     await convertirHidratado(page, 'València');
     await expect(cajaResultado(page)).toContainText('⠨⠧⠁⠇'); // precondición: hubo conversión
@@ -1313,6 +1320,17 @@ test.describe('re-inspección 22/10/2026', () => {
     const avisoDiceFuera =
       (await aviso.count()) > 0 && ((await aviso.textContent()) ?? '').includes('fuera de la signografía básica');
     expect({ prometeCatalan, avisoDiceFuera }).not.toEqual({ prometeCatalan: true, avisoDiceFuera: true });
+    // Su aviso propio nombra la letra y no la da por «fuera de la signografía básica»
+    const avisoCooficial = page.locator('[class*="avisoConversion"]').filter({ hasText: 'del catalán y el valenciano' });
+    await expect(avisoCooficial).toContainText('è');
+    await expect(avisoCooficial).not.toContainText('fuera de la signografía');
+
+    // «Plaça» y «col·legi» igual; y si se mezcla con un emoji, cada uno a su aviso
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'Plaça col·legi 🙂');
+    await expect(avisoCooficial).toContainText('ç · ·');
+    await expect(avisoSinCelda(page)).toContainText('🙂');
+    await expect(avisoSinCelda(page)).not.toContainText('ç');
   });
 
   // ─────────────────────────────────────────────────────────────────────────

@@ -207,6 +207,19 @@ const caracteresSinCelda = (texto: string): string[] => [
 const aEspacioNormal = (c: string): string =>
   c !== ' ' && c !== '\n' && c !== '\r' && /\s/.test(c) ? ' ' : c;
 
+/**
+ * Letras propias del catalán y el valenciano que esta app aún no escribe (hallazgo 3415,
+ * 22/10/2026). El aviso genérico decía que «puede que el Código Braille Español sí les asigne
+ * celda fuera de la signografía básica que cubre esta app», y la FAQ dice que la app sigue el
+ * B 2, «Signografía básica de las lenguas cooficiales españolas»: una letra de una lengua
+ * cooficial está, por el título del documento, DENTRO de esa signografía. No se les inventa
+ * celda (sale del documento, no de memoria): llevan su propio aviso, que dice la verdad.
+ */
+const LETRAS_COOFICIALES_SIN_ESCRIBIR = new Set(['à', 'è', 'ò', 'ï', 'ç', '·']);
+
+const esLetraCooficialSinEscribir = (c: string): boolean =>
+  LETRAS_COOFICIALES_SIN_ESCRIBIR.has(c.toLowerCase());
+
 /** ¿Hay en el texto alguna comilla simple que no sea un apóstrofo entre dos letras? */
 const comillasSimplesOmitidas = (texto: string): boolean => {
   const caracteres = Array.from(texto);
@@ -307,10 +320,14 @@ export default function ConversorBraillePage() {
    * Lo que la conversión ha dejado fuera. Se calcula sobre el texto de entrada, no
    * sobre el resultado, porque el resultado ya no contiene rastro de lo omitido.
    */
-  const sinCelda = useMemo(
+  const omitidos = useMemo(
     () => (mode === 'textToBraille' && result ? caracteresSinCelda(input) : []),
     [mode, result, input],
   );
+  /** Lo que no tiene celda en esta app y quizá tampoco en la signografía básica. */
+  const sinCelda = omitidos.filter((c) => !esLetraCooficialSinEscribir(c));
+  /** Letras del catalán y el valenciano que el B 2 recoge y esta app aún no escribe. */
+  const cooficialesOmitidas = omitidos.filter(esLetraCooficialSinEscribir);
 
   const omiteComillasSimples = useMemo(
     () => mode === 'textToBraille' && result !== '' && comillasSimplesOmitidas(input),
@@ -885,6 +902,18 @@ export default function ConversorBraillePage() {
               </p>
             )}
 
+            {cooficialesOmitidas.length > 0 && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                Esta herramienta aún no escribe en braille{' '}
+                {cooficialesOmitidas.length === 1 ? 'esta letra' : 'estas letras'} del catalán y
+                el valenciano: <strong>{cooficialesOmitidas.join(' · ')}</strong>, y no{' '}
+                {cooficialesOmitidas.length === 1 ? 'está' : 'están'} en el resultado. El
+                Documento Técnico B 2 que sigue esta app recoge las lenguas cooficiales, pero
+                por ahora solo escribe las letras del castellano.
+              </p>
+            )}
+
             {omiteComillasSimples && (
               <p className={styles.avisoConversion} role="alert">
                 <span aria-hidden="true">⚠️</span> Las <strong>comillas simples</strong> (‘ ’)
@@ -1348,7 +1377,9 @@ export default function ConversorBraillePage() {
                 oficiales y publica los documentos técnicos que las recogen. Esta app sigue el
                 <strong> Documento Técnico B 2</strong>, «Signografía básica de las lenguas
                 cooficiales españolas» (V4, 22/01/2026), que cubre castellano, catalán, gallego,
-                euskera y valenciano. La diferencia con el braille inglés no es de matiz: en
+                euskera y valenciano, y escribe por ahora las letras del castellano: las propias
+                del catalán y el valenciano (à, è, ò, ï, ç y el punto volado de «l·l») todavía no,
+                y al convertir lo avisa. La diferencia con el braille inglés no es de matiz: en
                 español la interrogación son los puntos 2-6 y las comillas los 2-3-6, mientras en
                 inglés esos mismos 2-3-6 son la interrogación, así que un texto convertido con las
                 tablas inglesas cambia de signos de puntuación sin avisar. El UEB, que unificó los
