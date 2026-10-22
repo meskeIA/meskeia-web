@@ -190,12 +190,22 @@ const caracteresSinCelda = (texto: string): string[] => [
         !SIGNOS_COMPUESTOS[c] &&
         // Las comillas simples llevan su propio aviso (`comillasSimplesOmitidas`)
         !COMILLAS_SIMPLES.has(c) &&
-        // El salto de línea sí se escribe: se convierte en separación de palabra
-        c !== '\n' &&
-        c !== '\r',
+        // El salto de línea y los demás blancos sí se escriben: son separación de palabra
+        !/\s/.test(c),
     ),
   ),
 ];
+
+/**
+ * ⚠️ 22/10/2026 (hallazgo 3416) — el espacio duro (U+00A0: el de casi cualquier texto copiado de
+ * una web, y el del «15 %» del formato de meskeIA), el espacio fino (U+202F) y el tabulador no
+ * estaban en la tabla y se DESCARTABAN, y con ellos la separación de palabra: «hola mundo» salía
+ * como una sola palabra de nueve celdas, y «10 000» con ⠼ de más delante del segundo grupo y sin
+ * nada que lo separase. Es el defecto del salto de línea (21/08/2026) con otro carácter. Cualquier
+ * blanco que no sea salto de línea se escribe como el espacio normal: separación de palabra ⠀.
+ */
+const aEspacioNormal = (c: string): string =>
+  c !== ' ' && c !== '\n' && c !== '\r' && /\s/.test(c) ? ' ' : c;
 
 /** ¿Hay en el texto alguna comilla simple que no sea un apóstrofo entre dos letras? */
 const comillasSimplesOmitidas = (texto: string): boolean => {
@@ -210,8 +220,10 @@ const comillasSimplesOmitidas = (texto: string): boolean => {
  * control dejaba un <strong> vacío y una frase que no decía nada (Inspector, 20/08/2026).
  */
 const NOMBRE_VISIBLE: { [caracter: string]: string } = {
-  '\t': 'tabulador',
-  '\u00a0': 'espacio duro',
+  // El tabulador y el espacio duro ya no llegan aqu\u00ed: se escriben como separaci\u00f3n de palabra
+  // (hallazgo 3416). Quedan los invisibles que no son blancos para JavaScript.
+  '\u200b': 'espacio de ancho cero',
+  '\u00ad': 'guion de corte invisible',
 };
 
 const nombraCaracter = (c: string): string =>
@@ -471,7 +483,7 @@ export default function ConversorBraillePage() {
 
     // Por code points, no por índices UTF-16: un emoji ocupa dos unidades y
     // recorrerlo a pares partía el carácter en dos mitades sin celda.
-    const caracteres = Array.from(text);
+    const caracteres = Array.from(text).map(aEspacioNormal);
 
     for (let i = 0; i < caracteres.length; i++) {
       const original = caracteres[i];

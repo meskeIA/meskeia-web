@@ -1316,9 +1316,13 @@ test.describe('re-inspección 22/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — espacio duro, fino y tabulador
+  // REPARADO (22/10/2026, hallazgo 3416) — espacio duro, fino y tabulador
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // La reparación escribe cualquier blanco que no sea salto de línea como el espacio normal:
+  // separación de palabra ⠀. «10 000» queda como con el espacio normal (⠼⠁⠚⠀⠼⠚⠚⠚).
+  //
+  // Era:
   // Un espacio duro (U+00A0: el que trae casi cualquier texto copiado de una web, Opción+Espacio en
   // Mac, o el «15 %» del propio formato de meskeIA), un espacio fino (U+202F) o un tabulador se
   // DESCARTAN, y con ellos la separación de palabra: «hola mundo» sale ⠓⠕⠇⠁⠍⠥⠝⠙⠕, una sola palabra
@@ -1330,8 +1334,24 @@ test.describe('re-inspección 22/10/2026', () => {
   // que la reparación de los hallazgos 57-58 quitó. Valen las dos lecturas que la app sabe
   // escribir: separador de millar (⠄, § 8.1 citado) o separación de palabra (⠀, como el espacio
   // normal); la pegada no es ninguna de las dos.
+  test('espacio duro — tabulador y espacio fino tampoco pierden la separación', async ({ page }) => {
+    // h ⠓ (1-2-5) · o ⠕ · l ⠇ · a ⠁ · separación ⠀ · m ⠍ (1-3-4) · u ⠥ (1-3-6) · n ⠝ · d ⠙ (1-4-5) · o ⠕
+    for (const blanco of [' ', ' ', '\t']) {
+      await page.goto(RUTA);
+      await convertirHidratado(page, `hola${blanco}mundo`);
+      await expect(cajaResultado(page)).toHaveText('⠓⠕⠇⠁⠀⠍⠥⠝⠙⠕');
+      // Y sin el aviso de carácter sin celda, que decía «el resto del texto sí está completo»
+      await expect(avisoSinCelda(page)).toHaveCount(0);
+    }
+    // ⠼ · 1 ⠁ · 0 ⠚ · ⠀ + ⠼ · 0 ⠚ · 0 ⠚ · 0 ⠚ — lo mismo que con el espacio normal
+    for (const blanco of [' ', ' ', ' ']) {
+      await page.goto(RUTA);
+      await convertirHidratado(page, `10${blanco}000`);
+      await expect(cajaResultado(page)).toHaveText('⠼⠁⠚⠀⠼⠚⠚⠚');
+    }
+  });
+
   test('espacio duro — «hola mundo» y «10 000» con U+00A0 no pierden la separación', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     // h ⠓ (1-2-5) · o ⠕ · l ⠇ · a ⠁ · separación ⠀ · m ⠍ (1-3-4) · u ⠥ (1-3-6) · n ⠝ · d ⠙ (1-4-5) · o ⠕
     await convertirHidratado(page, 'hola mundo');
