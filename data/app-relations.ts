@@ -1545,7 +1545,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calendario-fiscal-emprendedor/', icon: '📅', name: 'Calendario Fiscal', description: 'Todas las fechas clave' },
     { url: '/planificador-cashflow/', icon: '💰', name: 'Cash Flow', description: 'Flujo de caja mensual' },
     { url: '/visualizador-estructura-costes-autonomo/', icon: '💼', name: 'Costes del Autónomo', description: 'Estructura financiera completa' },
-    { url: '/checklist-preparar-verifactu/', icon: '📋', name: 'Checklist VeriFactu', description: 'Facturación electrónica 2027' },
+    { url: '/checklist-preparar-verifactu/', icon: '📋', name: 'Checklist VeriFactu', description: 'Software de facturación 2027' },
   ],
   'orientador-diversificacion-clientes': [
     { url: '/mapa-dependencia-clientes/', icon: '📊', name: 'Mapa Dependencia', description: 'Análisis detallado de cartera' },

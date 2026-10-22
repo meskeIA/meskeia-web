@@ -2,16 +2,16 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Checklist VeriFactu — Prepara tu Negocio para la Facturación Electrónica | meskeIA',
+  title: 'Checklist VeriFactu: prepara tu software de facturación para 2027 (RD 1007/2023) | meskeIA',
   description: 'Checklist interactivo para preparar tu negocio para VeriFactu (obligatorio en 2027). Requisitos, plazos, software adaptado y sanciones.',
-  keywords: 'verifactu, facturación electrónica, factura electrónica España, checklist verifactu, autónomo verifactu, obligaciones fiscales 2027, RD 1007/2023',
+  keywords: 'verifactu, checklist verifactu, software de facturación, sistemas informáticos de facturación, autónomo verifactu, obligaciones fiscales 2027, RD 1007/2023',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Checklist VeriFactu — Facturación Electrónica 2027 | meskeIA',
+    title: 'Checklist VeriFactu: prepara tu software de facturación para 2027 (RD 1007/2023) | meskeIA',
     description: 'Prepara tu negocio para VeriFactu: requisitos técnicos, software adaptado, formatos de factura, plazos y sanciones.',
     url: 'https://meskeia.com/checklist-preparar-verifactu/',
     siteName: 'meskeIA',
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Checklist VeriFactu 2027 | meskeIA',
-    description: 'Prepara tu negocio para la facturación electrónica obligatoria. Requisitos, plazos, software y sanciones.',
+    title: 'Checklist VeriFactu: prepara tu software de facturación para 2027 (RD 1007/2023) | meskeIA',
+    description: 'Prepara tu software de facturación para VeriFactu (RD 1007/2023). Requisitos, plazos, software y sanciones.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {

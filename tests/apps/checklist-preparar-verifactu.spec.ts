@@ -70,4 +70,19 @@ test.describe('Checklist VeriFactu — C0318', () => {
     expect(queEs).not.toMatch(/en tiempo real/);
     expect(await faqJsonLd(page)).not.toMatch(/obliga a enviar registros de facturas a la AEAT en tiempo real/);
   });
+
+  // Decisión del usuario (22/10/2026, cabo C0318): VeriFactu es el reglamento de los sistemas
+  // informáticos de facturación, no la factura electrónica de la Ley Crea y Crece, y el título
+  // que se ve en Google y en las tarjetas sociales dejaba de decirlo.
+  test('el título y las tarjetas sociales no presentan VeriFactu como facturación electrónica', async ({ page }) => {
+    await abrir(page);
+    const titulo = 'Checklist VeriFactu: prepara tu software de facturación para 2027 (RD 1007/2023) | meskeIA';
+    await expect(page).toHaveTitle(titulo);
+    const meta = async (selector: string) => (await page.locator(selector).getAttribute('content')) ?? '';
+    expect(await meta('meta[property="og:title"]')).toBe(titulo);
+    expect(await meta('meta[name="twitter:title"]')).toBe(titulo);
+    for (const selector of ['meta[name="keywords"]', 'meta[name="twitter:description"]', 'meta[property="og:description"]', 'meta[name="description"]']) {
+      expect(await meta(selector), selector).not.toMatch(/factura(ción)? electrónica/i);
+    }
+  });
 });
