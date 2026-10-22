@@ -39,14 +39,16 @@ export const jsonLd = generateWebAppSchema({
   description: 'Simulador interactivo del flujo de fluidos ideales según la ecuación de Bernoulli (P + ½ρv² + ρgh = constante). Selecciona entre 3 geometrías (tubería Venturi horizontal, tubería con desnivel, vena con estenosis), ajusta caudal Q, densidad ρ, ratio de estrechamiento y altura, y observa partículas animadas fluyendo, manómetros midiendo presión local y vectores de velocidad. Aplica la ecuación de continuidad (A·v = constante) y Bernoulli para calcular v y P en cada sección. Ideal para EBAU de Física y Bachillerato (España), preparatoria, secundaria y educación media (Latinoamérica), examen de admisión universitaria, biofísica y primero de Universidad.',
   url: 'https://meskeia.com/simulador-fluidos-bernoulli/',
   category: 'EducationalApplication',
+  // Hallazgo 3409 (22/10/2026): tres de las siete prometían lo que la app no hace (un deslizador
+  // de densidad, una «verificación de la conservación» que no se muestra, el aire como líquido).
   features: [
-    'Tubería interactiva con 3 geometrías predefinidas',
-    'Animación de partículas cuya velocidad sigue al caudal y a la sección del tubo',
-    'Manómetros mostrando presión local en cada sección',
-    'Aplicación automática de continuidad (A·v = cte) y Bernoulli',
-    'Sliders para caudal, densidad, ratio de estrechamiento y altura',
-    'Cálculo de velocidad, presión y verificación de la conservación',
-    'Comparación con líquidos reales (agua, aceite, sangre, aire)',
+    'Tres geometrías: Venturi horizontal, tubería con desnivel y vena con estenosis',
+    'Deslizadores de caudal (0,1-10 L/s), estrechamiento D₂/D₁ (0,25-1), desnivel (0-10 m) y presión de entrada',
+    'Cuatro fluidos con su densidad: agua, aceite, sangre y aire',
+    'Tabla por sección con diámetro, área, velocidad por continuidad y presión absoluta por Bernoulli',
+    'Manómetros y vectores de velocidad dibujados en la tubería, con partículas animadas que siguen al caudal',
+    'Aviso de cavitación cuando la presión cae por debajo de la de vapor del agua',
+    '12 casos para clase con corrección automática y modo de práctica aleatorio',
   ],
   keywords: ['ecuación de Bernoulli', 'fluidos', 'efecto Venturi', 'presión', 'caudal', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'educación media', 'física'],
 });

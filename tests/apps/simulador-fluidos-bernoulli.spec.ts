@@ -1975,7 +1975,8 @@ test.describe('Inspector 22/10/2026 — 2.ª re-inspección con firma de rotura'
     expect(conUnidad).not.toContain('NaN');
   });
 
-  // ABIERTO: hallazgo «con la página traducida, cambiar de geometría tumba la app» (Inspector
+  // REPARADO (22/10/2026, hallazgo 3407): cada frase de la tarjeta va en su <span key>.
+  // Era: hallazgo «con la página traducida, cambiar de geometría tumba la app» (Inspector
   // 22/10/2026, familia C0312). (operativa, alto) · La tarjeta de descripción escribe la frase de
   // cada geometría como texto suelto condicional junto a sus hermanos,
   //   {geom === 'venturi' && ' En la garganta del Venturi…'}  (y las de 'desnivel' y 'estenosis'),
@@ -1988,8 +1989,7 @@ test.describe('Inspector 22/10/2026 — 2.ª re-inspección con firma de rotura'
   // propio <span> (React retira el elemento, no el texto).
   // Caso: página traducida → «Tubería con desnivel» → esperado la tubería con desnivel · obtenido
   // «Algo salió mal» y «NotFoundError: Failed to execute 'removeChild' on 'Node'».
-  test('HALLAZGO · con la página traducida, cambiar de geometría no tumba la app', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo de la página traducida (Inspector 22/10/2026, C0312)
+  test('HALLAZGO 3407 · con la página traducida, cambiar de geometría no tumba la app', async ({ page }) => {
     const errores = vigilarCaida(page);
     await traducirPagina(page);
     await page.getByRole('button', { name: /Tubería con desnivel/ }).click();
@@ -1997,16 +1997,25 @@ test.describe('Inspector 22/10/2026 — 2.ª re-inspección con firma de rotura'
     await expect(page.getByText('Algo salió mal')).toHaveCount(0);
     expect(errores).toEqual([]);
     await expect(page.locator('#ctrl-desnivel')).toBeVisible();
+    // Y las otras dos bocas del mismo mecanismo: la estenosis y un caso de aula que cambia la geometría
+    await page.getByRole('button', { name: /Vena con estenosis/ }).click();
+    await page.getByRole('button', { name: /Venturi horizontal/ }).click();
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: /^Caso 9:/ }).click();
+    await seccion.getByRole('button', { name: /Cargar en el simulador/ }).click();
+    await page.waitForTimeout(400);
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
   });
 
-  // ABIERTO: el mismo hallazgo, segunda boca. La cifra grande de ΔP escribe el signo como un nodo
+  // REPARADO (22/10/2026, hallazgo 3407): signo y cifra en un solo nodo de texto.
+  // Era: el mismo hallazgo, segunda boca. La cifra grande de ΔP escribe el signo como un nodo
   // de texto aparte, {dP < 0 ? '−' : dP > 0 ? '+' : ''}, delante de «486 Pa»: al llegar ΔP a 0
   // (D₂/D₁ = 1, el tope del deslizador, o Δh = 0) la rama vacía retira el nodo «−» y, traducido,
   // cae igual. Medido aislándolo: traduciendo todo MENOS esa cifra, llevar D₂/D₁ a 1 ya no cae.
   // Caso: página traducida → D₂/D₁ = 1 con el teclado (tecla Fin) → esperado «0 Pa · Sin
   // estrechamiento no hay caída» · obtenido «Algo salió mal».
-  test('HALLAZGO · con la página traducida, llevar ΔP a cero no tumba la app', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo de la página traducida (Inspector 22/10/2026, C0312)
+  test('HALLAZGO 3407 · con la página traducida, llevar ΔP a cero no tumba la app', async ({ page }) => {
     const errores = vigilarCaida(page);
     await traducirPagina(page);
     // Con el teclado y no con el setter: el deslizador sale de su tope con un evento real
@@ -2015,9 +2024,15 @@ test.describe('Inspector 22/10/2026 — 2.ª re-inspección con firma de rotura'
     await page.waitForTimeout(400);
     await expect(page.getByText('Algo salió mal')).toHaveCount(0);
     expect(errores).toEqual([]);
+    // Y de vuelta: del cero a una caída (la rama vacía pasa a «−»)
+    await page.keyboard.press('Home');
+    await page.waitForTimeout(400);
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
   });
 
-  // ABIERTO: hallazgo «el featureList del JSON-LD promete lo que la app no hace» (contenido, bajo;
+  // REPARADO (22/10/2026, hallazgo 3409): las siete características son las que propuso el
+  // Inspector con lo que vio en la app. Era: hallazgo «el featureList del JSON-LD promete lo que la app no hace» (contenido, bajo;
   // Inspector 22/10/2026). De las siete características, tres no describen la app: «Sliders para
   // caudal, densidad, ratio de estrechamiento y altura» (la densidad son cuatro botones de fluido,
   // y falta el deslizador de presión de entrada), «Cálculo de velocidad, presión y verificación de
@@ -2025,8 +2040,7 @@ test.describe('Inspector 22/10/2026 — 2.ª re-inspección con firma de rotura'
   // P + ½ρv² + ρgh) y «Comparación con líquidos reales (agua, aceite, sangre, aire)» (el aire es un
   // gas). Y calla los 12 casos para clase con corrección y el aviso de cavitación, que sí hace.
   // Caso: JSON-LD WebApplication → esperado características que la app cumple · obtenido las tres.
-  test('HALLAZGO · el featureList del JSON-LD no promete lo que la app no hace', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo del featureList (Inspector 22/10/2026)
+  test('HALLAZGO 3409 · el featureList del JSON-LD no promete lo que la app no hace', async ({ page }) => {
     const web = await page.evaluate(() =>
       Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
         .map((s) => s.textContent ?? '')
@@ -2043,7 +2057,10 @@ test.describe('Inspector 22/10/2026 — 2.ª re-inspección con firma de rotura'
 test.describe('Inspector 22/10/2026 — el lienzo en la primera pantalla de un portátil', () => {
   test.use({ viewport: { width: 1366, height: 768 } });
 
-  // ABIERTO: hallazgo «el lienzo empieza por debajo de la primera pantalla» (operativa, bajo;
+  // REPARADO (22/10/2026, hallazgo 3408): el lienzo va lo primero del bloque principal, con los
+  // controles debajo, y en el móvil los botones de geometría van en fila. Medido tras la
+  // reparación: 658 px a 1366 × 768, 820 px a 390 × 844 y 867 px a 360 × 740.
+  // Era: hallazgo «el lienzo empieza por debajo de la primera pantalla» (operativa, bajo;
   // Inspector 22/10/2026). La app promete «Visualiza por qué más velocidad implica menos presión»,
   // pero antes del lienzo van el hero, el aviso legal, la banda de Stemum, los tres botones de
   // geometría, la tarjeta de descripción y los cuatro controles. Medido: el lienzo empieza a
@@ -2052,12 +2069,20 @@ test.describe('Inspector 22/10/2026 — el lienzo en la primera pantalla de un p
   // primera cifra (la tabla) a 1.430 y 2.360 px. Nada de la tubería se ve sin desplazarse.
   // Caso: 1366 × 768, carga → esperado que el lienzo asome en la primera pantalla · obtenido su
   // borde superior a 987 px.
-  test('HALLAZGO · el lienzo de la tubería asoma en la primera pantalla de un portátil de 1366 × 768', async ({
+  test('HALLAZGO 3408 · el lienzo de la tubería asoma en la primera pantalla de un portátil de 1366 × 768', async ({
     page,
   }) => {
-    test.fail(); // ABIERTO: hallazgo del lienzo bajo la primera pantalla (Inspector 22/10/2026)
     const arriba = await page.evaluate(() => document.querySelector('canvas')!.getBoundingClientRect().top + scrollY);
-    expect(arriba).toBeLessThan(768);
+    // Con margen: que asome lo bastante para ver los manómetros, no un píxel
+    expect(arriba).toBeLessThan(768 - 80);
+    // El deslizador de caudal y el lienzo caben juntos en una pantalla (lo que se arrastra y lo
+    // que cambia), que es lo que había antes con los controles encima
+    const juntos = await page.evaluate(() => {
+      const lienzo = document.querySelector('canvas')!.getBoundingClientRect();
+      const caudal = document.querySelector('#ctrl-caudal')!.getBoundingClientRect();
+      return caudal.bottom - lienzo.top;
+    });
+    expect(juntos).toBeLessThan(768);
   });
 });
 

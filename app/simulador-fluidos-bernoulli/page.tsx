@@ -550,16 +550,29 @@ export default function SimuladorFluidosBernoulliPage() {
 
       {/* MAIN */}
       <div className={styles.mainContent}>
-        <p className={styles.descriptionCard}>
-          Aplicamos la ecuación de continuidad <strong>A·v = Q (constante)</strong> y la ecuación de
-          Bernoulli <strong>P + ½ρv² + ρgh = constante</strong> en un fluido ideal estacionario.
-          {geom === 'venturi' && ' En la garganta del Venturi, la velocidad sube y la presión cae — efecto que se mide con un manómetro diferencial.'}
-          {geom === 'desnivel' && ' Subir altura cuesta presión: parte del trabajo se transforma en energía potencial gravitatoria.'}
-          {/* El aviso de escala va también AQUÍ, a la vista: hasta el 28/09/2026 solo estaba en
-              el bloque educativo, que nace plegado, mientras esta tarjeta decía «Útil para
-              entender Doppler vascular» sin más. */}
-          {geom === 'estenosis' && ' Una estenosis arterial reduce la luz, acelera la sangre y la presión local cae bruscamente: es el mecanismo que mide el Doppler vascular. La escala no es fisiológica (tubo de 10 cm y caudales de litros por segundo): sirve para ver el mecanismo, no para leer las cifras de un vaso real.'}
-        </p>
+        {/* CANVAS — Hallazgo 3408 (22/10/2026): va lo primero, tras los botones de geometría.
+            Detrás de la tarjeta de descripción y los cuatro controles empezaba a 987 px en un
+            portátil de 1366 × 768: quien llegaba no veía la tubería sin desplazarse. Los controles
+            siguen pegados debajo, así que el lienzo y el deslizador que se arrastra caben juntos
+            en la pantalla; la descripción pasa detrás de los controles. */}
+        <div className={styles.canvasWrapper}>
+          <canvas ref={canvasRef} className={styles.canvas} aria-label="Tubería con flujo y manómetros" />
+          <div className={styles.legendRow}>
+            <span className={styles.legendItem}>
+              <span className={styles.legendDot} aria-hidden="true" style={{ background: '#2E86AB' }} />
+              Partículas de fluido
+            </span>
+            <span className={styles.legendItem}>
+              <span className={styles.legendDot} aria-hidden="true" style={{ background: '#E07A1F' }} />
+              Vector velocidad
+            </span>
+            <span className={styles.legendItem}>
+              {/* Por clase: sigue al tema, igual que el manómetro que representa. */}
+              <span className={`${styles.legendDot} ${styles.puntoPresion}`} aria-hidden="true" />
+              Manómetro (presión local)
+            </span>
+          </div>
+        </div>
 
         <div className={styles.controls}>
           <div className={styles.controlsGrid}>
@@ -675,25 +688,19 @@ export default function SimuladorFluidosBernoulliPage() {
           </label>
         </div>
 
-        {/* CANVAS */}
-        <div className={styles.canvasWrapper}>
-          <canvas ref={canvasRef} className={styles.canvas} aria-label="Tubería con flujo y manómetros" />
-          <div className={styles.legendRow}>
-            <span className={styles.legendItem}>
-              <span className={styles.legendDot} aria-hidden="true" style={{ background: '#2E86AB' }} />
-              Partículas de fluido
-            </span>
-            <span className={styles.legendItem}>
-              <span className={styles.legendDot} aria-hidden="true" style={{ background: '#E07A1F' }} />
-              Vector velocidad
-            </span>
-            <span className={styles.legendItem}>
-              {/* Por clase: sigue al tema, igual que el manómetro que representa. */}
-              <span className={`${styles.legendDot} ${styles.puntoPresion}`} aria-hidden="true" />
-              Manómetro (presión local)
-            </span>
-          </div>
-        </div>
+        <p className={styles.descriptionCard}>
+          Aplicamos la ecuación de continuidad <strong>A·v = Q (constante)</strong> y la ecuación de
+          Bernoulli <strong>P + ½ρv² + ρgh = constante</strong> en un fluido ideal estacionario.
+          {/* Hallazgo 3407 (22/10/2026): cada frase en su <span key>. Como texto suelto, con la
+              página traducida (el traductor cambia el nodo por <font>) cambiar de geometría hacía
+              que React retirase un nodo que ya no era hijo del <p>, y la app caía entera. */}
+          {geom === 'venturi' && <span key="venturi"> En la garganta del Venturi, la velocidad sube y la presión cae — efecto que se mide con un manómetro diferencial.</span>}
+          {geom === 'desnivel' && <span key="desnivel"> Subir altura cuesta presión: parte del trabajo se transforma en energía potencial gravitatoria.</span>}
+          {/* El aviso de escala va también AQUÍ, a la vista: hasta el 28/09/2026 solo estaba en
+              el bloque educativo, que nace plegado, mientras esta tarjeta decía «Útil para
+              entender Doppler vascular» sin más. */}
+          {geom === 'estenosis' && <span key="estenosis"> Una estenosis arterial reduce la luz, acelera la sangre y la presión local cae bruscamente: es el mecanismo que mide el Doppler vascular. La escala no es fisiológica (tubo de 10 cm y caudales de litros por segundo): sirve para ver el mecanismo, no para leer las cifras de un vaso real.</span>}
+        </p>
 
         {/* TABLA SECCIONES — dentro de un contenedor que se desplaza en horizontal (hallazgo
             2363): a 390 px la tabla mide ~500 px y html/body llevan overflow-x: hidden, así que
@@ -740,7 +747,9 @@ export default function SimuladorFluidosBernoulliPage() {
             <span
               className={`${styles.resultValueLarge} ${dP < 0 ? styles.valorCae : dP > 0 ? styles.valorSube : ''}`}
             >
-              {dP < 0 ? '−' : dP > 0 ? '+' : ''}{fmtPresion(Math.abs(dP))}
+              {/* Un solo nodo de texto (hallazgo 3407): con el signo aparte, al llegar ΔP a 0 la
+                  rama vacía retiraba el nodo «−» y, con la página traducida, la app caía. */}
+              {`${dP < 0 ? '−' : dP > 0 ? '+' : ''}${fmtPresion(Math.abs(dP))}`}
             </span>
             {/* Tres ramas, no dos. dP = 0 exacto no es rebuscado: es el extremo alto del
                 deslizador de estrechamiento (D₂/D₁ = 1, tubo recto) y el bajo del de desnivel

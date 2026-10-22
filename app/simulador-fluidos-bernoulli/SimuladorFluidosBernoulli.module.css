@@ -43,12 +43,6 @@
   margin-bottom: var(--spacing-xl);
 }
 
-@media (max-width: 720px) {
-  .geomSelector {
-    grid-template-columns: 1fr;
-  }
-}
-
 .geomBtn {
   display: flex;
   flex-direction: column;
@@ -91,6 +85,34 @@
 .geomDesc {
   font-size: 0.78rem;
   color: var(--text-secondary);
+}
+
+/* Hallazgo 3408 (22/10/2026): en columna, los tres botones ocupaban 359 px en el móvil y
+   empujaban la tubería a 2,6 pantallas. Se quedan en fila, compactos y sin la línea de detalle
+   (la tarjeta de descripción explica cada geometría). Va detrás de las reglas base para que
+   la cascada no la pise. */
+@media (max-width: 720px) {
+  .geomSelector {
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .geomBtn {
+    padding: var(--spacing-sm) 4px;
+  }
+
+  .geomIcon {
+    font-size: 1.3rem;
+  }
+
+  .geomName {
+    font-size: 0.82rem;
+    line-height: 1.25;
+  }
+
+  .geomDesc {
+    display: none;
+  }
 }
 
 /* MAIN */
