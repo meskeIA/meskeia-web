@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import styles from './ConversorBraille.module.css';
 import impresion from '@/styles/impresion.module.css';
-import TecladoBraille from './TecladoBraille';
+import TecladoBraille, { type Borrado } from './TecladoBraille';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
@@ -731,10 +731,14 @@ export default function ConversorBraillePage() {
     setResult(convertBrailleToText(nuevo));
   };
 
-  const borrarCelda = () => {
-    const nuevo = Array.from(input).slice(0, -1).join('');
+  /** Devuelve qué celda quitó y cuántas quedan, para que el teclado lo anuncie (hallazgo 3420). */
+  const borrarCelda = (): Borrado => {
+    const celdas = Array.from(input);
+    if (celdas.length === 0) return { borrada: null, quedan: 0 };
+    const nuevo = celdas.slice(0, -1).join('');
     setInput(nuevo);
     setResult(nuevo ? convertBrailleToText(nuevo) : '');
+    return { borrada: celdas[celdas.length - 1], quedan: celdas.length - 1 };
   };
 
   const cambiarModo = (nuevo: 'textToBraille' | 'brailleToText') => {

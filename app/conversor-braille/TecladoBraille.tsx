@@ -37,33 +37,59 @@ export function puntosDeCelda(celda: string): number[] {
 /** Orden de pintado de la celda: fila a fila, columna izquierda (1 2 3) y derecha (4 5 6). */
 const ORDEN_VISUAL = [1, 4, 2, 5, 3, 6];
 
+/** Lo que ha hecho un retroceso: la celda que quitó (null si la caja ya estaba vacía) y cuántas quedan. */
+export interface Borrado {
+  borrada: string | null;
+  quedan: number;
+}
+
 interface Props {
   /** Añade una celda (también la del espacio, U+2800) al final de la entrada. */
   onCelda: (celda: string) => void;
-  /** Borra la última celda de la entrada. */
-  onBorrar: () => void;
+  /** Borra la última celda de la entrada y dice cuál era. */
+  onBorrar: () => Borrado;
 }
+
+/** «Celda ⠇, puntos 1-2-3» · «Espacio». */
+const describirCelda = (celda: string): string => {
+  const puntos = puntosDeCelda(celda);
+  return puntos.length === 0
+    ? 'Espacio'
+    : `Celda ${celda}, ${puntos.length === 1 ? 'punto' : 'puntos'} ${puntos.join('-')}`;
+};
 
 export default function TecladoBraille({ onCelda, onBorrar }: Props) {
   const [marcados, setMarcados] = useState<Set<number>>(new Set());
   const [acorde, setAcorde] = useState<Set<number>>(new Set());
-  const [anuncio, setAnuncio] = useState('');
+  /**
+   * ⚠️ 22/10/2026 (hallazgo 3420) — el anuncio era solo un texto, y con el mismo texto dos veces
+   * seguidas (la segunda «l» de «llave», dos retrocesos) React no toca el DOM y la región viva no
+   * vuelve a hablar. Cada pulsación lleva su número, y su paridad añade o quita un espacio duro
+   * invisible al final: el contenido cambia siempre y el lector lo lee siempre.
+   */
+  const [anuncio, setAnuncio] = useState({ texto: '', n: 0 });
+  const anunciar = (texto: string) => setAnuncio((a) => ({ texto, n: a.n + 1 }));
   const pulsadas = useRef<Set<string>>(new Set());
   const acordeRef = useRef<Set<number>>(new Set());
+  const puntoUnoRef = useRef<HTMLButtonElement>(null);
+  const escribirRef = useRef<HTMLButtonElement>(null);
 
   const escribir = (celda: string) => {
     onCelda(celda);
     const puntos = puntosDeCelda(celda);
-    setAnuncio(
-      puntos.length === 0
-        ? 'Espacio añadido'
-        : `Celda ${celda} añadida, ${puntos.length === 1 ? 'punto' : 'puntos'} ${puntos.join('-')}`,
-    );
+    anunciar(puntos.length === 0 ? 'Espacio añadido' : `${describirCelda(celda)}, añadida`);
   };
 
+  // Hallazgo 3420: el retroceso dice qué borró y si la caja queda vacía (la caja de resultado
+  // desaparece entonces, y eso no lo anuncia nadie); con la caja ya vacía, que no hay nada.
   const borrar = () => {
-    onBorrar();
-    setAnuncio('Última celda borrada');
+    const { borrada, quedan } = onBorrar();
+    if (borrada === null) {
+      anunciar('No hay ninguna celda que borrar');
+      return;
+    }
+    const que = puntosDeCelda(borrada).length === 0 ? 'Espacio borrado' : `${describirCelda(borrada)}, borrada`;
+    anunciar(quedan === 0 ? `${que}. La caja está vacía` : que);
   };
 
   const alternar = (punto: number) => {
@@ -79,6 +105,10 @@ export default function TecladoBraille({ onCelda, onBorrar }: Props) {
     if (marcados.size === 0) return;
     escribir(celdaDePuntos(marcados));
     setMarcados(new Set());
+    // Hallazgo 3421 (22/10/2026): sin puntos marcados el botón se deshabilita, y un botón con el
+    // foco que pasa a disabled lo suelta al <body>: con teclado o lector se perdía el sitio en
+    // cada celda. El foco vuelve al punto 1, donde empieza la celda siguiente.
+    if (document.activeElement === escribirRef.current) puntoUnoRef.current?.focus();
   };
 
   // Solo cuando el foco está en la propia zona: dentro de un botón, Espacio ya lo pulsa
@@ -152,6 +182,7 @@ export default function TecladoBraille({ onCelda, onBorrar }: Props) {
           {ORDEN_VISUAL.map((p) => (
             <button
               key={p}
+              ref={p === 1 ? puntoUnoRef : undefined}
               type="button"
               className={`${styles.tecladoPunto} ${marcados.has(p) ? styles.tecladoPuntoActivo : ''}`}
               aria-pressed={marcados.has(p)}
@@ -164,6 +195,7 @@ export default function TecladoBraille({ onCelda, onBorrar }: Props) {
         </div>
         <div className={styles.tecladoAcciones}>
           <button
+            ref={escribirRef}
             type="button"
             className={styles.exampleBtn}
             onClick={escribirMarcados}
@@ -180,7 +212,9 @@ export default function TecladoBraille({ onCelda, onBorrar }: Props) {
         </div>
       </div>
 
-      <p className={styles.tecladoAnuncio} aria-live="polite">{anuncio}</p>
+      <p className={styles.tecladoAnuncio} aria-live="polite">
+        {`${anuncio.texto}${anuncio.n % 2 === 1 ? ' ' : ''}`}
+      </p>
     </div>
   );
 }

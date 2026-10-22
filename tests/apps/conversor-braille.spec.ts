@@ -1230,16 +1230,20 @@ test.describe('re-inspección 22/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — región viva del teclado
+  // REPARADO (22/10/2026, hallazgo 3420) — región viva del teclado
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // Cada anuncio lleva su número y su paridad añade o quita un espacio duro al final, así que el
+  // contenido cambia siempre; el retroceso dice qué celda borró y si la caja queda vacía, y con la
+  // caja ya vacía, que no hay nada que borrar.
+  //
+  // Era:
   // El teclado confirma cada pulsación en un <p aria-live="polite">. Con el mismo texto dos veces
   // seguidas React no toca el DOM, y una región viva solo habla cuando su contenido CAMBIA: la
   // segunda «l» de «llave» y el segundo retroceso no se anuncian. El caso peor es el retroceso que
   // VACÍA la caja: la caja de resultado desaparece (eso no se anuncia) y el anuncio repite
   // «Última celda borrada», así que quien escribe sin ver no oye nada.
   test('teclado — la segunda celda igual y el retroceso que vacía la caja se anuncian', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
     await page.getByRole('button', { name: 'Braille → Texto' }).click();
@@ -1265,6 +1269,13 @@ test.describe('re-inspección 22/10/2026', () => {
     await page.keyboard.press('Backspace');
     await expect(textarea).toHaveValue(''); // precondición
     expect.soft(await cambios(), 'el retroceso que vacía la caja no se anuncia').toBeGreaterThan(antes);
+    const anuncio = page.locator('[class*="tecladoAnuncio"]');
+    await expect(anuncio).toContainText('Celda ⠁, punto 1, borrada. La caja está vacía');
+
+    // Con la caja ya vacía, el retroceso no dice que ha borrado nada
+    await page.keyboard.press('Backspace');
+    await expect(anuncio).toContainText('No hay ninguna celda que borrar');
+    await expect(anuncio).not.toContainText('borrada');
 
     // «ll»: l ⠇ (1-2-3) dos veces.
     await acorde(page, [1, 2, 3]);
@@ -1273,21 +1284,23 @@ test.describe('re-inspección 22/10/2026', () => {
     await acorde(page, [1, 2, 3]);
     await expect(textarea).toHaveValue('⠇⠇'); // precondición
     expect.soft(await cambios(), 'la segunda ⠇ seguida no se anuncia').toBeGreaterThan(antesL);
+    await expect(anuncio).toContainText('Celda ⠇, puntos 1-2-3, añadida');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — foco tras «Escribir celda»
+  // REPARADO (22/10/2026, hallazgo 3421) — foco tras «Escribir celda»: vuelve al punto 1
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // Era:
   // «Escribir celda» se deshabilita en cuanto escribe (los puntos se apagan), y un botón con el
   // foco que pasa a `disabled` lo suelta al <body>: con teclado o lector de pantalla se pierde el
   // sitio en cada celda que se escribe por este camino.
   test('teclado — tras «Escribir celda» con Intro el foco no cae al <body>', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
     await page.getByRole('button', { name: 'Braille → Texto' }).click();
-    await page.getByRole('button', { name: 'Punto 1', exact: true }).focus();
+    const puntoUno = page.getByRole('button', { name: 'Punto 1', exact: true });
+    await puntoUno.focus();
     await page.keyboard.press('Space');
     const escribir = page.getByRole('button', { name: /^Escribir celda/ });
     await expect(escribir).toHaveText('Escribir celda ⠁');
@@ -1295,6 +1308,17 @@ test.describe('re-inspección 22/10/2026', () => {
     await page.keyboard.press('Enter');
     await expect(page.locator('textarea').first()).toHaveValue('⠁'); // precondición
     expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+    // Vuelve al punto 1, donde empieza la celda siguiente: «b» (1-2) sin salir del teclado
+    await expect(puntoUno).toBeFocused();
+    await page.keyboard.press('Space');
+    // El orden de tabulación es el visual (1 4 2 5 3 6): el punto 2 está a dos paradas
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('button', { name: 'Punto 2', exact: true })).toBeFocused();
+    await page.keyboard.press('Space');
+    await escribir.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('textarea').first()).toHaveValue('⠁⠃');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
