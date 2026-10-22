@@ -880,3 +880,46 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
     expect(/<\s*1\.000\.000/.test(nota) && /≤\s*1\.000\.000/.test(desglose)).toBe(false);
   });
 });
+
+/**
+ * CABO C0146 (reparar, 22/10/2026) — Extremadura, art. 30.1 del DLeg 1/2018 (BOE-A-2018-8159,
+ * consolidado a 04/08/2026, leído en sesión): Grupos I y II, 99 % «si la base liquidable es
+ * inferior o igual a 300.000 euros», 50 % «para la parte de base liquidable que supere los
+ * 300.000 euros con el límite de 600.000 euros»; documento público obligatorio «cuando la base
+ * imponible sea superior a 10.000 euros». La app aplicaba el 99 % a toda la cuota sin límite.
+ * El reparto por partes de base es el medio ponderado, como la escala del art. 58 bis catalán.
+ */
+test.describe('Estimador ISD donaciones — Extremadura (C0146)', () => {
+  /**
+   * 400.000 € de padre a hijo (Grupo II), en escritura pública, sin patrimonio previo:
+   *   Cuota íntegra = 80.655,08 + (400.000 − 398.777,54) × 29,75 % = 81.018,76185
+   *   Bonificación  = (300.000 × 99 % + 100.000 × 50 %) / 400.000 = 86,75 % de la cuota
+   *                 = 70.283,7759
+   *   A ingresar    = 10.734,98595                                    → «10.734,99 €»
+   * Con el 99 % plano de antes: 810,19 €.
+   */
+  test('400.000 € a un hijo: 99 % hasta 300.000 € y 50 % del resto, 10.734,99 €', async ({ page }) => {
+    await rellenar(page, { ccaa: 'extremadura', grupo: 'II', valor: '400000' });
+    expect(await cuota(page)).toBe('10.734,99 €');
+  });
+
+  /**
+   * 20.000 € sin escritura: la base imponible supera 10.000 €, así que no hay bonificación.
+   *   Cuota íntegra = 1.290,43 + (20.000 − 15.980,91) × 9,35 % = 1.666,214915 → «1666,21 €»
+   * Con 9.000 € sin escritura, sí: 611,50 + (9.000 − 7.993,46) × 8,50 % = 697,0559 × 1 %
+   *   = 6,970559 → «6,97 €»
+   */
+  test('sin escritura pierde la bonificación por encima de 10.000 € de base, y no por debajo', async ({ page }) => {
+    await rellenar(page, { ccaa: 'extremadura', grupo: 'II', valor: '20000', escritura: false });
+    expect(await cuota(page)).toBe('1666,21 €'); // cuatro cifras: sin punto de miles (RAE)
+    expect(await panel(page)).toMatch(/documento público/);
+    await rellenar(page, { ccaa: 'extremadura', grupo: 'II', valor: '9000', escritura: false });
+    expect(await cuota(page)).toBe('6,97 €');
+  });
+
+  test('la tabla de comunidades describe la escala de Extremadura, no un 99 % plano', async ({ page }) => {
+    await abrir(page);
+    const texto = await textoCompleto(page);
+    expect(texto).toMatch(/Extremadura\s*99 % de la parte de base hasta 300\.000 €; 50 % de la parte de base de 300\.000 € a 600\.000 €; nada por encima de 600\.000 €/);
+  });
+});

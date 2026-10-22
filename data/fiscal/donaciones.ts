@@ -50,7 +50,24 @@ export interface BonificacionGrupoID {
   exencion?: number;
   limite?: number | null;
   escalonado?: Array<{ hasta?: number; desde?: number; porcentaje: number }>;
+  /**
+   * Escala MARGINAL sobre la base liquidable: cada tramo bonifica solo la parte de base que le
+   * toca, y el porcentaje que se aplica a la cuota es el medio ponderado (la misma forma que
+   * `escalaPonderada` de la rama de sucesiones, Cataluña). No confundir con `escalonado`, donde
+   * la base entera se lleva el porcentaje de su tramo.
+   */
+  escalaPonderada?: TramoEscalaBonificacionID[];
+  /** La misma escala con los límites que rigen si el donatario tiene discapacidad (≥ 33 %) */
+  escalaPonderadaDiscapacidad?: TramoEscalaBonificacionID[];
   requiereEscritura?: boolean;
+}
+
+/** Un tramo de una escala marginal de bonificación: el marginal se aplica a la parte de base del tramo. */
+export interface TramoEscalaBonificacionID {
+  /** Límite superior del tramo de base liquidable (€); `Infinity` en el último. */
+  hasta: number;
+  /** Fracción (0,99 = 99 %) que bonifica la porción de base comprendida en este tramo. */
+  marginal: number;
 }
 
 /**
@@ -73,6 +90,11 @@ export interface BonificacionCCAA_ID {
   bonificaciones: Record<string, BonificacionGrupoID>;
   notas: string;
   requiereEscritura?: boolean;
+  /**
+   * La bonificación exige documento público solo si la base imponible SUPERA este importe
+   * (Extremadura: 10.000 €, art. 30.1 DLeg 1/2018). Por debajo, no lo exige.
+   */
+  escrituraSiBaseSupera?: number;
   /** Artículo de la bonificación por parentesco, si está cotejado (se imprime en el desglose) */
   normaBonificacion?: string;
   /** Solo en las comunidades donde está cotejada; las demás no la modelan */
@@ -161,6 +183,20 @@ export const ACUMULACION_DONACIONES_A_SUCESION_ANIOS = 4;
 
 // ─── Bonificaciones autonómicas — donaciones (17 CCAA) ───────────────────────
 
+/** Extremadura, art. 30.1 DLeg 1/2018: 99 % hasta 300.000 €, 50 % hasta 600.000 €, nada después. */
+export const ESCALA_EXTREMADURA_ID: TramoEscalaBonificacionID[] = [
+  { hasta: 300000, marginal: 0.99 },
+  { hasta: 600000, marginal: 0.5 },
+  { hasta: Infinity, marginal: 0 },
+];
+
+/** La misma, con la consideración legal de persona con discapacidad: 450.000 y 750.000 €. */
+export const ESCALA_EXTREMADURA_ID_DISCAPACIDAD: TramoEscalaBonificacionID[] = [
+  { hasta: 450000, marginal: 0.99 },
+  { hasta: 750000, marginal: 0.5 },
+  { hasta: Infinity, marginal: 0 },
+];
+
 export const BONIFICACIONES_CCAA_ID: Record<string, BonificacionCCAA_ID> = {
 
   'madrid': {
@@ -240,18 +276,30 @@ export const BONIFICACIONES_CCAA_ID: Record<string, BonificacionCCAA_ID> = {
     notas: 'Bonificación 99 % para cónyuge, padres, hijos, nietos y abuelos, si la donación consta en documento público (o se eleva a él en plazo) y, en metálico, con justificación del origen de los fondos. Hermanos, sobrinos y tíos tienen un 25 % que esta estimación no aplica.',
   },
 
+  // Cotejado el 22/10/2026 en el BOE consolidado (BOE-A-2018-8159, DLeg 1/2018 de Extremadura,
+  // art. 30, texto actualizado el 04/08/2026), cabo C0146. Art. 30.1: 99 % de la cuota para los
+  // Grupos I y II «si la base liquidable es inferior o igual a 300.000 euros», 50 % «para la
+  // parte de base liquidable que supere los 300.000 euros con el límite de 600.000 euros»; con
+  // la consideración legal de persona con discapacidad, 450.000 y 750.000 €. Documento público
+  // obligatorio «cuando la base imponible sea superior a 10.000 euros». Hasta esta fecha el
+  // módulo aplicaba el 99 % a toda la cuota sin límite, aunque el límite está en la ley desde
+  // el 17/05/2022. La parte de base por encima de 600.000 € no bonifica. No se modelan: la
+  // acumulación de donaciones sucesivas (art. 30.2) ni los requisitos del metálico (art. 30.4).
+  // Una sola comunidad: el sello del módulo NO se mueve.
   'extremadura': {
     nombre: 'Extremadura',
     regimen: 'comun',
+    normaBonificacion: 'art. 30.1 DLeg 1/2018',
+    escrituraSiBaseSupera: 10000,
     bonificaciones: {
-      'I-conyuge':      { porcentaje: 0.99 },
-      'I-descendiente': { porcentaje: 0.99 },
-      'II':             { porcentaje: 0.99 },
-      'II-ascendiente': { porcentaje: 0.99 },
+      'I-conyuge':      { escalaPonderada: ESCALA_EXTREMADURA_ID, escalaPonderadaDiscapacidad: ESCALA_EXTREMADURA_ID_DISCAPACIDAD },
+      'I-descendiente': { escalaPonderada: ESCALA_EXTREMADURA_ID, escalaPonderadaDiscapacidad: ESCALA_EXTREMADURA_ID_DISCAPACIDAD },
+      'II':             { escalaPonderada: ESCALA_EXTREMADURA_ID, escalaPonderadaDiscapacidad: ESCALA_EXTREMADURA_ID_DISCAPACIDAD },
+      'II-ascendiente': { escalaPonderada: ESCALA_EXTREMADURA_ID, escalaPonderadaDiscapacidad: ESCALA_EXTREMADURA_ID_DISCAPACIDAD },
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99 % para Grupos I y II.',
+    notas: 'Grupos I y II: bonificación del 99 % de la cuota por la parte de base liquidable hasta 300.000 € y del 50 % por la parte entre 300.000 y 600.000 € (450.000 y 750.000 € con discapacidad); lo que pasa de ese límite no se bonifica. Si la base imponible supera 10.000 €, exige documento público. Las donaciones al mismo donatario en los tres años anteriores se acumulan para fijar el porcentaje, y en metálico hay requisitos de pago y de justificación del origen: esta estimación no los aplica.',
   },
 
   'canarias': {

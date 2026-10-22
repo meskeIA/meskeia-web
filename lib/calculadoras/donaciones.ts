@@ -31,6 +31,7 @@ import {
   cuotaTributariaConCorreccionIS,
   type TramoTarifaID,
   type BonificacionGrupoID,
+  type TramoEscalaBonificacionID,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ───────────────────────────────────────────────────────────
@@ -181,6 +182,24 @@ function porcentajeEscalonado(b: BonificacionGrupoID, base: number): number {
   return tramo?.porcentaje ?? 0;
 }
 
+/**
+ * Porcentaje (fracción) medio de una escala MARGINAL: cada tramo bonifica la parte de base que
+ * le toca, y la cuota se bonifica con la media ponderada (Extremadura, art. 30.1 DLeg 1/2018:
+ * 400.000 € → (300.000 × 99 % + 100.000 × 50 %) / 400.000 = 86,75 %).
+ */
+function porcentajePonderado(escala: TramoEscalaBonificacionID[], base: number): number {
+  if (base <= 0) return escala[0]?.marginal ?? 0;
+  let desde = 0;
+  let bonificado = 0;
+  for (const t of escala) {
+    const parte = Math.max(0, Math.min(base, t.hasta) - desde);
+    bonificado += parte * t.marginal;
+    desde = t.hasta;
+    if (base <= t.hasta) break;
+  }
+  return bonificado / base;
+}
+
 function aplicarBonificaciones(
   cuotaTributaria: number,
   baseLiquidable: number,
@@ -200,7 +219,10 @@ function aplicarBonificaciones(
   const tieneAlguna =
     aplicaDisc ||
     (bGrupo !== undefined &&
-      ((bGrupo.porcentaje ?? 0) > 0 || bGrupo.exencion !== undefined || (bGrupo.escalonado?.length ?? 0) > 0));
+      ((bGrupo.porcentaje ?? 0) > 0 ||
+        bGrupo.exencion !== undefined ||
+        (bGrupo.escalonado?.length ?? 0) > 0 ||
+        (bGrupo.escalaPonderada?.length ?? 0) > 0));
 
   if (!tieneAlguna) {
     return { bonificaciones, sinBonificacion: 'Sin bonificación autonómica para este grupo' };
@@ -209,6 +231,14 @@ function aplicarBonificaciones(
   // Castilla-La Mancha: todas sus bonificaciones inter vivos exigen escritura pública (art. 18.3.a Ley 8/2013)
   if (config.requiereEscritura && !escrituraPublica) {
     return { bonificaciones, sinBonificacion: 'Sin bonificación: requiere escritura pública notarial' };
+  }
+  // Extremadura: solo la exige por encima de un importe de base imponible (art. 30.1 DLeg 1/2018).
+  // En una donación la base imponible es el valor neto, que aquí es `baseLiquidable` (art. 20.5 LISD).
+  if (config.escrituraSiBaseSupera !== undefined && baseLiquidable > config.escrituraSiBaseSupera && !escrituraPublica) {
+    return {
+      bonificaciones,
+      sinBonificacion: `Sin bonificación: con una base imponible de más de ${config.escrituraSiBaseSupera.toLocaleString('es-ES')} € la donación debe constar en documento público (${config.nombre}${config.normaBonificacion ? `, ${config.normaBonificacion}` : ''})`,
+    };
   }
 
   let restante = cuotaTributaria;
@@ -224,13 +254,21 @@ function aplicarBonificaciones(
       });
       restante = 0;
     } else {
-      const fraccion = bGrupo.escalonado?.length
-        ? porcentajeEscalonado(bGrupo, baseLiquidable)
-        : (bGrupo.porcentaje ?? 0);
+      // Con discapacidad (≥ 33 %, «consideración legal de persona con discapacidad»), la escala
+      // de límites ampliados si la comunidad la tiene.
+      const escala = gradoDisc >= 33 && bGrupo.escalaPonderadaDiscapacidad?.length
+        ? bGrupo.escalaPonderadaDiscapacidad
+        : bGrupo.escalaPonderada;
+      const fraccion = escala?.length
+        ? porcentajePonderado(escala, baseLiquidable)
+        : bGrupo.escalonado?.length
+          ? porcentajeEscalonado(bGrupo, baseLiquidable)
+          : (bGrupo.porcentaje ?? 0);
       if (fraccion > 0) {
         const importe = restante * fraccion;
+        const media = escala?.length && fraccion !== escala[0].marginal ? ' de media por tramos de base' : '';
         bonificaciones.push({
-          concepto: `Bonificación ${textoPorcentaje(fraccion)} (${config.nombre}${norma})`,
+          concepto: `Bonificación ${textoPorcentaje(fraccion)}${media} (${config.nombre}${norma})`,
           porcentaje: fraccion * 100,
           importe,
         });

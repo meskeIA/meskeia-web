@@ -87,6 +87,22 @@ function textoTramoPatrimonio(patrimonio: number): string {
 /** Resumen de la bonificación de un grupo, sacado del módulo de datos (no escrito a mano). */
 function describirBonificacion(b: BonificacionGrupoID | undefined): string {
   if (!b) return 'Sin bonificación';
+  if (b.escalaPonderada?.length) {
+    // Escala marginal: cada porcentaje bonifica solo la parte de base de su tramo (C0146)
+    let desde = 0;
+    const partes: string[] = [];
+    for (const t of b.escalaPonderada) {
+      if (t.marginal > 0) {
+        partes.push(Number.isFinite(t.hasta)
+          ? `${pctFraccion(t.marginal)} de la parte de base ${desde === 0 ? 'hasta' : `de ${euros0(desde)} a`} ${euros0(t.hasta)}`
+          : `${pctFraccion(t.marginal)} de la parte de base desde ${euros0(desde)}`);
+      } else if (Number.isFinite(desde)) {
+        partes.push(`nada por encima de ${euros0(desde)}`);
+      }
+      desde = t.hasta;
+    }
+    return partes.join('; ');
+  }
   if (b.escalonado?.length) {
     return b.escalonado
       .map((t) => {
@@ -109,6 +125,7 @@ function describirComunidad(clave: string, c: BonificacionCCAA_ID): { gruposIyII
   }
   let gruposIyII = describirBonificacion(c.bonificaciones['II']);
   if (c.requiereEscritura) gruposIyII += ' · exige escritura pública';
+  if (c.escrituraSiBaseSupera !== undefined) gruposIyII += ` · exige documento público si la base supera ${euros0(c.escrituraSiBaseSupera)}`;
   if (c.regimen === 'foral') gruposIyII += ' · régimen foral: estimación muy aproximada';
   return { gruposIyII, grupoIII: describirBonificacion(c.bonificaciones['III']) };
 }
@@ -398,8 +415,8 @@ export default function EstimadorImpuestoDonacionesPage() {
                 </label>
               </div>
               <span id="escritura-ayuda" className={styles.helper}>
-                Obligatoria para inmuebles (art. 633 del Código Civil). Necesaria en Cataluña (tarifa reducida)
-                y en Castilla-La Mancha (bonificaciones)
+                Obligatoria para inmuebles (art. 633 del Código Civil). Necesaria en Cataluña (tarifa reducida),
+                en Castilla-La Mancha (bonificaciones) y en Extremadura si la base supera 10.000 € (bonificaciones)
               </span>
             </fieldset>
           </div>
@@ -818,7 +835,8 @@ export default function EstimadorImpuestoDonacionesPage() {
                   Legalmente no es obligatoria para donaciones de dinero o bienes muebles. Sin embargo,
                   es muy recomendable por varias razones: (1) Facilita la acreditación del origen de
                   los fondos ante Hacienda. (2) En Castilla-La Mancha, las bonificaciones están
-                  condicionadas a la escritura pública (art. 18.3 Ley 8/2013). (3) Para inmuebles, sí es
+                  condicionadas a la escritura pública (art. 18.3 Ley 8/2013), y en Extremadura, cuando la
+                  base imponible supera 10.000 € (art. 30.1 DLeg 1/2018). (3) Para inmuebles, sí es
                   obligatoria (art. 633 Código Civil) y además necesaria para inscribir en el
                   Registro de la Propiedad. (4) En Cataluña, la tarifa reducida (del 5&nbsp;% al 9&nbsp;%)
                   para los Grupos I y II requiere escritura.
