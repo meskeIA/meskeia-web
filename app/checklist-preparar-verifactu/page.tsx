@@ -40,7 +40,9 @@ const SECCIONES: Seccion[] = [
       {
         id: 'que-es',
         titulo: 'Sé qué es VeriFactu y cómo me afecta como autónomo/empresa',
-        info: 'Sistema de facturación electrónica regulado por el RD 1007/2023. Obliga a que el software de facturación envíe registros de facturación a la AEAT en tiempo real (o casi real).',
+        // C0318 (22/10/2026): no es la factura electrónica entre empresas (Ley Crea y Crece), ni
+        // obliga a remitir: remitir es la modalidad VERI*FACTU, voluntaria (FAQ de la AEAT).
+        info: 'Reglamento de los sistemas informáticos de facturación (RD 1007/2023); no es la factura electrónica entre empresas de la Ley Crea y Crece. Obliga a que el programa con el que facturas genere un registro de cada factura, encadenado e inalterable. Puedes remitirlos a la AEAT al emitir cada factura (modalidad VERI*FACTU, voluntaria) o conservarlos firmados en tu propio sistema.',
       },
       {
         id: 'fecha-limite',
@@ -50,7 +52,7 @@ const SECCIONES: Seccion[] = [
       {
         id: 'obligado',
         titulo: 'Sé si estoy obligado a cumplir VeriFactu',
-        info: 'Obligados: todos los autónomos y empresas que facturen en territorio español (excepto quienes tributen en SII — grandes empresas, IGIC Canarias tiene normativa propia). Si usas el SII de la AEAT, ya cumples un sistema similar.',
+        info: 'Obligados (art. 3.1 del RD 1007/2023): las sociedades y los autónomos que facturen con un programa informático, también en estimación objetiva (módulos). Quedan fuera quienes llevan los libros registro por el SII de la AEAT (art. 3.3), que ya le remiten sus facturas por esa vía (IGIC Canarias tiene normativa propia).',
       },
     ],
   },
@@ -67,7 +69,7 @@ const SECCIONES: Seccion[] = [
       {
         id: 'certificado-digital',
         titulo: 'Tengo certificado digital vigente (persona física o entidad)',
-        info: 'Necesario para la firma electrónica de los registros. Obtenerlo en la FNMT (sede.fnmt.gob.es) o con DNIe. Renovar antes de caducidad.',
+        info: 'Con VERI*FACTU los registros no se firman: basta su huella o «hash» (art. 16.3 del RD 1007/2023); la firma electrónica es de la modalidad que no los remite (art. 12). Para remitirlos, el programa usa un certificado cualificado: el tuyo, o el de quien te represente o colabore en tu nombre. Obtenerlo en la FNMT (sede.fnmt.gob.es) o con DNIe, y renovarlo antes de que caduque.',
       },
       {
         id: 'sandbox-aeat',
@@ -116,7 +118,9 @@ const SECCIONES: Seccion[] = [
       {
         id: 'conocer-sanciones',
         titulo: 'Conozco las sanciones por incumplimiento',
-        info: 'Usar software no certificado: hasta 50.000 \u20AC por ejercicio. No enviar registros: sanción por cada factura no reportada. Facturación fraudulenta: sanción agravada + posible delito fiscal.',
+        // C0318 (22/10/2026): art. 201 bis LGT, según la FAQ de la AEAT: multa FIJA, no «hasta»,
+        // y no hay una sanción por cada factura.
+        info: 'Tener un programa que no cumple el reglamento, o alterado: multa fija de 50.000 € por cada ejercicio (art. 201 bis LGT). A quien lo fabrica o vende: 150.000 € por ejercicio y por cada tipo de programa, y 1.000 € por cada uno vendido sin la certificación exigida. Facturación fraudulenta: además, posible delito fiscal.',
       },
       {
         id: 'fechas-calendario',
@@ -322,15 +326,21 @@ export default function ChecklistPrepararVerifactuPage() {
         {/* Contenido educativo */}
         <EducationalSection
           title="Todo sobre VeriFactu"
-          subtitle="Guía completa sobre la facturación electrónica en España"
+          subtitle="Guía del reglamento de los sistemas informáticos de facturación en España"
         >
           <section className={styles.guideSection}>
             <h2>¿Qué es VeriFactu exactamente?</h2>
             <p>
               VeriFactu es el nombre coloquial del sistema de <strong>Verificación de Facturas</strong> regulado
               por el <strong>Real Decreto 1007/2023</strong>, de 5 de diciembre. Establece que los programas
-              de facturación deben generar un registro de cada factura emitida y enviarlo a la Agencia Tributaria
-              (AEAT) de forma automática, prácticamente en tiempo real.
+              de facturación deben generar un registro de cada factura emitida, encadenado con el anterior e
+              inalterable. Hay dos formas de cumplirlo: remitir cada registro a la Agencia Tributaria (AEAT)
+              al emitir la factura —la modalidad <strong>VERI*FACTU</strong>, voluntaria, que no exige firmarlos— o
+              conservarlos en el propio sistema firmados electrónicamente (arts. 12 y 16).
+            </p>
+            <p>
+              No es la <strong>factura electrónica</strong> entre empresas que exige la Ley Crea y Crece: esa es
+              otra obligación, que puede convivir con esta en el mismo programa.
             </p>
             <p>
               El objetivo es combatir el fraude fiscal mediante <strong>software de facturación que cumpla el reglamento</strong> y
@@ -346,12 +356,12 @@ export default function ChecklistPrepararVerifactuPage() {
               (facturación &gt; 6 millones €/año) a enviar registros de facturación a la AEAT desde 2017.
             </p>
             <p>
-              <strong>VeriFactu</strong> extiende una obligación similar al resto de autónomos y pymes. Las
-              principales diferencias:
+              El <strong>RD 1007/2023</strong> exige al resto de sociedades y autónomos que su programa de
+              facturación cumpla el reglamento. Las principales diferencias:
             </p>
             <ul>
               <li><strong>SII</strong>: envío en 4 días naturales, solo grandes empresas, sin código QR.</li>
-              <li><strong>VeriFactu</strong>: envío (casi) inmediato, todos los obligados, incluye código QR verificable.</li>
+              <li><strong>RD 1007/2023</strong>: registro de cada factura en el programa, remitido al emitirla solo si se elige la modalidad VERI*FACTU; las facturas llevan código QR verificable.</li>
               <li>Si ya estás en el SII, no necesitas adaptarte a VeriFactu (cumples un estándar equivalente).</li>
             </ul>
           </section>
@@ -360,7 +370,7 @@ export default function ChecklistPrepararVerifactuPage() {
             <h2>Cronología: del borrador al RD 1007/2023</h2>
             <ul>
               <li><strong>2021</strong>: Ley 11/2021 Antifraude — establece la base legal para prohibir software de doble contabilidad.</li>
-              <li><strong>2022</strong>: Borrador del reglamento técnico de facturación electrónica.</li>
+              <li><strong>2022</strong>: Borrador del reglamento de los sistemas informáticos de facturación.</li>
               <li><strong>Dic 2023</strong>: Publicación del RD 1007/2023 con los requisitos técnicos.</li>
               <li><strong>Jul 2025</strong>: Fecha original de adaptación, aplazada después por el RD 254/2025 y el RDL 15/2025.</li>
               <li><strong>Ene 2027</strong>: Fecha límite para las sociedades (contribuyentes del Impuesto sobre Sociedades).</li>
@@ -388,8 +398,8 @@ export default function ChecklistPrepararVerifactuPage() {
             <p>
               No. VeriFactu exige un programa que cumpla el reglamento, y lo acredita la <strong>declaración
               responsable de su fabricante</strong> (no hay homologación de la AEAT). Excel, Word
-              o cualquier herramienta genérica no cumple los requisitos técnicos (firma electrónica, envío
-              automático a la AEAT, código QR).
+              o cualquier herramienta genérica no cumple los requisitos técnicos (registros encadenados con su
+              huella, registro de eventos, código QR, y la firma o la remisión a la AEAT).
             </p>
 
             <h3>¿Qué pasa si mi proveedor de software no está listo?</h3>

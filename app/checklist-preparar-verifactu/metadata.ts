@@ -54,7 +54,7 @@ export const faqJsonLd = {
       name: '¿Qué es VeriFactu y cuándo es obligatorio en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'VeriFactu es el sistema de facturación electrónica verificable regulado por el Real Decreto 1007/2023. Obliga a los autónomos y empresas sujetos al IRPF o IS a usar un software de facturación adaptado al reglamento, que el fabricante acredita con una declaración responsable (no hay homologación de la AEAT). Las sociedades deben tenerlo antes del 1 de enero de 2027 y el resto, autónomos incluidos, antes del 1 de julio de 2027 (disposición final 4.ª, en la redacción del RDL 15/2025).',
+        text: 'VeriFactu es el nombre con que se conoce el reglamento de los sistemas informáticos de facturación, el Real Decreto 1007/2023 (no es la factura electrónica entre empresas). Obliga a los autónomos y empresas sujetos al IRPF o IS a usar un software de facturación adaptado al reglamento, que el fabricante acredita con una declaración responsable (no hay homologación de la AEAT). Las sociedades deben tenerlo antes del 1 de enero de 2027 y el resto, autónomos incluidos, antes del 1 de julio de 2027 (disposición final 4.ª, en la redacción del RDL 15/2025).',
       },
     },
     {
@@ -62,7 +62,7 @@ export const faqJsonLd = {
       name: '¿Qué sanciones hay por no cumplir con VeriFactu?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El incumplimiento puede acarrear multas de hasta 50.000 € por ejercicio, con infracciones graves si el software utilizado no cumple los requisitos del reglamento o si se altera el registro de facturas. Además, la falta de trazabilidad puede derivar en inspecciones tributarias por incoherencias contables.',
+        text: 'Tener un programa de facturación que no cumple el reglamento, o alterado, se sanciona con una multa fija de 50.000 € por cada ejercicio (art. 201 bis de la Ley General Tributaria); no hay una sanción por cada factura. A quien fabrica o vende esos programas, 150.000 € por ejercicio y por cada tipo de programa, y 1.000 € por cada uno vendido sin la certificación exigida. La facturación fraudulenta puede ser además delito fiscal.',
       },
     },
     {
@@ -70,7 +70,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre VeriFactu y la facturación electrónica de la Ley Crea y Crece?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Son dos obligaciones distintas. La Ley Crea y Crece exige factura electrónica entre empresas (B2B) para evitar la morosidad. VeriFactu (RD 1007/2023) afecta al software contable y obliga a enviar registros de facturas a la AEAT en tiempo real, incluyendo también operaciones con particulares. Pueden coexistir en el mismo software certificado.',
+        text: 'Son dos obligaciones distintas. La Ley Crea y Crece exige factura electrónica entre empresas (B2B) para evitar la morosidad. VeriFactu (RD 1007/2023) afecta al programa con el que se factura, también a particulares: debe generar un registro encadenado e inalterable de cada factura, que se remite a la AEAT al emitirla solo si se elige la modalidad VERI*FACTU, voluntaria; si no, se conserva firmado en el propio sistema. Pueden coexistir en el mismo software certificado.',
       },
     },
     {
@@ -78,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Todos los autónomos están obligados a usar VeriFactu?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Están obligados los autónomos en estimación directa (IRPF) y las sociedades sujetas al Impuesto sobre Sociedades que usen software de facturación. Quedan excluidos quienes tributan en módulos (estimación objetiva), así como determinadas operaciones exentas. Es recomendable verificar el caso concreto con un asesor fiscal.',
+        text: 'Están obligados los autónomos con actividades económicas en el IRPF, también en estimación objetiva (módulos), y las sociedades del Impuesto sobre Sociedades, siempre que facturen con un programa informático (art. 3.1 del RD 1007/2023). Quedan fuera quienes llevan los libros registro por el SII (art. 3.3), las entidades exentas del Impuesto sobre Sociedades y algunas operaciones concretas (art. 4). Es recomendable verificar el caso concreto con un asesor fiscal.',
       },
     },
     {
