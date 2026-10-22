@@ -29,11 +29,12 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   signo de número ⠼ (§ 8.1) y el signo interruptor de número ⠐ (§ 8.2) coinciden con
  *   el documento. Las siglas letra a letra son el «recurso 1» del § 7.1, también válido.
  *
- * HALLAZGOS: los de las inspecciones del 20/08 y del 22/09/2026 están todos REPARADOS
- * (24-29 el 19/08, 57-62 el 21/08, 1183-1187 el 22/09) y sus tests pasan en verde. Los
- * marcados con `test.fail()` —hoy, solo en el bloque del 13/10/2026— afirman lo que DEBERÍA
- * pasar y fallan a propósito. El día que se corrija la app pasarán a ROJO («expected to
- * fail, but passed») y habrá que quitarles la marca, no reescribir el valor esperado.
+ * HALLAZGOS: los de las inspecciones del 20/08, del 22/09 y del 13/10/2026 están todos
+ * REPARADOS (24-29 el 19/08, 57-62 el 21/08, 1183-1187 el 22/09, 3277-3280 el 19/10) y sus
+ * tests pasan en verde. Los marcados con `test.fail()` —hoy, solo en el bloque del
+ * 22/10/2026— afirman lo que DEBERÍA pasar y fallan a propósito. El día que se corrija la app
+ * pasarán a ROJO («expected to fail, but passed») y habrá que quitarles la marca, no
+ * reescribir el valor esperado.
  */
 
 const RUTA = '/conversor-braille/';
@@ -861,8 +862,8 @@ test.describe('re-inspección 13/10/2026', () => {
 
     // Lo que DEBERÍA pasar: o el resultado es el del texto que hay en la caja
     //   A ⠨⠁ · d ⠙ (1-4-5) · i ⠊ (2-4) · ó ⠬ (3-4-6) · s ⠎ (2-3-4) · ' ' ⠀ · 🙂 se omite
-    // o ya no hay un resultado que pueda tomarse por él. Hoy sigue ⠨⠓⠕⠇⠁ («Hola»), la hoja
-    // dibuja «Hola» y el aviso nombra el 🙂 de «Adiós 🙂».
+    // o ya no hay un resultado que pueda tomarse por él. Antes de la reparación seguía ⠨⠓⠕⠇⠁
+    // («Hola»), la hoja dibujaba «Hola» y el aviso nombraba el 🙂 de «Adiós 🙂».
     await expect
       .poll(async () =>
         (await cajaResultado(page).count()) === 0
@@ -903,7 +904,7 @@ test.describe('re-inspección 13/10/2026', () => {
     await expect(guia.getByText('Limitaciones y Errores Comunes al Usar Braille Digital')).toBeVisible();
 
     // Lo que DEBERÍA pasar: ningún emoji en el árbol accesible de la guía (todos son
-    // decorativos: el texto de al lado ya dice lo mismo). Hoy salen 22.
+    // decorativos: el texto de al lado ya dice lo mismo). Antes de la reparación salían 22.
     const arbol = await guia.ariaSnapshot();
     const emojis = [...arbol.matchAll(/\p{Extended_Pictographic}/gu)].map((m) => m[0]);
     expect(emojis).toEqual([]);
@@ -990,5 +991,491 @@ test.describe('S0219 — teclado braille de seis puntos', () => {
     await page.getByRole('button', { name: 'Borrar última' }).click();
     await expect(page.locator('textarea').first()).toHaveValue('');
     await expect(page.locator('[class*="resultBox"]')).toHaveCount(0);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// re-inspección 22/10/2026 — teclado de seis puntos (e122b8ed), 3277-3280 y cabo C0238
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Los bloques de arriba siguen en verde con el código de hoy: las reparaciones de 3277 (comillas
+// simples), 3278 (resultado retirado al cambiar la entrada), 3279 (⠠ suelta) y 3280 (emojis de la
+// guía) se sostienen. Este bloque mira lo que aquéllos no miraban: el teclado de seis puntos a
+// fondo —cada punto, acordes, foco, región viva, móvil— y las sospechas del cabo C0238 que se
+// pueden juzgar SIN el B 2, por coherencia interna de la app.
+//
+// FUENTE de los valores esperados: la de la cabecera, y SOLO por los apartados que el repositorio
+// ya cita literalmente (§ 6.1, § 6.2, § 7, § 7.1, § 8.1, § 8.2). La web de la ONCE sigue fuera de
+// los dominios permitidos. Las celdas Unicode salen de la aritmética del bloque: U+2800 + bits
+// (punto 1 = 0x01, 2 = 0x02, 3 = 0x04, 4 = 0x08, 5 = 0x10, 6 = 0x20). Donde la celda correcta NO
+// está anclada, el test exige solo lo que la propia app dice o hace en otro sitio.
+test.describe('re-inspección 22/10/2026', () => {
+  const TECLA: Record<number, string> = { 1: 'KeyF', 2: 'KeyD', 3: 'KeyS', 4: 'KeyJ', 5: 'KeyK', 6: 'KeyL' };
+
+  async function convertirHidratado(
+    page: Page,
+    texto: string,
+    modo: 'texto' | 'braille' = 'texto',
+  ) {
+    await esperarHidratacion(page, ['textarea']);
+    if (modo === 'braille') {
+      await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    }
+    const textarea = page.locator('textarea').first();
+    await textarea.fill(texto);
+    await esperarValorEnReact(page, textarea, texto);
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+  }
+
+  /** Pulsa a la vez las teclas de esos puntos y las suelta en el mismo orden. */
+  async function acorde(page: Page, puntos: number[]) {
+    for (const p of puntos) await page.keyboard.down(TECLA[p]);
+    for (const p of puntos) await page.keyboard.up(TECLA[p]);
+  }
+
+  /** El aviso de «Texto → Braille» para los caracteres que no se escriben. */
+  const avisoSinCelda = (page: Page) =>
+    page.locator('[class*="avisoConversion"]').filter({ hasText: 'Esta herramienta no escribe en braille' });
+
+  /** Texto plano de la guía educativa (está en el DOM aunque nazca plegada). */
+  const textoGuia = async (page: Page) =>
+    ((await page.locator('[data-guia-educativa]').textContent()) ?? '').replace(/\s+/g, ' ');
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 1 (normal) — mayúscula con tilde, decimal y ñ, ida y vuelta
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 1 (normal) — «Él tiene 12,5 años.» y su vuelta', async ({ page }) => {
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'Él tiene 12,5 años.');
+    // Derivación a mano:
+    //   'É' → ⠨ (4-6, § 7) + é ⠮ (2-3-4-6 = 0x02+0x04+0x08+0x20 = U+282E)
+    //   'l' → ⠇ (1-2-3) · ' ' → ⠀
+    //   'tiene' → ⠞ (2-3-4-5) ⠊ (2-4) ⠑ (1-5) ⠝ (1-3-4-5) ⠑ · ' ' → ⠀
+    //   '12,5' → ⠼ (3-4-5-6, § 8.1, uno solo) ⠁ (1) ⠃ (1-2) ⠂ (2: coma decimal) ⠑ (1-5)
+    //   ' ' → ⠀ · 'años' → ⠁ ⠻ (1-2-4-5-6) ⠕ (1-3-5) ⠎ (2-3-4) · '.' → ⠄ (3, § 6.1)
+    await expect(cajaResultado(page)).toHaveText('⠨⠮⠇⠀⠞⠊⠑⠝⠑⠀⠼⠁⠃⠂⠑⠀⠁⠻⠕⠎⠄');
+    await expect(page.locator('[class*="avisoConversion"]')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+    await expect(cajaResultado(page)).toHaveText('Él tiene 12,5 años.');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 2 (límite) — toda la puntuación del § 6.1, millar + decimal, palabra en mayúsculas
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 2 (límite) — toda la puntuación del § 6.1, «1.234,56» y «HOLA», con su vuelta', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    // ¿ ? → ⠢ (2-6) · ¡ ! → ⠖ (2-3-5) · ; → ⠆ (2-3) · : → ⠒ (2-5) · , → ⠂ (2) · . → ⠄ (3)
+    // - → ⠤ (3-6) · ( → ⠣ (1-2-6) · ) → ⠜ (3-4-5) · « » " → ⠦ (2-3-6)
+    await convertirHidratado(page, '¿?¡!;:,.-()«»"');
+    await expect(cajaResultado(page)).toHaveText('⠢⠢⠖⠖⠆⠒⠂⠄⠤⠣⠜⠦⠦⠦');
+    await expect(avisoSinCelda(page)).toHaveCount(0);
+    await expect(page.getByText(/se abren y se cierran con el/)).toBeVisible();
+
+    // § 8.1: un solo ⠼; punto 3 de millar y punto 2 decimal dentro del número.
+    //   ⠼ · 1 ⠁ · ⠄ · 2 ⠃ · 3 ⠉ · 4 ⠙ · ⠂ · 5 ⠑ · 6 ⠋
+    await page.goto(RUTA);
+    await convertirHidratado(page, '1.234,56');
+    await expect(cajaResultado(page)).toHaveText('⠼⠁⠄⠃⠉⠙⠂⠑⠋');
+    await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+    await expect(cajaResultado(page)).toHaveText('1.234,56');
+
+    // Una palabra entera en mayúsculas sale letra a letra (⠨ delante de cada una). Es el
+    // «recurso 1» del § 7.1 para SIGLAS; para una palabra en mayúsculas no está anclado (cabo
+    // C0238 d, sigue sin el B 2), así que aquí solo se fija que la ida y la vuelta cuadran.
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'HOLA');
+    await expect(cajaResultado(page)).toHaveText('⠨⠓⠨⠕⠨⠇⠨⠁');
+    await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+    await expect(cajaResultado(page)).toHaveText('HOLA');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 3 (rechazo) — la celda de los seis puntos no tiene equivalente en la tabla
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 3 (rechazo) — «⠓⠕⠇⠁⠿» pasa la ⠿ sin traducir y lo avisa', async ({ page }) => {
+    await page.goto(RUTA);
+    // ⠿ = puntos 1-2-3-4-5-6 = U+2800 + 0x3F = U+283F: no está en la tabla de la app.
+    await convertirHidratado(page, '⠓⠕⠇⠁⠿', 'braille');
+    await expect(cajaResultado(page)).toHaveText('hola⠿');
+    await expect(
+      page.locator('[class*="avisoConversion"]').filter({ hasText: 'sin traducir' }),
+    ).toContainText('⠿');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Teclado de seis puntos (S0219, e122b8ed) — lo que funciona
+  // ─────────────────────────────────────────────────────────────────────────
+  test('teclado — cada tecla escribe su punto (F ⠁ … L ⠠) y las seis juntas ⠿, que se avisa', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    await page.getByTestId('zona-perkins').focus();
+    const textarea = page.locator('textarea').first();
+
+    // U+2800 + bit del punto: F=1 → 0x01, D=2 → 0x02, S=3 → 0x04, J=4 → 0x08, K=5 → 0x10, L=6 → 0x20
+    const esperadas: Record<number, string> = { 1: '⠁', 2: '⠂', 3: '⠄', 4: '⠈', 5: '⠐', 6: '⠠' };
+    for (const p of [1, 2, 3, 4, 5, 6]) {
+      await acorde(page, [p]);
+      await expect(textarea).toHaveValue(esperadas[p]);
+      await page.keyboard.press('Backspace');
+      await expect(textarea).toHaveValue('');
+    }
+
+    // Las seis a la vez: 0x3F → U+283F ⠿, sin equivalente: pasa al resultado y se avisa.
+    await acorde(page, [1, 2, 3, 4, 5, 6]);
+    await expect(textarea).toHaveValue('⠿');
+    await expect(
+      page.locator('[class*="avisoConversion"]').filter({ hasText: 'sin traducir' }),
+    ).toContainText('⠿');
+  });
+
+  test('teclado — «Hola 2026» a acordes, con signo de mayúscula y de número, sin pulsar Convertir', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    await page.getByTestId('zona-perkins').focus();
+
+    // ⠨ = 4-6 (J+L) · h ⠓ = 1-2-5 · o ⠕ = 1-3-5 · l ⠇ = 1-2-3 · a ⠁ = 1 · Espacio ⠀
+    // ⠼ = 3-4-5-6 (S+J+K+L) · 2 = b ⠃ = 1-2 · 0 = j ⠚ = 2-4-5 · 2 = ⠃ · 6 = f ⠋ = 1-2-4
+    for (const c of [[4, 6], [1, 2, 5], [1, 3, 5], [1, 2, 3], [1]]) await acorde(page, c);
+    await page.keyboard.press('Space');
+    for (const c of [[3, 4, 5, 6], [1, 2], [2, 4, 5], [1, 2], [1, 2, 4]]) await acorde(page, c);
+
+    await expect(page.locator('textarea').first()).toHaveValue('⠨⠓⠕⠇⠁⠀⠼⠃⠚⠃⠋');
+    await expect(cajaResultado(page)).toHaveText('Hola 2026');
+    await expect(page.locator('[class*="avisoConversion"]')).toHaveCount(0);
+
+    // Corregir la caja a mano retira el resultado (la regla del 3278 vale también aquí).
+    const textarea = page.locator('textarea').first();
+    await textarea.fill('⠨⠓⠕⠇⠁⠀⠼⠃⠚⠃⠋⠁');
+    await esperarValorEnReact(page, textarea, '⠨⠓⠕⠇⠁⠀⠼⠃⠚⠃⠋⠁');
+    await expect(page.locator('[class*="resultBox"]')).toHaveCount(0);
+  });
+
+  test('teclado — perder el foco a mitad de acorde o pulsar Ctrl+F no escribe nada; volver a Texto → Braille lo retira', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    const zona = page.getByTestId('zona-perkins');
+    const textarea = page.locator('textarea').first();
+
+    await zona.focus();
+    await page.keyboard.down('KeyF');
+    await textarea.focus(); // el acorde se descarta al perder el foco
+    await page.keyboard.up('KeyF');
+    await expect(textarea).toHaveValue('');
+
+    await zona.focus();
+    await page.keyboard.down('Control');
+    await page.keyboard.press('KeyF');
+    await page.keyboard.up('Control');
+    await expect(textarea).toHaveValue('');
+
+    await acorde(page, [1]);
+    await expect(textarea).toHaveValue('⠁');
+    await page.getByRole('button', { name: 'Texto → Braille' }).click();
+    await expect(zona).toHaveCount(0);
+    await expect(page.locator('[class*="resultBox"]')).toHaveCount(0);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — texto en tinta + teclado
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // Al cambiar de sentido, la caja conserva lo que había. Si era TINTA (el «Hola» que se acaba de
+  // pasar a braille) y se escribe con el teclado, la celda se añade detrás y la vuelta copia la
+  // tinta tal cual: «Hola⠁» → «Holaa», sin ningún aviso. Es la forma del hallazgo 1187 (lo que no
+  // es braille sale con aspecto de traducción), que la reparación de entonces cubrió solo cuando la
+  // entrada no traía NI UNA celda. Y la hoja imprimible, que en este sentido se dibuja con la
+  // entrada filtrada, punza solo «⠁»: resultado y hoja dicen cosas distintas.
+  test('teclado — tras pasar «Hola» a braille y cambiar de sentido, la F no da «Holaa» sin aviso', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'Hola');
+    await expect(cajaResultado(page)).toHaveText('⠨⠓⠕⠇⠁'); // precondición
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    await page.getByTestId('zona-perkins').focus();
+    await acorde(page, [1]);
+    await expect(page.locator('textarea').first()).toHaveValue(/⠁$/); // precondición: el teclado escribió
+
+    // Sin esperas implícitas: si una reparación retira el resultado, la caja no existe y eso vale.
+    const caja = page.locator('[class*="resultBox"]');
+    const estado = {
+      resultado: (await caja.count()) > 0 ? await caja.textContent() : null,
+      avisos: await page.locator('[class*="avisoConversion"]').count(),
+    };
+    // Lo que DEBERÍA pasar: o la tinta se avisa, o el teclado no la mezcla con sus celdas.
+    expect(estado).not.toEqual({ resultado: 'Holaa', avisos: 0 });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — región viva del teclado
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // El teclado confirma cada pulsación en un <p aria-live="polite">. Con el mismo texto dos veces
+  // seguidas React no toca el DOM, y una región viva solo habla cuando su contenido CAMBIA: la
+  // segunda «l» de «llave» y el segundo retroceso no se anuncian. El caso peor es el retroceso que
+  // VACÍA la caja: la caja de resultado desaparece (eso no se anuncia) y el anuncio repite
+  // «Última celda borrada», así que quien escribe sin ver no oye nada.
+  test('teclado — la segunda celda igual y el retroceso que vacía la caja se anuncian', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    await page.evaluate(() => {
+      const anuncio = document.querySelector('[class*="tecladoAnuncio"]');
+      if (!anuncio) throw new Error('El teclado no tiene región de anuncio');
+      const w = window as unknown as { __cambiosAnuncio: number };
+      w.__cambiosAnuncio = 0;
+      new MutationObserver((m) => {
+        w.__cambiosAnuncio += m.length;
+      }).observe(anuncio, { childList: true, subtree: true, characterData: true });
+    });
+    const cambios = () => page.evaluate(() => (window as unknown as { __cambiosAnuncio: number }).__cambiosAnuncio);
+    const textarea = page.locator('textarea').first();
+    await page.getByTestId('zona-perkins').focus();
+
+    // «ab»: a ⠁ (1), b ⠃ (1-2). Dos retrocesos: el segundo deja la caja vacía.
+    await acorde(page, [1]);
+    await acorde(page, [1, 2]);
+    await page.keyboard.press('Backspace');
+    await expect(textarea).toHaveValue('⠁');
+    const antes = await cambios();
+    await page.keyboard.press('Backspace');
+    await expect(textarea).toHaveValue(''); // precondición
+    expect.soft(await cambios(), 'el retroceso que vacía la caja no se anuncia').toBeGreaterThan(antes);
+
+    // «ll»: l ⠇ (1-2-3) dos veces.
+    await acorde(page, [1, 2, 3]);
+    await expect(textarea).toHaveValue('⠇');
+    const antesL = await cambios();
+    await acorde(page, [1, 2, 3]);
+    await expect(textarea).toHaveValue('⠇⠇'); // precondición
+    expect.soft(await cambios(), 'la segunda ⠇ seguida no se anuncia').toBeGreaterThan(antesL);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — foco tras «Escribir celda»
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // «Escribir celda» se deshabilita en cuanto escribe (los puntos se apagan), y un botón con el
+  // foco que pasa a `disabled` lo suelta al <body>: con teclado o lector de pantalla se pierde el
+  // sitio en cada celda que se escribe por este camino.
+  test('teclado — tras «Escribir celda» con Intro el foco no cae al <body>', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    await page.getByRole('button', { name: 'Punto 1', exact: true }).focus();
+    await page.keyboard.press('Space');
+    const escribir = page.getByRole('button', { name: /^Escribir celda/ });
+    await expect(escribir).toHaveText('Escribir celda ⠁');
+    await escribir.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('textarea').first()).toHaveValue('⠁'); // precondición
+    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — C0238 (a), catalán
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // La FAQ visible dice que la app sigue el B 2, «que cubre castellano, catalán, gallego, euskera y
+  // valenciano», y el título del documento es «Signografía básica de las lenguas cooficiales». Pero
+  // «València», «Plaça» y «col·legi» pierden è, ç y ·, y el aviso lo justifica con que «puede que el
+  // Código Braille Español sí les asigne celda fuera de la signografía básica que cubre esta app»:
+  // la letra de una lengua cooficial está, por definición, en la signografía básica de las lenguas
+  // cooficiales. No hace falta el B 2 para ver que las dos frases no pueden ser ciertas a la vez.
+  test('C0238 (a) — la FAQ promete catalán y valenciano y el aviso de «València» lo contradice', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const prometeCatalan = /Esta app sigue[^.]*catalán[^.]*valenciano/.test(await textoGuia(page));
+    // V ⠨⠧ (4-6 | 1-2-3-6) · a ⠁ · l ⠇ · (è) · n ⠝ · c ⠉ · i ⠊ · a ⠁
+    await convertirHidratado(page, 'València');
+    await expect(cajaResultado(page)).toContainText('⠨⠧⠁⠇'); // precondición: hubo conversión
+    const aviso = avisoSinCelda(page);
+    const avisoDiceFuera =
+      (await aviso.count()) > 0 && ((await aviso.textContent()) ?? '').includes('fuera de la signografía básica');
+    expect({ prometeCatalan, avisoDiceFuera }).not.toEqual({ prometeCatalan: true, avisoDiceFuera: true });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — espacio duro, fino y tabulador
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // Un espacio duro (U+00A0: el que trae casi cualquier texto copiado de una web, Opción+Espacio en
+  // Mac, o el «15 %» del propio formato de meskeIA), un espacio fino (U+202F) o un tabulador se
+  // DESCARTAN, y con ellos la separación de palabra: «hola mundo» sale ⠓⠕⠇⠁⠍⠥⠝⠙⠕, una sola palabra
+  // de nueve celdas, y la hoja la punza así. Es el defecto del salto de línea («salpimienta»),
+  // reparado el 21/08/2026, con otro carácter; y el aviso dice que «el resto del texto sí está
+  // completo» y que puede que el Código asigne celda al espacio fuera de la signografía básica,
+  // cuando la celda del espacio, ⠀, está en la tabla de la propia app.
+  // En un número es peor: «10 000» con espacio duro sale ⠼⠁⠚⠼⠚⠚⠚, el ⠼ de más delante del grupo
+  // que la reparación de los hallazgos 57-58 quitó. Valen las dos lecturas que la app sabe
+  // escribir: separador de millar (⠄, § 8.1 citado) o separación de palabra (⠀, como el espacio
+  // normal); la pegada no es ninguna de las dos.
+  test('espacio duro — «hola mundo» y «10 000» con U+00A0 no pierden la separación', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    // h ⠓ (1-2-5) · o ⠕ · l ⠇ · a ⠁ · separación ⠀ · m ⠍ (1-3-4) · u ⠥ (1-3-6) · n ⠝ · d ⠙ (1-4-5) · o ⠕
+    await convertirHidratado(page, 'hola mundo');
+    await expect.soft(cajaResultado(page)).toHaveText('⠓⠕⠇⠁⠀⠍⠥⠝⠙⠕');
+
+    // ⠼ · 1 ⠁ · 0 ⠚ · (⠄ millar | ⠀ + ⠼) · 0 ⠚ · 0 ⠚ · 0 ⠚
+    await page.goto(RUTA);
+    await convertirHidratado(page, '10 000');
+    await expect.soft(cajaResultado(page)).toHaveText(/^(⠼⠁⠚⠄⠚⠚⠚|⠼⠁⠚⠀⠼⠚⠚⠚)$/);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — C0238 (c), puntos suspensivos
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // «...» (tres puntos del teclado) sale ⠄⠄⠄, y «…» (U+2026, el que ponen Word, Google Docs e iOS al
+  // escribir tres puntos) se descarta con el aviso de que el Código puede asignarle celda «fuera de
+  // la signografía básica». Es el mismo signo en tinta. La forma es la del hallazgo 1184 (’ frente a
+  // '): la tabla normaliza las comillas tipográficas y el apóstrofo tipográfico, y no los puntos
+  // suspensivos. Qué celdas da el B 2 § 6.1 a los puntos suspensivos sigue sin anclar: el test no
+  // fija ninguna, exige que las dos grafías den lo mismo.
+  test('C0238 (c) — «Espera…» (U+2026) sale igual que «Espera...»', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'Espera...');
+    // E ⠨⠑ · s ⠎ · p ⠏ · e ⠑ · r ⠗ · a ⠁ · y los puntos suspensivos
+    await expect(cajaResultado(page)).toContainText('⠨⠑⠎⠏⠑⠗⠁'); // precondición
+    const conTresPuntos = await cajaResultado(page).innerText();
+    expect(conTresPuntos.length).toBeGreaterThan('⠨⠑⠎⠏⠑⠗⠁'.length); // los puntos se escriben
+
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'Espera…');
+    await expect(cajaResultado(page)).toHaveText(conTresPuntos);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — C0238 (e), «ONCE, 2009»
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // La reparación del 1185 retiró de la FAQ el «aprobado por la ONCE en 2009» por no poder
+  // anclarlo y porque convivía sin explicación con el documento que la app sigue. La FAQ cita hoy
+  // el B 2 (V4, 22/01/2026), pero la caja de Limitaciones conserva «El Código Braille Español
+  // (ONCE, 2009)»: la misma página da dos referencias distintas, una de ellas ya retirada.
+  test('C0238 (e) — la caja de Limitaciones no conserva la fecha de 2009 que la FAQ retiró', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const guia = await textoGuia(page);
+    expect(guia).toContain('V4, 22/01/2026'); // precondición: la FAQ cita la fuente de hoy
+    expect(guia).not.toContain('(ONCE, 2009)');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — FAQPage y teclado
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // El FAQPage responde a «¿Puedo convertir Braille a texto…?» que se pegan caracteres Unicode y que
+  // «La conversión se hace al pulsar «Convertir»». Con el teclado de seis puntos la vuelta se
+  // recalcula sola en cada celda (lo fija el test «Hola 2026» de este bloque), y es la forma de
+  // entrar braille para quien tiene un cartel delante, que es justo quien se lo pregunta a un
+  // asistente de IA.
+  test('FAQPage — la respuesta sobre Braille → Texto no contradice al teclado de seis puntos', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const respuesta = await page.evaluate(() => {
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        const datos = JSON.parse(s.textContent || '{}') as {
+          '@type'?: string;
+          mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+        };
+        if (datos['@type'] !== 'FAQPage') continue;
+        const q = datos.mainEntity?.find((e) => e.name.startsWith('¿Puedo convertir Braille'));
+        if (q) return q.acceptedAnswer.text;
+      }
+      return null;
+    });
+    expect(respuesta).not.toBeNull(); // precondición
+    const soloAlPulsar = (respuesta ?? '').includes('La conversión se hace al pulsar «Convertir»');
+    const nombraTeclado = /teclado/i.test(respuesta ?? '');
+    expect({ soloAlPulsar, nombraTeclado }).not.toEqual({ soloAlPulsar: true, nombraTeclado: false });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — el % y el € pegados
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // CLAUDE.md §2 (decidido el 25/09/2026, se corrige app a app al pasar el Inspector): «15 %» con
+  // espacio duro U+00A0, y «2 €» con espacio. La guía trae «25-40%», «10%», «25-30%» (dos veces),
+  // «90%» y «44%» pegados; la nota de la hoja, «90 %» y «100 %» con espacio normal (U+0020), que
+  // deja saltar el % solo de línea; y «el 2€».
+  test('formato — el % y el € de la hoja y de la guía van con espacio duro', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const texto = await page.evaluate(() =>
+      ['[class*="hojaSection"]', '[data-guia-educativa]']
+        .map((s) => document.querySelector(s)?.textContent ?? '')
+        .join(' '),
+    );
+    expect(texto.length).toBeGreaterThan(1000); // precondición: se leyó la hoja y la guía
+    const malos = [...texto.matchAll(/\S{0,8}\d( ?)(%|€)/g)].map((m) => m[0]);
+    expect(malos).toEqual([]);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// re-inspección 22/10/2026 — el teclado de seis puntos en un móvil
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('re-inspección 22/10/2026 — teclado en móvil', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('móvil — marcar puntos y «Escribir celda»: ⠨⠍ ⠀ ⠼⠁ se lee «M 1», sin desbordar', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    await page.getByRole('button', { name: 'Braille → Texto' }).tap();
+    const punto = (n: number) => page.getByRole('button', { name: `Punto ${n}`, exact: true });
+    const escribir = page.getByRole('button', { name: /^Escribir celda/ });
+
+    // ⠨ = 4-6 (0x08+0x20 = U+2828) · m ⠍ = 1-3-4 (0x01+0x04+0x08 = U+280D) · Espacio ⠀
+    // ⠼ = 3-4-5-6 (U+283C) · 1 = a ⠁ = 1 (U+2801)
+    for (const celda of [[4, 6], [1, 3, 4], null, [3, 4, 5, 6], [1]]) {
+      if (celda === null) {
+        await page.getByRole('button', { name: 'Espacio', exact: true }).tap();
+        continue;
+      }
+      for (const p of celda) await punto(p).tap();
+      await escribir.tap();
+    }
+    await expect(page.locator('textarea').first()).toHaveValue('⠨⠍⠀⠼⠁');
+    await expect(cajaResultado(page)).toHaveText('M 1');
+
+    // Los seis puntos son dianas de 48 px y la página no desborda en horizontal.
+    const caja = await punto(1).boundingBox();
+    expect(caja?.width).toBeGreaterThanOrEqual(44);
+    expect(caja?.height).toBeGreaterThanOrEqual(44);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    ).toBe(true);
   });
 });

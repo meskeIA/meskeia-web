@@ -1489,17 +1489,20 @@ test.describe('Inspector 28/09/2026 — móvil de 390 px', () => {
  *       P₂ = 101.325 − 206.695,21 = −105.370,21 Pa → «−105,37 kPa» → «Cavitación segura»
  *       y el arrastre horizontal no debe desplazar la página.
  *
- * RESULTADO: los tres casos cuadran con la app al céntimo, en escritorio y en móvil. Los
+ * RESULTADO: los tres casos cuadraron con la app al céntimo, en escritorio y en móvil. Los
  * deslizadores responden al dedo (el pulgar de 22 px es tocable aunque el carril mida 6 px) y no
- * arrastran la página. Hallazgos NUEVOS, con `test.fail()` afirmando lo que DEBERÍA pasar (el
- * test queda en verde mientras el defecto siga y avisa en rojo «passed unexpectedly» al repararse):
- *   · el tubo del desnivel se sale del lienzo en el tope del deslizador (nace de la reparación
- *     del 399, que fijó la escala sin dejar sitio arriba);
- *   · «Cargar en el simulador» en el móvil deja la vista en los botones de geometría, sin la
- *     tubería ni la tabla a la vista;
- *   · el bucle de dibujo reasigna canvas.width 60 veces por segundo con la animación apagada;
- *   · dos preguntas del FAQPage están también en la FAQ visible con OTRA respuesta;
- *   · el bloque educativo llama «presión hidrostática» a P y a ρgh a la vez.
+ * arrastran la página. Hallazgos NUEVOS (3242-3246), que nacieron con `test.fail()` afirmando lo
+ * que DEBÍA pasar y se REPARARON el 19/10/2026 (2d1610a9); los tests de abajo ya afirman lo
+ * correcto sin la marca:
+ *   · el tubo del desnivel se salía del lienzo en el tope del deslizador (nacía de la reparación
+ *     del 399, que fijó la escala sin dejar sitio arriba) — 3242;
+ *   · «Cargar en el simulador» en el móvil dejaba la vista en los botones de geometría, sin la
+ *     tubería ni la tabla a la vista — 3243;
+ *   · el bucle de dibujo reasignaba canvas.width 60 veces por segundo con la animación apagada
+ *     — 3244;
+ *   · dos preguntas del FAQPage estaban también en la FAQ visible con OTRA respuesta — 3245;
+ *   · el bloque educativo llamaba «presión hidrostática» a P y a ρgh a la vez — 3246.
+ * Re-inspección del 22/10/2026 (bloque del final): los cinco siguen reparados, también a 360 px.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 /** Primer píxel opaco de la columna x normalizada del lienzo, de arriba abajo: y en px CSS y color. */
@@ -1786,5 +1789,354 @@ test.describe('Inspector 13/10/2026 — operativa en móvil táctil de 390 px', 
       return ve('canvas') || ve('div[class*="seccionesWrapper"]');
     });
     expect(enPantalla).toBe(true);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR 22/10/2026 — 2.ª RE-INSPECCIÓN CON FIRMA DE ROTURA (1.201 usos). Visitas cortas del
+ * 56,4 % al 69,1 % en los 14 días hasta el 21/10/2026 y 8,4 % de recargas tras visita corta
+ * (catálogo: 2,8 %). Se buscó lo que impide USAR la app, en escritorio y a 360 px táctil, y se
+ * comprobó que las reparaciones de 2d1610a9 (3242-3246, 19/10/2026) se sostienen: los 48 tests
+ * de arriba pasan en verde contra el build de HEAD.
+ *
+ * CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (A = π·D²/4, D₁ = 10 cm, g = 9,81 m/s²,
+ * presión ABSOLUTA; ρ de la tabla de la app: aceite 920, agua 1000, aire 1,225 kg/m³):
+ *
+ *   N (normal) · Vena con estenosis, ACEITE, Q = 3 L/s, D₂/D₁ = 0,70, P₁ = 101.325 Pa
+ *       A₁ = π·0,05²  = 7,853982·10⁻³ m² → 78,54 cm² · v₁ = 0,003/A₁ = 0,381972 m/s → «0,38»
+ *       A₂ = π·0,035² = 3,848451·10⁻³ m² → 38,48 cm² · v₂ = 0,003/A₂ = 0,779534 m/s → «0,78»
+ *       continuidad: v₂/v₁ = 1/0,7² = 2,0408 ✔
+ *       ΔP = ½·920·(0,145903 − 0,607674) = 460·(−0,461771) = −212,41 Pa → «−212 Pa»
+ *       P₂ = 101.325 − 212,41 = 101.112,59 Pa → «101,11 kPa» · ṁ = 920·0,003 = 2,76 → «2,760 kg/s»
+ *
+ *   L (límite: la frontera de la cavitación y la presión de entrada mínima) · Venturi, AGUA,
+ *       Q = 10 L/s (tope), D₂/D₁ = 0,30
+ *       v₁ = 0,01/7,853982·10⁻³ = 1,273240 m/s, v₁² = 1,621139
+ *       A₂ = π·0,015² = 7,068583·10⁻⁴ m² → 7,07 cm² · v₂ = 14,147106 m/s, v₂² = v₁²/0,3⁴ = 200,140610
+ *       ΔP = 500·(1,621139 − 200,140610) = −99.259,74 Pa → «−99,26 kPa» (no depende de P₁)
+ *       P₁ = 101.325 → P₂ = 2.065,26 Pa → «2065 Pa»: POSITIVA pero bajo la presión de vapor
+ *                     (2.339 Pa) → «Zona de cavitación», sin llamarla negativa
+ *       P₁ = 50.325 (el suelo de la rejilla) → P₂ = −48.934,74 Pa → «−48,93 kPa» → «Cavitación
+ *                     segura: presión absoluta negativa»
+ *
+ *   R (rechazo y aviso) · casilla del caso 4 de aula, cuya clave es −486 Pa
+ *       (ΔP = 500·(0,254648² − 1,018592²) = −486,34 → −486) y tolerancia el 1 % = 4,86 Pa:
+ *       «486»     → valor bueno con el signo cambiado → aviso del signo, no «correcto»
+ *       «−486»    → con el menos tipográfico que escribe la propia tabla → «¡Correcto!»
+ *       «-490»    → a 4 Pa de la clave, dentro de 4,86 → «¡Correcto!»
+ *       «-491»    → a 5 Pa, fuera → «No es correcto»
+ *       «-486 Pa» → con la unidad pegada no es un número → «Escribe un número», sin NaN
+ *
+ *   M (operativa en móvil, 360 × 740 táctil) · con el DEDO: «Tubería con desnivel» y «Aire»
+ *       (desnivel de fábrica 2 m, Q = 2 L/s → v = 0,254648 m/s en las tres secciones)
+ *       P₂ (h = 1 m) = 101.325 − 1,225·9,81·1 = 101.312,98 Pa → «101,31 kPa» · ΔP → «−12 Pa»
+ *       P₃ (h = 2 m) = 101.325 − 24,03 = 101.300,97 Pa → «101,30 kPa»
+ *       y el caso 9 (aceite, 3 L/s, 5 m) cargado con el dedo deja el lienzo a la vista con
+ *       P₂ = 101.325 − 920·9,81·2,5 = 78.762 → «78,76 kPa» y P₃ = 56.199 → «56,20 kPa».
+ *
+ * RESULTADO: los cuatro casos cuadran con la app. A 360 px no hay desbordamiento horizontal, los
+ * botones y la casilla responden al dedo, la carga de un caso enseña el lienzo (3243) y con 10 m
+ * el tubo cabe en el lienzo de 320 px (3242). Hallazgos NUEVOS, con `test.fail()`:
+ *   · con la página TRADUCIDA por el navegador, cambiar de geometría (o cargar los casos 8-11, o
+ *     llevar D₂/D₁ a 1) tumba la app en «Algo salió mal» — familia C0312;
+ *   · el lienzo —lo que la app promete «visualizar»— empieza por debajo de la primera pantalla:
+ *     a 987 px en un portátil de 1366 × 768 y a 1.902 px (2,6 pantallas) a 360 × 740;
+ *   · el featureList del JSON-LD promete un deslizador de densidad que no existe, una
+ *     «verificación de la conservación» que no se muestra y llama «líquido» al aire.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Simula la traducción automática del navegador: cada nodo de texto con contenido pasa a ser
+ * <font><font>texto</font></font> y el nodo original sale del DOM. Es el `traducir()` de
+ * tests/apps/texto-condicional-traducido-familia.spec.ts (C0312) y del testigo del 3314.
+ */
+const traducirPagina = (page: Page) =>
+  page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+
+/** Errores de la caída por la página traducida (NotFoundError en removeChild / insertBefore). */
+function vigilarCaida(page: Page): string[] {
+  const errores: string[] = [];
+  page.on('pageerror', (e) => errores.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+  });
+  return errores;
+}
+
+test.describe('Inspector 22/10/2026 — 2.ª re-inspección con firma de rotura', () => {
+  const seccionCasos = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  /** Escribe en la casilla del caso, espera a que React lo tenga, pulsa «Comprobar» y lee el veredicto. */
+  async function responder(page: Page, texto: string): Promise<string> {
+    const casilla = seccionCasos(page).locator('#casos-respuesta');
+    await casilla.fill(texto);
+    await esperarValorEnReact(page, casilla, texto);
+    await seccionCasos(page).getByRole('button', { name: 'Comprobar' }).click();
+    // Acotado a la sección: getByRole('alert') a secas casaría con el anunciador de rutas de Next.
+    const veredicto = seccionCasos(page).getByRole('alert');
+    await expect(veredicto).toBeVisible();
+    return ((await veredicto.textContent()) ?? '').trim();
+  }
+
+  test('N · estenosis con aceite, 3 L/s y D₂/D₁ = 0,70: v₂ = 0,78 m/s y ΔP = −212 Pa', async ({ page }) => {
+    await page.getByRole('button', { name: /Vena con estenosis/ }).click();
+    await page.getByRole('button', { name: 'Aceite', exact: true }).click();
+    expect(await poner(page, 'Caudal', 3)).toBe('3');
+    expect(await poner(page, 'Ratio de estrechamiento', 0.7)).toBe('0.7');
+
+    const rots = await rotulos(page);
+    expect(rots).toContain('Caudal (Q = 3,0 L/s)');
+    expect(rots).toContain('Ratio de estrechamiento (D₂/D₁ = 0,70)');
+    expect(rots).toContain('Fluido (ρ = 920 kg/m³)');
+
+    const filas = await tabla(page);
+    // v₁ = 0,003/7,853982·10⁻³ = 0,381972 m/s
+    expect(filas[0]).toEqual(['Pre-estenosis', '10,0', '78,54', '0,38', '101,33 kPa', '0,00']);
+    // A₂ = π·0,035² = 38,48 cm² · v₂ = 0,779534 m/s · P₂ = 101.325 − 212,41 = 101.112,59 Pa
+    expect(filas[1]).toEqual(['Estenosis', '7,0', '38,48', '0,78', '101,11 kPa', '0,00']);
+    // Fluido ideal: la sección vuelve a 10 cm y la presión se recupera entera
+    expect(filas[2]).toEqual(['Post-estenosis', '10,0', '78,54', '0,38', '101,33 kPa', '0,00']);
+
+    // Continuidad con las cifras de la tabla: A·v = 0,003 m³/s. El redondeo de v a centésimas
+    // mueve como mucho 0,005·78,54·10⁻⁴ = 0,00004; olvidar el cuadrado del diámetro
+    // (v₂ = v₁/0,7 = 0,55 m/s) daría 0,0021 en la estenosis, 0,0009 fuera.
+    for (const f of filas) {
+      const A = parseFloat(f[2].replace(',', '.')) / 10000; // cm² → m²
+      const v = parseFloat(f[3].replace(',', '.'));
+      expect(Math.abs(A * v - 0.003)).toBeLessThan(0.00005);
+    }
+
+    const tarjetas = await panel(page);
+    expect(tarjetas[0][0]).toBe('Diferencia de presión P₂ − P₁ (de Pre-estenosis a Estenosis)');
+    expect(tarjetas[0][1]).toBe('−212 Pa'); // ½·920·(v₁² − v₂²) = 460·(−0,461771)
+    expect(tarjetas[0][2]).toContain('La presión CAE en el estrechamiento');
+    expect(tarjetas[1][1]).toBe('2,760 kg/s'); // ρ·Q = 920 · 0,003
+    expect(tarjetas[2][2]).toBe('0,00300 m³/s');
+    expect(tarjetas[3][1]).toBe('0,78 m/s');
+    expect(tarjetas[4][1]).toBe('920 kg/m³');
+  });
+
+  test('L · Venturi con agua a 10 L/s y D₂/D₁ = 0,30: 2065 Pa en zona de cavitación y −48,93 kPa con P₁ mínima', async ({
+    page,
+  }) => {
+    expect(await poner(page, 'Caudal', 10)).toBe('10');
+    expect(await poner(page, 'Ratio de estrechamiento', 0.3)).toBe('0.3');
+    const aviso = page.locator('[role="status"] [role="note"]');
+
+    // P₁ = 101.325 Pa: P₂ = 101.325 − 99.259,74 = 2.065,26 Pa, positiva y bajo los 2.339 de vapor
+    let filas = await tabla(page);
+    expect(filas[0]).toEqual(['Entrada', '10,0', '78,54', '1,27', '101,33 kPa', '0,00']);
+    expect(filas[1]).toEqual(['Garganta', '3,0', '7,07', '14,15', '2065 Pa', '0,00']);
+    expect((await panel(page))[0][1]).toBe('−99,26 kPa'); // ΔP = 500·(1,621139 − 200,140610)
+    await expect(aviso).toContainText('Zona de cavitación');
+    await expect(aviso).toContainText('2065 Pa');
+    await expect(aviso).not.toContainText('negativa');
+
+    // El suelo de la rejilla, 101.325 − 51·1000: P₂ = 50.325 − 99.259,74 = −48.934,74 Pa
+    expect(await poner(page, 'Presión de entrada', 50325)).toBe('50325');
+    filas = await tabla(page);
+    expect(filas[0][4]).toBe('50,33 kPa');
+    expect(filas[1][4]).toBe('−48,93 kPa');
+    expect((await panel(page))[0][1]).toBe('−99,26 kPa'); // la diferencia no depende de P₁
+    await expect(aviso).toContainText('Cavitación segura');
+    await expect(aviso).toContainText('presión absoluta negativa');
+    await expect(aviso).toContainText('−48,93 kPa');
+  });
+
+  test('R · la casilla del caso 4 (−486 Pa): signo cambiado, menos tipográfico, tolerancia y unidad pegada', async ({
+    page,
+  }) => {
+    await seccionCasos(page).getByRole('button', { name: /^Caso 4:/ }).click();
+    // Clave −486 (ΔP = −486,34 Pa) y tolerancia el 1 %: 4,86 Pa
+    expect(await responder(page, '486')).toContain('el signo no');
+    expect(await responder(page, '−486')).toContain('Correcto'); // el «−» que escribe la tabla
+    expect(await responder(page, '-490')).toContain('Correcto'); // a 4 Pa, dentro de 4,86
+    expect(await responder(page, '-491')).toContain('No es correcto'); // a 5 Pa, fuera
+    const conUnidad = await responder(page, '-486 Pa');
+    expect(conUnidad).toContain('Escribe un número');
+    expect(conUnidad).not.toContain('NaN');
+  });
+
+  // ABIERTO: hallazgo «con la página traducida, cambiar de geometría tumba la app» (Inspector
+  // 22/10/2026, familia C0312). (operativa, alto) · La tarjeta de descripción escribe la frase de
+  // cada geometría como texto suelto condicional junto a sus hermanos,
+  //   {geom === 'venturi' && ' En la garganta del Venturi…'}  (y las de 'desnivel' y 'estenosis'),
+  // dentro del mismo <p> que «Aplicamos la ecuación de continuidad <strong>…». Con la página
+  // traducida (el traductor del navegador cambia cada nodo de texto por <font>), al cambiar de
+  // geometría React intenta retirar ese nodo, que ya no es hijo del <p>, y cae con NotFoundError
+  // en removeChild: la pantalla entera pasa a «Algo salió mal» y solo una recarga la devuelve. Es
+  // el PRIMER control de la app, y también lo disparan los casos 8-11 de aula al cargarse (cambian
+  // la geometría). Existe desde la creación (10/05/2026). Receta de la familia: cada frase en su
+  // propio <span> (React retira el elemento, no el texto).
+  // Caso: página traducida → «Tubería con desnivel» → esperado la tubería con desnivel · obtenido
+  // «Algo salió mal» y «NotFoundError: Failed to execute 'removeChild' on 'Node'».
+  test('HALLAZGO · con la página traducida, cambiar de geometría no tumba la app', async ({ page }) => {
+    test.fail(); // ABIERTO: hallazgo de la página traducida (Inspector 22/10/2026, C0312)
+    const errores = vigilarCaida(page);
+    await traducirPagina(page);
+    await page.getByRole('button', { name: /Tubería con desnivel/ }).click();
+    await page.waitForTimeout(400);
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+    await expect(page.locator('#ctrl-desnivel')).toBeVisible();
+  });
+
+  // ABIERTO: el mismo hallazgo, segunda boca. La cifra grande de ΔP escribe el signo como un nodo
+  // de texto aparte, {dP < 0 ? '−' : dP > 0 ? '+' : ''}, delante de «486 Pa»: al llegar ΔP a 0
+  // (D₂/D₁ = 1, el tope del deslizador, o Δh = 0) la rama vacía retira el nodo «−» y, traducido,
+  // cae igual. Medido aislándolo: traduciendo todo MENOS esa cifra, llevar D₂/D₁ a 1 ya no cae.
+  // Caso: página traducida → D₂/D₁ = 1 con el teclado (tecla Fin) → esperado «0 Pa · Sin
+  // estrechamiento no hay caída» · obtenido «Algo salió mal».
+  test('HALLAZGO · con la página traducida, llevar ΔP a cero no tumba la app', async ({ page }) => {
+    test.fail(); // ABIERTO: hallazgo de la página traducida (Inspector 22/10/2026, C0312)
+    const errores = vigilarCaida(page);
+    await traducirPagina(page);
+    // Con el teclado y no con el setter: el deslizador sale de su tope con un evento real
+    await page.locator(`#${CONTROL['Ratio de estrechamiento']}`).focus();
+    await page.keyboard.press('End');
+    await page.waitForTimeout(400);
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  // ABIERTO: hallazgo «el featureList del JSON-LD promete lo que la app no hace» (contenido, bajo;
+  // Inspector 22/10/2026). De las siete características, tres no describen la app: «Sliders para
+  // caudal, densidad, ratio de estrechamiento y altura» (la densidad son cuatro botones de fluido,
+  // y falta el deslizador de presión de entrada), «Cálculo de velocidad, presión y verificación de
+  // la conservación» (no se muestra ninguna verificación: ni Q por sección ni la suma
+  // P + ½ρv² + ρgh) y «Comparación con líquidos reales (agua, aceite, sangre, aire)» (el aire es un
+  // gas). Y calla los 12 casos para clase con corrección y el aviso de cavitación, que sí hace.
+  // Caso: JSON-LD WebApplication → esperado características que la app cumple · obtenido las tres.
+  test('HALLAZGO · el featureList del JSON-LD no promete lo que la app no hace', async ({ page }) => {
+    test.fail(); // ABIERTO: hallazgo del featureList (Inspector 22/10/2026)
+    const web = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+        .map((s) => s.textContent ?? '')
+        .find((t) => t.includes('"WebApplication"')) ?? '{}',
+    );
+    const lista = (JSON.parse(web) as { featureList?: string[] }).featureList ?? [];
+    expect(lista.length).toBeGreaterThanOrEqual(4);
+    expect(lista.filter((f) => /sliders?|deslizador/i.test(f) && /densidad/i.test(f))).toEqual([]);
+    expect(lista.filter((f) => /verificaci[oó]n de la conservaci[oó]n/i.test(f))).toEqual([]);
+    expect(lista.filter((f) => /l[ií]quidos/i.test(f) && /aire/i.test(f))).toEqual([]);
+  });
+});
+
+test.describe('Inspector 22/10/2026 — el lienzo en la primera pantalla de un portátil', () => {
+  test.use({ viewport: { width: 1366, height: 768 } });
+
+  // ABIERTO: hallazgo «el lienzo empieza por debajo de la primera pantalla» (operativa, bajo;
+  // Inspector 22/10/2026). La app promete «Visualiza por qué más velocidad implica menos presión»,
+  // pero antes del lienzo van el hero, el aviso legal, la banda de Stemum, los tres botones de
+  // geometría, la tarjeta de descripción y los cuatro controles. Medido: el lienzo empieza a
+  // 987 px con cualquier ancho de escritorio (1366 × 768: 1,29 pantallas; 1280 × 720: 1,37) y, con
+  // los botones en columna, a 1.807 px a 390 × 844 y a 1.902 px a 360 × 740 (2,6 pantallas); la
+  // primera cifra (la tabla) a 1.430 y 2.360 px. Nada de la tubería se ve sin desplazarse.
+  // Caso: 1366 × 768, carga → esperado que el lienzo asome en la primera pantalla · obtenido su
+  // borde superior a 987 px.
+  test('HALLAZGO · el lienzo de la tubería asoma en la primera pantalla de un portátil de 1366 × 768', async ({
+    page,
+  }) => {
+    test.fail(); // ABIERTO: hallazgo del lienzo bajo la primera pantalla (Inspector 22/10/2026)
+    const arriba = await page.evaluate(() => document.querySelector('canvas')!.getBoundingClientRect().top + scrollY);
+    expect(arriba).toBeLessThan(768);
+  });
+});
+
+test.describe('Inspector 22/10/2026 — operativa con el dedo a 360 px', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('M · sin desbordamiento, desnivel y aire con el dedo, caso 9 cargado a la vista y 10 m dentro del lienzo', async ({
+    page,
+  }) => {
+    // Nada se sale por la derecha fuera de un contenedor desplazable (html y body cortan en x)
+    const fuera = await page.evaluate(() => {
+      const malos: string[] = [];
+      for (const el of Array.from(document.querySelectorAll('body *'))) {
+        const b = el.getBoundingClientRect();
+        if (b.width === 0 || b.right <= innerWidth + 1) continue;
+        let n = el.parentElement;
+        let contenido = false;
+        while (n && n !== document.body) {
+          const ox = getComputedStyle(n).overflowX;
+          if (ox === 'auto' || ox === 'scroll' || ox === 'hidden') {
+            contenido = true;
+            break;
+          }
+          n = n.parentElement;
+        }
+        if (!contenido) malos.push(`${el.tagName} → ${Math.round(b.right)}`);
+      }
+      return malos;
+    });
+    expect(fuera).toEqual([]);
+
+    // Con el dedo: geometría y fluido
+    await page.getByRole('button', { name: /Tubería con desnivel/ }).tap();
+    await expect(page.getByRole('button', { name: /Tubería con desnivel/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator(`#${CONTROL.Desnivel}`)).toBeVisible();
+    await page.getByRole('button', { name: 'Aire', exact: true }).tap();
+    await expect(page.locator('table tbody tr').nth(2)).toContainText('101,30 kPa');
+    // Aire, 2 m de fábrica: ρ·g·h = 1,225·9,81·1 = 12,02 Pa y 24,03 Pa
+    expect(await tabla(page)).toEqual([
+      ['Inferior', '10,0', '78,54', '0,25', '101,33 kPa', '0,00'],
+      ['Subida', '10,0', '78,54', '0,25', '101,31 kPa', '1,00'],
+      ['Superior', '10,0', '78,54', '0,25', '101,30 kPa', '2,00'],
+    ]);
+    expect((await panel(page))[0][1]).toBe('−12 Pa');
+
+    // La casilla de la animación responde al dedo
+    const casilla = page.getByLabel(/Animación de partículas/);
+    await casilla.tap();
+    await expect(casilla).not.toBeChecked();
+
+    // Caso 9 cargado con el dedo: el lienzo queda a la vista (3243) con las cifras del caso
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: /^Caso 9:/ }).tap();
+    await seccion.getByRole('button', { name: /Cargar en el simulador/ }).tap();
+    await page.waitForTimeout(1500); // el desplazamiento suave termina antes
+    const filas = await tabla(page);
+    expect(filas[1][4]).toBe('78,76 kPa'); // 101.325 − 920·9,81·2,5 = 78.762 Pa
+    expect(filas[2][4]).toBe('56,20 kPa'); // 101.325 − 920·9,81·5 = 56.199 Pa
+    const lienzoVisible = await page.evaluate(() => {
+      const b = document.querySelector('canvas')!.getBoundingClientRect();
+      return b.top >= 0 && b.bottom <= innerHeight;
+    });
+    expect(lienzoVisible).toBe(true);
+
+    // 3242 en el lienzo de 320 px del móvil: con 10 m lo primero de la columna x = 0,85 es el
+    // borde oscuro del tubo (#555), dentro del lienzo (la base está en 320 − 40 − 40 − 20 = 220 px
+    // y la escala la deja a 10 m con el eje en y = 50 y el borde en y = 10)
+    expect(await poner(page, 'Desnivel', 10)).toBe('10');
+    await page.waitForTimeout(200);
+    const diez = await primerPixelOpaco(page, 0.85);
+    expect(diez, 'algo dibujado en la columna x = 0,85').not.toBeNull();
+    expect(diez!.rgb[0], 'lo primero es el borde del tubo, no su relleno cortado').toBeLessThan(150);
+    expect(diez!.y, 'el borde superior queda dentro del lienzo').toBeGreaterThan(0);
   });
 });

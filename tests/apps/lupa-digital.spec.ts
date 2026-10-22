@@ -1,5 +1,5 @@
 import { test, expect, devices, type Page } from '@playwright/test';
-import { esperarHidratacion } from './_hidratacion';
+import { esperarHidratacion, sembrarValor } from './_hidratacion';
 import { contrasteSobreFondoReal } from './_contraste';
 
 /**
@@ -15,8 +15,10 @@ import { contrasteSobreFondoReal } from './_contraste';
  *     sostener el teléfono, recorriéndola con el dedo o el teclado», filtros de
  *     accesibilidad, ajuste independiente de brillo y contraste, «Restablecer todos los
  *     ajustes de un toque» y «procesado 100 % local en el navegador, sin envío de imágenes».
- *   - FAQ: «Se congela a la resolución de la cámara, no a la de la pantalla» y «pulsa
- *     "Detener", que apaga la cámara y reduce el consumo».
+ *   - FAQ: «La captura se hace a la resolución de la cámara y no a la de la pantalla»
+ *     (RESPUESTA_IMAGEN_FIJA de metadata.ts desde el 19/10/2026; antes, «Se congela a la resolución
+ *     de la cámara, no a la de la pantalla») y «pulsa "Detener", que apaga la cámara y reduce el
+ *     consumo».
  *
  * CÓMO SE PRUEBA UNA APP DE CÁMARA: Chromium arranca con `--use-fake-device-for-media-stream`
  * (vídeo sintético) y `--use-fake-ui-for-media-stream` (concede el permiso sin diálogo).
@@ -33,8 +35,10 @@ import { contrasteSobreFondoReal } from './_contraste';
  * simulada que expone zoom por cámara y recuerda el que ha aplicado: se mide el aumento que se VE.
  * La del 15/10/2026 (tras f3e9c635) añade, también al final, el reparto con rangos raros, la imagen
  * congelada con la cámara haciendo todo el zoom y tres hallazgos (3315, 3316 y 3317) que se
- * repararon ese mismo día (3b52f497, 00153144 y 70cee569). La del 16/10/2026, la última del fichero,
- * comprueba que esas tres reparaciones se sostienen con casos nuevos.
+ * repararon ese mismo día (3b52f497, 00153144 y 70cee569). La del 16/10/2026 comprueba que esas tres
+ * reparaciones se sostienen con casos nuevos. La del 22/10/2026, la última del fichero, comprueba las
+ * reparaciones de 3273, 3274, 3276 y 3327 con casos que las anteriores no miraban (el eje vertical al
+ * girar, la rama sin cifra de la nota, el contraste con su valor exacto) y mide el cabo C0260.
  */
 
 test.use({
@@ -195,7 +199,7 @@ test.describe('en móvil (Pixel 7)', () => {
     await expect(page.getByRole('button', { name: /Reanudar/i })).toHaveAttribute('aria-pressed', 'true');
     expect((await estadoDelVideo(page))?.pausado).toBe(true);
 
-    // La promesa de la FAQ: «se congela a la resolución de la cámara, no a la de la pantalla».
+    // La promesa de la FAQ: «la captura se hace a la resolución de la cámara y no a la de la pantalla».
     // El visor del Pixel 7 mide 392 px (412 de viewport − 10 de padding a cada lado); el
     // fotograma copiado tiene que conservar el ancho del sensor, muy por encima de eso.
     const medidas = await page.evaluate(() => {
@@ -959,6 +963,12 @@ interface CamaraSimulada {
   frontal: RangoZoomSimulado | null;
   /** La cámara rechaza todo zoom por encima de este valor, aunque lo anuncie en su máximo. */
   rechazarPorEncima?: number;
+  /**
+   * Zoom con el que ABRE la pista (su getSettings() antes de que la app pida nada). Sin él, sin
+   * ampliar: max(1, mín). Lo añadió el Inspector del 22/10/2026 para medir el cabo C0260 (una
+   * cámara que abre en gran angular, 0,5).
+   */
+  abreEn?: number;
 }
 interface PistaSimulada {
   t: MediaStreamTrack;
@@ -990,8 +1000,9 @@ async function simularCamaraPorPista(page: Page, cfg: CamaraSimulada) {
         const pista: PistaSimulada = { t, facing, zoom: null };
         const rango = rangoDe(pista);
         rangos.set(t, rango);
-        // Una cámara recién abierta empieza sin ampliar (o en su mínimo, si este pasa de 1).
-        pista.zoom = rango ? Math.max(1, rango.min) : null;
+        // Una cámara recién abierta empieza sin ampliar (o en su mínimo, si este pasa de 1), salvo
+        // que la configuración diga en qué zoom abre (abreEn, cabo C0260).
+        pista.zoom = rango ? (w.__cfgCamara.abreEn ?? Math.max(1, rango.min)) : null;
         w.__pistas.push(pista);
       }
       return s;
@@ -2096,20 +2107,21 @@ test.describe('Inspector 16/10/2026 — re-inspección tras 3b52f497, 00153144 y
     expect(caracteristicas.filter((c) => /\d( ?)%/.test(c))).toEqual([]);
   });
 
-  // ⚠️ HALLAZGO NUEVO — operativa (16/10/2026), vecino del 3315 que su reparación (3b52f497) no
-  // cubrió. La frase del 3304 sale ya con cualquier reducción en pantalla (< 1), pero las dos cifras
-  // que da van por formatearZoom, que quita el decimal cuando el valor está a menos de 0,05 del
-  // entero. Con la cámara clavada un poco por encima del zoom elegido (2,03 a 2x: pantalla
-  // 2 / 2,03 = 0,985), la nota dice «La cámara se ha quedado en 2x y no deja bajar de ahí: para ver
-  // 2x, la imagen se reduce en pantalla…»: la misma cifra a los dos lados, y aun así se reduce.
-  // Exige una cámara cuyo zoom quede a menos de 0,05 por encima del pedido (paso de 0,01 o sin
-  // paso); con el paso de 0,1 del caso del 3315 no se da.
+  // ✓ HALLAZGO 3327 REPARADO (6ec61bc2, 18/10/2026) — operativa (16/10/2026), vecino del 3315 que su
+  // reparación (3b52f497) no cubrió. La frase del 3304 salía ya con cualquier reducción en pantalla
+  // (< 1), pero las dos cifras que daba iban por formatearZoom, que quita el decimal cuando el valor
+  // está a menos de 0,05 del entero. Con la cámara clavada un poco por encima del zoom elegido (2,03
+  // a 2x: pantalla 2 / 2,03 = 0,985), la nota decía «La cámara se ha quedado en 2x y no deja bajar
+  // de ahí: para ver 2x, la imagen se reduce en pantalla…»: la misma cifra a los dos lados, y aun así
+  // se reducía. Exigía una cámara cuyo zoom quedara a menos de 0,05 por encima del pedido (paso de
+  // 0,01 o sin paso); con el paso de 0,1 del caso del 3315 no se daba.
   // Caso: cámara {1..2,03, paso 0,01}; 3x (cámara 2,03 aceptado, pantalla 1,478); desde ahí lo
   //       rechaza todo, también el 1; 2x → esperado: la nota no da a la cámara la misma cifra que al
-  //       zoom pedido cuando dice que la imagen se reduce · obtenido «La cámara se ha quedado en 2x y
-  //       no deja bajar de ahí: para ver 2x, la imagen se reduce en pantalla y queda un borde negro
-  //       alrededor.» con el vídeo a scale(0,985).
-  test('HALLAZGO NUEVO (operativa, vecino del 3315) — con la cámara clavada en 2,03x, a 2x la nota no debe decir que se ha quedado en 2x y que para ver 2x la imagen se reduce', async ({
+  //       zoom pedido cuando dice que la imagen se reduce · obtenido entonces «La cámara se ha quedado
+  //       en 2x y no deja bajar de ahí: para ver 2x, la imagen se reduce en pantalla y queda un borde
+  //       negro alrededor.» con el vídeo a scale(0,985).
+  // La re-inspección del 22/10/2026 comprueba también la rama sin cifra (CASO 20).
+  test('REPARADO 3327 (operativa, vecino del 3315) — con la cámara clavada en 2,03x, a 2x la nota no dice que se ha quedado en 2x y que para ver 2x la imagen se reduce', async ({
     page,
   }) => {
     // REPARADO (hallazgo 3327, 18/10/2026): formatearZoomFrente da a la cámara los decimales que la
@@ -2142,5 +2154,351 @@ test.describe('Inspector 16/10/2026 — re-inspección tras 3b52f497, 00153144 y
     if (cifras) expect(cifras[1]).not.toBe(cifras[2]);
     // Lo que dice ahora: la cámara con sus dos decimales.
     expect(texto).toContain('La cámara se ha quedado en 2,03x y no deja bajar de ahí: para ver 2x');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSPECTOR 22/10/2026 — re-inspección tras 6ec61bc2 (3327), ae8759c4 (3274) y 4196701d (3273 y
+// 3276), y medida del cabo C0260
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Mismo simulador de cámara por pista que los bloques del 14 al 16/10, con `abreEn` para el C0260.
+ * Valores esperados calculados a mano ANTES de ejecutar:
+ *   · reparto (zoom.ts): cámara = min(max(zoom, max(1, mín)), máx), redondeada HACIA ABAJO a su paso;
+ *     pantalla = zoom / cámara, a milésimas. Imagen congelada: escala = zoom / cámara al congelar.
+ *   · recorrido de la imagen congelada (acotarDesplazamiento y el ResizeObserver del 3273): ancho del
+ *     visor × (escala − 1) / 2 en x y alto × (escala − 1) / 2 en y. Visor del Pixel 7: 412 − 2 × 10
+ *     = 392 × 294 (4:3); en horizontal (863 × 360): 700 − 2 × 20 = 660 × 495.
+ *   · nota con la cámara clavada por encima del zoom (3327, formatearZoomFrente): la cifra de la
+ *     cámara con los decimales que la distingan del zoom pedido, hasta dos; si ni con dos se
+ *     distingue, la frase sin cifra («un poco por encima de»).
+ *   · contraste WCAG 2.x sobre el fondo compuesto (tinte rgba sobre la tarjeta).
+ */
+test.describe('Inspector 22/10/2026 — re-inspección tras 6ec61bc2, ae8759c4 y 4196701d', () => {
+  test.describe('en móvil (Pixel 7)', () => {
+    // Opciones enumeradas: `...devices['Pixel 7']` arrastra `defaultBrowserType` y fuerza un
+    // worker nuevo, que Playwright no admite dentro de un describe.
+    const P7 = devices['Pixel 7'];
+    test.use({
+      viewport: P7.viewport,
+      userAgent: P7.userAgent,
+      deviceScaleFactor: P7.deviceScaleFactor,
+      isMobile: P7.isMobile,
+      hasTouch: P7.hasTouch,
+    });
+
+    test('CASO 18 — deslizador a 3,5x con una cámara de 1-3×: la cámara hace 3x y la pantalla 1,167; congelada, el sepia, el brillo y el contraste llegan a la imagen quieta, las flechas la recorren hasta su tope y «Restablecer» no toca el zoom', async ({
+      page,
+    }) => {
+      await simularCamaraPorPista(page, { trasera: { min: 1, max: 3, step: 0.1 }, frontal: null });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom', '#control-brillo', '#control-contraste']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      // El medio arranca DE VERDAD, no basta con que exista el <video>.
+      const arranque = await estadoDelVideo(page);
+      expect(arranque?.readyState).toBeGreaterThanOrEqual(2);
+      expect(arranque?.ancho).toBeGreaterThan(0);
+      const lienzo = page.locator('canvas');
+      const nota = page.locator('[class*=zoomNota]');
+
+      // 2x por defecto: cámara 2 (20 pasos de 0,1), pantalla 1.
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 2, pantalla: 1, total: 2 });
+
+      // 3,5x con el deslizador (no hay preajuste de 3,5): cámara min(3,5; 3) = 3 (30 pasos), pantalla
+      // 3,5 / 3 = 1,1667 → 1,167; lo que se ve, 3 × 1,167 = 3,501. La nota redondea 1,167 a «1,2».
+      await sembrarValor(page, '#control-zoom', 3.5);
+      await expect
+        .poll(() => aumentoPintado(page))
+        .toEqual({ facing: 'environment', camara: 3, pantalla: 1.167, total: 3.501 });
+      await expect(page.locator('#titulo-zoom')).toHaveText('Zoom: 3,5x');
+      await expect(page.locator('[class*=zoomIndicador]')).toHaveText('3,5x');
+      await expect(page.locator('[class*=zoomPresets] button[aria-pressed="true"]')).toHaveCount(0);
+      await expect(nota).toHaveText('La cámara hace 3x y el resto (1,2x) se amplía en pantalla.');
+
+      // Congelada: la imagen trae los 3x de la cámara → escala 3,5 / 3 = 1,167.
+      await page.getByRole('button', { name: /Congelar/i }).click();
+      await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(1\.167\)/);
+
+      // RESPUESTA_IMAGEN_FIJA (la respuesta única de 3276): «Sobre la imagen quieta siguen funcionando
+      // el zoom, los filtros de contraste y el brillo». Sepia, brillo 140 y contraste 80 llegan al
+      // filtro del LIENZO, en el orden de getFiltroStyle (brillo, contraste, filtro).
+      await page.getByRole('button', { name: /Sepia/i }).click();
+      await sembrarValor(page, '#control-brillo', 140);
+      await sembrarValor(page, '#control-contraste', 80);
+      await expect(lienzo).toHaveAttribute('style', /filter: brightness\(140%\) contrast\(80%\) sepia\(100%\)/);
+      // Rótulos con espacio duro (U+00A0) antes del %, como manda el formato español (3317).
+      await expect(page.locator('label[for=control-brillo]')).toHaveText('☀️ Brillo: 140 %');
+      await expect(page.locator('label[for=control-contraste]')).toHaveText('◐ Contraste: 80 %');
+
+      // Flechas: 20 px por pulsación, acotado a 392 × (1,167 − 1) / 2 = 32,732 en x y a
+      // 294 × 0,167 / 2 = 24,549 en y. La segunda pulsación (40) choca con el tope en los dos ejes.
+      await lienzo.focus();
+      for (const tecla of ['ArrowLeft', 'ArrowLeft', 'ArrowUp', 'ArrowUp']) await page.keyboard.press(tecla);
+      await expect(lienzo).toHaveAttribute('style', /translate\(32\.732\d*px, 24\.549\d*px\) scale\(1\.167\)/);
+
+      // «Restablecer ajustes»: brillo, contraste y filtro al origen; ni el zoom ni el recorrido cambian.
+      await page.getByRole('button', { name: /Restablecer ajustes/i }).click();
+      await expect(lienzo).toHaveAttribute(
+        'style',
+        /translate\(32\.732\d*px, 24\.549\d*px\) scale\(1\.167\); filter: brightness\(100%\) contrast\(100%\);/,
+      );
+      await expect(page.getByRole('button', { name: /Normal/i })).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.locator('#titulo-zoom')).toHaveText('Zoom: 3,5x');
+
+      // Reanudar: se le vuelve a pedir su 3 a la cámara ([2, 3, 3]) y la nota vuelve.
+      await page.getByRole('button', { name: /Reanudar/i }).click();
+      await esperarCamaraEnMarcha(page);
+      await expect.poll(async () => (await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 3, 3]);
+      await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 3, pantalla: 1.167 });
+      await expect(nota).toHaveText('La cámara hace 3x y el resto (1,2x) se amplía en pantalla.');
+    });
+
+    test('CASO 19 (3273) — girar con la imagen congelada recorrida en DIAGONAL y con zoom de cámara (2x de cámara, 2,5 en pantalla): en vertical se reacota en los dos ejes y sigue cubriendo el visor; al volver a horizontal no se mueve', async ({
+      page,
+    }) => {
+      await simularCamaraPorPista(page, { trasera: { min: 1, max: 2, step: 0.1 }, frontal: null });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      const lienzo = page.locator('canvas');
+
+      // 5x: cámara min(5; 2) = 2, pantalla 2,5. Congelada: escala 5 / 2 = 2,5 (no 5: el test del 3273
+      // solo miraba todo el zoom en pantalla y el eje x).
+      await page.getByRole('button', { name: '5x', exact: true }).click();
+      await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2, pantalla: 2.5, total: 5 });
+      await page.getByRole('button', { name: /Congelar/i }).click();
+      await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(2\.5\)/);
+
+      // Horizontal (Pixel 7 landscape, 863 × 360): visor 660 × 495; topes 660 × 1,5 / 2 = 495 y
+      // 495 × 1,5 / 2 = 371,25. El dedo va en diagonal hasta los dos topes.
+      await page.setViewportSize({ width: 863, height: 360 });
+      await expect.poll(async () => (await cajas(page)).visor.ancho).toBe(660);
+      await deslizarDesdeElVisor(page, -3000, -3000);
+      await expect(lienzo).toHaveAttribute('style', /translate\(-495px, -371\.25px\) scale\(2\.5\)/);
+
+      // Vertical: visor 392 × 294; topes 392 × 1,5 / 2 = 294 y 294 × 1,5 / 2 = 220,5.
+      await page.setViewportSize({ width: 412, height: 839 });
+      await expect.poll(async () => (await cajas(page)).visor.ancho).toBe(392);
+      await expect(lienzo).toHaveAttribute('style', /translate\(-294px, -220\.5px\) scale\(2\.5\)/);
+      // Con los topes, la imagen (392 × 2,5 = 980 de ancho y 294 × 2,5 = 735 de alto) llega justo al
+      // borde derecho e inferior del visor: lo cubre entero, sin franja negra en ningún lado.
+      const cubre = await page.evaluate(() => {
+        const c = (document.querySelector('canvas') as HTMLCanvasElement).getBoundingClientRect();
+        const v = ((document.querySelector('canvas') as HTMLCanvasElement).parentElement as HTMLElement).getBoundingClientRect();
+        return {
+          izquierda: c.left <= v.left + 0.5,
+          derecha: c.right >= v.right - 0.5,
+          arriba: c.top <= v.top + 0.5,
+          abajo: c.bottom >= v.bottom - 0.5,
+        };
+      });
+      expect(cubre).toEqual({ izquierda: true, derecha: true, arriba: true, abajo: true });
+
+      // Otra vez horizontal: el visor crece y el desplazamiento cabe en los topes nuevos, así que el
+      // ResizeObserver no lo toca.
+      await page.setViewportSize({ width: 863, height: 360 });
+      await expect.poll(async () => (await cajas(page)).visor.ancho).toBe(660);
+      await page.waitForTimeout(300); // margen para un ResizeObserver que no debe mover nada
+      await expect(lienzo).toHaveAttribute('style', /translate\(-294px, -220\.5px\) scale\(2\.5\)/);
+
+      // Congelada, 2x: escala 2 / 2 = 1, sin recorrido.
+      await page.getByRole('button', { name: '2x', exact: true }).click();
+      await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(1\)/);
+    });
+
+    test('CASO 20 (3327) — cámara sin paso de 1-2,004× clavada en 2,004: a 2x ni con dos decimales se distingue de 2, así que la nota dice que se ha quedado «un poco por encima de 2x» (la rama sin cifra)', async ({
+      page,
+    }) => {
+      const camaras = { trasera: { min: 1, max: 2.004, step: 0 }, frontal: null };
+      await simularCamaraPorPista(page, camaras);
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      const nota = page.locator('[class*=zoomNota]');
+
+      // 3x: cámara min(3; 2,004) = 2,004 (sin paso no se redondea); pantalla 3 / 2,004 = 1,497.
+      // formatearZoom(2,004) = «2» y formatearZoom(1,497) = «1,5».
+      await page.getByRole('button', { name: '3x', exact: true }).click();
+      await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2.004, pantalla: 1.497 });
+      await expect(nota).toHaveText('La cámara hace 2x y el resto (1,5x) se amplía en pantalla.');
+
+      // Desde aquí lo rechaza todo, también el 1. 2x: pide 2 → rechazado → 1 → rechazado →
+      // getSettings 2,004 → rango {2,004}; el efecto pide 2,004 y 1 una vez más y se para.
+      // Pantalla 2 / 2,004 = 0,998; lo que se ve, 2,004 × 0,998 = 2,000.
+      await cambiarCamaraSimulada(page, { ...camaras, rechazarPorEncima: 0 });
+      await page.getByRole('button', { name: '2x', exact: true }).click();
+      await expect
+        .poll(async () => (await zoomPedidoPorPista(page)).map((p) => p.zoom))
+        .toEqual([2, 2.004, 2, 1, 2.004, 1]);
+      await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 2.004, pantalla: 0.998 });
+      expect((await aumentoPintado(page)).total).toBeCloseTo(2, 2);
+      await expect(page.locator('[class*=zoomIndicador]')).toHaveText('2x');
+      // formatearZoomFrente(2,004; 2): 2 → 2,0 → 2,00, las tres iguales a «2» → sin cifra.
+      await expect(nota).toHaveText(
+        'La cámara se ha quedado un poco por encima de 2x y no deja bajar de ahí: la imagen se reduce en pantalla y queda un borde negro alrededor.',
+      );
+      // El vídeo, reducido: 392 × 0,998 = 391,2 → 391 y 294 × 0,998 = 293,4 → 293.
+      await expect
+        .poll(() =>
+          page.locator('video').evaluate((v) => {
+            const r = v.getBoundingClientRect();
+            return `${Math.round(r.width)}×${Math.round(r.height)}`;
+          }),
+        )
+        .toBe('391×293');
+      await page.waitForTimeout(500);
+      expect(await zoomPedidoPorPista(page)).toHaveLength(6); // sin bucle
+    });
+
+    /**
+     * Cabo C0260 (inspector del 15/10/2026): «una cámara que ABRE por debajo de 1 (zoom 0,5 en
+     * getSettings) y rechaza todo applyConstraints». Medido el 22/10/2026 con este simulador
+     * (abreEn 0,5, rango {0,5..8, paso 0,1}, rechazarPorEncima 0): a 2x la app pide 2 y 1, los dos
+     * rechazados; getSettings dice 0,5 y el catch del efecto solo fija el rango si el zoom pasa de 1
+     * (page.tsx), así que cae a «todo en pantalla»: scale(2) sobre una cámara en 0,5 = 1 aumento visto
+     * con el indicador en 2x y sin nota; a 5x, 2,5; a 1x, 0,5; congelada a 2x, scale(2) sobre la
+     * imagen tomada a 0,5. El cabo SIGUE ABIERTO —no se conoce un navegador que abra la pista por
+     * debajo de 1 y además rechace el 1—, y por eso esa combinación no se fija aquí ni como esperado
+     * ni con test.fail(). Lo que sí se fija: con la misma cámara que COOPERA, la app acierta.
+     */
+    test('CASO 22 (cabo C0260) — una cámara que ABRE en gran angular (0,5) y acepta el zoom no se queda alejada: a 2x la cámara hace 2 y a 1x vuelve a 1; si rechaza el 3 pero acepta el 1, todo va a la pantalla y se ven los 3 aumentos', async ({
+      page,
+    }) => {
+      const gran = { min: 0.5, max: 8, step: 0.1 };
+      await simularCamaraPorPista(page, { trasera: gran, frontal: null, abreEn: 0.5 });
+      await page.goto(RUTA);
+      await esperarHidratacion(page, ['#control-zoom']);
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      const nota = page.locator('[class*=zoomNota]');
+
+      // 2x: leerRangoZoom acepta {0,5..8} (un mínimo de 0,5 es un aumento); cámara min(max(2; 1); 8)
+      // = 2 (20 pasos), pantalla 1. La cámara sale de 0,5 a 2.
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 2, pantalla: 1, total: 2 });
+      await expect(nota).toHaveText(/^Los 2x los hace la propia cámara/);
+
+      // 1x: cámara max(1; max(1; 0,5)) = 1 → se le pide 1 (nunca 0,5): sin ampliar, no alejada.
+      await page.getByRole('button', { name: '1x', exact: true }).click();
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 1, pantalla: 1, total: 1 });
+      expect((await zoomPedidoPorPista(page)).map((p) => p.zoom)).toEqual([2, 1]);
+      // min(8; 5) = 5: la nota ofrece el tope de la app, no el de la cámara.
+      await expect(nota).toHaveText(/^Esta cámara puede ampliar por sí misma hasta 5x/);
+
+      // Pista nueva (la 1) que abre en 0,5, rechaza lo que pase de 1,5 y acepta el 1. A 3x: pide 3 →
+      // rechazado → pide 1 → aceptado → getSettings 1 → sin rango: todo en pantalla y sin nota.
+      // Lo que se ve, 1 × 3 = 3, lo que marca el indicador.
+      await page.getByRole('button', { name: /Detener/i }).click();
+      await cambiarCamaraSimulada(page, { trasera: gran, frontal: null, abreEn: 0.5, rechazarPorEncima: 1.5 });
+      await page.getByRole('button', { name: '3x', exact: true }).click();
+      await page.getByRole('button', { name: /Activar lupa/i }).click();
+      await esperarCamaraEnMarcha(page);
+      await expect
+        .poll(async () => (await zoomPedidoPorPista(page)).filter((p) => p.pista === 1).map((p) => p.zoom))
+        .toEqual([3, 1]);
+      await expect.poll(() => aumentoPintado(page)).toEqual({ facing: 'environment', camara: 1, pantalla: 3, total: 3 });
+      await expect(page.locator('[class*=zoomIndicador]')).toHaveText('3x');
+      await expect(nota).toHaveCount(0);
+    });
+  });
+
+  test('CASO 21 (3274) — con su valor exacto: el preajuste activo, los consejos de escenario y el dato de la FAQ dan 4,85 · 4,97 · 4,79:1 en claro y 4,68 · 4,68 · 5,13:1 en oscuro', async ({
+    page,
+  }) => {
+    // A mano (WCAG 2.x; L = 0,2126 R + 0,7152 G + 0,0722 B con cada canal linealizado), sobre la
+    // tarjeta (--bg-card: #FFFFFF en claro, #2D2D2D en oscuro) con el tinte de cada regla encima:
+    //   claro
+    //     preajuste: #26718F (L 0,1421) sobre el tinte 0,10 → (234,1; 242,9; 246,6), L 0,8824 → 4,85
+    //     escenario: #26718F sobre el tinte 0,08 → (238,28; 245,32; 248,28), L 0,9052 → 4,97
+    //     dato FAQ:  #327874 (L 0,1537) sobre rgba(72,169,166,0,08) → (240,36; 248,12; 247,88), L 0,9257 → 4,79
+    //   oscuro
+    //     preajuste y escenario: #3FA5D1 (L 0,3257) sobre el tinte 0,05 → (45,05; 49,45; 51,3), L 0,0304 → 4,68
+    //     dato FAQ:  #5ABDB9 (L 0,4207) sobre rgba(72,169,166,0,12) → (48,24; 59,88; 59,52), L 0,0417 → 5,13
+    // Antes de ae8759c4, el preajuste y el escenario daban 4,42 y 4,33 en oscuro (tintes del 10 y 12 %):
+    // toBeCloseTo(x, 1) = ±0,05 los distingue de sobra.
+    // ⚠️ El dato de la FAQ vive dentro de un <details> cerrado, y ahí la transición global de
+    // background-color (globals.css, 0,3 s) no avanza: getComputedStyle se queda con el tinte del tema
+    // anterior (medido: 0,08 en oscuro y 5,47:1). Por eso se abre la pregunta antes de medir.
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await page.locator('summary', { hasText: '¿La lupa digital tiene la misma calidad que una lupa física?' }).click();
+
+    /** Espera al color y al fondo finales del elemento y a dos lecturas iguales del contraste. */
+    const medir = async (selector: string, color: string, fondo: string) => {
+      const el = page.locator(selector).first();
+      await expect
+        .poll(() => el.evaluate((e) => `${getComputedStyle(e).color} | ${getComputedStyle(e).backgroundColor}`))
+        .toBe(`${color} | ${fondo}`);
+      let previo = -1;
+      let ratio = -1;
+      await expect
+        .poll(
+          async () => {
+            ratio = Math.round((await contrasteSobreFondoReal(el)) * 1000) / 1000;
+            const quieto = ratio === previo;
+            previo = ratio;
+            return quieto;
+          },
+          { intervals: [150], message: `${selector} con el contraste quieto` },
+        )
+        .toBe(true);
+      return ratio;
+    };
+
+    expect(await medir('[class*=zoomPresetActivo]', 'rgb(38, 113, 143)', 'rgba(46, 134, 171, 0.1)')).toBeCloseTo(4.85, 1);
+    expect(await medir('[class*=escenarioTip]', 'rgb(38, 113, 143)', 'rgba(46, 134, 171, 0.08)')).toBeCloseTo(4.97, 1);
+    expect(await medir('[class*=faqTip]', 'rgb(50, 120, 116)', 'rgba(72, 169, 166, 0.08)')).toBeCloseTo(4.79, 1);
+
+    // Con el botón de la propia página: sembrar data-theme a mano puede medir otro estado.
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    expect(await medir('[class*=zoomPresetActivo]', 'rgb(63, 165, 209)', 'rgba(46, 134, 171, 0.05)')).toBeCloseTo(4.68, 1);
+    expect(await medir('[class*=escenarioTip]', 'rgb(63, 165, 209)', 'rgba(46, 134, 171, 0.05)')).toBeCloseTo(4.68, 1);
+    expect(await medir('[class*=faqTip]', 'rgb(90, 189, 185)', 'rgba(72, 169, 166, 0.12)')).toBeCloseTo(5.13, 1);
+  });
+
+  // ⚠️ ABIERTO: hallazgo nuevo (Inspector 22/10/2026) — contenido. El dato de la FAQ visible
+  // («¿La lupa digital tiene la misma calidad que una lupa física?») dice: «Debajo del control de
+  // zoom verás cuánto hace la cámara y cuánto la pantalla; si no aparece esa línea, todo el zoom se
+  // hace en pantalla». Con la imagen congelada la línea se oculta SIEMPRE (page.tsx la pinta solo con
+  // `activo && !congelado && rangoZoomCamara`), también cuando la cámara hizo parte del zoom y la
+  // imagen quieta lo trae dentro: con una cámara de 1-3× a 5x la imagen se toma con 3x de cámara y en
+  // pantalla solo va 5 / 3 = 1,667, pero sin la línea la FAQ lleva a leer que los 5x son de pantalla
+  // (y que la cámara no tiene zoom). Lo mismo con la cámara clavada por encima del zoom: congelada,
+  // el borde negro se queda sin la frase que lo explica.
+  // Caso: cámara {1..3, paso 0,1}, 5x, «Congelar» → esperado: o la línea sigue diciendo cuánto hizo la
+  //       cámara, o la FAQ limita su lectura a la imagen en directo · obtenido: sin línea, la FAQ tal
+  //       cual y el lienzo a scale(1,667).
+  test('HALLAZGO NUEVO (contenido) — con la imagen congelada, la FAQ no debe dar a entender que todo el zoom es de pantalla cuando la cámara hizo 3 de los 5 aumentos', async ({
+    page,
+  }) => {
+    test.fail(); // ABIERTO: hallazgo nuevo del 22/10/2026; el día que se repare, quitar esta línea
+    await simularCamaraPorPista(page, { trasera: { min: 1, max: 3, step: 0.1 }, frontal: null });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#control-zoom']);
+    await page.getByRole('button', { name: /Activar lupa/i }).click();
+    await esperarCamaraEnMarcha(page);
+    const nota = page.locator('[class*=zoomNota]');
+
+    // 5x en directo: cámara min(5; 3) = 3, pantalla 5 / 3 = 1,667 (3 × 1,667 = 5,001), y la línea lo dice.
+    await page.getByRole('button', { name: '5x', exact: true }).click();
+    await expect.poll(() => aumentoPintado(page)).toMatchObject({ camara: 3, pantalla: 1.667, total: 5.001 });
+    await expect(nota).toHaveText('La cámara hace 3x y el resto (1,7x) se amplía en pantalla.');
+
+    // Congelada: la imagen trae los 3x de la cámara; en pantalla solo 1,667 (no los 5).
+    await page.getByRole('button', { name: /Congelar/i }).click();
+    await expect(page.locator('canvas')).toHaveAttribute('style', /scale\(1\.667\)/);
+
+    // DEBERÍA: o la línea sigue a la vista, o la FAQ no afirma sin matiz que su ausencia significa
+    // «todo en pantalla» (admite cualquier reparación: una línea para la imagen quieta, o limitar la
+    // frase a la imagen en directo).
+    const lineaVisible = await nota.isVisible();
+    const dato = ((await page.locator('[class*=faqTip]').first().textContent()) ?? '').replace(/\s+/g, ' ');
+    const faqSinMatiz =
+      /si no aparece esa línea,? todo el zoom se hace en pantalla/i.test(dato) && !/congel|en directo|en vivo/i.test(dato);
+    expect(lineaVisible || !faqSinMatiz, `línea visible: ${lineaVisible} · FAQ: «${dato}»`).toBe(true);
   });
 });

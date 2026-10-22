@@ -71,8 +71,9 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *      CPU cargada): `abrir` espera ahora a la hidratación (ver su comentario).
  *   7. INSPECTOR 13/10/2026 (al final): re-inspección tras la <ZonaHerramienta> (3d5c5db0). Casos
  *      N (1.234,5 Hz triangular, medido en el sonido) y L (20.000 Hz al 100 %), la envoltura sin
- *      efecto visible ni de teclado, y los hallazgos J1-J3, ABIERTOS, con `test.fail()`. El caso de
- *      rechazo (un sonido por encima de 20 kHz en el medidor) y el J4, en
+ *      efecto visible ni de teclado, y los hallazgos J1-J3, que nacieron ABIERTOS con `test.fail()` y
+ *      fueron REPARADOS el 21/10/2026 (929ae68b, hallazgos 3281-3283). El caso de
+ *      rechazo (un sonido por encima de 20 kHz en el medidor) y el J4 (3284, REPARADO), en
  *      generador-tonos-medidor-inspector.spec.ts, que ya lleva el micrófono falso.
  *   8. INSPECTOR 14/10/2026 (al final): re-inspección tras el cromo fijo (cd462414), que quitó el
  *      `scroll-margin` de la sección del medidor. El salto del hero, en escritorio y a 360/390 px;
@@ -91,7 +92,13 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *  11. INSPECTOR 16/10/2026, tras d72384b5, 34046071 y 56f27649 (al final): el preset Medios-bajos
  *      medido por el micrófono (CASO 20), la misma nota dos veces en una medida (CASO 21), «Llevar» a
  *      mitad de un deslizamiento lento (CASO 22), un deslizamiento rápido que no llega a «estable»
- *      (CASO 23), el aviso de lo llevado en móvil (CASO 24) y el hallazgo N1, ABIERTO, con `test.fail()`.
+ *      (CASO 23), el aviso de lo llevado en móvil (CASO 24) y el hallazgo N1, que nació ABIERTO con
+ *      `test.fail()` y fue REPARADO el 18/10/2026 (4662361a, hallazgo 3328): hoy es regresión.
+ *  12. INSPECTOR 22/10/2026, tras 929ae68b (3281-3283), 91099701 (C0355), 6da04594 (C0173) y 4662361a
+ *      (al final): el barrido parado y vuelto a arrancar, con la onda cambiada en mitad (CASO 25), con
+ *      «Desde» = «Hasta» en el techo (CASO 26) y con los tres campos rechazados (CASO 27); C0355 con una
+ *      lectura estable escrita y aún sin pintar al pulsar «Llevar»; la guarda de las dos FAQ para TODAS
+ *      las preguntas, y los hallazgos P1-P3, ABIERTOS, con `test.fail()`.
  */
 
 test.use({
@@ -699,8 +706,11 @@ test('CASO 5 — el barrido con «Desde» mayor que «Hasta» ordena los límite
   await page.waitForTimeout(1300); // ~26 pasos de 50 ms
   await page.getByRole('button', { name: /Detener barrido/ }).click();
 
-  // El oscilador arranca en «Desde» (500), no en el 440 que había en el campo: lo fijaba este caso
-  // hasta que se reparó el hallazgo 3281 (J1). El resto es el barrido.
+  // El oscilador arranca en el MENOR de los dos límites (500, que aquí es «Hasta»), no en el 440 que
+  // había en el campo: lo fijaba este caso hasta que se reparó el hallazgo 3281 (J1). El resto es el
+  // barrido. Que con los límites invertidos no empiece en «Desde» (2.000) ni avise de que los ha
+  // ordenado es el HALLAZGO P1 (Inspector 22/10/2026, al final del fichero): si se repara barriendo
+  // hacia abajo, este primer valor pasa a 2.000.
   const aplicadas = await frecuenciasAplicadas(page);
   expect(aplicadas[0]).toBe(500);
   const barrido = aplicadas.slice(1);
@@ -4451,5 +4461,407 @@ test.describe('Inspector 16/10/2026 — en móvil (Pixel 7)', () => {
     await page.getByRole('button', { name: /Detener barrido/ }).tap();
     // Y nada desborda a lo ancho en el móvil
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 22/10/2026 — re-inspección (invalidada por 929ae68b, 91099701, 6da04594 y 4662361a)
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * LO QUE LA INVALIDÓ. 929ae68b (3281): `iniciarSweep` arranca el tono en «Desde» (`iniciarAudio(desde)`)
+ * y lo escribe en el campo; 91099701 (C0355): «Llevar la lectura al generador» lee la retenida de un ref
+ * que el intervalo del medidor escribe a la vez que el estado; 6da04594 (C0173): el primer tercio de la
+ * medida se relee hasta asentarse; 4662361a (3284 y 3328): «estable» pide unos 0,3 s. Los cinco specs de
+ * la app salieron en verde salvo un rojo INESTABLE del medidor («19,8 Hz … ninguna cifra», en
+ * generador-tonos-medidor-inspector.spec.ts): un hueco de 10 ms en el puente MediaStream entre los dos
+ * contextos, con la máquina cargada, es un clic de verdad en la señal; fabricado a propósito da
+ * «146 Hz · Leyendo…» medio segundo, nunca «estable». No es la app (ver el acta).
+ *
+ * Resueltos a mano ANTES de ejecutar (iniciarSweep: incremento = (Hasta − Desde) / (Duración · 20), un
+ * peldaño cada 50 ms, Math.round en cada uno, vuelta a «Desde» al alcanzar «Hasta»):
+ *   · NORMAL (CASO 25) — 1.000 → 3.000 Hz en 2 s: incremento 2.000/40 = 50 Hz exactos → escalera
+ *     1.000 + 50k, k = 0…39 (2.950 la más alta; 3.000 no se emite). Arranca en 1.000. «Cuadrada» en
+ *     mitad: el MISMO oscilador pasa a 'square' y el barrido sigue. «Detener barrido»: el tono sigue,
+ *     sin peldaños nuevos, en lo que dice el campo. «Iniciar barrido» otra vez: el mismo oscilador salta
+ *     a 1.000. «Detener» y «Iniciar barrido»: oscilador nuevo, que arranca 'square' y en 1.000.
+ *   · LÍMITE (CASO 26) — «Desde» = «Hasta» = 20.000 Hz (el techo que promete el <h1>), 1 s: incremento 0
+ *     → todo lo emitido es 20.000, el campo «20000», el rótulo «Umbral del ultrasonido…» y el pico del
+ *     sonido en 20.000 Hz.
+ *   · RECHAZO (CASO 27) — «Desde» vacío, «Hasta» «25.000», «Duración» «0» (`leerCampoBarrido`): «Desde» → 20
+ *     con «estaba vacío: se usa 20 Hz.» · «Hasta» → 20.000 con «25.000 Hz queda fuera del rango de 20 a
+ *     20.000 Hz; se ajusta a 20.000 Hz.» · «Duración» → 1 con «0 s queda fuera del rango de 1 a 60 s; se
+ *     ajusta a 1 s.» Escalera 20 + 999k, k = 0…19 (19.001 la más alta).
+ *   · C0355 — una lectura del medidor escrita en el estado y aún sin pintar cuando llega el clic en
+ *     «Llevar»: lo llevado tiene que ser ESA lectura, que es la que se queda a la vista. Con el
+ *     deslizamiento de 60 cents/s del CASO 22, la lectura nueva queda un peldaño (~1,5 Hz, ~6 cents)
+ *     por encima de la pintada, así que llevar la del render anterior se ve: los cents de lo llevado
+ *     frente a los de la retenida se separarían ~6, y se exige ≤ 1 (0,5 del redondeo de los cents de la
+ *     app + 0,2 del decimal de lo llevado).
+ * Medido el 22/10/2026 (44,1 kHz): todo como se resolvió; C0355 en 3 de 3 (retenida pintada 422 Hz,
+ * lectura nueva 423-425 Hz, llevado 423,4-424,8).
+ */
+test.describe('Inspector 22/10/2026', () => {
+  const botonIniciarBarrido = (page: Page) => page.getByRole('button', { name: /Iniciar barrido/ });
+  const botonDetenerBarrido = (page: Page) => page.getByRole('button', { name: /Detener barrido/ });
+  const ESCALERA_1000_3000 = Array.from({ length: 40 }, (_, k) => 1000 + 50 * k);
+
+  /** Escribe en un campo como un usuario (con «» lo vacía), espera a que React lo tenga y sale de él. */
+  async function escribir(page: Page, selector: string, texto: string): Promise<void> {
+    const campo = page.locator(selector);
+    await campo.click();
+    await campo.press('Control+a');
+    if (texto === '') await campo.press('Backspace');
+    else await campo.pressSequentially(texto, { delay: 30 });
+    await esperarValorEnReact(page, selector, texto);
+    await campo.blur();
+  }
+
+  async function abrirBarrido(page: Page, desde: string, hasta: string, duracion: string): Promise<void> {
+    await abrir(page);
+    await esperarHidratacion(page, ['#sweep-min', '#sweep-max', '#sweep-dur']);
+    await escribir(page, '#sweep-min', desde);
+    await escribir(page, '#sweep-max', hasta);
+    await escribir(page, '#sweep-dur', duracion);
+  }
+
+  async function barridoEnMarcha(page: Page, minimo: number): Promise<void> {
+    await botonIniciarBarrido(page).click();
+    await expect(botonDetenerBarrido(page)).toHaveAttribute('aria-pressed', 'true');
+    await expect
+      .poll(async () => (await frecuenciasAplicadas(page)).length, { timeout: 5000, message: 'el barrido no avanza' })
+      .toBeGreaterThanOrEqual(minimo);
+  }
+
+  /** Frecuencia de una nota del temperamento igual con La4 = 440 Hz: «Sol#4» → 440·2^(−1/12) = 415,305 Hz. */
+  function frecuenciaDeNota(nombre: string): number {
+    const m = nombre.match(/^(Do|Re|Mi|Fa|Sol|La|Si)(#?)(-?\d+)$/);
+    if (!m) return NaN;
+    const base: Record<string, number> = { Do: 0, Re: 2, Mi: 4, Fa: 5, Sol: 7, La: 9, Si: 11 };
+    const n = (Number(m[3]) - 4) * 12 + base[m[1]] + (m[2] ? 1 : 0) - 9;
+    return 440 * 2 ** (n / 12);
+  }
+
+  test('CASO 25 — barrido 1.000 → 3.000 Hz en 2 s: arranca en «Desde», cambia de onda sin cortarse y, parado y vuelto a arrancar, empieza otra vez en «Desde»', async ({
+    page,
+  }) => {
+    await abrirBarrido(page, '1000', '3000', '2');
+    await barridoEnMarcha(page, 6);
+    expect((await frecuenciasAplicadas(page))[0], 'el tono arranca en «Desde» (3281)').toBe(1000);
+
+    // La onda, en mitad: el MISMO oscilador cambia de tipo y el barrido sigue
+    await page.getByRole('button', { name: /Cuadrada/ }).click();
+    await expect.poll(async () => (await vivo(page))?.tipo, { timeout: 5000 }).toBe('square');
+    const trasOnda = (await frecuenciasAplicadas(page)).length;
+    await expect
+      .poll(async () => (await frecuenciasAplicadas(page)).length, { timeout: 5000, message: 'el barrido se paró al cambiar de onda' })
+      .toBeGreaterThanOrEqual(trasOnda + 4);
+    expect(await registros(page), 'cambiar de onda no crea otro oscilador').toHaveLength(1);
+
+    // «Detener barrido»: el tono sigue, quieto, en lo que dice el campo
+    await botonDetenerBarrido(page).click();
+    await expect(botonIniciarBarrido(page)).toHaveAttribute('aria-pressed', 'false');
+    const parado = (await frecuenciasAplicadas(page)).length;
+    await page.waitForTimeout(300); // seis peldaños de 50 ms
+    expect((await frecuenciasAplicadas(page)).length, 'ningún peldaño tras parar el barrido').toBe(parado);
+    await expect(botonDetener(page)).toHaveAttribute('aria-pressed', 'true');
+    const enCampo = Number(await campoFrecuencia(page).inputValue());
+    expect(ESCALERA_1000_3000, `el campo dice ${enCampo}`).toContain(enCampo);
+    await esperarFrecuencia(page, enCampo, 0);
+
+    // Otra vez «Iniciar barrido», con el tono sonando: el mismo oscilador vuelve a «Desde»
+    await botonIniciarBarrido(page).click();
+    await expect.poll(async () => (await frecuenciasAplicadas(page)).length, { timeout: 5000 }).toBeGreaterThanOrEqual(parado + 3);
+    expect((await frecuenciasAplicadas(page))[parado], 'al volver a arrancar, el barrido empieza en «Desde»').toBe(1000);
+    expect(await registros(page)).toHaveLength(1);
+    for (const f of await frecuenciasAplicadas(page)) {
+      expect(ESCALERA_1000_3000, `${f} Hz fuera de la escalera de 50 Hz`).toContain(f);
+    }
+
+    // «Detener» y «Iniciar barrido»: oscilador nuevo, con la onda elegida y en «Desde»
+    await botonDetener(page).click();
+    await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
+    expect((await registros(page))[0].detenido).toBe(true);
+    await botonIniciarBarrido(page).click();
+    await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(2);
+    const nuevo = (await registros(page))[1];
+    expect(nuevo.tipoAlArrancar, 'el tono nuevo nace con la onda elegida').toBe('square');
+    expect(nuevo.frecuenciasAplicadas[0], 'y en «Desde»').toBe(1000);
+    await botonDetenerBarrido(page).click();
+    await botonDetener(page).click();
+  });
+
+  test('CASO 26 — «Desde» = «Hasta» = 20.000 Hz, el techo: el barrido se queda en 20.000 y no emite nada más', async ({ page }) => {
+    await abrirBarrido(page, '20.000', '20000', '1');
+    await expect(page.locator('#sweep-min')).toHaveValue('20000');
+    await expect(page.locator('[class*="barridoAvisos"]'), 'nada que corregir: los dos están en el rango').toHaveCount(0);
+    await botonIniciarBarrido(page).click();
+    await expect(botonDetenerBarrido(page)).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(500); // diez peldaños de 50 ms con incremento 0
+    const aplicadas = await frecuenciasAplicadas(page);
+    expect(aplicadas[0]).toBe(20000);
+    expect([...new Set(aplicadas)], `emitido: ${aplicadas.join(', ')}`).toEqual([20000]);
+    await expect(campoFrecuencia(page)).toHaveValue('20000');
+    await expect(page.locator('[class*="descripcionFrecuencia"]')).toHaveText('Umbral del ultrasonido - Inaudible para la mayoría');
+    await esperarPicoEspectral(page, 20000);
+    await expect(botonDetenerBarrido(page)).toHaveAttribute('aria-pressed', 'true');
+    await botonDetenerBarrido(page).click();
+  });
+
+  test('CASO 27 — «Desde» vacío, «Hasta» 25.000 y «Duración» 0 se corrigen diciéndolo, y el barrido recorre 20 → 20.000 Hz en 1 s', async ({
+    page,
+  }) => {
+    await abrirBarrido(page, '', '25.000', '0');
+    await expect(page.locator('#sweep-min')).toHaveValue('20');
+    await expect(page.locator('#sweep-max')).toHaveValue('20000');
+    await expect(page.locator('#sweep-dur')).toHaveValue('1');
+    // El aviso lleva delante el ⚠️ decorativo (aria-hidden): se compara lo que sigue.
+    await expect(page.locator('#sweep-min-aviso')).toContainText('«Desde» estaba vacío: se usa 20 Hz.');
+    await expect(page.locator('#sweep-max-aviso')).toContainText(
+      '«Hasta»: 25.000 Hz queda fuera del rango de 20 a 20.000 Hz; se ajusta a 20.000 Hz.',
+    );
+    await expect(page.locator('#sweep-dur-aviso')).toContainText('«Duración»: 0 s queda fuera del rango de 1 a 60 s; se ajusta a 1 s.');
+    for (const campo of ['min', 'max', 'dur']) {
+      await expect(page.locator(`#sweep-${campo}`)).toHaveAttribute('aria-describedby', `sweep-${campo}-aviso`);
+      await expect(page.locator(`#sweep-${campo}`)).toHaveAttribute('aria-invalid', 'true');
+    }
+
+    await botonIniciarBarrido(page).click();
+    // Hasta la vuelta: un 20 después de haber subido (20 pasos = 1 s)
+    const volvio = (fs: number[]) => {
+      const i = fs.findIndex((f) => f !== 20);
+      return i >= 0 && fs.slice(i).includes(20);
+    };
+    await expect
+      .poll(async () => volvio(await frecuenciasAplicadas(page)), { timeout: 10000, message: 'el barrido nunca volvió a 20 Hz' })
+      .toBe(true);
+    await botonDetenerBarrido(page).click();
+    const aplicadas = await frecuenciasAplicadas(page);
+    expect(aplicadas[0], 'arranca en el «Desde» corregido').toBe(20);
+    const escalera = Array.from({ length: 20 }, (_, k) => 20 + 999 * k);
+    for (const f of aplicadas) expect(escalera, `${f} Hz fuera de la escalera de 999 Hz`).toContain(f);
+    expect(Math.max(...aplicadas), '20.000 no se emite: la vuelta llega antes').toBe(19001);
+  });
+
+  test('C0355 (91099701) — «Llevar» con una lectura estable escrita y aún sin pintar lleva ESA lectura, la que se queda a la vista', async ({
+    page,
+  }) => {
+    // El intervalo del medidor (MS_LECTURA_MEDIDOR = 100 ms), para poder dar una lectura a mano
+    await page.addInitScript(() => {
+      type Programar = (fn: TimerHandler, ms?: number, ...resto: unknown[]) => number;
+      const w = window as unknown as { __lecturasMedidor: (() => void)[]; setInterval: Programar };
+      w.__lecturasMedidor = [];
+      const original = window.setInterval.bind(window) as unknown as Programar;
+      w.setInterval = (fn, ms, ...resto) => {
+        if (ms === 100 && typeof fn === 'function') w.__lecturasMedidor.push(fn as () => void);
+        return original(fn, ms, ...resto);
+      };
+    });
+    await microfonoPorApertura(page, [
+      {
+        segundos: 6,
+        glissandos: [
+          { f0: 400, f1: 443.83, amp: 0.3, desde: 0, hasta: 3 },
+          { f0: 443.83, f1: 400, amp: 0.3, desde: 3, hasta: 6 },
+        ],
+      },
+    ]);
+    await arrancarMedidor(page);
+    const retenida = seccionMedidor(page).locator('[class*="medidorRetenida"]');
+    await expect(retenida).toBeVisible({ timeout: 6000 });
+    await page.waitForTimeout(700); // en plena subida (60 cents/s), lejos de la cima del segundo 3
+
+    // En UNA tarea: una lectura (escribe la retenida nueva en el estado, sin pintar) y el clic
+    const carrera = await page.evaluate(() => {
+      const w = window as unknown as { __lecturasMedidor: (() => void)[] };
+      const texto = () =>
+        (document.querySelector('#medir-frecuencia [class*="medidorRetenida"]')?.textContent ?? '').replace(/ /g, ' ');
+      const antes = texto();
+      w.__lecturasMedidor[w.__lecturasMedidor.length - 1]();
+      const sinPintar = texto();
+      const boton = [...document.querySelectorAll('button')].find((b) => b.textContent?.trim() === 'Llevar la lectura al generador');
+      boton?.click();
+      return { antes, sinPintar, hayBoton: !!boton, intervalos: w.__lecturasMedidor.length };
+    });
+    expect(carrera.hayBoton).toBe(true);
+    expect(carrera.intervalos, 'un solo intervalo de lectura del medidor').toBe(1);
+    expect(carrera.sinPintar, 'al pulsar, la lectura nueva aún no estaba pintada').toBe(carrera.antes);
+    await expect(page.getByRole('button', { name: /Medir la frecuencia/ })).toHaveAttribute('aria-pressed', 'false');
+
+    const antes = lecturaDeTexto(carrera.antes);
+    const vista = lecturaDeTexto((await retenida.textContent()) ?? '');
+    expect(vista, 'la retenida se queda a la vista').not.toBeNull();
+    expect(vista?.hz, 'la lectura dada a mano movió la retenida (si no, el caso no prueba nada)').not.toBe(antes?.hz);
+    const texto = await campoFrecuencia(page).inputValue();
+    // parser-ok: se lee el campo que la propia app acaba de escribir con coma decimal, no lo que teclea el usuario.
+    const llevado = Number(texto.replace(',', '.'));
+    const centsLlevado = 1200 * Math.log2(llevado / frecuenciaDeNota(vista?.nota ?? ''));
+    expect(
+      Math.abs(centsLlevado - (vista?.cents ?? NaN)),
+      `llevado «${texto}» (${centsLlevado.toFixed(2)} cents de ${vista?.nota}) · retenida «${vista?.hz} Hz, ${vista?.cents} cents» · pintada antes «${antes?.hz} Hz»`,
+    ).toBeLessThanOrEqual(1);
+    expect(Math.abs(llevado - Number(vista?.hz))).toBeLessThanOrEqual(0.5);
+  });
+
+  test('3283 — ninguna pregunta del FAQPage está en la FAQ visible con otra respuesta (todas, no solo las dos del J3)', async ({ page }) => {
+    await abrir(page);
+    const { ld, visibles } = await page.evaluate(() => {
+      let ld: { pregunta: string; respuesta: string }[] = [];
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        const j = JSON.parse(s.textContent ?? '{}') as {
+          '@type'?: string;
+          mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+        };
+        if (j['@type'] === 'FAQPage') ld = (j.mainEntity ?? []).map((q) => ({ pregunta: q.name, respuesta: q.acceptedAnswer.text }));
+      }
+      const visibles = [...document.querySelectorAll('details')]
+        .map((d) => ({ d, s: d.querySelector('summary') }))
+        .filter((x) => x.s !== null)
+        .map(({ d, s }) => ({
+          pregunta: (s?.textContent ?? '').trim(),
+          respuesta: (d.textContent ?? '').replace(s?.textContent ?? '', '').trim(),
+        }));
+      return { ld, visibles };
+    });
+    const normal = (t: string) => t.replace(/\s+/g, ' ').trim();
+    expect(ld.length, 'el FAQPage tiene sus preguntas').toBeGreaterThanOrEqual(5);
+    const comunes = ld.filter((q) => visibles.some((v) => normal(v.pregunta) === normal(q.pregunta)));
+    expect(comunes.length, 'las dos de FAQ_MEDIR_HERCIOS y FAQ_TIPOS_ONDA, al menos').toBeGreaterThanOrEqual(2);
+    for (const q of comunes) {
+      const v = visibles.find((x) => normal(x.pregunta) === normal(q.pregunta));
+      expect(normal(v?.respuesta ?? ''), `«${q.pregunta}»: la respuesta visible y la del FAQPage`).toBe(normal(q.respuesta));
+    }
+  });
+
+  /**
+   * HALLAZGO P1 [bajo · operativa] — ABIERTO. Con los límites invertidos, el barrido no empieza en «Desde»
+   * ni dice que los ha ordenado. `iniciarSweep` ordena en silencio (Math.min / Math.max, desde el hallazgo
+   * 128) y arranca en el MENOR, que aquí es «Hasta»; el campo de frecuencia escribe ese 1.000 mientras
+   * «Desde» sigue diciendo 3.000. La reparación del 3281 dice «El barrido SUENA desde "Desde"», y el resto
+   * de correcciones de estos campos se dicen (hallazgo 1804: «Antes el acotado era mudo»).
+   *   entrada   «Desde» 3.000 · «Hasta» 1.000 · «Duración» 2 → «Iniciar barrido»
+   *   esperado  el primer tono en 3.000 Hz bajando hacia 1.000 (lo que dicen las etiquetas), o un aviso de
+   *             que se barre de 1.000 a 3.000
+   *   obtenido  [1000, 1000, 1050, 1100…] subiendo, sin ningún aviso en la región del barrido
+   * Se acepta cualquiera de las dos reparaciones; si es la primera, el CASO 5 pasa a esperar 2.000.
+   */
+  test('HALLAZGO P1 — con «Desde» 3.000 y «Hasta» 1.000, el barrido empieza en «Desde» o dice que ha ordenado los límites', async ({
+    page,
+  }) => {
+    test.fail(); // ABIERTO: hallazgo P1 del Inspector del 22/10/2026
+    await abrirBarrido(page, '3000', '1000', '2');
+    await barridoEnMarcha(page, 4);
+    await botonDetenerBarrido(page).click();
+    const aplicadas = await frecuenciasAplicadas(page);
+    const avisos = await page.locator('[class*="sweepControles"] [role="status"]').innerText();
+    const diceElOrden = /Desde/.test(avisos) && /Hasta/.test(avisos);
+    expect(
+      aplicadas[0] === 3000 || diceElOrden,
+      `primera frecuencia ${aplicadas[0]} Hz con «Desde» en 3.000; avisos: «${avisos}»`,
+    ).toBe(true);
+  });
+
+  /**
+   * HALLAZGO P2 [medio · operativa] — ABIERTO. Con el barrido en marcha, los controles de frecuencia siguen
+   * activos y el barrido los pisa en el peldaño siguiente (≤ 50 ms): ni se para ni los ignora.
+   *   · «La (A4)»: 440 Hz suena 43 ms, el preset se marca y se desmarca, y el barrido sigue donde iba.
+   *   · El campo: cada tecla se escribe DETRÁS del peldaño que el barrido acaba de poner, y ese número se
+   *     emite. Tecleando «1234» con el barrido 1.000 → 3.000: el campo pasa por «1», «15502», «17003»,
+   *     «18504» y el oscilador emite 15.502, 17.003 y 18.504 Hz, 26-54 ms cada uno (medido dos veces);
+   *     1.234 no suena nunca. Ráfagas de 15-18 kHz en un barrido acotado a 3 kHz, en la franja que la
+   *     propia página pide explorar a volumen bajo y lejos de mascotas.
+   *   entrada   barrido 1.000 → 3.000 Hz en 2 s en marcha; teclear «1234» en el campo (una tecla cada 120 ms)
+   *   esperado  suena 1.234 Hz (el barrido se para) o el campo no se deja editar mientras barre; nada fuera
+   *             de 1.000–3.000 Hz salvo lo tecleado (123 y 1.234)
+   *   obtenido  15.502 · 17.003 · 18.504 Hz, y el barrido sigue
+   * Mismo criterio que la app ya aplica al medidor (hallazgo 2413): gana lo último que se pulsa.
+   */
+  test('HALLAZGO P2 — con el barrido en marcha, teclear «1234» en el campo no emite nada fuera de 1.000–3.000 Hz salvo lo tecleado', async ({
+    page,
+  }) => {
+    test.fail(); // ABIERTO: hallazgo P2 del Inspector del 22/10/2026
+    await abrirBarrido(page, '1000', '3000', '2');
+    await barridoEnMarcha(page, 6);
+    const antes = (await frecuenciasAplicadas(page)).length;
+    const campo = campoFrecuencia(page);
+    await campo.click();
+    await campo.press('Control+a');
+    const vistos: string[] = [];
+    for (const tecla of '1234') {
+      await campo.press(tecla);
+      vistos.push(await campo.inputValue());
+      await page.waitForTimeout(120); // al ritmo de quien teclea: dos peldaños entre tecla y tecla
+    }
+    await page.waitForTimeout(200);
+    const tras = (await frecuenciasAplicadas(page)).slice(antes);
+    if (await botonDetenerBarrido(page).isVisible()) await botonDetenerBarrido(page).click();
+    // Lo tecleado, a medio teclear, también puede sonar si ya es una frecuencia del rango (123 Hz)
+    const tecleado = [123, 1234];
+    expect(
+      tras.filter((f) => (f < 1000 || f > 3000) && !tecleado.includes(f)),
+      `el campo mostró ${vistos.join(' | ')}; emitido tras teclear: ${tras.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  test('HALLAZGO P2 — con el barrido en marcha, «La (A4)» deja 440 Hz sonando o no hace nada; no un destello de 50 ms', async ({
+    page,
+  }) => {
+    test.fail(); // ABIERTO: hallazgo P2 del Inspector del 22/10/2026
+    await abrirBarrido(page, '1000', '3000', '2');
+    await barridoEnMarcha(page, 6);
+    const antes = (await frecuenciasAplicadas(page)).length;
+    const preset = page.getByRole('button', { name: /La \(A4\)/ });
+    await preset.click();
+    await page.waitForTimeout(300); // seis peldaños
+    const tras = (await frecuenciasAplicadas(page)).slice(antes);
+    const marcado = await preset.getAttribute('aria-pressed');
+    if (await botonDetenerBarrido(page).isVisible()) await botonDetenerBarrido(page).click();
+    const i440 = tras.indexOf(440);
+    expect(
+      i440 === -1 || (i440 === tras.length - 1 && marcado === 'true'),
+      `tras «La (A4)»: ${tras.join(', ')} · el preset queda con aria-pressed=${marcado}`,
+    ).toBe(true);
+  });
+
+  /**
+   * HALLAZGO P3 [bajo · operativa] — ABIERTO. «Reproducir» (y «Iniciar barrido») siguen activos mientras se
+   * mide la respuesta, y el tono que arrancan sale por el mismo altavoz que la medida: la app lo sabe
+   * («El generador manual no puede seguir sonando: contaminaría su propia medida», `medirRespuesta`) y
+   * lo apaga si sonaba ANTES de medir, pero no impide arrancarlo DURANTE. El medidor de frecuencia sí
+   * queda bloqueado mientras se mide (`disabled={midiendo !== null}`); el generador, no.
+   *   entrada   cadena plana (micrófono en bucle); 1.010 Hz y volumen al 100 % en el generador; «Medir A»
+   *             y, con «Emitiendo 50 Hz (1 de 26)», «Reproducir»
+   *   esperado  el tono no arranca mientras se mide (o la medida se descarta y lo dice); en una cadena
+   *             plana el tercio de 1.000 Hz queda a 0 ± 1,5 dB rel.
+   *   obtenido  arranca un oscilador de 1.010 Hz que suena hasta el final; la medida se guarda («26 de 26
+   *             puntos medidos») con 1.000 Hz a +9,3 dB (a mano: 20·log10(1/0,35) = +9,1, el tono manual
+   *             cae en la ventana de ±3 % del tercio y pasa por encima del de medida) y «Máximo en 1000 Hz».
+   *             Sin tocar nada, el mismo tercio sale a ≈0 dB.
+   */
+  test('HALLAZGO P3 — «Reproducir» con la medida de respuesta en marcha no se cuela en la curva', async ({ page }) => {
+    test.fail(); // ABIERTO: hallazgo P3 del Inspector del 22/10/2026
+    test.setTimeout(90000);
+    await abrirConMicro(page);
+    const campo = campoFrecuencia(page);
+    await campo.click();
+    await campo.press('Control+a');
+    await campo.pressSequentially('1010', { delay: 30 });
+    await esperarValorEnReact(page, CAMPO_FRECUENCIA, '1010');
+    await campo.blur();
+    await page.getByRole('slider', { name: 'Volumen' }).press('End');
+    await expect(page.locator('[class*="volumenValor"]')).toHaveText(/^100\s%$/);
+
+    await page.getByRole('button', { name: 'Medir A', exact: true }).click();
+    // Ya leído el ruido de fondo: está emitiendo el primer tercio
+    await expect(page.getByText(/Emitiendo 50 Hz \(1 de 26\)/)).toBeVisible({ timeout: 15000 });
+    if (await botonReproducir(page).isEnabled()) await botonReproducir(page).click();
+
+    const guardada = page.getByRole('button', { name: 'Repetir medida A', exact: true });
+    await expect(guardada.or(avisoMedida(page))).toBeVisible({ timeout: 60000 });
+    if (await guardada.isVisible()) {
+      const a1000 = (await tablaMedida(page)).get(1000)?.[0] ?? null;
+      expect(a1000, 'A en 1.000 Hz (null = «sin medida»)').not.toBeNull();
+      expect(Math.abs(a1000 as number), `tercio de 1.000 Hz de una cadena plana: ${a1000} dB rel.`).toBeLessThanOrEqual(1.5);
+    }
   });
 });
