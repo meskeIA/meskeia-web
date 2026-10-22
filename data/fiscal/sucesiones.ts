@@ -62,6 +62,18 @@ export interface BonificacionCCAA_IS {
   regimen: 'comun' | 'foral';
   bonificaciones: Record<string, BonificacionGrupoIS>;
   notas: string;
+  /**
+   * Causahabientes de los Grupos III y IV a los que la comunidad extiende los beneficios de los
+   * Grupos I y II si cumplen un requisito propio (Extremadura: inscripción en el Registro
+   * Autonómico de Personas con Especial Vinculación, arts. 20 ter y 20 quater DLeg 1/2018).
+   * Solo cambia la bonificación en cuota: la reducción estatal por parentesco y el coeficiente
+   * del art. 22 siguen siendo los de su grupo legal.
+   */
+  especialVinculacion?: {
+    norma: string;
+    /** Quiénes pueden serlo y qué se exige, para la ayuda del formulario */
+    quienes: string;
+  };
 }
 
 // ─── Tarifa estatal del ISD (art. 21.2 LISD — 16 tramos) ─────────────────────
@@ -520,9 +532,20 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
     notas: 'Bonificación 99 % para Grupos I y II.',
   },
 
+  // 22/10/2026 (cabo C0146), cotejado en el BOE consolidado (BOE-A-2018-8159, texto del
+  // 04/08/2026): art. 20 la bonificación del 99 % de los Grupos I y II; arts. 20 ter y 20 quater
+  // extienden «los beneficios fiscales autonómicos vigentes para los grupos I y II» a las personas
+  // con especial vinculación inscritas en el Registro Autonómico. Lo único de esos beneficios que
+  // el módulo modela es la bonificación: la reducción propia de 500.000 € del art. 17 no está
+  // modelada para nadie (cabo aparte). Una sola comunidad: el sello del módulo NO se mueve.
   'extremadura': {
     nombre: 'Extremadura',
     regimen: 'comun',
+    especialVinculacion: {
+      norma: 'arts. 20 ter y 20 quater DLeg 1/2018',
+      quienes:
+        'Descendientes de la pareja del causante, parejas de sus ascendientes, sobrinos de un causante sin descendientes directos y quien convivió con él sus tres últimos años (hasta cuatro, sin relación laboral de cuidados), inscritos en el Registro Autonómico de Personas con Especial Vinculación',
+    },
     bonificaciones: {
       'I-conyuge':      { porcentaje: 0.99 },
       'I-descendiente': { porcentaje: 0.99 },

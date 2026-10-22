@@ -120,6 +120,29 @@ export interface ParametrosSucesiones {
    * apps individuales se deja vacío y rige el tope conjunto de 500.000 €.
    */
   limiteViviendaCataluna?: number;
+  /**
+   * Heredero de los Grupos III o IV que la comunidad equipara a los Grupos I y II por especial
+   * vinculación (hoy solo Extremadura, arts. 20 ter y 20 quater DLeg 1/2018, con inscripción en
+   * su Registro). Recibe la bonificación del Grupo II; la reducción estatal por parentesco y el
+   * coeficiente siguen siendo los de su grupo. En otra comunidad o grupo no hace nada (C0146).
+   */
+  especialVinculacion?: boolean;
+}
+
+/**
+ * Clave de bonificación con la que se liquida a un heredero: la suya, o la del Grupo II si su
+ * comunidad lo equipara por especial vinculación. La comparten este motor y las apps que llevan
+ * su propia aritmética (estimador-impuesto-sucesiones).
+ */
+export function claveBonificacionEfectiva(
+  grupo: string,
+  ccaa: string,
+  especialVinculacion: boolean | undefined,
+): { clave: string; equiparado: boolean } {
+  const propia = grupo === 'II-descendiente' ? 'II' : grupo;
+  const equiparado =
+    !!especialVinculacion && (grupo === 'III' || grupo === 'IV') && !!BONIFICACIONES_CCAA_IS[ccaa]?.especialVinculacion;
+  return { clave: equiparado ? 'II' : propia, equiparado };
 }
 
 export interface ResultadoSucesiones {
@@ -254,12 +277,18 @@ function aplicarBonificacionIS(
   grupo: GrupoParentescoIS,
   ccaa: string,
   baseImponible: number,
+  especialVinculacion?: boolean,
 ): { bonificacion: number; porcentaje: number; detalle: string } {
   const config = BONIFICACIONES_CCAA_IS[ccaa];
   if (!config) return { bonificacion: 0, porcentaje: 0, detalle: 'CCAA no configurada' };
 
-  const bGrupo: BonificacionGrupoIS | undefined = config.bonificaciones[claveBonificacion(grupo)];
+  const { clave, equiparado } = claveBonificacionEfectiva(grupo, ccaa, especialVinculacion);
+  const bGrupo: BonificacionGrupoIS | undefined = config.bonificaciones[clave];
   if (!bGrupo) return { bonificacion: 0, porcentaje: 0, detalle: 'Sin bonificación para este grupo' };
+  if (equiparado && config.especialVinculacion) {
+    const r = aplicarBonificacionIS(cuotaTributaria, baseLiquidable, 'II', ccaa, baseImponible);
+    return { ...r, detalle: `${r.detalle}, como Grupos I y II por especial vinculación (${config.especialVinculacion.norma})` };
+  }
 
   /**
    * Reducción adicional en BASE (Asturias). Aquí solo se rotula: restarla es cosa del paso 6.bis
@@ -535,7 +564,7 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   // 9. Bonificación autonómica
   // `baseConAjuar` es la base IMPONIBLE, que es sobre la que la escala catalana del art. 58 bis
   // construye su porcentaje. Las demás comunidades siguen decidiendo por la base liquidable.
-  const { bonificacion, porcentaje, detalle } = aplicarBonificacionIS(cuotaTributaria, baseLiquidable, p.grupo, p.ccaa, baseConAjuar);
+  const { bonificacion, porcentaje, detalle } = aplicarBonificacionIS(cuotaTributaria, baseLiquidable, p.grupo, p.ccaa, baseConAjuar, p.especialVinculacion);
   // Se resta la bonificación REDONDEADA, que es la que se publica en `bonificacionCcaa` y la
   // que el usuario ve escrita. Restando la de dentro, el desglose no cuadraba consigo mismo por
   // un céntimo en el 0,9 % de los casos: cuota tributaria − bonificación publicada daba un

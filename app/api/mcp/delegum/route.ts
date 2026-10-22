@@ -302,6 +302,12 @@ const DESCRIPCION_PATRIMONIO_HEREDERO =
   'Patrimonio preexistente del heredero en euros (lo que ya tenía antes de heredar). Fija el coeficiente ' +
   'multiplicador del art. 22 LISD, con la corrección del salto de tramo del art. 22.2. Si se omite, se ' +
   'calcula con el coeficiente del primer tramo, el más bajo.';
+// Cabo C0146 (22/10/2026): Extremadura extiende a estas personas la bonificación de los Grupos I y II.
+const DESCRIPCION_ESPECIAL_VINCULACION =
+  'Solo Extremadura y Grupos III o IV: true si el heredero está inscrito en el Registro Autonómico de Personas ' +
+  'con Especial Vinculación (arts. 20 ter y 20 quater DLeg 1/2018: sobrinos de un causante sin descendientes ' +
+  'directos, descendientes de su pareja, parejas de sus ascendientes o convivientes de sus tres últimos años). ' +
+  'Recibe la bonificación del 99 % de los Grupos I y II. Por defecto false.';
 const AVISO_PATRIMONIO_HEREDERO =
   '📌 *Calculado con el coeficiente del primer tramo de patrimonio preexistente (art. 22 LISD), el más bajo. ' +
   'Si el heredero ya tenía un patrimonio importante, indícalo: el coeficiente puede subir la cuota.*';
@@ -718,9 +724,10 @@ function crearServidorDelegum(): McpServer {
         .describe('Grado de discapacidad del heredero. Por defecto "0".'),
       patrimonio_preexistente: z.number().nonnegative().optional()
         .describe(DESCRIPCION_PATRIMONIO_HEREDERO),
+      especial_vinculacion: z.boolean().optional().describe(DESCRIPCION_ESPECIAL_VINCULACION),
     },
     { title: 'Consulta de herencia: Impuesto de Sucesiones por CCAA', readOnlyHint: true },
-    async ({ valor_herencia, ccaa, grupo_parentesco, edad_heredero, vivienda_habitual, convivio_dos_anios, seguro_vida, discapacidad, patrimonio_preexistente }, extra) => {
+    async ({ valor_herencia, ccaa, grupo_parentesco, edad_heredero, vivienda_habitual, convivio_dos_anios, seguro_vida, discapacidad, patrimonio_preexistente, especial_vinculacion }, extra) => {
       await registrarUsoDelegum('consulta_herencia', getCaller(extra));
       try {
         const r = calcularSucesion({
@@ -733,6 +740,7 @@ function crearServidorDelegum(): McpServer {
           convivenciaDosAnios: convivio_dos_anios,
           seguroVida: seguro_vida,
           patrimonioPreexistente: patrimonio_preexistente,
+          especialVinculacion: especial_vinculacion,
         });
         const lineas = [
           `⚖️ **Delegum — Impuesto de Sucesiones en ${r.ccaaNombre}**`,
@@ -1447,9 +1455,10 @@ function crearServidorDelegum(): McpServer {
         'Si el heredero convivió con el fallecido los dos años anteriores. Solo se le exige al Grupo III ' +
         '(colateral) para la reducción por vivienda habitual (art. 20.2.c LISD).'),
       patrimonio_preexistente: z.number().nonnegative().optional().describe(DESCRIPCION_PATRIMONIO_HEREDERO),
+      especial_vinculacion: z.boolean().optional().describe(DESCRIPCION_ESPECIAL_VINCULACION),
     },
     { title: 'Calcula el Impuesto de Sucesiones por comunidad autónoma', readOnlyHint: true },
-    async ({ valor_herencia, ccaa, grupo_parentesco, vivienda_habitual, seguro_vida, discapacidad, edad_heredero, convivio_dos_anios, patrimonio_preexistente }, extra) => {
+    async ({ valor_herencia, ccaa, grupo_parentesco, vivienda_habitual, seguro_vida, discapacidad, edad_heredero, convivio_dos_anios, patrimonio_preexistente, especial_vinculacion }, extra) => {
       await registrarUsoDelegum('calcular_sucesiones', getCaller(extra));
       try {
         const r = calcularSucesion({
@@ -1462,6 +1471,7 @@ function crearServidorDelegum(): McpServer {
           edadHeredero: edad_heredero,
           convivenciaDosAnios: convivio_dos_anios,
           patrimonioPreexistente: patrimonio_preexistente,
+          especialVinculacion: especial_vinculacion,
         });
         const texto = [
           `⚖️ **Impuesto de Sucesiones — ${r.ccaaNombre}**`,

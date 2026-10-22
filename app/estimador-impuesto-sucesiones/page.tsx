@@ -48,6 +48,7 @@ import {
 import {
   evaluarReduccionVivienda,
   calcularSucesion,
+  claveBonificacionEfectiva,
   porcentajeBonificacionPonderada,
   EDAD_MIN_COLATERAL_VIVIENDA_IS,
 } from '@/lib/calculadoras/sucesiones';
@@ -556,6 +557,7 @@ export default function EstimadorImpuestoSucesionesPage() {
   const [edad, setEdad] = useState('');
   // Solo interviene si el heredero es colateral (Grupo III): art. 20.2.c LISD
   const [convivenciaDosAnios, setConvivenciaDosAnios] = useState(false);
+  const [especialVinculacion, setEspecialVinculacion] = useState(false);
   const [discapacidad, setDiscapacidad] = useState<NivelDiscapacidad>('0');
   /**
    * El patrimonio preexistente se pide como IMPORTE, no por tramos (hallazgo 2483, 30/09/2026).
@@ -941,10 +943,16 @@ export default function EstimadorImpuestoSucesionesPage() {
     // y con su porcentaje de herencia o su usufructo aplicados—, que es sobre la que la escala
     // catalana del art. 58 bis construye el porcentaje. El resto de comunidades siguen mirando
     // la liquidable.
+    // Con especial vinculación (Extremadura, C0146), la bonificación de los Grupos I y II. La
+    // casilla solo se ve con su comunidad y los Grupos III y IV, y el motor lo vuelve a exigir.
+    const { equiparado } = claveBonificacionEfectiva(grupo, ccaa, especialVinculacion);
     const bonificacionCalculada = aplicarBonificacion(
-      cuotaTributaria, baseLiquidable, grupo, ccaa, baseAjustada
+      cuotaTributaria, baseLiquidable, equiparado ? 'II' : grupo, ccaa, baseAjustada
     );
-    const { porcentaje, detalle } = bonificacionCalculada;
+    const { porcentaje } = bonificacionCalculada;
+    const detalle = equiparado && ccaaInfo?.especialVinculacion
+      ? `${bonificacionCalculada.detalle}, como Grupos I y II por especial vinculación (${ccaaInfo.especialVinculacion.norma})`
+      : bonificacionCalculada.detalle;
     const bonificacion = aCentimo(bonificacionCalculada.bonificacion);
 
     const cuotaFinal = aCentimo(Math.max(0, cuotaTributaria - bonificacion));
@@ -980,7 +988,7 @@ export default function EstimadorImpuestoSucesionesPage() {
       esForal,
     };
   }, [
-    ccaa, grupo, edad, convivenciaDosAnios, discapacidad, tipoAdquisicion,
+    ccaa, grupo, edad, convivenciaDosAnios, especialVinculacion, discapacidad, tipoAdquisicion,
     edadUsufructuario, porcentajeHerencia, porcentajeInvalido, importes, ccaaInfo, avisoEdad,
   ]);
 
@@ -1125,6 +1133,22 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <span className={styles.helper}>
                   Requisito adicional del art. 20.2.c LISD para que un hermano, tío o sobrino
                   acceda a la reducción por vivienda habitual
+                </span>
+              </div>
+            )}
+
+            {/* Cabo C0146: Extremadura extiende a estas personas los beneficios de los Grupos I y II */}
+            {(grupo === 'III' || grupo === 'IV') && ccaaInfo?.especialVinculacion && (
+              <div className={styles.campo}>
+                <label className={styles.radioLabel}>
+                  <input type="checkbox" checked={especialVinculacion}
+                    onChange={(e) => setEspecialVinculacion(e.target.checked)}
+                    aria-describedby="especial-vinculacion-ayuda" />
+                  Inscrito/a como persona con especial vinculación con el fallecido
+                </label>
+                <span className={styles.helper} id="especial-vinculacion-ayuda">
+                  {ccaaInfo.especialVinculacion.quienes} ({ccaaInfo.especialVinculacion.norma}). Se
+                  aplica la bonificación de los Grupos I y II; la reducción por parentesco sigue siendo la de tu grupo
                 </span>
               </div>
             )}

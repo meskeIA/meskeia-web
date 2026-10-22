@@ -3176,3 +3176,54 @@ test.describe('Inspector 30/09/2026', () => {
     expect(texto.slice(desde, desde + 700)).not.toContain('reserva de dominio');
   });
 });
+
+/**
+ * CABO C0146 (reparar, 22/10/2026) — Extremadura, arts. 20 ter y 20 quater del DLeg 1/2018
+ * (BOE-A-2018-8159, consolidado a 04/08/2026, leído en sesión): las personas con especial
+ * vinculación inscritas en su Registro (entre ellas, los sobrinos de un causante sin
+ * descendientes directos) reciben «los beneficios fiscales autonómicos vigentes para los grupos
+ * I y II», y el art. 20 bonifica al 99 % la cuota de esos grupos. La app no lo podía expresar.
+ *
+ * Sobrino (Grupo III) con 100.000 € en cuentas, sin edad ni vivienda:
+ *   Base imponible  = 100.000 + 3 % de ajuar        = 103.000,00
+ *   − parentesco Grupo III (art. 20.2.a LISD)        =   7.993,46
+ *   = base liquidable                                 =  95.006,54
+ *   Cuota íntegra = 9.166,06 + (95.006,54 − 79.880,52) × 16,15 % = 11.608,91
+ *   × 1,5882 (Grupo III, sin patrimonio previo)       = 18.437,27
+ *   Sin la casilla: «18.437,27 €». Con ella, − 99 % = 18.252,90 → «184,37 €»
+ */
+test.describe('Estimador ISD — Extremadura, especial vinculación (C0146)', () => {
+  async function sobrino(page: Page, ccaa: string) {
+    await page.goto(RUTA);
+    await page.locator('select').nth(SELECT.ccaa).selectOption(ccaa);
+    await page.locator('select').nth(SELECT.parentesco).selectOption('III');
+    await importe(page, CAMPO.saldos, '100000');
+  }
+
+  test('un sobrino inscrito recibe la bonificación del 99 % de los Grupos I y II: 184,37 €', async ({ page }) => {
+    await sobrino(page, 'extremadura');
+    expect(await cuota(page)).toBe('18.437,27 €');
+    await page.getByLabel(/especial vinculación/).check();
+    expect(await cuota(page)).toBe('184,37 €');
+    expect(await textoPagina(page)).toContain('por especial vinculación');
+  });
+
+  test('la casilla solo aparece con Extremadura y los Grupos III y IV', async ({ page }) => {
+    await sobrino(page, 'madrid');
+    await expect(page.getByLabel(/especial vinculación/)).toHaveCount(0);
+    await page.locator('select').nth(SELECT.ccaa).selectOption('extremadura');
+    await expect(page.getByLabel(/especial vinculación/)).toHaveCount(1);
+    await page.locator('select').nth(SELECT.parentesco).selectOption('II');
+    await expect(page.getByLabel(/especial vinculación/)).toHaveCount(0);
+  });
+
+  test('el motor del MCP da la misma cifra, y en otra comunidad la marca no hace nada', () => {
+    const conMarca = calcularSucesion({ baseImponible: 100000, ccaa: 'extremadura', grupo: 'III', incluyeAjuar: true, especialVinculacion: true });
+    const sinMarca = calcularSucesion({ baseImponible: 100000, ccaa: 'extremadura', grupo: 'III', incluyeAjuar: true });
+    expect(sinMarca.cuotaFinal).toBeCloseTo(18437.27, 2);
+    expect(conMarca.cuotaFinal).toBeCloseTo(184.37, 2);
+    const madrid = calcularSucesion({ baseImponible: 100000, ccaa: 'madrid', grupo: 'III', incluyeAjuar: true, especialVinculacion: true });
+    const madridSin = calcularSucesion({ baseImponible: 100000, ccaa: 'madrid', grupo: 'III', incluyeAjuar: true });
+    expect(madrid.cuotaFinal).toBe(madridSin.cuotaFinal);
+  });
+});
