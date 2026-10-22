@@ -466,6 +466,8 @@ export default function GeneradorTonosPage() {
     max: null,
     dur: null,
   });
+  /** El barrido se ha detenido porque se eligió una frecuencia a mano (hallazgo 3413). */
+  const [barridoParadoAMano, setBarridoParadoAMano] = useState(false);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
@@ -748,7 +750,8 @@ export default function GeneradorTonosPage() {
   const toggleAudio = () => {
     if (reproduciendo) {
       detenerAudio();
-    } else {
+    } else if (!midiendo) {
+      // Hallazgo 3414: no arranca mientras se mide la respuesta (el botón va deshabilitado)
       iniciarAudio();
     }
   };
@@ -1215,10 +1218,16 @@ export default function GeneradorTonosPage() {
 
   // Función de barrido (sweep)
   const iniciarSweep = () => {
-    // Los límites se ordenan aquí: con «Desde» mayor que «Hasta» el incremento salía
-    // negativo y el barrido se quedaba clavado en el mínimo sin avisar de nada.
-    const desde = acotarFrecuencia(Math.min(sweepMin, sweepMax));
-    const hasta = acotarFrecuencia(Math.max(sweepMin, sweepMax));
+    // Hallazgo 3414: mientras se mide la respuesta, el tono del barrido se colaría en la curva.
+    if (midiendo) return;
+    setBarridoParadoAMano(false);
+    // ⚠️ 22/10/2026 (hallazgo 3412) — con «Desde» mayor que «Hasta» el barrido va HACIA ABAJO, que
+    // es lo que dicen las etiquetas. Desde el hallazgo 128 los límites se ordenaban en silencio
+    // (Math.min / Math.max) y el barrido arrancaba en «Hasta» con el campo diciendo otra cosa que
+    // «Desde»; lo que entonces se quedaba clavado era la comprobación del final, que solo miraba
+    // hacia arriba. Ahora mira en el sentido del incremento.
+    const desde = acotarFrecuencia(sweepMin);
+    const hasta = acotarFrecuencia(sweepMax);
 
     // El barrido SUENA desde «Desde» (hallazgo 3281). Arrancaba el oscilador con la frecuencia que
     // hubiera en el campo y el primer paso, a los 50 ms, ya sumaba el incremento: con el último
@@ -1242,7 +1251,7 @@ export default function GeneradorTonosPage() {
 
     sweepIntervalRef.current = setInterval(() => {
       frecActual += incremento;
-      if (frecActual >= hasta) {
+      if (incremento >= 0 ? frecActual >= hasta : frecActual <= hasta) {
         frecActual = desde;
       }
       aplicarFrecuencia(Math.round(frecActual));
@@ -1255,6 +1264,24 @@ export default function GeneradorTonosPage() {
       sweepIntervalRef.current = null;
     }
     setSweep(false);
+  };
+
+  /**
+   * ⚠️ 22/10/2026 (hallazgo 3413) — con el barrido en marcha, el campo, los presets, los atajos y
+   * el deslizador seguían activos y el barrido los pisaba en el peldaño siguiente (≤ 50 ms): un
+   * preset sonaba 43 ms, y en el campo cada tecla se escribía DETRÁS del peldaño recién puesto y se
+   * emitía (15.002, 16.503, 18.004 Hz en un barrido acotado a 3 kHz). Gana lo último que se pulsa,
+   * como con el medidor (hallazgo 2413): elegir una frecuencia a mano detiene el barrido y lo dice.
+   */
+  const pararBarridoAMano = () => {
+    if (!sweepIntervalRef.current) return;
+    detenerSweep();
+    setBarridoParadoAMano(true);
+  };
+
+  const elegirFrecuencia = (n: number) => {
+    pararBarridoAMano();
+    aplicarFrecuencia(n);
   };
 
   const getDescripcionFrecuencia = (freq: number): string => {
@@ -1337,6 +1364,7 @@ export default function GeneradorTonosPage() {
               // control canónico del catálogo. Sin esto, «12abc» se quedaba escrito en
               // pantalla hasta que el usuario saliera del campo.
               if (!/^-?[\d.,]*$/.test(e.target.value)) return;
+              pararBarridoAMano();
               setFrecuenciaTexto(e.target.value);
               // Solo se emite cuando lo escrito ya es una frecuencia válida; mientras tanto
               // el oscilador se queda en la última buena y el usuario termina de teclear.
@@ -1356,6 +1384,9 @@ export default function GeneradorTonosPage() {
               const n = parseSpanishNumber(e.target.value);
               if (Number.isFinite(n) && n >= FREC_MIN && n <= FREC_MAX) setFrecuencia(n);
             }}
+            // Al ENTRAR en el campo, no a la primera tecla (hallazgo 3413): mientras el barrido
+            // sigue, reescribe el texto cada 50 ms y la selección para teclear encima se pierde.
+            onFocus={pararBarridoAMano}
             onBlur={() => {
               const leido = parseSpanishNumber(frecuenciaTexto);
               const n = acotarFrecuencia(Number.isFinite(leido) ? leido : FREC_MIN);
@@ -1380,7 +1411,7 @@ export default function GeneradorTonosPage() {
             min="20"
             max="20000"
             value={frecuencia}
-            onChange={(e) => aplicarFrecuencia(parseInt(e.target.value, 10))}
+            onChange={(e) => elegirFrecuencia(parseInt(e.target.value, 10))}
             className={styles.frecuenciaSlider}
             aria-label="Seleccionar frecuencia"
             aria-valuetext={`${cifraExacta(frecuencia)} Hz`}
@@ -1390,13 +1421,13 @@ export default function GeneradorTonosPage() {
 
         {/* Slider logarítmico visual */}
         <div className={styles.escalaVisual}>
-          <button type="button" onClick={() => aplicarFrecuencia(20)} aria-label="Ir a 20 Hz">20</button>
-          <button type="button" onClick={() => aplicarFrecuencia(100)} aria-label="Ir a 100 Hz">100</button>
-          <button type="button" onClick={() => aplicarFrecuencia(500)} aria-label="Ir a 500 Hz">500</button>
-          <button type="button" onClick={() => aplicarFrecuencia(1000)} aria-label="Ir a 1.000 Hz">1k</button>
-          <button type="button" onClick={() => aplicarFrecuencia(5000)} aria-label="Ir a 5.000 Hz">5k</button>
-          <button type="button" onClick={() => aplicarFrecuencia(10000)} aria-label="Ir a 10.000 Hz">10k</button>
-          <button type="button" onClick={() => aplicarFrecuencia(20000)} aria-label="Ir a 20.000 Hz">20k</button>
+          <button type="button" onClick={() => elegirFrecuencia(20)} aria-label="Ir a 20 Hz">20</button>
+          <button type="button" onClick={() => elegirFrecuencia(100)} aria-label="Ir a 100 Hz">100</button>
+          <button type="button" onClick={() => elegirFrecuencia(500)} aria-label="Ir a 500 Hz">500</button>
+          <button type="button" onClick={() => elegirFrecuencia(1000)} aria-label="Ir a 1.000 Hz">1k</button>
+          <button type="button" onClick={() => elegirFrecuencia(5000)} aria-label="Ir a 5.000 Hz">5k</button>
+          <button type="button" onClick={() => elegirFrecuencia(10000)} aria-label="Ir a 10.000 Hz">10k</button>
+          <button type="button" onClick={() => elegirFrecuencia(20000)} aria-label="Ir a 20.000 Hz">20k</button>
         </div>
 
         {/* Botones de control */}
@@ -1406,10 +1437,19 @@ export default function GeneradorTonosPage() {
             className={`${styles.btnPlay} ${reproduciendo ? styles.activo : ''}`}
             onClick={toggleAudio}
             aria-pressed={reproduciendo}
+            disabled={midiendo !== null}
+            aria-describedby={midiendo !== null ? 'generador-en-espera' : undefined}
           >
             <span aria-hidden="true">{reproduciendo ? '⏹️' : '▶️'}</span> {reproduciendo ? 'Detener' : 'Reproducir'}
           </button>
         </div>
+        {/* Hallazgo 3414 (22/10/2026): el tono del generador sale por el mismo altavoz que la
+            medida y se colaba en la curva sin aviso; mientras se mide, el generador espera. */}
+        {midiendo !== null && (
+          <p id="generador-en-espera" className={styles.medidaIntro}>
+            Mientras se mide la respuesta, el generador y el barrido esperan: su tono se colaría en la medida.
+          </p>
+        )}
 
         {/* Volumen */}
         <div className={styles.volumenControl}>
@@ -1662,6 +1702,8 @@ export default function GeneradorTonosPage() {
             className={`${styles.btnSweep} ${sweep ? styles.sweepActivo : ''}`}
             onClick={sweep ? detenerSweep : iniciarSweep}
             aria-pressed={sweep}
+            disabled={midiendo !== null}
+            aria-describedby={midiendo !== null ? 'generador-en-espera' : undefined}
           >
             <span aria-hidden="true">{sweep ? '⏹️' : '🔄'}</span> {sweep ? 'Detener barrido' : 'Iniciar barrido'}
           </button>
@@ -1669,6 +1711,11 @@ export default function GeneradorTonosPage() {
               aviso aparece en el blur (antes del click) y, si empujara el botón, el clic caería fuera. */}
           {/* La región viva existe siempre: una que nace con el texto dentro no siempre se anuncia. */}
           <div role="status" aria-live="polite">
+            {barridoParadoAMano && (
+              <p className={styles.barridoAvisos}>
+                Barrido detenido: has elegido otra frecuencia a mano.
+              </p>
+            )}
             {(avisosBarrido.min || avisosBarrido.max || avisosBarrido.dur) && (
               <div className={styles.barridoAvisos}>
                 {(['min', 'max', 'dur'] as const).map((campo) =>
@@ -1878,7 +1925,7 @@ export default function GeneradorTonosPage() {
                   key={preset.nombre}
                   type="button"
                   className={`${styles.presetBtn} ${Math.round(frecuencia) === Math.round(preset.frecuencia) ? styles.presetActivo : ''}`}
-                  onClick={() => aplicarFrecuencia(preset.frecuencia)}
+                  onClick={() => elegirFrecuencia(preset.frecuencia)}
                   aria-pressed={Math.round(frecuencia) === Math.round(preset.frecuencia)}
                 >
                   <span className={styles.presetNombre}>{preset.nombre}</span>

@@ -98,7 +98,8 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *      (al final): el barrido parado y vuelto a arrancar, con la onda cambiada en mitad (CASO 25), con
  *      «Desde» = «Hasta» en el techo (CASO 26) y con los tres campos rechazados (CASO 27); C0355 con una
  *      lectura estable escrita y aún sin pintar al pulsar «Llevar»; la guarda de las dos FAQ para TODAS
- *      las preguntas, y los hallazgos P1-P3, ABIERTOS, con `test.fail()`.
+ *      las preguntas, y los hallazgos P1-P3, que nacieron ABIERTOS con `test.fail()` y fueron
+ *      REPARADOS el mismo 22/10/2026 (hallazgos 3412-3414): hoy son regresión.
  */
 
 test.use({
@@ -672,7 +673,7 @@ test('CASO 4 — «432» tecleado dígito a dígito emite un tono cuyo pico est�
 // CASO 5 — LÍMITE (10/09/2026): barrido con el mínimo MAYOR que
 // el máximo, y los bordes del rango en los campos del barrido
 // ============================================================
-test('CASO 5 — el barrido con «Desde» mayor que «Hasta» ordena los límites y recorre la escalera', async ({
+test('CASO 5 — el barrido con «Desde» mayor que «Hasta» baja de «Desde» a «Hasta» por la escalera', async ({
   page,
 }) => {
   await abrir(page);
@@ -687,11 +688,12 @@ test('CASO 5 — el barrido con «Desde» mayor que «Hasta» ordena los límite
   await hasta.blur();
   await expect(hasta).toHaveValue('20000'); // techo prometido
 
-  // Ahora el caso: límites INVERTIDOS, 2.000 → 500 en 1 segundo.
-  //   iniciarSweep ordena: desde = min(2000,500) = 500 · hasta = max(2000,500) = 2.000
-  //   incremento = (2000 − 500) / (1 · 20) = 75 Hz, un paso cada 50 ms
-  //   escalera aplicada: 575, 650, 725 … 1.925 y vuelta a 500
-  //   (al alcanzar 2.000 exactos se reinicia ANTES de aplicar, así que 2.000 no se emite)
+  // Ahora el caso: límites INVERTIDOS, 2.000 → 500 en 1 segundo. Desde el hallazgo 3412
+  // (22/10/2026) el barrido baja, que es lo que dicen las etiquetas:
+  //   desde = 2.000 · hasta = 500
+  //   incremento = (500 − 2000) / (1 · 20) = −75 Hz, un paso cada 50 ms
+  //   escalera aplicada: 1.925, 1.850 … 575 y vuelta a 2.000
+  //   (al alcanzar 500 exactos se reinicia ANTES de aplicar, así que 500 no se emite)
   await desde.fill('2000');
   await desde.blur();
   await hasta.fill('500');
@@ -706,27 +708,27 @@ test('CASO 5 — el barrido con «Desde» mayor que «Hasta» ordena los límite
   await page.waitForTimeout(1300); // ~26 pasos de 50 ms
   await page.getByRole('button', { name: /Detener barrido/ }).click();
 
-  // El oscilador arranca en el MENOR de los dos límites (500, que aquí es «Hasta»), no en el 440 que
-  // había en el campo: lo fijaba este caso hasta que se reparó el hallazgo 3281 (J1). El resto es el
-  // barrido. Que con los límites invertidos no empiece en «Desde» (2.000) ni avise de que los ha
-  // ordenado es el HALLAZGO P1 (Inspector 22/10/2026, al final del fichero): si se repara barriendo
-  // hacia abajo, este primer valor pasa a 2.000.
+  // El oscilador arranca en «Desde» (2.000), no en el 440 que había en el campo (hallazgo 3281, J1)
+  // ni en el menor de los dos límites, que es donde arrancaba hasta el hallazgo 3412 (P1).
   const aplicadas = await frecuenciasAplicadas(page);
-  expect(aplicadas[0]).toBe(500);
+  expect(aplicadas[0]).toBe(2000);
   const barrido = aplicadas.slice(1);
 
-  // Que se MUEVE es lo que prueba que los límites se ordenaron: con incremento negativo se
-  // quedaba clavado en el mínimo sin avisar (hallazgo 128 de 08/2026).
+  // Que se MUEVE es lo que prueba que la vuelta se comprueba en el sentido del incremento: con
+  // incremento negativo se quedaba clavado sin avisar (hallazgo 128 de 08/2026).
   expect(barrido.length, 'pasos del barrido en 1,3 s').toBeGreaterThanOrEqual(15);
   expect(new Set(barrido).size, 'frecuencias distintas recorridas').toBeGreaterThanOrEqual(10);
+  // Y BAJA: el primer peldaño es 2.000 − 75 (el 2.000 puede salir dos veces al arrancar: lo
+  // aplican el oscilador y el efecto de la frecuencia)
+  expect(barrido.find((f) => f !== 2000)).toBe(1925);
 
-  // Y recorre EXACTAMENTE la escalera calculada a mano: 500 + 75k, con k de 0 a 19.
-  expect(Math.min(...barrido)).toBe(500);
-  expect(Math.max(...barrido)).toBe(1925); // 500 + 75·19
+  // Recorre EXACTAMENTE la escalera calculada a mano: 2.000 − 75k, con k de 0 a 19.
+  expect(Math.min(...barrido)).toBe(575); // 2000 − 75·19
+  expect(Math.max(...barrido)).toBeLessThanOrEqual(2000); // 2.000 solo si llegó a dar la vuelta
   for (const f of barrido) {
-    expect((f - 500) % 75, `paso fuera de la escalera de 75 Hz: ${f}`).toBe(0);
-    expect(f).toBeGreaterThanOrEqual(500);
-    expect(f).toBeLessThanOrEqual(1925);
+    expect((2000 - f) % 75, `paso fuera de la escalera de 75 Hz: ${f}`).toBe(0);
+    expect(f).toBeGreaterThanOrEqual(575);
+    expect(f).toBeLessThanOrEqual(2000);
   }
 
   // Lo que se enseña es lo que se emite: el campo y el oscilador terminan en el mismo sitio.
@@ -4734,7 +4736,11 @@ test.describe('Inspector 22/10/2026', () => {
   });
 
   /**
-   * HALLAZGO P1 [bajo · operativa] — ABIERTO. Con los límites invertidos, el barrido no empieza en «Desde»
+   * REPARADOS el 22/10/2026: P1 (hallazgo 3412) barre hacia abajo desde «Desde»; P2 (3413) elegir una
+   * frecuencia a mano —campo (al entrar en él), presets, atajos, deslizador— detiene el barrido y lo
+   * dice; P3 (3414) «Reproducir» e «Iniciar barrido» van deshabilitados mientras se mide.
+   *
+   * HALLAZGO P1 [bajo · operativa] — Era: con los límites invertidos, el barrido no empieza en «Desde»
    * ni dice que los ha ordenado. `iniciarSweep` ordena en silencio (Math.min / Math.max, desde el hallazgo
    * 128) y arranca en el MENOR, que aquí es «Hasta»; el campo de frecuencia escribe ese 1.000 mientras
    * «Desde» sigue diciendo 3.000. La reparación del 3281 dice «El barrido SUENA desde "Desde"», y el resto
@@ -4748,7 +4754,6 @@ test.describe('Inspector 22/10/2026', () => {
   test('HALLAZGO P1 — con «Desde» 3.000 y «Hasta» 1.000, el barrido empieza en «Desde» o dice que ha ordenado los límites', async ({
     page,
   }) => {
-    test.fail(); // ABIERTO: hallazgo P1 del Inspector del 22/10/2026
     await abrirBarrido(page, '3000', '1000', '2');
     await barridoEnMarcha(page, 4);
     await botonDetenerBarrido(page).click();
@@ -4759,6 +4764,8 @@ test.describe('Inspector 22/10/2026', () => {
       aplicadas[0] === 3000 || diceElOrden,
       `primera frecuencia ${aplicadas[0]} Hz con «Desde» en 3.000; avisos: «${avisos}»`,
     ).toBe(true);
+    // Reparado bajando: incremento (1000 − 3000) / (2 · 20) = −50 Hz → 2.950, 2.900…
+    expect([...new Set(aplicadas)].slice(0, 3)).toEqual([3000, 2950, 2900]);
   });
 
   /**
@@ -4779,7 +4786,6 @@ test.describe('Inspector 22/10/2026', () => {
   test('HALLAZGO P2 — con el barrido en marcha, teclear «1234» en el campo no emite nada fuera de 1.000–3.000 Hz salvo lo tecleado', async ({
     page,
   }) => {
-    test.fail(); // ABIERTO: hallazgo P2 del Inspector del 22/10/2026
     await abrirBarrido(page, '1000', '3000', '2');
     await barridoEnMarcha(page, 6);
     const antes = (await frecuenciasAplicadas(page)).length;
@@ -4801,12 +4807,16 @@ test.describe('Inspector 22/10/2026', () => {
       tras.filter((f) => (f < 1000 || f > 3000) && !tecleado.includes(f)),
       `el campo mostró ${vistos.join(' | ')}; emitido tras teclear: ${tras.join(', ')}`,
     ).toEqual([]);
+    // Reparado: entrar en el campo detiene el barrido, lo tecleado se escribe tal cual y suena
+    expect(vistos).toEqual(['1', '12', '123', '1234']);
+    expect(tras[tras.length - 1]).toBe(1234);
+    await expect(page.getByRole('button', { name: /Iniciar barrido/ })).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('[class*="sweepControles"] [role="status"]')).toContainText('Barrido detenido');
   });
 
   test('HALLAZGO P2 — con el barrido en marcha, «La (A4)» deja 440 Hz sonando o no hace nada; no un destello de 50 ms', async ({
     page,
   }) => {
-    test.fail(); // ABIERTO: hallazgo P2 del Inspector del 22/10/2026
     await abrirBarrido(page, '1000', '3000', '2');
     await barridoEnMarcha(page, 6);
     const antes = (await frecuenciasAplicadas(page)).length;
@@ -4821,6 +4831,9 @@ test.describe('Inspector 22/10/2026', () => {
       i440 === -1 || (i440 === tras.length - 1 && marcado === 'true'),
       `tras «La (A4)»: ${tras.join(', ')} · el preset queda con aria-pressed=${marcado}`,
     ).toBe(true);
+    // Reparado: gana el preset, que queda sonando y marcado
+    expect(i440).toBe(tras.length - 1);
+    expect(marcado).toBe('true');
   });
 
   /**
@@ -4839,7 +4852,6 @@ test.describe('Inspector 22/10/2026', () => {
    *             Sin tocar nada, el mismo tercio sale a ≈0 dB.
    */
   test('HALLAZGO P3 — «Reproducir» con la medida de respuesta en marcha no se cuela en la curva', async ({ page }) => {
-    test.fail(); // ABIERTO: hallazgo P3 del Inspector del 22/10/2026
     test.setTimeout(90000);
     await abrirConMicro(page);
     const campo = campoFrecuencia(page);
@@ -4854,6 +4866,10 @@ test.describe('Inspector 22/10/2026', () => {
     await page.getByRole('button', { name: 'Medir A', exact: true }).click();
     // Ya leído el ruido de fondo: está emitiendo el primer tercio
     await expect(page.getByText(/Emitiendo 50 Hz \(1 de 26\)/)).toBeVisible({ timeout: 15000 });
+    // Reparado: los dos van deshabilitados y la página dice por qué
+    await expect(botonReproducir(page)).toBeDisabled();
+    await expect(page.getByRole('button', { name: /Iniciar barrido/ })).toBeDisabled();
+    await expect(page.locator('#generador-en-espera')).toContainText('el generador y el barrido esperan');
     if (await botonReproducir(page).isEnabled()) await botonReproducir(page).click();
 
     const guardada = page.getByRole('button', { name: 'Repetir medida A', exact: true });
