@@ -519,7 +519,8 @@ export default function SimuladorTerrenoRusticoPage() {
                   en {nombreEnFrase(ccaa)} <strong>no se devenga IVA</strong> —rige el{' '}
                   {territorioActualSinIva.impuesto}—, pero la entrega de terrenos rústicos también está exenta
                   del {territorioActualSinIva.impuesto} (art. 50.Uno.20.º) y el vendedor puede renunciar a esa
-                  exención si se cumplen los requisitos de la ley. El{' '}
+                  exención si el comprador es empresario o profesional con derecho a deducir, total o
+                  parcialmente, el impuesto de la compra. El{' '}
                   {territorioActualSinIva.impuesto} lo autoliquida el comprador por{' '}
                   <strong>inversión del sujeto pasivo</strong> (art. 19.1.2.º g Ley 20/1991) y la operación deja
                   de pagar ITP (art. 4.4 de esa misma ley). Este simulador no cuantifica el{' '}

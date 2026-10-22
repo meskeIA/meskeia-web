@@ -2019,6 +2019,9 @@ test.describe('Inspección 24/09/2026 — régimen × territorio, la Comunitat V
     expect(texto).toContain('art. 50.Uno.20.º');
     expect(texto).toContain('inversión del sujeto pasivo (art. 19.1.2.º g Ley 20/1991)');
     expect(texto).toContain('art. 4.4');
+    // Cabo C0335 (22/10/2026): el art. 50.Cinco, leído en el BOE consolidado, pide al ADQUIRENTE lo
+    // mismo que el art. 20.Dos LIVA; el aviso lo dice en vez de «si se cumplen los requisitos de la ley».
+    expect(texto).toContain('si el comprador es empresario o profesional con derecho a deducir, total o parcialmente, el impuesto de la compra');
     // Y el botón nombra el impuesto cuya exención se renuncia.
     await expect(page.getByRole('button', { name: /Con renuncia a la exención del IGIC/ })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('button', { name: /Con renuncia a la exención del IVA/ })).toHaveCount(0);

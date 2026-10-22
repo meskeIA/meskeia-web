@@ -7039,9 +7039,11 @@ test.describe('Inspección 19/10/2026 — La Rioja con decimales, Aragón en el 
    * deducirlo». El cálculo no exige nada a ninguno de los dos: la tercera opción es un botón.
    */
   test('[19/10-a] el derecho a deducir que exige la renuncia es del ADQUIRENTE, y renuncia quien vende (art. 20.Dos LIVA)', async ({ page }) => {
-    // REPARADO el 20/10/2026 (hallazgo 3387). En Canarias el aviso ya no pone requisito a ninguna de
-    // las partes («si se cumplen los requisitos de la ley»): el art. 50.Cinco de la Ley canaria 4/2012
-    // no se pudo leer en el BOE consolidado en la sesión, y no se escribe un requisito sin cotejar.
+    // REPARADO el 20/10/2026 (hallazgo 3387). En Canarias el aviso se quedó sin requisito a ninguna de
+    // las partes («si se cumplen los requisitos de la ley») porque el art. 50.Cinco de la Ley canaria
+    // 4/2012 no se pudo leer; leído en el BOE consolidado el 22/10/2026 (cabo C0335), pide lo mismo que
+    // el art. 20.Dos LIVA: que el ADQUIRENTE sea sujeto pasivo en su actividad empresarial o
+    // profesional con derecho a deducir total o parcialmente. Ahora el aviso lo dice.
     const limpio = (s: string | null) => (s ?? '').replace(/\s+/g, ' ').trim();
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
@@ -7071,6 +7073,8 @@ test.describe('Inspección 19/10/2026 — La Rioja con decimales, Aragón en el 
 
     const aLosDos = /comprador y vendedor son empresarios con derecho a deducción|entre empresarios con derecho a deducción|el comprador y el vendedor renuncian/i;
     expect(textos.filter(({ t }) => aLosDos.test(t)).map(({ donde, t }) => `${donde}: «${t.match(aLosDos)![0]}»`)).toEqual([]);
+    const canarias = textos.find(({ donde }) => donde.includes('(canarias)'))!.t;
+    expect(canarias).toContain('si el comprador es empresario o profesional con derecho a deducir, total o parcialmente, el impuesto de la compra');
   });
 
   /**

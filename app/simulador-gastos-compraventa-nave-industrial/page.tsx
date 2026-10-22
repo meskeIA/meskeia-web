@@ -555,7 +555,8 @@ export default function SimuladorNaveIndustrialPage() {
                   <>
                     En {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
                     ({territorioActualSinIva.nombre}). También en él la segunda entrega de una nave está
-                    exenta y, si se cumplen los requisitos de la ley, quien vende puede{' '}
+                    exenta y, si el comprador es empresario o profesional con derecho a deducir, total o
+                    parcialmente, el impuesto de la compra, quien vende puede{' '}
                     <strong>renunciar a esa exención</strong> (art. 50.Cinco Ley canaria 4/2012): la
                     operación pasa al {territorioActualSinIva.impuesto}, que autoliquida el comprador
                     (inversión del sujeto pasivo), y no se paga ITP. Si es tu caso, usa la tercera opción;
