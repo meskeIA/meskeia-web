@@ -950,13 +950,16 @@ export default function GeneradorLoteriaPage() {
                 <summary>¿Qué probabilidad tengo de acertar el bote de La Primitiva?</summary>
                 <p>
                   {/* Hallazgo 3390: el bote es la categoría especial (6 números + reintegro), no la
-                      primera. ln 2 × 139.838.160 ≈ 96,9 millones; 139.838.160 / 52 ≈ 2,69 millones. */}
+                      primera. ln 2 × 139.838.160 ≈ 96,9 millones; 139.838.160 / 52 ≈ 2,69 millones.
+                      Hallazgo 3410 (22/10/2026): decía «97 millones de apuestas distintas», pero esa
+                      cifra es la de UNA apuesta en cada sorteo; con apuestas distintas en un mismo
+                      sorteo, P = n / N y el 50 % se alcanza con N / 2 ≈ 70 millones. */}
                   El bote de La Primitiva es el premio de la categoría especial: acertar los 6
                   números y además el reintegro. La probabilidad es de 1 entre 139.838.160 (los 6
                   números, 1 entre 13.983.816, por 1 entre 10 del reintegro). Para tener una
                   probabilidad del 50 % de acertarlo al menos una vez necesitarías unos 97 millones
-                  de apuestas distintas. Con una por semana, de media tardarías unos 2,7 millones de
-                  años en acertarlo.
+                  de apuestas, una en cada sorteo. Con una por semana, de media tardarías unos 2,7
+                  millones de años en acertarlo.
                 </p>
               </details>
             </li>

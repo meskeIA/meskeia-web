@@ -4537,8 +4537,9 @@ test.describe('re-inspección 22/10/2026', () => {
   });
 
   test.describe('hallazgo NUEVO (re-inspección 22/10/2026)', () => {
-    test('ABIERTO (contenido, bajo) · la FAQ del bote no casa «unos 97 millones» con «apuestas distintas»', async ({ page }) => {
-      // ABIERTO: hallazgo de la re-inspección del 22/10/2026 (número al registrarlo). La frase la
+    test('HALLAZGO 3410 (contenido, bajo) · la FAQ del bote no casa «unos 97 millones» con «apuestas distintas»', async ({ page }) => {
+      // REPARADO (22/10/2026, hallazgo 3410): «unos 97 millones de apuestas, una en cada sorteo».
+      // Era: hallazgo de la re-inspección del 22/10/2026. La frase la
       // escribió 328d72c6: «Para tener una probabilidad del 50 % de acertarlo al menos una vez
       // necesitarías unos 97 millones de apuestas distintas». Con N = 139.838.160:
       //   · n apuestas DISTINTAS en un mismo sorteo → P = n / N; el 50 % pide N / 2 ≈ 70 millones
@@ -4547,11 +4548,11 @@ test.describe('re-inspección 22/10/2026', () => {
       //     distintas.
       // 97 millones es la segunda cifra con el adjetivo de la primera. La de antes («más de 9,6
       // millones de boletos», sobre la 1.ª categoría) usaba el mismo modelo, sin «distintas».
-      test.fail();
       const N = comb(49, 6) * 10;
       const faqBote = page.locator('[class*="faqList"] details')
         .filter({ has: page.locator('summary', { hasText: '¿Qué probabilidad tengo de acertar el bote de La Primitiva?' }) });
       const texto = ((await faqBote.textContent()) ?? '').replace(/\s+/g, ' ');
+      expect(texto).toContain('unos 97 millones de apuestas, una en cada sorteo');
       const cifra = /unos (\d+) millones de apuestas( distintas)?/.exec(texto);
       if (!cifra) return; // la respuesta ya no da una cifra de apuestas: no queda nada que casar
       const distintas = Boolean(cifra?.[2]);
