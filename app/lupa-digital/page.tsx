@@ -601,6 +601,25 @@ export default function LupaDigitalPage() {
                 : `La cámara hace ${formatearZoom(reparto.camara)}x y el resto (${formatearZoom(reparto.pantalla)}x) se amplía en pantalla.`}
           </p>
         )}
+        {/* ⚠️ 22/10/2026 (hallazgo 3411) — con la imagen congelada la línea se ocultaba SIEMPRE, y la
+            FAQ dice que «si no aparece esa línea, todo el zoom se hace en pantalla»: con una cámara
+            de 1-3x a 5x, la imagen quieta trae dentro los 3x de la cámara y la línea ausente decía
+            lo contrario. Ahora la imagen congelada lleva la suya, con el zoom de cámara con que se
+            tomó; si la cámara no amplió (1x), no hay línea y la FAQ sigue siendo cierta. */}
+        {congelado && zoomCamaraCongelado > 1 && (
+          <p className={styles.zoomNota} role="status" aria-live="polite">
+            {escalaCongelada < 1
+              ? (() => {
+                  const camara = formatearZoomFrente(zoomCamaraCongelado, zoom);
+                  return camara
+                    ? `La imagen se tomó con ${camara}x de la cámara: para verla a ${formatearZoom(zoom)}x se reduce en pantalla y queda un borde negro alrededor.`
+                    : `La imagen se tomó con la cámara un poco por encima de ${formatearZoom(zoom)}x: se reduce en pantalla y queda un borde negro alrededor.`;
+                })()
+              : escalaCongelada < 1.05
+                ? `Los ${formatearZoom(zoomCamaraCongelado)}x de esta imagen los hizo la cámara al tomarla, sobre la imagen completa del sensor.`
+                : `La imagen se tomó con ${formatearZoom(zoomCamaraCongelado)}x de la cámara y el resto (${formatearZoom(escalaCongelada)}x) se amplía en pantalla.`}
+          </p>
+        )}
       </div>
 
       {/* Filtros */}

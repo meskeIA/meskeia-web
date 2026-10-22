@@ -365,7 +365,11 @@ test('CASO 4 — con una cámara que amplía hasta 3x, la lupa le pide el zoom a
   await page.getByRole('button', { name: '2x', exact: true }).click();
   await expect(lienzo).toHaveAttribute('style', /scale\(0\.667\)/);
   expect((await zoomPedido(page)).length).toBe(pedidosAlCongelar);
-  await expect(nota).toBeHidden();
+  // Hasta el hallazgo 3411 (22/10/2026) la nota se ocultaba con la imagen quieta, y la FAQ lee esa
+  // ausencia como «todo el zoom es de pantalla»: ahora dice con qué zoom de cámara se tomó.
+  await expect(nota).toHaveText(
+    'La imagen se tomó con 3x de la cámara: para verla a 2x se reduce en pantalla y queda un borde negro alrededor.',
+  );
 
   // Al reanudar, la cámara vuelve a recibir el zoom actual.
   await page.getByRole('button', { name: /Reanudar/i }).click();
@@ -1963,10 +1967,13 @@ test.describe('Inspector 16/10/2026 — re-inspección tras 3b52f497, 00153144 y
       );
 
       // Congelada a 3x: la imagen trae los 3,1x de la cámara → escala 3 / 3,1 = 0,968 y recorrido
-      // max(0; 392 × (0,968 − 1) / 2) = 0. Sin nota: con la imagen quieta no se le pide nada a la cámara.
+      // max(0; 392 × (0,968 − 1) / 2) = 0. Con la imagen quieta no se le pide nada a la cámara, y
+      // desde el hallazgo 3411 (22/10/2026) la nota explica el borde negro con el zoom de la toma.
       await page.getByRole('button', { name: /Congelar/i }).click();
       await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(0\.968\)/);
-      await expect(nota).toHaveCount(0);
+      await expect(nota).toHaveText(
+        'La imagen se tomó con 3,1x de la cámara: para verla a 3x se reduce en pantalla y queda un borde negro alrededor.',
+      );
       await deslizarDesdeElVisor(page, -3000, 0);
       await expect(lienzo).toHaveAttribute('style', /translate\(0px, 0px\) scale\(0\.968\)/);
 
@@ -2460,7 +2467,10 @@ test.describe('Inspector 22/10/2026 — re-inspección tras 6ec61bc2, ae8759c4 y
     expect(await medir('[class*=faqTip]', 'rgb(90, 189, 185)', 'rgba(72, 169, 166, 0.12)')).toBeCloseTo(5.13, 1);
   });
 
-  // ⚠️ ABIERTO: hallazgo nuevo (Inspector 22/10/2026) — contenido. El dato de la FAQ visible
+  // REPARADO (22/10/2026, hallazgo 3411): la imagen congelada lleva su propia línea, con el zoom de
+  // cámara con que se tomó («La imagen se tomó con 3x de la cámara y el resto (1,7x)…»); a 1x de
+  // cámara no hay línea, y la FAQ sigue siendo cierta.
+  // Era: hallazgo nuevo (Inspector 22/10/2026) — contenido. El dato de la FAQ visible
   // («¿La lupa digital tiene la misma calidad que una lupa física?») dice: «Debajo del control de
   // zoom verás cuánto hace la cámara y cuánto la pantalla; si no aparece esa línea, todo el zoom se
   // hace en pantalla». Con la imagen congelada la línea se oculta SIEMPRE (page.tsx la pinta solo con
@@ -2475,7 +2485,6 @@ test.describe('Inspector 22/10/2026 — re-inspección tras 6ec61bc2, ae8759c4 y
   test('HALLAZGO NUEVO (contenido) — con la imagen congelada, la FAQ no debe dar a entender que todo el zoom es de pantalla cuando la cámara hizo 3 de los 5 aumentos', async ({
     page,
   }) => {
-    test.fail(); // ABIERTO: hallazgo nuevo del 22/10/2026; el día que se repare, quitar esta línea
     await simularCamaraPorPista(page, { trasera: { min: 1, max: 3, step: 0.1 }, frontal: null });
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#control-zoom']);
@@ -2500,5 +2509,16 @@ test.describe('Inspector 22/10/2026 — re-inspección tras 6ec61bc2, ae8759c4 y
     const faqSinMatiz =
       /si no aparece esa línea,? todo el zoom se hace en pantalla/i.test(dato) && !/congel|en directo|en vivo/i.test(dato);
     expect(lineaVisible || !faqSinMatiz, `línea visible: ${lineaVisible} · FAQ: «${dato}»`).toBe(true);
+    await expect(nota).toHaveText('La imagen se tomó con 3x de la cámara y el resto (1,7x) se amplía en pantalla.');
+
+    // Congelada, bajar a 2x: la imagen trae 3x, así que se reduce (2 / 3 = 0,667) con borde negro
+    await page.getByRole('button', { name: '2x', exact: true }).click();
+    await expect(page.locator('canvas')).toHaveAttribute('style', /scale\(0\.667\)/);
+    await expect(nota).toHaveText(
+      'La imagen se tomó con 3x de la cámara: para verla a 2x se reduce en pantalla y queda un borde negro alrededor.',
+    );
+    // Y a 3x, todo de la cámara
+    await page.getByRole('button', { name: '3x', exact: true }).click();
+    await expect(nota).toHaveText('Los 3x de esta imagen los hizo la cámara al tomarla, sobre la imagen completa del sensor.');
   });
 });
