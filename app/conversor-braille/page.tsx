@@ -190,6 +190,8 @@ const caracteresSinCelda = (texto: string): string[] => [
         !SIGNOS_COMPUESTOS[c] &&
         // Las comillas simples llevan su propio aviso (`comillasSimplesOmitidas`)
         !COMILLAS_SIMPLES.has(c) &&
+        // «…» se escribe como tres puntos (hallazgo 3418)
+        c !== '…' &&
         // El salto de línea y los demás blancos sí se escriben: son separación de palabra
         !/\s/.test(c),
     ),
@@ -206,6 +208,15 @@ const caracteresSinCelda = (texto: string): string[] => [
  */
 const aEspacioNormal = (c: string): string =>
   c !== ' ' && c !== '\n' && c !== '\r' && /\s/.test(c) ? ' ' : c;
+
+/**
+ * ⚠️ 22/10/2026 (hallazgo 3418) — «...» (tres puntos del teclado) salía ⠄⠄⠄ y «…» (U+2026, el que
+ * ponen Word, Google Docs e iOS al escribir tres puntos) se descartaba con el aviso de signo sin
+ * celda: el mismo signo en tinta daba dos resultados según cómo se tecleara. Es la forma del 1184
+ * (’ frente a '). «…» se escribe como los tres puntos. Qué celdas da el B 2 § 6.1 a los puntos
+ * suspensivos sigue sin anclar (cabo C0238): esto solo hace que las dos grafías den lo mismo.
+ */
+const PUNTOS_SUSPENSIVOS_TECLADO = '...';
 
 /**
  * Letras propias del catalán y el valenciano que esta app aún no escribe (hallazgo 3415,
@@ -514,7 +525,7 @@ export default function ConversorBraillePage() {
 
     // Por code points, no por índices UTF-16: un emoji ocupa dos unidades y
     // recorrerlo a pares partía el carácter en dos mitades sin celda.
-    const caracteres = Array.from(text).map(aEspacioNormal);
+    const caracteres = Array.from(text.replace(/…/g, PUNTOS_SUSPENSIVOS_TECLADO)).map(aEspacioNormal);
 
     for (let i = 0; i < caracteres.length; i++) {
       const original = caracteres[i];

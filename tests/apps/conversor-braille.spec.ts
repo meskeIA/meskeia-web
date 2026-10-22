@@ -1413,9 +1413,10 @@ test.describe('re-inspección 22/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — C0238 (c), puntos suspensivos
+  // REPARADO (22/10/2026, hallazgo 3418) — C0238 (c), puntos suspensivos: «…» se escribe como «...»
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // Era:
   // «...» (tres puntos del teclado) sale ⠄⠄⠄, y «…» (U+2026, el que ponen Word, Google Docs e iOS al
   // escribir tres puntos) se descarta con el aviso de que el Código puede asignarle celda «fuera de
   // la signografía básica». Es el mismo signo en tinta. La forma es la del hallazgo 1184 (’ frente a
@@ -1423,7 +1424,6 @@ test.describe('re-inspección 22/10/2026', () => {
   // suspensivos. Qué celdas da el B 2 § 6.1 a los puntos suspensivos sigue sin anclar: el test no
   // fija ninguna, exige que las dos grafías den lo mismo.
   test('C0238 (c) — «Espera…» (U+2026) sale igual que «Espera...»', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     await convertirHidratado(page, 'Espera...');
     // E ⠨⠑ · s ⠎ · p ⠏ · e ⠑ · r ⠗ · a ⠁ · y los puntos suspensivos
@@ -1434,6 +1434,7 @@ test.describe('re-inspección 22/10/2026', () => {
     await page.goto(RUTA);
     await convertirHidratado(page, 'Espera…');
     await expect(cajaResultado(page)).toHaveText(conTresPuntos);
+    await expect(avisoSinCelda(page)).toHaveCount(0);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
