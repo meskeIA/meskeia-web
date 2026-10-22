@@ -58,7 +58,7 @@ export const FISCAL_CNAE_IAE_META = {
   cnae: {
     fuente: 'Clasificación Nacional de Actividades Económicas CNAE-2025 — RD 10/2025',
     urlOficial:
-      'https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177032',
+      'https://www.ine.es/dyngs/INEbase/operacion.htm?c=Estadistica_C&cid=1254736177032&menu=ultiDatos&idp=1254735976614',
     organismo: 'INE',
     finalidad: 'estadística',
   },

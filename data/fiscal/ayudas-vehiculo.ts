@@ -34,7 +34,13 @@ export const FISCAL_AYUDAS_VEHICULO_META = {
 export const MOVES_III_HISTORICO = {
   nombre: 'Programa MOVES III',
   norma: 'Real Decreto 266/2021',
-  vigencia: '2019-2025',
+  /**
+   * Años del Programa MOVES con TODAS sus convocatorias, no los del MOVES III (que nace con el
+   * RD 266/2021): «el Programa MOVES, que, mediante sus diversas convocatorias, ha estado vigente
+   * entre los años 2019 y 2025» (preámbulo del RD 609/2026, BOE-A-2026-16010, leído el
+   * 22/10/2026). Se llamaba `vigencia` y parecía la del MOVES III (cabo C0143).
+   */
+  vigenciaProgramaMoves: '2019-2025',
   finalizado: '2025-12-31',
 };
 

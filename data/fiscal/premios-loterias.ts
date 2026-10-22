@@ -22,6 +22,10 @@
  *   · ap. 7  — no hay que autoliquidar si se practicó la retención.
  *   · ap. 8  — el premio no se integra en la base imponible del IRPF.
  *
+ * Re-sellado el 22/10/2026 (cabo C0231): la LIRPF consolidada se actualizó el 07/10/2026 por el
+ * RDL 29/2026, que modifica los arts. 7, 23 y 68 pero NO esta disposición; su última redacción
+ * sigue siendo la de la Ley 6/2018, leída de nuevo en la API del BOE (40.000 € y 20 %).
+ *
  * Lo que dice la sede de la AEAT (nivel 3: sirve para entender, NO para sellar) en su nota del
  * 15/12/2025 sobre la Lotería de Navidad: en los premios compartidos (amigos, familia, peñas,
  * cofradías…) quien cobra como beneficiario único o gestor «deberá estar en condiciones de
@@ -35,7 +39,7 @@
 
 export const FISCAL_PREMIOS_LOTERIAS_META = {
   fuente: 'Ley 35/2006 del IRPF, disposición adicional 33.ª (redacción de la Ley 6/2018)',
-  verificado: '2026-10-05',
+  verificado: '2026-10-22',
   vigencia: '2020-2026',
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#datrigesimatercera',
   nota: 'Se aplica a los premios de SELAE, de las loterías autonómicas, de la ONCE y de los sorteos de Cruz Roja, y a los equivalentes de otros Estados de la UE o del EEE. Exento hasta 40.000 € por décimo o apuesta desde 2020 (10.000 € en los juegos de 2018 desde el 05/07/2018 y 20.000 € en los de 2019: disposición transitoria 35.ª de la LIRPF, añadida por el art. 67.2 de la Ley 6/2018).',

@@ -279,7 +279,7 @@ const salida = {
     },
     cnae: {
       fuente: 'CNAE-2025 — RD 10/2025 (INE)',
-      urlOficial: 'https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177032',
+      urlOficial: 'https://www.ine.es/dyngs/INEbase/operacion.htm?c=Estadistica_C&cid=1254736177032&menu=ultiDatos&idp=1254735976614',
       // Sin fecha: la de la sustitución vive en CNAE_VIGENCIA (data/fiscal/cnae-iae.ts), de la
       // que la página deriva su nota; aquí estaba tecleada y se quedó atrás (hallazgo 2924).
       nota: 'CNAE-2025 sustituye a CNAE-2009 (RD 10/2025). La correspondencia entre ambas es la tabla oficial del INE.',

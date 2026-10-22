@@ -723,7 +723,7 @@ test.describe('Re-inspección 04/10/2026 · contenido', () => {
   // HALLAZGO M (2835, REPARADO el 20/10/2026 en la app, sin tocar data/fiscal) — RD 609/2026 (BOE-A-2026-16010), preámbulo: «el Programa MOVES, que,
   // mediante sus diversas convocatorias, ha estado vigente entre los años 2019 y 2025», y en el
   // párrafo siguiente MOVES III es el «Real Decreto 266/2021, de 13 de abril». La app atribuye a
-  // MOVES III los años de todo el programa (MOVES_III_HISTORICO.vigencia = '2019-2025').
+  // MOVES III los años de todo el programa (MOVES_III_HISTORICO.vigencia = '2019-2025'; desde el 22/10/2026 el campo se llama vigenciaProgramaMoves).
   test('no atribuye a MOVES III la vigencia 2019-2025 de todo el Programa MOVES', async ({ page }) => {
     await abrir(page);
     await expect(page.locator('main')).toContainText('Hoy rige el Programa Auto+');

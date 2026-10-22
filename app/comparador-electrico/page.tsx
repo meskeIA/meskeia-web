@@ -628,7 +628,7 @@ export default function ComparadorElectrico() {
                 del MOVES III, que nace con el RD 266/2021 (preámbulo del RD 609/2026, hallazgo
                 2835). */}
             En España, el Programa MOVES tuvo convocatorias entre{' '}
-            {MOVES_III_HISTORICO.vigencia.replace('-', ' y ')} (la última, el{' '}
+            {MOVES_III_HISTORICO.vigenciaProgramaMoves.replace('-', ' y ')} (la última, el{' '}
             {MOVES_III_HISTORICO.nombre}, del {MOVES_III_HISTORICO.norma}) y terminó el{' '}
             {fechaISO(MOVES_III_HISTORICO.finalizado)}. Hoy rige el {AUTO_PLUS.nombre}{' '}
             (RD 609/2026), con un máximo de {euros(AUTO_PLUS.maximo.turismo)} por turismo
