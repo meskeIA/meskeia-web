@@ -644,7 +644,7 @@ export default function CalculadoraCosteViviendaPage() {
               <p className={styles.eduEscenarioExample}>
                 Piso de 200.000 € en alquiler. Hipoteca: 550 €. Gastos fijos (IBI, comunidad, seguros): 200 €. Alquiler recibido: 950 €. Margen bruto antes de IRPF: 200 €/mes.
               </p>
-              <p className={styles.eduEscenarioTip}><span aria-hidden="true">💡</span> Incluye vacíos y derramas en tus cálculos. El 60% de reducción IRPF por alquiler habitual mejora la rentabilidad real.</p>
+              <p className={styles.eduEscenarioTip}><span aria-hidden="true">💡</span> Incluye vacíos y derramas en tus cálculos. La reducción del IRPF por alquilar una vivienda habitual (art. 23.2 LIRPF), cuyo porcentaje depende de la fecha y las condiciones del contrato, mejora la rentabilidad real.</p>
             </div>
           </div>
         </section>
