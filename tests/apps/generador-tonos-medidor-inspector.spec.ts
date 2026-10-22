@@ -560,6 +560,36 @@ async function comprobarSinCifra(page: Page) {
   ).toEqual([]);
 }
 
+/**
+ * Lo que de verdad vigila el caso de un tono FUERA del rango: que ese tono no dé cifra, ni estable
+ * ni retenida. Admite una cifra provisional de otra frecuencia, que no viene del tono.
+ *
+ * Por qué no `comprobarSinCifra` (cabo C0338, 22/10/2026): con carga, el puente MediaStream entre
+ * los dos AudioContext pierde a veces un bloque de 10 ms, que es un clic de verdad, y la app enseña
+ * su cifra provisional como con cualquier clic (~143 Hz, el primer lóbulo de un hueco de 10 ms:
+ * 1,43/0,010 s); R1 solo exige que un clic no llegue a estable. Reproducido en el inspector del
+ * 22/10 con un hueco de 10 ms fabricado en la señal: la misma firma «146 Hz · Re3 · Leyendo…».
+ * La aserción «ninguna cifra» no admitía ese clic del entorno y caía 3 de 6 veces con otro
+ * Playwright a la vez; aislada, nunca.
+ */
+async function comprobarSinLecturaDelTono(page: Page, entorno: [number, number]) {
+  const r = await registro(page);
+  const conMedidor = r.filter((x) => x.cifra !== '');
+  expect(conMedidor.length, 'el medidor tenía que estar a la vista').toBeGreaterThan(0);
+  const delTono = conMedidor
+    .map((x) => x.cifra)
+    .filter((c) => c !== '— Hz' && hzDe(c) >= entorno[0] && hzDe(c) <= entorno[1]);
+  expect([...new Set(delTono)], `ninguna cifra entre ${entorno[0]} y ${entorno[1]} Hz`).toEqual([]);
+  expect(
+    r.filter((x) => x.estado === 'Lectura estable').map((x) => x.cifra),
+    'ninguna «Lectura estable»',
+  ).toEqual([]);
+  expect(
+    r.filter((x) => x.retenida !== '').map((x) => x.retenida),
+    'sin «Última lectura estable»',
+  ).toEqual([]);
+}
+
 test.describe('RE-INSPECCIÓN 02/10 — móvil de 360 px por el micrófono falso (camino de verdad)', () => {
   test.use({
     viewport: { width: 360, height: 780 },
@@ -708,12 +738,14 @@ test.describe('RE-INSPECCIÓN 02/10 — los bordes del rango y la señal saturad
 
   test('19,8 Hz, por debajo del rango de 20 Hz a 20 kHz: ninguna cifra', async ({ page }) => {
     // 19,8 Hz asoma en el bin de 20,5 Hz a 48 kHz, pero afinado da 19,8: no es del rango.
+    // Ninguna cifra cerca del tono (lo que leería el defecto: 19,8 tomado por 20-21 Hz), ninguna
+    // estable y nada retenido; una provisional lejana es un clic del entorno (cabo C0338).
     await medirSintetico(page, {
       segundos: 10,
       componentes: [{ tipo: 'tono', hz: 19.8, amp: 0.5, desde: 0, hasta: 10 }],
     });
     await esperarDesdeElMicrofono(page, 3000);
-    await comprobarSinCifra(page);
+    await comprobarSinLecturaDelTono(page, [15, 25]);
   });
 });
 
