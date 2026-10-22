@@ -600,6 +600,10 @@ test.describe('orientador-grado-dependencia', () => {
    * meses desde la presentación de la solicitud» sin resolución, y la PECEF queda sujeta a un
    * plazo suspensivo de hasta dos años. REPARADO (hallazgo 2145, 26/09/2026): los seis sitios
    * citan ahora la DF 1.ª.3. Además de no decir lo falso, el bloque debe decir lo verdadero.
+   *
+   * 22/10/2026 (cabo C0356): el art. 2.48 de la Ley 4/2026 (BOE-A-2026-20528) reescribe la DF 1.ª.3
+   * con efectos del 23/10/2026 y SUPRIME el plazo suspensivo. La app ya no puede presentarlo como
+   * vigente: lo nombra solo como suprimido, con la ley que lo suprime.
    */
   test('el bloque educativo no dice que las prestaciones se cobran desde la solicitud', async ({ page }) => {
     await abrir(page);
@@ -609,7 +613,9 @@ test.describe('orientador-grado-dependencia', () => {
     await expect(falsas).toHaveCount(0);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.getByText(/se genera desde la resolución|desde la fecha de la resolución/).first()).toBeVisible();
-    await expect(page.getByText(/plazo suspensivo de hasta dos años/).first()).toBeVisible();
+    await expect(page.getByText(/suprimió[^.]*plazo suspensivo de hasta dos años/).first()).toBeVisible();
+    // Ninguna frase lo da por vigente («quedan sujetas», «puede tener»)
+    await expect(page.getByText(/(sujetas a un|puede tener (además )?un) plazo suspensivo/)).toHaveCount(0);
   });
 
   /*

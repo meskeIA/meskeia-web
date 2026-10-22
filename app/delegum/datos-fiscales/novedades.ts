@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-10-22',
+    fichaSlug: 'prestaciones-dependencia',
+    texto:
+      'Desde el 23/10/2026 la prestación económica para cuidados en el entorno familiar ya no tiene el plazo suspensivo de hasta dos años: el derecho se genera, como en las demás prestaciones, desde la resolución o a los seis meses de la solicitud sin resolución (disposición final 1.ª.3 de la Ley 39/2006, en la redacción del art. 2.48 de la Ley 4/2026, BOE-A-2026-20528).',
+  },
+  {
     fecha: '2026-10-19',
     fichaSlug: 'prestaciones-dependencia',
     texto:
