@@ -1,5 +1,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { FISCAL_PREMIOS_LOTERIAS_META } from '../../data/fiscal/premios-loterias';
 
 /**
  * Inspector — generador-loteria (segmento interactiva, riesgo 4 informativo, 562 usos reales)
@@ -1515,7 +1516,9 @@ test.describe('S0180 · reparto del premio de una peña', () => {
     await expect(page.getByRole('note', { name: 'Aviso importante' }).filter({ hasText: 'carácter exclusivamente orientativo' })).toBeVisible();
     const ref = page.getByRole('note', { name: 'Datos de referencia normativos' });
     await expect(ref).toContainText('disposición adicional 33.ª');
-    await expect(ref).toContainText('05/10/2026');
+    // La fecha sale del módulo: escrita a mano, el re-sello del 22/10/2026 (4b0d54c3) la dejó atrás
+    const [anio, mes, dia] = FISCAL_PREMIOS_LOTERIAS_META.verificado.split('-');
+    await expect(ref).toContainText(`${dia}/${mes}/${anio}`);
   });
 });
 
