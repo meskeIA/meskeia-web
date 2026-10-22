@@ -369,6 +369,16 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
   - La valoración de lo indeterminado **para la tasa** es la del art. 6.2 Ley 10/2012 (18.000 €), no 0 €.
 - **Verificado**: 2026-10-01 · vigencia 2025-2026.
 
+#### `subastas.ts` — Depósito, plazo de pago y aprobación del remate en subastas de inmuebles
+- **Contiene**: depósito para pujar en la subasta judicial (20 % con mínimo de 1.000 € tras la LO 1/2025; 5 % en los procedimientos incoados antes del 03/04/2025), de la Agencia Tributaria (5 % del tipo con un inmueble en el lote) y de la Seguridad Social por embargo (25 % en sobre cerrado, 30 % de viva voz); plazo para pagar el resto (20 / 40 / 15 / 5 días); umbrales de aprobación del remate judicial (70, 60, 50 y 40 %, y 70/60 % de la vivienda habitual); puja mínima de la AEAT (10 % del tipo) y postura verbal mínima de la Seguridad Social (75 %); años de afección a las cuotas de comunidad (art. 9.1.e LPH).
+- **Normativa**: LEC arts. 647, 669-671 en la redacción de la LO 1/2025 (con su DT 9.ª) y en la anterior · RD 939/2005 (RGR) arts. 101, 103 bis y 104 · RD 1415/2004 (RGRSS) arts. 117 y 120 · TRLITPAJD art. 10.2 · LPH art. 9.
+- **Vigilar**: reformas procesales de la LEC (la LO 1/2025 cuadruplicó el depósito y partió el plazo por la mitad); modificaciones del RGR por real decreto (el art. 103 bis cambió en 2024); un reglamento o una orden que lleve las subastas de la Seguridad Social por embargo al Portal de Subastas del BOE, porque el RGRSS vigente (última versión de 2015) las regula aún en sobre cerrado y acto presencial.
+- **Cadencia**: baja, por ley procesal o real decreto. Sin ventana fija.
+- **Alerta metodológica**: cualquier norma que cambie la base del ITP en las adjudicaciones en subasta (hoy, valor de referencia si el precio no lo supera: art. 10.2 TRLITPAJD, DGT V0453-22 y TSJ de Galicia 2026); la consulta V2631-21, anterior a la Ley 11/2021, decía lo contrario.
+- **Fuera, a propósito**: la subasta notarial y la de inmuebles propios de la Tesorería, que se rigen por su pliego (decisión del usuario, 22/10/2026).
+- **Dependencias internas**: la app `calculadora-subastas-boe` importa de aquí y toma el ITP y el arancel registral de `data/itp-ccaa.ts`.
+- **Verificado**: 2026-10-22 · vigencia 2026.
+
 #### `ayudas-vehiculo.ts` — Ayuda estatal a la compra de vehículos eléctricos (Programa Auto+)
 - **Contiene**: importes máximos por vehículo de la línea 1 (turismo 4.500 €, furgoneta 5.000 €, motocicleta 1.100 €, cuadriciclo 1.500 €), los porcentajes acumulativos del Anexo II (eléctrico, económico, europeo), el precio máximo del turismo (45.000 € sin impuestos) y el MOVES III solo como referencia histórica (2019-2025).
 - **Normativa**: RD 609/2026, de 22 de julio (BOE-A-2026-16010).

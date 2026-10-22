@@ -43,3 +43,4 @@ export * from './costas-judiciales';
 export * from './modulos-irpf';
 export * from './ayudas-vehiculo';
 export * from './premios-loterias';
+export * from './subastas';

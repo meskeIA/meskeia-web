@@ -52,6 +52,15 @@ const tools = [
     description: 'Hipoteca, comunidad, IBI, seguros, suministros... El coste mensual real de ser propietario.',
     step: 5,
   },
+  {
+    id: 'subastas-boe',
+    name: 'Calculadora de Subastas del BOE',
+    icon: '🔨',
+    url: '/calculadora-subastas-boe/',
+    question: '¿Y si compro en una subasta?',
+    description: 'Depósito para pujar, plazo para pagar el resto y coste total, con el ITP sobre el valor de referencia.',
+    step: 6,
+  },
 ];
 
 // Pasos del journey de compra

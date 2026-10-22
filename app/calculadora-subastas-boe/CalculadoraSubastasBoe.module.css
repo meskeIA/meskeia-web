@@ -1,0 +1,552 @@
+/* Calculadora de Subastas del BOE — usa los tokens de app/globals.css (claro y oscuro) */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ─── Hero ─────────────────────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  margin-top: 80px;
+  margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: #ffffff;
+}
+
+.title {
+  font-size: 2.3rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  margin: 0;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+/* ─── Paneles ──────────────────────────────────────────────────────────── */
+.mainContent {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--spacing-xl);
+  margin: var(--spacing-xl) 0;
+  align-items: start;
+}
+
+.inputPanel,
+.resultsPanel {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border);
+}
+
+.resultsPanel {
+  position: sticky;
+  top: var(--spacing-md);
+}
+
+.panelTitle {
+  font-size: 1.35rem;
+  margin: 0 0 var(--spacing-lg);
+  color: var(--text-primary);
+}
+
+.subTitle {
+  font-size: 1.05rem;
+  margin: var(--spacing-lg) 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 var(--spacing-lg);
+}
+
+.inputGroup {
+  margin-bottom: var(--spacing-lg);
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  padding: 0;
+}
+
+.select {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ayuda {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: var(--spacing-sm) 0 0;
+  line-height: 1.5;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.checkbox input {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+/* ─── Selector de subasta ──────────────────────────────────────────────── */
+.regimenGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.regimenBtn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 0.5rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.regimenBtn:hover {
+  border-color: var(--primary-boton);
+}
+
+.regimenBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.regimenBtnActivo,
+.regimenBtnActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #ffffff;
+}
+
+.regimenNombre {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.regimenDetalle {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* ─── Resultados ───────────────────────────────────────────────────────── */
+.resultados {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.vacio {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.nota {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.listaSimple {
+  margin: var(--spacing-sm) 0;
+  padding-left: 1.2rem;
+  line-height: 1.55;
+}
+
+.listaSimple li {
+  margin-bottom: 0.4rem;
+}
+
+.alerta {
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--error);
+  background: rgba(220, 53, 69, 0.08);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.tramoOk,
+.tramoAviso,
+.avisoReducidos {
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.tramoOk p,
+.tramoAviso p {
+  margin: 0 0 var(--spacing-sm);
+}
+
+.tramoOk {
+  border-left: 4px solid var(--success);
+  background: rgba(40, 167, 69, 0.08);
+}
+
+.tramoAviso {
+  border-left: 4px solid var(--warning);
+  background: rgba(255, 193, 7, 0.12);
+}
+
+.avisoReducidos {
+  border: 1px dashed var(--border);
+  background: var(--hover);
+}
+
+.avisoTitulo {
+  font-weight: 600;
+  margin: 0;
+}
+
+.totalCompleto,
+.totalIncompleto {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-large);
+  border: 2px solid var(--primary-boton);
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.totalIncompleto {
+  border-color: var(--warning);
+  border-style: dashed;
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.totalTitulo {
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.totalValor {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.totalDetalle {
+  font-size: 0.9rem;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.pendientes,
+.sinCifra {
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.pendientes .subTitle,
+.sinCifra .subTitle {
+  margin-top: 0;
+}
+
+.pendientes a,
+.sinCifra a {
+  color: var(--primary-texto);
+}
+
+/* ─── Sección educativa (patrón v2.0) ──────────────────────────────────── */
+.guideSection {
+  padding: var(--spacing-lg);
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.guideSection h2 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: var(--spacing-md);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.comparativaTable thead th {
+  background: var(--primary-boton);
+  color: #ffffff;
+  text-align: left;
+  padding: 0.7rem;
+}
+
+.comparativaTable td,
+.comparativaTable tbody th {
+  padding: 0.7rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.comparativaTable tbody th {
+  font-weight: 600;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.escenarioCard {
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+
+.escenarioCard h3 {
+  font-size: 1.02rem;
+  margin: 0 0 var(--spacing-sm);
+}
+
+.escenarioCard p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.stepGuide {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.stepNumber {
+  flex: 0 0 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--primary-boton);
+  color: #ffffff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepContent h3 {
+  font-size: 1.02rem;
+  margin: 0.2rem 0 0.3rem;
+}
+
+.stepContent p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+
+.tipCard p {
+  margin: 0;
+}
+
+.tipIcon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.warningBox {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-large);
+  border-left: 5px solid var(--warning);
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: 0;
+}
+
+.warningIcon {
+  font-size: 1.4rem;
+}
+
+.warningList {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.warningList li {
+  margin-bottom: 0.4rem;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  padding: var(--spacing-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+
+.faqItem h3 {
+  font-size: 1.02rem;
+  margin: 0 0 var(--spacing-sm);
+}
+
+.faqItem p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ─── Modo oscuro ──────────────────────────────────────────────────────── */
+[data-theme='dark'] .alerta {
+  background: rgba(220, 53, 69, 0.16);
+}
+
+[data-theme='dark'] .tramoOk {
+  background: rgba(40, 167, 69, 0.16);
+}
+
+[data-theme='dark'] .tramoAviso,
+[data-theme='dark'] .totalIncompleto,
+[data-theme='dark'] .warningBox {
+  background: rgba(255, 193, 7, 0.12);
+}
+
+[data-theme='dark'] .totalCompleto {
+  background: rgba(127, 179, 211, 0.12);
+}
+
+[data-theme='dark'] .regimenBtn:not(.regimenBtnActivo) {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .comparativaTable td,
+[data-theme='dark'] .comparativaTable tbody th {
+  border-bottom-color: var(--border);
+}
+
+/* ─── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resultsPanel {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .inputPanel,
+  .resultsPanel {
+    padding: var(--spacing-lg);
+  }
+
+  .regimenGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .totalValor {
+    font-size: 1.5rem;
+  }
+
+  .guideSection {
+    padding: var(--spacing-md) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .regimenBtn {
+    transition: none;
+  }
+}

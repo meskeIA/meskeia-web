@@ -9,6 +9,7 @@
  */
 export const APPS_REGION_ES: ReadonlySet<string> = new Set([
   'asistente-alta-autonomo',
+  'calculadora-subastas-boe',
   'calendario-fiscal-emprendedor',
   'checklist-cambio-regimen-autonomo',
   'checklist-preparar-verifactu',

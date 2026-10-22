@@ -706,6 +706,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/estimador-plusvalia-municipal/', icon: '🏛️', name: 'Plusvalía Municipal', description: 'Impuesto del vendedor (suelo urbano)' },
     { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
   ],
+  'calculadora-subastas-boe': [
+    { url: '/estimador-compraventa-inmueble/', icon: '🏠', name: 'Gastos Compraventa Vivienda', description: 'ITP/IVA, notaría y registro de una compra normal' },
+    { url: '/estimador-hipoteca/', icon: '🏦', name: 'Simulador Hipoteca', description: 'Calcula tu cuota mensual' },
+    { url: '/estimador-coste-vivienda/', icon: '🏠', name: 'Coste Real de Vivienda', description: 'Comunidad, IBI, seguros y suministros al mes' },
+    { url: '/simulador-gastos-compraventa-garaje/', icon: '🚗', name: 'Gastos Garaje', description: 'Si el lote incluye una plaza de garaje' },
+  ],
   'amortizacion-hipoteca': finanzasHipotecaApps.filter(a => a.url !== '/amortizacion-hipoteca/'),
   'simulador-prestamos': finanzasHipotecaApps.filter(a => a.url !== '/estimador-prestamos/'),
   'calculadora-alquiler-vs-compra': finanzasHipotecaApps.filter(a => a.url !== '/orientador-alquiler-vs-compra/'),

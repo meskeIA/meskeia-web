@@ -82,6 +82,7 @@ export const implementedAppsUrls = [
   "/simulador-gastos-compraventa-local-comercial/", // Gastos compraventa local comercial: comprador IVA/ITP + renuncia exención IVA (ISP), AJD, notaría, registro · vendedor plusvalía municipal + IRPF
   "/simulador-gastos-compraventa-terreno-rustico/", // Gastos compra finca/terreno rústico: ITP (exento IVA), sin plusvalía municipal, renuncia exención IVA
   "/simulador-gastos-compraventa-solar/", // Gastos compra solar/terreno edificable: IVA 21%+AJD (empresario) o ITP (particular), plusvalía municipal vendedor
+  "/calculadora-subastas-boe/", // Subastas de vivienda judiciales, de Hacienda y de la Seguridad Social: depósito, plazo de pago, ITP sobre valor de referencia y coste total
   "/estimador-prestamos/",           // Compara sistemas francés, alemán, americano
   "/amortizacion-hipoteca/",         // Amortización anticipada: reducir cuota vs plazo
   "/orientador-deduccion-obras-energeticas/", // Orientador deducciones IRPF 20/40/60% por obras mejora energética vivienda

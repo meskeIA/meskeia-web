@@ -11,7 +11,7 @@ const guias = [
     title: 'Comprar Casa en España',
     description:
       'Simulador de hipoteca, gastos de compraventa, ITP/IVA, notaría y comparativa alquiler vs compra. Todo para tomar la mejor decisión sobre tu vivienda.',
-    tools: 5,
+    tools: 6,
   },
   {
     slug: 'invertir',

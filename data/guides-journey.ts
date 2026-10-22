@@ -22,7 +22,7 @@ export const guidesJourney: GuideJourney[] = [
     icon: '🏠',
     description: 'Desde buscar hipoteca hasta calcular todos los gastos de compra',
     url: '/guia/comprar-casa/',
-    toolsCount: 5,
+    toolsCount: 6,
     available: true,
   },
   {
