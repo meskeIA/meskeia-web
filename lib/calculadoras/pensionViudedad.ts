@@ -11,6 +11,25 @@
  *    mínima (sin prueba de rentas ni tope de la PNC), aplicaban una retención inventada
  *    (0 / 8 / 12 % con escalón en 15.000 €) y, aquí, el mínimo miraba la edad antes que las
  *    cargas familiares. Ahora la app llama a este motor y solo hay una copia.
+ *
+ * ⚠️ 2026-10-22 (cabo C0368): el 70 % se daba con «cargas» e ingresos propios < 75 % del SMI.
+ *    El art. 31.2 del Decreto 3158/1966 (BOE-A-1966-21116), releído en el BOE ese día, pide tres
+ *    cosas a la vez, y el 31.3 recorta:
+ *    (a) cargas familiares: convivir con hijos menores de 26 o mayores incapacitados, o menores
+ *        acogidos, y que la renta de la unidad familiar, «incluido el pensionista», «dividida
+ *        entre el número de miembros», no pase del 75 % del SMI sin la parte proporcional de dos
+ *        pagas extra (en cómputo anual: 75 % × SMI mensual × 12);
+ *    (b) que la pensión «constituya la principal o única fuente de ingresos»: al menos el 50 % de
+ *        los ingresos totales del pensionista (pensión ≥ resto de sus rendimientos);
+ *    (c) que sus rendimientos anuales («del trabajo como del capital, así como los de naturaleza
+ *        prestacional», del ejercicio anterior) no pasen del límite del complemento a mínimos más
+ *        la pensión mínima de viudedad «en función de la edad del pensionista»;
+ *    31.3: si pensión al 70 % + rendimientos excede ese límite, la pensión se reduce hasta no
+ *    superarlo. Dos lecturas que la norma no fija, DECIDIDAS por el usuario el 22/10/2026: la
+ *    renta de la unidad familiar va SIN la propia pensión de viudedad, y el recorte del 31.3
+ *    nunca deja la pensión por debajo de la del 52 % (solo limita la aplicación del 70 %).
+ *    Lecturas propias, a la letra: (b) se mide con la pensión al 70 % antes del recorte, y el
+ *    mínimo «en función de la edad» es el del tramo de edad (no la fila «con cargas»).
  */
 
 import {
@@ -53,13 +72,25 @@ export interface ParametrosPensionViudedad {
   pensionCausante?: number;
   /** Edad del beneficiario (viudo/a) en años */
   edadBeneficiario: number;
-  /** Si el beneficiario tiene cargas familiares (hijos < 26 o con discapacidad a cargo) */
+  /**
+   * Si el beneficiario convive con hijos menores de 26 años o mayores incapacitados, o con
+   * menores acogidos. Para el 70 % hace falta además la prueba de renta de la unidad familiar.
+   */
   tieneCargas?: boolean;
   /**
-   * Ingresos propios del beneficiario (€/mes, con las pagas extra prorrateadas: se anualizan × 12).
+   * Ingresos propios del beneficiario sin la pensión de viudedad: trabajo, capital y otras
+   * prestaciones (€/mes, con las pagas extra prorrateadas: se anualizan × 12).
    * Determinan el acceso a los porcentajes del 60 % y 70 % y al complemento a mínimos.
    */
   ingresosMensualesPropios?: number;
+  /**
+   * Renta anual de toda la unidad familiar, incluidos los ingresos del beneficiario y SIN la
+   * pensión de viudedad (€/año). Solo cuenta con `tieneCargas`: sin ella no se puede comprobar
+   * el 70 %. Si es menor que los ingresos propios anualizados, se toman estos.
+   */
+  rentaAnualUnidadFamiliar?: number;
+  /** Personas de la unidad familiar, incluido el beneficiario (mínimo 2 con cargas). */
+  miembrosUnidadFamiliar?: number;
 }
 
 export interface ResultadoPensionViudedad {
@@ -69,8 +100,10 @@ export interface ResultadoPensionViudedad {
   porcentajeAplicable: number;
   /** Explicación del porcentaje aplicado */
   razonPorcentaje: string;
-  /** Pensión bruta calculada (€/mes) */
+  /** Pensión bruta calculada (€/mes), ya con el recorte del art. 31.3 si lo hay */
   pensionBruta: number;
+  /** Lo que el art. 31.3 recorta de la pensión al 70 % (€/mes); 0 si no hay recorte */
+  recorte70: number;
   /** Cuantía mínima de viudedad de la situación (€/mes). NO está garantizada: ver el complemento. */
   pensionMinima: number;
   /** Complemento a mínimos reconocido (€/mes), con prueba de rentas y tope de la PNC */
@@ -131,21 +164,56 @@ export function calcularPensionViudedad(p: ParametrosPensionViudedad): Resultado
   const ingresos = Math.max(0, p.ingresosMensualesPropios ?? 0);
   const tieneCargas = p.tieneCargas ?? false;
 
+  // Sin el 70 %: el 60 % si se cumple, si no el 52 % general.
   let porcentajeAplicable: number;
   let razonPorcentaje: string;
-
-  if (tieneCargas && ingresos < pv.limiteIngresos70) {
-    porcentajeAplicable = pv.porcentaje70;
-    razonPorcentaje = `${pct(pv.porcentaje70)}: tiene cargas familiares e ingresos del trabajo inferiores al ${pct(75)} del SMI (${eur(pv.limiteIngresos70)}/mes)`;
-  } else if (edad >= 65 && ingresos < pv.smiMensual) {
+  if (edad >= 65 && ingresos < pv.smiMensual) {
     porcentajeAplicable = pv.porcentaje60;
     razonPorcentaje = `${pct(pv.porcentaje60)}: tiene 65 años o más e ingresos del trabajo inferiores al SMI (${eur(pv.smiMensual)}/mes)`;
   } else {
     porcentajeAplicable = pv.porcentajeGeneral;
     razonPorcentaje = `Porcentaje general (${pct(pv.porcentajeGeneral)})`;
   }
+  let pensionBruta = r(baseReguladora * porcentajeAplicable / 100);
+  let recorte70 = 0;
 
-  const pensionBruta = r(baseReguladora * porcentajeAplicable / 100);
+  // ── 70 % (art. 31.2 y 31.3 del Decreto 3158/1966; cabecera) ──
+  const rentasAnuales = ingresos * MESES;
+  const anualTopada = (mensual: number): number => Math.min(mensual, pv.pensionMaxima) * PAGAS;
+  const pension70Anual = anualTopada(r(baseReguladora * pv.porcentaje70 / 100));
+  const alternativaAnual = anualTopada(pensionBruta);
+  // 75 % del SMI sin la parte proporcional de dos pagas extra, en cómputo anual (× 12).
+  const limiteRentaPorMiembro = r(pv.limiteIngresos70 * MESES);
+  // Límite del complemento a mínimos + mínima de viudedad del TRAMO DE EDAD («en función de la edad»).
+  const limite70 = r(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge + minimoViudedad2026(edad, false) * PAGAS);
+  const miembros = Math.floor(p.miembrosUnidadFamiliar ?? 0);
+  const sinDatosFamilia = p.rentaAnualUnidadFamiliar === undefined || miembros < 2;
+  const rentaPorMiembro = sinDatosFamilia ? 0 : r(Math.max(p.rentaAnualUnidadFamiliar ?? 0, rentasAnuales, 0) / miembros);
+
+  if (tieneCargas) {
+    let motivoSin70 = '';
+    if (sinDatosFamilia) motivoSin70 = `para el ${pct(70)} hacen falta la renta anual de la unidad familiar y cuántas personas la forman (al menos 2)`;
+    else if (rentaPorMiembro > limiteRentaPorMiembro) motivoSin70 = `la renta de la unidad familiar por miembro (${eur(rentaPorMiembro)}/año) pasa del ${pct(75)} del SMI (${eur(limiteRentaPorMiembro)}/año), así que no hay cargas familiares a efectos del ${pct(70)}`;
+    else if (pension70Anual < rentasAnuales) motivoSin70 = `la pensión al ${pct(70)} (${eur(pension70Anual)}/año) no llega a la mitad de tus ingresos totales: no sería tu fuente principal de ingresos`;
+    else if (rentasAnuales > limite70) motivoSin70 = `tus ingresos propios (${eur(rentasAnuales)}/año) pasan de ${eur(limite70)}/año (límite del complemento a mínimos más la mínima de viudedad de tu edad)`;
+
+    // 31.3: pensión al 70 % + rendimientos no pueden exceder el límite. El recorte nunca deja la
+    // pensión por debajo de la que correspondería sin el 70 % (decisión del usuario, 22/10/2026).
+    const recortadaAnual = Math.min(pension70Anual, limite70 - rentasAnuales);
+    if (!motivoSin70 && recortadaAnual <= alternativaAnual) {
+      motivoSin70 = `con el recorte del art. 31.3 (pensión más ingresos no pueden exceder ${eur(limite70)}/año) quedaría por debajo del ${pct(porcentajeAplicable)}`;
+    }
+
+    if (motivoSin70) {
+      razonPorcentaje += `. Sin el ${pct(70)}: ${motivoSin70}`;
+    } else {
+      porcentajeAplicable = pv.porcentaje70;
+      pensionBruta = r(recortadaAnual / PAGAS);
+      recorte70 = r((pension70Anual - recortadaAnual) / PAGAS);
+      razonPorcentaje = `${pct(pv.porcentaje70)}: hay cargas familiares (renta de la unidad familiar de ${eur(rentaPorMiembro)}/año por miembro, sin pasar del ${pct(75)} del SMI), la pensión es tu fuente principal de ingresos y tus ingresos no pasan de ${eur(limite70)}/año (art. 31.2 del Decreto 3158/1966)`
+        + (recorte70 > 0 ? `. Se recorta en ${eur(recorte70)}/mes para que pensión más ingresos no excedan ese límite (art. 31.3)` : '');
+    }
+  }
 
   // Cuantía mínima: las cargas familiares mandan sobre la edad (Anexo I del RD 241/2026).
   const pensionMinima = minimoViudedad2026(edad, tieneCargas);
@@ -158,7 +226,6 @@ export function calcularPensionViudedad(p: ParametrosPensionViudedad): Resultado
   //  La viudedad no admite cónyuge a cargo: el límite y el tope son los de «sin cónyuge».
   const minimaAnual = pensionMinima * PAGAS;
   const brutaAnual = Math.min(pensionBruta, pv.pensionMaxima) * PAGAS;
-  const rentasAnuales = ingresos * MESES;
   const limiteRentas = COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge;
   const topeAnual = TOPE_COMPLEMENTO_MINIMOS_2026.pncAnual;
 
@@ -182,6 +249,7 @@ export function calcularPensionViudedad(p: ParametrosPensionViudedad): Resultado
   const notas: string[] = [
     'Cálculo orientativo. La SS calculará la pensión real a partir del historial completo de cotización del causante.',
     p.situacionCausante === 'no-alta' ? 'Causante no en alta: se requieren 15 años cotizados en toda su vida laboral (art. 219.1 LGSS).' : '',
+    porcentajeAplicable === pv.porcentaje70 ? `El ${pct(70)} se mide con los ingresos del ejercicio anterior y exige cumplir los requisitos mientras se cobra: si se deja de cumplir alguno, se pasa al ${pct(52)} (art. 31 del Decreto 3158/1966).` : '',
     p.situacionCausante === 'activo' ? 'Causante en alta: se requieren 500 días cotizados dentro de los 5 años anteriores al fallecimiento; ninguno si la muerte se debió a un accidente o a una enfermedad profesional (art. 219.1 LGSS).' : '',
     estadoComplemento === 'integro' ? `Se completa hasta la cuantía mínima (${eur(pensionMinima)}/mes): las rentas propias no pasan de ${eur(limiteRentas)}/año.` : '',
     estadoComplemento === 'diferencial' ? `Complemento reducido a ${eur(complemento)}/mes: las rentas propias pasan de ${eur(limiteRentas)}/año (regla diferencial del art. 9.2 RD 241/2026).` : '',
@@ -196,6 +264,7 @@ export function calcularPensionViudedad(p: ParametrosPensionViudedad): Resultado
     porcentajeAplicable,
     razonPorcentaje,
     pensionBruta,
+    recorte70,
     pensionMinima,
     complemento,
     estadoComplemento,

@@ -3044,7 +3044,10 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
   });
 
   test('GOLDEN-CD: causante activo, BC media 1.200 €, 45 años con cargas → 70% pero se aplica el mínimo [sin contraste oficial]', () => {
-    // BR = (24 × 1.200) / 28 = 1.028,57 €. Cargas + ingresos (500) < límite 70% (916) → 70%.
+    // BR = (24 × 1.200) / 28 = 1.028,57 €. 70 % (art. 31.2 Decreto 3158/1966, cabo C0368):
+    //   renta familiar 6.000 / 3 = 2.000 €/año por miembro ≤ 75 % SMI × 12 = 10.989 → cargas;
+    //   pensión al 70 % 720 × 14 = 10.080 ≥ ingresos 6.000 → fuente principal;
+    //   6.000 ≤ 9.442 + 9.931,60 = 19.373,60, y 10.080 + 6.000 no lo excede → sin recorte (31.3).
     // Pensión bruta = 1.028,57 × 70% = 720,00 €. Mínimo (con cargas, 2026) = 1.256,60 € → SE APLICA.
     // Las cargas familiares mandan sobre la edad (Anexo I del RD 241/2026).
     // Complemento íntegro 536,60 €/mes: rentas 6.000 €/año < 9.442 y por debajo del tope de la PNC (628,80).
@@ -3057,8 +3060,11 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
       edadBeneficiario: 45,
       tieneCargas: true,
       ingresosMensualesPropios: 500,
+      rentaAnualUnidadFamiliar: 6000,
+      miembrosUnidadFamiliar: 3,
     });
     expect(pv.baseReguladora).toBeCloseTo(1028.57, 2);
+    expect(pv.recorte70).toBe(0);
     expect(pv.porcentajeAplicable).toBe(70);
     expect(pv.pensionBruta).toBeCloseTo(720.00, 2);
     expect(pv.pensionMinima).toBeCloseTo(1256.60, 2);
@@ -3080,6 +3086,8 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
       edadBeneficiario: 62,
       tieneCargas: true,
       ingresosMensualesPropios: 0,
+      rentaAnualUnidadFamiliar: 0,
+      miembrosUnidadFamiliar: 2,
     });
     expect(pv.pensionBruta).toBeCloseTo(480.00, 2);
     expect(pv.pensionMinima).toBeCloseTo(1256.60, 2);
@@ -3102,6 +3110,68 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
     expect(pv.pensionFinal).toBeCloseTo(520.00, 2);
     expect(pv.complemento).toBe(0);
     expect(pv.estadoComplemento).toBe('rentas');
+  });
+
+  // ── El 70 % del art. 31.2-31.3 del Decreto 3158/1966 (cabo C0368, 22/10/2026) ──
+  // Antes bastaba «cargas» + ingresos propios < 915,75 €/mes. Límites 2026 para < 60 años:
+  //   renta por miembro ≤ 75 % × 1.221 × 12 = 10.989 €/año (SMI sin la parte de dos pagas extra);
+  //   límite de ingresos = 9.442 (complemento a mínimos) + 9.931,60 (mínima < 60) = 19.373,60 €/año.
+  const viudedad45ConCargas = (pensionCausante: number, ingresosMes: number, renta?: number, miembros?: number) =>
+    calcularPensionViudedad({
+      situacionCausante: 'jubilado', pensionCausante, edadBeneficiario: 45, tieneCargas: true,
+      ingresosMensualesPropios: ingresosMes, rentaAnualUnidadFamiliar: renta, miembrosUnidadFamiliar: miembros,
+    });
+
+  test('GOLDEN-CD4: con hijos pero sin la renta de la unidad familiar no se puede dar el 70 % → 52 %', () => {
+    const pv = viudedad45ConCargas(1000, 0);
+    expect(pv.porcentajeAplicable).toBe(52);
+    expect(pv.pensionBruta).toBeCloseTo(520.00, 2);
+    expect(pv.razonPorcentaje).toContain('hacen falta la renta anual de la unidad familiar');
+  });
+
+  test('GOLDEN-CD5: renta por miembro 15.000 > 10.989 → no hay cargas familiares → 52 %, aunque los ingresos propios sean bajos', () => {
+    // El motor viejo daba aquí el 70 %: 500 €/mes propios < 915,75.
+    const pv = viudedad45ConCargas(1000, 500, 30000, 2);
+    expect(pv.porcentajeAplicable).toBe(52);
+    expect(pv.razonPorcentaje).toContain('10.989,00');
+  });
+
+  test('GOLDEN-CD6: la pensión al 70 % (9.800) no llega a la mitad de los ingresos (10.800 + 9.800) → 52 %', () => {
+    // 1.000 × 70 % = 700 × 14 = 9.800 < 900 × 12 = 10.800. Renta por miembro 3.600: sí hay cargas.
+    const pv = viudedad45ConCargas(1000, 900, 10800, 3);
+    expect(pv.porcentajeAplicable).toBe(52);
+    expect(pv.razonPorcentaje).toContain('fuente principal');
+  });
+
+  test('GOLDEN-CD7: ingresos propios 20.400 > 19.373,60 → 52 %', () => {
+    // 3.000 × 70 % = 2.100 × 14 = 29.400 ≥ 20.400 (fuente principal); 20.400 / 2 = 10.200 ≤ 10.989.
+    const pv = viudedad45ConCargas(3000, 1700, 20400, 2);
+    expect(pv.porcentajeAplicable).toBe(52);
+    expect(pv.pensionBruta).toBeCloseTo(1560.00, 2);
+    expect(pv.razonPorcentaje).toContain('19.373,60');
+  });
+
+  test('GOLDEN-CD8: art. 31.3 — pensión al 70 % + ingresos exceden 19.373,60 → se recorta a 1.126,69 €/mes', () => {
+    // 1.700 × 70 % = 1.190 × 14 = 16.660; ingresos 300 × 12 = 3.600; 16.660 + 3.600 = 20.260 > 19.373,60.
+    // Recortada: 19.373,60 − 3.600 = 15.773,60 €/año = 1.126,69 €/mes > 52 % (884,00): se queda el 70 %.
+    // Recorte (16.660 − 15.773,60) / 14 = 63,31 €/mes. La mínima con cargas (1.256,60) la completa:
+    // íntegro 17.592,40 − 1.126,69 × 14 = 1.818,74 €/año (rentas 3.600 ≤ 9.442; bajo la PNC) → 129,91 €/mes.
+    const pv = viudedad45ConCargas(1700, 300, 3600, 2);
+    expect(pv.porcentajeAplicable).toBe(70);
+    expect(pv.pensionBruta).toBeCloseTo(1126.69, 2);
+    expect(pv.recorte70).toBeCloseTo(63.31, 2);
+    expect(pv.complemento).toBeCloseTo(129.91, 2);
+    expect(pv.pensionFinal).toBeCloseTo(1256.60, 2);
+  });
+
+  test('GOLDEN-CD9: el recorte del 31.3 nunca baja del 52 % (decisión del usuario, 22/10/2026)', () => {
+    // 2.000 × 70 % = 1.400 × 14 = 19.600; ingresos 700 × 12 = 8.400; recortada 19.373,60 − 8.400 =
+    // 10.973,60 < 52 % (1.040 × 14 = 14.560) → se queda el 52 %: 1.040,00 €/mes, no 783,83.
+    const pv = viudedad45ConCargas(2000, 700, 8400, 2);
+    expect(pv.porcentajeAplicable).toBe(52);
+    expect(pv.pensionBruta).toBeCloseTo(1040.00, 2);
+    expect(pv.recorte70).toBe(0);
+    expect(pv.razonPorcentaje).toContain('art. 31.3');
   });
 
 });

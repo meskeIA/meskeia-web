@@ -441,7 +441,7 @@ export const PENSION_VIUDEDAD_2026 = {
   // ese día se citaba el art. 231 LGSS, que trata del impedimento por homicidio (cabo C0134).
   porcentajeGeneral:       52,   // % — Caso general
   porcentaje60:            60,   // % — ≥65 años sin otra pensión pública y rentas < SMI
-  porcentaje70:            70,   // % — Cargas familiares + rentas del trabajo < 75% SMI
+  porcentaje70:            70,   // % — art. 31.2-31.3: cargas (renta familiar por miembro ≤ 75 % SMI), pensión ingreso principal y rentas bajo límite (motor: lib/calculadoras/pensionViudedad.ts)
 
   // SMI 2026 mensual (14 pagas, RD 126/2026 — ver data/fiscal/smi.ts)
   smiMensual:            SMI_2026.mensual14, // 1.221 €

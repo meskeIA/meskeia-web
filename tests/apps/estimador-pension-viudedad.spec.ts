@@ -79,7 +79,9 @@ const ROTULO = {
   pension: 'Pensión mensual que cobraba el causante (€/mes)',
   base: 'Base de cotización media de los últimos 2 años (€/mes)',
   anios: 'Años cotizados totales del causante',
-  ingresos: 'Ingresos propios del trabajo o actividad (€/mes)',
+  ingresos: 'Ingresos propios: trabajo, capital y otras prestaciones (€/mes)',
+  rentaFamiliar: 'Ingresos anuales de toda la unidad familiar (€/año)',
+  miembros: 'Personas de la unidad familiar, tú incluido',
 } as const;
 
 /** El formato es-ES separa la cifra del € con espacio duro (U+00A0). */
@@ -118,6 +120,8 @@ interface Entrada {
   edad?: '45' | '62' | '67';
   cargas?: boolean;
   ingresos?: string;
+  rentaFamiliar?: string;
+  miembros?: string;
 }
 
 /** Rellena el formulario a partir del estado por defecto (jubilado · 1400 · 67 · sin cargas · 0). */
@@ -131,6 +135,9 @@ async function rellenar(page: Page, e: Entrada): Promise<void> {
     await page.getByRole('button', { name: e.cargas ? 'Sí' : 'No', exact: true }).click();
   }
   if (e.ingresos !== undefined) await sembrarValor(page, campo(page, ROTULO.ingresos), e.ingresos);
+  // Solo existen con «Sí» en la convivencia con hijos (se parte de «0» y «2»).
+  if (e.rentaFamiliar !== undefined) await sembrarValor(page, campo(page, ROTULO.rentaFamiliar), e.rentaFamiliar);
+  if (e.miembros !== undefined) await sembrarValor(page, campo(page, ROTULO.miembros), e.miembros);
 }
 
 async function calcular(page: Page): Promise<void> {
@@ -224,6 +231,32 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
     expect(await lineaDesglose(page, 'Complemento a mínimos')).toBeCloseTo(628.8, 2);
     expect(await pensionFinal(page)).toBeCloseTo(1108.8, 2);
     await expect(panelResultado(page)).toContainText('no puede superar la pensión no contributiva');
+  });
+
+  // Cabo C0368 (22/10/2026): el 70 % pide lo del art. 31.2 del Decreto 3158/1966 (BOE-A-1966-21116)
+  // y el 31.3 lo recorta. Antes bastaba «Sí» en hijos e ingresos propios < 915,75 €/mes.
+  test('CASO 5b — con hijos, pero 30.000 €/año entre 2 = 15.000 por persona > 10.989: sin cargas familiares, 52 %', async ({ page }) => {
+    await abrir(page);
+    await rellenar(page, { pension: '1000', edad: '45', cargas: true, ingresos: '500', rentaFamiliar: '30000' });
+    await calcular(page);
+
+    // 75 % × SMI 1.221 × 12 = 10.989,00 €/año por miembro. El motor viejo daba el 70 % (700,00).
+    expect(normalizar(await panelResultado(page).innerText())).toContain('Porcentaje aplicado 52');
+    expect(await lineaDesglose(page, 'Pensión calculada')).toBeCloseTo(520, 2);
+    await expect(panelResultado(page)).toContainText('no hay cargas familiares');
+  });
+
+  test('CASO 5c — art. 31.3: el 70 % (1.190,00) más 3.600 €/año pasan de 19.373,60 y se recorta a 1.126,69', async ({ page }) => {
+    await abrir(page);
+    await rellenar(page, { pension: '1700', edad: '45', cargas: true, ingresos: '300', rentaFamiliar: '3600' });
+    await calcular(page);
+
+    // 1.190 × 14 = 16.660 + 3.600 = 20.260 > 9.442 + 9.931,60 → (19.373,60 − 3.600) / 14 = 1.126,69;
+    // recorte 63,31 €/mes; la mínima con cargas (1.256,60) la completa con 129,91 de complemento.
+    expect(normalizar(await panelResultado(page).innerText())).toContain('Porcentaje aplicado 70');
+    expect(await lineaDesglose(page, 'Pensión calculada')).toBeCloseTo(1126.69, 2);
+    expect(normalizar(await panelResultado(page).innerText())).toContain('Se recorta en 63,31 €/mes');
+    expect(await pensionFinal(page)).toBeCloseTo(1256.6, 2);
   });
 
   test('CASO 6 — tope de la PNC con 65 años o más: 240,00 + 628,80 = 868,80 €/mes, no 936,20', async ({ page }) => {

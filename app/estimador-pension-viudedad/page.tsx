@@ -32,8 +32,10 @@ interface FormData {
   baseCotizacionMedia: string;   // Si activo: media últimas 24 bases/mes
   pensionCausante: string;       // Si jubilado: importe mensual de su pensión
   edadBeneficiario: string;
-  tieneCargas: boolean;          // Hijos < 26 años o discapacitados a cargo
-  ingresosTrabajoMes: string;    // Ingresos propios del trabajo del beneficiario
+  tieneCargas: boolean;          // Convive con hijos < 26, mayores incapacitados o menores acogidos
+  ingresosTrabajoMes: string;    // Ingresos propios del beneficiario: trabajo, capital y prestaciones
+  rentaFamiliarAnual: string;    // Renta anual de la unidad familiar, sin la pensión de viudedad
+  miembrosFamilia: string;       // Personas de la unidad familiar, incluido el beneficiario
   tipoVinculo: TipoVinculo;
   aniosCotizadosCausante: string; // Para validar requisito mínimo
 }
@@ -82,6 +84,9 @@ function calcularPension(form: FormData): Resultado | null {
     edadBeneficiario: edad,
     tieneCargas: form.tieneCargas,
     ingresosMensualesPropios: leer(form.ingresosTrabajoMes),
+    // El 70 % mira la renta de la unidad familiar por miembro (art. 31.2 Decreto 3158/1966, cabo C0368).
+    rentaAnualUnidadFamiliar: leer(form.rentaFamiliarAnual),
+    miembrosUnidadFamiliar: leer(form.miembrosFamilia),
   });
 
   // Requisitos
@@ -154,6 +159,8 @@ export default function EstimadorPensionViudedad() {
     edadBeneficiario: '67',
     tieneCargas: false,
     ingresosTrabajoMes: '0',
+    rentaFamiliarAnual: '0',
+    miembrosFamilia: '2',
     tipoVinculo: 'matrimonio',
     aniosCotizadosCausante: '35',
   });
@@ -307,7 +314,7 @@ export default function EstimadorPensionViudedad() {
 
           {/* Cargas familiares */}
           <div className={styles.formGroup}>
-            <span className={styles.label} id="grupo-cargas">¿Tiene hijos/as menores de 26 años o con discapacidad a cargo?</span>
+            <span className={styles.label} id="grupo-cargas">¿Convive con hijos/as menores de 26 años, mayores incapacitados o menores acogidos?</span>
             <div className={styles.switchRow} role="group" aria-labelledby="grupo-cargas">
               <button
                 type="button"
@@ -328,10 +335,32 @@ export default function EstimadorPensionViudedad() {
           <NumberInput
             value={form.ingresosTrabajoMes}
             onChange={v => update('ingresosTrabajoMes', v)}
-            label="Ingresos propios del trabajo o actividad (€/mes)"
+            label="Ingresos propios: trabajo, capital y otras prestaciones (€/mes)"
             placeholder="0"
-            helperText="Salario o rendimientos propios al mes, con las pagas extra prorrateadas. Deciden si se aplica el 60 % o el 70 % y si hay complemento a mínimos. Pon 0 si no tienes."
+            helperText="Al mes, con las pagas extra prorrateadas y sin la pensión de viudedad. Deciden si se aplica el 60 % o el 70 % y si hay complemento a mínimos. Pon 0 si no tienes."
           />
+
+          {/* Unidad familiar: solo cuenta para el 70 % (art. 31.2 del Decreto 3158/1966) */}
+          {form.tieneCargas && (
+            <>
+              <NumberInput
+                value={form.rentaFamiliarAnual}
+                onChange={v => update('rentaFamiliarAnual', v)}
+                label="Ingresos anuales de toda la unidad familiar (€/año)"
+                placeholder="0"
+                helperText={`Lo que ingresan en un año todos los que conviven, tú incluido (trabajo, capital y prestaciones), sin contar la pensión de viudedad. Para el ${pct(70)}, dividido entre las personas de la familia no puede pasar del ${pct(75)} del SMI (${formatCurrency(PV.limiteIngresos70 * 12)} al año por persona).`}
+              />
+              <NumberInput
+                value={form.miembrosFamilia}
+                onChange={v => update('miembrosFamilia', v)}
+                label="Personas de la unidad familiar, tú incluido"
+                placeholder="2"
+                min={2}
+                step={1}
+                helperText="Tú y quienes conviven contigo: hijos/as menores de 26 años, mayores incapacitados o menores acogidos."
+              />
+            </>
+          )}
 
           {error && (
             <div role="alert" aria-live="polite" className={styles.errorMsg}><span aria-hidden="true">⚠️</span> {error}</div>
@@ -462,7 +491,7 @@ export default function EstimadorPensionViudedad() {
         <ul>
           <li><strong>52&nbsp;%</strong>: cuantía general, para la mayoría de los casos.</li>
           <li><strong>60&nbsp;%</strong>: si el beneficiario tiene 65 o más años, no recibe otra pensión pública y sus ingresos por trabajo no superan el SMI anual.</li>
-          <li><strong>70&nbsp;%</strong>: si tiene cargas familiares (hijos menores de 26 o con discapacidad) y los rendimientos del trabajo son inferiores al 75&nbsp;% del SMI mensual. Desde 2022 este porcentaje se aplica con carácter general si se cumplen los requisitos.</li>
+          <li><strong>70&nbsp;%</strong>: exige tres cosas a la vez (art. 31.2 del Decreto 3158/1966). Cargas familiares: convivir con hijos menores de 26 años, mayores incapacitados o menores acogidos, y que los ingresos de toda la familia, divididos entre sus miembros, no pasen del 75&nbsp;% del SMI sin pagas extra ({formatCurrency(PV.limiteIngresos70 * 12)} al año por persona en 2026). Que la pensión sea la principal o única fuente de ingresos: al menos la mitad de lo que ingresa el viudo o la viuda. Y que sus ingresos anuales no pasen del límite del complemento a mínimos ({formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)}) más la cuantía mínima de viudedad de su edad. Si la pensión al 70&nbsp;% más esos ingresos superan ese límite, la pensión se reduce hasta no superarlo (art. 31.3).</li>
         </ul>
         <h3>¿Cómo se calcula la base reguladora?</h3>
         <p>Si el causante era pensionista: la base reguladora es igual al importe de su pensión. Si fallecía en activo: se toman las bases de cotización de los últimos 24 meses y se divide entre 28 (para obtener el equivalente mensual, incluyendo pagas extras).</p>
@@ -487,7 +516,7 @@ export default function EstimadorPensionViudedad() {
             </thead>
             <tbody>
               <tr><td>General (sin cargas familiares)</td><td>52&nbsp;%</td><td>Cualquier circunstancia</td><td>Vitalicia</td></tr>
-              <tr><td>Con hijos menores o discapacitados</td><td>70&nbsp;%</td><td>Mientras existan cargas familiares</td><td>Mientras dure la situación</td></tr>
+              <tr><td>Con hijos menores de 26, incapacitados o acogidos</td><td>70&nbsp;%</td><td>Cargas familiares, la pensión como ingreso principal y rentas bajo el límite</td><td>Mientras dure la situación</td></tr>
               <tr><td>Mayor de 65 años sin otras rentas</td><td>60&nbsp;%</td><td>Ingresos &lt; límite legal (anual)</td><td>Vitalicia</td></tr>
               <tr><td>Pareja de hecho reconocida</td><td>52&nbsp;%</td><td>5 años de convivencia (salvo hijos en común) + inscripción 2 años antes</td><td>Vitalicia</td></tr>
               <tr><td>Ex cónyuge divorciado/separado</td><td>Proporcional</td><td>Pensión compensatoria activa</td><td>Según pensión compensatoria</td></tr>
@@ -603,7 +632,7 @@ export default function EstimadorPensionViudedad() {
             <span className={styles.stepNumber}>4</span>
             <div className={styles.stepContent}>
               <strong>Declara tus ingresos con exactitud</strong>
-              <p>Si quieres optar al 70&nbsp;%, debes declarar que tus ingresos propios del trabajo no superan el límite legal (aproximadamente {formatCurrency(PV.limiteIngresos70)}/mes, el 75&nbsp;% del SMI 2026). El INSS verificará esta información con la AEAT.</p>
+              <p>Si quieres optar al 70&nbsp;%, tendrás que acreditar los ingresos del año anterior: los tuyos (trabajo, capital y prestaciones) y los de toda la unidad familiar, que divididos entre sus miembros no pueden pasar de {formatCurrency(PV.limiteIngresos70 * 12)} al año por persona (75&nbsp;% del SMI 2026 sin pagas extra). Cada año, antes del 1 de marzo, hay que declarar los del año anterior (art. 31 del Decreto 3158/1966). El INSS verificará esta información con la AEAT.</p>
             </div>
           </div>
           <div className={styles.step}>
