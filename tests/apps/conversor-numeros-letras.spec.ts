@@ -1,5 +1,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { prepararParaMedir } from '../_contraste';
 
 /**
  * Inspector — conversor-numeros-letras (segmento CÁLCULO / LENGUA, riesgo 3)
@@ -721,11 +722,11 @@ test.describe('Inspección 24/09/2026 — importes reales, lempira, móvil y tem
       page.getByText('Con tildes, como manda la ortografía'),
     ];
     await expect(ayudas[0]).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)'); // tema claro
+    // Lectura ÚNICA, sin transiciones: un toHaveCSS con reintentos casaría con el primer fotograma
+    // de la de 0,3 s de globals.css, y una espera fija no basta con carga (C0340).
+    await prepararParaMedir(page);
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    // Lectura ÚNICA tras la transición de 0,3 s de globals.css: un toHaveCSS con reintentos
-    // casaría con el primer fotograma de la transición, que aún es transparente.
-    await page.waitForTimeout(700);
     for (const ayuda of ayudas) {
       expect(await ayuda.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
       expect(await ayuda.evaluate((el) => getComputedStyle(el).color)).toBe('rgb(148, 163, 184)'); // #94a3b8
@@ -733,7 +734,7 @@ test.describe('Inspección 24/09/2026 — importes reales, lempira, móvil y tem
     // El aviso de la coma ambigua sí conserva su fondo ámbar
     await enLetras(page, '830,400');
     const aviso = panel(page).locator('[role="status"]');
-    await page.waitForTimeout(400);
+    await expect(aviso).toBeVisible();
     expect(await aviso.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(245, 158, 11, 0.14)');
   });
 
@@ -746,12 +747,13 @@ test.describe('Inspección 24/09/2026 — importes reales, lempira, móvil y tem
    */
   for (const tema of ['claro', 'oscuro'] as const) {
     test(`REGRESIÓN 1544 · controles con color de marca a 4,5:1 o más, tema ${tema}`, async ({ page }) => {
+      // Sin transiciones de fondo y color (0,2-0,3 s, más con carga) antes de cambiar nada (C0340)
+      await prepararParaMedir(page);
       await page.getByRole('button', { name: /MAYÚSCULAS/ }).click(); // se mide ACTIVO
       if (tema === 'oscuro') {
         await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
       }
-      await page.waitForTimeout(700); // transiciones de fondo y color (0,2-0,3 s)
       const controles = {
         'modo activo': page.getByRole('button', { name: /Importe con moneda/ }),
         'MAYÚSCULAS activo': page.getByRole('button', { name: /MAYÚSCULAS/ }),

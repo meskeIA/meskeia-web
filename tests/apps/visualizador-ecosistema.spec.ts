@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
+import { prepararParaMedir } from '../_contraste';
 
 /**
  * Ciclos del Carbono y del Nitrógeno (visualizador-ecosistema) — generado por /inspector el 25/09/2026
@@ -373,13 +374,14 @@ test('contraste — cifras de nivel, flujo, dieta, datos y centro del ciclo a 4,
       const ciclos = seccion === 'Ciclos biogeoquímicos' ? ['Ciclo del Carbono', 'Ciclo del Nitrógeno'] : [''];
       for (const ciclo of ciclos) {
         if (ciclo) await page.getByRole('button', { name: ciclo }).click();
-        await page.waitForTimeout(300); // transiciones de 0,2 s
         const r = await contrasteMinimo(page, selector);
         if (r < 4.5) fallos.push(`${selector}${ciclo ? ` (${ciclo})` : ''}: ${r}:1`);
       }
     }
     return fallos;
   };
+  // Sin las transiciones de 0,2 s, que con carga duran más que una espera fija (C0340)
+  await prepararParaMedir(page);
   const claro = await medir();
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
@@ -592,10 +594,11 @@ test('contraste — barrido de todo el texto propio de la app en oscuro, con fic
     ['Datos fascinantes', () => page.locator('div[class*="datosGrid"] > button').nth(7).click()],
   ];
   const fallos: string[] = [];
+  // Sin transiciones de 0,2 s ni el fadeIn de la ficha: se mide su estado final (C0340)
+  await prepararParaMedir(page);
   for (const [seccion, accion] of pasos) {
     await irA(page, seccion);
     if (accion) await accion();
-    await page.waitForTimeout(400); // transiciones de 0,2 s y fadeIn de la ficha
     fallos.push(...(await barrer()).map((f) => `${seccion}: ${f}`));
   }
   expect(fallos).toEqual([]);

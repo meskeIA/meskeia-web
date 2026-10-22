@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { prepararParaMedir } from '../_contraste';
 
 /**
  * transportador-angulos — verificación de interacción (PASO 4.bis).
@@ -193,6 +194,7 @@ test.describe('transportador-angulos · fondo de las tarjetas (C0052)', () => {
     test(`tema ${tema}: las tarjetas tienen fondo de tarjeta y su texto llega a 4,5:1`, async ({ page }) => {
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await abrir(page);
+      await prepararParaMedir(page); // sin transiciones de color, que con carga duran más (C0340)
       if (tema === 'dark') {
         const conmutador = page.getByRole('button', { name: /Cambiar a modo oscuro/ });
         await expect(async () => {
@@ -200,7 +202,6 @@ test.describe('transportador-angulos · fondo de las tarjetas (C0052)', () => {
           await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 1000 });
         }).toPass({ timeout: 15000 });
       }
-      await page.waitForTimeout(500); // transiciones de color
 
       const r = await page.evaluate(() => {
         const rgba = (c: string): number[] => {

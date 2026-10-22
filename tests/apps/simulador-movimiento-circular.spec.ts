@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact, leerValorEnReact, sembrarValorAcotado } from './_hidratacion';
+import { prepararParaMedir } from '../_contraste';
 
 /**
  * Inspector — simulador-movimiento-circular (segmento interactiva/física, riesgo 3, 816 usos)
@@ -1526,6 +1527,8 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
       'button[class*="casoComprobar"]',
       'span[class*="stepNumber"]', // los círculos numerados de la guía
     ];
+    // Sin transiciones de color (0,15-0,2 s, más con carga): se mide el estado final (C0340)
+    await prepararParaMedir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.locator('span[class*="stepNumber"]').first()).toBeVisible();
 
@@ -1536,12 +1539,10 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
       }
       await page.getByRole('button', { name: /^Caso 1:/ }).click();
       await page.mouse.move(0, 0);
-      await page.waitForTimeout(500); // transiciones de color de 0,15-0,2 s
       for (const s of PUNTOS) expect(await contrasteDe(page, s), `${tema} · ${s}`).toBeGreaterThanOrEqual(4.5);
 
       // El :hover de «Ver pista» también pone blanco sobre la marca.
       await page.getByRole('button', { name: /Ver pista/ }).hover();
-      await page.waitForTimeout(300);
       expect(await contrasteDe(page, 'button[class*="casoAyudaBoton"]'), `${tema} · «Ver pista» con el ratón encima`)
         .toBeGreaterThanOrEqual(4.5);
 
@@ -1549,7 +1550,6 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
       // le ganaba a `.modeBtnActive` (una) y pintaba el rótulo del color del fondo: 1:1 en
       // claro, el texto desaparecía. Ahora `.modeBtnActive:hover` mantiene el blanco.
       await page.locator('button[class*="modeBtnActive"]').hover();
-      await page.waitForTimeout(300);
       expect(await contrasteDe(page, 'button[class*="modeBtnActive"]'), `${tema} · modo activo con el ratón encima`)
         .toBeGreaterThanOrEqual(4.5);
 
@@ -1557,7 +1557,6 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
       await page.getByRole('button', { name: /Practicar/ }).click();
       await expect(page.getByRole('button', { name: /Practicar/ })).toHaveAttribute('aria-pressed', 'true');
       await page.mouse.move(0, 0);
-      await page.waitForTimeout(500);
       expect(await contrasteDe(page, 'button[class*="casoBotonActivo"]'), `${tema} · «Practicar» activo`)
         .toBeGreaterThanOrEqual(4.5);
     }
@@ -1579,6 +1578,7 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
       '[class*="scenarioCard"] h4',
       '[class*="faqItem"] dt',
     ];
+    await prepararParaMedir(page); // sin transiciones: se mide el color final (C0340)
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     await expect(page.locator('[class*="faqItem"] dt').first()).toBeVisible();
     await page.mouse.move(0, 0);
@@ -1588,7 +1588,6 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
         await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
         await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
         await page.mouse.move(0, 0);
-        await page.waitForTimeout(500);
       }
       for (const s of PUNTOS) expect(await contrasteDe(page, s), `${tema} · ${s}`).toBeGreaterThanOrEqual(4.5);
     }

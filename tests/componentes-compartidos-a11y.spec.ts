@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { prepararParaMedir } from './_contraste';
 
 /**
  * Accesibilidad de los componentes que monta TODO el catálogo.
@@ -81,12 +82,13 @@ test.describe('Componentes compartidos · accesibilidad', () => {
     // página) daba 3,53:1. Es texto normal: exige 4,5. Las otras rutas son las del acta.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(ruta);
+    // Sin transiciones ANTES del cambio de tema: con carga duran más que una espera fija (C0340)
+    await prepararParaMedir(page);
     const conmutador = page.getByRole('button', { name: /Cambiar a modo oscuro/ });
     await expect(async () => {
       await conmutador.click();
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 1000 });
     }).toPass({ timeout: 15000 });
-    await page.waitForTimeout(500); // transiciones de color de globals.css
 
     const ratios = await page.evaluate(() => {
       const rgba = (c: string): number[] => (c.match(/[\d.]+/g) ?? []).map(Number);

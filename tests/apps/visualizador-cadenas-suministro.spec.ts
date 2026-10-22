@@ -1,5 +1,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
+import { prepararParaMedir } from '../_contraste';
 
 /**
  * Cadenas de Suministro Globales — generado por /inspector el 24/09/2026
@@ -477,9 +478,9 @@ async function contrasteMinimo(page: Page, selector: string): Promise<number> {
 async function ponerOscuro(page: Page): Promise<void> {
   // El gestor de tema pisa un data-theme puesto a mano: se usa el conmutador real.
   await page.emulateMedia({ colorScheme: 'dark' });
+  await prepararParaMedir(page); // sin las transiciones de 0,3 s de los rótulos, más con carga (C0340)
   await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await page.waitForTimeout(400); // transiciones de 0,3 s en los rótulos
 }
 
 /** Pulsa Tab hasta que el foco caiga en el elemento con ese aria-label. */

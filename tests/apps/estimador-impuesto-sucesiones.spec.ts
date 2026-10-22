@@ -19,6 +19,7 @@
 
 import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { prepararParaMedir } from '../_contraste';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
@@ -2147,9 +2148,9 @@ test.describe('Inspector 25/09/2026', () => {
     await page.locator('#ccaa-causante').selectOption('murcia');
     await page.locator('#parentesco').selectOption('III');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '100000');
+    await prepararParaMedir(page); // sin la transición de 0,3 s de globals.css, que con carga dura más (C0340)
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await page.waitForTimeout(700); // transición de 0,3 s de globals.css
 
     const ratios = await page.locator('[class*="resultsPanel"] [class*="lineaBonif"]').evaluateAll((nodos) => {
       const rgb = (s: string) => (s.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
@@ -2630,12 +2631,12 @@ test.describe('Re-inspección 27/09/2026', () => {
 
     const contenedor = page.locator('header[class*="hero"]').locator('xpath=..');
     const fondoClaro = await contenedor.evaluate((e) => getComputedStyle(e).backgroundColor);
+    await prepararParaMedir(page); // sin la transición de 0,3 s de globals.css, que con carga dura más (C0340)
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await expect
       .poll(() => contenedor.evaluate((e) => getComputedStyle(e).backgroundColor), { message: 'el tema oscuro se aplicó' })
       .not.toBe(fondoClaro);
-    await page.waitForTimeout(700); // transición de 0,3 s de globals.css
     expect(await cuotaEstimada(page), 'el cálculo no depende del tema').toBe('9218,63 €');
     const oscuro = await contrastes(page, comunes);
 
@@ -2705,12 +2706,12 @@ test.describe('Re-inspección 27/09/2026', () => {
     const claro = await medir();
     const contenedor = page.locator('header[class*="hero"]').locator('xpath=..');
     const fondoClaro = await contenedor.evaluate((e) => getComputedStyle(e).backgroundColor);
+    await prepararParaMedir(page); // sin la transición de 0,3 s de globals.css, que con carga dura más (C0340)
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await expect
       .poll(() => contenedor.evaluate((e) => getComputedStyle(e).backgroundColor), { message: 'el tema oscuro se aplicó' })
       .not.toBe(fondoClaro);
-    await page.waitForTimeout(700); // transición de 0,3 s de globals.css
     const oscuro = await medir();
 
     for (const [tema, m] of [['claro', claro], ['oscuro', oscuro]] as const) {
@@ -3095,12 +3096,12 @@ test.describe('Inspector 30/09/2026', () => {
 
     const contenedor = page.locator('header[class*="hero"]').locator('xpath=..');
     const fondoClaro = await contenedor.evaluate((e) => getComputedStyle(e).backgroundColor);
+    await prepararParaMedir(page); // sin la transición de 0,3 s de globals.css, que con carga dura más (C0340)
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await expect
       .poll(() => contenedor.evaluate((e) => getComputedStyle(e).backgroundColor), { message: 'el tema oscuro se aplicó' })
       .not.toBe(fondoClaro);
-    await page.waitForTimeout(700); // transición de 0,3 s de globals.css
     const [oscuro] = await contrastes(page, [selector]);
     expect(oscuro.ratio, 'oscuro').toBeGreaterThanOrEqual(4.5);
   });
@@ -3153,8 +3154,8 @@ test.describe('Inspector 30/09/2026', () => {
 
     const reposo = await medir();
     expect(reposo.subrayado || reposo.frenteAlTexto >= 3, `en reposo: ${JSON.stringify(reposo)}`).toBe(true);
+    await prepararParaMedir(page); // sin la transición de 0,2 s del color de los enlaces (C0340)
     await enlace.hover();
-    await page.waitForTimeout(400); // transición de 0,2 s del color de los enlaces
     const encima = await medir();
     expect(encima.frenteAlFondo, `con el ratón encima: ${JSON.stringify(encima)}`).toBeGreaterThanOrEqual(4.5);
   });

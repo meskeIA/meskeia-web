@@ -1,4 +1,5 @@
 import { test, expect, devices, Page } from '@playwright/test';
+import { prepararParaMedir } from '../_contraste';
 import { PUERTO } from './_puerto';
 import {
   esperarHidratacion,
@@ -858,10 +859,11 @@ function contraste(a: string, b: string): number {
 }
 
 async function pasarAOscuro(page: Page): Promise<void> {
+  // Sin transiciones (las de los botones son de 0,15 s, más con carga) antes del cambio (C0340)
+  await prepararParaMedir(page);
   await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(300); // las transiciones de los botones son de 0,15 s
 }
 
 /**
@@ -869,10 +871,10 @@ async function pasarAOscuro(page: Page): Promise<void> {
  * oscuro. Devuelve los que siguen bajo el listón.
  */
 async function textosDeMarcaBajos(page: Page): Promise<{ claro: string[]; oscuro: string[] }> {
+  await prepararParaMedir(page); // sin transiciones: se mide el color final, no uno a medio camino (C0340)
   await page.getByRole('button', { name: /Añadir a comparativa/ }).click();
   await expect(page.getByRole('button', { name: 'Limpiar comparativa' })).toBeVisible();
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(300);
   const medir = () =>
     page.evaluate(() => {
       const fondoDe = (el: Element | null): string => {
@@ -916,7 +918,6 @@ async function textosDeMarcaBajos(page: Page): Promise<{ claro: string[]; oscuro
   // La guía está colapsada: se abre para que los pasos y los h4 existan.
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(300);
   const pares = await medir();
   expect(pares.length).toBeGreaterThan(12);
   const claro = bajos(pares);

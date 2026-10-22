@@ -1,5 +1,6 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
+import { prepararParaMedir } from '../_contraste';
 
 /**
  * Quiz Biología Molecular — test de regresión del Inspector (1.ª pasada, 25/09/2026)
@@ -516,10 +517,11 @@ test.describe('Hallazgos del Inspector', () => {
   test('1674 · en oscuro la correcta y la fallada no se pintan igual', async ({ page }) => {
     await abrir(page, 'dark');
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    // Sin transiciones de fondo (globals.css anima `*`): con carga duran más que una espera fija (C0340)
+    await prepararParaMedir(page);
     await empezar(page, 'examen');
     const { iCorrecta, iPulsada } = await responder(page, 'mal');
     await page.mouse.move(0, 0);
-    await page.waitForTimeout(400); // que acabe cualquier transición de fondo (globals.css anima `*`)
     const iNeutra = [0, 1, 2, 3].find((i) => i !== iCorrecta && i !== iPulsada) ?? 3;
     expect(await page.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBe('dark');
     const pintura = (i: number) =>
