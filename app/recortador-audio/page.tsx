@@ -6,9 +6,11 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { navegadorCodificaAac, codificarM4a, codificarWav } from './codificar';
 
 // Tipos
-type OutputFormat = 'mp3' | 'wav' | 'ogg';
+type OutputFormat = 'm4a' | 'wav';
+type SoporteAac = 'comprobando' | 'si' | 'no';
 
 interface AudioInfo {
   name: string;
@@ -51,10 +53,13 @@ export default function RecortadorAudioPage() {
   const [fadeOut, setFadeOut] = useState(0);
 
   // Estados de salida
-  const [outputFormat, setOutputFormat] = useState<OutputFormat>('mp3');
+  const [outputFormat, setOutputFormat] = useState<OutputFormat>('m4a');
+  const [soporteAac, setSoporteAac] = useState<SoporteAac>('comprobando');
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [processedSize, setProcessedSize] = useState<number | null>(null);
+  // Formato con el que se generó el resultado: la descarga lleva SU extensión
+  const [processedFormat, setProcessedFormat] = useState<OutputFormat | null>(null);
 
   // Estados UI
   const [isDragging, setIsDragging] = useState(false);
@@ -93,6 +98,17 @@ export default function RecortadorAudioPage() {
     };
   }, []);
 
+  // Sin codificador AAC, el único formato que se puede entregar de verdad es WAV
+  useEffect(() => {
+    let vigente = true;
+    navegadorCodificaAac().then((puede) => {
+      if (!vigente) return;
+      setSoporteAac(puede ? 'si' : 'no');
+      if (!puede) setOutputFormat('wav');
+    });
+    return () => { vigente = false; };
+  }, []);
+
   // Cargar archivo de audio
   const handleFileSelect = useCallback(async (file: File) => {
     if (!file.type.startsWith('audio/')) {
@@ -108,6 +124,7 @@ export default function RecortadorAudioPage() {
     setAudioFile(file);
     setProcessedUrl(null);
     setProcessedSize(null);
+    setProcessedFormat(null);
 
     // Crear URL para reproducción
     const url = URL.createObjectURL(file);
@@ -365,101 +382,45 @@ export default function RecortadorAudioPage() {
         }
       }
 
-      // Convertir a WAV (formato base)
-      const wavBlob = audioBufferToWav(newBuffer);
+      const blob = outputFormat === 'm4a' ? await codificarM4a(newBuffer) : codificarWav(newBuffer);
 
-      // Si el formato es WAV, usar directamente
-      if (outputFormat === 'wav') {
-        const url = URL.createObjectURL(wavBlob);
-        if (processedUrl) URL.revokeObjectURL(processedUrl);
-        setProcessedUrl(url);
-        setProcessedSize(wavBlob.size);
-      } else {
-        // Para MP3 y OGG, usamos WAV como fallback
-        // (La conversión real a MP3/OGG requeriría bibliotecas adicionales como lamejs)
-        // Por ahora, exportamos como WAV con la extensión correcta
-        const url = URL.createObjectURL(wavBlob);
-        if (processedUrl) URL.revokeObjectURL(processedUrl);
-        setProcessedUrl(url);
-        setProcessedSize(wavBlob.size);
-      }
+      const url = URL.createObjectURL(blob);
+      if (processedUrl) URL.revokeObjectURL(processedUrl);
+      setProcessedUrl(url);
+      setProcessedSize(blob.size);
+      setProcessedFormat(outputFormat);
     } catch (error) {
       console.error('Error al procesar audio:', error);
-      alert('Error al procesar el audio');
+      alert(outputFormat === 'm4a'
+        ? 'No se pudo codificar a M4A en este navegador. Prueba a exportar en WAV.'
+        : 'Error al procesar el audio');
     }
 
     setIsProcessing(false);
   }, [audioBuffer, startTime, endTime, volume, fadeIn, fadeOut, outputFormat, processedUrl, getAudioContext]);
 
-  // Convertir AudioBuffer a WAV
-  const audioBufferToWav = (buffer: AudioBuffer): Blob => {
-    const numberOfChannels = buffer.numberOfChannels;
-    const sampleRate = buffer.sampleRate;
-    const format = 1; // PCM
-    const bitDepth = 16;
-
-    const bytesPerSample = bitDepth / 8;
-    const blockAlign = numberOfChannels * bytesPerSample;
-
-    const dataLength = buffer.length * blockAlign;
-    const bufferLength = 44 + dataLength;
-
-    const arrayBuffer = new ArrayBuffer(bufferLength);
-    const view = new DataView(arrayBuffer);
-
-    // Escribir encabezado WAV
-    const writeString = (offset: number, string: string) => {
-      for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
-      }
-    };
-
-    writeString(0, 'RIFF');
-    view.setUint32(4, bufferLength - 8, true);
-    writeString(8, 'WAVE');
-    writeString(12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, format, true);
-    view.setUint16(22, numberOfChannels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * blockAlign, true);
-    view.setUint16(32, blockAlign, true);
-    view.setUint16(34, bitDepth, true);
-    writeString(36, 'data');
-    view.setUint32(40, dataLength, true);
-
-    // Escribir datos de audio
-    const channels: Float32Array[] = [];
-    for (let i = 0; i < numberOfChannels; i++) {
-      channels.push(buffer.getChannelData(i));
-    }
-
-    let offset = 44;
-    for (let i = 0; i < buffer.length; i++) {
-      for (let channel = 0; channel < numberOfChannels; channel++) {
-        const sample = Math.max(-1, Math.min(1, channels[channel][i]));
-        const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
-        view.setInt16(offset, intSample, true);
-        offset += 2;
-      }
-    }
-
-    return new Blob([arrayBuffer], { type: 'audio/wav' });
-  };
+  // Cambiar de formato invalida el resultado anterior, que se generó con el otro
+  const elegirFormato = useCallback((formato: OutputFormat) => {
+    if (formato === outputFormat) return;
+    if (processedUrl) URL.revokeObjectURL(processedUrl);
+    setProcessedUrl(null);
+    setProcessedSize(null);
+    setProcessedFormat(null);
+    setOutputFormat(formato);
+  }, [outputFormat, processedUrl]);
 
   // Descargar audio procesado
   const downloadAudio = useCallback(() => {
-    if (!processedUrl || !audioFile) return;
+    if (!processedUrl || !audioFile || !processedFormat) return;
 
     const baseName = audioFile.name.replace(/\.[^.]+$/, '');
-    const extension = outputFormat === 'mp3' ? 'mp3' : outputFormat === 'ogg' ? 'ogg' : 'wav';
-    const fileName = `${baseName}_recortado.${extension}`;
+    const fileName = `${baseName}_recortado.${processedFormat}`;
 
     const link = document.createElement('a');
     link.href = processedUrl;
     link.download = fileName;
     link.click();
-  }, [processedUrl, audioFile, outputFormat]);
+  }, [processedUrl, audioFile, processedFormat]);
 
   // Limpiar
   const handleClear = useCallback(() => {
@@ -479,6 +440,7 @@ export default function RecortadorAudioPage() {
     setFadeOut(0);
     setProcessedUrl(null);
     setProcessedSize(null);
+    setProcessedFormat(null);
 
     if (fileInputRef.current) fileInputRef.current.value = '';
 
@@ -693,32 +655,33 @@ export default function RecortadorAudioPage() {
               <div className={styles.formatButtons}>
                 <button
                   type="button"
-                  className={`${styles.formatBtn} ${outputFormat === 'mp3' ? styles.formatActive : ''}`}
-                  onClick={() => setOutputFormat('mp3')}
-                  aria-pressed={outputFormat === 'mp3'}
+                  className={`${styles.formatBtn} ${outputFormat === 'm4a' ? styles.formatActive : ''}`}
+                  onClick={() => elegirFormato('m4a')}
+                  aria-pressed={outputFormat === 'm4a'}
+                  disabled={soporteAac !== 'si'}
                 >
-                  MP3
+                  M4A (AAC)
                 </button>
                 <button
                   type="button"
                   className={`${styles.formatBtn} ${outputFormat === 'wav' ? styles.formatActive : ''}`}
-                  onClick={() => setOutputFormat('wav')}
+                  onClick={() => elegirFormato('wav')}
                   aria-pressed={outputFormat === 'wav'}
                 >
                   WAV
                 </button>
-                <button
-                  type="button"
-                  className={`${styles.formatBtn} ${outputFormat === 'ogg' ? styles.formatActive : ''}`}
-                  onClick={() => setOutputFormat('ogg')}
-                  aria-pressed={outputFormat === 'ogg'}
-                >
-                  OGG
-                </button>
               </div>
-              <p className={styles.formatNote}>
-                Nota: El audio se exporta en formato WAV de alta calidad. Los navegadores no soportan codificación nativa a MP3/OGG.
-              </p>
+              {soporteAac === 'no' ? (
+                <p key="sin-aac" className={styles.formatNote} role="status">
+                  Tu navegador no puede codificar AAC, así que el audio se exporta en WAV (sin pérdida,
+                  pero unas siete veces más pesado). Chrome y Edge sí codifican M4A.
+                </p>
+              ) : (
+                <p key="con-aac" className={styles.formatNote}>
+                  <strong>M4A (AAC)</strong>: unas siete veces más ligero que WAV y lo reproducen
+                  iPhone, Android, Windows y Mac. <strong>WAV</strong>: sin pérdida, para seguir editando.
+                </p>
+              )}
             </div>
 
             {/* Botones de acción */}
@@ -799,7 +762,7 @@ export default function RecortadorAudioPage() {
               <tr><td>OGG Vorbis</td><td>Con pérdida</td><td>~0,9 MB</td><td>Alta</td><td>Sin Apple</td><td>Web, videojuegos, streaming</td></tr>
               <tr><td>FLAC</td><td>Sin pérdida</td><td>~5 MB</td><td>Perfecta</td><td>Limitada</td><td>Archivado, audiófilos</td></tr>
               <tr><td>AAC</td><td>Con pérdida</td><td>~1 MB</td><td>Mejor que MP3</td><td>Universal (iOS)</td><td>Mobile, Apple, streaming</td></tr>
-              <tr><td>M4A</td><td>Con pérdida</td><td>~1 MB</td><td>Alta</td><td>Apple/Mac</td><td>iTunes, iPhone, iPad</td></tr>
+              <tr><td>M4A</td><td>Con pérdida</td><td>~1 MB</td><td>Alta</td><td>Muy amplia</td><td>Tonos de llamada, móviles, compartir</td></tr>
               <tr><td>AIFF</td><td>Sin pérdida</td><td>~10 MB</td><td>Perfecta</td><td>Apple</td><td>Producción en Mac, Logic Pro</td></tr>
               <tr><td>OPUS</td><td>Con pérdida</td><td>~0,6 MB</td><td>Excelente (voz)</td><td>Web moderna</td><td>Voz, videoconferencias, Discord</td></tr>
             </tbody>
@@ -810,7 +773,7 @@ export default function RecortadorAudioPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <h3><span aria-hidden="true">📱</span> Crear tono de llamada personalizado</h3>
-            <p>Recorta tu canción favorita a 30-40 segundos y añade un fade out al final para un tono profesional sin cortes bruscos. La mayoría de móviles aceptan WAV directamente.</p>
+            <p>Recorta tu canción favorita a 30-40 segundos, añade un fade out al final y expórtala en M4A. Android la acepta como tono tal cual; en iPhone, el tono dura 40 segundos como máximo y necesita la extensión .m4r: cambia la extensión del archivo y pásalo al teléfono con el Finder (Mac) o iTunes (Windows).</p>
           </div>
           <div className={styles.escenarioCard}>
             <h3><span aria-hidden="true">🎬</span> Sincronizar audio con vídeo</h3>
@@ -837,8 +800,8 @@ export default function RecortadorAudioPage() {
         {/* Sección 3: FAQ ampliado */}
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
-            <h3>¿Por qué el archivo se descarga siempre como WAV aunque elija MP3?</h3>
-            <p>Los navegadores no pueden codificar audio a MP3 de forma nativa por restricciones técnicas y de patentes. WAV es el único formato sin pérdida disponible de forma nativa. Para convertir a MP3, usa Audacity o ffmpeg localmente.</p>
+            <h3>¿En qué formato se descarga el audio recortado?</h3>
+            <p>En M4A (AAC) o en WAV, a tu elección. El M4A lo codifica el propio navegador: pesa unas siete veces menos que el WAV y lo reproducen iPhone, Android, Windows y Mac. El WAV no pierde calidad y es el que conviene para seguir editando. Si tu navegador no puede codificar AAC, la app lo indica y solo ofrece WAV.</p>
           </div>
           <div className={styles.faqItem}>
             <h3>¿Mis archivos de audio son seguros?</h3>
@@ -861,8 +824,8 @@ export default function RecortadorAudioPage() {
             <p>Es una API nativa del navegador para procesar y sintetizar audio directamente en JavaScript, sin plugins. Permite decodificar, manipular y reproducir audio con alta precisión temporal, todo localmente en tu dispositivo.</p>
           </div>
           <div className={styles.faqItem}>
-            <h3>¿Por qué no puedo recortar directamente un MP3 sin convertir a WAV?</h3>
-            <p>Para recortar audio con precisión, el navegador debe decodificarlo a PCM (sin compresión) en memoria, manipularlo y re-codificarlo. La re-codificación nativa solo produce WAV; para MP3 se necesitan librerías externas como lamejs.</p>
+            <h3>¿Por qué hay que volver a codificar el audio al recortarlo?</h3>
+            <p>Para recortar audio con precisión, el navegador debe decodificarlo a PCM (sin compresión) en memoria, manipularlo y volver a codificarlo. Los navegadores no traen codificador de MP3, así que el recorte se codifica en AAC (el M4A), que con el mismo peso suena igual o mejor, o se guarda en WAV sin compresión.</p>
           </div>
           <div className={styles.faqItem}>
             <h3>¿Cómo consigo la mayor calidad posible en el resultado?</h3>
@@ -890,7 +853,7 @@ export default function RecortadorAudioPage() {
             <div className={styles.stepNumber}>3</div>
             <div className={styles.stepContent}>
               <h3>Ajusta el punto de inicio</h3>
-              <p>Mueve el slider de inicio o escribe los segundos exactos en el campo correspondiente. La precisión es de centésimas de segundo.</p>
+              <p>Mueve el control de inicio. Avanza en centésimas de segundo: con las flechas del teclado puedes moverlo de centésima en centésima.</p>
             </div>
           </div>
           <div className={styles.step}>
@@ -918,7 +881,7 @@ export default function RecortadorAudioPage() {
             <div className={styles.stepNumber}>7</div>
             <div className={styles.stepContent}>
               <h3>Procesa y descarga</h3>
-              <p>Pulsa &quot;Recortar y Procesar&quot;. El audio procesado aparecerá con un reproductor para verificar antes de descargar. El archivo tendrá el sufijo &quot;_recortado&quot;.</p>
+              <p>Elige M4A o WAV y pulsa &quot;Recortar y Procesar&quot;. El audio procesado aparecerá con un reproductor para verificar antes de descargar. El archivo tendrá el sufijo &quot;_recortado&quot;.</p>
             </div>
           </div>
         </div>
@@ -946,8 +909,8 @@ export default function RecortadorAudioPage() {
             <p>Si vas a importar el resultado en un editor de audio (Audacity, Logic, Premiere), usa siempre WAV. Cada conversión a formato con pérdida (MP3) degrada la calidad acumulativamente.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3><span aria-hidden="true">⏱️</span> Usa los campos numéricos para precisión máxima</h3>
-            <p>Los sliders son útiles para aproximarte al fragmento, pero los campos de segundos te dan precisión de centésimas. Para cortes exactos en producción, siempre escribe el valor manualmente.</p>
+            <h3><span aria-hidden="true">⏱️</span> Afina el corte con el teclado</h3>
+            <p>Arrastra los controles para acercarte al fragmento y termina con las flechas del teclado, que mueven el corte de centésima en centésima. Reproduce la selección antes de procesar para comprobar que no corta una palabra o una nota.</p>
           </div>
         </div>
 
@@ -955,7 +918,7 @@ export default function RecortadorAudioPage() {
         <div className={styles.warningBox}>
           <h3><span aria-hidden="true">⚠️</span> Limitaciones técnicas y legales</h3>
           <ul className={styles.warningList}>
-            <li>Los navegadores no codifican MP3/OGG de forma nativa; el archivo exportado siempre es WAV, independientemente del formato seleccionado.</li>
+            <li>Los navegadores no traen codificador de MP3 ni de OGG: el recorte se exporta en M4A (AAC) o en WAV. Si tu navegador no codifica AAC, solo está disponible WAV.</li>
             <li>La calidad del resultado está limitada por la calidad del archivo original. No se puede recuperar calidad perdida en una codificación previa.</li>
             <li>Para archivos superiores a 100 MB, el procesamiento puede ser lento o consumir mucha memoria RAM según tu dispositivo.</li>
             <li>Respeta los derechos de autor al recortar y reutilizar audio de terceros, incluso para uso personal.</li>
@@ -1043,11 +1006,11 @@ export default function RecortadorAudioPage() {
 
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>¿Por qué el archivo se descarga como WAV?</h4>
+              <h4>¿Por qué no se puede descargar en MP3?</h4>
               <p>
-                Los navegadores web no pueden codificar audio a MP3 u OGG de forma nativa
-                debido a patentes y limitaciones técnicas. WAV es el formato sin pérdida
-                que garantiza la mejor calidad posible.
+                Los navegadores no traen codificador de MP3 ni de OGG. Sí traen el de AAC,
+                el formato del M4A, que con el mismo peso suena igual o mejor que un MP3 y
+                se reproduce en cualquier móvil u ordenador actual. Para no perder nada, WAV.
               </p>
             </div>
             <div className={styles.faqItem}>

@@ -352,8 +352,14 @@
   transition: all 0.2s ease;
 }
 
-.formatBtn:hover {
+.formatBtn:hover:not(:disabled) {
   border-color: var(--primary);
+}
+
+/* M4A sin codificador AAC en el navegador (o mientras se comprueba) */
+.formatBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .formatActive {
