@@ -362,7 +362,7 @@ export default function GeneradorMetaDescripcionesPage() {
                   type="button"
                   onClick={() => setHtmlExpanded(!htmlExpanded)}
                   className={styles.btnToggleCode}
-                  aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
+                  aria-expanded={htmlExpanded}
                 >
                   {htmlExpanded ? <><span aria-hidden="true">🔼</span> Ocultar código</> : <><span aria-hidden="true">🔽</span> Ver código completo</>}
                 </button>
@@ -518,7 +518,7 @@ export default function GeneradorMetaDescripcionesPage() {
                 </div>
                 <div className={styles.escenarioExample}>
                   <p><strong>Ejemplo:</strong></p>
-                  <code>
+                  <code>{/* a11y-ok: los emojis son parte del ejemplo de meta descripción, que la app evalúa por usar símbolos; ocultarlos haría leer otro ejemplo */}
                     Fontanero urgente 24h en Madrid Centro. 15 años de experiencia. ⭐ 4.9/5 (200+ reseñas).
                     Presupuesto sin compromiso. ☎️ Llámanos ahora: 900 123 456
                   </code>

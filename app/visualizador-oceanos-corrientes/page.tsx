@@ -533,7 +533,7 @@ export default function VisualizadorOceanosCorreintes() {
                 )}
                 {sinCorriente && (
                   <text x="360" y="199" fontSize="10" fill="#c0392b" textAnchor="middle" fontWeight="700">
-                    ⚠ Sin corriente: Europa -5 a -10°C
+                    <tspan aria-hidden="true">⚠</tspan> Sin corriente: Europa -5 a -10°C
                   </text>
                 )}
               </svg>

@@ -883,8 +883,8 @@ export default function JuegoSpaceInvadersPage() {
               <details>
                 <summary>¿Qué invasor da más puntos?</summary>
                 <p>
-                  En esta versión, los invasores de la fila superior (<span aria-hidden="true">👾</span>) valen 30 puntos, los de la
-                  fila intermedia (<span aria-hidden="true">👽</span>) valen 20 puntos, y los de la fila inferior (<span aria-hidden="true">🛸</span>) valen 10 puntos.
+                  En esta versión, los invasores de la fila superior (<span role="img" aria-label="marciano">👾</span>) valen 30 puntos, los de la
+                  fila intermedia (<span role="img" aria-label="alienígena">👽</span>) valen 20 puntos, y los de la fila inferior (<span role="img" aria-label="platillo volante">🛸</span>) valen 10 puntos.
                   Cada vez que destruyes un invasor se genera una pequeña explosión de partículas en
                   su posición, una referencia visual al feedback de impacto del arcade original.
                 </p>
@@ -1021,8 +1021,8 @@ export default function JuegoSpaceInvadersPage() {
               <span className={styles.tipIcon} aria-hidden="true">👾</span>
               <h4>Prioriza según la fila cuando puedas elegir</h4>
               <p>
-                Los invasores <span aria-hidden="true">👾</span> de la fila superior valen 30 puntos, los <span aria-hidden="true">👽</span> de la fila media 20, y
-                los <span aria-hidden="true">🛸</span> de la fila inferior 10. Si tienes vía libre hacia varias filas, apunta primero
+                Los invasores <span role="img" aria-label="marciano">👾</span> de la fila superior valen 30 puntos, los <span role="img" aria-label="alienígena">👽</span> de la fila media 20, y
+                los <span role="img" aria-label="platillo volante">🛸</span> de la fila inferior 10. Si tienes vía libre hacia varias filas, apunta primero
                 a los de mayor valor sin descuidar la amenaza inmediata de los que están más cerca.
               </p>
             </div>
@@ -1053,8 +1053,8 @@ export default function JuegoSpaceInvadersPage() {
                 que eran fácilmente esquivables con un simple paso lateral a tiempo.
               </li>
               <li>
-                <strong>Dejar pasar a los invasores de mayor valor.</strong> Los invasores <span aria-hidden="true">👾</span> de la
-                fila superior valen 30 puntos, el triple que los <span aria-hidden="true">🛸</span> de la fila inferior. Centrarte
+                <strong>Dejar pasar a los invasores de mayor valor.</strong> Los invasores <span role="img" aria-label="marciano">👾</span> de la
+                fila superior valen 30 puntos, el triple que los <span role="img" aria-label="platillo volante">🛸</span> de la fila inferior. Centrarte
                 solo en los más cercanos y descuidar las filas superiores cuando tienes línea de
                 tiro libre te hace perder puntuación fácil de conseguir.
               </li>

@@ -613,38 +613,38 @@ export default function ComparadorAsistentesCodigo() {
             <tbody>
               <tr>
                 <td><strong>CLI / Terminal</strong></td>
-                <td><span aria-hidden="true">✅</span> Claude Code CLI</td>
-                <td><span aria-hidden="true">✅</span> gh extension</td>
-                <td>❌</td>
-                <td><span aria-hidden="true">✅</span> Codex CLI</td>
+                <td><span role="img" aria-label="Sí">✅</span> Claude Code CLI</td>
+                <td><span role="img" aria-label="Sí">✅</span> gh extension</td>
+                <td><span role="img" aria-label="No">❌</span></td>
+                <td><span role="img" aria-label="Sí">✅</span> Codex CLI</td>
               </tr>
               <tr>
                 <td><strong>Extensión IDE</strong></td>
-                <td><span aria-hidden="true">✅</span> VS Code, JetBrains</td>
-                <td><span aria-hidden="true">✅</span> VS Code, JetBrains, Neovim, Xcode</td>
-                <td><span aria-hidden="true">✅</span> VS Code, JetBrains</td>
-                <td><span aria-hidden="true">❌</span> Sin extensión propia</td>
+                <td><span role="img" aria-label="Sí">✅</span> VS Code, JetBrains</td>
+                <td><span role="img" aria-label="Sí">✅</span> VS Code, JetBrains, Neovim, Xcode</td>
+                <td><span role="img" aria-label="Sí">✅</span> VS Code, JetBrains</td>
+                <td><span role="img" aria-label="No">❌</span> Sin extensión propia</td>
               </tr>
               <tr>
                 <td><strong>Agente cloud autónomo</strong></td>
-                <td><span aria-hidden="true">❌</span> Opera en tu máquina</td>
-                <td><span aria-hidden="true">✅</span> Copilot Workspace</td>
-                <td><span aria-hidden="true">✅</span> Jules (experimental)</td>
-                <td><span aria-hidden="true">✅</span> Codex (cloud agent)</td>
+                <td><span role="img" aria-label="No">❌</span> Opera en tu máquina</td>
+                <td><span role="img" aria-label="Sí">✅</span> Copilot Workspace</td>
+                <td><span role="img" aria-label="Sí">✅</span> Jules (experimental)</td>
+                <td><span role="img" aria-label="Sí">✅</span> Codex (cloud agent)</td>
               </tr>
               <tr>
                 <td><strong>Chat web / app</strong></td>
-                <td><span aria-hidden="true">✅</span> Claude.ai</td>
-                <td><span aria-hidden="true">✅</span> copilot.github.com</td>
-                <td><span aria-hidden="true">✅</span> gemini.google.com</td>
-                <td><span aria-hidden="true">✅</span> ChatGPT</td>
+                <td><span role="img" aria-label="Sí">✅</span> Claude.ai</td>
+                <td><span role="img" aria-label="Sí">✅</span> copilot.github.com</td>
+                <td><span role="img" aria-label="Sí">✅</span> gemini.google.com</td>
+                <td><span role="img" aria-label="Sí">✅</span> ChatGPT</td>
               </tr>
               <tr>
                 <td><strong>Plan gratuito</strong></td>
-                <td><span aria-hidden="true">❌</span> Solo muy limitado</td>
-                <td><span aria-hidden="true">✅</span> 2.000 comp/mes</td>
-                <td><span aria-hidden="true">✅</span> 6.000 comp/día</td>
-                <td><span aria-hidden="true">❌</span> Muy limitado</td>
+                <td><span role="img" aria-label="No">❌</span> Solo muy limitado</td>
+                <td><span role="img" aria-label="Sí">✅</span> 2.000 comp/mes</td>
+                <td><span role="img" aria-label="Sí">✅</span> 6.000 comp/día</td>
+                <td><span role="img" aria-label="No">❌</span> Muy limitado</td>
               </tr>
             </tbody>
           </table>

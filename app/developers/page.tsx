@@ -146,7 +146,7 @@ export default function DevelopersPage() {
             style={{ cursor: 'pointer', border: 'none' }}
             aria-label="Copiar URL del servidor MCP"
           >
-            {copiado ? '✓ Copiado' : '📋 Copiar'}
+            {copiado ? <span key="si"><span aria-hidden="true">✓</span> Copiado</span> : <span key="no"><span aria-hidden="true">📋</span> Copiar</span>}
           </button>
         </div>
 
