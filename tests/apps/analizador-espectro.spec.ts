@@ -517,6 +517,8 @@ test.describe('Los 8 hallazgos del 18/09/2026, reparados el mismo día', () => {
 type VentanaEspia = Window & {
   __contextosApp?: AudioContext[];
   __pistas?: MediaStreamTrack[];
+  /** Cada llamada a getUserMedia del espía: cuándo empezó, cuándo acabó y cómo (cabo C0352). */
+  __llamadasMicro?: { inicio: number; fin?: number; resultado?: string }[];
   __maxByte?: number;
   __rellenos?: { color: string; alto: number; ancho: number; lienzoAncho: number; lienzoAlto: number }[];
 };
@@ -730,12 +732,21 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       await page.addInitScript(() => {
         const w = window as VentanaEspia;
         w.__pistas = [];
+        w.__llamadasMicro = [];
         const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
         navigator.mediaDevices.getUserMedia = async (r?: MediaStreamConstraints) => {
+          const llamada: { inicio: number; fin?: number; resultado?: string } = { inicio: performance.now() };
+          w.__llamadasMicro?.push(llamada);
           await new Promise((resolver) => setTimeout(resolver, 400));
-          const flujo = await original(r);
-          w.__pistas?.push(...flujo.getTracks());
-          return flujo;
+          try {
+            const flujo = await original(r);
+            w.__pistas?.push(...flujo.getTracks());
+            Object.assign(llamada, { fin: performance.now(), resultado: `${flujo.getTracks().length} pista(s)` });
+            return flujo;
+          } catch (e) {
+            Object.assign(llamada, { fin: performance.now(), resultado: `error ${(e as Error).name}` });
+            throw e;
+          }
         };
       });
       await page.goto('/analizador-espectro/');
@@ -746,7 +757,31 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       // y bajo la suite de 4 workers el micrófono emulado, más los 400 ms del espía, pasó dos
       // veces de 5 s. La captura de los dos rojos («Iniciar análisis», sin error) es la de una
       // apertura aún pendiente; aislado pasa siempre (5 de 5).
-      await expect(page.getByRole('button', { name: /Detener/ })).toBeVisible({ timeout: 15_000 });
+      // Cabo C0352 (22/10/2026): siguió fallando 1 de cada 5 suites con los 15 s, así que no es solo
+      // lentitud. Si vuelve, el mensaje dice si getUserMedia llegó a resolver, cuántas veces se llamó,
+      // y en qué estado quedaron pistas, contextos y botones: el primer paso del diagnóstico.
+      try {
+        await expect(page.getByRole('button', { name: /Detener/ })).toBeVisible({ timeout: 15_000 });
+      } catch (e) {
+        const diagnostico = await page.evaluate(() => {
+          const w = window as VentanaEspia;
+          const ahora = performance.now();
+          return {
+            llamadasMicro: (w.__llamadasMicro ?? []).map((l) => ({
+              hace: Math.round(ahora - l.inicio),
+              duro: l.fin === undefined ? 'sin resolver' : Math.round(l.fin - l.inicio),
+              resultado: l.resultado ?? 'pendiente',
+            })),
+            pistas: (w.__pistas ?? []).map((p) => p.readyState),
+            contextos: (w.__contextosApp ?? []).map((c) => c.state),
+            botones: [...document.querySelectorAll('button')]
+              .map((b) => (b.textContent ?? '').trim())
+              .filter((t) => /Iniciar|Detener|análisis/i.test(t)),
+            alertas: [...document.querySelectorAll('[role="alert"]')].map((a) => (a.textContent ?? '').trim()),
+          };
+        });
+        throw new Error(`${(e as Error).message}\n\nDIAGNÓSTICO C0352: ${JSON.stringify(diagnostico)}`);
+      }
       await page.waitForTimeout(1000);
       await page.getByRole('button', { name: /Detener/ }).click();
       await expect(botonIniciar(page)).toBeVisible();
