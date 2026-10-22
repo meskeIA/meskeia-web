@@ -15,7 +15,7 @@ import {
   COMPLEMENTO_MATERNIDAD_DEROGADO,
   EFECTOS_COMPLEMENTO_BRECHA_VARONES,
   FISCAL_PENSIONES_META,
-  LIMITES_PENSION_2025,
+  LIMITES_PENSION_2026,
   RECLAMACION_PREVIA_SS_META,
 } from '@/data/fiscal';
 import { calcularAtrasos, type ResultadoAtrasos } from './atrasos';
@@ -95,7 +95,7 @@ const TIPOS_CON_PRORRATA: readonly TipoPension[] = ['jubilacion', 'incapacidad',
 const CUANTIA_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual);
 const MAX_HIJOS = COMPLEMENTO_BRECHA_GENERO_2026.maxHijos;
 const MAX_MES = formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.maxMensual);
-const PENSION_MAXIMA_MES = formatCurrency(LIMITES_PENSION_2025.maximaMensual);
+const PENSION_MAXIMA_MES = formatCurrency(LIMITES_PENSION_2026.maximaMensual);
 /**
  * Fecha mínima del hecho causante, leída de `data/fiscal` y no tecleada aquí (hallazgo 504):
  * hasta esta reparación el dato vivía declarado en el módulo fiscal sin ningún consumidor,

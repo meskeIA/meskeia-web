@@ -10,7 +10,7 @@ import {
   COTIZACION_MINIMA,
   getEscalaPorcentajePension,
   ESCALA_PORCENTAJE_PENSION_META,
-  LIMITES_PENSION_2025,
+  LIMITES_PENSION_2026,
   FISCAL_PENSIONES_META,
 } from '@/data/fiscal';
 import { formatCurrency, formatDate, parseISODateLocal } from '@/lib';
@@ -41,10 +41,10 @@ const [ESCALA_HOY, ESCALA_2027] = COLUMNAS_ESCALA;
 
 // Límites de pensión 2026 (€/mes, 14 pagas)
 const LIMITES = [
-  { concepto: 'Pensión máxima', importe: LIMITES_PENSION_2025.maximaMensual },
-  { concepto: 'Mínima con cónyuge a cargo (≥65)', importe: LIMITES_PENSION_2025.minimaConConyuge },
-  { concepto: 'Mínima unidad unipersonal (≥65)', importe: LIMITES_PENSION_2025.minimaSolo },
-  { concepto: 'Mínima con cónyuge no a cargo (≥65)', importe: LIMITES_PENSION_2025.minimaSinConyuge },
+  { concepto: 'Pensión máxima', importe: LIMITES_PENSION_2026.maximaMensual },
+  { concepto: 'Mínima con cónyuge a cargo (≥65)', importe: LIMITES_PENSION_2026.minimaConConyuge },
+  { concepto: 'Mínima unidad unipersonal (≥65)', importe: LIMITES_PENSION_2026.minimaSolo },
+  { concepto: 'Mínima con cónyuge no a cargo (≥65)', importe: LIMITES_PENSION_2026.minimaSinConyuge },
 ];
 
 // Formatea años y meses: «66 años y 10 meses» / «65 años»
@@ -247,7 +247,7 @@ export default function PensionesJubilacionPage() {
               </table>
             </div>
             <p className={styles.tableFoot}>
-              La pensión máxima anual asciende a {formatCurrency(LIMITES_PENSION_2025.maximaAnual)} (14
+              La pensión máxima anual asciende a {formatCurrency(LIMITES_PENSION_2026.maximaAnual)} (14
               pagas). Las cuantías mínimas requieren acreditar límites de ingresos y se complementan
               hasta el mínimo garantizado cuando la pensión calculada queda por debajo.
             </p>

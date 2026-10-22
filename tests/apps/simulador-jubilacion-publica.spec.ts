@@ -36,7 +36,7 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *     · BASE_REGULADORA.factor = 300/350 = 0,857142857…
  *     · SISTEMA_DUAL_TRANSICION[2026] (DT 40.ª LGSS) → basesSeleccionadas 302 / divisor
  *       352,33 = 0,857150…
- *     · LIMITES_PENSION_2025 → maximaMensual 3.359,60 € · maximaAnual 47.034,40 €
+ *     · LIMITES_PENSION_2026 → maximaMensual 3.359,60 € · maximaAnual 47.034,40 €
  *       · minimaSinConyuge 888,70 €.
  *     · COMPLEMENTO_MINIMOS_LIMITES_2026 → 9.442 € sin cónyuge a cargo · 11.013 € con él.
  *     · COTIZACION_MINIMA.anosMinimosAcceso = 15. El 100 % lo fija la escala del año (444 meses).
@@ -73,7 +73,7 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *       %          456 meses pasa del mes 444 → 100,00 %
  *       BR         5.000 × 300/350 = 4.285,71 €
  *       pensión    las DOS fórmulas superan el tope → 3.359,60 €/mes, y ahora la app lo DICE
- *       anual      3.359,60 × 14 = 47.034,40 € = LIMITES_PENSION_2025.maximaAnual clavado
+ *       anual      3.359,60 × 14 = 47.034,40 € = LIMITES_PENSION_2026.maximaAnual clavado
  *
  *   CASO 3 (escala, hallazgos 1093 y S0163) — 1965 · 28 años (336 meses) · base 1.200 €/mes
  *       año        se jubila en 2032 (336 meses < 462 → 67 años): escala de 2027
@@ -134,7 +134,7 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *   CASO 10 (el tope depende de la escala) — 1980 · 26,5 años (318 m) · 5.101,20 €
  *       BR 5.101,20 × 300/350 = 4.372,4571 · % 2027: 50 + 138 × 0,19 = 76,22
  *       pensión 3.332,69 €/mes, SIN tope. Con la de 2026 (77,20 %) saldrían 3.375,54 y la
- *       app recortaría a LIMITES_PENSION_2025.maximaMensual = 3.359,60 con su aviso.
+ *       app recortaría a LIMITES_PENSION_2026.maximaMensual = 3.359,60 con su aviso.
  *
  *   CASO 11 (mínimo de acceso justo) — 1985 · 15 años (180 m) · 1.500 €
  *       50,00 % · BR 1.285,71 · pensión 642,86 < 888,70 → aviso de mínimos · faltan 264 m = 22 años.
@@ -273,9 +273,9 @@ test('CASO 2 · límite: sin cotización suficiente son 67 años, y la pensión 
   await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('100,00'));
   await expect(valorDe(page, 'Base reguladora (25 años / 350)')).toContainText('4285,71');
 
-  // ── …y la pensión se corta en LIMITES_PENSION_2025.maximaMensual = 3.359,60 € ──
+  // ── …y la pensión se corta en LIMITES_PENSION_2026.maximaMensual = 3.359,60 € ──
   expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(3359.60, 2);
-  // 3.359,60 × 14 = LIMITES_PENSION_2025.maximaAnual, clavado.
+  // 3.359,60 × 14 = LIMITES_PENSION_2026.maximaAnual, clavado.
   expect(await importeDe(page, 'Pensión anual (14 pagas)')).toBeCloseTo(47034.40, 2);
 
   // Hallazgo 1097: el recorte se ANUNCIA. Antes la única pista era que la cifra no cuadrase

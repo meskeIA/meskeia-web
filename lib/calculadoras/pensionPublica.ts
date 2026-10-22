@@ -13,7 +13,7 @@ import {
   getEscalaPorcentajePension,
   BASE_REGULADORA,
   COTIZACION_MINIMA,
-  LIMITES_PENSION_2025,
+  LIMITES_PENSION_2026,
   getEdadJubilacion,
   getSistemaDualParams,
   FISCAL_PENSIONES_META,
@@ -169,8 +169,8 @@ export function calcularPensionPublica(p: ParametrosPensionPublica): ResultadoPe
   const pensionDualSinLimites = r(baseReguladoraDual * (porcentajePension / 100));
 
   // 4. Aplicar mínimos y máximo a cada fórmula
-  const pensionMinima = LIMITES_PENSION_2025.minimaSinConyuge; // referencia sin cónyuge a cargo
-  const pensionMaxima = LIMITES_PENSION_2025.maximaMensual;
+  const pensionMinima = LIMITES_PENSION_2026.minimaSinConyuge; // referencia sin cónyuge a cargo
+  const pensionMaxima = LIMITES_PENSION_2026.maximaMensual;
 
   // ⚠️ 2026-09-21 (hallazgo 1089 del Inspector): aquí se elevaba al mínimo CUALQUIER
   //    pensión menor, sin condición alguna. El complemento a mínimos no es automático —

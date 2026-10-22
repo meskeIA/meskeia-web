@@ -22,7 +22,7 @@ import {
   getEdadJubilacion,
   COTIZACION_MINIMA,
   getEscalaPorcentajePension,
-  LIMITES_PENSION_2025,
+  LIMITES_PENSION_2026,
   BASE_REGULADORA,
   BASES_SS_2026,
   getSistemaDualParams,
@@ -183,7 +183,7 @@ function calcularEdadOrdinaria(mesesCotizados: number, anioJubilacion: number): 
  *    es no tocar la cuantía y AVISAR de que puede haber derecho a complemento.
  */
 function aplicarTopeMaximo(pensionBruta: number): { pension: number; topeAplicado: boolean } {
-  const pension = Math.min(LIMITES_PENSION_2025.maximaMensual, pensionBruta);
+  const pension = Math.min(LIMITES_PENSION_2026.maximaMensual, pensionBruta);
   return { pension, topeAplicado: pension !== pensionBruta };
 }
 
@@ -223,9 +223,9 @@ function estimarPension(baseMensualMedia: number, anosCotizados: number, anioJub
     edadOrdinaria: calcularEdadOrdinaria(mesesCotizados, anioJubilacion),
     mesesQueFaltanParaCien: mesesQueFaltanParaCien(mesesCotizados, anioJubilacion),
     mesesParaCienTotal: getEscalaPorcentajePension(anioJubilacion).mesesParaCien,
-    porcentajeSobreMaxima: (pensionFinal / LIMITES_PENSION_2025.maximaMensual) * 100,
+    porcentajeSobreMaxima: (pensionFinal / LIMITES_PENSION_2026.maximaMensual) * 100,
     pensionMensualFinal: pensionFinal,
-    bajoMinimo: pensionFinal < LIMITES_PENSION_2025.minimaSinConyuge,
+    bajoMinimo: pensionFinal < LIMITES_PENSION_2026.minimaSinConyuge,
   };
 }
 
@@ -675,7 +675,7 @@ export default function SimuladorJubilacionPublicaPage() {
                 <div className={styles.resultItem}>
                   <span className={styles.resultLabel}>Tope máximo aplicado</span>
                   <span className={styles.resultNote}>
-                    El cálculo supera la pensión máxima ({formatCurrency(LIMITES_PENSION_2025.maximaMensual)}/mes)
+                    El cálculo supera la pensión máxima ({formatCurrency(LIMITES_PENSION_2026.maximaMensual)}/mes)
                     y se ha recortado a ese tope, que es el que fija la ley.
                   </span>
                 </div>
@@ -683,7 +683,7 @@ export default function SimuladorJubilacionPublicaPage() {
 
               <div className={styles.barraProgreso}>
                 <div className={styles.barraLabel}>
-                  <span>Sobre pensión máxima ({formatCurrency(LIMITES_PENSION_2025.maximaMensual)})</span>
+                  <span>Sobre pensión máxima ({formatCurrency(LIMITES_PENSION_2026.maximaMensual)})</span>
                   <span>{formatNumber(resultadoPension.porcentajeSobreMaxima, 1)}&nbsp;%</span>
                 </div>
                 <div
@@ -707,16 +707,16 @@ export default function SimuladorJubilacionPublicaPage() {
                 </div>
                 <p>
                   La cuantía calculada ({formatCurrency(resultadoPension.pensionMensualFinal)}/mes) no llega a la
-                  pensión mínima de referencia ({formatCurrency(LIMITES_PENSION_2025.minimaSinConyuge)}/mes, sin cónyuge a cargo).
+                  pensión mínima de referencia ({formatCurrency(LIMITES_PENSION_2026.minimaSinConyuge)}/mes, sin cónyuge a cargo).
                   Eso <strong>no</strong> significa que vayas a cobrar automáticamente el mínimo: el complemento a
                   mínimos depende de tus rentas y de con quién convivas, y esta herramienta no pregunta ninguna de
                   las dos cosas. En {FISCAL_PENSIONES_META.vigencia} se exige no superar{' '}
                   {formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)}/año de rentas distintas de la
                   pensión ({formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.conConyuge)}/año con cónyuge a cargo),
                   y la cuantía garantizada cambia según el caso:{' '}
-                  {formatCurrency(LIMITES_PENSION_2025.minimaSinConyuge)} con cónyuge no a cargo,{' '}
-                  {formatCurrency(LIMITES_PENSION_2025.minimaSolo)} en unidad unipersonal y{' '}
-                  {formatCurrency(LIMITES_PENSION_2025.minimaConConyuge)} con cónyuge a cargo.
+                  {formatCurrency(LIMITES_PENSION_2026.minimaSinConyuge)} con cónyuge no a cargo,{' '}
+                  {formatCurrency(LIMITES_PENSION_2026.minimaSolo)} en unidad unipersonal y{' '}
+                  {formatCurrency(LIMITES_PENSION_2026.minimaConConyuge)} con cónyuge a cargo.
                 </p>
               </div>
             )}

@@ -180,9 +180,11 @@ export function getEscalaPorcentajePension(anioJubilacion: number): EscalaPorcen
 }
 
 // ─── Límites de pensión 2026 (euros/mes, 14 pagas) ───────────────────────────
-// Actualizado 2026-03-16. Revalorización ~2,8% IPC.
+// Máxima: art. 1 del RD 241/2026 (BOE-A-2026-6977), 3.359,60 €/mes o 47.034,40 €/año; mínimas,
+// su Anexo I. Revalorización general de 2026: 2,7 % (art. 6). Cotejado en el BOE el 22/10/2026.
+// Se llamó LIMITES_PENSION_2025 hasta ese día con las cifras de 2026 dentro (cabo C0093).
 
-export const LIMITES_PENSION_2025 = {
+export const LIMITES_PENSION_2026 = {
   maximaMensual:   3359.60,  // Pensión máxima mensual 2026 (era 3.267,60 en 2025)
   maximaAnual:     47034.40, // Pensión máxima anual (× 14 pagas)
   minimaConConyuge: 1256.60, // Mínima ≥65 con cónyuge a cargo (17.592,40 € / 14)
@@ -433,14 +435,21 @@ export function minimoViudedad2026(edad: number, tieneCargasFamiliares: boolean,
 // SMI 2026: 1.221 €/mes (RD 126/2026) — ver data/fiscal/smi.ts
 
 export const PENSION_VIUDEDAD_2026 = {
-  // Porcentajes aplicables sobre la base reguladora (LGSS art. 231)
+  // Porcentajes sobre la base reguladora: el 52 % y el 70 % son los apartados 1 y 2 del art. 31
+  // del Decreto 3158/1966 (BOE-A-1966-21116, redacción de los RD 1465/2001 y 1795/2003), leído
+  // en el BOE el 22/10/2026. El 60 % no está en ese artículo: su fuente queda por cotejar. Hasta
+  // ese día se citaba el art. 231 LGSS, que trata del impedimento por homicidio (cabo C0134).
   porcentajeGeneral:       52,   // % — Caso general
   porcentaje60:            60,   // % — ≥65 años sin otra pensión pública y rentas < SMI
   porcentaje70:            70,   // % — Cargas familiares + rentas del trabajo < 75% SMI
 
   // SMI 2026 mensual (14 pagas, RD 126/2026 — ver data/fiscal/smi.ts)
   smiMensual:            SMI_2026.mensual14, // 1.221 €
-  limiteIngresos70:      Math.round(SMI_2026.mensual14 * 0.75), // 916 € = 75% del SMI 2026
+  // 915,75 € = 75 % del SMI mensual «excluida la parte proporcional de dos pagas extraordinarias»
+  // (art. 31.2 del Decreto 3158/1966). Hasta el 22/10/2026 se redondeaba a 916 €, al alza de un
+  // umbral legal (cabo C0134). Ojo: la norma lo aplica a la renta POR MIEMBRO de la unidad
+  // familiar, para definir las cargas familiares, no a los ingresos propios del pensionista.
+  limiteIngresos70:      Math.round(SMI_2026.mensual14 * 0.75 * 100) / 100,
 
   // Mínimos 2026: derivados de MINIMOS_VIUDEDAD_2026, nunca escritos a mano.
   // «Con cargas» no depende de la edad, pese al nombre heredado del campo.
@@ -450,8 +459,8 @@ export const PENSION_VIUDEDAD_2026 = {
   minimo65SinDiscap:      MINIMOS_VIUDEDAD_2026.desde65oDiscapacidad65,
   minimo65ConDiscap65:    MINIMOS_VIUDEDAD_2026.desde65oDiscapacidad65,
 
-  // Pensión máxima SS 2026 (igual que LIMITES_PENSION_2025.maximaMensual)
-  pensionMaxima:          3359.60,
+  // Pensión máxima SS 2026: la misma cifra, leída de su único sitio (antes, tecleada aquí otra vez)
+  pensionMaxima:          LIMITES_PENSION_2026.maximaMensual,
 
   // Base reguladora para causante en activo: BR = (24 bases × media) / 28
   divisorBaseReguladora:    28,
@@ -564,7 +573,7 @@ export const TOPE_COMPLEMENTO_MINIMOS_2026 = {
 //
 // Sustituyó al antiguo complemento de maternidad (vigente desde 4-feb-2021).
 // Se abona junto con la pensión en 14 pagas. NO computa para el límite máximo
-// de pensiones públicas (LIMITES_PENSION_2025.maximaMensual).
+// de pensiones públicas (LIMITES_PENSION_2026.maximaMensual).
 
 /**
  * Reclamación previa ante el INSS: el trámite obligatorio antes de demandar en materia de

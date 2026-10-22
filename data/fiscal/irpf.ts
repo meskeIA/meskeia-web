@@ -275,7 +275,11 @@ export const CALENDARIO_MEI = {
 // Tipos de cotización 2026 (porción trabajador) — DT 38ª LGSS / Orden PJC/297/2026
 export const COTIZACIONES_SS_2026 = {
   contingenciasComunes:    4.70,
-  desempleo:               1.55,
+  desempleo:               1.55, // contratación indefinida
+  // Contratación de duración determinada: «8,30 por ciento, del que el 6,70 por ciento será a cargo
+  // del empresario y el 1,60 por ciento, a cargo de la persona trabajadora» (art. 33.2.a.2.º de la
+  // Orden PJC/297/2026, BOE-A-2026-7296, leído el 22/10/2026; cabo C0097).
+  desempleoTemporal:       1.60,
   formacionProfesional:    0.10,
   mef:                     0.15, // Mecanismo Equidad Intergeneracional (0,9% total; 0,15% trabajador en 2026)
 };

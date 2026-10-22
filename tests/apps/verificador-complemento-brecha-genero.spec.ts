@@ -1709,7 +1709,7 @@ test.describe('Inspección 07/09/2026', () => {
    *     (silencio a los 45 días) → salen de `RECLAMACION_PREVIA_SS`, cuyo sello propio es
    *     `RECLAMACION_PREVIA_SS_META`: fuente «Art. 71 LRJS (Ley 36/2011) + art. 30.2
    *     Ley 39/2015», verificado el 05/09/2026;
-   *   · el límite máximo de pensiones públicas (3.359,60 €/mes) → `LIMITES_PENSION_2025`,
+   *   · el límite máximo de pensiones públicas (3.359,60 €/mes) → `LIMITES_PENSION_2026`,
    *     bajo `FISCAL_PENSIONES_META`, verificado el 12/08/2026.
    *
    * O sea: la fuente que el lector ve NO dice nada de la LRJS ni de la Ley 39/2015, y la
@@ -3671,7 +3671,7 @@ test.describe('Re-inspección 01/10/2026 — móvil y oscuro', () => {
 // hallazgos 2538-2544) y por d6ba391e (03/10: TOPE_COMPLEMENTO_MINIMOS_2026 y la fila de
 // gran incapacidad en PENSIONES_MINIMAS_2026). El segundo no toca nada que esta app lea:
 // `COMPLEMENTO_BRECHA_GENERO_2026`, `_META`, `COMPLEMENTO_MATERNIDAD_DEROGADO` y
-// `LIMITES_PENSION_2025` siguen idénticos, y las cifras del navegador no se movieron.
+// `LIMITES_PENSION_2026` siguen idénticos, y las cifras del navegador no se movieron.
 // Las siete reparaciones del 01/10 se reprodujeron en el navegador, en 1280 y en 390 px.
 //
 // Fuentes oficiales consultadas en sesión (06/10/2026):

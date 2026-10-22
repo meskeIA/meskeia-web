@@ -15,7 +15,7 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *
  * ── DE DÓNDE SALE CADA CIFRA ─────────────────────────────────────────────────────────────
  *   · `PENSION_VIUDEDAD_2026` (data/fiscal/pensiones.ts): 52 / 60 / 70 %, divisor 28 de la base
- *     reguladora en activo, límite del 70 % = 916 €/mes (75 % del SMI redondeado), SMI 1.221 €/mes,
+ *     reguladora en activo, límite del 70 % = 915,75 €/mes (75 % del SMI; hasta el 22/10/2026, 916 redondeado), SMI 1.221 €/mes,
  *     pensión máxima 3.359,60 €/mes.
  *   · `MINIMOS_VIUDEDAD_2026` (Anexo I del RD 241/2026, BOE-A-2026-6977, €/año ÷ 14):
  *     con cargas 17.592,40 → 1.256,60 · ≥ 65 13.106,80 → 936,20 · 60-64 12.262,60 → 875,90 ·
@@ -194,7 +194,7 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
     await calcular(page);
 
     expect(await lineaDesglose(page, 'Pensión calculada')).toBeCloseTo(3640, 2);
-    // PENSION_VIUDEDAD_2026.pensionMaxima = 3.359,60 (= LIMITES_PENSION_2025.maximaMensual)
+    // PENSION_VIUDEDAD_2026.pensionMaxima = 3.359,60 (= LIMITES_PENSION_2026.maximaMensual)
     expect(await pensionFinal(page)).toBeCloseTo(3359.6, 2);
     await expect(panelResultado(page)).toContainText('Se aplica la pensión máxima');
   });
