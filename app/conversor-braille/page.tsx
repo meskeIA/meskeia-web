@@ -1158,9 +1158,9 @@ export default function ConversorBraillePage() {
         <div className={styles.hojaNota}>
           <p>
             <strong>Comprueba la escala antes de usarla.</strong> Los navegadores imprimen a menudo
-            al 90 % o ajustan al papel sin avisar, y una celda encogida deja de encajar en la
+            al 90&nbsp;% o ajustan al papel sin avisar, y una celda encogida deja de encajar en la
             regleta. La hoja lleva una regla de 100 mm: mídela con una regla de verdad y, si no da
-            100 mm, pon la escala de impresión al 100 % y desactiva &laquo;ajustar al área
+            100 mm, pon la escala de impresión al 100&nbsp;% y desactiva &laquo;ajustar al área
             imprimible&raquo;.
           </p>
           <p>
@@ -1229,7 +1229,7 @@ export default function ConversorBraillePage() {
               ))}
             </svg>
             <span className={styles.hojaReglaTexto}>
-              Esta barra debe medir exactamente 100 mm. Si no, imprime al 100 % de escala.
+              Esta barra debe medir exactamente 100 mm. Si no, imprime al 100&nbsp;% de escala.
             </span>
           </div>
         </div>
@@ -1316,7 +1316,7 @@ export default function ConversorBraillePage() {
                   <tr>
                     <td><strong>Braille Grado 2</strong></td>
                     <td>Con contracciones de palabras comunes</td>
-                    <td>25-40% más rápida</td>
+                    <td>25-40&nbsp;% más rápida</td>
                     <td>Lectura diaria, libros</td>
                     <td>UEB / Nacional</td>
                   </tr>
@@ -1358,7 +1358,7 @@ export default function ConversorBraillePage() {
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioIcon} aria-hidden="true">🏙️</div>
                 <h4>Señalización y Entorno</h4>
-                <p>El Braille aparece en la vida cotidiana: carteles de ascensores (planta, nombre), envases de medicamentos (nombre y dosis en UE es obligatorio por la Directiva 2004/27/CE), monedas de euro (el 2€ tiene el valor en Braille desde 2022) y tarjetas de visita.</p>
+                <p>El Braille aparece en la vida cotidiana: carteles de ascensores (planta, nombre), envases de medicamentos (nombre y dosis en UE es obligatorio por la Directiva 2004/27/CE), monedas de euro (el 2&nbsp;€ tiene el valor en Braille desde 2022) y tarjetas de visita.</p>
               </div>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioIcon} aria-hidden="true">💻</div>
@@ -1379,7 +1379,7 @@ export default function ConversorBraillePage() {
             <div className={styles.eduFaqList}>
               <div className={styles.eduFaqItem}>
                 <h4>¿Cuántas personas en el mundo usan Braille?</h4>
-                <p>La OMS estima que 285 millones de personas tienen discapacidad visual en el mundo, de las cuales 39 millones son ciegas. Sin embargo, el porcentaje que utiliza Braille ha disminuido con la proliferación de lectores de pantalla de voz: en EE.UU. se estima que solo el 10% de las personas ciegas son lectoras activas de Braille. En España, la ONCE atiende a unos 70.000 afiliados con discapacidad visual severa. Los expertos señalan que quienes aprenden Braille tienen mayor tasa de empleo y autonomía que quienes solo usan tecnología de voz.</p>
+                <p>La OMS estima que 285 millones de personas tienen discapacidad visual en el mundo, de las cuales 39 millones son ciegas. Sin embargo, el porcentaje que utiliza Braille ha disminuido con la proliferación de lectores de pantalla de voz: en EE.UU. se estima que solo el 10&nbsp;% de las personas ciegas son lectoras activas de Braille. En España, la ONCE atiende a unos 70.000 afiliados con discapacidad visual severa. Los expertos señalan que quienes aprenden Braille tienen mayor tasa de empleo y autonomía que quienes solo usan tecnología de voz.</p>
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Por qué Louis Braille inventó el sistema con solo 15 años?</h4>
@@ -1436,7 +1436,7 @@ export default function ConversorBraillePage() {
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Qué diferencia hay entre Braille Grado 1 y Grado 2?</h4>
-                <p>El Grado 1 es literal: cada letra se escribe con su celda correspondiente, sin abreviaciones. El Grado 2 incluye contracciones: combinaciones de celdas que representan palabras completas o sílabas frecuentes (en inglés, &quot;the&quot; tiene una sola celda; en español, palabras como &quot;que&quot;, &quot;con&quot;, &quot;para&quot; tienen abreviaturas). El Grado 2 ocupa un 25-30% menos espacio y permite leer más rápido. Este conversor implementa Grado 1 únicamente. Para Grado 2 en español se necesitan tablas de contracciones del Código Braille Español de la ONCE.</p>
+                <p>El Grado 1 es literal: cada letra se escribe con su celda correspondiente, sin abreviaciones. El Grado 2 incluye contracciones: combinaciones de celdas que representan palabras completas o sílabas frecuentes (en inglés, &quot;the&quot; tiene una sola celda; en español, palabras como &quot;que&quot;, &quot;con&quot;, &quot;para&quot; tienen abreviaturas). El Grado 2 ocupa un 25-30&nbsp;% menos espacio y permite leer más rápido. Este conversor implementa Grado 1 únicamente. Para Grado 2 en español se necesitan tablas de contracciones del Código Braille Español de la ONCE.</p>
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Por qué los números Braille usan las mismas celdas que las letras A-J?</h4>
@@ -1488,7 +1488,7 @@ export default function ConversorBraillePage() {
                 <div className={styles.eduStepNumber}>6</div>
                 <div className={styles.eduStepContent}>
                   <h4>Del texto digital al Braille físico</h4>
-                  <p>Para producir Braille físico se necesita una embosadora (impresora Braille). Las embosadoras de sobremesa (Index, Braillo) cuestan 3.000-8.000 €. El papel especial (150 g/m²) mantiene los relieves durante años. El software de traducción (Braille2000, Duxbury DBT) convierte texto digital a Braille automáticamente, incluyendo Grado 2, tablas matemáticas y partituras. En España, la ONCE tiene un servicio gratuito de trascripción para material educativo.</p>
+                  <p>Para producir Braille físico se necesita una embosadora (impresora Braille). Las embosadoras de sobremesa (Index, Braillo) cuestan 3.000-8.000&nbsp;€. El papel especial (150 g/m²) mantiene los relieves durante años. El software de traducción (Braille2000, Duxbury DBT) convierte texto digital a Braille automáticamente, incluyendo Grado 2, tablas matemáticas y partituras. En España, la ONCE tiene un servicio gratuito de trascripción para material educativo.</p>
                 </div>
               </div>
             </div>
@@ -1501,7 +1501,7 @@ export default function ConversorBraillePage() {
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon} aria-hidden="true">🔢</span>
                 <h4>Aprende la primera década y el resto fluye</h4>
-                <p>Las letras a-j son la clave de todo el sistema. Memorizar esas 10 celdas + la regla de &quot;añadir punto 3 para la segunda década&quot; te da el 90% del alfabeto casi gratis.</p>
+                <p>Las letras a-j son la clave de todo el sistema. Memorizar esas 10 celdas + la regla de &quot;añadir punto 3 para la segunda década&quot; te da el 90&nbsp;% del alfabeto casi gratis.</p>
               </div>
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon} aria-hidden="true">📐</span>
@@ -1526,7 +1526,7 @@ export default function ConversorBraillePage() {
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon} aria-hidden="true">🌍</span>
                 <h4>El Braille sobrevive a la tecnología de voz</h4>
-                <p>Los estudios muestran que las personas ciegas alfabetizadas en Braille tienen un 44% más de probabilidad de estar empleadas que las que usan solo tecnología de voz. El Braille proporciona acceso a la ortografía, puntuación y formato textual que el audio no transmite.</p>
+                <p>Los estudios muestran que las personas ciegas alfabetizadas en Braille tienen un 44&nbsp;% más de probabilidad de estar empleadas que las que usan solo tecnología de voz. El Braille proporciona acceso a la ortografía, puntuación y formato textual que el audio no transmite.</p>
               </div>
             </div>
           </div>
@@ -1539,8 +1539,8 @@ export default function ConversorBraillePage() {
             </div>
             <ul className={styles.warningList}>
               <li><strong><span aria-hidden="true">❌</span>Este conversor es visual/educativo, no táctil:</strong> Los caracteres Braille Unicode en pantalla sirven para aprender y entender el sistema, pero no son equivalentes al Braille real en papel. Para producir Braille físico funcional (que una persona ciega pueda leer con los dedos) se necesita una embosadora Braille, no copiar y pegar caracteres Unicode.</li>
-              <li><strong><span aria-hidden="true">❌</span>Solo implementa Grado 1 (sin contracciones):</strong> El uso diario real del Braille utiliza el Grado 2, que incluye contracciones para palabras y sílabas frecuentes. La transcripción literal letra a letra del Grado 1 ocupa un 25-30% más de espacio. Para materiales de lectura real, un software de transcripción profesional (Duxbury DBT, Braille2000) con tablas de Grado 2 es imprescindible.</li>
-              <li><strong><span aria-hidden="true">❌</span>Las reglas de puntuación Braille varían por país y normativa:</strong> El Código Braille Español (ONCE, 2009) puede diferir en detalles del sistema usado en México, Argentina u otros países hispanohablantes. La puntuación, indicadores y algunos caracteres especiales no son completamente universales entre las normas nacionales.</li>
+              <li><strong><span aria-hidden="true">❌</span>Solo implementa Grado 1 (sin contracciones):</strong> El uso diario real del Braille utiliza el Grado 2, que incluye contracciones para palabras y sílabas frecuentes. La transcripción literal letra a letra del Grado 1 ocupa un 25-30&nbsp;% más de espacio. Para materiales de lectura real, un software de transcripción profesional (Duxbury DBT, Braille2000) con tablas de Grado 2 es imprescindible.</li>
+              <li><strong><span aria-hidden="true">❌</span>Las reglas de puntuación Braille varían por país y normativa:</strong> El braille español que fija la Comisión Braille Española (esta app sigue su Documento Técnico B 2, V4, 22/01/2026) puede diferir en detalles del sistema usado en México, Argentina u otros países hispanohablantes. La puntuación, indicadores y algunos caracteres especiales no son completamente universales entre las normas nacionales.</li>
               <li><strong><span aria-hidden="true">❌</span>Confundir &quot;leer Braille&quot; con &quot;reconocer caracteres Unicode&quot;:</strong> La habilidad real de leer Braille es táctil y requiere meses de entrenamiento. Reconocer visualmente que ⠁ es &quot;a&quot; es útil para diseñadores y educadores, pero no es leer Braille en el sentido funcional. Son circuitos cerebrales completamente distintos.</li>
               <li><strong><span aria-hidden="true">❌</span>Los números Braille necesitan el indicador ⠼:</strong> Si introduces números sin el indicador numérico, un lector Braille los interpretará como letras (1→a, 2→b, etc.). Este conversor añade automáticamente ⠼ antes de secuencias numéricas, pero al copiar Braille generado hay que asegurarse de no perder el indicador.</li>
               <li><strong><span aria-hidden="true">❌</span>No todos los caracteres especiales tienen equivalente en Braille Español:</strong> Emojis, símbolos matemáticos complejos, caracteres de otros alfabetos (cirílico, árabe, chino) no tienen representación en el Braille español estándar. Para esos contenidos existen sistemas Braille especializados (matemático, musical, informático) con sus propias tablas de conversión.</li>

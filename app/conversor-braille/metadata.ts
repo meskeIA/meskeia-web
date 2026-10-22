@@ -75,7 +75,10 @@ export const faqJsonLd = {
       name: '¿Puedo convertir Braille a texto normal o solo texto a Braille?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El conversor funciona en ambas direcciones. Puedes escribir texto en español y obtener los símbolos Braille correspondientes, o pegar caracteres Braille Unicode para obtener el texto en español. La conversión se hace al pulsar «Convertir», directamente en el navegador, sin enviar datos a ningún servidor.',
+        // Hallazgo 3422 (22/10/2026): decía que Braille → Texto era pegar caracteres Unicode y pulsar
+        // «Convertir», y callaba el teclado de seis puntos, que traduce cada celda al momento y es
+        // la forma de entrar braille de quien tiene un cartel delante.
+        text: 'El conversor funciona en ambas direcciones. Puedes escribir texto en español y obtener los símbolos Braille correspondientes al pulsar «Convertir». Para pasar Braille a texto puedes pegar caracteres Braille Unicode y pulsar «Convertir», o escribir las celdas con el teclado de seis puntos de la app —las teclas F, D, S, J, K y L a la vez, como en una máquina Perkins, o marcando los puntos en la pantalla—, que traduce cada celda en cuanto la escribes. Todo se hace en el navegador, sin enviar datos a ningún servidor.',
       },
     },
     {

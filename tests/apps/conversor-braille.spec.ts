@@ -29,12 +29,11 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   signo de número ⠼ (§ 8.1) y el signo interruptor de número ⠐ (§ 8.2) coinciden con
  *   el documento. Las siglas letra a letra son el «recurso 1» del § 7.1, también válido.
  *
- * HALLAZGOS: los de las inspecciones del 20/08, del 22/09 y del 13/10/2026 están todos
- * REPARADOS (24-29 el 19/08, 57-62 el 21/08, 1183-1187 el 22/09, 3277-3280 el 19/10) y sus
- * tests pasan en verde. Los marcados con `test.fail()` —hoy, solo en el bloque del
- * 22/10/2026— afirman lo que DEBERÍA pasar y fallan a propósito. El día que se corrija la app
- * pasarán a ROJO («expected to fail, but passed») y habrá que quitarles la marca, no
- * reescribir el valor esperado.
+ * HALLAZGOS: los de las inspecciones del 20/08, del 22/09, del 13/10 y del 22/10/2026 están
+ * todos REPARADOS (24-29 el 19/08, 57-62 el 21/08, 1183-1187 el 22/09, 3277-3280 el 19/10,
+ * 3415-3423 el 22/10) y sus tests pasan en verde. No queda ningún `test.fail()`: uno nuevo
+ * afirma lo que DEBERÍA pasar y falla a propósito; el día que se corrija la app pasará a ROJO
+ * («expected to fail, but passed») y habrá que quitarle la marca, no reescribir el valor esperado.
  */
 
 const RUTA = '/conversor-braille/';
@@ -1438,25 +1437,27 @@ test.describe('re-inspección 22/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — C0238 (e), «ONCE, 2009»
+  // REPARADO (22/10/2026, hallazgo 3419) — C0238 (e), «ONCE, 2009»: la caja cita el B 2 de la FAQ
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // Era:
   // La reparación del 1185 retiró de la FAQ el «aprobado por la ONCE en 2009» por no poder
   // anclarlo y porque convivía sin explicación con el documento que la app sigue. La FAQ cita hoy
   // el B 2 (V4, 22/01/2026), pero la caja de Limitaciones conserva «El Código Braille Español
   // (ONCE, 2009)»: la misma página da dos referencias distintas, una de ellas ya retirada.
   test('C0238 (e) — la caja de Limitaciones no conserva la fecha de 2009 que la FAQ retiró', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     const guia = await textoGuia(page);
     expect(guia).toContain('V4, 22/01/2026'); // precondición: la FAQ cita la fuente de hoy
     expect(guia).not.toContain('(ONCE, 2009)');
+    expect(guia).not.toContain('2009');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — FAQPage y teclado
+  // REPARADO (22/10/2026, hallazgo 3422) — FAQPage y teclado: la respuesta nombra el teclado
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // Era:
   // El FAQPage responde a «¿Puedo convertir Braille a texto…?» que se pegan caracteres Unicode y que
   // «La conversión se hace al pulsar «Convertir»». Con el teclado de seis puntos la vuelta se
   // recalcula sola en cada celda (lo fija el test «Hola 2026» de este bloque), y es la forma de
@@ -1465,7 +1466,6 @@ test.describe('re-inspección 22/10/2026', () => {
   test('FAQPage — la respuesta sobre Braille → Texto no contradice al teclado de seis puntos', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     const respuesta = await page.evaluate(() => {
       for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
@@ -1483,18 +1483,22 @@ test.describe('re-inspección 22/10/2026', () => {
     const soloAlPulsar = (respuesta ?? '').includes('La conversión se hace al pulsar «Convertir»');
     const nombraTeclado = /teclado/i.test(respuesta ?? '');
     expect({ soloAlPulsar, nombraTeclado }).not.toEqual({ soloAlPulsar: true, nombraTeclado: false });
+    // Y dice lo que hace el teclado: traducir sin pulsar «Convertir»
+    expect(respuesta).toContain('teclado de seis puntos');
+    expect(respuesta).toContain('traduce cada celda en cuanto la escribes');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — el % y el € pegados
+  // REPARADO (22/10/2026, hallazgo 3423) — el % y el € con espacio duro (también los «3.000-8.000 €»
+  // de la guía, con espacio normal, que la ficha no listaba y el test sí mide)
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // Era:
   // CLAUDE.md §2 (decidido el 25/09/2026, se corrige app a app al pasar el Inspector): «15 %» con
   // espacio duro U+00A0, y «2 €» con espacio. La guía trae «25-40%», «10%», «25-30%» (dos veces),
   // «90%» y «44%» pegados; la nota de la hoja, «90 %» y «100 %» con espacio normal (U+0020), que
   // deja saltar el % solo de línea; y «el 2€».
   test('formato — el % y el € de la hoja y de la guía van con espacio duro', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     const texto = await page.evaluate(() =>
       ['[class*="hojaSection"]', '[data-guia-educativa]']
