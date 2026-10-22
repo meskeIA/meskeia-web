@@ -630,7 +630,7 @@ export default function JuegoPlatformRunnerPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🏃 PLATFORM RUNNER</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🏃</span> PLATFORM RUNNER</h1>
         <p className={styles.subtitle}>Corre, salta y recolecta monedas</p>
       </header>
 
@@ -653,14 +653,14 @@ export default function JuegoPlatformRunnerPage() {
                 <h2>PLATFORM RUNNER</h2>
                 <p className={styles.instructions}>Corre, salta y recolecta monedas</p>
                 <div className={styles.gameRules}>
-                  <p>🟢 Controla al cubo verde con las flechas</p>
-                  <p>🪙 Recolecta monedas para sumar puntos</p>
-                  <p>🔴 Salta encima de enemigos para eliminarlos</p>
-                  <p>⚠️ Evita tocar enemigos por los lados</p>
-                  <p>🚩 Llega a la bandera para completar el nivel</p>
-                  <p>❤️ Tienes 3 vidas - ¡úsalas sabiamente!</p>
+                  <p><span aria-hidden="true">🟢</span> Controla al cubo verde con las flechas</p>
+                  <p><span aria-hidden="true">🪙</span> Recolecta monedas para sumar puntos</p>
+                  <p><span aria-hidden="true">🔴</span> Salta encima de enemigos para eliminarlos</p>
+                  <p><span aria-hidden="true">⚠️</span> Evita tocar enemigos por los lados</p>
+                  <p><span aria-hidden="true">🚩</span> Llega a la bandera para completar el nivel</p>
+                  <p><span aria-hidden="true">❤️</span> Tienes 3 vidas - ¡úsalas sabiamente!</p>
                 </div>
-                <button onClick={startGame} className={styles.gameBtn}>
+                <button type="button" onClick={startGame} className={styles.gameBtn}>
                   INICIAR JUEGO
                 </button>
               </div>
@@ -684,7 +684,7 @@ export default function JuegoPlatformRunnerPage() {
                 <h2>¡NIVEL COMPLETADO!</h2>
                 <p>Puntuación: {formatNumber(score, 0)}</p>
                 <p>Monedas recolectadas: {coinsCollected}/{totalCoins}</p>
-                <button onClick={nextLevel} className={styles.gameBtn}>
+                <button type="button" onClick={nextLevel} className={styles.gameBtn}>
                   SIGUIENTE NIVEL
                 </button>
               </div>
@@ -698,7 +698,7 @@ export default function JuegoPlatformRunnerPage() {
                 <h2>GAME OVER</h2>
                 <p>Puntuación final: {formatNumber(score, 0)}</p>
                 <p>Mejor puntuación: {formatNumber(highScore, 0)}</p>
-                <button onClick={restartGame} className={styles.gameBtn}>
+                <button type="button" onClick={restartGame} className={styles.gameBtn}>
                   JUGAR DE NUEVO
                 </button>
               </div>
@@ -834,9 +834,9 @@ export default function JuegoPlatformRunnerPage() {
 
           <div className={styles.panel}>
             <h3 className={styles.panelTitle}>Consejos</h3>
-            <p className={styles.tip}>💡 Salta encima de enemigos para eliminarlos</p>
-            <p className={styles.tip}>💡 Recoge todas las monedas</p>
-            <p className={styles.tip}>💡 Llega a la bandera para avanzar</p>
+            <p className={styles.tip}><span aria-hidden="true">💡</span> Salta encima de enemigos para eliminarlos</p>
+            <p className={styles.tip}><span aria-hidden="true">💡</span> Recoge todas las monedas</p>
+            <p className={styles.tip}><span aria-hidden="true">💡</span> Llega a la bandera para avanzar</p>
           </div>
         </div>
       </div>
@@ -866,28 +866,28 @@ export default function JuegoPlatformRunnerPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🏃 Runner infinito</td>
+                  <td><span aria-hidden="true">🏃</span> Runner infinito</td>
                   <td>Correr y esquivar obstáculos generados aleatoriamente</td>
                   <td>Reflejos rápidos y anticipación</td>
                   <td>Progresiva (velocidad creciente)</td>
                   <td>2 – 10 minutos</td>
                 </tr>
                 <tr>
-                  <td>🍄 Plataformas clásico</td>
+                  <td><span aria-hidden="true">🍄</span> Plataformas clásico</td>
                   <td>Navegar niveles con saltos precisos y eliminar enemigos</td>
                   <td>Precisión y memoria espacial</td>
                   <td>Escalonada por niveles</td>
                   <td>15 – 45 minutos</td>
                 </tr>
                 <tr>
-                  <td>🎵 Runner rítmico</td>
+                  <td><span aria-hidden="true">🎵</span> Runner rítmico</td>
                   <td>Sincronizar saltos y acciones con la música</td>
                   <td>Sentido del ritmo y coordinación</td>
                   <td>Alta desde el principio</td>
                   <td>3 – 15 minutos</td>
                 </tr>
                 <tr>
-                  <td>🧩 Plataformas puzzle</td>
+                  <td><span aria-hidden="true">🧩</span> Plataformas puzzle</td>
                   <td>Resolver puzles usando mecánicas de salto y gravedad</td>
                   <td>Pensamiento lógico y paciencia</td>
                   <td>Variable según puzle</td>

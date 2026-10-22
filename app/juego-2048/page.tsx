@@ -295,8 +295,8 @@ export default function Juego2048Page() {
             <span className={styles.scoreLabel}>Mejor</span>
             <span className={styles.scoreValue}>{mejorPuntuacion}</span>
           </div>
-          <button onClick={reiniciar} className={styles.newGameBtn}>
-            🔄 Nuevo
+          <button type="button" onClick={reiniciar} className={styles.newGameBtn}>
+            <span aria-hidden="true">🔄</span> Nuevo
           </button>
         </div>
 
@@ -321,7 +321,7 @@ export default function Juego2048Page() {
               <div className={styles.overlayContent}>
                 <h2>Game Over</h2>
                 <p>Puntuación: {puntuacion}</p>
-                <button onClick={reiniciar} className={styles.overlayBtn}>
+                <button type="button" onClick={reiniciar} className={styles.overlayBtn}>
                   Intentar de nuevo
                 </button>
               </div>
@@ -332,13 +332,13 @@ export default function Juego2048Page() {
           {victoria && (
             <div className={styles.overlay}>
               <div className={styles.overlayContent}>
-                <h2>🎉 ¡Ganaste!</h2>
+                <h2><span aria-hidden="true">🎉</span> ¡Ganaste!</h2>
                 <p>¡Llegaste a 2048!</p>
                 <div className={styles.overlayBtns}>
-                  <button onClick={continuar} className={styles.overlayBtn}>
+                  <button type="button" onClick={continuar} className={styles.overlayBtn}>
                     Continuar
                   </button>
-                  <button onClick={reiniciar} className={styles.overlayBtnSecondary}>
+                  <button type="button" onClick={reiniciar} className={styles.overlayBtnSecondary}>
                     Nuevo juego
                   </button>
                 </div>
@@ -349,8 +349,8 @@ export default function Juego2048Page() {
 
         {/* Instrucciones */}
         <div className={styles.instrucciones}>
-          <p>⌨️ Usa las <strong>flechas del teclado</strong> para mover</p>
-          <p>📱 En móvil, <strong>desliza</strong> en cualquier dirección</p>
+          <p><span aria-hidden="true">⌨️</span> Usa las <strong>flechas del teclado</strong> para mover</p>
+          <p><span aria-hidden="true">📱</span> En móvil, <strong>desliza</strong> en cualquier dirección</p>
         </div>
       </div>
 

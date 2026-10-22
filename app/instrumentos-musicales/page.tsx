@@ -155,12 +155,12 @@ export default function InstrumentosMusicalesPage() {
             {expandedId === instrument.id && (
               <div className={styles.cardDetails}>
                 <div className={styles.detailSection}>
-                  <h3>📅 Origen</h3>
+                  <h3><span aria-hidden="true">📅</span> Origen</h3>
                   <p>{instrument.epocaOrigen}</p>
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>🪵 Materiales</h3>
+                  <h3><span aria-hidden="true">🪵</span> Materiales</h3>
                   <div className={styles.materialsList}>
                     {instrument.materiales.map((material, index) => (
                       <span key={index} className={styles.materialTag}>
@@ -171,12 +171,12 @@ export default function InstrumentosMusicalesPage() {
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>📝 Descripción</h3>
+                  <h3><span aria-hidden="true">📝</span> Descripción</h3>
                   <p>{instrument.descripcion}</p>
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h3>💡 Curiosidad</h3>
+                  <h3><span aria-hidden="true">💡</span> Curiosidad</h3>
                   <p className={styles.curiosity}>{instrument.curiosidad}</p>
                 </div>
               </div>
@@ -220,7 +220,7 @@ export default function InstrumentosMusicalesPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🎻 Cordófonos (Cuerda)</h4>
+              <h4><span aria-hidden="true">🎻</span> Cordófonos (Cuerda)</h4>
               <p>
                 El sonido se produce por la vibración de cuerdas tensadas. Pueden ser
                 frotadas (violín), pulsadas (guitarra) o percutidas (piano).
@@ -228,7 +228,7 @@ export default function InstrumentosMusicalesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🎷 Aerófonos (Viento)</h4>
+              <h4><span aria-hidden="true">🎷</span> Aerófonos (Viento)</h4>
               <p>
                 El sonido se produce por la vibración del aire. Se dividen en maderas
                 (flauta, clarinete) y metales (trompeta, tuba) según su embocadura.
@@ -236,7 +236,7 @@ export default function InstrumentosMusicalesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🥁 Membranófonos e Idiófonos</h4>
+              <h4><span aria-hidden="true">🥁</span> Membranófonos e Idiófonos</h4>
               <p>
                 Los membranófonos vibran una membrana (tambores). Los idiófonos vibran
                 todo el instrumento (xilófono, triángulo, platillos).
@@ -244,7 +244,7 @@ export default function InstrumentosMusicalesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🎸 Electrófonos</h4>
+              <h4><span aria-hidden="true">🎸</span> Electrófonos</h4>
               <p>
                 El sonido se genera o amplifica electrónicamente. Incluye guitarras
                 eléctricas, sintetizadores y theremin.
@@ -262,7 +262,7 @@ export default function InstrumentosMusicalesPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🎻 Cuerdas (60-70 músicos)</h4>
+              <h4><span aria-hidden="true">🎻</span> Cuerdas (60-70 músicos)</h4>
               <p>
                 La sección más grande: violines primeros y segundos, violas, violonchelos
                 y contrabajos. Son el "corazón" de la orquesta.
@@ -270,7 +270,7 @@ export default function InstrumentosMusicalesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🎷 Viento Madera (10-12)</h4>
+              <h4><span aria-hidden="true">🎷</span> Viento Madera (10-12)</h4>
               <p>
                 Flautas, oboes, clarinetes y fagotes. El oboe da la nota de afinación
                 al inicio del concierto.
@@ -278,7 +278,7 @@ export default function InstrumentosMusicalesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🎺 Viento Metal (10-12)</h4>
+              <h4><span aria-hidden="true">🎺</span> Viento Metal (10-12)</h4>
               <p>
                 Trompetas, trompas, trombones y tubas. Aportan potencia y brillantez
                 en los momentos climáticos.
@@ -286,7 +286,7 @@ export default function InstrumentosMusicalesPage() {
             </div>
 
             <div className={styles.contentCard}>
-              <h4>🥁 Percusión (4-6)</h4>
+              <h4><span aria-hidden="true">🥁</span> Percusión (4-6)</h4>
               <p>
                 Timbales, bombo, platillos, triángulo, xilófono y más. Un percusionista
                 puede tocar varios instrumentos en una obra.
@@ -311,7 +311,7 @@ export default function InstrumentosMusicalesPage() {
 
         {/* Tabla Comparativa: Familias de Instrumentos */}
         <section className={styles.guideSection}>
-          <h2>⚖️ Comparativa de Familias de Instrumentos</h2>
+          <h2><span aria-hidden="true">⚖️</span> Comparativa de Familias de Instrumentos</h2>
           <p className={styles.introParagraph}>
             Cada familia tiene características propias que determinan su timbre, versatilidad y contexto de uso. Esta tabla te ayuda a elegir qué estudiar o qué instrumento incorporar a una composición.
           </p>
@@ -320,10 +320,10 @@ export default function InstrumentosMusicalesPage() {
               <thead>
                 <tr>
                   <th>Criterio</th>
-                  <th>🎻 Cuerda</th>
-                  <th>🎷 Viento</th>
-                  <th>🥁 Percusión</th>
-                  <th>🎹 Teclado</th>
+                  <th><span aria-hidden="true">🎻</span> Cuerda</th>
+                  <th><span aria-hidden="true">🎷</span> Viento</th>
+                  <th><span aria-hidden="true">🥁</span> Percusión</th>
+                  <th><span aria-hidden="true">🎹</span> Teclado</th>
                 </tr>
               </thead>
               <tbody>
@@ -357,10 +357,10 @@ export default function InstrumentosMusicalesPage() {
                 </tr>
                 <tr>
                   <td><strong>Presencia en orquesta</strong></td>
-                  <td>✅ Mayoritaria (60-70 músicos)</td>
-                  <td>✅ Esencial (20-25 músicos)</td>
-                  <td>✅ Presente (4-6 músicos)</td>
-                  <td>⚠️ Opcional (piano, arpa, órgano)</td>
+                  <td><span aria-hidden="true">✅</span> Mayoritaria (60-70 músicos)</td>
+                  <td><span aria-hidden="true">✅</span> Esencial (20-25 músicos)</td>
+                  <td><span aria-hidden="true">✅</span> Presente (4-6 músicos)</td>
+                  <td><span aria-hidden="true">⚠️</span> Opcional (piano, arpa, órgano)</td>
                 </tr>
                 <tr>
                   <td><strong>Géneros típicos</strong></td>
@@ -383,7 +383,7 @@ export default function InstrumentosMusicalesPage() {
 
         {/* Casos de Uso Prácticos */}
         <section className={styles.guideSection}>
-          <h2>💼 ¿Cómo usar este atlas de instrumentos?</h2>
+          <h2><span aria-hidden="true">💼</span> ¿Cómo usar este atlas de instrumentos?</h2>
           <p className={styles.introParagraph}>
             Distintos perfiles obtienen un valor diferente según sus objetivos musicales o académicos.
           </p>
@@ -445,10 +445,10 @@ export default function InstrumentosMusicalesPage() {
 
         {/* FAQ Ampliado */}
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas Frecuentes sobre Instrumentos Musicales</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Instrumentos Musicales</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el saxofón está en viento-madera si es de metal?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué el saxofón está en viento-madera si es de metal?</h4>
               <p>
                 La clasificación en madera o metal no depende del material, sino del mecanismo de producción del sonido. Los instrumentos de viento-madera usan lengüeta (caña) o bisel para producir la vibración del aire. El saxofón usa lengüeta simple, igual que el clarinete, por lo que es "madera" aunque esté fabricado en latón. La trompeta y el trombón son "metal" porque usan los labios directamente como embocadura.
               </p>
@@ -457,7 +457,7 @@ export default function InstrumentosMusicalesPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿El piano es de cuerda o de teclado?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿El piano es de cuerda o de teclado?</h4>
               <p>
                 En la clasificación de Hornbostel-Sachs, el piano es un cordófono (instrumento de cuerda) porque el sonido se produce por cuerdas que vibran. El mecanismo de teclado acciona unos martillos que golpean las cuerdas. En el uso cotidiano se le clasifica como "teclado" por comodidad. El clavicémbalo (clavecín) también es de cuerda-teclado, pero en lugar de golpear, pulsa las cuerdas con plumas (plectros).
               </p>
@@ -466,7 +466,7 @@ export default function InstrumentosMusicalesPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuál es la diferencia entre violín y viola?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuál es la diferencia entre violín y viola?</h4>
               <p>
                 El violín es más pequeño (cuerpo ~35 cm) y suena en registro agudo (Do3-La7). La viola es más grande (~42 cm) y suena en registro medio (Do3-Fa6), con un timbre más oscuro y cálido. En la orquesta, los violines llevan la melodía principal; las violas dan cuerpo armónico. La viola usa la clave de Do (en 3.ª línea), lo que da lugar al chiste de que los violistas "no saben leer en clave de sol".
               </p>
@@ -475,7 +475,7 @@ export default function InstrumentosMusicalesPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuál es el instrumento más antiguo conocido?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuál es el instrumento más antiguo conocido?</h4>
               <p>
                 Las flautas de hueso encontradas en la cueva de Hohle Fels (Alemania) tienen 40.000-43.000 años de antigüedad, siendo los instrumentos musicales más antiguos conocidos. Están fabricadas con hueso de buitre y tienen 4-5 agujeros. Anteriores a la cerámica y la escritura, demuestran que la música es una expresión fundamental de la humanidad. Las flautas de caña y los tambores de percusión también se desarrollaron de forma independiente en distintas culturas.
               </p>
@@ -484,7 +484,7 @@ export default function InstrumentosMusicalesPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Por qué el oboe da la nota de afinación a la orquesta?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Por qué el oboe da la nota de afinación a la orquesta?</h4>
               <p>
                 Antes de un concierto, el oboe toca la nota La (440 Hz) y toda la orquesta afina a partir de ella. La razón histórica es que el oboe es difícil de afinar rápidamente (su mecanismo de caña doble es sensible a la temperatura y humedad), por lo que era más práctico que todos los demás afinaran con él como referencia. Además, su timbre penetrante se escucha claramente sobre el resto de instrumentos afinando simultáneamente.
               </p>
@@ -493,7 +493,7 @@ export default function InstrumentosMusicalesPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cuál es el instrumento más difícil de aprender?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cuál es el instrumento más difícil de aprender?</h4>
               <p>
                 Depende del criterio. Por dificultad técnica inicial: el violín (afinación completamente manual, postura compleja). Por complejidad avanzada: el órgano (manos, pies y múltiples teclados simultáneos). Por control de embocadura: la trompa (pequeña embocadura, rango amplio de notas). El oboe y el fagot también son famosos por su dificultad. El piano y la guitarra son considerados los más accesibles para comenzar.
               </p>
@@ -502,7 +502,7 @@ export default function InstrumentosMusicalesPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué diferencia hay entre flauta traversa y flauta de pico?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre flauta traversa y flauta de pico?</h4>
               <p>
                 La flauta traversa (o travesera) se sujeta horizontalmente y produce el sonido soplando sobre un agujero lateral (bisel). Es el instrumento estándar de las orquestas modernas, con un rango de 3 octavas (Do4-Re7). La flauta de pico (recorder) se sujeta verticalmente y se sopla por la boquilla superior. Es más fácil de tocar pero tiene menor volumen y expresividad. Fue el instrumento de viento-madera predominante hasta el siglo XVIII.
               </p>
@@ -511,7 +511,7 @@ export default function InstrumentosMusicalesPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Los instrumentos electrónicos son solo modernos?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Los instrumentos electrónicos son solo modernos?</h4>
               <p>
                 No. El theremin fue inventado por León Theremin en 1920 y es uno de los primeros instrumentos electrónicos. Se toca sin contacto físico, moviendo las manos cerca de dos antenas. El órgano Hammond data de 1934 y fue el pilar del jazz y el gospel. Los primeros sintetizadores (Moog) llegaron en los años 60. La guitarra eléctrica se popularizó en los 50 con Les Paul y Leo Fender, revolucionando el rock and roll.
               </p>
@@ -524,7 +524,7 @@ export default function InstrumentosMusicalesPage() {
 
         {/* Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>📋 Cómo aprender a reconocer instrumentos de oído</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo aprender a reconocer instrumentos de oído</h2>
           <p className={styles.introParagraph}>
             Desarrollar el oído para identificar instrumentos mejora la comprensión musical y el disfrute de conciertos, grabaciones y películas. Esta guía te lleva de cero al reconocimiento avanzado.
           </p>
@@ -588,7 +588,7 @@ export default function InstrumentosMusicalesPage() {
 
         {/* Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>✅ Mejores Prácticas para Aprender Música e Instrumentos</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores Prácticas para Aprender Música e Instrumentos</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🎵</span>
@@ -632,22 +632,22 @@ export default function InstrumentosMusicalesPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>❌ Clasificar el saxofón como viento-metal por su material:</strong> El saxofón es viento-madera porque usa lengüeta (caña). La clasificación depende del mecanismo de producción del sonido, no del material. Error muy frecuente en exámenes de conservatorio y lenguaje musical.
+                <strong><span aria-hidden="true">❌</span> Clasificar el saxofón como viento-metal por su material:</strong> El saxofón es viento-madera porque usa lengüeta (caña). La clasificación depende del mecanismo de producción del sonido, no del material. Error muy frecuente en exámenes de conservatorio y lenguaje musical.
               </li>
               <li>
-                <strong>❌ Creer que el piano es exclusivamente de teclado:</strong> En la clasificación organológica, el piano es un cordófono (vibra por cuerdas golpeadas por martillos). Clasificarlo solo como "teclado" es incompleto. El clavecín también es de cuerda-teclado, pero pulsa en vez de golpear.
+                <strong><span aria-hidden="true">❌</span> Creer que el piano es exclusivamente de teclado:</strong> En la clasificación organológica, el piano es un cordófono (vibra por cuerdas golpeadas por martillos). Clasificarlo solo como "teclado" es incompleto. El clavecín también es de cuerda-teclado, pero pulsa en vez de golpear.
               </li>
               <li>
-                <strong>❌ Confundir violín y viola por apariencia:</strong> La viola es más grande (~42 cm vs ~35 cm del violín), suena más grave y oscura, y usa clave de Do en vez de Sol. En una partitura, si ves clave de Do en 3.ª línea, es viola. Error clásico en estudiantes de orquesta de cámara.
+                <strong><span aria-hidden="true">❌</span> Confundir violín y viola por apariencia:</strong> La viola es más grande (~42 cm vs ~35 cm del violín), suena más grave y oscura, y usa clave de Do en vez de Sol. En una partitura, si ves clave de Do en 3.ª línea, es viola. Error clásico en estudiantes de orquesta de cámara.
               </li>
               <li>
-                <strong>❌ Pensar que "percusión" equivale solo a batería:</strong> La familia de percusión incluye instrumentos de altura definida (marimba, xilófono, timbales, vibráfono) e indefinida (caja, bombo, platillos). Los timbales sí tienen altura definida y se afinan durante el concierto.
+                <strong><span aria-hidden="true">❌</span> Pensar que "percusión" equivale solo a batería:</strong> La familia de percusión incluye instrumentos de altura definida (marimba, xilófono, timbales, vibráfono) e indefinida (caja, bombo, platillos). Los timbales sí tienen altura definida y se afinan durante el concierto.
               </li>
               <li>
-                <strong>❌ Creer que los instrumentos electrónicos son una invención reciente:</strong> El theremin (1920) y el órgano Hammond (1934) son anteriores a la Segunda Guerra Mundial. Los sintetizadores analógicos Moog datan de 1964. La guitarra eléctrica se comercializó en los años 50. La electrónica lleva un siglo en la música.
+                <strong><span aria-hidden="true">❌</span> Creer que los instrumentos electrónicos son una invención reciente:</strong> El theremin (1920) y el órgano Hammond (1934) son anteriores a la Segunda Guerra Mundial. Los sintetizadores analógicos Moog datan de 1964. La guitarra eléctrica se comercializó en los años 50. La electrónica lleva un siglo en la música.
               </li>
               <li>
-                <strong>❌ Confundir oboe y clarinete visualmente:</strong> El oboe es más delgado y usa caña doble (dos lengüetas enfrentadas). El clarinete usa caña simple y tiene una campana más pronunciada. El oboe tiene un sonido más nasal y penetrante; el clarinete es más cálido y redondo. Ambos son viento-madera.
+                <strong><span aria-hidden="true">❌</span> Confundir oboe y clarinete visualmente:</strong> El oboe es más delgado y usa caña doble (dos lengüetas enfrentadas). El clarinete usa caña simple y tiene una campana más pronunciada. El oboe tiene un sonido más nasal y penetrante; el clarinete es más cálido y redondo. Ambos son viento-madera.
               </li>
             </ul>
           </div>

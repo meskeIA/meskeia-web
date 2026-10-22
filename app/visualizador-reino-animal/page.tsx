@@ -870,35 +870,35 @@ export default function VisualizadorReinoAnimalPage() {
                 <dt className={styles.faqPregunta}>¿Cuántas especies de animales existen?</dt>
                 <dd className={styles.faqRespuesta}>
                   Se han descrito aproximadamente 1,5 millones de especies animales. Sin embargo, las estimaciones científicas sitúan el total real entre 8 y 10 millones, con la mayoría de las especies por describir siendo insectos, nematodos y otros invertebrados de suelos tropicales.
-                  <span className={styles.faqTip}>💡 Los artrópodos representan más del 75% de todas las especies animales conocidas.</span>
+                  <span className={styles.faqTip}><span aria-hidden="true">💡</span> Los artrópodos representan más del 75% de todas las especies animales conocidas.</span>
                 </dd>
               </div>
               <div className={styles.faqItem}>
                 <dt className={styles.faqPregunta}>¿Cuál es la diferencia entre vertebrados e invertebrados?</dt>
                 <dd className={styles.faqRespuesta}>
                   Los vertebrados poseen columna vertebral (endoesqueleto de cartílago u hueso) y forman el subfilo Vertebrata dentro del filo Chordata. Los invertebrados son todos los demás animales —sin columna vertebral— e incluyen desde esponjas hasta cefalópodos y artrópodos. El término «invertebrado» es descriptivo, no un grupo filogenético natural.
-                  <span className={styles.faqTip}>💡 Los vertebrados son solo el 5% de las especies animales; el 95% restante son invertebrados.</span>
+                  <span className={styles.faqTip}><span aria-hidden="true">💡</span> Los vertebrados son solo el 5% de las especies animales; el 95% restante son invertebrados.</span>
                 </dd>
               </div>
               <div className={styles.faqItem}>
                 <dt className={styles.faqPregunta}>¿Los insectos son el grupo animal más numeroso?</dt>
                 <dd className={styles.faqRespuesta}>
                   Sí. Con más de 1 millón de especies descritas —y estimaciones de 5 a 10 millones totales—, los insectos (clase Hexapoda) son el grupo más diverso del reino animal. Se estima que existen en todo momento unos 10 quintillones (10¹⁹) de insectos vivos en la Tierra.
-                  <span className={styles.faqTip}>💡 Por cada persona en la Tierra hay aproximadamente 1,4 mil millones de insectos.</span>
+                  <span className={styles.faqTip}><span aria-hidden="true">💡</span> Por cada persona en la Tierra hay aproximadamente 1,4 mil millones de insectos.</span>
                 </dd>
               </div>
               <div className={styles.faqItem}>
                 <dt className={styles.faqPregunta}>¿Cuándo aparecieron los primeros animales en la Tierra?</dt>
                 <dd className={styles.faqRespuesta}>
                   Los fósiles más antiguos de animales datan de hace unos 600-635 millones de años (Edicárico). La «explosión cámbrica» (hace ~541 Ma) fue el período de mayor diversificación, cuando aparecieron la mayoría de los grandes planes corporales (filos). Los vertebrados aparecieron hace unos 525 Ma.
-                  <span className={styles.faqTip}>💡 Los animales terrestres colonizaron la tierra firme hace ~375 Ma, tras las plantas.</span>
+                  <span className={styles.faqTip}><span aria-hidden="true">💡</span> Los animales terrestres colonizaron la tierra firme hace ~375 Ma, tras las plantas.</span>
                 </dd>
               </div>
               <div className={styles.faqItem}>
                 <dt className={styles.faqPregunta}>¿Son los mamíferos los animales más evolucionados?</dt>
                 <dd className={styles.faqRespuesta}>
                   No. La evolución no tiene dirección ni jerarquía: todos los organismos vivos actuales han evolucionado el mismo tiempo desde el origen de la vida. Los mamíferos tienen características adaptativas complejas (placenta, lactancia, neocórtex), pero los insectos, con su exoesqueleto y metamorfosis, son igualmente «evolucionados» para su nicho ecológico.
-                  <span className={styles.faqTip}>💡 La filogenia molecular ha revelado que los pulpos (invertebrados) poseen una inteligencia cognitiva comparable a vertebrados avanzados.</span>
+                  <span className={styles.faqTip}><span aria-hidden="true">💡</span> La filogenia molecular ha revelado que los pulpos (invertebrados) poseen una inteligencia cognitiva comparable a vertebrados avanzados.</span>
                 </dd>
               </div>
             </dl>

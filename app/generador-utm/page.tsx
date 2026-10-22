@@ -413,7 +413,7 @@ export default function GeneradorUTMPage() {
       >
         {/* ====== SECCIÓN 1: TABLA COMPARATIVA ====== */}
         <section className={styles.comparativaSection}>
-          <h2>📊 Los 5 parámetros UTM: referencia completa</h2>
+          <h2><span aria-hidden="true">📊</span> Los 5 parámetros UTM: referencia completa</h2>
           <p className={styles.comparativaSubtitle}>
             Cada parámetro cumple una función específica. Los tres primeros son obligatorios; los dos últimos amplían la granularidad del tracking.
           </p>
@@ -431,35 +431,35 @@ export default function GeneradorUTMPage() {
               <tbody>
                 <tr>
                   <td><code>utm_source</code></td>
-                  <td><span className={styles.badgeYes}>✅ Sí</span></td>
+                  <td><span className={styles.badgeYes}><span aria-hidden="true">✅</span> Sí</span></td>
                   <td>Origen del tráfico</td>
                   <td>google, facebook, newsletter</td>
                   <td>Siempre</td>
                 </tr>
                 <tr>
                   <td><code>utm_medium</code></td>
-                  <td><span className={styles.badgeYes}>✅ Sí</span></td>
+                  <td><span className={styles.badgeYes}><span aria-hidden="true">✅</span> Sí</span></td>
                   <td>Canal o tipo de tráfico</td>
                   <td>cpc, email, social</td>
                   <td>Siempre</td>
                 </tr>
                 <tr>
                   <td><code>utm_campaign</code></td>
-                  <td><span className={styles.badgeYes}>✅ Sí</span></td>
+                  <td><span className={styles.badgeYes}><span aria-hidden="true">✅</span> Sí</span></td>
                   <td>Nombre de la campaña</td>
                   <td>black_friday, verano_2025</td>
                   <td>Siempre</td>
                 </tr>
                 <tr>
                   <td><code>utm_term</code></td>
-                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><span className={styles.badgeNo}><span aria-hidden="true">❌</span> No</span></td>
                   <td>Palabra clave de pago</td>
                   <td>zapatillas_running</td>
                   <td>Solo en Google Ads / Bing Ads</td>
                 </tr>
                 <tr>
                   <td><code>utm_content</code></td>
-                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><span className={styles.badgeNo}><span aria-hidden="true">❌</span> No</span></td>
                   <td>Diferencia versiones del anuncio</td>
                   <td>banner_azul, cta_comprar</td>
                   <td>A/B testing de creatividades</td>
@@ -471,7 +471,7 @@ export default function GeneradorUTMPage() {
 
         {/* ====== SECCIÓN 2: CASOS DE USO ====== */}
         <section className={styles.casosSection}>
-          <h2>💼 Casos de uso reales</h2>
+          <h2><span aria-hidden="true">💼</span> Casos de uso reales</h2>
           <div className={styles.casoGrid}>
 
             <div className={styles.casoCard}>
@@ -543,7 +543,7 @@ export default function GeneradorUTMPage() {
 
         {/* ====== SECCIÓN 3: FAQ ====== */}
         <section className={styles.faqSection}>
-          <h2>❓ Preguntas frecuentes sobre UTM</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre UTM</h2>
           <div className={styles.faqGrid}>
 
             <div className={styles.faqItem}>
@@ -599,7 +599,7 @@ export default function GeneradorUTMPage() {
 
         {/* ====== SECCIÓN 4: GUÍA PASO A PASO ====== */}
         <section className={styles.guiaSection}>
-          <h2>📋 Cómo crear una estrategia UTM consistente</h2>
+          <h2><span aria-hidden="true">📋</span> Cómo crear una estrategia UTM consistente</h2>
           <div className={styles.guiaSteps}>
             <div className={styles.guiaStep}>
               <span className={styles.guiaNum}>1</span>
@@ -648,30 +648,30 @@ export default function GeneradorUTMPage() {
 
         {/* ====== SECCIÓN 5: TIPS Y ERRORES ====== */}
         <section className={styles.tipsSection}>
-          <h2>💡 Tips y errores que debes evitar</h2>
+          <h2><span aria-hidden="true">💡</span> Tips y errores que debes evitar</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <h4>✅ Documenta en una hoja de cálculo</h4>
+              <h4><span aria-hidden="true">✅</span> Documenta en una hoja de cálculo</h4>
               <p>Mantén un registro de todos los UTMs creados con URL, canal, fecha y campaña. Imprescindible en equipos donde varias personas crean enlaces.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>✅ Usa siempre minúsculas y guiones bajos</h4>
+              <h4><span aria-hidden="true">✅</span> Usa siempre minúsculas y guiones bajos</h4>
               <p>Es la convención estándar de la industria. <code>black_friday</code>, no <code>Black-Friday</code> ni <code>BlackFriday</code>. Facilita el filtrado en GA4.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>✅ Agrupa por campaña para ver el total multicanal</h4>
+              <h4><span aria-hidden="true">✅</span> Agrupa por campaña para ver el total multicanal</h4>
               <p>Mismo <code>utm_campaign</code> en todos los canales → puedes ver en un solo informe cuánto generó tu campaña de Black Friday en total.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>❌ UTMs en links internos</h4>
+              <h4><span aria-hidden="true">❌</span> UTMs en links internos</h4>
               <p>Sobreescriben el origen real del usuario. Un visitante de Google Ads puede quedar registrado como &quot;email&quot; si hace clic en un link interno mal etiquetado.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>❌ Mezclar mayúsculas y minúsculas</h4>
+              <h4><span aria-hidden="true">❌</span> Mezclar mayúsculas y minúsculas</h4>
               <p>&quot;Google&quot; y &quot;google&quot; son dos fuentes distintas en GA4. Una convención inconsistente fragmenta los datos y dificulta el análisis.</p>
             </div>
             <div className={styles.tipCard}>
-              <h4>❌ UTMs en URLs de emails transaccionales</h4>
+              <h4><span aria-hidden="true">❌</span> UTMs en URLs de emails transaccionales</h4>
               <p>Los emails de confirmación, facturación o reseteo de contraseña no deben llevar UTMs. Son transaccionales, no campañas de marketing.</p>
             </div>
           </div>
@@ -679,7 +679,7 @@ export default function GeneradorUTMPage() {
 
         {/* ====== SECCIÓN V2.0 — TABLA COMPARATIVA EXTENDIDA ====== */}
         <section className={styles.tableWrapper}>
-          <h2>📋 Referencia rápida: los 5 parámetros UTM</h2>
+          <h2><span aria-hidden="true">📋</span> Referencia rápida: los 5 parámetros UTM</h2>
           <div style={{ overflowX: 'auto' }}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -697,7 +697,7 @@ export default function GeneradorUTMPage() {
                   <td><code>utm_source</code></td>
                   <td>Quién envía el tráfico</td>
                   <td>google, newsletter, instagram</td>
-                  <td><span className={styles.badgeYes}>✅ Sí</span></td>
+                  <td><span className={styles.badgeYes}><span aria-hidden="true">✅</span> Sí</span></td>
                   <td><code>utm_source=google</code></td>
                   <td>Columna &quot;Origen&quot; en Adquisición</td>
                 </tr>
@@ -705,7 +705,7 @@ export default function GeneradorUTMPage() {
                   <td><code>utm_medium</code></td>
                   <td>Canal o tipo de marketing</td>
                   <td>cpc, email, social, organic</td>
-                  <td><span className={styles.badgeYes}>✅ Sí</span></td>
+                  <td><span className={styles.badgeYes}><span aria-hidden="true">✅</span> Sí</span></td>
                   <td><code>utm_medium=cpc</code></td>
                   <td>Columna &quot;Medio&quot; en Adquisición</td>
                 </tr>
@@ -713,7 +713,7 @@ export default function GeneradorUTMPage() {
                   <td><code>utm_campaign</code></td>
                   <td>Nombre identificador de la campaña</td>
                   <td>black-friday, verano2025, rebajas</td>
-                  <td><span className={styles.badgeYes}>✅ Sí</span></td>
+                  <td><span className={styles.badgeYes}><span aria-hidden="true">✅</span> Sí</span></td>
                   <td><code>utm_campaign=verano2025</code></td>
                   <td>Columna &quot;Campaña&quot; en Adquisición</td>
                 </tr>
@@ -721,7 +721,7 @@ export default function GeneradorUTMPage() {
                   <td><code>utm_term</code></td>
                   <td>Palabra clave de pago (SEM)</td>
                   <td>zapatillas running, seguro coche</td>
-                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><span className={styles.badgeNo}><span aria-hidden="true">❌</span> No</span></td>
                   <td><code>utm_term=zapatillas-running</code></td>
                   <td>&quot;Término de búsqueda&quot; en informes de campaña</td>
                 </tr>
@@ -729,7 +729,7 @@ export default function GeneradorUTMPage() {
                   <td><code>utm_content</code></td>
                   <td>Diferencia variantes del mismo anuncio</td>
                   <td>banner-azul, cta-comprar, imagen-v2</td>
-                  <td><span className={styles.badgeNo}>❌ No</span></td>
+                  <td><span className={styles.badgeNo}><span aria-hidden="true">❌</span> No</span></td>
                   <td><code>utm_content=banner-azul</code></td>
                   <td>&quot;Contenido del anuncio&quot; en informes</td>
                 </tr>
@@ -740,7 +740,7 @@ export default function GeneradorUTMPage() {
 
         {/* ====== SECCIÓN V2.0 — CASOS DE USO / ESCENARIOS ====== */}
         <section>
-          <h2>🎯 Quién usa los UTM y para qué</h2>
+          <h2><span aria-hidden="true">🎯</span> Quién usa los UTM y para qué</h2>
           <div className={styles.escenariosGrid}>
 
             <div className={styles.escenarioCard}>
@@ -796,7 +796,7 @@ export default function GeneradorUTMPage() {
 
         {/* ====== SECCIÓN V2.0 — FAQ ====== */}
         <section>
-          <h2>❓ Preguntas frecuentes (ampliadas)</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes (ampliadas)</h2>
           <div className={styles.faqList}>
 
             <div className={styles.faqItem}>
@@ -852,7 +852,7 @@ export default function GeneradorUTMPage() {
 
         {/* ====== SECCIÓN V2.0 — GUÍA PASO A PASO ====== */}
         <section>
-          <h2>🗺️ Cómo crear un sistema UTM profesional (paso a paso)</h2>
+          <h2><span aria-hidden="true">🗺️</span> Cómo crear un sistema UTM profesional (paso a paso)</h2>
           <div className={styles.stepGuide}>
 
             <div className={styles.step}>
@@ -916,7 +916,7 @@ export default function GeneradorUTMPage() {
 
         {/* ====== SECCIÓN V2.0 — MEJORES PRÁCTICAS ====== */}
         <section>
-          <h2>✅ Mejores prácticas para un tracking limpio</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores prácticas para un tracking limpio</h2>
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>

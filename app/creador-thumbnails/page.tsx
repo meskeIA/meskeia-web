@@ -1248,7 +1248,7 @@ export default function CreadorThumbnailsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🎓 Tutoriales</td>
+                  <td><span aria-hidden="true">🎓</span> Tutoriales</td>
                   <td>1280×720 px</td>
                   <td>5 – 8 %</td>
                   <td>Azul, naranja, blanco</td>
@@ -1256,7 +1256,7 @@ export default function CreadorThumbnailsPage() {
                   <td>Cara + texto grande + resultado</td>
                 </tr>
                 <tr>
-                  <td>🎙️ Vlogs</td>
+                  <td><span aria-hidden="true">🎙️</span> Vlogs</td>
                   <td>1280×720 px</td>
                   <td>3 – 6 %</td>
                   <td>Cálidos, saturados</td>
@@ -1264,7 +1264,7 @@ export default function CreadorThumbnailsPage() {
                   <td>Momento emocional del vídeo</td>
                 </tr>
                 <tr>
-                  <td>🎮 Gaming</td>
+                  <td><span aria-hidden="true">🎮</span> Gaming</td>
                   <td>1280×720 px</td>
                   <td>6 – 12 %</td>
                   <td>Rojo, amarillo, negro</td>
@@ -1272,7 +1272,7 @@ export default function CreadorThumbnailsPage() {
                   <td>Acción + expresión exagerada</td>
                 </tr>
                 <tr>
-                  <td>📰 Noticias / Actualidad</td>
+                  <td><span aria-hidden="true">📰</span> Noticias / Actualidad</td>
                   <td>1280×720 px</td>
                   <td>4 – 7 %</td>
                   <td>Rojo, blanco, negro</td>
@@ -1280,7 +1280,7 @@ export default function CreadorThumbnailsPage() {
                   <td>Foto de portada + texto llamativo</td>
                 </tr>
                 <tr>
-                  <td>🎭 Entretenimiento</td>
+                  <td><span aria-hidden="true">🎭</span> Entretenimiento</td>
                   <td>1280×720 px</td>
                   <td>7 – 15 %</td>
                   <td>Cualquiera, alta saturación</td>
@@ -1288,7 +1288,7 @@ export default function CreadorThumbnailsPage() {
                   <td>Expresión facial exagerada</td>
                 </tr>
                 <tr>
-                  <td>📚 Educativo / Divulgación</td>
+                  <td><span aria-hidden="true">📚</span> Educativo / Divulgación</td>
                   <td>1280×720 px</td>
                   <td>4 – 9 %</td>
                   <td>Azul, verde, blanco</td>

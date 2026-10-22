@@ -384,7 +384,7 @@ export default function GerminacionPage() {
                 <h3 className={styles.comparativaTitulo}><span aria-hidden="true">🫘</span> Judía vs <span aria-hidden="true">🌽</span> Maíz — ¿Qué diferencia hay?</h3>
                 <div className={styles.comparativaGrid}>
                   <div className={styles.comparativaCol}>
-                    <span className={styles.comparativaColTitulo}>🌽 Monocotiledónea</span>
+                    <span className={styles.comparativaColTitulo}><span aria-hidden="true">🌽</span> Monocotiledónea</span>
                     {COMPARATIVA_MONO_DICO.map(c => (
                       <div key={c.caracteristica} className={styles.comparativaFila}>
                         <span className={styles.comparativaLabel}>{c.caracteristica}</span>
@@ -393,7 +393,7 @@ export default function GerminacionPage() {
                     ))}
                   </div>
                   <div className={styles.comparativaCol}>
-                    <span className={styles.comparativaColTitulo}>🫘 Dicotiledónea</span>
+                    <span className={styles.comparativaColTitulo}><span aria-hidden="true">🫘</span> Dicotiledónea</span>
                     {COMPARATIVA_MONO_DICO.map(c => (
                       <div key={c.caracteristica} className={styles.comparativaFila}>
                         <span className={styles.comparativaLabel}>{c.caracteristica}</span>
@@ -423,7 +423,7 @@ export default function GerminacionPage() {
                   disabled={faseActual === 0}
                   aria-label="Fase anterior"
                 >
-                  ◀ Anterior
+                  <span aria-hidden="true">◀</span> Anterior
                 </button>
                 <span className={styles.faseIndicador}>
                   Fase {faseActual + 1} de {FASES_GERMINACION.length}
@@ -435,7 +435,7 @@ export default function GerminacionPage() {
                   disabled={faseActual === FASES_GERMINACION.length - 1}
                   aria-label="Fase siguiente"
                 >
-                  Siguiente ▶
+                  Siguiente <span aria-hidden="true">▶</span>
                 </button>
               </div>
 
@@ -545,7 +545,7 @@ export default function GerminacionPage() {
                     aria-pressed={aguaActiva}
                     aria-label={`Agua ${aguaActiva ? 'activada' : 'desactivada'}`}
                   >
-                    {aguaActiva ? '✅ Disponible' : '❌ Sin agua'}
+                    {aguaActiva ? <><span aria-hidden="true">✅</span> Disponible</> : <><span aria-hidden="true">❌</span> Sin agua</>}
                   </button>
                 </div>
 
@@ -676,7 +676,7 @@ export default function GerminacionPage() {
                 <h3 className={styles.comparativaTitulo}>Monocotiledóneas vs Dicotiledóneas</h3>
                 <div className={styles.comparativaGrid}>
                   <div className={styles.comparativaCol}>
-                    <span className={styles.comparativaColTitulo}>🌽 Monocotiledónea</span>
+                    <span className={styles.comparativaColTitulo}><span aria-hidden="true">🌽</span> Monocotiledónea</span>
                     {COMPARATIVA_MONO_DICO.slice(0, 3).map(c => (
                       <div key={c.caracteristica} className={styles.comparativaFila}>
                         <span className={styles.comparativaLabel}>{c.caracteristica}</span>
@@ -685,7 +685,7 @@ export default function GerminacionPage() {
                     ))}
                   </div>
                   <div className={styles.comparativaCol}>
-                    <span className={styles.comparativaColTitulo}>🫘 Dicotiledónea</span>
+                    <span className={styles.comparativaColTitulo}><span aria-hidden="true">🫘</span> Dicotiledónea</span>
                     {COMPARATIVA_MONO_DICO.slice(0, 3).map(c => (
                       <div key={c.caracteristica} className={styles.comparativaFila}>
                         <span className={styles.comparativaLabel}>{c.caracteristica}</span>

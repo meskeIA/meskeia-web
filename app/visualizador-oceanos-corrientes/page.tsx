@@ -426,7 +426,7 @@ export default function VisualizadorOceanosCorreintes() {
 
             <div className={styles.conveyorInfo}>
               <h3 className={styles.conveyorInfoTitulo}>
-                {conveyorDebilitado ? '⚠️ Estado: AMOC Debilitada' : '✅ Estado: Circulación Normal'}
+                {conveyorDebilitado ? <><span aria-hidden="true">⚠️</span> Estado: AMOC Debilitada</> : <><span aria-hidden="true">✅</span> Estado: Circulación Normal</>}
               </h3>
               <p className={styles.conveyorInfoTexto}>
                 {conveyorDebilitado

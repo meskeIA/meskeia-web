@@ -1146,7 +1146,7 @@ export default function VisualizadorUrbanismo() {
 
           {/* ── Sección 6: Warning Box ── */}
           <div className={styles.warningBox} role="alert">
-            <strong>⚠️ Errores frecuentes al interpretar datos urbanos</strong>
+            <strong><span aria-hidden="true">⚠️</span> Errores frecuentes al interpretar datos urbanos</strong>
             <ul>
               <li><strong>Confundir densidad con masificación:</strong> la densidad se mide en hab/km², no en la percepción subjetiva de agobio. Una ciudad puede tener alta densidad y mucho espacio público de calidad.</li>
               <li><strong>Creer que la zonificación estricta es siempre la mejor solución:</strong> separar usos (residencial, industrial, comercial) puede crear ciudades dormitorio sin vida propia ni comercio de proximidad.</li>

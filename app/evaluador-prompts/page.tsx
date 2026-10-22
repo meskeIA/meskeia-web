@@ -285,6 +285,7 @@ export default function EvaluadorPromptsPage() {
               <div className={styles.scaleContainer} role="radiogroup" aria-label={`Pregunta ${index + 1}: ${pregunta.texto}`}>
                 {ESCALA.map((opcion) => (
                   <button
+                    type="button"
                     key={opcion.valor}
                     className={`${styles.scaleButton} ${respuestas[pregunta.id] === opcion.valor ? styles.scaleButtonActive : ''}`}
                     onClick={() => handleRespuesta(pregunta.id, opcion.valor)}

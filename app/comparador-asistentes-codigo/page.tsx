@@ -393,7 +393,7 @@ export default function ComparadorAsistentesCodigo() {
                           </div>
                         </td>
                         <td className={styles.td}><span className={styles.modeloLabel}>{a.modeloBase}</span></td>
-                        <td className={styles.td}>{a.planGratuito ? <span className={styles.siTag}>✅ Sí</span> : <span className={styles.noTag}>❌ No</span>}</td>
+                        <td className={styles.td}>{a.planGratuito ? <span className={styles.siTag}><span aria-hidden="true">✅</span> Sí</span> : <span className={styles.noTag}><span aria-hidden="true">❌</span> No</span>}</td>
                         <td className={styles.td}><span className={styles.precioTag} style={{ borderColor: a.color, color: a.color }}>{a.precioDesde}</span></td>
                         <td className={styles.td}>{a.completionInline ? '✅' : '❌'}</td>
                         <td className={styles.td}>{a.agenteAutonomo ? '✅' : '❌'}</td>
@@ -424,7 +424,7 @@ export default function ComparadorAsistentesCodigo() {
                                 ))}
                               </div>
                               <a href={a.urlPrecios} target="_blank" rel="noopener noreferrer" className={styles.enlaceOficial}>
-                                🔗 Precios oficiales →
+                                <span aria-hidden="true">🔗</span> Precios oficiales →
                               </a>
                             </div>
                           </td>
@@ -613,38 +613,38 @@ export default function ComparadorAsistentesCodigo() {
             <tbody>
               <tr>
                 <td><strong>CLI / Terminal</strong></td>
-                <td>✅ Claude Code CLI</td>
-                <td>✅ gh extension</td>
+                <td><span aria-hidden="true">✅</span> Claude Code CLI</td>
+                <td><span aria-hidden="true">✅</span> gh extension</td>
                 <td>❌</td>
-                <td>✅ Codex CLI</td>
+                <td><span aria-hidden="true">✅</span> Codex CLI</td>
               </tr>
               <tr>
                 <td><strong>Extensión IDE</strong></td>
-                <td>✅ VS Code, JetBrains</td>
-                <td>✅ VS Code, JetBrains, Neovim, Xcode</td>
-                <td>✅ VS Code, JetBrains</td>
-                <td>❌ Sin extensión propia</td>
+                <td><span aria-hidden="true">✅</span> VS Code, JetBrains</td>
+                <td><span aria-hidden="true">✅</span> VS Code, JetBrains, Neovim, Xcode</td>
+                <td><span aria-hidden="true">✅</span> VS Code, JetBrains</td>
+                <td><span aria-hidden="true">❌</span> Sin extensión propia</td>
               </tr>
               <tr>
                 <td><strong>Agente cloud autónomo</strong></td>
-                <td>❌ Opera en tu máquina</td>
-                <td>✅ Copilot Workspace</td>
-                <td>✅ Jules (experimental)</td>
-                <td>✅ Codex (cloud agent)</td>
+                <td><span aria-hidden="true">❌</span> Opera en tu máquina</td>
+                <td><span aria-hidden="true">✅</span> Copilot Workspace</td>
+                <td><span aria-hidden="true">✅</span> Jules (experimental)</td>
+                <td><span aria-hidden="true">✅</span> Codex (cloud agent)</td>
               </tr>
               <tr>
                 <td><strong>Chat web / app</strong></td>
-                <td>✅ Claude.ai</td>
-                <td>✅ copilot.github.com</td>
-                <td>✅ gemini.google.com</td>
-                <td>✅ ChatGPT</td>
+                <td><span aria-hidden="true">✅</span> Claude.ai</td>
+                <td><span aria-hidden="true">✅</span> copilot.github.com</td>
+                <td><span aria-hidden="true">✅</span> gemini.google.com</td>
+                <td><span aria-hidden="true">✅</span> ChatGPT</td>
               </tr>
               <tr>
                 <td><strong>Plan gratuito</strong></td>
-                <td>❌ Solo muy limitado</td>
-                <td>✅ 2.000 comp/mes</td>
-                <td>✅ 6.000 comp/día</td>
-                <td>❌ Muy limitado</td>
+                <td><span aria-hidden="true">❌</span> Solo muy limitado</td>
+                <td><span aria-hidden="true">✅</span> 2.000 comp/mes</td>
+                <td><span aria-hidden="true">✅</span> 6.000 comp/día</td>
+                <td><span aria-hidden="true">❌</span> Muy limitado</td>
               </tr>
             </tbody>
           </table>
@@ -655,19 +655,19 @@ export default function ComparadorAsistentesCodigo() {
         </h4>
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <strong>🎓 Estudiante</strong>
+            <strong><span aria-hidden="true">🎓</span> Estudiante</strong>
             <p>Prioriza el coste cero. GitHub Copilot Free o Gemini Code Assist cubren las necesidades de aprendizaje sin tarjeta de crédito.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>💼 Freelance</strong>
+            <strong><span aria-hidden="true">💼</span> Freelance</strong>
             <p>Claude Code Pro o Copilot Pro a $10-20/mes. El ROI se amortiza en pocas horas de trabajo ahorrado al mes en proyectos de clientes.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🏢 Empresa RGPD</strong>
+            <strong><span aria-hidden="true">🏢</span> Empresa RGPD</strong>
             <p>GitHub Copilot Business/Enterprise con opción de región EU. Es el único con DPA europeo consolidado y garantía de no uso del código para entrenamiento.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <strong>🔬 Proyectos complejos</strong>
+            <strong><span aria-hidden="true">🔬</span> Proyectos complejos</strong>
             <p>Claude Code para análisis profundo de arquitecturas y refactoring multi-archivo. Combina bien con Cursor o VS Code como IDE principal.</p>
           </div>
         </div>

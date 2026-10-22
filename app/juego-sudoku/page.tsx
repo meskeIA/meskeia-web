@@ -368,7 +368,7 @@ export default function JuegoSudokuPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>🔢 Sudoku</h1>
+        <h1 className={styles.title}><span aria-hidden="true">🔢</span> Sudoku</h1>
         <p className={styles.subtitle}>Completa la cuadrícula con números del 1 al 9</p>
       </header>
 
@@ -386,6 +386,7 @@ export default function JuegoSudokuPage() {
         <div className={styles.difficultySelector}>
           {(['facil', 'medio', 'dificil'] as Dificultad[]).map((dif) => (
             <button
+              type="button"
               key={dif}
               className={`${styles.difficultyBtn} ${dificultad === dif ? styles.active : ''}`}
               onClick={() => nuevoJuego(dif)}
@@ -399,7 +400,7 @@ export default function JuegoSudokuPage() {
       {/* Mensaje de victoria */}
       {victoria && (
         <div className={`${styles.mensaje} ${styles.victoria}`}>
-          🎉 ¡Completado en {formatearTiempo(tiempo)}!
+          <span aria-hidden="true">🎉</span> ¡Completado en {formatearTiempo(tiempo)}!
         </div>
       )}
 
@@ -452,6 +453,7 @@ export default function JuegoSudokuPage() {
 
           return (
             <button
+              type="button"
               key={num}
               className={`${styles.teclaNum} ${completo ? styles.completo : ''}`}
               onClick={() => colocarNumero(num)}
@@ -466,12 +468,14 @@ export default function JuegoSudokuPage() {
       {/* Botones de acción */}
       <div className={styles.acciones}>
         <button
+          type="button"
           className={`${styles.btnAccion} ${styles.btnNuevo}`}
           onClick={() => nuevoJuego()}
         >
-          🔄 Nuevo juego
+          <span aria-hidden="true">🔄</span> Nuevo juego
         </button>
         <button
+          type="button"
           className={`${styles.btnAccion} ${modoNotas ? styles.modoNotas : ''}`}
           onClick={() => setModoNotas(m => !m)}
           disabled={!juegoActivo || victoria}
@@ -479,6 +483,7 @@ export default function JuegoSudokuPage() {
           ✏️ {modoNotas ? 'Modo notas ON' : 'Notas (N)'}
         </button>
         <button
+          type="button"
           className={styles.btnAccion}
           onClick={() => colocarNumero(null)}
           disabled={!juegoActivo || victoria || !celdaSeleccionada}
@@ -486,17 +491,18 @@ export default function JuegoSudokuPage() {
           ⌫ Borrar
         </button>
         <button
+          type="button"
           className={styles.btnAccion}
           onClick={darPista}
           disabled={!juegoActivo || victoria}
         >
-          💡 Pista
+          <span aria-hidden="true">💡</span> Pista
         </button>
       </div>
 
       {/* Estadísticas */}
       <div className={styles.estadisticas}>
-        <h3>📊 Estadísticas</h3>
+        <h3><span aria-hidden="true">📊</span> Estadísticas</h3>
         <div className={styles.statsGrid}>
           <div className={styles.statItem}>
             <div className={styles.valor}>{estadisticas.partidasJugadas}</div>
@@ -560,21 +566,21 @@ export default function JuegoSudokuPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>🟢 Fácil</td>
+                  <td><span aria-hidden="true">🟢</span> Fácil</td>
                   <td>46 – 50</td>
                   <td>Naked single</td>
                   <td>5 – 10 min</td>
                   <td>Buscar celdas con una sola opción</td>
                 </tr>
                 <tr>
-                  <td>🟡 Medio</td>
+                  <td><span aria-hidden="true">🟡</span> Medio</td>
                   <td>36 – 45</td>
                   <td>Naked single + hidden single</td>
                   <td>15 – 30 min</td>
                   <td>Identificar números exclusivos por bloque</td>
                 </tr>
                 <tr>
-                  <td>🔴 Difícil</td>
+                  <td><span aria-hidden="true">🔴</span> Difícil</td>
                   <td>26 – 35</td>
                   <td>Pares desnudos, apuntamiento, bifurcación</td>
                   <td>30 – 60 min</td>

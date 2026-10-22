@@ -591,12 +591,12 @@ console.log('Hola mundo');
               </tr>
             </thead>
             <tbody>
-              <tr><td>Encabezado H1</td><td><code># Título</code></td><td><code>&lt;h1&gt;Título&lt;/h1&gt;</code></td><td>Título grande</td><td>✅ Universal</td></tr>
-              <tr><td>Negrita</td><td><code>**texto**</code></td><td><code>&lt;strong&gt;texto&lt;/strong&gt;</code></td><td><strong>texto</strong></td><td>✅ Universal</td></tr>
-              <tr><td>Enlace</td><td><code>[texto](url)</code></td><td><code>&lt;a href=&quot;url&quot;&gt;texto&lt;/a&gt;</code></td><td>Enlace clicable</td><td>✅ Universal</td></tr>
-              <tr><td>Código inline</td><td><code>`código`</code></td><td><code>&lt;code&gt;código&lt;/code&gt;</code></td><td><code>código</code></td><td>✅ Universal</td></tr>
-              <tr><td>Lista ordenada</td><td><code>1. item</code></td><td><code>&lt;ol&gt;&lt;li&gt;item&lt;/li&gt;&lt;/ol&gt;</code></td><td>1. item</td><td>✅ Universal</td></tr>
-              <tr><td>Tabla</td><td><code>| col | col |</code></td><td><code>&lt;table&gt;...&lt;/table&gt;</code></td><td>Tabla HTML</td><td>🟡 GFM (GitHub Flavored)</td></tr>
+              <tr><td>Encabezado H1</td><td><code># Título</code></td><td><code>&lt;h1&gt;Título&lt;/h1&gt;</code></td><td>Título grande</td><td><span aria-hidden="true">✅</span> Universal</td></tr>
+              <tr><td>Negrita</td><td><code>**texto**</code></td><td><code>&lt;strong&gt;texto&lt;/strong&gt;</code></td><td><strong>texto</strong></td><td><span aria-hidden="true">✅</span> Universal</td></tr>
+              <tr><td>Enlace</td><td><code>[texto](url)</code></td><td><code>&lt;a href=&quot;url&quot;&gt;texto&lt;/a&gt;</code></td><td>Enlace clicable</td><td><span aria-hidden="true">✅</span> Universal</td></tr>
+              <tr><td>Código inline</td><td><code>`código`</code></td><td><code>&lt;code&gt;código&lt;/code&gt;</code></td><td><code>código</code></td><td><span aria-hidden="true">✅</span> Universal</td></tr>
+              <tr><td>Lista ordenada</td><td><code>1. item</code></td><td><code>&lt;ol&gt;&lt;li&gt;item&lt;/li&gt;&lt;/ol&gt;</code></td><td>1. item</td><td><span aria-hidden="true">✅</span> Universal</td></tr>
+              <tr><td>Tabla</td><td><code>| col | col |</code></td><td><code>&lt;table&gt;...&lt;/table&gt;</code></td><td>Tabla HTML</td><td><span aria-hidden="true">🟡</span> GFM (GitHub Flavored)</td></tr>
             </tbody>
           </table>
         </div>

@@ -705,7 +705,7 @@ export default function GuiaTejidosFibrasPage() {
               onClick={() => setSostenibilidadActiva(s)}
               aria-pressed={sostenibilidadActiva === s}
             >
-              {s === 'Alta' ? '🌱 Alta' : s === 'Media' ? '🟡 Media' : s === 'Baja' ? '🔴 Baja' : 'Todas'}
+              {s === 'Alta' ? <><span aria-hidden="true">🌱</span> Alta</> : s === 'Media' ? <><span aria-hidden="true">🟡</span> Media</> : s === 'Baja' ? <><span aria-hidden="true">🔴</span> Baja</> : <>Todas</>}
             </button>
           ))}
         </div>
@@ -810,7 +810,7 @@ export default function GuiaTejidosFibrasPage() {
                     <td>Natural-Vegetal</td>
                     <td>Alta</td>
                     <td>Media</td>
-                    <td>🌱 Alta</td>
+                    <td><span aria-hidden="true">🌱</span> Alta</td>
                     <td>Medio</td>
                   </tr>
                   <tr>
@@ -818,7 +818,7 @@ export default function GuiaTejidosFibrasPage() {
                     <td>Natural-Animal</td>
                     <td>Alta</td>
                     <td>Media-Alta</td>
-                    <td>🟡 Media</td>
+                    <td><span aria-hidden="true">🟡</span> Media</td>
                     <td>Alto</td>
                   </tr>
                   <tr>
@@ -826,7 +826,7 @@ export default function GuiaTejidosFibrasPage() {
                     <td>Semisintética</td>
                     <td>Alta</td>
                     <td>Media</td>
-                    <td>🌱 Alta</td>
+                    <td><span aria-hidden="true">🌱</span> Alta</td>
                     <td>Medio-alto</td>
                   </tr>
                   <tr>
@@ -834,7 +834,7 @@ export default function GuiaTejidosFibrasPage() {
                     <td>Sintética</td>
                     <td>Baja</td>
                     <td>Alta</td>
-                    <td>🔴 Baja</td>
+                    <td><span aria-hidden="true">🔴</span> Baja</td>
                     <td>Bajo</td>
                   </tr>
                   <tr>
@@ -842,7 +842,7 @@ export default function GuiaTejidosFibrasPage() {
                     <td>Natural-Animal</td>
                     <td>Alta</td>
                     <td>Media (delicada)</td>
-                    <td>🔴 Baja</td>
+                    <td><span aria-hidden="true">🔴</span> Baja</td>
                     <td>Muy alto</td>
                   </tr>
                   <tr>
@@ -850,7 +850,7 @@ export default function GuiaTejidosFibrasPage() {
                     <td>Técnica</td>
                     <td>Alta + impermeable</td>
                     <td>Muy alta</td>
-                    <td>🔴 Baja</td>
+                    <td><span aria-hidden="true">🔴</span> Baja</td>
                     <td>Muy alto</td>
                   </tr>
                 </tbody>
@@ -918,7 +918,7 @@ export default function GuiaTejidosFibrasPage() {
             <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre tejidos y fibras</h2>
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué fibra es mejor para el verano?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué fibra es mejor para el verano?</h4>
                 <p>
                   Para el calor, las mejores opciones son el lino, el algodón (especialmente orgánico), el bambú y el lyocell. Son transpirables, absorben la humedad y permiten que el cuerpo respire. El lino es especialmente fresco porque su estructura capilar favorece la circulación del aire. Evita las fibras sintéticas como el poliéster, que retienen el calor y el sudor.
                 </p>
@@ -927,7 +927,7 @@ export default function GuiaTejidosFibrasPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cómo lavar correctamente la lana para que no encoja?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo lavar correctamente la lana para que no encoja?</h4>
                 <p>
                   La lana encoge por el calor y la agitación mecánica combinados, que hacen que las escamas de la fibra se enganchen entre sí. Para evitarlo: usa agua fría o tibia (máximo 30°C), programa de lana o delicados (muy poca agitación), detergente específico para lana (pH neutro) y nunca la retuerces para escurrirla. Sécala extendida en horizontal para mantener la forma.
                 </p>
@@ -936,7 +936,7 @@ export default function GuiaTejidosFibrasPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué diferencia hay entre viscosa, modal y lyocell?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué diferencia hay entre viscosa, modal y lyocell?</h4>
                 <p>
                   Las tres son fibras semisintéticas de celulosa vegetal, pero con diferente proceso de fabricación y sostenibilidad. La viscosa (rayon) usa un proceso químico agresivo con sosa cáustica. El modal mejora la viscosa usando madera de haya y procesos más eficientes. El lyocell (Tencel) es el más sostenible: circuito cerrado con recuperación del 99% del solvente y madera certificada FSC.
                 </p>
@@ -945,7 +945,7 @@ export default function GuiaTejidosFibrasPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿El poliéster reciclado es realmente sostenible?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿El poliéster reciclado es realmente sostenible?</h4>
                 <p>
                   El rPET (poliéster reciclado de botellas) tiene un impacto menor que el poliéster virgen: usa hasta un 59% menos de energía y reduce las emisiones de CO₂. Sin embargo, sigue siendo plástico: libera microfibras de plástico en cada lavado que acaban en los océanos. Para mitigarlo existen bolsas de lavado especiales (como Guppyfriend) que atrapan las microfibras antes de que lleguen al desagüe.
                 </p>
@@ -954,7 +954,7 @@ export default function GuiaTejidosFibrasPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Qué es la lana merino y por qué no pica?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Qué es la lana merino y por qué no pica?</h4>
                 <p>
                   La lana merino es la obtenida de la oveja merina, que produce una fibra mucho más fina (15-24 micrones de diámetro) que la lana convencional (mayor de 30 micrones). Las fibras gruesas se doblan al rozar la piel y producen la sensación de picor; las finas se doblan sin molestar. Por eso la merino se puede usar directamente sobre la piel sin la incomodidad de la lana normal.
                 </p>
@@ -963,7 +963,7 @@ export default function GuiaTejidosFibrasPage() {
                 </p>
               </div>
               <div className={styles.faqItem}>
-                <h4>❓ ¿Cómo saber si una prenda de cachemira es auténtica?</h4>
+                <h4><span aria-hidden="true">❓</span> ¿Cómo saber si una prenda de cachemira es auténtica?</h4>
                 <p>
                   La cachemira real se distingue por su peso (muy ligera), suavidad extrema sin pilling inmediato y precio (un jersey de cachemira puro de calidad cuesta mínimo 150-200 €). Desconfía de "cachemira" por 30 €: suele ser acrílico o mezcla con mínimo porcentaje real. Lee la etiqueta de composición (debe decir 100% cachemira o especificar el porcentaje exacto). El pilling rápido es señal de cachemira de baja calidad (fibras cortas) o falsificación.
                 </p>
@@ -1057,19 +1057,19 @@ export default function GuiaTejidosFibrasPage() {
               </div>
               <ul className={styles.warningList}>
                 <li>
-                  <strong>❌ Lavar la lana o cachemira en programa normal de algodón:</strong> El calor y la agitación mecánica activan el proceso de apelmazamiento irreversible de la lana. Solo programa de lana (fría, sin agitación) o a mano. Una sola lavada equivocada puede reducir a la mitad el tamaño de la prenda.
+                  <strong><span aria-hidden="true">❌</span> Lavar la lana o cachemira en programa normal de algodón:</strong> El calor y la agitación mecánica activan el proceso de apelmazamiento irreversible de la lana. Solo programa de lana (fría, sin agitación) o a mano. Una sola lavada equivocada puede reducir a la mitad el tamaño de la prenda.
                 </li>
                 <li>
-                  <strong>❌ Secar la seda en secadora o al sol directo:</strong> El calor intenso degrada las proteínas de la seda y el sol directo la decolora y fragiliza rápidamente. La seda debe secarse a la sombra, extendida sin apretar, lejos de fuentes de calor.
+                  <strong><span aria-hidden="true">❌</span> Secar la seda en secadora o al sol directo:</strong> El calor intenso degrada las proteínas de la seda y el sol directo la decolora y fragiliza rápidamente. La seda debe secarse a la sombra, extendida sin apretar, lejos de fuentes de calor.
                 </li>
                 <li>
-                  <strong>❌ Mezclar ropa de colores con blanca en agua caliente:</strong> Muchos tintes naturales (especialmente de fibras naturales como lino o algodón sin fijador) se sueltan con el calor. Lava siempre las prendas nuevas de colores vivos por separado las primeras veces.
+                  <strong><span aria-hidden="true">❌</span> Mezclar ropa de colores con blanca en agua caliente:</strong> Muchos tintes naturales (especialmente de fibras naturales como lino o algodón sin fijador) se sueltan con el calor. Lava siempre las prendas nuevas de colores vivos por separado las primeras veces.
                 </li>
                 <li>
-                  <strong>❌ Guardar prendas de fibras animales sin lavar:</strong> Las manchas de sudor y alimentos atraen a las larvas de polilla. Las prendas de lana, cachemira o angora deben guardarse siempre limpias para el largo almacenaje de temporada.
+                  <strong><span aria-hidden="true">❌</span> Guardar prendas de fibras animales sin lavar:</strong> Las manchas de sudor y alimentos atraen a las larvas de polilla. Las prendas de lana, cachemira o angora deben guardarse siempre limpias para el largo almacenaje de temporada.
                 </li>
                 <li>
-                  <strong>❌ Usar suavizante con ropa deportiva técnica o de lana merino:</strong> El suavizante obstruye las microfibras de los tejidos técnicos impidiendo la gestión de humedad. En la merino, recubre las fibras reduciendo su capacidad antibacteriana natural. Evita el suavizante con estas prendas siempre.
+                  <strong><span aria-hidden="true">❌</span> Usar suavizante con ropa deportiva técnica o de lana merino:</strong> El suavizante obstruye las microfibras de los tejidos técnicos impidiendo la gestión de humedad. En la merino, recubre las fibras reduciendo su capacidad antibacteriana natural. Evita el suavizante con estas prendas siempre.
                 </li>
               </ul>
             </div>

@@ -777,11 +777,11 @@ export default function ConversorFormatosPage() {
                 </tr>
                 <tr>
                   <td><strong>Datos anidados</strong></td>
-                  <td>✅ Nativo</td>
-                  <td>❌ Se aplanan</td>
-                  <td>⚠️ Limitado (múltiples hojas)</td>
-                  <td>✅ Nativo</td>
-                  <td>✅ Nativo</td>
+                  <td><span aria-hidden="true">✅</span> Nativo</td>
+                  <td><span aria-hidden="true">❌</span> Se aplanan</td>
+                  <td><span aria-hidden="true">⚠️</span> Limitado (múltiples hojas)</td>
+                  <td><span aria-hidden="true">✅</span> Nativo</td>
+                  <td><span aria-hidden="true">✅</span> Nativo</td>
                 </tr>
                 <tr>
                   <td><strong>Tamaño archivo</strong></td>
@@ -802,10 +802,10 @@ export default function ConversorFormatosPage() {
                 <tr>
                   <td><strong>Validación</strong></td>
                   <td>JSON Schema</td>
-                  <td>❌ Sin estándar</td>
+                  <td><span aria-hidden="true">❌</span> Sin estándar</td>
                   <td>Validación de celdas</td>
                   <td>XSD, DTD</td>
-                  <td>❌ Sin estándar oficial</td>
+                  <td><span aria-hidden="true">❌</span> Sin estándar oficial</td>
                 </tr>
               </tbody>
             </table>
@@ -928,7 +928,7 @@ export default function ConversorFormatosPage() {
           <h2>Preguntas Frecuentes</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>❓ ¿Se pierden datos al convertir entre formatos?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Se pierden datos al convertir entre formatos?</h4>
               <p>
                 Depende de la conversión. <strong>Conversiones sin pérdida:</strong> JSON ↔ XML ↔ YAML
                 (todos soportan estructuras anidadas). <strong>Conversiones con pérdida potencial:</strong>
@@ -943,7 +943,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué pasa con los datos anidados al convertir a CSV?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué pasa con los datos anidados al convertir a CSV?</h4>
               <p>
                 CSV NO soporta anidación. Los objetos anidados se <strong>aplanan</strong> o <strong>serializan
                 como strings</strong>. Ejemplo: un JSON con <code>{`{usuario: {nombre: "Ana", edad: 30}}`}</code>
@@ -959,7 +959,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo convertir archivos Excel con fórmulas?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo convertir archivos Excel con fórmulas?</h4>
               <p>
                 Sí, pero <strong>solo se convierten los valores calculados</strong>, NO las fórmulas.
                 Si tu Excel tiene <code>=SUMA(A1:A10)</code>, el resultado (ej: 150) se convierte, pero
@@ -973,7 +973,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Cómo manejar caracteres especiales (ñ, á, €) correctamente?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Cómo manejar caracteres especiales (ñ, á, €) correctamente?</h4>
               <p>
                 Usa <strong>UTF-8 encoding</strong> siempre. Problema común: abrir CSV en Excel con
                 caracteres raros (�, Ã±). Causa: Excel asume Latin-1 (ISO-8859-1) por defecto en Windows.
@@ -987,7 +987,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Hay límite de tamaño en las conversiones?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Hay límite de tamaño en las conversiones?</h4>
               <p>
                 No hay límite fijo impuesto por la herramienta. El límite es tu navegador (RAM disponible).
                 <strong>Archivos típicos:</strong> Hasta 50 MB funcionan bien (~500k filas CSV). <strong>Archivos
@@ -1003,7 +1003,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Mis datos son 100% privados? ¿Se envían a un servidor?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Mis datos son 100% privados? ¿Se envían a un servidor?</h4>
               <p>
                 <strong>100% privado, garantizado.</strong> Todo el procesamiento ocurre en tu navegador
                 usando JavaScript (librerías: PapaParse para CSV, SheetJS para Excel, js-yaml para YAML).
@@ -1019,7 +1019,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Puedo automatizar conversiones en mi flujo de trabajo?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Puedo automatizar conversiones en mi flujo de trabajo?</h4>
               <p>
                 Esta herramienta es manual (UI web). Para automatización, necesitas scripts. <strong>Opciones
                 profesionales:</strong> (1) Python con pandas: <code>df.to_csv()</code>, <code>df.to_json()</code>,
@@ -1034,7 +1034,7 @@ export default function ConversorFormatosPage() {
             </div>
 
             <div className={styles.faqItem}>
-              <h4>❓ ¿Qué formato debo elegir para mi proyecto?</h4>
+              <h4><span aria-hidden="true">❓</span> ¿Qué formato debo elegir para mi proyecto?</h4>
               <p>
                 <strong>Depende de tu audiencia y caso de uso:</strong> Usa <strong>JSON</strong> para APIs
                 y desarrollo web. Usa <strong>CSV</strong> para análisis en Excel/Sheets y bases de datos.
@@ -1217,7 +1217,7 @@ export default function ConversorFormatosPage() {
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>❌ Perder datos anidados al convertir a CSV:</strong> CSV es plano (2D). Convertir
+              <strong><span aria-hidden="true">❌</span> Perder datos anidados al convertir a CSV:</strong> CSV es plano (2D). Convertir
               JSON/XML con objetos anidados a CSV aplana estructura - puedes perder jerarquía. Ejemplo:
               <code>{`{usuario: {nombre: "Ana"}}`}</code> se convierte a <code>usuario_nombre: Ana</code>.
               <br/>
@@ -1226,7 +1226,7 @@ export default function ConversorFormatosPage() {
             </li>
 
             <li>
-              <strong>❌ Encoding incorrecto causa mojibake (caracteres raros):</strong> Abrir CSV UTF-8
+              <strong><span aria-hidden="true">❌</span> Encoding incorrecto causa mojibake (caracteres raros):</strong> Abrir CSV UTF-8
               en Excel con doble clic asume Latin-1 → <code>España</code> se ve como <code>EspaÃ±a</code>.
               Problema común en Windows.
               <br/>
@@ -1236,7 +1236,7 @@ export default function ConversorFormatosPage() {
             </li>
 
             <li>
-              <strong>❌ Formato de fechas inconsistente entre sistemas:</strong> Excel interpreta
+              <strong><span aria-hidden="true">❌</span> Formato de fechas inconsistente entre sistemas:</strong> Excel interpreta
               <code>01/02/2023</code> como 1 Feb (UK) o 2 Ene (US) según locale. JSON no tiene tipo fecha
               nativo - se usa string ISO <code>2023-02-01T00:00:00Z</code>.
               <br/>
@@ -1246,7 +1246,7 @@ export default function ConversorFormatosPage() {
             </li>
 
             <li>
-              <strong>❌ Comas dentro de valores CSV sin entrecomillar:</strong> Si tu CSV tiene valores
+              <strong><span aria-hidden="true">❌</span> Comas dentro de valores CSV sin entrecomillar:</strong> Si tu CSV tiene valores
               como <code>Madrid, España</code> sin comillas, el parser interpreta como dos columnas separadas.
               Rompe la estructura.
               <br/>
@@ -1256,7 +1256,7 @@ export default function ConversorFormatosPage() {
             </li>
 
             <li>
-              <strong>❌ Caracteres especiales XML sin escapar:</strong> XML requiere escapar <code>&lt;</code>
+              <strong><span aria-hidden="true">❌</span> Caracteres especiales XML sin escapar:</strong> XML requiere escapar <code>&lt;</code>
               <code>&gt;</code> <code>&amp;</code> <code>&quot;</code> <code>&apos;</code>. Si tu JSON tiene
               <code>{`{msg: "5 < 10"}`}</code> y conviertes a XML sin escapar, el parser falla.
               <br/>
@@ -1266,7 +1266,7 @@ export default function ConversorFormatosPage() {
             </li>
 
             <li>
-              <strong>❌ Fórmulas Excel se convierten a valores estáticos:</strong> Si tu Excel tiene
+              <strong><span aria-hidden="true">❌</span> Fórmulas Excel se convierten a valores estáticos:</strong> Si tu Excel tiene
               <code>=SUMA(A1:A10)</code> con resultado 150, al convertir a JSON/CSV solo obtienes <code>150</code>.
               La fórmula se pierde PERMANENTEMENTE.
               <br/>
@@ -1276,7 +1276,7 @@ export default function ConversorFormatosPage() {
             </li>
 
             <li>
-              <strong>❌ Headers duplicados en CSV causan sobrescritura:</strong> Si tu CSV tiene dos
+              <strong><span aria-hidden="true">❌</span> Headers duplicados en CSV causan sobrescritura:</strong> Si tu CSV tiene dos
               columnas llamadas <code>nombre</code>, el parser JSON solo guarda la última. Pierdes datos
               silenciosamente.
               <br/>
@@ -1286,7 +1286,7 @@ export default function ConversorFormatosPage() {
             </li>
 
             <li>
-              <strong>❌ XML sin declaración UTF-8 rompe caracteres especiales:</strong> Si omites
+              <strong><span aria-hidden="true">❌</span> XML sin declaración UTF-8 rompe caracteres especiales:</strong> Si omites
               <code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</code> y tienes ñ, á, €,
               parsers antiguos asumen ASCII → text corruption.
               <br/>

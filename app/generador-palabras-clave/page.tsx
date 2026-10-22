@@ -256,7 +256,7 @@ export default function GeneradorPalabrasClavePage() {
           {totalKeywords > 0 && (
             <div className={styles.actions}>
               <button type="button" onClick={copiarTodas} className={styles.btnPrimary}>
-                {copiado ? '✅ Copiadas!' : `📋 Copiar todas (${totalKeywords})`}
+                {copiado ? <><span aria-hidden="true">✅</span> Copiadas!</> : <><span aria-hidden="true">📋</span> Copiar todas ({totalKeywords})</>}
               </button>
               <button type="button" onClick={exportarCSV} className={styles.btnSecondary}>
                 <span aria-hidden="true">📥</span> Exportar CSV
@@ -381,22 +381,22 @@ export default function GeneradorPalabrasClavePage() {
             <h2>Tipos de intención de búsqueda</h2>
             <div className={styles.intentGrid}>
               <div className={styles.intentCard}>
-                <h4>🔍 Informacional</h4>
+                <h4><span aria-hidden="true">🔍</span> Informacional</h4>
                 <p>&quot;qué es SEO&quot;, &quot;cómo hacer pan&quot;</p>
                 <span className={styles.intentTag}>Aprenden</span>
               </div>
               <div className={styles.intentCard}>
-                <h4>🧭 Navegacional</h4>
+                <h4><span aria-hidden="true">🧭</span> Navegacional</h4>
                 <p>&quot;login facebook&quot;, &quot;amazon prime&quot;</p>
                 <span className={styles.intentTag}>Buscan sitio</span>
               </div>
               <div className={styles.intentCard}>
-                <h4>🛒 Transaccional</h4>
+                <h4><span aria-hidden="true">🛒</span> Transaccional</h4>
                 <p>&quot;comprar iPhone 15&quot;, &quot;precio hosting&quot;</p>
                 <span className={styles.intentTag}>Quieren comprar</span>
               </div>
               <div className={styles.intentCard}>
-                <h4>🔬 Investigación comercial</h4>
+                <h4><span aria-hidden="true">🔬</span> Investigación comercial</h4>
                 <p>&quot;mejor portátil 2025&quot;, &quot;opiniones X&quot;</p>
                 <span className={styles.intentTag}>Comparando</span>
               </div>

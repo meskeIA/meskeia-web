@@ -226,28 +226,28 @@ export default function GeneradorLoremIpsumPage() {
 
           {/* SECCIÓN 1: Comparativa de tipos de placeholder text */}
           <div className={styles.comparativaSection}>
-            <h3>📊 Tipos de Texto de Relleno: Cuándo Usar Cada Uno</h3>
+            <h3><span aria-hidden="true">📊</span> Tipos de Texto de Relleno: Cuándo Usar Cada Uno</h3>
             <div className={styles.infoGrid}>
               <div className={styles.infoCard}>
-                <h4>📜 Lorem Ipsum (clásico)</h4>
+                <h4><span aria-hidden="true">📜</span> Lorem Ipsum (clásico)</h4>
                 <p><strong>Mejor para:</strong> maquetación general, prototipos visuales, presentaciones de diseño<br />
                 <strong>Ventaja:</strong> neutral, nadie lo lee, enfoca atención en el diseño<br />
                 <strong>Origen:</strong> Cicerón, siglo I a.C.</p>
               </div>
               <div className={styles.infoCard}>
-                <h4>📰 Texto real del proyecto</h4>
+                <h4><span aria-hidden="true">📰</span> Texto real del proyecto</h4>
                 <p><strong>Mejor para:</strong> maquetación final, revisión de contenido, copy UX<br />
                 <strong>Ventaja:</strong> detecta problemas reales (textos muy largos, caracteres especiales)<br />
                 <strong>Cuándo:</strong> cuando ya tienes el contenido definitivo</p>
               </div>
               <div className={styles.infoCard}>
-                <h4>🔢 Texto generado (IA / Faker)</h4>
+                <h4><span aria-hidden="true">🔢</span> Texto generado (IA / Faker)</h4>
                 <p><strong>Mejor para:</strong> demos, seeds de bases de datos, tests automatizados<br />
                 <strong>Ventaja:</strong> legible y temático (nombres, emails, fechas realistas)<br />
                 <strong>Herramientas:</strong> Faker.js, ChatGPT, generadores temáticos</p>
               </div>
               <div className={styles.infoCard}>
-                <h4>🎯 Placeholder específico</h4>
+                <h4><span aria-hidden="true">🎯</span> Placeholder específico</h4>
                 <p><strong>Mejor para:</strong> campos de formulario, labels, tooltips<br />
                 <strong>Ventaja:</strong> describe el tipo de contenido esperado<br />
                 <strong>Ejemplo:</strong> &quot;Nombre completo&quot;, &quot;usuario@email.com&quot;</p>
@@ -257,7 +257,7 @@ export default function GeneradorLoremIpsumPage() {
 
           {/* SECCIÓN 2: Historia */}
           <div className={styles.historiaSection}>
-            <h3>📜 La Historia Completa del Lorem Ipsum</h3>
+            <h3><span aria-hidden="true">📜</span> La Historia Completa del Lorem Ipsum</h3>
             <div className={styles.historiaTimeline}>
               <div className={styles.timelineItem}>
                 <span className={styles.timelineDate}>45 a.C.</span>
@@ -292,7 +292,7 @@ export default function GeneradorLoremIpsumPage() {
 
           {/* SECCIÓN 3: FAQ */}
           <div className={styles.faqSection}>
-            <h3>❓ Preguntas Frecuentes sobre Lorem Ipsum</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Lorem Ipsum</h3>
             <div className={styles.faqList}>
               <details className={styles.faqItem}>
                 <summary className={styles.faqQuestion}>¿El Lorem Ipsum tiene algún significado en latín?</summary>
@@ -319,7 +319,7 @@ export default function GeneradorLoremIpsumPage() {
 
           {/* SECCIÓN 4: Usos en flujo de trabajo */}
           <div className={styles.usosSection}>
-            <h3>🎯 Lorem Ipsum en el Flujo de Trabajo Real</h3>
+            <h3><span aria-hidden="true">🎯</span> Lorem Ipsum en el Flujo de Trabajo Real</h3>
             <div className={styles.usosGrid}>
               <div className={styles.usoCard}>
                 <span className={styles.usoIcon}>🎨</span>
@@ -346,7 +346,7 @@ export default function GeneradorLoremIpsumPage() {
 
           {/* SECCIÓN 5: Tips */}
           <div className={styles.tipsSection}>
-            <h3>💡 Tips para Usar Texto de Relleno Eficientemente</h3>
+            <h3><span aria-hidden="true">💡</span> Tips para Usar Texto de Relleno Eficientemente</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon}>🔍</span>
@@ -378,10 +378,10 @@ export default function GeneradorLoremIpsumPage() {
               <h3>Errores Comunes con el Texto de Relleno</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ Dejar Lorem Ipsum en producción:</strong> Es el error más frecuente y uno de los más visibles. Los usuarios perciben el Lorem Ipsum como señal de que el sitio está en construcción o es poco profesional. Configura un linter o búsqueda en CI/CD que lo detecte automáticamente.</li>
-              <li><strong>❌ Usar Lorem Ipsum para UX copy:</strong> El texto de interfaz (botones, labels, mensajes de error, onboarding) nunca debe usar Lorem Ipsum en pruebas de usabilidad. El texto real cambia radicalmente cómo los usuarios perciben e interactúan con el flujo.</li>
-              <li><strong>❌ Ignorar la longitud real del contenido:</strong> El Lorem Ipsum suele ser texto uniforme de longitud media. En producción, los textos varían: títulos de 3 palabras o de 15, descripciones de 20 caracteres o de 300. Diseñar solo con Lorem Ipsum puede ocultar problemas de overflow, truncado o ruptura del layout.</li>
-              <li><strong>❌ Confiar en Lorem Ipsum para accesibilidad:</strong> El texto de relleno no tiene estructura semántica real (jerarquía de encabezados, listas, énfasis). Las pruebas de accesibilidad con screen readers deben hacerse siempre con contenido real o muy similar al definitivo.</li>
+              <li><strong><span aria-hidden="true">❌</span> Dejar Lorem Ipsum en producción:</strong> Es el error más frecuente y uno de los más visibles. Los usuarios perciben el Lorem Ipsum como señal de que el sitio está en construcción o es poco profesional. Configura un linter o búsqueda en CI/CD que lo detecte automáticamente.</li>
+              <li><strong><span aria-hidden="true">❌</span> Usar Lorem Ipsum para UX copy:</strong> El texto de interfaz (botones, labels, mensajes de error, onboarding) nunca debe usar Lorem Ipsum en pruebas de usabilidad. El texto real cambia radicalmente cómo los usuarios perciben e interactúan con el flujo.</li>
+              <li><strong><span aria-hidden="true">❌</span> Ignorar la longitud real del contenido:</strong> El Lorem Ipsum suele ser texto uniforme de longitud media. En producción, los textos varían: títulos de 3 palabras o de 15, descripciones de 20 caracteres o de 300. Diseñar solo con Lorem Ipsum puede ocultar problemas de overflow, truncado o ruptura del layout.</li>
+              <li><strong><span aria-hidden="true">❌</span> Confiar en Lorem Ipsum para accesibilidad:</strong> El texto de relleno no tiene estructura semántica real (jerarquía de encabezados, listas, énfasis). Las pruebas de accesibilidad con screen readers deben hacerse siempre con contenido real o muy similar al definitivo.</li>
             </ul>
           </div>
 

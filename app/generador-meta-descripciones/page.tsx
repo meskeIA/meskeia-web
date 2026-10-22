@@ -298,7 +298,7 @@ export default function GeneradorMetaDescripcionesPage() {
           {/* Botones de acción */}
           <div className={styles.actions}>
             <button type="button" onClick={copiarDescripcion} className={styles.btnPrimary} disabled={!descripcion}>
-              📋 Copiar descripción
+              <span aria-hidden="true">📋</span> Copiar descripción
             </button>
             <button type="button" onClick={copiarHTML} className={styles.btnSecondary} disabled={!descripcion}>
               {'<>'} Copiar HTML
@@ -364,7 +364,7 @@ export default function GeneradorMetaDescripcionesPage() {
                   className={styles.btnToggleCode}
                   aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
                 >
-                  {htmlExpanded ? '🔼 Ocultar código' : '🔽 Ver código completo'}
+                  {htmlExpanded ? <><span aria-hidden="true">🔼</span> Ocultar código</> : <><span aria-hidden="true">🔽</span> Ver código completo</>}
                 </button>
               </div>
               {htmlExpanded && (
@@ -373,7 +373,7 @@ export default function GeneradorMetaDescripcionesPage() {
                     <code>{htmlCode}</code>
                   </pre>
                   <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
-                    📋 Copiar código completo
+                    <span aria-hidden="true">📋</span> Copiar código completo
                   </button>
                 </div>
               )}
@@ -792,37 +792,37 @@ export default function GeneradorMetaDescripcionesPage() {
               </div>
               <ul className={styles.warningList}>
                 <li>
-                  <strong>❌ Dejar la meta descripción vacía:</strong> Google usará texto aleatorio de tu página,
+                  <strong><span aria-hidden="true">❌</span> Dejar la meta descripción vacía:</strong> Google usará texto aleatorio de tu página,
                   generalmente el primer párrafo que puede ser poco atractivo o cortarse a mitad de frase.
                   Resultado: CTR reducido hasta 40%.
                 </li>
                 <li>
-                  <strong>❌ Copiar el primer párrafo de la página:</strong> Los usuarios pueden leerlo completo
+                  <strong><span aria-hidden="true">❌</span> Copiar el primer párrafo de la página:</strong> Los usuarios pueden leerlo completo
                   si hacen clic. No hay incentivo para el clic. Usa un resumen diferente con CTA.
                 </li>
                 <li>
-                  <strong>❌ Keyword stuffing:</strong> "Comprar zapatos, zapatos baratos, tienda zapatos online"
+                  <strong><span aria-hidden="true">❌</span> Keyword stuffing:</strong> "Comprar zapatos, zapatos baratos, tienda zapatos online"
                   se ve spam y Google puede penalizarte. Una mención natural de la keyword es suficiente.
                 </li>
                 <li>
-                  <strong>❌ Descripciones genéricas sin diferenciador:</strong> "Ofrecemos los mejores productos
+                  <strong><span aria-hidden="true">❌</span> Descripciones genéricas sin diferenciador:</strong> "Ofrecemos los mejores productos
                   al mejor precio" no dice nada específico. ¿Qué productos? ¿Qué precio? ¿Por qué son mejores?
                 </li>
                 <li>
-                  <strong>❌ Promesas falsas o clickbait engañoso:</strong> "¡Gana 10.000€ al mes sin trabajar!"
+                  <strong><span aria-hidden="true">❌</span> Promesas falsas o clickbait engañoso:</strong> "¡Gana 10.000€ al mes sin trabajar!"
                   genera clics pero alta tasa de rebote. Google detecta esto y penaliza tu ranking.
                 </li>
                 <li>
-                  <strong>❌ Duplicar meta descripciones entre páginas:</strong> Google puede ignorar todas tus
+                  <strong><span aria-hidden="true">❌</span> Duplicar meta descripciones entre páginas:</strong> Google puede ignorar todas tus
                   meta descripciones si detecta duplicación masiva. Cada página necesita su propia descripción única.
                 </li>
                 <li>
-                  <strong>❌ Olvidar la intención de búsqueda:</strong> Si el usuario busca "cómo instalar WordPress"
+                  <strong><span aria-hidden="true">❌</span> Olvidar la intención de búsqueda:</strong> Si el usuario busca "cómo instalar WordPress"
                   (búsqueda informativa), una descripción de venta "Compra hosting WordPress" genera bajo CTR.
                   Adapta el tono a la intención.
                 </li>
                 <li>
-                  <strong>❌ No optimizar para móvil:</strong> El 60% de búsquedas son desde móvil. Si tu mensaje
+                  <strong><span aria-hidden="true">❌</span> No optimizar para móvil:</strong> El 60% de búsquedas son desde móvil. Si tu mensaje
                   clave está después del carácter 120, se cortará en móvil y perderás impacto.
                 </li>
               </ul>
