@@ -1191,9 +1191,13 @@ test.describe('re-inspección 22/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO: hallazgo del Inspector del 22/10/2026 (n.º al registrar) — texto en tinta + teclado
+  // REPARADO (22/10/2026, hallazgo 3417) — texto en tinta + teclado
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // La reparación avisa de los caracteres en tinta que hay en la caja de «Braille → Texto»: han
+  // pasado tal cual y no salen en la hoja.
+  //
+  // Era:
   // Al cambiar de sentido, la caja conserva lo que había. Si era TINTA (el «Hola» que se acaba de
   // pasar a braille) y se escribe con el teclado, la celda se añade detrás y la vuelta copia la
   // tinta tal cual: «Hola⠁» → «Holaa», sin ningún aviso. Es la forma del hallazgo 1187 (lo que no
@@ -1203,7 +1207,6 @@ test.describe('re-inspección 22/10/2026', () => {
   test('teclado — tras pasar «Hola» a braille y cambiar de sentido, la F no da «Holaa» sin aviso', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     await convertirHidratado(page, 'Hola');
     await expect(cajaResultado(page)).toHaveText('⠨⠓⠕⠇⠁'); // precondición
@@ -1220,6 +1223,10 @@ test.describe('re-inspección 22/10/2026', () => {
     };
     // Lo que DEBERÍA pasar: o la tinta se avisa, o el teclado no la mezcla con sus celdas.
     expect(estado).not.toEqual({ resultado: 'Holaa', avisos: 0 });
+    // Y el aviso nombra la tinta que ha pasado sin traducir
+    await expect(
+      page.locator('[class*="avisoConversion"]').filter({ hasText: 'mezcla celdas braille con texto en tinta' }),
+    ).toContainText('H · o · l · a');
   });
 
   // ─────────────────────────────────────────────────────────────────────────

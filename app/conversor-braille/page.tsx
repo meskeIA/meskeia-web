@@ -397,6 +397,20 @@ export default function ConversorBraillePage() {
     [mode, input],
   );
 
+  /**
+   * ⚠️ 22/10/2026 (hallazgo 3417) — la otra mitad del 1187: la entrada trae celdas Y tinta. Pasa
+   * con el teclado de seis puntos en cuanto la caja conserva el «Hola» del otro sentido: «Hola⠁»
+   * volvía como «Holaa» sin aviso, y la hoja (que punza la entrada filtrada al bloque braille)
+   * solo ⠁. Los caracteres en tinta se nombran: han pasado tal cual y no salen en la hoja.
+   */
+  const tintaEnBraille = useMemo(
+    () =>
+      mode === 'brailleToText' && result !== '' && !entradaSinCeldas
+        ? [...new Set(Array.from(input).filter((c) => !/[⠀-⣿]/.test(c) && !/\s/.test(c)))]
+        : [],
+    [mode, result, input, entradaSinCeldas],
+  );
+
   /** ¿Lleva el resultado algún signo que en español abre y cierra igual? */
   const llevaSignoAmbiguo = useMemo(
     () => (mode === 'textToBraille' ? /[⠢⠖⠦]/.test(result) : false),
@@ -928,6 +942,18 @@ export default function ConversorBraillePage() {
                 <span aria-hidden="true">⚠️</span> Lo que has pegado no contiene ninguna celda
                 braille, así que ha salido tal cual: esto no es una traducción. Si querías pasar
                 un texto a braille, cambia el sentido de la conversión ahí arriba.
+              </p>
+            )}
+
+            {tintaEnBraille.length > 0 && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                La caja mezcla celdas braille con texto en tinta:{' '}
+                <strong>{tintaEnBraille.join(' · ')}</strong>{' '}
+                {tintaEnBraille.length === 1 ? 'ha pasado' : 'han pasado'} al resultado tal cual,
+                sin traducir, y no {tintaEnBraille.length === 1 ? 'sale' : 'salen'} en la hoja
+                imprimible. Si vas a escribir con el teclado de seis puntos, vacía antes la caja
+                con «Limpiar».
               </p>
             )}
 
