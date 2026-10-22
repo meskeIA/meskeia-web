@@ -15,7 +15,7 @@
  *   · LO 1/2025 (BOE-A-2025-76), disposición transitoria 9.ª.1: la reforma se aplica
  *     «exclusivamente a los procedimientos incoados con posterioridad a su entrada en vigor».
  *   · RGR, RD 939/2005 (BOE-A-2005-14803) arts. 101.f, 103 bis.1 (RD 117/2024) y 104.3.
- *   · RGRSS, RD 1415/2004 (BOE-A-2004-11836) arts. 117.e-g y 120.
+ *   · RGRSS, RD 1415/2004 (BOE-A-2004-11836) arts. 117.e-g, 118.2 y 120.
  *   · TRLITPAJD (BOE-A-1993-25359) art. 10.2: la base es el valor de referencia si el precio no
  *     lo supera. La DGT lo aplica a las subastas (V0453-22) y lo confirmó el TSJ de Galicia (2026).
  *   · LPH (BOE-A-1960-10906) art. 9.1.e: el adquirente responde con el inmueble de las cuotas de
@@ -26,7 +26,7 @@
 
 export const FISCAL_SUBASTAS_META = {
   fuente:
-    'LEC arts. 669-671 (LO 1/2025) · RGR arts. 101 y 103 bis · RGRSS arts. 117 y 120 · TRLITPAJD art. 10.2 · LPH art. 9.1.e',
+    'LEC arts. 669-671 (LO 1/2025) · RGR arts. 101 y 103 bis · RGRSS arts. 117, 118 y 120 · TRLITPAJD art. 10.2 · LPH art. 9.1.e',
   verificado: '2026-10-22',
   vigencia: '2026',
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2000-323',
@@ -52,8 +52,9 @@ export const DEPOSITO_SUBASTA = {
   judicialAnterior: { porcentaje: 5, minimo: null, norma: 'art. 669.1 LEC (redacción de la Ley 19/2015)' },
   /** Art. 103 bis.1.b RGR: lotes con al menos un inmueble (el 10 % es solo para muebles). */
   aeat: { porcentaje: 5, minimo: null, norma: 'art. 103 bis.1.b del Reglamento General de Recaudación' },
-  /** Art. 117.e RGRSS: cheque «por importe, en todo caso, del 25 por ciento del tipo». */
-  seguridadSocialSobre: { porcentaje: 25, minimo: null, norma: 'art. 117.e del Reglamento General de Recaudación de la Seguridad Social' },
+  /** Art. 118.2 RGRSS (y el anuncio, art. 117.e): depósito con la oferta en sobre cerrado «por
+   * importe, en todo caso, del 25 por ciento del tipo establecido para la enajenación». */
+  seguridadSocialSobre: { porcentaje: 25, minimo: null, norma: 'arts. 117.e y 118.2 del Reglamento General de Recaudación de la Seguridad Social' },
   /** Arts. 117.f y 120.2 RGRSS: quien puja de viva voz sin sobre previo deposita el 30 %. */
   seguridadSocialEnElActo: { porcentaje: 30, minimo: null, norma: 'arts. 117.f y 120.2 del Reglamento General de Recaudación de la Seguridad Social' },
 } as const satisfies Record<string, ReglaDepositoSubasta>;
