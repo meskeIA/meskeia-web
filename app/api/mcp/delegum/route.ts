@@ -290,6 +290,11 @@ const pct = (n: number) => n.toFixed(2).replace('.', ',');
 /** Coeficiente multiplicador del ISD en formato español: decía «×1.6676» (cabo C0085). */
 const coef = (n: number) => n.toLocaleString('es-ES', { maximumFractionDigits: 4 });
 
+// El tramo "50" existe porque Extremadura distingue del 50 % al 64 % (art. 18 DLeg 1/2018, C0371)
+const DESCRIPCION_DISCAPACIDAD_ISD =
+  'Grado de discapacidad del heredero: "33" del 33 % al 49 %, "50" del 50 % al 64 %, "65" del 65 % o más. ' +
+  'La reducción estatal no distingue "33" de "50"; Extremadura sí. Por defecto "0".';
+
 // El seguro va APARTE de valor_herencia y el motor lo acumula a la base (cabo C0027)
 const DESCRIPCION_SEGURO_VIDA =
   'Importe cobrado como beneficiario de un seguro de vida del fallecido, APARTE de valor_herencia (no lo sumes en él): ' +
@@ -720,8 +725,8 @@ function crearServidorDelegum(): McpServer {
         .describe('Si el heredero convivió con el fallecido los dos años anteriores. Solo se le exige al Grupo III (colateral) para la reducción por vivienda habitual (art. 20.2.c LISD).'),
       seguro_vida: z.number().nonnegative().optional()
         .describe(DESCRIPCION_SEGURO_VIDA),
-      discapacidad: z.enum(['0', '33', '65']).optional()
-        .describe('Grado de discapacidad del heredero. Por defecto "0".'),
+      discapacidad: z.enum(['0', '33', '50', '65']).optional()
+        .describe(DESCRIPCION_DISCAPACIDAD_ISD),
       patrimonio_preexistente: z.number().nonnegative().optional()
         .describe(DESCRIPCION_PATRIMONIO_HEREDERO),
       especial_vinculacion: z.boolean().optional().describe(DESCRIPCION_ESPECIAL_VINCULACION),
@@ -1443,7 +1448,7 @@ function crearServidorDelegum(): McpServer {
         .describe('Grupo de parentesco. II=HIJO de 21 o más; II-descendiente=nieto/bisnieto de 21 o más (en Cataluña reducen distinto: 100.000 € frente a 50.000 €)'),
       vivienda_habitual: z.number().nonnegative().optional().describe('Valor de la vivienda habitual heredada (reducción 95%)'),
       seguro_vida: z.number().nonnegative().optional().describe(DESCRIPCION_SEGURO_VIDA),
-      discapacidad: z.enum(['0', '33', '65']).optional().describe('Grado de discapacidad. Por defecto "0".'),
+      discapacidad: z.enum(['0', '33', '50', '65']).optional().describe(DESCRIPCION_DISCAPACIDAD_ISD),
       // Los dos requisitos que el art. 20.2.c LISD le exige al pariente COLATERAL (Grupo III)
       // para la reducción por vivienda habitual. Antes no se podían ni expresar, así que la
       // tool se la concedía siempre y contradecía a la web (hallazgo 462).

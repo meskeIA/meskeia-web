@@ -18,7 +18,6 @@ import {
   TARIFA_ESTATAL_IS,
   TARIFA_CATALUNA_IS,
   REDUCCIONES_PARENTESCO_IS,
-  REDUCCIONES_PARENTESCO_CATALUNA_IS,
   BONIFICACIONES_CCAA_IS,
   COEFICIENTES_IS,
   COEFICIENTES_CATALUNA_IS,
@@ -32,10 +31,6 @@ import {
   REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
-  REDUCCION_EDAD_MENOR_21_IS,
-  REDUCCION_EDAD_MENOR_21_MAX_IS,
-  REDUCCION_EDAD_MENOR_21_CATALUNA_IS,
-  REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS,
   desglosarCuotaBaseAhorro,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   PLUSVALIA_MUNICIPAL_META,
@@ -57,6 +52,7 @@ const TIPO_AHORRO_MAX = ESCALA_AHORRO[ESCALA_AHORRO.length - 1].tipo;
 import {
   calcularCuotaIntegraIS,
   evaluarReduccionVivienda,
+  reduccionesPersonalesIS,
   porcentajeBonificacionPonderada,
   EDAD_MIN_COLATERAL_VIVIENDA_IS,
   type GrupoParentescoIS,
@@ -448,28 +444,18 @@ function calcularISD(
   const ajuarDomestico = redondearCentimos(caudalRelicto * PORC_AJUAR_DOMESTICO_IS);
   const baseImponible = redondearCentimos(caudalRelicto + ajuarDomestico);
 
-  // Reducción por parentesco
-  const reducciones = esCataluna ? REDUCCIONES_PARENTESCO_CATALUNA_IS : REDUCCIONES_PARENTESCO_IS;
-  const reduccionBaseParentesco = reducciones[reducKey] ?? 0;
-
   /**
-   * Incremento del Grupo I por cada año menos de 21: la reducción de parentesco sube 3.990,72 €
-   * por año sin que el TOTAL exceda de 47.858,59 € (art. 20.2.a LISD), y en Cataluña 12.000 €
-   * por año con tope de 196.000 € (art. 2 Ley 19/2010).
+   * Reducción por parentesco con el incremento del Grupo I por cada año menos de 21: sube
+   * 3.990,72 € por año sin que el TOTAL exceda de 47.858,59 € (art. 20.2.a LISD), y en Cataluña
+   * 12.000 € por año con tope de 196.000 € (art. 2 Ley 19/2010). En Extremadura, los 500.000 €
+   * del art. 17 DLeg 1/2018 SUSTITUYEN a la estatal y al incremento por edad (C0371).
    *
-   * Cataluña se saltaba entera esta figura porque `data/fiscal` no traía sus cuantías. Desde
-   * el 08/09/2026 sí las trae, verificadas en el BOE y en la Agència Tributària, así que ya no
-   * hay que elegir entre inventarse el dato estatal y no dar ninguno.
+   * Desde el 22/10/2026 la sirve `reduccionesPersonalesIS` del motor: estaba escrita aquí, en
+   * `estimador-impuesto-sucesiones` y en el motor, y modelar la mejora extremeña pedía tocarla
+   * en los tres sitios. Esta app no pregunta la discapacidad, así que solo usa la de parentesco.
    */
-  const anosPorDebajo = grupo === 'I' ? Math.max(0, 21 - edad) : 0;
-  const reduccionParentesco = redondearCentimos(
-    anosPorDebajo > 0
-      ? Math.min(
-          reduccionBaseParentesco + anosPorDebajo * (esCataluna ? REDUCCION_EDAD_MENOR_21_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_IS),
-          esCataluna ? REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_MAX_IS,
-        )
-      : reduccionBaseParentesco
-  );
+  const personales = reduccionesPersonalesIS({ ccaa, grupo: reducKey, edadHeredero: edad });
+  const reduccionParentesco = redondearCentimos(personales.parentesco + personales.edadMenor21);
 
   /**
    * Reducción por vivienda habitual: 95 % hasta 122.606,47 € en régimen común (art. 20.2.c

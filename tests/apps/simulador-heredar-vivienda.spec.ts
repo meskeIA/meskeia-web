@@ -3042,6 +3042,32 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   });
 
   /**
+   * C0371 (reparar, 22/10/2026) — en Extremadura la reducción por parentesco de los Grupos I y II
+   * es de 500.000 € (art. 17 DLeg 1/2018, BOE-A-2018-8159) y SUSTITUYE a la estatal de 15.956,87 €
+   * (art. 48.1.a Ley 22/2009; decisión del usuario del 22/10/2026). La app la tecleaba con la
+   * estatal y cobraba el 1 % de una cuota que la ley extremeña deja en cero.
+   *
+   * Hijo de 45 años, vivienda habitual de 300.000 €:
+   *   base imponible  300.000 + 3 % de ajuar = 309.000,00
+   *   − parentesco    500.000,00 (art. 17)  → base liquidable 0,00 → cuota 0,00 €
+   *   (antes: 309.000 − 15.956,87 − 122.606,47 = 170.436,66 de base liquidable)
+   */
+  test('C0371 — un hijo en Extremadura reduce 500.000 € por parentesco y no paga ISD', async ({ page }) => {
+    await abrir(page);
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'extremadura');
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'valorRef', 300000);
+
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−500.000,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('0,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('0,00 €');
+    expect(
+      calcularSucesion({ baseImponible: 300000, ccaa: 'extremadura', grupo: 'II', edadHeredero: 45, viviendaHabitual: 300000, incluyeAjuar: true }).cuotaFinal
+    ).toBe(0);
+  });
+
+  /**
    * CASO 3 (RECHAZO) — Cataluña deniega la reducción por vivienda habitual al Grupo IV, y
    * lo DICE con su norma, no con la estatal.
    *

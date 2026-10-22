@@ -32,6 +32,7 @@ import {
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
   PORC_AJUAR_DOMESTICO_IS,
   BONIFICACIONES_CCAA_IS,
+  MEJORAS_REDUCCIONES_CCAA_IS,
   FISCAL_SUCESIONES_META,
   FISCAL_SUCESIONES_CATALUNA_META,
   type TramoTarifaIS,
@@ -57,7 +58,14 @@ export type GrupoParentescoIS =
   | 'III'
   | 'IV';
 
-export type NivelDiscapacidadIS = '0' | '33' | '65';
+/**
+ * Grado de discapacidad del heredero: '33' es del 33 % al 49 %, '50' del 50 % al 64 % y '65' del
+ * 65 % o más. La reducción estatal (art. 20.2.a LISD) no distingue '33' de '50' —47.858,59 € del
+ * 33 % al 64 %—, pero Extremadura sí (art. 18 DLeg 1/2018: 60.000 / 120.000 / 180.000 €). Hasta el
+ * 22/10/2026 el tipo solo tenía '33' y '65' (C0371); quien siga pasando '33' para un grado del 50 %
+ * al 64 % recibe en Extremadura la reducción del tramo inferior, nunca una de más.
+ */
+export type NivelDiscapacidadIS = '0' | '33' | '50' | '65';
 
 /** 1–4: ninguno/bajo/medio/alto (rangos de patrimonio preexistente) */
 export type IndicePatrimonioIS = 1 | 2 | 3 | 4;
@@ -359,6 +367,80 @@ function aplicarBonificacionIS(
   return { bonificacion: 0, porcentaje: 0, detalle: 'Sin bonificación autonómica para este grupo' };
 }
 
+export interface ReduccionesPersonalesIS {
+  /** Reducción por parentesco: la estatal, la catalana o la mejora autonómica que la sustituye. */
+  parentesco: number;
+  /** Incremento por cada año por debajo de 21 (0 si una mejora autonómica sustituye la estatal). */
+  edadMenor21: number;
+  discapacidad: number;
+  /** Norma de la mejora autonómica aplicada a la de parentesco, o `null` si rige la estatal. */
+  mejoraParentesco: string | null;
+  /** Norma de la mejora autonómica aplicada a la de discapacidad, o `null`. */
+  mejoraDiscapacidad: string | null;
+}
+
+/**
+ * Reducciones por parentesco, por edad y por discapacidad del art. 20.2.a LISD, con la tabla
+ * catalana o la MEJORA autonómica que las sustituye (`MEJORAS_REDUCCIONES_CCAA_IS`) — FUENTE
+ * ÚNICA desde el 22/10/2026.
+ *
+ * Vivía escrita tres veces —este motor, `estimador-impuesto-sucesiones` y
+ * `simulador-heredar-vivienda`—, y por eso modelar las mejoras de Extremadura (arts. 17 y 18 DLeg
+ * 1/2018, cabo C0371) exigía tocarla en tres sitios: se saca aquí para que la siguiente comunidad
+ * que mejore una reducción se declare UNA vez, en `data/fiscal`.
+ *
+ * ⚠️ Una mejora SUSTITUYE a la estatal (art. 48.1.a Ley 22/2009): en Extremadura el menor de 21
+ * años no suma los 3.990,72 € por año a los 500.000 €. No es una reducción propia como la de
+ * Asturias, que se suma y se lee de `reduccionBase`.
+ */
+export function reduccionesPersonalesIS(p: {
+  ccaa: string;
+  grupo: GrupoParentescoIS;
+  edadHeredero?: number;
+  discapacidad?: NivelDiscapacidadIS;
+}): ReduccionesPersonalesIS {
+  const esCataluna = p.ccaa === 'cataluna';
+  const mejora = MEJORAS_REDUCCIONES_CCAA_IS[p.ccaa];
+  const r = (n: number) => Math.round(n * 100) / 100;
+
+  let parentesco: number;
+  let edadMenor21 = 0;
+  let mejoraParentesco: string | null = null;
+  const mejorada = mejora?.parentesco.importes[p.grupo];
+  if (mejora && mejorada !== undefined) {
+    parentesco = mejorada;
+    mejoraParentesco = mejora.parentesco.norma;
+  } else {
+    parentesco = esCataluna
+      ? (REDUCCIONES_PARENTESCO_CATALUNA_IS[p.grupo] ?? 0)
+      : (REDUCCIONES_PARENTESCO_IS[p.grupo] ?? 0);
+    // Menor de 21 años: solo descendientes/adoptados, art. 20.2.a LISD. Cataluña tiene la misma
+    // figura con importes propios —12.000 € por año con tope de 196.000 €, art. 2 Ley 19/2010—,
+    // y hasta el 08/09/2026 se la saltaba entera: un nieto huérfano de 5 años perdía los
+    // 192.000 € de incremento que la ley catalana le da. El tope es del TOTAL.
+    const edad = p.edadHeredero;
+    if (edad !== undefined && Number.isFinite(edad) && edad < 21 && p.grupo === 'I-descendiente') {
+      const porAnio = esCataluna ? REDUCCION_EDAD_MENOR_21_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_IS;
+      const tope = esCataluna ? REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_MAX_IS;
+      edadMenor21 = Math.max(0, r(Math.min(parentesco + (21 - edad) * porAnio, tope) - parentesco));
+    }
+  }
+
+  const nivel = p.discapacidad ?? '0';
+  let discapacidad = 0;
+  let mejoraDiscapacidad: string | null = null;
+  if (nivel !== '0') {
+    if (mejora) {
+      discapacidad = mejora.discapacidad[nivel];
+      mejoraDiscapacidad = mejora.discapacidad.norma;
+    } else {
+      discapacidad = nivel === '65' ? REDUCCION_DISCAPACIDAD_65_IS : REDUCCION_DISCAPACIDAD_33_IS;
+    }
+  }
+
+  return { parentesco, edadMenor21, discapacidad, mejoraParentesco, mejoraDiscapacidad };
+}
+
 /** Edad mínima del colateral (Grupo III) para la reducción por vivienda, art. 20.2.c LISD */
 export const EDAD_MIN_COLATERAL_VIVIENDA_IS = 65;
 
@@ -476,28 +558,12 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   const seguroAcumulado = p.seguroVida && p.seguroVida > 0 ? r(p.seguroVida) : 0;
   const baseConAjuar = r(p.baseImponible + ajuarDomestico + seguroAcumulado);
 
-  // 2. Reducción por parentesco
-  const reduccionParentesco = esCataluna
-    ? (REDUCCIONES_PARENTESCO_CATALUNA_IS[p.grupo] ?? 0)
-    : (REDUCCIONES_PARENTESCO_IS[p.grupo] ?? 0);
-
-  // 3. Reducción por edad (menor de 21 años: solo descendientes/adoptados, art. 20.2.a LISD).
-  //    Cataluña tiene la misma figura con importes propios —12.000 € por año con tope de
-  //    196.000 €, art. 2 Ley 19/2010—, y hasta el 08/09/2026 se la saltaba entera: un nieto
-  //    huérfano de 5 años perdía los 192.000 € de incremento que la ley catalana le da.
-  let reduccionEdadMenor21 = 0;
-  if (edad !== undefined && edad < 21 && p.grupo === 'I-descendiente') {
-    const aniosDevida = 21 - edad;
-    const porAnio = esCataluna ? REDUCCION_EDAD_MENOR_21_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_IS;
-    const tope = esCataluna ? REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_MAX_IS;
-    reduccionEdadMenor21 = Math.min(reduccionParentesco + aniosDevida * porAnio, tope) - reduccionParentesco;
-    reduccionEdadMenor21 = Math.max(0, r(reduccionEdadMenor21));
-  }
-
-  // 4. Reducción por discapacidad
-  let reduccionDiscapacidad = 0;
-  if (discapacidad === '33') reduccionDiscapacidad = REDUCCION_DISCAPACIDAD_33_IS;
-  else if (discapacidad === '65') reduccionDiscapacidad = REDUCCION_DISCAPACIDAD_65_IS;
+  // 2-4. Reducciones por parentesco, por edad (menor de 21) y por discapacidad, con la tabla
+  // catalana o la mejora autonómica que sustituye a la estatal: `reduccionesPersonalesIS`.
+  const personales = reduccionesPersonalesIS({ ccaa: p.ccaa, grupo: p.grupo, edadHeredero: edad, discapacidad });
+  const reduccionParentesco = personales.parentesco;
+  const reduccionEdadMenor21 = personales.edadMenor21;
+  const reduccionDiscapacidad = personales.discapacidad;
 
   // 5. Reducción vivienda habitual — ver `evaluarReduccionVivienda`, que es la fuente única
   // de esta regla desde el 27/08/2026 y la comparten este motor y la app.

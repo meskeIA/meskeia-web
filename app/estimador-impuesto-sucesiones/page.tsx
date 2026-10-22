@@ -24,8 +24,6 @@ import {
   REDUCCIONES_PARENTESCO_CATALUNA_IS,
   REDUCCION_EDAD_MENOR_21_IS,
   REDUCCION_EDAD_MENOR_21_MAX_IS,
-  REDUCCION_EDAD_MENOR_21_CATALUNA_IS,
-  REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS,
   REDUCCION_SEGURO_VIDA_MAX_IS,
   PLAZO_ISD,
   REDUCCION_VIVIENDA_MAX_IS,
@@ -42,11 +40,13 @@ import {
   REDUCCION_EMPRESA_FAMILIAR_CATALUNA_IS,
   PORC_AJUAR_DOMESTICO_IS,
   BONIFICACIONES_CCAA_IS,
+  MEJORAS_REDUCCIONES_CCAA_IS,
   TramoTarifaIS,
   BonificacionGrupoIS,
 } from '@/data/fiscal';
 import {
   evaluarReduccionVivienda,
+  reduccionesPersonalesIS,
   calcularSucesion,
   claveBonificacionEfectiva,
   porcentajeBonificacionPonderada,
@@ -60,7 +60,9 @@ import {
 // distingue. Ver el tipo `GrupoParentescoIS` del motor, con el que este debe coincidir.
 type GrupoParentesco = 'I-conyuge' | 'I-descendiente' | 'II' | 'II-descendiente' | 'II-ascendiente' | 'III' | 'IV';
 type TipoAdquisicion = 'plena' | 'usufructo' | 'nuda';
-type NivelDiscapacidad = '0' | '33' | '65';
+// '33' es del 33 % al 49 % y '50' del 50 % al 64 %: el Estado no los distingue y Extremadura sí
+// (art. 18 DLeg 1/2018, C0371). Debe coincidir con `NivelDiscapacidadIS` del motor.
+type NivelDiscapacidad = '0' | '33' | '50' | '65';
 
 interface DetalleReduccion {
   concepto: string;
@@ -751,19 +753,14 @@ export default function EstimadorImpuestoSucesionesPage() {
     // Reducciones
     const reducciones: DetalleReduccion[] = [];
 
-    // 1. Reducción por parentesco
-    const reduccionesParentesco = esCataluna
-      ? REDUCCIONES_PARENTESCO_CATALUNA_IS
-      : REDUCCIONES_PARENTESCO_IS;
-    const reduccionParentesco = reduccionesParentesco[grupo] || 0;
-    if (reduccionParentesco > 0) {
-      reducciones.push({ concepto: 'Por parentesco', importe: reduccionParentesco });
-    }
-
-    // 2. Reducción por edad (solo grupo I descendiente, para menores de 21).
-    //    ⚠️ El tope legal es del TOTAL (parentesco + incremento), no del incremento suelto:
-    //    47.858,59 € en régimen común (art. 20.2.a LISD) y 196.000 € en Cataluña (art. 2 Ley
-    //    19/2010). Hasta el 08/09/2026 aquí se sumaba `reduccionParentesco + MAX`, así que un
+    // 1-2. Reducciones por parentesco y por edad, y abajo (5) la de discapacidad: las calcula
+    //    `reduccionesPersonalesIS` del motor, con la tabla catalana o la mejora autonómica que
+    //    sustituye a la estatal (Extremadura, arts. 17 y 18 DLeg 1/2018; C0371). Hasta el
+    //    22/10/2026 esta app las llevaba escritas a mano y un hijo que heredaba 400.000 € en
+    //    Extremadura pagaba el 1 % de la cuota estatal en vez de 0.
+    //    ⚠️ El tope legal de la de edad es del TOTAL (parentesco + incremento), no del incremento
+    //    suelto: 47.858,59 € en régimen común (art. 20.2.a LISD) y 196.000 € en Cataluña (art. 2
+    //    Ley 19/2010). Hasta el 08/09/2026 aquí se sumaba `reduccionParentesco + MAX`, así que un
     //    recién nacido llegaba a 63.815,46 € estatales, un 33 % por encima del tope de la ley,
     //    y además se le aplicaban las cifras estatales viviendo en Cataluña.
     /**
@@ -779,21 +776,25 @@ export default function EstimadorImpuestoSucesionesPage() {
      */
     const edadHeredero = leerEdad(edad);
     const edadNum = edadHeredero ?? Number.NaN;
-    if (grupo === 'I-descendiente' && edadNum < EDAD_LIMITE_GRUPO_I) {
-      const porAnio = esCataluna ? REDUCCION_EDAD_MENOR_21_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_IS;
-      const topeTotal = esCataluna ? REDUCCION_EDAD_MENOR_21_MAX_CATALUNA_IS : REDUCCION_EDAD_MENOR_21_MAX_IS;
-      const reduccionEdad = Math.min(
-        reduccionParentesco + porAnio * (EDAD_LIMITE_GRUPO_I - edadNum),
-        topeTotal
-      ) - reduccionParentesco;
-      if (reduccionEdad > 0) {
-        // Rotulaba `${21 - edad} años < 21`, que se lee como la edad del heredero: a uno de 15
-        // le ponía «6 años < 21» y a uno de 0, «21 años < 21» (hallazgo 1831).
-        reducciones.push({
-          concepto: `Por edad (heredero de ${edadNum} ${edadNum === 1 ? 'año' : 'años'}, menor de ${EDAD_LIMITE_GRUPO_I})`,
-          importe: reduccionEdad,
-        });
-      }
+    const personales = reduccionesPersonalesIS({
+      ccaa,
+      grupo,
+      edadHeredero: edadHeredero ?? undefined,
+      discapacidad,
+    });
+    if (personales.parentesco > 0) {
+      reducciones.push({
+        concepto: personales.mejoraParentesco ? `Por parentesco (${personales.mejoraParentesco})` : 'Por parentesco',
+        importe: personales.parentesco,
+      });
+    }
+    if (personales.edadMenor21 > 0) {
+      // Rotulaba `${21 - edad} años < 21`, que se lee como la edad del heredero: a uno de 15
+      // le ponía «6 años < 21» y a uno de 0, «21 años < 21» (hallazgo 1831).
+      reducciones.push({
+        concepto: `Por edad (heredero de ${edadNum} ${edadNum === 1 ? 'año' : 'años'}, menor de ${EDAD_LIMITE_GRUPO_I})`,
+        importe: personales.edadMenor21,
+      });
     }
 
     // 3. Reducción por seguro de vida (solo para cónyuge, descendientes, ascendientes)
@@ -883,11 +884,17 @@ export default function EstimadorImpuestoSucesionesPage() {
       ? `falta la edad del heredero: el pariente colateral necesita ${EDAD_MIN_COLATERAL_VIVIENDA_IS} años o más`
       : vivienda.noAplicada;
 
-    // 5. Reducción por discapacidad
-    if (discapacidad === '33') {
-      reducciones.push({ concepto: `Discapacidad ${pct(33)}–${pct(64)}`, importe: REDUCCION_DISCAPACIDAD_33_IS });
-    } else if (discapacidad === '65') {
-      reducciones.push({ concepto: `Discapacidad ≥${pct(65)}`, importe: REDUCCION_DISCAPACIDAD_65_IS });
+    // 5. Reducción por discapacidad (de `reduccionesPersonalesIS`, arriba)
+    if (personales.discapacidad > 0) {
+      const tramo = discapacidad === '65'
+        ? `≥${pct(65)}`
+        : personales.mejoraDiscapacidad
+          ? (discapacidad === '50' ? `${pct(50)}–${pct(64)}` : `${pct(33)}–${pct(49)}`)
+          : `${pct(33)}–${pct(64)}`;
+      reducciones.push({
+        concepto: personales.mejoraDiscapacidad ? `Discapacidad ${tramo} (${personales.mejoraDiscapacidad})` : `Discapacidad ${tramo}`,
+        importe: personales.discapacidad,
+      });
     }
 
     // 6. Reducción adicional Asturias
@@ -1156,7 +1163,7 @@ export default function EstimadorImpuestoSucesionesPage() {
             <div className={styles.campo}>
               <span className={styles.label} id="etiqueta-discapacidad">Discapacidad reconocida</span>
               <div className={styles.radioGroup} role="radiogroup" aria-labelledby="etiqueta-discapacidad">
-                {[['0','No'], ['33',`${pct(33)}–${pct(64)}`], ['65',`≥${pct(65)}`]].map(([v, l]) => (
+                {[['0','No'], ['33',`${pct(33)}–${pct(49)}`], ['50',`${pct(50)}–${pct(64)}`], ['65',`≥${pct(65)}`]].map(([v, l]) => (
                   <label key={v} className={styles.radioLabel}>
                     <input type="radio" value={v} checked={discapacidad === v}
                       onChange={() => setDiscapacidad(v as NivelDiscapacidad)} />
@@ -1846,7 +1853,13 @@ export default function EstimadorImpuestoSucesionesPage() {
                 da derecho a una reducción adicional de <strong>{euros(REDUCCION_DISCAPACIDAD_33_IS)}</strong>;
                 discapacidad del 65&nbsp;% o superior da derecho a <strong>{euros(REDUCCION_DISCAPACIDAD_65_IS)}</strong>. Estas reducciones
                 se suman a las de parentesco. Algunas CCAA (Andalucía, Valencia, Cataluña) amplían
-                estos importes. El grado de discapacidad debe estar reconocido oficialmente antes
+                estos importes. Extremadura los sustituye por una escala de tres tramos, que esta
+                herramienta aplica: {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad['33'])} del 33&nbsp;%
+                al 49&nbsp;%, {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad['50'])} del 50&nbsp;% al 64&nbsp;%
+                y {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad['65'])} desde el 65&nbsp;%
+                ({MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad.norma}), y la reducción por
+                parentesco de los Grupos I y II por {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].parentesco.importes['II'] ?? 0)}
+                ({MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].parentesco.norma}). El grado de discapacidad debe estar reconocido oficialmente antes
                 del devengo del impuesto.
               </dd>
             </div>

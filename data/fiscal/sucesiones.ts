@@ -267,6 +267,60 @@ export const REDUCCION_DISCAPACIDAD_33_IS = 47858.59;    // Grado 33%–64%
 export const REDUCCION_DISCAPACIDAD_65_IS = 150253.03;   // Grado ≥65%
 export const PORC_AJUAR_DOMESTICO_IS = 0.03;             // 3% de la masa hereditaria
 
+// ─── Mejoras autonómicas de las reducciones estatales ────────────────────────
+
+/**
+ * Reducciones por parentesco y por discapacidad que una comunidad MEJORA: la cifra autonómica
+ * SUSTITUYE a la estatal en esa comunidad (art. 48.1.a Ley 22/2009, BOE-A-2009-20375: «la
+ * reducción mejorada sustituirá, en esa Comunidad Autónoma, a la reducción estatal»). No es lo
+ * mismo que una reducción PROPIA, que se aplica después de las estatales y se suma a ellas
+ * —como la de Asturias, `reduccionBase` en `BONIFICACIONES_CCAA_IS`— ni impide la bonificación
+ * en cuota.
+ *
+ * Hoy solo Extremadura (DLeg 1/2018, BOE-A-2018-8159, consolidado; cotejado el 22/10/2026):
+ *   · art. 17, «Mejora de la reducción personal […] para los causahabientes incluidos en los
+ *     grupos I y II de parentesco»: «podrán aplicarse una reducción en la base imponible de
+ *     500.000 euros» (redacción de la Ley 1/2024, vigente desde el 01/01/2024). Sustituye a los
+ *     15.956,87 € del art. 20.2.a LISD y a los 3.990,72 € por año hasta los 21.
+ *   · art. 18, «Mejora de la reducción de la base imponible para las personas discapacitadas»:
+ *     60.000 € (33 % a menos del 50 %), 120.000 € (50 % a menos del 65 %) y 180.000 € (65 % o
+ *     más), «además de la reducción que les pudiera corresponder en función de su grado de
+ *     parentesco». Sustituye a los 47.858,59 / 150.253,03 € estatales.
+ * Las dos son compatibles con la bonificación del 99 % del art. 20.
+ *
+ * Hasta el 22/10/2026 no se modelaban (cabo C0371): un hijo que heredaba 400.000 € en
+ * Extremadura pagaba el 1 % de la cuota estatal cuando la reducción de 500.000 € la deja en 0.
+ * Modelarlas como mejoras y no como propias lo decidió el usuario el 22/10/2026: la diferencia
+ * solo aparece con bases de más de unos 500.000 €. Lo haría cambiar un criterio de la Junta o
+ * una consulta vinculante que las trate como propias.
+ */
+export interface MejoraReduccionesCCAA_IS {
+  /** Reducción por parentesco que sustituye a la estatal (y al incremento por edad), por grupo. */
+  parentesco: { norma: string; importes: Partial<Record<string, number>> };
+  /** Escala por discapacidad que sustituye a la estatal, por grado mínimo. */
+  discapacidad: { norma: string; '33': number; '50': number; '65': number };
+  urlOficial: string;
+  verificado: string;
+}
+
+export const MEJORAS_REDUCCIONES_CCAA_IS: Record<string, MejoraReduccionesCCAA_IS> = {
+  'extremadura': {
+    parentesco: {
+      norma: 'art. 17 DLeg 1/2018 de Extremadura',
+      importes: {
+        'I-conyuge':       500000,
+        'I-descendiente':  500000,
+        'II':              500000,
+        'II-descendiente': 500000,
+        'II-ascendiente':  500000,
+      },
+    },
+    discapacidad: { norma: 'art. 18 DLeg 1/2018 de Extremadura', '33': 60000, '50': 120000, '65': 180000 },
+    urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2018-8159',
+    verificado: '2026-10-22',
+  },
+};
+
 /**
  * Plazo de presentación y prórroga del ISD en adquisiciones por causa de muerte.
  *
@@ -535,9 +589,10 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
   // 22/10/2026 (cabo C0146), cotejado en el BOE consolidado (BOE-A-2018-8159, texto del
   // 04/08/2026): art. 20 la bonificación del 99 % de los Grupos I y II; arts. 20 ter y 20 quater
   // extienden «los beneficios fiscales autonómicos vigentes para los grupos I y II» a las personas
-  // con especial vinculación inscritas en el Registro Autonómico. Lo único de esos beneficios que
-  // el módulo modela es la bonificación: la reducción propia de 500.000 € del art. 17 no está
-  // modelada para nadie (cabo aparte). Una sola comunidad: el sello del módulo NO se mueve.
+  // con especial vinculación inscritas en el Registro Autonómico. Las mejoras de los arts. 17 y 18
+  // (500.000 € por parentesco y la escala por discapacidad) están en `MEJORAS_REDUCCIONES_CCAA_IS`
+  // desde el 22/10/2026 (C0371); a la especial vinculación solo se le extiende la bonificación.
+  // Una sola comunidad: el sello del módulo NO se mueve.
   'extremadura': {
     nombre: 'Extremadura',
     regimen: 'comun',
@@ -554,7 +609,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Bonificación 99 % para Grupos I y II.',
+    notas: 'Bonificación 99 % para Grupos I y II. Reducción de 500.000 € por parentesco para los Grupos I y II y de 60.000, 120.000 o 180.000 € por discapacidad, que sustituyen a las estatales (arts. 17 y 18 DLeg 1/2018).',
   },
 
   'canarias': {

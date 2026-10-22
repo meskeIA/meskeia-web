@@ -1812,38 +1812,44 @@ test.describe('Inspector 25/09/2026', () => {
 
   /**
    * CASO LÍMITE — EXTREMADURA, descendiente de CERO años (Grupo I) con discapacidad del 65 % o
-   * más, que hereda 2.000.000 € en cuentas: el límite inferior de la edad, el tope del art.
-   * 20.2.a y el tramo más alto de la tarifa, a la vez.
+   * más, que hereda 2.000.000 € en cuentas: el límite inferior de la edad, las dos mejoras
+   * autonómicas y el tramo más alto de la tarifa, a la vez.
+   *
+   * ⚠️ 22/10/2026 (C0371) — este caso esperaba las reducciones ESTATALES (15.956,87 de parentesco,
+   * 31.901,72 de edad y 150.253,03 de discapacidad, 5611,65 € de cuota) y consagraba el defecto:
+   * en Extremadura las mejoras de los arts. 17 y 18 DLeg 1/2018 las SUSTITUYEN (art. 48.1.a Ley
+   * 22/2009; modeladas así por decisión del usuario del 22/10/2026). Se conserva el fondo —edad
+   * cero, discapacidad máxima, tramo del 34 %— con las cifras de la ley extremeña. El tope del
+   * art. 20.2.a lo sigue vigilando el caso del heredero de 15 años, ahora en Galicia.
    *
    *   Activos          2.000.000,00
    *   + ajuar 3 %         60.000,00
    *   = base imponible 2.060.000,00
-   *   − parentesco        15.956,87   REDUCCIONES_PARENTESCO_IS['I-descendiente']
-   *   − edad              31.901,72   min(15.956,87 + 21 × 3990,72 ; 47.858,59) − 15.956,87
-   *                                   REDUCCION_EDAD_MENOR_21_IS / …_MAX_IS (el tope es del TOTAL)
-   *   − discapacidad     150.253,03   REDUCCION_DISCAPACIDAD_65_IS
-   *   = base liquidable 1.861.888,38
-   *   cuota íntegra     561.164,72   TARIFA_ESTATAL_IS, último tramo:
-   *                                   199.291,40 + 34 % × (1.861.888,38 − 797.555,08)
+   *   − parentesco       500.000,00   art. 17 (sustituye a la estatal y a la de edad: sin línea «Por edad»)
+   *   − discapacidad     180.000,00   art. 18, 65 % o más
+   *   = base liquidable 1.380.000,00
+   *   cuota íntegra     397.322,67   TARIFA_ESTATAL_IS, último tramo:
+   *                                   199.291,40 + 34 % × (1.380.000,00 − 797.555,08) = 397.322,6728
    *   × 1,0000                        COEFICIENTES_IS['I'][0]
-   *   − bonificación 99 % 555.553,07  BONIFICACIONES_CCAA_IS['extremadura']…['I-descendiente']
-   *   = cuota final        5611,65 €  (561.164,72 × 1 %, = 561.164,72 − 555.553,07)
+   *   − bonificación 99 % 393.349,44  (393.349,4433)
+   *   = cuota final        3973,23 €  (397.322,67 − 393.349,44)
    */
-  test('caso límite: en Extremadura un heredero de 0 años con discapacidad ≥65 % y 2 M€ paga 5611,65 €', async ({ page }) => {
+  test('caso límite: en Extremadura un heredero de 0 años con discapacidad ≥65 % y 2 M€ paga 3973,23 €', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('extremadura');
     await page.locator('#parentesco').selectOption('I-descendiente');
     await sembrarValor(page, page.locator('#edad-heredero'), '0');
     await page.getByRole('radio', { name: /≥\s*65\s*%/ }).check();
     await sembrarValor(page, page.locator('#saldos-cuentas'), '2000000');
 
-    expect(await cuotaDestacada(page)).toBe('5611,65 €');
+    expect(await cuotaDestacada(page)).toBe('3973,23 €');
     const texto = await panel(page);
     expect(texto).toContain('2.060.000,00 €');   // base imponible con ajuar
-    expect(texto).toContain('31.901,72 €');      // edad, ya topada en el total de 47.858,59 €
-    expect(texto).toContain('150.253,03 €');     // discapacidad del 65 % o más
-    expect(texto).toContain('1.861.888,38 €');   // base liquidable
-    expect(texto).toContain('561.164,72 €');     // cuota íntegra, tramo del 34 %
-    expect(texto).toContain('555.553,07 €');     // bonificación del 99 %
+    expect(await importeDeLinea(page, /Por parentesco \(art\. 17 DLeg 1\/2018 de Extremadura\)/)).toBe('500.000,00 €');
+    expect(await importeDeLinea(page, /Discapacidad ≥\s?65\s?% \(art\. 18 DLeg 1\/2018 de Extremadura\)/)).toBe('180.000,00 €');
+    expect(texto).not.toContain('Por edad');      // la mejora sustituye también al incremento por edad
+    expect(texto).toContain('1.380.000,00 €');   // base liquidable
+    expect(texto).toContain('397.322,67 €');     // cuota íntegra, tramo del 34 %
+    expect(texto).toContain('393.349,44 €');     // bonificación del 99 %
     expect(texto).toContain('Bonificación 99,0 % (Extremadura)');
   });
 
@@ -1970,9 +1976,12 @@ test.describe('Inspector 25/09/2026', () => {
    * que se lee como que tiene 6 años; con 0 años, «(21 años < 21)», que es falso literalmente.
    * El importe sí es correcto: 6 × 3990,72 = 23.944,32 € (REDUCCION_EDAD_MENOR_21_IS; con los
    * 15.956,87 del parentesco suman 39.901,19, por debajo del tope de 47.858,59).
+   *
+   * Iba en Extremadura hasta el 22/10/2026; allí la mejora del art. 17 DLeg 1/2018 sustituye a la
+   * reducción estatal y al incremento por edad (C0371), así que el caso pasa a Galicia.
    */
   test('el concepto de la reducción por edad no presenta los años que faltan como la edad', async ({ page }) => {
-    await page.locator('#ccaa-causante').selectOption('extremadura');
+    await page.locator('#ccaa-causante').selectOption('galicia');
     await page.locator('#parentesco').selectOption('I-descendiente');
     await sembrarValor(page, page.locator('#edad-heredero'), '15');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '50000');
@@ -3226,5 +3235,97 @@ test.describe('Estimador ISD — Extremadura, especial vinculación (C0146)', ()
     const madrid = calcularSucesion({ baseImponible: 100000, ccaa: 'madrid', grupo: 'III', incluyeAjuar: true, especialVinculacion: true });
     const madridSin = calcularSucesion({ baseImponible: 100000, ccaa: 'madrid', grupo: 'III', incluyeAjuar: true });
     expect(madrid.cuotaFinal).toBe(madridSin.cuotaFinal);
+  });
+});
+
+/**
+ * CABO C0371 (reparar, 22/10/2026) — Extremadura, arts. 17 y 18 del DLeg 1/2018 (BOE-A-2018-8159,
+ * consolidado, leído en sesión): «podrán aplicarse una reducción en la base imponible de 500.000
+ * euros» los Grupos I y II (art. 17, redacción de la Ley 1/2024), y la discapacidad reduce 60.000 €
+ * (33 % a menos del 50 %), 120.000 € (50 % a menos del 65 %) o 180.000 € (65 % o más) (art. 18).
+ * Las dos son MEJORAS: sustituyen a la reducción estatal (art. 48.1.a Ley 22/2009), y así lo
+ * decidió el usuario el 22/10/2026. Compatibles con la bonificación del 99 % del art. 20.
+ *
+ * A · hijo de 21 o más (Grupo II), 400.000 € en cuentas — el caso del cabo:
+ *   base imponible 412.000,00 (ajuar 3 %) − 500.000,00 → base liquidable 0,00 → cuota 0,00 €
+ *   (antes: 412.000 − 15.956,87 = 396.043,13 → 79.957,81 de cuota íntegra → 799,58 € tras el 99 %)
+ * B · hijo, 1.000.000 € — la mejora no deja la cuota a cero por encima de ~500.000 €:
+ *   1.030.000 − 500.000 = 530.000,00
+ *   cuota íntegra 80.655,08 + 29,75 % × (530.000 − 398.777,54) = 119.693,76185 → 119.693,76
+ *   − 99 % (118.496,8224 → 118.496,82) = 1196,94 €
+ * C · hijo, 700.000 €, discapacidad del 50 % al 64 % — el tramo nuevo:
+ *   721.000 − 500.000 − 120.000 = 101.000,00
+ *   cuota íntegra 9.166,06 + 16,15 % × (101.000 − 79.880,52) = 12.576,85602 → 12.576,86
+ *   − 99 % (12.451,0914 → 12.451,09) = 125,77 €
+ * D · el mismo tramo en la Comunitat Valenciana, sin mejora modelada: la estatal del 33 % al 64 %,
+ *   47.858,59 € (REDUCCION_DISCAPACIDAD_33_IS).
+ */
+test.describe('Estimador ISD — Extremadura, mejoras de los arts. 17 y 18 (C0371)', () => {
+  const panelC0371 = async (page: Page): Promise<string> =>
+    (await page.locator('[class*="resultsPanel"]').innerText()).replace(/ /g, ' ');
+
+  async function hijo(page: Page, ccaa: string, cuentas: string) {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas', '#porcentaje-herencia']);
+    await page.locator('#ccaa-causante').selectOption(ccaa);
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), cuentas);
+  }
+
+  test('A · un hijo que hereda 400.000 € en Extremadura paga 0,00 €', async ({ page }) => {
+    await hijo(page, 'extremadura', '400000');
+    expect(await cuotaEstimada(page)).toBe('0,00 €');
+    expect(await importeDelPanel(page, /Por parentesco \(art\. 17 DLeg 1\/2018 de Extremadura\)/)).toBe('500.000,00 €');
+    expect(await panelC0371(page)).not.toContain('799,58 €');
+  });
+
+  test('B · con 1.000.000 € la cuota no es cero: 1196,94 €', async ({ page }) => {
+    await hijo(page, 'extremadura', '1000000');
+    const texto = await panelC0371(page);
+    expect(texto).toContain('530.000,00 €');   // base liquidable
+    expect(texto).toContain('119.693,76 €');   // cuota íntegra
+    expect(await cuotaEstimada(page)).toBe('1196,94 €');
+  });
+
+  test('C · la discapacidad del 50 % al 64 % reduce 120.000 € en Extremadura: 125,77 €', async ({ page }) => {
+    await hijo(page, 'extremadura', '700000');
+    await page.getByRole('radio', { name: /^50\s*%–64\s*%$/ }).check();
+    expect(await importeDelPanel(page, /Discapacidad 50\s?%–64\s?% \(art\. 18 DLeg 1\/2018 de Extremadura\)/)).toBe('120.000,00 €');
+    expect(await panelC0371(page)).toContain('101.000,00 €');
+    expect(await cuotaEstimada(page)).toBe('125,77 €');
+
+    // Y del 33 % al 49 %, 60.000 €.
+    await page.getByRole('radio', { name: /^33\s*%–49\s*%$/ }).check();
+    expect(await importeDelPanel(page, /Discapacidad 33\s?%–49\s?%/)).toBe('60.000,00 €');
+  });
+
+  test('D · fuera de Extremadura el tramo del 50 % al 64 % recibe la estatal del 33 % al 64 %', async ({ page }) => {
+    await hijo(page, 'valencia', '100000');
+    await page.getByRole('radio', { name: /^50\s*%–64\s*%$/ }).check();
+    expect(await importeDelPanel(page, /Discapacidad 33\s?%–64\s?%/)).toBe('47.858,59 €');
+    expect(await importeDelPanel(page, /Por parentesco/)).toBe('15.956,87 €');
+    expect(await panelC0371(page)).not.toContain('DLeg 1/2018');
+  });
+
+  test('el motor del MCP da las mismas cifras y no suma la reducción por edad a la mejora', () => {
+    const a = calcularSucesion({ baseImponible: 400000, ccaa: 'extremadura', grupo: 'II', incluyeAjuar: true });
+    expect(a.reduccionParentesco).toBe(500000);
+    expect(a.baseLiquidable).toBe(0);
+    expect(a.cuotaFinal).toBe(0);
+
+    const b = calcularSucesion({ baseImponible: 1000000, ccaa: 'extremadura', grupo: 'II', incluyeAjuar: true });
+    expect(b.cuotaFinal).toBeCloseTo(1196.94, 2);
+
+    const c = calcularSucesion({ baseImponible: 700000, ccaa: 'extremadura', grupo: 'II', incluyeAjuar: true, discapacidad: '50' });
+    expect(c.reduccionDiscapacidad).toBe(120000);
+    expect(c.cuotaFinal).toBeCloseTo(125.77, 2);
+
+    const menor = calcularSucesion({ baseImponible: 100000, ccaa: 'extremadura', grupo: 'I-descendiente', edadHeredero: 5 });
+    expect(menor.reduccionParentesco).toBe(500000);
+    expect(menor.reduccionEdadMenor21).toBe(0);
+
+    const valencia = calcularSucesion({ baseImponible: 100000, ccaa: 'valencia', grupo: 'II', discapacidad: '50' });
+    expect(valencia.reduccionDiscapacidad).toBe(47858.59);
+    expect(valencia.reduccionParentesco).toBe(15956.87);
   });
 });
