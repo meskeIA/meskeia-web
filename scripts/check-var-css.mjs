@@ -13,8 +13,11 @@
  *   · el propio módulo;
  *   · el TSX de su carpeta (la de la app, `app/<slug>/`, o `components/`), que la pone en
  *     línea: `style={{ ['--pos' as string]: … }}`, `setProperty('--x', …)`;
- *   · un `layout.tsx` de `app/`, que la cuelga del `<html>` o del `<body>` (las fuentes de
- *     next/font: `variable: '--font-sora'`).
+ *   · un `layout.tsx` de `app/`, que la cuelga del `<html>` o del `<body>`, o un `.module.css`
+ *     que ese layout importa y cuya clase pone en su envoltorio: así declaran los portales su
+ *     fuente desde el 22/10/2026 (`app/delegum/fuentes/sora.module.css`, que genera
+ *     `scripts/fuentes-locales.mjs`). Antes la declaraba next/font en el propio layout:
+ *     `variable: '--font-sora'`.
  *
  * Una `var()` sin declarar y sin reserva no da un valor por defecto: invalida la declaración
  * ENTERA en tiempo de cálculo, como si no estuviera. Un `background: var(--card-bg)` deja la
@@ -116,7 +119,13 @@ if (!globalsLeido || !globales.has('--primary')) {
   process.exit(1);
 }
 for (const f of recorrer(path.join(RAIZ, 'app'), (n) => /^layout\.(tsx?|jsx?)$/.test(n))) {
-  union(globales, declaradasTs(fs.readFileSync(f, 'utf8')));
+  const txt = fs.readFileSync(f, 'utf8');
+  union(globales, declaradasTs(txt));
+  // El módulo CSS que importa el layout (la fuente de cada portal) declara para todo su árbol
+  for (const [, mod] of txt.matchAll(/import\s+\w+\s+from\s+['"](\.{1,2}\/[^'"]+\.module\.css)['"]/g)) {
+    const ruta = path.join(path.dirname(f), mod);
+    if (fs.existsSync(ruta)) union(globales, declaradasCss(fs.readFileSync(ruta, 'utf8')));
+  }
 }
 
 // ─── Lo de cada carpeta: el TSX de la app o de components/ ─────────────────────

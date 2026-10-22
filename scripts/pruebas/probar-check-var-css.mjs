@@ -20,11 +20,14 @@
  *   6. Variable de next/font declarada en un `layout.tsx` (`variable: '--font-sora'`).
  *   7. `var(--x)` dentro de un comentario CSS.
  *   8. `var-ok: <razón>` con razón escrita.
+ *  13. Variable declarada en el `.module.css` que importa un `layout.tsx`: la fuente de cada
+ *      portal desde el 22/10/2026 (`app/delegum/fuentes/sora.module.css`).
  *
  * Y lo que SÍ debe encender aunque parezca cubierto:
  *
  *   9. Variable puesta en línea por el TSX de OTRA app: no llega a esta.
  *  10. `var-ok:` a secas, sin razón.
+ *  14. El mismo módulo de fuente, pero SIN que ningún layout lo importe: no cuelga de nada.
  *
  * Y las dos maneras de dar verde (o rojo) sin mirar, que deben PLANTARLO:
  *
@@ -84,6 +87,20 @@ const CASOS = [
     ficheros: modulo('.caja { background: var(--bg-card); }\n'),
   },
   { n: 12, nombre: 'SE PLANTA · ningún .module.css que leer', debeFallar: true, ficheros: {} },
+  {
+    n: 13, nombre: 'declarada en el módulo de fuente que importa un layout.tsx', debeFallar: false,
+    ficheros: modulo('.titulo { font-family: var(--font-sora); }\n', {
+      'app/portal/fuentes/sora.module.css': ".variable {\n  --font-sora: 'Sora', 'Sora Fallback';\n}\n",
+      'app/portal/layout.tsx': "import fuente from './fuentes/sora.module.css';\nexport default function L() { return <div className={fuente.variable} />; }\n",
+    }),
+  },
+  {
+    n: 14, nombre: 'el módulo de fuente existe pero ningún layout lo importa', debeFallar: true,
+    ficheros: modulo('.titulo { font-family: var(--font-sora); }\n', {
+      'app/portal/fuentes/sora.module.css': ".variable {\n  --font-sora: 'Sora', 'Sora Fallback';\n}\n",
+      'app/portal/layout.tsx': "export default function L() { return <div />; }\n",
+    }),
+  },
 ];
 
 let fallos = 0;

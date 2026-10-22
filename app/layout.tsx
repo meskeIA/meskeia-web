@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { generateBaseMetadata } from '@/lib/metadata';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
@@ -9,16 +8,6 @@ import RecentAppTracker from '@/components/RecentAppTracker';
 import TransparencyBanner from '@/components/TransparencyBanner';
 import { Providers } from './providers';
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 // Viewport configuration (Next.js 16+)
 export const viewport: Viewport = {
@@ -85,7 +74,7 @@ export default function RootLayout({
           contaminar subsitios con marca propia (p.ej. /delegum) ni el resto de páginas internas.
         */}
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
         <Providers>
           <ThemeProvider
             attribute="data-theme"
