@@ -805,6 +805,27 @@ test.describe('Invariantes de composición — comparar_donacion_vs_herencia', (
     expect(() => calcularIIVTNU({ ...comun, mesesTenencia: -1 })).toThrow();
   });
 
+  test('C0080: con el patrimonio en euros, las dos vías aplican la corrección del salto del art. 22.2 LISD', () => {
+    // Sobrino (grupo III) en Galicia con 402.700 € preexistentes, 22 € por encima del primer
+    // umbral (402.678,11): el caso del hallazgo de estimador-impuesto-sucesiones. Con solo el
+    // tramo (2) el motor multiplica por el coeficiente entero; con los euros, la cuota no puede
+    // superar la del coeficiente inferior más lo que el patrimonio pasa del límite.
+    const comun = {
+      valorInmueble: 300000, valorAdquisicion: 300000, anioAdquisicion: 2020, mesAdquisicion: 1,
+      ccaa: 'galicia', grupo: 'III' as const,
+    };
+    const conEuros = compararDonacionHerencia({ ...comun, patrimonioPreexistente: 402700 });
+    const conTramo = compararDonacionHerencia({ ...comun, patrimonioIdx: 2 });
+    const suc = calcularSucesion({ baseImponible: 300000, ccaa: 'galicia', grupo: 'III', patrimonioPreexistente: 402700 });
+    const don = calcularDonacion({
+      valorDonacion: 300000, ccaa: 'galicia', grupo: 'III', patrimonioPreexistente: 402700, escrituraPublica: true,
+    });
+    expect(conEuros.herencia.isd).toBeCloseTo(suc.cuotaFinal, 2);
+    expect(conEuros.donacion.isd).toBeCloseTo(don.cuotaFinal, 2);
+    expect(conEuros.herencia.isd).toBeLessThan(conTramo.herencia.isd);
+    expect(conEuros.donacion.isd).toBeLessThan(conTramo.donacion.isd);
+  });
+
   test('COHERENCIA: la recomendación concuerda con el total más barato', () => {
     expect(r.ahorroEstimado).toBeCloseTo(Math.abs(r.donacion.total - r.herencia.total), 2);
     if (r.opcionRecomendada === 'donacion') {

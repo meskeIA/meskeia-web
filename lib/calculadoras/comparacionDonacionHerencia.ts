@@ -73,8 +73,16 @@ export interface ParametrosComparacionDonacionHerencia {
   edadHeredero?: number;
   /** ¿El receptor convivió con el transmitente los 2 años anteriores? Solo importa si `grupo` es 'III' */
   convivenciaDosAnios?: boolean;
-  /** Índice de patrimonio preexistente del receptor (1–4). Por defecto 1. */
+  /**
+   * Índice de patrimonio preexistente del receptor (1–4). Por defecto 1. Con solo el tramo se
+   * aplica su coeficiente entero, sin la corrección del salto del art. 22.2 LISD.
+   */
   patrimonioIdx?: IndicePatrimonio;
+  /**
+   * Patrimonio preexistente del receptor en euros. Prevalece sobre `patrimonioIdx`: fija el
+   * tramo y permite aplicar la corrección del salto en las dos vías (cabo C0080, 22/10/2026).
+   */
+  patrimonioPreexistente?: number;
   /** Grado de discapacidad del receptor. Por defecto '0'. */
   discapacidad?: NivelDiscapacidad;
   /** Valor catastral del suelo (€) — opcional, para calcular la plusvalía municipal */
@@ -162,6 +170,7 @@ export function compararDonacionHerencia(
     grupo,
     discapacidad,
     patrimonioIdx,
+    patrimonioPreexistente: p.patrimonioPreexistente,
     escrituraPublica: true, // la donación de inmueble exige escritura pública notarial
   });
 
@@ -201,6 +210,7 @@ export function compararDonacionHerencia(
     grupo: grupo as unknown as GrupoParentescoIS,
     discapacidad: discapacidad as unknown as NivelDiscapacidadIS,
     patrimonioIdx: patrimonioIdx as unknown as IndicePatrimonioIS,
+    patrimonioPreexistente: p.patrimonioPreexistente,
     viviendaHabitual: p.esViviendaHabitual ? p.valorInmueble : undefined,
     edadHeredero: p.edadHeredero,
     convivenciaDosAnios: p.convivenciaDosAnios,
