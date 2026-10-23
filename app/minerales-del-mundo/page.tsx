@@ -169,7 +169,7 @@ export default function MineralesDelMundoPage() {
             {mineralSeleccionado?.id === mineral.id && (
               <div className={styles.expandedContent}>
                 <div className={styles.detailSection}>
-                  <h4 className={styles.detailTitle}>📋 Propiedades</h4>
+                  <h4 className={styles.detailTitle}><span aria-hidden="true">📋</span> Propiedades</h4>
                   <div className={styles.propertiesGrid}>
                     <div className={styles.propertyItem}>
                       <span className={styles.propertyLabel}>Categoría</span>
@@ -199,7 +199,7 @@ export default function MineralesDelMundoPage() {
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h4 className={styles.detailTitle}>🎨 Colores</h4>
+                  <h4 className={styles.detailTitle}><span aria-hidden="true">🎨</span> Colores</h4>
                   <div className={styles.allColors}>
                     {mineral.colores.map((color, idx) => (
                       <span key={idx} className={styles.colorTagLarge}>{color}</span>
@@ -208,7 +208,7 @@ export default function MineralesDelMundoPage() {
                 </div>
 
                 <div className={styles.detailSection}>
-                  <h4 className={styles.detailTitle}>🏭 Usos principales</h4>
+                  <h4 className={styles.detailTitle}><span aria-hidden="true">🏭</span> Usos principales</h4>
                   <ul className={styles.usesList}>
                     {mineral.usos.map((uso, idx) => (
                       <li key={idx}>{uso}</li>
@@ -217,7 +217,7 @@ export default function MineralesDelMundoPage() {
                 </div>
 
                 <div className={styles.curiositySection}>
-                  <h4 className={styles.detailTitle}>💡 Curiosidad</h4>
+                  <h4 className={styles.detailTitle}><span aria-hidden="true">💡</span> Curiosidad</h4>
                   <p className={styles.curiosityText}>{mineral.curiosidad}</p>
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function MineralesDelMundoPage() {
         icon="📚"
       >
         <section className={styles.guideSection}>
-          <h2>🔬 Escala de Dureza de Mohs</h2>
+          <h2><span aria-hidden="true">🔬</span> Escala de Dureza de Mohs</h2>
           <p className={styles.introParagraph}>
             La escala de Mohs mide la resistencia de un mineral a ser rayado. Fue creada en 1812 por el geólogo alemán Friedrich Mohs. Es una escala relativa: cada mineral raya al anterior y es rayado por el siguiente.
           </p>
@@ -271,7 +271,7 @@ export default function MineralesDelMundoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>🔷 Sistemas Cristalinos</h2>
+          <h2><span aria-hidden="true">🔷</span> Sistemas Cristalinos</h2>
           <p className={styles.introParagraph}>
             Los minerales se clasifican en 7 sistemas cristalinos según la geometría de su estructura atómica. Cada sistema tiene características distintivas.
           </p>
@@ -308,7 +308,7 @@ export default function MineralesDelMundoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>📊 Categorías de Minerales</h2>
+          <h2><span aria-hidden="true">📊</span> Categorías de Minerales</h2>
           <p className={styles.introParagraph}>
             Los minerales se clasifican por su composición química en grupos principales:
           </p>
@@ -373,7 +373,7 @@ export default function MineralesDelMundoPage() {
         </section>
 
         <section className={styles.guideSection}>
-          <h2>💡 Datos curiosos</h2>
+          <h2><span aria-hidden="true">💡</span> Datos curiosos</h2>
           <div className={styles.funFacts}>
             <div className={styles.funFact}>
               <span className={styles.factIcon}>🌍</span>
@@ -396,7 +396,7 @@ export default function MineralesDelMundoPage() {
 
         {/* SECCIÓN 1: Tabla Comparativa */}
         <section className={styles.guideSection}>
-          <h2>📊 Tabla Comparativa por Grupo Mineralógico</h2>
+          <h2><span aria-hidden="true">📊</span> Tabla Comparativa por Grupo Mineralógico</h2>
           <p className={styles.introParagraph}>
             Los minerales se organizan en grupos según su composición química. Esta tabla resume las características principales de cada grupo con ejemplos representativos.
           </p>
@@ -476,7 +476,7 @@ export default function MineralesDelMundoPage() {
 
         {/* SECCIÓN 2: Casos de Uso */}
         <section className={styles.guideSection}>
-          <h2>🎯 ¿A quién le resulta útil esta herramienta?</h2>
+          <h2><span aria-hidden="true">🎯</span> ¿A quién le resulta útil esta herramienta?</h2>
           <p className={styles.introParagraph}>
             El catálogo de minerales de meskeIA sirve a perfiles muy distintos. Aquí te mostramos cómo sacarle el máximo partido según tus necesidades.
           </p>
@@ -534,7 +534,7 @@ export default function MineralesDelMundoPage() {
 
         {/* SECCIÓN 3: FAQ */}
         <section className={styles.guideSection}>
-          <h2>❓ Preguntas frecuentes sobre mineralogía</h2>
+          <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre mineralogía</h2>
           <ol className={styles.faqList}>
             <li className={styles.faqItem}>
               <strong>¿Cuál es la diferencia entre un mineral y una roca?</strong>
@@ -575,7 +575,7 @@ export default function MineralesDelMundoPage() {
 
         {/* SECCIÓN 4: Guía Paso a Paso */}
         <section className={styles.guideSection}>
-          <h2>🔎 Cómo identificar un mineral desconocido: guía paso a paso</h2>
+          <h2><span aria-hidden="true">🔎</span> Cómo identificar un mineral desconocido: guía paso a paso</h2>
           <p className={styles.introParagraph}>
             Sigue este protocolo sistemático cuando tengas una muestra sin identificar. Cada propiedad descarta grupos enteros de minerales y te acerca a la respuesta.
           </p>
@@ -634,7 +634,7 @@ export default function MineralesDelMundoPage() {
 
         {/* SECCIÓN 5: Mejores Prácticas */}
         <section className={styles.guideSection}>
-          <h2>✅ Mejores prácticas para identificar y coleccionar minerales</h2>
+          <h2><span aria-hidden="true">✅</span> Mejores prácticas para identificar y coleccionar minerales</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>🧱</span>
@@ -683,7 +683,7 @@ export default function MineralesDelMundoPage() {
 
         {/* SECCIÓN 6: Warning Box — Errores frecuentes */}
         <section className={styles.guideSection}>
-          <h2>⚠️ Errores frecuentes al identificar minerales</h2>
+          <h2><span aria-hidden="true">⚠️</span> Errores frecuentes al identificar minerales</h2>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
               <span className={styles.warningIcon}>⚠️</span>

@@ -25,7 +25,7 @@ export default function PrevencionParasitosPage() {
         </div>
         <p>Piensa en los antiparasitarios como los guardianes de tu mascota. Tienes tres opciones principales: las pastillas (como Drontal o Milbemax) que se dan por la boca y eliminan lombrices intestinales, las pipetas (como Nexgard) que se aplican en el cuello y protegen contra pulgas y garrapatas, y los collares (como Seresto) que actúan por varios meses. ¿Tu mascota es un cachorro o gatito? Necesitarán protección cada 15 días hasta los 3 meses, después una vez al mes hasta los 6 meses. Si ya es adulto, cada 3 meses está perfecto. Los perritos que pasean mucho por parques pueden necesitarlo un poco más seguido.</p>
         <div className={styles.tipBox}>
-          <p>💡 Tu veterinario conoce a tu mascota mejor que nadie, siempre pregúntale cuál es el mejor para tu caso</p>
+          <p><span aria-hidden="true">💡</span> Tu veterinario conoce a tu mascota mejor que nadie, siempre pregúntale cuál es el mejor para tu caso</p>
         </div>
       </section>
 
@@ -36,7 +36,7 @@ export default function PrevencionParasitosPage() {
         </div>
         <p>Tu peludo no puede decirte 'me siento mal', pero su cuerpo te da pistas claras. Si notas que come igual pero baja de peso, su pelo se ve sin brillo, tiene diarrea o vómitos frecuentes, su pancita se ve hinchada, está más decaído que de costumbre o se rasca muchísimo, es momento de actuar. Los perros suelen ser más evidentes (como ese amigo dramático que todos tenemos), mientras que los gatos son más reservados y disimulan mejor. Un truco infalible: revisa su popó. Si ves gusanitos blancos como granos de arroz o algo raro, ¡bingo!</p>
         <div className={styles.tipBox}>
-          <p>💡 Una mascota feliz corre, juega y tiene buen apetito. Si algo cambió, investiga</p>
+          <p><span aria-hidden="true">💡</span> Una mascota feliz corre, juega y tiene buen apetito. Si algo cambió, investiga</p>
         </div>
       </section>
 

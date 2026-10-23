@@ -25,7 +25,7 @@ export default function DesarrolloCachorroPage() {
         </div>
         <p>El crecimiento de tu mascota es como ver crecer a un hijo. Al principio (primeras 8 semanas), tu pequeño depende totalmente de mamá para todo. Entre las 8 y 16 semanas viene la etapa más divertida: la socialización. Es cuando tu cachorro o gatito se convierte en una esponjita que absorbe todo - nuevos sonidos, olores, personas. Luego llega la 'adolescencia' (6 a 18 meses): crecen como maleza, prueban límites y desarrollan su personalidad única. Los perros pequeños como un Yorkshire crecen súper rápido y ya están casi listos a los 10 meses, mientras que los grandotes como un Labrador siguen creciendo hasta los 18 meses. Los gatos son más parejos: la mayoría está listo alrededor del año.</p>
         <div className={styles.tipBox}>
-          <p>💡 Toma una foto mensual junto al mismo objeto (como tu zapato) - ¡te sorprenderás de lo rápido que crecen!</p>
+          <p><span aria-hidden="true">💡</span> Toma una foto mensual junto al mismo objeto (como tu zapato) - ¡te sorprenderás de lo rápido que crecen!</p>
         </div>
       </section>
 
@@ -36,7 +36,7 @@ export default function DesarrolloCachorroPage() {
         </div>
         <p>Piensa en la comida como la gasolina premium de tu auto deportivo. Los cachorros y gatitos queman energía como locos, así que necesitan 'combustible' especial: más proteína y calorías que los adultos. Un cachorro pequeño (como un Pug) necesita comer 3-4 veces al día hasta los 6 meses - imagínate como un bebé que come cada pocas horas. Los grandotes (como un Golden) comen menos veces pero porciones más grandes. Los gatitos son similares: 3-4 comidas hasta los 6 meses. La clave está en buscar la bolsa que diga 'cachorro' o 'kitten' - no es marketing, realmente tienen la fórmula que necesitan para crecer fuertes y sanos.</p>
         <div className={styles.tipBox}>
-          <p>💡 Si cambias de comida, hazlo gradualmente mezclando la nueva con la vieja durante una semana</p>
+          <p><span aria-hidden="true">💡</span> Si cambias de comida, hazlo gradualmente mezclando la nueva con la vieja durante una semana</p>
         </div>
       </section>
 

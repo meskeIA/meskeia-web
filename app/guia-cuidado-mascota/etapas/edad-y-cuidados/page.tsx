@@ -25,7 +25,7 @@ export default function EdadYCuidadosPage() {
         </div>
         <p>Imagínate que la vida de tu mascota es como una película en cámara rápida. Los bebés (cachorros y gatitos) son pura energía: corren, juegan, se meten en problemas y aprenden todo súper rápido. Como un niño de 2 años, necesitan sus vacunas al día, comida especial para crecer y conocer el mundo poco a poco. Los adultos jóvenes (1-7 años en perros chicos, 1-5 en perros grandes, 1-7 en gatos) están en su mejor momento: son como esa persona de 25-40 años que tiene todo bajo control. Finalmente, nuestros seniors (desde los 7-8 años) son como nuestros abuelos: más tranquilos, necesitan más cuidados médicos y una dieta más suave. Aquí viene lo curioso: un Chihuahua de 10 años apenas está entrando a la tercera edad, pero un Gran Danés de la misma edad ya es un abuelito.</p>
         <div className={styles.tipBox}>
-          <p>💡 Fíjate si tu mascota duerme más, tiene el pelaje más opaco o le cuesta subir escalones. Son señales de que está cambiando de etapa</p>
+          <p><span aria-hidden="true">💡</span> Fíjate si tu mascota duerme más, tiene el pelaje más opaco o le cuesta subir escalones. Son señales de que está cambiando de etapa</p>
         </div>
       </section>
 

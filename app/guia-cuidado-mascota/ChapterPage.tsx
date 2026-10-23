@@ -51,7 +51,7 @@ export default function ChapterPage({ chapterId, children }: ChapterPageProps) {
           <p className={styles.chapterHeroSubtitle}>{module.title}</p>
           <div className={styles.chapterMeta}>
             <span>⏱️ {chapter.duration} min de lectura</span>
-            <span>📊 Progreso: {progress}%</span>
+            <span><span aria-hidden="true">📊</span> Progreso: {progress}%</span>
           </div>
         </header>
 
@@ -98,6 +98,7 @@ export default function ChapterPage({ chapterId, children }: ChapterPageProps) {
         {/* Complete Button */}
         <div className={styles.completeSection}>
           <button
+            type="button"
             onClick={handleComplete}
             className={`${styles.completeButton} ${completed ? styles.completed : ''}`}
           >

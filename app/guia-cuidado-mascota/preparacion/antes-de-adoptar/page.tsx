@@ -25,7 +25,7 @@ export default function AntesDeAdoptarPage() {
         </div>
         <p>Es como elegir entre salir de fiesta o una noche de Netflix. Los perros son como ese amigo extrovertido: necesitan salir, jugar y estar siempre contigo. Perfecto si te gusta caminar, tienes patio o eres de los que van al parque los domingos. Los gatos son más tipo 'amigo introvertido genial': cariñosos pero independientes, ideales si vives en un piso pequeño o trabajas todo el día. Un perro necesita salir al menos 3 veces al día (¡llueva o truene!), mientras que tu gato se las arregla solito con su arenero. ¿Viajas mucho por trabajo? Definitivamente, gato. ¿Te encanta hacer senderismo? Tu perro será tu mejor compañero de aventuras.</p>
         <div className={styles.tipBox}>
-          <p>💡 Elige pensando en tu día a día real, no en el ideal de Instagram</p>
+          <p><span aria-hidden="true">💡</span> Elige pensando en tu día a día real, no en el ideal de Instagram</p>
         </div>
       </section>
 
@@ -36,7 +36,7 @@ export default function AntesDeAdoptarPage() {
         </div>
         <p>Imagínate llegar a una casa nueva: necesitas una cama cómoda, saber dónde comer y sentirte seguro. Tu mascota piensa igual. Lo básico: una camita (o transportín para perros pequeños), dos bowls (uno para agua, otro para comida), y juguetes para que no se aburra. Si adoptas un perro, necesitarás correa, collar con su nombre, y empapadores para los primeros meses. Para gatos: arenero, arena que no haga polvo, y un rascador (tu sofá te lo agradecerá). Un truco: coloca todo en un rincón tranquilo donde pueda relajarse cuando se sienta abrumado.</p>
         <div className={styles.tipBox}>
-          <p>💡 Su rincón debe ser su 'zona de confort', respétala siempre</p>
+          <p><span aria-hidden="true">💡</span> Su rincón debe ser su 'zona de confort', respétala siempre</p>
         </div>
       </section>
 
@@ -47,7 +47,7 @@ export default function AntesDeAdoptarPage() {
         </div>
         <p>Hablemos claro de dinero. Cuenta unos 40-70€ al mes en comida (más si adoptas un San Bernardo, menos si es un Chihuahua). Las vacunas y revisión anual rondan los 150€. Pero lo importante: ten siempre 400-600€ guardados para emergencias (como cuando tu perro se come un calcetín o tu gato decide que las plantas son deliciosas). Los perros suelen costar más: comen más, necesitan más accesorios y a veces clases de educación. Los gatos son más económicos día a día, pero no escatimes en su comida de calidad ni en sus revisiones anuales.</p>
         <div className={styles.tipBox}>
-          <p>💡 Piénsalo como un 'capricho mensual' que vale oro en compañía</p>
+          <p><span aria-hidden="true">💡</span> Piénsalo como un 'capricho mensual' que vale oro en compañía</p>
         </div>
       </section>
 
@@ -58,7 +58,7 @@ export default function AntesDeAdoptarPage() {
         </div>
         <p>Busca uno como buscarías pediatra para tu hijo. Pregunta a otros dueños de mascotas del barrio, mira reseñas en Google, pero sobre todo: visítalo antes de decidir. Fíjate si trata bien a los animales, si te explica las cosas con paciencia y si la clínica está limpia. Pregunta si atienden urgencias (tu gato no va a decidir ponerse malo solo en horario de oficina). Valora también que esté cerca de casa: cuando tengas una emergencia a las 2 AM, te importará mucho más que los 5€ que ahorres yendo al más barato.</p>
         <div className={styles.tipBox}>
-          <p>💡 Una buena relación con tu veterinario vale más que el precio más barato</p>
+          <p><span aria-hidden="true">💡</span> Una buena relación con tu veterinario vale más que el precio más barato</p>
         </div>
       </section>
 

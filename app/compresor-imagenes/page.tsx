@@ -847,28 +847,28 @@ export default function CompresorImagenesPage() {
 
           <div className={styles.contentGrid}>
             <div className={styles.contentCard}>
-              <h4>🌐 Para páginas web</h4>
+              <h4><span aria-hidden="true">🌐</span> Para páginas web</h4>
               <p>
                 Imágenes pesadas ralentizan tu web. Google penaliza sitios lentos en SEO.
                 Una imagen de 5 MB puede reducirse a 500 KB sin pérdida visible.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📧 Para email</h4>
+              <h4><span aria-hidden="true">📧</span> Para email</h4>
               <p>
                 Muchos servidores rechazan adjuntos grandes. Comprimir fotos evita
                 que tus emails reboten y mejora la velocidad de envío.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>💾 Para almacenamiento</h4>
+              <h4><span aria-hidden="true">💾</span> Para almacenamiento</h4>
               <p>
                 Ahorra espacio en tu disco, nube o dispositivo móvil.
                 Una carpeta de 1 GB de fotos puede reducirse a 200 MB.
               </p>
             </div>
             <div className={styles.contentCard}>
-              <h4>📱 Para redes sociales</h4>
+              <h4><span aria-hidden="true">📱</span> Para redes sociales</h4>
               <p>
                 Subidas más rápidas y menor consumo de datos móviles.
                 Las plataformas recomprimen tus fotos, mejor hazlo tú primero con control.
@@ -882,32 +882,32 @@ export default function CompresorImagenesPage() {
 
           <div className={styles.formatComparison}>
             <div className={styles.formatCard}>
-              <h4>📷 JPEG/JPG</h4>
+              <h4><span aria-hidden="true">📷</span> JPEG/JPG</h4>
               <ul>
-                <li>✅ Mejor para fotografías</li>
-                <li>✅ Gran compresión</li>
-                <li>❌ No soporta transparencia</li>
-                <li>❌ Pierde calidad cada vez que se guarda</li>
+                <li><span aria-hidden="true">✅</span> Mejor para fotografías</li>
+                <li><span aria-hidden="true">✅</span> Gran compresión</li>
+                <li><span aria-hidden="true">❌</span> No soporta transparencia</li>
+                <li><span aria-hidden="true">❌</span> Pierde calidad cada vez que se guarda</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: fotos, imágenes con muchos colores</p>
             </div>
             <div className={styles.formatCard}>
-              <h4>🎨 PNG</h4>
+              <h4><span aria-hidden="true">🎨</span> PNG</h4>
               <ul>
-                <li>✅ Soporta transparencia</li>
-                <li>✅ Sin pérdida de calidad</li>
-                <li>❌ Archivos más grandes</li>
-                <li>❌ No ideal para fotografías</li>
+                <li><span aria-hidden="true">✅</span> Soporta transparencia</li>
+                <li><span aria-hidden="true">✅</span> Sin pérdida de calidad</li>
+                <li><span aria-hidden="true">❌</span> Archivos más grandes</li>
+                <li><span aria-hidden="true">❌</span> No ideal para fotografías</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: logos, iconos, gráficos con texto</p>
             </div>
             <div className={styles.formatCard}>
-              <h4>🌐 WebP</h4>
+              <h4><span aria-hidden="true">🌐</span> WebP</h4>
               <ul>
-                <li>✅ Mejor compresión que JPG y PNG</li>
-                <li>✅ Soporta transparencia</li>
-                <li>✅ Ideal para web moderna</li>
-                <li>⚠️ No compatible con software antiguo</li>
+                <li><span aria-hidden="true">✅</span> Mejor compresión que JPG y PNG</li>
+                <li><span aria-hidden="true">✅</span> Soporta transparencia</li>
+                <li><span aria-hidden="true">✅</span> Ideal para web moderna</li>
+                <li><span aria-hidden="true">⚠️</span> No compatible con software antiguo</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: webs, apps modernas</p>
             </div>

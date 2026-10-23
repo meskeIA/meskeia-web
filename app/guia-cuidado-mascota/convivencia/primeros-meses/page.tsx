@@ -25,7 +25,7 @@ export default function PrimerosMesesPage() {
         </div>
         <p>La primera noche puede ser intensa para ambos, ¡pero no te preocupes! Prepara un espacio súper acogedor donde se sienta seguro. Para perros: una esquina con su mantita o transportadora abierta. Para gatos: un rincón con su camita y algún juguete suave. Pon temperatura agradable y evita ruidos fuertes (nada de TV a todo volumen). Mantente relajado y transmite buena vibra. No lo agobies queriendo consolarlo cada 5 minutos: déjalo que curiosee y se vaya sintiendo como en casa. Es normal que se sienta un poco perdido al principio.</p>
         <div className={styles.tipBox}>
-          <p>💡 Un rincón tranquilo y siempre igual le da mucha seguridad durante la adaptación</p>
+          <p><span aria-hidden="true">💡</span> Un rincón tranquilo y siempre igual le da mucha seguridad durante la adaptación</p>
         </div>
       </section>
 
@@ -36,7 +36,7 @@ export default function PrimerosMesesPage() {
         </div>
         <p>Las mascotas aman saber qué viene después. Crea horarios sencillos para comida, paseos, juegos y siesta. Con perros: paseo mañanero para hacer sus necesidades y uno nocturno para relajarse. Con gatos: sesiones de juego de 10-15 minutos cuando estén más activos (usually al amanecer o atardecer). Mantén estos horarios lo más parecidos posible cada día. Esta rutina les da tranquilidad y les ayuda a entender cómo funciona su nuevo hogar. Premia con caricias o su snack favorito cuando hagan las cosas bien.</p>
         <div className={styles.tipBox}>
-          <p>💡 Ser constante es más importante que ser perfecto todos los días</p>
+          <p><span aria-hidden="true">💡</span> Ser constante es más importante que ser perfecto todos los días</p>
         </div>
       </section>
 
@@ -47,7 +47,7 @@ export default function PrimerosMesesPage() {
         </div>
         <p>Los primeros meses son oro puro para que tu mascota aprenda a llevarse bien con todo y todos. Preséntale poco a poco diferentes personas, sonidos, lugares y situaciones. Con perros: paseos cortitos y encuentros amigables con otros perritos (siempre supervisados). Con gatos: juegos que despierten su curiosidad y le permitan explorar sin sustos. La meta es tener una mascota sociable, confiada y adaptable. Evita exponerlo a cosas que lo estresen mucho o le den miedo real.</p>
         <div className={styles.tipBox}>
-          <p>💡 Cada experiencia nueva es como una clase que lo prepara para ser más feliz</p>
+          <p><span aria-hidden="true">💡</span> Cada experiencia nueva es como una clase que lo prepara para ser más feliz</p>
         </div>
       </section>
 

@@ -30,7 +30,7 @@ export default function HerramientasPage() {
               <span className={styles.toolName}>Planificador de Mascota</span>
             </div>
             <p className={styles.toolDesc}>Checklist completo con todo lo que necesitas antes de adoptar una mascota</p>
-            <p className={styles.toolWhen}>📅 Antes de adoptar tu primera mascota o cuando quieras agregar una nueva a la familia</p>
+            <p className={styles.toolWhen}><span aria-hidden="true">📅</span> Antes de adoptar tu primera mascota o cuando quieras agregar una nueva a la familia</p>
           </Link>
           <Link href="/calculadora-alimentacion-mascotas/" className={styles.toolCard}>
             <div className={styles.toolHeader}>
@@ -38,7 +38,7 @@ export default function HerramientasPage() {
               <span className={styles.toolName}>Calculadora de Alimentación</span>
             </div>
             <p className={styles.toolDesc}>Calcula la cantidad exacta de comida que necesita tu mascota diariamente</p>
-            <p className={styles.toolWhen}>📅 Al cambiar de alimento, cuando tu mascota gana o pierde peso, o cada 6 meses para ajustar porciones</p>
+            <p className={styles.toolWhen}><span aria-hidden="true">📅</span> Al cambiar de alimento, cuando tu mascota gana o pierde peso, o cada 6 meses para ajustar porciones</p>
           </Link>
           <Link href="/orientador-medicamentos-mascotas/" className={styles.toolCard}>
             <div className={styles.toolHeader}>
@@ -46,7 +46,7 @@ export default function HerramientasPage() {
               <span className={styles.toolName}>Calculadora de Medicamentos</span>
             </div>
             <p className={styles.toolDesc}>Determina la dosis correcta de antiparasitarios según el peso de tu mascota</p>
-            <p className={styles.toolWhen}>📅 Antes de administrar cualquier medicamento antiparasitario o cuando el veterinario lo indique</p>
+            <p className={styles.toolWhen}><span aria-hidden="true">📅</span> Antes de administrar cualquier medicamento antiparasitario o cuando el veterinario lo indique</p>
           </Link>
           <Link href="/calculadora-tamano-adulto-perro/" className={styles.toolCard}>
             <div className={styles.toolHeader}>
@@ -54,7 +54,7 @@ export default function HerramientasPage() {
               <span className={styles.toolName}>Calculadora de Tamaño Adulto</span>
             </div>
             <p className={styles.toolDesc}>Predice el peso y tamaño que alcanzará tu cachorro cuando sea adulto</p>
-            <p className={styles.toolWhen}>📅 Con cachorros de 8-16 semanas para planificar espacio, alimentación y accesorios futuros</p>
+            <p className={styles.toolWhen}><span aria-hidden="true">📅</span> Con cachorros de 8-16 semanas para planificar espacio, alimentación y accesorios futuros</p>
           </Link>
           <Link href="/calculadora-edad-mascotas/" className={styles.toolCard}>
             <div className={styles.toolHeader}>
@@ -62,7 +62,7 @@ export default function HerramientasPage() {
               <span className={styles.toolName}>Calculadora de Edad</span>
             </div>
             <p className={styles.toolDesc}>Convierte la edad de tu mascota a años humanos equivalentes</p>
-            <p className={styles.toolWhen}>📅 Para entender la etapa de vida de tu mascota y adaptar sus cuidados según su edad</p>
+            <p className={styles.toolWhen}><span aria-hidden="true">📅</span> Para entender la etapa de vida de tu mascota y adaptar sus cuidados según su edad</p>
           </Link>
         </div>
       </section>
@@ -74,7 +74,7 @@ export default function HerramientasPage() {
           <h2 className={styles.sectionTitleText}>Checklist del Buen Dueño</h2>
         </div>
         <div className={styles.checklistSection}>
-          <h4>📋 Responsabilidades del dueño responsable</h4>
+          <h4><span aria-hidden="true">📋</span> Responsabilidades del dueño responsable</h4>
           <ul>
             <li>Proporciona alimentación balanceada y agua fresca diariamente</li>
             <li>Mantiene al día las vacunas y desparasitaciones</li>
@@ -96,7 +96,7 @@ export default function HerramientasPage() {
         </div>
         <div className={styles.calendarGrid}>
           <div className={styles.calendarCard}>
-            <h4>📆 Cada Mes</h4>
+            <h4><span aria-hidden="true">📆</span> Cada Mes</h4>
             <ul>
               <li>Revisión de peso corporal y condición física</li>
               <li>Inspección de orejas, ojos y dientes</li>
@@ -105,7 +105,7 @@ export default function HerramientasPage() {
             </ul>
           </div>
           <div className={styles.calendarCard}>
-            <h4>📆 Cada 3 Meses</h4>
+            <h4><span aria-hidden="true">📆</span> Cada 3 Meses</h4>
             <ul>
               <li>Desparasitación interna según protocolo veterinario</li>
               <li>Revisión y actualización del botiquín de primeros auxilios</li>
@@ -114,7 +114,7 @@ export default function HerramientasPage() {
             </ul>
           </div>
           <div className={styles.calendarCard}>
-            <h4>📆 Cada Año</h4>
+            <h4><span aria-hidden="true">📆</span> Cada Año</h4>
             <ul>
               <li>Examen veterinario completo con análisis de sangre</li>
               <li>Actualización del calendario de vacunación</li>
