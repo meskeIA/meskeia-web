@@ -5,7 +5,8 @@ import { useEffect } from 'react';
 /**
  * Baja hasta el ancla de la URL cuando el navegador no lo ha hecho al cargar la página.
  *
- * `app/loading.tsx` envuelve cada página en un Suspense y, como el contenido supera el trozo de
+ * Hasta el 23/10/2026 `app/loading.tsx` envolvía cada página en un Suspense (se retiró por el cabo
+ * C0381; queda esto para cualquier Suspense de una página) y, como el contenido supera el trozo de
  * React, el HTML llega con el fallback y la página de verdad en `<div hidden id="S:0">`, que el
  * script `$RC` revela en el siguiente frame (React 19.2 agrupa las revelaciones con
  * requestAnimationFrame). Chrome busca el ancla hasta el evento `load`: si el documento sale de
