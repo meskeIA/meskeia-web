@@ -98,7 +98,7 @@ export const faqJsonLd = {
       name: '¿Qué es el efecto Venturi y dónde se aplica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El efecto Venturi es la caída de presión que experimenta un fluido al pasar por un estrechamiento de la tubería: al reducirse la sección, la velocidad aumenta (ecuación de continuidad A·v = cte) y la presión desciende. Se aplica en carburadores de motores, inyectores de combustible, venturímetros de medición de caudal, nebulizadores médicos y en el diseño de arterias artificiales para predecir zonas de trombosis.',
+        text: 'El efecto Venturi es la caída de presión que experimenta un fluido al pasar por un estrechamiento de la tubería: al reducirse la sección, la velocidad aumenta (ecuación de continuidad A·v = cte) y la presión desciende. Se aplica en los venturímetros que miden el caudal en plantas químicas, motores y conductos de aire acondicionado, en los carburadores, que aspiran el combustible con esa depresión, y en los nebulizadores médicos.',
       },
     },
     {

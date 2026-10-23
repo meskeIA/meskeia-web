@@ -2217,7 +2217,8 @@ test.describe('Inspector 22/10/2026 — operativa con el dedo a 360 px', () => {
  *       «Escribe un número» · «2,28» → DEBE suspender (no es ningún redondeo de 2,3) y hoy aprueba
  *       con la tolerancia del 1 % (0,023): cabo C0267, HALLAZGO.
  *
- * HALLAZGOS de esta inspección, ABIERTOS con `test.fail()` afirmando lo correcto:
+ * HALLAZGOS de esta inspección (3424-3430), que nacieron con `test.fail()` afirmando lo correcto y
+ * se REPARARON el mismo 23/10/2026 (los tests de abajo llevan «REPARADO (nº)»):
  *   · C0267 — la tolerancia relativa aprueba respuestas EXACTAS mal redondeadas (2,28 por 2,3);
  *   · el aviso del signo habla de presión en un diámetro, una velocidad o un caudal;
  *   · con aire y caudal bajo, la tarjeta escribe «−0 Pa» y el caudal másico «0,000 kg/s»;
@@ -2302,10 +2303,11 @@ test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura'
   // caudal másico nulo con el aire en movimiento.
   // Caso: aire, Q = 0,1 L/s, D₂/D₁ = 0,25 → esperado ΔP = −0,025 Pa y ṁ = 0,0001225 kg/s (cifras
   // distintas de cero, o un «≈0» sin signo) · obtenido «−0 Pa» y «0,000 kg/s».
-  test('HALLAZGO · con aire y caudal bajo, la tarjeta no escribe «−0 Pa» ni un caudal másico de 0,000 kg/s', async ({
+  // REPARADO (hallazgo 3426): la cifra no nula que se quedaría en cero va con dos cifras
+  // significativas (`fmtNoNulo`), y la de ΔP lleva el signo solo si no es cero.
+  test('REPARADO (3426) · con aire y caudal bajo, la tarjeta no escribe «−0 Pa» ni un caudal másico de 0,000 kg/s', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: «−0 Pa» y «0,000 kg/s» con aire a 0,1 L/s');
     await page.getByRole('button', { name: 'Aire', exact: true }).click();
     expect(await poner(page, 'Caudal', 0.1)).toBe('0.1');
     expect(await poner(page, 'Ratio de estrechamiento', 0.25)).toBe('0.25');
@@ -2314,6 +2316,16 @@ test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura'
     expect(tarjetas[0][1]).not.toMatch(/^[−-]0 Pa$/);
     // ṁ = 1,225·0,0001 = 0,0001225 kg/s: el aire se mueve, su caudal másico no es cero
     expect(tarjetas[1][1]).not.toBe('0,000 kg/s');
+    // Con dos cifras significativas: −0,0253 → «−0,025 Pa» · 0,0001225 → «0,00012 kg/s»
+    expect(tarjetas[0][1]).toBe('−0,025 Pa');
+    expect(tarjetas[1][1]).toBe('0,00012 kg/s');
+    // Lo que ya se leía bien no cambia: con agua, fábrica (2 L/s, 0,5) → −486 Pa y 2,000 kg/s
+    await page.getByRole('button', { name: 'Agua', exact: true }).click();
+    expect(await poner(page, 'Caudal', 2)).toBe('2');
+    expect(await poner(page, 'Ratio de estrechamiento', 0.5)).toBe('0.5');
+    const deFabrica = await panel(page);
+    expect(deFabrica[0][1]).toBe('−486 Pa');
+    expect(deFabrica[1][1]).toBe('2,000 kg/s');
   });
 
   test('R · caso 7 de aula (ṁ = 2,3 kg/s exacto): acierto, fallo con su desviación y unidad pegada', async ({
@@ -2476,8 +2488,8 @@ test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura'
   // con desnivel de 10 m, «Desnivel (Δh = 2,0 m)» y «(de Entrada a Garganta)».
   // Caso: página traducida → caudal al tope (10 L/s) y «Aire» → esperado «Caudal (Q = 10,0 L/s)»
   // y «1,225 kg/m³» · obtenido «Caudal (Q = 2,0 L/s)» y «1000 kg/m³» junto a «Aire».
-  test('HALLAZGO · traducida, los rótulos de los deslizadores y las tarjetas siguen al valor', async ({ page }) => {
-    test.fail(true, 'ABIERTO: con la página traducida, Q, ρ, Δh, P₁ y las tarjetas pequeñas se congelan');
+  // REPARADO (hallazgo 3427): cada texto variable es el único hijo de su elemento.
+  test('REPARADO (3427) · traducida, los rótulos de los deslizadores y las tarjetas siguen al valor', async ({ page }) => {
     await traducirPagina(page);
     await page.locator(`#${CONTROL.Caudal}`).focus();
     await page.keyboard.press('End'); // 10 L/s
@@ -2493,6 +2505,21 @@ test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura'
     const tarjetas = await panel(page);
     expect(tarjetas[2][1]).toBe('10,00 L/s');
     expect(tarjetas[4][1]).toBe('1,225 kg/m³');
+    // v máxima = 5,09 m/s, igual que la tabla
+    expect(tarjetas[3][1]).toBe('5,09 m/s');
+    // Desnivel de 10 m: su rótulo y el tramo del de ΔP siguen al control
+    await page.getByRole('button', { name: /Tubería con desnivel/ }).click();
+    await page.waitForTimeout(300);
+    await traducirPagina(page);
+    await page.locator(`#${CONTROL.Desnivel}`).focus();
+    await page.keyboard.press('End'); // 10 m
+    await page.waitForTimeout(300);
+    await traducirPagina(page);
+    expect(((await page.locator(`label[for="${CONTROL.Desnivel}"]`).textContent()) ?? '').trim()).toBe(
+      'Desnivel (Δh = 10,0 m)',
+    );
+    const tarjetasDesnivel = await panel(page);
+    expect(tarjetasDesnivel[0][0]).not.toContain('Garganta');
   });
 
   // HALLAZGO (contenido, medio) — ABIERTO (Inspector 23/10/2026, cabo C0362). La tarjeta
@@ -2507,11 +2534,12 @@ test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura'
   // una guía clínica (no hay fuente oficial a mano), y no hace falta: sin fuente no debe estar.
   // Caso: bloque educativo → esperado sin umbral clínico, o con fuente, año y qué gradiente mide ·
   // obtenido «Diferencias de presión > 50 mmHg indican estenosis severa».
-  test('HALLAZGO · C0362: el bloque educativo no da un umbral clínico sin fuente', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «Diferencias de presión > 50 mmHg indican estenosis severa», sin fuente ni año');
+  // REPARADO (hallazgo 3429): el umbral se retira; la tarjeta remite a las guías clínicas.
+  test('REPARADO (3429) · C0362: el bloque educativo no da un umbral clínico sin fuente', async ({ page }) => {
     const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
     expect(cuerpo).toContain('La escala de esta geometría no es fisiológica.'); // la misma tarjeta
     expect(cuerpo).not.toContain('Diferencias de presión > 50 mmHg indican estenosis severa');
+    expect(cuerpo).not.toMatch(/\d+\s*mmHg indican/);
   });
 
   // HALLAZGO (contenido, bajo) — ABIERTO (Inspector 23/10/2026, cabo C0362). La respuesta del
@@ -2526,8 +2554,9 @@ test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura'
   // aplicaciones del Venturi son «plantas químicas, motores y conductos de aire acondicionado».
   // Caso: FAQPage → esperado aplicaciones que la página y el modelo respaldan · obtenido
   // «inyectores de combustible» y «arterias artificiales para predecir zonas de trombosis».
-  test('HALLAZGO · C0362: el FAQPage no atribuye al efecto Venturi lo que la página no respalda', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «inyectores de combustible» y «predecir zonas de trombosis» en el FAQPage');
+  // REPARADO (hallazgo 3430): la respuesta nombra las aplicaciones que da la página (venturímetros en
+  // plantas químicas, motores y aire acondicionado), el carburador y el nebulizador.
+  test('REPARADO (3430) · C0362: el FAQPage no atribuye al efecto Venturi lo que la página no respalda', async ({ page }) => {
     const faq = await page.evaluate(
       () =>
         Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
@@ -2539,6 +2568,7 @@ test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura'
     expect(venturi, 'la pregunta del efecto Venturi sigue en el FAQPage').toBeDefined();
     expect(venturi!.acceptedAnswer.text).not.toMatch(/trombosis/i);
     expect(venturi!.acceptedAnswer.text).not.toMatch(/inyectores de combustible/i);
+    expect(venturi!.acceptedAnswer.text).toContain('plantas químicas, motores y conductos de aire acondicionado');
   });
 });
 
@@ -2562,11 +2592,31 @@ test.describe('Inspector 23/10/2026 — la primera pantalla del móvil', () => {
   // los enlaces legales y tres botones, no la tubería que la app promete «visualizar».
   // Caso: 390 × 844, carga → esperado el lienzo asomando con sus manómetros (como en el portátil,
   // al menos 80 px) · obtenido su borde superior a 820 px.
-  test('HALLAZGO · en un móvil de 390 × 844 el lienzo asoma en la primera pantalla, como en el portátil (3408)', async ({
+  // REPARADO (hallazgo 3428): hero compacto por debajo de 720 px (margen, relleno y título).
+  // Medido el 23/10/2026: el lienzo empieza a 634 px en 390 × 844 y a 676 px en 360 × 740.
+  test('REPARADO (3428) · en un móvil de 390 × 844 el lienzo asoma en la primera pantalla, como en el portátil (3408)', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: el lienzo empieza a 820 px en 390 × 844 y a 867 px en 360 × 740');
     const arriba = await page.evaluate(() => document.querySelector('canvas')!.getBoundingClientRect().top + scrollY);
     expect(arriba).toBeLessThan(844 - 80);
+    // Y el hero no queda debajo de la barra fija del logo
+    const hero = await page.evaluate(() => document.querySelector('header')!.getBoundingClientRect().top);
+    const barra = await page.evaluate(() =>
+      Math.max(
+        0,
+        ...Array.from(document.querySelectorAll('body *'))
+          .filter((el) => getComputedStyle(el).position === 'fixed' && el.getBoundingClientRect().top <= 0)
+          .map((el) => el.getBoundingClientRect().bottom)
+          .filter((b) => b < 200),
+      ),
+    );
+    expect(hero).toBeGreaterThanOrEqual(barra);
+  });
+
+  test('REPARADO (3428) · a 360 × 740 el lienzo también asoma', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await page.reload();
+    const arriba = await page.evaluate(() => document.querySelector('canvas')!.getBoundingClientRect().top + scrollY);
+    expect(arriba).toBeLessThan(740 - 40);
   });
 });

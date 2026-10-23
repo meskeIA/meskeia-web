@@ -90,6 +90,30 @@ function fmtPresion(P: number): string {
   return `${fmt(P, 0)} Pa`;
 }
 
+/**
+ * Con `decimales` fijos, salvo que la cifra no nula se quede en cero: entonces con dos cifras
+ * significativas (hallazgo 3426). Con aire y caudal bajo, el caudal másico a tres decimales salía
+ * «0,000 kg/s» con el aire en movimiento (1,225·0,0001 = 0,0001225 → «0,00012»).
+ */
+function fmtNoNulo(n: number, decimales: number): string {
+  const a = Math.abs(n);
+  if (n === 0 || !isFinite(n) || a >= 0.5 / 10 ** decimales) return fmt(n, decimales);
+  return fmt(n, Math.min(8, 1 - Math.floor(Math.log10(a))));
+}
+
+/**
+ * La cifra grande de ΔP, con su signo (hallazgo 3426). Antes era el signo delante de
+ * `fmtPresion(|ΔP|)`, y toda caída de menos de 0,5 Pa —con aire, cualquier caudal bajo— salía
+ * «−0 Pa» junto a «La presión CAE». Un cero no lleva signo (hallazgo 346), y una caída no nula
+ * no es un cero: −0,025 Pa se escribe «−0,025 Pa».
+ */
+function fmtDiferenciaPresion(dP: number): string {
+  if (dP === 0 || !isFinite(dP)) return fmtPresion(dP);
+  const a = Math.abs(dP);
+  const cifra = a >= 10000 ? fmtPresion(a) : `${fmtNoNulo(a, 0)} Pa`;
+  return `${dP < 0 ? '−' : '+'}${cifra}`;
+}
+
 // ============================================
 // CONFIGURACIÓN GEOMETRÍAS
 // ============================================
@@ -578,7 +602,8 @@ export default function SimuladorFluidosBernoulliPage() {
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
               <label className={styles.controlLabel} htmlFor="ctrl-caudal">
-                Caudal (Q = <strong>{fmt(Q, 1)} L/s</strong>)
+                {/* La cifra y su unidad en un solo nodo de texto (hallazgo 3427) */}
+                Caudal (Q = <strong>{`${fmt(Q, 1)} L/s`}</strong>)
               </label>
               <input
                 type="range"
@@ -596,7 +621,7 @@ export default function SimuladorFluidosBernoulliPage() {
                   se nombra con este rótulo —que lleva la densidad— en vez de con un
                   aria-label fijo, para que el lector anuncie también el valor vigente. */}
               <span className={styles.controlLabel} id="rotulo-fluido">
-                Fluido (ρ = <strong>{fmtDensidad(rho)} kg/m³</strong>)
+                Fluido (ρ = <strong>{`${fmtDensidad(rho)} kg/m³`}</strong>)
               </span>
               <div className={styles.fluidSelector} role="group" aria-labelledby="rotulo-fluido">
                 {FLUIDOS.map(f => (
@@ -635,7 +660,7 @@ export default function SimuladorFluidosBernoulliPage() {
             {geom === 'desnivel' && (
               <div className={styles.controlGroup}>
                 <label className={styles.controlLabel} htmlFor="ctrl-desnivel">
-                  Desnivel (Δh = <strong>{fmt(alturaDesnivel, 1)} m</strong>)
+                  Desnivel (Δh = <strong>{`${fmt(alturaDesnivel, 1)} m`}</strong>)
                 </label>
                 <input
                   type="range"
@@ -651,7 +676,7 @@ export default function SimuladorFluidosBernoulliPage() {
             )}
             <div className={styles.controlGroup}>
               <label className={styles.controlLabel} htmlFor="ctrl-presion-entrada">
-                Presión entrada (P₁ = <strong>{fmt(P0 / 1000, 1)} kPa</strong>)
+                Presión entrada (P₁ = <strong>{`${fmt(P0 / 1000, 1)} kPa`}</strong>)
               </label>
               {/* La rejilla arranca en 1 atm y avanza de 1 kPa, así que el valor inicial
                   (101.325 Pa) es alcanzable y el pulgar no nace desplazado. Antes, con
@@ -741,7 +766,11 @@ export default function SimuladorFluidosBernoulliPage() {
         {/* RESULTADOS */}
         <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
           <div className={styles.resultCardOk}>
-            <span className={styles.resultLabel}>Diferencia de presión P₂ − P₁ {datos.length > 1 && `(de ${datos[0].nombre} a ${datos[1].nombre})`}</span>
+            {/* Hallazgo 3427: cada texto que cambia, ÚNICO hijo de su elemento (un template literal).
+                Con la cifra o el tramo como nodo suelto junto a otro texto, el traductor del
+                navegador cambiaba ese nodo por <font> y React seguía escribiendo en el que ya no
+                estaba: con la página traducida, rótulos y tarjetas se quedaban en el valor viejo. */}
+            <span className={styles.resultLabel}>{`Diferencia de presión P₂ − P₁${datos.length > 1 ? ` (de ${datos[0].nombre} a ${datos[1].nombre})` : ''}`}</span>
             {/* El color va por clase y no en línea: en línea no había variante oscura, y el
                 magenta #A82E68 daba 1,69:1 sobre la tarjeta del tema oscuro (hallazgo 2364). */}
             <span
@@ -749,7 +778,7 @@ export default function SimuladorFluidosBernoulliPage() {
             >
               {/* Un solo nodo de texto (hallazgo 3407): con el signo aparte, al llegar ΔP a 0 la
                   rama vacía retiraba el nodo «−» y, con la página traducida, la app caía. */}
-              {`${dP < 0 ? '−' : dP > 0 ? '+' : ''}${fmtPresion(Math.abs(dP))}`}
+              {fmtDiferenciaPresion(dP)}
             </span>
             {/* Tres ramas, no dos. dP = 0 exacto no es rebuscado: es el extremo alto del
                 deslizador de estrechamiento (D₂/D₁ = 1, tubo recto) y el bajo del de desnivel
@@ -778,16 +807,20 @@ export default function SimuladorFluidosBernoulliPage() {
           {presionMinima < P_VAPOR_AGUA_20C && (
             <div className={styles.avisoCavitacion} role="note">
               <span aria-hidden="true">🫧</span>{' '}
+              {/* Cada rama en su <span key> y la presión como único hijo de su <span> (hallazgo
+                  3427): con la página traducida la cifra sigue al control y cambiar de rama retira
+                  el <span> entero, no un nodo de texto que el traductor ya cambió por <font>. */}
               {presionMinima < 0 ? (
-                <>
-                  <strong>Cavitación segura: presión absoluta negativa</strong> ({fmtPresion(presionMinima)}).
-                  El modelo ideal ha salido de su dominio — un líquido no puede tener presión absoluta
+                <span key="negativa">
+                  <strong>Cavitación segura: presión absoluta negativa</strong>{' '}
+                  <span>{`(${fmtPresion(presionMinima)}).`}</span>
+                  {' '}El modelo ideal ha salido de su dominio — un líquido no puede tener presión absoluta
                   negativa.
-                </>
+                </span>
               ) : (
-                <>
-                  <strong>Zona de cavitación</strong> ({fmtPresion(presionMinima)}).
-                </>
+                <span key="zona">
+                  <strong>Zona de cavitación</strong> <span>{`(${fmtPresion(presionMinima)}).`}</span>
+                </span>
               )}{' '}
               Por debajo de la presión de vapor —unos {fmt(P_VAPOR_AGUA_20C / 1000, 1)} kPa para el agua a
               20 °C— el líquido hierve a temperatura ambiente y se forman burbujas que al colapsar erosionan
@@ -798,22 +831,22 @@ export default function SimuladorFluidosBernoulliPage() {
 
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Caudal másico</span>
-            <span className={styles.resultValue}>{fmt(caudalMasico, 3)} kg/s</span>
+            <span className={styles.resultValue}>{`${fmtNoNulo(caudalMasico, 3)} kg/s`}</span>
             <span className={styles.resultRange}>= ρ · Q</span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Caudal volumétrico</span>
-            <span className={styles.resultValue}>{fmt(Q, 2)} L/s</span>
+            <span className={styles.resultValue}>{`${fmt(Q, 2)} L/s`}</span>
             <span className={styles.resultRange}>{fmt(Q_m3s, 5)} m³/s</span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>v máxima (zona estrecha)</span>
-            <span className={styles.resultValue}>{fmt(Math.max(...datos.map(d => d.v)), 2)} m/s</span>
+            <span className={styles.resultValue}>{`${fmt(Math.max(...datos.map(d => d.v)), 2)} m/s`}</span>
             <span className={styles.resultRange}>= Q / A_mín</span>
           </div>
           <div className={styles.resultCard}>
             <span className={styles.resultLabel}>Densidad del fluido</span>
-            <span className={styles.resultValue}>{fmtDensidad(rho)} kg/m³</span>
+            <span className={styles.resultValue}>{`${fmtDensidad(rho)} kg/m³`}</span>
             <span className={styles.resultRange}>{fluido.nombre}</span>
           </div>
         </div>
@@ -918,7 +951,10 @@ export default function SimuladorFluidosBernoulliPage() {
             <div className={styles.scenarioCard}>
               <span className={styles.scenarioIcon} aria-hidden="true">🩺</span>
               <strong>Circulación sanguínea y estenosis</strong>
-              <p>Una arteria parcialmente bloqueada (estenosis) acelera la sangre en la zona estrecha. La presión local cae, lo que el ecocardiograma Doppler detecta y cuantifica. Diferencias de presión &gt; 50 mmHg indican estenosis severa.</p>
+              <p>Una arteria parcialmente bloqueada (estenosis) acelera la sangre en la zona estrecha. La presión local cae, lo que el ecocardiograma Doppler detecta y cuantifica. Cuándo esa caída indica una estenosis grave lo fijan las guías clínicas, no este modelo.</p>
+              {/* Sin el «> 50 mmHg indican estenosis severa»: un umbral clínico sin fuente, año ni
+                  qué gradiente mide, que un Bernoulli ideal en un tubo de 10 cm no respalda
+                  (hallazgo 3429, cabo C0362) */}
               <p className={styles.avisoEscala}>
                 <span aria-hidden="true">⚠️</span> <strong>La escala de esta geometría no es fisiológica.</strong>{' '}
                 El simulador usa el diámetro nominal de la tubería industrial (10 cm, unas cuatro veces

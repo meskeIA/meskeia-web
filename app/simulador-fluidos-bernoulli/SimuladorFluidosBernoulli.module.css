@@ -35,6 +35,31 @@
   font-weight: 700;
 }
 
+/*
+  Hero más compacto en el móvil (hallazgo 3428): la reparación del 3408 llevó el lienzo a la
+  primera pantalla del portátil, pero a 390 × 844 empezaba a 820 px. El título iba en tres líneas a
+  1,9 rem con 80 px de margen y el relleno de escritorio.
+*/
+@media (max-width: 720px) {
+  /* 48 px de margen más el relleno del contenedor dejan el hero justo bajo la barra fija del logo */
+  .hero {
+    margin-top: 48px;
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .title {
+    font-size: 1.3rem;
+    line-height: 1.25;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .subtitle {
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+}
+
 /* GEOMETRÍA SELECTOR */
 .geomSelector {
   display: grid;
