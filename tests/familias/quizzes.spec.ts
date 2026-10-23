@@ -100,9 +100,9 @@ const HERMANAS: Hermana[] = [
     arranque: [EMPEZAR],
   },
   {
+    // REPARADO el 23/10/2026 al declarar la familia.
     slug: 'quiz-metrica-estrofas',
     arranque: [EMPEZAR],
-    foco: { falla: 'C0018, 23/10/2026: tras «Siguiente pregunta» el foco cae a body' },
   },
   {
     slug: 'quiz-reinos-naturaleza',
