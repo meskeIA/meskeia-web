@@ -256,9 +256,14 @@
   opacity: 0.9;
 }
 
+/*
+  Aviso de emergencias del variant="medical". Es texto de 16 px en negrita, que no llega a
+  «grande» (18,66 px): pide 4,5:1. Con #d32f2f sobre #ffebee daba 4,36:1 y, en oscuro, #ef5350
+  sobre #4a1a1a 4,14:1 (hallazgo 3449). Ahora 5,76:1 y 6,33:1.
+*/
 .emergency {
   font-weight: 700;
-  color: #d32f2f;
+  color: #b71c1c;
   padding: var(--spacing-md, 1rem);
   background: #ffebee;
   border-radius: var(--radius, 12px);
@@ -266,7 +271,7 @@
 }
 
 [data-theme='dark'] .emergency {
-  color: #ef5350;
+  color: #ff8a80;
   background: #4a1a1a;
 }
 
