@@ -884,30 +884,30 @@ export default function CompresorImagenesPage() {
             <div className={styles.formatCard}>
               <h4><span aria-hidden="true">📷</span> JPEG/JPG</h4>
               <ul>
-                <li><span aria-hidden="true">✅</span> Mejor para fotografías</li>
-                <li><span aria-hidden="true">✅</span> Gran compresión</li>
-                <li><span aria-hidden="true">❌</span> No soporta transparencia</li>
-                <li><span aria-hidden="true">❌</span> Pierde calidad cada vez que se guarda</li>
+                <li><span role="img" aria-label="A favor">✅</span>Mejor para fotografías</li>
+                <li><span role="img" aria-label="A favor">✅</span>Gran compresión</li>
+                <li><span role="img" aria-label="En contra">❌</span>No soporta transparencia</li>
+                <li><span role="img" aria-label="En contra">❌</span>Pierde calidad cada vez que se guarda</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: fotos, imágenes con muchos colores</p>
             </div>
             <div className={styles.formatCard}>
               <h4><span aria-hidden="true">🎨</span> PNG</h4>
               <ul>
-                <li><span aria-hidden="true">✅</span> Soporta transparencia</li>
-                <li><span aria-hidden="true">✅</span> Sin pérdida de calidad</li>
-                <li><span aria-hidden="true">❌</span> Archivos más grandes</li>
-                <li><span aria-hidden="true">❌</span> No ideal para fotografías</li>
+                <li><span role="img" aria-label="A favor">✅</span>Soporta transparencia</li>
+                <li><span role="img" aria-label="A favor">✅</span>Sin pérdida de calidad</li>
+                <li><span role="img" aria-label="En contra">❌</span>Archivos más grandes</li>
+                <li><span role="img" aria-label="En contra">❌</span>No ideal para fotografías</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: logos, iconos, gráficos con texto</p>
             </div>
             <div className={styles.formatCard}>
               <h4><span aria-hidden="true">🌐</span> WebP</h4>
               <ul>
-                <li><span aria-hidden="true">✅</span> Mejor compresión que JPG y PNG</li>
-                <li><span aria-hidden="true">✅</span> Soporta transparencia</li>
-                <li><span aria-hidden="true">✅</span> Ideal para web moderna</li>
-                <li><span aria-hidden="true">⚠️</span> No compatible con software antiguo</li>
+                <li><span role="img" aria-label="A favor">✅</span>Mejor compresión que JPG y PNG</li>
+                <li><span role="img" aria-label="A favor">✅</span>Soporta transparencia</li>
+                <li><span role="img" aria-label="A favor">✅</span>Ideal para web moderna</li>
+                <li><span role="img" aria-label="Atención">⚠️</span>No compatible con software antiguo</li>
               </ul>
               <p className={styles.formatUse}>Ideal para: webs, apps modernas</p>
             </div>
