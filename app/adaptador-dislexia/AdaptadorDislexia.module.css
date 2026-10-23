@@ -591,8 +591,17 @@
     grid-template-columns: 1fr;
   }
 
+  /*
+    Sin tope de alto ni desplazamiento propio en el móvil (hallazgo 3431). El max-height y el
+    overflow-y de arriba son para que el panel pegue en escritorio; aquí, sin sticky, solo lo
+    convertían en una caja con scroll dentro de la página: con el dedo encima bajaba el panel y
+    no la página, la muestra en línea se escondía dentro de él y la fija no salía, porque la app
+    escucha el desplazamiento de la VENTANA.
+  */
   .controlesPanel {
     position: static;
+    max-height: none;
+    overflow: visible;
     padding: 1rem;
   }
 
@@ -898,6 +907,15 @@
 
 [data-theme='dark'] .warningBox strong {
   color: #FCD34D;
+}
+
+/* En papel, el panel entero: su tope de alto lo cortaba en «Color de fondo» (hallazgo 3431) */
+@media print {
+  .controlesPanel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
 }
 
 /* ============================================

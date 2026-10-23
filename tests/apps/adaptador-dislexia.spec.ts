@@ -1311,10 +1311,11 @@ test.describe('en móvil 390×844 (re-inspección del 23/10/2026)', () => {
     expect(html).toContain(PARRAFO_3);
   });
 
-  test('CASO 17 — con el dedo sobre el panel baja la página y la muestra no se pierde (ABIERTO, hallazgo (inspector 23/10/2026))', async ({
+  test('CASO 17 — con el dedo sobre el panel baja la página y la muestra no se pierde (hallazgo 3431)', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 23/10/2026). Desde 3978f382 (13/10/2026) `.controlesPanel`
+    // REPARADO, hallazgo 3431 (inspector 23/10/2026): la regla de ≤ 768 px le quita también el
+    // `max-height` y el `overflow-y`, que es la contraprueba de abajo hecha código. Desde 3978f382 (13/10/2026) `.controlesPanel`
     // lleva `max-height: calc(100vh − barra − píldora − 1rem)` y `overflow-y: auto` para pegar
     // en escritorio, y la regla de ≤ 768 px solo le pone `position: static`: en el móvil el
     // panel se queda en 766 px (844 − 62 − 0 − 16) con 1.191 px dentro, y a 360×740 en 662 con
@@ -1328,7 +1329,6 @@ test.describe('en móvil 390×844 (re-inspección del 23/10/2026)', () => {
     // ajustes se queda fija en la parte de arriba»). Contraprueba hecha inyectando en el móvil
     // `max-height: none; overflow: visible` al panel: en las seis paradas el panel no se desplaza
     // y, siempre que el deslizador está a la vista, hay muestra. Lo que se afirma es eso.
-    test.fail(true, 'ABIERTO, hallazgo (inspector 23/10/2026): el panel se desplaza por dentro en el móvil');
     await abrir(page);
     const cdp = await page.context().newCDPSession(page);
     const paradas: Parada[] = [];
