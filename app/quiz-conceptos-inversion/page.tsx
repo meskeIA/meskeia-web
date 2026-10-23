@@ -1,7 +1,8 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { enfocarALaVista } from '@/lib';
 import {
   MeskeiaLogo,
   Footer,
@@ -455,6 +456,26 @@ export default function QuizConceptosInversionPage() {
 
   const reiniciar = () => setEstado('inicio');
 
+  /**
+   * Foco (familia de los quizzes, cabo C0018). La opción elegida se deshabilita y «Empezar»,
+   * «Siguiente» y «Ver resultado» se desmontan al pulsarlos: el foco caía a <body> y con teclado
+   * o lector de pantalla se volvía al principio de la página sin oír la pregunta nueva. Ahora va
+   * al enunciado, a «Siguiente» tras responder y a la tarjeta del resultado. En la carga no se toca.
+   */
+  const enunciadoRef = useRef<HTMLParagraphElement>(null);
+  const siguienteRef = useRef<HTMLButtonElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  const pantallaRef = useRef<string | null>(null);
+  useEffect(() => {
+    const pantalla = `${estado}-${indice}`;
+    const venia = pantallaRef.current;
+    pantallaRef.current = pantalla;
+    if (venia === null || venia === pantalla) return;
+    if (estado === 'jugando') enfocarALaVista(enunciadoRef.current);
+    else if (estado === 'respondida') siguienteRef.current?.focus();
+    else if (estado === 'fin') enfocarALaVista(resultadoRef.current);
+  }, [estado, indice]);
+
   const preguntaActual = preguntas[indice];
   const pctProgreso = preguntas.length > 0 ? (indice / preguntas.length) * 100 : 0;
   const pctFinal = preguntas.length > 0 ? Math.round((correctas / preguntas.length) * 100) : 0;
@@ -561,7 +582,7 @@ export default function QuizConceptosInversionPage() {
             </div>
 
             {/* Pregunta */}
-            <p className={styles.pregunta}>{preguntaActual.pregunta}</p>
+            <p className={styles.pregunta} ref={enunciadoRef} tabIndex={-1}>{preguntaActual.pregunta}</p>
 
             {/* Opciones */}
             <div className={styles.opciones}>
@@ -595,7 +616,7 @@ export default function QuizConceptosInversionPage() {
                   {respuestaElegida === preguntaActual.correcta ? ' Correcto' : ' Incorrecto'}
                 </p>
                 <p className={styles.feedbackExplicacion}>{preguntaActual.explicacion}</p>
-                <button type="button" onClick={siguiente} className={styles.btnSiguiente}>
+                <button type="button" onClick={siguiente} className={styles.btnSiguiente} ref={siguienteRef}>
                   {indice + 1 < preguntas.length ? 'Siguiente pregunta →' : 'Ver resultado →'}
                 </button>
               </div>
@@ -606,7 +627,7 @@ export default function QuizConceptosInversionPage() {
         {/* ── Pantalla fin ── */}
         {estado === 'fin' && (
           <div className={styles.resultado}>
-            <div className={styles.resultadoTarjeta}>
+            <div className={styles.resultadoTarjeta} ref={resultadoRef} tabIndex={-1}>
               <span className={styles.resultadoIcono}>{clasif.icono}</span>
               <h2 className={styles.resultadoPuntuacion} style={{ color: clasif.color }}>
                 {correctas} / {preguntas.length}

@@ -91,9 +91,9 @@ const HERMANAS: Hermana[] = [
     foco: { falla: 'C0018, 23/10/2026: tras «Siguiente pregunta» el foco cae a body' },
   },
   {
+    // REPARADO el 23/10/2026 al declarar la familia.
     slug: 'quiz-conceptos-inversion',
     arranque: [EMPEZAR],
-    foco: { falla: 'C0018, 23/10/2026: tras «Siguiente pregunta» el foco cae a body' },
   },
   {
     slug: 'quiz-figuras-retoricas',
