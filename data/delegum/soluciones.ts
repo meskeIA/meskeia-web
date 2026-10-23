@@ -66,6 +66,7 @@ export const PUERTAS: Puerta[] = [
       { url: '/estimador-compraventa-inmueble/', desc: 'Comprar o vender una vivienda: ITP/IVA, notaría, registro, plusvalía e IRPF.' },
       { url: '/simulador-gastos-compraventa-garaje/', desc: 'Plaza de garaje: ITP, IVA del anejo, notaría y plusvalía.' },
       { url: '/simulador-gastos-compraventa-trastero/', desc: 'Trastero vinculado o independiente: cambia el IVA.' },
+      { url: '/calculadora-subastas-boe/', desc: 'Comprar en subasta judicial, de Hacienda o de la Seguridad Social: depósito, plazo y coste total.' },
       { url: '/estimador-plusvalia-municipal/', desc: 'IIVTNU al vender o heredar: objetivo vs real.' },
       { url: '/selector-tipo-hipoteca/', desc: 'Fija, variable o mixta según tu perfil.' },
       { url: '/selector-tipo-prestamo/' },
