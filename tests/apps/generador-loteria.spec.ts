@@ -2119,16 +2119,20 @@ test.describe('Inspector 12/10/2026', () => {
       await expect(page.locator('[class*="quantitySelector"] label')).toHaveCount(0);
     });
 
-    test('ABIERTO (contenido, bajo) · el reparto dice que su gravamen es el español', async ({ page }) => {
-      // La sección calcula el gravamen de la DA 33.ª de la LIRPF (40.000 € exentos, 20 %) y no dice
-      // en ningún sitio que es el de España; tampoco hay RegionBadge «es-only», que CLAUDE.md
-      // (1.bis) exige a las apps fiscales-España. Con media audiencia en Latinoamérica, una peña
-      // de otro país leería como suyas la exención y la retención españolas.
-      test.fail();
+    test('REPARADO (contenido, bajo) · el reparto dice que su gravamen es el español', async ({ page }) => {
+      // Hallazgo 3236, REPARADO el 23/10/2026: la entradilla de la sección dice que calcula el
+      // gravamen especial español y que en otros países es distinto. Antes calculaba el de la
+      // DA 33.ª de la LIRPF (40.000 € exentos, 20 %) sin decir en ningún sitio que era el de
+      // España, y con media audiencia en Latinoamérica una peña de otro país leería como suyas
+      // la exención y la retención españolas. Va en la sección y no como RegionBadge «es-only» en
+      // la página: el generador sirve también fuera de España (Euromillones).
       const texto = ((await pena(page).textContent()) ?? '').replace(/\s+/g, ' ');
       expect(texto).toContain('Hacienda'); // la sección habla de impuestos
-      const insignia = await page.getByRole('note', { name: /únicamente a España/ }).count();
-      expect(/Españ/.test(texto) || insignia > 0).toBe(true);
+      expect(texto).toContain('gravamen especial español');
+      expect(texto).toContain('En otros países el impuesto sobre estos premios es distinto');
+      // Lo dice ANTES de los campos, no en una nota al pie
+      const entradilla = pena(page).locator('[class*="penaIntro"]');
+      await expect(entradilla).toContainText('en España');
     });
 
     test('ABIERTO (contenido, bajo) · la pregunta del generador aleatorio tiene UNA respuesta', async ({ page }) => {

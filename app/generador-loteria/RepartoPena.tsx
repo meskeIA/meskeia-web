@@ -120,10 +120,16 @@ export default function RepartoPena() {
   return (
     <section className={styles.penaSection} aria-labelledby="pena-titulo">
       <h2 id="pena-titulo"><span aria-hidden="true">🤝</span> Repartir el premio de una peña</h2>
+      {/* Que el gravamen es el de España, aquí y no solo en la ficha de modalidades (hallazgo 3236):
+          sin decirlo, una peña de otro país leía como suyas la exención y la retención. No lleva
+          RegionBadge «es-only» en la página porque el generador sirve también fuera de España
+          (Euromillones se juega en varios países): lo único que aplica solo a España es esta sección. */}
       <p className={styles.penaIntro}>
-        Si jugáis en grupo y sale premio: cuánto retiene Hacienda y cuánto le llega a cada persona
-        según lo que puso. Los primeros {formatNumber(EXENCION_PREMIO_LOTERIA, 0)}&nbsp;€ de cada décimo o
-        apuesta premiados están exentos, y esa exención se reparte entre todos en proporción a su parte.
+        Si jugáis en grupo en España y sale premio: cuánto retiene Hacienda y cuánto le llega a cada
+        persona según lo que puso. Usa el gravamen especial español sobre los premios de loterías: los
+        primeros {formatNumber(EXENCION_PREMIO_LOTERIA, 0)}&nbsp;€ de cada décimo o apuesta premiados están
+        exentos, y esa exención se reparte entre todos en proporción a su parte. En otros países el
+        impuesto sobre estos premios es distinto.
       </p>
 
       <fieldset className={styles.penaGrupo}>
