@@ -1,7 +1,8 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { enfocarALaVista } from '@/lib';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -315,6 +316,29 @@ export default function QuizComplejidadAlgoritmosPage() {
     'comparativa': { correctas: 0, total: 0 },
   });
 
+  /**
+   * Foco (familia de los quizzes, cabo C0018). Cada botón que se pulsa aquí se desmonta o se
+   * deshabilita —la opción elegida, «Siguiente», «Comenzar», «Ver resultados»— y el foco caía a
+   * <body>: con teclado o lector de pantalla se volvía al principio de la página sin oír la
+   * pregunta nueva. Ahora va al enunciado, a «Siguiente» tras responder, a la tarjeta del
+   * resultado y, al volver a empezar, al título del inicio. En la carga de la página no se toca.
+   */
+  const inicioRef = useRef<HTMLHeadingElement>(null);
+  const enunciadoRef = useRef<HTMLParagraphElement>(null);
+  const siguienteRef = useRef<HTMLButtonElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  const pantallaRef = useRef<string | null>(null);
+  useEffect(() => {
+    const pantalla = `${estado}-${indice}`;
+    const venia = pantallaRef.current;
+    pantallaRef.current = pantalla;
+    if (venia === null || venia === pantalla) return;
+    if (estado === 'jugando') enfocarALaVista(enunciadoRef.current);
+    else if (estado === 'respondida') siguienteRef.current?.focus();
+    else if (estado === 'fin') enfocarALaVista(resultadoRef.current);
+    else if (estado === 'inicio') enfocarALaVista(inicioRef.current);
+  }, [estado, indice]);
+
   const preguntaActual = preguntas[indice];
   const haRespondido = seleccionada !== null;
   const totalAciertos = aciertos.filter(Boolean).length;
@@ -394,7 +418,7 @@ export default function QuizComplejidadAlgoritmosPage() {
           <div className={styles.pantallaCentrada}>
             <div className={styles.cardInicio}>
               <div className={styles.iconoInicio} aria-hidden="true">⚡</div>
-              <h2 className={styles.tituloInicio}>¿Sabes analizar algoritmos?</h2>
+              <h2 className={styles.tituloInicio} ref={inicioRef} tabIndex={-1}>¿Sabes analizar algoritmos?</h2>
               <p className={styles.descInicio}>
                 Pon a prueba tu conocimiento de complejidad algorítmica con preguntas sobre
                 notación Big O, búsqueda, ordenación, estructuras de datos y análisis de código.
@@ -483,7 +507,7 @@ export default function QuizComplejidadAlgoritmosPage() {
                 {ETIQUETAS_CATEGORIA[preguntaActual.categoria]}
               </span>
 
-              <p className={styles.textoPregunta}>{preguntaActual.pregunta}</p>
+              <p className={styles.textoPregunta} ref={enunciadoRef} tabIndex={-1}>{preguntaActual.pregunta}</p>
 
               {preguntaActual.codigo && (
                 <pre className={styles.bloquecodigo}>
@@ -527,7 +551,7 @@ export default function QuizComplejidadAlgoritmosPage() {
                     {seleccionada === preguntaActual.correcta ? '✓ ¡Correcto!' : '✗ Incorrecto'}
                   </p>
                   <p className={styles.explicacionFeedback}>{preguntaActual.explicacion}</p>
-                  <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
+                  <button type="button" className={styles.btnSiguiente} onClick={siguiente} ref={siguienteRef}>
                     {indice + 1 >= preguntas.length ? 'Ver resultados →' : 'Siguiente pregunta →'}
                   </button>
                 </div>
@@ -539,7 +563,7 @@ export default function QuizComplejidadAlgoritmosPage() {
         {/* ── Pantalla de resultados ── */}
         {estado === 'fin' && (
           <div className={styles.pantallaCentrada}>
-            <div className={styles.cardResultado}>
+            <div className={styles.cardResultado} ref={resultadoRef} tabIndex={-1}>
               <div className={styles.circuloPuntuacion}>
                 <span className={styles.numeroAciertos}>{totalAciertos}</span>
                 <span className={styles.totalPreguntas}>/{preguntas.length}</span>

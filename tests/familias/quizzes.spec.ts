@@ -80,9 +80,9 @@ const HERMANAS: Hermana[] = [
     arranque: [EMPEZAR],
   },
   {
+    // REPARADO el 23/10/2026 al declarar la familia (enfocarALaVista de lib/cromoFijo.ts).
     slug: 'quiz-complejidad-algoritmos',
     arranque: [EMPEZAR],
-    foco: { falla: 'C0018, 23/10/2026: tras «Siguiente pregunta» el foco cae a body' },
   },
   {
     // Sin pantalla de inicio: abre en la primera pregunta.

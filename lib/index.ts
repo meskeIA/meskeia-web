@@ -46,4 +46,4 @@ export {
 export { withFrom } from './trackingFrom';
 export { registrarEventoInteraccion } from './trackingEvento';
 export { URL_PRIVACIDAD, URL_TERMINOS } from './urls-legales';
-export { margenBarraLogo } from './cromoFijo';
+export { margenBarraLogo, enfocarALaVista } from './cromoFijo';
