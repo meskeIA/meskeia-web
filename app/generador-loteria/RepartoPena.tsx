@@ -72,6 +72,13 @@ export default function RepartoPena() {
   const [premios, setPremios] = useState<FilaPremio[]>([{ id: 4, importe: '' }]);
   const [importeJugado, setImporteJugado] = useState('20');
 
+  /**
+   * Número de campo (1, 2, 3…) de cada premio escrito, en el orden en que van al cálculo. El
+   * desglose numeraba con la posición en `resultado.porPremio`, que solo cuenta los escritos:
+   * con el campo 1 vacío, la retención del campo 3 salía como la del «décimo 2» (hallazgo 3234).
+   */
+  const numerosEscritos = premios.flatMap((p, i) => (p.importe.trim() !== '' ? [i + 1] : []));
+
   const resultado = useMemo(() => {
     // Hasta que no se escribe ningún premio no hay nada que repartir, y no se riñe a nadie
     const escritos = premios.filter(p => p.importe.trim() !== '');
@@ -276,7 +283,7 @@ export default function RepartoPena() {
                 {resultado.porPremio.map((p, i) => (
                   // Una sola cadena: con la página traducida, los importes sueltos se quedaban viejos (hallazgo 3289)
                   <span key={i}>
-                    {`${i > 0 ? ' · ' : ''}Décimo ${i + 1}: ${formatCurrency(p.premio)}, retención ${formatCurrency(p.retencion)}`}
+                    {`${i > 0 ? ' · ' : ''}Décimo o apuesta ${numerosEscritos[i]}: ${formatCurrency(p.premio)}, retención ${formatCurrency(p.retencion)}`}
                   </span>
                 ))}
               </p>

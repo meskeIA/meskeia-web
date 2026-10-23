@@ -2087,19 +2087,21 @@ test.describe('Inspector 12/10/2026', () => {
     // 3237 (FAQ duplicada). Siguen abiertos en las re-inspecciones del 14/10/2026, del 15/10/2026, del
     // 21/10/2026 y del 22/10/2026: los cuatro `test.fail()` fallan como se espera. 1e288cc3 (15/10) numeró bien los RÓTULOS de
     // los campos, pero el desglose de 3234 sigue contando solo los premios escritos.
-    test('ABIERTO (contenido, bajo) · el desglose por décimo numera los décimos como el formulario', async ({ page }) => {
+    test('REPARADO (contenido, bajo) · el desglose por décimo numera los décimos como el formulario', async ({ page }) => {
+      // Hallazgo 3234, REPARADO el 23/10/2026: numera con el campo y dice «décimo o apuesta», como
+      // los rótulos y los avisos. Lo que hacía antes:
       // Con el campo 1 vacío y premios en los campos 2 y 3 («Premio del décimo o apuesta 2/3 (€)»),
       // el desglose decía «Décimo 1: 60.000,00 €… · Décimo 2: 125.000,00 €…»: numera solo los
       // campos escritos, así que la retención de 17.000 € se atribuye al «décimo 2», que en el
       // formulario es el de 60.000 €. Los avisos de error sí usan la numeración del formulario.
-      test.fail();
       await esperarHidratacion(page, [`${SELECTOR_PENA} input`]);
       await pena(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
       await pena(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
       await expect(pena(page).getByLabel('Premio del décimo o apuesta 3 (€)')).toHaveCount(1);
       await escribir(page, campoPremio(page, 1), '60.000');
       await escribir(page, campoPremio(page, 2), '125.000');
-      await expect(desglose(page)).toContainText(`retención ${eur('17.000,00')}`); // hay desglose
+      await expect(desglose(page)).toHaveText(
+        `Décimo o apuesta 2: ${eur('60.000,00')}, retención ${eur('4000,00')} · Décimo o apuesta 3: ${eur('125.000,00')}, retención ${eur('17.000,00')}`);
       await expect(desglose(page)).toHaveText(new RegExp(`\\b2: 60\\.000,00 €.*\\b3: 125\\.000,00 €`));
     });
 
@@ -2841,7 +2843,7 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
         ['Lo que se cobra', eurT('123.000,01')],
       ]);
       await expect(penaT(page).locator('[class*="penaResultado"] > p')).toHaveText(
-        `Décimo 1: ${eurT('35.000,00')}, retención ${eurT('0,00')} · Décimo 2: ${eurT('100.000,01')}, retención ${eurT('12.000,00')}`);
+        `Décimo o apuesta 1: ${eurT('35.000,00')}, retención ${eurT('0,00')} · Décimo o apuesta 2: ${eurT('100.000,01')}, retención ${eurT('12.000,00')}`);
       // 13.500.001 c entre tres restos iguales: el céntimo, al primero de la lista (Ana)
       expect(await filasT(page)).toEqual([
         ['Ana', eurT('3,00'), eurT('41.000,01'), pctT('33,33'), eurT('45.000,01'), eurT('4000,00')],
@@ -2874,7 +2876,7 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
       const desglose = penaT(page).locator('[class*="penaResultado"] > p span');
       await expect(desglose).toHaveCount(20);
       await expect(desglose).toHaveText(Array.from({ length: 20 }, (_, i) =>
-        `${i > 0 ? '· ' : ''}Décimo ${i + 1}: ${eurT('40.001,00')}, retención ${eurT('0,20')}`));
+        `${i > 0 ? '· ' : ''}Décimo o apuesta ${i + 1}: ${eurT('40.001,00')}, retención ${eurT('0,20')}`));
     });
 
     test('Euromillones tecleado con ceros delante y en los topes (50 y estrella 12): 1.ª y 3.ª', async ({ page }) => {
@@ -3305,7 +3307,7 @@ test.describe('re-inspección 15/10/2026', () => {
           ['Lo que se cobra', eurQ('110.000,00')],
         ]);
         await expect(penaQ(page).locator('[class*="penaResultado"] > p')).toHaveText(
-          `Décimo 1: ${eurQ('30.000,00')}, retención ${eurQ('0,00')} · Décimo 2: ${eurQ('90.000,00')}, retención ${eurQ('10.000,00')}`);
+          `Décimo o apuesta 1: ${eurQ('30.000,00')}, retención ${eurQ('0,00')} · Décimo o apuesta 2: ${eurQ('90.000,00')}, retención ${eurQ('10.000,00')}`);
         expect(await filasQ(page)).toEqual([
           ['Ana', eurQ('6,00'), eurQ('66.000,00'), pctQ('60,00'), eurQ('72.000,00'), eurQ('6000,00')],
           ['Bea', eurQ('3,00'), eurQ('33.000,00'), pctQ('30,00'), eurQ('36.000,00'), eurQ('3000,00')],
@@ -3357,9 +3359,9 @@ test.describe('re-inspección 15/10/2026', () => {
         ['Persona 2', eurQ('5,00'), eurQ('22.000,00'), pctQ('25,00'), eurQ('22.500,00'), eurQ('500,00')],
         ['Persona 3', eurQ('5,00'), eurQ('22.000,00'), pctQ('25,00'), eurQ('22.500,00'), eurQ('500,00')],
       ]);
-      // La numeración del desglose es el hallazgo 3234 (abierto, test.fail arriba): aquí, las cifras
-      await expect(penaQ(page).locator('[class*="penaResultado"] > p')).toContainText(`${eurQ('50.000,00')}, retención ${eurQ('2000,00')}`);
-      await expect(penaQ(page).locator('[class*="penaResultado"] > p')).toContainText(`${eurQ('40.000,00')}, retención ${eurQ('0,00')}`);
+      // Hallazgo 3234, REPARADO el 23/10/2026: el desglose numera con el campo (1 y 3, el 2 está vacío)
+      await expect(penaQ(page).locator('[class*="penaResultado"] > p')).toHaveText(
+        `Décimo o apuesta 1: ${eurQ('50.000,00')}, retención ${eurQ('2000,00')} · Décimo o apuesta 3: ${eurQ('40.000,00')}, retención ${eurQ('0,00')}`);
       expect(await rotulosQ(page)).toEqual([
         'Premio del décimo o apuesta 1 (€)', 'Premio del décimo o apuesta 2 (€)', 'Premio del décimo o apuesta 3 (€)']);
     });
@@ -3955,7 +3957,7 @@ test.describe('re-inspección 21/10/2026', () => {
         ['Persona 3', eurR('1,00'), eurR('45.333,34'), pctR('33,33'), eurR('50.000,00'), eurR('4666,66')],
       ]);
       await expect(penaR(page).locator('[class*="penaResultado"] > p')).toHaveText(
-        `Décimo 1: ${eurR('100.000,00')}, retención ${eurR('12.000,00')} · Décimo 2: ${eurR('50.000,00')}, retención ${eurR('2000,00')}`);
+        `Décimo o apuesta 1: ${eurR('100.000,00')}, retención ${eurR('12.000,00')} · Décimo o apuesta 2: ${eurR('50.000,00')}, retención ${eurR('2000,00')}`);
     });
   });
 
@@ -4245,7 +4247,7 @@ test.describe('re-inspección 22/10/2026', () => {
         ['Dani', eurV('2,00'), eurV('16.960,00'), pctV('8,00'), eurV('19.600,00'), eurV('2640,00')],
       ]);
       await expect(penaV(page).locator('[class*="penaResultado"] > p')).toHaveText(
-        `Décimo 1: ${eurV('200.000,00')}, retención ${eurV('32.000,00')} · Décimo 2: ${eurV('45.000,00')}, retención ${eurV('1000,00')}`);
+        `Décimo o apuesta 1: ${eurV('200.000,00')}, retención ${eurV('32.000,00')} · Décimo o apuesta 2: ${eurV('45.000,00')}, retención ${eurV('1000,00')}`);
       await expect(avisoV(page)).toHaveCount(0);
     });
   });
