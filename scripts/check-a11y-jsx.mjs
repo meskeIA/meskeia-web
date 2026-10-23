@@ -26,8 +26,10 @@
  *   AVISA   3. botón con onClick + className condicional y sin ningún aria-* ni role
  *   AVISA   4. emoji en nodo propio, sin aria-hidden y sin aria-label
  *   AVISA   5. aria-pressed en un botón que al pulsarlo se deshabilita (no se despulsa)
+ *   AVISA   6. <label> sin htmlFor ni control dentro (23/10/2026, hallazgo 3235 y cabo C0382;
+ *              745 en el catálogo al añadirla): ver la regla en `visitar`
  *
- * Las tres últimas exigen criterio y no se pueden resolver a ciegas: un `aria-pressed` en un
+ * Las de aviso exigen criterio y no se pueden resolver a ciegas: un `aria-pressed` en un
  * botón de ACCIÓN es una regresión, no una mejora (el teclado de calculadora-jugada-scrabble
  * es el caso que lo demostró), y un emoji solo puede ser decorativo o portar información,
  * que se arreglan al revés. Un candado que grita por lo que no sabe resolver acaba
@@ -370,6 +372,44 @@ for (const rel of objetivos()) {
         if (seDeshabilitaAlPulsarse(pressed, disabled)) {
           apuntar(avisos, n, 'aria-pressed en un botón que no se puede despulsar',
                   `disabled={${textoPlano(disabled).slice(0, 50)}} lo deja fijo al pulsarlo`);
+        }
+      }
+    }
+
+    /**
+     * Regla 6 — `<label>` que no nombra nada: sin `htmlFor` y sin un control dentro, no
+     * asocia su texto a ningún campo (WCAG 1.3.1), y el lector de pantalla anuncia el campo de
+     * al lado sin nombre o el grupo de botones sin rótulo.
+     *
+     * Sale del hallazgo 3235 (generador-loteria, fddceea6, 23/10/2026): «Combinaciones a
+     * generar:» era un <label> así encima de los botones 1/3/5/10. El cabo C0382 contó 470 en
+     * 110 ficheros con un grep, mezcla de dos defectos que se reparan al revés: el que va
+     * delante de un input (htmlFor + id) y el que rotula un grupo de botones (role="group" +
+     * aria-labelledby, y entonces el rótulo puede dejar de ser <label>). Por eso avisa y no
+     * rompe.
+     *
+     * Calla ante la duda: con spread, con `id` (puede ser el rótulo de un aria-labelledby) o
+     * con cualquier componente dentro (un <NumberInput> puede ser el control). Casos:
+     * `scripts/pruebas/a11y-label.tsx`.
+     */
+    if (ts.isJsxElement(n) && n.openingElement.tagName.getText() === 'label') {
+      const { m: at, spread } = atributos(n.openingElement);
+      if (!spread && !at.has('htmlFor') && !at.has('id')) {
+        let conControl = false;
+        const buscar = (h) => {
+          if (conControl) return;
+          if (ts.isJsxOpeningElement(h) || ts.isJsxSelfClosingElement(h)) {
+            const etiqueta = h.tagName.getText();
+            if (/^(input|select|textarea|meter|output|progress)$/.test(etiqueta) || /^[A-Z]|\./.test(etiqueta))
+              conControl = true;
+          }
+          ts.forEachChild(h, buscar);
+        };
+        n.children.forEach(buscar);
+        if (!conControl) {
+          const txt = n.children.map((c) => c.getText()).join('').replace(/\s+/g, ' ').trim().slice(0, 40);
+          apuntar(avisos, n, 'label sin control',
+            '«' + txt + '» → htmlFor + id si va con un campo, o role="group" + aria-labelledby si rotula botones');
         }
       }
     }
