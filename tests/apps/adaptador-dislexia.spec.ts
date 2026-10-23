@@ -1,4 +1,4 @@
-import { test, expect, devices, type Locator, type Page } from '@playwright/test';
+import { test, expect, devices, type CDPSession, type Locator, type Page } from '@playwright/test';
 import {
   esperarHidratacion,
   esperarValorEnReact,
@@ -69,7 +69,8 @@ import {
  * `overflow-wrap: anywhere` que evita que el panel se salga de la pantalla PARTE LAS PALABRAS
  * por cualquier letra y sin guion en cuanto no caben en la línea, y en móvil la columna del
  * texto adaptado mide 130 px (Pixel 7) o 95 px (360 px) con los ajustes de fábrica. Lo que
- * sigue abierto va en `test.fail()` con «ABIERTO, hallazgo (inspector 03/10/2026)».
+ * quedó abierto fue en `test.fail()` con «ABIERTO, hallazgo (inspector 03/10/2026)», y se
+ * REPARÓ ese mismo día (hallazgos 2724-2731, abajo): hoy son candados.
  *
  * REPARACIÓN DEL 03/10/2026 (hallazgos 2724-2731): los ocho casos abiertos pasan a candado.
  *   · 2724 — la columna del texto adaptado tiene un SUELO de 20 caracteres (min-width) y los
@@ -82,6 +83,17 @@ import {
  *   · 2727/2728 — JSON-LD y bloque educativo con fuentes. CASOS 11 y 11.bis.
  *   · 2730 — «5 %» y «20 px» con U+00A0. CASO 10.
  *   · 2731 — «Copiar texto» lleva text/html con estilos en línea. CASOS 13.bis y 13.ter.
+ *
+ * RE-INSPECCIÓN DEL 23/10/2026 (CASOS 14 a 19) — otra vez por la cola «firma de rotura» (77,8 %
+ * de visitas cortas y 6,2 % de recargas en los 30 días hasta el 22/10). Los 17 hallazgos
+ * anteriores siguen cerrados (los 39 casos de arriba, en verde). Lo nuevo sale de 3978f382
+ * (13/10/2026, cabo C0125): el panel de ajustes recibió `max-height` + `overflow-y: auto` para
+ * pegar en escritorio, y la regla de móvil solo le quita el `sticky`, así que en el móvil el
+ * panel es una caja con desplazamiento propio. Con el DEDO encima, lo que baja es el panel y no
+ * la página, la muestra en línea se esconde por arriba dentro de él y la copia fija no sale,
+ * porque la app solo escucha el desplazamiento de la ventana: vuelve el hallazgo 2725. El CASO 9
+ * no lo ve porque `scrollIntoView` mueve a la vez el panel y la ventana. CASO 17, con eventos
+ * táctiles de verdad (CDP). Los CASOS 14-16 son el flujo normal, el límite y el rechazo.
  */
 
 /** Lo que la app guarda en `localStorage`, con los campos que miran estos casos. */
@@ -1133,5 +1145,374 @@ test.describe('portapapeles', () => {
     await expect(page.getByRole('button', { name: 'Copiado sin formato' })).toBeVisible();
     await expect(page.getByRole('status').filter({ hasText: 'sin los ajustes' })).toBeVisible();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Hola mundo');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN DEL 23/10/2026 — CASOS 14 a 19
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Un texto «propio» de tres párrafos, como los apuntes que la app invita a pegar. */
+const PARRAFO_1 =
+  'Los apuntes de historia del tercer trimestre empiezan con la Revolución Industrial, que transformó la manera de producir, de trabajar y de vivir en las ciudades europeas del siglo XIX.';
+const PARRAFO_2 =
+  'Las fábricas textiles de Manchester usaban máquinas de vapor, y muchas familias dejaron el campo para trabajar en ellas durante jornadas de catorce horas, niños incluidos.';
+const PARRAFO_3 =
+  'Para el examen conviene repasar las causas, las consecuencias sociales y el papel del ferrocarril, que acortó los viajes y abarató el transporte de mercancías.';
+const TEXTO_PROPIO = `${PARRAFO_1}\n\n${PARRAFO_2}\n\n${PARRAFO_3}`;
+
+/** La caja de texto de la muestra del móvil (la en línea, dentro del panel de ajustes). */
+const muestraEnLinea = (page: Page) => page.locator('[data-muestra="en-linea"] [class*="muestraTexto"]');
+
+/** Un arrastre del dedo de arriba abajo de la pantalla (eventos táctiles reales de Chromium). */
+async function arrastrarConElDedo(cdp: CDPSession, x: number, desde: number, hasta: number): Promise<void> {
+  const pasos = 12;
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: desde }] });
+  for (let i = 1; i <= pasos; i++) {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x, y: desde + ((hasta - desde) * i) / pasos }],
+    });
+    await new Promise((r) => setTimeout(r, 16));
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+}
+
+/** Espera a que ni la ventana ni el panel se muevan (y a que el oyente de scroll haya pintado). */
+async function esperarQuieto(page: Page): Promise<void> {
+  let anterior = '';
+  await expect
+    .poll(
+      async () => {
+        const ahora = await page.evaluate(
+          () => `${scrollY}|${document.querySelector('aside[aria-label="Ajustes de lectura"]')?.scrollTop}`,
+        );
+        const quieto = ahora === anterior;
+        anterior = ahora;
+        return quieto;
+      },
+      { intervals: [150], timeout: 4000 },
+    )
+    .toBe(true);
+}
+
+/** Lo que ve el usuario en una parada del recorrido. */
+interface Parada {
+  ventana: number;
+  panelDesplazado: number;
+  deslizadorALaVista: boolean;
+  muestraALaVista: boolean;
+}
+
+/**
+ * ¿Se ve el deslizador de tamaño, entero y sin nada encima? ¿Y alguna muestra del texto? La en
+ * línea cuenta solo por la parte que queda DENTRO del recorte del panel y de la pantalla (40 px
+ * como mínimo: una línea de texto a 20 px con interlineado 1,9 son 38).
+ */
+async function parada(page: Page): Promise<Parada> {
+  return page.evaluate(() => {
+    const panel = document.querySelector('aside[aria-label="Ajustes de lectura"]')!;
+    const p = panel.getBoundingClientRect();
+    const s = document.querySelector('#slider-tamano')!.getBoundingClientRect();
+    const enElCentro = document.elementFromPoint(s.left + s.width / 2, s.top + s.height / 2);
+    const m = document.querySelector('[data-muestra="en-linea"] [class*="muestraTexto"]')!.getBoundingClientRect();
+    const arriba = Math.max(0, p.top, m.top);
+    const abajo = Math.min(innerHeight, p.bottom, m.bottom);
+    return {
+      ventana: Math.round(scrollY),
+      panelDesplazado: Math.round(panel.scrollTop),
+      deslizadorALaVista: s.top >= 0 && s.bottom <= innerHeight && enElCentro?.id === 'slider-tamano',
+      muestraALaVista: Boolean(document.querySelector('[data-muestra="fija"]')) || abajo - arriba >= 40,
+    };
+  });
+}
+
+test.describe('en móvil 390×844 (re-inspección del 23/10/2026)', () => {
+  const PIXEL_7 = devices['Pixel 7'];
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: PIXEL_7.userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+    permissions: ['clipboard-read', 'clipboard-write'],
+  });
+
+  test('CASO 14 — el flujo real: borrar el ejemplo, pegar unos apuntes, ajustar con el dedo y copiar', async ({
+    page,
+  }) => {
+    await abrir(page);
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    await textarea.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Delete');
+    await esperarValorEnReact(page, textarea, '');
+    await page.evaluate((t) => navigator.clipboard.writeText(t), TEXTO_PROPIO);
+    await page.keyboard.press('Control+V');
+    await esperarValorEnReact(page, textarea, TEXTO_PROPIO);
+
+    // Los seis distintos de fábrica (lexend · 20 · 0,05 · 0,15 · 1,9 · 68 · crema).
+    await page.getByRole('button', { name: /mono/i }).tap();
+    await sembrarValor(page, '#slider-tamano', 24);
+    await sembrarValor(page, '#slider-letras', 0.12);
+    await sembrarValor(page, '#slider-palabras', 0.25);
+    await sembrarValor(page, '#slider-lineas', 2.2);
+    await sembrarValor(page, '#slider-ancho', 60);
+    await page.getByRole('button', { name: 'Verde pálido' }).tap();
+
+    // Calculado a mano: 24 px · 0,12 em × 24 = 2,88 px · 0,25 em × 24 = 6 px · 2,2 × 24 = 52,8 px.
+    const texto = vistaPrevia(page);
+    await expect(texto).toHaveCSS('font-family', '"Courier New", Courier, monospace');
+    await expect(texto).toHaveCSS('font-size', '24px');
+    await expect(texto).toHaveCSS('letter-spacing', '2.88px');
+    await expect(texto).toHaveCSS('word-spacing', '6px');
+    await expect(texto).toHaveCSS('line-height', '52.8px');
+    await expect(texto).toHaveCSS('max-width', '60%');
+    await expect(texto).toHaveCSS('background-color', 'rgb(240, 247, 240)'); // #F0F7F0
+    // Ancho de la caja: 390 − 2×16 (página) − 2×1 − 2×16 (tarjeta) − 2×2 − 2×8 (caja punteada)
+    // = 304 px. El 60 % serían 182,4, pero manda el suelo de 20 caracteres (hallazgo 2724):
+    // 20 ch de Courier New a 24 px (0,6 em = 14,4 px) = 288 + 2,4 em (57,6) + 32 = 377,6 px, que
+    // se queda en el 100 % de la caja. Un defecto del suelo daría 182; de ahí la precisión 0.
+    await expect
+      .poll(() => texto.evaluate((el) => el.getBoundingClientRect().width))
+      .toBeCloseTo(304, 0);
+    await expect(texto.locator('p')).toHaveCount(3); // tres párrafos, las líneas vacías son <br>
+
+    // La muestra del móvil: el primer párrafo (184 caracteres) cortado en el último espacio
+    // antes del carácter 160 (LARGO_MUESTRA), que es el que hay tras «ciudades», más «…».
+    await expect(muestraEnLinea(page)).toHaveText(
+      'Los apuntes de historia del tercer trimestre empiezan con la Revolución Industrial, que transformó la manera de producir, de trabajar y de vivir en las ciudades…',
+    );
+    await expect(muestraEnLinea(page)).toHaveCSS('line-height', '52.8px');
+    await expect(page.locator('[role="status"]').filter({ hasText: 'interlineado' })).toHaveText(
+      'Courier New · 24 px · interlineado 2,2 · letras 12 % · palabras 25 % · ancho 60 % · fondo Verde pálido',
+    );
+    expect(await page.evaluate(() => document.body.scrollWidth)).toBe(390);
+
+    await page.getByRole('button', { name: 'Copiar texto' }).tap();
+    await expect(page.getByRole('button', { name: 'Copiado con formato' })).toBeVisible();
+    const { html, plano } = await page.evaluate(async () => {
+      const item = (await navigator.clipboard.read())[0];
+      return {
+        html: await (await item.getType('text/html')).text(),
+        plano: await (await item.getType('text/plain')).text(),
+      };
+    });
+    // El portapapeles de Windows devuelve los saltos como CRLF: medido el 23/10/2026 también con
+    // un `writeText` directo, sin pasar por la app. Se normaliza para comparar.
+    expect(plano.replace(/\r\n/g, '\n')).toBe(TEXTO_PROPIO);
+    // En puntos (× 0,75): 24 px = 18 pt · 2,88 px = 2,16 pt · 6 px = 4,5 pt · 52,8 px = 39,6 pt.
+    expect(html).toContain('font-size: 18pt');
+    expect(html).toContain('letter-spacing: 2.16pt');
+    expect(html).toContain('word-spacing: 4.5pt');
+    expect(html).toContain('line-height: 39.6pt');
+    expect(html).toContain('background-color: #F0F7F0');
+    expect(html.match(/<p /g) ?? []).toHaveLength(3);
+    expect(html).toContain(PARRAFO_3);
+  });
+
+  test('CASO 17 — con el dedo sobre el panel baja la página y la muestra no se pierde (ABIERTO, hallazgo (inspector 23/10/2026))', async ({
+    page,
+  }) => {
+    // ABIERTO, hallazgo (inspector 23/10/2026). Desde 3978f382 (13/10/2026) `.controlesPanel`
+    // lleva `max-height: calc(100vh − barra − píldora − 1rem)` y `overflow-y: auto` para pegar
+    // en escritorio, y la regla de ≤ 768 px solo le pone `position: static`: en el móvil el
+    // panel se queda en 766 px (844 − 62 − 0 − 16) con 1.191 px dentro, y a 360×740 en 662 con
+    // 1.164. Medido el 23/10/2026 con arrastres de 300 px desde el 75 % de la pantalla:
+    //     1.º  la ventana baja 285 px (el dedo aún no está sobre el panel)
+    //     2.º  la ventana NO se mueve: el panel se desplaza 285 px por dentro
+    //     3.º  el panel llega a su tope (427 px): el deslizador de tamaño está a la vista en
+    //          y = 542 y no se ve ninguna muestra — la en línea quedó por encima del recorte del
+    //          panel y la fija no sale, porque la app solo escucha el scroll de la VENTANA.
+    // Es el hallazgo 2725 otra vez, y la FAQ visible lo promete («una muestra del texto con tus
+    // ajustes se queda fija en la parte de arriba»). Contraprueba hecha inyectando en el móvil
+    // `max-height: none; overflow: visible` al panel: en las seis paradas el panel no se desplaza
+    // y, siempre que el deslizador está a la vista, hay muestra. Lo que se afirma es eso.
+    test.fail(true, 'ABIERTO, hallazgo (inspector 23/10/2026): el panel se desplaza por dentro en el móvil');
+    await abrir(page);
+    const cdp = await page.context().newCDPSession(page);
+    const paradas: Parada[] = [];
+    for (let i = 0; i < 6; i++) {
+      await arrastrarConElDedo(cdp, 195, 633, 333);
+      await esperarQuieto(page);
+      paradas.push(await parada(page));
+    }
+    // Ninguna parada con el deslizador a la vista y sin muestra
+    expect(paradas.filter((p) => p.deslizadorALaVista && !p.muestraALaVista)).toEqual([]);
+    // Y el dedo mueve la página, no una caja dentro de ella
+    expect(Math.max(...paradas.map((p) => p.panelDesplazado))).toBe(0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASO 15 (360×740) — todos los deslizadores en su extremo, una palabra de 40 letras y el vacío
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('en móvil 360×740 (re-inspección del 23/10/2026)', () => {
+  const PIXEL_7 = devices['Pixel 7'];
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: PIXEL_7.userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('CASO 15 — al máximo y con una palabra de 40 letras: solo se parte ella, dentro de la caja', async ({
+    page,
+  }) => {
+    await abrir(page);
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    const palabra = 'Electroencefalografistasmultidisciplinar'; // 40 letras
+    const frase = `Una ${palabra} larga`;
+    await textarea.fill(frase);
+    await esperarValorEnReact(page, textarea, frase);
+    await sembrarValor(page, '#slider-tamano', 36);
+    await sembrarValor(page, '#slider-letras', 0.3);
+    await sembrarValor(page, '#slider-palabras', 0.5);
+    await sembrarValor(page, '#slider-lineas', 3);
+    await sembrarValor(page, '#slider-ancho', 40);
+
+    // 36 px · 0,3 em × 36 = 10,8 px · 0,5 em × 36 = 18 px · 3,0 × 36 = 108 px
+    const texto = vistaPrevia(page);
+    await expect(texto).toHaveCSS('font-size', '36px');
+    await expect(texto).toHaveCSS('letter-spacing', '10.8px');
+    await expect(texto).toHaveCSS('word-spacing', '18px');
+    await expect(texto).toHaveCSS('line-height', '108px');
+    await expect(texto).toHaveCSS('max-width', '40%');
+    // Caja: 360 − 32 − 2 − 32 − 4 − 16 = 274 px. El 40 % serían 109,6; el suelo (20 ch + 6 em
+    // + 32 px, más de 600 px a 36 px) se queda en el 100 %, y `min-width` gana a `max-width`.
+    await expect
+      .poll(() => texto.evaluate((el) => el.getBoundingClientRect().width))
+      .toBeCloseTo(274, 0);
+    await esperarLexend(page);
+    // Unos 30 px por letra con el espaciado: la palabra (≈ 1.200 px) no cabe ni en una línea
+    // entera de 242 px y `break-word` la parte; «Una» y «larga» no.
+    await expect.poll(() => palabrasPartidas(page), { timeout: 3000 }).toEqual([palabra]);
+    expect(await desbordes(page)).toEqual({ fuera: [], cajaDesborda: false });
+    expect(await page.evaluate(() => document.body.scrollWidth)).toBe(360);
+
+    // Vaciar el texto: los dos marcadores, y los ajustes siguen
+    await textarea.fill('');
+    await esperarValorEnReact(page, textarea, '');
+    await expect(texto).toHaveText('El texto aparecerá aquí con tus ajustes aplicados...');
+    await expect(page.locator('[data-muestra="en-linea"]')).toContainText('Escribe o pega un texto para verlo aquí');
+    await expect(texto).toHaveCSS('font-size', '36px');
+    await expect(etiqueta(page, 'slider-ancho')).toHaveText('Ancho columna: 40 %');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CASO 16, 18 y 19 (escritorio) — lo que hay que rechazar, y dos promesas
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('re-inspección del 23/10/2026: rechazo y promesas', () => {
+  test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
+  test('CASO 16 — un JSON roto en el almacenamiento cae a fábrica, y el HTML pegado se copia escapado', async ({
+    page,
+  }) => {
+    let dialogos = 0;
+    page.on('dialog', async (d) => {
+      dialogos++;
+      await d.dismiss();
+    });
+    // JSON sin cerrar: `JSON.parse` lanza, el try/catch de la carga lo absorbe y quedan los de fábrica.
+    await page.addInitScript(() => {
+      localStorage.setItem('adaptador-dislexia-prefs', '{"tamano":22');
+    });
+    await abrir(page);
+    await expect(page.locator('h1')).toContainText('Adaptador de Lectura para Dislexia');
+    await expect(etiqueta(page, 'slider-tamano')).toHaveText('Tamaño: 20 px');
+    await expect(vistaPrevia(page)).toHaveCSS('font-size', '20px');
+    // Prueba de que la app LEYÓ lo sembrado y no llegó antes: el guardado lo reescribe con fábrica.
+    await expect
+      .poll(() =>
+        page.evaluate(() => JSON.parse(localStorage.getItem('adaptador-dislexia-prefs') ?? 'null') as unknown),
+      )
+      .toEqual({
+        fuente: 'lexend',
+        tamano: 20,
+        espaciadoLetras: 0.05,
+        espaciadoPalabras: 0.15,
+        interlineado: 1.9,
+        anchoColumna: 68,
+        colorFondo: '#FEFDF6',
+      });
+
+    const textarea = page.getByRole('textbox', { name: 'Texto a adaptar para lectura' });
+    const html = '<b>hola</b> & "comillas" <img src=x onerror="alert(1)">';
+    await textarea.fill(html);
+    await esperarValorEnReact(page, textarea, html);
+    await expect(vistaPrevia(page)).toHaveText(html);
+    await page.getByRole('button', { name: 'Copiar texto' }).click();
+    await expect(page.getByRole('button', { name: 'Copiado con formato' })).toBeVisible();
+    const copiado = await page.evaluate(async () => {
+      const item = (await navigator.clipboard.read())[0];
+      return await (await item.getType('text/html')).text();
+    });
+    // `escaparHtml` convierte < > & en entidades: al portapapeles va TEXTO, no etiquetas. (Las
+    // comillas vuelven como «"» al leer: Chromium re-serializa el HTML del portapapeles, y en un
+    // nodo de texto no hace falta escaparlas.)
+    expect(copiado).toContain('&lt;b&gt;hola&lt;/b&gt; &amp;');
+    expect(copiado).toContain('&lt;img src=x');
+    expect(copiado).not.toMatch(/<b>|<img/);
+    expect(dialogos).toBe(0);
+  });
+
+  test('CASO 18 — si Google Fonts no responde, el resumen no dice «Lexend Deca» mientras pinta Arial (ABIERTO, hallazgo (inspector 23/10/2026))', async ({
+    page,
+  }) => {
+    // ABIERTO, hallazgo (inspector 23/10/2026). Lexend se pide a fonts.googleapis.com y la app
+    // solo la aplica en el `onload` del <link>; si la red lo bloquea (un colegio, una empresa, sin
+    // conexión y sin caché) no hay `onerror`: el texto se pinta en «Arial, sans-serif», pero el
+    // botón «Lexend» sigue marcado y el resumen —visible y hablado— dice «Lexend Deca · 20 px…».
+    // Pulsar «Arial» y «Lexend» no cambia nada a la vista. Medido el 23/10/2026 con la petición
+    // abortada: font-family «Arial, sans-serif», resumen «Lexend Deca · 20 px · interlineado 1,9…».
+    // Lo que se afirma: el resumen nombra la fuente que de verdad se pinta.
+    test.fail(true, 'ABIERTO, hallazgo (inspector 23/10/2026): sin Google Fonts dice Lexend y pinta Arial');
+    await page.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
+    await abrir(page);
+    const resumen = page.locator('[role="status"]').filter({ hasText: 'interlineado' });
+    await expect
+      .poll(
+        async () => {
+          const pinta = await vistaPrevia(page).evaluate((el) => getComputedStyle(el).fontFamily);
+          const dice = (await resumen.textContent()) ?? '';
+          return pinta.includes('Lexend') || !dice.includes('Lexend');
+        },
+        { timeout: 5000 },
+      )
+      .toBe(true);
+  });
+
+  test('CASO 19 — con Ctrl+P sale el texto adaptado y no la página entera, o la FAQ no lo promete (ABIERTO, hallazgo (inspector 23/10/2026))', async ({
+    page,
+  }) => {
+    // ABIERTO, hallazgo (inspector 23/10/2026). La FAQ visible responde «¿Se puede imprimir el
+    // texto con los ajustes aplicados?» con «Sí. Puedes usar la función de imprimir del navegador
+    // (Ctrl+P). El texto de la vista previa se imprimirá…». No hay estilos de impresión: medido
+    // el 23/10/2026, en papel A4 salen 4 páginas con la cabecera, el aviso legal, el aviso de
+    // salud, el panel de ajustes (cortado en «Color de fondo» por su `max-height`), el área de
+    // texto con el texto SIN adaptar y, a partir del 55 % del documento, la vista previa. La
+    // reparación puede ser cualquiera de las dos: que en papel solo quede el texto adaptado, o
+    // que la FAQ diga lo que pasa.
+    test.fail(true, 'ABIERTO, hallazgo (inspector 23/10/2026): Ctrl+P imprime la página entera');
+    await abrir(page);
+    const prometeCtrlP = await page.evaluate(() => (document.body.textContent ?? '').includes('(Ctrl+P)'));
+    await page.emulateMedia({ media: 'print' });
+    const enPapel = await page.evaluate(() => {
+      const seVe = (sel: string): boolean => {
+        const el = document.querySelector(sel);
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        return getComputedStyle(el).display !== 'none' && getComputedStyle(el).visibility !== 'hidden' && r.height > 0;
+      };
+      return {
+        panelDeAjustes: seVe('aside[aria-label="Ajustes de lectura"]'),
+        areaDeTexto: seVe('textarea'),
+        textoAdaptado: seVe('[aria-label="Texto con formato aplicado"]'),
+      };
+    });
+    const loQueSePromete = { panelDeAjustes: false, areaDeTexto: false, textoAdaptado: true };
+    expect(prometeCtrlP ? enPapel : loQueSePromete).toEqual(loQueSePromete);
   });
 });

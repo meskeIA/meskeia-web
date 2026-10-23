@@ -1838,9 +1838,9 @@ test.describe('06/10 · contenido', () => {
  *      veredicto; corregido (3 8 12 19 25 31 · caballo 7): 1.ª, 4.ª, 7.ª y sin premio.
  * Los tres casos dieron en el navegador exactamente lo calculado (29 de 29 comprobaciones).
  *
- * HALLAZGOS ABIERTOS de esta inspección, con `test.fail()` al final del bloque: afirman lo que
- * DEBE pasar. Al repararlos empezarán a pasar y Playwright avisará: entonces se quita el
- * `test.fail()` y su comentario pasa a «REPARADO».
+ * HALLAZGOS de esta inspección (3234-3237), al final del bloque: nacieron ABIERTOS, con
+ * `test.fail()`, y se REPARARON el 23/10/2026 (415646ec, fddceea6, 3cf56c6a y 5a5cb389); sus
+ * tests van ya sin `test.fail()` (re-inspección del 23/10/2026: se sostienen).
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 test.describe('Inspector 12/10/2026', () => {
@@ -4181,14 +4181,15 @@ test.describe('re-inspección 21/10/2026', () => {
  * Los tres casos dieron en el navegador exactamente lo calculado.
  *
  * 3390, 3391 y 3392 SE SOSTIENEN: tabla, fichas, FAQ visible y FAQPage dan las cifras de arriba, y
- * las comparaciones entre modalidades cuadran con ellas. Los cuatro abiertos (3234-3237) siguen
- * igual. Página traducida (cabo C0243): recorrido de 102 pasos por la app entera (tema, guía
+ * las comparaciones entre modalidades cuadran con ellas. Los cuatro abiertos (3234-3237) seguían
+ * igual ese día (se repararon el 23/10/2026). Página traducida (cabo C0243): recorrido de 102 pasos por la app entera (tema, guía
  * educativa, FAQ, las cinco fichas, generador, copiar, guardadas y su tope, comprobador de las
  * cinco loterías, reparto con 50 personas y 20 décimos, tarjeta de compartir y pie) sin un nodo
  * con texto viejo ni un NotFoundError; aquí queda lo que los bloques anteriores no recorrían.
  *
- * HALLAZGO NUEVO, con `test.fail()` al final del bloque: la FAQ del bote pide «unos 97 millones de
- * apuestas distintas», cifra que solo vale con una apuesta por sorteo (y entonces «distintas» sobra).
+ * HALLAZGO NUEVO 3410, al final del bloque: la FAQ del bote pedía «unos 97 millones de apuestas
+ * distintas», cifra que solo vale con una apuesta por sorteo (y entonces «distintas» sobra). Nació
+ * con `test.fail()` y se REPARÓ el 22/10/2026 (83c2f5ec): su test va ya sin `test.fail()`.
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 test.describe('re-inspección 22/10/2026', () => {
@@ -4557,8 +4558,8 @@ test.describe('re-inspección 22/10/2026', () => {
     });
   });
 
-  test.describe('hallazgo NUEVO (re-inspección 22/10/2026)', () => {
-    test('HALLAZGO 3410 (contenido, bajo) · la FAQ del bote no casa «unos 97 millones» con «apuestas distintas»', async ({ page }) => {
+  test.describe('hallazgo NUEVO (re-inspección 22/10/2026), REPARADO el 22/10/2026', () => {
+    test('REPARADO 3410 (contenido, bajo) · la FAQ del bote no casa «unos 97 millones» con «apuestas distintas»', async ({ page }) => {
       // REPARADO (22/10/2026, hallazgo 3410): «unos 97 millones de apuestas, una en cada sorteo».
       // Era: hallazgo de la re-inspección del 22/10/2026. La frase la
       // escribió 328d72c6: «Para tener una probabilidad del 50 % de acertarlo al menos una vez
@@ -4580,5 +4581,394 @@ test.describe('re-inspección 22/10/2026', () => {
       const esperado = distintas ? Math.round(N / 2 / 1e6) : Math.round((Math.LN2 * N) / 1e6);
       expect(Number(cifra?.[1])).toBe(esperado);
     });
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Re-inspección 23/10/2026 — vuelve INVALIDADA por las cuatro reparaciones de hoy: 415646ec (3234,
+ * el desglose por décimo numera con el campo), fddceea6 (3235, el selector 1/3/5/10 es un grupo con
+ * nombre), 3cf56c6a (3236, la entradilla del reparto dice que el gravamen es el español) y
+ * 5a5cb389 (3237, FAQPage y FAQ visible importan UNA constante de metadata.ts por pregunta); y por
+ * 83c2f5ec (22/10, 3410). Segmento fiscal, riesgo 1, 1.984 usos.
+ *
+ * NORMA — data/fiscal/premios-loterias.ts (DA 33.ª LIRPF, BOE-A-2006-20764, re-sellado el
+ * 22/10/2026): EXENCION_PREMIO_LOTERIA = 40.000 € por décimo o apuesta (el premio «igual o inferior»
+ * está exento; por encima tributa solo el exceso); TIPO_GRAVAMEN_PREMIO_LOTERIA = 20 % del exceso;
+ * gravamenPremio por décimo, redondeado al céntimo por décimo; bruto, exento y retención se reparten
+ * por el mayor resto (reparto.ts; empate de restos → el primero de la lista).
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR:
+ *   1. Normal — Ana 8, Bea 6, Carlos 3, Dani 2 y Eva 1 € (20 €: cuotas 40/30/15/10/5 %), precio 20 €,
+ *      décimos de 400.000 € (exento 40.000, base 360.000, retención 72.000) y 55.555,55 € (exento
+ *      40.000, base 15.555,55, retención 3111,11). Totales 455.555,55 / 80.000 / 75.111,11 / se cobran
+ *      380.444,44. Bruto, 45.555.555 c → 18.222.222 / 13.666.666,5 / 6.833.333,25 / 4.555.555,5 /
+ *      2.277.777,75: sobran 2 c, a Eva (,75) y a Bea (,5, empatada con Dani y antes en la lista) →
+ *      182.222,22 / 136.666,67 / 68.333,33 / 45.555,55 / 22.777,78. Retención, 7.511.111 c →
+ *      3.004.444,4 / 2.253.333,3 / 1.126.666,65 / 751.111,1 / 375.555,55: sobran 2 c, a Carlos (,65) y
+ *      a Eva (,55) → 30.044,44 / 22.533,33 / 11.266,67 / 7511,11 / 3755,56. Le llega 152.177,78 /
+ *      114.133,34 / 57.066,66 / 38.044,44 / 19.022,22 (suman 380.444,44).
+ *   2. Límite — décimos con hueco delante, peña de partida 10/5/5 € y precio 20 €: campo 1 vacío,
+ *      campo 2 = 40.000,05 € (base 0,05, retención 0,01: un céntimo por encima de la exención tributa)
+ *      y campo 3 = 100.000 € (base 60.000, retención 12.000). Totales 140.000,05 / 80.000,00 /
+ *      12.000,01 / 128.000,04. Bruto 14.000.005 c → 7.000.002,5 / 3.500.001,25 / 3.500.001,25: el
+ *      céntimo que sobra, a Persona 1 → 70.000,03 / 35.000,01 / 35.000,01; retención 1.200.001 c →
+ *      6000,01 / 3000,00 / 3000,00; le llega 64.000,02 / 32.000,01 / 32.000,01. Desglose «Décimo o
+ *      apuesta 2: … · Décimo o apuesta 3: …» (no 1 y 2). Quitado el campo vacío, pasa a 1 y 2; con un
+ *      3.º de 40.000 € (exento justo, retención 0,00) a 1, 2 y 3 (180.000,05 / 120.000 / 12.000,01 /
+ *      168.000,04); vaciando el 2.º, a 1 y 3 (80.000,05 / 80.000 / 0,01 / 80.000,04; el céntimo de
+ *      retención y el de bruto, a Persona 1 → le llega 40.000,02 / 20.000,01 / 20.000,01).
+ *   3. Rechazo — hueco delante, «1.2.3» en el campo 2 (parseSpanishNumber → NaN) y 50.000 € en el 3:
+ *      «Indica el premio … mayor que 0 €. Revisa el premio del décimo o apuesta 2.», marcado solo ese
+ *      campo y sin tabla. Con −5 € en Persona 3 manda la guarda de las aportaciones (va antes en el
+ *      motor): el aviso nombra a Persona 3 y el premio deja de marcarse. Corregidos (5 € y 60.000 €):
+ *      110.000 / 80.000 / 6000 / 104.000, desglose «2: 60.000, retención 4000 · 3: 50.000, retención
+ *      2000», le llega 52.000 / 26.000 / 26.000.
+ * Los tres casos dieron en el navegador exactamente lo calculado.
+ *
+ * LAS REPARACIONES SE SOSTIENEN, y sin regresión: con la página traducida (el traductor y el detector
+ * de texto viejo del 15/10) los nodos que tocaron hoy —el desglose con décimos que entran y salen, el
+ * grupo 1/3/5/10 con Generar, la entradilla y las FAQ convertidas en constante— no dan NotFoundError
+ * ni un nodo con texto viejo. Las únicas preguntas que están a la vez en el FAQPage (9) y en la FAQ
+ * visible (5) son las dos constantes de 3237, y dicen lo mismo palabra por palabra; las demás son
+ * preguntas distintas. Sin hallazgos nuevos.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+test.describe('re-inspección 23/10/2026', () => {
+  const SEL_W = 'section[aria-labelledby="pena-titulo"]';
+  const penaW = (page: Page) => page.locator(SEL_W);
+  const premioW = (page: Page, n = 0) => penaW(page).getByLabel(/Premio del décimo o apuesta/).nth(n);
+  const poneW = (page: Page, n: number) => penaW(page).getByLabel('Pone (€)').nth(n);
+  const nombreW = (page: Page, n: number) => penaW(page).getByLabel('Nombre').nth(n);
+  const precioW = (page: Page) => penaW(page).getByLabel('Precio de cada décimo o apuesta (€)');
+  const avisoW = (page: Page) => penaW(page).locator('[class*="comprobadorError"]');
+  const desgloseW = (page: Page) => penaW(page).locator('[class*="penaResultado"] > p');
+  const anadirDecimoW = (page: Page) => penaW(page).getByRole('button', { name: /Añadir otro décimo/ });
+  const anadirPersonaW = (page: Page) => penaW(page).getByRole('button', { name: /Añadir persona/ });
+  const quitarPremioW = (page: Page, n: number) =>
+    penaW(page).getByRole('button', { name: `Quitar el premio ${n}`, exact: true });
+  // formatCurrency y formatPercentage ponen espacio duro (U+00A0) delante del símbolo
+  const eurW = (s: string) => `${s} €`;
+  const pctW = (s: string) => `${s} %`;
+
+  async function escribirW(page: Page, campo: Locator, valor: string) {
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+  async function prepararW(page: Page) {
+    await esperarInteractiva(page);
+    await esperarHidratacion(page, [`${SEL_W} input`]);
+  }
+  const totalesW = (page: Page) => penaW(page).locator('[class*="penaTotales"] > div').evaluateAll((divs) =>
+    divs.map((d) => [d.querySelector('dt')?.textContent ?? '', d.querySelector('dd')?.textContent ?? '']));
+  const filasW = (page: Page) => penaW(page).locator('tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => [
+      tr.querySelector('th')?.textContent ?? '',
+      ...Array.from(tr.querySelectorAll('td')).map((td) => td.textContent ?? ''),
+    ]));
+  /** Rótulo de cada campo de premio, tal como lo lee su <label> (es su nombre accesible). */
+  const rotulosW = (page: Page) => penaW(page).getByLabel(/Premio del décimo o apuesta/).evaluateAll((ins) =>
+    ins.map((i) => ((i as HTMLInputElement).labels?.[0]?.textContent ?? '').replace(/\s+/g, ' ').trim()));
+  const marcadosW = (page: Page) => penaW(page).locator('input[aria-invalid="true"]').evaluateAll((ins) =>
+    ins.map((i) => ((i as HTMLInputElement).labels?.[0]?.textContent ?? '').replace(/\s+/g, ' ').trim()));
+  /** Las cuatro filas de totales, para no repetirlas en cada paso. */
+  const totales = (premio: string, exento: string, retencion: string, neto: string) => [
+    ['Premio íntegro', eurW(premio)],
+    ['Exento', eurW(exento)],
+    [`Retención del ${pctW('20')}`, eurW(retencion)],
+    ['Lo que se cobra', eurW(neto)],
+  ];
+  /** Una entrada del desglose por décimo, tal como la escribe RepartoPena.tsx. */
+  const decimo = (n: number, premio: string, retencion: string) =>
+    `Décimo o apuesta ${n}: ${eurW(premio)}, retención ${eurW(retencion)}`;
+
+  interface NodoW { nodo: Text; valor: string | null; avisado: boolean }
+  type VentanaW = Window & { __nodosW?: NodoW[] };
+
+  /** El traductor de los bloques anteriores: cada texto a <font><font>…, y apunta el nodo retirado. */
+  const traducirW = (page: Page) =>
+    page.evaluate(() => {
+      const w = window as VentanaW;
+      const apuntados = (w.__nodosW = w.__nodosW ?? []);
+      const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => {
+          const padre = n.parentElement;
+          if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+          if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const nodos: Text[] = [];
+      while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+      for (const nodo of nodos) {
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = nodo.nodeValue;
+        exterior.appendChild(interior);
+        apuntados.push({ nodo, valor: nodo.nodeValue, avisado: false });
+        nodo.parentNode?.replaceChild(exterior, nodo);
+      }
+    });
+
+  /** Nodos retirados en los que React ha vuelto a escribir: en pantalla sigue el texto de antes. */
+  const textoViejoW = (page: Page) =>
+    page.evaluate(() => {
+      const r: string[] = [];
+      for (const t of (window as VentanaW).__nodosW ?? []) {
+        if (!t.avisado && t.nodo.nodeValue !== t.valor) {
+          t.avisado = true;
+          r.push(`«${t.valor}» → «${t.nodo.nodeValue}»`);
+        }
+      }
+      return r;
+    });
+
+  function erroresW(page: Page): string[] {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    return errores;
+  }
+
+  /** Traduce, hace el paso y apunta lo que se haya quedado viejo con el nombre del paso. */
+  async function pasoW(page: Page, viejos: string[], nombre: string, accion: () => Promise<void>) {
+    await traducirW(page);
+    await accion();
+    await page.waitForTimeout(150); // el commit de React tras la última comprobación del paso
+    for (const v of await textoViejoW(page)) viejos.push(`${nombre}: ${v}`);
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' }), nombre).toHaveCount(0);
+  }
+
+  test.describe('caso 1 (normal)', () => {
+    test('peña de cinco (8/6/3/2/1 €) con décimos de 400.000 y 55.555,55 €: los dos céntimos que sobran en cada reparto, por el mayor resto', async ({ page }) => {
+      await prepararW(page);
+      await anadirPersonaW(page).click();
+      await anadirPersonaW(page).click();
+      await expect(penaW(page).getByLabel('Pone (€)')).toHaveCount(5);
+      const nombres = ['Ana', 'Bea', 'Carlos', 'Dani', 'Eva'];
+      const puesto = ['8', '6', '3', '2', '1'];
+      for (let i = 0; i < 5; i++) {
+        await escribirW(page, nombreW(page, i), nombres[i]);
+        await escribirW(page, poneW(page, i), puesto[i]);
+      }
+      await escribirW(page, precioW(page), '20');
+      await escribirW(page, premioW(page, 0), '400.000');
+      await anadirDecimoW(page).click();
+      await escribirW(page, premioW(page, 1), '55.555,55');
+
+      // DA 33.ª por décimo: (400.000 − 40.000) × 20 % = 72.000; (55.555,55 − 40.000) × 20 % = 3111,11
+      await expect.poll(() => totalesW(page)).toEqual(totales('455.555,55', '80.000,00', '75.111,11', '380.444,44'));
+      await expect(desgloseW(page)).toHaveText(
+        `${decimo(1, '400.000,00', '72.000,00')} · ${decimo(2, '55.555,55', '3111,11')}`);
+      // Bruto: sobran 2 c → Eva (,75) y Bea (,5, empatada con Dani). Retención: 2 c → Carlos (,65) y Eva (,55)
+      expect(await filasW(page)).toEqual([
+        ['Ana', eurW('8,00'), eurW('152.177,78'), pctW('40,00'), eurW('182.222,22'), eurW('30.044,44')],
+        ['Bea', eurW('6,00'), eurW('114.133,34'), pctW('30,00'), eurW('136.666,67'), eurW('22.533,33')],
+        ['Carlos', eurW('3,00'), eurW('57.066,66'), pctW('15,00'), eurW('68.333,33'), eurW('11.266,67')],
+        ['Dani', eurW('2,00'), eurW('38.044,44'), pctW('10,00'), eurW('45.555,55'), eurW('7511,11')],
+        ['Eva', eurW('1,00'), eurW('19.022,22'), pctW('5,00'), eurW('22.777,78'), eurW('3755,56')],
+      ]);
+      await expect(avisoW(page)).toHaveCount(0);
+    });
+  });
+
+  test.describe('caso 2 (límite)', () => {
+    for (const traducida of [false, true]) {
+      test(`décimos con hueco delante (vacío, 40.000,05 y 100.000 €): el desglose numera 2 y 3, y sigue al formulario al quitar, añadir y vaciar${traducida ? ', con la página traducida' : ''}`, async ({ page }) => {
+        const errores = erroresW(page);
+        const viejos: string[] = [];
+        await prepararW(page);
+        const paso = (nombre: string, accion: () => Promise<void>) =>
+          traducida ? pasoW(page, viejos, nombre, accion) : accion();
+
+        await paso('dos campos más', async () => {
+          await anadirDecimoW(page).click();
+          await anadirDecimoW(page).click();
+          await expect(penaW(page).getByLabel('Premio del décimo o apuesta 3 (€)')).toHaveCount(1);
+        });
+        await paso('campo 2 = 40.000,05', () => escribirW(page, premioW(page, 1), '40.000,05'));
+        await paso('campo 3 = 100.000', async () => {
+          await escribirW(page, premioW(page, 2), '100.000');
+          // 0,05 de base → 0,01 de retención; (100.000 − 40.000) × 20 % = 12.000
+          await expect.poll(() => totalesW(page)).toEqual(totales('140.000,05', '80.000,00', '12.000,01', '128.000,04'));
+          await expect(desgloseW(page)).toHaveText(
+            `${decimo(2, '40.000,05', '0,01')} · ${decimo(3, '100.000,00', '12.000,00')}`);
+        });
+        expect(await filasW(page)).toEqual([
+          ['Persona 1', eurW('10,00'), eurW('64.000,02'), pctW('50,00'), eurW('70.000,03'), eurW('6000,01')],
+          ['Persona 2', eurW('5,00'), eurW('32.000,01'), pctW('25,00'), eurW('35.000,01'), eurW('3000,00')],
+          ['Persona 3', eurW('5,00'), eurW('32.000,01'), pctW('25,00'), eurW('35.000,01'), eurW('3000,00')],
+        ]);
+
+        await paso('quitar el campo 1, vacío', async () => {
+          await quitarPremioW(page, 1).click();
+          await expect(desgloseW(page)).toHaveText(
+            `${decimo(1, '40.000,05', '0,01')} · ${decimo(2, '100.000,00', '12.000,00')}`);
+        });
+        expect(await rotulosW(page)).toEqual(['Premio del décimo o apuesta 1 (€)', 'Premio del décimo o apuesta 2 (€)']);
+        expect(await totalesW(page)).toEqual(totales('140.000,05', '80.000,00', '12.000,01', '128.000,04'));
+
+        await paso('añadir un 3.º de 40.000', async () => {
+          await anadirDecimoW(page).click();
+          await escribirW(page, premioW(page, 2), '40.000');
+          // 40.000 justos: «igual o inferior» → exento entero, retención 0,00
+          await expect(desgloseW(page)).toHaveText(
+            `${decimo(1, '40.000,05', '0,01')} · ${decimo(2, '100.000,00', '12.000,00')} · ${decimo(3, '40.000,00', '0,00')}`);
+        });
+        await expect.poll(() => totalesW(page)).toEqual(totales('180.000,05', '120.000,00', '12.000,01', '168.000,04'));
+
+        await paso('vaciar el 2.º', async () => {
+          await escribirW(page, premioW(page, 1), '');
+          await expect(desgloseW(page)).toHaveText(
+            `${decimo(1, '40.000,05', '0,01')} · ${decimo(3, '40.000,00', '0,00')}`);
+        });
+        await expect.poll(() => totalesW(page)).toEqual(totales('80.000,05', '80.000,00', '0,01', '80.000,04'));
+        // Bruto 8.000.005 c y retención 1 c: el céntimo que sobra en los dos, a Persona 1 (resto ,5)
+        expect(await filasW(page)).toEqual([
+          ['Persona 1', eurW('10,00'), eurW('40.000,02'), pctW('50,00'), eurW('40.000,03'), eurW('0,01')],
+          ['Persona 2', eurW('5,00'), eurW('20.000,01'), pctW('25,00'), eurW('20.000,01'), eurW('0,00')],
+          ['Persona 3', eurW('5,00'), eurW('20.000,01'), pctW('25,00'), eurW('20.000,01'), eurW('0,00')],
+        ]);
+        expect(await rotulosW(page)).toEqual([
+          'Premio del décimo o apuesta 1 (€)', 'Premio del décimo o apuesta 2 (€)', 'Premio del décimo o apuesta 3 (€)']);
+        expect(viejos).toEqual([]);
+        expect(errores).toEqual([]);
+      });
+    }
+  });
+
+  test.describe('caso 3 (rechazo)', () => {
+    test('hueco delante y «1.2.3» en el 2.º: el aviso nombra el 2; con −5 € en Persona 3 manda la aportación; corregidos, desglose 2 y 3', async ({ page }) => {
+      await prepararW(page);
+      await anadirDecimoW(page).click();
+      await anadirDecimoW(page).click();
+      // «1.2.3» no es un importe: parseSpanishNumber → NaN
+      await escribirW(page, premioW(page, 1), '1.2.3');
+      await escribirW(page, premioW(page, 2), '50.000');
+      await expect(avisoW(page)).toHaveText(
+        'Indica el premio de cada décimo o apuesta premiados, mayor que 0 €. Revisa el premio del décimo o apuesta 2.');
+      expect(await marcadosW(page)).toEqual(['Premio del décimo o apuesta 2 (€)']);
+      await expect(premioW(page, 1)).toHaveAttribute('aria-describedby', 'pena-error');
+      await expect(penaW(page).locator('tbody tr')).toHaveCount(0);
+      await expect(penaW(page).locator('[class*="penaTotales"]')).toHaveCount(0);
+
+      // La guarda de las aportaciones va antes en el motor: el aviso pasa a la persona y el premio ya no se marca
+      await escribirW(page, poneW(page, 2), '-5');
+      await expect(avisoW(page)).toHaveText(
+        'Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Persona 3.');
+      expect(await marcadosW(page)).toEqual(['Pone (€)']);
+      await expect(poneW(page, 2)).toHaveAttribute('aria-invalid', 'true');
+      await expect(penaW(page).locator('tbody tr')).toHaveCount(0);
+
+      await escribirW(page, poneW(page, 2), '5');
+      await escribirW(page, premioW(page, 1), '60.000');
+      await expect(avisoW(page)).toHaveCount(0);
+      // (60.000 − 40.000) × 20 % = 4000; (50.000 − 40.000) × 20 % = 2000
+      await expect.poll(() => totalesW(page)).toEqual(totales('110.000,00', '80.000,00', '6000,00', '104.000,00'));
+      await expect(desgloseW(page)).toHaveText(
+        `${decimo(2, '60.000,00', '4000,00')} · ${decimo(3, '50.000,00', '2000,00')}`);
+      expect(await filasW(page)).toEqual([
+        ['Persona 1', eurW('10,00'), eurW('52.000,00'), pctW('50,00'), eurW('55.000,00'), eurW('3000,00')],
+        ['Persona 2', eurW('5,00'), eurW('26.000,00'), pctW('25,00'), eurW('27.500,00'), eurW('1500,00')],
+        ['Persona 3', eurW('5,00'), eurW('26.000,00'), pctW('25,00'), eurW('27.500,00'), eurW('1500,00')],
+      ]);
+    });
+  });
+
+  test('las reparaciones del 23/10 con la página traducida: grupo 1/3/5/10 con Generar, entradilla y las dos FAQ en constante, sin caída ni texto viejo', async ({ page }) => {
+    test.setTimeout(90_000);
+    const errores = erroresW(page);
+    const viejos: string[] = [];
+    await prepararW(page);
+    const paso = (nombre: string, accion: () => Promise<void>) => pasoW(page, viejos, nombre, accion);
+    const normal = (s: string | null) => (s ?? '').replace(/\s+/g, ' ').trim();
+
+    // 3235: grupo con nombre y sus cuatro botones
+    const grupo = page.getByRole('group', { name: 'Combinaciones a generar:' });
+    await expect(grupo.getByRole('button')).toHaveText(['1', '3', '5', '10']);
+    // 3236: la entradilla, literal (las cifras, de data/fiscal: 40.000 € exentos)
+    const entradilla = penaW(page).locator('[class*="penaIntro"]');
+    const ENTRADILLA = 'Si jugáis en grupo en España y sale premio: cuánto retiene Hacienda y cuánto le llega a cada persona según lo que puso. Usa el gravamen especial español sobre los premios de loterías: los primeros 40.000 € de cada décimo o apuesta premiados están exentos, y esa exención se reparte entre todos en proporción a su parte. En otros países el impuesto sobre estos premios es distinto.';
+    expect(normal(await entradilla.textContent())).toBe(ENTRADILLA);
+
+    // 1 + 3 + 10 + 5 + 1: 20 tarjetas (el historial guarda hasta 50)
+    let tarjetas = 0;
+    for (const n of [1, 3, 10, 5, 1]) {
+      await paso(`cantidad ${n}`, async () => {
+        await grupo.getByRole('button', { name: String(n), exact: true }).click();
+        await expect(grupo.getByRole('button', { name: String(n), exact: true })).toHaveAttribute('aria-pressed', 'true');
+      });
+      tarjetas += n;
+      await paso(`generar ${n}`, async () => {
+        await botonGenerar(page).click();
+        await expect(page.locator('[class*="resultCard"]')).toHaveCount(tarjetas);
+      });
+      await expect(botonGenerar(page)).toContainText(
+        `Generar ${n} ${n > 1 ? 'combinaciones' : 'combinación'} de La Primitiva`);
+    }
+    await expect(grupo).toHaveCount(1); // traducido, el rótulo sigue nombrando el grupo
+
+    const guia = page.locator('button[aria-expanded]').filter({ hasText: 'guía educativa' });
+    await paso('abrir la guía', async () => {
+      await guia.click();
+      await expect(guia).toHaveText(/Ocultar guía educativa/);
+    });
+    const detalles = page.locator('[class*="faqList"] details');
+    await expect(detalles).toHaveCount(5);
+    for (let i = 0; i < 5; i++) {
+      await paso(`abrir la pregunta ${i + 1}`, async () => {
+        await detalles.nth(i).locator('summary').click();
+        await expect(detalles.nth(i)).toHaveAttribute('open', '');
+      });
+      await paso(`cerrar la pregunta ${i + 1}`, async () => {
+        await detalles.nth(i).locator('summary').click();
+        await expect(detalles.nth(i)).not.toHaveAttribute('open', '');
+      });
+    }
+    // Las dos constantes de 3237 siguen diciendo lo suyo con la página traducida
+    await expect(detalles.first()).toContainText('1 entre 13.983.816');
+    await expect(detalles.last()).toContainText('no hay que presentar autoliquidación');
+    await paso('cerrar la guía', async () => {
+      await guia.click();
+      await expect(guia).toHaveText(/Ver guía educativa/);
+    });
+    expect(normal(await entradilla.textContent())).toBe(ENTRADILLA);
+    expect(viejos).toEqual([]);
+    expect(errores).toEqual([]);
+  });
+
+  test('3237 en TODAS las preguntas: las que están en las dos bocas son solo las dos constantes y dicen lo mismo', async ({ page }) => {
+    interface PreguntaLd { name: string; acceptedAnswer: { text: string } }
+    interface BloqueLd { '@type'?: string; mainEntity?: PreguntaLd[] }
+    const normal = (s: string) => s.replace(/\s+/g, ' ').trim();
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const ld = (bloques.map((b) => JSON.parse(b) as BloqueLd).find((j) => j['@type'] === 'FAQPage')?.mainEntity ?? [])
+      .map((q) => ({ q: normal(q.name), a: normal(q.acceptedAnswer.text) }));
+    const visibles = (await page.locator('[class*="faqList"] details').evaluateAll((ds) => ds.map((d) => ({
+      q: d.querySelector('summary')?.textContent ?? '',
+      a: Array.from(d.querySelectorAll('p')).map((p) => p.textContent ?? '').join(' '),
+    })))).map((v) => ({ q: normal(v.q), a: normal(v.a) }));
+    expect(ld).toHaveLength(9);
+    expect(visibles).toHaveLength(5);
+
+    const comunes = visibles.filter((v) => ld.some((x) => x.q === v.q));
+    expect(comunes.map((c) => c.q)).toEqual([
+      '¿Usar un generador aleatorio mejora mis probabilidades en la lotería?',
+      '¿Cuánto se lleva Hacienda de un premio de lotería en España y cómo se reparte en una peña?',
+    ]);
+    for (const c of comunes) expect(c.a, c.q).toBe(ld.find((x) => x.q === c.q)?.a);
+
+    // Las cifras de Hacienda, resueltas a mano con data/fiscal (40.000 € exentos por décimo, 20 %):
+    // 1.000.000 − 40.000 = 960.000 → 192.000; 125.000 − 40.000 = 85.000 → 17.000, netos 108.000,
+    // la mitad (10 de 20 €) 54.000 y un cuarto (5 de 20 €) 27.000
+    const hacienda = comunes[1].a;
+    for (const frase of [
+      'gravamen especial del 20 % sobre lo que pasa de 40.000 €',
+      'de un premio de 1.000.000 € tributan los 960.000 € del exceso: 192.000 € de impuesto',
+      'un décimo de 125.000 € jugado entre tres que ponen 10, 5 y 5 € deja 17.000 € de retención y 108.000 € netos: 54.000 € para quien puso 10 € y 27.000 € para cada uno de los otros',
+      'no hay que presentar autoliquidación del gravamen',
+    ]) expect(hacienda).toContain(frase);
+    // C(49, 6) = 13.983.816
+    expect(comunes[0].a).toContain('hay 13.983.816 combinaciones posibles de 6 números');
   });
 });

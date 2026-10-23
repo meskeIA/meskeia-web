@@ -1836,13 +1836,15 @@ test.describe('Inspector 13/10/2026 — operativa en móvil táctil de 390 px', 
  *
  * RESULTADO: los cuatro casos cuadran con la app. A 360 px no hay desbordamiento horizontal, los
  * botones y la casilla responden al dedo, la carga de un caso enseña el lienzo (3243) y con 10 m
- * el tubo cabe en el lienzo de 320 px (3242). Hallazgos NUEVOS, con `test.fail()`:
+ * el tubo cabe en el lienzo de 320 px (3242). Hallazgos NUEVOS (3407-3409), que nacieron con
+ * `test.fail()` y se REPARARON el 22/10/2026 en 6ada809e (los tests de abajo ya afirman lo
+ * correcto sin la marca):
  *   · con la página TRADUCIDA por el navegador, cambiar de geometría (o cargar los casos 8-11, o
- *     llevar D₂/D₁ a 1) tumba la app en «Algo salió mal» — familia C0312;
- *   · el lienzo —lo que la app promete «visualizar»— empieza por debajo de la primera pantalla:
- *     a 987 px en un portátil de 1366 × 768 y a 1.902 px (2,6 pantallas) a 360 × 740;
- *   · el featureList del JSON-LD promete un deslizador de densidad que no existe, una
- *     «verificación de la conservación» que no se muestra y llama «líquido» al aire.
+ *     llevar D₂/D₁ a 1) tumbaba la app en «Algo salió mal» — familia C0312 (3407);
+ *   · el lienzo —lo que la app promete «visualizar»— empezaba por debajo de la primera pantalla:
+ *     a 987 px en un portátil de 1366 × 768 y a 1.902 px (2,6 pantallas) a 360 × 740 (3408);
+ *   · el featureList del JSON-LD prometía un deslizador de densidad que no existe, una
+ *     «verificación de la conservación» que no se muestra y llamaba «líquido» al aire (3409).
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 /**
@@ -2163,5 +2165,382 @@ test.describe('Inspector 22/10/2026 — operativa con el dedo a 360 px', () => {
     expect(diez, 'algo dibujado en la columna x = 0,85').not.toBeNull();
     expect(diez!.rgb[0], 'lo primero es el borde del tubo, no su relleno cortado').toBeLessThan(150);
     expect(diez!.y, 'el borde superior queda dentro del lienzo').toBeGreaterThan(0);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR 23/10/2026 — 3.ª RE-INSPECCIÓN CON FIRMA DE ROTURA (1.232 usos). Visitas cortas del
+ * 56,6 % al 69,9 % en 14 días (z 3,2). Se comprobó que las reparaciones de 6ada809e (3407-3409,
+ * 22/10/2026) se sostienen y se buscó lo que impide USAR la app, en escritorio (1366 × 768) y en
+ * móvil táctil (390 × 844 y 360 × 740).
+ *
+ * LO QUE SE SOSTIENE
+ *   · 3407: la página traducida (el traductor simulado de arriba, re-traduciendo tras CADA acción,
+ *     como hace el del navegador con lo que React escribe) aguantó 206 pasos en escritorio y otros
+ *     206 en móvil sin «Algo salió mal» ni un error: las tres geometrías, los cuatro fluidos, cada
+ *     deslizador con Inicio/Fin/flechas, «Volver a 1 atm», la animación, las tres zonas del aviso
+ *     de cavitación, el tema, los doce casos (cargar, responder, pista, solución) y «Practicar».
+ *     Lo que NO se sostiene con la página traducida es otra forma, la del 3297 (d): los rótulos
+ *     se quedan en el valor de antes (HALLAZGO de abajo).
+ *   · 3408: el lienzo empieza a 658 px en 1366 × 768. En el móvil, no (HALLAZGO de abajo).
+ *   · 3409: las siete características del featureList son las que se ven hacer a la app.
+ *
+ * FIRMA: nada de lo medido impide usar la app. Los deslizadores responden al dedo sin arrastrar la
+ * página, no hay desbordamiento horizontal a 390 ni a 360 px, el lienzo se pinta y se anima, no hay
+ * errores de consola ni recargas (el segundo `framenavigated` de la carga es el replaceState de
+ * Next, sin petición). 6ada809e no puede ser la causa: la firma ya estaba en las inspecciones del
+ * 13/10 y del 22/10, medida antes de ese commit, y lo que cambió (span con key, el lienzo antes de
+ * los controles, los botones de geometría en fila en el móvil) solo acercó la tubería.
+ *
+ * CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (A = π·D²/4, D₁ = 10 cm, presión ABSOLUTA,
+ * ρ del aire 1,225 kg/m³ y del aceite 920, como la tabla de fluidos de la app):
+ *
+ *   N (normal) · Venturi, AIRE, Q = 8 L/s, D₂/D₁ = 0,40, P₁ = 101.325 Pa
+ *       A₁ = π·0,05² = 7,853982·10⁻³ m² → 78,54 cm² · v₁ = 0,008/A₁ = 1,018592 m/s → «1,02»
+ *       A₂ = π·0,02² = 1,256637·10⁻³ m² → 12,57 cm² · v₂ = 0,008/A₂ = 6,366198 m/s → «6,37»
+ *       continuidad: v₂/v₁ = 1/0,4² = 6,25 ✔ (olvidar el cuadrado daría v₂ = 2,55)
+ *       ΔP = ½·1,225·(1,037530 − 40,528473) = 0,6125·(−39,490943) = −24,19 Pa → «−24 Pa»
+ *       P₂ = 101.325 − 24,19 = 101.300,81 Pa → «101,30 kPa» · ṁ = 1,225·0,008 = 0,0098 → «0,010 kg/s»
+ *
+ *   L (límite: los dos mínimos a la vez) · Venturi, AIRE, Q = 0,1 L/s, D₂/D₁ = 0,25
+ *       v₁ = 0,0001/7,853982·10⁻³ = 0,012732 m/s → «0,01» · v₂ = 16·v₁ = 0,203718 → «0,20»
+ *       ΔP = 0,6125·(0,000162 − 0,041501) = −0,0253 Pa · P₂ = 101.324,97 Pa → «101,32 kPa»
+ *       ṁ = 1,225·0,0001 = 0,0001225 kg/s
+ *       La tabla cuadra; la tarjeta escribe «−0 Pa» y el caudal másico «0,000 kg/s» (HALLAZGO).
+ *
+ *   R (rechazo) · caso 7 de aula: ṁ = ρ·Q = 920·0,0025 = 2,3 kg/s EXACTO, sin constantes
+ *       «2,3» y «2,30» → correcto · «2,4» → «No es correcto. Te has desviado 0,1» · «2,3 kg/s» →
+ *       «Escribe un número» · «2,28» → DEBE suspender (no es ningún redondeo de 2,3) y hoy aprueba
+ *       con la tolerancia del 1 % (0,023): cabo C0267, HALLAZGO.
+ *
+ * HALLAZGOS de esta inspección, ABIERTOS con `test.fail()` afirmando lo correcto:
+ *   · C0267 — la tolerancia relativa aprueba respuestas EXACTAS mal redondeadas (2,28 por 2,3);
+ *   · el aviso del signo habla de presión en un diámetro, una velocidad o un caudal;
+ *   · con aire y caudal bajo, la tarjeta escribe «−0 Pa» y el caudal másico «0,000 kg/s»;
+ *   · con la página traducida, los rótulos de Q, ρ, Δh y P₁ y las tarjetas pequeñas se congelan;
+ *   · en el móvil el lienzo sigue fuera de la primera pantalla (820 px a 390 × 844);
+ *   · C0362 — «Diferencias de presión > 50 mmHg indican estenosis severa», sin fuente ni año;
+ *   · C0362 — el FAQPage atribuye al efecto Venturi los inyectores de combustible y la
+ *     predicción de trombosis en arterias artificiales, que nada de la página respalda.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura', () => {
+  const seccionCasos = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  /** Escribe en la casilla del caso, espera a que React lo tenga, pulsa «Comprobar» y lee el veredicto. */
+  async function responder(page: Page, texto: string): Promise<string> {
+    const casilla = seccionCasos(page).locator('#casos-respuesta');
+    await casilla.fill(texto);
+    await esperarValorEnReact(page, casilla, texto);
+    await seccionCasos(page).getByRole('button', { name: 'Comprobar' }).click();
+    // Acotado a la sección: getByRole('alert') a secas casaría con el anunciador de rutas de Next.
+    const veredicto = seccionCasos(page).getByRole('alert');
+    await expect(veredicto).toBeVisible();
+    return ((await veredicto.textContent()) ?? '').trim();
+  }
+
+  test('N · Venturi con aire, 8 L/s y D₂/D₁ = 0,40: v₂ = 6,37 m/s, ΔP = −24 Pa y P₂ = 101,30 kPa', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Aire', exact: true }).click();
+    expect(await poner(page, 'Caudal', 8)).toBe('8');
+    expect(await poner(page, 'Ratio de estrechamiento', 0.4)).toBe('0.4');
+
+    const rots = await rotulos(page);
+    expect(rots).toContain('Caudal (Q = 8,0 L/s)');
+    expect(rots).toContain('Ratio de estrechamiento (D₂/D₁ = 0,40)');
+    expect(rots).toContain('Fluido (ρ = 1,225 kg/m³)');
+
+    const filas = await tabla(page);
+    // v₁ = 0,008/7,853982·10⁻³ = 1,018592 m/s
+    expect(filas[0]).toEqual(['Entrada', '10,0', '78,54', '1,02', '101,33 kPa', '0,00']);
+    // A₂ = π·0,02² = 12,57 cm² · v₂ = v₁/0,4² = 6,366198 m/s (sin el cuadrado saldría 2,55)
+    // P₂ = 101.325 + 0,6125·(1,037530 − 40,528473) = 101.325 − 24,19 = 101.300,81 Pa
+    expect(filas[1]).toEqual(['Garganta', '4,0', '12,57', '6,37', '101,30 kPa', '0,00']);
+    expect(filas[2]).toEqual(['Salida', '10,0', '78,54', '1,02', '101,33 kPa', '0,00']);
+
+    const tarjetas = await panel(page);
+    expect(tarjetas[0][1]).toBe('−24 Pa'); // ½·1,225·(v₁² − v₂²) = 0,6125·(−39,490943) = −24,19 Pa
+    expect(tarjetas[0][2]).toContain('La presión CAE en el estrechamiento');
+    expect(tarjetas[1][1]).toBe('0,010 kg/s'); // ρ·Q = 1,225·0,008 = 0,0098 kg/s, a tres decimales
+    expect(tarjetas[2][1]).toBe('8,00 L/s');
+    expect(tarjetas[2][2]).toBe('0,00800 m³/s');
+    expect(tarjetas[3][1]).toBe('6,37 m/s');
+    expect(tarjetas[4][1]).toBe('1,225 kg/m³');
+    expect(tarjetas[4][2]).toBe('Aire');
+    // 101,30 kPa queda muy por encima de la presión de vapor (2,3 kPa): sin aviso de cavitación
+    await expect(page.locator('[role="status"] [role="note"]')).toHaveCount(0);
+  });
+
+  test('L · aire en los dos mínimos (0,1 L/s y D₂/D₁ = 0,25): v₂ = 0,20 m/s y P₂ = 101,32 kPa', async ({ page }) => {
+    await page.getByRole('button', { name: 'Aire', exact: true }).click();
+    expect(await poner(page, 'Caudal', 0.1)).toBe('0.1');
+    expect(await poner(page, 'Ratio de estrechamiento', 0.25)).toBe('0.25');
+
+    const filas = await tabla(page);
+    // v₁ = 0,0001/7,853982·10⁻³ = 0,012732 m/s · v₂ = 16·v₁ = 0,203718 m/s
+    // P₂ = 101.325 + 0,6125·(0,000162 − 0,041501) = 101.325 − 0,0253 = 101.324,97 Pa
+    expect(filas[0]).toEqual(['Entrada', '10,0', '78,54', '0,01', '101,33 kPa', '0,00']);
+    expect(filas[1]).toEqual(['Garganta', '2,5', '4,91', '0,20', '101,32 kPa', '0,00']);
+    const tarjetas = await panel(page);
+    expect(tarjetas[0][2]).toContain('La presión CAE en el estrechamiento');
+    expect(tarjetas[2][1]).toBe('0,10 L/s');
+    expect(tarjetas[2][2]).toBe('0,00010 m³/s'); // 0,1 L/s = 0,0001 m³/s
+    expect(tarjetas[3][1]).toBe('0,20 m/s');
+  });
+
+  // HALLAZGO (cálculo, bajo) — ABIERTO (Inspector 23/10/2026). La tarjeta de ΔP antepone el signo
+  // a `fmtPresion(|ΔP|)`, y `fmt` da 0 a lo que no llega a media unidad: con aire, toda caída de
+  // menos de 0,5 Pa sale «−0 Pa» junto a «La presión CAE en el estrechamiento» (con D₂/D₁ = 0,5,
+  // cualquier caudal por debajo de 1,8 L/s). El catálogo ya decidió que el cero no lleva signo
+  // (formatNumber y redondearA, hallazgo 346: «pH −0,00»). Y el caudal másico va a tres decimales
+  // fijos: con aire y Q ≤ 0,4 L/s, ṁ = 1,225·Q·10⁻³ < 0,0005 kg/s se escribe «0,000 kg/s», un
+  // caudal másico nulo con el aire en movimiento.
+  // Caso: aire, Q = 0,1 L/s, D₂/D₁ = 0,25 → esperado ΔP = −0,025 Pa y ṁ = 0,0001225 kg/s (cifras
+  // distintas de cero, o un «≈0» sin signo) · obtenido «−0 Pa» y «0,000 kg/s».
+  test('HALLAZGO · con aire y caudal bajo, la tarjeta no escribe «−0 Pa» ni un caudal másico de 0,000 kg/s', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: «−0 Pa» y «0,000 kg/s» con aire a 0,1 L/s');
+    await page.getByRole('button', { name: 'Aire', exact: true }).click();
+    expect(await poner(page, 'Caudal', 0.1)).toBe('0.1');
+    expect(await poner(page, 'Ratio de estrechamiento', 0.25)).toBe('0.25');
+    const tarjetas = await panel(page);
+    // ΔP = 0,6125·(0,000162 − 0,041501) = −0,0253 Pa: una caída, no un cero con signo
+    expect(tarjetas[0][1]).not.toMatch(/^[−-]0 Pa$/);
+    // ṁ = 1,225·0,0001 = 0,0001225 kg/s: el aire se mueve, su caudal másico no es cero
+    expect(tarjetas[1][1]).not.toBe('0,000 kg/s');
+  });
+
+  test('R · caso 7 de aula (ṁ = 2,3 kg/s exacto): acierto, fallo con su desviación y unidad pegada', async ({
+    page,
+  }) => {
+    await seccionCasos(page).getByRole('button', { name: /^Caso 7:/ }).click();
+    // ṁ = ρ·Q = 920 · 0,0025 = 2,3 kg/s: sin constantes ni redondeos intermedios
+    expect(await responder(page, '2,3')).toContain('¡Correcto!');
+    expect(await responder(page, '2,30')).toContain('¡Correcto!');
+    const lejos = await responder(page, '2,4');
+    expect(lejos).toContain('No es correcto');
+    expect(lejos).toContain('Te has desviado 0,1 de la respuesta'); // |2,4 − 2,3| = 0,1
+    const conUnidad = await responder(page, '2,3 kg/s');
+    expect(conUnidad).toContain('Escribe un número');
+    expect(conUnidad).not.toContain('NaN');
+  });
+
+  // HALLAZGO (cálculo, medio) — ABIERTO (Inspector 23/10/2026, cabo C0267). `comprobarRespuesta`
+  // corrige con `toleranciaRelativa` (el mayor entre 0,01 y el 1 %) también cuando la respuesta es
+  // EXACTA, y aprueba cifras que no son ningún redondeo de ella. Caso 7: ṁ = 920·0,0025 = 2,3 kg/s
+  // sin una sola constante → aprueba 2,28 y 2,32. Caso 2: v₂ = 1,5·(10/5)² = 6 m/s (π se cancela)
+  // → aprueba 5,94 y 6,05. Caso 3: D₂ = 2·√(1,5/6) = 1 cm → aprueba 0,99 y 1,01. Precedentes
+  // reparados pasando a la política de redondeo: 3342 (movimiento-circular), 3363 (tabla-periódica),
+  // 3322 (genética). El caso 10 (6,25 exacto) SÍ arrastra un redondeo legítimo —su enunciado manda
+  // usar las áreas de la tabla, 78,54/12,57 = 6,248—, y la reparación debe seguir aceptándolo.
+  // Caso: caso 7 → «2,28» → esperado «No es correcto» · obtenido «✅ ¡Correcto!».
+  test('HALLAZGO · C0267: una respuesta exacta no aprueba lo que no es ningún redondeo de ella', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el 1 % aprueba 2,28 para un 2,3 exacto (caso 7) y 5,94 para un 6 exacto (caso 2)');
+    const caso7 = CASOS_AULA.find((c) => c.id === 7)!;
+    expect(caso7.respuesta).toBe(2.3); // 920 · 0,0025
+    // En el motor: |2,28 − 2,3| = 0,02 ≤ 0,023 (el 1 %) → hoy «correcto»
+    expect(comprobarRespuesta(2.28, caso7.respuesta).correcto).toBe(false);
+    await seccionCasos(page).getByRole('button', { name: /^Caso 7:/ }).click();
+    expect(await responder(page, '2,28')).toContain('No es correcto');
+    // Caso 2: 6 m/s exacto; 5,94 está a 0,06, justo el 1 %
+    await seccionCasos(page).getByRole('button', { name: /^Caso 2:/ }).click();
+    expect(await responder(page, '5,94')).toContain('No es correcto');
+  });
+
+  // HALLAZGO (contenido, bajo) — ABIERTO (Inspector 23/10/2026). `comprobarRespuesta` da el aviso
+  // del signo —«El valor es correcto pero el signo no: ¿la presión sube o baja entre esas dos
+  // secciones?»— a CUALQUIER respuesta con el signo cambiado, también donde no hay presión ni
+  // secciones: la velocidad del caso 1, la del 2, el diámetro del 3, el caudal másico del 7 y el
+  // caudal del 12 (y la velocidad y el caudal másico del modo práctica). A quien escribe un
+  // diámetro negativo le dice que «el valor es correcto» y le pregunta por la presión.
+  // Caso: caso 3 (D₂ = 1 cm) → «−1» → esperado un rechazo que no hable de presión (un diámetro no
+  // es negativo) · obtenido «❌ El valor es correcto pero el signo no: ¿la presión sube o baja
+  // entre esas dos secciones?».
+  test('HALLAZGO · el aviso del signo no habla de presión en un diámetro, una velocidad o un caudal', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: «−1» en el caso 3 (un diámetro) recibe «¿la presión sube o baja…?»');
+    await seccionCasos(page).getByRole('button', { name: /^Caso 3:/ }).click();
+    const diametro = await responder(page, '−1'); // D₂ = 2·√(1,5/6) = 1 cm
+    expect(diametro).not.toContain('¡Correcto!');
+    expect(diametro).not.toMatch(/presión/);
+    await seccionCasos(page).getByRole('button', { name: /^Caso 7:/ }).click();
+    expect(await responder(page, '−2,3')).not.toMatch(/presión/); // ṁ = 2,3 kg/s
+  });
+
+  // REGRESIÓN del 3407 (reparado el 22/10/2026), con el recorrido entero y no solo el cambio de
+  // geometría: se re-traduce tras cada acción, porque el traductor del navegador también traduce
+  // lo que React acaba de escribir.
+  test('3407 se sostiene · traducida, geometrías, fluidos, deslizadores, cavitación y casos no tumban la app', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    const errores = vigilarCaida(page);
+    const sigueViva = async (que: string): Promise<void> => {
+      await page.waitForTimeout(100);
+      await traducirPagina(page);
+      await expect(page.getByText('Algo salió mal'), que).toHaveCount(0);
+      expect(errores, que).toEqual([]);
+      await expect(page.locator(`#${CONTROL.Caudal}`), que).toHaveCount(1);
+    };
+    const teclas = async (id: string, lista: string[]): Promise<void> => {
+      await page.locator(`#${id}`).focus();
+      for (const k of lista) {
+        await page.keyboard.press(k);
+        await sigueViva(`${id} · ${k}`);
+      }
+    };
+
+    await traducirPagina(page);
+    for (const [geometria, segundo] of [
+      [/Tubería con desnivel/, CONTROL.Desnivel],
+      [/Vena con estenosis/, CONTROL['Ratio de estrechamiento']],
+      [/Venturi horizontal/, CONTROL['Ratio de estrechamiento']],
+    ] as const) {
+      await page.getByRole('button', { name: geometria }).click();
+      await sigueViva(`geometría ${geometria.source}`);
+      for (const f of ['Aire', 'Sangre', 'Aceite', 'Agua']) {
+        await page.getByRole('button', { name: f, exact: true }).click();
+        await sigueViva(`fluido ${f}`);
+      }
+      await teclas(CONTROL.Caudal, ['End', 'Home', 'ArrowRight']);
+      await teclas(segundo, ['Home', 'End', 'ArrowLeft']);
+      await teclas(CONTROL['Presión de entrada'], ['Home', 'End']);
+      await page.getByRole('button', { name: /Volver a 1 atm/ }).click();
+      await sigueViva('Volver a 1 atm');
+      await page.getByLabel(/Animación de partículas/).click();
+      await sigueViva('animación apagada');
+      await page.getByLabel(/Animación de partículas/).click();
+      await sigueViva('animación encendida');
+    }
+
+    // Venturi con agua y 10 L/s, las tres zonas del aviso (P₁ = 1 atm):
+    //   D₂/D₁ = 0,25 → P₂ = −105,37 kPa (negativa) · 0,30 → 2065 Pa (zona) · 0,40 → 70,47 kPa (sin
+    //   aviso) · 1 → ΔP = 0 (la rama sin signo de la tarjeta)
+    await teclas(CONTROL.Caudal, ['End']);
+    await teclas(CONTROL['Ratio de estrechamiento'], ['Home', 'ArrowRight', 'ArrowRight', 'ArrowRight', 'End', 'Home']);
+
+    // Los casos que cambian la geometría al cargarse, y el modo práctica
+    for (const n of [8, 9, 10, 11]) {
+      await seccionCasos(page).getByRole('button', { name: new RegExp(`^Caso ${n}:`) }).click();
+      await sigueViva(`caso ${n}`);
+      await seccionCasos(page).getByRole('button', { name: /Cargar en el simulador/ }).click();
+      await sigueViva(`caso ${n} · cargar`);
+    }
+    for (let i = 0; i < 2; i++) {
+      await seccionCasos(page).getByRole('button', { name: /Practicar/ }).click();
+      await sigueViva('practicar');
+      await seccionCasos(page).getByRole('button', { name: /Cargar en el simulador/ }).click();
+      await sigueViva('practicar · cargar');
+    }
+  });
+
+  // HALLAZGO (operativa, medio) — ABIERTO (Inspector 23/10/2026). Con la página traducida no cae
+  // (3407), pero los rótulos de los controles y las tarjetas pequeñas se quedan en el valor que
+  // tenían al traducir. Escriben la cifra como un nodo de texto JUNTO a su unidad
+  // (`{fmt(Q, 1)} L/s`, `{fmtDensidad(rho)} kg/m³`, `{fmt(alturaDesnivel, 1)} m`, `{fmt(P0/1000, 1)}
+  // kPa`, las tarjetas de ṁ, caudal, v máxima y densidad, y el «(de Entrada a Garganta)» del
+  // rótulo de ΔP): el traductor cambia ese nodo por <font> y React sigue escribiendo en el que ya
+  // no está en la página. Es la forma del hallazgo 3297 (d) de simulador-genetica, que se reparó
+  // dejando cada texto variable como ÚNICO hijo de su elemento; la tabla y la cifra de ΔP, que ya
+  // lo son, sí siguen al control. Medido: caudal a 10 L/s y «Aire» → el rótulo dice «Caudal (Q =
+  // 2,0 L/s)» y «Fluido (ρ = 1000 kg/m³)», y la tarjeta «Densidad del fluido · 1000 kg/m³ · Aire»;
+  // con desnivel de 10 m, «Desnivel (Δh = 2,0 m)» y «(de Entrada a Garganta)».
+  // Caso: página traducida → caudal al tope (10 L/s) y «Aire» → esperado «Caudal (Q = 10,0 L/s)»
+  // y «1,225 kg/m³» · obtenido «Caudal (Q = 2,0 L/s)» y «1000 kg/m³» junto a «Aire».
+  test('HALLAZGO · traducida, los rótulos de los deslizadores y las tarjetas siguen al valor', async ({ page }) => {
+    test.fail(true, 'ABIERTO: con la página traducida, Q, ρ, Δh, P₁ y las tarjetas pequeñas se congelan');
+    await traducirPagina(page);
+    await page.locator(`#${CONTROL.Caudal}`).focus();
+    await page.keyboard.press('End'); // 10 L/s
+    await page.getByRole('button', { name: 'Aire', exact: true }).click();
+    await page.waitForTimeout(300);
+    await traducirPagina(page);
+    // La tabla sí sigue: v₂ = 0,01/1,963495·10⁻³ = 5,09 m/s en la garganta
+    expect((await tabla(page))[1][3]).toBe('5,09');
+    expect(((await page.locator(`label[for="${CONTROL.Caudal}"]`).textContent()) ?? '').trim()).toBe(
+      'Caudal (Q = 10,0 L/s)',
+    );
+    expect(((await page.locator('#rotulo-fluido').textContent()) ?? '').trim()).toBe('Fluido (ρ = 1,225 kg/m³)');
+    const tarjetas = await panel(page);
+    expect(tarjetas[2][1]).toBe('10,00 L/s');
+    expect(tarjetas[4][1]).toBe('1,225 kg/m³');
+  });
+
+  // HALLAZGO (contenido, medio) — ABIERTO (Inspector 23/10/2026, cabo C0362). La tarjeta
+  // «Circulación sanguínea y estenosis» del bloque educativo dice: «Una arteria parcialmente
+  // bloqueada (estenosis) acelera la sangre en la zona estrecha. La presión local cae, lo que el
+  // ecocardiograma Doppler detecta y cuantifica. Diferencias de presión > 50 mmHg indican estenosis
+  // severa.» Es una cifra clínica sin fuente ni año (neutralidad, regla 1), sin decir si es el
+  // gradiente medio o el máximo ni de qué válvula o vaso (habla de «una arteria» y del
+  // «ecocardiograma»), y la misma tarjeta advierte justo debajo que la geometría no sirve «para
+  // interpretar un Doppler». Un Bernoulli ideal en un tubo de 10 cm no puede respaldar un umbral
+  // diagnóstico. El cabo la señala como el umbral antiguo de la estenosis aórtica; no se coteja con
+  // una guía clínica (no hay fuente oficial a mano), y no hace falta: sin fuente no debe estar.
+  // Caso: bloque educativo → esperado sin umbral clínico, o con fuente, año y qué gradiente mide ·
+  // obtenido «Diferencias de presión > 50 mmHg indican estenosis severa».
+  test('HALLAZGO · C0362: el bloque educativo no da un umbral clínico sin fuente', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «Diferencias de presión > 50 mmHg indican estenosis severa», sin fuente ni año');
+    const cuerpo = ((await page.locator('body').textContent()) ?? '').replace(/\s+/g, ' ');
+    expect(cuerpo).toContain('La escala de esta geometría no es fisiológica.'); // la misma tarjeta
+    expect(cuerpo).not.toContain('Diferencias de presión > 50 mmHg indican estenosis severa');
+  });
+
+  // HALLAZGO (contenido, bajo) — ABIERTO (Inspector 23/10/2026, cabo C0362). La respuesta del
+  // FAQPage «¿Qué es el efecto Venturi y dónde se aplica?» termina: «Se aplica en carburadores de
+  // motores, inyectores de combustible, venturímetros de medición de caudal, nebulizadores médicos
+  // y en el diseño de arterias artificiales para predecir zonas de trombosis.» Las zonas de
+  // trombosis son de recirculación y de esfuerzo cortante en la pared, fenómenos viscosos que el
+  // modelo ideal no contiene —lo dice la respuesta de limitaciones de ese mismo FAQPage: Bernoulli
+  // «no se aplica directamente a fluidos viscosos… ni al flujo turbulento»—; y un inyector
+  // pulveriza por la presión de su bomba, no por la depresión del estrechamiento (eso es el
+  // carburador, que la lista ya nombra). La página visible no menciona ninguna de las dos: sus
+  // aplicaciones del Venturi son «plantas químicas, motores y conductos de aire acondicionado».
+  // Caso: FAQPage → esperado aplicaciones que la página y el modelo respaldan · obtenido
+  // «inyectores de combustible» y «arterias artificiales para predecir zonas de trombosis».
+  test('HALLAZGO · C0362: el FAQPage no atribuye al efecto Venturi lo que la página no respalda', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «inyectores de combustible» y «predecir zonas de trombosis» en el FAQPage');
+    const faq = await page.evaluate(
+      () =>
+        Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+          .map((s) => s.textContent ?? '')
+          .find((t) => t.includes('FAQPage')) ?? '',
+    );
+    const datos = JSON.parse(faq) as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] };
+    const venturi = datos.mainEntity.find((q) => /efecto Venturi/i.test(q.name));
+    expect(venturi, 'la pregunta del efecto Venturi sigue en el FAQPage').toBeDefined();
+    expect(venturi!.acceptedAnswer.text).not.toMatch(/trombosis/i);
+    expect(venturi!.acceptedAnswer.text).not.toMatch(/inyectores de combustible/i);
+  });
+});
+
+test.describe('Inspector 23/10/2026 — la primera pantalla del móvil', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  // HALLAZGO (operativa, bajo) — ABIERTO (Inspector 23/10/2026). La reparación del 3408 llevó el
+  // lienzo a la primera pantalla del portátil (658 px en 1366 × 768), pero el hallazgo medía
+  // también el móvil, y ahí sigue fuera: antes del lienzo van el logotipo fijo, el hero (316 px:
+  // el título en tres líneas a 1,9 rem, que no se reduce en el móvil, y 80 px de margen), el aviso
+  // legal, la banda de Stemum (121 px) y los botones de geometría. Medido: el lienzo empieza a 820
+  // px en 390 × 844 (asoman 24 px, por encima de los rótulos de los manómetros, que van a 24-36 px
+  // de su borde) y a 867 px en 360 × 740 (fuera del todo). Quien llega desde el móvil ve el título,
+  // los enlaces legales y tres botones, no la tubería que la app promete «visualizar».
+  // Caso: 390 × 844, carga → esperado el lienzo asomando con sus manómetros (como en el portátil,
+  // al menos 80 px) · obtenido su borde superior a 820 px.
+  test('HALLAZGO · en un móvil de 390 × 844 el lienzo asoma en la primera pantalla, como en el portátil (3408)', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: el lienzo empieza a 820 px en 390 × 844 y a 867 px en 360 × 740');
+    const arriba = await page.evaluate(() => document.querySelector('canvas')!.getBoundingClientRect().top + scrollY);
+    expect(arriba).toBeLessThan(844 - 80);
   });
 });

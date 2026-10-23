@@ -60,8 +60,11 @@ import { test, expect, Page } from '@playwright/test';
  * (3296 y 3297, página traducida; 3298, FAQ) se REPARARON ese mismo día (7ef9a6db y 7d883ad0) y
  * quedan como regresión, sin marca. La re-inspección de la tarde del 14/10/2026 dejó un hallazgo
  * (3309, desplegables sin nombre accesible) que se REPARÓ el 15/10/2026 (003094f9) y queda como
- * regresión sin marca. La re-inspección del 15/10/2026 deja DOS hallazgos ABIERTOS con
- * `test.fail()`, en el último bloque del fichero.
+ * regresión sin marca. La re-inspección del 15/10/2026 dejó DOS hallazgos (3321, nombre de los
+ * desplegables del rasgo 2; 3322, el corrector aceptaba 99 por 100) que se REPARARON ese mismo día
+ * (01674bea y 4cce0c40) y quedan como regresión sin marca en su bloque «hallazgos reparados». La
+ * re-inspección del 23/10/2026 (tras e27fbb16 y las tandas 1 y 2 del cabo C0070) deja CINCO
+ * hallazgos ABIERTOS con `test.fail()`, en el último bloque del fichero.
  */
 
 const RUTA = '/simulador-genetica/';
@@ -4662,10 +4665,12 @@ test.describe('Re-inspección 14/10/2026 (tarde) · hallazgo reparado', () => {
  * positivo del método: el botón de EducationalSection sí se quedaba viejo (cabo C0250, compartido,
  * REPARADO el 16/10/2026).
  *
- * HALLAZGOS ABIERTOS de esta re-inspección (`test.fail()`, último bloque):
- *   (1) accesibilidad, bajo — los desplegables del rasgo 2 no contienen su rótulo visible.
- *   (2) calculo, bajo — el corrector da por buenas respuestas que no son el resultado ni un
- *       redondeo suyo (99 % en la 1ª ley).
+ * HALLAZGOS de esta re-inspección — REPARADOS el 15/10/2026 y sin marca, en el bloque «hallazgos
+ * reparados» que sigue:
+ *   (1) 3321, accesibilidad, bajo — los desplegables del rasgo 2 no contenían su rótulo visible
+ *       (01674bea).
+ *   (2) 3322, calculo, bajo — el corrector daba por buenas respuestas que no eran el resultado ni
+ *       un redondeo suyo, 99 % en la 1ª ley (4cce0c40, política de redondeo).
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
 test.describe('Re-inspección 15/10/2026 · los tres casos', () => {
@@ -4800,7 +4805,8 @@ test.describe('Re-inspección 15/10/2026 · los tres casos', () => {
       await page.getByRole('button', { name: 'Comprobar' }).click();
     };
 
-    // Caso 7: AaRr × AaRr, verde y rugosa = 1/16 = 6,25 % (tolerancia 0,0625).
+    // Caso 7: AaRr × AaRr, verde y rugosa = 1/16 = 6,25 % (tolerancia 0,0625 hasta 4cce0c40; 0 desde
+    // el 15/10/2026, porque la respuesta es exacta).
     await page.getByRole('button', { name: /^Caso 7:/ }).click();
     for (const forma of ['6,25', '6.25', '6,25 %', '6,25%', '6,25 %']) {
       await responder(forma);
@@ -4989,7 +4995,7 @@ test.describe('Re-inspección 15/10/2026 · página traducida', () => {
   });
 });
 
-test.describe('Re-inspección 15/10/2026 · hallazgos abiertos', () => {
+test.describe('Re-inspección 15/10/2026 · hallazgos reparados', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
@@ -5059,6 +5065,537 @@ test.describe('Re-inspección 15/10/2026 · hallazgos abiertos', () => {
       await esperarValorEnReact(page, '#casos-respuesta', texto);
       await page.getByRole('button', { name: 'Comprobar' }).click();
       await expect(veredicto, `caso ${id}, «${texto}»`).toContainText('¡Correcto!');
+    }
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN · 23/10/2026 (Opus 5.5) — tras e27fbb16 (el corrector compartido escribe la
+ * desviación real en un caso exacto, hallazgo 3369 de otra app), dfaf84a2 y 4488bd1d (tandas 1 y 2
+ * del cabo C0070: blanco sobre la marca → --*-boton; marca como texto → --*-texto) y 03ec4600
+ * (redondearA del motor compartido, cabo C0126; casos.ts de esta app no cambió).
+ *
+ * LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *
+ *   CASO 1 (normal) — Guisantes, Color de flor (P púrpura > p blanco) × Altura (T alta > t enana),
+ *     Pp Tt × Pp Tt. Gametos de cada progenitor: PT, Pt, pT, pt (1/4 cada uno).
+ *          |  PT    |  Pt    |  pT    |  pt
+ *       PT | PP TT  | PP Tt  | Pp TT  | Pp Tt
+ *       Pt | PP Tt  | PP tt  | Pp Tt  | Pp tt
+ *       pT | Pp TT  | Pp Tt  | pp TT  | pp Tt
+ *       pt | Pp Tt  | Pp tt  | pp Tt  | pp tt
+ *     cada casilla 1/16 = 6,25 % → «6,3 %» con un decimal (formatPercentage, redondeo hacia arriba)
+ *     fenotipos: Púrpura/Alta 9/16 = 56,25 % · Púrpura/Enana 3/16 = 18,75 % · Blanco/Alta 18,75 % ·
+ *       Blanco/Enana 1/16 = 6,25 % → 9:3:3:1
+ *     genotipos: Pp Tt 4/16 = 25 % · PP Tt, Pp TT, Pp tt, pp Tt 2/16 = 12,50 % · PP TT, PP tt,
+ *       pp TT, pp tt 1/16 = 6,25 % → en el orden del motor (por filas) 1:2:2:4:1:2:1:2:1
+ *
+ *   CASO 2 (límite) — los dos extremos del dihíbrido:
+ *     PP TT × pp tt (1ª ley con dos caracteres): un solo gameto por progenitor (PT y pt), las 16
+ *       casillas Pp Tt → 100 % Pp Tt y 100 % Púrpura/Alta; «Ratio: 1 (…)».
+ *     Pp Tt × pp tt (cruce prueba dihíbrido): columnas PT, Pt, pT, pt; filas pt ×4; cada fila
+ *       Pp Tt, Pp tt, pp Tt, pp tt → 1:1:1:1, 25 % cada fenotipo y cada genotipo.
+ *     Y el corrector en su límite: desde 4cce0c40 la tolerancia de las 16 respuestas es 0 (son
+ *     exactas), así que lo que vale es el número exacto escrito de cualquier forma legítima: caso 6
+ *     (9/16 = 56,25) con «56,25», «56.25», «56,250», «56,2500», «56.2500», «56,25 %», «56,25%» y con
+ *     espacios alrededor. (No «56.250»: un punto que parte el número en grupos de tres cifras es de
+ *     millares por la regla de parseSpanishNumber, y 56.250 % se rechaza por imposible.)
+ *
+ *   CASO 3 (rechazo) — lo casi exacto suspende y dice CUÁNTO se desvía (e27fbb16):
+ *     caso 6, «56,26» → |56,26 − 56,25| = 0,01 · «56,3» → 0,05
+ *     caso 1 (25), «25,004» → 0,004 · «24,996» → 0,004 · «25,0004» → 0,0004 · «25,5» → 0,50 ·
+ *       «0,25» (en tanto por uno) → 24,75
+ *     «25 por ciento», «veinticinco», «», «1/4» → no son números
+ *     caso 3 (100), «100,001» → imposible: más del 100 % de la descendencia
+ *     Y la media centésima: «25,005» se desvía 0,005, que a dos decimales es 0,01 y no 0 → ABIERTO (1).
+ *
+ * CONTRASTE TRAS C0070, medido por píxel (color calculado contra el fondo compuesto) en los dos
+ * temas, con el selector de tema de la página: los botones de marca (Animar, Realizar Cruce,
+ * Comprobar, caso activo, Simular), las cabeceras de Punnett y de la tabla comparativa, la pestaña y
+ * los botones seleccionados y los textos de marca cumplen. Quedan por debajo: «Simular» en hover
+ * (2), el título del χ² en oscuro (3), el relleno del caso seleccionado en oscuro (4) y el aviso de
+ * emergencias del DisclaimerCard (5).
+ *
+ * PÁGINA TRADUCIDA: los mensajes nuevos del corrector se renuevan en cada Comprobar con la página
+ * traducida antes de cada paso, y la app no cae; 82cb70a2 (EducationalSection) se sostiene.
+ *
+ * HALLAZGOS ABIERTOS de esta re-inspección (`test.fail()`, último bloque):
+ *   (1) calculo, bajo — a media centésima de la respuesta exacta suspende con «Te has desviado 0,00».
+ *   (2) accesibilidad, bajo — «Simular» en hover: blanco sobre #3d918e, 3,72:1.
+ *   (3) accesibilidad, bajo — en oscuro, el título «Prueba Chi-cuadrado (χ²)» en 4,40:1 sobre su
+ *       tinte de marca (familia del cabo C0278).
+ *   (4) accesibilidad, bajo — en oscuro, el caso seleccionado se marca con un relleno a 2,52:1 de la
+ *       tarjeta (WCAG 1.4.11).
+ *   (5) accesibilidad, bajo — «EMERGENCIAS MÉDICAS» del DisclaimerCard compartido: 4,36:1 en claro
+ *       y 4,14:1 en oscuro.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+import type { Locator } from '@playwright/test';
+import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
+
+/** Qué se mide: el texto contra su fondo, o el relleno o un borde contra lo que hay detrás. */
+type ModoContraste = 'texto' | 'relleno' | 'borde' | 'borde-inferior';
+
+interface LecturaContraste {
+  ratio: number;
+  color: string;
+  fondo: string;
+  px: number;
+  peso: number;
+}
+
+/**
+ * Contraste por píxel: cada color se normaliza pintándolo en un canvas de 1×1 y el fondo se compone
+ * capa a capa con su alfa (cada parada, si es un degradado). Devuelve el PEOR par. En 'relleno' y en
+ * los bordes, lo de delante es el propio elemento y lo de detrás, lo que pinta su padre.
+ */
+async function contrastePixel(loc: Locator, modo: ModoContraste): Promise<LecturaContraste> {
+  return loc.evaluate((el: Element, que: ModoContraste) => {
+    const lienzo = document.createElement('canvas');
+    lienzo.width = 1;
+    lienzo.height = 1;
+    const ctx = lienzo.getContext('2d', { willReadFrequently: true });
+    if (!ctx) throw new Error('Sin contexto 2D para medir');
+    const normalizar = (css: string): number[] => {
+      ctx.clearRect(0, 0, 1, 1);
+      ctx.fillStyle = '#000';
+      ctx.fillStyle = css;
+      ctx.fillRect(0, 0, 1, 1);
+      const d = ctx.getImageData(0, 0, 1, 1).data;
+      return [d[0], d[1], d[2], d[3] / 255];
+    };
+    const canal = (c: number): number => {
+      const s = c / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    const luminancia = (p: number[]): number => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+    const razon = (a: number[], b: number[]): number => {
+      const l1 = luminancia(a);
+      const l2 = luminancia(b);
+      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    };
+    const sobre = (c: number[], base: number[]): number[] => [0, 1, 2].map((k) => c[k] * c[3] + base[k] * (1 - c[3]));
+    const fondos = (desde: Element | null): number[][] => {
+      const pila: number[][][] = [];
+      for (let m = desde; m; m = m.parentElement) {
+        const cs = getComputedStyle(m);
+        const imagen = cs.backgroundImage;
+        const paradas = /gradient/i.test(imagen) ? (imagen.match(/(rgba?|color)\([^)]*\)/g) ?? []).map(normalizar) : [];
+        if (paradas.length > 0) pila.push(paradas);
+        const color = normalizar(cs.backgroundColor);
+        if (color[3] > 0) pila.push([color]);
+        if (color[3] >= 1 || (paradas.length > 0 && paradas.every((p) => p[3] >= 1))) break;
+      }
+      let bases: number[][] = [[255, 255, 255]];
+      for (let i = pila.length - 1; i >= 0; i--) bases = bases.flatMap((b) => pila[i].map((c) => sobre(c, b)));
+      return bases;
+    };
+    const hex = (p: number[]): string =>
+      '#' + p.slice(0, 3).map((x) => Math.round(x).toString(16).padStart(2, '0')).join('');
+
+    const cs = getComputedStyle(el);
+    const pares: Array<[number[], number[]]> = [];
+    if (que === 'texto') {
+      const color = normalizar(cs.color);
+      for (const b of fondos(el)) pares.push([sobre(color, b), b]);
+    } else {
+      const detras = fondos(el.parentElement);
+      for (const b of detras) {
+        if (que === 'relleno') {
+          for (const propio of fondos(el)) pares.push([propio, b]);
+        } else {
+          const borde = normalizar(que === 'borde-inferior' ? cs.borderBottomColor : cs.borderTopColor);
+          pares.push([sobre(borde, b), b]);
+        }
+      }
+    }
+    let peor = { ratio: Number.POSITIVE_INFINITY, color: '', fondo: '' };
+    for (const [delante, fondo] of pares) {
+      const r = razon(delante, fondo);
+      if (r < peor.ratio) peor = { ratio: r, color: hex(delante), fondo: hex(fondo) };
+    }
+    return {
+      ratio: Math.round(peor.ratio * 100) / 100,
+      color: peor.color,
+      fondo: peor.fondo,
+      px: parseFloat(cs.fontSize),
+      peso: Number(cs.fontWeight),
+    };
+  }, modo);
+}
+
+/** 3:1 si es texto grande (≥ 24 px, o ≥ 18,66 px en negrita), 4,5:1 si no (WCAG 1.4.3). */
+const umbralDeTexto = (m: LecturaContraste): number => (m.px >= 24 || (m.px >= 18.66 && m.peso >= 700) ? 3 : 4.5);
+
+const veredictoCaso = (page: Page) => page.locator('[class*="casoVeredicto"]');
+
+/** Elige el caso, escribe la respuesta con React ya enterado y pulsa Comprobar. */
+async function responderCaso(page: Page, caso: number, texto: string): Promise<void> {
+  await page.getByRole('button', { name: new RegExp(`^Caso ${caso}:`) }).click();
+  await page.locator('#casos-respuesta').fill(texto);
+  await esperarValorEnReact(page, '#casos-respuesta', texto);
+  await page.getByRole('button', { name: 'Comprobar' }).click();
+  await expect(veredictoCaso(page)).toBeVisible();
+}
+
+test.describe('Re-inspección 23/10/2026 · los tres casos', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('CASO 1 (normal) · guisantes Pp Tt × Pp Tt: 16 casillas, 9:3:3:1 y 1:2:2:4:1:2:1:2:1', async ({ page }) => {
+    await selectorRasgo(page, 0).selectOption('color-flor');
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await selectorRasgo(page, 1).selectOption('altura-planta');
+    await selectorGenotipo(page, 0).selectOption('Pp');
+    await selectorGenotipo(page, 1).selectOption('Pp');
+    await selectorGenotipo(page, 2).selectOption('Tt');
+    await selectorGenotipo(page, 3).selectOption('Tt');
+
+    // El cuadro resuelto a mano en la cabecera del bloque, fila a fila.
+    await expect(genotiposDeCelda(page)).toHaveText([
+      'PP TT', 'PP Tt', 'Pp TT', 'Pp Tt',
+      'PP Tt', 'PP tt', 'Pp Tt', 'Pp tt',
+      'Pp TT', 'Pp Tt', 'pp TT', 'pp Tt',
+      'Pp Tt', 'Pp tt', 'pp Tt', 'pp tt',
+    ]);
+    await expect(fenotiposDeCelda(page)).toHaveText([
+      'Púrpura / Alta', 'Púrpura / Alta', 'Púrpura / Alta', 'Púrpura / Alta',
+      'Púrpura / Alta', 'Púrpura / Enana', 'Púrpura / Alta', 'Púrpura / Enana',
+      'Púrpura / Alta', 'Púrpura / Alta', 'Blanco / Alta', 'Blanco / Alta',
+      'Púrpura / Alta', 'Púrpura / Enana', 'Blanco / Alta', 'Blanco / Enana',
+    ]);
+    // 1/16 = 6,25 % con un decimal
+    await expect(probabilidadesDeCelda(page)).toHaveText(Array(16).fill('6,3 %'));
+    const [columnas, filas] = await cabeceras(page);
+    expect(columnas).toEqual(['PT (25 %)', 'Pt (25 %)', 'pT (25 %)', 'pt (25 %)']);
+    expect(filas).toEqual(['PT (25 %)', 'Pt (25 %)', 'pT (25 %)', 'pt (25 %)']);
+
+    const { genotipos, fenotipos } = await estadisticas(page);
+    expect(genotipos.filas).toEqual([
+      'Pp Tt 25 %',
+      'PP Tt 12,50 %',
+      'Pp TT 12,50 %',
+      'Pp tt 12,50 %',
+      'pp Tt 12,50 %',
+      'PP TT 6,25 %',
+      'PP tt 6,25 %',
+      'pp TT 6,25 %',
+      'pp tt 6,25 %',
+    ]);
+    expect(genotipos.ratio).toBe(
+      'Ratio: 1:2:2:4:1:2:1:2:1 (PP TT · PP Tt · Pp TT · Pp Tt · PP tt · Pp tt · pp TT · pp Tt · pp tt)',
+    );
+    expect(sinIcono(fenotipos.filas)).toEqual([
+      'Púrpura / Alta 56,25 %',
+      'Púrpura / Enana 18,75 %',
+      'Blanco / Alta 18,75 %',
+      'Blanco / Enana 6,25 %',
+    ]);
+    expect(fenotipos.ratio).toBe('Ratio: 9:3:3:1 (Púrpura / Alta · Púrpura / Enana · Blanco / Alta · Blanco / Enana)');
+  });
+
+  test('CASO 2 (límite) · PP TT × pp tt da 100 % Pp Tt; Pp Tt × pp tt da 1:1:1:1; y el 56,25 exacto vale escrito de cualquier forma', async ({
+    page,
+  }) => {
+    await selectorRasgo(page, 0).selectOption('color-flor');
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await selectorRasgo(page, 1).selectOption('altura-planta');
+
+    // 1ª ley con dos caracteres: un solo gameto por progenitor.
+    await selectorGenotipo(page, 0).selectOption('PP');
+    await selectorGenotipo(page, 1).selectOption('pp');
+    await selectorGenotipo(page, 2).selectOption('TT');
+    await selectorGenotipo(page, 3).selectOption('tt');
+    await expect(genotiposDeCelda(page)).toHaveText(Array(16).fill('Pp Tt'));
+    await expect(fenotiposDeCelda(page)).toHaveText(Array(16).fill('Púrpura / Alta'));
+    expect(await cabeceras(page)).toEqual([Array(4).fill('PT (25 %)'), Array(4).fill('pt (25 %)')]);
+    let lectura = await estadisticas(page);
+    expect(lectura.genotipos.filas).toEqual(['Pp Tt 100 %']);
+    expect(lectura.genotipos.ratio).toBe('Ratio: 1 (Pp Tt)');
+    expect(sinIcono(lectura.fenotipos.filas)).toEqual(['Púrpura / Alta 100 %']);
+    expect(lectura.fenotipos.ratio).toBe('Ratio: 1 (Púrpura / Alta)');
+
+    // Cruce prueba dihíbrido: el progenitor pp tt solo da pt.
+    await pestana(page, 'Punnett').click();
+    await selectorGenotipo(page, 0).selectOption('Pp');
+    await selectorGenotipo(page, 2).selectOption('Tt');
+    await expect(genotiposDeCelda(page)).toHaveText([
+      'Pp Tt', 'Pp tt', 'pp Tt', 'pp tt',
+      'Pp Tt', 'Pp tt', 'pp Tt', 'pp tt',
+      'Pp Tt', 'Pp tt', 'pp Tt', 'pp tt',
+      'Pp Tt', 'Pp tt', 'pp Tt', 'pp tt',
+    ]);
+    expect(await cabeceras(page)).toEqual([
+      ['PT (25 %)', 'Pt (25 %)', 'pT (25 %)', 'pt (25 %)'],
+      Array(4).fill('pt (25 %)'),
+    ]);
+    lectura = await estadisticas(page);
+    expect(lectura.genotipos.filas).toEqual(['Pp Tt 25 %', 'Pp tt 25 %', 'pp Tt 25 %', 'pp tt 25 %']);
+    expect(lectura.genotipos.ratio).toBe('Ratio: 1:1:1:1 (Pp Tt · Pp tt · pp Tt · pp tt)');
+    expect(sinIcono(lectura.fenotipos.filas)).toEqual([
+      'Púrpura / Alta 25 %',
+      'Púrpura / Enana 25 %',
+      'Blanco / Alta 25 %',
+      'Blanco / Enana 25 %',
+    ]);
+    expect(lectura.fenotipos.ratio).toBe('Ratio: 1:1:1:1 (Púrpura / Alta · Púrpura / Enana · Blanco / Alta · Blanco / Enana)');
+
+    // El corrector con tolerancia 0 (4cce0c40): el 56,25 exacto del caso 6 (9/16), escrito de
+    // cualquier forma legítima, aprueba.
+    expect(toleranciaDe(56.25)).toBe(0);
+    for (const forma of ['56,25', '56.25', '56,250', '56,2500', '56.2500', '56,25 %', '56,25%', ' 56,25 ']) {
+      await responderCaso(page, 6, forma);
+      await expect(veredictoCaso(page), `«${forma}»`).toContainText('¡Correcto!');
+    }
+  });
+
+  test('CASO 3 (rechazo) · lo casi exacto suspende y dice cuánto se desvía (e27fbb16); lo que no es número, tampoco vale', async ({
+    page,
+  }) => {
+    const rechazos: Array<[number, string, string]> = [
+      [6, '56,26', 'No es correcto. Te has desviado 0,01 de la respuesta.'], // 56,26 − 56,25
+      [6, '56,3', 'No es correcto. Te has desviado 0,05 de la respuesta.'], // 56,3 − 56,25
+      [1, '25,004', 'No es correcto. Te has desviado 0,004 de la respuesta.'], // a 2 decimales sería 0
+      [1, '24,996', 'No es correcto. Te has desviado 0,004 de la respuesta.'],
+      [1, '25,0004', 'No es correcto. Te has desviado 0,0004 de la respuesta.'],
+      [1, '25,5', 'No es correcto. Te has desviado 0,50 de la respuesta.'],
+      [1, '0,25', 'No es correcto. Te has desviado 24,75 de la respuesta.'], // en tanto por uno
+      [1, '25 por ciento', 'Escribe un número (puedes usar la coma decimal).'],
+      [1, 'veinticinco', 'Escribe un número (puedes usar la coma decimal).'],
+      [1, '', 'Escribe un número (puedes usar la coma decimal).'],
+      [1, '1/4', 'Escribe un número (puedes usar la coma decimal).'],
+      [3, '100,001', 'No puede haber más del 100 % de la descendencia: repasa la cuenta.'],
+    ];
+    for (const [caso, texto, motivo] of rechazos) {
+      await responderCaso(page, caso, texto);
+      await expect(veredictoCaso(page), `caso ${caso}, «${texto}»`).toContainText(motivo);
+      await expect(veredictoCaso(page), `caso ${caso}, «${texto}»`).not.toContainText('¡Correcto!');
+    }
+    // Y lo exacto del mismo caso sigue aprobando
+    await responderCaso(page, 1, '25');
+    await expect(veredictoCaso(page)).toContainText('¡Correcto!');
+    await expect(page.locator('body')).not.toContainText('NaN');
+  });
+});
+
+test.describe('Re-inspección 23/10/2026 · página traducida', () => {
+  test('e27fbb16 · traducida antes de cada paso: cada Comprobar renueva el mensaje y la app no cae', async ({ page }) => {
+    const errores = vigilarCaidas(page);
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    const secuencia: Array<[number, string, string]> = [
+      [1, '25,004', 'Te has desviado 0,004 de la respuesta'],
+      [1, '25,0004', 'Te has desviado 0,0004 de la respuesta'],
+      [1, '25', '¡Correcto!'],
+      [6, '56,26', 'Te has desviado 0,01 de la respuesta'],
+      [6, '56,250', '¡Correcto!'],
+      [7, 'abc', 'Escribe un número'],
+      [16, '6,19', 'Te has desviado 0,06 de la respuesta'], // 6,25 − 6,19
+    ];
+    for (const [caso, texto, motivo] of secuencia) {
+      await traducirPagina(page);
+      await page.getByRole('button', { name: new RegExp(`^Caso ${caso}:`) }).click();
+      await traducirPagina(page);
+      await page.locator('#casos-respuesta').fill(texto);
+      await expect(veredictoCaso(page)).toHaveCount(0);
+      await traducirPagina(page);
+      await page.getByRole('button', { name: 'Comprobar' }).click();
+      await expect(veredictoCaso(page), `caso ${caso}, «${texto}»`).toContainText(motivo);
+      // Comprobar otra vez sobre la página traducida: el mismo mensaje, sin caer
+      await traducirPagina(page);
+      await page.locator('#casos-respuesta').press('Enter');
+      await expect(veredictoCaso(page), `caso ${caso}, «${texto}» (Enter)`).toContainText(motivo);
+    }
+    // 82cb70a2: el botón de la guía educativa sigue a su estado con la página traducida
+    const guia = page.getByRole('button', { name: /guía educativa/ });
+    await traducirPagina(page);
+    await guia.click();
+    await expect(guia).toHaveAttribute('aria-expanded', 'true');
+    await expect(guia).toContainText('Ocultar guía educativa');
+    await traducirPagina(page);
+    await guia.click();
+    await expect(guia).toContainText('Ver guía educativa');
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+});
+
+test.describe('Re-inspección 23/10/2026 · contraste tras C0070, en claro y en oscuro', () => {
+  test('dfaf84a2 y 4488bd1d · botones, cabeceras, pestaña y botones seleccionados y textos de marca llegan a su umbral', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    await prepararParaMedir(page);
+    await page.getByRole('button', { name: /guía educativa/ }).click();
+    await page.getByRole('button', { name: 'Dihíbrido', exact: true }).click();
+    await expect(genotiposDeCelda(page)).toHaveCount(16);
+
+    // Texto: blanco sobre --primary-boton (5,47:1) y --secondary-boton (5,15:1); --primary-texto
+    // sobre blanco 5,47:1 y en oscuro #3FA5D1 sobre #2D2D2D 4,93:1 (globals.css).
+    const textos: Array<[string, string]> = [
+      ['cabecera de Punnett', '[class*="punnettTable"] thead th:not([class*="corner"])'],
+      ['cabecera de la tabla comparativa', '[class*="comparativaTable"] thead th'],
+      ['Animar', 'button[class*="animBtn"]'],
+      ['Realizar Cruce', 'button[class*="crossButton"]'],
+      ['pestaña seleccionada', '[role="tab"][aria-selected="true"]'],
+      ['Dihíbrido seleccionado', 'button[class*="crossTypeBtn"][aria-pressed="true"]'],
+      ['caso seleccionado', 'button[class*="casoBoton"][aria-pressed="true"]'],
+      ['Comprobar', 'button[class*="casoComprobar"]'],
+      ['Ver pista', 'button[class*="casoAyudaBoton"]'],
+      ['título «Casos para clase»', 'h2[class*="casosTitulo"]'],
+      ['título del caso', 'h3[class*="casoTitulo"]'],
+      ['símbolo ×', '[class*="crossSymbol"]'],
+      ['pregunta de la FAQ', '[class*="faqItem"] h4'],
+    ];
+    // Indicadores no textuales de estado (WCAG 1.4.11, 3:1 contra lo que tienen detrás)
+    const indicadores: Array<[string, string, ModoContraste]> = [
+      ['subrayado de la pestaña seleccionada', '[role="tab"][aria-selected="true"]', 'borde-inferior'],
+      ['borde del organismo seleccionado', 'button[class*="organismButton"][aria-pressed="true"]', 'borde'],
+      ['borde de Dihíbrido seleccionado', 'button[class*="crossTypeBtn"][aria-pressed="true"]', 'borde'],
+    ];
+
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') await activarTemaOscuro(page);
+      await page.mouse.move(0, 0);
+      for (const [nombre, selector] of textos) {
+        const m = await contrastePixel(page.locator(selector).first(), 'texto');
+        expect.soft(m.ratio, `${tema} · ${nombre}: ${m.color} sobre ${m.fondo}`).toBeGreaterThanOrEqual(umbralDeTexto(m));
+      }
+      for (const [nombre, selector, modo] of indicadores) {
+        const m = await contrastePixel(page.locator(selector).first(), modo);
+        expect.soft(m.ratio, `${tema} · ${nombre}: ${m.color} sobre ${m.fondo}`).toBeGreaterThanOrEqual(3);
+      }
+      // Estadísticas: la línea «Ratio:» en --primary-texto
+      await pestana(page, 'Estadísticas').click();
+      await page.mouse.move(0, 0);
+      const ratio = await contrastePixel(page.locator('[class*="ratioSummary"]').first(), 'texto');
+      expect.soft(ratio.ratio, `${tema} · Ratio: ${ratio.color} sobre ${ratio.fondo}`).toBeGreaterThanOrEqual(4.5);
+      // Población: «Simular» en reposo, blanco sobre --secondary-boton
+      await pestana(page, 'Población').click();
+      await page.mouse.move(0, 0);
+      const simular = await contrastePixel(botonSimular(page), 'texto');
+      expect.soft(simular.ratio, `${tema} · Simular: ${simular.color} sobre ${simular.fondo}`).toBeGreaterThanOrEqual(4.5);
+      await pestana(page, 'Punnett').click();
+    }
+  });
+});
+
+test.describe('Re-inspección 23/10/2026 · hallazgos abiertos', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test.fail('ABIERTO · calculo, bajo — a media centésima de la respuesta exacta suspende con «Te has desviado 0,00»', async ({
+    page,
+  }) => {
+    // e27fbb16 (3369) hizo que una respuesta exacta suspendida dijera cuánto se desvía en vez de
+    // «Te has desviado 0». textoDesviacion (lib/calculadoras/correctorCasosAula.ts) decide los
+    // decimales con redondearA, que limpia el ruido binario a 12 cifras: |25,005 − 25| =
+    // 0,004999999999999005 se limpia a 0,005 y redondea a 0,01 ≠ 0, así que se queda en 2 decimales.
+    // Pero al formateador le pasa la diferencia EN BRUTO, e Intl redondea 0,004999… a «0,00»: el
+    // mensaje vuelve a decir a la vez «No es correcto» y «desviado 0,00». La desviación real es 0,005,
+    // que a dos decimales es 0,01. Con «56,255» la resta cae por encima (0,0050000000000026) y sale
+    // bien «0,01»: depende del lado al que redondee el binario.
+    const entradas: Array<[number, string]> = [
+      [1, '25,005'], // 25 % (caso 1)
+      [1, '24,995'],
+      [7, '6,255'], // 6,25 % (caso 7)
+      [3, '99,995'], // 100 % (caso 3)
+    ];
+    for (const [caso, texto] of entradas) {
+      await responderCaso(page, caso, texto);
+      await expect(veredictoCaso(page)).toContainText('No es correcto');
+      const mensaje = (await veredictoCaso(page).innerText()).replace(/\s+/g, ' ');
+      expect.soft(mensaje, `caso ${caso}, «${texto}»`).not.toMatch(/desviado 0(,0+)? de/);
+    }
+  });
+
+  test.fail('ABIERTO · accesibilidad, bajo — «Simular» en hover pinta el texto blanco sobre #3d918e: 3,72:1', async ({ page }) => {
+    // dfaf84a2 pasó la base de .simulateBtn de var(--secondary) (2,80:1) a var(--secondary-boton)
+    // #327874 (5,15:1), pero su :hover lleva el hexadecimal #3d918e escrito a mano, que no es de la
+    // marca y la campaña no tocó: blanco encima da 3,72:1 en los dos temas (texto de 13,3 px y 600,
+    // no es grande: pide 4,5:1). Al pasar el ratón el botón pierde el contraste que acaba de ganar.
+    await prepararParaMedir(page);
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') await activarTemaOscuro(page);
+      await pestana(page, 'Población').click();
+      await page.mouse.move(0, 0);
+      const reposo = await contrastePixel(botonSimular(page), 'texto');
+      expect(reposo.ratio, `${tema}, en reposo`).toBeGreaterThanOrEqual(4.5);
+      await botonSimular(page).hover();
+      const encima = await contrastePixel(botonSimular(page), 'texto');
+      expect.soft(encima.ratio, `${tema}, hover: ${encima.color} sobre ${encima.fondo}`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  test.fail('ABIERTO · accesibilidad, bajo — en oscuro el título «Prueba Chi-cuadrado (χ²)» queda en 4,40:1 sobre su tinte de marca (C0278)', async ({
+    page,
+  }) => {
+    // .chiSquareTitle pasó a --primary-texto (4488bd1d), que en oscuro es el mismo #3FA5D1 de antes,
+    // sobre .chiSquare: rgba(46, 134, 171, 0.1) encima de la tarjeta #2D2D2D = #2D3639. 4,40:1 con
+    // texto de 16 px y 600 (pide 4,5:1). En claro, #26718F sobre #EAF3F6, 4,85:1, cumple. Es la
+    // familia del cabo C0278 (texto de marca sobre tinte de marca), que se repara app a app; este
+    // panel solo existe tras pulsar Simular, por eso no lo ve un barrido de la página recién cargada.
+    await prepararParaMedir(page);
+    await pestana(page, 'Población').click();
+    await botonSimular(page).click();
+    await expect(individuosPoblacion(page)).toHaveCount(100);
+    const titulo = page.locator('[class*="chiSquareTitle"]');
+    await page.mouse.move(0, 0);
+    const claro = await contrastePixel(titulo, 'texto');
+    expect(claro.ratio, `claro: ${claro.color} sobre ${claro.fondo}`).toBeGreaterThanOrEqual(4.5);
+    await activarTemaOscuro(page);
+    await page.mouse.move(0, 0);
+    const oscuro = await contrastePixel(titulo, 'texto');
+    expect.soft(oscuro.ratio, `oscuro: ${oscuro.color} sobre ${oscuro.fondo}`).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test.fail('ABIERTO · accesibilidad, bajo — en oscuro el caso seleccionado se marca solo con un relleno a 2,52:1 de la tarjeta (WCAG 1.4.11)', async ({
+    page,
+  }) => {
+    // dfaf84a2 cambió [data-theme='dark'] .casoBotonActivo de var(--primary) (#3FA5D1 en oscuro) a
+    // var(--primary-boton) #26718F: el número blanco pasó de 2,79:1 a 5,47:1, pero el relleno, que
+    // es lo único que distingue el caso seleccionado (aria-pressed) de los demás —el texto pasa de
+    // #E5E7EB a blanco—, quedó a 2,52:1 de la tarjeta #2D2D2D que tiene alrededor (antes, 4,93:1) y a
+    // 2,68:1 del relleno #1F2937 de los no seleccionados. Un indicador de estado pide 3:1. En claro,
+    // #26718F sobre blanco, 5,47:1.
+    await prepararParaMedir(page);
+    await page.getByRole('button', { name: /^Caso 4:/ }).click();
+    const seleccionado = page.locator('button[class*="casoBoton"][aria-pressed="true"]');
+    await expect(seleccionado).toHaveText('4');
+    await page.mouse.move(0, 0);
+    const claro = await contrastePixel(seleccionado, 'relleno');
+    expect(claro.ratio, `claro: ${claro.color} sobre ${claro.fondo}`).toBeGreaterThanOrEqual(3);
+    await activarTemaOscuro(page);
+    await page.mouse.move(0, 0);
+    const oscuro = await contrastePixel(seleccionado, 'relleno');
+    expect.soft(oscuro.ratio, `oscuro: ${oscuro.color} sobre ${oscuro.fondo}`).toBeGreaterThanOrEqual(3);
+    // «Practicar» seleccionado lleva la misma clase
+    await page.getByRole('button', { name: /Practicar/ }).click();
+    await page.mouse.move(0, 0);
+    const practicar = await contrastePixel(page.locator('button[class*="casoBotonPractica"]'), 'relleno');
+    expect.soft(practicar.ratio, `oscuro, Practicar: ${practicar.color} sobre ${practicar.fondo}`).toBeGreaterThanOrEqual(3);
+  });
+
+  test.fail('ABIERTO · accesibilidad, bajo — «EMERGENCIAS MÉDICAS» del aviso médico (DisclaimerCard) en 4,36:1 en claro y 4,14:1 en oscuro', async ({
+    page,
+  }) => {
+    // components/DisclaimerCard.module.css, .emergency: #d32f2f sobre #ffebee (4,36:1) y, en oscuro,
+    // #ef5350 sobre #4a1a1a (4,14:1). Texto de 16 px en negrita: no llega a «grande» (18,66 px), pide
+    // 4,5:1. Es el componente compartido (variant="medical"), con esos colores desde 02/2026; no
+    // viene de C0070, que no toca los rojos.
+    await prepararParaMedir(page);
+    const aviso = page.locator('p[class*="emergency"]');
+    await expect(aviso).toContainText('EMERGENCIAS MÉDICAS');
+    for (const tema of ['claro', 'oscuro'] as const) {
+      if (tema === 'oscuro') await activarTemaOscuro(page);
+      await page.mouse.move(0, 0);
+      const m = await contrastePixel(aviso, 'texto');
+      expect.soft(m.ratio, `${tema}: ${m.color} sobre ${m.fondo} (${m.px} px, ${m.peso})`).toBeGreaterThanOrEqual(umbralDeTexto(m));
     }
   });
 });
