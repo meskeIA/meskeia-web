@@ -66,8 +66,9 @@ export interface BonificacionCCAA_IS {
    * Causahabientes de los Grupos III y IV a los que la comunidad extiende los beneficios de los
    * Grupos I y II si cumplen un requisito propio (Extremadura: inscripción en el Registro
    * Autonómico de Personas con Especial Vinculación, arts. 20 ter y 20 quater DLeg 1/2018).
-   * Solo cambia la bonificación en cuota: la reducción estatal por parentesco y el coeficiente
-   * del art. 22 siguen siendo los de su grupo legal.
+   * Cambia la bonificación en cuota y la reducción por parentesco, que pasa a ser la MEJORA
+   * autonómica de los Grupos I y II si la comunidad la tiene (`MEJORAS_REDUCCIONES_CCAA_IS`); el
+   * coeficiente del art. 22 LISD sigue siendo el de su grupo legal.
    */
   especialVinculacion?: {
     norma: string;
@@ -591,7 +592,10 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
   // extienden «los beneficios fiscales autonómicos vigentes para los grupos I y II» a las personas
   // con especial vinculación inscritas en el Registro Autonómico. Las mejoras de los arts. 17 y 18
   // (500.000 € por parentesco y la escala por discapacidad) están en `MEJORAS_REDUCCIONES_CCAA_IS`
-  // desde el 22/10/2026 (C0371); a la especial vinculación solo se le extiende la bonificación.
+  // desde el 22/10/2026 (C0371). Desde el 23/10/2026 (C0374, decisión del usuario) a la especial
+  // vinculación se le extiende también la mejora de 500.000 € del art. 17, que sustituye a la
+  // reducción estatal de su grupo: el art. 20 quater.1 habla de «los beneficios fiscales que se
+  // encuentren vigentes en la normativa autonómica para los grupos I y II», sin acotarlos.
   // Una sola comunidad: el sello del módulo NO se mueve.
   'extremadura': {
     nombre: 'Extremadura',

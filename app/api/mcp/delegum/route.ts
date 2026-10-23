@@ -307,12 +307,14 @@ const DESCRIPCION_PATRIMONIO_HEREDERO =
   'Patrimonio preexistente del heredero en euros (lo que ya tenía antes de heredar). Fija el coeficiente ' +
   'multiplicador del art. 22 LISD, con la corrección del salto de tramo del art. 22.2. Si se omite, se ' +
   'calcula con el coeficiente del primer tramo, el más bajo.';
-// Cabo C0146 (22/10/2026): Extremadura extiende a estas personas la bonificación de los Grupos I y II.
+// Cabo C0146 (22/10/2026): Extremadura extiende a estas personas la bonificación de los Grupos I y II,
+// y desde C0374 (23/10/2026) también la reducción por parentesco de 500.000 € del art. 17.
 const DESCRIPCION_ESPECIAL_VINCULACION =
   'Solo Extremadura y Grupos III o IV: true si el heredero está inscrito en el Registro Autonómico de Personas ' +
   'con Especial Vinculación (arts. 20 ter y 20 quater DLeg 1/2018: sobrinos de un causante sin descendientes ' +
   'directos, descendientes de su pareja, parejas de sus ascendientes o convivientes de sus tres últimos años). ' +
-  'Recibe la bonificación del 99 % de los Grupos I y II. Por defecto false.';
+  'Recibe la reducción por parentesco de 500.000 € (art. 17) y la bonificación del 99 % (art. 20) de los ' +
+  'Grupos I y II. Por defecto false.';
 const AVISO_PATRIMONIO_HEREDERO =
   '📌 *Calculado con el coeficiente del primer tramo de patrimonio preexistente (art. 22 LISD), el más bajo. ' +
   'Si el heredero ya tenía un patrimonio importante, indícalo: el coeficiente puede subir la cuota.*';

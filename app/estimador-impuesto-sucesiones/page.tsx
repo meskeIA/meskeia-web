@@ -781,6 +781,8 @@ export default function EstimadorImpuestoSucesionesPage() {
       grupo,
       edadHeredero: edadHeredero ?? undefined,
       discapacidad,
+      // Con especial vinculación, la mejora de 500.000 € de los Grupos I y II (C0374)
+      especialVinculacion,
     });
     if (personales.parentesco > 0) {
       reducciones.push({
@@ -1155,7 +1157,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                 </label>
                 <span className={styles.helper} id="especial-vinculacion-ayuda">
                   {ccaaInfo.especialVinculacion.quienes} ({ccaaInfo.especialVinculacion.norma}). Se
-                  aplica la bonificación de los Grupos I y II; la reducción por parentesco sigue siendo la de tu grupo
+                  aplican la reducción por parentesco y la bonificación de los Grupos I y II
                 </span>
               </div>
             )}

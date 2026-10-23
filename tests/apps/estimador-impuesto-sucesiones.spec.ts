@@ -3200,22 +3200,45 @@ test.describe('Inspector 30/09/2026', () => {
  *   = base liquidable                                 =  95.006,54
  *   Cuota íntegra = 9.166,06 + (95.006,54 − 79.880,52) × 16,15 % = 11.608,91
  *   × 1,5882 (Grupo III, sin patrimonio previo)       = 18.437,27
- *   Sin la casilla: «18.437,27 €». Con ella, − 99 % = 18.252,90 → «184,37 €»
+ *   Sin la casilla: «18.437,27 €». Con ella, hasta el 23/10/2026 solo el 99 % → «184,37 €».
+ *
+ * CABO C0374 (reparar, 23/10/2026, decisión del usuario del 23/10/2026) — el art. 20 quater.1 dice
+ * «Se extienden los beneficios fiscales que se encuentren vigentes en la normativa autonómica para
+ * los grupos I y II de parentesco […] a los causahabientes con especial vinculación» (BOE-A-2018-8159,
+ * consolidado, leído en sesión): no lo acota a la bonificación, así que también la mejora de
+ * 500.000 € del art. 17, que SUSTITUYE a los 7.993,46 € estatales del Grupo III (como en C0371).
+ *   A · sobrino inscrito, 100.000 €: 103.000,00 − 500.000,00 → base liquidable 0,00 → «0,00 €»
+ *   B · sobrino inscrito, 1.000.000 € — por encima de la mejora, el coeficiente sigue siendo el del III:
+ *       1.030.000,00 − 500.000,00 = 530.000,00
+ *       cuota íntegra 80.655,08 + 29,75 % × (530.000 − 398.777,54) = 119.693,76185 → 119.693,76
+ *       × 1,5882 = 190.097,629632 → 190.097,63
+ *       − 99 % (188.196,6537 → 188.196,65) = 1900,98 €
  */
-test.describe('Estimador ISD — Extremadura, especial vinculación (C0146)', () => {
-  async function sobrino(page: Page, ccaa: string) {
+test.describe('Estimador ISD — Extremadura, especial vinculación (C0146, C0374)', () => {
+  async function sobrino(page: Page, ccaa: string, cuentas = '100000') {
     await page.goto(RUTA);
     await page.locator('select').nth(SELECT.ccaa).selectOption(ccaa);
     await page.locator('select').nth(SELECT.parentesco).selectOption('III');
-    await importe(page, CAMPO.saldos, '100000');
+    await importe(page, CAMPO.saldos, cuentas);
   }
 
-  test('un sobrino inscrito recibe la bonificación del 99 % de los Grupos I y II: 184,37 €', async ({ page }) => {
+  test('A · un sobrino inscrito recibe la reducción de 500.000 € y la bonificación de los Grupos I y II: 0,00 €', async ({ page }) => {
     await sobrino(page, 'extremadura');
     expect(await cuota(page)).toBe('18.437,27 €');
     await page.getByLabel(/especial vinculación/).check();
-    expect(await cuota(page)).toBe('184,37 €');
-    expect(await textoPagina(page)).toContain('por especial vinculación');
+    expect(await cuota(page)).toBe('0,00 €');
+    expect(await importeDelPanel(page, /Por parentesco \(art\. 17 DLeg 1\/2018 de Extremadura, por especial vinculación\)/)).toBe('500.000,00 €');
+    expect(await textoPagina(page)).not.toContain('184,37 €');
+  });
+
+  test('B · con 1.000.000 € la cuota no es cero y conserva el coeficiente del Grupo III: 1900,98 €', async ({ page }) => {
+    await sobrino(page, 'extremadura', '1000000');
+    await page.getByLabel(/especial vinculación/).check();
+    const texto = await textoPagina(page);
+    expect(texto).toContain('530.000,00 €');   // base liquidable
+    expect(texto).toContain('119.693,76 €');   // cuota íntegra
+    expect(await cuota(page)).toBe('1900,98 €');
+    expect(texto).toContain('por especial vinculación');
   });
 
   test('la casilla solo aparece con Extremadura y los Grupos III y IV', async ({ page }) => {
@@ -3231,7 +3254,13 @@ test.describe('Estimador ISD — Extremadura, especial vinculación (C0146)', ()
     const conMarca = calcularSucesion({ baseImponible: 100000, ccaa: 'extremadura', grupo: 'III', incluyeAjuar: true, especialVinculacion: true });
     const sinMarca = calcularSucesion({ baseImponible: 100000, ccaa: 'extremadura', grupo: 'III', incluyeAjuar: true });
     expect(sinMarca.cuotaFinal).toBeCloseTo(18437.27, 2);
-    expect(conMarca.cuotaFinal).toBeCloseTo(184.37, 2);
+    expect(sinMarca.reduccionParentesco).toBe(7993.46);
+    expect(conMarca.reduccionParentesco).toBe(500000);
+    expect(conMarca.cuotaFinal).toBe(0);
+    const millon = calcularSucesion({ baseImponible: 1000000, ccaa: 'extremadura', grupo: 'III', incluyeAjuar: true, especialVinculacion: true });
+    expect(millon.baseLiquidable).toBe(530000);
+    expect(millon.cuotaTributaria).toBeCloseTo(190097.63, 2);
+    expect(millon.cuotaFinal).toBeCloseTo(1900.98, 2);
     const madrid = calcularSucesion({ baseImponible: 100000, ccaa: 'madrid', grupo: 'III', incluyeAjuar: true, especialVinculacion: true });
     const madridSin = calcularSucesion({ baseImponible: 100000, ccaa: 'madrid', grupo: 'III', incluyeAjuar: true });
     expect(madrid.cuotaFinal).toBe(madridSin.cuotaFinal);

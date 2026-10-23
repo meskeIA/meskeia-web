@@ -131,8 +131,10 @@ export interface ParametrosSucesiones {
   /**
    * Heredero de los Grupos III o IV que la comunidad equipara a los Grupos I y II por especial
    * vinculación (hoy solo Extremadura, arts. 20 ter y 20 quater DLeg 1/2018, con inscripción en
-   * su Registro). Recibe la bonificación del Grupo II; la reducción estatal por parentesco y el
-   * coeficiente siguen siendo los de su grupo. En otra comunidad o grupo no hace nada (C0146).
+   * su Registro). Recibe la bonificación del Grupo II (C0146) y la mejora autonómica de la
+   * reducción por parentesco de los Grupos I y II, que sustituye a la estatal de su grupo (C0374).
+   * El coeficiente del art. 22 LISD sigue siendo el de su grupo. En otra comunidad o grupo no
+   * hace nada.
    */
   especialVinculacion?: boolean;
 }
@@ -392,12 +394,23 @@ export interface ReduccionesPersonalesIS {
  * ⚠️ Una mejora SUSTITUYE a la estatal (art. 48.1.a Ley 22/2009): en Extremadura el menor de 21
  * años no suma los 3.990,72 € por año a los 500.000 €. No es una reducción propia como la de
  * Asturias, que se suma y se lee de `reduccionBase`.
+ *
+ * Con especial vinculación (Extremadura, arts. 20 ter y 20 quater DLeg 1/2018), el heredero de
+ * los Grupos III o IV recibe la mejora de los Grupos I y II, que sustituye a la reducción estatal
+ * de su grupo. El art. 20 quater.1 extiende «los beneficios fiscales que se encuentren vigentes en
+ * la normativa autonómica para los grupos I y II de parentesco», sin limitarlo a la bonificación
+ * (BOE-A-2018-8159, consolidado, leído el 23/10/2026). Hasta esa fecha solo se le extendía la
+ * bonificación del 99 %, y un sobrino inscrito con 100.000 € pagaba 184,37 € en vez de 0
+ * (cabo C0374, decisión del usuario del 23/10/2026). La escala por discapacidad del art. 18 no
+ * depende del grupo, y la reducción del seguro de vida (art. 20.2.b LISD) es estatal: no cambian.
  */
 export function reduccionesPersonalesIS(p: {
   ccaa: string;
   grupo: GrupoParentescoIS;
   edadHeredero?: number;
   discapacidad?: NivelDiscapacidadIS;
+  /** Inscrito como persona con especial vinculación (solo surte efecto donde la comunidad la prevé). */
+  especialVinculacion?: boolean;
 }): ReduccionesPersonalesIS {
   const esCataluna = p.ccaa === 'cataluna';
   const mejora = MEJORAS_REDUCCIONES_CCAA_IS[p.ccaa];
@@ -406,10 +419,11 @@ export function reduccionesPersonalesIS(p: {
   let parentesco: number;
   let edadMenor21 = 0;
   let mejoraParentesco: string | null = null;
-  const mejorada = mejora?.parentesco.importes[p.grupo];
+  const { equiparado } = claveBonificacionEfectiva(p.grupo, p.ccaa, p.especialVinculacion);
+  const mejorada = mejora?.parentesco.importes[equiparado ? 'II' : p.grupo];
   if (mejora && mejorada !== undefined) {
     parentesco = mejorada;
-    mejoraParentesco = mejora.parentesco.norma;
+    mejoraParentesco = equiparado ? `${mejora.parentesco.norma}, por especial vinculación` : mejora.parentesco.norma;
   } else {
     parentesco = esCataluna
       ? (REDUCCIONES_PARENTESCO_CATALUNA_IS[p.grupo] ?? 0)
@@ -560,7 +574,9 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
 
   // 2-4. Reducciones por parentesco, por edad (menor de 21) y por discapacidad, con la tabla
   // catalana o la mejora autonómica que sustituye a la estatal: `reduccionesPersonalesIS`.
-  const personales = reduccionesPersonalesIS({ ccaa: p.ccaa, grupo: p.grupo, edadHeredero: edad, discapacidad });
+  const personales = reduccionesPersonalesIS({
+    ccaa: p.ccaa, grupo: p.grupo, edadHeredero: edad, discapacidad, especialVinculacion: p.especialVinculacion,
+  });
   const reduccionParentesco = personales.parentesco;
   const reduccionEdadMenor21 = personales.edadMenor21;
   const reduccionDiscapacidad = personales.discapacidad;
