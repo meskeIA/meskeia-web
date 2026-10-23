@@ -1879,7 +1879,9 @@ test.describe('re-inspección 23/10/2026', () => {
   // estima que solo el 10 % de las personas ciegas son lectoras activas de Braille» (sin fuente ni
   // año); consejo: «Los estudios muestran que las personas ciegas alfabetizadas en Braille tienen un
   // 44 % más de probabilidad de estar empleadas» (sin fuente ni año). No están en el FAQPage.
-  test.fail('ABIERTO — las cifras de la OMS, del 10 % y del 44 % llevan año', async ({ page }) => {
+  // REPARADO (hallazgo 3441): la OMS con su año (2010, publicado en 2012), el 10 % con su fuente
+  // (informe de la Federación Nacional de Ciegos de EE. UU., 2009) y el 44 % retirado.
+  test('REPARADO (3441) — las cifras de la OMS, del 10 % y del 44 % llevan año', async ({ page }) => {
     await page.goto(RUTA);
     const guia = await textoGuia(page);
     expect(guia).toContain('Preguntas Frecuentes'); // precondición: se leyó la guía
@@ -1894,8 +1896,9 @@ test.describe('re-inspección 23/10/2026', () => {
   //
   // Si el Grado 2 ocupa un 25-30 % menos, G2 = 0,70-0,75 · G1, y el Grado 1 ocupa 1/0,75 − 1 = 33,3 %
   // a 1/0,70 − 1 = 42,9 % más, no un 25-30 %. La FAQ dice lo primero y la caja de Limitaciones lo
-  // segundo.
-  test.fail('ABIERTO — los porcentajes de espacio del Grado 1 y el Grado 2 cuadran entre sí', async ({ page }) => {
+  // segundo. REPARADO (hallazgo 3442): Limitaciones ya no da cifra propia («ocupa bastante más
+  // espacio que el Grado 2 abreviado»), así que solo queda la de la FAQ.
+  test('REPARADO (3442) — los porcentajes de espacio del Grado 1 y el Grado 2 cuadran entre sí', async ({ page }) => {
     await page.goto(RUTA);
     const guia = await textoGuia(page);
     const menos = guia.match(/Grado 2 ocupa un (\d+)-(\d+)\s%\s+menos/);
@@ -1911,7 +1914,7 @@ test.describe('re-inspección 23/10/2026', () => {
   // ─────────────────────────────────────────────────────────────────────────
   // ABIERTO (23/10/2026) — «basado en silabas» sin tilde
   // ─────────────────────────────────────────────────────────────────────────
-  test.fail('ABIERTO — la FAQ escribe «sílabas» con tilde', async ({ page }) => {
+  test('REPARADO (3443) — la FAQ escribe «sílabas» con tilde', async ({ page }) => {
     await page.goto(RUTA);
     const guia = await textoGuia(page);
     expect(guia).toContain('japonés tiene un Braille basado en'); // precondición

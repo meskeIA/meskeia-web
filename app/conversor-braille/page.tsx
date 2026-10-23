@@ -1379,7 +1379,7 @@ export default function ConversorBraillePage() {
             <div className={styles.eduFaqList}>
               <div className={styles.eduFaqItem}>
                 <h4>¿Cuántas personas en el mundo usan Braille?</h4>
-                <p>La OMS estima que 285 millones de personas tienen discapacidad visual en el mundo, de las cuales 39 millones son ciegas. Sin embargo, el porcentaje que utiliza Braille ha disminuido con la proliferación de lectores de pantalla de voz: en EE.UU. se estima que solo el 10&nbsp;% de las personas ciegas son lectoras activas de Braille. En España, la ONCE atiende a unos 70.000 afiliados con discapacidad visual severa. Los expertos señalan que quienes aprenden Braille tienen mayor tasa de empleo y autonomía que quienes solo usan tecnología de voz.</p>
+                <p>La OMS estimó que en 2010 había 285 millones de personas con discapacidad visual en el mundo, de las cuales 39 millones eran ciegas (estimaciones publicadas en 2012). Sin embargo, el porcentaje que utiliza Braille ha disminuido con la proliferación de lectores de pantalla de voz: en EE.&nbsp;UU., un informe de la Federación Nacional de Ciegos de 2009 estimaba que menos del 10&nbsp;% de las personas legalmente ciegas leían Braille. En España, la ONCE atiende a unos 70.000 afiliados con discapacidad visual severa. Los expertos señalan que quienes aprenden Braille tienen mayor tasa de empleo y autonomía que quienes solo usan tecnología de voz.</p>
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Por qué Louis Braille inventó el sistema con solo 15 años?</h4>
@@ -1387,7 +1387,7 @@ export default function ConversorBraillePage() {
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Es el Braille igual en todos los idiomas?</h4>
-                <p>No exactamente. El sistema de 6 puntos es universal, pero cada idioma adapta los símbolos a sus necesidades. El español tiene celdas propias para ñ, á, é, í, ó, ú y ü. En cambio no tiene signos de apertura: ¿ y ? comparten el mismo signo (puntos 2-6), igual que ¡ y ! (puntos 2-3-5), de modo que la pregunta se marca al principio y al final con la misma celda. El árabe Braille va de derecha a izquierda igual que el árabe impreso. El japonés tiene un Braille basado en silabas (kana) en lugar de letras. El chino Braille tiene variantes por dialectos (mandarín, cantonés). El UEB (Unified English Braille) de 2004 unificó los distintos sistemas del inglés en un estándar global.</p>
+                <p>No exactamente. El sistema de 6 puntos es universal, pero cada idioma adapta los símbolos a sus necesidades. El español tiene celdas propias para ñ, á, é, í, ó, ú y ü. En cambio no tiene signos de apertura: ¿ y ? comparten el mismo signo (puntos 2-6), igual que ¡ y ! (puntos 2-3-5), de modo que la pregunta se marca al principio y al final con la misma celda. El árabe Braille va de derecha a izquierda igual que el árabe impreso. El japonés tiene un Braille basado en sílabas (kana) en lugar de letras. El chino Braille tiene variantes por dialectos (mandarín, cantonés). El UEB (Unified English Braille) de 2004 unificó los distintos sistemas del inglés en un estándar global.</p>
               </div>
               {/*
                 ⚠️ 22/09/2026 (hallazgo 1185) — esta pregunta se titulaba «¿Qué es el Braille
@@ -1526,7 +1526,8 @@ export default function ConversorBraillePage() {
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon} aria-hidden="true">🌍</span>
                 <h4>El Braille sobrevive a la tecnología de voz</h4>
-                <p>Los estudios muestran que las personas ciegas alfabetizadas en Braille tienen un 44&nbsp;% más de probabilidad de estar empleadas que las que usan solo tecnología de voz. El Braille proporciona acceso a la ortografía, puntuación y formato textual que el audio no transmite.</p>
+                {/* Sin el «44 % más de probabilidad de estar empleadas»: no traía estudio ni año (hallazgo 3441) */}
+                <p>Leer en Braille sigue siendo distinto de escuchar un texto: proporciona acceso a la ortografía, puntuación y formato textual que el audio no transmite.</p>
               </div>
             </div>
           </div>
@@ -1539,7 +1540,7 @@ export default function ConversorBraillePage() {
             </div>
             <ul className={styles.warningList}>
               <li><strong><span aria-hidden="true">❌</span>Este conversor es visual/educativo, no táctil:</strong> Los caracteres Braille Unicode en pantalla sirven para aprender y entender el sistema, pero no son equivalentes al Braille real en papel. Para producir Braille físico funcional (que una persona ciega pueda leer con los dedos) se necesita una embosadora Braille, no copiar y pegar caracteres Unicode.</li>
-              <li><strong><span aria-hidden="true">❌</span>Solo implementa Grado 1 (sin contracciones):</strong> El uso diario real del Braille utiliza el Grado 2, que incluye contracciones para palabras y sílabas frecuentes. La transcripción literal letra a letra del Grado 1 ocupa un 25-30&nbsp;% más de espacio. Para materiales de lectura real, un software de transcripción profesional (Duxbury DBT, Braille2000) con tablas de Grado 2 es imprescindible.</li>
+              <li><strong><span aria-hidden="true">❌</span>Solo implementa Grado 1 (sin contracciones):</strong> El uso diario real del Braille utiliza el Grado 2, que incluye contracciones para palabras y sílabas frecuentes. La transcripción literal letra a letra del Grado 1 ocupa bastante más espacio que el Grado 2 abreviado. Para materiales de lectura real, un software de transcripción profesional (Duxbury DBT, Braille2000) con tablas de Grado 2 es imprescindible.</li>
               <li><strong><span aria-hidden="true">❌</span>Las reglas de puntuación Braille varían por país y normativa:</strong> El braille español que fija la Comisión Braille Española (esta app sigue su Documento Técnico B 2, V4, 22/01/2026) puede diferir en detalles del sistema usado en México, Argentina u otros países hispanohablantes. La puntuación, indicadores y algunos caracteres especiales no son completamente universales entre las normas nacionales.</li>
               <li><strong><span aria-hidden="true">❌</span>Confundir &quot;leer Braille&quot; con &quot;reconocer caracteres Unicode&quot;:</strong> La habilidad real de leer Braille es táctil y requiere meses de entrenamiento. Reconocer visualmente que ⠁ es &quot;a&quot; es útil para diseñadores y educadores, pero no es leer Braille en el sentido funcional. Son circuitos cerebrales completamente distintos.</li>
               <li><strong><span aria-hidden="true">❌</span>Los números Braille necesitan el indicador ⠼:</strong> Si introduces números sin el indicador numérico, un lector Braille los interpretará como letras (1→a, 2→b, etc.). Este conversor añade automáticamente ⠼ antes de secuencias numéricas, pero al copiar Braille generado hay que asegurarse de no perder el indicador.</li>
