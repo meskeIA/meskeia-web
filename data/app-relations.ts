@@ -1155,13 +1155,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-celula': [
     { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
+    { url: '/simulador-fotosintesis-factores/', icon: '🌱', name: 'Fotosíntesis: Factores Limitantes', description: 'Mueve la luz, el CO₂ y la temperatura y mira cuál frena al cloroplasto' },
     { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
-    { url: '/visualizador-cerebro/', icon: '🧠', name: 'Cómo Piensa tu Cerebro', description: '86.000 millones de neuronas' },
     { url: '/simulador-osmosis/', icon: '🧫', name: 'Ósmosis', description: 'Qué le pasa a la célula en agua dulce o salada' },
   ],
   'visualizador-fotosintesis': [
+    { url: '/simulador-fotosintesis-factores/', icon: '🌿', name: 'Fotosíntesis: Factores Limitantes', description: 'Ahora pruébalo: mueve la luz, el CO₂ y la temperatura y mira cuál limita la tasa' },
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
-    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
     { url: '/visualizador-ciclo-nitrogeno/', icon: '🔄', name: 'Ciclo del Nitrógeno', description: 'El nitrógeno asimilado por las raíces es tan esencial para la fotosíntesis como la luz solar' },
     { url: '/visualizador-cadena-alimentaria/', icon: '🌾', name: 'De la Granja a tu Mesa', description: 'Cadena alimentaria' },
   ],
