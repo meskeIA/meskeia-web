@@ -46,10 +46,28 @@ test('CASO 1 · de partida: depósito del 20 %, resto en 20 días y total INCOMP
   for (const falta of ['Valor de referencia.', 'Cargas anteriores.', 'Deudas con la comunidad.', 'IBI pendiente.']) {
     await expect(r).toContainText(falta);
   }
-  // Riesgo 1: el aviso crítico va desplegado y sin botón para plegarlo
+  // Riesgo 1: el aviso crítico va desplegado, sin botón para plegarlo y ANTES de la herramienta,
+  // como en el resto del clúster de compraventa (lo pidió el usuario el 23/10/2026)
   const disclaimer = page.getByRole('note', { name: 'Aviso importante' });
   await expect(disclaimer).toContainText('carácter exclusivamente orientativo');
   expect(await disclaimer.locator('button').count()).toBe(0);
+  const yAviso = (await disclaimer.boundingBox())?.y ?? Infinity;
+  const yHerramienta = (await page.locator('section[aria-labelledby="titulo-datos"]').boundingBox())?.y ?? -Infinity;
+  expect(yAviso).toBeLessThan(yHerramienta);
+  // Devolución del depósito y reserva de postura (art. 652 LEC; sugerencia de Alex, 23/10/2026)
+  await expect(r).toContainText('Si no ganas, el Portal de Subastas lo devuelve en cuanto termina la subasta');
+  await expect(r).toContainText('Reserva de postura');
+});
+
+test('CASO 1.bis · la app aparece en la puerta Vivienda de Delegum', async ({ page }) => {
+  await expect(page.getByText('forma parte de', { exact: false }).first()).toContainText('Vivienda');
+});
+
+test('CASO 3.bis · Seguridad Social: el depósito se devuelve al acabar el acto y no hay reserva', async ({ page }) => {
+  await page.getByRole('button', { name: /Seguridad Social/ }).click();
+  const r = resultados(page);
+  await expect(r).toContainText('la mesa lo devuelve al terminar el acto');
+  await expect(r).toContainText('no prevé reserva de postura');
 });
 
 test('CASO 2 · con todo conocido: ITP sobre el valor de referencia y total completo', async ({ page }) => {
@@ -73,6 +91,8 @@ test('CASO 3 · Agencia Tributaria: 5 % del tipo y 15 días tras la notificació
   const r = resultados(page);
   await expect(r).toContainText(euros(10000));
   await expect(r).toContainText('15 días siguientes a la notificación de la adjudicación');
+  await expect(r).toContainText('queda disponible al cerrar el plazo de pujas');
+  await expect(r).toContainText('igual o inferior a la más alta');
   await expect(page.locator('#select-inicio')).toHaveCount(0);
 });
 

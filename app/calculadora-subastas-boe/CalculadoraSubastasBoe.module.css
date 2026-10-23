@@ -235,6 +235,24 @@
   background: var(--hover);
 }
 
+.devolucion {
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--accent);
+  background: rgba(127, 179, 211, 0.12);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.devolucion p {
+  margin: 0 0 var(--spacing-sm);
+}
+
+.devolucion p:last-child {
+  margin-bottom: 0;
+}
+
 .avisoTitulo {
   font-weight: 600;
   margin: 0;
@@ -482,6 +500,10 @@
 [data-theme='dark'] .totalIncompleto,
 [data-theme='dark'] .warningBox {
   background: rgba(255, 193, 7, 0.12);
+}
+
+[data-theme='dark'] .devolucion {
+  background: rgba(127, 179, 211, 0.1);
 }
 
 [data-theme='dark'] .totalCompleto {

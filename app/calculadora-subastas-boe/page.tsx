@@ -25,6 +25,7 @@ import {
   PUJA_MINIMA_AEAT,
   POSTURA_VERBAL_MINIMA_SS,
   AFECCION_COMUNIDAD_ANIOS_ANTERIORES,
+  DEVOLUCION_DEPOSITO,
   PLAZO_ITP,
 } from '@/data/fiscal';
 import { ENLACE_CATASTRO, nombreEnFrase, superaElTope, type ComunidadAutonoma, type PerfilComprador } from '@/data/itp-ccaa';
@@ -228,6 +229,16 @@ export default function CalculadoraSubastasBoePage() {
         <RegionBadge variant="es-only" />
 
         <LegalNotice />
+
+        {/* Riesgo 1: el aviso va ANTES de la herramienta, como en el resto del clúster de compraventa */}
+        <DisclaimerCard variant="financial" severity="critical" collapsible={false} context="calculadora-subastas-boe" />
+        <DataReference
+          normativa="Subastas judiciales, de Hacienda y de la Seguridad Social"
+          fuente={FISCAL_SUBASTAS_META.fuente}
+          verificado={FISCAL_SUBASTAS_META.verificado}
+          urlOficial={FISCAL_SUBASTAS_META.urlOficial}
+          nota={FISCAL_SUBASTAS_META.nota}
+        />
 
         <div className={styles.mainContent}>
           <section className={styles.inputPanel} aria-labelledby="titulo-datos">
@@ -435,15 +446,6 @@ export default function CalculadoraSubastasBoePage() {
           </section>
         </div>
 
-        <DisclaimerCard variant="financial" severity="critical" collapsible={false} context="calculadora-subastas-boe" />
-        <DataReference
-          normativa="Subastas judiciales, de Hacienda y de la Seguridad Social"
-          fuente={FISCAL_SUBASTAS_META.fuente}
-          verificado={FISCAL_SUBASTAS_META.verificado}
-          urlOficial={FISCAL_SUBASTAS_META.urlOficial}
-          nota={FISCAL_SUBASTAS_META.nota}
-        />
-
         <EducationalSection
           icon="📚"
           title="Cómo funcionan las subastas de vivienda"
@@ -593,7 +595,7 @@ export default function CalculadoraSubastasBoePage() {
                 ['Lee la certificación de cargas y el edicto', 'Ahí están las cargas anteriores que asumirás, la situación posesoria si consta y las condiciones particulares.'],
                 ['Averigua lo que no dice el anuncio', 'El valor de referencia en el Catastro, las deudas con la comunidad y el IBI pendiente.'],
                 ['Calcula aquí', 'Con tu puja, mira el depósito, el resto y su plazo, y el coste total con lo que hayas podido averiguar.'],
-                ['Constituye el depósito y puja', 'El depósito se hace antes de pujar. Si no ganas, se devuelve; si te reservas la postura, queda retenido hasta que pague el ganador.'],
+                ['Constituye el depósito y puja', `El depósito se hace antes de pujar. Si no ganas, se devuelve al terminar, salvo que hayas pedido la reserva de postura, que lo deja retenido por si el ganador no paga (${DEVOLUCION_DEPOSITO.judicial.norma}). En las de la Seguridad Social no hay reserva.`],
                 ['Paga el resto en plazo', 'Si vas a financiar con hipoteca, en la judicial puedes pedir el testimonio del decreto de aprobación del remate para constituirla: esa petición suspende el plazo de pago (art. 670.6 LEC).'],
                 ['Liquida el ITP e inscribe', 'Con el decreto o la certificación de adjudicación se paga el ITP y se inscribe la vivienda en el Registro de la Propiedad.'],
               ].map(([titulo, texto], i) => (
@@ -684,6 +686,35 @@ export default function CalculadoraSubastasBoePage() {
   );
 }
 
+/**
+ * Qué pasa con el depósito si no ganas, y qué cambia con la reserva de postura. Sugerencia de
+ * Alex (subastasdeviviendas.es, 23/10/2026): para quien va justo de liquidez, el dinero retenido
+ * cuenta tanto como el que se paga.
+ */
+function DevolucionDeposito({ regimen }: { regimen: RegimenSubasta }) {
+  const regla =
+    regimen === 'judicial'
+      ? DEVOLUCION_DEPOSITO.judicial
+      : regimen === 'aeat'
+        ? DEVOLUCION_DEPOSITO.aeat
+        : DEVOLUCION_DEPOSITO.seguridadSocial;
+  return (
+    <div className={styles.devolucion} role="note">
+      <p>
+        <strong>Si no ganas</strong>, {regla.devolucion} ({regla.norma}).
+      </p>
+      {regla.reserva !== null ? (
+        <p key="con-reserva">
+          <strong>Reserva de postura</strong>: {regla.reserva}. Si vas justo de liquidez, cuenta con ese dinero
+          inmovilizado.
+        </p>
+      ) : (
+        <p key="sin-reserva">Esta subasta no prevé reserva de postura.</p>
+      )}
+    </div>
+  );
+}
+
 interface ResultadosProps {
   resultado: ResultadoSubasta;
   regimen: RegimenSubasta;
@@ -721,6 +752,7 @@ function Resultados({ resultado: r, regimen, reformaRige, ccaa }: ResultadosProp
           y el plazo de {PLAZO_PAGO_SUBASTA.judicialAnterior.dias} días.
         </p>
       )}
+      <DevolucionDeposito regimen={regimen} />
 
       <ResultCard
         title="Resto a pagar si ganas"

@@ -20,14 +20,16 @@
  *     lo supera. La DGT lo aplica a las subastas (V0453-22) y lo confirmó el TSJ de Galicia (2026).
  *   · LPH (BOE-A-1960-10906) art. 9.1.e: el adquirente responde con el inmueble de las cuotas de
  *     comunidad de la parte vencida del año en curso y los tres años naturales anteriores.
+ *   · Devolución del depósito y reserva de postura (23/10/2026): art. 652 LEC, art. 103 bis.2-4
+ *     RGR y art. 120.8 RGRSS.
  *
- * Verificado: 2026-10-22
+ * Verificado: 2026-10-23
  */
 
 export const FISCAL_SUBASTAS_META = {
   fuente:
-    'LEC arts. 669-671 (LO 1/2025) · RGR arts. 101 y 103 bis · RGRSS arts. 117, 118 y 120 · TRLITPAJD art. 10.2 · LPH art. 9.1.e',
-  verificado: '2026-10-22',
+    'LEC arts. 652 y 669-671 (LO 1/2025) · RGR arts. 101 y 103 bis · RGRSS arts. 117, 118 y 120 · TRLITPAJD art. 10.2 · LPH art. 9.1.e',
+  verificado: '2026-10-23',
   vigencia: '2026',
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2000-323',
   nota: 'Subastas judiciales, de la Agencia Tributaria y de la Seguridad Social por embargo. No cubre las notariales ni las de inmuebles propios de la Tesorería.',
@@ -109,6 +111,43 @@ export const PUJA_MINIMA_AEAT = { porcentaje: 10, salvoCargasDesde: 25 } as cons
 /** Las posturas de viva voz en la subasta de la Seguridad Social han de ser iguales o superiores
  * al 75 % del tipo (arts. 117.f y 120.3 RGRSS). */
 export const POSTURA_VERBAL_MINIMA_SS = 75;
+
+export interface ReglaDevolucionDeposito {
+  /** Cuándo se devuelve el depósito a quien no gana */
+  devolucion: string;
+  /** Qué cambia si se pide la reserva de postura; null si el régimen no la prevé */
+  reserva: string | null;
+  norma: string;
+}
+
+/**
+ * Devolución del depósito a quien no gana, y la reserva de postura que lo deja inmovilizado por
+ * si el mejor postor no paga. Sugerencia de Alex (subastasdeviviendas.es, 23/10/2026): para quien
+ * va justo de liquidez, ese dinero retenido cuenta. Leído en el BOE ese día:
+ *   · art. 652.1 LEC: «el Portal de Subastas devolverá inmediatamente los depósitos de los postores
+ *     excepto lo que corresponda al mejor postor»; si los demás lo solicitan, se mantiene la reserva.
+ *   · art. 103 bis.2-4 RGR: la reserva se declara al pujar, y una puja igual o inferior a la más
+ *     alta existente la deja reservada «en todo caso»; se libera cuando el adjudicatario paga.
+ *   · art. 120.8 RGRSS: «concluido el acto, el secretario de la mesa procederá a devolver los
+ *     depósitos», salvo los de los adjudicatarios. El reglamento no prevé reserva de postura.
+ */
+export const DEVOLUCION_DEPOSITO = {
+  judicial: {
+    devolucion: 'el Portal de Subastas lo devuelve en cuanto termina la subasta',
+    reserva: 'si pides la reserva de postura, queda retenido por si el mejor postor no paga el resto: puedes acabar adjudicándote la vivienda, pero no recuperas el dinero hasta que el ganador paga o te toca a ti',
+    norma: 'art. 652 LEC',
+  },
+  aeat: {
+    devolucion: 'queda disponible al cerrar el plazo de pujas',
+    reserva: 'si al pujar declaras la reserva, o si tu puja es igual o inferior a la más alta en ese momento (entonces se reserva siempre), queda retenido hasta que el adjudicatario paga el resto',
+    norma: 'art. 103 bis.2-4 del Reglamento General de Recaudación',
+  },
+  seguridadSocial: {
+    devolucion: 'la mesa lo devuelve al terminar el acto de la subasta',
+    reserva: null,
+    norma: 'art. 120.8 del Reglamento General de Recaudación de la Seguridad Social',
+  },
+} as const satisfies Record<string, ReglaDevolucionDeposito>;
 
 /** Afección de la vivienda a las cuotas de comunidad impagadas (art. 9.1.e LPH): la parte vencida
  * del año de la adquisición y los tres años naturales anteriores. */
