@@ -105,9 +105,9 @@ const HERMANAS: Hermana[] = [
     arranque: [EMPEZAR],
   },
   {
+    // REPARADO el 23/10/2026 al declarar la familia.
     slug: 'quiz-reinos-naturaleza',
     arranque: [EMPEZAR],
-    foco: { falla: 'C0018, 23/10/2026: tras «Siguiente pregunta» el foco cae a body' },
   },
   {
     // Elige el modo y la pregunta aparece; las opciones son los seis grupos de plantas.
