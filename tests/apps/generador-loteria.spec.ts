@@ -2082,11 +2082,10 @@ test.describe('Inspector 12/10/2026', () => {
     });
   });
 
-  test.describe('hallazgos ABIERTOS (inspector 12/10/2026)', () => {
+  test.describe('hallazgos de la inspección del 12/10/2026, REPARADOS el 23/10/2026', () => {
     // En la base, por orden: 3234 (desglose), 3235 (botones 1/3/5/10), 3236 (gravamen español) y
-    // 3237 (FAQ duplicada). Siguen abiertos en las re-inspecciones del 14/10/2026, del 15/10/2026, del
-    // 21/10/2026 y del 22/10/2026: los cuatro `test.fail()` fallan como se espera. 1e288cc3 (15/10) numeró bien los RÓTULOS de
-    // los campos, pero el desglose de 3234 sigue contando solo los premios escritos.
+    // 3237 (FAQ duplicada). Siguieron abiertos en las re-inspecciones del 14, 15, 21 y 22/10/2026;
+    // los cuatro se repararon el 23/10/2026 (/reparar) y sus tests van ya sin `test.fail()`.
     test('REPARADO (contenido, bajo) · el desglose por décimo numera los décimos como el formulario', async ({ page }) => {
       // Hallazgo 3234, REPARADO el 23/10/2026: numera con el campo y dice «décimo o apuesta», como
       // los rótulos y los avisos. Lo que hacía antes:
