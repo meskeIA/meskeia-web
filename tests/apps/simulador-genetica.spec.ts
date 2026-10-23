@@ -5489,7 +5489,9 @@ test.describe('Re-inspección 23/10/2026 · hallazgos abiertos', () => {
     await esperarHidratacion(page, ['#casos-respuesta']);
   });
 
-  test.fail('ABIERTO · calculo, bajo — a media centésima de la respuesta exacta suspende con «Te has desviado 0,00»', async ({
+  // REPARADO (hallazgo 3445): textoDesviacion formatea la diferencia ya redondeada con redondearA,
+  // la misma con la que elige los decimales.
+  test('REPARADO (3445) · calculo, bajo — a media centésima de la respuesta exacta suspende con «Te has desviado 0,00»', async ({
     page,
   }) => {
     // e27fbb16 (3369) hizo que una respuesta exacta suspendida dijera cuánto se desvía en vez de
@@ -5511,6 +5513,8 @@ test.describe('Re-inspección 23/10/2026 · hallazgos abiertos', () => {
       await expect(veredictoCaso(page)).toContainText('No es correcto');
       const mensaje = (await veredictoCaso(page).innerText()).replace(/\s+/g, ' ');
       expect.soft(mensaje, `caso ${caso}, «${texto}»`).not.toMatch(/desviado 0(,0+)? de/);
+      // La desviación real es 0,005: a dos decimales, 0,01
+      expect.soft(mensaje, `caso ${caso}, «${texto}»`).toContain('Te has desviado 0,01 de la respuesta');
     }
   });
 

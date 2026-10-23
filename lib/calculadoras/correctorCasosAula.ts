@@ -134,7 +134,11 @@ export function textoDesviacion(
 ): string {
   let d = decimales;
   while (diferencia > 0 && d < 12 && redondearA(diferencia, d) === 0) d += 1;
-  return formatear(diferencia, d);
+  // ⚠️ 23/10/2026 (hallazgo 3445) — se formatea la diferencia YA redondeada con `redondearA`, la
+  // misma que ha elegido los decimales. Antes se pasaba en bruto: |25,005 − 25| = 0,004999999999999005
+  // se limpiaba a 0,005 y se quedaba en 2 decimales, pero el formateador recibía el valor sucio y
+  // lo redondeaba a «0,00»: otra vez «No es correcto. Te has desviado 0,00».
+  return formatear(Number.isFinite(diferencia) ? redondearA(diferencia, d) : diferencia, d);
 }
 
 /* ─────────────────────────────── Dominio ─────────────────────────────── */

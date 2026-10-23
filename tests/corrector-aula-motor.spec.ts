@@ -157,6 +157,14 @@ test.describe('el motor', () => {
     expect(textoDesviacion(90 - 1.5707963, 2, conComa)).toBe('88,43');
     expect(textoDesviacion(4, 2, conComa)).toBe('4');
     expect(textoDesviacion(0, 2, conComa)).toBe('0');
+    // Hallazgo 3445: a media centésima, la resta en binario cae a un lado o al otro del 0,005.
+    // |25,005 − 25| = 0,004999999999999005 se limpia a 0,005 → 2 decimales → «0,01», no «0,00»
+    expect(textoDesviacion(Math.abs(25.005 - 25), 2, conComa)).toBe('0,01');
+    expect(textoDesviacion(Math.abs(24.995 - 25), 2, conComa)).toBe('0,01');
+    expect(textoDesviacion(Math.abs(6.255 - 6.25), 2, conComa)).toBe('0,01');
+    expect(textoDesviacion(Math.abs(99.995 - 100), 2, conComa)).toBe('0,01');
+    // Y la del otro lado, que ya salía bien: 0,0050000000000026 → «0,01»
+    expect(textoDesviacion(Math.abs(56.255 - 56.25), 2, conComa)).toBe('0,01');
   });
 });
 
