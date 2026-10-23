@@ -288,6 +288,13 @@ const OBLIGACIONES = [
     'Exige que la variante EXISTA', 'tests/contraste-text-muted-*.spec.ts',
     'un valor se decide midiendo contra el fondo REAL', 'npm run oscuro:probar-candado',
   ]],
+  ['Candado de la clase que el módulo CSS no declara', [
+    'npm run check:clases-css', 'rompe el build', 'el .module.css importado no declara .x',
+    'las líneas que el commit añade', 'que el commit quita de su módulo',
+    'clases-ok: <razón>', 'razón obligatoria', 'npm run check:clases-css -- --todo',
+    'node scripts/check-clases-css.mjs <fichero>', 'Drenar el pasivo en bloque NO',
+    'npm run clases-css:probar-candado',
+  ]],
   ['Candado del parser numérico', [
     'npm run check:parser', 'rompe el build', "parseFloat(x.replace(',', '.'))",
     'parseSpanishNumber', 'las líneas que el commit añade', 'Sustituirlos en bloque',

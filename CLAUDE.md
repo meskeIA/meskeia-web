@@ -559,6 +559,19 @@ obligatoria.
 > 12/10/2026) fue el último. Crónica: cabecera de `scripts/check-var-css.mjs` · pruebas:
 > `npm run var-css:probar-candado`.
 
+### Candado de la clase que el módulo CSS no declara
+
+`npm run check:clases-css` — en el build, y **rompe el build** si el commit escribe `styles.x`
+o `styles['x']` y el `.module.css` importado no declara `.x`: el elemento sale sin `class` y sin
+maquetar. Juzga **las líneas que el commit añade**, y todos los usos de una clase que el commit
+quita de su módulo · liga cada uso a SU import, no al nombre `styles` · Escape:
+`clases-ok: <razón>`, razón obligatoria · `npm run check:clases-css -- --todo` mide el pasivo y
+`node scripts/check-clases-css.mjs <fichero>` audita uno.
+⚠️ Drenar el pasivo en bloque NO: cada clase es hallazgo de su app (cabo C0386).
+> Salió del cabo C0157: 28 clases de estimador-cartera-inversion sin declarar (reparado en
+> c465b811). Crónica: cabecera de `scripts/check-clases-css.mjs` · pruebas:
+> `npm run clases-css:probar-candado`.
+
 ### Candado del pie que cuenta dos veces
 
 `npm run check:footer-tracker` — en el build, y **rompe el build** si un `.tsx` de `app/` monta
