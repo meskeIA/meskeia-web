@@ -1,7 +1,8 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { enfocarALaVista } from '@/lib';
 import styles from './QuizFigurasRetorica.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -138,6 +139,26 @@ export default function QuizFigurasRetoricaPage() {
   const reiniciar = useCallback(() => { iniciarQuiz(); }, [iniciarQuiz]);
   const volverConfig = useCallback(() => { setPantalla('config'); }, []);
 
+  /**
+   * Foco (familia de los quizzes, cabo C0018). La opción elegida se deshabilita y «Empezar»,
+   * «Siguiente pregunta» y «Ver resultados» se desmontan al pulsarlos: el foco caía a <body> y
+   * con teclado o lector de pantalla se volvía al principio de la página sin oír el ejemplo
+   * nuevo. Ahora va a la tarjeta de la pregunta, a «Siguiente» tras responder y al resultado.
+   */
+  const enunciadoRef = useRef<HTMLDivElement>(null);
+  const siguienteRef = useRef<HTMLButtonElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  const vistaRef = useRef<string | null>(null);
+  useEffect(() => {
+    const vista = `${pantalla}-${preguntaActual}-${seleccionada !== null}`;
+    const venia = vistaRef.current;
+    vistaRef.current = vista;
+    if (venia === null || venia === vista) return;
+    if (pantalla === 'quiz' && seleccionada === null) enfocarALaVista(enunciadoRef.current);
+    else if (pantalla === 'quiz') siguienteRef.current?.focus();
+    else if (pantalla === 'resultado') enfocarALaVista(resultadoRef.current);
+  }, [pantalla, preguntaActual, seleccionada]);
+
   const puntuacion = useMemo(
     () => calcularPuntuacion(correctas, totalPreguntas),
     [correctas, totalPreguntas]
@@ -241,7 +262,7 @@ export default function QuizFigurasRetoricaPage() {
           </div>
 
           {/* Tarjeta de pregunta */}
-          <div className={styles.preguntaCard}>
+          <div className={styles.preguntaCard} ref={enunciadoRef} tabIndex={-1}>
             <p className={styles.preguntaNumero}>Pregunta {preguntaActual + 1} de {totalPreguntas}</p>
             <p className={styles.preguntaEtiqueta}>¿Qué figura retórica identifica este ejemplo?</p>
             <blockquote className={styles.ejemploTexto}>
@@ -312,7 +333,7 @@ export default function QuizFigurasRetoricaPage() {
                 </div>
               </div>
 
-              <button type="button" className={styles.btnSiguiente} onClick={siguiente}>
+              <button type="button" className={styles.btnSiguiente} onClick={siguiente} ref={siguienteRef}>
                 {esUltima ? 'Ver resultados' : 'Siguiente pregunta →'}
               </button>
             </>
@@ -322,7 +343,7 @@ export default function QuizFigurasRetoricaPage() {
 
       {/* ── PANTALLA RESULTADO ── */}
       {pantalla === 'resultado' && (
-        <div className={styles.resultadoPanel}>
+        <div className={styles.resultadoPanel} ref={resultadoRef} tabIndex={-1}>
           <span className={styles.resultadoEmoji} aria-hidden="true">{resultadoTexto.emoji}</span>
           <h2 className={styles.resultadoTitulo}>{resultadoTexto.titulo}</h2>
           <p className={styles.resultadoPuntos}>{puntuacion} pts</p>
