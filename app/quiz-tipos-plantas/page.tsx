@@ -1,7 +1,8 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { enfocarALaVista } from '@/lib';
 import {
   MeskeiaLogo,
   Footer,
@@ -251,6 +252,27 @@ function QuizPorFases() {
     setJuego(ESTADO_INICIAL);
   }, []);
 
+  /**
+   * Foco (familia de los quizzes, cabo C0018). El modo elegido, la opción, «Siguiente» y «Ver
+   * resultados» se desmontan o se deshabilitan al pulsarlos: el foco caía a <body> y con teclado
+   * o lector de pantalla se volvía al principio de la página sin oír la planta nueva. Ahora va
+   * al nombre de la planta, a «Siguiente» tras responder y al resultado. Va aquí, antes de los
+   * `return` de cada estado, porque un hook no puede ir detrás de un `return`.
+   */
+  const enunciadoRef = useRef<HTMLHeadingElement>(null);
+  const siguienteRef = useRef<HTMLButtonElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  const vistaRef = useRef<string | null>(null);
+  useEffect(() => {
+    const vista = `${juego.estado}-${juego.indiceActual}`;
+    const venia = vistaRef.current;
+    vistaRef.current = vista;
+    if (venia === null || venia === vista) return;
+    if (juego.estado === 'jugando') enfocarALaVista(enunciadoRef.current);
+    else if (juego.estado === 'feedback') siguienteRef.current?.focus();
+    else if (juego.estado === 'resultados') enfocarALaVista(resultadoRef.current);
+  }, [juego.estado, juego.indiceActual]);
+
   // ============================================================================
   // RENDERS SEGÚN ESTADO
   // ============================================================================
@@ -286,7 +308,7 @@ function QuizPorFases() {
         {/* Tarjeta de pregunta */}
         <div className={styles.tarjetaPregunta}>
           <div className={styles.plantaEmoji} aria-hidden="true">{plantaActual.emoji}</div>
-          <h2 className={styles.plantaNombreComun}>{plantaActual.nombreComun}</h2>
+          <h2 className={styles.plantaNombreComun} ref={enunciadoRef} tabIndex={-1}>{plantaActual.nombreComun}</h2>
           <p className={styles.plantaNombreCientifico}><em>{plantaActual.nombreCientifico}</em></p>
           <p className={styles.plantaPista}>{plantaActual.pista}</p>
 
@@ -334,7 +356,7 @@ function QuizPorFases() {
                 : <><span aria-hidden="true">❌</span> Era: <span aria-hidden="true">{GRUPOS[plantaActual.grupo].emoji}</span> {GRUPOS[plantaActual.grupo].label}</>}
             </p>
             <p className={styles.feedbackExplicacion}>{plantaActual.explicacion}</p>
-            <button type="button" className={styles.btnSiguiente} onClick={siguientePregunta}>
+            <button type="button" className={styles.btnSiguiente} onClick={siguientePregunta} ref={siguienteRef}>
               {juego.indiceActual >= juego.preguntas.length - 1 ? 'Ver resultados →' : 'Siguiente →'}
             </button>
           </div>
@@ -372,7 +394,7 @@ function QuizPorFases() {
 
         <main className={styles.main}>
           {/* Panel de resultados */}
-          <div className={styles.resultadosPanel}>
+          <div className={styles.resultadosPanel} ref={resultadoRef} tabIndex={-1}>
             <div className={styles.resultadoEmoji} aria-hidden="true">{emojiResultado}</div>
             <h2 className={styles.resultadoTitulo}>Resultado: {correctas}/{total}</h2>
             <p className={styles.resultadoPorcentaje}>{porcentaje}% de acierto</p>

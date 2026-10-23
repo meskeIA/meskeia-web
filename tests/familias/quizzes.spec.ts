@@ -113,8 +113,8 @@ const HERMANAS: Hermana[] = [
     // Elige el modo y la pregunta aparece; las opciones son los seis grupos de plantas.
     slug: 'quiz-tipos-plantas',
     arranque: [/Modo Rápido/],
+    // REPARADO el 23/10/2026 al declarar la familia.
     opcion: /Alga|Briófito|Pteridófito|Gimnosperma|Monocotiledónea|Dicotiledónea/,
-    foco: { falla: 'C0018, 23/10/2026: tras «Siguiente» el foco cae a body' },
   },
   {
     // REPARADO el 23/10/2026 al declarar la familia.
