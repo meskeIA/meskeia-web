@@ -178,7 +178,7 @@
   margin-bottom: var(--spacing-lg);
 }
 
-.quantitySelector label {
+.quantityTitulo {
   display: block;
   font-size: 0.95rem;
   color: var(--text-secondary);

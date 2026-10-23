@@ -513,8 +513,10 @@ export default function GeneradorLoteriaPage() {
 
         {/* Generador */}
         <div className={styles.generatorPanel} ref={generadorRef}>
-          <div className={styles.quantitySelector}>
-            <label>Combinaciones a generar:</label>
+          {/* Grupo con nombre (hallazgo 3235): era un <label> sin control, que no nombraba nada,
+              y el lector de pantalla anunciaba «3, botón conmutador» sin decir qué cuentan. */}
+          <div className={styles.quantitySelector} role="group" aria-labelledby="cantidad-titulo">
+            <span id="cantidad-titulo" className={styles.quantityTitulo}>Combinaciones a generar:</span>
             <div className={styles.quantityButtons}>
               {[1, 3, 5, 10].map(num => (
                 <button

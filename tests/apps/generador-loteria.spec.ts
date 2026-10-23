@@ -2105,20 +2105,18 @@ test.describe('Inspector 12/10/2026', () => {
       await expect(desglose(page)).toHaveText(new RegExp(`\\b2: 60\\.000,00 €.*\\b3: 125\\.000,00 €`));
     });
 
-    test('ABIERTO (accesibilidad, bajo) · los botones 1/3/5/10 dicen de qué son (WCAG 1.3.1)', async ({ page }) => {
-      // «Combinaciones a generar:» es un <label> sin control (ni htmlFor ni input dentro): no
-      // nombra nada. Los botones se anuncian «1», «3», «5», «10», conmutadores sin grupo ni
-      // descripción, y al tabular hasta ellos un lector de pantalla no dice qué cuentan.
-      test.fail();
+    test('REPARADO (accesibilidad, bajo) · los botones 1/3/5/10 dicen de qué son (WCAG 1.3.1)', async ({ page }) => {
+      // Hallazgo 3235, REPARADO el 23/10/2026: el selector es un role="group" con aria-labelledby
+      // al rótulo. Antes «Combinaciones a generar:» era un <label> sin control (ni htmlFor ni
+      // input dentro): no nombraba nada. Los botones se anunciaban «1», «3», «5», «10»,
+      // conmutadores sin grupo ni descripción, y al tabular hasta ellos un lector de pantalla no
+      // decía qué cuentan.
       const botones = page.locator('[class*="quantityButtons"] button');
       await expect(botones).toHaveCount(4);
-      const enGrupo = await page.getByRole('group', { name: /combinaciones a generar/i }).getByRole('button').count();
-      const contexto = await botones.nth(1).evaluate((b) => {
-        const textos = (ids: string | null) => (ids ?? '').split(/\s+/).filter(Boolean)
-          .map((id) => document.getElementById(id)?.textContent ?? '').join(' ');
-        return `${b.getAttribute('aria-label') ?? ''} ${textos(b.getAttribute('aria-labelledby'))} ${textos(b.getAttribute('aria-describedby'))}`;
-      });
-      expect(enGrupo === 4 || /combinaci/i.test(contexto)).toBe(true);
+      const grupo = page.getByRole('group', { name: 'Combinaciones a generar:' });
+      await expect(grupo.getByRole('button')).toHaveText(['1', '3', '5', '10']);
+      // Ningún <label> huérfano en el selector: nombraría nada
+      await expect(page.locator('[class*="quantitySelector"] label')).toHaveCount(0);
     });
 
     test('ABIERTO (contenido, bajo) · el reparto dice que su gravamen es el español', async ({ page }) => {
