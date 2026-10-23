@@ -163,5 +163,24 @@ for (const h of HERMANAS) {
       await pulsarHidratado(page, /siguiente/i);
       await expect.poll(() => dondeFoco(page), { message: 'dónde está el foco tras «Siguiente»' }).toBe('destino');
     });
+
+    /**
+     * Elegir respuesta es una ACCIÓN: la opción queda deshabilitada y no se puede despulsar, así
+     * que `aria-pressed` la anunciaba como «botón de alternar, no pulsado» (hallazgo 285 en
+     * simbolos-quimicos; al declarar la familia, igual en complejidad-algoritmos,
+     * conceptos-inversion y tipos-plantas, reparadas el 23/10/2026). Antes y después de responder.
+     */
+    test('las opciones de respuesta no llevan aria-pressed', async ({ page }) => {
+      await page.goto(`/${h.slug}/`);
+      for (const boton of h.arranque) await pulsarHidratado(page, boton);
+      const opciones = page.locator('button:visible').filter({ hasText: h.opcion ?? /^\s*A\S/ });
+      await expect(opciones.first()).toBeVisible();
+      expect(await opciones.evaluateAll((bs) => bs.filter((b) => b.hasAttribute('aria-pressed')).length)).toBe(0);
+      await pulsarHidratado(page, h.opcion ?? /^\s*A\S/);
+      expect(
+        await page.locator('button[aria-pressed]:disabled').count(),
+        'tras responder, ningún botón deshabilitado anuncia un estado de conmutador',
+      ).toBe(0);
+    });
   });
 }

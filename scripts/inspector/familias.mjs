@@ -103,7 +103,7 @@ export const FAMILIAS = [
     testigo: 'tests/familias/quizzes.spec.ts',
     invariante:
       'Tras «Siguiente», el foco va al enunciado de la pregunta nueva (tabindex="-1", no un ' +
-      'botón), nunca a <body>.',
+      'botón), nunca a <body>. Las opciones de respuesta son acciones: sin aria-pressed.',
     referencia: 'quiz-literatura-universal',
     slugs: [
       'quiz-literatura-universal',

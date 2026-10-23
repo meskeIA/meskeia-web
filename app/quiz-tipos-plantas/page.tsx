@@ -335,7 +335,8 @@ function QuizPorFases() {
                   className={claseBoton}
                   onClick={() => seleccionarRespuesta(grupo)}
                   disabled={esFeedback}
-                  aria-pressed={juego.respuestaSeleccionada === grupo}
+                  // Sin aria-pressed: elegir respuesta es una acción, no un conmutador (queda
+                  // disabled y no se puede despulsar). Receta del hallazgo 285, familia de los quizzes.
                   style={{ borderColor: esFeedback && grupo === plantaActual.grupo ? info.color : undefined }}
                 >
                   <span className={styles.opcionEmoji} aria-hidden="true">{info.emoji}</span>

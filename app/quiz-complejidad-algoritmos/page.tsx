@@ -523,6 +523,8 @@ export default function QuizComplejidadAlgoritmosPage() {
                     else if (i === seleccionada) claseOpcion = `${styles.opcion} ${styles.opcionIncorrecta}`;
                     else claseOpcion = `${styles.opcion} ${styles.opcionApagada}`;
                   }
+                  // Sin aria-pressed: elegir respuesta es una acción, no un conmutador (queda
+                  // disabled y no se puede despulsar). Receta del hallazgo 285, familia de los quizzes.
                   return (
                     <button
                       key={i}
@@ -530,7 +532,6 @@ export default function QuizComplejidadAlgoritmosPage() {
                       className={claseOpcion}
                       onClick={() => responder(i)}
                       disabled={haRespondido}
-                      aria-pressed={seleccionada === i}
                     >
                       <span className={styles.letraOpcion} aria-hidden="true">
                         {['A', 'B', 'C', 'D'][i]}

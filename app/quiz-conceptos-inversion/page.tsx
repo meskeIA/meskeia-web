@@ -592,6 +592,8 @@ export default function QuizConceptosInversionPage() {
                   if (i === preguntaActual.correcta) cls = `${styles.opcion} ${styles.opcionCorrecta}`;
                   else if (i === respuestaElegida)   cls = `${styles.opcion} ${styles.opcionIncorrecta}`;
                 }
+                // Sin aria-pressed: elegir respuesta es una acción, no un conmutador (queda
+                // disabled y no se puede despulsar). Receta del hallazgo 285, familia de los quizzes.
                 return (
                   <button
                     key={i}
@@ -599,7 +601,6 @@ export default function QuizConceptosInversionPage() {
                     onClick={() => responder(i)}
                     disabled={estado === 'respondida'}
                     className={cls}
-                    aria-pressed={respuestaElegida === i}
                   >
                     <span className={styles.opcionLetra}>{LETRAS[i]}</span>
                     <span>{op}</span>
