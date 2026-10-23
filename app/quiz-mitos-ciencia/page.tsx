@@ -1,7 +1,8 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { enfocarALaVista } from '@/lib';
 import styles from './QuizMitosCiencia.module.css';
 import {
   MeskeiaLogo,
@@ -284,6 +285,27 @@ export default function QuizMitosCiencia() {
     }
   }
 
+  /**
+   * Foco (familia de los quizzes, cabo C0018). «Comenzar», «Verdad»/«Mito», «Siguiente» y «Ver
+   * resultados» se desmontan al pulsarlos: el foco caía a <body> y con teclado o lector de
+   * pantalla se volvía al principio de la página sin oír la afirmación nueva. Ahora va a la
+   * afirmación; tras responder, a la revelación (que no es región viva: así se lee, y el
+   * siguiente Tab es «Siguiente»); y al final, al resultado.
+   */
+  const afirmacionRef = useRef<HTMLDivElement>(null);
+  const revelacionRef = useRef<HTMLDivElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  const vistaRef = useRef<string | null>(null);
+  useEffect(() => {
+    const vista = `${fase}-${indice}`;
+    const venia = vistaRef.current;
+    vistaRef.current = vista;
+    if (venia === null || venia === vista) return;
+    if (fase === 'jugando') enfocarALaVista(afirmacionRef.current);
+    else if (fase === 'revelado') enfocarALaVista(revelacionRef.current);
+    else if (fase === 'fin') enfocarALaVista(resultadoRef.current);
+  }, [fase, indice]);
+
   const aciertosCategoria = Object.keys(CATEGORIAS).reduce<Record<string, { total: number; correctas: number }>>((acc, cat) => {
     const pregsCategoria = PREGUNTAS.filter(p => p.categoria === cat);
     const correctas = pregsCategoria.filter((p, i) => {
@@ -362,7 +384,11 @@ export default function QuizMitosCiencia() {
             </div>
 
             {/* Tarjeta de afirmación */}
-            <div className={`${styles.preguntaCard} ${fase === 'revelado' ? (seleccion === pregunta.esVerdad ? styles.correcto : styles.incorrecto) : ''}`}>
+            <div
+              className={`${styles.preguntaCard} ${fase === 'revelado' ? (seleccion === pregunta.esVerdad ? styles.correcto : styles.incorrecto) : ''}`}
+              ref={afirmacionRef}
+              tabIndex={-1}
+            >
               <div className={styles.preguntaEmoji}>{pregunta.emoji}</div>
               <p className={styles.afirmacion}>&ldquo;{pregunta.afirmacion}&rdquo;</p>
             </div>
@@ -383,7 +409,7 @@ export default function QuizMitosCiencia() {
 
             {/* Revelación */}
             {fase === 'revelado' && (
-              <div className={styles.revelacion}>
+              <div className={styles.revelacion} ref={revelacionRef} tabIndex={-1}>
                 <div className={`${styles.resultadoBadge} ${seleccion === pregunta.esVerdad ? styles.badgeCorrecto : styles.badgeIncorrecto}`}>
                   {seleccion === pregunta.esVerdad ? '✓ ¡Correcto!' : '✗ Incorrecto'}
                   <span className={styles.respuestaCorrecta}>
@@ -403,7 +429,7 @@ export default function QuizMitosCiencia() {
 
         {/* PANTALLA DE RESULTADOS */}
         {fase === 'fin' && (
-          <div className={styles.finPanel}>
+          <div className={styles.finPanel} ref={resultadoRef} tabIndex={-1}>
             <div className={styles.nivelEmoji}>{nivel.emoji}</div>
             <h2 className={styles.nivelNombre}>{nivel.nombre}</h2>
             <p className={styles.nivelDesc}>{nivel.descripcion}</p>

@@ -117,10 +117,10 @@ const HERMANAS: Hermana[] = [
     foco: { falla: 'C0018, 23/10/2026: tras «Siguiente» el foco cae a body' },
   },
   {
+    // REPARADO el 23/10/2026 al declarar la familia.
     slug: 'quiz-mitos-ciencia',
     arranque: [EMPEZAR],
     opcion: /Verdad/,
-    foco: { falla: 'C0018, 23/10/2026: tras «Siguiente» el foco cae a body' },
   },
 ];
 
