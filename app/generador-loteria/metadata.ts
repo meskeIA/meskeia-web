@@ -3,10 +3,38 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 import { EXENCION_PREMIO_LOTERIA, TIPO_GRAVAMEN_PREMIO_LOTERIA, gravamenPremio } from '@/data/fiscal';
 import { formatNumber, formatPercentage } from '@/lib';
 
-// Ejemplo de la FAQ del reparto de una peña, calculado con el módulo fiscal (S0180):
-// 125.000 € entre tres que ponen 10, 5 y 5 €
-const EJ_PENA = gravamenPremio(125_000, 20);
-const eur = (n: number) => `${formatNumber(n, 0)} €`;
+/*
+ * Las dos preguntas que la página publicaba dos veces, en UN solo sitio (hallazgo 3237).
+ *
+ * El FAQPage de abajo y la FAQ visible de `page.tsx` las redactaban aparte: «¿Usar un generador
+ * aleatorio mejora mis probabilidades…?» frente a «¿Los números generados aleatoriamente tienen
+ * más probabilidad de ganar?», y «¿Cómo se reparte un premio… en una peña…?» frente a «¿Cuánto se
+ * lleva Hacienda…?», con ejemplos distintos y sin decir en el FAQPage que con la retención no hay
+ * autoliquidación. No se contradecían, pero dos redacciones divergen en cuanto se toca una (como
+ * en app/simulador-gastos-compraventa-garaje). Ahora las dos bocas importan estas constantes, en
+ * texto plano: la respuesta de Hacienda es una lista de párrafos que el FAQPage une con espacios.
+ *
+ * Las cifras salen de data/fiscal/premios-loterias.ts (DA 33.ª de la Ley 35/2006).
+ */
+const eur = (n: number) => `${formatNumber(n, 0)} €`;
+const TIPO = formatPercentage(TIPO_GRAVAMEN_PREMIO_LOTERIA, 0);
+// Ejemplo de un premio grande jugado por una sola persona, con un décimo de 20 €
+const EJ_PREMIO = 1_000_000;
+const EJ_GRAVAMEN = gravamenPremio(EJ_PREMIO, 20);
+// Ejemplo del reparto de una peña (S0180): 125.000 € entre tres que ponen 10, 5 y 5 €
+const EJ_PENA_PREMIO = 125_000;
+const EJ_PENA = gravamenPremio(EJ_PENA_PREMIO, 20);
+
+export const PREGUNTA_ALEATORIO = '¿Usar un generador aleatorio mejora mis probabilidades en la lotería?';
+export const RESPUESTA_ALEATORIO = 'No. Cada combinación posible tiene exactamente la misma probabilidad de salir premiada, la elijas tú, la genere un ordenador o la elija la máquina del sorteo. Un generador aleatorio no la mejora ni la empeora: sirve para ahorrar tiempo y evitar sesgos inconscientes al elegir los números. En La Primitiva, por ejemplo, hay 13.983.816 combinaciones posibles de 6 números, y cada una tiene la misma probabilidad de salir: 1 entre 13.983.816.';
+
+export const PREGUNTA_HACIENDA = '¿Cuánto se lleva Hacienda de un premio de lotería en España y cómo se reparte en una peña?';
+export const RESPUESTA_HACIENDA: readonly string[] = [
+  `Los premios de las loterías del Estado tienen un gravamen especial del ${TIPO} sobre lo que pasa de ${eur(EXENCION_PREMIO_LOTERIA)}; hasta esa cifra están exentos. Por ejemplo, de un premio de ${eur(EJ_PREMIO)} tributan los ${eur(EJ_GRAVAMEN.base)} del exceso: ${eur(EJ_GRAVAMEN.retencion)} de impuesto. El tipo es fijo, no progresivo como el IRPF general, y la exención se cuenta por cada décimo o apuesta premiados, no una vez sobre el total.`,
+  `Lo descuenta quien paga el premio: se cobra ya con la retención del ${TIPO}, y entonces no hay que presentar autoliquidación del gravamen. El premio tampoco se suma a la base del IRPF, así que no cambia el tipo del resto de tus ingresos.`,
+  `En una peña, la exención y la retención de cada décimo se reparten según lo que puso cada uno. Por ejemplo, un décimo de ${eur(EJ_PENA_PREMIO)} jugado entre tres que ponen 10, 5 y 5 € deja ${eur(EJ_PENA.retencion)} de retención y ${eur(EJ_PENA.neto)} netos: ${eur(EJ_PENA.neto / 2)} para quien puso 10 € y ${eur(EJ_PENA.neto / 4)} para cada uno de los otros. El reparto de la peña de esta página lo calcula con lo que puso cada persona.`,
+  `Referencia legal: disposición adicional 33.ª de la Ley 35/2006 del IRPF; el exento de ${eur(EXENCION_PREMIO_LOTERIA)} lo fijó la Ley 6/2018. Incluye también los premios de la ONCE, los sorteos de Cruz Roja y las loterías de las comunidades autónomas.`,
+];
 
 export const metadata: Metadata = {
   title: 'Generador Lotería: Primitiva, Euromillones, Bonoloto | meskeIA',
@@ -97,10 +125,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Usar un generador aleatorio mejora mis probabilidades en la lotería?',
+      name: PREGUNTA_ALEATORIO,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. En los sorteos de lotería todos los números tienen exactamente la misma probabilidad de salir, independientemente de cómo se elijan. Un generador aleatorio no mejora ni empeora las probabilidades: sirve para ahorrar tiempo y evitar sesgos inconscientes al elegir los números.',
+        text: RESPUESTA_ALEATORIO,
       },
     },
     {
@@ -129,10 +157,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cómo se reparte un premio de lotería entre los de una peña y cuánto se lleva Hacienda?',
+      name: PREGUNTA_HACIENDA,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `Cada décimo o apuesta premiados tiene ${eur(EXENCION_PREMIO_LOTERIA)} exentos, y del resto se retiene un ${formatPercentage(TIPO_GRAVAMEN_PREMIO_LOTERIA, 0)} al cobrar. En una peña, esa exención y la retención se reparten según lo que puso cada uno. Por ejemplo, un décimo de ${eur(125_000)} jugado entre tres que ponen 10, 5 y 5 € deja ${eur(EJ_PENA.retencion)} de retención y ${eur(EJ_PENA.neto)} netos: ${eur(EJ_PENA.neto / 2)} para quien puso 10 € y ${eur(EJ_PENA.neto / 4)} para cada uno de los otros. La exención se aplica a cada décimo por separado, no una vez al total.`,
+        text: RESPUESTA_HACIENDA.join(' '),
       },
     },
   ],

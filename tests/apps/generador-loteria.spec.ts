@@ -2135,24 +2135,39 @@ test.describe('Inspector 12/10/2026', () => {
       await expect(entradilla).toContainText('en España');
     });
 
-    test('ABIERTO (contenido, bajo) · la pregunta del generador aleatorio tiene UNA respuesta', async ({ page }) => {
-      // El FAQPage pregunta «¿Usar un generador aleatorio mejora mis probabilidades en la lotería?»
-      // y la FAQ visible «¿Los números generados aleatoriamente tienen más probabilidad de ganar?»:
-      // la misma pregunta con dos respuestas redactadas aparte. La reparación es UNA constante en
-      // metadata.ts que importen las dos (como app/simulador-gastos-compraventa-garaje).
-      test.fail();
+    test('REPARADO (contenido, bajo) · la pregunta del generador aleatorio tiene UNA respuesta', async ({ page }) => {
+      // Hallazgo 3237, REPARADO el 23/10/2026. El FAQPage preguntaba «¿Usar un generador aleatorio
+      // mejora mis probabilidades en la lotería?» y la FAQ visible «¿Los números generados
+      // aleatoriamente tienen más probabilidad de ganar?»: la misma pregunta con dos respuestas
+      // redactadas aparte. Y el par de Hacienda: «¿Cómo se reparte un premio… en una peña…?» en el
+      // FAQPage frente a «¿Cuánto se lleva Hacienda…?» en la visible, con otro ejemplo y sin decir
+      // que con la retención no hay autoliquidación. Ahora las dos bocas importan UNA constante de
+      // metadata.ts por pregunta (como app/simulador-gastos-compraventa-garaje): mismo título y
+      // misma respuesta, palabra por palabra.
       interface PreguntaFaq { name: string; acceptedAnswer: { text: string } }
       interface BloqueLd { '@type'?: string; mainEntity?: PreguntaFaq[] }
       const normal = (s: string) => s.replace(/\s+/g, ' ').trim();
-      const visible = page.locator('[class*="faqList"] details')
-        .filter({ has: page.locator('summary', { hasText: 'generados aleatoriamente tienen más probabilidad' }) });
-      await expect(visible).toHaveCount(1);
-      const textoVisible = normal((await visible.textContent()) ?? '');
       const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
       const faq = bloques.map((b) => JSON.parse(b) as BloqueLd).find((j) => j['@type'] === 'FAQPage');
-      const gemela = (faq?.mainEntity ?? []).find((q) =>
-        /generador aleatorio mejora|aleatoriamente tienen más probabilidad/i.test(q.name));
-      if (gemela) expect(textoVisible).toContain(normal(gemela.acceptedAnswer.text));
+      const ld = faq?.mainEntity ?? [];
+      const detalles = page.locator('[class*="faqList"] details');
+
+      for (const [patron, debeContener] of [
+        [/generador aleatorio|aleatoriamente/i, '1 entre 13.983.816'],
+        // Por «Hacienda», no por «peña»: «¿Merece la pena jugar en grupo (peña)?» es otra pregunta
+        [/Hacienda/, 'no hay que presentar autoliquidación'],
+      ] as Array<[RegExp, string]>) {
+        // Una sola pregunta de ese tema en cada boca
+        const gemelasLd = ld.filter((q) => patron.test(q.name));
+        expect(gemelasLd).toHaveLength(1);
+        const visible = detalles.filter({ has: page.locator('summary', { hasText: patron }) });
+        await expect(visible).toHaveCount(1);
+        // El mismo título y la misma respuesta
+        expect(normal((await visible.locator('summary').textContent()) ?? '')).toBe(normal(gemelasLd[0].name));
+        const respuestaVisible = normal((await visible.locator('p').allTextContents()).join(' '));
+        expect(respuestaVisible).toBe(normal(gemelasLd[0].acceptedAnswer.text));
+        expect(respuestaVisible).toContain(debeContener);
+      }
     });
   });
 });

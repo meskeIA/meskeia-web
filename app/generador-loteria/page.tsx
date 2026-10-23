@@ -6,6 +6,7 @@ import { MeskeiaLogo, Footer, RelatedApps, DisclaimerCard, LegalNotice, ShareCar
 import { formatDate, formatNumber, formatPercentage } from '@/lib';
 import ComprobadorSorteo from './ComprobadorSorteo';
 import RepartoPena from './RepartoPena';
+import { PREGUNTA_ALEATORIO, RESPUESTA_ALEATORIO, PREGUNTA_HACIENDA, RESPUESTA_HACIENDA } from './metadata';
 import DataReference from '@/components/DataReference';
 import {
   FISCAL_PREMIOS_LOTERIAS_META,
@@ -72,7 +73,8 @@ const CLAVE_FAVORITAS = 'meskeia-loteria-favoritas';
 /**
  * Cifras del gravamen especial para el texto de la página. Hasta S0180 iban escritas a mano en
  * la FAQ (hallazgo 2734) porque nada las calculaba; ahora las calcula el reparto de la peña y
- * viven en data/fiscal/premios-loterias.ts, de donde las toma también el texto.
+ * viven en data/fiscal/premios-loterias.ts, de donde las toma también el texto. Las usa el
+ * aviso de errores frecuentes; la FAQ de Hacienda, desde el hallazgo 3237, sale de metadata.ts.
  */
 const EXENCION_TEXTO = `${formatNumber(EXENCION_PREMIO_LOTERIA, 0)}\u00A0€`;
 const TIPO_TEXTO = formatPercentage(TIPO_GRAVAMEN_PREMIO_LOTERIA, 0);
@@ -914,17 +916,10 @@ export default function GeneradorLoteriaPage() {
           <h2>Preguntas frecuentes sobre loterías y probabilidad</h2>
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
+              {/* Pregunta y respuesta compartidas con el FAQPage (hallazgo 3237): viven en metadata.ts */}
               <details>
-                <summary>¿Los números generados aleatoriamente tienen más probabilidad de ganar?</summary>
-                <p>
-                  No. Cada combinación posible tiene exactamente la misma probabilidad de salir premiada,
-                  independientemente de si la elegiste tú, la generó un ordenador o la elige la máquina
-                  del sorteo. La aleatoriedad del generador es tan válida como cualquier otro método.
-                </p>
-                <p className={styles.faqTip}>
-                  Dato matemático: en La Primitiva hay 13.983.816 combinaciones posibles. Todas tienen
-                  la misma probabilidad: 1 entre 13.983.816.
-                </p>
+                <summary>{PREGUNTA_ALEATORIO}</summary>
+                <p>{RESPUESTA_ALEATORIO}</p>
               </details>
             </li>
             <li className={styles.faqItem}>
@@ -982,31 +977,16 @@ export default function GeneradorLoteriaPage() {
             </li>
             <li className={styles.faqItem}>
               <details>
-                <summary>¿Cuánto se lleva Hacienda de un premio de lotería en España?</summary>
+                <summary>{PREGUNTA_HACIENDA}</summary>
                 {/* Hallazgo 2734 y S0180. Cotejado en el texto consolidado de la Ley 35/2006
                     (BOE-A-2006-20764), DA 33.ª: exención por décimo o apuesta (ap. 2, redacción del
                     art. 67.1 de la Ley 6/2018); tipo sobre el exceso (ap. 3 y 4); retención al
                     pagarlo (ap. 6); sin autoliquidación si se retuvo (ap. 7); fuera de la base del
-                    IRPF (ap. 8). Las cifras salen de data/fiscal/premios-loterias.ts. */}
-                <p>
-                  Los premios de las loterías del Estado tienen un gravamen especial del {TIPO_TEXTO}{' '}
-                  sobre lo que pasa de {EXENCION_TEXTO}; hasta esa cifra están exentos. Por ejemplo, de un
-                  premio de {euros(EJEMPLO_PREMIO)} tributan los {euros(EJEMPLO_GRAVAMEN.base)} del exceso:{' '}
-                  {euros(EJEMPLO_GRAVAMEN.retencion)} de impuesto. El tipo es fijo, no progresivo como el
-                  IRPF general, y se cuenta por cada décimo o apuesta premiados (si el premio es
-                  compartido, como en una peña, los {EXENCION_TEXTO} se reparten entre los cotitulares
-                  según su parte: el reparto de la peña, más arriba, lo calcula).
-                </p>
-                <p>
-                  Lo descuenta quien paga el premio: se cobra ya con la retención del {TIPO_TEXTO}, y
-                  entonces no hay que presentar autoliquidación del gravamen. El premio tampoco se
-                  suma a la base del IRPF, así que no cambia el tipo del resto de tus ingresos.
-                </p>
-                <p className={styles.faqTip}>
-                  Referencia legal: disposición adicional 33.ª de la Ley 35/2006 del IRPF; el exento
-                  de {EXENCION_TEXTO} lo fijó la Ley 6/2018. Incluye también los premios de la ONCE, los
-                  sorteos de Cruz Roja y las loterías de las comunidades autónomas.
-                </p>
+                    IRPF (ap. 8). Pregunta y respuesta compartidas con el FAQPage (hallazgo 3237):
+                    viven en metadata.ts, y el último párrafo, la referencia legal, va como nota. */}
+                {RESPUESTA_HACIENDA.map((parrafo, i) => (
+                  <p key={i} className={i === RESPUESTA_HACIENDA.length - 1 ? styles.faqTip : undefined}>{parrafo}</p>
+                ))}
               </details>
             </li>
           </ul>
