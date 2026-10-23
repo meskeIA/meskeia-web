@@ -94,6 +94,36 @@ export const FAMILIAS = [
       'selector-vehiculo-electrico',
     ],
   },
+  {
+    // Cabos C0018 y C0082 (23/10/2026): el Inspector midió foco a <body> tras «Siguiente» en
+    // ocho de ocho quizzes, reparados uno a uno; al declararla, las otras ocho lo tenían igual.
+    // El invariante es el armazón; el banco de cada quiz lo mide su spec en tests/apps/.
+    id: 'quizzes',
+    nombre: 'Quizzes de opción múltiple (quiz-*)',
+    testigo: 'tests/familias/quizzes.spec.ts',
+    invariante:
+      'Tras «Siguiente», el foco va al enunciado de la pregunta nueva (tabindex="-1", no un ' +
+      'botón), nunca a <body>.',
+    referencia: 'quiz-literatura-universal',
+    slugs: [
+      'quiz-literatura-universal',
+      'quiz-biologia-molecular',
+      'quiz-historia-espana',
+      'quiz-geografia-espana',
+      'quiz-simbolos-quimicos',
+      'quiz-tabla-periodica',
+      'quiz-verbos-irregulares',
+      'quiz-paises-capitales',
+      'quiz-complejidad-algoritmos',
+      'quiz-conceptos-financieros',
+      'quiz-conceptos-inversion',
+      'quiz-figuras-retoricas',
+      'quiz-metrica-estrofas',
+      'quiz-reinos-naturaleza',
+      'quiz-tipos-plantas',
+      'quiz-mitos-ciencia',
+    ],
+  },
 ];
 
 const PORSLUG = new Map();
