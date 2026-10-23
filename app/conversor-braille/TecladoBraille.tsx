@@ -28,10 +28,24 @@ export function celdaDePuntos(puntos: Iterable<number>): string {
   return String.fromCodePoint(0x2800 + bits);
 }
 
-/** Puntos de una celda Unicode, en orden (⠇ → [1, 2, 3]). */
+/** ¿Es una celda del bloque braille de Unicode (U+2800-U+28FF)? */
+export function esCeldaBraille(caracter: string): boolean {
+  const codigo = caracter.codePointAt(0) ?? 0;
+  return codigo >= 0x2800 && codigo <= 0x28ff;
+}
+
+/**
+ * Puntos de una celda Unicode, en orden (⠇ → [1, 2, 3]). Cuenta también los puntos 7 y 8 de las
+ * celdas de ocho puntos (⡀ → [7]), que antes salían como «Espacio».
+ *
+ * ⚠️ 23/10/2026 (hallazgo 3437) — restaba U+2800 a CUALQUIER carácter y leía los bits de un
+ * número negativo: la «a» en tinta (0x61 − 0x2800 = −10143) daba los puntos 1-6. Solo se llama
+ * con celdas braille; lo demás lo describe `describirCaracter`.
+ */
 export function puntosDeCelda(celda: string): number[] {
+  if (!esCeldaBraille(celda)) return [];
   const bits = (celda.codePointAt(0) ?? 0x2800) - 0x2800;
-  return [1, 2, 3, 4, 5, 6].filter((p) => bits & (1 << (p - 1)));
+  return [1, 2, 3, 4, 5, 6, 7, 8].filter((p) => bits & (1 << (p - 1)));
 }
 
 /** Orden de pintado de la celda: fila a fila, columna izquierda (1 2 3) y derecha (4 5 6). */
@@ -88,7 +102,15 @@ export default function TecladoBraille({ onCelda, onBorrar }: Props) {
       anunciar('No hay ninguna celda que borrar');
       return;
     }
-    const que = puntosDeCelda(borrada).length === 0 ? 'Espacio borrado' : `${describirCelda(borrada)}, borrada`;
+    // Hallazgo 3437: la caja puede traer tinta (pegada, o de un sentido anterior) y una letra en
+    // tinta no es una celda ni tiene puntos
+    const que = !esCeldaBraille(borrada)
+      ? borrada.trim() === ''
+        ? 'Espacio borrado'
+        : `Carácter ${borrada} borrado, no es una celda braille`
+      : puntosDeCelda(borrada).length === 0
+        ? 'Espacio borrado'
+        : `${describirCelda(borrada)}, borrada`;
     anunciar(quedan === 0 ? `${que}. La caja está vacía` : que);
   };
 
@@ -168,7 +190,7 @@ export default function TecladoBraille({ onCelda, onBorrar }: Props) {
           <kbd>J</kbd><kbd>K</kbd><kbd>L</kbd>
         </span>
         <span className={styles.tecladoAyuda}>
-          Haz clic aquí y pulsa las teclas a la vez, como en una máquina Perkins
+          Con un teclado físico: haz clic aquí y pulsa las teclas a la vez, como en una máquina Perkins
         </span>
         <div className={styles.brailleGrid} aria-hidden="true">
           {ORDEN_VISUAL.map((p) => (

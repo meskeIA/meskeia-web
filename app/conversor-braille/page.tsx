@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import styles from './ConversorBraille.module.css';
 import impresion from '@/styles/impresion.module.css';
 import TecladoBraille, { type Borrado } from './TecladoBraille';
+import { formatNumber } from '@/lib';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
@@ -311,6 +312,13 @@ const NORMAS: NormaBraille[] = [
       'Norma de señalización estadounidense (2010 ADA Standards): celdas algo más separadas.',
   },
 ];
+
+/**
+ * Una medida de la norma en formato español (hallazgo 3439): `{norma.entreCeldas}` pintaba el
+ * número de JavaScript, y con ADA salía «6.2 mm». Las enteras van sin decimales («6 mm»).
+ */
+const milimetros = (valor: number): string =>
+  formatNumber(valor, Number.isInteger(valor) ? 0 : 1);
 
 /** Ancho útil considerado para la hoja: A4 (210 mm) menos márgenes de página e interior. */
 const ANCHO_UTIL_MM = 172;
@@ -933,10 +941,12 @@ export default function ConversorBraillePage() {
         </div>
 
         <div className={styles.inputSection}>
-          <label className={styles.label}>
+          {/* Con htmlFor: sin él la caja tomaba por nombre su placeholder, que se va al escribir (hallazgo 3438) */}
+          <label className={styles.label} htmlFor="entrada-conversor">
             {mode === 'textToBraille' ? 'Texto a convertir:' : 'Braille a convertir:'}
           </label>
           <textarea
+            id="entrada-conversor"
             className={styles.textarea}
             value={input}
             onChange={(e) => cambiarEntrada(e.target.value)}
@@ -996,8 +1006,9 @@ export default function ConversorBraillePage() {
 
         {result && (
           <div className={styles.resultSection}>
-            <label className={styles.label}>Resultado:</label>
-            <div className={styles.resultBox} role="status" aria-live="polite">
+            {/* No es un control: rótulo de la región, no <label> (hallazgo 3438) */}
+            <span className={styles.label} id="etiqueta-resultado">Resultado:</span>
+            <div className={styles.resultBox} role="status" aria-live="polite" aria-labelledby="etiqueta-resultado">
               {result}
             </div>
 
@@ -1237,8 +1248,8 @@ export default function ConversorBraillePage() {
           ) : (
             <span className={styles.hojaAviso} role="status">
               {hoja.numeroLineas} línea{hoja.numeroLineas === 1 ? '' : 's'} de{' '}
-              {hoja.celdasPorLinea} celdas · celda de {norma.entreCeldas} mm ·{' '}
-              {norma.entreLineas} mm entre líneas
+              {hoja.celdasPorLinea} celdas · celda de {milimetros(norma.entreCeldas)} mm ·{' '}
+              {milimetros(norma.entreLineas)} mm entre líneas
               {hoja.recortada ? ' · texto recortado a 200 líneas' : ''}
             </span>
           )}
@@ -1273,7 +1284,7 @@ export default function ConversorBraillePage() {
             height={`${hoja.alto}mm`}
             viewBox={`0 0 ${hoja.ancho} ${hoja.alto}`}
             role="img"
-            aria-label={`Hoja de ${hoja.numeroLineas} líneas en Braille a escala real, orientación ${
+            aria-label={`Hoja de ${hoja.numeroLineas} ${hoja.numeroLineas === 1 ? 'línea' : 'líneas'} en Braille a escala real, orientación ${
               modoEspejo ? 'en espejo para regleta y punzón' : 'de lectura'
             }`}
           >

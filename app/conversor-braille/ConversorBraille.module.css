@@ -1054,6 +1054,37 @@
   cursor: not-allowed;
 }
 
+/*
+  Pantalla táctil sin ratón (hallazgo 3444): los puntos táctiles son el camino, y la zona de las
+  teclas F D S · J K L —que solo sirve con un teclado físico, y lo dice— baja detrás de ellos en
+  vez de ocupar el primer sitio. No se oculta: una tableta con teclado externo también da
+  hover: none.
+*/
+@media (hover: none) and (pointer: coarse) {
+  .teclado {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tecladoTitulo {
+    order: 0;
+  }
+
+  .tecladoTactil {
+    order: 1;
+    margin-top: 0;
+  }
+
+  .tecladoZona {
+    order: 2;
+    margin-top: var(--spacing-md);
+  }
+
+  .tecladoAnuncio {
+    order: 3;
+  }
+}
+
 .tecladoAnuncio {
   min-height: 1.2em;
   margin: var(--spacing-sm) 0 0;

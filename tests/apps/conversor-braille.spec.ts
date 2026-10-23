@@ -32,9 +32,7 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * HALLAZGOS: los de las inspecciones del 20/08, del 22/09, del 13/10 y del 22/10/2026 están
  * todos REPARADOS (24-29 el 19/08, 57-62 el 21/08, 1183-1187 el 22/09, 3277-3280 el 19/10,
  * 3415-3423 el 22/10) y sus tests pasan en verde. Los de la re-inspección del 23/10/2026 (bloque
- * del final) están ABIERTOS y van con `test.fail()`: cada uno afirma lo que DEBERÍA pasar y falla
- * a propósito; el día que se corrija la app pasará a ROJO («expected to fail, but passed») y habrá
- * que quitarle la marca, no reescribir el valor esperado.
+ * del final, 3434-3444) se repararon el mismo 23/10 y van como tests normales con «REPARADO (nº)».
  */
 
 const RUTA = '/conversor-braille/';
@@ -1837,7 +1835,9 @@ test.describe('re-inspección 23/10/2026', () => {
   // (0x61 − 0x2800 = −10143, cuyos seis bits bajos son 100001), «l» → «puntos 3-4-6». Una celda de
   // ocho puntos (⡀) se anuncia «Espacio borrado» y un espacio normal «Celda  , punto 6». La tinta en
   // la caja la pone el propio ejemplo «Saludo» (hallazgo de arriba).
-  test.fail('ABIERTO — borrar la «a» de «Hola» con Retroceso no anuncia puntos braille', async ({ page }) => {
+  // REPARADO (hallazgo 3437): `puntosDeCelda` solo lee celdas del bloque braille (y cuenta los
+  // puntos 7 y 8), y el retroceso dice de la tinta que no es una celda.
+  test('REPARADO (3437) — borrar la «a» de «Hola» con Retroceso no anuncia puntos braille', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
     await page.getByRole('button', { name: 'Braille → Texto' }).click();
@@ -1851,6 +1851,18 @@ test.describe('re-inspección 23/10/2026', () => {
     await expect(anuncio).toContainText('borrad'); // precondición: el retroceso se anunció
     // Lo que DEBERÍA pasar: la «a» no es una celda y no tiene puntos. Hoy: «Celda a, puntos 1-6, borrada».
     await expect(anuncio).not.toContainText('punto', { timeout: 2000 });
+    await expect(anuncio).toContainText('Carácter a borrado, no es una celda braille');
+    // Una celda de ocho puntos: ⡀ es U+2840, el bit 6 → punto 7 (no «Espacio»)
+    await textarea.fill('⠁⡀');
+    await esperarValorEnReact(page, textarea, '⠁⡀');
+    await page.getByRole('button', { name: 'Borrar última' }).click();
+    await expect(anuncio).toContainText('Celda ⡀, punto 7, borrada');
+    // Un espacio normal en tinta: «Espacio borrado», sin puntos
+    await textarea.fill('⠁ ');
+    await esperarValorEnReact(page, textarea, '⠁ ');
+    await page.getByRole('button', { name: 'Borrar última' }).click();
+    await expect(anuncio).toContainText('Espacio borrado');
+    await expect(anuncio).not.toContainText('punto');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -1860,13 +1872,22 @@ test.describe('re-inspección 23/10/2026', () => {
   // «Texto a convertir:» / «Braille a convertir:» (y «Resultado:») son <label> sin `htmlFor` ni
   // control dentro: el árbol accesible da a la caja el nombre de su placeholder («Escribe el texto
   // aquí...»), que desaparece al escribir. WCAG 1.3.1 y 4.1.2.
-  test.fail('ABIERTO — la caja se llama «Texto a convertir» / «Braille a convertir»', async ({ page }) => {
+  // REPARADO (hallazgo 3438): el <label> lleva `htmlFor` y «Resultado:» es el rótulo de la región.
+  test('REPARADO (3438) — la caja se llama «Texto a convertir» / «Braille a convertir»', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
     await expect(page.getByText('Texto a convertir:')).toBeVisible(); // precondición: el rótulo está
     await expect(page.getByRole('textbox', { name: /Texto a convertir/ })).toHaveCount(1, { timeout: 2000 });
     await page.getByRole('button', { name: 'Braille → Texto' }).click();
     await expect(page.getByRole('textbox', { name: /Braille a convertir/ })).toHaveCount(1, { timeout: 2000 });
+    // Y el resultado es una región con nombre, no un <label> suelto
+    await page.getByRole('button', { name: 'Texto → Braille' }).click();
+    const textarea = page.getByRole('textbox', { name: 'Texto a convertir:' });
+    await textarea.fill('Hola');
+    await esperarValorEnReact(page, textarea, 'Hola');
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+    await expect(page.getByRole('status', { name: 'Resultado:' })).toHaveText('⠨⠓⠕⠇⠁');
+    expect(await page.locator('label:not([for])').count()).toBe(0);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -1876,7 +1897,8 @@ test.describe('re-inspección 23/10/2026', () => {
   // `{norma.entreCeldas} mm` pinta el número de JavaScript tal cual: con Marburg (6 y 10) no se nota,
   // con ADA (6,2 y 10,2) sale el punto decimal. CLAUDE.md §2. Y el nombre accesible de la hoja dice
   // «Hoja de 1 líneas» (el texto visible sí distingue «1 línea»).
-  test.fail('ABIERTO — con ADA la hoja dice «6,2 mm · 10,2 mm» y su nombre no dice «1 líneas»', async ({ page }) => {
+  // REPARADO (hallazgo 3439): las medidas pasan por formatNumber y el nombre distingue el singular.
+  test('REPARADO (3439) — con ADA la hoja dice «6,2 mm · 10,2 mm» y su nombre no dice «1 líneas»', async ({ page }) => {
     await page.goto(RUTA);
     await convertirHidratado(page, 'Hola');
     await page.getByRole('button', { name: 'ADA 703.3 (EE. UU.)' }).click();
@@ -1887,6 +1909,10 @@ test.describe('re-inspección 23/10/2026', () => {
     await expect(aviso).toContainText('celda de 6,2 mm · 10,2 mm entre líneas', { timeout: 2000 });
     const nombre = await page.locator('svg[aria-label*="escala real"]').getAttribute('aria-label');
     expect(nombre).not.toContain('1 líneas');
+    expect(nombre).toContain('Hoja de 1 línea en Braille');
+    // Marburg, con medidas enteras, sigue sin decimales: ⌊(172 − 2,5 − 1,5) / 6⌋ + 1 = 29 celdas
+    await page.getByRole('button', { name: 'Marburg Medium' }).click();
+    await expect(aviso).toContainText('1 línea de 29 celdas · celda de 6 mm · 10 mm entre líneas');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -1984,7 +2010,9 @@ test.describe('re-inspección 23/10/2026 — zona Perkins en móvil', () => {
     hasTouch: true,
   });
 
-  test.fail('ABIERTO — en el móvil la zona de teclas no pide pulsar teclas que no hay', async ({ page }) => {
+  // REPARADO (hallazgo 3444): la zona dice que es para un teclado físico y, en una pantalla táctil
+  // sin ratón, va detrás de los puntos táctiles.
+  test('REPARADO (3444) — en el móvil la zona de teclas no pide pulsar teclas que no hay', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
     await page.getByRole('button', { name: 'Braille → Texto' }).tap();
@@ -1996,5 +2024,9 @@ test.describe('re-inspección 23/10/2026 — zona Perkins en móvil', () => {
       // Lo que DEBERÍA pasar: si se muestra, dice que es para un teclado físico.
       await expect(zona).toContainText(/teclado (físico|externo)/i, { timeout: 2000 });
     }
+    // Los puntos táctiles van primero: el punto 1 queda por encima de la zona
+    const yPunto = (await page.getByRole('button', { name: 'Punto 1', exact: true }).boundingBox())?.y ?? Infinity;
+    const yZona = (await zona.boundingBox())?.y ?? -Infinity;
+    expect(yPunto).toBeLessThan(yZona);
   });
 });
