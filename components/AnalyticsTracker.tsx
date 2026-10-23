@@ -142,9 +142,23 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     const deviceType = isMobile ? 'movil' : 'escritorio';
 
-    // Iniciar contador de duración
-    let sessionStartTime = Date.now();
+    // Contador de duración: tiempo VISIBLE acumulado de la visita, no el del último tramo.
+    // Hasta el 23/10/2026, volver a la pestaña reiniciaba el contador y el siguiente envío
+    // pisaba al anterior: una visita interrumpida guardaba solo su trozo final (medido el
+    // 16/09: en estancias reales >= 60 s, el 30,9 % registraba <= 29 s). Ahora cada envío
+    // lleva el TOTAL hasta ese momento, así que repetirlo es inocuo: el segundo dice lo
+    // mismo o más, y /api/analytics/duration se queda con el mayor.
+    let acumuladoMs = 0;
+    let inicioTramo = Date.now();
     let isActive = true;
+    const tiempoVisibleMs = () => acumuladoMs + (isActive ? Date.now() - inicioTramo : 0);
+    // Suma el tramo en curso al acumulado y apaga el envío. Lo usan las dos salidas —ocultar
+    // la pestaña y abandonar la página— porque una página restaurada del bfcache vuelve a
+    // ser visible y debe seguir sumando sobre todo lo anterior.
+    const cerrarTramo = () => {
+      if (isActive) acumuladoMs += Date.now() - inicioTramo;
+      isActive = false;
+    };
 
     // Detectar si llegó por un enlace compartido (?ref=share)
     const refParam = urlParams.get('ref');
@@ -221,10 +235,12 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
 
     // Registrar duración usando sendBeacon (más fiable para móviles)
     const registerDuration = () => {
-      const durationSeconds = Math.floor((Date.now() - sessionStartTime) / 1000);
+      const durationSeconds = Math.floor(tiempoVisibleMs() / 1000);
 
-      // Solo registrar si la duración es mayor a 2 segundos
-      if (durationSeconds > 2 && isActive) {
+      // Sin umbral mínimo desde el 23/10/2026: antes no se enviaba nada de 2 s o menos, y
+      // «sin dato» mezclaba la salida instantánea con la pérdida real. Una visita de 0-2 s
+      // sigue contando como «no se quedó» en la permanencia; solo sube la cobertura.
+      if (isActive) {
         const data = JSON.stringify({
           aplicacion: finalAppName,
           duracion_segundos: durationSeconds,
@@ -265,11 +281,13 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
         // Usuario salió de la app (minimizó, cambió de pestaña, etc.)
         console.log('[Analytics] Usuario salió de la app');
         registerDuration(); // Registrar ANTES de marcar inactivo (isActive debe ser true)
-        isActive = false;
+        cerrarTramo();
       } else {
-        // Usuario volvió a la app
+        // Usuario volvió a la app: abre un tramo nuevo SIN tirar lo ya acumulado. Sin
+        // condición a propósito: una pestaña abierta en segundo plano se monta oculta, sin
+        // evento y con isActive en true, y al mostrarse hay que descartar ese tiempo oculto.
         console.log('[Analytics] Usuario volvió a la app');
-        sessionStartTime = Date.now(); // Reiniciar contador
+        inicioTramo = Date.now();
         isActive = true;
       }
     };
@@ -280,7 +298,7 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
     // Añadir listener de visibilidad (CRÍTICO para móviles)
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Salida de la página. La línea «isActive = false» no es cosmética: al cerrar
+    // Salida de la página. El «isActive = false» de cerrarTramo no es cosmético: al cerrar
     // pestaña en escritorio se disparan beforeunload Y pagehide, y sin ella la duración
     // se enviaba DOS veces por salida. Medido en Vercel el 19/08/2026: 30K llamadas a
     // /duration frente a 16K de /track en 30 días.
@@ -291,7 +309,7 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
     const handleSalida = () => {
       if (isActive) {
         registerDuration();
-        isActive = false;
+        cerrarTramo();
       }
     };
     window.addEventListener('beforeunload', handleSalida);
@@ -322,6 +340,9 @@ export default function AnalyticsTracker({ applicationName, appName, extra }: An
     // Las dos correcciones van juntas a propósito: arreglar solo (1) dejaría la duración
     // enviada dos veces —aquí y en el listener colgado—, y la segunda pisaría a la primera,
     // porque el UPDATE de /api/analytics/duration apunta al id mayor de (sesion, app).
+    // (Desde el 23/10/2026 ese UPDATE se queda con el mayor de los dos valores y cada envío
+    // lleva el acumulado, así que un duplicado ya no pisaría; el listener colgado sí seguiría
+    // inflando, porque su closure suma desde que se montó.)
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('beforeunload', handleSalida);

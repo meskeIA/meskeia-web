@@ -64,9 +64,19 @@ export async function POST(request: NextRequest) {
       // Actualizar SOLO el registro de entrada (el último de esa sesión+app), no
       // todas sus filas: si una sesión tuviera varias entradas de la misma app,
       // el WHERE plano les ponía a todas la misma duración e inflaba las medias.
+      //
+      // Se queda con el MAYOR de los dos valores, no con el último (23/10/2026). El tracker
+      // envía el tiempo visible ACUMULADO de la visita, que solo crece, así que con los
+      // envíos en orden el MAX da lo mismo que el SET. Cubre los dos casos en que no llegan
+      // en orden: el beacon de «ocultar pestaña» que aterriza después del de salida, y el
+      // de una visita de 0-1 s que llega antes que su propio INSERT —desde que no hay umbral
+      // mínimo— y caería sobre la visita anterior de la misma app en esa sesión. Con SET la
+      // pisaría; con MAX solo la toca si tenía menos que esos 0-1 s. Un envío repetido
+      // tampoco puede inflar: repite la cifra.
+      // MAX escalar de SQLite devuelve NULL si un argumento es NULL: de ahí el COALESCE.
       await client.execute({
         sql: `UPDATE uso_aplicaciones
-              SET duracion_segundos = ?
+              SET duracion_segundos = MAX(COALESCE(duracion_segundos, 0), ?)
               WHERE id = (
                 SELECT id FROM uso_aplicaciones
                 WHERE sesion_id = ? AND aplicacion = ?

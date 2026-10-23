@@ -14,6 +14,13 @@
  * QUÉ EXIGE
  *   1. Que al salir de una app por un enlace interno se registre SU duración.
  *   2. Que no se registre DOS veces (el listener retirado no puede volver a disparar).
+ *   3. Que una visita interrumpida (ocultar la pestaña y volver) registre la SUMA de sus
+ *      tramos visibles, no el último ni el tiempo de reloj (23/10/2026: el contador se
+ *      reiniciaba al volver y el `SET` del endpoint pisaba el tramo anterior; en estancias
+ *      reales >= 60 s, el 30,9 % registraba <= 29 s).
+ *   4. Que una visita de menos de 2 s también registre su duración (23/10/2026: hasta
+ *      entonces el tracker no enviaba nada de 2 s o menos, y «sin dato» mezclaba la salida
+ *      instantánea con la pérdida real).
  *
  * POR QUÉ ES UN TEST DE NAVEGADOR Y NO UN CANDADO ESTÁTICO
  * Lo que falla no es una forma del código sino un hecho del runtime —qué eventos dispara una
@@ -55,9 +62,11 @@ interface EnvioDuracion {
  */
 async function prepararCaptura(page: Page) {
   await page.addInitScript(() => {
-    const w = window as unknown as { __duraciones: string[] };
+    const w = window as unknown as { __duraciones: string[]; __entradas: number };
     w.__duraciones = [];
+    w.__entradas = 0;
     const esDuracion = (url: unknown) => String(url).includes('/api/analytics/duration');
+    const esEntrada = (url: unknown) => String(url).includes('/api/analytics/track');
     const anotar = (cuerpo: unknown) => {
       if (cuerpo instanceof Blob) void cuerpo.text().then((t) => w.__duraciones.push(t));
       else if (typeof cuerpo === 'string') w.__duraciones.push(cuerpo);
@@ -73,9 +82,54 @@ async function prepararCaptura(page: Page) {
     window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' || input instanceof URL ? input : input.url;
       if (esDuracion(url)) anotar(init?.body);
+      if (esEntrada(url)) w.__entradas++;
       return fetchOriginal(input, init);
     };
   });
+}
+
+/**
+ * Espera a que el tracker se haya montado, que es cuando empieza a contar: su primer acto
+ * es el POST de entrada. Cronometrar desde `domcontentloaded` mediría también la
+ * hidratación, que en `next dev` puede llevarse un segundo o más, y los casos de abajo
+ * comparan cifras de pocos segundos.
+ *
+ * ⚠️ Y descarta lo capturado hasta ese momento, a propósito. En `next dev`, React StrictMode
+ * monta, desmonta y vuelve a montar cada efecto (2 POST de entrada por carga, medido el
+ * 23/10/2026), y ese desmontaje simulado envía una duración de 0 s. En producción no hay
+ * doble montaje y ese envío no existe; hasta el 23/10 tampoco se veía en dev, porque el
+ * umbral de 2 s se lo tragaba. Sin descartarlo, los casos contarían un envío que solo
+ * existe en el servidor de pruebas.
+ */
+async function esperarMontaje(page: Page) {
+  await page.waitForFunction(() => (window as unknown as { __entradas: number }).__entradas > 0, null, {
+    timeout: 15000,
+  });
+  await page.waitForTimeout(300); // el Blob del beacon se lee en asíncrono
+  await page.evaluate(() => {
+    (window as unknown as { __duraciones: string[] }).__duraciones = [];
+  });
+}
+
+/** Simula ocultar o mostrar la pestaña: lo que el tracker lee es `document.hidden`. */
+async function cambiarVisibilidad(page: Page, oculta: boolean) {
+  await page.evaluate((o) => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => o });
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => (o ? 'hidden' : 'visible'),
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+  }, oculta);
+}
+
+/** Sale de calculadora-iva por el primer enlace de RelatedApps (salto client-side). */
+async function saltarPorRelacionada(page: Page) {
+  const relacionada = page.locator('a[href*="#from=related-"]').first();
+  await expect(relacionada, 'la app de partida debe tener RelatedApps para poder saltar').toBeVisible();
+  await relacionada.click();
+  await page.waitForFunction((d) => window.location.pathname !== d, '/calculadora-iva/', { timeout: 10000 });
+  await page.waitForTimeout(1000); // margen para que salga el beacon
 }
 
 /** Envíos capturados hasta ahora, ya parseados, filtrados por app. */
@@ -93,8 +147,8 @@ test('la duración se registra al salir de una app por un enlace interno', async
   await prepararCaptura(page);
 
   await page.goto(`${ORIGEN}/calculadora-iva/`, { waitUntil: 'domcontentloaded' });
-  // El tracker solo envía duraciones de más de 2 s (salida instantánea = sin dato, por
-  // diseño). Se esperan 4 para quedar del lado seguro del umbral.
+  await esperarMontaje(page);
+  // Se esperan 4 s para que la cifra se distinga de una salida instantánea.
   await page.waitForTimeout(4000);
 
   // Salto client-side: el primer enlace de RelatedApps lleva #from=related-<slug>.
@@ -135,6 +189,7 @@ test('la duración también se registra al abandonar el sitio (carga completa)',
   await prepararCaptura(page);
 
   await page.goto(`${ORIGEN}/calculadora-iva/`, { waitUntil: 'domcontentloaded' });
+  await esperarMontaje(page);
   await page.waitForTimeout(4000);
   // Camino que ya funcionaba antes de la reparación: se comprueba que sigue funcionando y,
   // sobre todo, que sigue enviándose UNA sola vez por salida.
@@ -142,4 +197,78 @@ test('la duración también se registra al abandonar el sitio (carga completa)',
   await page.waitForTimeout(500);
 
   expect(await duracionesDe(page, 'calculadora-iva')).toHaveLength(1);
+});
+
+test('una visita interrumpida registra la SUMA de sus tramos visibles', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', { get: () => false });
+  });
+  await prepararCaptura(page);
+
+  await page.goto(`${ORIGEN}/calculadora-iva/`, { waitUntil: 'domcontentloaded' });
+  await esperarMontaje(page);
+  // 4 s visible · 4 s oculta · 4 s visible · salida por <Link>. Lo correcto son ~8 s.
+  // El defecto anterior guardaba 4 (el último tramo: el contador se reiniciaba al volver
+  // y el SET pisaba); contar el reloj daría 12 (la pestaña oculta no es estancia).
+  await page.waitForTimeout(4000);
+  await cambiarVisibilidad(page, true);
+  await page.waitForTimeout(4000);
+  await cambiarVisibilidad(page, false);
+  await page.waitForTimeout(4000);
+  await saltarPorRelacionada(page);
+
+  const envios = await duracionesDe(page, 'calculadora-iva');
+  expect(envios.length, 'debe haber un envío al ocultar y otro al salir').toBeGreaterThanOrEqual(2);
+  // El endpoint guarda el MAYOR de los envíos (MAX en el UPDATE), así que lo que queda en la
+  // base es el máximo, no el último que llegue.
+  const guardado = Math.max(...envios.map((e) => e.duracion_segundos));
+  expect(
+    guardado,
+    `se guardaría ${guardado} s de ~8 visibles: solo el último tramo (envíos: ` +
+      `${envios.map((e) => e.duracion_segundos).join(', ')})`
+  ).toBeGreaterThanOrEqual(7);
+  expect(guardado, `${guardado} s cuenta el tiempo con la pestaña oculta`).toBeLessThanOrEqual(10);
+});
+
+test('una pestaña abierta en segundo plano no cuenta el tiempo antes de mostrarse', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', { get: () => false });
+    // Se monta OCULTA y sin evento, como una pestaña abierta con clic central.
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
+  });
+  await prepararCaptura(page);
+
+  await page.goto(`${ORIGEN}/calculadora-iva/`, { waitUntil: 'domcontentloaded' });
+  await esperarMontaje(page);
+  // 4 s oculta antes de verla · 3 s visible · salida. Lo correcto son ~3 s, no ~7.
+  await page.waitForTimeout(4000);
+  await cambiarVisibilidad(page, false);
+  await page.waitForTimeout(3000);
+  await saltarPorRelacionada(page);
+
+  const envios = await duracionesDe(page, 'calculadora-iva');
+  expect(envios.length).toBeGreaterThan(0);
+  const guardado = Math.max(...envios.map((e) => e.duracion_segundos));
+  expect(guardado, `${guardado} s incluye el tiempo en que nadie había visto la pestaña`).toBeLessThanOrEqual(4);
+  expect(guardado).toBeGreaterThanOrEqual(2);
+});
+
+test('una visita de menos de 2 s también registra su duración', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', { get: () => false });
+  });
+  await prepararCaptura(page);
+
+  await page.goto(`${ORIGEN}/calculadora-iva/`, { waitUntil: 'domcontentloaded' });
+  await esperarMontaje(page);
+  await saltarPorRelacionada(page); // sin esperar: salida casi instantánea
+
+  const envios = await duracionesDe(page, 'calculadora-iva');
+  expect(
+    envios.length,
+    'sin envío en una visita corta: el umbral de 2 s sigue puesto, y «sin dato» vuelve a ' +
+      'mezclar la salida instantánea con la pérdida real'
+  ).toBe(1);
+  expect(envios[0].duracion_segundos).toBeLessThanOrEqual(2);
 });
