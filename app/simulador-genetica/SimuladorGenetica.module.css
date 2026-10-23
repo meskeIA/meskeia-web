@@ -527,8 +527,10 @@
   transition: background 0.2s;
 }
 
+/* Más oscuro que la base, no más claro (hallazgo 3446): el #3d918e escrito a mano daba 3,72:1 con
+   el texto blanco y el botón perdía en hover el contraste que gana en reposo (5,15:1) */
 .simulateBtn:hover {
-  background: #3d918e;
+  background: color-mix(in srgb, var(--secondary-boton) 85%, black);
 }
 
 .populationGrid {
@@ -605,6 +607,12 @@
   font-weight: 600;
   color: var(--primary-texto);
   margin-bottom: var(--spacing-sm);
+}
+
+/* En oscuro el tinte al 10 % dejaba el título #3FA5D1 en 4,40:1; al 5 %, 4,69:1 (hallazgo 3447,
+   familia del cabo C0278) */
+[data-theme='dark'] .chiSquare {
+  background: rgba(46, 134, 171, 0.05);
 }
 
 .chiSquareValue {
@@ -1638,11 +1646,18 @@
   color: #e5e7eb;
 }
 
+/*
+  En oscuro, relleno CLARO de marca con número oscuro (hallazgo 3448). Con --primary-boton
+  (#26718F) el número blanco daba 5,47:1, pero el relleno —lo único que marca el caso
+  seleccionado— quedaba a 2,52:1 de la tarjeta #2D2D2D (WCAG 1.4.11 pide 3:1), y entre 3:1 contra
+  la tarjeta y 4,5:1 con texto blanco apenas cabe un color. #3FA5D1 (--primary en oscuro) da 4,93:1
+  contra la tarjeta y 5,4:1 contra el #1F2937 de los no seleccionados, y #111827 encima, 6,2:1.
+*/
 [data-theme='dark'] .casoBotonActivo,
 [data-theme='dark'] .casoBotonActivo:hover {
-  background: var(--primary-boton);
-  border-color: var(--primary-boton);
-  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #111827;
 }
 
 [data-theme='dark'] .casoCuerpo {

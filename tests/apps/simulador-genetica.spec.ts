@@ -63,8 +63,8 @@ import { test, expect, Page } from '@playwright/test';
  * regresión sin marca. La re-inspección del 15/10/2026 dejó DOS hallazgos (3321, nombre de los
  * desplegables del rasgo 2; 3322, el corrector aceptaba 99 por 100) que se REPARARON ese mismo día
  * (01674bea y 4cce0c40) y quedan como regresión sin marca en su bloque «hallazgos reparados». La
- * re-inspección del 23/10/2026 (tras e27fbb16 y las tandas 1 y 2 del cabo C0070) deja CINCO
- * hallazgos ABIERTOS con `test.fail()`, en el último bloque del fichero.
+ * re-inspección del 23/10/2026 (tras e27fbb16 y las tandas 1 y 2 del cabo C0070) dejó CINCO
+ * hallazgos (3445-3449) que se REPARARON ese mismo día y quedan, sin marca, en el último bloque.
  */
 
 const RUTA = '/simulador-genetica/';
@@ -5483,7 +5483,7 @@ test.describe('Re-inspección 23/10/2026 · contraste tras C0070, en claro y en 
   });
 });
 
-test.describe('Re-inspección 23/10/2026 · hallazgos abiertos', () => {
+test.describe('Re-inspección 23/10/2026 · hallazgos reparados', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#casos-respuesta']);
@@ -5518,7 +5518,8 @@ test.describe('Re-inspección 23/10/2026 · hallazgos abiertos', () => {
     }
   });
 
-  test.fail('ABIERTO · accesibilidad, bajo — «Simular» en hover pinta el texto blanco sobre #3d918e: 3,72:1', async ({ page }) => {
+  // REPARADO (hallazgo 3446): el hover oscurece --secondary-boton en vez de aclararlo.
+  test('REPARADO (3446) · accesibilidad, bajo — «Simular» en hover pinta el texto blanco sobre #3d918e: 3,72:1', async ({ page }) => {
     // dfaf84a2 pasó la base de .simulateBtn de var(--secondary) (2,80:1) a var(--secondary-boton)
     // #327874 (5,15:1), pero su :hover lleva el hexadecimal #3d918e escrito a mano, que no es de la
     // marca y la campaña no tocó: blanco encima da 3,72:1 en los dos temas (texto de 13,3 px y 600,
@@ -5536,7 +5537,8 @@ test.describe('Re-inspección 23/10/2026 · hallazgos abiertos', () => {
     }
   });
 
-  test.fail('ABIERTO · accesibilidad, bajo — en oscuro el título «Prueba Chi-cuadrado (χ²)» queda en 4,40:1 sobre su tinte de marca (C0278)', async ({
+  // REPARADO (hallazgo 3447): en oscuro el tinte de .chiSquare baja al 5 %.
+  test('REPARADO (3447) · accesibilidad, bajo — en oscuro el título «Prueba Chi-cuadrado (χ²)» queda en 4,40:1 sobre su tinte de marca (C0278)', async ({
     page,
   }) => {
     // .chiSquareTitle pasó a --primary-texto (4488bd1d), que en oscuro es el mismo #3FA5D1 de antes,
@@ -5558,7 +5560,8 @@ test.describe('Re-inspección 23/10/2026 · hallazgos abiertos', () => {
     expect.soft(oscuro.ratio, `oscuro: ${oscuro.color} sobre ${oscuro.fondo}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test.fail('ABIERTO · accesibilidad, bajo — en oscuro el caso seleccionado se marca solo con un relleno a 2,52:1 de la tarjeta (WCAG 1.4.11)', async ({
+  // REPARADO (hallazgo 3448): en oscuro, relleno #3FA5D1 (--primary) con el número en #111827.
+  test('REPARADO (3448) · accesibilidad, bajo — en oscuro el caso seleccionado se marca solo con un relleno a 2,52:1 de la tarjeta (WCAG 1.4.11)', async ({
     page,
   }) => {
     // dfaf84a2 cambió [data-theme='dark'] .casoBotonActivo de var(--primary) (#3FA5D1 en oscuro) a
@@ -5583,9 +5586,13 @@ test.describe('Re-inspección 23/10/2026 · hallazgos abiertos', () => {
     await page.mouse.move(0, 0);
     const practicar = await contrastePixel(page.locator('button[class*="casoBotonPractica"]'), 'relleno');
     expect.soft(practicar.ratio, `oscuro, Practicar: ${practicar.color} sobre ${practicar.fondo}`).toBeGreaterThanOrEqual(3);
+    // Y el número del seleccionado sigue legible sobre su relleno nuevo
+    const texto = await contrastePixel(page.locator('button[class*="casoBotonPractica"]'), 'texto');
+    expect.soft(texto.ratio, `oscuro, texto de Practicar: ${texto.color} sobre ${texto.fondo}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test.fail('ABIERTO · accesibilidad, bajo — «EMERGENCIAS MÉDICAS» del aviso médico (DisclaimerCard) en 4,36:1 en claro y 4,14:1 en oscuro', async ({
+  // REPARADO (hallazgo 3449): components/DisclaimerCard.module.css, #b71c1c en claro y #ff8a80 en oscuro.
+  test('REPARADO (3449) · accesibilidad, bajo — «EMERGENCIAS MÉDICAS» del aviso médico (DisclaimerCard) en 4,36:1 en claro y 4,14:1 en oscuro', async ({
     page,
   }) => {
     // components/DisclaimerCard.module.css, .emergency: #d32f2f sobre #ffebee (4,36:1) y, en oscuro,
