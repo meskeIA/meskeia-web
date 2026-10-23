@@ -1458,30 +1458,45 @@ test.describe('re-inspección del 23/10/2026: rechazo y promesas', () => {
     expect(dialogos).toBe(0);
   });
 
-  test('CASO 18 — si Google Fonts no responde, el resumen no dice «Lexend Deca» mientras pinta Arial (ABIERTO, hallazgo (inspector 23/10/2026))', async ({
+  test('CASO 18 — si Google Fonts no responde, el resumen no dice «Lexend Deca» mientras pinta Arial (hallazgo 3432)', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 23/10/2026). Lexend se pide a fonts.googleapis.com y la app
+    // REPARADO, hallazgo 3432 (inspector 23/10/2026): el <link> tiene `onerror` y, al cargar la
+    // hoja, se pide la fuente a `document.fonts`; si no llega, el resumen dice «Arial (Lexend no
+    // ha podido cargarse)». Lexend se pide a fonts.googleapis.com y la app
     // solo la aplica en el `onload` del <link>; si la red lo bloquea (un colegio, una empresa, sin
     // conexión y sin caché) no hay `onerror`: el texto se pinta en «Arial, sans-serif», pero el
     // botón «Lexend» sigue marcado y el resumen —visible y hablado— dice «Lexend Deca · 20 px…».
     // Pulsar «Arial» y «Lexend» no cambia nada a la vista. Medido el 23/10/2026 con la petición
     // abortada: font-family «Arial, sans-serif», resumen «Lexend Deca · 20 px · interlineado 1,9…».
     // Lo que se afirma: el resumen nombra la fuente que de verdad se pinta.
-    test.fail(true, 'ABIERTO, hallazgo (inspector 23/10/2026): sin Google Fonts dice Lexend y pinta Arial');
     await page.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
     await abrir(page);
     const resumen = page.locator('[role="status"]').filter({ hasText: 'interlineado' });
+    await expect(resumen).toContainText('Arial (Lexend no ha podido cargarse) · 20 px');
     await expect
       .poll(
         async () => {
           const pinta = await vistaPrevia(page).evaluate((el) => getComputedStyle(el).fontFamily);
           const dice = (await resumen.textContent()) ?? '';
-          return pinta.includes('Lexend') || !dice.includes('Lexend');
+          // «Lexend Deca» solo si se pinta; el aviso «Lexend no ha podido cargarse» sí vale
+          return pinta.includes('Lexend') || !dice.includes('Lexend Deca');
         },
         { timeout: 5000 },
       )
       .toBe(true);
+  });
+
+  test('CASO 18.bis — si llega la hoja de Google Fonts pero no el fichero de la fuente, tampoco dice «Lexend Deca» (hallazgo 3432)', async ({
+    page,
+  }) => {
+    // La hoja de estilos (fonts.googleapis.com) y el fichero de la fuente (fonts.gstatic.com)
+    // vienen de dominios distintos: un `onload` del <link> no prueba que la fuente haya llegado.
+    await page.route(/fonts\.gstatic\.com/, (r) => r.abort());
+    await abrir(page);
+    const resumen = page.locator('[role="status"]').filter({ hasText: 'interlineado' });
+    await expect(resumen).toContainText('Arial (Lexend no ha podido cargarse) · 20 px', { timeout: 15000 });
+    await expect(vistaPrevia(page)).toHaveCSS('font-family', 'Arial, sans-serif');
   });
 
   test('CASO 19 — con Ctrl+P sale el texto adaptado y no la página entera, o la FAQ no lo promete (ABIERTO, hallazgo (inspector 23/10/2026))', async ({

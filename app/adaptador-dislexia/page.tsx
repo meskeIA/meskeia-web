@@ -16,6 +16,9 @@ import { formatNumber } from '@/lib';
 // Tipos de fuente disponibles
 type TipoFuente = 'sistema' | 'lexend' | 'mono';
 
+/** Lexend llega de Google Fonts: puede tardar, llegar o no llegar nunca (hallazgo 3432). */
+type EstadoLexend = 'cargando' | 'cargada' | 'fallida';
+
 // Preferencias de lectura guardadas en localStorage
 interface Preferencias {
   fuente: TipoFuente;
@@ -149,7 +152,7 @@ export default function AdaptadorDislexiaPage() {
   const [texto, setTexto] = useState(TEXTO_EJEMPLO);
   const [prefs, setPrefs] = useState<Preferencias>(PREFERENCIAS_DEFAULT);
   const [copia, setCopia] = useState<EstadoCopia>('nada');
-  const [fonteCargada, setFonteCargada] = useState(false);
+  const [estadoLexend, setEstadoLexend] = useState<EstadoLexend>('cargando');
   /** ¿Se ha leído ya lo guardado? Hasta entonces no se escribe nada (hallazgo 932). */
   const [cargadas, setCargadas] = useState(false);
 
@@ -228,18 +231,45 @@ export default function AdaptadorDislexiaPage() {
     } catch { /* ignorar errores de localStorage */ }
   }, [prefs, cargadas]);
 
-  // Cargar Lexend desde Google Fonts
+  /**
+   * Cargar Lexend desde Google Fonts (hallazgo 3432).
+   *
+   * Antes solo había `onload`: si la red bloqueaba Google Fonts (un colegio, una empresa, sin
+   * conexión y sin caché) el texto se pintaba en Arial y el resumen seguía diciendo «Lexend
+   * Deca». Y que la hoja de estilos cargue no basta: el fichero de la fuente viene de otro
+   * dominio (fonts.gstatic.com), así que se pide la fuente a `document.fonts` y solo cuenta
+   * como cargada si de verdad llega algún tipo.
+   */
   useEffect(() => {
-    if (!document.querySelector('link[data-font="lexend"]')) {
+    let vivo = true;
+    const fijar = (estado: EstadoLexend) => {
+      if (vivo) setEstadoLexend(estado);
+    };
+    const comprobarFuente = () => {
+      document.fonts
+        .load("400 1em 'Lexend Deca'")
+        .then(caras => fijar(caras.length > 0 ? 'cargada' : 'fallida'))
+        .catch(() => fijar('fallida'));
+    };
+    const existente = document.querySelector<HTMLLinkElement>('link[data-font="lexend"]');
+    if (!existente) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = 'https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;500;600&display=swap';
       link.setAttribute('data-font', 'lexend');
+      link.onload = comprobarFuente;
+      link.onerror = () => fijar('fallida');
       document.head.appendChild(link);
-      link.onload = () => setFonteCargada(true);
+    } else if (!existente.sheet) {
+      // Otro montaje ya la pidió y aún no ha llegado: se espera a esa misma petición
+      existente.addEventListener('load', comprobarFuente);
+      existente.addEventListener('error', () => fijar('fallida'));
     } else {
-      setFonteCargada(true);
+      comprobarFuente();
     }
+    return () => {
+      vivo = false;
+    };
   }, []);
 
   const actualizarPref = useCallback(
@@ -293,7 +323,7 @@ export default function AdaptadorDislexiaPage() {
   const getFuenteFamily = (): string => {
     switch (prefs.fuente) {
       case 'lexend':
-        return fonteCargada ? "'Lexend Deca', Arial, sans-serif" : 'Arial, sans-serif';
+        return estadoLexend === 'cargada' ? "'Lexend Deca', Arial, sans-serif" : 'Arial, sans-serif';
       case 'mono':
         return "'Courier New', Courier, monospace";
       default:
@@ -301,8 +331,14 @@ export default function AdaptadorDislexiaPage() {
     }
   };
 
+  // El resumen nombra la fuente que se PINTA (hallazgo 3432): sin Lexend, se dice. Mientras
+  // carga no se anuncia nada aparte: el resumen es región viva y daría dos avisos en cada visita.
   const nombreFuente =
-    prefs.fuente === 'lexend' ? 'Lexend Deca' : prefs.fuente === 'mono' ? 'Courier New' : 'Arial';
+    prefs.fuente === 'lexend'
+      ? estadoLexend === 'fallida'
+        ? 'Arial (Lexend no ha podido cargarse)'
+        : 'Lexend Deca'
+      : prefs.fuente === 'mono' ? 'Courier New' : 'Arial';
   const nombreColorFondo =
     COLORES_FONDO.find(c => c.color === prefs.colorFondo)?.nombre ?? 'personalizado';
 
