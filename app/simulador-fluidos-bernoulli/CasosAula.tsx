@@ -97,7 +97,13 @@ export default function CasosAula({ onCargar }: Props) {
     // y «70.47» y devuelve NaN con cualquier otra cosa, y de ese NaN se encarga
     // comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     const valor = parseSpanishNumber(respuesta.replace(/[−‒–]/g, '-'));
-    const r = comprobarRespuesta(valor, esperado);
+    // Con la respuesta sin redondear, los decimales y la magnitud (hallazgos 3424 y 3425)
+    const r = comprobarRespuesta(valor, esperado, {
+      exacto: practica ? practica.exacto : caso.exacto,
+      decimales: datos.decimales ?? 2,
+      magnitud: datos.magnitud,
+      redondeoIntermedio: !practica && caso.redondeoIntermedio === true,
+    });
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 

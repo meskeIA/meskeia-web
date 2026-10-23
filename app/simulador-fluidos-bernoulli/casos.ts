@@ -37,8 +37,9 @@
  *    y presiones como las imprime `fmtPresion`: en Pa sin decimales por debajo de 10.000 Pa y en
  *    kPa con dos decimales por encima. Así el alumno puede cargar el caso y comparar.
  *
- * ⚠️ **Por qué los casos de presión ABSOLUTA tienen caídas grandes.** La tolerancia es el 1 %
- *    del valor, y el 1 % de 101 kPa es 1 kPa: en el Venturi de fábrica (caída de 0,49 kPa) quien
+ * ⚠️ **Por qué los casos de presión ABSOLUTA tienen caídas grandes.** En las respuestas que exigen
+ *    redondear la tolerancia es el 1 % del valor (en las exactas es 0: `toleranciaDe`), y el 1 % de
+ *    101 kPa es 1 kPa: en el Venturi de fábrica (caída de 0,49 kPa) quien
  *    no aplicara Bernoulli en absoluto acertaría. Por eso el caso 5 usa D₂/D₁ = 0,4 y 10 L/s
  *    (caída de 30,85 kPa) y el 9, 5 m de desnivel (45,13 kPa): ahí olvidar el término de v₁², el
  *    ½, la densidad correcta o usar g = 10 da una respuesta FUERA de la tolerancia.
@@ -63,7 +64,14 @@ import {
   type GeomId,
   type SeccionCalculada,
 } from './motor';
-import { corregirNumero, dentroDeTolerancia, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import {
+  corregirNumero,
+  dentroDeTolerancia,
+  exigeRedondeo,
+  redondearA,
+  textoDesviacion,
+  toleranciaRelativa,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 export { G, P_ATMOSFERICA } from './motor';
 
@@ -439,9 +447,26 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
 
 /* ─────────────────────────── Corrección ─────────────────────────── */
 
-/** El MAYOR entre 0,01 y el 1 % del valor. */
-export function toleranciaDe(valor: number): number {
-  return toleranciaRelativa(valor);
+/**
+ * Tolerancia de la corrección (hallazgo 3424, cabo C0267, 23/10/2026).
+ *
+ *   · Respuesta que EXIGE redondear (lleva π, una raíz o un cociente que no cierra): la relativa
+ *     de siempre, el mayor entre 0,01 y el 1 %, sobre la que están pensados los casos de presión
+ *     de la cabecera («por qué los casos de presión ABSOLUTA tienen caídas grandes»).
+ *   · Respuesta EXACTA a los decimales pedidos (ṁ = 920·0,0025 = 2,3; v₂ = 1,5·(10/5)² = 6, donde
+ *     π se cancela; D₂ = 2·√(1,5/6) = 1): tolerancia 0. Antes el 1 % aprobaba 2,28 y 2,32 para el
+ *     2,3, o 5,94 y 6,05 para el 6, cifras que no son ningún redondeo de la respuesta. Es la
+ *     política de redondeo de los precedentes (3322, 3342, 3363) en el único sitio donde la
+ *     relativa no tiene nada que absorber.
+ *   · `redondeoIntermedio`: el caso cuyo enunciado MANDA trabajar con cifras redondeadas. El 10
+ *     (6,25 exacto) pide usar la columna de áreas de la tabla, 78,54/12,57 = 6,248, y ese 6,248
+ *     tiene que seguir valiendo.
+ *
+ * `exacto` es la respuesta SIN redondear: con la ya redondeada, todo parecería exacto.
+ */
+export function toleranciaDe(exacto: number, decimales = 2, redondeoIntermedio = false): number {
+  if (redondeoIntermedio || exigeRedondeo(exacto, decimales)) return toleranciaRelativa(exacto);
+  return 0;
 }
 
 export interface Veredicto {
@@ -451,11 +476,46 @@ export interface Veredicto {
   tolerancia: number;
 }
 
+/** Lo que `comprobarRespuesta` necesita saber del caso, además de su respuesta. */
+export interface OpcionesComprobacion {
+  /** La respuesta sin redondear. Por defecto, la redondeada. */
+  exacto?: number;
+  /** Decimales que pide el enunciado. Por defecto 2. */
+  decimales?: number;
+  /** Qué se pregunta: decide el aviso del signo (hallazgo 3425). */
+  magnitud?: Magnitud;
+  /** El enunciado manda arrastrar un redondeo (caso 10). */
+  redondeoIntermedio?: boolean;
+}
+
+/**
+ * Por qué un negativo es imposible en cada magnitud que no es una diferencia (hallazgo 3425).
+ * Antes cualquier respuesta con el signo cambiado recibía «El valor es correcto pero el signo no:
+ * ¿la presión sube o baja entre esas dos secciones?», también un diámetro o un caudal másico.
+ */
+const NEGATIVO_IMPOSIBLE: Partial<Record<Magnitud, string>> = {
+  velocidad: 'Esa velocidad es la rapidez con la que avanza el fluido: no puede ser negativa.',
+  velocidadContinuidad: 'Esa velocidad es la rapidez con la que avanza el fluido: no puede ser negativa.',
+  velocidadSeccion: 'Esa velocidad es la rapidez con la que avanza el fluido: no puede ser negativa.',
+  diametroContinuidad: 'Un diámetro no puede ser negativo.',
+  presionAbsoluta: 'Una presión absoluta no puede ser negativa: se mide desde el vacío.',
+  razonVelocidades: 'Es un cociente de dos velocidades positivas: no puede ser negativo.',
+  caudalMasico: 'Un caudal másico no puede ser negativo: son los kilos que pasan cada segundo.',
+  caudalVenturi: 'Un caudal no puede ser negativo: son los litros que pasan cada segundo.',
+};
+
 /** Corrige la respuesta del alumno. Nunca lanza. */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
+export function comprobarRespuesta(
+  usuario: number,
+  esperado: number,
+  opciones: OpcionesComprobacion = {},
+): Veredicto {
+  const exacto = opciones.exacto ?? esperado;
+  const tol = toleranciaDe(exacto, opciones.decimales ?? 2, opciones.redondeoIntermedio);
   // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
-  // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
-  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
+  // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica). Los negativos de
+  // las magnitudes que no son diferencias se tratan abajo, con su propio motivo.
+  const c = corregirNumero(usuario, esperado, { tolerancia: tol, magnitud: 'real' });
   const { diferencia, tolerancia } = c;
 
   if (c.estado === 'no-numerico') {
@@ -472,8 +532,16 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
     return { correcto: true, motivo: '¡Correcto!', diferencia, tolerancia };
   }
 
+  // Un negativo donde la magnitud no puede serlo: se dice por qué, sin hablar de presión (3425).
+  const imposible = opciones.magnitud ? NEGATIVO_IMPOSIBLE[opciones.magnitud] : undefined;
+  if (imposible && usuario < 0) {
+    return { correcto: false, motivo: imposible, diferencia, tolerancia };
+  }
+
   // Un fallo de signo en una diferencia de presión merece su propio aviso: es EL error del tema.
-  if (esperado !== 0 && dentroDeTolerancia(-usuario, esperado, tolerancia)) {
+  // Solo en las diferencias: sin magnitud (llamadas antiguas) se mantiene el comportamiento.
+  const esDiferencia = opciones.magnitud === undefined || opciones.magnitud === 'diferenciaPresion';
+  if (esDiferencia && esperado !== 0 && dentroDeTolerancia(-usuario, esperado, tolerancia)) {
     return {
       correcto: false,
       motivo: 'El valor es correcto pero el signo no: ¿la presión sube o baja entre esas dos secciones?',
@@ -482,9 +550,10 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
     };
   }
 
+  // Con tolerancia 0 la desviación puede ser de milésimas: no se escribe «0» (hallazgo 3369)
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 2)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, 2, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };
@@ -571,7 +640,13 @@ export interface Caso {
   categoria: 'abstracto' | 'aplicado';
   datos: DatosCaso;
   etiquetaRespuesta: string;
+  /** La respuesta redondeada a los decimales pedidos: la que se enseña. */
   respuesta: number;
+  /** La respuesta sin redondear: decide si es exacta (ver `toleranciaDe`). */
+  exacto: number;
+  decimales: number;
+  /** El enunciado manda trabajar con cifras redondeadas de la tabla (caso 10). */
+  redondeoIntermedio?: boolean;
   respuestaTexto: string;
   pasos: string[];
   pista: string;
@@ -583,7 +658,7 @@ export interface Caso {
  *
  * Sin ciudades, países ni monedas: el 91 % de este canal es de fuera de España.
  */
-const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'pasos'>> = [
+const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'exacto' | 'decimales' | 'respuestaTexto' | 'pasos'>> = [
   {
     id: 1,
     titulo: 'Velocidad a partir del caudal',
@@ -710,6 +785,8 @@ const DEFINICIONES: ReadonlyArray<Omit<Caso, 'respuesta' | 'respuestaTexto' | 'p
       'Un modelo de vaso sanguíneo es un tubo por el que circula sangre (ρ = 1060 kg/m³) a 1 L/s. En un tramo, el diámetro se reduce al 40 % del original (D₂/D₁ = 0,4), como en una estenosis. ¿Cuántas veces más rápido va la sangre en el estrechamiento que antes de él? Resuélvelo con las áreas de las dos secciones; si lo cargas en el simulador, usa su columna de áreas y no la de velocidades, que va redondeada a centésimas y desvía el cociente.',
     categoria: 'aplicado',
     datos: { magnitud: 'razonVelocidades', geometria: 'estenosis', fluido: 'sangre', caudalLs: 1, ratio: 0.4 },
+    // 6,25 es exacto, pero el enunciado manda usar las áreas redondeadas de la tabla (6,248)
+    redondeoIntermedio: true,
     etiquetaRespuesta: 'v₂/v₁ (sin unidad)',
     pista: 'El caudal y la densidad no hacen falta: v₂/v₁ = A₁/A₂ = (D₁/D₂)².',
   },
@@ -752,6 +829,8 @@ export const CASOS: readonly Caso[] = DEFINICIONES.map((def) => {
   return {
     ...def,
     respuesta: valor,
+    exacto: r.ok ? r.valor : NaN,
+    decimales,
     respuestaTexto: textoRespuesta(valor, def.datos),
     pasos: r.pasos,
   };
@@ -784,7 +863,10 @@ function aleatorioCon(semilla: number): () => number {
 export interface Ejercicio {
   enunciado: string;
   datos: DatosCaso;
+  /** Redondeada a los decimales pedidos, para enseñarla. */
   respuesta: number;
+  /** Sin redondear, para saber si es exacta (ver `toleranciaDe`). */
+  exacto: number;
   etiquetaRespuesta: string;
   pasos: string[];
 }
@@ -863,6 +945,7 @@ export function generarEjercicioAleatorio(semilla = Date.now()): Ejercicio {
     enunciado,
     datos,
     respuesta: r.ok ? redondear(r.valor, datos.decimales ?? 2) : NaN,
+    exacto: r.ok ? r.valor : NaN,
     etiquetaRespuesta: etiqueta,
     pasos: r.pasos,
   };

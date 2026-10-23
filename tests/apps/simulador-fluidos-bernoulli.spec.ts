@@ -890,8 +890,12 @@ test.describe('simulador-fluidos-bernoulli · casos para clase', () => {
     expect(comprobarRespuesta(-486, -486).correcto).toBe(true);
     expect(comprobarRespuesta(NaN, 6).correcto).toBe(false);
     expect(comprobarRespuesta(486, -486).motivo).toMatch(/signo/i);
-    expect(toleranciaDe(0)).toBe(0.01);
-    expect(toleranciaDe(-486)).toBeCloseTo(4.86, 10);
+    // Hallazgo 3424: la relativa (el mayor entre 0,01 y el 1 %) solo donde hay que redondear;
+    // una respuesta exacta a los decimales pedidos tiene tolerancia 0.
+    expect(toleranciaDe(-486.34, 0)).toBeCloseTo(4.8634, 10); // caso 4: −486,34 → −486
+    expect(toleranciaDe(0.2546, 2)).toBe(0.01); // caso 1: el 1 % no llega a 0,01
+    expect(toleranciaDe(2.3, 1)).toBe(0); // caso 7: 920·0,0025, exacto
+    expect(toleranciaDe(6.25, 2, true)).toBeCloseTo(0.0625, 10); // caso 10: manda arrastrar
   });
 });
 
@@ -2336,17 +2340,32 @@ test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura'
   // 3322 (genética). El caso 10 (6,25 exacto) SÍ arrastra un redondeo legítimo —su enunciado manda
   // usar las áreas de la tabla, 78,54/12,57 = 6,248—, y la reparación debe seguir aceptándolo.
   // Caso: caso 7 → «2,28» → esperado «No es correcto» · obtenido «✅ ¡Correcto!».
-  test('HALLAZGO · C0267: una respuesta exacta no aprueba lo que no es ningún redondeo de ella', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el 1 % aprueba 2,28 para un 2,3 exacto (caso 7) y 5,94 para un 6 exacto (caso 2)');
+  // REPARADO (hallazgo 3424): `toleranciaDe` da 0 a la respuesta exacta y deja la relativa para la
+  // que exige redondear y para el caso 10, cuyo enunciado manda arrastrar el redondeo de la tabla.
+  test('REPARADO (3424) · C0267: una respuesta exacta no aprueba lo que no es ningún redondeo de ella', async ({ page }) => {
     const caso7 = CASOS_AULA.find((c) => c.id === 7)!;
     expect(caso7.respuesta).toBe(2.3); // 920 · 0,0025
-    // En el motor: |2,28 − 2,3| = 0,02 ≤ 0,023 (el 1 %) → hoy «correcto»
-    expect(comprobarRespuesta(2.28, caso7.respuesta).correcto).toBe(false);
+    // En el motor: |2,28 − 2,3| = 0,02, y la tolerancia de un 2,3 exacto es 0
+    expect(comprobarRespuesta(2.28, caso7.respuesta, { exacto: caso7.exacto, decimales: 1 }).correcto).toBe(false);
     await seccionCasos(page).getByRole('button', { name: /^Caso 7:/ }).click();
     expect(await responder(page, '2,28')).toContain('No es correcto');
-    // Caso 2: 6 m/s exacto; 5,94 está a 0,06, justo el 1 %
+    expect(await responder(page, '2,32')).toContain('No es correcto');
+    // Con tolerancia 0 la desviación de milésimas no se escribe «0»: |2,301 − 2,3| = 0,001
+    expect(await responder(page, '2,301')).toContain('Te has desviado 0,001 de la respuesta');
+    // Caso 2: 6 m/s exacto (π se cancela); 5,94 está a 0,06, justo el 1 %
     await seccionCasos(page).getByRole('button', { name: /^Caso 2:/ }).click();
     expect(await responder(page, '5,94')).toContain('No es correcto');
+    expect(await responder(page, '6')).toContain('¡Correcto!');
+    // Caso 3: D₂ = 2·√(1,5/6) = 1 cm exacto
+    await seccionCasos(page).getByRole('button', { name: /^Caso 3:/ }).click();
+    expect(await responder(page, '0,99')).toContain('No es correcto');
+    // Caso 10: 6,25 exacto, pero 78,54/12,57 = 6,248 con las áreas de la tabla sigue valiendo
+    await seccionCasos(page).getByRole('button', { name: /^Caso 10:/ }).click();
+    expect(await responder(page, '6,248')).toContain('¡Correcto!');
+    expect(await responder(page, '6,25')).toContain('¡Correcto!');
+    // Caso 4 (−486,34 Pa → «−486»): exige redondear, la relativa sigue (±4,86 Pa)
+    await seccionCasos(page).getByRole('button', { name: /^Caso 4:/ }).click();
+    expect(await responder(page, '−489')).toContain('¡Correcto!');
   });
 
   // HALLAZGO (contenido, bajo) — ABIERTO (Inspector 23/10/2026). `comprobarRespuesta` da el aviso
@@ -2358,16 +2377,23 @@ test.describe('Inspector 23/10/2026 — 3.ª re-inspección con firma de rotura'
   // Caso: caso 3 (D₂ = 1 cm) → «−1» → esperado un rechazo que no hable de presión (un diámetro no
   // es negativo) · obtenido «❌ El valor es correcto pero el signo no: ¿la presión sube o baja
   // entre esas dos secciones?».
-  test('HALLAZGO · el aviso del signo no habla de presión en un diámetro, una velocidad o un caudal', async ({
+  // REPARADO (hallazgo 3425): el aviso del signo solo en las diferencias de presión; en las demás
+  // magnitudes un negativo es imposible y se dice por qué.
+  test('REPARADO (3425) · el aviso del signo no habla de presión en un diámetro, una velocidad o un caudal', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: «−1» en el caso 3 (un diámetro) recibe «¿la presión sube o baja…?»');
     await seccionCasos(page).getByRole('button', { name: /^Caso 3:/ }).click();
     const diametro = await responder(page, '−1'); // D₂ = 2·√(1,5/6) = 1 cm
     expect(diametro).not.toContain('¡Correcto!');
     expect(diametro).not.toMatch(/presión/);
+    expect(diametro).toContain('Un diámetro no puede ser negativo');
     await seccionCasos(page).getByRole('button', { name: /^Caso 7:/ }).click();
-    expect(await responder(page, '−2,3')).not.toMatch(/presión/); // ṁ = 2,3 kg/s
+    const masico = await responder(page, '−2,3'); // ṁ = 2,3 kg/s
+    expect(masico).not.toMatch(/presión/);
+    expect(masico).toContain('Un caudal másico no puede ser negativo');
+    // En una diferencia de presión el aviso del signo sigue: caso 4, P₂ − P₁ = −486 Pa
+    await seccionCasos(page).getByRole('button', { name: /^Caso 4:/ }).click();
+    expect(await responder(page, '486')).toContain('el signo no');
   });
 
   // REGRESIÓN del 3407 (reparado el 22/10/2026), con el recorrido entero y no solo el cambio de
