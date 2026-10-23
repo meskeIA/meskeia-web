@@ -903,7 +903,8 @@ export default function AdaptadorDislexiaPage() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Se puede imprimir el texto con los ajustes aplicados?</dt>
-              <dd>Sí. Puedes usar la función de imprimir del navegador (Ctrl+P). El texto de la vista previa se imprimirá con la fuente y el tamaño que hayas configurado, aunque el color de fondo depende de la configuración de tu impresora.</dd>
+              {/* Promesa bajada a lo que la app hace (hallazgo 3433): imprimir desde el navegador saca la página entera */}
+              <dd>Sí, pasando por un procesador de textos. Si imprimes esta página desde el navegador, sale entera: el panel de ajustes, el área de texto y, más abajo, la vista previa. Para tener en papel solo el texto adaptado, pulsa «Copiar texto» y pégalo en un procesador de textos (Word, LibreOffice, Google Docs…): llega con el tamaño, el espaciado y el interlineado que hayas configurado, y con la fuente si ese programa la tiene, y desde allí lo imprimes. El color de fondo depende del programa y de la impresora.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Hay diferencia entre dislexia y baja visión?</dt>

@@ -1499,10 +1499,13 @@ test.describe('re-inspección del 23/10/2026: rechazo y promesas', () => {
     await expect(vistaPrevia(page)).toHaveCSS('font-family', 'Arial, sans-serif');
   });
 
-  test('CASO 19 — con Ctrl+P sale el texto adaptado y no la página entera, o la FAQ no lo promete (ABIERTO, hallazgo (inspector 23/10/2026))', async ({
+  test('CASO 19 — con Ctrl+P sale el texto adaptado y no la página entera, o la FAQ no lo promete (hallazgo 3433)', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 23/10/2026). La FAQ visible responde «¿Se puede imprimir el
+    // REPARADO, hallazgo 3433 (inspector 23/10/2026), por el lado de la promesa (frontera
+    // «promesa», N2): la FAQ dice ahora que imprimir desde el navegador saca la página entera y
+    // manda a «Copiar texto» + procesador de textos, que es lo que sí da solo el texto adaptado.
+    // Que en papel quede solo la vista previa sería ampliar la app: lo decide el usuario. La FAQ visible responde «¿Se puede imprimir el
     // texto con los ajustes aplicados?» con «Sí. Puedes usar la función de imprimir del navegador
     // (Ctrl+P). El texto de la vista previa se imprimirá…». No hay estilos de impresión: medido
     // el 23/10/2026, en papel A4 salen 4 páginas con la cabecera, el aviso legal, el aviso de
@@ -1510,9 +1513,14 @@ test.describe('re-inspección del 23/10/2026: rechazo y promesas', () => {
     // texto con el texto SIN adaptar y, a partir del 55 % del documento, la vista previa. La
     // reparación puede ser cualquiera de las dos: que en papel solo quede el texto adaptado, o
     // que la FAQ diga lo que pasa.
-    test.fail(true, 'ABIERTO, hallazgo (inspector 23/10/2026): Ctrl+P imprime la página entera');
     await abrir(page);
+    const faq = page.locator('dt', { hasText: '¿Se puede imprimir el texto con los ajustes aplicados?' }).locator('xpath=following-sibling::dd[1]');
+    await expect(faq).toContainText('Si imprimes esta página desde el navegador, sale entera');
+    await expect(faq).toContainText('«Copiar texto»');
+    // «Copiar texto» existe y se llama así
+    await expect(page.getByRole('button', { name: 'Copiar texto' })).toBeVisible();
     const prometeCtrlP = await page.evaluate(() => (document.body.textContent ?? '').includes('(Ctrl+P)'));
+    expect(prometeCtrlP).toBe(false);
     await page.emulateMedia({ media: 'print' });
     const enPapel = await page.evaluate(() => {
       const seVe = (sel: string): boolean => {
