@@ -1,7 +1,8 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { enfocarALaVista } from '@/lib';
 import styles from './QuizConceptosFinancieros.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
@@ -68,6 +69,27 @@ export default function QuizConceptosFinancierosPage() {
     setQuizTerminado(false);
   };
 
+  /**
+   * Foco (familia de los quizzes, cabo C0018). La opción elegida se deshabilita y «Siguiente
+   * pregunta», «Ver resultado» y «Repetir quiz» se desmontan al pulsarlos: el foco caía a <body>
+   * y con teclado o lector de pantalla se volvía al principio de la página sin oír la pregunta
+   * nueva. Ahora va al enunciado, a «Siguiente» tras responder y al título del resultado. En la
+   * carga de la página (que abre ya en la primera pregunta) no se toca.
+   */
+  const enunciadoRef = useRef<HTMLHeadingElement>(null);
+  const siguienteRef = useRef<HTMLButtonElement>(null);
+  const resultadoRef = useRef<HTMLDivElement>(null);
+  const pantallaRef = useRef<string | null>(null);
+  useEffect(() => {
+    const pantalla = `${quizTerminado}-${preguntaActual}-${mostrarExplicacion}`;
+    const venia = pantallaRef.current;
+    pantallaRef.current = pantalla;
+    if (venia === null || venia === pantalla) return;
+    if (quizTerminado) enfocarALaVista(resultadoRef.current);
+    else if (mostrarExplicacion) siguienteRef.current?.focus();
+    else enfocarALaVista(enunciadoRef.current);
+  }, [quizTerminado, preguntaActual, mostrarExplicacion]);
+
   const aciertos = respuestas.filter((r, i) => r === PREGUNTAS[i].correcta).length;
   const porcentaje = (aciertos / PREGUNTAS.length) * 100;
 
@@ -105,7 +127,7 @@ export default function QuizConceptosFinancierosPage() {
 
             {/* Pregunta */}
             <div className={styles.preguntaCard}>
-              <h2 className={styles.preguntaTexto}>{PREGUNTAS[preguntaActual].pregunta}</h2>
+              <h2 className={styles.preguntaTexto} ref={enunciadoRef} tabIndex={-1}>{PREGUNTAS[preguntaActual].pregunta}</h2>
               <div className={styles.opcionesGrid}>
                 {PREGUNTAS[preguntaActual].opciones.map((op, i) => {
                   let estado = '';
@@ -143,7 +165,7 @@ export default function QuizConceptosFinancierosPage() {
               )}
 
               {mostrarExplicacion && (
-                <button type="button" className={styles.btn} onClick={siguiente}>
+                <button type="button" className={styles.btn} onClick={siguiente} ref={siguienteRef}>
                   {preguntaActual < PREGUNTAS.length - 1 ? 'Siguiente pregunta' : 'Ver resultado'}
                 </button>
               )}
@@ -154,7 +176,7 @@ export default function QuizConceptosFinancierosPage() {
             {(() => {
               const nivel = getNivel();
               return (
-                <div className={styles.resultadoHero}>
+                <div className={styles.resultadoHero} ref={resultadoRef} tabIndex={-1}>
                   <span className={styles.resultadoEmoji} aria-hidden="true">{nivel.emoji}</span>
                   <h2>{nivel.titulo}</h2>
                   <div className={styles.resultadoPuntuacion}>

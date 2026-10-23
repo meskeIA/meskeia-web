@@ -85,10 +85,9 @@ const HERMANAS: Hermana[] = [
     arranque: [EMPEZAR],
   },
   {
-    // Sin pantalla de inicio: abre en la primera pregunta.
+    // Sin pantalla de inicio: abre en la primera pregunta. REPARADO el 23/10/2026.
     slug: 'quiz-conceptos-financieros',
     arranque: [],
-    foco: { falla: 'C0018, 23/10/2026: tras «Siguiente pregunta» el foco cae a body' },
   },
   {
     // REPARADO el 23/10/2026 al declarar la familia.
