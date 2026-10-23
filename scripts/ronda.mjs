@@ -325,9 +325,29 @@ async function anchosConTituloTapado(page) {
       await page.waitForTimeout(150); // un par de fotogramas para recalcular el layout
     }
     if (await tituloTapado(page)) avisos.push(aviso);
+    if (ancho === 390 && await desbordaAncho(page)) avisos.push(AVISO_DESBORDE);
   }
   if (original) await page.setViewportSize(original);
   return avisos;
+}
+
+const AVISO_DESBORDE = 'en móvil (390 px) el contenido es más ancho que la pantalla y se corta';
+
+/**
+ * ¿Es el contenido más ancho que la pantalla? Se mide `body.scrollWidth`, no el del documento:
+ * html y body llevan `overflow-x: hidden`, así que lo que sobra se recorta sin barra de
+ * desplazamiento y `documentElement.scrollWidth` sigue dando 390. Se mira también el del
+ * documento por si una página quita ese recorte.
+ *
+ * De dónde sale (cabo C0154, 07/10/2026): conversor-colores (body de 460 px), playground-sql
+ * (496) y calculadora-estadistica-medica (405), las tres por una pista `1fr` que crece hasta el
+ * min-content de un hijo (receta: `minmax(0, 1fr)`). Un regex sobre el CSS no sirve: hay 2.831
+ * `1fr` y casi todas son inocuas. Límite: la ronda ve la página recién cargada, no el estado con
+ * resultados (playground-sql solo desbordaba al ejecutar una consulta).
+ */
+async function desbordaAncho(page) {
+  return page.evaluate(() =>
+    Math.max(document.body.scrollWidth, document.documentElement.scrollWidth) > window.innerWidth + 1);
 }
 
 /** ¿Pisa alguna pieza de la barra fija las letras del <h1> al ancho actual? */
