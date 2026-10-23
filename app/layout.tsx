@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { generateBaseMetadata } from '@/lib/metadata';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
+import AnclaInicial from '@/components/AnclaInicial';
 import DynamicThemeColor from '@/components/DynamicThemeColor';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import RecentAppTracker from '@/components/RecentAppTracker';
@@ -87,6 +88,7 @@ export default function RootLayout({
               <DynamicThemeColor />
               <ServiceWorkerRegister />
               <RecentAppTracker />
+              <AnclaInicial />
               {children}
               <TransparencyBanner />
             </ErrorBoundary>
