@@ -751,8 +751,25 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       });
       await page.goto('/analizador-espectro/');
       await esperarHidratacion(page, ['#sensitivity-slider']);
-      await botonIniciar(page).click();
-      await botonIniciar(page).click();
+      // Los dos clics, en el MISMO tick (cabo C0352, 23/10/2026). Con dos `click()` de Playwright
+      // seguidos, bajo la suite de 4 workers el segundo podía llegar después de que getUserMedia
+      // resolviera (diagnóstico del 22/10: una llamada, resuelta en 414 ms, y luego pista 'ended'
+      // y contexto 'closed' sin error). React REUTILIZA el mismo <button> al pasar de «Iniciar» a
+      // «Detener» (mismo tipo en la misma posición), así que ese segundo clic, ya resuelto el
+      // localizador, pulsaba «Detener»: la carrera era del test, no la del hallazgo. Se dispara en
+      // el navegador y se comprueba que el segundo clic llegó con la apertura aún pendiente, que es
+      // el caso del hallazgo (el usuario mirando el diálogo de permiso).
+      const pendientesAlSegundoClic = await page.evaluate(() => {
+        const boton = [...document.querySelectorAll('button')].find((b) =>
+          /Iniciar análisis/.test(b.textContent ?? ''),
+        );
+        if (!boton) throw new Error('No está el botón «Iniciar análisis»');
+        boton.click();
+        boton.click();
+        return ((window as VentanaEspia).__llamadasMicro ?? []).map((l) => l.fin === undefined);
+      });
+      // Una sola petición del micrófono, y sin resolver cuando llegó el segundo clic.
+      expect(pendientesAlSegundoClic).toEqual([true]);
       // 15 s y no 5 (cabo C0280, 19/10/2026): el botón no cambia hasta que getUserMedia resuelve,
       // y bajo la suite de 4 workers el micrófono emulado, más los 400 ms del espía, pasó dos
       // veces de 5 s. La captura de los dos rojos («Iniciar análisis», sin error) es la de una
