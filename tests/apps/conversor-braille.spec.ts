@@ -1451,7 +1451,9 @@ test.describe('re-inspección 22/10/2026', () => {
     const guia = await textoGuia(page);
     expect(guia).toContain('V4, 22/01/2026'); // precondición: la FAQ cita la fuente de hoy
     expect(guia).not.toContain('(ONCE, 2009)');
-    expect(guia).not.toContain('2009');
+    // Ningún 2009 atribuido a la ONCE. El de la FAQ de lectores en EE. UU. es otra fuente (informe
+    // de la Federación Nacional de Ciegos, 2009; hallazgo 3441) y no cuenta.
+    expect(guia).not.toMatch(/ONCE[^.]{0,60}2009/);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -1723,7 +1725,11 @@ test.describe('re-inspección 23/10/2026', () => {
   // no se ve nada: ni resultado ni aviso. Si la caja trae además tinta, el aviso dice que la app
   // «no escribe en braille» las celdas ⠓ · ⠕ · ⠇ · ⠁ y que «puede que el Código Braille Español sí
   // les asigne celda»: son celdas braille.
-  test.fail('ABIERTO — celdas braille en «Texto → Braille»: hay resultado o aviso, no silencio', async ({ page }) => {
+  //
+  // REPARADO (hallazgo 3434): una celda braille pasa tal cual al resultado, no cuenta como «sin
+  // celda» y un aviso informativo dice que la caja ya traía braille. Y si la conversión no da nada
+  // con algo en la caja (solo emojis, por ejemplo), un aviso lo dice fuera de la caja de resultado.
+  test('REPARADO (3434) — celdas braille en «Texto → Braille»: hay resultado o aviso, no silencio', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
     await page.getByRole('button', { name: 'Braille → Texto' }).click();
@@ -1745,7 +1751,21 @@ test.describe('re-inspección 23/10/2026', () => {
     await page.goto(RUTA);
     await convertirHidratado(page, '⠓⠕⠇⠁ hola');
     await expect(cajaResultado(page)).toContainText('⠓⠕⠇⠁'); // precondición: «hola» sí se escribió
-    await expect(avisoSinCelda(page)).not.toContainText('⠓');
+    // Las celdas pasan tal cual, el espacio es separación de palabra y «hola» se escribe:
+    // ⠓⠕⠇⠁ · ⠀ · h ⠓ (1-2-5) o ⠕ (1-3-5) l ⠇ (1-2-3) a ⠁ (1)
+    await expect(cajaResultado(page)).toHaveText('⠓⠕⠇⠁⠀⠓⠕⠇⠁');
+    await expect(avisoSinCelda(page)).toHaveCount(0);
+    await expect(
+      page.locator('[class*="avisoConversion"]').filter({ hasText: 'La caja ya traía celdas braille' }),
+    ).toBeVisible();
+
+    // Solo emojis: no hay resultado, pero sí un aviso que lo dice y los nombra
+    await page.goto(RUTA);
+    await convertirHidratado(page, '😀😀');
+    await expect(page.locator('[class*="resultBox"]')).toHaveCount(0);
+    await expect(
+      page.locator('[class*="avisoConversion"]').filter({ hasText: 'La conversión no ha dado ningún resultado' }),
+    ).toContainText('😀');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -1756,7 +1776,8 @@ test.describe('re-inspección 23/10/2026', () => {
   // en los DOS sentidos. En «Braille → Texto» eso es tinta: Convertir devuelve «Hola» con el aviso
   // «Lo que has pegado no contiene ninguna celda braille… esto no es una traducción», y si luego se
   // escribe con el teclado, la caja queda mezclada (el aviso del 3417).
-  test.fail('ABIERTO — en «Braille → Texto» el ejemplo «Saludo» pone celdas braille (o no se ofrece)', async ({
+  // REPARADO (hallazgo 3435): en ese sentido el ejemplo llega ya escrito en braille.
+  test('REPARADO (3435) — en «Braille → Texto» el ejemplo «Saludo» pone celdas braille (o no se ofrece)', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -1768,7 +1789,16 @@ test.describe('re-inspección 23/10/2026', () => {
       await saludo.click();
       // «Hola» en braille sería ⠨⠓⠕⠇⠁: solo celdas del bloque U+2800-U+28FF. Hoy pone «Hola».
       await expect(page.locator('textarea').first()).toHaveValue(/^[⠀-⣿]+$/, { timeout: 2000 });
+      // H = signo de mayúscula ⠨ (4-6) + ⠓ (1-2-5) · o ⠕ (1-3-5) · l ⠇ (1-2-3) · a ⠁ (1)
+      await expect(page.locator('textarea').first()).toHaveValue('⠨⠓⠕⠇⠁');
+      await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+      await expect(cajaResultado(page)).toHaveText('Hola');
+      await expect(page.locator('[class*="avisoConversion"]')).toHaveCount(0);
     }
+    // En «Texto → Braille» el ejemplo sigue poniendo tinta
+    await page.getByRole('button', { name: 'Texto → Braille' }).click();
+    await page.getByRole('button', { name: 'Números', exact: true }).click();
+    await expect(page.locator('textarea').first()).toHaveValue('2024');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -1778,7 +1808,8 @@ test.describe('re-inspección 23/10/2026', () => {
   // `handleSwap` pone en la caja el RESULTADO, y desde la reparación del 3278 cualquier cambio de
   // la entrada lo retira. Así que escribir (o corregir) un texto y pulsar ⇄ sin Convertir cambia
   // de sentido y deja la caja vacía: lo escrito se pierde sin aviso ni forma de recuperarlo.
-  test.fail('ABIERTO — ⇄ con «Hola mundo» sin convertir no deja la caja vacía', async ({ page }) => {
+  // REPARADO (hallazgo 3436): sin resultado, ⇄ convierte en el acto lo que hay en la caja.
+  test('REPARADO (3436) — ⇄ con «Hola mundo» sin convertir no deja la caja vacía', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
     const textarea = page.locator('textarea').first();
@@ -1791,6 +1822,10 @@ test.describe('re-inspección 23/10/2026', () => {
     //   H ⠨⠓ · o ⠕ · l ⠇ · a ⠁ · ⠀ · m ⠍ (1-3-4) · u ⠥ (1-3-6) · n ⠝ · d ⠙ (1-4-5) · o ⠕
     // Hoy la caja queda vacía.
     await expect(textarea).toHaveValue(/^(Hola mundo|⠨⠓⠕⠇⠁⠀⠍⠥⠝⠙⠕)$/, { timeout: 2000 });
+    await expect(textarea).toHaveValue('⠨⠓⠕⠇⠁⠀⠍⠥⠝⠙⠕');
+    // Y de vuelta, también sin convertir, recupera el texto (la mayúscula vuelve por ⠨)
+    await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
+    await expect(textarea).toHaveValue('Hola mundo');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -1862,12 +1897,21 @@ test.describe('re-inspección 23/10/2026', () => {
   // incluye U+FEFF, el espacio de ancho cero NO SEPARABLE (y la marca de orden de bytes que encabeza
   // algunos textos). No se ve ni separa: «hola﻿mundo» es una sola palabra. Antes se omitía con
   // aviso; ahora sale con una separación de palabra (⠀) en medio, y «﻿Hola» con ⠀ delante.
-  test.fail('ABIERTO — «hola» + U+FEFF + «mundo» no lleva separación de palabra', async ({ page }) => {
+  // REPARADO (hallazgo 3440): U+FEFF se retira antes de convertir, sin aviso.
+  test('REPARADO (3440) — «hola» + U+FEFF + «mundo» no lleva separación de palabra', async ({ page }) => {
     await page.goto(RUTA);
     await convertirHidratado(page, 'hola﻿mundo');
     // h ⠓ · o ⠕ · l ⠇ · a ⠁ · (U+FEFF no se escribe) · m ⠍ · u ⠥ · n ⠝ · d ⠙ · o ⠕
     await expect(cajaResultado(page)).toContainText('⠓⠕⠇⠁'); // precondición: hubo conversión
     await expect(cajaResultado(page)).toHaveText('⠓⠕⠇⠁⠍⠥⠝⠙⠕', { timeout: 2000 });
+    // Al principio del texto (la marca de orden de bytes): ⠨⠓⠕⠇⠁, sin ⠀ delante
+    await page.goto(RUTA);
+    await convertirHidratado(page, '﻿Hola');
+    await expect(cajaResultado(page)).toHaveText('⠨⠓⠕⠇⠁');
+    // Y el espacio duro de 3416 sigue separando palabras
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'hola mundo');
+    await expect(cajaResultado(page)).toHaveText('⠓⠕⠇⠁⠀⠍⠥⠝⠙⠕');
   });
 
   // ─────────────────────────────────────────────────────────────────────────

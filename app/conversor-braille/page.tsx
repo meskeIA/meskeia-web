@@ -192,6 +192,8 @@ const caracteresSinCelda = (texto: string): string[] => [
         !COMILLAS_SIMPLES.has(c) &&
         // «…» se escribe como tres puntos (hallazgo 3418)
         c !== '…' &&
+        // Una celda braille ya es braille: pasa tal cual (hallazgo 3434)
+        !ES_CELDA_BRAILLE.test(c) &&
         // El salto de línea y los demás blancos sí se escriben: son separación de palabra
         !/\s/.test(c),
     ),
@@ -208,6 +210,17 @@ const caracteresSinCelda = (texto: string): string[] => [
  */
 const aEspacioNormal = (c: string): string =>
   c !== ' ' && c !== '\n' && c !== '\r' && /\s/.test(c) ? ' ' : c;
+
+/**
+ * ⚠️ 23/10/2026 (hallazgo 3440) — pero `\s` incluye también U+FEFF, el espacio de ancho cero NO
+ * separable, que además es la marca de orden de bytes con la que empiezan algunos textos. No se ve
+ * ni separa palabras, así que no puede salir como separación de palabra ⠀: se retira del texto
+ * antes de convertir, sin aviso, porque no se pierde nada que el lector pudiera ver.
+ */
+const ANCHO_CERO_NO_SEPARABLE = /﻿/g;
+
+/** Una celda del bloque braille de Unicode (U+2800-U+28FF), espacio braille incluido. */
+const ES_CELDA_BRAILLE = /^[⠀-⣿]$/;
 
 /**
  * ⚠️ 22/10/2026 (hallazgo 3418) — «...» (tres puntos del teclado) salía ⠄⠄⠄ y «…» (U+2026, el que
@@ -324,6 +337,12 @@ export default function ConversorBraillePage() {
   const [modoEspejo, setModoEspejo] = useState(false);
   const [mostrarGuia, setMostrarGuia] = useState(true);
   const [tituloHoja, setTituloHoja] = useState('');
+  /**
+   * Convertir dio una cadena vacía con algo escrito en la caja (hallazgo 3434). Los avisos viven
+   * dentro de la caja de resultado, que no se pinta sin resultado: sin esto, una caja de puros
+   * caracteres sin celda (emojis, por ejemplo) no daba ni resultado ni aviso.
+   */
+  const [conversionVacia, setConversionVacia] = useState(false);
 
   const norma = NORMAS.find((n) => n.id === normaId) ?? NORMAS[0];
 
@@ -420,6 +439,12 @@ export default function ConversorBraillePage() {
         ? [...new Set(Array.from(input).filter((c) => !/[⠀-⣿]/.test(c) && !/\s/.test(c)))]
         : [],
     [mode, result, input, entradaSinCeldas],
+  );
+
+  /** ¿Traía la caja de «Texto → Braille» celdas braille, que han pasado tal cual? (hallazgo 3434) */
+  const celdasYaBraille = useMemo(
+    () => mode === 'textToBraille' && result !== '' && /[⠀-⣿]/.test(input),
+    [mode, result, input],
   );
 
   /** ¿Lleva el resultado algún signo que en español abre y cierra igual? */
@@ -525,7 +550,9 @@ export default function ConversorBraillePage() {
 
     // Por code points, no por índices UTF-16: un emoji ocupa dos unidades y
     // recorrerlo a pares partía el carácter en dos mitades sin celda.
-    const caracteres = Array.from(text.replace(/…/g, PUNTOS_SUSPENSIVOS_TECLADO)).map(aEspacioNormal);
+    const caracteres = Array.from(
+      text.replace(ANCHO_CERO_NO_SEPARABLE, '').replace(/…/g, PUNTOS_SUSPENSIVOS_TECLADO),
+    ).map(aEspacioNormal);
 
     for (let i = 0; i < caracteres.length; i++) {
       const original = caracteres[i];
@@ -580,6 +607,18 @@ export default function ConversorBraillePage() {
       const compuesto = SIGNOS_COMPUESTOS[original];
       if (compuesto) {
         result += compuesto;
+        enExpresionNumerica = false;
+        continue;
+      }
+
+      /**
+       * ⚠️ 23/10/2026 (hallazgo 3434) — una celda braille en la caja (escrita con el teclado de seis
+       * puntos y traída al cambiar de sentido, o pegada) no estaba en la tabla de tinta y se
+       * descartaba: Convertir no daba resultado ni aviso, y con tinta al lado el aviso decía que la
+       * app «no escribe en braille» ⠓ · ⠕… Ya es braille: pasa tal cual y `celdasYaBraille` lo dice.
+       */
+      if (ES_CELDA_BRAILLE.test(original)) {
+        result += original;
         enExpresionNumerica = false;
         continue;
       }
@@ -709,12 +748,13 @@ export default function ConversorBraillePage() {
     return result;
   };
 
+  const convertir = (texto: string): string =>
+    mode === 'textToBraille' ? convertTextToBraille(texto) : convertBrailleToText(texto);
+
   const handleConvert = () => {
-    if (mode === 'textToBraille') {
-      setResult(convertTextToBraille(input));
-    } else {
-      setResult(convertBrailleToText(input));
-    }
+    const salida = convertir(input);
+    setResult(salida);
+    setConversionVacia(salida === '' && input.trim() !== '');
   };
 
   /**
@@ -728,6 +768,16 @@ export default function ConversorBraillePage() {
   const cambiarEntrada = (texto: string) => {
     setInput(texto);
     setResult('');
+    setConversionVacia(false);
+  };
+
+  /**
+   * ⚠️ 23/10/2026 (hallazgo 3435) — los ejemplos ponían «Hola», «España»… también en «Braille →
+   * Texto», donde eso es tinta: el ejemplo de la propia app acababa en el aviso «Lo que has pegado
+   * no contiene ninguna celda braille». En ese sentido el ejemplo llega ya escrito en braille.
+   */
+  const ponerEjemplo = (texto: string) => {
+    cambiarEntrada(mode === 'brailleToText' ? convertTextToBraille(texto) : texto);
   };
 
   /**
@@ -740,6 +790,7 @@ export default function ConversorBraillePage() {
     const nuevo = input + celda;
     setInput(nuevo);
     setResult(convertBrailleToText(nuevo));
+    setConversionVacia(false);
   };
 
   /** Devuelve qué celda quitó y cuántas quedan, para que el teclado lo anuncie (hallazgo 3420). */
@@ -749,6 +800,7 @@ export default function ConversorBraillePage() {
     const nuevo = celdas.slice(0, -1).join('');
     setInput(nuevo);
     setResult(nuevo ? convertBrailleToText(nuevo) : '');
+    setConversionVacia(false);
     return { borrada: celdas[celdas.length - 1], quedan: celdas.length - 1 };
   };
 
@@ -756,12 +808,21 @@ export default function ConversorBraillePage() {
     if (nuevo === mode) return;
     setMode(nuevo);
     setResult('');
+    setConversionVacia(false);
   };
 
+  /**
+   * ⚠️ 23/10/2026 (hallazgo 3436) — ⇄ ponía en la caja el RESULTADO, y desde el hallazgo 3278
+   * cualquier cambio de la entrada lo retira: escribir un texto y pulsar ⇄ sin Convertir cambiaba
+   * de sentido y dejaba la caja vacía. Ahora, si no hay resultado, se convierte en el acto lo que
+   * hay en la caja y es eso lo que pasa al otro sentido.
+   */
   const handleSwap = () => {
+    const salida = result !== '' ? result : input.trim() !== '' ? convertir(input) : '';
     setMode(mode === 'textToBraille' ? 'brailleToText' : 'textToBraille');
-    setInput(result);
+    setInput(salida);
     setResult('');
+    setConversionVacia(false);
   };
 
   const handleCopy = async () => {
@@ -771,6 +832,7 @@ export default function ConversorBraillePage() {
   const handleClear = () => {
     setInput('');
     setResult('');
+    setConversionVacia(false);
   };
 
   const renderBrailleCell = (char: string) => {
@@ -890,7 +952,7 @@ export default function ConversorBraillePage() {
                 key={ex.text}
                 type="button"
                 className={styles.exampleBtn}
-                onClick={() => cambiarEntrada(ex.text)}
+                onClick={() => ponerEjemplo(ex.text)}
               >
                 {ex.label}
               </button>
@@ -912,6 +974,25 @@ export default function ConversorBraillePage() {
             Limpiar
           </button>
         </div>
+
+        {conversionVacia && (
+          <p className={styles.avisoConversion} role="alert">
+            <span aria-hidden="true">⚠️</span>{' '}
+            {/* Cada rama en su <span key>: con la página traducida no cae (check:ternario-traducido) */}
+            {mode === 'textToBraille' && caracteresSinCelda(input).length > 0 ? (
+              <span key="sin-celda">
+                La conversión no ha dado ningún resultado: esta herramienta no escribe en braille
+                nada de lo que hay en la caja (
+                <strong>{caracteresSinCelda(input).map(nombraCaracter).join(' · ')}</strong>).
+              </span>
+            ) : (
+              <span key="nada">
+                La conversión no ha dado ningún resultado: en la caja no hay nada que se pueda
+                escribir con esta herramienta.
+              </span>
+            )}
+          </p>
+        )}
 
         {result && (
           <div className={styles.resultSection}>
@@ -979,6 +1060,14 @@ export default function ConversorBraillePage() {
                 equivalente en la signografía básica que cubre esta app y{' '}
                 {celdasSinTexto.length === 1 ? 'ha pasado' : 'han pasado'} al resultado sin
                 traducir: <strong>{celdasSinTexto.join(' ')}</strong>.
+              </p>
+            )}
+
+            {celdasYaBraille && (
+              <p className={styles.avisoConversion} role="status">
+                <span aria-hidden="true">ℹ️</span> La caja ya traía{' '}
+                <strong>celdas braille</strong>: han pasado al resultado tal cual, sin convertir.
+                Si querías leerlas en texto, cambia el sentido a «Braille → Texto».
               </p>
             )}
 
