@@ -49,6 +49,12 @@ interface ResultadoEdad {
   cotizacionNecesaria: { anios: number; meses: number };
   edadAlternativa: { anios: number; meses: number };
   anioAlternativo: number;
+  /**
+   * El cálculo cae en un año anterior a TABLA_EDAD_JUBILACION (2024), del que el módulo no tiene
+   * fila: getEdadJubilacion daría la de 2027 y la app diría «67 años en 2022» a quien nació en
+   * 1955 (hallazgo 2874). Entonces no se da edad ni año: o se calcula o no hay cifra.
+   */
+  fueraDeTabla: boolean;
 }
 
 interface ResultadoFormula {
@@ -108,48 +114,53 @@ interface ResultadoParcial {
 // LÓGICA: EDAD DE JUBILACIÓN
 // ──────────────────────────────────────────────────────────────────────────────
 
-function calcularEdadJubilacion(anioNacimiento: number, anosCotizados: number): ResultadoEdad {
+/** Primer año de TABLA_EDAD_JUBILACION: antes, getEdadJubilacion devuelve la fila de 2027. */
+const PRIMER_ANIO_TABLA = TABLA_EDAD_JUBILACION[0].anio;
+
+/**
+ * Edad ordinaria sin la cotización para los 65: el primer año en que se tiene la edad de la
+ * fila de ESE año (con meses, se supone el año siguiente al cumpleaños: no se pregunta el mes).
+ * Devuelve la edad y el año de la MISMA fila. Antes devolvía como año `nacimiento + edad.anios`,
+ * que con meses es el año anterior al de la fila: 1959 salía «66 años y 10 meses» (la fila de
+ * 2026) «en 2025», y la fila «Edad ordinaria», calculada con 2025, decía 66 y 8 (hallazgo 2874).
+ */
+function edadOrdinariaSinCotizacion(anioNacimiento: number): { edad: { anios: number; meses: number }; anio: number } {
   for (let anioJub = anioNacimiento + 65; anioJub <= anioNacimiento + 70; anioJub++) {
-    const datos = getEdadJubilacion(anioJub);
-    const cotMin = datos.cotizacionPara65.anios * 12 + datos.cotizacionPara65.meses;
-    const mesesCotizados = Math.round(anosCotizados * 12);
+    const edad = getEdadJubilacion(anioJub).edadSinCotizacion;
+    if (anioJub >= anioNacimiento + edad.anios + (edad.meses > 0 ? 1 : 0)) return { edad, anio: anioJub };
+  }
+  return { edad: { anios: 67, meses: 0 }, anio: anioNacimiento + 67 };
+}
 
-    if (mesesCotizados >= cotMin) {
-      return {
-        edadAnios: 65,
-        edadMeses: 0,
-        anioJubilacion: anioNacimiento + 65,
-        cotizacionSuficiente: true,
-        cotizacionNecesaria: datos.cotizacionPara65,
-        edadAlternativa: datos.edadSinCotizacion,
-        anioAlternativo: anioNacimiento + datos.edadSinCotizacion.anios + (datos.edadSinCotizacion.meses > 0 ? 1 : 0),
-      };
-    }
+function calcularEdadJubilacion(anioNacimiento: number, anosCotizados: number): ResultadoEdad {
+  const mesesCotizados = Math.round(anosCotizados * 12);
+  // A los 65 se llega en un solo año: el umbral de cotización es el de esa fila.
+  const fila65 = getEdadJubilacion(anioNacimiento + 65);
+  const cotMin = fila65.cotizacionPara65.anios * 12 + fila65.cotizacionPara65.meses;
+  const ordinaria = edadOrdinariaSinCotizacion(anioNacimiento);
 
-    const edadOrd = datos.edadSinCotizacion;
-    const anioEdadOrd = anioNacimiento + edadOrd.anios + (edadOrd.meses > 0 ? 1 : 0);
-
-    if (anioJub >= anioEdadOrd) {
-      return {
-        edadAnios: edadOrd.anios,
-        edadMeses: edadOrd.meses,
-        anioJubilacion: anioNacimiento + edadOrd.anios,
-        cotizacionSuficiente: false,
-        cotizacionNecesaria: datos.cotizacionPara65,
-        edadAlternativa: edadOrd,
-        anioAlternativo: anioNacimiento + edadOrd.anios,
-      };
-    }
+  if (mesesCotizados >= cotMin) {
+    return {
+      edadAnios: 65,
+      edadMeses: 0,
+      anioJubilacion: anioNacimiento + 65,
+      cotizacionSuficiente: true,
+      cotizacionNecesaria: fila65.cotizacionPara65,
+      edadAlternativa: ordinaria.edad,
+      anioAlternativo: ordinaria.anio,
+      fueraDeTabla: anioNacimiento + 65 < PRIMER_ANIO_TABLA || ordinaria.anio < PRIMER_ANIO_TABLA,
+    };
   }
 
   return {
-    edadAnios: 67,
-    edadMeses: 0,
-    anioJubilacion: anioNacimiento + 67,
+    edadAnios: ordinaria.edad.anios,
+    edadMeses: ordinaria.edad.meses,
+    anioJubilacion: ordinaria.anio,
     cotizacionSuficiente: false,
-    cotizacionNecesaria: { anios: 38, meses: 6 },
-    edadAlternativa: { anios: 67, meses: 0 },
-    anioAlternativo: anioNacimiento + 67,
+    cotizacionNecesaria: fila65.cotizacionPara65,
+    edadAlternativa: ordinaria.edad,
+    anioAlternativo: ordinaria.anio,
+    fueraDeTabla: anioNacimiento + 65 < PRIMER_ANIO_TABLA || ordinaria.anio < PRIMER_ANIO_TABLA,
   };
 }
 
@@ -587,7 +598,19 @@ export default function SimuladorJubilacionPublicaPage() {
         </div>
 
         {/* ═══════ RESULTADO 1: EDAD DE JUBILACIÓN ═══════ */}
-        {calculado && resultadoEdad && (
+        {calculado && resultadoEdad && resultadoEdad.fueraDeTabla && (
+          <div className={styles.resultAge} role="status" aria-live="polite">
+            {/* Sin fila para ese año no hay cifra (hallazgo 2874): antes salía «67 años en 2022». */}
+            <p className={styles.resultAgeDetail}>
+              <span aria-hidden="true">⚠️</span> Con ese año de nacimiento, la jubilación ordinaria cae antes de{' '}
+              {PRIMER_ANIO_TABLA}, el primer año de la tabla de edades de esta app. La edad y la cotización que se
+              exigían entonces seguían otro escalón del calendario transitorio, así que no te damos una edad ni un año:
+              consulta tu caso en la Seguridad Social.
+            </p>
+          </div>
+        )}
+
+        {calculado && resultadoEdad && !resultadoEdad.fueraDeTabla && (
           <div className={styles.resultAge} role="status" aria-live="polite">
             <div className={styles.resultAgeNumber}>
               {edadTexto(resultadoEdad.edadAnios, resultadoEdad.edadMeses)}
@@ -658,7 +681,9 @@ export default function SimuladorJubilacionPublicaPage() {
 
               <div className={styles.resultItem}>
                 <span className={styles.resultLabel}>Edad ordinaria de jubilación</span>
-                <span className={styles.resultValue}>{resultadoPension.edadOrdinaria}</span>
+                <span className={styles.resultValue}>
+                  {resultadoEdad?.fueraDeTabla ? `Antes de ${PRIMER_ANIO_TABLA}: fuera de la tabla` : resultadoPension.edadOrdinaria}
+                </span>
               </div>
 
               {resultadoPension.mesesQueFaltanParaCien > 0 && (

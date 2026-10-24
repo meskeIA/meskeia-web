@@ -555,7 +555,9 @@ test('CASO 13.bis · cambiar los años sin pulsar «Simular» no reescribe la ta
 });
 
 test('CASO 14 · nacido en 1959: la edad del titular y la «Edad ordinaria» deben salir de la misma fila de la tabla', async ({ page }) => {
-  test.fail(true, 'ABIERTO (04/10/2026): calcularEdadJubilacion toma la edad de la fila de 2026 (66a10m) pero devuelve anioJubilacion = 1959 + 66 = 2025, y la fila «Edad ordinaria» se calcula con 2025 (66a8m). Para 1955-1956 llega a decir «67 años» en 2022-2023 (getEdadJubilacion devuelve la fila de 2027 para años anteriores a 2024).');
+  // REPARADO el 24/10/2026 (2874). Antes calcularEdadJubilacion tomaba la edad de la fila de 2026
+  // (66a10m) pero devolvía anioJubilacion = 1959 + 66 = 2025, y la fila «Edad ordinaria» se
+  // calculaba con 2025 (66a8m). Ahora edad y año salen de la misma fila.
   await simular(page, 1959, 25, 2000);
   // Preparación: el cálculo se hizo (el porcentaje de la escala 2023-2026 es correcto).
   await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('73,78'));
@@ -564,6 +566,30 @@ test('CASO 14 · nacido en 1959: la edad del titular y la «Edad ordinaria» deb
   // TABLA_EDAD_JUBILACION: 66a10m es la edad de 2026 (2025 era 66a8m). Lo coherente:
   await expect(valorDe(page, 'Edad ordinaria de jubilación')).toHaveText('66 años y 10 meses');
   await expect(page.getByRole('status').first()).toContainText('Te jubilarías en 2026');
+});
+
+test('CASO 14.bis · con los 65 antes de 2024 (1958, 1955) no se da una edad sacada de otra fila; 1962 sí la tiene', async ({ page }) => {
+  // 1958, 25 años: sin la cotización de los 65. La edad ordinaria es la del primer año en que se
+  // tiene la de su fila (con meses, el año siguiente al cumpleaños): 2024 pide 66a6m, que en la
+  // app se cumple en 1958 + 66 + 1 = 2025 > 2024; 2025 pide 66a8m y 2025 ≥ 2025 → 66 y 8 en 2025.
+  // Antes: «66 años y 8 meses · Te jubilarías en 2024» con la fila en 66 y 6. Pero los 65 de quien
+  // nació en 1958 caen en 2023, antes de la tabla (2024-2027), así que el umbral de cotización de
+  // ese año no está en el módulo: la app no da edad ni año, lo dice.
+  await simular(page, 1958, 25, 2000);
+  await expect(page.getByRole('status').first()).toContainText('la jubilación ordinaria cae antes de 2024');
+  await expect(page.getByRole('status').first()).not.toContainText('Te jubilarías en');
+  await expect(valorDe(page, 'Edad ordinaria de jubilación')).toHaveText('Antes de 2024: fuera de la tabla');
+
+  // 1955: getEdadJubilacion da la fila de 2027 para 2020-2023, y salía «67 años · Te jubilarías
+  // en 2022», cuando el módulo fija los 67 como definitivos en 2027.
+  await simular(page, 1955, 25, 2000);
+  await expect(page.getByRole('status').first()).not.toContainText('67 años');
+  await expect(page.getByRole('status').first()).toContainText('consulta tu caso en la Seguridad Social');
+
+  // Control: 1962 (65 en 2027, dentro de la tabla) sigue dando edad y año.
+  await simular(page, 1962, 25, 2000);
+  await expect(page.getByRole('status').first()).toContainText('67 años');
+  await expect(page.getByRole('status').first()).toContainText('Te jubilarías en 2029');
 });
 
 test('CASO 15 · el escenario de Carlos debe dar lo que la propia calculadora da para él (escala de 2027)', async ({ page }) => {
