@@ -11,6 +11,7 @@ import {
   ShareCard,
   EducationalSection,
   DisclaimerCard,
+  RegionBadge,
 } from '@/components';
 import {
   calcularResultado,
@@ -228,6 +229,26 @@ export default function SelectorTabletPage() {
     setRespuestas(nuevasRespuestas);
   };
 
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG, receta 1681 de selector-smartphone): las flechas
+   * mueven el foco a la opción vecina y la marcan, con vuelta al principio, e Inicio/Fin van a los
+   * extremos. El grupo es UNA parada de Tab (tabindex itinerante). Antes cada opción era una
+   * parada y las flechas no hacían nada (hallazgo 3206).
+   */
+  const teclaEnOpcion = (e: React.KeyboardEvent<HTMLButtonElement>, indice: number) => {
+    const total = pregunta.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(destino);
+    const opciones = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    opciones?.[destino]?.focus();
+  };
+
   // Avanza desde la pregunta DEL RENDER (`preguntaActual + 1`): dos clics antes de repintar no
   // saltan una pregunta.
   const avanzar = () => {
@@ -267,6 +288,10 @@ export default function SelectorTabletPage() {
         <p>Responde 10 preguntas y descubre qué tipo de tablet se adapta mejor a tu estilo de vida</p>
       </header>
 
+      {/* El presupuesto se pregunta en euros y los precios de referencia son de España (hallazgo
+          3208; forma del 949 de selector-smartphone). */}
+      <RegionBadge variant="es-data" />
+
       <LegalNotice />
 
       {!resultado ? (
@@ -294,6 +319,9 @@ export default function SelectorTabletPage() {
                   // no un conmutador (hallazgo 3199; selector-smartphone, 950).
                   role="radio"
                   aria-checked={respuestaActual === idx}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (3206).
+                  tabIndex={respuestaActual !== null ? (respuestaActual === idx ? 0 : -1) : idx === 0 ? 0 : -1}
+                  onKeyDown={(e) => teclaEnOpcion(e, idx)}
                 >
                   <span className={styles.opcionIcono} aria-hidden="true">{opcion.icono}</span>
                   <span>{opcion.texto}</span>

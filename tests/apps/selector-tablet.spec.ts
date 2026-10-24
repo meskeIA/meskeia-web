@@ -336,15 +336,23 @@ test.describe('accesibilidad y foco', () => {
   });
 
   test('teclado del patrón de radios: flechas mueven y marcan, y el grupo es una sola parada de Tab', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Hoy cada opción es una parada de Tab (tabIndex 0 en las cinco)
-    // y ArrowDown no mueve el foco ni marca nada (receta del 1681 de la referencia).
-    test.fail();
+    // REPARADO el 24/10/2026 (3206). Antes (inspector 10/10/2026): cada opción era una parada de Tab
+    // (tabIndex 0 en las cinco) y ArrowDown no movía el foco ni marcaba nada. Ahora, receta del
+    // 1681 de la referencia: tabindex itinerante, flechas, Inicio y Fin.
     await abrir(page);
     const opciones = page.locator('main [class*="opciones"] button');
     expect(await opciones.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1, -1]);
     await opciones.nth(0).focus();
     await page.keyboard.press('ArrowDown');
     await expect(opciones.nth(1)).toBeFocused({ timeout: 1_000 });
+    await expect(opciones.nth(1)).toHaveAttribute('aria-checked', 'true');
+    expect(await opciones.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([-1, 0, -1, -1, -1]);
+    await page.keyboard.press('End');
+    await expect(opciones.nth(4)).toBeFocused();
+    await page.keyboard.press('ArrowRight');
+    await expect(opciones.nth(0)).toBeFocused();
+    await expect(opciones.nth(0)).toHaveAttribute('aria-checked', 'true');
+    await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(1);
   });
 
   test('tras «Siguiente» el foco va al enunciado nuevo, no a <body>', async ({ page }) => {
@@ -410,13 +418,14 @@ test.describe('contenido y HTML servido', () => {
   });
 
   test('el JSON-LD WebApplication lleva entre 4 y 8 featureList (§1.ter del CLAUDE.md)', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). metadata.ts pasa `features: []`; servido: "featureList":[].
-    test.fail();
+    // REPARADO el 24/10/2026 (3207). Antes (inspector 10/10/2026): metadata.ts pasaba `features: []`
+    // y se servía "featureList":[].
     const html = await (await page.request.get('/selector-tablet/')).text();
     const bloques = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
       .map((m) => JSON.parse(m[1]) as Record<string, unknown>);
     const app = bloques.find((b) => b['@type'] === 'WebApplication');
     expect(((app?.featureList ?? []) as unknown[]).length).toBeGreaterThanOrEqual(4);
+    expect(((app?.featureList ?? []) as unknown[]).length).toBeLessThanOrEqual(8);
   });
 
   test('«2025» no aparece como año en curso (cabo C0005): solo la fecha ISO del JSON-LD', async ({ page }) => {
@@ -443,9 +452,8 @@ test.describe('contenido y HTML servido', () => {
   });
 
   test('con el presupuesto en euros, la app declara el ámbito de sus datos (RegionBadge es-data)', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). P3 en euros («Menos de 150 €»…) y la tarjeta de Android
-    // «desde 100 €», sin RegionBadge: forma del 949 de selector-smartphone.
-    test.fail();
+    // REPARADO el 24/10/2026 (3208). Antes (inspector 10/10/2026): P3 en euros («Menos de 150 €»…)
+    // y la tarjeta de Android «desde 100 €», sin RegionBadge: forma del 949 de selector-smartphone.
     await abrir(page);
     await expect(page.getByText(/Datos de referencia: España/)).toBeVisible({ timeout: 1_000 });
   });

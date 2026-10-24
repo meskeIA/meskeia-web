@@ -41,7 +41,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para saber qué tipo de tablet se adapta mejor a tus necesidades: tablet Android, iPad/iOS, tablet Windows, eReader o prescindir de tablet.",
   url: "https://meskeia.com/selector-tablet/",
   category: 'EducationalApplication',
-  features: [],
+  // Lo que la app hace de verdad (hallazgo 3207, §1.ter): antes iba vacía.
+  features: [
+    'Test de 10 preguntas sobre uso, sistema del móvil, presupuesto, teclado, lápiz y software',
+    'Compara tablet Android, iPadOS, Windows 2 en 1, eReader o seguir sin tablet',
+    'Deja fuera la tablet con iPadOS cuando el presupuesto no llega a un modelo nuevo, y lo dice',
+    'Avisa si la recomendada no cumple algo que declaraste imprescindible (software de escritorio, teclado o lápiz)',
+    'Dice los empates en lugar de resolverlos por el orden de la lista',
+    'Características a mirar al comprar, sin marcas ni modelos',
+  ],
 });
 
 export const faqJsonLd = {
