@@ -1140,7 +1140,7 @@ test.describe('re-inspección 24/10/2026 · página traducida (cabo C0243)', () 
   //   «58,444 g», «1,0001 mol»; al 50 %, 29,222192 g → «29,222 g»
   for (const traducida of [false, true]) {
     test(`elegir la neutralización y bajar el rendimiento al 50 %: rótulo, ecuación y tarjetas dicen la reacción elegida${traducida ? ', con la página traducida' : ''}`, async ({ page }) => {
-      test.fail(traducida, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): con la página traducida el texto se queda viejo');
+      // REPARADO (hallazgo 3450, 24/10/2026): cada texto variable, una sola cadena única hija de su elemento.
       const errores = erroresDeReact(page);
       await abrir(page);
       if (traducida) await traducir(page);
@@ -1269,7 +1269,7 @@ test.describe('re-inspección 24/10/2026 · contenido', () => {
   // arriba). El ejemplo no muestra el error que nombra (2 mol < 5 mol → «el N₂ es el limitante»)
   // y tacha de error un método correcto.
   test('los «errores frecuentes» no tachan de error comparar 5 mol de H₂ con los 3 × 2 = 6 necesarios', async ({ page }) => {
-    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): el ejemplo tacha de error un método correcto');
+    // REPARADO (hallazgo 3452, 24/10/2026): el ejemplo muestra el error (2 < 5 → «el N₂») y da por buena la comparación 5 con 6.
     await abrir(page);
     const primero = page.locator('[class*="warningList"] li').first();
     await expect(primero).toContainText('Comparar moles directamente sin dividir por el coeficiente');
@@ -1281,7 +1281,7 @@ test.describe('re-inspección 24/10/2026 · contenido', () => {
   // coeficiente no hace limitante a nadie (lo dice la propia página: «el que tiene menor (moles /
   // coeficiente)»), y con la alimentación 3:1 de la propia reacción ninguno sobra.
   test('la tabla no atribuye el limitante del Haber-Bosch al coeficiente', async ({ page }) => {
-    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): «mayor coeficiente (×3)» como razón del limitante');
+    // REPARADO (hallazgo 3453, 24/10/2026).
     await abrir(page);
     const fila = page.locator('[class*="tabla"] tbody tr').filter({ hasText: 'Haber-Bosch' });
     await expect(fila).toHaveCount(1);
@@ -1293,7 +1293,7 @@ test.describe('re-inspección 24/10/2026 · contenido', () => {
   // «la mezcla es estequiométricay no hay reactivo en exceso» y el quinto error frecuente «a la
   // masa del producto— El rendimiento afecta…» (los otros cuatro llevan « — » con espacios).
   test('errata: «estequiométrica y» y «producto — El» con su espacio', async ({ page }) => {
-    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): palabras pegadas tras </strong>');
+    // REPARADO (hallazgo 3454, 24/10/2026): {' '} tras el </strong>.
     await abrir(page);
     const faq = page.locator('[class*="faqItem"]').filter({ hasText: '¿Puede haber más de un reactivo limitante?' });
     await expect(faq).toHaveCount(1);
@@ -1335,7 +1335,7 @@ test.describe('re-inspección 24/10/2026 · contenido', () => {
   // visible avisa de que no es el de menor masa y pone el CH₄ como ejemplo; el FAQPage, el método
   // del cociente y el H₂O). La reparación es UNA constante en metadata.ts que importen las dos.
   test('una pregunta que está en las dos bocas tiene la misma respuesta', async ({ page }) => {
-    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): FAQ escrita dos veces');
+    // REPARADO (hallazgo 3455, 24/10/2026): RESPUESTA_REACTIVO_LIMITANTE y RESPUESTA_MOLES_DESDE_GRAMOS en metadata.ts.
     await abrir(page);
     const { jsonLd, visibles } = await faqs(page);
     const enJsonLd = (inicio: string) => jsonLd.find((q) => q.name.startsWith(inicio))?.acceptedAnswer.text;

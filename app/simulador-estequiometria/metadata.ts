@@ -51,6 +51,19 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['estequiometría', 'reactivo limitante', 'moles', 'masa molar', 'rendimiento', 'EBAU', 'Bachillerato', 'preparatoria', 'secundaria', 'química'],
 });
 
+/**
+ * Las dos preguntas que están a la vez en la FAQ visible y en el FAQPage, con UNA respuesta que
+ * importan las dos bocas (hallazgo 3455, 24/10/2026). Iban escritas dos veces y cada una callaba lo
+ * que daba la otra: la visible avisaba de que el limitante no es el de menor masa y la del FAQPage
+ * daba el método del cociente. Texto plano: el énfasis se pierde, pero no vuelven a divergir.
+ */
+export const RESPUESTA_REACTIVO_LIMITANTE =
+  'El reactivo limitante es el que se agota primero en la reacción y, por tanto, determina la cantidad máxima de producto que puede formarse. Para identificarlo se compara, en cada reactivo, la razón moles disponibles / coeficiente estequiométrico: el de cociente más pequeño es el limitante. No es necesariamente el que se añade en menor masa, porque depende también de su masa molar y de su coeficiente. El reactivo que no se agota se llama reactivo en exceso.';
+
+/** 12,011 + 4 × 1,008 = 16,043 g/mol; 32 / 16,043 = 1,99464 → «≈ 1,995 mol». */
+export const RESPUESTA_MOLES_DESDE_GRAMOS =
+  'Los moles se calculan dividiendo la masa en gramos entre la masa molar del compuesto: n = m / M. La masa molar (g/mol) es la suma de las masas atómicas de todos los átomos de la fórmula. Por ejemplo, el CH₄ tiene M = 12,011 + 4 × 1,008 = 16,043 g/mol, así que 32 g de CH₄ son 32 / 16,043 ≈ 1,995 mol.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -60,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Qué es el reactivo limitante en una reacción química?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El reactivo limitante es el que se consume completamente primero, determinando la cantidad máxima de producto que puede formarse. Su identificación requiere comparar la razón moles disponibles / coeficiente estequiométrico para cada reactivo: el que tiene el cociente más pequeño es el limitante. El resto de reactivos quedan en exceso.',
+        text: RESPUESTA_REACTIVO_LIMITANTE,
       },
     },
     {
@@ -68,7 +81,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calculan los moles a partir de gramos en estequiometría?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los moles se calculan dividiendo la masa en gramos entre la masa molar del compuesto: n = m / M. La masa molar (g/mol) se obtiene sumando las masas atómicas de todos los átomos de la fórmula. Por ejemplo, para el agua H₂O: M = 2·1,008 + 15,999 = 18,015 g/mol.',
+        text: RESPUESTA_MOLES_DESDE_GRAMOS,
       },
     },
     {

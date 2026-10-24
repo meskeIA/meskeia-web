@@ -11,6 +11,7 @@ import { formatNumber } from '@/lib';
 // suspenda una masa que ella misma muestra (skill /casos-aula-meskeia).
 import { REACCIONES, calcular, molesNecesarios, type ResultadoCalculo } from './motor';
 import CasosAula, { type ConfiguracionSimulador } from './CasosAula';
+import { RESPUESTA_REACTIVO_LIMITANTE, RESPUESTA_MOLES_DESDE_GRAMOS } from './metadata';
 
 /**
  * Lee el valor de un `<input type="number">`. El navegador lo entrega SIEMPRE en forma canónica
@@ -163,7 +164,7 @@ export default function SimuladorEstequiometriaPage() {
                       : undefined
                   }
                 >
-                  {token}{' '}
+                  {`${token} `}
                 </span>
               );
             })}
@@ -175,9 +176,13 @@ export default function SimuladorEstequiometriaPage() {
         <div className={styles.inputsGrid}>
           {/* Reactivo A */}
           <div className={styles.inputGroup}>
+            {/* Hallazgo 3450 (24/10/2026): con la página traducida (el traductor cambia cada nodo de
+                texto por <font>), un texto variable junto a otro nodo se quedaba con el valor de la
+                reacción anterior. Cada texto que cambia es aquí UNA cadena, única hija de su
+                elemento, como en simulador-fluidos-bernoulli: React reescribe el elemento entero. */}
             <label className={styles.inputLabel} htmlFor="inputA">
-              {reaccion.reactivos[0].nombre} ({reaccion.reactivos[0].formula})
-              <span className={styles.masaMolarTag}>M = {formatNumber(reaccion.reactivos[0].masaMolar, reaccion.reactivos[0].decimalesM)} g/mol</span>
+              <span>{`${reaccion.reactivos[0].nombre} (${reaccion.reactivos[0].formula})`}</span>
+              <span className={styles.masaMolarTag}>{`M = ${formatNumber(reaccion.reactivos[0].masaMolar, reaccion.reactivos[0].decimalesM)} g/mol`}</span>
             </label>
             <div className={styles.inputRow}>
               <button
@@ -210,8 +215,8 @@ export default function SimuladorEstequiometriaPage() {
           {!esCatalizador ? (
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel} htmlFor="inputB">
-                {reaccion.reactivos[1].nombre} ({reaccion.reactivos[1].formula})
-                <span className={styles.masaMolarTag}>M = {formatNumber(reaccion.reactivos[1].masaMolar, reaccion.reactivos[1].decimalesM)} g/mol</span>
+                <span>{`${reaccion.reactivos[1].nombre} (${reaccion.reactivos[1].formula})`}</span>
+                <span className={styles.masaMolarTag}>{`M = ${formatNumber(reaccion.reactivos[1].masaMolar, reaccion.reactivos[1].decimalesM)} g/mol`}</span>
               </label>
               <div className={styles.inputRow}>
                 <button
@@ -251,7 +256,7 @@ export default function SimuladorEstequiometriaPage() {
           {/* Slider de rendimiento */}
           <div className={styles.rendimientoRow}>
             <label className={styles.inputLabel} htmlFor="sliderRendimiento">
-              Rendimiento de la reacción: <strong>{rendimiento}&nbsp;%</strong>
+              Rendimiento de la reacción: <strong>{`${rendimiento} %`}</strong>
             </label>
             <input
               id="sliderRendimiento"
@@ -286,14 +291,13 @@ export default function SimuladorEstequiometriaPage() {
                 <div className={styles.barGroup} key={reactivo.formula}>
                   <div className={styles.barLabel}>
                     <span id={idNombre}>
-                      {reactivo.nombre} ({reactivo.formula})
+                      <span>{`${reactivo.nombre} (${reactivo.formula})`}</span>
                       {limitante && (
                         <span className={styles.limitanteBadge}><span aria-hidden="true">⚠️</span> Limitante</span>
                       )}
                     </span>
                     <span className={styles.barValor}>
-                      {formatNumber(disponibles, 4)} mol disponibles / {formatNumber(necesarios, 4)} mol necesarios
-                      {' '}({formatNumber(porcentaje, 0)}&nbsp;%)
+                      {`${formatNumber(disponibles, 4)} mol disponibles / ${formatNumber(necesarios, 4)} mol necesarios (${formatNumber(porcentaje, 0)} %)`}
                     </span>
                   </div>
                   <div
@@ -330,17 +334,17 @@ export default function SimuladorEstequiometriaPage() {
             {/* Masa teórica */}
             <div className={styles.resultadoCard}>
               <span className={styles.resultadoLabel}>
-                Masa teórica de {reaccion.productos[0].nombre} ({reaccion.productos[0].formula})
+                {`Masa teórica de ${reaccion.productos[0].nombre} (${reaccion.productos[0].formula})`}
               </span>
-              <span className={styles.resultadoValor}>{formatNumber(resultado.masaProductoTeorica, 3)} g</span>
-              <span className={styles.resultadoSubValor}>{formatNumber(resultado.molesProductoTeorico, 4)} mol</span>
+              <span className={styles.resultadoValor}>{`${formatNumber(resultado.masaProductoTeorica, 3)} g`}</span>
+              <span className={styles.resultadoSubValor}>{`${formatNumber(resultado.molesProductoTeorico, 4)} mol`}</span>
             </div>
 
             {/* Masa real (con rendimiento) */}
             <div className={`${styles.resultadoCard} ${styles.resultadoCardDestacado}`}>
-              <span className={styles.resultadoLabel}>Masa real obtenida (rendimiento {rendimiento}&nbsp;%)</span>
+              <span className={styles.resultadoLabel}>{`Masa real obtenida (rendimiento ${rendimiento} %)`}</span>
               <span className={`${styles.resultadoValor} ${styles.resultadoValorGrande}`}>
-                {formatNumber(resultado.masaProductoReal, 3)} g
+                {`${formatNumber(resultado.masaProductoReal, 3)} g`}
               </span>
             </div>
 
@@ -352,7 +356,7 @@ export default function SimuladorEstequiometriaPage() {
                   {resultado.exceso.nombre}
                 </span>
                 <span className={styles.resultadoSubValor}>
-                  Sobran {formatNumber(resultado.exceso.gramos, 3)} g ({formatNumber(resultado.exceso.moles, 4)} mol)
+                  {`Sobran ${formatNumber(resultado.exceso.gramos, 3)} g (${formatNumber(resultado.exceso.moles, 4)} mol)`}
                 </span>
               </div>
             ) : (
@@ -452,7 +456,9 @@ export default function SimuladorEstequiometriaPage() {
                   <tr>
                     <td>Síntesis de amoniaco (Haber-Bosch)</td>
                     <td>Síntesis industrial</td>
-                    <td>Hidrógeno (H₂) — mayor coeficiente (×3)</td>
+                    {/* Hallazgo 3453: decía «mayor coeficiente (×3)», el razonamiento que la propia
+                        página desmiente: el limitante es el de menor moles / coeficiente. */}
+                    <td>Ninguno con la alimentación 3:1 de la ecuación; si no, el que quede por debajo de esa proporción</td>
                     <td>NH₃</td>
                     <td>Fertilizantes que alimentan ~4000 millones de personas</td>
                     <td>~10-15&nbsp;% por paso (ciclo continuo)</td>
@@ -529,12 +535,8 @@ export default function SimuladorEstequiometriaPage() {
             <div className={styles.faqList}>
               <div className={styles.faqItem}>
                 <h4>¿Qué es el reactivo limitante?</h4>
-                <p>
-                  El <strong>reactivo limitante</strong> es el que se agota primero en la reacción y, por tanto,
-                  determina la cantidad máxima de producto que puede formarse. No es necesariamente el que
-                  se añade en menor masa: depende también de su masa molar y del coeficiente estequiométrico.
-                  El reactivo que no se agota se llama <strong>reactivo en exceso</strong>.
-                </p>
+                {/* La misma respuesta que el FAQPage, de metadata.ts (hallazgo 3455). */}
+                <p>{RESPUESTA_REACTIVO_LIMITANTE}</p>
                 <p className={styles.faqTip}>
                   <span aria-hidden="true">💡</span> Ejemplo: para CH₄ + 2 O₂ → CO₂ + 2 H₂O, 1 mol de CH₄ son 16,043 g y 2 mol de O₂
                   son 63,996 g: en esa proporción se agotan los dos a la vez. Con los 16 g de CH₄ y 64 g de O₂
@@ -545,11 +547,7 @@ export default function SimuladorEstequiometriaPage() {
 
               <div className={styles.faqItem}>
                 <h4>¿Cómo calculo los moles a partir de los gramos?</h4>
-                <p>
-                  La relación fundamental es: <strong>moles = masa (g) / masa molar (g/mol)</strong>. La masa
-                  molar es la suma de las masas atómicas de todos los átomos de la fórmula. Por ejemplo,
-                  CH₄ tiene M = 12,011 + 4 × 1,008 = 16,043 g/mol. Si tienes 32 g de CH₄, son 32 / 16,043 ≈ 1,995 mol.
-                </p>
+                <p>{RESPUESTA_MOLES_DESDE_GRAMOS}</p>
                 <p className={styles.faqTip}>
                   <span aria-hidden="true">💡</span> Las masas molares de los elementos están en la tabla periódica (peso atómico en u ≈ g/mol).
                   El simulador usa los pesos atómicos estándar de la IUPAC/CIAAW (tabla 2021).
@@ -591,7 +589,7 @@ export default function SimuladorEstequiometriaPage() {
                 <p>
                   Formalmente, no: siempre hay un único reactivo limitante (el de menor ratio). Sin embargo,
                   si dos reactivos tienen la misma razón estequiométrica, ambos se agotan
-                  simultáneamente. En ese caso se dice que la mezcla es <strong>estequiométrica</strong>
+                  simultáneamente. En ese caso se dice que la mezcla es <strong>estequiométrica</strong>{' '}
                   y no hay reactivo en exceso. En la práctica esto es muy raro de lograr exactamente.
                 </p>
                 <p className={styles.faqTip}>
@@ -710,9 +708,13 @@ export default function SimuladorEstequiometriaPage() {
               <li>
                 <strong>Comparar moles directamente sin dividir por el coeficiente</strong> — El error más
                 común en los exámenes de admisión universitaria, tanto en la EBAU/selectividad (España) como
-                en preparatoria y educación media (Latinoamérica). Si N₂ + 3 H₂ y tienes 2 mol N₂ y 5 mol H₂, NO es limitante el H₂ por
-                &quot;tener menos moles que 3×2=6&quot;: el ratio de H₂ = 5/3 ≈ 1,67 &lt; 2/1 = 2, así que
-                sí es limitante, pero hay que hacer la división.
+                en preparatoria y educación media (Latinoamérica). Con N₂ + 3 H₂ → 2 NH₃, 2 mol de N₂ y 5 mol de
+                H₂, comparar 2 con 5 lleva a pensar que el limitante es el N₂, porque hay menos. Pero el H₂ se
+                gasta tres veces más deprisa: 5/3 ≈ 1,67 &lt; 2/1 = 2, así que el limitante es el H₂.
+                Comparar los 5 mol de H₂ con los 3 × 2 = 6 que harían falta da la misma respuesta: lo que
+                falla es olvidar el coeficiente.
+                {/* Hallazgo 3452: el ejemplo tachaba de error comparar 5 con 3 × 2 = 6, que equivale a
+                    5/3 < 2/1 y es justo lo que hacen las barras de la app, y no mostraba el error. */}
               </li>
               <li>
                 <strong>Olvidar convertir gramos a moles antes de calcular</strong> — Las relaciones
@@ -729,7 +731,7 @@ export default function SimuladorEstequiometriaPage() {
                 (2 × 15,999 = 31,998), no 16 g/mol. Siempre considera la fórmula molecular completa, no solo el átomo.
               </li>
               <li>
-                <strong>Aplicar el rendimiento a los moles del limitante en vez de a la masa del producto</strong>
+                <strong>Aplicar el rendimiento a los moles del limitante en vez de a la masa del producto</strong>{' '}
                 — El rendimiento afecta al producto obtenido: m_real = m_teórica × η/100. No reduce los
                 moles del reactivo que reacciona (eso es conversión, no rendimiento).
               </li>
