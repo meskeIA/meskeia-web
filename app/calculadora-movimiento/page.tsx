@@ -8,6 +8,7 @@ import { EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { G, resolverRectilineo, resolverParabolico, type ResultadoRectilineo, type ResultadoParabolico } from './motor';
 import SimuladorCinematica from './SimuladorCinematica';
+import CasosAula from './CasosAula';
 
 type TipoMovimiento = 'mru' | 'mrua' | 'caida' | 'parabolico';
 
@@ -376,6 +377,9 @@ export default function CalculadoraMovimientoPage() {
           <a href="/simulador-proyectiles/">simulador de tiro parabólico</a>.
         </p>
       )}
+
+      {/* Tarea asignable para clase (skill /casos-aula-meskeia) */}
+      <CasosAula />
 
       {/* Sección educativa */}
       <EducationalSection
