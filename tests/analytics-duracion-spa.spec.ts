@@ -32,6 +32,15 @@
  *     con --host-resolver-rules, en vez de interceptar y reescribir cada petición.
  *   · `navigator.webdriver` debe ser false → addInitScript sobre el prototipo.
  *   · el UA no puede contener «Headless» → se fija un UA de Chrome normal.
+ *
+ * ⚠️ Y POR ESO NADA DE /api/analytics/ PUEDE LLEGAR AL SERVIDOR (24/10/2026, acta del digest,
+ * P1). El servidor local tiene las credenciales de Turso: hasta ese día cada pasada de este
+ * fichero escribía sus visitas en producción, 126 filas de calculadora-iva y
+ * orientador-iva-espana con `ip_address = '::ffff::'` en 7 tandas desde el 16/09. Ahora todo
+ * /api/analytics/ se contesta con `page.route`, como en `primer-uso-zona.spec.ts`, y cada
+ * caso termina comprobando que el route contestó tantas peticiones como envíos salieron de
+ * la página: si una se le escapara, habría llegado al servidor. La captura de abajo no
+ * cambia, porque mira los envíos dentro del navegador, antes de la red.
  */
 import { test, expect, type Page } from '@playwright/test';
 
@@ -62,9 +71,11 @@ interface EnvioDuracion {
  */
 async function prepararCaptura(page: Page) {
   await page.addInitScript(() => {
-    const w = window as unknown as { __duraciones: string[]; __entradas: number };
+    const w = window as unknown as { __duraciones: string[]; __entradas: number; __enviosAnalytics: number };
     w.__duraciones = [];
     w.__entradas = 0;
+    w.__enviosAnalytics = 0;
+    const esAnalytics = (url: unknown) => String(url).includes('/api/analytics/');
     const esDuracion = (url: unknown) => String(url).includes('/api/analytics/duration');
     const esEntrada = (url: unknown) => String(url).includes('/api/analytics/track');
     const anotar = (cuerpo: unknown) => {
@@ -74,6 +85,7 @@ async function prepararCaptura(page: Page) {
     const beaconOriginal = navigator.sendBeacon?.bind(navigator);
     if (beaconOriginal) {
       navigator.sendBeacon = (url: string | URL, data?: BodyInit | null) => {
+        if (esAnalytics(url)) w.__enviosAnalytics++;
         if (esDuracion(url)) anotar(data);
         return beaconOriginal(url, data);
       };
@@ -81,12 +93,44 @@ async function prepararCaptura(page: Page) {
     const fetchOriginal = window.fetch.bind(window);
     window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' || input instanceof URL ? input : input.url;
+      if (esAnalytics(url)) w.__enviosAnalytics++;
       if (esDuracion(url)) anotar(init?.body);
       if (esEntrada(url)) w.__entradas++;
       return fetchOriginal(input, init);
     };
   });
 }
+
+/**
+ * Peticiones a /api/analytics/ que ha contestado el route de cada caso. Se comparan al final
+ * con `__enviosAnalytics`, los envíos que salieron de la página: si el route contestó menos,
+ * el resto llegó al servidor y de ahí a Turso.
+ */
+let contestadasPorRoute = 0;
+
+test.beforeEach(async ({ page }) => {
+  contestadasPorRoute = 0;
+  await page.route('**/api/analytics/**', async (ruta) => {
+    contestadasPorRoute++;
+    await ruta.fulfill({ status: 200, contentType: 'application/json', body: '{"status":"success"}' });
+  });
+});
+
+test.afterEach(async ({ page }) => {
+  const enviados = await page.evaluate(
+    () => (window as unknown as { __enviosAnalytics: number }).__enviosAnalytics
+  );
+  expect(enviados, 'el caso no envió nada a /api/analytics/: la comprobación no probaría nada').toBeGreaterThan(0);
+  // Un beacon sale en asíncrono: se le da margen para llegar al route antes de contar.
+  await expect
+    .poll(() => contestadasPorRoute, {
+      message:
+        `salieron ${enviados} envíos a /api/analytics/ y el route no los contestó todos: ` +
+        `los que faltan llegaron al servidor local, que escribe en la base de producción`,
+      timeout: 5000,
+    })
+    .toBe(enviados);
+});
 
 /**
  * Espera a que el tracker se haya montado, que es cuando empieza a contar: su primer acto
