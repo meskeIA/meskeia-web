@@ -55,7 +55,9 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre seguro a terceros y todo riesgo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En el seguro de coche (también llamado seguro de carro o seguro de auto según el país), el de terceros cubre los daños que tú causas a otros vehículos o personas, pero no repara tu propio coche. El todo riesgo, además, cubre los daños de tu vehículo independientemente de quién tenga la culpa, incluidos los provocados por ti mismo. En España, lo único que exige la ley es la responsabilidad civil obligatoria, que es lo que cubre el seguro a terceros básico; el todo riesgo es voluntario.',
+        // Distingue básico de ampliado: el ampliado sí paga robo, incendio y lunas del propio coche,
+        // como dicen su ficha y la 4.ª respuesta (hallazgo 3139).
+        text: 'En el seguro de coche (también llamado seguro de carro o seguro de auto según el país), el de terceros básico cubre solo los daños que tú causas a otros vehículos o personas y no repara tu propio coche; el terceros ampliado añade algunos daños del propio coche, como el robo, el incendio o la rotura de lunas, pero no los de un accidente. El todo riesgo, además, cubre los daños de tu vehículo independientemente de quién tenga la culpa, incluidos los provocados por ti mismo. En España, lo único que exige la ley es la responsabilidad civil obligatoria, que es lo que cubre el seguro a terceros básico; el todo riesgo es voluntario.',
       },
     },
     {
@@ -71,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Qué es el todo riesgo con franquicia y para quién es recomendable?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El todo riesgo con franquicia cubre los daños propios, pero el asegurado paga una cantidad fija (la franquicia, cuyo importe fija cada póliza) en cada siniestro. La prima anual es inferior al todo riesgo sin franquicia, por lo que resulta adecuado para conductores experimentados con bajo historial de siniestros que quieren protección ante daños graves sin pagar la prima más alta.',
+        text: 'El todo riesgo con franquicia cubre los daños propios, pero el asegurado paga una cantidad fija (la franquicia, cuyo importe fija cada póliza) en cada siniestro. La prima anual es inferior al todo riesgo sin franquicia, por lo que resulta adecuado para quien quiere cubrir los daños de su coche y podría pagar de su bolsillo la franquicia de un siniestro, pero no una reparación entera. En este test es esa respuesta la que más empuja hacia esta modalidad.',
       },
     },
     {

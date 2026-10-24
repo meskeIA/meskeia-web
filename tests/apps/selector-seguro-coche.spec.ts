@@ -842,16 +842,18 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
   });
 
   test('FAQPage y guía: el todo riesgo con franquicia no se recomienda a «conductores experimentados» mientras el test les resta peso', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). El FAQPage dice que el TR con franquicia «resulta adecuado
-    // para conductores experimentados con bajo historial de siniestros», y la guía, que con «buen
-    // historial» la franquicia es «una excelente forma de reducir el coste». El test hace lo
-    // contrario: «Más de 5 años con experiencia sólida» y «No, ninguno» dan 0 al TR con franquicia
-    // (y +1 al básico y al ampliado); «novel» y «uno leve», +2 cada una. Enumerado: el TR con
-    // franquicia gana en el 29,1 % de los experimentados sin siniestros, frente al 49,5 % de todos,
-    // el 51,9 % de los noveles y el 62,0 % de quien tuvo un siniestro leve.
+    // REPARADO el 24/10/2026 (3137). Antes (inspector 10/10/2026): el FAQPage decía que el TR con
+    // franquicia «resulta adecuado para conductores experimentados con bajo historial de
+    // siniestros», y la guía, que con «buen historial» la franquicia es «una excelente forma de
+    // reducir el coste». El test hace lo contrario: «Más de 5 años con experiencia sólida» y «No,
+    // ninguno» dan 0 al TR con franquicia (y +1 al básico y al ampliado); «novel» y «uno leve», +2
+    // cada una. Enumerado: el TR con franquicia gana en el 29,1 % de los experimentados sin
+    // siniestros, frente al 49,5 % de todos, el 51,9 % de los noveles y el 62,0 % de quien tuvo un
+    // siniestro leve. Se corrige el TEXTO, no los pesos (forma del 1480: guía y FAQ dicen lo que
+    // hace el test): los dos nombran ahora lo que más empuja hacia esa modalidad, poder asumir
+    // parte de una reparación (pregunta 9, +3, su mayor peso).
     // A mano: [1,1,1,2,0,1,1,1,1,2] → TRf 11 (4, 7, 11, 2); el mismo con «novel» y «uno leve»,
     // [1,1,1,0,1,1,1,1,1,2] → TRf 15 (2, 6, 15, 4).
-    test.fail();
     expect(calcularResultado([1, 1, 1, 2, 0, 1, 1, 1, 1, 2]).puntos.todo_riesgo_franquicia).toBe(11);
     expect(calcularResultado([1, 1, 1, 0, 1, 1, 1, 1, 1, 2]).puntos.todo_riesgo_franquicia).toBe(15);
     await abrirTest(page);
@@ -862,15 +864,21 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
     const experimentadoLimpio = trf(3, 2) + trf(4, 0);
     const novelConParte = trf(3, 0) + trf(4, 1);
     expect(loDice && experimentadoLimpio < novelConParte, `texto ${loDice} · pesos TRf ${experimentadoLimpio} frente a ${novelConParte}`).toBe(false);
+    // Lo que dicen ahora, y que es verdad en los pesos: «Podría asumir parte» es el mayor peso del TRf.
+    expect(faq).toContain('podría pagar de su bolsillo la franquicia de un siniestro, pero no una reparación entera');
+    expect(guia.replace(/\s+/g, ' ')).toContain('Si podrías pagar de tu bolsillo la franquicia de un siniestro, pero no una reparación entera');
+    const maxTRf = Math.max(...PREGUNTAS.flatMap((p) => p.opciones.map((o) => o.pesos.todo_riesgo_franquicia ?? 0)));
+    expect(trf(8, 1)).toBe(maxTRf);
   });
 
   test('guía: «primer coche de bajo valor → terceros ampliado» no contradice lo que el test da a ese perfil', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Forma del 1480 (la guía orientaba con otros criterios que el
-    // test). JOVEN_PRIMER_COCHE: el test da TR con franquicia (10) y su nota nombra el BÁSICO (8)
-    // como terceros; el ampliado queda con 6. La guía, en la misma página: «Para el primer coche (de
-    // bajo valor): terceros ampliado». Enumerado: con un menor de 25 y menos de 3.000 €, el ampliado
-    // sale en el 5,5 % de los 15.552 perfiles (TRf 51,0 %, TRsf 23,4 %, básico 20,1 %).
-    test.fail();
+    // REPARADO el 24/10/2026 (3138). Antes (inspector 10/10/2026), forma del 1480 (la guía orientaba
+    // con otros criterios que el test). JOVEN_PRIMER_COCHE: el test da TR con franquicia (10) y su
+    // nota nombra el BÁSICO (8) como terceros; el ampliado queda con 6. La guía, en la misma página,
+    // decía «Para el primer coche (de bajo valor): terceros ampliado». Enumerado: con un menor de 25
+    // y menos de 3.000 €, el ampliado sale en el 5,5 % de los 15.552 perfiles. Ahora la guía dice
+    // «una modalidad a terceros», el porqué (art. 26 de la Ley 50/1980) y que el test avisa con la
+    // nota «valor-bajo», que es lo que el test hace.
     await abrirTest(page);
     await responder(page, JOVEN_PRIMER_COCHE);
     await expect(titulo(page)).toHaveText('Todo Riesgo con Franquicia');
@@ -880,17 +888,20 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
     const guiaDiceAmpliado = guia.includes('Para el primer coche (de bajo valor): terceros ampliado');
     const testDaAmpliado = (await titulo(page).innerText()) === 'Seguro a Terceros Ampliado' || textoNota.includes('terceros ampliado');
     expect(guiaDiceAmpliado && !testDaAmpliado, 'la guía dice ampliado y el test, otra cosa').toBe(false);
+    expect(guia.replace(/\s+/g, ' ')).toContain('Si con un coche de menos de 3.000 € el test te da un todo riesgo, te lo avisa');
   });
 
   test('FAQPage: «el de terceros… no repara tu propio coche» no contradice la ficha del terceros ampliado', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). La ficha del terceros ampliado (y la 4.ª respuesta del mismo
-    // FAQPage) incluye robo, incendio y rotura de lunas del propio coche; la 1.ª respuesta dice del
-    // seguro «de terceros», sin distinguir, que «no repara tu propio coche».
-    test.fail();
+    // REPARADO el 24/10/2026 (3139). Antes (inspector 10/10/2026): la ficha del terceros ampliado
+    // (y la 4.ª respuesta del mismo FAQPage) incluye robo, incendio y rotura de lunas del propio
+    // coche, y la 1.ª respuesta decía del seguro «de terceros», sin distinguir, que «no repara tu
+    // propio coche». Ahora lo dice del básico, y del ampliado, que no cubre los daños por accidente.
     expect(RESULTADOS.terceros_ampliado.coberturas).toContain('Rotura de lunas (parabrisas, luneta, laterales)');
     await abrirTest(page);
     const q1 = await respuestaFaq(page, '¿Qué diferencia hay entre seguro a terceros y todo riesgo?');
     expect(q1).not.toMatch(/el de terceros cubre[^.]*pero no repara tu propio coche/);
+    expect(q1).toContain('el de terceros básico cubre solo los daños que tú causas');
+    expect(q1).toContain('el terceros ampliado añade algunos daños del propio coche, como el robo, el incendio o la rotura de lunas, pero no los de un accidente');
   });
 
   test('doble clic (escritorio) en «Siguiente» de la pregunta 3 no contesta la 4', async ({ page }) => {

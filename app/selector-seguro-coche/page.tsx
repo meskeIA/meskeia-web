@@ -471,10 +471,13 @@ export default function SelectorSeguroCochePage() {
             una franquicia de 300 € y una reparación de 1.200 €, tú pagas 300 € y la
             compañía abona 900 €.
           </p>
+          {/* Decía que la franquicia conviene al «conductor experimentado con buen historial», y
+              el test les resta peso: lo que más empuja al todo riesgo con franquicia es poder
+              asumir parte de una reparación (hallazgo 3137; forma del 1480). */}
           <p>
-            A mayor franquicia, menor prima anual. Si eres un conductor experimentado con
-            buen historial, la franquicia puede ser una excelente forma de reducir el coste
-            anual del seguro sin perder protección ante siniestros graves.
+            A mayor franquicia, menor prima anual. Si podrías pagar de tu bolsillo la franquicia
+            de un siniestro, pero no una reparación entera, la franquicia es una forma de reducir
+            el coste anual del seguro sin perder protección ante siniestros graves.
           </p>
         </section>
 
@@ -485,9 +488,14 @@ export default function SelectorSeguroCochePage() {
             estadísticas indican mayor siniestralidad. En su caso, lo más habitual es:
           </p>
           <ul>
+            {/* Decía «terceros ampliado» y el test, con menos de 3.000 €, puntúa al básico y su
+                nota nombra el terceros que mejor encaja con las respuestas (hallazgo 3138). */}
             <li>
-              Para el primer coche (de bajo valor): terceros ampliado para no encarecer
-              demasiado la prima.
+              Para un primer coche de poco valor: una modalidad a terceros abarata la prima, y el
+              todo riesgo compensa menos, porque el seguro indemniza según el valor del coche justo
+              antes del siniestro (Ley 50/1980, art. 26). Si con un coche de menos de 3.000 € el
+              test te da un todo riesgo, te lo avisa y te dice qué seguro a terceros encaja mejor
+              con tus respuestas.
             </li>
             {/* Decía «todo riesgo obligatorio»: la ley solo obliga a la responsabilidad civil
                 (RDL 8/2004, art. 2.1); el todo riesgo, si acaso, lo exige el contrato (hallazgo 1478). */}
