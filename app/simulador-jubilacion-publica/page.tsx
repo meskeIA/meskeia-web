@@ -36,6 +36,24 @@ import {
   edadMinimaJubilacionParcial,
   getCoeficienteAnticipada,
 } from '@/data/fiscal';
+// Las cifras normativas de la guía y la FAQ salen de data/fiscal vía ./textos (hallazgo 2873).
+import {
+  ANIO_VIGENTE,
+  RESPUESTA_CIEN_POR_CIEN,
+  RESPUESTA_SISTEMA_DUAL,
+  RESPUESTA_ANTICIPADA_VIAS,
+  RESPUESTA_ANTICIPADA_PERMANENTE,
+  RESPUESTA_PARCIAL,
+  TEXTO_EDAD_ESTABLE,
+  TEXTO_EDAD_VIGENTE,
+  TEXTO_EDAD_DEFINITIVA,
+  TEXTO_COTIZACION_DEFINITIVA,
+  ANIO_EDAD_DEFINITIVA,
+  ESCENARIO_PEDRO,
+  ESCENARIO_MARIA,
+  ESCENARIO_ANA_BR,
+  TEXTO_FACTOR_BR,
+} from './textos';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // TIPOS
@@ -1016,8 +1034,8 @@ export default function SimuladorJubilacionPublicaPage() {
             </thead>
             <tbody>
               {TABLA_EDAD_JUBILACION.map(row => (
-                <tr key={row.anio} className={row.anio === 2026 ? styles.tablaHighlight : ''}>
-                  <td>{row.anio}{row.anio === 2026 ? ' ←' : ''}</td>
+                <tr key={row.anio} className={row.anio === ANIO_VIGENTE ? styles.tablaHighlight : ''}>
+                  <td>{row.anio}{row.anio === ANIO_VIGENTE ? ' ←' : ''}</td>
                   <td>{edadTexto(row.edadSinCotizacion.anios, row.edadSinCotizacion.meses)}</td>
                   <td>{edadTexto(row.cotizacionPara65.anios, row.cotizacionPara65.meses)} cotizados</td>
                 </tr>
@@ -1025,7 +1043,7 @@ export default function SimuladorJubilacionPublicaPage() {
             </tbody>
           </table>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            Desde 2027 la edad ordinaria se estabiliza en 67 años (o 65 con 38 años y 6 meses cotizados).
+            {TEXTO_EDAD_ESTABLE}
           </p>
         </div>
 
@@ -1043,7 +1061,7 @@ export default function SimuladorJubilacionPublicaPage() {
                 <strong>Empleada con carrera completa</strong>
               </div>
               <p className={styles.escenarioExample}>Ana, 62 años, 38 años cotizados al jubilarse, base media 2.200 €/mes.</p>
-              <p className={styles.escenarioTip}>Llega al 100 %, pero eso es el 100 % de la <strong>base reguladora</strong>, no del sueldo: 2.200 × 300/350 = 1.885,71 €/mes. Y 38 años no bastan para jubilarse a los 65 a partir de 2027, que pide 38 años y 6 meses: su edad ordinaria es 67.</p>
+              <p className={styles.escenarioTip}>Llega al 100 %, pero eso es el 100 % de la <strong>base reguladora</strong>, no del sueldo: 2.200 × {TEXTO_FACTOR_BR} = {ESCENARIO_ANA_BR}/mes. Y 38 años no bastan para jubilarse a los 65 a partir de {ANIO_EDAD_DEFINITIVA}, que pide {TEXTO_COTIZACION_DEFINITIVA}: su edad ordinaria es {TEXTO_EDAD_DEFINITIVA}.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -1059,7 +1077,7 @@ export default function SimuladorJubilacionPublicaPage() {
                 <strong>Trabajador que quiere anticipar</strong>
               </div>
               <p className={styles.escenarioExample}>Pedro, 63 años, 36 cotizados. Quiere jubilarse 2 años antes.</p>
-              <p className={styles.escenarioTip}>Puede anticipar voluntariamente (supera los 35 años), pero la reducción no es pequeña: con menos de 38 años y 6 meses cotizados son 2,00 % por trimestre, y 2 años son 8 trimestres → <strong>16,00 % permanente</strong>.</p>
+              <p className={styles.escenarioTip}>Puede anticipar voluntariamente (supera los {ESCENARIO_PEDRO.supera} años), pero la reducción no es pequeña: con menos de {ESCENARIO_PEDRO.tramo} cotizados son {ESCENARIO_PEDRO.coef} por trimestre, y 2 años son {ESCENARIO_PEDRO.trimestres} trimestres → <strong>{ESCENARIO_PEDRO.total} permanente</strong>.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -1067,7 +1085,7 @@ export default function SimuladorJubilacionPublicaPage() {
                 <strong>Persona que prefiere transición gradual</strong>
               </div>
               <p className={styles.escenarioExample}>María, 62 años, 35 cotizados hoy. Quiere reducir jornada al 50 %.</p>
-              <p className={styles.escenarioTip}>Todavía no puede: la parcial exige estar como máximo a 3 años de la edad ordinaria, y sin los 38 años y 3 meses acreditados la suya es 66 años y 10 meses, así que el mínimo son 63 años y 10 meses. Cuando llegue, cobrará el 50 % de su pensión más el 50 % de su salario.</p>
+              <p className={styles.escenarioTip}>Todavía no puede: la parcial exige estar como máximo a {ESCENARIO_MARIA.anticipacion} años de la edad ordinaria, y sin los {ESCENARIO_MARIA.cotizacion} acreditados la suya es {ESCENARIO_MARIA.edad}, así que el mínimo son {ESCENARIO_MARIA.minimo}. Cuando llegue, cobrará el 50 % de su pensión más el 50 % de su salario.</p>
             </div>
           </div>
 
@@ -1076,23 +1094,23 @@ export default function SimuladorJubilacionPublicaPage() {
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
               <strong>¿Cuántos años hay que cotizar para cobrar el 100&nbsp;%?</strong>
-              <p>En 2026 se necesitan 36 años y 6 meses cotizados para alcanzar el 100&nbsp;% de la base reguladora. Los primeros 15 años dan el 50&nbsp;%; cada uno de los 49 meses siguientes suma un 0,21&nbsp;% y los 209 posteriores, un 0,19&nbsp;%. Este requisito ha ido subiendo escalón a escalón y desde el 1 de enero de 2027 será de 37 años: cada uno de los 248 meses siguientes a los 15 años suma un 0,19&nbsp;% y los 16 posteriores, un 0,18&nbsp;%. Por eso con 25 años cotizados el porcentaje baja del 73,78&nbsp;% al 72,80&nbsp;% para quien se jubile a partir de 2027, y el simulador aplica la escala del año en que te jubilas.</p>
+              <p>{RESPUESTA_CIEN_POR_CIEN}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué es el sistema dual de pensiones 2026?</strong>
-              <p>Desde enero de 2026, la SS calcula tu pensión con dos fórmulas —la clásica (media de las últimas 300 bases dividida entre 350) y la ampliada (las 302 mejores bases de 304 meses, divididas entre 352,33)— y aplica de oficio la más favorable. La ampliada gana cuando hay lagunas o bases muy desiguales, porque puede descartar los peores meses. Esta herramienta parte de una única base media, así que no puede distinguirlas: para saber cuál te conviene hace falta tu historial mes a mes, que es lo que usa el simulador oficial.</p>
+              <p>{RESPUESTA_SISTEMA_DUAL}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Puedo jubilarme antes de la edad ordinaria?</strong>
-              <p>Sí: anticipada voluntaria (hasta 2 años antes, 35+ años cotizados) o involuntaria (hasta 4 años, 33+ cotizados). Ambas implican coeficientes reductores permanentes. Existe una tercera vía, la jubilación anticipada por discapacidad, con un régimen propio y coeficientes distintos que esta herramienta no cubre: si es tu caso, consúltalo en el INSS.</p>
+              <p>{RESPUESTA_ANTICIPADA_VIAS}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿La reducción por anticipada es permanente?</strong>
-              <p>Sí, se mantiene toda la vida. Anticipar 2 años de forma voluntaria son 8 trimestres, entre el 13,04&nbsp;% y el 16,00&nbsp;% según los años cotizados: el coeficiente más duro (2,00&nbsp;% por trimestre) le toca precisamente a quien menos ha cotizado. El punto de equilibrio suele estar entre 10 y 15 años.</p>
+              <p>{RESPUESTA_ANTICIPADA_PERMANENTE}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué es la jubilación parcial?</strong>
-              <p>Permite reducir la jornada entre el 25&nbsp;% y el 75&nbsp;% combinando salario y pensión parcial. No hay una edad fija: desde el RDL 11/2024 (efectos del 1 de abril de 2025) puede anticiparse como máximo 3 años sobre la edad ordinaria, así que en 2026 son 62 años con la cotización suficiente acreditada, o 63 años y 10 meses sin ella. Requiere 33 años cotizados, contrato de relevo y acuerdo con el empleador.</p>
+              <p>{RESPUESTA_PARCIAL}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Puedo trabajar y cobrar pensión a la vez?</strong>
@@ -1105,7 +1123,7 @@ export default function SimuladorJubilacionPublicaPage() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cuándo será definitiva la edad de 67 años?</strong>
-              <p>En 2027. Desde ese año, la edad ordinaria es 67 años (o 65 con 38 años y 6 meses). No hay más escalones previstos.</p>
+              <p>En {ANIO_EDAD_DEFINITIVA}. {TEXTO_EDAD_ESTABLE} No hay más escalones previstos.</p>
             </li>
           </ul>
 
@@ -1190,7 +1208,7 @@ export default function SimuladorJubilacionPublicaPage() {
               <strong>Errores frecuentes al planificar la jubilación</strong>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>Creer que la edad es siempre 65 años:</strong> En 2026 es 66 años y 10 meses sin cotización suficiente.</li>
+              <li><strong>Creer que la edad es siempre 65 años:</strong> En {ANIO_VIGENTE} es {TEXTO_EDAD_VIGENTE} sin cotización suficiente.</li>
               <li><strong>No verificar la vida laboral:</strong> Muchas personas descubren lagunas o errores solo al solicitar la pensión.</li>
               <li><strong>Confundir años cotizados con años trabajados:</strong> El paro sin prestación no cotiza y genera lagunas.</li>
               <li><strong>Calcular sobre sueldo bruto:</strong> Horas extra y complementos no siempre cotizan igual que el salario base.</li>

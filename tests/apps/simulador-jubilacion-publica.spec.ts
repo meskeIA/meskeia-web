@@ -642,7 +642,50 @@ test('CASO 19 · título, JSON-LD y DataReference dicen el mismo año (b7ec248c)
   // La FAQ del JSON-LD da las DOS escalas, como la de la página: no promete el 100 % a los
   // 36 años y 6 meses a quien se jubila desde 2027.
   expect(faq!.mainEntity[1].acceptedAnswer.text).toContain('Desde 2027 la escala cambia');
-  expect(faq!.mainEntity[1].acceptedAnswer.text).toContain('hasta el 100% a los 37 años');
+  // Desde el 24/10/2026 (2873) el «%» del FAQPage va con espacio duro, como en la página.
+  expect(faq!.mainEntity[1].acceptedAnswer.text).toContain('hasta el 100 % a los 37 años');
   const web = ld.find((j) => j['@type'] === 'WebApplication');
   expect(web?.name).toBe('Simulador de Jubilación Pública');
+});
+
+test('CASO 20 · las cifras normativas de la guía y del FAQPage salen de data/fiscal, no del teclado (hallazgo 2873)', async ({ page }) => {
+  // Antes (inspector 04/10/2026): «36 años y 6 meses», «49», «0,21 %», «209», «248», «16»,
+  // «0,18 %», «73,78 %», «72,80 %», «3.359,60 €», «888,70 €», «9.442 €», 302/304/352,33 y
+  // 1,50-1,875 escritos a mano en page.tsx y metadata.ts. Ahora los interpola ./textos.ts.
+  // 1) En el código fuente ya no están (sin comentarios).
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const sinComentarios = (f: string) =>
+    fs.readFileSync(path.join(process.cwd(), 'app/simulador-jubilacion-publica', f), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '').replace(/\{\/\*[\s\S]*?\*\/\}/g, '').replace(/^\s*\/\/.*$/gm, '');
+  for (const f of ['page.tsx', 'metadata.ts']) {
+    const codigo = sinComentarios(f);
+    for (const literal of ['36 años y 6 meses', '0,21', '0,18', '73,78', '72,80', '3.359,60', '888,70', '936,20', '1.256,60', '9.442', '11.013', '352,33', '1,875', '66 años y 10 meses', '38 años y 6 meses', '13,04', '16,00', '63 años y 10 meses', 'row.anio === 2026']) {
+      expect(codigo.includes(literal), `«${literal}» tecleado en ${f}`).toBe(false);
+    }
+  }
+  // 2) Y lo servido dice lo mismo que el módulo (cotejado a mano con data/fiscal/pensiones.ts):
+  //    escala 2023-2026: 49 × 0,21 + 209 × 0,19 = 50 puntos → 100 % en 438 meses (36 años y 6 meses);
+  //    2027: 248 × 0,19 + 16 × 0,18 = 50 → 444 meses (37 años); 25 años: 50 + 49 × 0,21 + 71 × 0,19
+  //    = 73,78 % y 50 + 120 × 0,19 = 72,80 %; voluntaria 8 trimestres × 1,63 = 13,04 y × 2,00 = 16,00.
+  const ld = (await page.evaluate(() =>
+    [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => JSON.parse(s.textContent ?? '{}')),
+  )) as Array<Record<string, unknown>>;
+  const faq = ld.find((j) => j['@type'] === 'FAQPage') as { mainEntity: Array<{ acceptedAnswer: { text: string } }> };
+  const textos = faq.mainEntity.map((q) => limpiar(q.acceptedAnswer.text));
+  expect(textos[0]).toContain('En 2026, la edad ordinaria de jubilación en España es de 66 años y 10 meses si tienes menos de 38 años y 3 meses cotizados');
+  expect(textos[1]).toContain('más un 0,21 % por cada uno de los 49 meses siguientes y un 0,19 % por cada uno de los 209 posteriores, hasta el 100 % a los 36 años y 6 meses en 2026');
+  expect(textos[1]).toContain('las 302 mejores bases de un periodo de 304 meses, divididas entre 352,33');
+  expect(textos[2]).toContain('la reducción va del 13,04 % al 16,00 %');
+  expect(textos[2]).toContain('del 1,50 % al 1,875 % por trimestre');
+  expect(textos[3]).toContain('en 2026 son 62 años con la cotización suficiente acreditada o 63 años y 10 meses sin ella');
+  expect(textos[4]).toContain('3359,60 € al mes');
+  expect(textos[4]).toContain('no superen 9442,00 €, u 11.013,00 € contando al cónyuge a cargo');
+
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const guia = limpiar(await page.locator('main, body').first().innerText());
+  expect(guia).toContain('Por eso con 25 años cotizados el porcentaje baja del 73,78 % al 72,80 % para quien se jubile a partir de 2027');
+  expect(guia).toContain('2 años son 8 trimestres → 16,00 % permanente');
+  expect(guia).toContain('así que el mínimo son 63 años y 10 meses');
+  await expect(page.locator('[class*="tablaHighlight"]')).toContainText('2026');
 });
