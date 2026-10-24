@@ -116,6 +116,18 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     presenta como fecha de APLICACIÓN y de SUSTITUCIÓN (el art. 5 dice 01/01/2025 y el propio
  *     módulo, en CNAE_VIGENCIA.nota, también), y la ficha de Delegum pinta la fecha un día antes
  *     al oeste de Greenwich (el gotcha del 482, fuera del conversor).
+ *   · RE-inspección  24/10/2026 → INVALIDADA por su dependencia: 4b0d54c3 (22/10, cabo C0266) cambia
+ *     la urlOficial de la CNAE en data/fiscal/cnae-iae.ts, en el generador y en el catálogo servido
+ *     (la de /es/ daba 404). La batería entera (122) pasa en verde antes de tocar nada, y las ocho
+ *     reparaciones cerradas desde la anterior (2945, 2946, 2948-2951, 3336, 3337) se SOSTIENEN
+ *     también en el navegador a 1280 y a 390 px. La URL nueva sirve la página del INE de la
+ *     CNAE-2025 («Clasificación Nacional de Actividades Económicas. CNAE. Últimos datos»). Casos
+ *     nuevos y cinco hallazgos en los bloques «Inspector 24/10/2026», al final: un código de DOS
+ *     cifras casa también DENTRO de otros códigos («12» → 9 de las 10 fichas son clases ajenas;
+ *     «00», que no existe, da 9; en el IAE «47» mete al corte un grupo de la Sección 2ª y otro de
+ *     la 3ª), el sello y la FAQ dicen «se aplica de forma escalonada: se aplica…», la tabla dice
+ *     que el RD 10/2025 «sustituye al RD 475/2007», que no deroga, y los sellos leen fuente y URL
+ *     del catálogo (tecleadas en el generador) en vez de FISCAL_CNAE_IAE_META.
  *
  *   Los bloques que esta crónica llama «hallazgos abiertos del …» son historia: a 07/10/2026
  *   la base no tiene abierto ninguno anterior al 06/10, y esos bloques se rotulan hoy como
@@ -157,7 +169,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * but passed»), y entonces se le quita la marca y se queda como regresión, sin reescribir el
  * valor esperado. Los siete del bloque del 07/10/2026 (2945-2951) están REPARADOS: el último,
  * el 2950, el 20/10/2026. También los dos del bloque «Inspector 16/10/2026» (3336 y 3337) y los
- * cuatro del 06/10/2026 (2923-2926): hoy no queda ningún `test.fail()` abierto.
+ * cuatro del 06/10/2026 (2923-2926). A 24/10/2026 los únicos `test.fail()` abiertos son los del
+ * bloque «Inspector 24/10/2026 — hallazgos ABIERTOS», al final del fichero.
  */
 
 const RUTA = '/conversor-cnae-iae/';
@@ -3468,6 +3481,10 @@ test.describe('Buscador CNAE-IAE — re-inspección del 06/10/2026', () => {
     // termina en .24 (01.24, 14.24 … 95.24), que contienen «24» como subcadena del texto de
     // búsqueda: 35. Las clases van primero y, entre ellas, el prefijo (relevancia 1) delante de
     // la subcadena, así que la primera ficha es 24.10.
+    // ⚠️ 24/10/2026: esas 13 clases «.24» son actividades AJENAS a la División 24 — es el hallazgo
+    // del bloque «Inspector 24/10/2026 — hallazgos ABIERTOS» (un código de dos cifras casa también
+    // dentro de otros códigos). Este recuento fija el comportamiento de hoy: al repararlo pasará a
+    // 22 (las entradas cuyo código EMPIEZA por 24), y la primera ficha seguirá siendo 24.10.
     await buscarCnaeVerificado(page, '24');
     await expect(contador(page)).toHaveText(/^35 resultados/);
     await expect(fichas(page).first()).toContainText('24.10');
@@ -3894,11 +3911,12 @@ test.describe('Buscador CNAE-IAE — re-verificación del 07/10/2026', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS del 07/10/2026 — escritos con `test.fail()` afirmando lo que DEBERÍA
-// ocurrir. El día que se reparen pasarán a ROJO («expected to fail, but passed»): entonces se
-// les quita la marca y quedan como regresión, SIN tocar el valor esperado.
+// HALLAZGOS del 07/10/2026 (2945-2951) — se escribieron con `test.fail()` afirmando lo que
+// DEBÍA ocurrir y están todos REPARADOS (2947 el 07/10; el resto el 20/10/2026, en 7d3c7766 y
+// 1b80dcf6). Se les quitó la marca sin tocar el valor esperado: hoy son regresión. Re-verificados
+// en la re-inspección del 24/10/2026, también a 390 px.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('Buscador CNAE-IAE — hallazgos ABIERTOS del 07/10/2026', () => {
+test.describe('Buscador CNAE-IAE — hallazgos del 07/10/2026, reparados', () => {
   test('REPARADO 20/10/2026 · BAJO (operativa) — la reparación del 2925 deja en cero un código presentado con dos palabras o con dos puntos', async ({
     page,
   }) => {
@@ -4412,5 +4430,264 @@ test.describe('Inspector 16/10/2026 — hallazgos REPARADOS el 18/10/2026', () =
     }
     expect(textos.faq).toContain('está en vigor desde el 16/01/2025, pero se aplica de forma escalonada');
     expect(ldJson).toContain('no deroga la CNAE-2009');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSPECTOR 24/10/2026 — RE-inspección por dependencia INVALIDADA: 4b0d54c3 (22/10, cabo C0266)
+// cambia FISCAL_CNAE_IAE_META.cnae.urlOficial en data/fiscal/cnae-iae.ts, en el generador y en el
+// catálogo servido, porque la variante con /es/ daba 404.
+//
+// Cada valor esperado se resolvió ANTES de abrir la app:
+//   · Literales de la CNAE-2025: anexo del RD 10/2025 (BOE-A-2025-587), cotejado el 24/10/2026 —
+//     12.00 «Industria del tabaco», 62.10 «Actividades de programación informática», 43.21
+//     «Instalaciones eléctricas» y División 62 «Programación, consultoría y otras actividades
+//     relacionadas con la informática». Jerarquía y correspondencia: catálogo sellado
+//     (public/datos/cnae-iae-catalogo.json, meta.generado 2026-10-20).
+//   · Literales del IAE: texto consolidado del RD Legislativo 1175/1990 (BOE-A-1990-23930),
+//     cotejado el 24/10/2026 — División 5 «CONSTRUCCIÓN», Agrupación 50 «Construcción», Grupo 504
+//     «Instalaciones y montajes», Epígrafe 504.1 «Instalaciones eléctricas en general…», Agrupación
+//     47 «Industria del papel y fabricación de artículos de papel; artes gráficas y edición».
+//   · Norma: RD 10/2025 sin disposición derogatoria; preámbulo: «este real decreto no incluye
+//     cláusulas derogatorias, en particular, en referencia con la CNAE-2009».
+//   · URL: la de FISCAL_CNAE_IAE_META.cnae.urlOficial sirve el 24/10/2026 la página del INE
+//     «Clasificación Nacional de Actividades Económicas. CNAE. Últimos datos», de la CNAE-2025.
+//   · Retención por sección: SECCIONES_IAE (importado arriba, no transcrito).
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Inspector 24/10/2026 — casos de la re-inspección', () => {
+  test('CASO 1 (normal) — «electricista» y «instalador electrico» (sin tilde) dan 43.21; el IAE «504.1» es el epígrafe de instalaciones eléctricas de la Sección 1ª', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // «electricista» es sinónimo solo de 43.21 (sinonimos['43.21'] del catálogo sellado) y ningún
+    // título lo lleva; no es un oficio de los que derivan género (-ista). 1 resultado.
+    // correspondenciaInversa['4321'] = ['43.21'] → «En la CNAE-2009 esto correspondía a 4321.»
+    for (const consulta of ['electricista', 'instalador electrico']) {
+      await buscarCnaeVerificado(page, consulta);
+      await expect(contador(page)).toHaveText(/^1 resultado/, { timeout: 2000 });
+      await expect(avisoAntiguo(page)).toHaveCount(0);
+      const clase = fichas(page).first();
+      await expect(clase.locator('[class*="codigoCnae"]')).toHaveText('43.21');
+      await expect(clase.locator('[class*="denominacion"]')).toHaveText('Instalaciones eléctricas');
+      await expect(clase.locator('[class*="badgeNivel"]')).toHaveText('Clase');
+      await expect(clase).toContainText('Sección F: CONSTRUCCIÓN');
+      await expect(clase).toContainText('División 43: Actividades de construcción especializada');
+      await expect(clase).toContainText(
+        'Grupo 43.2: Instalaciones eléctricas, de fontanería y otras instalaciones en obras de construcción',
+      );
+      await expect(clase).toContainText('En la CNAE-2009 esto correspondía a 4321.');
+    }
+
+    // IAE: ningún otro código empieza por 5041 ni lleva «504.1» en su texto: 1 resultado.
+    await buscarIaeVerificado(page, '504.1');
+    await expect(contador(page)).toHaveText(/^1 resultado/, { timeout: 2000 });
+    const epigrafe = fichas(page).first();
+    await expect(epigrafe.locator('[class*="codigoCnae"]')).toHaveText('504.1');
+    await expect(epigrafe.locator('[class*="denominacion"]')).toContainText('Instalaciones eléctricas en general.');
+    await expect(epigrafe.locator('[class*="badgeNivel"]')).toHaveText('Epígrafe');
+    await expect(epigrafe).toContainText('Sección 1ª');
+    await expect(epigrafe).toContainText('División 5: CONSTRUCCIÓN');
+    await expect(epigrafe).toContainText('Agrupación 50: Construcción');
+    await expect(epigrafe).toContainText('Grupo 504: Instalaciones y montajes');
+    await expect(epigrafe).toContainText(SECCION_1.retencion);
+  });
+
+  test('CASO 3 (debe rechazarse) — la CNAE «99.01» y el IAE «504.9» no existen', async ({ page }) => {
+    await abrirHidratado(page);
+
+    // La División 99 solo tiene la clase 99.00, y «9901» no es clave de la correspondencia: cero,
+    // sin aviso de código antiguo.
+    await buscarCnaeVerificado(page, '99.01');
+    await expect(contador(page)).toHaveText(/^0 resultados/, { timeout: 2000 });
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(avisoAntiguo(page)).toHaveCount(0);
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
+      'No hay ninguna entrada que encaje con lo que has escrito.',
+    );
+
+    // El grupo 504 se agota en el epígrafe 504.8 (BOE): «504.9» no existe.
+    await buscarIaeVerificado(page, '504.9');
+    await expect(contador(page)).toHaveText(/^0 resultados/, { timeout: 2000 });
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(panelActivo(page).locator('[class*="sinResultados"]').first()).toContainText(
+      'Ningún epígrafe coincide con esa búsqueda.',
+    );
+  });
+
+  test('el sello de cada catálogo enlaza la URL oficial de data/fiscal (la del INE, corregida en 4b0d54c3) y lleva la fecha del sello', async ({
+    page,
+  }) => {
+    // La URL de la CNAE que daba 404 (con /es/) ya no está en el módulo
+    expect(FISCAL_CNAE_IAE_META.cnae.urlOficial).toBe(
+      'https://www.ine.es/dyngs/INEbase/operacion.htm?c=Estadistica_C&cid=1254736177032&menu=ultiDatos&idp=1254735976614',
+    );
+    await abrirHidratado(page);
+    const sellos = page.locator('[aria-label="Datos de referencia normativos"]');
+    await expect(sellos).toHaveCount(2);
+    const selloCnae = sellos.filter({ hasText: 'CNAE-2025' });
+    const selloIae = sellos.filter({ hasText: 'Tarifas del IAE' });
+    await expect(selloCnae.locator('a')).toHaveAttribute('href', FISCAL_CNAE_IAE_META.cnae.urlOficial);
+    await expect(selloIae.locator('a')).toHaveAttribute('href', FISCAL_CNAE_IAE_META.iae.urlOficial);
+    const [anio, mes, dia] = FISCAL_CNAE_IAE_META.verificado.split('-');
+    for (const sello of [selloCnae, selloIae]) {
+      await expect(sello).toContainText(`Última verificación:${dia}/${mes}/${anio}`);
+      await expect(sello.locator('a')).not.toHaveAttribute('href', /INEbase\/es\/operacion/);
+    }
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSPECTOR 24/10/2026 — HALLAZGOS ABIERTOS, escritos con `test.fail()` afirmando lo que DEBERÍA
+// ocurrir. El día que se reparen pasarán a ROJO («expected to fail, but passed»): entonces se les
+// quita la marca y quedan como regresión, SIN tocar el valor esperado.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Inspector 24/10/2026 — hallazgos ABIERTOS', () => {
+  test('ABIERTO · MEDIO (operativa) — en la CNAE, un código de dos cifras casa también DENTRO de otros códigos: «62», «12» y «00»', async ({
+    page,
+  }) => {
+    // ABIERTO (hallazgo del 24/10/2026, «código de dos cifras dentro de otros códigos»).
+    // Con la consulta reconocida como código, el filtro admite además toda entrada cuyo texto de
+    // búsqueda CONTENGA la consulta, y ese texto empieza por el propio código: «62» casa con
+    // «01.62», «12» con «01.12» y «00» con «12.00». Medido el 24/10/2026, a 1280 y a 390:
+    //   · «62» → «13 resultados»: seis de las diez fichas visibles son de otras divisiones (01.62
+    //     Actividades de apoyo a la ganadería, 10.62, 23.62, 25.62, 46.62, 47.62) y la División 62
+    //     queda la 13.ª, fuera del corte;
+    //   · «12» → «44 resultados»: tras 12.00, las otras nueve visibles son 01.12 Cultivo de arroz,
+    //     03.12 Pesca en agua dulce, 08.12… y la División 12 es la 44.ª;
+    //   · «00» → «9 resultados» (12.00, 31.00, 36.00… 99.00), y no hay División 00.
+    // Lo esperado (anexo del RD 10/2025 y catálogo sellado): las entradas cuyo código EMPIEZA por
+    // esas cifras. «62» → 7 (División 62, grupos 62.1, 62.2 y 62.9, clases 62.10, 62.20 y 62.90);
+    // «12» → 3 (División 12, grupo 12.0 y clase 12.00, las tres «Industria del tabaco»); «00» → 0.
+    test.fail();
+    await abrirHidratado(page);
+
+    await buscarCnaeVerificado(page, '62');
+    await expect(contador(page)).toHaveText(/^7 resultados/, { timeout: 2000 });
+    const codigos62 = await fichas(page).locator('[class*="codigoCnae"]').allTextContents();
+    expect(codigos62.filter((c) => !c.startsWith('62'))).toEqual([]);
+    expect(codigos62).toContain('62');
+
+    await buscarCnaeVerificado(page, '12');
+    await expect(contador(page)).toHaveText(/^3 resultados/, { timeout: 2000 });
+    const codigos12 = await fichas(page).locator('[class*="codigoCnae"]').allTextContents();
+    expect([...codigos12].sort()).toEqual(['12', '12.0', '12.00']);
+
+    await buscarCnaeVerificado(page, '00');
+    await expect(contador(page)).toHaveText(/^0 resultados/, { timeout: 2000 });
+    await expect(fichas(page)).toHaveCount(0);
+  });
+
+  test('ABIERTO · MEDIO (operativa) — en el IAE, un código de dos cifras mete en el corte grupos de OTRA sección que solo lo llevan dentro: «47» y «65»', async ({
+    page,
+  }) => {
+    // ABIERTO (hallazgo del 24/10/2026, el mismo que el de arriba en el panel del IAE). Aquí lo
+    // agrava la garantía de «al menos uno de cada sección» del corte (hallazgo 480): la entrada
+    // que casa por subcadena con el código es la única de su sección y entra en las diez visibles,
+    // con el texto de retención de su sección. Medido el 24/10/2026, a 1280 y a 390:
+    //   · «47» → «43 resultados · se muestran 10, con al menos uno de cada sección», y las dos
+    //     últimas visibles son 2ª 747 «Auditores de cuentas y Censores jurados de cuentas» y 3ª 047
+    //     «Jugadores, entrenadores y preparadores de balonmano…»;
+    //   · «65» → «61 resultados», con 2ª 765 «Grabadores, Informáticos y otros profesionales
+    //     auxiliares del tratamiento electrónico de datos» entre las diez visibles.
+    // Lo esperado (BOE y catálogo sellado): «47» es la Agrupación 47 de la Sección 1ª —«Industria
+    // del papel y fabricación de artículos de papel; artes gráficas y edición»— con sus grupos y
+    // epígrafes, 26 entradas, todas de la Sección 1ª; ninguna de la 2ª ni de la 3ª lleva código 47.
+    // «65», la Agrupación 65 de la Sección 1ª, 45 entradas.
+    test.fail();
+    await abrirHidratado(page);
+
+    await buscarIaeVerificado(page, '47');
+    await expect(contador(page)).toHaveText(/^26 resultados/, { timeout: 2000 });
+    await expect(fichas(page).filter({ hasText: 'Sección 2ª' })).toHaveCount(0);
+    await expect(fichas(page).filter({ hasText: 'Sección 3ª' })).toHaveCount(0);
+
+    await buscarIaeVerificado(page, '65');
+    await expect(contador(page)).toHaveText(/^45 resultados/, { timeout: 2000 });
+    await expect(fichas(page).filter({ hasText: 'Grabadores, Informáticos' })).toHaveCount(0);
+  });
+
+  test('ABIERTO · BAJO (contenido) — el sello, la FAQ visible y el FAQPage dicen «se aplica de forma escalonada: se aplica a las estadísticas…»', async ({
+    page,
+  }) => {
+    // ABIERTO (hallazgo del 24/10/2026). Las tres bocas pegan «… se aplica de forma escalonada: »
+    // delante de APLICACION_CNAE (metadata.ts), que es CNAE_VIGENCIA.nota sin su arranque y empieza
+    // a su vez por «se aplica a las estadísticas oficiales…». Lo esperado: el verbo una sola vez.
+    test.fail();
+    await abrirHidratado(page);
+    const duplicado = /se aplica de forma escalonada: se aplica/;
+    const sello = await page
+      .locator('[aria-label="Datos de referencia normativos"]')
+      .filter({ hasText: 'CNAE-2025' })
+      .textContent();
+    const faq = await page.locator('[class*="faqItem"]').filter({ hasText: 'Desde cuándo rige' }).textContent();
+    const ldJson = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    for (const [boca, texto] of [['sello', sello ?? ''], ['FAQ visible', faq ?? ''], ['FAQPage', ldJson]] as const) {
+      expect(texto, boca).not.toMatch(duplicado);
+    }
+  });
+
+  test('ABIERTO · BAJO (dato) — la tabla comparativa dice que el RD 10/2025 «sustituye al RD 475/2007», que no deroga', async ({
+    page,
+  }) => {
+    // ABIERTO (hallazgo del 24/10/2026, residuo del 3336). BOE-A-2025-587: el RD 10/2025 no tiene
+    // disposición derogatoria, y su preámbulo dice «este real decreto no incluye cláusulas
+    // derogatorias, en particular, en referencia con la CNAE-2009». La propia página lo dice dos
+    // párrafos antes de la tabla («la CNAE-2009 no se ha derogado y las dos conviven»), y la fila
+    // «Norma de referencia» dice «RD 10/2025, de 14 de enero (sustituye al RD 475/2007, de 13 de
+    // abril)». Lo esperado: la norma vigente sin afirmar que sustituye a la anterior.
+    test.fail();
+    await abrirHidratado(page);
+    const fila = page.locator('tr').filter({ hasText: 'Norma de referencia' });
+    await expect(fila).toContainText(CNAE_VIGENCIA.normaVigente);
+    await expect(fila).not.toContainText(`sustituye al ${CNAE_VIGENCIA.normaAnterior}`, { timeout: 2000 });
+  });
+
+  test('ABIERTO · BAJO (dato) — los sellos leen fuente y URL oficial del catálogo, tecleadas en el generador, y no de FISCAL_CNAE_IAE_META', async () => {
+    // ABIERTO (hallazgo del 24/10/2026). page.tsx pasa a los dos DataReference `meta.cnae.fuente`,
+    // `meta.cnae.urlOficial`, `meta.iae.fuente` y `meta.iae.urlOficial` del JSON servido, que
+    // escribe a mano scripts/generar-catalogos-cnae-iae.mjs (l. 276-282), mientras el mismo dato
+    // vive en FISCAL_CNAE_IAE_META con su contrato de vigilancia. Hoy la URL coincide porque
+    // 4b0d54c3 la corrigió en los TRES sitios. Es la forma de los hallazgos 588 (fecha) y 2924
+    // (nota), que se repararon pasando el sello a leer del módulo.
+    test.fail();
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const fuente = readFileSync(join(process.cwd(), 'app', 'conversor-cnae-iae', 'page.tsx'), 'utf8');
+    expect(fuente).not.toMatch(/meta\.(cnae|iae)\.(urlOficial|fuente)/);
+  });
+});
+
+test.describe('Inspector 24/10/2026 — CASO 1 a 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('«electricista» da 43.21 y el IAE «504.1» su epígrafe, y la lista desplegada del IAE no desborda', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+    await buscarCnaeVerificado(page, 'electricista');
+    await expect(contador(page)).toHaveText(/^1 resultado/, { timeout: 2000 });
+    await expect(fichas(page).first().locator('[class*="codigoCnae"]')).toHaveText('43.21');
+
+    await buscarIaeVerificado(page, '504.1');
+    await expect(contador(page)).toHaveText(/^1 resultado/, { timeout: 2000 });
+    await expect(fichas(page).first().locator('[class*="codigoCnae"]')).toHaveText('504.1');
+    await expect(fichas(page).first()).toContainText('Sección 1ª');
+
+    // La Agrupación 65 tiene 45 entradas (más de 10): «Ver los N» existe y despliega sin desbordar
+    await buscarIaeVerificado(page, '65');
+    await panelActivo(page).getByRole('button', { name: /^Ver los/ }).tap();
+    await expect.poll(() => fichas(page).count()).toBeGreaterThan(10);
+    const desborde = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(desborde).toBe(0);
   });
 });

@@ -910,3 +910,437 @@ test.describe('casos para clase · en la página', () => {
     await expect(tarjeta(page, 'Masa teórica')).toContainText('33,009 g');
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 24/10/2026 — invalidada por una dependencia (3b92acef, `textoDesviacion` del
+// corrector compartido). Esta app NO usa `textoDesviacion`: su `comprobarRespuesta` escribe la
+// desviación con su propio `cifra`, y con la tolerancia relativa (nunca menor que 0,01) un fallo
+// se desvía siempre ≥ 0,01, así que «Te has desviado 0,00» no puede salir aquí. Los REPARADO de
+// arriba (2710–2723) se sostienen: el spec entero pasó en verde antes de añadir este bloque.
+//
+// Casos nuevos, resueltos a mano ANTES de abrir la app, con los pesos atómicos IUPAC/CIAAW 2021
+// abreviados de `app/tabla-periodica/elementos-data.ts` (H 1,008 · N 14,007 · O 15,999 ·
+// Na 22,990 · Cl 35,45 · Fe 55,845) y la masa molar redondeada a los decimales del elemento
+// menos preciso: H₂ 2,016 · O₂ 31,998 · H₂O 18,015 · N₂ 28,014 · NH₃ 17,031 · Fe₂O₃ 159,687 ·
+// HCl 36,46 · NaOH 39,997 · NaCl 58,44.
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+
+// CASO NORMAL — síntesis del agua, 5 g de H₂ + 30 g de O₂, rendimiento 80 %
+//   n(H₂) = 5 / 2,016 = 2,480159 mol → razón /2 = 1,240079
+//   n(O₂) = 30 / 31,998 = 0,937559 mol → razón /1 = 0,937559 → O₂ LIMITANTE
+//   n(H₂O) = 0,937559 × 2 = 1,875117 mol → × 18,015 = 33,780236 g → «33,780 g», «1,8751 mol»
+//   real = 33,780236 × 0,80 = 27,024189 g → «27,024 g»
+//   exceso H₂: 2,480159 − 0,937559 × 2 = 0,605042 mol → × 2,016 = 1,219764 g → «1,220 g», «0,6050 mol»
+//   barras: H₂ 2,4802 / (0,937559 × 2 = 1,8751) = 132,3 % → «132 %» · O₂ 0,9376 / (2,480159 / 2 =
+//   1,2401) = 75,6 % → «76 %», con la insignia «Limitante»
+async function casoAgua(page: Page): Promise<void> {
+  await abrir(page);
+  await elegir(page, /Síntesis del agua/);
+  await escribir(page, '#inputA', '5'); // el valor por defecto era 4
+  await escribir(page, '#inputB', '30'); // y 32
+  await sembrarValor(page, '#sliderRendimiento', 80);
+  await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Oxígeno');
+  const teorica = tarjeta(page, 'Masa teórica de Agua (H₂O)');
+  await expect(teorica).toContainText('33,780 g');
+  await expect(teorica).toContainText('1,8751 mol');
+  await expect(tarjeta(page, 'Masa real obtenida')).toContainText('rendimiento 80 %');
+  await expect(tarjeta(page, 'Masa real obtenida')).toContainText('27,024 g');
+  const exceso = tarjeta(page, 'Reactivo en exceso');
+  await expect(exceso).toContainText('Hidrógeno');
+  await expect(exceso).toContainText('Sobran 1,220 g (0,6050 mol)');
+  await expect(barra(page, 'Hidrógeno (H₂)')).toContainText('2,4802 mol disponibles / 1,8751 mol necesarios (132 %)');
+  const o2 = barra(page, 'Oxígeno (O₂)');
+  await expect(o2).toContainText('0,9376 mol disponibles / 1,2401 mol necesarios (76 %)');
+  await expect(o2.locator('[class*="limitanteBadge"]')).toHaveCount(1);
+  await expect(page.locator('[class*="limitanteResaltado"]')).toHaveText(/^O₂\s*$/);
+}
+
+test.describe('re-inspección 24/10/2026 · cálculo', () => {
+  test('normal: 5 g H₂ + 30 g O₂ al 80 % → O₂ limitante, 33,780 g de agua, 27,024 g reales, sobran 1,220 g de H₂', async ({ page }) => {
+    await casoAgua(page);
+  });
+
+  // LÍMITE — oxidación del hierro en proporción EXACTA y a un paso de ella
+  //   223,38 g Fe = 223,38 / 55,845 = 4 mol (razón 4/4 = 1) · 95,994 g O₂ = 3 mol (razón 3/3 = 1)
+  //   → mezcla estequiométrica: Fe₂O₃ = 1 × 2 = 2 mol × 159,687 = «319,374 g», «2,0000 mol»
+  //   96 g O₂ → 3,000188 mol, razón 1,0000625: difiere un 0,00625 %, más que la incertidumbre de
+  //   redondeo de las dos masas molares (0,0005/55,845 + 0,0005/31,998 = 0,0025 %) → Fe limitante,
+  //   sobran 0,000188 mol × 31,998 = 0,006 g de O₂ → «Sobran 0,006 g (0,0002 mol)», producto igual
+  //   95 g O₂ → 2,968936 mol, razón 0,989645 → O₂ limitante; Fe₂O₃ 0,989645 × 2 = 1,979290 mol ×
+  //   159,687 = 316,066942 g → «316,067 g», «1,9793 mol»; sobra Fe 4 − 0,989645 × 4 = 0,041419 mol ×
+  //   55,845 = 2,313058 g → «Sobran 2,313 g (0,0414 mol)»
+  test('límite: 223,38 g Fe + 95,994 g O₂ es estequiométrica; con 96 g sobra 0,006 g de O₂ y con 95 g el limitante pasa a ser el O₂', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Oxidación del hierro/);
+    await escribir(page, '#inputA', '223.38');
+    await escribir(page, '#inputB', '95.994');
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Ninguno: se agotan los dos a la vez');
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Ninguno (estequiométrico)');
+    const teorica = tarjeta(page, 'Masa teórica de Óxido de hierro (III)');
+    await expect(teorica).toContainText('319,374 g');
+    await expect(teorica).toContainText('2,0000 mol');
+
+    await escribir(page, '#inputB', '96');
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Hierro');
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Sobran 0,006 g (0,0002 mol)');
+    await expect(teorica).toContainText('319,374 g');
+
+    await escribir(page, '#inputB', '95');
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Oxígeno');
+    await expect(teorica).toContainText('316,067 g');
+    await expect(teorica).toContainText('1,9793 mol');
+    const exceso = tarjeta(page, 'Reactivo en exceso');
+    await expect(exceso).toContainText('Hierro');
+    await expect(exceso).toContainText('Sobran 2,313 g (0,0414 mol)');
+  });
+
+  // LÍMITE — el limitante cambia de reactivo: Haber-Bosch, 28 g N₂ con 6 y con 6,1 g de H₂
+  //   n(N₂) = 28 / 28,014 = 0,999500 mol (razón 0,999500)
+  //   6 g H₂ → 2,976190 mol, razón /3 = 0,992063 → H₂ limitante (el testigo del estado de partida)
+  //   6,1 g H₂ → 3,025794 mol, razón 1,008598 → N₂ LIMITANTE; NH₃ = 0,999500 × 2 = 1,999000 mol ×
+  //   17,031 = 34,044978 g → «34,045 g», «1,9990 mol»; sobra H₂ 3,025794 − 0,999500 × 3 = 0,027293 mol
+  //   × 2,016 = 0,055022 g → «Sobran 0,055 g (0,0273 mol)»
+  test('límite: 28 g N₂ + 6 g H₂ → H₂ limitante; con 6,1 g de H₂ el limitante pasa al N₂ y salen 34,045 g de NH₃', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Haber-Bosch/);
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Hidrógeno');
+    await escribir(page, '#inputB', '6.1');
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Nitrógeno');
+    const teorica = tarjeta(page, 'Masa teórica de Amoniaco');
+    await expect(teorica).toContainText('34,045 g');
+    await expect(teorica).toContainText('1,9990 mol');
+    const exceso = tarjeta(page, 'Reactivo en exceso');
+    await expect(exceso).toContainText('Hidrógeno');
+    await expect(exceso).toContainText('Sobran 0,055 g (0,0273 mol)');
+    await expect(page.locator('[class*="limitanteResaltado"]')).toHaveText(/^N₂\s*$/);
+  });
+
+  // RECHAZO — 0 g del segundo reactivo, el segundo vacío y 0 g del primero: sin resultados, y el aviso
+  test('rechazo: 0 g de H₂, H₂ vacío o 0 g de N₂ no calculan y muestran el aviso', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Haber-Bosch/);
+    const mensaje = 'Introduce gramos válidos y positivos para ver los resultados.';
+    for (const [sel, valor] of [['#inputB', '0'], ['#inputB', ''], ['#inputA', '0']] as const) {
+      if (sel === '#inputA') await escribir(page, '#inputB', '6');
+      await escribir(page, sel, valor);
+      await expect(aviso(page), `${sel} = «${valor}»`).toHaveText(mensaje);
+      await expect(page.locator('[class*="resultadoCard"]')).toHaveCount(0);
+      await expect(page.locator('[role="progressbar"]')).toHaveCount(0);
+    }
+    await expect(page.locator('body')).not.toContainText('NaN');
+  });
+});
+
+test.describe('re-inspección 24/10/2026 · móvil 390 × 844', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('el caso normal da lo mismo en móvil', async ({ page }) => {
+    await casoAgua(page);
+  });
+
+  // Firma de rotura (visitas cortas con recarga): en móvil los controles responden al TOQUE, no hay
+  // ningún <form> que un botón o un Intro pueda enviar y la página no navega al usarla.
+  test('al toque responden la reacción, el «+», el caso y «Cargar en el simulador», sin recargar la página', async ({ page }) => {
+    let cargas = 0;
+    page.on('load', () => (cargas += 1));
+    await abrir(page);
+    const cargasIniciales = cargas;
+    await expect(page.locator('form')).toHaveCount(0);
+    await page.getByRole('button', { name: /Síntesis del agua/ }).tap();
+    await expect(page.locator('#inputA')).toHaveValue('4');
+    await expect(page.locator('#inputB')).toHaveValue('32');
+    await page.getByRole('button', { name: 'Aumentar gramos de reactivo B' }).tap();
+    await expect(page.locator('#inputB')).toHaveValue('33');
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: /^Caso 5:/ }).tap();
+    await seccion.locator('#casos-respuesta').fill('45,04');
+    await seccion.locator('#casos-respuesta').press('Enter');
+    await expect(seccion.getByRole('alert')).toContainText('¡Correcto!');
+    await seccion.getByRole('button', { name: 'Cargar en el simulador' }).tap();
+    await expect(page.locator('#inputA')).toHaveValue('6');
+    await expect(page.locator('#inputB')).toHaveValue('40');
+    // caso 5: H₂ 6 / 2,016 = 2,976190 (razón 1,488095) · O₂ 40 / 31,998 = 1,250078 → O₂ limitante;
+    // H₂O = 1,250078 × 2 × 18,015 = 45,040313 g → «45,040 g»
+    await expect(tarjeta(page, 'Masa teórica de Agua')).toContainText('45,040 g');
+    expect(cargas, 'cargas de página durante el uso').toBe(cargasIniciales);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// PÁGINA TRADUCIDA (cabo C0243) — el traductor simulado de tests/apps/generador-loteria.spec.ts:
+// cada nodo de texto pasa a <font><font>…</font></font>, y se apunta el nodo retirado para
+// detectar el texto que se queda VIEJO (React escribe en el nodo que ya no está en pantalla).
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+interface NodoTraducido { nodo: Text; valor: string | null; avisado: boolean }
+type VentanaTraducida = Window & { __nodosTraducidos?: NodoTraducido[] };
+
+const traducir = (page: Page) =>
+  page.evaluate(() => {
+    const w = window as VentanaTraducida;
+    const apuntados = (w.__nodosTraducidos = w.__nodosTraducidos ?? []);
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      apuntados.push({ nodo, valor: nodo.nodeValue, avisado: false });
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+
+const textoViejo = (page: Page) =>
+  page.evaluate(() => {
+    const r: string[] = [];
+    for (const t of (window as VentanaTraducida).__nodosTraducidos ?? []) {
+      if (!t.avisado && t.nodo.nodeValue !== t.valor) {
+        t.avisado = true;
+        r.push(`«${t.valor}» → «${t.nodo.nodeValue}»`);
+      }
+    }
+    return r;
+  });
+
+function erroresDeReact(page: Page): string[] {
+  const errores: string[] = [];
+  page.on('pageerror', (e) => errores.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+  });
+  return errores;
+}
+
+test.describe('re-inspección 24/10/2026 · página traducida (cabo C0243)', () => {
+  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, operativa) — con la página traducida, el
+  // rótulo de cada reactivo, la ecuación, las tarjetas de masa teórica y real, el «Sobran …», las
+  // barras y el «N %» del rendimiento son VARIOS nodos de texto en un mismo elemento: React escribe
+  // el valor nuevo en el nodo que el traductor ya retiró y en pantalla sigue el de antes. Medido:
+  // al elegir la neutralización, el rótulo seguía «Metano (CH₄) M = 16,043 g/mol», la tarjeta
+  // «Masa teórica de Dióxido de carbono (CO₂) 43,891 g 0,9973 mol» y la ecuación «CH₄ + 2 O₂ → CO₂ +»
+  // (mientras «Reactivo limitante», que es el único hijo de su elemento, sí decía «Hidróxido de
+  // sodio»); al bajar el rendimiento a 50 %, el rótulo seguía en «100 %». Sin traducir pasa.
+  //   Neutralización por defecto (36,5 g HCl + 40 g NaOH): n(HCl) = 36,5 / 36,46 = 1,001097 ·
+  //   n(NaOH) = 40 / 39,997 = 1,000075 → NaOH limitante; NaCl = 1,000075 × 58,44 = 58,444384 g →
+  //   «58,444 g», «1,0001 mol»; al 50 %, 29,222192 g → «29,222 g»
+  for (const traducida of [false, true]) {
+    test(`elegir la neutralización y bajar el rendimiento al 50 %: rótulo, ecuación y tarjetas dicen la reacción elegida${traducida ? ', con la página traducida' : ''}`, async ({ page }) => {
+      test.fail(traducida, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): con la página traducida el texto se queda viejo');
+      const errores = erroresDeReact(page);
+      await abrir(page);
+      if (traducida) await traducir(page);
+      await elegir(page, /Neutralización ácido-base/);
+      await expect(page.locator('label[for="inputA"]')).toContainText('Ácido clorhídrico (HCl)');
+      await expect(page.locator('label[for="inputA"]')).toContainText('M = 36,46 g/mol');
+      await expect(page.locator('[class*="ecuacionText"]')).toHaveText(/^HCl \+ NaOH → NaCl \+ H₂O\s*$/);
+      const teorica = tarjeta(page, 'Masa teórica de Cloruro de sodio (NaCl)');
+      await expect(teorica).toContainText('58,444 g');
+      await expect(teorica).toContainText('1,0001 mol');
+      if (traducida) await traducir(page);
+      await sembrarValor(page, '#sliderRendimiento', 50);
+      await expect(page.locator('label[for="sliderRendimiento"]')).toContainText('50 %');
+      await expect(tarjeta(page, 'Masa real obtenida')).toContainText('rendimiento 50 %');
+      await expect(tarjeta(page, 'Masa real obtenida')).toContainText('29,222 g');
+      expect(await textoViejo(page), 'textos que se quedaron viejos').toEqual([]);
+      expect(errores).toEqual([]);
+    });
+  }
+
+  // Lo que SÍ se sostiene traducida: nada se cae (ni NotFoundError ni «Algo salió mal») al recorrer
+  // las seis reacciones, el rendimiento, los ± y los casos para clase con la página traducida.
+  test('traducida, recorrer reacciones, rendimiento, ± y casos para clase no tumba la app', async ({ page }) => {
+    const errores = erroresDeReact(page);
+    await abrir(page);
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    const pasos: [string, () => Promise<unknown>][] = [
+      ['neutralización', () => elegir(page, /Neutralización ácido-base/)],
+      ['rendimiento 40 %', () => sembrarValor(page, '#sliderRendimiento', 40)],
+      ['HCl vacío', () => escribir(page, '#inputA', '')],
+      ['HCl 36,46', () => escribir(page, '#inputA', '36.46')],
+      ['fermentación', () => elegir(page, /Fermentación alcohólica/)],
+      ['Haber-Bosch', () => elegir(page, /Haber-Bosch/)],
+      ['+ de A', () => page.getByRole('button', { name: 'Aumentar gramos de reactivo A' }).click()],
+      ['caso 4', () => seccion.getByRole('button', { name: /^Caso 4:/ }).click()],
+      ['comprobar 54,86', async () => {
+        await seccion.locator('#casos-respuesta').fill('54,86');
+        await seccion.getByRole('button', { name: 'Comprobar' }).click();
+      }],
+      ['ver pista', () => seccion.getByRole('button', { name: /Ver pista/ }).click()],
+      ['ver solución', () => seccion.getByRole('button', { name: /Ver solución/ }).click()],
+      ['practicar', () => seccion.getByRole('button', { name: /Practicar/ }).click()],
+      ['cargar en el simulador', () => seccion.getByRole('button', { name: 'Cargar en el simulador' }).click()],
+    ];
+    for (const [nombre, accion] of pasos) {
+      await traducir(page);
+      await accion();
+      await page.waitForTimeout(150);
+      await expect(page.getByRole('heading', { name: 'Algo salió mal' }), nombre).toHaveCount(0);
+    }
+    expect(errores).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// CABO C0267 — la tolerancia relativa del corrector (el mayor entre 0,01 y el 1 %)
+//
+// Aquí SÍ tiene un uso legítimo: el alumno puede hacer las cuentas con las masas de su libro
+// (H = 1, C = 12, O = 16, Na = 23, Cl = 35,5…), y la app lo dice («se acepta una desviación del
+// 1 %»). Medido caso a caso, el hueco IUPAC↔libro va del 0,007 % (caso 12) al 0,553 % (caso 8).
+// Pero la tolerancia es la misma en los doce: en el caso 12 las DOS tablas dan 81,11 %, y los
+// redondeos intermedios que puede arrastrar el alumno (n(HCl) a 1,1 / 1,096 / 1,097 mol, M(NaCl)
+// 58,4–58,5, la masa teórica a 64 g) van de 80,81 % a 81,25 %; el 1 % acepta de 80,30 a 81,92 %.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+test.describe('re-inspección 24/10/2026 · corrector (cabo C0267)', () => {
+  test('caso 12: las dos tablas de masas dan 81,11 % y las dos se aceptan', () => {
+    const c12 = CASOS_AULA[11];
+    expect(c12.id).toBe(12);
+    expect(c12.respuesta).toBe(81.11);
+    // IUPAC: 52 ÷ (1,097093 × 58,44 = 64,114098) × 100 = 81,105 · libro: 52 ÷ (40 ÷ 36,5 × 58,5 =
+    // 64,109589) × 100 = 81,111
+    expect(redondearTest(estequiometriaPropia(c12.datos, IUPAC).valor, 2)).toBe(81.11);
+    expect(redondearTest(estequiometriaPropia(c12.datos, LIBRO).valor, 2)).toBe(81.11);
+    expect(comprobarRespuesta(81.11, c12.respuesta, c12.datos).correcto).toBe(true);
+    // y un redondeo intermedio corriente: n(HCl) = 1,1 mol × 58,44 = 64,284 g → 80,89 %
+    expect(comprobarRespuesta(80.89, c12.respuesta, c12.datos).correcto).toBe(true);
+  });
+
+  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, cálculo) — 81,9 % y 80,3 % no salen de
+  // ninguna tabla ni de ningún redondeo intermedio (de 80,81 a 81,25 %), y el 1 % los aprueba.
+  test('caso 12: 81,9 % y 80,3 % no son ningún redondeo de 81,11 % y no se aprueban', () => {
+    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): el 1 % aprueba lo que no da ninguna tabla');
+    const c12 = CASOS_AULA[11];
+    expect(comprobarRespuesta(81.9, c12.respuesta, c12.datos).correcto, '81,9 %').toBe(false);
+    expect(comprobarRespuesta(80.3, c12.respuesta, c12.datos).correcto, '80,3 %').toBe(false);
+  });
+
+  test('en la página: «81,9» para el caso 12 no dice «¡Correcto!»', async ({ page }) => {
+    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): el 1 % aprueba lo que no da ninguna tabla');
+    await abrir(page);
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: /^Caso 12:/ }).click();
+    await seccion.locator('#casos-respuesta').fill('81,9');
+    await seccion.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion.getByRole('alert')).toBeVisible();
+    await expect(seccion.getByRole('alert')).not.toContainText('¡Correcto!');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// CONTENIDO (re-inspección 24/10/2026)
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+test.describe('re-inspección 24/10/2026 · contenido', () => {
+  // Testigo: la propia app compara «disponibles» con «necesarios», que es multiplicar por el
+  // coeficiente. N₂ + 3 H₂ con 2 mol de N₂ (2 × 28,014 = 56,028 g) y 5 mol de H₂ (5 × 2,016 = 10,08 g):
+  //   H₂: 5,0000 disponibles / 2 × 3 = 6,0000 necesarios = 83,3 % → «83 %», limitante
+  //   N₂: 2,0000 / 5 ÷ 3 = 1,6667 → 120 % · NH₃ = 5/3 × 2 = 3,3333 mol × 17,031 = «56,770 g»
+  //   sobra N₂: 2 − 1,666667 = 0,333333 mol × 28,014 = 9,338 g → «Sobran 9,338 g (0,3333 mol)»
+  test('la app decide el limitante comparando 5 mol de H₂ con los 3 × 2 = 6 que harían falta', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Haber-Bosch/);
+    await escribir(page, '#inputA', '56.028');
+    await escribir(page, '#inputB', '10.08');
+    const h2 = barra(page, 'Hidrógeno (H₂)');
+    await expect(h2).toContainText('5,0000 mol disponibles / 6,0000 mol necesarios (83 %)');
+    await expect(h2.locator('[class*="limitanteBadge"]')).toHaveCount(1);
+    await expect(barra(page, 'Nitrógeno (N₂)')).toContainText('2,0000 mol disponibles / 1,6667 mol necesarios (120 %)');
+    await expect(tarjeta(page, 'Masa teórica de Amoniaco')).toContainText('56,770 g');
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Sobran 9,338 g (0,3333 mol)');
+  });
+
+  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, contenido) — el primer «error frecuente»
+  // («Comparar moles directamente sin dividir por el coeficiente») pone como ejemplo del error
+  // «NO es limitante el H₂ por "tener menos moles que 3×2=6"… pero hay que hacer la división».
+  // 5 < 3 × 2 es lo mismo que 5/3 < 2/1, y es justo lo que hacen las barras de la app (test de
+  // arriba). El ejemplo no muestra el error que nombra (2 mol < 5 mol → «el N₂ es el limitante»)
+  // y tacha de error un método correcto.
+  test('los «errores frecuentes» no tachan de error comparar 5 mol de H₂ con los 3 × 2 = 6 necesarios', async ({ page }) => {
+    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): el ejemplo tacha de error un método correcto');
+    await abrir(page);
+    const primero = page.locator('[class*="warningList"] li').first();
+    await expect(primero).toContainText('Comparar moles directamente sin dividir por el coeficiente');
+    await expect(primero).not.toContainText('NO es limitante el H₂ por');
+  });
+
+  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, contenido) — la tabla comparativa da como
+  // razón de que el H₂ sea el limitante habitual del Haber-Bosch su «mayor coeficiente (×3)». El
+  // coeficiente no hace limitante a nadie (lo dice la propia página: «el que tiene menor (moles /
+  // coeficiente)»), y con la alimentación 3:1 de la propia reacción ninguno sobra.
+  test('la tabla no atribuye el limitante del Haber-Bosch al coeficiente', async ({ page }) => {
+    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): «mayor coeficiente (×3)» como razón del limitante');
+    await abrir(page);
+    const fila = page.locator('[class*="tabla"] tbody tr').filter({ hasText: 'Haber-Bosch' });
+    await expect(fila).toHaveCount(1);
+    await expect(fila.locator('td').nth(2)).not.toContainText('mayor coeficiente');
+  });
+
+  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, contenido) — dos palabras pegadas por el
+  // salto de línea de JSX después de un </strong> (JSX descarta el salto y la sangría): la FAQ dice
+  // «la mezcla es estequiométricay no hay reactivo en exceso» y el quinto error frecuente «a la
+  // masa del producto— El rendimiento afecta…» (los otros cuatro llevan « — » con espacios).
+  test('errata: «estequiométrica y» y «producto — El» con su espacio', async ({ page }) => {
+    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): palabras pegadas tras </strong>');
+    await abrir(page);
+    const faq = page.locator('[class*="faqItem"]').filter({ hasText: '¿Puede haber más de un reactivo limitante?' });
+    await expect(faq).toHaveCount(1);
+    await expect(faq).not.toContainText('estequiométricay');
+    await expect(page.locator('[class*="warningList"] li').last()).not.toContainText('producto—');
+  });
+
+  /** Las preguntas del FAQPage servido (layout.tsx) y las de la FAQ visible, con su respuesta. */
+  async function faqs(page: Page) {
+    const jsonLd = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('script[type="application/ld+json"]'))
+        .map((s) => JSON.parse(s.textContent ?? '{}'))
+        .find((d) => d['@type'] === 'FAQPage') as { mainEntity: { name: string; acceptedAnswer: { text: string } }[] } | undefined,
+    );
+    const visibles = await page.locator('[class*="faqItem"]').evaluateAll((items) =>
+      items.map((i) => ({
+        pregunta: i.querySelector('h4')?.textContent?.trim() ?? '',
+        respuesta: i.querySelector('p')?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      })),
+    );
+    return { jsonLd: jsonLd?.mainEntity ?? [], visibles };
+  }
+
+  test('las dos preguntas duplicadas están en el FAQPage y en la FAQ visible', async ({ page }) => {
+    await abrir(page);
+    const { jsonLd, visibles } = await faqs(page);
+    expect(jsonLd.map((q) => q.name)).toEqual(expect.arrayContaining([
+      '¿Qué es el reactivo limitante en una reacción química?',
+      '¿Cómo se calculan los moles a partir de gramos en estequiometría?',
+    ]));
+    expect(visibles.map((v) => v.pregunta)).toEqual(expect.arrayContaining([
+      '¿Qué es el reactivo limitante?',
+      '¿Cómo calculo los moles a partir de los gramos?',
+    ]));
+  });
+
+  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, contenido) — «¿Qué es el reactivo
+  // limitante?» y «¿Cómo calculo los moles…?» están en las dos bocas con respuestas distintas (la
+  // visible avisa de que no es el de menor masa y pone el CH₄ como ejemplo; el FAQPage, el método
+  // del cociente y el H₂O). La reparación es UNA constante en metadata.ts que importen las dos.
+  test('una pregunta que está en las dos bocas tiene la misma respuesta', async ({ page }) => {
+    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): FAQ escrita dos veces');
+    await abrir(page);
+    const { jsonLd, visibles } = await faqs(page);
+    const enJsonLd = (inicio: string) => jsonLd.find((q) => q.name.startsWith(inicio))?.acceptedAnswer.text;
+    const enPantalla = (inicio: string) => visibles.find((v) => v.pregunta.startsWith(inicio))?.respuesta;
+    expect(enPantalla('¿Qué es el reactivo limitante')).toBe(enJsonLd('¿Qué es el reactivo limitante'));
+    expect(enPantalla('¿Cómo calculo los moles')).toBe(enJsonLd('¿Cómo se calculan los moles'));
+  });
+});
