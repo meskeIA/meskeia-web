@@ -476,14 +476,16 @@ componentes lo descargan todas las apps. Las relacionadas se resuelven en el lay
 
 ### Candado de las celdas braille
 
-`npm run check:braille` — en el build, y **rompe el build** si una celda que `conversor-braille`
-puede EMITIR no tiene entrada en `brailleDots` (se dibujaría en blanco: en la hoja punzada, un
-espacio), o si los puntos de una entrada no cuadran con su código Unicode.
+`npm run check:braille` — en el build, y **rompe el build** si la vista de celdas o la hoja de
+`conversor-braille` dejan de dibujar con `puntosDeCelda` (los bits del código Unicode) o buscan
+en una tabla con caída a vacío (`tabla[c] ?? []`): se dibujaría en blanco, y en la hoja punzada
+es un espacio. También si una celda emitible sale sin puntos, o si `puntosDeCelda` no cuadra con
+el código Unicode en las 256 celdas.
 **Sin pasivo** · **sin escape**, a propósito: no hay falso positivo posible.
-⚠️ No mira si la celda es la CORRECTA para su carácter en tinta: eso lo dice el B 2 de la
-Comisión Braille Española, y es trabajo del Inspector contra la fuente.
-> Salió del mismo defecto dos veces: el 21/08/2026 (los tres indicadores) y el 22/09 (hallazgo
-> 1183, `⠠` de la barra inclinada). Crónica y trampas: cabecera de
+⚠️ No mira si la celda es la CORRECTA para su carácter en tinta (B 2 de la Comisión Braille
+Española, trabajo del Inspector) ni los puntos 7 y 8, que la vista no dibuja.
+> Salió del mismo defecto tres veces: el 21/08/2026, el 22/09 (hallazgo 1183) y el 24/10
+> (hallazgo 3456: el candado de la tabla `brailleDots` falló). Crónica y trampas: cabecera de
 > `scripts/check-celdas-braille.mjs` · pruebas: `npm run braille:probar-candado`.
 
 ### Candado del mínimo personal del IRPF

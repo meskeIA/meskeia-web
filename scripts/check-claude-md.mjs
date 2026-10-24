@@ -247,8 +247,8 @@ const OBLIGACIONES = [
   ]],
   ['Candado de las celdas braille', [
     'npm run check:braille', 'rompe el build',
-    'celda que conversor-braille puede EMITIR no tiene entrada en brailleDots',
-    'no cuadran con su código Unicode', 'Sin pasivo', 'sin escape, a propósito',
+    'dejan de dibujar con puntosDeCelda', 'caída a vacío', 'una celda emitible sale sin puntos',
+    'no cuadra con el código Unicode', 'Sin pasivo', 'sin escape, a propósito',
     'npm run braille:probar-candado',
   ]],
   ['Candado del mínimo personal del IRPF', [
