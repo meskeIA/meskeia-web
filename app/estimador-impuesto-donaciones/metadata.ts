@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FISCAL_DONACIONES_META } from '@/data/fiscal';
+import { FISCAL_DONACIONES_META, PLAZO_AUTOLIQUIDACION_DONACIONES } from '@/data/fiscal';
 
 // Año del título: la vigencia del módulo que sella los datos. Sale del dato
 // y no se escribe a mano (lo exige check:anio-titulo).
@@ -53,7 +53,8 @@ export const faqJsonLd = {
       name: '¿Qué es el Impuesto de Donaciones y cuándo se paga?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Impuesto de Donaciones (ISD, modalidad inter vivos) es un tributo que paga quien recibe una donación de dinero, inmuebles u otros bienes. Se devenga en el momento de la donación y el plazo general de autoliquidación es de 30 días hábiles desde el día siguiente (art. 67.1.b del Reglamento del impuesto), salvo que la comunidad fije otro. Si se dona un inmueble, tributa en la comunidad donde está situado; si se dona dinero u otros bienes, en la de residencia habitual de quien recibe.',
+        // Plazo y vigencia, de data/fiscal (hallazgo 2827).
+        text: `El Impuesto de Donaciones (ISD, modalidad inter vivos) es un tributo que paga quien recibe una donación de dinero, inmuebles u otros bienes. Se devenga en el momento de la donación y el plazo general de autoliquidación es de ${PLAZO_AUTOLIQUIDACION_DONACIONES.diasHabiles} días hábiles desde el día siguiente (art. 67.1.b del Reglamento del impuesto), salvo que la comunidad fije otro. Si se dona un inmueble, tributa en la comunidad donde está situado; si se dona dinero u otros bienes, en la de residencia habitual de quien recibe.`,
       },
     },
     {
@@ -77,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Cómo calcula el estimador el impuesto por comunidad autónoma?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El estimador aplica la tarifa estatal según el valor neto recibido, el grupo de parentesco y el patrimonio preexistente del donatario, y luego incorpora los coeficientes multiplicadores y las bonificaciones autonómicas vigentes para 2025. Cubre las 15 comunidades de régimen común, incluida Cataluña con su tarifa propia, y da una aproximación para los regímenes forales del País Vasco y Navarra.',
+        text: `El estimador aplica la tarifa estatal según el valor neto recibido, el grupo de parentesco y el patrimonio preexistente del donatario, y luego incorpora los coeficientes multiplicadores y las bonificaciones autonómicas vigentes para ${FISCAL_DONACIONES_META.vigencia}. Cubre las 15 comunidades de régimen común, incluida Cataluña con su tarifa propia, y da una aproximación para los regímenes forales del País Vasco y Navarra.`,
       },
     },
     {

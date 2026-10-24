@@ -848,7 +848,9 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    * comentarios antes de buscar.
    */
   test('HALLAZGO 04/10 (e): page.tsx no teclea datos normativos que data/fiscal exporta', () => {
-    test.fail(true, 'ABIERTO: umbrales, coeficientes, plazos y tarifa escritos a mano en page.tsx');
+    // REPARADO el 24/10/2026 (2827): los umbrales ya venían de LIMITES_PATRIMONIO_PREEXISTENTE_IS;
+    // ahora también los coeficientes, los plazos (con los intereses de la prórroga del ISD), la
+    // tarifa y el escalón de Castilla-La Mancha. Lo servido lo coteja el test siguiente.
     const jsx = readFileSync(join(process.cwd(), 'app/estimador-impuesto-donaciones/page.tsx'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/^\s*\/\/.*$/gm, '');
@@ -860,6 +862,21 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
       '7,65&nbsp;% al 34',                           // TARIFA_ESTATAL_ID
     ].filter((t) => jsx.includes(t));
     expect(tecleados).toEqual([]);
+  });
+
+  test('REPARADO 2827: la guía servida dice las mismas cifras, leídas de data/fiscal', async ({ page }) => {
+    // A mano, de data/fiscal: COEFICIENTES_ID II 1,0000-1,2000 · III 1,5882-1,9059 · IV 2,0000-2,4000;
+    // TARIFA_ESTATAL_ID 16 tramos, 7,65 % a 34 %; PLAZO_ISD 6 + 6 meses con intereses (art. 68.3);
+    // PLAZO_ITP y PLAZO_IIVTNU inter vivos, 30 días hábiles; CLM, primer escalón 120.000 €.
+    const html = (await (await page.request.get('/estimador-impuesto-donaciones/')).text())
+      .replace(/<!-- -->/g, '').replace(/<[^>]+>/g, ' ').replace(/ |&nbsp;/g, ' ').replace(/\s+/g, ' ');
+    expect(html).toContain('16 tramos, del 7,65 % al 34 %');
+    expect(html).toContain('de 1,0000 a 1,2000 en los Grupos I y II, de 1,5882 a 1,9059 en el Grupo III y de 2,0000 a 2,4000 en el Grupo IV');
+    expect(html).toContain('6 meses desde el fallecimiento (prorrogable 6 meses más, con intereses de demora)');
+    expect(html).toContain('30 días hábiles desde la firma');
+    expect(html).toContain('coeficiente de 1,5882 o más');
+    expect(html).toContain('Con una base de 120.000 € o más');
+    expect(html).toMatch(/vigentes para 2025/); // FAQPage, de FISCAL_DONACIONES_META.vigencia
   });
 
   /**

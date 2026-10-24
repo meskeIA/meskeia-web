@@ -15,6 +15,11 @@ import {
   ACUMULACION_DONACIONES_A_SUCESION_ANIOS,
   LIMITES_PATRIMONIO_PREEXISTENTE_IS,
   indiceTramoPatrimonioIS,
+  COEFICIENTES_ID,
+  TARIFA_ESTATAL_ID,
+  PLAZO_ISD,
+  PLAZO_ITP,
+  PLAZO_IIVTNU,
   type BonificacionCCAA_ID,
   type BonificacionGrupoID,
 } from '@/data/fiscal';
@@ -147,6 +152,20 @@ const EJ_HIJO_100K_CLM_SIN_ESCRITURA = calcularDonacion({
 const FECHA_VERIFICADO = formatDate(parseISODateLocal(FISCAL_DONACIONES_META.verificado));
 const R = ESCALA_RECARGO_EXTEMPORANEO;
 const PLAZO = `${PLAZO_AUTOLIQUIDACION_DONACIONES.diasHabiles} días hábiles`;
+
+/*
+ * Cifras normativas de la guía, de data/fiscal (hallazgo 2827): iban tecleadas y, aunque hoy
+ * coincidían, el día que una cambiara en el módulo la guía seguiría diciendo la vieja.
+ */
+const PLAZO_SUCESION = `${PLAZO_ISD.mesesPresentacion} meses desde el fallecimiento (prorrogable ${PLAZO_ISD.mesesProrroga} meses más${PLAZO_ISD.prorrogaDevengaIntereses ? ', con intereses de demora' : ''})`;
+const PLAZO_COMPRAVENTA = `${PLAZO_ITP.dias} ${PLAZO_ITP.unidad} desde la firma`;
+const PLAZO_PLUSVALIA = `${PLAZO_IIVTNU.diasHabilesInterVivos} días hábiles`;
+const coef = (g: string, i: number): string => formatNumber(COEFICIENTES_ID[g][i], 4);
+const rangoCoef = (g: string): string => `de ${coef(g, 0)} a ${coef(g, COEFICIENTES_ID[g].length - 1)}`;
+const tipoTarifa = (t: number): string => `${formatNumber(t, Number.isInteger(t) ? 0 : 2)} %`;
+const TARIFA_RESUMEN = `${TARIFA_ESTATAL_ID.length} tramos, del ${tipoTarifa(TARIFA_ESTATAL_ID[0].tipo)} al ${tipoTarifa(TARIFA_ESTATAL_ID[TARIFA_ESTATAL_ID.length - 1].tipo)}`;
+/** Primer escalón de la bonificación de Castilla-La Mancha al Grupo II (art. 17 bis.1 Ley 8/2013). */
+const UMBRAL_CLM = BONIFICACIONES_CCAA_ID['castilla-mancha'].bonificaciones['II']?.escalonado?.[0]?.hasta ?? NaN;
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
@@ -666,8 +685,8 @@ export default function EstimadorImpuestoDonacionesPage() {
                 <tr>
                   <td><strong>Plazo de declaración</strong></td>
                   <td>{PLAZO} (salvo plazo propio de la comunidad)</td>
-                  <td>6 meses desde el fallecimiento (prorrogable 6 meses más)</td>
-                  <td>30 días hábiles desde la firma</td>
+                  <td>{PLAZO_SUCESION}</td>
+                  <td>{PLAZO_COMPRAVENTA}</td>
                 </tr>
                 <tr>
                   <td><strong>¿Requiere escritura?</strong></td>
@@ -732,7 +751,7 @@ export default function EstimadorImpuestoDonacionesPage() {
               <p className={styles.escenarioExample}>
                 El piso está en Castilla-La Mancha, así que tributa allí, viva donde viva la hija
                 (art. 32.2.b Ley 22/2009). Base imponible: {formatCurrency(EJ_PISO_CLM.baseLiquidable)}.
-                Cuota íntegra: {formatCurrency(EJ_PISO_CLM.cuotaIntegra)}. Con una base de 120.000 € o
+                Cuota íntegra: {formatCurrency(EJ_PISO_CLM.cuotaIntegra)}. Con una base de {euros0(UMBRAL_CLM)} o
                 más, la bonificación de Castilla-La Mancha para el Grupo II es del{' '}
                 {formatPercentage(EJ_PISO_CLM.porcentajeBonificacion / 100, 0)} (art. 17 bis.1 Ley 8/2013):{' '}
                 {formatCurrency(EJ_PISO_CLM.bonificacionCcaa)}.
@@ -786,7 +805,7 @@ export default function EstimadorImpuestoDonacionesPage() {
                 ({formatPercentage(EJ_SOBRINO_CLM.tipoEfectivo / 100, 2)} de tipo efectivo).
               </p>
               <p className={styles.escenarioTip}>
-                En el Grupo III, la tarifa progresiva se multiplica por un coeficiente de 1,5882 o más, así
+                En el Grupo III, la tarifa progresiva se multiplica por un coeficiente de {coef('III', 0)} o más, así
                 que el tipo efectivo crece con el importe. Pocas comunidades bonifican a este grupo: la tabla
                 de arriba muestra cuáles.
               </p>
@@ -921,8 +940,8 @@ export default function EstimadorImpuestoDonacionesPage() {
                   donación ({PLAZO_AUTOLIQUIDACION_DONACIONES.norma}); algunas comunidades fijan un plazo
                   propio. Se presenta el <strong>Modelo 651</strong> ante la administración tributaria de la
                   comunidad competente. No existe prórroga automática (a diferencia de sucesiones, que
-                  permite 6 meses prorrogables). Si la donación es de un inmueble urbano, la plusvalía
-                  municipal (IIVTNU) se declara ante el Ayuntamiento donde está, también en 30 días hábiles
+                  permite {PLAZO_ISD.mesesPresentacion} meses prorrogables otros {PLAZO_ISD.mesesProrroga}, con intereses de demora: art. 68.3 RISD). Si la donación es de un inmueble urbano, la plusvalía
+                  municipal (IIVTNU) se declara ante el Ayuntamiento donde está, también en {PLAZO_PLUSVALIA}
                   (art. 110.2.a del texto refundido de la Ley reguladora de las Haciendas Locales).
                 </p>
               </details>
@@ -988,10 +1007,10 @@ export default function EstimadorImpuestoDonacionesPage() {
                 <p>
                   Base imponible = valor del bien donado − cargas deducibles (art. 9.1.b LISD).
                   Base liquidable = base imponible, salvo reducciones propias de la comunidad (art. 20.5).
-                  La tarifa estatal (16 tramos, del 7,65&nbsp;% al 34&nbsp;%) se aplica sobre la base liquidable
+                  La tarifa estatal ({TARIFA_RESUMEN}) se aplica sobre la base liquidable
                   para obtener la cuota íntegra, que se multiplica por el coeficiente según el patrimonio
-                  preexistente (art. 22.2): de 1,0000 a 1,2000 en los Grupos I y II, de 1,5882 a 1,9059 en
-                  el Grupo III y de 2,0000 a 2,4000 en el Grupo IV.
+                  preexistente (art. 22.2): {rangoCoef('II')} en los Grupos I y II, {rangoCoef('III')} en
+                  el Grupo III y {rangoCoef('IV')} en el Grupo IV.
                 </p>
               </div>
             </li>
@@ -1016,7 +1035,7 @@ export default function EstimadorImpuestoDonacionesPage() {
                   Presentar el <strong>Modelo 651</strong> ante la administración tributaria de la comunidad
                   competente, dentro del plazo general de <strong>{PLAZO}</strong> desde el día siguiente a la
                   donación, salvo que la comunidad fije otro. Si hay inmueble urbano, presentar también la
-                  plusvalía municipal (IIVTNU) ante el Ayuntamiento, en 30 días hábiles. Conservar toda la
+                  plusvalía municipal (IIVTNU) ante el Ayuntamiento, en {PLAZO_PLUSVALIA}. Conservar toda la
                   documentación (escritura, justificante bancario, acuse de recibo de la autoliquidación)
                   por prescripción de 4 años.
                 </p>
@@ -1148,7 +1167,7 @@ export default function EstimadorImpuestoDonacionesPage() {
               <li>
                 <strong>Olvidar el Impuesto Municipal de Plusvalía (IIVTNU).</strong> Si se dona
                 un inmueble urbano, el donatario también debe declarar la plusvalía municipal ante
-                el Ayuntamiento donde radica el bien, en 30 días hábiles. El incumplimiento
+                el Ayuntamiento donde radica el bien, en {PLAZO_PLUSVALIA}. El incumplimiento
                 genera recargos e intereses adicionales.
               </li>
               <li>
