@@ -3485,9 +3485,14 @@ test.describe('Buscador CNAE-IAE — re-inspección del 06/10/2026', () => {
     // del bloque «Inspector 24/10/2026 — hallazgos ABIERTOS» (un código de dos cifras casa también
     // dentro de otros códigos). Este recuento fija el comportamiento de hoy: al repararlo pasará a
     // 22 (las entradas cuyo código EMPIEZA por 24), y la primera ficha seguirá siendo 24.10.
+    // REPARADO el 24/10/2026 (hallazgo 3461): son 22, y el código tecleado (la División 24) va el
+    // primero, delante del nivel: antes salía el 22.º, fuera del corte. La 24.10 la sigue.
     await buscarCnaeVerificado(page, '24');
-    await expect(contador(page)).toHaveText(/^35 resultados/);
-    await expect(fichas(page).first()).toContainText('24.10');
+    await expect(contador(page)).toHaveText(/^22 resultados/);
+    const codigos24 = await fichas(page).locator('[class*="codigoCnae"]').allTextContents();
+    expect(codigos24[0]).toBe('24');
+    expect(codigos24[1]).toBe('24.10');
+    expect(codigos24.filter((c) => !c.startsWith('24'))).toEqual([]);
 
     // IAE: el grupo 763 de la Sección 2ª no tiene epígrafes y en la 1ª no hay grupo 763, así
     // que nada empieza por 7631. «763» a secas, en cambio, es exactamente ese grupo.
@@ -3835,13 +3840,15 @@ test.describe('Buscador CNAE-IAE — re-verificación del 07/10/2026', () => {
     }
 
     // «grupo 62.1»: una palabra de presentación admitida; los dígitos 621 son el prefijo del
-    // grupo 62.1 y de su única clase, 62.10. Las clases van antes que los grupos.
+    // grupo 62.1 y de su única clase, 62.10. Desde el 24/10/2026 (hallazgo 3461) el código tecleado
+    // tal cual va primero, delante del nivel: el grupo 62.1 y luego su clase (antes, las clases
+    // iban siempre antes que los grupos, y una División tecleada podía quedar fuera del corte).
     await buscarCnaeVerificado(page, 'grupo 62.1');
     await expect(contador(page)).toHaveText(/^2 resultados/);
-    await expect(fichas(page).nth(0).locator('[class*="codigoCnae"]')).toHaveText('62.10');
-    await expect(fichas(page).nth(0).locator('[class*="badgeNivel"]')).toHaveText('Clase');
-    await expect(fichas(page).nth(1).locator('[class*="codigoCnae"]')).toHaveText('62.1');
-    await expect(fichas(page).nth(1).locator('[class*="badgeNivel"]')).toHaveText('Grupo');
+    await expect(fichas(page).nth(0).locator('[class*="codigoCnae"]')).toHaveText('62.1');
+    await expect(fichas(page).nth(0).locator('[class*="badgeNivel"]')).toHaveText('Grupo');
+    await expect(fichas(page).nth(1).locator('[class*="codigoCnae"]')).toHaveText('62.10');
+    await expect(fichas(page).nth(1).locator('[class*="badgeNivel"]')).toHaveText('Clase');
 
     // La última clase de la CNAE-2025: 99.00, Sección V. Con punto es la vigente (sin aviso);
     // sin punto, el código 9900 de la CNAE-2009, cuya única equivalencia es ella misma.
@@ -4428,7 +4435,8 @@ test.describe('Inspector 16/10/2026 — hallazgos REPARADOS el 18/10/2026', () =
       expect(texto, boca).toContain('antes del 30/06/2025');
       expect(texto, boca).toContain('antes del 01/01/2027');
     }
-    expect(textos.faq).toContain('está en vigor desde el 16/01/2025, pero se aplica de forma escalonada');
+    // «su aplicación es escalonada» desde el hallazgo 3463 (el verbo «se aplica» iba dos veces).
+    expect(textos.faq).toContain('está en vigor desde el 16/01/2025, pero su aplicación es escalonada');
     expect(ldJson).toContain('no deroga la CNAE-2009');
   });
 });
@@ -4542,8 +4550,9 @@ test.describe('Inspector 24/10/2026 — casos de la re-inspección', () => {
 // ocurrir. El día que se reparen pasarán a ROJO («expected to fail, but passed»): entonces se les
 // quita la marca y quedan como regresión, SIN tocar el valor esperado.
 // ═══════════════════════════════════════════════════════════════════════════
+// REPARADOS el 24/10/2026 (hallazgos 3461-3465): se les quitó la marca sin tocar el valor esperado.
 test.describe('Inspector 24/10/2026 — hallazgos ABIERTOS', () => {
-  test('ABIERTO · MEDIO (operativa) — en la CNAE, un código de dos cifras casa también DENTRO de otros códigos: «62», «12» y «00»', async ({
+  test('REPARADO 3461 · MEDIO (operativa) — en la CNAE, un código de dos cifras casa también DENTRO de otros códigos: «62», «12» y «00»', async ({
     page,
   }) => {
     // ABIERTO (hallazgo del 24/10/2026, «código de dos cifras dentro de otros códigos»).
@@ -4559,7 +4568,6 @@ test.describe('Inspector 24/10/2026 — hallazgos ABIERTOS', () => {
     // Lo esperado (anexo del RD 10/2025 y catálogo sellado): las entradas cuyo código EMPIEZA por
     // esas cifras. «62» → 7 (División 62, grupos 62.1, 62.2 y 62.9, clases 62.10, 62.20 y 62.90);
     // «12» → 3 (División 12, grupo 12.0 y clase 12.00, las tres «Industria del tabaco»); «00» → 0.
-    test.fail();
     await abrirHidratado(page);
 
     await buscarCnaeVerificado(page, '62');
@@ -4578,7 +4586,7 @@ test.describe('Inspector 24/10/2026 — hallazgos ABIERTOS', () => {
     await expect(fichas(page)).toHaveCount(0);
   });
 
-  test('ABIERTO · MEDIO (operativa) — en el IAE, un código de dos cifras mete en el corte grupos de OTRA sección que solo lo llevan dentro: «47» y «65»', async ({
+  test('REPARADO 3462 · MEDIO (operativa) — en el IAE, un código de dos cifras mete en el corte grupos de OTRA sección que solo lo llevan dentro: «47» y «65»', async ({
     page,
   }) => {
     // ABIERTO (hallazgo del 24/10/2026, el mismo que el de arriba en el panel del IAE). Aquí lo
@@ -4594,7 +4602,6 @@ test.describe('Inspector 24/10/2026 — hallazgos ABIERTOS', () => {
     // del papel y fabricación de artículos de papel; artes gráficas y edición»— con sus grupos y
     // epígrafes, 26 entradas, todas de la Sección 1ª; ninguna de la 2ª ni de la 3ª lleva código 47.
     // «65», la Agrupación 65 de la Sección 1ª, 45 entradas.
-    test.fail();
     await abrirHidratado(page);
 
     await buscarIaeVerificado(page, '47');
@@ -4607,13 +4614,12 @@ test.describe('Inspector 24/10/2026 — hallazgos ABIERTOS', () => {
     await expect(fichas(page).filter({ hasText: 'Grabadores, Informáticos' })).toHaveCount(0);
   });
 
-  test('ABIERTO · BAJO (contenido) — el sello, la FAQ visible y el FAQPage dicen «se aplica de forma escalonada: se aplica a las estadísticas…»', async ({
+  test('REPARADO 3463 · BAJO (contenido) — el sello, la FAQ visible y el FAQPage dicen «se aplica de forma escalonada: se aplica a las estadísticas…»', async ({
     page,
   }) => {
     // ABIERTO (hallazgo del 24/10/2026). Las tres bocas pegan «… se aplica de forma escalonada: »
     // delante de APLICACION_CNAE (metadata.ts), que es CNAE_VIGENCIA.nota sin su arranque y empieza
     // a su vez por «se aplica a las estadísticas oficiales…». Lo esperado: el verbo una sola vez.
-    test.fail();
     await abrirHidratado(page);
     const duplicado = /se aplica de forma escalonada: se aplica/;
     const sello = await page
@@ -4627,7 +4633,7 @@ test.describe('Inspector 24/10/2026 — hallazgos ABIERTOS', () => {
     }
   });
 
-  test('ABIERTO · BAJO (dato) — la tabla comparativa dice que el RD 10/2025 «sustituye al RD 475/2007», que no deroga', async ({
+  test('REPARADO 3464 · BAJO (dato) — la tabla comparativa dice que el RD 10/2025 «sustituye al RD 475/2007», que no deroga', async ({
     page,
   }) => {
     // ABIERTO (hallazgo del 24/10/2026, residuo del 3336). BOE-A-2025-587: el RD 10/2025 no tiene
@@ -4636,21 +4642,19 @@ test.describe('Inspector 24/10/2026 — hallazgos ABIERTOS', () => {
     // párrafos antes de la tabla («la CNAE-2009 no se ha derogado y las dos conviven»), y la fila
     // «Norma de referencia» dice «RD 10/2025, de 14 de enero (sustituye al RD 475/2007, de 13 de
     // abril)». Lo esperado: la norma vigente sin afirmar que sustituye a la anterior.
-    test.fail();
     await abrirHidratado(page);
     const fila = page.locator('tr').filter({ hasText: 'Norma de referencia' });
     await expect(fila).toContainText(CNAE_VIGENCIA.normaVigente);
     await expect(fila).not.toContainText(`sustituye al ${CNAE_VIGENCIA.normaAnterior}`, { timeout: 2000 });
   });
 
-  test('ABIERTO · BAJO (dato) — los sellos leen fuente y URL oficial del catálogo, tecleadas en el generador, y no de FISCAL_CNAE_IAE_META', async () => {
+  test('REPARADO 3465 · BAJO (dato) — los sellos leen fuente y URL oficial del catálogo, tecleadas en el generador, y no de FISCAL_CNAE_IAE_META', async () => {
     // ABIERTO (hallazgo del 24/10/2026). page.tsx pasa a los dos DataReference `meta.cnae.fuente`,
     // `meta.cnae.urlOficial`, `meta.iae.fuente` y `meta.iae.urlOficial` del JSON servido, que
     // escribe a mano scripts/generar-catalogos-cnae-iae.mjs (l. 276-282), mientras el mismo dato
     // vive en FISCAL_CNAE_IAE_META con su contrato de vigilancia. Hoy la URL coincide porque
     // 4b0d54c3 la corrigió en los TRES sitios. Es la forma de los hallazgos 588 (fecha) y 2924
     // (nota), que se repararon pasando el sello a leer del módulo.
-    test.fail();
     const { readFileSync } = await import('node:fs');
     const { join } = await import('node:path');
     const fuente = readFileSync(join(process.cwd(), 'app', 'conversor-cnae-iae', 'page.tsx'), 'utf8');

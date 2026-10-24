@@ -40,10 +40,17 @@ export const NORMA_IAE: string = (() => {
  * aplicación van en su `nota`. Aquí se leen de ella, sin su arranque («La CNAE-2025 sustituye a
  * la CNAE-2009: »), y la FAQ visible, el FAQPage y el sello las publican con la MISMA frase.
  */
-export const APLICACION_CNAE: string = CNAE_VIGENCIA.nota.replace(/^[^:]*:\s*/, '');
+//
+// ⚠️ 24/10/2026 (hallazgo 3463) — la nota empieza ya por «se aplica a las estadísticas…», y las tres
+// bocas le pegaban delante «se aplica de forma escalonada: »: el verbo dos veces. Ahora el arranque
+// dice «su aplicación es escalonada». Y «incorporada al catálogo» quedaba sin referente en el
+// FAQPage, que leen los asistentes de IA sin la página al lado: se dice qué hace con ella la página.
+export const APLICACION_CNAE: string = CNAE_VIGENCIA.nota
+  .replace(/^[^:]*:\s*/, '')
+  .replace(/, incorporada al catálogo\.$/, ', y el buscador de esta página la aplica a los códigos antiguos.');
 export const VIGENCIA_CNAE: string =
   `La ${CNAE_VIGENCIA.vigente} fue aprobada por el ${CNAE_VIGENCIA.normaVigente} y está en vigor ` +
-  `desde el ${formatearFecha(CNAE_VIGENCIA.desde)}, pero se aplica de forma escalonada: ` +
+  `desde el ${formatearFecha(CNAE_VIGENCIA.desde)}, pero su aplicación es escalonada: ` +
   `${APLICACION_CNAE} El real decreto no deroga la ${CNAE_VIGENCIA.anterior}: durante la ` +
   `transición conviven las dos.`;
 

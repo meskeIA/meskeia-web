@@ -858,12 +858,13 @@ export default function ConversorCnaeIaePage() {
     } else if (consultaCnaeNormalizada.length === 0) {
       base = cnaeIndexado;
     } else {
+      // ⚠️ 24/10/2026 (hallazgo 3461) — una consulta que es un código casa SOLO por el principio
+      // del código. Se admitía además toda entrada cuyo textoBusqueda CONTUVIERA la consulta, y
+      // ese texto empieza por el propio código: «62» casaba con 01.62, 10.62…, «12» con 01.12 y
+      // «00» con 12.00. Es la forma del 2925 entrando por el código a secas.
       base = cnaeIndexado.filter((entrada) => {
-        if (
-          digitosConsultaCnae.length > 0 &&
-          entrada.codigoDigitos.startsWith(digitosConsultaCnae)
-        ) {
-          return true;
+        if (digitosConsultaCnae.length > 0) {
+          return entrada.codigoDigitos.startsWith(digitosConsultaCnae);
         }
         return entrada.textoBusqueda.includes(consultaCnaeNormalizada);
       });
@@ -874,6 +875,11 @@ export default function ConversorCnaeIaePage() {
     }
 
     return [...base].sort((a, b) => {
+      // El código tecleado tal cual va primero, delante del nivel: la División 24 salía detrás
+      // de sus 21 grupos y clases, fuera del corte de los 10 primeros (hallazgo 3461).
+      const exactaA = digitosConsultaCnae.length > 0 && a.codigoDigitos === digitosConsultaCnae;
+      const exactaB = digitosConsultaCnae.length > 0 && b.codigoDigitos === digitosConsultaCnae;
+      if (exactaA !== exactaB) return exactaA ? -1 : 1;
       const porNivel = PESO_NIVEL_CNAE[a.nivel] - PESO_NIVEL_CNAE[b.nivel];
       if (porNivel !== 0) return porNivel;
       const porRelevancia = relevancia(a) - relevancia(b);
@@ -922,9 +928,12 @@ export default function ConversorCnaeIaePage() {
     let base = iaeIndexado;
 
     if (consultaIaeNormalizada.length > 0) {
+      // Hallazgo 3462: un código casa solo por el principio del código, como en la CNAE (3461):
+      // «47» casaba dentro de «747» y «047», y el representante de sección metía entre los diez
+      // visibles un grupo de otra sección con otra retención de IRPF.
       base = base.filter((entrada) => {
-        if (digitosConsultaIae.length > 0 && entrada.codigoDigitos.startsWith(digitosConsultaIae)) {
-          return true;
+        if (digitosConsultaIae.length > 0) {
+          return entrada.codigoDigitos.startsWith(digitosConsultaIae);
         }
         return (
           entrada.textoBusqueda.includes(consultaIaeNormalizada) ||
@@ -1054,21 +1063,26 @@ export default function ConversorCnaeIaePage() {
           {/* `normativa` NO repite el nombre del catálogo: la `fuente` del JSON ya lo trae
               delante, y en pantalla se leía «CNAE-2025 — CNAE-2025 — RD 10/2025 (INE)»
               (hallazgo 587). `sinPrefijo` retira ese primer tramo cuando coincide. */}
+          {/* Fuente y URL oficial salen de FISCAL_CNAE_IAE_META, que tiene el contrato de
+              vigilancia, y no del catálogo servido, donde las teclea a mano el generador: es la
+              forma de los hallazgos 588 (fecha) y 2924 (nota) en los dos campos que quedaban
+              (hallazgo 3465). */}
           <DataReference
             normativa={CNAE_VIGENCIA.vigente}
-            fuente={sinPrefijo(meta.cnae.fuente, CNAE_VIGENCIA.vigente)}
+            fuente={sinPrefijo(FISCAL_CNAE_IAE_META.cnae.fuente, CNAE_VIGENCIA.vigente)}
             verificado={FISCAL_CNAE_IAE_META.verificado}
-            urlOficial={meta.cnae.urlOficial}
+            urlOficial={FISCAL_CNAE_IAE_META.cnae.urlOficial}
             // La nota sale de CNAE_VIGENCIA y no de `meta.cnae.nota`, que la escribía el
             // generador con la fecha tecleada, y caducada (hallazgo 2924). Y lleva las fechas de
-            // APLICACIÓN, que la entrada en vigor no dice (hallazgo 3336).
-            nota={`La ${CNAE_VIGENCIA.vigente} rige desde el ${formatFechaLarga(CNAE_VIGENCIA.desde)} (${CNAE_VIGENCIA.normaVigente}) y se aplica de forma escalonada: ${APLICACION_CNAE}`}
+            // APLICACIÓN, que la entrada en vigor no dice (hallazgo 3336), con el verbo una sola
+            // vez: APLICACION_CNAE ya empieza por «se aplica» (hallazgo 3463).
+            nota={`La ${CNAE_VIGENCIA.vigente} rige desde el ${formatFechaLarga(CNAE_VIGENCIA.desde)} (${CNAE_VIGENCIA.normaVigente}) y su aplicación es escalonada: ${APLICACION_CNAE}`}
           />
           <DataReference
             normativa="Tarifas del IAE"
-            fuente={sinPrefijo(meta.iae.fuente, 'Tarifas del IAE')}
+            fuente={sinPrefijo(FISCAL_CNAE_IAE_META.iae.fuente, 'Tarifas del IAE')}
             verificado={FISCAL_CNAE_IAE_META.verificado}
-            urlOficial={meta.iae.urlOficial}
+            urlOficial={FISCAL_CNAE_IAE_META.iae.urlOficial}
             nota={meta.iae.nota}
           />
         </>
@@ -1615,7 +1629,9 @@ export default function ConversorCnaeIaePage() {
                   <td>
                     <strong>Norma de referencia</strong>
                   </td>
-                  <td>{CNAE_VIGENCIA.normaVigente} (sustituye al {CNAE_VIGENCIA.normaAnterior})</td>
+                  {/* Hallazgo 3464: el RD 10/2025 (BOE-A-2025-587) no tiene disposición
+                      derogatoria, así que no «sustituye al» RD 475/2007. */}
+                  <td>{`${CNAE_VIGENCIA.normaVigente} (la ${CNAE_VIGENCIA.anterior} sigue en el ${CNAE_VIGENCIA.normaAnterior}, que no se deroga)`}</td>
                   <td>{NORMA_IAE} y modificaciones</td>
                 </tr>
                 <tr>
