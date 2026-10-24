@@ -43,7 +43,7 @@ import {
   REGISTRO_CONCEPTOS,
   sumarLineasVisibles, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL, avisoIrpfForalResidente,
   TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION,
-  BONIFICACION_CUOTA_CEUTA_MELILLA } from '@/data/itp-ccaa';
+  BONIFICACION_CUOTA_CEUTA_MELILLA, SALVEDAD_PLUSVALIA_NO_RESIDENTE } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
   HORQUILLA_GASTOS_COMPRAVENTA,
@@ -661,7 +661,9 @@ const DERIVACIONES: Partial<Record<TipoInmueble, { url: string; nombre: string; 
     {
       url: '/simulador-gastos-compraventa-terreno-rustico/',
       nombre: 'Simulador de gastos de compra de finca rústica',
-      matiz: 'el suelo rústico está exento de IVA (art. 20.Uno.20º LIVA): paga ITP incluso cuando el vendedor es un empresario, y no genera plusvalía municipal, porque el IIVTNU solo grava suelo urbano.',
+      // Hallazgo 3468 (cabo C0351): con la renuncia a la exención (art. 20.Dos LIVA) va por IVA con
+      // inversión del sujeto pasivo (art. 84.Uno.2.º.e) más AJD, no por ITP (TRLITPAJD, art. 7.5).
+      matiz: 'el suelo rústico está exento de IVA (art. 20.Uno.20º LIVA), así que paga ITP aunque venda un empresario, salvo con la renuncia a la exención, que cabe cuando compra otro empresario con derecho a deducir (art. 20.Dos LIVA): entonces va por IVA, que ingresa el comprador, más AJD. Y no genera plusvalía municipal, porque el IIVTNU solo grava suelo urbano.',
     },
     {
       url: '/simulador-gastos-compraventa-solar/',
@@ -2999,7 +3001,9 @@ export default function SimuladorCompraventaPage() {
             <div className={styles.contentCard}>
               <h4><span aria-hidden="true">🏛️</span> Plusvalía municipal</h4>
               <p>
-                El vendedor debe pagar el <strong>Impuesto sobre el Incremento del Valor de los Terrenos</strong> (plusvalía municipal).
+                {/* Con la salvedad del art. 106.2 TRLRHL (hallazgo 3467, cabo C0354). */}
+                El vendedor debe pagar el <strong>Impuesto sobre el Incremento del Valor de los Terrenos</strong> (plusvalía municipal),
+                con una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}.
               </p>
               <p>
                 Desde 2021, puede elegir entre el método <strong>objetivo</strong> (valor catastral del suelo × coeficiente
@@ -3120,17 +3124,24 @@ export default function SimuladorCompraventaPage() {
                   <td>AJD</td>
                   <td>{formatNumber(RANGO_AJD_VIVIENDA.min, 0)}&nbsp;% – {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}&nbsp;%</td>
                   <td>{formatNumber(RANGO_AJD_VIVIENDA.min, 0)}&nbsp;% – {formatNumber(RANGO_AJD_VIVIENDA.max, 1)}&nbsp;% (con hipoteca)</td>
-                  <td>Comprador · con hipoteca, la entidad financiera (Ley 5/2019)</td>
+                  {/* Hallazgo 3471: la Ley 5/2019 remite a la normativa tributaria (art. 14.1.e); quien
+                      hace sujeto pasivo al prestamista es el art. 29 TRLITPAJD, párrafo segundo, en la
+                      redacción del RDL 17/2018 (BOE-A-1993-25359, leído el 24/10/2026). */}
+                  <td>Comprador · con hipoteca, la entidad financiera (art. 29 TRLITPAJD, redacción del RDL 17/2018)</td>
                 </tr>
                 <tr>
                   <td>Plusvalía municipal</td>
                   <td>Sí</td>
                   <td>Sí</td>
-                  <td>Vendedor</td>
+                  {/* Hallazgo 3467 (cabo C0354): la salvedad del no residente, art. 106.2 TRLRHL. */}
+                  <td>Vendedor (si es una persona física no residente, la ingresa el comprador como sustituto, art. 106.2 TRLRHL)</td>
                 </tr>
                 <tr>
                   <td>IRPF ganancia patrimonial</td>
-                  <td>{formatNumber(TIPO_AHORRO_MIN, 0)}&nbsp;% – {formatNumber(TIPO_AHORRO_MAX, 0)}&nbsp;%</td>
+                  {/* Hallazgo 3470: en una primera entrega vende el promotor, cuya renta es de actividad
+                      económica (art. 27.1 LIRPF) o del Impuesto sobre Sociedades, como dicen el FAQPage
+                      y la tarjeta «IRPF del vendedor»; no la escala del ahorro. */}
+                  <td>No aplica: vende el promotor (actividad económica o Impuesto sobre Sociedades)</td>
                   <td>{formatNumber(TIPO_AHORRO_MIN, 0)}&nbsp;% – {formatNumber(TIPO_AHORRO_MAX, 0)}&nbsp;%</td>
                   <td>Vendedor</td>
                 </tr>
@@ -3390,8 +3401,9 @@ export default function SimuladorCompraventaPage() {
           <ul className={styles.warningList}>
             <li><strong>No incluir el IVA de notaría y registro:</strong> Los honorarios de notaría y registro llevan IVA al {formatNumber(PORCENTAJES_IVA.general, 0)}&nbsp;% (en Canarias, IGIC, y en Ceuta y Melilla, IPSI, que esta calculadora no suma), que a menudo se olvida en el presupuesto inicial.</li>
             <li><strong>Ignorar el valor de referencia catastral:</strong> Si supera el precio escriturado, Hacienda aplicará ITP sobre ese valor mayor y podrás recibir una comprobación de valores.</li>
-            <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican.</li>
-            <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final.</li>
+            <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano, entre particulares, solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican. La excepción es la renuncia a la exención del IVA cuando vende un empresario a otro con derecho a deducir (art. 20.Dos LIVA): entonces la compra va por IVA, que ingresa el comprador, más AJD, y no por ITP.</li>
+            {/* Hallazgos 3468 (la renuncia, cabo C0351) y 3467 (el no residente, cabo C0354). */}
+            <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final. La plusvalía tiene una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}.</li>
             <li><strong>Calcular el IRPF de la venta como si fuera tu única renta del ahorro:</strong> La escala del ahorro (del {TIPO_AHORRO_MIN}&nbsp;% al {TIPO_AHORRO_MAX}&nbsp;%) se aplica a todas las rentas del ahorro del año juntas: intereses, dividendos y otras ganancias. Escríbelas en la pestaña Vendedor y la cuota será la que esta venta añade. Lo que esta calculadora no hace es compensar pérdidas de otras operaciones: en la declaración, las ganancias y pérdidas patrimoniales del año sí se compensan entre sí (art. 49.1.b LIRPF).</li>
             <li><strong>No comprobar bonificaciones autonómicas:</strong> Cada comunidad tiene tipos reducidos para ciertos colectivos. Ignorarlos puede costar miles de euros en impuestos innecesarios.</li>
             <li><strong>Liquidar fuera de plazo:</strong> El ITP o, en obra nueva, el AJD debe pagarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la escritura ({PLAZO_ITP.baseNormativa}), y hay comunidades que fijan el suyo propio. Pasado ese plazo hay recargo automático

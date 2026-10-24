@@ -6,6 +6,7 @@ import {
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar,
+  SALVEDAD_PLUSVALIA_NO_RESIDENTE,
 } from '@/data/itp-ccaa';
 import { PORCENTAJES_IVA } from '@/data/fiscal';
 
@@ -33,13 +34,11 @@ export const RESPUESTA_SOLAR_NO_EXENTO = `Porque la exención de IVA alcanza al 
 export const PREGUNTA_IVA_DEDUCIBLE = '¿Puedo deducir el IVA de la compra de un solar?';
 export const RESPUESTA_IVA_DEDUCIBLE = 'Si eres promotor, empresario o autónomo y afectas el solar a una actividad económica sujeta y no exenta de IVA, puedes deducir el IVA soportado en el modelo 303. Si la actividad está exenta, no: es el caso de quien levanta en él viviendas para alquilarlas, porque ese arrendamiento está exento (art. 20.Uno.23.º de la Ley del IVA). Y un particular que compra un solar para autopromover su vivienda no actúa como empresario, así que tampoco lo deduce: el IVA soportado se convierte en un mayor coste de la parcela.';
 /**
- * La excepción a «la paga el vendedor» (hallazgo 3269): en una transmisión onerosa, si el
- * contribuyente es una persona física no residente en España, el adquirente es sujeto pasivo
- * sustituto (TRLRHL, art. 106.2, BOE-A-2004-4214, leído el 21/10/2026). La pintan la FAQ (las dos
- * bocas), la nota «Recuerda», la tarjeta de casos de uso y Limitaciones. «En territorio común»:
- * el País Vasco y Navarra tienen sus normas forales del impuesto, que no se han consultado.
+ * La excepción a «la paga el vendedor» (hallazgo 3269). La pintan la FAQ (las dos bocas), la nota
+ * «Recuerda», la tarjeta de casos de uso y Limitaciones. Desde el 24/10/2026 vive en
+ * data/itp-ccaa.ts, con su fuente, porque la usan también el estimador y el local (3467, 3472).
  */
-export const SALVEDAD_PLUSVALIA_NO_RESIDENTE = 'si vende una persona física no residente en España, el comprador es sujeto pasivo sustituto y es él quien la ingresa (art. 106.2 TRLRHL, en territorio común)';
+export { SALVEDAD_PLUSVALIA_NO_RESIDENTE };
 export const PREGUNTA_PLUSVALIA = '¿Hay plusvalía municipal al comprar o vender un solar?';
 export const RESPUESTA_PLUSVALIA = `Sí, pero la paga el vendedor, no el comprador, salvo en un caso: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}. El solar es suelo de naturaleza urbana, así que su transmisión genera plusvalía municipal (IIVTNU) sobre el incremento de valor del terreno durante el tiempo de tenencia. Si no ha habido incremento real de valor, la transmisión no está sujeta al impuesto (art. 104.5 TRLRHL, redacción del RDL 26/2021): hay que declararlo y acreditarlo con las escrituras de compra y venta.`;
 

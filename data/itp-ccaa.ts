@@ -1499,6 +1499,17 @@ export function motivoPlusvaliaForal(ccaa: ComunidadAutonoma): string {
   return `en ${nombreEnFrase(ccaa)} la plusvalía municipal se rige por ${norma}, que esta herramienta no aplica`;
 }
 
+/**
+ * La excepción a «la plusvalía la paga el vendedor» (hallazgo 3269 del solar, traída aquí el
+ * 24/10/2026 para el estimador y el local, hallazgos 3467 y 3472, cabo C0354): en una transmisión
+ * onerosa, si el contribuyente es una persona física no residente en España, el adquirente es
+ * sujeto pasivo sustituto (TRLRHL, art. 106.2, BOE-A-2004-4214, leído el 21/10/2026 y el
+ * 24/10/2026). «En territorio común»: el País Vasco y Navarra tienen sus normas forales del
+ * impuesto, que no se han consultado. Va en minúscula para encajar tras «con una excepción: ».
+ */
+export const SALVEDAD_PLUSVALIA_NO_RESIDENTE =
+  'si vende una persona física no residente en España, el comprador es sujeto pasivo sustituto y es él quien la ingresa (art. 106.2 TRLRHL, en territorio común)';
+
 /** Para el sello del IRPF de las apps con vendedor, que no saben dónde reside. */
 export const AVISO_IRPF_FORAL =
   'Es la escala estatal: si resides en el País Vasco o en Navarra, tu IRPF es foral y se liquida con su propia escala, que esta herramienta no aplica.';

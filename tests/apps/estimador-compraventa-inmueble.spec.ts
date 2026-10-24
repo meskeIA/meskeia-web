@@ -10215,10 +10215,10 @@ test.describe('Inspector 24/10/2026 — la plusvalía del promotor, quién respo
    * la plusvalía municipal»), la tarjeta «Plusvalía municipal» de la guía («El vendedor debe pagar…»)
    * y la tabla comparativa («¿Quién paga?» → «Vendedor»).
    */
+  // REPARADO (hallazgo 3467, 24/10/2026): SALVEDAD_PLUSVALIA_NO_RESIDENTE, ahora en data/itp-ccaa.ts.
   test('HALLAZGO C0354 — la plusvalía municipal lleva la salvedad del comprador sustituto (no residente)', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     const faq = await faqPage(page);
     const quien = faq.find((q) => q.pregunta === '¿Qué es la plusvalía municipal y quién la paga?');
@@ -10238,10 +10238,10 @@ test.describe('Inspector 24/10/2026 — la plusvalía del promotor, quién respo
    * con inversión del sujeto pasivo (art. 84.Uno.2.º.e, la renuncia) lo ingresa el comprador, y
    * esa no es la obra nueva de vivienda que calcula la app. Solo esta app de la familia tiene la frase.
    */
+  // REPARADO (hallazgo 3469, 24/10/2026): del IVA de la obra nueva responde el promotor, que lo repercute.
   test('HALLAZGO quién responde del IVA — la FAQ no hace al comprador responsable del IVA ante la Administración', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     expect(await faqVisible(page, '¿Puedo negociar quién paga cada gasto?')).not.toContain('el comprador del ITP o del IVA');
     const faq = await faqPage(page);
@@ -10257,8 +10257,8 @@ test.describe('Inspector 24/10/2026 — la plusvalía del promotor, quién respo
    * 7.5 y 31.2), no por ITP: es lo que la app del rústico calcula con su opción de renuncia. La misma
    * frase en el FAQPage del solar fue el hallazgo 3268.
    */
+  // REPARADO (hallazgo 3468, 24/10/2026), y la caja «Errores comunes» nombra la renuncia en segunda mano.
   test('HALLAZGO C0351 — la derivación del rústico nombra la renuncia a la exención', async ({ page }) => {
-    test.fail();
     await abrir(page, 'madrid');
     await page.getByRole('button', { name: /Terreno/ }).click();
     // Obtenido hoy: «…exento de IVA (art. 20.Uno.20º LIVA): paga ITP incluso cuando el vendedor es un
@@ -10274,10 +10274,10 @@ test.describe('Inspector 24/10/2026 — la plusvalía del promotor, quién respo
    * publica cuota en obra nueva (AVISO_VENTA_PROMOTOR). La tabla comparativa sigue dando, en la
    * columna «Vivienda nueva», «IRPF ganancia patrimonial · 19 % – 30 % · Vendedor».
    */
+  // REPARADO (hallazgo 3470, 24/10/2026).
   test('HALLAZGO tabla del promotor — la columna «Vivienda nueva» no da la ganancia del ahorro como renta del promotor', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     const fila = await filaComparativa(page, 'IRPF ganancia patrimonial');
     expect(fila[2]).toBe('19 % – 30 %');
@@ -10291,8 +10291,8 @@ test.describe('Inspector 24/10/2026 — la plusvalía del promotor, quién respo
    * prestamista es el art. 29 TRLITPAJD en la redacción del RDL 17/2018. El mismo error está en la
    * nota de TIPOS_AJD_2025 (data/fiscal/inmuebles.ts), que esta app no pinta.
    */
+  // REPARADO (hallazgo 3471, 24/10/2026) en la tabla; la nota de TIPOS_AJD_2025 en data/fiscal queda a decisión (fiscal).
   test('HALLAZGO norma del AJD de la hipoteca — la tabla cita el art. 29 TRLITPAJD (RDL 17/2018)', async ({ page }) => {
-    test.fail();
     await page.goto(RUTA);
     // Obtenido hoy: «Comprador · con hipoteca, la entidad financiera (Ley 5/2019)».
     const fila = await filaComparativa(page, 'AJD');

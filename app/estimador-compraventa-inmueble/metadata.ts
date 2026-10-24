@@ -16,6 +16,7 @@ import {
   importeITP,
   sumarLineasVisibles,
   TERRITORIOS_SIN_IVA,
+  SALVEDAD_PLUSVALIA_NO_RESIDENTE,
 } from '@/data/itp-ccaa';
 import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
 
@@ -267,9 +268,14 @@ export const RESPUESTA_NO_SUJECION =
  * el comprador pague toda la notaría es un pacto habitual, no la ley (hallazgo 2185). Y el pacto no
  * mueve al obligado tributario: art. 17.5 de la Ley General Tributaria (BOE-A-2003-23186).
  */
+//
+// ⚠️ 24/10/2026 — Del IVA de la obra nueva no responde el comprador: el sujeto pasivo es quien
+// entrega, el promotor (Ley 37/1992, art. 84.Uno.1.º, BOE-A-1992-28740), que lo repercute; solo con
+// la inversión del sujeto pasivo lo ingresa el comprador (hallazgo 3469). Y la plusvalía lleva la
+// salvedad del no residente, art. 106.2 TRLRHL (hallazgo 3467, cabo C0354).
 export const PREGUNTA_QUIEN_PAGA = '¿Puedo negociar quién paga cada gasto?';
 export const RESPUESTA_QUIEN_PAGA =
-  'Sí, dentro de un límite. Por ley, los gastos de otorgamiento de la escritura —la matriz que autoriza el notario— son del vendedor, y los de la primera copia y los posteriores a la venta, del comprador, salvo pacto en contrario (art. 1455 del Código Civil). En la práctica es habitual pactar que el comprador pague toda la notaría y el registro, pero es un acuerdo que se escribe en las arras o en el contrato privado, no una obligación legal. Lo que el pacto no cambia es quién responde de cada impuesto ante la Administración (art. 17.5 de la Ley General Tributaria): el comprador del ITP o del IVA y el AJD, y el vendedor de la plusvalía municipal y del IRPF de la ganancia.';
+  `Sí, dentro de un límite. Por ley, los gastos de otorgamiento de la escritura —la matriz que autoriza el notario— son del vendedor, y los de la primera copia y los posteriores a la venta, del comprador, salvo pacto en contrario (art. 1455 del Código Civil). En la práctica es habitual pactar que el comprador pague toda la notaría y el registro, pero es un acuerdo que se escribe en las arras o en el contrato privado, no una obligación legal. Lo que el pacto no cambia es quién responde de cada impuesto ante la Administración (art. 17.5 de la Ley General Tributaria): el comprador, del ITP y del AJD; el promotor, del IVA de la obra nueva, que repercute al comprador en la factura; y el vendedor, del IRPF de la ganancia y de la plusvalía municipal, con una excepción: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}.`;
 
 /**
  * «¿Qué son los tipos reducidos de ITP…?», en UNA constante para la FAQ visible y el FAQPage: era la
@@ -376,7 +382,8 @@ export const faqJsonLd = {
       name: '¿Qué es la plusvalía municipal y quién la paga?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La plusvalía municipal (IIVTNU, Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) grava el aumento de valor del suelo desde la última transmisión. La paga el vendedor, salvo en herencias y donaciones (donde la paga el heredero o donatario). Si no hay incremento de valor del terreno, la transmisión no está sujeta (art. 104.5 del texto refundido de la Ley de Haciendas Locales, redacción del RDL 26/2021): el impuesto no llega a devengarse, aunque hay que declarar la transmisión y aportar las escrituras de compra y venta. Si lo hay, el vendedor elige el método de cálculo más favorable, el objetivo o el real.',
+        // La salvedad del no residente, art. 106.2 TRLRHL (hallazgo 3467, cabo C0354).
+        text: `La plusvalía municipal (IIVTNU, Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) grava el aumento de valor del suelo desde la última transmisión. La paga el vendedor, salvo en herencias y donaciones (donde la paga el heredero o donatario) y con otra excepción en la venta: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}. Si no hay incremento de valor del terreno, la transmisión no está sujeta (art. 104.5 del texto refundido de la Ley de Haciendas Locales, redacción del RDL 26/2021): el impuesto no llega a devengarse, aunque hay que declarar la transmisión y aportar las escrituras de compra y venta. Si lo hay, el vendedor elige el método de cálculo más favorable, el objetivo o el real.`,
       },
     },
     ...preguntasGuiaJsonLd,
