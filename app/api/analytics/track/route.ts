@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
 import { getCorsHeaders } from '@/lib/cors';
 import { esAgenteIALectura } from '@/lib/analytics-rollup';
+import { esVisitaPropia } from '@/lib/esVisitaPropia';
 
 // Runtime nodejs: el Edge Runtime está deprecado desde Next 16.3.0 (detectado 2026-08-10)
 export const runtime = 'nodejs';
@@ -187,14 +188,14 @@ export async function POST(request: NextRequest) {
       null;
     const ip_address = rawIP ? anonymizeIP(rawIP) : null;
 
-    // Marcar en origen las visitas del propietario (ver getIpPropia). Se compara IP
-    // anonimizada contra IP anonimizada: `ip-filter` guarda `ip_excluida` ya truncada.
+    // Marcar en origen las visitas del propietario (ver getIpPropia): la IP excluida y
+    // cualquier IP local, que es un test del servidor de desarrollo (lib/esVisitaPropia.ts).
     // `filtro_ip_activo` NO se consulta a propósito: `es_propio` describe un HECHO —la
     // visita es del propietario— mientras que el checkbox del dashboard es una decisión
     // de visualización, y se aplica al leer. Así el dato queda correcto en el dump aunque
     // el filtro esté desactivado.
     const ipPropia = ip_address ? await getIpPropia(client) : null;
-    const es_propio = ipPropia !== null && ip_address === ipPropia ? 1 : 0;
+    const es_propio = esVisitaPropia(rawIP, ip_address, ipPropia) ? 1 : 0;
 
     // Agentes de IA que RENDERIZAN la página. El `botsPattern` de arriba mira el UA de
     // la petición HTTP, y esta clase lo esquiva: NotebookLM abre la URL con un headless
