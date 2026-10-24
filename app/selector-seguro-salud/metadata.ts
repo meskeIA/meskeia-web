@@ -11,7 +11,8 @@ const FUNCIONES = [
   'Avisos de preexistencias, embarazo en curso y periodos de carencia',
   'Explica la puntuación con todo lo que suma y lo que resta',
   'Referencia de precio con fuente (UNESPA) en lugar de cifras sin origen',
-  '100% en el navegador, sin registro ni instalación',
+  // «%» con espacio duro (CLAUDE.md §2, hallazgo 3131).
+  '100 % en el navegador, sin registro ni instalación',
 ];
 
 export const metadata: Metadata = {
@@ -32,8 +33,10 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: '¿Te conviene un seguro de salud privado? Test gratuito | meskeIA',
+    // Sin «cuánto te costaría»: la app da la prima media del sector y no pregunta la edad, que es
+    // lo que más mueve el precio (hallazgo 3130, tipo «promesa»).
     description:
-      'Descubre si el seguro médico privado tiene sentido para tu situación, qué cobertura necesitas y cuánto te costaría aproximadamente.',
+      'Descubre si el seguro médico privado tiene sentido para tu situación, qué cobertura necesitas y cuál es la prima media del sector.',
     type: 'website',
     locale: 'es_ES',
     url: 'https://meskeia.com/selector-seguro-salud/',

@@ -70,6 +70,26 @@ export default function SelectorSeguroSalud() {
   const progreso = (paso / totalPreguntas) * 100;
 
   function seleccionarOpcion(valor: string) { setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor })); }
+
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG, receta 1681 de selector-smartphone): las flechas
+   * mueven el foco a la opción vecina y la marcan, con vuelta al principio, e Inicio/Fin van a los
+   * extremos. El grupo es UNA parada de Tab (tabindex itinerante). Antes cada opción era una
+   * parada y las flechas no hacían nada (hallazgo 3123, cabo C0016).
+   */
+  function teclaEnOpcion(e: React.KeyboardEvent<HTMLButtonElement>, indice: number) {
+    const total = preguntaActual.opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(preguntaActual.opciones[destino].valor);
+    const opciones = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    opciones?.[destino]?.focus();
+  }
   // Avanza desde la pregunta DEL RENDER (`paso + 1`) y solo si está respondida: dos clics antes de
   // repintar no saltan una pregunta.
   function avanzar() {
@@ -168,7 +188,7 @@ export default function SelectorSeguroSalud() {
             <span className={styles.preguntaIcon} aria-hidden="true">{preguntaActual.icon}</span>
             <h2 className={styles.preguntaTexto} ref={enunciado} tabIndex={-1}>{preguntaActual.pregunta}</h2>
             <div className={styles.opcionesGrid} role="radiogroup" aria-label={preguntaActual.pregunta}>
-              {preguntaActual.opciones.map(op => (
+              {preguntaActual.opciones.map((op, indice) => (
                 <button key={op.valor} type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
                   onClick={() => seleccionarOpcion(op.valor)}
@@ -177,6 +197,13 @@ export default function SelectorSeguroSalud() {
                   // radio dentro (selector-smartphone, hallazgo 950).
                   role="radio"
                   aria-checked={respuestas[preguntaActual.id] === op.valor}
+                  // Tabindex itinerante: la marcada, o la primera si no hay ninguna (3123).
+                  tabIndex={
+                    respuestas[preguntaActual.id]
+                      ? respuestas[preguntaActual.id] === op.valor ? 0 : -1
+                      : indice === 0 ? 0 : -1
+                  }
+                  onKeyDown={e => teclaEnOpcion(e, indice)}
                 >
                   <span className={styles.opcionEtiqueta}>{op.etiqueta}</span>
                   <span className={styles.opcionDesc}>{op.desc}</span>

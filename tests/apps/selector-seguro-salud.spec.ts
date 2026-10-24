@@ -881,19 +881,28 @@ test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C01
     await expect.poll(() => enfocado(page), { timeout: 2_000 }).toBe('¿Con qué frecuencia vas al médico aproximadamente?');
   });
 
-  test('C0016 (hallazgo) teclado de radios (APG): las flechas no hacen nada y cada opción es una parada de Tab', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Forma del 1681 de selector-smartphone (tabindex itinerante
-    // 0/−1/−1/−1 y teclaEnOpcion). Medido: los cuatro radios sin tabindex (cuatro paradas de Tab) y
-    // ArrowDown deja el foco en el primero sin marcar nada.
-    test.fail();
+  test('REPARADO 3123 (C0016): teclado de radios (APG): las flechas mueven y marcan, y el grupo es una sola parada de Tab', async ({ page }) => {
+    // REPARADO el 24/10/2026 (3123). Antes (inspector 10/10/2026): los cuatro radios sin tabindex
+    // (cuatro paradas de Tab) y ArrowDown dejaba el foco en el primero sin marcar nada. Ahora,
+    // forma del 1681 de selector-smartphone (tabindex itinerante 0/−1/−1/−1 y teclaEnOpcion).
     await abrirTest(page);
     const radios = page.locator('[role="radiogroup"] [role="radio"]');
+    expect(await radios.evaluateAll((els) => els.map((e) => e.getAttribute('tabindex')))).toEqual(['0', '-1', '-1', '-1']);
     await radios.first().focus();
     await page.keyboard.press('ArrowDown');
     await expect(radios.nth(1)).toBeFocused({ timeout: 1_000 });
     await expect(radios.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
     // La marcada es la única parada de Tab del grupo.
     expect(await radios.evaluateAll((els) => els.map((e) => e.getAttribute('tabindex')))).toEqual(['-1', '0', '-1', '-1']);
+    await page.keyboard.press('ArrowUp');
+    await page.keyboard.press('ArrowUp');
+    await expect(radios.nth(3)).toBeFocused();
+    await expect(radios.nth(3)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('Home');
+    await expect(radios.nth(0)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('End');
+    await expect(radios.nth(3)).toBeFocused();
+    await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(1);
   });
 
   test('C0104 (hallazgo) la guía educativa no está en el HTML servido: solo se monta en el resultado', async ({ page }) => {
@@ -910,10 +919,10 @@ test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C01
   });
 
   test('el «%» del JSON-LD lleva espacio duro (CLAUDE.md §2, desde el 25/09/2026)', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). FUNCIONES de metadata.ts alimenta el featureList del JSON-LD
-    // WebApplication y la meta schema:WebApplication: «100% en el navegador, sin registro ni
-    // instalación», pegado. Es el único «%» de la app (pantalla, guía y FAQPage no tienen ninguno).
-    test.fail();
+    // REPARADO el 24/10/2026 (3131). Antes (inspector 10/10/2026): FUNCIONES de metadata.ts
+    // alimenta el featureList del JSON-LD WebApplication y la meta schema:WebApplication, y decía
+    // «100% en el navegador, sin registro ni instalación», pegado. Es el único «%» de la app.
+    expect((await (await page.request.get('/selector-seguro-salud/')).text())).toContain('100 % en el navegador');
     await page.goto('/selector-seguro-salud/');
     const bloques = (await page.locator('script[type="application/ld+json"]').allTextContents()).filter((b) => b.includes('Selector de Seguro de Salud') || b.includes('FAQPage'));
     const meta = (await page.locator('meta[name="schema:WebApplication"]').getAttribute('content')) ?? '';
@@ -922,27 +931,29 @@ test.describe('Re-inspección 10/10/2026 — casos a mano, cabos C0011/C0016/C01
     expect(separadores.filter((s) => s !== 'U+00A0')).toEqual([]);
   });
 
-  test('la descripción para redes promete «cuánto te costaría», y la app dice que no puede calcularlo', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). openGraph.description: «… qué cobertura necesitas y cuánto te
-    // costaría aproximadamente». La app da la prima media del sector y dice en la nota de precio
-    // «Esta app no pregunta tu edad, que es lo que más mueve el precio: pide presupuesto con tus
-    // datos» (NOTA_PRECIO_BASE de motor.ts). La description y la de Twitter no lo prometen.
-    test.fail();
+  test('REPARADO 3130: la descripción para redes no promete «cuánto te costaría», que la app dice no poder calcular', async ({ page }) => {
+    // REPARADO el 24/10/2026 (3130). Antes (inspector 10/10/2026): openGraph.description «… qué
+    // cobertura necesitas y cuánto te costaría aproximadamente», cuando la app da la prima media del
+    // sector y dice en la nota de precio «Esta app no pregunta tu edad, que es lo que más mueve el
+    // precio: pide presupuesto con tus datos» (NOTA_PRECIO_BASE de motor.ts). Ahora promete la
+    // prima media, que es lo que da.
     await page.goto('/selector-seguro-salud/');
     const og = (await page.locator('meta[property="og:description"]').getAttribute('content')) ?? '';
     expect(og).not.toMatch(/cuánto te costar/);
+    expect(og).toContain('prima media del sector');
   });
 
   test('neutralidad (§1.quinquies, reglas 2 y 4): las opciones de presupuesto no valoran cuánto se gasta en salud', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Pregunta 9: «Más de 100 €/mes — La salud es mi prioridad» (que
-    // además suma 1 punto al seguro) y «40 – 100 €/mes — Inversión razonable en salud». Equipara pagar
+    // REPARADO el 24/10/2026 (3129). Antes (inspector 10/10/2026): pregunta 9, «Más de 100 €/mes —
+    // La salud es mi prioridad» y «40 – 100 €/mes — Inversión razonable en salud». Equiparaba pagar
     // un seguro con priorizar la salud —quien se queda en la sanidad pública o no puede pagar más no
-    // la prioriza menos— y da por «razonable» un gasto que depende de la renta.
-    test.fail();
+    // la prioriza menos— y daba por «razonable» un gasto que depende de la renta. El punto que suma
+    // «Más de 100 €/mes» se queda: con ese margen cabe una póliza completa, y es un hecho, no un juicio.
     await hasta(page, 8);
     const opciones = (await page.locator('[role="radiogroup"]').innerText()).replace(/\s+/g, ' ');
     expect(opciones).toContain('Más de 100 €/mes'); // precondición: es la pregunta del presupuesto
-    expect(opciones).not.toMatch(/La salud es mi prioridad|Inversión razonable/);
+    expect(opciones).not.toMatch(/La salud es mi prioridad|Inversión razonable|prioridad|razonable/);
+    expect(opciones).toContain('Un gasto intermedio');
   });
 
   test.describe('móvil 360 × 740', () => {

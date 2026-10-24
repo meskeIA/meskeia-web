@@ -212,10 +212,13 @@ export const PREGUNTAS: Pregunta[] = [
   {
     id: 9, categoria: 'Tu presupuesto', pregunta: '¿Cuánto estarías dispuesto/a a pagar mensualmente?', icon: '💶',
     opciones: [
-      { valor: 'nada', etiqueta: 'Nada, no quiero gasto extra', desc: 'La sanidad pública debe ser suficiente' },
-      { valor: 'poco', etiqueta: 'Hasta 40 €/mes', desc: 'Gasto muy ajustado' },
-      { valor: 'medio', etiqueta: '40 – 100 €/mes', desc: 'Inversión razonable en salud' },
-      { valor: 'alto', etiqueta: 'Más de 100 €/mes', desc: 'La salud es mi prioridad' },
+      // Descripciones que describen, no valoran (§1.quinquies, reglas 2 y 4; hallazgo 3129): antes
+      // «Inversión razonable en salud» y «La salud es mi prioridad», que equiparaban pagar un
+      // seguro con priorizar la salud y daban por razonable un gasto que depende de la renta.
+      { valor: 'nada', etiqueta: 'Nada, no quiero gasto extra', desc: 'Me quedo con la sanidad pública' },
+      { valor: 'poco', etiqueta: 'Hasta 40 €/mes', desc: 'Un gasto pequeño' },
+      { valor: 'medio', etiqueta: '40 – 100 €/mes', desc: 'Un gasto intermedio' },
+      { valor: 'alto', etiqueta: 'Más de 100 €/mes', desc: 'Margen para una póliza amplia' },
     ],
   },
   {
