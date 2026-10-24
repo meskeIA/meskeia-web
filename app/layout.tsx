@@ -70,8 +70,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/*
-          El JSON-LD WebSite/SearchAction de meskeIA se inyecta solo en la home (app/page.tsx),
-          que es donde Google espera el sitelinks searchbox. No va en el layout raíz para no
+          El JSON-LD WebSite de meskeIA se inyecta solo en la home (app/page.tsx).
+          No va en el layout raíz para no
           contaminar subsitios con marca propia (p.ej. /delegum) ni el resto de páginas internas.
         */}
       </head>

@@ -12,7 +12,8 @@ import VerticalesPortales from '@/components/home/VerticalesPortales';
 import { TOTAL_IMPLEMENTED_APPS } from '@/data/implemented-apps';
 import styles from './page.module.css';
 
-// JSON-LD WebSite + SearchAction de meskeIA (sitelinks searchbox).
+// JSON-LD WebSite de meskeIA. Sin SearchAction: anunciaba /herramientas?q=,
+// que no existe (404), y Google retiró la caja de búsqueda de sitelinks en 2024 (C0387).
 // Se inyecta solo aquí, en la home, no en el layout raíz, para no contaminar
 // subsitios con marca propia (/delegum) ni el resto de páginas internas.
 const WEBSITE_JSONLD = JSON.stringify({
@@ -32,14 +33,6 @@ const WEBSITE_JSONLD = JSON.stringify({
       width: 512,
       height: 512,
     },
-  },
-  potentialAction: {
-    '@type': 'SearchAction',
-    target: {
-      '@type': 'EntryPoint',
-      urlTemplate: 'https://meskeia.com/herramientas?q={search_term_string}',
-    },
-    'query-input': 'required name=search_term_string',
   },
 });
 
