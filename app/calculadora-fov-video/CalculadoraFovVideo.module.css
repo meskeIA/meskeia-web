@@ -285,7 +285,7 @@
 /* ─── Tres ángulos ───────────────────────────────────────────────────────── */
 .angulos {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
@@ -489,8 +489,10 @@
 
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
+  /* minmax(0, 1fr): una pista 1fr crece hasta su contenido más ancho y a 390 px
+     sacaba la página de la pantalla (cabo C0431) */
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -513,8 +515,12 @@
   }
 
   .angulos {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.5rem;
+  }
+
+  .anguloCard {
+    padding: var(--spacing-sm) 0.25rem;
   }
 
   .anguloValor {

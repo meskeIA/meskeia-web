@@ -389,8 +389,13 @@
   overflow: hidden;
 }
 
+/* El lienzo dibuja a 1200×630 y se muestra al ancho del panel: width 100 % y height auto
+   conservan la proporción. Antes se escalaba con transform, que no cambia la caja: dejaba
+   630 px de hueco en blanco bajo la vista previa en el móvil (cabo C0407) */
 .canvas {
   display: block;
+  width: 100%;
+  height: auto;
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
 }
@@ -500,8 +505,10 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  /* minmax(0, 1fr): una pista 1fr crece hasta su contenido más ancho y a 390 px
+     sacaba la página de la pantalla (cabo C0407) */
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .controlsPanel {
@@ -558,8 +565,10 @@
     font-size: 1.5rem;
   }
 
+  /* minmax(0, 1fr): una pista 1fr crece hasta su contenido más ancho y a 390 px
+     sacaba la página de la pantalla (cabo C0407) */
   .templatesGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .previewWrapper {

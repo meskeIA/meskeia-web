@@ -250,6 +250,7 @@
 /* Tabla comparativa */
 .tablaWrapper {
   margin-bottom: var(--spacing-xl);
+  overflow-x: auto;
 }
 
 .tablaTitulo {
@@ -501,8 +502,10 @@
 
 /* Responsive */
 @media (max-width: 1200px) {
+  /* minmax(0, 1fr): la pista 1fr crecía hasta la tabla comparativa y sacaba los paneles de
+     la pantalla a 390 px (cabo C0394); la tabla se desplaza dentro de .tablaWrapper */
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .inputPanel {

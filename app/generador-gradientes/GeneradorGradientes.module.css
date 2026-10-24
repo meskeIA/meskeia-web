@@ -511,8 +511,10 @@
 }
 
 @media (max-width: 1024px) {
+  /* minmax(0, 1fr): una pista 1fr crece hasta su contenido más ancho y a 390 px
+     sacaba la página de la pantalla (cabo C0404) */
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .presetsGrid {

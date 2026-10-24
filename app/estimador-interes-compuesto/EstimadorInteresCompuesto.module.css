@@ -902,8 +902,9 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  /* minmax(0, 1fr): la pista 1fr crecía hasta 542 px a 390 de pantalla (cabo C0392) */
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .desgloseGrid {
@@ -926,7 +927,7 @@
   }
 
   .desgloseGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .desgloseValor {

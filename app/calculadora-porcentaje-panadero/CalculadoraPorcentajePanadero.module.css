@@ -288,6 +288,9 @@
 
 .inputNombre {
   flex: 1;
+  /* Un input con flex: 1 no baja de su ancho intrínseco: sin esto la fila del ingrediente
+     sacaba los botones de la pantalla a 390 px (cabo C0432) */
+  min-width: 0;
   padding: 0.5rem 0.6rem;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -820,8 +823,10 @@
 
 /* Responsive */
 @media (max-width: 900px) {
+  /* minmax(0, 1fr): una pista 1fr crece hasta su contenido más ancho y a 390 px
+     sacaba la página de la pantalla (cabo C0432) */
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .pasosGrid {

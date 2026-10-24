@@ -348,8 +348,10 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  /* minmax(0, 1fr): una pista 1fr crece hasta su contenido más ancho y a 390 px
+     sacaba la página de la pantalla (cabo C0397) */
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -369,6 +371,13 @@
 
   .resultsGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* A 390 px «Identidades» no cabe en una cuarta parte del panel: dos por fila */
+@media (max-width: 480px) {
+  .tiposGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

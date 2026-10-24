@@ -1,11 +1,42 @@
 /**
  * Cabos C0200 y C0201 (turno de noche a11y del 09/10/2026) — a 390 px de ancho la página no
  * puede ser más ancha que la pantalla. `documentElement.scrollWidth` NO lo delata (html y body
- * llevan overflow-x: hidden y recortan): se mide `body.scrollWidth`, como en C0154.
+ * llevan overflow-x: hidden y recortan): se mide `body.scrollWidth`, como en C0154. Se mira
+ * también el del documento: una etiqueta oculta con position: absolute y sin ancestro
+ * posicionado escapa del recorte de su tabla y lo ensancha a él (forma F3 de la Ronda).
+ *
+ * Las demás rutas, de la primera pasada del detector de desborde de la Ronda (24/10/2026,
+ * cabos C0391-C0434), reparadas en /reparar el 24/10: casi todas por una pista `1fr` que crece
+ * hasta su contenido más ancho (receta: `minmax(0, 1fr)`).
  */
 import { test, expect } from '@playwright/test';
 
-for (const ruta of ['/seguimiento-habitos/', '/calculadora-matematica/']) {
+const RUTAS = [
+  '/seguimiento-habitos/',
+  '/calculadora-matematica/',
+  '/estimador-tir-van/', // C0391
+  '/estimador-interes-compuesto/', // C0392
+  '/comparador-vehiculos/', // C0394
+  '/calculadora-gasto-energetico/', // C0395
+  '/calculadora-mcd-mcm/', // C0396
+  '/calculadora-trigonometria/', // C0397
+  '/generador-qr/', // C0398
+  '/validador-regex/', // C0402
+  '/calculadora-aspectos/', // C0403
+  '/generador-gradientes/', // C0404
+  '/generador-tipografias/', // C0405
+  '/generador-og-images/', // C0407
+  '/orientador-tarifa-freelance/', // C0408
+  '/conversor-unidades-rf/', // C0410
+  '/calculadora-subredes/', // C0412
+  '/visualizador-iluminacion-phong/', // C0414
+  '/arbol-decision-ia/', // C0426
+  '/calculadora-regla-500-npf-astrofoto/', // C0430
+  '/calculadora-fov-video/', // C0431
+  '/calculadora-porcentaje-panadero/', // C0432
+];
+
+for (const ruta of RUTAS) {
   test(`${ruta} · a 390 px nada fuerza un ancho mayor que la pantalla`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(ruta);
@@ -26,9 +57,10 @@ for (const ruta of ['/seguimiento-habitos/', '/calculadora-matematica/']) {
         })
         .slice(0, 6)
         .map((el) => `${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0]} → ${Math.round(el.getBoundingClientRect().right)}`);
-      return { body: document.body.scrollWidth, ancho, culpables };
+      return { body: document.body.scrollWidth, doc: document.documentElement.scrollWidth, ancho, culpables };
     });
     expect(r.body, `body ${r.body} px en ${r.ancho}: ${r.culpables.join(' · ')}`).toBeLessThanOrEqual(r.ancho);
+    expect(r.doc, `documento ${r.doc} px en ${r.ancho}`).toBeLessThanOrEqual(r.ancho);
   });
 }
 

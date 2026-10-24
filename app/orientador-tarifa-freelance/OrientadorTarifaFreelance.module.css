@@ -811,8 +811,10 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  /* minmax(0, 1fr): una pista 1fr crece hasta su contenido más ancho y a 390 px
+     sacaba la página de la pantalla (cabo C0408) */
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .resultsPanel {
@@ -847,11 +849,15 @@
   }
 
   .gastoItem {
-    grid-template-columns: 1fr 100px 36px;
+    /* minmax(0, 1fr): el campo del concepto no bajaba de su ancho intrínseco y el botón de
+       eliminar salía de la pantalla (cabo C0408) */
+    grid-template-columns: minmax(0, 1fr) 100px 36px;
   }
 
+  /* minmax(0, 1fr): una pista 1fr crece hasta su contenido más ancho y a 390 px
+     sacaba la página de la pantalla (cabo C0408) */
   .configGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .desgloseGrid {

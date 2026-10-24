@@ -760,8 +760,10 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  /* minmax(0, …): las pistas 1fr crecían hasta su contenido y a 390 px sacaban de la
+     pantalla los paneles y la rejilla de electrodomésticos (cabo C0395) */
   .mainContent {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .configPanel {
@@ -792,11 +794,20 @@
   }
 
   .presetsGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .presetCard {
+    padding: var(--spacing-sm) var(--spacing-xs);
+  }
+
+  /* «Vitrocerámica/Inducción» es una sola palabra más ancha que la tarjeta a 390 px */
+  .presetNombre {
+    overflow-wrap: anywhere;
   }
 
   .electrodomesticoInputs {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .resultadosGrid {

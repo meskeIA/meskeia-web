@@ -218,20 +218,8 @@ export default function GeneradorOGImagesPage() {
   // Estado del diseño
   const [design, setDesign] = useState<OGDesign>(TEMPLATES[0].design);
   const [activeTab, setActiveTab] = useState<'templates' | 'background' | 'title' | 'subtitle' | 'branding' | 'badge' | 'icon' | 'logo'>('templates');
-  const [scale, setScale] = useState(1);
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
   const [logoImage, setLogoImage] = useState<HTMLImageElement | null>(null);
-
-  // Calcular escala para preview responsivo
-  useEffect(() => {
-    const updateScale = () => {
-      const containerWidth = Math.min(window.innerWidth - 40, 900);
-      setScale(Math.min(containerWidth / CANVAS_WIDTH, 0.8));
-    };
-    updateScale();
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
-  }, []);
 
   // Cargar imagen de fondo cuando cambia
   useEffect(() => {
@@ -1199,10 +1187,6 @@ export default function GeneradorOGImagesPage() {
               width={CANVAS_WIDTH}
               height={CANVAS_HEIGHT}
               className={styles.canvas}
-              style={{
-                transform: `scale(${scale})`,
-                transformOrigin: 'top left',
-              }}
             />
           </div>
 

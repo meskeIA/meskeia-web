@@ -367,7 +367,9 @@
 
 /* ─── Responsive ─── */
 @media (max-width: 900px) {
-  .editorLayout { grid-template-columns: 1fr; }
+  /* minmax(0, 1fr): la pista 1fr crecía a 436 px con el árbol y a 390 px sacaba la página de
+     la pantalla (cabo C0426) */
+  .editorLayout { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 768px) {
