@@ -72,6 +72,7 @@ import {
   AVISO_IRPF_FORAL,
   TERRITORIOS_IIVTNU_FORAL,
   motivoPlusvaliaForal,
+  SALVEDAD_PLUSVALIA_NO_RESIDENTE,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -1329,45 +1330,50 @@ export default function SimuladorLocalComercialPage() {
           el hallazgo 1177 destapó en la hermana nave-industrial, y que allí ya habían cerrado
           los dos avisos del selector de transmisión con el hallazgo 647. */}
       <div className={styles.ivaAviso} role="note">
+        {/* Cada rama en su <span key> y cada variable sola en su elemento: con la página traducida,
+            el cambio de rama de fragmentos con texto suelto tumba la app (forma del hallazgo 3476
+            de nave-industrial, llevada aquí al reparar el 3474 en este mismo aviso). */}
         {territorioActualSinIva ? (
-          <>
+          <span key="sin-iva">
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
-            {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
-            ({territorioActualSinIva.nombre}), que esta calculadora no cifra.{' '}
+            <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el <span>{territorioActualSinIva.impuesto}</span>{' '}
+            <span>({territorioActualSinIva.nombre})</span>, que esta calculadora no cifra.{' '}
             {/* Hallazgo 3262 (19/10/2026): en Ceuta y Melilla prometía deducir el IPSI soportado, y
                 la Ley 8/1991, art. 20.3 (BOE-A-1991-7645, leído el 19/10/2026) dice que las cuotas
                 soportadas en las entregas de bienes inmuebles «no podrán ser objeto de deducción».
                 En Canarias el IGIC sí se deduce y la frase se queda. */}
             {territorioActualSinIva.impuesto === 'IPSI' ? (
-              <>
+              <span key="ipsi">
                 El IPSI soportado en la compra de un inmueble <strong>no se puede deducir</strong>{' '}
                 (Ley 8/1991, art. 20.3).
-              </>
+              </span>
             ) : (
-              <>
+              <span key="igic">
                 El impuesto soportado también puede ser <strong>deducible</strong>, pero con las reglas
-                del {territorioActualSinIva.impuesto}.
-              </>
+                del <span>{territorioActualSinIva.impuesto}</span>.
+              </span>
             )}{' '}
             {/* Decía que la renuncia «no existe allí» en los tres territorios, y en Canarias sí:
                 es a la exención del IGIC (art. 50.Cinco Ley canaria 4/2012). En Ceuta y Melilla el
                 IPSI no la regula (Ley 8/1991, arts. 7 y 20.3). Decisión común de la familia con
                 nave-industrial (hallazgo 1584). */}
+            {/* Hallazgo 3474 (resto del cabo C0335): «si se cumplen los requisitos de la ley» no decía
+                que el requisito es del COMPRADOR, como ya dice el aviso de la renuncia (b83720a4). */}
             {renunciaImposible ? (
-              <>La <strong>renuncia a la exención</strong> no existe en el {territorioActualSinIva.impuesto}: la segunda mano paga siempre ITP.</>
+              <span key="sin-renuncia">La <strong>renuncia a la exención</strong> no existe en el <span>{territorioActualSinIva.impuesto}</span>: la segunda mano paga siempre ITP.</span>
             ) : (
-              <>En segunda mano, si se cumplen los requisitos de la ley, el vendedor empresario puede <strong>renunciar a la exención del {territorioActualSinIva.impuesto}</strong> (art. 50.Cinco Ley canaria 4/2012).</>
+              <span key="renuncia-igic">En segunda mano, el vendedor empresario puede <strong>{`renunciar a la exención del ${territorioActualSinIva.impuesto}`}</strong> si el comprador es empresario o profesional con derecho a deducir, total o parcialmente, el impuesto de la compra (art. 50.Cinco Ley canaria 4/2012).</span>
             )}{' '}
             Consúltalo con tu asesor fiscal antes de decidir.
-          </>
+          </span>
         ) : (
-          <>
+          <span key="con-iva">
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de un local comercial
             puede ser <strong>deducible</strong> si lo destinas a una actividad sujeta y no exenta de IVA (una
             consulta médica o una academia, exentas, no lo deducen). Por eso, en segunda mano, si
             quien vende es empresario y tú tienes derecho a deducir, muchas veces conviene que <strong>renuncie a la exención de IVA</strong> (art. 20.Dos LIVA)
             para que no pagues un ITP que no se recupera. Consulta con tu asesor fiscal antes de decidir.
-          </>
+          </span>
         )}
       </div>
 
@@ -1799,8 +1805,11 @@ export default function SimuladorLocalComercialPage() {
                     campos que solo alimentan la ganancia y su cuota —gastos de aquella compra,
                     amortizaciones y otras rentas del ahorro— no se piden, en vez de prometer un
                     efecto que no producen (hallazgo 3400, efecto familia del 3394). */}
+                {/* Grupo con nombre, como el del tipo de transmisión (hallazgo 3475, forma del 3261):
+                    sin él, el lector de pantalla no decía a qué pregunta responden los dos botones. */}
                 {transmision !== 'primera-mano' && (
-                <div className={styles.perfilGrid}>
+                <div className={styles.perfilGrid} role="group" aria-label="Uso del local por quien vende">
+
                   <button
                     type="button"
                     aria-pressed={perfilVendedor === 'particular'}
@@ -2500,7 +2509,9 @@ export default function SimuladorLocalComercialPage() {
               <strong>Plusvalía municipal (IIVTNU).</strong> El local está sobre suelo urbano, así que
               la transmisión sí genera este impuesto. Puedes elegir entre el método objetivo (coeficientes
               sobre el valor catastral del suelo) y el real (ganancia efectiva del suelo): se aplica el
-              que salga menor, y si vendes con pérdida no hay impuesto.
+              que salga menor, y si vendes con pérdida no hay impuesto. Con una excepción en quién la
+              ingresa: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}.
+              {/* La salvedad del no residente (hallazgo 3472, cabo C0354). */}
             </li>
             <li>
               <strong>IRPF de la ganancia patrimonial.</strong> Tributa en la base del ahorro con los

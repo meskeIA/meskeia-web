@@ -7030,7 +7030,8 @@ test.describe('Inspector 24/10/2026 — Galicia con el vendedor afecto, Asturias
   // vende») y el bloque educativo («El comprador soporta IVA o ITP; el vendedor responde de otros dos
   // impuestos»). En un local el vendedor puede ser una sociedad o un empresario: la salvedad es SOLO la
   // de la persona física no residente.
-  test.fail('[24/10-a] la plusvalía «la paga el vendedor» nombra al comprador sustituto cuando vende una persona física no residente (art. 106.2 TRLRHL)', async ({ page }) => {
+  // REPARADO (hallazgo 3472, 24/10/2026): SALVEDAD_PLUSVALIA_NO_RESIDENTE de data/itp-ccaa.ts en el FAQPage y el bloque educativo.
+  test('[24/10-a] la plusvalía «la paga el vendedor» nombra al comprador sustituto cuando vende una persona física no residente (art. 106.2 TRLRHL)', async ({ page }) => {
     await abrir0810(page);
     const faq = (await faqPage0710(page)).get('¿Qué gastos e impuestos paga el vendedor de un local comercial?') ?? '';
     expect(faq).toContain('El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano.');
@@ -7081,7 +7082,8 @@ test.describe('Inspector 24/10/2026 — Galicia con el vendedor afecto, Asturias
   // si se cumplen los requisitos de la ley, el vendedor empresario puede renunciar a la exención del
   // IGIC (art. 50.Cinco Ley canaria 4/2012)», sin decir que el requisito es del COMPRADOR (empresario o
   // profesional con derecho a deducir, total o parcialmente), que es lo que pidió el cabo.
-  test.fail('[24/10-c] en Canarias, el aviso de cabecera nombra el requisito de la renuncia al IGIC', async ({ page }) => {
+  // REPARADO (hallazgo 3474, 24/10/2026).
+  test('[24/10-c] en Canarias, el aviso de cabecera nombra el requisito de la renuncia al IGIC', async ({ page }) => {
     await abrir0810(page);
     await page.selectOption('#select-ccaa', 'canarias');
     const cabecera = page.locator('div[class*="ivaAviso"]');
@@ -7102,7 +7104,8 @@ test.describe('Inspector 24/10/2026 — Galicia con el vendedor afecto, Asturias
   // entre sí, pero su contenedor no es un grupo ni tiene nombre (role y aria-labelledby nulos), así que
   // el lector de pantalla no dice a qué pregunta responden. Los del tipo de transmisión ya lo tienen
   // (role="group" con aria-labelledby="etiqueta-transmision").
-  test.fail('[24/10-d] los botones del perfil del vendedor forman un grupo con nombre', async ({ page }) => {
+  // REPARADO (hallazgo 3475, 24/10/2026): role="group" con aria-label.
+  test('[24/10-d] los botones del perfil del vendedor forman un grupo con nombre', async ({ page }) => {
     await abrir0810(page);
     await expect(page.getByRole('group', { name: 'Tipo de transmisión' })).toHaveCount(1);
     await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
