@@ -127,10 +127,7 @@ const HERMANAS: Hermana[] = [
     slug: 'selector-seguro-salud',
     empezar: true,
     // Huecos 3122 (foco) y 3125/3126 (doble toque, guarda en captura sobre window) REPARADOS el
-    // 19/10/2026; queda el teclado.
-    recetas: {
-      teclado: { falla: 'hallazgo 3123: los radios no tienen tabindex itinerante ni flechas (APG)' },
-    },
+    // 19/10/2026, y el teclado (3123) el 24/10/2026 (5de0770f).
   },
   // Cinco que tenían el armazón sin estar declaradas (cabo C0005, medidas por el Inspector del
   // 25/09 y el 10/10 y reparadas en la tanda del 19/10). selector-tarifa-electrica no entra: sus
@@ -140,18 +137,14 @@ const HERMANAS: Hermana[] = [
     empezar: true,
   },
   {
+    // Teclado del patrón de radios REPARADO el 24/10/2026 (hallazgo 3206, e5021825).
     slug: 'selector-tablet',
     empezar: false,
-    recetas: {
-      teclado: { falla: 'hallazgo 3206: cada opción es una parada de Tab y las flechas no hacen nada (APG)' },
-    },
   },
   {
+    // Teclado del patrón de radios REPARADO el 24/10/2026 (hallazgo 3187, 9c121c2b).
     slug: 'selector-tipo-gimnasio',
     empezar: false,
-    recetas: {
-      teclado: { falla: 'hallazgo 3187: los radios no tienen tabindex itinerante ni flechas (APG)' },
-    },
   },
   {
     // Doble toque REPARADO al declararla (21/10/2026, C0005): no tenía guarda y el 2.º toque
