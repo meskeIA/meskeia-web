@@ -2,6 +2,7 @@
 
 import { useRef, useState, type KeyboardEvent } from 'react';
 import styles from './ConversorBraille.module.css';
+import { celdaDePuntos, esCeldaBraille, puntosDeCelda } from './celdas';
 
 /**
  * Teclado braille de seis puntos para el sentido Braille → Texto (S0219, 21/10/2026).
@@ -17,36 +18,12 @@ import styles from './ConversorBraille.module.css';
  *     Pulsar seis dedos a la vez en un móvil no es fiable, así que aquí no se intenta.
  */
 
+// La aritmética de las celdas vive en ./celdas.ts (hallazgo 3456): la importa también check:braille.
+export { celdaDePuntos, esCeldaBraille, puntosDeCelda };
+
 const PUNTO_DE_TECLA: Record<string, number> = {
   KeyF: 1, KeyD: 2, KeyS: 3, KeyJ: 4, KeyK: 5, KeyL: 6,
 };
-
-/** Celda Unicode de un conjunto de puntos: U+2800 + bit (n − 1) de cada punto n. */
-export function celdaDePuntos(puntos: Iterable<number>): string {
-  let bits = 0;
-  for (const p of puntos) bits |= 1 << (p - 1);
-  return String.fromCodePoint(0x2800 + bits);
-}
-
-/** ¿Es una celda del bloque braille de Unicode (U+2800-U+28FF)? */
-export function esCeldaBraille(caracter: string): boolean {
-  const codigo = caracter.codePointAt(0) ?? 0;
-  return codigo >= 0x2800 && codigo <= 0x28ff;
-}
-
-/**
- * Puntos de una celda Unicode, en orden (⠇ → [1, 2, 3]). Cuenta también los puntos 7 y 8 de las
- * celdas de ocho puntos (⡀ → [7]), que antes salían como «Espacio».
- *
- * ⚠️ 23/10/2026 (hallazgo 3437) — restaba U+2800 a CUALQUIER carácter y leía los bits de un
- * número negativo: la «a» en tinta (0x61 − 0x2800 = −10143) daba los puntos 1-6. Solo se llama
- * con celdas braille; lo demás lo describe `describirCaracter`.
- */
-export function puntosDeCelda(celda: string): number[] {
-  if (!esCeldaBraille(celda)) return [];
-  const bits = (celda.codePointAt(0) ?? 0x2800) - 0x2800;
-  return [1, 2, 3, 4, 5, 6, 7, 8].filter((p) => bits & (1 << (p - 1)));
-}
 
 /** Orden de pintado de la celda: fila a fila, columna izquierda (1 2 3) y derecha (4 5 6). */
 const ORDEN_VISUAL = [1, 4, 2, 5, 3, 6];

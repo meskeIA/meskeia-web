@@ -3,87 +3,73 @@
  * check-celdas-braille.mjs — que ninguna celda braille se dibuje en blanco
  *
  * Ejecutar:  npm run check:braille            (lo ejecuta también `npm run build`)
- *            npm run check:braille -- --lista  (imprime las celdas y sus puntos)
+ *            npm run check:braille -- --lista  (imprime las celdas emitibles y sus puntos)
+ *            node scripts/check-celdas-braille.mjs <page.tsx> [--celdas <celdas.ts>]  (trampas)
  *
  * QUÉ EXIGE
  * ─────────
- * Dos cosas sobre `app/conversor-braille/page.tsx`, y las dos son aritmética, no criterio:
+ * Sobre `app/conversor-braille/page.tsx` y `app/conversor-braille/celdas.ts`, y todo es
+ * aritmética, no criterio:
  *
- *   A · COBERTURA — que toda celda que la app pueda EMITIR tenga entrada en `brailleDots`.
- *       Las celdas emitibles salen de tres sitios: los valores de `textToBraille`, los de
- *       `SIGNOS_COMPUESTOS` (descompuestos, porque son de dos celdas) y las constantes de los
- *       indicadores (`NUMBER_INDICATOR`, `CAPITAL_INDICATOR`, `LATIN_PREFIX`).
+ *   A · DIBUJO DESDE EL CÓDIGO — que la vista de celdas y la hoja a escala real saquen los puntos
+ *       de `puntosDeCelda` (los bits del código Unicode), y que en page.tsx no haya ninguna
+ *       búsqueda en tabla que caiga a vacío (`tabla[c] ?? []`, `tabla[c] || []`). Esa caída es
+ *       la ausencia SILENCIOSA de los tres casos de abajo: no da error, dibuja seis puntos apagados.
  *
- *   B · COHERENCIA — que los puntos declarados de cada celda sean los que dice su código
- *       Unicode. El bloque U+2800 codifica los puntos en bits: U+2800 + bit 0 = punto 1,
- *       bit 1 = punto 2, y así hasta el punto 8. `⠙` es U+2819 = 0b00011001, o sea bits 0, 3
- *       y 4, o sea puntos 1-4-5 — que es lo que `brailleDots` tiene que declarar. Esto no
- *       comprueba que la celda esté: comprueba que su patrón no esté mal TECLEADO.
+ *   B · COBERTURA — que toda celda que la app pueda EMITIR salga con puntos (salvo ⠀, el espacio).
+ *       Las emitibles salen de los valores de `textToBraille`, de `SIGNOS_COMPUESTOS`
+ *       (descompuestos, porque son de dos celdas) y de las constantes de los indicadores.
+ *
+ *   C · COHERENCIA — que `puntosDeCelda` dé, para las 256 celdas U+2800-U+28FF, los puntos de su
+ *       código (U+2800 + bit 0 = punto 1 … bit 7 = punto 8), y [] para lo que no es braille.
+ *
+ * B y C EJECUTAN `celdas.ts` (Node 24 carga .ts); si este Node no sabe, se omiten avisando, como
+ * `check:consumidores`, y A sigue valiendo: lo cubre el build local que hace /push.
  *
  * DE DÓNDE SALE
  * ─────────────
- * Del Inspector, del mismo defecto DOS veces, con el argumento ya escrito en el código:
+ * Del Inspector, del mismo defecto TRES veces:
  *
- *   · 21/08/2026 — faltaban en `brailleDots` los indicadores numeral (⠼), de mayúscula (⠨) y
- *     de latina minúscula (⠐). La reparación dejó escrito por qué importaba, literalmente:
- *     «faltaban, y `brailleDots[c] ?? []` devolvía una celda sin ningún punto: en la hoja a
- *     escala real eso es un espacio, no un indicador».
- *   · 22/09/2026 (hallazgo 1183) — faltaba ⠠ (U+2820, punto 6), la PRIMERA celda de la barra
- *     inclinada del B 2 § 6.2, que llega por `SIGNOS_COMPUESTOS` y por eso se quedó fuera de
- *     aquella reparación. En la hoja imprimible, el lector táctil encontraba una celda en
- *     blanco —separación de palabra— seguida de un punto 2 —coma—, así que «12/05/2026» se
- *     punzaba «12 ,05 ,2026». Afecta a toda fecha, fracción o URL, y duele en el único
- *     producto FÍSICO del catálogo: una hoja punzada no se puede desmentir después.
+ *   · 21/08/2026 — faltaban en la tabla `brailleDots` los indicadores numeral (⠼), de mayúscula
+ *     (⠨) y de latina minúscula (⠐): «`brailleDots[c] ?? []` devolvía una celda sin ningún punto:
+ *     en la hoja a escala real eso es un espacio, no un indicador».
+ *   · 22/09/2026 (hallazgo 1183) — faltaba ⠠, la PRIMERA celda de la barra inclinada del
+ *     B 2 § 6.2, que llega por `SIGNOS_COMPUESTOS`: «12/05/2026» se punzaba «12 ,05 ,2026».
+ *     Entonces nació este candado, que exigía una entrada en la tabla por cada celda emitible.
+ *   · 24/10/2026 (hallazgo 3456) — EL CANDADO FALLÓ. Desde el 3434 (23/10) una celda braille
+ *     pegada pasa tal cual al resultado, y en «Braille → Texto» la hoja punza la ENTRADA: puede
+ *     llegar cualquiera de las 256. El candado solo contaba como emitibles las de las tablas de la
+ *     app, y 14 de las 64 celdas de seis puntos se dibujaban en blanco. Una lista de celdas
+ *     emitibles nunca iba a estar completa; la reparación quitó la tabla y dibuja desde los bits,
+ *     y desde entonces este candado vigila eso (regla A) en vez de la tabla.
  *
- * Un mes entre las dos, la segunda con la lección de la primera delante. Eso es lo que un
- * candado hace y un comentario no: `brailleDots[c] ?? []` es una ausencia SILENCIOSA —cae al
- * array vacío y dibuja seis puntos apagados—, y el spec anterior fijaba la CADENA de celdas y
- * nunca sus PUNTOS, que es justo donde fallaba.
- *
- * POR QUÉ NO BASTABA CON EL CUADRE
- * ────────────────────────────────
- * El Cuadre compara conjuntos antes/después, así que vería DESAPARECER una entrada de
- * `brailleDots`. Las dos veces la entrada no desapareció: nunca existió, porque la celda se
- * dio de alta en otra tabla. «Nacer no es una sorpresa», y ahí el Cuadre es ciego por diseño.
- *
- * SIN PASIVO
- * ──────────
- * Las 50 entradas actuales cumplen las dos reglas (medido el 23/09/2026 al crear el candado),
- * así que solo puede encenderlo código nuevo. Igual que `check:og-image` y `check:minimo-irpf`.
+ * SIN PASIVO · SIN ESCAPE, a propósito: una celda dibujada en blanco no tiene falso positivo.
  *
  * LO QUE NO MIRA
  * ──────────────
- *   · `brailleToText`, la tabla inversa. Su defecto no es silencioso del mismo modo: lo que no
- *     reconoce lo copia tal cual y la app lo avisa desde el 21/08/2026 (y desde el hallazgo
- *     1187, también cuando la entrada no trae ninguna celda braille).
- *   · Si una celda es la CORRECTA para su carácter en tinta. Eso lo dice el Documento Técnico
- *     B 2 de la Comisión Braille Española, no la aritmética, así que es trabajo del Inspector
- *     contra la fuente. Aquí solo se comprueba que lo que la app emite se pueda dibujar y que
- *     los puntos de cada celda sean los de su propio código.
+ *   · Los puntos 7 y 8 de las celdas de ocho puntos: la vista y la hoja son de seis.
+ *   · Si una celda es la CORRECTA para su carácter en tinta: eso lo dice el Documento Técnico B 2
+ *     de la Comisión Braille Española, y es trabajo del Inspector contra la fuente.
  *
- * ⚠️ PARSEA UN .tsx CON REGEX, con las dos defensas que `scripts/CLAUDE.md` exige:
- *   1. Retira las líneas de comentario antes de buscar, porque este fichero CITA celdas braille
- *      en sus comentarios (⠼, ⠨, ⠐, ⠄ aparecen en la prosa que explica las reparaciones). Sin
- *      esto, el parser recogería celdas que la app no emite.
- *   2. Cuenta lo que extrae y SE PLANTA si sale absurdo. Un parser que devuelve 0 celdas donde
- *      hay 50 no está «conforme», está roto, y un candado que da verde por no haber mirado es
- *      peor que no tenerlo (§TypeScript del CLAUDE.md, el validador ciego del 14/08/2026).
- *
- * Escape: no lo tiene a propósito. Una celda emitible sin puntos no tiene falso positivo
- * posible —o se dibuja o sale en blanco— y un patrón que no cuadra con su Unicode es un error
- * de tecleo, no una decisión.
+ * ⚠️ PARSEA UN .tsx CON REGEX, con las dos defensas que `scripts/CLAUDE.md` exige: retira las
+ * líneas de comentario antes de buscar (el fichero CITA celdas y `brailleDots[c] ?? []` en su
+ * prosa) y SE PLANTA si lo que extrae sale absurdo, en vez de dar verde por no haber mirado.
  */
 
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const FICHERO = process.argv.find((a) => a.endsWith('.tsx')) ?? 'app/conversor-braille/page.tsx';
+const iCeldas = process.argv.indexOf('--celdas');
+const CELDAS = iCeldas >= 0 ? process.argv[iCeldas + 1] : 'app/conversor-braille/celdas.ts';
 const LISTA = process.argv.includes('--lista');
 
-/** Mínimos de cordura: por debajo, el parser no ha entendido el fichero (no «está limpio»). */
+/** Mínimo de cordura: por debajo, el parser no ha entendido el fichero (no «está limpio»). */
 const MINIMO_CELDAS_EMITIBLES = 40;
-const MINIMO_ENTRADAS_DOTS = 40;
+/** La vista de celdas y la hoja: dos sitios que dibujan. */
+const MINIMO_LLAMADAS_DIBUJO = 2;
 
-/** El bloque braille de Unicode codifica los puntos en bits desde U+2800. */
 const BASE_BRAILLE = 0x2800;
 
 /** Los puntos que corresponden a una celda según su código Unicode. */
@@ -96,18 +82,9 @@ function puntosSegunUnicode(celda) {
   return puntos;
 }
 
-const esCeldaBraille = (c) => {
-  const cp = c.codePointAt(0);
-  return cp >= BASE_BRAILLE && cp <= 0x28ff;
-};
+const unicode = (celda) => `U+${celda.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`;
 
-/**
- * Quita las líneas de comentario, que en este fichero citan celdas braille a propósito.
- *
- * Se filtra por LÍNEA y no con un regex sobre todo el texto: `[\s\S]*?` no se detiene donde uno
- * cree —lo aprendió `detectar-candidatas-latam.mjs` comiéndose 607 líneas de código— y aquí no
- * hace falta, porque los comentarios de este fichero empiezan su línea.
- */
+/** Quita las líneas de comentario (por LÍNEA: `[\s\S]*?` no se detiene donde uno cree). */
 function sinComentarios(texto) {
   return texto
     .split('\n')
@@ -115,134 +92,128 @@ function sinComentarios(texto) {
     .join('\n');
 }
 
-/**
- * El cuerpo de un objeto literal `const NOMBRE... = { … };`, ya sin comentarios.
- *
- * ⚠️ El `\b` tras el nombre no es adorno: sin él, `const brailleDots[^{]*\{` encajaba también con
- * `const brailleDotsLoQueSea`, de modo que el parser podía leer un objeto que NO es el que
- * gobierna el dibujo y dar verde con él. Lo destapó la trampa 5 de `braille:probar-candado`, que
- * renombra la tabla y exige que el candado se plante: daba verde.
- */
+/** El cuerpo de un objeto literal `const NOMBRE... = { … };`, ya sin comentarios. */
 function cuerpoDeObjeto(src, nombre) {
   const m = src.match(new RegExp(`const ${nombre}\\b[^{]*\\{([\\s\\S]*?)\\n\\};`));
   return m ? sinComentarios(m[1]) : null;
 }
 
+function plantarse(mensaje) {
+  console.error(`\n✗ braille: ${mensaje}`);
+  console.error('  El parser no ha entendido el fichero: revísalo antes de creer este candado.\n');
+  process.exit(1);
+}
+
 const src = readFileSync(FICHERO, 'utf8');
+const codigo = sinComentarios(src);
 const problemas = [];
 
 // ── Las celdas que la app puede EMITIR ────────────────────────────────────────
 const emitibles = new Map(); // celda → de dónde sale
 
 const cuerpoTexto = cuerpoDeObjeto(src, 'textToBraille');
-if (cuerpoTexto === null) {
-  console.error(`\n✗ braille: no se encuentra \`textToBraille\` en ${FICHERO}.`);
-  console.error('  El parser no ha entendido el fichero: revísalo antes de creer este candado.\n');
-  process.exit(1);
-}
+if (cuerpoTexto === null) plantarse(`no se encuentra \`textToBraille\` en ${FICHERO}.`);
 for (const [, celdas] of cuerpoTexto.matchAll(/:\s*'([⠀-⣿]+)'/g)) {
   for (const celda of celdas) emitibles.set(celda, 'textToBraille');
 }
 
 const cuerpoCompuestos = cuerpoDeObjeto(src, 'SIGNOS_COMPUESTOS');
-if (cuerpoCompuestos === null) {
-  console.error(`\n✗ braille: no se encuentra \`SIGNOS_COMPUESTOS\` en ${FICHERO}.`);
-  console.error('  Es la tabla de la que salió el hallazgo 1183: sin ella el candado no vale.\n');
-  process.exit(1);
-}
+if (cuerpoCompuestos === null) plantarse(`no se encuentra \`SIGNOS_COMPUESTOS\` en ${FICHERO} (la tabla del hallazgo 1183).`);
 for (const [, celdas] of cuerpoCompuestos.matchAll(/:\s*'([⠀-⣿]+)'/g)) {
-  // De dos celdas, y la primera es la que el 1183 dejó sin dibujar.
   for (const celda of celdas) emitibles.set(celda, 'SIGNOS_COMPUESTOS');
 }
 
-// Los indicadores, que son constantes sueltas y fueron el caso del 21/08/2026.
-for (const [, nombre, celda] of sinComentarios(src).matchAll(
-  /const (\w*(?:INDICATOR|PREFIX))\s*=\s*'([⠀-⣿])'/g,
-)) {
+for (const [, nombre, celda] of codigo.matchAll(/const (\w*(?:INDICATOR|PREFIX))\s*=\s*'([⠀-⣿])'/g)) {
   emitibles.set(celda, nombre);
 }
 
-// ── Las celdas que la app sabe DIBUJAR ────────────────────────────────────────
-const cuerpoDots = cuerpoDeObjeto(src, 'brailleDots');
-if (cuerpoDots === null) {
-  console.error(`\n✗ braille: no se encuentra \`brailleDots\` en ${FICHERO}.`);
-  console.error('  Sin la tabla de puntos no hay nada que comprobar, y callar sería mentir.\n');
-  process.exit(1);
+if (emitibles.size < MINIMO_CELDAS_EMITIBLES) {
+  plantarse(`el parser ha leído ${emitibles.size} celdas emitibles, por debajo del mínimo (${MINIMO_CELDAS_EMITIBLES}).`);
 }
 
-const dibujables = new Map(); // celda → puntos declarados
-for (const [, celda, puntos] of cuerpoDots.matchAll(/'([⠀-⣿])':\s*\[([0-9,\s]*)\]/g)) {
-  dibujables.set(
-    celda,
-    puntos
-      .split(',')
-      .map((p) => p.trim())
-      .filter(Boolean)
-      .map(Number),
+// ── Regla A · el dibujo sale del código, no de una tabla ──────────────────────
+// Primero la búsqueda en tabla: si la hay, ESE es el defecto, y plantarse por faltar una llamada
+// a puntosDeCelda escondería el motivo (lo destapó la trampa 1).
+for (const [busqueda] of codigo.matchAll(/\b\w+\s*\[\s*\w+\s*\]\s*(?:\?\?|\|\|)\s*\[\s*\]/g)) {
+  problemas.push(
+    `búsqueda en tabla que cae a vacío: «${busqueda}» → una celda que no esté en la tabla se ` +
+      'dibuja sin ningún punto, y en la hoja a escala real eso es un ESPACIO (hallazgo 3456). ' +
+      'Los puntos salen de `puntosDeCelda`',
   );
 }
-
-// ── Cordura del parser ANTES de dar cualquier veredicto ───────────────────────
-if (emitibles.size < MINIMO_CELDAS_EMITIBLES || dibujables.size < MINIMO_ENTRADAS_DOTS) {
-  console.error(
-    `\n✗ braille: el parser ha leído ${emitibles.size} celdas emitibles y ${dibujables.size} ` +
-      `entradas de puntos, por debajo de los mínimos (${MINIMO_CELDAS_EMITIBLES} y ` +
-      `${MINIMO_ENTRADAS_DOTS}).`,
+const llamadas = [...codigo.matchAll(/\bpuntosDeCelda\s*\(/g)].length;
+if (llamadas < MINIMO_LLAMADAS_DIBUJO && problemas.length === 0) {
+  plantarse(
+    `no se encuentra el dibujo con \`puntosDeCelda\` en ${FICHERO}: ${llamadas} llamada(s), y la ` +
+      `vista de celdas y la hoja son ${MINIMO_LLAMADAS_DIBUJO}. Si el dibujo cambió de forma, hay que ` +
+      'actualizar este candado (scripts/CLAUDE.md).',
   );
-  console.error(
-    '  Eso no es un fichero conforme, es un parser que no ha entendido el formato: si las\n' +
-      '  tablas han cambiado de forma, hay que actualizar este candado (scripts/CLAUDE.md).\n',
-  );
-  process.exit(1);
+}
+if (!/import\s*\{[^}]*\bpuntosDeCelda\b[^}]*\}\s*from\s*'\.\/(celdas|TecladoBraille)'/.test(codigo)) {
+  plantarse(`no se encuentra el import de \`puntosDeCelda\` desde ./celdas en ${FICHERO}.`);
 }
 
-// ── Regla A · cobertura ───────────────────────────────────────────────────────
-for (const [celda, origen] of emitibles) {
-  if (!esCeldaBraille(celda)) continue;
-  if (!dibujables.has(celda)) {
-    const u = celda.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
-    problemas.push(
-      `celda emitible sin puntos: «${celda}» (U+${u}, puntos ${puntosSegunUnicode(celda).join('-') || 'ninguno'}) ` +
-        `sale de ${origen} y no está en brailleDots → se dibujaría en blanco, y en la hoja ` +
-        `impresa eso es un ESPACIO`,
-    );
+// ── Reglas B y C · ejecutando celdas.ts ───────────────────────────────────────
+let puntosDeCelda = null;
+if (!process.features?.typescript) {
+  console.log(`⏭️  check:braille: Node ${process.version} no carga .ts; omito cobertura y coherencia (la regla A sí se ha mirado).`);
+} else {
+  try {
+    ({ puntosDeCelda } = await import(pathToFileURL(resolve(CELDAS)).href));
+  } catch (e) {
+    plantarse(`no se puede cargar ${CELDAS}: ${e.message}`);
   }
-}
+  if (typeof puntosDeCelda !== 'function') plantarse(`no se encuentra \`puntosDeCelda\` exportada en ${CELDAS}.`);
 
-// ── Regla B · coherencia con Unicode ──────────────────────────────────────────
-for (const [celda, declarados] of dibujables) {
-  const esperados = puntosSegunUnicode(celda);
-  if (declarados.join('-') !== esperados.join('-')) {
-    const u = celda.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
-    problemas.push(
-      `puntos que no cuadran con su código: «${celda}» (U+${u}) declara ` +
-        `[${declarados.join('-') || 'vacío'}] y Unicode dice [${esperados.join('-') || 'vacío'}]`,
-    );
+  // B · cobertura
+  for (const [celda, origen] of emitibles) {
+    if (celda === '⠀') continue;
+    if (puntosDeCelda(celda).length === 0) {
+      problemas.push(
+        `celda emitible sin puntos: «${celda}» (${unicode(celda)}, puntos ${puntosSegunUnicode(celda).join('-')}) ` +
+          `sale de ${origen} y se dibujaría en blanco: en la hoja impresa eso es un ESPACIO`,
+      );
+    }
+  }
+
+  // C · coherencia, las 256
+  for (let cp = BASE_BRAILLE; cp <= 0x28ff; cp++) {
+    const celda = String.fromCodePoint(cp);
+    const obtenidos = puntosDeCelda(celda).join('-');
+    const esperados = puntosSegunUnicode(celda).join('-');
+    if (obtenidos !== esperados) {
+      problemas.push(
+        `puntos que no cuadran con su código: «${celda}» (${unicode(celda)}) da ` +
+          `[${obtenidos || 'vacío'}] y Unicode dice [${esperados || 'vacío'}]`,
+      );
+    }
+  }
+  for (const ajeno of ['a', 'Z', '1', ' ']) {
+    if (puntosDeCelda(ajeno).length > 0) {
+      problemas.push(`puntos que no cuadran con su código: «${ajeno}» no es una celda braille y da [${puntosDeCelda(ajeno).join('-')}]`);
+    }
   }
 }
 
 if (LISTA) {
-  console.log(`\nbraille · ${dibujables.size} celdas dibujables, ${emitibles.size} emitibles\n`);
-  for (const [celda, puntos] of dibujables) {
-    const u = celda.codePointAt(0).toString(16).toUpperCase().padStart(4, '0');
-    const origen = emitibles.get(celda) ?? '(solo dibujable)';
-    console.log(`  ${celda}  U+${u}  ${(puntos.join('-') || '—').padEnd(9)} ${origen}`);
+  console.log(`\nbraille · ${emitibles.size} celdas emitibles, ${llamadas} dibujos con puntosDeCelda\n`);
+  for (const [celda, origen] of emitibles) {
+    console.log(`  ${celda}  ${unicode(celda)}  ${(puntosSegunUnicode(celda).join('-') || '—').padEnd(9)} ${origen}`);
   }
   console.log();
 }
 
 if (problemas.length > 0) {
+  const mostrados = problemas.slice(0, 20);
   console.error(`\n✗ braille: ${problemas.length} problema(s) en ${FICHERO}\n`);
-  for (const p of problemas) console.error(`  · ${p}`);
-  console.error(
-    '\n  `brailleDots[c] ?? []` no da error: devuelve una celda con los seis puntos apagados,\n' +
-      '  que en la hoja a escala real es una separación de palabra. Añade la celda con sus\n' +
-      '  puntos, que salen de su código Unicode (U+2800 + bits).\n',
-  );
+  for (const p of mostrados) console.error(`  · ${p}`);
+  if (problemas.length > mostrados.length) console.error(`  · … y ${problemas.length - mostrados.length} más`);
+  console.error('\n  Una celda sin puntos no da error: se dibuja con los seis apagados, que en la hoja a\n  escala real es una separación de palabra.\n');
   process.exit(1);
 }
 
 console.log(
-  `✓ braille: las ${emitibles.size} celdas emitibles se pueden dibujar, y los puntos de las ` +
-    `${dibujables.size} entradas cuadran con su código Unicode`,
+  `✓ braille: el dibujo sale del código Unicode (${llamadas} llamadas a puntosDeCelda), las ` +
+    `${emitibles.size} celdas emitibles se pueden dibujar` +
+    (puntosDeCelda ? ' y las 256 celdas cuadran con su código' : ''),
 );

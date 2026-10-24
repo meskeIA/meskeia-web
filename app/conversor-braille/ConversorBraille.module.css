@@ -409,8 +409,12 @@
     align-self: center;
   }
 
+  /* Hallazgo 3460 (24/10/2026): con `repeat(5, 1fr)` cada ficha mide 62 px de mínimo (la celda
+     dibujada: el scale(0.7) de .miniCell no encoge su caja), y 5 × 62 + 4 huecos no caben en la
+     tarjeta de un móvil de 360-390 px: la quinta columna (E, J, Ñ, S, X) quedaba fuera de la
+     pantalla. Tantas columnas como quepan, nunca menos de 62 px. */
   .alphabetGrid {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
   }
 
   .resultBox {

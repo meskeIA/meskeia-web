@@ -8,16 +8,17 @@
  * ([[project_test_juicio_baseline]]): si no se comprueba, lo único que se sabe es que calla, y
  * callar lo hace igual de bien un script vacío.
  *
- * Los casos 1 y 2 son los dos defectos REALES, tal y como estaban en el código:
- *   1. El estado del 21/08/2026 — sin los tres indicadores en `brailleDots`.
- *   2. El estado del 22/09/2026 (hallazgo 1183) — sin ⠠, la primera celda de la barra inclinada.
- * El 3 es un patrón mal teclado, que es lo que la regla B añade sobre la A. Y los dos últimos
- * son los que impiden que este candado se vuelva decorativo: tiene que CALLAR con el código
- * bueno y PLANTARSE cuando no ha entendido el fichero, en vez de dar verde por no haber mirado.
- *
- * El quinto (renombrar la tabla a `brailleDotsRenombrado`) fue el que destapó que el propio
- * regex del candado leía cualquier `brailleDotsLoQueSea`: con la tabla renombrada seguía
- * encontrándola y daba verde, en vez de plantarse.
+ * Reescritas el 24/10/2026 con el candado (hallazgo 3456): la tabla `brailleDots` ya no existe y
+ * el dibujo sale de los bits del código. Los casos de origen se reinyectan en su forma de hoy:
+ *   1. La hoja vuelve a buscar en una tabla con caída a vacío (`tabla[c] ?? []`), que es la
+ *      forma de los tres defectos (21/08, 1183 y 3456).
+ *   2. La vista de celdas, igual con `|| []`, que era la forma de `renderBrailleCell`.
+ *   3. `puntosDeCelda` calcula mal los bits (un patrón «mal tecleado», regla C).
+ *   4. `puntosDeCelda` se queda sin puntos para parte del bloque: las celdas emitibles salen en
+ *      blanco (regla B), que es el efecto del 3456 visto desde el cálculo.
+ *   5. El código de hoy CALLA.
+ *   6. y 7. El candado SE PLANTA si no entiende el fichero: sin `textToBraille`, o sin el dibujo
+ *      con `puntosDeCelda` (alguien renombra la función), en vez de dar verde por no haber mirado.
  */
 
 import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
@@ -25,64 +26,89 @@ import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const ORIGINAL = 'app/conversor-braille/page.tsx';
+const PAGINA = 'app/conversor-braille/page.tsx';
+const CELDAS = 'app/conversor-braille/celdas.ts';
 const CANDADO = 'scripts/check-celdas-braille.mjs';
-const src = readFileSync(ORIGINAL, 'utf8');
+const src = readFileSync(PAGINA, 'utf8');
+const celdas = readFileSync(CELDAS, 'utf8');
 const dir = mkdtempSync(join(tmpdir(), 'braille-candado-'));
 
-/** Corre el candado sobre un .tsx y devuelve si ha fallado y qué ha dicho. */
-function correr(contenido, nombre) {
-  const ruta = join(dir, `${nombre}.tsx`);
-  writeFileSync(ruta, contenido, 'utf8');
+/** Corre el candado sobre una página y unas celdas, y devuelve si ha fallado y qué ha dicho. */
+function correr(pagina, modulo, nombre) {
+  const rutaPagina = join(dir, `${nombre}.tsx`);
+  const rutaCeldas = join(dir, `${nombre}-celdas.ts`);
+  writeFileSync(rutaPagina, pagina, 'utf8');
+  writeFileSync(rutaCeldas, modulo, 'utf8');
   try {
-    const salida = execFileSync('node', [CANDADO, ruta], { encoding: 'utf8' });
+    const salida = execFileSync('node', [CANDADO, rutaPagina, '--celdas', rutaCeldas], { encoding: 'utf8', stdio: 'pipe' });
     return { fallo: false, salida };
   } catch (e) {
     return { fallo: true, salida: `${e.stdout ?? ''}${e.stderr ?? ''}` };
   }
 }
 
+const exigir = (texto, patron, caso) => {
+  if (!texto.includes(patron)) throw new Error(`trampa ${caso}: no encuentro «${patron}» en el original`);
+  return texto;
+};
+
 const casos = [
   {
-    nombre: '1-sin-los-tres-indicadores-21-08',
+    nombre: '1-la-hoja-vuelve-a-la-tabla',
     debeFallar: true,
-    // Tal como estaba antes de la reparación del 21/08/2026.
-    //
-    // ⚠️ El numeral NO empieza su línea —comparte línea con ⠣ y ⠜—, así que su regex no puede
-    // anclarse a `\n`: la primera versión de esta trampa lo dejaba dentro y comprobaba dos
-    // ausencias donde quería comprobar tres, sin que nada lo dijera.
-    contenido: src
-      .replace(/'⠼': \[3,4,5,6\],\s*/, '')
-      .replace(/\n\s*'⠨': \[4,6\],[^\n]*/, '')
-      .replace(/\n\s*'⠐': \[5\],[^\n]*/, ''),
-    espera: 'U+283C',
+    pagina: exigir(src, 'const activos = puntosDeCelda(caracter);', 1).replace(
+      'const activos = puntosDeCelda(caracter);',
+      'const activos = brailleDots[caracter] ?? [];',
+    ),
+    modulo: celdas,
+    espera: 'cae a vacío',
   },
   {
-    nombre: '2-sin-la-barra-inclinada-1183',
+    nombre: '2-la-vista-vuelve-a-la-tabla',
     debeFallar: true,
-    // El hallazgo 1183 exacto: ⠠ emitible por SIGNOS_COMPUESTOS y ausente de brailleDots.
-    contenido: src.replace(/\n\s*'⠠': \[6\],[^\n]*/, ''),
-    espera: 'U+2820',
+    pagina: exigir(src, 'const dots = puntosDeCelda(char);', 2).replace(
+      'const dots = puntosDeCelda(char);',
+      'const dots = brailleDots[char] || []; const otra = puntosDeCelda(char);',
+    ),
+    modulo: celdas,
+    espera: 'cae a vacío',
   },
   {
-    nombre: '3-puntos-mal-tecleados',
+    nombre: '3-bits-mal-calculados',
     debeFallar: true,
-    // ⠙ es U+2819 → puntos 1-4-5. Aquí se teclea 1-4-6, que es otra celda.
-    contenido: src.replace("'⠙': [1,4,5]", "'⠙': [1,4,6]"),
+    modulo: exigir(celdas, 'bits & (1 << (p - 1))', 3).replace('bits & (1 << (p - 1))', 'bits & (1 << p)'),
+    pagina: src,
     espera: 'no cuadran con su código',
   },
   {
-    nombre: '4-el-codigo-de-hoy-debe-callar',
+    nombre: '4-celdas-emitibles-en-blanco',
+    debeFallar: true,
+    modulo: exigir(celdas, "if (!esCeldaBraille(celda)) return [];", 4).replace(
+      "if (!esCeldaBraille(celda)) return [];",
+      "if (!esCeldaBraille(celda) || (celda.codePointAt(0) ?? 0) > 0x2810) return [];",
+    ),
+    pagina: src,
+    espera: 'se dibujaría en blanco',
+  },
+  {
+    nombre: '5-el-codigo-de-hoy-debe-callar',
     debeFallar: false,
-    contenido: src,
+    pagina: src,
+    modulo: celdas,
     espera: 'se pueden dibujar',
   },
   {
-    nombre: '5-parser-mudo-no-puede-dar-verde',
+    nombre: '6-parser-mudo-sin-textToBraille',
     debeFallar: true,
-    // Si `brailleDots` cambia de forma y el regex deja de encajar, el candado NO puede callar:
-    // es la lección de scripts/CLAUDE.md y la del validador ciego del 14/08/2026.
-    contenido: src.replace('const brailleDots', 'const brailleDotsRenombrado'),
+    pagina: exigir(src, 'const textToBraille', 6).replace('const textToBraille', 'const textToBrailleRenombrado'),
+    modulo: celdas,
+    espera: 'no se encuentra',
+  },
+  {
+    nombre: '7-parser-mudo-sin-el-dibujo',
+    debeFallar: true,
+    pagina: src.replaceAll('puntosDeCelda', 'puntosDeLaCelda'),
+    modulo: celdas,
     espera: 'no se encuentra',
   },
 ];
@@ -91,7 +117,7 @@ let fallos = 0;
 console.log('\nTrampas de check:braille\n');
 
 for (const caso of casos) {
-  const r = correr(caso.contenido, caso.nombre);
+  const r = correr(caso.pagina, caso.modulo, caso.nombre);
   const bienElVeredicto = r.fallo === caso.debeFallar;
   const bienElMotivo = r.salida.includes(caso.espera);
 

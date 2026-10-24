@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import styles from './ConversorBraille.module.css';
 import impresion from '@/styles/impresion.module.css';
 import TecladoBraille, { type Borrado } from './TecladoBraille';
+import { puntosDeCelda } from './celdas';
 import { formatNumber } from '@/lib';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -132,34 +133,17 @@ const COMPUESTOS_INVERSO: { [celdas: string]: string } = Object.fromEntries(
 );
 
 
-// Patrón de puntos para visualización
-const brailleDots: { [key: string]: number[] } = {
-  '⠁': [1], '⠃': [1,2], '⠉': [1,4], '⠙': [1,4,5], '⠑': [1,5],
-  '⠋': [1,2,4], '⠛': [1,2,4,5], '⠓': [1,2,5], '⠊': [2,4], '⠚': [2,4,5],
-  '⠅': [1,3], '⠇': [1,2,3], '⠍': [1,3,4], '⠝': [1,3,4,5], '⠻': [1,2,4,5,6],
-  '⠕': [1,3,5], '⠏': [1,2,3,4], '⠟': [1,2,3,4,5], '⠗': [1,2,3,5], '⠎': [2,3,4],
-  '⠞': [2,3,4,5], '⠥': [1,3,6], '⠧': [1,2,3,6], '⠺': [2,4,5,6], '⠭': [1,3,4,6],
-  '⠽': [1,3,4,5,6], '⠵': [1,3,5,6],
-  '⠷': [1,2,3,5,6], '⠮': [2,3,4,6], '⠌': [3,4], '⠬': [3,4,6], '⠾': [2,3,4,5,6],
-  '⠳': [1,2,5,6],
-  '⠀': [], '⠲': [2,5,6], '⠂': [2], '⠆': [2,3], '⠒': [2,5],
-  '⠦': [2,3,6], '⠖': [2,3,5], '⠶': [2,3,5,6], '⠄': [3], '⠤': [3,6],
-  '⠣': [1,2,6], '⠜': [3,4,5], '⠼': [3,4,5,6],
-  '⠢': [2,6],
-  // Los tres indicadores. Faltaban, y brailleDots[c] ?? [] devolvía una celda sin
-  // ningún punto: en la hoja a escala real eso es un espacio, no un indicador.
-  '⠨': [4,6],   // signo de mayúscula (B 2 § 7)
-  '⠐': [5],     // prefijo de latina minúscula (B 2 § 8.2)
-  /**
-   * ⚠️ 22/09/2026 (hallazgo 1183) — y faltaba una cuarta, por la misma razón y con el mismo
-   * efecto: U+2820 (punto 6) es la PRIMERA celda de la barra inclinada del § 6.2, que llega por
-   * `SIGNOS_COMPUESTOS` y por eso se quedó fuera de aquella reparación. `brailleDots[c] ?? []`
-   * la dibujaba con los seis puntos apagados, y en la hoja imprimible a escala real una celda
-   * sin puntos es un ESPACIO: el lector táctil encontraba separación de palabra seguida de un
-   * punto 2, así que «12/05/2026» se punzaba «12 ,05 ,2026». Afecta a toda fecha, fracción o URL.
-   */
-  '⠠': [6],     // prefijo de la barra inclinada (B 2 § 6.2)
-};
+/*
+ * Los puntos de cada celda que se dibuja —en la vista de celdas y en la hoja a escala real— salen
+ * de su código Unicode con `puntosDeCelda` (./celdas.ts), no de una tabla.
+ *
+ * ⚠️ 24/10/2026 (hallazgo 3456) — salían de `brailleDots`, una tabla con las 50 celdas que la app
+ * ESCRIBE, y `brailleDots[c] ?? []` dibujaba cualquier otra sin ningún punto: en la hoja, una
+ * separación de palabra. Pasó tres veces: los indicadores (21/08), la ⠠ de la barra (hallazgo
+ * 1183, 22/09) y, desde que una celda pegada pasa tal cual al resultado (3434, 23/10), 14 de las 64
+ * celdas de seis puntos (⠈ ⠔ ⠘ ⠡ ⠩ ⠪ ⠫ ⠯ ⠰ ⠱ ⠴ ⠸ ⠹ ⠿). Con los bits del código no hay celda que
+ * pueda faltar. `check:braille` exige que el dibujo siga saliendo de ahí.
+ */
 
 const NUMBER_INDICATOR = '⠼';   // puntos 3-4-5-6 — signo de número (B 2 § 8.1)
 const CAPITAL_INDICATOR = '⠨';  // puntos 4-6 — signo de mayúscula (B 2 § 7)
@@ -517,7 +501,7 @@ export default function ConversorBraillePage() {
       const desplazamiento = modoEspejo ? (celdasPorLinea - linea.length) * norma.entreCeldas : 0;
 
       celdas.forEach((caracter, indiceCelda) => {
-        const activos = brailleDots[caracter] ?? [];
+        const activos = puntosDeCelda(caracter);
         const activosFinales = modoEspejo ? activos.map((p) => PUNTO_ESPEJO[p]) : activos;
         for (let punto = 1; punto <= 6; punto++) {
           const { columna, fila } = POSICION_PUNTO[punto];
@@ -844,7 +828,7 @@ export default function ConversorBraillePage() {
   };
 
   const renderBrailleCell = (char: string) => {
-    const dots = brailleDots[char] || [];
+    const dots = puntosDeCelda(char);
     return (
       <div className={styles.brailleCell}>
         <div className={styles.brailleGrid} aria-hidden="true">
@@ -1018,7 +1002,10 @@ export default function ConversorBraillePage() {
                 Esta herramienta no escribe en braille{' '}
                 {sinCelda.length === 1 ? 'este carácter' : 'estos caracteres'}:{' '}
                 <strong>{sinCelda.map(nombraCaracter).join(' · ')}</strong>. El resto del texto
-                sí está completo. Puede que el Código Braille Español sí les asigne celda fuera
+                sí está completo. Puede que el Código Braille Español sí{' '}
+                {/* Hallazgo 3459: concuerda con «este carácter / estos caracteres». Cada forma en su
+                    <span key>, que con la página traducida no cae (check:ternario-traducido). */}
+                {sinCelda.length === 1 ? <span key="uno">le asigne</span> : <span key="varios">les asigne</span>} celda fuera
                 de la signografía básica que cubre esta app.
               </p>
             )}
@@ -1416,7 +1403,8 @@ export default function ConversorBraillePage() {
                   <tr>
                     <td><strong>Braille Grado 2</strong></td>
                     <td>Con contracciones de palabras comunes</td>
-                    <td>25-40&nbsp;% más rápida</td>
+                    {/* Hallazgo 3458: «25-40 % más rápida» sin fuente ni año (regla 1 de neutralidad). */}
+                    <td>Más rápida (menos celdas por palabra)</td>
                     <td>Lectura diaria, libros</td>
                     <td>UEB / Nacional</td>
                   </tr>
@@ -1468,7 +1456,8 @@ export default function ConversorBraillePage() {
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioIcon} aria-hidden="true">📚</div>
                 <h4>Cultura y Literatura</h4>
-                <p>La Biblioteca de la ONCE gestiona la mayor colección de libros en Braille en español del mundo, con más de 50.000 títulos. Un libro de 300 páginas en tinta puede ocupar 3-5 volúmenes en Braille. Los libros en relieve se fabrican en papel especial de 150 g/m² para que los puntos mantengan el relieve durante años de uso.</p>
+                {/* Hallazgo 3458: «la mayor colección… del mundo, con más de 50.000 títulos», sin fuente ni año. */}
+                <p>La ONCE mantiene en España un fondo bibliográfico en Braille y transcribe libros bajo demanda. Un libro de 300 páginas en tinta puede ocupar 3-5 volúmenes en Braille. Los libros en relieve se fabrican en papel especial de 150 g/m² para que los puntos mantengan el relieve durante años de uso.</p>
               </div>
             </div>
           </div>
@@ -1479,7 +1468,10 @@ export default function ConversorBraillePage() {
             <div className={styles.eduFaqList}>
               <div className={styles.eduFaqItem}>
                 <h4>¿Cuántas personas en el mundo usan Braille?</h4>
-                <p>La OMS estimó que en 2010 había 285 millones de personas con discapacidad visual en el mundo, de las cuales 39 millones eran ciegas (estimaciones publicadas en 2012). Sin embargo, el porcentaje que utiliza Braille ha disminuido con la proliferación de lectores de pantalla de voz: en EE.&nbsp;UU., un informe de la Federación Nacional de Ciegos de 2009 estimaba que menos del 10&nbsp;% de las personas legalmente ciegas leían Braille. En España, la ONCE atiende a unos 70.000 afiliados con discapacidad visual severa. Los expertos señalan que quienes aprenden Braille tienen mayor tasa de empleo y autonomía que quienes solo usan tecnología de voz.</p>
+                <p>La OMS estimó que en 2010 había 285 millones de personas con discapacidad visual en el mundo, de las cuales 39 millones eran ciegas (estimaciones publicadas en 2012). Sin embargo, el porcentaje que utiliza Braille ha disminuido con la proliferación de lectores de pantalla de voz: en EE.&nbsp;UU., un informe de la Federación Nacional de Ciegos de 2009 estimaba que menos del 10&nbsp;% de las personas legalmente ciegas leían Braille. En España, la ONCE es la organización que agrupa a las personas con ceguera o deficiencia visual grave que se afilian a ella.</p>
+                {/* Hallazgo 3457 (cabo C0389): se retiran «unos 70.000 afiliados» y «Los expertos
+                    señalan… mayor tasa de empleo», sin año, fuente ni quién (regla 1 de neutralidad;
+                    la idea del empleo ya la retiró el 3441 por lo mismo). */}
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Por qué Louis Braille inventó el sistema con solo 15 años?</h4>
@@ -1532,11 +1524,11 @@ export default function ConversorBraillePage() {
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Cuánto tiempo tarda en aprenderse el Braille?</h4>
-                <p>Una persona vidente aprende a reconocer visualmente el alfabeto Braille en pocas horas. Leer Braille táctilmente (con los dedos) requiere mucho más: típicamente 6-12 meses de práctica diaria para alcanzar una velocidad funcional (80-100 palabras por minuto). Un lector experto llega a 200 WPM táctilmente, comparable a la lectura visual normal. Los niños ciegos de nacimiento aprenden más rápido que los adultos que pierden la vista tardíamente, ya que sus yemas de los dedos son más sensibles y su cerebro más plástico.</p>
+                <p>Una persona vidente aprende a reconocer visualmente el alfabeto Braille en pocas horas. Leer Braille táctilmente (con los dedos) requiere mucho más: meses de práctica regular para alcanzar una velocidad funcional, y el ritmo varía mucho de una persona a otra. Los niños ciegos de nacimiento aprenden más rápido que los adultos que pierden la vista tardíamente, ya que sus yemas de los dedos son más sensibles y su cerebro más plástico.</p>
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Qué diferencia hay entre Braille Grado 1 y Grado 2?</h4>
-                <p>El Grado 1 es literal: cada letra se escribe con su celda correspondiente, sin abreviaciones. El Grado 2 incluye contracciones: combinaciones de celdas que representan palabras completas o sílabas frecuentes (en inglés, &quot;the&quot; tiene una sola celda; en español, palabras como &quot;que&quot;, &quot;con&quot;, &quot;para&quot; tienen abreviaturas). El Grado 2 ocupa un 25-30&nbsp;% menos espacio y permite leer más rápido. Este conversor implementa Grado 1 únicamente. Para Grado 2 en español se necesitan tablas de contracciones del Código Braille Español de la ONCE.</p>
+                <p>El Grado 1 es literal: cada letra se escribe con su celda correspondiente, sin abreviaciones. El Grado 2 incluye contracciones: combinaciones de celdas que representan palabras completas o sílabas frecuentes (en inglés, &quot;the&quot; tiene una sola celda; en español, palabras como &quot;que&quot;, &quot;con&quot;, &quot;para&quot; tienen abreviaturas). El Grado 2 ocupa menos espacio y permite leer más rápido. Este conversor implementa Grado 1 únicamente. Para Grado 2 en español se necesitan tablas de contracciones del Código Braille Español de la ONCE.</p>
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Por qué los números Braille usan las mismas celdas que las letras A-J?</h4>
@@ -1588,7 +1580,7 @@ export default function ConversorBraillePage() {
                 <div className={styles.eduStepNumber}>6</div>
                 <div className={styles.eduStepContent}>
                   <h4>Del texto digital al Braille físico</h4>
-                  <p>Para producir Braille físico se necesita una embosadora (impresora Braille). Las embosadoras de sobremesa (Index, Braillo) cuestan 3.000-8.000&nbsp;€. El papel especial (150 g/m²) mantiene los relieves durante años. El software de traducción (Braille2000, Duxbury DBT) convierte texto digital a Braille automáticamente, incluyendo Grado 2, tablas matemáticas y partituras. En España, la ONCE tiene un servicio gratuito de trascripción para material educativo.</p>
+                  <p>Para producir Braille físico se necesita una embosadora (impresora Braille). Las embosadoras de sobremesa (Index, Braillo) cuestan bastante más que una impresora de tinta. El papel especial (150 g/m²) mantiene los relieves durante años. El software de traducción (Braille2000, Duxbury DBT) convierte texto digital a Braille automáticamente, incluyendo Grado 2, tablas matemáticas y partituras. En España, la ONCE tiene un servicio gratuito de trascripción para material educativo.</p>
                 </div>
               </div>
             </div>

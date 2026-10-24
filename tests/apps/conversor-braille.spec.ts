@@ -1978,7 +1978,10 @@ test.describe('re-inspección 23/10/2026', () => {
     const guia = await textoGuia(page);
     const menos = guia.match(/Grado 2 ocupa un (\d+)-(\d+)\s%\s+menos/);
     const mas = guia.match(/Grado 1 ocupa un (\d+)-(\d+)\s%\s+más/);
-    expect(menos ?? mas).not.toBeNull(); // precondición: al menos una de las dos frases está
+    // Desde el hallazgo 3458 (24/10/2026) la FAQ tampoco da cifra («El Grado 2 ocupa menos espacio»,
+    // la del 25-30 % no tenía fuente ni año), así que lo normal es que no quede ninguna: la
+    // precondición pasa a ser que se leyó la guía, y si algún día vuelven las dos, que cuadren.
+    expect(guia).toContain('El Grado 2 ocupa menos espacio');
     if (menos && mas) {
       const esperadoMas = (pct: number) => (100 / (100 - pct) - 1) * 100;
       expect(Math.abs(Number(mas[1]) - esperadoMas(Number(menos[1])))).toBeLessThanOrEqual(2);
@@ -2237,7 +2240,10 @@ test.describe('re-inspección 24/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (24/10/2026) — 14 de las 64 celdas de seis puntos se dibujan EN BLANCO
+  // REPARADO (24/10/2026, hallazgo 3456) — 14 de las 64 celdas de seis puntos se dibujaban EN BLANCO.
+  // La vista y la hoja sacan ahora los puntos de los bits del código (`puntosDeCelda`, celdas.ts), la
+  // tabla `brailleDots` se retiró y `check:braille` exige que el dibujo siga saliendo de ahí.
+  // Lo de debajo es la descripción del defecto tal como lo encontró el Inspector.
   // ─────────────────────────────────────────────────────────────────────────
   //
   // Desde la reparación del 3434 (8b08f5e1, 23/10) una celda braille en «Texto → Braille» pasa tal
@@ -2249,7 +2255,7 @@ test.describe('re-inspección 24/10/2026', () => {
   // de la barra), y `npm run check:braille` no la ve: solo cuenta como «emitibles» las celdas de
   // `textToBraille`, `SIGNOS_COMPUESTOS` y los indicadores, no las que pasan tal cual ni las de la
   // entrada que punza la hoja.
-  test.fail('ABIERTO — una celda que pasa tal cual se dibuja con sus puntos en la vista y en la hoja', async ({
+  test('REPARADO 3456 — una celda que pasa tal cual se dibuja con sus puntos en la vista y en la hoja', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -2268,7 +2274,7 @@ test.describe('re-inspección 24/10/2026', () => {
     expect(await celdasMalDibujadas(page)).toEqual([]);
   });
 
-  test.fail('ABIERTO — en Braille → Texto la hoja punza la ⠿ que escribe el teclado, no un espacio', async ({
+  test('REPARADO 3456 — en Braille → Texto la hoja punza la ⠿ que escribe el teclado, no un espacio', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -2280,7 +2286,7 @@ test.describe('re-inspección 24/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (24/10/2026) — cabo C0389: «70.000 afiliados» y «Los expertos señalan», sin fuente
+  // REPARADO (24/10/2026, hallazgo 3457) — cabo C0389: «70.000 afiliados» y «Los expertos señalan», retirados
   // ─────────────────────────────────────────────────────────────────────────
   //
   // Regla 1 de neutralidad (CLAUDE.md §1.quinquies). La reparación del 3441 puso año y fuente a la
@@ -2288,7 +2294,7 @@ test.describe('re-inspección 24/10/2026', () => {
   // a unos 70.000 afiliados con discapacidad visual severa.» y «Los expertos señalan que quienes
   // aprenden Braille tienen mayor tasa de empleo y autonomía que quienes solo usan tecnología de
   // voz.» No está en el FAQPage (sus preguntas son otras).
-  test.fail('ABIERTO (C0389) — la cifra de afiliados de la ONCE lleva año y fuente, y nadie «señala» sin nombre', async ({
+  test('REPARADO 3457 (C0389) — la cifra de afiliados de la ONCE lleva año y fuente, y nadie «señala» sin nombre', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -2307,9 +2313,9 @@ test.describe('re-inspección 24/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (24/10/2026) — más cifras de la guía sin fuente ni año (la misma regla 1)
+  // REPARADO (24/10/2026, hallazgo 3458) — más cifras de la guía sin fuente ni año: retiradas
   // ─────────────────────────────────────────────────────────────────────────
-  test.fail('ABIERTO — las cifras de velocidad, espacio, aprendizaje, catálogo y precio llevan año', async ({
+  test('REPARADO 3458 — las cifras de velocidad, espacio, aprendizaje, catálogo y precio llevan año', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -2329,15 +2335,20 @@ test.describe('re-inspección 24/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (24/10/2026) — el aviso de un solo carácter dice «les asigne»
+  // REPARADO (24/10/2026, hallazgo 3459) — el aviso de un solo carácter decía «les asigne»
   // ─────────────────────────────────────────────────────────────────────────
-  test.fail('ABIERTO — con un solo carácter omitido, el aviso concuerda en singular', async ({ page }) => {
+  test('REPARADO 3459 — con un solo carácter omitido, el aviso concuerda en singular', async ({ page }) => {
     await page.goto(RUTA);
     await convertirHidratado(page, 'Precio: 5 €');
     const aviso = avisoSinCelda(page);
     await expect(aviso).toContainText('este carácter'); // precondición: es el aviso de UN carácter
     // Lo que DEBERÍA pasar: «le asigne». Hoy: «este carácter: €. … sí les asigne celda».
     await expect(aviso).not.toContainText('les asigne', { timeout: 2000 });
+    await expect(aviso).toContainText('le asigne celda');
+    // Con dos, el plural sigue (el ternario va en las dos ramas).
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'Precio: 5 € o 6 ¥');
+    await expect(avisoSinCelda(page)).toContainText('les asigne celda');
   });
 });
 
@@ -2371,13 +2382,14 @@ test.describe('re-inspección 24/10/2026 — móvil de 360 px', () => {
     expect(fuera).toEqual([]);
   });
 
-  // ABIERTO (24/10/2026). Por debajo de 768 px la rejilla del alfabeto pasa a `repeat(5, 1fr)`, pero
+  // REPARADO (24/10/2026, hallazgo 3460): la rejilla pasa a `repeat(auto-fill, minmax(62px, 1fr))`.
+  // Lo que había: por debajo de 768 px la rejilla del alfabeto pasaba a `repeat(5, 1fr)`, pero
   // cada ficha mide 62 px de ancho mínimo (la celda dibujada): 5 × 62 + 4 huecos de 8 = 342 px en una
   // tarjeta de 276 (390 px) o 246 (360 px). La quinta columna —E, J, Ñ, S y X— se sale de la tarjeta
   // y el `overflow-x: clip` del <body> la corta: a 360 px queda fuera de la pantalla casi entera, sin
   // desplazamiento horizontal que la alcance. A 360 px se sale también la quinta columna de las
   // cifras (5 y 0).
-  test.fail('ABIERTO — el alfabeto de referencia no deja la E, la J, la Ñ, la S ni la X fuera de la pantalla', async ({
+  test('REPARADO 3460 — el alfabeto de referencia no deja la E, la J, la Ñ, la S ni la X fuera de la pantalla', async ({
     page,
   }) => {
     await page.goto(RUTA);
