@@ -7493,8 +7493,8 @@ test.describe('Inspección 24/10/2026 — Murcia con decimales, Cataluña en el 
    * referencia de la familia, con el mismo cambio (Madrid → Canarias), no cae. El candado
    * `check:ternario-traducido` no lo ve: las dos ramas son fragmentos, no texto contra JSX.
    */
+  // REPARADO (hallazgo 3476, 24/10/2026): cada rama en su <span key> y cada variable sola en su elemento.
   test('[24/10-a] con la página traducida, cambiar de comunidad no tumba la app', async ({ page }) => {
-    test.fail(!I24_VER_HUECOS, 'ABIERTO (hallazgo [24/10-a]): el cambio de rama de ivaAviso y avisoRenuncia tumba la app traducida');
     const errores: string[] = [];
     page.on('pageerror', (e) => errores.push(e.message));
     page.on('console', (m) => {
@@ -7505,6 +7505,9 @@ test.describe('Inspección 24/10/2026 — Murcia con decimales, Cataluña en el 
       { nombre: 'Madrid → Canarias', desde: 'madrid', renuncia: false, hasta: 'canarias', rotulo: 'Canarias' },
       { nombre: 'Ceuta → Madrid', desde: 'ceuta', renuncia: false, hasta: 'madrid', rotulo: 'Comunidad de Madrid' },
       { nombre: 'Madrid con renuncia → Valencia', desde: 'madrid', renuncia: true, hasta: 'valencia', rotulo: 'Comunidad Valenciana' },
+      // Añadidos al reparar: entre dos territorios sin IVA y con la renuncia hacia Canarias.
+      { nombre: 'Canarias → Ceuta', desde: 'canarias', renuncia: false, hasta: 'ceuta', rotulo: 'Ciudad Autónoma de Ceuta' },
+      { nombre: 'Valencia con renuncia → Canarias', desde: 'valencia', renuncia: true, hasta: 'canarias', rotulo: 'Canarias' },
     ];
     const caidas: string[] = [];
     for (const t of transiciones) {
@@ -7533,8 +7536,8 @@ test.describe('Inspección 24/10/2026 — Murcia con decimales, Cataluña en el 
    * `<strong>{nombre}:</strong> {notas}`, l. 708) y React escribe en el nodo que el traductor retiró.
    * Esperado para Cataluña: ITP General 10 %, AJD 1,5 % (`ITP_CCAA.cataluna`), la escala 10 → 13 %.
    */
+  // REPARADO (hallazgo 3477, 24/10/2026): cada cifra es una sola cadena, único hijo de su elemento.
   test('[24/10-b] con la página traducida, el recuadro de la comunidad dice los tipos de la comunidad elegida', async ({ page }) => {
-    test.fail(!I24_VER_HUECOS, 'ABIERTO (hallazgo [24/10-b]): el recuadro se queda con los tipos de la comunidad anterior');
     await page.goto(RUTA);
     await esperarHidratacion(page, CAMPOS);
     await page.selectOption('#select-ccaa', 'valencia');
@@ -7567,8 +7570,8 @@ test.describe('Inspección 24/10/2026 — Murcia con decimales, Cataluña en el 
    * Convenio, Ley 28/1990), y las cuatro hermanas con pestaña Vendedor lo llevan en ese mismo sello
    * desde 41c9992c (hallazgo 3061). La nave ofrece las dos comunidades en su desplegable.
    */
+  // REPARADO (hallazgo 3478, 24/10/2026): AVISO_IRPF_FORAL en el sello; foral y art. 68.4 en la guía.
   test('[24/10-c] el IRPF de quien vende la nave se da con la escala estatal y lo dice: en el País Vasco y Navarra es foral', async ({ page }) => {
-    test.fail(!I24_VER_HUECOS, 'ABIERTO (hallazgo [24/10-c]): sello y guía del IRPF sin AVISO_IRPF_FORAL');
     expect(TERRITORIOS_IRPF_FORAL).toEqual(['pais-vasco', 'navarra']);
     expect(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje).toBe(60);
     expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo).toBe(19);
@@ -7595,8 +7598,8 @@ test.describe('Inspección 24/10/2026 — Murcia con decimales, Cataluña en el 
    * foral (`TERRITORIOS_IIVTNU_FORAL`, art. 1.2 TRLRHL), y en Ceuta y Melilla la cuota se bonifica un
    * 50 % (`BONIFICACION_IIVTNU_CEUTA_MELILLA`, art. 159.2 TRLRHL); la receta de las hermanas los nombra.
    */
+  // REPARADO (hallazgo 3479, 24/10/2026): la receta de garaje y trastero.
   test('[24/10-d] la FAQ de la plusvalía dice que es el régimen común: foral en Navarra y el País Vasco, bonificada en Ceuta y Melilla', async ({ page }) => {
-    test.fail(!I24_VER_HUECOS, 'ABIERTO (hallazgo [24/10-d]): FAQ de la plusvalía sin régimen foral ni Ceuta y Melilla');
     expect(TERRITORIOS_IIVTNU_FORAL).toEqual(['pais-vasco', 'navarra']);
     expect(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje).toBe(50);
     await page.goto(RUTA);

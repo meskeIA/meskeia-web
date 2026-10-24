@@ -53,12 +53,15 @@ import {
   nombreEnFrase,
   deNombreCcaa,
   TERRITORIOS_SIN_RENUNCIA,
+  AVISO_IRPF_FORAL,
 } from '@/data/itp-ccaa';
 import {
   IVA_INMUEBLES_2025,
   FISCAL_INMUEBLES_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   GANANCIAS_PATRIMONIALES_META,
+  DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA,
+  BONIFICACION_IIVTNU_CEUTA_MELILLA,
 } from '@/data/fiscal';
 
 // ===== TIPOS =====
@@ -423,51 +426,58 @@ export default function SimuladorNaveIndustrialPage() {
         verificado={REGISTRO_CONCEPTOS.verificado}
         urlOficial={REGISTRO_CONCEPTOS.urlOficial}
       />
-      {/* La escala del ahorro que publica la guía («Vender nave con ganancia patrimonial»). */}
+      {/* La escala del ahorro que publica la guía («Vender nave con ganancia patrimonial»).
+          Con el aviso foral, como las cuatro hermanas con pestaña Vendedor desde 41c9992c: la
+          escala es la estatal (hallazgo 3478). */}
       <DataReference
         normativa={`IRPF de la ganancia ${GANANCIAS_PATRIMONIALES_META.vigencia} · lo que paga quien vende`}
         fuente={GANANCIAS_PATRIMONIALES_META.fuente}
         verificado={GANANCIAS_PATRIMONIALES_META.verificado}
         urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
-        nota={GANANCIAS_PATRIMONIALES_META.nota}
+        nota={`${GANANCIAS_PATRIMONIALES_META.nota} ${AVISO_IRPF_FORAL}`}
       />
 
       {/* Aviso IVA deducible — es el TERCERO de los avisos que explicaban un IVA que la propia
           app niega dos tarjetas más allá, y el único que quedó fuera de la reparación del
           hallazgo 647 por estar más arriba, antes del selector. Es además el primero que se lee
           (hallazgo 1177). */}
+      {/* Hallazgo 3476 (24/10/2026): con la página traducida por el navegador, el cambio de rama
+          de dos FRAGMENTOS con texto suelto tumbaba la app (NotFoundError): el traductor cambia
+          cada nodo de texto por <font> y React retira un nodo que ya no está. Cada rama va en su
+          <span key> y cada texto variable es el único hijo de su elemento (receta de
+          check:ternario-traducido; la de los variables, hallazgo 3477). */}
       <div className={styles.ivaAviso} role="note">
         {territorioActualSinIva ? (
-          <>
+          <span key="sin-iva">
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
-            {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
-            ({territorioActualSinIva.nombre}), que esta calculadora no cifra.{' '}
+            <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el <span>{territorioActualSinIva.impuesto}</span>{' '}
+            <span>({territorioActualSinIva.nombre})</span>, que esta calculadora no cifra.{' '}
             {/* Hallazgo 3263 (19/10/2026): en Ceuta y Melilla decía que el IPSI soportado «también
                 puede ser deducible», y la Ley 8/1991, art. 20.3 (BOE-A-1991-7645, leído el
                 19/10/2026) dice: «Las cuotas soportadas o satisfechas en relación con las entregas
                 de bienes inmuebles […] no podrán ser objeto de deducción». En Canarias el IGIC sí
                 se deduce y la frase se queda. */}
             {territorioActualSinIva.impuesto === 'IPSI' ? (
-              <>
+              <span key="ipsi">
                 El IPSI soportado en la compra de un inmueble <strong>no se puede deducir</strong>{' '}
                 (Ley 8/1991, art. 20.3): consulta con tu asesor fiscal antes de tomar decisiones.
-              </>
+              </span>
             ) : (
-              <>
+              <span key="igic">
                 El impuesto soportado también puede ser <strong>deducible</strong>, pero con las
-                reglas del {territorioActualSinIva.impuesto}: consúltalas en la administración
-                tributaria {deNombreCcaa(ccaa)} y con tu asesor fiscal antes de tomar decisiones.
-              </>
+                reglas del <span>{territorioActualSinIva.impuesto}</span>: consúltalas en la administración
+                tributaria <span>{deNombreCcaa(ccaa)}</span> y con tu asesor fiscal antes de tomar decisiones.
+              </span>
             )}
-          </>
+          </span>
         ) : (
-          <>
+          <span key="con-iva">
             {/* Hallazgo 3264 (cabo C0164): «sujeta y no exenta», art. 94.Uno.1.º.a LIVA. */}
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> el IVA soportado en la compra de una nave industrial
             puede ser <strong>deducible</strong> si la destinas a una actividad sujeta y no exenta de IVA
             (una actividad exenta, como la sanitaria o la educativa, no lo deduce). Consulta con tu asesor
             fiscal antes de tomar decisiones.
-          </>
+          </span>
         )}
       </div>
 
@@ -523,7 +533,7 @@ export default function SimuladorNaveIndustrialPage() {
                 disabled={renunciaImposible}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
-                <span>2ª mano con renuncia al {impuestoDeLaRenuncia}</span>
+                <span>{`2ª mano con renuncia al ${impuestoDeLaRenuncia}`}</span>
                 <span className={styles.transmisionSub}>
                   {renunciaImposible
                     ? 'No existe en el IPSI: paga ITP'
@@ -541,34 +551,35 @@ export default function SimuladorNaveIndustrialPage() {
             {transmision === 'segunda-mano' && (
               <p className={styles.avisoRenuncia} role="note">
                 <span aria-hidden="true">ℹ️</span>{' '}
+                {/* Cada rama en su <span key> y cada variable sola en su elemento (hallazgo 3476). */}
                 {renunciaImposible && territorioActualSinIva ? (
-                  <>
-                    En {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
-                    ({territorioActualSinIva.nombre}), y en él <strong>no existe la renuncia a la
+                  <span key="sin-renuncia">
+                    En <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el <span>{territorioActualSinIva.impuesto}</span>{' '}
+                    <span>({territorioActualSinIva.nombre})</span>, y en él <strong>no existe la renuncia a la
                     exención</strong>: la Ley 8/1991 toma sus exenciones de la ley del IVA (art. 7) sin
-                    regular ninguna renuncia, y no deja deducir el {territorioActualSinIva.impuesto}{' '}
+                    regular ninguna renuncia, y no deja deducir el <span>{territorioActualSinIva.impuesto}</span>{' '}
                     soportado en la compra de un inmueble (art. 20.3), que es lo que la renuncia exige en
                     la ley del IVA (art. 20.Dos). La segunda mano de una nave paga siempre ITP, así que la
                     tercera opción no se puede elegir aquí.
-                  </>
+                  </span>
                 ) : territorioActualSinIva ? (
-                  <>
-                    En {nombreEnFrase(ccaa)} no rige el IVA, sino el {territorioActualSinIva.impuesto}{' '}
-                    ({territorioActualSinIva.nombre}). También en él la segunda entrega de una nave está
+                  <span key="canarias">
+                    En <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el <span>{territorioActualSinIva.impuesto}</span>{' '}
+                    <span>({territorioActualSinIva.nombre})</span>. También en él la segunda entrega de una nave está
                     exenta y, si el comprador es empresario o profesional con derecho a deducir, total o
                     parcialmente, el impuesto de la compra, quien vende puede{' '}
                     <strong>renunciar a esa exención</strong> (art. 50.Cinco Ley canaria 4/2012): la
-                    operación pasa al {territorioActualSinIva.impuesto}, que autoliquida el comprador
+                    operación pasa al <span>{territorioActualSinIva.impuesto}</span>, que autoliquida el comprador
                     (inversión del sujeto pasivo), y no se paga ITP. Si es tu caso, usa la tercera opción;
-                    el {territorioActualSinIva.impuesto} no lo cifra este simulador.
-                  </>
+                    el <span>{territorioActualSinIva.impuesto}</span> no lo cifra este simulador.
+                  </span>
                 ) : (
-                  <>
+                  <span key="con-iva">
                     Cuando el comprador es un empresario o profesional con derecho a deducir el IVA, es
                     habitual que quien vende <strong>renuncie a la exención de IVA</strong> en la segunda
                     transmisión (art. 20.Dos LIVA): la operación vuelve al IVA, lo autoliquida el comprador
                     (inversión del sujeto pasivo) y no se paga ITP. Si es tu caso, usa la tercera opción.
-                  </>
+                  </span>
                 )}
               </p>
             )}
@@ -576,32 +587,32 @@ export default function SimuladorNaveIndustrialPage() {
               <p className={styles.avisoRenuncia} role="note">
                 <span aria-hidden="true">ℹ️</span>{' '}
                 {territorioActualSinIva ? (
-                  <>
-                    En {nombreEnFrase(ccaa)} <strong>no se devenga IVA</strong>: la renuncia es a la
-                    exención del {territorioActualSinIva.impuesto} (art. 50.Cinco Ley canaria 4/2012), y
-                    ese {territorioActualSinIva.impuesto} lo <strong>autoliquida el comprador</strong> por
+                  <span key="canarias">
+                    En <span>{nombreEnFrase(ccaa)}</span> <strong>no se devenga IVA</strong>: la renuncia es a la
+                    exención del <span>{territorioActualSinIva.impuesto}</span> (art. 50.Cinco Ley canaria 4/2012), y
+                    ese <span>{territorioActualSinIva.impuesto}</span> lo <strong>autoliquida el comprador</strong> por
                     inversión del sujeto pasivo (art. 19.1.2.º g Ley 20/1991). Con la renuncia la
                     operación deja de pagar ITP (art. 4.4 de esa misma ley) y la escritura paga AJD. Este
-                    simulador no cuantifica el {territorioActualSinIva.impuesto}; el AJD sí, con el tipo
+                    simulador no cuantifica el <span>{territorioActualSinIva.impuesto}</span>; el AJD sí, con el tipo
                     general de la comunidad —algunas le aplican un <strong>tipo incrementado</strong>{' '}
                     cuando hay renuncia—.
-                  </>
+                  </span>
                 ) : ajdRotulo.motivo === 'renuncia' ? (
-                  <>
+                  <span key="ajd-renuncia">
                     Con renuncia a la exención el IVA no se paga al vendedor: lo{' '}
                     <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
                     deducible si tu actividad está sujeta y no exenta de IVA. El AJD de la escritura va al{' '}
-                    <strong>tipo propio de la renuncia</strong> en {nombreEnFrase(ccaa)} (
-                    {formatTipoNominal(ajdRotulo.tipo)}&nbsp;%), que es el que se aplica aquí.
-                  </>
+                    <strong>tipo propio de la renuncia</strong> en <span>{nombreEnFrase(ccaa)}</span> (
+                    <span>{`${formatTipoNominal(ajdRotulo.tipo)} %`}</span>), que es el que se aplica aquí.
+                  </span>
                 ) : (
-                  <>
+                  <span key="ajd-general">
                     Con renuncia a la exención el IVA no se paga al vendedor: lo{' '}
                     <strong>autoliquida el comprador</strong> (inversión del sujeto pasivo), y suele ser
                     deducible si tu actividad está sujeta y no exenta de IVA. Ojo al AJD: varias comunidades le aplican
                     un <strong>tipo incrementado</strong> cuando hay renuncia, y aquí se calcula con el
                     tipo general de la tabla — consúltalo en tu comunidad.
-                  </>
+                  </span>
                 )}
               </p>
             )}
@@ -653,7 +664,9 @@ export default function SimuladorNaveIndustrialPage() {
                 <span className={styles.infoCcaaLabel}>ITP General</span>
                 {/* El de una nave, no el de la vivienda: en el País Vasco, 7 % y no 4 %
                     (hallazgo 1582); en Valencia, el 11 % si el precio pasa del millón (1581). */}
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(itpGeneralRotulo)}&nbsp;%</span>
+                {/* Una sola cadena, único hijo del <span>: con la página traducida, React escribía el
+                    tipo nuevo en el nodo que el traductor ya había retirado (hallazgo 3477). */}
+                <span className={styles.infoCcaaValue}>{`${formatTipoNominal(itpGeneralRotulo)} %`}</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
@@ -664,7 +677,7 @@ export default function SimuladorNaveIndustrialPage() {
                     escribía ese rango sin ellos (hallazgo 685). */}
                 {/* Del motor y para esta operación: el País Vasco cobra el 0,5 % a una nave
                     (hallazgo 1583) y Valencia el 2 % con renuncia (1603). */}
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(ajdRotulo.tipo)}&nbsp;%</span>
+                <span className={styles.infoCcaaValue}>{`${formatTipoNominal(ajdRotulo.tipo)} %`}</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>
@@ -679,19 +692,21 @@ export default function SimuladorNaveIndustrialPage() {
                 progresiva (9% → 11%)» y el 11 % grava TODO el valor, no el exceso (hallazgo 1581). */}
             {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> <strong>Tipo según el valor:</strong> {subidaITP}.
+                <span aria-hidden="true">⚠️</span> <strong>Tipo según el valor:</strong> <span>{`${subidaITP}.`}</span>
               </p>
             )}
+            {/* Las dos notas, con key: sin ella React reutiliza el <p> y reescribe sus nodos de
+                texto, que con la página traducida ya no están (hallazgo 3476). */}
             {esCiudadBonificada ? (
-              <p className={styles.infoCcaaNote}>
+              <p key="ciudad-bonificada" className={styles.infoCcaaNote}>
                 Las naves industriales tributan por el <strong>tipo general</strong> de ITP, pero en{' '}
-                {nombreEnFrase(ccaa)} se aplica además la{' '}
-                <strong>bonificación del {BONIFICACION_CIUDADES} de la cuota</strong>{' '}
+                <span>{nombreEnFrase(ccaa)}</span> se aplica además la{' '}
+                <strong>{`bonificación del ${BONIFICACION_CIUDADES} de la cuota`}</strong>{' '}
                 del artículo 57 bis del TRLITPAJD, que corresponde a los inmuebles situados en la ciudad
                 sea cual sea su uso. El simulador ya la descuenta.
               </p>
             ) : (
-              <p className={styles.infoCcaaNote}>
+              <p key="tipo-general" className={styles.infoCcaaNote}>
                 Una nave industrial tributa por el <strong>tipo general</strong> de ITP: los tipos reducidos por
                 perfil del comprador (jóvenes, familia numerosa, discapacidad) exigen que el inmueble sea la
                 vivienda habitual, y una nave no lo es. Eso no agota los beneficios posibles: alguna comunidad
@@ -705,15 +720,15 @@ export default function SimuladorNaveIndustrialPage() {
                 (local-comercial) y del 2208 (solar), llevada aquí, donde tampoco se pintaba. */}
             {datosCcaaActual.notas && (
               <p className={styles.infoCcaaNote}>
-                <strong>{datosCcaaActual.nombre}:</strong> {separarPorcentajes(datosCcaaActual.notas)}
+                <strong>{`${datosCcaaActual.nombre}:`}</strong> <span>{separarPorcentajes(datosCcaaActual.notas)}</span>
               </p>
             )}
             {territorioActualSinIva && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> En {nombreEnFrase(ccaa)} <strong>no se aplica el IVA</strong>:
-                la obra nueva tributa por el {territorioActualSinIva.impuesto} ({territorioActualSinIva.nombre}),
+                <span aria-hidden="true">⚠️</span> En <span>{nombreEnFrase(ccaa)}</span> <strong>no se aplica el IVA</strong>:
+                la obra nueva tributa por el <span>{territorioActualSinIva.impuesto}</span> <span>({territorioActualSinIva.nombre})</span>,
                 con sus propios tipos. Este simulador no lo calcula — consúltalo en la administración
-                tributaria {deNombreCcaa(ccaa)}.
+                tributaria <span>{deNombreCcaa(ccaa)}</span>.
               </p>
             )}
           </div>
@@ -1051,6 +1066,12 @@ export default function SimuladorNaveIndustrialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Si vendes la nave como persona física, la ganancia tributa en el IRPF base del ahorro
                 ({formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo, 0)}-{formatNumber(TRAMOS_GANANCIAS_PATRIMONIALES_2025[TRAMOS_GANANCIAS_PATRIMONIALES_2025.length - 1].tipo, 0)}&nbsp;%). Si vendes como empresa (IS), tributa en el Impuesto de Sociedades.
+                {/* Hallazgo 3478: la escala es la estatal. */}
+                {' '}Esa escala es la estatal: si resides en el País Vasco o en Navarra, tu IRPF es foral y
+                se liquida con su propia escala. Y si la nave está en Ceuta o Melilla, la parte de la cuota
+                que corresponde a esa ganancia lleva una deducción del{' '}
+                {formatNumber(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje, 0)}&nbsp;% (art. 68.4 de la Ley
+                del IRPF).
               </p>
             </div>
           </div>
@@ -1113,6 +1134,11 @@ export default function SimuladorNaveIndustrialPage() {
                 Sí. La plusvalía municipal (IIVTNU) se aplica al incremento del valor del suelo durante el
                 tiempo de propiedad, independientemente de si el inmueble es residencial o industrial.
                 Si no hay incremento real en el valor del terreno se produce un supuesto de no sujeción, no una exención (art. 104.5 TRLRHL, redacción del RDL 26/2021): el impuesto no llega a devengarse, pero hay que declararlo y acreditarlo con las escrituras de compra y venta.
+                {/* Hallazgo 3479: la receta de garaje y trastero (f6de548d). */}
+                {' '}Todo eso es el régimen común: en Navarra y el País Vasco el impuesto se rige por su
+                normativa foral, con sus propias reglas y tipos; en Ceuta y Melilla la cuota se bonifica
+                un {formatNumber(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje, 0)}&nbsp;% (art. 159.2
+                TRLRHL). Este simulador no calcula la plusvalía municipal.
               </p>
             </div>
           </div>
