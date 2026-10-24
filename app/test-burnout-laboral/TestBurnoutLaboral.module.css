@@ -793,13 +793,28 @@
     grid-template-columns: 1fr;
   }
 
+  /* minmax(0, 1fr) y sin el mínimo de 80 px: cinco pistas de 80 no caben en 226 px y las
+     opciones 3 y 4 quedaban fuera de la pantalla, sin poder contestarse (cabo C0423) */
   .opcionesGrid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
+  .opcionBtn {
+    position: relative;
+    min-width: 0;
+    padding: var(--spacing-sm) 0;
+  }
+
+  /* Oculta a la vista, no al lector de pantalla: con display none el botón se anunciaba
+     solo con su número, sin la frecuencia */
   .opcionEtiqueta {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
   .navegacionBtns {

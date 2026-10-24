@@ -64,6 +64,34 @@ for (const ruta of RUTAS) {
   });
 }
 
+// C0393 y C0423: con cinco pistas de 80 px en 226, las últimas opciones quedaban fuera de la
+// pantalla y no se podían pulsar. Cada opción tiene que verse entera, contestar al toque y
+// conservar su frecuencia en el nombre accesible aunque a la vista solo quede el número.
+for (const [ruta, ultima] of [
+  ['/test-zarit-cuidador/', /^5 Casi siempre$/],
+  ['/test-burnout-laboral/', /^4 Siempre$/],
+] as const) {
+  test(`${ruta} · a 390 px las cinco opciones se ven enteras y la última se puede contestar`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(ruta);
+    await page.waitForLoadState('networkidle');
+    const opciones = page.locator('[class*="opcionBtn"]');
+    await expect(opciones).toHaveCount(5);
+    for (let i = 0; i < 5; i++) {
+      const caja = await opciones.nth(i).boundingBox();
+      expect(caja, `opción ${i + 1}`).not.toBeNull();
+      expect(caja!.x, `opción ${i + 1}: borde izquierdo`).toBeGreaterThanOrEqual(0);
+      expect(caja!.x + caja!.width, `opción ${i + 1}: borde derecho`).toBeLessThanOrEqual(390);
+      expect(caja!.width, `opción ${i + 1}: ancho mínimo de diana`).toBeGreaterThanOrEqual(24);
+    }
+    const ultimaBtn = page.getByRole('button', { name: ultima });
+    await expect(async () => {
+      await ultimaBtn.click();
+      await expect(ultimaBtn).toHaveAttribute('aria-pressed', 'true', { timeout: 1000 });
+    }).toPass({ timeout: 15000 });
+  });
+}
+
 test('/seguimiento-habitos/ · a 390 px, con un hábito, ninguna de las tres vistas desborda (C0200)', async ({
   page,
 }) => {
