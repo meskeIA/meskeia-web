@@ -77,10 +77,12 @@ interface Fila { etiqueta: string; puntos: string; ancho: string; ganador: boole
 async function marcador(page: Page): Promise<Fila[]> {
   return page.locator('[class*="barraResultado"]').evaluateAll((els) =>
     els.map((e) => {
-      const relleno = e.querySelector('[role="progressbar"]')?.firstElementChild as HTMLElement | null;
+      // Desde el 24/10/2026 (3188) la barra es decorativa (aria-hidden) y no un progressbar, y
+      // los puntos llevan « puntos» solo para el lector: se lee el número, el primer nodo.
+      const relleno = e.querySelector('[class*="barraFondo"]')?.firstElementChild as HTMLElement | null;
       return {
         etiqueta: e.querySelector('[class*="barraLabel"]')?.textContent ?? '',
-        puntos: e.querySelector('[class*="barraPuntos"]')?.textContent ?? '',
+        puntos: e.querySelector('[class*="barraPuntos"]')?.firstChild?.textContent ?? '',
         ancho: relleno?.style.width ?? '',
         ganador: /ganador/.test(relleno?.className ?? ''),
       };
@@ -309,36 +311,54 @@ test.describe('invariante de familia y accesibilidad', () => {
     await expect.poll(pintada).toBeCloseTo(0.1, 2);
   });
 
-  test('ABIERTO: las barras tienen nombre accesible (cuestionario y «Compatibilidad con cada opción»)', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). La del cuestionario no lleva aria-label ni aria-valuetext
-    // (ariaSnapshot: «- progressbar»), y las cinco del marcador del resultado son role="progressbar"
-    // sin nombre: un lector anuncia «barra de progreso, 100 %», «… 33 %», desligado de la
-    // modalidad y como si fuera un progreso. La fracción sí casa con lo pintado.
-    test.fail();
+  test('REPARADO 3188: las barras tienen nombre accesible (cuestionario y «Compatibilidad con cada opción»)', async ({ page }) => {
+    // Antes (inspector 10/10/2026): la del cuestionario no llevaba aria-label ni aria-valuetext
+    // (ariaSnapshot: «- progressbar»), y las cinco del marcador del resultado eran role="progressbar"
+    // sin nombre: un lector anunciaba «barra de progreso, 100 %», «… 33 %», desligado de la
+    // modalidad y como si fuera un progreso. Ahora la del cuestionario se llama «Progreso del
+    // test» y las del marcador son decorativas: cada fila se lee «Yoga / Pilates 21 puntos».
     test.setTimeout(60_000);
     await abrir(page);
     const sinNombre = async () => page.locator('[role="progressbar"]').evaluateAll((els) =>
       els.filter((e) => !e.getAttribute('aria-label') && !e.getAttribute('aria-labelledby') && !e.getAttribute('aria-valuetext')).length);
     const enCuestionario = await sinNombre();
+    await expect(page.getByRole('progressbar', { name: 'Progreso del test' })).toHaveAttribute('aria-valuetext', '0 % completado');
     await responder(page, NORMAL_YOGA);
     const enResultado = await sinNombre();
     expect({ enCuestionario, enResultado }).toEqual({ enCuestionario: 0, enResultado: 0 });
+    const primera = page.locator('[class*="barraResultado"]').first();
+    expect((await primera.textContent())?.replace(/\s+/g, ' ').trim()).toBe('Yoga / Pilates21 puntos');
   });
 
-  test('ABIERTO (C0016): las flechas mueven la selección y el grupo es una sola parada de Tab', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Patrón de radios del WAI-ARIA APG, como la referencia
-    // selector-smartphone (1681, b0f31109). Medido: ArrowDown y ArrowRight sobre «Ganar fuerza»
-    // no mueven el foco ni marcan nada; las 7 opciones tienen tabIndex 0 y el Tab desde la
-    // marcada va a la opción siguiente.
-    test.fail();
+  test('REPARADO 3187 (C0016): las flechas mueven la selección y el grupo es una sola parada de Tab', async ({ page }) => {
+    // Antes (inspector 10/10/2026): ArrowDown y ArrowRight sobre «Ganar fuerza» no movían el foco
+    // ni marcaban nada; las 7 opciones tenían tabIndex 0 y el Tab desde la marcada iba a la
+    // opción siguiente. Ahora, patrón de radios del WAI-ARIA APG, como la referencia
+    // selector-smartphone (1681, b0f31109).
     await abrir(page);
     const r = radios(page);
+    expect(await r.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([0, -1, -1, -1, -1, -1, -1]);
     await r.nth(0).click();
     await r.nth(0).focus();
     await page.keyboard.press('ArrowDown');
     await expect(r.nth(1)).toBeFocused({ timeout: 1_000 });
     await expect(r.nth(1)).toHaveAttribute('aria-checked', 'true', { timeout: 1_000 });
     expect(await r.evaluateAll((els) => els.map((e) => (e as HTMLElement).tabIndex))).toEqual([-1, 0, -1, -1, -1, -1, -1]);
+    await page.keyboard.press('ArrowRight');
+    await expect(r.nth(2)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('End');
+    await expect(r.nth(6)).toBeFocused();
+    await expect(r.nth(6)).toHaveAttribute('aria-checked', 'true');
+    await page.keyboard.press('ArrowDown');
+    await expect(r.nth(0)).toBeFocused();
+    await page.keyboard.press('ArrowUp');
+    await expect(r.nth(6)).toBeFocused();
+    await page.keyboard.press('Home');
+    await expect(r.nth(0)).toHaveAttribute('aria-checked', 'true');
+    await expect(page.locator('[role="radio"][aria-checked="true"]')).toHaveCount(1);
+    // Una sola parada de Tab: desde la marcada, el Tab sale del grupo.
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('role'))).not.toBe('radio');
   });
 
   test('ABIERTO: tras «Siguiente» con teclado el foco sigue en el cuestionario (no cae a <body>)', async ({ page }) => {
@@ -602,19 +622,17 @@ test('ABIERTO: «Siguiente», la opción marcada y «Anterior» llegan a 4,5:1',
   expect(bajos, 'textos por debajo de 4,5:1').toEqual([]);
 });
 
-test('ABIERTO: el porcentaje del progreso lleva espacio duro antes del «%» (CLAUDE.md §2)', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). `{progresoPct}% completado` pinta «10% completado» pegado.
-  test.fail();
+test('REPARADO 3191: el porcentaje del progreso lleva espacio duro antes del «%» (CLAUDE.md §2)', async ({ page }) => {
+  // Antes (inspector 10/10/2026): `{progresoPct}% completado` pintaba «10% completado» pegado.
   await abrir(page);
   await radios(page).first().click();
   const etiqueta = await page.locator('[class*="progresoLabel"]').evaluate((e) => e.textContent ?? '');
   expect(etiqueta).toContain('10 % completado');
 });
 
-test('ABIERTO: el JSON-LD WebApplication lleva entre 4 y 8 featureList (§1.ter)', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). metadata.ts pasa `features: []` y el HTML servido sale con
+test('REPARADO 3190: el JSON-LD WebApplication lleva entre 4 y 8 featureList (§1.ter)', async ({ page }) => {
+  // Antes (inspector 10/10/2026): metadata.ts pasaba `features: []` y el HTML servido salía con
   // «featureList»: [].
-  test.fail();
   const html = await (await page.request.get('/selector-tipo-gimnasio/')).text();
   const app = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
     .map((m) => JSON.parse(m[1]) as Record<string, unknown>)
@@ -624,22 +642,21 @@ test('ABIERTO: el JSON-LD WebApplication lleva entre 4 y 8 featureList (§1.ter)
   expect(n).toBeLessThanOrEqual(8);
 });
 
-test('ABIERTO: la guía educativa está en el HTML servido', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). <EducationalSection> va dentro de `if (mostrarResultado)`:
-  // el HTML servido (el cuestionario) no lleva ni una línea de «¿Cómo elegir el entrenamiento
-  // adecuado?», y quien no termina las 10 preguntas no la ve. La referencia lo reparó (2663).
-  test.fail();
+test('REPARADO 3189: la guía educativa y el aviso médico están en el HTML servido', async ({ page }) => {
+  // Antes (inspector 10/10/2026): <EducationalSection> iba dentro de `if (mostrarResultado)`:
+  // el HTML servido (el cuestionario) no llevaba ni una línea de «¿Cómo elegir el entrenamiento
+  // adecuado?», y quien no terminaba las 10 preguntas no la veía. Receta 2663 de la referencia.
   const html = await (await page.request.get('/selector-tipo-gimnasio/')).text();
   expect(html).toContain('¿Cómo elegir el entrenamiento adecuado?');
+  expect(html).toContain('Aviso Médico Importante');
 });
 
-test('ABIERTO: la guía describe clases por sus características, no por marcas registradas', async ({ page }) => {
-  // ABIERTO (inspector 10/10/2026). «clases colectivas (zumba, spinning, bodypump...)»: tres
-  // marcas registradas en la guía, cuando la pauta del catálogo es características, no marcas
+test('REPARADO 3192: la guía describe clases por sus características, no por marcas registradas', async ({ page }) => {
+  // Antes (inspector 10/10/2026): «clases colectivas (zumba, spinning, bodypump...)», tres marcas
+  // registradas en la guía, cuando la pauta del catálogo es características, no marcas
   // (selector-smartphone retiró los modelos comerciales). «CrossFit», también marca, es además
   // el nombre de una de las cinco salidas y una keyword: eso lo decide el usuario (neutralidad
   // editorial, nivel 3), y este caso no lo fija.
-  test.fail();
   test.setTimeout(60_000);
   await abrir(page);
   await responder(page, NORMAL_YOGA);
@@ -647,4 +664,34 @@ test('ABIERTO: la guía describe clases por sus características, no por marcas 
   await expect(page.getByRole('heading', { name: 'Gimnasio tradicional' })).toBeVisible();
   const guia = (await page.locator('body').innerText()).toLowerCase();
   expect(guia).not.toMatch(/zumba|spinning|bodypump/);
+  expect(guia).toContain('baile aeróbico, ciclo indoor, tonificación con barra');
+});
+
+test('REPARADO 3193: la guía no da precios ni «más populares» sin fuente, y el ámbito de los euros va declarado', async ({ page }) => {
+  // Antes (inspector 10/10/2026): «Los precios en España oscilan entre 20 y 60 € al mes»,
+  // «60-120 €/mes», «30-80 €/mes», «hasta 120 €/mes (CrossFit premium)», «Los 5 tipos de
+  // entrenamiento más populares en España» y «España tiene un clima favorable…», sin fuente ni
+  // fecha, y la pregunta 4 en euros sin RegionBadge. Ahora la guía es cualitativa (compara cuotas
+  // en tu zona) y el badge es-data declara que los importes toman España como referencia.
+  const html = await (await page.request.get('/selector-tipo-gimnasio/')).text();
+  const texto = html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;| /g, ' ').replace(/\s+/g, ' ');
+  expect(texto).toContain('¿Cómo elegir el entrenamiento adecuado?');
+  expect(texto).not.toMatch(/20 y 60 €|60-120|30-80|120 €\/mes|más populares en España|clima favorable/);
+  expect(texto).toContain('Presupuestos en euros, con España como referencia');
+});
+
+test('REPARADO 3194: el FAQPage da la frecuencia de la OMS y ejercicios sin material para «sin equipamiento»', async ({ page }) => {
+  // Antes (inspector 10/10/2026): «entrenar entre 3 y 5 días a la semana» y «3 sesiones semanales
+  // de cuerpo completo» sin fuente, cuando la guía de la página cita a la OMS (fuerza «al menos 2
+  // días por semana»); y «dominadas» como ejercicio sin equipamiento, que necesita una barra.
+  const html = await (await page.request.get('/selector-tipo-gimnasio/')).text();
+  const faq = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((m) => JSON.parse(m[1]) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] })
+    .find((b) => b['@type'] === 'FAQPage');
+  const respuesta = (pregunta: RegExp) => faq?.mainEntity?.find((q) => pregunta.test(q.name))?.acceptedAnswer.text ?? '';
+  const frecuencia = respuesta(/frecuencia/);
+  expect(frecuencia).toContain('Organización Mundial de la Salud');
+  expect(frecuencia).toContain('al menos 2 días por semana');
+  expect(frecuencia).not.toMatch(/3 y 5 días|3 sesiones/);
+  expect(respuesta(/sin equipamiento/)).not.toContain('dominadas');
 });

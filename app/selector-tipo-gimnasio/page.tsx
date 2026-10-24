@@ -10,6 +10,7 @@ import {
   EducationalSection,
   DisclaimerCard,
   ShareCard,
+  RegionBadge,
 } from '@/components';
 import styles from './SelectorTipoGimnasio.module.css';
 
@@ -342,6 +343,26 @@ export default function SelectorTipoGimnasio() {
     setRespuestas(nuevas);
   }
 
+  /**
+   * Teclado del patrón de radios (WAI-ARIA APG, receta 1681 de selector-smartphone): las flechas
+   * mueven el foco a la opción vecina y la marcan, con vuelta al principio, e Inicio/Fin van a los
+   * extremos. El grupo es UNA parada de Tab (tabindex itinerante). Antes cada opción era una
+   * parada y las flechas no hacían nada (hallazgo 3187, cabo C0016).
+   */
+  function teclaEnOpcion(e: React.KeyboardEvent<HTMLButtonElement>, indice: number) {
+    const total = PREGUNTAS[preguntaActual].opciones.length;
+    let destino: number;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') destino = (indice + 1) % total;
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') destino = (indice - 1 + total) % total;
+    else if (e.key === 'Home') destino = 0;
+    else if (e.key === 'End') destino = total - 1;
+    else return;
+    e.preventDefault();
+    seleccionarOpcion(destino);
+    const opciones = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+    opciones?.[destino]?.focus();
+  }
+
   function siguientePregunta() {
     if (seleccionActual < 0) return;
     cambiaPantalla();
@@ -369,6 +390,98 @@ export default function SelectorTipoGimnasio() {
   const esUltima = preguntaActual === totalPreguntas - 1;
   const progresoPct = Math.round(((preguntaActual + (seleccionActual >= 0 ? 1 : 0)) / totalPreguntas) * 100);
 
+  // Aviso médico y guía, en las dos pantallas: dentro de la rama del resultado no llegaban al HTML
+  // servido y quien no terminaba las 10 preguntas no los veía (hallazgo 3189; receta 2663 de
+  // selector-smartphone). Sin precios ni «más populares» sin fuente (3193) y con las clases por su
+  // característica, no por su marca (3192).
+  const guia = (
+    <>
+      <DisclaimerCard variant="medical" severity="high" />
+
+      <EducationalSection
+        title="¿Cómo elegir el entrenamiento adecuado?"
+        subtitle="Todo lo que debes saber para tomar la mejor decisión para tu salud y objetivos"
+      >
+        <h3>Los 5 tipos de entrenamiento de este test</h3>
+        <p>
+          Hay muchas formas de hacer ejercicio. Cada modalidad tiene sus puntos fuertes y se adapta
+          mejor a perfiles distintos de persona. Conocer las diferencias te ayudará a elegir con criterio.
+        </p>
+
+        <h3>Gimnasio tradicional</h3>
+        <p>
+          Es la opción más versátil. Permite combinar máquinas de musculación, peso libre, cardio y
+          clases colectivas (baile aeróbico, ciclo indoor, tonificación con barra...). La cuota cambia
+          mucho según la ciudad y las instalaciones: compara las de tu zona. Es ideal si quieres
+          flexibilidad horaria y variedad de opciones bajo un mismo techo.
+        </p>
+
+        <h3>CrossFit y entrenamiento funcional</h3>
+        <p>
+          El CrossFit combina levantamiento de pesas olímpico, movimientos gimnásticos y cardio de alta
+          intensidad en sesiones de grupo llamadas WOD (Workout Of the Day). El entrenamiento funcional
+          es similar pero menos estructurado en cuanto a metodología. Son ideales para personas con buena
+          condición física que buscan retos constantes y comunidad. Al ser sesiones guiadas en grupos
+          reducidos, la cuota suele ser más alta que la de un gimnasio de libre acceso.
+        </p>
+
+        <h3>Yoga y pilates</h3>
+        <p>
+          Aunque son disciplinas distintas, comparten el enfoque en el cuerpo y la mente. El yoga trabaja
+          la flexibilidad, la respiración y la meditación. El pilates se centra en el core, la postura
+          y el control muscular. Ambos son muy recomendados para personas con estrés, sedentarismo o
+          lesiones de espalda. El precio depende del centro y de cuántas clases a la semana incluya.
+        </p>
+
+        <h3>Entrenamiento en casa</h3>
+        <p>
+          Con aplicaciones, vídeos y materiales básicos (esterilla, mancuernas, banda elástica) es posible
+          entrenar eficazmente desde casa. Es la opción más económica y cómoda, aunque requiere mayor
+          autodisciplina. Es una opción válida para personas con horarios complicados o poca movilidad.
+        </p>
+
+        <h3>Entrenamiento al aire libre</h3>
+        <p>
+          Correr, ciclismo, senderismo, calistenia en parques o deportes de equipo son formas muy
+          completas de mantenerse activo. La exposición al sol y la naturaleza tiene beneficios adicionales
+          para la salud mental. El clima de tu zona y la estación marcan cuánto puedes contar con esta
+          opción a lo largo del año. Además, muchos parques cuentan con circuitos biosaludables gratuitos.
+        </p>
+
+        <h3>Factores clave para tomar la decisión</h3>
+        <ul>
+          <li><strong>Objetivo:</strong> fuerza, adelgazar, movilidad, bienestar o resistencia.</li>
+          <li><strong>Presupuesto:</strong> desde gratis (aire libre, o en casa sin material) hasta la cuota de un centro con sesiones guiadas.</li>
+          <li><strong>Tiempo disponible:</strong> desplazamiento al gimnasio vs. entrenar en casa.</li>
+          <li><strong>Estado físico:</strong> algunos entrenamientos requieren una base previa.</li>
+          <li><strong>Motivación:</strong> el ambiente grupal ayuda a muchas personas a ser constantes.</li>
+        </ul>
+
+        <h3>¿Cuánto ejercicio recomienda la OMS?</h3>
+        <p>
+          La Organización Mundial de la Salud recomienda para adultos al menos 150-300 minutos semanales
+          de actividad aeróbica moderada o 75-150 minutos de actividad vigorosa, combinados con ejercicios
+          de fortalecimiento muscular al menos 2 días por semana. Independientemente del tipo de entrenamiento
+          que elijas, lo importante es la constancia.
+        </p>
+
+        <div className={styles.warningBox} role="note">
+          <strong>Importante:</strong> Antes de iniciar cualquier programa de entrenamiento intenso,
+          especialmente si tienes más de 40 años, llevas tiempo sedentario o tienes alguna condición
+          de salud, consulta con tu médico o un profesional de la actividad física.
+        </div>
+      </EducationalSection>
+    </>
+  );
+
+  // Ámbito de los importes de la pregunta 4 (hallazgo 3193; forma del 949 de selector-smartphone).
+  const ambito = (
+    <RegionBadge
+      variant="es-data"
+      text="Presupuestos en euros, con España como referencia. El cuestionario sirve en cualquier país"
+    />
+  );
+
   // Resultado
   if (mostrarResultado) {
     const puntos = calcularPuntuaciones();
@@ -384,6 +497,8 @@ export default function SelectorTipoGimnasio() {
           <h1>Tu resultado</h1>
           <p>Basado en tus respuestas, este es el tipo de entrenamiento que mejor se adapta a ti</p>
         </header>
+
+        {ambito}
 
         <LegalNotice />
 
@@ -411,13 +526,18 @@ export default function SelectorTipoGimnasio() {
                       {NOMBRE_TIPOS[tipo]}
                       {descartadas.includes(tipo) && <span className={styles.barraFuera}> (fuera por lo declarado)</span>}
                     </span>
-                    <div className={styles.barraFondo} role="progressbar" aria-valuenow={puntos[tipo]} aria-valuemax={maxPuntos}>
+                    {/* La barra solo dibuja los puntos de la fila: no es un progreso, y como
+                        progressbar sin nombre se anunciaba «barra de progreso, 33 %» sin decir de
+                        qué modalidad (hallazgo 3188). La fila se lee «Yoga / Pilates 21 puntos». */}
+                    <div className={styles.barraFondo} aria-hidden="true">
                       <div
                         className={`${styles.barraRelleno} ${tipo === tipoGanador ? styles.ganador : ''}`}
                         style={{ width: maxPuntos > 0 ? `${Math.round((puntos[tipo] / maxPuntos) * 100)}%` : '0%' }}
                       />
                     </div>
-                    <span className={styles.barraPuntos}>{puntos[tipo]}</span>
+                    <span className={styles.barraPuntos}>
+                      {puntos[tipo]}<span className="sr-only"> puntos</span>
+                    </span>
                   </div>
                 ))}
             </div>
@@ -438,82 +558,7 @@ export default function SelectorTipoGimnasio() {
           </button>
         </div>
 
-        <DisclaimerCard variant="medical" severity="high" />
-
-        <EducationalSection
-          title="¿Cómo elegir el entrenamiento adecuado?"
-          subtitle="Todo lo que debes saber para tomar la mejor decisión para tu salud y objetivos"
-        >
-          <h3>Los 5 tipos de entrenamiento más populares en España</h3>
-          <p>
-            En España existe una gran variedad de opciones para hacer ejercicio. Cada modalidad tiene sus puntos
-            fuertes y se adapta mejor a perfiles distintos de persona. Conocer las diferencias te ayudará
-            a elegir con criterio.
-          </p>
-
-          <h3>Gimnasio tradicional</h3>
-          <p>
-            Es la opción más versátil y accesible. Permite combinar máquinas de musculación, peso libre,
-            cardio y clases colectivas (zumba, spinning, bodypump...). Los precios en España oscilan
-            entre 20 y 60 € al mes dependiendo de la ciudad y las instalaciones. Es ideal si quieres
-            flexibilidad horaria y variedad de opciones bajo un mismo techo.
-          </p>
-
-          <h3>CrossFit y entrenamiento funcional</h3>
-          <p>
-            El CrossFit combina levantamiento de pesas olímpico, movimientos gimnásticos y cardio de alta
-            intensidad en sesiones de grupo llamadas WOD (Workout Of the Day). El entrenamiento funcional
-            es similar pero menos estructurado en cuanto a metodología. Son ideales para personas con buena
-            condición física que buscan retos constantes y comunidad. El precio suele ser más elevado (60-120 €/mes).
-          </p>
-
-          <h3>Yoga y pilates</h3>
-          <p>
-            Aunque son disciplinas distintas, comparten el enfoque en el cuerpo y la mente. El yoga trabaja
-            la flexibilidad, la respiración y la meditación. El pilates se centra en el core, la postura
-            y el control muscular. Ambos son muy recomendados para personas con estrés, sedentarismo o
-            lesiones de espalda. Las clases en España rondan los 30-80 €/mes.
-          </p>
-
-          <h3>Entrenamiento en casa</h3>
-          <p>
-            Con aplicaciones, YouTube y materiales básicos (esterilla, mancuernas, banda elástica) es posible
-            entrenar eficazmente desde casa. Es la opción más económica y cómoda, aunque requiere mayor
-            autodisciplina. Especialmente popular desde 2020, sigue siendo una opción válida para personas
-            con horarios complicados o poca movilidad.
-          </p>
-
-          <h3>Entrenamiento al aire libre</h3>
-          <p>
-            Running, ciclismo, senderismo, calistenia en parques o deportes de equipo son formas muy
-            completas de mantenerse activo. La exposición al sol y la naturaleza tiene beneficios adicionales
-            para la salud mental. España tiene un clima favorable la mayor parte del año, lo que facilita
-            esta opción. Además, muchos parques cuentan con circuitos biosaludables gratuitos.
-          </p>
-
-          <h3>Factores clave para tomar la decisión</h3>
-          <ul>
-            <li><strong>Objetivo:</strong> fuerza, adelgazar, movilidad, bienestar o resistencia.</li>
-            <li><strong>Presupuesto:</strong> gratuito (aire libre) hasta 120 €/mes (CrossFit premium).</li>
-            <li><strong>Tiempo disponible:</strong> desplazamiento al gimnasio vs. entrenar en casa.</li>
-            <li><strong>Estado físico:</strong> algunos entrenamientos requieren una base previa.</li>
-            <li><strong>Motivación:</strong> el ambiente grupal ayuda a muchas personas a ser constantes.</li>
-          </ul>
-
-          <h3>¿Cuánto ejercicio recomienda la OMS?</h3>
-          <p>
-            La Organización Mundial de la Salud recomienda para adultos al menos 150-300 minutos semanales
-            de actividad aeróbica moderada o 75-150 minutos de actividad vigorosa, combinados con ejercicios
-            de fortalecimiento muscular al menos 2 días por semana. Independientemente del tipo de entrenamiento
-            que elijas, lo importante es la constancia.
-          </p>
-
-          <div className={styles.warningBox} role="note">
-            <strong>Importante:</strong> Antes de iniciar cualquier programa de entrenamiento intenso,
-            especialmente si tienes más de 40 años, llevas tiempo sedentario o tienes alguna condición
-            de salud, consulta con tu médico o un profesional de la actividad física.
-          </div>
-        </EducationalSection>
+        {guia}
 
         <RelatedApps />
         <ShareCard appName="selector-tipo-gimnasio" />
@@ -534,6 +579,8 @@ export default function SelectorTipoGimnasio() {
         <p>Responde 10 preguntas y descubre el entrenamiento que mejor se adapta a ti</p>
       </header>
 
+      {ambito}
+
       <LegalNotice />
 
       <div className={styles.quiz}>
@@ -541,9 +588,19 @@ export default function SelectorTipoGimnasio() {
         <div className={styles.progreso}>
           <div className={styles.progresoLabel}>
             <span>Pregunta {preguntaActual + 1} de {totalPreguntas}</span>
-            <span>{progresoPct}% completado</span>
+            {/* «%» con espacio duro (CLAUDE.md §2, hallazgo 3191). */}
+            <span>{progresoPct}&nbsp;% completado</span>
           </div>
-          <div className={styles.progresoBar} role="progressbar" aria-valuenow={progresoPct} aria-valuemin={0} aria-valuemax={100}>
+          {/* Con nombre: era un «progressbar» mudo (hallazgo 3188). */}
+          <div
+            className={styles.progresoBar}
+            role="progressbar"
+            aria-label="Progreso del test"
+            aria-valuenow={progresoPct}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuetext={`${progresoPct} % completado`}
+          >
             <div className={styles.progresoFill} style={{ width: `${progresoPct}%` }} />
           </div>
         </div>
@@ -561,6 +618,9 @@ export default function SelectorTipoGimnasio() {
                 onClick={() => seleccionarOpcion(idx)}
                 role="radio"
                 aria-checked={seleccionActual === idx}
+                // Tabindex itinerante: la marcada, o la primera si no hay ninguna (3187).
+                tabIndex={seleccionActual >= 0 ? (seleccionActual === idx ? 0 : -1) : idx === 0 ? 0 : -1}
+                onKeyDown={(e) => teclaEnOpcion(e, idx)}
               >
                 {opcion.texto}
               </button>
@@ -590,6 +650,8 @@ export default function SelectorTipoGimnasio() {
           </button>
         </div>
       </div>
+
+      {guia}
 
       <RelatedApps />
       <ShareCard appName="selector-tipo-gimnasio" />

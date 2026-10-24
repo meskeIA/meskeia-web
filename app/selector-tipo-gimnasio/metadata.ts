@@ -37,7 +37,15 @@ export const jsonLd = generateWebAppSchema({
   description: "Test de 10 preguntas para saber qué tipo de entrenamiento o gimnasio se adapta mejor a ti: gimnasio tradicional, CrossFit o funcional, yoga o pilates, entrenamiento en casa o al aire libre.",
   url: "https://meskeia.com/selector-tipo-gimnasio/",
   category: 'UtilityApplication',
-  features: [],
+  // Lo que la app hace de verdad (hallazgo 3190, §1.ter): antes iba vacía.
+  features: [
+    'Test de 10 preguntas sobre objetivo, nivel, presupuesto, espacio, horario y lesiones',
+    'Compara cinco modalidades: gimnasio tradicional, CrossFit o funcional, yoga o pilates, en casa y al aire libre',
+    'Marcador con los puntos de cada modalidad',
+    'Descarta las modalidades de pago si prefieres opciones gratuitas, y el entrenamiento en casa si no tienes espacio',
+    'Avisa de los empates y de cuando el resultado choca con lo declarado (presupuesto, lesiones o nivel)',
+    'Funciona en el navegador, sin registro',
+  ],
 });
 
 export const faqJsonLd = {
@@ -65,7 +73,7 @@ export const faqJsonLd = {
       name: '¿Es efectivo entrenar en casa sin equipamiento?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El entrenamiento en casa con el peso corporal (calistenia) es perfectamente válido para mejorar la condición física, especialmente para personas principiantes o intermedias. Ejercicios como sentadillas, flexiones, dominadas y planchas permiten trabajar todos los grupos musculares. La principal limitación aparece en etapas avanzadas, donde la progresión de carga se complica sin pesas. La constancia y la planificación de la progresión son más determinantes que el lugar de entrenamiento.',
+        text: 'El entrenamiento en casa con el peso corporal (calistenia) es perfectamente válido para mejorar la condición física, especialmente para personas principiantes o intermedias. Ejercicios como sentadillas, flexiones, zancadas y planchas permiten trabajar todos los grupos musculares. La principal limitación aparece en etapas avanzadas, donde la progresión de carga se complica sin pesas. La constancia y la planificación de la progresión son más determinantes que el lugar de entrenamiento.',
       },
     },
     {
@@ -81,7 +89,8 @@ export const faqJsonLd = {
       name: '¿Con qué frecuencia semanal hay que ir al gimnasio para ver resultados?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La recomendación general para obtener mejoras visibles en fuerza y composición corporal es entrenar entre 3 y 5 días a la semana, con al menos un día de descanso entre sesiones de los mismos grupos musculares. Para principiantes, 3 sesiones semanales de cuerpo completo son suficientes para progresar. Los resultados también dependen de la calidad del sueño, la nutrición y la consistencia a lo largo del tiempo, más que de la frecuencia puntual.',
+        // La de la OMS que cita la guía de la página; «3-5 días» y «3 sesiones» iban sin fuente (3194).
+        text: 'La Organización Mundial de la Salud recomienda a los adultos ejercicios de fortalecimiento muscular al menos 2 días por semana, además de 150-300 minutos semanales de actividad aeróbica moderada (o 75-150 de actividad vigorosa). Conviene dejar al menos un día de descanso entre sesiones de los mismos grupos musculares. Los resultados también dependen de la calidad del sueño, la nutrición y la constancia a lo largo del tiempo, más que de la frecuencia puntual.',
       },
     },
   ],
