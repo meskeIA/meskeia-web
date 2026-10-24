@@ -17,6 +17,7 @@ import {
   type ModoEstimulo,
   type Muestra,
 } from './motor';
+import { RESPUESTA_TODO_O_NADA, RESPUESTA_REFRACTARIO } from './metadata';
 
 // ============================================
 // UTILIDADES
@@ -603,7 +604,8 @@ export default function SimuladorPotencialAccionPage() {
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>¿Qué significa la ley del &quot;todo o nada&quot;?</h4>
-              <p>Si el estímulo NO alcanza el umbral, no hay PA: solo respuesta pasiva que decae rápido. Si SÍ lo alcanza (o lo supera), el PA es <strong>siempre del mismo tamaño</strong> e idéntica forma. Aumentar la intensidad NO produce un PA &quot;más grande&quot;; produce más PAs por segundo (codificación por frecuencia).</p>
+              {/* La misma respuesta que el FAQPage, de una sola constante (hallazgo 2955). */}
+              <p>{RESPUESTA_TODO_O_NADA}</p>
               <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, con el pulso de 5 ms que viene de fábrica, prueba intensidad = 23 (subumbral) y luego 24: verás un cambio brusco de NADA a PA completo, con el mismo pico de +35 mV. Si acortas el pulso hace falta más intensidad, porque la membrana carga con τ = 5 ms y no llega a su asíntota.</p>
             </div>
 
@@ -615,11 +617,10 @@ export default function SimuladorPotencialAccionPage() {
 
             <div className={styles.faqItem}>
               <h4>¿Qué es el periodo refractario?</h4>
-              <p>Tras un PA, hay un breve tiempo en que la neurona no puede disparar otro:
-              <strong> absoluto</strong> (1-2 ms): canales de Na⁺ inactivados, IMPOSIBLE disparar.
-              <strong> relativo</strong> (3-5 ms): hiperpolarización, NECESITA estímulo más fuerte.
-              Esto limita la frecuencia máxima a ~500 Hz e impide que el PA &quot;se devuelva&quot; por donde llegó.</p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> Es lo que asegura la propagación unidireccional del PA por el axón.</p>
+              {/* La misma respuesta que el FAQPage (hallazgo 2955), y el modelo hace lo que dice:
+                  absoluto = la espiga de 2 ms, relativo = los 5 ms de hiperpolarización (2954). */}
+              <p>{RESPUESTA_REFRACTARIO}</p>
+              <p className={styles.faqTip}><span aria-hidden="true">💡</span> En el simulador, el absoluto es la espiga (2 ms) y el relativo, los 5 ms de hiperpolarización que la siguen. En modo sostenido con el pulso de 5 ms cada 5 ms y la intensidad al máximo, el siguiente PA llega antes de que acabe la hiperpolarización; con una intensidad baja, ya no.</p>
             </div>
 
             <div className={styles.faqItem}>
@@ -688,7 +689,7 @@ export default function SimuladorPotencialAccionPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <strong>Memoriza los iones clave</strong>
-              <p>Na⁺ entra → despolariza. K⁺ sale → repolariza. Cl⁻ entra → hiperpolariza (inhibitoria). Ca²⁺ entra → libera neurotransmisor en sinapsis. Los 4 cubren 90 % de la fisiología neuronal básica.</p>
+              <p>Na⁺ entra → despolariza. K⁺ sale → repolariza. Cl⁻ entra → hiperpolariza (inhibitoria). Ca²⁺ entra → libera neurotransmisor en sinapsis. Con estos cuatro se explican las fases del potencial de acción y la liberación en la sinapsis.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🎯</span>

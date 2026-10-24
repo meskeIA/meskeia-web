@@ -1,6 +1,18 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
+/*
+ * UNA respuesta por pregunta, que importan el FAQPage y la FAQ visible de page.tsx: antes cada
+ * boca tenía su texto, y el FAQPage daba el absoluto «≈1-2 ms» sin cifra para el relativo
+ * mientras la pantalla daba «relativo (3-5 ms)» (hallazgo 2955; receta de
+ * simulador-gastos-compraventa-garaje).
+ */
+export const RESPUESTA_TODO_O_NADA =
+  'Una neurona o dispara un potencial de acción completo o no dispara nada. Si el estímulo no alcanza el umbral, no hay potencial de acción: solo una respuesta local subumbral que decae sin propagarse. Si lo alcanza (o lo supera), el potencial de acción es siempre del mismo tamaño y forma, sea cual sea la intensidad: aumentarla no produce un potencial «más grande», sino más potenciales por segundo. Por eso la información del sistema nervioso se codifica en la frecuencia de disparo, no en la amplitud.';
+
+export const RESPUESTA_REFRACTARIO =
+  'Tras un potencial de acción hay un breve tiempo en que la neurona no puede volver a disparar como antes. En el periodo refractario absoluto (1-2 ms) los canales de Na⁺ están inactivados y es imposible generar otro potencial de acción, por grande que sea el estímulo. En el relativo (3-5 ms) los canales de K⁺ siguen abiertos, el potencial está en hiperpolarización y solo un estímulo más intenso que el normal desencadena un nuevo disparo. El absoluto limita la frecuencia máxima de disparo a unos 500 Hz e impide que el potencial de acción «se devuelva» por donde llegó.';
+
 export const metadata: Metadata = {
   title: 'Simulador del Potencial de Acción Neuronal | meskeIA',
   description: 'Visualiza el disparo de una neurona: despolarización, repolarización, hiperpolarización y periodos refractarios. Estímulo configurable y umbral ajustable.',
@@ -68,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Qué significa la ley del "todo o nada" en neurociencia?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La ley del "todo o nada" establece que una neurona o dispara un potencial de acción completo o no dispara nada, independientemente de la intensidad del estímulo supraumbral. Un estímulo que no alcanza el umbral produce solo una respuesta local subumbral que se desvanece sin propagarse. Esta ley explica por qué la información en el sistema nervioso se codifica en frecuencia de disparos, no en amplitud.',
+        text: RESPUESTA_TODO_O_NADA,
       },
     },
     {
@@ -92,7 +104,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre periodo refractario absoluto y relativo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Durante el periodo refractario absoluto (≈1-2 ms tras el disparo), los canales de Na⁺ están inactivados y es imposible generar otro potencial de acción por grande que sea el estímulo. En el periodo refractario relativo los canales de K⁺ siguen abiertos, el potencial está en hiperpolarización y solo un estímulo más intenso que el umbral normal puede desencadenar un nuevo disparo. Esta diferencia determina la frecuencia máxima de disparo de una neurona.',
+        text: RESPUESTA_REFRACTARIO,
       },
     },
   ],

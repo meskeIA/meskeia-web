@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
 import { parseSpanishNumber } from '../../lib/formatters';
-import { REFRACTARIO_ABSOLUTO } from '../../app/simulador-potencial-accion/motor';
+import { REFRACTARIO_ABSOLUTO, REFRACTARIO_RELATIVO } from '../../app/simulador-potencial-accion/motor';
 import { PUERTO } from './_puerto';
 
 /**
@@ -74,13 +74,21 @@ interface Trazado {
   picoT: number;
   valleV: number;
   valleT: number;
+  /** Borde superior del trazo en su punto más alto y borde inferior en el más bajo. */
+  picoBorde: number;
+  valleBorde: number;
+  /** Centro del marcador del pico (#48A9A6), que tapa el vértice de la curva. */
+  marcadorV: number;
+  marcadorT: number;
 }
 
 /**
  * Mide la curva REALMENTE dibujada en el canvas, no el rótulo: busca los píxeles del trazo
  * (#2E86AB) y los convierte a mV y ms con la escala que el propio componente declara
  * (rango −100..+50 mV, ventana 0..50 ms, márgenes 30/30/50/60). Devuelve el centro del trazo,
- * que tiene 2,5 px de grosor ≈ 1,3 mV.
+ * que tiene 2,5 px de grosor ≈ 1,3 mV, y los bordes de sus extremos: desde el 24/10/2026 la
+ * espiga sube en 0,5 ms y una columna de píxel cerca del vértice abarca varios mV de flanco, así
+ * que su centro queda por debajo del pico (32,3 mV con el pico en 35); el borde no.
  */
 async function medirTrazado(page: Page): Promise<Trazado> {
   return page.evaluate(() => {
@@ -94,11 +102,30 @@ async function medirTrazado(page: Page): Promise<Trazado> {
     const [yMin, yMax, T] = [-100, 50, 50];
     const aVoltios = (y: number) => yMin + ((pad.top + plotH - y) / plotH) * (yMax - yMin);
     const aMilisegundos = (x: number) => ((x - pad.left) / plotW) * T;
+    // Tolerancia 20, no 40: con 40 entraba también el marcador del pico (#48A9A6, a 26/35/5 del
+    // trazo), un círculo de 5 px de radio que el borde superior medía como +37 mV.
     const esTrazo = (r: number, g: number, b: number) =>
-      Math.abs(r - 46) < 40 && Math.abs(g - 134) < 40 && Math.abs(b - 171) < 40;
+      Math.abs(r - 46) < 20 && Math.abs(g - 134) < 20 && Math.abs(b - 171) < 20;
 
     let pico = { v: -Infinity, t: 0 };
     let valle = { v: Infinity, t: 0 };
+    let picoBorde = -Infinity;
+    let valleBorde = Infinity;
+    const esMarcador = (r: number, g: number, b: number) =>
+      Math.abs(r - 72) < 20 && Math.abs(g - 169) < 20 && Math.abs(b - 166) < 20;
+    // Solo por encima de +25 mV y dentro del área del trazado: el lienzo tiene otros elementos
+    // en ese color (leyenda, rótulos) que no son el marcador.
+    const marcador = { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity };
+    for (let yp = 0; yp < canvas.height; yp++) {
+      if (aVoltios(yp / dpr) < 25 || aVoltios(yp / dpr) > 45) continue;
+      for (let xp = Math.round(pad.left * dpr); xp <= Math.round((pad.left + plotW) * dpr); xp++) {
+        const i = (yp * canvas.width + xp) * 4;
+        if (img.data[i + 3] > 200 && esMarcador(img.data[i], img.data[i + 1], img.data[i + 2])) {
+          marcador.x0 = Math.min(marcador.x0, xp); marcador.x1 = Math.max(marcador.x1, xp);
+          marcador.y0 = Math.min(marcador.y0, yp); marcador.y1 = Math.max(marcador.y1, yp);
+        }
+      }
+    }
     for (let xp = Math.round(pad.left * dpr); xp <= Math.round((pad.left + plotW) * dpr); xp++) {
       let arriba: number | null = null;
       let abajo: number | null = null;
@@ -114,8 +141,14 @@ async function medirTrazado(page: Page): Promise<Trazado> {
       const centro = (aVoltios(arriba / dpr) + aVoltios(abajo / dpr)) / 2;
       if (centro > pico.v) pico = { v: centro, t };
       if (centro < valle.v) valle = { v: centro, t };
+      picoBorde = Math.max(picoBorde, aVoltios(arriba / dpr));
+      valleBorde = Math.min(valleBorde, aVoltios(abajo / dpr));
     }
-    return { picoV: pico.v, picoT: pico.t, valleV: valle.v, valleT: valle.t };
+    return {
+      picoV: pico.v, picoT: pico.t, valleV: valle.v, valleT: valle.t, picoBorde, valleBorde,
+      marcadorV: aVoltios((marcador.y0 + marcador.y1) / 2 / dpr),
+      marcadorT: aMilisegundos((marcador.x0 + marcador.x1) / 2 / dpr),
+    };
   });
 }
 
@@ -145,22 +178,29 @@ test('caso de dato: con I=40 u.a. y pulso de 5 ms la neurona dispara un PA con l
   await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('35,0 mV');
 
   // Y ahora el TRAZADO, no el rótulo: el pico dibujado tiene que estar en +35 mV alrededor de
-  // t = 8,3 ms (disparo en 7,3 ms + 1 ms de despolarización rápida) y la hiperpolarización en
-  // −85 mV hacia t = 10,3 ms (+2 ms de repolarización). Amplitud reposo→pico = 105 mV, los
-  // «unos 100 mV» declarados; despolarización+repolarización = 3,0 ms, los «2-3 ms» declarados.
-  // Tolerancia: el trazo mide 2,5 px ≈ 1,3 mV y una columna de píxel ≈ 0,05 ms.
+  // t = 7,8 ms (disparo en 7,3 ms + 0,5 ms de despolarización rápida) y la hiperpolarización en
+  // −85 mV hacia t = 9,3 ms (+1,5 ms de repolarización; espiga del 24/10/2026, hallazgo 2954: antes
+  // 1 + 2 ms). Amplitud reposo→pico = 105 mV, los «unos 100 mV» declarados; despolarización +
+  // repolarización = 2,0 ms, dentro de los «2-3 ms» declarados.
+  // Tolerancia: el trazo mide 2,5 px ≈ 1,3 mV (sus bordes, ±0,65 mV del valor) y una columna de
+  // píxel ≈ 0,05 ms. El marcador del pico (círculo de 5 px, unos 2 mV) se pinta ENCIMA del
+  // vértice: la curva visible sube hasta su borde inferior, y el marcador va centrado en el pico.
   const trazado = await medirTrazado(page);
-  expect(trazado.picoV).toBeGreaterThan(32.5);
-  expect(trazado.picoV).toBeLessThan(37.5);
-  expect(trazado.picoT).toBeGreaterThan(8.0);
-  expect(trazado.picoT).toBeLessThan(8.6);
-  expect(trazado.valleV).toBeGreaterThan(-86.5);
-  expect(trazado.valleV).toBeLessThan(-82.5);
-  expect(trazado.valleT).toBeGreaterThan(10.0);
-  expect(trazado.valleT).toBeLessThan(10.6);
-  // La repolarización dura 2 ms: del pico al valle.
-  expect(trazado.valleT - trazado.picoT).toBeGreaterThan(1.7);
-  expect(trazado.valleT - trazado.picoT).toBeLessThan(2.3);
+  expect(trazado.picoBorde).toBeGreaterThan(31);
+  expect(trazado.picoBorde).toBeLessThan(36.5);
+  expect(trazado.marcadorV).toBeGreaterThan(34);
+  expect(trazado.marcadorV).toBeLessThan(36);
+  expect(trazado.marcadorT).toBeGreaterThan(7.6);
+  expect(trazado.marcadorT).toBeLessThan(8.0);
+  expect(trazado.picoT).toBeGreaterThan(7.5);
+  expect(trazado.picoT).toBeLessThan(8.1);
+  expect(trazado.valleBorde).toBeGreaterThan(-87);
+  expect(trazado.valleBorde).toBeLessThan(-84);
+  expect(trazado.valleT).toBeGreaterThan(9.0);
+  expect(trazado.valleT).toBeLessThan(9.6);
+  // La repolarización dura 1,5 ms: del pico al valle.
+  expect(trazado.valleT - trazado.picoT).toBeGreaterThan(1.2);
+  expect(trazado.valleT - trazado.picoT).toBeLessThan(1.8);
 });
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -212,28 +252,31 @@ test('caso límite: el periodo refractario impide un PA por pulso cuando los est
   await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
   await sembrarValor(page, INTERVALO, 5);
 
-  // A mano: el primer PA arranca en 5 + 5·ln(40/25) = 7,35 ms y la plantilla ocupa 8 ms
-  // (1 de despolarización + 2 de repolarización + 5 de recuperación), durante los cuales el
-  // estímulo no cuenta en absoluto: es el refractario ABSOLUTO. Después viene el RELATIVO,
-  // con el umbral elevado 15 mV que decae en 6 ms, así que el segundo PA se retrasa hasta
-  // 21,3 ms. Intervalo = 21,3 − 7,3 = 14,0 ms → 1000/14,0 = 71 Hz.
-  await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('3');
-  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('71 Hz');
+  // Modelo desde el 24/10/2026 (hallazgo 2954): espiga de 2 ms (0,5 de subida + 1,5 de bajada),
+  // que es el refractario ABSOLUTO —el estímulo no cuenta—, y 5 ms de hiperpolarización, que es
+  // el RELATIVO: el estímulo vuelve a sumar encima de la plantilla y el umbral, elevado 15 mV,
+  // decae. A mano: el primer PA arranca en 5 + 5·ln(40/25) = 7,35 → 7,3 ms; espiga hasta 9,3.
+  // El pulso de 10-12,5 ms deja u = 40·(1 − 0,98²⁵) = 15,86 sobre una plantilla de −75,7
+  // (−59,8 mV, lejos del umbral de −52,7) y la hiperpolarización acaba en 14,3 sin disparo. El
+  // pulso de 15 ms parte de u ≈ 10 y cruza −55 en 15,9 ms. Intervalo 8,6 ms → 1000/8,6 = 116 Hz,
+  // y 5 PA (7,3 · 15,9 · 25,9 · 35,9 · 45,9) para 9 pulsos.
+  await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('5');
+  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('116 Hz');
 
-  // Con estímulo continuo (pulso de 5 ms cada 5 ms) el tren se aprieta: 7,3 · 18,5 · 29,7 ·
-  // 40,9 ms, o sea 11,2 ms entre PAs → 89 Hz.
+  // Con estímulo continuo (pulso de 5 ms cada 5 ms) el tren se aprieta y el 2.º PA llega EN la
+  // hiperpolarización: u = 40·(1 − 0,98ⁿ) sobre −85 + 0,3·n cruza −55 + 15·e^(−0,06·n) en
+  // n = 37 (13,0 ms; en n = 36, −53,53 frente a −53,27). 5,7 ms entre PA → 175 Hz, 8 PA. Antes,
+  // con la plantilla entera de 8 ms como absoluto, 11,2 ms y 89 Hz.
   await sembrarValor(page, DURACION, 5);
-  await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('4');
-  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('89 Hz');
+  await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('8');
+  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('175 Hz');
 
-  // Y el refractario RELATIVO se nota en que la frecuencia depende de la intensidad: antes
-  // se topaba, porque los 8 ms de plantilla eran refractario absoluto puro y ninguna
-  // intensidad los acortaba.
+  // Y el refractario RELATIVO se nota en que la frecuencia depende de la intensidad: con 24 el
+  // estímulo no cruza el umbral elevado y el 2.º PA espera al final de la hiperpolarización
+  // (9,8 → 16,8 ms, 7,0 ms: 143 Hz y 6 PA).
   await sembrarValor(page, INTENSIDAD, 24);
-  const conMenosFuerza = Number(
-    (await tarjeta(page, 'Nº potenciales de acción').textContent())?.trim(),
-  );
-  expect(conMenosFuerza).toBeLessThan(4);
+  await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('6');
+  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('143 Hz');
 });
 
 /* ══════════════════════════════════════════════════════════════════════════════
@@ -513,10 +556,9 @@ test('el veredicto y la tarjeta «Despolarización del pulso» no se contradicen
 });
 
 test('el refractario absoluto del modelo dura lo que dice la FAQ de la propia app', async ({ page }) => {
-  test.fail(
-    true,
-    'ABIERTO (07/10/2026): REFRACTARIO_ABSOLUTO = 8 ms (la plantilla entera, hiperpolarización incluida) frente al «absoluto (1-2 ms)» de la FAQ',
-  );
+  // REPARADO el 24/10/2026 (2954). Antes REFRACTARIO_ABSOLUTO = 8 ms: la plantilla entera,
+  // hiperpolarización incluida, frente al «absoluto (1-2 ms)» de la FAQ. Ahora la espiga dura
+  // 2 ms y es el absoluto; los 5 ms de hiperpolarización son el relativo («3-5 ms»).
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   const faq = page.locator('[class*="faqItem"]').filter({ hasText: '¿Qué es el periodo refractario?' });
   const texto = await faq.innerText();
@@ -526,21 +568,19 @@ test('el refractario absoluto del modelo dura lo que dice la FAQ de la propia ap
   expect(m).not.toBeNull();
   const maximoDeclarado = Number(m![2]);
 
-  // Lo observable (lo vigila, en verde, el caso límite del refractario de más arriba): con
-  // estímulo continuo al máximo (pulso 5 ms cada 5 ms, I = 40) el 1.er PA sale en 7,3 ms y la
-  // plantilla de 8 ms ignora el estímulo entero —también los 5 ms de hiperpolarización, que
-  // la FAQ llama relativo—, así que el 2.º llega en 18,5: 11,2 ms entre PAs, 89 Hz, y ninguna
-  // intensidad baja de 8 ms (125 Hz), frente a los «~500 Hz» que la FAQ atribuye al
-  // refractario. No se comprueba aquí para no tapar la reparación, que cambiará esa cifra.
-  // Si la reparación reescribe la FAQ en vez del modelo, hay que adaptar esta lectura.
+  // Lo observable lo vigila el caso límite del refractario de más arriba: con estímulo continuo
+  // al máximo el 2.º PA llega a los 5,7 ms, dentro de la hiperpolarización (antes, 11,2 ms).
   expect(REFRACTARIO_ABSOLUTO).toBeLessThanOrEqual(maximoDeclarado);
+  const relativo = texto.match(/relativo\s*\((\d+)-(\d+)\s*ms\)/);
+  expect(relativo).not.toBeNull();
+  expect(REFRACTARIO_RELATIVO).toBeGreaterThanOrEqual(Number(relativo![1]));
+  expect(REFRACTARIO_RELATIVO).toBeLessThanOrEqual(Number(relativo![2]));
 });
 
 test('el FAQPage y la FAQ visible dan la MISMA respuesta a «¿Qué significa la ley del todo o nada?»', async ({ page }) => {
-  test.fail(
-    true,
-    'ABIERTO (07/10/2026): la pregunta está en las dos bocas con textos distintos; la reparación es UNA constante en metadata.ts que importen las dos',
-  );
+  // REPARADO el 24/10/2026 (2955): la pregunta estaba en las dos bocas con textos distintos; ahora
+  // es UNA constante de metadata.ts (RESPUESTA_TODO_O_NADA) que importan las dos. Igual con el
+  // refractario (RESPUESTA_REFRACTARIO), comprobado al final.
   const bloques = await leerJsonLd(page);
   const faqPage = bloques.find((b) => b['@type'] === 'FAQPage');
   expect(faqPage).toBeDefined();
@@ -555,6 +595,16 @@ test('el FAQPage y la FAQ visible dan la MISMA respuesta a «¿Qué significa la
     .locator('p')
     .first();
   expect(normalizar(await visible.innerText())).toBe(normalizar(deLd!.acceptedAnswer.text));
+
+  const refractarioLd = preguntas.find((p) => /refractario/i.test(p.name));
+  expect(refractarioLd).toBeDefined();
+  const refractarioVisible = page
+    .locator('[class*="faqItem"]')
+    .filter({ has: page.locator('h4', { hasText: '¿Qué es el periodo refractario?' }) })
+    .locator('p')
+    .first();
+  expect(normalizar(await refractarioVisible.innerText())).toBe(normalizar(refractarioLd!.acceptedAnswer.text));
+  expect(refractarioLd!.acceptedAnswer.text).toContain('relativo (3-5 ms)');
 });
 
 test('el jsonLd no promete una «animación en tiempo real» que la app no tiene', async ({ page }) => {
@@ -572,10 +622,8 @@ test('el jsonLd no promete una «animación en tiempo real» que la app no tiene
 });
 
 test('el bloque educativo no da una cifra redonda sin fuente («los 4 iones cubren 90 %»)', async ({ page }) => {
-  test.fail(
-    true,
-    'ABIERTO (07/10/2026): «Los 4 cubren 90 % de la fisiología neuronal básica», sin fuente (neutralidad editorial, regla 1)',
-  );
+  // REPARADO el 24/10/2026 (2957): «Los 4 cubren 90 % de la fisiología neuronal básica», sin fuente
+  // (neutralidad editorial, regla 1) y con espacio normal ante el «%». Ahora dice qué explican.
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   const iones = page.locator('[class*="tipCard"]').filter({ hasText: 'Memoriza los iones clave' });
   await expect(iones).toBeVisible();
@@ -625,7 +673,7 @@ test.describe('móvil 390×844, con el dedo', () => {
     await expect(page).toHaveURL(/\/simulador-potencial-accion\/$/);
   });
 
-  test('caso límite: con el dedo, «Estímulo sostenido» saca el intervalo y un tren de 4 PA a 89 Hz', async ({ page }) => {
+  test('caso límite: con el dedo, «Estímulo sostenido» saca el intervalo y un tren de 5 PA a 102 Hz', async ({ page }) => {
     await arrastrarConElDedo(page, INTENSIDAD, 'derecha');
     await expect(etiquetaControl(page, 'Intensidad del estímulo')).toContainText('40 u.a.');
     const boton = page.getByRole('button', { name: /Estímulo sostenido/ });
@@ -633,12 +681,13 @@ test.describe('móvil 390×844, con el dedo', () => {
     await boton.tap();
     await expect(boton).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator(INTERVALO)).toBeVisible();
-    // A mano (pulso 5 ms cada 10 ms, I = 40): 1.er PA en 7,3 ms; la plantilla acaba en 15,4 y
-    // el umbral queda elevado, −55 + 15·e^(−s/2); con V = −70 + 40·(1 − 0,98^k) se cruzan en
-    // s = 3,1 ms → 2.º PA en 18,5 ms (11,2 ms → 89 Hz). El 3.º en 29,7 ms; el pulso de 35-40
-    // no llega (−56,2 frente a −49,8) y el 4.º sale en el de 45-50, en 46,6 ms: 4 PA.
-    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('4');
-    await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('89 Hz');
+    // A mano (pulso 5 ms cada 10 ms, I = 40; modelo del 24/10/2026, hallazgo 2954): 1.er PA en
+    // 7,3 ms; espiga hasta 9,3. El pulso sigue hasta 10 ms: 6 pasos dejan u = 40·(1 − 0,98⁶) =
+    // 4,57, que decae a 4,57·0,98⁵⁰ = 1,66 hasta las 15. El pulso de 15 ms cruza −55 cuando
+    // 40 − 38,34·0,98ⁿ > 15, n = 22 → 2.º PA en 17,1 ms (9,8 ms → 102 Hz). Los siguientes, en
+    // 27,0 · 37,0 · 47,0: 5 PA. Antes (absoluto de 8 ms) eran 4 a 89 Hz.
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('5');
+    await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('102 Hz');
   });
 
   test('caso a rechazar: arrastrando la intensidad más allá del extremo izquierdo se queda en 0 u.a. y en reposo', async ({ page }) => {
@@ -892,9 +941,11 @@ test.describe('Inspector 08/10/2026 — umbral −60, extremos de los controles 
     await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-55,0 mV');
 
     // I = 16: asíntota −54 mV, por encima. Cruza cuando 16·(1 − 0,98^k) > 15 → k = 138 →
-    // latencia 13,70 ms (analítica 5·ln 16 = 13,86; con el factor exacto, 13,80). La plantilla de
-    // 8 ms y otros 13,8 de carga ponen el 2.º PA hacia 40,5 ms y ya no cabe un 3.º: 2 PA a
-    // ~46 Hz (1000/21,8). La horquilla cubre Euler y el factor exacto.
+    // latencia 13,70 ms (analítica 5·ln 16 = 13,86; con el factor exacto, 13,80). Desde el
+    // 24/10/2026 (2954) la carga vuelve a empezar al acabar la espiga de 2 ms (20,7 ms) y sigue
+    // durante la hiperpolarización: otros 138 pasos (13,8 ms) ponen el 2.º PA en 34,5 ms y ya no
+    // cabe un 3.º: 2 PA a ~63 Hz (1000/15,8). Antes, con la plantilla de 8 ms ignorando el
+    // estímulo, ~46 Hz. La horquilla cubre Euler y el factor exacto.
     await sembrarValor(page, INTENSIDAD, 16);
     await expect(barraEstado(page)).toContainText('La neurona DISPARA');
     await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('2');
@@ -902,8 +953,8 @@ test.describe('Inspector 08/10/2026 — umbral −60, extremos de los controles 
     expect(latencia).toBeGreaterThanOrEqual(13.6);
     expect(latencia).toBeLessThanOrEqual(13.95);
     const hz = await cifra(page, 'Frecuencia de disparo');
-    expect(hz).toBeGreaterThanOrEqual(44);
-    expect(hz).toBeLessThanOrEqual(48);
+    expect(hz).toBeGreaterThanOrEqual(61);
+    expect(hz).toBeLessThanOrEqual(65);
   });
 
   // REPARADO el 08/10/2026 (hallazgo 3066): la intensidad necesaria se calcula con el tren de

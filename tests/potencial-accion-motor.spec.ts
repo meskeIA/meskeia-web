@@ -32,7 +32,9 @@ import {
   umbralEfectivo,
   V_REPOSO,
   V_PICO,
+  REFRACTARIO_ABSOLUTO,
   REFRACTARIO_RELATIVO,
+  DURACION_PA,
   type ParametrosSimulacion,
 } from '../app/simulador-potencial-accion/motor';
 
@@ -107,14 +109,18 @@ test.describe('Hallazgo 980 (medio) — el PA arranca en el umbral cruzado', () 
   });
 
   test('la plantilla sube desde donde se le diga hasta el pico', () => {
+    // Desde el 24/10/2026 (2954) la espiga dura 2 ms: 0,5 de subida y 1,5 de bajada.
     expect(formaPA(0, -65)).toBe(-65);
     expect(formaPA(0, -45)).toBe(-45);
-    expect(formaPA(1.0, -65)).toBeCloseTo(V_PICO, 6); // a 1 ms está en el pico
-    expect(formaPA(3.0, -65)).toBeCloseTo(-85, 6); // a 3 ms, en el mínimo de la hiperpolarización
-    expect(formaPA(0.5, -65)).toBeCloseTo((-65 + V_PICO) / 2, 6);
+    expect(formaPA(0.5, -65)).toBeCloseTo(V_PICO, 6); // a 0,5 ms está en el pico
+    expect(formaPA(2.0, -65)).toBeCloseTo(-85, 6); // a 2 ms, en el mínimo de la hiperpolarización
+    expect(formaPA(0.25, -65)).toBeCloseTo((-65 + V_PICO) / 2, 6);
+    expect(formaPA(1.25, -65)).toBeCloseTo((V_PICO - 85) / 2, 6); // mitad de la bajada: −25 mV
+    expect(formaPA(4.5, -65)).toBeCloseTo(-77.5, 6); // mitad de la hiperpolarización
+    expect(formaPA(7.0, -65)).toBe(V_REPOSO); // fin de la plantilla
     // El pico es el mismo salga de donde salga: es la ley del todo o nada.
-    expect(formaPA(0.999, -65)).toBeCloseTo(V_PICO, 0);
-    expect(formaPA(0.999, -45)).toBeCloseTo(V_PICO, 0);
+    expect(formaPA(0.4999, -65)).toBeCloseTo(V_PICO, 0);
+    expect(formaPA(0.4999, -45)).toBeCloseTo(V_PICO, 0);
   });
 });
 
@@ -145,8 +151,55 @@ test.describe('Hallazgo 982 — el refractario relativo existe de verdad', () =>
       intensidad: 40,
     });
     for (let i = 1; i < r.spikes.length; i++) {
-      expect(r.spikes[i].inicio - r.spikes[i - 1].inicio).toBeGreaterThanOrEqual(8);
+      expect(r.spikes[i].inicio - r.spikes[i - 1].inicio).toBeGreaterThan(REFRACTARIO_ABSOLUTO);
     }
+  });
+});
+
+test.describe('Hallazgo 2954 — los refractarios duran lo que dice la FAQ de la app', () => {
+  test('absoluto = la espiga (2 ms, «1-2 ms»); relativo = la hiperpolarización (5 ms, «3-5 ms»)', () => {
+    expect(REFRACTARIO_ABSOLUTO).toBe(2);
+    expect(REFRACTARIO_RELATIVO).toBe(5);
+    expect(DURACION_PA).toBe(7);
+    // Antes REFRACTARIO_ABSOLUTO = 8: la plantilla entera, hiperpolarización incluida.
+  });
+
+  test('con estímulo continuo al máximo, el 2.º PA llega DURANTE la hiperpolarización', () => {
+    // Pulso 5 ms cada 5 ms (continuo desde 5 ms), I = 40, umbral −55. A mano:
+    //   1.er PA en 7,3 ms (latencia 5·ln(40/25) = 2,35 → 2,3 en la rejilla de 0,1 ms).
+    //   Espiga hasta 9,3 ms (absoluto: el estímulo no cuenta, u = 0). Desde ahí, n pasos de
+    //   0,1 ms: u = 40·(1 − 0,98ⁿ) sobre la plantilla −85 + 0,3·n, contra el umbral elevado
+    //   −55 + 15·e^(−0,06·n).
+    //   n = 36 (12,9 ms): 0,98³⁶ = 0,4833 → u = 20,67; v = −74,2 + 20,67 = −53,53 < −53,27.
+    //   n = 37 (13,0 ms): 0,98³⁷ = 0,4736 → u = 21,06; v = −73,9 + 21,06 = −52,84 > −53,37 → dispara.
+    //   Intervalo 5,7 ms (< 7 ms de plantilla) → 175 Hz. Antes: 11,2 ms y 89 Hz.
+    const r = correr({ modo: 'sostenido', duracionEstimulo: 5, intervaloSostenido: 5, intensidad: 40 });
+    expect(r.spikes[0].inicio).toBeCloseTo(7.3, 6);
+    expect(r.spikes[1].inicio).toBeCloseTo(13.0, 6);
+    expect(r.spikes[1].inicio - r.spikes[0].inicio).toBeLessThan(DURACION_PA);
+    expect(r.spikes).toHaveLength(8); // 7,3 · 13,0 · 18,7 · 24,4 · 30,1 · 35,8 · 41,5 · 47,2
+  });
+
+  test('con un estímulo flojo, la hiperpolarización no se salta: el 2.º PA espera a que acabe', () => {
+    // I = 24 continuo: 1.er PA en 9,8 ms. Al acabar la espiga (11,8) u parte de 0; en la
+    // hiperpolarización, u = 24·(1 − 0,98ⁿ) no llega a −55 + 15·e^(−0,06·n) − (−85 + 0,3·n):
+    // en n = 49 (16,7 ms) u = 24·(1 − 0,3716) = 15,08 y v = −70,3 + 15,08 = −55,22, por debajo de
+    // −55 + 15·e^(−2,94) = −54,21. En n = 50 acaba la plantilla: 0,98⁵⁰ = 0,3642, v = −70 + 15,26 = −54,74 > −55,
+    // con el umbral ya nominal → dispara en 16,8 ms, 7,0 ms después del 1.º.
+    const r = correr({ modo: 'sostenido', duracionEstimulo: 5, intervaloSostenido: 5, intensidad: 24 });
+    expect(r.spikes[0].inicio).toBeCloseTo(9.8, 6);
+    expect(r.spikes[1].inicio).toBeCloseTo(16.8, 6);
+    for (let i = 1; i < r.spikes.length; i++) {
+      expect(r.spikes[i].inicio - r.spikes[i - 1].inicio).toBeGreaterThanOrEqual(DURACION_PA - 1e-9);
+    }
+  });
+
+  test('sin estímulo tras el PA, la membrana vuelve al reposo siguiendo la plantilla', () => {
+    // Pulso único de 5 ms con I = 40: dispara en 7,3; el pulso acaba en 10 ms, en plena
+    // hiperpolarización, y u decae sin cruzar nada. Al final, reposo.
+    const r = correr({ intensidad: 40 });
+    expect(r.spikes).toHaveLength(1);
+    expect(r.trayectoria[r.trayectoria.length - 1].v).toBeCloseTo(V_REPOSO, 1);
   });
 });
 

@@ -3,7 +3,8 @@
  *
  * Es un **integrador con fuga y umbral** (leaky integrate-and-fire) con una plantilla de
  * potencial de acción: la membrana carga hacia V_reposo + I con constante de tiempo τ, y al
- * cruzar el umbral se dispara una forma fija de 8 ms. NO es Hodgkin-Huxley —no hay
+ * cruzar el umbral se dispara una forma fija de 7 ms (2 de espiga y 5 de hiperpolarización;
+ * hasta el 24/10/2026 eran 3 y 5). NO es Hodgkin-Huxley —no hay
  * conductancias ni variables de compuerta m/h/n— y llamarlo así era un error en una app que
  * prepara la EBAU, donde el nombre del modelo es materia examinable (hallazgo 982).
  *
@@ -20,8 +21,14 @@
  *
  *  3. El refractario era uno solo, absoluto, de 8 ms. La FAQ de la app define además el
  *     RELATIVO —una ventana en la que un estímulo más intenso sí dispara— y el jsonLd lo
- *     anunciaba como característica. Ahora existe: el umbral queda elevado al terminar el
- *     PA y decae exponencialmente durante `REFRACTARIO_RELATIVO` ms.
+ *     anunciaba como característica. Desde el hallazgo 982 el umbral quedaba elevado al
+ *     terminar el PA, pero el absoluto seguía siendo la plantilla ENTERA de 8 ms,
+ *     hiperpolarización incluida, frente al «absoluto (1-2 ms)» y «relativo (3-5 ms):
+ *     hiperpolarización» de la FAQ: ninguna intensidad bajaba de 8 ms entre PA (hallazgo
+ *     2954). Ahora la plantilla tiene una espiga de 2 ms (0,5 de subida y 1,5 de bajada), que
+ *     es el absoluto, y 5 ms de hiperpolarización, que es el relativo: en ella la membrana
+ *     vuelve a integrar el estímulo encima de la plantilla y dispara si cruza un umbral
+ *     elevado que decae. Fuera de las dos ventanas, el umbral es el nominal.
  *
  * Casos resueltos a mano en tests/potencial-accion-motor.spec.ts.
  */
@@ -64,17 +71,28 @@ export const DT = 0.1; // ms — paso de simulación
 /** Constante de tiempo de la membrana: cuánto tarda en cargar hacia su asíntota. */
 export const TAU = 5.0; // ms
 
-/** Duración de la plantilla de PA. Durante ella no hay forma de volver a disparar. */
-export const REFRACTARIO_ABSOLUTO = 8.0; // ms
+/** Subida de la espiga: del umbral al pico. */
+export const T_SUBIDA = 0.5; // ms
+/** Bajada de la espiga: del pico al mínimo de la hiperpolarización. */
+export const T_BAJADA = 1.5; // ms
 
 /**
- * Ventana posterior en la que el umbral sigue elevado y decae: un estímulo MÁS INTENSO
- * puede disparar antes de que termine, que es como la propia FAQ define el refractario
- * relativo.
+ * La espiga entera (subida + bajada): canales de Na⁺ inactivados, el estímulo no cuenta y no hay
+ * forma de volver a disparar. Es el «absoluto (1-2 ms)» de la FAQ (hallazgo 2954).
  */
-export const REFRACTARIO_RELATIVO = 6.0; // ms
-/** Cuánto se eleva el umbral justo al terminar el PA, en mV. */
+export const REFRACTARIO_ABSOLUTO = T_SUBIDA + T_BAJADA; // 2 ms
+
+/**
+ * La hiperpolarización que sigue a la espiga: el umbral sigue elevado y decae, así que un
+ * estímulo MÁS INTENSO puede disparar antes de que termine, que es como la propia FAQ define el
+ * refractario relativo («relativo (3-5 ms): hiperpolarización»).
+ */
+export const REFRACTARIO_RELATIVO = 5.0; // ms
+/** Cuánto se eleva el umbral justo al terminar el absoluto, en mV. */
 export const ELEVACION_UMBRAL = 15.0; // mV
+
+/** Duración de la plantilla de PA: espiga + hiperpolarización. */
+export const DURACION_PA = REFRACTARIO_ABSOLUTO + REFRACTARIO_RELATIVO; // 7 ms
 
 /**
  * Despolarización que un pulso de intensidad I y duración d consigue de verdad.
@@ -132,17 +150,17 @@ export function respuestaEstimulo(p: ParametrosSimulacion): RespuestaEstimulo {
  */
 export function formaPA(tDesdeInicio: number, vInicio: number): number {
   if (tDesdeInicio < 0) return V_REPOSO;
-  if (tDesdeInicio < 1.0) {
-    // Despolarización rápida (1 ms): del umbral al pico
-    return vInicio + (V_PICO - vInicio) * (tDesdeInicio / 1.0);
-  }
-  if (tDesdeInicio < 3.0) {
-    // Repolarización (2 ms): del pico a la hiperpolarización
-    return V_PICO + (V_HIPER - V_PICO) * ((tDesdeInicio - 1.0) / 2.0);
+  if (tDesdeInicio < T_SUBIDA) {
+    // Despolarización rápida (0,5 ms): del umbral al pico
+    return vInicio + (V_PICO - vInicio) * (tDesdeInicio / T_SUBIDA);
   }
   if (tDesdeInicio < REFRACTARIO_ABSOLUTO) {
-    // Hiperpolarización + recuperación (5 ms): de −85 al reposo
-    return V_HIPER + (V_REPOSO - V_HIPER) * ((tDesdeInicio - 3.0) / 5.0);
+    // Repolarización (1,5 ms): del pico a la hiperpolarización
+    return V_PICO + (V_HIPER - V_PICO) * ((tDesdeInicio - T_SUBIDA) / T_BAJADA);
+  }
+  if (tDesdeInicio < DURACION_PA) {
+    // Hiperpolarización + recuperación (5 ms, el refractario relativo): de −85 al reposo
+    return V_HIPER + (V_REPOSO - V_HIPER) * ((tDesdeInicio - REFRACTARIO_ABSOLUTO) / REFRACTARIO_RELATIVO);
   }
   return V_REPOSO;
 }
@@ -150,12 +168,12 @@ export function formaPA(tDesdeInicio: number, vInicio: number): number {
 /**
  * Umbral efectivo en un instante, contando el refractario relativo.
  *
- * `msDesdeFinPA` es el tiempo transcurrido desde que terminó el último PA. Durante la
- * ventana relativa el umbral está elevado y decae exponencialmente hacia el nominal.
+ * `msDesdeFinAbsoluto` es el tiempo transcurrido desde que terminó la espiga del último PA.
+ * Durante la ventana relativa el umbral está elevado y decae exponencialmente hacia el nominal.
  */
-export function umbralEfectivo(umbralNominal: number, msDesdeFinPA: number | null): number {
-  if (msDesdeFinPA === null || msDesdeFinPA >= REFRACTARIO_RELATIVO) return umbralNominal;
-  const decaimiento = Math.exp((-3 * msDesdeFinPA) / REFRACTARIO_RELATIVO);
+export function umbralEfectivo(umbralNominal: number, msDesdeFinAbsoluto: number | null): number {
+  if (msDesdeFinAbsoluto === null || msDesdeFinAbsoluto >= REFRACTARIO_RELATIVO) return umbralNominal;
+  const decaimiento = Math.exp((-3 * msDesdeFinAbsoluto) / REFRACTARIO_RELATIVO);
   return umbralNominal + ELEVACION_UMBRAL * decaimiento;
 }
 
@@ -164,9 +182,16 @@ export function simular(p: ParametrosSimulacion): ResultadoSimulacion {
   const spikes: Disparo[] = [];
   const pasos = Math.floor(T_TOTAL / DT);
 
+  // `u` es la despolarización que el estímulo acumula sobre la línea de base: el reposo fuera
+  // de un PA y la plantilla durante la hiperpolarización (refractario relativo). Fuera de un PA
+  // v = V_reposo + u, y la integración es la misma de siempre: v ← v + (V_reposo + I − v)·DT/τ.
+  let u = 0;
   let v = V_REPOSO;
-  let enPA: { inicio: number; pico: number; umbralDisparo: number } | null = null;
-  let finUltimoPA: number | null = null;
+  // `paso` es el índice del disparo: medir la espiga en pasos y no en ms evita que 2,0000000004
+  // caiga del lado equivocado del límite del absoluto.
+  let enPA: { paso: number; umbralDisparo: number } | null = null;
+  const pasosAbsoluto = Math.round(REFRACTARIO_ABSOLUTO / DT);
+  const pasosPA = Math.round(DURACION_PA / DT);
   let estimuloMaxAplicado = 0;
 
   for (let i = 0; i <= pasos; i++) {
@@ -186,27 +211,30 @@ export function simular(p: ParametrosSimulacion): ResultadoSimulacion {
 
     estimuloMaxAplicado = Math.max(estimuloMaxAplicado, estimuloActual);
 
-    if (enPA) {
-      const desde = t - enPA.inicio;
-      v = formaPA(desde, enPA.umbralDisparo);
-      if (desde > REFRACTARIO_ABSOLUTO) {
-        finUltimoPA = t;
-        enPA = null;
-      }
+    const k = enPA ? i - enPA.paso : null;
+    if (enPA && k !== null && k <= pasosAbsoluto) {
+      // Refractario ABSOLUTO: la espiga sigue su plantilla y el estímulo no cuenta.
+      v = formaPA(k * DT, enPA.umbralDisparo);
+      u = 0;
     } else {
-      const objetivo = V_REPOSO + estimuloActual * 1.0; // 1 mV por unidad de intensidad
-      v = v + (objetivo - v) * (DT / TAU);
-
-      const umbralAhora = umbralEfectivo(
-        p.umbral,
-        finUltimoPA === null ? null : t - finUltimoPA
-      );
+      u = u + (estimuloActual * 1.0 - u) * (DT / TAU); // 1 mV por unidad de intensidad
+      let umbralAhora = p.umbral;
+      if (enPA && k !== null && k < pasosPA) {
+        // Refractario RELATIVO: el estímulo suma encima de la hiperpolarización y el umbral está
+        // elevado; solo uno más intenso que el normal llega a cruzarlo.
+        v = formaPA(k * DT, enPA.umbralDisparo) + u;
+        umbralAhora = umbralEfectivo(p.umbral, (k - pasosAbsoluto) * DT);
+      } else {
+        enPA = null;
+        v = V_REPOSO + u;
+      }
 
       if (v > umbralAhora) {
         // El PA arranca EN el umbral que se acaba de cruzar, no en un −55 cableado.
-        enPA = { inicio: t, pico: t + 1.0, umbralDisparo: umbralAhora };
-        spikes.push({ inicio: t, pico: t + 1.0 });
+        enPA = { paso: i, umbralDisparo: umbralAhora };
+        spikes.push({ inicio: t, pico: t + T_SUBIDA });
         v = umbralAhora;
+        u = 0;
       }
     }
 
