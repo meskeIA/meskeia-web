@@ -1867,6 +1867,16 @@ export interface DatosPlusvalia {
    * ella, la cuota sin bonificar.
    */
   ccaa?: ComunidadAutonoma;
+  /**
+   * Lo que se compró era SOLO el suelo (un solar, sobre el que después se construyó), como el
+   * promotor que vende obra nueva. El art. 104.5 TRLRHL aplica la proporción catastral suelo/total
+   * al valor de transmisión y «en su caso» al de adquisición: cuando lo adquirido no tenía
+   * construcción, la compra se compara ENTERA con el valor del suelo en la venta, para la no
+   * sujeción y para el incremento real del art. 107.5 (hallazgo 3466, 24/10/2026). Sin el valor
+   * catastral total no se puede repartir la venta: la no sujeción se decide con venta − compra y
+   * el resultado puede quedarse alto (`sinRepartoSolar`).
+   */
+  adquisicionSoloSuelo?: boolean;
 }
 
 /**
@@ -1896,6 +1906,16 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   cotaSuperior: boolean;
   /** Se ha aplicado la bonificación de Ceuta y Melilla a la cuota (art. 159.2 TRLRHL). */
   bonificadaCiudad: boolean;
+  /**
+   * Con `adquisicionSoloSuelo`: el valor del suelo en la venta (venta × proporción catastral) que
+   * se ha comparado con la compra del solar. undefined si no se ha podido repartir.
+   */
+  valorSueloTransmision?: number;
+  /**
+   * Compra de un solar sin el valor catastral total: la venta no se ha podido repartir, así que la
+   * no sujeción y el método real no la tienen en cuenta y la cifra puede salir más alta que la legal.
+   */
+  sinRepartoSolar: boolean;
 } {
   const {
     valorCatastralSuelo,
@@ -1924,9 +1944,7 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   const baseObjetivo = valorCatastralSuelo * coeficiente;
   const metodoObjetivo = baseObjetivo * (tipoMaximo / 100) * factorCuota;
 
-  // No sujeción cuando no hay incremento de valor (art. 104.5 TRLHL)
   const incrementoReal = precioVenta - precioCompra;
-  const exento = incrementoReal <= 0;
 
   // Método real (art. 107.5 TRLHL): el incremento se reparte en la proporción catastral
   // suelo/total. Solo es calculable si conocemos el valor catastral total.
@@ -1946,8 +1964,22 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   const proporcionSuelo = metodoRealDisponible
     ? Math.min(1, valorCatastralSuelo / (valorCatastralTotal as number))
     : 0;
+  // Incremento del SUELO (art. 104.5 TRLRHL): la proporción va siempre a la venta y a la compra
+  // solo si lo comprado tenía construcción. Comprado un solar, la compra entra entera.
+  const soloSuelo = datos.adquisicionSoloSuelo === true;
+  const valorSueloTransmision = metodoRealDisponible ? precioVenta * proporcionSuelo : undefined;
+  const incrementoSuelo =
+    valorSueloTransmision === undefined
+      ? 0
+      : valorSueloTransmision - (soloSuelo ? precioCompra : precioCompra * proporcionSuelo);
+
+  // No sujeción cuando no hay incremento de valor del terreno (art. 104.5 TRLRHL). Sin solar,
+  // venta − compra ≤ 0 equivale a incrementoSuelo ≤ 0, porque la proporción es positiva.
+  const exento = soloSuelo && valorSueloTransmision !== undefined ? incrementoSuelo <= 0 : incrementoReal <= 0;
+  const sinRepartoSolar = soloSuelo && valorSueloTransmision === undefined;
+
   const metodoReal = metodoRealDisponible
-    ? Math.max(0, incrementoReal * proporcionSuelo * (tipoMaximo / 100) * factorCuota)
+    ? Math.max(0, incrementoSuelo * (tipoMaximo / 100) * factorCuota)
     : 0;
 
   // El contribuyente puede elegir el método más favorable
@@ -1967,6 +1999,8 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
     coeficiente,
     cotaSuperior,
     bonificadaCiudad,
+    valorSueloTransmision: soloSuelo ? valorSueloTransmision : undefined,
+    sinRepartoSolar,
   };
 }
 

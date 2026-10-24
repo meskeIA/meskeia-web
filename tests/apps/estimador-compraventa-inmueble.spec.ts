@@ -9325,7 +9325,12 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
     await campo.blur();
   }
 
-  /** La BASE O en la comunidad dada, con la pestaña Vendedor abierta. */
+  /**
+   * La BASE O en la comunidad dada, con la pestaña Vendedor abierta. En obra nueva, con «Un
+   * inmueble ya construido»: desde el 3466 (24/10/2026) la app pregunta qué compró el promotor y
+   * por defecto es un solar, que con esta base sale NO SUJETA (300.000 × 60/150 = 120.000 ≤
+   * 200.000). Ya construido, la proporción va a las dos y la plusvalía es la de segunda mano.
+   */
   async function baseO(page: Page, ccaa: string, primeraMano = false): Promise<void> {
     await page.goto(RUTA);
     await esperarHidratacion(page, [CAMPO_PRECIO]);
@@ -9334,6 +9339,7 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
     await sembrar(page, 'Precio de la vivienda', '300000');
     await page.getByRole('button', { name: 'Vendedor' }).click();
     await esperarHidratacion(page, ['input[aria-label="Precio de compra original"]']);
+    if (primeraMano) await page.getByLabel('¿Qué compraste?').selectOption('construido');
     await sembrar(page, 'Precio de compra original', '200000');
     await sembrar(page, 'Años de propiedad', '10');
     await sembrar(page, 'Valor catastral del suelo', '60000');
@@ -9483,6 +9489,9 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
    * BASE O: 1800,00 €. Hasta la reparación (3377, 20/10/2026) medía también el valor de
    * transmisión, 289.200,00 €; desde entonces esa tarjeta no se pinta en obra nueva, y la cifra
    * es el neto sin IRPF: 300.000 − 9.000 de comisión − 1.800 de plusvalía.
+   * Desde el 3466 (24/10/2026) eso vale con «Un inmueble ya construido». Con un solar (la opción
+   * de fábrica), el suelo en la venta, 300.000 × 60/150 = 120.000, no supera los 200.000 pagados:
+   * NO SUJETA (art. 104.5 TRLRHL) y neto 300.000 − 9.000 = 291.000,00 €.
    */
   test('CONTROL de montaje — BASE O con «Primera mano»: la plusvalía y la transmisión no cambian', async ({ page }) => {
     test.setTimeout(90_000);
@@ -9490,6 +9499,9 @@ test.describe('Inspector 19/10/2026 — otras rentas del ahorro (3368) y la rama
     await expect(page.getByRole('button', { name: /Primera mano/ })).toHaveAttribute('aria-pressed', 'true');
     expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('1800,00 €');
     expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
+    await page.getByLabel('¿Qué compraste?').selectOption('solar');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('291.000,00 €');
   });
 
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
@@ -9610,12 +9622,14 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
    * La BASE O del describe del 19/10 (300.000 · compra 200.000 · 10 años · suelo 60.000 · total
    * 150.000 · comisión 3 %, la de fábrica), en la comunidad y la transmisión dadas. A mano:
    * plusvalía objetivo 60.000 × 0,12 × 25 % = 1.800 (el real, 100.000 × 60/150 × 25 % = 10.000,
-   * pierde) · comisión 9.000 · transmisión 289.200 · ganancia 89.200.
+   * pierde) · comisión 9.000 · transmisión 289.200 · ganancia 89.200. En obra nueva, con «Un
+   * inmueble ya construido» (3466: con el solar de fábrica esta base sale NO SUJETA).
    */
   async function baseO(page: Page, ccaa: string, primeraMano = false): Promise<void> {
     await abrir(page, ccaa, primeraMano);
     await sembrar(page, 'Precio de la vivienda', '300000');
     await irAVendedor(page);
+    if (primeraMano) await page.getByLabel('¿Qué compraste?').selectOption('construido');
     await sembrar(page, 'Precio de compra original', '200000');
     await sembrar(page, 'Años de propiedad', '10');
     await sembrar(page, 'Valor catastral del suelo', '60000');
@@ -9837,6 +9851,8 @@ test.describe('Inspector 21/10/2026 — reinversión parcial con todo, el plazo 
     await sembrar(page, 'Impuestos y gastos que pagaste al comprar', '20000');
     await sembrar(page, 'Inversiones y mejoras (opcional)', '10000');
     await page.getByRole('button', { name: /Primera mano/ }).click();
+    // Ya construido, la plusvalía de la BASE O (con el solar de fábrica sería no sujeta, 3466).
+    await page.getByLabel('¿Qué compraste?').selectOption('construido');
     expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('289.200,00 €');
     await expect(page.locator(`input[aria-label="${OTRAS}"]`)).toHaveCount(0);
   });
@@ -10181,12 +10197,17 @@ test.describe('Inspector 24/10/2026 — la plusvalía del promotor, quién respo
    *   · compra del solar 140.000: incremento real 150.000 − 140.000 = 10.000 → 2.500,00 € (art.
    *     107.5) frente al objetivo de 7.500 · la app: real (300.000 − 140.000) × 0,5 × 25 % = 20.000,
    *     así que se queda en «7500,00 €»
-   * Si la reparación avisa en vez de calcular, el aviso tiene que nombrar el solar o la regla.
+   * REPARADO (24/10/2026, decisión del usuario): en obra nueva la pestaña Vendedor pregunta «¿Qué
+   * compraste?» (por defecto, el solar) y `calcularPlusvaliaMunicipal` recibe
+   * `adquisicionSoloSuelo`: la venta se reparte en la proporción catastral y la compra del solar
+   * entra entera, para la no sujeción y para el método real. Art. 104.5 y 107.5 TRLRHL releídos en
+   * el BOE (BOE-A-2004-4214, consolidado) el 24/10/2026. Con «Un inmueble ya construido» la
+   * proporción vuelve a ir a las dos (CONTROL), y sin el valor catastral total la venta no se puede
+   * repartir: objetivo, con el aviso de que puede salir más baja.
    */
   test('HALLAZGO plusvalía del promotor — en obra nueva la proporción catastral no se aplica a la compra del solar', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(90_000);
     await abrir(page, 'madrid', true);
     await sembrar(page, 'Precio de la vivienda', '300000');
@@ -10195,14 +10216,32 @@ test.describe('Inspector 24/10/2026 — la plusvalía del promotor, quién respo
     await sembrar(page, 'Años de propiedad', '7');
     await sembrar(page, 'Valor catastral del suelo', '150000');
     await sembrar(page, 'Valor catastral total (suelo + construcción)', '300000');
-    const avisaDelSolar = (d: string) => /solar|en su caso|sin construcci/i.test(d);
-    const v160 = await valorTarjeta(page, 'Plusvalía municipal');
-    const d160 = await descripcionTarjeta(page, 'Plusvalía municipal');
-    expect(v160 === 'NO SUJETA' || avisaDelSolar(d160), `obtenido «${v160} · ${d160}»`).toBe(true);
+    // 300.000 × 150/300 = 150.000 ≤ 160.000 pagados por el solar → no sujeta.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No sujeta: el valor del suelo en la venta (150.000,00 €) no supera lo que se pagó por el solar (art. 104.5 TRLRHL)',
+    );
+    // Neto: 300.000 − 9.000 de comisión.
+    expect(await valorTarjeta(page, /^IMPORTE NETO VENDEDOR/)).toBe('291.000,00 €');
+
+    // 150.000 − 140.000 = 10.000 × 25 % = 2.500, por debajo del objetivo (150.000 × 0,20 × 25 % = 7.500).
     await sembrar(page, 'Precio de compra original', '140000');
-    const v140 = await valorTarjeta(page, 'Plusvalía municipal');
-    const d140 = await descripcionTarjeta(page, 'Plusvalía municipal');
-    expect(v140 === '2500,00 €' || avisaDelSolar(d140), `obtenido «${v140} · ${d140}»`).toBe(true);
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('2500,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain('menos lo pagado por el solar');
+
+    // CONTROL: comprado ya construido, la proporción va también a la compra:
+    // (300.000 − 140.000) × 0,5 × 25 % = 20.000 > 7.500 → objetivo.
+    await page.getByLabel('¿Qué compraste?').selectOption('construido');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('7500,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+
+    // Solar sin el valor catastral total: no se puede repartir la venta → objetivo, con el aviso.
+    await page.getByLabel('¿Qué compraste?').selectOption('solar');
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('7500,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toContain(
+      'Al haberse comprado un solar, puede salir más baja o no sujeta',
+    );
   });
 
   /**

@@ -381,6 +381,43 @@ test.describe('Plusvalía municipal (IIVTNU)', () => {
     expect(p.metodoRealDisponible).toBe(true);
     expect(r2(p.metodoReal)).toBe(12500);
   });
+
+  test('compra de un solar: la proporción va a la venta y la compra entra entera (art. 104.5 TRLRHL, hallazgo 3466)', () => {
+    // Caso de la ficha: venta 300.000, suelo 150.000 de 300.000 → suelo en la venta 150.000.
+    const base = {
+      valorCatastralSuelo: 150000,
+      valorCatastralTotal: 300000,
+      aniosPropiedad: 7,
+      precioVenta: 300000,
+      tipoMaximo: 25,
+    };
+    // Solar a 160.000: 150.000 ≤ 160.000 → no sujeta.
+    const a160 = calcularPlusvaliaMunicipal({ ...base, precioCompra: 160000, adquisicionSoloSuelo: true });
+    expect(a160.exento).toBe(true);
+    expect(a160.recomendado).toBe(0);
+    expect(a160.valorSueloTransmision).toBe(150000);
+    // Solar a 140.000: incremento 10.000 × 25 % = 2.500 frente al objetivo de 7.500.
+    const a140 = calcularPlusvaliaMunicipal({ ...base, precioCompra: 140000, adquisicionSoloSuelo: true });
+    expect(a140.exento).toBe(false);
+    expect(r2(a140.metodoReal)).toBe(2500);
+    expect(r2(a140.recomendado)).toBe(2500);
+    // CONTROL: comprado ya construido, (300.000 − 140.000) × 0,5 × 25 % = 20.000 → objetivo 7.500.
+    const construido = calcularPlusvaliaMunicipal({ ...base, precioCompra: 140000 });
+    expect(r2(construido.metodoReal)).toBe(20000);
+    expect(r2(construido.recomendado)).toBe(7500);
+    expect(construido.valorSueloTransmision).toBeUndefined();
+    expect(construido.sinRepartoSolar).toBe(false);
+    // Solar sin el valor catastral total: no se puede repartir → objetivo, marcado.
+    const sinTotal = calcularPlusvaliaMunicipal({
+      ...base,
+      valorCatastralTotal: undefined,
+      precioCompra: 160000,
+      adquisicionSoloSuelo: true,
+    });
+    expect(sinTotal.sinRepartoSolar).toBe(true);
+    expect(sinTotal.exento).toBe(false);
+    expect(r2(sinTotal.recomendado)).toBe(7500);
+  });
 });
 
 test.describe('Coherencia entre la tool MCP y el motor de las apps web', () => {

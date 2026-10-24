@@ -470,6 +470,11 @@ interface EntradaVendedor {
    * patrimonial del ahorro, y no se liquida IRPF (hallazgo 3377, AVISO_VENTA_PROMOTOR).
    */
   ventaDelPromotor?: boolean;
+  /**
+   * Obra nueva y lo que compró el promotor fue un solar: la compra se compara entera con el valor
+   * del suelo en la venta (art. 104.5 TRLRHL, «en su caso»; hallazgo 3466).
+   */
+  compraSoloSuelo?: boolean;
 }
 
 /**
@@ -505,6 +510,7 @@ function calcularVendedor(e: EntradaVendedor) {
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
         // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL; hallazgo 3069).
         ccaa: e.ccaa,
+        adquisicionSoloSuelo: e.compraSoloSuelo,
       })
     : null;
   const plusvalia = resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0;
@@ -722,6 +728,8 @@ export default function SimuladorCompraventaPage() {
    * son 9.500 € más de valor de adquisición, y quedarse corto ahí infla la ganancia y el IRPF.
    */
   const [regimenCompraOriginal, setRegimenCompraOriginal] = useState<TipoTransmision>('segunda-mano');
+  // Obra nueva: qué compró el promotor. Lo normal es el solar sobre el que construyó (hallazgo 3466).
+  const [compraOriginal, setCompraOriginal] = useState<'solar' | 'construido'>('solar');
 
   // Exención por reinversión en vivienda habitual (art. 38 LIRPF)
   const [reinvierte, setReinvierte] = useState(false);
@@ -1022,6 +1030,7 @@ export default function SimuladorCompraventaPage() {
       // dejaban el IRPF «Sin calcular» como si el vendedor residiera allí. Como en pideExencion.
       irpfForal: puedeSerViviendaHabitual && esViviendaHabitual && TERRITORIOS_IIVTNU_FORAL.includes(ccaa),
       ventaDelPromotor,
+      compraSoloSuelo: ventaDelPromotor && compraOriginal === 'solar',
     };
     const r = calcularVendedor(entrada);
     const rp = r.resultadoPlusvalia;
@@ -1030,7 +1039,9 @@ export default function SimuladorCompraventaPage() {
     let metodoPlusvalia = r.plusvaliaForal ? `No calculada: ${motivoPlusvaliaForal(ccaa)}` : 'No calculada';
     if (rp) {
       metodoPlusvalia = rp.exento
-        ? 'No sujeta (sin incremento de valor)'
+        ? rp.valorSueloTransmision !== undefined
+          ? `No sujeta: el valor del suelo en la venta (${formatCurrency(rp.valorSueloTransmision)}) no supera lo que se pagó por el solar (art. 104.5 TRLRHL)`
+          : 'No sujeta (sin incremento de valor)'
         : rp.parCatastralImposible
           ? 'Método objetivo (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)'
           : !rp.metodoRealDisponible
@@ -1040,8 +1051,15 @@ export default function SimuladorCompraventaPage() {
               ? `Método objetivo (${escritoNoValido(valorCatastralTotal, parseSpanishNumber) ? 'el valor catastral total escrito tiene que ser mayor que 0: corrígelo para comparar con el método real' : 'falta el valor catastral total para comparar'})`
               : 'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).'
             : rp.metodoReal < rp.metodoObjetivo
-              ? 'Método real (más favorable)'
+              ? rp.valorSueloTransmision !== undefined
+                ? `Método real (más favorable): valor del suelo en la venta (${formatCurrency(rp.valorSueloTransmision)}) menos lo pagado por el solar (arts. 104.5 y 107.5 TRLRHL)`
+                : 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
+      // Comprado un solar sin el valor catastral total, la venta no se puede repartir entre suelo
+      // y construcción, y la cifra puede quedarse por encima de la legal (hallazgo 3466).
+      if (!rp.exento && rp.sinRepartoSolar) {
+        metodoPlusvalia = `${metodoPlusvalia}${metodoPlusvalia.endsWith('.') ? '' : '.'} Al haberse comprado un solar, puede salir más baja o no sujeta: el valor catastral total permite comparar lo pagado por el solar con el valor del suelo en la venta.`;
+      }
       if (!rp.exento && rp.bonificadaCiudad) {
         const bonificacion = `la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
         // Receta del 3259 de local-comercial (20/10/2026, efecto familia del 3254 de trastero):
@@ -1210,7 +1228,7 @@ export default function SimuladorCompraventaPage() {
       // reinversión y la hipoteca no mueven la ganancia, pero sí esta base (hallazgo 2904).
       veredictoBase: veredictoDe((x) => (x.hayDatosGanancia ? x.g.baseImponible : 0)),
     };
-  }, [precioVenta, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble, otrasRentasAhorro, tipoTransmision]);
+  }, [precioVenta, ccaa, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, otrosGastosVenta, gastosAdquisicion, mejoras, vendedorMayor65, vendedorDependencia, esViviendaHabitual, excepcionPlazoResidencia, reinvierte, importeReinversion, hipotecaPendiente, tipoInmueble, otrasRentasAhorro, tipoTransmision, compraOriginal]);
 
   /**
    * En Canarias, Ceuta y Melilla la obra nueva no pagó IVA sino IGIC o IPSI, que esta app no
@@ -2226,9 +2244,40 @@ export default function SimuladorCompraventaPage() {
                   onChange={setPrecioCompraOriginal}
                   label="Precio de compra original"
                   placeholder="150000"
-                  helperText="Lo que pagaste cuando compraste"
+                  helperText={
+                    tipoTransmision === 'primera-mano'
+                      ? 'Lo que pagaste por el solar (o por el inmueble, si lo compraste ya construido)'
+                      : 'Lo que pagaste cuando compraste'
+                  }
                   min={0}
                 />
+
+                {/* Obra nueva: el art. 104.5 TRLRHL aplica la proporción catastral a la compra solo
+                    «en su caso», si lo comprado tenía construcción; comprado un solar, se compara
+                    entero con el valor del suelo en la venta (hallazgo 3466). Un <select>, como el
+                    régimen de aquella compra: dos valores cerrados. */}
+                {tipoTransmision === 'primera-mano' && (
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label} htmlFor="compra-original">
+                      ¿Qué compraste?
+                    </label>
+                    <select
+                      id="compra-original"
+                      value={compraOriginal}
+                      onChange={(e) => setCompraOriginal(e.target.value as 'solar' | 'construido')}
+                      className={styles.select}
+                      aria-describedby="nota-compra-original"
+                    >
+                      <option value="solar">Solo el suelo (un solar sobre el que se construyó)</option>
+                      <option value="construido">Un inmueble ya construido</option>
+                    </select>
+                    <p id="nota-compra-original" className={styles.notaEstimar}>
+                      La plusvalía grava solo el suelo. Si compraste un solar, lo que pagaste se compara
+                      entero con el valor del suelo en la venta (art. 104.5 TRLRHL), así que conviene
+                      escribir también el valor catastral total.
+                    </p>
+                  </div>
+                )}
 
                 <NumberInput
                   value={aniosPropiedad}
