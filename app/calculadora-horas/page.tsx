@@ -11,7 +11,15 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
+import {
+  cifraSinUnidad,
+  formatearHM,
+  formatearHMS,
+  operarTiempo,
+  parsearTiempo,
+  type Operacion,
+} from '@/lib/calculadoras/horas';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
@@ -68,51 +76,7 @@ const EQUIVALENCIAS: Array<{ minutos: number; decimal: string }> = [
 // Lógica de tiempo — todo se calcula en minutos enteros
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Convierte texto a minutos. Reglas explícitas para el usuario:
- *   con dos puntos o hache → horas:minutos   ("7:45", "7h45", "1:20:30")
- *   con coma o punto       → horas decimales ("7,75", "7.75")
- *   solo cifras            → horas enteras   ("7")
- * Devuelve null si el texto no es interpretable.
- */
-function parsearTiempo(entrada: string): number | null {
-  const limpio = entrada.trim().toLowerCase().replace(/\s+/g, '');
-  if (!limpio) return null;
-
-  const negativo = limpio.startsWith('-');
-  const cuerpo = limpio.replace(/^[+-]/, '').replace(/h(?!$)/g, ':').replace(/h$/, '');
-  if (!cuerpo) return null;
-
-  let minutos: number;
-
-  if (cuerpo.includes(':')) {
-    const partes = cuerpo.split(':');
-    if (partes.length > 3) return null;
-    const [h, m = '0', s = '0'] = partes;
-    if (![h, m, s].every((p) => /^\d*$/.test(p))) return null;
-    const horas = Number(h || 0);
-    const mins = Number(m || 0);
-    const segs = Number(s || 0);
-    if (mins >= 60 || segs >= 60) return null;
-    minutos = horas * 60 + mins + segs / 60;
-  } else {
-    const decimal = cuerpo.replace(',', '.');
-    if (!/^\d*\.?\d*$/.test(decimal) || decimal === '.') return null;
-    minutos = Number(decimal) * 60;
-  }
-
-  if (!Number.isFinite(minutos)) return null;
-  return Math.round(minutos) * (negativo ? -1 : 1);
-}
-
-/** Minutos → "7:45" (con signo si es negativo) */
-function formatearHM(minutos: number): string {
-  const signo = minutos < 0 ? '−' : '';
-  const abs = Math.abs(Math.round(minutos));
-  const h = Math.floor(abs / 60);
-  const m = abs % 60;
-  return `${signo}${h}:${String(m).padStart(2, '0')}`;
-}
+// Leer y escribir cantidades (y multiplicar o repartir): lib/calculadoras/horas.ts
 
 /** Minutos → "7,75" en formato español */
 function formatearDecimal(minutos: number): string {
@@ -217,6 +181,20 @@ export default function CalculadoraHorasPage() {
   const totalLista = lineasValidas.reduce((suma, x) => suma + x.minutos * x.linea.signo, 0);
   const hayErrorLista = lineas.some((l) => l.texto.trim() !== '' && parsearTiempo(l.texto) === null);
   const mediaLista = lineasValidas.length > 0 ? totalLista / lineasValidas.length : 0;
+
+  // Una cifra sola se lee como horas: «45» son 45:00, no 45 minutos. Se avisa a partir de 10,
+  // donde ya no suele ser una jornada, para que quien quería minutos sepa cómo escribirlos.
+  const cifraDudosa = lineas
+    .map((l) => cifraSinUnidad(l.texto))
+    .find((n): n is number => n !== null && n >= 10);
+
+  // Multiplicar o repartir el total
+  const [operacion, setOperacion] = useState<Operacion>('por');
+  const [factor, setFactor] = useState('');
+  const factorNumero = factor.trim() === '' ? null : parseSpanishNumber(factor);
+  const segundosOperados =
+    factorNumero === null ? null : operarTiempo(totalLista, operacion, factorNumero);
+  const factorErroneo = factorNumero !== null && segundosOperados === null;
 
   // ── Modo 2 ────────────────────────────────────────────────
   const pausaMinutos = pausa.trim() === '' ? 0 : Number(pausa.replace(',', '.'));
@@ -324,9 +302,10 @@ export default function CalculadoraHorasPage() {
           <div className={styles.panel}>
             <h2 className={styles.panelTitle}>Tiempos a sumar o restar</h2>
             <p className={styles.ayuda}>
-              Escribe <strong>7:45</strong> para siete horas y cuarenta y cinco minutos, o{' '}
-              <strong>7,75</strong> para horas decimales. Puedes mezclar los dos formatos en la misma
-              lista.
+              Escribe <strong>7:45</strong> para siete horas y cuarenta y cinco minutos,{' '}
+              <strong>7,75</strong> para horas decimales o <strong>45 min</strong> si son minutos.
+              También se entiende <strong>1 h 20</strong>, <strong>media hora</strong> o{' '}
+              <strong>hora y media</strong>, y se pueden mezclar formatos en la misma lista.
             </p>
 
             <ul className={styles.listaLineas}>
@@ -389,8 +368,17 @@ export default function CalculadoraHorasPage() {
 
             {hayErrorLista && (
               <p className={styles.aviso} role="alert">
-                Hay alguna línea que no se entiende. Usa <strong>7:45</strong> (horas y minutos) o{' '}
-                <strong>7,75</strong> (horas decimales); los minutos no pueden pasar de 59.
+                Hay alguna línea que no se entiende. Usa <strong>7:45</strong> (horas y minutos),{' '}
+                <strong>7,75</strong> (horas decimales) o <strong>45 min</strong> (minutos), una
+                cantidad por línea; junto a unas horas, los minutos no pueden pasar de 59.
+              </p>
+            )}
+
+            {cifraDudosa !== undefined && (
+              <p className={styles.aviso}>
+                Una cifra sin unidad se lee como horas: {cifraDudosa} son{' '}
+                {formatearHM(cifraDudosa * 60)}. Si eran minutos, escribe{' '}
+                <strong>{cifraDudosa} min</strong>.
               </p>
             )}
           </div>
@@ -419,6 +407,58 @@ export default function CalculadoraHorasPage() {
                 <span className={styles.etiquetaResultado}>Media por tiempo</span>
                 <strong className={styles.valorResultado}>{formatearHM(mediaLista)}</strong>
               </div>
+            </div>
+
+            <div className={styles.bloqueOperar}>
+              <h3 className={styles.operarTitulo}>Multiplicar o repartir el total</h3>
+              <div className={styles.operarFila}>
+                <div className={styles.operarBotones} role="group" aria-label="Operación">
+                  <button
+                    type="button"
+                    className={`${styles.btnOperacion} ${operacion === 'por' ? styles.btnOperacionActiva : ''}`}
+                    aria-pressed={operacion === 'por'}
+                    onClick={() => setOperacion('por')}
+                  >
+                    × por
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.btnOperacion} ${operacion === 'entre' ? styles.btnOperacionActiva : ''}`}
+                    aria-pressed={operacion === 'entre'}
+                    onClick={() => setOperacion('entre')}
+                  >
+                    ÷ entre
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  className={`${styles.input} ${styles.inputFactor} ${factorErroneo ? styles.inputError : ''}`}
+                  value={factor}
+                  placeholder={operacion === 'por' ? '5 días' : '4 personas'}
+                  aria-label={operacion === 'por' ? 'Multiplicar el total por' : 'Repartir el total entre'}
+                  aria-invalid={factorErroneo}
+                  onChange={(e) => setFactor(e.target.value.replace(/[^\d.,]/g, ''))}
+                />
+              </div>
+              <p className={styles.operarResultado} aria-live="polite">
+                {segundosOperados !== null && factorNumero !== null ? (
+                  <span key="resultado">
+                    {formatearHM(totalLista)} {operacion === 'por' ? '×' : '÷'}{' '}
+                    {formatNumber(factorNumero, Number.isInteger(factorNumero) ? 0 : 2)} ={' '}
+                    <strong>{formatearHMS(segundosOperados)}</strong>
+                    {segundosOperados % 60 !== 0 && <span> (horas:minutos:segundos)</span>}
+                  </span>
+                ) : factorErroneo ? (
+                  <span key="error">
+                    {operacion === 'entre' ? 'No se puede repartir entre cero.' : 'El número no vale.'}
+                  </span>
+                ) : (
+                  <span key="vacio">
+                    Por ejemplo, una jornada de 7:45 por 5 días, o 15 minutos entre 4 personas.
+                  </span>
+                )}
+              </p>
             </div>
 
             <button
@@ -848,8 +888,10 @@ export default function CalculadoraHorasPage() {
             <div className={styles.faqItem}>
               <h4>¿Cómo escribo los tiempos en la lista?</h4>
               <p>
-                Con dos puntos si son horas y minutos (7:45) y con coma si son horas decimales
-                (7,75). También se admite 7h45 y, si quieres afinar, 1:20:30 con segundos. Puedes
+                Con dos puntos si son horas y minutos (7:45), con coma si son horas decimales
+                (7,75) y con «min» si son minutos (45 min). También se admite 7h45, 1 h 20, media
+                hora, hora y media y, si quieres afinar, 1:20:30 con segundos. Una cifra sola, sin
+                unidad, se lee como horas: 45 son 45 horas, y la calculadora lo avisa. Puedes
                 mezclar formatos en la misma lista: a la derecha de cada línea aparece siempre la
                 equivalencia decimal para comprobar que se ha entendido lo que querías decir.
               </p>
@@ -929,7 +971,7 @@ export default function CalculadoraHorasPage() {
               <div className={styles.stepContent}>
                 <h4>Escribe los tiempos como los tengas apuntados</h4>
                 <p>
-                  No hace falta convertir nada a mano: 7:45 y 7,75 conviven sin problema. La
+                  No hace falta convertir nada a mano: 7:45, 7,75 y 45 min conviven sin problema. La
                   equivalencia decimal de cada línea aparece a su derecha en cuanto el texto es
                   válido.
                 </p>

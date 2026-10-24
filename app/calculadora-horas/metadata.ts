@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora de Horas y Minutos - Sumar y Restar Tiempos | meskeIA',
   description:
-    'Suma y resta horas y minutos, convierte 7:45 en 7,75 horas decimales y calcula el total de una semana de trabajo con sus pausas. Sin registro y en tu navegador.',
+    'Suma y resta horas y minutos (7:45, 45 min, media hora), multiplica o reparte el total, convierte 7:45 en 7,75 horas decimales y calcula el total de una semana con sus pausas.',
   keywords:
     'calculadora de horas, sumar horas, restar horas, calculadora de horas y minutos, horas a decimal, convertir horas decimales, contador de horas, calcular horas trabajadas, suma de horas, parte de horas semanal',
   authors: [{ name: 'meskeIA' }],
@@ -47,7 +47,8 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/calculadora-horas/',
   category: 'UtilityApplication',
   features: [
-    'Suma y resta de tiempos con signo, mezclando formato 7:45 y 7,75',
+    'Suma y resta de tiempos con signo, mezclando 7:45, 7,75, 45 min, 1 h 20 o media hora',
+    'Multiplica el total por un número o lo reparte entre N, con segundos si no sale exacto',
     'Conversión instantánea entre horas:minutos y horas decimales',
     'Duración entre dos horas con cruce de medianoche y descuento de pausa',
     'Parte de horas semanal con entrada, salida y pausa por día',
