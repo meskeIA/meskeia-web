@@ -140,7 +140,7 @@ const ACTIVO_ADOPTA: Perfil = [
 ];
 
 // «Menos de 30 €/mes» (hallazgo 1333): perro-mediano 3+2+2+2+2+1−1 = 11 gana por estilo de
-// vida, pero su mínimo es 100 €/mes. Caben pez (10), pequeño mamífero (15), pájaro (20) y
+// vida, pero su mínimo es 70 €/mes. Caben pez (10), pequeño mamífero (15), pájaro (20) y
 // reptil (20): roedor 2+2 = 4 · pez 3 · pájaro 1 · reptil 1 → Pequeño mamífero, 15 – 40 €.
 const ACTIVO_SIN_DINERO: Perfil = [
   'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'No, solo adultos',
@@ -267,7 +267,7 @@ test('1333: con menos de 30 €/mes la recomendación cabe en el presupuesto, y 
   expect(ficha.mensual).toBe('15 – 40 €');
   const aviso = page.locator('[class*="avisoRecorte"]');
   await expect(aviso).toContainText('Por estilo de vida encajaría un perro mediano');
-  await expect(aviso).toContainText('(100 – 200 €) no cabe en tu presupuesto de menos de 30 €/mes');
+  await expect(aviso).toContainText('(70 – 200 €) no cabe en tu presupuesto de menos de 30 €/mes');
   // Y avisa de que la parte alta de la horquilla (40 €) se sale del tramo.
   expect(ficha.texto).toContain('La parte alta de la horquilla de un pequeño mamífero (15 – 40 €) supera tu tramo');
 });
@@ -686,11 +686,17 @@ test.describe('Inspección 24/09/2026 — re-inspección: lo que la reparación 
     await page.getByText('Pregunta 1 de 10').first().waitFor();
     await esperarSinTransiciones(page);
     expect(await contraste(page, '[class*="progresoPaso"]'), 'progresoPaso').toBeGreaterThanOrEqual(4.5);
-    // Perfil con aviso de recorte y aviso de empate, para medir los dos
+    // Perfil con aviso de recorte y aviso de empate, para medir los dos. Desde el 24/10/2026
+    // (hallazgo 3212: perros desde 50 / 70 / 100 €/mes) el de antes, con «30 – 80 €/mes», ya no
+    // recortaba: el perro mediano (70 €) cabe. Con niños de 5 a 12 años y «Menos de 30 €/mes»
+    // gana por estilo de vida el perro mediano y queda fuera por presupuesto; pequeño mamífero y
+    // peces empatan y los separa el vínculo («Juego»: roedor +1, pez 0).
     await responder(page, [
-      'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'No, solo adultos',
-      'Necesidad de silencio', 'Juego e interacción', 'ciclo de vida más corto', '300 – 1.000 €', '30 – 80 €/mes',
+      'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'Sí, de 5 a 12 años',
+      'Necesidad de silencio', 'Juego e interacción', 'ciclo de vida más corto', '300 – 1.000 €', 'Menos de 30 €/mes',
     ]);
+    await expect(page.locator('[class*="avisoRecorte"]')).toContainText('encajaría un perro mediano');
+    await expect(page.locator('[class*="avisoEmpate"]')).toContainText('un pequeño mamífero y unos peces encajan exactamente igual');
     await leerFicha(page);
     await esperarSinTransiciones(page);
     for (const clase of ['recomendacionPerfil', 'prosTitulo', 'contrasTitulo', 'consejosTitulo', 'costeValor',
@@ -729,24 +735,28 @@ test.describe('Inspección 24/09/2026 — re-inspección: lo que la reparación 
   // ── 1438: la frontera del tramo mensual ──────────────────────────────────────
   // El caso literal de la ficha: P1 Mucho · P2 Casi nunca vacía · P3 Jardín · P4 Muy activo ·
   // P5 Niños < 5 · P6 Comunidad · P7 Compañía · P8 Varios años · P9 Hasta 300 € · P10 30 – 80 €/mes
-  // perro-mediano 3+2+2+2+1+2 = 12 (fuera: 100 € no queda por debajo de 80) · perro-grande 5
-  // (fuera: 150 €) · perro-pequeño 2+2+1 = 5 (fuera: su mínimo, 80 €, ES el techo) · gato
-  // 1+1+1+1 = 4 (50 € < 80) · pez 2+1 = 3 → Gato. Antes: perro pequeño, «Con 30 – 80 €/mes puedes
-  // mantener un perro pequeño». Ahora el gato, avisando de que su parte alta se sale del tramo.
-  test('1438: un animal cuyo mínimo es el techo del tramo no «cabe», y se recomienda uno que sí', async ({ page }) => {
+  // perro-mediano 3+2+2+2+1+2 = 12 · perro-grande 5 · perro-pequeño 2+2+1 = 5 · gato 1+1+1+1 = 4 ·
+  // pez 2+1 = 3. Con las horquillas de entonces ganaba el gato: mediano (100 €) y pequeño (80 €, ES
+  // el techo) no quedaban por debajo de 80. Desde el 24/10/2026 (hallazgo 3212) los mínimos de los
+  // perros son 50 / 70 / 100 €: ningún mínimo coincide ya con un techo (30, 80, 180), así que el
+  // caso exacto de la frontera ya no se puede teclear; la regla («por debajo», no «no supera») la
+  // sigue vigilando `fronteraMensual` sobre las 589.824 combinaciones. En el navegador, el mismo
+  // perfil: el perro mediano (70 € < 80) cabe y gana con 12; el grande (100 € ≥ 80) queda fuera,
+  // pero iba por detrás, así que no hay aviso de recorte; y se avisa de la parte alta (200 € > 80).
+  test('1438: cabe el animal cuyo mínimo queda por debajo del techo, y se avisa de su parte alta', async ({ page }) => {
     await abrirTest(page);
     await responder(page, [
       'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'Sí, menores de 5 años',
       'La comunidad restringe', 'Compañía constante', 'Varios años con posibilidad', 'Hasta 300 €', '30 – 80 €/mes',
     ]);
     const ficha = await leerFicha(page);
-    expect(ficha.mascota).toBe('Gato');
-    expect(ficha.mensual).toBe('50 – 120 €');
-    await expect(page.locator('[class*="avisoRecorte"]')).toContainText('encajaría un perro mediano');
-    await expect(page.locator('[class*="avisoRecorte"]')).toContainText('(100 – 200 €) no cabe en tu presupuesto de 30 – 80 €/mes');
-    expect(ficha.texto).not.toContain('Con 30 – 80 €/mes puedes mantener un perro pequeño');
-    expect(ficha.texto).not.toContain('La parte alta de la horquilla de un perro pequeño (80 – 150 €)');
-    expect(ficha.texto).toContain('La parte alta de la horquilla de un gato (50 – 120 €) supera tu tramo de 30 – 80 €/mes');
+    expect(ficha.mascota).toBe('Perro mediano');
+    expect(ficha.mensual).toBe('70 – 200 €');
+    await expect(page.locator('[class*="avisoRecorte"]')).toHaveCount(0);
+    expect(ficha.texto).not.toContain('Con 30 – 80 €/mes puedes mantener');
+    expect(ficha.texto).toContain('La parte alta de la horquilla de un perro mediano (70 – 200 €) supera tu tramo de 30 – 80 €/mes');
+    const motor = calcularResultado({ 1: 'mucho', 2: 'siempre', 3: 'jardin', 4: 'mucho', 5: 'si_pequenos', 6: 'comunidad', 7: 'compania', 8: 'medio', 9: 'bajo', 10: 'bajo' });
+    expect(motor.descartes['perro-grande']).toBe('presupuesto');
     // Motor viejo: 3.195 perfiles con el perro pequeño en «30 – 80 €/mes»
     expect(recontar().fronteraMensual).toBe(0);
   });
@@ -813,17 +823,22 @@ test.describe('Inspección 24/09/2026 — re-inspección: lo que la reparación 
   });
 
   // ── 1442: el criterio de desempate anunciado es el que decide ────────────────
-  // P1 Mucho · P2 Casi nunca vacía · P3 Jardín · P4 Muy activo · P5 Sin niños · P6 Silencio ·
-  // P7 Juego · P8 Ciclo corto · P9 300 – 1.000 € · P10 30 – 80 €/mes
-  // gato 1+1+1+1 = 4 · roedor 1+3 = 4 · pez 3+1 = 4 (perros fuera por 80 €/mes). Vínculo «Juego»:
-  // roedor +1, gato +1, pez 0 → los peces quedan detrás por el vínculo; entre roedor y gato
-  // decide el coste mensual (15 € < 50 €). Los peces (10 €) cuestan menos que el roedor: el
-  // superlativo «el más bajo» era falso; ahora cada criterio nombra a quien deja detrás.
+  // El perfil de la ficha (P1 Mucho · P3 Jardín · P4 Muy activo…) daba un empate a 4 entre gato,
+  // pequeño mamífero y peces porque los perros caían por «30 – 80 €/mes»; desde el 24/10/2026
+  // (hallazgo 3212) el perro mediano (70 €) cabe y gana. El mismo empate, con un perfil sin
+  // tiempo para un perro: P1 Mínimo · P2 Casi nunca vacía · P3 Piso normal · P4 Moderado · P5 Sin
+  // niños · P6 Silencio · P7 Juego · P8 Ciclo corto · P9 Lo mínimo · P10 30 – 80 €/mes →
+  // gato 7 = roedor 7 = pez 7, y el perro mediano 6 (puntos del motor, comprobados abajo).
+  // Vínculo «Juego»: roedor +1, gato +1, pez 0 → los peces quedan detrás por el vínculo; entre
+  // roedor y gato decide el coste mensual (15 € < 50 €). Los peces (10 €) cuestan menos que el
+  // roedor: el superlativo «el más bajo» era falso; ahora cada criterio nombra a quien deja detrás.
   test('1442: el empate dice qué criterio deja detrás a cada empatada', async ({ page }) => {
+    const motor = calcularResultado({ 1: 'minimo', 2: 'siempre', 3: 'piso_normal', 4: 'medio', 5: 'no', 6: 'sin_ruido', 7: 'juego', 8: 'corto', 9: 'minimo', 10: 'bajo' });
+    expect([motor.puntos.gato, motor.puntos.roedor, motor.puntos.pez, motor.puntos['perro-mediano']]).toEqual([7, 7, 7, 6]);
     await abrirTest(page);
     await responder(page, [
-      'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'No, solo adultos',
-      'Necesidad de silencio', 'Juego e interacción', 'ciclo de vida más corto', '300 – 1.000 €', '30 – 80 €/mes',
+      'Mínimo — solo fines', 'Casi nunca está vacía', 'Piso normal', 'Moderado', 'No, solo adultos',
+      'Necesidad de silencio', 'Juego e interacción', 'ciclo de vida más corto', 'Lo mínimo', '30 – 80 €/mes',
     ]);
     const ficha = await leerFicha(page);
     expect(ficha.mascota).toBe('Pequeño mamífero');
@@ -1033,6 +1048,8 @@ test.describe('re-inspección 02/10/2026 · motor y casos resueltos a mano', () 
   interface Cuentas {
     empates: number;
     empatesPorCosteInicial: number;
+    /** «su coste inicial mínimo es el más bajo» con otra empatada igual o más barata de compra. */
+    inicialFalso: number;
     empatesPorOrdenDeDeclaracion: number;
     comunidadConPerroMudo: number;
     perroSinTiempoNiCasa: number;
@@ -1041,7 +1058,7 @@ test.describe('re-inspección 02/10/2026 · motor y casos resueltos a mano', () 
   /** Una pasada por las 589.824 combinaciones (≈3 s), reutilizada dentro del worker. */
   function contar(): Cuentas {
     if (cuentas) return cuentas;
-    const c: Cuentas = { empates: 0, empatesPorCosteInicial: 0, empatesPorOrdenDeDeclaracion: 0, comunidadConPerroMudo: 0, perroSinTiempoNiCasa: 0 };
+    const c: Cuentas = { empates: 0, empatesPorCosteInicial: 0, inicialFalso: 0, empatesPorOrdenDeDeclaracion: 0, comunidadConPerroMudo: 0, perroSinTiempoNiCasa: 0 };
     const idx = new Array(10).fill(0);
     for (;;) {
       const r: Record<number, string> = {};
@@ -1051,6 +1068,8 @@ test.describe('re-inspección 02/10/2026 · motor y casos resueltos a mano', () 
       if (res.empatadas.length > 0) {
         c.empates++;
         if (res.criterioDesempate.includes('coste inicial')) c.empatesPorCosteInicial++;
+        if (res.criterioDesempate.includes('coste inicial mínimo es el más bajo')
+          && res.empatadas.some((k) => MASCOTAS[k].costeInicialMin <= info.costeInicialMin)) c.inicialFalso++;
         if (res.empatadas.some((k) => MASCOTAS[k].costeMensualMin === info.costeMensualMin
           && MASCOTAS[k].costeInicialMin === info.costeInicialMin)) c.empatesPorOrdenDeDeclaracion++;
       }
@@ -1065,15 +1084,20 @@ test.describe('re-inspección 02/10/2026 · motor y casos resueltos a mano', () 
     return c;
   }
 
-  test('motor: los empates (53.325) se explican todos y ninguno lo decide el orden de declaración', () => {
+  test('motor: los empates (56.943) se explican todos y ninguno lo decide el orden de declaración', () => {
     // Cuentas del 02/10/2026. Eran 54.462 sobre motor.ts sin cambios desde a3c2066c; la reparación
     // del 2665 (sin tiempo y con la casa vacía, fuera los perros) cambia la ganadora de esos
-    // perfiles y con ella sus empates: 53.325, medido tras la reparación. El tercer criterio
-    // (coste inicial) no llega a decidir nunca: el único par con el mismo mínimo mensual (pájaro y
-    // reptil, 20 €) siempre se separa antes por el vínculo.
+    // perfiles y con ella sus empates: 53.325, medido tras la reparación. El 24/10/2026 (hallazgo
+    // 3212) bajan los mínimos de los perros a 50 / 70 / 100 €/mes: caben en más tramos y empatan
+    // en más perfiles, 56.943 medidos. Antes el tercer criterio (coste inicial) no decidía nunca;
+    // ahora el perro pequeño y el gato comparten mínimo mensual (50 €), y en 317 empates entre los
+    // dos con el mismo vínculo lo deshace el coste inicial (gato 100 € frente a 500 €). Lo que
+    // no puede pasar: que lo anuncie como «el más bajo» con otra empatada igual o más barata, ni
+    // que dos empatadas coincidan en los tres criterios (el orden del código).
     const c = contar();
-    expect(c.empates).toBe(53_325);
-    expect(c.empatesPorCosteInicial).toBe(0);
+    expect(c.empates).toBe(56_943);
+    expect(c.empatesPorCosteInicial).toBe(317);
+    expect(c.inicialFalso).toBe(0);
     expect(c.empatesPorOrdenDeDeclaracion).toBe(0);
   });
 
@@ -1585,14 +1609,14 @@ test.describe('Re-inspección 10/10/2026 — casos resueltos a mano', () => {
     expect(consejos[1]).toContain('Ley 7/2023, art. 26.i');
   });
 
-  test('caso límite: Perro grande con «80 – 180 €/mes» — su mínimo (150) cabe y se avisa de que la parte alta (280) no', async ({ page }) => {
+  test('caso límite: Perro grande con «80 – 180 €/mes» — su mínimo (100) cabe y se avisa de que la parte alta (280) no', async ({ page }) => {
     // P1 Mucho: perro-mediano 3, perro-grande 3, perro-pequeño 2, gato 1 · P2 Casi nunca vacía:
     // perro-grande 2, perro-mediano 2 · P3 Jardín: perro-grande 3, perro-mediano 2 · P4 Muy activo:
     // perro-grande 2, perro-mediano 2 · P7 Presencia tranquila: pez 2, gato 2, reptil 1 · P5 Sin
     // niños, P6 Sin restricciones, P8 Varios años, P9 Sin límite y P10 80 – 180 €/mes: nada.
     // perro-grande 3+2+3+2 = 10 · perro-mediano 3+2+2+2 = 9 · gato 1+2 = 3 · perro-pequeño 2 ·
     // pez 2 · reptil 1 → Perro grande. Filtro (1438): cabe si el MÍNIMO queda por debajo del techo,
-    // 150 < 180 → cabe; pero 280 > 180, y eso se avisa. Razones: P1 (+3), P3 (+3) y P2 (+2, antes
+    // 100 < 180 → cabe; pero 280 > 180, y eso se avisa. Razones: P1 (+3), P3 (+3) y P2 (+2, antes
     // que P4 por número). Sin «Lo mínimo» ni «Hasta 300 €»: el coste inicial es el de compra.
     const motor = calcularResultado({ 1: 'mucho', 2: 'siempre', 3: 'jardin', 4: 'mucho', 5: 'no', 6: 'ninguna', 7: 'tranquilidad', 8: 'medio', 9: 'alto', 10: 'medio' });
     expect([motor.puntos['perro-grande'], motor.puntos['perro-mediano'], motor.puntos.gato]).toEqual([10, 9, 3]);
@@ -1602,15 +1626,15 @@ test.describe('Re-inspección 10/10/2026 — casos resueltos a mano', () => {
       'Sin restricciones', 'Presencia tranquila', 'Varios años con posibilidad', 'Sin límite especial', '80 – 180 €/mes',
     ]);
     const ficha = await leerFicha(page);
-    expect([ficha.mascota, ficha.inicial, ficha.mensual, ficha.vida]).toEqual(['Perro grande', '400 – 2.000 €', '150 – 280 €', '8 – 12 años']);
+    expect([ficha.mascota, ficha.inicial, ficha.mensual, ficha.vida]).toEqual(['Perro grande', '400 – 2.000 €', '100 – 280 €', '8 – 12 años']);
     expect(await itemsDeSeccion(page, 'Por qué esta recomendación')).toEqual([
       'Tienes más de 2 horas al día: da para los paseos, el juego y la atención que pide un perro grande.',
       'Tienes casa con jardín o patio, el espacio que mejor aprovecha un perro grande.',
       'Casi siempre hay alguien en casa, y un perro grande lo agradece: no pasará horas a solas.',
-      'Coste mensual estimado para Perro grande: 150 – 280 €. Esperanza de vida: 8 – 12 años.',
+      'Coste mensual estimado para Perro grande: 100 – 280 €. Esperanza de vida: 8 – 12 años.',
     ]);
     expect(await itemsDeSeccion(page, 'Lo que juega en contra')).toEqual([
-      'La parte alta de la horquilla de un perro grande (150 – 280 €) supera tu tramo de 80 – 180 €/mes: los meses con veterinario pueden salirse de él.',
+      'La parte alta de la horquilla de un perro grande (100 – 280 €) supera tu tramo de 80 – 180 €/mes: los meses con veterinario pueden salirse de él.',
     ]);
     await expect(page.locator('[class*="avisoRecorte"]')).toHaveCount(0);
     await expect(page.locator('[class*="avisoEmpate"]')).toHaveCount(0);
@@ -1636,12 +1660,12 @@ test.describe('Re-inspección 10/10/2026 — casos resueltos a mano', () => {
       'Sin restricciones', 'Juego e interacción', 'Varios años con posibilidad', 'Sin límite especial', 'Más de 180 €/mes',
     ]);
     const ficha = await leerFicha(page);
-    expect([ficha.mascota, ficha.inicial, ficha.mensual, ficha.vida]).toEqual(['Perro mediano', '300 – 1.500 €', '100 – 200 €', '10 – 14 años']);
+    expect([ficha.mascota, ficha.inicial, ficha.mensual, ficha.vida]).toEqual(['Perro mediano', '300 – 1.500 €', '70 – 200 €', '10 – 14 años']);
     expect(await itemsDeSeccion(page, 'Por qué esta recomendación')).toEqual([
       'Tienes casa con jardín o patio, el espacio que mejor aprovecha un perro mediano.',
       'Te declaras muy activo: puedes compartir paseos largos y salidas al campo con un perro mediano.',
       'Con niños de 5 a 12 años, un perro mediano les deja participar en el cuidado.',
-      'Coste mensual estimado para Perro mediano: 100 – 200 €. Esperanza de vida: 10 – 14 años.',
+      'Coste mensual estimado para Perro mediano: 70 – 200 €. Esperanza de vida: 10 – 14 años.',
     ]);
     expect(await itemsDeSeccion(page, 'Lo que juega en contra')).toEqual([
       'Has dicho que tienes menos de una hora al día: un perro mediano necesita salir varias veces al día, todos los días.',
@@ -1976,7 +2000,10 @@ test.describe('Re-inspección 10/10/2026 — contenido (cabo C0011)', () => {
   });
 
   test('HALLAZGO (C0011): las horquillas de los perros cuadran con la media de la OCU que la propia página cita', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Bajo los costes de cualquier resultado: «la encuesta de la OCU
+    // REPARADO el 24/10/2026 (hallazgo 3212): los mínimos bajan a 50 / 70 / 100 € y la media de los
+    // mínimos queda en 73,33 € ≤ 94,25 €. Los máximos no cambian. Lo que sigue es el razonamiento
+    // del Inspector, con las horquillas de entonces.
+    // Inspector 10/10/2026. Bajo los costes de cualquier resultado: «la encuesta de la OCU
     // de 2022 midió un gasto medio de 1.131 € al año por perro (unos 94 € al mes)»; el FAQPage da la
     // misma cifra como «referencia» de «¿Cuánto cuesta mantener una mascota al mes?».
     // 1.131 / 12 = 94,25 €/mes. Horquillas (motor.ts): pequeño 80 – 150, mediano 100 – 200,
@@ -1988,13 +2015,12 @@ test.describe('Re-inspección 10/10/2026 — contenido (cabo C0011)', () => {
     // de los mínimos) ni los conceptos (la OCU incluye veterinario; la guía de la app llama «coste
     // mensual visible» a comida, arena y accesorios). Con el gato sí cuadra (control de arriba), y
     // las horquillas de los perros alimentan el filtro de presupuesto.
-    // Esperado: media de los mínimos ≤ media de la OCU. Obtenido: 110 frente a 94,25.
-    test.fail();
+    // Esperado: media de los mínimos ≤ media de la OCU. Obtenido entonces: 110 frente a 94,25.
     expect(await notaCostes(page)).toContain('1.131 € al año por perro (unos 94 € al mes)');
     const ocuPerroMes = 1131 / 12;
     expect(ocuPerroMes).toBeCloseTo(94.25, 2);
     const minimos = [MASCOTAS['perro-pequeno'], MASCOTAS['perro-mediano'], MASCOTAS['perro-grande']].map((m) => m.costeMensualMin);
-    expect(minimos).toEqual([80, 100, 150]);
+    expect(minimos).toEqual([50, 70, 100]);
     const mediaDeMinimos = minimos.reduce((a, b) => a + b, 0) / minimos.length;
     expect(mediaDeMinimos).toBeLessThanOrEqual(ocuPerroMes);
   });

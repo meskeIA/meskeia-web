@@ -30,6 +30,11 @@
  *     un gato de 50 – 120 € en «30 – 80 €/mes» cabe en los meses normales, y el resultado avisa
  *     de que la parte alta se sale. Si la mejor opción por estilo de vida no cabe, se recomienda
  *     la mejor que cabe y se dice cuál era la otra.
+ *     Los MÍNIMOS de los perros (50, 70 y 100 €) se bajaron el 24/10/2026 (hallazgo 3212, cabo
+ *     C0011): las horquillas son estimación propia, sin fuente, y la única cifra con fuente que
+ *     la página cita, la media de la OCU de 2022 (1.131 €/año por perro, 94,25 €/mes), quedaba
+ *     por debajo de la media de los mínimos (110 €). Ahora cabe, como la del gato; los máximos
+ *     no cambian. Decisión del usuario.
  *
  *  3.bis El presupuesto INICIAL (hallazgo 1437). Con «Hasta 300 €», a un animal cuya compra
  *     empieza en 300 € o más (los tres perros) se le enseña la tasa de adopción, con el precio
@@ -116,8 +121,8 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     costeInicial: '500 – 2.000 €',
     costeInicialMin: 500,
     costeInicialMax: 2000,
-    costeMensual: '80 – 150 €',
-    costeMensualMin: 80,
+    costeMensual: '50 – 150 €',
+    costeMensualMin: 50,
     costeMensualMax: 150,
     esperanzaVida: '12 – 18 años',
     descripcion: 'Compañero muy afectivo y adaptable a espacios pequeños. Necesita paseos diarios aunque cortos. Muy longevo comparado con razas grandes.',
@@ -135,8 +140,8 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     costeInicial: '300 – 1.500 €',
     costeInicialMin: 300,
     costeInicialMax: 1500,
-    costeMensual: '100 – 200 €',
-    costeMensualMin: 100,
+    costeMensual: '70 – 200 €',
+    costeMensualMin: 70,
     costeMensualMax: 200,
     esperanzaVida: '10 – 14 años',
     descripcion: 'El equilibrio entre compañía, ejercicio y espacio. Versátil para ciudad y campo. Ideal para familias activas.',
@@ -154,8 +159,8 @@ export const MASCOTAS: Record<MascotaKey, MascotaInfo> = {
     costeInicial: '400 – 2.000 €',
     costeInicialMin: 400,
     costeInicialMax: 2000,
-    costeMensual: '150 – 280 €',
-    costeMensualMin: 150,
+    costeMensual: '100 – 280 €',
+    costeMensualMin: 100,
     costeMensualMax: 280,
     esperanzaVida: '8 – 12 años',
     descripcion: 'Compañero fiel y protector. Requiere espacio, ejercicio abundante y compromiso económico mayor. Ideal con jardín o acceso fácil a zonas verdes.',
