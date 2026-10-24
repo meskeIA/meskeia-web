@@ -34,6 +34,14 @@ const RUTAS = [
   '/calculadora-regla-500-npf-astrofoto/', // C0430
   '/calculadora-fov-video/', // C0431
   '/calculadora-porcentaje-panadero/', // C0432
+  '/presupuesto-viaje/', // C0399
+  '/conversor-numeros-romanos/', // C0400
+  '/orientador-aval-ico/', // C0424: un flex-shrink: 0 pensado para el emoji alcanzaba al texto
+  // F3: etiqueta oculta con position: absolute y sin ancestro posicionado; body sigue en 390 y
+  // es el documento el que crece, por eso el test mide los dos
+  '/simulador-automata-pila/', // C0415
+  '/escalador-recetas/', // C0433
+  '/escandallo-food-cost/', // C0434
 ];
 
 for (const ruta of RUTAS) {

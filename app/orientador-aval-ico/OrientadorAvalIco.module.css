@@ -67,7 +67,10 @@
   line-height: 1.5;
 }
 
-.infoBanner span { font-size: 1.25rem; flex-shrink: 0; }
+/* Solo el emoji: escrita para todo span, alcanzaba también al del texto, que no podía
+   encogerse y salía en una línea de 3.064 px, ilegible en el móvil (cabo C0424) */
+.infoBanner > span:first-child { font-size: 1.25rem; flex-shrink: 0; }
+.infoBanner > span:last-child { flex: 1; min-width: 0; }
 
 /* Pestañas de perfil */
 .perfilGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }

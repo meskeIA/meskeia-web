@@ -205,7 +205,9 @@
 
 .filaGasto {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  /* minmax(0, 1fr): la descripción no bajaba de su ancho intrínseco y el botón de eliminar
+     salía de la pantalla a 390 px (cabo C0399) */
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 0.5rem;
   align-items: center;
 }

@@ -667,8 +667,10 @@
     font-size: 1.8rem;
   }
 
+  /* minmax(0, 1fr): las cuatro pistas crecían a 77-89 px en 276 y sacaban la página de la
+     pantalla a 390 px (cabo C0400) */
   .symbolsGrid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .rulesGrid {

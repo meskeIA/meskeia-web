@@ -46,7 +46,9 @@
   gap: 8px;
 }
 
-.tableWrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* position: relative contiene el sr-only «Eliminar» (position: absolute): sin él escapaba del
+   recorte y ensanchaba el documento a 629 px en el móvil (cabo C0434) */
+.tableWrapper { position: relative; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 .tablaEdicion {
   width: 100%;

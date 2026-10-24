@@ -145,6 +145,9 @@
 }
 
 .tableWrapper {
+  /* Bloque de contención del sr-only «Acciones» (position: absolute): sin él escapaba del
+     recorte y ensanchaba el documento a 613 px en el móvil (cabo C0433) */
+  position: relative;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }

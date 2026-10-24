@@ -267,6 +267,9 @@
 /* ---------------------------------------------------------------- Transiciones */
 
 .tablaWrapper {
+  /* Bloque de contención de la etiqueta oculta de la tabla (position: absolute): sin él
+     escapaba del recorte y ensanchaba el documento a 633 px en el móvil (cabo C0415) */
+  position: relative;
   overflow-x: auto;
   margin-bottom: var(--spacing-md);
   border: 1px solid var(--border);
