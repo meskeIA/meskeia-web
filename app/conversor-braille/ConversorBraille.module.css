@@ -445,9 +445,11 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* min(280px, 100%): en un móvil de 390 px la tarjeta mide 276 y una pista de 280 desbordaba el
+   <body> (cabo C0401, 24/10/2026). */
 .hojaControles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
 }

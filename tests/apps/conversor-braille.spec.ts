@@ -2411,4 +2411,35 @@ test.describe('re-inspección 24/10/2026 — móvil de 360 px', () => {
     // Lo que DEBERÍA pasar: ninguna ficha fuera. Hoy: E, J, Ñ, S, X (x 337 → 399 px), 5 y 0.
     expect(medida.cortadas).toEqual([]);
   });
+
+  // REPARADO (cabo C0401, 24/10/2026): la página no desborda en horizontal. Además del alfabeto,
+  // .hojaControles tenía pistas de 280 px como mínimo en una tarjeta de 246-276.
+  // Reinyectado el 24/10/2026 con minmax(280px, 1fr): 4 controles fuera de la tarjeta.
+  test('REPARADO C0401 — ni los controles de la hoja se salen de su tarjeta ni la página desborda', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    const textarea = page.locator('textarea').first();
+    await textarea.fill('hola');
+    await esperarValorEnReact(page, textarea, 'hola');
+    await page.getByRole('button', { name: 'Convertir', exact: true }).tap();
+    await expect(cajaResultado(page)).toHaveText('⠓⠕⠇⠁');
+    const medida = await page.evaluate(() => {
+      const ancho = document.documentElement.clientWidth;
+      const controles = document.querySelector('[class*="hojaControles"]');
+      // El borde útil de la tarjeta: a 360 px una pista de 280 no llega al borde de la pantalla,
+      // pero sí se sale de la tarjeta de 246 px (C0401).
+      const tarjeta = controles?.closest('[class*="hojaSection"]');
+      const borde = tarjeta
+        ? tarjeta.getBoundingClientRect().right - parseFloat(getComputedStyle(tarjeta).paddingRight)
+        : ancho;
+      return {
+        hayControles: controles !== null,
+        sobra: document.body.scrollWidth - ancho,
+        fuera: [...(controles?.children ?? [])].filter((c) => c.getBoundingClientRect().right > Math.min(ancho, borde) + 0.5).length,
+      };
+    });
+    expect(medida.hayControles).toBe(true); // precondición: la hoja está montada
+    expect(medida.fuera).toBe(0);
+    expect(medida.sobra).toBeLessThanOrEqual(0);
+  });
 });
