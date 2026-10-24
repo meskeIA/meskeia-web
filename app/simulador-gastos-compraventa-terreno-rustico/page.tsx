@@ -56,6 +56,7 @@ import {
   nombreEnFrase,
   deNombreCcaa,
   TERRITORIOS_SIN_RENUNCIA,
+  AVISO_IRPF_FORAL,
 } from '@/data/itp-ccaa';
 import {
   FISCAL_INMUEBLES_META,
@@ -63,6 +64,7 @@ import {
   GANANCIAS_PATRIMONIALES_META,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   PORCENTAJES_IVA,
+  DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA,
 } from '@/data/fiscal';
 
 // ===== TIPOS =====
@@ -433,7 +435,7 @@ export default function SimuladorTerrenoRusticoPage() {
         fuente={GANANCIAS_PATRIMONIALES_META.fuente}
         verificado={GANANCIAS_PATRIMONIALES_META.verificado}
         urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
-        nota={GANANCIAS_PATRIMONIALES_META.nota}
+        nota={`${GANANCIAS_PATRIMONIALES_META.nota} ${AVISO_IRPF_FORAL}`}
       />
 
       {/* Aviso clave: exención de IVA y sin plusvalía */}
@@ -463,7 +465,9 @@ export default function SimuladorTerrenoRusticoPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🔄</span>
                 <span>Compra habitual</span>
-                <span className={styles.transmisionSub}>Exenta de {impuestoDeLaRenuncia} → paga ITP</span>
+                {/* Una sola cadena por elemento: con la página traducida, una variable junto a un
+                    texto se quedaba con el valor del territorio anterior (hallazgo 3482). */}
+                <span className={styles.transmisionSub}>{`Exenta de ${impuestoDeLaRenuncia} → paga ITP`}</span>
               </button>
               {/* En Canarias la renuncia es a la exención del IGIC, y el botón lo dice (hallazgo
                   1605). En Ceuta y Melilla no existe (TERRITORIOS_SIN_RENUNCIA): se desactiva y
@@ -476,7 +480,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 disabled={renunciaImposible}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
-                <span>Con renuncia a la exención del {impuestoDeLaRenuncia}</span>
+                <span>{`Con renuncia a la exención del ${impuestoDeLaRenuncia}`}</span>
                 {/* El subtítulo no puede prometer un IVA que allí no se liquida, ni escribir
                     su tipo a mano teniéndolo en data/fiscal (hallazgos 803 y 806). */}
                 <span className={styles.transmisionSub}>
@@ -493,11 +497,11 @@ export default function SimuladorTerrenoRusticoPage() {
           {/* En Ceuta y Melilla la opción está desactivada, y se dice por qué con la norma. */}
           {renunciaImposible && territorioActualSinIva && (
             <p className={styles.renunciaAviso} role="note">
-              <span aria-hidden="true">ℹ️</span> En {nombreEnFrase(ccaa)} no rige el IVA, sino el{' '}
-              {territorioActualSinIva.impuesto} ({territorioActualSinIva.nombre}), y en él{' '}
+              <span aria-hidden="true">ℹ️</span> En <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el{' '}
+              <span>{territorioActualSinIva.impuesto}</span> <span>({territorioActualSinIva.nombre})</span>, y en él{' '}
               <strong>no existe la renuncia a la exención</strong>: la Ley 8/1991 toma sus exenciones de la
               ley del IVA (art. 7) sin regular ninguna renuncia, y no deja deducir el{' '}
-              {territorioActualSinIva.impuesto} soportado en la compra de un inmueble (art. 20.3), que es lo
+              <span>{territorioActualSinIva.impuesto}</span> soportado en la compra de un inmueble (art. 20.3), que es lo
               que la renuncia exige en la ley del IVA (art. 20.Dos). La finca paga siempre ITP, con la
               bonificación de la cuota.
             </p>
@@ -513,22 +517,26 @@ export default function SimuladorTerrenoRusticoPage() {
           */}
           {esRenuncia && (
             <div className={styles.renunciaAviso} role="note">
+              {/* Hallazgo 3480 (24/10/2026): con la página traducida, el cambio de rama de estos
+                  fragmentos con texto suelto tumbaba la app (NotFoundError en removeChild) o mezclaba
+                  las dos ramas. Cada rama en su <span key> y cada variable sola en su elemento
+                  (receta de check:ternario-traducido). */}
               {territorioActualSinIva ? (
-                <>
-                  <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención del {territorioActualSinIva.impuesto} (art. 50.Cinco Ley canaria 4/2012):</strong>{' '}
-                  en {nombreEnFrase(ccaa)} <strong>no se devenga IVA</strong> —rige el{' '}
-                  {territorioActualSinIva.impuesto}—, pero la entrega de terrenos rústicos también está exenta
-                  del {territorioActualSinIva.impuesto} (art. 50.Uno.20.º) y el vendedor puede renunciar a esa
+                <span key="canarias">
+                  <strong><span aria-hidden="true">⚠️</span> <span>{`Renuncia a la exención del ${territorioActualSinIva.impuesto} (art. 50.Cinco Ley canaria 4/2012):`}</span></strong>{' '}
+                  en <span>{nombreEnFrase(ccaa)}</span> <strong>no se devenga IVA</strong> —rige el{' '}
+                  <span>{territorioActualSinIva.impuesto}</span>—, pero la entrega de terrenos rústicos también está exenta
+                  del <span>{territorioActualSinIva.impuesto}</span> (art. 50.Uno.20.º) y el vendedor puede renunciar a esa
                   exención si el comprador es empresario o profesional con derecho a deducir, total o
                   parcialmente, el impuesto de la compra. El{' '}
-                  {territorioActualSinIva.impuesto} lo autoliquida el comprador por{' '}
+                  <span>{territorioActualSinIva.impuesto}</span> lo autoliquida el comprador por{' '}
                   <strong>inversión del sujeto pasivo</strong> (art. 19.1.2.º g Ley 20/1991) y la operación deja
                   de pagar ITP (art. 4.4 de esa misma ley). Este simulador no cuantifica el{' '}
-                  {territorioActualSinIva.impuesto}; sí el AJD de la escritura, con el tipo general de la
+                  <span>{territorioActualSinIva.impuesto}</span>; sí el AJD de la escritura, con el tipo general de la
                   comunidad —algunas le aplican un <strong>tipo incrementado</strong> cuando hay renuncia—.
-                </>
+                </span>
               ) : (
-                <>
+                <span key="con-iva">
                   <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> solo es posible cuando
                   el vendedor es empresario o profesional y el <strong>comprador</strong> es un empresario o
                   profesional que compra para su actividad y tiene derecho a deducir, total o parcialmente, el IVA
@@ -538,17 +546,17 @@ export default function SimuladorTerrenoRusticoPage() {
                   <strong> inversión del sujeto pasivo</strong> y es deducible si tienes derecho. A cambio, la
                   escritura tributa por AJD
                   {ajdRenunciaRotulo.motivo === 'renuncia' ? (
-                    <>
-                      , al <strong>tipo propio de la renuncia</strong> en {nombreEnFrase(ccaa)} (
-                      {formatTipoNominal(ajdRenunciaRotulo.tipo)}&nbsp;%), que es el que se aplica aquí.
-                    </>
+                    <span key="ajd-renuncia">
+                      , al <strong>tipo propio de la renuncia</strong> en <span>{nombreEnFrase(ccaa)}</span> (
+                      <span>{`${formatTipoNominal(ajdRenunciaRotulo.tipo)} %`}</span>), que es el que se aplica aquí.
+                    </span>
                   ) : (
-                    <>
+                    <span key="ajd-general">
                       , que <strong>muchas CCAA aplican a un tipo incrementado</strong> en la renuncia; este
                       simulador usa el AJD general.
-                    </>
+                    </span>
                   )}
-                </>
+                </span>
               )}
             </div>
           )}
@@ -597,7 +605,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 <span className={styles.infoCcaaLabel}>ITP General</span>
                 {/* El de lo que no es vivienda, al precio escrito: 7 % en el País Vasco y, en
                     Valencia, el 11 % si el precio pasa del millón (hallazgo 1602). */}
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(itpGeneralRotulo)}&nbsp;%</span>
+                <span className={styles.infoCcaaValue}>{`${formatTipoNominal(itpGeneralRotulo)} %`}</span>
               </div>
               {/*
                 Sin esta casilla, el recuadro anunciaba «ITP General 6%» y la tarjeta cobraba el
@@ -608,7 +616,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 <div className={styles.infoCcaaItem}>
                   <span className={styles.infoCcaaLabel}>Bonificación en cuota</span>
                   <span className={styles.infoCcaaValue}>
-                    −{formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}&nbsp;%
+                    {`−${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} %`}
                   </span>
                 </div>
               )}
@@ -622,7 +630,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 </span>
               </div>
               <div className={styles.infoCcaaItem}>
-                <span className={styles.infoCcaaLabel}>{impuestoDeLaRenuncia} (renuncia)</span>
+                <span className={styles.infoCcaaLabel}>{`${impuestoDeLaRenuncia} (renuncia)`}</span>
                 <span className={styles.infoCcaaValue}>
                   {renunciaImposible
                     ? 'No existe'
@@ -636,7 +644,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 progresiva (9% → 11%)» y el 11 % grava TODO el valor, no el exceso (hallazgo 1602). */}
             {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> <strong>Tipo según el valor:</strong> {subidaITP}.
+                <span aria-hidden="true">⚠️</span> <strong>Tipo según el valor:</strong> <span>{`${subidaITP}.`}</span>
               </p>
             )}
             <p className={styles.infoCcaaNote}>
@@ -648,7 +656,7 @@ export default function SimuladorTerrenoRusticoPage() {
                 son de vivienda, como el del art. 121-11 de Aragón para iniciar una actividad. */}
             {datosCcaaActual.notas && (
               <p className={styles.infoCcaaNote}>
-                <strong>{datosCcaaActual.nombre}:</strong> {separarPorcentajes(datosCcaaActual.notas)}
+                <strong>{`${datosCcaaActual.nombre}:`}</strong> <span>{separarPorcentajes(datosCcaaActual.notas)}</span>
               </p>
             )}
           </div>
@@ -857,7 +865,7 @@ export default function SimuladorTerrenoRusticoPage() {
               {territorioHonorarios && (
                 <p className={styles.avisoHonorarios} role="note">
                   <span aria-hidden="true">ℹ️</span> Las facturas de notaría y registro llevan además{' '}
-                  {territorioHonorarios.impuesto}, que esta herramienta no calcula, así que cuestan más de lo
+                  <span>{territorioHonorarios.impuesto}</span>, que esta herramienta no calcula, así que cuestan más de lo
                   que se muestra.
                 </p>
               )}
@@ -974,6 +982,12 @@ export default function SimuladorTerrenoRusticoPage() {
                 No hay plusvalía municipal, pero la ganancia patrimonial tributa en el IRPF del vendedor (base
                 del ahorro, {formatNumber(TIPO_AHORRO_MIN, 0)}&nbsp;%-{formatNumber(TIPO_AHORRO_MAX, 0)}&nbsp;%) o en el
                 Impuesto de Sociedades si vende una empresa.
+                {/* Hallazgo 3483: la escala es la estatal. */}
+                {' '}Esa escala es la estatal: si resides en el País Vasco o en Navarra, tu IRPF es foral y
+                se liquida con su propia escala. Y si la finca está en Ceuta o Melilla, la parte de la cuota
+                que corresponde a esa ganancia lleva una deducción del{' '}
+                {formatNumber(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje, 0)}&nbsp;% (art. 68.4 de la Ley
+                del IRPF).
               </p>
             </div>
           </div>
@@ -1010,8 +1024,12 @@ export default function SimuladorTerrenoRusticoPage() {
             <div style={{ background: 'var(--bg-card)', borderLeft: '4px solid var(--primary)', padding: '1rem', borderRadius: '0 8px 8px 0' }}>
               <strong>¿Sobre qué valor se calcula el ITP de una finca rústica?</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.4rem' }}>
+                {/* Hallazgo 3484: art. 10.2 TRLITPAJD (BOE-A-1993-25359, leído el 24/10/2026), «será
+                    la mayor de las siguientes magnitudes: el valor declarado por los interesados, el
+                    precio o contraprestación pactada o el valor de mercado». */}
                 Sobre el valor de referencia de la finca o el precio escriturado, el que sea mayor. Si no existe
-                valor de referencia catastral para ese inmueble, se toma el valor de mercado. Con la renuncia a
+                valor de referencia catastral para ese inmueble (o no puede certificarse), se toma la mayor de
+                estas tres cifras: el valor declarado, el precio pactado o el valor de mercado. Con la renuncia a
                 la exención, el IVA va sobre el precio pactado, pero el AJD de la escritura tampoco puede
                 calcularse sobre menos que el valor de referencia (art. 30.1 TRLITPAJD). Conviene consultar
                 el valor de referencia en la Sede del Catastro antes de firmar.

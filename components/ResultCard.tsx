@@ -47,9 +47,14 @@ export default function ResultCard({
         <h3 className={styles.title}>{title}</h3>
       </div>
 
+      {/* La cifra, ÚNICA hija de su <span>. Suelta junto a la unidad era un nodo de texto, y con la
+          página traducida (el traductor cambia cada nodo por <font>) React escribía la cifra nueva
+          en el nodo retirado: las tarjetas se quedaban con la de antes mientras el rótulo cambiaba
+          (hallazgo 3481, 24/10/2026; forma del cabo C0243). Con un solo hijo de texto, React
+          reescribe el textContent del <span> entero. */}
       <div className={styles.valueContainer}>
         <p className={styles.value}>
-          {value}
+          <span>{value}</span>
           {unidad && <span className={styles.unit}>{unidad}</span>}
         </p>
       </div>

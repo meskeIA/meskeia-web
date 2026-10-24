@@ -4557,7 +4557,7 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
    *   es el que se aplica aquí.»
    */
   test('[24/10-a] con la página traducida, cambiar de comunidad con la renuncia elegida no tumba la app ni mezcla los avisos', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'ABIERTO (hallazgo [24/10-a]): el aviso de la renuncia alterna fragmentos con texto suelto');
+    // REPARADO (hallazgo 3480, 24/10/2026): cada rama en su <span key>, cada variable sola en su elemento.
     const errores: string[] = [];
     page.on('pageerror', (e) => errores.push(e.message));
     const escenarios: [string, keyof typeof ITP_CCAA, keyof typeof ITP_CCAA][] = [
@@ -4599,7 +4599,7 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
    * hijos de su <h3>, sí cambian (las CIFRAS no: es el [24/10-e]). Forma del 3477 de nave.
    */
   test('[24/10-b] con la página traducida, el recuadro, los botones y los avisos cambian con la comunidad', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'ABIERTO (hallazgo [24/10-b]): textos variables junto a otro nodo de texto');
+    // REPARADO (hallazgo 3482, 24/10/2026): cada texto variable, único hijo de su elemento (también en AvisoTerritorioSinIva).
 
     // a) Madrid → Canarias, compra habitual: 300.000 × 6,5 % = 19.500,00 €.
     await abrirHidratada(page);
@@ -4667,7 +4667,7 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
    * aparece en toda la página.
    */
   test('[24/10-c] el sello del IRPF y la guía de la venta nombran el IRPF foral y la deducción de Ceuta y Melilla', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'ABIERTO (hallazgo [24/10-c]): la escala estatal del ahorro sin la salvedad foral');
+    // REPARADO (hallazgo 3483, 24/10/2026): AVISO_IRPF_FORAL en el sello; foral y art. 68.4 en la guía.
     expect(AVISO_IRPF_FORAL).toContain('foral');
     expect(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje).toBe(60);
 
@@ -4698,7 +4698,7 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
    * la suya. Solo esta app de la familia lleva esa pregunta.
    */
   test('[24/10-d] la FAQ de la base del ITP toma el MAYOR cuando no hay valor de referencia (art. 10.2 TRLITPAJD)', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'ABIERTO (hallazgo [24/10-d]): sin valor de referencia la base no es solo el de mercado');
+    // REPARADO (hallazgo 3484, 24/10/2026): la mayor de las tres magnitudes del art. 10.2.
     await abrirHidratada(page);
     const texto = await page.evaluate(() => {
       const strong = [...document.querySelectorAll('strong')].find(
@@ -4730,7 +4730,7 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
    *   300.000 con la página traducida: las tarjetas siguen en 200.000): componente compartido.
    */
   test('[24/10-e] con la página traducida, las cifras de las tarjetas siguen al precio y a la comunidad', async ({ page }) => {
-    test.fail(!I08_VER_HUECOS, 'ABIERTO (hallazgo [24/10-e]): ResultCard pinta la cifra como un nodo de texto con hermano');
+    // REPARADO (hallazgo 3481, 24/10/2026): en ResultCard la cifra es la única hija de su <span>.
     await abrirHidratada(page);
     await sembrarValor(page, CAMPO_PRECIO, '300000');
     // Preparación (pasa): sin traducir, las cifras de 300.000 € en Madrid.
