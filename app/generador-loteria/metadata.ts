@@ -96,7 +96,10 @@ export const faqJsonLd = {
       name: '¿Cuántos números hay que elegir en la Primitiva y en el Euromillones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En la Primitiva se eligen 6 números del 1 al 49 y el Reintegro, un número del 0 al 9. El número complementario no lo elige el jugador: lo determina el propio sorteo entre las bolas no premiadas. En el Euromillones se eligen 5 números del 1 al 50 y 2 estrellas del 1 al 12. El generador produce automáticamente combinaciones válidas para cada modalidad respetando estos rangos.',
+        // El reintegro de La Primitiva lo asigna el terminal en el resguardo (normas de SELAE de junio
+        // de 2015, 9.ª.1 y 11.ª.4), como ya decía la nota del comprobador desde 328d72c6; esta
+        // respuesta decía que «se elige» (hallazgo 3487, cabo C0390).
+        text: 'En la Primitiva se eligen 6 números del 1 al 49. El Reintegro, un número del 0 al 9, no lo elige el jugador: lo asigna el terminal al validar la apuesta y va impreso en el resguardo. El número complementario tampoco: lo determina el propio sorteo entre las bolas no premiadas. En el Euromillones se eligen 5 números del 1 al 50 y 2 estrellas del 1 al 12. El generador produce automáticamente combinaciones válidas para cada modalidad respetando estos rangos; el dígito de reintegro que añade en La Primitiva es solo de referencia, porque el que cuenta es el impreso en el resguardo.',
       },
     },
     {

@@ -276,7 +276,9 @@ test.describe('REPARADO — HALLAZGO 570 (contenido, bajo) — el FAQPage ya no 
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage');
     const primeraRespuesta: string = faq.mainEntity[0].acceptedAnswer.text;
-    expect(primeraRespuesta).toContain('6 números del 1 al 49 y el Reintegro');
+    // Desde el 25/10/2026 (hallazgo 3487) el Reintegro tampoco «se elige»: lo asigna el resguardo.
+    expect(primeraRespuesta).toContain('se eligen 6 números del 1 al 49.');
+    expect(primeraRespuesta).toContain('lo asigna el terminal');
     expect(primeraRespuesta).toContain('no lo elige el jugador');
     expect(primeraRespuesta).not.toContain('más un número complementario');
   });
@@ -5206,8 +5208,8 @@ test.describe('Inspector 25/10/2026', () => {
         'El reintegro que cuenta es el impreso en tu resguardo: si no es el de la combinación guardada, compara el del boleto.');
     });
 
-    test('ABIERTO (dato, medio; cabo C0390) · el FAQPage dice que en La Primitiva «se eligen» el Reintegro, que lo asigna el resguardo', async ({ page }) => {
-      test.fail(); // ABIERTO: hallazgo de la inspección del 25/10/2026 (cabo C0390)
+    // REPARADO el 25/10/2026 (/reparar, hallazgo 3487): la respuesta dice que lo asigna el terminal.
+    test('REPARADO 3487 (dato, medio; cabo C0390) · el FAQPage dice que en La Primitiva «se eligen» el Reintegro, que lo asigna el resguardo', async ({ page }) => {
       const preguntas = await faqPageZ(page);
       const q = preguntas.find((p) => p.name === '¿Cuántos números hay que elegir en la Primitiva y en el Euromillones?');
       expect(q).toBeDefined();
