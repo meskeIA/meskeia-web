@@ -85,20 +85,22 @@ export default function AppsPage() {
         {/* Pestañas */}
         <div className={styles.tabs} role="tablist">
           <button
+            type="button"
             role="tab"
             aria-selected={tab === 'apps'}
             className={`${styles.tab} ${tab === 'apps' ? styles.tabActive : ''}`}
             onClick={() => setTab('apps')}
           >
-            📦 Apps <span className={styles.tabCount}>{TOTAL_IMPLEMENTED_APPS}</span>
+            <span aria-hidden="true">📦</span> Apps <span className={styles.tabCount}>{TOTAL_IMPLEMENTED_APPS}</span>
           </button>
           <button
+            type="button"
             role="tab"
             aria-selected={tab === 'guias'}
             className={`${styles.tab} ${tab === 'guias' ? styles.tabActive : ''}`}
             onClick={() => setTab('guias')}
           >
-            🧭 Caminos guiados <span className={styles.tabCount}>{guidesJourney.length}</span>
+            <span aria-hidden="true">🧭</span> Caminos guiados <span className={styles.tabCount}>{guidesJourney.length}</span>
           </button>
         </div>
 
@@ -128,7 +130,7 @@ export default function AppsPage() {
                 className={`${styles.filterChip} ${selectedSuite === 'all' ? styles.filterChipActive : ''}`}
                 onClick={() => setSelectedSuite('all')}
               >
-                📦 Todas <span className={styles.filterCount}>{TOTAL_IMPLEMENTED_APPS}</span>
+                <span aria-hidden="true">📦</span> Todas <span className={styles.filterCount}>{TOTAL_IMPLEMENTED_APPS}</span>
               </button>
               {suites.map((suite) => {
                 const count = suiteCounts.get(suite.id) || 0;

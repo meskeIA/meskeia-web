@@ -102,12 +102,12 @@ export default function PrivacidadPage() {
             </button>
             {deleteStatus === 'success' && (
               <p id="delete-status" className={styles.deleteSuccess} role="alert">
-                ✅ Datos borrados correctamente. La página se comportará como si fuera su primera visita.
+                <span aria-hidden="true">✅</span> Datos borrados correctamente. La página se comportará como si fuera su primera visita.
               </p>
             )}
             {deleteStatus === 'error' && (
               <p id="delete-status" className={styles.deleteError} role="alert">
-                ❌ Ocurrió un error al borrar los datos. Por favor, intente borrar los datos del sitio desde la configuración de su navegador.
+                <span aria-hidden="true">❌</span> Ocurrió un error al borrar los datos. Por favor, intente borrar los datos del sitio desde la configuración de su navegador.
               </p>
             )}
           </div>

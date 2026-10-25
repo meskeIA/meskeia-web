@@ -287,13 +287,13 @@ export default function GuiaPensarMejorPage() {
         </p>
         <div className={styles.ctaButtons}>
           <Link href="/diagnostico-estancamiento-profesional/" className={styles.ctaButton}>
-            🌊 ¿Estoy estancado?
+            <span aria-hidden="true">🌊</span> ¿Estoy estancado?
           </Link>
           <Link href="/detector-sesgos-cognitivos/" className={styles.ctaButtonSecondary}>
-            🧠 ¿Decido bien?
+            <span aria-hidden="true">🧠</span> ¿Decido bien?
           </Link>
           <Link href="/test-validacion-idea/" className={styles.ctaButtonSecondary}>
-            🧪 ¿Mi idea es buena?
+            <span aria-hidden="true">🧪</span> ¿Mi idea es buena?
           </Link>
         </div>
       </section>

@@ -704,7 +704,12 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                 disabled={actualizandoIP}
                 title="Guardar mi IP actual para excluirla"
               >
-                {actualizandoIP ? '...' : '🔄 Actualizar IP'}
+                {/* Cada rama en su span con key: alternar texto suelto y JSX tumba la página traducida */}
+                {actualizandoIP ? (
+                  <span key="guardando">...</span>
+                ) : (
+                  <span key="actualizar"><span aria-hidden="true">🔄</span> Actualizar IP</span>
+                )}
               </button>
             </div>
           </div>
@@ -1324,7 +1329,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
             <h2><span aria-hidden="true">🏆</span> Ranking de Aplicaciones</h2>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '0 0 1rem' }}>
               El <strong>Estado</strong> usa los umbrales canónicos del ecosistema sobre los usos de
-              los últimos 30 días (✅ Activa ≥ 5 · ⚠️ Bajo uso 1–4 · 💤 Sin visitas 0 — la misma
+              los últimos 30 días (<span aria-hidden="true">✅</span> Activa ≥ 5 · <span aria-hidden="true">⚠️</span> Bajo uso 1–4 · <span aria-hidden="true">💤</span> Sin visitas 0 — la misma
               definición de «apps activas» que el digest diario). «Sin visitas» no es un veredicto:
               si hay demanda sin cobertura lo dice GSC, no Analytics. Clic en una cabecera para
               reordenar; por defecto manda <strong>Usos 30d</strong>, el presente antes que el
@@ -1600,7 +1605,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
               </>
             ) : (
               <div className={styles.noAppSelected}>
-                <p>👆 Selecciona una aplicación del menú para ver sus estadísticas detalladas.</p>
+                <p><span aria-hidden="true">👆</span> Selecciona una aplicación del menú para ver sus estadísticas detalladas.</p>
               </div>
             )}
           </section>
@@ -1666,20 +1671,20 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                         <td><strong>{registro.aplicacion}</strong></td>
                         <td>
                           {registro.modo === 'mcp'
-                            ? <span className={styles.badgeMCP}>🤖 MCP</span>
+                            ? <span className={styles.badgeMCP}><span aria-hidden="true">🤖</span> MCP</span>
                             : registro.modo === 'chatgpt'
-                            ? <span className={styles.badgeChatGPT}>💬 ChatGPT</span>
+                            ? <span className={styles.badgeChatGPT}><span aria-hidden="true">💬</span> ChatGPT</span>
                             : registro.modo === 'referral-ia'
-                            ? <span className={styles.badgeReferral}>🔗 Desde IA</span>
+                            ? <span className={styles.badgeReferral}><span aria-hidden="true">🔗</span> Desde IA</span>
                             : registro.modo === 'pwa'
-                            ? <span className={styles.badgePWA}>📲 PWA</span>
+                            ? <span className={styles.badgePWA}><span aria-hidden="true">📲</span> PWA</span>
                             : registro.modo === 'referral-social'
-                            ? <span className={styles.badgeRedes}>📣 Redes</span>
+                            ? <span className={styles.badgeRedes}><span aria-hidden="true">📣</span> Redes</span>
                             : registro.modo === 'bot'
-                            ? <span className={styles.badgeBot}>🕷️ Bot</span>
+                            ? <span className={styles.badgeBot}><span aria-hidden="true">🕷️</span> Bot</span>
                             : registro.modo === 'share-emit'
-                            ? <span className={styles.badgeShare}>🔗 Compartido{registro.datos_adicionales?.share_emit ? ` · ${registro.datos_adicionales.share_emit}` : ''}</span>
-                            : <span className={styles.badgeWeb}>🌐 Web</span>}
+                            ? <span className={styles.badgeShare}><span aria-hidden="true">🔗</span> Compartido{registro.datos_adicionales?.share_emit ? ` · ${registro.datos_adicionales.share_emit}` : ''}</span>
+                            : <span className={styles.badgeWeb}><span aria-hidden="true">🌐</span> Web</span>}
                         </td>
                         <td>{registro.timestamp}</td>
                         <td>
@@ -1763,7 +1768,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                     })}
                     {/* Fila Total Real */}
                     <tr style={{ borderTop: '2px solid var(--primary)', fontWeight: 700 }}>
-                      <td>✅ TOTAL REAL</td>
+                      <td><span aria-hidden="true">✅</span> TOTAL REAL</td>
                       <td style={{ textAlign: 'center' }}>{resumenQuery.data.totalReal.hoy || '–'}</td>
                       <td style={{ textAlign: 'center' }}>{resumenQuery.data.totalReal.ayer || '–'}</td>
                       <td style={{ textAlign: 'center' }}>{resumenQuery.data.totalReal.semana || '–'}</td>
@@ -1807,7 +1812,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
               dominio propio. Excluye bots y tu propia IP.
             </p>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-              ⚠️ La cifra de dominio propio <strong>no es comparable entre verticales</strong>: solo Cronicum
+              <span aria-hidden="true">⚠️</span> La cifra de dominio propio <strong>no es comparable entre verticales</strong>: solo Cronicum
               migró sus apps a su dominio; las de los otros tres viven en meskeia.com <strong>por diseño</strong>,
               así que su número de portal solo mide sus páginas propias y está estructuralmente acotado. Un
               portal pequeño aquí no es síntoma de nada — compara cada tema consigo mismo en el tiempo, no
@@ -1947,7 +1952,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                           </tr>
                           {/* TOTAL ecosistema — al final; = subtotales de tema + resto (+ huérfanos) */}
                           <tr style={{ borderTop: '2px solid var(--primary)', fontWeight: 700 }}>
-                            <td>✅ TOTAL ecosistema</td>
+                            <td><span aria-hidden="true">✅</span> TOTAL ecosistema</td>
                             <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.hoy || '–'}</td>
                             <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.ayer || '–'}</td>
                             <td style={{ textAlign: 'center' }}>{dominioFusion.totalEco.semana || '–'}</td>
@@ -1999,7 +2004,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
               cuenta directo, sobreviva o no la sesión. Se lee en <strong>absoluto y tendencia, sin suelos</strong>.
             </p>
 
-            {navegacionQuery.isLoading && <p>⏳ Cargando análisis de navegación…</p>}
+            {navegacionQuery.isLoading && <p><span aria-hidden="true">⏳</span> Cargando análisis de navegación…</p>}
             {navegacionQuery.error && <p style={{ color: '#dc2626' }}>Error: {navegacionQuery.error.message}</p>}
             {navegacionQuery.data && (
               <>
@@ -2115,19 +2120,30 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       {/* Status Bar */}
       <div className={styles.statusBar}>
         <span className={loading ? styles.statusLoading : styles.statusSuccess}>
-          {loading ? '⏳ Cargando...' : '✅ Conectado'}
+          {loading ? (
+            <span key="cargando"><span aria-hidden="true">⏳</span> Cargando...</span>
+          ) : (
+            <span key="conectado"><span aria-hidden="true">✅</span> Conectado</span>
+          )}
         </span>
         {filtroIPActivo && ipConfig?.ip_excluida && (
-          <span className={styles.filterActive}>🧪 Filtro IP activo</span>
+          <span className={styles.filterActive}><span aria-hidden="true">🧪</span> Filtro IP activo</span>
         )}
         {/* Estado del rollup: hasta qué día están los agregados. Si va por detrás
             de anteayer, el cron ha fallado y conviene saberlo (los números de días
             cerrados podrían estar incompletos hasta el on-demand defensivo). */}
         {datos?.rollup && (
           <span className={datos.rollup.hasta && datos.rollup.hasta >= datos.rollup.esperado ? styles.lastUpdate : styles.rollupWarn}>
-            {datos.rollup.hasta && datos.rollup.hasta >= datos.rollup.esperado
-              ? `📦 Agregados al día (hasta ${formatearOrd(datos.rollup.hasta)})`
-              : `⚠️ Rollup atrasado (hasta ${datos.rollup.hasta ? formatearOrd(datos.rollup.hasta) : 'nunca'}, esperado ${formatearOrd(datos.rollup.esperado)})`}
+            {datos.rollup.hasta && datos.rollup.hasta >= datos.rollup.esperado ? (
+              <span key="al-dia">
+                <span aria-hidden="true">📦</span> {`Agregados al día (hasta ${formatearOrd(datos.rollup.hasta)})`}
+              </span>
+            ) : (
+              <span key="atrasado">
+                <span aria-hidden="true">⚠️</span>{' '}
+                {`Rollup atrasado (hasta ${datos.rollup.hasta ? formatearOrd(datos.rollup.hasta) : 'nunca'}, esperado ${formatearOrd(datos.rollup.esperado)})`}
+              </span>
+            )}
           </span>
         )}
         <span className={styles.lastUpdate}>

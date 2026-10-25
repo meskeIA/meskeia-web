@@ -223,10 +223,10 @@ export default function TerminosPage() {
           <h3>6.4 Recomendación de Uso</h3>
           <p>Use nuestras aplicaciones como <strong>punto de partida</strong> para:</p>
           <ul>
-            <li>✅ Entender conceptos básicos y familiarizarse con cálculos</li>
-            <li>✅ Hacer estimaciones rápidas y planificación inicial</li>
-            <li>✅ Explorar escenarios hipotéticos y simulaciones educativas</li>
-            <li>✅ Aprender sobre diferentes áreas (finanzas, salud, matemáticas, etc.)</li>
+            <li><span aria-hidden="true">✅</span> Entender conceptos básicos y familiarizarse con cálculos</li>
+            <li><span aria-hidden="true">✅</span> Hacer estimaciones rápidas y planificación inicial</li>
+            <li><span aria-hidden="true">✅</span> Explorar escenarios hipotéticos y simulaciones educativas</li>
+            <li><span aria-hidden="true">✅</span> Aprender sobre diferentes áreas (finanzas, salud, matemáticas, etc.)</li>
           </ul>
 
           <p>Para decisiones finales e importantes, <strong>siempre consulte con un profesional cualificado</strong> en la materia correspondiente.</p>

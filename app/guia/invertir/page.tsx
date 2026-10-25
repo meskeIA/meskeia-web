@@ -232,6 +232,7 @@ export default function GuiaInvertirPage() {
           {faqData.map((faq, index) => (
             <div key={index} className={styles.faqItem}>
               <button
+                type="button"
                 className={`${styles.faqQuestion} ${openFaq === index ? styles.faqQuestionOpen : ''}`}
                 onClick={() => setOpenFaq(openFaq === index ? null : index)}
                 aria-expanded={openFaq === index}

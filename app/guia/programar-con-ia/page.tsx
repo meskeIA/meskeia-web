@@ -273,6 +273,7 @@ export default function GuiaProgramarConIaPage() {
           {faqData.map((faq, i) => (
             <div key={i} className={`${styles.faqItem} ${openFaq === i ? styles.faqItemOpen : ''}`}>
               <button
+                type="button"
                 className={styles.faqQuestion}
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 aria-expanded={openFaq === i}
@@ -296,13 +297,13 @@ export default function GuiaProgramarConIaPage() {
         </p>
         <div className={styles.ctaBotones}>
           <Link href="/comparador-ides-ia/" className={styles.ctaBtn}>
-            🖥️ Elige tu IDE
+            <span aria-hidden="true">🖥️</span> Elige tu IDE
           </Link>
           <Link href="/constructor-prompts/" className={styles.ctaBtnSecundario}>
-            🧱 Escribe tu primer prompt
+            <span aria-hidden="true">🧱</span> Escribe tu primer prompt
           </Link>
           <Link href="/comparador-asistentes-codigo/" className={styles.ctaBtnSecundario}>
-            ⌨️ Elige tu asistente IA
+            <span aria-hidden="true">⌨️</span> Elige tu asistente IA
           </Link>
         </div>
       </section>

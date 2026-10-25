@@ -447,6 +447,7 @@ export default function HistoriaInteractivo({
 
               <div className={styles.filtroCategoria}>
                 <button
+                  type="button"
                   className={`${styles.filtroCatBtn} ${catFiltro === 'todas' ? styles.filtroCatBtnActivo : ''}`}
                   onClick={() => setCatFiltro('todas')}
                   style={
