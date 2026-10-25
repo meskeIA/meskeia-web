@@ -45,10 +45,12 @@
  * y registral recalculados tramo a tramo por un script propio que NO llama al código de la
  * app; el desarrollo va comentado junto a cada aserción, con los importes sin redondear.
  *
- * HALLAZGOS: a 25/10/2026 hay tres ABIERTOS, con `test.fail()` en el último bloque ([25/10-a] la
+ * HALLAZGOS: el 25/10/2026 se abrieron tres, con `test.fail()` en el último bloque ([25/10-a] la
  * retención del 3 % que calla la salvedad del no residente, [25/10-b] la caída de la página traducida al
  * salir de Ceuta o Melilla y [25/10-c] el recuadro traducido que se queda con la comunidad anterior),
- * más dos de componentes compartidos registrados en otra app de la familia (3493 y 3498).
+ * más dos de componentes compartidos registrados en otra app de la familia (3493 y 3498). La tanda de
+ * /reparar de ese día reparó [25/10-b] (3507), [25/10-c] (3508), 3493 y 3498, ya sin la marca; el
+ * [25/10-a] (3509) sigue ABIERTO, a decisión del usuario (dato normativo nuevo, TRLIRNR art. 25.2).
  * A 21/10/2026 se sumó uno, [21/10-a] (las notas de comunidad con ranking o
  * calificativo), reparado en b8d8bff5 y ya sin `test.fail()`. Los tres del 13/10 ([13/10-a] a
  * [13/10-c], hallazgos 3267-3269) se REPARARON el 21/10/2026 y quedan como regresión, sin marca:
@@ -4754,7 +4756,7 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
   });
 
   /**
-   * [25/10-b] (operativa, alto) — ABIERTO. Con la página traducida (cada nodo de texto a <font><font>),
+   * [25/10-b] (operativa, alto) — REPARADO 25/10/2026 (hallazgo 3507): las dos notas llevan key. Con la página traducida (cada nodo de texto a <font><font>),
    * salir de Ceuta o Melilla a CUALQUIER otra comunidad tumba la app en «Algo salió mal» (NotFoundError en
    * removeChild). page.tsx l. 539-555: `{ciudadBonificada ? (<p className={styles.infoCcaaNote}>…) : (<p
    * className={styles.infoCcaaNote}>…)}` son dos <p> del MISMO tipo en el mismo sitio, así que React no
@@ -4766,7 +4768,6 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
    * check:ternario-traducido no lo ve: las dos ramas son JSX, no texto suelto frente a JSX.
    */
   test('[25/10-b] con la página traducida, salir de Ceuta o Melilla a otra comunidad no tumba la app', async ({ page }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-b], la nota de las ciudades traducida tumba la app al salir de Ceuta o Melilla');
     // Control: sin traducir, el mismo paso cuadra (200.000 × 6 % = 12.000 €).
     await abrir(page, 'ceuta', 'particular', '200000');
     await page.selectOption('#select-ccaa', 'madrid');
@@ -4789,7 +4790,7 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
   });
 
   /**
-   * [25/10-c] (operativa, medio) — ABIERTO. Con la página traducida, el recuadro de la comunidad se queda
+   * [25/10-c] (operativa, medio) — REPARADO 25/10/2026 (hallazgo 3508). Con la página traducida, el recuadro de la comunidad se queda
    * con la ANTERIOR (o con el tipo del precio anterior) mientras las tarjetas ya cobran lo nuevo: React
    * escribe en el nodo de texto que el traductor retiró cuando la variable va junto a otro texto.
    *   · Madrid → Andalucía (120.000 €): «ITP General 6 %» y «AJD 0,75 %» (l. 502 y 519,
@@ -4806,7 +4807,6 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
    * Es la forma de las hermanas (3492, 3495, 3503, 3506) en el page.tsx de esta.
    */
   test('[25/10-c] con la página traducida, el recuadro y la nota de los honorarios dicen la comunidad y el precio elegidos', async ({ page }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-c], el recuadro traducido se queda con la comunidad anterior');
     expect(ITP_CCAA.cataluna.tramosProgresivos?.map((t) => t.tipo)).toEqual([10, 11, 12, 13]);
     expect(ITP_CCAA.valencia.umbralTipoUnico).toEqual({ superiorA: 1_000_000, tipo: 11 });
     const viejos: string[] = [];
@@ -4892,10 +4892,9 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
    * Hallazgo 3498 — REGISTRADO hoy en otra app de la familia (components/AvisoTerritorioSinIva.tsx l. 46,
    * `<span>({territorio.nombre})</span>`), y se reproduce aquí: con la página traducida, Canarias → Ceuta con
    * promotor deja «tributa por el IPSI (Impuesto General Indirecto Canario)». Esperado el nombre del IPSI
-   * (TERRITORIOS_SIN_IVA.ceuta). ABIERTO; se repara en el componente, no en esta app.
+   * (TERRITORIOS_SIN_IVA.ceuta). REPARADO el 25/10/2026 en el componente (412caa1e).
    */
   test('3498 (registrado en otra app) — traducida, Canarias → Ceuta: el aviso del territorio da el nombre del IPSI', async ({ page }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo 3498, registrado en otra app de la familia (AvisoTerritorioSinIva)');
     await abrir(page, 'canarias', 'promotor', '200000');
     await traducir(page);
     await page.selectOption('#select-ccaa', 'ceuta');
@@ -4909,10 +4908,9 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
    * app monta con conComunidad={false}), y se reproduce aquí. Escritura el 15/03/2026: el vendedor paga
    * del 01/01 al 14/03 (31 + 28 + 14 = 73 días) y el comprador 292. Con IBI 400: 400 × 73 / 365 = 80,00 y
    * 320,00. Traducida, IBI 650: esperado 650 × 73 / 365 = 130,00 € · 73 días y 520,00 € · 292 días; la tabla
-   * sigue en 80,00 y 320,00. ABIERTO; se repara en el componente.
+   * seguía en 80,00 y 320,00. REPARADO el 25/10/2026 en el componente (45e79788).
    */
   test('3493 (registrado en otra app) — traducida, la tabla del reparto del IBI dice los importes de lo escrito', async ({ page }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo 3493, registrado en otra app de la familia (ProrrateoIbiComunidad)');
     await abrir(page, 'madrid', 'particular');
     const bloque = page.locator('section[aria-labelledby="titulo-prorrateo"]');
     const fecha = bloque.locator('input[type="date"]');

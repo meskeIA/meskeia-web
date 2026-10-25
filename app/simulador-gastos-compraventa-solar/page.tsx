@@ -499,7 +499,9 @@ export default function SimuladorSolarPage() {
             <div className={styles.infoCcaaGrid}>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>ITP General</span>
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(itpGeneralRotulo)}&nbsp;%</span>
+                {/* Una sola cadena, único hijo del <span>: con la página traducida, React escribía el
+                    tipo nuevo en el nodo que el traductor ya había retirado (hallazgo 3508). */}
+                <span className={styles.infoCcaaValue}>{`${formatTipoNominal(itpGeneralRotulo)} %`}</span>
               </div>
               {/*
                 Sin esta casilla, el recuadro anunciaba «ITP General 6%» y la tarjeta cobraba el
@@ -510,13 +512,13 @@ export default function SimuladorSolarPage() {
                 <div className={styles.infoCcaaItem}>
                   <span className={styles.infoCcaaLabel}>Bonificación en cuota</span>
                   <span className={styles.infoCcaaValue}>
-                    −{formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)}&nbsp;%
+                    {`−${formatTipoNominal(BONIFICACION_CUOTA_CEUTA_MELILLA * 100)} %`}
                   </span>
                 </div>
               )}
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(ajdRotulo)}&nbsp;%</span>
+                <span className={styles.infoCcaaValue}>{`${formatTipoNominal(ajdRotulo)} %`}</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>
@@ -531,21 +533,25 @@ export default function SimuladorSolarPage() {
                 progresiva (9% → 11%)» y el 11 % grava TODO el valor, no el exceso. */}
             {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> <strong>Tipo según el valor:</strong> {subidaITP}.
+                <span aria-hidden="true">⚠️</span> <strong>Tipo según el valor:</strong> <span>{`${subidaITP}.`}</span>
               </p>
             )}
             {/* En Ceuta y Melilla la nota negaba una rebaja que la app sí aplica: la
                 bonificación no es un tipo reducido de vivienda sino del SITIO (hallazgo 1593). */}
+            {/* Las dos notas, con key: sin ella React reutiliza el <p> y reconcilia sus nodos de
+                texto, que con la página traducida ya no están, y la app caía al salir de Ceuta o
+                Melilla (hallazgo 3507, la receta del 3476 de nave-industrial). Cada variable, sola
+                en su elemento (3508). */}
             {ciudadBonificada ? (
-              <p className={styles.infoCcaaNote}>
+              <p key="ciudad-bonificada" className={styles.infoCcaaNote}>
                 Los solares tributan por el <strong>tipo general</strong> de ITP cuando vende un particular,
-                pero en {nombreEnFrase(ccaa)} se aplica además la{' '}
-                <strong>bonificación del {BONIFICACION_CIUDADES} de la cuota</strong> del artículo 57 bis
+                pero en <span>{nombreEnFrase(ccaa)}</span> se aplica además la{' '}
+                <strong>{`bonificación del ${BONIFICACION_CIUDADES} de la cuota`}</strong> del artículo 57 bis
                 del TRLITPAJD, que corresponde a los inmuebles situados en la ciudad sea cual sea su uso.
                 El simulador ya la descuenta.
               </p>
             ) : (
-              <p className={styles.infoCcaaNote}>
+              <p key="tipo-general" className={styles.infoCcaaNote}>
                 Cuando vende un particular, un solar tributa por el <strong>tipo general</strong> de ITP: los
                 tipos reducidos por perfil del comprador (jóvenes, familia numerosa, discapacidad) exigen que
                 el inmueble sea la vivienda habitual, y un solar no lo es. Eso no agota los beneficios
@@ -562,7 +568,7 @@ export default function SimuladorSolarPage() {
             */}
             {datosCcaaActual.notas && (
               <p className={styles.infoCcaaNote}>
-                <strong>{datosCcaaActual.nombre}:</strong> {separarPorcentajes(datosCcaaActual.notas)}
+                <strong>{`${datosCcaaActual.nombre}:`}</strong> <span>{separarPorcentajes(datosCcaaActual.notas)}</span>
               </p>
             )}
           </div>
@@ -772,9 +778,10 @@ export default function SimuladorSolarPage() {
                   esta nota no habla del «coste real» (redacción común de las siete hermanas). */}
               {territorioHonorarios && (
                 <p className={styles.avisoHonorarios} role="note">
-                  <span aria-hidden="true">ℹ️</span> Las facturas de notaría y registro llevan además{' '}
-                  {territorioHonorarios.impuesto}, que esta herramienta no calcula, así que cuestan más de lo
-                  que se muestra.
+                  {/* Una sola cadena: con la página traducida nombraba el impuesto del territorio
+                      anterior (hallazgo 3508). */}
+                  <span aria-hidden="true">ℹ️</span>{' '}
+                  <span>{`Las facturas de notaría y registro llevan además ${territorioHonorarios.impuesto}, que esta herramienta no calcula, así que cuestan más de lo que se muestra.`}</span>
                 </p>
               )}
 
