@@ -5219,12 +5219,13 @@ test.describe('Inspector 25/10/2026', () => {
       expect(q?.acceptedAnswer.text ?? '').not.toMatch(/se eligen 6 números del 1 al 49 y el Reintegro/);
     });
 
-    test('ABIERTO (dato, bajo; cabo C0390) · la tabla da a La Primitiva un «Bote mínimo» de 3.000.000 € que sus normas no fijan', async ({ page }) => {
-      test.fail(); // ABIERTO: hallazgo de la inspección del 25/10/2026 (cabo C0390)
+    // REPARADO el 25/10/2026 (hallazgo 3488, decisión del usuario): la celda dice que no hay mínimo,
+    // con el criterio de Lototurf. Norma 8.ª leída de nuevo en la sesión (58014anexo.pdf).
+    test('REPARADO 3488 (dato, bajo; cabo C0390) · la tabla da a La Primitiva un «Bote mínimo» de 3.000.000 € que sus normas no fijan', async ({ page }) => {
       await expect(page.locator('[class*="comparativaTable"] thead th').nth(4)).toHaveText('Bote mínimo');
       // Norma 8.ª.1: la categoría especial se lleva «El 20 por 100» del fondo, con arrastre (8.ª.1.1 y
       // 1.2); ninguna de las 57 normas fija un mínimo garantizado, a diferencia de El Gordo (66.ª.1).
-      await expect(celdaTabla(page, 'La Primitiva', 4)).not.toHaveText(/3\.000\.000/);
+      await expect(celdaTabla(page, 'La Primitiva', 4)).toHaveText('Sin mínimo fijado');
     });
   });
 });

@@ -810,7 +810,11 @@ export default function GeneradorLoteriaPage() {
                       13.983.816 × 10. Acertar solo los 6 es la primera categoría. */}
                   <td>1 entre 139.838.160</td>
                   <td>1,00 €</td>
-                  <td>3.000.000 €</td>
+                  {/* Hallazgo 3488 (25/10/2026): las normas de SELAE de junio de 2015 no fijan mínimo.
+                      La categoría especial es «El 20 por 100» del fondo y, sin acertantes, pasa «a
+                      incrementar el de la misma categoría del concurso inmediato siguiente» (8.ª.1 y
+                      1.1). Los 3.000.000 € no tenían ancla. Mismo criterio que Lototurf. */}
+                  <td>Sin mínimo fijado</td>
                   <td>Lunes, jueves y sábados</td>
                 </tr>
                 <tr>
