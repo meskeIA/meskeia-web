@@ -476,7 +476,7 @@ export default function CalculadoraNotasPage() {
           onClick={() => setTabActivo('evau')}
           aria-pressed={tabActivo === 'evau'}
         >
-          <span aria-hidden="true">🎓</span> Simulador EvAU 🇪🇸
+          <span aria-hidden="true">🎓</span> Simulador EvAU <span aria-hidden="true">🇪🇸</span>
         </button>
         <button
           type="button"
@@ -788,6 +788,7 @@ export default function CalculadoraNotasPage() {
                     />
                     <span></span>
                     <button
+                      type="button"
                       className={styles.btnEliminar}
                       onClick={() => eliminarEspecifica(asig.id)}
                       title="Eliminar materia"
@@ -800,7 +801,7 @@ export default function CalculadoraNotasPage() {
               </div>
 
               {asignaturasEspecificas.length < 4 && (
-                <button className={styles.btnAnadir} onClick={agregarEspecifica}>
+                <button type="button" className={styles.btnAnadir} onClick={agregarEspecifica}>
                   <span>+</span> Añadir materia específica
                 </button>
               )}
@@ -944,7 +945,7 @@ export default function CalculadoraNotasPage() {
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.colombia, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
-                  <span className={styles.conversorEscala}><span aria-hidden="true">🇵🇪</span> Perú / 🇻🇪 Venezuela (0-20)</span>
+                  <span className={styles.conversorEscala}><span aria-hidden="true">🇵🇪</span> Perú / <span aria-hidden="true">🇻🇪</span> Venezuela (0-20)</span>
                   <span className={styles.conversorValor}>{formatNumber(resultadoConversor.peru, 2)}</span>
                 </div>
                 <div className={styles.conversorResultado}>
@@ -1151,7 +1152,7 @@ export default function CalculadoraNotasPage() {
 
         {/* 3. FAQ */}
         <details className={styles.faqList}>
-          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}>❓ Preguntas Frecuentes sobre Calificaciones y Medias</summary>
+          <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Calificaciones y Medias</summary>
           <div>
             <div className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Cómo se calcula la media ponderada?</div>

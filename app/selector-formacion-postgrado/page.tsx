@@ -242,7 +242,11 @@ export default function SelectorFormacionPostgradoPage() {
               disabled={opcionSeleccionada === -1}
               aria-disabled={opcionSeleccionada === -1}
             >
-              {preguntaActual < totalPreguntas - 1 ? 'Siguiente →' : 'Ver resultado 🎯'}
+              {preguntaActual < totalPreguntas - 1 ? (
+                <span key="siguiente">Siguiente →</span>
+              ) : (
+                <span key="resultado">Ver resultado <span aria-hidden="true">🎯</span></span>
+              )}
             </button>
           </nav>
         </section>

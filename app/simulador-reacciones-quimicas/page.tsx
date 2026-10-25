@@ -242,7 +242,13 @@ export default function SimuladorReaccionesQuimicas() {
                       <p className={styles.reaccionNombre}>
                         {r.nombre}
                         <span className={`${styles.energiaBadge} ${r.energia === 'exotérmica' ? styles.exotermica : r.energia === 'endotérmica' ? styles.endotermica : styles.variable}`}>
-                          {r.energia === 'exotérmica' ? '🔥 Exotérmica' : r.energia === 'endotérmica' ? '❄️ Endotérmica' : '〜 Variable'}
+                          {r.energia === 'exotérmica' ? (
+                            <span key="exo"><span aria-hidden="true">🔥</span> Exotérmica</span>
+                          ) : r.energia === 'endotérmica' ? (
+                            <span key="endo"><span aria-hidden="true">❄️</span> Endotérmica</span>
+                          ) : (
+                            <span key="variable"><span aria-hidden="true">〜</span> Variable</span>
+                          )}
                         </span>
                       </p>
                       <p className={styles.ecuacion}>{r.ecuacion}</p>

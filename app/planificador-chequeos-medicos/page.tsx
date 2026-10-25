@@ -303,7 +303,11 @@ function TarjetaChequeo({ chequeo, alDia, onToggle }: TarjetaChequeoProps) {
             <span className={styles.frecuencia}><span aria-hidden="true">⏱</span> {chequeo.frecuencia}</span>
             {chequeo.aplicaA !== 'todos' && (
               <span className={`${styles.badge} ${styles.badgeSexo}`}>
-                {chequeo.aplicaA === 'mujer' ? '♀ Solo mujeres' : '♂ Solo hombres'}
+                {chequeo.aplicaA === 'mujer' ? (
+                  <span key="mujer"><span aria-hidden="true">♀</span> Solo mujeres</span>
+                ) : (
+                  <span key="hombre"><span aria-hidden="true">♂</span> Solo hombres</span>
+                )}
               </span>
             )}
           </div>

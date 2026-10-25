@@ -929,7 +929,11 @@ export default function ConvertidorColoresPage() {
               aria-label={htmlExpanded ? 'Ocultar código' : 'Mostrar código'}
               aria-expanded={htmlExpanded}
             >
-              {htmlExpanded ? '▼ Ocultar código' : '▶ Ver código HTML'}
+              {htmlExpanded ? (
+                <span key="ocultar"><span aria-hidden="true">▼</span> Ocultar código</span>
+              ) : (
+                <span key="ver"><span aria-hidden="true">▶</span> Ver código HTML</span>
+              )}
             </button>
           </div>
 

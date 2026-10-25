@@ -1562,13 +1562,19 @@ export default function SimuladorAutomatasFinitos() {
                         : styles.resultadoRechazada
                   }
                 >
-                  {validacion.resultado === 'aceptada' && '✓ ACEPTADA'}
-                  {validacion.resultado === 'rechazada' && '✗ RECHAZADA'}
-                  {validacion.resultado === 'sin-transicion' && '⚠ SIN TRANSICIÓN'}
+                  {/* Cada veredicto en su span: un texto suelto que aparece y desaparece junto a
+                      sus hermanos tumba la página traducida (cabo C0312) */}
+                  {validacion.resultado === 'aceptada' && <span key="aceptada">✓ ACEPTADA</span>}
+                  {validacion.resultado === 'rechazada' && <span key="rechazada">✗ RECHAZADA</span>}
+                  {validacion.resultado === 'sin-transicion' && (
+                    <span key="sin-transicion">
+                      <span aria-hidden="true">⚠</span> SIN TRANSICIÓN
+                    </span>
+                  )}
                   {validacion.resultado === 'fuera-alfabeto' && (
-                    <>
+                    <span key="fuera-alfabeto">
                       <span aria-hidden="true">⚠</span> FUERA DEL ALFABETO
-                    </>
+                    </span>
                   )}
                 </div>
               )}

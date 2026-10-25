@@ -312,28 +312,28 @@ export default function LimpiadorTextoPage() {
 
           {/* SECCIÓN 1: Guía de opciones */}
           <div className={styles.eduComparativaSection}>
-            <h3>📊 Guía de Opciones: Cuándo Usar Cada Una</h3>
+            <h3><span aria-hidden="true">📊</span> Guía de Opciones: Cuándo Usar Cada Una</h3>
             <div className={styles.eduInfoGrid}>
               <div className={styles.eduInfoCard}>
-                <h4>🧹 Espacios y formato</h4>
+                <h4><span aria-hidden="true">🧹</span> Espacios y formato</h4>
                 <p><strong>Espacios extra</strong> → texto copiado de Word/PDF con dobles espacios<br />
                 <strong>Espacios inicio/fin</strong> → limpiar líneas antes de procesar en código<br />
                 <strong>Tabulaciones</strong> → texto exportado de Excel/tablas</p>
               </div>
               <div className={styles.eduInfoCard}>
-                <h4>📄 Estructura de líneas</h4>
+                <h4><span aria-hidden="true">📄</span> Estructura de líneas</h4>
                 <p><strong>Líneas vacías</strong> → compactar texto para conteo de palabras real<br />
                 <strong>Líneas duplicadas</strong> → listas de emails, CSV con registros repetidos<br />
                 <strong>Saltos de línea</strong> → convertir párrafos a una sola línea para SQL/JSON</p>
               </div>
               <div className={styles.eduInfoCard}>
-                <h4>🔣 Caracteres especiales</h4>
+                <h4><span aria-hidden="true">🔣</span> Caracteres especiales</h4>
                 <p><strong>HTML tags</strong> → extraer texto plano de código HTML<br />
                 <strong>URLs</strong> → limpiar posts de redes con muchos enlaces<br />
                 <strong>Emails</strong> → anonimizar texto antes de compartir</p>
               </div>
               <div className={styles.eduInfoCard}>
-                <h4>✂️ Contenido selectivo</h4>
+                <h4><span aria-hidden="true">✂️</span> Contenido selectivo</h4>
                 <p><strong>Números</strong> → extraer solo texto de documentos mixtos<br />
                 <strong>Puntuación</strong> → preparar texto para análisis lingüístico/NLP<br />
                 <strong>Emojis</strong> → limpiar comentarios de redes para análisis de sentimiento</p>
@@ -343,7 +343,7 @@ export default function LimpiadorTextoPage() {
 
           {/* SECCIÓN 2: Casos de uso reales */}
           <div className={styles.eduCasosSection}>
-            <h3>🎯 Casos de Uso Reales por Tipo de Usuario</h3>
+            <h3><span aria-hidden="true">🎯</span> Casos de Uso Reales por Tipo de Usuario</h3>
             <div className={styles.eduCasosGrid}>
               <div className={styles.eduCasoCard}>
                 <span className={styles.eduCasoIcon}>👨‍💻</span>
@@ -370,7 +370,7 @@ export default function LimpiadorTextoPage() {
 
           {/* SECCIÓN 3: FAQ */}
           <div className={styles.eduFaqSection}>
-            <h3>❓ Preguntas Frecuentes sobre Limpieza de Texto</h3>
+            <h3><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Limpieza de Texto</h3>
             <div className={styles.eduFaqList}>
               <details className={styles.eduFaqItem}>
                 <summary className={styles.eduFaqQuestion}>¿En qué orden se aplican las operaciones?</summary>
@@ -397,7 +397,7 @@ export default function LimpiadorTextoPage() {
 
           {/* SECCIÓN 4: Flujo de múltiples pasadas */}
           <div className={styles.eduPasadasSection}>
-            <h3>🔄 Técnica de Múltiples Pasadas</h3>
+            <h3><span aria-hidden="true">🔄</span> Técnica de Múltiples Pasadas</h3>
             <p className={styles.eduPasadasIntro}>
               El botón <strong>&quot;↓ Aplicar&quot;</strong> convierte el texto limpio en entrada para una nueva pasada.
               Esto permite encadenar limpiezas complejas:
@@ -429,7 +429,7 @@ export default function LimpiadorTextoPage() {
 
           {/* SECCIÓN 5: Tips */}
           <div className={styles.eduTipsSection}>
-            <h3>💡 Tips para Limpiezas Profesionales</h3>
+            <h3><span aria-hidden="true">💡</span> Tips para Limpiezas Profesionales</h3>
             <div className={styles.eduTipsGrid}>
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon}>💾</span>
@@ -461,10 +461,10 @@ export default function LimpiadorTextoPage() {
               <h3>Limitaciones y Riesgos de la Limpieza de Texto</h3>
             </div>
             <ul className={styles.warningList}>
-              <li><strong>❌ &quot;Caracteres especiales&quot; puede eliminar datos importantes:</strong> Símbolos como @, #, $, &amp; tienen significado funcional en muchos contextos (menciones de Twitter, hashtags, divisas, operadores lógicos). Esta opción elimina todo símbolo no estándar, lo que puede corromper datos estructurados como JSON, XML o código de programación.</li>
-              <li><strong>❌ &quot;Líneas duplicadas&quot; no distingue contexto:</strong> Si tu texto tiene dos párrafos que comienzan igual (por ejemplo, en legalese repetitivo), el segundo se elimina aunque sea diferente. La deduplicación es estricta: cualquier línea normalizada idéntica a una anterior se descarta.</li>
-              <li><strong>❌ &quot;Saltos de línea&quot; fusiona párrafos:</strong> Convertir a una sola línea elimina la estructura de párrafos. Si después necesitas distinguir dónde empezaba cada párrafo, habrás perdido esa información. Úsalo solo cuando el texto destino es un campo de texto plano sin estructura (como un campo de búsqueda o una variable de código).</li>
-              <li><strong>❌ La detección de emails y URLs es aproximada:</strong> Las expresiones regulares usadas capturan la mayoría de formatos, pero pueden dar falsos positivos (eliminar texto que parece email pero no lo es) o falsos negativos (no detectar URLs con formatos inusuales). Para procesamiento de producción, usa librerías especializadas.</li>
+              <li><strong><span aria-hidden="true">❌</span> &quot;Caracteres especiales&quot; puede eliminar datos importantes:</strong> Símbolos como @, #, $, &amp; tienen significado funcional en muchos contextos (menciones de Twitter, hashtags, divisas, operadores lógicos). Esta opción elimina todo símbolo no estándar, lo que puede corromper datos estructurados como JSON, XML o código de programación.</li>
+              <li><strong><span aria-hidden="true">❌</span> &quot;Líneas duplicadas&quot; no distingue contexto:</strong> Si tu texto tiene dos párrafos que comienzan igual (por ejemplo, en legalese repetitivo), el segundo se elimina aunque sea diferente. La deduplicación es estricta: cualquier línea normalizada idéntica a una anterior se descarta.</li>
+              <li><strong><span aria-hidden="true">❌</span> &quot;Saltos de línea&quot; fusiona párrafos:</strong> Convertir a una sola línea elimina la estructura de párrafos. Si después necesitas distinguir dónde empezaba cada párrafo, habrás perdido esa información. Úsalo solo cuando el texto destino es un campo de texto plano sin estructura (como un campo de búsqueda o una variable de código).</li>
+              <li><strong><span aria-hidden="true">❌</span> La detección de emails y URLs es aproximada:</strong> Las expresiones regulares usadas capturan la mayoría de formatos, pero pueden dar falsos positivos (eliminar texto que parece email pero no lo es) o falsos negativos (no detectar URLs con formatos inusuales). Para procesamiento de producción, usa librerías especializadas.</li>
             </ul>
           </div>
 

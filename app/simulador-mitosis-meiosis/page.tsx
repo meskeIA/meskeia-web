@@ -634,7 +634,11 @@ export default function SimuladorMitosisMeiosis() {
               aria-pressed={autoplay}
               aria-label={autoplay ? 'Pausar reproducción automática' : 'Iniciar reproducción automática'}
             >
-              {autoplay ? '⏸ Pausa' : '▶ Auto'}
+              {autoplay ? (
+                <span key="pausa"><span aria-hidden="true">⏸</span> Pausa</span>
+              ) : (
+                <span key="auto"><span aria-hidden="true">▶</span> Auto</span>
+              )}
             </button>
             <button
               className={styles.btnNav}
