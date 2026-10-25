@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { abrir, alta, listar, clasificar, anotar, cerrar, resumen, movimientosDe, leerId, DESTINOS, RAIZ } from './cabos.mjs';
+import { abrir, alta, listar, clasificar, anotar, cerrar, resumen, movimientosDe, leerId, avisoSujetoInspector, DESTINOS, RAIZ } from './cabos.mjs';
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'cabos-'));
 let fallos = 0;
@@ -145,6 +145,27 @@ console.log('\nEntran y salen en 7 días (18/10/2026)');
     const env = { ...process.env, CABOS_DB: path.join(TMP, 'semana.db') };
     const salida = execFileSync(process.execPath, [path.join(RAIZ, 'scripts', 'cabos', 'cabos.mjs'), 'resumen'], { env, encoding: 'utf8' });
     if (!/en 7 días \(entran → salen\): inspector 2 → 0 · reparar 0 → 1/.test(salida)) throw new Error(`no lo dice: «${salida.trim()}»`);
+  });
+}
+
+console.log('\nCabo del Inspector que la cola no sacaría (C0443)');
+{
+  const slugs = new Set(['simulador-gastos-compraventa-garaje', 'simulador-regresion']);
+  // Caso de origen: C0354, sujeto «compraventa», mudo del 21 al 24/10/2026
+  caso('«compraventa» a secas avisa', () => {
+    if (!avisoSujetoInspector('compraventa', slugs)) throw new Error('no avisó');
+  });
+  caso('«familia:compraventa» no avisa', () => igual(avisoSujetoInspector('familia:compraventa', slugs), null, 'aviso'));
+  caso('un slug no avisa', () => igual(avisoSujetoInspector('simulador-regresion', slugs), null, 'aviso'));
+  caso('un texto que nombra un slug no avisa', () => igual(avisoSujetoInspector('simulador-regresion/page.tsx:444', slugs), null, 'aviso'));
+  caso('una familia que no está declarada avisa', () => {
+    if (!avisoSujetoInspector('familia: tests y cuestionarios por fases', slugs)) throw new Error('no avisó');
+  });
+  caso('la línea de órdenes lo imprime al dar de alta con destino inspector', () => {
+    const env = { ...process.env, CABOS_DB: path.join(TMP, 'cli-inspector.db') };
+    const cli = path.join(RAIZ, 'scripts', 'cabos', 'cabos.mjs');
+    const salida = execFileSync(process.execPath, [cli, 'alta', '--sujeto', 'compraventa', '--origen', 'o', '--texto', 't', '--destino', 'inspector'], { env, encoding: 'utf8' });
+    if (!salida.includes('no sacará este cabo')) throw new Error(`no lo dice: «${salida.trim()}»`);
   });
 }
 

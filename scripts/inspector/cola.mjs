@@ -59,7 +59,7 @@
 import fs from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import { abrir, SQL_INVALIDADA } from './db.mjs';
-import { FAMILIAS, familiaDe, slugsHuerfanos } from './familias.mjs';
+import { FAMILIAS, familiaDe, slugsHuerfanos, appsDelSujeto } from './familias.mjs';
 import { RUTA_BASE as RUTA_CABOS, codigo } from '../cabos/cabos.mjs';
 
 const args = process.argv.slice(2);
@@ -85,10 +85,7 @@ function cabosPorApp() {
     const slugs = new Set(db.prepare('SELECT slug FROM apps').all().map((a) => a.slug));
     const filas = cabos.prepare("SELECT id, sujeto FROM cabos WHERE estado = 'abierto' AND destino = 'inspector' ORDER BY id").all();
     for (const c of filas) {
-      const sujeto = c.sujeto.trim();
-      const fam = sujeto.startsWith('familia:') ? FAMILIAS.find((f) => f.id === sujeto.slice('familia:'.length).trim()) : null;
-      const nombra = fam ? fam.slugs : slugs.has(sujeto) ? [sujeto] : sujeto.split(/[^a-z0-9-]+/).filter((t) => slugs.has(t));
-      for (const s of new Set(nombra)) {
+      for (const s of appsDelSujeto(c.sujeto, slugs)) {
         if (!mapa.has(s)) mapa.set(s, []);
         mapa.get(s).push(codigo(c.id));
       }

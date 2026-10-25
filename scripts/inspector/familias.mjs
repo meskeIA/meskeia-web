@@ -141,6 +141,20 @@ export function hermanasDe(slug) {
 }
 
 /**
+ * Las apps a las que se refiere el sujeto de un cabo, con el criterio de la cola: el sujeto ES
+ * un slug, NOMBRA slugs (`simulador-regresion/page.tsx:444`, «a y b») o es `familia:<id>` de
+ * una familia declarada. `slugs` es el conjunto de slugs vivos. Lo comparten `cola.mjs`, que
+ * adelanta esas apps, y `cabos.mjs`, que avisa al anotar un cabo del Inspector que la cola no
+ * sacará nunca (cabo C0443: C0354 se quedó mudo con el sujeto «compraventa»).
+ */
+export function appsDelSujeto(sujeto, slugs) {
+  const s = sujeto.trim();
+  const fam = s.startsWith('familia:') ? FAMILIAS.find((f) => f.id === s.slice('familia:'.length).trim()) : null;
+  const nombra = fam ? fam.slugs : slugs.has(s) ? [s] : s.split(/[^a-z0-9-]+/).filter((t) => slugs.has(t));
+  return [...new Set(nombra)];
+}
+
+/**
  * Comprueba que todo slug declarado existe de verdad en la base.
  *
  * Es el fallo silencioso clásico de este proyecto: una lista a mano que envejece sin que

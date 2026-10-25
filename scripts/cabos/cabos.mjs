@@ -67,6 +67,7 @@ import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { appsDelSujeto } from '../inspector/familias.mjs';
 
 export const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const RUTA_BASE = path.join(RAIZ, '_private', 'cabos', 'cabos.db');
@@ -187,6 +188,28 @@ function exigirDestino(destino) {
 const GENERICAS = new Set(['familia', 'fuera', 'tests', 'scripts', 'components', 'compartido', 'inspeccionadas', 'herramienta', 'candado', 'app', 'apps']);
 function palabrasDe(sujeto) {
   return [...new Set(sujeto.toLowerCase().split(/[\s,·()]+/).filter((p) => p.length >= 5 && !GENERICAS.has(p)))];
+}
+
+/** Los slugs vivos: las carpetas de `app/` con su `page.tsx`. */
+function slugsDeApp(raiz = RAIZ) {
+  const dir = path.join(raiz, 'app');
+  if (!fs.existsSync(dir)) return new Set();
+  return new Set(
+    fs.readdirSync(dir, { withFileTypes: true })
+      .filter((e) => e.isDirectory() && fs.existsSync(path.join(dir, e.name, 'page.tsx')))
+      .map((e) => e.name),
+  );
+}
+
+/**
+ * Un cabo del Inspector solo sale si la cola lo asocia a alguna app, y la cola solo entiende un
+ * slug, un texto que nombre slugs o `familia:<id>`. Con otro sujeto se queda mudo sin aviso:
+ * C0354 («compraventa», 21/10/2026) nunca salió con su familia (cabo C0443). Devuelve el aviso,
+ * o null si la cola lo verá. Avisa y no bloquea: el sujeto se corrige en el momento.
+ */
+export function avisoSujetoInspector(sujeto, slugs = slugsDeApp()) {
+  if (appsDelSujeto(sujeto, slugs).length) return null;
+  return `⚠ la cola del Inspector no sacará este cabo: «${sujeto}» no es un slug, no nombra ninguno y no es familia:<id> de scripts/inspector/familias.mjs. Pon de sujeto el slug o la familia, o dale otro destino (reparar, si es técnico).`;
 }
 
 // ── órdenes ─────────────────────────────────────────────────────────────────
@@ -373,6 +396,8 @@ function principal(argv) {
         const { id, parecidos } = alta(db, e);
         console.log(`${codigo(id)} dado de alta · ${e.destino ?? 'sin clasificar'} · ${e.sujeto}`);
         for (const p of parecidos) console.log(`  ojo, abierto con un sujeto parecido: ${codigo(p.id)} · ${p.sujeto}`);
+        const aviso = e.destino === 'inspector' ? avisoSujetoInspector(e.sujeto) : null;
+        if (aviso) console.log(`  ${aviso}`);
       }
       return;
     }
@@ -401,6 +426,8 @@ function principal(argv) {
       const id = leerId(resto[0]);
       clasificar(db, id, resto[1], typeof op.nota === 'string' ? op.nota : null);
       console.log(`${codigo(id)} → ${resto[1]}`);
+      const aviso = resto[1] === 'inspector' ? avisoSujetoInspector(obtener(db, id).sujeto) : null;
+      if (aviso) console.log(`  ${aviso}`);
       return;
     }
     case 'nota': {
