@@ -8509,7 +8509,11 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
     expect(panel).not.toMatch(/IRPF sobre ganancia|Ganancia patrimonial|base del ahorro \(del/);
     expect(await i24Valor(page, /^Impuesto sobre la renta de la venta/)).toBe('Sin calcular');
     expect(await i24Titulo(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
-    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('29.850,00 €');
+    // Desde el 25/10/2026 (hallazgo 3489, cabo C0441) la pestaña pregunta «¿Qué compraste?» y de
+    // serie es el solar: el suelo en la venta, 30.000 × 4.000 / 12.000 = 10.000, no supera los 20.000
+    // pagados por él → plusvalía NO SUJETA (art. 104.5 TRLRHL) y el neto pasa de 29.850,00 € a 30.000,00 €.
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('NO SUJETA');
+    expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('30.000,00 €');
   });
 });
 
@@ -9141,7 +9145,8 @@ test.describe('Inspector 25/10/2026 — Murcia, el 11 % de Extremadura, los rech
   });
 
   /**
-   * [25/10-a] (cálculo, medio) — ABIERTO. Cabo C0441: la forma del hallazgo 3466 de la referencia
+   * [25/10-a] (cálculo, medio) — REPARADO 25/10/2026 (hallazgo 3489): «¿Qué compraste?» y
+   * adquisicionSoloSuelo, como la referencia. Cabo C0441: la forma del hallazgo 3466 de la referencia
    * (reparado allí en 92df481b) que no llegó a esta hermana. El motor compartido admite ya
    * `adquisicionSoloSuelo`, pero esta app no se lo pasa ni pregunta qué compró el promotor.
    * En «Primera mano (obra nueva)» vende el promotor, que normalmente compró el SUELO. El art. 104.5
@@ -9162,7 +9167,6 @@ test.describe('Inspector 25/10/2026 — Murcia, el 11 % de Extremadura, los rech
   test('[25/10-a] cabo C0441 — en obra nueva, la plusvalía del promotor que compró un solar compara la compra entera con el suelo de la venta (art. 104.5 TRLRHL)', async ({
     page,
   }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-a] (cabo C0441), la plusvalía del promotor sin adquisicionSoloSuelo');
     // El motor compartido ya lo sabe hacer desde 92df481b: es el ancla de lo esperado.
     const motor = (precioCompra: number, adquisicionSoloSuelo?: boolean) =>
       calcularPlusvaliaMunicipal({
@@ -9206,7 +9210,8 @@ test.describe('Inspector 25/10/2026 — Murcia, el 11 % de Extremadura, los rech
   });
 
   /**
-   * [25/10-b] (dato, bajo) — ABIERTO. Cabo C0442: la forma del 3467 de la referencia y del 3472 de
+   * [25/10-b] (dato, bajo) — REPARADO 25/10/2026 (hallazgo 3490): la constante lleva
+   * SALVEDAD_PLUSVALIA_NO_RESIDENTE. Cabo C0442: la forma del 3467 de la referencia y del 3472 de
    * local-comercial (aa47727a), que no llegó aquí. TRLRHL, art. 106.2 (BOE-A-2004-4214, consolidado, leído
    * el 25/10/2026): en las transmisiones onerosas tiene «la consideración de sujeto pasivo sustituto del
    * contribuyente» quien adquiere el terreno «cuando el contribuyente sea una persona física no residente en
@@ -9220,7 +9225,6 @@ test.describe('Inspector 25/10/2026 — Murcia, el 11 % de Extremadura, los rech
   test('[25/10-b] cabo C0442 — «el vendedor paga la plusvalía» nombra al comprador sustituto cuando vende un no residente (art. 106.2 TRLRHL)', async ({
     page,
   }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-b] (cabo C0442), la FAQ de la plusvalía sin la salvedad del no residente');
     await page.goto(RUTA);
     const pregunta = '¿El vendedor de un garaje paga plusvalía municipal?';
     const visible = i24Normaliza(
@@ -9242,7 +9246,8 @@ test.describe('Inspector 25/10/2026 — Murcia, el 11 % de Extremadura, los rech
 
 test.describe('Inspector 25/10/2026 — la página traducida por el navegador', () => {
   /**
-   * [25/10-c] (operativa, medio) — ABIERTO. Con la página traducida (cada nodo de texto pasa a
+   * [25/10-c] (operativa, medio) — REPARADO 25/10/2026 (hallazgo 3492): cada texto variable, única
+   * hija de su elemento. Con la página traducida (cada nodo de texto pasa a
    * <font><font>), al cambiar de comunidad el formulario se queda con la ANTERIOR bajo el nombre de la
    * nueva: React escribe en el nodo de texto que el traductor retiró cuando la cifra va junto a otro texto.
    *   · Madrid → Cataluña: el recuadro dice «ITP General 6,00 %» y «AJD 0,75 %» (los de Madrid) con
@@ -9259,7 +9264,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
   test('[25/10-c] con la página traducida, el recuadro de la comunidad y los reducidos dicen los de la comunidad elegida', async ({
     page,
   }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-c], el formulario traducido se queda con la comunidad anterior');
     expect(ITP_CCAA.cataluna.tipoGeneral).toBe(10);
     expect(ITP_CCAA.cataluna.ajd).toBe(1.5);
     expect(ITP_CCAA.cantabria.tipoGeneral).toBe(9);
@@ -9291,7 +9295,8 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
   });
 
   /**
-   * [25/10-d] (operativa, alto) — ABIERTO. Con la página traducida, dos cambios del aviso «Podrías pagar
+   * [25/10-d] (operativa, alto) — REPARADO 25/10/2026 (hallazgo 3491): lo que aparece o desaparece es
+   * un <span key> entero. Con la página traducida, dos cambios del aviso «Podrías pagar
    * menos» tumban la app en «Algo salió mal» (NotFoundError en removeChild): React retira un nodo de texto
    * suelto que el traductor ya cambió por <font>.
    *   · Joven en Cantabria, 350.000 → 250.000 €: la línea «Jóvenes < 36 años» pierde «· ⚠️ tu precio supera
@@ -9306,7 +9311,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
   test('[25/10-d] con la página traducida, salir del tope de un reducido o pasar a una comunidad sin él no tumba la app', async ({
     page,
   }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-d], dos caídas del aviso «Podrías pagar menos» con la página traducida');
     expect(ITP_CCAA.cantabria.tiposReducidos.find((r) => /j[óo]ven/i.test(r.nombre))?.valorMaximo).toBe(300000);
     expect(ITP_CCAA.cantabria.tiposReducidos.find((r) => r.nombre === 'Familia numerosa')?.valorMaximo).toBe(300000);
     expect(ITP_CCAA.madrid.tiposReducidos.find((r) => r.nombre === 'Familia numerosa')?.valorMaximo).toBeUndefined();
@@ -9340,7 +9344,8 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
   });
 
   /**
-   * [25/10-e] (operativa, medio) — ABIERTO. Con la página traducida, la tabla del reparto del IBI se queda
+   * [25/10-e] (operativa, medio) — REPARADO 25/10/2026 (hallazgo 3493, en el componente compartido).
+   * Con la página traducida, la tabla del reparto del IBI se queda
    * con los importes y los días de ANTES, mientras la frase del total, debajo, ya dice el nuevo
    * (components/ProrrateoIbiComunidad.tsx, compartido por las siete apps de la familia: l. 183, la leyenda
    * `… el {fmtFecha(…)}`; l. 201-206, `{fmtEuro(…)}<span> · {días} días</span>`).
@@ -9354,7 +9359,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
   test('[25/10-e] con la página traducida, la tabla del reparto del IBI dice los importes y los días de lo escrito', async ({
     page,
   }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-e], la tabla del reparto traducida se queda vieja');
     await page.goto(RUTA);
     await esperarHidratacion(page, TESTIGOS_COMPRADOR);
     const bloque = page.locator('section[aria-labelledby="titulo-prorrateo"]');

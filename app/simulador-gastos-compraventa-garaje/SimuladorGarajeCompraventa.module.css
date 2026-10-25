@@ -462,6 +462,14 @@
   padding: var(--spacing-sm) 0;
 }
 
+/* La nota de «¿Qué compraste?» en la obra nueva (hallazgo 3489). */
+.notaCompraOriginal {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: var(--spacing-xs, 0.25rem) 0 0;
+}
+
 /* Casos de uso */
 .casosGrid {
   display: grid;

@@ -355,6 +355,12 @@ interface EntradaVendedor {
    * ahorro, y no se liquida IRPF (hallazgo 3379, AVISO_VENTA_PROMOTOR).
    */
   ventaDelPromotor?: boolean;
+  /**
+   * Obra nueva y lo que compró el promotor fue un solar: la compra se compara entera con el valor
+   * del suelo en la venta (art. 104.5 TRLRHL, «en su caso»; hallazgo 3489, receta del 3466 de la
+   * referencia).
+   */
+  compraSoloSuelo?: boolean;
   /** Dónde está el inmueble: Ceuta y Melilla bonifican la plusvalía y deducen el IRPF; en
    *  territorio foral la plusvalía no es la del TRLRHL (hallazgos 3059-3071, 10/10/2026). */
   ccaa: ComunidadAutonoma;
@@ -391,6 +397,7 @@ function calcularVendedor(e: EntradaVendedor) {
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
         // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL).
         ccaa: e.ccaa,
+        adquisicionSoloSuelo: e.compraSoloSuelo,
       })
     : null;
   const plusvalia = resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0;
@@ -463,6 +470,8 @@ export default function SimuladorGarajeCompraventaPage() {
 
   // Estado del formulario — vendedor
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
+  // Obra nueva: qué compró el promotor. Lo normal es el solar sobre el que construyó (hallazgo 3489).
+  const [compraOriginal, setCompraOriginal] = useState<'solar' | 'construido'>('solar');
   const [gastosAdquisicion, setGastosAdquisicion] = useState('');
   const [aniosPropiedad, setAniosPropiedad] = useState('');
   /** Meses completos cuando se vende antes de cumplir el año ('' = sin elegir). */
@@ -646,6 +655,7 @@ export default function SimuladorGarajeCompraventaPage() {
       otrasRentas: Math.max(0, parseSpanishNumberOr(otrasRentasAhorro)),
       sinGanancia: comisionImposible,
       ventaDelPromotor: tipoTransmision === 'primera-mano',
+      compraSoloSuelo: tipoTransmision === 'primera-mano' && compraOriginal === 'solar',
       ccaa,
     };
     const r = calcularVendedor(entrada);
@@ -708,7 +718,9 @@ export default function SimuladorGarajeCompraventaPage() {
     const exentoPlusvalia = rp ? rp.exento : false;
     if (rp) {
       metodoPlusvalia = rp.exento
-        ? 'No sujeta (sin incremento de valor)'
+        ? rp.valorSueloTransmision !== undefined
+          ? `No sujeta: el valor del suelo en la venta (${formatCurrency(rp.valorSueloTransmision)}) no supera lo que se pagó por el solar (art. 104.5 TRLRHL)`
+          : 'No sujeta (sin incremento de valor)'
         : rp.parCatastralImposible
           ? 'Método objetivo (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)'
           : !rp.metodoRealDisponible
@@ -718,8 +730,15 @@ export default function SimuladorGarajeCompraventaPage() {
               ? `Método objetivo (${escritoNoValido(valorCatastralTotal, parseSpanishNumber) ? 'el valor catastral total escrito tiene que ser mayor que 0: corrígelo para comparar con el método real' : 'falta el valor catastral total para comparar'})`
               : 'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).'
             : rp.metodoReal < rp.metodoObjetivo
-              ? 'Método real (más favorable)'
+              ? rp.valorSueloTransmision !== undefined
+                ? `Método real (más favorable): valor del suelo en la venta (${formatCurrency(rp.valorSueloTransmision)}) menos lo pagado por el solar (arts. 104.5 y 107.5 TRLRHL)`
+                : 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
+      // Comprado un solar sin el valor catastral total, la venta no se puede repartir entre suelo
+      // y construcción, y la cifra puede quedarse por encima de la legal (receta del 3466).
+      if (!rp.exento && rp.sinRepartoSolar) {
+        metodoPlusvalia = `${metodoPlusvalia}${metodoPlusvalia.endsWith('.') ? '' : '.'} Al haberse comprado un solar, puede salir más baja o no sujeta: el valor catastral total permite comparar lo pagado por el solar con el valor del suelo en la venta.`;
+      }
     }
     if (rp && !rp.exento && rp.bonificadaCiudad) {
       const bonificacion = `la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
@@ -834,7 +853,7 @@ export default function SimuladorGarajeCompraventaPage() {
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioGaraje, ccaa, tipoTransmision, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion, otrasRentasAhorro]);
+  }, [precioGaraje, ccaa, tipoTransmision, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion, otrasRentasAhorro, compraOriginal]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
   /** El precio escrito, para rotular el tipo que le toca (0 mientras no se lea). */
@@ -1243,7 +1262,9 @@ export default function SimuladorGarajeCompraventaPage() {
                 {/* Del motor, para un garaje suelto y con el precio escrito: el País Vasco lo
                     grava al 7 % y no al 4 % de la vivienda, y Valencia pasa al 11 % por encima
                     del millón (hallazgos 1581 y 1582). */}
-                <span className={styles.infoCcaaValue}>{formatNumber(tipoGeneralITP(ccaa, OBJETO_ITP, precioLeido), 2)}&nbsp;%</span>
+                {/* Una sola cadena, único hijo del <span>: con la página traducida, React escribía el
+                    tipo nuevo en el nodo que el traductor ya había retirado (hallazgo 3492). */}
+                <span className={styles.infoCcaaValue}>{`${formatNumber(tipoGeneralITP(ccaa, OBJETO_ITP, precioLeido), 2)} %`}</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
@@ -1256,9 +1277,9 @@ export default function SimuladorGarajeCompraventaPage() {
                     salía del selector oculto y la misma pantalla daba 0 % o 0,5 % en el País Vasco
                     según por dónde se hubiera pasado (hallazgo 2905, 06/10/2026). */}
                 <span className={styles.infoCcaaValue}>
-                  {formatTipoNominal(
+                  {`${formatTipoNominal(
                     tipoAJD(ccaa, { objeto: tipoTransmision === 'primera-mano' ? objetoAJDDe(tipoGaraje) : 'otro' }).tipo,
-                  )}&nbsp;%
+                  )} %`}
                 </span>
               </div>
             </div>
@@ -1293,15 +1314,17 @@ export default function SimuladorGarajeCompraventaPage() {
                     llamara a su oficina liquidadora pediría algo que no existe con ese nombre
                     (hallazgo 711). El rótulo nombra ahora lo que la lista contiene de verdad.
                   */}
-                  <h3>Beneficios fiscales en {nombreEnFrase(ccaa)} (solo si se cumplen TODAS sus condiciones):</h3>
+                  {/* Cada texto variable, único hijo de su elemento: con la página traducida, el
+                      rótulo y las líneas se quedaban con la comunidad anterior (hallazgo 3492). */}
+                  <h3>{`Beneficios fiscales en ${nombreEnFrase(ccaa)} (solo si se cumplen TODAS sus condiciones):`}</h3>
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
-                        <strong>{formatNumber(tr.tipo, 2)}&nbsp;%</strong> — {separarPorcentajes(tr.nombre)}
+                        <strong>{`${formatNumber(tr.tipo, 2)} %`}</strong> — <span>{separarPorcentajes(tr.nombre)}</span>
                         {tr.valorMaximo && (
-                          <span className={styles.limite}> (máx. {formatCurrency(tr.valorMaximo)})</span>
+                          <span className={styles.limite}>{` (máx. ${formatCurrency(tr.valorMaximo)})`}</span>
                         )}
-                        <span className={styles.limite}> · {separarPorcentajes(tr.condiciones.join(', '))}</span>
+                        <span className={styles.limite}>{` · ${separarPorcentajes(tr.condiciones.join(', '))}`}</span>
                       </li>
                     ))}
                   </ul>
@@ -1530,25 +1553,33 @@ export default function SimuladorGarajeCompraventaPage() {
                         era la frase que lo explica. Se nombra el tipo EFECTIVO, que es el que sale de
                         dividir la cuota por el precio, igual que hace la tarjeta del ITP.
                       */}
+                      {/* Una sola cadena, único hijo del <p>: con la página traducida se quedaba con
+                          el tipo efectivo y la comunidad anteriores (hallazgo 3492). */}
                       <p className={styles.avisoReducidosTexto}>
-                        El cálculo usa el tipo que te corresponde sin requisitos especiales
-                        ({formatNumber(resultadosComprador.porcentajeImpuesto, 2)}&nbsp;% efectivo sobre el precio)
-                        porque no podemos comprobar tu situación. En {nombreEnFrase(ccaa)} {resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:
+                        {`El cálculo usa el tipo que te corresponde sin requisitos especiales (${formatNumber(resultadosComprador.porcentajeImpuesto, 2)} % efectivo sobre el precio) porque no podemos comprobar tu situación. En ${nombreEnFrase(ccaa)} ${resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:`}
                       </p>
                       <ul className={styles.avisoReducidosLista}>
+                        {/* Hallazgos 3491 y 3492 (25/10/2026): con la página traducida, el fragmento
+                            del ⚠️ y el ternario del «Valor máximo» retiraban un nodo de texto suelto
+                            que el traductor ya había cambiado por <font>, y la app caía
+                            (NotFoundError); el tipo y los requisitos se quedaban con la comunidad
+                            anterior. Cada texto variable es el único hijo de su elemento, y lo que
+                            aparece o desaparece es un <span key> entero. */}
                         {resultadosComprador.tipoElegido.noComprobables.map(r => (
                           <li key={r.nombre}>
-                            <strong>{formatNumber(r.tipo, 2)}&nbsp;% — {separarPorcentajes(r.nombre)}</strong>
+                            <strong>{`${formatNumber(r.tipo, 2)} % — ${separarPorcentajes(r.nombre)}`}</strong>
                             <br />
-                            Requisitos: {separarPorcentajes(r.condiciones.join(' · '))}
-                            {r.valorMaximo ? ` · Valor máximo ${formatCurrency(r.valorMaximo)}` : ''}
+                            <span>{`Requisitos: ${separarPorcentajes(r.condiciones.join(' · '))}`}</span>
+                            {r.valorMaximo ? (
+                              <span key="tope">{` · Valor máximo ${formatCurrency(r.valorMaximo)}`}</span>
+                            ) : null}
                             {/* El tope de valor SÍ se comprueba, así que la línea no puede
                                 ofrecerse como rebaja al alcance cuando el precio la descarta
                                 (hallazgo 765). Se enseña igualmente porque dice a partir de qué
                                 precio existiría, que es lo que los hallazgos 721 y 741 exigen. */}
                             {superaElTope(r, resultadosComprador.precioGaraje) && (
                               // El emoji, fuera del árbol accesible (hallazgo 3083).
-                              <> · <span aria-hidden="true">⚠️</span> tu precio supera ese límite: no podrías acogerte</>
+                              <span key="supera"> · <span aria-hidden="true">⚠️</span> tu precio supera ese límite: no podrías acogerte</span>
                             )}
                           </li>
                         ))}
@@ -1586,9 +1617,39 @@ export default function SimuladorGarajeCompraventaPage() {
                   onChange={setPrecioCompraOriginal}
                   label="Precio de compra original del garaje"
                   placeholder="18000"
-                  helperText="Lo que pagaste cuando lo compraste"
+                  helperText={
+                    tipoTransmision === 'primera-mano'
+                      ? 'Lo que pagaste por el solar (o por el garaje, si lo compraste ya construido)'
+                      : 'Lo que pagaste cuando lo compraste'
+                  }
                   min={0}
                 />
+                {/* Obra nueva: el art. 104.5 TRLRHL aplica la proporción catastral a la compra solo
+                    «en su caso», si lo comprado tenía construcción; comprado un solar, se compara
+                    entero con el valor del suelo en la venta (hallazgo 3489, receta del 3466 de la
+                    referencia). */}
+                {tipoTransmision === 'primera-mano' && (
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label} htmlFor="compra-original">
+                      ¿Qué compraste?
+                    </label>
+                    <select
+                      id="compra-original"
+                      value={compraOriginal}
+                      onChange={(e) => setCompraOriginal(e.target.value as 'solar' | 'construido')}
+                      className={styles.select}
+                      aria-describedby="nota-compra-original"
+                    >
+                      <option value="solar">Solo el suelo (un solar sobre el que se construyó)</option>
+                      <option value="construido">Un garaje ya construido</option>
+                    </select>
+                    <p id="nota-compra-original" className={styles.notaCompraOriginal}>
+                      La plusvalía grava solo el suelo. Si compraste un solar, lo que pagaste se compara
+                      entero con el valor del suelo en la venta (art. 104.5 TRLRHL), así que conviene
+                      escribir también el valor catastral total.
+                    </p>
+                  </div>
+                )}
                 {/* En obra nueva vende el promotor y su renta no se calcula (3379): los campos que solo
                     alimentan la ganancia y su cuota no se piden, en vez de prometer un efecto que no
                     producen (efecto familia del 3394, medido en trastero y local: 3397 y 3400). */}

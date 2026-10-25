@@ -179,8 +179,12 @@ export default function ProrrateoIbiComunidad({ conComunidad = true }: Props) {
         <>
           <div className={styles.tablaWrapper}>
             <table className={styles.tabla}>
+              {/* Cada texto variable, una sola cadena única hija de su elemento: con la página
+                  traducida, React escribía los importes, los días y la fecha nuevos en nodos que el
+                  traductor ya había retirado, y la tabla contradecía al total de debajo (hallazgo
+                  3493, 25/10/2026). */}
               <caption className={styles.srOnly}>
-                Días e importe que corresponden a vendedor y comprador, con escritura el {fmtFecha(resultado.fecha)}
+                {`Días e importe que corresponden a vendedor y comprador, con escritura el ${fmtFecha(resultado.fecha)}`}
               </caption>
               <thead>
                 <tr>
@@ -194,16 +198,14 @@ export default function ProrrateoIbiComunidad({ conComunidad = true }: Props) {
                 {resultado.filas.map(({ concepto, r }) => (
                   <tr key={concepto}>
                     <td>{concepto}</td>
+                    <td>{`${fmtFecha(r.inicio)} – ${fmtFecha(r.fin)}`}</td>
                     <td>
-                      {fmtFecha(r.inicio)} – {fmtFecha(r.fin)}
+                      <span>{fmtEuro(r.importeVendedor)}</span>
+                      <span className={styles.dias}>{` · ${r.diasVendedor} días`}</span>
                     </td>
                     <td>
-                      {fmtEuro(r.importeVendedor)}
-                      <span className={styles.dias}> · {r.diasVendedor} días</span>
-                    </td>
-                    <td>
-                      {fmtEuro(r.importeComprador)}
-                      <span className={styles.dias}> · {r.diasComprador} días</span>
+                      <span>{fmtEuro(r.importeComprador)}</span>
+                      <span className={styles.dias}>{` · ${r.diasComprador} días`}</span>
                     </td>
                   </tr>
                 ))}
