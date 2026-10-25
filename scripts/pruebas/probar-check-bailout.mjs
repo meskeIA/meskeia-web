@@ -16,6 +16,9 @@
  *   5. La palabra BAILOUT en un .txt o .rsc, no en un .html. Debe CALLAR.
  *   6. SE PLANTA · un árbol con 10 HTML no es un build completo.
  *   7. SE PLANTA · el directorio no existe.
+ *   8. NEXT 16.4 · la misma frontera con el digest VACÍO (`data-dgst=""`), copiada del build del
+ *      25/10/2026 tras subir de la 16.3.8 a la 16.4.3. Debe FALLAR: con la marca antigua el
+ *      candado se quedó ciego y daba por «ya sin bailout» una página que lo seguía teniendo.
  */
 
 import fs from 'node:fs';
@@ -28,6 +31,7 @@ const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 const CANDADO = path.join(RAIZ, 'scripts', 'check-bailout-prerender.mjs');
 
 const FRAGMENTO = '</aside><!--$!--><template data-dgst="BAILOUT_TO_CLIENT_SIDE_RENDERING"></template><!--/$--><div class="mainContent">';
+const FRAGMENTO_16_4 = '</aside><!--$!--><template data-dgst=""></template><!--/$--><div class="NGolmq_mainContent">';
 const pagina = (cuerpo = '<main>contenido</main>') => `<!DOCTYPE html><html><body>${cuerpo}</body></html>`;
 const relleno = (n = 60) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`app-${i}.html`, pagina()]));
 
@@ -39,6 +43,7 @@ const CASOS = [
   { n: 5, nombre: 'BAILOUT en un .txt y un .rsc, no en .html', debeFallar: false, ficheros: { ...relleno(), 'x.txt': FRAGMENTO, 'x.rsc': FRAGMENTO } },
   { n: 6, nombre: 'SE PLANTA · solo 10 HTML', debeFallar: true, ficheros: relleno(10) },
   { n: 7, nombre: 'SE PLANTA · el directorio no existe', debeFallar: true, ficheros: null },
+  { n: 8, nombre: 'NEXT 16.4 · la frontera con el digest vacío en una página sin declarar', debeFallar: true, ficheros: { ...relleno(), 'simulador-nuevo.html': pagina(FRAGMENTO_16_4) } },
 ];
 
 let fallos = 0;

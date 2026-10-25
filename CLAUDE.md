@@ -625,7 +625,8 @@ el Inspector app por app, que comprueba qué hace la app.
 ### Candado del bailout en el prerender
 
 `npm run check:bailout` — en el build, **después** de `next build`, y **rompe el build** si un HTML
-de `.next/server/app/` lleva una frontera `BAILOUT_TO_CLIENT_SIDE_RENDERING` y su página no está
+de `.next/server/app/` lleva una frontera de Suspense pintada en cliente (`<!--$!-->`; desde
+Next 16.4 el digest `BAILOUT_TO_CLIENT_SIDE_RENDERING` sale vacío) y su página no está
 en `ACEPTADOS` del script con su razón: lo de dentro no está en el HTML servido.
 ⚠️ `next dev` no genera el bailout: un spec de «está en el HTML servido» pasa en dev y falla en
 producción. Por eso se mira aquí, el único momento con el HTML de producción, y no en los tests.

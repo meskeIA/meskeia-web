@@ -9,9 +9,15 @@
  * QUÉ BUSCA
  * ─────────
  * En los HTML que `next build` deja en `.next/server/app/`, la frontera de Suspense que React
- * marca con `data-dgst="BAILOUT_TO_CLIENT_SIDE_RENDERING"`: lo que va dentro NO está en el HTML
+ * marca con `<!--$!-->` (seguida de `<template data-dgst=…>`): lo que va dentro NO está en el HTML
  * servido, se pinta en el navegador. Para un buscador o un asistente de IA que lee el HTML, ese
  * contenido no existe.
+ *
+ * Se busca la marca de React y NO el digest: hasta Next 16.3 el digest decía
+ * `BAILOUT_TO_CLIENT_SIDE_RENDERING`, y la 16.4 lo deja vacío (`data-dgst=""`). Buscando el digest,
+ * el build del 25/10/2026 dio estimador-cartera-inversion por «ya sin bailout» cuando lo seguía
+ * teniendo: el candado se había quedado ciego. Medido ese día: la marca de React encuentra la misma
+ * página, 1 de 1.634, que el digest el 13/10. Caso 8 de las pruebas.
  *
  * POR QUÉ DESPUÉS DEL BUILD, Y NO EN LOS TESTS
  * ────────────────────────────────────────────
@@ -48,7 +54,7 @@ const ACEPTADOS = {
     'el contenido de la app está fuera del Suspense (C0160, 08/10/2026)',
 };
 
-const MARCA = 'BAILOUT_TO_CLIENT_SIDE_RENDERING';
+const MARCA = '<!--$!-->';
 /** Por debajo de esto no es el árbol de un build completo, y callar sería mentir. */
 const MINIMO_HTML = 50;
 
