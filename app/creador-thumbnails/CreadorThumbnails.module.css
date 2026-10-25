@@ -64,7 +64,8 @@
 /* Editor Layout */
 .editor {
   display: grid;
-  grid-template-columns: 280px 1fr 220px;
+  /* minmax(0, 1fr): la columna del lienzo no crece hasta él; el lienzo se escala a ella */
+  grid-template-columns: 280px minmax(0, 1fr) 220px;
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
 }
@@ -655,13 +656,13 @@
 /* Responsive */
 @media (max-width: 1200px) {
   .editor {
-    grid-template-columns: 250px 1fr 200px;
+    grid-template-columns: 250px minmax(0, 1fr) 200px;
   }
 }
 
 @media (max-width: 1024px) {
   .editor {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .toolsPanel {

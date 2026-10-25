@@ -104,6 +104,7 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 export default function CreadorThumbnailsPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bgFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -125,15 +126,20 @@ export default function CreadorThumbnailsPage() {
   // Obtener elemento seleccionado
   const selectedElement = elements.find(el => el.id === selectedId);
 
-  // Calcular escala para preview
+  // Calcular escala para preview: se mide la columna del lienzo, no la ventana. Con
+  // `innerWidth - 400` la escala salía negativa en móvil y el lienzo se quedaba en 1280 px,
+  // y en escritorio no descontaba los dos paneles laterales (cabos C0406 y C0358)
   useEffect(() => {
+    const contenedor = canvasContainerRef.current;
+    if (!contenedor) return;
     const updateScale = () => {
-      const containerWidth = Math.min(window.innerWidth - 400, 900);
-      setScale(containerWidth / CANVAS_WIDTH);
+      const containerWidth = Math.min(contenedor.clientWidth, 900);
+      if (containerWidth > 0) setScale(containerWidth / CANVAS_WIDTH);
     };
     updateScale();
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
+    const observador = new ResizeObserver(updateScale);
+    observador.observe(contenedor);
+    return () => observador.disconnect();
   }, []);
 
   // Dibujar canvas
@@ -1106,7 +1112,7 @@ export default function CreadorThumbnailsPage() {
         </div>
 
         {/* Canvas central */}
-        <div className={styles.canvasContainer}>
+        <div ref={canvasContainerRef} className={styles.canvasContainer}>
           <div className={styles.canvasWrapper} style={{ width: CANVAS_WIDTH * scale, height: CANVAS_HEIGHT * scale }}>
             <canvas
               ref={previewCanvasRef}
