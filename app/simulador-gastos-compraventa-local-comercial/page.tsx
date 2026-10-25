@@ -266,6 +266,12 @@ interface EntradaVendedor {
    * patrimonial del ahorro, y no se liquida IRPF (hallazgo 3384, AVISO_VENTA_PROMOTOR).
    */
   ventaDelPromotor?: boolean;
+  /**
+   * Obra nueva y lo que compró el promotor fue un solar: la compra se compara entera con el valor
+   * del suelo en la venta (art. 104.5 TRLRHL, «en su caso»; hallazgo 3504, receta del 3466 de la
+   * referencia).
+   */
+  compraSoloSuelo?: boolean;
   /** Dónde está el local: Ceuta y Melilla bonifican la plusvalía y deducen el IRPF; en
    *  territorio foral la plusvalía no es la del TRLRHL (hallazgos 3059, 3060 y 3071, 10/10/2026). */
   ccaa: ComunidadAutonoma;
@@ -303,6 +309,7 @@ function calcularVendedor(e: EntradaVendedor) {
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
         // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL; hallazgo 3060).
         ccaa: e.ccaa,
+        adquisicionSoloSuelo: e.compraSoloSuelo,
       })
     : null;
   const plusvalia = e.plusvaliaForzada ?? (resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0);
@@ -478,6 +485,8 @@ export default function SimuladorLocalComercialPage() {
 
   // Datos del vendedor
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
+  // Obra nueva: qué compró el promotor. Lo normal es el solar sobre el que construyó (hallazgo 3504).
+  const [compraOriginal, setCompraOriginal] = useState<'solar' | 'construido'>('solar');
   const [gastosAdquisicion, setGastosAdquisicion] = useState('');
   const [aniosPropiedad, setAniosPropiedad] = useState('');
   /** Meses completos cuando se vende antes de cumplir el año ('' = sin elegir). */
@@ -708,6 +717,7 @@ export default function SimuladorLocalComercialPage() {
       amortizaciones: Math.max(0, parseSpanishNumberOr(amortizacionesAcumuladas)),
       otrasRentas: Math.max(0, parseSpanishNumberOr(otrasRentasAhorro)),
       ventaDelPromotor: transmision === 'primera-mano',
+      compraSoloSuelo: transmision === 'primera-mano' && compraOriginal === 'solar',
       ccaa,
     };
 
@@ -831,7 +841,9 @@ export default function SimuladorLocalComercialPage() {
         0
       )}${PCT}`;
       metodoPlusvalia = rp.exento
-        ? 'No sujeta (sin incremento de valor)'
+        ? rp.valorSueloTransmision !== undefined
+          ? `No sujeta: el valor del suelo en la venta (${formatCurrency(rp.valorSueloTransmision)}) no supera lo que se pagó por el solar (art. 104.5 TRLRHL)`
+          : 'No sujeta (sin incremento de valor)'
         : rp.parCatastralImposible
           ? `Método objetivo, ${tipoMunicipal} (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)`
           : !rp.metodoRealDisponible
@@ -841,8 +853,15 @@ export default function SimuladorLocalComercialPage() {
             ? `Método objetivo, ${tipoMunicipal} (${escritoNoValido(valorCatastralTotal, parseSpanishNumber) ? 'el valor catastral total escrito tiene que ser mayor que 0: corrígelo para comparar con el método real' : 'falta el valor catastral total para comparar'})`
             : `Método objetivo, ${tipoMunicipal}, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).`
           : rp.metodoReal < rp.metodoObjetivo
-            ? `Método real (más favorable), ${tipoMunicipal}`
+            ? rp.valorSueloTransmision !== undefined
+              ? `Método real (más favorable), ${tipoMunicipal}: valor del suelo en la venta (${formatCurrency(rp.valorSueloTransmision)}) menos lo pagado por el solar (arts. 104.5 y 107.5 TRLRHL)`
+              : `Método real (más favorable), ${tipoMunicipal}`
             : `Método objetivo (más favorable), ${tipoMunicipal}`;
+      // Comprado un solar sin el valor catastral total, la venta no se puede repartir entre suelo
+      // y construcción, y la cifra puede quedarse por encima de la legal (receta del 3466).
+      if (!rp.exento && rp.sinRepartoSolar) {
+        metodoPlusvalia = `${metodoPlusvalia}${metodoPlusvalia.endsWith('.') ? '' : '.'} Al haberse comprado un solar, puede salir más baja o no sujeta: el valor catastral total permite comparar lo pagado por el solar con el valor del suelo en la venta.`;
+      }
       if (!rp.exento && rp.bonificadaCiudad) {
         const bonificacion = `la bonificación del ${conPct(formatNumber(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje, 0))} de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
         // Hallazgo 3259 (19/10/2026): pegada con «, con…» detrás de una descripción que ya acaba
@@ -995,6 +1014,8 @@ export default function SimuladorLocalComercialPage() {
     ccaa,
     // En obra nueva vende el promotor, y no se liquida IRPF (hallazgo 3384).
     transmision,
+    // Y lo que compró, si un solar o un local ya construido, mueve la plusvalía (hallazgo 3504).
+    compraOriginal,
   ]);
 
   const datosCcaaActual = ITP_CCAA[ccaa];
@@ -1337,7 +1358,9 @@ export default function SimuladorLocalComercialPage() {
           <span key="sin-iva">
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
             <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el <span>{territorioActualSinIva.impuesto}</span>{' '}
-            <span>({territorioActualSinIva.nombre})</span>, que esta calculadora no cifra.{' '}
+            {/* El nombre con sus paréntesis, una sola cadena: con la página traducida, de Canarias
+                a Ceuta salía «IPSI (Impuesto General Indirecto Canario)» (hallazgo 3506). */}
+            <span>{`(${territorioActualSinIva.nombre})`}</span>, que esta calculadora no cifra.{' '}
             {/* Hallazgo 3262 (19/10/2026): en Ceuta y Melilla prometía deducir el IPSI soportado, y
                 la Ley 8/1991, art. 20.3 (BOE-A-1991-7645, leído el 19/10/2026) dice que las cuotas
                 soportadas en las entregas de bienes inmuebles «no podrán ser objeto de deducción».
@@ -1410,7 +1433,8 @@ export default function SimuladorLocalComercialPage() {
                 disabled={renunciaImposible}
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🤝</span>
-                <span>2ª mano con renuncia {impuestoDeLaRenuncia}</span>
+                {/* Una sola cadena: con la página traducida se quedaba en «IVA» (hallazgo 3506). */}
+                <span>{`2ª mano con renuncia ${impuestoDeLaRenuncia}`}</span>
                 {/* En Canarias, Ceuta y Melilla no rige el IVA (IGIC/IPSI): el rótulo no puede
                     prometer un IVA que el recuadro de abajo desmiente, y el tipo se lee de
                     data/fiscal en vez de teclearse (hallazgos 620 y 621). */}
@@ -1472,8 +1496,8 @@ export default function SimuladorLocalComercialPage() {
                       solo está verificado en Valencia (Ley 13/1997, art. 14.Dos: 2 %, hallazgo 1603),
                       y ahí el simulador lo aplica; en el resto usa el general y lo dice. */}
                   {ajdRenunciaPropio
-                    ? <span key="rama-1">En {nombreEnFrase(ccaa)} es del {conPct(formatTipoNominal(ajdRenuncia.tipo))}, y es el que aplica este simulador.</span>
-                    : <span key="rama-2">Este simulador usa el AJD general {deNombreCcaa(ccaa)}: si tu comunidad tiene un tipo propio para la renuncia, el coste real de AJD puede ser mayor.</span>}
+                    ? <span key="rama-1">{`En ${nombreEnFrase(ccaa)} es del ${conPct(formatTipoNominal(ajdRenuncia.tipo))}, y es el que aplica este simulador.`}</span>
+                    : <span key="rama-2">{`Este simulador usa el AJD general ${deNombreCcaa(ccaa)}: si tu comunidad tiene un tipo propio para la renuncia, el coste real de AJD puede ser mayor.`}</span>}
                 </span>
               )}
             </div>
@@ -1558,7 +1582,7 @@ export default function SimuladorLocalComercialPage() {
             {/* Escala o umbral, con sus palabras: Valencia no tiene escala (hallazgos 1581 y 1602). */}
             {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> {subidaITP}
+                <span aria-hidden="true">⚠️</span> <span>{subidaITP}</span>
               </p>
             )}
             <p className={styles.infoCcaaNote}>
@@ -1577,7 +1601,8 @@ export default function SimuladorLocalComercialPage() {
             */}
             {datosCcaaActual.notas && (
               <p className={styles.infoCcaaNote}>
-                <strong>{datosCcaaActual.nombre}:</strong> {separarPorcentajes(datosCcaaActual.notas)}
+                {/* Cada texto variable, único hijo de su elemento (hallazgo 3506). */}
+                <strong>{`${datosCcaaActual.nombre}:`}</strong> <span>{separarPorcentajes(datosCcaaActual.notas)}</span>
               </p>
             )}
           </div>
@@ -1838,9 +1863,42 @@ export default function SimuladorLocalComercialPage() {
                   onChange={setPrecioCompraOriginal}
                   label="Precio de compra original"
                   placeholder="150000"
-                  helperText="Precio escriturado al adquirir el local, sin los gastos (van en el campo siguiente)"
+                  // En obra nueva el campo de los gastos no se pide (b462c664) y lo comprado suele ser
+                  // el solar: la ayuda ya no manda a un «campo siguiente» que no está (hallazgo 3505).
+                  helperText={
+                    transmision === 'primera-mano'
+                      ? 'Lo que pagaste por el solar (o por el local, si lo compraste ya construido), sin los gastos'
+                      : 'Precio escriturado al adquirir el local, sin los gastos (van en el campo siguiente)'
+                  }
                   min={0}
                 />
+
+                {/* Obra nueva: el art. 104.5 TRLRHL aplica la proporción catastral a la compra solo
+                    «en su caso», si lo comprado tenía construcción; comprado un solar, se compara
+                    entero con el valor del suelo en la venta (hallazgo 3504, receta del 3466 de la
+                    referencia). */}
+                {transmision === 'primera-mano' && (
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label} htmlFor="compra-original">
+                      ¿Qué compraste?
+                    </label>
+                    <select
+                      id="compra-original"
+                      value={compraOriginal}
+                      onChange={(e) => setCompraOriginal(e.target.value as 'solar' | 'construido')}
+                      className={styles.select}
+                      aria-describedby="nota-compra-original"
+                    >
+                      <option value="solar">Solo el suelo (un solar sobre el que se construyó)</option>
+                      <option value="construido">Un local ya construido</option>
+                    </select>
+                    <p id="nota-compra-original" className={styles.notaCompraOriginal}>
+                      La plusvalía grava solo el suelo. Si compraste un solar, lo que pagaste se compara
+                      entero con el valor del suelo en la venta (art. 104.5 TRLRHL), así que conviene
+                      escribir también el valor catastral total.
+                    </p>
+                  </div>
+                )}
 
                 {transmision !== 'primera-mano' && (
                 <>

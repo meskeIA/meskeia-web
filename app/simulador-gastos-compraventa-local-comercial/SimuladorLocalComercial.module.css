@@ -115,6 +115,14 @@
   color: var(--text-secondary);
 }
 
+/* La nota de «¿Qué compraste?» en la obra nueva (hallazgo 3504). */
+.notaCompraOriginal {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
 .select {
   padding: 0.65rem 0.9rem;
   border: 1.5px solid #d0d0d0;

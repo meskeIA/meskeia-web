@@ -6152,7 +6152,12 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro cruzando tra
     await page.getByRole('button', { name: /Obra nueva/ }).click();
     await expect(page.getByRole('button', { name: /Obra nueva/ })).toHaveAttribute('aria-pressed', 'true');
     await esperarTarjeta2609(page, 'Impuesto sobre la renta de la venta', 'Sin calcular');
-    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('192.300,00 €');
+    // Desde el 25/10/2026 (hallazgo 3504, cabo C0441) la obra nueva pregunta «¿Qué compraste?» y de
+    // serie es el solar: el suelo en la venta, 200.000 × 40.000 / 100.000 = 80.000, no supera los
+    // 150.000 pagados por él → plusvalía no sujeta (art. 104.5 TRLRHL), y el neto pasa de 192.300,00 €
+    // a 200.000 − 6.000 − 500 = 193.500,00 €.
+    expect(await valorTarjeta(page, 'Plusvalía municipal (IIVTNU)')).toBe('0,00 €');
+    expect(await valorTarjeta(page, /^NETO QUE RECIBES/)).toBe('193.500,00 €');
     // «Impuesto sobre Sociedades» no cuenta: la nota fija lo dice de cualquier venta, con cualquier
     // tipo de transmisión. Lo que se mide es que el panel nombra al promotor y no liquida su IRPF.
     const panel = ((await page.locator('div[class*="resultsInner"]').first().textContent()) ?? '').replace(/\s+/g, ' ');
@@ -7477,7 +7482,8 @@ test.describe('Inspector 25/10/2026 — Baleares en su escala, Cataluña en el 1
   });
 
   /**
-   * [25/10-a] (cálculo, medio) — ABIERTO. Cabo C0441: la forma del hallazgo 3466 de la referencia
+   * [25/10-a] (cálculo, medio) — REPARADO 25/10/2026 (hallazgo 3504): «¿Qué compraste?» y
+   * adquisicionSoloSuelo, como la referencia. Cabo C0441: la forma del hallazgo 3466 de la referencia
    * (reparado allí en 92df481b) que no llegó a esta hermana; el 3489 de garaje, el mismo día. En «Obra nueva /
    * Promotor» vende el promotor, que normalmente compró el SUELO, y la pestaña Vendedor solo pide «Precio de
    * compra original»: calcularPlusvaliaMunicipal se llama sin `adquisicionSoloSuelo` (page.tsx l. 296-306) y
@@ -7495,7 +7501,6 @@ test.describe('Inspector 25/10/2026 — Baleares en su escala, Cataluña en el 1
    * Si la reparación pregunta «¿Qué compraste?», como la referencia, este caso elige el solar.
    */
   test('[25/10-a] cabo C0441 — en obra nueva, la plusvalía del promotor que compró un solar compara la compra entera con el suelo de la venta (art. 104.5 TRLRHL)', async ({ page }) => {
-    test.fail(!VER_HUECOS_2510, 'ABIERTO: hallazgo [25/10-a] (cabo C0441), la plusvalía del promotor sin adquisicionSoloSuelo');
     expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 7)?.coeficiente).toBe(0.2);
     // El motor compartido ya lo sabe hacer desde 92df481b: es el ancla de lo esperado (±0,5 €; el
     // defecto que vigila es de 5.000 y 7.500 €).
@@ -7537,7 +7542,8 @@ test.describe('Inspector 25/10/2026 — Baleares en su escala, Cataluña en el 1
   });
 
   /**
-   * [25/10-b] (contenido, bajo) — ABIERTO. Residuo de b462c664 (hallazgo 3400): en obra nueva la pestaña
+   * [25/10-b] (contenido, bajo) — REPARADO 25/10/2026 (hallazgo 3505): la ayuda depende de la
+   * transmisión. Residuo de b462c664 (hallazgo 3400): en obra nueva la pestaña
    * Vendedor ya no pide «Impuestos y gastos que pagaste al comprarlo» (vende el promotor y su renta no se
    * calcula), pero la ayuda del campo de encima, «Precio de compra original», sigue diciendo «Precio
    * escriturado al adquirir el local, sin los gastos (van en el campo siguiente)» (page.tsx l. 1841): el
@@ -7545,7 +7551,6 @@ test.describe('Inspector 25/10/2026 — Baleares en su escala, Cataluña en el 1
    * (cabo C0441).
    */
   test('[25/10-b] en obra nueva, la ayuda del precio de compra no manda los gastos a un campo que no existe', async ({ page }) => {
-    test.fail(!VER_HUECOS_2510, 'ABIERTO: hallazgo [25/10-b], «van en el campo siguiente» en obra nueva');
     await abrir0810(page);
     await sembrarImporte12(page, 'Precio del local comercial', '300000');
     await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
@@ -7625,7 +7630,7 @@ const normaliza2510 = (s: string | null): string => (s ?? '').replace(ESPACIO_DU
 
 test.describe('Inspector 25/10/2026 — la página traducida por el navegador', () => {
   /**
-   * [25/10-c] (operativa, medio) — ABIERTO. Con la página traducida, cinco textos del formulario se quedan con
+   * [25/10-c] (operativa, medio) — REPARADO 25/10/2026 (hallazgo 3506). Con la página traducida, cinco textos del formulario se quedan con
    * la comunidad o el impuesto ANTERIOR mientras las tarjetas (ResultCard, 3481) ya calculan con el nuevo:
    * React escribe en el nodo de texto que el traductor retiró cuando la variable va junto a otro texto en el
    * mismo elemento. Es la forma del 3492 de garaje y del 3477 de nave, en otras líneas:
@@ -7642,7 +7647,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
    * Las cifras del recuadro (ITP General, AJD) sí siguen: cada una es la única hija de su <span>.
    */
   test('[25/10-c] con la página traducida, las notas de la comunidad, el botón de la renuncia y los avisos dicen los de la comunidad elegida', async ({ page }) => {
-    test.fail(!VER_HUECOS_2510, 'ABIERTO: hallazgo [25/10-c], el formulario traducido se queda con la comunidad o el impuesto anterior');
     const escalaBaleares = (ITP_CCAA.baleares.tramosProgresivos ?? []).map((t) => `${t.tipo} %`).join(' → ');
     expect(escalaBaleares).toBe('8 % → 9 % → 10 % → 12 % → 13 %');
     const nombreIpsi = TERRITORIOS_SIN_IVA.ceuta?.nombre ?? '';
@@ -7703,7 +7707,7 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
   });
 
   /**
-   * [25/10-d] (operativa, bajo) — ABIERTO, hallazgo 3498. Registrado UNA vez, en estimador-compraventa-inmueble,
+   * [25/10-d] (operativa, bajo) — REPARADO 25/10/2026, hallazgo 3498 (412caa1e). Registrado UNA vez, en estimador-compraventa-inmueble,
    * porque es un componente compartido: este test lo vigila también aquí. La misma forma en el aviso COMPARTIDO de los territorios sin IVA
    * (components/AvisoTerritorioSinIva.tsx l. 46, `<span>({territorio.nombre})</span>`: tres nodos de texto
    * en un <span>), que 3482 dejó a medias. En obra nueva, Canarias → Ceuta con la página traducida: el aviso
@@ -7711,7 +7715,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
    * `TERRITORIOS_SIN_IVA.ceuta`. Lo montan las apps de la familia que lo importan; aquí, page.tsx l. 1516.
    */
   test('[25/10-d] con la página traducida, el aviso de los territorios sin IVA nombra el impuesto del territorio elegido', async ({ page }) => {
-    test.fail(!VER_HUECOS_2510, 'ABIERTO: hallazgo [25/10-d], AvisoTerritorioSinIva traducido se queda con el nombre del IGIC');
     const errores = vigilarCaidas2510(page);
     const aviso = page.locator('p[role="note"]').filter({ hasText: 'no se aplica el IVA' });
     await abrir0810(page);
