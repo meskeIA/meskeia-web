@@ -1203,11 +1203,27 @@
   }
 
   .chartsGrid {
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr): con 1fr el lienzo de Chart.js conservaba el ancho de escritorio al
+       estrechar la ventana (cabo C0409) */
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 768px) {
+  /* El ROI y el beneficio bajan a una segunda línea en vez de salirse de la tarjeta (C0409) */
+  .rankingItem {
+    flex-wrap: wrap;
+  }
+
+  .rankingNombre {
+    min-width: 0;
+  }
+
+  .rankingRoi,
+  .rankingBeneficio {
+    min-width: 0;
+  }
+
   .container {
     padding: var(--spacing-md);
     padding-top: 80px;

@@ -246,6 +246,8 @@
 
 .faseDetalleTitulo {
   display: flex;
+  /* La duración (nowrap) baja de línea en vez de salir 5 px de la tarjeta a 390 px (cabo C0428) */
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);

@@ -37,6 +37,22 @@ const RUTAS = [
   '/presupuesto-viaje/', // C0399
   '/conversor-numeros-romanos/', // C0400
   '/orientador-aval-ico/', // C0424: un flex-shrink: 0 pensado para el emoji alcanzaba al texto
+  // Reparadas en /reparar el 25/10/2026
+  '/creador-thumbnails/', // C0406: la escala del lienzo salía de innerWidth - 400, negativa en móvil
+  '/estimador-roi-marketing/', // C0409
+  '/creador-flashcards/', // C0411
+  '/simulador-equilibrio-quimico/', // C0413
+  // C0416-C0421: el mismo .speedControl sin salto de línea en seis simuladores
+  '/simulador-arboles-bst-avl/',
+  '/simulador-arboles-b/',
+  '/simulador-concurrencia/',
+  '/simulador-modelo-osi/',
+  '/simulador-backtracking/',
+  '/simulador-programacion-dinamica/',
+  '/simulador-disoluciones/', // C0422
+  '/simulador-bono-joven-alquiler/', // C0425
+  '/visualizador-tipos-cliente-freelance/', // C0427: punto en el extremo de un espectro
+  '/visualizador-ciclo-economico/', // C0428
   // F3: etiqueta oculta con position: absolute y sin ancestro posicionado; body sigue en 390 y
   // es el documento el que crece, por eso el test mide los dos
   '/simulador-automata-pila/', // C0415
@@ -69,6 +85,27 @@ for (const ruta of RUTAS) {
     });
     expect(r.body, `body ${r.body} px en ${r.ancho}: ${r.culpables.join(' · ')}`).toBeLessThanOrEqual(r.ancho);
     expect(r.doc, `documento ${r.doc} px en ${r.ancho}`).toBeLessThanOrEqual(r.ancho);
+  });
+}
+
+// C0429, C0409 y C0406: el desborde solo salía al estrechar la ventana desde escritorio (la
+// secuencia de la Ronda), porque un lienzo conservaba su ancho de 1280 px y mantenía ancha su
+// pista `1fr`. creador-thumbnails desbordaba además en escritorio (C0358: 1452 px a 1280).
+for (const ruta of ['/visualizador-melatonina/', '/estimador-roi-marketing/', '/creador-thumbnails/']) {
+  test(`${ruta} · de 1280 a 390 px la página acaba en el ancho de la pantalla`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(ruta);
+    await page.waitForLoadState('networkidle');
+    const enEscritorio = await page.evaluate(() => document.body.scrollWidth);
+    expect(enEscritorio, `a 1280 px: body ${enEscritorio}`).toBeLessThanOrEqual(1280);
+    for (const ancho of [1024, 800, 390]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      await page.waitForTimeout(150);
+    }
+    // Chart.js redimensiona tras un rebote: se espera a que el ancho se asiente
+    await expect
+      .poll(() => page.evaluate(() => document.body.scrollWidth), { timeout: 5000 })
+      .toBeLessThanOrEqual(390);
   });
 }
 

@@ -744,7 +744,9 @@
   }
 
   .inputGrid {
-    grid-template-columns: repeat(2, 1fr);
+    /* minmax(0, 1fr): con 1fr la pista crecía hasta la etiqueta más larga y la página
+       desbordaba a 390 px (cabo C0413) */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .perturbacionGrid {

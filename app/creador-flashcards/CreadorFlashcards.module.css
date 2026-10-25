@@ -84,6 +84,8 @@
 .toolbarRight {
   display: flex;
   gap: var(--spacing-sm);
+  /* Sin salto de línea, «Importar» se salía 13 px a 390 px (cabo C0411) */
+  flex-wrap: wrap;
 }
 
 .btnPrimary {

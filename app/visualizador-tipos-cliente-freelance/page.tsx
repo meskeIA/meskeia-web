@@ -397,7 +397,7 @@ export default function VisualizadorTiposClienteFreelance() {
                   <button
                     key={item.id}
                     type="button"
-                    className={`${styles.espectroPunto} ${item.id === 'falso-autonomo' ? styles.espectroPuntoIlegal : ''}`}
+                    className={`${styles.espectroPunto} ${item.id === 'falso-autonomo' ? styles.espectroPuntoIlegal : ''} ${100 - item.pct <= 5 ? styles.espectroPuntoExtremoIzq : 100 - item.pct >= 95 ? styles.espectroPuntoExtremoDer : ''}`}
                     style={{ left: `${100 - item.pct}%` }}
                     onClick={() => { setVistaComparativa(false); setActivo(item.id); }}
                     aria-label={`${item.label}: ${item.pct}% independencia`}

@@ -346,8 +346,21 @@
     grid-template-columns: 1fr;
   }
 
+  /* Con align-items: center la rejilla de resultados medía su ancho máximo (dos pistas de
+     160 px) y salía 18 px de la pantalla a 390 px (cabo C0422): ahora ocupa el ancho de la
+     columna y pasa a una pista si no caben dos */
   .vasoLayout {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vasoWrap {
+    align-self: center;
+  }
+
+  .resultadosGrid {
+    min-width: 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
   }
 }
 

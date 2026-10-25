@@ -438,6 +438,19 @@
   border-radius: 4px;
 }
 
+/* En los extremos la etiqueta centrada salía de la barra: «Falso Aut.», al 100 %, ensanchaba
+   la página 5 px a 390 px (cabo C0427). Ahí la etiqueta se alinea hacia dentro y el punto
+   (14 px) sigue con su centro en su posición */
+.espectroPuntoExtremoIzq {
+  align-items: flex-start;
+  transform: translateX(-7px);
+}
+
+.espectroPuntoExtremoDer {
+  align-items: flex-end;
+  transform: translateX(calc(-100% + 7px));
+}
+
 .espectroPuntoDot {
   width: 14px;
   height: 14px;
