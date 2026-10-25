@@ -10830,7 +10830,8 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
 
   /**
-   * HALLAZGO [operativa, alto] — ABIERTO (25/10/2026). Con la página traducida, dos piezas de cada
+   * HALLAZGO 3494 [operativa, alto] — REPARADO (25/10/2026, /reparar): lo que aparece o desaparece es
+   * un <span key> entero y cada texto variable, único hijo de su elemento. Antes: con la página traducida, dos piezas de cada
    * línea de «Podrías pagar menos» (page.tsx l. 2190-2194) tumban la app en «Algo salió mal»
    * (NotFoundError en removeChild o insertBefore): React retira o inserta un nodo de texto suelto junto
    * a otros que el traductor ya cambió por <font>.
@@ -10846,7 +10847,6 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
    *  100.000 × 10 % = 30.000,00 € «ITP (8,57 %)».
    */
   test('HALLAZGO página traducida — bajar el precio por debajo del tope del reducido tumba la app', async ({ page }) => {
-    test.fail(); // ABIERTO: el fragmento ⚠️ (page.tsx l. 2191-2194)
     test.setTimeout(90_000);
     const errores = vigilarErrores(page);
     await abrir(page, 'madrid');
@@ -10861,7 +10861,6 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
   });
 
   test('HALLAZGO página traducida — cambiar de comunidad con el «Valor máximo» de una línea tumba la app', async ({ page }) => {
-    test.fail(); // ABIERTO: el ternario del «Valor máximo» (page.tsx l. 2190)
     test.setTimeout(90_000);
     const errores = vigilarErrores(page);
     await abrir(page, 'castilla-leon');
@@ -10883,7 +10882,8 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
   });
 
   /**
-   * HALLAZGO [operativa, medio] — ABIERTO (25/10/2026). Con la página traducida, al cambiar de
+   * HALLAZGO 3495 [operativa, medio] — REPARADO (25/10/2026, /reparar): cada cifra o nombre, una sola
+   * cadena única hija de su elemento. Antes: con la página traducida, al cambiar de
    * comunidad el formulario se queda con la ANTERIOR mientras las tarjetas cobran la nueva: React
    * escribe en el nodo que el traductor retiró cuando una cifra o un nombre va junto a otro texto.
    *  · recuadro «ITP General» y «AJD» (l. 1838 y 1844, `{formatTipoNominal(…)}&nbsp;%`) y la nota de la
@@ -10897,7 +10897,6 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
    *  la escala de ITP_CCAA.baleares, 8 % → 9 % → 10 % → 12 % → 13 %.
    */
   test('HALLAZGO página traducida — el recuadro de la comunidad y la nota de su escala se quedan con la anterior', async ({ page }) => {
-    test.fail(); // ABIERTO: page.tsx l. 1838, 1844 y 1852
     test.setTimeout(90_000);
     expect(ITP_CCAA.cataluna.tipoGeneral).toBe(10);
     expect(ITP_CCAA.cataluna.ajd).toBe(1.5);
@@ -10927,7 +10926,6 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
    *  (bonif. 10 %)» al 5,40 % (tope 250.000) → «En la Comunidad de Madrid existe:».
    */
   test('HALLAZGO página traducida — «Beneficios fiscales en…» y «Podrías pagar menos» se quedan con la comunidad anterior', async ({ page }) => {
-    test.fail(); // ABIERTO: page.tsx l. 1879-1887 y 2166-2189
     test.setTimeout(90_000);
     expect(ITP_CCAA.cataluna.tiposReducidos[0]).toMatchObject({ nombre: 'Jóvenes ≤35 años', tipo: 5 });
     await abrir(page, 'madrid');
@@ -10958,7 +10956,6 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
    *  llevan además IPSI (TERRITORIOS_SIN_IVA.ceuta.impuesto).
    */
   test('HALLAZGO página traducida — «Paga IVA» y la nota de los honorarios no siguen a Canarias, Ceuta y Melilla', async ({ page }) => {
-    test.fail(); // ABIERTO: page.tsx l. 1786 y 2112-2113
     test.setTimeout(90_000);
     expect(TERRITORIOS_SIN_IVA.canarias?.impuesto).toBe('IGIC');
     expect(TERRITORIOS_SIN_IVA.ceuta?.impuesto).toBe('IPSI');
@@ -10979,7 +10976,7 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
   });
 
   /**
-   * HALLAZGO [operativa, medio] — ABIERTO (25/10/2026). La misma forma, con otros disparadores:
+   * HALLAZGO 3496 [operativa, medio] — REPARADO (25/10/2026, /reparar), con la receta del 3495. La misma forma, con otros disparadores:
    *  · el aviso del IVA superreducido de la obra nueva (l. 2132-2137) se queda con las cifras de antes
    *    al cambiar el PRECIO: Madrid · Primera mano · 250.000 → 300.000 → «serían 12.000,00 € en vez de
    *    30.000,00 €» (300.000 × IVA_INMUEBLES_2025.viviendaProtegida 4 % y × obraNueva 10 %), con la
@@ -10988,7 +10985,6 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
    *    queda con el inmueble anterior: Local comercial → Nave industrial → «…de una nave industrial».
    */
   test('HALLAZGO página traducida — el aviso del IVA del 4 % se queda con el precio anterior', async ({ page }) => {
-    test.fail(); // ABIERTO: page.tsx l. 2132-2137
     test.setTimeout(90_000);
     expect(IVA_INMUEBLES_2025.obraNueva).toBe(10);
     expect(IVA_INMUEBLES_2025.viviendaProtegida).toBe(4);
@@ -11003,7 +10999,6 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
   });
 
   test('HALLAZGO página traducida — la nota del vendedor nombra el inmueble anterior', async ({ page }) => {
-    test.fail(); // ABIERTO: page.tsx l. 2530
     test.setTimeout(90_000);
     await abrir(page, 'madrid');
     await sembrar(page, 'Precio de la vivienda', '250000');
@@ -11017,14 +11012,14 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
   });
 
   /**
-   * HALLAZGO [operativa, bajo] — ABIERTO (25/10/2026). components/NumberInput.tsx, compartido: el
+   * HALLAZGO 3497 [operativa, bajo] — REPARADO (25/10/2026, /reparar): el rótulo va en su <span>.
+   * components/NumberInput.tsx, compartido: el
    * rótulo es `{label}{required && …}`, dos hijos, así que el texto es un nodo suelto y con la página
    * traducida se queda viejo. Aquí el del precio cambia con el tipo de inmueble (page.tsx l. 1795):
    * Vivienda → Garaje → el campo se llama «Precio del inmueble» (su aria-label ya lo dice) y el rótulo
    * visible sigue diciendo «Precio de la vivienda».
    */
   test('HALLAZGO página traducida — el rótulo del precio no cambia con el tipo de inmueble', async ({ page }) => {
-    test.fail(); // ABIERTO: components/NumberInput.tsx l. 140-141
     test.setTimeout(90_000);
     await abrir(page, 'madrid');
     await sembrar(page, 'Precio de la vivienda', '250000');
@@ -11038,14 +11033,14 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
   });
 
   /**
-   * HALLAZGO [operativa, bajo] — ABIERTO (25/10/2026). components/AvisoTerritorioSinIva.tsx,
+   * HALLAZGO 3498 [operativa, bajo] — REPARADO (25/10/2026, /reparar): `{`(${nombre})`}` en una sola
+   * cadena. components/AvisoTerritorioSinIva.tsx,
    * compartido: 8c473228 (3482) metió cada variable en su <span>, pero `<span>({territorio.nombre})</span>`
    * (l. 46) son tres hijos y el nombre sigue siendo un nodo suelto. Madrid → Primera mano → Canarias →
    * Ceuta: «tributa por el IPSI (Impuesto sobre la Producción, los Servicios y la Importación)»
    * (TERRITORIOS_SIN_IVA.ceuta) y no «IPSI (Impuesto General Indirecto Canario)».
    */
   test('HALLAZGO página traducida — el aviso de territorio sin IVA deja el nombre del impuesto de Canarias en Ceuta', async ({ page }) => {
-    test.fail(); // ABIERTO: components/AvisoTerritorioSinIva.tsx l. 46
     test.setTimeout(90_000);
     expect(TERRITORIOS_SIN_IVA.ceuta?.nombre).toBe('Impuesto sobre la Producción, los Servicios y la Importación');
     await abrir(page, 'canarias', true);
@@ -11060,7 +11055,8 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
   });
 
   /**
-   * HALLAZGO [dato, bajo] — ABIERTO (25/10/2026). El tope de 240.000 € de la renta vitalicia de los
+   * HALLAZGO 3499 [dato, bajo] — REPARADO (25/10/2026, /reparar): EXENCION_RENTA_VITALICIA_MAYORES_65
+   * en data/fiscal/inmuebles.ts, con el art. 38.3 leído en el BOE ese día. El tope de 240.000 € de la renta vitalicia de los
    * mayores de 65 (art. 38.3 LIRPF) va tecleado en dos bocas: el bloque educativo (page.tsx l. 3111,
    * «con un máximo de 240.000 €») y el FAQPage «¿Qué impuestos paga el vendedor al vender un
    * inmueble?» (metadata.ts l. 369, «hasta 240.000 €»). No está en data/fiscal (ningún módulo lo
@@ -11069,7 +11065,6 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
    * en las mismas frases.
    */
   test('HALLAZGO dato — el tope de 240.000 € del art. 38.3 LIRPF no va tecleado en la página ni en el FAQPage', async () => {
-    test.fail(); // ABIERTO: page.tsx l. 3111 y metadata.ts l. 369
     const tecleado = /240\.000\s*€/;
     for (const fichero of ['page.tsx', 'metadata.ts']) {
       const fuente = readFileSync(join(process.cwd(), 'app/estimador-compraventa-inmueble', fichero), 'utf8');

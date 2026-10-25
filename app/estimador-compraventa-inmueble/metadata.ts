@@ -18,7 +18,12 @@ import {
   TERRITORIOS_SIN_IVA,
   SALVEDAD_PLUSVALIA_NO_RESIDENTE,
 } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+import {
+  IVA_INMUEBLES_2025,
+  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
+  // El tope y el plazo del art. 38.3 LIRPF, de data/fiscal y no tecleados (hallazgo 3499).
+  EXENCION_RENTA_VITALICIA_MAYORES_65,
+} from '@/data/fiscal';
 
 /**
  * Los tipos que cita el JSON-LD se LEEN de la tabla, no se escriben.
@@ -366,7 +371,7 @@ export const faqJsonLd = {
       name: '¿Qué impuestos paga el vendedor al vender un inmueble?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el ${TIPO_AHORRO_MIN}\u00A0% y el ${TIPO_AHORRO_MAX}\u00A0% según el importe. Si es una primera entrega (obra nueva), vende el promotor, que es empresario aunque promueva una sola vez: su renta no es una ganancia patrimonial del ahorro, sino un rendimiento de actividad económica en el IRPF (art. 27.1 LIRPF) o, si es una sociedad, renta del Impuesto sobre Sociedades. Existen dos exenciones en el IRPF, y las dos exigen que lo vendido sea la vivienda habitual, es decir, la residencia durante al menos 3 años seguidos salvo fallecimiento o una causa que obligue a cambiar de domicilio (art. 41 bis.1 RIRPF): la reinversión del importe obtenido en otra vivienda habitual (art. 38.1 LIRPF) y la de los mayores de 65 años o personas en situación de dependencia severa o gran dependencia (art. 33.4.b LIRPF). Los mayores de 65 años pueden además excluir la ganancia de cualquier elemento patrimonial si destinan lo obtenido, en seis meses, a una renta vitalicia asegurada a su favor, hasta 240.000 € (art. 38.3 LIRPF). Tener hipoteca pendiente no exime de nada: el principal que se cancela solo minora el importe obtenido a efectos de la reinversión (art. 41 RIRPF).`,
+        text: `El vendedor debe hacer frente a dos tributos principales: la plusvalía municipal (IIVTNU), que grava el incremento del valor del terreno durante los años de tenencia, y la ganancia patrimonial en el IRPF si el precio de venta supera el precio de adquisición. La ganancia patrimonial tributa entre el ${TIPO_AHORRO_MIN}\u00A0% y el ${TIPO_AHORRO_MAX}\u00A0% según el importe. Si es una primera entrega (obra nueva), vende el promotor, que es empresario aunque promueva una sola vez: su renta no es una ganancia patrimonial del ahorro, sino un rendimiento de actividad económica en el IRPF (art. 27.1 LIRPF) o, si es una sociedad, renta del Impuesto sobre Sociedades. Existen dos exenciones en el IRPF, y las dos exigen que lo vendido sea la vivienda habitual, es decir, la residencia durante al menos 3 años seguidos salvo fallecimiento o una causa que obligue a cambiar de domicilio (art. 41 bis.1 RIRPF): la reinversión del importe obtenido en otra vivienda habitual (art. 38.1 LIRPF) y la de los mayores de 65 años o personas en situación de dependencia severa o gran dependencia (art. 33.4.b LIRPF). Los mayores de 65 años pueden además excluir la ganancia de cualquier elemento patrimonial si destinan lo obtenido, en ${EXENCION_RENTA_VITALICIA_MAYORES_65.plazoMeses} meses, a una renta vitalicia asegurada a su favor, hasta ${euros(EXENCION_RENTA_VITALICIA_MAYORES_65.importeMaximo)} (art. 38.3 LIRPF). Tener hipoteca pendiente no exime de nada: el principal que se cancela solo minora el importe obtenido a efectos de la reinversión (art. 41 RIRPF).`,
       },
     },
     {

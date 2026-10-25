@@ -8,7 +8,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, Resu
 import ProrrateoIbiComunidad from '@/components/ProrrateoIbiComunidad';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR, EXENCION_RENTA_VITALICIA_MAYORES_65 } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -1783,7 +1783,7 @@ export default function SimuladorCompraventaPage() {
               >
                 <span className={styles.transmisionIcon} aria-hidden="true">🆕</span>
                 <span>Primera mano</span>
-                <span className={styles.transmisionSub}>Paga {TERRITORIOS_SIN_IVA[ccaa]?.impuesto ?? 'IVA'}</span>
+                <span className={styles.transmisionSub}>{`Paga ${TERRITORIOS_SIN_IVA[ccaa]?.impuesto ?? 'IVA'}`}</span>
               </button>
             </div>
           </div>
@@ -1834,14 +1834,16 @@ export default function SimuladorCompraventaPage() {
                 {/* Del motor, con lo que se transmite y el precio: el País Vasco grava al 7 % lo
                     que no es vivienda, y Valencia pasa al 11 % por encima del millón (hallazgos
                     1581 y 1582). `datosCcaaActual.tipoGeneral` es solo el de la vivienda. */}
+                {/* Una sola cadena, único hijo del <span>: con la página traducida, React escribía
+                    el tipo nuevo en el nodo que el traductor ya había retirado (hallazgo 3495). */}
                 <span className={styles.infoCcaaValue}>
-                  {formatTipoNominal(tipoGeneralITP(ccaa, objetoITPDe(tipoInmueble), precioLeido))}&nbsp;%
+                  {`${formatTipoNominal(tipoGeneralITP(ccaa, objetoITPDe(tipoInmueble), precioLeido))} %`}
                 </span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
                 <span className={styles.infoCcaaValue}>
-                  {formatTipoNominal(tipoAJD(ccaa, { objeto: objetoAJDDe(tipoInmueble) }).tipo)}&nbsp;%
+                  {`${formatTipoNominal(tipoAJD(ccaa, { objeto: objetoAJDDe(tipoInmueble) }).tipo)} %`}
                 </span>
               </div>
             </div>
@@ -1849,7 +1851,7 @@ export default function SimuladorCompraventaPage() {
                 11 % sobre TODO el valor por encima del millón (hallazgos 1581 y 1602). */}
             {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> {separarPorcentajes(subidaITP)}
+                <span aria-hidden="true">⚠️</span> <span>{separarPorcentajes(subidaITP)}</span>
               </p>
             )}
             <p className={styles.infoCcaaNote}>{separarPorcentajes(datosCcaaActual.notas)}</p>
@@ -1876,14 +1878,16 @@ export default function SimuladorCompraventaPage() {
                       nota —impresa unos centímetros más arriba— lo dice. Quien llamara a la
                       oficina liquidadora pedía algo que allí no existe con ese nombre
                       (hallazgo 769; ya reparado así en la hermana garaje el 11/09). */}
-                  <h4>Beneficios fiscales en {nombreEnFrase(ccaa)}, solo si se cumplen TODAS sus condiciones:</h4>
+                  {/* Cada texto variable, único hijo de su elemento: con la página traducida,
+                      el rótulo y las líneas se quedaban con la comunidad anterior (hallazgo 3495). */}
+                  <h4>{`Beneficios fiscales en ${nombreEnFrase(ccaa)}, solo si se cumplen TODAS sus condiciones:`}</h4>
                   <ul>
                     {datosCcaaActual.tiposReducidos.map((tr, idx) => (
                       <li key={idx}>
                         {/* formatTipoNominal y no el número crudo: «3.5%» es formato US, y dos
                             dedos más abajo la misma página ya escribía «7,00%» bien (hallazgo 721) */}
-                        <strong>{formatTipoNominal(tr.tipo)}&nbsp;%</strong> - {separarPorcentajes(tr.nombre)}
-                        {tr.valorMaximo && <span className={styles.limite}> (máx. {formatCurrency(tr.valorMaximo)})</span>}
+                        <strong>{`${formatTipoNominal(tr.tipo)} %`}</strong> - <span>{separarPorcentajes(tr.nombre)}</span>
+                        {tr.valorMaximo && <span className={styles.limite}>{` (máx. ${formatCurrency(tr.valorMaximo)})`}</span>}
                       </li>
                     ))}
                   </ul>
@@ -2109,9 +2113,7 @@ export default function SimuladorCompraventaPage() {
                   {resultadosComprador.honorariosSinImpuesto && (
                     <div className={styles.avisoReducidos} role="note">
                       <p className={styles.avisoReducidosTexto}>
-                        Las facturas de notaría y registro llevan además{' '}
-                        {resultadosComprador.honorariosSinImpuesto}, que esta herramienta no calcula, así
-                        que cuestan más de lo que se muestra.
+                        {`Las facturas de notaría y registro llevan además ${resultadosComprador.honorariosSinImpuesto}, que esta herramienta no calcula, así que cuestan más de lo que se muestra.`}
                       </p>
                     </div>
                   )}
@@ -2128,15 +2130,17 @@ export default function SimuladorCompraventaPage() {
                       <p className={styles.avisoReducidosTitulo}>
                         <span aria-hidden="true">💡</span> Podrías pagar menos, pero depende de requisitos que no preguntamos
                       </p>
+                      {/* Cada tramo con cifras, una sola cadena: con la página traducida, React
+                          escribía las cifras del precio nuevo en nodos que el traductor ya había
+                          retirado, y el aviso contradecía a la tarjeta del IVA (hallazgo 3496). */}
                       <p className={styles.avisoReducidosTexto}>
-                        El cálculo usa el IVA del {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;%. Si la
-                        vivienda está acogida a un régimen de <strong>protección oficial de régimen especial
-                        o de promoción pública</strong>, el IVA baja al {formatNumber(IVA_INMUEBLES_2025.viviendaProtegida, 0)}&nbsp;%
-                        (art. 91.Dos.1.6º LIVA): serían{' '}
-                        {formatCurrency(resultadosComprador.precioInmueble * (IVA_INMUEBLES_2025.viviendaProtegida / 100))}{' '}
-                        en vez de {formatCurrency(resultadosComprador.impuestoTransmision)}. No lo aplicamos
-                        porque la calificación concreta de la vivienda no se puede deducir del precio:
-                        compruébala en la escritura o con la promotora.
+                        <span>
+                          {`El cálculo usa el IVA del ${formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)} %. Si la vivienda está acogida a un régimen de `}
+                        </span>
+                        <strong>protección oficial de régimen especial o de promoción pública</strong>
+                        <span>
+                          {`, el IVA baja al ${formatNumber(IVA_INMUEBLES_2025.viviendaProtegida, 0)} % (art. 91.Dos.1.6º LIVA): serían ${formatCurrency(resultadosComprador.precioInmueble * (IVA_INMUEBLES_2025.viviendaProtegida / 100))} en vez de ${formatCurrency(resultadosComprador.impuestoTransmision)}. No lo aplicamos porque la calificación concreta de la vivienda no se puede deducir del precio: compruébala en la escritura o con la promotora.`}
+                        </span>
                       </p>
                     </div>
                   )}
@@ -2153,17 +2157,20 @@ export default function SimuladorCompraventaPage() {
                         {resultadosComprador.tipoElegido.esReducido ? (
                           <span key="rama-1">
                             El cálculo aplica el{' '}
-                            <strong>{formatNumber(resultadosComprador.tipoElegido.tipo, 2)}&nbsp;%</strong>
-                            {resultadosComprador.tipoElegido.nombre
-                              ? ` (${separarPorcentajes(resultadosComprador.tipoElegido.nombre)})`
-                              : ''}
-                            . En {nombreEnFrase(ccaa)} hay además tipos más bajos que dependen
-                            de requisitos que no preguntamos:
+                            <strong>{`${formatNumber(resultadosComprador.tipoElegido.tipo, 2)} %`}</strong>
+                            {/* Una sola cadena, único hijo de su <span> (hallazgo 3495). */}
+                            <span>
+                              {`${resultadosComprador.tipoElegido.nombre
+                                ? ` (${separarPorcentajes(resultadosComprador.tipoElegido.nombre)})`
+                                : ''}. En ${nombreEnFrase(ccaa)} hay además tipos más bajos que dependen de requisitos que no preguntamos:`}
+                            </span>
                           </span>
                         ) : (
                           <span key="rama-2">
-                            El cálculo usa el tipo general porque no podemos comprobar tu situación.
-                            En {nombreEnFrase(ccaa)} {resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:
+                            El cálculo usa el tipo general porque no podemos comprobar tu situación.{' '}
+                            <span>
+                              {`En ${nombreEnFrase(ccaa)} ${resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:`}
+                            </span>
                           </span>
                         )}
                       </p>
@@ -2183,15 +2190,24 @@ export default function SimuladorCompraventaPage() {
                           );
                           const topeYaDicho = !r.valorMaximo || topeEnNombre || condiciones.some(diceElTope);
                           return (
+                            // Hallazgos 3494 y 3495 (25/10/2026): con la página traducida, el
+                            // fragmento del ⚠️ y el ternario del «Valor máximo» retiraban o metían
+                            // un nodo de texto suelto junto a otros que el traductor ya había
+                            // cambiado por <font>, y la app caía (NotFoundError); el tipo y los
+                            // requisitos se quedaban con la comunidad anterior. Cada texto
+                            // variable es ahora el único hijo de su elemento, y lo que aparece o
+                            // desaparece es un <span key> entero.
                             <li key={r.nombre}>
-                              <strong>{formatNumber(r.tipo, 2)}&nbsp;% — {separarPorcentajes(r.nombre)}</strong>
+                              <strong>{`${formatNumber(r.tipo, 2)} % — ${separarPorcentajes(r.nombre)}`}</strong>
                               <br />
-                              Requisitos: {separarPorcentajes(condiciones.join(' · '))}
-                              {topeYaDicho ? '' : ` · Valor máximo ${formatCurrency(r.valorMaximo ?? 0)}`}
+                              <span>{`Requisitos: ${separarPorcentajes(condiciones.join(' · '))}`}</span>
+                              {!topeYaDicho && (
+                                <span key="tope">{` · Valor máximo ${formatCurrency(r.valorMaximo ?? 0)}`}</span>
+                              )}
                               {superaElTope(r, resultadosComprador.precioInmueble) && (
-                              // El emoji, fuera del árbol accesible (hallazgo 3083).
-                              <> · <span aria-hidden="true">⚠️</span> tu precio supera ese límite: no podrías acogerte</>
-                            )}
+                                // El emoji, fuera del árbol accesible (hallazgo 3083).
+                                <span key="supera"> · <span aria-hidden="true">⚠️</span> tu precio supera ese límite: no podrías acogerte</span>
+                              )}
                             </li>
                           );
                         })}
@@ -2526,8 +2542,9 @@ export default function SimuladorCompraventaPage() {
                   <p className={styles.derivacionPie} role="note">
                     La exención de los mayores de 65 años y de las personas con dependencia severa o
                     gran dependencia (art. 33.4.b LIRPF) y la de reinversión
-                    (art. 38 LIRPF) son de la <strong>vivienda habitual</strong>: no se aplican a
-                    la venta de {CON_ARTICULO[tipoInmueble]}, así que la ganancia tributa entera.
+                    (art. 38 LIRPF) son de la <strong>vivienda habitual</strong>: no se aplican{' '}
+                    {/* Una sola cadena: con la página traducida nombraba el inmueble anterior (hallazgo 3496). */}
+                    <span>{`a la venta de ${CON_ARTICULO[tipoInmueble]}, así que la ganancia tributa entera.`}</span>
                   </p>
                 )}
 
@@ -3107,8 +3124,10 @@ export default function SimuladorCompraventaPage() {
               <p>
                 Los mayores de 65 años tienen además otra vía, que esta calculadora no aplica: excluir la
                 ganancia de cualquier elemento patrimonial, no solo de la vivienda, si destinan lo obtenido en
-                un plazo de seis meses a constituir una renta vitalicia asegurada a su favor, con un máximo de
-                240.000 € (art. 38.3 LIRPF).
+                un plazo de {EXENCION_RENTA_VITALICIA_MAYORES_65.plazoMeses} meses a constituir una renta
+                vitalicia asegurada a su favor, con un máximo de{' '}
+                {/* De data/fiscal, no tecleado (hallazgo 3499). */}
+                {`${formatNumber(EXENCION_RENTA_VITALICIA_MAYORES_65.importeMaximo, 0)} €`} (art. 38.3 LIRPF).
               </p>
             </div>
           </div>

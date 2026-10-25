@@ -39,11 +39,14 @@ export default function AvisoTerritorioSinIva({ ccaa, aplica = true }: Props) {
 
   // Cada variable, sola en su <span>: con la página traducida, React escribía el territorio nuevo
   // en el nodo de texto que el traductor ya había retirado, y al pasar de Canarias a Ceuta el aviso
-  // seguía diciendo «Canarias» e «IGIC» (forma del hallazgo 3482, 24/10/2026).
+  // seguía diciendo «Canarias» e «IGIC» (forma del hallazgo 3482, 24/10/2026). El nombre del
+  // impuesto, con sus paréntesis en la misma cadena: `<span>({nombre})</span>` son tres hijos y el
+  // nombre seguía suelto, así que en Ceuta salía «IPSI (Impuesto General Indirecto Canario)»
+  // (hallazgo 3498, 25/10/2026).
   return (
     <p className={styles.aviso} role="note">
       <span aria-hidden="true">⚠️</span> En <span>{nombreEnFrase(ccaa)}</span> <strong>no se aplica el IVA</strong>:
-      esta operación tributa por el <span>{territorio.impuesto}</span> <span>({territorio.nombre})</span>, que tiene sus propios
+      esta operación tributa por el <span>{territorio.impuesto}</span> <span>{`(${territorio.nombre})`}</span>, que tiene sus propios
       tipos. Esta herramienta no lo calcula, así que el importe del impuesto indirecto no es el tuyo —
       consúltalo en la administración tributaria <span>{deNombreCcaa(ccaa)}</span>.
     </p>

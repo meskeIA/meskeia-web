@@ -267,6 +267,26 @@ export const DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA = {
 };
 
 /**
+ * Exención de la ganancia de los mayores de 65 años que reinvierten lo obtenido en una renta
+ * vitalicia asegurada a su favor.
+ *
+ * LIRPF, art. 38.3 (BOE-A-2006-20764, texto consolidado, leído el 25/10/2026): la ganancia de
+ * cualquier elemento patrimonial queda exenta si el importe se destina «en el plazo de seis meses
+ * a constituir una renta vitalicia asegurada a su favor», y «La cantidad máxima total que a tal
+ * efecto podrá destinarse a constituir rentas vitalicias será de 240.000 euros».
+ *
+ * Estaba tecleado en el bloque educativo y en el FAQPage de estimador-compraventa-inmueble, sin
+ * ningún módulo detrás (hallazgo 3499). Ninguna app la aplica: solo se cuenta.
+ */
+export const EXENCION_RENTA_VITALICIA_MAYORES_65 = {
+  importeMaximo: 240000,
+  plazoMeses: 6,
+  fuente: 'Ley 35/2006 del IRPF, art. 38.3',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764#a38',
+  verificado: '2026-10-25',
+};
+
+/**
  * Plazo de autoliquidación del ITP y AJD.
  *
  * ── De dónde sale (11/09/2026, hallazgo 713 del Inspector) ───────────────────

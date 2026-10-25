@@ -136,8 +136,11 @@ export default function NumberInput({
 
   return (
     <div className={`${styles.inputGroup} ${className}`}>
+      {/* El rótulo en su propio <span>: suelto junto al asterisco era un nodo de texto que, con la
+          página traducida, React no podía reescribir y se quedaba con el rótulo anterior mientras
+          el aria-label ya decía el nuevo (hallazgo 3497, 25/10/2026). */}
       <label className={styles.label} htmlFor={id}>
-        {label}
+        <span>{label}</span>
         {required && <span className={styles.required}>*</span>}
       </label>
 
