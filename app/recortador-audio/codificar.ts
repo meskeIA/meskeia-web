@@ -1,5 +1,5 @@
 /**
- * Codificación del recorte: WAV (PCM 16 bits, siempre disponible) y M4A con AAC-LC.
+ * Codificación del recorte: WAV (PCM 16 bits, siempre disponible), M4A con AAC-LC y OGG con Opus.
  *
  * El M4A lo codifica el propio navegador con WebCodecs (`AudioEncoder`) y lo empaqueta
  * `mp4-muxer`, la misma librería que ya usa recortador-video: no entra ningún paquete nuevo.
@@ -8,7 +8,14 @@
  *
  * El codificador AAC del sistema solo acepta 44,1 y 48 kHz (medido en Chromium 151 y Edge 155:
  * 22,05 kHz da `supported: false`). Un original a otra frecuencia se remuestrea antes.
+ *
+ * El OGG (desde el 25/10/2026, semilla S0226) lo codifica el mismo `AudioEncoder` con Opus, y las
+ * páginas OGG las escribe `ogg-opus.ts`, porque ninguna dependencia del proyecto lo hace. Opus
+ * acepta en Chromium de 8 a 48 kHz, 44,1 incluido (sonda del 25/10/2026); si un navegador no
+ * acepta la frecuencia del original, se remuestrea a 48 kHz, la nativa de Opus.
  */
+
+import { empaquetarOggOpus, preSkipDeDescripcion, type PaqueteOpus } from './ogg-opus';
 
 const CODEC_AAC = 'mp4a.40.2';
 /** 96 kbps por canal: con 16 bits a 44,1 kHz, el M4A pesa unas siete veces menos que el WAV. */
@@ -57,6 +64,45 @@ async function remuestrear(buffer: AudioBuffer, sampleRate: number): Promise<Aud
 }
 
 /**
+ * Entrega el audio al codificador en bloques f32-planar. Cada canal va entero detrás del anterior
+ * y se recorta a [-1, 1] como el WAV, porque el volumen llega al 200 %.
+ */
+async function alimentarCodificador(
+  encoder: AudioEncoder,
+  buffer: AudioBuffer,
+  canales: number,
+  hayError: () => boolean,
+): Promise<void> {
+  const sampleRate = buffer.sampleRate;
+  const planos = Array.from({ length: canales }, (_, c) => buffer.getChannelData(c));
+  for (let inicio = 0; inicio < buffer.length; inicio += TRAMAS_POR_BLOQUE) {
+    if (hayError()) break;
+    const tramas = Math.min(TRAMAS_POR_BLOQUE, buffer.length - inicio);
+    const datos = new Float32Array(tramas * canales);
+    for (let c = 0; c < canales; c++) {
+      const plano = planos[c];
+      for (let i = 0; i < tramas; i++) {
+        datos[c * tramas + i] = Math.max(-1, Math.min(1, plano[inicio + i]));
+      }
+    }
+    const audioData = new AudioData({
+      format: 'f32-planar',
+      sampleRate,
+      numberOfFrames: tramas,
+      numberOfChannels: canales,
+      timestamp: Math.round((inicio * 1_000_000) / sampleRate),
+      data: datos,
+    });
+    encoder.encode(audioData);
+    audioData.close();
+    // No acumular el archivo entero en la cola del codificador
+    if (encoder.encodeQueueSize > 32) {
+      await new Promise<void>((resolve) => encoder.addEventListener('dequeue', () => resolve(), { once: true }));
+    }
+  }
+}
+
+/**
  * Codifica el recorte a M4A (AAC-LC, 96 kbps por canal). Lanza un error si el navegador no puede:
  * quien llama debe haber comprobado antes `navegadorCodificaAac()`.
  */
@@ -85,34 +131,7 @@ export async function codificarM4a(original: AudioBuffer): Promise<Blob> {
   });
   encoder.configure({ codec: CODEC_AAC, sampleRate, numberOfChannels: canales, bitrate: bitrateAac(canales) });
 
-  const planos = Array.from({ length: canales }, (_, c) => buffer.getChannelData(c));
-  for (let inicio = 0; inicio < buffer.length; inicio += TRAMAS_POR_BLOQUE) {
-    if (errorCodificador) break;
-    const tramas = Math.min(TRAMAS_POR_BLOQUE, buffer.length - inicio);
-    // f32-planar: cada canal entero detrás del anterior. Se recorta a [-1, 1] como el WAV,
-    // porque el volumen llega al 200 %.
-    const datos = new Float32Array(tramas * canales);
-    for (let c = 0; c < canales; c++) {
-      const plano = planos[c];
-      for (let i = 0; i < tramas; i++) {
-        datos[c * tramas + i] = Math.max(-1, Math.min(1, plano[inicio + i]));
-      }
-    }
-    const audioData = new AudioData({
-      format: 'f32-planar',
-      sampleRate,
-      numberOfFrames: tramas,
-      numberOfChannels: canales,
-      timestamp: Math.round((inicio * 1_000_000) / sampleRate),
-      data: datos,
-    });
-    encoder.encode(audioData);
-    audioData.close();
-    // No acumular el archivo entero en la cola del codificador
-    if (encoder.encodeQueueSize > 32) {
-      await new Promise<void>((resolve) => encoder.addEventListener('dequeue', () => resolve(), { once: true }));
-    }
-  }
+  await alimentarCodificador(encoder, buffer, canales, () => errorCodificador !== null);
 
   await encoder.flush();
   encoder.close();
@@ -120,6 +139,86 @@ export async function codificarM4a(original: AudioBuffer): Promise<Blob> {
 
   muxer.finalize();
   return new Blob([target.buffer], { type: 'audio/mp4' });
+}
+
+const CODEC_OPUS = 'opus';
+/** 48 kbps por canal: en Opus suena como un AAC de 96 y el archivo pesa la mitad que el M4A. */
+const bitrateOpus = (canales: number): number => 48_000 * canales;
+/**
+ * Retardo de libopus a 48 kHz (6,5 ms). Solo se usa si el codificador no entrega su OpusHead:
+ * Chromium la entrega, con este mismo valor.
+ */
+const PRE_SKIP_LIBOPUS = 312;
+
+/** ¿Puede este navegador codificar Opus? Lo pregunta al codificador, como con el AAC. */
+export async function navegadorCodificaOpus(): Promise<boolean> {
+  return typeof AudioEncoder !== 'undefined' && opusAcepta(48_000, 2);
+}
+
+async function opusAcepta(sampleRate: number, canales: number): Promise<boolean> {
+  try {
+    const { supported } = await AudioEncoder.isConfigSupported({
+      codec: CODEC_OPUS, sampleRate, numberOfChannels: canales, bitrate: bitrateOpus(canales),
+    });
+    return supported === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Codifica el recorte a OGG (Opus, 48 kbps por canal). Lanza un error si el navegador no puede:
+ * quien llama debe haber comprobado antes `navegadorCodificaOpus()`.
+ */
+export async function codificarOgg(original: AudioBuffer): Promise<Blob> {
+  // Opus en OGG con la familia de canales 0 solo lleva mono o estéreo
+  const canales = Math.min(original.numberOfChannels, 2);
+  const mezclado = mezclarAEstereo(original, canales);
+  const buffer = (await opusAcepta(mezclado.sampleRate, canales))
+    ? mezclado
+    : await remuestrear(mezclado, 48_000);
+  if (!(await opusAcepta(buffer.sampleRate, canales))) {
+    throw new Error('El navegador no acepta esta configuración Opus');
+  }
+  const sampleRate = buffer.sampleRate;
+
+  const paquetes: PaqueteOpus[] = [];
+  let descripcion: Uint8Array | null = null;
+  let errorCodificador: Error | null = null;
+  const encoder = new AudioEncoder({
+    output: (chunk, meta) => {
+      const datos = new Uint8Array(chunk.byteLength);
+      chunk.copyTo(datos);
+      // Duración en microsegundos → muestras a 48 kHz; un marco Opus típico es de 20 ms
+      const muestras48k = chunk.duration ? Math.round((chunk.duration * 48_000) / 1_000_000) : 960;
+      paquetes.push({ datos, muestras48k });
+      const desc = meta?.decoderConfig?.description;
+      if (desc && !descripcion) {
+        // Copia: el codificador puede reutilizar su memoria
+        descripcion = ArrayBuffer.isView(desc)
+          ? new Uint8Array(desc.buffer, desc.byteOffset, desc.byteLength).slice()
+          : new Uint8Array(desc).slice();
+      }
+    },
+    error: (e) => { errorCodificador = e instanceof Error ? e : new Error(String(e)); },
+  });
+  encoder.configure({ codec: CODEC_OPUS, sampleRate, numberOfChannels: canales, bitrate: bitrateOpus(canales) });
+
+  await alimentarCodificador(encoder, buffer, canales, () => errorCodificador !== null);
+
+  await encoder.flush();
+  encoder.close();
+  if (errorCodificador) throw errorCodificador;
+
+  const archivo = empaquetarOggOpus({
+    paquetes,
+    canales,
+    frecuenciaOriginal: sampleRate,
+    preSkip: preSkipDeDescripcion(descripcion) ?? PRE_SKIP_LIBOPUS,
+    muestrasAudio48k: Math.round((buffer.length * 48_000) / sampleRate),
+    serie: crypto.getRandomValues(new Uint32Array(1))[0],
+  });
+  return new Blob([archivo], { type: 'audio/ogg' });
 }
 
 /** Con 3 o más canales, mezcla los impares a la izquierda y los pares a la derecha. */

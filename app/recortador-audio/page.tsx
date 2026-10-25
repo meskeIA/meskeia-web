@@ -6,11 +6,11 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { navegadorCodificaAac, codificarM4a, codificarWav } from './codificar';
+import { navegadorCodificaAac, navegadorCodificaOpus, codificarM4a, codificarOgg, codificarWav } from './codificar';
 
 // Tipos
-type OutputFormat = 'm4a' | 'wav';
-type SoporteAac = 'comprobando' | 'si' | 'no';
+type OutputFormat = 'm4a' | 'ogg' | 'wav';
+type Soporte = 'comprobando' | 'si' | 'no';
 
 interface AudioInfo {
   name: string;
@@ -54,7 +54,8 @@ export default function RecortadorAudioPage() {
 
   // Estados de salida
   const [outputFormat, setOutputFormat] = useState<OutputFormat>('m4a');
-  const [soporteAac, setSoporteAac] = useState<SoporteAac>('comprobando');
+  const [soporteAac, setSoporteAac] = useState<Soporte>('comprobando');
+  const [soporteOpus, setSoporteOpus] = useState<Soporte>('comprobando');
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [processedSize, setProcessedSize] = useState<number | null>(null);
@@ -98,7 +99,9 @@ export default function RecortadorAudioPage() {
     };
   }, []);
 
-  // Sin codificador AAC, el único formato que se puede entregar de verdad es WAV
+  // Sin codificador AAC, el único formato que se puede entregar de verdad es WAV. OGG solo se
+  // ofrece si el navegador codifica Opus (S0226): no es el formato por defecto, porque iPhone y
+  // Mac no siempre lo abren.
   useEffect(() => {
     let vigente = true;
     navegadorCodificaAac().then((puede) => {
@@ -106,12 +109,16 @@ export default function RecortadorAudioPage() {
       setSoporteAac(puede ? 'si' : 'no');
       if (!puede) setOutputFormat('wav');
     });
+    navegadorCodificaOpus().then((puede) => {
+      if (vigente) setSoporteOpus(puede ? 'si' : 'no');
+    });
     return () => { vigente = false; };
   }, []);
 
   // Cargar archivo de audio
   const handleFileSelect = useCallback(async (file: File) => {
-    if (!file.type.startsWith('audio/')) {
+    // Una nota de voz (.opus) puede llegar sin tipo MIME, según el sistema que la entregue
+    if (!file.type.startsWith('audio/') && !/\.(opus|ogg|oga)$/i.test(file.name)) {
       alert('Por favor, selecciona un archivo de audio válido');
       return;
     }
@@ -382,7 +389,11 @@ export default function RecortadorAudioPage() {
         }
       }
 
-      const blob = outputFormat === 'm4a' ? await codificarM4a(newBuffer) : codificarWav(newBuffer);
+      const blob = outputFormat === 'm4a'
+        ? await codificarM4a(newBuffer)
+        : outputFormat === 'ogg'
+          ? await codificarOgg(newBuffer)
+          : codificarWav(newBuffer);
 
       const url = URL.createObjectURL(blob);
       if (processedUrl) URL.revokeObjectURL(processedUrl);
@@ -391,9 +402,9 @@ export default function RecortadorAudioPage() {
       setProcessedFormat(outputFormat);
     } catch (error) {
       console.error('Error al procesar audio:', error);
-      alert(outputFormat === 'm4a'
-        ? 'No se pudo codificar a M4A en este navegador. Prueba a exportar en WAV.'
-        : 'Error al procesar el audio');
+      alert(outputFormat === 'wav'
+        ? 'Error al procesar el audio'
+        : `No se pudo codificar a ${outputFormat === 'm4a' ? 'M4A' : 'OGG'} en este navegador. Prueba a exportar en WAV.`);
     }
 
     setIsProcessing(false);
@@ -516,7 +527,7 @@ export default function RecortadorAudioPage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="audio/*"
+              accept="audio/*,.opus"
               onChange={handleInputChange}
               className={styles.fileInput}
             />
@@ -664,6 +675,15 @@ export default function RecortadorAudioPage() {
                 </button>
                 <button
                   type="button"
+                  className={`${styles.formatBtn} ${outputFormat === 'ogg' ? styles.formatActive : ''}`}
+                  onClick={() => elegirFormato('ogg')}
+                  aria-pressed={outputFormat === 'ogg'}
+                  disabled={soporteOpus !== 'si'}
+                >
+                  OGG (Opus)
+                </button>
+                <button
+                  type="button"
                   className={`${styles.formatBtn} ${outputFormat === 'wav' ? styles.formatActive : ''}`}
                   onClick={() => elegirFormato('wav')}
                   aria-pressed={outputFormat === 'wav'}
@@ -682,6 +702,18 @@ export default function RecortadorAudioPage() {
                   iPhone, Android, Windows y Mac. <strong>WAV</strong>: sin pérdida, para seguir editando.
                 </p>
               )}
+              {soporteOpus === 'si' ? (
+                <p key="con-opus" className={styles.formatNote}>
+                  <strong>OGG (Opus)</strong>: el más ligero, la mitad que el M4A, y el formato de las
+                  notas de voz de WhatsApp y Telegram. Lo abren Android, Chrome y Firefox; para iPhone y
+                  Mac, mejor M4A.
+                </p>
+              ) : soporteOpus === 'no' ? (
+                <p key="sin-opus" className={styles.formatNote} role="status">
+                  Tu navegador no puede codificar Opus, así que no exporta en OGG. Chrome y Edge sí
+                  lo hacen.
+                </p>
+              ) : null}
             </div>
 
             {/* Botones de acción */}
@@ -801,7 +833,7 @@ export default function RecortadorAudioPage() {
         <div className={styles.faqList}>
           <div className={styles.faqItem}>
             <h3>¿En qué formato se descarga el audio recortado?</h3>
-            <p>En M4A (AAC) o en WAV, a tu elección. El M4A lo codifica el propio navegador: pesa unas siete veces menos que el WAV y lo reproducen iPhone, Android, Windows y Mac. El WAV no pierde calidad y es el que conviene para seguir editando. Si tu navegador no puede codificar AAC, la app lo indica y solo ofrece WAV.</p>
+            <p>En M4A (AAC), OGG (Opus) o WAV, a tu elección. El M4A lo codifica el propio navegador: pesa unas siete veces menos que el WAV y lo reproducen iPhone, Android, Windows y Mac. El OGG con Opus pesa la mitad que el M4A y es el formato de las notas de voz de WhatsApp y Telegram, así que una nota de voz recortada sigue en su formato; lo abren Android, Chrome y Firefox, y para iPhone y Mac conviene el M4A. El WAV no pierde calidad y es el que conviene para seguir editando. Si tu navegador no puede codificar AAC u Opus, la app lo indica y no ofrece ese formato.</p>
           </div>
           <div className={styles.faqItem}>
             <h3>¿Mis archivos de audio son seguros?</h3>
@@ -825,7 +857,7 @@ export default function RecortadorAudioPage() {
           </div>
           <div className={styles.faqItem}>
             <h3>¿Por qué hay que volver a codificar el audio al recortarlo?</h3>
-            <p>Para recortar audio con precisión, el navegador debe decodificarlo a PCM (sin compresión) en memoria, manipularlo y volver a codificarlo. Los navegadores no traen codificador de MP3, así que el recorte se codifica en AAC (el M4A), que con el mismo peso suena igual o mejor, o se guarda en WAV sin compresión.</p>
+            <p>Para recortar audio con precisión, el navegador debe decodificarlo a PCM (sin compresión) en memoria, manipularlo y volver a codificarlo. Los navegadores no traen codificador de MP3, así que el recorte se codifica en AAC (el M4A), que con el mismo peso suena igual o mejor, en Opus (el OGG), o se guarda en WAV sin compresión.</p>
           </div>
           <div className={styles.faqItem}>
             <h3>¿Cómo consigo la mayor calidad posible en el resultado?</h3>
@@ -881,7 +913,7 @@ export default function RecortadorAudioPage() {
             <div className={styles.stepNumber}>7</div>
             <div className={styles.stepContent}>
               <h3>Procesa y descarga</h3>
-              <p>Elige M4A o WAV y pulsa &quot;Recortar y Procesar&quot;. El audio procesado aparecerá con un reproductor para verificar antes de descargar. El archivo tendrá el sufijo &quot;_recortado&quot;.</p>
+              <p>Elige M4A, OGG o WAV y pulsa &quot;Recortar y Procesar&quot;. El audio procesado aparecerá con un reproductor para verificar antes de descargar. El archivo tendrá el sufijo &quot;_recortado&quot;.</p>
             </div>
           </div>
         </div>
@@ -918,7 +950,7 @@ export default function RecortadorAudioPage() {
         <div className={styles.warningBox}>
           <h3><span aria-hidden="true">⚠️</span> Limitaciones técnicas y legales</h3>
           <ul className={styles.warningList}>
-            <li>Los navegadores no traen codificador de MP3 ni de OGG: el recorte se exporta en M4A (AAC) o en WAV. Si tu navegador no codifica AAC, solo está disponible WAV.</li>
+            <li>Los navegadores no traen codificador de MP3 ni de OGG Vorbis: el recorte se exporta en M4A (AAC), en OGG con Opus o en WAV. Si tu navegador no codifica AAC u Opus, ese formato no se ofrece; WAV está siempre disponible.</li>
             <li>La calidad del resultado está limitada por la calidad del archivo original. No se puede recuperar calidad perdida en una codificación previa.</li>
             <li>Para archivos superiores a 100 MB, el procesamiento puede ser lento o consumir mucha memoria RAM según tu dispositivo.</li>
             <li>Respeta los derechos de autor al recortar y reutilizar audio de terceros, incluso para uso personal.</li>
@@ -992,11 +1024,12 @@ export default function RecortadorAudioPage() {
               <h4><span aria-hidden="true">🌐</span> OGG</h4>
               <ul>
                 <li><span role="img" aria-label="Ventaja:">✅</span> Mejor compresión que MP3</li>
+                <li><span role="img" aria-label="Ventaja:">✅</span> Con Opus, el de las notas de voz</li>
                 <li><span role="img" aria-label="Ventaja:">✅</span> Código abierto y gratuito</li>
                 <li><span role="img" aria-label="Con reservas:">⚠️</span> Menos compatible</li>
                 <li><span role="img" aria-label="Con reservas:">⚠️</span> No soportado por Apple</li>
               </ul>
-              <p className={styles.formatUse}>Ideal para: web, juegos, streaming</p>
+              <p className={styles.formatUse}>Ideal para: notas de voz, web, juegos, streaming</p>
             </div>
           </div>
         </section>
@@ -1008,9 +1041,10 @@ export default function RecortadorAudioPage() {
             <div className={styles.faqItem}>
               <h4>¿Por qué no se puede descargar en MP3?</h4>
               <p>
-                Los navegadores no traen codificador de MP3 ni de OGG. Sí traen el de AAC,
-                el formato del M4A, que con el mismo peso suena igual o mejor que un MP3 y
-                se reproduce en cualquier móvil u ordenador actual. Para no perder nada, WAV.
+                Los navegadores no traen codificador de MP3. Sí traen el de AAC, el formato
+                del M4A, que con el mismo peso suena igual o mejor que un MP3 y se reproduce
+                en cualquier móvil u ordenador actual, y el de Opus, que la app guarda en OGG.
+                Para no perder nada, WAV.
               </p>
             </div>
             <div className={styles.faqItem}>

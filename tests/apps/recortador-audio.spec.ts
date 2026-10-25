@@ -168,6 +168,120 @@ test.describe('recortador-audio · exportación real', () => {
   });
 });
 
+/**
+ * OGG con Opus (semilla S0226, 25/10/2026). Esperados derivados a mano:
+ *   - Página OGG (RFC 3533): «OggS» en 0-3; la primera página lleva solo OpusHead, así que su
+ *     firma va en 28-35 (27 B de cabecera + 1 de tabla de segmentos).
+ *   - Granule de la última página (RFC 7845): pre-skip + duración real a 48 kHz. 3 s → 144.000.
+ *   - Peso: 48 kbps por canal → 3 s estéreo = 96.000 × 3 / 8 = 36.000 B de audio más las
+ *     cabeceras de página (~1 %). Se exige < 1/8 del WAV más pequeño (66.155 B) y > 20.000 B.
+ *   - El CRC de cada página se recalcula aquí bit a bit (polinomio 0x04C11DB7, inicio 0).
+ */
+function crcOggBitABit(bytes: Uint8Array): number {
+  let crc = 0;
+  for (const byte of bytes) {
+    crc ^= byte << 24;
+    for (let b = 0; b < 8; b++) crc = crc & 0x80000000 ? ((crc << 1) ^ 0x04c11db7) >>> 0 : (crc << 1) >>> 0;
+  }
+  return crc >>> 0;
+}
+
+function paginasOgg(bytes: number[]): { granule: number; crcOk: boolean; tipo: number }[] {
+  const a = Uint8Array.from(bytes);
+  const paginas: { granule: number; crcOk: boolean; tipo: number }[] = [];
+  let i = 0;
+  while (i < a.length) {
+    const vista = new DataView(a.buffer, i);
+    const n = a[i + 26];
+    let largo = 27 + n;
+    for (let k = 0; k < n; k++) largo += a[i + 27 + k];
+    const copia = a.slice(i, i + largo);
+    copia.fill(0, 22, 26);
+    paginas.push({
+      granule: Number(vista.getBigUint64(6, true)),
+      crcOk: crcOggBitABit(copia) === vista.getUint32(22, true),
+      tipo: a[i + 5],
+    });
+    i += largo;
+  }
+  return paginas;
+}
+
+test.describe('recortador-audio · OGG (Opus)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['input[type="file"]']);
+  });
+
+  test('OGG de verdad: páginas con CRC válido, OpusHead, granule exacto, mitad de peso y mismo tono', async ({ page }) => {
+    await cargar(page, wavSeno(3, 44_100, 2));
+    const ogg = page.getByRole('button', { name: 'OGG (Opus)' });
+    await expect(ogg).toBeEnabled();
+    // No es el formato por defecto: iPhone y Mac no siempre lo abren
+    await expect(ogg).toHaveAttribute('aria-pressed', 'false');
+    await ogg.click();
+
+    const { nombre, bytes } = await procesarYDescargar(page);
+    expect(nombre).toBe('tono_recortado.ogg');
+    expect(texto(bytes, 0, 4)).toBe('OggS');
+    expect(texto(bytes, 28, 36)).toBe('OpusHead');
+    expect(bytes.length).toBeLessThan(529_244 / 8);
+    expect(bytes.length).toBeGreaterThan(20_000);
+
+    const paginas = paginasOgg(bytes);
+    expect(paginas.every((p) => p.crcOk)).toBe(true);
+    expect(paginas[0].tipo).toBe(0x02);
+    expect(paginas.at(-1)?.tipo).toBe(0x04);
+    const preSkip = bytes[28 + 10] | (bytes[28 + 11] << 8);
+    expect(paginas.at(-1)?.granule).toBe(preSkip + 144_000);
+
+    const r = await analizar(page, bytes);
+    expect(r.canales).toBe(2);
+    expect(Math.abs(r.duracion - 3)).toBeLessThan(0.06);
+    expect(Math.abs(r.hz - 440)).toBeLessThan(5);
+  });
+
+  test('el recorte de 1 a 2 s llega al OGG', async ({ page }) => {
+    await cargar(page, wavSeno(3, 44_100, 1));
+    const rangos = page.locator('input[type="range"]');
+    await sembrarValor(page, rangos.nth(1), 2);
+    await sembrarValor(page, rangos.nth(0), 1);
+    await page.getByRole('button', { name: 'OGG (Opus)' }).click();
+    const { bytes } = await procesarYDescargar(page);
+    const r = await analizar(page, bytes);
+    expect(r.canales).toBe(1);
+    expect(Math.abs(r.duracion - 1)).toBeLessThan(0.06);
+  });
+
+  test('una nota de voz .opus sin tipo MIME se abre y se recorta', async ({ page }) => {
+    // La nota se fabrica con la propia app (OGG con Opus, como las de WhatsApp) y se vuelve a
+    // cargar con otro nombre y sin tipo, que es como llega desde algunos sistemas
+    await cargar(page, wavSeno(2, 48_000, 1));
+    await page.getByRole('button', { name: 'OGG (Opus)' }).click();
+    const nota = await procesarYDescargar(page);
+
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['input[type="file"]']);
+    // setInputFiles deduce el tipo del nombre aunque se le pase vacío: el File se arma a mano
+    const tipo = await page.locator('input[type="file"]').evaluate((input: HTMLInputElement, arr: number[]) => {
+      const dt = new DataTransfer();
+      dt.items.add(new File([new Uint8Array(arr)], 'PTT-20261025-WA0001.opus', { type: '' }));
+      input.files = dt.files;
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      return input.files[0].type;
+    }, nota.bytes);
+    // Testigo: si el navegador le pusiera tipo, el caso no probaría nada
+    expect(tipo).toBe('');
+    await expect(page.getByRole('button', { name: /Recortar y Procesar/ })).toBeVisible();
+    await page.getByRole('button', { name: 'OGG (Opus)' }).click();
+    const { nombre, bytes } = await procesarYDescargar(page);
+    expect(nombre).toBe('PTT-20261025-WA0001_recortado.ogg');
+    const r = await analizar(page, bytes);
+    expect(Math.abs(r.duracion - 2)).toBeLessThan(0.06);
+    expect(Math.abs(r.hz - 440)).toBeLessThan(5);
+  });
+});
+
 test.describe('recortador-audio · contexto de audio a 22,05 kHz', () => {
   test.beforeEach(async ({ page }) => {
     // Un contexto a una frecuencia que el codificador AAC no acepta obliga a remuestrear
@@ -210,6 +324,8 @@ test.describe('recortador-audio · navegador sin codificador AAC', () => {
     await expect(page.getByRole('button', { name: 'M4A (AAC)' })).toBeDisabled();
     await expect(page.getByRole('button', { name: 'WAV' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('status').filter({ hasText: 'no puede codificar AAC' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'OGG (Opus)' })).toBeDisabled();
+    await expect(page.getByRole('status').filter({ hasText: 'no puede codificar Opus' })).toBeVisible();
     const { nombre, bytes } = await procesarYDescargar(page);
     expect(nombre).toBe('tono_recortado.wav');
     expect(texto(bytes, 0, 4)).toBe('RIFF');
