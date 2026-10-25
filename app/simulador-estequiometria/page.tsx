@@ -9,7 +9,7 @@ import { formatNumber } from '@/lib';
 // Las reacciones, las masas molares y el cálculo viven en ./motor.ts desde el 16/10/2026: los
 // lee también la corrección de los casos para clase, y una sola implementación evita que la app
 // suspenda una masa que ella misma muestra (skill /casos-aula-meskeia).
-import { REACCIONES, calcular, molesNecesarios, type ResultadoCalculo } from './motor';
+import { REACCIONES, calcular, molesNecesarios, porcentajeDeBarraLegible, type ResultadoCalculo } from './motor';
 import CasosAula, { type ConfiguracionSimulador } from './CasosAula';
 import { RESPUESTA_REACTIVO_LIMITANTE, RESPUESTA_MOLES_DESDE_GRAMOS } from './metadata';
 
@@ -286,7 +286,9 @@ export default function SimuladorEstequiometriaPage() {
               // La barra se llena hasta lo necesario; si sobra, se queda llena y el porcentaje real
               // va en el texto. aria-valuenow dice ESE porcentaje, y el máximo crece con él para que
               // la fracción leída (valuenow / valuemax) sea la que se ve llena.
-              const pctRedondeado = Math.round(porcentaje);
+              // Sin cruzar el 100 %: el limitante se lee por debajo y el exceso por encima (3485).
+              const { valor: pctRedondeado, decimales: pctDecimales } = porcentajeDeBarraLegible(porcentaje);
+              const pctTexto = formatNumber(pctRedondeado, pctDecimales);
               return (
                 <div className={styles.barGroup} key={reactivo.formula}>
                   <div className={styles.barLabel}>
@@ -297,7 +299,7 @@ export default function SimuladorEstequiometriaPage() {
                       )}
                     </span>
                     <span className={styles.barValor}>
-                      {`${formatNumber(disponibles, 4)} mol disponibles / ${formatNumber(necesarios, 4)} mol necesarios (${formatNumber(porcentaje, 0)} %)`}
+                      {`${formatNumber(disponibles, 4)} mol disponibles / ${formatNumber(necesarios, 4)} mol necesarios (${pctTexto} %)`}
                     </span>
                   </div>
                   <div
@@ -307,7 +309,7 @@ export default function SimuladorEstequiometriaPage() {
                     aria-valuenow={pctRedondeado}
                     aria-valuemin={0}
                     aria-valuemax={Math.max(100, pctRedondeado)}
-                    aria-valuetext={`${formatNumber(disponibles, 4)} mol disponibles de ${formatNumber(necesarios, 4)} mol necesarios: ${formatNumber(porcentaje, 0)} %`}
+                    aria-valuetext={`${formatNumber(disponibles, 4)} mol disponibles de ${formatNumber(necesarios, 4)} mol necesarios: ${pctTexto} %`}
                   >
                     <div
                       className={`${styles.barFill} ${limitante ? styles.barFillLimitante : ''}`}
@@ -358,6 +360,14 @@ export default function SimuladorEstequiometriaPage() {
                 <span className={styles.resultadoSubValor}>
                   {`Sobran ${formatNumber(resultado.exceso.gramos, 3)} g (${formatNumber(resultado.exceso.moles, 4)} mol)`}
                 </span>
+                {/* Con η < 100 el exceso se calcula como si el limitante reaccionara entero: si el
+                    rendimiento es bajo porque la reacción no se completa, sobra más (hallazgo 3486). */}
+                {rendimiento < 100 && (
+                  <span key="nota-exceso" className={styles.resultadoSubValor}>
+                    Contando que el limitante reacciona entero: si el rendimiento es bajo porque la
+                    reacción no se completa, queda además limitante sin reaccionar y sobra más de este.
+                  </span>
+                )}
               </div>
             ) : (
               !esCatalizador && (
@@ -722,18 +732,27 @@ export default function SimuladorEstequiometriaPage() {
                 completamente incorrectos.
               </li>
               <li>
-                <strong>Confundir rendimiento (η) con pureza</strong> — El rendimiento se refiere a la
-                fracción de reactivo que se transforma en producto deseado. La pureza es la fracción de
-                la mezcla final que es el producto deseado. Son conceptos distintos.
+                <strong>Confundir rendimiento (η) con pureza</strong> — El rendimiento compara el
+                producto deseado que se obtiene con el que permitiría el limitante (m_real / m_teórica).
+                La pureza es la fracción de la mezcla final que es el producto deseado. Son conceptos
+                distintos.
               </li>
               <li>
                 <strong>Usar masa atómica en vez de masa molar</strong> — La masa molar de O₂ es ≈ 32 g/mol
                 (2 × 15,999 = 31,998), no 16 g/mol. Siempre considera la fórmula molecular completa, no solo el átomo.
               </li>
+              {/* Hallazgo 3486 (25/10/2026): decía que el rendimiento «No reduce los moles del reactivo
+                  que reacciona (eso es conversión, no rendimiento)», y la misma página llama
+                  rendimiento a la fracción que reacciona (caso 11, Haber-Bosch y la definición, con
+                  su «equilibrio incompleto»). Una sola noción: el rendimiento compara masas, y si es
+                  bajo porque la reacción no se completa, el limitante tampoco se gasta entero. */}
               <li>
-                <strong>Aplicar el rendimiento a los moles del limitante en vez de a la masa del producto</strong>{' '}
-                — El rendimiento afecta al producto obtenido: m_real = m_teórica × η/100. No reduce los
-                moles del reactivo que reacciona (eso es conversión, no rendimiento).
+                <strong>Aplicar el rendimiento a lo que no es el producto</strong> — El rendimiento se
+                aplica a la masa teórica del producto, la que sale del limitante: m_real = m_teórica × η/100.
+                No se multiplica por η la masa de los reactivos de partida ni la del exceso. Si el
+                rendimiento es bajo porque la reacción no llega a completarse (un equilibrio, como el
+                del amoníaco), tampoco se gasta todo el limitante y sobra más reactivo del que dice el
+                simulador, que calcula el exceso como si el limitante reaccionara entero.
               </li>
             </ul>
           </div>

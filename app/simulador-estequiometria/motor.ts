@@ -274,3 +274,24 @@ export function molesNecesarios(reaccion: Reaccion, molesA: number, molesB: numb
     necesariosB: molesA * (rB.coeficiente / rA.coeficiente),
   };
 }
+
+/**
+ * El porcentaje de una barra de moles, redondeado sin cruzar el 100 %: con los decimales justos
+ * (de 0 a 2) para que lo que no llega al 100 % se lea por debajo y lo que lo pasa, por encima. La
+ * página explica las barras con «el que no llega al 100 % es el limitante; el que lo pasa,
+ * sobra», y con el redondeo a entero las DOS barras decían «100 %» cerca de la mezcla
+ * estequiométrica: la combustión por defecto (CH₄ 99,73 %, O₂ 100,28 %) y la neutralización
+ * (NaOH 99,90 %, HCl 100,10 %), hallazgo 3485. Si ni con dos decimales se separa del 100, se
+ * trunca hacia él (99,999 → 99,99; 100,001 → 100,01): un 100 solo se escribe si es exacto.
+ */
+export function porcentajeDeBarraLegible(porcentaje: number): { valor: number; decimales: number } {
+  const lado = Math.sign(porcentaje - 100);
+  if (lado === 0 || !Number.isFinite(porcentaje)) return { valor: porcentaje, decimales: 0 };
+  for (let decimales = 0; decimales <= 2; decimales++) {
+    const f = 10 ** decimales;
+    const valor = Math.round(porcentaje * f) / f;
+    if (Math.sign(valor - 100) === lado) return { valor, decimales };
+  }
+  const valor = lado < 0 ? Math.floor(porcentaje * 100) / 100 : Math.ceil(porcentaje * 100) / 100;
+  return { valor, decimales: 2 };
+}

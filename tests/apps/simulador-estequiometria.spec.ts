@@ -45,6 +45,7 @@ import {
   ventanaDe,
   type DatosCaso,
 } from '../../app/simulador-estequiometria/casos';
+import { porcentajeDeBarraLegible } from '../../app/simulador-estequiometria/motor';
 
 /**
  * stemum.com → el servidor local, para medir la app como la sirve el portal (data-brand="stemum",
@@ -624,11 +625,13 @@ test.describe('accesibilidad', () => {
     await abrir(page);
     await expect(page.getByRole('progressbar', { name: /Metano/ })).toHaveCount(1);
     await expect(page.getByRole('progressbar', { name: /Oxígeno/ })).toHaveCount(1);
+    // Hasta el 25/10/2026 se redondeaba a entero y el limitante decía «100», contra la regla escrita
+    // encima de las barras (hallazgo 3485): ahora sale con un decimal, «99,7».
     // por defecto (16 g CH₄ + 64 g O₂): n(CH₄) = 0,997320, n(O₂) = 2,000125; necesarios de CH₄ =
     // 2,000125 / 2 = 1,000063 → 99,73 % → «100 %» tras redondear a entero
     await expect(page.getByRole('progressbar', { name: /Metano/ })).toHaveAttribute(
       'aria-valuetext',
-      '0,9973 mol disponibles de 1,0001 mol necesarios: 100 %',
+      '0,9973 mol disponibles de 1,0001 mol necesarios: 99,7 %',
     );
   });
 });
@@ -1510,13 +1513,22 @@ test.describe('re-inspección 25/10/2026 · cálculo', () => {
   //     O₂ 2,0001250 / 1,9946394 = 100,28 % → «(100 %)»
   //   neutralización 36,5 g HCl + 40 g NaOH: NaOH 1,0000750 / 1,0010971 = 99,90 % → «(100 %)»,
   //     limitante · HCl 1,0010971 / 1,0000750 = 100,10 % → «(100 %)»
-  // Es lo primero que ve quien abre la app. Pasará a verde cuando el limitante se lea por debajo de
-  // 100 y el exceso por encima.
+  // Es lo primero que ve quien abre la app.
+  // REPARADO el 25/10/2026 (/reparar, hallazgo 3485): porcentajeDeBarraLegible (motor.ts) redondea
+  // con los decimales justos para no cruzar el 100: «99,7 %» y «100,3 %» en la combustión, «99,9 %»
+  // y «100,1 %» en la neutralización; texto, aria-valuetext y aria-valuenow dicen lo mismo.
   test('valores por defecto: la barra del limitante se lee por debajo del 100 % y la del exceso por encima', async ({ page }) => {
-    test.fail();
+    expect(porcentajeDeBarraLegible(99.73197)).toEqual({ valor: 99.7, decimales: 1 });
+    expect(porcentajeDeBarraLegible(100.0)).toEqual({ valor: 100, decimales: 0 });
+    expect(porcentajeDeBarraLegible(99.9996)).toEqual({ valor: 99.99, decimales: 2 });
+    expect(porcentajeDeBarraLegible(100.0004)).toEqual({ valor: 100.01, decimales: 2 });
+    expect(porcentajeDeBarraLegible(233.4)).toEqual({ valor: 233, decimales: 0 });
     await abrir(page);
     const ch4 = barra(page, 'Metano (CH₄)');
     await expect(ch4).toContainText('0,9973 mol disponibles / 1,0001 mol necesarios');
+    await expect(ch4.locator('[class*="barValor"]')).toContainText(/\(99,7\s%\)/);
+    await expect(ch4.locator('[role="progressbar"]')).toHaveAttribute('aria-valuenow', '99.7');
+    await expect(barra(page, 'Oxígeno (O₂)').locator('[class*="barValor"]')).toContainText(/\(100,3\s%\)/);
     await expect(ch4.locator('[class*="limitanteBadge"]')).toHaveCount(1);
     expect(porcentajeDeBarra(await ch4.locator('[class*="barValor"]').textContent()), 'CH₄, limitante').toBeLessThan(100);
     expect(porcentajeDeBarra(await barra(page, 'Oxígeno (O₂)').locator('[class*="barValor"]').textContent()), 'O₂, en exceso').toBeGreaterThan(100);
@@ -1881,8 +1893,10 @@ test.describe('re-inspección 25/10/2026 · contenido', () => {
   // «Reactivo limitante: Nitrógeno» y «Sobran 5,955 g (2,9539 mol)» de H₂ como si todo el N₂ hubiera
   // reaccionado, cuando con el 15 % transformado quedan 0,85 × 28 = 23,80 g de N₂ y
   // 12 − 0,15 × 2,9985 × 2,016 = 11,093 g de H₂. Pasará a verde cuando la página use una sola noción.
+  // REPARADO el 25/10/2026 (/reparar, hallazgo 3486): el quinto error ya no separa «conversión» de
+  // «rendimiento», dice que con una reacción incompleta el limitante tampoco se gasta entero, y la
+  // tarjeta del exceso lo advierte con η < 100. La masa real (5,107 g) no cambia.
   test('rendimiento y conversión: la página no llama rendimiento a lo que su quinto error frecuente llama conversión', async ({ page }) => {
-    test.fail();
     await abrir(page);
     const quinto = (await page.locator('[class*="warningList"] li').last().textContent()) ?? '';
     const escenario = (await page.locator('[class*="scenarioCard"]').filter({ hasText: 'Haber-Bosch' }).textContent()) ?? '';
