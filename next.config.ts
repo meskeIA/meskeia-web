@@ -106,6 +106,15 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ['meskeia.com', 'stemum.com', 'coquinum.com', 'cronicum.com', 'delegum.com'],
 
   // ============================================================================
+  // AGENTS.md — desactivado (solo afecta a `next dev`)
+  // ============================================================================
+  // Desde Next 16.4, el `next dev` que lanza un agente (también el de Playwright dentro de
+  // check:familias) crea AGENTS.md con su bloque de instrucciones; antes lo dejaba en
+  // CLAUDE.md. Aquí se decidió no tener AGENTS.md: Claude Code lee CLAUDE.md *o* AGENTS.md,
+  // no los dos, y el fichero quedaría sin leer. Con `false`, Next retira el que hubiera creado.
+  agentRules: false,
+
+  // ============================================================================
   // IMÁGENES - Sin optimización por ahora (puede habilitarse en Vercel)
   // ============================================================================
   images: {
@@ -254,6 +263,13 @@ const nextConfig: NextConfig = {
       path: { browser: './empty-module.js' },
       crypto: { browser: './empty-module.js' },
     },
+    // @ffmpeg/ffmpeg (extractor-audio-video) crea su worker con `new URL(classWorkerURL, …)`
+    // cuando se le pasa esa opción; desde Next 16.4 esa URL dinámica rompe el build con
+    // «Module not found». La app no la pasa: usa la otra rama, `new URL('./worker.js', …)`,
+    // que Turbopack sí empaqueta. Se silencia solo ese aviso de ese fichero.
+    ignoreIssue: [
+      { path: /node_modules[\\/]@ffmpeg[\\/]ffmpeg[\\/]dist[\\/]esm[\\/]classes\.js$/, title: /Module not found/ },
+    ],
   },
 };
 
