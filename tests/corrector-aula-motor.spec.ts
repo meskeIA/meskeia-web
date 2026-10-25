@@ -313,8 +313,8 @@ const APPS: Record<string, () => Pregunta[]> = {
     conPractica(
       estequiometria.CASOS,
       estequiometria.generarEjercicioAleatorio,
-      (c) => ({ origen: `caso ${c.id}`, esperado: c.respuesta, tolerancia: estequiometria.toleranciaDe(c.respuesta), magnitud: estequiometria.magnitudDe(c.datos.pregunta), acierta: (v) => estequiometria.comprobarRespuesta(v, c.respuesta, c.datos).correcto }),
-      (e, s) => ({ origen: `semilla ${s}`, esperado: e.respuesta, tolerancia: estequiometria.toleranciaDe(e.respuesta), magnitud: estequiometria.magnitudDe(e.datos.pregunta), acierta: (v) => estequiometria.comprobarRespuesta(v, e.respuesta, e.datos).correcto }),
+      (c) => ({ origen: `caso ${c.id}`, esperado: c.respuesta, tolerancia: estequiometria.toleranciaDe(c.datos), magnitud: estequiometria.magnitudDe(c.datos.pregunta), acierta: (v) => estequiometria.comprobarRespuesta(v, c.respuesta, c.datos).correcto }),
+      (e, s) => ({ origen: `semilla ${s}`, esperado: e.respuesta, tolerancia: estequiometria.toleranciaDe(e.datos), magnitud: estequiometria.magnitudDe(e.datos.pregunta), acierta: (v) => estequiometria.comprobarRespuesta(v, e.respuesta, e.datos).correcto }),
     ),
   'tabla-periodica': () =>
     periodica.CASOS.flatMap((c) => {

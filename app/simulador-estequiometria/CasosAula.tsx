@@ -95,7 +95,8 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
         <p className={styles.casosIntro}>
           El simulador usa las masas molares de la IUPAC (H = 1,008; O = 15,999…). Si haces las
           cuentas con las redondeadas de tu libro (H = 1, C = 12, O = 16, Na = 23, Cl = 35,5,
-          Fe = 56), el resultado también se da por bueno: se acepta una desviación del 1&nbsp;%.
+          Fe = 56), el resultado también se da por bueno, y además se deja un margen del 0,5&nbsp;%
+          para los redondeos de las cuentas intermedias.
           «Cargar en el simulador» pone la reacción y los gramos del caso para que compruebes la
           respuesta en el panel.
         </p>

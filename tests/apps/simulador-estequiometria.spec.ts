@@ -1204,6 +1204,7 @@ test.describe('re-inspección 24/10/2026 · página traducida (cabo C0243)', () 
 // Pero la tolerancia es la misma en los doce: en el caso 12 las DOS tablas dan 81,11 %, y los
 // redondeos intermedios que puede arrastrar el alumno (n(HCl) a 1,1 / 1,096 / 1,097 mol, M(NaCl)
 // 58,4–58,5, la masa teórica a 64 g) van de 80,81 % a 81,25 %; el 1 % acepta de 80,30 a 81,92 %.
+// REPARADO (hallazgo 3451, 25/10/2026): `ventanaDe` en casos.ts, ver los tests de abajo.
 // ─────────────────────────────────────────────────────────────────────────────────────────────
 test.describe('re-inspección 24/10/2026 · corrector (cabo C0267)', () => {
   test('caso 12: las dos tablas de masas dan 81,11 % y las dos se aceptan', () => {
@@ -1219,17 +1220,59 @@ test.describe('re-inspección 24/10/2026 · corrector (cabo C0267)', () => {
     expect(comprobarRespuesta(80.89, c12.respuesta, c12.datos).correcto).toBe(true);
   });
 
-  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, cálculo) — 81,9 % y 80,3 % no salen de
-  // ninguna tabla ni de ningún redondeo intermedio (de 80,81 a 81,25 %), y el 1 % los aprueba.
+  // REPARADO (hallazgo 3451, 25/10/2026) — 81,9 % y 80,3 % no salen de ninguna tabla ni de ningún
+  // redondeo intermedio (de 80,81 a 81,25 %), y el 1 % los aprobaba. Ahora se acepta el intervalo
+  // entre las dos respuestas exactas (IUPAC 81,105 · libro 81,111) más un 0,5 % y media centésima:
+  // de 80,70 a 81,52 %.
   test('caso 12: 81,9 % y 80,3 % no son ningún redondeo de 81,11 % y no se aprueban', () => {
-    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): el 1 % aprueba lo que no da ninguna tabla');
     const c12 = CASOS_AULA[11];
     expect(comprobarRespuesta(81.9, c12.respuesta, c12.datos).correcto, '81,9 %').toBe(false);
     expect(comprobarRespuesta(80.3, c12.respuesta, c12.datos).correcto, '80,3 %').toBe(false);
+    expect(comprobarRespuesta(81.92, c12.respuesta, c12.datos).correcto, '81,92 %').toBe(false);
+    // y los redondeos intermedios que anotó el Inspector se siguen aceptando: n(HCl) = 1,1 mol ×
+    // 58,5 = 64,35 g → 80,81 % · la masa teórica a 64 g → 52 ÷ 64 = 81,25 %
+    expect(comprobarRespuesta(80.81, c12.respuesta, c12.datos).correcto, '80,81 %').toBe(true);
+    expect(comprobarRespuesta(81.25, c12.respuesta, c12.datos).correcto, '81,25 %').toBe(true);
+  });
+
+  // Caso 9: IUPAC 3,01375 mol × 55,845 = 168,30 g · libro (5 − 1,5 × 4 ÷ 3) × 56 = 168,00 g.
+  // Ventana: de 168,00 − 0,84 − 0,005 = 167,15 a 168,30 + 0,84 + 0,005 = 169,15 g.
+  test('caso 9: 168,30 y 168,00 g se aceptan, 166,7 g no', () => {
+    const c9 = CASOS_AULA[8];
+    expect(c9.id).toBe(9);
+    expect(comprobarRespuesta(168.3, c9.respuesta, c9.datos).correcto, '168,30 g').toBe(true);
+    expect(comprobarRespuesta(168, c9.respuesta, c9.datos).correcto, '168,00 g').toBe(true);
+    expect(comprobarRespuesta(166.7, c9.respuesta, c9.datos).correcto, '166,7 g').toBe(false);
+  });
+
+  // Testigo de la ventana en los doce casos y 80 prácticas: lo que está entre las dos tablas y un
+  // 0,2 % más allá (lo más que se aleja una cuenta con los moles a tres decimales, medido el
+  // 25/10/2026) se acepta; lo que está un 0,6 % y una centésima más allá de las dos, no.
+  test('la ventana: las dos tablas y sus redondeos sí, un 0,6 % más allá no', () => {
+    const lista = [
+      ...CASOS_AULA.map((c) => ({ datos: c.datos, respuesta: c.respuesta, origen: `caso ${c.id}` })),
+      ...[...Array.from({ length: 40 }, (_, i) => i + 1), ...Array.from({ length: 40 }, (_, i) => (i + 1) * 7919)]
+        .map((s) => generarEjercicioAleatorio(s))
+        .map((e) => ({ datos: e.datos, respuesta: e.respuesta, origen: `semilla ${e.semilla}` })),
+    ];
+    const problemas: string[] = [];
+    for (const { datos, respuesta, origen } of lista) {
+      const iupac = estequiometriaPropia(datos, IUPAC).valor;
+      const libro = estequiometriaPropia(datos, LIBRO).valor;
+      const menor = Math.min(iupac, libro);
+      const mayor = Math.max(iupac, libro);
+      const acepta = (v: number) => comprobarRespuesta(v, respuesta, datos).correcto;
+      // Un rendimiento por encima del 100 % no existe: ese lo rechaza el dominio, no la ventana.
+      const posibles = [menor, mayor, menor - 0.002 * iupac, mayor + 0.002 * iupac].filter((v) => datos.pregunta !== 'rendimiento' || v <= 100);
+      for (const v of posibles) if (!acepta(v)) problemas.push(`${origen}: suspende ${v}`);
+      const fuera = 0.006 * iupac + 0.01;
+      for (const v of [menor - fuera, mayor + fuera]) if (v > 0 && acepta(v)) problemas.push(`${origen}: aprueba ${v}`);
+    }
+    expect(problemas).toEqual([]);
   });
 
   test('en la página: «81,9» para el caso 12 no dice «¡Correcto!»', async ({ page }) => {
-    test.fail(true, 'ABIERTO (hallazgo de la re-inspección del 24/10/2026): el 1 % aprueba lo que no da ninguna tabla');
+    // REPARADO (hallazgo 3451, 25/10/2026).
     await abrir(page);
     const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
     await seccion.getByRole('button', { name: /^Caso 12:/ }).click();

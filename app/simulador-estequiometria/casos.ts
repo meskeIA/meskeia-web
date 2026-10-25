@@ -23,9 +23,11 @@
  * descarta lo que no cumpla lo mismo (`coincideConLibro`). El test lo comprueba con una tabla
  * de masas de libro escrita en el propio test.
  *
- * Por eso la tolerancia es la RELATIVA del motor del corrector (el mayor entre 0,01 y el 1 %)
- * y no la de redondeo: con media centésima de margen, quien usa las masas de su libro
- * suspendería una cuenta bien hecha.
+ * Por eso el corrector no usa la tolerancia de redondeo: con media centésima de margen, quien usa
+ * las masas de su libro suspendería una cuenta bien hecha. Tampoco el 1 % fijo que usó hasta el
+ * 25/10/2026 (hallazgo 3451): da por buenas las dos tablas, pero donde las dos coinciden aprueba
+ * cifras que no salen de ninguna. Acepta el intervalo entre las dos respuestas exactas más un
+ * margen medido para los redondeos intermedios (`ventanaDe`).
  *
  * · Todos los gramos son enteros y caben en los controles del simulador, y el rendimiento es
  *   un entero de 0 a 100, como su deslizador: «Cargar en el simulador» los pone tal cual.
@@ -44,6 +46,7 @@ import {
   dentroDeTolerancia,
   exigeRedondeo,
   redondearA,
+  textoDesviacion,
   toleranciaRelativa,
   type Magnitud,
 } from '@/lib/calculadoras/correctorCasosAula';
@@ -292,9 +295,40 @@ export function magnitudDe(pregunta: Pregunta): Magnitud {
   return pregunta === 'rendimiento' ? 'porcentaje' : 'real';
 }
 
-/** Tolerancia: la relativa del motor del corrector (el porqué, en la cabecera). */
-export function toleranciaDe(esperado: number): number {
-  return toleranciaRelativa(esperado);
+/**
+ * Margen para los redondeos intermedios, sobre el intervalo entre las dos tablas de masas: un
+ * 0,5 % de la respuesta. Medido el 25/10/2026 en los doce casos y 80 prácticas: con los moles a
+ * tres decimales y las masas molares a uno o dos, ninguna cuenta se sale del intervalo más de un
+ * 0,20 %; n(HCl) a 1,1 mol en el caso 12 (80,81 %, el redondeo más grueso que anotó el Inspector)
+ * se sale un 0,37 %. Los moles a dos decimales llegan al 1,33 %, y ni el 1 % de antes los cubría.
+ */
+const MARGEN_REDONDEO = 0.005;
+
+/**
+ * Lo que se da por bueno: de la menor a la mayor de las dos respuestas exactas (masas IUPAC y
+ * masas de libro), más el margen de redondeo y media unidad del último decimal pedido. Se
+ * expresa como un centro y una tolerancia para el corrector compartido.
+ *
+ * Hasta el 25/10/2026 era el 1 % de la respuesta en todos los casos (hallazgo 3451): justificado
+ * por las masas de libro, pero el hueco entre las dos tablas va del 0,006 % al 0,55 % según el
+ * caso, y donde es casi nulo el 1 % aprobaba cifras que no salen de ninguna tabla ni de ningún
+ * redondeo (81,9 % en el caso 12, cuyas dos tablas dan 81,11 %; 166,7 g en el caso 9).
+ */
+export function ventanaDe(d: DatosCaso): { centro: number; tolerancia: number } {
+  const iupac = resolverCaso(d);
+  const r = reaccionPorId(d.reaccionId);
+  if (!iupac.ok || !r) return { centro: NaN, tolerancia: 0 };
+  const libro = resolverConReaccion(conMasasDeLibro(r), d);
+  const otra = Number.isFinite(libro) ? libro : iupac.valor;
+  const menor = Math.min(iupac.valor, otra);
+  const mayor = Math.max(iupac.valor, otra);
+  const margen = MARGEN_REDONDEO * Math.abs(iupac.valor) + 10 ** -decimalesDe(d.pregunta) / 2;
+  return { centro: (menor + mayor) / 2, tolerancia: (mayor - menor) / 2 + margen };
+}
+
+/** La semianchura de la ventana: lo que se da por bueno a cada lado de su centro. */
+export function toleranciaDe(d: DatosCaso): number {
+  return ventanaDe(d).tolerancia;
 }
 
 export interface Veredicto {
@@ -350,9 +384,12 @@ export function erroresTipicos(d: DatosCaso): { valor: number; motivo: string }[
  * un veredicto, no con una excepción que tumbaría el render.
  */
 export function comprobarRespuesta(usuario: number, esperado: number, d: DatosCaso): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
-  const c = corregirNumero(usuario, esperado, { tolerancia, magnitud: magnitudDe(d.pregunta) });
-  const { diferencia } = c;
+  const ventana = ventanaDe(d);
+  const centro = Number.isFinite(ventana.centro) ? ventana.centro : esperado;
+  const tolerancia = Number.isFinite(ventana.centro) ? ventana.tolerancia : toleranciaRelativa(esperado);
+  const c = corregirNumero(usuario, centro, { tolerancia, magnitud: magnitudDe(d.pregunta) });
+  // La desviación que se enseña es frente a la respuesta de la clave, no frente al centro.
+  const diferencia = Math.abs(usuario - esperado);
 
   if (c.estado === 'no-numerico') {
     return { correcto: false, motivo: 'Escribe un número (puedes usar la coma decimal, por ejemplo 21,95).', diferencia: NaN, tolerancia };
@@ -364,14 +401,16 @@ export function comprobarRespuesta(usuario: number, esperado: number, d: DatosCa
   }
 
   for (const e of erroresTipicos(d)) {
-    if (!dentroDeTolerancia(e.valor, esperado, tolerancia) && dentroDeTolerancia(usuario, e.valor, toleranciaDe(e.valor))) {
+    if (!dentroDeTolerancia(e.valor, centro, tolerancia) && dentroDeTolerancia(usuario, e.valor, toleranciaRelativa(e.valor))) {
       return { correcto: false, motivo: e.motivo, diferencia, tolerancia };
     }
   }
 
+  // textoDesviacion y no `cifra`: la ventana ya no tiene suelo de 0,01, y en unos moles pequeños
+  // la desviación con tres decimales podía escribirse «0» (hallazgo 3369).
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${cifra(diferencia, decimalesDe(d.pregunta))} ${unidadDe(d.pregunta)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, decimalesDe(d.pregunta), formatNumber)} ${unidadDe(d.pregunta)} de la respuesta.`,
     diferencia,
     tolerancia,
   };
@@ -397,8 +436,10 @@ function conMasasDeLibro(r: Reaccion): Reaccion {
 }
 
 /**
- * ¿Da lo mismo con las masas de libro? Lo mismo = el mismo limitante y una respuesta dentro de
- * `margen` veces la tolerancia (0,6: deja sitio a que el alumno arrastre además algún redondeo).
+ * ¿Da lo mismo con las masas de libro? Lo mismo = el mismo limitante y una respuesta a no más
+ * de `margen` veces el 1 % de la IUPAC (0,6: un 0,6 %). El corrector acepta las dos respuestas
+ * sea cual sea su distancia (`ventanaDe`); este filtro es el que impide que la ventana se abra
+ * más de la cuenta en un ejercicio aleatorio.
  */
 export function coincideConLibro(d: DatosCaso, margen = 0.6): boolean {
   const r = reaccionPorId(d.reaccionId);
@@ -409,7 +450,7 @@ export function coincideConLibro(d: DatosCaso, margen = 0.6): boolean {
   const catalizador = esReaccionConCatalizador(r);
   const limI = calcular(r, d.gramosA, catalizador ? 0 : d.gramosB, 100).limitante;
   const limL = calcular(conMasasDeLibro(r), d.gramosA, catalizador ? 0 : d.gramosB, 100).limitante;
-  return limI === limL && Math.abs(libro - iupac.valor) <= margen * toleranciaDe(iupac.valor);
+  return limI === limL && Math.abs(libro - iupac.valor) <= margen * toleranciaRelativa(iupac.valor);
 }
 
 /** Solo el número de la respuesta, con una reacción dada (la de libro). */
