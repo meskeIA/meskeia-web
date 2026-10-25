@@ -30,7 +30,7 @@
  * Se quitó cada `.fail` al repararlo (03/10/2026); los bloques REPARADO conservan el caso del acta.
  */
 
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 import { activarTema, desplegarTodo, prepararParaMedir } from '../contraste-text-muted-auxiliares';
 import { PUERTO } from './_puerto';
@@ -42,6 +42,7 @@ import {
   decimalesDe,
   generarEjercicioAleatorio,
   resolverCaso,
+  ventanaDe,
   type DatosCaso,
 } from '../../app/simulador-estequiometria/casos';
 
@@ -53,6 +54,15 @@ import {
 test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0.1:${PUERTO}`] } });
 
 const RUTA = '/simulador-estequiometria/';
+
+/**
+ * El contenedor de la app: el `div` que tiene el hero como hijo directo. Hasta el 25/10/2026 se
+ * buscaba por `[class*="SimuladorEstequiometria"][class*="container"]`, que solo casa con los
+ * nombres de clase de `next dev` («SimuladorEstequiometria-module__…__container»): contra el build
+ * de producción (`_8XFbKG_container`, el servidor del 3052 del Inspector) no casaba nada y siete
+ * tests caían sin que la app hubiera cambiado.
+ */
+const CONTENEDOR = 'div:has(> header[class*="hero"])';
 
 const tarjeta = (page: Page, rotulo: string) =>
   page.locator('[class*="resultadoCard"]').filter({ hasText: rotulo });
@@ -375,7 +385,7 @@ test.describe('cálculo — escritorio', () => {
     await abrir(page);
     // en ninguna parte de la app (bloque educativo incluido: está en el DOM aunque nazca colapsado)
     // queda una cifra con el % pegado ni separada por un espacio normal
-    const texto = (await page.locator('[class*="SimuladorEstequiometria"][class*="container"]').textContent()) ?? '';
+    const texto = (await page.locator(CONTENEDOR).textContent()) ?? '';
     expect(texto).toContain('~21 % de O₂');
     expect(texto).not.toMatch(/\d%/);
     expect(texto).not.toMatch(/\d %/);
@@ -435,7 +445,8 @@ test.describe('móvil (390 px)', () => {
       const mas = Array.from(document.querySelectorAll('button[aria-label^="Aumentar gramos"]')).map((b) => b.getBoundingClientRect().right);
       const valorRendimiento = document.querySelector('label[for="sliderRendimiento"] strong')!.getBoundingClientRect().right;
       const slider = document.querySelector('#sliderRendimiento')!.getBoundingClientRect().right;
-      const raiz = document.querySelector('[class*="SimuladorEstequiometria"][class*="container"]')!;
+      // El contenedor por el hero, no por el nombre del módulo (ver CONTENEDOR arriba)
+      const raiz = document.querySelector('h1')!.closest('[class*="container"]')!;
       const fuera: string[] = [];
       raiz.querySelectorAll('*').forEach((el) => {
         for (let p = el.parentElement; p && p !== raiz; p = p.parentElement) {
@@ -913,10 +924,11 @@ test.describe('casos para clase · en la página', () => {
 
 // ═════════════════════════════════════════════════════════════════════════════════════════════
 // RE-INSPECCIÓN 24/10/2026 — invalidada por una dependencia (3b92acef, `textoDesviacion` del
-// corrector compartido). Esta app NO usa `textoDesviacion`: su `comprobarRespuesta` escribe la
-// desviación con su propio `cifra`, y con la tolerancia relativa (nunca menor que 0,01) un fallo
-// se desvía siempre ≥ 0,01, así que «Te has desviado 0,00» no puede salir aquí. Los REPARADO de
-// arriba (2710–2723) se sostienen: el spec entero pasó en verde antes de añadir este bloque.
+// corrector compartido). Ese día esta app NO usaba `textoDesviacion`: su `comprobarRespuesta`
+// escribía la desviación con su propio `cifra`, y con la tolerancia relativa (nunca menor que 0,01)
+// un fallo se desviaba siempre ≥ 0,01. Desde 301b3e3d (25/10/2026, hallazgo 3451) SÍ lo usa, porque
+// la ventana ya no tiene ese suelo: lo comprueba el bloque de la re-inspección del 25/10, al final.
+// Los REPARADO de arriba (2710–2723) se sostienen: el spec entero pasó en verde antes de añadir este bloque.
 //
 // Casos nuevos, resueltos a mano ANTES de abrir la app, con los pesos atómicos IUPAC/CIAAW 2021
 // abreviados de `app/tabla-periodica/elementos-data.ts` (H 1,008 · N 14,007 · O 15,999 ·
@@ -1127,10 +1139,10 @@ function erroresDeReact(page: Page): string[] {
 }
 
 test.describe('re-inspección 24/10/2026 · página traducida (cabo C0243)', () => {
-  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, operativa) — con la página traducida, el
-  // rótulo de cada reactivo, la ecuación, las tarjetas de masa teórica y real, el «Sobran …», las
-  // barras y el «N %» del rendimiento son VARIOS nodos de texto en un mismo elemento: React escribe
-  // el valor nuevo en el nodo que el traductor ya retiró y en pantalla sigue el de antes. Medido:
+  // REPARADO (hallazgo 3450, re-inspección del 24/10/2026, operativa; b82fadff) — con la página
+  // traducida, el rótulo de cada reactivo, la ecuación, las tarjetas de masa teórica y real, el
+  // «Sobran …», las barras y el «N %» del rendimiento eran VARIOS nodos de texto en un mismo elemento:
+  // React escribía el valor nuevo en el nodo que el traductor ya retiró y en pantalla seguía el de antes. Medido:
   // al elegir la neutralización, el rótulo seguía «Metano (CH₄) M = 16,043 g/mol», la tarjeta
   // «Masa teórica de Dióxido de carbono (CO₂) 43,891 g 0,9973 mol» y la ecuación «CH₄ + 2 O₂ → CO₂ +»
   // (mientras «Reactivo limitante», que es el único hijo de su elemento, sí decía «Hidróxido de
@@ -1198,9 +1210,9 @@ test.describe('re-inspección 24/10/2026 · página traducida (cabo C0243)', () 
 // ─────────────────────────────────────────────────────────────────────────────────────────────
 // CABO C0267 — la tolerancia relativa del corrector (el mayor entre 0,01 y el 1 %)
 //
-// Aquí SÍ tiene un uso legítimo: el alumno puede hacer las cuentas con las masas de su libro
-// (H = 1, C = 12, O = 16, Na = 23, Cl = 35,5…), y la app lo dice («se acepta una desviación del
-// 1 %»). Medido caso a caso, el hueco IUPAC↔libro va del 0,007 % (caso 12) al 0,553 % (caso 8).
+// Aquí SÍ tenía un uso legítimo: el alumno puede hacer las cuentas con las masas de su libro
+// (H = 1, C = 12, O = 16, Na = 23, Cl = 35,5…), y la app lo decía («se acepta una desviación del
+// 1 %»; desde 301b3e3d dice que se da por buena la cuenta con las masas del libro, más un 0,5 %). Medido caso a caso, el hueco IUPAC↔libro va del 0,007 % (caso 12) al 0,553 % (caso 8).
 // Pero la tolerancia es la misma en los doce: en el caso 12 las DOS tablas dan 81,11 %, y los
 // redondeos intermedios que puede arrastrar el alumno (n(HCl) a 1,1 / 1,096 / 1,097 mol, M(NaCl)
 // 58,4–58,5, la masa teórica a 64 g) van de 80,81 % a 81,25 %; el 1 % acepta de 80,30 a 81,92 %.
@@ -1305,12 +1317,12 @@ test.describe('re-inspección 24/10/2026 · contenido', () => {
     await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Sobran 9,338 g (0,3333 mol)');
   });
 
-  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, contenido) — el primer «error frecuente»
-  // («Comparar moles directamente sin dividir por el coeficiente») pone como ejemplo del error
+  // REPARADO (hallazgo 3452, re-inspección del 24/10/2026, contenido) — el primer «error frecuente»
+  // («Comparar moles directamente sin dividir por el coeficiente») ponía como ejemplo del error
   // «NO es limitante el H₂ por "tener menos moles que 3×2=6"… pero hay que hacer la división».
   // 5 < 3 × 2 es lo mismo que 5/3 < 2/1, y es justo lo que hacen las barras de la app (test de
-  // arriba). El ejemplo no muestra el error que nombra (2 mol < 5 mol → «el N₂ es el limitante»)
-  // y tacha de error un método correcto.
+  // arriba). El ejemplo no mostraba el error que nombra (2 mol < 5 mol → «el N₂ es el limitante»)
+  // y tachaba de error un método correcto.
   test('los «errores frecuentes» no tachan de error comparar 5 mol de H₂ con los 3 × 2 = 6 necesarios', async ({ page }) => {
     // REPARADO (hallazgo 3452, 24/10/2026): el ejemplo muestra el error (2 < 5 → «el N₂») y da por buena la comparación 5 con 6.
     await abrir(page);
@@ -1319,9 +1331,9 @@ test.describe('re-inspección 24/10/2026 · contenido', () => {
     await expect(primero).not.toContainText('NO es limitante el H₂ por');
   });
 
-  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, contenido) — la tabla comparativa da como
-  // razón de que el H₂ sea el limitante habitual del Haber-Bosch su «mayor coeficiente (×3)». El
-  // coeficiente no hace limitante a nadie (lo dice la propia página: «el que tiene menor (moles /
+  // REPARADO (hallazgo 3453, re-inspección del 24/10/2026, contenido) — la tabla comparativa daba
+  // como razón de que el H₂ sea el limitante habitual del Haber-Bosch su «mayor coeficiente (×3)».
+  // El coeficiente no hace limitante a nadie (lo dice la propia página: «el que tiene menor (moles /
   // coeficiente)»), y con la alimentación 3:1 de la propia reacción ninguno sobra.
   test('la tabla no atribuye el limitante del Haber-Bosch al coeficiente', async ({ page }) => {
     // REPARADO (hallazgo 3453, 24/10/2026).
@@ -1331,8 +1343,8 @@ test.describe('re-inspección 24/10/2026 · contenido', () => {
     await expect(fila.locator('td').nth(2)).not.toContainText('mayor coeficiente');
   });
 
-  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, contenido) — dos palabras pegadas por el
-  // salto de línea de JSX después de un </strong> (JSX descarta el salto y la sangría): la FAQ dice
+  // REPARADO (hallazgo 3454, re-inspección del 24/10/2026, contenido) — dos palabras pegadas por el
+  // salto de línea de JSX después de un </strong> (JSX descarta el salto y la sangría): la FAQ decía
   // «la mezcla es estequiométricay no hay reactivo en exceso» y el quinto error frecuente «a la
   // masa del producto— El rendimiento afecta…» (los otros cuatro llevan « — » con espacios).
   test('errata: «estequiométrica y» y «producto — El» con su espacio', async ({ page }) => {
@@ -1373,10 +1385,10 @@ test.describe('re-inspección 24/10/2026 · contenido', () => {
     ]));
   });
 
-  // ABIERTO (hallazgo de la re-inspección del 24/10/2026, contenido) — «¿Qué es el reactivo
-  // limitante?» y «¿Cómo calculo los moles…?» están en las dos bocas con respuestas distintas (la
-  // visible avisa de que no es el de menor masa y pone el CH₄ como ejemplo; el FAQPage, el método
-  // del cociente y el H₂O). La reparación es UNA constante en metadata.ts que importen las dos.
+  // REPARADO (hallazgo 3455, re-inspección del 24/10/2026, contenido) — «¿Qué es el reactivo
+  // limitante?» y «¿Cómo calculo los moles…?» estaban en las dos bocas con respuestas distintas (la
+  // visible avisaba de que no es el de menor masa y ponía el CH₄ como ejemplo; el FAQPage, el método
+  // del cociente y el H₂O). Reparado con UNA constante en metadata.ts que importan las dos.
   test('una pregunta que está en las dos bocas tiene la misma respuesta', async ({ page }) => {
     // REPARADO (hallazgo 3455, 24/10/2026): RESPUESTA_REACTIVO_LIMITANTE y RESPUESTA_MOLES_DESDE_GRAMOS en metadata.ts.
     await abrir(page);
@@ -1385,5 +1397,500 @@ test.describe('re-inspección 24/10/2026 · contenido', () => {
     const enPantalla = (inicio: string) => visibles.find((v) => v.pregunta.startsWith(inicio))?.respuesta;
     expect(enPantalla('¿Qué es el reactivo limitante')).toBe(enJsonLd('¿Qué es el reactivo limitante'));
     expect(enPantalla('¿Cómo calculo los moles')).toBe(enJsonLd('¿Cómo se calculan los moles'));
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 25/10/2026 — tras b82fadff (hallazgo 3450, página traducida) y 301b3e3d (hallazgo
+// 3451, cabo C0267: el corrector acepta una VENTANA por caso en vez del 1 % fijo). Firma de rotura
+// (cambio) en la cola: visitas cortas del 53 % al 80 % en 14 días.
+//
+// LAS DOS REPARACIONES SE SOSTIENEN:
+//   · 3450 — la app ENTERA traducida (cada nodo de texto a <font><font>), en escritorio con clic y
+//     en móvil con toques: las seis reacciones, los campos (también vacíos y en la mezcla
+//     estequiométrica), el deslizador, los ±, los doce casos con pista, solución, comprobar e Intro,
+//     la práctica con semilla fija y la guía educativa. Ni texto viejo (el detector de
+//     generador-loteria), ni un NotFoundError, ni «Algo salió mal», y el texto de la app es idéntico
+//     al de la misma secuencia sin traducir. No queda ninguna cifra como nodo de texto junto a otro
+//     hijo que cambie (la forma del cabo C0243).
+//   · 3451 — las ventanas, resueltas a mano abajo, coinciden con las de `ventanaDe` hasta el sexto
+//     decimal, y la página aprueba y suspende justo donde dicen (76 respuestas tecleadas). En un
+//     barrido de 20.000 prácticas: 0 suspensos de la cuenta con masas de libro, 0 de la cuenta con
+//     los moles redondeados a tres decimales (con masas IUPAC y con las del libro), 0 respuestas por
+//     encima del 100 % y 0 avisos «Te has desviado 0…». Con los moles a DOS decimales suspenden 2.063
+//     de 20.000: es lo que el comentario de MARGEN_REDONDEO en casos.ts deja fuera a sabiendas.
+//
+// Ventana = [menor − m, mayor + m], con menor y mayor las dos respuestas exactas (IUPAC y libro) y
+// m = 0,5 % de la IUPAC + media unidad del último decimal pedido. Resueltas a mano:
+//   caso 1  40 g CH₄ → IUPAC 40 ÷ 16,043 = 2,4932993 · libro 40 ÷ 16 = 2,5
+//           m = 0,0124665 + 0,0005 = 0,0129665 → [2,4803328 ; 2,5129665]
+//   caso 3  8 g CH₄ + 40 g O₂ → CH₄ limitante; IUPAC 0,4986599 × 44,009 = 21,945521 · libro 0,5 × 44 = 22
+//           m = 0,1097276 + 0,005 = 0,1147276 → [21,830793 ; 22,114728]
+//   caso 7  73 g HCl + 60 g NaOH → sobra HCl; IUPAC 73 − 1,5001125 × 36,46 = 18,305898 · libro 0,5 × 36,5 = 18,25
+//           m = 0,0915295 + 0,005 = 0,0965295 → [18,153471 ; 18,402428]
+//   caso 9  280 g Fe + 48 g O₂ → sobra Fe; IUPAC 280 − 2,000125 × 55,845 = 168,303019 · libro 3 × 56 = 168
+//           m = 0,8415151 + 0,005 = 0,8465151 → [167,153485 ; 169,149534]
+//   caso 10 90 g glucosa al 85 % → IUPAC 0,9991341 × 46,069 × 0,85 = 39,124742 · libro 1 × 46 × 0,85 = 39,1
+//           m = 0,1956237 + 0,005 = 0,2006237 → [38,899376 ; 39,325366]
+//   caso 12 52 g de NaCl de 40 g HCl → IUPAC 52 ÷ 64,114098 = 81,10541 % · libro 52 ÷ 64,109589 = 81,11111 %
+//           m = 0,4055271 + 0,005 = 0,4105271 → [80,69488 ; 81,52164]
+// La desviación del aviso se mide desde la CLAVE redondeada (no desde el centro de la ventana).
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+
+/** El porcentaje «(N %)» del texto de una barra, como número; NaN si no lo hay. */
+function porcentajeDeBarra(texto: string | null): number {
+  const m = (texto ?? '').match(/\(([\d.,]+)\s%\)/);
+  return m ? Number(m[1].replace(/\./g, '').replace(',', '.')) : NaN;
+}
+
+/** «0,013 mol» → «Te has desviado 0,013 mol», con el espacio duro que escribe la app. */
+const desviado = (texto: string) => `desviado ${texto.replace(' ', ' ')} de la respuesta`;
+
+test.describe('re-inspección 25/10/2026 · cálculo', () => {
+  // NORMAL — neutralización, 50 g de HCl + 30 g de NaOH, rendimiento 90 %
+  //   n(HCl) = 50 / 36,46 = 1,3713659 mol · n(NaOH) = 30 / 39,997 = 0,7500563 mol → NaOH LIMITANTE
+  //   NaCl = 0,7500563 mol × 58,44 = 43,833288 g → «43,833 g», «0,7501 mol»; al 90 %: 39,449959 → «39,450 g»
+  //   sobra HCl: 50 − 0,7500563 × 36,46 = 22,652949 g → «22,653 g»; 1,3713659 − 0,7500563 = 0,6213096 → «0,6213 mol»
+  //   barras: HCl 1,3713659 / 0,7500563 = 182,8 % → «183 %» · NaOH 0,7500563 / 1,3713659 = 54,7 % → «55 %»
+  test('normal: 50 g HCl + 30 g NaOH al 90 % → NaOH limitante, 43,833 g de NaCl, 39,450 g reales, sobran 22,653 g de HCl', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Neutralización ácido-base/);
+    await escribir(page, '#inputA', '50'); // por defecto 36.5
+    await escribir(page, '#inputB', '30'); // y 40
+    await sembrarValor(page, '#sliderRendimiento', 90);
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Hidróxido de sodio');
+    const teorica = tarjeta(page, 'Masa teórica de Cloruro de sodio (NaCl)');
+    await expect(teorica).toContainText('43,833 g');
+    await expect(teorica).toContainText('0,7501 mol');
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('rendimiento 90 %');
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('39,450 g');
+    const exceso = tarjeta(page, 'Reactivo en exceso');
+    await expect(exceso).toContainText('Ácido clorhídrico');
+    await expect(exceso).toContainText('Sobran 22,653 g (0,6213 mol)');
+    await expect(barra(page, 'Ácido clorhídrico (HCl)')).toContainText('1,3714 mol disponibles / 0,7501 mol necesarios (183 %)');
+    const naoh = barra(page, 'Hidróxido de sodio (NaOH)');
+    await expect(naoh).toContainText('0,7501 mol disponibles / 1,3714 mol necesarios (55 %)');
+    await expect(naoh.locator('[class*="limitanteBadge"]')).toHaveCount(1);
+    await expect(page.locator('[class*="limitanteResaltado"]')).toHaveText(/^NaOH\s*$/);
+  });
+
+  // LÍMITE — el mínimo de los campos (min="0.1"): 0,1 g de Fe + 0,1 g de O₂, y el rendimiento al 1 %
+  //   n(Fe) = 0,1 / 55,845 = 0,001790671 → razón /4 = 0,000447668 · n(O₂) = 0,1 / 31,998 = 0,003125195
+  //   → razón /3 = 0,001041732 → Fe LIMITANTE
+  //   Fe₂O₃ = 0,000447668 × 2 = 0,000895336 mol × 159,687 = 0,142974 g → «0,143 g», «0,0009 mol»
+  //   sobra O₂: 0,003125195 − 0,000447668 × 3 = 0,001782192 mol × 31,998 = 0,057027 g → «0,057 g (0,0018 mol)»
+  //   barras: Fe 0,0017907 / (0,003125195 × 4/3 = 0,0041669) = 43,0 % → «43 %» ·
+  //           O₂ 0,0031252 / (0,001790671 × 3/4 = 0,0013430) = 232,7 % → «233 %»
+  //   al 1 %: 0,142974 × 0,01 = 0,00142974 → «0,001 g»
+  test('límite: 0,1 g Fe + 0,1 g O₂ → Fe limitante, 0,143 g de Fe₂O₃, sobran 0,057 g de O₂; al 1 %, 0,001 g', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Oxidación del hierro/);
+    await escribir(page, '#inputA', '0.1');
+    await escribir(page, '#inputB', '0.1');
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Hierro');
+    const teorica = tarjeta(page, 'Masa teórica de Óxido de hierro (III)');
+    await expect(teorica).toContainText('0,143 g');
+    await expect(teorica).toContainText('0,0009 mol');
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Sobran 0,057 g (0,0018 mol)');
+    await expect(barra(page, 'Hierro (Fe)')).toContainText('0,0018 mol disponibles / 0,0042 mol necesarios (43 %)');
+    await expect(barra(page, 'Oxígeno (O₂)')).toContainText('0,0031 mol disponibles / 0,0013 mol necesarios (233 %)');
+    await sembrarValor(page, '#sliderRendimiento', 1);
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('rendimiento 1 %');
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('0,001 g');
+    // el «−» no baja de 0,1 g
+    await page.getByRole('button', { name: 'Reducir gramos de reactivo A' }).click();
+    await expect(page.locator('#inputA')).toHaveValue('0.1');
+  });
+
+  // ABIERTO (re-inspección del 25/10/2026, contenido) — la explicación de las barras dice «El que
+  // no llega al 100 % es el limitante; el que lo pasa, sobra», pero el porcentaje va redondeado a
+  // entero, y en dos de las seis reacciones con sus valores por defecto las DOS barras dicen «100 %»
+  // (texto y aria-valuetext), también la del limitante:
+  //   combustión 16 g CH₄ + 64 g O₂: CH₄ 0,9973197 / 1,0000625 = 99,73 % → «(100 %)», limitante ·
+  //     O₂ 2,0001250 / 1,9946394 = 100,28 % → «(100 %)»
+  //   neutralización 36,5 g HCl + 40 g NaOH: NaOH 1,0000750 / 1,0010971 = 99,90 % → «(100 %)»,
+  //     limitante · HCl 1,0010971 / 1,0000750 = 100,10 % → «(100 %)»
+  // Es lo primero que ve quien abre la app. Pasará a verde cuando el limitante se lea por debajo de
+  // 100 y el exceso por encima.
+  test('valores por defecto: la barra del limitante se lee por debajo del 100 % y la del exceso por encima', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    const ch4 = barra(page, 'Metano (CH₄)');
+    await expect(ch4).toContainText('0,9973 mol disponibles / 1,0001 mol necesarios');
+    await expect(ch4.locator('[class*="limitanteBadge"]')).toHaveCount(1);
+    expect(porcentajeDeBarra(await ch4.locator('[class*="barValor"]').textContent()), 'CH₄, limitante').toBeLessThan(100);
+    expect(porcentajeDeBarra(await barra(page, 'Oxígeno (O₂)').locator('[class*="barValor"]').textContent()), 'O₂, en exceso').toBeGreaterThan(100);
+    await elegir(page, /Neutralización ácido-base/);
+    const naoh = barra(page, 'Hidróxido de sodio (NaOH)');
+    await expect(naoh.locator('[class*="limitanteBadge"]')).toHaveCount(1);
+    expect(porcentajeDeBarra(await naoh.locator('[class*="barValor"]').textContent()), 'NaOH, limitante').toBeLessThan(100);
+    expect(porcentajeDeBarra(await barra(page, 'Ácido clorhídrico (HCl)').locator('[class*="barValor"]').textContent()), 'HCl, en exceso').toBeGreaterThan(100);
+  });
+});
+
+test.describe('re-inspección 25/10/2026 · corrector por ventana (301b3e3d se sostiene)', () => {
+  // [respuesta, desviación que dice el aviso] — los bordes, de las ventanas resueltas en la cabecera
+  const VENTANAS: { caso: number; dentro: number[]; fuera: [number, string][] }[] = [
+    { caso: 1, dentro: [2.493, 2.5, 2.481, 2.512], fuera: [[2.48, '0,013 mol'], [2.513, '0,020 mol']] },
+    { caso: 3, dentro: [21.95, 22, 21.84, 22.11], fuera: [[21.83, '0,12 g'], [22.12, '0,17 g']] },
+    { caso: 7, dentro: [18.31, 18.25, 18.16, 18.4], fuera: [[18.15, '0,16 g'], [18.41, '0,10 g']] },
+    { caso: 9, dentro: [168.3, 168, 167.16, 169.14], fuera: [[167.15, '1,15 g'], [169.15, '0,85 g'], [166.7, '1,60 g']] },
+    { caso: 10, dentro: [39.12, 39.1, 38.9, 39.32], fuera: [[38.89, '0,23 g'], [39.33, '0,21 g']] },
+    {
+      caso: 12,
+      dentro: [81.11, 80.81, 81.25, 80.7, 81.52],
+      fuera: [[81.9, '0,79 %'], [80.3, '0,81 %'], [81.92, '0,81 %'], [80.69, '0,42 %'], [81.53, '0,42 %']],
+    },
+  ];
+
+  test('la ventana de seis casos, resuelta a mano: dentro aprueba, fuera suspende con la desviación desde la clave', () => {
+    for (const { caso, dentro, fuera } of VENTANAS) {
+      const c = CASOS_AULA[caso - 1];
+      expect(c.id).toBe(caso);
+      for (const v of dentro) expect(comprobarRespuesta(v, c.respuesta, c.datos).correcto, `caso ${caso}: ${v}`).toBe(true);
+      for (const [v, texto] of fuera) {
+        const r = comprobarRespuesta(v, c.respuesta, c.datos);
+        expect(r.correcto, `caso ${caso}: ${v}`).toBe(false);
+        expect(r.motivo, `caso ${caso}: ${v}`).toContain(desviado(texto));
+      }
+    }
+    // y los bordes calculados a mano son los de ventanaDe. Precisión 4 (< 0,00005): un margen
+    // distinto (0,6 % en vez de 0,5 %) movería el borde del caso 1, el más estrecho, 0,0025.
+    const bordes: [number, number, number][] = [
+      [1, 2.4803328, 2.5129665], [3, 21.830793, 22.114728], [7, 18.153471, 18.402428],
+      [9, 167.153485, 169.149534], [10, 38.899376, 39.325366], [12, 80.69488, 81.52164],
+    ];
+    for (const [caso, menor, mayor] of bordes) {
+      const w = ventanaDe(CASOS_AULA[caso - 1].datos);
+      expect(w.centro - w.tolerancia, `caso ${caso}, borde inferior`).toBeCloseTo(menor, 4);
+      expect(w.centro + w.tolerancia, `caso ${caso}, borde superior`).toBeCloseTo(mayor, 4);
+    }
+  });
+
+  // Cinco prácticas con semilla fija, resueltas a mano a partir de su enunciado (la «cuenta de
+  // alumno» redondea cada cantidad de moles a tres decimales):
+  //   424242  exceso, 40 g CH₄ + 32 g O₂ → O₂ limitante; IUPAC 40 − 0,5000313 × 16,043 = 31,977998 ·
+  //           alumno 1,993 × 16,043 = 31,9737 → 31,97 · libro 2 × 16 = 32 → ventana [31,813108 ; 32,16489]
+  //   7       rendimiento, 45 g glucosa y 20,7 g de etanol → IUPAC 20,7 ÷ 23,014554 = 89,94308 % ·
+  //           alumno 20,7 ÷ (0,500 × 46,069) = 89,865 → 89,87 · libro 20,7 ÷ 23 = 90 → [89,488369 ; 90,454715]
+  //   99991   masa teórica, 8 g CH₄ + 24 g O₂ → O₂ limitante; IUPAC 0,3750234 × 44,009 = 16,504407 ·
+  //           alumno 0,375 × 44,009 = 16,50 · libro 0,375 × 44 = 16,5 → [16,412478 ; 16,591929]
+  //   123456  masa real, 36 g glucosa al 70 % → IUPAC 18,411643 × 0,7 = 12,888150 · alumno 0,400 ×
+  //           46,069 × 0,7 = 12,8993 → 12,90 · libro 18,4 × 0,7 = 12,88 → [12,810559 ; 12,957591]
+  //   2026    rendimiento, 224 g Fe + 64 g O₂ y 212,5 g de Fe₂O₃ → O₂ limitante; IUPAC 212,5 ÷
+  //           212,929318 = 99,79838 % · alumno 212,5 ÷ (1,333 × 159,687) = 99,83 · libro 212,5 ÷
+  //           213,3333 = 99,61 → [99,105383 ; 100,302372] (por encima de 100 manda el dominio)
+  const PRACTICAS: { semilla: number; datos: string; clave: number; buenas: number[]; malas: [number, string][] }[] = [
+    { semilla: 424242, datos: 'Reaccionan 40 g de metano (CH₄) y 32 g de oxígeno (O₂)', clave: 31.98, buenas: [31.97, 32, 31.82, 32.16], malas: [[31.81, '0,17 g'], [32.17, '0,19 g']] },
+    { semilla: 7, datos: 'Reaccionan 45 g de glucosa (C₆H₁₂O₆) según C₆H₁₂O₆ → 2 C₂H₅OH + 2 CO₂ y se recogen 20,7 g de etanol', clave: 89.94, buenas: [89.87, 90, 89.49, 90.45], malas: [[89.48, '0,46 %'], [90.46, '0,52 %']] },
+    { semilla: 99991, datos: 'Reaccionan 8 g de metano (CH₄) y 24 g de oxígeno (O₂)', clave: 16.5, buenas: [16.5, 16.42, 16.59], malas: [[16.41, '0,09 g'], [16.6, '0,10 g']] },
+    { semilla: 123456, datos: 'Reaccionan 36 g de glucosa (C₆H₁₂O₆) según C₆H₁₂O₆ → 2 C₂H₅OH + 2 CO₂, con un rendimiento del 70', clave: 12.89, buenas: [12.9, 12.88, 12.82, 12.95], malas: [[12.81, '0,08 g'], [12.96, '0,07 g']] },
+    { semilla: 2026, datos: 'Reaccionan 224 g de hierro (Fe) y 64 g de oxígeno (O₂) según 4 Fe + 3 O₂ → 2 Fe₂O₃ y se recogen 212,5 g', clave: 99.8, buenas: [99.83, 99.61, 99.11], malas: [[99.1, '0,70 %']] },
+  ];
+
+  test('práctica aleatoria: la cuenta con moles a tres decimales y la del libro aprueban; un 0,5 % más allá, no', () => {
+    for (const { semilla, datos, clave, buenas, malas } of PRACTICAS) {
+      const e = generarEjercicioAleatorio(semilla);
+      expect(e.enunciado, `semilla ${semilla}`).toContain(datos);
+      expect(e.respuesta, `semilla ${semilla}`).toBe(clave);
+      for (const v of buenas) expect(comprobarRespuesta(v, e.respuesta, e.datos).correcto, `semilla ${semilla}: ${v}`).toBe(true);
+      for (const [v, texto] of malas) {
+        const r = comprobarRespuesta(v, e.respuesta, e.datos);
+        expect(r.correcto, `semilla ${semilla}: ${v}`).toBe(false);
+        expect(r.motivo, `semilla ${semilla}: ${v}`).toContain(desviado(texto));
+      }
+    }
+  });
+
+  /** La cuenta de un alumno con las masas de la tabla `t` y los moles redondeados a `dm` decimales. */
+  function cuentaDeAlumno(d: DatosCaso, t: Tabla, dm: number): number {
+    const rm = (v: number) => redondearTest(v, dm);
+    const r = R[d.reaccionId];
+    const MA = masaMolarDe(r.A.c, t);
+    const MP = masaMolarDe(r.P.c, t);
+    const nA = rm(d.gramosA / MA);
+    if (d.pregunta === 'moles' && d.reactivo !== 'B') return nA;
+    const MB = r.B ? masaMolarDe(r.B.c, t) : NaN;
+    const nB = r.B ? rm(d.gramosB / MB) : NaN;
+    if (d.pregunta === 'moles') return nB;
+    if (d.pregunta === 'masa-necesaria') return rm((nA / r.A.k) * (r.B?.k ?? NaN)) * MB;
+    const ratioA = nA / r.A.k;
+    const ratioB = r.B ? nB / r.B.k : Infinity;
+    const ratio = Math.min(ratioA, ratioB);
+    const teorica = rm(ratio * r.P.k) * MP;
+    if (d.pregunta === 'masa-teorica') return teorica;
+    if (d.pregunta === 'masa-real') return (teorica * (d.rendimiento ?? 100)) / 100;
+    if (d.pregunta === 'rendimiento') return ((d.masaObtenida ?? NaN) / teorica) * 100;
+    return ratioA <= ratioB ? rm(nB - rm(ratio * (r.B?.k ?? NaN))) * MB : rm(nA - rm(ratio * r.A.k)) * MA;
+  }
+
+  test('barrido de 400 prácticas: aprueba la cuenta con moles a tres decimales (IUPAC y libro) y ningún aviso dice «desviado 0»', () => {
+    const problemas: string[] = [];
+    for (let s = 1; s <= 400; s++) {
+      const e = generarEjercicioAleatorio(s * 104729);
+      const dec = decimalesDe(e.datos.pregunta);
+      if (e.datos.pregunta === 'rendimiento' && e.respuesta > 100) problemas.push(`semilla ${e.semilla}: la clave pasa del 100 % (${e.respuesta})`);
+      for (const [tabla, t] of [['IUPAC', IUPAC], ['libro', LIBRO]] as const) {
+        const v = redondearTest(cuentaDeAlumno(e.datos, t, 3), dec);
+        const r = comprobarRespuesta(v, e.respuesta, e.datos);
+        if (!r.correcto) problemas.push(`semilla ${e.semilla} (${e.datos.pregunta}, ${tabla}): suspende ${v} para ${e.respuesta} — «${r.motivo}»`);
+      }
+      const w = ventanaDe(e.datos);
+      for (const u of [w.centro - w.tolerancia - 10 ** -dec, w.centro + w.tolerancia + 10 ** -dec]) {
+        const r = comprobarRespuesta(redondearTest(u, dec), e.respuesta, e.datos);
+        if (!r.correcto && /desviado 0(,0+)?\s/.test(r.motivo)) problemas.push(`semilla ${e.semilla}: «${r.motivo}»`);
+      }
+    }
+    expect(problemas).toEqual([]);
+  });
+});
+
+test.describe('re-inspección 25/10/2026 · corrector en la página', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const veredicto = (page: Page) => seccion(page).locator('[role="alert"]');
+
+  async function comprobar(page: Page, respuesta: string): Promise<void> {
+    await seccion(page).locator('#casos-respuesta').fill(respuesta);
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toBeVisible();
+  }
+
+  test('casos 12 y 9: lo que aprobaba el 1 % y no sale de ninguna tabla se suspende con su desviación', async ({ page }) => {
+    await abrir(page);
+    await seccion(page).getByRole('button', { name: /^Caso 12:/ }).click();
+    for (const [v, texto] of [['81,9', '0,79 %'], ['80,3', '0,81 %'], ['81,92', '0,81 %']]) {
+      await comprobar(page, v);
+      await expect(veredicto(page), v).toContainText(desviado(texto));
+    }
+    for (const v of ['80,81', '81,25', '81,11']) {
+      await comprobar(page, v);
+      await expect(veredicto(page), v).toContainText('¡Correcto!');
+    }
+    await seccion(page).getByRole('button', { name: /^Caso 9:/ }).click();
+    await comprobar(page, '166,7');
+    await expect(veredicto(page)).toContainText(desviado('1,60 g'));
+    for (const v of ['168,30', '168']) {
+      await comprobar(page, v);
+      await expect(veredicto(page), v).toContainText('¡Correcto!');
+    }
+  });
+
+  test('práctica con la semilla 7: el rendimiento con moles a tres decimales (89,87 %) aprueba; 89,48 % no', async ({ page }) => {
+    await abrir(page);
+    // «Practicar» siembra con Date.now(): se fija el reloj para que salga siempre la semilla 7
+    await page.clock.setFixedTime(7);
+    await seccion(page).getByRole('button', { name: /Practicar/ }).click();
+    await expect(seccion(page).locator('[class*="casoEnunciado"]')).toContainText(
+      'Reaccionan 45 g de glucosa (C₆H₁₂O₆) según C₆H₁₂O₆ → 2 C₂H₅OH + 2 CO₂ y se recogen 20,7 g de etanol (C₂H₅OH).',
+    );
+    await comprobar(page, '89,87');
+    await expect(veredicto(page)).toContainText('¡Correcto!');
+    await comprobar(page, '90');
+    await expect(veredicto(page)).toContainText('¡Correcto!');
+    await comprobar(page, '89,48');
+    await expect(veredicto(page)).toContainText(desviado('0,46 %'));
+    await seccion(page).getByRole('button', { name: /Ver solución/ }).click();
+    await expect(seccion(page).locator('[class*="casoRespuestaFinal"]')).toHaveText('Respuesta: 89,94 %');
+  });
+});
+
+/** El texto visible de la app (el contenedor del hero), con los espacios normalizados. */
+const textoApp = (page: Page) =>
+  page.evaluate(() =>
+    ((document.querySelector('h1')?.closest('[class*="container"]') as HTMLElement | null)?.innerText ?? '').replace(/\s+/g, ' ').trim(),
+  );
+
+type Paso = [string, (p: Page) => Promise<void>];
+
+/** El recorrido de la app entera, igual para la página traducida y para la de control. */
+function recorrido(toque: boolean): Paso[] {
+  const pulsar = (l: Locator) => (toque ? l.tap() : l.click());
+  const boton = (nombre: string | RegExp) => (p: Page) => pulsar(p.getByRole('button', { name: nombre }).first());
+  const casos = (p: Page) => p.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const enCasos = (nombre: string | RegExp) => (p: Page) => pulsar(casos(p).getByRole('button', { name: nombre }));
+  const campo = (sel: string, valor: string) => (p: Page) => escribir(p, sel, valor);
+  const rendimiento = (v: number) => (p: Page) => sembrarValor(p, '#sliderRendimiento', v);
+  const pasos: Paso[] = [
+    ['agua', boton(/Síntesis del agua/)],
+    ['agua A = 5', campo('#inputA', '5')],
+    ['agua B = 30', campo('#inputB', '30')],
+    ['rendimiento 80', rendimiento(80)],
+    ['+ de A', boton('Aumentar gramos de reactivo A')],
+    ['− de B', boton('Reducir gramos de reactivo B')],
+    ['A vacío', campo('#inputA', '')],
+    ['A = 4', campo('#inputA', '4')],
+    ['neutralización', boton(/Neutralización ácido-base/)],
+    ['HCl 36,46 (estequiométrica)', campo('#inputA', '36.46')],
+    ['HCl 36,56 (NaOH limitante)', campo('#inputA', '36.56')],
+    ['HCl 30 (HCl limitante)', campo('#inputA', '30')],
+    ['NaOH vacío', campo('#inputB', '')],
+    ['NaOH 40', campo('#inputB', '40')],
+    ['rendimiento 5', rendimiento(5)],
+    ['Haber-Bosch', boton(/Haber-Bosch/)],
+    ['H₂ 6,1 (N₂ limitante)', campo('#inputB', '6.1')],
+    ['hierro', boton(/Oxidación del hierro/)],
+    ['Fe 223,38', campo('#inputA', '223.38')],
+    ['O₂ 95,994 (estequiométrica)', campo('#inputB', '95.994')],
+    ['O₂ 95 (O₂ limitante)', campo('#inputB', '95')],
+    ['fermentación', boton(/Fermentación alcohólica/)],
+    ['rendimiento 85', rendimiento(85)],
+    ['− de glucosa', boton('Reducir gramos de reactivo A')],
+    ['glucosa 0', campo('#inputA', '0')],
+    ['glucosa 90', campo('#inputA', '90')],
+    ['combustión desde fermentación', boton(/Combustión del metano/)],
+  ];
+  for (let i = 1; i <= 12; i++) {
+    pasos.push(
+      [`caso ${i}`, enCasos(new RegExp(`^Caso ${i}:`))],
+      [`caso ${i} · ver pista`, enCasos(/Ver pista/)],
+      [`caso ${i} · ver solución`, enCasos(/Ver solución/)],
+      [`caso ${i} · comprobar 1`, async (p) => {
+        await casos(p).locator('#casos-respuesta').fill('1');
+        await pulsar(casos(p).getByRole('button', { name: 'Comprobar' }));
+      }],
+      [`caso ${i} · Intro con «abc»`, async (p) => {
+        await casos(p).locator('#casos-respuesta').fill('abc');
+        await casos(p).locator('#casos-respuesta').press('Enter');
+      }],
+      [`caso ${i} · ocultar pista y solución`, async (p) => {
+        await enCasos(/Ocultar pista/)(p);
+        await enCasos(/Ocultar solución/)(p);
+      }],
+      [`caso ${i} · cargar en el simulador`, enCasos('Cargar en el simulador')],
+    );
+  }
+  // «Practicar» siembra con Date.now(): el reloj se fija para que las dos pestañas saquen el mismo
+  // ejercicio. Dentro del AÑO EN CURSO: con un instante de 1970 el pie, que se vuelve a pintar al
+  // cargar el caso, pasaba de «© 2026» a «1970» y el detector lo daba (con razón) por texto viejo.
+  const base = new Date(new Date().getFullYear(), 6, 1).getTime();
+  for (const semilla of [base + 424242, base + 7]) {
+    pasos.push(
+      [`practicar (semilla ${semilla})`, async (p) => {
+        await p.clock.setFixedTime(semilla);
+        await enCasos(/Practicar/)(p);
+      }],
+      [`practicar ${semilla} · solución y comprobar`, async (p) => {
+        await enCasos(/Ver solución/)(p);
+        await casos(p).locator('#casos-respuesta').fill('2');
+        await pulsar(casos(p).getByRole('button', { name: 'Comprobar' }));
+      }],
+      [`practicar ${semilla} · cargar`, enCasos('Cargar en el simulador')],
+    );
+  }
+  pasos.push(
+    ['de la práctica al caso 3', enCasos(/^Caso 3:/)],
+    ['guía educativa: abrir', boton(/Ver guía educativa/)],
+    ['guía educativa: cerrar', boton(/Ocultar guía educativa/)],
+  );
+  return pasos;
+}
+
+/**
+ * Recorre la app traducida y, en otra pestaña, sin traducir. Tras cada paso: el detector de texto
+ * viejo, y que el texto de las dos coincida (si la traducida se queda con un valor viejo en un
+ * nodo que el detector no apuntó, también sale aquí).
+ */
+async function recorrerTraducida(page: Page, toque: boolean) {
+  const errores = erroresDeReact(page);
+  let cargas = 0;
+  page.on('load', () => (cargas += 1));
+  await abrir(page);
+  const control = await page.context().newPage();
+  await abrir(control);
+  const cargasIniciales = cargas;
+  const viejos: string[] = [];
+  const distintos: string[] = [];
+  for (const [nombre, accion] of recorrido(toque)) {
+    await traducir(page);
+    await accion(page);
+    await accion(control);
+    for (const v of await textoViejo(page)) viejos.push(`${nombre}: ${v}`);
+    let a = '';
+    let b = '';
+    for (let intento = 0; intento < 20; intento++) {
+      [a, b] = [await textoApp(page), await textoApp(control)];
+      if (a === b) break;
+      await page.waitForTimeout(100);
+    }
+    if (a !== b) {
+      let i = 0;
+      while (i < a.length && a[i] === b[i]) i++;
+      distintos.push(`${nombre}: traducida «${a.slice(Math.max(0, i - 40), i + 60)}» · control «${b.slice(Math.max(0, i - 40), i + 60)}»`);
+    }
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' }), nombre).toHaveCount(0);
+  }
+  expect(viejos, 'textos que se quedaron viejos').toEqual([]);
+  expect(distintos, 'la traducida no dice lo mismo que la de control').toEqual([]);
+  expect(errores, 'errores de React').toEqual([]);
+  expect(cargas, 'recargas de la página durante el uso').toBe(cargasIniciales);
+  await control.close();
+}
+
+test.describe('re-inspección 25/10/2026 · página traducida, la app entera (3450 se sostiene)', () => {
+  test('escritorio: seis reacciones, campos, deslizador, ±, doce casos, práctica y guía, sin texto viejo', async ({ page }) => {
+    test.setTimeout(300_000);
+    await recorrerTraducida(page, false);
+  });
+});
+
+test.describe('re-inspección 25/10/2026 · móvil 390 × 844 (firma de rotura)', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('traducida y con toques: el mismo recorrido, sin texto viejo, sin caídas y sin recargar', async ({ page }) => {
+    test.setTimeout(300_000);
+    await recorrerTraducida(page, true);
+  });
+
+  // El deslizador al dedo: tocar la pista al 25 % de su anchura lo lleva cerca del 25 % (el pulgar
+  // de 22 px desplaza el punto: 23 % medido), y arrastrar del 99 al 50 % lo deja en 50.
+  //   combustión por defecto: CO₂ teórico 16 / 16,043 × 44,009 = 43,891 g → al 50 %, 21,946 g
+  test('el deslizador de rendimiento responde al toque y al arrastre', async ({ page }) => {
+    await abrir(page);
+    const deslizador = page.locator('#sliderRendimiento');
+    await deslizador.scrollIntoViewIfNeeded();
+    const b = (await deslizador.boundingBox())!;
+    await page.touchscreen.tap(b.x + b.width * 0.25, b.y + b.height / 2);
+    await expect.poll(async () => Number(await deslizador.inputValue())).toBeLessThan(30);
+    const cdp = await page.context().newCDPSession(page);
+    const y = b.y + b.height / 2;
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: b.x + b.width * 0.99, y }] });
+    for (let i = 1; i <= 8; i++) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: b.x + b.width * (0.99 - (0.49 * i) / 8), y }] });
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect(page.locator('label[for="sliderRendimiento"]')).toContainText('50 %');
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('21,946 g');
+  });
+});
+
+test.describe('re-inspección 25/10/2026 · contenido', () => {
+  // ABIERTO (re-inspección del 25/10/2026, contenido) — el quinto «error frecuente» dice que el
+  // rendimiento «No reduce los moles del reactivo que reacciona (eso es conversión, no
+  // rendimiento)», pero la misma página llama rendimiento a lo que reacciona: el caso 11 («en cada
+  // pasada por el reactor solo se transforma el 15 % de lo posible», pista: «El 15 % es el
+  // rendimiento»), el escenario del Haber-Bosch («El rendimiento por paso es bajo (~15 %), pero el
+  // gas no reaccionado se recicla») y la definición («por pérdidas, reacciones secundarias o
+  // equilibrio incompleto»). Y «Cargar en el simulador» del caso 11 (28 g N₂, 12 g H₂, 15 %) pinta
+  // «Reactivo limitante: Nitrógeno» y «Sobran 5,955 g (2,9539 mol)» de H₂ como si todo el N₂ hubiera
+  // reaccionado, cuando con el 15 % transformado quedan 0,85 × 28 = 23,80 g de N₂ y
+  // 12 − 0,15 × 2,9985 × 2,016 = 11,093 g de H₂. Pasará a verde cuando la página use una sola noción.
+  test('rendimiento y conversión: la página no llama rendimiento a lo que su quinto error frecuente llama conversión', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    const quinto = (await page.locator('[class*="warningList"] li').last().textContent()) ?? '';
+    const escenario = (await page.locator('[class*="scenarioCard"]').filter({ hasText: 'Haber-Bosch' }).textContent()) ?? '';
+    const caso11 = CASOS_AULA[10];
+    expect(caso11.id).toBe(11);
+    const separaConversion = /eso es conversión, no rendimiento/.test(quinto);
+    const llamaRendimientoALoQueReacciona =
+      /solo se transforma el 15/.test(caso11.enunciado) || /gas no reaccionado se recicla/.test(escenario);
+    expect(separaConversion && llamaRendimientoALoQueReacciona).toBe(false);
   });
 });

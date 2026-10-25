@@ -4972,3 +4972,257 @@ test.describe('re-inspección 23/10/2026', () => {
     expect(comunes[0].a).toContain('hay 13.983.816 combinaciones posibles de 6 números');
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 25/10/2026 — segmento fiscal, riesgo 1, 2.001 usos en 90 días. Sale en la cola por el
+ * cabo C0390: cotejar con las normas de SELAE de junio de 2015 (las que cita 328d72c6) si el
+ * reintegro de La Primitiva lo elige quien juega (FAQPage) o lo asigna el resguardo (nota del
+ * comprobador), y los botes mínimos de la tabla comparativa.
+ *
+ * El spec entero pasaba (148 de 148) antes de añadir este bloque: 5a5cb389 (3237), 3cf56c6a (3236),
+ * fddceea6 (3235), 415646ec (3234) y 83c2f5ec (3410) se sostienen, también con la página traducida.
+ *
+ * FUENTE OFICIAL leída en la sesión: «Normas que regulan los concursos de pronósticos de Lotería
+ * Primitiva en la modalidad de La Primitiva», SELAE, junio de 2015 (de aplicación desde el día
+ * siguiente al sorteo del 01/08/2015), en hacienda.gob.es/DocLeyes/REPOSITORIO NORMATIVA/58014anexo.pdf
+ * (loteriasyapuestas.es sigue dando 403). Literal:
+ *   · 4.ª: «Pronóstico: Cada número elegido en un bloque.» («Bloque: Cada uno de los conjuntos
+ *     formados por 49 recuadros o casillas numerados correlativamente»).
+ *   · 9.ª.1: «Obtendrán el premio del reintegro en la cuantía del importe jugado en cada concurso,
+ *     aquellos resguardos que hayan participado de acuerdo a las normas y en los que el número
+ *     asignado específicamente en el resguardo validado coincida con el obtenido al azar en el
+ *     sorteo celebrado al efecto.»
+ *   · 11.ª.4: «A continuación el terminal expedirá uno o varios resguardos. En todos ellos
+ *     constarán los siguientes datos: […] Número asignado específicamente a efectos del reintegro».
+ *   · 18.ª.1: «Para pronosticar se marcará con el signo "X" en los bloques del boleto las casillas
+ *     que contengan los números elegidos.» (18.ª.2 y 18.ª.3: la casilla de múltiples y la del
+ *     sorteo; ninguna casilla de reintegro, y los boletos del anexo no la tienen.)
+ *   → El reintegro de La Primitiva NO lo elige quien juega: lo asigna el terminal en el resguardo.
+ *     La nota del comprobador acierta; el FAQPage («se eligen 6 números del 1 al 49 y el
+ *     Reintegro») no. Contraste: en El Gordo la clave SÍ la marca quien juega (BOE-A-2005-1507,
+ *     norma 64.ª.3: «Además, siempre se ha de marcar un número en la 2.ª matriz.»).
+ *   · 8.ª.1: «Categoría especial: El 20 por 100, a distribuir a partes iguales entre los que en
+ *     una sola apuesta acierten los seis primeros números extraídos, que constituyen la combinación
+ *     ganadora, y además el número extraído para el reintegro.»; 8.ª.1.1 y 1.2, el arrastre. Ninguna
+ *     de las 57 normas fija un bote o fondo mínimo garantizado → la tabla da a La Primitiva un
+ *     «Bote mínimo» de 3.000.000 € sin ancla. El Gordo SÍ lo tiene: BOE-A-2005-1507, norma 66.ª.1,
+ *     «Se establece un fondo mínimo garantizado de 5 millones de euros» (primera categoría del
+ *     primer sorteo de cada ciclo) → sus 5.000.000 € se sostienen. Bonoloto (400.000 €) y
+ *     Euromillones (17.000.000 €) no se pudieron cotejar: sus normas no estaban al alcance.
+ *   · 6.ª: «El precio de cada apuesta queda fijado en 1 euro.» → 1,00 € se sostiene.
+ *
+ * GRAVAMEN — data/fiscal/premios-loterias.ts (DA 33.ª LIRPF): 40.000 € exentos por décimo o
+ * apuesta, reducidos en proporción si cuesta menos de 0,50 € (40.000 × precio / 0,50); 20 % del
+ * exceso, redondeado al céntimo por décimo; reparto por el mayor resto (reparto.ts).
+ *
+ * CASOS RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (los tres dieron exactamente lo calculado):
+ *   1. Normal — Ana 7,50 · Luis 2,50 · Marta 4 · Pablo 6 € (20 €: 37,5 / 12,5 / 20 / 30 %), precio
+ *      20 €, décimos de 300.000 € (base 260.000, retención 52.000) y 41.234,56 € (base 1234,56,
+ *      retención 246,912 → 246,91). Totales 341.234,56 / 80.000,00 / 52.246,91 / 288.987,65.
+ *      Bruto 34.123.456 c → 12.796.296 / 4.265.432 / 6.824.691,2 / 10.237.036,8: sobra 1 c, a Pablo
+ *      (,8) → 127.962,96 / 42.654,32 / 68.246,91 / 102.370,37. Retención 5.224.691 c → 1.959.259,125
+ *      / 653.086,375 / 1.044.938,2 / 1.567.407,3: sobra 1 c, a Luis (,375) → 19.592,59 / 6530,87 /
+ *      10.449,38 / 15.674,07. Le llega 108.370,37 / 36.123,45 / 57.797,53 / 86.696,30.
+ *   2. Límite — peña 10/5/5, precio 0,40 € → exención 40.000 × 0,40 / 0,50 = 32.000 €. Premio de
+ *      32.000 € justo: exento entero, retención 0,00. Premio de 32.000,05 €: base 0,05, retención
+ *      0,01, se cobran 32.000,04; bruto 3.200.005 c → 1.600.002,5 / 800.001,25 / 800.001,25, el
+ *      céntimo a Persona 1 → 16.000,03 / 8000,01 / 8000,01; la retención de 1 c, a Persona 1; le
+ *      llega 16.000,02 / 8000,01 / 8000,01. Con 0,50 € la exención vuelve a 40.000: los 32.000,05
+ *      quedan exentos (retención 0,00) y el aviso de exención reducida desaparece.
+ *   3. Rechazo — Ana, Luis y Marta, premio 100.000 €: Luis «5 € y 50» (no es un importe) → aviso de
+ *      las aportaciones que nombra a Luis, solo su campo marcado, sin tabla; Marta «−2» (signo menos
+ *      tipográfico) → nombra a «Luis y Marta», dos campos marcados. Corregidos (Luis «5,50 €»,
+ *      Marta «4,50»): 50 / 27,5 / 22,5 %, retención 6000 / 3300 / 2700, le llega 44.000 / 24.200 /
+ *      19.800. Precio «0» con lo demás bien: aviso del precio, marcado y descrito por el aviso.
+ *
+ * HALLAZGOS NUEVOS (cabo C0390), ABIERTOS con `test.fail()` al final del bloque.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+test.describe('Inspector 25/10/2026', () => {
+  const SEL_Z = 'section[aria-labelledby="pena-titulo"]';
+  const penaZ = (page: Page) => page.locator(SEL_Z);
+  const poneZ = (page: Page, n: number) => penaZ(page).getByLabel('Pone (€)').nth(n);
+  const nombreZ = (page: Page, n: number) => penaZ(page).getByLabel('Nombre').nth(n);
+  const precioZ = (page: Page) => penaZ(page).getByLabel('Precio de cada décimo o apuesta (€)');
+  const premioZ = (page: Page, n = 0) => penaZ(page).getByLabel(/Premio del décimo o apuesta/).nth(n);
+  const avisoZ = (page: Page) => penaZ(page).locator('[class*="comprobadorError"]');
+  const desgloseZ = (page: Page) => penaZ(page).locator('[class*="penaResultado"] > p');
+  const ayudaPrecioZ = (page: Page) => penaZ(page).locator('#pena-precio-ayuda');
+  // formatCurrency y formatPercentage ponen espacio duro (U+00A0) delante del símbolo
+  const eurZ = (s: string) => `${s} €`;
+  const pctZ = (s: string) => `${s} %`;
+
+  async function escribirZ(page: Page, campo: Locator, valor: string) {
+    await campo.fill(valor);
+    await esperarValorEnReact(page, campo, valor);
+  }
+  async function prepararZ(page: Page) {
+    await esperarInteractiva(page);
+    await esperarHidratacion(page, [`${SEL_Z} input`]);
+  }
+  const totalesZ = (page: Page) => penaZ(page).locator('[class*="penaTotales"] > div').evaluateAll((divs) =>
+    divs.map((d) => [d.querySelector('dt')?.textContent ?? '', d.querySelector('dd')?.textContent ?? '']));
+  const filasZ = (page: Page) => penaZ(page).locator('tbody tr').evaluateAll((trs) =>
+    trs.map((tr) => [
+      tr.querySelector('th')?.textContent ?? '',
+      ...Array.from(tr.querySelectorAll('td')).map((td) => td.textContent ?? ''),
+    ]));
+  const marcadosZ = (page: Page) => penaZ(page).locator('input[aria-invalid="true"]').evaluateAll((ins) =>
+    ins.map((i) => `${((i as HTMLInputElement).labels?.[0]?.textContent ?? '').replace(/\s+/g, ' ').trim()} = ${(i as HTMLInputElement).value}`));
+  const totales = (premio: string, exento: string, retencion: string, neto: string) => [
+    ['Premio íntegro', eurZ(premio)],
+    ['Exento', eurZ(exento)],
+    [`Retención del ${pctZ('20')}`, eurZ(retencion)],
+    ['Lo que se cobra', eurZ(neto)],
+  ];
+  const decimoZ = (n: number, premio: string, retencion: string) =>
+    `Décimo o apuesta ${n}: ${eurZ(premio)}, retención ${eurZ(retencion)}`;
+
+  test.describe('caso 1 (normal)', () => {
+    test('peña de cuatro (7,50 / 2,50 / 4 / 6 €) con décimos de 300.000 y 41.234,56 €: el céntimo sobrante del bruto a Pablo y el de la retención a Luis', async ({ page }) => {
+      await prepararZ(page);
+      await penaZ(page).getByRole('button', { name: /Añadir persona/ }).click();
+      await expect(penaZ(page).getByLabel('Pone (€)')).toHaveCount(4);
+      const nombres = ['Ana', 'Luis', 'Marta', 'Pablo'];
+      const puesto = ['7,50', '2,50', '4', '6'];
+      for (let i = 0; i < 4; i++) {
+        await escribirZ(page, nombreZ(page, i), nombres[i]);
+        await escribirZ(page, poneZ(page, i), puesto[i]);
+      }
+      await escribirZ(page, precioZ(page), '20');
+      await escribirZ(page, premioZ(page, 0), '300.000');
+      await penaZ(page).getByRole('button', { name: /Añadir otro décimo/ }).click();
+      await escribirZ(page, premioZ(page, 1), '41.234,56');
+
+      // DA 33.ª por décimo: (300.000 − 40.000) × 20 % = 52.000; (41.234,56 − 40.000) × 20 % = 246,912 → 246,91
+      await expect.poll(() => totalesZ(page)).toEqual(totales('341.234,56', '80.000,00', '52.246,91', '288.987,65'));
+      await expect(desgloseZ(page)).toHaveText(
+        `${decimoZ(1, '300.000,00', '52.000,00')} · ${decimoZ(2, '41.234,56', '246,91')}`);
+      // Bruto: sobra 1 c → Pablo (resto ,8). Retención: sobra 1 c → Luis (resto ,375)
+      expect(await filasZ(page)).toEqual([
+        ['Ana', eurZ('7,50'), eurZ('108.370,37'), pctZ('37,50'), eurZ('127.962,96'), eurZ('19.592,59')],
+        ['Luis', eurZ('2,50'), eurZ('36.123,45'), pctZ('12,50'), eurZ('42.654,32'), eurZ('6530,87')],
+        ['Marta', eurZ('4,00'), eurZ('57.797,53'), pctZ('20,00'), eurZ('68.246,91'), eurZ('10.449,38')],
+        ['Pablo', eurZ('6,00'), eurZ('86.696,30'), pctZ('30,00'), eurZ('102.370,37'), eurZ('15.674,07')],
+      ]);
+      await expect(avisoZ(page)).toHaveCount(0);
+    });
+  });
+
+  test.describe('caso 2 (límite)', () => {
+    test('precio de 0,40 €: 32.000 € exentos; un premio de 32.000 € justo no retiene nada y 32.000,05 € retiene 0,01 €; con 0,50 € vuelven los 40.000', async ({ page }) => {
+      await prepararZ(page);
+      await escribirZ(page, precioZ(page), '0,40');
+      await escribirZ(page, premioZ(page, 0), '32.000');
+      // 40.000 × 0,40 / 0,50 = 32.000 € exentos: el premio justo en la exención reducida no tributa
+      await expect.poll(() => totalesZ(page)).toEqual(totales('32.000,00', '32.000,00', '0,00', '32.000,00'));
+      await expect(ayudaPrecioZ(page)).toContainText(/Con este precio, cada décimo o apuesta tiene 32\.000,00\s€ exentos\./);
+
+      // Cinco céntimos por encima: base 0,05 → 0,01 de retención
+      await escribirZ(page, premioZ(page, 0), '32.000,05');
+      await expect.poll(() => totalesZ(page)).toEqual(totales('32.000,05', '32.000,00', '0,01', '32.000,04'));
+      // Bruto 3.200.005 c y retención 1 c: el céntimo que sobra en los dos, a Persona 1 (resto ,5)
+      expect(await filasZ(page)).toEqual([
+        ['Persona 1', eurZ('10,00'), eurZ('16.000,02'), pctZ('50,00'), eurZ('16.000,03'), eurZ('0,01')],
+        ['Persona 2', eurZ('5,00'), eurZ('8000,01'), pctZ('25,00'), eurZ('8000,01'), eurZ('0,00')],
+        ['Persona 3', eurZ('5,00'), eurZ('8000,01'), pctZ('25,00'), eurZ('8000,01'), eurZ('0,00')],
+      ]);
+
+      // 0,50 € justos: la exención ya no se reduce (DA 33.ª.2) y el aviso de exención reducida se va
+      await escribirZ(page, precioZ(page), '0,50');
+      await expect.poll(() => totalesZ(page)).toEqual(totales('32.000,05', '32.000,05', '0,00', '32.000,05'));
+      await expect(ayudaPrecioZ(page)).not.toContainText('Con este precio');
+    });
+  });
+
+  test.describe('caso 3 (rechazo)', () => {
+    test('«5 € y 50» y «−2» en lo que pone cada uno: el aviso nombra a Luis y luego a Luis y Marta, sin reparto; corregidos, 50 / 27,5 / 22,5 %; y el precio 0', async ({ page }) => {
+      await prepararZ(page);
+      const nombres = ['Ana', 'Luis', 'Marta'];
+      for (let i = 0; i < 3; i++) await escribirZ(page, nombreZ(page, i), nombres[i]);
+      await escribirZ(page, premioZ(page, 0), '100.000');
+
+      // «5 € y 50» no es un importe (parseSpanishNumber → NaN)
+      await escribirZ(page, poneZ(page, 1), '5 € y 50');
+      await expect(avisoZ(page)).toHaveText(
+        'Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Luis.');
+      expect(await marcadosZ(page)).toEqual(['Pone (€) = 5 € y 50']);
+      await expect(poneZ(page, 1)).toHaveAttribute('aria-describedby', 'pena-error');
+      await expect(penaZ(page).locator('tbody tr')).toHaveCount(0);
+
+      // «−2» con el signo menos tipográfico (U+2212) vale −2: negativo, también se señala
+      await escribirZ(page, poneZ(page, 2), '−2');
+      await expect(avisoZ(page)).toHaveText(
+        'Revisa las aportaciones: tienen que ser cantidades de 0 € o más. Revisa lo que pone Luis y Marta.');
+      expect(await marcadosZ(page)).toEqual(['Pone (€) = 5 € y 50', 'Pone (€) = −2']);
+      await expect(penaZ(page).locator('[class*="penaTotales"]')).toHaveCount(0);
+
+      // Corregidos («5,50 €» con el símbolo pegado se lee 5,5): 10 + 5,5 + 4,5 = 20 €
+      await escribirZ(page, poneZ(page, 1), '5,50 €');
+      await escribirZ(page, poneZ(page, 2), '4,50');
+      await expect(avisoZ(page)).toHaveCount(0);
+      // (100.000 − 40.000) × 20 % = 12.000; 88.000 netos
+      await expect.poll(() => totalesZ(page)).toEqual(totales('100.000,00', '40.000,00', '12.000,00', '88.000,00'));
+      expect(await filasZ(page)).toEqual([
+        ['Ana', eurZ('10,00'), eurZ('44.000,00'), pctZ('50,00'), eurZ('50.000,00'), eurZ('6000,00')],
+        ['Luis', eurZ('5,50'), eurZ('24.200,00'), pctZ('27,50'), eurZ('27.500,00'), eurZ('3300,00')],
+        ['Marta', eurZ('4,50'), eurZ('19.800,00'), pctZ('22,50'), eurZ('22.500,00'), eurZ('2700,00')],
+      ]);
+
+      // Precio 0 con todo lo demás bien: manda la guarda del precio
+      await escribirZ(page, precioZ(page), '0');
+      await expect(avisoZ(page)).toHaveText('Indica lo que costó cada décimo o apuesta, mayor que 0 €.');
+      expect(await marcadosZ(page)).toEqual(['Precio de cada décimo o apuesta (€) = 0']);
+      await expect(precioZ(page)).toHaveAttribute('aria-describedby', 'pena-error pena-precio-ayuda');
+      await expect(penaZ(page).locator('tbody tr')).toHaveCount(0);
+    });
+  });
+
+  test.describe('cabo C0390 · normas de SELAE de junio de 2015', () => {
+    interface PreguntaLdZ { name: string; acceptedAnswer: { text: string } }
+    async function faqPageZ(page: Page): Promise<PreguntaLdZ[]> {
+      const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+      const faq = bloques.map((b) => JSON.parse(b) as { '@type'?: string; mainEntity?: PreguntaLdZ[] })
+        .find((j) => j['@type'] === 'FAQPage');
+      return faq?.mainEntity ?? [];
+    }
+    const celdaTabla = (page: Page, loteria: string, columna: number) =>
+      page.locator('[class*="comparativaTable"] tbody tr').filter({ hasText: loteria }).locator('td').nth(columna);
+
+    test('lo que se sostiene: precio de 1,00 € (norma 6.ª), la nota del comprobador (norma 9.ª.1) y el bote mínimo de El Gordo (BOE-A-2005-1507, norma 66.ª.1)', async ({ page }) => {
+      await expect(page.locator('[class*="comparativaTable"] thead th').nth(4)).toHaveText('Bote mínimo');
+      // 6.ª: «El precio de cada apuesta queda fijado en 1 euro.»
+      await expect(celdaTabla(page, 'La Primitiva', 3)).toHaveText('1,00 €');
+      // 66.ª.1: «Se establece un fondo mínimo garantizado de 5 millones de euros»
+      await expect(celdaTabla(page, 'El Gordo', 4)).toHaveText('5.000.000 €');
+
+      // 9.ª.1: cuenta «el número asignado específicamente en el resguardo validado», y eso dice la nota
+      await sembrarYRecargar(page, {
+        [CLAVE_FAVORITAS]: JSON.stringify([
+          { id: 'c0390', type: 'primitiva', mainNumbers: [4, 9, 16, 23, 37, 45], extraNumbers: [3], timestamp: '2026-10-25T10:00:00.000Z' },
+        ]),
+      });
+      const zona = page.locator('section[aria-labelledby="titulo-comprobador"]');
+      await expect(zona.locator('[class*="comprobadorNotas"]')).toContainText(
+        'El reintegro que cuenta es el impreso en tu resguardo: si no es el de la combinación guardada, compara el del boleto.');
+    });
+
+    test('ABIERTO (dato, medio; cabo C0390) · el FAQPage dice que en La Primitiva «se eligen» el Reintegro, que lo asigna el resguardo', async ({ page }) => {
+      test.fail(); // ABIERTO: hallazgo de la inspección del 25/10/2026 (cabo C0390)
+      const preguntas = await faqPageZ(page);
+      const q = preguntas.find((p) => p.name === '¿Cuántos números hay que elegir en la Primitiva y en el Euromillones?');
+      expect(q).toBeDefined();
+      // Normas de SELAE de junio de 2015: 4.ª («Pronóstico: Cada número elegido en un bloque»), 18.ª.1
+      // (se marcan las casillas de los números elegidos), 11.ª.4 y 9.ª.1 («el número asignado
+      // específicamente en el resguardo validado»): el reintegro no se elige, lo asigna el terminal.
+      expect(q?.acceptedAnswer.text ?? '').not.toMatch(/se eligen 6 números del 1 al 49 y el Reintegro/);
+    });
+
+    test('ABIERTO (dato, bajo; cabo C0390) · la tabla da a La Primitiva un «Bote mínimo» de 3.000.000 € que sus normas no fijan', async ({ page }) => {
+      test.fail(); // ABIERTO: hallazgo de la inspección del 25/10/2026 (cabo C0390)
+      await expect(page.locator('[class*="comparativaTable"] thead th').nth(4)).toHaveText('Bote mínimo');
+      // Norma 8.ª.1: la categoría especial se lleva «El 20 por 100» del fondo, con arrastre (8.ª.1.1 y
+      // 1.2); ninguna de las 57 normas fija un mínimo garantizado, a diferencia de El Gordo (66.ª.1).
+      await expect(celdaTabla(page, 'La Primitiva', 4)).not.toHaveText(/3\.000\.000/);
+    });
+  });
+});
