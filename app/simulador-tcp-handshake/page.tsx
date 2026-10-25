@@ -550,8 +550,8 @@ export default function SimuladorTcpHandshakePage() {
             />
           </div>
           <div className={styles.configGrupo}>
-            <label className={styles.configLabel}>Velocidad</label>
-            <div className={styles.velSelector}>
+            <label id="velocidad-label" className={styles.configLabel}>Velocidad</label>
+            <div role="group" aria-labelledby="velocidad-label" className={styles.velSelector}>
               {(['lenta', 'normal', 'rapida'] as VelocidadAnim[]).map((v) => (
                 <button
                   key={v}
@@ -566,8 +566,8 @@ export default function SimuladorTcpHandshakePage() {
             </div>
           </div>
           <div className={styles.configGrupo}>
-            <label className={styles.configLabel}>Modo</label>
-            <div className={styles.velSelector}>
+            <label id="modo-label" className={styles.configLabel}>Modo</label>
+            <div role="group" aria-labelledby="modo-label" className={styles.velSelector}>
               <button
                 type="button"
                 className={`${styles.velBtn} ${modo === 'apertura' ? styles.velBtnActivo : ''}`}

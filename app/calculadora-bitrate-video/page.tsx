@@ -84,8 +84,8 @@ export default function CalculadoraBitrateVideoPage() {
         <section className={styles.configPanel} aria-label="Parámetros de vídeo">
           {/* Resolución */}
           <div className={styles.configGroup}>
-            <label className={styles.configLabel}>Resolución</label>
-            <div className={styles.selectorResolucion} role="group" aria-label="Seleccionar resolución">
+            <label id="resolucion-label" className={styles.configLabel}>Resolución</label>
+            <div className={styles.selectorResolucion} role="group" aria-labelledby="resolucion-label" aria-label="Seleccionar resolución">
               {RESOLUCIONES.map((r) => (
                 <button
                   key={r.id}
@@ -104,8 +104,8 @@ export default function CalculadoraBitrateVideoPage() {
 
           {/* FPS */}
           <div className={styles.configGroup}>
-            <label className={styles.configLabel}>Fotogramas por segundo (fps)</label>
-            <div className={styles.selectorFps} role="group" aria-label="Seleccionar fps">
+            <label id="fps-label" className={styles.configLabel}>Fotogramas por segundo (fps)</label>
+            <div className={styles.selectorFps} role="group" aria-labelledby="fps-label" aria-label="Seleccionar fps">
               {FPS_OPCIONES.map((f) => (
                 <button
                   key={f}
@@ -122,8 +122,8 @@ export default function CalculadoraBitrateVideoPage() {
 
           {/* Códec */}
           <div className={styles.configGroup}>
-            <label className={styles.configLabel}>Códec</label>
-            <div className={styles.selectorCodec} role="group" aria-label="Seleccionar códec">
+            <label id="codec-label" className={styles.configLabel}>Códec</label>
+            <div className={styles.selectorCodec} role="group" aria-labelledby="codec-label" aria-label="Seleccionar códec">
               {CODECS.map((c) => (
                 <button
                   key={c.id}

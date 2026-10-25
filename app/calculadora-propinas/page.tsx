@@ -128,8 +128,8 @@ export default function CalculadoraPropinas() {
 
           {/* Botones de porcentaje */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Selecciona porcentaje:</label>
-            <div className={styles.porcentajes}>
+            <label id="porcentaje-label" className={styles.label}>Selecciona porcentaje:</label>
+            <div role="group" aria-labelledby="porcentaje-label" className={styles.porcentajes}>
               <button
                 type="button"
                 className={`${styles.btnPorcentaje} ${

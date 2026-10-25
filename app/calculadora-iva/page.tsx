@@ -160,8 +160,8 @@ export default function CalculadoraIvaPage() {
           />
 
           <div className={styles.ivaSelector}>
-            <label className={styles.label}>Tipo de IVA</label>
-            <div className={styles.ivaOptions}>
+            <label id="tipo-iva-label" className={styles.label}>Tipo de IVA</label>
+            <div role="group" aria-labelledby="tipo-iva-label" className={styles.ivaOptions}>
               {IVA_RATES.map((rate) => (
                 <button
                   type="button"
