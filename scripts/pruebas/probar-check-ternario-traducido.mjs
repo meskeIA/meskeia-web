@@ -31,6 +31,16 @@
  *  13. `traduccion-ok:` a secas, sin razón.
  *  14. SE PLANTA · ningún .tsx que leer.
  *
+ * Y la ampliación a dos fragmentos (cabo C0438, 25/10/2026):
+ *
+ *  15. nave industrial antes de 5ed0e98e (hallazgo 3476). Debe FALLAR.
+ *  16. La misma, reparada en 5ed0e98e. Debe CALLAR.
+ *  17. terreno rústico antes de 8c473228 (hallazgo 3480). Debe FALLAR.
+ *  18. La forma de conversor-colores, medida con la página traducida: cae. Debe FALLAR.
+ *  19. Dos fragmentos con la MISMA forma. Debe CALLAR.
+ *  20. Fragmento con texto frente a null (C0312, aparte). Debe CALLAR.
+ *  21. La receta, cada fragmento en su span con key. Debe CALLAR.
+ *
  * Trabaja sobre mini-catálogos en directorios temporales: no escribe NADA en `app/`.
  */
 
@@ -48,6 +58,8 @@ const SHARE = 'components/ShareCard.tsx';
 const MONEDA = 'app/cara-o-cruz/page.tsx';
 const BOOLEANA = 'app/calculadora-algebra-booleana/page.tsx';
 const BERNOULLI = 'app/simulador-fluidos-bernoulli/page.tsx';
+const NAVE = 'app/simulador-gastos-compraventa-nave-industrial/page.tsx';
+const RUSTICO = 'app/simulador-gastos-compraventa-terreno-rustico/page.tsx';
 
 const pagina = (cuerpo) => ({ 'app/prueba/page.tsx': `export default function P() {\n  return (\n    <div>\n${cuerpo}\n    </div>\n  );\n}\n` });
 
@@ -81,6 +93,26 @@ const CASOS = [
     ficheros: pagina("      {/* traduccion-ok: */}\n      <p>{a ? 'Hola' : <><b>!</b> Adiós</>}</p>"),
   },
   { n: 14, nombre: 'SE PLANTA · ningún .tsx que leer', debeFallar: true, ficheros: {} },
+  // Cabo C0438 (25/10/2026): dos fragmentos con texto suelto y distinta forma
+  { n: 15, nombre: 'CASO DE ORIGEN · nave industrial antes de 5ed0e98e (hallazgo 3476)', debeFallar: true, ficheros: { [NAVE]: deGit('5ed0e98e^', NAVE) } },
+  { n: 16, nombre: 'CASO DE ORIGEN REPARADO · nave industrial en 5ed0e98e', debeFallar: false, ficheros: { [NAVE]: deGit('5ed0e98e', NAVE) } },
+  { n: 17, nombre: 'CASO DE ORIGEN · terreno rústico antes de 8c473228 (hallazgo 3480)', debeFallar: true, ficheros: { [RUSTICO]: deGit('8c473228^', RUSTICO) } },
+  {
+    n: 18, nombre: 'dos fragmentos con texto y distinta forma (conversor-colores, medido: cae)', debeFallar: true,
+    ficheros: pagina("      <p>\n        {png ? (\n          <>PNG conserva el color <strong>exacto</strong>.</>\n        ) : (\n          <><span aria-hidden=\"true\">⚠️</span> JPEG remuestrea el color {hex}.</>\n        )}\n      </p>"),
+  },
+  {
+    n: 19, nombre: 'dos fragmentos con la MISMA forma (reescribe el texto en su sitio)', debeFallar: false,
+    ficheros: pagina("      <p>{a ? <>Hay <b>{n}</b> filas</> : <>Sin <b>{m}</b> datos</>}</p>"),
+  },
+  {
+    n: 20, nombre: 'fragmento con texto frente a null (la forma de C0312, va aparte)', debeFallar: false,
+    ficheros: pagina("      <p>{a ? <>Hola <b>!</b></> : null}</p>"),
+  },
+  {
+    n: 21, nombre: 'la receta: cada fragmento en su span con key', debeFallar: false,
+    ficheros: pagina("      <p>\n        {png ? (\n          <span key=\"rama-1\">PNG conserva el color <strong>exacto</strong>.</span>\n        ) : (\n          <span key=\"rama-2\"><span aria-hidden=\"true\">⚠️</span> JPEG remuestrea el color {hex}.</span>\n        )}\n      </p>"),
+  },
 ];
 
 let fallos = 0;

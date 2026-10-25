@@ -21,6 +21,18 @@
  * Se miran las HOJAS del ternario, también anidado y entre paréntesis: basta con que una sea
  * un literal de texto no vacío (comillas o plantilla) y otra sea JSX (elemento o fragmento).
  *
+ * Y, desde el cabo C0438 (25/10/2026), dos FRAGMENTOS que alternan cuando al menos uno lleva
+ * texto suelto entre sus hijos directos y no tienen la misma forma (la secuencia de texto,
+ * etiquetas y expresiones):
+ *
+ *   {png ? <>PNG conserva el color <strong>exacto</strong>.</> : <><span>⚠️</span> JPEG …</>}
+ *
+ * El fragmento no lleva key ni etiqueta: React compara sus hijos por posición y, donde la otra
+ * rama pone otra cosa, retira el nodo de texto. Es la forma de los hallazgos 3476 y 3480
+ * (compraventa de nave y de terreno rústico); medida el 25/10/2026 en conversor-colores, que
+ * caía al pasar de PNG a JPEG. Dos fragmentos con la MISMA forma reescriben el texto en su
+ * sitio y no caen (se quedan viejos: cabo C0243, que esto no mira).
+ *
  * DE DÓNDE SALE
  * ─────────────
  * Del hallazgo 3314 (cabo C0233): Copiar de ShareCard y los cuatro pies de portal tumbaban la
@@ -32,7 +44,9 @@
  * SIN PASIVO
  * ──────────
  * Barre `app/` y `components/` enteros. Tras 9a553aee no queda ninguna aparición: solo puede
- * encenderlo código nuevo.
+ * encenderlo código nuevo. La forma de los fragmentos dio 49 apariciones en 40 ficheros al
+ * nacer, reparadas en la misma tanda con la receta (cada fragmento-hoja en un <span key>, o un
+ * <div key> si sus hijos son bloques).
  *
  * QUÉ NO MIRA, Y POR QUÉ
  * ──────────────────────
@@ -43,7 +57,8 @@
  *     forma del código no se sabe si guarda texto o JSX.
  *   · Dos elementos del mismo tipo SIN `key` y con hijos distintos (`<span>A</span>` frente a
  *     `<span><b /> B</span>`): React reutiliza el `<span>` y retira el texto de dentro. Lo mide
- *     el testigo de familia, que traduce, pulsa y vuelve.
+ *     el testigo de familia, que traduce, pulsa y vuelve. (Con fragmentos sí lo mira: arriba.)
+ *   · Un fragmento con texto frente a `null` o una variable: es la forma de C0312.
  *   · Los ternarios de un atributo (`title={a ? 'x' : 'y'}`): no crean nodos de texto.
  *
  * ESCAPE
@@ -92,6 +107,42 @@ function clase(n) {
   return 'otro';
 }
 
+// Un fragmento con texto suelto entre sus hijos directos (C0438). El fragmento no lleva `key` ni
+// etiqueta propia: al cambiar de rama React compara sus hijos por posición, y donde la otra rama
+// tiene otra cosa retira el nodo de texto, que con la página traducida ya es un <font>.
+function hijosConTexto(n) {
+  return ts.isJsxFragment(n) && n.children.some((h) => ts.isJsxText(h) && h.text.trim() !== '');
+}
+
+// La forma de los hijos de una rama: «T» por texto, la etiqueta por elemento, «{}» por
+// expresión. Dos fragmentos con la misma forma reescriben su texto en el sitio y no caen (lo que
+// sí pasa es que el texto se queda viejo, cabo C0243, que este candado no mira).
+function forma(n) {
+  if (!ts.isJsxFragment(n)) return `<${clase(n)}>`;
+  return n.children
+    .filter((h) => !(ts.isJsxText(h) && h.text.trim() === ''))
+    .map((h) => {
+      if (ts.isJsxText(h)) return 'T';
+      if (ts.isJsxExpression(h)) return h.expression ? '{}' : '';
+      if (ts.isJsxElement(h)) return h.openingElement.tagName.getText();
+      if (ts.isJsxSelfClosingElement(h)) return h.tagName.getText();
+      return '<>';
+    })
+    .filter(Boolean)
+    .join(' ');
+}
+
+// ¿Cae al cambiar de rama? Texto suelto frente a JSX (la forma de origen), o un fragmento con
+// texto suelto frente a otra rama que se pinta (texto o JSX) con otra forma. Una rama vacía o
+// variable (`null`, `resultado`) es la forma de C0312, que va aparte.
+function cae(ramas) {
+  const clases = new Set(ramas.map(clase));
+  if (clases.has('texto') && clases.has('jsx')) return 'texto';
+  const pintadas = ramas.filter((r) => clase(r) !== 'otro');
+  if (!pintadas.some(hijosConTexto)) return null;
+  return new Set(pintadas.map(forma)).size > 1 ? 'fragmento' : null;
+}
+
 // ─── Escape ────────────────────────────────────────────────────────────────────
 function escapeEn(lineas, n) {
   const trozo = lineas.slice(Math.max(0, n - 4), n).join('\n');
@@ -120,14 +171,17 @@ for (const carpeta of CARPETAS) {
         && (ts.isJsxElement(nodo.parent) || ts.isJsxFragment(nodo.parent))
         && ts.isConditionalExpression(sinParentesis(nodo.expression))
       ) {
-        const clases = new Set(hojas(nodo.expression).map(clase));
-        if (clases.has('texto') && clases.has('jsx')) {
+        const tipo = cae(hojas(nodo.expression));
+        if (tipo) {
           const linea = fuente.getLineAndCharacterOfPosition(nodo.getStart(fuente)).line + 1;
           const escape = escapeEn(lineas, linea);
           if (escape === 'firmado') exentos.push(`${rel}:${linea}`);
           else {
             const porQue = escape === 'sin razón' ? ' — lleva `traduccion-ok:` SIN razón escrita' : '';
-            errores.push(`${rel}:${linea} — un ternario alterna texto suelto y JSX: con la página traducida, al cambiar de rama React retira un nodo de texto que ya no está y la app cae (NotFoundError). Pon cada rama en su elemento con \`key\`: <span key="a">…</span> : <span key="b">…</span>.${porQue}`);
+            const que = tipo === 'texto'
+              ? 'un ternario alterna texto suelto y JSX'
+              : 'un ternario alterna un fragmento con texto suelto y otra rama de distinta forma';
+            errores.push(`${rel}:${linea} — ${que}: con la página traducida, al cambiar de rama React retira un nodo de texto que ya no está y la app cae (NotFoundError). Pon cada rama en su elemento con \`key\`: <span key="a">…</span> : <span key="b">…</span>.${porQue}`);
           }
         }
       }

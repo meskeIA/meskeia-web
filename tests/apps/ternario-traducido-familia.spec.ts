@@ -87,3 +87,37 @@ test.describe('ternario de texto y fragmento con la página traducida (C0262)', 
     });
   }
 });
+
+// Cabo C0438 (25/10/2026): dos FRAGMENTOS con texto suelto y distinta forma. conversor-colores
+// caía al pasar de PNG a JPEG con la página traducida (medido antes de la campaña: NotFoundError
+// en removeChild, con .reparar-trabajo/medir-c0438.mjs de la copia). Se va y se vuelve,
+// traduciendo antes de cada cambio.
+test('C0438 · conversor-colores: cambiar el formato de descarga con la página traducida no tumba la app', async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  const errores: string[] = [];
+  page.on('pageerror', (e) => errores.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+  });
+  await page.goto('/conversor-colores/');
+  const jpeg = page.getByRole('button', { name: /JPEG/ });
+  const png = page.getByRole('button', { name: /PNG/ });
+  await expect(jpeg).toBeVisible();
+  await expect
+    .poll(() => jpeg.evaluate((b) => Object.keys(b).some((k) => k.startsWith('__reactProps$'))))
+    .toBe(true);
+
+  await traducir(page);
+  await jpeg.click();
+  await expect(jpeg).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText(/JPEG comprime por bloques/)).toBeVisible();
+
+  await traducir(page);
+  await png.click();
+  await expect(png).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText(/PNG conserva el color/)).toBeVisible();
+  await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+  expect(errores).toEqual([]);
+});
