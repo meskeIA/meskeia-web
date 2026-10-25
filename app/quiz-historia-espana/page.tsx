@@ -323,9 +323,9 @@ export default function QuizHistoriaEspanaPage() {
               <>
                 <div className={`${styles.feedbackMensaje} ${acierto ? styles.feedbackOk : styles.feedbackFail}`}>
                   {acierto ? (
-                    <><span aria-hidden="true">✅</span> ¡Correcto!</>
+                    <span key="rama-1"><span aria-hidden="true">✅</span> ¡Correcto!</span>
                   ) : (
-                    <><span aria-hidden="true">❌</span> Incorrecto. La respuesta correcta es: «{preguntaActual.correcta}»</>
+                    <span key="rama-2"><span aria-hidden="true">❌</span> Incorrecto. La respuesta correcta es: «{preguntaActual.correcta}»</span>
                   )}
                 </div>
                 {preguntaActual.explicacion && (

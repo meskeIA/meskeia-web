@@ -353,8 +353,8 @@ function QuizPorFases() {
           <div className={`${styles.feedbackPanel} ${esCorrecta ? styles.feedbackCorrecto : styles.feedbackIncorrecto}`} role="alert" aria-live="polite">
             <p className={styles.feedbackTitulo}>
               {esCorrecta
-                ? <><span aria-hidden="true">✅</span> ¡Correcto!</>
-                : <><span aria-hidden="true">❌</span> Era: <span aria-hidden="true">{GRUPOS[plantaActual.grupo].emoji}</span> {GRUPOS[plantaActual.grupo].label}</>}
+                ? <span key="rama-1"><span aria-hidden="true">✅</span> ¡Correcto!</span>
+                : <span key="rama-2"><span aria-hidden="true">❌</span> Era: <span aria-hidden="true">{GRUPOS[plantaActual.grupo].emoji}</span> {GRUPOS[plantaActual.grupo].label}</span>}
             </p>
             <p className={styles.feedbackExplicacion}>{plantaActual.explicacion}</p>
             <button type="button" className={styles.btnSiguiente} onClick={siguientePregunta} ref={siguienteRef}>

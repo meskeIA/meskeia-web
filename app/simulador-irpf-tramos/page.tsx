@@ -377,9 +377,9 @@ export default function SimuladorIrpfTramosPage() {
 
         <div className={styles.diferenciaBadge} role="status" aria-live="polite">
           {incremento === 0 ? (
-            <>Mueve el slider de incremento para ver la diferencia.</>
+            <span key="rama-1">Mueve el slider de incremento para ver la diferencia.</span>
           ) : (
-            <>
+            <span key="rama-2">
               <span className={styles.diferenciaTitulo}>
                 {incremento >= 0 ? 'Si subes' : 'Si bajas'} {formatCurrency(Math.abs(incremento))} de base liquidable:
               </span>
@@ -390,7 +390,7 @@ export default function SimuladorIrpfTramosPage() {
               <span className={styles.diferenciaDetalle}>
                 ({formatNumber((diferenciaCuota / (incremento || 1)) * 100, 1)}% del incremento se va en impuestos)
               </span>
-            </>
+            </span>
           )}
         </div>
       </div>

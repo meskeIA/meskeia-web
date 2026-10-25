@@ -349,7 +349,7 @@ const SeccionSerie = () => {
                 {resultado.fem > 0 ? '+' : ''}{resultado.fem.toFixed(2)} V
               </p>
               <p className={`${styles.serieEspontaneo} ${resultado.fem > 0 ? styles.serieFemPos : styles.serieFemNeg}`}>
-                {resultado.fem > 0 ? <><span aria-hidden="true">✅</span> {'Reacción espontánea (ΔG < 0)'}</> : <><span aria-hidden="true">❌</span> No espontánea (requiere energía externa)</>}
+                {resultado.fem > 0 ? <span key="rama-1"><span aria-hidden="true">✅</span> {'Reacción espontánea (ΔG < 0)'}</span> : <span key="rama-2"><span aria-hidden="true">❌</span> No espontánea (requiere energía externa)</span>}
               </p>
             </div>
             <p className={styles.serieMnemonico}>

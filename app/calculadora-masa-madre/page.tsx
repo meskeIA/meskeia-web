@@ -351,7 +351,7 @@ export default function CalculadoraMasaMadrePage() {
             <div className={styles.tiempoBox}>
               <span className={styles.tiempoIcon} aria-hidden="true">⏱️</span>
               {rango ? (
-                <>
+                <span key="rama-1">
                   <strong>Fermentación en bloque a {formatNumber(tempC, 0)} °C:</strong>{' '}
                   {formatearTiempo(rango.horasMin)} – {formatearTiempo(rango.horasMax)}
                   {rango.factor !== 1 && (
@@ -361,15 +361,15 @@ export default function CalculadoraMasaMadrePage() {
                   )}
                   . Después, 1–2 h en frío. Es una estimación con masa madre activa: guíate
                   por el volumen de la masa, no solo por el reloj.
-                </>
+                </span>
               ) : (
-                <>
+                <span key="rama-2">
                   <strong>Fermentación:</strong> no se puede estimar el tiempo a esa
                   temperatura. La regla que usa esta calculadora (la actividad de la levadura
                   se duplica por cada +10 °C) solo vale entre {TEMP_MODELO_MIN} y{' '}
                   {TEMP_MODELO_MAX} °C: por debajo el fermento queda casi parado y por encima
                   se estresa y aparecen sabores ácidos.
-                </>
+                </span>
               )}
             </div>
           </div>

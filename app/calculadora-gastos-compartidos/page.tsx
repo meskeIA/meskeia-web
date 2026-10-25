@@ -532,16 +532,16 @@ export default function CalculadoraGastosCompartidosPage() {
 
             <p className={styles.liquidacionResumen} role="status" aria-live="polite">
               {pagosSueltos > transferencias.length ? (
-                <>
+                <span key="rama-1">
                   <strong>{transferencias.length} {transferencias.length === 1 ? 'transferencia' : 'transferencias'}</strong>{' '}
                   en lugar de los {pagosSueltos} pagos sueltos que haría falta si cada uno devolviese
                   su parte de cada gasto a quien lo adelantó.
-                </>
+                </span>
               ) : (
-                <>
+                <span key="rama-2">
                   <strong>{transferencias.length} {transferencias.length === 1 ? 'transferencia' : 'transferencias'}</strong>{' '}
                   bastan para dejar todas las cuentas a cero.
-                </>
+                </span>
               )}
               {!liquidacionExacta && ' Con más de 12 personas con saldo pendiente se usa un reparto aproximado, que puede no ser el mínimo absoluto.'}
             </p>

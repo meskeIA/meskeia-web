@@ -448,18 +448,18 @@ export default function SimuladorAutomatasCelularesPage() {
           </div>
           <div className={styles.hint}>
             {modo === 'vida' ? (
-              <>
+              <span key="rama-1">
                 <strong>Juego de la Vida:</strong> una célula viva sobrevive con 2 o 3 vecinas; una
                 muerta nace con exactamente 3 vecinas. En cualquier otro caso, muere. El exterior de
                 la rejilla se considera siempre muerto.
-              </>
+              </span>
             ) : (
-              <>
+              <span key="rama-2">
                 <strong>Generación de cuevas:</strong> cada celda se vuelve roca si tiene{' '}
                 {UMBRAL_CUEVA} o más vecinas roca, y hueco si tiene menos. Aplicado sobre ruido
                 aleatorio, hace emerger cavernas conectadas. El borde cuenta como roca para cerrar la
                 cueva.
-              </>
+              </span>
             )}
           </div>
         </div>

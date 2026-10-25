@@ -490,8 +490,8 @@ export default function EstimadorPlusvalidasIRPFPage() {
                   <strong>Compensación aplicada:</strong> has reducido la ganancia en{' '}
                   {formatCurrency(resultado.perdidasPreviasAplicadas)} con minusvalías de años anteriores.
                   {resultado.perdidasPreviasRestantes > 0
-                    ? <> Te quedan <strong>{formatCurrency(resultado.perdidasPreviasRestantes)}</strong> de minusvalías pendientes para los próximos ejercicios.</>
-                    : <> Has agotado las minusvalías pendientes que introdujiste.</>}
+                    ? <span key="rama-1"> Te quedan <strong>{formatCurrency(resultado.perdidasPreviasRestantes)}</strong> de minusvalías pendientes para los próximos ejercicios.</span>
+                    : <span key="rama-2"> Has agotado las minusvalías pendientes que introdujiste.</span>}
                 </div>
               )}
 

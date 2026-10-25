@@ -775,7 +775,7 @@ export default function VisualizadorQuimicaOrganica() {
                 <div className={styles.aromaticNombre}>{c.nombre}</div>
                 <div className={styles.aromaticFormula}>{c.formula}</div>
                 <div className={styles.aromaticHuckel}>
-                  {c.electrones}e⁻π · {c.aromatico ? <>n={c.n} <span role="img" aria-label="cumple la regla de Hückel">✅</span></> : <>4n=4 <span role="img" aria-label="no cumple la regla de Hückel">❌</span></>}
+                  {c.electrones}e⁻π · {c.aromatico ? <span key="rama-1">n={c.n} <span role="img" aria-label="cumple la regla de Hückel">✅</span></span> : <span key="rama-2">4n=4 <span role="img" aria-label="no cumple la regla de Hückel">❌</span></span>}
                 </div>
                 <div className={styles.aromaticUso}>{c.uso}</div>
               </div>

@@ -299,15 +299,15 @@ export default function FormuladorCompuestosInorganicos() {
             <>
               <p className={styles.enunciado}>
                 {ejercicio.tipo === 'nombrar' ? (
-                  <>
+                  <span key="rama-1">
                     Nombra <strong className={styles.enunciadoDestacado}>{embellecer(ejercicio.formula)}</strong> en
                     nomenclatura <strong>{ETIQUETA_NOMENCLATURA[ejercicio.nomenclatura]}</strong>.
-                  </>
+                  </span>
                 ) : (
-                  <>
+                  <span key="rama-2">
                     Escribe la fórmula de{' '}
                     <strong className={styles.enunciadoDestacado}>{ejercicio.solucion}</strong>.
-                  </>
+                  </span>
                 )}
               </p>
 

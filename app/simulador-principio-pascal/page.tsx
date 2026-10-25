@@ -456,7 +456,7 @@ export default function SimuladorPrincipioPascalPage() {
               </div>
               <div className={styles.formulaBox}>
                 {presion ? (
-                  <>
+                  <div key="rama-1">
                     <p className={styles.formulaLinea}>
                       <code>ρ·g·h = {formatNumber(liquido.densidad, 0)} · {formatNumber(G, 2)} · {formatoSignificativo(profundidad)} = {textoPa(presion.presionHidrostatica)}</code>
                     </p>
@@ -466,9 +466,9 @@ export default function SimuladorPrincipioPascalPage() {
                     <p className={styles.formulaLinea}>
                       <code>P / 101.325 = {formatNumber(presion.presionAbsolutaAtm, 4)} atm</code>
                     </p>
-                  </>
+                  </div>
                 ) : (
-                  <>Con los dos datos aparecen aquí las fórmulas con tus números.</>
+                  <span key="rama-2">Con los dos datos aparecen aquí las fórmulas con tus números.</span>
                 )}
               </div>
             </div>
@@ -649,7 +649,7 @@ export default function SimuladorPrincipioPascalPage() {
               </div>
               <div className={styles.formulaBox}>
                 {prensa && area1Cm2 !== null && area2Cm2 !== null ? (
-                  <>
+                  <div key="rama-1">
                     {modoArea === 'diametro' && (
                       <p className={styles.formulaLinea}>
                         <code>A = π·d²/4 → A₁ = {formatoSignificativo(area1Cm2)} cm², A₂ = {formatoSignificativo(area2Cm2)} cm²</code>
@@ -664,9 +664,9 @@ export default function SimuladorPrincipioPascalPage() {
                     <p className={styles.formulaLinea}>
                       <code>m = F₂/g = {formatoSignificativo(prensa.fuerzaSalida)}/{formatNumber(G, 2)} = {formatoSignificativo(prensa.masaSostenida)} kg</code>
                     </p>
-                  </>
+                  </div>
                 ) : (
-                  <>Con los datos de los dos émbolos aparecen aquí las fórmulas con tus números.</>
+                  <span key="rama-2">Con los datos de los dos émbolos aparecen aquí las fórmulas con tus números.</span>
                 )}
               </div>
             </div>
@@ -795,16 +795,16 @@ export default function SimuladorPrincipioPascalPage() {
               </div>
               <div className={styles.formulaBox}>
                 {tubo ? (
-                  <>
+                  <div key="rama-1">
                     <p className={styles.formulaLinea}>
                       <code>ρ_A·g·h_A = ρ_B·g·h_B</code> (g se simplifica)
                     </p>
                     <p className={styles.formulaLinea}>
                       <code>h_A = {formatNumber(anadido.densidad, 0)} · {formatoSignificativo(alturaAnadidoCm)}/{formatNumber(fondo.densidad, 0)} = {formatoSignificativo(tubo.alturaFondo * 100)} cm</code>
                     </p>
-                  </>
+                  </div>
                 ) : (
-                  <>Con dos líquidos y la altura de B aparecen aquí las fórmulas con tus números.</>
+                  <span key="rama-2">Con dos líquidos y la altura de B aparecen aquí las fórmulas con tus números.</span>
                 )}
               </div>
             </div>

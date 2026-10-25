@@ -877,17 +877,17 @@ export default function ConvertidorColoresPage() {
             </div>
             <p className={styles.descargaAvisoFormato}>
               {formato === 'png' ? (
-                <>
+                <span key="rama-1">
                   PNG conserva el color <strong>exacto</strong>. Un color plano comprime bien, pero el
                   archivo no es diminuto: un 4K puede rondar los 150-200 KB según el navegador.
-                </>
+                </span>
               ) : (
-                <>
+                <span key="rama-2">
                   <span aria-hidden="true">⚠️</span> JPEG comprime por bloques y remuestrea el color
                   aunque se genere a calidad máxima: el píxel del archivo{' '}
                   <strong>ya no será exactamente {color.hex}</strong>. Para un fondo se nota poco,
                   pero si necesitas el código fiel, usa PNG.
-                </>
+                </span>
               )}
             </p>
           </fieldset>

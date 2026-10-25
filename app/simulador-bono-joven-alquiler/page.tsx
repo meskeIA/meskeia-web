@@ -594,20 +594,20 @@ export default function SimuladorBonoJovenAlquilerPage() {
               </h3>
               <p className={styles.resultadoTexto}>
                 {rentaDentroDelLimite === true ? (
-                  <>
+                  <span key="rama-1">
                     Cumples los requisitos obligatorios que se pueden comprobar aquí, incluida la renta,
                     aunque algunos aspectos adicionales (documentación completa, disponibilidad de fondos
                     en tu CA) pueden condicionar la aprobación final.
-                  </>
+                  </span>
                 ) : (
-                  <>
+                  <span key="rama-2">
                     De momento no fallas ninguno de los requisitos que has respondido, pero todavía no se
                     puede decir que cumplas los obligatorios: falta la renta, que el art. 133.1.e impone
                     igual que los demás.{' '}
                     {alquilerInvalido
                       ? 'La que has introducido no es válida: corrígela aquí arriba.'
                       : 'Introdúcela aquí arriba para comprobarla contra su tope.'}
-                  </>
+                  </span>
                 )}{' '}
                 Consulta con tu Comunidad Autónoma.
               </p>

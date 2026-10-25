@@ -490,9 +490,9 @@ export default function EtiquetaDgtPage() {
                 {resultado.etiqueta === 'ninguna' ? (
                   <strong>Sin etiqueta</strong>
                 ) : (
-                  <>
+                  <span key="rama-1">
                     Etiqueta <strong>{resultado.nombre}</strong>
-                  </>
+                  </span>
                 )}
               </h2>
               <p className={styles.etiquetaDesc}>{resultado.descripcion}</p>

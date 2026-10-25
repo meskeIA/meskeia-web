@@ -1098,17 +1098,17 @@ export default function AsistenteAltaAutonomoPage() {
 
                 <p className={styles.basesInfo} aria-live="polite">
                   {tramo ? (
-                    <>
+                    <span key="rama-1">
                       <strong>Tramo {tramo.id}</strong>
                       {` (rendimientos ${horquillaRendimientos(tramo)}/mes)`}
                       : base entre {formatCurrency(tramo.baseMinima)} y {formatCurrency(tramo.baseMaxima)}.
-                    </>
+                    </span>
                   ) : (
-                    <>
+                    <span key="rama-2">
                       Sin rendimientos, la base mínima es la del tramo 1 ({formatCurrency(TRAMO_1.baseMinima)}), que
                       solo corresponde a rendimientos de hasta {formatCurrency(TRAMO_1.rendimientoMax ?? 0)}/mes. Con
                       más rendimientos la base mínima sube: indícalos arriba.
-                    </>
+                    </span>
                   )}
                 </p>
 

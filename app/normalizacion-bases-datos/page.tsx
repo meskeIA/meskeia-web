@@ -545,7 +545,7 @@ export default function NormalizacionBasesDatosPage() {
 
             <p className={styles.veredictoCierre} data-superclave={resultadoCierre.esSuperclave ? 'si' : 'no'}>
               {resultadoCierre.esSuperclave ? (
-                <>
+                <span key="rama-1">
                   <span aria-hidden="true">✔</span> Su cierre llega a TODOS los atributos, así que{' '}
                   <strong>
                     {'{'}
@@ -553,9 +553,9 @@ export default function NormalizacionBasesDatosPage() {
                     {'}'} es superclave
                   </strong>
                   . Será además clave candidata si ningún subconjunto suyo lo consigue también.
-                </>
+                </span>
               ) : (
-                <>
+                <span key="rama-2">
                   <span aria-hidden="true">✘</span> Su cierre NO llega a todos los atributos, así que{' '}
                   <strong>
                     {'{'}
@@ -567,7 +567,7 @@ export default function NormalizacionBasesDatosPage() {
                     .filter((a) => !enMinusculas(resultadoCierre.resultado).has(a.toLowerCase()))
                     .join(', ')}
                   .
-                </>
+                </span>
               )}
             </p>
           </div>

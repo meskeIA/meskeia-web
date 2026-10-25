@@ -1340,15 +1340,15 @@ export default function SimuladorAutomatasFinitos() {
                   Al autómata le faltan transiciones. Una transición que falta equivale a ir a un estado
                   trampa, así que se añade uno implícito, <strong>∅</strong>: no es final y de él no se sale.
                   {minimizacion.trampa.length > 0 ? (
-                    <>
+                    <span key="rama-1">
                       {' '}
                       <strong>{minimizacion.trampa.join(', ')}</strong>{' '}
                       {minimizacion.trampa.length === 1 ? 'resulta equivalente' : 'resultan equivalentes'} a
                       él (desde ahí no se llega a ningún final), así que en el mínimo las transiciones que
                       faltaban van a esa clase.
-                    </>
+                    </span>
                   ) : (
-                    <> Ningún estado dibujado es equivalente a él, así que no aparece en el mínimo.</>
+                    <span key="rama-2"> Ningún estado dibujado es equivalente a él, así que no aparece en el mínimo.</span>
                   )}
                 </p>
               )}
@@ -1367,19 +1367,19 @@ export default function SimuladorAutomatasFinitos() {
               <p className={styles.convResumen}>
                 {minimizacion.fusionados.length === 0 ? (
                   minimizacion.inalcanzables.length === 0 ? (
-                    <>
+                    <span key="rama-1">
                       Ningún par de estados resultó equivalente: el autómata{' '}
                       <strong>ya era mínimo</strong> con sus{' '}
                       {contar(minimizacion.automata.estados.length, 'estado', 'estados')}.
-                    </>
+                    </span>
                   ) : (
-                    <>
+                    <span key="rama-2">
                       Ningún par de estados resultó equivalente. Sin los inalcanzables, el autómata mínimo
                       tiene <strong>{contar(minimizacion.automata.estados.length, 'estado', 'estados')}</strong>.
-                    </>
+                    </span>
                   )
                 ) : (
-                  <>
+                  <span key="rama-3">
                     Se fusionan{' '}
                     {minimizacion.fusionados.map((g, i) => (
                       <span key={i}>
@@ -1389,7 +1389,7 @@ export default function SimuladorAutomatasFinitos() {
                     ))}
                     . El autómata mínimo tiene{' '}
                     <strong>{contar(minimizacion.automata.estados.length, 'estado', 'estados')}</strong>.
-                  </>
+                  </span>
                 )}
               </p>
               <button

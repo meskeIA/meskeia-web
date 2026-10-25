@@ -2151,7 +2151,7 @@ export default function SimuladorCompraventaPage() {
                           Ahora nombra el tipo que de verdad se ha cobrado. */}
                       <p className={styles.avisoReducidosTexto}>
                         {resultadosComprador.tipoElegido.esReducido ? (
-                          <>
+                          <span key="rama-1">
                             El cálculo aplica el{' '}
                             <strong>{formatNumber(resultadosComprador.tipoElegido.tipo, 2)}&nbsp;%</strong>
                             {resultadosComprador.tipoElegido.nombre
@@ -2159,12 +2159,12 @@ export default function SimuladorCompraventaPage() {
                               : ''}
                             . En {nombreEnFrase(ccaa)} hay además tipos más bajos que dependen
                             de requisitos que no preguntamos:
-                          </>
+                          </span>
                         ) : (
-                          <>
+                          <span key="rama-2">
                             El cálculo usa el tipo general porque no podemos comprobar tu situación.
                             En {nombreEnFrase(ccaa)} {resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:
-                          </>
+                          </span>
                         )}
                       </p>
                       <ul className={styles.avisoReducidosLista}>
@@ -3224,15 +3224,15 @@ export default function SimuladorCompraventaPage() {
               </div>
               <p>Marta, {EJEMPLO_MARTA_EDAD} años, compra su primera vivienda habitual de segunda mano en {nombreEnFrase(EJEMPLO_MARTA.ccaa)} por
               {' '}{eurosEnteros(EJEMPLO_MARTA.precio)}. {EJEMPLO_MARTA_JOVEN_APLICA
-                ? <>Al ser menor de {EJEMPLO_MARTA_EDAD_TOPE} años{EJEMPLO_MARTA_TOPE ? <> y no superar los {eurosEnteros(EJEMPLO_MARTA_TOPE)}</> : null}, se aplica el tipo
+                ? <span key="rama-1">Al ser menor de {EJEMPLO_MARTA_EDAD_TOPE} años{EJEMPLO_MARTA_TOPE ? <> y no superar los {eurosEnteros(EJEMPLO_MARTA_TOPE)}</> : null}, se aplica el tipo
               reducido de ITP del {formatTipoNominal(EJEMPLO_MARTA_TIPO_JOVEN)}&nbsp;% ({eurosEnteros(EJEMPLO_MARTA_ITP)}) en lugar del tipo general
-              del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;%.</>
-                : <>Aunque es menor de {EJEMPLO_MARTA_EDAD_TOPE} años, su compra supera el tope de {EJEMPLO_MARTA_TOPE ? eurosEnteros(EJEMPLO_MARTA_TOPE) : 'valor'} del tipo
-              reducido, así que paga el tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;% ({eurosEnteros(EJEMPLO_MARTA_ITP)}).</>} Además paga
+              del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;%.</span>
+                : <span key="rama-2">Aunque es menor de {EJEMPLO_MARTA_EDAD_TOPE} años, su compra supera el tope de {EJEMPLO_MARTA_TOPE ? eurosEnteros(EJEMPLO_MARTA_TOPE) : 'valor'} del tipo
+              reducido, así que paga el tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;% ({eurosEnteros(EJEMPLO_MARTA_ITP)}).</span>} Además paga
               unos {eurosEnteros(EJEMPLO_MARTA_GASTOS)} en notaría ({eurosEnteros(EJEMPLO_MARTA_NOTARIA)}), registro ({eurosEnteros(EJEMPLO_MARTA_REGISTRO)}) y gestoría ({eurosEnteros(EJEMPLO_MARTA_GESTORIA)}).</p>
               <div className={styles.casoResultado}>{EJEMPLO_MARTA_JOVEN_APLICA
-                ? <>Ahorra {eurosEnteros(EJEMPLO_MARTA_AHORRO)} frente al tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;%</>
-                : <>Sin ahorro: el tipo reducido de jóvenes no alcanza a este precio</>}</div>
+                ? <span key="rama-1">Ahorra {eurosEnteros(EJEMPLO_MARTA_AHORRO)} frente al tipo general del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;%</span>
+                : <span key="rama-2">Sin ahorro: el tipo reducido de jóvenes no alcanza a este precio</span>}</div>
             </div>
             <div className={styles.casoCard}>
               <div className={styles.casoHeader}>

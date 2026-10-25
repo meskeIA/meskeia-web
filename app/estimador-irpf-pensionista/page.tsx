@@ -744,8 +744,8 @@ export default function EstimadorIrpfPensionista() {
           <div className={styles.escenarioTip}>
             <span aria-hidden="true">💡</span>{' '}
             {ESC_PENSION_UNICA.rendimientosIntegrosTrabajo <= OBLIGACION.trabajo.unPagador
-              ? <>No está obligado a declarar: cobra solo rendimientos del trabajo de un único pagador y no pasan de {formatCurrency(OBLIGACION.trabajo.unPagador)} (art. 96.2.a LIRPF), sea cual sea la retención. Si le han retenido más de {formatCurrency(ESC_PENSION_UNICA.cuotaIRPF)} en el año, le conviene declarar para recuperar la diferencia.</>
-              : <>Está obligado a declarar: sus rendimientos del trabajo pasan de {formatCurrency(OBLIGACION.trabajo.unPagador)} (art. 96.2.a LIRPF).</>}
+              ? <span key="rama-1">No está obligado a declarar: cobra solo rendimientos del trabajo de un único pagador y no pasan de {formatCurrency(OBLIGACION.trabajo.unPagador)} (art. 96.2.a LIRPF), sea cual sea la retención. Si le han retenido más de {formatCurrency(ESC_PENSION_UNICA.cuotaIRPF)} en el año, le conviene declarar para recuperar la diferencia.</span>
+              : <span key="rama-2">Está obligado a declarar: sus rendimientos del trabajo pasan de {formatCurrency(OBLIGACION.trabajo.unPagador)} (art. 96.2.a LIRPF).</span>}
           </div>
         </div>
         <div className={styles.escenarioCard}>

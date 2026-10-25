@@ -441,24 +441,24 @@ export default function OrientadorTiposRentaIrpfPage() {
             {importe > 0 && (
               <p className={styles.importeResultado}>
                 {base === 'ahorro' && marginalAhorro !== null ? (
-                  <>
+                  <span key="rama-1">
                     Para {formatNumber(importe, 0)} € en la base del ahorro, el tramo marginal sería{' '}
                     <strong>{marginalAhorro} %</strong> (de forma aislada; se suma al resto de tus rentas del ahorro).
-                  </>
+                  </span>
                 ) : base === 'especial' ? (
-                  <>
+                  <span key="rama-2">
                     {importe > 40000
                       ? `Tributarías al 20 % sobre ${formatNumber(importe - 40000, 0)} € = ${formatNumber((importe - 40000) * 0.2, 0)} €.`
                       : 'Por debajo de 40.000 € el premio está totalmente exento.'}
-                  </>
+                  </span>
                 ) : (
-                  <>
+                  <span key="rama-3">
                     En la base general el tipo depende del total de tus rentas. Usa el{' '}
                     <Link href="/estimador-irpf/" className={styles.enlaceInline}>
                       Estimador de IRPF
                     </Link>{' '}
                     para el cálculo completo.
-                  </>
+                  </span>
                 )}
               </p>
             )}

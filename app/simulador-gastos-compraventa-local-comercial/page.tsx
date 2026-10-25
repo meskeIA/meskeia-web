@@ -1451,7 +1451,7 @@ export default function SimuladorLocalComercialPage() {
                 // Solo se llega aquí en Canarias: en Ceuta y Melilla la renuncia no existe y
                 // `transmision` ya es la segunda mano. Decía que «ni la renuncia ni la inversión
                 // del sujeto pasivo entran en juego», y en el IGIC entran las dos.
-                <>
+                <span key="rama-1">
                   <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención del {territorioActualSinIva.impuesto}:</strong> en{' '}
                   {nombreEnFrase(ccaa)} no se devenga IVA, sino el <strong>{territorioActualSinIva.impuesto}</strong>, y la
                   renuncia es a su exención (art. 50.Cinco Ley canaria 4/2012): la hace el vendedor si el comprador
@@ -1459,9 +1459,9 @@ export default function SimuladorLocalComercialPage() {
                   como en el art. 20.Dos LIVA. Ese {territorioActualSinIva.impuesto} lo <strong>autoliquida el comprador</strong> por inversión
                   del sujeto pasivo, la operación deja de pagar ITP y la escritura paga AJD. Esta calculadora no
                   cifra el {territorioActualSinIva.impuesto}; el AJD sí, con el tipo general de la comunidad.
-                </>
+                </span>
               ) : (
-                <>
+                <span key="rama-2">
                   <strong><span aria-hidden="true">⚠️</span> Renuncia a la exención de IVA (Art. 20.Dos LIVA):</strong> la hace el vendedor
                   empresario, y solo es posible cuando el comprador es empresario o profesional con derecho a
                   deducir el IVA. El IVA se autoliquida
@@ -1472,9 +1472,9 @@ export default function SimuladorLocalComercialPage() {
                       solo está verificado en Valencia (Ley 13/1997, art. 14.Dos: 2 %, hallazgo 1603),
                       y ahí el simulador lo aplica; en el resto usa el general y lo dice. */}
                   {ajdRenunciaPropio
-                    ? <>En {nombreEnFrase(ccaa)} es del {conPct(formatTipoNominal(ajdRenuncia.tipo))}, y es el que aplica este simulador.</>
-                    : <>Este simulador usa el AJD general {deNombreCcaa(ccaa)}: si tu comunidad tiene un tipo propio para la renuncia, el coste real de AJD puede ser mayor.</>}
-                </>
+                    ? <span key="rama-1">En {nombreEnFrase(ccaa)} es del {conPct(formatTipoNominal(ajdRenuncia.tipo))}, y es el que aplica este simulador.</span>
+                    : <span key="rama-2">Este simulador usa el AJD general {deNombreCcaa(ccaa)}: si tu comunidad tiene un tipo propio para la renuncia, el coste real de AJD puede ser mayor.</span>}
+                </span>
               )}
             </div>
           )}

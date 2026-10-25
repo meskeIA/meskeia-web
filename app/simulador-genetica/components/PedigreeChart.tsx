@@ -80,17 +80,17 @@ export default function PedigreeChart({ pedigree, rasgos }: PedigreeChartProps) 
     <div className={styles.pedigreeContainer}>
       <p className={styles.pedigreeRasgo}>
         {segundoRasgo ? (
-          <>
+          <span key="rama-1">
             Árbol de <strong>{rasgo.name}</strong> y <strong>{segundoRasgo.name}</strong>: debajo
             de cada símbolo, el genotipo y el fenotipo de los dos. El símbolo (afectado,
             portador) sigue solo a <strong>{rasgo.name}</strong>. Los cuatro hijos son ejemplos de
             lo que puede salir, no una muestra en proporción
             {queEnsenan ? `: ${queEnsenan}` : ''}. Las proporciones están en Estadísticas.
-          </>
+          </span>
         ) : (
-          <>
+          <span key="rama-2">
             Árbol de <strong>{rasgo.name}</strong>
-          </>
+          </span>
         )}
       </p>
 

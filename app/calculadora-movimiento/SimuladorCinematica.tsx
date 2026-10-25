@@ -142,9 +142,9 @@ export default function SimuladorCinematica({ modo, v0, a, T }: Props) {
       <div className={styles.simControles}>
         <button type="button" className={styles.simBoton} onClick={alternar}>
           {reproduciendo ? (
-            <><span aria-hidden="true">⏸</span> Pausa</>
+            <span key="rama-1"><span aria-hidden="true">⏸</span> Pausa</span>
           ) : (
-            <><span aria-hidden="true">▶</span> {t >= T ? 'Reproducir de nuevo' : 'Reproducir'}</>
+            <span key="rama-2"><span aria-hidden="true">▶</span> {t >= T ? 'Reproducir de nuevo' : 'Reproducir'}</span>
           )}
         </button>
         <button type="button" className={styles.simBotonSecundario} onClick={reiniciar}>

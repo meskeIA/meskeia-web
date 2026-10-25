@@ -1273,17 +1273,17 @@ export default function ConversorCnaeIaePage() {
                   {CNAE_VIGENCIA.vigente} ({CNAE_VIGENCIA.normaVigente}), y
                   estas son las clases actuales que recogen esa actividad
                   {homonimaEsOtraActividad && vigenteHomonima ? (
-                    <>
+                    <span key="rama-1">
                       . <strong>Ojo</strong>: ese mismo número también es una clase VIGENTE
                       distinta —{vigenteHomonima.codigo} {vigenteHomonima.titulo}—, que{' '}
                       <strong>no</strong> recoge la actividad que buscas y aparece igualmente
                       en la lista
-                    </>
+                    </span>
                   ) : vigenteHomonima ? (
-                    <>
+                    <span key="rama-2">
                       , entre ellas <strong>{vigenteHomonima.codigo} {vigenteHomonima.titulo}</strong>,
                       que conserva el mismo número en la clasificación nueva
-                    </>
+                    </span>
                   ) : null}
                   :
                 </p>

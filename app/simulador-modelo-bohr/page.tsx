@@ -398,7 +398,7 @@ export default function SimuladorModeloBohrPage() {
 
             <div className={styles.formulaBox}>
               {t && eInicial !== null && eFinal !== null ? (
-                <>
+                <div key="rama-1">
                   <p className={styles.formulaLinea}>
                     <code>Eₙ = −{formatNumber(ENERGIA_IONIZACION_EV, 3)}/n² eV</code>
                   </p>
@@ -418,9 +418,9 @@ export default function SimuladorModeloBohrPage() {
                       <> · con R = 1,097·10⁷ m⁻¹ del libro sale {formatoSignificativo(lambdaLibro, 4)} nm</>
                     )}
                   </p>
-                </>
+                </div>
               ) : (
-                <>Con dos niveles distintos aparecen aquí las fórmulas con sus números.</>
+                <span key="rama-2">Con dos niveles distintos aparecen aquí las fórmulas con sus números.</span>
               )}
             </div>
           </div>

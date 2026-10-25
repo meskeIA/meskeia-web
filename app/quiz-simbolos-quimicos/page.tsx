@@ -355,9 +355,9 @@ export default function QuizSimbolosQuimicosPage() {
             <div className={styles.feedbackPanel}>
               <div role="alert" className={`${styles.feedbackMensaje} ${seleccionada === preguntaActual.correcta ? styles.feedbackOk : styles.feedbackFail}`}>
                 {seleccionada === preguntaActual.correcta ? (
-                  <><span aria-hidden="true">✅</span> ¡Correcto! <strong>{preguntaActual.elemento.nombre}</strong> · símbolo <strong>{preguntaActual.elemento.simbolo}</strong> · Z={preguntaActual.elemento.z}</>
+                  <span key="rama-1"><span aria-hidden="true">✅</span> ¡Correcto! <strong>{preguntaActual.elemento.nombre}</strong> · símbolo <strong>{preguntaActual.elemento.simbolo}</strong> · Z={preguntaActual.elemento.z}</span>
                 ) : (
-                  <><span aria-hidden="true">❌</span> La respuesta correcta era: <strong>{preguntaActual.correcta}</strong> ({modo === 'simbolo-nombre' ? `símbolo ${preguntaActual.elemento.simbolo}` : `nombre: ${preguntaActual.elemento.nombre}`})</>
+                  <span key="rama-2"><span aria-hidden="true">❌</span> La respuesta correcta era: <strong>{preguntaActual.correcta}</strong> ({modo === 'simbolo-nombre' ? `símbolo ${preguntaActual.elemento.simbolo}` : `nombre: ${preguntaActual.elemento.nombre}`})</span>
                 )}
               </div>
               <button type="button" ref={botonSiguienteRef} className={styles.btnSiguiente} onClick={siguiente}>

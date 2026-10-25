@@ -486,16 +486,16 @@ export default function DiccionarioRimasPage() {
           {resultado.palabras.length === 0 ? (
             <p className={styles.vacio}>
               {resultado.totalSinFiltrar === 0 ? (
-                <>
+                <span key="rama-1">
                   No hay ninguna palabra que rime en {tipo} con{' '}
                   <strong>{resultado.consulta.palabra}</strong> en este diccionario. Prueba con la
                   otra pestaña: la rima asonante es mucho menos exigente.
-                </>
+                </span>
               ) : (
-                <>
+                <span key="rama-2">
                   Los filtros dejan fuera las {formatNumber(resultado.totalSinFiltrar, 0)} palabras
                   encontradas. Quita alguno para verlas.
-                </>
+                </span>
               )}
             </p>
           ) : (

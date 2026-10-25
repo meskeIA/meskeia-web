@@ -1469,16 +1469,16 @@ export default function SimuladorKmeans() {
             <h2 className={styles.panelTitle}>Tamaños de cada cluster</h2>
             <p className={styles.codoDesc}>
               {espacio.tipo === 'datos' ? (
-                <>
+                <span key="rama-1">
                   Centroides en las unidades de tus columnas: (X = {espacio.nombres.x}; Y ={' '}
                   {espacio.nombres.y}). La inercia va en unidades normalizadas, con cada columna
                   de 0 (su mínimo) a 1 (su máximo), que es donde agrupa el algoritmo.
-                </>
+                </span>
               ) : (
-                <>
+                <span key="rama-2">
                   Centroides en píxeles del lienzo, con el origen abajo a la izquierda (x; y).
                   Los datos sintéticos no tienen otras unidades.
-                </>
+                </span>
               )}
             </p>
             <div className={styles.clustersGrid}>

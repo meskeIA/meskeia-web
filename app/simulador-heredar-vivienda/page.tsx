@@ -1563,15 +1563,15 @@ export default function SimuladorHeredarViviendaPage() {
                   ingresar una cifra que no existe. Es la reparación del 778 pasada de frenada.
                 */}
                 {regularizacionVivienda > 0 ? (
-                  <>
+                  <span key="rama-1">
                     Hay que presentar una autoliquidación complementaria e ingresar los{' '}
                     <strong>{formatCurrency(regularizacionVivienda)}</strong> que la reducción ahorró,
                     más intereses de demora (que dependen de las fechas reales y no se calculan aquí).
                     El plazo para presentarla lo fija la normativa de tu comunidad autónoma: compruébalo
                     antes de que corran más intereses.
-                  </>
+                  </span>
                 ) : (
-                  <>
+                  <span key="rama-2">
                     Con estos datos, <strong>quitar la reducción no cambia la cuota</strong>: los
                     beneficios de {CCAA_LIST.find(c => c.id === ccaa)?.label ?? 'tu comunidad'} llegan
                     después de ella y el ISD sale igual a{' '}
@@ -1579,7 +1579,7 @@ export default function SimuladorHeredarViviendaPage() {
                     que no hay importe que devolver. Aun así, el incumplimiento del plazo de
                     mantenimiento se comunica a la administración de tu comunidad autónoma, que es
                     quien fija cómo y cuándo.
-                  </>
+                  </span>
                 )}
                 {ccaa !== 'cataluna' && ' Otras comunidades fijan plazos de mantenimiento propios: comprueba el de la tuya.'}
               </div>

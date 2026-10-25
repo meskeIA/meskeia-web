@@ -638,18 +638,18 @@ export default function SimuladorJubilacionPublicaPage() {
             </div>
             <p className={styles.resultAgeDetail}>
               {resultadoEdad.cotizacionSuficiente ? (
-                <>
+                <span key="rama-1">
                   Con {formatNumber(anosCalculados, Number.isInteger(anosCalculados) ? 0 : 1)} años cotizados, superas el umbral de{' '}
                   {edadTexto(resultadoEdad.cotizacionNecesaria.anios, resultadoEdad.cotizacionNecesaria.meses)}{' '}
                   necesarios para jubilarte a los <strong>65 años</strong>.
-                </>
+                </span>
               ) : (
-                <>
+                <span key="rama-2">
                   Con {formatNumber(anosCalculados, Number.isInteger(anosCalculados) ? 0 : 1)} años cotizados, no alcanzas el umbral de{' '}
                   {edadTexto(resultadoEdad.cotizacionNecesaria.anios, resultadoEdad.cotizacionNecesaria.meses)}{' '}
                   necesarios para jubilarte a los 65. Tu edad ordinaria es{' '}
                   <strong>{edadTexto(resultadoEdad.edadAlternativa.anios, resultadoEdad.edadAlternativa.meses)}</strong>.
-                </>
+                </span>
               )}
             </p>
 

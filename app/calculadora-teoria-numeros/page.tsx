@@ -680,26 +680,26 @@ export default function CalculadoraTeoriaNumerosPage() {
                       </h4>
                       <p className={styles.antiprimoTexto}>
                         {analisisAntiprimo.esAntiprimo ? (
-                          <>
+                          <span key="rama-1">
                             Tiene {analisisAntiprimo.divisores} divisores y ningún número menor
                             que él llega a esa cifra: es un récord. Por eso se le llama número
                             altamente compuesto.
-                          </>
+                          </span>
                         ) : (
-                          <>
+                          <span key="rama-2">
                             Tiene {analisisAntiprimo.divisores}{' '}
                             {analisisAntiprimo.divisores === 1 ? 'divisor' : 'divisores'}
                             {analisisAntiprimo.primeroConTantos &&
                             analisisAntiprimo.primeroConTantos.numero !== analisisAntiprimo.numero ? (
-                              <>
+                              <span key="rama-1">
                                 , pero {formatNumber(analisisAntiprimo.primeroConTantos.numero, 0)} ya
                                 llegaba a {analisisAntiprimo.primeroConTantos.divisores} siendo más
                                 pequeño, así que no bate ningún récord.
-                              </>
+                              </span>
                             ) : (
-                              <>, que no baten el récord de ningún número anterior.</>
+                              <span key="rama-2">, que no baten el récord de ningún número anterior.</span>
                             )}
-                          </>
+                          </span>
                         )}
                       </p>
                       <p className={styles.antiprimoVecinos}>
@@ -718,7 +718,7 @@ export default function CalculadoraTeoriaNumerosPage() {
                           </>
                         )}
                         {analisisAntiprimo.siguiente ? (
-                          <>
+                          <span key="rama-1">
                             Siguiente:{' '}
                             <button
                               type="button"
@@ -729,13 +729,13 @@ export default function CalculadoraTeoriaNumerosPage() {
                               {formatNumber(analisisAntiprimo.siguiente.numero, 0)}
                             </button>{' '}
                             ({analisisAntiprimo.siguiente.divisores} divisores).
-                          </>
+                          </span>
                         ) : (
-                          <>
+                          <span key="rama-2">
                             El siguiente queda por encima de{' '}
                             {formatNumber(analisisAntiprimo.limiteExplorado, 0)}, que es hasta donde
                             se ha comprobado.
-                          </>
+                          </span>
                         )}
                       </p>
                     </div>

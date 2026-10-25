@@ -256,7 +256,7 @@ export default function GeneradorPalabrasClavePage() {
           {totalKeywords > 0 && (
             <div className={styles.actions}>
               <button type="button" onClick={copiarTodas} className={styles.btnPrimary}>
-                {copiado ? <><span aria-hidden="true">✅</span> Copiadas!</> : <><span aria-hidden="true">📋</span> Copiar todas ({totalKeywords})</>}
+                {copiado ? <span key="rama-1"><span aria-hidden="true">✅</span> Copiadas!</span> : <span key="rama-2"><span aria-hidden="true">📋</span> Copiar todas ({totalKeywords})</span>}
               </button>
               <button type="button" onClick={exportarCSV} className={styles.btnSecondary}>
                 <span aria-hidden="true">📥</span> Exportar CSV

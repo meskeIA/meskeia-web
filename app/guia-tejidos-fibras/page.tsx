@@ -705,7 +705,7 @@ export default function GuiaTejidosFibrasPage() {
               onClick={() => setSostenibilidadActiva(s)}
               aria-pressed={sostenibilidadActiva === s}
             >
-              {s === 'Alta' ? <><span aria-hidden="true">🌱</span> Alta</> : s === 'Media' ? <><span aria-hidden="true">🟡</span> Media</> : s === 'Baja' ? <><span aria-hidden="true">🔴</span> Baja</> : <>Todas</>}
+              {s === 'Alta' ? <span key="rama-1"><span aria-hidden="true">🌱</span> Alta</span> : s === 'Media' ? <span key="rama-2"><span aria-hidden="true">🟡</span> Media</span> : s === 'Baja' ? <span key="rama-3"><span aria-hidden="true">🔴</span> Baja</span> : <span key="rama-4">Todas</span>}
             </button>
           ))}
         </div>

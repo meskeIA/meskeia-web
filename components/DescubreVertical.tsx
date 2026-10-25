@@ -268,14 +268,14 @@ export default function DescubreVertical() {
         <span className={styles.icono} aria-hidden="true">{banda.icono}</span>
         <span className={styles.texto}>
           {banda.etiqueta ? (
-            <>
+            <span key="rama-1">
               {banda.intro} <strong>{banda.etiqueta}</strong> en{' '}
               <strong>{banda.marca}</strong>, {banda.descripcion}{' '}
-            </>
+            </span>
           ) : (
-            <>
+            <span key="rama-2">
               {banda.intro} <strong>{banda.marca}</strong>{banda.descripcion}{' '}
-            </>
+            </span>
           )}
           <span className={styles.cta}>{banda.cta}</span>
         </span>

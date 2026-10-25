@@ -482,18 +482,18 @@ export default function CalculadoraTramosPage() {
                     peor.
                   </strong>{' '}
                   {zonaActual.zona.tipo === 'neto' ? (
-                    <>
+                    <span key="rama-1">
                       Con {fmtBase(calculo.base)} quedan {fmtImporte(calculo.base - calculo.esc.total)}, menos que con
                       solo {fmtBase(zonaActual.limite)} ({fmtImporte(zonaActual.limite * (1 - zonaActual.tipoAntes / 100))}
                       ). Por tramos no ocurre: quedan {fmtImporte(calculo.base - calculo.prog.total)}.
-                    </>
+                    </span>
                   ) : (
-                    <>
+                    <span key="rama-2">
                       {fmtBase(calculo.base)} salen por {fmtImporte(calculo.esc.total)}, menos que{' '}
                       {fmtBase(zonaActual.limite)} (
                       {fmtImporte(zonaActual.limite * (modo === 'porcentaje' ? zonaActual.tipoAntes / 100 : zonaActual.tipoAntes))}
                       ).
-                    </>
+                    </span>
                   )}
                 </div>
               )}
@@ -648,16 +648,16 @@ export default function CalculadoraTramosPage() {
                             {' '}
                             {u.zona.tipo === 'neto' ? 'Lo que queda es menor que en el límite' : 'Se paga menos que en el límite'}{' '}
                             {u.zona.infinita ? (
-                              <>en adelante: la zona no se cierra.</>
+                              <span key="rama-1">en adelante: la zona no se cierra.</span>
                             ) : (
-                              <>
+                              <span key="rama-2">
                                 hasta {fmtLimiteZona(u.zona.hasta)}
                                 {u.zona.recortada
                                   ? ' (como mínimo: ahí acaba el tramo).'
                                   : fmtLimiteZona(u.zona.hasta).endsWith('.')
                                     ? ''
                                     : '.'}
-                              </>
+                              </span>
                             )}
                           </>
                         )}

@@ -120,10 +120,10 @@ export default function PlazosLegalesPage() {
         <div className={styles.resultsHeader}>
           <h2 className={styles.sectionTitle}>
             {selectedCategory
-              ? <><span aria-hidden="true">📋</span> {CATEGORIES.find(c => c.id === selectedCategory)?.name}</>
+              ? <span key="rama-1"><span aria-hidden="true">📋</span> {CATEGORIES.find(c => c.id === selectedCategory)?.name}</span>
               : searchQuery
-                ? <><span aria-hidden="true">🔍</span> Resultados para "{searchQuery}"</>
-                : <><span aria-hidden="true">📚</span> Todos los plazos</>}
+                ? <span key="rama-2"><span aria-hidden="true">🔍</span> Resultados para "{searchQuery}"</span>
+                : <span key="rama-3"><span aria-hidden="true">📚</span> Todos los plazos</span>}
           </h2>
           <span className={styles.resultsCount}>
             {filteredPlazos.length} {filteredPlazos.length === 1 ? 'resultado' : 'resultados'}

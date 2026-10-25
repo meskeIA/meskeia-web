@@ -852,14 +852,14 @@ export default function SimuladorCarteraPage() {
             aria-disabled={totalPesos !== 100 || simulando || camposInvalidos.length > 0}
           >
             {simulando ? (
-              <>
+              <span key="rama-1">
                 <span className={styles.spinner}></span>
                 Simulando {NUM_SIMULACIONES} escenarios...
-              </>
+              </span>
             ) : (
-              <>
+              <span key="rama-2">
                 <span aria-hidden="true">🎲</span> Simular Cartera
-              </>
+              </span>
             )}
           </button>
 

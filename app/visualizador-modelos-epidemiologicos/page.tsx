@@ -339,8 +339,8 @@ const SeccionSIR = () => {
         </div>
         <p className={styles.r0Texto}>
           {epidemia
-            ? <><strong>Epidemia</strong>: R₀ &gt; 1 significa que cada infectado contagia a más de una persona — la infección se expande. El umbral de inmunidad colectiva es {(100 * (1 - 1 / r0)).toFixed(0)}%.</>
-            : <><strong>Extinción</strong>: R₀ &lt; 1 significa que cada infectado contagia a menos de una persona — la infección desaparece sola. No hay epidemia sostenida.</>
+            ? <span key="rama-1"><strong>Epidemia</strong>: R₀ &gt; 1 significa que cada infectado contagia a más de una persona — la infección se expande. El umbral de inmunidad colectiva es {(100 * (1 - 1 / r0)).toFixed(0)}%.</span>
+            : <span key="rama-2"><strong>Extinción</strong>: R₀ &lt; 1 significa que cada infectado contagia a menos de una persona — la infección desaparece sola. No hay epidemia sostenida.</span>
           }
         </p>
       </div>

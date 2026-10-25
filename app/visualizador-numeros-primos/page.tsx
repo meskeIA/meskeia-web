@@ -452,8 +452,8 @@ function SeccionCriba() {
         <p>
           Solo necesitas comprobar primos hasta <strong>√n</strong>. Para n = {formatNumber(hasta, 0)},{' '}
           {resuelta.primosQueTachan.length > 0
-            ? <>basta con tachar los múltiplos de {listaConY(resuelta.primosQueTachan)}.</>
-            : <>no hay ningún primo cuyo cuadrado quepa, así que no se tacha nada.</>}{' '}
+            ? <span key="rama-1">basta con tachar los múltiplos de {listaConY(resuelta.primosQueTachan)}.</span>
+            : <span key="rama-2">no hay ningún primo cuyo cuadrado quepa, así que no se tacha nada.</span>}{' '}
           Todo número compuesto ≤ n tiene al menos un factor primo ≤ √n.
         </p>
       </div>
