@@ -23,7 +23,7 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
-import { formatNumber, formatCurrency } from '@/lib/formatters';
+import { formatNumber, formatCurrency, formatPercentage } from '@/lib/formatters';
 import styles from './VisualizadorDesigualdadRiqueza.module.css';
 
 ChartJS.register(
@@ -142,6 +142,24 @@ export default function VisualizadorDesigualdadRiqueza() {
 
   useEffect(() => {
     setMontado(true);
+  }, []);
+
+  // Con el equipo cargado, Chart.js pierde a veces el último redimensionado al estrechar la
+  // ventana deprisa y los lienzos se quedan con el ancho anterior (736 px a 390: la página
+  // desbordaba, cabo C0454). Cuando la ventana deja de cambiar, se redimensionan otra vez.
+  useEffect(() => {
+    let espera: ReturnType<typeof setTimeout> | undefined;
+    const alAsentarse = () => {
+      clearTimeout(espera);
+      espera = setTimeout(() => {
+        Object.values(ChartJS.instances).forEach((grafico) => grafico.resize());
+      }, 250);
+    };
+    window.addEventListener('resize', alAsentarse);
+    return () => {
+      clearTimeout(espera);
+      window.removeEventListener('resize', alAsentarse);
+    };
   }, []);
 
   const paisActual = PAISES[paisSeleccionado];
@@ -280,7 +298,7 @@ export default function VisualizadorDesigualdadRiqueza() {
 
           <div className={styles.giniBadge} aria-label={`Coeficiente Gini de ${paisActual.nombre}`}>
             <span className={styles.giniBadgeLabel}>Coeficiente Gini</span>
-            <span className={styles.giniBadgeValor}>{paisActual.gini.toFixed(2)}</span>
+            <span className={styles.giniBadgeValor}>{formatNumber(paisActual.gini, 2)}</span>
           </div>
         </div>
 
@@ -406,10 +424,10 @@ export default function VisualizadorDesigualdadRiqueza() {
                 <tr key={fila.pais}>
                   <td><strong>{fila.pais}</strong></td>
                   <td>{fila.medida}</td>
-                  <td className={styles.celdaNumero}>{fila.giniPre.toFixed(2)}</td>
-                  <td className={styles.celdaNumero}>{fila.giniPost.toFixed(2)}</td>
+                  <td className={styles.celdaNumero}>{formatNumber(fila.giniPre, 2)}</td>
+                  <td className={styles.celdaNumero}>{formatNumber(fila.giniPost, 2)}</td>
                   <td className={styles.celdaReduccion}>
-                    -{((fila.giniPre - fila.giniPost) / fila.giniPre * 100).toFixed(0)}%
+                    {formatPercentage(-(fila.giniPre - fila.giniPost) / fila.giniPre, 0)}
                   </td>
                 </tr>
               ))}
@@ -431,7 +449,7 @@ export default function VisualizadorDesigualdadRiqueza() {
           <p>
             El coeficiente de Gini es el indicador más usado para medir desigualdad. Va de 0
             (igualdad perfecta: todos tienen lo mismo) a 1 (desigualdad máxima: una persona tiene
-            todo). Un Gini de 0.30 se considera bajo; de 0.50 o más, muy alto.
+            todo). Un Gini de 0,30 se considera bajo; de 0,50 o más, muy alto.
           </p>
         </div>
 
@@ -450,7 +468,7 @@ export default function VisualizadorDesigualdadRiqueza() {
           <p>
             La riqueza (patrimonio neto: activos menos deudas) es mucho más desigual que los
             ingresos (salarios y rentas). Una persona puede tener ingresos medios pero acumular
-            riqueza durante décadas. El Gini de riqueza suele ser 0.10-0.20 puntos mayor que el
+            riqueza durante décadas. El Gini de riqueza suele ser 0,10-0,20 puntos mayor que el
             Gini de ingresos en el mismo país.
           </p>
         </div>
