@@ -19,7 +19,7 @@ const PREGUNTAS: Pregunta[] = [
   { id: 'q3',  texto: 'He sufrido una fractura de hueso tras un golpe leve (caída desde mi propia altura) después de los 40 años', puntos: 4 },
   { id: 'q4',  texto: 'Alguno de mis padres tuvo fractura de cadera o pronunciada curvatura de la espalda', puntos: 2 },
   { id: 'q5',  texto: 'Peso menos de 57 kg', puntos: 2 },
-  { id: 'q6',  texto: 'Tuve la menopausia antes de los 45 años, o me extirparon los ovarios sin tomar terapia hormonal sustitutiva (solo mujeres)', puntos: 2, soloMujeres: true },
+  { id: 'q6',  texto: 'Tuve la menopausia antes de los 45 años, o me extirparon los ovarios sin tomar terapia hormonal sustitutiva', puntos: 2, soloMujeres: true },
   { id: 'q7',  texto: 'He tomado pastillas de cortisona u otros corticoides durante más de 3 meses en total', puntos: 3 },
   { id: 'q8',  texto: 'Tengo artritis reumatoide u otra enfermedad reumática inflamatoria diagnosticada', puntos: 2 },
   { id: 'q9',  texto: 'Fumo actualmente', puntos: 1 },
@@ -183,12 +183,18 @@ export default function EstimadorRiesgoOsteoporosis() {
                 checked={respuestas.has(pregunta.id)}
                 onChange={() => toggleRespuesta(pregunta.id)}
                 onClick={e => e.stopPropagation()}
-                aria-label={pregunta.texto}
+                aria-labelledby={`preg-${pregunta.id}`}
               />
-              <label className={styles.preguntaTexto}>
+              {/*
+                Un <span> y no un <label>: el label no rotulaba nada, y con htmlFor el clic en el
+                texto conmutaría dos veces (el del label y el onClick de la fila). El nombre de la
+                casilla sale de aquí, con el «(solo mujeres)», que el texto llevaba además escrito
+                dos veces (cabo C0452)
+              */}
+              <span id={`preg-${pregunta.id}`} className={styles.preguntaTexto}>
                 {pregunta.texto}
                 {pregunta.soloMujeres && <em> (solo mujeres)</em>}
-              </label>
+              </span>
             </div>
           ))}
 

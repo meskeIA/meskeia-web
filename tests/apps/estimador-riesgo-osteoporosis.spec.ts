@@ -54,6 +54,24 @@ test('confirmando, sí se emite el resultado de riesgo bajo', async ({ page }) =
   await expect(avisoSinFactores(page)).toHaveCount(0);
 });
 
+test('cabo C0452: la casilla de la menopausia se llama con su «(solo mujeres)», una sola vez, y conmuta una vez con el texto o con la casilla', async ({
+  page,
+}) => {
+  await abrir(page);
+  const casilla = page.getByRole('checkbox', {
+    name: /^Tuve la menopausia antes de los 45 años.*sustitutiva \(solo mujeres\)$/,
+  });
+  await expect(casilla).toHaveCount(1);
+  // El texto llevaba «(solo mujeres)» escrito y además el <em> lo repetía
+  const fila = page.locator('[class*="preguntaItem"]').filter({ has: casilla });
+  expect(((await fila.textContent()) ?? '').match(/solo mujeres/g)).toHaveLength(1);
+
+  await fila.locator('[class*="preguntaTexto"]').click();
+  await expect(casilla).toBeChecked();
+  await casilla.click();
+  await expect(casilla).not.toBeChecked();
+});
+
 test('con un factor marcado el veredicto sale a la primera, sin confirmación', async ({ page }) => {
   await abrir(page);
   await page.locator('input[type="checkbox"]').first().check();
