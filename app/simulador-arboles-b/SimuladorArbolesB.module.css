@@ -129,6 +129,9 @@
 
 .opRow {
   display: flex;
+  /* «Limpiar todo» (nowrap) salía 61 px de la fila en móvil (cabo C0417), como en
+     simulador-arboles-bst-avl (hallazgo 2299) */
+  flex-wrap: wrap;
   gap: var(--spacing-sm);
 }
 
@@ -204,6 +207,9 @@
 /* Velocidad */
 .speedControl {
   display: flex;
+  /* Etiqueta en nowrap + deslizador + valor no caben en móvil: sin salto de línea el valor
+     salía de la pantalla (cabos C0416-C0421, el mismo bloque en seis simuladores) */
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-md);

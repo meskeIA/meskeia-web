@@ -340,6 +340,9 @@
 
 .speedControl {
   display: flex;
+  /* Etiqueta en nowrap + deslizador + valor no caben en móvil: sin salto de línea el valor
+     salía de la pantalla (cabos C0416-C0421, el mismo bloque en seis simuladores) */
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
