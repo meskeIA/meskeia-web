@@ -7203,7 +7203,12 @@ test.describe('Inspector 19/10/2026 — las otras rentas del ahorro: un tramo cr
     expect(panel).not.toMatch(/IRPF sobre ganancia|Ganancia patrimonial|base del ahorro \(del/);
     expect(await valorTarjeta(page, 'Impuesto sobre la renta de la venta')).toBe('Sin calcular');
     expect(panel).toContain('IMPORTE NETO VENDEDOR (PARCIAL)');
-    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('24.895,00 €');
+    // Desde el 25/10/2026 (hallazgo 3500, cabo C0441) la pestaña pregunta «¿Qué compraste?» y de
+    // serie es el solar: el suelo en la venta, 25.000 × 3.000 / 9.000 = 8.333,33, no supera los
+    // 18.000 pagados por él → plusvalía NO SUJETA (art. 104.5 TRLRHL) y el neto pasa de 24.895,00 €
+    // a 25.000,00 €.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('25.000,00 €');
   });
 
   // HALLAZGO [19/10-b] (bajo, contenido) — el ejemplo «Vender un trastero» del bloque educativo
@@ -7328,6 +7333,8 @@ const recuadro2110 = (page: Page) => texto(page.locator('[class*="infoCcaaGrid"]
 async function promotorAndalucia2110(page: Page): Promise<void> {
   await obraNuevaIndependiente2110(page, 'andalucia', '22000', '280');
   await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+  // Un trastero ya construido, para conservar el reparto del caso (hallazgo 3500, 25/10/2026).
+  await page.locator('#compra-original').selectOption('construido');
   await sembrar(page, 'Precio de compra original', '14000');
   await sembrar(page, 'Años de propiedad', '3');
   await sembrar(page, 'Valor catastral del suelo', '2000');
@@ -7401,6 +7408,8 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
     await expect(avisoReducidos0810(page)).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    // Lo comprado, un trastero ya construido: el reparto de este caso (hallazgo 3500; el solar, al final).
+    await page.locator('#compra-original').selectOption('construido');
     await sembrar(page, 'Precio de compra original', '14000');
     await sembrar(page, 'Años de propiedad', '3');
     await sembrar(page, 'Valor catastral del suelo', '2000');
@@ -7430,6 +7439,15 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
     expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toContain(
       'No descuenta la comisión inmobiliaria, que no se ha podido leer: el neto real es menor que este.',
     );
+
+    // Y con el solar, que es lo de serie desde el 25/10/2026 (hallazgo 3500): el suelo en la venta,
+    // 22.000 × 2.000 / 6.000 = 7.333,33, no supera los 14.000 pagados por él → NO SUJETA (art. 104.5
+    // TRLRHL); con la comisión del 3 %, total 660 + 150 = 810,00 y neto 21.190,00 €.
+    await sembrar(page, 'Comisión inmobiliaria (%)', '3');
+    await page.locator('#compra-original').selectOption('solar');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('810,00 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('21.190,00 €');
   });
 
   /**
@@ -7934,7 +7952,8 @@ test.describe('Inspector 25/10/2026 — Andalucía, el 30 % del ahorro en Castil
   });
 
   /**
-   * [25/10-a] (cálculo, medio) — ABIERTO. Cabo C0441: la forma del hallazgo 3466 de la referencia
+   * [25/10-a] (cálculo, medio) — REPARADO 25/10/2026 (hallazgo 3500): «¿Qué compraste?» y
+   * adquisicionSoloSuelo, como la referencia. Cabo C0441: la forma del hallazgo 3466 de la referencia
    * (reparado allí en 92df481b) y del registrado hoy en garaje (3489), que no llegó a esta hermana.
    * En «Primera mano» vende el promotor, que normalmente compró el SUELO. La pestaña Vendedor solo pide
    * «Precio de compra original · Lo que pagaste cuando compraste el trastero», y `calcularVendedor`
@@ -7955,7 +7974,6 @@ test.describe('Inspector 25/10/2026 — Andalucía, el 30 % del ahorro en Castil
    * 21.120,00 a 21.190,00 €.
    */
   test('[25/10-a] cabo C0441 — en obra nueva, la plusvalía del promotor que compró un solar compara la compra entera con el suelo de la venta (art. 104.5 TRLRHL)', async ({ page }) => {
-    test.fail(!T25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-a] (cabo C0441), la plusvalía del promotor sin adquisicionSoloSuelo');
     // El motor compartido ya lo sabe hacer desde 92df481b: es el ancla de lo esperado.
     const motor = (precioCompra: number, adquisicionSoloSuelo?: boolean) =>
       calcularPlusvaliaMunicipal({
@@ -7997,7 +8015,8 @@ test.describe('Inspector 25/10/2026 — Andalucía, el 30 % del ahorro en Castil
   });
 
   /**
-   * [25/10-b] (dato, bajo) — ABIERTO. Cabo C0442: la forma del 3467 de la referencia, del 3472 de
+   * [25/10-b] (dato, bajo) — REPARADO 25/10/2026 (hallazgo 3501): SALVEDAD_PLUSVALIA_NO_RESIDENTE en
+   * la constante y en el ejemplo. Cabo C0442: la forma del 3467 de la referencia, del 3472 de
    * local-comercial y del registrado hoy en garaje (3490). TRLRHL, art. 106.2 (BOE-A-2004-4214,
    * consolidado, leído el 25/10/2026): en las transmisiones onerosas tiene «la consideración de sujeto
    * pasivo sustituto del contribuyente» quien adquiere el terreno «cuando el contribuyente sea una
@@ -8010,7 +8029,6 @@ test.describe('Inspector 25/10/2026 — Andalucía, el 30 % del ahorro en Castil
    * (data/itp-ccaa.ts) en esa constante y en el ejemplo.
    */
   test('[25/10-b] cabo C0442 — la plusvalía «del vendedor» nombra al comprador sustituto cuando vende un no residente (art. 106.2 TRLRHL)', async ({ page }) => {
-    test.fail(!T25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-b] (cabo C0442), la plusvalía sin la salvedad del no residente');
     await t25Abrir(page);
     const bocas = await page.evaluate(() => {
       const n = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ');
@@ -8106,7 +8124,7 @@ const t25Caida = (page: Page) => page.getByRole('heading', { name: 'Algo salió 
 
 test.describe('Inspector 25/10/2026 — la página traducida por el navegador', () => {
   /**
-   * [25/10-c] (operativa, medio) — ABIERTO. Con la página traducida, al cambiar de comunidad el formulario
+   * [25/10-c] (operativa, medio) — REPARADO 25/10/2026 (hallazgo 3503). Con la página traducida, al cambiar de comunidad el formulario
    * se queda con la ANTERIOR bajo el nombre de la nueva, mientras la tarjeta del ITP ya cobra la nueva:
    * React escribe en el nodo de texto que el traductor retiró cuando una cifra o un nombre va junto a otro
    * texto. Medido aquí (la forma del registrado hoy en garaje y del 3477 de nave-industrial):
@@ -8121,7 +8139,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
    *     Esperado «En Cantabria existen:», «4,00 %» y «… · Valor ≤ 300.000 €» (`ITP_CCAA.cantabria`).
    */
   test('[25/10-c] con la página traducida, el recuadro, la nota de la escala y «Podrías pagar menos» dicen los de la comunidad elegida', async ({ page }) => {
-    test.fail(!T25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-c], el formulario traducido se queda con la comunidad anterior');
     expect(ITP_CCAA.cataluna.tipoGeneral).toBe(10);
     expect(ITP_CCAA.cataluna.ajd).toBe(1.5);
     expect(ITP_CCAA['castilla-leon'].tramosProgresivos?.map((t) => t.tipo)).toEqual([8, 10]);
@@ -8169,7 +8186,7 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
   });
 
   /**
-   * [25/10-d] (operativa, alto) — ABIERTO. Con la página traducida, dos cambios del aviso «Podrías pagar
+   * [25/10-d] (operativa, alto) — REPARADO 25/10/2026 (hallazgo 3502). Con la página traducida, dos cambios del aviso «Podrías pagar
    * menos» tumban la app en «Algo salió mal» (NotFoundError en removeChild): React retira un nodo de texto
    * suelto que el traductor ya cambió por <font>.
    *   · Joven en Cantabria, 350.000 → 250.000 €: la línea «Jóvenes < 36 años» pierde «· ⚠️ tu precio
@@ -8182,7 +8199,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
    * cadenas. Es el registrado hoy en garaje, medido aquí con su caso propio.
    */
   test('[25/10-d] con la página traducida, salir del tope de un reducido o pasar a una comunidad sin él no tumba la app', async ({ page }) => {
-    test.fail(!T25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-d], dos caídas del aviso «Podrías pagar menos» con la página traducida');
     expect(ITP_CCAA.cantabria.tipoGeneral).toBe(9);
     expect(ITP_CCAA.cantabria.tiposReducidos.find((r) => /j[óo]ven/i.test(r.nombre))?.valorMaximo).toBe(300000);
     expect(ITP_CCAA.cantabria.tiposReducidos.find((r) => r.nombre === 'Familia numerosa')?.valorMaximo).toBe(300000);
@@ -8224,7 +8240,7 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
   });
 
   /**
-   * [25/10-e] (operativa, bajo) — ABIERTO, hallazgo 3498. Registrado UNA vez, en estimador-compraventa-inmueble,
+   * [25/10-e] (operativa, bajo) — REPARADO 25/10/2026, hallazgo 3498 (412caa1e). Registrado UNA vez, en estimador-compraventa-inmueble,
    * porque es un componente compartido: este test lo vigila también aquí. Con la página traducida, en obra nueva, al pasar de Canarias a
    * Ceuta el aviso de territorio sin IVA dice «tributa por el IPSI (Impuesto General Indirecto Canario)»:
    * el nombre largo se queda con el de Canarias mientras la sigla, la tarjeta («IPSI») y la ciudad ya han
@@ -8235,7 +8251,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
    *   (`TERRITORIOS_SIN_IVA.ceuta.nombre`).
    */
   test('[25/10-e] con la página traducida, el aviso de territorio sin IVA nombra el impuesto de la comunidad elegida', async ({ page }) => {
-    test.fail(!T25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-e], el aviso de territorio sin IVA traducido se queda con el nombre de Canarias');
     const canarias = TERRITORIOS_SIN_IVA.canarias;
     const ceuta = TERRITORIOS_SIN_IVA.ceuta;
     expect(canarias?.impuesto).toBe('IGIC');

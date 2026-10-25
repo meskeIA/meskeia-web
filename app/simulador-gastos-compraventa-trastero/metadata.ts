@@ -1,5 +1,11 @@
 import { Metadata } from 'next';
-import { CASOS_ESCRITURAR, preguntaEscriturar, respuestaEscriturar, tipoGeneralITP } from '@/data/itp-ccaa';
+import {
+  CASOS_ESCRITURAR,
+  preguntaEscriturar,
+  respuestaEscriturar,
+  tipoGeneralITP,
+  SALVEDAD_PLUSVALIA_NO_RESIDENTE,
+} from '@/data/itp-ccaa';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 import { IVA_INMUEBLES_2025, PLUSVALIA_MUNICIPAL_META, BONIFICACION_IIVTNU_CEUTA_MELILLA } from '@/data/fiscal';
 
@@ -47,7 +53,9 @@ export const RESPUESTA_IVA_TRASTERO_NUEVO = `Depende de cómo se compre. Si el p
  * un supuesto de NO SUJECIÓN —«No se producirá la sujeción al impuesto […] respecto de los cuales
  * se constate la inexistencia de incremento de valor»—, que es lo que ya decía la tarjeta.
  */
-export const RESPUESTA_PLUSVALIA_TRASTERO = `Sí. La plusvalía municipal (Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) se aplica también a la venta de trasteros. Desde 2021, el vendedor puede elegir el método más favorable: el objetivo (basado en el valor catastral del suelo y el tiempo de tenencia) o el real (basado en la ganancia efectiva). Si no hay incremento de valor —por ejemplo, si vendes por lo mismo que pagaste o por menos—, la transmisión no está sujeta al impuesto (art. 104.5 del texto refundido de la Ley de Haciendas Locales): no es una exención, el impuesto no llega a devengarse, aunque hay que declararlo y aportar las escrituras de compra y venta. Todo eso es el régimen común: en Navarra y el País Vasco el impuesto se rige por su normativa foral, con sus propias reglas y tipos, y esta calculadora no lo calcula; en Ceuta y Melilla la cuota se bonifica un ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje} % (art. 159.2 TRLRHL), y la calculadora lo aplica. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}\u00A0% como referencia orientativa habitual; cada ayuntamiento fija el suyo, con un máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}\u00A0%.`;
+// La salvedad del no residente (art. 106.2 TRLRHL), de data/itp-ccaa.ts, como la referencia,
+// local-comercial y garaje (hallazgo 3501, cabo C0442): llega sola a la FAQ visible y al FAQPage.
+export const RESPUESTA_PLUSVALIA_TRASTERO = `Sí. La plusvalía municipal (Impuesto sobre el Incremento del Valor de los Terrenos de Naturaleza Urbana) se aplica también a la venta de trasteros, y la paga quien vende, con una excepción: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}. Desde 2021, el vendedor puede elegir el método más favorable: el objetivo (basado en el valor catastral del suelo y el tiempo de tenencia) o el real (basado en la ganancia efectiva). Si no hay incremento de valor —por ejemplo, si vendes por lo mismo que pagaste o por menos—, la transmisión no está sujeta al impuesto (art. 104.5 del texto refundido de la Ley de Haciendas Locales): no es una exención, el impuesto no llega a devengarse, aunque hay que declararlo y aportar las escrituras de compra y venta. Todo eso es el régimen común: en Navarra y el País Vasco el impuesto se rige por su normativa foral, con sus propias reglas y tipos, y esta calculadora no lo calcula; en Ceuta y Melilla la cuota se bonifica un ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje} % (art. 159.2 TRLRHL), y la calculadora lo aplica. Esta calculadora aplica un tipo del ${PLUSVALIA_MUNICIPAL_META.tipoOrientativo}\u00A0% como referencia orientativa habitual; cada ayuntamiento fija el suyo, con un máximo legal del ${PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal}\u00A0%.`;
 
 /**
  * Las tres que se quedaron fuera del mecanismo del hallazgo 774 y que el 1157/1158 cierra.

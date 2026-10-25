@@ -86,7 +86,8 @@ import {
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL,
-  TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION } from '@/data/itp-ccaa';
+  TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION,
+  SALVEDAD_PLUSVALIA_NO_RESIDENTE } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
@@ -378,6 +379,12 @@ interface EntradaVendedor {
    * ahorro, y no se liquida IRPF (hallazgo 3380, AVISO_VENTA_PROMOTOR).
    */
   ventaDelPromotor?: boolean;
+  /**
+   * Obra nueva y lo que compró el promotor fue un solar: la compra se compara entera con el valor
+   * del suelo en la venta (art. 104.5 TRLRHL, «en su caso»; hallazgo 3500, receta del 3466 de la
+   * referencia).
+   */
+  compraSoloSuelo?: boolean;
   /** Dónde está el inmueble: Ceuta y Melilla bonifican la plusvalía y deducen el IRPF; en
    *  territorio foral la plusvalía no es la del TRLRHL (hallazgos 3059-3071, 10/10/2026). */
   ccaa: ComunidadAutonoma;
@@ -414,6 +421,7 @@ function calcularVendedor(e: EntradaVendedor) {
         valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
         // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL).
         ccaa: e.ccaa,
+        adquisicionSoloSuelo: e.compraSoloSuelo,
       })
     : null;
   const plusvalia = resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0;
@@ -484,6 +492,8 @@ export default function SimuladorTrasteroCompraventaPage() {
 
   // Datos del vendedor (para plusvalía)
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');
+  // Obra nueva: qué compró el promotor. Lo normal es el solar sobre el que construyó (hallazgo 3500).
+  const [compraOriginal, setCompraOriginal] = useState<'solar' | 'construido'>('solar');
   const [gastosAdquisicion, setGastosAdquisicion] = useState('');
   const [aniosPropiedad, setAniosPropiedad] = useState('');
   /** Meses completos cuando se vende antes de cumplir el año ('' = sin elegir). */
@@ -673,6 +683,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       otrasRentas: Math.max(0, parseSpanishNumberOr(otrasRentasAhorro)),
       sinGanancia: comisionImposible,
       ventaDelPromotor: tipoTransmision === 'primera-mano',
+      compraSoloSuelo: tipoTransmision === 'primera-mano' && compraOriginal === 'solar',
       ccaa,
     };
     const r = calcularVendedor(entrada);
@@ -735,7 +746,9 @@ export default function SimuladorTrasteroCompraventaPage() {
     const exentoPlusvalia = rp ? rp.exento : false;
     if (rp) {
       metodoPlusvalia = rp.exento
-        ? 'No sujeta (sin incremento de valor)'
+        ? rp.valorSueloTransmision !== undefined
+          ? `No sujeta: el valor del suelo en la venta (${formatCurrency(rp.valorSueloTransmision)}) no supera lo que se pagó por el solar (art. 104.5 TRLRHL)`
+          : 'No sujeta (sin incremento de valor)'
         : rp.parCatastralImposible
           ? 'Método objetivo (el valor catastral del suelo no puede superar al total, que ya lo incluye: revisa los dos campos del recibo del IBI)'
           : !rp.metodoRealDisponible
@@ -745,8 +758,15 @@ export default function SimuladorTrasteroCompraventaPage() {
               ? `Método objetivo (${escritoNoValido(valorCatastralTotal, parseSpanishNumber) ? 'el valor catastral total escrito tiene que ser mayor que 0: corrígelo para comparar con el método real' : 'falta el valor catastral total para comparar'})`
               : 'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56).'
             : rp.metodoReal < rp.metodoObjetivo
-              ? 'Método real (más favorable)'
+              ? rp.valorSueloTransmision !== undefined
+                ? `Método real (más favorable): valor del suelo en la venta (${formatCurrency(rp.valorSueloTransmision)}) menos lo pagado por el solar (arts. 104.5 y 107.5 TRLRHL)`
+                : 'Método real (más favorable)'
               : 'Método objetivo (más favorable)';
+      // Comprado un solar sin el valor catastral total, la venta no se puede repartir entre suelo
+      // y construcción, y la cifra puede quedarse por encima de la legal (receta del 3466).
+      if (!rp.exento && rp.sinRepartoSolar) {
+        metodoPlusvalia = `${metodoPlusvalia}${metodoPlusvalia.endsWith('.') ? '' : '.'} Al haberse comprado un solar, puede salir más baja o no sujeta: el valor catastral total permite comparar lo pagado por el solar con el valor del suelo en la venta.`;
+      }
     }
     if (rp && !rp.exento && rp.bonificadaCiudad) {
       const bonificacion = `la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje}\u00A0% de la cuota de Ceuta y Melilla (art. 159.2 TRLRHL)`;
@@ -861,7 +881,7 @@ export default function SimuladorTrasteroCompraventaPage() {
       veredictoIrpf: veredictoDe((x) => x.irpf),
       veredictoGanancia: veredictoDe((x) => x.ganancia),
     };
-  }, [precioVenta, ccaa, tipoTransmision, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion, otrasRentasAhorro]);
+  }, [precioVenta, ccaa, tipoTransmision, precioCompraOriginal, aniosPropiedad, mesesCompletos, valorCatastralSuelo, valorCatastralTotal, comisionInmobiliaria, gastosGestoriaVenta, gastosAdquisicion, otrasRentasAhorro, compraOriginal]);
 
   /**
    * Lo que el neto NO incluye por falta de datos, para que «IMPORTE NETO VENDEDOR» no se
@@ -1318,23 +1338,25 @@ export default function SimuladorTrasteroCompraventaPage() {
                 {/* Del motor, para un trastero suelto y con el precio escrito: el País Vasco lo
                     grava al 7 % y no al 4 % de la vivienda, y Valencia pasa al 11 % por encima
                     del millón (hallazgos 1581 y 1582). */}
-                <span className={styles.infoCcaaValue}>{formatTipoNominal(tipoGeneralITP(ccaa, OBJETO_ITP, precioLeido))}&nbsp;%</span>
+                {/* Una sola cadena, único hijo del <span>: con la página traducida, React escribía el
+                    tipo nuevo en el nodo que el traductor ya había retirado (hallazgo 3503). */}
+                <span className={styles.infoCcaaValue}>{`${formatTipoNominal(tipoGeneralITP(ccaa, OBJETO_ITP, precioLeido))} %`}</span>
               </div>
               <div className={styles.infoCcaaItem}>
                 <span className={styles.infoCcaaLabel}>AJD</span>
                 {/* En segunda mano la modalidad no se ve: el AJD es el del trastero suelto, el
                     mismo objeto cuyo ITP rotula la casilla de al lado (hallazgo 2909, 06/10/2026). */}
                 <span className={styles.infoCcaaValue}>
-                  {formatTipoNominal(
+                  {`${formatTipoNominal(
                     tipoAJD(ccaa, { objeto: tipoTransmision === 'primera-mano' ? objetoAJDDe(modalidadTrastero) : 'otro' }).tipo,
-                  )}&nbsp;%
+                  )} %`}
                 </span>
               </div>
             </div>
             {/* Escala o umbral, con sus palabras: Valencia no tiene escala (hallazgos 1581 y 1602). */}
             {subidaITP && (
               <p className={styles.infoCcaaNote}>
-                <span aria-hidden="true">⚠️</span> {separarPorcentajes(subidaITP)}
+                <span aria-hidden="true">⚠️</span> <span>{separarPorcentajes(subidaITP)}</span>
               </p>
             )}
             <p className={styles.infoCcaaNote}>{separarPorcentajes(datosCcaaActual.notas)}</p>
@@ -1536,24 +1558,33 @@ export default function SimuladorTrasteroCompraventaPage() {
                       <p className={styles.avisoReducidosTitulo}>
                         <span aria-hidden="true">💡</span> Podrías pagar menos, pero depende de requisitos que no preguntamos
                       </p>
+                      {/* Una sola cadena, único hijo del <p>: con la página traducida se quedaba con
+                          la comunidad anterior (hallazgo 3503). */}
                       <p className={styles.avisoReducidosTexto}>
-                        El cálculo usa el tipo general porque no podemos comprobar tu situación.
-                        En {nombreEnFrase(ccaa)} {resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:
+                        {`El cálculo usa el tipo general porque no podemos comprobar tu situación. En ${nombreEnFrase(ccaa)} ${resultadosComprador.tipoElegido.noComprobables.length === 1 ? 'existe' : 'existen'}:`}
                       </p>
                       <ul className={styles.avisoReducidosLista}>
+                        {/* Hallazgos 3502 y 3503 (25/10/2026): con la página traducida, el fragmento
+                            del ⚠️ y el ternario del «Valor máximo» retiraban un nodo de texto suelto
+                            que el traductor ya había cambiado por <font>, y la app caía
+                            (NotFoundError); el tipo y los requisitos se quedaban con la comunidad
+                            anterior. Cada texto variable es el único hijo de su elemento, y lo que
+                            aparece o desaparece es un <span key> entero. */}
                         {resultadosComprador.tipoElegido.noComprobables.map(r => (
                           <li key={r.nombre}>
-                            <strong>{formatNumber(r.tipo, 2)}&nbsp;% — {separarPorcentajes(r.nombre)}</strong>
+                            <strong>{`${formatNumber(r.tipo, 2)} % — ${separarPorcentajes(r.nombre)}`}</strong>
                             <br />
-                            Requisitos: {separarPorcentajes(r.condiciones.join(' · '))}
-                            {r.valorMaximo ? ` · Valor máximo ${formatCurrency(r.valorMaximo)}` : ''}
+                            <span>{`Requisitos: ${separarPorcentajes(r.condiciones.join(' · '))}`}</span>
+                            {r.valorMaximo ? (
+                              <span key="tope">{` · Valor máximo ${formatCurrency(r.valorMaximo)}`}</span>
+                            ) : null}
                             {/* El tope de valor SÍ se comprueba, así que la línea no puede
                                 ofrecerse como rebaja al alcance cuando el precio la descarta
                                 (hallazgo 765). Se enseña igualmente porque dice a partir de qué
                                 precio existiría, que es lo que los hallazgos 721 y 741 exigen. */}
                             {superaElTope(r, resultadosComprador.precioInmueble) && (
                               // El emoji, fuera del árbol accesible (hallazgo 3083).
-                              <> · <span aria-hidden="true">⚠️</span> tu precio supera ese límite: no podrías acogerte</>
+                              <span key="supera"> · <span aria-hidden="true">⚠️</span> tu precio supera ese límite: no podrías acogerte</span>
                             )}
                           </li>
                         ))}
@@ -1592,9 +1623,40 @@ export default function SimuladorTrasteroCompraventaPage() {
                   onChange={setPrecioCompraOriginal}
                   label="Precio de compra original"
                   placeholder="10000"
-                  helperText="Lo que pagaste cuando compraste el trastero"
+                  helperText={
+                    tipoTransmision === 'primera-mano'
+                      ? 'Lo que pagaste por el solar (o por el trastero, si lo compraste ya construido)'
+                      : 'Lo que pagaste cuando compraste el trastero'
+                  }
                   min={0}
                 />
+
+                {/* Obra nueva: el art. 104.5 TRLRHL aplica la proporción catastral a la compra solo
+                    «en su caso», si lo comprado tenía construcción; comprado un solar, se compara
+                    entero con el valor del suelo en la venta (hallazgo 3500, receta del 3466 de la
+                    referencia). */}
+                {tipoTransmision === 'primera-mano' && (
+                  <div className={styles.inputGroup}>
+                    <label className={styles.label} htmlFor="compra-original">
+                      ¿Qué compraste?
+                    </label>
+                    <select
+                      id="compra-original"
+                      value={compraOriginal}
+                      onChange={(e) => setCompraOriginal(e.target.value as 'solar' | 'construido')}
+                      className={styles.select}
+                      aria-describedby="nota-compra-original"
+                    >
+                      <option value="solar">Solo el suelo (un solar sobre el que se construyó)</option>
+                      <option value="construido">Un trastero ya construido</option>
+                    </select>
+                    <p id="nota-compra-original" className={styles.notaCompraOriginal}>
+                      La plusvalía grava solo el suelo. Si compraste un solar, lo que pagaste se compara
+                      entero con el valor del suelo en la venta (art. 104.5 TRLRHL), así que conviene
+                      escribir también el valor catastral total.
+                    </p>
+                  </div>
+                )}
 
                 {/* En obra nueva vende el promotor y su renta no se calcula (3380): los campos que solo
                     alimentan la ganancia y su cuota no se piden, en vez de prometer un efecto que no
@@ -2168,7 +2230,9 @@ export default function SimuladorTrasteroCompraventaPage() {
                   art. 35.1 LIRPF descuenta del valor de transmisión. Con estos mismos datos la
                   calculadora las rotula «(máximo)» (patrón 2, hallazgo 1562), y el ejemplo las
                   daba por cerradas (hallazgo 2197). */}
-              <p>El vendedor debe calcular la plusvalía municipal (si la hay) y la posible ganancia patrimonial
+              {/* La salvedad del no residente (art. 106.2 TRLRHL), como la FAQ (hallazgo 3501, cabo C0442). */}
+              <p>El vendedor debe calcular la plusvalía municipal (si la hay; con una excepción:{' '}
+              {SALVEDAD_PLUSVALIA_NO_RESIDENTE}) y la posible ganancia patrimonial
               en IRPF. Si compró el trastero por 8.000 € y lo vende por 15.000 €, la diferencia bruta son 7.000 €,
               pero el art. 35 LIRPF descuenta antes los gastos de la venta: con la comisión del 3&nbsp;% que trae el
               simulador ({formatCurrency(EJEMPLOS.ventaComision)}), y antes de restar la plusvalía municipal, la ganancia queda como máximo en {formatCurrency(EJEMPLOS.ventaGanancia)} y
