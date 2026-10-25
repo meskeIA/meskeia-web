@@ -138,8 +138,11 @@ export function preSkipDeDescripcion(descripcion: Uint8Array | null): number | n
   return descripcion[10] | (descripcion[11] << 8);
 }
 
-/** Archivo OGG completo con las dos cabeceras y el audio. */
-export function empaquetarOggOpus(entrada: EntradaOggOpus): Uint8Array {
+/**
+ * Archivo OGG completo con las dos cabeceras y el audio. Devuelve `Uint8Array<ArrayBuffer>`, no
+ * `Uint8Array` a secas: este se ensancha a `ArrayBufferLike` y `new Blob([…])` lo rechaza (C0458).
+ */
+export function empaquetarOggOpus(entrada: EntradaOggOpus): Uint8Array<ArrayBuffer> {
   const { paquetes, canales, frecuenciaOriginal, preSkip, muestrasAudio48k, serie } = entrada;
   if (paquetes.length === 0) throw new Error('No hay audio que empaquetar');
 
