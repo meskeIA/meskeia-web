@@ -1050,6 +1050,10 @@ test.describe('re-inspección 02/10/2026 · motor y casos resueltos a mano', () 
     empatesPorCosteInicial: number;
     /** «su coste inicial mínimo es el más bajo» con otra empatada igual o más barata de compra. */
     inicialFalso: number;
+    /** Con «Lo mínimo (adopción)» y dos adoptables, el precio de compra dado como razón (C0451). */
+    adopcionPorCompra: number;
+    /** Empates en los que se dice que el orden no depende de las respuestas (C0451). */
+    ordenSinRazon: number;
     empatesPorOrdenDeDeclaracion: number;
     comunidadConPerroMudo: number;
     perroSinTiempoNiCasa: number;
@@ -1058,7 +1062,7 @@ test.describe('re-inspección 02/10/2026 · motor y casos resueltos a mano', () 
   /** Una pasada por las 589.824 combinaciones (≈3 s), reutilizada dentro del worker. */
   function contar(): Cuentas {
     if (cuentas) return cuentas;
-    const c: Cuentas = { empates: 0, empatesPorCosteInicial: 0, inicialFalso: 0, empatesPorOrdenDeDeclaracion: 0, comunidadConPerroMudo: 0, perroSinTiempoNiCasa: 0 };
+    const c: Cuentas = { empates: 0, empatesPorCosteInicial: 0, inicialFalso: 0, adopcionPorCompra: 0, ordenSinRazon: 0, empatesPorOrdenDeDeclaracion: 0, comunidadConPerroMudo: 0, perroSinTiempoNiCasa: 0 };
     const idx = new Array(10).fill(0);
     for (;;) {
       const r: Record<number, string> = {};
@@ -1070,6 +1074,9 @@ test.describe('re-inspección 02/10/2026 · motor y casos resueltos a mano', () 
         if (res.criterioDesempate.includes('coste inicial')) c.empatesPorCosteInicial++;
         if (res.criterioDesempate.includes('coste inicial mínimo es el más bajo')
           && res.empatadas.some((k) => MASCOTAS[k].costeInicialMin <= info.costeInicialMin)) c.inicialFalso++;
+        if (r[9] === 'minimo' && info.adoptable && res.criterioDesempate.includes('coste inicial')
+          && res.empatadas.some((k) => MASCOTAS[k].adoptable)) c.adopcionPorCompra++;
+        if (res.criterioDesempate.includes('no depende de nada de lo que has dicho')) c.ordenSinRazon++;
         if (res.empatadas.some((k) => MASCOTAS[k].costeMensualMin === info.costeMensualMin
           && MASCOTAS[k].costeInicialMin === info.costeInicialMin)) c.empatesPorOrdenDeDeclaracion++;
       }
@@ -1094,11 +1101,27 @@ test.describe('re-inspección 02/10/2026 · motor y casos resueltos a mano', () 
     // dos con el mismo vínculo lo deshace el coste inicial (gato 100 € frente a 500 €). Lo que
     // no puede pasar: que lo anuncie como «el más bajo» con otra empatada igual o más barata, ni
     // que dos empatadas coincidan en los tres criterios (el orden del código).
+    // C0451 (25/10/2026): en 16 de esos 317 se ha contestado «Lo mínimo (adopción)» y los dos se
+    // adoptan, así que el precio de compra no es una razón: el orden se mantiene, pero la frase
+    // dice que no depende de las respuestas. Quedan 301 que nombran el coste inicial.
     const c = contar();
     expect(c.empates).toBe(56_943);
-    expect(c.empatesPorCosteInicial).toBe(317);
+    expect(c.empatesPorCosteInicial).toBe(301);
     expect(c.inicialFalso).toBe(0);
+    expect(c.adopcionPorCompra).toBe(0);
+    expect(c.ordenSinRazon).toBe(16);
     expect(c.empatesPorOrdenDeDeclaracion).toBe(0);
+  });
+
+  test('C0451: con «Lo mínimo (adopción)» el empate gato / perro pequeño no se razona con el precio de compra', () => {
+    const r = { 1: 'mucho', 2: 'pocas', 3: 'piso_normal', 4: 'medio', 5: 'si_pequenos', 6: 'ninguna', 7: 'novedad', 8: 'medio', 9: 'minimo', 10: 'bajo' };
+    const res = calcularResultado(r);
+    // El orden no cambia: gato primero, empatado con el perro pequeño.
+    expect(res.mascota).toBe('gato');
+    expect(res.empatadas).toEqual(['perro-pequeno']);
+    expect(res.costeInicial.valor).toBe('Tasa de adopción');
+    expect(res.criterioDesempate).toBe('se muestra primero un gato, pero el orden entre los dos no depende de nada de lo que has dicho');
+    // Los 301 empates que siguen razonando con el coste inicial (sin adopción) los cuenta el barrido de arriba.
   });
 
   test('caso normal: 1-2 h, casa vacía 3 – 5 h, piso amplio, niños 5-12 y juego → Gato (10 frente a 8)', async ({ page }) => {

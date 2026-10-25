@@ -47,7 +47,9 @@
  *     mensual mínimo, y después la de menor coste inicial mínimo. El empate se anuncia, y cada
  *     criterio nombra a las que deja detrás cuando no es el mismo para todas (hallazgo 1442:
  *     «su coste mensual mínimo es el más bajo» era falso si otra empatada, apartada por el
- *     vínculo, costaba menos).
+ *     vínculo, costaba menos). Con «Lo mínimo (adopción…)», el coste inicial (que es el de
+ *     compra) no se da como razón entre dos animales que se adoptan: el orden sigue igual, pero
+ *     se dice que no depende de las respuestas (C0451).
  *
  *  5. Las razones salen de las respuestas (hallazgo 1335). Antes eran un texto fijo por animal
  *     («Tu perfil activo…» al perro de un sedentario). Ahora se citan las respuestas que más
@@ -598,13 +600,27 @@ export function calcularResultado(r: Record<number, string>): Resultado {
       { motivo: 'su coste mensual mínimo es el más bajo', frente: (o: string) => `su coste mensual mínimo es más bajo que el de ${o}` },
       { motivo: 'su coste inicial mínimo es el más bajo', frente: (o: string) => `su coste inicial mínimo es más bajo que el de ${o}` },
     ];
-    const grupos = [...new Set(empatadas.map(decisivo))].sort((a, b) => a - b);
-    const porque = grupos.length === 1
+    // Quien adopta no paga el precio de compra: si solo el coste inicial separa a dos animales
+    // que se adoptan, ese criterio no dice nada de sus respuestas y no se da como razón (C0451:
+    // el gato iba delante del perro pequeño «porque su coste inicial mínimo es el más bajo»).
+    const sinRazon = r[9] === 'minimo' && info.adoptable
+      ? empatadas.filter((k) => decisivo(k) === 2 && MASCOTAS[k].adoptable)
+      : [];
+    const conRazon = empatadas.filter((k) => !sinRazon.includes(k));
+    const grupos = [...new Set(conRazon.map(decisivo))].sort((a, b) => a - b);
+    // El superlativo solo si compara con TODAS: una empatada sin razón iguala los costes mensuales.
+    const porque = grupos.length === 1 && sinRazon.length === 0
       ? criterios[grupos[0]].motivo
       : grupos
-        .map((g) => criterios[g].frente(enumerarConY(empatadas.filter((k) => decisivo(k) === g).map((k) => MASCOTAS[k].conArticulo))))
+        .map((g) => criterios[g].frente(enumerarConY(conRazon.filter((k) => decisivo(k) === g).map((k) => MASCOTAS[k].conArticulo))))
         .join(', y ');
-    criterioDesempate = `${seMuestra} porque ${porque}`;
+    const sinOrden = 'no depende de nada de lo que has dicho';
+    if (sinRazon.length === 0) criterioDesempate = `${seMuestra} porque ${porque}`;
+    else if (conRazon.length === 0) {
+      criterioDesempate = `${seMuestra}, pero el orden entre ${sinRazon.length === 1 ? 'los dos' : 'ellos'} ${sinOrden}`;
+    } else {
+      criterioDesempate = `${seMuestra} porque ${porque}; frente a ${enumerarConY(sinRazon.map((k) => MASCOTAS[k].conArticulo))}, el orden ${sinOrden}`;
+    }
   }
 
   // ─ Razones: las respuestas que más han sumado a la ganadora ─
