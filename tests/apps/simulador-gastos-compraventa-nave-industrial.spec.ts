@@ -97,7 +97,15 @@
  *    con «euros» y con «€» en los dos campos (NumberInput cambió el 20/10, 652a5f6f), el reparto del
  *    IBI y la comunidad semestral un 29 de febrero, y la renuncia al IGIC en un móvil de 390 × 844.
  *    Cuatro hallazgos al final con `test.fail()` salvo con `VER_HUECOS=1`: la página traducida (dos)
- *    y dos bocas del bloque educativo sin la salvedad foral.
+ *    y dos bocas del bloque educativo sin la salvedad foral (3476-3479), REPARADOS ese mismo día
+ *    (5ed0e98e): sus tests perdieron la marca.
+ *  · 26/10/2026 — RE-INSPECCIÓN (INVALIDADA tras 8d859faf, 412caa1e, 45e79788 y f8aa2eeb). 3476-3479
+ *    se sostienen, salvo un resto de la receta de la página traducida: al pasar de Canarias a Ceuta o
+ *    Melilla, tres textos se quedan con el IGIC ([26/10-a]); y el caso de uso de la obra nueva da el
+ *    IVA por universal ([26/10-b]). Casos nuevos: Andalucía a 387.450,75 € con la gestoría
+ *    por defecto (GESTORIA_POR_DEFECTO, f8aa2eeb), Asturias en el corte exacto de 500.000 € con la
+ *    gestoría vaciada, y el precio pegado con «EUR» con la página traducida; las 19 comunidades en los
+ *    tres regímenes con la página traducida, a 1280 y a 390 px.
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -139,7 +147,9 @@
  * quedaron REPARADOS el 19/10/2026: hoy son regresión en el bloque de su fecha.
  * Los tres de la inspección del 19/10/2026 (3387-3389) se escribieron con `test.fail()` y quedaron
  * REPARADOS el 20/10/2026: hoy son regresión en el bloque de su fecha.
- * HALLAZGOS ABIERTOS a 24/10/2026: los cuatro de la inspección de ese día, al final del fichero con
+ * Los cuatro de la inspección del 24/10/2026 (3476-3479) se escribieron con `test.fail()` y quedaron
+ * REPARADOS ese mismo día (5ed0e98e): hoy son regresión en el bloque de su fecha.
+ * HALLAZGOS ABIERTOS a 26/10/2026: los dos de la re-inspección de ese día, al final del fichero con
  * `test.fail()` salvo con `VER_HUECOS=1`. Todos se escriben igual, afirmando lo que DEBERÍA pasar, y
  * al repararse pierden la marca y se quedan como regresión en el bloque de su fecha.
  */
@@ -157,6 +167,7 @@ import {
   TERRITORIOS_IRPF_FORAL,
   BONIFICACION_CUOTA_CEUTA_MELILLA,
   FACTURA_NOTARIAL,
+  GESTORIA_POR_DEFECTO,
   ITP_CCAA,
   LIMITE_ARANCEL_NOTARIAL,
   RANGO_AJD_OTROS,
@@ -7171,7 +7182,10 @@ test.describe('Inspección 19/10/2026 — La Rioja con decimales, Aragón en el 
 //    (6,010121 €) + nota simple (3,005061 €), × 1,21 donde hay IVA.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/** `VER_HUECOS=1` quita la marca de los hallazgos abiertos del 24/10 y enseña por qué fallan. */
+/**
+ * `VER_HUECOS=1` quitaba la marca de los hallazgos abiertos del 24/10 y enseñaba por qué fallaban.
+ * Los cuatro (3476-3479) se REPARARON ese mismo día y ya no llevan marca; la constante queda sin uso.
+ */
 const I24_VER_HUECOS = Boolean(process.env.VER_HUECOS);
 
 /**
@@ -7481,7 +7495,8 @@ test.describe('Inspección 24/10/2026 — Murcia con decimales, Cataluña en el 
     expect(bocas.filter((t) => afirma.test(t) && !/no residente/i.test(t)).map((t) => t.slice(0, 160))).toEqual([]);
   });
 
-  // ─── Hallazgos de la inspección del 24/10/2026, con `test.fail()` salvo con VER_HUECOS=1 ───
+  // ─── Hallazgos de la inspección del 24/10/2026 (3476-3479): se escribieron con `test.fail()` y
+  //     quedaron REPARADOS ese mismo día (5ed0e98e) ───
 
   /**
    * [24/10-a] (operativa, alto) — Con la página traducida por el navegador, cambiar de comunidad tumba
@@ -7663,5 +7678,477 @@ test.describe('Inspección 24/10/2026 — móvil 390 × 844', () => {
     expect(medidas.documento).toBeLessThanOrEqual(390);
     expect(medidas.botones).toHaveLength(3);
     for (const derecha of medidas.botones) expect(derecha).toBeLessThanOrEqual(390);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 26/10/2026 — hermana del grupo B de la familia «Compraventa inmobiliaria» (referencia:
+// estimador-compraventa-inmueble). La cola la sacó INVALIDADA tras 8d859faf (no toca esta app),
+// 412caa1e y 45e79788 (NumberInput, AvisoTerritorioSinIva y ProrrateoIbiComunidad con la página
+// traducida) y f8aa2eeb (la gestoría por defecto sale de GESTORIA_POR_DEFECTO de data/itp-ccaa.ts).
+//
+// Cifras resueltas a mano ANTES de abrir el navegador, con un script propio que NO importa la app ni
+// data/ (.inspector-trabajo/nave-esperados.mjs, fuera del repositorio):
+//  - Andalucía: tipo general 7 (`TIPOS_ITP_CCAA_2025`, data/fiscal/inmuebles.ts), sin escala ni umbral;
+//    `ITP_CCAA.andalucia.ajd = 1.2`, sin tipo propio de la renuncia.
+//  - Asturias: escala 8 % hasta 300.000, 9 % hasta 500.000 y 10 % después (`ITP_CCAA.asturias`), `ajd: 1.2`.
+//  - Navarra: tipo general 6 (`TIPOS_ITP_CCAA_2025`), `ajd: 0.5`.
+//  - Canarias → IGIC «Impuesto General Indirecto Canario»; Ceuta y Melilla → IPSI «Impuesto sobre la
+//    Producción, los Servicios y la Importación» (`TERRITORIOS_SIN_IVA`); en los tres, notaría y registro
+//    sin IVA (`honorariosLlevanIVA`).
+//  - Gestoría por defecto: `GESTORIA_POR_DEFECTO.nave = 500`.
+//  - IVA de la nave: `IVA_INMUEBLES_2025.local = 21`.
+//  - Notaría: RD 1426/1989, nº 2 × 0,95 (`REBAJA_ARANCEL_CUANTIA`) × 1,21 donde hay IVA; la factura,
+//    × 1,5 / 1,75 / 2 (`FACTURA_NOTARIAL`). Registro: RD 1427/1989, nº 2.1 × 0,95 + presentación
+//    (6,010121 €) + nota simple (3,005061 €), × 1,21 donde hay IVA.
+//
+// PÁGINA TRADUCIDA (.inspector-trabajo/nave-traducida.mjs: la traducida contra una gemela sin traducir
+// que recibe los mismos pasos; 181 pasos a 1280 px y otros 181 a 390 px: las 19 comunidades en los tres
+// regímenes, la transmisión dentro de ocho territorios, precio y gestoría —umbral valenciano, notaría
+// de libre acuerdo, ilegible, cero, vacío—, el reparto del IBI y la comunidad entero y la guía). Cero
+// caídas: 3476 se sostiene. Las cifras del recuadro siguen a la comunidad: 3477 se sostiene en lo que
+// reparó. Texto VIEJO solo en un sitio, y en los dos anchos: al pasar de Canarias a Ceuta o Melilla
+// (hallazgo [26/10-a], al final de este bloque).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** `VER_HUECOS=1` quita la marca de los hallazgos abiertos del 26/10 y enseña por qué fallan. */
+const I26_VER_HUECOS = Boolean(process.env.VER_HUECOS);
+
+const normaliza26 = (s: string): string => s.replace(/\s+/g, ' ').trim();
+
+test.describe('Re-inspección 26/10/2026 — Andalucía con decimales, Asturias en el corte de 500.000 € con la gestoría vaciada, el precio pegado con «EUR» y la página traducida', () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  /**
+   * CASO 1 (NORMAL) — Andalucía, 387.450,75 € (punto de millar y coma decimal) y la gestoría que trae el
+   * campo, sin tocarla: GESTORIA_POR_DEFECTO.nave = 500 desde f8aa2eeb.
+   *   Segunda mano: ITP = 387.450,75 × 7 % = 27.121,5525 → «27.121,55 €», «ITP (7,00 %)». Sin AJD.
+   *   Notaría: 90,151816 + 108,182205 + 45,0759 + 90,15182 + 237.197,72 × 0,05 % (118,59886) = 452,160601
+   *            × 0,95 = 429,552571 × 1,21 = 519,758611 → ×1,5 = 779,64 · ×1,75 = 909,58 · ×2 = 1039,52.
+   *   Registro: 24,040484 + 42,070858 + 37,56325 + 67,613865 + 237.197,72 × 0,03 % (71,159316) = 242,447773
+   *            × 0,95 = 230,325384 + 9,015182 = 239,340566 × 1,21 = 289,602085 → «289,60 €».
+   *   Total = 27.121,55 + 909,58 + 289,60 + 500,00 = 28.820,73 € (7,4386 % → «7,44 %») · coste 416.271,48 €.
+   *   Obra nueva: IVA 21 % = 81.364,6575 → 81.364,66 € · AJD 1,2 % = 4649,409 → 4649,41 € · total 81.364,66 +
+   *   4649,41 + 909,58 + 289,60 + 500 = 87.713,25 € (22,6386 % → «22,64 %») · coste 475.164,00 €. Con
+   *   renuncia, las mismas cifras (Andalucía no tiene AJD propio de la renuncia).
+   */
+  test('CASO 1 (normal) — Andalucía 387.450,75 € con la gestoría por defecto: ITP 27.121,55 € (7,00 %); obra nueva 81.364,66 € + AJD 4649,41 €', async ({ page }) => {
+    const an = ITP_CCAA['andalucia'];
+    expect(an.tipoGeneral).toBe(7);
+    expect(an.tramosProgresivos).toBeUndefined();
+    expect(an.umbralTipoUnico).toBeUndefined();
+    expect(an.ajd).toBe(1.2);
+    expect(an.ajdRenuncia).toBeUndefined();
+    expect(GESTORIA_POR_DEFECTO.nave).toBe(500);
+    expect(IVA_INMUEBLES_2025.local).toBe(21);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    // La gestoría no se siembra: se mide la que trae el campo.
+    await expect(page.locator(`input[aria-label="${GESTORIA}"]`)).toHaveValue('500');
+    await page.selectOption('#select-ccaa', 'andalucia');
+    await sembrar(page, PRECIO, '387.450,75');
+
+    await expect(page.getByRole('button', { name: /^Segunda mano/ })).toHaveAttribute('aria-pressed', 'true');
+    expect(await valorTarjeta(page, 'Precio de la nave industrial')).toBe('387.450,75 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (7,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('27.121,55 €');
+    await expect(page.locator('[class*="resultados"] h3', { hasText: /^AJD/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('909,58 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 779,64 € y 1039,52 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('289,60 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('500,00 €');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('28.820,73 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('7,44% sobre el precio de compra');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('416.271,48 €');
+    const recuadro = await recuadroCcaa(page);
+    expect(recuadro).toContain('ITP General 7%');
+    expect(recuadro).toContain('AJD 1,2%');
+    expect(recuadro).toContain('IVA (obra nueva) 21%');
+    expect(recuadro).toContain('Andalucía: Tipo reducido del 3,5% en la vivienda habitual');
+
+    await page.getByRole('button', { name: /Obra nueva/ }).click();
+    await expect(page.locator('[class*="resultados"] h3', { hasText: /^ITP/ })).toHaveCount(0);
+    expect(await rotuloTarjeta(page, /^IVA \(/)).toBe('IVA (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('81.364,66 €');
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (1,20%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('4649,41 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('87.713,25 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('22,64% sobre el precio de compra');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('475.164,00 €');
+
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    expect(await rotuloTarjeta(page, /^IVA \(/)).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('81.364,66 €');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('4649,41 €');
+    expect(await descripcionTarjeta(page, 'AJD (')).toBe('Tipo general de la comunidad: algunas aplican uno incrementado cuando hay renuncia');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('475.164,00 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Asturias en el corte EXACTO entre el 9 % y el 10 % (500.000 €), un céntimo y 100 €
+   * por encima, con la gestoría VACIADA (límite cero: un campo vacío no es un ilegible, vale 0 y no
+   * deja el total en parcial).
+   *   500.000: ITP = 300.000 × 8 % + 200.000 × 9 % = 24.000 + 18.000 = 42.000,00 € (8,40 %).
+   *   Notaría: 333,561741 (acumulado a 150.253,03) + 349.746,97 × 0,05 % (174,873485) = 508,435226 × 0,95
+   *            = 483,013465 × 1,21 = 584,446292 → 876,67 / 1022,78 / 1168,89.
+   *   Registro: 171,288457 + 349.746,97 × 0,03 % (104,924091) = 276,212548 × 0,95 = 262,40192 + 9,015182
+   *            = 271,417102 × 1,21 = 328,414694 → «328,41 €».
+   *   Total = 42.000 + 1022,78 + 328,41 = 43.351,19 € (8,6702 % → «8,67 %») · coste 543.351,19 €.
+   *   500.000,01: ITP 42.000,001 → 42.000,00 € · coste 543.351,20 €.
+   *   500.100: los 100 € que pasan del corte van al 10 %: ITP 42.010,00 € (al 9 % serían 42.009) · notaría
+   *            1022,88 € · registro 328,45 € · total 43.361,33 € · coste 543.461,33 €.
+   *   Renuncia a 500.000: IVA 105.000,00 € · AJD 1,2 % = 6000,00 € · total 112.351,19 € (22,4702 % →
+   *   «22,47 %») · coste 612.351,19 €.
+   */
+  test('CASO 2 (límite) — Asturias en el corte de 500.000 € con la gestoría vacía: ITP 42.000,00 € (8,40 %); a 500.100 €, 42.010,00 €; renuncia 105.000 + 6000 €', async ({ page }) => {
+    expect(ITP_CCAA['asturias'].tramosProgresivos).toEqual([
+      { hasta: 300000, tipo: 8 },
+      { hasta: 500000, tipo: 9 },
+      { hasta: Infinity, tipo: 10 },
+    ]);
+    expect(ITP_CCAA['asturias'].ajd).toBe(1.2);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'asturias');
+    await sembrar(page, PRECIO, '500000');
+    await sembrar(page, GESTORIA, '');
+
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,40%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('42.000,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1022,78 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 876,67 € y 1168,89 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('328,41 €');
+    // Vacía no es ilegible: ni tarjeta «Sin leer», ni total parcial.
+    await expect(page.locator('[class*="resultados"] h3', { hasText: 'Gastos de gestoría' })).toHaveCount(0);
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('43.351,19 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('8,67% sobre el precio de compra');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('543.351,19 €');
+    const recuadro = await recuadroCcaa(page);
+    expect(recuadro).toContain('ITP General 8%');
+    expect(recuadro).toContain('AJD 1,2%');
+    expect(recuadro).toContain('aplica escala progresiva (8% → 9% → 10%)');
+
+    await sembrar(page, PRECIO, '500.000,01');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('42.000,00 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('543.351,20 €');
+
+    await sembrar(page, PRECIO, '500100');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (8,40%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('42.010,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('1022,88 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('328,45 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('43.361,33 €');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('543.461,33 €');
+
+    await sembrar(page, PRECIO, '500000');
+    await page.getByRole('button', { name: /renuncia al IVA/ }).click();
+    expect(await rotuloTarjeta(page, /^IVA \(/)).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('105.000,00 €');
+    expect(await rotuloTarjeta(page, /^AJD \(/)).toBe('AJD (1,20%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('6000,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('112.351,19 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('22,47% sobre el precio de compra');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('612.351,19 €');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — con la página TRADUCIDA, Navarra, 420.000 € y la gestoría por defecto (500 €).
+   *   ITP = 420.000 × 6 % = 25.200,00 €. Notaría: 333,561741 + 269.746,97 × 0,05 % (134,873485) =
+   *   468,435226 × 0,95 × 1,21 = 538,466292 → 807,70 / 942,32 / 1076,93. Registro: 171,288457 + 269.746,97
+   *   × 0,03 % (80,924091) = 252,212548 × 0,95 + 9,015182 = 248,61710 × 1,21 = 300,83 €. Total 25.200 +
+   *   942,32 + 300,83 + 500 = 26.943,15 € (6,415 % → «6,42 %») · coste 446.943,15 €.
+   *   Precio pegado «420.000,00 EUR»: ilegible → sin desglose y el marcador lo nombra, sin tarjetas viejas.
+   *   Gestoría pegada «500 EUR»: «Sin leer», fuera del total → 26.443,15 € (6,2960 % → «6,30 %»), coste
+   *   446.443,15 € (−500 €, la gestoría entera) y «el coste real será mayor».
+   */
+  test('CASO 3 (rechazo) — con la página traducida, «420.000,00 EUR» pegado en el precio se nombra sin cifra y «500 EUR» en la gestoría sale del total (−500 €)', async ({ page }) => {
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    expect(ITP_CCAA['navarra'].tipoGeneral).toBe(6);
+
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await page.selectOption('#select-ccaa', 'navarra');
+    await sembrar(page, PRECIO, '420000');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('446.943,15 €');
+
+    const campoPrecio = page.locator(`input[aria-label="${PRECIO}"]`);
+    const campoGestoria = page.locator(`input[aria-label="${GESTORIA}"]`);
+    const resultados = page.locator('[class*="resultados"]');
+
+    await traducirPagina(page);
+    await pegarEn(page, PRECIO, '420.000,00 EUR');
+    await expect(campoPrecio).toHaveValue('420.000,00 EUR');
+    await expect(resultados.locator('h3')).toHaveCount(0);
+    expect(normaliza26(await resultados.innerText())).toBe(
+      '📊 No se ha podido leer el precio «420.000,00 EUR». Introduce el precio de la nave industrial para ver el desglose de gastos, con coma decimal (500.000 o 500000,50)',
+    );
+
+    await traducirPagina(page);
+    await pegarEn(page, PRECIO, '420.000');
+    await expect(campoPrecio).toHaveValue('420.000');
+    await expect.poll(() => valorTarjeta(page, 'COSTE TOTAL')).toBe('446.943,15 €');
+    expect(await rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (6,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('25.200,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('942,32 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('300,83 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('26.943,15 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('6,42% sobre el precio de compra');
+
+    await traducirPagina(page);
+    await pegarEn(page, GESTORIA, '500 EUR');
+    await expect(campoGestoria).toHaveValue('500 EUR');
+    await expect.poll(() => valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('26.443,15 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '6,30% sobre el precio de compra — SIN la gestoría, que no se ha podido leer',
+    );
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('446.443,15 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('No incluye la gestoría, que no se ha podido leer: el coste real será mayor');
+
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  /**
+   * 3476 y 3477 SE SOSTIENEN — con la página traducida, las 19 comunidades en los tres regímenes a
+   * 500.000 €: ninguna caída, y el recuadro y la tarjeta del ITP dicen lo de la comunidad elegida.
+   *   ITP General (tipo de una nave, `ITP_CCAA` y `TIPOS_ITP_CCAA_2025`) y AJD general (`ITP_CCAA[x].ajd`),
+   *   escritos a mano de la tabla; con la renuncia, Valencia pasa al 2 % (`ajdRenuncia`).
+   *   ITP efectivo a 500.000 € en las de escala: Aragón 32.000 + 4250 + 4500 = 40.750 (8,15 %) · Asturias
+   *   42.000 (8,40 %) · Baleares 32.000 + 9000 = 41.000 (8,20 %) · Castilla y León 20.000 + 25.000 = 45.000
+   *   (9,00 %) · Cataluña 10,00 % · Extremadura 28.800 + 14.000 = 42.800 (8,56 %) · Ceuta y Melilla 6 % × 50 %
+   *   = 3,00 %. Los nombres de los territorios sin IVA no se miran aquí: es el hallazgo [26/10-a].
+   */
+  test('3476 y 3477 se sostienen — con la página traducida, 19 comunidades × 3 regímenes sin caídas y con los tipos de la comunidad elegida', async ({ page }) => {
+    test.setTimeout(180_000);
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    // [comunidad, ITP General, AJD, ITP efectivo en segunda mano a 500.000 €]
+    const TABLA: [string, string, string, string][] = [
+      ['madrid', '6%', '0,75%', '6,00%'],
+      ['canarias', '6,5%', '0,75%', '6,50%'],
+      ['ceuta', '6%', '0,5%', '3,00%'],
+      ['valencia', '9%', '1,4%', '9,00%'],
+      ['melilla', '6%', '0,5%', '3,00%'],
+      ['pais-vasco', '7%', '0,5%', '7,00%'],
+      ['navarra', '6%', '0,5%', '6,00%'],
+      ['cataluna', '10%', '1,5%', '10,00%'],
+      ['baleares', '8%', '1,5%', '8,20%'],
+      ['aragon', '8%', '1,5%', '8,15%'],
+      ['asturias', '8%', '1,2%', '8,40%'],
+      ['andalucia', '7%', '1,2%', '7,00%'],
+      ['cantabria', '9%', '1,5%', '9,00%'],
+      ['castilla-leon', '8%', '1,5%', '9,00%'],
+      ['castilla-mancha', '9%', '1,5%', '9,00%'],
+      ['extremadura', '8%', '1,5%', '8,56%'],
+      ['galicia', '8%', '1,5%', '8,00%'],
+      ['murcia', '7,75%', '1,5%', '7,75%'],
+      ['rioja', '7%', '1%', '7,00%'],
+    ];
+    const fallos: string[] = [];
+    for (const [regimen, boton] of [
+      ['segunda mano', /^Segunda mano/],
+      ['obra nueva', /Obra nueva/],
+      ['renuncia', /2ª mano con renuncia/],
+    ] as const) {
+      errores.length = 0;
+      await page.goto(RUTA);
+      await esperarHidratacion(page, CAMPOS);
+      await sembrar(page, PRECIO, '500000');
+      await page.getByRole('button', { name: boton }).click();
+      for (const [ccaa, itp, ajd, efectivo] of TABLA) {
+        await traducirPagina(page);
+        await page.selectOption('#select-ccaa', ccaa);
+        const nombre = ITP_CCAA[ccaa as keyof typeof ITP_CCAA].nombre;
+        await expect(page.locator('[class*="infoCcaaNombre"]', { hasText: nombre }).or(page.getByText('Algo salió mal')).first()).toBeVisible();
+        if ((await page.getByText('Algo salió mal').count()) > 0 || errores.length > 0) {
+          fallos.push(`${regimen} → ${ccaa}: ${(errores[0] ?? 'Algo salió mal').slice(0, 90)}`);
+          break;
+        }
+        const recuadro = await recuadroCcaa(page);
+        const ajdEsperado = regimen === 'renuncia' && ccaa === 'valencia' ? '2%' : ajd;
+        if (!recuadro.includes(`ITP General ${itp}`)) fallos.push(`${regimen} → ${ccaa}: falta «ITP General ${itp}»`);
+        if (!recuadro.includes(`AJD ${ajdEsperado}`)) fallos.push(`${regimen} → ${ccaa}: falta «AJD ${ajdEsperado}»`);
+        // En segunda mano (y en Ceuta y Melilla con cualquier régimen salvo la obra nueva) se paga ITP.
+        const pagaItp = regimen === 'segunda mano' || (regimen === 'renuncia' && (ccaa === 'ceuta' || ccaa === 'melilla'));
+        if (pagaItp) {
+          const rotulo = await rotuloTarjeta(page, /^ITP \(/);
+          if (rotulo !== `ITP (${efectivo})`) fallos.push(`${regimen} → ${ccaa}: tarjeta «${rotulo}», esperado «ITP (${efectivo})»`);
+        }
+      }
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  /**
+   * 3478 y 3479 SE SOSTIENEN — el sello del IRPF y la guía de la ganancia dicen que la escala es la
+   * estatal (AVISO_IRPF_FORAL, data/itp-ccaa.ts; Concierto, Ley 12/2002, art. 6.Uno, y Convenio, Ley
+   * 28/1990) con la deducción del 60 % de Ceuta y Melilla (art. 68.4 LIRPF,
+   * DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA), y la FAQ de la plusvalía dice que es el régimen común (art. 1.2
+   * TRLRHL: foral en Navarra y el País Vasco) con el 50 % de Ceuta y Melilla (art. 159.2 TRLRHL,
+   * BONIFICACION_IIVTNU_CEUTA_MELILLA). Texto literal, leído hoy en la página.
+   */
+  test('3478 y 3479 se sostienen — IRPF estatal y foral en el sello y la guía; la plusvalía, régimen común', async ({ page }) => {
+    expect(DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje).toBe(60);
+    expect(BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje).toBe(50);
+    await page.goto(RUTA);
+    const sello = page.getByRole('note', { name: 'Datos de referencia normativos' }).filter({ hasText: 'IRPF de la ganancia' });
+    expect(normaliza26(await sello.innerText())).toContain(
+      'Es la escala estatal: si resides en el País Vasco o en Navarra, tu IRPF es foral y se liquida con su propia escala, que esta herramienta no aplica.',
+    );
+    const guia = normaliza26(
+      (await page.locator('strong', { hasText: 'Vender nave con ganancia patrimonial' }).first().locator('xpath=following-sibling::p[1]').textContent()) ?? '',
+    );
+    expect(guia).toContain('Esa escala es la estatal: si resides en el País Vasco o en Navarra, tu IRPF es foral y se liquida con su propia escala.');
+    expect(guia).toContain('lleva una deducción del 60 % (art. 68.4 de la Ley del IRPF)');
+    const plusvalia = (await faqVisible(page)).find((f) => /plusvalía municipal al vender una nave/.test(f.q));
+    expect(plusvalia?.a).toContain(
+      'Todo eso es el régimen común: en Navarra y el País Vasco el impuesto se rige por su normativa foral, con sus propias reglas y tipos; en Ceuta y Melilla la cuota se bonifica un 50 % (art. 159.2 TRLRHL). Este simulador no calcula la plusvalía municipal.',
+    );
+  });
+
+  // ─── Hallazgos de la re-inspección del 26/10/2026, con `test.fail()` salvo con VER_HUECOS=1 ───
+
+  /**
+   * [26/10-a] (operativa, medio) — Resto de la receta de 3476/3477 (5ed0e98e) y forma de los hallazgos
+   * 3506 (local) y 3508 (solar), que no llegó a la nave. Con la página traducida, al pasar de Canarias a
+   * Ceuta o Melilla tres textos siguen con el IGIC mientras las tarjetas ya cobran la ciudad:
+   *   · el aviso de cabecera y la nota del recuadro dicen «el IPSI (Impuesto General Indirecto Canario)»:
+   *     `<span>({territorioActualSinIva.nombre})</span>` (page.tsx l. 455 y 730) tiene TRES hijos —«(»,
+   *     el nombre y «)»—, así que el nombre no es el único hijo de su elemento;
+   *   · la nota de honorarios dice «Las facturas de notaría y registro llevan además IGIC»:
+   *     `{territorioHonorarios.impuesto}` (l. 945) va suelto junto al texto del <p>.
+   * React escribe el valor nuevo en el nodo que el traductor ya retiró. Esperado en Ceuta y Melilla
+   * (`TERRITORIOS_SIN_IVA`): «IPSI (Impuesto sobre la Producción, los Servicios y la Importación)» y
+   * «llevan además IPSI». La receta de las hermanas: local-comercial l. 1364, `{`(${…nombre})`}`; solar
+   * l. 786, la frase entera en una cadena.
+   */
+  test('[26/10-a] con la página traducida, al pasar de Canarias a Ceuta o Melilla los avisos nombran el IPSI y no el IGIC', async ({ page }) => {
+    test.fail(!I26_VER_HUECOS, 'hallazgo [26/10-a] abierto: tres textos se quedan con el IGIC al pasar de Canarias a Ceuta o Melilla');
+    const IPSI = 'IPSI (Impuesto sobre la Producción, los Servicios y la Importación)';
+    const viejos: string[] = [];
+    for (const ciudad of ['ceuta', 'melilla'] as const) {
+      await page.goto(RUTA);
+      await esperarHidratacion(page, CAMPOS);
+      await page.selectOption('#select-ccaa', 'canarias');
+      await sembrar(page, PRECIO, '420000');
+      // 420.000 × 6,5 % = 27.300,00 €
+      await expect.poll(() => rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (6,50%)');
+      await expect(page.locator('[class*="avisoHonorarios"]')).toContainText('llevan además IGIC');
+
+      await traducirPagina(page);
+      await page.selectOption('#select-ccaa', ciudad);
+      // La tarjeta sí sigue: 420.000 × 6 % × 50 % = 12.600,00 € (3,00 %).
+      await expect.poll(() => rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (3,00%)');
+      expect(await valorTarjeta(page, 'ITP (')).toBe('12.600,00 €');
+
+      const aviso = normaliza26(await page.locator('[class*="ivaAviso"]').innerText());
+      const nota = normaliza26(await page.locator('[class*="infoCcaaNote"]', { hasText: 'no se aplica el IVA' }).innerText());
+      const honorarios = normaliza26(await page.locator('[class*="avisoHonorarios"]').innerText());
+      if (!aviso.includes(`sino el ${IPSI}`)) viejos.push(`${ciudad} · aviso: «${aviso.slice(0, 150)}»`);
+      if (!nota.includes(`tributa por el ${IPSI}`)) viejos.push(`${ciudad} · recuadro: «${nota.slice(0, 120)}»`);
+      if (!honorarios.includes('llevan además IPSI')) viejos.push(`${ciudad} · honorarios: «${honorarios.slice(0, 80)}»`);
+    }
+    expect(viejos).toEqual([]);
+  });
+
+  /**
+   * [26/10-b] (dato, bajo) — Forma del hallazgo 3265 (el FAQPage «nave vs local», que daba por universal
+   * el IVA) y del punto ciego del grupo B de 3478/3479, en otra boca del bloque educativo. El caso de uso
+   * «Empresa compra nave nueva al promotor» dice «Paga IVA 21 % + AJD. Si la empresa destina la nave a
+   * actividades sujetas y no exentas de IVA, puede deducir el IVA en la declaración trimestral (modelo
+   * 303).», sin salvedad territorial. La app ofrece Canarias, Ceuta y Melilla, donde la obra nueva no paga
+   * IVA sino IGIC o IPSI (`TERRITORIOS_SIN_IVA`; el aviso de cabecera, el recuadro y
+   * RESPUESTA_IMPUESTO_COMPRA de esta misma página lo dicen), y el IPSI soportado en la compra de un
+   * inmueble no se deduce (Ley 8/1991, art. 20.3, hallazgo 3263). La tarjeta de al lado («Autónomo compra
+   * nave de segunda mano») sí nombra a Ceuta y Melilla.
+   */
+  test('[26/10-b] el caso de uso «Empresa compra nave nueva al promotor» dice que en Canarias, Ceuta y Melilla no se paga IVA', async ({ page }) => {
+    test.fail(!I26_VER_HUECOS, 'hallazgo [26/10-b] abierto: la tarjeta de la obra nueva da el IVA por universal');
+    await page.goto(RUTA);
+    const tarjeta = normaliza26(
+      (await page.locator('strong', { hasText: 'Empresa compra nave nueva al promotor' }).first().locator('xpath=following-sibling::p[1]').textContent()) ?? '',
+    );
+    expect(tarjeta).toContain('Paga IVA 21 % + AJD');
+    expect(tarjeta).toMatch(/IGIC/);
+    expect(tarjeta).toMatch(/IPSI/);
+  });
+});
+
+test.describe('Re-inspección 26/10/2026 — móvil 390 × 844, página traducida', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * 500.000 €, gestoría por defecto, traduciendo antes de cada toque:
+   *   Canarias, segunda mano: 500.000 × 6,5 % = 32.500,00 € (6,50 %).
+   *   Canarias, obra nueva: IGIC sin cifra («No calculado»).
+   *   Ceuta, obra nueva: IPSI sin cifra; la renuncia, desactivada.
+   *   Ceuta, segunda mano: 500.000 × 6 % × 50 % = 15.000,00 € (3,00 %).
+   *   Madrid, segunda mano: 30.000,00 € (6,00 %); con renuncia: IVA 105.000,00 € (21,00 %).
+   */
+  test('con la página traducida, los toques entre Canarias, Ceuta y Madrid no tumban la app y las tarjetas siguen al cálculo', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, CAMPOS);
+    await sembrar(page, PRECIO, '500000');
+
+    await traducirPagina(page);
+    await page.selectOption('#select-ccaa', 'canarias');
+    await expect.poll(() => rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (6,50%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('32.500,00 €');
+
+    await traducirPagina(page);
+    await page.getByRole('button', { name: /Obra nueva/ }).tap();
+    await expect.poll(() => valorTarjeta(page, 'IGIC')).toBe('No calculado');
+
+    await traducirPagina(page);
+    await page.selectOption('#select-ccaa', 'ceuta');
+    await expect.poll(() => valorTarjeta(page, 'IPSI')).toBe('No calculado');
+    await expect(page.getByRole('button', { name: /2ª mano con renuncia/ })).toBeDisabled();
+
+    await traducirPagina(page);
+    await page.getByRole('button', { name: /^Segunda mano/ }).tap();
+    await expect.poll(() => rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (3,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('15.000,00 €');
+
+    await traducirPagina(page);
+    await page.selectOption('#select-ccaa', 'madrid');
+    await expect.poll(() => rotuloTarjeta(page, /^ITP \(/)).toBe('ITP (6,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('30.000,00 €');
+
+    await traducirPagina(page);
+    await page.getByRole('button', { name: /renuncia al IVA/ }).tap();
+    await expect.poll(() => rotuloTarjeta(page, /^IVA \(/)).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('105.000,00 €');
+
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
   });
 });

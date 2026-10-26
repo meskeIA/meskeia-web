@@ -159,8 +159,16 @@
  *      León a 400.000 € (el segundo tramo de su escala y el 30 % del ahorro) más la venta con
  *      pérdida, y un precio «1e5» y una gestoría «200 euros» PEGADOS. Los cabos C0441 (la plusvalía
  *      del promotor que compró un solar) y C0442 (el comprador sustituto del no residente), y la
- *      PÁGINA TRADUCIDA por el navegador con el detector de texto viejo. Hallazgos ABIERTOS con
- *      `test.fail()` y etiqueta [25/10-a] … [25/10-e].
+ *      PÁGINA TRADUCIDA por el navegador con el detector de texto viejo. Hallazgos que nacieron con
+ *      `test.fail()` y etiqueta [25/10-a] … [25/10-e] (3500-3503 y 3498), REPARADOS el 25/10/2026
+ *      (ed8fb208 y 412caa1e) y hoy regresión.
+ *
+ *  25. INSPECTOR 26/10/2026 (re-inspección, app INVALIDADA por ed8fb208, 412caa1e, 45e79788 y
+ *      f8aa2eeb) — CASOS 67-69 al final del fichero, los tres en «Primera mano» y con el «¿Qué
+ *      compraste?» que estrenó el 3500: Asturias con el trastero independiente y el método REAL del
+ *      solar, la raya exacta de la no sujeción (el suelo de la venta IGUAL a lo pagado por el solar) y
+ *      el valor catastral total ilegible con el solar. La app ENTERA traducida, a 1280 y a 390 px. Y un
+ *      hallazgo ABIERTO con `test.fail()` y etiqueta [26/10-a].
  *
  * De dónde sale CADA cifra esperada (ninguna de memoria):
  *  - Tipo general de ITP por CCAA → `TIPOS_ITP_CCAA_2025` en `data/fiscal/inmuebles.ts`,
@@ -209,15 +217,15 @@
  * Los hallazgos de la re-inspección van al final. Estaban marcados con `test.fail()` y hoy
  * están REPARADOS, así que la marca se retiró y las aserciones sujetan la reparación.
  */
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, devices } from '@playwright/test';
 // Los casos añadidos el 12/09/2026 siembran con estos dos: `rellenar` usa `fill()` sin
 // esperar a que React haya montado el input, y en esa ventana el DOM cambia sin que el
 // estado de React se entere (ver la cabecera de `_hidratacion.ts`).
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 // Inspector 25/10/2026: los datos de los casos 64-66 y de los hallazgos [25/10-*] se leen de los
 // mismos módulos que componen la página, para que el esperado no sea una copia tecleada.
-import { ITP_CCAA, TERRITORIOS_SIN_IVA, calcularPlusvaliaMunicipal } from '../../data/itp-ccaa';
-import { COEFICIENTES_IIVTNU_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles';
+import { ITP_CCAA, TERRITORIOS_SIN_IVA, calcularPlusvaliaMunicipal, GESTORIA_POR_DEFECTO, ARANCELES_NOTARIO, ARANCELES_REGISTRO, REBAJA_ARANCEL_CUANTIA, REGISTRO_CONCEPTOS, FACTURA_NOTARIAL } from '../../data/itp-ccaa';
+import { COEFICIENTES_IIVTNU_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025, IVA_INMUEBLES_2025, PLUSVALIA_MUNICIPAL_META } from '../../data/fiscal/inmuebles';
 
 const RUTA = '/simulador-gastos-compraventa-trastero/';
 
@@ -7673,7 +7681,8 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
 //   · CASO 66 (rechazo) — un precio «1e5» y una gestoría «200 euros» PEGADOS (el NumberInput los
 //     conserva desde el hallazgo 2965): ningún desglose con el primero, y el segundo nombrado con
 //     la dirección del neto real.
-//  Hallazgos ABIERTOS con `test.fail()` (salvo con VER_HUECOS=1) y la aserción de fondo:
+//  Hallazgos que nacieron con `test.fail()` y la aserción de fondo, REPARADOS el 25/10/2026 (ed8fb208
+//  y 412caa1e) y hoy regresión, sin la marca:
 //   [25/10-a] cabo C0441 — la plusvalía del promotor que compró un solar (art. 104.5 TRLRHL).
 //   [25/10-b] cabo C0442 — la plusvalía «del vendedor» sin el comprador sustituto (art. 106.2).
 //   [25/10-c] página traducida: el recuadro, la nota de la escala y «Podrías pagar menos» se quedan
@@ -7702,7 +7711,10 @@ test.describe('Inspector 21/10/2026 — Andalucía en obra nueva con el promotor
 //     200.000 · 27 % hasta 300.000 · 30 % el resto).
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/** `VER_HUECOS=1` quita la marca de los hallazgos abiertos del 25/10 y enseña por qué fallan. */
+/**
+ * `VER_HUECOS=1` quitaba la marca de los hallazgos del 25/10 mientras estuvieron abiertos; desde su
+ * reparación (25/10/2026) no la lleva ninguno, y la usa el [26/10-a] del final.
+ */
 const T25_VER_HUECOS = Boolean(process.env.VER_HUECOS);
 const T25_PRECIO = 'Precio del trastero';
 
@@ -8320,5 +8332,467 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
     expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('21.837,60 €');
     expect(viejos).toEqual([]);
     expect(errores).toEqual([]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+//  INSPECTOR 26/10/2026 — re-inspección: la app estaba INVALIDADA por ed8fb208 (3500-3503), 412caa1e y
+//  45e79788 (NumberInput, AvisoTerritorioSinIva y ProrrateoIbiComunidad, compartidos) y f8aa2eeb (la
+//  gestoría de serie sale de GESTORIA_POR_DEFECTO). El testigo de la familia no pasa por «¿Qué
+//  compraste?» (solo existe en la referencia, garaje y esta), así que los tres casos van ahí:
+//   · CASO 67 (normal) — Asturias en obra nueva con el trastero INDEPENDIENTE (IVA 21 % + AJD 1,2 %) y
+//     el promotor que compró el solar: el método REAL de su plusvalía gana al objetivo comparando lo
+//     pagado por el solar con el suelo de la venta; con «Un trastero ya construido», el objetivo.
+//   · CASO 68 (límite) — la raya exacta de la no sujeción: el suelo de la venta IGUAL a lo pagado por el
+//     solar (NO SUJETA), y un euro menos de compra (0,25 € por el método real).
+//   · CASO 69 (rechazo) — el valor catastral total «20.000.50» con el solar: no se lee, la plusvalía va
+//     por el objetivo y la app lo nombra, con la dirección; escrito bien, el neto sube, como anunciaba.
+//  Y la app ENTERA con la página traducida, a 1280 y a 390 px (verde: 0 caídas y 0 nodos viejos), más
+//  un hallazgo ABIERTO con `test.fail()` (salvo con VER_HUECOS=1) y la aserción de fondo primero:
+//   [26/10-a] con el solar, la no sujeción no depende de los años, y sin ellos la app la da por «SIN
+//             CALCULAR» y pide rellenarlos (la forma del hallazgo 1564, patrón 4, en la rama nueva).
+//
+//  De dónde sale cada cifra (ninguna de memoria):
+//   · IVA → `IVA_INMUEBLES_2025.garaje` = 21 % (data/fiscal/inmuebles.ts: «garaje o trastero
+//     independiente»). AJD → `ITP_CCAA.asturias.ajd` = 1,2 %, sin tipo propio de vivienda (data/itp-ccaa.ts).
+//   · Notaría → `ARANCELES_NOTARIO` (RD 1426/1989, nº 2) × (1 − `REBAJA_ARANCEL_CUANTIA`) × 1,21 y la
+//     horquilla de `FACTURA_NOTARIAL` (×1,5 · ×2; la tarjeta, ×1,75) · Registro → `ARANCELES_REGISTRO`
+//     × 0,95 + `REGISTRO_CONCEPTOS` (6,010121 + 3,005061), × 1,21 (RD 1427/1989).
+//   · Gestoría del comprador → `GESTORIA_POR_DEFECTO.trastero` = 300 € (estimación de mercado, no norma).
+//   · Plusvalía → `COEFICIENTES_IIVTNU_2025` (3 años 0,14) × `PLUSVALIA_MUNICIPAL_META.tipoOrientativo`
+//     (25 %). Con la compra de un SOLAR, TRLRHL art. 104.5 (BOE-A-2004-4214, la cita que lleva el bloque
+//     del 25/10 de este fichero): la proporción del suelo va al valor de transmisión y «en su caso» al de
+//     adquisición; el incremento real, del art. 107.5. Que la no sujeción no depende de los años lo dice
+//     la propia app (page.tsx, `calcularVendedor`, hallazgo 1564).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const T26_VER_HUECOS = T25_VER_HUECOS;
+
+/** Obra nueva con la comunidad, la modalidad y el precio, comprobando que cada botón ha entrado. */
+async function t26ObraNueva(page: Page, ccaa: string, modalidad: 'vinculado' | 'independiente', precio: string): Promise<void> {
+  await t25Abrir(page, ccaa);
+  await page.getByRole('button', { name: /Primera mano/ }).click();
+  await expect(page.getByRole('button', { name: /Primera mano/ })).toHaveAttribute('aria-pressed', 'true');
+  if (modalidad === 'independiente') {
+    await page.getByRole('button', { name: /Independiente/ }).click();
+    await expect(page.getByRole('button', { name: /Independiente/ })).toHaveAttribute('aria-pressed', 'true');
+  }
+  await sembrar(page, T25_PRECIO, precio);
+}
+
+/** El promotor que vende: lo que pagó, los años (vacío = no se escriben) y el recibo del IBI. */
+async function t26Promotor(page: Page, d: { compra: string; anios: string; suelo: string; total: string }): Promise<void> {
+  await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+  await sembrar(page, 'Precio de compra original', d.compra);
+  if (d.anios !== '') await sembrar(page, 'Años de propiedad', d.anios);
+  await sembrar(page, 'Valor catastral del suelo', d.suelo);
+  await sembrar(page, 'Valor catastral total (suelo + construcción)', d.total);
+}
+
+/** La plusvalía, la renta del promotor, la comisión, el total y el neto, en una lectura. */
+async function t26Vendedor(page: Page): Promise<string[]> {
+  const leer = async (t: string | RegExp) => `${await tituloTarjeta24(page, t instanceof RegExp ? t : new RegExp(`^${t}`))} · ${await valorTarjeta(page, t)}`;
+  return [
+    await leer('Plusvalía municipal'),
+    await leer('Impuesto sobre la renta de la venta'),
+    await leer(/^Comisión inmobiliaria/),
+    await leer(/^Total gastos vendedor/),
+    await leer(/^IMPORTE NETO VENDEDOR/),
+  ];
+}
+
+test.describe('Inspector 26/10/2026 — obra nueva con el «¿Qué compraste?»: Asturias, la raya de la no sujeción y un total ilegible', () => {
+  /**
+   * CASO 67 (normal) — Asturias · primera mano · INDEPENDIENTE · 30.000 € · gestoría de serie.
+   *   IVA 30.000 × 21 % = 6.300,00 → «IVA (21,00 %)» · AJD 30.000 × 1,2 % = 360,00 → «AJD (1,20 %)»
+   *   Notaría: 90,151816 + (30.000 − 6.010,12) × 0,45 % (107,95446) = 198,106276 × 0,95 = 188,200962
+   *     × 1,21 = 227,723164 → ×1,5 = 341,58 · ×2 = 455,45 · ×1,75 = 398,52
+   *   Registro: 24,040484 + 23.989,88 × 0,175 % (41,98229) = 66,022774 × 0,95 = 62,721635 + 9,015182 =
+   *     71,736817 × 1,21 = 86,80
+   *   Gestoría 300 (GESTORIA_POR_DEFECTO.trastero) · total 6.300 + 360 + 398,52 + 86,80 + 300 = 7.445,32
+   *   (24,818 % → 24,82 %) · coste 37.445,32, sin nada pendiente: «Precio del trastero + todos los gastos».
+   *   El recuadro, del trastero suelto en Asturias: «ITP General 8 % · AJD 1,2 %».
+   * VENDEDOR (el promotor) — «¿Qué compraste?» de serie «solar» · solar 12.500 · 3 años · suelo 9.000 de
+   * 20.000 · comisión 3 % de serie:
+   *   objetivo 9.000 × 0,14 × 25 % = 315,00 · suelo en la venta 30.000 × 9.000 / 20.000 = 13.500,00 ·
+   *   real (13.500 − 12.500) × 25 % = 250,00 → 250,00 «Método real (más favorable)» con los 13.500,00 €.
+   *   comisión 900,00 · total 250 + 900 = 1.150,00 (parcial: sin la renta del promotor) · neto 28.850,00.
+   *   Con «Un trastero ya construido» la proporción va también a la compra: 13.500 − 12.500 × 0,45 =
+   *   7.875 × 25 % = 1.968,75 > 315 → 315,00 objetivo · total 1.215,00 · neto 28.785,00.
+   * Lo que vigila: el 21 % del independiente (con el 10 % del anejo, 3.000 €), la gestoría que sale de la
+   * constante, y que el 3500 se sostenga con otra comunidad y con el método REAL ganando.
+   */
+  test('CASO 67 — Asturias, obra nueva independiente de 30.000 €: IVA 21 % y AJD 1,2 %, y el solar del promotor por el método real', async ({ page }) => {
+    expect(IVA_INMUEBLES_2025.garaje).toBe(21);
+    expect(IVA_INMUEBLES_2025.anejoVinculado).toBe(10);
+    expect(ITP_CCAA.asturias.ajd).toBe(1.2);
+    expect(ITP_CCAA.asturias.ajdVivienda).toBeUndefined();
+    expect(ITP_CCAA.asturias.tramosProgresivos?.map((t) => t.tipo)).toEqual([8, 9, 10]);
+    expect(GESTORIA_POR_DEFECTO.trastero).toBe(300);
+    expect(ARANCELES_NOTARIO.slice(0, 2)).toEqual([
+      { hasta: 6010.12, base: 90.151816, exceso: 0 },
+      { hasta: 30050.61, base: 90.151816, exceso: 0.45 },
+    ]);
+    expect(ARANCELES_REGISTRO.slice(0, 2)).toEqual([
+      { hasta: 6010.12, base: 24.040484, exceso: 0 },
+      { hasta: 30050.61, base: 24.040484, exceso: 0.175 },
+    ]);
+    expect(REBAJA_ARANCEL_CUANTIA).toBe(0.05);
+    expect([REGISTRO_CONCEPTOS.presentacion, REGISTRO_CONCEPTOS.notaSimple]).toEqual([6.010121, 3.005061]);
+    expect([FACTURA_NOTARIAL.factorMin, FACTURA_NOTARIAL.factorMax]).toEqual([1.5, 2]);
+    expect(COEFICIENTES_IIVTNU_2025.find((c) => c.anios === 3)?.coeficiente).toBe(0.14);
+    expect(PLUSVALIA_MUNICIPAL_META.tipoOrientativo).toBe(25);
+
+    await t25Abrir(page, 'asturias');
+    // f8aa2eeb: el valor de serie del campo es la constante, no un '300' tecleado.
+    await expect(page.locator('input[aria-label="Gastos de gestoría del comprador (€)"]')).toHaveValue(String(GESTORIA_POR_DEFECTO.trastero));
+    await page.getByRole('button', { name: /Primera mano/ }).click();
+    await page.getByRole('button', { name: /Independiente/ }).click();
+    await expect(page.getByRole('button', { name: /Independiente/ })).toHaveAttribute('aria-pressed', 'true');
+    await sembrar(page, T25_PRECIO, '30000');
+    expect(await texto(page.getByRole('button', { name: /Primera mano/ }))).toContain('Paga IVA 21 %');
+    expect(await recuadro2110(page)).toBe('ITP General 8 % AJD 1,2 %');
+    expect(await tituloTarjeta24(page, /^IVA \(/)).toBe('IVA (21,00 %)');
+    expect(await valorTarjeta(page, /^IVA \(/)).toBe('6300,00 €');
+    expect(await descripcionTarjeta(page, /^IVA \(/)).toBe('IVA 21 % — trastero independiente (obra nueva)');
+    expect(await tituloTarjeta24(page, /^AJD \(/)).toBe('AJD (1,20 %)');
+    expect(await valorTarjeta(page, /^AJD \(/)).toBe('360,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría')).toBe('398,52 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 341,58 € y 455,45 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad')).toBe('86,80 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('300,00 €');
+    expect(await tituloTarjeta24(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7445,32 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('24,82 % sobre el precio');
+    expect(await valorTarjeta(page, 'COSTE TOTAL DE ADQUISICIÓN')).toBe('37.445,32 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio del trastero + todos los gastos');
+
+    await page.getByRole('button', { name: 'Vendedor', exact: true }).click();
+    // De serie, el solar (hallazgo 3500).
+    await expect(page.locator('#compra-original')).toHaveValue('solar');
+    await t26Promotor(page, { compra: '12500', anios: '3', suelo: '9000', total: '20000' });
+    expect(await t26Vendedor(page)).toEqual([
+      'Plusvalía municipal · 250,00 €',
+      'Impuesto sobre la renta de la venta · Sin calcular',
+      'Comisión inmobiliaria (3 %) · 900,00 €',
+      'Total gastos vendedor (parcial) · 1150,00 €',
+      'IMPORTE NETO VENDEDOR (PARCIAL) · 28.850,00 €',
+    ]);
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método real (más favorable): valor del suelo en la venta (13.500,00 €) menos lo pagado por el solar (arts. 104.5 y 107.5 TRLRHL)',
+    );
+    expect(await descripcionTarjeta(page, 'Total gastos vendedor')).toBe('SIN el impuesto sobre la renta del promotor, que no se incluye');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'No descuenta el impuesto sobre la renta del promotor: el neto real puede ser menor que este.',
+    );
+
+    await page.locator('#compra-original').selectOption('construido');
+    expect(await t26Vendedor(page)).toEqual([
+      'Plusvalía municipal · 315,00 €',
+      'Impuesto sobre la renta de la venta · Sin calcular',
+      'Comisión inmobiliaria (3 %) · 900,00 €',
+      'Total gastos vendedor (parcial) · 1215,00 €',
+      'IMPORTE NETO VENDEDOR (PARCIAL) · 28.785,00 €',
+    ]);
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe('Método objetivo (más favorable)');
+  });
+
+  /**
+   * CASO 68 (límite) — la raya de la no sujeción con el solar. Región de Murcia · primera mano (vinculado,
+   * de serie) · 30.000 € · el promotor pagó por el solar 13.500 · 3 años · suelo 9.000 de 20.000:
+   *   suelo en la venta 30.000 × 0,45 = 13.500,00, IGUAL a lo pagado → no hay incremento (art. 104.5
+   *   TRLRHL: «inexistencia de incremento de valor») → NO SUJETA. Total 900,00 (la comisión) · neto
+   *   29.100,00 (PARCIAL solo por la renta del promotor).
+   *   Con un euro menos de compra (13.499): incremento 1 × 25 % = 0,25 € < 315 (objetivo) → 0,25 € por el
+   *   método real · total 900,25 · neto 29.099,75.
+   * Lo que vigila: un `<` donde va `<=` (o la coma flotante de 30.000 × 9.000 / 20.000) liquidaría 0,00 € por
+   * el método real en lugar de la no sujeción, y un `<=` donde va `<` daría NO SUJETA con 1 € de incremento.
+   */
+  test('CASO 68 — en obra nueva, el suelo de la venta igual a lo pagado por el solar es NO SUJETA, y un euro menos, 0,25 €', async ({ page }) => {
+    const motor = (precioCompra: number) =>
+      calcularPlusvaliaMunicipal({
+        valorCatastralSuelo: 9000,
+        aniosPropiedad: 3,
+        precioCompra,
+        precioVenta: 30000,
+        valorCatastralTotal: 20000,
+        ccaa: 'murcia',
+        adquisicionSoloSuelo: true,
+      });
+    expect(motor(13500).exento).toBe(true);
+    expect(motor(13500).valorSueloTransmision).toBeCloseTo(13500, 6);
+    expect(motor(13499).recomendado).toBeCloseTo(0.25, 6);
+
+    await t26ObraNueva(page, 'murcia', 'vinculado', '30000');
+    await t26Promotor(page, { compra: '13500', anios: '3', suelo: '9000', total: '20000' });
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'No sujeta: el valor del suelo en la venta (13.500,00 €) no supera lo que se pagó por el solar (art. 104.5 TRLRHL)',
+    );
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('900,00 €');
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.100,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'No descuenta el impuesto sobre la renta del promotor: el neto real puede ser menor que este.',
+    );
+
+    await sembrar(page, 'Precio de compra original', '13499');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('0,25 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método real (más favorable): valor del suelo en la venta (13.500,00 €) menos lo pagado por el solar (arts. 104.5 y 107.5 TRLRHL)',
+    );
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('900,25 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.099,75 €');
+  });
+
+  /**
+   * CASO 69 (debe rechazarse) — Asturias · obra nueva independiente · 30.000 € · solar 12.500 · 3 años ·
+   * suelo 9.000 · valor catastral total «20.000.50» (dos puntos: `parseSpanishNumber` lo rechaza).
+   *   Sin el total no hay reparto: plusvalía por el objetivo, 9.000 × 0,14 × 25 % = 315,00, y la tarjeta
+   *   dice que no se ha podido leer y que puede salir más baja o no sujeta. Total 315 + 900 = 1.215,00 ·
+   *   neto 28.785,00 (PARCIAL). El sondeo: con el total igual al suelo (todo suelo) el real es
+   *   (30.000 − 12.500) × 25 % = 4.375 y queda el objetivo; con uno enorme, el suelo de la venta es casi
+   *   nada y sale no sujeta → el ilegible solo puede SUBIR el neto, y como falta la renta del promotor,
+   *   que lo baja, «Sin cerrar».
+   *   Escrito bien, 20.000,50: suelo en la venta 30.000 × 9.000 / 20.000,5 = 13.499,66 · real
+   *   (13.499,6625 − 12.500) × 25 % = 249,9156 → 249,92 < 315 · total 1.149,92 · neto 28.850,08, MAYOR.
+   */
+  test('CASO 69 — el valor catastral total «20.000.50» con el solar no se lee como un número: la plusvalía va por el objetivo y la app lo nombra', async ({ page }) => {
+    await t26ObraNueva(page, 'asturias', 'independiente', '30000');
+    await t26Promotor(page, { compra: '12500', anios: '3', suelo: '9000', total: '20.000.50' });
+    await expect(page.locator('input[aria-label="Valor catastral total (suelo + construcción)"]')).toHaveValue('20.000.50');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('315,00 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método objetivo, y puede salir más barata: el valor catastral total no se ha podido leer, así que no se compara con el método real. Escríbelo con coma decimal (1.234,56). Al haberse comprado un solar, puede salir más baja o no sujeta: el valor catastral total permite comparar lo pagado por el solar con el valor del suelo en la venta.',
+    );
+    expect(await tituloTarjeta24(page, /^Total gastos vendedor/)).toBe('Total gastos vendedor (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1215,00 €');
+    expect(await descripcionTarjeta(page, 'Total gastos vendedor')).toBe(
+      'SIN el impuesto sobre la renta del promotor, que no se incluye — con importes que no se han podido leer (ver el neto de abajo)',
+    );
+    expect(await tituloTarjeta24(page, /^IMPORTE NETO VENDEDOR/)).toBe('IMPORTE NETO VENDEDOR (PARCIAL)');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('28.785,00 €');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe(
+      'No descuenta el impuesto sobre la renta del promotor: el neto real puede ser menor que este. Sin cerrar: el valor catastral total no se ha podido leer y lo subiría, pero falta el impuesto sobre la renta del promotor, que lo bajaría: no se puede saber si el neto real es mayor o menor que este. Escribe con coma decimal (1.234,56) lo que no se ha podido leer para calcular lo demás.',
+    );
+
+    await sembrar(page, 'Valor catastral total (suelo + construcción)', '20000,50');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('249,92 €');
+    expect(await descripcionTarjeta(page, 'Plusvalía municipal')).toBe(
+      'Método real (más favorable): valor del suelo en la venta (13.499,66 €) menos lo pagado por el solar (arts. 104.5 y 107.5 TRLRHL)',
+    );
+    expect(await valorTarjeta(page, 'Total gastos vendedor')).toBe('1149,92 €');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('28.850,08 €');
+  });
+
+  /**
+   * [26/10-a] (cálculo, bajo) — ABIERTO. Con el solar, la no sujeción del art. 104.5 TRLRHL se decide
+   * comparando lo pagado por el solar con el suelo de la venta (venta × suelo / total); los años no
+   * intervienen. `calcularVendedor` (page.tsx l. 408-414) solo da la plusvalía por resuelta sin años
+   * cuando venta ≤ compra (`sinIncremento`), que es la regla de la compra CON construcción: con el solar,
+   * vendiendo por más de lo que costó pero con el suelo de la venta por debajo, exige los años.
+   *   Murcia · obra nueva · 30.000 € · solar 13.500 · años VACÍOS · suelo 9.000 de 20.000:
+   *     esperado «NO SUJETA» (13.500 ≤ 13.500, como en el CASO 68 con 3 años) y el neto sin pedir nada;
+   *     obtenido «SIN CALCULAR · No calculada (faltan los años de propiedad)», «No descuenta la plusvalía
+   *     municipal ni el impuesto sobre la renta del promotor…» y «Rellena los años de propiedad para
+   *     calcular lo demás.»: un dato que no cambia nada (la forma del hallazgo 1564, patrón 4).
+   *   Con el solar a 15.000 (más lejos de la raya), lo mismo.
+   * El motor compartido ya lo decide sin años: es el ancla de lo esperado.
+   */
+  test('[26/10-a] con el solar y el suelo de la venta por debajo de lo pagado, la plusvalía es NO SUJETA aunque falten los años', async ({ page }) => {
+    test.fail(!T26_VER_HUECOS, 'hallazgo [26/10-a] abierto: la no sujeción con el solar exige los años');
+    for (const anios of [0, 3, 20]) {
+      const r = calcularPlusvaliaMunicipal({
+        valorCatastralSuelo: 9000,
+        aniosPropiedad: anios,
+        mesesCompletos: anios === 0 ? 6 : undefined,
+        precioCompra: 13500,
+        precioVenta: 30000,
+        valorCatastralTotal: 20000,
+        ccaa: 'murcia',
+        adquisicionSoloSuelo: true,
+      });
+      expect(r.exento, `${anios} años`).toBe(true);
+    }
+
+    await t26ObraNueva(page, 'murcia', 'vinculado', '30000');
+    await t26Promotor(page, { compra: '13500', anios: '', suelo: '9000', total: '20000' });
+    // FONDO primero: dentro de un test.fail() basta con que falle cualquier aserción.
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
+    expect(await descripcionTarjeta(page, 'IMPORTE NETO VENDEDOR')).not.toContain('Rellena los años de propiedad');
+    expect(await valorTarjeta(page, 'IMPORTE NETO VENDEDOR')).toBe('29.100,00 €');
+    await sembrar(page, 'Precio de compra original', '15000');
+    expect(await valorTarjeta(page, 'Plusvalía municipal')).toBe('NO SUJETA');
+  });
+});
+
+/**
+ * La app ENTERA con la página traducida (el traductor de t25Traducir, que apunta cada nodo que retira, y
+ * el detector t25TextoViejo sobre TODA la página, no solo el panel). Cada paso traduce de nuevo, actúa y
+ * mira: caídas («Algo salió mal», NotFoundError) y nodos en los que React volvió a escribir. Recorre las
+ * dos pestañas, las 19 comunidades con y sin tope, Canarias, Ceuta y Melilla en obra nueva, el País
+ * Vasco y Navarra, las dos modalidades, el «¿Qué compraste?», los ilegibles, el reparto del IBI, la guía
+ * y el tema. Los puntos de control, resueltos a mano:
+ *   · Cantabria, joven, 25.000: tipo general 9 % (el reducido exige vivienda habitual) → «ITP (9,00 %)».
+ *   · Valencia, 1.200.000: el umbral del 11 % sobre todo el valor → 132.000,00 € y el recuadro «ITP
+ *     General 11 % AJD 1,4 %» (`ITP_CCAA.valencia`: umbral de 1.000.000 al 11 %, `ajd` 1,4).
+ *   · Ceuta en obra nueva: «IPSI · No calculado» (`TERRITORIOS_SIN_IVA`).
+ *   · Reparto con escritura el 15/06/2026 (año de 365 días; el vendedor cuenta hasta el día anterior):
+ *     IBI 450 → comprador 450 × 200/365 = 246,58; comunidad 60 mensual (junio, 30 días, 16 del comprador)
+ *     = 32,00 → 278,58 € · trimestral (abril-junio, 91 días, 16) = 10,55 → 257,13 € · anual (200/365) =
+ *     32,88 → 279,46 € · y con escritura el 01/03/2026 (306 días del comprador): 377,26 + 50,30 = 427,56 €.
+ */
+async function t26RecorridoTraducido(page: Page): Promise<{ viejos: string[]; fallos: string[]; errores: string[]; pasos: number }> {
+  const errores = t25VigilarCaidas(page);
+  const viejos: string[] = [];
+  const fallos: string[] = [];
+  let pasos = 0;
+  const paso = async (nombre: string, accion: () => Promise<unknown>, control?: () => Promise<string | null>) => {
+    pasos++;
+    await t25Traducir(page);
+    await accion();
+    await page.waitForTimeout(150); // el commit de React tras la acción
+    for (const v of await t25TextoViejo(page, false)) viejos.push(`${nombre}: ${v}`);
+    await expect(t25Caida(page), nombre).toHaveCount(0);
+    const fallo = control ? await control() : null;
+    if (fallo) fallos.push(`${nombre}: ${fallo}`);
+  };
+  const ccaa = (v: string) => page.locator('#select-ccaa').selectOption(v);
+  const perfil = (v: string) => page.locator('#select-perfil').selectOption(v);
+  const pulsar = (nombre: RegExp | string) =>
+    page.getByRole('button', typeof nombre === 'string' ? { name: nombre, exact: true } : { name: nombre }).first().click();
+  const ver = async (leido: Promise<string>, esperado: string) => {
+    const v = await leido;
+    return v === esperado ? null : `«${v}» y se esperaba «${esperado}»`;
+  };
+  const reparto = page.locator('section[aria-labelledby="titulo-prorrateo"]');
+  const totalReparto = () => texto(reparto.locator('p[class*="total"] strong'));
+
+  await t25Abrir(page);
+  // ===== Comprador, segunda mano =====
+  await paso('precio 25.000', () => sembrar(page, T25_PRECIO, '25000'));
+  for (const p of ['joven', 'familia-numerosa', 'discapacidad', 'general', 'familia-numerosa']) await paso(`perfil ${p}`, () => perfil(p));
+  const TODAS = ['andalucia', 'aragon', 'asturias', 'baleares', 'canarias', 'cantabria', 'castilla-leon', 'castilla-mancha', 'cataluna', 'valencia', 'extremadura', 'galicia', 'murcia', 'navarra', 'pais-vasco', 'rioja', 'ceuta', 'melilla', 'madrid'];
+  for (const c of TODAS) await paso(`familia numerosa → ${c}`, () => ccaa(c));
+  await paso('perfil joven', () => perfil('joven'));
+  for (const c of ['cantabria', 'castilla-leon', 'valencia', 'baleares', 'aragon']) {
+    await paso(`joven → ${c}`, () => ccaa(c), c === 'cantabria' ? () => ver(tituloTarjeta24(page, /^ITP \(/), 'ITP (9,00 %)') : undefined);
+  }
+  for (const [n, v] of [['350.000', '350000'], ['7.000.000', '7000000'], ['ilegible 2.0.0', '2.0.0'], ['0', '0'], ['25.000', '25000']]) {
+    await paso(`precio ${n}`, () => sembrar(page, T25_PRECIO, v));
+  }
+  await paso('Valencia a 1.200.000', async () => { await ccaa('valencia'); await sembrar(page, T25_PRECIO, '1200000'); }, async () =>
+    (await ver(valorTarjeta(page, /^ITP \(/), '132.000,00 €')) ?? (await ver(recuadro2110(page), 'ITP General 11 % AJD 1,4 %')));
+  await paso('Valencia a 25.000', () => sembrar(page, T25_PRECIO, '25000'));
+  await paso('Madrid', () => ccaa('madrid'));
+  for (const [n, v] of [['ilegible 3.0.0', '3.0.0'], ['0', '0'], ['300', '300']]) {
+    await paso(`gestoría del comprador ${n}`, () => sembrar(page, 'Gastos de gestoría del comprador (€)', v));
+  }
+  // ===== Comprador, obra nueva =====
+  await paso('primera mano', () => pulsar(/Primera mano/));
+  await paso('independiente', () => pulsar(/Independiente/));
+  await paso('vinculado', () => pulsar(/Vinculado a vivienda/));
+  await paso('independiente otra vez', () => pulsar(/Independiente/));
+  for (const c of ['canarias', 'ceuta', 'melilla', 'canarias', 'pais-vasco', 'navarra', 'valencia', 'madrid']) {
+    await paso(`obra nueva → ${c}`, () => ccaa(c), c === 'ceuta'
+      ? async () => (await ver(tituloTarjeta24(page, /^(IGIC|IPSI)$/), 'IPSI')) ?? (await ver(valorTarjeta(page, /^(IGIC|IPSI)$/), 'No calculado'))
+      : undefined);
+  }
+  await paso('obra nueva a 7.000.000', () => sembrar(page, T25_PRECIO, '7000000'));
+  await paso('obra nueva a 25.000', () => sembrar(page, T25_PRECIO, '25000'));
+  await paso('segunda mano', () => pulsar(/Segunda mano/));
+  // ===== Vendedor =====
+  await paso('pestaña Vendedor', () => pulsar('Vendedor'));
+  await paso('compra 15.000', () => sembrar(page, 'Precio de compra original', '15000'));
+  await paso('gastos de aquella compra 1.000', () => sembrar(page, 'Impuestos y gastos que pagaste al comprarlo', '1000'));
+  await paso('años 0', () => sembrar(page, 'Años de propiedad', '0'));
+  await paso('5 meses', () => page.locator('#meses-completos').selectOption('5'));
+  await paso('meses sin elegir', () => page.locator('#meses-completos').selectOption(''));
+  await paso('años -1', () => sembrar(page, 'Años de propiedad', '-1'));
+  await paso('años 4', () => sembrar(page, 'Años de propiedad', '4'));
+  await paso('suelo 3.000', () => sembrar(page, 'Valor catastral del suelo', '3000'));
+  await paso('total 2.000 (par imposible)', () => sembrar(page, 'Valor catastral total (suelo + construcción)', '2000'));
+  await paso('total ilegible', () => sembrar(page, 'Valor catastral total (suelo + construcción)', '9.0.0'));
+  await paso('total 9.000', () => sembrar(page, 'Valor catastral total (suelo + construcción)', '9000'));
+  await paso('comisión 150', () => sembrar(page, 'Comisión inmobiliaria (%)', '150'));
+  await paso('comisión ilegible', () => sembrar(page, 'Comisión inmobiliaria (%)', '3.5.0'));
+  await paso('comisión 4', () => sembrar(page, 'Comisión inmobiliaria (%)', '4'));
+  await paso('gestoría de la venta ilegible', () => sembrar(page, 'Gestoría y certificados del vendedor (€)', '2.0.0'));
+  await paso('gestoría de la venta 200', () => sembrar(page, 'Gestoría y certificados del vendedor (€)', '200'));
+  await paso('otras rentas 60.000', () => sembrar(page, 'Otras rentas del ahorro de este año (€)', '60000'));
+  await paso('otras rentas ilegibles', () => sembrar(page, 'Otras rentas del ahorro de este año (€)', '6.0.0'));
+  await paso('otras rentas vacías', () => sembrar(page, 'Otras rentas del ahorro de este año (€)', ''));
+  await paso('compra 30.000 (pérdida)', () => sembrar(page, 'Precio de compra original', '30000'));
+  await paso('compra 0', () => sembrar(page, 'Precio de compra original', '0'));
+  await paso('compra ilegible', () => sembrar(page, 'Precio de compra original', '1.5.0'));
+  await paso('compra 15.000', () => sembrar(page, 'Precio de compra original', '15000'));
+  for (const c of ['pais-vasco', 'navarra', 'melilla', 'ceuta', 'canarias', 'madrid']) await paso(`vendedor → ${c}`, () => ccaa(c));
+  await paso('obra nueva (promotor)', () => pulsar(/Primera mano/));
+  await paso('qué compraste: construido', () => page.locator('#compra-original').selectOption('construido'));
+  await paso('qué compraste: solar', () => page.locator('#compra-original').selectOption('solar'));
+  await paso('solar 20.000 (no sujeta)', () => sembrar(page, 'Precio de compra original', '20000'));
+  await paso('promotor, total ilegible', () => sembrar(page, 'Valor catastral total (suelo + construcción)', '9.0.0'));
+  await paso('promotor, total vacío', () => sembrar(page, 'Valor catastral total (suelo + construcción)', ''));
+  await paso('promotor, total 9.000', () => sembrar(page, 'Valor catastral total (suelo + construcción)', '9000'));
+  for (const c of ['melilla', 'pais-vasco', 'madrid']) await paso(`promotor → ${c}`, () => ccaa(c));
+  await paso('segunda mano (vendedor)', () => pulsar(/Segunda mano/));
+  await paso('precio de venta ilegible', () => sembrar(page, T25_PRECIO, '2.5.0'));
+  await paso('precio de venta 25.000', () => sembrar(page, T25_PRECIO, '25000'));
+  await paso('pestaña Comprador', () => pulsar('Comprador'));
+  // ===== Reparto del IBI =====
+  await paso('IBI 450', () => sembrar(page, 'Cuota anual del IBI', '450'));
+  await paso('escritura 15/06/2026', () => reparto.locator('input[type="date"]').fill('2026-06-15'));
+  await paso('comunidad 60 mensual', () => sembrar(page, 'Cuota de comunidad', '60'), () => ver(totalReparto(), '278,58 €'));
+  await paso('trimestral', () => reparto.locator('select').selectOption('trimestral'), () => ver(totalReparto(), '257,13 €'));
+  await paso('anual', () => reparto.locator('select').selectOption('anual'), () => ver(totalReparto(), '279,46 €'));
+  await paso('escritura 01/03/2026', () => reparto.locator('input[type="date"]').fill('2026-03-01'), () => ver(totalReparto(), '427,56 €'));
+  await paso('IBI ilegible', () => sembrar(page, 'Cuota anual del IBI', '4.5.0'));
+  await paso('IBI -450', () => sembrar(page, 'Cuota anual del IBI', '-450'));
+  await paso('IBI 500', () => sembrar(page, 'Cuota anual del IBI', '500'));
+  await paso('comunidad vacía', () => sembrar(page, 'Cuota de comunidad', ''));
+  await paso('sin fecha', () => reparto.locator('input[type="date"]').fill(''));
+  await paso('IBI vacío', () => sembrar(page, 'Cuota anual del IBI', ''));
+  // ===== Guía y tema =====
+  await paso('abrir la guía', () => pulsar(/Ver guía educativa/));
+  await paso('cerrar la guía', () => pulsar(/Ocultar guía educativa/));
+  await paso('tema oscuro', () => page.locator('button[aria-label="Cambiar a modo oscuro"]').first().click());
+  await paso('tema claro', () => page.locator('button[aria-label="Cambiar a modo claro"]').first().click());
+
+  // Sensibilidad del detector: escribir en un nodo ya retirado tiene que salir.
+  await page.evaluate(() => {
+    const t = ((window as T25Ventana).__t25Nodos ?? []).find((x) => !x.avisado);
+    if (t) t.nodo.nodeValue = `${t.valor ?? ''}·`;
+  });
+  const sensibilidad = await t25TextoViejo(page, false);
+  if (sensibilidad.length !== 1) fallos.push(`el detector no ve un nodo retirado reescrito (${sensibilidad.length})`);
+  return { viejos, fallos, errores, pasos };
+}
+
+test.describe('Inspector 26/10/2026 — la app entera con la página traducida, a 1280 px', () => {
+  test('con la página traducida, ningún control de las dos pestañas, el reparto del IBI ni la guía tumba la app ni deja texto viejo', async ({ page }) => {
+    test.setTimeout(300_000);
+    const r = await t26RecorridoTraducido(page);
+    expect(r.pasos).toBeGreaterThan(100);
+    expect(r.fallos).toEqual([]);
+    expect(r.viejos).toEqual([]);
+    expect(r.errores).toEqual([]);
+  });
+});
+
+test.describe('Inspector 26/10/2026 — la app entera con la página traducida, a 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+  test('en móvil, con la página traducida, ningún control tumba la app ni deja texto viejo', async ({ page }) => {
+    test.setTimeout(300_000);
+    const r = await t26RecorridoTraducido(page);
+    expect(r.pasos).toBeGreaterThan(100);
+    expect(r.fallos).toEqual([]);
+    expect(r.viejos).toEqual([]);
+    expect(r.errores).toEqual([]);
   });
 });
