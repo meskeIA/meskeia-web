@@ -797,7 +797,13 @@ export default function SimuladorSolarPage() {
                 terreno; sin incremento, la transmisión no está sujeta (art. 104.5 TRLRHL). No es un coste del
                 comprador, con una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}. En cualquier caso, puede
                 influir en la negociación del precio.{' '}
-                <span>{fraseRetencionIrnrComprador(resultadosComprador.precioInmueble)}</span>
+                {/* Sin IVA en pantalla, el campo pide el mayor de precio y valor de referencia, y la
+                    retención es del precio pactado: la nota dice de dónde sale la cifra (3522). */}
+                <span>
+                  {fraseRetencionIrnrComprador(resultadosComprador.precioInmueble, {
+                    importePuedeSerReferencia: !conIvaEnPantalla,
+                  })}
+                </span>
               </div>
             </>
           ) : (

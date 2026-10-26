@@ -1516,13 +1516,22 @@ export const SALVEDAD_PLUSVALIA_NO_RESIDENTE =
  * cita del art. 25.2 TRLIRNR en data/fiscal/inmuebles.ts). Hallazgo 3509 (solar, 26/10/2026): con
  * «con una excepción» la plusvalía parecía lo único. Con `precio` da la cifra; sin él, solo el tipo.
  * Es una frase entera, para ir DESPUÉS de la salvedad. Las normas forales no se han consultado.
+ *
+ * `importePuedeSerReferencia`: el importe sale de un campo que pide «el mayor» de precio y valor de
+ * referencia (la base del ITP). La retención es de «la contraprestación acordada» (art. 25.2), así
+ * que con la cifra va una frase que dice de dónde sale y cuándo no vale (hallazgo 3522).
  */
-export function fraseRetencionIrnrComprador(precio?: number): string {
+export function fraseRetencionIrnrComprador(
+  precio?: number,
+  opciones: { importePuedeSerReferencia?: boolean } = {},
+): string {
   const { porcentaje } = RETENCION_IRNR_COMPRADOR;
-  const cifra = precio !== undefined && Number.isFinite(precio) && precio > 0
-    ? ` (${formatCurrency(Math.round(precio * porcentaje) / 100)})`
+  const conCifra = precio !== undefined && Number.isFinite(precio) && precio > 0;
+  const cifra = conCifra ? ` (${formatCurrency(Math.round((precio as number) * porcentaje) / 100)})` : '';
+  const deDondeSale = conCifra && opciones.importePuedeSerReferencia
+    ? ` Esa cifra sale del importe escrito arriba: si es el valor de referencia porque supera al precio, la retención es la del precio pactado, no la de ese valor.`
     : '';
-  return `Si el vendedor es no residente y no actúa mediante establecimiento permanente en España, el comprador tiene además que retener el ${formatNumber(porcentaje, 0)} % del precio acordado${cifra} e ingresarlo a cuenta del impuesto del vendedor (art. 25.2 TRLIRNR): esa parte no se le paga al vendedor, sino a Hacienda. Si no se ingresa, el inmueble queda afecto al pago de la menor de las dos cantidades, la retención o el impuesto. No se aplica a la aportación de un inmueble al constituir o ampliar el capital de una sociedad residente en España.`;
+  return `Si el vendedor es no residente y no actúa mediante establecimiento permanente en España, el comprador tiene además que retener el ${formatNumber(porcentaje, 0)} % del precio acordado${cifra} e ingresarlo a cuenta del impuesto del vendedor (art. 25.2 TRLIRNR): esa parte no se le paga al vendedor, sino a Hacienda.${deDondeSale} Si no se ingresa, el inmueble queda afecto al pago de la menor de las dos cantidades, la retención o el impuesto. No se aplica a la aportación de un inmueble al constituir o ampliar el capital de una sociedad residente en España.`;
 }
 
 /** Para el sello del IRPF de las apps con vendedor, que no saben dónde reside. */

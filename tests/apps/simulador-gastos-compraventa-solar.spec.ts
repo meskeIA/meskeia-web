@@ -5429,7 +5429,9 @@ test.describe('Inspector 26/10/2026 — Galicia, Cataluña a 2 M, la retención 
   });
 
   /**
-   * [26/10-a] (cálculo, bajo) — HALLAZGO ABIERTO hoy (lo deja 9e67838d). Con vendedor PARTICULAR la ayuda del
+   * [26/10-a] (cálculo, bajo; hallazgo 3522) — REPARADO el 26/10/2026: sin IVA en pantalla (el campo pide el
+   * mayor), la nota añade que la cifra sale del importe escrito y que, si es el valor de referencia, la
+   * retención es del precio pactado. Con promotor fuera de Canarias, Ceuta y Melilla no la añade. Con vendedor PARTICULAR la ayuda del
    * campo pide «Precio escriturado o valor de referencia catastral (el mayor de ambos)» —es la base del ITP—, y
    * la nota calcula la retención sobre ese mismo importe y la rotula «del precio acordado». El art. 25.2
    * TRLIRNR la quiere sobre «la contraprestación acordada», no sobre el valor de referencia.
@@ -5441,10 +5443,11 @@ test.describe('Inspector 26/10/2026 — Galicia, Cataluña a 2 M, la retención 
    * la cifra buena. Es la forma del hallazgo 2209 (un solo precio para dos bases, AVISO_BASE_AJD).
    */
   test('[26/10-a] con vendedor particular, la retención no se rotula «del precio acordado» sobre un campo que pide el mayor de precio y valor de referencia', async ({ page }) => {
-    test.fail(!I26_VER_HUECOS, 'Hallazgo [26/10-a] abierto: la retención sale del importe del campo, que la ayuda pide como el mayor de precio y valor de referencia');
     await abrir26(page, 'madrid', 'promotor', '120000');
     expect(t26(await ayudaPrecio26(page).textContent())).toMatch(/^Precio pactado en la escritura/);
     expect(await recuerda26(page)).toContain('del precio acordado (3600,00 €)');
+    // Con el precio pactado en el campo, la cifra es la buena y no lleva la salvedad.
+    expect(await recuerda26(page)).not.toContain('importe escrito');
     await elegir26(page, 'particular');
     expect(t26(await ayudaPrecio26(page).textContent())).toBe('Precio escriturado o valor de referencia catastral (el mayor de ambos)');
     expect(tarjeta26(await leer26(page), /^ITP \(/).valor).toBe('7200,00 €');
