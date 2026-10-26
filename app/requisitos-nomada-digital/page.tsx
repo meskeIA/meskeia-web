@@ -260,8 +260,8 @@ export default function RequisitosNomadaDigitalPage() {
                 min={0}
               />
               <div className={styles.dependientesField}>
-                <label className={styles.label}>Familiares dependientes a cargo</label>
-                <div className={styles.stepperContainer}>
+                <label id="dependientes-label" className={styles.label}>Familiares dependientes a cargo</label>
+                <div role="group" aria-labelledby="dependientes-label" className={styles.stepperContainer}>
                   <button
                     type="button"
                     className={styles.stepperBtn}

@@ -426,9 +426,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {variableOhm !== 'V' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Voltaje (V)</label>
+                    <label htmlFor="voltaje" className={styles.label}>Voltaje (V)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="voltaje"
                         type="text"
                         value={voltaje}
                         onChange={(e) => setVoltaje(e.target.value)}
@@ -441,9 +442,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {variableOhm !== 'I' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Corriente (I)</label>
+                    <label htmlFor="corriente" className={styles.label}>Corriente (I)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="corriente"
                         type="text"
                         value={corriente}
                         onChange={(e) => setCorriente(e.target.value)}
@@ -456,9 +458,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {variableOhm !== 'R' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Resistencia (R)</label>
+                    <label htmlFor="resistencia" className={styles.label}>Resistencia (R)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="resistencia"
                         type="text"
                         value={resistencia}
                         onChange={(e) => setResistencia(e.target.value)}
@@ -488,9 +491,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {variablePotencia !== 'P' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Potencia (P)</label>
+                    <label htmlFor="potencia" className={styles.label}>Potencia (P)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="potencia"
                         type="text"
                         value={potencia}
                         onChange={(e) => setPotencia(e.target.value)}
@@ -503,9 +507,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {variablePotencia !== 'V' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Voltaje (V)</label>
+                    <label htmlFor="voltaje-pot" className={styles.label}>Voltaje (V)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="voltaje-pot"
                         type="text"
                         value={voltajePot}
                         onChange={(e) => setVoltajePot(e.target.value)}
@@ -518,9 +523,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {variablePotencia !== 'I' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Corriente (I)</label>
+                    <label htmlFor="corriente-pot" className={styles.label}>Corriente (I)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="corriente-pot"
                         type="text"
                         value={corrientePot}
                         onChange={(e) => setCorrientePot(e.target.value)}
@@ -552,8 +558,9 @@ export default function CalculadoraElectricidadPage() {
                 </div>
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Resistencias (separadas por coma)</label>
+                  <label htmlFor="resistencias" className={styles.label}>Resistencias (separadas por coma)</label>
                   <input
+                    id="resistencias"
                     type="text"
                     value={resistencias}
                     onChange={(e) => setResistencias(e.target.value)}
@@ -585,9 +592,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {tipoDivisor === 'tension' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Voltaje de entrada (Vin)</label>
+                    <label htmlFor="voltaje-fuente" className={styles.label}>Voltaje de entrada (Vin)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="voltaje-fuente"
                         type="text"
                         value={voltajeFuente}
                         onChange={(e) => setVoltajeFuente(e.target.value)}
@@ -600,9 +608,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {tipoDivisor === 'corriente' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Corriente total (Iin)</label>
+                    <label htmlFor="corriente-fuente" className={styles.label}>Corriente total (Iin)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="corriente-fuente"
                         type="text"
                         value={corrienteFuente}
                         onChange={(e) => setCorrienteFuente(e.target.value)}
@@ -614,9 +623,10 @@ export default function CalculadoraElectricidadPage() {
                 )}
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Resistencia R1</label>
+                  <label htmlFor="r1-divisor" className={styles.label}>Resistencia R1</label>
                   <div className={styles.inputWrapper}>
                     <input
+                      id="r1-divisor"
                       type="text"
                       value={r1Divisor}
                       onChange={(e) => setR1Divisor(e.target.value)}
@@ -627,9 +637,10 @@ export default function CalculadoraElectricidadPage() {
                 </div>
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Resistencia R2</label>
+                  <label htmlFor="r2-divisor" className={styles.label}>Resistencia R2</label>
                   <div className={styles.inputWrapper}>
                     <input
+                      id="r2-divisor"
                       type="text"
                       value={r2Divisor}
                       onChange={(e) => setR2Divisor(e.target.value)}
@@ -650,8 +661,9 @@ export default function CalculadoraElectricidadPage() {
               <>
                 <h3 className={styles.sectionTitle}>Configuración del Circuito</h3>
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Expresión del circuito</label>
+                  <label htmlFor="configuracion-mixta" className={styles.label}>Expresión del circuito</label>
                   <textarea
+                    id="configuracion-mixta"
                     value={configuracionMixta}
                     onChange={(e) => setConfiguracionMixta(e.target.value)}
                     className={styles.textarea}
@@ -709,9 +721,10 @@ export default function CalculadoraElectricidadPage() {
                 </div>
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Resistencia (R)</label>
+                  <label htmlFor="resistencia-rcrl" className={styles.label}>Resistencia (R)</label>
                   <div className={styles.inputWrapper}>
                     <input
+                      id="resistencia-rcrl"
                       type="text"
                       value={resistenciaRCRL}
                       onChange={(e) => setResistenciaRCRL(e.target.value)}
@@ -723,9 +736,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {tipoRCRL === 'rc' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Capacitancia (C)</label>
+                    <label htmlFor="capacitancia" className={styles.label}>Capacitancia (C)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="capacitancia"
                         type="text"
                         value={capacitancia}
                         onChange={(e) => setCapacitancia(e.target.value)}
@@ -738,9 +752,10 @@ export default function CalculadoraElectricidadPage() {
 
                 {tipoRCRL === 'rl' && (
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Inductancia (L)</label>
+                    <label htmlFor="inductancia" className={styles.label}>Inductancia (L)</label>
                     <div className={styles.inputWrapper}>
                       <input
+                        id="inductancia"
                         type="text"
                         value={inductancia}
                         onChange={(e) => setInductancia(e.target.value)}
@@ -752,9 +767,10 @@ export default function CalculadoraElectricidadPage() {
                 )}
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Voltaje de fuente (V₀)</label>
+                  <label htmlFor="voltaje-rcrl" className={styles.label}>Voltaje de fuente (V₀)</label>
                   <div className={styles.inputWrapper}>
                     <input
+                      id="voltaje-rcrl"
                       type="text"
                       value={voltajeRCRL}
                       onChange={(e) => setVoltajeRCRL(e.target.value)}
@@ -765,9 +781,10 @@ export default function CalculadoraElectricidadPage() {
                 </div>
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Tiempo de análisis (t)</label>
+                  <label htmlFor="tiempo-rcrl" className={styles.label}>Tiempo de análisis (t)</label>
                   <div className={styles.inputWrapper}>
                     <input
+                      id="tiempo-rcrl"
                       type="text"
                       value={tiempoRCRL}
                       onChange={(e) => setTiempoRCRL(e.target.value)}
@@ -782,9 +799,10 @@ export default function CalculadoraElectricidadPage() {
             {tipoCalculo === 'consumo' && (
               <>
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Potencia del aparato</label>
+                  <label htmlFor="potencia-consumo" className={styles.label}>Potencia del aparato</label>
                   <div className={styles.inputWrapper}>
                     <input
+                      id="potencia-consumo"
                       type="text"
                       value={potenciaConsumo}
                       onChange={(e) => setPotenciaConsumo(e.target.value)}
@@ -795,9 +813,10 @@ export default function CalculadoraElectricidadPage() {
                 </div>
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Horas de uso diario</label>
+                  <label htmlFor="horas-uso" className={styles.label}>Horas de uso diario</label>
                   <div className={styles.inputWrapper}>
                     <input
+                      id="horas-uso"
                       type="text"
                       value={horasUso}
                       onChange={(e) => setHorasUso(e.target.value)}
@@ -808,9 +827,10 @@ export default function CalculadoraElectricidadPage() {
                 </div>
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Días al mes</label>
+                  <label htmlFor="dias-mes" className={styles.label}>Días al mes</label>
                   <div className={styles.inputWrapper}>
                     <input
+                      id="dias-mes"
                       type="text"
                       value={diasMes}
                       onChange={(e) => setDiasMes(e.target.value)}
@@ -821,9 +841,10 @@ export default function CalculadoraElectricidadPage() {
                 </div>
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.label}>Precio kWh</label>
+                  <label htmlFor="precio-kwh" className={styles.label}>Precio kWh</label>
                   <div className={styles.inputWrapper}>
                     <input
+                      id="precio-kwh"
                       type="text"
                       value={precioKwh}
                       onChange={(e) => setPrecioKwh(e.target.value)}

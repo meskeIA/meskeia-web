@@ -334,8 +334,9 @@ export default function OrientadorTarifaFreelancePage() {
 
             <div className={styles.configGrid}>
               <div className={styles.selectGroup}>
-                <label className={styles.selectLabel}>IRPF estimado</label>
+                <label htmlFor="tipo-irpf" className={styles.selectLabel}>IRPF estimado</label>
                 <select
+                  id="tipo-irpf"
                   className={styles.select}
                   value={tipoIRPF}
                   onChange={(e) => setTipoIRPF(e.target.value)}
@@ -346,8 +347,9 @@ export default function OrientadorTarifaFreelancePage() {
                 </select>
               </div>
               <div className={styles.selectGroup}>
-                <label className={styles.selectLabel}>Tipo IVA</label>
+                <label htmlFor="tipo-iva" className={styles.selectLabel}>Tipo IVA</label>
                 <select
+                  id="tipo-iva"
                   className={styles.select}
                   value={tipoIVA}
                   onChange={(e) => setTipoIVA(e.target.value)}

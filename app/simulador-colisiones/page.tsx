@@ -159,15 +159,15 @@ export default function SimuladorColisionesPage() {
               Objeto A (azul)
             </h2>
             <div className={styles.sliderRow}>
-              <label>Masa: <strong>{m1} kg</strong></label>
-              <input type="range" min={1} max={20} step={0.5} value={m1}
+              <label htmlFor="masa-a">Masa: <strong>{m1} kg</strong></label>
+              <input id="masa-a" type="range" min={1} max={20} step={0.5} value={m1}
                 onChange={e => { setM1(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Masa objeto A" />
               <span className={styles.sliderLimits}><span>1 kg</span><span>20 kg</span></span>
             </div>
             <div className={styles.sliderRow}>
-              <label>Velocidad: <strong>{v1 > 0 ? '+' : ''}{v1} m/s</strong></label>
-              <input type="range" min={-10} max={10} step={0.5} value={v1}
+              <label htmlFor="velocidad-a">Velocidad: <strong>{v1 > 0 ? '+' : ''}{v1} m/s</strong></label>
+              <input id="velocidad-a" type="range" min={-10} max={10} step={0.5} value={v1}
                 onChange={e => { setV1(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Velocidad inicial objeto A" />
               <span className={styles.sliderLimits}><span>−10 m/s</span><span>+10 m/s</span></span>
@@ -180,15 +180,15 @@ export default function SimuladorColisionesPage() {
               Objeto B (naranja)
             </h2>
             <div className={styles.sliderRow}>
-              <label>Masa: <strong>{m2} kg</strong></label>
-              <input type="range" min={1} max={20} step={0.5} value={m2}
+              <label htmlFor="masa-b">Masa: <strong>{m2} kg</strong></label>
+              <input id="masa-b" type="range" min={1} max={20} step={0.5} value={m2}
                 onChange={e => { setM2(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Masa objeto B" />
               <span className={styles.sliderLimits}><span>1 kg</span><span>20 kg</span></span>
             </div>
             <div className={styles.sliderRow}>
-              <label>Velocidad: <strong>{v2 > 0 ? '+' : ''}{v2} m/s</strong></label>
-              <input type="range" min={-10} max={10} step={0.5} value={v2}
+              <label htmlFor="velocidad-b">Velocidad: <strong>{v2 > 0 ? '+' : ''}{v2} m/s</strong></label>
+              <input id="velocidad-b" type="range" min={-10} max={10} step={0.5} value={v2}
                 onChange={e => { setV2(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Velocidad inicial objeto B" />
               <span className={styles.sliderLimits}><span>−10 m/s</span><span>+10 m/s</span></span>
@@ -199,10 +199,10 @@ export default function SimuladorColisionesPage() {
           <div className={styles.panelCoef}>
             <h2 className={styles.panelTitulo}>Tipo de Colisión</h2>
             <div className={styles.sliderRow}>
-              <label>
+              <label htmlFor="coeficiente-restitucion">
                 Coeficiente de restitución (e): <strong>{formatNumber(e, 2)}</strong>
               </label>
-              <input type="range" min={0} max={1} step={0.05} value={e}
+              <input id="coeficiente-restitucion" type="range" min={0} max={1} step={0.05} value={e}
                 onChange={ev => { setE(Number(ev.target.value)); resetear(); }}
                 className={styles.sliderCoef} aria-label="Coeficiente de restitución" />
               <span className={styles.sliderLimits}><span>0 — inelástica perfecta</span><span>1 — elástica perfecta</span></span>
