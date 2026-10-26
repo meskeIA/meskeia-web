@@ -1091,6 +1091,11 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
       await expect(page.getByText('Pregunta 1 / 10')).toBeAttached();
       const tapadas: string[] = [];
       for (let n = 1; n <= 10; n++) {
+        // Lee la pregunta antes de contestar. Desde la guarda de doble toque (C0082,
+        // lib/useGuardaRafaga.ts), tocar la opción a velocidad de máquina tras «Empezar» o
+        // «Siguiente» es el 2.º toque de su ráfaga si cae cerca del botón, y se ignora: la C o la D
+        // quedan a veces donde estaba «Siguiente» (2 de 3 aislado el 26/10/2026).
+        await page.waitForTimeout(500);
         const simbolo = (await enunciado(page).textContent())!.trim();
         const nombre = COMUNES[simbolo];
         expect(nombre, `«${simbolo}» no es de los 26 elementos del nivel Fácil`).toBeTruthy();
