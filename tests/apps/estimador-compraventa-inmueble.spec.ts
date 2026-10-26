@@ -11624,7 +11624,8 @@ test.describe('Inspector 26/10/2026 — Galicia y Asturias a mano, la app entera
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
 
   /**
-   * HALLAZGO [dato, medio] — ABIERTO. «¿Puedo negociar quién paga cada gasto?» (RESPUESTA_QUIEN_PAGA de
+   * HALLAZGO [dato, medio] (3510) — REPARADO el 26/10/2026, con el OK del usuario: la constante lleva
+   * fraseRetencionIrnrComprador() sin precio tras la salvedad. «¿Puedo negociar quién paga cada gasto?» (RESPUESTA_QUIEN_PAGA de
    * metadata.ts, la misma constante en la FAQ visible y en el FAQPage) dice: «Lo que el pacto no cambia
    * es quién responde de cada impuesto ante la Administración (art. 17.5 de la Ley General Tributaria):
    * el comprador, del ITP y del AJD; el promotor, del IVA de la obra nueva […]; y el vendedor, del IRPF
@@ -11639,7 +11640,6 @@ test.describe('Inspector 26/10/2026 — Galicia y Asturias a mano, la app entera
    * en la constante.
    */
   test('HALLAZGO dato — «¿Puedo negociar quién paga cada gasto?» deja la plusvalía como única obligación del comprador ante un vendedor no residente', async ({ page }) => {
-    test.fail(true, 'ABIERTO: RESPUESTA_QUIEN_PAGA calla la retención del 3 % del art. 25.2 TRLIRNR');
     expect(RETENCION_IRNR_COMPRADOR.porcentaje).toBe(3);
     await page.goto(RUTA);
     const pregunta = '¿Puedo negociar quién paga cada gasto?';

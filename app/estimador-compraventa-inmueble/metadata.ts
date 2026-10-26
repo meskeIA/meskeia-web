@@ -17,6 +17,7 @@ import {
   sumarLineasVisibles,
   TERRITORIOS_SIN_IVA,
   SALVEDAD_PLUSVALIA_NO_RESIDENTE,
+  fraseRetencionIrnrComprador,
   GESTORIA_POR_DEFECTO,
 } from '@/data/itp-ccaa';
 import {
@@ -279,9 +280,12 @@ export const RESPUESTA_NO_SUJECION =
 // entrega, el promotor (Ley 37/1992, art. 84.Uno.1.º, BOE-A-1992-28740), que lo repercute; solo con
 // la inversión del sujeto pasivo lo ingresa el comprador (hallazgo 3469). Y la plusvalía lleva la
 // salvedad del no residente, art. 106.2 TRLRHL (hallazgo 3467, cabo C0354).
+// 26/10/2026 — Y tras ella la retención del 3 % del art. 25.2 TRLIRNR, la frase del solar sin cifra:
+// con la salvedad sola, la plusvalía parecía lo único que el no residente traslada al comprador
+// (hallazgo 3510, forma del 3509; OK del usuario el 26/10/2026).
 export const PREGUNTA_QUIEN_PAGA = '¿Puedo negociar quién paga cada gasto?';
 export const RESPUESTA_QUIEN_PAGA =
-  `Sí, dentro de un límite. Por ley, los gastos de otorgamiento de la escritura —la matriz que autoriza el notario— son del vendedor, y los de la primera copia y los posteriores a la venta, del comprador, salvo pacto en contrario (art. 1455 del Código Civil). En la práctica es habitual pactar que el comprador pague toda la notaría y el registro, pero es un acuerdo que se escribe en las arras o en el contrato privado, no una obligación legal. Lo que el pacto no cambia es quién responde de cada impuesto ante la Administración (art. 17.5 de la Ley General Tributaria): el comprador, del ITP y del AJD; el promotor, del IVA de la obra nueva, que repercute al comprador en la factura; y el vendedor, del IRPF de la ganancia y de la plusvalía municipal, con una excepción: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}.`;
+  `Sí, dentro de un límite. Por ley, los gastos de otorgamiento de la escritura —la matriz que autoriza el notario— son del vendedor, y los de la primera copia y los posteriores a la venta, del comprador, salvo pacto en contrario (art. 1455 del Código Civil). En la práctica es habitual pactar que el comprador pague toda la notaría y el registro, pero es un acuerdo que se escribe en las arras o en el contrato privado, no una obligación legal. Lo que el pacto no cambia es quién responde de cada impuesto ante la Administración (art. 17.5 de la Ley General Tributaria): el comprador, del ITP y del AJD; el promotor, del IVA de la obra nueva, que repercute al comprador en la factura; y el vendedor, del IRPF de la ganancia y de la plusvalía municipal, con una excepción: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}. ${fraseRetencionIrnrComprador()}`;
 
 /**
  * «¿Qué son los tipos reducidos de ITP…?», en UNA constante para la FAQ visible y el FAQPage: era la
