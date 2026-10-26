@@ -14,6 +14,8 @@ import { TRAMOS_IRPF_2025, TIPOS_IS_2025, TRAMOS_IS_MICROPYMES_2026 } from '@/da
 /**
  * Extremos de la escala del IRPF, de data/fiscal: hasta el 19/10/2026 la tabla los llevaba
  * tecleados («19-47 %», cabo C0036), la forma que el hallazgo 2143 dejó desfasada en otra app.
+ * El párrafo «¿Cuándo puede el IS ser más favorable…?» llevó «37-47 %» a mano hasta el 26/10/2026
+ * (cabo C0341): ahora lee la misma escala.
  */
 const ESCALA_IRPF_TEXTO = `${TRAMOS_IRPF_2025[0].tipo}-${TRAMOS_IRPF_2025[TRAMOS_IRPF_2025.length - 1].tipo} %`;
 
@@ -467,7 +469,7 @@ export default function SelectorFormaJuridica() {
         <p>
           En términos generales, el Impuesto sobre Sociedades (IS), al {IS_GENERAL_MICRO_TEXTO}, puede
           resultar más ventajoso que el IRPF sobre la parte del beneficio que se queda en la
-          sociedad: el tipo marginal del IRPF escala (37-47 %), mientras que el IS no sube con el
+          sociedad: el tipo marginal del IRPF sube por tramos ({ESCALA_IRPF_TEXTO}), mientras que el IS no sube con el
           beneficio de la misma forma. No hay una cifra de beneficio que valga para todos: depende
           de cuánto se retira como sueldo o dividendos (que vuelven a tributar en el IRPF), de la
           retribución del socio-administrador, las cotizaciones a la Seguridad Social y los gastos
