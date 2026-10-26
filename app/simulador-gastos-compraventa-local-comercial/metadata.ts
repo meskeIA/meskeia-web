@@ -11,7 +11,9 @@ import {
   // La salvedad del no residente en la plusvalía, art. 106.2 TRLRHL (hallazgo 3472, cabo C0354).
   SALVEDAD_PLUSVALIA_NO_RESIDENTE,
 } from '@/data/itp-ccaa';
-import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '@/data/fiscal';
+// El tope y el plazo de la renta vitalicia de los mayores de 65 (art. 38.3 LIRPF), del módulo y no
+// tecleados (hallazgo 3518, efecto familia del 3499 de la referencia).
+import { IVA_INMUEBLES_2025, TRAMOS_GANANCIAS_PATRIMONIALES_2025, EXENCION_RENTA_VITALICIA_MAYORES_65 } from '@/data/fiscal';
 import { formatNumber } from '@/lib/formatters';
 
 /**
@@ -163,7 +165,7 @@ export const faqJsonLd = {
         '@type': 'Answer',
         // La salvedad del promotor, como la tarjeta de la pestaña Vendedor (AVISO_VENTA_PROMOTOR,
         // 616e5fc8): sin ella el FAQPage daba por ganancia del ahorro cualquier venta (hallazgo 3402).
-        text: `El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano. Hay una excepción: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}. Si es una persona física, tributa en el IRPF por la ganancia patrimonial en la base del ahorro (tipos del ${AHORRO_MIN}${PCT} al ${AHORRO_MAX}${PCT} en 2025); si es una sociedad, en el Impuesto sobre Sociedades. En una primera entrega (obra nueva) vende el promotor, que es empresario aunque promueva una sola vez: su renta no es una ganancia patrimonial, sino un rendimiento de actividad económica en el IRPF (art. 27.1 LIRPF) o, si es una sociedad, renta del Impuesto sobre Sociedades, y esta calculadora no la calcula. A diferencia de la vivienda habitual, no existe exención por reinversión; los mayores de 65 años sí pueden excluir la ganancia si destinan lo obtenido, en seis meses, a constituir una renta vitalicia asegurada a su favor, hasta 240.000 € (art. 38.3 LIRPF), algo que esta calculadora no aplica. Si el local estuvo afecto a una actividad económica o alquilado, el valor de adquisición se minora en las amortizaciones deducidas, o al menos en la mínima (art. 35.2 LIRPF y art. 40 de su Reglamento), lo que aumenta la ganancia. A esto se suman la comisión de la inmobiliaria y la gestoría.`,
+        text: `El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano. Hay una excepción: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}. Si es una persona física, tributa en el IRPF por la ganancia patrimonial en la base del ahorro (tipos del ${AHORRO_MIN}${PCT} al ${AHORRO_MAX}${PCT} en 2025); si es una sociedad, en el Impuesto sobre Sociedades. En una primera entrega (obra nueva) vende el promotor, que es empresario aunque promueva una sola vez: su renta no es una ganancia patrimonial, sino un rendimiento de actividad económica en el IRPF (art. 27.1 LIRPF) o, si es una sociedad, renta del Impuesto sobre Sociedades, y esta calculadora no la calcula. A diferencia de la vivienda habitual, no existe exención por reinversión; los mayores de 65 años sí pueden excluir la ganancia si destinan lo obtenido, en ${EXENCION_RENTA_VITALICIA_MAYORES_65.plazoMeses} meses, a constituir una renta vitalicia asegurada a su favor, hasta ${formatNumber(EXENCION_RENTA_VITALICIA_MAYORES_65.importeMaximo, 0)} € (art. 38.3 LIRPF), algo que esta calculadora no aplica. Si el local estuvo afecto a una actividad económica o alquilado, el valor de adquisición se minora en las amortizaciones deducidas, o al menos en la mínima (art. 35.2 LIRPF y art. 40 de su Reglamento), lo que aumenta la ganancia. A esto se suman la comisión de la inmobiliaria y la gestoría.`,
       },
     },
     {

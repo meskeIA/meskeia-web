@@ -5394,7 +5394,7 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
     expect(await valorTarjeta(page, 'IRPF sobre la ganancia')).toBe('5613,00 €');
     expect(await descripcionTarjeta(page, 'IRPF sobre la ganancia')).toBe(
       // Desde el hallazgo 3256 (19/10/2026) nombra la vía del art. 38.3 LIRPF en vez de negarla.
-      'Base del ahorro (19–30 %). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en seis meses (art. 38.3 LIRPF), que esta calculadora no aplica. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
+      'Base del ahorro (19–30 %). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en 6 meses (art. 38.3 LIRPF), que esta calculadora no aplica. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
     // El defecto.
     // Todo el texto de la página, también lo plegado del bloque educativo, sin los scripts (el JSON-LD).
@@ -7329,7 +7329,7 @@ test.describe('Inspector 25/10/2026 — Baleares en su escala, Cataluña en el 1
     ];
     await expect.poll(vendedor).toEqual(esperado);
     expect(await descripcionTarjeta(page, /^IRPF sobre la ganancia/)).toBe(
-      'Base del ahorro (19–30 %). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en seis meses (art. 38.3 LIRPF), que esta calculadora no aplica. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
+      'Base del ahorro (19–30 %). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en 6 meses (art. 38.3 LIRPF), que esta calculadora no aplica. Calculado como si esta venta fuera tu única renta del ahorro del año: si tienes intereses, dividendos u otras ganancias, escríbelos arriba, porque la cuota puede ser mayor.',
     );
 
     // El perfil «afecto» cambia la ayuda del campo, no las cifras.
@@ -7952,7 +7952,7 @@ test.describe('Inspector 26/10/2026 — Murcia con la gestoría de serie, el pro
       '67.775,00 €',
       'IRPF sobre la ganancia',
       '14.788,25 €',
-      'Base del ahorro (19–30 %). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en seis meses (art. 38.3 LIRPF), que esta calculadora no aplica. Es lo que esta venta añade a tu cuota, sumada a 10.000,00 € de otras rentas del ahorro del año.',
+      'Base del ahorro (19–30 %). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en 6 meses (art. 38.3 LIRPF), que esta calculadora no aplica. Es lo que esta venta añade a tu cuota, sumada a 10.000,00 € de otras rentas del ahorro del año.',
       '5400,00 €',
       '22.013,25 €',
       '12,23 % sobre el precio de venta',
@@ -8257,7 +8257,8 @@ test.describe('Inspector 26/10/2026 — Murcia con la gestoría de serie, el pro
   });
 
   /**
-   * [26/10-b] (dato, bajo) — ABIERTO. Efecto familia del hallazgo 3499 de la referencia: el tope de la renta
+   * [26/10-b] (dato, bajo; hallazgo 3518) — REPARADO el 26/10/2026: las tres bocas leen el módulo (la
+   * tarjeta y el bloque dicen ahora «6 meses», como la referencia). Efecto familia del hallazgo 3499 de la referencia: el tope de la renta
    * vitalicia de los mayores de 65 (art. 38.3 LIRPF) y su plazo van TECLEADOS en tres sitios de esta app
    * —la tarjeta del IRPF (page.tsx l. 2282, «en seis meses»), el bloque educativo (l. 2579-2582, «en seis
    * meses … hasta 240.000 €») y el FAQPage «¿Qué gastos e impuestos paga el vendedor…?» (metadata.ts
@@ -8266,7 +8267,6 @@ test.describe('Inspector 26/10/2026 — Murcia con la gestoría de serie, el pro
    * el día que la ley los mueva, estas bocas no se enterarían. Se lee el fuente, como el test del 3499.
    */
   test('[26/10-b] el tope de 240.000 € y los seis meses del art. 38.3 LIRPF no van tecleados en la página ni en el FAQPage', async () => {
-    test.fail(!VER_HUECOS_2510, 'hallazgo abierto del 26/10/2026: el art. 38.3 LIRPF tecleado, con EXENCION_RENTA_VITALICIA_MAYORES_65 en data/fiscal');
     expect(EXENCION_RENTA_VITALICIA_MAYORES_65.importeMaximo).toBe(240000);
     expect(EXENCION_RENTA_VITALICIA_MAYORES_65.plazoMeses).toBe(6);
     const tecleado = /240\.000\s*€|seis meses/;

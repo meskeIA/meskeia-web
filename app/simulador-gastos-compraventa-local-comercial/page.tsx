@@ -37,6 +37,8 @@ import {
   NOMBRE_RENTA_PROMOTOR,
   AVISO_VENTA_PROMOTOR,
   LIMITACION_ABATIMIENTO,
+  // El tope y el plazo del art. 38.3 LIRPF, del módulo y no tecleados (hallazgo 3518).
+  EXENCION_RENTA_VITALICIA_MAYORES_65,
 } from '@/data/fiscal';
 import {
   ITP_CCAA,
@@ -2285,7 +2287,7 @@ export default function SimuladorLocalComercialPage() {
                                 ? 'No hay ganancia que gravar: la pérdida se compensa con otras ganancias del ahorro en tu declaración'
                                 : resultadosVendedor.gananciaPatrimonial === 0
                                   ? 'No hay ganancia que gravar, así que esta venta no tiene IRPF'
-                                  : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en seis meses (art. 38.3 LIRPF), que esta calculadora no aplica.${fraseCeutaMelilla} ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`;
+                                  : `Base del ahorro (${formatNumber(TIPO_AHORRO_MIN, 0)}–${conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). La exención por reinversión es solo de la vivienda habitual; con más de 65 años, la ganancia se excluye si destinas lo obtenido a una renta vitalicia en ${EXENCION_RENTA_VITALICIA_MAYORES_65.plazoMeses} meses (art. 38.3 LIRPF), que esta calculadora no aplica.${fraseCeutaMelilla} ${textoOtrasRentasAhorro(resultadosVendedor.otrasRentasAhorro)}`;
                             })()
                     }
                   />
@@ -2584,8 +2586,9 @@ export default function SimuladorLocalComercialPage() {
               {/* Hallazgo 3256: el art. 38.3 LIRPF vale para cualquier elemento patrimonial. */}
               <strong>No hay exención por reinversión</strong>, que es exclusiva de la vivienda
               habitual. Los mayores de 65 años sí tienen otra vía, que esta calculadora no aplica:
-              la ganancia queda excluida si destinan lo obtenido, en seis meses, a constituir una
-              renta vitalicia asegurada a su favor, hasta 240.000 € (art. 38.3 LIRPF).
+              la ganancia queda excluida si destinan lo obtenido, en {EXENCION_RENTA_VITALICIA_MAYORES_65.plazoMeses} meses, a constituir una
+              renta vitalicia asegurada a su favor, hasta{' '}
+              {`${formatNumber(EXENCION_RENTA_VITALICIA_MAYORES_65.importeMaximo, 0)} €`} (art. 38.3 LIRPF).
             </li>
             <li>
               <strong>Amortizaciones si el local estuvo afecto a una actividad o alquilado.</strong> Si lo usaste en
