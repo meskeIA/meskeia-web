@@ -80,6 +80,7 @@
     "inspector:probar-revalidar-commits": "node scripts/inspector/probar-revalidar-commits.mjs",
     "cabos": "node scripts/cabos/cabos.mjs",
     "cabos:probar": "node scripts/cabos/probar-cabos.mjs",
+    "ronda:probar": "node scripts/pruebas/probar-ronda-base.mjs",
     "check:tipos": "node scripts/check-tipos.mjs",
     "cuadrante": "node scripts/cuadrante-catalogo.mjs",
     "analisis:geografia": "node scripts/analisis-geografia-serie.mjs",
