@@ -75,7 +75,9 @@ import {
   CASOS_ESCRITURAR,
   preguntaEscriturar,
   respuestaEscriturar, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL,
-  TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION } from '@/data/itp-ccaa';
+  TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION,
+  GESTORIA_POR_DEFECTO,
+} from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
   RESPUESTA_ITP_GARAJE_SEGUNDA_MANO,
@@ -466,7 +468,7 @@ export default function SimuladorGarajeCompraventaPage() {
   const [tipoTransmision, setTipoTransmision] = useState<TipoTransmision>('segunda-mano');
   const [tipoGaraje, setTipoGaraje] = useState<TipoGaraje>('vinculado');
   const [perfilComprador, setPerfilComprador] = useState<PerfilComprador>('general');
-  const [gastosGestoria, setGastosGestoria] = useState('300');
+  const [gastosGestoria, setGastosGestoria] = useState(String(GESTORIA_POR_DEFECTO.garaje));
 
   // Estado del formulario — vendedor
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');

@@ -57,6 +57,7 @@ import {
   deNombreCcaa,
   TERRITORIOS_SIN_RENUNCIA,
   AVISO_IRPF_FORAL,
+  GESTORIA_POR_DEFECTO,
 } from '@/data/itp-ccaa';
 import {
   FISCAL_INMUEBLES_META,
@@ -194,7 +195,7 @@ export default function SimuladorTerrenoRusticoPage() {
   const [precioVenta, setPrecioVenta] = useState('');
   const [ccaa, setCcaa] = useState<ComunidadAutonoma>('madrid');
   const [tipoOperacion, setTipoOperacion] = useState<TipoOperacion>('itp');
-  const [gastosGestoria, setGastosGestoria] = useState('400');
+  const [gastosGestoria, setGastosGestoria] = useState(String(GESTORIA_POR_DEFECTO.rustico));
 
   /**
    * La operación que se CALCULA. En Ceuta y Melilla la renuncia no existe (ver

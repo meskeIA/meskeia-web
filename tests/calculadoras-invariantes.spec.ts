@@ -59,6 +59,10 @@ import { calcularIRPF } from '../lib/calculadoras/irpf';
 import { compararAutonomoVsSL } from '../lib/calculadoras/autonomoVsSL';
 import { calcularCompraventa } from '../lib/calculadoras/compraventa';
 import { calcularGastosCompraInmueble } from '../lib/calculadoras/gastosCompraInmueble';
+import { GESTORIA_POR_DEFECTO, ITP_CCAA, elegirTipoITP, importeITP, calcularAJD, estimarFacturaNotarial, calcularRegistro, sumarLineasVisibles, TERRITORIOS_SIN_IVA, AVISO_IRPF_FORAL, type ComunidadAutonoma } from '../data/itp-ccaa';
+import { IVA_INMUEBLES_2025 } from '../data/fiscal';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { calcularHipoteca } from '../lib/calculadoras/hipoteca';
 import { calcularSucesion } from '../lib/calculadoras/sucesiones';
 import { calcularPensionPublica } from '../lib/calculadoras/pensionPublica';
@@ -5562,5 +5566,126 @@ test.describe('modulosVsDirecta — rendimiento de módulos aportado, diferencia
     expect(b.modulos!.irpf).toBeCloseTo(12222, 2);
     expect(b.modulos!.costeAnualTotal).toBeCloseTo(16062, 2);
     expect(b.diferencia).toBeCloseTo(4314.2, 2);
+  });
+});
+
+// ─── Unificación app ↔ motor — 26/10/2026 (hito unificar-app-motor-42-pares) ──────────────
+//
+// `compraventa` y `gastosCompraInmueble` calculan lo que publican las siete apps del clúster de
+// compraventa. El comprador ya salía de las mismas funciones (cabos C0004 y C0209) salvo la
+// gestoría (500 € a todo) y el ITP del garaje, que cobraba el tipo reducido de la vivienda
+// habitual. El vendedor era una copia propia. Los casos A-D están resueltos a mano:
+//   A · Madrid, venta 250.000, compra 180.000, 8 años, suelo 60.000, tipo 25 %:
+//       plusvalía 60.000 × 0,19 × 25 % = 2.850,00 · ganancia 250.000 − 2.850 − 180.000 = 67.150
+//       IRPF 6.000 × 19 % + 44.000 × 21 % + 17.150 × 23 % = 1.140 + 9.240 + 3.944,50 = 14.324,50
+//   B · A vendiendo por 150.000: sin incremento, no sujeta (art. 104.5 TRLRHL) → 0
+//   C · A en Ceuta: plusvalía 2.850 × 50 % = 1.425,00 · ganancia 68.575 → cuota 14.652,25,
+//       con la deducción del 60 % del art. 68.4 LIRPF → 5.860,90
+//   D · A en el País Vasco, vivienda habitual: plusvalía foral y IRPF foral, sin cifra
+test.describe('Unificación app ↔ motor — compraventa (26/10/2026)', () => {
+  const A = {
+    precioInmueble: 250000, ccaa: 'madrid', tipoTransmision: 'segunda_mano' as const,
+    precioCompraOriginal: 180000, aniosTenencia: 8, valorCatastralSuelo: 60000,
+  };
+
+  test('A · la plusvalía minora el valor de transmisión del IRPF (art. 35.1 LIRPF)', () => {
+    const v = calcularCompraventa(A).vendedor!;
+    expect(v.plusvaliaMunicipal).toBeCloseTo(2850, 2);
+    expect(v.gananciaPatrimonial).toBeCloseTo(67150, 2);
+    expect(v.irpfGananciaPatrimonial).toBeCloseTo(14324.5, 2);
+    expect(v.totalGastosVendedor).toBeCloseTo(17174.5, 2);
+  });
+
+  test('B · vendiendo con pérdida no hay plusvalía municipal (art. 104.5 TRLRHL)', () => {
+    const v = calcularCompraventa({ ...A, precioInmueble: 150000 }).vendedor!;
+    expect(v.plusvaliaMunicipal).toBe(0);
+    expect(v.metodoPlusvalia).toContain('No sujeta');
+    expect(v.irpfGananciaPatrimonial).toBe(0);
+    expect(v.totalGastosVendedor).toBe(0);
+  });
+
+  test('C · Ceuta: bonificación del 50 % de la plusvalía y deducción del 60 % del IRPF', () => {
+    const v = calcularCompraventa({ ...A, ccaa: 'ceuta' }).vendedor!;
+    expect(v.plusvaliaMunicipal).toBeCloseTo(1425, 2);
+    expect(v.irpfGananciaPatrimonial).toBeCloseTo(5860.9, 2);
+    expect(v.nota).toContain('art. 68.4 LIRPF');
+  });
+
+  test('D · País Vasco: ni la plusvalía ni el IRPF del residente se liquidan con la ley estatal', () => {
+    const habitual = calcularCompraventa({ ...A, ccaa: 'pais-vasco', esViviendaHabitual: true }).vendedor!;
+    expect(habitual.plusvaliaMunicipal).toBeNull();
+    expect(habitual.metodoPlusvalia).toContain('No calculada');
+    expect(habitual.irpfGananciaPatrimonial).toBeNull();
+    expect(habitual.exentoIRPF).toBe(false);
+    // Sin ser su vivienda habitual puede no residir allí: cuota estatal, con el aviso foral
+    const otra = calcularCompraventa({ ...A, ccaa: 'pais-vasco' }).vendedor!;
+    expect(otra.irpfGananciaPatrimonial).toBeGreaterThan(0);
+    expect(otra.nota).toContain(AVISO_IRPF_FORAL);
+  });
+
+  test('la exención del mayor de 65 nombra el plazo de residencia del art. 41 bis RIRPF', () => {
+    const v = calcularCompraventa({ ...A, vendedorMayor65: true, esViviendaHabitual: true }).vendedor!;
+    expect(v.exentoIRPF).toBe(true);
+    expect(v.irpfGananciaPatrimonial).toBe(0);
+    expect(v.motivoExencion).toContain('41 bis');
+  });
+
+  test('un garaje de segunda mano no paga el ITP reducido de la vivienda habitual (hallazgo 833)', () => {
+    const c = calcularCompraventa({
+      precioInmueble: 25000, ccaa: 'andalucia', tipoTransmision: 'segunda_mano', tipoInmueble: 'garaje', perfilComprador: 'joven',
+    }).comprador;
+    expect(c.importeImpuesto).toBeCloseTo(1750, 2);
+  });
+
+  test('la gestoría de los dos motores es la de la app de cada tipo', () => {
+    expect(calcularCompraventa({ precioInmueble: 200000, ccaa: 'madrid', tipoTransmision: 'segunda_mano' }).comprador.gestoria)
+      .toBe(GESTORIA_POR_DEFECTO.vivienda);
+    const tipos = [
+      ['vivienda', 'vivienda'], ['garaje', 'garaje'], ['trastero', 'trastero'], ['local_comercial', 'local'],
+      ['nave_industrial', 'nave'], ['solar_edificable', 'solar'], ['finca_rustica', 'rustico'],
+    ] as const;
+    for (const [tipo, clave] of tipos) {
+      expect(calcularGastosCompraInmueble({ precio: 30000, ccaa: 'madrid', tipoInmueble: tipo }).gestoria, tipo)
+        .toBe(GESTORIA_POR_DEFECTO[clave]);
+    }
+    // Y las apps la leen de ahí, no de un literal en su useState
+    const apps: [string, string][] = [
+      ['simulador-gastos-compraventa-garaje', 'garaje'], ['simulador-gastos-compraventa-trastero', 'trastero'],
+      ['simulador-gastos-compraventa-local-comercial', 'local'], ['simulador-gastos-compraventa-nave-industrial', 'nave'],
+      ['simulador-gastos-compraventa-solar', 'solar'], ['simulador-gastos-compraventa-terreno-rustico', 'rustico'],
+    ];
+    for (const [slug, clave] of apps) {
+      const fuente = readFileSync(join(process.cwd(), 'app', slug, 'page.tsx'), 'utf8');
+      expect(fuente, slug).toContain(`useState(String(GESTORIA_POR_DEFECTO.${clave}))`);
+    }
+  });
+
+  // El comprador de estimador-compraventa-inmueble, con las llamadas de su useMemo
+  // (page.tsx, «ITP para segunda mano» y «AJD: Solo aplica en primera mano»).
+  test('el comprador del motor es el de la app: 19 comunidades × precios × perfiles × transmisión', () => {
+    const perfiles = [['general', 'general'], ['joven', 'joven'], ['familia-numerosa', 'familia_numerosa'], ['discapacidad', 'discapacidad']] as const;
+    let distintos = 0;
+    const primero: string[] = [];
+    for (const tipo of ['vivienda', 'garaje'] as const)
+      for (const ccaa of Object.keys(ITP_CCAA) as ComunidadAutonoma[])
+        for (const precio of [25000, 150000, 450000, 1200000])
+          for (const [perfilApp, perfilMotor] of perfiles)
+            for (const primera of [false, true]) {
+              const m = calcularCompraventa({ precioInmueble: precio, ccaa, tipoTransmision: primera ? 'obra_nueva' : 'segunda_mano', tipoInmueble: tipo, perfilComprador: perfilMotor }).comprador;
+              let impuesto = 0;
+              if (primera) {
+                if (!TERRITORIOS_SIN_IVA[ccaa]) impuesto = precio * ((tipo === 'vivienda' ? IVA_INMUEBLES_2025.obraNueva : IVA_INMUEBLES_2025.anejoVinculado) / 100);
+              } else {
+                impuesto = importeITP(precio, ccaa, elegirTipoITP(ccaa, perfilApp, precio, { viviendaHabitual: tipo === 'vivienda', objeto: tipo === 'vivienda' ? 'vivienda' : 'otro' }));
+              }
+              const ajd = primera ? calcularAJD(precio, ccaa, { objeto: 'vivienda' }) : 0;
+              const total = sumarLineasVisibles(impuesto, ajd, estimarFacturaNotarial(precio, ccaa).medio, calcularRegistro(precio, ccaa), GESTORIA_POR_DEFECTO.vivienda);
+              if (Math.abs(m.totalGastos - total) > 0.005) {
+                distintos++;
+                if (primero.length < 3) primero.push(`${tipo} ${ccaa} ${precio} ${perfilMotor} ${primera ? 'obra nueva' : '2ª mano'}: motor ${m.totalGastos} · app ${total}`);
+              }
+            }
+    expect(primero).toEqual([]);
+    expect(distintos).toBe(0);
   });
 });

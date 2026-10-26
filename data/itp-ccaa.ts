@@ -1718,6 +1718,26 @@ export function calcularNotario(valor: number, ccaa?: ComunidadAutonoma): number
 }
 
 /**
+ * Gestoría del comprador que proponen por defecto las apps del clúster, y que suman los dos
+ * motores del MCP (`compraventa.ts` y `gastosCompraInmueble.ts`). No es normativa: es una
+ * estimación de mercado, editable en cada app.
+ *
+ * Hasta el 26/10/2026 cada app la escribía en su `useState` y los dos motores ponían 500 € a
+ * todo: Madrid · 200.000 € daba 13.246,00 € de gastos en la web y 13.446,00 € en Delegum, y el
+ * garaje y el trastero, 200 € más en el MCP que en su app (hito unificar-app-motor).
+ */
+export const GESTORIA_POR_DEFECTO = {
+  /** También la de estimador-compraventa-inmueble para cualquier tipo: tiene un solo campo. */
+  vivienda: 300,
+  garaje: 300,
+  trastero: 300,
+  local: 500,
+  nave: 500,
+  solar: 500,
+  rustico: 400,
+} as const;
+
+/**
  * Conceptos del Arancel de los Registradores (RD 1427/1989) que acompañan siempre a una
  * inscripción de compraventa y que el número 2 no incluye: el asiento de presentación
  * (número 1) y la nota simple informativa (número 4).

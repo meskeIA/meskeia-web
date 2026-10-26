@@ -35,6 +35,7 @@ import {
   tipoAJD,
   TERRITORIOS_SIN_IVA,
   TERRITORIOS_SIN_RENUNCIA,
+  GESTORIA_POR_DEFECTO,
   type ObjetoTransmision,
 } from '@/data/itp-ccaa';
 import { formatNumber } from '@/lib/formatters';
@@ -76,7 +77,7 @@ export interface ParametrosGastosCompra {
   vendedorEsEmpresario?: boolean;
   /** Perfil del comprador — solo produce efecto en vivienda y anejos residenciales */
   perfilComprador?: PerfilCompradorMCP;
-  /** Gastos de gestoría en euros (por defecto 500) */
+  /** Gastos de gestoría en euros (por defecto, la de la app del tipo: GESTORIA_POR_DEFECTO) */
   gestoria?: number;
 }
 
@@ -110,6 +111,17 @@ export interface ResultadoGastosCompra {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** La app del clúster de cada tipo, para leer su gestoría por defecto. */
+const GESTORIA_DE: Record<TipoInmuebleCompra, keyof typeof GESTORIA_POR_DEFECTO> = {
+  vivienda: 'vivienda',
+  garaje: 'garaje',
+  trastero: 'trastero',
+  local_comercial: 'local',
+  nave_industrial: 'nave',
+  solar_edificable: 'solar',
+  finca_rustica: 'rustico',
+};
 
 // ─── Función principal ─────────────────────────────────────────────────────────
 
@@ -267,7 +279,8 @@ export function calcularGastosCompraInmueble(p: ParametrosGastosCompra): Resulta
   const { notaria, registro, nota: notaHonorarios } = honorariosSegunApps(p.precio, ccaa);
   advertencias.push(notaHonorarios);
 
-  const gestoria = p.gestoria ?? 500;
+  // La de cada app del clúster (hasta el 26/10/2026, 500 € para todos: 200 € de más en garaje)
+  const gestoria = p.gestoria ?? GESTORIA_POR_DEFECTO[GESTORIA_DE[p.tipoInmueble]];
   const totalGastos = r(importeImpuesto + ajd + notaria + registro + gestoria);
 
   advertencias.push('La base imponible del ITP es el valor de referencia catastral cuando supera el precio escriturado.');

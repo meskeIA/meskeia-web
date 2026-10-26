@@ -18,6 +18,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { z } from 'zod';
+import { GESTORIA_POR_DEFECTO } from '@/data/itp-ccaa';
 
 // ── Calculadoras compartidas (fiscal / laboral / financiero) ──────────────────
 import { calcularSueldoNeto, type SituacionFamiliar } from '@/lib/calculadoras/sueldoNeto';
@@ -638,7 +639,7 @@ function crearServidorDelegum(): McpServer {
       perfil_comprador: z.enum(['general', 'joven', 'familia_numerosa', 'discapacidad']).optional()
         .describe('Perfil del comprador. Solo produce efecto en vivienda y en anejos comprados con ella: los tipos reducidos de ITP son exclusivos de la vivienda habitual.'),
       gestoria: z.number().nonnegative().optional()
-        .describe('Gastos de gestoría en euros. Por defecto 500.'),
+        .describe(`Gastos de gestoría en euros. Por defecto, los de la app de cada tipo: vivienda ${GESTORIA_POR_DEFECTO.vivienda}, garaje ${GESTORIA_POR_DEFECTO.garaje}, trastero ${GESTORIA_POR_DEFECTO.trastero}, local ${GESTORIA_POR_DEFECTO.local}, nave ${GESTORIA_POR_DEFECTO.nave}, solar ${GESTORIA_POR_DEFECTO.solar}, finca rústica ${GESTORIA_POR_DEFECTO.rustico}.`),
     },
     { title: 'Gastos de compra por tipo de inmueble (garaje, local, nave, solar, rústico)', readOnlyHint: true },
     async ({ precio, ccaa, tipo_inmueble, obra_nueva, anejo_de_vivienda, renuncia_exencion_iva, vendedor_es_empresario, perfil_comprador, gestoria }, extra) => {

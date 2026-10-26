@@ -73,6 +73,7 @@ import {
   TERRITORIOS_IIVTNU_FORAL,
   motivoPlusvaliaForal,
   SALVEDAD_PLUSVALIA_NO_RESIDENTE,
+  GESTORIA_POR_DEFECTO,
 } from '@/data/itp-ccaa';
 
 // ===== TIPOS =====
@@ -481,7 +482,7 @@ export default function SimuladorLocalComercialPage() {
   const [precioVenta, setPrecioVenta] = useState('');
   const [ccaa, setCcaa] = useState<ComunidadAutonoma>('madrid');
   const [tipoTransmision, setTipoTransmision] = useState<TipoTransmision>('segunda-mano');
-  const [gastosGestoria, setGastosGestoria] = useState('500');
+  const [gastosGestoria, setGastosGestoria] = useState(String(GESTORIA_POR_DEFECTO.local));
 
   // Datos del vendedor
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');

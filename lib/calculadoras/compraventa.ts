@@ -20,13 +20,24 @@
  * llevaba la rebaja del 5 % del nº 2.1 de los aranceles ni sabía que en Canarias, Ceuta y Melilla
  * no se factura IVA: Madrid 200.000 € daba 600 € de notaría y 400 € de registro, y las apps, 721,04
  * y 224,96 €. Ahora salen de las mismas funciones que ellas (`honorariosSegunApps`).
+ *
+ * Hasta el 26/10/2026 (hito unificar-app-motor) el lado del VENDEDOR era una copia propia: no
+ * restaba la plusvalía del valor de transmisión (art. 35.1 LIRPF: 14.980 € de IRPF donde la app
+ * da 14.324,50), cobraba plusvalía vendiendo con pérdida (no sujeción del art. 104.5 TRLRHL) y
+ * no sabía de Ceuta, Melilla ni territorio foral. Ahora es el cálculo de la pestaña Vendedor de
+ * estimador-compraventa-inmueble: `calcularPlusvaliaMunicipal` y `calcularGananciaInmueble`. En el
+ * mismo cambio, el garaje dejó de pagar ITP de vivienda habitual (hallazgo 833 de la app) y la
+ * gestoría pasó a ser la de la app (`GESTORIA_POR_DEFECTO`), no 500 €.
  */
 
 import {
   IVA_INMUEBLES_2025,
   coeficienteIIVTNU,
+  calcularGananciaInmueble,
+  PORCENTAJES_IVA,
+  BONIFICACION_IIVTNU_CEUTA_MELILLA,
+  DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA,
   PLUSVALIA_MUNICIPAL_META,
-  TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   FISCAL_INMUEBLES_META,
 } from '@/data/fiscal';
 import {
@@ -43,6 +54,13 @@ import {
   honorariosLlevanIVA,
   notariaDeLibreAcuerdo,
   LIMITE_ARANCEL_NOTARIAL,
+  GESTORIA_POR_DEFECTO,
+  calcularPlusvaliaMunicipal,
+  TERRITORIOS_IIVTNU_FORAL,
+  motivoPlusvaliaForal,
+  avisoIrpfForalResidente,
+  TERRITORIOS_IRPF_FORAL,
+  AVISO_IRPF_FORAL,
   normaliza,
   type ComunidadAutonoma,
   type ContextoAJD,
@@ -206,22 +224,6 @@ export function honorariosSegunApps(
   return { notaria, registro, nota: partes.join(' ') };
 }
 
-function calcularIRPFGanancia(ganancia: number): number {
-  if (ganancia <= 0) return 0;
-  let impuesto = 0;
-  let base = ganancia;
-  let prevHasta = 0;
-
-  for (const tramo of TRAMOS_GANANCIAS_PATRIMONIALES_2025) {
-    if (base <= 0) break;
-    const tranche = Math.min(base, tramo.hasta === Infinity ? base : tramo.hasta - prevHasta);
-    impuesto += tranche * (tramo.tipo / 100);
-    base -= tranche;
-    prevHasta = tramo.hasta;
-  }
-  return impuesto;
-}
-
 const esResidencialObjeto = (t: TipoInmuebleMCP): boolean => t === 'vivienda' || t === 'garaje';
 
 // ─── Función principal ─────────────────────────────────────────────────────────
@@ -233,8 +235,12 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
   const ccaa = claveCCAA(p.ccaa);
   const ccaaNombre = ITP_CCAA[ccaa].nombre;
   const tipoInmueble = p.tipoInmueble ?? 'vivienda';
-  // Garaje y anejos van con la vivienda (objeto «vivienda» del motor); local y terreno, aparte
+  // AJD e IVA: el garaje va con la vivienda (objeto «vivienda» del motor); local y terreno, aparte
   const objeto: ObjetoTransmision = esResidencialObjeto(tipoInmueble) ? 'vivienda' : 'otro';
+  // ITP: solo la vivienda es vivienda. Un garaje con su precio propio es un garaje SUELTO, que
+  // no es vivienda habitual nunca y en el País Vasco paga el 7 % y no el 4 % (hallazgo 833 de
+  // estimador-compraventa-inmueble: Andalucía, 25.000 €, joven, 875 € donde son 1.750 €).
+  const objetoITP: ObjetoTransmision = tipoInmueble === 'vivienda' ? 'vivienda' : 'otro';
   const perfil = p.perfilComprador ?? 'general';
   const esResidencial = tipoInmueble === 'vivienda' || tipoInmueble === 'garaje';
 
@@ -263,11 +269,16 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
     notaITP = 'IVA superreducido 4% para vivienda de protección oficial';
   } else if (p.tipoTransmision === 'obra_nueva') {
     tipoImpuesto = 'IVA (obra nueva)';
-    porcentajeImpuesto = esResidencial ? IVA_INMUEBLES_2025.obraNueva : IVA_INMUEBLES_2025.local;
+    // Cada rama con SU constante, como la app (hallazgos 674 y 770): hoy valen 10, 10 y 21
+    porcentajeImpuesto = tipoInmueble === 'vivienda'
+      ? IVA_INMUEBLES_2025.obraNueva
+      : esResidencial
+        ? IVA_INMUEBLES_2025.anejoVinculado
+        : PORCENTAJES_IVA.general;
     importeImpuesto = r(p.precioInmueble * porcentajeImpuesto / 100);
     notaITP = `IVA ${porcentajeImpuesto}% (${esResidencial ? 'residencial' : 'comercial/industrial'})`;
   } else {
-    const itp = itpSegunApps(p.precioInmueble, ccaa, perfil, { objeto, viviendaHabitual: objeto === 'vivienda' });
+    const itp = itpSegunApps(p.precioInmueble, ccaa, perfil, { objeto: objetoITP, viviendaHabitual: objetoITP === 'vivienda' });
     tipoImpuesto = 'ITP (segunda mano)';
     porcentajeImpuesto = itp.tipoEfectivo;
     importeImpuesto = itp.importe;
@@ -291,8 +302,8 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
   // Notaría y registro: los aranceles, como las apps (cabo C0209)
   const { notaria, registro, nota: notaHonorarios } = honorariosSegunApps(p.precioInmueble, ccaa);
 
-  // Gestoría: orientativo
-  const gestoria = 500;
+  // Gestoría: la que propone la app, que tiene un solo campo para cualquier tipo de inmueble
+  const gestoria = GESTORIA_POR_DEFECTO.vivienda;
 
   const totalGastos = r(importeImpuesto + ajd + notaria + registro + gestoria);
   const totalOperacion = r(p.precioInmueble + totalGastos);
@@ -318,42 +329,82 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
   let vendedor: GastosVendedor | null = null;
 
   if (p.precioCompraOriginal !== undefined || p.valorCatastralSuelo !== undefined) {
-    // Plusvalía municipal (IIVTNU)
+    // Plusvalía municipal (IIVTNU), con la función de la pestaña Vendedor de la app
     let plusvaliaMunicipal: number | null = null;
     let metodoPlusvalia = '';
+    const compra = p.precioCompraOriginal;
+    // Sin incremento no hay plusvalía (art. 104.5 TRLRHL), y para saberlo bastan los dos precios
+    const sinIncremento = compra !== undefined && compra > 0 && p.precioInmueble <= compra;
 
-    if (p.valorCatastralSuelo && p.aniosTenencia !== undefined) {
+    if (TERRITORIOS_IIVTNU_FORAL.includes(ccaa)) {
+      metodoPlusvalia = `No calculada: ${motivoPlusvaliaForal(ccaa)}.`;
+    } else if (sinIncremento || (p.valorCatastralSuelo && p.aniosTenencia !== undefined)) {
       // Años completos, tope en 20 y prorrateo por meses bajo el año: coeficienteIIVTNU
-      // (hallazgos 1559 y 1560, 24/09/2026).
-      const coefData = coeficienteIIVTNU(p.aniosTenencia);
+      // (hallazgos 1559 y 1560, 24/09/2026), que es la que usa calcularPlusvaliaMunicipal.
       const tipoMunicipal = Math.min(p.tipoMunicipalIIVTNU ?? PLUSVALIA_MUNICIPAL_META.tipoOrientativo, PLUSVALIA_MUNICIPAL_META.tipoMaximoLegal);
-      const baseImponibleIIVTNU = r(p.valorCatastralSuelo * coefData.coeficiente);
-      plusvaliaMunicipal = r(baseImponibleIIVTNU * tipoMunicipal / 100);
-      const tramo = coefData.prorrateado
-        ? `${coefData.label}, prorrateado por ${coefData.meses} meses${coefData.cotaSuperior ? ' (máximo: sin los meses exactos)' : ''}`
-        : coefData.label;
-      metodoPlusvalia = `Método objetivo: valor catastral suelo (${p.valorCatastralSuelo.toLocaleString('es-ES')} €) × coeficiente ${coefData.coeficiente.toLocaleString('es-ES', { maximumFractionDigits: 4 })} (${tramo}) × tipo ${tipoMunicipal}%`;
+      const pm = calcularPlusvaliaMunicipal({
+        valorCatastralSuelo: p.valorCatastralSuelo ?? 0,
+        aniosPropiedad: p.aniosTenencia ?? 0,
+        // Sin el precio de compra no se puede comprobar la no sujeción: va el objetivo
+        precioCompra: compra ?? 0,
+        precioVenta: p.precioInmueble,
+        ccaa,
+        tipoMaximo: tipoMunicipal,
+      });
+      plusvaliaMunicipal = r(pm.recomendado);
+      if (pm.exento && compra !== undefined) {
+        metodoPlusvalia = 'No sujeta: vendiendo por el precio de compra o por debajo no hay incremento de valor (art. 104.5 TRLRHL).';
+      } else {
+        const coefData = coeficienteIIVTNU(p.aniosTenencia ?? 0);
+        const tramo = coefData.prorrateado
+          ? `${coefData.label}, prorrateado por ${coefData.meses} meses${coefData.cotaSuperior ? ' (máximo: sin los meses exactos)' : ''}`
+          : coefData.label;
+        metodoPlusvalia = `Método objetivo: valor catastral suelo (${formatNumber(p.valorCatastralSuelo ?? 0, 2)} €) × coeficiente ${pm.coeficiente.toLocaleString('es-ES', { maximumFractionDigits: 4 })} (${tramo}) × tipo ${pct(tipoMunicipal)}`;
+        if (pm.bonificadaCiudad) metodoPlusvalia += `, con la bonificación del ${BONIFICACION_IIVTNU_CEUTA_MELILLA.porcentaje} % de la cuota de ${ccaaNombre} (art. 159.2 TRLRHL)`;
+        if (compra === undefined) metodoPlusvalia += '. Sin el precio de compra no se ha podido comprobar si hay incremento de valor: vendiendo por debajo de lo que costó no se paga (art. 104.5 TRLRHL)';
+        metodoPlusvalia += '.';
+      }
     }
 
-    // IRPF sobre ganancia patrimonial
+    // IRPF sobre la ganancia patrimonial: el motor único del art. 35 LIRPF de las apps
     let gananciaPatrimonial: number | null = null;
     let irpfGananciaPatrimonial: number | null = null;
     let exentoIRPF = false;
     let motivoExencion = '';
+    let avisoIRPF = '';
 
-    if (p.precioCompraOriginal !== undefined) {
-      gananciaPatrimonial = r(p.precioInmueble - p.precioCompraOriginal);
+    if (compra !== undefined) {
+      const g = calcularGananciaInmueble({
+        precioVenta: p.precioInmueble,
+        precioCompra: compra,
+        // La plusvalía minora el valor de transmisión (art. 35.1 LIRPF)
+        plusvaliaMunicipal: plusvaliaMunicipal ?? 0,
+        exentoPorEdad: !!(p.vendedorMayor65 && p.esViviendaHabitual),
+        // Ceuta y Melilla: la deducción del 60 % del art. 68.4 LIRPF
+        inmuebleEnCeutaMelilla: CIUDADES_CON_BONIFICACION.includes(ccaa),
+      });
+      gananciaPatrimonial = r(g.ganancia);
+      // Vende su vivienda habitual en el País Vasco o Navarra: reside allí y su IRPF es foral
+      const avisoForal = avisoIrpfForalResidente(ccaa, !!p.esViviendaHabitual);
 
-      if (p.vendedorMayor65 && p.esViviendaHabitual) {
-        exentoIRPF = true;
-        motivoExencion = 'Exención por mayor de 65 años con vivienda habitual (art. 33.4.b LIRPF)';
-        irpfGananciaPatrimonial = 0;
-      } else if (gananciaPatrimonial <= 0) {
+      if (g.esPerdida) {
         exentoIRPF = true;
         motivoExencion = 'No hay ganancia patrimonial (venta con pérdida o sin ganancia)';
         irpfGananciaPatrimonial = 0;
+      } else if (avisoForal) {
+        motivoExencion = `IRPF no calculado: ${avisoForal}.`;
+      } else if (g.exentaPorEdad > 0) {
+        exentoIRPF = true;
+        // La app no la aplica sin los tres años de residencia del art. 41 bis RIRPF
+        motivoExencion = `${g.motivoExencion}, siempre que haya sido su residencia habitual al menos tres años (art. 41 bis RIRPF).`;
+        irpfGananciaPatrimonial = 0;
       } else {
-        irpfGananciaPatrimonial = r(calcularIRPFGanancia(gananciaPatrimonial));
+        irpfGananciaPatrimonial = r(g.cuotaIRPF);
+        // Puede no residir allí (no vende su vivienda habitual): la cuota estatal, con el aviso
+        if (TERRITORIOS_IRPF_FORAL.includes(ccaa) && g.cuotaIRPF > 0) avisoIRPF = ` ${AVISO_IRPF_FORAL}`;
+        if (g.deduccionCeutaMelilla > 0) {
+          avisoIRPF = ` El IRPF lleva la deducción del ${DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA.porcentaje} % por ganancias de inmuebles situados en ${ccaaNombre} (art. 68.4 LIRPF): ${formatNumber(g.deduccionCeutaMelilla, 2)} € menos.`;
+        }
       }
     }
 
@@ -369,7 +420,7 @@ export function calcularCompraventa(p: ParametrosCompraventa): ResultadoComprave
       exentoIRPF,
       motivoExencion,
       totalGastosVendedor,
-      nota: `${PLUSVALIA_MUNICIPAL_META.nota} El IRPF sobre ganancia es orientativo — no incluye mejoras, gastos de compra deducibles ni coeficientes de actualización.`,
+      nota: `${PLUSVALIA_MUNICIPAL_META.nota} El IRPF sobre la ganancia es orientativo: resta la plusvalía municipal del valor de transmisión (art. 35.1 LIRPF), pero no los impuestos y gastos de aquella compra, las mejoras ni los gastos de la venta, que bajarían la ganancia.${avisoIRPF}`,
     };
   }
 

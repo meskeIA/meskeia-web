@@ -17,6 +17,7 @@ import {
   sumarLineasVisibles,
   TERRITORIOS_SIN_IVA,
   SALVEDAD_PLUSVALIA_NO_RESIDENTE,
+  GESTORIA_POR_DEFECTO,
 } from '@/data/itp-ccaa';
 import {
   IVA_INMUEBLES_2025,
@@ -73,7 +74,7 @@ const techoDe = (id: keyof typeof ITP_CCAA) => {
  * de abajo, y `page.tsx` la importa para su valor inicial: si el defecto de la app y el de
  * la horquilla se separaran, la cifra publicada dejaría de ser la que el motor suma.
  */
-export const GESTORIA_TIPICA = 300;
+export const GESTORIA_TIPICA = GESTORIA_POR_DEFECTO.vivienda;
 
 /**
  * Horquilla de la gestoría, en una sola boca.

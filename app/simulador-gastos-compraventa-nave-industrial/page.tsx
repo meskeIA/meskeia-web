@@ -54,6 +54,7 @@ import {
   deNombreCcaa,
   TERRITORIOS_SIN_RENUNCIA,
   AVISO_IRPF_FORAL,
+  GESTORIA_POR_DEFECTO,
 } from '@/data/itp-ccaa';
 import {
   IVA_INMUEBLES_2025,
@@ -193,7 +194,7 @@ export default function SimuladorNaveIndustrialPage() {
   const [precioVenta, setPrecioVenta] = useState('');
   const [ccaa, setCcaa] = useState<ComunidadAutonoma>('madrid');
   const [tipoTransmision, setTipoTransmision] = useState<TipoTransmision>('segunda-mano');
-  const [gastosGestoria, setGastosGestoria] = useState('500');
+  const [gastosGestoria, setGastosGestoria] = useState(String(GESTORIA_POR_DEFECTO.nave));
 
   /**
    * Un precio ESCRITO pero ilegible no es un precio vacío (grupo B del testigo de familia,

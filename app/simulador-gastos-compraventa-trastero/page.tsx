@@ -87,7 +87,9 @@ import {
   preguntaEscriturar,
   respuestaEscriturar, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL,
   TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION,
-  SALVEDAD_PLUSVALIA_NO_RESIDENTE } from '@/data/itp-ccaa';
+  SALVEDAD_PLUSVALIA_NO_RESIDENTE,
+  GESTORIA_POR_DEFECTO,
+} from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
@@ -488,7 +490,7 @@ export default function SimuladorTrasteroCompraventaPage() {
   const [tipoTransmision, setTipoTransmision] = useState<TipoTransmision>('segunda-mano');
   const [modalidadTrastero, setModalidadTrastero] = useState<ModalidadTrastero>('vinculado');
   const [perfilComprador, setPerfilComprador] = useState<PerfilComprador>('general');
-  const [gastosGestoria, setGastosGestoria] = useState('300');
+  const [gastosGestoria, setGastosGestoria] = useState(String(GESTORIA_POR_DEFECTO.trastero));
 
   // Datos del vendedor (para plusvalía)
   const [precioCompraOriginal, setPrecioCompraOriginal] = useState('');

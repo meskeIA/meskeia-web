@@ -47,6 +47,7 @@ import {
   nombreEnFrase,
   deNombreCcaa,
   fraseRetencionIrnrComprador,
+  GESTORIA_POR_DEFECTO,
 } from '@/data/itp-ccaa';
 import { FISCAL_INMUEBLES_META, FISCAL_IVA_META, PORCENTAJES_IVA } from '@/data/fiscal';
 import {
@@ -167,7 +168,7 @@ export default function SimuladorSolarPage() {
   const [precioVenta, setPrecioVenta] = useState('');
   const [ccaa, setCcaa] = useState<ComunidadAutonoma>('madrid');
   const [tipoVendedor, setTipoVendedor] = useState<TipoVendedor>('particular');
-  const [gastosGestoria, setGastosGestoria] = useState('500');
+  const [gastosGestoria, setGastosGestoria] = useState(String(GESTORIA_POR_DEFECTO.solar));
 
   const esEmpresario = tipoVendedor === 'empresario';
 
