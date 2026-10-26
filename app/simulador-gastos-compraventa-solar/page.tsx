@@ -49,7 +49,7 @@ import {
   fraseRetencionIrnrComprador,
   GESTORIA_POR_DEFECTO,
 } from '@/data/itp-ccaa';
-import { FISCAL_INMUEBLES_META, FISCAL_IVA_META, PORCENTAJES_IVA } from '@/data/fiscal';
+import { FISCAL_INMUEBLES_META, FISCAL_IVA_META, PORCENTAJES_IVA, RETENCION_IRNR_COMPRADOR } from '@/data/fiscal';
 import {
   PREGUNTA_IVA_O_ITP,
   RESPUESTA_IVA_O_ITP,
@@ -390,6 +390,14 @@ export default function SimuladorSolarPage() {
         fuente={REGISTRO_CONCEPTOS.baseNormativa}
         verificado={REGISTRO_CONCEPTOS.verificado}
         urlOficial={REGISTRO_CONCEPTOS.urlOficial}
+      />
+      {/* La retención del 3 % del no residente, que la nota «Recuerda» calcula desde 9e67838d: su
+          módulo publica un dato con fuente y fecha propias (hallazgo 3523, la forma «a» de arriba). */}
+      <DataReference
+        normativa="Retención del comprador a un vendedor no residente"
+        fuente={RETENCION_IRNR_COMPRADOR.fuente}
+        verificado={RETENCION_IRNR_COMPRADOR.verificado}
+        urlOficial={RETENCION_IRNR_COMPRADOR.urlOficial}
       />
 
       {/* Aviso clave: quién vende decide el impuesto */}

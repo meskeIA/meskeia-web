@@ -4991,7 +4991,6 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
 // Los dos hallazgos van con `test.fail()` salvo con `VER_HUECOS=1`, que enseña el fallo.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const I26_VER_HUECOS = Boolean(process.env.VER_HUECOS);
 
 test.describe('Inspector 26/10/2026 — Galicia, Cataluña a 2 M, la retención del 3 % y la página traducida entera', () => {
   test.describe.configure({ timeout: 240_000 });
@@ -5458,7 +5457,8 @@ test.describe('Inspector 26/10/2026 — Galicia, Cataluña a 2 M, la retención 
   });
 
   /**
-   * [26/10-b] (contenido, bajo) — HALLAZGO ABIERTO hoy (lo deja 9e67838d). La página CALCULA desde hoy un dato
+   * [26/10-b] (contenido, bajo; hallazgo 3523) — REPARADO el 26/10/2026: un quinto sello con el TRLIRNR, leído
+   * de RETENCION_IRNR_COMPRADOR. La página CALCULA desde hoy un dato
    * normativo con fuente y fecha propias —RETENCION_IRNR_COMPRADOR: «TRLIRNR (RD Legislativo 5/2004), art.
    * 25.2», verificado el 26/10/2026— y ninguno de sus cuatro sellos «Datos de referencia» lo nombra: ITP/AJD
    * (RDLeg 1/1993, 17/06/2026), IVA (Ley 37/1992), arancel notarial y arancel registral. Es la forma «a» de la
@@ -5468,7 +5468,6 @@ test.describe('Inspector 26/10/2026 — Galicia, Cataluña a 2 M, la retención 
    *   Madrid, 95.000 € → la nota da «(2850,00 €)» · esperado: un sello con el TRLIRNR · obtenido: ninguno.
    */
   test('[26/10-b] el TRLIRNR, cuyo 3 % calcula la nota «Recuerda», tiene su sello de «Datos de referencia»', async ({ page }) => {
-    test.fail(!I26_VER_HUECOS, 'Hallazgo [26/10-b] abierto: ningún sello de datos nombra el TRLIRNR');
     await abrir26(page, 'madrid', 'particular', '95000');
     expect(await recuerda26(page)).toContain('(2850,00 €)');
     const sellos = (await page.locator('[role="note"]', { hasText: 'Datos de referencia' }).allTextContents()).map(t26);
