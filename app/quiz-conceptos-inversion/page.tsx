@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { enfocarALaVista } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import {
   MeskeiaLogo,
   Footer,
@@ -410,7 +411,12 @@ export default function QuizConceptosInversionPage() {
     'valoracion':          { correctas: 0, total: 0 },
   });
 
+  // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
+  // (cabo C0082, lib/useGuardaRafaga.ts)
+  const marcarCambioPantalla = useGuardaRafaga();
+
   const iniciar = useCallback(() => {
+    marcarCambioPantalla();
     const pool = modo === 'examen'
       ? mezclar(PREGUNTAS)
       : mezclar(PREGUNTAS.filter(p => p.categoria === categoriaSeleccionada));
@@ -426,7 +432,7 @@ export default function QuizConceptosInversionPage() {
       'valoracion':          { correctas: 0, total: 0 },
     });
     setEstado('jugando');
-  }, [modo, categoriaSeleccionada]);
+  }, [modo, categoriaSeleccionada, marcarCambioPantalla]);
 
   const responder = useCallback((idx: number) => {
     if (estado !== 'jugando') return;
@@ -445,6 +451,7 @@ export default function QuizConceptosInversionPage() {
   }, [estado, preguntas, indice]);
 
   const siguiente = useCallback(() => {
+    marcarCambioPantalla();
     if (indice + 1 >= preguntas.length) {
       setEstado('fin');
     } else {
@@ -452,9 +459,12 @@ export default function QuizConceptosInversionPage() {
       setRespuestaElegida(null);
       setEstado('jugando');
     }
-  }, [indice, preguntas.length]);
+  }, [indice, preguntas.length, marcarCambioPantalla]);
 
-  const reiniciar = () => setEstado('inicio');
+  const reiniciar = () => {
+    marcarCambioPantalla();
+    setEstado('inicio');
+  };
 
   /**
    * Foco (familia de los quizzes, cabo C0018). La opción elegida se deshabilita y «Empezar»,

@@ -11,6 +11,7 @@ import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import styles from './QuizTablaPeriodica.module.css';
 import { margenBarraLogo } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 
 /**
@@ -97,7 +98,12 @@ export default function QuizTablaPeriodicaPage() {
     }
   }, [fase, indice, haRespondido]);
 
+  // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
+  // (cabo C0082, lib/useGuardaRafaga.ts)
+  const marcarCambioPantalla = useGuardaRafaga();
+
   function iniciarQuiz() {
+    marcarCambioPantalla();
     setPreguntas(mezclarArray(BANCO_PREGUNTAS).slice(0, TOTAL_PREGUNTAS));
     setIndice(0);
     setSeleccionada(null);
@@ -112,6 +118,7 @@ export default function QuizTablaPeriodicaPage() {
   }
 
   function siguiente() {
+    marcarCambioPantalla();
     if (indice + 1 >= TOTAL_PREGUNTAS) {
       setFase('resultado');
     } else {

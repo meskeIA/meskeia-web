@@ -3,6 +3,7 @@
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { enfocarALaVista } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import {
   MeskeiaLogo,
   Footer,
@@ -202,8 +203,13 @@ function QuizPorFases() {
 
   const plantaActual = juego.preguntas[juego.indiceActual] ?? null;
 
+  // Doble toque en el modo, «Siguiente» o «Ver resultados»: el 2.º no cae en la pantalla nueva
+  // (cabo C0082, lib/useGuardaRafaga.ts)
+  const marcarCambioPantalla = useGuardaRafaga();
+
   // --- Iniciar quiz ---
   const iniciarQuiz = useCallback((modo: ModoJuego) => {
+    marcarCambioPantalla();
     const preguntas = seleccionarPreguntas(modo);
     setJuego({
       estado: 'jugando',
@@ -214,7 +220,7 @@ function QuizPorFases() {
       respuestasCorrectas: 0,
       errores: [],
     });
-  }, []);
+  }, [marcarCambioPantalla]);
 
   // --- Seleccionar respuesta ---
   const seleccionarRespuesta = useCallback((respuesta: GrupoPlanta) => {
@@ -233,6 +239,7 @@ function QuizPorFases() {
 
   // --- Siguiente pregunta ---
   const siguientePregunta = useCallback(() => {
+    marcarCambioPantalla();
     setJuego((prev) => {
       const esUltima = prev.indiceActual >= prev.preguntas.length - 1;
       if (esUltima) {
@@ -245,12 +252,13 @@ function QuizPorFases() {
         respuestaSeleccionada: null,
       };
     });
-  }, []);
+  }, [marcarCambioPantalla]);
 
   // --- Reiniciar ---
   const reiniciar = useCallback(() => {
+    marcarCambioPantalla();
     setJuego(ESTADO_INICIAL);
-  }, []);
+  }, [marcarCambioPantalla]);
 
   /**
    * Foco (familia de los quizzes, cabo C0018). El modo elegido, la opción, «Siguiente» y «Ver

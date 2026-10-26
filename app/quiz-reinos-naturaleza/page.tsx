@@ -3,6 +3,7 @@
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { enfocarALaVista } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import styles from './QuizReinosNaturaleza.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -87,7 +88,12 @@ export default function QuizReinosNaturalezaPage() {
   const totalPreguntas = preguntas.length;
   const esUltima = preguntaActual === totalPreguntas - 1;
 
+  // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
+  // (cabo C0082, lib/useGuardaRafaga.ts)
+  const marcarCambioPantalla = useGuardaRafaga();
+
   const iniciarQuiz = useCallback(() => {
+    marcarCambioPantalla();
     const nuevasPreguntas = generarPreguntas(nivel, numPreguntas);
     setPreguntas(nuevasPreguntas);
     setPreguntaActual(0);
@@ -95,7 +101,7 @@ export default function QuizReinosNaturalezaPage() {
     setCorrectas(0);
     setTiempoInicio(Date.now());
     setPantalla('quiz');
-  }, [nivel, numPreguntas]);
+  }, [nivel, numPreguntas, marcarCambioPantalla]);
 
   const responder = useCallback((opcion: string) => {
     if (seleccionada !== null) return;
@@ -106,6 +112,7 @@ export default function QuizReinosNaturalezaPage() {
   }, [seleccionada, pregunta]);
 
   const siguiente = useCallback(() => {
+    marcarCambioPantalla();
     if (esUltima) {
       setTiempoTotal(Math.round((Date.now() - tiempoInicio) / 1000));
       setPantalla('resultado');
@@ -113,10 +120,13 @@ export default function QuizReinosNaturalezaPage() {
       setPreguntaActual(prev => prev + 1);
       setSeleccionada(null);
     }
-  }, [esUltima, tiempoInicio]);
+  }, [esUltima, tiempoInicio, marcarCambioPantalla]);
 
   const reiniciar = useCallback(() => { iniciarQuiz(); }, [iniciarQuiz]);
-  const volverConfig = useCallback(() => { setPantalla('config'); }, []);
+  const volverConfig = useCallback(() => {
+    marcarCambioPantalla();
+    setPantalla('config');
+  }, [marcarCambioPantalla]);
 
   /**
    * Foco (familia de los quizzes, cabo C0018). La opción elegida se deshabilita y «Empezar»,

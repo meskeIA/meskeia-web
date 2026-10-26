@@ -103,7 +103,9 @@ export const FAMILIAS = [
     testigo: 'tests/familias/quizzes.spec.ts',
     invariante:
       'Tras «Siguiente», el foco va al enunciado de la pregunta nueva (tabindex="-1", no un ' +
-      'botón), nunca a <body>. Las opciones de respuesta son acciones: sin aria-pressed.',
+      'botón), nunca a <body>. Las opciones de respuesta son acciones: sin aria-pressed. Un ' +
+      'doble toque en «Empezar», «Siguiente» o «Ver resultado» es una sola intención: el 2.º no ' +
+      'contesta la pregunta nueva, no saca de la app ni se come la nota (useGuardaRafaga).',
     referencia: 'quiz-literatura-universal',
     slugs: [
       'quiz-literatura-universal',

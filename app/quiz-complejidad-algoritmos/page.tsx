@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { enfocarALaVista } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -344,7 +345,12 @@ export default function QuizComplejidadAlgoritmosPage() {
   const totalAciertos = aciertos.filter(Boolean).length;
   const pct = preguntas.length > 0 ? Math.round((totalAciertos / preguntas.length) * 100) : 0;
 
+  // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
+  // (cabo C0082, lib/useGuardaRafaga.ts)
+  const marcarCambioPantalla = useGuardaRafaga();
+
   function iniciarQuiz() {
+    marcarCambioPantalla();
     let seleccionadas: PreguntaAlgo[];
     if (modo === 'examen') {
       seleccionadas = [...BANCO_PREGUNTAS];
@@ -381,6 +387,7 @@ export default function QuizComplejidadAlgoritmosPage() {
   }
 
   function siguiente() {
+    marcarCambioPantalla();
     if (indice + 1 >= preguntas.length) {
       setEstado('fin');
     } else {
@@ -391,6 +398,7 @@ export default function QuizComplejidadAlgoritmosPage() {
   }
 
   function reiniciar() {
+    marcarCambioPantalla();
     setEstado('inicio');
     setPreguntas([]);
     setIndice(0);

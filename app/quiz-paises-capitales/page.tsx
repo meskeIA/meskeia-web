@@ -10,6 +10,7 @@ import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { countries, Country } from '@/data/countries';
 import EducationalSection from '@/components/EducationalSection';
 import { formatPercentage, margenBarraLogo } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 type ModoJuego = 'capital' | 'pais' | 'bandera';
 type Dificultad = 'facil' | 'normal' | 'dificil' | 'experto' | 'maestro';
@@ -215,7 +216,12 @@ export default function QuizPaisesCapitalesPage() {
     }
   }, [pantalla, preguntaActual, seleccionada]);
 
+  // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
+  // (cabo C0082, lib/useGuardaRafaga.ts)
+  const marcarCambioPantalla = useGuardaRafaga();
+
   const iniciarQuiz = useCallback(() => {
+    marcarCambioPantalla();
     const nuevasPreguntas = generarPreguntas(modo, dificultad);
     setPreguntas(nuevasPreguntas);
     setPreguntaActual(0);
@@ -223,7 +229,7 @@ export default function QuizPaisesCapitalesPage() {
     setCorrectas(0);
     setTiempoInicio(Date.now());
     setPantalla('quiz');
-  }, [modo, dificultad]);
+  }, [modo, dificultad, marcarCambioPantalla]);
 
   const responder = useCallback((opcion: string) => {
     if (seleccionada !== null) return;
@@ -234,6 +240,7 @@ export default function QuizPaisesCapitalesPage() {
   }, [seleccionada, pregunta]);
 
   const siguiente = useCallback(() => {
+    marcarCambioPantalla();
     if (esUltima) {
       setTiempoTotal(Math.round((Date.now() - tiempoInicio) / 1000));
       setPantalla('resultado');
@@ -241,16 +248,17 @@ export default function QuizPaisesCapitalesPage() {
       setPreguntaActual(prev => prev + 1);
       setSeleccionada(null);
     }
-  }, [esUltima, tiempoInicio]);
+  }, [esUltima, tiempoInicio, marcarCambioPantalla]);
 
   const reiniciar = useCallback(() => {
     iniciarQuiz();
   }, [iniciarQuiz]);
 
   const volverConfig = useCallback(() => {
+    marcarCambioPantalla();
     vieneDelResultado.current = true;
     setPantalla('config');
-  }, []);
+  }, [marcarCambioPantalla]);
 
   const puntuacion = useMemo(
     () => calcularPuntuacion(correctas, totalPreguntas),

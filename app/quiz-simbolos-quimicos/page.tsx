@@ -5,6 +5,7 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import styles from './QuizSimbolosQuimicos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, ShareCard, LegalNotice, RelatedApps } from '@/components';
 import { formatPercentage, margenBarraLogo } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import { ELEMENTOS, TOTAL_ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
 
 type Modo = 'simbolo-nombre' | 'nombre-simbolo';
@@ -139,7 +140,12 @@ export default function QuizSimbolosQuimicosPage() {
     }
   }, [fase, indice]);
 
+  // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
+  // (cabo C0082, lib/useGuardaRafaga.ts)
+  const marcarCambioPantalla = useGuardaRafaga();
+
   const iniciarQuiz = useCallback(() => {
+    marcarCambioPantalla();
     const qs = generarPreguntas(modo, dificultad);
     setPreguntas(qs);
     setIndice(0);
@@ -149,7 +155,7 @@ export default function QuizSimbolosQuimicosPage() {
     setRachMax(0);
     setErroresDetalle([]);
     setFase('jugando');
-  }, [modo, dificultad]);
+  }, [modo, dificultad, marcarCambioPantalla]);
 
   const responder = useCallback((opcion: string) => {
     if (!preguntaActual || seleccionada !== null) return;
@@ -178,6 +184,7 @@ export default function QuizSimbolosQuimicosPage() {
   }, [preguntaActual, seleccionada]);
 
   const siguiente = useCallback(() => {
+    marcarCambioPantalla();
     const siguienteIndice = indice + 1;
     if (siguienteIndice >= preguntas.length) {
       setFase('fin');
@@ -186,7 +193,7 @@ export default function QuizSimbolosQuimicosPage() {
       setSeleccionada(null);
       setFase('jugando');
     }
-  }, [indice, preguntas.length]);
+  }, [indice, preguntas.length, marcarCambioPantalla]);
 
   // «50 %» con espacio duro (formato español, CLAUDE.md §2; hallazgo 1816)
   const porcentaje = formatPercentage(preguntas.length > 0 ? aciertos / preguntas.length : 0, 0);
@@ -421,6 +428,7 @@ export default function QuizSimbolosQuimicosPage() {
             <button type="button"
               className={styles.btnSecundario}
               onClick={() => {
+                marcarCambioPantalla();
                 vieneDelResultado.current = true;
                 setFase('inicio');
               }}

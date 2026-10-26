@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatPercentage, margenBarraLogo } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import {
   PREGUNTAS_HISTORIA,
   PREGUNTAS_FACIL,
@@ -145,7 +146,12 @@ export default function QuizHistoriaEspanaPage() {
     }
   }, [fase, indice]);
 
+  // Doble toque en «Comenzar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
+  // (cabo C0082, lib/useGuardaRafaga.ts)
+  const marcarCambioPantalla = useGuardaRafaga();
+
   const iniciarQuiz = useCallback(() => {
+    marcarCambioPantalla();
     const seleccionadas = seleccionarPreguntas(dificultad);
     setPreguntas(seleccionadas);
     setIndice(0);
@@ -154,7 +160,7 @@ export default function QuizHistoriaEspanaPage() {
     setAciertos(0);
     setErrores([]);
     setFase('jugando');
-  }, [dificultad]);
+  }, [dificultad, marcarCambioPantalla]);
 
   const responder = useCallback((opcion: string) => {
     if (fase !== 'jugando' || !preguntaActual) return;
@@ -169,6 +175,7 @@ export default function QuizHistoriaEspanaPage() {
   }, [fase, preguntaActual]);
 
   const siguiente = useCallback(() => {
+    marcarCambioPantalla();
     const siguienteIndice = indice + 1;
     if (siguienteIndice >= preguntas.length) {
       setFase('fin');
@@ -178,16 +185,17 @@ export default function QuizHistoriaEspanaPage() {
       setSeleccionada(null);
       setFase('jugando');
     }
-  }, [indice, preguntas]);
+  }, [indice, preguntas, marcarCambioPantalla]);
 
   const reiniciar = useCallback(() => {
+    marcarCambioPantalla();
     setFase('inicio');
     setPreguntas([]);
     setIndice(0);
     setSeleccionada(null);
     setAciertos(0);
     setErrores([]);
-  }, []);
+  }, [marcarCambioPantalla]);
 
   const porcentaje = useMemo(() => {
     if (preguntas.length === 0) return 0;
